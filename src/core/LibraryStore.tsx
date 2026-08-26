@@ -102,132 +102,67 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
       snapshot: snapshotWorkflow(normalized),
     };
     return appendAudit(
-      {
-        ...s,
-        sterilizationWorkflow: normalized,
-        workflowVersions: [versionEntry, ...(s.workflowVersions || [])].slice(0, 100),
-      },
-      {
-        entityType: 'WORKFLOW',
-        entityId: normalized.profileName,
-        action: 'UPDATE',
-        by,
-        before: snapshotWorkflow(s.sterilizationWorkflow),
-        after: snapshotWorkflow(normalized),
-        reason,
-      },
+      {...s, sterilizationWorkflow: normalized, workflowVersions: [versionEntry, ...(s.workflowVersions || [])].slice(0, 100)},
+      {entityType: 'WORKFLOW', entityId: normalized.profileName, action: 'UPDATE', by, before: snapshotWorkflow(s.sterilizationWorkflow), after: snapshotWorkflow(normalized), reason},
     );
   };
-  const addItem = (key: LibraryKey, item: Omit<LibraryItem, 'id'>) =>
-    commit(s => {
-      const created = {...item, id: `${key}-${Date.now()}`};
-      return appendAudit(
-        {...s, [key]: [...s[key], created]},
-        {entityType: 'LIBRARY', entityId: `${key}:${created.id}`, action: 'CREATE', by: 'Admin', after: created},
-      );
-    });
-  const updateItem = (key: LibraryKey, id: string, item: Partial<LibraryItem>) =>
-    commit(s => {
-      const before = s[key].find(x => x.id === id);
-      const after = before ? {...before, ...item} : undefined;
-      return appendAudit(
-        {...s, [key]: s[key].map(x => (x.id === id ? {...x, ...item} : x))},
-        {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'UPDATE', by: 'Admin', before, after},
-      );
-    });
-  const removeItem = (key: LibraryKey, id: string) =>
-    commit(s => {
-      const before = s[key].find(x => x.id === id);
-      return appendAudit(
-        {...s, [key]: s[key].filter(x => x.id !== id)},
-        {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'DELETE', by: 'Admin', before},
-      );
-    });
-  const addOrganization = (organization: Omit<Organization, 'id'>) =>
-    commit(s => {
-      const created = {...organization, id: `org-${Date.now()}`};
-      return appendAudit(
-        {...s, organizations: [...s.organizations, created]},
-        {entityType: 'ORGANIZATION', entityId: created.id, action: 'CREATE', by: 'Admin', after: created},
-      );
-    });
-  const updateOrganization = (id: string, patch: Partial<Organization>) =>
-    commit(s => {
-      const before = s.organizations.find(org => org.id === id);
-      const after = before ? {...before, ...patch} : undefined;
-      return appendAudit(
-        {...s, organizations: s.organizations.map(org => (org.id === id ? {...org, ...patch} : org))},
-        {entityType: 'ORGANIZATION', entityId: id, action: 'UPDATE', by: 'Admin', before, after},
-      );
-    });
-  const removeOrganization = (id: string) =>
-    commit(s => {
-      const before = s.organizations.find(org => org.id === id);
-      const usersForOrganization = s.users.filter(user => user.organizationId === id);
-      if (usersForOrganization.length) return s;
-      return appendAudit(
-        {...s, organizations: s.organizations.filter(org => org.id !== id)},
-        {entityType: 'ORGANIZATION', entityId: id, action: 'DELETE', by: 'Admin', before},
-      );
-    });
-  const addUser = (user: Omit<AdminUser, 'id'>) =>
-    commit(s => {
-      const created = {...user, id: `user-${Date.now()}`};
-      return appendAudit(
-        {...s, users: [...s.users, created]},
-        {entityType: 'USER', entityId: created.id, action: 'CREATE', by: 'Admin', after: created},
-      );
-    });
-  const updateUser = (id: string, patch: Partial<AdminUser>) =>
-    commit(s => {
-      const before = s.users.find(u => u.id === id);
-      const after = before ? {...before, ...patch} : undefined;
-      return appendAudit(
-        {...s, users: s.users.map(u => (u.id === id ? {...u, ...patch} : u))},
-        {entityType: 'USER', entityId: id, action: 'UPDATE', by: 'Admin', before, after},
-      );
-    });
-  const removeUser = (id: string) =>
-    commit(s => {
-      const before = s.users.find(u => u.id === id);
-      return appendAudit(
-        {...s, users: s.users.filter(u => u.id !== id)},
-        {entityType: 'USER', entityId: id, action: 'DELETE', by: 'Admin', before},
-      );
-    });
+  const addItem = (key: LibraryKey, item: Omit<LibraryItem, 'id'>) => commit(s => {
+    const created = {...item, id: `${key}-${Date.now()}`};
+    return appendAudit({...s, [key]: [...s[key], created]}, {entityType: 'LIBRARY', entityId: `${key}:${created.id}`, action: 'CREATE', by: 'Admin', after: created});
+  });
+  const updateItem = (key: LibraryKey, id: string, item: Partial<LibraryItem>) => commit(s => {
+    const before = s[key].find(x => x.id === id);
+    const after = before ? {...before, ...item} : undefined;
+    return appendAudit({...s, [key]: s[key].map(x => (x.id === id ? {...x, ...item} : x))}, {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'UPDATE', by: 'Admin', before, after});
+  });
+  const removeItem = (key: LibraryKey, id: string) => commit(s => {
+    const before = s[key].find(x => x.id === id);
+    return appendAudit({...s, [key]: s[key].filter(x => x.id !== id)}, {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'DELETE', by: 'Admin', before});
+  });
+  const addOrganization = (organization: Omit<Organization, 'id'>) => commit(s => {
+    const created = {...organization, id: `org-${Date.now()}`};
+    return appendAudit({...s, organizations: [...s.organizations, created]}, {entityType: 'ORGANIZATION', entityId: created.id, action: 'CREATE', by: 'Admin', after: created});
+  });
+  const updateOrganization = (id: string, patch: Partial<Organization>) => commit(s => {
+    const before = s.organizations.find(org => org.id === id);
+    const after = before ? {...before, ...patch} : undefined;
+    return appendAudit({...s, organizations: s.organizations.map(org => (org.id === id ? {...org, ...patch} : org))}, {entityType: 'ORGANIZATION', entityId: id, action: 'UPDATE', by: 'Admin', before, after});
+  });
+  const removeOrganization = (id: string) => commit(s => {
+    const before = s.organizations.find(org => org.id === id);
+    const usersForOrganization = s.users.filter(user => user.organizationId === id);
+    if (usersForOrganization.length) return s;
+    return appendAudit({...s, organizations: s.organizations.filter(org => org.id !== id)}, {entityType: 'ORGANIZATION', entityId: id, action: 'DELETE', by: 'Admin', before});
+  });
+  const addUser = (user: Omit<AdminUser, 'id'>) => commit(s => {
+    const created = {...user, id: `user-${Date.now()}`};
+    return appendAudit({...s, users: [...s.users, created]}, {entityType: 'USER', entityId: created.id, action: 'CREATE', by: 'Admin', after: created});
+  });
+  const updateUser = (id: string, patch: Partial<AdminUser>) => commit(s => {
+    const before = s.users.find(u => u.id === id);
+    const after = before ? {...before, ...patch} : undefined;
+    return appendAudit({...s, users: s.users.map(u => (u.id === id ? {...u, ...patch} : u))}, {entityType: 'USER', entityId: id, action: 'UPDATE', by: 'Admin', before, after});
+  });
+  const removeUser = (id: string) => commit(s => {
+    const before = s.users.find(u => u.id === id);
+    return appendAudit({...s, users: s.users.filter(u => u.id !== id)}, {entityType: 'USER', entityId: id, action: 'DELETE', by: 'Admin', before});
+  });
   const updateRolePermissions = (role: UserRole, permissions: Permission[], actor: string) =>
     commit(s => {
       const safe = sanitizeRolePermissions(role, permissions);
-      return appendAudit(
-        {
-          ...s,
-          rolePermissions: {...s.rolePermissions, [role]: safe},
-          rolePermissionAudit: [
-            {id: `rpa-${Date.now()}`, role, at: new Date().toISOString(), by: actor, permissions: [...safe]},
-            ...(s.rolePermissionAudit || []),
-          ].slice(0, 100),
-        },
-        {
-          entityType: 'ROLE_PERMISSIONS',
-          entityId: role,
-          action: 'UPDATE',
-          by: actor,
-          before: s.rolePermissions[role],
-          after: [...safe],
-        },
-      );
+      return appendAudit({
+        ...s,
+        rolePermissions: {...s.rolePermissions, [role]: safe},
+        rolePermissionAudit: [
+          {id: `rpa-${Date.now()}`, role, at: new Date().toISOString(), by: actor, permissions: [...safe]},
+          ...(s.rolePermissionAudit || []),
+        ].slice(0, 100),
+      }, {entityType: 'ROLE_PERMISSIONS', entityId: role, action: 'UPDATE', by: actor, before: s.rolePermissions[role], after: [...safe]});
     });
   const resetRolePermissions = (role: UserRole, actor: string) =>
     updateRolePermissions(role, [...defaultRolePermissions[role]], actor);
   const updateSterilizationWorkflow = (patch: Partial<SterilizationWorkflowConfig>, actor?: string, reason?: string) =>
-    commit(s =>
-      commitWorkflow(
-        s,
-        {...s.sterilizationWorkflow, ...patch, version: s.sterilizationWorkflow.version + 1},
-        actor,
-        reason,
-      ),
-    );
+    commit(s => commitWorkflow(s, {...s.sterilizationWorkflow, ...patch, version: s.sterilizationWorkflow.version + 1}, actor, reason));
   const setWorkflowStageEnabled = (id: WorkflowStageId, enabled: boolean, actor?: string, reason?: string) =>
     commit(s => {
       const current = s.sterilizationWorkflow.stages.find(stage => stage.id === id);
@@ -235,40 +170,19 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
       const next = {
         ...s.sterilizationWorkflow,
         version: s.sterilizationWorkflow.version + 1,
-        stages: s.sterilizationWorkflow.stages.map(stage => (stage.id === id ? {...stage, enabled} : stage)),
+        stages: s.sterilizationWorkflow.stages.map(stage => stage.id === id ? {...stage, enabled} : stage),
       };
-      return commitWorkflow(
-        s,
-        next,
-        actor,
-        reason || `${current.labelEl}: ${enabled ? 'ενεργοποίηση' : 'απενεργοποίηση'}`,
-      );
+      return commitWorkflow(s, next, actor, reason || `${current.labelEl}: ${enabled ? 'ενεργοποίηση' : 'απενεργοποίηση'}`);
     });
   const resetSterilizationWorkflow = (actor?: string, reason?: string) =>
     commit(s => {
       const base = repository.getInitialData().sterilizationWorkflow;
-      return commitWorkflow(
-        s,
-        {...base, version: s.sterilizationWorkflow.version + 1},
-        actor,
-        reason || 'Επαναφορά προεπιλεγμένης ροής',
-      );
+      return commitWorkflow(s, {...base, version: s.sterilizationWorkflow.version + 1}, actor, reason || 'Επαναφορά προεπιλεγμένης ροής');
     });
   const updateSystemSettings = (patch: Partial<LibraryState['systemSettings']>, actor?: string, reason?: string) =>
     commit(s => {
       const after = {...s.systemSettings, ...patch};
-      return appendAudit(
-        {...s, systemSettings: after},
-        {
-          entityType: 'SYSTEM_SETTING',
-          entityId: 'systemSettings',
-          action: 'UPDATE',
-          by: actorName(actor),
-          before: s.systemSettings,
-          after,
-          reason,
-        },
-      );
+      return appendAudit({...s, systemSettings: after}, {entityType: 'SYSTEM_SETTING', entityId: 'systemSettings', action: 'UPDATE', by: actorName(actor), before: s.systemSettings, after, reason});
     });
   const resetData = () => {
     localStorage.removeItem(repository.storageKey);

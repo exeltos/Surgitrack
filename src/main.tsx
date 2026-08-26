@@ -5,16 +5,17 @@ import App from './app/App';
 import {SurgiProvider} from './store/SurgiStore';
 import {AppPreferencesProvider} from './core/AppPreferences';
 import {LibraryStoreProvider} from './core/LibraryStore';
-import {SURGITRACK_DATA_MODE} from './config/dataMode';
+import {getRuntimeDataMode} from './config/dataMode';
 import './styles/global.css';
 const root = document.getElementById('root');
+const runtimeDataMode = getRuntimeDataMode();
 if (!root) throw new Error('SurgiTrack: root element was not found.');
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <HashRouter>
       <AppPreferencesProvider>
-        <LibraryStoreProvider dataMode={SURGITRACK_DATA_MODE}>
-          <SurgiProvider dataMode={SURGITRACK_DATA_MODE}>
+        <LibraryStoreProvider dataMode={runtimeDataMode}>
+          <SurgiProvider dataMode={runtimeDataMode}>
             <App />
           </SurgiProvider>
         </LibraryStoreProvider>

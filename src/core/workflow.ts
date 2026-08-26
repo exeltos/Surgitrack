@@ -167,6 +167,7 @@ export function reprocessState(stages: readonly WorkflowStageConfig[]): string {
   return next ? workflowStageState[next.id] : 'IN_PREPARATION';
 }
 
+
 export type SterilizationWorkflowVersion = {
   id: string;
   version: number;

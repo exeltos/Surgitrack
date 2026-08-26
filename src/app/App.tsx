@@ -22,6 +22,7 @@ import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser, UserRole} from '../store/types';
+import {setRuntimeDataMode} from '../config/dataMode';
 
 function RoleHome() {
   const {role} = useSurgi();
@@ -54,9 +55,17 @@ export default function App() {
         : `See you soon, ${currentUser.name.split(' ')[0]}.`;
     if (!window.confirm(lang === 'el' ? 'Θέλετε να αποσυνδεθείτε από το SurgiTrack;' : 'Sign out of SurgiTrack?'))
       return;
+    const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
     sessionStorage.removeItem('surgitrack-auth');
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
+    sessionStorage.removeItem('surgitrack-active-organization');
+    setRuntimeDataMode('PRODUCTION');
+    if (wasDemo) {
+      window.location.hash = '#/';
+      window.location.reload();
+      return;
+    }
     setGoodbye(msg);
     setAuthenticated(false);
     navigate('/', {replace: true});

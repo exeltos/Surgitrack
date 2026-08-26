@@ -1515,18 +1515,15 @@ export default function SterilizationPage() {
           <details className="released-loads" open>
             <summary>Ενεργές ανακλήσεις · {recallCases.filter(item => item.status === 'OPEN').length}</summary>
             <div>
-              {recallCases
-                .filter(item => item.status === 'OPEN')
-                .map(recall => (
-                  <div key={recall.id}>
-                    <span>
-                      <b>{recall.id}</b> · φορτίο {recall.loadId} ·{' '}
-                      {recall.items.filter(item => item.status !== 'CLOSED').length} εκκρεμή
-                      <small style={{display: 'block'}}>{recall.reason}</small>
-                    </span>
-                    <span>{recall.items.filter(item => item.status === 'OUTSTANDING').length} προς επιστροφή</span>
-                  </div>
-                ))}
+              {recallCases.filter(item => item.status === 'OPEN').map(recall => (
+                <div key={recall.id}>
+                  <span>
+                    <b>{recall.id}</b> · φορτίο {recall.loadId} · {recall.items.filter(item => item.status !== 'CLOSED').length} εκκρεμή
+                    <small style={{display: 'block'}}>{recall.reason}</small>
+                  </span>
+                  <span>{recall.items.filter(item => item.status === 'OUTSTANDING').length} προς επιστροφή</span>
+                </div>
+              ))}
             </div>
           </details>
         )}
