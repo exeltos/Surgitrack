@@ -122,7 +122,11 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     return false;
   };
   const isAssetRecalled = (kind: AssetKind, id: string) =>
-    recallCases.some(c => c.status === 'OPEN' && c.items.some(item => item.assetKind === kind && item.assetId === id && item.status !== 'CLOSED'));
+    recallCases.some(
+      c =>
+        c.status === 'OPEN' &&
+        c.items.some(item => item.assetKind === kind && item.assetId === id && item.status !== 'CLOSED'),
+    );
   const assertCirculationAllowed = (kind: AssetKind, id: string) => {
     const asset = assetName(kind, id);
     if (!asset) return false;
@@ -198,7 +202,20 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       setChecks: payload.checkPerformed ? payload.setChecks : undefined,
     };
     setReceipts(x => [record, ...x]);
-    setRecallCases(cases => cases.map(c => c.status !== 'OPEN' ? c : ({...c, items: c.items.map(item => item.assetKind === kind && item.assetId === id ? {...item, status: 'REPROCESSING', returnedAt: record.at} : item)})));
+    setRecallCases(cases =>
+      cases.map(c =>
+        c.status !== 'OPEN'
+          ? c
+          : {
+              ...c,
+              items: c.items.map(item =>
+                item.assetKind === kind && item.assetId === id
+                  ? {...item, status: 'REPROCESSING', returnedAt: record.at}
+                  : item,
+              ),
+            },
+      ),
+    );
     if (kind === 'SET' && payload.checkPerformed && checkedCount !== undefined)
       setSets(x => x.map(s => (s.id === id ? {...s, actual: checkedCount} : s)));
     if (payload.checkPerformed && payload.checkResult && payload.checkResult !== 'OK') {
@@ -632,12 +649,21 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     setProcessLoads(list => list.map(item => (item.id === loadId ? updated : item)));
     if (decision === 'RELEASED') {
       const releasedKeys = new Set(load.items.map(item => `${item.assetKind}:${item.assetId}`));
-      setRecallCases(cases => cases.map(recall => {
-        if (recall.status !== 'OPEN') return recall;
-        const items = recall.items.map(item => releasedKeys.has(`${item.assetKind}:${item.assetId}`) ? {...item, status: 'CLOSED' as const} : item);
-        const closed = items.every(item => item.status === 'CLOSED');
-        return {...recall, items, status: closed ? 'CLOSED' as const : 'OPEN' as const, closedAt: closed ? now : recall.closedAt};
-      }));
+      setRecallCases(cases =>
+        cases.map(recall => {
+          if (recall.status !== 'OPEN') return recall;
+          const items = recall.items.map(item =>
+            releasedKeys.has(`${item.assetKind}:${item.assetId}`) ? {...item, status: 'CLOSED' as const} : item,
+          );
+          const closed = items.every(item => item.status === 'CLOSED');
+          return {
+            ...recall,
+            items,
+            status: closed ? ('CLOSED' as const) : ('OPEN' as const),
+            closedAt: closed ? now : recall.closedAt,
+          };
+        }),
+      );
     }
     notify(
       decision === 'RELEASED'
@@ -680,7 +706,11 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     load.items.forEach(item => {
       const asset = assetName(item.assetKind, item.assetId);
       if (!asset) return;
-      updateState(item.assetKind, item.assetId, asset.state === 'IN_DEPARTMENT' ? 'PENDING_STERILIZATION' : reprocessState());
+      updateState(
+        item.assetKind,
+        item.assetId,
+        asset.state === 'IN_DEPARTMENT' ? 'PENDING_STERILIZATION' : reprocessState(),
+      );
       addMovement({
         asset: `${item.barcode} · ${item.assetName}`,
         assetKind: item.assetKind,
@@ -691,7 +721,11 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
         patientCode: asset && 'patientCode' in asset ? asset.patientCode : undefined,
       });
     });
-    setProcessLoads(list => list.map(item => item.id === loadId ? {...item, status: 'RECALLED', recalledAt: now, recallReason: reason.trim()} : item));
+    setProcessLoads(list =>
+      list.map(item =>
+        item.id === loadId ? {...item, status: 'RECALLED', recalledAt: now, recallReason: reason.trim()} : item,
+      ),
+    );
     notify(`Άνοιξε η ανάκληση ${recallCase.id} για το φορτίο ${loadId} (${load.items.length} αντικείμενα).`);
   };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
