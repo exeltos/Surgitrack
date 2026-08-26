@@ -439,6 +439,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       refs.forEach(({ref, asset}) => {
         const checkpoint: WorkflowCheckpointRecord = {
           id: `wc${Date.now()}-${ref.id}`,
+          workflowVersion: sterilizationWorkflow.version,
           assetId: ref.id,
           assetKind: ref.kind,
           barcode: asset.barcode,
