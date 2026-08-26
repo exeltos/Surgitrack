@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react';
 import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, UserPlus, LogIn} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
+import type {SessionUser, UserRole} from '../../store/types';
 import {SURGITRACK_DATA_MODE} from '../../config/dataMode';
 import {APP_VERSION} from '../../config/appMeta';
 
@@ -8,8 +9,9 @@ type Lang = 'el' | 'en';
 type View = 'login' | 'register' | 'forgot';
 type InfoView = 'privacy' | 'terms' | 'support' | null;
 
-type DemoRole = 'DEPARTMENT' | 'STERILIZATION' | 'ADMIN';
-type Props = {onAuthenticated: (role?: DemoRole) => void; goodbye?: string};
+type Props = {onAuthenticated: (role?: UserRole, user?: SessionUser) => void; goodbye?: string};
+
+const DEMO_ACCESS_KEY = 'SurgiTrack!2026';
 
 const copy = {
   el: {
@@ -51,8 +53,9 @@ const copy = {
     secure: 'Ασφαλής πρόσβαση · Role-based permissions',
     required: 'Συμπληρώστε τα υποχρεωτικά πεδία.',
     mismatch: 'Οι κωδικοί δεν είναι ίδιοι.',
-    realLoginUnavailable:
-      'Η κανονική σύνδεση δεν είναι ενεργή σε αυτή την έκδοση Demo. Χρησιμοποιήστε μία από τις τρεις εισόδους Demo.',
+    invalidCredentials: 'Το email ή ο κωδικός πρόσβασης δεν είναι σωστά.',
+    accessDisabled: 'Η πρόσβαση αυτού του λογαριασμού δεν είναι ενεργή.',
+    demoDisabled: 'Η δοκιμαστική πρόσβαση δεν είναι ενεργή για αυτόν τον χρήστη ή οργανισμό.',
     productionAuthUnavailable:
       'Η σύνδεση παραγωγής απαιτεί ενεργό backend authentication και δεν είναι διαθέσιμη σε αυτό το build.',
     close: 'Κλείσιμο',
@@ -96,8 +99,9 @@ const copy = {
     secure: 'Secure access · Role-based permissions',
     required: 'Please complete the required fields.',
     mismatch: 'Passwords do not match.',
-    realLoginUnavailable:
-      'Standard sign-in is not enabled in this Demo build. Use one of the three Demo entries below.',
+    invalidCredentials: 'The email or password is incorrect.',
+    accessDisabled: 'Access for this account is not active.',
+    demoDisabled: 'Demo access is not enabled for this user or organization.',
     productionAuthUnavailable:
       'Production sign-in requires an active backend authentication service and is not available in this build.',
     close: 'Close',
@@ -105,7 +109,7 @@ const copy = {
 };
 
 export default function AuthIndex({onAuthenticated, goodbye}: Props) {
-  const {departments} = useLibraries();
+  const {departments, users, organizations} = useLibraries();
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
   const [view, setView] = useState<View>('login');
   const [showPassword, setShowPassword] = useState(false);
@@ -117,9 +121,36 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
     setLang(next);
     localStorage.setItem('surgitrack-lang', next);
   };
-  const submitLogin = (e: React.FormEvent) => {
+  const submitLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage(SURGITRACK_DATA_MODE === 'DEMO' ? t.realLoginUnavailable : t.productionAuthUnavailable);
+    setMessage('');
+    if (SURGITRACK_DATA_MODE !== 'DEMO') {
+      setMessage(t.productionAuthUnavailable);
+      return;
+    }
+    const data = new FormData(e.currentTarget);
+    const email = String(data.get('email') || '').trim().toLowerCase();
+    const password = String(data.get('password') || '');
+    const user = users.find(candidate => candidate.email.toLowerCase() === email);
+    if (!user || password !== DEMO_ACCESS_KEY) {
+      setMessage(t.invalidCredentials);
+      return;
+    }
+    const organization = organizations.find(org => org.id === user.organizationId);
+    if (!user.active || (organization && !organization.active)) {
+      setMessage(t.accessDisabled);
+      return;
+    }
+    if (user.role !== 'ADMIN' && (!user.demoEnabled || !organization?.demoEnabled)) {
+      setMessage(t.demoDisabled);
+      return;
+    }
+    onAuthenticated(user.role, {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      department: user.department,
+    });
   };
   const submitRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -190,14 +221,14 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                     {t.email}
                     <div className="auth-input">
                       <Mail size={17} />
-                      <input type="email" required autoComplete="email" placeholder="name@hospital.gr" />
+                      <input name="email" type="email" required autoComplete="email" placeholder="name@hospital.gr" />
                     </div>
                   </label>
                   <label>
                     {t.password}
                     <div className="auth-input">
                       <LockKeyhole size={17} />
-                      <input type={showPassword ? 'text' : 'password'} required autoComplete="current-password" />
+                      <input name="password" type={showPassword ? 'text' : 'password'} required autoComplete="current-password" />
                       <button type="button" onClick={() => setShowPassword(v => !v)} aria-label="toggle password">
                         {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                       </button>
@@ -217,25 +248,6 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                     {t.signIn}
                   </button>
                 </form>
-                <div className="auth-divider">
-                  <span>ή / or</span>
-                </div>
-                <div className="demo-role-grid">
-                  <button className="auth-demo" type="button" onClick={() => onAuthenticated('STERILIZATION')}>
-                    {lang === 'el' ? 'Demo Αποστείρωσης' : 'Sterilization Demo'}
-                    <small>{lang === 'el' ? 'Ροή αποστείρωσης και διακίνησης' : 'Sterilization workflow'}</small>
-                  </button>
-                  <button className="auth-demo" type="button" onClick={() => onAuthenticated('DEPARTMENT')}>
-                    {lang === 'el' ? 'Demo Τμήματος' : 'Department Demo'}
-                    <small>{lang === 'el' ? 'Εργαλεία και σετ τμήματος' : 'Department assets'}</small>
-                  </button>
-                  <button className="auth-demo" type="button" onClick={() => onAuthenticated('ADMIN')}>
-                    {lang === 'el' ? 'Demo Διαχειριστή' : 'Administrator Demo'}
-                    <small>
-                      {lang === 'el' ? 'Βιβλιοθήκες, χρήστες και ρυθμίσεις' : 'Libraries, users and settings'}
-                    </small>
-                  </button>
-                </div>
                 <div className="auth-bottom-question">
                   <span>{t.noAccount}</span>
                   <button onClick={() => changeView('register')}>{t.createAccount}</button>

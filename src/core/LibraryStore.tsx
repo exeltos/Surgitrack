@@ -2,19 +2,22 @@ import {createContext, useContext, useMemo, useState, type ReactNode} from 'reac
 import {getAdminRepository} from '../data/adminRepositories';
 import type {SurgiDataMode} from '../data/repositories';
 import type {LibraryItem} from './libraries';
-import type {AdminUser, ConfigurationAuditEvent, LibraryKey, LibraryState} from './libraryTypes';
+import type {AdminUser, ConfigurationAuditEvent, LibraryKey, LibraryState, Organization} from './libraryTypes';
 import type {Permission} from './permissions';
 import {defaultRolePermissions, sanitizeRolePermissions} from './permissions';
 import type {UserRole} from '../store/types';
 import type {SterilizationWorkflowConfig, WorkflowStageId} from './workflow';
 
-export type {AdminUser, LibraryKey, LibraryState} from './libraryTypes';
+export type {AdminUser, LibraryKey, LibraryState, Organization} from './libraryTypes';
 
 type LibraryStore = LibraryState & {
   dataMode: SurgiDataMode;
   addItem: (key: LibraryKey, item: Omit<LibraryItem, 'id'>) => void;
   updateItem: (key: LibraryKey, id: string, item: Partial<LibraryItem>) => void;
   removeItem: (key: LibraryKey, id: string) => void;
+  addOrganization: (organization: Omit<Organization, 'id'>) => void;
+  updateOrganization: (id: string, patch: Partial<Organization>) => void;
+  removeOrganization: (id: string) => void;
   addUser: (user: Omit<AdminUser, 'id'>) => void;
   updateUser: (id: string, patch: Partial<AdminUser>) => void;
   removeUser: (id: string) => void;
@@ -34,9 +37,17 @@ const load = (repository: ReturnType<typeof getAdminRepository>): LibraryState =
     const raw = localStorage.getItem(repository.storageKey);
     if (raw) {
       const saved = JSON.parse(raw);
+      const organizations = Array.isArray(saved.organizations) ? saved.organizations : initial.organizations;
+      const defaultOrganizationId = organizations[0]?.id || '';
       return {
         ...initial,
         ...saved,
+        organizations,
+        users: (saved.users || initial.users).map((user: AdminUser) => ({
+          ...user,
+          organizationId: user.organizationId || defaultOrganizationId,
+          demoEnabled: user.demoEnabled ?? user.role === 'ADMIN',
+        })),
         systemSettings: {...initial.systemSettings, ...(saved.systemSettings || {})},
       } as LibraryState;
     }
@@ -108,6 +119,21 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
     const before = s[key].find(x => x.id === id);
     return appendAudit({...s, [key]: s[key].filter(x => x.id !== id)}, {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'DELETE', by: 'Admin', before});
   });
+  const addOrganization = (organization: Omit<Organization, 'id'>) => commit(s => {
+    const created = {...organization, id: `org-${Date.now()}`};
+    return appendAudit({...s, organizations: [...s.organizations, created]}, {entityType: 'ORGANIZATION', entityId: created.id, action: 'CREATE', by: 'Admin', after: created});
+  });
+  const updateOrganization = (id: string, patch: Partial<Organization>) => commit(s => {
+    const before = s.organizations.find(org => org.id === id);
+    const after = before ? {...before, ...patch} : undefined;
+    return appendAudit({...s, organizations: s.organizations.map(org => (org.id === id ? {...org, ...patch} : org))}, {entityType: 'ORGANIZATION', entityId: id, action: 'UPDATE', by: 'Admin', before, after});
+  });
+  const removeOrganization = (id: string) => commit(s => {
+    const before = s.organizations.find(org => org.id === id);
+    const usersForOrganization = s.users.filter(user => user.organizationId === id);
+    if (usersForOrganization.length) return s;
+    return appendAudit({...s, organizations: s.organizations.filter(org => org.id !== id)}, {entityType: 'ORGANIZATION', entityId: id, action: 'DELETE', by: 'Admin', before});
+  });
   const addUser = (user: Omit<AdminUser, 'id'>) => commit(s => {
     const created = {...user, id: `user-${Date.now()}`};
     return appendAudit({...s, users: [...s.users, created]}, {entityType: 'USER', entityId: created.id, action: 'CREATE', by: 'Admin', after: created});
@@ -168,6 +194,9 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
       dataMode,
       addItem,
       updateItem,
+      addOrganization,
+      updateOrganization,
+      removeOrganization,
       removeItem,
       addUser,
       updateUser,

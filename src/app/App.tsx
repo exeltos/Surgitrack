@@ -21,6 +21,7 @@ import StudioPage from '../modules/studio/StudioPage';
 import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
+import type {SessionUser, UserRole} from '../store/types';
 
 function RoleHome() {
   const {role} = useSurgi();
@@ -36,9 +37,11 @@ export default function App() {
   const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(() => sessionStorage.getItem('surgitrack-auth') === '1');
   const [goodbye, setGoodbye] = useState('');
-  const login = (role: 'DEPARTMENT' | 'STERILIZATION' | 'ADMIN' = 'STERILIZATION') => {
+  const login = (role: UserRole = 'STERILIZATION', user?: SessionUser) => {
     sessionStorage.setItem('surgitrack-auth', '1');
     sessionStorage.setItem('surgitrack-demo-role', role);
+    if (user) sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
+    else sessionStorage.removeItem('surgitrack-session-user');
     setRole(role);
     setAuthenticated(true);
     setGoodbye('');
@@ -53,6 +56,7 @@ export default function App() {
       return;
     sessionStorage.removeItem('surgitrack-auth');
     sessionStorage.removeItem('surgitrack-demo-role');
+    sessionStorage.removeItem('surgitrack-session-user');
     setGoodbye(msg);
     setAuthenticated(false);
     navigate('/', {replace: true});

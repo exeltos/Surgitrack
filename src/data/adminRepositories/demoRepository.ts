@@ -21,7 +21,17 @@ const createDemoInitialData = (): LibraryState => ({
   suppliers: cloneItems(suppliers),
   toolCategories: cloneItems(toolCategories),
   sterilizers: cloneItems(sterilizers),
-  users: demoUsers.map(user => ({...user, active: true})) as AdminUser[],
+  organizations: [
+    {id: 'org-iaso-thessalias', name: 'ΙΑΣΩ Θεσσαλίας', code: 'IASO-TH', active: true, demoEnabled: true},
+    {id: 'org-demo-athens', name: 'Demo Hospital Athens', code: 'DEMO-ATH', active: true, demoEnabled: false},
+    {id: 'org-demo-north', name: 'Demo Hospital North', code: 'DEMO-NORTH', active: true, demoEnabled: false},
+  ],
+  users: demoUsers.map((user, index) => ({
+    ...user,
+    active: true,
+    organizationId: index === 0 ? 'org-iaso-thessalias' : 'org-iaso-thessalias',
+    demoEnabled: user.role === 'ADMIN',
+  })) as AdminUser[],
   rolePermissions: {
     ADMIN: [...defaultRolePermissions.ADMIN],
     STERILIZATION: [...defaultRolePermissions.STERILIZATION],

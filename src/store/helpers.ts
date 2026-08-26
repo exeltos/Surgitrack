@@ -6,6 +6,15 @@ export const formatStoreDateTime = () => new Date().toLocaleString('el-GR', {dat
 export const getActiveDepartment = (role: UserRole) => (role === 'DEPARTMENT' ? 'Αίθουσα Τοκετών' : 'Όλα τα τμήματα');
 
 export const getDemoSessionUser = (role: UserRole): SessionUser => {
+  try {
+    const raw = sessionStorage.getItem('surgitrack-session-user');
+    if (raw) {
+      const user = JSON.parse(raw) as SessionUser;
+      if (user?.id && user.role === role) return user;
+    }
+  } catch {
+    // Fall back to the built-in demo identity.
+  }
   if (role === 'STERILIZATION') {
     return {
       id: 'u-ster-01',

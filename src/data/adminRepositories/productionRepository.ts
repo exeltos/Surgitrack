@@ -13,6 +13,7 @@ export const productionAdminRepository: AdminRepository = {
     suppliers: [],
     toolCategories: [],
     sterilizers: [],
+    organizations: [],
     users: [],
     rolePermissions: {
       ADMIN: [...defaultRolePermissions.ADMIN],
