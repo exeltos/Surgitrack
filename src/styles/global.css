@@ -1,0 +1,488 @@
+/* SurgiTrack stylesheet entry point.
+   Keep imports in this order: cascade order is intentional. */
+@import './layers/01-core-sterilization.css';
+@import './layers/02-assets-shared.css';
+@import './layers/03-registry-workspaces.css';
+@import './layers/04-reports-department-admin.css';
+
+/* Tool ownership invariants */
+.asset-inline-locked {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--border, #dbe4ea);
+  border-radius: 9px;
+  background: #f6f8fa;
+  color: #667782;
+  font-size: 13px;
+}
+.asset-field-na {
+  color: #7a8a94;
+  font-weight: 600;
+}
+
+/* v0.26.1 Receipt final UI polish
+   Fixed workspaces: only data lists scroll on desktop. */
+@media (min-width: 1101px) {
+  .sterilization-workspace > .ster-work-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+  }
+  .sterilization-workspace > .ster-work-panel > .ster-panel-head,
+  .sterilization-workspace > .ster-work-panel > .load-release-strip,
+  .sterilization-workspace > .ster-work-panel > .released-loads,
+  .sterilization-workspace > .ster-work-panel > .ster-list-head {
+    flex: 0 0 auto;
+  }
+  .ster-list-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+}
+
+.ster-list-head,
+.ster-work-row {
+  display: grid;
+  grid-template-columns:
+    minmax(320px, 1.55fr) minmax(145px, 0.72fr) minmax(145px, 0.72fr) minmax(150px, 0.72fr) minmax(170px, 0.82fr)
+    minmax(210px, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+.ster-list-head {
+  padding: 9px 16px;
+  border-bottom: 1px solid #e7edf1;
+  background: #f8fafb;
+  color: #7c8997;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.ster-list-head span:last-child {
+  text-align: right;
+  padding-right: 4px;
+}
+.ster-work-row {
+  padding: 14px 16px;
+}
+.ster-asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.ster-asset-cell .ster-kind {
+  flex: 0 0 auto;
+}
+.ster-cell-text {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.ster-cell-text strong,
+.ster-cell-text span {
+  font-size: 11px;
+  color: #526273;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ster-cell-text strong {
+  font-weight: 700;
+  color: #344054;
+}
+.ster-meta {
+  min-width: 0;
+}
+.ster-meta .status-badge {
+  max-width: 100%;
+}
+.ster-status {
+  min-width: 0;
+}
+.ster-status small {
+  line-height: 1.35;
+  color: #718095;
+}
+.ster-row-action {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* Receipt modal: fixed left controls, only Set tools list scrolls. */
+@media (min-width: 1101px) {
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) {
+    height: min(94vh, 940px) !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
+    grid-template-columns: minmax(410px, 35%) minmax(0, 65%);
+    overflow: hidden !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-left-panel {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+    gap: 8px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-left-panel .receipt-work-section {
+    margin: 0 !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-section-title {
+    padding: 9px 12px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary {
+    padding: 9px !important;
+    gap: 7px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary > div {
+    min-height: 48px !important;
+    padding: 7px 8px 7px 35px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary svg {
+    left: 10px !important;
+    top: 10px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section {
+    padding: 9px 11px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section input,
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .demo-fill-btn {
+    height: 36px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-work-section .handover-warning {
+    margin: 0 11px 9px !important;
+    padding: 7px 9px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation {
+    margin: 8px 10px 9px;
+    gap: 7px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation button {
+    padding: 8px 9px;
+    min-height: 42px;
+    font-size: 10px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-check-section > .handover-warning {
+    margin: 0 10px 9px !important;
+    padding: 7px 9px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-count-only {
+    margin: 0 10px 9px;
+    padding: 8px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-note-section {
+    padding: 9px 11px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-note-section textarea {
+    min-height: 42px !important;
+    max-height: 52px !important;
+    resize: none !important;
+  }
+}
+
+/* Receipt Set composition: explicit, stable columns. */
+.receipt-tool-columns,
+.receipt-verification-row:not(.single) {
+  display: grid;
+  grid-template-columns: 105px 120px minmax(190px, 1.35fr) minmax(130px, 0.9fr) minmax(145px, 0.95fr) 92px;
+  gap: 12px;
+  align-items: center;
+}
+.receipt-tool-columns {
+  flex: 0 0 auto;
+  padding: 8px 13px;
+  background: #f7f9fb;
+  border-top: 1px solid #e9eef2;
+  border-bottom: 1px solid #e4eaee;
+  color: #7d8996;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.receipt-tool-columns span:last-child {
+  text-align: right;
+}
+.receipt-verification-row:not(.single) {
+  min-height: 58px;
+  padding: 9px 13px;
+  border-bottom: 1px solid #edf1f4;
+  background: #fff;
+}
+.receipt-verification-row:not(.single):last-child {
+  border-bottom: 0;
+}
+.receipt-verification-row.has-issue {
+  background: #fffaf2;
+}
+.receipt-tool-barcode {
+  font-size: 10px;
+  font-weight: 800;
+  color: #16627d;
+}
+.receipt-tool-code,
+.receipt-tool-manufacturer {
+  font-size: 10px;
+  color: #677687;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-tool-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+.receipt-tool-name strong {
+  font-size: 10px;
+  color: #29384a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-tool-name small {
+  font-size: 8px;
+  color: #8a96a4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-tool-state {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.receipt-tool-state .prep-ok-chip,
+.receipt-tool-state .prep-issue-chip {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-verification-row .tool-report-btn {
+  justify-self: end;
+}
+.receipt-tools-toolbar {
+  flex: 0 0 auto;
+}
+.receipt-right-panel .receipt-tools-scroll {
+  flex: 1 1 auto !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Report modal: the camera action opens the in-app camera instead of a file picker. */
+.issue-photo-actions button.app-button {
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 1320px) and (min-width: 1101px) {
+  .ster-list-head,
+  .ster-work-row {
+    grid-template-columns: minmax(270px, 1.4fr) 135px 125px 135px 150px 190px;
+    gap: 11px;
+  }
+  .receipt-tool-columns,
+  .receipt-verification-row:not(.single) {
+    grid-template-columns: 92px 105px minmax(165px, 1.3fr) minmax(110px, 0.85fr) 130px 86px;
+    gap: 9px;
+  }
+}
+@media (max-width: 1100px) {
+  .ster-list-head {
+    display: none;
+  }
+  .ster-list-scroll {
+    overflow: visible;
+  }
+  .ster-work-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+  }
+  .ster-asset-cell {
+    grid-column: 1/-1;
+  }
+  .ster-row-action {
+    grid-column: 1/-1;
+    justify-content: flex-start;
+  }
+  .receipt-tool-columns {
+    display: none;
+  }
+  .receipt-verification-row:not(.single) {
+    grid-template-columns: 105px 1fr auto;
+    gap: 8px;
+  }
+  .receipt-tool-code,
+  .receipt-tool-manufacturer {
+    display: none;
+  }
+  .receipt-tool-state {
+    grid-column: 2;
+  }
+  .receipt-verification-row .tool-report-btn {
+    grid-column: 3;
+    grid-row: 1/3;
+  }
+}
+
+/* v0.26.5 — CSSD receipt queue structural fix.
+   This block intentionally sits after every layer import and replaces the old
+   v0.26.2 horizontal-scroll hotfix. The queue must fit the available workspace. */
+.sterilization-workspace > .ster-work-panel {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+.sterilization-workspace .ster-list-scroll {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.sterilization-workspace .ster-list-head,
+.sterilization-workspace .ster-work-row {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+.sterilization-workspace .ster-list-head > *,
+.sterilization-workspace .ster-work-row > * {
+  min-width: 0 !important;
+}
+
+/* Receipt queue: Specialty is secondary information and lives under Department.
+   Five columns are more readable and leave the action area permanently visible. */
+.sterilization-workspace .receipt-queue-panel .ster-list-head,
+.sterilization-workspace .receipt-queue-panel .ster-work-row {
+  grid-template-columns: minmax(260px, 2.05fr) minmax(145px, 1.05fr) minmax(150px, 0.95fr) minmax(150px, 1fr) minmax(
+      190px,
+      1.15fr
+    ) !important;
+  column-gap: 14px !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(3),
+.sterilization-workspace .receipt-queue-panel .ster-cell-specialty {
+  display: none !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4) {
+  grid-column: 3;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5) {
+  grid-column: 4;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(6) {
+  grid-column: 5;
+  text-align: left;
+  padding-right: 0;
+}
+.sterilization-workspace .receipt-queue-panel .ster-cell-department {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 3px !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-tablet-specialty {
+  display: block !important;
+  font-size: 9px !important;
+  color: #84919f !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-row-action {
+  justify-content: flex-start !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-row-action .primary.compact,
+.sterilization-workspace .receipt-queue-panel .ster-row-action .text-link {
+  flex: 0 0 auto;
+  white-space: nowrap !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-asset strong {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+.sterilization-workspace .receipt-queue-panel .ster-status small {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+
+@media (max-width: 1180px) and (min-width: 761px) {
+  .sterilization-workspace .receipt-queue-panel .ster-list-head,
+  .sterilization-workspace .receipt-queue-panel .ster-work-row {
+    grid-template-columns: minmax(230px, 1.85fr) minmax(140px, 1fr) minmax(140px, 0.9fr) minmax(188px, 1.15fr) !important;
+    column-gap: 11px !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5),
+  .sterilization-workspace .receipt-queue-panel .ster-status {
+    display: none !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4) {
+    grid-column: 3;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(6) {
+    grid-column: 4;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-tablet-stage {
+    display: block !important;
+    margin-top: 2px;
+    font-size: 9px;
+    color: #84919f;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 760px) {
+  .sterilization-workspace .receipt-queue-panel .ster-list-head {
+    display: none !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-work-row {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    gap: 8px 10px !important;
+    padding: 13px 14px !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-asset-cell {
+    grid-column: 1/-1 !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-cell-department,
+  .sterilization-workspace .receipt-queue-panel .ster-meta,
+  .sterilization-workspace .receipt-queue-panel .ster-row-action {
+    grid-column: 2/-1 !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-status {
+    display: none !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-tablet-stage {
+    display: block !important;
+  }
+  .sterilization-workspace .receipt-queue-panel .ster-row-action {
+    flex-wrap: wrap !important;
+  }
+}
+.camera-modal-backdrop {
+  z-index: 1400 !important;
+}
+.camera-modal {
+  z-index: 1401 !important;
+}

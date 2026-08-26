@@ -1,0 +1,2454 @@
+/* v0.21.0 — Asset registry/list UX overhaul
+   Goal: no page-level horizontal overflow, quieter filters, clearer rows and a stable list header. */
+.tools-list-workspace {
+  min-width: 0;
+}
+.asset-list-head {
+  margin-bottom: 16px;
+}
+.asset-list-head > div:first-child {
+  min-width: 0;
+}
+.asset-list-head h1 {
+  letter-spacing: -0.025em;
+}
+.asset-list-head p {
+  max-width: 920px;
+  line-height: 1.45;
+}
+
+/* KPI strip is intentionally compact so the list remains the primary workspace. */
+.tools-list-workspace .compact-kpis,
+.tools-list-workspace > .kpis {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tools-list-workspace .kpis > div {
+  padding: 13px 16px;
+  border-color: #dce7eb;
+  box-shadow: 0 1px 2px rgba(25, 57, 72, 0.025);
+}
+.tools-list-workspace .kpis small {
+  font-size: 11px;
+  color: #70838e;
+}
+.tools-list-workspace .kpis strong {
+  font-size: 24px;
+  line-height: 1.05;
+  margin-top: 5px;
+  color: #203744;
+}
+
+/* Filters: keep all selectors visible. Never create horizontal scrolling on the page. */
+.asset-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(250px, 1.15fr) minmax(0, 2.85fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  overflow: hidden;
+}
+.asset-filter-search {
+  min-width: 0;
+  flex: none;
+}
+.asset-filter-selects {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  width: 100%;
+  overflow: visible;
+}
+.asset-filter-selects select {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  text-overflow: ellipsis;
+}
+.asset-filter-icon {
+  flex: 0 0 17px;
+}
+.asset-filter-clear {
+  margin: 0;
+}
+.asset-list-controls {
+  min-width: 0;
+  align-items: stretch;
+}
+.asset-list-controls > .asset-filter-bar {
+  min-width: 0;
+}
+.asset-list-controls > .icon-toggle {
+  min-height: 58px;
+}
+
+/* Registry list card */
+.list-scroll-panel {
+  border-color: #dbe6ea;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(24, 56, 74, 0.035);
+  overflow: auto;
+}
+.asset-registry-table {
+  width: 100%;
+  min-width: 1020px !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-size: 12.5px;
+}
+.asset-registry-table thead th {
+  height: 46px;
+  padding: 0 10px;
+  vertical-align: middle;
+  background: #f7fafb !important;
+  color: #5f7581;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border-bottom: 1px solid #dce7eb;
+  box-shadow: none !important;
+}
+.asset-registry-table tbody td {
+  padding: 11px 10px;
+  vertical-align: middle;
+  line-height: 1.35;
+  color: #334b59;
+  border-bottom: 1px solid #edf2f4;
+  background: #fff;
+}
+.asset-registry-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.asset-registry-table tbody tr {
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.asset-registry-table tbody tr:hover td {
+  background: #f7fbfc;
+}
+.asset-registry-table th:first-child,
+.asset-registry-table td:first-child {
+  padding-left: 16px;
+}
+.asset-registry-table th:last-child,
+.asset-registry-table td:last-child {
+  width: 48px;
+  padding-right: 12px;
+  text-align: center;
+}
+.asset-registry-table .row-title-link {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #243b4a;
+  text-decoration: none;
+}
+.asset-registry-table .row-title-link:hover {
+  color: #0d687d;
+  text-decoration: none;
+}
+.asset-registry-table .row-sub {
+  margin-top: 3px;
+  font-size: 9.5px;
+  line-height: 1.3;
+  color: #8697a1;
+}
+.asset-registry-table .mono {
+  font-size: 11.5px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.asset-registry-table .muted {
+  color: #84959f;
+}
+.asset-registry-table .badge {
+  font-size: 10px;
+}
+.asset-registry-table .icon-link {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  color: #607986;
+}
+.asset-registry-table .icon-link:hover {
+  background: #eaf4f6;
+  color: #145e70;
+}
+
+/* The dense Stock action stays usable without making every row tall. */
+.asset-registry-table .inline-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 250px;
+}
+.asset-registry-table .inline-action select {
+  min-width: 150px;
+  max-width: 210px;
+  height: 34px;
+  border: 1px solid #d8e4e8;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 8px;
+  font-size: 10.5px;
+  color: #425d69;
+}
+.asset-registry-table .inline-action .small {
+  min-height: 34px;
+  padding: 0 9px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+/* Useful visual hierarchy on wide asset tables. */
+.asset-registry-table th:nth-child(1) {
+  min-width: 220px;
+}
+.asset-registry-table td:nth-child(1) {
+  min-width: 220px;
+}
+
+@media (max-width: 1320px) {
+  .asset-filter-bar {
+    grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr) auto;
+  }
+  .asset-filter-selects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  }
+  .asset-filter-icon {
+    display: none;
+  }
+}
+@media (max-width: 1040px) {
+  .asset-filter-bar {
+    grid-template-columns: 1fr auto;
+  }
+  .asset-filter-search {
+    grid-column: 1/2;
+  }
+  .asset-filter-selects {
+    grid-column: 1/-1;
+    grid-row: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .asset-filter-clear {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .asset-list-controls > .icon-toggle {
+    min-height: 96px;
+  }
+}
+@media (max-width: 760px) {
+  .asset-filter-bar {
+    grid-template-columns: 1fr auto;
+    padding: 8px;
+  }
+  .asset-filter-selects {
+    grid-template-columns: 1fr;
+  }
+  .asset-list-controls {
+    gap: 7px;
+  }
+  .asset-list-controls > .icon-toggle {
+    min-height: 48px;
+    width: 42px;
+    flex-basis: 42px;
+  }
+  .asset-registry-table {
+    min-width: 920px !important;
+  }
+}
+
+/* v0.21.1 — natural list flow, consistent buttons and photographic documentation */
+/* Registry pages use the document/page scroll. Avoid a second vertical scrollbar inside the list card. */
+.list-scroll-panel,
+.list-scroll-panel-kpis {
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  overscroll-behavior: auto;
+  scrollbar-gutter: auto;
+}
+.list-scroll-panel thead th {
+  position: static !important;
+}
+
+/* Do not force the first column to be oversized: each registry can size itself naturally. */
+.asset-registry-table th:nth-child(1),
+.asset-registry-table td:nth-child(1) {
+  min-width: 0;
+}
+.asset-registry-table {
+  min-width: 960px !important;
+}
+
+/* Stock has a compact barcode first column and gives the useful space to the asset/action columns. */
+.asset-registry-table th:first-child,
+.asset-registry-table td:first-child {
+  width: auto;
+}
+.asset-registry-table .inline-action .app-button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+/* Primary buttons inside page actions must keep the same white-on-teal treatment as every other primary action. */
+.asset-page-actions .app-button-primary,
+.page-head .app-button-primary {
+  color: #fff !important;
+}
+.asset-page-actions .app-button-primary svg,
+.page-head .app-button-primary svg {
+  color: currentColor;
+}
+.asset-page-actions button:not(.primary):not(.app-button-primary) {
+  background: #fff;
+  color: #304d5d;
+  border: 1px solid #d8e2e8;
+}
+
+.visually-hidden-file {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.asset-photos-card {
+  margin-top: 14px;
+}
+.photo-section-head {
+  align-items: flex-start;
+  gap: 18px;
+}
+.photo-section-head > div:first-child {
+  min-width: 0;
+}
+.photo-section-head p {
+  max-width: 760px;
+}
+.photo-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.asset-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.asset-photo-tile {
+  position: relative;
+  margin: 0;
+  border: 1px solid #dce7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f7fafb;
+  min-width: 0;
+}
+.asset-photo-tile img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  background: #edf3f5;
+}
+.asset-photo-tile figcaption {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+.asset-photo-tile figcaption span {
+  font-size: 10.5px;
+  font-weight: 750;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #304957;
+}
+.asset-photo-tile figcaption small {
+  font-size: 9px;
+  color: #80929c;
+}
+.photo-remove {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 9px;
+  background: rgba(21, 42, 53, 0.72);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+.photo-remove:hover {
+  background: #8d302c;
+}
+.asset-photo-empty {
+  min-height: 82px;
+  margin-top: 12px;
+  border: 1px dashed #cfdde2;
+  border-radius: 12px;
+  background: #fbfcfd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  color: #6b818c;
+}
+.asset-photo-empty > div {
+  display: grid;
+  gap: 2px;
+}
+.asset-photo-empty strong {
+  font-size: 12px;
+  color: #48616e;
+}
+.asset-photo-empty span {
+  font-size: 10.5px;
+}
+
+.issue-photo-field {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+  padding: 12px;
+  border: 1px solid #dce7eb;
+  border-radius: 12px;
+  background: #f9fbfc;
+}
+.issue-photo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.issue-photo-head > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+.issue-photo-head strong {
+  font-size: 12px;
+}
+.issue-photo-head span {
+  font-size: 10px;
+  color: #7b8d96;
+}
+.issue-photo-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.issue-photo-actions label {
+  cursor: pointer;
+  margin: 0 !important;
+  flex-direction: row !important;
+}
+.issue-photo-preview {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.issue-photo-preview > div {
+  position: relative;
+  width: 82px;
+  height: 64px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid #d7e3e7;
+  background: #eef3f5;
+}
+.issue-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.issue-photo-preview button {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(18, 38, 48, 0.72);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.issue-table-photos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+}
+.issue-table-photos img {
+  width: 38px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #d7e2e6;
+}
+.issue-table-photos span {
+  font-size: 9px;
+  font-weight: 800;
+  color: #5e7682;
+  background: #edf3f5;
+  border-radius: 999px;
+  padding: 4px 6px;
+}
+.issue-no-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #9aabb3;
+}
+.issues-registry-table th:nth-child(5) {
+  min-width: 260px;
+}
+
+@media (max-width: 760px) {
+  .photo-section-head,
+  .issue-photo-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .photo-actions,
+  .issue-photo-actions {
+    justify-content: flex-start;
+  }
+  .asset-photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.asset-issue-photos {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+}
+.asset-issue-photos img {
+  width: 58px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 7px;
+  border: 1px solid #d7e2e6;
+}
+
+/* v0.21.2 — fixed application viewport, list-only scrolling, camera capture and tablet ergonomics */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  overscroll-behavior: none;
+}
+.app-shell {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.sidebar {
+  height: 100dvh;
+  overflow: hidden;
+}
+.sidebar nav {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.main {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.topbar {
+  flex: 0 0 var(--st-topbar-h);
+  height: var(--st-topbar-h);
+}
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 24px;
+  padding-bottom: 16px;
+}
+.main > footer {
+  flex: 0 0 auto;
+  padding: 5px 32px 7px;
+  line-height: 1.2;
+}
+
+/* Registry workspaces fill the available content area. Headers, KPIs and filters stay still; only results scroll. */
+.tools-list-workspace {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tools-list-workspace > .page-head,
+.tools-list-workspace > .kpis,
+.tools-list-workspace > .asset-filter-bar,
+.tools-list-workspace > .asset-list-controls {
+  flex: 0 0 auto;
+}
+.tools-list-workspace > .list-scroll-panel,
+.tools-list-workspace > .list-scroll-panel-kpis,
+.tools-list-workspace > .list-scroll-region {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none !important;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-top: 0;
+}
+.tools-list-workspace > .list-scroll-panel thead th,
+.tools-list-workspace > .list-scroll-panel-kpis thead th {
+  position: sticky !important;
+  top: 0;
+  z-index: 4;
+  background: #f7fafb;
+  box-shadow: 0 1px 0 #dce7eb;
+}
+.tools-list-workspace .asset-list-head {
+  margin-bottom: 12px;
+}
+.tools-list-workspace .kpis {
+  margin-bottom: 12px;
+}
+.tools-list-workspace > .asset-filter-bar,
+.tools-list-workspace > .asset-list-controls {
+  margin-bottom: 12px;
+}
+
+/* Sterilization is a true workstation: the queue body is the only vertical scroll region. */
+.sterilization-workspace {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sterilization-workspace > .ster-work-head,
+.sterilization-workspace > .ster-scan,
+.sterilization-workspace > .asset-filter-bar,
+.sterilization-workspace > .sterile-queues {
+  flex: 0 0 auto;
+}
+.sterilization-workspace > .ster-work-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none !important;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  margin-bottom: 0;
+}
+.sterilization-workspace .ster-panel-head {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+/* Asset cards no longer place photography above the working content. It lives in its own tab. */
+.asset-tab-panel > .asset-photos-card {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.asset-tab-panel > .asset-photos-card .asset-section-head {
+  position: static;
+  background: transparent;
+  padding: 0;
+}
+.asset-tab-panel > .asset-photos-card .photo-section-head {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.asset-tab-panel > .asset-photos-card .photo-actions {
+  justify-content: flex-start;
+}
+.asset-tab-panel > .asset-photos-card .asset-photo-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.asset-side-tabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.asset-side-tabs::-webkit-scrollbar {
+  display: none;
+}
+.asset-side-tabs button {
+  min-width: max-content;
+}
+
+/* Real camera dialog. getUserMedia opens the device camera; capture produces a JPEG for the existing photo store. */
+.camera-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(8, 26, 34, 0.66);
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.camera-modal {
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 40px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #d7e3e7;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(5, 31, 42, 0.28);
+  overflow: hidden;
+}
+.camera-modal > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 17px;
+  border-bottom: 1px solid #e1e9ec;
+}
+.camera-modal > header h2 {
+  margin: 2px 0 0;
+  font-size: 18px;
+  color: #173846;
+}
+.camera-preview {
+  min-height: 0;
+  aspect-ratio: 4/3;
+  background: #0d1d24;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.camera-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.camera-error {
+  max-width: 430px;
+  padding: 30px;
+  text-align: center;
+  color: #eaf3f6;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+.camera-error span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #bfd0d7;
+}
+.camera-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 13px 16px;
+  border-top: 1px solid #e1e9ec;
+  background: #fbfcfd;
+}
+
+/* Detail pages remain inside the app viewport. Their dense working panels manage their own content. */
+.tool-detail-workspace,
+.set-detail-workspace {
+  height: 100% !important;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+.tool-detail-workspace > .back-link,
+.set-detail-workspace > .back-link,
+.tool-detail-workspace > .asset-profile-card,
+.set-detail-workspace > .asset-profile-card,
+.tool-detail-workspace > .asset-alert {
+  flex: 0 0 auto;
+}
+.tool-workspace-grid,
+.set-workspace-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  align-items: stretch;
+}
+.asset-workspace-left,
+.tool-identity-panel,
+.set-composition-fixed {
+  min-height: 0;
+  overflow: hidden;
+}
+.asset-tab-panel,
+.tool-identity-panel {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.set-composition-fixed {
+  height: auto !important;
+  max-height: none !important;
+}
+.set-tool-list {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* Tablet: preserve desktop information architecture, increase touch targets and give tables their own horizontal canvas. */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .app-shell {
+    grid-template-columns: 205px minmax(0, 1fr);
+  }
+  .sidebar {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .nav-item {
+    padding: 10px 9px;
+    gap: 9px;
+    font-size: 12px;
+  }
+  .topbar {
+    padding: 0 18px;
+  }
+  .content {
+    padding: 20px 18px 14px;
+  }
+  .main > footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .global-scan {
+    min-width: 180px;
+  }
+  .role-switch select {
+    max-width: 155px;
+  }
+  .page-head h1,
+  .ster-work-head h1 {
+    font-size: 24px;
+  }
+  .kpis {
+    gap: 9px;
+  }
+  .kpis > div {
+    padding: 12px;
+  }
+  .kpis strong {
+    font-size: 23px;
+  }
+  .asset-filter-bar {
+    padding: 8px 10px;
+  }
+  .asset-filter-selects select {
+    min-height: 40px;
+  }
+  .app-button,
+  .small,
+  .primary {
+    min-height: 40px;
+  }
+  .asset-registry-table {
+    min-width: 900px !important;
+  }
+  .tool-workspace-grid {
+    grid-template-columns: minmax(270px, 38%) minmax(0, 62%);
+  }
+  .set-workspace-grid {
+    grid-template-columns: minmax(280px, 34%) minmax(0, 66%) !important;
+  }
+  .asset-profile-actions {
+    gap: 7px;
+  }
+  .asset-profile-actions .app-button,
+  .asset-action-link {
+    min-height: 40px !important;
+  }
+  .ster-scan {
+    margin-bottom: 10px;
+  }
+  .sterile-queues.modern {
+    gap: 8px;
+  }
+  .sterile-queues.modern button {
+    min-height: 74px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: fixed;
+    display: flex;
+    left: 0;
+    top: 0;
+    width: min(290px, 86vw);
+    z-index: 80;
+    transform: translateX(-104%);
+    transition: transform 0.2s ease;
+    box-shadow: 18px 0 45px rgba(8, 38, 50, 0.18);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .mobile-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    border: 0;
+    background: rgba(7, 30, 39, 0.34);
+  }
+  .mobile-menu {
+    display: grid;
+  }
+  .content {
+    padding: 16px 14px 10px;
+  }
+  .main > footer {
+    display: none;
+  }
+  .tools-list-workspace > .list-scroll-panel,
+  .tools-list-workspace > .list-scroll-panel-kpis {
+    overflow: auto !important;
+  }
+  .tool-detail-workspace,
+  .set-detail-workspace {
+    overflow: hidden !important;
+  }
+  .tool-workspace-grid,
+  .set-workspace-grid {
+    grid-template-columns: 1fr !important;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .tool-identity-panel,
+  .asset-workspace-left,
+  .set-composition-fixed {
+    overflow: visible;
+  }
+  .asset-tab-panel {
+    overflow: visible;
+  }
+  .set-tool-list {
+    max-height: 52dvh;
+  }
+  .camera-modal-backdrop {
+    padding: 0;
+  }
+  .camera-modal {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+  .camera-preview {
+    flex: 1;
+    aspect-ratio: auto;
+  }
+}
+
+/* v0.21.3 — full-screen asset workspaces, larger typography and horizontal detail navigation */
+.asset-detail-workspace {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.asset-detail-topline {
+  flex: 0 0 auto;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.asset-detail-topline .back-link {
+  font-size: 13px;
+  font-weight: 750;
+  gap: 7px;
+}
+.asset-detail-workspace > .asset-profile-card {
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+  border-radius: 18px;
+}
+.asset-detail-workspace .asset-profile-head {
+  padding: 18px 22px 15px;
+  gap: 16px;
+}
+.asset-detail-workspace .asset-profile-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+}
+.asset-detail-workspace .asset-profile-title h1 {
+  font-size: 25px;
+  line-height: 1.16;
+  margin: 3px 0 5px;
+}
+.asset-detail-workspace .asset-profile-title p {
+  font-size: 13px;
+}
+.asset-detail-workspace .asset-profile-facts {
+  padding: 10px 22px;
+  gap: 12px;
+}
+.asset-detail-workspace .asset-profile-facts > div {
+  min-height: 54px;
+  min-width: 170px;
+  padding: 8px 13px;
+  border-radius: 11px;
+}
+.asset-detail-workspace .asset-profile-facts span,
+.asset-detail-workspace .asset-profile-facts small {
+  font-size: 10px;
+}
+.asset-detail-workspace .asset-profile-facts strong {
+  font-size: 13px;
+}
+.asset-detail-workspace .asset-profile-actions {
+  padding: 10px 22px 12px;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.asset-detail-workspace .asset-profile-actions .app-button,
+.asset-detail-workspace .asset-action-link {
+  min-height: 42px !important;
+  padding: 0 14px !important;
+  font-size: 12.5px;
+}
+
+.asset-detail-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  min-height: 52px;
+  padding: 0 6px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #dce7eb;
+  overflow-x: auto;
+  background: transparent;
+}
+.asset-detail-tabs button {
+  position: relative;
+  min-height: 50px;
+  padding: 0 18px !important;
+  border: 0;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+  color: #607784;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.asset-detail-tabs button:hover {
+  background: #f4f9fa;
+  color: #1b6072;
+}
+.asset-detail-tabs button.active {
+  background: #fff;
+  color: #145f72;
+}
+.asset-detail-tabs button.active:after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: #1f8999;
+}
+.asset-detail-tabs button b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 7px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #fff1e7;
+  color: #9a5127;
+  font-size: 10px;
+}
+
+.asset-detail-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.asset-detail-body > .asset-section,
+.asset-detail-body > .asset-summary-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.asset-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 14px;
+  overflow: auto;
+  padding-bottom: 2px;
+}
+.asset-summary-card {
+  min-height: 0;
+  overflow: auto;
+}
+.asset-section-body {
+  padding: 16px 18px 18px;
+}
+.asset-detail-workspace .asset-section-head {
+  padding: 17px 19px;
+}
+.asset-detail-workspace .asset-section-head h2 {
+  font-size: 18px;
+  margin: 3px 0 2px;
+}
+.asset-detail-workspace .asset-section-head p {
+  font-size: 12px;
+  line-height: 1.45;
+  max-width: 760px;
+}
+.asset-detail-workspace .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.11em;
+}
+.asset-detail-workspace .asset-definition-list {
+  font-size: 13px;
+}
+.asset-detail-workspace .asset-definition-list dt {
+  font-size: 11px;
+}
+.asset-detail-workspace .asset-definition-list dd {
+  font-size: 13px;
+}
+.asset-detail-full-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.asset-detail-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-bottom: 10px;
+}
+.asset-detail-full-panel > .asset-photos-card {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+}
+.asset-detail-full-panel > .asset-photos-card .asset-section-head {
+  padding: 0 0 16px;
+  border-bottom: 1px solid #e7edf1;
+}
+.asset-detail-full-panel .asset-photo-grid {
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+.asset-detail-full-panel .asset-photo-tile figcaption span {
+  font-size: 12px;
+}
+.asset-detail-full-panel .asset-photo-tile figcaption small {
+  font-size: 10px;
+}
+
+/* Set composition now owns the full working canvas. Only the instruments list scrolls. */
+.asset-detail-body .set-composition-fixed {
+  height: 100% !important;
+  max-height: none !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.asset-detail-body .set-composition-head {
+  flex: 0 0 auto;
+  align-items: center;
+}
+.asset-detail-body .set-composition-filters {
+  flex: 0 0 auto;
+  margin: 0 14px 10px;
+}
+.asset-detail-body .set-tool-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.asset-detail-body .set-tool-row {
+  grid-template-columns: 42px 155px minmax(260px, 1fr) 110px 150px !important;
+  min-height: 68px;
+  padding: 12px 20px !important;
+  gap: 14px;
+}
+.asset-detail-body .set-tool-index {
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+}
+.asset-detail-body .set-tool-code strong,
+.asset-detail-body .set-tool-name strong {
+  font-size: 13px;
+}
+.asset-detail-body .set-tool-code small,
+.asset-detail-body .set-tool-name small {
+  font-size: 10.5px;
+}
+.asset-detail-body .set-tool-uses span {
+  font-size: 10px;
+}
+.asset-detail-body .set-tool-uses strong {
+  font-size: 13px;
+}
+.asset-detail-body .set-tool-state small {
+  font-size: 9.5px;
+}
+.asset-detail-body .set-composition-actions .app-button {
+  min-height: 42px;
+}
+.asset-detail-body .asset-count-state {
+  min-height: 42px;
+}
+
+@media (max-width: 1180px) {
+  .asset-detail-workspace .asset-profile-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .asset-detail-workspace .asset-profile-facts > div {
+    max-width: none;
+    min-width: 0;
+  }
+  .asset-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .asset-detail-body .set-tool-row {
+    grid-template-columns: 38px 135px minmax(220px, 1fr) 90px 125px !important;
+  }
+}
+@media (max-width: 900px) {
+  .asset-detail-workspace .asset-profile-head {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 15px 16px 13px;
+  }
+  .asset-detail-workspace .asset-profile-status {
+    grid-column: 2;
+  }
+  .asset-detail-workspace .asset-profile-title h1 {
+    font-size: 22px;
+    white-space: normal;
+  }
+  .asset-detail-workspace .asset-profile-facts {
+    padding: 9px 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .asset-detail-workspace .asset-profile-actions {
+    padding: 9px 16px 11px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .asset-detail-tabs {
+    min-height: 50px;
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+  .asset-detail-tabs button {
+    min-height: 48px;
+    padding: 0 15px !important;
+    font-size: 12.5px;
+  }
+  .asset-detail-body {
+    overflow: hidden;
+  }
+  .asset-summary-grid {
+    overflow: auto;
+  }
+  .asset-detail-body .set-composition-fixed {
+    overflow: hidden !important;
+  }
+  .asset-detail-body .set-composition-filters {
+    margin: 0 10px 8px;
+  }
+  .asset-detail-body .set-tool-list {
+    max-height: none !important;
+    overflow: auto !important;
+  }
+  .asset-detail-body .set-tool-row {
+    min-width: 760px;
+    grid-template-columns: 36px 125px minmax(220px, 1fr) 85px 120px !important;
+  }
+  .asset-detail-full-panel .asset-photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .asset-detail-workspace .asset-profile-facts {
+    grid-template-columns: 1fr;
+  }
+  .asset-detail-workspace .asset-profile-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .asset-detail-full-panel .asset-photo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* v0.22.7 Cleanup 08 — asset records stay inside the standard application shell.
+   Set and Tool cards retain the left navigation + global header on desktop;
+   the existing responsive shell still collapses the sidebar below 900px. */
+.asset-focus-shell > .main {
+  width: 100%;
+  max-width: none;
+}
+.asset-focus-shell .topbar {
+  width: 100%;
+  padding-left: clamp(18px, 2.2vw, 34px);
+  padding-right: clamp(18px, 2.2vw, 34px);
+}
+.asset-focus-shell .content {
+  max-width: none;
+  width: 100%;
+  padding-left: clamp(16px, 1.7vw, 28px);
+  padding-right: clamp(16px, 1.7vw, 28px);
+}
+.asset-focus-shell .asset-detail-workspace {
+  width: 100%;
+  max-width: 1760px;
+  margin: 0 auto;
+}
+.asset-focus-shell .asset-detail-body {
+  width: 100%;
+}
+.asset-focus-shell .asset-detail-tabs {
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .asset-focus-shell .content {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .asset-focus-shell .topbar {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* v0.21.5 — FileMaker-inspired asset workbench: fixed identity left, working canvas right. */
+.asset-focus-shell .content {
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+.asset-focus-shell footer {
+  display: none;
+}
+.legacy-inspired-workspace {
+  gap: 10px;
+}
+.asset-workbench-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 54px;
+  padding: 7px 0 10px;
+  border-bottom: 1px solid #dfe8ec;
+}
+.asset-action-group {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.asset-workbench-actions .app-button,
+.asset-workbench-actions .asset-action-link {
+  min-height: 44px !important;
+  padding: 0 16px !important;
+  font-size: 13px;
+  font-weight: 800;
+  border-radius: 10px;
+}
+.asset-workbench-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 16px;
+  overflow: hidden;
+}
+.asset-workbench-sidebar {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 15px 16px;
+  border: 1px solid #dce7eb;
+  border-radius: 15px;
+  background: #fff;
+  scrollbar-gutter: stable;
+}
+.asset-workbench-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #e6edf0;
+}
+.asset-workbench-title h1 {
+  margin: 3px 0 2px;
+  color: #17384a;
+  font-size: 25px;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+}
+.asset-workbench-title p {
+  margin: 0;
+  color: #708590;
+  font-size: 12px;
+  font-weight: 750;
+}
+.asset-workbench-fields {
+  margin: 10px 0 12px;
+  display: grid;
+  gap: 0;
+}
+.asset-workbench-fields > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px solid #edf2f4;
+}
+.asset-workbench-fields dt {
+  font-size: 11px;
+  color: #6d818c;
+  font-weight: 700;
+}
+.asset-workbench-fields dd {
+  margin: 0;
+  font-size: 12.5px;
+  color: #243e4d;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.asset-cover {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #dce7eb;
+  border-radius: 12px;
+  background: #f7fafb;
+  cursor: pointer;
+}
+.asset-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+.asset-cover-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #7d929c;
+}
+.asset-cover-empty strong {
+  font-size: 13px;
+  color: #516b78;
+}
+.asset-cover-empty span {
+  font-size: 11px;
+}
+.asset-cover-count {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(15, 53, 70, 0.88);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
+.asset-barcode-card {
+  margin-top: 10px;
+  min-height: 78px;
+  padding: 12px 14px;
+  border: 1px solid #dce7eb;
+  border-radius: 12px;
+  background: #fbfcfd;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+.asset-barcode-card > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #607986;
+  font-size: 11px;
+  font-weight: 750;
+}
+.asset-barcode-card strong {
+  font-size: 18px;
+  color: #0d6479;
+  letter-spacing: 0.04em;
+}
+.asset-workbench-mini {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid #e1eaee;
+  border-radius: 11px;
+  background: #f7fafb;
+  color: #55707d;
+}
+.asset-workbench-mini div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.asset-workbench-mini span {
+  font-size: 10px;
+}
+.asset-workbench-mini strong {
+  font-size: 12px;
+  color: #203d4c;
+}
+.asset-workbench-main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dce7eb;
+  border-radius: 15px;
+  background: #fff;
+}
+.asset-workbench-main > .asset-detail-tabs {
+  margin: 0;
+  padding: 0 10px;
+  background: #f8fafb;
+  min-height: 54px;
+}
+.asset-workbench-main > .asset-alert {
+  margin: 10px 12px 0;
+}
+.asset-workbench-main > .asset-detail-body {
+  padding: 12px;
+  min-height: 0;
+}
+.asset-workbench-main .asset-section {
+  box-shadow: none;
+}
+.asset-workbench-main .set-composition-fixed {
+  border: 0 !important;
+}
+.asset-workbench-main .set-composition-head {
+  padding-top: 10px;
+}
+.asset-workbench-main .set-tool-list {
+  border-top: 1px solid #e5ecef;
+}
+.asset-workbench-main .asset-summary-grid {
+  height: 100%;
+}
+
+@media (max-width: 1180px) {
+  .asset-workbench-grid {
+    grid-template-columns: 290px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .asset-workbench-sidebar {
+    padding: 12px;
+  }
+  .asset-cover {
+    height: 180px;
+  }
+  .asset-workbench-fields > div {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .asset-workbench-actions {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .asset-action-group {
+    flex: 0 0 auto;
+  }
+}
+@media (max-width: 900px) {
+  .asset-focus-shell .content {
+    padding: 10px !important;
+  }
+  .asset-workbench-grid {
+    grid-template-columns: 260px minmax(620px, 1fr);
+    overflow-x: auto;
+  }
+  .asset-workbench-sidebar {
+    overflow: auto;
+  }
+  .asset-workbench-main {
+    min-width: 620px;
+  }
+  .asset-workbench-actions .app-button,
+  .asset-workbench-actions .asset-action-link {
+    min-height: 46px !important;
+  }
+}
+@media (max-width: 700px) {
+  .asset-workbench-grid {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  .asset-workbench-sidebar {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  .asset-workbench-main {
+    flex: 0 0 72dvh;
+    min-width: 0;
+  }
+  .asset-cover {
+    height: 220px;
+  }
+}
+
+/* v0.21.6 — set workbench refinement: fixed identity, composition-first, contextual actions. */
+.asset-workbench-sidebar {
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 14px;
+}
+.asset-workbench-title {
+  padding-bottom: 9px;
+}
+.asset-workbench-title h1 {
+  font-size: 21px;
+}
+.asset-fields-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0 3px;
+}
+.asset-fields-heading > strong {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #718690;
+}
+.asset-inline-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: #176f82;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 7px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.asset-inline-edit:hover {
+  background: #edf7f8;
+}
+.asset-workbench-fields {
+  margin: 0 0 7px;
+}
+.asset-workbench-fields > div {
+  min-height: 31px;
+  grid-template-columns: 104px minmax(0, 1fr);
+}
+.asset-workbench-fields dt {
+  font-size: 10.5px;
+}
+.asset-workbench-fields dd {
+  font-size: 11.5px;
+}
+.asset-sidebar-quickfacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 3px 0 8px;
+}
+.asset-sidebar-quickfacts .asset-barcode-card,
+.asset-sidebar-quickfacts .asset-workbench-mini {
+  margin: 0;
+  min-height: 58px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.asset-sidebar-quickfacts .asset-barcode-card {
+  gap: 5px;
+}
+.asset-sidebar-quickfacts .asset-barcode-card strong {
+  font-size: 14px;
+}
+.asset-sidebar-quickfacts .asset-workbench-mini {
+  align-items: center;
+}
+.asset-sidebar-quickfacts .asset-workbench-mini span {
+  font-size: 9px;
+}
+.asset-sidebar-quickfacts .asset-workbench-mini strong {
+  font-size: 10.5px;
+}
+.asset-workbench-sidebar .asset-cover {
+  height: min(170px, 22vh);
+  min-height: 118px;
+  margin-top: 0;
+}
+.asset-workbench-actions {
+  min-height: 50px;
+  padding: 5px 0 8px;
+}
+.asset-workbench-actions .app-button,
+.asset-workbench-actions .asset-action-link {
+  min-height: 40px !important;
+  padding: 0 13px !important;
+  font-size: 12px;
+}
+.asset-workbench-main > .asset-detail-tabs {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+.asset-workbench-main > .asset-detail-tabs button {
+  justify-content: center;
+}
+.choice-dialog-body {
+  display: grid;
+  gap: 9px;
+  padding: 4px 20px 20px;
+}
+.choice-dialog-body > button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid #dce7eb;
+  border-radius: 11px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+.choice-dialog-body > button:hover {
+  border-color: #8dbbc5;
+  background: #f6fbfc;
+}
+.choice-dialog-body strong {
+  font-size: 13px;
+  color: #203d4c;
+}
+.choice-dialog-body span {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #71848e;
+}
+.choice-dialog-body .danger-option {
+  border-color: #efd0ce;
+}
+.choice-dialog-body .danger-option strong {
+  color: #9f3531;
+}
+.choice-dialog-body .danger-option:hover {
+  background: #fff7f6;
+  border-color: #d99a96;
+}
+.asset-photo-manager-modal {
+  width: min(980px, calc(100vw - 36px));
+  max-height: 86dvh;
+}
+.asset-photo-manager-modal .modal-body {
+  overflow: auto;
+}
+.asset-photo-manager-modal .asset-photos-card {
+  border: 0;
+  box-shadow: none;
+}
+.set-report-modal {
+  width: min(760px, calc(100vw - 36px));
+  max-height: 88dvh;
+}
+.set-report-modal .modal-body {
+  overflow: auto;
+}
+.report-target-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.report-target-switch button {
+  min-height: 42px;
+  border: 1px solid #dce7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #536d79;
+  font-weight: 800;
+  cursor: pointer;
+}
+.report-target-switch button.active {
+  border-color: #23879a;
+  background: #edf8fa;
+  color: #12677a;
+}
+.report-tool-picker {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid #e1eaee;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+.report-tool-picker label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-bottom: 1px solid #edf2f4;
+  cursor: pointer;
+}
+.report-tool-picker label:last-child {
+  border-bottom: 0;
+}
+.report-tool-picker span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.report-tool-picker strong {
+  font-size: 11.5px;
+}
+.report-tool-picker small {
+  font-size: 9.5px;
+  color: #718690;
+}
+.report-photo-input {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 7px;
+  padding: 11px 12px !important;
+  border: 1px dashed #b8ccd3;
+  border-radius: 10px;
+  background: #f8fbfc;
+  cursor: pointer;
+}
+.report-photo-input input {
+  grid-column: 1/-1;
+}
+.report-photo-input small {
+  grid-column: 2;
+  color: #718690;
+}
+@media (max-width: 1180px) {
+  .asset-sidebar-quickfacts {
+    grid-template-columns: 1fr;
+  }
+  .asset-workbench-sidebar .asset-cover {
+    height: 140px;
+  }
+  .asset-workbench-fields > div {
+    min-height: 29px;
+  }
+}
+
+/* v0.21.8 — conservative workbench repair. Keep v0.21.6 geometry; edit in place without changing panel height. */
+.asset-inline-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+.asset-inline-save,
+.asset-inline-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 28px;
+  border: 1px solid #cfe0e5;
+  border-radius: 7px;
+  background: #fff;
+  color: #176f82;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.asset-inline-save {
+  padding: 0 8px;
+  background: #edf8fa;
+  border-color: #a9d0d8;
+}
+.asset-inline-cancel {
+  width: 28px;
+  padding: 0;
+  color: #667e89;
+}
+.asset-inline-input {
+  width: 100%;
+  min-width: 0;
+  height: 25px;
+  padding: 2px 6px;
+  border: 1px solid #b9d0d7;
+  border-radius: 6px;
+  background: #fff;
+  color: #203d4c;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  outline: none;
+}
+.asset-inline-input:focus {
+  border-color: #25889a;
+  box-shadow: 0 0 0 2px rgba(37, 136, 154, 0.1);
+}
+.asset-workbench-fields dd {
+  min-width: 0;
+}
+.asset-workbench-fields dd .asset-inline-input {
+  display: block;
+}
+.asset-photo-manager-modal {
+  width: min(1120px, calc(100vw - 44px));
+  height: min(820px, 88dvh);
+  max-height: none;
+}
+.asset-photo-manager-modal > header {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.asset-photo-manager-modal > header > .modal-close-right {
+  grid-column: 2;
+  margin-left: auto;
+}
+.asset-photo-manager-modal .modal-body {
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: 26px;
+}
+.set-report-modal > header {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.set-report-modal > header > .icon-button {
+  grid-column: 2;
+  margin-left: auto;
+}
+.set-report-modal {
+  height: min(760px, 88dvh);
+  max-height: none;
+}
+.set-report-modal .modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.set-report-modal .report-tool-picker {
+  flex: 0 1 220px;
+  min-height: 100px;
+  overflow: auto;
+}
+.set-report-modal .form-grid {
+  flex: 0 0 auto;
+}
+.set-report-modal > footer {
+  flex: 0 0 auto;
+}
+.tool-detail-workspace .asset-workbench-main > .asset-detail-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+@media (max-width: 900px) {
+  .asset-photo-manager-modal {
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 24px);
+  }
+}
+
+/* v0.22.9 workflow map participates as a compact fixed control; only the queue list scrolls */
+.sterilization-workspace > .ster-work-panel {
+  flex: 1 1 180px;
+  min-height: 150px;
+  overflow: auto;
+}
+
+/* Full-page create workspaces: use the same focus-shell behavior as existing Set / Tool cards. */
+.asset-create-page {
+  height: calc(100vh - 108px);
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.asset-create-page .asset-workbench-actions {
+  flex: 0 0 auto;
+}
+.asset-create-mode-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f7fafb;
+  color: #607783;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.asset-create-page-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dce6ea;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(17, 48, 61, 0.07);
+}
+.asset-create-page-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 20px 15px;
+  border-bottom: 1px solid #e5ecef;
+  background: linear-gradient(105deg, #f6fbfc, #fff 60%);
+}
+.asset-create-page-head h1 {
+  margin: 2px 0 4px;
+  font-size: 23px;
+  line-height: 1.15;
+  color: #20313f;
+}
+.asset-create-page-head p {
+  margin: 0;
+  color: #71838d;
+  font-size: 12px;
+}
+.asset-create-page-workspace {
+  flex: 1;
+  min-height: 0;
+  border-radius: 0;
+  border: 0;
+}
+.asset-create-tool-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px;
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+}
+.asset-create-tool-body .form-grid {
+  align-content: start;
+}
+.asset-create-page-footer {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid #e5ecef;
+  background: #f8fbfc;
+}
+.asset-create-page .create-set-details-pane,
+.asset-create-page .create-set-tools-pane {
+  min-height: 0;
+}
+.asset-create-page .create-set-tools-list {
+  max-height: none;
+  flex: 1;
+  min-height: 0;
+}
+.asset-create-page .create-set-details-scroll {
+  min-height: 0;
+  overflow: auto;
+}
+@media (max-width: 900px) {
+  .asset-create-page {
+    height: calc(100vh - 86px);
+  }
+  .asset-create-page-head {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .asset-create-page-head > .barcode-preview {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .asset-create-tool-body {
+    padding: 16px;
+  }
+  .asset-create-page-workspace {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+  .asset-create-page .create-set-details-pane,
+  .asset-create-page .create-set-tools-pane {
+    min-height: auto;
+  }
+  .asset-create-page .create-set-tools-list {
+    max-height: 360px;
+  }
+}
+@media (max-width: 640px) {
+  .asset-create-page {
+    height: calc(100vh - 74px);
+  }
+  .asset-create-page-head {
+    padding: 14px;
+  }
+  .asset-create-page-head h1 {
+    font-size: 20px;
+  }
+  .asset-create-page-footer {
+    padding: 10px;
+    position: sticky;
+    bottom: 0;
+  }
+  .asset-create-tool-body .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .asset-create-tool-body .span-2 {
+    grid-column: span 1;
+  }
+}
+
+/* v0.26.6 — asset card QA: readable identity column, workflow locks and no horizontal composition scroll. */
+.asset-workbench-grid {
+  grid-template-columns: minmax(330px, 390px) minmax(0, 1fr);
+}
+.asset-workbench-title {
+  display: block;
+}
+.asset-workbench-title-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+}
+.asset-workbench-title-main > div:last-child {
+  min-width: 0;
+}
+.asset-workbench-title h1 {
+  font-size: clamp(21px, 1.55vw, 25px);
+  line-height: 1.12;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.asset-workbench-title-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 9px;
+  padding-left: 50px;
+  min-width: 0;
+}
+.asset-workbench-title-status small {
+  font-size: 9.5px;
+  color: #8a6a38;
+  font-weight: 700;
+}
+.asset-detail-body .set-tool-list {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+.asset-detail-body .set-tool-row {
+  width: 100%;
+  min-width: 0 !important;
+  grid-template-columns: 34px minmax(96px, 125px) minmax(150px, 1fr) minmax(92px, 115px) minmax(118px, 145px) !important;
+  gap: 10px;
+  padding: 11px 14px !important;
+}
+.asset-detail-body .set-tool-row > * {
+  min-width: 0;
+}
+.asset-detail-body .set-tool-state {
+  min-width: 0;
+  justify-items: stretch;
+}
+.asset-detail-body .set-tool-state .status-badge {
+  max-width: 100%;
+  white-space: normal !important;
+  line-height: 1.2;
+  text-align: center;
+  justify-content: center;
+  padding-inline: 8px;
+}
+.asset-detail-body .set-tool-code strong,
+.asset-detail-body .set-tool-code small,
+.asset-detail-body .set-tool-name strong,
+.asset-detail-body .set-tool-name small {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+.app-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  filter: saturate(0.65);
+}
+@media (max-width: 1180px) {
+  .asset-workbench-grid {
+    grid-template-columns: 310px minmax(0, 1fr);
+  }
+  .asset-detail-body .set-tool-row {
+    grid-template-columns: 30px minmax(86px, 105px) minmax(130px, 1fr) minmax(82px, 96px) minmax(105px, 125px) !important;
+    gap: 8px;
+    padding-inline: 10px !important;
+  }
+}
+@media (max-width: 900px) {
+  .asset-workbench-grid {
+    grid-template-columns: minmax(280px, 34%) minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+  .asset-workbench-main {
+    min-width: 0 !important;
+  }
+  .asset-detail-body .set-tool-row {
+    min-width: 0 !important;
+    grid-template-columns: 28px minmax(82px, 100px) minmax(125px, 1fr) minmax(78px, 92px) !important;
+  }
+  .asset-detail-body .set-tool-state {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .asset-workbench-grid {
+    display: flex !important;
+    flex-direction: column;
+    overflow: auto !important;
+  }
+  .asset-workbench-title-status {
+    padding-left: 0;
+  }
+}
+
+/* v0.26.7 — Tool card readability: tool identity uses its own geometry instead of the denser Set title layout. */
+.tool-detail-workspace .asset-workbench-grid {
+  grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+}
+.asset-workbench-sidebar-tool .asset-workbench-title {
+  display: block;
+}
+.asset-workbench-sidebar-tool .asset-workbench-title-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+  min-width: 0;
+}
+.asset-workbench-sidebar-tool .asset-workbench-title-main > div {
+  min-width: 0;
+}
+.asset-workbench-sidebar-tool .asset-workbench-title h1 {
+  font-size: 23px;
+  line-height: 1.14;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+.asset-workbench-sidebar-tool .asset-workbench-title-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+  padding-left: 47px;
+}
+.asset-workbench-sidebar-tool .asset-workbench-title-status small {
+  flex-basis: 100%;
+  line-height: 1.35;
+  color: #7a8d97;
+}
+.asset-workbench-sidebar-tool .asset-workbench-fields > div {
+  grid-template-columns: 118px minmax(0, 1fr);
+}
+@media (max-width: 1180px) {
+  .tool-detail-workspace .asset-workbench-grid {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+  .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+    grid-template-columns: 108px minmax(0, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .tool-detail-workspace .asset-workbench-grid {
+    grid-template-columns: 300px minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .tool-detail-workspace .asset-workbench-main {
+    min-width: 0;
+  }
+}
+@media (max-width: 700px) {
+  .tool-detail-workspace .asset-workbench-grid {
+    display: flex;
+    overflow: auto;
+  }
+  .asset-workbench-sidebar-tool .asset-workbench-title-status {
+    padding-left: 0;
+  }
+}
+
+/* v0.26.9 — tool card: compact photo lives beside quick facts, not below the fold */
+.asset-workbench-sidebar-tool {
+  overflow: hidden;
+}
+.asset-workbench-sidebar-tool .asset-sidebar-quickfacts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.asset-workbench-sidebar-tool .asset-sidebar-quickfacts .asset-barcode-card,
+.asset-workbench-sidebar-tool .asset-sidebar-quickfacts .asset-workbench-mini {
+  margin-top: 0;
+  min-height: 78px;
+}
+.asset-tool-photo-card {
+  position: relative;
+  width: 100%;
+  min-height: 86px;
+  margin-top: 10px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #dce7eb;
+  border-radius: 12px;
+  background: #f7fafb;
+  cursor: pointer;
+}
+.asset-tool-photo-card img {
+  width: 100%;
+  height: 86px;
+  display: block;
+  object-fit: contain;
+  background: #fff;
+}
+.asset-tool-photo-empty {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #78909b;
+}
+.asset-tool-photo-empty div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.asset-tool-photo-empty strong {
+  font-size: 12px;
+  color: #516b78;
+}
+.asset-tool-photo-empty span {
+  font-size: 10px;
+  color: #82949d;
+}
+.asset-workbench-sidebar-tool .asset-cover-count {
+  right: 7px;
+  bottom: 7px;
+  padding: 5px 7px;
+}
+
+/* v0.27.0 — tool quick facts are one fixed row: barcode | uses | photo */
+.asset-workbench-sidebar-tool .asset-sidebar-quickfacts {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 104px !important;
+  gap: 9px !important;
+  align-items: stretch !important;
+}
+.asset-workbench-sidebar-tool .asset-tool-photo-card {
+  margin-top: 0 !important;
+  min-height: 78px !important;
+  height: 78px !important;
+}
+.asset-workbench-sidebar-tool .asset-tool-photo-card img {
+  height: 76px !important;
+}
+.asset-workbench-sidebar-tool .asset-tool-photo-empty {
+  min-height: 76px !important;
+  gap: 5px !important;
+  flex-direction: column !important;
+}
+.asset-workbench-sidebar-tool .asset-tool-photo-empty div {
+  align-items: center !important;
+}
+.asset-workbench-sidebar-tool .asset-tool-photo-empty span {
+  display: none;
+}
+.asset-workbench-sidebar-tool .asset-barcode-card strong {
+  font-size: 15px;
+}
