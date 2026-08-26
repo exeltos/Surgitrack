@@ -21,6 +21,7 @@ export type SterilizationWorkflowConfig = {
   profileName: string;
   version: number;
   updatedAt: string;
+  updatedBy?: string;
   receiptPolicy: SterilizationReceiptPolicy;
   releasePolicy: SterilizationReleasePolicy;
   stages: WorkflowStageConfig[];
@@ -165,3 +166,14 @@ export function reprocessState(stages: readonly WorkflowStageConfig[]): string {
   const next = stages.filter(stage => stage.enabled).find(stage => stage.id !== 'RECEIPT');
   return next ? workflowStageState[next.id] : 'IN_PREPARATION';
 }
+
+
+export type SterilizationWorkflowVersion = {
+  id: string;
+  version: number;
+  profileName: string;
+  effectiveFrom: string;
+  changedBy: string;
+  changeReason?: string;
+  snapshot: SterilizationWorkflowConfig;
+};

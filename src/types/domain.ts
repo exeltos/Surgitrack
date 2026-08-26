@@ -112,7 +112,7 @@ export interface PreparationProcessChecks {
 }
 export interface PreparationRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   assetId: string;
   assetKind: AssetKind;
   barcode: string;
@@ -132,7 +132,7 @@ export type SterilizationCycleResult = 'PASSED' | 'FAILED';
 export type SterilizationIndicatorResult = 'PASS' | 'FAIL' | 'NOT_RECORDED';
 export interface SterilizationCycleRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   loadId?: string;
   assetId: string;
   assetKind: AssetKind;
@@ -155,7 +155,7 @@ export type SterilizationReleaseDecision = 'RELEASED' | 'REPROCESS';
 export type BiologicalIndicatorResult = 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL';
 export interface SterilizationReleaseRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   loadId?: string;
   assetId: string;
   assetKind: AssetKind;
@@ -188,7 +188,7 @@ export interface ProcessLoadItem {
 }
 export interface ProcessLoadRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   kind: ProcessLoadKind;
   equipment: string;
   cycleNumber: string;
@@ -210,7 +210,7 @@ export interface ProcessLoadRecord {
 }
 export interface ReceiptRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   batchId?: string;
   assetId: string;
   assetKind: AssetKind;
@@ -240,7 +240,7 @@ export interface ReceiptRecord {
 }
 export interface DeliveryRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   batchId?: string;
   assetId: string;
   assetKind: AssetKind;
@@ -259,7 +259,7 @@ export interface DeliveryRecord {
 
 export interface WorkflowCheckpointRecord {
   id: string;
-  workflowVersion?: number;
+  workflowVersion: number;
   assetId: string;
   assetKind: AssetKind;
   barcode: string;
@@ -274,8 +274,24 @@ export interface WorkflowCheckpointRecord {
   completedAt: string;
 }
 
-export type OperationalAuditAction = 'STATE_CHANGE'|'PROCESS'|'RELEASE'|'REPROCESS'|'RECALL'|'DELIVERY'|'ASSET_UPDATE'|'USAGE_LIMIT'|'SECURITY_BLOCK';
-export interface OperationalAuditEvent {id:string; at:string; byUserId:string; byName:string; action:OperationalAuditAction; entityType:'SET'|'TOOL'|'LOAD'|'SYSTEM'; entityId:string; description:string; before?:unknown; after?:unknown; reason?:string; workflowVersion?:number;}
-export type RecallItemStatus = 'OUTSTANDING'|'SECURED'|'REPROCESSING'|'CLOSED';
-export interface RecallCaseItem {assetId:string; assetKind:AssetKind; barcode:string; assetName:string; department:string; patientCode?:string; status:RecallItemStatus; securedAt?:string;}
-export interface RecallCaseRecord {id:string; loadId:string; cycleNumber:string; sterilizer:string; reason:string; status:'OPEN'|'CLOSED'; openedAt:string; openedByUserId:string; openedByName:string; workflowVersion?:number; items:RecallCaseItem[]; closedAt?:string;}
+
+export type RecallItemStatus = 'OUTSTANDING' | 'RETURNED' | 'REPROCESSING' | 'CLOSED';
+export interface RecallCaseItem extends ProcessLoadItem {
+  currentState: AssetState;
+  patientCode?: string;
+  status: RecallItemStatus;
+  returnedAt?: string;
+}
+export interface RecallCase {
+  id: string;
+  loadId: string;
+  cycleNumber: string;
+  sterilizer: string;
+  reason: string;
+  openedAt: string;
+  openedByUserId: string;
+  openedByName: string;
+  status: 'OPEN' | 'CLOSED';
+  items: RecallCaseItem[];
+  closedAt?: string;
+}

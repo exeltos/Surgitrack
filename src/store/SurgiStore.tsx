@@ -7,8 +7,6 @@ import type {
   DeliveryRecord,
   Issue,
   Movement,
-  OperationalAuditEvent,
-  RecallCaseRecord,
   PreparationRecord,
   ReceiptRecord,
   SetAsset,
@@ -17,6 +15,7 @@ import type {
   Tool,
   WorkflowCheckpointRecord,
   ProcessLoadRecord,
+  RecallCase,
 } from '../types/domain';
 import {
   findAsset,
@@ -99,11 +98,10 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
   const [preparations, setPreparations] = useState<PreparationRecord[]>([]);
   const [sterilizationCycles, setSterilizationCycles] = useState<SterilizationCycleRecord[]>([]);
   const [processLoads, setProcessLoads] = useState<ProcessLoadRecord[]>([]);
+  const [recallCases, setRecallCases] = useState<RecallCase[]>([]);
   const [sterilizationReleases, setSterilizationReleases] = useState<SterilizationReleaseRecord[]>([]);
   const [workflowCheckpoints, setWorkflowCheckpoints] = useState<WorkflowCheckpointRecord[]>([]);
   const [deliveries, setDeliveries] = useState<DeliveryRecord[]>([]);
-  const [operationalAudit, setOperationalAudit] = useState<OperationalAuditEvent[]>([]);
-  const [recallCases, setRecallCases] = useState<RecallCaseRecord[]>([]);
   const [toast, setToast] = useState<Toast>();
   const notify = (text: string) => setToast({id: Date.now(), text});
   useEffect(() => {
@@ -113,11 +111,31 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
   }, [toast]);
   const addMovement = (m: Omit<Movement, 'id' | 'at'>) =>
     setMovements(x => [{...m, id: `m${Date.now()}`, at: formatStoreDateTime()}, ...x]);
-  const addOperationalAudit = (event: Omit<OperationalAuditEvent, 'id' | 'at' | 'byUserId' | 'byName' | 'workflowVersion'>) =>
-    setOperationalAudit(list => [{...event,id:`oa-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,at:new Date().toISOString(),byUserId:currentUser.id,byName:currentUser.name,workflowVersion:sterilizationWorkflow.version},...list].slice(0,1000));
   const assetName = (kind: AssetKind, id: string) => findAsset(kind, id, sets, tools);
-  const usageExhausted = (kind: AssetKind, id: string) => { const a=assetName(kind,id); if(!a) return false; if(a.maxUses!==undefined && (a.uses||0)>=a.maxUses) return true; return kind==='SET' && tools.some(t=>t.setId===id && t.maxUses!==undefined && t.uses>=t.maxUses); };
-  const blockIfUsageExhausted = (kind: AssetKind,id:string,action:string) => { const a=assetName(kind,id); if(!a||!usageExhausted(kind,id)) return false; notify(`${a.barcode}: η ενέργεια δεν επιτρέπεται επειδή έχει εξαντληθεί το όριο χρήσεων.`); addOperationalAudit({action:'SECURITY_BLOCK',entityType:kind,entityId:id,description:`Hard stop: ${action}`,reason:'Usage limit exhausted'}); return true; };
+  const isUsageExhausted = (kind: AssetKind, id: string) => {
+    const asset = assetName(kind, id);
+    if (!asset) return false;
+    if (asset.maxUses && (asset.uses || 0) >= asset.maxUses) return true;
+    if (kind === 'SET') {
+      return tools.some(tool => tool.setId === id && tool.maxUses && (tool.uses || 0) >= tool.maxUses);
+    }
+    return false;
+  };
+  const isAssetRecalled = (kind: AssetKind, id: string) =>
+    recallCases.some(c => c.status === 'OPEN' && c.items.some(item => item.assetKind === kind && item.assetId === id && item.status !== 'CLOSED'));
+  const assertCirculationAllowed = (kind: AssetKind, id: string) => {
+    const asset = assetName(kind, id);
+    if (!asset) return false;
+    if (isUsageExhausted(kind, id)) {
+      notify(`${asset.barcode}: δεν επιτρέπεται η κυκλοφορία — έχει εξαντληθεί το όριο χρήσεων.`);
+      return false;
+    }
+    if (isAssetRecalled(kind, id)) {
+      notify(`${asset.barcode}: δεν επιτρέπεται η κυκλοφορία — βρίσκεται σε ενεργή ανάκληση.`);
+      return false;
+    }
+    return true;
+  };
   const updateState = (kind: AssetKind, id: string, state: AssetState) => {
     if (kind === 'SET') {
       setSets(x => x.map(a => (a.id === id ? {...a, state} : a)));
@@ -128,7 +146,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
   };
   const sendToSterilization = (kind: AssetKind, id: string, patientCode?: string, note?: string) => {
     const a = assetName(kind, id);
-    if (!a || blockIfUsageExhausted(kind,id,'Αποστολή προς Αποστείρωση')) return;
+    if (!a || !assertCirculationAllowed(kind, id)) return;
     updateState(kind, id, 'PENDING_STERILIZATION');
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
@@ -140,7 +158,6 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       patientCode,
       note,
     });
-    addOperationalAudit({action:'STATE_CHANGE',entityType:kind,entityId:id,description:'Αποστολή προς Κεντρική Αποστείρωση',before:a.state,after:'PENDING_STERILIZATION'});
     notify(`${a.barcode} προωθήθηκε ηλεκτρονικά προς Αποστείρωση από ${currentUser.name}.`);
   };
   const receiveAtSterilization = (kind: AssetKind, id: string, payload: ReceivePayload) => {
@@ -181,6 +198,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       setChecks: payload.checkPerformed ? payload.setChecks : undefined,
     };
     setReceipts(x => [record, ...x]);
+    setRecallCases(cases => cases.map(c => c.status !== 'OPEN' ? c : ({...c, items: c.items.map(item => item.assetKind === kind && item.assetId === id ? {...item, status: 'REPROCESSING', returnedAt: record.at} : item)})));
     if (kind === 'SET' && payload.checkPerformed && checkedCount !== undefined)
       setSets(x => x.map(s => (s.id === id ? {...s, actual: checkedCount} : s)));
     if (payload.checkPerformed && payload.checkResult && payload.checkResult !== 'OK') {
@@ -401,7 +419,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       .map(ref => ({ref, asset: assetName(ref.kind, ref.id)}))
       .filter(
         (entry): entry is {ref: {kind: AssetKind; id: string}; asset: NonNullable<ReturnType<typeof assetName>>} =>
-          !!entry.asset && entry.asset.state === expectedState && !usageExhausted(entry.ref.kind, entry.ref.id),
+          !!entry.asset && entry.asset.state === expectedState,
       );
     if (!refs.length) {
       notify('Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.');
@@ -421,7 +439,6 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       refs.forEach(({ref, asset}) => {
         const checkpoint: WorkflowCheckpointRecord = {
           id: `wc${Date.now()}-${ref.id}`,
-          workflowVersion: sterilizationWorkflow.version,
           assetId: ref.id,
           assetKind: ref.kind,
           barcode: asset.barcode,
@@ -450,6 +467,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       });
       const record: ProcessLoadRecord = {
         id: loadId,
+        workflowVersion: sterilizationWorkflow.version,
         kind: 'WASHING',
         equipment: payload.equipment,
         cycleNumber: payload.cycleNumber,
@@ -471,6 +489,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       const toolIds = ref.kind === 'SET' ? tools.filter(t => t.setId === ref.id).map(t => t.id) : [ref.id];
       const cycle: SterilizationCycleRecord = {
         id: `sc${Date.now()}-${index}`,
+        workflowVersion: sterilizationWorkflow.version,
         loadId,
         assetId: ref.id,
         assetKind: ref.kind,
@@ -564,7 +583,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       if (!cycle) return;
       const record: SterilizationReleaseRecord = {
         id: `sr${Date.now()}-${index}`,
-        workflowVersion: load.workflowVersion || sterilizationWorkflow.version,
+        workflowVersion: sterilizationWorkflow.version,
         loadId,
         assetId: item.assetId,
         assetKind: item.assetKind,
@@ -610,6 +629,15 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       releasedAt: now,
     };
     setProcessLoads(list => list.map(item => (item.id === loadId ? updated : item)));
+    if (decision === 'RELEASED') {
+      const releasedKeys = new Set(load.items.map(item => `${item.assetKind}:${item.assetId}`));
+      setRecallCases(cases => cases.map(recall => {
+        if (recall.status !== 'OPEN') return recall;
+        const items = recall.items.map(item => releasedKeys.has(`${item.assetKind}:${item.assetId}`) ? {...item, status: 'CLOSED' as const} : item);
+        const closed = items.every(item => item.status === 'CLOSED');
+        return {...recall, items, status: closed ? 'CLOSED' as const : 'OPEN' as const, closedAt: closed ? now : recall.closedAt};
+      }));
+    }
     notify(
       decision === 'RELEASED'
         ? `Το φορτίο ${loadId} αποδεσμεύτηκε (${load.items.length} αντικείμενα).`
@@ -618,14 +646,52 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     return updated;
   };
   const recallProcessLoad = (loadId: string, reason: string) => {
-    const load=processLoads.find(item=>item.id===loadId&&item.kind==='STERILIZATION');
-    if(!load||load.status!=='RELEASED'){notify('Ανάκληση επιτρέπεται μόνο για αποδεσμευμένο φορτίο.');return;}
-    const now=formatStoreDateTime();
-    const recallCase:RecallCaseRecord={id:`RC-${Date.now()}`,loadId,cycleNumber:load.cycleNumber,sterilizer:load.equipment,reason,status:'OPEN',openedAt:now,openedByUserId:currentUser.id,openedByName:currentUser.name,workflowVersion:load.workflowVersion||sterilizationWorkflow.version,items:load.items.map(item=>{const d=deliveries.find(x=>x.assetId===item.assetId&&x.assetKind===item.assetKind);const a=assetName(item.assetKind,item.assetId);return {assetId:item.assetId,assetKind:item.assetKind,barcode:item.barcode,assetName:item.assetName,department:d?.receivedByDepartment||a?.department||item.department,patientCode:a&&'patientCode' in a?(a as SetAsset).patientCode:undefined,status:'REPROCESSING',securedAt:now};})};
-    load.items.forEach(item=>{const a=assetName(item.assetKind,item.assetId);if(!a)return;updateState(item.assetKind,item.assetId,reprocessState());addMovement({asset:`${item.barcode} · ${item.assetName}`,assetKind:item.assetKind,from:a.department||'Κυκλοφορία',to:'Ανάκληση / Επανεπεξεργασία',status:`ΑΝΑΚΛΗΣΗ φορτίου ${loadId} · ${reason}`,by:currentUser.name});});
-    setRecallCases(list=>[recallCase,...list]); setProcessLoads(list=>list.map(item=>item.id===loadId?{...item,status:'RECALLED',recalledAt:now,recallReason:reason}:item));
-    addOperationalAudit({action:'RECALL',entityType:'LOAD',entityId:loadId,description:`Άνοιγμα ανάκλησης ${recallCase.id}`,before:'RELEASED',after:'RECALLED',reason});
-    notify(`Το φορτίο ${loadId} ανακλήθηκε. Δημιουργήθηκε υπόθεση ${recallCase.id}.`);
+    const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
+    if (!load || load.status !== 'RELEASED' || !reason.trim()) return;
+    if (recallCases.some(c => c.loadId === loadId && c.status === 'OPEN')) {
+      notify(`Υπάρχει ήδη ενεργή ανάκληση για το φορτίο ${loadId}.`);
+      return;
+    }
+    const now = formatStoreDateTime();
+    const caseItems = load.items.map(item => {
+      const asset = assetName(item.assetKind, item.assetId);
+      const currentState = asset?.state || ('IN_DEPARTMENT' as AssetState);
+      return {
+        ...item,
+        currentState,
+        patientCode: asset && 'patientCode' in asset ? asset.patientCode : undefined,
+        status: (currentState === 'IN_DEPARTMENT' ? 'OUTSTANDING' : 'REPROCESSING') as 'OUTSTANDING' | 'REPROCESSING',
+      };
+    });
+    const recallCase: RecallCase = {
+      id: `recall-${Date.now()}`,
+      loadId,
+      cycleNumber: load.cycleNumber,
+      sterilizer: load.equipment,
+      reason: reason.trim(),
+      openedAt: now,
+      openedByUserId: currentUser.id,
+      openedByName: currentUser.name,
+      status: 'OPEN',
+      items: caseItems,
+    };
+    setRecallCases(list => [recallCase, ...list]);
+    load.items.forEach(item => {
+      const asset = assetName(item.assetKind, item.assetId);
+      if (!asset) return;
+      updateState(item.assetKind, item.assetId, asset.state === 'IN_DEPARTMENT' ? 'PENDING_STERILIZATION' : reprocessState());
+      addMovement({
+        asset: `${item.barcode} · ${item.assetName}`,
+        assetKind: item.assetKind,
+        from: asset.department || 'Κυκλοφορία',
+        to: 'Ανάκληση / Επανεπεξεργασία',
+        status: `ΑΝΑΚΛΗΣΗ ${recallCase.id} · φορτίο ${loadId} · ${reason.trim()}`,
+        by: currentUser.name,
+        patientCode: asset && 'patientCode' in asset ? asset.patientCode : undefined,
+      });
+    });
+    setProcessLoads(list => list.map(item => item.id === loadId ? {...item, status: 'RECALLED', recalledAt: now, recallReason: reason.trim()} : item));
+    notify(`Άνοιξε η ανάκληση ${recallCase.id} για το φορτίο ${loadId} (${load.items.length} αντικείμενα).`);
   };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
     const a = assetName(kind, id);
@@ -666,7 +732,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
   };
   const completeDeliveryToDepartment = (kind: AssetKind, id: string, payload: DeliveryPayload) => {
     const a = assetName(kind, id);
-    if (!a || a.state !== 'READY_FOR_PICKUP' || blockIfUsageExhausted(kind,id,'Παράδοση στο Τμήμα')) return;
+    if (!a || a.state !== 'READY_FOR_PICKUP' || !assertCirculationAllowed(kind, id)) return;
     const record: DeliveryRecord = {
       id: `d${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       workflowVersion: sterilizationWorkflow.version,
@@ -1419,7 +1485,6 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     } else {
       setTools(list => list.map(item => (item.id === id ? {...item, maxUses: normalized} : item)));
     }
-    addOperationalAudit({action:'USAGE_LIMIT',entityType:kind,entityId:id,description:normalized?`Ορισμός ορίου ${normalized} χρήσεων`:'Αφαίρεση ορίου χρήσεων',after:normalized});
     notify(normalized ? `Ορίστηκε όριο ${normalized} χρήσεων.` : 'Το όριο χρήσεων αφαιρέθηκε.');
   };
   const value = useMemo(
@@ -1433,11 +1498,10 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       preparations,
       sterilizationCycles,
       processLoads,
+      recallCases,
       sterilizationReleases,
       workflowCheckpoints,
       deliveries,
-      operationalAudit,
-      recallCases,
       lifecycleAlerts,
       toast,
       role,
@@ -1489,11 +1553,10 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       preparations,
       sterilizationCycles,
       processLoads,
+      recallCases,
       sterilizationReleases,
       workflowCheckpoints,
       deliveries,
-      operationalAudit,
-      recallCases,
       lifecycleAlerts,
       toast,
       role,

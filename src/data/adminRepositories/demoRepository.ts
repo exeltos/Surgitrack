@@ -29,7 +29,18 @@ const createDemoInitialData = (): LibraryState => ({
   },
   rolePermissionAudit: [],
   configurationAudit: [],
-  workflowVersions: [{version: defaultSterilizationWorkflow.version, effectiveFrom: new Date().toISOString(), changedBy: 'System', reason: 'Initial workflow', config: {...defaultSterilizationWorkflow, stages: defaultSterilizationWorkflow.stages.map(stage => ({...stage}))}}],
+  workflowVersions: [{
+    id: 'wf-1-initial',
+    version: 1,
+    profileName: defaultSterilizationWorkflow.profileName,
+    effectiveFrom: '',
+    changedBy: 'System',
+    changeReason: 'Initial workflow',
+    snapshot: {
+      ...defaultSterilizationWorkflow,
+      stages: defaultSterilizationWorkflow.stages.map(stage => ({...stage, checksEl: [...stage.checksEl], checksEn: [...stage.checksEn]})),
+    },
+  }],
   systemSettings: {usageWarningThreshold: 3},
   sterilizationWorkflow: {
     ...defaultSterilizationWorkflow,

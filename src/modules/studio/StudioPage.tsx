@@ -140,6 +140,9 @@ export default function StudioPage() {
   ]);
 
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
+  const handleResetSterilizationWorkflow = () => {
+    libs.resetSterilizationWorkflow(currentUser.name);
+  };
   const currentMeta = libraryMeta.find(x => x.key === libraryKey)!;
   const currentItems = libs[libraryKey];
   const filteredItems = currentItems.filter(x =>
@@ -451,8 +454,12 @@ export default function StudioPage() {
               <div className="studio-workflow-profile">
                 <small>{L('Προφίλ μονάδας', 'Facility profile')}</small>
                 <input
-                  value={libs.sterilizationWorkflow.profileName}
-                  onChange={e => libs.updateSterilizationWorkflow({profileName: e.target.value})}
+                  defaultValue={libs.sterilizationWorkflow.profileName}
+                  onBlur={e => {
+                    const name = e.target.value.trim();
+                    if (name && name !== libs.sterilizationWorkflow.profileName)
+                      libs.updateSterilizationWorkflow({profileName: name}, currentUser.name, 'Μετονομασία προφίλ ροής');
+                  }}
                 />
                 <span>v{libs.sterilizationWorkflow.version}</span>
               </div>
@@ -666,7 +673,7 @@ export default function StudioPage() {
                       type="checkbox"
                       checked={stage.enabled}
                       disabled={stage.locked}
-                      onChange={e => libs.setWorkflowStageEnabled(stage.id, e.target.checked)}
+                      onChange={e => libs.setWorkflowStageEnabled(stage.id, e.target.checked, currentUser.name)}
                     />
                     <span></span>
                     <b>{stage.enabled ? L('Ενεργό', 'Active') : L('Παράκαμψη', 'Skipped')}</b>
@@ -674,6 +681,20 @@ export default function StudioPage() {
                 </section>
               ))}
             </div>
+            <details className="released-loads">
+              <summary>{L('Ιστορικό εκδόσεων ροής', 'Workflow version history')} · {libs.workflowVersions.length}</summary>
+              <div>
+                {libs.workflowVersions.slice(0, 8).map(version => (
+                  <div key={version.id}>
+                    <span>
+                      <b>v{version.version}</b> · {version.profileName}
+                      <small style={{display: 'block'}}>{version.changeReason || L('Αλλαγή παραμετροποίησης', 'Configuration change')}</small>
+                    </span>
+                    <span>{version.changedBy} · {version.effectiveFrom ? new Date(version.effectiveFrom).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB') : L('Αρχική', 'Initial')}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
             <footer className="studio-workflow-footer">
               <div>
                 <strong>{L('Ενεργή διαδρομή', 'Active route')}</strong>
@@ -684,7 +705,7 @@ export default function StudioPage() {
                     .join(' → ')}
                 </span>
               </div>
-              <AppButton onClick={libs.resetSterilizationWorkflow}>
+              <AppButton onClick={handleResetSterilizationWorkflow}>
                 <RefreshCcw size={16} />
                 {L('Επαναφορά προτύπου', 'Reset template')}
               </AppButton>
@@ -988,7 +1009,7 @@ export default function StudioPage() {
                     onChange={e =>
                       libs.updateSystemSettings({
                         usageWarningThreshold: Math.max(1, Math.min(20, Number(e.target.value) || 1)),
-                      })
+                      }, currentUser.name)
                     }
                   />
                   <span>{L('χρήσεις', 'uses')}</span>
@@ -1036,6 +1057,18 @@ export default function StudioPage() {
                 <CheckCircle2 />
                 <span>{L('Καταγραφή chain of custody', 'Chain-of-custody logging')}</span>
               </div>
+              <details className="released-loads">
+                <summary>{L('Ιστορικό παραμετροποίησης', 'Configuration audit')} · {libs.configurationAudit.length}</summary>
+                <div>
+                  {libs.configurationAudit.slice(0, 10).map(event => (
+                    <div key={event.id}>
+                      <span><b>{event.entityType}</b> · {event.entityId}</span>
+                      <span>{event.by} · {new Date(event.at).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB')}</span>
+                    </div>
+                  ))}
+                  {!libs.configurationAudit.length && <small>{L('Δεν υπάρχουν ακόμη αλλαγές.', 'No changes recorded yet.')}</small>}
+                </div>
+              </details>
               <div className="studio-check-row">
                 <CheckCircle2 />
                 <span>{L('Δεν αποθηκεύονται κωδικοί πρόσβασης στο Studio', 'Passwords are not stored in Studio')}</span>

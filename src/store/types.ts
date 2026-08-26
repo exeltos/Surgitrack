@@ -5,10 +5,9 @@ import type {
   DeliveryRecord,
   Issue,
   Movement,
-  OperationalAuditEvent,
-  RecallCaseRecord,
   PreparationRecord,
   ProcessLoadRecord,
+  RecallCase,
   ReceiptRecord,
   SetAsset,
   SterilizationCycleRecord,
@@ -207,11 +206,10 @@ export type SurgiStoreValue = {
   preparations: PreparationRecord[];
   sterilizationCycles: SterilizationCycleRecord[];
   processLoads: ProcessLoadRecord[];
+  recallCases: RecallCase[];
   sterilizationReleases: SterilizationReleaseRecord[];
   workflowCheckpoints: WorkflowCheckpointRecord[];
   deliveries: DeliveryRecord[];
-  operationalAudit: OperationalAuditEvent[];
-  recallCases: RecallCaseRecord[];
   lifecycleAlerts: LifecycleAlert[];
   toast?: Toast;
   role: UserRole;
