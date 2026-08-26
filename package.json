@@ -1,7 +1,7 @@
 {
   "name": "surgitrack-web",
   "private": true,
-  "version": "0.29.4",
+  "version": "0.29.5",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -13,7 +13,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ci": "npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build"
+    "ci": "npm run format && npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

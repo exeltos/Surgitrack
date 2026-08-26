@@ -1,20 +1,21 @@
 # SurgiTrack CI checks
 
-The same verification command is used locally and by GitHub Actions:
+Use the same verification command locally and in GitHub Actions:
 
 ```bash
 npm ci
 npm run ci
 ```
 
-`npm run ci` runs, in order:
+`npm run ci` now runs, in order:
 
-1. Prettier formatting check
-2. TypeScript typecheck
-3. ESLint
-4. Vitest unit tests
-5. Production build
+1. Prettier auto-format (`npm run format`)
+2. Prettier verification (`npm run format:check`)
+3. TypeScript typecheck
+4. ESLint
+5. Vitest unit tests
+6. Production build
 
-The project is pinned to Node.js 22 via `.nvmrc` and GitHub Actions reads the same file.
+This intentionally normalizes formatting before verification, so formatting drift does not abort the CI pipeline before the functional checks run. GitHub Actions uses the same command.
 
-Do not use `npm audit fix --force` as part of CI stabilization. Dependency upgrades should be reviewed separately.
+The project is pinned to Node.js 22 via `.nvmrc`.
