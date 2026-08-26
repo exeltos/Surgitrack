@@ -28,6 +28,8 @@ const createDemoInitialData = (): LibraryState => ({
     DEPARTMENT: [...defaultRolePermissions.DEPARTMENT],
   },
   rolePermissionAudit: [],
+  configurationAudit: [],
+  workflowVersions: [{version: defaultSterilizationWorkflow.version, effectiveFrom: new Date().toISOString(), changedBy: 'System', reason: 'Initial workflow', config: {...defaultSterilizationWorkflow, stages: defaultSterilizationWorkflow.stages.map(stage => ({...stage}))}}],
   systemSettings: {usageWarningThreshold: 3},
   sterilizationWorkflow: {
     ...defaultSterilizationWorkflow,

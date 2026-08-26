@@ -6,18 +6,17 @@ import type {Permission} from './permissions';
 export type AdminUser = {id: string; name: string; email: string; role: UserRole; department: string; active: boolean};
 export type RolePermissionAudit = {id: string; role: UserRole; at: string; by: string; permissions: Permission[]};
 export type SystemSettings = {usageWarningThreshold: number};
-export type LibraryKey =
-  'departments' | 'specialties' | 'manufacturers' | 'suppliers' | 'toolCategories' | 'sterilizers';
+export type LibraryKey = 'departments' | 'specialties' | 'manufacturers' | 'suppliers' | 'toolCategories' | 'sterilizers';
+export type ConfigAuditEntity = 'LIBRARY' | 'USER' | 'ROLE_PERMISSIONS' | 'WORKFLOW' | 'SYSTEM_SETTINGS';
+export type ConfigurationAuditEvent = {id:string; entityType:ConfigAuditEntity; entityId:string; action:'CREATE'|'UPDATE'|'DELETE'|'RESET'; at:string; by:string; before?:unknown; after?:unknown; reason?:string};
+export type WorkflowVersionSnapshot = {version:number; effectiveFrom:string; changedBy:string; reason?:string; config:SterilizationWorkflowConfig};
 export type LibraryState = {
-  departments: LibraryItem[];
-  specialties: LibraryItem[];
-  manufacturers: LibraryItem[];
-  suppliers: LibraryItem[];
-  toolCategories: LibraryItem[];
-  sterilizers: LibraryItem[];
+  departments: LibraryItem[]; specialties: LibraryItem[]; manufacturers: LibraryItem[]; suppliers: LibraryItem[]; toolCategories: LibraryItem[]; sterilizers: LibraryItem[];
   users: AdminUser[];
   rolePermissions: Record<UserRole, Permission[]>;
   rolePermissionAudit: RolePermissionAudit[];
+  configurationAudit: ConfigurationAuditEvent[];
   sterilizationWorkflow: SterilizationWorkflowConfig;
+  workflowVersions: WorkflowVersionSnapshot[];
   systemSettings: SystemSettings;
 };
