@@ -393,7 +393,7 @@ export default function SetDetailPage() {
                                         </strong>
                                       </div>
                                       <div className="set-tool-state">
-                                        <StatusBadge value={tool.state} />
+                                        {tool.state !== set.state && <StatusBadge value={tool.state} />}
                                         {hasIssue && <small>Ανοικτή αναφορά</small>}
                                       </div>
                                     </Link>
@@ -431,7 +431,7 @@ export default function SetDetailPage() {
                               </strong>
                             </div>
                             <div className="set-tool-state">
-                              <StatusBadge value={tool.state} />
+                              {tool.state !== set.state && <StatusBadge value={tool.state} />}
                               {hasIssue && <small>Ανοικτή αναφορά</small>}
                             </div>
                           </Link>

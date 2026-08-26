@@ -124,9 +124,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
     e.preventDefault();
     setMessage('');
     const data = new FormData(e.currentTarget);
-    const email = String(data.get('email') || '')
-      .trim()
-      .toLowerCase();
+    const email = String(data.get('email') || '').trim().toLowerCase();
     const password = String(data.get('password') || '');
     const user = users.find(candidate => candidate.email.toLowerCase() === email);
     if (!user || password !== DEMO_ACCESS_KEY) {
@@ -225,12 +223,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                     {t.password}
                     <div className="auth-input">
                       <LockKeyhole size={17} />
-                      <input
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        autoComplete="current-password"
-                      />
+                      <input name="password" type={showPassword ? 'text' : 'password'} required autoComplete="current-password" />
                       <button type="button" onClick={() => setShowPassword(v => !v)} aria-label="toggle password">
                         {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                       </button>

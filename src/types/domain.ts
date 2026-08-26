@@ -274,6 +274,7 @@ export interface WorkflowCheckpointRecord {
   completedAt: string;
 }
 
+
 export type RecallItemStatus = 'OUTSTANDING' | 'RETURNED' | 'REPROCESSING' | 'CLOSED';
 export interface RecallCaseItem extends ProcessLoadItem {
   currentState: AssetState;

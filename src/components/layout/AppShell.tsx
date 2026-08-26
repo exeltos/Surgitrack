@@ -1,4 +1,4 @@
-import {useState, type ReactNode} from 'react';
+import {useEffect, useState, type ReactNode} from 'react';
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {
   Accessibility,
@@ -44,6 +44,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const [mobileOpen, setMobileOpen] = useState(false);
   const [a11y, setA11y] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [departmentReadyToast, setDepartmentReadyToast] = useState<{id: string; text: string}>();
   const [scan, setScan] = useState('');
   const [scanMatches, setScanMatches] = useState<
     Array<{id: string; kind: 'SET' | 'TOOL'; barcode: string; code: string; name: string}>
@@ -61,6 +62,34 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     role === 'DEPARTMENT'
       ? departmentReady.length + departmentIssues.length + departmentUsage.length
       : issues.filter(i => i.status === 'OPEN').length + lifecycleAlerts.length;
+  useEffect(() => {
+    if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
+      setDepartmentReadyToast(undefined);
+      return;
+    }
+    const storageKey = `surgitrack-ready-seen:${currentUser.department}`;
+    let seen = new Set<string>();
+    try {
+      seen = new Set(JSON.parse(window.sessionStorage.getItem(storageKey) || '[]') as string[]);
+    } catch {
+      seen = new Set<string>();
+    }
+    const newlyReady = departmentReady.filter(asset => !seen.has(asset.id));
+    if (!newlyReady.length) return;
+
+    const first = newlyReady[0];
+    const extra = newlyReady.length - 1;
+    const text =
+      lang === 'el'
+        ? `${first.barcode} · ${first.name} είναι έτοιμο για παραλαβή${extra > 0 ? ` (+${extra} ακόμη)` : ''}.`
+        : `${first.barcode} · ${first.name} is ready for pickup${extra > 0 ? ` (+${extra} more)` : ''}.`;
+    setDepartmentReadyToast({id: first.id, text});
+
+    newlyReady.forEach(asset => seen.add(asset.id));
+    window.sessionStorage.setItem(storageKey, JSON.stringify([...seen]));
+    const timer = window.setTimeout(() => setDepartmentReadyToast(undefined), 5200);
+    return () => window.clearTimeout(timer);
+  }, [role, currentUser.department, departmentReady.map(asset => asset.id).join('|'), lang]);
   const assetDetailMode = /^\/(tools|sets)\/[^/]+$/.test(location.pathname);
   const departmentMode = location.pathname === '/department';
   const runGlobalSearch = () => {
@@ -364,6 +393,15 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           <strong>{lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}</strong>
           <span>{toast.text}</span>
           <button onClick={clearToast}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      {!toast && departmentReadyToast && role === 'DEPARTMENT' && (
+        <div className="toast department-ready-toast">
+          <strong>{lang === 'el' ? 'Έτοιμο για παραλαβή' : 'Ready for pickup'}</strong>
+          <span>{departmentReadyToast.text}</span>
+          <button onClick={() => setDepartmentReadyToast(undefined)}>
             <X size={16} />
           </button>
         </div>
