@@ -22,18 +22,24 @@ export const productionAdminRepository: AdminRepository = {
     },
     rolePermissionAudit: [],
     configurationAudit: [],
-    workflowVersions: [{
-    id: 'wf-1-initial',
-    version: 1,
-    profileName: defaultSterilizationWorkflow.profileName,
-    effectiveFrom: '',
-    changedBy: 'System',
-    changeReason: 'Initial workflow',
-    snapshot: {
-      ...defaultSterilizationWorkflow,
-      stages: defaultSterilizationWorkflow.stages.map(stage => ({...stage, checksEl: [...stage.checksEl], checksEn: [...stage.checksEn]})),
-    },
-  }],
+    workflowVersions: [
+      {
+        id: 'wf-1-initial',
+        version: 1,
+        profileName: defaultSterilizationWorkflow.profileName,
+        effectiveFrom: '',
+        changedBy: 'System',
+        changeReason: 'Initial workflow',
+        snapshot: {
+          ...defaultSterilizationWorkflow,
+          stages: defaultSterilizationWorkflow.stages.map(stage => ({
+            ...stage,
+            checksEl: [...stage.checksEl],
+            checksEn: [...stage.checksEn],
+          })),
+        },
+      },
+    ],
     systemSettings: {usageWarningThreshold: 3},
     sterilizationWorkflow: {
       ...defaultSterilizationWorkflow,
