@@ -237,6 +237,11 @@ export default function StudioPage() {
     if(failed.length){setCloudError(`${failed.length} προσκλήσεις απέτυχαν.`);} else setBulkRows([]);
     await loadCloudUsers();
   };
+  const setCloudUserAccess = async (u: AdminUser, patch: {active?:boolean;demoEnabled?:boolean}) => {
+    if(libs.dataMode==='DEMO'){libs.updateUser(u.id,patch);return;}
+    const {error}=await supabase.rpc('platform_set_profile_access',{p_id:u.id,p_active:patch.active ?? u.active,p_demo_enabled:patch.demoEnabled ?? u.demoEnabled});
+    if(error){setCloudError(error.message);return;} await loadCloudUsers();
+  };
   const saveOrganization = async (data: Omit<Organization, 'id'>) => {
     if (libs.dataMode === 'DEMO') {
       if (organizationEditor) libs.updateOrganization(organizationEditor.id, data);
@@ -1073,13 +1078,13 @@ export default function StudioPage() {
                     <small>{u.email}</small>
                   </div>
                   <span>{displayedOrganizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
-                  <span>{u.department}</span>
+                  <span>{libs.dataMode==='PRODUCTION' ? (cloudDepartments.find(d=>d.id===u.department)?.name || '—') : u.department}</span>
                   <span className="role-chip">
                     {L(roles.find(r => r.id === u.role)?.el || u.role, roles.find(r => r.id === u.role)?.en || u.role)}
                   </span>
                   <button
                     className={`studio-access-toggle ${u.active ? 'active' : ''}`}
-                    onClick={() => libs.updateUser(u.id, {active: !u.active})}
+                    onClick={() => void setCloudUserAccess(u, {active: !u.active})}
                   >
                     <span></span>
                     {u.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
@@ -1092,16 +1097,14 @@ export default function StudioPage() {
                         ? L('Ο Platform Admin έχει πάντα πρόσβαση.', 'Platform Admin always has access.')
                         : ''
                     }
-                    onClick={() => libs.updateUser(u.id, {demoEnabled: !u.demoEnabled})}
+                    onClick={() => void setCloudUserAccess(u, {demoEnabled: !u.demoEnabled})}
                   >
                     <span></span>
                     {u.role === 'ADMIN' ? L('Admin', 'Admin') : u.demoEnabled ? 'Demo ON' : 'Demo OFF'}
                   </button>
                   <div className="studio-row-actions">
-                    <button onClick={() => setUserEditor(u)}>
-                      <Pencil size={16} />
-                    </button>
-                    <button
+                    {libs.dataMode==='DEMO' && <button onClick={() => setUserEditor(u)}><Pencil size={16} /></button>}
+                    {libs.dataMode==='DEMO' && <button
                       className="danger-icon"
                       onClick={() =>
                         setConfirm({
@@ -1115,7 +1118,7 @@ export default function StudioPage() {
                       }
                     >
                       <Trash2 size={16} />
-                    </button>
+                    </button>}
                   </div>
                 </div>
               ))}
