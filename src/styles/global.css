@@ -563,3 +563,28 @@
  .studio-users-panel>.studio-panel-head{flex-direction:column!important}
  .studio-users-panel>.studio-panel-head select{width:100%!important}
 }
+
+/* Platform hospitals — final compact row layout */
+.studio-platform-panel .platform-org-card{
+ grid-template-columns:minmax(260px,1.5fr) minmax(300px,1fr) minmax(360px,1.25fr) minmax(310px,.95fr)!important;
+ gap:22px!important;
+}
+.studio-platform-panel .platform-org-meta{
+ display:grid!important;grid-template-columns:minmax(145px,1fr) 112px 38px!important;
+ align-items:center!important;justify-content:stretch!important;gap:8px!important;
+}
+.studio-platform-panel .platform-org-meta>span{justify-self:end!important;text-align:right!important}
+.studio-platform-panel .platform-manage-btn{
+ width:112px!important;height:38px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ gap:6px!important;padding:0 10px!important;border:1px solid #d8e4e9!important;border-radius:10px!important;background:#fff!important;
+ color:#365d70!important;font-weight:700!important;font-size:12px!important;white-space:nowrap!important;
+}
+.studio-platform-panel .platform-edit-btn{
+ width:38px!important;height:38px!important;display:grid!important;place-items:center!important;padding:0!important;
+ border:1px solid #d8e4e9!important;border-radius:10px!important;background:#fff!important;color:#557486!important;
+}
+@media(max-width:1450px){
+ .studio-platform-panel .platform-org-card{grid-template-columns:minmax(250px,1.3fr) minmax(270px,1fr) minmax(330px,1.15fr)!important}
+ .studio-platform-panel .platform-org-meta{grid-column:1/-1!important;border-top:1px solid #edf2f5!important;padding-top:12px!important}
+ .studio-platform-panel .platform-org-meta>span{justify-self:start!important;text-align:left!important}
+}
