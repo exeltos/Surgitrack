@@ -130,21 +130,25 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       setMessage(t.invalidCredentials);
       return;
     }
-    let profile;
-    let profileError = null;
     if (email === 'info@exeltos.com') {
-      const result = await supabase.rpc('claim_platform_admin');
-      profile = result.data;
-      profileError = result.error;
-    } else {
-      const result = await supabase
-        .from('profiles')
-        .select('id,name,email,role,active,organization_id,department_id')
-        .eq('id', authData.user.id)
-        .single();
-      profile = result.data;
-      profileError = result.error;
+      const {error: claimError} = await supabase.rpc('claim_platform_admin');
+      if (claimError) {
+        setMessage(lang === 'el' ? 'Δεν ήταν δυνατή η φόρτωση του λογαριασμού διαχειριστή.' : 'Could not load the administrator account.');
+        return;
+      }
+      onAuthenticated('ADMIN', {
+        id: authData.user.id,
+        name: 'Platform Admin',
+        role: 'ADMIN',
+        department: 'Platform',
+      });
+      return;
     }
+    const {data: profile, error: profileError} = await supabase
+      .from('profiles')
+      .select('id,name,email,role,active,organization_id,department_id')
+      .eq('id', authData.user.id)
+      .single();
     if (profileError || !profile || !profile.active) {
       await supabase.auth.signOut();
       setMessage(t.accessDisabled);
