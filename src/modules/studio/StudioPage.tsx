@@ -635,10 +635,8 @@ export default function StudioPage() {
                     </div>
                     <div className="platform-org-meta">
                       <span>{L('Τμήματα','Departments')}: <b>{cloudDepartments.filter(d=>d.organizationId===org.id).length}</b> · {L('Demo χρήστες','Demo users')}: <b>{demoUsers}</b></span>
-                      <div className="platform-org-card-actions">
-                        <button onClick={() => openOrganization(org)}><Users size={15}/>{L('Διαχείριση','Manage')}</button>
-                        <button onClick={() => setOrganizationEditor(org)}><Pencil size={16}/></button>
-                      </div>
+                      <button className="platform-manage-btn" onClick={() => openOrganization(org)}><Users size={15}/>{L('Διαχείριση','Manage')}</button>
+                      <button className="platform-edit-btn" title={L('Επεξεργασία νοσοκομείου','Edit hospital')} onClick={() => setOrganizationEditor(org)}><Pencil size={16}/></button>
                     </div>
                   </article>
                 );
