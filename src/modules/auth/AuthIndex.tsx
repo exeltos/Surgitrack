@@ -470,7 +470,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                 <button className="auth-primary" onClick={() => changeView('login')}>{t.backLogin}</button>
                 {sentKind === 'reset' && <button className="auth-text-btn auth-resend" onClick={() => changeView('forgot')}>{lang === 'el' ? 'Δεν έλαβα email — αποστολή ξανά' : 'I did not receive it — send again'}</button>}
               </div>
-
+            )}
           </div>
         </section>
       </main>
