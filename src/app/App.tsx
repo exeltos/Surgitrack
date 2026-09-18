@@ -1,4 +1,4 @@
-import {useEffect, useState, type ReactNode} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
@@ -40,12 +40,22 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
-  const [passwordRecovery, setPasswordRecovery] = useState(false);
+  const [passwordRecovery, setPasswordRecovery] = useState(() => window.location.hash.includes('type=recovery'));
+  const recoveryRef = useRef(passwordRecovery);
+  useEffect(() => {
+    recoveryRef.current = passwordRecovery;
+  }, [passwordRecovery]);
   useEffect(() => {
     let mounted = true;
     const restoreSession = async () => {
       const {data} = await supabase.auth.getSession();
       if (!mounted) return;
+      if (recoveryRef.current || window.location.hash.includes('type=recovery')) {
+        setPasswordRecovery(true);
+        setAuthenticated(false);
+        setAuthReady(true);
+        return;
+      }
       if (!data.session?.user) {
         setAuthenticated(false);
         setAuthReady(true);
