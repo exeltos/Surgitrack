@@ -1,12 +1,11 @@
 import {useEffect, useMemo, useState} from 'react';
-import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, UserPlus, LogIn} from 'lucide-react';
-import {useLibraries} from '../../core/LibraryStore';
+import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, LogIn} from 'lucide-react';
 import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION} from '../../config/appMeta';
 import {supabase} from '../../lib/supabase';
 
 type Lang = 'el' | 'en';
-type View = 'login' | 'register' | 'forgot' | 'reset' | 'sent';
+type View = 'login' | 'forgot' | 'reset' | 'sent';
 type InfoView = 'privacy' | 'terms' | 'support' | null;
 
 type Props = {
@@ -114,13 +113,12 @@ const copy = {
 };
 
 export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = false, onPasswordRecoveryHandled}: Props) {
-  const {departments, users, organizations} = useLibraries();
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
   const [view, setView] = useState<View>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
-  const [sentKind, setSentKind] = useState<'reset' | 'register' | 'request'>('reset');
+  const [sentKind, setSentKind] = useState<'reset'>('reset');
   useEffect(() => {
     const {data: listener} = supabase.auth.onAuthStateChange(event => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -193,74 +191,6 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
       role: profile.role as UserRole,
       department: profile.organization_id ? profile.department_id || '' : 'Platform',
     });
-  };
-  const submitRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setMessage('');
-    const data = new FormData(e.currentTarget);
-    const fullName = String(data.get('fullName') || '').trim();
-    const email = String(data.get('email') || '').trim().toLowerCase();
-    const p = String(data.get('password') || '');
-    const cp = String(data.get('confirmPassword') || '');
-    if (!fullName || !email || !p) {
-      setMessage(t.required);
-      return;
-    }
-    if (p !== cp) {
-      setMessage(t.mismatch);
-      return;
-    }
-    if (email !== 'info@exeltos.com') {
-      const organization = String(data.get('organization') || '').trim();
-      const department = String(data.get('department') || '').trim();
-      const {error: requestError} = await supabase.rpc('submit_registration_request', {
-        p_full_name: fullName,
-        p_email: email,
-        p_organization_name: organization || null,
-        p_department_name: department || null,
-      });
-      if (requestError) {
-        setMessage(lang === 'el' ? 'Δεν ήταν δυνατή η υποβολή του αιτήματος. Δοκιμάστε ξανά.' : 'Could not submit the request. Please try again.');
-        return;
-      }
-      const {error: signUpError} = await supabase.auth.signUp({
-        email,
-        password: p,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: {full_name: fullName, organization_name: organization, department_name: department},
-        },
-      });
-      if (signUpError) {
-        setMessage(signUpError.message);
-        return;
-      }
-      setPendingEmail(email);
-      setSentKind('register');
-      setMessage('');
-      setView('sent');
-      return;
-    }
-    const {data: signUpData, error} = await supabase.auth.signUp({
-      email,
-      password: p,
-      options: {data: {full_name: fullName}},
-    });
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-    if (signUpData.session) {
-      await supabase.rpc('claim_platform_admin');
-      setMessage(lang === 'el' ? 'Ο λογαριασμός δημιουργήθηκε. Μπορείτε να συνδεθείτε.' : 'Account created. You can now sign in.');
-      await supabase.auth.signOut();
-      changeView('login');
-      return;
-    }
-    setPendingEmail(email);
-    setSentKind('register');
-    setMessage('');
-    setView('sent');
   };
   const submitForgot = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -381,76 +311,6 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
                     {t.signIn}
                   </button>
                 </form>
-                <div className="auth-bottom-question">
-                  <span>{t.noAccount}</span>
-                  <button onClick={() => changeView('register')}>{t.createAccount}</button>
-                </div>
-              </>
-            )}
-            {view === 'register' && (
-              <>
-                <button className="auth-back" onClick={() => changeView('login')}>
-                  <ArrowLeft size={15} />
-                  {t.backLogin}
-                </button>
-                <div className="auth-card-title">
-                  <div>
-                    <span className="auth-eyebrow">{t.register}</span>
-                    <h2>{t.registerTitle}</h2>
-                    <p>{t.registerIntro}</p>
-                  </div>
-                  <UserPlus size={22} />
-                </div>
-                <form className="auth-form" onSubmit={submitRegister}>
-                  <div className="auth-two-col">
-                    <label>
-                      {t.fullName}
-                      <input name="fullName" required />
-                    </label>
-                    <label>
-                      {t.email}
-                      <input name="email" type="email" required />
-                    </label>
-                  </div>
-                  <div className="auth-two-col">
-                    <label>
-                      {t.organization}
-                      <input name="organization" />
-                    </label>
-                    <label>
-                      {t.department}
-                      <select name="department">
-                        {departments.map(d => (
-                          <option key={d.id} value={d.el}>
-                            {lang === 'el' ? d.el : d.en}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
-                  <div className="auth-two-col">
-                    <label>
-                      {t.password}
-                      <input name="password" type="password" required />
-                    </label>
-                    <label>
-                      {t.confirmPassword}
-                      <input name="confirmPassword" type="password" required />
-                    </label>
-                  </div>
-                  <label className="auth-check auth-terms">
-                    <input name="terms" type="checkbox" required />
-                    <span>{t.terms}</span>
-                  </label>
-                  {message && <div className="auth-message">{message}</div>}
-                  <button className="auth-primary" type="submit">
-                    {t.submitRequest}
-                  </button>
-                </form>
-                <div className="auth-bottom-question">
-                  <span>{t.already}</span>
-                  <button onClick={() => changeView('login')}>{t.login}</button>
-                </div>
               </>
             )}
             {view === 'forgot' && (
