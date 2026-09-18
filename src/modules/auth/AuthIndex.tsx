@@ -223,8 +223,20 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
         setMessage(lang === 'el' ? 'Δεν ήταν δυνατή η υποβολή του αιτήματος. Δοκιμάστε ξανά.' : 'Could not submit the request. Please try again.');
         return;
       }
+      const {error: signUpError} = await supabase.auth.signUp({
+        email,
+        password: p,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {full_name: fullName, organization_name: organization, department_name: department},
+        },
+      });
+      if (signUpError) {
+        setMessage(signUpError.message);
+        return;
+      }
       setPendingEmail(email);
-      setSentKind('request');
+      setSentKind('register');
       setMessage('');
       setView('sent');
       return;
