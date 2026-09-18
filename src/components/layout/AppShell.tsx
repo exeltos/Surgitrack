@@ -17,7 +17,7 @@ import {
 import {navigationFor} from '../../config/navigation';
 import {useSurgi, type UserRole} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
-import {SURGITRACK_DATA_MODE} from '../../config/dataMode';
+import {SURGITRACK_DATA_MODE, setRuntimeDataMode} from '../../config/dataMode';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Τμήμα · Χειρουργείο', en: 'Department · Operating Theatre'},
@@ -51,6 +51,15 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   >([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const isDemo = SURGITRACK_DATA_MODE === 'DEMO';
+  const returnFromDemo = () => {
+    sessionStorage.removeItem('surgitrack-demo-role');
+    sessionStorage.removeItem('surgitrack-session-user');
+    sessionStorage.removeItem('surgitrack-active-organization');
+    setRuntimeDataMode('PRODUCTION');
+    window.location.hash = '#/studio';
+    window.location.reload();
+  };
   const departmentAssets = [
     ...sets.filter(s => s.department === currentUser.department),
     ...tools.filter(t => t.department === currentUser.department && t.mode === 'STANDALONE'),
@@ -142,6 +151,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           <X size={18} />
         </button>
       </div>
+      {isDemo && <div className="demo-exit-panel"><span>DEMO</span><button onClick={returnFromDemo}>{lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}</button></div>}
       <div className="workspace-label">
         <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
         <strong>{roleLabel[role][lang]}</strong>
