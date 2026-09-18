@@ -23,6 +23,8 @@ import {
   Layers3,
   Lock,
   Save,
+  Upload,
+  Send,
   type LucideIcon,
 } from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -140,6 +142,9 @@ export default function StudioPage() {
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
+  const [cloudUsers, setCloudUsers] = useState<AdminUser[]>([]);
+  const [bulkRows, setBulkRows] = useState<Array<{name:string;email:string;organizationId:string;role:UserRole}>>([]);
+  const [bulkSending, setBulkSending] = useState(false);
   const [confirm, setConfirm] = useState<{title: string; message: string; action: () => void} | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('STERILIZATION');
   const [roleDraft, setRoleDraft] = useState<Permission[]>(() => [
@@ -168,6 +173,47 @@ export default function StudioPage() {
     void loadCloudOrganizations();
   }, [libs.dataMode]);
   const displayedOrganizations = libs.dataMode === 'PRODUCTION' ? cloudOrganizations : libs.organizations;
+  const loadCloudUsers = async () => {
+    if (libs.dataMode !== 'PRODUCTION') return;
+    const {data, error} = await supabase.from('profiles').select('id,name,email,role,active,demo_enabled,organization_id,department_id').not('organization_id','is',null).order('name');
+    if (error) { setCloudError(error.message); return; }
+    setCloudUsers((data || []).map(row => ({
+      id: row.id, name: row.name, email: row.email, role: row.role as UserRole,
+      active: row.active, demoEnabled: row.demo_enabled, organizationId: row.organization_id || '',
+      department: row.department_id || '',
+    })));
+  };
+  useEffect(() => { void loadCloudUsers(); }, [libs.dataMode]);
+  const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
+  const inviteUser = async (data: Omit<AdminUser,'id'>) => {
+    if (libs.dataMode === 'DEMO') { libs.addUser(data); setUserEditor(undefined); return; }
+    const {data: result, error} = await supabase.functions.invoke('invite-staff', {body: {users:[{
+      full_name:data.name,email:data.email,organization_id:data.organizationId,department_id:null,role:data.role
+    }],redirect_to:window.location.origin}});
+    if (error || !result?.results?.[0]?.ok) { setCloudError(result?.results?.[0]?.error || error?.message || 'Invite failed'); return; }
+    setUserEditor(undefined); await loadCloudUsers();
+  };
+  const importCsv = async (file: File) => {
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const rows = lines.slice(1).map(line => {
+      const parts=line.split(/[;,]/).map(x=>x.trim().replace(/^"|"$/g,''));
+      const [name,email,hospital,roleRaw]=parts;
+      const org=displayedOrganizations.find(o=>o.code.toLowerCase()===String(hospital||'').toLowerCase()||o.name.toLowerCase()===String(hospital||'').toLowerCase());
+      const role=(['ADMIN','STERILIZATION','DEPARTMENT'].includes(String(roleRaw||'').toUpperCase())?String(roleRaw).toUpperCase():'DEPARTMENT') as UserRole;
+      return {name,email,organizationId:org?.id||'',role};
+    }).filter(r=>r.name&&r.email&&r.organizationId);
+    setBulkRows(rows);
+  };
+  const sendBulkInvites = async () => {
+    if (!bulkRows.length) return; setBulkSending(true); setCloudError('');
+    const {data: result,error}=await supabase.functions.invoke('invite-staff',{body:{users:bulkRows.map(r=>({full_name:r.name,email:r.email,organization_id:r.organizationId,department_id:null,role:r.role})),redirect_to:window.location.origin}});
+    setBulkSending(false);
+    if(error){setCloudError(error.message);return;}
+    const failed=(result?.results||[]).filter((x:{ok:boolean})=>!x.ok);
+    if(failed.length){setCloudError(`${failed.length} προσκλήσεις απέτυχαν.`);} else setBulkRows([]);
+    await loadCloudUsers();
+  };
   const saveOrganization = async (data: Omit<Organization, 'id'>) => {
     if (libs.dataMode === 'DEMO') {
       if (organizationEditor) libs.updateOrganization(organizationEditor.id, data);
@@ -242,18 +288,18 @@ export default function StudioPage() {
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
-  const filteredUsers = libs.users.filter(u => {
-    const organizationName = libs.organizations.find(org => org.id === u.organizationId)?.name || '';
+  const filteredUsers = displayedUsers.filter(u => {
+    const organizationName = displayedOrganizations.find(org => org.id === u.organizationId)?.name || '';
     return `${u.name} ${u.email} ${u.department} ${u.role} ${organizationName}`
       .toLowerCase()
       .includes(query.toLowerCase());
   });
-  const activeUsers = libs.users.filter(u => u.active).length;
+  const activeUsers = displayedUsers.filter(u => u.active).length;
   const totalLibraryRecords = libraryMeta.reduce((sum, m) => sum + libs[m.key].length, 0);
-  const departmentUsers = libs.users.filter(u => u.role === 'DEPARTMENT').length;
+  const departmentUsers = displayedUsers.filter(u => u.role === 'DEPARTMENT').length;
   const roleCount = useMemo(
-    () => roles.map(r => ({role: r.id, count: libs.users.filter(u => u.role === r.id && u.active).length})),
-    [libs.users],
+    () => roles.map(r => ({role: r.id, count: displayedUsers.filter(u => u.role === r.id && u.active).length})),
+    [displayedUsers],
   );
   const resetQuery = () => setQuery('');
   const selectTab = (next: Tab) => {
@@ -617,7 +663,12 @@ export default function StudioPage() {
                   {L('Νέα εγγραφή', 'New record')}
                 </AppButton>
               </header>
-              <div className="studio-search">
+              {cloudError && <div className="auth-message">{cloudError}</div>}
+            {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && <div className="studio-mini-note">
+              <Upload size={17}/><span><b>{bulkRows.length}</b> {L('έγκυρες εγγραφές έτοιμες για πρόσκληση.','valid rows ready to invite.')}</span>
+              <AppButton variant="primary" disabled={bulkSending} onClick={()=>void sendBulkInvites()}><Send size={15}/>{bulkSending?L('Αποστολή...','Sending...'):L('Αποστολή προσκλήσεων','Send invitations')}</AppButton>
+            </div>}
+            <div className="studio-search">
                 <Search size={17} />
                 <input
                   value={query}
@@ -967,10 +1018,15 @@ export default function StudioPage() {
                   )}
                 </p>
               </div>
-              <AppButton variant="primary" onClick={() => setUserEditor(null)}>
-                <Plus size={16} />
-                {L('Νέος χρήστης', 'New user')}
-              </AppButton>
+              <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                {libs.dataMode === 'PRODUCTION' && <label className="app-button" style={{cursor:'pointer'}}>
+                  <Upload size={16} /> {L('Μαζική εισαγωγή CSV','Bulk CSV import')}
+                  <input type="file" accept=".csv,text/csv" hidden onChange={e=>e.target.files?.[0]&&void importCsv(e.target.files[0])}/>
+                </label>}
+                <AppButton variant="primary" onClick={() => setUserEditor(null)}>
+                  <Plus size={16} /> {L('Πρόσκληση χρήστη', 'Invite user')}
+                </AppButton>
+              </div>
             </header>
             <div className="studio-search">
               <Search size={17} />
@@ -1392,13 +1448,9 @@ export default function StudioPage() {
         <UserEditor
           user={userEditor || undefined}
           departments={libs.departments.map(d => d.el)}
-          organizations={libs.organizations}
+          organizations={displayedOrganizations}
           onClose={() => setUserEditor(undefined)}
-          onSave={data => {
-            if (userEditor) libs.updateUser(userEditor.id, data);
-            else libs.addUser(data);
-            setUserEditor(undefined);
-          }}
+          onSave={data => { if (userEditor && libs.dataMode === 'DEMO') { libs.updateUser(userEditor.id,data); setUserEditor(undefined); } else void inviteUser(data); }}
         />
       )}
       {organizationEditor !== undefined && (
