@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, UserPlus, LogIn} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
 import type {SessionUser, UserRole} from '../../store/types';
@@ -6,7 +6,7 @@ import {APP_VERSION} from '../../config/appMeta';
 import {supabase} from '../../lib/supabase';
 
 type Lang = 'el' | 'en';
-type View = 'login' | 'register' | 'forgot';
+type View = 'login' | 'register' | 'forgot' | 'reset' | 'sent';
 type InfoView = 'privacy' | 'terms' | 'support' | null;
 
 type Props = {onAuthenticated: (role?: UserRole, user?: SessionUser) => void; goodbye?: string};
@@ -112,6 +112,17 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
   const [view, setView] = useState<View>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [sentKind, setSentKind] = useState<'reset' | 'register'>('reset');
+  useEffect(() => {
+    const {data: listener} = supabase.auth.onAuthStateChange(event => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMessage('');
+        setView('reset');
+      }
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
   const [infoView, setInfoView] = useState<InfoView>(null);
   const t = useMemo(() => copy[lang], [lang]);
   const switchLang = () => {
@@ -197,14 +208,47 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       changeView('login');
       return;
     }
-    setMessage(lang === 'el' ? 'Ο λογαριασμός δημιουργήθηκε. Ελέγξτε το email σας για επιβεβαίωση.' : 'Account created. Check your email to confirm it.');
+    setPendingEmail(email);
+    setSentKind('register');
+    setMessage('');
+    setView('sent');
   };
   const submitForgot = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     const email = String(data.get('email') || '').trim().toLowerCase();
     const {error} = await supabase.auth.resetPasswordForEmail(email, {redirectTo: window.location.origin});
-    setMessage(error ? error.message : t.resetSent);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setPendingEmail(email);
+    setSentKind('reset');
+    setMessage('');
+    setView('sent');
+  };
+  const submitReset = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setMessage('');
+    const data = new FormData(e.currentTarget);
+    const password = String(data.get('password') || '');
+    const confirmPassword = String(data.get('confirmPassword') || '');
+    if (password.length < 8) {
+      setMessage(lang === 'el' ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.' : 'The new password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setMessage(t.mismatch);
+      return;
+    }
+    const {error} = await supabase.auth.updateUser({password});
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    await supabase.auth.signOut();
+    setMessage(lang === 'el' ? 'Ο κωδικός άλλαξε επιτυχώς. Συνδεθείτε με τον νέο κωδικό.' : 'Password updated. Sign in with your new password.');
+    setView('login');
   };
   const changeView = (next: View) => {
     setView(next);
@@ -388,6 +432,45 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                 </form>
               </>
             )}
+            {view === 'reset' && (
+              <>
+                <button className="auth-back" onClick={() => changeView('login')}>
+                  <ArrowLeft size={15} />
+                  {t.backLogin}
+                </button>
+                <div className="auth-card-title">
+                  <div>
+                    <span className="auth-eyebrow">{lang === 'el' ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ' : 'ACCOUNT SECURITY'}</span>
+                    <h2>{lang === 'el' ? 'Ορισμός νέου κωδικού' : 'Set a new password'}</h2>
+                    <p>{lang === 'el' ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.' : 'Create a new password for your account.'}</p>
+                  </div>
+                  <ShieldCheck size={22} />
+                </div>
+                <form className="auth-form" onSubmit={submitReset}>
+                  <label>
+                    {lang === 'el' ? 'Νέος κωδικός' : 'New password'}
+                    <div className="auth-input"><LockKeyhole size={17} /><input name="password" type={showPassword ? 'text' : 'password'} required autoComplete="new-password" /><button type="button" onClick={() => setShowPassword(v => !v)}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div>
+                  </label>
+                  <label>
+                    {t.confirmPassword}
+                    <div className="auth-input"><LockKeyhole size={17} /><input name="confirmPassword" type={showPassword ? 'text' : 'password'} required autoComplete="new-password" /></div>
+                  </label>
+                  {message && <div className="auth-message">{message}</div>}
+                  <button className="auth-primary" type="submit">{lang === 'el' ? 'Αποθήκευση νέου κωδικού' : 'Save new password'}</button>
+                </form>
+              </>
+            )}
+            {view === 'sent' && (
+              <div className="auth-status-card">
+                <div className="auth-status-icon"><Mail size={24} /></div>
+                <span className="auth-eyebrow">{sentKind === 'reset' ? (lang === 'el' ? 'ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ' : 'PASSWORD RESET') : (lang === 'el' ? 'ΕΠΙΒΕΒΑΙΩΣΗ ΕΓΓΡΑΦΗΣ' : 'REGISTRATION CONFIRMATION')}</span>
+                <h2>{lang === 'el' ? 'Ελέγξτε το email σας' : 'Check your email'}</h2>
+                <p>{sentKind === 'reset' ? (lang === 'el' ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό.' : 'We sent a secure link to set a new password.') : (lang === 'el' ? 'Στείλαμε σύνδεσμο επιβεβαίωσης για να ολοκληρώσετε την εγγραφή.' : 'We sent a confirmation link to complete registration.')}</p>
+                {pendingEmail && <div className="auth-email-chip"><Mail size={15} />{pendingEmail}</div>}
+                <button className="auth-primary" onClick={() => changeView('login')}>{t.backLogin}</button>
+                {sentKind === 'reset' && <button className="auth-text-btn auth-resend" onClick={() => changeView('forgot')}>{lang === 'el' ? 'Δεν έλαβα email — αποστολή ξανά' : 'I did not receive it — send again'}</button>}
+              </div>
+
           </div>
         </section>
       </main>
