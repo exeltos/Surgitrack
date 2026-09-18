@@ -51,29 +51,43 @@ export default function App() {
         return;
       }
       const sessionEmail = data.session.user.email?.toLowerCase();
-      const profileResult =
-        sessionEmail === 'info@exeltos.com'
-          ? await supabase.rpc('claim_platform_admin')
-          : await supabase
-              .from('profiles')
-              .select('id,name,email,role,active,organization_id,department_id')
-              .eq('id', data.session.user.id)
-              .single();
-      const profile = profileResult.data;
-      if (!mounted) return;
-      if (!profile?.active) {
-        await supabase.auth.signOut();
-        setAuthenticated(false);
-        setAuthReady(true);
-        return;
+      let role: UserRole;
+      let user: SessionUser;
+      if (sessionEmail === 'info@exeltos.com') {
+        const {error: claimError} = await supabase.rpc('claim_platform_admin');
+        if (claimError) {
+          setAuthenticated(false);
+          setAuthReady(true);
+          return;
+        }
+        role = 'ADMIN';
+        user = {
+          id: data.session.user.id,
+          name: 'Platform Admin',
+          role: 'ADMIN',
+          department: 'Platform',
+        };
+      } else {
+        const {data: profile} = await supabase
+          .from('profiles')
+          .select('id,name,email,role,active,organization_id,department_id')
+          .eq('id', data.session.user.id)
+          .single();
+        if (!mounted) return;
+        if (!profile?.active) {
+          await supabase.auth.signOut();
+          setAuthenticated(false);
+          setAuthReady(true);
+          return;
+        }
+        role = profile.role as UserRole;
+        user = {
+          id: profile.id,
+          name: profile.name,
+          role,
+          department: profile.organization_id ? profile.department_id || '' : 'Platform',
+        };
       }
-      const role = profile.role as UserRole;
-      const user: SessionUser = {
-        id: profile.id,
-        name: profile.name,
-        role,
-        department: profile.organization_id ? profile.department_id || '' : 'Platform',
-      };
       sessionStorage.setItem('surgitrack-auth', '1');
       sessionStorage.setItem('surgitrack-demo-role', role);
       sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
