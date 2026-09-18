@@ -28,10 +28,8 @@ jobs:
           npm --version
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
 
-      - name: Format
-        run: npm run format
       - name: Format check
         run: npm run format:check
       - name: Typecheck
