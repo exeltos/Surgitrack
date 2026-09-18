@@ -30,11 +30,15 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
 
-      - name: Run project CI checks
-        run: |
-          npm run format
-          npm run format:check
-          npm run typecheck
-          npm run lint
-          npm run test
-          npm run build
+      - name: Format
+        run: npm run format
+      - name: Format check
+        run: npm run format:check
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build
