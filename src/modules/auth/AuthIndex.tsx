@@ -9,7 +9,12 @@ type Lang = 'el' | 'en';
 type View = 'login' | 'register' | 'forgot' | 'reset' | 'sent';
 type InfoView = 'privacy' | 'terms' | 'support' | null;
 
-type Props = {onAuthenticated: (role?: UserRole, user?: SessionUser) => void; goodbye?: string};
+type Props = {
+  onAuthenticated: (role?: UserRole, user?: SessionUser) => void;
+  goodbye?: string;
+  passwordRecovery?: boolean;
+  onPasswordRecoveryHandled?: () => void;
+};
 
 const copy = {
   el: {
@@ -106,7 +111,7 @@ const copy = {
   },
 };
 
-export default function AuthIndex({onAuthenticated, goodbye}: Props) {
+export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = false, onPasswordRecoveryHandled}: Props) {
   const {departments, users, organizations} = useLibraries();
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
   const [view, setView] = useState<View>('login');
@@ -123,6 +128,12 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+  useEffect(() => {
+    if (passwordRecovery) {
+      setMessage('');
+      setView('reset');
+    }
+  }, [passwordRecovery]);
   const [infoView, setInfoView] = useState<InfoView>(null);
   const t = useMemo(() => copy[lang], [lang]);
   const switchLang = () => {
@@ -250,6 +261,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       return;
     }
     await supabase.auth.signOut();
+    onPasswordRecoveryHandled?.();
     setMessage(lang === 'el' ? 'Ο κωδικός άλλαξε επιτυχώς. Συνδεθείτε με τον νέο κωδικό.' : 'Password updated. Sign in with your new password.');
     setView('login');
   };
