@@ -143,7 +143,8 @@ export default function StudioPage() {
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
   const [cloudUsers, setCloudUsers] = useState<AdminUser[]>([]);
-  const [bulkRows, setBulkRows] = useState<Array<{name:string;email:string;organizationId:string;role:UserRole}>>([]);
+  const [cloudDepartments, setCloudDepartments] = useState<Array<{id:string;organizationId:string;name:string;code:string;active:boolean}>>([]);
+  const [bulkRows, setBulkRows] = useState<Array<{name:string;email:string;organizationId:string;departmentId:string;departmentName:string;role:UserRole;error?:string}>>([]);
   const [bulkSending, setBulkSending] = useState(false);
   const [confirm, setConfirm] = useState<{title: string; message: string; action: () => void} | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('STERILIZATION');
@@ -185,10 +186,26 @@ export default function StudioPage() {
   };
   useEffect(() => { void loadCloudUsers(); }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
+  const loadCloudDepartments = async () => {
+    if (libs.dataMode !== 'PRODUCTION') return;
+    const {data,error}=await supabase.rpc('platform_list_departments');
+    if(error){setCloudError(error.message);return;}
+    setCloudDepartments((data||[]).map((d:{id:string;organization_id:string;name:string;code:string|null;active:boolean})=>({
+      id:d.id,organizationId:d.organization_id,name:d.name,code:d.code||'',active:d.active
+    })));
+  };
+  useEffect(()=>{void loadCloudDepartments();},[libs.dataMode]);
+  const saveCloudDepartment = async (item: LibraryItem) => {
+    const org=displayedOrganizations[0];
+    if(!org){setCloudError(L('Δημιουργήστε πρώτα νοσοκομείο.','Create a hospital first.'));return;}
+    const {error}=await supabase.rpc('platform_create_department',{p_organization_id:org.id,p_name:item.el,p_code:item.code||item.el.slice(0,8)});
+    if(error){setCloudError(error.message);return;}
+    setNewItem(false); await loadCloudDepartments();
+  };
   const inviteUser = async (data: Omit<AdminUser,'id'>) => {
     if (libs.dataMode === 'DEMO') { libs.addUser(data); setUserEditor(undefined); return; }
     const {data: result, error} = await supabase.functions.invoke('invite-staff', {body: {users:[{
-      full_name:data.name,email:data.email,organization_id:data.organizationId,department_id:null,role:data.role
+      full_name:data.name,email:data.email,organization_id:data.organizationId,department_id:data.department || null,role:data.role
     }],redirect_to:window.location.origin}});
     if (error || !result?.results?.[0]?.ok) { setCloudError(result?.results?.[0]?.error || error?.message || 'Invite failed'); return; }
     setUserEditor(undefined); await loadCloudUsers();
@@ -198,16 +215,18 @@ export default function StudioPage() {
     const lines = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
     const rows = lines.slice(1).map(line => {
       const parts=line.split(/[;,]/).map(x=>x.trim().replace(/^"|"$/g,''));
-      const [name,email,hospital,roleRaw]=parts;
+      const [name,email,hospital,department,roleRaw]=parts;
       const org=displayedOrganizations.find(o=>o.code.toLowerCase()===String(hospital||'').toLowerCase()||o.name.toLowerCase()===String(hospital||'').toLowerCase());
+      const dep=org?cloudDepartments.find(d=>d.organizationId===org.id&&(d.code.toLowerCase()===String(department||'').toLowerCase()||d.name.toLowerCase()===String(department||'').toLowerCase())):undefined;
       const role=(['ADMIN','STERILIZATION','DEPARTMENT'].includes(String(roleRaw||'').toUpperCase())?String(roleRaw).toUpperCase():'DEPARTMENT') as UserRole;
-      return {name,email,organizationId:org?.id||'',role};
-    }).filter(r=>r.name&&r.email&&r.organizationId);
+      const error=!name||!email.includes('@')?L('Μη έγκυρο όνομα/email','Invalid name/email'):!org?L('Άγνωστο νοσοκομείο','Unknown hospital'):(role==='DEPARTMENT'&&!dep)?L('Άγνωστο τμήμα','Unknown department'):undefined;
+      return {name,email,organizationId:org?.id||'',departmentId:dep?.id||'',departmentName:dep?.name||department||'',role,error};
+    });
     setBulkRows(rows);
   };
   const sendBulkInvites = async () => {
-    if (!bulkRows.length) return; setBulkSending(true); setCloudError('');
-    const {data: result,error}=await supabase.functions.invoke('invite-staff',{body:{users:bulkRows.map(r=>({full_name:r.name,email:r.email,organization_id:r.organizationId,department_id:null,role:r.role})),redirect_to:window.location.origin}});
+    if (!bulkRows.length || bulkRows.some(r=>r.error)) return; setBulkSending(true); setCloudError('');
+    const {data: result,error}=await supabase.functions.invoke('invite-staff',{body:{users:bulkRows.map(r=>({full_name:r.name,email:r.email,organization_id:r.organizationId,department_id:r.departmentId||null,role:r.role})),redirect_to:window.location.origin}});
     setBulkSending(false);
     if(error){setCloudError(error.message);return;}
     const failed=(result?.results||[]).filter((x:{ok:boolean})=>!x.ok);
@@ -284,7 +303,9 @@ export default function StudioPage() {
     window.location.reload();
   };
   const currentMeta = libraryMeta.find(x => x.key === libraryKey)!;
-  const currentItems = libs[libraryKey];
+  const currentItems = libs.dataMode === 'PRODUCTION' && libraryKey === 'departments'
+    ? cloudDepartments.map(d=>({id:d.id,el:d.name,en:d.name,code:d.code}))
+    : libs[libraryKey];
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
@@ -665,8 +686,8 @@ export default function StudioPage() {
               </header>
               {cloudError && <div className="auth-message">{cloudError}</div>}
             {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && <div className="studio-mini-note">
-              <Upload size={17}/><span><b>{bulkRows.length}</b> {L('έγκυρες εγγραφές έτοιμες για πρόσκληση.','valid rows ready to invite.')}</span>
-              <AppButton variant="primary" disabled={bulkSending} onClick={()=>void sendBulkInvites()}><Send size={15}/>{bulkSending?L('Αποστολή...','Sending...'):L('Αποστολή προσκλήσεων','Send invitations')}</AppButton>
+              <Upload size={17}/><span><b>{bulkRows.length}</b> {L('εγγραφές · ','rows · ')}<b>{bulkRows.filter(r=>!r.error).length}</b> {L('έγκυρες','valid')} · <b>{bulkRows.filter(r=>r.error).length}</b> {L('με σφάλμα','with errors')}</span>
+              <AppButton variant="primary" disabled={bulkSending || bulkRows.some(r=>r.error)} onClick={()=>void sendBulkInvites()}><Send size={15}/>{bulkSending?L('Αποστολή...','Sending...'):L('Αποστολή προσκλήσεων','Send invitations')}</AppButton>
             </div>}
             <div className="studio-search">
                 <Search size={17} />
@@ -1437,17 +1458,22 @@ export default function StudioPage() {
             setNewItem(false);
           }}
           onSave={data => {
-            if (editItem) libs.updateItem(libraryKey, editItem.id, data);
-            else libs.addItem(libraryKey, data);
-            setEditItem(null);
-            setNewItem(false);
+            if (libs.dataMode === 'PRODUCTION' && libraryKey === 'departments') {
+              if (editItem) {
+                void supabase.rpc('platform_update_department',{p_id:editItem.id,p_name:data.el,p_code:data.code||'',p_active:true}).then(({error})=>{if(error)setCloudError(error.message);else void loadCloudDepartments();});
+                setEditItem(null); setNewItem(false);
+              } else void saveCloudDepartment(data);
+            } else {
+              if (editItem) libs.updateItem(libraryKey, editItem.id, data); else libs.addItem(libraryKey, data);
+              setEditItem(null); setNewItem(false);
+            }
           }}
         />
       )}
       {userEditor !== undefined && (
         <UserEditor
           user={userEditor || undefined}
-          departments={libs.departments.map(d => d.el)}
+          departments={libs.dataMode === 'PRODUCTION' ? cloudDepartments.map(d=>d.name) : libs.departments.map(d => d.el)}
           organizations={displayedOrganizations}
           onClose={() => setUserEditor(undefined)}
           onSave={data => { if (userEditor && libs.dataMode === 'DEMO') { libs.updateUser(userEditor.id,data); setUserEditor(undefined); } else void inviteUser(data); }}
