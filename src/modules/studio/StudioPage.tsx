@@ -450,7 +450,7 @@ export default function StudioPage() {
               <div>
                 <Building2 />
                 <span>{L('Τμήματα', 'Departments')}</span>
-                <strong>{libs.departments.length}</strong>
+                <strong>{libs.dataMode === 'PRODUCTION' ? cloudDepartments.length : libs.departments.length}</strong>
               </div>
               <div>
                 <ShieldCheck />
@@ -532,18 +532,8 @@ export default function StudioPage() {
         {tab === 'PLATFORM' && (
           <section className="studio-manager-panel studio-platform-panel">
             <header className="studio-panel-head">
-              <div>
-                <span className="eyebrow">ACCESS CONTROL</span>
-                <h2>{selectedOrganization ? selectedOrganization.name : L('Χρήστες','Users')}</h2>
-                <p>{selectedOrganization ? L('Χρήστες και τμήματα του επιλεγμένου νοσοκομείου.','Users and departments for the selected hospital.') : L('Επιλέξτε νοσοκομείο για διαχείριση χρηστών.','Select a hospital to manage users.')}</p>
-              </div>
-              <div style={{display:'flex',gap:8}}>
-                <select value={selectedOrganizationId} onChange={e=>setSelectedOrganizationId(e.target.value)}>
-                  <option value="">{L('Επιλογή νοσοκομείου','Select hospital')}</option>
-                  {displayedOrganizations.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}
-                </select>
-                {selectedOrganization && <AppButton variant="primary" onClick={()=>setUserEditor(null)}><Plus size={16}/>{L('Πρόσκληση χρήστη','Invite user')}</AppButton>}
-              </div>
+              <div><span className="eyebrow">PLATFORM ADMIN</span><h2>{L('Νοσοκομεία & πρόσβαση Demo','Hospitals & Demo access')}</h2><p>{L('Διαχείριση πραγματικών οργανισμών και απομονωμένης πρόσβασης Demo.','Manage real organizations and isolated Demo access.')}</p></div>
+              <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}><Plus size={16}/>{L('Νέο νοσοκομείο','New hospital')}</AppButton>
             </header>
             <div className="platform-kpis">
               <div>
@@ -1038,26 +1028,23 @@ export default function StudioPage() {
         {tab === 'USERS' && (
           <section className="studio-manager-panel studio-users-panel">
             <header className="studio-panel-head">
-              <div>
-                <span className="eyebrow">ACCESS CONTROL</span>
-                <h2>{L('Χρήστες SurgiTrack', 'SurgiTrack users')}</h2>
-                <p>
-                  {L(
-                    'Δημιουργία χρήστη, τμήμα, ρόλος και ενεργή πρόσβαση. Δεν αποθηκεύονται κωδικοί πρόσβασης εδώ.',
-                    'Create users, assign department and role, and control active access. Passwords are not stored here.',
-                  )}
-                </p>
-              </div>
-              <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                {libs.dataMode === 'PRODUCTION' && <label className="app-button" style={{cursor:'pointer'}}>
-                  <Upload size={16} /> {L('Μαζική εισαγωγή CSV','Bulk CSV import')}
-                  <input type="file" accept=".csv,text/csv" hidden onChange={e=>e.target.files?.[0]&&void importCsv(e.target.files[0])}/>
-                </label>}
-                <AppButton variant="primary" onClick={() => setUserEditor(null)}>
-                  <Plus size={16} /> {L('Πρόσκληση χρήστη', 'Invite user')}
-                </AppButton>
-              </div>
+              <div><span className="eyebrow">HOSPITAL ACCESS</span><h2>{selectedOrganization ? selectedOrganization.name : L('Χρήστες & Τμήματα','Users & Departments')}</h2><p>{selectedOrganization ? L('Κεντρική διαχείριση τμημάτων, χρηστών και προσκλήσεων.','Central management of departments, users and invitations.') : L('Επιλέξτε νοσοκομείο.','Select a hospital.')}</p></div>
+              <select value={selectedOrganizationId} onChange={e=>setSelectedOrganizationId(e.target.value)}><option value="">{L('Επιλογή νοσοκομείου','Select hospital')}</option>{displayedOrganizations.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select>
             </header>
+            {selectedOrganization && <div className="hospital-admin-summary">
+              <div><Building2 size={18}/><span>{L('Τμήματα','Departments')}</span><strong>{selectedOrgDepartments.length}</strong></div>
+              <div><Users size={18}/><span>{L('Χρήστες','Users')}</span><strong>{selectedOrgUsers.length}</strong></div>
+              <div><ShieldCheck size={18}/><span>{L('Ενεργοί','Active')}</span><strong>{selectedOrgUsers.filter(u=>u.active).length}</strong></div>
+            </div>}
+            {selectedOrganization && <section className="hospital-departments">
+              <header><div><b>{L('Τμήματα νοσοκομείου','Hospital departments')}</b><small>{L('Τα τμήματα χρησιμοποιούνται σε χρήστες, Σετ και ιχνηλασιμότητα.','Departments are used by users, sets and traceability.')}</small></div>
+              <AppButton onClick={()=>{setLibraryKey('departments');setEditItem(null);setNewItem(true);}}><Plus size={15}/>{L('Νέο τμήμα','New department')}</AppButton></header>
+              <div className="hospital-department-list">{selectedOrgDepartments.map(d=><div key={d.id}><span><b>{d.name}</b><small>{d.code||'—'}</small></span><button onClick={()=>{setLibraryKey('departments');setEditItem({id:d.id,el:d.name,en:d.name,code:d.code});setNewItem(false);}}><Pencil size={14}/></button></div>)}</div>
+            </section>}
+            {selectedOrganization && <div className="hospital-user-actions">
+              <AppButton variant="primary" onClick={()=>setUserEditor(null)}><Plus size={16}/>{L('Πρόσκληση χρήστη','Invite user')}</AppButton>
+              {libs.dataMode==='PRODUCTION' && <label className="app-button"><Upload size={16}/>{L('Μαζική εισαγωγή CSV','Bulk CSV import')}<input type="file" accept=".csv,text/csv" hidden onChange={e=>e.target.files?.[0]&&void importCsv(e.target.files[0])}/></label>}
+            </div>}
             <div className="studio-search">
               <Search size={17} />
               <input
