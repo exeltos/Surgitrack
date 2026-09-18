@@ -139,6 +139,7 @@ export default function StudioPage() {
   const [newItem, setNewItem] = useState(false);
   const [userEditor, setUserEditor] = useState<AdminUser | null | undefined>(undefined);
   const [organizationEditor, setOrganizationEditor] = useState<Organization | null | undefined>(undefined);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
@@ -186,6 +187,9 @@ export default function StudioPage() {
   };
   useEffect(() => { void loadCloudUsers(); }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
+  const selectedOrganization = displayedOrganizations.find(o=>o.id===selectedOrganizationId);
+  const selectedOrgDepartments = cloudDepartments.filter(d=>d.organizationId===selectedOrganizationId);
+  const selectedOrgUsers = displayedUsers.filter(u=>u.organizationId===selectedOrganizationId);
   const loadCloudDepartments = async () => {
     if (libs.dataMode !== 'PRODUCTION') return;
     const {data,error}=await supabase.rpc('platform_list_departments');
@@ -196,7 +200,7 @@ export default function StudioPage() {
   };
   useEffect(()=>{void loadCloudDepartments();},[libs.dataMode]);
   const saveCloudDepartment = async (item: LibraryItem) => {
-    const org=displayedOrganizations[0];
+    const org=selectedOrganization || displayedOrganizations[0];
     if(!org){setCloudError(L('Δημιουργήστε πρώτα νοσοκομείο.','Create a hospital first.'));return;}
     const {error}=await supabase.rpc('platform_create_department',{p_organization_id:org.id,p_name:item.el,p_code:item.code||item.el.slice(0,8)});
     if(error){setCloudError(error.message);return;}
@@ -253,6 +257,13 @@ export default function StudioPage() {
     setOrganizationEditor(undefined);
     await loadCloudOrganizations();
   };
+  const updateOrganizationFlags = async (org: Organization, patch: Partial<Pick<Organization,'active'|'demoEnabled'>>) => {
+    if (libs.dataMode === 'DEMO') { libs.updateOrganization(org.id,patch); return; }
+    const next={...org,...patch};
+    const {error}=await supabase.rpc('platform_update_organization',{p_id:org.id,p_name:org.name,p_code:org.code,p_active:next.active,p_demo_enabled:next.demoEnabled});
+    if(error){setCloudError(error.message);return;} await loadCloudOrganizations();
+  };
+  const openOrganization = (org: Organization) => { setSelectedOrganizationId(org.id); setTab('USERS'); setQuery(''); };
   const handleResetSterilizationWorkflow = () => {
     libs.resetSterilizationWorkflow(currentUser.name);
   };
@@ -310,6 +321,7 @@ export default function StudioPage() {
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
   const filteredUsers = displayedUsers.filter(u => {
+    if (selectedOrganizationId && u.organizationId !== selectedOrganizationId) return false;
     const organizationName = displayedOrganizations.find(org => org.id === u.organizationId)?.name || '';
     return `${u.name} ${u.email} ${u.department} ${u.role} ${organizationName}`
       .toLowerCase()
@@ -521,36 +533,34 @@ export default function StudioPage() {
           <section className="studio-manager-panel studio-platform-panel">
             <header className="studio-panel-head">
               <div>
-                <span className="eyebrow">PLATFORM ADMIN</span>
-                <h2>{L('Νοσοκομεία & πρόσβαση Demo', 'Hospitals & Demo access')}</h2>
-                <p>
-                  {L(
-                    'Ο κεντρικός διαχειριστής βλέπει όλους τους οργανισμούς και αποφασίζει πού επιτρέπεται δοκιμαστική πρόσβαση.',
-                    'The platform administrator can see all organizations and decide where demo access is allowed.',
-                  )}
-                </p>
+                <span className="eyebrow">ACCESS CONTROL</span>
+                <h2>{selectedOrganization ? selectedOrganization.name : L('Χρήστες','Users')}</h2>
+                <p>{selectedOrganization ? L('Χρήστες και τμήματα του επιλεγμένου νοσοκομείου.','Users and departments for the selected hospital.') : L('Επιλέξτε νοσοκομείο για διαχείριση χρηστών.','Select a hospital to manage users.')}</p>
               </div>
-              <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}>
-                <Plus size={16} />
-                {L('Νέο νοσοκομείο', 'New hospital')}
-              </AppButton>
+              <div style={{display:'flex',gap:8}}>
+                <select value={selectedOrganizationId} onChange={e=>setSelectedOrganizationId(e.target.value)}>
+                  <option value="">{L('Επιλογή νοσοκομείου','Select hospital')}</option>
+                  {displayedOrganizations.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}
+                </select>
+                {selectedOrganization && <AppButton variant="primary" onClick={()=>setUserEditor(null)}><Plus size={16}/>{L('Πρόσκληση χρήστη','Invite user')}</AppButton>}
+              </div>
             </header>
             <div className="platform-kpis">
               <div>
                 <span>{L('Νοσοκομεία', 'Hospitals')}</span>
-                <strong>{libs.organizations.length}</strong>
+                <strong>{displayedOrganizations.length}</strong>
               </div>
               <div>
                 <span>{L('Ενεργά', 'Active')}</span>
-                <strong>{libs.organizations.filter(org => org.active).length}</strong>
+                <strong>{displayedOrganizations.filter(org => org.active).length}</strong>
               </div>
               <div>
                 <span>{L('Demo ενεργό', 'Demo enabled')}</span>
-                <strong>{libs.organizations.filter(org => org.demoEnabled).length}</strong>
+                <strong>{displayedOrganizations.filter(org => org.demoEnabled).length}</strong>
               </div>
               <div>
                 <span>{L('Σύνολο χρηστών', 'Total users')}</span>
-                <strong>{libs.users.length}</strong>
+                <strong>{displayedUsers.length}</strong>
               </div>
             </div>
             <section className="platform-private-demo">
@@ -576,7 +586,7 @@ export default function StudioPage() {
             </section>
             <div className="platform-org-list">
               {displayedOrganizations.map(org => {
-                const orgUsers = libs.users.filter(user => user.organizationId === org.id);
+                const orgUsers = displayedUsers.filter(user => user.organizationId === org.id);
                 const demoUsers = orgUsers.filter(user => user.demoEnabled).length;
                 return (
                   <article className="platform-org-card" key={org.id}>
@@ -594,14 +604,14 @@ export default function StudioPage() {
                     <div className="platform-org-status">
                       <button
                         className={`studio-access-toggle ${org.active ? 'active' : ''}`}
-                        onClick={() => libs.updateOrganization(org.id, {active: !org.active})}
+                        onClick={() => void updateOrganizationFlags(org, {active: !org.active})}
                       >
                         <span></span>
                         {org.active ? L('Ενεργό', 'Active') : L('Ανενεργό', 'Inactive')}
                       </button>
                       <button
                         className={`studio-access-toggle demo ${org.demoEnabled ? 'active' : ''}`}
-                        onClick={() => libs.updateOrganization(org.id, {demoEnabled: !org.demoEnabled})}
+                        onClick={() => void updateOrganizationFlags(org, {demoEnabled: !org.demoEnabled})}
                       >
                         <span></span>
                         {org.demoEnabled ? L('Demo ανοικτό', 'Demo open') : L('Demo κλειστό', 'Demo closed')}
@@ -629,12 +639,11 @@ export default function StudioPage() {
                       </button>
                     </div>
                     <div className="platform-org-meta">
-                      <span>
-                        {L('Demo χρήστες', 'Demo users')}: <b>{demoUsers}</b>
-                      </span>
-                      <button onClick={() => setOrganizationEditor(org)}>
-                        <Pencil size={16} />
-                      </button>
+                      <span>{L('Τμήματα','Departments')}: <b>{cloudDepartments.filter(d=>d.organizationId===org.id).length}</b> · {L('Demo χρήστες','Demo users')}: <b>{demoUsers}</b></span>
+                      <div className="platform-org-card-actions">
+                        <button onClick={() => openOrganization(org)}><Users size={15}/>{L('Διαχείριση','Manage')}</button>
+                        <button onClick={() => setOrganizationEditor(org)}><Pencil size={16}/></button>
+                      </div>
                     </div>
                   </article>
                 );
@@ -1474,7 +1483,7 @@ export default function StudioPage() {
         <UserEditor
           user={userEditor || undefined}
           departments={libs.dataMode === 'PRODUCTION' ? cloudDepartments.map(d=>d.name) : libs.departments.map(d => d.el)}
-          organizations={displayedOrganizations}
+          organizations={selectedOrganization ? [selectedOrganization] : displayedOrganizations}
           cloudDepartments={libs.dataMode === 'PRODUCTION' ? cloudDepartments : undefined}
           onClose={() => setUserEditor(undefined)}
           onSave={data => { if (userEditor && libs.dataMode === 'DEMO') { libs.updateUser(userEditor.id,data); setUserEditor(undefined); } else void inviteUser(data); }}
