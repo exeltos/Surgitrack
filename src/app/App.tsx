@@ -40,6 +40,7 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
   useEffect(() => {
     let mounted = true;
     const restoreSession = async () => {
@@ -98,6 +99,12 @@ export default function App() {
     void restoreSession();
     const {data: listener} = supabase.auth.onAuthStateChange(event => {
       if (!mounted) return;
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true);
+        setAuthenticated(false);
+        setAuthReady(true);
+        return;
+      }
       if (event === 'SIGNED_OUT') {
         setAuthenticated(false);
         setAuthReady(true);
@@ -142,7 +149,15 @@ export default function App() {
     navigate('/', {replace: true});
   };
   if (!authReady) return null;
-  if (!authenticated) return <AuthIndex onAuthenticated={login} goodbye={goodbye} />;
+  if (!authenticated)
+    return (
+      <AuthIndex
+        onAuthenticated={login}
+        goodbye={goodbye}
+        passwordRecovery={passwordRecovery}
+        onPasswordRecoveryHandled={() => setPasswordRecovery(false)}
+      />
+    );
   return (
     <AppShell onLogout={logout}>
       <Routes>
