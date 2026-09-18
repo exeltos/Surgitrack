@@ -486,3 +486,35 @@
 .camera-modal {
   z-index: 1401 !important;
 }
+
+/* Platform Admin — hospital rows: keep actions compact and aligned. */
+.studio-platform-panel .platform-org-card{
+  display:grid!important;
+  grid-template-columns:minmax(260px,1.55fr) minmax(250px,.95fr) minmax(330px,1.25fr) 210px!important;
+  align-items:center!important;
+  gap:18px!important;
+  padding:16px 18px!important;
+}
+.studio-platform-panel .platform-org-main,
+.studio-platform-panel .platform-org-status,
+.studio-platform-panel .platform-demo-actions,
+.studio-platform-panel .platform-org-meta{min-width:0!important;}
+.studio-platform-panel .platform-org-meta{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:14px!important;
+}
+.studio-platform-panel .platform-org-meta>span{
+  white-space:nowrap!important;font-size:12px!important;
+}
+.studio-platform-panel .platform-org-card-actions{
+  display:flex!important;align-items:center!important;gap:7px!important;flex:0 0 auto!important;
+}
+.studio-platform-panel .platform-org-card-actions button{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  gap:6px!important;height:36px!important;min-width:36px!important;padding:0 10px!important;
+  white-space:nowrap!important;border:1px solid #d7e2e8!important;border-radius:10px!important;background:#fff!important;
+}
+.studio-platform-panel .platform-org-card-actions button:last-child{width:36px!important;padding:0!important;}
+@media(max-width:1280px){
+ .studio-platform-panel .platform-org-card{grid-template-columns:minmax(240px,1.4fr) minmax(230px,1fr) minmax(280px,1.2fr)!important;}
+ .studio-platform-panel .platform-org-meta{grid-column:1/-1!important;justify-content:space-between!important;border-top:1px solid #edf2f5!important;padding-top:11px!important;}
+}
