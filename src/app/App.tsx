@@ -50,11 +50,16 @@ export default function App() {
         setAuthReady(true);
         return;
       }
-      const {data: profile} = await supabase
-        .from('profiles')
-        .select('id,name,email,role,active,organization_id,department_id')
-        .eq('id', data.session.user.id)
-        .single();
+      const sessionEmail = data.session.user.email?.toLowerCase();
+      const profileResult =
+        sessionEmail === 'info@exeltos.com'
+          ? await supabase.rpc('claim_platform_admin')
+          : await supabase
+              .from('profiles')
+              .select('id,name,email,role,active,organization_id,department_id')
+              .eq('id', data.session.user.id)
+              .single();
+      const profile = profileResult.data;
       if (!mounted) return;
       if (!profile?.active) {
         await supabase.auth.signOut();
