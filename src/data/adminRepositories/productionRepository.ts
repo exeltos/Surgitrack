@@ -5,7 +5,7 @@ import {defaultRolePermissions} from '../../core/permissions';
 
 export const productionAdminRepository: AdminRepository = {
   mode: 'PRODUCTION',
-  storageKey: 'surgitrack-admin-core-production-v1',
+  storageKey: '',
   getInitialData: (): LibraryState => ({
     departments: [],
     specialties: [],
