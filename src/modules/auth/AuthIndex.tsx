@@ -130,12 +130,21 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       setMessage(t.invalidCredentials);
       return;
     }
-    if (email === 'info@exeltos.com') await supabase.rpc('claim_platform_admin');
-    const {data: profile, error: profileError} = await supabase
-      .from('profiles')
-      .select('id,name,email,role,active,organization_id,department_id')
-      .eq('id', authData.user.id)
-      .single();
+    let profile;
+    let profileError = null;
+    if (email === 'info@exeltos.com') {
+      const result = await supabase.rpc('claim_platform_admin');
+      profile = result.data;
+      profileError = result.error;
+    } else {
+      const result = await supabase
+        .from('profiles')
+        .select('id,name,email,role,active,organization_id,department_id')
+        .eq('id', authData.user.id)
+        .single();
+      profile = result.data;
+      profileError = result.error;
+    }
     if (profileError || !profile || !profile.active) {
       await supabase.auth.signOut();
       setMessage(t.accessDisabled);
