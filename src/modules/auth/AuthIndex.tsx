@@ -211,6 +211,18 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
       return;
     }
     if (email !== 'info@exeltos.com') {
+      const organization = String(data.get('organization') || '').trim();
+      const department = String(data.get('department') || '').trim();
+      const {error: requestError} = await supabase.rpc('submit_registration_request', {
+        p_full_name: fullName,
+        p_email: email,
+        p_organization_name: organization || null,
+        p_department_name: department || null,
+      });
+      if (requestError) {
+        setMessage(lang === 'el' ? 'Δεν ήταν δυνατή η υποβολή του αιτήματος. Δοκιμάστε ξανά.' : 'Could not submit the request. Please try again.');
+        return;
+      }
       setPendingEmail(email);
       setSentKind('request');
       setMessage('');
