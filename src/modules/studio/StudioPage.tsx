@@ -199,7 +199,7 @@ export default function StudioPage() {
     })));
   };
   useEffect(()=>{void loadCloudDepartments();},[libs.dataMode]);
-  const saveCloudDepartment = async (item: LibraryItem) => {
+  const saveCloudDepartment = async (item: Omit<LibraryItem, 'id'>) => {
     const org=selectedOrganization || displayedOrganizations[0];
     if(!org){setCloudError(L('Δημιουργήστε πρώτα νοσοκομείο.','Create a hospital first.'));return;}
     const {error}=await supabase.rpc('platform_create_department',{p_organization_id:org.id,p_name:item.el,p_code:item.code||item.el.slice(0,8)});
