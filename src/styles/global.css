@@ -601,3 +601,27 @@
 .studio-platform-panel .platform-manage-btn span{
  display:inline!important;white-space:nowrap!important;
 }
+
+/* Platform hospitals: must fit viewport; never horizontal-scroll. */
+.studio-body-platform,
+.studio-platform-panel,
+.studio-platform-panel .platform-org-list{max-width:100%!important;min-width:0!important;overflow-x:hidden!important;}
+.studio-platform-panel .platform-org-card{
+ display:grid!important;
+ grid-template-columns:minmax(220px,1.25fr) minmax(235px,.9fr) minmax(300px,1.1fr) minmax(235px,.8fr)!important;
+ gap:14px!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important;
+}
+.studio-platform-panel .platform-org-main{min-width:0!important}
+.studio-platform-panel .platform-org-main>div:last-child{min-width:0!important}
+.studio-platform-panel .platform-org-main strong,
+.studio-platform-panel .platform-org-main small{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.studio-platform-panel .platform-org-status{gap:12px!important;white-space:nowrap!important}
+.studio-platform-panel .platform-demo-actions{min-width:0!important}
+.studio-platform-panel .platform-demo-actions>div{display:flex!important;gap:6px!important;flex-wrap:nowrap!important}
+.studio-platform-panel .platform-demo-actions button{padding:7px 9px!important;white-space:nowrap!important}
+.studio-platform-panel .platform-org-meta{grid-template-columns:minmax(120px,1fr) 118px!important;min-width:0!important}
+.studio-platform-panel .platform-manage-btn{width:118px!important;min-width:118px!important}
+@media(max-width:1200px){
+ .studio-platform-panel .platform-org-card{grid-template-columns:1fr 1fr!important}
+ .studio-platform-panel .platform-org-meta{grid-column:auto!important;border-top:0!important;padding-top:0!important}
+}
