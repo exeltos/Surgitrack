@@ -14,18 +14,7 @@ export const productionAdminRepository: AdminRepository = {
     toolCategories: [],
     sterilizers: [],
     organizations: [],
-    users: [
-      {
-        id: 'platform-admin',
-        name: 'Platform Admin',
-        email: 'admin@surgitrack.demo',
-        role: 'ADMIN',
-        department: 'Platform',
-        active: true,
-        organizationId: '',
-        demoEnabled: false,
-      },
-    ],
+    users: [],
     rolePermissions: {
       ADMIN: [...defaultRolePermissions.ADMIN],
       STERILIZATION: [...defaultRolePermissions.STERILIZATION],
