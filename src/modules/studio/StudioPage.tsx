@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {setRuntimeDataMode} from '../../config/dataMode';
 import {
   BookOpen,
@@ -42,6 +42,7 @@ import {
 } from '../../core/permissions';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import {supabase} from '../../lib/supabase';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -136,6 +137,9 @@ export default function StudioPage() {
   const [newItem, setNewItem] = useState(false);
   const [userEditor, setUserEditor] = useState<AdminUser | null | undefined>(undefined);
   const [organizationEditor, setOrganizationEditor] = useState<Organization | null | undefined>(undefined);
+  const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
+  const [cloudLoading, setCloudLoading] = useState(false);
+  const [cloudError, setCloudError] = useState('');
   const [confirm, setConfirm] = useState<{title: string; message: string; action: () => void} | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('STERILIZATION');
   const [roleDraft, setRoleDraft] = useState<Permission[]>(() => [
@@ -143,6 +147,47 @@ export default function StudioPage() {
   ]);
 
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
+  const loadCloudOrganizations = async () => {
+    if (libs.dataMode !== 'PRODUCTION') return;
+    setCloudLoading(true);
+    const {data, error} = await supabase.from('organizations').select('id,name,code,active,demo_enabled').order('name');
+    if (error) setCloudError(error.message);
+    else {
+      setCloudError('');
+      setCloudOrganizations((data || []).map(row => ({
+        id: row.id,
+        name: row.name,
+        code: row.code,
+        active: row.active,
+        demoEnabled: row.demo_enabled,
+      })));
+    }
+    setCloudLoading(false);
+  };
+  useEffect(() => {
+    void loadCloudOrganizations();
+  }, [libs.dataMode]);
+  const displayedOrganizations = libs.dataMode === 'PRODUCTION' ? cloudOrganizations : libs.organizations;
+  const saveOrganization = async (data: Omit<Organization, 'id'>) => {
+    if (libs.dataMode === 'DEMO') {
+      if (organizationEditor) libs.updateOrganization(organizationEditor.id, data);
+      else libs.addOrganization(data);
+      setOrganizationEditor(undefined);
+      return;
+    }
+    const {error} = organizationEditor
+      ? await supabase.rpc('platform_update_organization', {
+          p_id: organizationEditor.id, p_name: data.name, p_code: data.code,
+          p_active: data.active, p_demo_enabled: data.demoEnabled,
+        })
+      : await supabase.rpc('platform_create_organization', {p_name: data.name, p_code: data.code});
+    if (error) { setCloudError(error.message); return; }
+    if (!organizationEditor && data.demoEnabled) {
+      await loadCloudOrganizations();
+    }
+    setOrganizationEditor(undefined);
+    await loadCloudOrganizations();
+  };
   const handleResetSterilizationWorkflow = () => {
     libs.resetSterilizationWorkflow(currentUser.name);
   };
@@ -463,7 +508,7 @@ export default function StudioPage() {
               </div>
             </section>
             <div className="platform-org-list">
-              {libs.organizations.map(org => {
+              {displayedOrganizations.map(org => {
                 const orgUsers = libs.users.filter(user => user.organizationId === org.id);
                 const demoUsers = orgUsers.filter(user => user.demoEnabled).length;
                 return (
@@ -528,7 +573,7 @@ export default function StudioPage() {
                 );
               })}
             </div>
-            {!libs.organizations.length && (
+            {!displayedOrganizations.length && (
               <div className="studio-empty">{L('Δεν υπάρχουν νοσοκομεία.', 'No hospitals yet.')}</div>
             )}
           </section>
@@ -954,7 +999,7 @@ export default function StudioPage() {
                     <strong>{u.name}</strong>
                     <small>{u.email}</small>
                   </div>
-                  <span>{libs.organizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
+                  <span>{displayedOrganizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
                   <span>{u.department}</span>
                   <span className="role-chip">
                     {L(roles.find(r => r.id === u.role)?.el || u.role, roles.find(r => r.id === u.role)?.en || u.role)}
@@ -1360,11 +1405,7 @@ export default function StudioPage() {
         <OrganizationEditor
           organization={organizationEditor || undefined}
           onClose={() => setOrganizationEditor(undefined)}
-          onSave={data => {
-            if (organizationEditor) libs.updateOrganization(organizationEditor.id, data);
-            else libs.addOrganization(data);
-            setOrganizationEditor(undefined);
-          }}
+          onSave={data => { void saveOrganization(data); }}
         />
       )}
       {confirm && (
