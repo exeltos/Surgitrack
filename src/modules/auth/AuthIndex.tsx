@@ -148,13 +148,15 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       department: profile.organization_id ? profile.department_id || '' : 'Platform',
     });
   };
-  const submitRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
     const data = new FormData(e.currentTarget);
+    const fullName = String(data.get('fullName') || '').trim();
+    const email = String(data.get('email') || '').trim().toLowerCase();
     const p = String(data.get('password') || '');
     const cp = String(data.get('confirmPassword') || '');
-    if (!data.get('fullName') || !data.get('email') || !data.get('organization') || !p) {
+    if (!fullName || !email || !p) {
       setMessage(t.required);
       return;
     }
@@ -162,7 +164,27 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       setMessage(t.mismatch);
       return;
     }
-    setMessage(t.requestSent);
+    if (email !== 'info@exeltos.com') {
+      setMessage(t.requestSent);
+      return;
+    }
+    const {data: signUpData, error} = await supabase.auth.signUp({
+      email,
+      password: p,
+      options: {data: {full_name: fullName}},
+    });
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    if (signUpData.session) {
+      await supabase.rpc('claim_platform_admin');
+      setMessage(lang === 'el' ? 'Ο λογαριασμός δημιουργήθηκε. Μπορείτε να συνδεθείτε.' : 'Account created. You can now sign in.');
+      await supabase.auth.signOut();
+      changeView('login');
+      return;
+    }
+    setMessage(lang === 'el' ? 'Ο λογαριασμός δημιουργήθηκε. Ελέγξτε το email σας για επιβεβαίωση.' : 'Account created. Check your email to confirm it.');
   };
   const submitForgot = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -286,7 +308,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                   <div className="auth-two-col">
                     <label>
                       {t.organization}
-                      <input name="organization" required />
+                      <input name="organization" />
                     </label>
                     <label>
                       {t.department}
