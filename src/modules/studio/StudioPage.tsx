@@ -1475,6 +1475,7 @@ export default function StudioPage() {
           user={userEditor || undefined}
           departments={libs.dataMode === 'PRODUCTION' ? cloudDepartments.map(d=>d.name) : libs.departments.map(d => d.el)}
           organizations={displayedOrganizations}
+          cloudDepartments={libs.dataMode === 'PRODUCTION' ? cloudDepartments : undefined}
           onClose={() => setUserEditor(undefined)}
           onSave={data => { if (userEditor && libs.dataMode === 'DEMO') { libs.updateUser(userEditor.id,data); setUserEditor(undefined); } else void inviteUser(data); }}
         />
@@ -1623,19 +1624,21 @@ function OrganizationEditor({
 function UserEditor({
   user,
   departments,
+  cloudDepartments = [],
   organizations,
   onClose,
   onSave,
 }: {
   user?: AdminUser;
   departments: string[];
+  cloudDepartments?: Array<{id:string;organizationId:string;name:string}>;
   organizations: Organization[];
   onClose: () => void;
   onSave: (data: Omit<AdminUser, 'id'>) => void;
 }) {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [department, setDepartment] = useState(user?.department || departments[0] || '');
+  const [department, setDepartment] = useState(user?.department || cloudDepartments.find(d=>d.organizationId===(user?.organizationId||organizations[0]?.id))?.id || departments[0] || '');
   const [organizationId, setOrganizationId] = useState(user?.organizationId || organizations[0]?.id || '');
   const [role, setRole] = useState<UserRole>(user?.role || 'DEPARTMENT');
   const [active, setActive] = useState(user?.active ?? true);
@@ -1689,9 +1692,9 @@ function UserEditor({
           <label>
             Τμήμα
             <select value={department} onChange={e => setDepartment(e.target.value)}>
-              {departments.map(d => (
-                <option key={d}>{d}</option>
-              ))}
+              {cloudDepartments.length ? cloudDepartments.filter(d=>d.organizationId===organizationId).map(d => (
+                <option key={d.id} value={d.id}>{d.name}</option>
+              )) : departments.map(d => (<option key={d}>{d}</option>))}
             </select>
           </label>
           <label className="studio-switch-row">
