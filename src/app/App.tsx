@@ -42,21 +42,53 @@ export default function App() {
   const [goodbye, setGoodbye] = useState('');
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getSession().then(({data}) => {
+    const restoreSession = async () => {
+      const {data} = await supabase.auth.getSession();
       if (!mounted) return;
-      setAuthenticated(Boolean(data.session));
-      setAuthReady(true);
-    });
-    const {data: listener} = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!data.session?.user) {
+        setAuthenticated(false);
+        setAuthReady(true);
+        return;
+      }
+      const {data: profile} = await supabase
+        .from('profiles')
+        .select('id,name,email,role,active,organization_id,department_id')
+        .eq('id', data.session.user.id)
+        .single();
       if (!mounted) return;
-      setAuthenticated(Boolean(session));
+      if (!profile?.active) {
+        await supabase.auth.signOut();
+        setAuthenticated(false);
+        setAuthReady(true);
+        return;
+      }
+      const role = profile.role as UserRole;
+      const user: SessionUser = {
+        id: profile.id,
+        name: profile.name,
+        role,
+        department: profile.organization_id ? profile.department_id || '' : 'Platform',
+      };
+      sessionStorage.setItem('surgitrack-auth', '1');
+      sessionStorage.setItem('surgitrack-demo-role', role);
+      sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
+      setRole(role);
+      setAuthenticated(true);
       setAuthReady(true);
+    };
+    void restoreSession();
+    const {data: listener} = supabase.auth.onAuthStateChange(event => {
+      if (!mounted) return;
+      if (event === 'SIGNED_OUT') {
+        setAuthenticated(false);
+        setAuthReady(true);
+      }
     });
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, []);
+  }, [setRole]);
   const login = (role: UserRole = 'STERILIZATION', user?: SessionUser) => {
     sessionStorage.setItem('surgitrack-auth', '1');
     sessionStorage.setItem('surgitrack-demo-role', role);
