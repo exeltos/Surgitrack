@@ -372,13 +372,11 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
             )}
             {view === 'sent' && (
               <div className="auth-status-card">
-                <div className="auth-status-icon">{sentKind === 'request' ? <ShieldCheck size={24} /> : <Mail size={24} />}</div>
-                <span className="auth-eyebrow">{sentKind === 'reset' ? (lang === 'el' ? 'ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ' : 'PASSWORD RESET') : sentKind === 'request' ? (lang === 'el' ? 'ΑΙΤΗΜΑ ΠΡΟΣΒΑΣΗΣ' : 'ACCESS REQUEST') : (lang === 'el' ? 'ΕΠΙΒΕΒΑΙΩΣΗ ΕΓΓΡΑΦΗΣ' : 'REGISTRATION CONFIRMATION')}</span>
-                <h2>{sentKind === 'request' ? (lang === 'el' ? 'Το αίτημα υποβλήθηκε' : 'Request submitted') : (lang === 'el' ? 'Ελέγξτε το email σας' : 'Check your email')}</h2>
-                <p>{sentKind === 'reset' ? (lang === 'el' ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό. Ο σύνδεσμος είναι προσωπικός και περιορισμένης διάρκειας.' : 'We sent a secure link to set a new password. The link is personal and time-limited.') : sentKind === 'request' ? (lang === 'el' ? 'Το αίτημα πρόσβασης καταχωρήθηκε και αναμένει έγκριση διαχειριστή. Δεν χρειάζεται άλλη ενέργεια αυτή τη στιγμή.' : 'Your access request was recorded and is awaiting administrator approval. No further action is needed right now.') : (lang === 'el' ? 'Στείλαμε σύνδεσμο επιβεβαίωσης για να ολοκληρώσετε την εγγραφή και να ενεργοποιήσετε το email σας.' : 'We sent a confirmation link to complete registration and verify your email address.')}</p>
-                {pendingEmail && <div className="auth-email-chip"><Mail size={15} />{pendingEmail}</div>}
-                <button className="auth-primary" onClick={() => changeView('login')}>{t.backLogin}</button>
-                {sentKind === 'reset' && <button className="auth-text-btn auth-resend" onClick={() => changeView('forgot')}>{lang === 'el' ? 'Δεν έλαβα email — αποστολή ξανά' : 'I did not receive it — send again'}</button>}
+                <div className="auth-status-icon"><Mail size={24} /></div>
+                <span className="auth-eyebrow">{lang === 'el' ? 'ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ' : 'PASSWORD RESET'}</span>
+                <h2>{lang === 'el' ? 'Ελέγξτε το email σας' : 'Check your email'}</h2>
+                <p>{lang === 'el' ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό. Ο σύνδεσμος είναι προσωπικός και περιορισμένης διάρκειας.' : 'We sent a secure link to set a new password. The link is personal and time-limited.'}</p>
+                <button className="auth-primary" type="button" onClick={() => setView('login')}>{lang === 'el' ? 'Επιστροφή στη σύνδεση' : 'Back to sign in'}</button>
               </div>
             )}
           </div>
