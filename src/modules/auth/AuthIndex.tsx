@@ -27,6 +27,7 @@ const copy = {
     welcome: 'Καλώς ήρθατε',
     loginIntro: 'Συνδεθείτε για να συνεχίσετε στο SurgiTrack.',
     email: 'Email',
+    loginId: 'Κωδικός χρήστη ή Email',
     password: 'Κωδικός πρόσβασης',
     remember: 'Να παραμείνω συνδεδεμένος',
     forgotLink: 'Ξέχασα τον κωδικό μου',
@@ -73,6 +74,7 @@ const copy = {
     welcome: 'Welcome',
     loginIntro: 'Sign in to continue to SurgiTrack.',
     email: 'Email',
+    loginId: 'User ID or Email',
     password: 'Password',
     remember: 'Keep me signed in',
     forgotLink: 'Forgot my password',
@@ -145,8 +147,17 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
     e.preventDefault();
     setMessage('');
     const data = new FormData(e.currentTarget);
-    const email = String(data.get('email') || '').trim().toLowerCase();
+    const loginId = String(data.get('loginId') || '').trim();
     const password = String(data.get('password') || '');
+    let email = loginId.toLowerCase();
+    if (!loginId.includes('@')) {
+      const {data: resolvedEmail, error: resolveError} = await supabase.rpc('resolve_login_email', {p_user_code: loginId});
+      if (resolveError || !resolvedEmail) {
+        setMessage(t.invalidCredentials);
+        return;
+      }
+      email = String(resolvedEmail).toLowerCase();
+    }
     const {data: authData, error} = await supabase.auth.signInWithPassword({email, password});
     if (error || !authData.user) {
       setMessage(t.invalidCredentials);
@@ -311,10 +322,10 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
                 </div>
                 <form className="auth-form" onSubmit={submitLogin}>
                   <label>
-                    {t.email}
+                    {t.loginId}
                     <div className="auth-input">
                       <Mail size={17} />
-                      <input name="email" type="email" required autoComplete="email" placeholder="name@hospital.gr" />
+                      <input name="loginId" type="text" required autoComplete="username" placeholder="AF2741 ή name@hospital.gr" />
                     </div>
                   </label>
                   <label>
