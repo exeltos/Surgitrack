@@ -1,4 +1,4 @@
-import {useState, type ReactNode} from 'react';
+import {useEffect, useState, type ReactNode} from 'react';
 import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
@@ -23,6 +23,7 @@ import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser, UserRole} from '../store/types';
 import {setRuntimeDataMode} from '../config/dataMode';
+import {supabase} from '../lib/supabase';
 
 function RoleHome() {
   const {role} = useSurgi();
@@ -36,8 +37,26 @@ export default function App() {
   const {setRole, currentUser} = useSurgi();
   const {lang} = useAppPreferences();
   const navigate = useNavigate();
-  const [authenticated, setAuthenticated] = useState(() => sessionStorage.getItem('surgitrack-auth') === '1');
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({data}) => {
+      if (!mounted) return;
+      setAuthenticated(Boolean(data.session));
+      setAuthReady(true);
+    });
+    const {data: listener} = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setAuthenticated(Boolean(session));
+      setAuthReady(true);
+    });
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
   const login = (role: UserRole = 'STERILIZATION', user?: SessionUser) => {
     sessionStorage.setItem('surgitrack-auth', '1');
     sessionStorage.setItem('surgitrack-demo-role', role);
@@ -48,7 +67,7 @@ export default function App() {
     setGoodbye('');
     navigate(roleHomePath(role), {replace: true});
   };
-  const logout = () => {
+  const logout = async () => {
     const msg =
       lang === 'el'
         ? `Καλή συνέχεια, ${currentUser.name.split(' ')[0]}.`
@@ -56,6 +75,7 @@ export default function App() {
     if (!window.confirm(lang === 'el' ? 'Θέλετε να αποσυνδεθείτε από το SurgiTrack;' : 'Sign out of SurgiTrack?'))
       return;
     const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
+    if (!wasDemo) await supabase.auth.signOut();
     sessionStorage.removeItem('surgitrack-auth');
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
@@ -70,6 +90,7 @@ export default function App() {
     setAuthenticated(false);
     navigate('/', {replace: true});
   };
+  if (!authReady) return null;
   if (!authenticated) return <AuthIndex onAuthenticated={login} goodbye={goodbye} />;
   return (
     <AppShell onLogout={logout}>

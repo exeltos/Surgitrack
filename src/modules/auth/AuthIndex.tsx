@@ -3,14 +3,13 @@ import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, UserP
 import {useLibraries} from '../../core/LibraryStore';
 import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION} from '../../config/appMeta';
+import {supabase} from '../../lib/supabase';
 
 type Lang = 'el' | 'en';
 type View = 'login' | 'register' | 'forgot';
 type InfoView = 'privacy' | 'terms' | 'support' | null;
 
 type Props = {onAuthenticated: (role?: UserRole, user?: SessionUser) => void; goodbye?: string};
-
-const DEMO_ACCESS_KEY = 'SurgiTrack!2026';
 
 const copy = {
   el: {
@@ -120,42 +119,44 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
     setLang(next);
     localStorage.setItem('surgitrack-lang', next);
   };
-  const submitLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
     const data = new FormData(e.currentTarget);
-    const email = String(data.get('email') || '')
-      .trim()
-      .toLowerCase();
+    const email = String(data.get('email') || '').trim().toLowerCase();
     const password = String(data.get('password') || '');
-    const user = users.find(candidate => candidate.email.toLowerCase() === email);
-    if (!user || password !== DEMO_ACCESS_KEY) {
+    const {data: authData, error} = await supabase.auth.signInWithPassword({email, password});
+    if (error || !authData.user) {
       setMessage(t.invalidCredentials);
       return;
     }
-    const organization = organizations.find(org => org.id === user.organizationId);
-    if (!user.active || (organization && !organization.active)) {
+    if (email === 'info@exeltos.com') await supabase.rpc('claim_platform_admin');
+    const {data: profile, error: profileError} = await supabase
+      .from('profiles')
+      .select('id,name,email,role,active,organization_id,department_id')
+      .eq('id', authData.user.id)
+      .single();
+    if (profileError || !profile || !profile.active) {
+      await supabase.auth.signOut();
       setMessage(t.accessDisabled);
       return;
     }
-    if (user.role !== 'ADMIN' && (!user.demoEnabled || !organization?.demoEnabled)) {
-      setMessage(t.demoDisabled);
-      return;
-    }
-    onAuthenticated(user.role, {
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      department: user.department,
+    onAuthenticated(profile.role as UserRole, {
+      id: profile.id,
+      name: profile.name,
+      role: profile.role as UserRole,
+      department: profile.organization_id ? profile.department_id || '' : 'Platform',
     });
   };
-  const submitRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
     const data = new FormData(e.currentTarget);
+    const fullName = String(data.get('fullName') || '').trim();
+    const email = String(data.get('email') || '').trim().toLowerCase();
     const p = String(data.get('password') || '');
     const cp = String(data.get('confirmPassword') || '');
-    if (!data.get('fullName') || !data.get('email') || !data.get('organization') || !p) {
+    if (!fullName || !email || !p) {
       setMessage(t.required);
       return;
     }
@@ -163,11 +164,34 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
       setMessage(t.mismatch);
       return;
     }
-    setMessage(t.requestSent);
+    if (email !== 'info@exeltos.com') {
+      setMessage(t.requestSent);
+      return;
+    }
+    const {data: signUpData, error} = await supabase.auth.signUp({
+      email,
+      password: p,
+      options: {data: {full_name: fullName}},
+    });
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    if (signUpData.session) {
+      await supabase.rpc('claim_platform_admin');
+      setMessage(lang === 'el' ? 'Ο λογαριασμός δημιουργήθηκε. Μπορείτε να συνδεθείτε.' : 'Account created. You can now sign in.');
+      await supabase.auth.signOut();
+      changeView('login');
+      return;
+    }
+    setMessage(lang === 'el' ? 'Ο λογαριασμός δημιουργήθηκε. Ελέγξτε το email σας για επιβεβαίωση.' : 'Account created. Check your email to confirm it.');
   };
-  const submitForgot = (e: React.FormEvent) => {
+  const submitForgot = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage(t.resetSent);
+    const data = new FormData(e.currentTarget);
+    const email = String(data.get('email') || '').trim().toLowerCase();
+    const {error} = await supabase.auth.resetPasswordForEmail(email, {redirectTo: window.location.origin});
+    setMessage(error ? error.message : t.resetSent);
   };
   const changeView = (next: View) => {
     setView(next);
@@ -284,7 +308,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                   <div className="auth-two-col">
                     <label>
                       {t.organization}
-                      <input name="organization" required />
+                      <input name="organization" />
                     </label>
                     <label>
                       {t.department}
@@ -341,7 +365,7 @@ export default function AuthIndex({onAuthenticated, goodbye}: Props) {
                     {t.email}
                     <div className="auth-input">
                       <Mail size={17} />
-                      <input type="email" required placeholder="name@hospital.gr" />
+                      <input name="email" type="email" required placeholder="name@hospital.gr" />
                     </div>
                   </label>
                   {message && <div className="auth-message">{message}</div>}
