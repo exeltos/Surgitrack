@@ -34,7 +34,7 @@ const Ctx = createContext<LibraryStore | null>(null);
 const load = (repository: ReturnType<typeof getAdminRepository>): LibraryState => {
   const initial = repository.getInitialData();
   try {
-    const raw = localStorage.getItem(repository.storageKey);
+    const raw = repository.mode === 'DEMO' && repository.storageKey ? localStorage.getItem(repository.storageKey) : null;
     if (raw) {
       const saved = JSON.parse(raw);
       const organizations = Array.isArray(saved.organizations) ? saved.organizations : initial.organizations;
@@ -55,7 +55,7 @@ const load = (repository: ReturnType<typeof getAdminRepository>): LibraryState =
       const legacyRaw = localStorage.getItem(legacyKey);
       if (!legacyRaw) continue;
       const migrated = {...initial, ...JSON.parse(legacyRaw)} as LibraryState;
-      localStorage.setItem(repository.storageKey, JSON.stringify(migrated));
+      if (repository.mode === 'DEMO' && repository.storageKey) localStorage.setItem(repository.storageKey, JSON.stringify(migrated));
       return migrated;
     }
   } catch {
@@ -71,7 +71,7 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
   const commit = (fn: (s: LibraryState) => LibraryState) =>
     setState(s => {
       const next = fn(s);
-      localStorage.setItem(repository.storageKey, JSON.stringify(next));
+      if (repository.mode === 'DEMO' && repository.storageKey) localStorage.setItem(repository.storageKey, JSON.stringify(next));
       return next;
     });
   const actorName = (actor?: string) => actor?.trim() || 'Admin';
