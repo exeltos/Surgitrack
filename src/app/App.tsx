@@ -40,7 +40,7 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
-  const [passwordRecovery, setPasswordRecovery] = useState(() => window.location.hash.includes('type=recovery'));
+  const [passwordRecovery, setPasswordRecovery] = useState(() => /type=(recovery|invite)/.test(window.location.hash));
   const recoveryRef = useRef(passwordRecovery);
   useEffect(() => {
     recoveryRef.current = passwordRecovery;
@@ -50,7 +50,7 @@ export default function App() {
     const restoreSession = async () => {
       const {data} = await supabase.auth.getSession();
       if (!mounted) return;
-      if (recoveryRef.current || window.location.hash.includes('type=recovery')) {
+      if (recoveryRef.current || /type=(recovery|invite)/.test(window.location.hash)) {
         setPasswordRecovery(true);
         setAuthenticated(false);
         setAuthReady(true);
