@@ -112,7 +112,12 @@ const copy = {
   },
 };
 
-export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = false, onPasswordRecoveryHandled}: Props) {
+export default function AuthIndex({
+  onAuthenticated,
+  goodbye,
+  passwordRecovery = false,
+  onPasswordRecoveryHandled,
+}: Props) {
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
   const [view, setView] = useState<View>('login');
   const [showPassword, setShowPassword] = useState(false);
@@ -149,7 +154,9 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
     const password = String(data.get('password') || '');
     let email = loginId.toLowerCase();
     if (!loginId.includes('@')) {
-      const {data: resolvedEmail, error: resolveError} = await supabase.rpc('resolve_login_email', {p_user_code: loginId});
+      const {data: resolvedEmail, error: resolveError} = await supabase.rpc('resolve_login_email', {
+        p_user_code: loginId,
+      });
       if (resolveError || !resolvedEmail) {
         setMessage(t.invalidCredentials);
         return;
@@ -164,7 +171,11 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
     if (email === 'info@exeltos.com') {
       const {error: claimError} = await supabase.rpc('claim_platform_admin');
       if (claimError) {
-        setMessage(lang === 'el' ? 'Δεν ήταν δυνατή η φόρτωση του λογαριασμού διαχειριστή.' : 'Could not load the administrator account.');
+        setMessage(
+          lang === 'el'
+            ? 'Δεν ήταν δυνατή η φόρτωση του λογαριασμού διαχειριστή.'
+            : 'Could not load the administrator account.',
+        );
         return;
       }
       onAuthenticated('ADMIN', {
@@ -195,7 +206,9 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
   const submitForgot = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    const email = String(data.get('email') || '').trim().toLowerCase();
+    const email = String(data.get('email') || '')
+      .trim()
+      .toLowerCase();
     const {error} = await supabase.auth.resetPasswordForEmail(email, {redirectTo: window.location.origin});
     if (error) {
       setMessage(error.message);
@@ -213,7 +226,11 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
     const password = String(data.get('password') || '');
     const confirmPassword = String(data.get('confirmPassword') || '');
     if (password.length < 8) {
-      setMessage(lang === 'el' ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.' : 'The new password must be at least 8 characters.');
+      setMessage(
+        lang === 'el'
+          ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.'
+          : 'The new password must be at least 8 characters.',
+      );
       return;
     }
     if (password !== confirmPassword) {
@@ -227,7 +244,11 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
     }
     await supabase.auth.signOut();
     onPasswordRecoveryHandled?.();
-    setMessage(lang === 'el' ? 'Ο κωδικός άλλαξε επιτυχώς. Συνδεθείτε με τον νέο κωδικό.' : 'Password updated. Sign in with your new password.');
+    setMessage(
+      lang === 'el'
+        ? 'Ο κωδικός άλλαξε επιτυχώς. Συνδεθείτε με τον νέο κωδικό.'
+        : 'Password updated. Sign in with your new password.',
+    );
     setView('login');
   };
   const changeView = (next: View) => {
@@ -279,7 +300,13 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
                     {t.loginId}
                     <div className="auth-input">
                       <Mail size={17} />
-                      <input name="loginId" type="text" required autoComplete="username" placeholder="AF2741 ή name@hospital.gr" />
+                      <input
+                        name="loginId"
+                        type="text"
+                        required
+                        autoComplete="username"
+                        placeholder="AF2741 ή name@hospital.gr"
+                      />
                     </div>
                   </label>
                   <label>
@@ -352,31 +379,64 @@ export default function AuthIndex({onAuthenticated, goodbye, passwordRecovery = 
                   <div>
                     <span className="auth-eyebrow">{lang === 'el' ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ' : 'ACCOUNT SECURITY'}</span>
                     <h2>{lang === 'el' ? 'Ορισμός νέου κωδικού' : 'Set a new password'}</h2>
-                    <p>{lang === 'el' ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.' : 'Create a new password for your account.'}</p>
+                    <p>
+                      {lang === 'el'
+                        ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.'
+                        : 'Create a new password for your account.'}
+                    </p>
                   </div>
                   <ShieldCheck size={22} />
                 </div>
                 <form className="auth-form" onSubmit={submitReset}>
                   <label>
                     {lang === 'el' ? 'Νέος κωδικός' : 'New password'}
-                    <div className="auth-input"><LockKeyhole size={17} /><input name="password" type={showPassword ? 'text' : 'password'} required autoComplete="new-password" /><button type="button" onClick={() => setShowPassword(v => !v)}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div>
+                    <div className="auth-input">
+                      <LockKeyhole size={17} />
+                      <input
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        autoComplete="new-password"
+                      />
+                      <button type="button" onClick={() => setShowPassword(v => !v)}>
+                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
+                    </div>
                   </label>
                   <label>
                     {t.confirmPassword}
-                    <div className="auth-input"><LockKeyhole size={17} /><input name="confirmPassword" type={showPassword ? 'text' : 'password'} required autoComplete="new-password" /></div>
+                    <div className="auth-input">
+                      <LockKeyhole size={17} />
+                      <input
+                        name="confirmPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        autoComplete="new-password"
+                      />
+                    </div>
                   </label>
                   {message && <div className="auth-message">{message}</div>}
-                  <button className="auth-primary" type="submit">{lang === 'el' ? 'Αποθήκευση νέου κωδικού' : 'Save new password'}</button>
+                  <button className="auth-primary" type="submit">
+                    {lang === 'el' ? 'Αποθήκευση νέου κωδικού' : 'Save new password'}
+                  </button>
                 </form>
               </>
             )}
             {view === 'sent' && (
               <div className="auth-status-card">
-                <div className="auth-status-icon"><Mail size={24} /></div>
+                <div className="auth-status-icon">
+                  <Mail size={24} />
+                </div>
                 <span className="auth-eyebrow">{lang === 'el' ? 'ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ' : 'PASSWORD RESET'}</span>
                 <h2>{lang === 'el' ? 'Ελέγξτε το email σας' : 'Check your email'}</h2>
-                <p>{lang === 'el' ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό. Ο σύνδεσμος είναι προσωπικός και περιορισμένης διάρκειας.' : 'We sent a secure link to set a new password. The link is personal and time-limited.'}</p>
-                <button className="auth-primary" type="button" onClick={() => setView('login')}>{lang === 'el' ? 'Επιστροφή στη σύνδεση' : 'Back to sign in'}</button>
+                <p>
+                  {lang === 'el'
+                    ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό. Ο σύνδεσμος είναι προσωπικός και περιορισμένης διάρκειας.'
+                    : 'We sent a secure link to set a new password. The link is personal and time-limited.'}
+                </p>
+                <button className="auth-primary" type="button" onClick={() => setView('login')}>
+                  {lang === 'el' ? 'Επιστροφή στη σύνδεση' : 'Back to sign in'}
+                </button>
               </div>
             )}
           </div>
