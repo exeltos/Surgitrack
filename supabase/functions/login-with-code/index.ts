@@ -41,22 +41,34 @@ Deno.serve(async req => {
       return json({error: "invalid_credentials"}, 401);
     }
 
-    const since = new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString();
-    const [{count: codeFails}, {count: ipFails}] = await Promise.all([
-      admin.from("login_attempts").select("id", {count: "exact", head: true}).eq("user_code", code).eq("succeeded", false).gte("attempted_at", since),
-      admin.from("login_attempts").select("id", {count: "exact", head: true}).eq("ip", ip).eq("succeeded", false).gte("attempted_at", since),
-    ]);
-    if ((codeFails ?? 0) >= MAX_FAILS_PER_CODE || (ipFails ?? 0) >= MAX_FAILS_PER_IP) {
+    // Check the limits and record this attempt as failed in one atomic step, so parallel
+    // guesses cannot slip past the limit. Fail closed if the limiter is unavailable.
+    const {data: attemptId, error: reserveError} = await admin.rpc("reserve_login_attempt", {
+      p_user_code: code,
+      p_ip: ip,
+      p_window_minutes: WINDOW_MINUTES,
+      p_max_code_fails: MAX_FAILS_PER_CODE,
+      p_max_ip_fails: MAX_FAILS_PER_IP,
+    });
+    if (reserveError) {
+      await settle();
+      return json({error: "login_unavailable"}, 503);
+    }
+    if (attemptId === null) {
       await settle();
       return json({error: "too_many_attempts", retry_after_minutes: WINDOW_MINUTES}, 429);
     }
 
-    const {data: profile} = await admin
+    const {data: profile, error: profileError} = await admin
       .from("profiles")
       .select("email")
       .eq("user_code", code)
       .eq("active", true)
       .maybeSingle();
+    if (profileError) {
+      await settle();
+      return json({error: "login_unavailable"}, 503);
+    }
 
     let session = null;
     if (profile?.email) {
@@ -65,7 +77,8 @@ Deno.serve(async req => {
       if (!error && data.session) session = data.session;
     }
 
-    await admin.from("login_attempts").insert({user_code: code, ip, succeeded: !!session});
+    // The reserved attempt counts as a failure unless the password was correct.
+    if (session) await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
     await settle();
     if (!session) return json({error: "invalid_credentials"}, 401);
     return json({access_token: session.access_token, refresh_token: session.refresh_token});
