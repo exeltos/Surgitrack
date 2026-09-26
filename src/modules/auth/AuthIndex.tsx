@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, LogIn} from 'lucide-react';
 import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION} from '../../config/appMeta';
+import {FunctionsHttpError, type User} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 
 type Lang = 'el' | 'en';
@@ -57,6 +58,7 @@ const copy = {
     required: 'Συμπληρώστε τα υποχρεωτικά πεδία.',
     mismatch: 'Οι κωδικοί δεν είναι ίδιοι.',
     invalidCredentials: 'Το email ή ο κωδικός πρόσβασης δεν είναι σωστά.',
+    tooManyAttempts: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.',
     accessDisabled: 'Η πρόσβαση αυτού του λογαριασμού δεν είναι ενεργή.',
     demoDisabled: 'Η δοκιμαστική πρόσβαση δεν είναι ενεργή για αυτόν τον χρήστη ή οργανισμό.',
     productionAuthUnavailable:
@@ -104,6 +106,7 @@ const copy = {
     required: 'Please complete the required fields.',
     mismatch: 'Passwords do not match.',
     invalidCredentials: 'The email or password is incorrect.',
+    tooManyAttempts: 'Too many failed attempts. Try again in 15 minutes.',
     accessDisabled: 'Access for this account is not active.',
     demoDisabled: 'Demo access is not enabled for this user or organization.',
     productionAuthUnavailable:
@@ -152,22 +155,34 @@ export default function AuthIndex({
     const data = new FormData(e.currentTarget);
     const loginId = String(data.get('loginId') || '').trim();
     const password = String(data.get('password') || '');
-    let email = loginId.toLowerCase();
-    if (!loginId.includes('@')) {
-      const {data: resolvedEmail, error: resolveError} = await supabase.rpc('resolve_login_email', {
-        p_user_code: loginId,
-      });
-      if (resolveError || !resolvedEmail) {
+    let authData: {user: User | null};
+    if (loginId.includes('@')) {
+      const {data: signIn, error} = await supabase.auth.signInWithPassword({email: loginId.toLowerCase(), password});
+      if (error || !signIn.user) {
         setMessage(t.invalidCredentials);
         return;
       }
-      email = String(resolvedEmail).toLowerCase();
+      authData = signIn;
+    } else {
+      // User-code sign-in runs server-side so the email behind a code is never exposed.
+      const {data: tokens, error} = await supabase.functions.invoke<{access_token: string; refresh_token: string}>(
+        'login-with-code',
+        {body: {user_code: loginId, password}},
+      );
+      if (error || !tokens?.access_token) {
+        const status = error instanceof FunctionsHttpError ? (error.context as Response).status : 0;
+        setMessage(status === 429 ? t.tooManyAttempts : t.invalidCredentials);
+        return;
+      }
+      const {data: restored, error: sessionError} = await supabase.auth.setSession(tokens);
+      if (sessionError || !restored.user) {
+        setMessage(t.invalidCredentials);
+        return;
+      }
+      authData = restored;
     }
-    const {data: authData, error} = await supabase.auth.signInWithPassword({email, password});
-    if (error || !authData.user) {
-      setMessage(t.invalidCredentials);
-      return;
-    }
+    if (!authData.user) return;
+    const email = authData.user.email?.toLowerCase() || '';
     if (email === 'info@exeltos.com') {
       const {error: claimError} = await supabase.rpc('claim_platform_admin');
       if (claimError) {
