@@ -1,23 +1,8 @@
-import {useEffect, useRef, useState, type ReactNode} from 'react';
+import {lazy, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
 import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import AuthIndex from '../modules/auth/AuthIndex';
-import SetsPage from '../modules/sets/SetsPage';
-import SetDetailPage from '../modules/sets/SetDetailPage';
-import ToolsPage from '../modules/tools/ToolsPage';
-import ToolDetailPage from '../modules/tools/ToolDetailPage';
-import AssetCreatePage from '../components/assets/AssetCreatePage';
-import StandaloneToolsPage from '../modules/tools/StandaloneToolsPage';
-import StockPage from '../modules/stock/StockPage';
-import SterilizationPage from '../modules/sterilization/SterilizationPage';
-import DepartmentPage from '../modules/department/DepartmentPage';
-import CountPage from '../modules/counts/CountPage';
-import IssuesPage from '../modules/issues/IssuesPage';
-import MovementsPage from '../modules/movements/MovementsPage';
-import TraceabilityPage from '../modules/traceability/TraceabilityPage';
-import ReportsPage from '../modules/reports/ReportsPage';
-import StudioPage from '../modules/studio/StudioPage';
 import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
@@ -25,12 +10,31 @@ import type {SessionUser, UserRole} from '../store/types';
 import {setRuntimeDataMode} from '../config/dataMode';
 import {supabase} from '../lib/supabase';
 
+// Route pages are code-split so the sign-in screen and each workspace load only what they need.
+const SetsPage = lazy(() => import('../modules/sets/SetsPage'));
+const SetDetailPage = lazy(() => import('../modules/sets/SetDetailPage'));
+const ToolsPage = lazy(() => import('../modules/tools/ToolsPage'));
+const ToolDetailPage = lazy(() => import('../modules/tools/ToolDetailPage'));
+const AssetCreatePage = lazy(() => import('../components/assets/AssetCreatePage'));
+const StandaloneToolsPage = lazy(() => import('../modules/tools/StandaloneToolsPage'));
+const StockPage = lazy(() => import('../modules/stock/StockPage'));
+const SterilizationPage = lazy(() => import('../modules/sterilization/SterilizationPage'));
+const DepartmentPage = lazy(() => import('../modules/department/DepartmentPage'));
+const CountPage = lazy(() => import('../modules/counts/CountPage'));
+const IssuesPage = lazy(() => import('../modules/issues/IssuesPage'));
+const MovementsPage = lazy(() => import('../modules/movements/MovementsPage'));
+const TraceabilityPage = lazy(() => import('../modules/traceability/TraceabilityPage'));
+const ReportsPage = lazy(() => import('../modules/reports/ReportsPage'));
+const StudioPage = lazy(() => import('../modules/studio/StudioPage'));
+
 function RoleHome() {
   const {role} = useSurgi();
   return <Navigate to={roleHomePath(role)} replace />;
 }
 const Guard = ({permission, children}: {permission: Permission; children: ReactNode}) => (
-  <ProtectedRoute permission={permission}>{children}</ProtectedRoute>
+  <ProtectedRoute permission={permission}>
+    <Suspense fallback={null}>{children}</Suspense>
+  </ProtectedRoute>
 );
 
 export default function App() {

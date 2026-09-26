@@ -144,8 +144,20 @@ export default function StudioPage() {
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
   const [cloudUsers, setCloudUsers] = useState<AdminUser[]>([]);
-  const [cloudDepartments, setCloudDepartments] = useState<Array<{id:string;organizationId:string;name:string;code:string;active:boolean}>>([]);
-  const [bulkRows, setBulkRows] = useState<Array<{name:string;email:string;organizationId:string;departmentId:string;departmentName:string;role:UserRole;error?:string}>>([]);
+  const [cloudDepartments, setCloudDepartments] = useState<
+    Array<{id: string; organizationId: string; name: string; code: string; active: boolean}>
+  >([]);
+  const [bulkRows, setBulkRows] = useState<
+    Array<{
+      name: string;
+      email: string;
+      organizationId: string;
+      departmentId: string;
+      departmentName: string;
+      role: UserRole;
+      error?: string;
+    }>
+  >([]);
   const [bulkSending, setBulkSending] = useState(false);
   const [confirm, setConfirm] = useState<{title: string; message: string; action: () => void} | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('STERILIZATION');
@@ -161,13 +173,15 @@ export default function StudioPage() {
     if (error) setCloudError(error.message);
     else {
       setCloudError('');
-      setCloudOrganizations((data || []).map(row => ({
-        id: row.id,
-        name: row.name,
-        code: row.code,
-        active: row.active,
-        demoEnabled: row.demo_enabled,
-      })));
+      setCloudOrganizations(
+        (data || []).map(row => ({
+          id: row.id,
+          name: row.name,
+          code: row.code,
+          active: row.active,
+          demoEnabled: row.demo_enabled,
+        })),
+      );
     }
     setCloudLoading(false);
   };
@@ -177,70 +191,191 @@ export default function StudioPage() {
   const displayedOrganizations = libs.dataMode === 'PRODUCTION' ? cloudOrganizations : libs.organizations;
   const loadCloudUsers = async () => {
     if (libs.dataMode !== 'PRODUCTION') return;
-    const {data, error} = await supabase.from('profiles').select('id,name,email,role,active,demo_enabled,organization_id,department_id').not('organization_id','is',null).order('name');
-    if (error) { setCloudError(error.message); return; }
-    setCloudUsers((data || []).map(row => ({
-      id: row.id, name: row.name, email: row.email, role: row.role as UserRole,
-      active: row.active, demoEnabled: row.demo_enabled, organizationId: row.organization_id || '',
-      department: row.department_id || '',
-    })));
+    const {data, error} = await supabase
+      .from('profiles')
+      .select('id,name,email,role,active,demo_enabled,organization_id,department_id')
+      .not('organization_id', 'is', null)
+      .order('name');
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
+    setCloudUsers(
+      (data || []).map(row => ({
+        id: row.id,
+        name: row.name,
+        email: row.email,
+        role: row.role as UserRole,
+        active: row.active,
+        demoEnabled: row.demo_enabled,
+        organizationId: row.organization_id || '',
+        department: row.department_id || '',
+      })),
+    );
   };
-  useEffect(() => { void loadCloudUsers(); }, [libs.dataMode]);
+  useEffect(() => {
+    void loadCloudUsers();
+  }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
-  const selectedOrganization = displayedOrganizations.find(o=>o.id===selectedOrganizationId);
-  const selectedOrgDepartments = cloudDepartments.filter(d=>d.organizationId===selectedOrganizationId);
-  const selectedOrgUsers = displayedUsers.filter(u=>u.organizationId===selectedOrganizationId);
+  const selectedOrganization = displayedOrganizations.find(o => o.id === selectedOrganizationId);
+  const selectedOrgDepartments = cloudDepartments.filter(d => d.organizationId === selectedOrganizationId);
+  const selectedOrgUsers = displayedUsers.filter(u => u.organizationId === selectedOrganizationId);
   const loadCloudDepartments = async () => {
     if (libs.dataMode !== 'PRODUCTION') return;
-    const {data,error}=await supabase.rpc('platform_list_departments');
-    if(error){setCloudError(error.message);return;}
-    setCloudDepartments((data||[]).map((d:{id:string;organization_id:string;name:string;code:string|null;active:boolean})=>({
-      id:d.id,organizationId:d.organization_id,name:d.name,code:d.code||'',active:d.active
-    })));
+    const {data, error} = await supabase.rpc('platform_list_departments');
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
+    setCloudDepartments(
+      (data || []).map(
+        (d: {id: string; organization_id: string; name: string; code: string | null; active: boolean}) => ({
+          id: d.id,
+          organizationId: d.organization_id,
+          name: d.name,
+          code: d.code || '',
+          active: d.active,
+        }),
+      ),
+    );
   };
-  useEffect(()=>{void loadCloudDepartments();},[libs.dataMode]);
+  useEffect(() => {
+    void loadCloudDepartments();
+  }, [libs.dataMode]);
   const saveCloudDepartment = async (item: Omit<LibraryItem, 'id'>) => {
-    const org=selectedOrganization || displayedOrganizations[0];
-    if(!org){setCloudError(L('Δημιουργήστε πρώτα νοσοκομείο.','Create a hospital first.'));return;}
-    const {error}=await supabase.rpc('platform_create_department',{p_organization_id:org.id,p_name:item.el,p_code:item.code||item.el.slice(0,8)});
-    if(error){setCloudError(error.message);return;}
-    setNewItem(false); await loadCloudDepartments();
+    const org = selectedOrganization || displayedOrganizations[0];
+    if (!org) {
+      setCloudError(L('Δημιουργήστε πρώτα νοσοκομείο.', 'Create a hospital first.'));
+      return;
+    }
+    const {error} = await supabase.rpc('platform_create_department', {
+      p_organization_id: org.id,
+      p_name: item.el,
+      p_code: item.code || item.el.slice(0, 8),
+    });
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
+    setNewItem(false);
+    await loadCloudDepartments();
   };
-  const inviteUser = async (data: Omit<AdminUser,'id'>) => {
-    if (libs.dataMode === 'DEMO') { libs.addUser(data); setUserEditor(undefined); return; }
-    const {data: result, error} = await supabase.functions.invoke('invite-staff', {body: {users:[{
-      full_name:data.name,email:data.email,organization_id:data.organizationId,department_id:data.department || null,role:data.role
-    }],redirect_to:window.location.origin}});
-    if (error || !result?.results?.[0]?.ok) { setCloudError(result?.results?.[0]?.error || error?.message || 'Invite failed'); return; }
-    setUserEditor(undefined); await loadCloudUsers();
+  const inviteUser = async (data: Omit<AdminUser, 'id'>) => {
+    if (libs.dataMode === 'DEMO') {
+      libs.addUser(data);
+      setUserEditor(undefined);
+      return;
+    }
+    const {data: result, error} = await supabase.functions.invoke('invite-staff', {
+      body: {
+        users: [
+          {
+            full_name: data.name,
+            email: data.email,
+            organization_id: data.organizationId,
+            department_id: data.department || null,
+            role: data.role,
+          },
+        ],
+        redirect_to: window.location.origin,
+      },
+    });
+    if (error || !result?.results?.[0]?.ok) {
+      setCloudError(result?.results?.[0]?.error || error?.message || 'Invite failed');
+      return;
+    }
+    setUserEditor(undefined);
+    await loadCloudUsers();
   };
   const importCsv = async (file: File) => {
     const text = await file.text();
-    const lines = text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const lines = text
+      .split(/\r?\n/)
+      .map(x => x.trim())
+      .filter(Boolean);
     const rows = lines.slice(1).map(line => {
-      const parts=line.split(/[;,]/).map(x=>x.trim().replace(/^"|"$/g,''));
-      const [name,email,hospital,department,roleRaw]=parts;
-      const org=displayedOrganizations.find(o=>o.code.toLowerCase()===String(hospital||'').toLowerCase()||o.name.toLowerCase()===String(hospital||'').toLowerCase());
-      const dep=org?cloudDepartments.find(d=>d.organizationId===org.id&&(d.code.toLowerCase()===String(department||'').toLowerCase()||d.name.toLowerCase()===String(department||'').toLowerCase())):undefined;
-      const role=(['ADMIN','STERILIZATION','DEPARTMENT'].includes(String(roleRaw||'').toUpperCase())?String(roleRaw).toUpperCase():'DEPARTMENT') as UserRole;
-      const error=!name||!email.includes('@')?L('Μη έγκυρο όνομα/email','Invalid name/email'):!org?L('Άγνωστο νοσοκομείο','Unknown hospital'):(role==='DEPARTMENT'&&!dep)?L('Άγνωστο τμήμα','Unknown department'):undefined;
-      return {name,email,organizationId:org?.id||'',departmentId:dep?.id||'',departmentName:dep?.name||department||'',role,error};
+      const parts = line.split(/[;,]/).map(x => x.trim().replace(/^"|"$/g, ''));
+      const [name, email, hospital, department, roleRaw] = parts;
+      const org = displayedOrganizations.find(
+        o =>
+          o.code.toLowerCase() === String(hospital || '').toLowerCase() ||
+          o.name.toLowerCase() === String(hospital || '').toLowerCase(),
+      );
+      const dep = org
+        ? cloudDepartments.find(
+            d =>
+              d.organizationId === org.id &&
+              (d.code.toLowerCase() === String(department || '').toLowerCase() ||
+                d.name.toLowerCase() === String(department || '').toLowerCase()),
+          )
+        : undefined;
+      const role = (
+        ['ADMIN', 'STERILIZATION', 'DEPARTMENT'].includes(String(roleRaw || '').toUpperCase())
+          ? String(roleRaw).toUpperCase()
+          : 'DEPARTMENT'
+      ) as UserRole;
+      const error =
+        !name || !email.includes('@')
+          ? L('Μη έγκυρο όνομα/email', 'Invalid name/email')
+          : !org
+            ? L('Άγνωστο νοσοκομείο', 'Unknown hospital')
+            : role === 'DEPARTMENT' && !dep
+              ? L('Άγνωστο τμήμα', 'Unknown department')
+              : undefined;
+      return {
+        name,
+        email,
+        organizationId: org?.id || '',
+        departmentId: dep?.id || '',
+        departmentName: dep?.name || department || '',
+        role,
+        error,
+      };
     });
     setBulkRows(rows);
   };
   const sendBulkInvites = async () => {
-    if (!bulkRows.length || bulkRows.some(r=>r.error)) return; setBulkSending(true); setCloudError('');
-    const {data: result,error}=await supabase.functions.invoke('invite-staff',{body:{users:bulkRows.map(r=>({full_name:r.name,email:r.email,organization_id:r.organizationId,department_id:r.departmentId||null,role:r.role})),redirect_to:window.location.origin}});
+    if (!bulkRows.length || bulkRows.some(r => r.error)) return;
+    setBulkSending(true);
+    setCloudError('');
+    const {data: result, error} = await supabase.functions.invoke('invite-staff', {
+      body: {
+        users: bulkRows.map(r => ({
+          full_name: r.name,
+          email: r.email,
+          organization_id: r.organizationId,
+          department_id: r.departmentId || null,
+          role: r.role,
+        })),
+        redirect_to: window.location.origin,
+      },
+    });
     setBulkSending(false);
-    if(error){setCloudError(error.message);return;}
-    const failed=(result?.results||[]).filter((x:{ok:boolean})=>!x.ok);
-    if(failed.length){setCloudError(`${failed.length} προσκλήσεις απέτυχαν.`);} else setBulkRows([]);
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
+    const failed = (result?.results || []).filter((x: {ok: boolean}) => !x.ok);
+    if (failed.length) {
+      setCloudError(`${failed.length} προσκλήσεις απέτυχαν.`);
+    } else setBulkRows([]);
     await loadCloudUsers();
   };
-  const setCloudUserAccess = async (u: AdminUser, patch: {active?:boolean;demoEnabled?:boolean}) => {
-    if(libs.dataMode==='DEMO'){libs.updateUser(u.id,patch);return;}
-    const {error}=await supabase.rpc('platform_set_profile_access',{p_id:u.id,p_active:patch.active ?? u.active,p_demo_enabled:patch.demoEnabled ?? u.demoEnabled});
-    if(error){setCloudError(error.message);return;} await loadCloudUsers();
+  const setCloudUserAccess = async (u: AdminUser, patch: {active?: boolean; demoEnabled?: boolean}) => {
+    if (libs.dataMode === 'DEMO') {
+      libs.updateUser(u.id, patch);
+      return;
+    }
+    const {error} = await supabase.rpc('platform_set_profile_access', {
+      p_id: u.id,
+      p_active: patch.active ?? u.active,
+      p_demo_enabled: patch.demoEnabled ?? u.demoEnabled,
+    });
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
+    await loadCloudUsers();
   };
   const saveOrganization = async (data: Omit<Organization, 'id'>) => {
     if (libs.dataMode === 'DEMO') {
@@ -251,24 +386,50 @@ export default function StudioPage() {
     }
     const {error} = organizationEditor
       ? await supabase.rpc('platform_update_organization', {
-          p_id: organizationEditor.id, p_name: data.name, p_code: data.code,
-          p_active: data.active, p_demo_enabled: data.demoEnabled,
+          p_id: organizationEditor.id,
+          p_name: data.name,
+          p_code: data.code,
+          p_active: data.active,
+          p_demo_enabled: data.demoEnabled,
         })
       : await supabase.rpc('platform_create_organization', {p_name: data.name, p_code: data.code});
-    if (error) { setCloudError(error.message); return; }
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
     if (!organizationEditor && data.demoEnabled) {
       await loadCloudOrganizations();
     }
     setOrganizationEditor(undefined);
     await loadCloudOrganizations();
   };
-  const updateOrganizationFlags = async (org: Organization, patch: Partial<Pick<Organization,'active'|'demoEnabled'>>) => {
-    if (libs.dataMode === 'DEMO') { libs.updateOrganization(org.id,patch); return; }
-    const next={...org,...patch};
-    const {error}=await supabase.rpc('platform_update_organization',{p_id:org.id,p_name:org.name,p_code:org.code,p_active:next.active,p_demo_enabled:next.demoEnabled});
-    if(error){setCloudError(error.message);return;} await loadCloudOrganizations();
+  const updateOrganizationFlags = async (
+    org: Organization,
+    patch: Partial<Pick<Organization, 'active' | 'demoEnabled'>>,
+  ) => {
+    if (libs.dataMode === 'DEMO') {
+      libs.updateOrganization(org.id, patch);
+      return;
+    }
+    const next = {...org, ...patch};
+    const {error} = await supabase.rpc('platform_update_organization', {
+      p_id: org.id,
+      p_name: org.name,
+      p_code: org.code,
+      p_active: next.active,
+      p_demo_enabled: next.demoEnabled,
+    });
+    if (error) {
+      setCloudError(error.message);
+      return;
+    }
+    await loadCloudOrganizations();
   };
-  const openOrganization = (org: Organization) => { setSelectedOrganizationId(org.id); setTab('USERS'); setQuery(''); };
+  const openOrganization = (org: Organization) => {
+    setSelectedOrganizationId(org.id);
+    setTab('USERS');
+    setQuery('');
+  };
   const handleResetSterilizationWorkflow = () => {
     libs.resetSterilizationWorkflow(currentUser.name);
   };
@@ -319,9 +480,10 @@ export default function StudioPage() {
     window.location.reload();
   };
   const currentMeta = libraryMeta.find(x => x.key === libraryKey)!;
-  const currentItems = libs.dataMode === 'PRODUCTION' && libraryKey === 'departments'
-    ? cloudDepartments.map(d=>({id:d.id,el:d.name,en:d.name,code:d.code}))
-    : libs[libraryKey];
+  const currentItems =
+    libs.dataMode === 'PRODUCTION' && libraryKey === 'departments'
+      ? cloudDepartments.map(d => ({id: d.id, el: d.name, en: d.name, code: d.code}))
+      : libs[libraryKey];
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
@@ -537,8 +699,20 @@ export default function StudioPage() {
         {tab === 'PLATFORM' && (
           <section className="studio-manager-panel studio-platform-panel">
             <header className="studio-panel-head">
-              <div><span className="eyebrow">PLATFORM ADMIN</span><h2>{L('Νοσοκομεία & πρόσβαση Demo','Hospitals & Demo access')}</h2><p>{L('Διαχείριση πραγματικών οργανισμών και απομονωμένης πρόσβασης Demo.','Manage real organizations and isolated Demo access.')}</p></div>
-              <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}><Plus size={16}/>{L('Νέο νοσοκομείο','New hospital')}</AppButton>
+              <div>
+                <span className="eyebrow">PLATFORM ADMIN</span>
+                <h2>{L('Νοσοκομεία & πρόσβαση Demo', 'Hospitals & Demo access')}</h2>
+                <p>
+                  {L(
+                    'Διαχείριση πραγματικών οργανισμών και απομονωμένης πρόσβασης Demo.',
+                    'Manage real organizations and isolated Demo access.',
+                  )}
+                </p>
+              </div>
+              <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}>
+                <Plus size={16} />
+                {L('Νέο νοσοκομείο', 'New hospital')}
+              </AppButton>
             </header>
             <div className="platform-kpis">
               <div>
@@ -634,9 +808,14 @@ export default function StudioPage() {
                       </button>
                     </div>
                     <div className="platform-org-meta">
-                      <span>{L('Τμήματα','Departments')}: <b>{cloudDepartments.filter(d=>d.organizationId===org.id).length}</b> · {L('Demo χρήστες','Demo users')}: <b>{demoUsers}</b></span>
+                      <span>
+                        {L('Τμήματα', 'Departments')}:{' '}
+                        <b>{cloudDepartments.filter(d => d.organizationId === org.id).length}</b> ·{' '}
+                        {L('Demo χρήστες', 'Demo users')}: <b>{demoUsers}</b>
+                      </span>
                       <button className="platform-manage-btn" onClick={() => openOrganization(org)}>
-                        <Users size={15}/><span>{L('Διαχείριση','Manage')}</span>
+                        <Users size={15} />
+                        <span>{L('Διαχείριση', 'Manage')}</span>
                       </button>
                     </div>
                   </article>
@@ -688,11 +867,25 @@ export default function StudioPage() {
                 </AppButton>
               </header>
               {cloudError && <div className="auth-message">{cloudError}</div>}
-            {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && <div className="studio-mini-note">
-              <Upload size={17}/><span><b>{bulkRows.length}</b> {L('εγγραφές · ','rows · ')}<b>{bulkRows.filter(r=>!r.error).length}</b> {L('έγκυρες','valid')} · <b>{bulkRows.filter(r=>r.error).length}</b> {L('με σφάλμα','with errors')}</span>
-              <AppButton variant="primary" disabled={bulkSending || bulkRows.some(r=>r.error)} onClick={()=>void sendBulkInvites()}><Send size={15}/>{bulkSending?L('Αποστολή...','Sending...'):L('Αποστολή προσκλήσεων','Send invitations')}</AppButton>
-            </div>}
-            <div className="studio-search">
+              {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && (
+                <div className="studio-mini-note">
+                  <Upload size={17} />
+                  <span>
+                    <b>{bulkRows.length}</b> {L('εγγραφές · ', 'rows · ')}
+                    <b>{bulkRows.filter(r => !r.error).length}</b> {L('έγκυρες', 'valid')} ·{' '}
+                    <b>{bulkRows.filter(r => r.error).length}</b> {L('με σφάλμα', 'with errors')}
+                  </span>
+                  <AppButton
+                    variant="primary"
+                    disabled={bulkSending || bulkRows.some(r => r.error)}
+                    onClick={() => void sendBulkInvites()}
+                  >
+                    <Send size={15} />
+                    {bulkSending ? L('Αποστολή...', 'Sending...') : L('Αποστολή προσκλήσεων', 'Send invitations')}
+                  </AppButton>
+                </div>
+              )}
+              <div className="studio-search">
                 <Search size={17} />
                 <input
                   value={query}
@@ -1032,23 +1225,112 @@ export default function StudioPage() {
         {tab === 'USERS' && (
           <section className="studio-manager-panel studio-users-panel">
             <header className="studio-panel-head">
-              <div><span className="eyebrow">HOSPITAL ACCESS</span><h2>{selectedOrganization ? selectedOrganization.name : L('Χρήστες & Τμήματα','Users & Departments')}</h2><p>{selectedOrganization ? L('Κεντρική διαχείριση τμημάτων, χρηστών και προσκλήσεων.','Central management of departments, users and invitations.') : L('Επιλέξτε νοσοκομείο.','Select a hospital.')}</p></div>
-              <select value={selectedOrganizationId} onChange={e=>setSelectedOrganizationId(e.target.value)}><option value="">{L('Επιλογή νοσοκομείου','Select hospital')}</option>{displayedOrganizations.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select>
+              <div>
+                <span className="eyebrow">HOSPITAL ACCESS</span>
+                <h2>
+                  {selectedOrganization ? selectedOrganization.name : L('Χρήστες & Τμήματα', 'Users & Departments')}
+                </h2>
+                <p>
+                  {selectedOrganization
+                    ? L(
+                        'Κεντρική διαχείριση τμημάτων, χρηστών και προσκλήσεων.',
+                        'Central management of departments, users and invitations.',
+                      )
+                    : L('Επιλέξτε νοσοκομείο.', 'Select a hospital.')}
+                </p>
+              </div>
+              <select value={selectedOrganizationId} onChange={e => setSelectedOrganizationId(e.target.value)}>
+                <option value="">{L('Επιλογή νοσοκομείου', 'Select hospital')}</option>
+                {displayedOrganizations.map(o => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
             </header>
-            {selectedOrganization && <div className="hospital-admin-summary">
-              <div><Building2 size={18}/><span>{L('Τμήματα','Departments')}</span><strong>{selectedOrgDepartments.length}</strong></div>
-              <div><Users size={18}/><span>{L('Χρήστες','Users')}</span><strong>{selectedOrgUsers.length}</strong></div>
-              <div><ShieldCheck size={18}/><span>{L('Ενεργοί','Active')}</span><strong>{selectedOrgUsers.filter(u=>u.active).length}</strong></div>
-            </div>}
-            {selectedOrganization && <section className="hospital-departments">
-              <header><div><b>{L('Τμήματα νοσοκομείου','Hospital departments')}</b><small>{L('Τα τμήματα χρησιμοποιούνται σε χρήστες, Σετ και ιχνηλασιμότητα.','Departments are used by users, sets and traceability.')}</small></div>
-              <AppButton onClick={()=>{setLibraryKey('departments');setEditItem(null);setNewItem(true);}}><Plus size={15}/>{L('Νέο τμήμα','New department')}</AppButton></header>
-              <div className="hospital-department-list">{selectedOrgDepartments.map(d=><div key={d.id}><span><b>{d.name}</b><small>{d.code||'—'}</small></span><button onClick={()=>{setLibraryKey('departments');setEditItem({id:d.id,el:d.name,en:d.name,code:d.code});setNewItem(false);}}><Pencil size={14}/></button></div>)}</div>
-            </section>}
-            {selectedOrganization && <div className="hospital-user-actions">
-              <AppButton variant="primary" onClick={()=>setUserEditor(null)}><Plus size={16}/>{L('Πρόσκληση χρήστη','Invite user')}</AppButton>
-              {libs.dataMode==='PRODUCTION' && <label className="app-button"><Upload size={16}/>{L('Μαζική εισαγωγή CSV','Bulk CSV import')}<input type="file" accept=".csv,text/csv" hidden onChange={e=>e.target.files?.[0]&&void importCsv(e.target.files[0])}/></label>}
-            </div>}
+            {selectedOrganization && (
+              <div className="hospital-admin-summary">
+                <div>
+                  <Building2 size={18} />
+                  <span>{L('Τμήματα', 'Departments')}</span>
+                  <strong>{selectedOrgDepartments.length}</strong>
+                </div>
+                <div>
+                  <Users size={18} />
+                  <span>{L('Χρήστες', 'Users')}</span>
+                  <strong>{selectedOrgUsers.length}</strong>
+                </div>
+                <div>
+                  <ShieldCheck size={18} />
+                  <span>{L('Ενεργοί', 'Active')}</span>
+                  <strong>{selectedOrgUsers.filter(u => u.active).length}</strong>
+                </div>
+              </div>
+            )}
+            {selectedOrganization && (
+              <section className="hospital-departments">
+                <header>
+                  <div>
+                    <b>{L('Τμήματα νοσοκομείου', 'Hospital departments')}</b>
+                    <small>
+                      {L(
+                        'Τα τμήματα χρησιμοποιούνται σε χρήστες, Σετ και ιχνηλασιμότητα.',
+                        'Departments are used by users, sets and traceability.',
+                      )}
+                    </small>
+                  </div>
+                  <AppButton
+                    onClick={() => {
+                      setLibraryKey('departments');
+                      setEditItem(null);
+                      setNewItem(true);
+                    }}
+                  >
+                    <Plus size={15} />
+                    {L('Νέο τμήμα', 'New department')}
+                  </AppButton>
+                </header>
+                <div className="hospital-department-list">
+                  {selectedOrgDepartments.map(d => (
+                    <div key={d.id}>
+                      <span>
+                        <b>{d.name}</b>
+                        <small>{d.code || '—'}</small>
+                      </span>
+                      <button
+                        onClick={() => {
+                          setLibraryKey('departments');
+                          setEditItem({id: d.id, el: d.name, en: d.name, code: d.code});
+                          setNewItem(false);
+                        }}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+            {selectedOrganization && (
+              <div className="hospital-user-actions">
+                <AppButton variant="primary" onClick={() => setUserEditor(null)}>
+                  <Plus size={16} />
+                  {L('Πρόσκληση χρήστη', 'Invite user')}
+                </AppButton>
+                {libs.dataMode === 'PRODUCTION' && (
+                  <label className="app-button">
+                    <Upload size={16} />
+                    {L('Μαζική εισαγωγή CSV', 'Bulk CSV import')}
+                    <input
+                      type="file"
+                      accept=".csv,text/csv"
+                      hidden
+                      onChange={e => e.target.files?.[0] && void importCsv(e.target.files[0])}
+                    />
+                  </label>
+                )}
+              </div>
+            )}
             <div className="studio-search">
               <Search size={17} />
               <input
@@ -1077,7 +1359,11 @@ export default function StudioPage() {
                     <small>{u.email}</small>
                   </div>
                   <span>{displayedOrganizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
-                  <span>{libs.dataMode==='PRODUCTION' ? (cloudDepartments.find(d=>d.id===u.department)?.name || '—') : u.department}</span>
+                  <span>
+                    {libs.dataMode === 'PRODUCTION'
+                      ? cloudDepartments.find(d => d.id === u.department)?.name || '—'
+                      : u.department}
+                  </span>
                   <span className="role-chip">
                     {L(roles.find(r => r.id === u.role)?.el || u.role, roles.find(r => r.id === u.role)?.en || u.role)}
                   </span>
@@ -1102,22 +1388,28 @@ export default function StudioPage() {
                     {u.role === 'ADMIN' ? L('Admin', 'Admin') : u.demoEnabled ? 'Demo ON' : 'Demo OFF'}
                   </button>
                   <div className="studio-row-actions">
-                    {libs.dataMode==='DEMO' && <button onClick={() => setUserEditor(u)}><Pencil size={16} /></button>}
-                    {libs.dataMode==='DEMO' && <button
-                      className="danger-icon"
-                      onClick={() =>
-                        setConfirm({
-                          title: L('Διαγραφή χρήστη;', 'Delete user?'),
-                          message: L(
-                            `Ο χρήστης ${u.name} θα αφαιρεθεί από το demo μητρώο χρηστών.`,
-                            `User ${u.name} will be removed from the demo user registry.`,
-                          ),
-                          action: () => libs.removeUser(u.id),
-                        })
-                      }
-                    >
-                      <Trash2 size={16} />
-                    </button>}
+                    {libs.dataMode === 'DEMO' && (
+                      <button onClick={() => setUserEditor(u)}>
+                        <Pencil size={16} />
+                      </button>
+                    )}
+                    {libs.dataMode === 'DEMO' && (
+                      <button
+                        className="danger-icon"
+                        onClick={() =>
+                          setConfirm({
+                            title: L('Διαγραφή χρήστη;', 'Delete user?'),
+                            message: L(
+                              `Ο χρήστης ${u.name} θα αφαιρεθεί από το demo μητρώο χρηστών.`,
+                              `User ${u.name} will be removed from the demo user registry.`,
+                            ),
+                            action: () => libs.removeUser(u.id),
+                          })
+                        }
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1458,12 +1750,25 @@ export default function StudioPage() {
           onSave={data => {
             if (libs.dataMode === 'PRODUCTION' && libraryKey === 'departments') {
               if (editItem) {
-                void supabase.rpc('platform_update_department',{p_id:editItem.id,p_name:data.el,p_code:data.code||'',p_active:true}).then(({error})=>{if(error)setCloudError(error.message);else void loadCloudDepartments();});
-                setEditItem(null); setNewItem(false);
+                void supabase
+                  .rpc('platform_update_department', {
+                    p_id: editItem.id,
+                    p_name: data.el,
+                    p_code: data.code || '',
+                    p_active: true,
+                  })
+                  .then(({error}) => {
+                    if (error) setCloudError(error.message);
+                    else void loadCloudDepartments();
+                  });
+                setEditItem(null);
+                setNewItem(false);
               } else void saveCloudDepartment(data);
             } else {
-              if (editItem) libs.updateItem(libraryKey, editItem.id, data); else libs.addItem(libraryKey, data);
-              setEditItem(null); setNewItem(false);
+              if (editItem) libs.updateItem(libraryKey, editItem.id, data);
+              else libs.addItem(libraryKey, data);
+              setEditItem(null);
+              setNewItem(false);
             }
           }}
         />
@@ -1471,18 +1776,27 @@ export default function StudioPage() {
       {userEditor !== undefined && (
         <UserEditor
           user={userEditor || undefined}
-          departments={libs.dataMode === 'PRODUCTION' ? cloudDepartments.map(d=>d.name) : libs.departments.map(d => d.el)}
+          departments={
+            libs.dataMode === 'PRODUCTION' ? cloudDepartments.map(d => d.name) : libs.departments.map(d => d.el)
+          }
           organizations={selectedOrganization ? [selectedOrganization] : displayedOrganizations}
           cloudDepartments={libs.dataMode === 'PRODUCTION' ? cloudDepartments : undefined}
           onClose={() => setUserEditor(undefined)}
-          onSave={data => { if (userEditor && libs.dataMode === 'DEMO') { libs.updateUser(userEditor.id,data); setUserEditor(undefined); } else void inviteUser(data); }}
+          onSave={data => {
+            if (userEditor && libs.dataMode === 'DEMO') {
+              libs.updateUser(userEditor.id, data);
+              setUserEditor(undefined);
+            } else void inviteUser(data);
+          }}
         />
       )}
       {organizationEditor !== undefined && (
         <OrganizationEditor
           organization={organizationEditor || undefined}
           onClose={() => setOrganizationEditor(undefined)}
-          onSave={data => { void saveOrganization(data); }}
+          onSave={data => {
+            void saveOrganization(data);
+          }}
         />
       )}
       {confirm && (
@@ -1629,14 +1943,19 @@ function UserEditor({
 }: {
   user?: AdminUser;
   departments: string[];
-  cloudDepartments?: Array<{id:string;organizationId:string;name:string}>;
+  cloudDepartments?: Array<{id: string; organizationId: string; name: string}>;
   organizations: Organization[];
   onClose: () => void;
   onSave: (data: Omit<AdminUser, 'id'>) => void;
 }) {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [department, setDepartment] = useState(user?.department || cloudDepartments.find(d=>d.organizationId===(user?.organizationId||organizations[0]?.id))?.id || departments[0] || '');
+  const [department, setDepartment] = useState(
+    user?.department ||
+      cloudDepartments.find(d => d.organizationId === (user?.organizationId || organizations[0]?.id))?.id ||
+      departments[0] ||
+      '',
+  );
   const [organizationId, setOrganizationId] = useState(user?.organizationId || organizations[0]?.id || '');
   const [role, setRole] = useState<UserRole>(user?.role || 'DEPARTMENT');
   const [active, setActive] = useState(user?.active ?? true);
@@ -1690,9 +2009,15 @@ function UserEditor({
           <label>
             Τμήμα
             <select value={department} onChange={e => setDepartment(e.target.value)}>
-              {cloudDepartments.length ? cloudDepartments.filter(d=>d.organizationId===organizationId).map(d => (
-                <option key={d.id} value={d.id}>{d.name}</option>
-              )) : departments.map(d => (<option key={d}>{d}</option>))}
+              {cloudDepartments.length
+                ? cloudDepartments
+                    .filter(d => d.organizationId === organizationId)
+                    .map(d => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))
+                : departments.map(d => <option key={d}>{d}</option>)}
             </select>
           </label>
           <label className="studio-switch-row">

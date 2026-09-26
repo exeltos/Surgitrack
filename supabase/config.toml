@@ -1,0 +1,6 @@
+project_id = "oklyqnoqzbhjudqbkulq"
+
+# Pre-authentication endpoint: callers have no session yet, so the gateway must not
+# require a user JWT. The function authenticates by checking the password itself.
+[functions.login-with-code]
+verify_jwt = false

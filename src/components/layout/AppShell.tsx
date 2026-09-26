@@ -151,7 +151,14 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           <X size={18} />
         </button>
       </div>
-      {isDemo && <div className="demo-exit-panel"><span>DEMO</span><button onClick={returnFromDemo}>{lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}</button></div>}
+      {isDemo && (
+        <div className="demo-exit-panel">
+          <span>DEMO</span>
+          <button onClick={returnFromDemo}>
+            {lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}
+          </button>
+        </div>
+      )}
       <div className="workspace-label">
         <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
         <strong>{roleLabel[role][lang]}</strong>
