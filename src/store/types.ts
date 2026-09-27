@@ -218,6 +218,8 @@ export type SurgiStoreValue = {
   permissions: readonly Permission[];
   can: (permission: Permission) => boolean;
   setRole: (role: UserRole) => void;
+  /** Demo only: work as another identity (role and department). */
+  switchIdentity: (user: SessionUser) => void;
   sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => void;
   receiveAtSterilization: (kind: AssetKind, id: string, payload: ReceivePayload) => ReceiptRecord | undefined;
   recordPreparation: (kind: AssetKind, id: string, payload: PreparationPayload) => PreparationRecord | undefined;

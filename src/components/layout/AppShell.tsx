@@ -17,10 +17,13 @@ import {
 import {navigationFor} from '../../config/navigation';
 import {useSurgi, type UserRole} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
-import {SURGITRACK_DATA_MODE, setRuntimeDataMode} from '../../config/dataMode';
+import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
+import {useLibraries} from '../../core/LibraryStore';
+import {currentDemoView, demoDepartments, demoSessionUser, type DemoView} from '../../config/demoRoles';
+import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
-  DEPARTMENT: {el: 'Τμήμα · Χειρουργείο', en: 'Department · Operating Theatre'},
+  DEPARTMENT: {el: 'Τμήμα', en: 'Department'},
   STERILIZATION: {el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},
   ADMIN: {el: 'Διαχειριστής', en: 'Administrator'},
 };
@@ -38,7 +41,9 @@ const navEN: Record<string, string> = {
   'Σετ & Εργαλεία': 'Sets & Instruments',
 };
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
-  const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, setRole, can} = useSurgi();
+  const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, switchIdentity, can} = useSurgi();
+  const {departments} = useLibraries();
+  const syncStatus = useSyncStatus();
   const {lang, setLang, fontScale, setFontScale, highContrast, setHighContrast, reducedMotion, setReducedMotion} =
     useAppPreferences();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -51,7 +56,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   >([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const isDemo = SURGITRACK_DATA_MODE === 'DEMO';
+  const isDemo = getRuntimeDataMode() === 'DEMO';
   const returnFromDemo = () => {
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
@@ -134,8 +139,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     }
     setScanMatches(matches);
   };
-  const changeRole = (next: UserRole) => {
-    setRole(next);
+  // Demo: work as Admin, Sterilization or a specific department and see that environment.
+  const changeDemoView = (view: DemoView) => {
+    switchIdentity(demoSessionUser(view, departments));
     navigate('/');
     setMobileOpen(false);
   };
@@ -153,7 +159,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       </div>
       {isDemo && (
         <div className="demo-exit-panel">
-          <span>DEMO</span>
+          <span>DEMO · {lang === 'el' ? 'ξεχωριστά δεδομένα' : 'separate data'}</span>
           <button onClick={returnFromDemo}>
             {lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}
           </button>
@@ -161,7 +167,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       )}
       <div className="workspace-label">
         <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
-        <strong>{roleLabel[role][lang]}</strong>
+        <strong>
+          {role === 'DEPARTMENT' ? `${roleLabel[role][lang]} · ${currentUser.department}` : roleLabel[role][lang]}
+        </strong>
       </div>
       <nav>
         {navigationFor(role, can).map(item => {
@@ -249,18 +257,36 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               </div>
             )}
           </div>
-          {SURGITRACK_DATA_MODE === 'DEMO' && (
+          {isDemo && (
             <div className="role-switch">
               <select
-                value={role}
-                onChange={e => changeRole(e.target.value as UserRole)}
-                title={lang === 'el' ? 'Εναλλαγή ρόλου μόνο για Demo' : 'Demo role switch'}
+                value={currentDemoView(role, currentUser, departments)}
+                onChange={e => changeDemoView(e.target.value as DemoView)}
+                title={lang === 'el' ? 'Προβολή ως ρόλος (μόνο Demo)' : 'View as role (Demo only)'}
+                aria-label={lang === 'el' ? 'Προβολή ως ρόλος' : 'View as role'}
               >
-                <option value="DEPARTMENT">{lang === 'el' ? 'Τμήμα' : 'Department'}</option>
-                <option value="STERILIZATION">{lang === 'el' ? 'Αποστείρωση' : 'Sterilization'}</option>
                 <option value="ADMIN">Admin</option>
+                <option value="STERILIZATION">{lang === 'el' ? 'Αποστείρωση' : 'Sterilization'}</option>
+                <optgroup label={lang === 'el' ? 'Τμήματα' : 'Departments'}>
+                  {demoDepartments(departments).map(d => (
+                    <option key={d.id} value={`DEPARTMENT:${d.id}`}>
+                      {lang === 'el' ? d.el : d.en}
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </div>
+          )}
+          {isDemo && syncStatus !== 'saved' && (
+            <span className={`sync-status ${syncStatus}`} role="status">
+              {syncStatus === 'saving'
+                ? lang === 'el'
+                  ? 'Αποθήκευση…'
+                  : 'Saving…'
+                : lang === 'el'
+                  ? 'Δεν αποθηκεύτηκε · νέα προσπάθεια'
+                  : 'Not saved · retrying'}
+            </span>
           )}
           <div className="top-actions">
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>

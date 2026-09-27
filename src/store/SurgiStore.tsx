@@ -24,8 +24,13 @@ import {
   getDemoSessionUser,
   getLifecycleAlerts,
   normalizeUsageLimit,
+  uniqueStamp,
 } from './helpers';
 import {hasPermission, permissionsForRole} from '../core/permissions';
+import type {SurgiInitialData} from '../data/repositories';
+import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
+import {useAppRecordSync} from '../data/cloud/useAppRecordSync';
+import {applyDemoSessionUser} from '../config/demoRoles';
 import type {
   CreateProcessLoadPayload,
   CreateSetPayload,
@@ -38,6 +43,7 @@ import type {
   SterilizationCompletionPayload,
   SterilizationReleasePayload,
   SurgicalCount,
+  SessionUser,
   SurgiStoreValue,
   Toast,
   ToolUpdatePatch,
@@ -65,19 +71,37 @@ export type {
 } from './types';
 
 const Ctx = createContext<SurgiStoreValue | null>(null);
-export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNode; dataMode?: SurgiDataMode}) {
+export function SurgiProvider({
+  children,
+  dataMode = 'DEMO',
+  cloud,
+}: {
+  children: ReactNode;
+  dataMode?: SurgiDataMode;
+  cloud?: CloudWorkspace | null;
+}) {
   const repository = useMemo(() => getSurgiRepository(dataMode), [dataMode]);
   const {sterilizationWorkflow, rolePermissions, systemSettings} = useLibraries();
   const enabledStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const nextStateAfter = (stageId: WorkflowStageId): AssetState =>
     nextStateAfterStage(sterilizationWorkflow.stages, stageId) as AssetState;
   const reprocessState = (): AssetState => reprocessStateForStages(sterilizationWorkflow.stages) as AssetState;
-  const initialData = useMemo(() => repository.getInitialData(), [repository]);
+  // With a cloud workspace every collection starts from what is stored for the organization.
+  const [initialData] = useState(() =>
+    cloud ? (cloud.records as unknown as SurgiInitialData) : repository.getInitialData(),
+  );
   const [role, setRole] = useState<UserRole>(
     () => (sessionStorage.getItem('surgitrack-demo-role') as UserRole) || 'STERILIZATION',
   );
-  const activeDepartment = getActiveDepartment(role);
+  // Bumped when the demo identity changes without a role change (one department to another).
+  const [identityVersion, setIdentityVersion] = useState(0);
   const currentUser = getDemoSessionUser(role);
+  const switchIdentity = (user: SessionUser) => {
+    applyDemoSessionUser(user);
+    setRole(user.role);
+    setIdentityVersion(v => v + 1);
+  };
+  const activeDepartment = getActiveDepartment(role, currentUser);
   const permissions = permissionsForRole(role, rolePermissions);
   const can = (permission: import('../core/permissions').Permission) =>
     hasPermission(role, permission, rolePermissions);
@@ -93,15 +117,35 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
   );
   const [movements, setMovements] = useState(initialData.movements);
   const [issues, setIssues] = useState(initialData.issues);
-  const [counts, setCounts] = useState<SurgicalCount[]>([]);
-  const [receipts, setReceipts] = useState<ReceiptRecord[]>([]);
-  const [preparations, setPreparations] = useState<PreparationRecord[]>([]);
-  const [sterilizationCycles, setSterilizationCycles] = useState<SterilizationCycleRecord[]>([]);
-  const [processLoads, setProcessLoads] = useState<ProcessLoadRecord[]>([]);
-  const [recallCases, setRecallCases] = useState<RecallCase[]>([]);
-  const [sterilizationReleases, setSterilizationReleases] = useState<SterilizationReleaseRecord[]>([]);
-  const [workflowCheckpoints, setWorkflowCheckpoints] = useState<WorkflowCheckpointRecord[]>([]);
-  const [deliveries, setDeliveries] = useState<DeliveryRecord[]>([]);
+  const [counts, setCounts] = useState<SurgicalCount[]>(initialData.counts || []);
+  const [receipts, setReceipts] = useState<ReceiptRecord[]>(initialData.receipts || []);
+  const [preparations, setPreparations] = useState<PreparationRecord[]>(initialData.preparations || []);
+  const [sterilizationCycles, setSterilizationCycles] = useState<SterilizationCycleRecord[]>(
+    initialData.sterilizationCycles || [],
+  );
+  const [processLoads, setProcessLoads] = useState<ProcessLoadRecord[]>(initialData.processLoads || []);
+  const [recallCases, setRecallCases] = useState<RecallCase[]>(initialData.recallCases || []);
+  const [sterilizationReleases, setSterilizationReleases] = useState<SterilizationReleaseRecord[]>(
+    initialData.sterilizationReleases || [],
+  );
+  const [workflowCheckpoints, setWorkflowCheckpoints] = useState<WorkflowCheckpointRecord[]>(
+    initialData.workflowCheckpoints || [],
+  );
+  const [deliveries, setDeliveries] = useState<DeliveryRecord[]>(initialData.deliveries || []);
+  const cloudOrganizationId = cloud?.organizationId;
+  useAppRecordSync(cloudOrganizationId, 'sets', sets);
+  useAppRecordSync(cloudOrganizationId, 'tools', tools);
+  useAppRecordSync(cloudOrganizationId, 'movements', movements);
+  useAppRecordSync(cloudOrganizationId, 'issues', issues);
+  useAppRecordSync(cloudOrganizationId, 'counts', counts);
+  useAppRecordSync(cloudOrganizationId, 'receipts', receipts);
+  useAppRecordSync(cloudOrganizationId, 'preparations', preparations);
+  useAppRecordSync(cloudOrganizationId, 'sterilizationCycles', sterilizationCycles);
+  useAppRecordSync(cloudOrganizationId, 'processLoads', processLoads);
+  useAppRecordSync(cloudOrganizationId, 'recallCases', recallCases);
+  useAppRecordSync(cloudOrganizationId, 'sterilizationReleases', sterilizationReleases);
+  useAppRecordSync(cloudOrganizationId, 'workflowCheckpoints', workflowCheckpoints);
+  useAppRecordSync(cloudOrganizationId, 'deliveries', deliveries);
   const [toast, setToast] = useState<Toast>();
   const notify = (text: string) => setToast({id: Date.now(), text});
   useEffect(() => {
@@ -110,7 +154,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     return () => window.clearTimeout(timer);
   }, [toast]);
   const addMovement = (m: Omit<Movement, 'id' | 'at'>) =>
-    setMovements(x => [{...m, id: `m${Date.now()}`, at: formatStoreDateTime()}, ...x]);
+    setMovements(x => [{...m, id: `m${uniqueStamp()}`, at: formatStoreDateTime()}, ...x]);
   const assetName = (kind: AssetKind, id: string) => findAsset(kind, id, sets, tools);
   const isUsageExhausted = (kind: AssetKind, id: string) => {
     const asset = assetName(kind, id);
@@ -172,7 +216,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     const checkedCount =
       setAsset && payload.checkPerformed ? (payload.checkedCount ?? physicalExpected ?? setAsset.actual) : undefined;
     const record: ReceiptRecord = {
-      id: `r${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: `r${uniqueStamp()}-${Math.random().toString(36).slice(2, 7)}`,
       workflowVersion: sterilizationWorkflow.version,
       batchId: payload.batchId,
       assetId: id,
@@ -227,7 +271,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
             : 'Παρατήρηση παραλαβής';
       setIssues(x => [
         {
-          id: `i${Date.now()}`,
+          id: `i${uniqueStamp()}`,
           asset: `${a.barcode} · ${a.name}`,
           type: issueType,
           status: 'OPEN',
@@ -265,7 +309,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     const a = assetName(kind, id);
     if (!a) return;
     const record: PreparationRecord = {
-      id: `p${Date.now()}`,
+      id: `p${uniqueStamp()}`,
       workflowVersion: sterilizationWorkflow.version,
       assetId: id,
       assetKind: kind,
@@ -302,7 +346,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     if (!a) return;
     const toolIds = kind === 'SET' ? tools.filter(t => t.setId === id).map(t => t.id) : [id];
     const record: SterilizationCycleRecord = {
-      id: `sc${Date.now()}`,
+      id: `sc${uniqueStamp()}`,
       workflowVersion: sterilizationWorkflow.version,
       loadId: payload.loadId,
       assetId: id,
@@ -378,7 +422,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       payload.decision === 'RELEASED';
     const decision = canRelease ? 'RELEASED' : 'REPROCESS';
     const record: SterilizationReleaseRecord = {
-      id: `sr${Date.now()}`,
+      id: `sr${uniqueStamp()}`,
       workflowVersion: sterilizationWorkflow.version,
       loadId: payload.loadId,
       assetId: id,
@@ -442,7 +486,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       notify('Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.');
       return;
     }
-    const loadId = `L${Date.now()}`;
+    const loadId = `L${uniqueStamp()}`;
     const items = refs.map(({ref, asset}) => ({
       assetId: ref.id,
       assetKind: ref.kind,
@@ -455,7 +499,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       const stage = sterilizationWorkflow.stages.find(stage => stage.id === 'WASHING');
       refs.forEach(({ref, asset}) => {
         const checkpoint: WorkflowCheckpointRecord = {
-          id: `wc${Date.now()}-${ref.id}`,
+          id: `wc${uniqueStamp()}-${ref.id}`,
           workflowVersion: sterilizationWorkflow.version,
           assetId: ref.id,
           assetKind: ref.kind,
@@ -506,7 +550,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     refs.forEach(({ref, asset}, index) => {
       const toolIds = ref.kind === 'SET' ? tools.filter(t => t.setId === ref.id).map(t => t.id) : [ref.id];
       const cycle: SterilizationCycleRecord = {
-        id: `sc${Date.now()}-${index}`,
+        id: `sc${uniqueStamp()}-${index}`,
         workflowVersion: sterilizationWorkflow.version,
         loadId,
         assetId: ref.id,
@@ -600,7 +644,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       );
       if (!cycle) return;
       const record: SterilizationReleaseRecord = {
-        id: `sr${Date.now()}-${index}`,
+        id: `sr${uniqueStamp()}-${index}`,
         workflowVersion: sterilizationWorkflow.version,
         loadId,
         assetId: item.assetId,
@@ -691,7 +735,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       };
     });
     const recallCase: RecallCase = {
-      id: `recall-${Date.now()}`,
+      id: `recall-${uniqueStamp()}`,
       loadId,
       cycleNumber: load.cycleNumber,
       sterilizer: load.equipment,
@@ -736,7 +780,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     const requiredCount = stage.checksEl.length;
     if (payload.checks.length < requiredCount || payload.checks.slice(0, requiredCount).some(value => !value)) return;
     const record: WorkflowCheckpointRecord = {
-      id: `wc${Date.now()}`,
+      id: `wc${uniqueStamp()}`,
       workflowVersion: sterilizationWorkflow.version,
       assetId: id,
       assetKind: kind,
@@ -769,7 +813,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     const a = assetName(kind, id);
     if (!a || a.state !== 'READY_FOR_PICKUP' || !assertCirculationAllowed(kind, id)) return;
     const record: DeliveryRecord = {
-      id: `d${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: `d${uniqueStamp()}-${Math.random().toString(36).slice(2, 6)}`,
       workflowVersion: sterilizationWorkflow.version,
       batchId: payload.batchId,
       assetId: id,
@@ -800,7 +844,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     return record;
   };
   const recordCount = (p: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => {
-    const c: SurgicalCount = {...p, id: `c${Date.now()}`, at: formatStoreDateTime(), by: 'OR User', signed: true};
+    const c: SurgicalCount = {...p, id: `c${uniqueStamp()}`, at: formatStoreDateTime(), by: 'OR User', signed: true};
     setCounts(x => [c, ...x]);
     const s = sets.find(x => x.id === p.setId);
     if (s) {
@@ -808,7 +852,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       if (p.counted !== p.expected || p.result !== 'OK')
         setIssues(x => [
           {
-            id: `i${Date.now()}`,
+            id: `i${uniqueStamp()}`,
             asset: `${s.barcode} · ${s.name}`,
             type: p.result === 'DAMAGE' ? 'Βλάβη' : 'Έλλειψη',
             status: 'OPEN',
@@ -919,7 +963,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     if (!issues.some(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode)))
       setIssues(x => [
         {
-          id: `i${Date.now()}`,
+          id: `i${uniqueStamp()}`,
           asset: `${t.barcode} · ${t.name}`,
           type: 'Βλάβη / Service',
           status: 'OPEN',
@@ -985,7 +1029,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     )
       setIssues(x => [
         {
-          id: `i${Date.now()}`,
+          id: `i${uniqueStamp()}`,
           asset: `${outgoing.barcode} · ${outgoing.name}`,
           type: 'Βλάβη / Service',
           status: 'OPEN',
@@ -1035,7 +1079,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     const sourceSet = t.setId ? sets.find(s => s.id === t.setId) : undefined;
     setIssues(x => [
       {
-        id: `i${Date.now()}`,
+        id: `i${uniqueStamp()}`,
         asset: `${t.barcode} · ${t.name}`,
         type,
         status: 'OPEN',
@@ -1124,7 +1168,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
   };
   const createSet = (p: CreateSetPayload) => {
     const barcode = nextBarcode('SET');
-    const id = `set-${Date.now()}`;
+    const id = `set-${uniqueStamp()}`;
     const department = p.department.trim();
     const inStock = !department;
     const state: AssetState = inStock ? 'IN_STOCK' : 'IN_DEPARTMENT';
@@ -1182,7 +1226,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     if (!src) return;
     const sourceTools = tools.filter(t => t.setId === id);
     const barcode = nextBarcode('SET');
-    const newSetId = `set-${Date.now()}`;
+    const newSetId = `set-${uniqueStamp()}`;
     const copy: SetAsset = {
       ...src,
       id: newSetId,
@@ -1227,7 +1271,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     const src = tools.find(t => t.id === id);
     if (!src) return;
     const barcode = nextBarcode('TOOL');
-    const newId = `tool-${Date.now()}`;
+    const newId = `tool-${uniqueStamp()}`;
     const copy: Tool = {
       ...src,
       id: newId,
@@ -1315,7 +1359,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       const selected = tools.filter(t => targetToolIds.includes(t.id));
       setIssues(x => [
         ...selected.map((t, i): Issue => ({
-          id: `i${Date.now()}-${i}`,
+          id: `i${uniqueStamp()}-${i}`,
           asset: `${t.barcode} · ${t.name}`,
           type,
           status: 'OPEN',
@@ -1331,7 +1375,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
     }
     setIssues(x => [
       {
-        id: `i${Date.now()}`,
+        id: `i${uniqueStamp()}`,
         asset: `${src.barcode} · ${src.name}`,
         type,
         status: 'OPEN',
@@ -1545,6 +1589,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       permissions,
       can,
       setRole,
+      switchIdentity,
       sendToSterilization,
       receiveAtSterilization,
       recordPreparation,
@@ -1595,6 +1640,7 @@ export function SurgiProvider({children, dataMode = 'DEMO'}: {children: ReactNod
       lifecycleAlerts,
       toast,
       role,
+      identityVersion,
     ],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -3,7 +3,11 @@ import type {LifecycleAlert, SessionUser, UserRole} from './types';
 
 export const formatStoreDateTime = () => new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'});
 
-export const getActiveDepartment = (role: UserRole) => (role === 'DEPARTMENT' ? 'Αίθουσα Τοκετών' : 'Όλα τα τμήματα');
+export const getActiveDepartment = (role: UserRole, user: SessionUser) =>
+  role === 'DEPARTMENT' ? user.department : 'Όλα τα τμήματα';
+
+/** Time-ordered, collision-free suffix for record ids (several records can be created in the same millisecond). */
+export const uniqueStamp = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export const getDemoSessionUser = (role: UserRole): SessionUser => {
   try {

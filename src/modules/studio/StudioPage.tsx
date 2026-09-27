@@ -45,6 +45,8 @@ import {
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
+import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
+import {departments as defaultDepartments} from '../../core/libraries';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -169,7 +171,12 @@ export default function StudioPage() {
   const loadCloudOrganizations = async () => {
     if (libs.dataMode !== 'PRODUCTION') return;
     setCloudLoading(true);
-    const {data, error} = await supabase.from('organizations').select('id,name,code,active,demo_enabled').order('name');
+    // Demo hospitals are sandboxes, not customers: they are managed through the Demo buttons only.
+    const {data, error} = await supabase
+      .from('organizations')
+      .select('id,name,code,active,demo_enabled')
+      .eq('is_demo', false)
+      .order('name');
     if (error) setCloudError(error.message);
     else {
       setCloudError('');
@@ -433,51 +440,45 @@ export default function StudioPage() {
   const handleResetSterilizationWorkflow = () => {
     libs.resetSterilizationWorkflow(currentUser.name);
   };
-  const enterBuiltInDemo = (role: UserRole) => {
-    const sessionUser = {
-      id: `builtin-demo-${role.toLowerCase()}`,
-      name: role === 'ADMIN' ? 'Demo Διαχειριστής' : role === 'STERILIZATION' ? 'Demo Αποστείρωση' : 'Demo Τμήμα',
-      role,
-      department:
-        role === 'DEPARTMENT' ? 'Χειρουργείο' : role === 'STERILIZATION' ? 'Κεντρική Αποστείρωση' : 'Διαχείριση',
-    };
-    sessionStorage.setItem('surgitrack-session-user', JSON.stringify(sessionUser));
-    sessionStorage.setItem('surgitrack-demo-role', role);
-    sessionStorage.setItem('surgitrack-active-organization', 'org-iaso-thessalias');
+  // Every demo is its own demo hospital in Supabase, so demo data never mixes with real hospitals.
+  // Without a source it is the built-in SurgiTrack Demo; with one, that hospital's private demo copy.
+  const enterDemo = async (role: UserRole, sourceOrganizationId?: string) => {
+    setCloudError('');
+    const {data: demoOrganizationId, error} = await supabase.rpc('platform_ensure_demo_organization', {
+      p_source: sourceOrganizationId ?? null,
+    });
+    if (error || !demoOrganizationId) {
+      setCloudError(error?.message || L('Δεν ήταν δυνατή η είσοδος στο Demo.', 'Could not open the Demo.'));
+      return;
+    }
+    const view: DemoView = role === 'DEPARTMENT' ? 'DEPARTMENT:' : role;
+    applyDemoSessionUser(demoSessionUser(view, defaultDepartments));
+    sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
     setRuntimeDataMode('DEMO');
     setRole(role);
     window.location.hash = `#${roleHomePath(role)}`;
     window.location.reload();
   };
+  const enterBuiltInDemo = (role: UserRole) => void enterDemo(role);
   const enterOrganizationDemo = (organization: Organization, role: UserRole) => {
     if (!organization.active || !organization.demoEnabled) return;
-    const candidate = libs.users.find(
-      user =>
-        user.organizationId === organization.id &&
-        user.role === role &&
-        user.active &&
-        (role === 'ADMIN' || user.demoEnabled),
-    );
-    const sessionUser = candidate
-      ? {id: candidate.id, name: candidate.name, role: candidate.role, department: candidate.department}
-      : {
-          id: `demo-${organization.id}-${role.toLowerCase()}`,
-          name: role === 'ADMIN' ? 'Demo Διαχειριστής' : role === 'STERILIZATION' ? 'Demo Αποστείρωση' : 'Demo Τμήμα',
-          role,
-          department:
-            role === 'DEPARTMENT'
-              ? libs.departments[0]?.el || 'Τμήμα'
-              : role === 'STERILIZATION'
-                ? 'Κεντρική Αποστείρωση'
-                : 'Διαχείριση',
-        };
-    sessionStorage.setItem('surgitrack-session-user', JSON.stringify(sessionUser));
-    sessionStorage.setItem('surgitrack-demo-role', role);
-    sessionStorage.setItem('surgitrack-active-organization', organization.id);
-    setRuntimeDataMode('DEMO');
-    setRole(role);
-    window.location.hash = `#${roleHomePath(role)}`;
-    window.location.reload();
+    void enterDemo(role, organization.id);
+  };
+  const resetBuiltInDemo = async () => {
+    const {data: demoOrganizationId, error} = await supabase.rpc('platform_ensure_demo_organization', {
+      p_source: null,
+    });
+    const {error: resetError} = error
+      ? {error}
+      : await supabase.rpc('platform_reset_demo_organization', {p_org: demoOrganizationId});
+    setCloudError(resetError ? resetError.message : '');
+    if (!resetError)
+      window.alert(
+        L(
+          'Το Demo επανήλθε. Την επόμενη φορά που θα μπείτε θα έχει ξανά τα αρχικά δοκιμαστικά δεδομένα.',
+          'The Demo was reset. Next time you enter it will have the original sample data again.',
+        ),
+      );
   };
   const currentMeta = libraryMeta.find(x => x.key === libraryKey)!;
   const currentItems =
@@ -740,8 +741,8 @@ export default function StudioPage() {
                 </strong>
                 <small>
                   {L(
-                    'Τα Set, εργαλεία, κινήσεις, προβλήματα και δείγματα ροών υπάρχουν μόνο εδώ και δεν αναμιγνύονται με την κανονική βάση.',
-                    'Sets, instruments, movements, issues and workflow samples exist only here and never mix with the normal data store.',
+                    'Ξεχωριστό Demo νοσοκομείο: ό,τι κάνετε αποθηκεύεται και παραμένει, χωρίς να αναμιγνύεται με τα πραγματικά νοσοκομεία. Στο header επιλέγετε ρόλο ή τμήμα.',
+                    'A separate Demo hospital: everything you do is saved and kept, without mixing with real hospitals. Pick a role or department in the header.',
                   )}
                 </small>
               </div>
@@ -751,6 +752,21 @@ export default function StudioPage() {
                   {L('Demo Αποστείρωσης', 'Sterilization Demo')}
                 </button>
                 <button onClick={() => enterBuiltInDemo('DEPARTMENT')}>{L('Demo Τμήματος', 'Department Demo')}</button>
+                <button
+                  className="platform-demo-reset"
+                  onClick={() =>
+                    setConfirm({
+                      title: L('Επαναφορά Demo', 'Reset Demo'),
+                      message: L(
+                        'Θα διαγραφούν όλα τα δεδομένα του SurgiTrack Demo και θα ξαναφορτωθούν τα αρχικά δοκιμαστικά. Τα πραγματικά νοσοκομεία δεν επηρεάζονται.',
+                        'All SurgiTrack Demo data will be deleted and the original sample data reloaded. Real hospitals are not affected.',
+                      ),
+                      action: () => void resetBuiltInDemo(),
+                    })
+                  }
+                >
+                  {L('Επαναφορά Demo', 'Reset Demo')}
+                </button>
               </div>
             </section>
             <div className="platform-org-list">

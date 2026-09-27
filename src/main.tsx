@@ -6,19 +6,27 @@ import {SurgiProvider} from './store/SurgiStore';
 import {AppPreferencesProvider} from './core/AppPreferences';
 import {LibraryStoreProvider} from './core/LibraryStore';
 import {getRuntimeDataMode} from './config/dataMode';
+import CloudWorkspaceGate from './data/cloud/CloudWorkspaceGate';
+import {getCloudOrganizationId} from './data/cloud/appRecords';
 import './styles/global.css';
 const root = document.getElementById('root');
 const runtimeDataMode = getRuntimeDataMode();
+// For now only demo organizations are stored in Supabase; production keeps its current data flow.
+const cloudOrganizationId = runtimeDataMode === 'DEMO' ? getCloudOrganizationId() : undefined;
 if (!root) throw new Error('SurgiTrack: root element was not found.');
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <HashRouter>
       <AppPreferencesProvider>
-        <LibraryStoreProvider dataMode={runtimeDataMode}>
-          <SurgiProvider dataMode={runtimeDataMode}>
-            <App />
-          </SurgiProvider>
-        </LibraryStoreProvider>
+        <CloudWorkspaceGate organizationId={cloudOrganizationId}>
+          {cloud => (
+            <LibraryStoreProvider dataMode={runtimeDataMode} cloud={cloud}>
+              <SurgiProvider dataMode={runtimeDataMode} cloud={cloud}>
+                <App />
+              </SurgiProvider>
+            </LibraryStoreProvider>
+          )}
+        </CloudWorkspaceGate>
       </AppPreferencesProvider>
     </HashRouter>
   </React.StrictMode>,

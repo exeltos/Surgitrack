@@ -7,6 +7,9 @@ import type {Permission} from './permissions';
 import {defaultRolePermissions, sanitizeRolePermissions} from './permissions';
 import type {UserRole} from '../store/types';
 import type {SterilizationWorkflowConfig, WorkflowStageId} from './workflow';
+import {libraryFromRecords} from '../data/cloud/appRecords';
+import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
+import {useAppRecordSync} from '../data/cloud/useAppRecordSync';
 
 export type {AdminUser, LibraryKey, LibraryState, Organization} from './libraryTypes';
 
@@ -67,16 +70,38 @@ const load = (repository: ReturnType<typeof getAdminRepository>): LibraryState =
   return initial;
 };
 
-export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: ReactNode; dataMode?: SurgiDataMode}) {
+export function LibraryStoreProvider({
+  children,
+  dataMode = 'DEMO',
+  cloud,
+}: {
+  children: ReactNode;
+  dataMode?: SurgiDataMode;
+  cloud?: CloudWorkspace | null;
+}) {
   const repository = useMemo(() => getAdminRepository(dataMode), [dataMode]);
-  const [state, setState] = useState<LibraryState>(() => load(repository));
+  const [state, setState] = useState<LibraryState>(() => {
+    const initial = repository.getInitialData();
+    const saved = cloud && libraryFromRecords(cloud.records);
+    // Stored libraries are merged over the defaults so fields added later still get a value.
+    return saved
+      ? ({
+          ...initial,
+          ...saved,
+          systemSettings: {...initial.systemSettings, ...(saved.systemSettings as object)},
+        } as LibraryState)
+      : load(repository);
+  });
+  // With a cloud workspace the library is saved to Supabase instead of this browser.
+  const localStorageKey = !cloud && repository.mode === 'DEMO' ? repository.storageKey : '';
   const commit = (fn: (s: LibraryState) => LibraryState) =>
     setState(s => {
       const next = fn(s);
-      if (repository.mode === 'DEMO' && repository.storageKey)
-        localStorage.setItem(repository.storageKey, JSON.stringify(next));
+      if (localStorageKey) localStorage.setItem(localStorageKey, JSON.stringify(next));
       return next;
     });
+  const libraryRecord = useMemo(() => [{...state, id: 'state'}], [state]);
+  useAppRecordSync(cloud?.organizationId, 'library', libraryRecord);
   const actorName = (actor?: string) => actor?.trim() || 'Admin';
   const appendAudit = (s: LibraryState, event: Omit<ConfigurationAuditEvent, 'id' | 'at'>): LibraryState => ({
     ...s,
@@ -274,7 +299,7 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
       );
     });
   const resetData = () => {
-    localStorage.removeItem(repository.storageKey);
+    if (localStorageKey) localStorage.removeItem(localStorageKey);
     setState(repository.getInitialData());
   };
   const value = useMemo(
@@ -298,7 +323,7 @@ export function LibraryStoreProvider({children, dataMode = 'DEMO'}: {children: R
       updateSystemSettings,
       resetData,
     }),
-    [state, dataMode, repository],
+    [state, dataMode, localStorageKey],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
