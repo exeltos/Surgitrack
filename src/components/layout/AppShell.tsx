@@ -159,7 +159,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       </div>
       {isDemo && (
         <div className="demo-exit-panel">
-          <span>DEMO · {lang === 'el' ? 'ξεχωριστά δεδομένα' : 'separate data'}</span>
+          <span>DEMO</span>
           <button onClick={returnFromDemo}>
             {lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}
           </button>

@@ -556,17 +556,16 @@ export default function StudioPage() {
         <div className="studio-health">
           <ShieldCheck size={20} />
           <div>
-            <strong>{L('Shared Core ενεργό', 'Shared Core active')}</strong>
+            <strong>
+              {libs.dataMode === 'DEMO' ? L('Περιβάλλον Demo', 'Demo environment') : L('Παραγωγή', 'Production')}
+            </strong>
             <span>
               {libs.dataMode === 'DEMO'
                 ? L(
-                    'Οι αλλαγές αποθηκεύονται τοπικά στο demo και χρησιμοποιούνται στις λειτουργικές φόρμες.',
-                    'Demo changes persist locally and are used by operational forms.',
+                    'Ξεχωριστό Demo νοσοκομείο· οι αλλαγές αποθηκεύονται μόνο εδώ.',
+                    'Separate Demo hospital; changes are saved only here.',
                   )
-                : L(
-                    'Production mode: οι βιβλιοθήκες και οι χρήστες ξεκινούν χωρίς demo δεδομένα.',
-                    'Production mode: libraries and users start without demo data.',
-                  )}
+                : L('Πραγματικά νοσοκομεία, χρήστες και δεδομένα.', 'Real hospitals, users and data.')}
             </span>
           </div>
         </div>
@@ -594,7 +593,7 @@ export default function StudioPage() {
         </button>
         <button className={tab === 'ROLES' ? 'active' : ''} onClick={() => selectTab('ROLES')}>
           <UserCog size={17} />
-          {L('Ρόλοι & Δικαιώματα', 'Roles & Permissions')}
+          {L('Δικαιώματα', 'Permissions')}
         </button>
         <button className={tab === 'SYSTEM' ? 'active' : ''} onClick={() => selectTab('SYSTEM')}>
           <Settings2 size={17} />

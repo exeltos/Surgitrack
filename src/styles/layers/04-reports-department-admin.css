@@ -2873,10 +2873,16 @@
 .studio-tabs {
   gap: 4px !important;
   padding: 4px !important;
+  /* All tabs stay visible: they share the row and wrap rather than hide off-screen. */
+  flex-wrap: wrap;
+  overflow-x: visible;
 }
 .studio-tabs button {
+  flex: 1 1 auto;
+  justify-content: center;
   min-height: 38px;
-  padding: 8px 12px !important;
+  gap: 6px;
+  padding: 8px 9px !important;
   font-size: 13px !important;
   line-height: 1 !important;
   font-weight: 620 !important;
@@ -3529,7 +3535,8 @@
 
 /* v0.29.1 — Platform administration & controlled demo access */
 .studio-platform-panel {
-  grid-template-rows: auto auto minmax(0, 1fr);
+  /* header, KPIs, private demo, hospital list, empty state: only the list takes the free height */
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
 }
 .platform-kpis {
   display: grid;
@@ -3567,11 +3574,12 @@
   gap: 9px;
 }
 .platform-org-card {
-  display: grid;
-  grid-template-columns: minmax(230px, 1.2fr) minmax(250px, auto) minmax(260px, auto) 150px;
+  /* One row per hospital that wraps instead of overflowing: identity, status, demo entry, summary, manage. */
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 12px 24px;
+  padding: 14px 16px;
   border: 1px solid #dfe9ed;
   border-radius: 12px;
   background: #fff;
@@ -3585,6 +3593,10 @@
   gap: 8px;
   min-width: 0;
 }
+.platform-org-main {
+  flex: 1 1 240px;
+  gap: 12px;
+}
 .platform-org-main > div:last-child {
   min-width: 0;
   display: grid;
@@ -3594,17 +3606,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 15px;
   color: var(--studio-ink, #203d4f);
 }
 .platform-org-main small,
 .platform-org-meta,
 .platform-demo-actions > span {
   color: #7b8f9d;
-  font-size: 10px;
+  font-size: 11.5px;
 }
 .platform-org-icon {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 9px;
   display: grid;
   place-items: center;
@@ -3613,42 +3626,57 @@
   flex: 0 0 auto;
 }
 .platform-org-status {
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  gap: 14px;
+  white-space: nowrap;
 }
 .platform-demo-actions {
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-.platform-demo-actions > span {
-  width: 100%;
+  flex: 0 0 auto;
+  gap: 6px;
 }
 .platform-demo-actions button {
   border: 1px solid #d6e3e8;
   background: #f8fbfc;
   color: #31586a;
-  border-radius: 7px;
-  padding: 5px 8px;
-  font-size: 10px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
   font-weight: 650;
+  white-space: nowrap;
   cursor: pointer;
+}
+.platform-demo-actions button:not(:disabled):hover {
+  background: #eaf6f8;
+  border-color: #9ccbd5;
 }
 .platform-demo-actions button:disabled {
   opacity: 0.42;
   cursor: not-allowed;
 }
 .platform-org-meta {
-  justify-content: flex-end;
+  flex: 0 0 auto;
+  margin-left: auto;
+  gap: 16px;
+  white-space: nowrap;
 }
-.platform-org-meta button {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #dbe6ea;
-  border-radius: 8px;
+.platform-manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #d8e4e9;
+  border-radius: 10px;
   background: #fff;
-  color: #527081;
-  display: grid;
-  place-items: center;
+  color: #365d70;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
+}
+.platform-manage-btn:hover {
+  background: #eaf6f8;
+  border-color: #9ccbd5;
 }
 .studio-access-toggle.demo.active {
   color: #14764f;
@@ -3662,20 +3690,9 @@
   grid-template-columns: minmax(210px, 1.25fr) minmax(155px, 0.95fr) minmax(135px, 0.8fr) 115px 105px 105px 70px;
 }
 
-@media (max-width: 1250px) {
-  .platform-org-card {
-    grid-template-columns: minmax(220px, 1fr) minmax(240px, 1fr);
-  }
-  .platform-org-meta {
-    justify-content: flex-start;
-  }
-}
 @media (max-width: 900px) {
   .platform-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .platform-org-card {
-    grid-template-columns: 1fr;
   }
   .studio-user-head,
   .studio-user-row {
@@ -3715,6 +3732,7 @@
   overflow-y: auto;
 }
 .platform-private-demo {
+  align-self: start;
   margin: 12px 16px 0;
   padding: 13px 14px;
   border: 1px solid #cfe5ea;
@@ -3758,6 +3776,14 @@
 .platform-private-demo-actions button:hover {
   background: #eaf6f8;
   border-color: #9ccbd5;
+}
+.platform-private-demo-actions .platform-demo-reset {
+  color: #b42318;
+  border-color: #fecdca;
+}
+.platform-private-demo-actions .platform-demo-reset:hover {
+  background: #fef3f2;
+  border-color: #fda29b;
 }
 @media (max-width: 900px) {
   .platform-private-demo {

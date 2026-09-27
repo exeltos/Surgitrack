@@ -991,6 +991,9 @@
 /* v0.20.3 — unified action system + set-composition workspace modal */
 .app-button {
   appearance: none;
+  /* Labels stay on one line; a row of buttons wraps as a whole instead of squeezing each label. */
+  white-space: nowrap;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2060,7 +2063,7 @@ td {
 }
 .create-set-list-head {
   display: grid;
-  grid-template-columns: 34px 155px minmax(260px, 1fr) minmax(170px, auto);
+  grid-template-columns: 34px 140px minmax(0, 1fr) minmax(96px, auto);
   gap: 12px;
   align-items: center;
   min-height: 38px;
@@ -2081,7 +2084,7 @@ td {
   background: #fff;
 }
 .create-set-tool-row {
-  grid-template-columns: 34px 155px minmax(260px, 1fr) minmax(170px, auto);
+  grid-template-columns: 34px 140px minmax(0, 1fr) minmax(96px, auto);
   min-height: 66px;
   padding: 12px 18px;
 }
