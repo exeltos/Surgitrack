@@ -80,10 +80,12 @@ export default function HospitalAdminPage() {
         .eq('organization_id', organizationId)
         .order('name'),
     ]);
-    // Each part shows what it could load; one failing query does not blank the whole page.
+    // Each part shows what it could load; one failing query does not blank the whole page. Requests
+    // need the departments (the suggested role and the department picker come from them), so without
+    // those they are not shown and cannot be approved.
     if (org.data) setHospital(org.data.name);
     if (deps.data) setDepartments(deps.data);
-    if (reqs.data) setRequests(reqs.data as Request[]);
+    setRequests(deps.data && reqs.data ? (reqs.data as Request[]) : []);
     if (profiles.data) setMembers(profiles.data as Member[]);
     const error = org.error || deps.error || reqs.error || profiles.error;
     if (error) setNotice({kind: 'error', text: error.message});
