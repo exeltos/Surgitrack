@@ -116,7 +116,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 <p>{code || 'Συμπλήρωσε κωδικό'}</p>
               </div>
             </div>
-            <span className="status-badge">ΝΕΟ</span>
+            <div className="asset-workbench-title-status">
+              <span className="status-badge asset-member-status">Νέα καταχώριση</span>
+            </div>
           </div>
 
           <div className="asset-fields-heading">

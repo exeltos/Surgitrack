@@ -3,15 +3,16 @@ import {Search, Route} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 export default function TraceabilityPage() {
   const {sets, tools, movements, counts} = useSurgi();
-  const [q, setQ] = useState('P-2026-10482');
+  const [q, setQ] = useState('');
   const needle = q.trim().toLowerCase();
-  const related = movements.filter(m =>
-    [m.asset, m.patientCode, m.status].some(x => x?.toLowerCase().includes(needle)),
-  );
-  const countHits = counts.filter(c => c.patientCode.toLowerCase().includes(needle));
-  const asset = [...sets, ...tools].find(
-    x => x.barcode.toLowerCase() === needle || x.name.toLowerCase().includes(needle),
-  );
+  // Nothing is shown until something is searched: an empty query would match every record.
+  const related = needle
+    ? movements.filter(m => [m.asset, m.patientCode, m.status].some(x => x?.toLowerCase().includes(needle)))
+    : [];
+  const countHits = needle ? counts.filter(c => c.patientCode.toLowerCase().includes(needle)) : [];
+  const asset = needle
+    ? [...sets, ...tools].find(x => x.barcode.toLowerCase() === needle || x.name.toLowerCase().includes(needle))
+    : undefined;
   return (
     <>
       <div className="page-head">
@@ -66,8 +67,12 @@ export default function TraceabilityPage() {
           ))
         ) : (
           <div className="empty">
-            <strong>Δεν βρέθηκαν επιπλέον κινήσεις</strong>
-            <span>Δοκιμάστε barcode ή κωδικό ασθενούς.</span>
+            <strong>{needle ? 'Δεν βρέθηκαν κινήσεις' : 'Αναζητήστε Set, εργαλείο ή ασθενή'}</strong>
+            <span>
+              {needle
+                ? 'Δοκιμάστε άλλο barcode ή κωδικό ασθενούς.'
+                : 'Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή κωδικό ασθενούς.'}
+            </span>
           </div>
         )}
       </div>

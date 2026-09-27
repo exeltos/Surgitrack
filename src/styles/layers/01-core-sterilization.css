@@ -6830,8 +6830,17 @@ td {
 }
 
 /* v0.23.4 · Configurable workflow queues and generic quality gates */
+/* Every enabled stage sits on one row on desktop, however many the workflow enables. */
 .workflow-configured-queues {
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)) !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+@media (max-width: 1100px) {
+  .workflow-configured-queues {
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)) !important;
+    grid-auto-flow: row;
+  }
 }
 .workflow-configured-queues button {
   min-width: 0;
@@ -9523,4 +9532,93 @@ td {
   .workflow-modal-cycle .cycle-clean-summary {
     grid-template-columns: 1fr;
   }
+}
+
+/* Cloud workspace: loading gate, save status, demo badge and role picker */
+.cloud-gate {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 24px 16px;
+  text-align: center;
+  background: #f6f8fb;
+  color: #344054;
+}
+.cloud-gate small {
+  color: #667085;
+  overflow-wrap: anywhere;
+}
+.cloud-gate > div {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.cloud-gate button {
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  background: #fff;
+  padding: 8px 14px;
+  font-weight: 650;
+  color: #344054;
+  cursor: pointer;
+}
+.sync-status {
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #eef4ff;
+  color: #3538cd;
+}
+.sync-status.failed {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+@media (max-width: 650px) {
+  /* In Demo the role picker is how each environment is reached, so keep it on phones too. */
+  .role-switch {
+    display: block;
+  }
+  .role-switch select {
+    max-width: 128px;
+    font-size: 13px;
+    padding: 0 6px;
+  }
+  .sync-status {
+    display: none;
+  }
+}
+/* Demo badge and exit, shown in the sidebar while working in a demo hospital */
+.demo-exit-panel {
+  margin: 12px 12px 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(253, 176, 34, 0.35);
+  border-radius: 10px;
+  background: rgba(253, 176, 34, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.demo-exit-panel span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #fdb022;
+}
+.demo-exit-panel button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 650;
+  color: #eef4fb;
+  cursor: pointer;
+}
+.demo-exit-panel button:hover {
+  text-decoration: underline;
 }
