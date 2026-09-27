@@ -31,7 +31,7 @@ export default function SetsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ASSET MANAGEMENT"
+        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
         title="Σετ εργαλείων"
         description="Μητρώο Σετ με ξεχωριστά πεδία Ονομασίας, Κωδικού και μοναδικού Barcode."
         actions={
@@ -107,7 +107,7 @@ export default function SetsPage() {
                       </span>
                     </div>
                   </td>
-                  <td>{s.code}</td>
+                  <td className="cell-nowrap">{s.code}</td>
                   <td>
                     <Link className="mono strong-link" to={`/sets/${s.id}`}>
                       {s.barcode}

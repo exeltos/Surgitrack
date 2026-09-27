@@ -24,6 +24,7 @@ export default function CountPage() {
     <>
       <div className="page-head">
         <div>
+          <span className="eyebrow">ΧΕΙΡΟΥΡΓΕΙΟ</span>
           <h1>Καταμέτρηση χειρουργείου</h1>
           <p>Τελική καταμέτρηση μετά την επέμβαση με κωδικό ασθενούς και ηλεκτρονική υπογραφή.</p>
         </div>

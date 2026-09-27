@@ -301,7 +301,7 @@ export default function ReportsPage() {
     <div className="reports-page-workspace">
       <div className="page-head reports-page-head">
         <div>
-          <span className="eyebrow">REPORTING</span>
+          <span className="eyebrow">ΑΝΑΛΥΣΗ ΔΕΔΟΜΕΝΩΝ</span>
           <h1>Αναφορές & Εκτυπώσεις</h1>
           <p>Επίλεξε αναφορά, όρισε φίλτρα και δες τα αποτελέσματα πριν από εκτύπωση ή PDF.</p>
         </div>

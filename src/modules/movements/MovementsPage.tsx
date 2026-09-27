@@ -101,7 +101,8 @@ export default function MovementsPage() {
     <div className="movements-workspace">
       <div className="page-head movements-head">
         <div>
-          <h1>Κινήσεις & chain of custody</h1>
+          <span className="eyebrow">ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ</span>
+          <h1>Ιστορικό κινήσεων</h1>
           <p>
             {role === 'DEPARTMENT'
               ? `Ιστορικό ιχνηλασιμότητας του τμήματος ${currentUser.department}.`
