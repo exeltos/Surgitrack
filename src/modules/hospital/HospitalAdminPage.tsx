@@ -1,11 +1,12 @@
 import {useCallback, useEffect, useState} from 'react';
-import {Check, Copy, Link2, Pencil, Plus, RefreshCw, Save, ShieldOff, UserCheck, UserX, X} from 'lucide-react';
+import {Pencil, Plus, RefreshCw, Save, UserCheck, UserX, X} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
+import SignupLinkCard from './SignupLinkCard';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRealIdentity} from '../../data/cloud/identity';
-import {ACCESS_REQUESTS_CHANGED, managedHospitalId, signupUrl} from '../../data/cloud/accessRequests';
+import {ACCESS_REQUESTS_CHANGED, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {UserRole} from '../../store/types';
 
 type Department = {id: string; name: string; code: string | null; active: boolean};
@@ -26,7 +27,6 @@ type Member = {
   active: boolean;
   department_id: string | null;
 };
-type Link = {token: string; expires_at: string};
 type Decision = {role: UserRole; departmentId: string; note: string};
 
 const STERILIZATION_CODE = 'STER';
@@ -50,14 +50,14 @@ export default function HospitalAdminPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
-  const [link, setLink] = useState<Link | null>(null);
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [newDepartment, setNewDepartment] = useState({name: '', code: ''});
   const [editing, setEditing] = useState<{id: string; name: string; code: string} | null>(null);
   const [notice, setNotice] = useState<{kind: 'ok' | 'error'; text: string} | null>(null);
-  const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
     if (e) setNotice({kind: 'error', text: e.message || String(e)});
     return !!e;
@@ -65,7 +65,7 @@ export default function HospitalAdminPage() {
 
   const load = useCallback(async () => {
     if (!organizationId) return;
-    const [org, deps, reqs, profiles, links] = await Promise.all([
+    const [org, deps, reqs, profiles] = await Promise.all([
       supabase.from('organizations').select('name').eq('id', organizationId).single(),
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
@@ -79,16 +79,8 @@ export default function HospitalAdminPage() {
         .select('id,name,email,user_code,role,active,department_id')
         .eq('organization_id', organizationId)
         .order('name'),
-      supabase
-        .from('signup_links')
-        .select('token,expires_at')
-        .eq('organization_id', organizationId)
-        .is('revoked_at', null)
-        .gt('expires_at', new Date().toISOString())
-        .order('created_at', {ascending: false})
-        .limit(1),
     ]);
-    const error = org.error || deps.error || reqs.error || profiles.error || links.error;
+    const error = org.error || deps.error || reqs.error || profiles.error;
     if (error) {
       setNotice({kind: 'error', text: error.message});
       return;
@@ -97,7 +89,6 @@ export default function HospitalAdminPage() {
     setDepartments(deps.data);
     setRequests(reqs.data as Request[]);
     setMembers(profiles.data as Member[]);
-    setLink(links.data[0] || null);
   }, [organizationId]);
 
   useEffect(() => {
@@ -159,29 +150,6 @@ export default function HospitalAdminPage() {
     setBusy(false);
   };
 
-  const createLink = async () => {
-    if (
-      link &&
-      !window.confirm(
-        L('Ο τρέχων σύνδεσμος θα πάψει να ισχύει. Συνέχεια;', 'The current link will stop working. Continue?'),
-      )
-    )
-      return;
-    const {error} = await supabase.rpc('hospital_create_signup_link', {p_org: organizationId});
-    if (!fail(error)) await load();
-  };
-  const revokeLink = async () => {
-    if (!window.confirm(L('Ανάκληση του συνδέσμου εγγραφής;', 'Revoke the signup link?'))) return;
-    const {error} = await supabase.rpc('hospital_revoke_signup_links', {p_org: organizationId});
-    if (!fail(error)) await load();
-  };
-  const copyLink = async () => {
-    if (!link) return;
-    await navigator.clipboard?.writeText(signupUrl(link.token)).catch(() => undefined);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  };
-
   const addDepartment = async () => {
     const name = newDepartment.name.trim();
     if (!name) return;
@@ -232,7 +200,13 @@ export default function HospitalAdminPage() {
           'Departments, the staff signup link and approval of new users.',
         )}
         actions={
-          <AppButton onClick={() => void load()} icon={<RefreshCw size={15} />}>
+          <AppButton
+            onClick={() => {
+              setRefreshKey(k => k + 1);
+              void load();
+            }}
+            icon={<RefreshCw size={15} />}
+          >
             {L('Ανανέωση', 'Refresh')}
           </AppButton>
         }
@@ -331,52 +305,7 @@ export default function HospitalAdminPage() {
           )}
         </section>
 
-        <section className="hospital-card hospital-link">
-          <header>
-            <div>
-              <b>{L('Σύνδεσμος εγγραφής', 'Signup link')}</b>
-              <small>
-                {L(
-                  'Μοιραστείτε τον με το προσωπικό. Ισχύει 10 ημέρες και είναι μοναδικός για το νοσοκομείο.',
-                  'Share it with your staff. It is valid for 10 days and unique to this hospital.',
-                )}
-              </small>
-            </div>
-            <Link2 size={18} />
-          </header>
-          {link ? (
-            <>
-              <div className="hospital-link-box">
-                <code>{signupUrl(link.token)}</code>
-                <AppButton
-                  size="sm"
-                  onClick={() => void copyLink()}
-                  icon={copied ? <Check size={14} /> : <Copy size={14} />}
-                >
-                  {copied ? L('Αντιγράφηκε', 'Copied') : L('Αντιγραφή', 'Copy')}
-                </AppButton>
-              </div>
-              <small className="hospital-link-expiry">
-                {L('Λήγει', 'Expires')}: <b>{date(link.expires_at)}</b>
-              </small>
-              <div className="hospital-link-actions">
-                <AppButton onClick={() => void createLink()} icon={<RefreshCw size={14} />}>
-                  {L('Νέος σύνδεσμος', 'New link')}
-                </AppButton>
-                <AppButton variant="ghost" onClick={() => void revokeLink()} icon={<ShieldOff size={14} />}>
-                  {L('Ανάκληση', 'Revoke')}
-                </AppButton>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="hospital-empty">{L('Δεν υπάρχει ενεργός σύνδεσμος.', 'There is no active link.')}</p>
-              <AppButton variant="primary" onClick={() => void createLink()} icon={<Link2 size={15} />}>
-                {L('Δημιουργία συνδέσμου (10 ημέρες)', 'Create link (10 days)')}
-              </AppButton>
-            </>
-          )}
-        </section>
+        <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />
 
         <section className="hospital-card hospital-departments-card">
           <header>
