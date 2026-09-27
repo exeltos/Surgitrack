@@ -3795,3 +3795,324 @@
     flex-wrap: wrap;
   }
 }
+
+/* Hospital self-signup and administration */
+.auth-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.auth-name-row label {
+  display: grid;
+  gap: 6px;
+  color: #526174;
+  font-size: 11px;
+  font-weight: 700;
+}
+.auth-name-row .auth-input input {
+  padding: 0 2px !important;
+}
+.auth-hint {
+  margin-top: -6px;
+  color: #7b8794;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.auth-input select {
+  flex: 1;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0 9px;
+  color: #1d2939;
+  font-size: 13px;
+}
+a.auth-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.auth-primary:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.pending-access {
+  grid-template-columns: minmax(0, 510px);
+  justify-content: center;
+}
+.pending-access .auth-primary {
+  gap: 8px;
+}
+.auth-status-icon.danger {
+  background: #fdecec;
+  color: #b42318;
+}
+.pending-access-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 4px 0 16px;
+  text-align: left;
+  font-size: 13px;
+}
+.pending-access-details dt {
+  color: #7b8794;
+  font-weight: 700;
+}
+.pending-access-details dd {
+  margin: 0;
+  color: #1d2939;
+}
+.nav-item .nav-badge {
+  margin-left: auto;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #d92d20;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  text-align: center;
+}
+.hospital-admin {
+  display: grid;
+  gap: 16px;
+}
+.hospital-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.hospital-notice.ok {
+  background: #ecfdf3;
+  color: #067647;
+}
+.hospital-notice.error {
+  background: #fef3f2;
+  color: #b42318;
+}
+.hospital-notice button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.hospital-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.hospital-card {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid #e3e9ee;
+  border-radius: 14px;
+  background: #fff;
+}
+.hospital-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  color: #0e6d82;
+}
+.hospital-card > header > div {
+  min-width: 0;
+}
+.hospital-card > header b {
+  display: block;
+  color: #1d2939;
+  font-size: 15px;
+}
+.hospital-card > header small {
+  display: block;
+  margin-top: 3px;
+  color: #7b8794;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.hospital-count {
+  min-width: 30px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef6f8;
+  color: #0e6d82;
+  font-weight: 800;
+  text-align: center;
+}
+.hospital-empty {
+  margin: 0;
+  color: #7b8794;
+  font-size: 13px;
+}
+.hospital-request {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e3e9ee;
+  border-radius: 11px;
+  background: #fafcfd;
+}
+.hospital-request-who {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 2px;
+}
+.hospital-request-who small {
+  color: #667782;
+}
+.hospital-request label,
+.hospital-department-add,
+.hospital-row {
+  font-size: 11px;
+  font-weight: 700;
+  color: #526174;
+}
+.hospital-request label {
+  display: grid;
+  gap: 5px;
+}
+.hospital-admin select,
+.hospital-admin input {
+  height: 36px;
+  min-width: 0;
+  border: 1px solid #d9e1e8;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 9px;
+  color: #1d2939;
+  font-size: 13px;
+}
+.hospital-request-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.hospital-unconfirmed {
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed #e3e9ee;
+  color: #667782;
+  font-size: 12px;
+}
+.hospital-link {
+  grid-row: span 2;
+}
+.hospital-link-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+  border: 1px solid #d9e1e8;
+  border-radius: 10px;
+  background: #f6f9fb;
+}
+.hospital-link-box code {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.hospital-link-expiry {
+  color: #667782;
+}
+.hospital-link-actions {
+  display: flex;
+  gap: 8px;
+}
+.hospital-department-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px auto;
+  gap: 8px;
+}
+.hospital-rows {
+  display: grid;
+  gap: 6px;
+  max-height: 420px;
+  overflow: auto;
+}
+.hospital-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #eef2f5;
+  border-radius: 9px;
+}
+.hospital-row.editing {
+  grid-template-columns: minmax(0, 1fr) 110px auto auto;
+}
+.hospital-row.inactive {
+  opacity: 0.6;
+}
+.hospital-row span,
+.hospital-member > span {
+  display: grid;
+  gap: 1px;
+}
+.hospital-row b,
+.hospital-member b {
+  color: #1d2939;
+  font-size: 13px;
+}
+.hospital-row small,
+.hospital-member small {
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 600;
+}
+.hospital-row > button:not(.studio-access-toggle) {
+  border: 1px solid #e3e9ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #526174;
+  padding: 6px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.hospital-members {
+  grid-column: 1 / -1;
+}
+.hospital-member-head,
+.hospital-member {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 110px;
+  align-items: center;
+  gap: 10px;
+}
+.hospital-member-head {
+  padding: 0 10px;
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.hospital-member {
+  padding: 8px 10px;
+  border: 1px solid #eef2f5;
+  border-radius: 9px;
+}
+.hospital-member code {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #0e6d82;
+}

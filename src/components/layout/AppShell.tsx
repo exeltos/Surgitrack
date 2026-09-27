@@ -13,6 +13,7 @@ import {
   PackageCheck,
   TriangleAlert,
   Gauge,
+  UserPlus,
 } from 'lucide-react';
 import {navigationFor} from '../../config/navigation';
 import {useSurgi, type UserRole} from '../../store/SurgiStore';
@@ -20,6 +21,7 @@ import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import RoleSwitcher from './RoleSwitcher';
 import {getRealIdentity} from '../../data/cloud/identity';
+import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
@@ -39,6 +41,7 @@ const navEN: Record<string, string> = {
   Ιστορικό: 'History',
   'SurgiTrack Studio': 'Management Center',
   'Σετ & Εργαλεία': 'Sets & Instruments',
+  'Διαχείριση νοσοκομείου': 'Hospital Administration',
 };
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
   const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, can} = useSurgi();
@@ -59,9 +62,23 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly =
     !isDemo && !!getRealIdentity()?.platform && !sessionStorage.getItem('surgitrack-active-organization');
-  const navigation = platformOnly
-    ? navigationFor(role, can).filter(item => item.to === '/studio')
-    : navigationFor(role, can);
+  // Hospital administration exists only for a real hospital's admin working as Admin.
+  const hospitalId = role === 'ADMIN' ? managedHospitalId() : undefined;
+  const [pendingAccess, setPendingAccess] = useState(0);
+  useEffect(() => {
+    if (!hospitalId) return;
+    const refresh = () => void countPendingAccessRequests(hospitalId).then(setPendingAccess);
+    refresh();
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener(ACCESS_REQUESTS_CHANGED, refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener(ACCESS_REQUESTS_CHANGED, refresh);
+    };
+  }, [hospitalId, location.pathname]);
+  const navigation = (
+    platformOnly ? navigationFor(role, can).filter(item => item.to === '/studio') : navigationFor(role, can)
+  ).filter(item => item.to !== '/hospital' || !!hospitalId);
   useEffect(() => {
     if (platformOnly && !location.pathname.startsWith('/studio')) navigate('/studio', {replace: true});
   }, [platformOnly, location.pathname, navigate]);
@@ -80,10 +97,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const departmentReady = departmentAssets.filter(a => a.state === 'READY_FOR_PICKUP');
   const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
   const departmentUsage = lifecycleAlerts.filter(a => departmentAssets.some(asset => asset.id === a.assetId));
+  const accessRequests = hospitalId ? pendingAccess : 0;
   const openNotifications =
     role === 'DEPARTMENT'
       ? departmentReady.length + departmentIssues.length + departmentUsage.length
-      : issues.filter(i => i.status === 'OPEN').length + lifecycleAlerts.length;
+      : issues.filter(i => i.status === 'OPEN').length + lifecycleAlerts.length + accessRequests;
   useEffect(() => {
     if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
       setDepartmentReadyToast(undefined);
@@ -197,6 +215,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             >
               <item.icon size={18} />
               <span>{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
+              {item.to === '/hospital' && accessRequests > 0 && <em className="nav-badge">{accessRequests}</em>}
             </NavLink>
           );
         })}
@@ -400,15 +419,38 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                       )}
                     </div>
                   ) : (
-                    <div className="notification-empty">
-                      {openNotifications
-                        ? lang === 'el'
-                          ? `${openNotifications} ενεργές ειδοποιήσεις`
-                          : `${openNotifications} active notifications`
-                        : lang === 'el'
-                          ? 'Δεν υπάρχουν νέες ειδοποιήσεις.'
-                          : 'No new notifications.'}
-                    </div>
+                    <>
+                      {accessRequests > 0 && (
+                        <div className="notification-list">
+                          <button
+                            className="notification-item ready"
+                            onClick={() => {
+                              setNotificationOpen(false);
+                              navigate('/hospital');
+                            }}
+                          >
+                            <UserPlus size={17} />
+                            <span>
+                              <strong>
+                                {lang === 'el'
+                                  ? `${accessRequests} ${accessRequests === 1 ? 'αίτημα' : 'αιτήματα'} πρόσβασης`
+                                  : `${accessRequests} access ${accessRequests === 1 ? 'request' : 'requests'}`}
+                              </strong>
+                              <small>{lang === 'el' ? 'Αναμένουν την έγκρισή σας' : 'Waiting for your approval'}</small>
+                            </span>
+                          </button>
+                        </div>
+                      )}
+                      <div className="notification-empty">
+                        {openNotifications - accessRequests
+                          ? lang === 'el'
+                            ? `${openNotifications - accessRequests} ενεργές ειδοποιήσεις`
+                            : `${openNotifications - accessRequests} active notifications`
+                          : lang === 'el'
+                            ? 'Δεν υπάρχουν νέες ειδοποιήσεις.'
+                            : 'No new notifications.'}
+                      </div>
+                    </>
                   )}
                 </div>
               )}

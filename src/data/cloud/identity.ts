@@ -14,9 +14,29 @@ export type RealIdentity = {
   departmentName: string;
 };
 
+/** A self-signup through a hospital link, before the hospital admin has approved it. */
+export type AccessRequest = {
+  id: string;
+  status: 'PENDING_EMAIL' | 'PENDING' | 'APPROVED' | 'REJECTED';
+  full_name: string;
+  email: string;
+  organization_name: string;
+  department_name: string | null;
+  decision_note: string | null;
+  admin_notified: boolean;
+};
+
+/** The signed-in user's own access request, if they joined through a hospital signup link. */
+export const loadMyAccessRequest = async (): Promise<AccessRequest | null> => {
+  const {data, error} = await supabase.rpc('my_access_request');
+  if (error) throw error;
+  return (data as AccessRequest | null) || null;
+};
+
 export type IdentityResult =
   | {status: 'signed-out'}
   | {status: 'inactive'}
+  | {status: 'pending'; request: AccessRequest}
   | {status: 'error'; message: string}
   | {status: 'ok'; identity: RealIdentity};
 
@@ -51,9 +71,19 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
         .from('profiles')
         .select('id,name,role,active,organization_id,department:departments(name)')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
       if (error) return {status: 'error', message: error.message};
-      if (!profile?.active) return {status: 'inactive'};
+      if (!profile) {
+        // No profile yet: a signup waiting for the hospital admin's approval (or a rejected one).
+        try {
+          const request = await loadMyAccessRequest();
+          if (request && request.status !== 'APPROVED') return {status: 'pending', request};
+        } catch (e) {
+          return {status: 'error', message: (e as {message?: string})?.message || String(e)};
+        }
+        return {status: 'inactive'};
+      }
+      if (!profile.active) return {status: 'inactive'};
       const department = profile.department as {name?: string} | {name?: string}[] | null;
       identity = {
         id: profile.id,

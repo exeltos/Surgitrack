@@ -4,6 +4,7 @@ import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION} from '../../config/appMeta';
 import {FunctionsHttpError, type User} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
+import {loadMyAccessRequest} from '../../data/cloud/identity';
 
 type Lang = 'el' | 'en';
 type View = 'login' | 'forgot' | 'reset' | 'sent';
@@ -60,6 +61,7 @@ const copy = {
     invalidCredentials: 'Το email ή ο κωδικός πρόσβασης δεν είναι σωστά.',
     tooManyAttempts: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.',
     accessDisabled: 'Η πρόσβαση αυτού του λογαριασμού δεν είναι ενεργή.',
+    emailNotConfirmed: 'Επιβεβαιώστε πρώτα το email σας από τον σύνδεσμο που σας στείλαμε.',
     demoDisabled: 'Η δοκιμαστική πρόσβαση δεν είναι ενεργή για αυτόν τον χρήστη ή οργανισμό.',
     productionAuthUnavailable:
       'Η σύνδεση παραγωγής απαιτεί ενεργό backend authentication και δεν είναι διαθέσιμη σε αυτό το build.',
@@ -108,6 +110,7 @@ const copy = {
     invalidCredentials: 'The email or password is incorrect.',
     tooManyAttempts: 'Too many failed attempts. Try again in 15 minutes.',
     accessDisabled: 'Access for this account is not active.',
+    emailNotConfirmed: 'Confirm your email first, using the link we sent you.',
     demoDisabled: 'Demo access is not enabled for this user or organization.',
     productionAuthUnavailable:
       'Production sign-in requires an active backend authentication service and is not available in this build.',
@@ -159,7 +162,8 @@ export default function AuthIndex({
     if (loginId.includes('@')) {
       const {data: signIn, error} = await supabase.auth.signInWithPassword({email: loginId.toLowerCase(), password});
       if (error || !signIn.user) {
-        setMessage(t.invalidCredentials);
+        const unconfirmed = error?.code === 'email_not_confirmed' || /not confirmed/i.test(error?.message || '');
+        setMessage(unconfirmed ? t.emailNotConfirmed : t.invalidCredentials);
         return;
       }
       authData = signIn;
@@ -205,7 +209,12 @@ export default function AuthIndex({
       .from('profiles')
       .select('id,name,email,role,active,organization_id,department_id')
       .eq('id', authData.user.id)
-      .single();
+      .maybeSingle();
+    // Joined through a hospital signup link and not approved yet: the app shows the request status.
+    if (!profileError && !profile && (await loadMyAccessRequest().catch(() => null))) {
+      onAuthenticated();
+      return;
+    }
     if (profileError || !profile || !profile.active) {
       await supabase.auth.signOut();
       setMessage(t.accessDisabled);
