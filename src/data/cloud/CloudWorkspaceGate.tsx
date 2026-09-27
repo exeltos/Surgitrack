@@ -57,18 +57,22 @@ export default function CloudWorkspaceGate({
         setStatus('local');
         return;
       }
+      // Only demo organizations use the cloud workspace for now. A stale tab may still hold a real
+      // hospital's id, so refuse anything that is not a demo before any write can happen.
+      const {data: org, error: orgError} = await supabase
+        .from('organizations')
+        .select('is_demo')
+        .eq('id', organizationId)
+        .single();
+      if (orgError) throw orgError;
+      if (!org.is_demo)
+        throw new Error(
+          lang === 'el' ? 'Ο οργανισμός δεν είναι Demo νοσοκομείο.' : 'This organization is not a Demo hospital.',
+        );
       let records = await loadAppRecords(organizationId);
       if (!records.library.length) {
-        const {data: org, error: orgError} = await supabase
-          .from('organizations')
-          .select('is_demo')
-          .eq('id', organizationId)
-          .single();
-        if (orgError) throw orgError;
-        if (org.is_demo) {
-          await seedDemoOrganization(organizationId);
-          records = await loadAppRecords(organizationId);
-        }
+        await seedDemoOrganization(organizationId);
+        records = await loadAppRecords(organizationId);
       }
       setWorkspace({organizationId, records});
       setStatus('ready');
@@ -76,7 +80,7 @@ export default function CloudWorkspaceGate({
       setError(e instanceof Error ? e.message : String((e as {message?: string})?.message || e));
       setStatus('error');
     }
-  }, [organizationId]);
+  }, [organizationId, lang]);
 
   useEffect(() => {
     void load();

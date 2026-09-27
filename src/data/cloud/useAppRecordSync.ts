@@ -3,6 +3,8 @@ import {deleteAppRecords, writeAppRecords, type CloudCollection, type CloudRecor
 
 const SYNC_DELAY_MS = 400;
 const RETRY_DELAY_MS = 5000;
+// Rounds per flush; later changes are picked up by the next render's flush.
+const MAX_ROUNDS = 5;
 
 export type SyncStatus = 'saved' | 'saving' | 'failed';
 
@@ -31,10 +33,19 @@ if (typeof window !== 'undefined') {
   });
 }
 
+const diff = (known: Map<string, CloudRecord>, items: readonly CloudRecord[]) => {
+  const changed = items.filter(item => known.get(item.id) !== item);
+  const currentIds = new Set(items.map(item => item.id));
+  const removed = [...known.keys()].filter(id => !currentIds.has(id));
+  return {changed, removed};
+};
+
 /**
  * Mirrors one store collection into `app_records`. The store updates records immutably,
  * so any record whose object identity changed since the last confirmed write is sent again,
- * and records that disappeared are deleted. Failed writes are retried until they succeed.
+ * and records that disappeared are deleted. Writes run one at a time and always diff against
+ * the latest items, so changes made while a write is in flight (even create-then-delete) are
+ * reconciled once it lands. Failed writes are retried until they succeed.
  */
 export function useAppRecordSync(
   organizationId: string | undefined,
@@ -42,11 +53,13 @@ export function useAppRecordSync(
   items: readonly CloudRecord[],
 ) {
   const confirmed = useRef<Map<string, CloudRecord> | null>(null);
-  // Writes run one after another so an older version can never land after a newer one.
+  const latest = useRef(items);
   const queue = useRef<Promise<void>>(Promise.resolve());
+  const busy = useRef(false);
   const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
+    latest.current = items;
     if (!organizationId) return;
     // The first snapshot is what was just loaded from the server.
     if (!confirmed.current) {
@@ -55,40 +68,44 @@ export function useAppRecordSync(
     }
     const known = confirmed.current;
     const key = `${organizationId}:${collection}`;
-    const changedOrRemoved =
-      items.some(item => known.get(item.id) !== item) || known.size !== new Set(items.map(item => item.id)).size;
-    if (!changedOrRemoved) {
+    const {changed, removed} = diff(known, items);
+    // While a write is in flight its outcome is not in `known` yet; that flush re-checks when it lands.
+    if (!changed.length && !removed.length && !busy.current) {
       if (pending.delete(key)) publish();
       return;
     }
     pending.add(key);
     publish();
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      queue.current = queue.current.then(async () => {
-        if (cancelled) return;
-        // Diff against what the server has confirmed at the moment this write starts.
-        const changed = items.filter(item => known.get(item.id) !== item);
-        const currentIds = new Set(items.map(item => item.id));
-        const removed = [...known.keys()].filter(id => !currentIds.has(id));
-        try {
-          if (changed.length) await writeAppRecords(organizationId, collection, changed);
-          if (removed.length) await deleteAppRecords(organizationId, collection, removed);
-          changed.forEach(item => known.set(item.id, item));
-          removed.forEach(id => known.delete(id));
-          failed.delete(key);
-          if (!cancelled) pending.delete(key);
-        } catch (error) {
-          console.error(`SurgiTrack: saving ${collection} failed`, error);
-          failed.add(key);
-          if (!cancelled) window.setTimeout(() => setRetryTick(tick => tick + 1), RETRY_DELAY_MS);
+    const flush = async () => {
+      busy.current = true;
+      try {
+        for (let round = 0; round < MAX_ROUNDS; round++) {
+          const next = diff(known, latest.current);
+          if (!next.changed.length && !next.removed.length) {
+            pending.delete(key);
+            break;
+          }
+          if (next.changed.length) await writeAppRecords(organizationId, collection, next.changed);
+          if (next.removed.length) await deleteAppRecords(organizationId, collection, next.removed);
+          next.changed.forEach(item => known.set(item.id, item));
+          next.removed.forEach(id => known.delete(id));
         }
+        failed.delete(key);
+        // Still changing after the last round: run another flush rather than wait for a render.
+        const rest = diff(known, latest.current);
+        if (rest.changed.length || rest.removed.length) setRetryTick(tick => tick + 1);
+      } catch (error) {
+        console.error(`SurgiTrack: saving ${collection} failed`, error);
+        failed.add(key);
+        window.setTimeout(() => setRetryTick(tick => tick + 1), RETRY_DELAY_MS);
+      } finally {
+        busy.current = false;
         publish();
-      });
-    }, SYNC_DELAY_MS);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
+      }
     };
+    const timer = window.setTimeout(() => {
+      queue.current = queue.current.then(flush);
+    }, SYNC_DELAY_MS);
+    return () => window.clearTimeout(timer);
   }, [organizationId, collection, items, retryTick]);
 }
