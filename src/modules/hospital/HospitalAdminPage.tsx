@@ -16,7 +16,7 @@ type Request = {
   email: string;
   status: 'PENDING_EMAIL' | 'PENDING' | 'APPROVED' | 'REJECTED';
   department_id: string | null;
-  created_at: string;
+  requested_at: string;
 };
 type Member = {
   id: string;
@@ -70,25 +70,23 @@ export default function HospitalAdminPage() {
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
         .from('staff_access_requests')
-        .select('id,full_name,email,status,department_id,created_at')
+        .select('id,full_name,email,status,department_id,requested_at')
         .eq('organization_id', organizationId)
         .in('status', ['PENDING', 'PENDING_EMAIL'])
-        .order('created_at'),
+        .order('requested_at'),
       supabase
         .from('profiles')
         .select('id,name,email,user_code,role,active,department_id')
         .eq('organization_id', organizationId)
         .order('name'),
     ]);
+    // Each part shows what it could load; one failing query does not blank the whole page.
+    if (org.data) setHospital(org.data.name);
+    if (deps.data) setDepartments(deps.data);
+    if (reqs.data) setRequests(reqs.data as Request[]);
+    if (profiles.data) setMembers(profiles.data as Member[]);
     const error = org.error || deps.error || reqs.error || profiles.error;
-    if (error) {
-      setNotice({kind: 'error', text: error.message});
-      return;
-    }
-    setHospital(org.data.name);
-    setDepartments(deps.data);
-    setRequests(reqs.data as Request[]);
-    setMembers(profiles.data as Member[]);
+    if (error) setNotice({kind: 'error', text: error.message});
   }, [organizationId]);
 
   useEffect(() => {
@@ -245,7 +243,7 @@ export default function HospitalAdminPage() {
                   <strong>{r.full_name}</strong>
                   <small>
                     {r.email} · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b> ·{' '}
-                    {date(r.created_at)}
+                    {date(r.requested_at)}
                   </small>
                 </div>
                 <label>
