@@ -844,7 +844,13 @@ export function SurgiProvider({
     return record;
   };
   const recordCount = (p: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => {
-    const c: SurgicalCount = {...p, id: `c${uniqueStamp()}`, at: formatStoreDateTime(), by: 'OR User', signed: true};
+    const c: SurgicalCount = {
+      ...p,
+      id: `c${uniqueStamp()}`,
+      at: formatStoreDateTime(),
+      by: currentUser.name,
+      signed: true,
+    };
     setCounts(x => [c, ...x]);
     const s = sets.find(x => x.id === p.setId);
     if (s) {

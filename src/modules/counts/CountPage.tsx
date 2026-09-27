@@ -2,14 +2,29 @@ import {useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import {Check, ScanBarcode, Signature, TriangleAlert} from 'lucide-react';
 export default function CountPage() {
-  const {sets, recordCount, counts} = useSurgi();
+  const {sets: allSets, recordCount, counts: allCounts, role, currentUser} = useSurgi();
+  // A department counts only its own sets and sees only its own counts (patient codes included).
+  const sets = useMemo(
+    () => (role === 'DEPARTMENT' ? allSets.filter(x => x.department === currentUser.department) : allSets),
+    [allSets, role, currentUser.department],
+  );
+  const counts = useMemo(() => {
+    const visible = new Set(sets.map(x => x.id));
+    return allCounts.filter(c => visible.has(c.setId));
+  }, [allCounts, sets]);
   const [setId, setSetId] = useState(sets[0]?.id || '');
-  const s = useMemo(() => sets.find(x => x.id === setId)!, [sets, setId]);
-  const [patientCode, setPatientCode] = useState('P-2026-10482');
+  const s = useMemo(() => sets.find(x => x.id === setId), [sets, setId]);
+  const [patientCode, setPatientCode] = useState('');
   const [counted, setCounted] = useState(s?.expected || 0);
   const [result, setResult] = useState<'OK' | 'MISSING' | 'DAMAGE'>('OK');
   const [note, setNote] = useState('');
-  if (!s) return null;
+  if (!s)
+    return (
+      <div className="empty">
+        <strong>Δεν υπάρχουν Σετ για καταμέτρηση</strong>
+        <span>Δεν βρέθηκαν Σετ του τμήματος {currentUser.department}.</span>
+      </div>
+    );
   const diff = counted - s.expected;
   const submit = () =>
     recordCount({
