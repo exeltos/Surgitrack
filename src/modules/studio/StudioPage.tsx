@@ -25,6 +25,8 @@ import {
   Save,
   Upload,
   Send,
+  UserCheck,
+  UserPlus,
   type LucideIcon,
 } from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -45,6 +47,8 @@ import {
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
+import SignupLinkCard from '../hospital/SignupLinkCard';
+import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
 import {departments as defaultDepartments} from '../../core/libraries';
 
@@ -142,6 +146,20 @@ export default function StudioPage() {
   const [userEditor, setUserEditor] = useState<AdminUser | null | undefined>(undefined);
   const [organizationEditor, setOrganizationEditor] = useState<Organization | null | undefined>(undefined);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
+  const [pendingRequests, setPendingRequests] = useState(0);
+  useEffect(() => {
+    setPendingRequests(0);
+    if (libs.dataMode !== 'PRODUCTION' || !selectedOrganizationId) return;
+    void countPendingAccessRequests(selectedOrganizationId).then(setPendingRequests);
+  }, [libs.dataMode, selectedOrganizationId]);
+  // Approvals happen in the hospital's own workspace, which loads that hospital's data.
+  const openHospitalAdministration = (organizationId: string) => {
+    sessionStorage.setItem('surgitrack-active-organization', organizationId);
+    sessionStorage.removeItem('surgitrack-session-user');
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+    window.location.hash = '#/hospital';
+    window.location.reload();
+  };
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
@@ -1280,82 +1298,109 @@ export default function StudioPage() {
                   <span>{L('Ενεργοί', 'Active')}</span>
                   <strong>{selectedOrgUsers.filter(u => u.active).length}</strong>
                 </div>
-              </div>
-            )}
-            {selectedOrganization && (
-              <section className="hospital-departments">
-                <header>
-                  <div>
-                    <b>{L('Τμήματα νοσοκομείου', 'Hospital departments')}</b>
-                    <small>
-                      {L(
-                        'Τα τμήματα χρησιμοποιούνται σε χρήστες, Σετ και ιχνηλασιμότητα.',
-                        'Departments are used by users, sets and traceability.',
-                      )}
-                    </small>
-                  </div>
-                  <AppButton
-                    onClick={() => {
-                      setLibraryKey('departments');
-                      setEditItem(null);
-                      setNewItem(true);
-                    }}
-                  >
-                    <Plus size={15} />
-                    {L('Νέο τμήμα', 'New department')}
-                  </AppButton>
-                </header>
-                <div className="hospital-department-list">
-                  {selectedOrgDepartments.map(d => (
-                    <div key={d.id}>
-                      <span>
-                        <b>{d.name}</b>
-                        <small>{d.code || '—'}</small>
-                      </span>
-                      <button
-                        onClick={() => {
-                          setLibraryKey('departments');
-                          setEditItem({id: d.id, el: d.name, en: d.name, code: d.code});
-                          setNewItem(false);
-                        }}
-                      >
-                        <Pencil size={14} />
-                      </button>
-                    </div>
-                  ))}
+                <div className={pendingRequests ? 'attention' : ''}>
+                  <UserPlus size={18} />
+                  <span>{L('Αιτήματα σε αναμονή', 'Pending requests')}</span>
+                  <strong>{pendingRequests}</strong>
                 </div>
-              </section>
+              </div>
             )}
             {selectedOrganization && (
-              <div className="hospital-user-actions">
-                <AppButton variant="primary" onClick={() => setUserEditor(null)}>
-                  <Plus size={16} />
-                  {L('Πρόσκληση χρήστη', 'Invite user')}
-                </AppButton>
+              <div className="hospital-access-row">
+                <section className="hospital-departments">
+                  <header>
+                    <div>
+                      <b>{L('Τμήματα νοσοκομείου', 'Hospital departments')}</b>
+                      <small>
+                        {L(
+                          'Τα τμήματα χρησιμοποιούνται σε χρήστες, Σετ και ιχνηλασιμότητα.',
+                          'Departments are used by users, sets and traceability.',
+                        )}
+                      </small>
+                    </div>
+                    <AppButton
+                      onClick={() => {
+                        setLibraryKey('departments');
+                        setEditItem(null);
+                        setNewItem(true);
+                      }}
+                    >
+                      <Plus size={15} />
+                      {L('Νέο τμήμα', 'New department')}
+                    </AppButton>
+                  </header>
+                  <div className="hospital-department-list">
+                    {selectedOrgDepartments.map(d => (
+                      <div key={d.id}>
+                        <span>
+                          <b>{d.name}</b>
+                          <small>{d.code || '—'}</small>
+                        </span>
+                        <button
+                          onClick={() => {
+                            setLibraryKey('departments');
+                            setEditItem({id: d.id, el: d.name, en: d.name, code: d.code});
+                            setNewItem(false);
+                          }}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
                 {libs.dataMode === 'PRODUCTION' && (
-                  <label className="app-button">
-                    <Upload size={16} />
-                    {L('Μαζική εισαγωγή CSV', 'Bulk CSV import')}
-                    <input
-                      type="file"
-                      accept=".csv,text/csv"
-                      hidden
-                      onChange={e => e.target.files?.[0] && void importCsv(e.target.files[0])}
-                    />
-                  </label>
+                  <SignupLinkCard organizationId={selectedOrganization.id} onError={setCloudError}>
+                    <div className="hospital-link-requests">
+                      <span>
+                        {pendingRequests
+                          ? L(
+                              `${pendingRequests} ${pendingRequests === 1 ? 'αίτημα περιμένει' : 'αιτήματα περιμένουν'} έγκριση`,
+                              `${pendingRequests} ${pendingRequests === 1 ? 'request is' : 'requests are'} awaiting approval`,
+                            )
+                          : L('Κανένα αίτημα σε αναμονή', 'No requests awaiting approval')}
+                      </span>
+                      <AppButton size="sm" onClick={() => openHospitalAdministration(selectedOrganization.id)}>
+                        <UserCheck size={14} />
+                        {L('Αιτήματα & έγκριση', 'Requests & approval')}
+                      </AppButton>
+                    </div>
+                  </SignupLinkCard>
                 )}
               </div>
             )}
-            <div className="studio-search">
-              <Search size={17} />
-              <input
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder={L(
-                  'Αναζήτηση χρήστη, email, τμήματος ή ρόλου...',
-                  'Search user, email, department or role...',
-                )}
-              />
+            <div className="hospital-users-toolbar">
+              <div className="studio-search">
+                <Search size={17} />
+                <input
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder={L(
+                    'Αναζήτηση χρήστη, email, τμήματος ή ρόλου...',
+                    'Search user, email, department or role...',
+                  )}
+                />
+              </div>
+              {selectedOrganization && (
+                <>
+                  <AppButton variant="primary" onClick={() => setUserEditor(null)}>
+                    <Plus size={16} />
+                    {L('Πρόσκληση χρήστη', 'Invite user')}
+                  </AppButton>
+                  {libs.dataMode === 'PRODUCTION' && (
+                    <label className="app-button">
+                      <Upload size={16} />
+                      {L('Μαζική εισαγωγή CSV', 'Bulk CSV import')}
+                      <input
+                        type="file"
+                        accept=".csv,text/csv"
+                        hidden
+                        onChange={e => e.target.files?.[0] && void importCsv(e.target.files[0])}
+                      />
+                    </label>
+                  )}
+                </>
+              )}
             </div>
             <div className="studio-user-head">
               <span>{L('Χρήστης', 'User')}</span>
@@ -1367,6 +1412,24 @@ export default function StudioPage() {
               <span></span>
             </div>
             <div className="studio-scroll-list">
+              {filteredUsers.length === 0 && (
+                <div className="hospital-users-empty">
+                  <Users size={22} />
+                  <strong>
+                    {query
+                      ? L('Κανένας χρήστης δεν ταιριάζει στην αναζήτηση.', 'No user matches the search.')
+                      : L('Δεν υπάρχουν χρήστες ακόμα.', 'No users yet.')}
+                  </strong>
+                  {!query && selectedOrganization && (
+                    <small>
+                      {L(
+                        'Στείλτε πρόσκληση στον διαχειριστή του νοσοκομείου ή μοιραστείτε τον σύνδεσμο εγγραφής.',
+                        "Invite the hospital's administrator or share the signup link.",
+                      )}
+                    </small>
+                  )}
+                </div>
+              )}
               {filteredUsers.map(u => (
                 <div className="studio-user-row" key={u.id}>
                   <div>

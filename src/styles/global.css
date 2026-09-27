@@ -645,3 +645,100 @@
     width: 100% !important;
   }
 }
+
+/* Studio — hospital access tab: natural height, no stretched gaps */
+.studio-body-users {
+  overflow-y: auto !important;
+  padding-bottom: 4px;
+}
+.studio-users-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 100%;
+  overflow: visible !important;
+}
+.studio-users-panel > .studio-scroll-list {
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+.hospital-admin-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+.hospital-admin-summary > div.attention {
+  border-color: #f4c27a !important;
+  background: #fffaf2 !important;
+}
+.hospital-admin-summary > div.attention strong {
+  color: #b54708;
+}
+.hospital-access-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin: 18px 22px 0;
+}
+.hospital-access-row > .hospital-departments {
+  margin: 0 !important;
+}
+.hospital-access-row .hospital-department-list {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+}
+.hospital-access-row > .hospital-link {
+  border-color: #e1e9ee;
+  border-radius: 13px;
+}
+.hospital-link-requests {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed #e3e9ee;
+  color: #526174;
+  font-size: 12px;
+  font-weight: 600;
+}
+.hospital-link-requests .app-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.hospital-users-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 22px 8px;
+}
+.hospital-users-toolbar > .studio-search {
+  flex: 1;
+  margin: 0 !important;
+}
+.hospital-users-toolbar .app-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  min-height: 39px !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.hospital-users-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 34px 16px;
+  color: #7d8d9c;
+  text-align: center;
+}
+.hospital-users-empty svg {
+  color: #9fb3bf;
+}
+.hospital-users-empty strong {
+  color: #33505f;
+  font-size: 13px;
+}
+.hospital-users-empty small {
+  font-size: 12px;
+}
