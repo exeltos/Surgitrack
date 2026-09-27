@@ -18,8 +18,8 @@ import {navigationFor} from '../../config/navigation';
 import {useSurgi, type UserRole} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
-import {useLibraries} from '../../core/LibraryStore';
-import {currentDemoView, demoDepartments, demoSessionUser, type DemoView} from '../../config/demoRoles';
+import RoleSwitcher from './RoleSwitcher';
+import {getRealIdentity} from '../../data/cloud/identity';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
@@ -41,8 +41,7 @@ const navEN: Record<string, string> = {
   'Σετ & Εργαλεία': 'Sets & Instruments',
 };
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
-  const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, switchIdentity, can} = useSurgi();
-  const {departments} = useLibraries();
+  const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, can} = useSurgi();
   const syncStatus = useSyncStatus();
   const {lang, setLang, fontScale, setFontScale, highContrast, setHighContrast, reducedMotion, setReducedMotion} =
     useAppPreferences();
@@ -58,7 +57,8 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const location = useLocation();
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
-  const platformOnly = !isDemo && role === 'ADMIN' && currentUser.department === 'Platform';
+  const platformOnly =
+    !isDemo && !!getRealIdentity()?.platform && !sessionStorage.getItem('surgitrack-active-organization');
   const navigation = platformOnly
     ? navigationFor(role, can).filter(item => item.to === '/studio')
     : navigationFor(role, can);
@@ -146,12 +146,6 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       return;
     }
     setScanMatches(matches);
-  };
-  // Demo: work as Admin, Sterilization or a specific department and see that environment.
-  const changeDemoView = (view: DemoView) => {
-    switchIdentity(demoSessionUser(view, departments));
-    navigate('/');
-    setMobileOpen(false);
   };
   const sidebar = (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
@@ -273,27 +267,8 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               )}
             </div>
           )}
-          {isDemo && (
-            <div className="role-switch">
-              <select
-                value={currentDemoView(role, currentUser, departments)}
-                onChange={e => changeDemoView(e.target.value as DemoView)}
-                title={lang === 'el' ? 'Προβολή ως ρόλος (μόνο Demo)' : 'View as role (Demo only)'}
-                aria-label={lang === 'el' ? 'Προβολή ως ρόλος' : 'View as role'}
-              >
-                <option value="ADMIN">Admin</option>
-                <option value="STERILIZATION">{lang === 'el' ? 'Αποστείρωση' : 'Sterilization'}</option>
-                <optgroup label={lang === 'el' ? 'Τμήματα' : 'Departments'}>
-                  {demoDepartments(departments).map(d => (
-                    <option key={d.id} value={`DEPARTMENT:${d.id}`}>
-                      {lang === 'el' ? d.el : d.en}
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
-            </div>
-          )}
-          {isDemo && syncStatus !== 'saved' && (
+          <RoleSwitcher />
+          {syncStatus !== 'saved' && (
             <span className={`sync-status ${syncStatus}`} role="status">
               {syncStatus === 'saving'
                 ? lang === 'el'

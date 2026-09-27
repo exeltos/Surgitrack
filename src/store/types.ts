@@ -43,6 +43,8 @@ export type SessionUser = {
   name: string;
   role: UserRole;
   department: string;
+  /** An admin working as another role or department of their hospital. */
+  viewAs?: boolean;
 };
 
 export type ReceivePayload = {

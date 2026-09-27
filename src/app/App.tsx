@@ -6,9 +6,16 @@ import AuthIndex from '../modules/auth/AuthIndex';
 import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
-import type {SessionUser, UserRole} from '../store/types';
+import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {supabase} from '../lib/supabase';
+import {
+  canViewAs,
+  clearIdentity,
+  productionOrganizationFor,
+  resolveIdentity,
+  sessionUserFor,
+} from '../data/cloud/identity';
 
 // Route pages are code-split so the sign-in screen and each workspace load only what they need.
 const SetsPage = lazy(() => import('../modules/sets/SetsPage'));
@@ -61,63 +68,34 @@ export default function App() {
   useEffect(() => {
     let mounted = true;
     const restoreSession = async () => {
-      const {data} = await supabase.auth.getSession();
-      if (!mounted) return;
       if (recoveryRef.current || /type=(recovery|invite)/.test(window.location.hash)) {
         setPasswordRecovery(true);
         setAuthenticated(false);
         setAuthReady(true);
         return;
       }
-      if (!data.session?.user) {
+      const result = await resolveIdentity();
+      if (!mounted) return;
+      if (result.status !== 'ok') {
+        if (result.status === 'inactive') {
+          await supabase.auth.signOut();
+          clearIdentity();
+        }
         setAuthenticated(false);
         setAuthReady(true);
         return;
       }
-      const sessionEmail = data.session.user.email?.toLowerCase();
-      let role: UserRole;
-      let user: SessionUser;
-      if (sessionEmail === 'info@exeltos.com') {
-        const {error: claimError} = await supabase.rpc('claim_platform_admin');
-        if (claimError) {
-          setAuthenticated(false);
-          setAuthReady(true);
-          return;
-        }
-        role = 'ADMIN';
-        user = {
-          id: data.session.user.id,
-          name: 'Platform Admin',
-          role: 'ADMIN',
-          department: 'Platform',
-        };
-        // In Demo the platform admin works as the role picked in the header; keep it across reloads.
-        const demoUser = getRuntimeDataMode() === 'DEMO' ? readDemoSessionUser() : undefined;
-        if (demoUser) {
-          role = demoUser.role;
-          user = demoUser;
-        }
-      } else {
-        const {data: profile} = await supabase
-          .from('profiles')
-          .select('id,name,email,role,active,organization_id,department_id')
-          .eq('id', data.session.user.id)
-          .single();
-        if (!mounted) return;
-        if (!profile?.active) {
-          await supabase.auth.signOut();
-          setAuthenticated(false);
-          setAuthReady(true);
-          return;
-        }
-        role = profile.role as UserRole;
-        user = {
-          id: profile.id,
-          name: profile.name,
-          role,
-          department: profile.organization_id ? profile.department_id || '' : 'Platform',
-        };
+      const identity = result.identity;
+      let user: SessionUser = sessionUserFor(identity);
+      // Keep the role picked in the header across reloads: any role in Demo, and for admins
+      // "view as" in their hospital (the platform admin only once a hospital is picked).
+      const chosen = readDemoSessionUser();
+      if (getRuntimeDataMode() === 'DEMO') {
+        if (identity.platform && chosen) user = chosen;
+      } else if (canViewAs(identity) && chosen?.viewAs && productionOrganizationFor(identity)) {
+        user = chosen;
       }
+      const role = user.role;
       sessionStorage.setItem('surgitrack-auth', '1');
       sessionStorage.setItem('surgitrack-demo-role', role);
       sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
@@ -144,15 +122,13 @@ export default function App() {
       listener.subscription.unsubscribe();
     };
   }, [setRole]);
-  const login = (role: UserRole = 'STERILIZATION', user?: SessionUser) => {
+  // After sign-in the page reloads so the workspace gate can load the user's hospital.
+  const login = () => {
     sessionStorage.setItem('surgitrack-auth', '1');
-    sessionStorage.setItem('surgitrack-demo-role', role);
-    if (user) sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
-    else sessionStorage.removeItem('surgitrack-session-user');
-    setRole(role);
-    setAuthenticated(true);
-    setGoodbye('');
-    navigate(roleHomePath(role), {replace: true});
+    sessionStorage.removeItem('surgitrack-session-user');
+    sessionStorage.removeItem('surgitrack-view-as');
+    window.location.hash = '#/';
+    window.location.reload();
   };
   const logout = async () => {
     const msg =
@@ -167,6 +143,7 @@ export default function App() {
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
     sessionStorage.removeItem('surgitrack-active-organization');
+    if (!wasDemo) clearIdentity();
     setRuntimeDataMode('PRODUCTION');
     if (wasDemo) {
       window.location.hash = '#/';
