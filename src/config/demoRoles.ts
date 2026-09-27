@@ -1,0 +1,45 @@
+import type {LibraryItem} from '../core/libraries';
+import type {SessionUser, UserRole} from '../store/types';
+
+/** Library code of the sterilization service; it is the Sterilization role, not a department role. */
+const STERILIZATION_DEPARTMENT_CODE = 'STER';
+
+/** Header choice in Demo: Admin, Sterilization, or one specific department from the library. */
+export type DemoView = 'ADMIN' | 'STERILIZATION' | `DEPARTMENT:${string}`;
+
+export const demoDepartments = (departments: readonly LibraryItem[]) =>
+  departments.filter(d => (d.code || '').toUpperCase() !== STERILIZATION_DEPARTMENT_CODE);
+
+/** The demo identity for a header choice; a department view works as that department's user. */
+export const demoSessionUser = (view: DemoView, departments: readonly LibraryItem[]): SessionUser => {
+  if (view === 'ADMIN') return {id: 'demo-admin', name: 'Demo Διαχειριστής', role: 'ADMIN', department: 'Διαχείριση'};
+  const sterilization = departments.find(d => (d.code || '').toUpperCase() === STERILIZATION_DEPARTMENT_CODE);
+  if (view === 'STERILIZATION')
+    return {
+      id: 'demo-sterilization',
+      name: 'Demo Αποστείρωση',
+      role: 'STERILIZATION',
+      department: sterilization?.el || 'Κεντρική Αποστείρωση',
+    };
+  const departmentId = view.slice('DEPARTMENT:'.length);
+  const department = demoDepartments(departments).find(d => d.id === departmentId) || demoDepartments(departments)[0];
+  return {
+    id: `demo-department-${department?.id || 'unit'}`,
+    name: `Demo · ${department?.el || 'Τμήμα'}`,
+    role: 'DEPARTMENT',
+    department: department?.el || 'Τμήμα',
+  };
+};
+
+/** The header choice matching the current role and identity. */
+export const currentDemoView = (role: UserRole, user: SessionUser, departments: readonly LibraryItem[]): DemoView => {
+  if (role !== 'DEPARTMENT') return role;
+  const department = demoDepartments(departments).find(d => d.el === user.department);
+  return `DEPARTMENT:${department?.id || demoDepartments(departments)[0]?.id || ''}`;
+};
+
+/** Stores the demo identity so the stores and a page reload pick it up. */
+export const applyDemoSessionUser = (user: SessionUser) => {
+  sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
+  sessionStorage.setItem('surgitrack-demo-role', user.role);
+};

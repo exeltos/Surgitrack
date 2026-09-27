@@ -1,4 +1,18 @@
-import type {Issue, Movement, SetAsset, Tool} from '../../types/domain';
+import type {
+  DeliveryRecord,
+  Issue,
+  Movement,
+  PreparationRecord,
+  ProcessLoadRecord,
+  RecallCase,
+  ReceiptRecord,
+  SetAsset,
+  SterilizationCycleRecord,
+  SterilizationReleaseRecord,
+  Tool,
+  WorkflowCheckpointRecord,
+} from '../../types/domain';
+import type {SurgicalCount} from '../../store/types';
 
 export type SurgiDataMode = 'DEMO' | 'PRODUCTION';
 
@@ -7,6 +21,16 @@ export type SurgiInitialData = {
   tools: Tool[];
   movements: Movement[];
   issues: Issue[];
+  // Workflow history; only present when loaded from a cloud workspace.
+  counts?: SurgicalCount[];
+  receipts?: ReceiptRecord[];
+  preparations?: PreparationRecord[];
+  sterilizationCycles?: SterilizationCycleRecord[];
+  processLoads?: ProcessLoadRecord[];
+  recallCases?: RecallCase[];
+  sterilizationReleases?: SterilizationReleaseRecord[];
+  workflowCheckpoints?: WorkflowCheckpointRecord[];
+  deliveries?: DeliveryRecord[];
 };
 
 /**

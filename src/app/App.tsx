@@ -7,7 +7,7 @@ import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser, UserRole} from '../store/types';
-import {setRuntimeDataMode} from '../config/dataMode';
+import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {supabase} from '../lib/supabase';
 
 // Route pages are code-split so the sign-in screen and each workspace load only what they need.
@@ -26,6 +26,15 @@ const MovementsPage = lazy(() => import('../modules/movements/MovementsPage'));
 const TraceabilityPage = lazy(() => import('../modules/traceability/TraceabilityPage'));
 const ReportsPage = lazy(() => import('../modules/reports/ReportsPage'));
 const StudioPage = lazy(() => import('../modules/studio/StudioPage'));
+
+const readDemoSessionUser = (): SessionUser | undefined => {
+  try {
+    const user = JSON.parse(sessionStorage.getItem('surgitrack-session-user') || 'null') as SessionUser | null;
+    return user?.id && user.role && user.role === sessionStorage.getItem('surgitrack-demo-role') ? user : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 function RoleHome() {
   const {role} = useSurgi();
@@ -82,6 +91,12 @@ export default function App() {
           role: 'ADMIN',
           department: 'Platform',
         };
+        // In Demo the platform admin works as the role picked in the header; keep it across reloads.
+        const demoUser = getRuntimeDataMode() === 'DEMO' ? readDemoSessionUser() : undefined;
+        if (demoUser) {
+          role = demoUser.role;
+          user = demoUser;
+        }
       } else {
         const {data: profile} = await supabase
           .from('profiles')
