@@ -3631,7 +3631,8 @@
   white-space: nowrap;
 }
 .platform-demo-actions {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
   gap: 6px;
 }
 .platform-demo-actions button {
