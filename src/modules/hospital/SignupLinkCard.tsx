@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState, type ReactNode} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {Check, Copy, Link2, RefreshCw, ShieldOff} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
@@ -14,10 +14,12 @@ type Link = {token: string; expires_at: string};
 export default function SignupLinkCard({
   organizationId,
   onError,
+  refreshKey = 0,
   children,
 }: {
   organizationId: string;
   onError?: (message: string) => void;
+  refreshKey?: number;
   children?: ReactNode;
 }) {
   const {lang} = useAppPreferences();
@@ -25,24 +27,34 @@ export default function SignupLinkCard({
   const L = (gr: string, en: string) => (el ? gr : en);
   const [link, setLink] = useState<Link | null>(null);
   const [copied, setCopied] = useState(false);
+  // Bumped after our own changes; `refreshKey` lets the page's Refresh button reload the link too.
+  const [version, setVersion] = useState(0);
+  const reportError = useRef(onError);
+  reportError.current = onError;
 
-  const load = useCallback(async () => {
-    const {data, error} = await supabase
+  useEffect(() => {
+    // A response for a hospital that is no longer selected is dropped, so the card never shows
+    // (or copies) another hospital's link after a quick switch.
+    let current = true;
+    setLink(null);
+    void supabase
       .from('signup_links')
       .select('token,expires_at')
       .eq('organization_id', organizationId)
       .is('revoked_at', null)
       .gt('expires_at', new Date().toISOString())
       .order('created_at', {ascending: false})
-      .limit(1);
-    if (error) onError?.(error.message);
-    else setLink(data[0] || null);
-  }, [organizationId, onError]);
-
-  useEffect(() => {
-    setLink(null);
-    void load();
-  }, [load]);
+      .limit(1)
+      .then(({data, error}) => {
+        if (!current) return;
+        if (error) reportError.current?.(error.message);
+        else setLink(data[0] || null);
+      });
+    return () => {
+      current = false;
+    };
+  }, [organizationId, version, refreshKey]);
+  const reload = () => setVersion(v => v + 1);
 
   const create = async () => {
     if (
@@ -54,13 +66,13 @@ export default function SignupLinkCard({
       return;
     const {error} = await supabase.rpc('hospital_create_signup_link', {p_org: organizationId});
     if (error) onError?.(error.message);
-    else await load();
+    else reload();
   };
   const revoke = async () => {
     if (!window.confirm(L('Ανάκληση του συνδέσμου εγγραφής;', 'Revoke the signup link?'))) return;
     const {error} = await supabase.rpc('hospital_revoke_signup_links', {p_org: organizationId});
     if (error) onError?.(error.message);
-    else await load();
+    else reload();
   };
   const copy = async () => {
     if (!link) return;

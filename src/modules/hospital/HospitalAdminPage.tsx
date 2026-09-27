@@ -55,6 +55,7 @@ export default function HospitalAdminPage() {
   const [editing, setEditing] = useState<{id: string; name: string; code: string} | null>(null);
   const [notice, setNotice] = useState<{kind: 'ok' | 'error'; text: string} | null>(null);
   const [busy, setBusy] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
@@ -199,7 +200,13 @@ export default function HospitalAdminPage() {
           'Departments, the staff signup link and approval of new users.',
         )}
         actions={
-          <AppButton onClick={() => void load()} icon={<RefreshCw size={15} />}>
+          <AppButton
+            onClick={() => {
+              setRefreshKey(k => k + 1);
+              void load();
+            }}
+            icon={<RefreshCw size={15} />}
+          >
             {L('Ανανέωση', 'Refresh')}
           </AppButton>
         }
@@ -298,7 +305,7 @@ export default function HospitalAdminPage() {
           )}
         </section>
 
-        <SignupLinkCard organizationId={organizationId} onError={showError} />
+        <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />
 
         <section className="hospital-card hospital-departments-card">
           <header>
