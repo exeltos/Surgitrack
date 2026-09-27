@@ -775,7 +775,13 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  max-width: none;
-  margin: 0;
-  padding: 40px max(32px, calc((100% - 1076px) / 2));
+}
+/* On desktop the scroll area spans the window (scrollbar at the edge); narrower screens keep
+   their own width and padding rules for .auth-main. */
+@media (min-width: 851px) {
+  .auth-page > .auth-main {
+    max-width: none;
+    margin: 0;
+    padding: 40px max(32px, calc((100% - 1076px) / 2));
+  }
 }
