@@ -38,6 +38,26 @@ export const currentDemoView = (role: UserRole, user: SessionUser, departments: 
   return `DEPARTMENT:${department?.id || demoDepartments(departments)[0]?.id || ''}`;
 };
 
+/**
+ * An admin working as another role or department of their own hospital: the actions stay theirs,
+ * so the history records their name with the role they were working as.
+ */
+export const viewAsSessionUser = (
+  view: DemoView,
+  departments: readonly LibraryItem[],
+  admin: {id: string; name: string},
+): SessionUser => {
+  const target = demoSessionUser(view, departments);
+  const as = view === 'ADMIN' ? 'Admin' : target.department;
+  return {
+    id: admin.id,
+    name: `${admin.name} (ως ${as})`,
+    role: target.role,
+    department: target.department,
+    viewAs: true,
+  };
+};
+
 /** Stores the demo identity so the stores and a page reload pick it up. */
 export const applyDemoSessionUser = (user: SessionUser) => {
   sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));

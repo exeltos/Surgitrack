@@ -84,13 +84,15 @@ export function LibraryStoreProvider({
     const initial = repository.getInitialData();
     const saved = cloud && libraryFromRecords(cloud.records);
     // Stored libraries are merged over the defaults so fields added later still get a value.
-    return saved
+    const state = saved
       ? ({
           ...initial,
           ...saved,
           systemSettings: {...initial.systemSettings, ...(saved.systemSettings as object)},
         } as LibraryState)
       : load(repository);
+    // A real hospital's departments are managed in Studio; they always win over a stored copy.
+    return cloud?.departments ? {...state, departments: cloud.departments} : state;
   });
   // With a cloud workspace the library is saved to Supabase instead of this browser.
   const localStorageKey = !cloud && repository.mode === 'DEMO' ? repository.storageKey : '';
