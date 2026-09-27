@@ -544,7 +544,7 @@ export default function StudioPage() {
     <div className="studio-workspace">
       <div className="studio-head">
         <div>
-          <span className="eyebrow">ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ</span>
+          <span className="eyebrow">{L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')}</span>
           <h1>{L('SurgiTrack Studio', 'SurgiTrack Studio')}</h1>
           <p>
             {L(
