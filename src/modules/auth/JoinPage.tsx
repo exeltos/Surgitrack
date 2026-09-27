@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Building2, Eye, EyeOff, LockKeyhole, Mail, MailCheck, ShieldCheck, UserRound} from 'lucide-react';
+import {Building2, Eye, EyeOff, Languages, LockKeyhole, Mail, MailCheck, ShieldCheck, UserRound} from 'lucide-react';
 import {FunctionsHttpError} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -121,6 +121,7 @@ export default function JoinPage({token}: {token: string}) {
           </div>
         </div>
         <button className="auth-lang" onClick={() => setLang(el ? 'en' : 'el')}>
+          <Languages size={16} />
           <span>{el ? 'EN' : 'EL'}</span>
         </button>
       </header>

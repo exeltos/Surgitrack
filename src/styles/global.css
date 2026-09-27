@@ -758,3 +758,30 @@
     flex-basis: 100%;
   }
 }
+
+/* Sign-in / signup pages: header and footer stay put, only the middle scrolls (the Greek copy
+   is longer, so the page height must not decide whether the footer is visible). */
+.auth-page {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.auth-topbar,
+.auth-footer {
+  flex-shrink: 0;
+}
+.auth-page > .auth-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+/* On desktop the scroll area spans the window (scrollbar at the edge); narrower screens keep
+   their own width and padding rules for .auth-main. */
+@media (min-width: 851px) {
+  .auth-page > .auth-main {
+    max-width: none;
+    margin: 0;
+    padding: 40px max(32px, calc((100% - 1076px) / 2));
+  }
+}
