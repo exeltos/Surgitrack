@@ -44,7 +44,7 @@ export default function StandaloneToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ΛΕΙΤΟΥΡΓΙΚΗ ΛΙΣΤΑ"
+        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
         title="Μεμονωμένα εργαλεία σε χρήση"
         description="Μόνο φυσικά εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα και δεν ανήκουν αυτή τη στιγμή σε Σετ."
         actions={
@@ -163,8 +163,8 @@ export default function StandaloneToolsPage() {
                         </span>
                       </div>
                     </td>
-                    <td>{t.code}</td>
-                    <td className="mono">{t.barcode}</td>
+                    <td className="cell-nowrap">{t.code}</td>
+                    <td className="mono cell-nowrap">{t.barcode}</td>
                     <td>{t.manufacturer || '—'}</td>
                     <td>{t.department || '—'}</td>
                     <td>

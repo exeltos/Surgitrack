@@ -45,7 +45,7 @@ export default function ToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ASSET MANAGEMENT"
+        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
         title="Εργαλεία"
         description="Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Stock, σε Σετ ή χρησιμοποιούνται μεμονωμένα."
         actions={
@@ -131,7 +131,7 @@ export default function ToolsPage() {
               <th>Εταιρεία</th>
               <th>Ειδικότητα</th>
               <th>Θέση</th>
-              <th>Χρήσεις</th>
+              <th>Υπόλοιπο χρήσεων</th>
               <th>Κατάσταση</th>
               <th></th>
             </tr>
@@ -185,7 +185,7 @@ export default function ToolsPage() {
                           </span>
                         </div>
                       </td>
-                      <td>{t.code}</td>
+                      <td className="cell-nowrap">{t.code}</td>
                       <td>
                         <Link className="mono strong-link" to={`/tools/${t.id}`}>
                           {t.barcode}
@@ -210,11 +210,11 @@ export default function ToolsPage() {
                           </>
                         )}
                       </td>
-                      <td>
+                      <td className="cell-nowrap">
                         {t.maxUses ? (
                           <>
                             <b>{Math.max(0, t.maxUses - t.uses)}</b>
-                            <span className="muted"> υπόλοιπο / {t.maxUses}</span>
+                            <span className="muted"> / {t.maxUses}</span>
                           </>
                         ) : (
                           <span className="muted">Χωρίς όριο</span>

@@ -33,7 +33,7 @@ export default function StockPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ASSET MANAGEMENT"
+        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
         title="Stock εργαλείων"
         description="Διαθέσιμα φυσικά εργαλεία για αντικατάσταση, σύνθεση Σετ ή αυτόνομη διάθεση."
         actions={
@@ -100,8 +100,8 @@ export default function StockPage() {
           <tbody>
             {filtered.map(t => (
               <tr key={t.id}>
-                <td className="mono">{t.barcode}</td>
-                <td>{t.code}</td>
+                <td className="mono cell-nowrap">{t.barcode}</td>
+                <td className="cell-nowrap">{t.code}</td>
                 <td>
                   <div className="registry-asset-name">
                     <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />

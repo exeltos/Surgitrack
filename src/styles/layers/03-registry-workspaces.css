@@ -134,6 +134,10 @@
   background: #f7fbfc;
 }
 .asset-registry-table th:first-child,
+.asset-registry-table .cell-nowrap {
+  /* Codes, barcodes and use counts are read as one token: never split them across lines. */
+  white-space: nowrap;
+}
 .asset-registry-table td:first-child {
   padding-left: 16px;
 }

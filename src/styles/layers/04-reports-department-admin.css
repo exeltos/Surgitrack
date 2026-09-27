@@ -627,11 +627,11 @@
   min-width: 0;
 }
 .ledger-route i {
+  /* Department names are the point of this column: wrap them instead of cutting them off. */
   font-style: normal;
   font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 .movement-chip {
   display: inline-flex;

@@ -17,6 +17,7 @@ export default function TraceabilityPage() {
     <>
       <div className="page-head">
         <div>
+          <span className="eyebrow">ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ</span>
           <h1>Ιχνηλάτηση</h1>
           <p>Αναζήτηση από barcode Set/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.</p>
         </div>

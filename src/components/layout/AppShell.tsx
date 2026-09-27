@@ -57,6 +57,14 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const navigate = useNavigate();
   const location = useLocation();
   const isDemo = getRuntimeDataMode() === 'DEMO';
+  // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
+  const platformOnly = !isDemo && role === 'ADMIN' && currentUser.department === 'Platform';
+  const navigation = platformOnly
+    ? navigationFor(role, can).filter(item => item.to === '/studio')
+    : navigationFor(role, can);
+  useEffect(() => {
+    if (platformOnly && !location.pathname.startsWith('/studio')) navigate('/studio', {replace: true});
+  }, [platformOnly, location.pathname, navigate]);
   const returnFromDemo = () => {
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
@@ -168,11 +176,17 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       <div className="workspace-label">
         <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
         <strong>
-          {role === 'DEPARTMENT' ? `${roleLabel[role][lang]} · ${currentUser.department}` : roleLabel[role][lang]}
+          {role === 'DEPARTMENT'
+            ? `${roleLabel[role][lang]} · ${currentUser.department}`
+            : platformOnly
+              ? lang === 'el'
+                ? 'Διαχείριση πλατφόρμας'
+                : 'Platform administration'
+              : roleLabel[role][lang]}
         </strong>
       </div>
       <nav>
-        {navigationFor(role, can).map(item => {
+        {navigation.map(item => {
           const [path, query = ''] = item.to.split('?');
           const active =
             location.pathname === path &&
@@ -220,43 +234,45 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             <Home size={15} />
             <span>SurgiTrack</span>
           </button>
-          <div className="global-scan-wrap">
-            <form
-              className="global-scan"
-              onSubmit={e => {
-                e.preventDefault();
-                runGlobalSearch();
-              }}
-            >
-              <Search size={16} />
-              <input
-                value={scan}
-                onChange={e => {
-                  setScan(e.target.value);
-                  if (!e.target.value.trim()) setScanMatches([]);
+          {!platformOnly && (
+            <div className="global-scan-wrap">
+              <form
+                className="global-scan"
+                onSubmit={e => {
+                  e.preventDefault();
+                  runGlobalSearch();
                 }}
-                placeholder={lang === 'el' ? 'Scan / αναζήτηση S..., T...' : 'Scan / search S..., T...'}
-              />
-            </form>
-            {scanMatches.length > 1 && (
-              <div className="global-scan-results">
-                {scanMatches.map(a => (
-                  <button
-                    key={`${a.kind}-${a.id}`}
-                    onClick={() => {
-                      setScanMatches([]);
-                      setScan('');
-                      navigate(a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`);
-                    }}
-                  >
-                    <strong className="mono">{a.barcode}</strong>
-                    <span>{a.name}</span>
-                    <small>{a.code}</small>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+              >
+                <Search size={16} />
+                <input
+                  value={scan}
+                  onChange={e => {
+                    setScan(e.target.value);
+                    if (!e.target.value.trim()) setScanMatches([]);
+                  }}
+                  placeholder={lang === 'el' ? 'Scan / αναζήτηση S..., T...' : 'Scan / search S..., T...'}
+                />
+              </form>
+              {scanMatches.length > 1 && (
+                <div className="global-scan-results">
+                  {scanMatches.map(a => (
+                    <button
+                      key={`${a.kind}-${a.id}`}
+                      onClick={() => {
+                        setScanMatches([]);
+                        setScan('');
+                        navigate(a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`);
+                      }}
+                    >
+                      <strong className="mono">{a.barcode}</strong>
+                      <span>{a.name}</span>
+                      <small>{a.code}</small>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {isDemo && (
             <div className="role-switch">
               <select

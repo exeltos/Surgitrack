@@ -25,6 +25,7 @@ export default function IssuesPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
+        eyebrow="ΠΑΡΑΚΟΛΟΥΘΗΣΗ"
         title="Εκκρεμότητες"
         description={
           role === 'DEPARTMENT'

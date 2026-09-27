@@ -544,7 +544,7 @@ export default function StudioPage() {
     <div className="studio-workspace">
       <div className="studio-head">
         <div>
-          <span className="eyebrow">SURGITRACK ADMIN</span>
+          <span className="eyebrow">{L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')}</span>
           <h1>{L('SurgiTrack Studio', 'SurgiTrack Studio')}</h1>
           <p>
             {L(
@@ -629,7 +629,7 @@ export default function StudioPage() {
               <div className="studio-overview-card">
                 <header>
                   <div>
-                    <span className="eyebrow">CORE LIBRARIES</span>
+                    <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΕΣ', 'LIBRARIES')}</span>
                     <h2>{L('Βιβλιοθήκες SurgiTrack', 'SurgiTrack libraries')}</h2>
                   </div>
                   <AppButton onClick={() => selectTab('LIBRARIES')}>{L('Διαχείριση', 'Manage')}</AppButton>
@@ -662,7 +662,7 @@ export default function StudioPage() {
               <div className="studio-overview-card">
                 <header>
                   <div>
-                    <span className="eyebrow">ACCESS CONTROL</span>
+                    <span className="eyebrow">{L('ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ', 'ACCESS CONTROL')}</span>
                     <h2>{L('Πρόσβαση χρηστών', 'User access')}</h2>
                   </div>
                   <AppButton onClick={() => selectTab('USERS')}>{L('Χρήστες', 'Users')}</AppButton>
@@ -700,7 +700,7 @@ export default function StudioPage() {
           <section className="studio-manager-panel studio-platform-panel">
             <header className="studio-panel-head">
               <div>
-                <span className="eyebrow">PLATFORM ADMIN</span>
+                <span className="eyebrow">{L('ΝΟΣΟΚΟΜΕΙΑ', 'HOSPITALS')}</span>
                 <h2>{L('Νοσοκομεία & πρόσβαση Demo', 'Hospitals & Demo access')}</h2>
                 <p>
                   {L(
@@ -872,7 +872,7 @@ export default function StudioPage() {
             <section className="studio-manager-panel">
               <header className="studio-panel-head">
                 <div>
-                  <span className="eyebrow">LIBRARY</span>
+                  <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΗ', 'LIBRARY')}</span>
                   <h2>{L(currentMeta.el, currentMeta.en)}</h2>
                   <p>{L(currentMeta.hintEl, currentMeta.hintEn)}</p>
                 </div>
@@ -954,7 +954,7 @@ export default function StudioPage() {
           <div className="studio-workflow-page">
             <section className="studio-workflow-hero">
               <div>
-                <span className="eyebrow">CSSD WORKFLOW ENGINE</span>
+                <span className="eyebrow">{L('ΡΟΗ ΕΡΓΑΣΙΑΣ CSSD', 'CSSD WORKFLOW')}</span>
                 <h2>{L('Ροή επανεπεξεργασίας', 'Reprocessing workflow')}</h2>
                 <p>
                   {L(
@@ -1241,7 +1241,7 @@ export default function StudioPage() {
           <section className="studio-manager-panel studio-users-panel">
             <header className="studio-panel-head">
               <div>
-                <span className="eyebrow">HOSPITAL ACCESS</span>
+                <span className="eyebrow">{L('ΠΡΟΣΒΑΣΗ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL ACCESS')}</span>
                 <h2>
                   {selectedOrganization ? selectedOrganization.name : L('Χρήστες & Τμήματα', 'Users & Departments')}
                 </h2>
@@ -1464,7 +1464,7 @@ export default function StudioPage() {
             <section className="studio-role-permission-panel">
               <header className="studio-role-permission-head">
                 <div>
-                  <span className="eyebrow">{L('ROLE PERMISSIONS', 'ROLE PERMISSIONS')}</span>
+                  <span className="eyebrow">{L('ΔΙΚΑΙΩΜΑΤΑ ΡΟΛΟΥ', 'ROLE PERMISSIONS')}</span>
                   <h2>{L(roles.find(r => r.id === selectedRole)!.el, roles.find(r => r.id === selectedRole)!.en)}</h2>
                   <p>
                     {L(
@@ -1902,7 +1902,7 @@ function OrganizationEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">PLATFORM ADMIN</span>
+            <span className="eyebrow">ΝΟΣΟΚΟΜΕΙΟ</span>
             <h2>{organization ? 'Επεξεργασία νοσοκομείου' : 'Νέο νοσοκομείο'}</h2>
           </div>
           <button onClick={onClose}>
@@ -1980,7 +1980,7 @@ function UserEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">ACCESS CONTROL</span>
+            <span className="eyebrow">ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ</span>
             <h2>{user ? 'Επεξεργασία χρήστη' : 'Νέος χρήστης'}</h2>
           </div>
           <button onClick={onClose}>
