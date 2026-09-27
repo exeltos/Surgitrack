@@ -27,6 +27,10 @@ const errorText = (code: string, el: boolean) => {
       return el ? 'Ο σύνδεσμος εγγραφής έληξε ή ανακλήθηκε.' : 'This signup link has expired or was revoked.';
     case 'department_invalid':
       return el ? 'Το τμήμα δεν είναι πλέον διαθέσιμο.' : 'The department is no longer available.';
+    case 'confirmation_failed':
+      return el
+        ? 'Δεν ήταν δυνατή η αποστολή του email επιβεβαίωσης. Δοκιμάστε ξανά σε λίγο.'
+        : 'The confirmation email could not be sent. Please try again shortly.';
     case 'too_many_attempts':
       return el ? 'Πολλές προσπάθειες. Δοκιμάστε ξανά αργότερα.' : 'Too many attempts. Try again later.';
     case 'invalid_input':

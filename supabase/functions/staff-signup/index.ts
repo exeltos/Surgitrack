@@ -94,12 +94,17 @@ Deno.serve(async req => {
       await admin.auth.admin.deleteUser(created.user.id);
       return json({error: "signup_failed"}, 500);
     }
-    await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
-
     // Supabase sends its (customised) confirmation email; the link returns to the app.
     const auth = createClient(url, anon, {auth: {persistSession: false, autoRefreshToken: false}});
     const {error: mailError} = await auth.auth.resend({type: "signup", email, options: {emailRedirectTo: redirectTo}});
-    return json({ok: true, confirmation_sent: !mailError});
+    if (mailError) {
+      // Without the confirmation email the account could never be activated, and the address would be
+      // stuck as "already registered": undo the signup (the request goes with the user) so it can be retried.
+      await admin.auth.admin.deleteUser(created.user.id);
+      return json({error: "confirmation_failed"}, 502);
+    }
+    await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
+    return json({ok: true});
   } catch {
     return json({error: "signup_failed"}, 500);
   }
