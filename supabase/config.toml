@@ -4,3 +4,8 @@ project_id = "oklyqnoqzbhjudqbkulq"
 # require a user JWT. The function authenticates by checking the password itself.
 [functions.login-with-code]
 verify_jwt = false
+
+# Public staff signup through a hospital's signup link: the caller has no account yet.
+# The function validates the link token and throttles by IP itself.
+[functions.staff-signup]
+verify_jwt = false

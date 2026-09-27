@@ -1,8 +1,9 @@
 import {lazy, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
-import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
+import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import AuthIndex from '../modules/auth/AuthIndex';
+import PendingAccess from '../modules/auth/PendingAccess';
 import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
@@ -10,6 +11,7 @@ import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {supabase} from '../lib/supabase';
 import {
+  type AccessRequest,
   canViewAs,
   clearIdentity,
   productionOrganizationFor,
@@ -33,6 +35,8 @@ const MovementsPage = lazy(() => import('../modules/movements/MovementsPage'));
 const TraceabilityPage = lazy(() => import('../modules/traceability/TraceabilityPage'));
 const ReportsPage = lazy(() => import('../modules/reports/ReportsPage'));
 const StudioPage = lazy(() => import('../modules/studio/StudioPage'));
+const HospitalAdminPage = lazy(() => import('../modules/hospital/HospitalAdminPage'));
+const JoinPage = lazy(() => import('../modules/auth/JoinPage'));
 
 const readDemoSessionUser = (): SessionUser | undefined => {
   try {
@@ -57,7 +61,9 @@ export default function App() {
   const {setRole, currentUser} = useSurgi();
   const {lang} = useAppPreferences();
   const navigate = useNavigate();
+  const location = useLocation();
   const [authenticated, setAuthenticated] = useState(false);
+  const [accessRequest, setAccessRequest] = useState<AccessRequest>();
   const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
   const [passwordRecovery, setPasswordRecovery] = useState(() => /type=(recovery|invite)/.test(window.location.hash));
@@ -76,6 +82,12 @@ export default function App() {
       }
       const result = await resolveIdentity();
       if (!mounted) return;
+      if (result.status === 'pending') {
+        setAccessRequest(result.request);
+        setAuthenticated(false);
+        setAuthReady(true);
+        return;
+      }
       if (result.status !== 'ok') {
         if (result.status === 'inactive') {
           await supabase.auth.signOut();
@@ -154,7 +166,28 @@ export default function App() {
     setAuthenticated(false);
     navigate('/', {replace: true});
   };
+  // A hospital's signup link is public: it works signed in or not.
+  const joinToken = /^\/join\/([0-9a-f]{16,})$/.exec(location.pathname)?.[1];
+  if (joinToken)
+    return (
+      <Suspense fallback={null}>
+        <JoinPage token={joinToken} />
+      </Suspense>
+    );
   if (!authReady) return null;
+  if (accessRequest)
+    return (
+      <PendingAccess
+        request={accessRequest}
+        onSignOut={async () => {
+          await supabase.auth.signOut();
+          clearIdentity();
+          sessionStorage.removeItem('surgitrack-auth');
+          setAccessRequest(undefined);
+          navigate('/', {replace: true});
+        }}
+      />
+    );
   if (!authenticated)
     return (
       <AuthIndex
@@ -294,6 +327,14 @@ export default function App() {
           element={
             <Guard permission="studio.manage">
               <StudioPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/hospital"
+          element={
+            <Guard permission="studio.manage">
+              <HospitalAdminPage />
             </Guard>
           }
         />
