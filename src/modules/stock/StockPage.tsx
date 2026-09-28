@@ -9,6 +9,7 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
 import KpiStrip from '../../components/ui/KpiStrip';
+import {tr, trData} from '../../i18n';
 
 export default function StockPage() {
   const {tools, sets, moveTool, can} = useSurgi();
@@ -33,15 +34,15 @@ export default function StockPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
-        title="Stock εργαλείων"
-        description="Διαθέσιμα φυσικά εργαλεία για αντικατάσταση, σύνθεση Σετ ή αυτόνομη διάθεση."
+        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        title={tr('Stock εργαλείων')}
+        description={tr('Διαθέσιμα φυσικά εργαλεία για αντικατάσταση, σύνθεση Σετ ή αυτόνομη διάθεση.')}
         actions={
           <div className="actions asset-page-actions">
-            <AppButton icon={<FileUp size={16} />}>Μαζικό upload</AppButton>
+            <AppButton icon={<FileUp size={16} />}>{tr('Μαζικό upload')}</AppButton>
             {can('asset.create') && (
               <AppButton variant="primary" icon={<Plus size={16} />} onClick={() => navigate('/tools/new')}>
-                Νέο Εργαλείο
+                {tr('Νέο Εργαλείο')}
               </AppButton>
             )}
           </div>
@@ -49,51 +50,51 @@ export default function StockPage() {
       />
       <KpiStrip
         items={[
-          {label: 'Διαθέσιμα', value: stock.length},
-          {label: 'Με όριο χρήσεων', value: stock.filter(t => t.maxUses).length},
-          {label: 'Σετ με έλλειψη', value: sets.filter(s => s.actual < s.expected).length},
+          {label: tr('Διαθέσιμα'), value: stock.length},
+          {label: tr('Με όριο χρήσεων'), value: stock.filter(t => t.maxUses).length},
+          {label: tr('Σετ με έλλειψη'), value: sets.filter(s => s.actual < s.expected).length},
         ]}
       />
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
-        placeholder="Ονομασία, κωδικός, barcode ή serial..."
+        placeholder={tr('Ονομασία, κωδικός, barcode ή serial...')}
         filters={[
           {
             key: 'specialty',
             value: specialty,
-            placeholder: 'Όλες οι ειδικότητες',
+            placeholder: tr('Όλες οι ειδικότητες'),
             options: values('specialty').map(value => ({value, label: value})),
             onChange: setSpecialty,
           },
           {
             key: 'manufacturer',
             value: manufacturer,
-            placeholder: 'Όλες οι εταιρείες',
+            placeholder: tr('Όλες οι εταιρείες'),
             options: values('manufacturer').map(value => ({value, label: value})),
             onChange: setManufacturer,
           },
           {
             key: 'state',
             value: state,
-            placeholder: 'Όλες οι καταστάσεις',
+            placeholder: tr('Όλες οι καταστάσεις'),
             options: values('state').map(value => ({value, label: value})),
             onChange: setState,
           },
         ]}
       />
-      <ScrollableListPanel withKpis ariaLabel="Stock εργαλείων">
+      <ScrollableListPanel withKpis ariaLabel={tr('Stock εργαλείων')}>
         <table className="asset-registry-table">
           <thead>
             <tr>
               <th>Barcode</th>
-              <th>Κωδικός</th>
-              <th>Εργαλείο</th>
-              <th>Κατασκευαστής</th>
-              <th>Ειδικότητα</th>
-              <th>Χρήσεις</th>
-              <th>Κατάσταση</th>
-              <th>Προσθήκη σε Σετ</th>
+              <th>{tr('Κωδικός')}</th>
+              <th>{tr('Εργαλείο')}</th>
+              <th>{tr('Κατασκευαστής')}</th>
+              <th>{tr('Ειδικότητα')}</th>
+              <th>{tr('Χρήσεις')}</th>
+              <th>{tr('Κατάσταση')}</th>
+              <th>{tr('Προσθήκη σε Σετ')}</th>
               <th></th>
             </tr>
           </thead>
@@ -111,7 +112,7 @@ export default function StockPage() {
                   </div>
                 </td>
                 <td>{t.manufacturer}</td>
-                <td>{t.specialty || '—'}</td>
+                <td>{trData(t.specialty) || '—'}</td>
                 <td>{t.maxUses ? `${t.uses}/${t.maxUses}` : '—'}</td>
                 <td>
                   <StatusBadge value={t.state} />
@@ -119,7 +120,7 @@ export default function StockPage() {
                 <td>
                   <div className="inline-action">
                     <select value={target[t.id] || ''} onChange={e => setTarget(x => ({...x, [t.id]: e.target.value}))}>
-                      <option value="">Επιλογή Σετ...</option>
+                      <option value="">{tr('Επιλογή Σετ...')}</option>
                       {sets.map(s => (
                         <option key={s.id} value={s.id}>
                           {s.barcode} · {s.name}
@@ -132,7 +133,7 @@ export default function StockPage() {
                       icon={<ArrowRightLeft size={15} />}
                       onClick={() => moveTool(t.id, 'SET', target[t.id])}
                     >
-                      Προσθήκη
+                      {tr('Προσθήκη')}
                     </AppButton>
                   </div>
                 </td>

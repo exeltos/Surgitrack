@@ -34,6 +34,7 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
+import {tr, trData} from '../../i18n';
 
 export default function SetDetailPage() {
   const {
@@ -104,20 +105,20 @@ export default function SetDetailPage() {
   if (!set)
     return (
       <div className="empty">
-        <strong>Το Set δεν βρέθηκε.</strong>
-        <span>Επιστρέψτε στη λίστα των Set και επιλέξτε ξανά.</span>
+        <strong>{tr('Το Set δεν βρέθηκε.')}</strong>
+        <span>{tr('Επιστρέψτε στη λίστα των Set και επιλέξτε ξανά.')}</span>
         <Link className="primary-link" to={role === 'DEPARTMENT' ? '/department' : '/sets'}>
-          Πίσω στη λίστα
+          {tr('Πίσω στη λίστα')}
         </Link>
       </div>
     );
   if (role === 'DEPARTMENT' && set.department !== currentUser.department)
     return (
       <div className="empty">
-        <strong>Δεν υπάρχει πρόσβαση σε αυτό το Σετ.</strong>
-        <span>Ο χρήστης του τμήματος βλέπει μόνο τον εξοπλισμό του δικού του τμήματος.</span>
+        <strong>{tr('Δεν υπάρχει πρόσβαση σε αυτό το Σετ.')}</strong>
+        <span>{tr('Ο χρήστης του τμήματος βλέπει μόνο τον εξοπλισμό του δικού του τμήματος.')}</span>
         <Link className="primary-link" to="/department">
-          Πίσω στα Σετ & Εργαλεία
+          {tr('Πίσω στα Σετ & Εργαλεία')}
         </Link>
       </div>
     );
@@ -153,10 +154,10 @@ export default function SetDetailPage() {
       <div className="asset-workbench-actions">
         <div className="asset-action-group">
           <AppButton icon={<Printer size={18} />} onClick={() => setPreview('COMPOSITION')}>
-            Εκτύπωση σύνθεσης
+            {tr('Εκτύπωση σύνθεσης')}
           </AppButton>
           <AppButton icon={<Barcode size={18} />} onClick={() => setPreview('BARCODE')}>
-            Εκτύπωση Barcode
+            {tr('Εκτύπωση Barcode')}
           </AppButton>
           {can('asset.duplicate') && (
             <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
@@ -170,28 +171,28 @@ export default function SetDetailPage() {
               disabled={workflowLocked}
               title={
                 workflowLocked
-                  ? 'Δεν επιτρέπεται διαγραφή όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.'
+                  ? tr('Δεν επιτρέπεται διαγραφή όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
                   : undefined
               }
               onClick={() => setDeleteOpen(true)}
             >
-              Διαγραφή Σετ
+              {tr('Διαγραφή Σετ')}
             </AppButton>
           )}
           {can('issue.create') && (
             <AppButton icon={<Flag size={18} />} onClick={() => setReportOpen(true)}>
-              Αναφορά
+              {tr('Αναφορά')}
             </AppButton>
           )}
           {can('department.dispatch') && set.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
-              Προς Αποστείρωση
+              {tr('Προς Αποστείρωση')}
             </AppButton>
           )}
         </div>
         <div className="asset-action-group">
           <Link to={backTo} className="asset-action-link">
-            <ArrowLeft size={18} /> Πίσω στη λίστα
+            <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </Link>
         </div>
       </div>
@@ -218,30 +219,30 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΣΥΝΟΨΗ</span>
-                    <h2>Κατάσταση & κύκλος ζωής</h2>
-                    <p>Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.</p>
+                    <span className="eyebrow">{tr('ΣΥΝΟΨΗ')}</span>
+                    <h2>{tr('Κατάσταση & κύκλος ζωής')}</h2>
+                    <p>{tr('Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.')}</p>
                   </div>
                 </div>
                 <div className="asset-section-body">
                   <UsageLimitCard
                     uses={uses}
                     maxUses={set.maxUses}
-                    description="Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων."
+                    description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />
                   <dl className="asset-definition-list compact-status-list">
                     <div>
-                      <dt>Σύνθεση</dt>
+                      <dt>{tr('Σύνθεση')}</dt>
                       <dd className={missing ? 'warn-text' : ''}>
                         {members.length}/{set.expected}
                       </dd>
                     </div>
                     <div>
-                      <dt>Ελλείψεις</dt>
+                      <dt>{tr('Ελλείψεις')}</dt>
                       <dd className={missing ? 'warn-text' : ''}>{missing}</dd>
                     </div>
                     <div>
-                      <dt>Ανοικτές εκκρεμότητες</dt>
+                      <dt>{tr('Ανοικτές εκκρεμότητες')}</dt>
                       <dd className={memberIssues.length ? 'warn-text' : ''}>{memberIssues.length}</dd>
                     </div>
                   </dl>
@@ -249,9 +250,10 @@ export default function SetDetailPage() {
                     <div className="asset-alert warning asset-side-alert">
                       <TriangleAlert size={18} />
                       <div>
-                        <strong>Μη πλήρης σύνθεση</strong>
+                        <strong>{tr('Μη πλήρης σύνθεση')}</strong>
                         <span>
-                          Λείπουν {missing} {missing === 1 ? 'φυσικό εργαλείο' : 'φυσικά εργαλεία'}.
+                          {tr('Λείπουν') + ' '}
+                          {missing} {missing === 1 ? tr('φυσικό εργαλείο') : tr('φυσικά εργαλεία')}.
                         </span>
                       </div>
                     </div>
@@ -264,9 +266,11 @@ export default function SetDetailPage() {
               <section className="asset-section set-composition-fixed asset-detail-full-panel">
                 <div className="asset-section-head set-composition-head">
                   <div>
-                    <span className="eyebrow">ΣΥΝΘΕΣΗ ΣΕΤ</span>
-                    <h2>Φυσικά εργαλεία</h2>
-                    <p>Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο. Η λίστα αξιοποιεί όλο τον διαθέσιμο χώρο.</p>
+                    <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ ΣΕΤ')}</span>
+                    <h2>{tr('Φυσικά εργαλεία')}</h2>
+                    <p>
+                      {tr('Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο. Η λίστα αξιοποιεί όλο τον διαθέσιμο χώρο.')}
+                    </p>
                   </div>
                   <div className="set-composition-actions">
                     {can('asset.edit') && (
@@ -275,28 +279,28 @@ export default function SetDetailPage() {
                         disabled={workflowLocked}
                         title={
                           workflowLocked
-                            ? 'Η σύνθεση δεν αλλάζει όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.'
+                            ? tr('Η σύνθεση δεν αλλάζει όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
                             : undefined
                         }
                         onClick={() => setAddToolsOpen(true)}
                       >
-                        Προσθήκη εργαλείων
+                        {tr('Προσθήκη εργαλείων')}
                       </AppButton>
                     )}
                     <IconToggleButton
                       active={grouped}
                       activeIcon={<List size={18} />}
                       inactiveIcon={<Layers3 size={18} />}
-                      activeTitle="Εμφάνιση φυσικών εγγραφών"
-                      inactiveTitle="Ομαδοποίηση ίδιων εργαλείων"
-                      aria-label={grouped ? 'Εμφάνιση φυσικών εγγραφών' : 'Ομαδοποίηση ίδιων εργαλείων'}
+                      activeTitle={tr('Εμφάνιση φυσικών εγγραφών')}
+                      inactiveTitle={tr('Ομαδοποίηση ίδιων εργαλείων')}
+                      aria-label={grouped ? tr('Εμφάνιση φυσικών εγγραφών') : tr('Ομαδοποίηση ίδιων εργαλείων')}
                       onClick={() => setGrouped(value => !value)}
                     />
                     <div className={`asset-count-state ${complete ? 'ok' : 'warning'}`}>
                       <strong>
                         {members.length}/{set.expected}
                       </strong>
-                      <span>{complete ? 'Πλήρες' : `Έλλειψη ${missing}`}</span>
+                      <span>{complete ? tr('Πλήρες') : tr('Έλλειψη {0}', missing)}</span>
                     </div>
                   </div>
                 </div>
@@ -305,26 +309,26 @@ export default function SetDetailPage() {
                   className="set-composition-filters"
                   query={toolQuery}
                   onQueryChange={setToolQuery}
-                  placeholder="Εργαλείο, κωδικός, barcode ή serial..."
+                  placeholder={tr('Εργαλείο, κωδικός, barcode ή serial...')}
                   filters={[
                     {
                       key: 'specialty',
                       value: toolSpecialty,
-                      placeholder: 'Όλες οι ειδικότητες',
+                      placeholder: tr('Όλες οι ειδικότητες'),
                       options: memberValues('specialty').map(value => ({value, label: value})),
                       onChange: setToolSpecialty,
                     },
                     {
                       key: 'manufacturer',
                       value: toolManufacturer,
-                      placeholder: 'Όλες οι εταιρείες',
+                      placeholder: tr('Όλες οι εταιρείες'),
                       options: memberValues('manufacturer').map(value => ({value, label: value})),
                       onChange: setToolManufacturer,
                     },
                     {
                       key: 'state',
                       value: toolState,
-                      placeholder: 'Όλες οι καταστάσεις',
+                      placeholder: tr('Όλες οι καταστάσεις'),
                       options: memberValues('state').map(value => ({value, label: value})),
                       onChange: setToolState,
                     },
@@ -346,25 +350,27 @@ export default function SetDetailPage() {
                             >
                               <span className="set-tool-index">{groupIndex + 1}</span>
                               <div className="set-tool-code">
-                                <strong className="qty-inline">{group.length} τεμ.</strong>
+                                <strong className="qty-inline">
+                                  {group.length} {tr('τεμ.')}
+                                </strong>
                                 <small>{first.code}</small>
                               </div>
                               <div className="set-tool-name">
                                 <strong>{first.name}</strong>
                                 <small>
                                   {first.manufacturer} ·{' '}
-                                  {open ? 'Απόκρυψη φυσικών barcodes' : 'Προβολή φυσικών barcodes'}
+                                  {open ? tr('Απόκρυψη φυσικών barcodes') : tr('Προβολή φυσικών barcodes')}
                                 </small>
                               </div>
                               <div className="set-tool-uses">
-                                <span>Ομάδα</span>
+                                <span>{tr('Ομάδα')}</span>
                                 <strong>{group.length}</strong>
                               </div>
                               <div className="set-tool-state">
                                 <span className="group-disclosure">
                                   {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                                 </span>
-                                {groupHasIssue && <small>Υπάρχει αναφορά</small>}
+                                {groupHasIssue && <small>{tr('Υπάρχει αναφορά')}</small>}
                               </div>
                             </button>
                             {open && (
@@ -384,17 +390,21 @@ export default function SetDetailPage() {
                                       </div>
                                       <div className="set-tool-name">
                                         <strong>{tool.name}</strong>
-                                        <small>{tool.serialNumber ? `S/N ${tool.serialNumber}` : 'Χωρίς serial'}</small>
+                                        <small>
+                                          {tool.serialNumber ? `S/N ${tool.serialNumber}` : tr('Χωρίς serial')}
+                                        </small>
                                       </div>
                                       <div className="set-tool-uses">
-                                        <span>Χρήσεις</span>
+                                        <span>{tr('Χρήσεις')}</span>
                                         <strong>
-                                          {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : `${tool.uses} · χωρίς όριο`}
+                                          {tool.maxUses
+                                            ? `${tool.uses}/${tool.maxUses}`
+                                            : tr('{0} · χωρίς όριο', tool.uses)}
                                         </strong>
                                       </div>
                                       <div className="set-tool-state">
                                         {tool.state !== set.state && <StatusBadge value={tool.state} />}
-                                        {hasIssue && <small>Ανοικτή αναφορά</small>}
+                                        {hasIssue && <small>{tr('Ανοικτή αναφορά')}</small>}
                                       </div>
                                     </Link>
                                   );
@@ -425,14 +435,14 @@ export default function SetDetailPage() {
                               </small>
                             </div>
                             <div className="set-tool-uses">
-                              <span>Χρήσεις</span>
+                              <span>{tr('Χρήσεις')}</span>
                               <strong>
-                                {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : `${tool.uses} · χωρίς όριο`}
+                                {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} · χωρίς όριο', tool.uses)}
                               </strong>
                             </div>
                             <div className="set-tool-state">
                               {tool.state !== set.state && <StatusBadge value={tool.state} />}
-                              {hasIssue && <small>Ανοικτή αναφορά</small>}
+                              {hasIssue && <small>{tr('Ανοικτή αναφορά')}</small>}
                             </div>
                           </Link>
                         );
@@ -445,8 +455,8 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ</span>
-                    <h2>Ιστορικό κινήσεων</h2>
+                    <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
+                    <h2>{tr('Ιστορικό κινήσεων')}</h2>
                   </div>
                   <History size={19} />
                 </div>
@@ -456,19 +466,19 @@ export default function SetDetailPage() {
                       <div className="asset-history-row" key={item.id}>
                         <span className="history-dot" />
                         <div>
-                          <strong>{item.status}</strong>
+                          <strong>{trData(item.status)}</strong>
                           <p>
-                            {item.from} → {item.to}
+                            {trData(item.from)} → {trData(item.to)}
                           </p>
                           <small>
-                            {item.at} · {item.by}
+                            {item.at} · {trData(item.by)}
                             {item.patientCode ? ` · ${item.patientCode}` : ''}
                           </small>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <AssetEmptyState>Δεν υπάρχει καταγεγραμμένη κίνηση.</AssetEmptyState>
+                    <AssetEmptyState>{tr('Δεν υπάρχει καταγεγραμμένη κίνηση.')}</AssetEmptyState>
                   )}
                 </div>
               </section>
@@ -477,8 +487,8 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΕΚΚΡΕΜΟΤΗΤΕΣ</span>
-                    <h2>Ανοικτές αναφορές</h2>
+                    <span className="eyebrow">{tr('ΕΚΚΡΕΜΟΤΗΤΕΣ')}</span>
+                    <h2>{tr('Ανοικτές αναφορές')}</h2>
                   </div>
                 </div>
                 <div className="asset-detail-scroll asset-issue-list">
@@ -488,7 +498,7 @@ export default function SetDetailPage() {
                         <TriangleAlert size={17} />
                         <div>
                           <strong>{issue.asset}</strong>
-                          <span>{issue.type}</span>
+                          <span>{trData(issue.type)}</span>
                           <small>{issue.note}</small>
                           {issue.photos?.length ? (
                             <div className="asset-issue-photos">
@@ -501,7 +511,7 @@ export default function SetDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <AssetEmptyState>Δεν υπάρχουν ανοικτές εκκρεμότητες.</AssetEmptyState>
+                    <AssetEmptyState>{tr('Δεν υπάρχουν ανοικτές εκκρεμότητες.')}</AssetEmptyState>
                   )}
                 </div>
               </section>
@@ -510,15 +520,15 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΣΗΜΕΙΩΣΕΙΣ</span>
-                    <h2>Μόνιμες παρατηρήσεις</h2>
+                    <span className="eyebrow">{tr('ΣΗΜΕΙΩΣΕΙΣ')}</span>
+                    <h2>{tr('Μόνιμες παρατηρήσεις')}</h2>
                   </div>
                 </div>
                 <div className="asset-section-body asset-notes-tab">
                   {set.notes ? (
                     <p>{set.notes}</p>
                   ) : (
-                    <AssetEmptyState>Δεν υπάρχουν σημειώσεις για το Set.</AssetEmptyState>
+                    <AssetEmptyState>{tr('Δεν υπάρχουν σημειώσεις για το Set.')}</AssetEmptyState>
                   )}
                 </div>
               </section>
@@ -529,7 +539,7 @@ export default function SetDetailPage() {
       {!departmentView && addToolsOpen && <AddToolsToSetModal setId={set.id} onClose={() => setAddToolsOpen(false)} />}
       {preview === 'COMPOSITION' && (
         <PrintPreviewModal
-          title={`Σύνθεση ${set.barcode}`}
+          title={tr('Σύνθεση {0}', set.barcode)}
           html={compositionHtml(
             set,
             members,
@@ -552,7 +562,7 @@ export default function SetDetailPage() {
           <div className="asset-modal asset-photo-manager-modal">
             <header>
               <div>
-                <h2>Φωτογραφίες Σετ</h2>
+                <h2>{tr('Φωτογραφίες Σετ')}</h2>
                 <p>
                   {set.barcode} · {set.name}
                 </p>
@@ -569,8 +579,8 @@ export default function SetDetailPage() {
                 readOnly={!can('asset.photos.manage')}
                 description={
                   !can('asset.photos.manage')
-                    ? 'Φωτογραφική τεκμηρίωση του Σετ. Προβολή μόνο για τον ενεργό ρόλο.'
-                    : 'Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.'
+                    ? tr('Φωτογραφική τεκμηρίωση του Σετ. Προβολή μόνο για τον ενεργό ρόλο.')
+                    : tr('Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.')
                 }
               />
             </div>
@@ -594,8 +604,11 @@ export default function SetDetailPage() {
                 <Copy size={20} />
               </div>
               <div>
-                <h3>Duplicate Σετ</h3>
-                <p>Τι θέλεις να αντιγραφεί από το {set.barcode};</p>
+                <h3>{tr('Duplicate Σετ')}</h3>
+                <p>
+                  {tr('Τι θέλεις να αντιγραφεί από το') + ' '}
+                  {set.barcode};
+                </p>
               </div>
               <button className="icon-button" onClick={() => setDuplicateOpen(false)}>
                 <X size={18} />
@@ -608,8 +621,8 @@ export default function SetDetailPage() {
                   setDuplicateOpen(false);
                 }}
               >
-                <strong>Μόνο το Σετ</strong>
-                <span>Δημιουργεί νέο κενό Σετ, χωρίς φυσικά εργαλεία.</span>
+                <strong>{tr('Μόνο το Σετ')}</strong>
+                <span>{tr('Δημιουργεί νέο κενό Σετ, χωρίς φυσικά εργαλεία.')}</span>
               </button>
               <button
                 onClick={() => {
@@ -617,8 +630,8 @@ export default function SetDetailPage() {
                   setDuplicateOpen(false);
                 }}
               >
-                <strong>Σετ + εργαλεία</strong>
-                <span>Δημιουργεί νέα φυσικά εργαλεία με νέα μοναδικά barcodes.</span>
+                <strong>{tr('Σετ + εργαλεία')}</strong>
+                <span>{tr('Δημιουργεί νέα φυσικά εργαλεία με νέα μοναδικά barcodes.')}</span>
               </button>
             </div>
           </div>
@@ -632,8 +645,11 @@ export default function SetDetailPage() {
                 <Trash2 size={20} />
               </div>
               <div>
-                <h3>Διαγραφή Σετ</h3>
-                <p>Επίλεξε τι θα γίνει με τα {members.length} φυσικά εργαλεία του Σετ.</p>
+                <h3>{tr('Διαγραφή Σετ')}</h3>
+                <p>
+                  {tr('Επίλεξε τι θα γίνει με τα') + ' '}
+                  {members.length} {tr('φυσικά εργαλεία του Σετ.')}
+                </p>
               </div>
               <button className="icon-button" onClick={() => setDeleteOpen(false)}>
                 <X size={18} />
@@ -647,21 +663,21 @@ export default function SetDetailPage() {
                   navigate('/sets');
                 }}
               >
-                <strong>Διαγραφή μόνο του Σετ</strong>
-                <span>Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Stock.</span>
+                <strong>{tr('Διαγραφή μόνο του Σετ')}</strong>
+                <span>{tr('Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Stock.')}</span>
               </button>
               <button
                 className="danger-option"
                 onClick={() => {
-                  if (window.confirm('Οριστική διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του;')) {
+                  if (window.confirm(tr('Οριστική διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του;'))) {
                     deleteSet(set.id, true);
                     setDeleteOpen(false);
                     navigate('/sets');
                   }
                 }}
               >
-                <strong>Διαγραφή Σετ + εργαλείων</strong>
-                <span>Οριστική αφαίρεση και των φυσικών εργαλείων.</span>
+                <strong>{tr('Διαγραφή Σετ + εργαλείων')}</strong>
+                <span>{tr('Οριστική αφαίρεση και των φυσικών εργαλείων.')}</span>
               </button>
             </div>
           </div>
@@ -672,8 +688,10 @@ export default function SetDetailPage() {
           <div className="asset-modal set-report-modal">
             <header>
               <div>
-                <h2>Νέα αναφορά</h2>
-                <p>{set.barcode} · επίλεξε αν αφορά το Σετ ή εργαλεία της σύνθεσης.</p>
+                <h2>{tr('Νέα αναφορά')}</h2>
+                <p>
+                  {set.barcode} {tr('· επίλεξε αν αφορά το Σετ ή εργαλεία της σύνθεσης.')}
+                </p>
               </div>
               <button className="icon-button" onClick={() => setReportOpen(false)}>
                 <X size={18} />
@@ -682,10 +700,10 @@ export default function SetDetailPage() {
             <div className="modal-body">
               <div className="report-target-switch">
                 <button className={reportTarget === 'SET' ? 'active' : ''} onClick={() => setReportTarget('SET')}>
-                  Ολόκληρο Σετ
+                  {tr('Ολόκληρο Σετ')}
                 </button>
                 <button className={reportTarget === 'TOOLS' ? 'active' : ''} onClick={() => setReportTarget('TOOLS')}>
-                  Εργαλεία του Σετ
+                  {tr('Εργαλεία του Σετ')}
                 </button>
               </div>
               {reportTarget === 'TOOLS' && (
@@ -713,27 +731,27 @@ export default function SetDetailPage() {
               )}
               <div className="form-grid">
                 <label>
-                  Τύπος αναφοράς
+                  {tr('Τύπος αναφοράς')}
                   <select value={reportType} onChange={e => setReportType(e.target.value)}>
-                    <option>Βλάβη</option>
-                    <option>Φθορά</option>
-                    <option>Απώλεια</option>
-                    <option>Έλλειψη</option>
+                    <option>{tr('Βλάβη')}</option>
+                    <option>{tr('Φθορά')}</option>
+                    <option>{tr('Απώλεια')}</option>
+                    <option>{tr('Έλλειψη')}</option>
                     <option>Service</option>
-                    <option>Άλλο</option>
+                    <option>{tr('Άλλο')}</option>
                   </select>
                 </label>
                 <label className="span-2">
-                  Παρατήρηση
+                  {tr('Παρατήρηση')}
                   <textarea
                     rows={3}
                     value={reportNote}
                     onChange={e => setReportNote(e.target.value)}
-                    placeholder="Περιγραφή συμβάντος..."
+                    placeholder={tr('Περιγραφή συμβάντος...')}
                   />
                 </label>
                 <label className="span-2 report-photo-input">
-                  <Camera size={17} /> Φωτογραφίες
+                  <Camera size={17} /> {tr('Φωτογραφίες')}
                   <input
                     type="file"
                     accept="image/*"
@@ -743,14 +761,14 @@ export default function SetDetailPage() {
                   />
                   <small>
                     {reportPhotos.length
-                      ? `${reportPhotos.length} φωτογραφίες έτοιμες`
-                      : 'Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών'}
+                      ? tr('{0} φωτογραφίες έτοιμες', reportPhotos.length)
+                      : tr('Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών')}
                   </small>
                 </label>
               </div>
             </div>
             <footer>
-              <AppButton onClick={() => setReportOpen(false)}>Ακύρωση</AppButton>
+              <AppButton onClick={() => setReportOpen(false)}>{tr('Ακύρωση')}</AppButton>
               <AppButton
                 variant="primary"
                 disabled={reportTarget === 'TOOLS' && !reportToolIds.length}
@@ -768,7 +786,7 @@ export default function SetDetailPage() {
                   setReportPhotos([]);
                 }}
               >
-                Καταχώρηση αναφοράς
+                {tr('Καταχώρηση αναφοράς')}
               </AppButton>
             </footer>
           </div>

@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react';
 import {ChevronRight, Clock3, Download, MapPin, Printer, Route, Search, ShieldCheck, UserRound, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import type {Movement} from '../../types/domain';
+import {tr, trData} from '../../i18n';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -76,14 +77,14 @@ export default function MovementsPage() {
   const exportCsv = () => {
     const esc = (v: string) => `"${v.replaceAll('"', '""')}"`;
     const rows = [
-      ['Ημερομηνία', 'Asset', 'Τύπος', 'Από', 'Προς', 'Κίνηση', 'Χρήστης', 'Κωδικός ασθενούς'],
+      ['Ημερομηνία', 'Asset', 'Τύπος', 'Από', 'Προς', 'Κίνηση', 'Χρήστης', 'Κωδικός ασθενούς'].map(h => tr(h)),
       ...filtered.map(m => [
         m.at,
         m.asset,
-        m.assetKind === 'SET' ? 'Σετ' : 'Εργαλείο',
-        m.from,
-        m.to,
-        m.status,
+        tr(m.assetKind === 'SET' ? 'Σετ' : 'Εργαλείο'),
+        trData(m.from),
+        trData(m.to),
+        trData(m.status),
         m.by,
         m.patientCode || '',
       ]),
@@ -101,12 +102,12 @@ export default function MovementsPage() {
     <div className="movements-workspace">
       <div className="page-head movements-head">
         <div>
-          <span className="eyebrow">ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ</span>
-          <h1>Ιστορικό κινήσεων</h1>
+          <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
+          <h1>{tr('Ιστορικό κινήσεων')}</h1>
           <p>
             {role === 'DEPARTMENT'
-              ? `Ιστορικό ιχνηλασιμότητας του τμήματος ${currentUser.department}.`
-              : 'Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.'}
+              ? tr('Ιστορικό ιχνηλασιμότητας του τμήματος {0}.', trData(currentUser.department))
+              : tr('Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.')}
           </p>
         </div>
         <div className="movements-actions">
@@ -114,7 +115,7 @@ export default function MovementsPage() {
             <Download size={16} /> Export
           </button>
           <button onClick={print}>
-            <Printer size={16} /> Εκτύπωση
+            <Printer size={16} /> {tr('Εκτύπωση')}
           </button>
         </div>
       </div>
@@ -124,62 +125,62 @@ export default function MovementsPage() {
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Barcode, Set/εργαλείο, χρήστης ή κωδικός ασθενούς..."
+            placeholder={tr('Barcode, Set/εργαλείο, χρήστης ή κωδικός ασθενούς...')}
           />
         </label>
         <select value={kind} onChange={e => setKind(e.target.value)}>
-          <option value="">Σετ & εργαλεία</option>
-          <option value="SET">Σετ</option>
-          <option value="TOOL">Εργαλεία</option>
+          <option value="">{tr('Σετ & εργαλεία')}</option>
+          <option value="SET">{tr('Σετ')}</option>
+          <option value="TOOL">{tr('Εργαλεία')}</option>
         </select>
         <select value={from} onChange={e => setFrom(e.target.value)}>
-          <option value="">Από όλα τα τμήματα</option>
+          <option value="">{tr('Από όλα τα τμήματα')}</option>
           {values('from').map(v => (
             <option key={v}>{v}</option>
           ))}
         </select>
         <select value={to} onChange={e => setTo(e.target.value)}>
-          <option value="">Προς όλα τα τμήματα</option>
+          <option value="">{tr('Προς όλα τα τμήματα')}</option>
           {values('to').map(v => (
             <option key={v}>{v}</option>
           ))}
         </select>
         <select value={status} onChange={e => setStatus(e.target.value)}>
-          <option value="">Όλες οι κινήσεις</option>
+          <option value="">{tr('Όλες οι κινήσεις')}</option>
           {values('status').map(v => (
             <option key={v}>{v}</option>
           ))}
         </select>
         <label className="date-filter">
-          <span>Από</span>
+          <span>{tr('Από')}</span>
           <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
         </label>
         <label className="date-filter">
-          <span>Έως</span>
+          <span>{tr('Έως')}</span>
           <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
         </label>
         <button className="filter-reset" onClick={reset}>
-          Καθαρισμός
+          {tr('Καθαρισμός')}
         </button>
       </div>
       <div className="movement-ledger">
         <div className="ledger-head">
           <div>
-            <strong>Ιστορικό κινήσεων</strong>
+            <strong>{tr('Ιστορικό κινήσεων')}</strong>
             <span>
-              {filtered.length} {filtered.length === 1 ? 'εγγραφή' : 'εγγραφές'}
+              {filtered.length} {filtered.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
             </span>
           </div>
           <small>
-            <ShieldCheck size={14} /> Audit trail · οι εγγραφές δεν τροποποιούνται
+            <ShieldCheck size={14} /> {tr('Audit trail · οι εγγραφές δεν τροποποιούνται')}
           </small>
         </div>
         <div className="ledger-columns">
-          <span>Ημερομηνία / ώρα</span>
-          <span>Set / Εργαλείο</span>
-          <span>Διαδρομή</span>
-          <span>Ενέργεια</span>
-          <span>Χρήστης</span>
+          <span>{tr('Ημερομηνία / ώρα')}</span>
+          <span>{tr('Set / Εργαλείο')}</span>
+          <span>{tr('Διαδρομή')}</span>
+          <span>{tr('Ενέργεια')}</span>
+          <span>{tr('Χρήστης')}</span>
           <span></span>
         </div>
         <div className="ledger-scroll">
@@ -193,22 +194,22 @@ export default function MovementsPage() {
                     <b>{m.at}</b>
                   </span>
                   <span className="ledger-asset">
-                    <small>{m.assetKind === 'SET' ? 'SET' : 'ΕΡΓΑΛΕΙΟ'}</small>
+                    <small>{m.assetKind === 'SET' ? 'SET' : tr('ΕΡΓΑΛΕΙΟ')}</small>
                     <b>{asset.barcode}</b>
                     {asset.name !== asset.barcode && <em>{asset.name}</em>}
                   </span>
                   <span className="ledger-route">
-                    <i>{m.from}</i>
+                    <i>{trData(m.from)}</i>
                     <ChevronRight size={15} />
-                    <i>{m.to}</i>
+                    <i>{trData(m.to)}</i>
                   </span>
                   <span>
-                    <mark className="movement-chip">{m.status}</mark>
+                    <mark className="movement-chip">{trData(m.status)}</mark>
                   </span>
                   <span className="ledger-user">
                     <UserRound size={15} />
                     <span>
-                      <b>{m.by}</b>
+                      <b>{trData(m.by)}</b>
                       {m.patientCode && <small>Patient {m.patientCode}</small>}
                     </span>
                   </span>
@@ -219,8 +220,8 @@ export default function MovementsPage() {
           ) : (
             <div className="ledger-empty">
               <Route size={28} />
-              <strong>Δεν βρέθηκαν κινήσεις</strong>
-              <span>Αλλάξτε ή καθαρίστε τα φίλτρα αναζήτησης.</span>
+              <strong>{tr('Δεν βρέθηκαν κινήσεις')}</strong>
+              <span>{tr('Αλλάξτε ή καθαρίστε τα φίλτρα αναζήτησης.')}</span>
             </div>
           )}
         </div>
@@ -236,54 +237,54 @@ export default function MovementsPage() {
             <div className="movement-detail-head">
               <div>
                 <small>CHAIN OF CUSTODY</small>
-                <h2>Λεπτομέρειες κίνησης</h2>
+                <h2>{tr('Λεπτομέρειες κίνησης')}</h2>
                 <span>{selected.asset}</span>
               </div>
-              <button onClick={() => setSelected(null)} aria-label="Κλείσιμο">
+              <button onClick={() => setSelected(null)} aria-label={tr('Κλείσιμο')}>
                 <X />
               </button>
             </div>
             <div className="movement-detail-grid">
               <div>
                 <Clock3 />
-                <span>Ημερομηνία & ώρα</span>
+                <span>{tr('Ημερομηνία & ώρα')}</span>
                 <strong>{selected.at}</strong>
               </div>
               <div>
                 <Route />
-                <span>Ενέργεια</span>
-                <strong>{selected.status}</strong>
+                <span>{tr('Ενέργεια')}</span>
+                <strong>{trData(selected.status)}</strong>
               </div>
               <div>
                 <MapPin />
-                <span>Από</span>
-                <strong>{selected.from}</strong>
+                <span>{tr('Από')}</span>
+                <strong>{trData(selected.from)}</strong>
               </div>
               <div>
                 <MapPin />
-                <span>Προς</span>
-                <strong>{selected.to}</strong>
+                <span>{tr('Προς')}</span>
+                <strong>{trData(selected.to)}</strong>
               </div>
               <div>
                 <UserRound />
-                <span>Καταχώρηση από</span>
-                <strong>{selected.by}</strong>
+                <span>{tr('Καταχώρηση από')}</span>
+                <strong>{trData(selected.by)}</strong>
               </div>
               <div>
                 <ShieldCheck />
-                <span>Τύπος αντικειμένου</span>
-                <strong>{selected.assetKind === 'SET' ? 'Σετ' : 'Εργαλείο'}</strong>
+                <span>{tr('Τύπος αντικειμένου')}</span>
+                <strong>{selected.assetKind === 'SET' ? tr('Σετ') : tr('Εργαλείο')}</strong>
               </div>
               {selected.patientCode && (
                 <div className="movement-patient">
-                  <span>Κωδικός ασθενούς</span>
+                  <span>{tr('Κωδικός ασθενούς')}</span>
                   <strong>{selected.patientCode}</strong>
                 </div>
               )}
             </div>
             <div className="movement-detail-foot">
               <ShieldCheck size={17} />
-              <span>Η εγγραφή αποτελεί μέρος του audit trail και είναι μόνο για ανάγνωση.</span>
+              <span>{tr('Η εγγραφή αποτελεί μέρος του audit trail και είναι μόνο για ανάγνωση.')}</span>
             </div>
           </div>
         </div>

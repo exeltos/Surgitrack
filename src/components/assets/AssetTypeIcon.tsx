@@ -1,5 +1,6 @@
 import {Gauge, Layers3, Wrench} from 'lucide-react';
 import type {AssetKind} from '../../types/domain';
+import {tr} from '../../i18n';
 
 type Props = {
   kind: AssetKind;
@@ -11,7 +12,7 @@ type Props = {
 
 export default function AssetTypeIcon({kind, maxUses, size = 18, className = '', framed = false}: Props) {
   const limited = kind === 'TOOL' && Boolean(maxUses);
-  const label = kind === 'SET' ? 'Σετ εργαλείων' : limited ? 'Εργαλείο περιορισμένων χρήσεων' : 'Εργαλείο';
+  const label = tr(kind === 'SET' ? 'Σετ εργαλείων' : limited ? 'Εργαλείο περιορισμένων χρήσεων' : 'Εργαλείο');
   const icon = kind === 'SET' ? <Layers3 size={size} /> : limited ? <Gauge size={size} /> : <Wrench size={size} />;
   if (!framed)
     return (

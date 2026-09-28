@@ -1,9 +1,10 @@
 import {AlertTriangle, X} from 'lucide-react';
 import AppButton from './AppButton';
+import {tr} from '../../i18n';
 export default function ConfirmDialog({
   title,
   message,
-  confirmLabel = 'Επιβεβαίωση',
+  confirmLabel = tr('Επιβεβαίωση'),
   danger = false,
   onConfirm,
   onClose,
@@ -29,12 +30,12 @@ export default function ConfirmDialog({
             <h3>{title}</h3>
             <p>{message}</p>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label="Κλείσιμο">
+          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
             <X size={18} />
           </button>
         </header>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton variant={danger ? 'danger' : 'primary'} onClick={onConfirm}>
             {confirmLabel}
           </AppButton>

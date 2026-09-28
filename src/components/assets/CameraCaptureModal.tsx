@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {Camera, CameraOff, RefreshCw, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
+import {tr} from '../../i18n';
 
 type Props = {onCapture: (file: File) => void; onClose: () => void};
 
@@ -28,7 +29,9 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
         await videoRef.current.play();
       }
     } catch {
-      setError('Δεν ήταν δυνατή η πρόσβαση στην κάμερα. Έλεγξε την άδεια κάμερας του browser ή χρησιμοποίησε Upload.');
+      setError(
+        tr('Δεν ήταν δυνατή η πρόσβαση στην κάμερα. Έλεγξε την άδεια κάμερας του browser ή χρησιμοποίησε Upload.'),
+      );
     }
   };
   useEffect(() => {
@@ -57,16 +60,16 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
       className="camera-modal-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label="Λήψη φωτογραφίας"
+      aria-label={tr('Λήψη φωτογραφίας')}
       onMouseDown={onClose}
     >
       <div className="camera-modal" onMouseDown={e => e.stopPropagation()}>
         <header>
           <div>
-            <span className="eyebrow">ΚΑΜΕΡΑ</span>
-            <h2>Λήψη φωτογραφίας</h2>
+            <span className="eyebrow">{tr('ΚΑΜΕΡΑ')}</span>
+            <h2>{tr('Λήψη φωτογραφίας')}</h2>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="Κλείσιμο">
+          <button className="icon-btn" onClick={onClose} aria-label={tr('Κλείσιμο')}>
             <X size={18} />
           </button>
         </header>
@@ -74,7 +77,7 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
           {error ? (
             <div className="camera-error">
               <CameraOff size={34} />
-              <strong>Η κάμερα δεν είναι διαθέσιμη</strong>
+              <strong>{tr('Η κάμερα δεν είναι διαθέσιμη')}</strong>
               <span>{error}</span>
             </div>
           ) : (
@@ -86,10 +89,10 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
             icon={<RefreshCw size={16} />}
             onClick={() => setFacing(v => (v === 'environment' ? 'user' : 'environment'))}
           >
-            Αλλαγή κάμερας
+            {tr('Αλλαγή κάμερας')}
           </AppButton>
           <AppButton variant="primary" icon={<Camera size={16} />} onClick={capture} disabled={!!error}>
-            Λήψη
+            {tr('Λήψη')}
           </AppButton>
         </footer>
       </div>

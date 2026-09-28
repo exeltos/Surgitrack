@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import {Check, ScanBarcode, Signature, TriangleAlert} from 'lucide-react';
+import {tr, trData} from '../../i18n';
 export default function CountPage() {
   const {sets: allSets, recordCount, counts: allCounts, role, currentUser} = useSurgi();
   // A department counts only its own sets and sees only its own counts (patient codes included).
@@ -21,8 +22,11 @@ export default function CountPage() {
   if (!s)
     return (
       <div className="empty">
-        <strong>Δεν υπάρχουν Σετ για καταμέτρηση</strong>
-        <span>Δεν βρέθηκαν Σετ του τμήματος {currentUser.department}.</span>
+        <strong>{tr('Δεν υπάρχουν Σετ για καταμέτρηση')}</strong>
+        <span>
+          {tr('Δεν βρέθηκαν Σετ του τμήματος') + ' '}
+          {trData(currentUser.department)}.
+        </span>
       </div>
     );
   const diff = counted - s.expected;
@@ -39,9 +43,9 @@ export default function CountPage() {
     <>
       <div className="page-head">
         <div>
-          <span className="eyebrow">ΧΕΙΡΟΥΡΓΕΙΟ</span>
-          <h1>Καταμέτρηση χειρουργείου</h1>
-          <p>Τελική καταμέτρηση μετά την επέμβαση με κωδικό ασθενούς και ηλεκτρονική υπογραφή.</p>
+          <span className="eyebrow">{tr('ΧΕΙΡΟΥΡΓΕΙΟ')}</span>
+          <h1>{tr('Καταμέτρηση χειρουργείου')}</h1>
+          <p>{tr('Τελική καταμέτρηση μετά την επέμβαση με κωδικό ασθενούς και ηλεκτρονική υπογραφή.')}</p>
         </div>
       </div>
       <div className="count-card">
@@ -68,23 +72,23 @@ export default function CountPage() {
         </div>
         <div className="form-grid">
           <label>
-            Κωδικός ασθενούς
+            {tr('Κωδικός ασθενούς')}
             <input value={patientCode} onChange={e => setPatientCode(e.target.value)} placeholder="P-..." />
           </label>
           <label>
-            Αναμενόμενα
+            {tr('Αναμενόμενα')}
             <input value={s.expected} readOnly />
           </label>
           <label>
-            Καταμετρημένα
+            {tr('Καταμετρημένα')}
             <input type="number" value={counted} onChange={e => setCounted(Number(e.target.value))} />
           </label>
           <label>
-            Αποτέλεσμα
+            {tr('Αποτέλεσμα')}
             <select value={result} onChange={e => setResult(e.target.value as 'OK' | 'MISSING' | 'DAMAGE')}>
-              <option value="OK">Πλήρης καταμέτρηση</option>
-              <option value="MISSING">Έλλειψη</option>
-              <option value="DAMAGE">Βλάβη</option>
+              <option value="OK">{tr('Πλήρης καταμέτρηση')}</option>
+              <option value="MISSING">{tr('Έλλειψη')}</option>
+              <option value="DAMAGE">{tr('Βλάβη')}</option>
             </select>
           </label>
         </div>
@@ -92,44 +96,44 @@ export default function CountPage() {
           {diff === 0 && result === 'OK' ? <Check size={20} /> : <TriangleAlert size={20} />}
           <div>
             <strong>
-              {counted}/{s.expected} εργαλεία
+              {counted}/{s.expected} {tr('εργαλεία')}
             </strong>
             <span>
               {diff === 0 && result === 'OK'
-                ? 'Η σύνθεση συμφωνεί με το πρότυπο του Set.'
+                ? tr('Η σύνθεση συμφωνεί με το πρότυπο του Set.')
                 : diff < 0
-                  ? `Έλλειψη ${Math.abs(diff)} εργαλείων. Θα δημιουργηθεί εκκρεμότητα.`
-                  : `Υπάρχουν ${diff} επιπλέον εργαλεία. Απαιτείται έλεγχος.`}
+                  ? tr('Έλλειψη {0} εργαλείων. Θα δημιουργηθεί εκκρεμότητα.', Math.abs(diff))
+                  : tr('Υπάρχουν {0} επιπλέον εργαλεία. Απαιτείται έλεγχος.', diff)}
             </span>
           </div>
         </div>
         <label>
-          Παρατηρήσεις
+          {tr('Παρατηρήσεις')}
           <textarea
             value={note}
             onChange={e => setNote(e.target.value)}
-            placeholder="Παρατηρήσεις, βλάβη ή διευκρίνιση..."
+            placeholder={tr('Παρατηρήσεις, βλάβη ή διευκρίνιση...')}
           />
         </label>
         <div className="sign-row">
           <div>
             <Signature size={20} />
-            <span>Η υπογραφή συνδέεται με τον συνδεδεμένο χρήστη και timestamp.</span>
+            <span>{tr('Η υπογραφή συνδέεται με τον συνδεδεμένο χρήστη και timestamp.')}</span>
           </div>
           <button className="primary" onClick={submit} disabled={!patientCode.trim()}>
-            Υπογραφή & ολοκλήρωση
+            {tr('Υπογραφή & ολοκλήρωση')}
           </button>
         </div>
       </div>
       {counts.length > 0 && (
         <div className="panel compact">
-          <h3>Πρόσφατες υπογεγραμμένες καταμετρήσεις</h3>
+          <h3>{tr('Πρόσφατες υπογεγραμμένες καταμετρήσεις')}</h3>
           {counts.map(c => (
             <div className="list-row" key={c.id}>
               <span className="mono">{sets.find(s => s.id === c.setId)?.barcode}</span>
               <strong>{c.patientCode}</strong>
               <span>
-                {c.counted}/{c.expected} · {c.by}
+                {c.counted}/{c.expected} · {trData(c.by)}
               </span>
               <span className="badge">{c.at}</span>
             </div>

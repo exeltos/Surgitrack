@@ -10,6 +10,7 @@ import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
 import IconToggleButton from '../../components/ui/IconToggleButton';
 import KpiStrip from '../../components/ui/KpiStrip';
+import {tr, trData} from '../../i18n';
 
 export default function ToolsPage() {
   const {tools, sets, can} = useSurgi();
@@ -45,13 +46,15 @@ export default function ToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
-        title="Εργαλεία"
-        description="Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Stock, σε Σετ ή χρησιμοποιούνται μεμονωμένα."
+        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        title={tr('Εργαλεία')}
+        description={tr(
+          'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Stock, σε Σετ ή χρησιμοποιούνται μεμονωμένα.',
+        )}
         actions={
           can('asset.create') ? (
             <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
-              Νέο Εργαλείο
+              {tr('Νέο Εργαλείο')}
             </AppButton>
           ) : undefined
         }
@@ -59,9 +62,9 @@ export default function ToolsPage() {
       <KpiStrip
         compact
         items={[
-          {label: 'Σύνολο εργαλείων', value: tools.length},
-          {label: 'Σε Σετ', value: tools.filter(t => t.mode === 'SET_MEMBER').length},
-          {label: 'Μεμονωμένα σε χρήση', value: tools.filter(t => t.mode === 'STANDALONE').length},
+          {label: tr('Σύνολο εργαλείων'), value: tools.length},
+          {label: tr('Σε Σετ'), value: tools.filter(t => t.mode === 'SET_MEMBER').length},
+          {label: tr('Μεμονωμένα σε χρήση'), value: tools.filter(t => t.mode === 'STANDALONE').length},
           {label: 'Stock', value: tools.filter(t => t.mode === 'STOCK').length},
         ]}
       />
@@ -69,44 +72,44 @@ export default function ToolsPage() {
         <AssetFilterBar
           query={q}
           onQueryChange={setQ}
-          placeholder="Ονομασία, κωδικός, barcode, serial..."
+          placeholder={tr('Ονομασία, κωδικός, barcode, serial...')}
           filters={[
             {
               key: 'department',
               value: department,
-              placeholder: 'Όλα τα τμήματα',
+              placeholder: tr('Όλα τα τμήματα'),
               options: values('department').map(value => ({value, label: value})),
               onChange: setDepartment,
             },
             {
               key: 'specialty',
               value: specialty,
-              placeholder: 'Όλες οι ειδικότητες',
+              placeholder: tr('Όλες οι ειδικότητες'),
               options: values('specialty').map(value => ({value, label: value})),
               onChange: setSpecialty,
             },
             {
               key: 'manufacturer',
               value: manufacturer,
-              placeholder: 'Όλες οι εταιρείες',
+              placeholder: tr('Όλες οι εταιρείες'),
               options: values('manufacturer').map(value => ({value, label: value})),
               onChange: setManufacturer,
             },
             {
               key: 'mode',
               value: mode,
-              placeholder: 'Όλες οι θέσεις',
+              placeholder: tr('Όλες οι θέσεις'),
               options: [
                 {value: 'STOCK', label: 'Stock'},
-                {value: 'SET_MEMBER', label: 'Σετ εργαλείων'},
-                {value: 'STANDALONE', label: 'Μεμονωμένα σε χρήση'},
+                {value: 'SET_MEMBER', label: tr('Σετ εργαλείων')},
+                {value: 'STANDALONE', label: tr('Μεμονωμένα σε χρήση')},
               ],
               onChange: setMode,
             },
             {
               key: 'state',
               value: state,
-              placeholder: 'Όλες οι καταστάσεις',
+              placeholder: tr('Όλες οι καταστάσεις'),
               options: values('state').map(value => ({value, label: value})),
               onChange: setState,
             },
@@ -116,23 +119,23 @@ export default function ToolsPage() {
           active={grouped}
           activeIcon={<List size={17} />}
           inactiveIcon={<Layers3 size={17} />}
-          activeTitle="Εμφάνιση φυσικών εγγραφών"
-          inactiveTitle="Ομαδοποίηση ίδιων εργαλείων"
+          activeTitle={tr('Εμφάνιση φυσικών εγγραφών')}
+          inactiveTitle={tr('Ομαδοποίηση ίδιων εργαλείων')}
           onClick={() => setGrouped(x => !x)}
         />
       </div>
-      <ScrollableListPanel withKpis ariaLabel="Λίστα εργαλείων">
+      <ScrollableListPanel withKpis ariaLabel={tr('Λίστα εργαλείων')}>
         <table className="asset-registry-table">
           <thead>
             <tr>
-              <th>Ονομασία</th>
-              <th>{grouped ? 'Ποσότητα' : 'Κωδικός'}</th>
+              <th>{tr('Ονομασία')}</th>
+              <th>{grouped ? tr('Ποσότητα') : tr('Κωδικός')}</th>
               <th>Barcode</th>
-              <th>Εταιρεία</th>
-              <th>Ειδικότητα</th>
-              <th>Θέση</th>
-              <th>Υπόλοιπο χρήσεων</th>
-              <th>Κατάσταση</th>
+              <th>{tr('Εταιρεία')}</th>
+              <th>{tr('Ειδικότητα')}</th>
+              <th>{tr('Θέση')}</th>
+              <th>{tr('Υπόλοιπο χρήσεων')}</th>
+              <th>{tr('Κατάσταση')}</th>
               <th></th>
             </tr>
           </thead>
@@ -148,20 +151,20 @@ export default function ToolsPage() {
                       <td>
                         <span className="qty-badge">{g.length}</span>
                       </td>
-                      <td className="muted">πολλαπλά</td>
+                      <td className="muted">{tr('πολλαπλά')}</td>
                       <td>{t.manufacturer || '—'}</td>
-                      <td>{t.specialty || '—'}</td>
+                      <td>{trData(t.specialty) || '—'}</td>
                       <td className="muted">
                         {new Set(g.map(x => x.mode)).size === 1
                           ? t.mode === 'STOCK'
                             ? 'Stock'
                             : t.mode === 'SET_MEMBER'
-                              ? 'Σετ'
-                              : 'Μεμονωμένα'
-                          : 'Μικτή'}
+                              ? tr('Σετ')
+                              : tr('Μεμονωμένα')
+                          : tr('Μικτή')}
                       </td>
                       <td>—</td>
-                      <td className="muted">Μικτή</td>
+                      <td className="muted">{tr('Μικτή')}</td>
                       <td>
                         <Link className="icon-link" to={`/tools/${t.id}`}>
                           <ChevronRight size={17} />
@@ -192,11 +195,11 @@ export default function ToolsPage() {
                         </Link>
                       </td>
                       <td>{t.manufacturer || '—'}</td>
-                      <td>{t.specialty || '—'}</td>
+                      <td>{trData(t.specialty) || '—'}</td>
                       <td>
                         {t.mode === 'SET_MEMBER' && set ? (
                           <>
-                            <b>Σετ</b>
+                            <b>{tr('Σετ')}</b>
                             <small className="row-sub">
                               {set.barcode} · {set.name}
                             </small>
@@ -205,8 +208,8 @@ export default function ToolsPage() {
                           <b>Stock</b>
                         ) : (
                           <>
-                            <b>Μεμονωμένο</b>
-                            <small className="row-sub">{t.department || '—'}</small>
+                            <b>{tr('Μεμονωμένο')}</b>
+                            <small className="row-sub">{trData(t.department) || '—'}</small>
                           </>
                         )}
                       </td>
@@ -217,7 +220,7 @@ export default function ToolsPage() {
                             <span className="muted"> / {t.maxUses}</span>
                           </>
                         ) : (
-                          <span className="muted">Χωρίς όριο</span>
+                          <span className="muted">{tr('Χωρίς όριο')}</span>
                         )}
                       </td>
                       <td>

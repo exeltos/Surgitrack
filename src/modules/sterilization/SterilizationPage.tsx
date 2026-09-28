@@ -39,6 +39,7 @@ import {
 import {printBarcodeLabel, printCompositionA4} from './printUtils';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
+import {tr, trc, trData} from '../../i18n';
 
 type Queue = 'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'RELEASE' | 'STORAGE' | 'READY';
 type Kind = AssetKind;
@@ -490,7 +491,7 @@ export default function SterilizationPage() {
     const raw = quickBarcode.trim();
     if (!raw) return;
     const ok = openBarcodeAsset(raw);
-    setQuickScanFeedback(ok ? 'Το barcode αναγνωρίστηκε.' : 'Το barcode δεν βρέθηκε στην ενεργή ροή.');
+    setQuickScanFeedback(ok ? tr('Το barcode αναγνωρίστηκε.') : tr('Το barcode δεν βρέθηκε στην ενεργή ροή.'));
     if (ok) setQuickBarcode('');
   };
   const openReceiptBatch = () => {
@@ -539,25 +540,29 @@ export default function SterilizationPage() {
       setReceiptBatchScanFeedback({
         type: 'ERROR',
         message: known
-          ? `${barcode} αναγνωρίστηκε, αλλά δεν βρίσκεται σε αναμονή φυσικής παραλαβής.`
-          : `${barcode} δεν βρέθηκε στο μητρώο.`,
+          ? tr('{0} αναγνωρίστηκε, αλλά δεν βρίσκεται σε αναμονή φυσικής παραλαβής.', barcode)
+          : tr('{0} δεν βρέθηκε στο μητρώο.', barcode),
       });
       return false;
     }
     const key = `${item.kind}:${item.id}`;
     if (receiptBatchSelected.has(key)) {
-      setReceiptBatchScanFeedback({type: 'WARN', message: `${barcode} είναι ήδη στην παραλαβή.`});
+      setReceiptBatchScanFeedback({type: 'WARN', message: tr('{0} είναι ήδη στην παραλαβή.', barcode)});
       return false;
     }
     if (receiptBatchDepartment && item.department !== receiptBatchDepartment) {
       setReceiptBatchScanFeedback({
         type: 'ERROR',
-        message: `Η τρέχουσα μαζική παραλαβή αφορά το ${receiptBatchDepartment}. Ολοκλήρωσέ την πριν παραλάβεις αντικείμενα από ${item.department}.`,
+        message: tr(
+          'Η τρέχουσα μαζική παραλαβή αφορά το {0}. Ολοκλήρωσέ την πριν παραλάβεις αντικείμενα από {1}.',
+          trData(receiptBatchDepartment),
+          trData(item.department),
+        ),
       });
       return false;
     }
     setReceiptBatchSelected(current => new Set([...current, key]));
-    setReceiptBatchScanFeedback({type: 'OK', message: `${barcode} · ${item.name} προστέθηκε στην παραλαβή.`});
+    setReceiptBatchScanFeedback({type: 'OK', message: tr('{0} · {1} προστέθηκε στην παραλαβή.', barcode, item.name)});
     return true;
   };
   const toggleReceiptBatchDeviation = (key: string) =>
@@ -725,7 +730,7 @@ export default function SterilizationPage() {
   const confirmReceipt = () => {
     if (!receiptDraft || !deliverer || !receiptIdentityValid) return;
     if (visibleDeviation && !receiptDeviationRecorded) {
-      window.alert('Κατέγραψε πρώτα την εμφανή απόκλιση με αναφορά στο Σετ ή στο συγκεκριμένο εργαλείο.');
+      window.alert(tr('Κατέγραψε πρώτα την εμφανή απόκλιση με αναφορά στο Σετ ή στο συγκεκριμένο εργαλείο.'));
       return;
     }
     const countPerformed = receiptDraft.kind === 'SET' && receiptPolicy.countSetsAtReceipt;
@@ -1072,18 +1077,18 @@ export default function SterilizationPage() {
       setLoadScanFeedback({
         type: 'ERROR',
         message: known
-          ? `${barcode} αναγνωρίστηκε, αλλά δεν βρίσκεται στο σωστό στάδιο για αυτό το φορτίο.`
-          : `${barcode} δεν βρέθηκε στο μητρώο.`,
+          ? tr('{0} αναγνωρίστηκε, αλλά δεν βρίσκεται στο σωστό στάδιο για αυτό το φορτίο.', barcode)
+          : tr('{0} δεν βρέθηκε στο μητρώο.', barcode),
       });
       return false;
     }
     const key = `${eligible.kind}:${eligible.id}`;
     if (loadSelected.has(key)) {
-      setLoadScanFeedback({type: 'WARN', message: `${barcode} είναι ήδη στο φορτίο.`});
+      setLoadScanFeedback({type: 'WARN', message: tr('{0} είναι ήδη στο φορτίο.', barcode)});
       return false;
     }
     setLoadSelected(current => new Set([...current, key]));
-    setLoadScanFeedback({type: 'OK', message: `${barcode} · ${eligible.name} προστέθηκε στο φορτίο.`});
+    setLoadScanFeedback({type: 'OK', message: tr('{0} · {1} προστέθηκε στο φορτίο.', barcode, eligible.name)});
     return true;
   };
   const completeLoad = () => {
@@ -1132,7 +1137,7 @@ export default function SterilizationPage() {
   };
   const recallLoad = (id: string) => {
     const reason = window.prompt(
-      'Αιτιολογία ανάκλησης φορτίου:',
+      tr('Αιτιολογία ανάκλησης φορτίου:'),
       'Μη αποδεκτό αποτέλεσμα δείκτη / απόκλιση μετά την αποδέσμευση',
     );
     if (!reason?.trim()) return;
@@ -1180,20 +1185,25 @@ export default function SterilizationPage() {
       setDeliveryScanFeedback({
         type: 'ERROR',
         message: known
-          ? `${barcode} αναγνωρίστηκε, αλλά δεν είναι αποδεσμευμένο / έτοιμο για παράδοση.`
-          : `${barcode} δεν βρέθηκε στο μητρώο.`,
+          ? tr('{0} αναγνωρίστηκε, αλλά δεν είναι αποδεσμευμένο / έτοιμο για παράδοση.', barcode)
+          : tr('{0} δεν βρέθηκε στο μητρώο.', barcode),
       });
       return false;
     }
     const key = `${eligible.kind}:${eligible.id}`;
     if (deliverySelected.has(key)) {
-      setDeliveryScanFeedback({type: 'WARN', message: `${barcode} έχει ήδη σαρωθεί για αυτή την παράδοση.`});
+      setDeliveryScanFeedback({type: 'WARN', message: tr('{0} έχει ήδη σαρωθεί για αυτή την παράδοση.', barcode)});
       return false;
     }
     if (deliveryBatchDepartment && eligible.department !== deliveryBatchDepartment) {
       setDeliveryScanFeedback({
         type: 'ERROR',
-        message: `${barcode} ανήκει στο ${eligible.department || 'χωρίς τμήμα'}. Η τρέχουσα παράδοση αφορά το ${deliveryBatchDepartment}. Ολοκλήρωσε πρώτα αυτή την παράδοση.`,
+        message: tr(
+          '{0} ανήκει στο {1}. Η τρέχουσα παράδοση αφορά το {2}. Ολοκλήρωσε πρώτα αυτή την παράδοση.',
+          barcode,
+          eligible.department ? trData(eligible.department) : tr('χωρίς τμήμα'),
+          trData(deliveryBatchDepartment),
+        ),
       });
       return false;
     }
@@ -1201,7 +1211,7 @@ export default function SterilizationPage() {
     setDeliveryBatchReceiverCode('');
     setDeliveryScanFeedback({
       type: 'OK',
-      message: `${barcode} · ${eligible.name} προστέθηκε στην παράδοση προς ${eligible.department}.`,
+      message: tr('{0} · {1} προστέθηκε στην παράδοση προς {2}.', barcode, eligible.name, trData(eligible.department)),
     });
     return true;
   };
@@ -1219,7 +1229,11 @@ export default function SterilizationPage() {
     if (deliveryBatchDepartment && item.department !== deliveryBatchDepartment) {
       setDeliveryScanFeedback({
         type: 'WARN',
-        message: `Η τρέχουσα παράδοση αφορά το ${deliveryBatchDepartment}. Μπορείς να επιλέξεις όσα αντικείμενα θέλεις από το ίδιο τμήμα· για ${item.department} ξεκίνησε ξεχωριστή παράδοση.`,
+        message: tr(
+          'Η τρέχουσα παράδοση αφορά το {0}. Μπορείς να επιλέξεις όσα αντικείμενα θέλεις από το ίδιο τμήμα· για {1} ξεκίνησε ξεχωριστή παράδοση.',
+          trData(deliveryBatchDepartment),
+          trData(item.department),
+        ),
       });
       return;
     }
@@ -1258,50 +1272,52 @@ export default function SterilizationPage() {
   };
   const queueTitle =
     queue === 'INCOMING'
-      ? 'Αναμονή φυσικής παραλαβής'
+      ? tr('Αναμονή φυσικής παραλαβής')
       : queue === 'WASHING'
-        ? 'Καθαρισμός & Απολύμανση'
+        ? tr('Καθαρισμός & Απολύμανση')
         : queue === 'PREP'
-          ? 'Έλεγχος & Σύνθεση'
+          ? tr('Έλεγχος & Σύνθεση')
           : queue === 'PACKAGING'
-            ? 'Συσκευασία & Σήμανση'
+            ? tr('Συσκευασία & Σήμανση')
             : queue === 'PROCESS'
-              ? 'Αποστείρωση'
+              ? tr('Αποστείρωση')
               : queue === 'RELEASE'
-                ? 'Έλεγχος & Αποδέσμευση'
+                ? tr('Έλεγχος & Αποδέσμευση')
                 : queue === 'STORAGE'
-                  ? 'Αποθήκευση'
-                  : 'Έτοιμα για παραλαβή';
+                  ? tr('Αποθήκευση')
+                  : tr('Έτοιμα για παραλαβή');
   const queueStageLabel =
     queue === 'INCOMING'
-      ? 'Αναμένει φυσική παράδοση'
+      ? tr('Αναμένει φυσική παράδοση')
       : queue === 'WASHING'
-        ? 'Προς καθαρισμό / απολύμανση'
+        ? tr('Προς καθαρισμό / απολύμανση')
         : queue === 'PREP'
-          ? 'Προς έλεγχο / σύνθεση'
+          ? tr('Προς έλεγχο / σύνθεση')
           : queue === 'PACKAGING'
-            ? 'Προς συσκευασία / σήμανση'
+            ? tr('Προς συσκευασία / σήμανση')
             : queue === 'PROCESS'
-              ? 'Σε αποστείρωση'
+              ? tr('Σε αποστείρωση')
               : queue === 'RELEASE'
-                ? 'Αναμένει αποδέσμευση'
+                ? tr('Αναμένει αποδέσμευση')
                 : queue === 'STORAGE'
-                  ? 'Σε αποθήκευση'
-                  : 'Έτοιμο για το τμήμα';
+                  ? tr('Σε αποθήκευση')
+                  : tr('Έτοιμο για το τμήμα');
   return (
     <div className="sterilization-workspace">
       <div className="ster-work-head">
         <div>
-          <span className="eyebrow">ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ</span>
-          <h1>Χώρος εργασίας Αποστείρωσης</h1>
-          <p>Η ενεργή ροή του νοσοκομείου εφαρμόζεται αυτόματα από το SurgiTrack Studio με πλήρη ιχνηλασιμότητα.</p>
+          <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
+          <h1>{tr('Χώρος εργασίας Αποστείρωσης')}</h1>
+          <p>
+            {tr('Η ενεργή ροή του νοσοκομείου εφαρμόζεται αυτόματα από το SurgiTrack Studio με πλήρη ιχνηλασιμότητα.')}
+          </p>
         </div>
         <div className="ster-shift">
           <ShieldCheck size={18} />
           <div>
-            <small>Συνδεδεμένος χρήστης</small>
-            <strong>{currentUser.name}</strong>
-            <span>{currentUser.department}</span>
+            <small>{tr('Συνδεδεμένος χρήστης')}</small>
+            <strong>{trData(currentUser.name)}</strong>
+            <span>{trData(currentUser.department)}</span>
           </div>
         </div>
       </div>
@@ -1311,8 +1327,8 @@ export default function SterilizationPage() {
           <ScanBarcode size={23} />
         </div>
         <div className="ster-scan-copy">
-          <strong>Γρήγορη σάρωση barcode</strong>
-          <span>Scanner υπολογιστή ή χειροκίνητη πληκτρολόγηση · Enter για άμεσο άνοιγμα</span>
+          <strong>{tr('Γρήγορη σάρωση barcode')}</strong>
+          <span>{tr('Scanner υπολογιστή ή χειροκίνητη πληκτρολόγηση · Enter για άμεσο άνοιγμα')}</span>
         </div>
         <div className="ster-scan-input">
           <Barcode size={17} />
@@ -1329,11 +1345,11 @@ export default function SterilizationPage() {
                 quickScan();
               }
             }}
-            placeholder="S000324 ή T001312"
-            aria-label="Γρήγορη σάρωση barcode"
+            placeholder={tr('S000324 ή T001312')}
+            aria-label={tr('Γρήγορη σάρωση barcode')}
           />
           <button type="button" onClick={quickScan}>
-            Άνοιγμα
+            {tr('Άνοιγμα')}
           </button>
         </div>
         {quickScanFeedback && <div className="ster-scan-feedback-inline">{quickScanFeedback}</div>}
@@ -1343,30 +1359,30 @@ export default function SterilizationPage() {
         compact
         query={query}
         onQueryChange={setQuery}
-        placeholder="Αναζήτηση με ονομασία, κωδικό, barcode ή τμήμα..."
+        placeholder={tr('Αναζήτηση με ονομασία, κωδικό, barcode ή τμήμα...')}
         onSubmitQuery={() => scan()}
         filters={[
           {
             key: 'department',
             value: departmentFilter,
-            placeholder: 'Όλα τα τμήματα',
+            placeholder: tr('Όλα τα τμήματα'),
             options: queueValues('department').map(value => ({value, label: value})),
             onChange: setDepartmentFilter,
           },
           {
             key: 'specialty',
             value: specialtyFilter,
-            placeholder: 'Όλες οι ειδικότητες',
+            placeholder: tr('Όλες οι ειδικότητες'),
             options: queueValues('specialty').map(value => ({value, label: value})),
             onChange: setSpecialtyFilter,
           },
           {
             key: 'kind',
             value: kindFilter,
-            placeholder: 'Σετ & εργαλεία',
+            placeholder: tr('Σετ & εργαλεία'),
             options: [
-              {value: 'SET', label: 'Μόνο Σετ'},
-              {value: 'TOOL', label: 'Μόνο εργαλεία'},
+              {value: 'SET', label: tr('Μόνο Σετ')},
+              {value: 'TOOL', label: tr('Μόνο εργαλεία')},
             ],
             onChange: setKindFilter,
           },
@@ -1376,44 +1392,44 @@ export default function SterilizationPage() {
       <div className="sterile-queues modern workflow-configured-queues">
         <button className={queue === 'INCOMING' ? 'active' : ''} onClick={() => setQueue('INCOMING')}>
           <Send />
-          <span>Παραλαβή</span>
+          <span>{tr('Παραλαβή')}</span>
           <strong>{incoming.length}</strong>
           <small>Chain of custody</small>
         </button>
         {(stageEnabled('WASHING') || washing.length > 0) && (
           <button className={queue === 'WASHING' ? 'active' : ''} onClick={() => setQueue('WASHING')}>
             <PackageOpen />
-            <span>Καθαρισμός</span>
+            <span>{trc('stage', 'Καθαρισμός')}</span>
             <strong>{washing.length}</strong>
-            <small>Πλύση / απολύμανση</small>
+            <small>{tr('Πλύση / απολύμανση')}</small>
           </button>
         )}
         {(stageEnabled('PREPARATION') || preparation.length > 0) && (
           <button className={queue === 'PREP' ? 'active' : ''} onClick={() => setQueue('PREP')}>
             <Layers3 />
-            <span>Έλεγχος & Σύνθεση</span>
+            <span>{tr('Έλεγχος & Σύνθεση')}</span>
             <strong>{preparation.length}</strong>
-            <small>Εργαλεία / αποκλίσεις</small>
+            <small>{tr('Εργαλεία / αποκλίσεις')}</small>
           </button>
         )}
         {(stageEnabled('PACKAGING') || packaging.length > 0) && (
           <button className={queue === 'PACKAGING' ? 'active' : ''} onClick={() => setQueue('PACKAGING')}>
             <Box />
-            <span>Συσκευασία</span>
+            <span>{tr('Συσκευασία')}</span>
             <strong>{packaging.length}</strong>
-            <small>Barrier / σήμανση</small>
+            <small>{tr('Barrier / σήμανση')}</small>
           </button>
         )}
         <button className={queue === 'PROCESS' ? 'active' : ''} onClick={() => setQueue('PROCESS')}>
           <Flame />
-          <span>Αποστείρωση</span>
+          <span>{tr('Αποστείρωση')}</span>
           <strong>{processing.length}</strong>
-          <small>Κύκλος / φορτίο</small>
+          <small>{tr('Κύκλος / φορτίο')}</small>
         </button>
         {(stageEnabled('RELEASE') || awaitingRelease.length > 0) && (
           <button className={queue === 'RELEASE' ? 'active' : ''} onClick={() => setQueue('RELEASE')}>
             <ShieldCheck />
-            <span>Αποδέσμευση</span>
+            <span>{tr('Αποδέσμευση')}</span>
             <strong>{awaitingRelease.length}</strong>
             <small>Quality gate</small>
           </button>
@@ -1421,16 +1437,16 @@ export default function SterilizationPage() {
         {(stageEnabled('STORAGE') || storage.length > 0) && (
           <button className={queue === 'STORAGE' ? 'active' : ''} onClick={() => setQueue('STORAGE')}>
             <PackageCheck />
-            <span>Αποθήκευση</span>
+            <span>{tr('Αποθήκευση')}</span>
             <strong>{storage.length}</strong>
-            <small>Πριν την παράδοση</small>
+            <small>{tr('Πριν την παράδοση')}</small>
           </button>
         )}
         <button className={queue === 'READY' ? 'active' : ''} onClick={() => setQueue('READY')}>
           <UserRoundCheck />
-          <span>Παράδοση</span>
+          <span>{tr('Παράδοση')}</span>
           <strong>{ready.length}</strong>
-          <small>Προς τμήμα</small>
+          <small>{tr('Προς τμήμα')}</small>
         </button>
       </div>
 
@@ -1439,54 +1455,54 @@ export default function SterilizationPage() {
           <div>
             <strong>{queueTitle}</strong>
             <span>
-              {rows.length} {rows.length === 1 ? 'εγγραφή' : 'εγγραφές'}
+              {rows.length} {rows.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
             </span>
           </div>
           <div className="ster-panel-head-actions">
             {queue === 'INCOMING' && (
               <>
                 <span className="ster-hint">
-                  Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.
+                  {tr('Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.')}
                 </span>
                 {incoming.length > 0 && (
                   <button className="primary compact" onClick={openReceiptBatch}>
-                    <ScanBarcode size={15} /> Μαζική παραλαβή
+                    <ScanBarcode size={15} /> {tr('Μαζική παραλαβή')}
                   </button>
                 )}
               </>
             )}
             {queue === 'WASHING' && (
               <>
-                <span className="ster-hint">Τεκμηριωμένο quality gate καθαρισμού / απολύμανσης.</span>
+                <span className="ster-hint">{tr('Τεκμηριωμένο quality gate καθαρισμού / απολύμανσης.')}</span>
                 {washing.length > 0 && (
                   <button className="primary compact" onClick={() => openLoad('WASHING')}>
-                    <Layers3 size={15} /> Νέο φορτίο πλυντηρίου
+                    <Layers3 size={15} /> {tr('Νέο φορτίο πλυντηρίου')}
                   </button>
                 )}
               </>
             )}
             {queue === 'PREP' && (
-              <span className="ster-hint">Έλεγχος λειτουργικότητας, σύνθεση και διαχείριση αποκλίσεων.</span>
+              <span className="ster-hint">{tr('Έλεγχος λειτουργικότητας, σύνθεση και διαχείριση αποκλίσεων.')}</span>
             )}
             {queue === 'PACKAGING' && (
-              <span className="ster-hint">Έλεγχος sterile barrier, σήμανσης και δείκτη πριν τον κύκλο.</span>
+              <span className="ster-hint">{tr('Έλεγχος sterile barrier, σήμανσης και δείκτη πριν τον κύκλο.')}</span>
             )}
             {queue === 'PROCESS' && processing.length > 0 && (
               <button className="primary compact" onClick={() => openLoad('STERILIZATION')}>
-                <Flame size={15} /> Δημιουργία φορτίου
+                <Flame size={15} /> {tr('Δημιουργία φορτίου')}
               </button>
             )}
             {queue === 'STORAGE' && (
-              <span className="ster-hint">Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.</span>
+              <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
             )}
             {queue === 'READY' && ready.length > 0 && (
               <button className="primary compact" onClick={openDeliveryBatch}>
-                <ScanBarcode size={15} /> Νέα παράδοση
+                <ScanBarcode size={15} /> {tr('Νέα παράδοση')}
               </button>
             )}
             {queue === 'RELEASE' && (
               <span className="ster-hint">
-                Αποδέσμευση ανά φορτίο με ενιαία τεκμηρίωση CI/BI και φυσικών παραμέτρων.
+                {tr('Αποδέσμευση ανά φορτίο με ενιαία τεκμηρίωση CI/BI και φυσικών παραμέτρων.')}
               </span>
             )}
           </div>
@@ -1496,16 +1512,19 @@ export default function SterilizationPage() {
             {awaitingLoads.map(load => (
               <div className="load-release-card" key={load.id}>
                 <div>
-                  <span>ΦΟΡΤΙΟ · {load.id}</span>
+                  <span>
+                    {tr('ΦΟΡΤΙΟ ·') + ' '}
+                    {load.id}
+                  </span>
                   <strong>
                     {load.equipment} · {load.cycleNumber}
                   </strong>
                   <small>
-                    {load.program} · {load.items.length} αντικείμενα
+                    {load.program} · {load.items.length} {tr('αντικείμενα')}
                   </small>
                 </div>
                 <button className="primary compact" onClick={() => openLoadRelease(load.id)}>
-                  <ShieldCheck size={15} /> Αποδέσμευση φορτίου
+                  <ShieldCheck size={15} /> {tr('Αποδέσμευση φορτίου')}
                 </button>
               </div>
             ))}
@@ -1513,18 +1532,23 @@ export default function SterilizationPage() {
         )}
         {queue === 'RELEASE' && recallCases.some(item => item.status === 'OPEN') && (
           <details className="released-loads" open>
-            <summary>Ενεργές ανακλήσεις · {recallCases.filter(item => item.status === 'OPEN').length}</summary>
+            <summary>
+              {tr('Ενεργές ανακλήσεις ·') + ' '}
+              {recallCases.filter(item => item.status === 'OPEN').length}
+            </summary>
             <div>
               {recallCases
                 .filter(item => item.status === 'OPEN')
                 .map(recall => (
                   <div key={recall.id}>
                     <span>
-                      <b>{recall.id}</b> · φορτίο {recall.loadId} ·{' '}
-                      {recall.items.filter(item => item.status !== 'CLOSED').length} εκκρεμή
+                      <b>{recall.id}</b> {tr('· φορτίο') + ' '}
+                      {recall.loadId} · {recall.items.filter(item => item.status !== 'CLOSED').length} {tr('εκκρεμή')}
                       <small style={{display: 'block'}}>{recall.reason}</small>
                     </span>
-                    <span>{recall.items.filter(item => item.status === 'OUTSTANDING').length} προς επιστροφή</span>
+                    <span>
+                      {recall.items.filter(item => item.status === 'OUTSTANDING').length} {tr('προς επιστροφή')}
+                    </span>
                   </div>
                 ))}
             </div>
@@ -1532,15 +1556,15 @@ export default function SterilizationPage() {
         )}
         {queue === 'RELEASE' && releasedLoads.length > 0 && (
           <details className="released-loads">
-            <summary>Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης</summary>
+            <summary>{tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}</summary>
             <div>
               {releasedLoads.map(load => (
                 <div key={load.id}>
                   <span>
-                    <b>{load.id}</b> · {load.equipment} · {load.cycleNumber} · {load.items.length} αντικείμενα
+                    <b>{load.id}</b> · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
                   </span>
                   <button onClick={() => recallLoad(load.id)}>
-                    <TriangleAlert size={14} /> Ανάκληση
+                    <TriangleAlert size={14} /> {tr('Ανάκληση')}
                   </button>
                 </div>
               ))}
@@ -1550,18 +1574,18 @@ export default function SterilizationPage() {
         {rows.length === 0 ? (
           <div className="empty ster-empty">
             <PackageCheck size={32} />
-            <strong>Δεν υπάρχουν εγγραφές σε αυτό το στάδιο</strong>
-            <span>Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.</span>
+            <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>
+            <span>{tr('Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.')}</span>
           </div>
         ) : (
           <>
             <div className="ster-list-head">
-              <span>Αντικείμενο</span>
-              <span>Τμήμα</span>
-              <span>Ειδικότητα</span>
-              <span>{queue === 'INCOMING' ? 'Σύνθεση / κατάσταση' : 'Κατάσταση'}</span>
-              <span>Στάδιο</span>
-              <span>Ενέργειες</span>
+              <span>{tr('Αντικείμενο')}</span>
+              <span>{tr('Τμήμα')}</span>
+              <span>{tr('Ειδικότητα')}</span>
+              <span>{queue === 'INCOMING' ? tr('Σύνθεση / κατάσταση') : tr('Κατάσταση')}</span>
+              <span>{tr('Στάδιο')}</span>
+              <span>{tr('Ενέργειες')}</span>
             </div>
             <div className="ster-list-scroll">
               {rows.map(x => {
@@ -1582,7 +1606,7 @@ export default function SterilizationPage() {
                           <Link to={detail} className="mono ster-code">
                             {x.barcode}
                           </Link>
-                          <span className="ster-type">{x.kind === 'SET' ? 'ΣΕΤ' : 'ΕΡΓΑΛΕΙΟ'}</span>
+                          <span className="ster-type">{x.kind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</span>
                         </div>
                         <Link to={detail} className="ster-asset-name">
                           {x.name}
@@ -1590,23 +1614,23 @@ export default function SterilizationPage() {
                       </div>
                     </div>
                     <div className="ster-cell-text ster-cell-department">
-                      <strong>{x.department || 'Χωρίς τμήμα'}</strong>
-                      <span className="ster-tablet-specialty">{x.specialty || '—'}</span>
+                      <strong>{trData(x.department) || tr('Χωρίς τμήμα')}</strong>
+                      <span className="ster-tablet-specialty">{trData(x.specialty) || '—'}</span>
                     </div>
                     <div className="ster-cell-text ster-cell-specialty">
-                      <span>{x.specialty || '—'}</span>
+                      <span>{trData(x.specialty) || '—'}</span>
                     </div>
                     <div className="ster-meta">
                       {queue === 'INCOMING' ? (
                         x.kind === 'SET' ? (
                           <>
-                            <small>Σύνθεση</small>
+                            <small>{tr('Σύνθεση')}</small>
                             <strong className={x.actual !== x.expected ? 'warn-text' : ''}>
                               {x.actual} / {x.expected}
                             </strong>
                           </>
                         ) : (
-                          <span className="ster-object-state">Μεμονωμένο εργαλείο</span>
+                          <span className="ster-object-state">{tr('Μεμονωμένο εργαλείο')}</span>
                         )
                       ) : (
                         <StatusBadge value={x.state} />
@@ -1614,7 +1638,7 @@ export default function SterilizationPage() {
                       {assetIssues.length > 0 && (
                         <span className="issue-inline">
                           <TriangleAlert size={14} />
-                          {assetIssues.length} ανοικτή
+                          {assetIssues.length} {tr('ανοικτή')}
                         </span>
                       )}
                       <small className="ster-tablet-stage">{queueStageLabel}</small>
@@ -1625,38 +1649,39 @@ export default function SterilizationPage() {
                     <div className="ster-row-action">
                       {queue === 'INCOMING' ? (
                         <button className="primary compact" onClick={() => openReceipt(x.kind, x)}>
-                          <CheckCircle2 size={15} /> Παραλαβή
+                          <CheckCircle2 size={15} /> {tr('Παραλαβή')}
                         </button>
                       ) : queue === 'WASHING' ? (
                         <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'WASHING')}>
-                          <PackageOpen size={15} /> Έλεγχος σταδίου
+                          <PackageOpen size={15} /> {tr('Έλεγχος σταδίου')}
                         </button>
                       ) : queue === 'PREP' ? (
                         <button
                           className="primary compact ster-primary-action"
                           onClick={() => openPreparation(x.kind, x)}
                         >
-                          <Layers3 size={15} /> Έλεγχος & Σύνθεση <ArrowRight size={14} />
+                          <Layers3 size={15} /> {tr('Έλεγχος & Σύνθεση') + ' '}
+                          <ArrowRight size={14} />
                         </button>
                       ) : queue === 'PACKAGING' ? (
                         <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'PACKAGING')}>
-                          <Box size={15} /> Έλεγχος συσκευασίας
+                          <Box size={15} /> {tr('Έλεγχος συσκευασίας')}
                         </button>
                       ) : queue === 'PROCESS' ? (
                         <button className="primary compact" onClick={() => openCycleCompletion(x.kind, x)}>
-                          <PackageCheck size={15} /> Καταχώρηση κύκλου
+                          <PackageCheck size={15} /> {tr('Καταχώρηση κύκλου')}
                         </button>
                       ) : queue === 'RELEASE' ? (
                         <button className="primary compact" onClick={() => openRelease(x.kind, x)}>
-                          <ShieldCheck size={15} /> Έλεγχος αποδέσμευσης
+                          <ShieldCheck size={15} /> {tr('Έλεγχος αποδέσμευσης')}
                         </button>
                       ) : queue === 'STORAGE' ? (
                         <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'STORAGE')}>
-                          <PackageCheck size={15} /> Έλεγχος αποθήκευσης
+                          <PackageCheck size={15} /> {tr('Έλεγχος αποθήκευσης')}
                         </button>
                       ) : (
                         <button className="primary compact" onClick={() => openDelivery(x.kind, x)}>
-                          <UserRoundCheck size={15} /> Παράδοση στο τμήμα
+                          <UserRoundCheck size={15} /> {tr('Παράδοση στο τμήμα')}
                         </button>
                       )}
                     </div>
@@ -1671,7 +1696,7 @@ export default function SterilizationPage() {
       {loadModal && (
         <div className="modal-backdrop" onMouseDown={closeLoad}>
           <div className="receipt-card-modal workflow-modal load-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeLoad}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoad}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -1679,51 +1704,54 @@ export default function SterilizationPage() {
                 {loadModal === 'WASHING' ? <PackageOpen size={20} /> : <Flame size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{loadModal === 'WASHING' ? 'ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ' : 'ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ'}</span>
-                <h2>Δημιουργία ενιαίου φορτίου</h2>
+                <span className="eyebrow">
+                  {loadModal === 'WASHING' ? tr('ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ') : tr('ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ')}
+                </span>
+                <h2>{tr('Δημιουργία ενιαίου φορτίου')}</h2>
                 <p>
-                  Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα
-                  επιλεγμένα barcodes.
+                  {tr(
+                    'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.',
+                  )}
                 </p>
               </div>
             </div>
             <div className="load-modal-body">
               <div className="cycle-clean-fields">
                 <label>
-                  {loadModal === 'WASHING' ? 'Πλυντήριο / απολυμαντής' : 'Κλίβανος'}
+                  {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}
                   <input value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)} />
                 </label>
                 <label>
-                  Αριθμός κύκλου / φορτίου
+                  {tr('Αριθμός κύκλου / φορτίου')}
                   <input
                     value={loadCycleNumber}
                     onChange={e => setLoadCycleNumber(e.target.value)}
-                    placeholder="π.χ. 2026-0815-07"
+                    placeholder={tr('π.χ. 2026-0815-07')}
                   />
                 </label>
                 <label>
-                  Πρόγραμμα
+                  {tr('Πρόγραμμα')}
                   <input value={loadProgram} onChange={e => setLoadProgram(e.target.value)} />
                 </label>
                 {loadModal === 'STERILIZATION' && (
                   <label>
-                    Χημικός δείκτης κύκλου
+                    {tr('Χημικός δείκτης κύκλου')}
                     <select
                       value={loadChemical}
                       onChange={e => setLoadChemical(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
                     >
-                      <option value="PASS">Αποδεκτός</option>
-                      <option value="FAIL">Αποτυχία</option>
-                      <option value="NOT_RECORDED">Δεν καταγράφηκε</option>
+                      <option value="PASS">{tr('Αποδεκτός')}</option>
+                      <option value="FAIL">{tr('Αποτυχία')}</option>
+                      <option value="NOT_RECORDED">{tr('Δεν καταγράφηκε')}</option>
                     </select>
                   </label>
                 )}
               </div>
               {loadModal === 'STERILIZATION' && (
                 <BarcodeCapture
-                  title="Προσθήκη στο φορτίο"
-                  subtitle="Σκάναρε, πληκτρολόγησε ή χρησιμοποίησε scanner υπολογιστή."
-                  placeholder="Barcode · π.χ. S000324"
+                  title={tr('Προσθήκη στο φορτίο')}
+                  subtitle={tr('Σκάναρε, πληκτρολόγησε ή χρησιμοποίησε scanner υπολογιστή.')}
+                  placeholder={tr('Barcode · π.χ. S000324')}
                   feedback={loadScanFeedback}
                   onBarcode={addBarcodeToLoad}
                 />
@@ -1731,14 +1759,15 @@ export default function SterilizationPage() {
               <section className="load-assets">
                 <div className="load-assets-head">
                   <div>
-                    <strong>Περιεχόμενο φορτίου</strong>
+                    <strong>{tr('Περιεχόμενο φορτίου')}</strong>
                     <span>
-                      {loadSelected.size} από {loadCandidates.length} επιλεγμένα
+                      {loadSelected.size} {tr('από') + ' '}
+                      {loadCandidates.length} {tr('επιλεγμένα')}
                     </span>
                   </div>
                   {loadModal === 'STERILIZATION' ? (
                     <span className="load-assets-mode">
-                      <ScanBarcode size={14} /> Barcode / χειροκίνητη επιλογή
+                      <ScanBarcode size={14} /> {tr('Barcode / χειροκίνητη επιλογή')}
                     </span>
                   ) : (
                     <button
@@ -1750,7 +1779,7 @@ export default function SterilizationPage() {
                         )
                       }
                     >
-                      {loadSelected.size === loadCandidates.length ? 'Αποεπιλογή όλων' : 'Επιλογή όλων'}
+                      {loadSelected.size === loadCandidates.length ? tr('Αποεπιλογή όλων') : tr('Επιλογή όλων')}
                     </button>
                   )}
                 </div>
@@ -1769,7 +1798,7 @@ export default function SterilizationPage() {
                         <span>
                           <b>{item.barcode}</b>
                           <strong>{item.name}</strong>
-                          <small>{item.department || 'Χωρίς τμήμα'}</small>
+                          <small>{trData(item.department) || tr('Χωρίς τμήμα')}</small>
                         </span>
                         {loadModal === 'STERILIZATION' && selected && (
                           <CheckCircle2 className="load-scanned-mark" size={17} />
@@ -1780,16 +1809,16 @@ export default function SterilizationPage() {
                 </div>
               </section>
               <label className="cycle-note">
-                Παρατήρηση φορτίου
+                {tr('Παρατήρηση φορτίου')}
                 <textarea
                   value={loadNote}
                   onChange={e => setLoadNote(e.target.value)}
-                  placeholder="Προαιρετική παρατήρηση / απόκλιση…"
+                  placeholder={tr('Προαιρετική παρατήρηση / απόκλιση…')}
                 />
               </label>
             </div>
             <div className="modal-actions workflow-modal-actions">
-              <button onClick={closeLoad}>Ακύρωση</button>
+              <button onClick={closeLoad}>{tr('Ακύρωση')}</button>
               <button
                 className={
                   loadModal === 'STERILIZATION' && loadChemical === 'FAIL' ? 'danger-action primary' : 'primary'
@@ -1802,7 +1831,8 @@ export default function SterilizationPage() {
                 ) : (
                   <CheckCircle2 size={16} />
                 )}{' '}
-                Ολοκλήρωση φορτίου · {loadSelected.size}
+                {tr('Ολοκλήρωση φορτίου ·') + ' '}
+                {loadSelected.size}
               </button>
             </div>
           </div>
@@ -1812,7 +1842,7 @@ export default function SterilizationPage() {
       {selectedReleaseLoad && (
         <div className="modal-backdrop" onMouseDown={closeLoadRelease}>
           <div className="receipt-card-modal workflow-modal load-release-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeLoadRelease}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoadRelease}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -1820,13 +1850,14 @@ export default function SterilizationPage() {
                 <ShieldCheck size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ</span>
+                <span className="eyebrow">{tr('QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ')}</span>
                 <h2>
                   {selectedReleaseLoad.id} · {selectedReleaseLoad.equipment}
                 </h2>
                 <p>
-                  Κύκλος {selectedReleaseLoad.cycleNumber} · {selectedReleaseLoad.program} ·{' '}
-                  {selectedReleaseLoad.items.length} αντικείμενα
+                  {tr('Κύκλος') + ' '}
+                  {selectedReleaseLoad.cycleNumber} · {selectedReleaseLoad.program} · {selectedReleaseLoad.items.length}{' '}
+                  {tr('αντικείμενα')}
                 </p>
               </div>
             </div>
@@ -1834,8 +1865,10 @@ export default function SterilizationPage() {
               <section className="release-check-card">
                 <div className="receipt-section-title">
                   <div>
-                    <strong>Έλεγχοι φορτίου</strong>
-                    <span>Η απόφαση εφαρμόζεται σε όλα τα αντικείμενα που συνδέονται με το συγκεκριμένο φορτίο.</span>
+                    <strong>{tr('Έλεγχοι φορτίου')}</strong>
+                    <span>
+                      {tr('Η απόφαση εφαρμόζεται σε όλα τα αντικείμενα που συνδέονται με το συγκεκριμένο φορτίο.')}
+                    </span>
                   </div>
                   <ShieldCheck size={18} />
                 </div>
@@ -1846,7 +1879,7 @@ export default function SterilizationPage() {
                     onChange={e => setReleaseLoadChecks(v => ({...v, physicalParametersOk: e.target.checked}))}
                   />
                   <span>
-                    <strong>Φυσικές παράμετροι κύκλου αποδεκτές</strong>
+                    <strong>{tr('Φυσικές παράμετροι κύκλου αποδεκτές')}</strong>
                   </span>
                 </label>
                 <label className="release-check-row">
@@ -1856,7 +1889,7 @@ export default function SterilizationPage() {
                     onChange={e => setReleaseLoadChecks(v => ({...v, chemicalIndicatorOk: e.target.checked}))}
                   />
                   <span>
-                    <strong>Χημικός δείκτης αποδεκτός</strong>
+                    <strong>{tr('Χημικός δείκτης αποδεκτός')}</strong>
                   </span>
                 </label>
                 <label className="release-check-row">
@@ -1866,48 +1899,49 @@ export default function SterilizationPage() {
                     onChange={e => setReleaseLoadChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
                   />
                   <span>
-                    <strong>Συσκευασίες στεγνές και ακέραιες</strong>
+                    <strong>{tr('Συσκευασίες στεγνές και ακέραιες')}</strong>
                   </span>
                 </label>
                 <label className="release-biological">
-                  Βιολογικός δείκτης
+                  {tr('Βιολογικός δείκτης')}
                   <select
                     value={releaseLoadBi}
                     onChange={e => setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')}
                   >
-                    <option value="NOT_REQUIRED">Δεν απαιτείται βάσει πολιτικής / κύκλου</option>
-                    <option value="PASS">Αρνητικός / επιτυχής</option>
-                    <option value="PENDING">Σε αναμονή</option>
-                    <option value="FAIL">Θετικός / αποτυχία</option>
+                    <option value="NOT_REQUIRED">{tr('Δεν απαιτείται βάσει πολιτικής / κύκλου')}</option>
+                    <option value="PASS">{tr('Αρνητικός / επιτυχής')}</option>
+                    <option value="PENDING">{tr('Σε αναμονή')}</option>
+                    <option value="FAIL">{tr('Θετικός / αποτυχία')}</option>
                   </select>
                 </label>
               </section>
               <div className="load-manifest">
-                <strong>Manifest φορτίου</strong>
+                <strong>{tr('Manifest φορτίου')}</strong>
                 {selectedReleaseLoad.items.map(item => (
                   <div key={`${item.assetKind}:${item.assetId}`}>
                     <span className="mono">{item.barcode}</span>
                     <b>{item.assetName}</b>
-                    <small>{item.department}</small>
+                    <small>{trData(item.department)}</small>
                   </div>
                 ))}
               </div>
               <label className="cycle-note">
-                Παρατήρηση αποδέσμευσης
+                {tr('Παρατήρηση αποδέσμευσης')}
                 <textarea
                   value={releaseLoadNote}
                   onChange={e => setReleaseLoadNote(e.target.value)}
-                  placeholder="Προαιρετική παρατήρηση / αιτιολογία…"
+                  placeholder={tr('Προαιρετική παρατήρηση / αιτιολογία…')}
                 />
               </label>
             </div>
             <div className="modal-actions workflow-modal-actions release-actions">
-              <button onClick={closeLoadRelease}>Ακύρωση</button>
+              <button onClick={closeLoadRelease}>{tr('Ακύρωση')}</button>
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>
-                <TriangleAlert size={16} /> Μη αποδέσμευση · όλο το φορτίο
+                <TriangleAlert size={16} /> {tr('Μη αποδέσμευση · όλο το φορτίο')}
               </button>
               <button className="primary" disabled={!releaseLoadReady} onClick={() => completeLoadRelease('RELEASED')}>
-                <ShieldCheck size={16} /> Αποδέσμευση φορτίου · {selectedReleaseLoad.items.length}
+                <ShieldCheck size={16} /> {tr('Αποδέσμευση φορτίου ·') + ' '}
+                {selectedReleaseLoad.items.length}
               </button>
             </div>
           </div>
@@ -1920,7 +1954,7 @@ export default function SterilizationPage() {
             className="receipt-card-modal workflow-modal workflow-checkpoint-modal"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeCheckpoint}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeCheckpoint}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -1932,7 +1966,7 @@ export default function SterilizationPage() {
                 size={19}
               />
               <div className="workflow-modal-title">
-                <span className="eyebrow">QUALITY GATE · {checkpointStage.labelEl.toUpperCase()}</span>
+                <span className="eyebrow">QUALITY GATE · {tr(checkpointStage.labelEl).toUpperCase()}</span>
                 <h2>
                   {checkpointDraft.draft.asset.barcode} · {checkpointDraft.draft.asset.name}
                 </h2>
@@ -1944,10 +1978,10 @@ export default function SterilizationPage() {
               <div className="workflow-checkpoint-user">
                 <UserCheck size={18} />
                 <div>
-                  <small>Καταγράφεται από</small>
-                  <strong>{currentUser.name}</strong>
+                  <small>{tr('Καταγράφεται από')}</small>
+                  <strong>{trData(currentUser.name)}</strong>
                   <span>
-                    {currentUser.department} ·{' '}
+                    {trData(currentUser.department)} ·{' '}
                     {new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}
                   </span>
                 </div>
@@ -1955,8 +1989,8 @@ export default function SterilizationPage() {
               <section className="release-check-card">
                 <div className="receipt-section-title">
                   <div>
-                    <strong>Απαιτούμενοι έλεγχοι</strong>
-                    <span>Όλοι οι ενεργοί έλεγχοι πρέπει να επιβεβαιωθούν για να προχωρήσει η ροή.</span>
+                    <strong>{tr('Απαιτούμενοι έλεγχοι')}</strong>
+                    <span>{tr('Όλοι οι ενεργοί έλεγχοι πρέπει να επιβεβαιωθούν για να προχωρήσει η ροή.')}</span>
                   </div>
                   <ShieldCheck size={18} />
                 </div>
@@ -1976,18 +2010,18 @@ export default function SterilizationPage() {
                 ))}
               </section>
               <label className="cycle-note">
-                Παρατήρηση σταδίου
+                {tr('Παρατήρηση σταδίου')}
                 <textarea
                   value={checkpointNote}
                   onChange={e => setCheckpointNote(e.target.value)}
-                  placeholder="Προαιρετική παρατήρηση ή αριθμός κύκλου / πλυντηρίου…"
+                  placeholder={tr('Προαιρετική παρατήρηση ή αριθμός κύκλου / πλυντηρίου…')}
                 />
               </label>
             </div>
             <div className="modal-actions workflow-modal-actions">
-              <button onClick={closeCheckpoint}>Ακύρωση</button>
+              <button onClick={closeCheckpoint}>{tr('Ακύρωση')}</button>
               <button className="primary" disabled={!checkpointReady} onClick={finishCheckpoint}>
-                <CheckCircle2 size={16} /> Ολοκλήρωση · Επόμενο στάδιο
+                <CheckCircle2 size={16} /> {tr('Ολοκλήρωση · Επόμενο στάδιο')}
               </button>
             </div>
           </div>
@@ -1997,7 +2031,7 @@ export default function SterilizationPage() {
       {receiptDraft && (
         <div className="modal-backdrop" onMouseDown={closeReceipt}>
           <div className="receipt-card-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeReceipt}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeReceipt}>
               <X size={18} />
             </button>
             <div className="receipt-card-head">
@@ -2009,11 +2043,13 @@ export default function SterilizationPage() {
                 size={19}
               />
               <div>
-                <span>ΚΑΡΤΕΛΑ ΠΑΡΑΛΑΒΗΣ</span>
+                <span>{tr('ΚΑΡΤΕΛΑ ΠΑΡΑΛΑΒΗΣ')}</span>
                 <h2>
                   {receiptDraft.asset.barcode} · {receiptDraft.asset.name}
                 </h2>
-                <p>{receiptDraft.asset.department} → Κεντρική Αποστείρωση</p>
+                <p>
+                  {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')}
+                </p>
               </div>
             </div>
 
@@ -2022,43 +2058,45 @@ export default function SterilizationPage() {
                 <section className="receipt-work-section">
                   <div className="receipt-section-title">
                     <div>
-                      <strong>Στοιχεία παραλαβής</strong>
-                      <span>Φυσική παράδοση και στοιχεία παραλαμβάνοντα.</span>
+                      <strong>{tr('Στοιχεία παραλαβής')}</strong>
+                      <span>{tr('Φυσική παράδοση και στοιχεία παραλαμβάνοντα.')}</span>
                     </div>
                   </div>
                   <div className="receipt-summary-grid compact-summary">
                     <div>
                       <Building2 />
-                      <span>Τμήμα αποστολής</span>
-                      <strong>{receiptDraft.asset.department}</strong>
+                      <span>{tr('Τμήμα αποστολής')}</span>
+                      <strong>{trData(receiptDraft.asset.department)}</strong>
                     </div>
                     <div>
                       <Clock3 />
-                      <span>Ημερομηνία / ώρα</span>
+                      <span>{tr('Ημερομηνία / ώρα')}</span>
                       <strong>{new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}</strong>
                     </div>
                     <div>
                       <UserCheck />
-                      <span>Παραλαμβάνει</span>
-                      <strong>{currentUser.name}</strong>
-                      <small>{currentUser.department}</small>
+                      <span>{tr('Παραλαμβάνει')}</span>
+                      <strong>{trData(currentUser.name)}</strong>
+                      <small>{trData(currentUser.department)}</small>
                     </div>
                     {receiptDraft.kind === 'SET' ? (
                       <div>
                         <ClipboardCheck />
-                        <span>Δηλωμένη σύνθεση</span>
+                        <span>{tr('Δηλωμένη σύνθεση')}</span>
                         <strong
                           className={receiptDraft.asset.actual !== receiptDraft.asset.expected ? 'warn-text' : ''}
                         >
-                          {receiptExpectedCount} τεμάχια
+                          {receiptExpectedCount} {tr('τεμάχια')}
                         </strong>
-                        <small>{receiptExpectedCount} φυσικές εγγραφές</small>
+                        <small>
+                          {receiptExpectedCount} {tr('φυσικές εγγραφές')}
+                        </small>
                       </div>
                     ) : (
                       <div>
                         <Stethoscope />
-                        <span>Τύπος</span>
-                        <strong>Μεμονωμένο εργαλείο</strong>
+                        <span>{tr('Τύπος')}</span>
+                        <strong>{tr('Μεμονωμένο εργαλείο')}</strong>
                       </div>
                     )}
                   </div>
@@ -2067,20 +2105,20 @@ export default function SterilizationPage() {
                 <section className="receipt-work-section identity-work-section">
                   <div className="receipt-section-title">
                     <div>
-                      <strong>Ταυτοποίηση παραδίδοντα</strong>
-                      <span>Επιβεβαίωση με προσωπικό κωδικό.</span>
+                      <strong>{tr('Ταυτοποίηση παραδίδοντα')}</strong>
+                      <span>{tr('Επιβεβαίωση με προσωπικό κωδικό.')}</span>
                     </div>
                     <IdCard size={18} />
                   </div>
                   <div className="identity-section">
                     <label>
-                      Κωδικός ταυτοποίησης
+                      {tr('Κωδικός ταυτοποίησης')}
                       <div className="identity-input-row">
                         <input
                           autoFocus
                           value={handoverCode}
                           onChange={e => setHandoverCode(e.target.value.toUpperCase())}
-                          placeholder="Κωδικός χρήστη"
+                          placeholder={tr('Κωδικός χρήστη')}
                         />
                         {demoIdentity && (
                           <button
@@ -2095,33 +2133,34 @@ export default function SterilizationPage() {
                     </label>
                     {demoIdentity && (
                       <small className="demo-code">
-                        Demo: {demoIdentity.code} · {demoIdentity.department}
+                        Demo: {demoIdentity.code} · {trData(demoIdentity.department)}
                       </small>
                     )}
                     {handoverCode &&
                       (!deliverer ? (
-                        <div className="identity-error">Ο κωδικός δεν αναγνωρίστηκε.</div>
+                        <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
                       ) : !delivererMatches ? (
                         <div className="identity-mismatch-box">
                           <div className="identity-warning">
                             <TriangleAlert size={16} />
                             <span>
-                              Ο χρήστης ανήκει στο <b>{deliverer.department}</b>, ενώ η αποστολή προέρχεται από{' '}
-                              <b>{receiptDraft.asset.department}</b>.
+                              {tr('Ο χρήστης ανήκει στο') + ' '}
+                              <b>{trData(deliverer.department)}</b>
+                              {tr(', ενώ η αποστολή προέρχεται από')} <b>{trData(receiptDraft.asset.department)}</b>.
                             </span>
                           </div>
                           {receiptPolicy.allowCrossDepartmentHandover ? (
                             <label>
-                              Αιτιολόγηση εξαίρεσης
+                              {tr('Αιτιολόγηση εξαίρεσης')}
                               <textarea
                                 value={departmentMismatchReason}
                                 onChange={e => setDepartmentMismatchReason(e.target.value)}
-                                placeholder="Π.χ. εξουσιοδοτημένη μεταφορά από άλλο τμήμα…"
+                                placeholder={tr('Π.χ. εξουσιοδοτημένη μεταφορά από άλλο τμήμα…')}
                               />
                             </label>
                           ) : (
                             <div className="identity-error">
-                              Η πολιτική της μονάδας δεν επιτρέπει παραλαβή από διαφορετικό τμήμα.
+                              {tr('Η πολιτική της μονάδας δεν επιτρέπει παραλαβή από διαφορετικό τμήμα.')}
                             </div>
                           )}
                         </div>
@@ -2131,7 +2170,7 @@ export default function SterilizationPage() {
                           <div>
                             <strong>{deliverer.name}</strong>
                             <span>
-                              {deliverer.role} · {deliverer.department}
+                              {deliverer.role} · {trData(deliverer.department)}
                             </span>
                           </div>
                         </div>
@@ -2139,15 +2178,15 @@ export default function SterilizationPage() {
                   </div>
                   <div className="handover-warning compact-warning">
                     <TriangleAlert size={16} />
-                    <span>Η παραλαβή ολοκληρώνεται μόνο μετά την ταυτοποίηση.</span>
+                    <span>{tr('Η παραλαβή ολοκληρώνεται μόνο μετά την ταυτοποίηση.')}</span>
                   </div>
                 </section>
 
                 <section className="receipt-work-section receipt-check-section">
                   <div className="receipt-section-title">
                     <div>
-                      <strong>Εμφανής κατάσταση κατά την παραλαβή</strong>
-                      <span>Δεν υποκαθιστά τον αναλυτικό Έλεγχο & Σύνθεση.</span>
+                      <strong>{tr('Εμφανής κατάσταση κατά την παραλαβή')}</strong>
+                      <span>{tr('Δεν υποκαθιστά τον αναλυτικό Έλεγχο & Σύνθεση.')}</span>
                     </div>
                     <TriangleAlert size={18} />
                   </div>
@@ -2160,14 +2199,14 @@ export default function SterilizationPage() {
                         setReceiptDeviationRecorded(false);
                       }}
                     >
-                      <CheckCircle2 size={16} /> Χωρίς εμφανή απόκλιση
+                      <CheckCircle2 size={16} /> {tr('Χωρίς εμφανή απόκλιση')}
                     </button>
                     <button
                       type="button"
                       className={visibleDeviation ? 'active warn' : ''}
                       onClick={() => setVisibleDeviation(true)}
                     >
-                      <TriangleAlert size={16} /> Υπάρχει εμφανής απόκλιση
+                      <TriangleAlert size={16} /> {tr('Υπάρχει εμφανής απόκλιση')}
                     </button>
                   </div>
                   {visibleDeviation && (
@@ -2175,19 +2214,21 @@ export default function SterilizationPage() {
                       <TriangleAlert size={16} />
                       <span>
                         {receiptDeviationRecorded
-                          ? 'Η εμφανής απόκλιση έχει καταγραφεί. Μπορείς να ολοκληρώσεις την παραλαβή.'
-                          : 'Απαιτείται καταγραφή: χρησιμοποίησε «Αναφορά Σετ» ή «Αναφορά» στο συγκεκριμένο εργαλείο.'}
+                          ? tr('Η εμφανής απόκλιση έχει καταγραφεί. Μπορείς να ολοκληρώσεις την παραλαβή.')
+                          : tr(
+                              'Απαιτείται καταγραφή: χρησιμοποίησε «Αναφορά Σετ» ή «Αναφορά» στο συγκεκριμένο εργαλείο.',
+                            )}
                       </span>
                     </div>
                   )}
                   {receiptDraft.kind === 'SET' && receiptPolicy.countSetsAtReceipt && (
                     <div className="receipt-count-only">
                       <div>
-                        <span>Αναμενόμενα</span>
+                        <span>{tr('Αναμενόμενα')}</span>
                         <strong>{receiptExpectedCount}</strong>
                       </div>
                       <label>
-                        Παραληφθέντα
+                        {tr('Παραληφθέντα')}
                         <input
                           type="number"
                           min={0}
@@ -2201,7 +2242,7 @@ export default function SterilizationPage() {
                       {checkedCount !== receiptExpectedCount && (
                         <div className="identity-warning">
                           <TriangleAlert size={15} />
-                          <span>Η διαφορά ποσότητας θα καταγραφεί αυτόματα ως έλλειψη.</span>
+                          <span>{tr('Η διαφορά ποσότητας θα καταγραφεί αυτόματα ως έλλειψη.')}</span>
                         </div>
                       )}
                     </div>
@@ -2213,16 +2254,16 @@ export default function SterilizationPage() {
                     <button type="button" className="receipt-add-note-btn" onClick={() => setReceiptNoteOpen(true)}>
                       <span className="receipt-add-note-plus">+</span>
                       <span>
-                        <strong>Προσθήκη παρατήρησης</strong>
-                        <small>Προαιρετική σημείωση για τη φυσική παραλαβή</small>
+                        <strong>{tr('Προσθήκη παρατήρησης')}</strong>
+                        <small>{tr('Προαιρετική σημείωση για τη φυσική παραλαβή')}</small>
                       </span>
                     </button>
                   ) : (
                     <div className="receipt-inline-note-editor">
                       <div className="receipt-inline-note-head">
                         <div>
-                          <strong>Παρατήρηση παραλαβής</strong>
-                          <small>Προαιρετικά</small>
+                          <strong>{tr('Παρατήρηση παραλαβής')}</strong>
+                          <small>{tr('Προαιρετικά')}</small>
                         </div>
                         <button
                           type="button"
@@ -2231,7 +2272,7 @@ export default function SterilizationPage() {
                             setReceiptNoteOpen(false);
                             setNote('');
                           }}
-                          aria-label="Κλείσιμο παρατήρησης"
+                          aria-label={tr('Κλείσιμο παρατήρησης')}
                         >
                           <X size={15} />
                         </button>
@@ -2239,7 +2280,7 @@ export default function SterilizationPage() {
                       <textarea
                         value={note}
                         onChange={e => setNote(e.target.value)}
-                        placeholder="Κατάσταση μεταφοράς ή άλλη παρατήρηση…"
+                        placeholder={tr('Κατάσταση μεταφοράς ή άλλη παρατήρηση…')}
                       />
                     </div>
                   )}
@@ -2252,8 +2293,10 @@ export default function SterilizationPage() {
                     <div className="prep-tools-head prep-tools-toolbar receipt-tools-toolbar">
                       <div className="receipt-tools-title-block">
                         <div>
-                          <strong>Φυσική σύνθεση Σετ</strong>
-                          <span>{receiptTools.length} εργαλεία — αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα</span>
+                          <strong>{tr('Φυσική σύνθεση Σετ')}</strong>
+                          <span>
+                            {receiptTools.length} {tr('εργαλεία — αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα')}
+                          </span>
                         </div>
                       </div>
                       <div className="prep-tools-toolbar-actions">
@@ -2264,21 +2307,21 @@ export default function SterilizationPage() {
                             openIssueReport('SET', receiptDraft.asset.id, 'Αποστείρωση · κατά την παραλαβή')
                           }
                         >
-                          <TriangleAlert size={14} /> Αναφορά Σετ
+                          <TriangleAlert size={14} /> {tr('Αναφορά Σετ')}
                         </button>
                       </div>
                     </div>
                     <div className="receipt-tool-columns">
                       <span>Barcode</span>
-                      <span>Κωδικός</span>
-                      <span>Όνομα εργαλείου</span>
-                      <span>Εταιρεία</span>
-                      <span>Κατάσταση</span>
-                      <span>Ενέργεια</span>
+                      <span>{tr('Κωδικός')}</span>
+                      <span>{tr('Όνομα εργαλείου')}</span>
+                      <span>{tr('Εταιρεία')}</span>
+                      <span>{tr('Κατάσταση')}</span>
+                      <span>{tr('Ενέργεια')}</span>
                     </div>
                     <div className="prep-tools-scroll receipt-tools-scroll">
                       {receiptTools.length === 0 ? (
-                        <div className="empty compact-empty">Δεν υπάρχουν συνδεδεμένα εργαλεία στο demo.</div>
+                        <div className="empty compact-empty">{tr('Δεν υπάρχουν συνδεδεμένα εργαλεία στο demo.')}</div>
                       ) : (
                         receiptTools.map(t => {
                           const toolIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode));
@@ -2297,7 +2340,8 @@ export default function SterilizationPage() {
                                 {t.serialNumber && <small>S/N {t.serialNumber}</small>}
                                 {t.maxUses && (
                                   <small>
-                                    Υπόλοιπο {remaining}/{t.maxUses}
+                                    {tr('Υπόλοιπο') + ' '}
+                                    {remaining}/{t.maxUses}
                                   </small>
                                 )}
                               </div>
@@ -2307,11 +2351,11 @@ export default function SterilizationPage() {
                                   toolIssues.map(i => (
                                     <span className="prep-issue-chip" key={i.id}>
                                       <TriangleAlert size={12} />
-                                      {i.type}
+                                      {trData(i.type)}
                                     </span>
                                   ))
                                 ) : (
-                                  <span className="prep-ok-chip">Χωρίς απόκλιση</span>
+                                  <span className="prep-ok-chip">{tr('Χωρίς απόκλιση')}</span>
                                 )}
                               </div>
                               <button
@@ -2319,7 +2363,7 @@ export default function SterilizationPage() {
                                 type="button"
                                 onClick={() => openIssueReport('TOOL', t.id, 'Αποστείρωση · κατά την παραλαβή')}
                               >
-                                <TriangleAlert size={14} /> Αναφορά
+                                <TriangleAlert size={14} /> {tr('Αναφορά')}
                               </button>
                             </div>
                           );
@@ -2331,21 +2375,22 @@ export default function SterilizationPage() {
                   <section className="receipt-work-section receipt-single-tool-panel">
                     <div className="prep-tools-head prep-tools-toolbar receipt-tools-toolbar">
                       <div>
-                        <strong>Μεμονωμένο εργαλείο κατά την παραλαβή</strong>
+                        <strong>{tr('Μεμονωμένο εργαλείο κατά την παραλαβή')}</strong>
                         <span>
-                          Τα βασικά στοιχεία εμφανίζονται σε μία καθαρή γραμμή · αναφορά μόνο αν εντοπιστεί εμφανές
-                          πρόβλημα
+                          {tr(
+                            'Τα βασικά στοιχεία εμφανίζονται σε μία καθαρή γραμμή · αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα',
+                          )}
                         </span>
                       </div>
                       <div className="prep-tools-toolbar-actions"></div>
                     </div>
                     <div className="receipt-tool-columns">
                       <span>Barcode</span>
-                      <span>Κωδικός</span>
-                      <span>Όνομα εργαλείου</span>
-                      <span>Εταιρεία</span>
-                      <span>Κατάσταση</span>
-                      <span>Ενέργεια</span>
+                      <span>{tr('Κωδικός')}</span>
+                      <span>{tr('Όνομα εργαλείου')}</span>
+                      <span>{tr('Εταιρεία')}</span>
+                      <span>{tr('Κατάσταση')}</span>
+                      <span>{tr('Ενέργεια')}</span>
                     </div>
                     <div className="prep-tools-scroll receipt-tools-scroll single-receipt-scroll">
                       {(() => {
@@ -2365,7 +2410,8 @@ export default function SterilizationPage() {
                               {t.serialNumber && <small>S/N {t.serialNumber}</small>}
                               {t.maxUses && (
                                 <small>
-                                  Υπόλοιπο {remaining}/{t.maxUses}
+                                  {tr('Υπόλοιπο') + ' '}
+                                  {remaining}/{t.maxUses}
                                 </small>
                               )}
                             </div>
@@ -2375,11 +2421,11 @@ export default function SterilizationPage() {
                                 toolIssues.map(i => (
                                   <span className="prep-issue-chip" key={i.id}>
                                     <TriangleAlert size={12} />
-                                    {i.type}
+                                    {trData(i.type)}
                                   </span>
                                 ))
                               ) : (
-                                <span className="prep-ok-chip">Χωρίς απόκλιση</span>
+                                <span className="prep-ok-chip">{tr('Χωρίς απόκλιση')}</span>
                               )}
                             </div>
                             <button
@@ -2387,7 +2433,7 @@ export default function SterilizationPage() {
                               type="button"
                               onClick={() => openIssueReport('TOOL', t.id, 'Αποστείρωση · κατά την παραλαβή')}
                             >
-                              <TriangleAlert size={14} /> Αναφορά
+                              <TriangleAlert size={14} /> {tr('Αναφορά')}
                             </button>
                           </div>
                         );
@@ -2399,13 +2445,13 @@ export default function SterilizationPage() {
             </div>
 
             <div className="modal-actions receipt-final-bar receipt-final-actions-only">
-              <button onClick={closeReceipt}>Ακύρωση</button>
+              <button onClick={closeReceipt}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
                 disabled={!receiptIdentityValid || (visibleDeviation && !receiptDeviationRecorded)}
                 onClick={confirmReceipt}
               >
-                <UserRoundCheck size={16} /> Επιβεβαίωση φυσικής παραλαβής
+                <UserRoundCheck size={16} /> {tr('Επιβεβαίωση φυσικής παραλαβής')}
               </button>
             </div>
           </div>
@@ -2415,10 +2461,10 @@ export default function SterilizationPage() {
       {issueTarget && (
         <div className="nested-modal-backdrop" onMouseDown={closeIssueReport}>
           <div className="tool-issue-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeIssueReport}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeIssueReport}>
               <X size={17} />
             </button>
-            <span className="eyebrow">{issueTarget.kind === 'SET' ? 'ΑΝΑΦΟΡΑ ΣΕΤ' : 'ΑΝΑΦΟΡΑ ΕΡΓΑΛΕΙΟΥ'}</span>
+            <span className="eyebrow">{issueTarget.kind === 'SET' ? tr('ΑΝΑΦΟΡΑ ΣΕΤ') : tr('ΑΝΑΦΟΡΑ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h3>
               {issueTarget.kind === 'SET'
                 ? `${sets.find(x => x.id === issueTarget.id)?.barcode || ''} · ${sets.find(x => x.id === issueTarget.id)?.name || ''}`
@@ -2434,32 +2480,32 @@ export default function SterilizationPage() {
               <span>{issueSource}</span>
             </div>
             <label>
-              Τύπος αναφοράς
+              {tr('Τύπος αναφοράς')}
               <select value={issueType} onChange={e => setIssueType(e.target.value)}>
-                <option>Βλάβη / μη λειτουργικό</option>
-                <option>Φθορά</option>
-                <option>Κατεστραμμένο</option>
-                {issueTarget.kind === 'SET' && <option>Έλλειψη σύνθεσης</option>}
-                <option>Άλλο πρόβλημα</option>
+                <option>{tr('Βλάβη / μη λειτουργικό')}</option>
+                <option>{tr('Φθορά')}</option>
+                <option>{tr('Κατεστραμμένο')}</option>
+                {issueTarget.kind === 'SET' && <option>{tr('Έλλειψη σύνθεσης')}</option>}
+                <option>{tr('Άλλο πρόβλημα')}</option>
               </select>
             </label>
             <label>
-              Παρατήρηση
+              {tr('Παρατήρηση')}
               <textarea
                 value={issueNote}
                 onChange={e => setIssueNote(e.target.value)}
                 placeholder={
                   issueTarget.kind === 'SET'
-                    ? 'Περιέγραψε το πρόβλημα που αφορά το Σετ…'
-                    : 'Περιέγραψε τι διαπιστώθηκε στο εργαλείο…'
+                    ? tr('Περιέγραψε το πρόβλημα που αφορά το Σετ…')
+                    : tr('Περιέγραψε τι διαπιστώθηκε στο εργαλείο…')
                 }
               />
             </label>
             <div className="issue-photo-field">
               <div className="issue-photo-head">
                 <div>
-                  <strong>Φωτογραφίες φθοράς / βλάβης</strong>
-                  <span>Προαιρετικά, μία ή περισσότερες φωτογραφίες.</span>
+                  <strong>{tr('Φωτογραφίες φθοράς / βλάβης')}</strong>
+                  <span>{tr('Προαιρετικά, μία ή περισσότερες φωτογραφίες.')}</span>
                 </div>
                 <div className="issue-photo-actions">
                   <button
@@ -2467,7 +2513,7 @@ export default function SterilizationPage() {
                     className="app-button app-button-secondary app-button-sm"
                     onClick={() => setIssueCameraOpen(true)}
                   >
-                    <Camera size={15} /> Λήψη
+                    <Camera size={15} /> {tr('Λήψη')}
                   </button>
                   <label className="app-button app-button-secondary app-button-sm">
                     <ImagePlus size={15} /> Upload
@@ -2492,7 +2538,7 @@ export default function SterilizationPage() {
                       <button
                         type="button"
                         onClick={() => setIssuePhotos(current => current.filter(item => item.id !== photo.id))}
-                        aria-label="Αφαίρεση φωτογραφίας"
+                        aria-label={tr('Αφαίρεση φωτογραφίας')}
                       >
                         <Trash2 size={13} />
                       </button>
@@ -2503,10 +2549,10 @@ export default function SterilizationPage() {
             </div>
             <div className="modal-actions">
               <button type="button" onClick={closeIssueReport}>
-                Ακύρωση
+                {tr('Ακύρωση')}
               </button>
               <button type="button" className="primary" onClick={saveIssueReport}>
-                <TriangleAlert size={15} /> Καταχώρηση αναφοράς
+                <TriangleAlert size={15} /> {tr('Καταχώρηση αναφοράς')}
               </button>
             </div>
           </div>
@@ -2525,7 +2571,12 @@ export default function SterilizationPage() {
       {prepDraft && (
         <div className="modal-backdrop" onMouseDown={() => setPrepDraft(null)}>
           <div className="receipt-card-modal prep-modal prep-workspace-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={() => setPrepDraft(null)}>
+            <button
+              className="modal-x"
+              aria-label={tr('Κλείσιμο')}
+              title={tr('Κλείσιμο')}
+              onClick={() => setPrepDraft(null)}
+            >
               <X size={18} />
             </button>
             <div className="receipt-card-head">
@@ -2537,11 +2588,11 @@ export default function SterilizationPage() {
                 size={19}
               />
               <div>
-                <span>ΣΥΝΘΕΣΗ & ΠΡΟΕΤΟΙΜΑΣΙΑ</span>
+                <span>{tr('ΣΥΝΘΕΣΗ & ΠΡΟΕΤΟΙΜΑΣΙΑ')}</span>
                 <h2>
                   {prepDraft.asset.barcode} · {prepDraft.asset.name}
                 </h2>
-                <p>Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.</p>
+                <p>{tr('Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.')}</p>
               </div>
             </div>
             <div className="prep-workspace-body">
@@ -2549,30 +2600,30 @@ export default function SterilizationPage() {
                 <section className="prep-card-section">
                   <div className="prep-section-head">
                     <div>
-                      <strong>Στοιχεία προετοιμασίας</strong>
-                      <span>Ο χρήστης καταγράφεται αυτόματα στην καρτέλα.</span>
+                      <strong>{tr('Στοιχεία προετοιμασίας')}</strong>
+                      <span>{tr('Ο χρήστης καταγράφεται αυτόματα στην καρτέλα.')}</span>
                     </div>
                   </div>
                   <div className="prep-facts">
                     <div>
                       <UserCheck />
-                      <span>Προετοιμάζει</span>
-                      <strong>{currentUser.name}</strong>
-                      <small>{currentUser.department}</small>
+                      <span>{tr('Προετοιμάζει')}</span>
+                      <strong>{trData(currentUser.name)}</strong>
+                      <small>{trData(currentUser.department)}</small>
                     </div>
                     <div>
                       <Clock3 />
-                      <span>Ημερομηνία / ώρα</span>
+                      <span>{tr('Ημερομηνία / ώρα')}</span>
                       <strong>{new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}</strong>
                     </div>
                     <div>
                       <Layers3 />
-                      <span>Φυσικά εργαλεία</span>
+                      <span>{tr('Φυσικά εργαλεία')}</span>
                       <strong>{prepItemIds.length}</strong>
                     </div>
                     <div className={prepBlockingIssues.length ? 'warning' : ''}>
                       <TriangleAlert />
-                      <span>Εκκρεμότητες που μπλοκάρουν</span>
+                      <span>{tr('Εκκρεμότητες που μπλοκάρουν')}</span>
                       <strong>{prepBlockingIssues.length}</strong>
                     </div>
                   </div>
@@ -2580,19 +2631,19 @@ export default function SterilizationPage() {
                 <section className="prep-card-section prep-quality-section">
                   <div className="prep-section-head">
                     <div>
-                      <strong>Έλεγχος & προετοιμασία</strong>
-                      <span>Τεκμηρίωση πριν από συσκευασία και κλιβανισμό.</span>
+                      <strong>{tr('Έλεγχος & προετοιμασία')}</strong>
+                      <span>{tr('Τεκμηρίωση πριν από συσκευασία και κλιβανισμό.')}</span>
                     </div>
                   </div>
                   <div className="prep-check-summary">
                     <div>
-                      <span>Ελεγμένα εργαλεία</span>
+                      <span>{tr('Ελεγμένα εργαλεία')}</span>
                       <strong>
                         {prepCheckedIds.size} / {prepItemIds.length}
                       </strong>
                     </div>
                     <div>
-                      <span>Σύνθεση</span>
+                      <span>{tr('Σύνθεση')}</span>
                       <strong>
                         {prepDraft.kind === 'SET' ? `${prepTools.length} / ${prepDraft.asset.expected}` : '1 / 1'}
                       </strong>
@@ -2602,7 +2653,8 @@ export default function SterilizationPage() {
                     <div className="prep-block-warning">
                       <TriangleAlert size={16} />
                       <span>
-                        Υπάρχουν {prepBlockingIssues.length} εκκρεμότητες που απαιτούν ενέργεια πριν την προώθηση.
+                        {tr('Υπάρχουν') + ' '}
+                        {prepBlockingIssues.length} {tr('εκκρεμότητες που απαιτούν ενέργεια πριν την προώθηση.')}
                       </span>
                     </div>
                   )}
@@ -2610,13 +2662,14 @@ export default function SterilizationPage() {
                     <div className="prep-accepted-warning">
                       <CheckCircle2 size={16} />
                       <span>
-                        Η έλλειψη έχει γίνει αποδεκτή ως τεκμηριωμένη απόκλιση. Η διαδικασία μπορεί να προχωρήσει όταν
-                        ολοκληρωθούν οι υπόλοιποι έλεγχοι.
+                        {tr(
+                          'Η έλλειψη έχει γίνει αποδεκτή ως τεκμηριωμένη απόκλιση. Η διαδικασία μπορεί να προχωρήσει όταν ολοκληρωθούν οι υπόλοιποι έλεγχοι.',
+                        )}
                       </span>
                     </div>
                   )}
                   <div className="prep-process-checks">
-                    <strong>Έλεγχοι πριν τον κλιβανισμό</strong>
+                    <strong>{tr('Έλεγχοι πριν τον κλιβανισμό')}</strong>
                     {!stageEnabled('WASHING') && (
                       <label>
                         <input
@@ -2625,8 +2678,8 @@ export default function SterilizationPage() {
                           onChange={e => setPrepProcessChecks(v => ({...v, cleanDry: e.target.checked}))}
                         />
                         <span>
-                          <b>Καθαρότητα & στέγνωμα</b>
-                          <small>Τα εργαλεία είναι οπτικά καθαρά και πλήρως στεγνά.</small>
+                          <b>{tr('Καθαρότητα & στέγνωμα')}</b>
+                          <small>{tr('Τα εργαλεία είναι οπτικά καθαρά και πλήρως στεγνά.')}</small>
                         </span>
                       </label>
                     )}
@@ -2637,8 +2690,8 @@ export default function SterilizationPage() {
                         onChange={e => setPrepProcessChecks(v => ({...v, functionIntegrity: e.target.checked}))}
                       />
                       <span>
-                        <b>Ακεραιότητα & λειτουργικότητα</b>
-                        <small>Δεν διαπιστώθηκε βλάβη και η λειτουργία είναι αποδεκτή.</small>
+                        <b>{tr('Ακεραιότητα & λειτουργικότητα')}</b>
+                        <small>{tr('Δεν διαπιστώθηκε βλάβη και η λειτουργία είναι αποδεκτή.')}</small>
                       </span>
                     </label>
                     <label>
@@ -2648,11 +2701,11 @@ export default function SterilizationPage() {
                         onChange={e => setPrepProcessChecks(v => ({...v, assembly: e.target.checked}))}
                       />
                       <span>
-                        <b>{prepDraft.kind === 'SET' ? 'Σύνθεση & συναρμολόγηση' : 'Επιβεβαίωση εργαλείου'}</b>
+                        <b>{prepDraft.kind === 'SET' ? tr('Σύνθεση & συναρμολόγηση') : tr('Επιβεβαίωση εργαλείου')}</b>
                         <small>
                           {prepDraft.kind === 'SET'
-                            ? 'Η σύνθεση έχει ελεγχθεί και συναρμολογηθεί σύμφωνα με τη δηλωμένη καρτέλα.'
-                            : 'Το εργαλείο και τα απαιτούμενα μέρη του έχουν ελεγχθεί.'}
+                            ? tr('Η σύνθεση έχει ελεγχθεί και συναρμολογηθεί σύμφωνα με τη δηλωμένη καρτέλα.')
+                            : tr('Το εργαλείο και τα απαιτούμενα μέρη του έχουν ελεγχθεί.')}
                         </small>
                       </span>
                     </label>
@@ -2665,8 +2718,8 @@ export default function SterilizationPage() {
                             onChange={e => setPrepProcessChecks(v => ({...v, packaging: e.target.checked}))}
                           />
                           <span>
-                            <b>Συσκευασία / περιέκτης</b>
-                            <small>Επιλέχθηκε κατάλληλη και ακέραιη συσκευασία ή περιέκτης.</small>
+                            <b>{tr('Συσκευασία / περιέκτης')}</b>
+                            <small>{tr('Επιλέχθηκε κατάλληλη και ακέραιη συσκευασία ή περιέκτης.')}</small>
                           </span>
                         </label>
                         <label>
@@ -2676,27 +2729,27 @@ export default function SterilizationPage() {
                             onChange={e => setPrepProcessChecks(v => ({...v, labelIndicator: e.target.checked}))}
                           />
                           <span>
-                            <b>Σήμανση & δείκτης</b>
-                            <small>Η σήμανση και ο απαιτούμενος χημικός δείκτης έχουν τοποθετηθεί.</small>
+                            <b>{tr('Σήμανση & δείκτης')}</b>
+                            <small>{tr('Η σήμανση και ο απαιτούμενος χημικός δείκτης έχουν τοποθετηθεί.')}</small>
                           </span>
                         </label>
                       </>
                     )}
                   </div>
                   <label className="prep-note-field">
-                    Παρατήρηση προετοιμασίας
+                    {tr('Παρατήρηση προετοιμασίας')}
                     <textarea
                       value={prepNote}
                       onChange={e => setPrepNote(e.target.value)}
-                      placeholder="Προαιρετική παρατήρηση για σύνθεση, συσκευασία ή άλλη απόκλιση…"
+                      placeholder={tr('Προαιρετική παρατήρηση για σύνθεση, συσκευασία ή άλλη απόκλιση…')}
                     />
                   </label>
                 </section>
                 <section className="prep-card-section">
                   <div className="prep-section-head">
                     <div>
-                      <strong>Εκτυπώσεις</strong>
-                      <span>Φύλλο σύνθεσης Α4 και barcode.</span>
+                      <strong>{tr('Εκτυπώσεις')}</strong>
+                      <span>{tr('Φύλλο σύνθεσης Α4 και barcode.')}</span>
                     </div>
                   </div>
                   <div className="prep-print-actions">
@@ -2715,7 +2768,7 @@ export default function SterilizationPage() {
                           )
                         }
                       >
-                        <Printer size={16} /> Εκτύπωση
+                        <Printer size={16} /> {tr('Εκτύπωση')}
                       </button>
                     )}
                     <button
@@ -2728,7 +2781,7 @@ export default function SterilizationPage() {
                         )
                       }
                     >
-                      <Barcode size={16} /> Εκτύπωση barcode
+                      <Barcode size={16} /> {tr('Εκτύπωση barcode')}
                     </button>
                   </div>
                 </section>
@@ -2740,13 +2793,19 @@ export default function SterilizationPage() {
                     <div>
                       <strong>
                         {prepMissingCount > 0
-                          ? `Σύνθεση ${prepTools.length}/${prepExpectedCount} · ${prepMissingCount} ${prepMissingCount === 1 ? 'έλλειψη' : 'ελλείψεις'}`
-                          : `Σύνθεση πλήρης · ${prepTools.length}/${prepExpectedCount}`}
+                          ? tr(
+                              'Σύνθεση {0}/{1} · {2} {3}',
+                              prepTools.length,
+                              prepExpectedCount,
+                              prepMissingCount,
+                              prepMissingCount === 1 ? 'έλλειψη' : 'ελλείψεις',
+                            )
+                          : tr('Σύνθεση πλήρης · {0}/{1}', prepTools.length, prepExpectedCount)}
                       </strong>
                       <span>
                         {prepMissingCount > 0
-                          ? 'Η έλλειψη εμφανίζεται και διαχειρίζεται μέσα στη λίστα εργαλείων.'
-                          : 'Όλες οι αναμενόμενες θέσεις της σύνθεσης είναι καλυμμένες.'}
+                          ? tr('Η έλλειψη εμφανίζεται και διαχειρίζεται μέσα στη λίστα εργαλείων.')
+                          : tr('Όλες οι αναμενόμενες θέσεις της σύνθεσης είναι καλυμμένες.')}
                       </span>
                     </div>
                   </div>
@@ -2754,20 +2813,21 @@ export default function SterilizationPage() {
                 <div className="prep-tools-head prep-tools-toolbar prep-tools-toolbar-refined">
                   <div className="prep-tools-heading-block">
                     <div>
-                      <strong>{prepDraft.kind === 'SET' ? 'Εργαλεία Σετ' : 'Μεμονωμένο εργαλείο'}</strong>
+                      <strong>{prepDraft.kind === 'SET' ? tr('Εργαλεία Σετ') : tr('Μεμονωμένο εργαλείο')}</strong>
                       <span>
                         {prepDraft.kind === 'SET'
-                          ? `${prepTools.length} φυσικές εγγραφές — έλεγχος και διαχείριση ανά εργαλείο`
-                          : 'Έλεγχος και επιβεβαίωση πριν τη συσκευασία'}
+                          ? tr('{0} φυσικές εγγραφές — έλεγχος και διαχείριση ανά εργαλείο', prepTools.length)
+                          : tr('Έλεγχος και επιβεβαίωση πριν τη συσκευασία')}
                       </span>
                       {prepDraft.kind === 'SET' && prepBlockingIssues.length > 0 && (
                         <button
                           type="button"
                           className="prep-open-issues-filter"
-                          title="Εκκρεμότητες που απαιτούν ενέργεια"
+                          title={tr('Εκκρεμότητες που απαιτούν ενέργεια')}
                         >
                           <TriangleAlert size={12} />
-                          {prepBlockingIssues.length} {prepBlockingIssues.length === 1 ? 'εκκρεμότητα' : 'εκκρεμότητες'}
+                          {prepBlockingIssues.length}{' '}
+                          {prepBlockingIssues.length === 1 ? tr('εκκρεμότητα') : tr('εκκρεμότητες')}
                         </button>
                       )}
                     </div>
@@ -2780,11 +2840,11 @@ export default function SterilizationPage() {
                       >
                         {prepAllEligibleSelected ? (
                           <>
-                            <X size={14} /> Αποεπιλογή όλων
+                            <X size={14} /> {tr('Αποεπιλογή όλων')}
                           </>
                         ) : (
                           <>
-                            <CheckCircle2 size={14} /> Επιλογή όλων
+                            <CheckCircle2 size={14} /> {tr('Επιλογή όλων')}
                           </>
                         )}
                       </button>
@@ -2829,12 +2889,12 @@ export default function SterilizationPage() {
                                 <span className="prep-open-issue-state">
                                   <span className="prep-issue-chip">
                                     <TriangleAlert size={12} />
-                                    Ανοικτή αναφορά
+                                    {tr('Ανοικτή αναφορά')}
                                   </span>
                                   <small>{toolIssues.map(i => i.type).join(' · ')}</small>
                                 </span>
                               ) : (
-                                <span className="prep-ok-chip">Έτοιμο για έλεγχο</span>
+                                <span className="prep-ok-chip">{tr('Έτοιμο για έλεγχο')}</span>
                               )}
                             </div>
                             <button
@@ -2844,11 +2904,12 @@ export default function SterilizationPage() {
                             >
                               {toolIssues.length ? (
                                 <>
-                                  <TriangleAlert size={14} /> Αντιμετώπιση
+                                  <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
                                 </>
                               ) : (
                                 <>
-                                  Λεπτομέρειες <ArrowRight size={14} />
+                                  {tr('Λεπτομέρειες') + ' '}
+                                  <ArrowRight size={14} />
                                 </>
                               )}
                             </button>
@@ -2869,13 +2930,15 @@ export default function SterilizationPage() {
                               <div className="prep-tool-main">
                                 <span className="mono">—</span>
                                 <strong>{req.name}</strong>
-                                <small>{req.code} · αναμενόμενο εργαλείο που λείπει από τη φυσική σύνθεση</small>
+                                <small>
+                                  {req.code} {tr('· αναμενόμενο εργαλείο που λείπει από τη φυσική σύνθεση')}
+                                </small>
                               </div>
                               <div className="prep-tool-state">
                                 {accepted ? (
-                                  <span className="prep-missing-accepted">Αποδεκτή απόκλιση</span>
+                                  <span className="prep-missing-accepted">{tr('Αποδεκτή απόκλιση')}</span>
                                 ) : (
-                                  <span className="prep-missing-chip">Λείπει</span>
+                                  <span className="prep-missing-chip">{tr('Λείπει')}</span>
                                 )}
                               </div>
                               {accepted ? (
@@ -2884,7 +2947,7 @@ export default function SterilizationPage() {
                                   type="button"
                                   onClick={() => undoAcceptedMissing(req.code)}
                                 >
-                                  Αναίρεση
+                                  {tr('Αναίρεση')}
                                 </button>
                               ) : (
                                 <button
@@ -2892,7 +2955,7 @@ export default function SterilizationPage() {
                                   type="button"
                                   onClick={() => openMissingManage(req.code)}
                                 >
-                                  <TriangleAlert size={14} /> Αντιμετώπιση
+                                  <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
                                 </button>
                               )}
                             </div>
@@ -2918,14 +2981,15 @@ export default function SterilizationPage() {
                         </small>
                       </div>
                       <div className="prep-tool-state">
-                        <span className="prep-ok-chip">Έτοιμο για έλεγχο</span>
+                        <span className="prep-ok-chip">{tr('Έτοιμο για έλεγχο')}</span>
                       </div>
                       <button
                         className="tool-manage-btn subtle prep-attention-action"
                         type="button"
                         onClick={() => openPrepManage(prepDraft.asset.id)}
                       >
-                        Λεπτομέρειες <ArrowRight size={14} />
+                        {tr('Λεπτομέρειες') + ' '}
+                        <ArrowRight size={14} />
                       </button>
                     </div>
                   )}
@@ -2936,21 +3000,22 @@ export default function SterilizationPage() {
               <label className="prep-accept-missing">
                 <input type="checkbox" checked={allowMissing} onChange={e => setAllowMissing(e.target.checked)} />
                 <span>
-                  <strong>Αποδοχή καταγεγραμμένης έλλειψης</strong>
+                  <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
                   <small>
-                    Το Set θα προχωρήσει με {prepMissingCount} λιγότερα εργαλεία. Η απόκλιση καταγράφεται στο ιστορικό.
+                    {tr('Το Set θα προχωρήσει με') + ' '}
+                    {prepMissingCount} {tr('λιγότερα εργαλεία. Η απόκλιση καταγράφεται στο ιστορικό.')}
                   </small>
                 </span>
               </label>
             )}
             <div className="modal-actions">
-              <button onClick={() => setPrepDraft(null)}>Ακύρωση</button>
+              <button onClick={() => setPrepDraft(null)}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
                 disabled={!prepReadyForProcess}
                 onClick={() => moveToProcess(prepDraft.kind, prepDraft.asset.id)}
               >
-                <Flame size={16} /> Ολοκλήρωση · Προς κλιβανισμό
+                <Flame size={16} /> {tr('Ολοκλήρωση · Προς κλιβανισμό')}
               </button>
             </div>
           </div>
@@ -2960,14 +3025,16 @@ export default function SterilizationPage() {
       {prepManageMissing && prepDraft?.kind === 'SET' && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepManage}>
           <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closePrepManage}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closePrepManage}>
               <X size={17} />
             </button>
-            <span className="eyebrow">ΔΙΑΧΕΙΡΙΣΗ ΕΛΛΕΙΨΗΣ</span>
+            <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΕΛΛΕΙΨΗΣ')}</span>
             <h3>{prepManageMissing.name}</h3>
             <div className="prep-manage-summary">
               <span>
-                {prepManageMissing.code} · λείπουν {prepManageMissing.missing} από {prepManageMissing.quantity}
+                {prepManageMissing.code} {tr('· λείπουν') + ' '}
+                {prepManageMissing.missing} {tr('από') + ' '}
+                {prepManageMissing.quantity}
               </span>
             </div>
             <div className="prep-manage-grid">
@@ -2988,8 +3055,8 @@ export default function SterilizationPage() {
               >
                 <ArrowRight size={16} />
                 <span>
-                  <b>Κάλυψη έλλειψης</b>
-                  <small>Επιλογή εργαλείου από Stock, άλλο Set ή μεμονωμένο</small>
+                  <b>{tr('Κάλυψη έλλειψης')}</b>
+                  <small>{tr('Επιλογή εργαλείου από Stock, άλλο Set ή μεμονωμένο')}</small>
                 </span>
               </button>
               <button
@@ -3001,8 +3068,8 @@ export default function SterilizationPage() {
               >
                 <TriangleAlert size={16} />
                 <span>
-                  <b>Αναφορά</b>
-                  <small>Καταγραφή της έλλειψης ως απόκλιση του Set</small>
+                  <b>{tr('Αναφορά')}</b>
+                  <small>{tr('Καταγραφή της έλλειψης ως απόκλιση του Set')}</small>
                 </span>
               </button>
               <button
@@ -3012,8 +3079,8 @@ export default function SterilizationPage() {
               >
                 <CheckCircle2 size={16} />
                 <span>
-                  <b>Χωρίς ενέργεια</b>
-                  <small>Καταγραφή της έλλειψης και συνέχιση της διαδικασίας</small>
+                  <b>{tr('Χωρίς ενέργεια')}</b>
+                  <small>{tr('Καταγραφή της έλλειψης και συνέχιση της διαδικασίας')}</small>
                 </span>
               </button>
             </div>
@@ -3024,10 +3091,10 @@ export default function SterilizationPage() {
       {prepManageTool && prepDraft && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepManage}>
           <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closePrepManage}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closePrepManage}>
               <X size={17} />
             </button>
-            <span className="eyebrow">ΔΙΑΧΕΙΡΙΣΗ ΕΡΓΑΛΕΙΟΥ</span>
+            <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h3>
               {prepManageTool.barcode} · {prepManageTool.name}
             </h3>
@@ -3040,7 +3107,7 @@ export default function SterilizationPage() {
             {((prepManageTool.photos || []).length > 0 ||
               issues.some(i => i.asset.startsWith(prepManageTool.barcode) && i.photos?.length)) && (
               <div className="prep-manage-photos">
-                <strong>Φωτογραφίες & τεκμηρίωση</strong>
+                <strong>{tr('Φωτογραφίες & τεκμηρίωση')}</strong>
                 <div>
                   {[
                     ...(prepManageTool.photos || []),
@@ -3053,14 +3120,14 @@ export default function SterilizationPage() {
             )}
             {issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(prepManageTool.barcode)).length > 0 && (
               <div className="prep-manage-open-issues">
-                <strong>Ανοικτές αναφορές</strong>
+                <strong>{tr('Ανοικτές αναφορές')}</strong>
                 {issues
                   .filter(i => i.status === 'OPEN' && i.asset.startsWith(prepManageTool.barcode))
                   .map(i => (
                     <div key={i.id}>
                       <TriangleAlert size={13} />
                       <span>
-                        <b>{i.type}</b>
+                        <b>{trData(i.type)}</b>
                         <small>{i.note}</small>
                       </span>
                     </div>
@@ -3078,8 +3145,8 @@ export default function SterilizationPage() {
               >
                 <TriangleAlert size={16} />
                 <span>
-                  <b>Αναφορά</b>
-                  <small>Βλάβη, φθορά ή άλλη απόκλιση</small>
+                  <b>{tr('Αναφορά')}</b>
+                  <small>{tr('Βλάβη, φθορά ή άλλη απόκλιση')}</small>
                 </span>
               </button>
               {prepDraft.kind === 'SET' && (
@@ -3093,8 +3160,8 @@ export default function SterilizationPage() {
                   >
                     <ArrowRight size={16} />
                     <span>
-                      <b>Αντικατάσταση</b>
-                      <small>Αντικατάσταση με άλλο φυσικό εργαλείο</small>
+                      <b>{tr('Αντικατάσταση')}</b>
+                      <small>{tr('Αντικατάσταση με άλλο φυσικό εργαλείο')}</small>
                     </span>
                   </button>
                   <button
@@ -3107,7 +3174,7 @@ export default function SterilizationPage() {
                     <Wrench size={16} />
                     <span>
                       <b>Service</b>
-                      <small>Απομάκρυνση για επισκευή / έλεγχο</small>
+                      <small>{tr('Απομάκρυνση για επισκευή / έλεγχο')}</small>
                     </span>
                   </button>
                   <button
@@ -3120,7 +3187,7 @@ export default function SterilizationPage() {
                     <PackageOpen size={16} />
                     <span>
                       <b>Stock</b>
-                      <small>Επιστροφή στο κεντρικό stock</small>
+                      <small>{tr('Επιστροφή στο κεντρικό stock')}</small>
                     </span>
                   </button>
                   <button
@@ -3132,8 +3199,8 @@ export default function SterilizationPage() {
                   >
                     <Layers3 size={16} />
                     <span>
-                      <b>Άλλο Set</b>
-                      <small>Μεταφορά σε διαφορετικό Set</small>
+                      <b>{tr('Άλλο Set')}</b>
+                      <small>{tr('Μεταφορά σε διαφορετικό Set')}</small>
                     </span>
                   </button>
                 </>
@@ -3146,25 +3213,34 @@ export default function SterilizationPage() {
       {prepToolAction && prepDraft?.kind === 'SET' && (prepSelectedTool || prepReplacementRequirement) && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepToolAction}>
           <div className="tool-issue-card prep-tool-action-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closePrepToolAction}>
+            <button
+              className="modal-x"
+              aria-label={tr('Κλείσιμο')}
+              title={tr('Κλείσιμο')}
+              onClick={closePrepToolAction}
+            >
               <X size={17} />
             </button>
-            <span className="eyebrow">ΔΙΑΧΕΙΡΙΣΗ ΣΥΝΘΕΣΗΣ</span>
+            <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΣΥΝΘΕΣΗΣ')}</span>
             <h3>
               {prepSelectedTool
                 ? `${prepSelectedTool.barcode} · ${prepSelectedTool.name}`
-                : `Κάλυψη έλλειψης · ${prepReplacementRequirement?.name || ''}`}
+                : tr('Κάλυψη έλλειψης · {0}', prepReplacementRequirement?.name || '')}
             </h3>
             <p className="prep-action-intro">
               {prepToolAction === 'REPLACE'
                 ? prepSelectedTool
-                  ? 'Η αντικατάσταση ολοκληρώνεται ως μία ενιαία κίνηση: ορίζεις πού πηγαίνει το υπάρχον εργαλείο και ποιο φυσικό εργαλείο μπαίνει στη θέση του.'
-                  : 'Επίλεξε το φυσικό εργαλείο που θα καλύψει την έλλειψη. Με την επιβεβαίωση θα προστεθεί στο Set.'
+                  ? tr(
+                      'Η αντικατάσταση ολοκληρώνεται ως μία ενιαία κίνηση: ορίζεις πού πηγαίνει το υπάρχον εργαλείο και ποιο φυσικό εργαλείο μπαίνει στη θέση του.',
+                    )
+                  : tr(
+                      'Επίλεξε το φυσικό εργαλείο που θα καλύψει την έλλειψη. Με την επιβεβαίωση θα προστεθεί στο Set.',
+                    )
                 : prepToolAction === 'SERVICE'
-                  ? 'Το εργαλείο θα αφαιρεθεί από το Set και θα μεταφερθεί στα Χαλασμένα / Service.'
+                  ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα μεταφερθεί στα Χαλασμένα / Service.')
                   : prepToolAction === 'STOCK'
-                    ? 'Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Stock.'
-                    : 'Το εργαλείο θα αφαιρεθεί από το τρέχον Set και θα προστεθεί σε άλλο Set.'}
+                    ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Stock.')
+                    : tr('Το εργαλείο θα αφαιρεθεί από το τρέχον Set και θα προστεθεί σε άλλο Set.')}
             </p>
             {prepToolAction === 'REPLACE' && (
               <>
@@ -3173,14 +3249,14 @@ export default function SterilizationPage() {
                     <div className="prep-replace-step">
                       <span>1</span>
                       <div>
-                        <strong>Εργαλείο που αφαιρείται</strong>
+                        <strong>{tr('Εργαλείο που αφαιρείται')}</strong>
                         <small>
                           {prepSelectedTool.barcode} · {prepSelectedTool.name}
                         </small>
                       </div>
                     </div>
                     <div className="prep-replace-destination">
-                      <strong>Πού θα μεταφερθεί το υπάρχον εργαλείο;</strong>
+                      <strong>{tr('Πού θα μεταφερθεί το υπάρχον εργαλείο;')}</strong>
                       <div className="prep-source-buttons">
                         <button
                           type="button"
@@ -3207,14 +3283,14 @@ export default function SterilizationPage() {
                           className={prepOutgoingDestination === 'SET' ? 'active' : ''}
                           onClick={() => setPrepOutgoingDestination('SET')}
                         >
-                          Άλλο Set
+                          {tr('Άλλο Set')}
                         </button>
                       </div>
                       {prepOutgoingDestination === 'SET' && (
                         <label>
-                          Set προορισμού
+                          {tr('Set προορισμού')}
                           <select value={prepOutgoingSetId} onChange={e => setPrepOutgoingSetId(e.target.value)}>
-                            <option value="">Επιλογή Set…</option>
+                            <option value="">{tr('Επιλογή Set…')}</option>
                             {prepOtherSets.map(s => (
                               <option key={s.id} value={s.id}>
                                 {s.barcode} · {s.name}
@@ -3227,14 +3303,14 @@ export default function SterilizationPage() {
                     <div className="prep-replace-step">
                       <span>2</span>
                       <div>
-                        <strong>Εργαλείο αντικατάστασης</strong>
-                        <small>Επίλεξε πηγή και φυσικό εργαλείο.</small>
+                        <strong>{tr('Εργαλείο αντικατάστασης')}</strong>
+                        <small>{tr('Επίλεξε πηγή και φυσικό εργαλείο.')}</small>
                       </div>
                     </div>
                   </div>
                 )}
                 <div className="prep-replace-source">
-                  <strong>Από πού θα γίνει η αντικατάσταση;</strong>
+                  <strong>{tr('Από πού θα γίνει η αντικατάσταση;')}</strong>
                   <div className="prep-source-buttons">
                     <button
                       type="button"
@@ -3256,7 +3332,7 @@ export default function SterilizationPage() {
                         setPrepReplacementId('');
                       }}
                     >
-                      Άλλο Set
+                      {tr('Άλλο Set')}
                     </button>
                     <button
                       type="button"
@@ -3267,13 +3343,13 @@ export default function SterilizationPage() {
                         setPrepReplacementId('');
                       }}
                     >
-                      Μεμονωμένο σε χρήση
+                      {tr('Μεμονωμένο σε χρήση')}
                     </button>
                   </div>
                 </div>
                 {prepReplacementSource === 'SET' && (
                   <label>
-                    1. Επιλογή Set
+                    {tr('1. Επιλογή Set')}
                     <select
                       value={prepReplacementSetId}
                       onChange={e => {
@@ -3281,24 +3357,24 @@ export default function SterilizationPage() {
                         setPrepReplacementId('');
                       }}
                     >
-                      <option value="">Επιλογή Set…</option>
+                      <option value="">{tr('Επιλογή Set…')}</option>
                       {prepReplacementSourceSets.map(set => (
                         <option key={set.id} value={set.id}>
                           {set.barcode} · {set.name} ·{' '}
-                          {tools.filter(t => t.mode === 'SET_MEMBER' && t.setId === set.id).length} εργαλεία
+                          {tools.filter(t => t.mode === 'SET_MEMBER' && t.setId === set.id).length} {tr('εργαλεία')}
                         </option>
                       ))}
                     </select>
                   </label>
                 )}
                 <label>
-                  {prepReplacementSource === 'SET' ? '2. Επιλογή εργαλείου' : 'Εργαλείο αντικατάστασης'}
+                  {prepReplacementSource === 'SET' ? tr('2. Επιλογή εργαλείου') : tr('Εργαλείο αντικατάστασης')}
                   <select
                     value={prepReplacementId}
                     disabled={prepReplacementSource === 'SET' && !prepReplacementSetId}
                     onChange={e => setPrepReplacementId(e.target.value)}
                   >
-                    <option value="">Επιλογή εργαλείου…</option>
+                    <option value="">{tr('Επιλογή εργαλείου…')}</option>
                     {prepReplacementCandidates.map(t => {
                       const sourceSet = t.setId ? sets.find(s => s.id === t.setId) : undefined;
                       const source =
@@ -3320,8 +3396,12 @@ export default function SterilizationPage() {
                   <CheckCircle2 size={15} />
                   <span>
                     {prepSelectedTool
-                      ? 'Με την επιβεβαίωση γίνονται ταυτόχρονα η έξοδος του υπάρχοντος εργαλείου και η είσοδος του νέου στο Set.'
-                      : 'Με την επιβεβαίωση το επιλεγμένο φυσικό εργαλείο προστίθεται στο Set και καλύπτει την έλλειψη.'}
+                      ? tr(
+                          'Με την επιβεβαίωση γίνονται ταυτόχρονα η έξοδος του υπάρχοντος εργαλείου και η είσοδος του νέου στο Set.',
+                        )
+                      : tr(
+                          'Με την επιβεβαίωση το επιλεγμένο φυσικό εργαλείο προστίθεται στο Set και καλύπτει την έλλειψη.',
+                        )}
                   </span>
                 </div>
                 {(() => {
@@ -3330,7 +3410,11 @@ export default function SterilizationPage() {
                   return replacement?.mode === 'SET_MEMBER' && sourceSet ? (
                     <div className="prep-block-warning">
                       <TriangleAlert size={16} />
-                      <span>Θα αφαιρεθεί από το Set {sourceSet.barcode}, το οποίο θα μείνει με έλλειψη.</span>
+                      <span>
+                        {tr('Θα αφαιρεθεί από το Set') + ' '}
+                        {sourceSet.barcode}
+                        {tr(', το οποίο θα μείνει με έλλειψη.')}
+                      </span>
                     </div>
                   ) : null;
                 })()}
@@ -3338,9 +3422,9 @@ export default function SterilizationPage() {
             )}
             {prepToolAction === 'SET' && (
               <label>
-                Set προορισμού
+                {tr('Set προορισμού')}
                 <select value={prepTargetSetId} onChange={e => setPrepTargetSetId(e.target.value)}>
-                  <option value="">Επιλογή Set…</option>
+                  <option value="">{tr('Επιλογή Set…')}</option>
                   {prepOtherSets.map(s => (
                     <option key={s.id} value={s.id}>
                       {s.barcode} · {s.name}
@@ -3350,7 +3434,7 @@ export default function SterilizationPage() {
               </label>
             )}
             <div className="modal-actions">
-              <button onClick={closePrepToolAction}>Ακύρωση</button>
+              <button onClick={closePrepToolAction}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
                 disabled={
@@ -3363,13 +3447,13 @@ export default function SterilizationPage() {
               >
                 {prepToolAction === 'REPLACE'
                   ? prepSelectedTool
-                    ? 'Επιβεβαίωση αντικατάστασης'
-                    : 'Επιβεβαίωση κάλυψης έλλειψης'
+                    ? tr('Επιβεβαίωση αντικατάστασης')
+                    : tr('Επιβεβαίωση κάλυψης έλλειψης')
                   : prepToolAction === 'SERVICE'
-                    ? 'Μεταφορά στα Χαλασμένα / Service'
+                    ? tr('Μεταφορά στα Χαλασμένα / Service')
                     : prepToolAction === 'STOCK'
-                      ? 'Μεταφορά στο Stock'
-                      : 'Μεταφορά σε άλλο Set'}
+                      ? tr('Μεταφορά στο Stock')
+                      : tr('Μεταφορά σε άλλο Set')}
               </button>
             </div>
           </div>
@@ -3382,7 +3466,12 @@ export default function SterilizationPage() {
             className="receipt-card-modal workflow-modal workflow-modal-cycle"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeCycleCompletion}>
+            <button
+              className="modal-x"
+              aria-label={tr('Κλείσιμο')}
+              title={tr('Κλείσιμο')}
+              onClick={closeCycleCompletion}
+            >
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -3390,73 +3479,73 @@ export default function SterilizationPage() {
                 {cycleDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">ΑΠΟΣΤΕΙΡΩΣΗ · ΚΑΤΑΓΡΑΦΗ ΚΥΚΛΟΥ</span>
+                <span className="eyebrow">{tr('ΑΠΟΣΤΕΙΡΩΣΗ · ΚΑΤΑΓΡΑΦΗ ΚΥΚΛΟΥ')}</span>
                 <h2>
                   {cycleDraft.asset.barcode} · {cycleDraft.asset.name}
                 </h2>
-                <p>Καταχώρηση αποτελέσματος κύκλου. Η αποδέσμευση γίνεται σε ξεχωριστό quality gate.</p>
+                <p>{tr('Καταχώρηση αποτελέσματος κύκλου. Η αποδέσμευση γίνεται σε ξεχωριστό quality gate.')}</p>
               </div>
               <StatusBadge value={cycleDraft.asset.state} />
             </div>
             <div className="workflow-modal-body">
               <div className="cycle-clean-summary">
                 <div>
-                  <span>Χειριστής</span>
-                  <strong>{currentUser.name}</strong>
+                  <span>{tr('Χειριστής')}</span>
+                  <strong>{trData(currentUser.name)}</strong>
                 </div>
                 <div>
-                  <span>Τμήμα</span>
-                  <strong>{cycleDraft.asset.department || '—'}</strong>
+                  <span>{tr('Τμήμα')}</span>
+                  <strong>{trData(cycleDraft.asset.department) || '—'}</strong>
                 </div>
                 <div>
-                  <span>{cycleDraft.kind === 'SET' ? 'Εργαλεία' : 'Τύπος'}</span>
+                  <span>{cycleDraft.kind === 'SET' ? tr('Εργαλεία') : tr('Τύπος')}</span>
                   <strong>
                     {cycleDraft.kind === 'SET'
                       ? tools.filter(t => t.setId === cycleDraft.asset.id).length || cycleDraft.asset.actual || 0
-                      : 'Μεμονωμένο'}
+                      : tr('Μεμονωμένο')}
                   </strong>
                 </div>
                 <div>
-                  <span>Ώρα καταχώρησης</span>
+                  <span>{tr('Ώρα καταχώρησης')}</span>
                   <strong>{new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}</strong>
                 </div>
               </div>
               <div className="cycle-clean-fields">
                 <label>
-                  Κλίβανος
+                  {tr('Κλίβανος')}
                   <select value={sterilizer} onChange={e => setSterilizer(e.target.value)}>
-                    <option>Κλίβανος 1</option>
-                    <option>Κλίβανος 2</option>
-                    <option>Κλίβανος 3</option>
+                    <option>{tr('Κλίβανος 1')}</option>
+                    <option>{tr('Κλίβανος 2')}</option>
+                    <option>{tr('Κλίβανος 3')}</option>
                   </select>
                 </label>
                 <label>
-                  Αριθμός κύκλου / φορτίου
+                  {tr('Αριθμός κύκλου / φορτίου')}
                   <input
                     autoFocus
                     value={cycleNumber}
                     onChange={e => setCycleNumber(e.target.value)}
-                    placeholder="π.χ. 2026-0813-042"
+                    placeholder={tr('π.χ. 2026-0813-042')}
                   />
                 </label>
                 <label>
-                  Πρόγραμμα
+                  {tr('Πρόγραμμα')}
                   <select value={cycleProgram} onChange={e => setCycleProgram(e.target.value)}>
                     <option>134°C · 5 min</option>
                     <option>134°C · 18 min</option>
                     <option>121°C · 20 min</option>
-                    <option>Άλλο πρόγραμμα</option>
+                    <option>{tr('Άλλο πρόγραμμα')}</option>
                   </select>
                 </label>
                 <label>
-                  Χημικός δείκτης
+                  {tr('Χημικός δείκτης')}
                   <select
                     value={indicatorResult}
                     onChange={e => setIndicatorResult(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
                   >
-                    <option value="PASS">Επιτυχής / OK</option>
-                    <option value="FAIL">Αποτυχία</option>
-                    <option value="NOT_RECORDED">Δεν καταγράφηκε</option>
+                    <option value="PASS">{tr('Επιτυχής / OK')}</option>
+                    <option value="FAIL">{tr('Αποτυχία')}</option>
+                    <option value="NOT_RECORDED">{tr('Δεν καταγράφηκε')}</option>
                   </select>
                 </label>
               </div>
@@ -3464,37 +3553,37 @@ export default function SterilizationPage() {
                 <div className="cycle-result-warning">
                   <TriangleAlert size={18} />
                   <div>
-                    <strong>Ο κύκλος δεν αποδεσμεύεται</strong>
-                    <span>Η εγγραφή παραμένει στην καρτέλα «Κλιβανισμός» για νέο κύκλο.</span>
+                    <strong>{tr('Ο κύκλος δεν αποδεσμεύεται')}</strong>
+                    <span>{tr('Η εγγραφή παραμένει στην καρτέλα «Κλιβανισμός» για νέο κύκλο.')}</span>
                   </div>
                 </div>
               ) : (
                 <div className="cycle-result-ok">
                   <CheckCircle2 size={18} />
                   <div>
-                    <strong>Ο κύκλος μπορεί να καταχωρηθεί</strong>
-                    <span>Μετά την καταχώρηση η εγγραφή μεταφέρεται στην «Αποδέσμευση» για τελικό έλεγχο.</span>
+                    <strong>{tr('Ο κύκλος μπορεί να καταχωρηθεί')}</strong>
+                    <span>{tr('Μετά την καταχώρηση η εγγραφή μεταφέρεται στην «Αποδέσμευση» για τελικό έλεγχο.')}</span>
                   </div>
                 </div>
               )}
               <label className="cycle-note">
-                Παρατήρηση
+                {tr('Παρατήρηση')}
                 <textarea
                   value={cycleNote}
                   onChange={e => setCycleNote(e.target.value)}
-                  placeholder="Προαιρετική παρατήρηση…"
+                  placeholder={tr('Προαιρετική παρατήρηση…')}
                 />
               </label>
             </div>
             <div className="modal-actions workflow-modal-actions">
-              <button onClick={closeCycleCompletion}>Ακύρωση</button>
+              <button onClick={closeCycleCompletion}>{tr('Ακύρωση')}</button>
               <button
                 className={indicatorResult === 'FAIL' ? 'danger-action primary' : 'primary'}
                 disabled={!cycleNumber.trim()}
                 onClick={finishCycle}
               >
                 {indicatorResult === 'FAIL' ? <TriangleAlert size={16} /> : <PackageCheck size={16} />}{' '}
-                {indicatorResult === 'FAIL' ? 'Καταχώρηση αποτυχίας' : 'Ολοκλήρωση κύκλου'}
+                {indicatorResult === 'FAIL' ? tr('Καταχώρηση αποτυχίας') : tr('Ολοκλήρωση κύκλου')}
               </button>
             </div>
           </div>
@@ -3507,7 +3596,7 @@ export default function SterilizationPage() {
             className="receipt-card-modal workflow-modal workflow-modal-cycle"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeRelease}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeRelease}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -3515,11 +3604,11 @@ export default function SterilizationPage() {
                 {releaseDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ</span>
+                <span className="eyebrow">{tr('QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ')}</span>
                 <h2>
                   {releaseDraft.asset.barcode} · {releaseDraft.asset.name}
                 </h2>
-                <p>Τεκμηριωμένος τελικός έλεγχος πριν χαρακτηριστεί έτοιμο για παράδοση.</p>
+                <p>{tr('Τεκμηριωμένος τελικός έλεγχος πριν χαρακτηριστεί έτοιμο για παράδοση.')}</p>
               </div>
               <StatusBadge value={releaseDraft.asset.state} />
             </div>
@@ -3529,19 +3618,19 @@ export default function SterilizationPage() {
                 return cycle ? (
                   <div className="cycle-clean-summary">
                     <div>
-                      <span>Κλίβανος</span>
+                      <span>{tr('Κλίβανος')}</span>
                       <strong>{cycle.sterilizer}</strong>
                     </div>
                     <div>
-                      <span>Κύκλος / φορτίο</span>
+                      <span>{tr('Κύκλος / φορτίο')}</span>
                       <strong>{cycle.cycleNumber}</strong>
                     </div>
                     <div>
-                      <span>Πρόγραμμα</span>
+                      <span>{tr('Πρόγραμμα')}</span>
                       <strong>{cycle.program}</strong>
                     </div>
                     <div>
-                      <span>Ολοκληρώθηκε από</span>
+                      <span>{tr('Ολοκληρώθηκε από')}</span>
                       <strong>{cycle.completedByName}</strong>
                     </div>
                   </div>
@@ -3549,8 +3638,8 @@ export default function SterilizationPage() {
                   <div className="cycle-result-warning">
                     <TriangleAlert size={18} />
                     <div>
-                      <strong>Δεν βρέθηκε επιτυχής κύκλος</strong>
-                      <span>Η αποδέσμευση δεν μπορεί να ολοκληρωθεί.</span>
+                      <strong>{tr('Δεν βρέθηκε επιτυχής κύκλος')}</strong>
+                      <span>{tr('Η αποδέσμευση δεν μπορεί να ολοκληρωθεί.')}</span>
                     </div>
                   </div>
                 );
@@ -3558,8 +3647,8 @@ export default function SterilizationPage() {
               <section className="release-check-card">
                 <div className="receipt-section-title">
                   <div>
-                    <strong>Έλεγχοι αποδέσμευσης</strong>
-                    <span>Οι κρίσιμοι έλεγχοι πρέπει να επιβεβαιωθούν πριν την αποδέσμευση.</span>
+                    <strong>{tr('Έλεγχοι αποδέσμευσης')}</strong>
+                    <span>{tr('Οι κρίσιμοι έλεγχοι πρέπει να επιβεβαιωθούν πριν την αποδέσμευση.')}</span>
                   </div>
                   <ShieldCheck size={18} />
                 </div>
@@ -3570,8 +3659,8 @@ export default function SterilizationPage() {
                     onChange={e => setReleaseChecks(v => ({...v, physicalParametersOk: e.target.checked}))}
                   />
                   <span>
-                    <strong>Παράμετροι κύκλου / φυσική καταγραφή</strong>
-                    <small>Ελέγχθηκαν τα καταγεγραμμένα στοιχεία του κύκλου και είναι αποδεκτά.</small>
+                    <strong>{tr('Παράμετροι κύκλου / φυσική καταγραφή')}</strong>
+                    <small>{tr('Ελέγχθηκαν τα καταγεγραμμένα στοιχεία του κύκλου και είναι αποδεκτά.')}</small>
                   </span>
                 </label>
                 <label className="release-check-row">
@@ -3581,8 +3670,8 @@ export default function SterilizationPage() {
                     onChange={e => setReleaseChecks(v => ({...v, chemicalIndicatorOk: e.target.checked}))}
                   />
                   <span>
-                    <strong>Χημικός δείκτης αποδεκτός</strong>
-                    <small>Το αποτέλεσμα συμφωνεί με τα κριτήρια της μονάδας.</small>
+                    <strong>{tr('Χημικός δείκτης αποδεκτός')}</strong>
+                    <small>{tr('Το αποτέλεσμα συμφωνεί με τα κριτήρια της μονάδας.')}</small>
                   </span>
                 </label>
                 <label className="release-check-row">
@@ -3592,22 +3681,22 @@ export default function SterilizationPage() {
                     onChange={e => setReleaseChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
                   />
                   <span>
-                    <strong>Συσκευασία στεγνή και ακέραιη</strong>
-                    <small>Δεν διαπιστώθηκε υγρασία, ρήξη ή άλλη απόκλιση του sterile barrier.</small>
+                    <strong>{tr('Συσκευασία στεγνή και ακέραιη')}</strong>
+                    <small>{tr('Δεν διαπιστώθηκε υγρασία, ρήξη ή άλλη απόκλιση του sterile barrier.')}</small>
                   </span>
                 </label>
                 <label className="release-biological">
-                  Βιολογικός δείκτης
+                  {tr('Βιολογικός δείκτης')}
                   <select
                     value={biologicalIndicatorResult}
                     onChange={e =>
                       setBiologicalIndicatorResult(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')
                     }
                   >
-                    <option value="NOT_REQUIRED">Δεν απαιτείται για τη συγκεκριμένη διαδικασία</option>
-                    <option value="PASS">Αρνητικός / επιτυχής</option>
-                    <option value="PENDING">Σε αναμονή αποτελέσματος</option>
-                    <option value="FAIL">Θετικός / αποτυχία</option>
+                    <option value="NOT_REQUIRED">{tr('Δεν απαιτείται για τη συγκεκριμένη διαδικασία')}</option>
+                    <option value="PASS">{tr('Αρνητικός / επιτυχής')}</option>
+                    <option value="PENDING">{tr('Σε αναμονή αποτελέσματος')}</option>
+                    <option value="FAIL">{tr('Θετικός / αποτυχία')}</option>
                   </select>
                 </label>
               </section>
@@ -3615,47 +3704,49 @@ export default function SterilizationPage() {
                 <div className="cycle-result-warning">
                   <TriangleAlert size={18} />
                   <div>
-                    <strong>Δεν επιτρέπεται αποδέσμευση</strong>
-                    <span>Καταχώρησε επανεπεξεργασία και ακολούθησε τη διαδικασία διερεύνησης της μονάδας.</span>
+                    <strong>{tr('Δεν επιτρέπεται αποδέσμευση')}</strong>
+                    <span>
+                      {tr('Καταχώρησε επανεπεξεργασία και ακολούθησε τη διαδικασία διερεύνησης της μονάδας.')}
+                    </span>
                   </div>
                 </div>
               ) : releaseReady ? (
                 <div className="cycle-result-ok">
                   <CheckCircle2 size={18} />
                   <div>
-                    <strong>Έτοιμο για αποδέσμευση</strong>
-                    <span>Οι απαιτούμενοι έλεγχοι έχουν επιβεβαιωθεί.</span>
+                    <strong>{tr('Έτοιμο για αποδέσμευση')}</strong>
+                    <span>{tr('Οι απαιτούμενοι έλεγχοι έχουν επιβεβαιωθεί.')}</span>
                   </div>
                 </div>
               ) : (
                 <div className="release-pending">
                   <Clock3 size={18} />
                   <div>
-                    <strong>Εκκρεμεί τελικός έλεγχος</strong>
-                    <span>Η εγγραφή παραμένει σε αναμονή αποδέσμευσης.</span>
+                    <strong>{tr('Εκκρεμεί τελικός έλεγχος')}</strong>
+                    <span>{tr('Η εγγραφή παραμένει σε αναμονή αποδέσμευσης.')}</span>
                   </div>
                 </div>
               )}
               <label className="cycle-note">
-                Παρατήρηση αποδέσμευσης
+                {tr('Παρατήρηση αποδέσμευσης')}
                 <textarea
                   value={releaseNote}
                   onChange={e => setReleaseNote(e.target.value)}
-                  placeholder="Προαιρετική παρατήρηση ή αιτιολογία επανεπεξεργασίας…"
+                  placeholder={tr('Προαιρετική παρατήρηση ή αιτιολογία επανεπεξεργασίας…')}
                 />
               </label>
             </div>
             <div className="modal-actions workflow-modal-actions release-actions">
-              <button onClick={closeRelease}>Ακύρωση</button>
+              <button onClick={closeRelease}>{tr('Ακύρωση')}</button>
               <button className="release-reprocess" onClick={() => completeRelease('REPROCESS')}>
-                <TriangleAlert size={16} /> Μη αποδέσμευση · Επανεπεξεργασία
+                <TriangleAlert size={16} /> {tr('Μη αποδέσμευση · Επανεπεξεργασία')}
               </button>
               <button
                 className="primary"
                 disabled={!releaseReady || !latestPassedCycle(releaseDraft.asset.id)}
                 onClick={() => completeRelease('RELEASED')}
               >
-                <ShieldCheck size={16} /> Αποδέσμευση προς παράδοση
+                <ShieldCheck size={16} /> {tr('Αποδέσμευση προς παράδοση')}
               </button>
             </div>
           </div>
@@ -3668,7 +3759,7 @@ export default function SterilizationPage() {
             className="receipt-card-modal workflow-modal delivery-batch-modal"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeReceiptBatch}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeReceiptBatch}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -3676,22 +3767,24 @@ export default function SterilizationPage() {
                 <ScanBarcode size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">ΦΥΣΙΚΗ ΠΑΡΑΛΑΒΗ</span>
-                <h2>Μαζική παραλαβή</h2>
-                <p>Ταυτοποίησε τον παραδίδοντα μία φορά και σκάναρε διαδοχικά τα αντικείμενα του ίδιου τμήματος.</p>
+                <span className="eyebrow">{tr('ΦΥΣΙΚΗ ΠΑΡΑΛΑΒΗ')}</span>
+                <h2>{tr('Μαζική παραλαβή')}</h2>
+                <p>
+                  {tr('Ταυτοποίησε τον παραδίδοντα μία φορά και σκάναρε διαδοχικά τα αντικείμενα του ίδιου τμήματος.')}
+                </p>
               </div>
               <div className="delivery-batch-count">
                 <strong>{receiptBatchAssets.length}</strong>
-                <span>αντικείμενα</span>
+                <span>{tr('αντικείμενα')}</span>
               </div>
             </div>
             <div className="delivery-batch-body">
               <BarcodeCapture
-                title="Προσθήκη στην παραλαβή"
+                title={tr('Προσθήκη στην παραλαβή')}
                 subtitle={
                   receiptBatchDepartment
-                    ? `Παραλαβή από ${receiptBatchDepartment}`
-                    : 'Το πρώτο barcode ορίζει το τμήμα της παραλαβής.'
+                    ? tr('Παραλαβή από {0}', receiptBatchDepartment)
+                    : tr('Το πρώτο barcode ορίζει το τμήμα της παραλαβής.')
                 }
                 feedback={receiptBatchScanFeedback}
                 onBarcode={addBarcodeToReceiptBatch}
@@ -3700,13 +3793,13 @@ export default function SterilizationPage() {
                 <section className="delivery-batch-assets">
                   <div className="load-assets-head">
                     <div>
-                      <strong>Αντικείμενα παραλαβής</strong>
+                      <strong>{tr('Αντικείμενα παραλαβής')}</strong>
                       <span>
-                        {receiptBatchAssets.length} επιλεγμένα
+                        {receiptBatchAssets.length} {tr('επιλεγμένα')}
                         {receiptBatchDepartment ? ` · ${receiptBatchDepartment}` : ''}
                       </span>
                     </div>
-                    <small>Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα στο «Έλεγχος & Σύνθεση».</small>
+                    <small>{tr('Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα στο «Έλεγχος & Σύνθεση».')}</small>
                   </div>
                   <div className="delivery-batch-list">
                     {incoming.map(item => {
@@ -3737,7 +3830,8 @@ export default function SterilizationPage() {
                               <strong>{item.name}</strong>
                             </span>
                             <small>
-                              {item.department || 'Χωρίς τμήμα'} · {item.kind === 'SET' ? 'Σετ' : 'Μεμονωμένο εργαλείο'}
+                              {trData(item.department) || tr('Χωρίς τμήμα')} ·{' '}
+                              {item.kind === 'SET' ? tr('Σετ') : tr('Μεμονωμένο εργαλείο')}
                             </small>
                           </div>
                           {selected && (
@@ -3752,11 +3846,11 @@ export default function SterilizationPage() {
                             >
                               {deviation ? (
                                 <>
-                                  <TriangleAlert size={13} /> Απόκλιση καταγράφηκε
+                                  <TriangleAlert size={13} /> {tr('Απόκλιση καταγράφηκε')}
                                 </>
                               ) : (
                                 <>
-                                  <TriangleAlert size={13} /> Αναφορά απόκλισης
+                                  <TriangleAlert size={13} /> {tr('Αναφορά απόκλισης')}
                                 </>
                               )}
                             </button>
@@ -3771,31 +3865,33 @@ export default function SterilizationPage() {
                     <div className="delivery-person confirmed">
                       <UserCheck size={19} />
                       <div>
-                        <span>Παραλαμβάνει</span>
-                        <strong>{currentUser.name}</strong>
-                        <small>{currentUser.department}</small>
+                        <span>{tr('Παραλαμβάνει')}</span>
+                        <strong>{trData(currentUser.name)}</strong>
+                        <small>{trData(currentUser.department)}</small>
                       </div>
                     </div>
                     <div className={`delivery-person ${receiptBatchIdentityValid ? 'confirmed' : ''}`}>
                       <IdCard size={19} />
                       <div>
-                        <span>Παραδίδει</span>
+                        <span>{tr('Παραδίδει')}</span>
                         <strong>
-                          {receiptBatchIdentityValid ? receiptBatchDeliverer?.name : 'Αναμονή ταυτοποίησης'}
+                          {receiptBatchIdentityValid ? receiptBatchDeliverer?.name : tr('Αναμονή ταυτοποίησης')}
                         </strong>
-                        <small>{receiptBatchDepartment || 'Σκάναρε πρώτα αντικείμενο'}</small>
+                        <small>{receiptBatchDepartment || tr('Σκάναρε πρώτα αντικείμενο')}</small>
                       </div>
                     </div>
                   </div>
                   <section className="delivery-auth">
                     <label>
-                      Κωδικός παραδίδοντα
+                      {tr('Κωδικός παραδίδοντα')}
                       <div className="identity-input-row">
                         <input
                           disabled={!receiptBatchDepartment}
                           value={receiptBatchDelivererCode}
                           onChange={e => setReceiptBatchDelivererCode(e.target.value.toUpperCase())}
-                          placeholder={receiptBatchDepartment ? 'Προσωπικός κωδικός' : 'Πρώτα σκάναρε αντικείμενο'}
+                          placeholder={
+                            receiptBatchDepartment ? tr('Προσωπικός κωδικός') : tr('Πρώτα σκάναρε αντικείμενο')
+                          }
                         />
                         {receiptBatchDemoIdentity && (
                           <button
@@ -3810,28 +3906,29 @@ export default function SterilizationPage() {
                     </label>
                     {receiptBatchDelivererCode &&
                       (!receiptBatchDeliverer ? (
-                        <div className="identity-error">Ο κωδικός δεν αναγνωρίστηκε.</div>
+                        <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
                       ) : !receiptBatchDelivererMatches ? (
                         <div className="identity-mismatch-box">
                           <div className="identity-warning">
                             <TriangleAlert size={15} />
                             <span>
-                              Ο χρήστης ανήκει στο {receiptBatchDeliverer.department}, ενώ η παραλαβή αφορά το{' '}
-                              {receiptBatchDepartment}.
+                              {tr('Ο χρήστης ανήκει στο') + ' '}
+                              {trData(receiptBatchDeliverer.department)}
+                              {tr(', ενώ η παραλαβή αφορά το')} {receiptBatchDepartment}.
                             </span>
                           </div>
                           {receiptPolicy.allowCrossDepartmentHandover ? (
                             <label>
-                              Αιτιολόγηση εξαίρεσης
+                              {tr('Αιτιολόγηση εξαίρεσης')}
                               <textarea
                                 value={receiptBatchMismatchReason}
                                 onChange={e => setReceiptBatchMismatchReason(e.target.value)}
-                                placeholder="Υποχρεωτική αιτιολόγηση…"
+                                placeholder={tr('Υποχρεωτική αιτιολόγηση…')}
                               />
                             </label>
                           ) : (
                             <div className="identity-error">
-                              Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.
+                              {tr('Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.')}
                             </div>
                           )}
                         </div>
@@ -3841,38 +3938,40 @@ export default function SterilizationPage() {
                           <div>
                             <strong>{receiptBatchDeliverer.name}</strong>
                             <span>
-                              {receiptBatchDeliverer.role} · {receiptBatchDeliverer.department}
+                              {receiptBatchDeliverer.role} · {trData(receiptBatchDeliverer.department)}
                             </span>
                           </div>
                         </div>
                       ))}
                   </section>
                   <label className="cycle-note">
-                    Παρατήρηση παραλαβής
+                    {tr('Παρατήρηση παραλαβής')}
                     <textarea
                       value={receiptBatchNote}
                       onChange={e => setReceiptBatchNote(e.target.value)}
-                      placeholder="Προαιρετική κοινή παρατήρηση…"
+                      placeholder={tr('Προαιρετική κοινή παρατήρηση…')}
                     />
                   </label>
                   <div className="delivery-trace-note">
                     <ShieldCheck size={17} />
                     <span>
-                      Με την ολοκλήρωση καταγράφονται κοινό batch ID, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η
-                      δήλωση εμφανής απόκλισης ανά barcode.
+                      {tr(
+                        'Με την ολοκλήρωση καταγράφονται κοινό batch ID, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.',
+                      )}
                     </span>
                   </div>
                 </section>
               </div>
             </div>
             <div className="modal-actions workflow-modal-actions">
-              <button onClick={closeReceiptBatch}>Ακύρωση</button>
+              <button onClick={closeReceiptBatch}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
                 disabled={!receiptBatchAssets.length || !receiptBatchIdentityValid}
                 onClick={completeReceiptBatch}
               >
-                <UserRoundCheck size={16} /> Ολοκλήρωση παραλαβής · {receiptBatchAssets.length}
+                <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παραλαβής ·') + ' '}
+                {receiptBatchAssets.length}
               </button>
             </div>
           </div>
@@ -3885,7 +3984,7 @@ export default function SterilizationPage() {
             className="receipt-card-modal workflow-modal delivery-batch-modal"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeDeliveryBatch}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeDeliveryBatch}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -3893,25 +3992,26 @@ export default function SterilizationPage() {
                 <ScanBarcode size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ</span>
-                <h2>Νέα παράδοση</h2>
+                <span className="eyebrow">{tr('ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ')}</span>
+                <h2>{tr('Νέα παράδοση')}</h2>
                 <p>
-                  Πρόσθεσε τα αντικείμενα με barcode, scanner υπολογιστή ή χειροκίνητα από τη λίστα. Κάθε παράδοση αφορά
-                  ένα τμήμα.
+                  {tr(
+                    'Πρόσθεσε τα αντικείμενα με barcode, scanner υπολογιστή ή χειροκίνητα από τη λίστα. Κάθε παράδοση αφορά ένα τμήμα.',
+                  )}
                 </p>
               </div>
               <div className="delivery-batch-count">
                 <strong>{deliverySelectedAssets.length}</strong>
-                <span>επιλεγμένα</span>
+                <span>{tr('επιλεγμένα')}</span>
               </div>
             </div>
             <div className="delivery-batch-body">
               <BarcodeCapture
-                title="Προσθήκη στην παράδοση"
+                title={tr('Προσθήκη στην παράδοση')}
                 subtitle={
                   deliveryBatchDepartment
-                    ? `Παράδοση προς ${deliveryBatchDepartment}`
-                    : 'Το πρώτο barcode ορίζει το τμήμα της παράδοσης.'
+                    ? tr('Παράδοση προς {0}', deliveryBatchDepartment)
+                    : tr('Το πρώτο barcode ορίζει το τμήμα της παράδοσης.')
                 }
                 feedback={deliveryScanFeedback}
                 onBarcode={addBarcodeToDelivery}
@@ -3920,9 +4020,9 @@ export default function SterilizationPage() {
                 <section className="delivery-batch-assets">
                   <div className="load-assets-head">
                     <div>
-                      <strong>Αντικείμενα παράδοσης</strong>
+                      <strong>{tr('Αντικείμενα παράδοσης')}</strong>
                       <span>
-                        {deliverySelectedAssets.length} επιλεγμένα
+                        {deliverySelectedAssets.length} {tr('επιλεγμένα')}
                         {deliveryBatchDepartment ? ` · ${deliveryBatchDepartment}` : ''}
                       </span>
                     </div>
@@ -3932,14 +4032,14 @@ export default function SterilizationPage() {
                           {ready
                             .filter(item => item.department === deliveryBatchDepartment)
                             .every(item => deliverySelected.has(`${item.kind}:${item.id}`))
-                            ? 'Αποεπιλογή τμήματος'
-                            : 'Επιλογή όλων του τμήματος'}
+                            ? tr('Αποεπιλογή τμήματος')
+                            : tr('Επιλογή όλων του τμήματος')}
                         </button>
                       )}
                       <small>
                         {deliveryBatchDepartment
-                          ? 'Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.'
-                          : 'Επίλεξε το πρώτο αντικείμενο για να οριστεί το τμήμα.'}
+                          ? tr('Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.')
+                          : tr('Επίλεξε το πρώτο αντικείμενο για να οριστεί το τμήμα.')}
                       </small>
                     </div>
                   </div>
@@ -3959,7 +4059,9 @@ export default function SterilizationPage() {
                         <label
                           key={key}
                           className={`${selected ? 'selected ' : ''}${incompatible ? 'incompatible' : ''}`.trim()}
-                          title={incompatible ? `Η τρέχουσα παράδοση αφορά το ${deliveryBatchDepartment}` : undefined}
+                          title={
+                            incompatible ? tr('Η τρέχουσα παράδοση αφορά το {0}', deliveryBatchDepartment) : undefined
+                          }
                         >
                           <input
                             type="checkbox"
@@ -3978,9 +4080,11 @@ export default function SterilizationPage() {
                               <strong>{item.name}</strong>
                             </span>
                             <small>
-                              {item.department} ·{' '}
-                              {lastLoad ? `Load ${lastLoad.id} / ${lastLoad.cycleNumber}` : 'Αποδεσμευμένο μεμονωμένα'}
-                              {incompatible ? ` · Άλλο τμήμα` : ''}
+                              {trData(item.department)} ·{' '}
+                              {lastLoad
+                                ? `Load ${lastLoad.id} / ${lastLoad.cycleNumber}`
+                                : tr('Αποδεσμευμένο μεμονωμένα')}
+                              {incompatible ? tr(' · Άλλο τμήμα') : ''}
                             </small>
                           </div>
                           {selected && <CheckCircle2 size={17} />}
@@ -3994,31 +4098,33 @@ export default function SterilizationPage() {
                     <div className="delivery-person confirmed">
                       <UserCheck size={19} />
                       <div>
-                        <span>Παραδίδει</span>
-                        <strong>{currentUser.name}</strong>
-                        <small>{currentUser.department}</small>
+                        <span>{tr('Παραδίδει')}</span>
+                        <strong>{trData(currentUser.name)}</strong>
+                        <small>{trData(currentUser.department)}</small>
                       </div>
                     </div>
                     <div className={`delivery-person ${deliveryBatchReceiverMatches ? 'confirmed' : ''}`}>
                       <IdCard size={19} />
                       <div>
-                        <span>Παραλαμβάνει</span>
+                        <span>{tr('Παραλαμβάνει')}</span>
                         <strong>
-                          {deliveryBatchReceiverMatches ? deliveryBatchReceiver?.name : 'Αναμονή ταυτοποίησης'}
+                          {deliveryBatchReceiverMatches ? deliveryBatchReceiver?.name : tr('Αναμονή ταυτοποίησης')}
                         </strong>
-                        <small>{deliveryBatchDepartment || 'Σκάναρε πρώτα αντικείμενο'}</small>
+                        <small>{deliveryBatchDepartment || tr('Σκάναρε πρώτα αντικείμενο')}</small>
                       </div>
                     </div>
                   </div>
                   <section className="delivery-auth">
                     <label>
-                      Κωδικός παραλαμβάνοντα
+                      {tr('Κωδικός παραλαμβάνοντα')}
                       <div className="identity-input-row">
                         <input
                           disabled={!deliveryBatchDepartment}
                           value={deliveryBatchReceiverCode}
                           onChange={e => setDeliveryBatchReceiverCode(e.target.value.toUpperCase())}
-                          placeholder={deliveryBatchDepartment ? 'Προσωπικός κωδικός' : 'Πρώτα σκάναρε αντικείμενο'}
+                          placeholder={
+                            deliveryBatchDepartment ? tr('Προσωπικός κωδικός') : tr('Πρώτα σκάναρε αντικείμενο')
+                          }
                         />
                         {deliveryBatchDemoIdentity && (
                           <button
@@ -4033,16 +4139,17 @@ export default function SterilizationPage() {
                     </label>
                     {deliveryBatchDemoIdentity && (
                       <small className="demo-code">
-                        Demo: {deliveryBatchDemoIdentity.code} · {deliveryBatchDemoIdentity.department}
+                        Demo: {deliveryBatchDemoIdentity.code} · {trData(deliveryBatchDemoIdentity.department)}
                       </small>
                     )}
                     {deliveryBatchReceiverCode &&
                       (!deliveryBatchReceiver ? (
-                        <div className="identity-error">Ο κωδικός δεν αναγνωρίστηκε.</div>
+                        <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
                       ) : !deliveryBatchReceiverMatches ? (
                         <div className="identity-error">
-                          Ο χρήστης ανήκει στο {deliveryBatchReceiver.department}, ενώ η παράδοση αφορά το{' '}
-                          {deliveryBatchDepartment}.
+                          {tr('Ο χρήστης ανήκει στο') + ' '}
+                          {trData(deliveryBatchReceiver.department)}
+                          {tr(', ενώ η παράδοση αφορά το')} {deliveryBatchDepartment}.
                         </div>
                       ) : (
                         <div className="identity-result">
@@ -4050,38 +4157,40 @@ export default function SterilizationPage() {
                           <div>
                             <strong>{deliveryBatchReceiver.name}</strong>
                             <span>
-                              {deliveryBatchReceiver.role} · {deliveryBatchReceiver.department}
+                              {deliveryBatchReceiver.role} · {trData(deliveryBatchReceiver.department)}
                             </span>
                           </div>
                         </div>
                       ))}
                   </section>
                   <label className="cycle-note">
-                    Παρατήρηση παράδοσης
+                    {tr('Παρατήρηση παράδοσης')}
                     <textarea
                       value={deliveryBatchNote}
                       onChange={e => setDeliveryBatchNote(e.target.value)}
-                      placeholder="Προαιρετική παρατήρηση για ολόκληρη την παράδοση…"
+                      placeholder={tr('Προαιρετική παρατήρηση για ολόκληρη την παράδοση…')}
                     />
                   </label>
                   <div className="delivery-trace-note">
                     <ShieldCheck size={17} />
                     <span>
-                      Με την ολοκλήρωση καταγράφονται κοινό ID παράδοσης, χρήστης αποστείρωσης, παραλαμβάνων, τμήμα,
-                      ημερομηνία/ώρα και σύνδεση κάθε barcode με το ιστορικό κύκλου του.
+                      {tr(
+                        'Με την ολοκλήρωση καταγράφονται κοινό ID παράδοσης, χρήστης αποστείρωσης, παραλαμβάνων, τμήμα, ημερομηνία/ώρα και σύνδεση κάθε barcode με το ιστορικό κύκλου του.',
+                      )}
                     </span>
                   </div>
                 </section>
               </div>
             </div>
             <div className="modal-actions workflow-modal-actions">
-              <button onClick={closeDeliveryBatch}>Ακύρωση</button>
+              <button onClick={closeDeliveryBatch}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
                 disabled={!deliverySelectedAssets.length || !deliveryBatchReceiverMatches}
                 onClick={completeDeliveryBatch}
               >
-                <UserRoundCheck size={16} /> Ολοκλήρωση παράδοσης · {deliverySelectedAssets.length}
+                <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης ·') + ' '}
+                {deliverySelectedAssets.length}
               </button>
             </div>
           </div>
@@ -4094,7 +4203,7 @@ export default function SterilizationPage() {
             className="receipt-card-modal workflow-modal workflow-modal-delivery"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={closeDelivery}>
+            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeDelivery}>
               <X size={18} />
             </button>
             <div className="workflow-modal-head">
@@ -4102,11 +4211,14 @@ export default function SterilizationPage() {
                 {deliveryDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ</span>
+                <span className="eyebrow">{tr('ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ')}</span>
                 <h2>
                   {deliveryDraft.asset.barcode} · {deliveryDraft.asset.name}
                 </h2>
-                <p>Κεντρική Αποστείρωση → {deliveryDraft.asset.department}</p>
+                <p>
+                  {tr('Κεντρική Αποστείρωση →') + ' '}
+                  {trData(deliveryDraft.asset.department)}
+                </p>
               </div>
               <StatusBadge value={deliveryDraft.asset.state} />
             </div>
@@ -4115,29 +4227,29 @@ export default function SterilizationPage() {
                 <div className="delivery-person confirmed">
                   <UserCheck size={19} />
                   <div>
-                    <span>Παραδίδει</span>
-                    <strong>{currentUser.name}</strong>
-                    <small>{currentUser.department}</small>
+                    <span>{tr('Παραδίδει')}</span>
+                    <strong>{trData(currentUser.name)}</strong>
+                    <small>{trData(currentUser.department)}</small>
                   </div>
                 </div>
                 <div className={`delivery-person ${receiver && receiverMatches ? 'confirmed' : ''}`}>
                   <IdCard size={19} />
                   <div>
-                    <span>Παραλαμβάνει</span>
-                    <strong>{receiver && receiverMatches ? receiver.name : 'Αναμονή ταυτοποίησης'}</strong>
+                    <span>{tr('Παραλαμβάνει')}</span>
+                    <strong>{receiver && receiverMatches ? receiver.name : tr('Αναμονή ταυτοποίησης')}</strong>
                     <small>{receiver && receiverMatches ? receiver.department : deliveryDraft.asset.department}</small>
                   </div>
                 </div>
               </div>
               <section className="delivery-auth">
                 <label>
-                  Κωδικός παραλαμβάνοντα
+                  {tr('Κωδικός παραλαμβάνοντα')}
                   <div className="identity-input-row">
                     <input
                       autoFocus
                       value={receiverCode}
                       onChange={e => setReceiverCode(e.target.value.toUpperCase())}
-                      placeholder="Προσωπικός κωδικός"
+                      placeholder={tr('Προσωπικός κωδικός')}
                     />
                     {deliveryDemoIdentity && (
                       <button
@@ -4152,16 +4264,17 @@ export default function SterilizationPage() {
                 </label>
                 {deliveryDemoIdentity && (
                   <small className="demo-code">
-                    Demo: {deliveryDemoIdentity.code} · {deliveryDemoIdentity.department}
+                    Demo: {deliveryDemoIdentity.code} · {trData(deliveryDemoIdentity.department)}
                   </small>
                 )}
                 {receiverCode &&
                   (!receiver ? (
-                    <div className="identity-error">Ο κωδικός δεν αναγνωρίστηκε.</div>
+                    <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
                   ) : !receiverMatches ? (
                     <div className="identity-error">
-                      Ο χρήστης ανήκει στο {receiver.department}, ενώ η παράδοση αφορά το{' '}
-                      {deliveryDraft.asset.department}.
+                      {tr('Ο χρήστης ανήκει στο') + ' '}
+                      {trData(receiver.department)}
+                      {tr(', ενώ η παράδοση αφορά το')} {trData(deliveryDraft.asset.department)}.
                     </div>
                   ) : (
                     <div className="identity-result">
@@ -4169,25 +4282,25 @@ export default function SterilizationPage() {
                       <div>
                         <strong>{receiver.name}</strong>
                         <span>
-                          {receiver.role} · {receiver.department}
+                          {receiver.role} · {trData(receiver.department)}
                         </span>
                       </div>
                     </div>
                   ))}
               </section>
               <label className="cycle-note">
-                Παρατήρηση παράδοσης
+                {tr('Παρατήρηση παράδοσης')}
                 <textarea
                   value={deliveryNote}
                   onChange={e => setDeliveryNote(e.target.value)}
-                  placeholder="Προαιρετική παρατήρηση…"
+                  placeholder={tr('Προαιρετική παρατήρηση…')}
                 />
               </label>
             </div>
             <div className="modal-actions workflow-modal-actions">
-              <button onClick={closeDelivery}>Ακύρωση</button>
+              <button onClick={closeDelivery}>{tr('Ακύρωση')}</button>
               <button className="primary" disabled={!receiver || !receiverMatches} onClick={completeDelivery}>
-                <UserRoundCheck size={16} /> Ολοκλήρωση παράδοσης / παραλαβής
+                <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης / παραλαβής')}
               </button>
             </div>
           </div>
@@ -4197,14 +4310,19 @@ export default function SterilizationPage() {
       {receiptView && !receiptDraft && !prepDraft && (
         <div className="modal-backdrop" onMouseDown={() => setReceiptView(null)}>
           <div className="receipt-card-modal completed" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label="Κλείσιμο" title="Κλείσιμο" onClick={() => setReceiptView(null)}>
+            <button
+              className="modal-x"
+              aria-label={tr('Κλείσιμο')}
+              title={tr('Κλείσιμο')}
+              onClick={() => setReceiptView(null)}
+            >
               <X size={18} />
             </button>
             <div className="receipt-complete-banner">
               <CheckCircle2 size={20} />
               <div>
-                <strong>Η παραλαβή ολοκληρώθηκε</strong>
-                <span>Η καρτέλα καταγράφηκε στο ιστορικό.</span>
+                <strong>{tr('Η παραλαβή ολοκληρώθηκε')}</strong>
+                <span>{tr('Η καρτέλα καταγράφηκε στο ιστορικό.')}</span>
               </div>
             </div>
             <div className="receipt-card-head">
@@ -4212,7 +4330,10 @@ export default function SterilizationPage() {
                 {receiptView.assetKind === 'SET' ? <Box size={19} /> : <Stethoscope size={19} />}
               </div>
               <div>
-                <span>ΚΑΡΤΕΛΑ ΠΑΡΑΛΑΒΗΣ · {receiptView.id.toUpperCase()}</span>
+                <span>
+                  {tr('ΚΑΡΤΕΛΑ ΠΑΡΑΛΑΒΗΣ ·') + ' '}
+                  {receiptView.id.toUpperCase()}
+                </span>
                 <h2>
                   {receiptView.barcode} · {receiptView.assetName}
                 </h2>
@@ -4223,22 +4344,22 @@ export default function SterilizationPage() {
             </div>
             <div className="receipt-facts">
               <div>
-                <span>Ημερομηνία / ώρα</span>
+                <span>{tr('Ημερομηνία / ώρα')}</span>
                 <strong>{receiptView.at}</strong>
               </div>
               <div>
-                <span>Παρέδωσε</span>
+                <span>{tr('Παρέδωσε')}</span>
                 <strong>{receiptView.deliveredByName}</strong>
                 <small>{receiptView.deliveredByDepartment}</small>
               </div>
               <div>
-                <span>Παρέλαβε</span>
+                <span>{tr('Παρέλαβε')}</span>
                 <strong>{receiptView.receivedByName}</strong>
                 <small>{receiptView.receivedByDepartment}</small>
               </div>
               {receiptView.assetKind === 'SET' && (
                 <div>
-                  <span>Σύνθεση κατά την παραλαβή</span>
+                  <span>{tr('Σύνθεση κατά την παραλαβή')}</span>
                   <strong>
                     {receiptView.actual} / {receiptView.expected}
                   </strong>
@@ -4249,13 +4370,15 @@ export default function SterilizationPage() {
               <div className="receipt-check-read">
                 <div>
                   <ClipboardCheck size={17} />
-                  <strong>Καταμέτρηση κατά την παραλαβή</strong>
+                  <strong>{tr('Καταμέτρηση κατά την παραλαβή')}</strong>
                 </div>
                 <span>
                   {receiptView.assetKind === 'SET'
-                    ? `Παραλήφθηκαν ${receiptView.checkedCount} από ${receiptView.expected}. `
+                    ? tr('Παραλήφθηκαν {0} από {1}. ', receiptView.checkedCount, receiptView.expected)
                     : ''}
-                  {receiptView.checkResult === 'MISSING' ? 'Καταγράφηκε διαφορά ποσότητας.' : 'Η ποσότητα συμφωνεί.'}
+                  {receiptView.checkResult === 'MISSING'
+                    ? tr('Καταγράφηκε διαφορά ποσότητας.')
+                    : tr('Η ποσότητα συμφωνεί.')}
                 </span>
               </div>
             )}
@@ -4263,29 +4386,30 @@ export default function SterilizationPage() {
               <div className="receipt-check-read">
                 <div>
                   {receiptView.visibleDeviation ? <TriangleAlert size={17} /> : <CheckCircle2 size={17} />}
-                  <strong>Εμφανής κατάσταση κατά την παραλαβή</strong>
+                  <strong>{tr('Εμφανής κατάσταση κατά την παραλαβή')}</strong>
                 </div>
                 <span>
                   {receiptView.visibleDeviation
-                    ? 'Δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.'
-                    : 'Δεν δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.'}
+                    ? tr('Δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.')
+                    : tr('Δεν δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.')}
                 </span>
                 {receiptView.departmentMismatch && (
                   <p>
-                    Παράδοση από διαφορετικό τμήμα: {receiptView.departmentMismatchReason || 'Καταγεγραμμένη εξαίρεση'}
+                    {tr('Παράδοση από διαφορετικό τμήμα:') + ' '}
+                    {receiptView.departmentMismatchReason || tr('Καταγεγραμμένη εξαίρεση')}
                   </p>
                 )}
               </div>
             }
             {receiptView.note && (
               <div className="receipt-note-read">
-                <span>Παρατήρηση</span>
+                <span>{tr('Παρατήρηση')}</span>
                 <p>{receiptView.note}</p>
               </div>
             )}
             <div className="modal-actions">
               <button className="primary" onClick={() => setReceiptView(null)}>
-                Κλείσιμο
+                {tr('Κλείσιμο')}
               </button>
             </div>
           </div>

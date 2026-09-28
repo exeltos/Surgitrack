@@ -54,6 +54,7 @@ import {localizedName, translateToEnglish} from '../../core/glossary';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
 import {departments as defaultDepartments} from '../../core/libraries';
+import {tr} from '../../i18n';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -379,7 +380,7 @@ export default function StudioPage() {
     }
     const failed = (result?.results || []).filter((x: {ok: boolean}) => !x.ok);
     if (failed.length) {
-      setCloudError(`${failed.length} προσκλήσεις απέτυχαν.`);
+      setCloudError(tr('{0} προσκλήσεις απέτυχαν.', failed.length));
     } else setBulkRows([]);
     await loadCloudUsers();
   };
@@ -1728,14 +1729,14 @@ export default function StudioPage() {
               <label>
                 {L('Barcode Σετ', 'Set barcode')}
                 <div className="studio-static-field">
-                  <b>S + 6 ψηφία</b>
+                  <b>{tr('S + 6 ψηφία')}</b>
                   <span>S000321</span>
                 </div>
               </label>
               <label>
                 {L('Barcode Εργαλείου', 'Instrument barcode')}
                 <div className="studio-static-field">
-                  <b>T + 6 ψηφία</b>
+                  <b>{tr('T + 6 ψηφία')}</b>
                   <span>T001250</span>
                 </div>
               </label>
@@ -1912,7 +1913,7 @@ function LibraryEditor({
         <header>
           <div>
             <span className="eyebrow">{title}</span>
-            <h2>{item ? 'Επεξεργασία εγγραφής' : 'Νέα εγγραφή'}</h2>
+            <h2>{item ? tr('Επεξεργασία εγγραφής') : tr('Νέα εγγραφή')}</h2>
           </div>
           <button onClick={onClose}>
             <X />
@@ -1920,7 +1921,7 @@ function LibraryEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονομασία
+            {tr('Ονομασία')}
             <input autoFocus value={el} onChange={e => setEl(e.target.value)} />
           </label>
           {el.trim() && (
@@ -1929,27 +1930,28 @@ function LibraryEditor({
               <span>
                 {english && english !== el.trim() ? (
                   <>
-                    Στα αγγλικά θα εμφανίζεται ως <b>{english}</b>.
+                    {tr('Στα αγγλικά θα εμφανίζεται ως') + ' '}
+                    <b>{english}</b>.
                   </>
                 ) : (
-                  'Στα αγγλικά θα εμφανίζεται όπως το γράψατε.'
+                  tr('Στα αγγλικά θα εμφανίζεται όπως το γράψατε.')
                 )}
               </span>
             </div>
           )}
           <label>
-            Κωδικός
-            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="Προαιρετικό" />
+            {tr('Κωδικός')}
+            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder={tr('Προαιρετικό')} />
           </label>
         </div>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
             disabled={!el.trim()}
             onClick={() => onSave({el: el.trim(), en: english || el.trim(), code: code.trim() || undefined})}
           >
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
         </footer>
       </aside>
@@ -1974,8 +1976,8 @@ function OrganizationEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">ΝΟΣΟΚΟΜΕΙΟ</span>
-            <h2>{organization ? 'Επεξεργασία νοσοκομείου' : 'Νέο νοσοκομείο'}</h2>
+            <span className="eyebrow">{tr('ΝΟΣΟΚΟΜΕΙΟ')}</span>
+            <h2>{organization ? tr('Επεξεργασία νοσοκομείου') : tr('Νέο νοσοκομείο')}</h2>
           </div>
           <button onClick={onClose}>
             <X />
@@ -1983,36 +1985,42 @@ function OrganizationEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονομασία
+            {tr('Ονομασία')}
             <input autoFocus value={name} onChange={e => setName(e.target.value)} />
           </label>
           <label>
-            Κωδικός
-            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="π.χ. IASO-TH" />
+            {tr('Κωδικός')}
+            <input
+              value={code}
+              onChange={e => setCode(e.target.value.toUpperCase())}
+              placeholder={tr('π.χ. IASO-TH')}
+            />
           </label>
           <label className="studio-switch-row">
             <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>Ενεργό νοσοκομείο</span>
+            <span>{tr('Ενεργό νοσοκομείο')}</span>
           </label>
           <label className="studio-switch-row">
             <input type="checkbox" checked={demoEnabled} onChange={e => setDemoEnabled(e.target.checked)} />
-            <span>Επιτρέπεται Demo πρόσβαση</span>
+            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
           </label>
           <div className="studio-form-note">
             <ShieldCheck size={16} />
             <span>
-              Η Demo πρόσβαση δεν εμφανίζεται στη δημόσια αρχική. Ενεργοποιείται κεντρικά ανά νοσοκομείο και ανά χρήστη.
+              {tr(
+                'Η Demo πρόσβαση δεν εμφανίζεται στη δημόσια αρχική. Ενεργοποιείται κεντρικά ανά νοσοκομείο και ανά χρήστη.',
+              )}
             </span>
           </div>
         </div>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
             disabled={!name.trim() || !code.trim()}
             onClick={() => onSave({name: name.trim(), code: code.trim(), active, demoEnabled})}
           >
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
         </footer>
       </aside>
@@ -2052,8 +2060,8 @@ function UserEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ</span>
-            <h2>{user ? 'Επεξεργασία χρήστη' : 'Νέος χρήστης'}</h2>
+            <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ')}</span>
+            <h2>{user ? tr('Επεξεργασία χρήστη') : tr('Νέος χρήστης')}</h2>
           </div>
           <button onClick={onClose}>
             <X />
@@ -2061,7 +2069,7 @@ function UserEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονοματεπώνυμο
+            {tr('Ονοματεπώνυμο')}
             <input autoFocus value={name} onChange={e => setName(e.target.value)} />
           </label>
           <label>
@@ -2069,7 +2077,7 @@ function UserEditor({
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
           </label>
           <label>
-            Νοσοκομείο
+            {tr('Νοσοκομείο')}
             <select value={organizationId} onChange={e => setOrganizationId(e.target.value)}>
               {organizations.map(org => (
                 <option key={org.id} value={org.id}>
@@ -2079,7 +2087,7 @@ function UserEditor({
             </select>
           </label>
           <label>
-            Ρόλος
+            {tr('Ρόλος')}
             <select
               value={role}
               onChange={e => {
@@ -2088,21 +2096,23 @@ function UserEditor({
                 if (next === 'ADMIN') setDemoEnabled(true);
               }}
             >
-              <option value="DEPARTMENT">Τμήμα</option>
-              <option value="STERILIZATION">Αποστείρωση</option>
-              <option value="ADMIN">Διαχειριστής</option>
+              <option value="DEPARTMENT">{tr('Τμήμα')}</option>
+              <option value="STERILIZATION">{tr('Αποστείρωση')}</option>
+              <option value="ADMIN">{tr('Διαχειριστής')}</option>
             </select>
           </label>
           {role === 'ADMIN' ? (
             <div className="studio-form-note">
               <ShieldCheck size={16} />
               <span>
-                Ο Διαχειριστής δεν ανήκει σε τμήμα: διαχειρίζεται όλο το νοσοκομείο και δημιουργεί τους χρήστες του.
+                {tr(
+                  'Ο Διαχειριστής δεν ανήκει σε τμήμα: διαχειρίζεται όλο το νοσοκομείο και δημιουργεί τους χρήστες του.',
+                )}
               </span>
             </div>
           ) : (
             <label>
-              Τμήμα
+              {tr('Τμήμα')}
               <select value={department} onChange={e => setDepartment(e.target.value)}>
                 {cloudDepartments.length
                   ? cloudDepartments
@@ -2118,7 +2128,7 @@ function UserEditor({
           )}
           <label className="studio-switch-row">
             <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>Ενεργή πρόσβαση</span>
+            <span>{tr('Ενεργή πρόσβαση')}</span>
           </label>
           <label className="studio-switch-row">
             <input
@@ -2127,18 +2137,19 @@ function UserEditor({
               disabled={role === 'ADMIN'}
               onChange={e => setDemoEnabled(e.target.checked)}
             />
-            <span>Επιτρέπεται Demo πρόσβαση</span>
+            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
           </label>
           <div className="studio-form-note">
             <KeyRound size={16} />
             <span>
-              Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα
-              αρχικά του.
+              {tr(
+                'Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα αρχικά του.',
+              )}
             </span>
           </div>
         </div>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
             disabled={!name.trim() || !email.trim()}
@@ -2154,7 +2165,7 @@ function UserEditor({
               })
             }
           >
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
         </footer>
       </aside>

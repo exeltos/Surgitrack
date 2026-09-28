@@ -203,7 +203,8 @@ export default function App() {
     );
   return (
     <AppShell onLogout={logout}>
-      <Routes>
+      {/* Pages re-render their text in the new language when it changes. */}
+      <Routes key={lang}>
         <Route path="/" element={<RoleHome />} />
         <Route
           path="/sets"

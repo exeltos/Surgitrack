@@ -15,6 +15,7 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
+import {tr, trData} from '../../i18n';
 
 export default function ToolDetailPage() {
   const {
@@ -49,20 +50,20 @@ export default function ToolDetailPage() {
   if (!tool)
     return (
       <div className="empty">
-        <strong>Το εργαλείο δεν βρέθηκε.</strong>
-        <span>Επιστρέψτε στη λίστα εργαλείων και επιλέξτε ξανά.</span>
+        <strong>{tr('Το εργαλείο δεν βρέθηκε.')}</strong>
+        <span>{tr('Επιστρέψτε στη λίστα εργαλείων και επιλέξτε ξανά.')}</span>
         <Link className="primary-link" to={role === 'DEPARTMENT' ? '/department' : '/tools'}>
-          Πίσω στη λίστα
+          {tr('Πίσω στη λίστα')}
         </Link>
       </div>
     );
   if (role === 'DEPARTMENT' && tool.department !== currentUser.department)
     return (
       <div className="empty">
-        <strong>Δεν υπάρχει πρόσβαση σε αυτό το εργαλείο.</strong>
-        <span>Ο χρήστης του τμήματος βλέπει μόνο τον εξοπλισμό του δικού του τμήματος.</span>
+        <strong>{tr('Δεν υπάρχει πρόσβαση σε αυτό το εργαλείο.')}</strong>
+        <span>{tr('Ο χρήστης του τμήματος βλέπει μόνο τον εξοπλισμό του δικού του τμήματος.')}</span>
         <Link className="primary-link" to="/department">
-          Πίσω στα Σετ & Εργαλεία
+          {tr('Πίσω στα Σετ & Εργαλεία')}
         </Link>
       </div>
     );
@@ -73,7 +74,13 @@ export default function ToolDetailPage() {
     .filter(movement => knownBarcodes.some(barcode => movement.asset.includes(barcode)))
     .slice(0, 30);
   const toolIssues = issues.filter(issue => issue.status === 'OPEN' && issue.asset.startsWith(tool.barcode));
-  const location = set ? `Set ${set.barcode}` : tool.mode === 'STOCK' ? 'Stock' : tool.department || 'Μεμονωμένο';
+  const location = set
+    ? `Set ${set.barcode}`
+    : tool.mode === 'STOCK'
+      ? 'Stock'
+      : tool.department
+        ? trData(tool.department)
+        : tr('Μεμονωμένο');
   const departmentView = role === 'DEPARTMENT';
   const backTo = departmentView ? '/department' : '/tools';
   const workflowLocked = !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(tool.state);
@@ -83,7 +90,7 @@ export default function ToolDetailPage() {
       <div className="asset-workbench-actions">
         <div className="asset-action-group">
           <AppButton icon={<Printer size={18} />} onClick={() => setPreview(true)}>
-            Εκτύπωση Barcode
+            {tr('Εκτύπωση Barcode')}
           </AppButton>
           {can('asset.duplicate') && (
             <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
@@ -96,28 +103,28 @@ export default function ToolDetailPage() {
               icon={<Trash2 size={18} />}
               title={
                 workflowLocked
-                  ? 'Η διαγραφή είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.'
+                  ? tr('Η διαγραφή είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
                   : undefined
               }
               onClick={() => (workflowLocked ? setDeleteBlockedOpen(true) : setDeleteOpen(true))}
             >
-              Διαγραφή Εργαλείου
+              {tr('Διαγραφή Εργαλείου')}
             </AppButton>
           )}
           {can('issue.create') && (
             <AppButton icon={<Flag size={18} />} onClick={() => setReportOpen(true)}>
-              Αναφορά
+              {tr('Αναφορά')}
             </AppButton>
           )}
           {can('department.dispatch') && tool.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
-              Προς Αποστείρωση
+              {tr('Προς Αποστείρωση')}
             </AppButton>
           )}
         </div>
         <div className="asset-action-group">
           <Link to={backTo} className="asset-action-link">
-            <ArrowLeft size={18} /> Πίσω στη λίστα
+            <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </Link>
         </div>
       </div>
@@ -126,7 +133,7 @@ export default function ToolDetailPage() {
           kind="TOOL"
           asset={tool}
           setName={set ? `${set.barcode} · ${set.name}` : undefined}
-          setDepartment={set?.department}
+          setDepartment={trData(set?.department)}
           onPhotos={() => setPhotosOpen(true)}
           workflowLocked={workflowLocked}
           onSave={can('asset.edit') ? patch => updateTool(tool.id, patch) : undefined}
@@ -138,9 +145,9 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ</span>
-                    <h2>Ιστορικό κινήσεων</h2>
-                    <p>Όλες οι κινήσεις του συγκεκριμένου φυσικού εργαλείου.</p>
+                    <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
+                    <h2>{tr('Ιστορικό κινήσεων')}</h2>
+                    <p>{tr('Όλες οι κινήσεις του συγκεκριμένου φυσικού εργαλείου.')}</p>
                   </div>
                   <History size={19} />
                 </div>
@@ -150,18 +157,18 @@ export default function ToolDetailPage() {
                       <div className="asset-history-row" key={item.id}>
                         <span className="history-dot" />
                         <div>
-                          <strong>{item.status}</strong>
+                          <strong>{trData(item.status)}</strong>
                           <p>
-                            {item.from} → {item.to}
+                            {trData(item.from)} → {trData(item.to)}
                           </p>
                           <small>
-                            {item.at} · {item.by}
+                            {item.at} · {trData(item.by)}
                           </small>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <AssetEmptyState>Δεν υπάρχει καταγεγραμμένη κίνηση.</AssetEmptyState>
+                    <AssetEmptyState>{tr('Δεν υπάρχει καταγεγραμμένη κίνηση.')}</AssetEmptyState>
                   )}
                 </div>
               </section>
@@ -170,8 +177,8 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΕΚΚΡΕΜΟΤΗΤΕΣ</span>
-                    <h2>Ανοικτές αναφορές</h2>
+                    <span className="eyebrow">{tr('ΕΚΚΡΕΜΟΤΗΤΕΣ')}</span>
+                    <h2>{tr('Ανοικτές αναφορές')}</h2>
                   </div>
                 </div>
                 <div className="asset-detail-scroll asset-issue-list">
@@ -180,7 +187,7 @@ export default function ToolDetailPage() {
                       <div className="asset-issue-row" key={issue.id}>
                         <TriangleAlert size={17} />
                         <div>
-                          <strong>{issue.type}</strong>
+                          <strong>{trData(issue.type)}</strong>
                           <span>{issue.created}</span>
                           <small>{issue.note}</small>
                           {issue.photos?.length ? (
@@ -194,7 +201,7 @@ export default function ToolDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <AssetEmptyState>Δεν υπάρχουν ανοικτές εκκρεμότητες.</AssetEmptyState>
+                    <AssetEmptyState>{tr('Δεν υπάρχουν ανοικτές εκκρεμότητες.')}</AssetEmptyState>
                   )}
                 </div>
               </section>
@@ -203,34 +210,34 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΣΥΝΟΨΗ</span>
-                    <h2>Κατάσταση & κύκλος ζωής</h2>
-                    <p>Η λειτουργική εικόνα του εργαλείου χωρίς επανάληψη των στοιχείων ταυτότητας.</p>
+                    <span className="eyebrow">{tr('ΣΥΝΟΨΗ')}</span>
+                    <h2>{tr('Κατάσταση & κύκλος ζωής')}</h2>
+                    <p>{tr('Η λειτουργική εικόνα του εργαλείου χωρίς επανάληψη των στοιχείων ταυτότητας.')}</p>
                   </div>
                 </div>
                 <div className="asset-section-body">
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
-                    description="Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων."
+                    description={tr('Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.')}
                   />
                   <dl className="asset-definition-list compact-status-list">
                     <div>
-                      <dt>Αποστειρώσεις</dt>
+                      <dt>{tr('Αποστειρώσεις')}</dt>
                       <dd>{tool.sterilizations}</dd>
                     </div>
                     <div>
-                      <dt>Τρέχουσα θέση</dt>
+                      <dt>{tr('Τρέχουσα θέση')}</dt>
                       <dd>{location}</dd>
                     </div>
                     <div>
-                      <dt>Κατάσταση</dt>
+                      <dt>{tr('Κατάσταση')}</dt>
                       <dd>
                         <StatusBadge value={tool.state} />
                       </dd>
                     </div>
                     <div>
-                      <dt>Ανοικτές εκκρεμότητες</dt>
+                      <dt>{tr('Ανοικτές εκκρεμότητες')}</dt>
                       <dd className={toolIssues.length ? 'warn-text' : ''}>{toolIssues.length}</dd>
                     </div>
                   </dl>
@@ -238,7 +245,7 @@ export default function ToolDetailPage() {
                     <Link className="asset-related-set-link" to={`/sets/${set.id}`}>
                       <Layers3 size={17} />
                       <span>
-                        <small>Ανήκει στο Σετ</small>
+                        <small>{tr('Ανήκει στο Σετ')}</small>
                         <strong>
                           {set.barcode} · {set.name}
                         </strong>
@@ -252,12 +259,16 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΣΗΜΕΙΩΣΕΙΣ</span>
-                    <h2>Μόνιμες παρατηρήσεις</h2>
+                    <span className="eyebrow">{tr('ΣΗΜΕΙΩΣΕΙΣ')}</span>
+                    <h2>{tr('Μόνιμες παρατηρήσεις')}</h2>
                   </div>
                 </div>
                 <div className="asset-section-body asset-notes-tab">
-                  {tool.notes ? <p>{tool.notes}</p> : <AssetEmptyState>Δεν υπάρχουν σημειώσεις.</AssetEmptyState>}
+                  {tool.notes ? (
+                    <p>{tool.notes}</p>
+                  ) : (
+                    <AssetEmptyState>{tr('Δεν υπάρχουν σημειώσεις.')}</AssetEmptyState>
+                  )}
                 </div>
               </section>
             )}
@@ -270,7 +281,7 @@ export default function ToolDetailPage() {
           <div className="asset-modal asset-photo-manager-modal">
             <header>
               <div>
-                <h2>Φωτογραφίες Εργαλείου</h2>
+                <h2>{tr('Φωτογραφίες Εργαλείου')}</h2>
                 <p>
                   {tool.barcode} · {tool.name}
                 </p>
@@ -287,8 +298,8 @@ export default function ToolDetailPage() {
                 readOnly={!can('asset.photos.manage')}
                 description={
                   !can('asset.photos.manage')
-                    ? 'Φωτογραφική τεκμηρίωση του εργαλείου. Προβολή μόνο για τον ενεργό ρόλο.'
-                    : 'Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.'
+                    ? tr('Φωτογραφική τεκμηρίωση του εργαλείου. Προβολή μόνο για τον ενεργό ρόλο.')
+                    : tr('Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.')
                 }
               />
             </div>
@@ -313,9 +324,11 @@ export default function ToolDetailPage() {
       )}
       {can('asset.duplicate') && duplicateOpen && (
         <ConfirmDialog
-          title="Επιβεβαίωση Duplicate εργαλείου"
-          message={`Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Stock. Θέλεις να συνεχίσεις;`}
-          confirmLabel="Ναι, δημιουργία αντιγράφου"
+          title={tr('Επιβεβαίωση Duplicate εργαλείου')}
+          message={tr(
+            'Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Stock. Θέλεις να συνεχίσεις;',
+          )}
+          confirmLabel={tr('Ναι, δημιουργία αντιγράφου')}
           onConfirm={() => {
             const newId = duplicateTool(tool.id);
             setDuplicateOpen(false);
@@ -326,22 +339,32 @@ export default function ToolDetailPage() {
       )}
       {can('asset.delete') && deleteBlockedOpen && (
         <ConfirmDialog
-          title="Η διαγραφή δεν επιτρέπεται"
-          message={`Το ${tool.barcode} βρίσκεται σε ενεργή διαδικασία αποστείρωσης. Η διαδικασία πρέπει να ολοκληρωθεί ή να ακυρωθεί με καταγεγραμμένο τρόπο πριν επιτραπεί η διαγραφή του εργαλείου.`}
-          confirmLabel="Κατάλαβα"
+          title={tr('Η διαγραφή δεν επιτρέπεται')}
+          message={tr(
+            'Το {0} βρίσκεται σε ενεργή διαδικασία αποστείρωσης. Η διαδικασία πρέπει να ολοκληρωθεί ή να ακυρωθεί με καταγεγραμμένο τρόπο πριν επιτραπεί η διαγραφή του εργαλείου.',
+            tool.barcode,
+          )}
+          confirmLabel={tr('Κατάλαβα')}
           onConfirm={() => setDeleteBlockedOpen(false)}
           onClose={() => setDeleteBlockedOpen(false)}
         />
       )}
       {can('asset.delete') && deleteOpen && (
         <ConfirmDialog
-          title="Επιβεβαίωση διαγραφής εργαλείου"
+          title={tr('Επιβεβαίωση διαγραφής εργαλείου')}
           message={
             set
-              ? `Πρόκειται να διαγραφεί οριστικά το ${tool.barcode} και να αφαιρεθεί από τη σύνθεση του ${set.barcode}. Η ενέργεια δεν αναιρείται. Θέλεις να συνεχίσεις;`
-              : `Πρόκειται να διαγραφεί οριστικά το ${tool.barcode}. Η ενέργεια δεν αναιρείται. Θέλεις να συνεχίσεις;`
+              ? tr(
+                  'Πρόκειται να διαγραφεί οριστικά το {0} και να αφαιρεθεί από τη σύνθεση του {1}. Η ενέργεια δεν αναιρείται. Θέλεις να συνεχίσεις;',
+                  tool.barcode,
+                  set.barcode,
+                )
+              : tr(
+                  'Πρόκειται να διαγραφεί οριστικά το {0}. Η ενέργεια δεν αναιρείται. Θέλεις να συνεχίσεις;',
+                  tool.barcode,
+                )
           }
-          confirmLabel="Ναι, οριστική διαγραφή"
+          confirmLabel={tr('Ναι, οριστική διαγραφή')}
           danger
           onConfirm={() => {
             deleteTool(tool.id);
@@ -356,7 +379,7 @@ export default function ToolDetailPage() {
           <div className="asset-modal set-report-modal tool-report-modal">
             <header>
               <div>
-                <h2>Νέα αναφορά</h2>
+                <h2>{tr('Νέα αναφορά')}</h2>
                 <p>
                   {tool.barcode} · {tool.name}
                 </p>
@@ -368,27 +391,27 @@ export default function ToolDetailPage() {
             <div className="modal-body">
               <div className="form-grid">
                 <label>
-                  Τύπος αναφοράς
+                  {tr('Τύπος αναφοράς')}
                   <select value={reportType} onChange={e => setReportType(e.target.value)}>
-                    <option>Βλάβη</option>
-                    <option>Φθορά</option>
-                    <option>Απώλεια</option>
-                    <option>Έλλειψη</option>
+                    <option>{tr('Βλάβη')}</option>
+                    <option>{tr('Φθορά')}</option>
+                    <option>{tr('Απώλεια')}</option>
+                    <option>{tr('Έλλειψη')}</option>
                     <option>Service</option>
-                    <option>Άλλο</option>
+                    <option>{tr('Άλλο')}</option>
                   </select>
                 </label>
                 <label className="span-2">
-                  Παρατήρηση
+                  {tr('Παρατήρηση')}
                   <textarea
                     rows={3}
                     value={reportNote}
                     onChange={e => setReportNote(e.target.value)}
-                    placeholder="Περιγραφή συμβάντος..."
+                    placeholder={tr('Περιγραφή συμβάντος...')}
                   />
                 </label>
                 <label className="span-2 report-photo-input">
-                  <Camera size={17} /> Φωτογραφίες
+                  <Camera size={17} /> {tr('Φωτογραφίες')}
                   <input
                     type="file"
                     accept="image/*"
@@ -398,14 +421,14 @@ export default function ToolDetailPage() {
                   />
                   <small>
                     {reportPhotos.length
-                      ? `${reportPhotos.length} φωτογραφίες έτοιμες`
-                      : 'Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών'}
+                      ? tr('{0} φωτογραφίες έτοιμες', reportPhotos.length)
+                      : tr('Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών')}
                   </small>
                 </label>
               </div>
             </div>
             <footer>
-              <AppButton onClick={() => setReportOpen(false)}>Ακύρωση</AppButton>
+              <AppButton onClick={() => setReportOpen(false)}>{tr('Ακύρωση')}</AppButton>
               <AppButton
                 variant="primary"
                 onClick={() => {
@@ -415,7 +438,7 @@ export default function ToolDetailPage() {
                   setReportPhotos([]);
                 }}
               >
-                Καταχώρηση αναφοράς
+                {tr('Καταχώρηση αναφοράς')}
               </AppButton>
             </footer>
           </div>

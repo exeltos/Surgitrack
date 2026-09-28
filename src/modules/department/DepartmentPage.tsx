@@ -4,6 +4,7 @@ import {ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wrench} from 
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
+import {tr, trData} from '../../i18n';
 
 type Category = 'SETS' | 'TOOLS';
 type StatusFilter = 'ALL' | 'IN_DEPARTMENT' | 'STERILIZATION' | 'READY';
@@ -94,35 +95,36 @@ export default function DepartmentPage() {
     <div className="department-workspace">
       <header className="department-header">
         <div>
-          <span className="eyebrow">ΣΕΤ & ΕΡΓΑΛΕΙΑ ΤΜΗΜΑΤΟΣ</span>
-          <h1>{dept}</h1>
+          <span className="eyebrow">{tr('ΣΕΤ & ΕΡΓΑΛΕΙΑ ΤΜΗΜΑΤΟΣ')}</span>
+          <h1>{trData(dept)}</h1>
           <p>
-            Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος, οι αναφορές και η ηλεκτρονική αποστολή προς Κεντρική
-            Αποστείρωση.
+            {tr(
+              'Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος, οι αναφορές και η ηλεκτρονική αποστολή προς Κεντρική Αποστείρωση.',
+            )}
           </p>
         </div>
         <div className="department-user-sign">
           <ShieldCheck size={18} />
-          <span>Συνδεδεμένος χρήστης</span>
-          <strong>{currentUser.name}</strong>
+          <span>{tr('Συνδεδεμένος χρήστης')}</span>
+          <strong>{trData(currentUser.name)}</strong>
         </div>
       </header>
 
       <section className="department-kpis">
         <div>
-          <span>Στο τμήμα</span>
+          <span>{tr('Στο τμήμα')}</span>
           <strong>{atDepartment}</strong>
         </div>
         <div>
-          <span>Προς / στην Αποστείρωση</span>
+          <span>{tr('Προς / στην Αποστείρωση')}</span>
           <strong>{inSterilization}</strong>
         </div>
         <div>
-          <span>Έτοιμα για παραλαβή</span>
+          <span>{tr('Έτοιμα για παραλαβή')}</span>
           <strong>{ready}</strong>
         </div>
         <div>
-          <span>Ανοικτές εκκρεμότητες</span>
+          <span>{tr('Ανοικτές εκκρεμότητες')}</span>
           <strong>{openIssues}</strong>
         </div>
       </section>
@@ -132,16 +134,20 @@ export default function DepartmentPage() {
           <button className={category === 'SETS' ? 'active' : ''} onClick={() => setCategory('SETS')}>
             <Layers3 size={19} />
             <span>
-              <strong>Σετ εργαλείων</strong>
-              <small>{departmentSets.length} Σετ του τμήματος</small>
+              <strong>{tr('Σετ εργαλείων')}</strong>
+              <small>
+                {departmentSets.length} {tr('Σετ του τμήματος')}
+              </small>
             </span>
             <b>{departmentSets.length}</b>
           </button>
           <button className={category === 'TOOLS' ? 'active' : ''} onClick={() => setCategory('TOOLS')}>
             <Wrench size={19} />
             <span>
-              <strong>Μεμονωμένα εργαλεία</strong>
-              <small>{departmentTools.length} εργαλεία σε αυτόνομη χρήση</small>
+              <strong>{tr('Μεμονωμένα εργαλεία')}</strong>
+              <small>
+                {departmentTools.length} {tr('εργαλεία σε αυτόνομη χρήση')}
+              </small>
             </span>
             <b>{departmentTools.length}</b>
           </button>
@@ -152,27 +158,27 @@ export default function DepartmentPage() {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Ονομασία, κωδικός ή barcode..."
+              placeholder={tr('Ονομασία, κωδικός ή barcode...')}
             />
           </label>
           <div className="department-status-tabs">
             <button className={statusFilter === 'ALL' ? 'active' : ''} onClick={() => setStatusFilter('ALL')}>
-              Όλα
+              {tr('Όλα')}
             </button>
             <button
               className={statusFilter === 'IN_DEPARTMENT' ? 'active' : ''}
               onClick={() => setStatusFilter('IN_DEPARTMENT')}
             >
-              Στο τμήμα
+              {tr('Στο τμήμα')}
             </button>
             <button
               className={statusFilter === 'STERILIZATION' ? 'active' : ''}
               onClick={() => setStatusFilter('STERILIZATION')}
             >
-              Αποστείρωση
+              {tr('Αποστείρωση')}
             </button>
             <button className={statusFilter === 'READY' ? 'active' : ''} onClick={() => setStatusFilter('READY')}>
-              Έτοιμα
+              {tr('Έτοιμα')}
             </button>
           </div>
         </div>
@@ -210,22 +216,22 @@ export default function DepartmentPage() {
                       <span className="mono">{asset.barcode}</span>
                       <strong>{asset.name}</strong>
                       <small>
-                        {asset.code} · {asset.specialty}
-                        {kind === 'SET' ? ` · ${memberCount}/${(asset as SetAsset).expected} εργαλεία` : ''}
+                        {asset.code} · {trData(asset.specialty)}
+                        {kind === 'SET' ? tr(' · {0}/{1} εργαλεία', memberCount, (asset as SetAsset).expected) : ''}
                       </small>
                     </div>
                     <div className="department-asset-state">
-                      <small>Κατάσταση</small>
+                      <small>{tr('Κατάσταση')}</small>
                       <span className={`badge badge-${asset.state.toLowerCase()}`}>
-                        {departmentStateLabel[asset.state] || asset.state}
+                        {tr(departmentStateLabel[asset.state] || asset.state)}
                       </span>
                     </div>
                     <div className="department-asset-uses">
-                      <small>Χρήσεις</small>
+                      <small>{tr('Χρήσεις')}</small>
                       <strong>
                         {asset.maxUses !== undefined
                           ? `${asset.uses || 0}/${asset.maxUses}`
-                          : `${asset.uses || 0} · χωρίς όριο`}
+                          : tr('{0} · χωρίς όριο', asset.uses || 0)}
                       </strong>
                     </div>
                     <ChevronRight size={19} />
@@ -236,8 +242,8 @@ export default function DepartmentPage() {
           ) : (
             <div className="department-empty">
               <ClipboardList size={28} />
-              <strong>Δεν υπάρχουν εγγραφές με αυτά τα φίλτρα.</strong>
-              <span>Άλλαξε κατηγορία, κατάσταση ή αναζήτηση.</span>
+              <strong>{tr('Δεν υπάρχουν εγγραφές με αυτά τα φίλτρα.')}</strong>
+              <span>{tr('Άλλαξε κατηγορία, κατάσταση ή αναζήτηση.')}</span>
             </div>
           )}
         </div>

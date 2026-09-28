@@ -4,6 +4,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import AppButton from '../ui/AppButton';
 import AssetFilterBar from './AssetFilterBar';
+import {tr, trData} from '../../i18n';
 
 type Source = 'STOCK' | 'SET_MEMBER' | 'STANDALONE';
 
@@ -34,7 +35,9 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
       ),
     [sourceTools, q, department, specialty, manufacturer],
   );
-  const label = source === 'STOCK' ? 'Stock εργαλείων' : source === 'SET_MEMBER' ? 'άλλα Σετ' : 'Μεμονωμένα σε χρήση';
+  const label = tr(
+    source === 'STOCK' ? 'Stock εργαλείων' : source === 'SET_MEMBER' ? 'άλλα Σετ' : 'Μεμονωμένα σε χρήση',
+  );
   const sourceCount = (value: Source) => tools.filter(t => t.setId !== setId && t.mode === value).length;
   const chooseSource = (value: Source) => {
     setSource(value);
@@ -54,79 +57,81 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
           className="asset-modal asset-modal-add-tools"
           role="dialog"
           aria-modal="true"
-          aria-label="Προσθήκη εργαλείων στο Σετ"
+          aria-label={tr('Προσθήκη εργαλείων στο Σετ')}
         >
           <header className="add-tools-profile-head">
             <div className="asset-profile-icon">
               <Box size={22} />
             </div>
             <div className="asset-profile-title">
-              <span className="eyebrow">ΣΥΝΘΕΣΗ ΣΕΤ</span>
-              <h2>Προσθήκη εργαλείων</h2>
+              <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ ΣΕΤ')}</span>
+              <h2>{tr('Προσθήκη εργαλείων')}</h2>
               <p>
-                <b>{target?.name || 'Σετ'}</b> · Κωδικός: {target?.code || '—'} · Barcode:{' '}
-                <span className="mono">{target?.barcode || '—'}</span>
+                <b>{target?.name || tr('Σετ')}</b> {tr('· Κωδικός:') + ' '}
+                {target?.code || '—'} · Barcode: <span className="mono">{target?.barcode || '—'}</span>
               </p>
             </div>
-            <button className="icon-button" onClick={onClose} aria-label="Κλείσιμο">
+            <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
               <X size={18} />
             </button>
           </header>
           <div className="add-tools-summary">
             <div>
               <Layers3 size={16} />
-              <span>Τρέχουσα σύνθεση</span>
+              <span>{tr('Τρέχουσα σύνθεση')}</span>
               <strong>
                 {members.length}/{target?.expected || members.length}
               </strong>
             </div>
             <div>
               <PackageOpen size={16} />
-              <span>Διαθέσιμα στην πηγή</span>
+              <span>{tr('Διαθέσιμα στην πηγή')}</span>
               <strong>{candidates.length}</strong>
             </div>
             <div>
               <Check size={16} />
-              <span>Επιλεγμένα</span>
+              <span>{tr('Επιλεγμένα')}</span>
               <strong>{selected.length}</strong>
             </div>
           </div>
           <div className="modal-body add-tools-body">
-            <div className="source-tabs source-tabs-spacious" role="tablist" aria-label="Πηγή εργαλείων">
+            <div className="source-tabs source-tabs-spacious" role="tablist" aria-label={tr('Πηγή εργαλείων')}>
               <button className={source === 'STOCK' ? 'active' : ''} onClick={() => chooseSource('STOCK')}>
                 <PackageOpen size={15} /> Stock <span>{sourceCount('STOCK')}</span>
               </button>
               <button className={source === 'SET_MEMBER' ? 'active' : ''} onClick={() => chooseSource('SET_MEMBER')}>
-                <Layers3 size={15} /> Από άλλο Σετ <span>{sourceCount('SET_MEMBER')}</span>
+                <Layers3 size={15} /> {tr('Από άλλο Σετ') + ' '}
+                <span>{sourceCount('SET_MEMBER')}</span>
               </button>
               <button className={source === 'STANDALONE' ? 'active' : ''} onClick={() => chooseSource('STANDALONE')}>
-                <Stethoscope size={15} /> Μεμονωμένα σε χρήση <span>{sourceCount('STANDALONE')}</span>
+                <Stethoscope size={15} /> {tr('Μεμονωμένα σε χρήση') + ' '}
+                <span>{sourceCount('STANDALONE')}</span>
               </button>
             </div>
             <AssetFilterBar
               compact
               query={q}
               onQueryChange={setQ}
-              placeholder={`Εργαλείο, κωδικός ή barcode σε ${label}...`}
+              placeholder={tr('Εργαλείο, κωδικός ή barcode σε {0}...', label)}
               filters={[
                 {
                   key: 'department',
                   value: department,
-                  placeholder: 'Όλα τα τμήματα',
+                  placeholder: tr('Όλα τα τμήματα'),
                   options: values('department').map(value => ({value, label: value})),
                   onChange: setDepartment,
                 },
                 {
                   key: 'specialty',
                   value: specialty,
-                  placeholder: 'Όλες οι ειδικότητες',
+                  placeholder: tr('Όλες οι ειδικότητες'),
                   options: values('specialty').map(value => ({value, label: value})),
                   onChange: setSpecialty,
                 },
                 {
                   key: 'manufacturer',
                   value: manufacturer,
-                  placeholder: 'Όλες οι εταιρείες',
+                  placeholder: tr('Όλες οι εταιρείες'),
                   options: values('manufacturer').map(value => ({value, label: value})),
                   onChange: setManufacturer,
                 },
@@ -151,12 +156,12 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
                     <span>
                       <b>{t.name}</b>
                       <small>
-                        {t.manufacturer} · {t.specialty || 'Χωρίς ειδικότητα'}
+                        {t.manufacturer} · {trData(t.specialty) || tr('Χωρίς ειδικότητα')}
                       </small>
                     </span>
                     <span className="source-pill">
                       {source === 'SET_MEMBER'
-                        ? `${set?.barcode || 'Σετ'} · ${set?.name || ''}`
+                        ? tr('{0} · {1}', set?.barcode || 'Σετ', set?.name || '')
                         : source === 'STANDALONE'
                           ? t.department || '—'
                           : 'Stock'}
@@ -165,24 +170,30 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
                 );
               })}
               {!candidates.length && (
-                <div className="empty-inline">Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την πηγή.</div>
+                <div className="empty-inline">{tr('Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την πηγή.')}</div>
               )}
             </div>
           </div>
           <footer className="asset-modal-footer-sticky">
-            <span className="selection-count">{selected.length} επιλεγμένα</span>
-            <AppButton onClick={onClose}>Ακύρωση</AppButton>
+            <span className="selection-count">
+              {selected.length} {tr('επιλεγμένα')}
+            </span>
+            <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
             <AppButton variant="primary" disabled={!selected.length} onClick={() => setConfirm(true)}>
-              Προσθήκη στο Σετ
+              {tr('Προσθήκη στο Σετ')}
             </AppButton>
           </footer>
         </div>
       </div>
       {confirm && (
         <ConfirmDialog
-          title="Προσθήκη εργαλείων στο Σετ;"
-          message={`Θα μετακινηθούν ${selected.length} φυσικά εργαλεία στο ${target?.barcode}. Η προηγούμενη θέση τους θα καταγραφεί στο ιστορικό.`}
-          confirmLabel="Ναι, προσθήκη"
+          title={tr('Προσθήκη εργαλείων στο Σετ;')}
+          message={tr(
+            'Θα μετακινηθούν {0} φυσικά εργαλεία στο {1}. Η προηγούμενη θέση τους θα καταγραφεί στο ιστορικό.',
+            selected.length,
+            target?.barcode,
+          )}
+          confirmLabel={tr('Ναι, προσθήκη')}
           onConfirm={() => {
             addToolsToSet(setId, selected);
             onClose();

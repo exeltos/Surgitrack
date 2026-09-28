@@ -24,6 +24,7 @@ import {getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
+import {trData} from '../../i18n';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Τμήμα', en: 'Department'},
   STERILIZATION: {el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},
@@ -199,7 +200,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
         <strong>
           {role === 'DEPARTMENT'
-            ? `${roleLabel[role][lang]} · ${currentUser.department}`
+            ? `${roleLabel[role][lang]} · ${trData(currentUser.department)}`
             : platformOnly
               ? lang === 'el'
                 ? 'Διαχείριση πλατφόρμας'
@@ -398,7 +399,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                           <TriangleAlert size={17} />
                           <span>
                             <strong>{i.asset}</strong>
-                            <small>{i.type}</small>
+                            <small>{trData(i.type)}</small>
                           </span>
                         </button>
                       ))}

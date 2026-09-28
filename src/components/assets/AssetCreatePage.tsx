@@ -8,6 +8,7 @@ import AssetPhotosCard from './AssetPhotosCard';
 import AssetTypeIcon from './AssetTypeIcon';
 import {filesToAssetPhotos} from './photoUtils';
 import type {AssetKind, AssetPhoto} from '../../types/domain';
+import {tr, trData} from '../../i18n';
 
 type Source = 'STOCK' | 'SET_MEMBER' | 'STANDALONE';
 type CreateTab = 'DETAILS' | 'COMPOSITION' | 'PHOTOS' | 'NOTES';
@@ -90,17 +91,17 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
     <div className="asset-detail-workspace asset-create-card-workspace legacy-inspired-workspace">
       <div className="asset-workbench-actions asset-create-card-actions">
         <div className="asset-action-group">
-          <span className="asset-create-mode-label">ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ</span>
+          <span className="asset-create-mode-label">{tr('ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ')}</span>
           <AppButton variant="primary" icon={<Save size={17} />} disabled={!valid} onClick={save}>
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
           <AppButton icon={<X size={17} />} onClick={() => navigate(backTo)}>
-            Ακύρωση
+            {tr('Ακύρωση')}
           </AppButton>
         </div>
         <div className="asset-action-group">
           <button className="asset-action-link" onClick={() => navigate(backTo)}>
-            <ArrowLeft size={18} /> Πίσω στη λίστα
+            <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </button>
         </div>
       </div>
@@ -111,55 +112,55 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             <div className="asset-workbench-title-main">
               <AssetTypeIcon kind={kind} maxUses={limited ? Number(maxUses) || 1 : undefined} framed size={19} />
               <div>
-                <span className="eyebrow">{kind === 'SET' ? 'ΝΕΑ ΚΑΡΤΕΛΑ ΣΕΤ' : 'ΝΕΑ ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ'}</span>
-                <h1>{name || 'Χωρίς ονομασία'}</h1>
-                <p>{code || 'Συμπλήρωσε κωδικό'}</p>
+                <span className="eyebrow">{kind === 'SET' ? tr('ΝΕΑ ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΝΕΑ ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
+                <h1>{name || tr('Χωρίς ονομασία')}</h1>
+                <p>{code || tr('Συμπλήρωσε κωδικό')}</p>
               </div>
             </div>
             <div className="asset-workbench-title-status">
-              <span className="status-badge asset-member-status">Νέα καταχώριση</span>
+              <span className="status-badge asset-member-status">{tr('Νέα καταχώριση')}</span>
             </div>
           </div>
 
           <div className="asset-fields-heading">
-            <strong>Στοιχεία</strong>
-            <span className="asset-create-required">* υποχρεωτικά</span>
+            <strong>{tr('Στοιχεία')}</strong>
+            <span className="asset-create-required">{tr('* υποχρεωτικά')}</span>
           </div>
           <div className="asset-create-field-list">
             <label>
-              <span>Κωδικός *</span>
+              <span>{tr('Κωδικός *')}</span>
               <input
                 className="asset-inline-input"
                 value={code}
                 onChange={e => setCode(e.target.value)}
-                placeholder="π.χ. 12.15.321"
+                placeholder={tr('π.χ. 12.15.321')}
               />
             </label>
             <label>
-              <span>Ονομασία *</span>
+              <span>{tr('Ονομασία *')}</span>
               <input
                 className="asset-inline-input"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                placeholder={kind === 'SET' ? 'π.χ. Σετ Λαπαροτομίας' : 'π.χ. Λαβίδα Kocher 20 cm'}
+                placeholder={kind === 'SET' ? tr('π.χ. Σετ Λαπαροτομίας') : tr('π.χ. Λαβίδα Kocher 20 cm')}
               />
             </label>
             <label>
-              <span>Ειδικότητα</span>
+              <span>{tr('Ειδικότητα')}</span>
               <select className="asset-inline-input" value={specialty} onChange={e => setSpecialty(e.target.value)}>
-                <option value="">— Χωρίς ειδικότητα —</option>
+                <option value="">{tr('— Χωρίς ειδικότητα —')}</option>
                 {specialties.map(x => (
                   <option key={x.id} value={x.el}>
                     {x.el}
                   </option>
                 ))}
               </select>
-              <small>Προαιρετικό για Σετ και εργαλεία.</small>
+              <small>{tr('Προαιρετικό για Σετ και εργαλεία.')}</small>
             </label>
             <label>
-              <span>Τμήμα</span>
+              <span>{tr('Τμήμα')}</span>
               <select className="asset-inline-input" value={department} onChange={e => setDepartment(e.target.value)}>
-                <option value="">— Χωρίς τμήμα / Stock —</option>
+                <option value="">{tr('— Χωρίς τμήμα / Stock —')}</option>
                 {allowedDepartments.map(x => (
                   <option key={x.id} value={x.el}>
                     {x.el}
@@ -168,25 +169,27 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               </select>
               <small>
                 {kind === 'SET'
-                  ? 'Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Stock Σετ και παραμένει ενιαίο.'
-                  : 'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Stock εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.'}
+                  ? tr('Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Stock Σετ και παραμένει ενιαίο.')
+                  : tr(
+                      'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Stock εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.',
+                    )}
               </small>
             </label>
             <label>
-              <span>Κατασκευαστής</span>
+              <span>{tr('Κατασκευαστής')}</span>
               <select
                 className="asset-inline-input"
                 value={manufacturer}
                 onChange={e => setManufacturer(e.target.value)}
               >
-                <option value="">— Χωρίς κατασκευαστή —</option>
+                <option value="">{tr('— Χωρίς κατασκευαστή —')}</option>
                 {manufacturers.map(x => (
                   <option key={x.id} value={x.el}>
                     {x.el}
                   </option>
                 ))}
               </select>
-              <small>Προαιρετικό για Σετ και εργαλεία.</small>
+              <small>{tr('Προαιρετικό για Σετ και εργαλεία.')}</small>
             </label>
             {kind === 'TOOL' && (
               <label>
@@ -196,24 +199,24 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                   value={serialNumber}
                   disabled={quantity > 1}
                   onChange={e => setSerialNumber(e.target.value)}
-                  placeholder={quantity > 1 ? 'Μόνο για 1 τεμάχιο' : 'Προαιρετικό'}
+                  placeholder={quantity > 1 ? tr('Μόνο για 1 τεμάχιο') : tr('Προαιρετικό')}
                 />
               </label>
             )}
             <label>
-              <span>Τύπος χρήσης</span>
+              <span>{tr('Τύπος χρήσης')}</span>
               <select
                 className="asset-inline-input"
                 value={limited ? 'LIMITED' : 'UNLIMITED'}
                 onChange={e => setLimited(e.target.value === 'LIMITED')}
               >
-                <option value="UNLIMITED">Χωρίς όριο</option>
-                <option value="LIMITED">Περιορισμένων χρήσεων</option>
+                <option value="UNLIMITED">{tr('Χωρίς όριο')}</option>
+                <option value="LIMITED">{tr('Περιορισμένων χρήσεων')}</option>
               </select>
             </label>
             {limited && (
               <label>
-                <span>Αρχικό όριο χρήσεων</span>
+                <span>{tr('Αρχικό όριο χρήσεων')}</span>
                 <input
                   className="asset-inline-input"
                   type="number"
@@ -236,16 +239,18 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <div className="asset-workbench-mini">
                 <AssetTypeIcon kind="SET" size={17} />
                 <div>
-                  <span>Αρχική σύνθεση</span>
-                  <strong>{selected.length} εργαλεία</strong>
+                  <span>{tr('Αρχική σύνθεση')}</span>
+                  <strong>
+                    {selected.length} {tr('εργαλεία')}
+                  </strong>
                 </div>
               </div>
             ) : (
               <div className="asset-workbench-mini">
                 <AssetTypeIcon kind="TOOL" maxUses={limited ? Number(maxUses) || 1 : undefined} size={17} />
                 <div>
-                  <span>Καταχώριση</span>
-                  <strong>{department.trim() ? 'Μεμονωμένο σε χρήση' : 'Stock εργαλείων'}</strong>
+                  <span>{tr('Καταχώριση')}</span>
+                  <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Stock εργαλείων')}</strong>
                 </div>
               </div>
             )}
@@ -255,15 +260,15 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             className="asset-cover"
             type="button"
             onClick={() => setTab('PHOTOS')}
-            aria-label="Προσθήκη φωτογραφιών"
+            aria-label={tr('Προσθήκη φωτογραφιών')}
           >
             {cover ? (
-              <img src={cover} alt={name || 'Νέο αντικείμενο'} />
+              <img src={cover} alt={name || tr('Νέο αντικείμενο')} />
             ) : (
               <div className="asset-cover-empty">
                 <Images size={30} />
-                <strong>Χωρίς φωτογραφία</strong>
-                <span>Λήψη ή upload πριν την αποθήκευση</span>
+                <strong>{tr('Χωρίς φωτογραφία')}</strong>
+                <span>{tr('Λήψη ή upload πριν την αποθήκευση')}</span>
               </div>
             )}
             <span className="asset-cover-count">
@@ -276,18 +281,20 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
         <section className="asset-workbench-main">
           <div className="asset-tabs asset-detail-tabs asset-create-tabs">
             <button className={tab === 'DETAILS' ? 'active' : ''} onClick={() => setTab('DETAILS')}>
-              Βασικά
+              {tr('Βασικά')}
             </button>
             {kind === 'SET' && (
               <button className={tab === 'COMPOSITION' ? 'active' : ''} onClick={() => setTab('COMPOSITION')}>
-                Σύνθεση <span>{selected.length}</span>
+                {tr('Σύνθεση') + ' '}
+                <span>{selected.length}</span>
               </button>
             )}
             <button className={tab === 'PHOTOS' ? 'active' : ''} onClick={() => setTab('PHOTOS')}>
-              Φωτογραφίες <span>{photos.length}</span>
+              {tr('Φωτογραφίες') + ' '}
+              <span>{photos.length}</span>
             </button>
             <button className={tab === 'NOTES' ? 'active' : ''} onClick={() => setTab('NOTES')}>
-              Σημειώσεις
+              {tr('Σημειώσεις')}
             </button>
           </div>
 
@@ -296,11 +303,12 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ</span>
-                    <h2>{kind === 'SET' ? 'Ρυθμίσεις νέου Σετ' : 'Ρυθμίσεις νέου εργαλείου'}</h2>
+                    <span className="eyebrow">{tr('ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ')}</span>
+                    <h2>{kind === 'SET' ? tr('Ρυθμίσεις νέου Σετ') : tr('Ρυθμίσεις νέου εργαλείου')}</h2>
                     <p>
-                      Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείς αργότερα στην προβολή και
-                      επεξεργασία.
+                      {tr(
+                        'Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείς αργότερα στην προβολή και επεξεργασία.',
+                      )}
                     </p>
                   </div>
                 </div>
@@ -308,26 +316,26 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                   <div className="form-grid form-grid-comfortable">
                     {kind === 'SET' && (
                       <div className="asset-inline-info">
-                        <strong>{department.trim() ? 'Σετ σε χρήση' : 'Stock Σετ'}</strong>
+                        <strong>{department.trim() ? tr('Σετ σε χρήση') : tr('Stock Σετ')}</strong>
                         <small>
                           {department.trim()
-                            ? `Θα καταχωρηθεί στο τμήμα ${department}.`
-                            : 'Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Stock Σετ.'}
+                            ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
+                            : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Stock Σετ.')}
                         </small>
                       </div>
                     )}
                     {kind === 'TOOL' && (
                       <>
                         <div className="asset-inline-info">
-                          <strong>{department.trim() ? 'Μεμονωμένο σε χρήση' : 'Stock εργαλείων'}</strong>
+                          <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Stock εργαλείων')}</strong>
                           <small>
                             {department.trim()
-                              ? `Θα καταχωρηθεί στο τμήμα ${department}.`
-                              : 'Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Stock εργαλείων.'}
+                              ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
+                              : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Stock εργαλείων.')}
                           </small>
                         </div>
                         <label>
-                          Ποσότητα
+                          {tr('Ποσότητα')}
                           <input
                             type="number"
                             min="1"
@@ -335,7 +343,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                             value={quantity}
                             onChange={e => setQuantity(Math.max(1, Number(e.target.value) || 1))}
                           />
-                          <small>Κάθε φυσικό τεμάχιο παίρνει δικό του barcode.</small>
+                          <small>{tr('Κάθε φυσικό τεμάχιο παίρνει δικό του barcode.')}</small>
                         </label>
                       </>
                     )}
@@ -343,8 +351,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                       Barcode
                       <input className="mono" value={barcode} readOnly />
                       <small>
-                        Αποδίδεται αυτόματα κατά την αποθήκευση. Ο κωδικός και το barcode παραμένουν διαφορετικά
-                        στοιχεία.
+                        {tr(
+                          'Αποδίδεται αυτόματα κατά την αποθήκευση. Ο κωδικός και το barcode παραμένουν διαφορετικά στοιχεία.',
+                        )}
                       </small>
                     </label>
                   </div>
@@ -356,11 +365,13 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <section className="asset-section asset-detail-full-panel create-card-composition">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΣΥΝΘΕΣΗ</span>
-                    <h2>Εργαλεία νέου Σετ</h2>
-                    <p>Επίλεξε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.</p>
+                    <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ')}</span>
+                    <h2>{tr('Εργαλεία νέου Σετ')}</h2>
+                    <p>{tr('Επίλεξε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.')}</p>
                   </div>
-                  <span className="selection-count">{selected.length} επιλεγμένα</span>
+                  <span className="selection-count">
+                    {selected.length} {tr('επιλεγμένα')}
+                  </span>
                 </div>
                 <div className="create-card-composition-body">
                   <div className="source-tabs create-set-source-tabs">
@@ -368,10 +379,10 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                       Stock <span>{tools.filter(t => t.mode === 'STOCK').length}</span>
                     </button>
                     <button className={source === 'SET_MEMBER' ? 'active' : ''} onClick={() => setSource('SET_MEMBER')}>
-                      Από άλλο Σετ
+                      {tr('Από άλλο Σετ')}
                     </button>
                     <button className={source === 'STANDALONE' ? 'active' : ''} onClick={() => setSource('STANDALONE')}>
-                      Μεμονωμένα
+                      {tr('Μεμονωμένα')}
                     </button>
                   </div>
                   <div className="composer-search create-set-search">
@@ -379,14 +390,14 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                     <input
                       value={query}
                       onChange={e => setQuery(e.target.value)}
-                      placeholder="Barcode, κωδικός ή ονομασία εργαλείου..."
+                      placeholder={tr('Barcode, κωδικός ή ονομασία εργαλείου...')}
                     />
                   </div>
                   <div className="create-set-list-head">
                     <span></span>
-                    <span>Barcode / Κωδικός</span>
-                    <span>Εργαλείο</span>
-                    <span>Προέλευση</span>
+                    <span>{tr('Barcode / Κωδικός')}</span>
+                    <span>{tr('Εργαλείο')}</span>
+                    <span>{tr('Προέλευση')}</span>
                   </div>
                   <div className="composer-list create-set-tools-list">
                     {candidates.map(t => {
@@ -395,8 +406,8 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                         t.mode === 'STOCK'
                           ? 'Stock'
                           : t.mode === 'SET_MEMBER'
-                            ? `${parent?.barcode || 'Σετ'} · ${parent?.name || ''}`
-                            : t.department || '—';
+                            ? `${parent?.barcode || tr('Σετ')} · ${parent?.name || ''}`
+                            : trData(t.department) || '—';
                       const active = selected.includes(t.id);
                       return (
                         <button
@@ -419,7 +430,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                       );
                     })}
                     {!candidates.length && (
-                      <div className="empty-inline">Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την κατηγορία.</div>
+                      <div className="empty-inline">{tr('Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την κατηγορία.')}</div>
                     )}
                   </div>
                 </div>
@@ -431,8 +442,10 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 photos={photos}
                 onAdd={addPhotos}
                 onRemove={removePhoto}
-                title={kind === 'SET' ? 'Φωτογραφίες νέου Σετ' : 'Φωτογραφίες νέου εργαλείου'}
-                description="Μπορείς να κάνεις λήψη με την κάμερα ή upload πολλών φωτογραφιών πριν από την πρώτη αποθήκευση."
+                title={kind === 'SET' ? tr('Φωτογραφίες νέου Σετ') : tr('Φωτογραφίες νέου εργαλείου')}
+                description={tr(
+                  'Μπορείς να κάνεις λήψη με την κάμερα ή upload πολλών φωτογραφιών πριν από την πρώτη αποθήκευση.',
+                )}
               />
             )}
 
@@ -440,9 +453,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">ΣΗΜΕΙΩΣΕΙΣ</span>
-                    <h2>Μόνιμες παρατηρήσεις</h2>
-                    <p>Οι σημειώσεις θα αποθηκευτούν στην ίδια καρτέλα του αντικειμένου.</p>
+                    <span className="eyebrow">{tr('ΣΗΜΕΙΩΣΕΙΣ')}</span>
+                    <h2>{tr('Μόνιμες παρατηρήσεις')}</h2>
+                    <p>{tr('Οι σημειώσεις θα αποθηκευτούν στην ίδια καρτέλα του αντικειμένου.')}</p>
                   </div>
                 </div>
                 <div className="asset-section-body asset-notes-tab">
@@ -451,7 +464,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                     rows={9}
                     value={notes}
                     onChange={e => setNotes(e.target.value)}
-                    placeholder="Τεχνικές ή μόνιμες παρατηρήσεις..."
+                    placeholder={tr('Τεχνικές ή μόνιμες παρατηρήσεις...')}
                   />
                 </div>
               </section>

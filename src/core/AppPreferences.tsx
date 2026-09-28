@@ -1,3 +1,4 @@
+import {setI18nLang} from '../i18n';
 import {createContext, useContext, useEffect, useMemo, useState, type ReactNode} from 'react';
 export type AppLang = 'el' | 'en';
 type Prefs = {
@@ -12,11 +13,17 @@ type Prefs = {
 };
 const Ctx = createContext<Prefs | null>(null);
 export function AppPreferencesProvider({children}: {children: ReactNode}) {
-  const [lang, setLangState] = useState<AppLang>(() => (localStorage.getItem('surgitrack-lang') as AppLang) || 'el');
+  const [lang, setLangState] = useState<AppLang>(() => {
+    const initial = (localStorage.getItem('surgitrack-lang') as AppLang) || 'el';
+    setI18nLang(initial);
+    return initial;
+  });
   const [fontScale, setFontScaleState] = useState(() => Number(localStorage.getItem('surgitrack-font-scale') || 1));
   const [highContrast, setHighContrastState] = useState(() => localStorage.getItem('surgitrack-contrast') === '1');
   const [reducedMotion, setReducedMotionState] = useState(() => localStorage.getItem('surgitrack-motion') === '1');
   const setLang = (v: AppLang) => {
+    // The t() helper reads the language directly, so it must switch before the re-render.
+    setI18nLang(v);
     setLangState(v);
     localStorage.setItem('surgitrack-lang', v);
   };

@@ -10,6 +10,7 @@ import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
 import IconToggleButton from '../../components/ui/IconToggleButton';
 import KpiStrip from '../../components/ui/KpiStrip';
+import {tr, trData} from '../../i18n';
 
 export default function StandaloneToolsPage() {
   const {tools, can} = useSurgi();
@@ -44,13 +45,15 @@ export default function StandaloneToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
-        title="Μεμονωμένα εργαλεία σε χρήση"
-        description="Μόνο φυσικά εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα και δεν ανήκουν αυτή τη στιγμή σε Σετ."
+        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        title={tr('Μεμονωμένα εργαλεία σε χρήση')}
+        description={tr(
+          'Μόνο φυσικά εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα και δεν ανήκουν αυτή τη στιγμή σε Σετ.',
+        )}
         actions={
           can('asset.create') ? (
             <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
-              Νέο Εργαλείο
+              {tr('Νέο Εργαλείο')}
             </AppButton>
           ) : undefined
         }
@@ -58,11 +61,11 @@ export default function StandaloneToolsPage() {
       <KpiStrip
         compact
         items={[
-          {label: 'Σε χρήση', value: standalone.length},
-          {label: 'Τμήματα', value: new Set(standalone.map(t => t.department).filter(Boolean)).size},
-          {label: 'Περιορισμένων χρήσεων', value: standalone.filter(t => t.maxUses).length},
+          {label: tr('Σε χρήση'), value: standalone.length},
+          {label: tr('Τμήματα'), value: new Set(standalone.map(t => t.department).filter(Boolean)).size},
+          {label: tr('Περιορισμένων χρήσεων'), value: standalone.filter(t => t.maxUses).length},
           {
-            label: '≤ 3 χρήσεις',
+            label: tr('≤ 3 χρήσεις'),
             value: standalone.filter(t => t.maxUses !== undefined && t.maxUses - t.uses <= 3).length,
           },
         ]}
@@ -71,33 +74,33 @@ export default function StandaloneToolsPage() {
         <AssetFilterBar
           query={q}
           onQueryChange={setQ}
-          placeholder="Ονομασία, κωδικός ή barcode..."
+          placeholder={tr('Ονομασία, κωδικός ή barcode...')}
           filters={[
             {
               key: 'department',
               value: department,
-              placeholder: 'Όλα τα τμήματα',
+              placeholder: tr('Όλα τα τμήματα'),
               options: values('department').map(value => ({value, label: value})),
               onChange: setDepartment,
             },
             {
               key: 'specialty',
               value: specialty,
-              placeholder: 'Όλες οι ειδικότητες',
+              placeholder: tr('Όλες οι ειδικότητες'),
               options: values('specialty').map(value => ({value, label: value})),
               onChange: setSpecialty,
             },
             {
               key: 'manufacturer',
               value: manufacturer,
-              placeholder: 'Όλες οι εταιρείες',
+              placeholder: tr('Όλες οι εταιρείες'),
               options: values('manufacturer').map(value => ({value, label: value})),
               onChange: setManufacturer,
             },
             {
               key: 'state',
               value: state,
-              placeholder: 'Όλες οι καταστάσεις',
+              placeholder: tr('Όλες οι καταστάσεις'),
               options: values('state').map(value => ({value, label: value})),
               onChange: setState,
             },
@@ -107,22 +110,22 @@ export default function StandaloneToolsPage() {
           active={grouped}
           activeIcon={<List size={17} />}
           inactiveIcon={<Layers3 size={17} />}
-          activeTitle="Εμφάνιση φυσικών εγγραφών"
-          inactiveTitle="Ομαδοποίηση ίδιων εργαλείων"
+          activeTitle={tr('Εμφάνιση φυσικών εγγραφών')}
+          inactiveTitle={tr('Ομαδοποίηση ίδιων εργαλείων')}
           onClick={() => setGrouped(v => !v)}
         />
       </div>
-      <ScrollableListPanel withKpis ariaLabel="Μεμονωμένα εργαλεία σε χρήση">
+      <ScrollableListPanel withKpis ariaLabel={tr('Μεμονωμένα εργαλεία σε χρήση')}>
         <table className="asset-registry-table">
           <thead>
             <tr>
-              <th>Ονομασία</th>
-              <th>{grouped ? 'Ποσότητα' : 'Κωδικός'}</th>
+              <th>{tr('Ονομασία')}</th>
+              <th>{grouped ? tr('Ποσότητα') : tr('Κωδικός')}</th>
               <th>Barcode</th>
-              <th>Εταιρεία</th>
-              <th>Τμήμα</th>
-              <th>Υπόλοιπο χρήσεων</th>
-              <th>Κατάσταση</th>
+              <th>{tr('Εταιρεία')}</th>
+              <th>{tr('Τμήμα')}</th>
+              <th>{tr('Υπόλοιπο χρήσεων')}</th>
+              <th>{tr('Κατάσταση')}</th>
               <th></th>
             </tr>
           </thead>
@@ -138,11 +141,11 @@ export default function StandaloneToolsPage() {
                       <td>
                         <span className="qty-badge">{g.length}</span>
                       </td>
-                      <td className="muted">πολλαπλά</td>
+                      <td className="muted">{tr('πολλαπλά')}</td>
                       <td>{t.manufacturer || '—'}</td>
-                      <td>{new Set(g.map(x => x.department)).size === 1 ? t.department : 'Πολλά τμήματα'}</td>
+                      <td>{new Set(g.map(x => x.department)).size === 1 ? t.department : tr('Πολλά τμήματα')}</td>
                       <td>—</td>
-                      <td className="muted">Μικτή</td>
+                      <td className="muted">{tr('Μικτή')}</td>
                       <td>
                         <Link className="icon-link" to={`/tools/${t.id}`}>
                           <ChevronRight size={17} />
@@ -166,7 +169,7 @@ export default function StandaloneToolsPage() {
                     <td className="cell-nowrap">{t.code}</td>
                     <td className="mono cell-nowrap">{t.barcode}</td>
                     <td>{t.manufacturer || '—'}</td>
-                    <td>{t.department || '—'}</td>
+                    <td>{trData(t.department) || '—'}</td>
                     <td>
                       {t.maxUses ? (
                         <>
@@ -174,7 +177,7 @@ export default function StandaloneToolsPage() {
                           <span className="muted"> / {t.maxUses}</span>
                         </>
                       ) : (
-                        <span className="muted">Χωρίς όριο</span>
+                        <span className="muted">{tr('Χωρίς όριο')}</span>
                       )}
                     </td>
                     <td>

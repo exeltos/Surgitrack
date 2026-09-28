@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {Search, SlidersHorizontal, X} from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
+import {trData} from '../../i18n';
 
 type Option = {value: string; label: string};
 type SelectFilter = {
@@ -100,7 +101,7 @@ export default function AssetFilterBar({
                   <option value="">{filter.placeholder}</option>
                   {filter.options.map(option => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {trData(option.label)}
                     </option>
                   ))}
                 </select>

@@ -20,6 +20,7 @@ import {useAppPreferences} from '../../core/AppPreferences';
 import {demoDepartments} from '../../config/demoRoles';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {AssetState} from '../../types/domain';
+import {trData} from '../../i18n';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -258,13 +259,13 @@ export default function HospitalOverviewPage() {
               <span>
                 <b>{m.asset}</b>
                 <small>
-                  {m.from} → {m.to}
+                  {trData(m.from)} → {trData(m.to)}
                 </small>
               </span>
               <span>
-                <b>{m.status}</b>
+                <b>{trData(m.status)}</b>
                 <small>
-                  {m.at} · {m.by}
+                  {m.at} · {trData(m.by)}
                 </small>
               </span>
             </div>
@@ -288,10 +289,10 @@ export default function HospitalOverviewPage() {
             <div key={i.id} className="overview-line">
               <span>
                 <b>{i.asset}</b>
-                <small>{i.department}</small>
+                <small>{trData(i.department)}</small>
               </span>
               <span>
-                <b className="bad">{i.type}</b>
+                <b className="bad">{trData(i.type)}</b>
                 <small>{i.created}</small>
               </span>
             </div>
