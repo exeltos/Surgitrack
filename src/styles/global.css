@@ -1680,3 +1680,15 @@
   justify-content: flex-end;
   gap: 8px;
 }
+.asset-manage-follows {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff7e6;
+  color: #7a4b00;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.asset-manage-choices[hidden] {
+  display: none;
+}

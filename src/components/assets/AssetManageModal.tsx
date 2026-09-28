@@ -26,6 +26,9 @@ export default function AssetManageModal({
   const tool = kind === 'TOOL' ? (asset as Tool) : undefined;
   const out = asset.state === 'LOST' || asset.state === 'SERVICE';
   const inSet = tool?.mode === 'SET_MEMBER' && !!tool.setId;
+  // A member of a Set that is itself lost or in service follows its Set: it is managed there.
+  const parentSet = tool?.setId ? sets.find(s => s.id === tool.setId) : undefined;
+  const followsSet = !!parentSet && (parentSet.state === 'LOST' || parentSet.state === 'SERVICE');
 
   const toolChoices: Array<Choice<ToolAction>> = out
     ? [
@@ -110,7 +113,8 @@ export default function AssetManageModal({
   const targets = useMemo(
     () =>
       sets
-        .filter(s => s.id !== tool?.setId && s.state !== 'LOST' && s.state !== 'SERVICE')
+        // Only Sets that can change composition: not in a reprocessing cycle, not out of use.
+        .filter(s => s.id !== tool?.setId && (s.state === 'IN_DEPARTMENT' || s.state === 'IN_STOCK'))
         .filter(s => `${s.barcode} ${s.name} ${s.department}`.toLowerCase().includes(setQuery.toLowerCase())),
     [sets, tool?.setId, setQuery],
   );
@@ -118,7 +122,7 @@ export default function AssetManageModal({
   const ready = action === 'MOVE' ? !!targetSetId : !needsNote || note.trim().length > 0;
 
   const confirm = () => {
-    if (!ready) return;
+    if (!ready || followsSet) return;
     if (kind === 'TOOL') {
       if (action === 'MOVE') moveTool(asset.id, 'SET', targetSetId);
       else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
@@ -146,7 +150,15 @@ export default function AssetManageModal({
             <X size={18} />
           </button>
         </header>
-        <div className="asset-manage-choices">
+        {followsSet && parentSet && (
+          <p className="asset-manage-follows">
+            {tr(
+              'Το εργαλείο ακολουθεί το Σετ {0}, που είναι εκτός χρήσης. Η επιστροφή γίνεται από τη διαχείριση του Σετ.',
+              parentSet.barcode,
+            )}
+          </p>
+        )}
+        <div className="asset-manage-choices" hidden={followsSet}>
           {choices.map(choice => (
             <button
               key={choice.id}
@@ -162,7 +174,7 @@ export default function AssetManageModal({
             </button>
           ))}
         </div>
-        {action === 'MOVE' && (
+        {!followsSet && action === 'MOVE' && (
           <div className="asset-manage-target">
             <label>
               <Layers3 size={16} />
@@ -189,7 +201,7 @@ export default function AssetManageModal({
             </div>
           </div>
         )}
-        {action !== 'MOVE' && (
+        {!followsSet && action !== 'MOVE' && (
           <label className="asset-manage-note">
             <span>{needsNote ? tr('Αιτιολογία (υποχρεωτική)') : tr('Σημείωση (προαιρετική)')}</span>
             <textarea
@@ -208,7 +220,7 @@ export default function AssetManageModal({
         )}
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
-          <AppButton variant="primary" disabled={!ready} onClick={confirm}>
+          <AppButton variant="primary" disabled={!ready || followsSet} onClick={confirm}>
             {tr('Καταχώρηση')}
           </AppButton>
         </footer>

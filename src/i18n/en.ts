@@ -1148,4 +1148,8 @@ export const en: Record<string, string> = {
   'Δηλώθηκε ως χαμένο.': 'Reported as lost.',
   'Το Σετ στάλθηκε για Service.': 'The Set was sent for service.',
   'action|Διαχείριση': 'Manage',
+  'Το Σετ {0} δεν δέχεται εργαλεία όσο βρίσκεται σε διαδικασία ή εκτός χρήσης.':
+    'Set {0} takes no instruments while it is being reprocessed or out of use.',
+  'Το εργαλείο ακολουθεί το Σετ {0}, που είναι εκτός χρήσης. Η επιστροφή γίνεται από τη διαχείριση του Σετ.':
+    'The instrument follows Set {0}, which is out of use. Bring it back from the Set’s management.',
 };

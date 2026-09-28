@@ -902,6 +902,12 @@ export function SurgiProvider({
     if (destination === 'SET') {
       const target = sets.find(x => x.id === setId);
       if (!target || target.id === sourceSetId) return;
+      // A Set in the middle of reprocessing (or out of use) takes no new instrument: it would
+      // inherit a sterile state without having gone through that Set's recorded cycle.
+      if (target.state !== 'IN_DEPARTMENT' && target.state !== 'IN_STOCK') {
+        notify(tr('Το Σετ {0} δεν δέχεται εργαλεία όσο βρίσκεται σε διαδικασία ή εκτός χρήσης.', target.barcode));
+        return;
+      }
       setTools(x =>
         x.map(a =>
           a.id === toolId
@@ -1473,11 +1479,13 @@ export function SurgiProvider({
     if (!a) return;
     const was = a.state === 'LOST' ? 'Απολεσθέντα' : 'Χαλασμένα / Service';
     if (kind === 'TOOL') {
+      const parentSetId = tools.find(t => t.id === id)?.setId;
       setTools(x =>
         x.map(t =>
           t.id === id ? {...t, mode: 'STOCK', setId: undefined, department: undefined, state: 'IN_STOCK'} : t,
         ),
       );
+      if (parentSetId) setSets(x => x.map(s => (s.id === parentSetId ? {...s, actual: Math.max(0, s.actual - 1)} : s)));
     } else {
       updateState('SET', id, a.department ? 'IN_DEPARTMENT' : 'IN_STOCK');
     }
