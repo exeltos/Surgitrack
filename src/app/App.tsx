@@ -9,7 +9,7 @@ import {useAppPreferences} from '../core/AppPreferences';
 import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
-import {supabase} from '../lib/supabase';
+import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import {
   type AccessRequest,
@@ -70,7 +70,9 @@ export default function App() {
   const [accessRequest, setAccessRequest] = useState<AccessRequest>();
   const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
-  const [passwordRecovery, setPasswordRecovery] = useState(() => /type=(recovery|invite)/.test(window.location.hash));
+  const [passwordRecovery, setPasswordRecovery] = useState(
+    () => passwordRecoveryPending() || /type=(recovery|invite)/.test(window.location.hash),
+  );
   const recoveryRef = useRef(passwordRecovery);
   useEffect(() => {
     recoveryRef.current = passwordRecovery;
@@ -78,7 +80,9 @@ export default function App() {
   useEffect(() => {
     let mounted = true;
     const restoreSession = async () => {
-      if (recoveryRef.current || /type=(recovery|invite)/.test(window.location.hash)) {
+      // Wait a moment for the client to finish reading a reset link from the URL.
+      await supabase.auth.getSession();
+      if (recoveryRef.current || passwordRecoveryPending() || /type=(recovery|invite)/.test(window.location.hash)) {
         setPasswordRecovery(true);
         setAuthenticated(false);
         setAuthReady(true);
@@ -140,6 +144,8 @@ export default function App() {
   }, [setRole]);
   // After sign-in the page reloads so the workspace gate can load the user's hospital.
   const login = () => {
+    // Signing in normally ends any unfinished password reset in this tab.
+    clearPasswordRecovery();
     sessionStorage.setItem('surgitrack-auth', '1');
     sessionStorage.removeItem('surgitrack-session-user');
     sessionStorage.removeItem('surgitrack-view-as');
@@ -198,7 +204,10 @@ export default function App() {
         onAuthenticated={login}
         goodbye={goodbye}
         passwordRecovery={passwordRecovery}
-        onPasswordRecoveryHandled={() => setPasswordRecovery(false)}
+        onPasswordRecoveryHandled={() => {
+          clearPasswordRecovery();
+          setPasswordRecovery(false);
+        }}
       />
     );
   return (
