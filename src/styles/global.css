@@ -1692,3 +1692,30 @@
 .asset-manage-choices[hidden] {
   display: none;
 }
+.asset-manage-reports {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid #f3d9a4;
+  border-radius: 12px;
+  background: #fffaf0;
+  font-size: 13px;
+}
+.asset-manage-reports > b {
+  color: #7a4b00;
+}
+.asset-manage-reports label {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.asset-manage-reports label span {
+  display: grid;
+  gap: 2px;
+}
+.asset-manage-reports label small,
+.asset-manage-reports > small {
+  color: #6b7c86;
+  font-size: 12px;
+}
