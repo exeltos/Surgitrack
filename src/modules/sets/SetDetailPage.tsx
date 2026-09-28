@@ -273,7 +273,7 @@ export default function SetDetailPage() {
                     </p>
                   </div>
                   <div className="set-composition-actions">
-                    {can('asset.edit') && (
+                    {can('asset.composition.manage') && (
                       <AppButton
                         icon={<Plus size={18} />}
                         disabled={workflowLocked}

@@ -338,7 +338,7 @@ export default function App() {
         <Route
           path="/overview"
           element={
-            <Guard permission="reports.view">
+            <Guard permission="overview.view">
               <HospitalOverviewPage />
             </Guard>
           }

@@ -19,6 +19,7 @@ export const en: Record<string, string> = {
   'Barcode, κωδικός ή ονομασία εργαλείου...': 'Barcode, code or instrument name...',
   'Barrier / σήμανση': 'Barrier / labelling',
   'Demo Αποστείρωση': 'Demo Sterilization',
+  'Demo Προϊστάμενος Αποστείρωσης': 'Demo Sterilization Supervisor',
   'Demo Διαχειριστής': 'Demo Administrator',
   'Demo Χρήστης IVF': 'Demo IVF User',
   'Demo Χρήστης Αίθουσας Τοκετών': 'Demo Delivery Suite User',
@@ -1097,4 +1098,6 @@ export const en: Record<string, string> = {
   '— Χωρίς τμήμα / Stock —': '— No department / Stock —',
   '→ Κεντρική Αποστείρωση': '→ Central Sterile Services',
   '≤ 3 χρήσεις': '≤ 3 uses',
+  'Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Stock) κάνει ο Προϊστάμενος Αποστείρωσης.':
+    'Set changes (replacement, service, stock) are made by the Sterilization supervisor.',
 };

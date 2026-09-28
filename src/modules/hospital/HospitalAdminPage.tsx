@@ -25,6 +25,7 @@ type Member = {
   email: string;
   user_code: string | null;
   role: UserRole;
+  supervisor: boolean;
   active: boolean;
   department_id: string | null;
 };
@@ -35,6 +36,14 @@ const roles: Array<{id: UserRole; el: string; en: string}> = [
   {id: 'DEPARTMENT', el: 'Τμήμα', en: 'Department'},
   {id: 'STERILIZATION', el: 'Αποστείρωση', en: 'Sterilization'},
   {id: 'ADMIN', el: 'Διαχειριστής', en: 'Administrator'},
+];
+/** In the users list Sterilization splits into staff and supervisor (who registers assets and changes Sets). */
+const SUPERVISOR = 'STERILIZATION_SUPERVISOR';
+const memberRoles = [
+  roles[0],
+  roles[1],
+  {id: SUPERVISOR, el: 'Προϊστάμενος Αποστείρωσης', en: 'Sterilization supervisor'},
+  roles[2],
 ];
 
 /**
@@ -77,7 +86,7 @@ export default function HospitalAdminPage() {
         .order('requested_at'),
       supabase
         .from('profiles')
-        .select('id,name,email,user_code,role,active,department_id')
+        .select('id,name,email,user_code,role,supervisor,active,department_id')
         .eq('organization_id', organizationId)
         .order('name'),
     ]);
@@ -181,7 +190,10 @@ export default function HospitalAdminPage() {
     if (!fail(error)) await load();
   };
 
-  const updateMember = async (m: Member, patch: Partial<Pick<Member, 'role' | 'active' | 'department_id'>>) => {
+  const updateMember = async (
+    m: Member,
+    patch: Partial<Pick<Member, 'role' | 'supervisor' | 'active' | 'department_id'>>,
+  ) => {
     const {error} = await supabase.from('profiles').update(patch).eq('id', m.id);
     if (!fail(error)) await load();
   };
@@ -430,11 +442,18 @@ export default function HospitalAdminPage() {
                     </select>
                   )}
                   <select
-                    value={m.role}
+                    value={m.role === 'STERILIZATION' && m.supervisor ? SUPERVISOR : m.role}
                     disabled={self}
-                    onChange={e => void updateMember(m, {role: e.target.value as UserRole})}
+                    onChange={e =>
+                      void updateMember(
+                        m,
+                        e.target.value === SUPERVISOR
+                          ? {role: 'STERILIZATION', supervisor: true}
+                          : {role: e.target.value as UserRole, supervisor: false},
+                      )
+                    }
                   >
-                    {roles.map(role => (
+                    {memberRoles.map(role => (
                       <option key={role.id} value={role.id}>
                         {el ? role.el : role.en}
                       </option>

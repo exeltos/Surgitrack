@@ -89,7 +89,10 @@ export default function SterilizationPage() {
     resolveIssues,
     moveTool,
     replaceToolInSet,
+    can,
   } = useSurgi();
+  // Set changes (cover a shortage, replace, service, stock, another Set) are the supervisor's.
+  const canCompose = can('asset.composition.manage');
   const {sterilizationWorkflow} = useLibraries();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
@@ -3038,27 +3041,29 @@ export default function SterilizationPage() {
               </span>
             </div>
             <div className="prep-manage-grid">
-              <button
-                type="button"
-                onClick={() => {
-                  setPrepSelectedToolId(null);
-                  setPrepReplacementRequirement({code: prepManageMissing.code, name: prepManageMissing.name});
-                  setPrepManageMissingCode(null);
-                  setPrepToolAction('REPLACE');
-                  setPrepReplacementId('');
-                  setPrepReplacementSource('STOCK');
-                  setPrepReplacementSetId('');
-                  setPrepOutgoingDestination('STOCK');
-                  setPrepOutgoingSetId('');
-                  setPrepTargetSetId('');
-                }}
-              >
-                <ArrowRight size={16} />
-                <span>
-                  <b>{tr('Κάλυψη έλλειψης')}</b>
-                  <small>{tr('Επιλογή εργαλείου από Stock, άλλο Set ή μεμονωμένο')}</small>
-                </span>
-              </button>
+              {canCompose && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPrepSelectedToolId(null);
+                    setPrepReplacementRequirement({code: prepManageMissing.code, name: prepManageMissing.name});
+                    setPrepManageMissingCode(null);
+                    setPrepToolAction('REPLACE');
+                    setPrepReplacementId('');
+                    setPrepReplacementSource('STOCK');
+                    setPrepReplacementSetId('');
+                    setPrepOutgoingDestination('STOCK');
+                    setPrepOutgoingSetId('');
+                    setPrepTargetSetId('');
+                  }}
+                >
+                  <ArrowRight size={16} />
+                  <span>
+                    <b>{tr('Κάλυψη έλλειψης')}</b>
+                    <small>{tr('Επιλογή εργαλείου από Stock, άλλο Set ή μεμονωμένο')}</small>
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -3084,6 +3089,11 @@ export default function SterilizationPage() {
                 </span>
               </button>
             </div>
+            {!canCompose && (
+              <p className="prep-supervisor-note">
+                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Stock) κάνει ο Προϊστάμενος Αποστείρωσης.')}
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -3149,7 +3159,7 @@ export default function SterilizationPage() {
                   <small>{tr('Βλάβη, φθορά ή άλλη απόκλιση')}</small>
                 </span>
               </button>
-              {prepDraft.kind === 'SET' && (
+              {prepDraft.kind === 'SET' && canCompose && (
                 <>
                   <button
                     type="button"
@@ -3206,6 +3216,11 @@ export default function SterilizationPage() {
                 </>
               )}
             </div>
+            {!canCompose && prepDraft.kind === 'SET' && (
+              <p className="prep-supervisor-note">
+                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Stock) κάνει ο Προϊστάμενος Αποστείρωσης.')}
+              </p>
+            )}
           </div>
         </div>
       )}

@@ -12,6 +12,8 @@ export type RealIdentity = {
   platform: boolean;
   organizationId: string | null;
   departmentName: string;
+  /** Sterilization supervisor, named by the hospital admin. */
+  supervisor?: boolean;
 };
 
 /** A self-signup through a hospital link, before the hospital admin has approved it. */
@@ -69,7 +71,7 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
     } else {
       const {data: profile, error} = await supabase
         .from('profiles')
-        .select('id,name,role,active,organization_id,department:departments(name)')
+        .select('id,name,role,active,supervisor,organization_id,department:departments(name)')
         .eq('id', authUser.id)
         .maybeSingle();
       if (error) return {status: 'error', message: error.message};
@@ -92,6 +94,7 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
         platform: false,
         organizationId: profile.organization_id,
         departmentName: (Array.isArray(department) ? department[0]?.name : department?.name) || '',
+        supervisor: profile.role === 'STERILIZATION' && !!profile.supervisor,
       };
     }
     sessionStorage.setItem(REAL_USER_KEY, JSON.stringify(identity));
@@ -124,6 +127,7 @@ export const sessionUserFor = (identity: RealIdentity): SessionUser => ({
   name: identity.name,
   role: identity.role,
   department: identity.platform ? 'Platform' : identity.departmentName,
+  ...(identity.supervisor ? {supervisor: true} : {}),
 });
 
 /** Admins can view (and act in) the app as another role or department of the hospital. */

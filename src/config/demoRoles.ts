@@ -4,8 +4,8 @@ import type {SessionUser, UserRole} from '../store/types';
 /** Library code of the sterilization service; it is the Sterilization role, not a department role. */
 const STERILIZATION_DEPARTMENT_CODE = 'STER';
 
-/** Header choice in Demo: Admin, Sterilization, or one specific department from the library. */
-export type DemoView = 'ADMIN' | 'STERILIZATION' | `DEPARTMENT:${string}`;
+/** Header choice in Demo: Admin, Sterilization (staff or supervisor), or one department from the library. */
+export type DemoView = 'ADMIN' | 'STERILIZATION' | 'STERILIZATION_SUPERVISOR' | `DEPARTMENT:${string}`;
 
 export const demoDepartments = (departments: readonly LibraryItem[]) =>
   departments.filter(d => (d.code || '').toUpperCase() !== STERILIZATION_DEPARTMENT_CODE);
@@ -21,6 +21,14 @@ export const demoSessionUser = (view: DemoView, departments: readonly LibraryIte
       role: 'STERILIZATION',
       department: sterilization?.el || 'Κεντρική Αποστείρωση',
     };
+  if (view === 'STERILIZATION_SUPERVISOR')
+    return {
+      id: 'demo-sterilization-supervisor',
+      name: 'Demo Προϊστάμενος Αποστείρωσης',
+      role: 'STERILIZATION',
+      department: sterilization?.el || 'Κεντρική Αποστείρωση',
+      supervisor: true,
+    };
   const departmentId = view.slice('DEPARTMENT:'.length);
   const department = demoDepartments(departments).find(d => d.id === departmentId) || demoDepartments(departments)[0];
   return {
@@ -33,6 +41,7 @@ export const demoSessionUser = (view: DemoView, departments: readonly LibraryIte
 
 /** The header choice matching the current role and identity. */
 export const currentDemoView = (role: UserRole, user: SessionUser, departments: readonly LibraryItem[]): DemoView => {
+  if (role === 'STERILIZATION') return user.supervisor ? 'STERILIZATION_SUPERVISOR' : 'STERILIZATION';
   if (role !== 'DEPARTMENT') return role;
   const department = demoDepartments(departments).find(d => d.el === user.department);
   return `DEPARTMENT:${department?.id || demoDepartments(departments)[0]?.id || ''}`;
@@ -48,12 +57,13 @@ export const viewAsSessionUser = (
   admin: {id: string; name: string},
 ): SessionUser => {
   const target = demoSessionUser(view, departments);
-  const as = view === 'ADMIN' ? 'Admin' : target.department;
+  const as = view === 'ADMIN' ? 'Admin' : target.supervisor ? `Προϊστάμενος · ${target.department}` : target.department;
   return {
     id: admin.id,
     name: `${admin.name} (ως ${as})`,
     role: target.role,
     department: target.department,
+    ...(target.supervisor ? {supervisor: true} : {}),
     viewAs: true,
   };
 };

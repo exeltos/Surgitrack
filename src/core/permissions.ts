@@ -10,6 +10,7 @@ export const permissionKeys = [
   'asset.photos.manage',
   'asset.barcode.reissue',
   'asset.usage.configure',
+  'asset.composition.manage',
   'stock.manage',
   'department.workspace',
   'department.dispatch',
@@ -24,6 +25,7 @@ export const permissionKeys = [
   'reports.view',
   'traceability.view',
   'counts.record',
+  'overview.view',
   'studio.manage',
 ] as const;
 
@@ -111,6 +113,14 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     en: 'Configure usage limit',
     hintEl: 'Ορισμός ή μεταβολή περιορισμένων χρήσεων.',
     hintEn: 'Set or change limited-use thresholds.',
+  },
+  {
+    key: 'asset.composition.manage',
+    group: 'ASSETS',
+    el: 'Αλλαγές σύνθεσης Σετ & Service',
+    en: 'Set changes & service',
+    hintEl: 'Προσθήκη, αντικατάσταση ή αφαίρεση εργαλείων από Σετ, αποστολή σε Service και επιστροφή στο Stock.',
+    hintEn: 'Add, replace or remove instruments in Sets, send to service and return to stock.',
   },
   {
     key: 'stock.manage',
@@ -225,6 +235,14 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     hintEn: 'Usage/count recording where applicable.',
   },
   {
+    key: 'overview.view',
+    group: 'TRACEABILITY',
+    el: 'Επισκόπηση νοσοκομείου',
+    en: 'Hospital overview',
+    hintEl: 'Συνολική εικόνα όλων των τμημάτων, κινήσεων και εκκρεμοτήτων.',
+    hintEn: 'Overall picture of all departments, movements and issues.',
+  },
+  {
     key: 'studio.manage',
     group: 'ADMIN',
     el: 'SurgiTrack Studio',
@@ -254,6 +272,7 @@ const sterilizationPermissions: readonly Permission[] = [
   'asset.photos.manage',
   'asset.barcode.reissue',
   'asset.usage.configure',
+  'asset.composition.manage',
   'stock.manage',
   'sterilization.workspace',
   'sterilization.receive',
@@ -266,7 +285,24 @@ const sterilizationPermissions: readonly Permission[] = [
   'reports.view',
   'traceability.view',
   'counts.record',
+  'overview.view',
 ];
+
+/**
+ * What only the Sterilization supervisor does: registering instruments and Sets, changing Set
+ * composition, service, and the hospital overview. The hospital admin names the supervisor; these
+ * follow that choice rather than the role settings in Studio.
+ */
+export const supervisorOnlyPermissions: readonly Permission[] = [
+  'asset.create',
+  'asset.edit',
+  'asset.delete',
+  'asset.duplicate',
+  'asset.usage.configure',
+  'asset.composition.manage',
+  'overview.view',
+];
+export const isSupervisorOnly = (permission: Permission) => supervisorOnlyPermissions.includes(permission);
 
 export const defaultRolePermissions: Record<UserRole, readonly Permission[]> = {
   DEPARTMENT: departmentPermissions,
@@ -302,6 +338,7 @@ export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]>
     'asset.photos.manage',
     'asset.barcode.reissue',
     'asset.usage.configure',
+    'asset.composition.manage',
     'stock.manage',
     'sterilization.workspace',
     'sterilization.receive',
@@ -310,6 +347,7 @@ export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]>
     'sterilization.deliver',
     'reports.view',
     'traceability.view',
+    'overview.view',
     'studio.manage',
   ],
 };
@@ -331,6 +369,7 @@ const sanitize = (role: UserRole, permissions: readonly Permission[]) => {
       'asset.photos.manage',
       'asset.barcode.reissue',
       'asset.usage.configure',
+      'asset.composition.manage',
       'stock.manage',
       'sterilization.workspace',
       'sterilization.receive',
@@ -339,6 +378,7 @@ const sanitize = (role: UserRole, permissions: readonly Permission[]) => {
       'sterilization.deliver',
       'reports.view',
       'traceability.view',
+      'overview.view',
       'studio.manage',
     ];
     denied.forEach(p => allowed.delete(p));
@@ -349,14 +389,25 @@ const sanitize = (role: UserRole, permissions: readonly Permission[]) => {
   return permissionKeys.filter(p => allowed.has(p));
 };
 
+/** The role's permissions for one user: in Sterilization the supervisor-only ones depend on the user. */
+const forUser = (role: UserRole, permissions: readonly Permission[], supervisor: boolean) => {
+  if (role !== 'STERILIZATION') return permissions;
+  const rest = permissions.filter(p => !isSupervisorOnly(p));
+  return supervisor ? permissionKeys.filter(p => rest.includes(p) || isSupervisorOnly(p)) : rest;
+};
+
 export const sanitizeRolePermissions = sanitize;
-export const permissionsForRole = (role: UserRole, overrides?: Partial<Record<UserRole, readonly Permission[]>>) =>
-  sanitize(role, overrides?.[role] || defaultRolePermissions[role]);
+export const permissionsForRole = (
+  role: UserRole,
+  overrides?: Partial<Record<UserRole, readonly Permission[]>>,
+  supervisor = false,
+) => forUser(role, sanitize(role, overrides?.[role] || defaultRolePermissions[role]), supervisor);
 export const hasPermission = (
   role: UserRole,
   permission: Permission,
   overrides?: Partial<Record<UserRole, readonly Permission[]>>,
-) => permissionsForRole(role, overrides).includes(permission);
+  supervisor = false,
+) => permissionsForRole(role, overrides, supervisor).includes(permission);
 
 export const roleHomePath = (role: UserRole) =>
   role === 'STERILIZATION' ? '/sterilization' : role === 'DEPARTMENT' ? '/department' : '/studio';

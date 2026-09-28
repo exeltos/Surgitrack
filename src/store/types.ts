@@ -43,6 +43,8 @@ export type SessionUser = {
   name: string;
   role: UserRole;
   department: string;
+  /** Sterilization supervisor, named by the hospital admin. */
+  supervisor?: boolean;
   /** An admin working as another role or department of their hospital. */
   viewAs?: boolean;
 };

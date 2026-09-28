@@ -103,9 +103,10 @@ export function SurgiProvider({
     setIdentityVersion(v => v + 1);
   };
   const activeDepartment = getActiveDepartment(role, currentUser);
-  const permissions = permissionsForRole(role, rolePermissions);
+  const supervisor = !!currentUser.supervisor;
+  const permissions = permissionsForRole(role, rolePermissions, supervisor);
   const can = (permission: import('../core/permissions').Permission) =>
-    hasPermission(role, permission, rolePermissions);
+    hasPermission(role, permission, rolePermissions, supervisor);
   const [sets, setSets] = useState(initialData.sets);
   const [tools, setTools] = useState(() =>
     initialData.tools.map(tool =>

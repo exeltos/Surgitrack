@@ -41,6 +41,7 @@ import {
   permissionCatalog,
   permissionKeys,
   protectedRolePermissions,
+  isSupervisorOnly,
   roleHomePath,
   type Permission,
   type PermissionGroup,
@@ -70,8 +71,10 @@ const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string;
     id: 'STERILIZATION',
     el: 'Αποστείρωση',
     en: 'Sterilization',
-    descriptionEl: 'Παραλαβή, έλεγχος, σύνθεση, κλιβανισμός, παράδοση και διαχείριση assets.',
-    descriptionEn: 'Receipt, preparation, sterilization, delivery and asset management.',
+    descriptionEl:
+      'Παραλαβή, έλεγχος, σύνθεση, κλιβανισμός και παράδοση. Ο Προϊστάμενος, που ορίζει ο διαχειριστής νοσοκομείου, καταχωρεί εργαλεία και Σετ, αλλάζει τη σύνθεσή τους και διαχειρίζεται το Service.',
+    descriptionEn:
+      'Receipt, inspection, assembly, sterilization and delivery. The supervisor, named by the hospital admin, registers instruments and Sets, changes their composition and handles service.',
   },
   {
     id: 'DEPARTMENT',
@@ -545,8 +548,16 @@ export default function StudioPage() {
     setSelectedRole(role);
     setRoleDraft([...(libs.rolePermissions?.[role] || defaultRolePermissions[role])]);
   };
+  // In Sterilization these follow who the hospital admin names supervisor, not the role settings.
+  const supervisorOnlyFor = (permission: Permission) =>
+    selectedRole === 'STERILIZATION' && isSupervisorOnly(permission);
   const toggleRolePermission = (permission: Permission) => {
-    if (protectedPermissionSet.has(permission) || !permissionAvailableForRole(selectedRole, permission)) return;
+    if (
+      protectedPermissionSet.has(permission) ||
+      supervisorOnlyFor(permission) ||
+      !permissionAvailableForRole(selectedRole, permission)
+    )
+      return;
     setRoleDraft(current =>
       current.includes(permission) ? current.filter(p => p !== permission) : [...current, permission],
     );
@@ -1640,14 +1651,19 @@ export default function StudioPage() {
                           {L(permissionGroupMeta[section.group].el, permissionGroupMeta[section.group].en)}
                         </strong>
                         <span>
-                          {section.permissions.filter(item => roleDraft.includes(item.key)).length}/
-                          {section.permissions.length}
+                          {
+                            section.permissions.filter(
+                              item => supervisorOnlyFor(item.key) || roleDraft.includes(item.key),
+                            ).length
+                          }
+                          /{section.permissions.length}
                         </span>
                       </header>
                       <div>
                         {section.permissions.map(item => {
-                          const locked = protectedPermissionSet.has(item.key);
-                          const checked = roleDraft.includes(item.key);
+                          const supervisorOnly = supervisorOnlyFor(item.key);
+                          const locked = protectedPermissionSet.has(item.key) || supervisorOnly;
+                          const checked = supervisorOnly || roleDraft.includes(item.key);
                           return (
                             <label key={item.key} className={`studio-permission-toggle ${locked ? 'locked' : ''}`}>
                               <input
@@ -1664,7 +1680,9 @@ export default function StudioPage() {
                               {locked && (
                                 <span className="studio-permission-lock">
                                   <Lock size={13} />
-                                  {L('Προστατευμένο', 'Protected')}
+                                  {supervisorOnly
+                                    ? L('Μόνο Προϊστάμενος', 'Supervisor only')
+                                    : L('Προστατευμένο', 'Protected')}
                                 </span>
                               )}
                             </label>
