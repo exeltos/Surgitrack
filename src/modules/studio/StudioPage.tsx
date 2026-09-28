@@ -25,6 +25,7 @@ import {
   Save,
   Upload,
   Send,
+  Languages,
   UserCheck,
   UserPlus,
   type LucideIcon,
@@ -49,6 +50,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
 import SignupLinkCard from '../hospital/SignupLinkCard';
 import {switchHospital} from '../../data/cloud/hospitalSwitch';
+import {localizedName, translateToEnglish} from '../../core/glossary';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
 import {departments as defaultDepartments} from '../../core/libraries';
@@ -1329,7 +1331,7 @@ export default function StudioPage() {
                     {selectedOrgDepartments.map(d => (
                       <div key={d.id}>
                         <span>
-                          <b>{d.name}</b>
+                          <b>{localizedName(d.name, lang)}</b>
                           <small>{d.code || '—'}</small>
                         </span>
                         <button
@@ -1435,7 +1437,7 @@ export default function StudioPage() {
                   <span>{displayedOrganizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
                   <span>
                     {libs.dataMode === 'PRODUCTION'
-                      ? cloudDepartments.find(d => d.id === u.department)?.name || '—'
+                      ? localizedName(cloudDepartments.find(d => d.id === u.department)?.name || '—', lang)
                       : u.department}
                   </span>
                   <span className="role-chip">
@@ -1901,8 +1903,9 @@ function LibraryEditor({
   onSave: (data: Omit<LibraryItem, 'id'>) => void;
 }) {
   const [el, setEl] = useState(item?.el || '');
-  const [en, setEn] = useState(item?.en || '');
   const [code, setCode] = useState(item?.code || '');
+  // One name only: the English comes from the built-in glossary (or stays as written).
+  const english = translateToEnglish(el);
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <aside className="studio-drawer">
@@ -1917,13 +1920,23 @@ function LibraryEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονομασία (EL)
+            Ονομασία
             <input autoFocus value={el} onChange={e => setEl(e.target.value)} />
           </label>
-          <label>
-            Ονομασία (EN)
-            <input value={en} onChange={e => setEn(e.target.value)} />
-          </label>
+          {el.trim() && (
+            <div className="studio-form-note">
+              <Languages size={16} />
+              <span>
+                {english && english !== el.trim() ? (
+                  <>
+                    Στα αγγλικά θα εμφανίζεται ως <b>{english}</b>.
+                  </>
+                ) : (
+                  'Στα αγγλικά θα εμφανίζεται όπως το γράψατε.'
+                )}
+              </span>
+            </div>
+          )}
           <label>
             Κωδικός
             <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="Προαιρετικό" />
@@ -1933,8 +1946,8 @@ function LibraryEditor({
           <AppButton onClick={onClose}>Ακύρωση</AppButton>
           <AppButton
             variant="primary"
-            disabled={!el.trim() || !en.trim()}
-            onClick={() => onSave({el: el.trim(), en: en.trim(), code: code.trim() || undefined})}
+            disabled={!el.trim()}
+            onClick={() => onSave({el: el.trim(), en: english || el.trim(), code: code.trim() || undefined})}
           >
             Αποθήκευση
           </AppButton>

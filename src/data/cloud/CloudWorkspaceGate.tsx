@@ -6,6 +6,7 @@ import {getRuntimeDataMode} from '../../config/dataMode';
 import type {LibraryItem} from '../../core/libraries';
 import {getCloudOrganizationId, loadAppRecords, seedAppRecords, type CloudRecords} from './appRecords';
 import {productionOrganizationFor, resolveIdentity} from './identity';
+import {translateToEnglish} from '../../core/glossary';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -97,7 +98,12 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         if (departmentsError) throw departmentsError;
         departments = rows
           .filter(row => row.active)
-          .map(row => ({id: row.id, code: row.code || undefined, el: row.name, en: row.name}));
+          .map(row => ({
+            id: row.id,
+            code: row.code || undefined,
+            el: row.name,
+            en: translateToEnglish(row.name) || row.name,
+          }));
       }
       setWorkspace({organizationId, organizationName: org.name, records, departments});
       setStatus('ready');

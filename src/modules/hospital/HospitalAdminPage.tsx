@@ -5,6 +5,7 @@ import AppButton from '../../components/ui/AppButton';
 import SignupLinkCard from './SignupLinkCard';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
+import {localizedName} from '../../core/glossary';
 import {getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {UserRole} from '../../store/types';
@@ -108,7 +109,7 @@ export default function HospitalAdminPage() {
       </div>
     );
 
-  const departmentName = (id: string | null) => departments.find(d => d.id === id)?.name || '—';
+  const departmentName = (id: string | null) => localizedName(departments.find(d => d.id === id)?.name || '—', lang);
   const suggestedRole = (departmentId: string | null): UserRole =>
     (departments.find(d => d.id === departmentId)?.code || '').toUpperCase() === STERILIZATION_CODE
       ? 'STERILIZATION'
@@ -267,7 +268,7 @@ export default function HospitalAdminPage() {
                     <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
                       {activeDepartments.map(dep => (
                         <option key={dep.id} value={dep.id}>
-                          {dep.name}
+                          {localizedName(dep.name, lang)}
                         </option>
                       ))}
                     </select>
@@ -361,7 +362,7 @@ export default function HospitalAdminPage() {
               ) : (
                 <div key={d.id} className={`hospital-row ${d.active ? '' : 'inactive'}`}>
                   <span>
-                    <b>{d.name}</b>
+                    <b>{localizedName(d.name, lang)}</b>
                     <small>{d.code || '—'}</small>
                   </span>
                   <button
@@ -423,7 +424,7 @@ export default function HospitalAdminPage() {
                       <option value="">—</option>
                       {departments.map(d => (
                         <option key={d.id} value={d.id}>
-                          {d.name}
+                          {localizedName(d.name, lang)}
                         </option>
                       ))}
                     </select>
