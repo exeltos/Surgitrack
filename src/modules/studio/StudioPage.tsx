@@ -50,6 +50,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
 import SignupLinkCard from '../hospital/SignupLinkCard';
 import {switchHospital} from '../../data/cloud/hospitalSwitch';
+import {getRealIdentity} from '../../data/cloud/identity';
 import {localizedName, translateToEnglish} from '../../core/glossary';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
@@ -142,8 +143,18 @@ export default function StudioPage() {
   const {lang} = useAppPreferences();
   const libs = useLibraries();
   const {currentUser, setRole} = useSurgi();
-  const [tab, setTab] = useState<Tab>('OVERVIEW');
-  const [libraryKey, setLibraryKey] = useState<LibraryKey>('departments');
+  // The platform admin runs the whole platform; a hospital admin only configures their own hospital
+  // here (libraries, workflow, permissions, settings) — no other hospitals, hospital record or Demo.
+  const platformAdmin = (() => {
+    const real = getRealIdentity();
+    return !real || real.platform;
+  })();
+  // A real hospital's departments are managed on its own administration page.
+  const hospitalLibraryMeta = libraryMeta.filter(
+    m => platformAdmin || libs.dataMode !== 'PRODUCTION' || m.key !== 'departments',
+  );
+  const [tab, setTab] = useState<Tab>(platformAdmin ? 'OVERVIEW' : 'LIBRARIES');
+  const [libraryKey, setLibraryKey] = useState<LibraryKey>(hospitalLibraryMeta[0].key);
   const [query, setQuery] = useState('');
   const [editItem, setEditItem] = useState<LibraryItem | null>(null);
   const [newItem, setNewItem] = useState(false);
@@ -209,7 +220,7 @@ export default function StudioPage() {
     setCloudLoading(false);
   };
   useEffect(() => {
-    void loadCloudOrganizations();
+    if (platformAdmin) void loadCloudOrganizations();
   }, [libs.dataMode]);
   const displayedOrganizations = libs.dataMode === 'PRODUCTION' ? cloudOrganizations : libs.organizations;
   const loadCloudUsers = async () => {
@@ -237,7 +248,7 @@ export default function StudioPage() {
     );
   };
   useEffect(() => {
-    void loadCloudUsers();
+    if (platformAdmin) void loadCloudUsers();
   }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
   const selectedOrganization = displayedOrganizations.find(o => o.id === selectedOrganizationId);
@@ -263,7 +274,7 @@ export default function StudioPage() {
     );
   };
   useEffect(() => {
-    void loadCloudDepartments();
+    if (platformAdmin) void loadCloudDepartments();
   }, [libs.dataMode]);
   const saveCloudDepartment = async (item: Omit<LibraryItem, 'id'>) => {
     const org = selectedOrganization || displayedOrganizations[0];
@@ -561,13 +572,22 @@ export default function StudioPage() {
     <div className="studio-workspace">
       <div className="studio-head">
         <div>
-          <span className="eyebrow">{L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')}</span>
+          <span className="eyebrow">
+            {platformAdmin
+              ? L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')
+              : L('ΡΥΘΜΙΣΕΙΣ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL SETTINGS')}
+          </span>
           <h1>{L('SurgiTrack Studio', 'SurgiTrack Studio')}</h1>
           <p>
-            {L(
-              'Κεντρική διαχείριση νοσοκομείων, χρηστών, demo πρόσβασης, βιβλιοθηκών και βασικών παραμέτρων του SurgiTrack.',
-              'Central administration of hospitals, users, demo access, libraries and core SurgiTrack settings.',
-            )}
+            {platformAdmin
+              ? L(
+                  'Κεντρική διαχείριση νοσοκομείων, χρηστών, demo πρόσβασης, βιβλιοθηκών και βασικών παραμέτρων του SurgiTrack.',
+                  'Central administration of hospitals, users, demo access, libraries and core SurgiTrack settings.',
+                )
+              : L(
+                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου σας. Τμήματα και χρήστες διαχειρίζεστε από τη «Διαχείριση νοσοκομείου».',
+                  "Your hospital's libraries, sterilization flow, role permissions and settings. Departments and users are managed in “Hospital administration”.",
+                )}
           </p>
         </div>
         <div className="studio-health">
@@ -588,14 +608,18 @@ export default function StudioPage() {
         </div>
       </div>
       <div className="studio-tabs" role="tablist">
-        <button className={tab === 'OVERVIEW' ? 'active' : ''} onClick={() => selectTab('OVERVIEW')}>
-          <Gauge size={17} />
-          {L('Επισκόπηση', 'Overview')}
-        </button>
-        <button className={tab === 'PLATFORM' ? 'active' : ''} onClick={() => selectTab('PLATFORM')}>
-          <Building2 size={17} />
-          {L('Νοσοκομεία & Demo', 'Hospitals & Demo')}
-        </button>
+        {platformAdmin && (
+          <button className={tab === 'OVERVIEW' ? 'active' : ''} onClick={() => selectTab('OVERVIEW')}>
+            <Gauge size={17} />
+            {L('Επισκόπηση', 'Overview')}
+          </button>
+        )}
+        {platformAdmin && (
+          <button className={tab === 'PLATFORM' ? 'active' : ''} onClick={() => selectTab('PLATFORM')}>
+            <Building2 size={17} />
+            {L('Νοσοκομεία & Demo', 'Hospitals & Demo')}
+          </button>
+        )}
         <button className={tab === 'LIBRARIES' ? 'active' : ''} onClick={() => selectTab('LIBRARIES')}>
           <BookOpen size={17} />
           {L('Βιβλιοθήκες', 'Libraries')}
@@ -604,10 +628,12 @@ export default function StudioPage() {
           <Layers3 size={17} />
           {L('Ροή Αποστείρωσης', 'Sterilization Flow')}
         </button>
-        <button className={tab === 'USERS' ? 'active' : ''} onClick={() => selectTab('USERS')}>
-          <Users size={17} />
-          {L('Χρήστες', 'Users')}
-        </button>
+        {platformAdmin && (
+          <button className={tab === 'USERS' ? 'active' : ''} onClick={() => selectTab('USERS')}>
+            <Users size={17} />
+            {L('Χρήστες', 'Users')}
+          </button>
+        )}
         <button className={tab === 'ROLES' ? 'active' : ''} onClick={() => selectTab('ROLES')}>
           <UserCog size={17} />
           {L('Δικαιώματα', 'Permissions')}
@@ -618,7 +644,7 @@ export default function StudioPage() {
         </button>
       </div>
       <div className={`studio-body studio-body-${tab.toLowerCase()}`}>
-        {tab === 'OVERVIEW' && (
+        {tab === 'OVERVIEW' && platformAdmin && (
           <div className="studio-overview">
             <div className="studio-kpis">
               <div>
@@ -713,7 +739,7 @@ export default function StudioPage() {
             </section>
           </div>
         )}
-        {tab === 'PLATFORM' && (
+        {tab === 'PLATFORM' && platformAdmin && (
           <section className="studio-manager-panel studio-platform-panel">
             <header className="studio-panel-head">
               <div>
@@ -862,7 +888,7 @@ export default function StudioPage() {
         {tab === 'LIBRARIES' && (
           <div className="studio-manager">
             <aside className="studio-manager-nav">
-              {libraryMeta.map(m => {
+              {hospitalLibraryMeta.map(m => {
                 const Icon = m.icon;
                 return (
                   <button
@@ -1254,7 +1280,7 @@ export default function StudioPage() {
             </footer>
           </div>
         )}
-        {tab === 'USERS' && (
+        {tab === 'USERS' && platformAdmin && (
           <section className="studio-manager-panel studio-users-panel">
             <header className="studio-panel-head">
               <div>
