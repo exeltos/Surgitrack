@@ -121,7 +121,7 @@ export default function AssetWorkbenchSidebar({
       state: draft.state,
       maxUses,
       ownership: draft.ownership || undefined,
-      ownerName: (draft.ownership !== 'HOSPITAL' && draft.ownerName.trim()) || undefined,
+      ownerName: ((draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && draft.ownerName.trim()) || undefined,
       ...(kind === 'TOOL' ? {serialNumber: draft.serialNumber.trim() || undefined} : {}),
     });
     setEditing(false);
