@@ -1,4 +1,4 @@
-import {useEffect, useState, type ReactNode} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {
   Accessibility,
@@ -25,6 +25,7 @@ import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} 
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {trData} from '../../i18n';
+import {useListMemory} from '../../core/listMemory';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
   STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
@@ -63,6 +64,8 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   >([]);
   const navigate = useNavigate();
   const location = useLocation();
+  const contentRef = useRef<HTMLElement>(null);
+  useListMemory(contentRef);
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly =
@@ -480,7 +483,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             </button>
           </div>
         </header>
-        <section className="content">{children}</section>
+        <section className="content" ref={contentRef}>
+          {children}
+        </section>
         <footer>© 2026 SurgiTrack · Healthcare Suite</footer>
       </main>
       {toast && (

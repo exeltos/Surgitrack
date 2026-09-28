@@ -1,4 +1,4 @@
-import {Download, Printer, X} from 'lucide-react';
+import {Printer, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
 export default function PrintPreviewModal({title, html, onClose}: {title: string; html: string; onClose: () => void}) {
@@ -7,15 +7,6 @@ export default function PrintPreviewModal({title, html, onClose}: {title: string
     const frame = document.getElementById(frameId) as HTMLIFrameElement | null;
     frame?.contentWindow?.focus();
     frame?.contentWindow?.print();
-  };
-  const download = () => {
-    const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.replace(/[^a-zA-Z0-9_-]+/g, '_')}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
   return (
     <div className="modal-backdrop">
@@ -34,11 +25,8 @@ export default function PrintPreviewModal({title, html, onClose}: {title: string
         </div>
         <footer>
           <AppButton onClick={onClose}>{tr('Κλείσιμο')}</AppButton>
-          <AppButton icon={<Download size={16} />} onClick={download}>
-            {tr('Λήψη')}
-          </AppButton>
           <AppButton variant="primary" icon={<Printer size={16} />} onClick={doPrint}>
-            {tr('Εκτύπωση / PDF')}
+            {tr('Εκτύπωση / Αποθήκευση PDF')}
           </AppButton>
         </footer>
       </div>

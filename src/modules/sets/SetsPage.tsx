@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -10,14 +9,15 @@ import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import {statusLabel} from '../../components/ui/statusLabel';
 import PageHeader from '../../components/ui/PageHeader';
 import {tr, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
 export default function SetsPage() {
   const {sets, tools, can} = useSurgi();
   const navigate = useNavigate();
-  const [q, setQ] = useState('');
-  const [department, setDepartment] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
-  const [state, setState] = useState('');
+  const [q, setQ] = useRememberedState('q', '');
+  const [department, setDepartment] = useRememberedState('department', '');
+  const [specialty, setSpecialty] = useRememberedState('specialty', '');
+  const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
+  const [state, setState] = useRememberedState('state', '');
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(sets.map(s => String(s[key] || '')).filter(Boolean))].sort();
   const filtered = sets.filter(

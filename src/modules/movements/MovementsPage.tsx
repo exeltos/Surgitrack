@@ -1,8 +1,12 @@
 import {useMemo, useState} from 'react';
-import {ChevronRight, Clock3, Download, MapPin, Printer, Route, Search, ShieldCheck, UserRound, X} from 'lucide-react';
+import {ChevronRight, Clock3, FileSpreadsheet, MapPin, Printer, Route, ShieldCheck, UserRound, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import type {Movement} from '../../types/domain';
-import {tr, trData} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import {downloadXlsx, tableReportHtml, type ExportTable} from '../../core/exportTable';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -37,13 +41,14 @@ export default function MovementsPage() {
         : movements,
     [movements, role, currentUser.department, departmentBarcodes],
   );
-  const [q, setQ] = useState('');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [status, setStatus] = useState('');
-  const [kind, setKind] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [q, setQ] = useRememberedState('q', '');
+  const [from, setFrom] = useRememberedState('from', '');
+  const [to, setTo] = useRememberedState('to', '');
+  const [status, setStatus] = useRememberedState('status', '');
+  const [kind, setKind] = useRememberedState('kind', '');
+  const [dateFrom, setDateFrom] = useRememberedState('dateFrom', '');
+  const [dateTo, setDateTo] = useRememberedState('dateTo', '');
+  const [report, setReport] = useState<string | null>(null);
   const [selected, setSelected] = useState<Movement | null>(null);
   const values = (key: 'from' | 'to' | 'status') =>
     [...new Set(scopedMovements.map(m => m[key]).filter(Boolean))].sort();
@@ -64,39 +69,49 @@ export default function MovementsPage() {
       }),
     [scopedMovements, q, from, to, status, kind, dateFrom, dateTo],
   );
-  const reset = () => {
-    setQ('');
-    setFrom('');
-    setTo('');
-    setStatus('');
-    setKind('');
-    setDateFrom('');
-    setDateTo('');
-  };
-  const print = () => window.print();
-  const exportCsv = () => {
-    const esc = (v: string) => `"${v.replaceAll('"', '""')}"`;
-    const rows = [
-      ['Ημερομηνία', 'Asset', 'Τύπος', 'Από', 'Προς', 'Κίνηση', 'Χρήστης', 'Κωδικός ασθενούς'].map(h => tr(h)),
-      ...filtered.map(m => [
-        m.at,
-        m.asset,
-        tr(m.assetKind === 'SET' ? 'Σετ' : 'Εργαλείο'),
-        trData(m.from),
-        trData(m.to),
-        trData(m.status),
-        m.by,
-        m.patientCode || '',
-      ]),
-    ];
-    const blob = new Blob(['\ufeff' + rows.map(r => r.map(esc).join(';')).join('\n')], {
-      type: 'text/csv;charset=utf-8',
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'SurgiTrack_chain_of_custody.csv';
-    a.click();
-    URL.revokeObjectURL(a.href);
+  const valuesOf = (key: 'from' | 'to' | 'status') => values(key).map(v => ({value: v, label: v}));
+  // What the export contains: the filtered list, with the filters in use written under the title.
+  const exportTable = (): ExportTable => {
+    const used = [
+      q && `${tr('Αναζήτηση')}: ${q}`,
+      kind && (kind === 'SET' ? tr('Σετ') : tr('Εργαλεία')),
+      from && `${tr('Από')}: ${trData(from)}`,
+      to && `${tr('Προς')}: ${trData(to)}`,
+      status && trData(status),
+      dateFrom && `${tr('Από')} ${dateFrom}`,
+      dateTo && `${tr('Έως')} ${dateTo}`,
+    ].filter(Boolean);
+    return {
+      title: tr('Ιστορικό κινήσεων'),
+      subtitle: `${filtered.length} ${filtered.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}${
+        used.length ? ` · ${used.join(' · ')}` : ''
+      }`,
+      headers: [
+        'Ημερομηνία / ώρα',
+        'Barcode',
+        'Σετ / Εργαλείο',
+        'Τύπος',
+        'Από',
+        'Προς',
+        'Ενέργεια',
+        'Χρήστης',
+        'Κωδικός ασθενούς',
+      ].map(h => tr(h)),
+      rows: filtered.map(m => {
+        const asset = assetParts(m.asset);
+        return [
+          m.at,
+          asset.barcode,
+          asset.name !== asset.barcode ? asset.name : '',
+          m.assetKind === 'SET' ? tr('Σετ') : tr('Εργαλείο'),
+          trData(m.from),
+          trData(m.to),
+          trData(m.status),
+          trData(m.by),
+          m.patientCode || '',
+        ];
+      }),
+    };
   };
   return (
     <div className="movements-workspace">
@@ -111,58 +126,63 @@ export default function MovementsPage() {
           </p>
         </div>
         <div className="movements-actions">
-          <button onClick={exportCsv}>
-            <Download size={16} /> Export
+          <button onClick={() => downloadXlsx(exportTable())}>
+            <FileSpreadsheet size={16} /> {tr('Εξαγωγή Excel')}
           </button>
-          <button onClick={print}>
-            <Printer size={16} /> {tr('Εκτύπωση')}
+          <button onClick={() => setReport(tableReportHtml(exportTable(), getI18nLang()))}>
+            <Printer size={16} /> {tr('Εκτύπωση / PDF')}
           </button>
         </div>
       </div>
-      <div className="movement-filters">
-        <label className="movement-search">
-          <Search size={18} />
-          <input
-            value={q}
-            onChange={e => setQ(e.target.value)}
-            placeholder={tr('Barcode, Set/εργαλείο, χρήστης ή κωδικός ασθενούς...')}
-          />
-        </label>
-        <select value={kind} onChange={e => setKind(e.target.value)}>
-          <option value="">{tr('Σετ & εργαλεία')}</option>
-          <option value="SET">{tr('Σετ')}</option>
-          <option value="TOOL">{tr('Εργαλεία')}</option>
-        </select>
-        <select value={from} onChange={e => setFrom(e.target.value)}>
-          <option value="">{tr('Από όλα τα τμήματα')}</option>
-          {values('from').map(v => (
-            <option key={v}>{v}</option>
-          ))}
-        </select>
-        <select value={to} onChange={e => setTo(e.target.value)}>
-          <option value="">{tr('Προς όλα τα τμήματα')}</option>
-          {values('to').map(v => (
-            <option key={v}>{v}</option>
-          ))}
-        </select>
-        <select value={status} onChange={e => setStatus(e.target.value)}>
-          <option value="">{tr('Όλες οι κινήσεις')}</option>
-          {values('status').map(v => (
-            <option key={v}>{v}</option>
-          ))}
-        </select>
-        <label className="date-filter">
-          <span>{tr('Από')}</span>
-          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-        </label>
-        <label className="date-filter">
-          <span>{tr('Έως')}</span>
-          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
-        </label>
-        <button className="filter-reset" onClick={reset}>
-          {tr('Καθαρισμός')}
-        </button>
-      </div>
+      <AssetFilterBar
+        className="movement-filter-bar"
+        query={q}
+        onQueryChange={setQ}
+        placeholder={tr('Barcode, Set/εργαλείο, χρήστης ή κωδικός ασθενούς...')}
+        filters={[
+          {
+            key: 'kind',
+            value: kind,
+            placeholder: tr('Σετ & εργαλεία'),
+            options: [
+              {value: 'SET', label: tr('Σετ')},
+              {value: 'TOOL', label: tr('Εργαλεία')},
+            ],
+            onChange: setKind,
+          },
+          {
+            key: 'from',
+            value: from,
+            placeholder: tr('Από όλα τα τμήματα'),
+            options: valuesOf('from'),
+            onChange: setFrom,
+          },
+          {key: 'to', value: to, placeholder: tr('Προς όλα τα τμήματα'), options: valuesOf('to'), onChange: setTo},
+          {
+            key: 'status',
+            value: status,
+            placeholder: tr('Όλες οι κινήσεις'),
+            options: valuesOf('status'),
+            onChange: setStatus,
+          },
+          {
+            key: 'dateFrom',
+            type: 'date',
+            value: dateFrom,
+            placeholder: tr('Από ημερομηνία'),
+            options: [],
+            onChange: setDateFrom,
+          },
+          {
+            key: 'dateTo',
+            type: 'date',
+            value: dateTo,
+            placeholder: tr('Έως ημερομηνία'),
+            options: [],
+            onChange: setDateTo,
+          },
+        ]}
+      />
       <div className="movement-ledger">
         <div className="ledger-head">
           <div>
@@ -289,6 +309,7 @@ export default function MovementsPage() {
           </div>
         </div>
       )}
+      {report && <PrintPreviewModal title={tr('Ιστορικό κινήσεων')} html={report} onClose={() => setReport(null)} />}
     </div>
   );
 }

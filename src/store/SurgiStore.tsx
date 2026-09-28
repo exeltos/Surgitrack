@@ -888,7 +888,12 @@ export function SurgiProvider({
       notify(tr('Η καταμέτρηση {0} καταγράφηκε και υπογράφηκε.', s.barcode));
     }
   };
-  const moveTool = (toolId: string, destination: 'STOCK' | 'SET' | 'SERVICE' | 'REMOVE', setId?: string) => {
+  const moveTool = (
+    toolId: string,
+    destination: 'STOCK' | 'SET' | 'SERVICE' | 'REMOVE',
+    setId?: string,
+    note?: string,
+  ) => {
     const t = tools.find(x => x.id === toolId);
     if (!t) return;
     const sourceSetId = t.mode === 'SET_MEMBER' ? t.setId : undefined;
@@ -983,7 +988,7 @@ export function SurgiProvider({
           status: 'OPEN',
           created: formatStoreDateTime(),
           department: sourceSet?.department || t.department || 'Αποστείρωση',
-          note: 'Αποστείρωση · σύνθεση & προετοιμασία: μεταφέρθηκε στα χαλασμένα / Service.',
+          note: note || 'Αποστείρωση · σύνθεση & προετοιμασία: μεταφέρθηκε στα χαλασμένα / Service.',
         },
         ...x,
       ]);
@@ -994,6 +999,7 @@ export function SurgiProvider({
       to: 'Χαλασμένα / Service',
       status: 'Αφαίρεση από σύνθεση · προς Service',
       by: currentUser.name,
+      note: note || undefined,
     });
     notify(tr('{0} μεταφέρθηκε στα Χαλασμένα / Service.', t.barcode));
   };
@@ -1416,6 +1422,100 @@ export function SurgiProvider({
     ]);
     notify(tr('Καταγράφηκε αναφορά για το Σετ {0}.', src.barcode));
   };
+  /** Opens an issue on the asset unless one of the same kind is already open. */
+  const openIssue = (asset: {barcode: string; name: string}, type: string, department: string, note: string) => {
+    if (issues.some(i => i.status === 'OPEN' && i.type === type && i.asset.startsWith(asset.barcode))) return;
+    setIssues(x => [
+      {
+        id: `i${uniqueStamp()}`,
+        asset: `${asset.barcode} · ${asset.name}`,
+        type,
+        status: 'OPEN',
+        created: formatStoreDateTime(),
+        department,
+        note,
+      },
+      ...x,
+    ]);
+  };
+  /** Declares a Set or instrument lost: an instrument leaves its Set; an issue records the loss. */
+  const markLost = (kind: AssetKind, id: string, note = '') => {
+    const a = assetName(kind, id);
+    if (!a) return;
+    const tool = kind === 'TOOL' ? tools.find(t => t.id === id) : undefined;
+    const sourceSet = tool?.setId ? sets.find(s => s.id === tool.setId) : undefined;
+    const from = sourceSet ? `Set ${sourceSet.barcode}` : a.department || 'Stock';
+    if (tool) {
+      setTools(x =>
+        x.map(t =>
+          t.id === id ? {...t, mode: 'STANDALONE', setId: undefined, department: undefined, state: 'LOST'} : t,
+        ),
+      );
+      if (sourceSet) setSets(x => x.map(s => (s.id === sourceSet.id ? {...s, actual: Math.max(0, s.actual - 1)} : s)));
+    } else {
+      updateState('SET', id, 'LOST');
+    }
+    openIssue(a, 'Απώλεια', sourceSet?.department || a.department || 'Αποστείρωση', note || 'Δηλώθηκε ως χαμένο.');
+    addMovement({
+      asset: `${a.barcode} · ${a.name}`,
+      assetKind: kind,
+      from,
+      to: 'Απολεσθέντα',
+      status: 'Δήλωση απώλειας',
+      by: currentUser.name,
+      note: note || undefined,
+    });
+    notify(tr('{0}: δηλώθηκε ως χαμένο.', a.barcode));
+  };
+  /** Brings a lost or serviced asset back: an instrument to stock, a Set to stock or its department. */
+  const returnToService = (kind: AssetKind, id: string, note = '') => {
+    const a = assetName(kind, id);
+    if (!a) return;
+    const was = a.state === 'LOST' ? 'Απολεσθέντα' : 'Χαλασμένα / Service';
+    if (kind === 'TOOL') {
+      setTools(x =>
+        x.map(t =>
+          t.id === id ? {...t, mode: 'STOCK', setId: undefined, department: undefined, state: 'IN_STOCK'} : t,
+        ),
+      );
+    } else {
+      updateState('SET', id, a.department ? 'IN_DEPARTMENT' : 'IN_STOCK');
+    }
+    setIssues(x =>
+      x.map(i =>
+        i.status === 'OPEN' && i.asset.startsWith(a.barcode) && (i.type === 'Απώλεια' || i.type === 'Βλάβη / Service')
+          ? {...i, status: 'RESOLVED'}
+          : i,
+      ),
+    );
+    addMovement({
+      asset: `${a.barcode} · ${a.name}`,
+      assetKind: kind,
+      from: was,
+      to: kind === 'TOOL' || !a.department ? 'Stock' : a.department,
+      status: a.state === 'LOST' ? 'Βρέθηκε · επιστροφή σε χρήση' : 'Επιστροφή από Service',
+      by: currentUser.name,
+      note: note || undefined,
+    });
+    notify(tr('{0}: επέστρεψε σε χρήση.', a.barcode));
+  };
+  /** Sends a whole Set to service: it leaves circulation until it comes back. */
+  const sendSetToService = (id: string, note = '') => {
+    const s = sets.find(x => x.id === id);
+    if (!s) return;
+    updateState('SET', id, 'SERVICE');
+    openIssue(s, 'Βλάβη / Service', s.department || 'Αποστείρωση', note || 'Το Σετ στάλθηκε για Service.');
+    addMovement({
+      asset: `${s.barcode} · ${s.name}`,
+      assetKind: 'SET',
+      from: s.department || 'Stock',
+      to: 'Χαλασμένα / Service',
+      status: 'Αποστολή Σετ σε Service',
+      by: currentUser.name,
+      note: note || undefined,
+    });
+    notify(tr('{0} μεταφέρθηκε στα Χαλασμένα / Service.', s.barcode));
+  };
   const retireAsset = (kind: AssetKind, id: string) => {
     const a = assetName(kind, id);
     if (!a) return;
@@ -1646,6 +1746,9 @@ export function SurgiProvider({
       deleteTool,
       reportSetIssue,
       retireAsset,
+      markLost,
+      returnToService,
+      sendSetToService,
       updateSet,
       updateTool,
       addToolsToSet,
