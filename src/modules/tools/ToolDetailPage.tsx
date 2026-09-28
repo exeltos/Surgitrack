@@ -146,7 +146,7 @@ export default function ToolDetailPage() {
           )}
           {can('issue.create') && (
             <AppButton icon={<Flag size={18} />} onClick={() => setReportOpen(true)}>
-              {tr('Αναφορά')}
+              {tr('Αναφορά προβλήματος')}
             </AppButton>
           )}
           {can('department.dispatch') && tool.state === 'IN_DEPARTMENT' && (

@@ -1152,4 +1152,7 @@ export const en: Record<string, string> = {
     'Set {0} takes no instruments while it is being reprocessed or out of use.',
   'Το εργαλείο ακολουθεί το Σετ {0}, που είναι εκτός χρήσης. Η επιστροφή γίνεται από τη διαχείριση του Σετ.':
     'The instrument follows Set {0}, which is out of use. Bring it back from the Set’s management.',
+  'Αναφορά προβλήματος': 'Report a problem',
+  'Ανοικτές αναφορές προβλήματος': 'Open problem reports',
+  'Οι επιλεγμένες αναφορές κλείνουν με αυτή την ενέργεια.': 'The selected reports are closed by this action.',
 };

@@ -985,19 +985,12 @@ export function SurgiProvider({
       ),
     );
     if (sourceSetId) setSets(x => x.map(a => (a.id === sourceSetId ? {...a, actual: Math.max(0, a.actual - 1)} : a)));
-    if (!issues.some(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode)))
-      setIssues(x => [
-        {
-          id: `i${uniqueStamp()}`,
-          asset: `${t.barcode} · ${t.name}`,
-          type: 'Βλάβη / Service',
-          status: 'OPEN',
-          created: formatStoreDateTime(),
-          department: sourceSet?.department || t.department || 'Αποστείρωση',
-          note: note || 'Αποστείρωση · σύνθεση & προετοιμασία: μεταφέρθηκε στα χαλασμένα / Service.',
-        },
-        ...x,
-      ]);
+    openIssue(
+      t,
+      'Βλάβη / Service',
+      sourceSet?.department || t.department || 'Αποστείρωση',
+      note || 'Αποστείρωση · σύνθεση & προετοιμασία: μεταφέρθηκε στα χαλασμένα / Service.',
+    );
     addMovement({
       asset: `${t.barcode} · ${t.name}`,
       assetKind: 'TOOL',
@@ -1429,21 +1422,24 @@ export function SurgiProvider({
     notify(tr('Καταγράφηκε αναφορά για το Σετ {0}.', src.barcode));
   };
   /** Opens an issue on the asset unless one of the same kind is already open. */
-  const openIssue = (asset: {barcode: string; name: string}, type: string, department: string, note: string) => {
-    if (issues.some(i => i.status === 'OPEN' && i.type === type && i.asset.startsWith(asset.barcode))) return;
-    setIssues(x => [
-      {
-        id: `i${uniqueStamp()}`,
-        asset: `${asset.barcode} · ${asset.name}`,
-        type,
-        status: 'OPEN',
-        created: formatStoreDateTime(),
-        department,
-        note,
-      },
-      ...x,
-    ]);
-  };
+  const openIssue = (asset: {barcode: string; name: string}, type: string, department: string, note: string) =>
+    // Checked against the latest list, so a report closed by the same action does not block it.
+    setIssues(x =>
+      x.some(i => i.status === 'OPEN' && i.type === type && i.asset.startsWith(asset.barcode))
+        ? x
+        : [
+            {
+              id: `i${uniqueStamp()}`,
+              asset: `${asset.barcode} · ${asset.name}`,
+              type,
+              status: 'OPEN',
+              created: formatStoreDateTime(),
+              department,
+              note,
+            },
+            ...x,
+          ],
+    );
   /** Declares a Set or instrument lost: an instrument leaves its Set; an issue records the loss. */
   const markLost = (kind: AssetKind, id: string, note = '') => {
     const a = assetName(kind, id);

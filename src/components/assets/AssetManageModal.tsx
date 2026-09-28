@@ -2,7 +2,7 @@ import {useMemo, useState, type ReactNode} from 'react';
 import {ArrowRightLeft, CircleCheck, Layers3, PackageOpen, SearchX, Unlink, Wrench, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
-import {tr} from '../../i18n';
+import {tr, trData} from '../../i18n';
 import type {SetAsset, Tool} from '../../types/domain';
 
 type ToolAction = 'MOVE' | 'REMOVE' | 'STOCK' | 'SERVICE' | 'LOST' | 'RETURN';
@@ -22,7 +22,7 @@ export default function AssetManageModal({
   asset: Tool | SetAsset;
   onClose: () => void;
 }) {
-  const {sets, moveTool, markLost, returnToService, sendSetToService} = useSurgi();
+  const {sets, issues, moveTool, markLost, returnToService, sendSetToService, resolveIssues} = useSurgi();
   const tool = kind === 'TOOL' ? (asset as Tool) : undefined;
   const out = asset.state === 'LOST' || asset.state === 'SERVICE';
   const inSet = tool?.mode === 'SET_MEMBER' && !!tool.setId;
@@ -107,6 +107,26 @@ export default function AssetManageModal({
   const choices: Array<Choice<ToolAction | SetAction>> = kind === 'TOOL' ? toolChoices : setChoices;
 
   const [action, setAction] = useState<ToolAction | SetAction>(choices[0].id);
+  // Problems already reported on this item (by anyone): the action taken here can settle them.
+  const openReports = useMemo(
+    () => issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(`${asset.barcode} `)),
+    [issues, asset.barcode],
+  );
+  const settles = (a: ToolAction | SetAction) => a === 'SERVICE' || a === 'LOST' || a === 'RETURN';
+  const [closing, setClosing] = useState<Set<string>>(
+    () => new Set(settles(choices[0].id) ? openReports.map(i => i.id) : []),
+  );
+  const pickAction = (next: ToolAction | SetAction) => {
+    setAction(next);
+    setClosing(new Set(settles(next) ? openReports.map(i => i.id) : []));
+  };
+  const toggleClosing = (id: string) =>
+    setClosing(current => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   const [targetSetId, setTargetSetId] = useState('');
   const [setQuery, setSetQuery] = useState('');
   const [note, setNote] = useState('');
@@ -123,6 +143,12 @@ export default function AssetManageModal({
 
   const confirm = () => {
     if (!ready || followsSet) return;
+    // Settle the chosen reports first, so the action can open its own issue where it needs one.
+    const chosen = choices.find(c => c.id === action)?.title || '';
+    resolveIssues(
+      openReports.filter(i => closing.has(i.id)).map(i => i.id),
+      `${chosen}${note.trim() ? ` · ${note.trim()}` : ''}`,
+    );
     if (kind === 'TOOL') {
       if (action === 'MOVE') moveTool(asset.id, 'SET', targetSetId);
       else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
@@ -150,6 +176,23 @@ export default function AssetManageModal({
             <X size={18} />
           </button>
         </header>
+        {openReports.length > 0 && !followsSet && (
+          <section className="asset-manage-reports">
+            <b>{tr('Ανοικτές αναφορές προβλήματος')}</b>
+            {openReports.map(report => (
+              <label key={report.id}>
+                <input type="checkbox" checked={closing.has(report.id)} onChange={() => toggleClosing(report.id)} />
+                <span>
+                  <strong>{trData(report.type)}</strong>
+                  <small>
+                    {report.note} · {trData(report.department)} · {report.created}
+                  </small>
+                </span>
+              </label>
+            ))}
+            <small>{tr('Οι επιλεγμένες αναφορές κλείνουν με αυτή την ενέργεια.')}</small>
+          </section>
+        )}
         {followsSet && parentSet && (
           <p className="asset-manage-follows">
             {tr(
@@ -164,7 +207,7 @@ export default function AssetManageModal({
               key={choice.id}
               type="button"
               className={`${action === choice.id ? 'active' : ''} ${choice.danger ? 'danger' : ''}`}
-              onClick={() => setAction(choice.id)}
+              onClick={() => pickAction(choice.id)}
             >
               {choice.icon}
               <span>

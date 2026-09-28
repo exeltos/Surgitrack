@@ -1393,7 +1393,8 @@ body {
   padding-top: 14px !important;
   padding-bottom: 14px !important;
 }
-.asset-focus-shell footer {
+/* Only the page footer: dialog footers (report, duplicate, delete) keep their buttons. */
+.asset-focus-shell .main > footer {
   display: none;
 }
 .legacy-inspired-workspace {
