@@ -1,4 +1,5 @@
 import {supabase} from '../../lib/supabase';
+import {getRuntimeDataMode} from '../../config/dataMode';
 import type {SessionUser, UserRole} from '../../store/types';
 
 export const PLATFORM_ADMIN_EMAIL = 'info@exeltos.com';
@@ -129,6 +130,22 @@ export const sessionUserFor = (identity: RealIdentity): SessionUser => ({
   department: identity.platform ? 'Platform' : identity.departmentName,
   ...(identity.supervisor ? {supervisor: true} : {}),
 });
+
+/**
+ * The platform owner working as the owner: not in Demo and not viewing a hospital as one of its
+ * roles (including "Hospital administrator", which shows exactly what that admin sees).
+ */
+export const actingAsPlatformOwner = (): boolean => {
+  const real = getRealIdentity();
+  if (!real) return true; // local development without sign-in
+  if (!real.platform || getRuntimeDataMode() === 'DEMO') return false;
+  try {
+    const user = JSON.parse(sessionStorage.getItem('surgitrack-session-user') || 'null') as SessionUser | null;
+    return !user?.viewAs;
+  } catch {
+    return true;
+  }
+};
 
 /** Admins can view (and act in) the app as another role or department of the hospital. */
 export const canViewAs = (identity: RealIdentity | undefined) => identity?.role === 'ADMIN';

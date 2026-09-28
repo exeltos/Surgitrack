@@ -20,7 +20,7 @@ import {useSurgi, type UserRole} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import RoleSwitcher from './RoleSwitcher';
-import {getRealIdentity} from '../../data/cloud/identity';
+import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
@@ -88,7 +88,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   )
     .filter(item => item.to !== '/hospital' || !!hospitalId)
     // The list of all hospitals is the platform admin's, outside Demo.
-    .filter(item => item.to !== '/hospitals' || (!isDemo && !!getRealIdentity()?.platform));
+    .filter(item => item.to !== '/hospitals' || actingAsPlatformOwner());
   useEffect(() => {
     if (platformOnly && !PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
       navigate('/studio', {replace: true});
@@ -205,11 +205,15 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               ? lang === 'el'
                 ? 'Διαχείριση πλατφόρμας'
                 : 'Platform administration'
-              : role === 'STERILIZATION' && currentUser.supervisor
+              : role === 'ADMIN' && actingAsPlatformOwner()
                 ? lang === 'el'
-                  ? 'Προϊστάμενος Αποστείρωσης'
-                  : 'Sterilization supervisor'
-                : roleLabel[role][lang]}
+                  ? 'Owner πλατφόρμας'
+                  : 'Platform owner'
+                : role === 'STERILIZATION' && currentUser.supervisor
+                  ? lang === 'el'
+                    ? 'Προϊστάμενος Αποστείρωσης'
+                    : 'Sterilization supervisor'
+                  : roleLabel[role][lang]}
         </strong>
       </div>
       <nav>

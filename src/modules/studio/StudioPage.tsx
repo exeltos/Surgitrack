@@ -51,7 +51,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
 import SignupLinkCard from '../hospital/SignupLinkCard';
 import {switchHospital} from '../../data/cloud/hospitalSwitch';
-import {getRealIdentity} from '../../data/cloud/identity';
+import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {localizedName, translateToEnglish} from '../../core/glossary';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {
@@ -156,10 +156,7 @@ export default function StudioPage() {
   const {currentUser, setRole} = useSurgi();
   // The platform admin runs the whole platform; a hospital admin only configures their own hospital
   // here (libraries, workflow, permissions, settings) — no other hospitals, hospital record or Demo.
-  const platformAdmin = (() => {
-    const real = getRealIdentity();
-    return !real || real.platform;
-  })();
+  const platformAdmin = actingAsPlatformOwner();
   // A real hospital's departments are managed on its own administration page.
   const hospitalLibraryMeta = libraryMeta.filter(
     m => platformAdmin || libs.dataMode !== 'PRODUCTION' || m.key !== 'departments',

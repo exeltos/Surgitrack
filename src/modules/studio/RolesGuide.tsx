@@ -21,8 +21,8 @@ const rows: Row[] = [
     },
     sees: {el: 'Όλα τα νοσοκομεία, το Studio και το Demo.', en: 'All hospitals, Studio and the Demo.'},
     does: {
-      el: 'Δημιουργεί νοσοκομεία, ορίζει τον Διαχειριστή κάθε νοσοκομείου και μπαίνει σε οποιοδήποτε νοσοκομείο.',
-      en: 'Creates hospitals, names each hospital administrator and can enter any hospital.',
+      el: 'Δημιουργεί νοσοκομεία, ορίζει τον Διαχειριστή κάθε νοσοκομείου και μπαίνει σε οποιοδήποτε νοσοκομείο. Μέσα σε νοσοκομείο, από το «Προβολή ως», βλέπει ό,τι βλέπει κάθε ρόλος.',
+      en: 'Creates hospitals, names each hospital administrator and can enter any hospital. Inside a hospital, "view as" shows exactly what each role sees.',
     },
   },
   {
