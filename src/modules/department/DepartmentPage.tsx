@@ -6,6 +6,8 @@ import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
+import ColorMarker from '../../components/assets/ColorMarker';
+import {effectiveToolMarker} from '../../core/colorTapes';
 
 type Category = 'SETS' | 'TOOLS';
 type StatusFilter = 'ALL' | 'IN_DEPARTMENT' | 'STERILIZATION' | 'READY';
@@ -215,7 +217,20 @@ export default function DepartmentPage() {
                     />
                     <div className="department-asset-identity">
                       <span className="mono">{asset.barcode}</span>
-                      <strong>{asset.name}</strong>
+                      <strong>
+                        {asset.name}{' '}
+                        <ColorMarker
+                          size="sm"
+                          tapes={
+                            kind === 'SET'
+                              ? (asset as SetAsset).colorTapes
+                              : effectiveToolMarker(
+                                  asset as Tool,
+                                  sets.find(s => s.id === (asset as Tool).setId),
+                                )
+                          }
+                        />
+                      </strong>
                       <small>
                         {asset.code} · {trData(asset.specialty)}
                         {kind === 'SET' ? tr(' · {0}/{1} εργαλεία', memberCount, (asset as SetAsset).expected) : ''}

@@ -5,11 +5,13 @@ import ConfirmDialog from '../ui/ConfirmDialog';
 import AppButton from '../ui/AppButton';
 import AssetFilterBar from './AssetFilterBar';
 import {tr, trData} from '../../i18n';
+import {useSetColorQuestion} from './useSetColorQuestion';
 
 type Source = 'STOCK' | 'SET_MEMBER' | 'STANDALONE';
 
 export default function AddToolsToSetModal({setId, onClose}: {setId: string; onClose: () => void}) {
-  const {tools, sets, addToolsToSet} = useSurgi();
+  const {tools, sets, addToolsToSet, applyColorPlan} = useSurgi();
+  const colorQuestion = useSetColorQuestion();
   const [source, setSource] = useState<Source>('STOCK');
   const [q, setQ] = useState('');
   const [department, setDepartment] = useState('');
@@ -194,13 +196,17 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
             target?.barcode,
           )}
           confirmLabel={tr('Ναι, προσθήκη')}
-          onConfirm={() => {
+          onConfirm={async () => {
+            const plan = await colorQuestion.ask(selected, setId);
+            if (!plan) return;
             addToolsToSet(setId, selected);
+            applyColorPlan(plan, sets.find(s => s.id === setId)?.barcode || '');
             onClose();
           }}
           onClose={() => setConfirm(false)}
         />
       )}
+      {colorQuestion.dialog}
     </>
   );
 }

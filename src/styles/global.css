@@ -1719,3 +1719,453 @@
   color: #6b7c86;
   font-size: 12px;
 }
+
+/* ---------- Color markers (identification tape) ---------- */
+.tape-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  color: #1c1c1c;
+  font-weight: 800;
+  line-height: 1;
+  overflow: hidden;
+}
+.tape-swatch b.on-dark {
+  color: #fff;
+}
+.tape-sm {
+  width: 16px;
+  height: 7px;
+  font-size: 0;
+}
+.tape-md {
+  width: 24px;
+  height: 10px;
+  font-size: 7px;
+}
+.tape-lg {
+  width: 40px;
+  height: 16px;
+  font-size: 10px;
+}
+.tape-swatch.missing {
+  background: repeating-linear-gradient(45deg, #ddd 0 4px, #f5f5f5 4px 8px);
+  color: #888;
+}
+.color-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  vertical-align: middle;
+}
+.color-marker-sm {
+  margin-left: 6px;
+}
+.color-marker-empty {
+  color: var(--muted);
+  font-size: 12px;
+}
+.asset-marker-field dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.asset-marker-field dd small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.asset-marker-edit {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  border: 1px solid #d8e3e8;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d6b7a;
+  cursor: pointer;
+}
+.member-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 6px;
+}
+.member-marker small {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9a5b00;
+}
+.member-marker.none small {
+  color: #6b7c86;
+}
+
+/* Marker picker */
+.color-picker-modal,
+.color-question-modal {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 40, 55, 0.25);
+  overflow: hidden;
+}
+.color-picker-modal > header,
+.color-question-modal > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.color-question-modal > header {
+  justify-content: flex-start;
+  color: #1d6b7a;
+}
+.color-picker-modal h2,
+.color-question-modal h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  color: #1c2b33;
+}
+.color-picker-modal > footer,
+.color-question-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.color-mode-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.color-mode-choices label {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid #d8e3e8;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.color-mode-choices label span {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+.color-mode-choices label small {
+  color: #6b7c86;
+  font-size: 12px;
+}
+.color-mode-choices label.active {
+  border-color: #1d6b7a;
+  background: #eef7f9;
+}
+.color-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f5f9fa;
+  font-size: 12.5px;
+  color: #51626c;
+}
+.color-selection em {
+  color: #8a99a2;
+}
+.color-selection-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid #d8e3e8;
+  border-radius: 10px;
+  background: #fff;
+}
+.color-selection-actions {
+  display: inline-flex;
+  gap: 2px;
+}
+.color-selection-actions button {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 6px;
+  background: #eef3f5;
+  cursor: pointer;
+}
+.color-selection-actions button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.color-duplicate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff4e5;
+  color: #8a4b00;
+  font-size: 13px;
+}
+.color-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  min-height: 38px;
+  border: 1px solid #d8e3e8;
+  border-radius: 10px;
+  color: #6b7c86;
+}
+.color-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  font: inherit;
+}
+.color-palette {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  padding-right: 4px;
+}
+.color-palette section > b,
+.tape-library-groups section > b {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #51626c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.color-palette section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 6px;
+}
+.color-palette button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #e3eaee;
+  border-radius: 9px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+.color-palette button small {
+  font-size: 11.5px;
+  color: #33505f;
+}
+.color-palette button:hover:not(:disabled) {
+  border-color: #1d6b7a;
+}
+.color-palette button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* The "keep own color or take the Set's" question sits above the dialog that asked it. */
+.nested-color-question {
+  z-index: 1300;
+}
+.color-question-rows {
+  display: grid;
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.color-question-rows > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f7fafb;
+  font-size: 13px;
+}
+.color-question-rows > .color-question-set {
+  background: #eef7f9;
+  font-weight: 600;
+}
+.color-question-modal > p {
+  margin: 0;
+  color: #51626c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Studio · palette */
+.tape-library {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 18px;
+}
+.tape-library > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.tape-library > header > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+.tape-library > header small {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.tape-library-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.tape-library-actions label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.tape-library-groups {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.tape-library-groups section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 6px;
+}
+.tape-library-groups article {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #e3eaee;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 12.5px;
+}
+.tape-library-groups article span:not(.tape-swatch) {
+  flex: 1;
+}
+.tape-library-groups article button {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: #eef3f5;
+  color: #1d6b7a;
+  cursor: pointer;
+}
+.tape-library-groups article button.danger {
+  color: #b42318;
+}
+.tape-library-groups article.hidden-tape {
+  opacity: 0.5;
+}
+.tape-new {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto minmax(140px, 0.7fr) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #cfe5ea;
+  border-radius: 12px;
+  background: #f4fafb;
+}
+.tape-new label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: #51626c;
+}
+.tape-new input:not([type='color']) {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #d8e3e8;
+  border-radius: 9px;
+  font: inherit;
+}
+.tape-new-colors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #51626c;
+}
+.tape-new-colors > span:first-child {
+  width: 100%;
+}
+.tape-new-color {
+  position: relative;
+}
+.tape-new-color input {
+  width: 38px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #d8e3e8;
+  border-radius: 7px;
+  background: #fff;
+}
+.tape-new-color button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: #51626c;
+  color: #fff;
+  cursor: pointer;
+}
+.tape-new-add-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px dashed #9ccbd5;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d6b7a;
+  cursor: pointer;
+}
+.tape-new-preview {
+  padding-bottom: 8px;
+}
+.tape-new > footer {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

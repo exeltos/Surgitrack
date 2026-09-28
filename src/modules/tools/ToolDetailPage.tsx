@@ -32,6 +32,9 @@ import {tr, trc, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
 import AssetManageModal from '../../components/assets/AssetManageModal';
+import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
+import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
+import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function ToolDetailPage() {
   const {
@@ -48,6 +51,7 @@ export default function ToolDetailPage() {
     role,
     currentUser,
     can,
+    setColorMarker,
   } = useSurgi();
   const navigate = useNavigate();
   const {id} = useParams();
@@ -57,6 +61,8 @@ export default function ToolDetailPage() {
   const [preview, setPreview] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [markerOpen, setMarkerOpen] = useState(false);
+  const tapesById = useColorTapes();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBlockedOpen, setDeleteBlockedOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -170,6 +176,15 @@ export default function ToolDetailPage() {
           onPhotos={() => setPhotosOpen(true)}
           workflowLocked={workflowLocked}
           onSave={can('asset.edit') ? patch => updateTool(tool.id, patch) : undefined}
+          markerTapes={effectiveToolMarker(tool, set)}
+          markerNote={
+            (tool.colorMode || (tool.mode === 'SET_MEMBER' ? 'SET' : 'NONE')) === 'SET' && tool.mode === 'SET_MEMBER'
+              ? tr('όπως το Σετ')
+              : tool.colorMode === 'OWN' && tool.mode === 'SET_MEMBER'
+                ? tr('δικό του, διαφορετικό από το Σετ')
+                : undefined
+          }
+          onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />
@@ -478,6 +493,26 @@ export default function ToolDetailPage() {
         </div>
       )}
       {manageOpen && <AssetManageModal kind="TOOL" asset={tool} onClose={() => setManageOpen(false)} />}
+      {markerOpen && (
+        <ColorMarkerPicker
+          kind="TOOL"
+          title={`${tool.barcode} · ${tool.name}`}
+          value={{mode: tool.colorMode, tapes: tool.colorTapes || []}}
+          parentTapes={set?.colorTapes}
+          inSet={tool.mode === 'SET_MEMBER' && !!set}
+          onClose={() => setMarkerOpen(false)}
+          onSave={value => {
+            const text =
+              value.mode === 'SET'
+                ? tr('όπως το Σετ')
+                : value.mode === 'NONE' || !value.tapes.length
+                  ? tr('χωρίς χρώμα')
+                  : markerText(value.tapes, tapesById, 'el');
+            setColorMarker('TOOL', tool.id, value, text);
+            setMarkerOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

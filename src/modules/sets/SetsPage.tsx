@@ -10,6 +10,7 @@ import {statusLabel} from '../../components/ui/statusLabel';
 import PageHeader from '../../components/ui/PageHeader';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
+import ColorMarker from '../../components/assets/ColorMarker';
 export default function SetsPage() {
   const {sets, tools, can} = useSurgi();
   const navigate = useNavigate();
@@ -106,6 +107,7 @@ export default function SetsPage() {
                         <Link className="row-title-link" to={`/sets/${s.id}`}>
                           {s.name}
                         </Link>
+                        <ColorMarker tapes={s.colorTapes} size="sm" />
                       </span>
                     </div>
                   </td>

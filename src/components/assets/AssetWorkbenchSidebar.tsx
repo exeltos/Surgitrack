@@ -1,6 +1,7 @@
 import {useLibraries} from '../../core/LibraryStore';
 import {useEffect, useState} from 'react';
-import {Barcode, Camera, Check, Images, Pencil, X} from 'lucide-react';
+import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
+import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
 import AssetTypeIcon from './AssetTypeIcon';
@@ -19,6 +20,10 @@ type Props = {
   onPhotos: () => void;
   onSave?: (patch: EditablePatch) => void;
   workflowLocked?: boolean;
+  /** The color marker shown (an instrument's own or its Set's), a note on where it comes from, and its editor. */
+  markerTapes?: string[];
+  markerNote?: string;
+  onEditMarker?: () => void;
 };
 const states: Array<{value: AssetState; label: string}> = [
   {value: 'IN_DEPARTMENT', label: 'Στο τμήμα'},
@@ -44,6 +49,9 @@ export default function AssetWorkbenchSidebar({
   onPhotos,
   onSave,
   workflowLocked = false,
+  markerTapes,
+  markerNote,
+  onEditMarker,
 }: Props) {
   const {systemSettings} = useLibraries();
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
@@ -212,6 +220,18 @@ export default function AssetWorkbenchSidebar({
             {editing
               ? textField('manufacturer', draft.manufacturer)
               : (asset as Tool).manufacturer || (asset as SetAsset).manufacturer || '—'}
+          </dd>
+        </div>
+        <div className="asset-marker-field">
+          <dt>{tr('Χρωματικός μάρτυρας')}</dt>
+          <dd>
+            <ColorMarker tapes={markerTapes} empty={tr('Χωρίς χρώμα')} />
+            {markerNote && <small>{markerNote}</small>}
+            {onEditMarker && (
+              <button type="button" className="asset-marker-edit" onClick={onEditMarker} title={tr('Αλλαγή χρώματος')}>
+                <Palette size={14} />
+              </button>
+            )}
           </dd>
         </div>
         {kind === 'TOOL' && (

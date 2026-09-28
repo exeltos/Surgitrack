@@ -58,6 +58,7 @@ import {
   type WorkflowStageId,
 } from '../core/workflow';
 import {tr} from '../i18n';
+import type {ColorPlan} from '../core/colorTapes';
 
 export type {
   DeliveryPayload,
@@ -1520,6 +1521,61 @@ export function SurgiProvider({
     });
     notify(tr('{0} μεταφέρθηκε στα Χαλασμένα / Service.', s.barcode));
   };
+  /** Sets the color marker of a Set or an instrument; the history records it in words. */
+  const setColorMarker = (
+    kind: AssetKind,
+    id: string,
+    value: {mode?: 'SET' | 'OWN' | 'NONE'; tapes: string[]},
+    description: string,
+  ) => {
+    const a = assetName(kind, id);
+    if (!a) return;
+    // Like every other change to the item, the marker is locked during a reprocessing cycle.
+    if (!['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(a.state)) {
+      notify(tr('{0}: ο χρωματικός μάρτυρας δεν αλλάζει όσο βρίσκεται σε διαδικασία αποστείρωσης.', a.barcode));
+      return;
+    }
+    if (kind === 'SET') setSets(x => x.map(s => (s.id === id ? {...s, colorTapes: value.tapes} : s)));
+    else setTools(x => x.map(t => (t.id === id ? {...t, colorMode: value.mode, colorTapes: value.tapes} : t)));
+    addMovement({
+      asset: `${a.barcode} · ${a.name}`,
+      assetKind: kind,
+      from: a.department || 'Stock',
+      to: a.department || 'Stock',
+      status: `Χρωματικός μάρτυρας: ${description}`,
+      by: currentUser.name,
+    });
+    notify(tr('{0}: ο χρωματικός μάρτυρας ενημερώθηκε.', a.barcode));
+  };
+  /** After instruments joined a Set: the ones that take its color, and the ones that keep their tape. */
+  const applyColorPlan = (plan: ColorPlan, setBarcode: string) => {
+    const follow = new Set(plan.follow);
+    const keep = new Map(plan.keep.map(k => [k.id, k.tapes]));
+    if (!follow.size && !keep.size) return;
+    setTools(x =>
+      x.map(t =>
+        follow.has(t.id)
+          ? {...t, colorMode: 'SET', colorTapes: []}
+          : keep.has(t.id)
+            ? {...t, colorMode: 'OWN', colorTapes: keep.get(t.id)}
+            : t,
+      ),
+    );
+    tools
+      .filter(t => follow.has(t.id) || keep.has(t.id))
+      .forEach(t =>
+        addMovement({
+          asset: `${t.barcode} · ${t.name}`,
+          assetKind: 'TOOL',
+          from: `Set ${setBarcode}`,
+          to: `Set ${setBarcode}`,
+          status: follow.has(t.id)
+            ? 'Χρωματικός μάρτυρας: όπως το Σετ · αλλαγή ταινίας'
+            : 'Χρωματικός μάρτυρας: κρατά την ταινία του',
+          by: currentUser.name,
+        }),
+      );
+  };
   const retireAsset = (kind: AssetKind, id: string) => {
     const a = assetName(kind, id);
     if (!a) return;
@@ -1750,6 +1806,8 @@ export function SurgiProvider({
       deleteTool,
       reportSetIssue,
       retireAsset,
+      setColorMarker,
+      applyColorPlan,
       markLost,
       returnToService,
       sendSetToService,

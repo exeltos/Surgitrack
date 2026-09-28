@@ -3,7 +3,9 @@ import {ArrowRightLeft, CircleCheck, Layers3, PackageOpen, SearchX, Unlink, Wren
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
+import {useSetColorQuestion} from './useSetColorQuestion';
 import type {SetAsset, Tool} from '../../types/domain';
+import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
 
 type ToolAction = 'MOVE' | 'REMOVE' | 'STOCK' | 'SERVICE' | 'LOST' | 'RETURN';
 type SetAction = 'SERVICE' | 'LOST' | 'RETURN';
@@ -22,7 +24,9 @@ export default function AssetManageModal({
   asset: Tool | SetAsset;
   onClose: () => void;
 }) {
-  const {sets, issues, moveTool, markLost, returnToService, sendSetToService, resolveIssues} = useSurgi();
+  const {sets, issues, moveTool, markLost, returnToService, sendSetToService, resolveIssues, applyColorPlan} =
+    useSurgi();
+  const colorQuestion = useSetColorQuestion();
   const tool = kind === 'TOOL' ? (asset as Tool) : undefined;
   const out = asset.state === 'LOST' || asset.state === 'SERVICE';
   const inSet = tool?.mode === 'SET_MEMBER' && !!tool.setId;
@@ -141,8 +145,12 @@ export default function AssetManageModal({
   const needsNote = action === 'LOST' || action === 'SERVICE';
   const ready = action === 'MOVE' ? !!targetSetId : !needsNote || note.trim().length > 0;
 
-  const confirm = () => {
+  const confirm = async () => {
     if (!ready || followsSet) return;
+    // An instrument with its own color joining a Set: keep it or take the Set's?
+    const plan =
+      kind === 'TOOL' && action === 'MOVE' ? await colorQuestion.ask([asset.id], targetSetId) : EMPTY_COLOR_PLAN;
+    if (!plan) return;
     // Settle the chosen reports first, so the action can open its own issue where it needs one.
     const chosen = choices.find(c => c.id === action)?.title || '';
     resolveIssues(
@@ -150,8 +158,10 @@ export default function AssetManageModal({
       `${chosen}${note.trim() ? ` · ${note.trim()}` : ''}`,
     );
     if (kind === 'TOOL') {
-      if (action === 'MOVE') moveTool(asset.id, 'SET', targetSetId);
-      else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
+      if (action === 'MOVE') {
+        moveTool(asset.id, 'SET', targetSetId);
+        applyColorPlan(plan, sets.find(s => s.id === targetSetId)?.barcode || '');
+      } else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
       else if (action === 'STOCK') moveTool(asset.id, 'STOCK');
       else if (action === 'SERVICE') moveTool(asset.id, 'SERVICE', undefined, note.trim());
       else if (action === 'LOST') markLost('TOOL', asset.id, note.trim());
@@ -268,6 +278,7 @@ export default function AssetManageModal({
           </AppButton>
         </footer>
       </div>
+      {colorQuestion.dialog}
     </div>
   );
 }

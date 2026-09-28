@@ -40,6 +40,8 @@ import {printBarcodeLabel, printCompositionA4} from './printUtils';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr, trc, trData} from '../../i18n';
+import {useSetColorQuestion} from '../../components/assets/useSetColorQuestion';
+import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
 
 type Queue = 'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'RELEASE' | 'STORAGE' | 'READY';
 type Kind = AssetKind;
@@ -89,8 +91,10 @@ export default function SterilizationPage() {
     resolveIssues,
     moveTool,
     replaceToolInSet,
+    applyColorPlan,
     can,
   } = useSurgi();
+  const colorQuestion = useSetColorQuestion();
   // Set changes (cover a shortage, replace, service, stock, another Set) are the supervisor's.
   const canCompose = can('asset.composition.manage');
   const {sterilizationWorkflow} = useLibraries();
@@ -854,12 +858,25 @@ export default function SterilizationPage() {
     setPrepOutgoingSetId('');
     setPrepTargetSetId('');
   };
-  const applyPrepToolAction = () => {
+  const applyPrepToolAction = async () => {
     if (!prepDraft || prepDraft.kind !== 'SET' || (!prepSelectedTool && !prepReplacementRequirement)) return;
+    // The instrument that joins a Set here, and that Set: ask about its own color first.
+    const joining =
+      prepToolAction === 'REPLACE' && prepReplacementId
+        ? {toolId: prepReplacementId, setId: prepDraft.asset.id}
+        : prepToolAction === 'SET' && prepSelectedTool && prepTargetSetId
+          ? {toolId: prepSelectedTool.id, setId: prepTargetSetId}
+          : null;
+    const plan = joining ? await colorQuestion.ask([joining.toolId], joining.setId) : EMPTY_COLOR_PLAN;
+    if (!plan) return;
+    const takeSetColor = () => {
+      if (joining) applyColorPlan(plan, sets.find(s => s.id === joining.setId)?.barcode || '');
+    };
     if (prepToolAction === 'REPLACE') {
       if (!prepReplacementId) return;
       if (!prepSelectedTool) {
         moveTool(prepReplacementId, 'SET', prepDraft.asset.id);
+        takeSetColor();
         if (prepReplacementRequirement)
           setAcceptedMissingCodes(current => {
             const next = new Set(current);
@@ -878,6 +895,7 @@ export default function SterilizationPage() {
         prepOutgoingDestination,
         prepOutgoingDestination === 'SET' ? prepOutgoingSetId : undefined,
       );
+      takeSetColor();
       setPrepCheckedIds(current => {
         const next = new Set(current);
         next.delete(prepSelectedTool.id);
@@ -891,6 +909,7 @@ export default function SterilizationPage() {
     if (prepToolAction === 'SET') {
       if (!prepTargetSetId) return;
       moveTool(prepSelectedTool.id, 'SET', prepTargetSetId);
+      takeSetColor();
     } else if (prepToolAction === 'SERVICE') {
       moveTool(prepSelectedTool.id, 'SERVICE');
     } else if (prepToolAction === 'STOCK') {
@@ -4430,6 +4449,7 @@ export default function SterilizationPage() {
           </div>
         </div>
       )}
+      {colorQuestion.dialog}
     </div>
   );
 }

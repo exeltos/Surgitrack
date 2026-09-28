@@ -2,6 +2,7 @@ import type {AdminRepository} from './types';
 import type {LibraryState} from '../../core/libraryTypes';
 import {defaultSterilizationWorkflow} from '../../core/workflow';
 import {defaultRolePermissions} from '../../core/permissions';
+import {colorTapeCatalog} from '../../core/colorTapes';
 
 export const productionAdminRepository: AdminRepository = {
   mode: 'PRODUCTION',
@@ -13,6 +14,7 @@ export const productionAdminRepository: AdminRepository = {
     suppliers: [],
     toolCategories: [],
     sterilizers: [],
+    colorTapes: colorTapeCatalog.map(tape => ({...tape, colors: [...tape.colors]})),
     organizations: [],
     users: [],
     rolePermissions: {

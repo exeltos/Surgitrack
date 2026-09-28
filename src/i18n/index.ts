@@ -45,6 +45,9 @@ export function trc(context: string, greek: string, ...args: Array<string | numb
 
 /** Stored record text that carries numbers or names: "Φορτίο L-12" → "Load L-12". */
 const DATA_PATTERNS: Array<[RegExp, string]> = [
+  [/^Χρωματικός μάρτυρας: όπως το Σετ · αλλαγή ταινίας$/, 'Color marker: as the Set · change the tape'],
+  [/^Χρωματικός μάρτυρας: κρατά την ταινία του$/, 'Color marker: keeps its tape'],
+  [/^Χρωματικός μάρτυρας: (.+)$/, 'Color marker: $1'],
   [/^Αποτυχία κύκλου (.+)$/, 'Cycle $1 failed'],
   [/^Φορτίο πλυντηρίου (.+)$/, 'Washer load $1'],
   [/^Αποδέσμευση φορτίου (.+)$/, 'Load $1 released'],
