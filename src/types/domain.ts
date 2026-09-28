@@ -13,6 +13,8 @@ export type AssetState =
   | 'SERVICE'
   | 'LOST';
 export type ToolMode = 'STANDALONE' | 'SET_MEMBER' | 'STOCK';
+/** Who owns a Set or instrument: the hospital, a doctor, or someone else (named in ownerName). */
+export type Ownership = 'HOSPITAL' | 'DOCTOR' | 'OTHER';
 export interface AssetPhoto {
   id: string;
   name: string;
@@ -44,6 +46,8 @@ export interface Tool {
   /** Color marker: follow the Set's, its own (colorTapes), or none. */
   colorMode?: 'SET' | 'OWN' | 'NONE';
   colorTapes?: string[];
+  ownership?: Ownership;
+  ownerName?: string;
 }
 export interface SetCompositionRequirement {
   code: string;
@@ -72,6 +76,8 @@ export interface SetAsset {
   photos?: AssetPhoto[];
   /** Color marker: 1-3 tape ids in order. */
   colorTapes?: string[];
+  ownership?: Ownership;
+  ownerName?: string;
 }
 export type Asset = SetAsset | Tool;
 export interface Movement {

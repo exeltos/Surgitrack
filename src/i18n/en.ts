@@ -1229,4 +1229,8 @@ export const en: Record<string, string> = {
   'Φθαρμένη ετικέτα': 'Worn label',
   'Χαμένη ετικέτα': 'Lost label',
   'Διπλό barcode': 'Duplicate barcode',
+  Ιδιοκτησία: 'Ownership',
+  Ιατρός: 'Doctor',
+  'Όνομα ιατρού': "Doctor's name",
+  'Σε ποιον ανήκει': 'Owned by',
 };

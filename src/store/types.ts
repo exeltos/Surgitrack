@@ -178,6 +178,8 @@ export type SetUpdatePatch = Partial<
     | 'category'
     | 'notes'
     | 'maxUses'
+    | 'ownership'
+    | 'ownerName'
   >
 >;
 
@@ -197,6 +199,8 @@ export type ToolUpdatePatch = Partial<
     | 'warrantyUntil'
     | 'cost'
     | 'maxUses'
+    | 'ownership'
+    | 'ownerName'
   >
 >;
 

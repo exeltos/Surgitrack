@@ -27,7 +27,7 @@ export default function SetsPage() {
       (!specialty || s.specialty === specialty) &&
       (!manufacturer || s.manufacturer === manufacturer) &&
       (!state || s.state === state) &&
-      `${s.barcode} ${s.name} ${s.code} ${s.manufacturer || ''} ${s.specialty} ${s.department}`
+      `${s.barcode} ${s.name} ${s.code} ${s.manufacturer || ''} ${s.specialty} ${s.department} ${s.ownerName || ''}`
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
