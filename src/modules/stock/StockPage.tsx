@@ -11,9 +11,20 @@ import PageHeader from '../../components/ui/PageHeader';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
+import {useSetColorQuestion} from '../../components/assets/useSetColorQuestion';
+import ColorMarker from '../../components/assets/ColorMarker';
+import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function StockPage() {
-  const {tools, sets, moveTool, can} = useSurgi();
+  const {tools, sets, moveTool, followSetColor, can} = useSurgi();
+  const colorQuestion = useSetColorQuestion();
+  // A stock instrument with its own color joining a Set: ask whether it keeps it.
+  const addToSet = async (toolId: string, setId: string) => {
+    const follow = await colorQuestion.ask([toolId], setId);
+    if (follow === null) return;
+    moveTool(toolId, 'SET', setId);
+    if (follow.length) followSetColor(follow, sets.find(s => s.id === setId)?.barcode || '');
+  };
   const canCompose = can('asset.composition.manage');
   const navigate = useNavigate();
   const stock = tools.filter(t => t.mode === 'STOCK');
@@ -110,6 +121,7 @@ export default function StockPage() {
                     <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
                     <span>
                       <strong>{t.name}</strong>
+                      <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
                     </span>
                   </div>
                 </td>
@@ -137,7 +149,7 @@ export default function StockPage() {
                         size="sm"
                         disabled={!target[t.id]}
                         icon={<ArrowRightLeft size={15} />}
-                        onClick={() => moveTool(t.id, 'SET', target[t.id])}
+                        onClick={() => void addToSet(t.id, target[t.id])}
                       >
                         {tr('Προσθήκη')}
                       </AppButton>
@@ -154,6 +166,7 @@ export default function StockPage() {
           </tbody>
         </table>
       </ScrollableListPanel>
+      {colorQuestion.dialog}
     </div>
   );
 }

@@ -20,7 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
-import type {AssetPhoto} from '../../types/domain';
+import type {AssetPhoto, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
@@ -39,6 +39,10 @@ import {tr, trc, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
 import AssetManageModal from '../../components/assets/AssetManageModal';
+import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
+import ColorMarker from '../../components/assets/ColorMarker';
+import {sameMarker} from '../../core/colorTapes';
+import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
 
 export default function SetDetailPage() {
   const {
@@ -55,6 +59,7 @@ export default function SetDetailPage() {
     updateSet,
     role,
     can,
+    setColorMarker,
   } = useSurgi();
   const navigate = useNavigate();
   const {id} = useParams();
@@ -63,6 +68,8 @@ export default function SetDetailPage() {
   const [photosOpen, setPhotosOpen] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [markerOpen, setMarkerOpen] = useState(false);
+  const tapesById = useColorTapes();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [dispatchOpen, setDispatchOpen] = useState(false);
@@ -226,6 +233,8 @@ export default function SetDetailPage() {
           onPhotos={() => setPhotosOpen(true)}
           workflowLocked={workflowLocked}
           onSave={can('asset.edit') ? patch => updateSet(set.id, patch) : undefined}
+          markerTapes={set.colorTapes}
+          onEditMarker={can('asset.edit') ? () => setMarkerOpen(true) : undefined}
         />
         <section className="asset-workbench-main">
           <AssetTabs
@@ -424,6 +433,7 @@ export default function SetDetailPage() {
                                         </strong>
                                       </div>
                                       <div className="set-tool-state">
+                                        <MemberMarker tool={tool} set={set} />
                                         {tool.state !== set.state && <StatusBadge value={tool.state} />}
                                         {hasIssue && <small>{tr('Ανοικτή αναφορά')}</small>}
                                       </div>
@@ -462,6 +472,7 @@ export default function SetDetailPage() {
                               </strong>
                             </div>
                             <div className="set-tool-state">
+                              <MemberMarker tool={tool} set={set} />
                               {tool.state !== set.state && <StatusBadge value={tool.state} />}
                               {hasIssue && <small>{tr('Ανοικτή αναφορά')}</small>}
                             </div>
@@ -814,6 +825,43 @@ export default function SetDetailPage() {
         </div>
       )}
       {manageOpen && <AssetManageModal kind="SET" asset={set} onClose={() => setManageOpen(false)} />}
+      {markerOpen && (
+        <ColorMarkerPicker
+          kind="SET"
+          title={`${set.barcode} · ${set.name}`}
+          value={{tapes: set.colorTapes || []}}
+          otherSets={sets.filter(s => s.id !== set.id)}
+          onClose={() => setMarkerOpen(false)}
+          onSave={value => {
+            setColorMarker(
+              'SET',
+              set.id,
+              value,
+              value.tapes.length ? markerText(value.tapes, tapesById, 'el') : tr('χωρίς χρώμα'),
+            );
+            setMarkerOpen(false);
+          }}
+        />
+      )}
     </div>
   );
+}
+
+/** In the Set's composition: an instrument whose color differs from the Set's, or that has none. */
+function MemberMarker({tool, set}: {tool: Tool; set: SetAsset}) {
+  const setTapes = set.colorTapes || [];
+  if (tool.colorMode === 'OWN' && tool.colorTapes?.length && !sameMarker(tool.colorTapes, setTapes))
+    return (
+      <span className="member-marker differs" title={tr('Δικό του χρώμα, διαφορετικό από το Σετ')}>
+        <ColorMarker tapes={tool.colorTapes} size="sm" />
+        <small>{tr('Άλλο χρώμα')}</small>
+      </span>
+    );
+  if (tool.colorMode === 'NONE' && setTapes.length)
+    return (
+      <span className="member-marker none">
+        <small>{tr('Χωρίς ταινία')}</small>
+      </span>
+    );
+  return null;
 }

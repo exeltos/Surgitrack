@@ -1520,6 +1520,45 @@ export function SurgiProvider({
     });
     notify(tr('{0} μεταφέρθηκε στα Χαλασμένα / Service.', s.barcode));
   };
+  /** Sets the color marker of a Set or an instrument; the history records it in words. */
+  const setColorMarker = (
+    kind: AssetKind,
+    id: string,
+    value: {mode?: 'SET' | 'OWN' | 'NONE'; tapes: string[]},
+    description: string,
+  ) => {
+    const a = assetName(kind, id);
+    if (!a) return;
+    if (kind === 'SET') setSets(x => x.map(s => (s.id === id ? {...s, colorTapes: value.tapes} : s)));
+    else setTools(x => x.map(t => (t.id === id ? {...t, colorMode: value.mode, colorTapes: value.tapes} : t)));
+    addMovement({
+      asset: `${a.barcode} · ${a.name}`,
+      assetKind: kind,
+      from: a.department || 'Stock',
+      to: a.department || 'Stock',
+      status: `Χρωματικός μάρτυρας: ${description}`,
+      by: currentUser.name,
+    });
+    notify(tr('{0}: ο χρωματικός μάρτυρας ενημερώθηκε.', a.barcode));
+  };
+  /** Instruments that joined a Set and take its color instead of keeping their own. */
+  const followSetColor = (toolIds: string[], setBarcode: string) => {
+    if (!toolIds.length) return;
+    const ids = new Set(toolIds);
+    setTools(x => x.map(t => (ids.has(t.id) ? {...t, colorMode: 'SET', colorTapes: []} : t)));
+    tools
+      .filter(t => ids.has(t.id))
+      .forEach(t =>
+        addMovement({
+          asset: `${t.barcode} · ${t.name}`,
+          assetKind: 'TOOL',
+          from: `Set ${setBarcode}`,
+          to: `Set ${setBarcode}`,
+          status: 'Χρωματικός μάρτυρας: όπως το Σετ · αλλαγή ταινίας',
+          by: currentUser.name,
+        }),
+      );
+  };
   const retireAsset = (kind: AssetKind, id: string) => {
     const a = assetName(kind, id);
     if (!a) return;
@@ -1750,6 +1789,8 @@ export function SurgiProvider({
       deleteTool,
       reportSetIssue,
       retireAsset,
+      setColorMarker,
+      followSetColor,
       markLost,
       returnToService,
       sendSetToService,

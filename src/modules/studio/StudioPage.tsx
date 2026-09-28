@@ -29,6 +29,7 @@ import {
   UserCheck,
   UserPlus,
   type LucideIcon,
+  Palette,
 } from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {useLibraries, type LibraryKey, type AdminUser, type Organization} from '../../core/LibraryStore';
@@ -65,6 +66,7 @@ import {
 import {departments as defaultDepartments} from '../../core/libraries';
 import {tr} from '../../i18n';
 import RolesGuide from './RolesGuide';
+import ColorTapeLibrary from './ColorTapeLibrary';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'GUIDE' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -163,6 +165,8 @@ export default function StudioPage() {
   );
   const [tab, setTab] = useState<Tab>(platformAdmin ? 'OVERVIEW' : 'LIBRARIES');
   const [libraryKey, setLibraryKey] = useState<LibraryKey>(hospitalLibraryMeta[0].key);
+  // The color tape palette has its own editor next to the plain libraries.
+  const [tapesOpen, setTapesOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [editItem, setEditItem] = useState<LibraryItem | null>(null);
   const [newItem, setNewItem] = useState(false);
@@ -906,8 +910,9 @@ export default function StudioPage() {
                 return (
                   <button
                     key={m.key}
-                    className={libraryKey === m.key ? 'active' : ''}
+                    className={!tapesOpen && libraryKey === m.key ? 'active' : ''}
                     onClick={() => {
+                      setTapesOpen(false);
                       setLibraryKey(m.key);
                       resetQuery();
                     }}
@@ -924,86 +929,103 @@ export default function StudioPage() {
                   </button>
                 );
               })}
-            </aside>
-            <section className="studio-manager-panel">
-              <header className="studio-panel-head">
+              <button className={tapesOpen ? 'active' : ''} onClick={() => setTapesOpen(true)}>
+                <span>
+                  <Palette size={18} />
+                </span>
                 <div>
-                  <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΗ', 'LIBRARY')}</span>
-                  <h2>{L(currentMeta.el, currentMeta.en)}</h2>
-                  <p>{L(currentMeta.hintEl, currentMeta.hintEn)}</p>
+                  <b>{L('Χρωματικοί μάρτυρες', 'Color markers')}</b>
+                  <small>
+                    {(libs.colorTapes || []).filter(t => t.active !== false).length} {L('σε χρήση', 'in use')}
+                  </small>
                 </div>
-                <AppButton variant="primary" onClick={() => setNewItem(true)}>
-                  <Plus size={16} />
-                  {L('Νέα εγγραφή', 'New record')}
-                </AppButton>
-              </header>
-              {cloudError && <div className="auth-message">{cloudError}</div>}
-              {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && (
-                <div className="studio-mini-note">
-                  <Upload size={17} />
-                  <span>
-                    <b>{bulkRows.length}</b> {L('εγγραφές · ', 'rows · ')}
-                    <b>{bulkRows.filter(r => !r.error).length}</b> {L('έγκυρες', 'valid')} ·{' '}
-                    <b>{bulkRows.filter(r => r.error).length}</b> {L('με σφάλμα', 'with errors')}
-                  </span>
-                  <AppButton
-                    variant="primary"
-                    disabled={bulkSending || bulkRows.some(r => r.error)}
-                    onClick={() => void sendBulkInvites()}
-                  >
-                    <Send size={15} />
-                    {bulkSending ? L('Αποστολή...', 'Sending...') : L('Αποστολή προσκλήσεων', 'Send invitations')}
-                  </AppButton>
-                </div>
-              )}
-              <div className="studio-search">
-                <Search size={17} />
-                <input
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  placeholder={L('Αναζήτηση ονομασίας ή κωδικού...', 'Search name or code...')}
-                />
-              </div>
-              <div className="studio-list-head">
-                <span>{L('Ονομασία', 'Name')}</span>
-                <span>{L('Αγγλικά', 'English')}</span>
-                <span>{L('Κωδικός', 'Code')}</span>
-                <span></span>
-              </div>
-              <div className="studio-scroll-list">
-                {filteredItems.map(item => (
-                  <div className="studio-list-row" key={item.id}>
-                    <strong>{item.el}</strong>
-                    <span>{item.en}</span>
-                    <code>{item.code || '—'}</code>
-                    <div>
-                      <button title={L('Επεξεργασία', 'Edit')} onClick={() => setEditItem(item)}>
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        className="danger-icon"
-                        title={L('Διαγραφή', 'Delete')}
-                        onClick={() =>
-                          setConfirm({
-                            title: L('Διαγραφή εγγραφής;', 'Delete record?'),
-                            message: L(
-                              `Η εγγραφή «${item.el}» θα αφαιρεθεί από τη βιβλιοθήκη.`,
-                              `“${item.en}” will be removed from the library.`,
-                            ),
-                            action: () => libs.removeItem(libraryKey, item.id),
-                          })
-                        }
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+              </button>
+            </aside>
+            {tapesOpen ? (
+              <section className="studio-manager-panel">
+                <ColorTapeLibrary />
+              </section>
+            ) : (
+              <section className="studio-manager-panel">
+                <header className="studio-panel-head">
+                  <div>
+                    <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΗ', 'LIBRARY')}</span>
+                    <h2>{L(currentMeta.el, currentMeta.en)}</h2>
+                    <p>{L(currentMeta.hintEl, currentMeta.hintEn)}</p>
                   </div>
-                ))}
-                {!filteredItems.length && (
-                  <div className="studio-empty">{L('Δεν βρέθηκαν εγγραφές.', 'No records found.')}</div>
+                  <AppButton variant="primary" onClick={() => setNewItem(true)}>
+                    <Plus size={16} />
+                    {L('Νέα εγγραφή', 'New record')}
+                  </AppButton>
+                </header>
+                {cloudError && <div className="auth-message">{cloudError}</div>}
+                {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && (
+                  <div className="studio-mini-note">
+                    <Upload size={17} />
+                    <span>
+                      <b>{bulkRows.length}</b> {L('εγγραφές · ', 'rows · ')}
+                      <b>{bulkRows.filter(r => !r.error).length}</b> {L('έγκυρες', 'valid')} ·{' '}
+                      <b>{bulkRows.filter(r => r.error).length}</b> {L('με σφάλμα', 'with errors')}
+                    </span>
+                    <AppButton
+                      variant="primary"
+                      disabled={bulkSending || bulkRows.some(r => r.error)}
+                      onClick={() => void sendBulkInvites()}
+                    >
+                      <Send size={15} />
+                      {bulkSending ? L('Αποστολή...', 'Sending...') : L('Αποστολή προσκλήσεων', 'Send invitations')}
+                    </AppButton>
+                  </div>
                 )}
-              </div>
-            </section>
+                <div className="studio-search">
+                  <Search size={17} />
+                  <input
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    placeholder={L('Αναζήτηση ονομασίας ή κωδικού...', 'Search name or code...')}
+                  />
+                </div>
+                <div className="studio-list-head">
+                  <span>{L('Ονομασία', 'Name')}</span>
+                  <span>{L('Αγγλικά', 'English')}</span>
+                  <span>{L('Κωδικός', 'Code')}</span>
+                  <span></span>
+                </div>
+                <div className="studio-scroll-list">
+                  {filteredItems.map(item => (
+                    <div className="studio-list-row" key={item.id}>
+                      <strong>{item.el}</strong>
+                      <span>{item.en}</span>
+                      <code>{item.code || '—'}</code>
+                      <div>
+                        <button title={L('Επεξεργασία', 'Edit')} onClick={() => setEditItem(item)}>
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          className="danger-icon"
+                          title={L('Διαγραφή', 'Delete')}
+                          onClick={() =>
+                            setConfirm({
+                              title: L('Διαγραφή εγγραφής;', 'Delete record?'),
+                              message: L(
+                                `Η εγγραφή «${item.el}» θα αφαιρεθεί από τη βιβλιοθήκη.`,
+                                `“${item.en}” will be removed from the library.`,
+                              ),
+                              action: () => libs.removeItem(libraryKey, item.id),
+                            })
+                          }
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {!filteredItems.length && (
+                    <div className="studio-empty">{L('Δεν βρέθηκαν εγγραφές.', 'No records found.')}</div>
+                  )}
+                </div>
+              </section>
+            )}
           </div>
         )}
         {tab === 'WORKFLOW' && (

@@ -12,6 +12,8 @@ import IconToggleButton from '../../components/ui/IconToggleButton';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
+import ColorMarker from '../../components/assets/ColorMarker';
+import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function ToolsPage() {
   const {tools, sets, can} = useSurgi();
@@ -185,6 +187,13 @@ export default function ToolsPage() {
                             <Link className="row-title-link" to={`/tools/${t.id}`}>
                               {t.name}
                             </Link>
+                            <ColorMarker
+                              tapes={effectiveToolMarker(
+                                t,
+                                sets.find(s => s.id === t.setId),
+                              )}
+                              size="sm"
+                            />
                             {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                           </span>
                         </div>

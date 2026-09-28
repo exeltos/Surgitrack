@@ -41,6 +41,9 @@ export interface Tool {
   notes?: string;
   imageUrl?: string;
   photos?: AssetPhoto[];
+  /** Color marker: follow the Set's, its own (colorTapes), or none. */
+  colorMode?: 'SET' | 'OWN' | 'NONE';
+  colorTapes?: string[];
 }
 export interface SetCompositionRequirement {
   code: string;
@@ -67,6 +70,8 @@ export interface SetAsset {
   uses?: number;
   maxUses?: number;
   photos?: AssetPhoto[];
+  /** Color marker: 1-3 tape ids in order. */
+  colorTapes?: string[];
 }
 export type Asset = SetAsset | Tool;
 export interface Movement {

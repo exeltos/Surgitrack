@@ -2,6 +2,7 @@ import {createContext, useContext, useMemo, useState, type ReactNode} from 'reac
 import {getAdminRepository} from '../data/adminRepositories';
 import type {SurgiDataMode} from '../data/repositories';
 import type {LibraryItem} from './libraries';
+import type {ColorTape} from './colorTapes';
 import type {AdminUser, ConfigurationAuditEvent, LibraryKey, LibraryState, Organization} from './libraryTypes';
 import type {Permission} from './permissions';
 import {defaultRolePermissions, sanitizeRolePermissions} from './permissions';
@@ -18,6 +19,9 @@ type LibraryStore = LibraryState & {
   addItem: (key: LibraryKey, item: Omit<LibraryItem, 'id'>) => void;
   updateItem: (key: LibraryKey, id: string, item: Partial<LibraryItem>) => void;
   removeItem: (key: LibraryKey, id: string) => void;
+  addColorTape: (tape: Omit<ColorTape, 'id' | 'custom'>) => void;
+  updateColorTape: (id: string, patch: Partial<ColorTape>) => void;
+  removeColorTape: (id: string) => void;
   addOrganization: (organization: Omit<Organization, 'id'>) => void;
   updateOrganization: (id: string, patch: Partial<Organization>) => void;
   removeOrganization: (id: string) => void;
@@ -173,6 +177,32 @@ export function LibraryStoreProvider({
         {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'DELETE', by: 'Admin', before},
       );
     });
+  const addColorTape = (tape: Omit<ColorTape, 'id' | 'custom'>) =>
+    commit(s => {
+      const created: ColorTape = {...tape, id: `tape-${Date.now()}`, custom: true};
+      return appendAudit(
+        {...s, colorTapes: [...(s.colorTapes || []), created]},
+        {entityType: 'LIBRARY', entityId: `colorTapes:${created.id}`, action: 'CREATE', by: 'Admin', after: created},
+      );
+    });
+  const updateColorTape = (id: string, patch: Partial<ColorTape>) =>
+    commit(s => {
+      const before = (s.colorTapes || []).find(x => x.id === id);
+      return appendAudit(
+        {...s, colorTapes: (s.colorTapes || []).map(x => (x.id === id ? {...x, ...patch} : x))},
+        {entityType: 'LIBRARY', entityId: `colorTapes:${id}`, action: 'UPDATE', by: 'Admin', before, after: patch},
+      );
+    });
+  /** Only the hospital's own tapes can be deleted; catalogue ones are hidden instead. */
+  const removeColorTape = (id: string) =>
+    commit(s => {
+      const before = (s.colorTapes || []).find(x => x.id === id);
+      if (!before?.custom) return s;
+      return appendAudit(
+        {...s, colorTapes: (s.colorTapes || []).filter(x => x.id !== id)},
+        {entityType: 'LIBRARY', entityId: `colorTapes:${id}`, action: 'DELETE', by: 'Admin', before},
+      );
+    });
   const addOrganization = (organization: Omit<Organization, 'id'>) =>
     commit(s => {
       const created = {...organization, id: `org-${Date.now()}`};
@@ -309,6 +339,9 @@ export function LibraryStoreProvider({
       ...state,
       dataMode,
       addItem,
+      addColorTape,
+      updateColorTape,
+      removeColorTape,
       updateItem,
       addOrganization,
       updateOrganization,

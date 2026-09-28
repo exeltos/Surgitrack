@@ -282,6 +282,13 @@ export type SurgiStoreValue = {
     source?: string,
   ) => void;
   retireAsset: (kind: AssetKind, id: string) => void;
+  setColorMarker: (
+    kind: AssetKind,
+    id: string,
+    value: {mode?: 'SET' | 'OWN' | 'NONE'; tapes: string[]},
+    description: string,
+  ) => void;
+  followSetColor: (toolIds: string[], setBarcode: string) => void;
   markLost: (kind: AssetKind, id: string, note?: string) => void;
   returnToService: (kind: AssetKind, id: string, note?: string) => void;
   sendSetToService: (id: string, note?: string) => void;

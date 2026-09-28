@@ -2,6 +2,7 @@ import type {UserRole} from '../store/types';
 import type {LibraryItem} from './libraries';
 import type {SterilizationWorkflowConfig, SterilizationWorkflowVersion} from './workflow';
 import type {Permission} from './permissions';
+import type {ColorTape} from './colorTapes';
 
 export type Organization = {
   id: string;
@@ -42,6 +43,8 @@ export type LibraryState = {
   suppliers: LibraryItem[];
   toolCategories: LibraryItem[];
   sterilizers: LibraryItem[];
+  /** The hospital's color tape palette for instrument and Set markers. */
+  colorTapes: ColorTape[];
   organizations: Organization[];
   users: AdminUser[];
   rolePermissions: Record<UserRole, Permission[]>;
