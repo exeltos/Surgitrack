@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {Link, useNavigate, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRightLeft,
@@ -15,6 +15,7 @@ import {
   Plus,
   Printer,
   Send,
+  Settings2,
   Trash2,
   TriangleAlert,
   X,
@@ -43,6 +44,8 @@ import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {sameMarker} from '../../core/colorTapes';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
+import ActionMenu from '../../components/ui/ActionMenu';
+import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 
 export default function SetDetailPage() {
   const {
@@ -63,11 +66,14 @@ export default function SetDetailPage() {
   } = useSurgi();
   const navigate = useNavigate();
   const {id} = useParams();
+  const [searchParams] = useSearchParams();
+  const scannedOldBarcode = searchParams.get('replaced');
   const set = sets.find(item => item.id === id);
   const [tab, setTab] = useRememberedState<AssetTab>('tab', 'CONTENTS');
   const [photosOpen, setPhotosOpen] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [newBarcodeOpen, setNewBarcodeOpen] = useState(false);
   const [markerOpen, setMarkerOpen] = useState(false);
   const tapesById = useColorTapes();
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -165,65 +171,118 @@ export default function SetDetailPage() {
     <div className="asset-detail-workspace set-detail-workspace legacy-inspired-workspace">
       <div className="asset-workbench-actions">
         <div className="asset-action-group">
-          <AppButton icon={<Printer size={18} />} onClick={() => setPreview('COMPOSITION')}>
-            {tr('Εκτύπωση σύνθεσης')}
-          </AppButton>
-          {can('asset.barcode.reissue') && (
-            <AppButton icon={<Barcode size={18} />} onClick={() => setPreview('BARCODE')}>
-              {tr('Εκτύπωση Barcode')}
-            </AppButton>
-          )}
-          {can('asset.composition.manage') && (
-            <AppButton
-              icon={<ArrowRightLeft size={18} />}
-              disabled={workflowLocked}
-              title={
-                workflowLocked
-                  ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
-                  : undefined
-              }
-              onClick={() => setManageOpen(true)}
-            >
-              {trc('action', 'Διαχείριση')}
-            </AppButton>
-          )}
-          {can('asset.duplicate') && (
-            <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
-              {tr('Αντίγραφο')}
-            </AppButton>
-          )}
-          {can('asset.delete') && (
-            <AppButton
-              variant="danger"
-              icon={<Trash2 size={18} />}
-              disabled={workflowLocked}
-              title={
-                workflowLocked
-                  ? tr('Δεν επιτρέπεται διαγραφή όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
-                  : undefined
-              }
-              onClick={() => setDeleteOpen(true)}
-            >
-              {tr('Διαγραφή Σετ')}
-            </AppButton>
-          )}
+          <BackLink fallback={backTo} className="asset-action-link">
+            <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
+          </BackLink>
+        </div>
+        <div className="asset-action-group">
+          <ActionMenu
+            icon={<Printer size={18} />}
+            label={tr('Εκτύπωση')}
+            items={[
+              {
+                key: 'composition',
+                icon: <Printer size={16} />,
+                label: tr('Σύνθεση Σετ'),
+                hint: tr('Λίστα εργαλείων για έλεγχο και αρχειοθέτηση'),
+                onSelect: () => setPreview('COMPOSITION'),
+              },
+              ...(can('asset.barcode.reissue')
+                ? [
+                    {
+                      key: 'label',
+                      icon: <Barcode size={16} />,
+                      label: tr('Ετικέτα barcode'),
+                      hint: tr('Ανατύπωση της ίδιας ετικέτας'),
+                      onSelect: () => setPreview('BARCODE'),
+                    },
+                  ]
+                : []),
+            ]}
+          />
           {can('issue.create') && (
             <AppButton icon={<Flag size={18} />} onClick={() => setReportOpen(true)}>
               {tr('Αναφορά προβλήματος')}
             </AppButton>
           )}
+          <ActionMenu
+            icon={<Settings2 size={18} />}
+            label={trc('action', 'Διαχείριση')}
+            align="right"
+            items={[
+              ...(can('asset.composition.manage')
+                ? [
+                    {
+                      key: 'moves',
+                      icon: <ArrowRightLeft size={16} />,
+                      label: tr('Κινήσεις'),
+                      hint: tr('Σε Service, απώλεια, επιστροφή'),
+                      disabled: workflowLocked,
+                      title: workflowLocked
+                        ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
+                        : undefined,
+                      onSelect: () => setManageOpen(true),
+                    },
+                  ]
+                : []),
+              ...(can('asset.barcode.reissue')
+                ? [
+                    {
+                      key: 'barcode',
+                      icon: <Barcode size={16} />,
+                      label: tr('Νέο barcode'),
+                      hint: tr('Όταν η ετικέτα χάθηκε, φθάρηκε ή είναι διπλή'),
+                      onSelect: () => setNewBarcodeOpen(true),
+                    },
+                  ]
+                : []),
+              ...(can('asset.duplicate')
+                ? [
+                    {
+                      key: 'duplicate',
+                      icon: <Copy size={16} />,
+                      label: tr('Αντίγραφο'),
+                      hint: tr('Νέο Σετ με τα ίδια στοιχεία'),
+                      onSelect: () => setDuplicateOpen(true),
+                    },
+                  ]
+                : []),
+              ...(can('asset.delete')
+                ? [
+                    {
+                      key: 'delete',
+                      icon: <Trash2 size={16} />,
+                      label: tr('Διαγραφή Σετ'),
+                      danger: true,
+                      disabled: workflowLocked,
+                      title: workflowLocked
+                        ? tr('Δεν επιτρέπεται διαγραφή όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
+                        : undefined,
+                      onSelect: () => setDeleteOpen(true),
+                    },
+                  ]
+                : []),
+            ]}
+          />
           {can('department.dispatch') && set.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}
             </AppButton>
           )}
         </div>
-        <div className="asset-action-group">
-          <BackLink fallback={backTo} className="asset-action-link">
-            <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
-          </BackLink>
-        </div>
       </div>
+      {scannedOldBarcode && (
+        <div className="replaced-barcode-banner">
+          <Barcode size={18} />
+          <span>
+            {tr(
+              'Σαρώθηκε παλιό barcode {0}. Το τωρινό barcode είναι {1}: κολλήστε τη νέα ετικέτα.',
+              scannedOldBarcode,
+              set.barcode,
+            )}
+          </span>
+        </div>
+      )}
       <div className="asset-workbench-grid">
         <AssetWorkbenchSidebar
           kind="SET"
@@ -840,6 +899,17 @@ export default function SetDetailPage() {
               value.tapes.length ? markerText(value.tapes, tapesById, 'el') : tr('χωρίς χρώμα'),
             );
             setMarkerOpen(false);
+          }}
+        />
+      )}
+      {newBarcodeOpen && (
+        <NewBarcodeModal
+          kind="SET"
+          asset={set}
+          onClose={() => setNewBarcodeOpen(false)}
+          onDone={() => {
+            setNewBarcodeOpen(false);
+            setPreview('BARCODE');
           }}
         />
       )}

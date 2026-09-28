@@ -1146,7 +1146,9 @@ export function SurgiProvider({
 
   const nextBarcode = (kind: AssetKind) => {
     const prefix = kind === 'SET' ? 'S' : 'T';
-    const barcodes = kind === 'SET' ? sets.map(asset => asset.barcode) : tools.map(asset => asset.barcode);
+    // Retired (legacy) barcodes are never handed out again.
+    const assets: Array<{barcode: string; legacyBarcodes?: string[]}> = kind === 'SET' ? sets : tools;
+    const barcodes = assets.flatMap(asset => [asset.barcode, ...(asset.legacyBarcodes || [])]);
     const max = barcodes.reduce((current, barcode) => {
       const numeric = Number(barcode.replace(/\D/g, ''));
       return Number.isFinite(numeric) ? Math.max(current, numeric) : current;
@@ -1156,7 +1158,9 @@ export function SurgiProvider({
   const createTool = (p: CreateToolPayload) => {
     const department = p.department.trim();
     const mode: 'STOCK' | 'STANDALONE' = department ? 'STANDALONE' : 'STOCK';
-    let max = tools.reduce((m, t) => Math.max(m, Number(t.barcode.replace(/\D/g, '')) || 0), 0);
+    let max = tools
+      .flatMap(t => [t.barcode, ...(t.legacyBarcodes || [])])
+      .reduce((m, barcode) => Math.max(m, Number(barcode.replace(/\D/g, '')) || 0), 0);
     const stamp = Date.now();
     const created: Tool[] = Array.from({length: p.quantity}, (_, i) => ({
       id: `tool-${stamp}-${i}`,
@@ -1238,18 +1242,27 @@ export function SurgiProvider({
     );
     return id;
   };
+  /**
+   * A new barcode for a Set or instrument (label lost, damaged or duplicated): the next free number,
+   * the old one kept as a legacy barcode so scanning an old label still finds the item.
+   */
   const reissueBarcode = (kind: AssetKind, id: string, reason = 'Επανέκδοση ετικέτας') => {
     const a = assetName(kind, id);
-    if (!a) return;
+    if (!a) return '';
+    const next = nextBarcode(kind);
+    const patch = {barcode: next, legacyBarcodes: [...(a.legacyBarcodes || []), a.barcode]};
+    if (kind === 'SET') setSets(x => x.map(s => (s.id === id ? {...s, ...patch} : s)));
+    else setTools(x => x.map(t => (t.id === id ? {...t, ...patch} : t)));
     addMovement({
-      asset: `${a.barcode} · ${a.name}`,
+      asset: `${next} · ${a.name}`,
       assetKind: kind,
-      from: 'Barcode',
-      to: 'Barcode',
-      status: `Επανέκδοση barcode · ${reason}`,
+      from: a.barcode,
+      to: next,
+      status: `Νέο barcode · ${reason}`,
       by: currentUser.name,
     });
-    notify(tr('{0}: καταγράφηκε επανέκδοση barcode.', a.barcode));
+    notify(tr('{0}: νέο barcode {1}. Το παλιό μένει στο ιστορικό.', a.barcode, next));
+    return next;
   };
   const duplicateSet = (id: string, withTools = false) => {
     const src = sets.find(s => s.id === id);
