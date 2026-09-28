@@ -89,9 +89,11 @@ export default function ToolDetailPage() {
     <div className="asset-detail-workspace tool-detail-workspace legacy-inspired-workspace">
       <div className="asset-workbench-actions">
         <div className="asset-action-group">
-          <AppButton icon={<Printer size={18} />} onClick={() => setPreview(true)}>
-            {tr('Εκτύπωση Barcode')}
-          </AppButton>
+          {can('asset.barcode.reissue') && (
+            <AppButton icon={<Printer size={18} />} onClick={() => setPreview(true)}>
+              {tr('Εκτύπωση Barcode')}
+            </AppButton>
+          )}
           {can('asset.duplicate') && (
             <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
               Duplicate

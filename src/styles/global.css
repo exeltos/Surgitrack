@@ -1307,3 +1307,86 @@
   font-size: 12.5px;
   line-height: 1.45;
 }
+
+/* Studio · Roles: who is who. */
+.studio-body-guide {
+  overflow-y: auto;
+}
+.roles-guide {
+  padding: 4px 2px 24px;
+}
+.roles-guide header h2 {
+  margin: 4px 0 16px;
+}
+.roles-guide-table {
+  border: 1px solid var(--line, #d8e0e6);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--panel, #fff);
+}
+.roles-guide-head,
+.roles-guide-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1.2fr) minmax(200px, 1.4fr) minmax(220px, 1.8fr);
+  gap: 16px;
+  padding: 14px 18px;
+  align-items: start;
+}
+.roles-guide-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line, #d8e0e6);
+}
+.roles-guide-row + .roles-guide-row {
+  border-top: 1px solid var(--line, #d8e0e6);
+}
+.roles-guide-row b {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.roles-guide-row span {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+/* Narrow screens: each role becomes a stacked card instead of four columns. */
+@media (max-width: 900px) {
+  .roles-guide-head {
+    display: none;
+  }
+  .roles-guide-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+.platform-demo-as {
+  font-size: 12px;
+  color: var(--muted);
+  align-self: center;
+}
+.platform-private-demo {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.platform-private-demo-actions {
+  flex-wrap: wrap;
+  align-items: center;
+}
+.platform-private-demo-actions .platform-demo-reset {
+  margin-left: auto;
+}
+/* Eight Studio tabs fit one row on desktop. */
+@media (min-width: 1100px) {
+  .studio-tabs button {
+    padding: 8px 6px !important;
+    gap: 5px;
+  }
+}
+.roles-guide-row b svg {
+  flex-shrink: 0;
+  color: var(--primary, #1d6b7a);
+}

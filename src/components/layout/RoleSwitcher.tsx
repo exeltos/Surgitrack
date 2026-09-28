@@ -5,6 +5,7 @@ import {
   currentDemoView,
   demoDepartments,
   demoSessionUser,
+  hospitalRoleNames,
   viewAsSessionUser,
   type DemoView,
 } from '../../config/demoRoles';
@@ -82,10 +83,12 @@ export default function RoleSwitcher() {
           title={L('Προβολή ως ρόλος ή τμήμα', 'View as role or department')}
           aria-label={L('Προβολή ως', 'View as')}
         >
-          <option value="ADMIN">Admin</option>
-          <option value="STERILIZATION">{L('Αποστείρωση', 'Sterilization')}</option>
-          <option value="STERILIZATION_SUPERVISOR">{L('Προϊστάμενος Αποστείρωσης', 'Sterilization supervisor')}</option>
-          <optgroup label={L('Τμήματα', 'Departments')}>
+          {(['ADMIN', 'STERILIZATION_SUPERVISOR', 'STERILIZATION'] as const).map(kind => (
+            <option key={kind} value={kind}>
+              {L(hospitalRoleNames[kind].el, hospitalRoleNames[kind].en)}
+            </option>
+          ))}
+          <optgroup label={L('Χρήστης Τμήματος', 'Department user')}>
             {demoDepartments(departments).map(d => (
               <option key={d.id} value={`DEPARTMENT:${d.id}`}>
                 {lang === 'el' ? d.el : d.en}
