@@ -205,7 +205,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               ? lang === 'el'
                 ? 'Διαχείριση πλατφόρμας'
                 : 'Platform administration'
-              : roleLabel[role][lang]}
+              : role === 'STERILIZATION' && currentUser.supervisor
+                ? lang === 'el'
+                  ? 'Προϊστάμενος Αποστείρωσης'
+                  : 'Sterilization supervisor'
+                : roleLabel[role][lang]}
         </strong>
       </div>
       <nav>

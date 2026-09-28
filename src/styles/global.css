@@ -1296,3 +1296,14 @@
   background: #17758a;
   color: #fff;
 }
+
+/* Sterilization staff: Set changes are the supervisor's. */
+.prep-supervisor-note {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--line, #d8e0e6);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}

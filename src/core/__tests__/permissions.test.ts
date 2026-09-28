@@ -9,6 +9,7 @@ import {
   roleHomePath,
   roleUnavailablePermissions,
   sanitizeRolePermissions,
+  supervisorOnlyPermissions,
   type Permission,
 } from '../permissions';
 
@@ -120,8 +121,34 @@ describe('hasPermission / permissionsForRole', () => {
   });
 
   it('falls back to the default set for a role with no override entry', () => {
-    const result = permissionsForRole('STERILIZATION', {});
+    const result = permissionsForRole('STERILIZATION', {}, true);
     expect(result).toEqual(sanitizeRolePermissions('STERILIZATION', [...defaultRolePermissions.STERILIZATION]));
+  });
+});
+
+describe('Sterilization supervisor', () => {
+  it('only the supervisor registers assets, changes Sets and sees the hospital overview', () => {
+    for (const permission of supervisorOnlyPermissions) {
+      expect(hasPermission('STERILIZATION', permission)).toBe(false);
+      expect(hasPermission('STERILIZATION', permission, undefined, true)).toBe(true);
+    }
+  });
+
+  it('keeps the everyday workflow, reports and stock for all Sterilization staff', () => {
+    for (const permission of ['sterilization.receive', 'sterilization.cycle', 'reports.view', 'stock.manage'] as const)
+      expect(hasPermission('STERILIZATION', permission)).toBe(true);
+  });
+
+  it('follows the supervisor choice even when the Studio role settings leave those permissions out', () => {
+    const overrides = {STERILIZATION: ['sterilization.workspace'] as Permission[]};
+    expect(hasPermission('STERILIZATION', 'asset.create', overrides, true)).toBe(true);
+    expect(hasPermission('STERILIZATION', 'asset.create', {STERILIZATION: [...permissionKeys]})).toBe(false);
+  });
+
+  it('never reaches Department roles or changes the Admin', () => {
+    expect(hasPermission('DEPARTMENT', 'asset.composition.manage', undefined, true)).toBe(false);
+    expect(hasPermission('ADMIN', 'asset.composition.manage')).toBe(true);
+    expect(hasPermission('ADMIN', 'overview.view')).toBe(true);
   });
 });
 

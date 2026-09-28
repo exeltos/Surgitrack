@@ -84,6 +84,7 @@ export default function RoleSwitcher() {
         >
           <option value="ADMIN">Admin</option>
           <option value="STERILIZATION">{L('Αποστείρωση', 'Sterilization')}</option>
+          <option value="STERILIZATION_SUPERVISOR">{L('Προϊστάμενος Αποστείρωσης', 'Sterilization supervisor')}</option>
           <optgroup label={L('Τμήματα', 'Departments')}>
             {demoDepartments(departments).map(d => (
               <option key={d.id} value={`DEPARTMENT:${d.id}`}>

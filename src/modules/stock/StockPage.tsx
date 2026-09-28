@@ -13,6 +13,7 @@ import {tr, trData} from '../../i18n';
 
 export default function StockPage() {
   const {tools, sets, moveTool, can} = useSurgi();
+  const canCompose = can('asset.composition.manage');
   const navigate = useNavigate();
   const stock = tools.filter(t => t.mode === 'STOCK');
   const [target, setTarget] = useState<Record<string, string>>({});
@@ -94,7 +95,7 @@ export default function StockPage() {
               <th>{tr('Ειδικότητα')}</th>
               <th>{tr('Χρήσεις')}</th>
               <th>{tr('Κατάσταση')}</th>
-              <th>{tr('Προσθήκη σε Σετ')}</th>
+              {canCompose && <th>{tr('Προσθήκη σε Σετ')}</th>}
               <th></th>
             </tr>
           </thead>
@@ -117,26 +118,31 @@ export default function StockPage() {
                 <td>
                   <StatusBadge value={t.state} />
                 </td>
-                <td>
-                  <div className="inline-action">
-                    <select value={target[t.id] || ''} onChange={e => setTarget(x => ({...x, [t.id]: e.target.value}))}>
-                      <option value="">{tr('Επιλογή Σετ...')}</option>
-                      {sets.map(s => (
-                        <option key={s.id} value={s.id}>
-                          {s.barcode} · {s.name}
-                        </option>
-                      ))}
-                    </select>
-                    <AppButton
-                      size="sm"
-                      disabled={!target[t.id]}
-                      icon={<ArrowRightLeft size={15} />}
-                      onClick={() => moveTool(t.id, 'SET', target[t.id])}
-                    >
-                      {tr('Προσθήκη')}
-                    </AppButton>
-                  </div>
-                </td>
+                {canCompose && (
+                  <td>
+                    <div className="inline-action">
+                      <select
+                        value={target[t.id] || ''}
+                        onChange={e => setTarget(x => ({...x, [t.id]: e.target.value}))}
+                      >
+                        <option value="">{tr('Επιλογή Σετ...')}</option>
+                        {sets.map(s => (
+                          <option key={s.id} value={s.id}>
+                            {s.barcode} · {s.name}
+                          </option>
+                        ))}
+                      </select>
+                      <AppButton
+                        size="sm"
+                        disabled={!target[t.id]}
+                        icon={<ArrowRightLeft size={15} />}
+                        onClick={() => moveTool(t.id, 'SET', target[t.id])}
+                      >
+                        {tr('Προσθήκη')}
+                      </AppButton>
+                    </div>
+                  </td>
+                )}
                 <td>
                   <Link className="icon-link" to={`/tools/${t.id}`}>
                     <ChevronRight size={17} />

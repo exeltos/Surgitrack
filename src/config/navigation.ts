@@ -38,7 +38,13 @@ const assetNavigation: NavigationItem[] = [
 
 export const navigationFor = (role: UserRole, can?: (permission: Permission) => boolean): NavigationItem[] => {
   const allowed = (permission: Permission) => (can ? can(permission) : hasPermission(role, permission));
-  if (role === 'STERILIZATION') return assetNavigation.filter(item => allowed(item.permission));
+  const overview: NavigationItem = {
+    to: '/overview',
+    label: 'Επισκόπηση',
+    icon: LayoutDashboard,
+    permission: 'overview.view',
+  };
+  if (role === 'STERILIZATION') return [overview, ...assetNavigation].filter(item => allowed(item.permission));
   if (role === 'DEPARTMENT') {
     const departmentNavigation: NavigationItem[] = [
       {to: '/department', label: 'Σετ & Εργαλεία', icon: PackageSearch, permission: 'department.workspace'},
@@ -48,7 +54,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     return departmentNavigation.filter(item => allowed(item.permission));
   }
   const adminNavigation: NavigationItem[] = [
-    {to: '/overview', label: 'Επισκόπηση', icon: LayoutDashboard, permission: 'reports.view'},
+    overview,
     ...assetNavigation,
     {to: '/hospital', label: 'Διαχείριση νοσοκομείου', icon: Building2, permission: 'studio.manage'},
     {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage'},
