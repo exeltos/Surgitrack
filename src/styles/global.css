@@ -1352,6 +1352,16 @@
   font-size: 13.5px;
   line-height: 1.5;
 }
+/* Narrow screens: each role becomes a stacked card instead of four columns. */
+@media (max-width: 900px) {
+  .roles-guide-head {
+    display: none;
+  }
+  .roles-guide-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
 .platform-demo-as {
   font-size: 12px;
   color: var(--muted);
