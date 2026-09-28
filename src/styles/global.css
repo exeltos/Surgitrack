@@ -1768,6 +1768,11 @@
   color: var(--muted);
   font-size: 12px;
 }
+.asset-ownership-field dd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .asset-marker-field dd {
   display: flex;
   align-items: center;

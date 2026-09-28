@@ -2,13 +2,16 @@ import {useLibraries} from '../../core/LibraryStore';
 import {useEffect, useState} from 'react';
 import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
-import type {AssetKind, AssetState, SetAsset, Tool} from '../../types/domain';
+import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
 import AssetTypeIcon from './AssetTypeIcon';
 import {tr, trData} from '../../i18n';
 
 type EditablePatch = Partial<
-  Pick<SetAsset, 'name' | 'code' | 'department' | 'specialty' | 'manufacturer' | 'state' | 'maxUses'>
+  Pick<
+    SetAsset,
+    'name' | 'code' | 'department' | 'specialty' | 'manufacturer' | 'state' | 'maxUses' | 'ownership' | 'ownerName'
+  >
 > & {serialNumber?: string};
 type Props = {
   kind: AssetKind;
@@ -39,6 +42,17 @@ const states: Array<{value: AssetState; label: string}> = [
   {value: 'SERVICE', label: 'Service'},
   {value: 'LOST', label: 'Απωλεσθέν'},
 ];
+const ownerships: Array<{value: Ownership; label: string}> = [
+  {value: 'HOSPITAL', label: 'Νοσοκομείο'},
+  {value: 'DOCTOR', label: 'Ιατρός'},
+  {value: 'OTHER', label: 'Άλλο'},
+];
+/** "Ιατρός · ΠΑΠΑΔΟΠΟΥΛΟΣ", "Νοσοκομείο", or '—' when not recorded. */
+const ownershipLabel = (asset: {ownership?: Ownership; ownerName?: string}) => {
+  const kind = ownerships.find(o => o.value === asset.ownership);
+  if (!kind) return asset.ownerName || '—';
+  return asset.ownerName && kind.value !== 'HOSPITAL' ? `${tr(kind.label)} · ${asset.ownerName}` : tr(kind.label);
+};
 export default function AssetWorkbenchSidebar({
   kind,
   asset,
@@ -68,6 +82,8 @@ export default function AssetWorkbenchSidebar({
     serialNumber: tool?.serialNumber || '',
     usageType: asset.maxUses !== undefined ? 'LIMITED' : 'UNLIMITED',
     maxUses: asset.maxUses?.toString() || '',
+    ownership: (asset.ownership || '') as Ownership | '',
+    ownerName: asset.ownerName || '',
   });
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(makeDraft);
@@ -83,6 +99,8 @@ export default function AssetWorkbenchSidebar({
     asset.state,
     tool?.serialNumber,
     asset.maxUses,
+    asset.ownership,
+    asset.ownerName,
     editing,
   ]);
   const textField = (key: keyof typeof draft, value: string) => (
@@ -102,6 +120,8 @@ export default function AssetWorkbenchSidebar({
       manufacturer: draft.manufacturer.trim(),
       state: draft.state,
       maxUses,
+      ownership: draft.ownership || undefined,
+      ownerName: ((draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && draft.ownerName.trim()) || undefined,
       ...(kind === 'TOOL' ? {serialNumber: draft.serialNumber.trim() || undefined} : {}),
     });
     setEditing(false);
@@ -220,6 +240,37 @@ export default function AssetWorkbenchSidebar({
             {editing
               ? textField('manufacturer', draft.manufacturer)
               : (asset as Tool).manufacturer || (asset as SetAsset).manufacturer || '—'}
+          </dd>
+        </div>
+        <div className="asset-ownership-field">
+          <dt>{tr('Ιδιοκτησία')}</dt>
+          <dd>
+            {editing ? (
+              <>
+                <select
+                  className="asset-inline-input"
+                  value={draft.ownership}
+                  onChange={e => setDraft(c => ({...c, ownership: e.target.value as Ownership | ''}))}
+                >
+                  <option value="">—</option>
+                  {ownerships.map(o => (
+                    <option key={o.value} value={o.value}>
+                      {tr(o.label)}
+                    </option>
+                  ))}
+                </select>
+                {(draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && (
+                  <input
+                    className="asset-inline-input"
+                    value={draft.ownerName}
+                    placeholder={draft.ownership === 'DOCTOR' ? tr('Όνομα ιατρού') : tr('Σε ποιον ανήκει')}
+                    onChange={e => setDraft(c => ({...c, ownerName: e.target.value}))}
+                  />
+                )}
+              </>
+            ) : (
+              ownershipLabel(asset)
+            )}
           </dd>
         </div>
         <div className="asset-marker-field">

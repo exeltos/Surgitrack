@@ -32,7 +32,7 @@ export default function ToolsPage() {
       (!manufacturer || t.manufacturer === manufacturer) &&
       (!state || t.state === state) &&
       (!mode || t.mode === mode) &&
-      `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''}`
+      `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''} ${t.ownerName || ''}`
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
