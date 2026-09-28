@@ -48,6 +48,7 @@ import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
 import SignupLinkCard from '../hospital/SignupLinkCard';
+import {switchHospital} from '../../data/cloud/hospitalSwitch';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
 import {departments as defaultDepartments} from '../../core/libraries';
@@ -153,13 +154,7 @@ export default function StudioPage() {
     void countPendingAccessRequests(selectedOrganizationId).then(setPendingRequests);
   }, [libs.dataMode, selectedOrganizationId]);
   // Approvals happen in the hospital's own workspace, which loads that hospital's data.
-  const openHospitalAdministration = (organizationId: string) => {
-    sessionStorage.setItem('surgitrack-active-organization', organizationId);
-    sessionStorage.removeItem('surgitrack-session-user');
-    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
-    window.location.hash = '#/hospital';
-    window.location.reload();
-  };
+  const openHospitalAdministration = (organizationId: string) => switchHospital(organizationId, '#/hospital');
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
@@ -474,7 +469,8 @@ export default function StudioPage() {
     sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
     setRuntimeDataMode('DEMO');
     setRole(role);
-    window.location.hash = `#${roleHomePath(role)}`;
+    // An admin opens the Demo hospital on its overview, like a real hospital admin.
+    window.location.hash = `#${role === 'ADMIN' ? '/overview' : roleHomePath(role)}`;
     window.location.reload();
   };
   const enterBuiltInDemo = (role: UserRole) => void enterDemo(role);

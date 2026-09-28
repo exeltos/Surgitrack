@@ -12,6 +12,7 @@ import {useAppPreferences} from '../../core/AppPreferences';
 import {useLibraries} from '../../core/LibraryStore';
 import {canViewAs, getRealIdentity, sessionUserFor} from '../../data/cloud/identity';
 import {supabase} from '../../lib/supabase';
+import {switchHospital} from '../../data/cloud/hospitalSwitch';
 import {useSurgi} from '../../store/SurgiStore';
 
 const ACTIVE_ORGANIZATION_KEY = 'surgitrack-active-organization';
@@ -53,14 +54,7 @@ export default function RoleSwitcher() {
   };
 
   // A different hospital means different data: reload so its records are loaded.
-  const changeHospital = (id: string) => {
-    if (id) sessionStorage.setItem(ACTIVE_ORGANIZATION_KEY, id);
-    else sessionStorage.removeItem(ACTIVE_ORGANIZATION_KEY);
-    sessionStorage.removeItem('surgitrack-session-user');
-    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
-    window.location.hash = id ? '#/' : '#/studio';
-    window.location.reload();
-  };
+  const changeHospital = (id: string) => switchHospital(id, id ? '#/' : '#/studio');
 
   if (!pickHospital && !pickRole) return null;
   const L = (el: string, en: string) => (lang === 'el' ? el : en);

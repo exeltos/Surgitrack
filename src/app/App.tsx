@@ -10,6 +10,7 @@ import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {supabase} from '../lib/supabase';
+import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import {
   type AccessRequest,
   canViewAs,
@@ -36,6 +37,8 @@ const TraceabilityPage = lazy(() => import('../modules/traceability/Traceability
 const ReportsPage = lazy(() => import('../modules/reports/ReportsPage'));
 const StudioPage = lazy(() => import('../modules/studio/StudioPage'));
 const HospitalAdminPage = lazy(() => import('../modules/hospital/HospitalAdminPage'));
+const HospitalsPage = lazy(() => import('../modules/hospital/HospitalsPage'));
+const HospitalOverviewPage = lazy(() => import('../modules/hospital/HospitalOverviewPage'));
 const JoinPage = lazy(() => import('../modules/auth/JoinPage'));
 
 const readDemoSessionUser = (): SessionUser | undefined => {
@@ -49,7 +52,8 @@ const readDemoSessionUser = (): SessionUser | undefined => {
 
 function RoleHome() {
   const {role} = useSurgi();
-  return <Navigate to={roleHomePath(role)} replace />;
+  const home = role === 'ADMIN' && hospitalOverviewAvailable() ? '/overview' : roleHomePath(role);
+  return <Navigate to={home} replace />;
 }
 const Guard = ({permission, children}: {permission: Permission; children: ReactNode}) => (
   <ProtectedRoute permission={permission}>
@@ -327,6 +331,22 @@ export default function App() {
           element={
             <Guard permission="studio.manage">
               <StudioPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/overview"
+          element={
+            <Guard permission="reports.view">
+              <HospitalOverviewPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/hospitals"
+          element={
+            <Guard permission="studio.manage">
+              <HospitalsPage />
             </Guard>
           }
         />

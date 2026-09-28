@@ -9,6 +9,8 @@ import {
   History,
   PackageSearch,
   Building2,
+  Hospital,
+  LayoutDashboard,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -46,8 +48,10 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     return departmentNavigation.filter(item => allowed(item.permission));
   }
   const adminNavigation: NavigationItem[] = [
+    {to: '/overview', label: 'Επισκόπηση', icon: LayoutDashboard, permission: 'reports.view'},
     ...assetNavigation,
     {to: '/hospital', label: 'Διαχείριση νοσοκομείου', icon: Building2, permission: 'studio.manage'},
+    {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage'},
     {to: '/studio', label: 'SurgiTrack Studio', icon: Settings, permission: 'studio.manage'},
   ];
   return adminNavigation.filter(item => allowed(item.permission));
