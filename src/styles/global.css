@@ -999,8 +999,24 @@
 .overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  grid-template-areas:
+    'departments departments'
+    'movements pipeline'
+    'movements issues';
   gap: 16px;
   align-items: start;
+}
+.overview-departments {
+  grid-area: departments;
+}
+.overview-pipeline {
+  grid-area: pipeline;
+}
+.overview-movements {
+  grid-area: movements;
+}
+.overview-issues {
+  grid-area: issues;
 }
 .hospital-card > header > a {
   color: #0e6d82;
@@ -1028,9 +1044,8 @@
 }
 .overview-row.head {
   color: #7b8794;
-  font-size: 10px;
-  letter-spacing: 0.02em;
-  overflow-wrap: anywhere;
+  font-size: 11px;
+  white-space: nowrap;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -1129,6 +1144,7 @@
 @media (max-width: 900px) {
   .overview-grid {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'departments' 'pipeline' 'movements' 'issues';
   }
   .overview-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1153,4 +1169,130 @@
   .hospitals-row:not(.editing) {
     min-width: 900px;
   }
+}
+.hospital-whole {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px dashed #d9e1e8;
+  border-radius: 8px;
+  color: #667782;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Filters behind one button: search on the left, "Filters" opens a panel with the choices. */
+.asset-filter-bar {
+  display: flex;
+  overflow: visible;
+}
+.asset-filter-bar > .asset-filter-search {
+  flex: 1 1 auto;
+}
+.asset-filter-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+.asset-filter-toggle {
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid #d7e4e8;
+  border-radius: 9px;
+  background: #fff;
+  color: #3f5c69;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.asset-filter-toggle:hover,
+.asset-filter-toggle.open {
+  border-color: #8ebdc8;
+  color: #175d70;
+}
+.asset-filter-toggle.has-active {
+  border-color: #17758a;
+  background: #eef8fa;
+  color: #0e6d82;
+}
+.asset-filter-toggle em {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #17758a;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  line-height: 18px;
+  text-align: center;
+}
+.asset-filter-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: 300px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #dbe7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(16, 45, 60, 0.16);
+}
+.asset-filter-panel select {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d7e4e8;
+  border-radius: 9px;
+  background: #fff;
+  color: #3f5c69;
+  font-size: 12.5px;
+  font-weight: 650;
+  outline: none;
+}
+.asset-filter-panel select.selected {
+  border-color: #17758a;
+  background: #eef8fa;
+  color: #0e6d82;
+}
+.asset-filter-panel footer {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 4px 0 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.asset-filter-panel footer button {
+  width: 100%;
+  white-space: nowrap;
+}
+.asset-filter-panel footer button {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #d7e4e8;
+  border-radius: 8px;
+  background: #fff;
+  color: #3f5c69;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.asset-filter-panel footer button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.asset-filter-panel footer button.primary {
+  border-color: #17758a;
+  background: #17758a;
+  color: #fff;
 }

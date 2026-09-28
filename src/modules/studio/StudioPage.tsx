@@ -2080,20 +2080,29 @@ function UserEditor({
               <option value="ADMIN">Διαχειριστής</option>
             </select>
           </label>
-          <label>
-            Τμήμα
-            <select value={department} onChange={e => setDepartment(e.target.value)}>
-              {cloudDepartments.length
-                ? cloudDepartments
-                    .filter(d => d.organizationId === organizationId)
-                    .map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
-                      </option>
-                    ))
-                : departments.map(d => <option key={d}>{d}</option>)}
-            </select>
-          </label>
+          {role === 'ADMIN' ? (
+            <div className="studio-form-note">
+              <ShieldCheck size={16} />
+              <span>
+                Ο Διαχειριστής δεν ανήκει σε τμήμα: διαχειρίζεται όλο το νοσοκομείο και δημιουργεί τους χρήστες του.
+              </span>
+            </div>
+          ) : (
+            <label>
+              Τμήμα
+              <select value={department} onChange={e => setDepartment(e.target.value)}>
+                {cloudDepartments.length
+                  ? cloudDepartments
+                      .filter(d => d.organizationId === organizationId)
+                      .map(d => (
+                        <option key={d.id} value={d.id}>
+                          {d.name}
+                        </option>
+                      ))
+                  : departments.map(d => <option key={d}>{d}</option>)}
+              </select>
+            </label>
+          )}
           <label className="studio-switch-row">
             <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
             <span>Ενεργή πρόσβαση</span>
@@ -2110,8 +2119,8 @@ function UserEditor({
           <div className="studio-form-note">
             <KeyRound size={16} />
             <span>
-              Το SurgiTrack Studio δεν αποθηκεύει κωδικό πρόσβασης. Η ταυτότητα / reset password θα συνδεθεί με το
-              authentication backend.
+              Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα
+              αρχικά του.
             </span>
           </div>
         </div>
@@ -2124,7 +2133,7 @@ function UserEditor({
               onSave({
                 name: name.trim(),
                 email: email.trim(),
-                department,
+                department: role === 'ADMIN' ? '' : department,
                 role,
                 active,
                 organizationId,
