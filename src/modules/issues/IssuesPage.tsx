@@ -1,19 +1,19 @@
-import {useState} from 'react';
 import {Images} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
 import {tr, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
 
 export default function IssuesPage() {
   const {issues, role, currentUser} = useSurgi();
   const scopedIssues =
     role === 'DEPARTMENT' ? issues.filter(issue => issue.department === currentUser.department) : issues;
-  const [q, setQ] = useState('');
-  const [department, setDepartment] = useState('');
-  const [type, setType] = useState('');
-  const [status, setStatus] = useState('');
+  const [q, setQ] = useRememberedState('q', '');
+  const [department, setDepartment] = useRememberedState('department', '');
+  const [type, setType] = useRememberedState('type', '');
+  const [status, setStatus] = useRememberedState('status', '');
   const values = (key: 'department' | 'type' | 'status') =>
     [...new Set(scopedIssues.map(i => i[key]).filter(Boolean))].sort();
   const filtered = scopedIssues.filter(

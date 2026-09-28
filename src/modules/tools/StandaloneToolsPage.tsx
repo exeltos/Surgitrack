@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronRight, Layers3, List, Plus} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -11,17 +11,18 @@ import PageHeader from '../../components/ui/PageHeader';
 import IconToggleButton from '../../components/ui/IconToggleButton';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
 
 export default function StandaloneToolsPage() {
   const {tools, can} = useSurgi();
   const navigate = useNavigate();
   const standalone = tools.filter(t => t.mode === 'STANDALONE');
-  const [q, setQ] = useState('');
-  const [grouped, setGrouped] = useState(false);
-  const [department, setDepartment] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
-  const [state, setState] = useState('');
+  const [q, setQ] = useRememberedState('q', '');
+  const [grouped, setGrouped] = useRememberedState('grouped', false);
+  const [department, setDepartment] = useRememberedState('department', '');
+  const [specialty, setSpecialty] = useRememberedState('specialty', '');
+  const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
+  const [state, setState] = useRememberedState('state', '');
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(standalone.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const filtered = standalone.filter(

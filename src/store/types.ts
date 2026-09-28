@@ -248,7 +248,12 @@ export type SurgiStoreValue = {
   completeDeliveryToDepartment: (kind: AssetKind, id: string, payload: DeliveryPayload) => DeliveryRecord | undefined;
   configureUsageLimit: (kind: AssetKind, id: string, maxUses?: number) => void;
   recordCount: (payload: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => void;
-  moveTool: (toolId: string, destination: 'STOCK' | 'SET' | 'SERVICE' | 'REMOVE', setId?: string) => void;
+  moveTool: (
+    toolId: string,
+    destination: 'STOCK' | 'SET' | 'SERVICE' | 'REMOVE',
+    setId?: string,
+    note?: string,
+  ) => void;
   replaceToolInSet: (
     setId: string,
     outgoingToolId: string,
@@ -277,6 +282,9 @@ export type SurgiStoreValue = {
     source?: string,
   ) => void;
   retireAsset: (kind: AssetKind, id: string) => void;
+  markLost: (kind: AssetKind, id: string, note?: string) => void;
+  returnToService: (kind: AssetKind, id: string, note?: string) => void;
+  sendSetToService: (id: string, note?: string) => void;
   updateSet: (id: string, patch: SetUpdatePatch) => void;
   updateTool: (id: string, patch: ToolUpdatePatch) => void;
   addToolsToSet: (setId: string, toolIds: string[]) => void;

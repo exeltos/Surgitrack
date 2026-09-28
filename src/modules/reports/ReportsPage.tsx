@@ -3,6 +3,7 @@ import {
   Activity,
   AlertTriangle,
   Boxes,
+  FileSpreadsheet,
   FileText,
   History,
   Printer,
@@ -13,6 +14,8 @@ import {
 } from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
+import {downloadXlsx} from '../../core/exportTable';
 import {useSurgi} from '../../store/SurgiStore';
 import {compositionHtml} from '../sterilization/printUtils';
 import {getI18nLang, tr, trData} from '../../i18n';
@@ -308,6 +311,98 @@ export default function ReportsPage() {
     };
   };
   const openPreview = () => setPreview(buildPreview());
+  // Filters of the chosen report, in one "Filters" button; "ALL" is the empty choice.
+  const choice = (value: string, set: (value: string) => void) => ({
+    value: value === 'ALL' ? '' : value,
+    onChange: (next: string) => set(next || 'ALL'),
+  });
+  const byDepartment = active === 'department' || active === 'specialty';
+  const reportFilters: SelectFilter[] = [
+    ...(byDepartment || active === 'issues' || active === 'usage'
+      ? [
+          {
+            key: 'department',
+            placeholder: tr('Όλα τα τμήματα'),
+            options: departments.map(x => ({value: x, label: x})),
+            ...choice(department, setDepartment),
+          },
+        ]
+      : []),
+    ...(byDepartment
+      ? [
+          {
+            key: 'specialty',
+            placeholder: tr('Όλες οι ειδικότητες'),
+            options: specialties.map(x => ({value: x, label: x})),
+            ...choice(specialty, setSpecialty),
+          },
+        ]
+      : []),
+    ...(byDepartment || active === 'usage'
+      ? [
+          {
+            key: 'kind',
+            placeholder: tr('Σετ & εργαλεία'),
+            options: [
+              {value: 'SET', label: tr('Μόνο Σετ')},
+              {value: 'TOOL', label: tr('Μόνο εργαλεία')},
+            ],
+            ...choice(assetKind, setAssetKind),
+          },
+        ]
+      : []),
+    ...(byDepartment
+      ? [
+          {
+            key: 'status',
+            placeholder: tr('Όλες οι καταστάσεις'),
+            options: Object.entries(stateLabel).map(([k, v]) => ({value: k, label: tr(v)})),
+            ...choice(status, setStatus),
+          },
+        ]
+      : []),
+    ...(active === 'issues'
+      ? [
+          {
+            key: 'issueType',
+            placeholder: tr('Όλοι οι τύποι'),
+            options: issueTypes.map(x => ({value: x, label: x})),
+            ...choice(issueType, setIssueType),
+          },
+          {
+            key: 'issueStatus',
+            placeholder: tr('Όλες οι καταστάσεις'),
+            options: [
+              {value: 'OPEN', label: tr('Ανοιχτές')},
+              {value: 'RESOLVED', label: tr('Ολοκληρωμένες')},
+            ],
+            ...choice(status, setStatus),
+          },
+        ]
+      : []),
+    ...(active === 'usage'
+      ? [
+          {
+            key: 'usage',
+            placeholder: tr('Όλα τα όρια'),
+            options: [
+              {value: 'CRITICAL', label: tr('Κρίσιμο · ≤ 3')},
+              {value: 'EXHAUSTED', label: tr('Εξαντλημένα · 0')},
+            ],
+            ...choice(usageFilter, setUsageFilter),
+          },
+        ]
+      : []),
+  ];
+  const exportExcel = () => {
+    const {title} = buildPreview();
+    downloadXlsx({
+      title,
+      subtitle: `${reportData.rows.length} ${tr('εγγραφές')}`,
+      headers: reportData.columns.map(c => c.label),
+      rows: reportData.rows.map(row => reportData.columns.map(c => cellText(c.key, row[c.key]))),
+    });
+  };
 
   return (
     <div className="reports-page-workspace">
@@ -355,8 +450,8 @@ export default function ReportsPage() {
               <p>{tr(activeMeta.description)}</p>
             </div>
             <div className="reports-stage-actions">
-              <AppButton icon={<FileText size={16} />} onClick={openPreview}>
-                {tr('Προεπισκόπηση')}
+              <AppButton icon={<FileSpreadsheet size={16} />} onClick={exportExcel}>
+                {tr('Εξαγωγή Excel')}
               </AppButton>
               <AppButton variant="primary" icon={<Printer size={16} />} onClick={openPreview}>
                 {tr('Εκτύπωση / PDF')}
@@ -376,82 +471,7 @@ export default function ReportsPage() {
                 </select>
               </label>
             )}
-            {(active === 'department' || active === 'specialty' || active === 'issues' || active === 'usage') && (
-              <label>
-                <span>{tr('Τμήμα')}</span>
-                <select value={department} onChange={e => setDepartment(e.target.value)}>
-                  <option value="ALL">{tr('Όλα τα τμήματα')}</option>
-                  {departments.map(x => (
-                    <option key={x}>{x}</option>
-                  ))}
-                </select>
-              </label>
-            )}
-            {(active === 'department' || active === 'specialty') && (
-              <label>
-                <span>{tr('Ειδικότητα')}</span>
-                <select value={specialty} onChange={e => setSpecialty(e.target.value)}>
-                  <option value="ALL">{tr('Όλες οι ειδικότητες')}</option>
-                  {specialties.map(x => (
-                    <option key={x}>{x}</option>
-                  ))}
-                </select>
-              </label>
-            )}
-            {(active === 'department' || active === 'specialty' || active === 'usage') && (
-              <label>
-                <span>{tr('Τύπος')}</span>
-                <select value={assetKind} onChange={e => setAssetKind(e.target.value)}>
-                  <option value="ALL">{tr('Σετ & εργαλεία')}</option>
-                  <option value="SET">{tr('Μόνο Σετ')}</option>
-                  <option value="TOOL">{tr('Μόνο εργαλεία')}</option>
-                </select>
-              </label>
-            )}
-            {(active === 'department' || active === 'specialty') && (
-              <label>
-                <span>{tr('Κατάσταση')}</span>
-                <select value={status} onChange={e => setStatus(e.target.value)}>
-                  <option value="ALL">{tr('Όλες οι καταστάσεις')}</option>
-                  {Object.entries(stateLabel).map(([k, v]) => (
-                    <option value={k} key={k}>
-                      {tr(v)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-            {active === 'issues' && (
-              <>
-                <label>
-                  <span>{tr('Τύπος συμβάντος')}</span>
-                  <select value={issueType} onChange={e => setIssueType(e.target.value)}>
-                    <option value="ALL">{tr('Όλοι οι τύποι')}</option>
-                    {issueTypes.map(x => (
-                      <option key={x}>{x}</option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span>{tr('Κατάσταση')}</span>
-                  <select value={status} onChange={e => setStatus(e.target.value)}>
-                    <option value="ALL">{tr('Όλες')}</option>
-                    <option value="OPEN">{tr('Ανοιχτές')}</option>
-                    <option value="RESOLVED">{tr('Ολοκληρωμένες')}</option>
-                  </select>
-                </label>
-              </>
-            )}
-            {active === 'usage' && (
-              <label>
-                <span>{tr('Υπόλοιπο')}</span>
-                <select value={usageFilter} onChange={e => setUsageFilter(e.target.value)}>
-                  <option value="ALL">{tr('Όλα τα όρια')}</option>
-                  <option value="CRITICAL">{tr('Κρίσιμο · ≤ 3')}</option>
-                  <option value="EXHAUSTED">{tr('Εξαντλημένα · 0')}</option>
-                </select>
-              </label>
-            )}
+            <FilterMenu filters={reportFilters} />
             {active === 'traceability' && (
               <label className="reports-filter-search">
                 <span>{tr('Κωδικός ασθενούς')}</span>

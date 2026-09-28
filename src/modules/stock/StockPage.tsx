@@ -10,6 +10,7 @@ import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
 
 export default function StockPage() {
   const {tools, sets, moveTool, can} = useSurgi();
@@ -17,10 +18,10 @@ export default function StockPage() {
   const navigate = useNavigate();
   const stock = tools.filter(t => t.mode === 'STOCK');
   const [target, setTarget] = useState<Record<string, string>>({});
-  const [q, setQ] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
-  const [state, setState] = useState('');
+  const [q, setQ] = useRememberedState('q', '');
+  const [specialty, setSpecialty] = useRememberedState('specialty', '');
+  const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
+  const [state, setState] = useRememberedState('state', '');
   const values = (key: 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(stock.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const filtered = stock.filter(

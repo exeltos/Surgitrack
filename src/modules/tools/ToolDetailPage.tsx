@@ -1,6 +1,19 @@
 import {useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import {ArrowLeft, Camera, Copy, Flag, History, Layers3, Printer, Send, Trash2, TriangleAlert, X} from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRightLeft,
+  Camera,
+  Copy,
+  Flag,
+  History,
+  Layers3,
+  Printer,
+  Send,
+  Trash2,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import type {AssetPhoto} from '../../types/domain';
 import StatusBadge from '../../components/ui/StatusBadge';
@@ -15,7 +28,10 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
-import {tr, trData} from '../../i18n';
+import {tr, trc, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
+import BackLink from '../../components/ui/BackLink';
+import AssetManageModal from '../../components/assets/AssetManageModal';
 
 export default function ToolDetailPage() {
   const {
@@ -36,10 +52,11 @@ export default function ToolDetailPage() {
   const navigate = useNavigate();
   const {id} = useParams();
   const tool = tools.find(item => item.id === id);
-  const [tab, setTab] = useState<AssetTab>('HISTORY');
+  const [tab, setTab] = useRememberedState<AssetTab>('tab', 'HISTORY');
   const [photosOpen, setPhotosOpen] = useState(false);
   const [preview, setPreview] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteBlockedOpen, setDeleteBlockedOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -94,9 +111,23 @@ export default function ToolDetailPage() {
               {tr('Εκτύπωση Barcode')}
             </AppButton>
           )}
+          {can('asset.composition.manage') && (
+            <AppButton
+              icon={<ArrowRightLeft size={18} />}
+              disabled={workflowLocked}
+              title={
+                workflowLocked
+                  ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
+                  : undefined
+              }
+              onClick={() => setManageOpen(true)}
+            >
+              {trc('action', 'Διαχείριση')}
+            </AppButton>
+          )}
           {can('asset.duplicate') && (
             <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
-              Duplicate
+              {tr('Αντίγραφο')}
             </AppButton>
           )}
           {can('asset.delete') && (
@@ -125,9 +156,9 @@ export default function ToolDetailPage() {
           )}
         </div>
         <div className="asset-action-group">
-          <Link to={backTo} className="asset-action-link">
+          <BackLink fallback={backTo} className="asset-action-link">
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
-          </Link>
+          </BackLink>
         </div>
       </div>
       <div className="asset-workbench-grid">
@@ -326,7 +357,7 @@ export default function ToolDetailPage() {
       )}
       {can('asset.duplicate') && duplicateOpen && (
         <ConfirmDialog
-          title={tr('Επιβεβαίωση Duplicate εργαλείου')}
+          title={tr('Επιβεβαίωση αντιγράφου εργαλείου')}
           message={tr(
             'Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Stock. Θέλεις να συνεχίσεις;',
           )}
@@ -446,6 +477,7 @@ export default function ToolDetailPage() {
           </div>
         </div>
       )}
+      {manageOpen && <AssetManageModal kind="TOOL" asset={tool} onClose={() => setManageOpen(false)} />}
     </div>
   );
 }

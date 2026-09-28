@@ -1390,3 +1390,305 @@
   flex-shrink: 0;
   color: var(--primary, #1d6b7a);
 }
+
+/* The record last opened from a list, marked when coming back to it. */
+.row-last-visited,
+.row-last-visited > td {
+  background: #fff4d6 !important;
+}
+.row-last-visited {
+  box-shadow: inset 4px 0 0 #e0a100;
+}
+
+/* Date filters inside the Filters panel. */
+.asset-filter-date {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.asset-filter-date input {
+  min-height: 36px;
+  border: 1px solid var(--line, #d8e0e6);
+  border-radius: 9px;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--text, #1c2b33);
+}
+.asset-filter-date.selected input {
+  border-color: #1d6b7a;
+}
+.movement-filter-bar {
+  margin-bottom: 14px;
+}
+/* In the Reports filter strip the Filters button sits on the left: open its panel to the right. */
+.reports-filter-strip .asset-filter-panel {
+  left: 0;
+  right: auto;
+}
+
+/* Tool / Set card: when editing makes the fields taller than the screen, the card scrolls
+   instead of squeezing the barcode, uses and photo tiles out of sight. */
+.asset-workbench-sidebar {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+.asset-workbench-sidebar > * {
+  flex-shrink: 0 !important;
+}
+/* The photo count sits in the corner, clear of the "Photo" label. */
+.asset-tool-photo-card {
+  position: relative;
+}
+.asset-tool-photo-card .asset-cover-count {
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: scale(0.85);
+  transform-origin: top right;
+}
+.asset-tool-photo-empty strong {
+  white-space: nowrap;
+}
+/* Short screens: the menu scrolls inside the sidebar, so every item stays reachable. */
+.sidebar nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.sidebar > *:not(nav) {
+  flex-shrink: 0;
+}
+
+/* Overview on a desktop screen: the page stays put, each card scrolls its own list. */
+@media (min-width: 1101px) and (min-height: 700px) {
+  .hospital-overview {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .hospital-overview > * {
+    flex-shrink: 0;
+  }
+  .hospital-overview > .overview-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas:
+      'pipeline pipeline'
+      'departments movements'
+      'departments issues';
+    align-items: stretch;
+  }
+  .overview-grid > .hospital-card {
+    min-height: 0;
+    align-content: start;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  /* Narrower cards: labels wrap between words, lines stack instead of being cut. */
+  .overview-grid .overview-row {
+    gap: 6px;
+    padding: 7px 8px;
+  }
+  .overview-grid .overview-row {
+    grid-template-columns: minmax(0, 1.3fr) repeat(5, minmax(0, 0.85fr));
+  }
+  .overview-grid .overview-row.head {
+    white-space: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 11px;
+    line-height: 1.2;
+    align-items: end;
+  }
+  .overview-grid .overview-line {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+  .overview-grid .overview-line b {
+    white-space: normal;
+    overflow: visible;
+  }
+  /* The sterilization flow becomes one line of stages with their counts. */
+  .overview-grid > .overview-pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    overflow: visible;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  .overview-grid > .overview-pipeline > header {
+    position: static;
+    margin: 0 8px 0 0;
+    padding: 0;
+    border: 0;
+  }
+  .overview-grid > .overview-pipeline > header small,
+  .overview-grid > .overview-pipeline > header svg {
+    display: none;
+  }
+  .overview-grid .overview-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .overview-grid .overview-bar > :nth-child(2) {
+    display: none;
+  }
+  .overview-grid > .hospital-card > header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: inherit;
+  }
+}
+
+/* Management of an instrument or Set (admin / sterilization supervisor). */
+.asset-manage-modal {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 40, 55, 0.25);
+  overflow: hidden;
+}
+.asset-manage-modal > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.asset-manage-modal h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+.asset-manage-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.asset-manage-choices button {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 11px 12px;
+  border: 1px solid #d8e3e8;
+  border-radius: 12px;
+  background: #fff;
+  color: #1d4f5f;
+  cursor: pointer;
+}
+.asset-manage-choices button span {
+  display: grid;
+  gap: 3px;
+}
+.asset-manage-choices button b {
+  color: #1c2b33;
+  font-size: 13.5px;
+}
+.asset-manage-choices button small {
+  color: #6b7c86;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.asset-manage-choices button.active {
+  border-color: #1d6b7a;
+  background: #eef7f9;
+  box-shadow: inset 0 0 0 1px #1d6b7a;
+}
+.asset-manage-choices button.danger {
+  color: #b42318;
+}
+.asset-manage-choices button.danger.active {
+  border-color: #b42318;
+  background: #fff4f2;
+  box-shadow: inset 0 0 0 1px #b42318;
+}
+.asset-manage-target {
+  display: grid;
+  gap: 8px;
+  min-height: 0;
+}
+.asset-manage-target label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  min-height: 40px;
+  border: 1px solid #d8e3e8;
+  border-radius: 10px;
+  color: #6b7c86;
+}
+.asset-manage-target input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  font: inherit;
+}
+.asset-manage-sets {
+  display: grid;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.asset-manage-sets button {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: #f7fafb;
+  cursor: pointer;
+  font-size: 13px;
+}
+.asset-manage-sets button small {
+  color: #6b7c86;
+}
+.asset-manage-sets button.active {
+  border-color: #1d6b7a;
+  background: #eef7f9;
+}
+.asset-manage-note {
+  display: grid;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #51626c;
+}
+.asset-manage-note textarea {
+  border: 1px solid #d8e3e8;
+  border-radius: 10px;
+  padding: 9px 11px;
+  font: inherit;
+  resize: vertical;
+}
+.asset-manage-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.asset-manage-follows {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff7e6;
+  color: #7a4b00;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.asset-manage-choices[hidden] {
+  display: none;
+}

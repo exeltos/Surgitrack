@@ -5,6 +5,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
 import {tr, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
 
 type Category = 'SETS' | 'TOOLS';
 type StatusFilter = 'ALL' | 'IN_DEPARTMENT' | 'STERILIZATION' | 'READY';
@@ -30,8 +31,8 @@ export default function DepartmentPage() {
     typeof window !== 'undefined' ? sessionStorage.getItem('surgitrack.department.lastAsset') : null;
   const initialCategory: Category = lastOpenedKey?.startsWith('TOOL:') ? 'TOOLS' : 'SETS';
   const [category, setCategory] = useState<Category>(initialCategory);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
-  const [query, setQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useRememberedState<StatusFilter>('statusFilter', 'ALL');
+  const [query, setQuery] = useRememberedState('query', '');
   const [lastOpened, setLastOpened] = useState(lastOpenedKey);
   const highlightedRef = useRef<HTMLElement | null>(null);
 

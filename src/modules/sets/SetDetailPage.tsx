@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {
   ArrowLeft,
+  ArrowRightLeft,
   Barcode,
   Camera,
   ChevronDown,
@@ -34,7 +35,10 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
-import {tr, trData} from '../../i18n';
+import {tr, trc, trData} from '../../i18n';
+import {useRememberedState} from '../../core/listMemory';
+import BackLink from '../../components/ui/BackLink';
+import AssetManageModal from '../../components/assets/AssetManageModal';
 
 export default function SetDetailPage() {
   const {
@@ -55,9 +59,10 @@ export default function SetDetailPage() {
   const navigate = useNavigate();
   const {id} = useParams();
   const set = sets.find(item => item.id === id);
-  const [tab, setTab] = useState<AssetTab>('CONTENTS');
+  const [tab, setTab] = useRememberedState<AssetTab>('tab', 'CONTENTS');
   const [photosOpen, setPhotosOpen] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [dispatchOpen, setDispatchOpen] = useState(false);
@@ -69,11 +74,11 @@ export default function SetDetailPage() {
   const [addToolsOpen, setAddToolsOpen] = useState(false);
 
   const [preview, setPreview] = useState<'COMPOSITION' | 'BARCODE' | null>(null);
-  const [grouped, setGrouped] = useState(false);
-  const [toolQuery, setToolQuery] = useState('');
-  const [toolManufacturer, setToolManufacturer] = useState('');
-  const [toolSpecialty, setToolSpecialty] = useState('');
-  const [toolState, setToolState] = useState('');
+  const [grouped, setGrouped] = useRememberedState('grouped', false);
+  const [toolQuery, setToolQuery] = useRememberedState('toolQuery', '');
+  const [toolManufacturer, setToolManufacturer] = useRememberedState('toolManufacturer', '');
+  const [toolSpecialty, setToolSpecialty] = useRememberedState('toolSpecialty', '');
+  const [toolState, setToolState] = useRememberedState('toolState', '');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   // Hooks must run unconditionally on every render (Rules of Hooks), so the
@@ -161,9 +166,23 @@ export default function SetDetailPage() {
               {tr('Εκτύπωση Barcode')}
             </AppButton>
           )}
+          {can('asset.composition.manage') && (
+            <AppButton
+              icon={<ArrowRightLeft size={18} />}
+              disabled={workflowLocked}
+              title={
+                workflowLocked
+                  ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
+                  : undefined
+              }
+              onClick={() => setManageOpen(true)}
+            >
+              {trc('action', 'Διαχείριση')}
+            </AppButton>
+          )}
           {can('asset.duplicate') && (
             <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
-              Duplicate
+              {tr('Αντίγραφο')}
             </AppButton>
           )}
           {can('asset.delete') && (
@@ -193,9 +212,9 @@ export default function SetDetailPage() {
           )}
         </div>
         <div className="asset-action-group">
-          <Link to={backTo} className="asset-action-link">
+          <BackLink fallback={backTo} className="asset-action-link">
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
-          </Link>
+          </BackLink>
         </div>
       </div>
       <div className="asset-workbench-grid">
@@ -606,7 +625,7 @@ export default function SetDetailPage() {
                 <Copy size={20} />
               </div>
               <div>
-                <h3>{tr('Duplicate Σετ')}</h3>
+                <h3>{tr('Αντίγραφο Σετ')}</h3>
                 <p>
                   {tr('Τι θέλεις να αντιγραφεί από το') + ' '}
                   {set.barcode};
@@ -794,6 +813,7 @@ export default function SetDetailPage() {
           </div>
         </div>
       )}
+      {manageOpen && <AssetManageModal kind="SET" asset={set} onClose={() => setManageOpen(false)} />}
     </div>
   );
 }
