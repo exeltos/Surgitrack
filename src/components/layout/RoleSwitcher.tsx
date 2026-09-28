@@ -11,7 +11,7 @@ import {
 } from '../../config/demoRoles';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {useLibraries} from '../../core/LibraryStore';
-import {canViewAs, getRealIdentity, sessionUserFor} from '../../data/cloud/identity';
+import {actingAsPlatformOwner, canViewAs, getRealIdentity, sessionUserFor} from '../../data/cloud/identity';
 import {supabase} from '../../lib/supabase';
 import {switchHospital} from '../../data/cloud/hospitalSwitch';
 import {useSurgi} from '../../store/SurgiStore';
@@ -32,7 +32,9 @@ export default function RoleSwitcher() {
   const isDemo = getRuntimeDataMode() === 'DEMO';
   const real = getRealIdentity();
   const activeOrganization = sessionStorage.getItem(ACTIVE_ORGANIZATION_KEY) || '';
-  const pickHospital = !isDemo && !!real?.platform;
+  // Viewing a hospital as one of its roles hides the other hospitals, as for that role; picking
+  // "Owner" brings the hospital picker back.
+  const pickHospital = !isDemo && !!real?.platform && (!activeOrganization || actingAsPlatformOwner());
   const pickRole = isDemo || (canViewAs(real) && (!real?.platform || !!activeOrganization));
   const [hospitals, setHospitals] = useState<Array<{id: string; name: string}>>([]);
 
@@ -47,12 +49,18 @@ export default function RoleSwitcher() {
       .then(({data}) => setHospitals(data || []));
   }, [pickHospital]);
 
-  const changeView = (view: DemoView) => {
-    if (isDemo) switchIdentity(demoSessionUser(view, departments));
-    else if (real && view === 'ADMIN') switchIdentity(sessionUserFor(real));
-    else if (real) switchIdentity(viewAsSessionUser(view, departments, real));
+  // The owner inside a hospital can work as themselves or see it exactly as its administrator does.
+  const ownerInHospital = !isDemo && !!real?.platform;
+  const changeView = (view: DemoView | 'OWNER') => {
+    if (isDemo) switchIdentity(demoSessionUser(view as DemoView, departments));
+    else if (real && (view === 'OWNER' || (view === 'ADMIN' && !real.platform))) switchIdentity(sessionUserFor(real));
+    else if (real) switchIdentity(viewAsSessionUser(view as DemoView, departments, real));
     navigate('/');
   };
+  const currentView =
+    ownerInHospital && role === 'ADMIN' && !currentUser.viewAs
+      ? 'OWNER'
+      : currentDemoView(role, currentUser, departments);
 
   // A different hospital means different data: reload so its records are loaded.
   const changeHospital = (id: string) => switchHospital(id, id ? '#/' : '#/studio');
@@ -78,11 +86,12 @@ export default function RoleSwitcher() {
       )}
       {pickRole && (
         <select
-          value={currentDemoView(role, currentUser, departments)}
-          onChange={e => changeView(e.target.value as DemoView)}
+          value={currentView}
+          onChange={e => changeView(e.target.value as DemoView | 'OWNER')}
           title={L('Προβολή ως ρόλος ή τμήμα', 'View as role or department')}
           aria-label={L('Προβολή ως', 'View as')}
         >
+          {ownerInHospital && <option value="OWNER">{L('Owner (εσείς)', 'Owner (you)')}</option>}
           {(['ADMIN', 'STERILIZATION_SUPERVISOR', 'STERILIZATION'] as const).map(kind => (
             <option key={kind} value={kind}>
               {L(hospitalRoleNames[kind].el, hospitalRoleNames[kind].en)}

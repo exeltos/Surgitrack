@@ -4,7 +4,7 @@ import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
-import {getRealIdentity} from '../../data/cloud/identity';
+import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {activeHospitalId, switchHospital} from '../../data/cloud/hospitalSwitch';
 
 type Hospital = {id: string; name: string; code: string; active: boolean; demo_enabled: boolean};
@@ -25,7 +25,7 @@ export default function HospitalsPage() {
   const {lang} = useAppPreferences();
   const el = lang === 'el';
   const L = (gr: string, en: string) => (el ? gr : en);
-  const platform = !!getRealIdentity()?.platform;
+  const platform = actingAsPlatformOwner();
   const current = activeHospitalId();
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [stats, setStats] = useState<Record<string, Stats>>({});

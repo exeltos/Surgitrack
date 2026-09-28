@@ -67,7 +67,12 @@ export const viewAsSessionUser = (
   admin: {id: string; name: string},
 ): SessionUser => {
   const target = demoSessionUser(view, departments);
-  const as = view === 'ADMIN' ? 'Admin' : target.supervisor ? `Προϊστάμενος · ${target.department}` : target.department;
+  const as =
+    view === 'ADMIN'
+      ? 'Διαχειριστής νοσοκομείου'
+      : target.supervisor
+        ? `Προϊστάμενος · ${target.department}`
+        : target.department;
   return {
     id: admin.id,
     name: `${admin.name} (ως ${as})`,
