@@ -7,6 +7,16 @@ const STERILIZATION_DEPARTMENT_CODE = 'STER';
 /** Header choice in Demo: Admin, Sterilization (staff or supervisor), or one department from the library. */
 export type DemoView = 'ADMIN' | 'STERILIZATION' | 'STERILIZATION_SUPERVISOR' | `DEPARTMENT:${string}`;
 
+/** The four kinds of hospital user, named the same everywhere (Demo buttons, "view as", Studio). */
+export type HospitalRoleKind = 'ADMIN' | 'STERILIZATION_SUPERVISOR' | 'STERILIZATION' | 'DEPARTMENT';
+export const hospitalRoleNames: Record<HospitalRoleKind, {el: string; en: string}> = {
+  ADMIN: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
+  STERILIZATION_SUPERVISOR: {el: 'Προϊστάμενος Αποστείρωσης', en: 'Sterilization supervisor'},
+  STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
+  DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
+};
+export const hospitalRoleKinds = Object.keys(hospitalRoleNames) as HospitalRoleKind[];
+
 export const demoDepartments = (departments: readonly LibraryItem[]) =>
   departments.filter(d => (d.code || '').toUpperCase() !== STERILIZATION_DEPARTMENT_CODE);
 

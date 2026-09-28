@@ -294,6 +294,7 @@ const sterilizationPermissions: readonly Permission[] = [
  * follow that choice rather than the role settings in Studio.
  */
 export const supervisorOnlyPermissions: readonly Permission[] = [
+  'asset.barcode.reissue',
   'asset.create',
   'asset.edit',
   'asset.delete',

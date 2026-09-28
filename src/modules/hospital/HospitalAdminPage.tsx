@@ -9,6 +9,7 @@ import {localizedName} from '../../core/glossary';
 import {getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {UserRole} from '../../store/types';
+import {hospitalRoleNames} from '../../config/demoRoles';
 
 type Department = {id: string; name: string; code: string | null; active: boolean};
 type Request = {
@@ -33,18 +34,13 @@ type Decision = {role: UserRole; departmentId: string; note: string};
 
 const STERILIZATION_CODE = 'STER';
 const roles: Array<{id: UserRole; el: string; en: string}> = [
-  {id: 'DEPARTMENT', el: 'Τμήμα', en: 'Department'},
-  {id: 'STERILIZATION', el: 'Αποστείρωση', en: 'Sterilization'},
-  {id: 'ADMIN', el: 'Διαχειριστής', en: 'Administrator'},
+  {id: 'DEPARTMENT', ...hospitalRoleNames.DEPARTMENT},
+  {id: 'STERILIZATION', ...hospitalRoleNames.STERILIZATION},
+  {id: 'ADMIN', ...hospitalRoleNames.ADMIN},
 ];
 /** In the users list Sterilization splits into staff and supervisor (who registers assets and changes Sets). */
 const SUPERVISOR = 'STERILIZATION_SUPERVISOR';
-const memberRoles = [
-  roles[0],
-  roles[1],
-  {id: SUPERVISOR, el: 'Προϊστάμενος Αποστείρωσης', en: 'Sterilization supervisor'},
-  roles[2],
-];
+const memberRoles = [roles[0], roles[1], {id: SUPERVISOR, ...hospitalRoleNames.STERILIZATION_SUPERVISOR}, roles[2]];
 
 /**
  * Hospital administration for the hospital's own admin (or the platform admin working in it):

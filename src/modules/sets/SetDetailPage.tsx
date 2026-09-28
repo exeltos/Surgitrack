@@ -156,9 +156,11 @@ export default function SetDetailPage() {
           <AppButton icon={<Printer size={18} />} onClick={() => setPreview('COMPOSITION')}>
             {tr('Εκτύπωση σύνθεσης')}
           </AppButton>
-          <AppButton icon={<Barcode size={18} />} onClick={() => setPreview('BARCODE')}>
-            {tr('Εκτύπωση Barcode')}
-          </AppButton>
+          {can('asset.barcode.reissue') && (
+            <AppButton icon={<Barcode size={18} />} onClick={() => setPreview('BARCODE')}>
+              {tr('Εκτύπωση Barcode')}
+            </AppButton>
+          )}
           {can('asset.duplicate') && (
             <AppButton icon={<Copy size={18} />} onClick={() => setDuplicateOpen(true)}>
               Duplicate

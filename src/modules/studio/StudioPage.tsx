@@ -54,11 +54,19 @@ import {switchHospital} from '../../data/cloud/hospitalSwitch';
 import {getRealIdentity} from '../../data/cloud/identity';
 import {localizedName, translateToEnglish} from '../../core/glossary';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
-import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
+import {
+  applyDemoSessionUser,
+  demoSessionUser,
+  hospitalRoleKinds,
+  hospitalRoleNames,
+  type DemoView,
+  type HospitalRoleKind,
+} from '../../config/demoRoles';
 import {departments as defaultDepartments} from '../../core/libraries';
 import {tr} from '../../i18n';
+import RolesGuide from './RolesGuide';
 
-type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'ROLES' | 'SYSTEM';
+type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'GUIDE' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
   {
     id: 'ADMIN',
@@ -472,7 +480,8 @@ export default function StudioPage() {
   };
   // Every demo is its own demo hospital in Supabase, so demo data never mixes with real hospitals.
   // Without a source it is the built-in SurgiTrack Demo; with one, that hospital's private demo copy.
-  const enterDemo = async (role: UserRole, sourceOrganizationId?: string) => {
+  const enterDemo = async (kind: HospitalRoleKind, sourceOrganizationId?: string) => {
+    const role: UserRole = kind === 'STERILIZATION_SUPERVISOR' ? 'STERILIZATION' : kind;
     setCloudError('');
     const {data: demoOrganizationId, error} = await supabase.rpc('platform_ensure_demo_organization', {
       p_source: sourceOrganizationId ?? null,
@@ -481,7 +490,7 @@ export default function StudioPage() {
       setCloudError(error?.message || L('Δεν ήταν δυνατή η είσοδος στο Demo.', 'Could not open the Demo.'));
       return;
     }
-    const view: DemoView = role === 'DEPARTMENT' ? 'DEPARTMENT:' : role;
+    const view: DemoView = kind === 'DEPARTMENT' ? 'DEPARTMENT:' : kind;
     applyDemoSessionUser(demoSessionUser(view, defaultDepartments));
     sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
     setRuntimeDataMode('DEMO');
@@ -490,10 +499,10 @@ export default function StudioPage() {
     window.location.hash = `#${role === 'ADMIN' ? '/overview' : roleHomePath(role)}`;
     window.location.reload();
   };
-  const enterBuiltInDemo = (role: UserRole) => void enterDemo(role);
-  const enterOrganizationDemo = (organization: Organization, role: UserRole) => {
+  const enterBuiltInDemo = (kind: HospitalRoleKind) => void enterDemo(kind);
+  const enterOrganizationDemo = (organization: Organization, kind: HospitalRoleKind) => {
     if (!organization.active || !organization.demoEnabled) return;
-    void enterDemo(role, organization.id);
+    void enterDemo(kind, organization.id);
   };
   const resetBuiltInDemo = async () => {
     const {data: demoOrganizationId, error} = await supabase.rpc('platform_ensure_demo_organization', {
@@ -645,6 +654,10 @@ export default function StudioPage() {
             {L('Χρήστες', 'Users')}
           </button>
         )}
+        <button className={tab === 'GUIDE' ? 'active' : ''} onClick={() => selectTab('GUIDE')}>
+          <ShieldCheck size={17} />
+          {L('Ρόλοι', 'Roles')}
+        </button>
         <button className={tab === 'ROLES' ? 'active' : ''} onClick={() => selectTab('ROLES')}>
           <UserCog size={17} />
           {L('Δικαιώματα', 'Permissions')}
@@ -800,11 +813,12 @@ export default function StudioPage() {
                 </small>
               </div>
               <div className="platform-private-demo-actions">
-                <button onClick={() => enterBuiltInDemo('ADMIN')}>{L('Demo ως Admin', 'Demo as Admin')}</button>
-                <button onClick={() => enterBuiltInDemo('STERILIZATION')}>
-                  {L('Demo Αποστείρωσης', 'Sterilization Demo')}
-                </button>
-                <button onClick={() => enterBuiltInDemo('DEPARTMENT')}>{L('Demo Τμήματος', 'Department Demo')}</button>
+                <span className="platform-demo-as">{L('Είσοδος στο Demo ως:', 'Enter the Demo as:')}</span>
+                {hospitalRoleKinds.map(kind => (
+                  <button key={kind} onClick={() => enterBuiltInDemo(kind)}>
+                    {L(hospitalRoleNames[kind].el, hospitalRoleNames[kind].en)}
+                  </button>
+                ))}
                 <button
                   className="platform-demo-reset"
                   onClick={() =>
@@ -857,24 +871,15 @@ export default function StudioPage() {
                     </div>
                     <div className="platform-demo-actions">
                       <span>{L('Είσοδος Demo ως:', 'Enter Demo as:')}</span>
-                      <button
-                        disabled={!org.active || !org.demoEnabled}
-                        onClick={() => enterOrganizationDemo(org, 'ADMIN')}
-                      >
-                        {L('Admin', 'Admin')}
-                      </button>
-                      <button
-                        disabled={!org.active || !org.demoEnabled}
-                        onClick={() => enterOrganizationDemo(org, 'STERILIZATION')}
-                      >
-                        {L('Αποστείρωση', 'Sterilization')}
-                      </button>
-                      <button
-                        disabled={!org.active || !org.demoEnabled}
-                        onClick={() => enterOrganizationDemo(org, 'DEPARTMENT')}
-                      >
-                        {L('Τμήμα', 'Department')}
-                      </button>
+                      {hospitalRoleKinds.map(kind => (
+                        <button
+                          key={kind}
+                          disabled={!org.active || !org.demoEnabled}
+                          onClick={() => enterOrganizationDemo(org, kind)}
+                        >
+                          {L(hospitalRoleNames[kind].el, hospitalRoleNames[kind].en)}
+                        </button>
+                      ))}
                     </div>
                     <div className="platform-org-meta">
                       <span>
@@ -1530,6 +1535,7 @@ export default function StudioPage() {
             </div>
           </section>
         )}
+        {tab === 'GUIDE' && <RolesGuide />}
         {tab === 'ROLES' && (
           <div className="studio-role-manager">
             <aside className="studio-role-selector">
