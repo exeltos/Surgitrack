@@ -184,7 +184,7 @@ export default function ToolDetailPage() {
                 ? tr('δικό του, διαφορετικό από το Σετ')
                 : undefined
           }
-          onEditMarker={can('asset.edit') ? () => setMarkerOpen(true) : undefined}
+          onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />

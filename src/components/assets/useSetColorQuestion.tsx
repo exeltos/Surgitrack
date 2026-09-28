@@ -3,45 +3,49 @@ import {Palette} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import ColorMarker from './ColorMarker';
 import {useSurgi} from '../../store/SurgiStore';
-import {sameMarker} from '../../core/colorTapes';
+import {EMPTY_COLOR_PLAN, effectiveToolMarker, sameMarker, type ColorPlan} from '../../core/colorTapes';
 import {tr} from '../../i18n';
 import type {SetAsset, Tool} from '../../types/domain';
 
-type Pending = {tools: Tool[]; set: SetAsset; resolve: (followIds: string[] | null) => void};
+type Conflict = {tool: Tool; tapes: string[]};
+type Pending = {conflicts: Conflict[]; set: SetAsset; resolve: (plan: ColorPlan | null) => void};
 
 /**
- * Before instruments join a Set: those with their own color marker, different from the Set's,
- * ask whether to keep it or take the Set's. Resolves with the ids that take the Set's color
- * ([] when nothing needs asking) or null when cancelled.
+ * Before instruments join a Set: any instrument that already carries tape (its own, or the tape of
+ * the Set it leaves) different from the new Set's color asks whether it keeps that tape or takes the
+ * Set's. Resolves with the plan to apply after the move, or null when cancelled.
  */
 export function useSetColorQuestion(): {
-  ask: (toolIds: string[], setId: string) => Promise<string[] | null>;
+  ask: (toolIds: string[], setId: string) => Promise<ColorPlan | null>;
   dialog: ReactNode;
 } {
   const {tools, sets} = useSurgi();
   const [pending, setPending] = useState<Pending | null>(null);
 
   const ask = (toolIds: string[], setId: string) =>
-    new Promise<string[] | null>(resolve => {
+    new Promise<ColorPlan | null>(resolve => {
       const set = sets.find(s => s.id === setId);
-      const conflicted = set
-        ? tools.filter(
-            t =>
-              toolIds.includes(t.id) &&
-              t.colorMode === 'OWN' &&
-              (t.colorTapes?.length || 0) > 0 &&
-              !sameMarker(t.colorTapes, set.colorTapes),
-          )
+      const conflicts: Conflict[] = set
+        ? tools
+            .filter(t => toolIds.includes(t.id) && t.setId !== setId && t.colorMode !== 'NONE')
+            .map(t => ({
+              tool: t,
+              tapes: effectiveToolMarker(
+                t,
+                sets.find(s => s.id === t.setId),
+              ),
+            }))
+            .filter(c => c.tapes.length > 0 && !sameMarker(c.tapes, set.colorTapes))
         : [];
-      if (!set || !conflicted.length) {
-        resolve([]);
+      if (!set || !conflicts.length) {
+        resolve(EMPTY_COLOR_PLAN);
         return;
       }
-      setPending({tools: conflicted, set, resolve});
+      setPending({conflicts, set, resolve});
     });
 
-  const finish = (result: string[] | null) => {
-    pending?.resolve(result);
+  const finish = (plan: ColorPlan | null) => {
+    pending?.resolve(plan);
     setPending(null);
   };
 
@@ -53,19 +57,19 @@ export function useSetColorQuestion(): {
           <div>
             <span className="eyebrow">{tr('ΧΡΩΜΑΤΙΚΟΣ ΜΑΡΤΥΡΑΣ')}</span>
             <h2>
-              {pending.tools.length === 1
-                ? tr('Το εργαλείο έχει δικό του χρώμα')
-                : tr('{0} εργαλεία έχουν δικό τους χρώμα', pending.tools.length)}
+              {pending.conflicts.length === 1
+                ? tr('Το εργαλείο έχει ήδη ταινία άλλου χρώματος')
+                : tr('{0} εργαλεία έχουν ήδη ταινία άλλου χρώματος', pending.conflicts.length)}
             </h2>
           </div>
         </header>
         <div className="color-question-rows">
-          {pending.tools.map(t => (
-            <div key={t.id}>
+          {pending.conflicts.map(({tool, tapes}) => (
+            <div key={tool.id}>
               <span>
-                <b className="mono">{t.barcode}</b> {t.name}
+                <b className="mono">{tool.barcode}</b> {tool.name}
               </span>
-              <ColorMarker tapes={t.colorTapes} />
+              <ColorMarker tapes={tapes} />
             </div>
           ))}
           <div className="color-question-set">
@@ -77,14 +81,21 @@ export function useSetColorQuestion(): {
         </div>
         <p>
           {tr(
-            'Να κρατήσει το δικό του χρώμα ή να πάρει του Σετ; Αν πάρει του Σετ, αλλάξτε και την ταινία πάνω στο εργαλείο.',
+            'Να κρατήσει την ταινία που έχει ή να πάρει το χρώμα του Σετ; Αν πάρει του Σετ, αλλάξτε και την ταινία πάνω στο εργαλείο.',
           )}
         </p>
         <footer>
           <AppButton onClick={() => finish(null)}>{tr('Ακύρωση')}</AppButton>
-          <AppButton onClick={() => finish([])}>{tr('Κρατά το δικό του')}</AppButton>
-          <AppButton variant="primary" onClick={() => finish(pending.tools.map(t => t.id))}>
-            {tr('Παίρνει του Σετ')}
+          <AppButton
+            onClick={() => finish({follow: [], keep: pending.conflicts.map(c => ({id: c.tool.id, tapes: c.tapes}))})}
+          >
+            {tr('Κρατά την ταινία του')}
+          </AppButton>
+          <AppButton
+            variant="primary"
+            onClick={() => finish({follow: pending.conflicts.map(c => c.tool.id), keep: []})}
+          >
+            {tr('Παίρνει το χρώμα του Σετ')}
           </AppButton>
         </footer>
       </div>

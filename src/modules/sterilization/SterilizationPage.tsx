@@ -41,6 +41,7 @@ import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr, trc, trData} from '../../i18n';
 import {useSetColorQuestion} from '../../components/assets/useSetColorQuestion';
+import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
 
 type Queue = 'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'RELEASE' | 'STORAGE' | 'READY';
 type Kind = AssetKind;
@@ -90,7 +91,7 @@ export default function SterilizationPage() {
     resolveIssues,
     moveTool,
     replaceToolInSet,
-    followSetColor,
+    applyColorPlan,
     can,
   } = useSurgi();
   const colorQuestion = useSetColorQuestion();
@@ -866,10 +867,10 @@ export default function SterilizationPage() {
         : prepToolAction === 'SET' && prepSelectedTool && prepTargetSetId
           ? {toolId: prepSelectedTool.id, setId: prepTargetSetId}
           : null;
-    const follow = joining ? await colorQuestion.ask([joining.toolId], joining.setId) : [];
-    if (follow === null) return;
+    const plan = joining ? await colorQuestion.ask([joining.toolId], joining.setId) : EMPTY_COLOR_PLAN;
+    if (!plan) return;
     const takeSetColor = () => {
-      if (joining && follow.length) followSetColor(follow, sets.find(s => s.id === joining.setId)?.barcode || '');
+      if (joining) applyColorPlan(plan, sets.find(s => s.id === joining.setId)?.barcode || '');
     };
     if (prepToolAction === 'REPLACE') {
       if (!prepReplacementId) return;

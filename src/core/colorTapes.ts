@@ -149,5 +149,12 @@ export const effectiveToolMarker = (
   return [];
 };
 
+/**
+ * What happens to the tape of instruments joining a Set: `follow` take the Set's color (a tape
+ * change), `keep` keep the tape they carry, which becomes their own marker.
+ */
+export type ColorPlan = {follow: string[]; keep: Array<{id: string; tapes: string[]}>};
+export const EMPTY_COLOR_PLAN: ColorPlan = {follow: [], keep: []};
+
 export const sameMarker = (a: string[] = [], b: string[] = []) =>
   a.length === b.length && a.every((id, i) => id === b[i]);

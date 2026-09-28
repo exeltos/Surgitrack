@@ -16,14 +16,14 @@ import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function StockPage() {
-  const {tools, sets, moveTool, followSetColor, can} = useSurgi();
+  const {tools, sets, moveTool, applyColorPlan, can} = useSurgi();
   const colorQuestion = useSetColorQuestion();
   // A stock instrument with its own color joining a Set: ask whether it keeps it.
   const addToSet = async (toolId: string, setId: string) => {
-    const follow = await colorQuestion.ask([toolId], setId);
-    if (follow === null) return;
+    const plan = await colorQuestion.ask([toolId], setId);
+    if (!plan) return;
     moveTool(toolId, 'SET', setId);
-    if (follow.length) followSetColor(follow, sets.find(s => s.id === setId)?.barcode || '');
+    applyColorPlan(plan, sets.find(s => s.id === setId)?.barcode || '');
   };
   const canCompose = can('asset.composition.manage');
   const navigate = useNavigate();

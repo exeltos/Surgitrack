@@ -5,6 +5,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
 import {useSetColorQuestion} from './useSetColorQuestion';
 import type {SetAsset, Tool} from '../../types/domain';
+import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
 
 type ToolAction = 'MOVE' | 'REMOVE' | 'STOCK' | 'SERVICE' | 'LOST' | 'RETURN';
 type SetAction = 'SERVICE' | 'LOST' | 'RETURN';
@@ -23,7 +24,7 @@ export default function AssetManageModal({
   asset: Tool | SetAsset;
   onClose: () => void;
 }) {
-  const {sets, issues, moveTool, markLost, returnToService, sendSetToService, resolveIssues, followSetColor} =
+  const {sets, issues, moveTool, markLost, returnToService, sendSetToService, resolveIssues, applyColorPlan} =
     useSurgi();
   const colorQuestion = useSetColorQuestion();
   const tool = kind === 'TOOL' ? (asset as Tool) : undefined;
@@ -147,8 +148,9 @@ export default function AssetManageModal({
   const confirm = async () => {
     if (!ready || followsSet) return;
     // An instrument with its own color joining a Set: keep it or take the Set's?
-    const follow = kind === 'TOOL' && action === 'MOVE' ? await colorQuestion.ask([asset.id], targetSetId) : [];
-    if (follow === null) return;
+    const plan =
+      kind === 'TOOL' && action === 'MOVE' ? await colorQuestion.ask([asset.id], targetSetId) : EMPTY_COLOR_PLAN;
+    if (!plan) return;
     // Settle the chosen reports first, so the action can open its own issue where it needs one.
     const chosen = choices.find(c => c.id === action)?.title || '';
     resolveIssues(
@@ -158,7 +160,7 @@ export default function AssetManageModal({
     if (kind === 'TOOL') {
       if (action === 'MOVE') {
         moveTool(asset.id, 'SET', targetSetId);
-        if (follow.length) followSetColor(follow, sets.find(s => s.id === targetSetId)?.barcode || '');
+        applyColorPlan(plan, sets.find(s => s.id === targetSetId)?.barcode || '');
       } else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
       else if (action === 'STOCK') moveTool(asset.id, 'STOCK');
       else if (action === 'SERVICE') moveTool(asset.id, 'SERVICE', undefined, note.trim());

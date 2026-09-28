@@ -10,7 +10,7 @@ import {useSetColorQuestion} from './useSetColorQuestion';
 type Source = 'STOCK' | 'SET_MEMBER' | 'STANDALONE';
 
 export default function AddToolsToSetModal({setId, onClose}: {setId: string; onClose: () => void}) {
-  const {tools, sets, addToolsToSet, followSetColor} = useSurgi();
+  const {tools, sets, addToolsToSet, applyColorPlan} = useSurgi();
   const colorQuestion = useSetColorQuestion();
   const [source, setSource] = useState<Source>('STOCK');
   const [q, setQ] = useState('');
@@ -197,10 +197,10 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
           )}
           confirmLabel={tr('Ναι, προσθήκη')}
           onConfirm={async () => {
-            const follow = await colorQuestion.ask(selected, setId);
-            if (follow === null) return;
+            const plan = await colorQuestion.ask(selected, setId);
+            if (!plan) return;
             addToolsToSet(setId, selected);
-            if (follow.length) followSetColor(follow, sets.find(s => s.id === setId)?.barcode || '');
+            applyColorPlan(plan, sets.find(s => s.id === setId)?.barcode || '');
             onClose();
           }}
           onClose={() => setConfirm(false)}

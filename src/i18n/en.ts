@@ -1198,4 +1198,12 @@ export const en: Record<string, string> = {
   'Χρωματικός μάρτυρας': 'Color marker',
   'Αλλαγή χρώματος': 'Change color',
   '{0}: ο χρωματικός μάρτυρας ενημερώθηκε.': '{0}: color marker updated.',
+  '{0}: ο χρωματικός μάρτυρας δεν αλλάζει όσο βρίσκεται σε διαδικασία αποστείρωσης.':
+    '{0}: the color marker cannot change during a sterilization process.',
+  'Το εργαλείο έχει ήδη ταινία άλλου χρώματος': 'The instrument already has tape of another color',
+  '{0} εργαλεία έχουν ήδη ταινία άλλου χρώματος': '{0} instruments already have tape of another color',
+  'Να κρατήσει την ταινία που έχει ή να πάρει το χρώμα του Σετ; Αν πάρει του Σετ, αλλάξτε και την ταινία πάνω στο εργαλείο.':
+    'Keep the tape it has or take the Set’s color? If it takes the Set’s, also change the tape on the instrument.',
+  'Κρατά την ταινία του': 'Keep its tape',
+  'Παίρνει το χρώμα του Σετ': 'Take the Set’s color',
 };

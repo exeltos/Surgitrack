@@ -288,7 +288,7 @@ export type SurgiStoreValue = {
     value: {mode?: 'SET' | 'OWN' | 'NONE'; tapes: string[]},
     description: string,
   ) => void;
-  followSetColor: (toolIds: string[], setBarcode: string) => void;
+  applyColorPlan: (plan: import('../core/colorTapes').ColorPlan, setBarcode: string) => void;
   markLost: (kind: AssetKind, id: string, note?: string) => void;
   returnToService: (kind: AssetKind, id: string, note?: string) => void;
   sendSetToService: (id: string, note?: string) => void;
