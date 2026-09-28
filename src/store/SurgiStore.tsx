@@ -57,6 +57,7 @@ import {
   workflowStageState,
   type WorkflowStageId,
 } from '../core/workflow';
+import {tr} from '../i18n';
 
 export type {
   DeliveryPayload,
@@ -175,11 +176,11 @@ export function SurgiProvider({
     const asset = assetName(kind, id);
     if (!asset) return false;
     if (isUsageExhausted(kind, id)) {
-      notify(`${asset.barcode}: δεν επιτρέπεται η κυκλοφορία — έχει εξαντληθεί το όριο χρήσεων.`);
+      notify(tr('{0}: δεν επιτρέπεται η κυκλοφορία — έχει εξαντληθεί το όριο χρήσεων.', asset.barcode));
       return false;
     }
     if (isAssetRecalled(kind, id)) {
-      notify(`${asset.barcode}: δεν επιτρέπεται η κυκλοφορία — βρίσκεται σε ενεργή ανάκληση.`);
+      notify(tr('{0}: δεν επιτρέπεται η κυκλοφορία — βρίσκεται σε ενεργή ανάκληση.', asset.barcode));
       return false;
     }
     return true;
@@ -206,7 +207,7 @@ export function SurgiProvider({
       patientCode,
       note,
     });
-    notify(`${a.barcode} προωθήθηκε ηλεκτρονικά προς Αποστείρωση από ${currentUser.name}.`);
+    notify(tr('{0} προωθήθηκε ηλεκτρονικά προς Αποστείρωση από {1}.', a.barcode, currentUser.name));
   };
   const receiveAtSterilization = (kind: AssetKind, id: string, payload: ReceivePayload) => {
     const a = assetName(kind, id);
@@ -301,7 +302,9 @@ export function SurgiProvider({
       by: `${currentUser.name} · παρέδωσε ${payload.deliveredByName}`,
     });
     notify(
-      `Παραλήφθηκε ${a.barcode} από την Αποστείρωση${payload.checkPerformed ? ' και καταγράφηκε ο έλεγχος' : ''}.`,
+      payload.checkPerformed
+        ? tr('Παραλήφθηκε {0} από την Αποστείρωση και καταγράφηκε ο έλεγχος.', a.barcode)
+        : tr('Παραλήφθηκε {0} από την Αποστείρωση.', a.barcode),
     );
     return record;
   };
@@ -338,7 +341,7 @@ export function SurgiProvider({
       status: 'Σύνθεση / προετοιμασία ολοκληρώθηκε · προς κλιβανισμό',
       by: currentUser.name,
     });
-    notify(`Η σύνθεση / προετοιμασία του ${a.barcode} καταγράφηκε.`);
+    notify(tr('Η σύνθεση / προετοιμασία του {0} καταγράφηκε.', a.barcode));
     return record;
   };
   const completeSterilizationCycle = (kind: AssetKind, id: string, payload: SterilizationCompletionPayload) => {
@@ -377,7 +380,11 @@ export function SurgiProvider({
         by: currentUser.name,
       });
       notify(
-        `Ο κύκλος ${payload.cycleNumber} καταγράφηκε ως αποτυχημένος. Το ${a.barcode} παραμένει προς επανεπεξεργασία.`,
+        tr(
+          'Ο κύκλος {0} καταγράφηκε ως αποτυχημένος. Το {1} παραμένει προς επανεπεξεργασία.',
+          payload.cycleNumber,
+          a.barcode,
+        ),
       );
       return record;
     }
@@ -395,7 +402,7 @@ export function SurgiProvider({
       status: `Κύκλος ολοκληρώθηκε · ${payload.sterilizer} · ${payload.cycleNumber} · ${payload.program}`,
       by: currentUser.name,
     });
-    notify(`${a.barcode}: ο κύκλος ολοκληρώθηκε και αναμένει έλεγχο αποδέσμευσης.`);
+    notify(tr('{0}: ο κύκλος ολοκληρώθηκε και αναμένει έλεγχο αποδέσμευσης.', a.barcode));
     return record;
   };
   const releaseSterilization = (kind: AssetKind, id: string, payload: SterilizationReleasePayload) => {
@@ -457,7 +464,7 @@ export function SurgiProvider({
         status: `Αποδεσμεύτηκε · κύκλος ${cycle.cycleNumber} · ${cycle.sterilizer}`,
         by: currentUser.name,
       });
-      notify(`${a.barcode}: αποδεσμεύτηκε και είναι έτοιμο για παραλαβή.`);
+      notify(tr('{0}: αποδεσμεύτηκε και είναι έτοιμο για παραλαβή.', a.barcode));
       return record;
     }
     updateState(kind, id, reprocessState());
@@ -471,7 +478,7 @@ export function SurgiProvider({
       status: `Μη αποδέσμευση · προς επανεπεξεργασία · κύκλος ${cycle.cycleNumber}`,
       by: currentUser.name,
     });
-    notify(`${a.barcode}: δεν αποδεσμεύτηκε και επέστρεψε για επανεπεξεργασία.`);
+    notify(tr('{0}: δεν αποδεσμεύτηκε και επέστρεψε για επανεπεξεργασία.', a.barcode));
     return record;
   };
   const createProcessLoad = (payload: CreateProcessLoadPayload) => {
@@ -483,7 +490,7 @@ export function SurgiProvider({
           !!entry.asset && entry.asset.state === expectedState,
       );
     if (!refs.length) {
-      notify('Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.');
+      notify(tr('Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.'));
       return;
     }
     const loadId = `L${uniqueStamp()}`;
@@ -543,7 +550,7 @@ export function SurgiProvider({
         completedAt: now,
       };
       setProcessLoads(list => [record, ...list]);
-      notify(`Το φορτίο ${loadId} ολοκληρώθηκε για ${items.length} αντικείμενα.`);
+      notify(tr('Το φορτίο {0} ολοκληρώθηκε για {1} αντικείμενα.', loadId, items.length));
       return record;
     }
     const result = payload.chemicalIndicatorResult === 'FAIL' ? 'FAILED' : 'PASSED';
@@ -611,8 +618,8 @@ export function SurgiProvider({
     setProcessLoads(list => [record, ...list]);
     notify(
       result === 'PASSED'
-        ? `Το φορτίο ${loadId} ολοκληρώθηκε και αναμένει αποδέσμευση.`
-        : `Το φορτίο ${loadId} απέτυχε και επέστρεψε σε επανεπεξεργασία.`,
+        ? tr('Το φορτίο {0} ολοκληρώθηκε και αναμένει αποδέσμευση.', loadId)
+        : tr('Το φορτίο {0} απέτυχε και επέστρεψε σε επανεπεξεργασία.', loadId),
     );
     return record;
   };
@@ -711,8 +718,8 @@ export function SurgiProvider({
     }
     notify(
       decision === 'RELEASED'
-        ? `Το φορτίο ${loadId} αποδεσμεύτηκε (${load.items.length} αντικείμενα).`
-        : `Το φορτίο ${loadId} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.`,
+        ? tr('Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).', loadId, load.items.length)
+        : tr('Το φορτίο {0} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.', loadId),
     );
     return updated;
   };
@@ -720,7 +727,7 @@ export function SurgiProvider({
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
     if (!load || load.status !== 'RELEASED' || !reason.trim()) return;
     if (recallCases.some(c => c.loadId === loadId && c.status === 'OPEN')) {
-      notify(`Υπάρχει ήδη ενεργή ανάκληση για το φορτίο ${loadId}.`);
+      notify(tr('Υπάρχει ήδη ενεργή ανάκληση για το φορτίο {0}.', loadId));
       return;
     }
     const now = formatStoreDateTime();
@@ -770,7 +777,7 @@ export function SurgiProvider({
         item.id === loadId ? {...item, status: 'RECALLED', recalledAt: now, recallReason: reason.trim()} : item,
       ),
     );
-    notify(`Άνοιξε η ανάκληση ${recallCase.id} για το φορτίο ${loadId} (${load.items.length} αντικείμενα).`);
+    notify(tr('Άνοιξε η ανάκληση {0} για το φορτίο {1} ({2} αντικείμενα).', recallCase.id, loadId, load.items.length));
   };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
     const a = assetName(kind, id);
@@ -806,7 +813,7 @@ export function SurgiProvider({
       status: `Ολοκλήρωση ελέγχου · ${stage.labelEl}`,
       by: currentUser.name,
     });
-    notify(`${a.barcode}: ολοκληρώθηκε το στάδιο «${stage.labelEl}».`);
+    notify(tr('{0}: ολοκληρώθηκε το στάδιο «{1}».', a.barcode, stage.labelEl));
     return record;
   };
   const completeDeliveryToDepartment = (kind: AssetKind, id: string, payload: DeliveryPayload) => {
@@ -840,7 +847,7 @@ export function SurgiProvider({
       status: `Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ${currentUser.name} · παρέλαβε ${payload.receivedByName}`,
       by: currentUser.name,
     });
-    notify(`Η παράδοση του ${a.barcode} στο ${a.department || 'τμήμα'} ολοκληρώθηκε.`);
+    notify(tr('Η παράδοση του {0} στο {1} ολοκληρώθηκε.', a.barcode, a.department || 'τμήμα'));
     return record;
   };
   const recordCount = (p: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => {
@@ -877,7 +884,7 @@ export function SurgiProvider({
         by: 'OR User',
         patientCode: p.patientCode,
       });
-      notify(`Η καταμέτρηση ${s.barcode} καταγράφηκε και υπογράφηκε.`);
+      notify(tr('Η καταμέτρηση {0} καταγράφηκε και υπογράφηκε.', s.barcode));
     }
   };
   const moveTool = (toolId: string, destination: 'STOCK' | 'SET' | 'SERVICE' | 'REMOVE', setId?: string) => {
@@ -913,7 +920,7 @@ export function SurgiProvider({
         status: 'Μεταφορά εργαλείου σε Set',
         by: currentUser.name,
       });
-      notify(`${t.barcode} μετακινήθηκε στο ${target.barcode}.`);
+      notify(tr('{0} μετακινήθηκε στο {1}.', t.barcode, target.barcode));
       return;
     }
     if (destination === 'STOCK') {
@@ -931,7 +938,7 @@ export function SurgiProvider({
         status: 'Μεταφορά εργαλείου στο Stock',
         by: currentUser.name,
       });
-      notify(`${t.barcode} μετακινήθηκε στο Stock.`);
+      notify(tr('{0} μετακινήθηκε στο Stock.', t.barcode));
       return;
     }
     if (destination === 'REMOVE') {
@@ -957,7 +964,7 @@ export function SurgiProvider({
         status: 'Αφαίρεση εργαλείου από Set',
         by: currentUser.name,
       });
-      notify(`${t.barcode} αφαιρέθηκε από το Set.`);
+      notify(tr('{0} αφαιρέθηκε από το Set.', t.barcode));
       return;
     }
     setTools(x =>
@@ -987,7 +994,7 @@ export function SurgiProvider({
       status: 'Αφαίρεση από σύνθεση · προς Service',
       by: currentUser.name,
     });
-    notify(`${t.barcode} μεταφέρθηκε στα Χαλασμένα / Service.`);
+    notify(tr('{0} μεταφέρθηκε στα Χαλασμένα / Service.', t.barcode));
   };
   const replaceToolInSet = (
     setId: string,
@@ -1071,7 +1078,7 @@ export function SurgiProvider({
       status: `Αντικατάσταση εργαλείου ${outgoing.barcode}`,
       by: currentUser.name,
     });
-    notify(`${outgoing.barcode} αντικαταστάθηκε από ${replacement.barcode} στο ${target.barcode}.`);
+    notify(tr('{0} αντικαταστάθηκε από {1} στο {2}.', outgoing.barcode, replacement.barcode, target.barcode));
   };
   const reportIssue = (
     toolId: string,
@@ -1096,7 +1103,7 @@ export function SurgiProvider({
       },
       ...x,
     ]);
-    notify(`Καταγράφηκε αναφορά για ${t.barcode}.`);
+    notify(tr('Καταγράφηκε αναφορά για {0}.', t.barcode));
   };
   const resolveIssues = (issueIds: string[], resolutionNote = 'Διαχειρίστηκε κατά τη σύνθεση & προετοιμασία') => {
     if (!issueIds.length) return;
@@ -1108,13 +1115,15 @@ export function SurgiProvider({
           : issue,
       ),
     );
-    notify(`${issueIds.length === 1 ? 'Η εκκρεμότητα επιλύθηκε.' : `${issueIds.length} εκκρεμότητες επιλύθηκαν.`}`);
+    notify(
+      issueIds.length === 1 ? tr('Η εκκρεμότητα επιλύθηκε.') : tr('{0} εκκρεμότητες επιλύθηκαν.', issueIds.length),
+    );
   };
   const addAssetPhotos = (kind: AssetKind, id: string, photos: AssetPhoto[]) => {
     if (!photos.length) return;
     if (kind === 'SET') setSets(x => x.map(a => (a.id === id ? {...a, photos: [...(a.photos || []), ...photos]} : a)));
     else setTools(x => x.map(a => (a.id === id ? {...a, photos: [...(a.photos || []), ...photos]} : a)));
-    notify(`${photos.length} ${photos.length === 1 ? 'φωτογραφία προστέθηκε' : 'φωτογραφίες προστέθηκαν'}.`);
+    notify(photos.length === 1 ? tr('1 φωτογραφία προστέθηκε.') : tr('{0} φωτογραφίες προστέθηκαν.', photos.length));
   };
   const removeAssetPhoto = (kind: AssetKind, id: string, photoId: string) => {
     if (kind === 'SET')
@@ -1125,7 +1134,7 @@ export function SurgiProvider({
       setTools(x =>
         x.map(a => (a.id === id ? {...a, photos: (a.photos || []).filter(photo => photo.id !== photoId)} : a)),
       );
-    notify('Η φωτογραφία αφαιρέθηκε.');
+    notify(tr('Η φωτογραφία αφαιρέθηκε.'));
   };
 
   const nextBarcode = (kind: AssetKind) => {
@@ -1169,7 +1178,11 @@ export function SurgiProvider({
         by: currentUser.name,
       }),
     );
-    notify(`Δημιουργήθηκαν ${created.length} εργαλεία με μοναδικά barcodes${mode === 'STOCK' ? ' στο Stock' : ''}.`);
+    notify(
+      mode === 'STOCK'
+        ? tr('Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes στο Stock.', created.length)
+        : tr('Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes.', created.length),
+    );
     return created.map(t => t.id);
   };
   const createSet = (p: CreateSetPayload) => {
@@ -1211,7 +1224,11 @@ export function SurgiProvider({
       status: `Δημιουργία Set · ${p.toolIds.length} εργαλεία${inStock ? ' · αυτόματα ως ενιαίο Stock Σετ' : ''}`,
       by: currentUser.name,
     });
-    notify(`${barcode}: το νέο Set δημιουργήθηκε${inStock ? ' αυτόματα στο Stock Σετ' : ''}.`);
+    notify(
+      inStock
+        ? tr('{0}: το νέο Set δημιουργήθηκε αυτόματα στο Stock Σετ.', barcode)
+        : tr('{0}: το νέο Set δημιουργήθηκε.', barcode),
+    );
     return id;
   };
   const reissueBarcode = (kind: AssetKind, id: string, reason = 'Επανέκδοση ετικέτας') => {
@@ -1225,7 +1242,7 @@ export function SurgiProvider({
       status: `Επανέκδοση barcode · ${reason}`,
       by: currentUser.name,
     });
-    notify(`${a.barcode}: καταγράφηκε επανέκδοση barcode.`);
+    notify(tr('{0}: καταγράφηκε επανέκδοση barcode.', a.barcode));
   };
   const duplicateSet = (id: string, withTools = false) => {
     const src = sets.find(s => s.id === id);
@@ -1271,7 +1288,11 @@ export function SurgiProvider({
       status: `Δημιουργία από ${src.barcode} · ${withTools ? 'με νέα φυσικά αντίγραφα εργαλείων' : 'κενό Σετ χωρίς φυσικά εργαλεία'}`,
       by: currentUser.name,
     });
-    notify(`${barcode}: δημιουργήθηκε ${withTools ? 'με αντίγραφα εργαλείων και νέα barcodes' : 'ως κενό Σετ'}.`);
+    notify(
+      withTools
+        ? tr('{0}: δημιουργήθηκε με αντίγραφα εργαλείων και νέα barcodes.', barcode)
+        : tr('{0}: δημιουργήθηκε ως κενό Σετ.', barcode),
+    );
   };
   const duplicateTool = (id: string) => {
     const src = tools.find(t => t.id === id);
@@ -1302,7 +1323,7 @@ export function SurgiProvider({
       status: 'Δημιουργία νέου φυσικού εργαλείου από υπάρχουσα καρτέλα',
       by: currentUser.name,
     });
-    notify(`${barcode}: δημιουργήθηκε νέο αντίγραφο εργαλείου στο Stock.`);
+    notify(tr('{0}: δημιουργήθηκε νέο αντίγραφο εργαλείου στο Stock.', barcode));
     return newId;
   };
   const deleteSet = (id: string, deleteTools = false) => {
@@ -1331,8 +1352,8 @@ export function SurgiProvider({
     });
     notify(
       deleteTools
-        ? 'Το Σετ και τα εργαλεία του διαγράφηκαν.'
-        : 'Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Stock.',
+        ? tr('Το Σετ και τα εργαλεία του διαγράφηκαν.')
+        : tr('Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Stock.'),
     );
   };
   const deleteTool = (id: string) => {
@@ -1349,7 +1370,7 @@ export function SurgiProvider({
       status: 'Οριστική διαγραφή φυσικού εργαλείου',
       by: currentUser.name,
     });
-    notify(`${src.barcode}: το εργαλείο διαγράφηκε.`);
+    notify(tr('{0}: το εργαλείο διαγράφηκε.', src.barcode));
   };
   const reportSetIssue = (
     setId: string,
@@ -1376,7 +1397,7 @@ export function SurgiProvider({
         })),
         ...x,
       ]);
-      notify(`Καταγράφηκε αναφορά για ${selected.length} εργαλεία του ${src.barcode}.`);
+      notify(tr('Καταγράφηκε αναφορά για {0} εργαλεία του {1}.', selected.length, src.barcode));
       return;
     }
     setIssues(x => [
@@ -1392,7 +1413,7 @@ export function SurgiProvider({
       },
       ...x,
     ]);
-    notify(`Καταγράφηκε αναφορά για το Σετ ${src.barcode}.`);
+    notify(tr('Καταγράφηκε αναφορά για το Σετ {0}.', src.barcode));
   };
   const retireAsset = (kind: AssetKind, id: string) => {
     const a = assetName(kind, id);
@@ -1406,7 +1427,7 @@ export function SurgiProvider({
       status: 'Απόσυρση από ενεργή χρήση',
       by: currentUser.name,
     });
-    notify(`${a.barcode}: αποσύρθηκε από ενεργή χρήση.`);
+    notify(tr('{0}: αποσύρθηκε από ενεργή χρήση.', a.barcode));
   };
   const updateSet = (id: string, patch: SetUpdatePatch) => {
     const before = sets.find(s => s.id === id);
@@ -1414,7 +1435,7 @@ export function SurgiProvider({
     const barcodeChanged = patch.barcode && patch.barcode !== before.barcode;
     const normalizedBarcode = patch.barcode?.trim().toUpperCase();
     if (normalizedBarcode && sets.some(s => s.id !== id && s.barcode === normalizedBarcode)) {
-      notify(`Το barcode ${normalizedBarcode} χρησιμοποιείται ήδη.`);
+      notify(tr('Το barcode {0} χρησιμοποιείται ήδη.', normalizedBarcode));
       return;
     }
     const requestedDepartment = (patch.department ?? before.department).trim();
@@ -1427,7 +1448,7 @@ export function SurgiProvider({
     const inStock = nextState === 'IN_STOCK';
     const department = inStock ? '' : requestedDepartment;
     if (!inStock && !department) {
-      notify('Ορίστε Τμήμα για να βγει το Σετ από το Stock.');
+      notify(tr('Ορίστε Τμήμα για να βγει το Σετ από το Stock.'));
       return;
     }
     const nextPatch = {
@@ -1457,7 +1478,7 @@ export function SurgiProvider({
       status: `Επεξεργασία στοιχείων Σετ${changedBarcode}${stockChange}`,
       by: currentUser.name,
     });
-    notify(`${normalizedBarcode || before.barcode}: οι αλλαγές αποθηκεύτηκαν.`);
+    notify(tr('{0}: οι αλλαγές αποθηκεύτηκαν.', normalizedBarcode || before.barcode));
   };
   const updateTool = (id: string, patch: ToolUpdatePatch) => {
     const before = tools.find(t => t.id === id);
@@ -1465,7 +1486,7 @@ export function SurgiProvider({
     const barcodeChanged = patch.barcode && patch.barcode !== before.barcode;
     const normalizedBarcode = patch.barcode?.trim().toUpperCase();
     if (normalizedBarcode && tools.some(t => t.id !== id && t.barcode === normalizedBarcode)) {
-      notify(`Το barcode ${normalizedBarcode} χρησιμοποιείται ήδη.`);
+      notify(tr('Το barcode {0} χρησιμοποιείται ήδη.', normalizedBarcode));
       return;
     }
     const parentSet = before.setId ? sets.find(s => s.id === before.setId) : undefined;
@@ -1515,7 +1536,7 @@ export function SurgiProvider({
       status: `Επεξεργασία στοιχείων εργαλείου${changedBarcode}${locationChange}`,
       by: currentUser.name,
     });
-    notify(`${normalizedBarcode || before.barcode}: οι αλλαγές αποθηκεύτηκαν.`);
+    notify(tr('{0}: οι αλλαγές αποθηκεύτηκαν.', normalizedBarcode || before.barcode));
   };
   const addToolsToSet = (setId: string, toolIds: string[]) => {
     const target = sets.find(item => item.id === setId);
@@ -1556,7 +1577,7 @@ export function SurgiProvider({
         by: currentUser.name,
       });
     });
-    notify(`${chosen.length} εργαλεία προστέθηκαν στο ${target.barcode}.`);
+    notify(tr('{0} εργαλεία προστέθηκαν στο {1}.', chosen.length, target.barcode));
   };
   const lifecycleAlerts = useMemo(
     () => getLifecycleAlerts(sets, tools, systemSettings.usageWarningThreshold),
@@ -1570,7 +1591,7 @@ export function SurgiProvider({
     } else {
       setTools(list => list.map(item => (item.id === id ? {...item, maxUses: normalized} : item)));
     }
-    notify(normalized ? `Ορίστηκε όριο ${normalized} χρήσεων.` : 'Το όριο χρήσεων αφαιρέθηκε.');
+    notify(normalized ? tr('Ορίστηκε όριο {0} χρήσεων.', normalized) : tr('Το όριο χρήσεων αφαιρέθηκε.'));
   };
   const value = useMemo(
     () => ({

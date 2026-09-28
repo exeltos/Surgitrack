@@ -3,6 +3,7 @@ import {Building2, Eye, EyeOff, Languages, LockKeyhole, Mail, MailCheck, ShieldC
 import {FunctionsHttpError} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
+import {localizedName} from '../../core/glossary';
 import {APP_VERSION} from '../../config/appMeta';
 
 type LinkInfo = {
@@ -231,7 +232,7 @@ export default function JoinPage({token}: {token: string}) {
                         <option value="">{L('— Επιλέξτε τμήμα —', '— Pick your department —')}</option>
                         {info.departments.map(d => (
                           <option key={d.id} value={d.id}>
-                            {d.name}
+                            {localizedName(d.name, lang)}
                           </option>
                         ))}
                       </select>

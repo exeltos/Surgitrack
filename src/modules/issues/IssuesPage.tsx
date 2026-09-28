@@ -4,6 +4,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
+import {tr, trData} from '../../i18n';
 
 export default function IssuesPage() {
   const {issues, role, currentUser} = useSurgi();
@@ -25,18 +26,18 @@ export default function IssuesPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ΠΑΡΑΚΟΛΟΥΘΗΣΗ"
-        title="Εκκρεμότητες"
+        eyebrow={tr('ΠΑΡΑΚΟΛΟΥΘΗΣΗ')}
+        title={tr('Εκκρεμότητες')}
         description={
           role === 'DEPARTMENT'
-            ? `Αναφορές και εκκρεμότητες του τμήματος ${currentUser.department}.`
-            : 'Ενιαία διαχείριση ελλείψεων, φθορών, βλαβών, απωλειών, service και αντικαταστάσεων.'
+            ? tr('Αναφορές και εκκρεμότητες του τμήματος {0}.', trData(currentUser.department))
+            : tr('Ενιαία διαχείριση ελλείψεων, φθορών, βλαβών, απωλειών, service και αντικαταστάσεων.')
         }
       />
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
-        placeholder="Εργαλείο/Σετ, barcode, τύπος ή σημείωση..."
+        placeholder={tr('Εργαλείο/Σετ, barcode, τύπος ή σημείωση...')}
         filters={[
           ...(role === 'DEPARTMENT'
             ? []
@@ -44,7 +45,7 @@ export default function IssuesPage() {
                 {
                   key: 'department',
                   value: department,
-                  placeholder: 'Όλα τα τμήματα',
+                  placeholder: tr('Όλα τα τμήματα'),
                   options: values('department').map(value => ({value, label: value})),
                   onChange: setDepartment,
                 },
@@ -52,33 +53,33 @@ export default function IssuesPage() {
           {
             key: 'type',
             value: type,
-            placeholder: 'Όλοι οι τύποι',
+            placeholder: tr('Όλοι οι τύποι'),
             options: values('type').map(value => ({value, label: value})),
             onChange: setType,
           },
           {
             key: 'status',
             value: status,
-            placeholder: 'Όλες οι καταστάσεις',
+            placeholder: tr('Όλες οι καταστάσεις'),
             options: [
-              {value: 'OPEN', label: 'Ανοικτές'},
-              {value: 'RESOLVED', label: 'Επιλυμένες'},
+              {value: 'OPEN', label: tr('Ανοικτές')},
+              {value: 'RESOLVED', label: tr('Επιλυμένες')},
             ],
             onChange: setStatus,
           },
         ]}
       />
-      <ScrollableListPanel ariaLabel="Λίστα εκκρεμοτήτων">
+      <ScrollableListPanel ariaLabel={tr('Λίστα εκκρεμοτήτων')}>
         <table className="asset-registry-table issues-registry-table">
           <thead>
             <tr>
-              <th>Αντικείμενο</th>
-              <th>Τύπος</th>
-              <th>Τμήμα</th>
-              <th>Δημιουργήθηκε</th>
-              <th>Σημείωση</th>
-              <th>Φωτογραφίες</th>
-              <th>Κατάσταση</th>
+              <th>{tr('Αντικείμενο')}</th>
+              <th>{tr('Τύπος')}</th>
+              <th>{tr('Τμήμα')}</th>
+              <th>{tr('Δημιουργήθηκε')}</th>
+              <th>{tr('Σημείωση')}</th>
+              <th>{tr('Φωτογραφίες')}</th>
+              <th>{tr('Κατάσταση')}</th>
             </tr>
           </thead>
           <tbody>
@@ -87,8 +88,8 @@ export default function IssuesPage() {
                 <td>
                   <strong>{i.asset}</strong>
                 </td>
-                <td>{i.type}</td>
-                <td>{i.department}</td>
+                <td>{trData(i.type)}</td>
+                <td>{trData(i.department)}</td>
                 <td>{i.created}</td>
                 <td>{i.note}</td>
                 <td>
@@ -107,7 +108,7 @@ export default function IssuesPage() {
                 </td>
                 <td>
                   <span className={`badge ${i.status === 'OPEN' ? 'warning' : ''}`}>
-                    {i.status === 'OPEN' ? 'Ανοικτή' : 'Επιλυμένη'}
+                    {i.status === 'OPEN' ? tr('Ανοικτή') : tr('Επιλυμένη')}
                   </span>
                 </td>
               </tr>

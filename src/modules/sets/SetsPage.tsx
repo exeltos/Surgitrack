@@ -7,7 +7,9 @@ import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
+import {statusLabel} from '../../components/ui/statusLabel';
 import PageHeader from '../../components/ui/PageHeader';
+import {tr, trData} from '../../i18n';
 export default function SetsPage() {
   const {sets, tools, can} = useSurgi();
   const navigate = useNavigate();
@@ -31,13 +33,13 @@ export default function SetsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow="ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ"
-        title="Σετ εργαλείων"
-        description="Μητρώο Σετ με ξεχωριστά πεδία Ονομασίας, Κωδικού και μοναδικού Barcode."
+        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        title={tr('Σετ εργαλείων')}
+        description={tr('Μητρώο Σετ με ξεχωριστά πεδία Ονομασίας, Κωδικού και μοναδικού Barcode.')}
         actions={
           can('asset.create') ? (
             <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/sets/new')}>
-              Νέο Σετ
+              {tr('Νέο Σετ')}
             </AppButton>
           ) : undefined
         }
@@ -45,50 +47,50 @@ export default function SetsPage() {
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
-        placeholder="Όνομα Σετ, κωδικός ή barcode..."
+        placeholder={tr('Όνομα Σετ, κωδικός ή barcode...')}
         filters={[
           {
             key: 'department',
             value: department,
-            placeholder: 'Όλα τα τμήματα',
-            options: values('department').map(value => ({value, label: value})),
+            placeholder: tr('Όλα τα τμήματα'),
+            options: values('department').map(value => ({value, label: trData(value)})),
             onChange: setDepartment,
           },
           {
             key: 'specialty',
             value: specialty,
-            placeholder: 'Όλες οι ειδικότητες',
+            placeholder: tr('Όλες οι ειδικότητες'),
             options: values('specialty').map(value => ({value, label: value})),
             onChange: setSpecialty,
           },
           {
             key: 'manufacturer',
             value: manufacturer,
-            placeholder: 'Όλες οι εταιρείες',
+            placeholder: tr('Όλες οι εταιρείες'),
             options: values('manufacturer').map(value => ({value, label: value})),
             onChange: setManufacturer,
           },
           {
             key: 'state',
             value: state,
-            placeholder: 'Όλες οι καταστάσεις',
-            options: values('state').map(value => ({value, label: value})),
+            placeholder: tr('Όλες οι καταστάσεις'),
+            options: values('state').map(value => ({value, label: statusLabel(value)})),
             onChange: setState,
           },
         ]}
       />
-      <ScrollableListPanel ariaLabel="Λίστα Σετ εργαλείων">
+      <ScrollableListPanel ariaLabel={tr('Λίστα Σετ εργαλείων')}>
         <table className="asset-registry-table">
           <thead>
             <tr>
-              <th>Όνομα Σετ</th>
-              <th>Κωδικός</th>
+              <th>{tr('Όνομα Σετ')}</th>
+              <th>{tr('Κωδικός')}</th>
               <th>Barcode</th>
-              <th>Εταιρεία</th>
-              <th>Τμήμα</th>
-              <th>Ειδικότητα</th>
-              <th>Εργαλεία</th>
-              <th>Κατάσταση</th>
+              <th>{tr('Εταιρεία')}</th>
+              <th>{tr('Τμήμα')}</th>
+              <th>{tr('Ειδικότητα')}</th>
+              <th>{tr('Εργαλεία')}</th>
+              <th>{tr('Κατάσταση')}</th>
               <th></th>
             </tr>
           </thead>
@@ -115,9 +117,13 @@ export default function SetsPage() {
                   </td>
                   <td>{s.manufacturer || '—'}</td>
                   <td>
-                    {s.state === 'IN_STOCK' ? <span className="asset-field-na">Stock Σετ</span> : s.department || '—'}
+                    {s.state === 'IN_STOCK' ? (
+                      <span className="asset-field-na">{tr('Stock Σετ')}</span>
+                    ) : (
+                      trData(s.department) || '—'
+                    )}
                   </td>
-                  <td>{s.specialty || '—'}</td>
+                  <td>{trData(s.specialty) || '—'}</td>
                   <td>
                     <b>{count}</b>
                     <span className="muted"> / {s.expected}</span>
@@ -126,7 +132,7 @@ export default function SetsPage() {
                     <StatusBadge value={s.state} />
                   </td>
                   <td>
-                    <Link className="icon-link" to={`/sets/${s.id}`} aria-label={`Άνοιγμα ${s.barcode}`}>
+                    <Link className="icon-link" to={`/sets/${s.id}`} aria-label={tr('Άνοιγμα {0}', s.barcode)}>
                       <ChevronRight size={17} />
                     </Link>
                   </td>

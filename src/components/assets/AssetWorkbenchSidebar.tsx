@@ -4,6 +4,7 @@ import {Barcode, Camera, Check, Images, Pencil, X} from 'lucide-react';
 import type {AssetKind, AssetState, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
 import AssetTypeIcon from './AssetTypeIcon';
+import {tr, trData} from '../../i18n';
 
 type EditablePatch = Partial<
   Pick<SetAsset, 'name' | 'code' | 'department' | 'specialty' | 'manufacturer' | 'state' | 'maxUses'>
@@ -48,7 +49,7 @@ export default function AssetWorkbenchSidebar({
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
-  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? 'Μέλος Set' : null;
+  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Set') : null;
   const makeDraft = () => ({
     name: asset.name,
     code: asset.code,
@@ -111,10 +112,10 @@ export default function AssetWorkbenchSidebar({
           <div>
             <span className="eyebrow">
               {kind === 'SET'
-                ? 'ΚΑΡΤΕΛΑ ΣΕΤ'
+                ? tr('ΚΑΡΤΕΛΑ ΣΕΤ')
                 : asset.maxUses !== undefined
-                  ? 'ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ · ΠΕΡΙΟΡΙΣΜΕΝΩΝ ΧΡΗΣΕΩΝ'
-                  : 'ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ'}
+                  ? tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ · ΠΕΡΙΟΡΙΣΜΕΝΩΝ ΧΡΗΣΕΩΝ')
+                  : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}
             </span>
             <h1>{asset.name}</h1>
             <p>{asset.code}</p>
@@ -126,29 +127,29 @@ export default function AssetWorkbenchSidebar({
           ) : (
             <StatusBadge value={asset.state} />
           )}{' '}
-          {workflowLocked && <small>Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες</small>}
+          {workflowLocked && <small>{tr('Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες')}</small>}
         </div>
       </div>
       <div className="asset-fields-heading">
-        <strong>Στοιχεία</strong>
+        <strong>{tr('Στοιχεία')}</strong>
         {onSave && !workflowLocked && !editing && (
           <button
             type="button"
             className="asset-inline-edit"
             onClick={() => setEditing(true)}
-            title="Ξεκλείδωμα πεδίων"
+            title={tr('Ξεκλείδωμα πεδίων')}
           >
             <Pencil size={15} />
-            <span>Επεξεργασία</span>
+            <span>{tr('Επεξεργασία')}</span>
           </button>
         )}
         {editing && (
           <div className="asset-inline-edit-actions">
             <button type="button" className="asset-inline-save" onClick={save}>
               <Check size={14} />
-              Αποθήκευση
+              {tr('Αποθήκευση')}
             </button>
-            <button type="button" className="asset-inline-cancel" onClick={cancel} title="Ακύρωση">
+            <button type="button" className="asset-inline-cancel" onClick={cancel} title={tr('Ακύρωση')}>
               <X size={14} />
             </button>
           </div>
@@ -156,7 +157,7 @@ export default function AssetWorkbenchSidebar({
       </div>
       <dl className="asset-workbench-fields">
         <div>
-          <dt>Κατάσταση</dt>
+          <dt>{tr('Κατάσταση')}</dt>
           <dd>
             {!editing && displayStateLabel ? (
               <span className="status-badge asset-member-status">{displayStateLabel}</span>
@@ -168,7 +169,7 @@ export default function AssetWorkbenchSidebar({
               >
                 {states.map(s => (
                   <option key={s.value} value={s.value}>
-                    {s.label}
+                    {tr(s.label)}
                   </option>
                 ))}
               </select>
@@ -178,35 +179,35 @@ export default function AssetWorkbenchSidebar({
           </dd>
         </div>
         <div>
-          <dt>Κωδικός</dt>
+          <dt>{tr('Κωδικός')}</dt>
           <dd>{editing ? textField('code', draft.code) : asset.code}</dd>
         </div>
         <div>
-          <dt>Ονομασία</dt>
+          <dt>{tr('Ονομασία')}</dt>
           <dd>{editing ? textField('name', draft.name) : asset.name}</dd>
         </div>
         <div>
-          <dt>Ειδικότητα</dt>
-          <dd>{editing ? textField('specialty', draft.specialty) : asset.specialty || '—'}</dd>
+          <dt>{tr('Ειδικότητα')}</dt>
+          <dd>{editing ? textField('specialty', draft.specialty) : trData(asset.specialty) || '—'}</dd>
         </div>
         <div>
-          <dt>Τμήμα</dt>
+          <dt>{tr('Τμήμα')}</dt>
           <dd>
             {tool?.mode === 'STOCK' ? (
               <span className="asset-field-na">— Stock</span>
             ) : tool?.mode === 'SET_MEMBER' ? (
-              setDepartment || asset.department || '—'
+              trData(setDepartment || asset.department) || '—'
             ) : kind === 'SET' && (editing ? draft.state : asset.state) === 'IN_STOCK' ? (
-              <span className="asset-field-na">— Stock Σετ</span>
+              <span className="asset-field-na">{tr('— Stock Σετ')}</span>
             ) : editing ? (
               textField('department', draft.department)
             ) : (
-              asset.department || '—'
+              trData(asset.department) || '—'
             )}
           </dd>
         </div>
         <div>
-          <dt>Κατασκευαστής</dt>
+          <dt>{tr('Κατασκευαστής')}</dt>
           <dd>
             {editing
               ? textField('manufacturer', draft.manufacturer)
@@ -216,12 +217,14 @@ export default function AssetWorkbenchSidebar({
         {kind === 'TOOL' && (
           <>
             <div>
-              <dt>Τύπος</dt>
-              <dd>{tool?.mode === 'SET_MEMBER' ? 'Μέλος Σετ' : tool?.mode === 'STOCK' ? 'Stock' : 'Μεμονωμένο'}</dd>
+              <dt>{tr('Τύπος')}</dt>
+              <dd>
+                {tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : tool?.mode === 'STOCK' ? 'Stock' : tr('Μεμονωμένο')}
+              </dd>
             </div>
             {setName && (
               <div>
-                <dt>Σετ εργαλείων</dt>
+                <dt>{tr('Σετ εργαλείων')}</dt>
                 <dd>{setName}</dd>
               </div>
             )}
@@ -232,7 +235,7 @@ export default function AssetWorkbenchSidebar({
           </>
         )}
         <div className="asset-usage-field">
-          <dt>Τύπος χρήσης</dt>
+          <dt>{tr('Τύπος χρήσης')}</dt>
           <dd>
             {editing ? (
               <select
@@ -246,18 +249,18 @@ export default function AssetWorkbenchSidebar({
                   }))
                 }
               >
-                <option value="UNLIMITED">Χωρίς όριο</option>
-                <option value="LIMITED">Περιορισμένων χρήσεων</option>
+                <option value="UNLIMITED">{tr('Χωρίς όριο')}</option>
+                <option value="LIMITED">{tr('Περιορισμένων χρήσεων')}</option>
               </select>
             ) : asset.maxUses !== undefined ? (
-              'Περιορισμένων χρήσεων'
+              tr('Περιορισμένων χρήσεων')
             ) : (
-              'Χωρίς όριο'
+              tr('Χωρίς όριο')
             )}
           </dd>
         </div>
         <div className="asset-usage-field">
-          <dt>Αρχικό όριο χρήσεων</dt>
+          <dt>{tr('Αρχικό όριο χρήσεων')}</dt>
           <dd>
             {editing && draft.usageType === 'LIMITED' ? (
               <input
@@ -275,11 +278,11 @@ export default function AssetWorkbenchSidebar({
         {asset.maxUses !== undefined && (
           <>
             <div>
-              <dt>Χρήσεις</dt>
+              <dt>{tr('Χρήσεις')}</dt>
               <dd>{asset.uses || 0}</dd>
             </div>
             <div>
-              <dt>Υπόλοιπο χρήσεων</dt>
+              <dt>{tr('Υπόλοιπο χρήσεων')}</dt>
               <dd
                 className={asset.maxUses - (asset.uses || 0) <= systemSettings.usageWarningThreshold ? 'warn-text' : ''}
               >
@@ -301,9 +304,9 @@ export default function AssetWorkbenchSidebar({
           <div className="asset-workbench-mini">
             <AssetTypeIcon kind="SET" size={17} />
             <div>
-              <span>Περιεχόμενα Σετ</span>
+              <span>{tr('Περιεχόμενα Σετ')}</span>
               <strong>
-                {memberCount}/{expectedCount} εργαλεία
+                {memberCount}/{expectedCount} {tr('εργαλεία')}
               </strong>
             </div>
           </div>
@@ -312,19 +315,26 @@ export default function AssetWorkbenchSidebar({
             <div className="asset-workbench-mini">
               <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} size={17} />
               <div>
-                <span>Χρήσεις</span>
-                <strong>{tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : `${tool?.uses || 0} · χωρίς όριο`}</strong>
+                <span>{tr('Χρήσεις')}</span>
+                <strong>
+                  {tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} · χωρίς όριο', tool?.uses || 0)}
+                </strong>
               </div>
             </div>
-            <button className="asset-tool-photo-card" type="button" onClick={onPhotos} aria-label="Άνοιγμα φωτογραφιών">
+            <button
+              className="asset-tool-photo-card"
+              type="button"
+              onClick={onPhotos}
+              aria-label={tr('Άνοιγμα φωτογραφιών')}
+            >
               {cover ? (
                 <img src={cover} alt={asset.name} />
               ) : (
                 <div className="asset-tool-photo-empty">
                   <Camera size={22} />
                   <div>
-                    <strong>Φωτογραφία</strong>
-                    <span>Λήψη ή upload</span>
+                    <strong>{tr('Φωτογραφία')}</strong>
+                    <span>{tr('Λήψη ή upload')}</span>
                   </div>
                 </div>
               )}
@@ -337,14 +347,14 @@ export default function AssetWorkbenchSidebar({
         )}
       </div>
       {kind === 'SET' && (
-        <button className="asset-cover" type="button" onClick={onPhotos} aria-label="Άνοιγμα φωτογραφιών">
+        <button className="asset-cover" type="button" onClick={onPhotos} aria-label={tr('Άνοιγμα φωτογραφιών')}>
           {cover ? (
             <img src={cover} alt={asset.name} />
           ) : (
             <div className="asset-cover-empty">
               <Camera size={30} />
-              <strong>Χωρίς φωτογραφία</strong>
-              <span>Λήψη ή upload</span>
+              <strong>{tr('Χωρίς φωτογραφία')}</strong>
+              <span>{tr('Λήψη ή upload')}</span>
             </div>
           )}
           <span className="asset-cover-count">

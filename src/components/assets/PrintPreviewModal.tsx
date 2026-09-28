@@ -1,5 +1,6 @@
 import {Download, Printer, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
+import {tr} from '../../i18n';
 export default function PrintPreviewModal({title, html, onClose}: {title: string; html: string; onClose: () => void}) {
   const frameId = 'surgitrack-print-preview';
   const doPrint = () => {
@@ -21,10 +22,10 @@ export default function PrintPreviewModal({title, html, onClose}: {title: string
       <div className="print-preview-modal">
         <header>
           <div>
-            <span className="eyebrow">ΠΡΟΕΠΙΣΚΟΠΗΣΗ</span>
+            <span className="eyebrow">{tr('ΠΡΟΕΠΙΣΚΟΠΗΣΗ')}</span>
             <h2>{title}</h2>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label="Κλείσιμο">
+          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
             <X size={18} />
           </button>
         </header>
@@ -32,12 +33,12 @@ export default function PrintPreviewModal({title, html, onClose}: {title: string
           <iframe id={frameId} title={title} srcDoc={html} />
         </div>
         <footer>
-          <AppButton onClick={onClose}>Κλείσιμο</AppButton>
+          <AppButton onClick={onClose}>{tr('Κλείσιμο')}</AppButton>
           <AppButton icon={<Download size={16} />} onClick={download}>
-            Λήψη
+            {tr('Λήψη')}
           </AppButton>
           <AppButton variant="primary" icon={<Printer size={16} />} onClick={doPrint}>
-            Εκτύπωση / PDF
+            {tr('Εκτύπωση / PDF')}
           </AppButton>
         </footer>
       </div>

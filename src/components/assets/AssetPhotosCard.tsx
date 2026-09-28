@@ -3,6 +3,7 @@ import {Camera, ImagePlus, Trash2, Images} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import type {AssetPhoto} from '../../types/domain';
 import CameraCaptureModal from './CameraCaptureModal';
+import {tr} from '../../i18n';
 
 type Props = {
   photos: AssetPhoto[];
@@ -17,8 +18,10 @@ export default function AssetPhotosCard({
   photos,
   onAdd,
   onRemove,
-  title = 'Φωτογραφίες',
-  description = 'Φωτογραφική τεκμηρίωση του φυσικού αντικειμένου. Μπορείς να κρατήσεις περισσότερες από μία φωτογραφίες.',
+  title = tr('Φωτογραφίες'),
+  description = tr(
+    'Φωτογραφική τεκμηρίωση του φυσικού αντικειμένου. Μπορείς να κρατήσεις περισσότερες από μία φωτογραφίες.',
+  ),
   readOnly = false,
 }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -32,17 +35,17 @@ export default function AssetPhotosCard({
     <section className="asset-section asset-photos-card">
       <div className="asset-section-head photo-section-head">
         <div>
-          <span className="eyebrow">ΤΕΚΜΗΡΙΩΣΗ</span>
+          <span className="eyebrow">{tr('ΤΕΚΜΗΡΙΩΣΗ')}</span>
           <h2>{title}</h2>
           <p>{description}</p>
         </div>
         {!readOnly && (
           <div className="photo-actions">
             <AppButton size="sm" icon={<Camera size={16} />} onClick={() => setCameraOpen(true)}>
-              Λήψη φωτογραφίας
+              {tr('Λήψη φωτογραφίας')}
             </AppButton>
             <AppButton size="sm" icon={<ImagePlus size={16} />} onClick={() => uploadRef.current?.click()}>
-              Upload φωτογραφιών
+              {tr('Upload φωτογραφιών')}
             </AppButton>
           </div>
         )}
@@ -82,9 +85,9 @@ export default function AssetPhotosCard({
         <div className="asset-photo-grid">
           {photos.map(photo => (
             <figure className="asset-photo-tile" key={photo.id}>
-              <img src={photo.dataUrl} alt={photo.name || 'Φωτογραφία αντικειμένου'} />
+              <img src={photo.dataUrl} alt={photo.name || tr('Φωτογραφία αντικειμένου')} />
               <figcaption>
-                <span>{photo.name || 'Φωτογραφία'}</span>
+                <span>{photo.name || tr('Φωτογραφία')}</span>
                 <small>{photo.createdAt}</small>
               </figcaption>
               {!readOnly && (
@@ -92,8 +95,8 @@ export default function AssetPhotosCard({
                   className="photo-remove"
                   type="button"
                   onClick={() => onRemove(photo.id)}
-                  title="Διαγραφή φωτογραφίας"
-                  aria-label="Διαγραφή φωτογραφίας"
+                  title={tr('Διαγραφή φωτογραφίας')}
+                  aria-label={tr('Διαγραφή φωτογραφίας')}
                 >
                   <Trash2 size={15} />
                 </button>
@@ -105,11 +108,11 @@ export default function AssetPhotosCard({
         <div className="asset-photo-empty">
           <Images size={22} />
           <div>
-            <strong>Δεν υπάρχουν φωτογραφίες</strong>
+            <strong>{tr('Δεν υπάρχουν φωτογραφίες')}</strong>
             <span>
               {readOnly
-                ? 'Δεν έχει καταχωρηθεί φωτογραφική τεκμηρίωση.'
-                : 'Χρησιμοποίησε κάμερα ή επίλεξε πολλές εικόνες από τη συσκευή.'}
+                ? tr('Δεν έχει καταχωρηθεί φωτογραφική τεκμηρίωση.')
+                : tr('Χρησιμοποίησε κάμερα ή επίλεξε πολλές εικόνες από τη συσκευή.')}
             </span>
           </div>
         </div>

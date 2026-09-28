@@ -24,6 +24,7 @@ import {getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
+import {trData} from '../../i18n';
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Τμήμα', en: 'Department'},
   STERILIZATION: {el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},
@@ -42,7 +43,11 @@ const navEN: Record<string, string> = {
   'SurgiTrack Studio': 'Management Center',
   'Σετ & Εργαλεία': 'Sets & Instruments',
   'Διαχείριση νοσοκομείου': 'Hospital Administration',
+  Νοσοκομεία: 'Hospitals',
+  Επισκόπηση: 'Overview',
 };
+/** Pages the platform admin can use without having entered a hospital. */
+const PLATFORM_ONLY_PAGES = ['/studio', '/hospitals'];
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
   const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, can} = useSurgi();
   const syncStatus = useSyncStatus();
@@ -77,10 +82,16 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     };
   }, [hospitalId, location.pathname]);
   const navigation = (
-    platformOnly ? navigationFor(role, can).filter(item => item.to === '/studio') : navigationFor(role, can)
-  ).filter(item => item.to !== '/hospital' || !!hospitalId);
+    platformOnly
+      ? navigationFor(role, can).filter(item => PLATFORM_ONLY_PAGES.includes(item.to))
+      : navigationFor(role, can)
+  )
+    .filter(item => item.to !== '/hospital' || !!hospitalId)
+    // The list of all hospitals is the platform admin's, outside Demo.
+    .filter(item => item.to !== '/hospitals' || (!isDemo && !!getRealIdentity()?.platform));
   useEffect(() => {
-    if (platformOnly && !location.pathname.startsWith('/studio')) navigate('/studio', {replace: true});
+    if (platformOnly && !PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
+      navigate('/studio', {replace: true});
   }, [platformOnly, location.pathname, navigate]);
   const returnFromDemo = () => {
     sessionStorage.removeItem('surgitrack-demo-role');
@@ -189,7 +200,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
         <strong>
           {role === 'DEPARTMENT'
-            ? `${roleLabel[role][lang]} · ${currentUser.department}`
+            ? `${roleLabel[role][lang]} · ${trData(currentUser.department)}`
             : platformOnly
               ? lang === 'el'
                 ? 'Διαχείριση πλατφόρμας'
@@ -388,7 +399,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                           <TriangleAlert size={17} />
                           <span>
                             <strong>{i.asset}</strong>
-                            <small>{i.type}</small>
+                            <small>{trData(i.type)}</small>
                           </span>
                         </button>
                       ))}

@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {Barcode, Camera, CheckCircle2, TriangleAlert} from 'lucide-react';
+import {tr} from '../../i18n';
 
 export type BarcodeFeedback = {type: 'OK' | 'WARN' | 'ERROR'; message: string};
 
@@ -14,7 +15,7 @@ type Props = {
 export default function BarcodeCapture({
   title,
   subtitle,
-  placeholder = 'Barcode · S… ή T…',
+  placeholder = tr('Barcode · S… ή T…'),
   feedback,
   onBarcode,
 }: Props) {
@@ -54,7 +55,7 @@ export default function BarcodeCapture({
     stopCamera();
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
-        setCameraError('Η κάμερα δεν υποστηρίζεται εδώ. Χρησιμοποίησε χειροκίνητη εισαγωγή ή scanner υπολογιστή.');
+        setCameraError(tr('Η κάμερα δεν υποστηρίζεται εδώ. Χρησιμοποίησε χειροκίνητη εισαγωγή ή scanner υπολογιστή.'));
         return;
       }
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -72,7 +73,9 @@ export default function BarcodeCapture({
       const Detector = (window as any).BarcodeDetector;
       if (!Detector) {
         setCameraError(
-          'Δεν υπάρχει αυτόματη αναγνώριση barcode σε αυτόν τον browser. Η χειροκίνητη εισαγωγή και ο USB/Bluetooth scanner λειτουργούν κανονικά.',
+          tr(
+            'Δεν υπάρχει αυτόματη αναγνώριση barcode σε αυτόν τον browser. Η χειροκίνητη εισαγωγή και ο USB/Bluetooth scanner λειτουργούν κανονικά.',
+          ),
         );
         return;
       }
@@ -97,7 +100,7 @@ export default function BarcodeCapture({
       };
       frameRef.current = requestAnimationFrame(scan);
     } catch (error) {
-      setCameraError(error instanceof Error ? error.message : 'Δεν ήταν δυνατή η πρόσβαση στην κάμερα.');
+      setCameraError(error instanceof Error ? error.message : tr('Δεν ήταν δυνατή η πρόσβαση στην κάμερα.'));
     }
   };
   useEffect(() => () => stopCamera(), []);
@@ -115,12 +118,12 @@ export default function BarcodeCapture({
         <button
           className={`barcode-camera-btn${cameraOpen ? ' active' : ''}`}
           type="button"
-          aria-label={cameraOpen ? 'Κλείσιμο κάμερας' : 'Σάρωση barcode με κάμερα'}
-          title={cameraOpen ? 'Κλείσιμο κάμερας' : 'Σάρωση με κάμερα'}
+          aria-label={cameraOpen ? tr('Κλείσιμο κάμερας') : tr('Σάρωση barcode με κάμερα')}
+          title={cameraOpen ? tr('Κλείσιμο κάμερας') : tr('Σάρωση με κάμερα')}
           onClick={cameraOpen ? closeCamera : startCamera}
         >
           <Camera size={16} />
-          <span>{cameraOpen ? 'Κλείσιμο' : 'Κάμερα'}</span>
+          <span>{cameraOpen ? tr('Κλείσιμο') : tr('Κάμερα')}</span>
         </button>
       </div>
       {cameraOpen && (
@@ -157,10 +160,12 @@ export default function BarcodeCapture({
           }}
         />
         <button type="button" onClick={() => submit()}>
-          Προσθήκη
+          {tr('Προσθήκη')}
         </button>
       </div>
-      <div className="barcode-capture-help">Χειροκίνητα ή με USB/Bluetooth scanner: σάρωση στο πεδίο και Enter.</div>
+      <div className="barcode-capture-help">
+        {tr('Χειροκίνητα ή με USB/Bluetooth scanner: σάρωση στο πεδίο και Enter.')}
+      </div>
       {feedback && (
         <div className={`load-scan-feedback ${feedback.type.toLowerCase()}`}>
           {feedback.type === 'OK' ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}

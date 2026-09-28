@@ -1,3 +1,4 @@
+import {tr} from '../../i18n';
 export type AssetTab = 'SUMMARY' | 'CONTENTS' | 'PHOTOS' | 'HISTORY' | 'ISSUES' | 'NOTES';
 const baseTabs: Array<{id: AssetTab; label: string}> = [
   {id: 'HISTORY', label: 'Ιστορικό'},
@@ -36,7 +37,7 @@ export default function AssetTabs({
           className={value === tab.id ? 'active' : ''}
           onClick={() => onChange(tab.id)}
         >
-          {tab.label}
+          {tr(tab.label)}
           {tab.id === 'ISSUES' && issueCount > 0 && <b>{issueCount}</b>}
         </button>
       ))}

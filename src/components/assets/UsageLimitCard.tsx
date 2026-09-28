@@ -1,5 +1,6 @@
 import {TriangleAlert} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
+import {tr} from '../../i18n';
 export default function UsageLimitCard({
   uses,
   maxUses,
@@ -17,34 +18,37 @@ export default function UsageLimitCard({
     <div className="usage-config-card usage-view-card">
       <div className="usage-config-head">
         <div>
-          <strong>Όριο χρήσεων</strong>
+          <strong>{tr('Όριο χρήσεων')}</strong>
           <span>{description}</span>
         </div>
-        <span className="usage-type-badge">{maxUses ? 'Περιορισμένων χρήσεων' : 'Χωρίς όριο'}</span>
+        <span className="usage-type-badge">{maxUses ? tr('Περιορισμένων χρήσεων') : tr('Χωρίς όριο')}</span>
       </div>
       {maxUses !== undefined && (
         <>
           <div className="usage-config-limit usage-view-stats">
             <div>
-              <span>Χρήσεις που έχουν γίνει</span>
+              <span>{tr('Χρήσεις που έχουν γίνει')}</span>
               <strong>{uses}</strong>
             </div>
             <div className={warning ? 'warning' : ''}>
-              <span>Υπόλοιπο χρήσεων</span>
+              <span>{tr('Υπόλοιπο χρήσεων')}</span>
               <strong>{remaining}</strong>
             </div>
             <div>
-              <span>Αρχικό όριο</span>
+              <span>{tr('Αρχικό όριο')}</span>
               <strong>{maxUses}</strong>
             </div>
           </div>
-          <div className="usage-limit-bar" aria-label={`Χρησιμοποιήθηκε ${Math.round(percent)}% του ορίου`}>
+          <div className="usage-limit-bar" aria-label={tr('Χρησιμοποιήθηκε {0}% του ορίου', Math.round(percent))}>
             <span style={{width: `${percent}%`}} />
           </div>
           {warning && (
             <div className="usage-threshold-warning">
               <TriangleAlert size={15} />
-              <span>Απομένουν μόνο {remaining} χρήσεις. Το αντικείμενο εμφανίζεται στις ειδοποιήσεις.</span>
+              <span>
+                {tr('Απομένουν μόνο') + ' '}
+                {remaining} {tr('χρήσεις. Το αντικείμενο εμφανίζεται στις ειδοποιήσεις.')}
+              </span>
             </div>
           )}
         </>

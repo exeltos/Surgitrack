@@ -15,6 +15,7 @@ import AppButton from '../../components/ui/AppButton';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {useSurgi} from '../../store/SurgiStore';
 import {compositionHtml} from '../sterilization/printUtils';
+import {getI18nLang, tr, trData} from '../../i18n';
 
 type ReportId = 'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'traceability';
 type Row = Record<string, string | number>;
@@ -48,6 +49,13 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
   },
 ];
 
+/** Report cells holding stored Greek values (type, department, state…) are shown in the UI language. */
+const TRANSLATED_COLUMNS = new Set(['kind', 'department', 'specialty', 'stateLabel', 'type', 'status', 'from', 'to']);
+const cellText = (key: string, value: unknown) => {
+  const text = String(value ?? '—');
+  return TRANSLATED_COLUMNS.has(key) ? trData(text) : text;
+};
+
 const escapeHtml = (value: unknown) =>
   String(value ?? '').replace(
     /[&<>'"]/g,
@@ -56,9 +64,13 @@ const escapeHtml = (value: unknown) =>
 
 function genericReportHtml(title: string, subtitle: string, columns: Array<{key: string; label: string}>, rows: Row[]) {
   const bodyRows = rows.length
-    ? rows.map(row => `<tr>${columns.map(col => `<td>${escapeHtml(row[col.key] ?? '—')}</td>`).join('')}</tr>`).join('')
-    : `<tr><td colspan="${columns.length}" class="empty">Δεν υπάρχουν εγγραφές για τα επιλεγμένα φίλτρα.</td></tr>`;
-  return `<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#172b38;margin:0;font-size:9pt}.brand{font-size:16pt;font-weight:800;color:#153f51}.head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid #d8e1e5;padding-bottom:5mm;margin-bottom:5mm}.head h1{font-size:15pt;margin:2mm 0 1mm}.head p{margin:0;color:#687b87}.meta{text-align:right;color:#72838d;font-size:8pt}.count{margin:0 0 3mm;color:#526975}table{width:100%;border-collapse:collapse;table-layout:auto}th{text-align:left;background:#f1f5f7;color:#526975;font-size:8pt;padding:2.5mm 2mm;border-bottom:.4mm solid #c9d5da}td{padding:2.4mm 2mm;border-bottom:.2mm solid #e3eaed;vertical-align:top}.empty{text-align:center;padding:15mm;color:#81909a}.footer{margin-top:5mm;padding-top:3mm;border-top:.2mm solid #d8e1e5;display:flex;justify-content:space-between;color:#7a8a94;font-size:7.5pt}</style></head><body><div class="head"><div><div class="brand">SurgiTrack</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></div><div class="meta">Αναφορά συστήματος<br>${escapeHtml(new Date().toLocaleString('el-GR'))}</div></div><p class="count">${rows.length} εγγραφές</p><table><thead><tr>${columns.map(c => `<th>${escapeHtml(c.label)}</th>`).join('')}</tr></thead><tbody>${bodyRows}</tbody></table><div class="footer"><span>SurgiTrack · Asset Management</span><span>${escapeHtml(title)}</span></div></body></html>`;
+    ? rows
+        .map(
+          row => `<tr>${columns.map(col => `<td>${escapeHtml(cellText(col.key, row[col.key]))}</td>`).join('')}</tr>`,
+        )
+        .join('')
+    : `<tr><td colspan="${columns.length}" class="empty">${escapeHtml(tr('Δεν υπάρχουν εγγραφές για τα επιλεγμένα φίλτρα.'))}</td></tr>`;
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#172b38;margin:0;font-size:9pt}.brand{font-size:16pt;font-weight:800;color:#153f51}.head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid #d8e1e5;padding-bottom:5mm;margin-bottom:5mm}.head h1{font-size:15pt;margin:2mm 0 1mm}.head p{margin:0;color:#687b87}.meta{text-align:right;color:#72838d;font-size:8pt}.count{margin:0 0 3mm;color:#526975}table{width:100%;border-collapse:collapse;table-layout:auto}th{text-align:left;background:#f1f5f7;color:#526975;font-size:8pt;padding:2.5mm 2mm;border-bottom:.4mm solid #c9d5da}td{padding:2.4mm 2mm;border-bottom:.2mm solid #e3eaed;vertical-align:top}.empty{text-align:center;padding:15mm;color:#81909a}.footer{margin-top:5mm;padding-top:3mm;border-top:.2mm solid #d8e1e5;display:flex;justify-content:space-between;color:#7a8a94;font-size:7.5pt}</style></head><body><div class="head"><div><div class="brand">SurgiTrack</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></div><div class="meta">${escapeHtml(tr('Αναφορά συστήματος'))}<br>${escapeHtml(new Date().toLocaleString(getI18nLang() === 'en' ? 'en-GB' : 'el-GR'))}</div></div><p class="count">${escapeHtml(tr('{0} εγγραφές', rows.length))}</p><table><thead><tr>${columns.map(c => `<th>${escapeHtml(c.label)}</th>`).join('')}</tr></thead><tbody>${bodyRows}</tbody></table><div class="footer"><span>SurgiTrack · Asset Management</span><span>${escapeHtml(title)}</span></div></body></html>`;
 }
 
 export default function ReportsPage() {
@@ -105,10 +117,10 @@ export default function ReportsPage() {
       return {
         columns: [
           {key: 'barcode', label: 'Barcode'},
-          {key: 'name', label: 'Εργαλείο'},
-          {key: 'code', label: 'Κωδικός'},
-          {key: 'manufacturer', label: 'Κατασκευαστής'},
-          {key: 'uses', label: 'Χρήσεις'},
+          {key: 'name', label: tr('Εργαλείο')},
+          {key: 'code', label: tr('Κωδικός')},
+          {key: 'manufacturer', label: tr('Κατασκευαστής')},
+          {key: 'uses', label: tr('Χρήσεις')},
         ],
         rows: members.map(t => ({
           barcode: t.barcode,
@@ -155,11 +167,11 @@ export default function ReportsPage() {
             key: active === 'department' ? 'department' : 'specialty',
             label: active === 'department' ? 'Τμήμα' : 'Ειδικότητα',
           },
-          {key: 'kind', label: 'Τύπος'},
+          {key: 'kind', label: tr('Τύπος')},
           {key: 'barcode', label: 'Barcode'},
-          {key: 'name', label: 'Ονομασία'},
-          {key: 'manufacturer', label: 'Κατασκευαστής'},
-          {key: 'stateLabel', label: 'Κατάσταση'},
+          {key: 'name', label: tr('Ονομασία')},
+          {key: 'manufacturer', label: tr('Κατασκευαστής')},
+          {key: 'stateLabel', label: tr('Κατάσταση')},
         ],
         rows: sorted.map(a => ({...a, stateLabel: stateLabel[a.state] || a.state})) as Row[],
       };
@@ -179,12 +191,12 @@ export default function ReportsPage() {
         }));
       return {
         columns: [
-          {key: 'asset', label: 'Σετ / Εργαλείο'},
-          {key: 'type', label: 'Τύπος'},
-          {key: 'department', label: 'Τμήμα'},
-          {key: 'status', label: 'Κατάσταση'},
-          {key: 'created', label: 'Ημερομηνία'},
-          {key: 'note', label: 'Παρατήρηση'},
+          {key: 'asset', label: tr('Σετ / Εργαλείο')},
+          {key: 'type', label: tr('Τύπος')},
+          {key: 'department', label: tr('Τμήμα')},
+          {key: 'status', label: tr('Κατάσταση')},
+          {key: 'created', label: tr('Ημερομηνία')},
+          {key: 'note', label: tr('Παρατήρηση')},
         ],
         rows: rows as Row[],
       };
@@ -219,13 +231,13 @@ export default function ReportsPage() {
         .sort((a, b) => a.remaining - b.remaining);
       return {
         columns: [
-          {key: 'kind', label: 'Τύπος'},
+          {key: 'kind', label: tr('Τύπος')},
           {key: 'barcode', label: 'Barcode'},
-          {key: 'name', label: 'Ονομασία'},
-          {key: 'department', label: 'Τμήμα'},
-          {key: 'uses', label: 'Χρήσεις'},
-          {key: 'maxUses', label: 'Όριο'},
-          {key: 'remaining', label: 'Υπόλοιπο'},
+          {key: 'name', label: tr('Ονομασία')},
+          {key: 'department', label: tr('Τμήμα')},
+          {key: 'uses', label: tr('Χρήσεις')},
+          {key: 'maxUses', label: tr('Όριο')},
+          {key: 'remaining', label: tr('Υπόλοιπο')},
         ],
         rows: assets as Row[],
       };
@@ -245,14 +257,14 @@ export default function ReportsPage() {
       }));
     return {
       columns: [
-        {key: 'patientCode', label: 'Κωδικός ασθενούς'},
+        {key: 'patientCode', label: tr('Κωδικός ασθενούς')},
         {key: 'asset', label: 'Asset'},
-        {key: 'kind', label: 'Τύπος'},
-        {key: 'from', label: 'Από'},
-        {key: 'to', label: 'Προς'},
-        {key: 'status', label: 'Κίνηση'},
-        {key: 'at', label: 'Ημερομηνία'},
-        {key: 'by', label: 'Χρήστης'},
+        {key: 'kind', label: tr('Τύπος')},
+        {key: 'from', label: tr('Από')},
+        {key: 'to', label: tr('Προς')},
+        {key: 'status', label: tr('Κίνηση')},
+        {key: 'at', label: tr('Ημερομηνία')},
+        {key: 'by', label: tr('Χρήστης')},
       ],
       rows: rows as Row[],
     };
@@ -275,7 +287,7 @@ export default function ReportsPage() {
   const buildPreview = () => {
     if (active === 'composition' && selectedSet) {
       return {
-        title: `Σύνθεση ${selectedSet.barcode}`,
+        title: tr('Σύνθεση {0}', selectedSet.barcode),
         html: compositionHtml(
           selectedSet,
           tools.filter(t => t.setId === selectedSet.id),
@@ -286,13 +298,13 @@ export default function ReportsPage() {
     }
     const subtitle =
       active === 'department'
-        ? 'Σετ και εργαλεία ανά τμήμα'
+        ? tr('Σετ και εργαλεία ανά τμήμα')
         : active === 'specialty'
-          ? 'Σετ και εργαλεία ανά ειδικότητα'
-          : activeMeta.description;
+          ? tr('Σετ και εργαλεία ανά ειδικότητα')
+          : tr(activeMeta.description);
     return {
-      title: activeMeta.title,
-      html: genericReportHtml(activeMeta.title, subtitle, reportData.columns, reportData.rows),
+      title: tr(activeMeta.title),
+      html: genericReportHtml(tr(activeMeta.title), subtitle, reportData.columns, reportData.rows),
     };
   };
   const openPreview = () => setPreview(buildPreview());
@@ -301,16 +313,18 @@ export default function ReportsPage() {
     <div className="reports-page-workspace">
       <div className="page-head reports-page-head">
         <div>
-          <span className="eyebrow">ΑΝΑΛΥΣΗ ΔΕΔΟΜΕΝΩΝ</span>
-          <h1>Αναφορές & Εκτυπώσεις</h1>
-          <p>Επίλεξε αναφορά, όρισε φίλτρα και δες τα αποτελέσματα πριν από εκτύπωση ή PDF.</p>
+          <span className="eyebrow">{tr('ΑΝΑΛΥΣΗ ΔΕΔΟΜΕΝΩΝ')}</span>
+          <h1>{tr('Αναφορές & Εκτυπώσεις')}</h1>
+          <p>{tr('Επίλεξε αναφορά, όρισε φίλτρα και δες τα αποτελέσματα πριν από εκτύπωση ή PDF.')}</p>
         </div>
       </div>
       <div className="reports-workbench">
-        <aside className="reports-catalog" aria-label="Τύποι αναφορών">
+        <aside className="reports-catalog" aria-label={tr('Τύποι αναφορών')}>
           <div className="reports-catalog-head">
-            <strong>Αναφορές</strong>
-            <span>{reports.length} διαθέσιμες</span>
+            <strong>{tr('Αναφορές')}</strong>
+            <span>
+              {reports.length} {tr('διαθέσιμες')}
+            </span>
           </div>
           <div className="reports-catalog-list">
             {reports.map(report => {
@@ -325,8 +339,8 @@ export default function ReportsPage() {
                     <Icon size={18} />
                   </span>
                   <span>
-                    <strong>{report.title}</strong>
-                    <small>{report.description}</small>
+                    <strong>{tr(report.title)}</strong>
+                    <small>{tr(report.description)}</small>
                   </span>
                 </button>
               );
@@ -336,23 +350,23 @@ export default function ReportsPage() {
         <section className="reports-stage">
           <header className="reports-stage-head">
             <div>
-              <span className="eyebrow">ΕΠΙΛΕΓΜΕΝΗ ΑΝΑΦΟΡΑ</span>
-              <h2>{activeMeta.title}</h2>
-              <p>{activeMeta.description}</p>
+              <span className="eyebrow">{tr('ΕΠΙΛΕΓΜΕΝΗ ΑΝΑΦΟΡΑ')}</span>
+              <h2>{tr(activeMeta.title)}</h2>
+              <p>{tr(activeMeta.description)}</p>
             </div>
             <div className="reports-stage-actions">
               <AppButton icon={<FileText size={16} />} onClick={openPreview}>
-                Προεπισκόπηση
+                {tr('Προεπισκόπηση')}
               </AppButton>
               <AppButton variant="primary" icon={<Printer size={16} />} onClick={openPreview}>
-                Εκτύπωση / PDF
+                {tr('Εκτύπωση / PDF')}
               </AppButton>
             </div>
           </header>
           <div className="reports-filter-strip">
             {active === 'composition' && (
               <label className="reports-filter-wide">
-                <span>Σετ</span>
+                <span>{tr('Σετ')}</span>
                 <select value={selectedSet?.id || ''} onChange={e => setSetId(e.target.value)}>
                   {sets.map(s => (
                     <option key={s.id} value={s.id}>
@@ -364,9 +378,9 @@ export default function ReportsPage() {
             )}
             {(active === 'department' || active === 'specialty' || active === 'issues' || active === 'usage') && (
               <label>
-                <span>Τμήμα</span>
+                <span>{tr('Τμήμα')}</span>
                 <select value={department} onChange={e => setDepartment(e.target.value)}>
-                  <option value="ALL">Όλα τα τμήματα</option>
+                  <option value="ALL">{tr('Όλα τα τμήματα')}</option>
                   {departments.map(x => (
                     <option key={x}>{x}</option>
                   ))}
@@ -375,9 +389,9 @@ export default function ReportsPage() {
             )}
             {(active === 'department' || active === 'specialty') && (
               <label>
-                <span>Ειδικότητα</span>
+                <span>{tr('Ειδικότητα')}</span>
                 <select value={specialty} onChange={e => setSpecialty(e.target.value)}>
-                  <option value="ALL">Όλες οι ειδικότητες</option>
+                  <option value="ALL">{tr('Όλες οι ειδικότητες')}</option>
                   {specialties.map(x => (
                     <option key={x}>{x}</option>
                   ))}
@@ -386,22 +400,22 @@ export default function ReportsPage() {
             )}
             {(active === 'department' || active === 'specialty' || active === 'usage') && (
               <label>
-                <span>Τύπος</span>
+                <span>{tr('Τύπος')}</span>
                 <select value={assetKind} onChange={e => setAssetKind(e.target.value)}>
-                  <option value="ALL">Σετ & εργαλεία</option>
-                  <option value="SET">Μόνο Σετ</option>
-                  <option value="TOOL">Μόνο εργαλεία</option>
+                  <option value="ALL">{tr('Σετ & εργαλεία')}</option>
+                  <option value="SET">{tr('Μόνο Σετ')}</option>
+                  <option value="TOOL">{tr('Μόνο εργαλεία')}</option>
                 </select>
               </label>
             )}
             {(active === 'department' || active === 'specialty') && (
               <label>
-                <span>Κατάσταση</span>
+                <span>{tr('Κατάσταση')}</span>
                 <select value={status} onChange={e => setStatus(e.target.value)}>
-                  <option value="ALL">Όλες οι καταστάσεις</option>
+                  <option value="ALL">{tr('Όλες οι καταστάσεις')}</option>
                   {Object.entries(stateLabel).map(([k, v]) => (
                     <option value={k} key={k}>
-                      {v}
+                      {tr(v)}
                     </option>
                   ))}
                 </select>
@@ -410,43 +424,43 @@ export default function ReportsPage() {
             {active === 'issues' && (
               <>
                 <label>
-                  <span>Τύπος συμβάντος</span>
+                  <span>{tr('Τύπος συμβάντος')}</span>
                   <select value={issueType} onChange={e => setIssueType(e.target.value)}>
-                    <option value="ALL">Όλοι οι τύποι</option>
+                    <option value="ALL">{tr('Όλοι οι τύποι')}</option>
                     {issueTypes.map(x => (
                       <option key={x}>{x}</option>
                     ))}
                   </select>
                 </label>
                 <label>
-                  <span>Κατάσταση</span>
+                  <span>{tr('Κατάσταση')}</span>
                   <select value={status} onChange={e => setStatus(e.target.value)}>
-                    <option value="ALL">Όλες</option>
-                    <option value="OPEN">Ανοιχτές</option>
-                    <option value="RESOLVED">Ολοκληρωμένες</option>
+                    <option value="ALL">{tr('Όλες')}</option>
+                    <option value="OPEN">{tr('Ανοιχτές')}</option>
+                    <option value="RESOLVED">{tr('Ολοκληρωμένες')}</option>
                   </select>
                 </label>
               </>
             )}
             {active === 'usage' && (
               <label>
-                <span>Υπόλοιπο</span>
+                <span>{tr('Υπόλοιπο')}</span>
                 <select value={usageFilter} onChange={e => setUsageFilter(e.target.value)}>
-                  <option value="ALL">Όλα τα όρια</option>
-                  <option value="CRITICAL">Κρίσιμο · ≤ 3</option>
-                  <option value="EXHAUSTED">Εξαντλημένα · 0</option>
+                  <option value="ALL">{tr('Όλα τα όρια')}</option>
+                  <option value="CRITICAL">{tr('Κρίσιμο · ≤ 3')}</option>
+                  <option value="EXHAUSTED">{tr('Εξαντλημένα · 0')}</option>
                 </select>
               </label>
             )}
             {active === 'traceability' && (
               <label className="reports-filter-search">
-                <span>Κωδικός ασθενούς</span>
+                <span>{tr('Κωδικός ασθενούς')}</span>
                 <div>
                   <Search size={16} />
                   <input
                     value={patientCode}
                     onChange={e => setPatientCode(e.target.value)}
-                    placeholder="π.χ. PAT-2026-001"
+                    placeholder={tr('π.χ. PAT-2026-001')}
                   />
                 </div>
               </label>
@@ -458,13 +472,15 @@ export default function ReportsPage() {
                 <strong>
                   {active === 'composition' && selectedSet
                     ? `${selectedSet.barcode} · ${selectedSet.name}`
-                    : 'Αποτελέσματα'}
+                    : tr('Αποτελέσματα')}
                 </strong>
-                <span>{reportData.rows.length} εγγραφές</span>
+                <span>
+                  {reportData.rows.length} {tr('εγγραφές')}
+                </span>
               </div>
               {active === 'usage' && reportData.rows.some((r: Row) => Number(r.remaining) <= 3) && (
                 <span className="reports-warning">
-                  <AlertTriangle size={14} /> Υπάρχουν κρίσιμα όρια
+                  <AlertTriangle size={14} /> {tr('Υπάρχουν κρίσιμα όρια')}
                 </span>
               )}
             </div>
@@ -483,7 +499,7 @@ export default function ReportsPage() {
                       <tr key={index}>
                         {reportData.columns.map(c => (
                           <td key={c.key} className={c.key === 'barcode' ? 'mono' : ''}>
-                            {String(row[c.key] ?? '—')}
+                            {cellText(c.key, row[c.key])}
                           </td>
                         ))}
                       </tr>
@@ -493,11 +509,11 @@ export default function ReportsPage() {
               ) : (
                 <div className="reports-empty">
                   <FileText size={30} />
-                  <strong>Δεν υπάρχουν αποτελέσματα</strong>
+                  <strong>{tr('Δεν υπάρχουν αποτελέσματα')}</strong>
                   <span>
                     {active === 'traceability' && !patientCode
-                      ? 'Πληκτρολόγησε κωδικό ασθενούς για αναζήτηση ιχνηλασιμότητας.'
-                      : 'Άλλαξε τα φίλτρα ή επίλεξε διαφορετική αναφορά.'}
+                      ? tr('Πληκτρολόγησε κωδικό ασθενούς για αναζήτηση ιχνηλασιμότητας.')
+                      : tr('Άλλαξε τα φίλτρα ή επίλεξε διαφορετική αναφορά.')}
                   </span>
                 </div>
               )}

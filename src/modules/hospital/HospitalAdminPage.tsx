@@ -5,6 +5,7 @@ import AppButton from '../../components/ui/AppButton';
 import SignupLinkCard from './SignupLinkCard';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
+import {localizedName} from '../../core/glossary';
 import {getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {UserRole} from '../../store/types';
@@ -108,7 +109,7 @@ export default function HospitalAdminPage() {
       </div>
     );
 
-  const departmentName = (id: string | null) => departments.find(d => d.id === id)?.name || '—';
+  const departmentName = (id: string | null) => localizedName(departments.find(d => d.id === id)?.name || '—', lang);
   const suggestedRole = (departmentId: string | null): UserRole =>
     (departments.find(d => d.id === departmentId)?.code || '').toUpperCase() === STERILIZATION_CODE
       ? 'STERILIZATION'
@@ -127,7 +128,8 @@ export default function HospitalAdminPage() {
       p_request: r.id,
       p_approve: approve,
       p_role: approve ? d.role : null,
-      p_department: approve ? d.departmentId || null : null,
+      // A hospital admin belongs to no department (the database enforces it too).
+      p_department: approve && d.role !== 'ADMIN' ? d.departmentId || null : null,
       p_note: d.note || null,
     });
     if (!fail(error)) {
@@ -260,13 +262,17 @@ export default function HospitalAdminPage() {
                 </label>
                 <label>
                   {L('Τμήμα', 'Department')}
-                  <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
-                    {activeDepartments.map(dep => (
-                      <option key={dep.id} value={dep.id}>
-                        {dep.name}
-                      </option>
-                    ))}
-                  </select>
+                  {d.role === 'ADMIN' ? (
+                    <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                  ) : (
+                    <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
+                      {activeDepartments.map(dep => (
+                        <option key={dep.id} value={dep.id}>
+                          {localizedName(dep.name, lang)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </label>
                 <label className="hospital-request-note">
                   {L('Σχόλιο (προαιρετικό)', 'Note (optional)')}
@@ -356,7 +362,7 @@ export default function HospitalAdminPage() {
               ) : (
                 <div key={d.id} className={`hospital-row ${d.active ? '' : 'inactive'}`}>
                   <span>
-                    <b>{d.name}</b>
+                    <b>{localizedName(d.name, lang)}</b>
                     <small>{d.code || '—'}</small>
                   </span>
                   <button
@@ -408,17 +414,21 @@ export default function HospitalAdminPage() {
                     <small>{m.email}</small>
                   </span>
                   <code>{m.user_code || '—'}</code>
-                  <select
-                    value={m.department_id || ''}
-                    onChange={e => void updateMember(m, {department_id: e.target.value || null})}
-                  >
-                    <option value="">—</option>
-                    {departments.map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
-                      </option>
-                    ))}
-                  </select>
+                  {m.role === 'ADMIN' ? (
+                    <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                  ) : (
+                    <select
+                      value={m.department_id || ''}
+                      onChange={e => void updateMember(m, {department_id: e.target.value || null})}
+                    >
+                      <option value="">—</option>
+                      {departments.map(d => (
+                        <option key={d.id} value={d.id}>
+                          {localizedName(d.name, lang)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <select
                     value={m.role}
                     disabled={self}

@@ -25,6 +25,7 @@ import {
   Save,
   Upload,
   Send,
+  Languages,
   UserCheck,
   UserPlus,
   type LucideIcon,
@@ -48,9 +49,13 @@ import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
 import SignupLinkCard from '../hospital/SignupLinkCard';
+import {switchHospital} from '../../data/cloud/hospitalSwitch';
+import {getRealIdentity} from '../../data/cloud/identity';
+import {localizedName, translateToEnglish} from '../../core/glossary';
 import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
 import {applyDemoSessionUser, demoSessionUser, type DemoView} from '../../config/demoRoles';
 import {departments as defaultDepartments} from '../../core/libraries';
+import {tr} from '../../i18n';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -138,8 +143,18 @@ export default function StudioPage() {
   const {lang} = useAppPreferences();
   const libs = useLibraries();
   const {currentUser, setRole} = useSurgi();
-  const [tab, setTab] = useState<Tab>('OVERVIEW');
-  const [libraryKey, setLibraryKey] = useState<LibraryKey>('departments');
+  // The platform admin runs the whole platform; a hospital admin only configures their own hospital
+  // here (libraries, workflow, permissions, settings) — no other hospitals, hospital record or Demo.
+  const platformAdmin = (() => {
+    const real = getRealIdentity();
+    return !real || real.platform;
+  })();
+  // A real hospital's departments are managed on its own administration page.
+  const hospitalLibraryMeta = libraryMeta.filter(
+    m => platformAdmin || libs.dataMode !== 'PRODUCTION' || m.key !== 'departments',
+  );
+  const [tab, setTab] = useState<Tab>(platformAdmin ? 'OVERVIEW' : 'LIBRARIES');
+  const [libraryKey, setLibraryKey] = useState<LibraryKey>(hospitalLibraryMeta[0].key);
   const [query, setQuery] = useState('');
   const [editItem, setEditItem] = useState<LibraryItem | null>(null);
   const [newItem, setNewItem] = useState(false);
@@ -153,13 +168,7 @@ export default function StudioPage() {
     void countPendingAccessRequests(selectedOrganizationId).then(setPendingRequests);
   }, [libs.dataMode, selectedOrganizationId]);
   // Approvals happen in the hospital's own workspace, which loads that hospital's data.
-  const openHospitalAdministration = (organizationId: string) => {
-    sessionStorage.setItem('surgitrack-active-organization', organizationId);
-    sessionStorage.removeItem('surgitrack-session-user');
-    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
-    window.location.hash = '#/hospital';
-    window.location.reload();
-  };
+  const openHospitalAdministration = (organizationId: string) => switchHospital(organizationId, '#/hospital');
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
@@ -211,7 +220,7 @@ export default function StudioPage() {
     setCloudLoading(false);
   };
   useEffect(() => {
-    void loadCloudOrganizations();
+    if (platformAdmin) void loadCloudOrganizations();
   }, [libs.dataMode]);
   const displayedOrganizations = libs.dataMode === 'PRODUCTION' ? cloudOrganizations : libs.organizations;
   const loadCloudUsers = async () => {
@@ -239,7 +248,7 @@ export default function StudioPage() {
     );
   };
   useEffect(() => {
-    void loadCloudUsers();
+    if (platformAdmin) void loadCloudUsers();
   }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
   const selectedOrganization = displayedOrganizations.find(o => o.id === selectedOrganizationId);
@@ -265,7 +274,7 @@ export default function StudioPage() {
     );
   };
   useEffect(() => {
-    void loadCloudDepartments();
+    if (platformAdmin) void loadCloudDepartments();
   }, [libs.dataMode]);
   const saveCloudDepartment = async (item: Omit<LibraryItem, 'id'>) => {
     const org = selectedOrganization || displayedOrganizations[0];
@@ -382,7 +391,7 @@ export default function StudioPage() {
     }
     const failed = (result?.results || []).filter((x: {ok: boolean}) => !x.ok);
     if (failed.length) {
-      setCloudError(`${failed.length} προσκλήσεις απέτυχαν.`);
+      setCloudError(tr('{0} προσκλήσεις απέτυχαν.', failed.length));
     } else setBulkRows([]);
     await loadCloudUsers();
   };
@@ -474,7 +483,8 @@ export default function StudioPage() {
     sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
     setRuntimeDataMode('DEMO');
     setRole(role);
-    window.location.hash = `#${roleHomePath(role)}`;
+    // An admin opens the Demo hospital on its overview, like a real hospital admin.
+    window.location.hash = `#${role === 'ADMIN' ? '/overview' : roleHomePath(role)}`;
     window.location.reload();
   };
   const enterBuiltInDemo = (role: UserRole) => void enterDemo(role);
@@ -562,13 +572,22 @@ export default function StudioPage() {
     <div className="studio-workspace">
       <div className="studio-head">
         <div>
-          <span className="eyebrow">{L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')}</span>
+          <span className="eyebrow">
+            {platformAdmin
+              ? L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')
+              : L('ΡΥΘΜΙΣΕΙΣ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL SETTINGS')}
+          </span>
           <h1>{L('SurgiTrack Studio', 'SurgiTrack Studio')}</h1>
           <p>
-            {L(
-              'Κεντρική διαχείριση νοσοκομείων, χρηστών, demo πρόσβασης, βιβλιοθηκών και βασικών παραμέτρων του SurgiTrack.',
-              'Central administration of hospitals, users, demo access, libraries and core SurgiTrack settings.',
-            )}
+            {platformAdmin
+              ? L(
+                  'Κεντρική διαχείριση νοσοκομείων, χρηστών, demo πρόσβασης, βιβλιοθηκών και βασικών παραμέτρων του SurgiTrack.',
+                  'Central administration of hospitals, users, demo access, libraries and core SurgiTrack settings.',
+                )
+              : L(
+                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου σας. Τμήματα και χρήστες διαχειρίζεστε από τη «Διαχείριση νοσοκομείου».',
+                  "Your hospital's libraries, sterilization flow, role permissions and settings. Departments and users are managed in “Hospital administration”.",
+                )}
           </p>
         </div>
         <div className="studio-health">
@@ -589,14 +608,18 @@ export default function StudioPage() {
         </div>
       </div>
       <div className="studio-tabs" role="tablist">
-        <button className={tab === 'OVERVIEW' ? 'active' : ''} onClick={() => selectTab('OVERVIEW')}>
-          <Gauge size={17} />
-          {L('Επισκόπηση', 'Overview')}
-        </button>
-        <button className={tab === 'PLATFORM' ? 'active' : ''} onClick={() => selectTab('PLATFORM')}>
-          <Building2 size={17} />
-          {L('Νοσοκομεία & Demo', 'Hospitals & Demo')}
-        </button>
+        {platformAdmin && (
+          <button className={tab === 'OVERVIEW' ? 'active' : ''} onClick={() => selectTab('OVERVIEW')}>
+            <Gauge size={17} />
+            {L('Επισκόπηση', 'Overview')}
+          </button>
+        )}
+        {platformAdmin && (
+          <button className={tab === 'PLATFORM' ? 'active' : ''} onClick={() => selectTab('PLATFORM')}>
+            <Building2 size={17} />
+            {L('Νοσοκομεία & Demo', 'Hospitals & Demo')}
+          </button>
+        )}
         <button className={tab === 'LIBRARIES' ? 'active' : ''} onClick={() => selectTab('LIBRARIES')}>
           <BookOpen size={17} />
           {L('Βιβλιοθήκες', 'Libraries')}
@@ -605,10 +628,12 @@ export default function StudioPage() {
           <Layers3 size={17} />
           {L('Ροή Αποστείρωσης', 'Sterilization Flow')}
         </button>
-        <button className={tab === 'USERS' ? 'active' : ''} onClick={() => selectTab('USERS')}>
-          <Users size={17} />
-          {L('Χρήστες', 'Users')}
-        </button>
+        {platformAdmin && (
+          <button className={tab === 'USERS' ? 'active' : ''} onClick={() => selectTab('USERS')}>
+            <Users size={17} />
+            {L('Χρήστες', 'Users')}
+          </button>
+        )}
         <button className={tab === 'ROLES' ? 'active' : ''} onClick={() => selectTab('ROLES')}>
           <UserCog size={17} />
           {L('Δικαιώματα', 'Permissions')}
@@ -619,7 +644,7 @@ export default function StudioPage() {
         </button>
       </div>
       <div className={`studio-body studio-body-${tab.toLowerCase()}`}>
-        {tab === 'OVERVIEW' && (
+        {tab === 'OVERVIEW' && platformAdmin && (
           <div className="studio-overview">
             <div className="studio-kpis">
               <div>
@@ -714,7 +739,7 @@ export default function StudioPage() {
             </section>
           </div>
         )}
-        {tab === 'PLATFORM' && (
+        {tab === 'PLATFORM' && platformAdmin && (
           <section className="studio-manager-panel studio-platform-panel">
             <header className="studio-panel-head">
               <div>
@@ -863,7 +888,7 @@ export default function StudioPage() {
         {tab === 'LIBRARIES' && (
           <div className="studio-manager">
             <aside className="studio-manager-nav">
-              {libraryMeta.map(m => {
+              {hospitalLibraryMeta.map(m => {
                 const Icon = m.icon;
                 return (
                   <button
@@ -1255,7 +1280,7 @@ export default function StudioPage() {
             </footer>
           </div>
         )}
-        {tab === 'USERS' && (
+        {tab === 'USERS' && platformAdmin && (
           <section className="studio-manager-panel studio-users-panel">
             <header className="studio-panel-head">
               <div>
@@ -1333,7 +1358,7 @@ export default function StudioPage() {
                     {selectedOrgDepartments.map(d => (
                       <div key={d.id}>
                         <span>
-                          <b>{d.name}</b>
+                          <b>{localizedName(d.name, lang)}</b>
                           <small>{d.code || '—'}</small>
                         </span>
                         <button
@@ -1439,7 +1464,7 @@ export default function StudioPage() {
                   <span>{displayedOrganizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
                   <span>
                     {libs.dataMode === 'PRODUCTION'
-                      ? cloudDepartments.find(d => d.id === u.department)?.name || '—'
+                      ? localizedName(cloudDepartments.find(d => d.id === u.department)?.name || '—', lang)
                       : u.department}
                   </span>
                   <span className="role-chip">
@@ -1730,14 +1755,14 @@ export default function StudioPage() {
               <label>
                 {L('Barcode Σετ', 'Set barcode')}
                 <div className="studio-static-field">
-                  <b>S + 6 ψηφία</b>
+                  <b>{tr('S + 6 ψηφία')}</b>
                   <span>S000321</span>
                 </div>
               </label>
               <label>
                 {L('Barcode Εργαλείου', 'Instrument barcode')}
                 <div className="studio-static-field">
-                  <b>T + 6 ψηφία</b>
+                  <b>{tr('T + 6 ψηφία')}</b>
                   <span>T001250</span>
                 </div>
               </label>
@@ -1905,15 +1930,16 @@ function LibraryEditor({
   onSave: (data: Omit<LibraryItem, 'id'>) => void;
 }) {
   const [el, setEl] = useState(item?.el || '');
-  const [en, setEn] = useState(item?.en || '');
   const [code, setCode] = useState(item?.code || '');
+  // One name only: the English comes from the built-in glossary (or stays as written).
+  const english = translateToEnglish(el);
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <aside className="studio-drawer">
         <header>
           <div>
             <span className="eyebrow">{title}</span>
-            <h2>{item ? 'Επεξεργασία εγγραφής' : 'Νέα εγγραφή'}</h2>
+            <h2>{item ? tr('Επεξεργασία εγγραφής') : tr('Νέα εγγραφή')}</h2>
           </div>
           <button onClick={onClose}>
             <X />
@@ -1921,26 +1947,37 @@ function LibraryEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονομασία (EL)
+            {tr('Ονομασία')}
             <input autoFocus value={el} onChange={e => setEl(e.target.value)} />
           </label>
+          {el.trim() && (
+            <div className="studio-form-note">
+              <Languages size={16} />
+              <span>
+                {english && english !== el.trim() ? (
+                  <>
+                    {tr('Στα αγγλικά θα εμφανίζεται ως') + ' '}
+                    <b>{english}</b>.
+                  </>
+                ) : (
+                  tr('Στα αγγλικά θα εμφανίζεται όπως το γράψατε.')
+                )}
+              </span>
+            </div>
+          )}
           <label>
-            Ονομασία (EN)
-            <input value={en} onChange={e => setEn(e.target.value)} />
-          </label>
-          <label>
-            Κωδικός
-            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="Προαιρετικό" />
+            {tr('Κωδικός')}
+            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder={tr('Προαιρετικό')} />
           </label>
         </div>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
-            disabled={!el.trim() || !en.trim()}
-            onClick={() => onSave({el: el.trim(), en: en.trim(), code: code.trim() || undefined})}
+            disabled={!el.trim()}
+            onClick={() => onSave({el: el.trim(), en: english || el.trim(), code: code.trim() || undefined})}
           >
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
         </footer>
       </aside>
@@ -1965,8 +2002,8 @@ function OrganizationEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">ΝΟΣΟΚΟΜΕΙΟ</span>
-            <h2>{organization ? 'Επεξεργασία νοσοκομείου' : 'Νέο νοσοκομείο'}</h2>
+            <span className="eyebrow">{tr('ΝΟΣΟΚΟΜΕΙΟ')}</span>
+            <h2>{organization ? tr('Επεξεργασία νοσοκομείου') : tr('Νέο νοσοκομείο')}</h2>
           </div>
           <button onClick={onClose}>
             <X />
@@ -1974,36 +2011,42 @@ function OrganizationEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονομασία
+            {tr('Ονομασία')}
             <input autoFocus value={name} onChange={e => setName(e.target.value)} />
           </label>
           <label>
-            Κωδικός
-            <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="π.χ. IASO-TH" />
+            {tr('Κωδικός')}
+            <input
+              value={code}
+              onChange={e => setCode(e.target.value.toUpperCase())}
+              placeholder={tr('π.χ. IASO-TH')}
+            />
           </label>
           <label className="studio-switch-row">
             <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>Ενεργό νοσοκομείο</span>
+            <span>{tr('Ενεργό νοσοκομείο')}</span>
           </label>
           <label className="studio-switch-row">
             <input type="checkbox" checked={demoEnabled} onChange={e => setDemoEnabled(e.target.checked)} />
-            <span>Επιτρέπεται Demo πρόσβαση</span>
+            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
           </label>
           <div className="studio-form-note">
             <ShieldCheck size={16} />
             <span>
-              Η Demo πρόσβαση δεν εμφανίζεται στη δημόσια αρχική. Ενεργοποιείται κεντρικά ανά νοσοκομείο και ανά χρήστη.
+              {tr(
+                'Η Demo πρόσβαση δεν εμφανίζεται στη δημόσια αρχική. Ενεργοποιείται κεντρικά ανά νοσοκομείο και ανά χρήστη.',
+              )}
             </span>
           </div>
         </div>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
             disabled={!name.trim() || !code.trim()}
             onClick={() => onSave({name: name.trim(), code: code.trim(), active, demoEnabled})}
           >
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
         </footer>
       </aside>
@@ -2043,8 +2086,8 @@ function UserEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ</span>
-            <h2>{user ? 'Επεξεργασία χρήστη' : 'Νέος χρήστης'}</h2>
+            <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ')}</span>
+            <h2>{user ? tr('Επεξεργασία χρήστη') : tr('Νέος χρήστης')}</h2>
           </div>
           <button onClick={onClose}>
             <X />
@@ -2052,7 +2095,7 @@ function UserEditor({
         </header>
         <div className="studio-drawer-form">
           <label>
-            Ονοματεπώνυμο
+            {tr('Ονοματεπώνυμο')}
             <input autoFocus value={name} onChange={e => setName(e.target.value)} />
           </label>
           <label>
@@ -2060,7 +2103,7 @@ function UserEditor({
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
           </label>
           <label>
-            Νοσοκομείο
+            {tr('Νοσοκομείο')}
             <select value={organizationId} onChange={e => setOrganizationId(e.target.value)}>
               {organizations.map(org => (
                 <option key={org.id} value={org.id}>
@@ -2070,7 +2113,7 @@ function UserEditor({
             </select>
           </label>
           <label>
-            Ρόλος
+            {tr('Ρόλος')}
             <select
               value={role}
               onChange={e => {
@@ -2079,28 +2122,39 @@ function UserEditor({
                 if (next === 'ADMIN') setDemoEnabled(true);
               }}
             >
-              <option value="DEPARTMENT">Τμήμα</option>
-              <option value="STERILIZATION">Αποστείρωση</option>
-              <option value="ADMIN">Διαχειριστής</option>
+              <option value="DEPARTMENT">{tr('Τμήμα')}</option>
+              <option value="STERILIZATION">{tr('Αποστείρωση')}</option>
+              <option value="ADMIN">{tr('Διαχειριστής')}</option>
             </select>
           </label>
-          <label>
-            Τμήμα
-            <select value={department} onChange={e => setDepartment(e.target.value)}>
-              {cloudDepartments.length
-                ? cloudDepartments
-                    .filter(d => d.organizationId === organizationId)
-                    .map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
-                      </option>
-                    ))
-                : departments.map(d => <option key={d}>{d}</option>)}
-            </select>
-          </label>
+          {role === 'ADMIN' ? (
+            <div className="studio-form-note">
+              <ShieldCheck size={16} />
+              <span>
+                {tr(
+                  'Ο Διαχειριστής δεν ανήκει σε τμήμα: διαχειρίζεται όλο το νοσοκομείο και δημιουργεί τους χρήστες του.',
+                )}
+              </span>
+            </div>
+          ) : (
+            <label>
+              {tr('Τμήμα')}
+              <select value={department} onChange={e => setDepartment(e.target.value)}>
+                {cloudDepartments.length
+                  ? cloudDepartments
+                      .filter(d => d.organizationId === organizationId)
+                      .map(d => (
+                        <option key={d.id} value={d.id}>
+                          {d.name}
+                        </option>
+                      ))
+                  : departments.map(d => <option key={d}>{d}</option>)}
+              </select>
+            </label>
+          )}
           <label className="studio-switch-row">
             <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>Ενεργή πρόσβαση</span>
+            <span>{tr('Ενεργή πρόσβαση')}</span>
           </label>
           <label className="studio-switch-row">
             <input
@@ -2109,18 +2163,19 @@ function UserEditor({
               disabled={role === 'ADMIN'}
               onChange={e => setDemoEnabled(e.target.checked)}
             />
-            <span>Επιτρέπεται Demo πρόσβαση</span>
+            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
           </label>
           <div className="studio-form-note">
             <KeyRound size={16} />
             <span>
-              Το SurgiTrack Studio δεν αποθηκεύει κωδικό πρόσβασης. Η ταυτότητα / reset password θα συνδεθεί με το
-              authentication backend.
+              {tr(
+                'Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα αρχικά του.',
+              )}
             </span>
           </div>
         </div>
         <footer>
-          <AppButton onClick={onClose}>Ακύρωση</AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
             disabled={!name.trim() || !email.trim()}
@@ -2128,7 +2183,7 @@ function UserEditor({
               onSave({
                 name: name.trim(),
                 email: email.trim(),
-                department,
+                department: role === 'ADMIN' ? '' : department,
                 role,
                 active,
                 organizationId,
@@ -2136,7 +2191,7 @@ function UserEditor({
               })
             }
           >
-            Αποθήκευση
+            {tr('Αποθήκευση')}
           </AppButton>
         </footer>
       </aside>
