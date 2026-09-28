@@ -2169,3 +2169,178 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+/* Toolbar menus (Print, Manage) on tool and Set pages. */
+.asset-workbench-actions {
+  flex-wrap: nowrap;
+}
+.action-menu {
+  position: relative;
+}
+.action-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.action-menu-caret {
+  transition: transform 0.15s;
+}
+.action-menu-toggle.open .action-menu-caret {
+  transform: rotate(180deg);
+}
+.action-menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 70;
+  min-width: 260px;
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid #d8e3e8;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(15, 40, 55, 0.18);
+}
+.action-menu-panel.align-left {
+  left: 0;
+}
+.action-menu-panel.align-right {
+  right: 0;
+}
+.action-menu-panel button {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1d4f5f;
+  text-align: left;
+  cursor: pointer;
+}
+.action-menu-panel button:hover:not(:disabled) {
+  background: #eef7f9;
+}
+.action-menu-panel button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.action-menu-panel button span {
+  display: grid;
+  gap: 2px;
+}
+.action-menu-panel button b {
+  color: #1c2b33;
+  font-size: 13.5px;
+}
+.action-menu-panel button small {
+  color: #6b7c86;
+  font-size: 12px;
+}
+.action-menu-panel button.danger,
+.action-menu-panel button.danger b {
+  color: #b42318;
+}
+.replaced-barcode-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border: 1px solid #f3d9a4;
+  border-radius: 12px;
+  background: #fffaf0;
+  color: #7a4b00;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* New barcode dialog */
+.new-barcode-modal {
+  width: min(520px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 40, 55, 0.25);
+}
+.new-barcode-modal > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.new-barcode-modal h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+.new-barcode-modal > p {
+  margin: 0;
+  color: #51626c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.new-barcode-swap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f5f9fa;
+  color: #6b7c86;
+}
+.new-barcode-swap span {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+.new-barcode-swap small {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.new-barcode-swap b {
+  font-size: 18px;
+  color: #6b7c86;
+  text-decoration: line-through;
+}
+.new-barcode-swap .new b {
+  color: #1d6b7a;
+  text-decoration: none;
+}
+.new-barcode-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  color: #51626c;
+}
+.new-barcode-reasons > span {
+  width: 100%;
+}
+.new-barcode-reasons label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border: 1px solid #d8e3e8;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.new-barcode-reasons label.active {
+  border-color: #1d6b7a;
+  background: #eef7f9;
+  color: #1d4f5f;
+}
+.new-barcode-reasons input {
+  display: none;
+}
+.new-barcode-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

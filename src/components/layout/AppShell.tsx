@@ -164,7 +164,10 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     );
     if (exact) {
       setScanMatches([]);
-      navigate(exact.kind === 'SET' ? `/sets/${exact.id}` : `/tools/${exact.id}`);
+      // An old (replaced) label still finds the item; its page says the barcode was replaced.
+      const replaced = exact.barcode.toLowerCase() !== q && exact.code.toLowerCase() !== q;
+      const path = exact.kind === 'SET' ? `/sets/${exact.id}` : `/tools/${exact.id}`;
+      navigate(replaced ? `${path}?replaced=${encodeURIComponent(scan.trim().toUpperCase())}` : path);
       return;
     }
     const matches = assets
