@@ -1,5 +1,8 @@
+import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight} from 'lucide-react';
+import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -19,6 +22,16 @@ export default function SetsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [usage, setUsage] = useRememberedState('usage', '');
+  // Limited-use instruments per Set, for the usage filter.
+  const limitedBySet = useMemo(() => {
+    const map = new Map<string, typeof tools>();
+    tools.forEach(t => {
+      if (t.setId && t.maxUses) map.set(t.setId, [...(map.get(t.setId) || []), t]);
+    });
+    return map;
+  }, [tools]);
+  const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(sets.map(s => String(s[key] || '')).filter(Boolean))].sort();
   const filtered = sets.filter(
@@ -26,6 +39,7 @@ export default function SetsPage() {
       (!department || s.department === department) &&
       (!specialty || s.specialty === specialty) &&
       (!manufacturer || s.manufacturer === manufacturer) &&
+      matchesUsage(usage, [s, ...(limitedBySet.get(s.id) || [])], systemSettings.usageWarningThreshold) &&
       (!state || s.state === state) &&
       `${s.barcode} ${s.name} ${s.code} ${s.manufacturer || ''} ${s.specialty} ${s.department} ${s.ownerName || ''}`
         .toLowerCase()
@@ -77,6 +91,13 @@ export default function SetsPage() {
             placeholder: tr('Όλες οι καταστάσεις'),
             options: values('state').map(value => ({value, label: statusLabel(value)})),
             onChange: setState,
+          },
+          {
+            key: 'usage',
+            value: usage,
+            placeholder: tr('Όλοι οι τύποι χρήσης'),
+            options: usageFilterOptions(),
+            onChange: setUsage,
           },
         ]}
       />

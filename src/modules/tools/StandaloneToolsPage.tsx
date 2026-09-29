@@ -1,6 +1,8 @@
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronRight, Layers3, List, Plus} from 'lucide-react';
+import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -25,6 +27,8 @@ export default function StandaloneToolsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [usage, setUsage] = useRememberedState('usage', '');
+  const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(standalone.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const filtered = standalone.filter(
@@ -32,6 +36,7 @@ export default function StandaloneToolsPage() {
       (!department || t.department === department) &&
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
         .toLowerCase()
@@ -106,6 +111,13 @@ export default function StandaloneToolsPage() {
               placeholder: tr('Όλες οι καταστάσεις'),
               options: values('state').map(value => ({value, label: value})),
               onChange: setState,
+            },
+            {
+              key: 'usage',
+              value: usage,
+              placeholder: tr('Όλοι οι τύποι χρήσης'),
+              options: usageFilterOptions(),
+              onChange: setUsage,
             },
           ]}
         />
