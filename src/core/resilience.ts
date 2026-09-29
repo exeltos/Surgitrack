@@ -18,7 +18,8 @@ export function reloadForNewVersion() {
     if (Date.now() - last < 30_000) return false;
     sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
   } catch {
-    // Storage unavailable: reload anyway, the browser cache makes a loop unlikely.
+    // Without a stored guard a reload could repeat forever: show the error instead.
+    return false;
   }
   window.location.reload();
   return true;
@@ -52,6 +53,30 @@ const DIALOG_BACKDROPS = [
   '.auth-info-backdrop',
 ].join(',');
 
+/**
+ * The dialog the user sees in front: the one under the middle of the screen, or else the one
+ * with the highest z-index (document order and nesting break ties). Document order alone is not
+ * enough: some pages render an overlay earlier in the page than the dialog it covers.
+ */
+function frontDialog(): HTMLElement | undefined {
+  const hit = document.elementFromPoint?.(window.innerWidth / 2, window.innerHeight / 2);
+  const underPointer = hit?.closest<HTMLElement>(DIALOG_BACKDROPS);
+  if (underPointer) return underPointer;
+  const visible = [...document.querySelectorAll<HTMLElement>(DIALOG_BACKDROPS)].filter(
+    el => el.getClientRects().length > 0,
+  );
+  const zIndex = (el: HTMLElement) => Number.parseInt(getComputedStyle(el).zIndex, 10) || 0;
+  const depth = (el: HTMLElement) => {
+    let n = 0;
+    for (let p = el.parentElement; p; p = p.parentElement) if (p.matches(DIALOG_BACKDROPS)) n++;
+    return n;
+  };
+  return visible
+    .map((el, order) => ({el, key: [zIndex(el), depth(el), order]}))
+    .sort((a, b) => a.key[0] - b.key[0] || a.key[1] - b.key[1] || a.key[2] - b.key[2])
+    .pop()?.el;
+}
+
 const CLOSE_LABELS = /^(Κλείσιμο|Ακύρωση|Close|Cancel|Άκυρο|Όχι|No)$/i;
 
 /**
@@ -64,10 +89,7 @@ export function installEscapeClosesDialogs() {
     'keydown',
     event => {
       if (event.key !== 'Escape' || event.defaultPrevented) return;
-      const backdrops = [...document.querySelectorAll<HTMLElement>(DIALOG_BACKDROPS)].filter(
-        el => el.getClientRects().length > 0,
-      );
-      const top = backdrops[backdrops.length - 1];
+      const top = frontDialog();
       if (!top) return;
       const buttons = [...top.querySelectorAll<HTMLButtonElement>('button:not([disabled])')];
       const close =

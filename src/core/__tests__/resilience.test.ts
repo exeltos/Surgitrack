@@ -22,6 +22,19 @@ describe('Escape closes the dialog in front', () => {
     expect(outer).not.toHaveBeenCalled();
   });
 
+  it('closes the dialog with the higher z-index even when it comes earlier in the page', () => {
+    document.body.innerHTML = `
+      <div class="nested-modal-backdrop" style="z-index: 1200"><header><button class="icon-button" id="front">x</button></header></div>
+      <div class="modal-backdrop" style="z-index: 1000"><header><button class="icon-button" id="back">x</button></header></div>`;
+    const front = vi.fn();
+    const back = vi.fn();
+    document.getElementById('front')!.addEventListener('click', front);
+    document.getElementById('back')!.addEventListener('click', back);
+    escape();
+    expect(front).toHaveBeenCalledTimes(1);
+    expect(back).not.toHaveBeenCalled();
+  });
+
   it('prefers a labelled Close / Cancel button', () => {
     document.body.innerHTML = `<div class="movement-modal-backdrop"><button aria-label="Κλείσιμο" id="c">x</button><button>Αποθήκευση</button></div>`;
     const close = vi.fn();
