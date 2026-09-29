@@ -111,11 +111,13 @@ export function SurgiProvider({
   const [sets, setSets] = useState(initialData.sets);
   const [tools, setTools] = useState(() =>
     initialData.tools.map(tool =>
-      tool.mode === 'STOCK'
-        ? {...tool, department: undefined, state: 'IN_STOCK' as const}
-        : tool.mode === 'SET_MEMBER'
-          ? {...tool, department: initialData.sets.find(set => set.id === tool.setId)?.department || tool.department}
-          : tool,
+      tool.state === 'RETIRED'
+        ? tool
+        : tool.mode === 'STOCK'
+          ? {...tool, department: undefined, state: 'IN_STOCK' as const}
+          : tool.mode === 'SET_MEMBER'
+            ? {...tool, department: initialData.sets.find(set => set.id === tool.setId)?.department || tool.department}
+            : tool,
     ),
   );
   const [movements, setMovements] = useState(initialData.movements);

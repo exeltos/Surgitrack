@@ -61,7 +61,17 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
 ];
 
 /** Report cells holding stored Greek values (type, department, state…) are shown in the UI language. */
-const TRANSLATED_COLUMNS = new Set(['kind', 'department', 'specialty', 'stateLabel', 'type', 'status', 'from', 'to']);
+const TRANSLATED_COLUMNS = new Set([
+  'kind',
+  'department',
+  'specialty',
+  'stateLabel',
+  'type',
+  'status',
+  'from',
+  'to',
+  'reason',
+]);
 const cellText = (key: string, value: unknown) => {
   const text = String(value ?? '—');
   return TRANSLATED_COLUMNS.has(key) ? trData(text) : text;
@@ -109,10 +119,10 @@ export default function ReportsPage() {
   );
   const specialties = useMemo(
     () =>
-      Array.from(new Set([...sets.map(x => x.specialty), ...tools.map(x => x.specialty)])).sort((a, b) =>
-        a.localeCompare(b, 'el'),
-      ),
-    [sets, tools],
+      Array.from(
+        new Set([...sets.map(x => x.specialty), ...tools.map(x => x.specialty), ...retiredTools.map(x => x.specialty)]),
+      ).sort((a, b) => a.localeCompare(b, 'el')),
+    [sets, tools, retiredTools],
   );
   const issueTypes = useMemo(
     () => Array.from(new Set(issues.map(x => x.type))).sort((a, b) => a.localeCompare(b, 'el')),
