@@ -406,8 +406,9 @@
   background: #fbfcfd;
 }
 .manual-open-screen {
-  width: 100%;
-  display: flex;
+  margin: 0 0 14px;
+  display: inline-flex;
+  gap: 8px;
   justify-content: space-between;
   align-items: center;
   padding: 10px 12px;

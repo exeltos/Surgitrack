@@ -27,7 +27,11 @@ describe('Help Center', () => {
   });
 
   it('opens on the current screen and shows only the sections of the role', () => {
-    setup('DEPARTMENT', '/department', <HelpCenter onClose={() => {}} />);
+    setup(
+      'DEPARTMENT',
+      '/department',
+      <HelpCenter onClose={() => {}} screens={['/department', '/issues', '/movements']} />,
+    );
     expect(screen.getByRole('heading', {level: 1, name: 'Σετ & Εργαλεία τμήματος'})).toBeInTheDocument();
     expect(screen.getByText('ΤΡΕΧΟΥΣΑ ΟΘΟΝΗ')).toBeInTheDocument();
     expect(screen.queryByText('SurgiTrack Studio')).not.toBeInTheDocument();
@@ -36,7 +40,7 @@ describe('Help Center', () => {
 
   it('moves between chapters, shows the glossary and closes', () => {
     const onClose = vi.fn();
-    setup('ADMIN', '/tools', <HelpCenter onClose={onClose} />);
+    setup('ADMIN', '/tools', <HelpCenter onClose={onClose} screens={['/overview', '/tools', '/sets', '/reports']} />);
     expect(screen.getByRole('heading', {level: 1, name: 'Εργαλεία'})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: /Επόμενο/}));
     expect(screen.getByRole('heading', {level: 2, name: 'Τύπος χρήσης'})).toBeInTheDocument();
@@ -44,5 +48,23 @@ describe('Help Center', () => {
     expect(screen.getByText('Ζωές / Όριο χρήσεων')).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'Escape'});
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('explains the record card on detail pages and leaves out screens the user cannot open', () => {
+    setup(
+      'DEPARTMENT',
+      '/tools/t1',
+      <HelpCenter onClose={() => {}} screens={['/department', '/issues', '/movements']} />,
+    );
+    expect(screen.getByRole('heading', {level: 1, name: 'Καρτέλα Σετ / εργαλείου'})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /Εργαλεία$/})).not.toBeInTheDocument();
+  });
+
+  it('shows the platform admin only the pages open outside a hospital', () => {
+    setup('ADMIN', '/studio', <HelpCenter onClose={() => {}} screens={['/studio', '/hospitals']} />);
+    expect(screen.getByRole('heading', {level: 1, name: 'SurgiTrack Studio'})).toBeInTheDocument();
+    expect(screen.queryByText('Επισκόπηση')).not.toBeInTheDocument();
+    expect(screen.queryByText('Αποστείρωση')).not.toBeInTheDocument();
+    expect(screen.queryByText('Καρτέλα Σετ / εργαλείου')).not.toBeInTheDocument();
   });
 });

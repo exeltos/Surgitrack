@@ -8,6 +8,8 @@ export type ManualSection = {
   to: string;
   /** Shown only to users with this permission (the same one that opens the screen). */
   permission?: Permission;
+  /** A record card rather than a menu page: the paths it covers (e.g. '/tools/'), no "Open screen". */
+  detailOf?: string[];
   title: {el: string; en: string};
   summary: {el: string; en: string};
   audience: {el: string; en: string};
@@ -19,6 +21,71 @@ export type ManualSection = {
 };
 
 export const helpManual: ManualSection[] = [
+  {
+    to: '/asset-card',
+    detailOf: ['/tools/', '/sets/'],
+    permission: 'asset.detail.view',
+    title: {el: 'Καρτέλα Σετ / εργαλείου', en: 'Set / instrument card'},
+    summary: {
+      el: 'Όλα όσα αφορούν ένα Σετ ή εργαλείο: στοιχεία, σύνθεση, ιστορικό, φωτογραφίες, χρήσεις και ενέργειες.',
+      en: 'Everything about one Set or instrument: details, composition, history, photos, uses and actions.',
+    },
+    audience: {
+      el: 'Όλοι οι χρήστες (οι ενέργειες εξαρτώνται από τον ρόλο)',
+      en: 'All users (actions depend on the role)',
+    },
+    chapters: [
+      {
+        el: [
+          'Στοιχεία',
+          'Αριστερά φαίνονται barcode, κωδικός, τμήμα, ειδικότητα, κατασκευαστής, ιδιοκτησία και χρωματική σήμανση. Όσοι έχουν δικαίωμα τα αλλάζουν με «Επεξεργασία».',
+        ],
+        en: [
+          'Details',
+          'On the left: barcode, code, department, specialty, manufacturer, ownership and color marker. Users with the right can change them with "Edit".',
+        ],
+      },
+      {
+        el: [
+          'Χρήσεις και ζωές',
+          'Για εργαλεία περιορισμένων χρήσεων φαίνεται το υπόλοιπο ζωών. Κάθε αποστολή μετά από χρήση αφαιρεί μία ζωή· στο μηδέν το εργαλείο τίθεται αυτόματα εκτός χρήσης.',
+        ],
+        en: [
+          'Uses and lives',
+          'Limited-use instruments show their remaining lives. Each dispatch after use takes one life; at zero the instrument is taken out of use automatically.',
+        ],
+      },
+      {
+        el: [
+          'Ιστορικό και φωτογραφίες',
+          'Οι καρτέλες δείχνουν κάθε κίνηση, αναφορά προβλήματος και φωτογραφία του αντικειμένου.',
+        ],
+        en: ['History and photos', 'The tabs show every movement, problem report and photo of the item.'],
+      },
+      {
+        el: [
+          'Ενέργειες',
+          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, αναφορά προβλήματος, εκτύπωση barcode, διαχείριση (μεταφορά σε Σετ, Stock, Service, απώλεια).',
+        ],
+        en: [
+          'Actions',
+          'Depending on the role: send to Sterilization, report a problem, print the barcode, manage (move to a Set, Stock, Service, loss).',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Ελέγξτε την κατάσταση και το υπόλοιπο ζωών.',
+        'Δείτε το ιστορικό για την τελευταία κίνηση.',
+        'Χρησιμοποιήστε την ενέργεια που χρειάζεστε από πάνω δεξιά.',
+      ],
+      en: [
+        'Check the state and remaining lives.',
+        'See the history for the last movement.',
+        'Use the action you need from the top right.',
+      ],
+    },
+  },
   {
     to: '/overview',
     permission: 'overview.view',

@@ -74,16 +74,33 @@ const ui = {
 
 type Mode = 'manual' | 'glossary' | 'about';
 
+/** Pages from which Set and instrument cards open. */
+const RECORD_LISTS = ['/department', '/tools', '/sets', '/standalone-tools', '/stock', '/sterilization'];
+
 /** The role-aware user manual, opened from the header; it starts on the section of the current screen. */
-export default function HelpCenter({onClose}: {onClose: () => void}) {
+/**
+ * `screens` are the pages the user can open from the menu now (the platform admin outside a
+ * hospital has only a few); sections for other pages are left out. Detail sections, which open
+ * from a record rather than the menu, only need their permission.
+ */
+export default function HelpCenter({onClose, screens}: {onClose: () => void; screens: string[]}) {
   const {pathname} = useLocation();
   const navigate = useNavigate();
   const {can} = useSurgi();
   const {lang} = useAppPreferences();
   const L = lang === 'en' ? 'en' : 'el';
   const tx = ui[L];
-  const visible = useMemo(() => helpManual.filter(s => !s.permission || can(s.permission)), [can]);
+  const visible = useMemo(
+    () =>
+      helpManual.filter(
+        s =>
+          (!s.permission || can(s.permission)) &&
+          (s.detailOf ? screens.some(x => RECORD_LISTS.includes(x)) : screens.includes(s.to)),
+      ),
+    [can, screens],
+  );
   const sectionFor = (path: string): ManualSection | undefined =>
+    visible.find(s => s.detailOf?.some(prefix => path.startsWith(prefix))) ||
     visible.find(s => path === s.to || path.startsWith(`${s.to}/`)) ||
     (path.startsWith('/standalone') ? visible.find(s => s.to === '/standalone-tools') : undefined);
   const screenSection = sectionFor(pathname);
@@ -105,8 +122,31 @@ export default function HelpCenter({onClose}: {onClose: () => void}) {
     .map(to => visible.find(s => s.to === to))
     .filter((s): s is ManualSection => Boolean(s));
 
+  const panelRef = useRef<HTMLElement>(null);
+  // Focus moves into the manual while it is open and returns to the Help button when it closes.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    searchRef.current?.focus();
+    return () => opener?.focus();
+  }, []);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Tab' && panelRef.current) {
+        const focusable = [
+          ...panelRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), input, [tabindex]:not([tabindex="-1"])',
+          ),
+        ];
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         searchRef.current?.focus();
@@ -127,7 +167,7 @@ export default function HelpCenter({onClose}: {onClose: () => void}) {
   return (
     <aside className="help-panel-shell" role="dialog" aria-modal="true" aria-label={tx.center}>
       <div className="help-backdrop" onMouseDown={onClose} />
-      <section className="manual-center">
+      <section className="manual-center" ref={panelRef}>
         <header className="manual-topbar">
           <div className="manual-brand">
             <span>S</span>
@@ -206,6 +246,18 @@ export default function HelpCenter({onClose}: {onClose: () => void}) {
                   <b>{tx.forRole}:</b> {current.audience[L]}
                 </span>
               </div>
+              {screenSection?.to !== current.to && !current.detailOf && (
+                <button
+                  className="manual-open-screen"
+                  onClick={() => {
+                    navigate(current.to);
+                    onClose();
+                  }}
+                >
+                  {tx.openScreen}
+                  <ChevronRight size={14} />
+                </button>
+              )}
               <div className="manual-chapter-tabs" role="tablist" aria-label={current.title[L]}>
                 {current.chapters.map((c, i) => (
                   <button
@@ -291,18 +343,6 @@ export default function HelpCenter({onClose}: {onClose: () => void}) {
 
           {mode === 'manual' && current && (
             <aside className="manual-side-pane">
-              {screenSection?.to !== current.to && (
-                <button
-                  className="manual-open-screen"
-                  onClick={() => {
-                    navigate(current.to);
-                    onClose();
-                  }}
-                >
-                  {tx.openScreen}
-                  <ChevronRight size={14} />
-                </button>
-              )}
               {related.length > 0 && (
                 <section className="manual-related">
                   <h3>{tx.related}</h3>

@@ -545,7 +545,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       </main>
       {helpOpen && (
         <Suspense fallback={null}>
-          <HelpCenter onClose={() => setHelpOpen(false)} />
+          <HelpCenter onClose={() => setHelpOpen(false)} screens={navigation.map(item => item.to)} />
         </Suspense>
       )}
       {toast && (
