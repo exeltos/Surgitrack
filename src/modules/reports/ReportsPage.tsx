@@ -18,6 +18,9 @@ import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import {downloadXlsx} from '../../core/exportTable';
 import {useSurgi} from '../../store/SurgiStore';
+import {useLibraries} from '../../core/LibraryStore';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
 import {compositionHtml} from '../sterilization/printUtils';
 import {getI18nLang, tr, trData} from '../../i18n';
 
@@ -49,7 +52,7 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
   {
     id: 'retired',
     title: 'Εργαλεία εκτός χρήσης',
-    description: 'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. εξάντληση ζωών).',
+    description: 'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. συμπλήρωση ορίου χρήσεων).',
     icon: Archive,
   },
   {
@@ -96,12 +99,16 @@ function genericReportHtml(title: string, subtitle: string, columns: Array<{key:
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, movements, currentUser} = useSurgi();
+  const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
+  // Sets in the composition picker, by name.
+  const setsByName = useMemo(() => [...sets].sort((a, b) => a.name.localeCompare(b.name, 'el')), [sets]);
   const [active, setActive] = useState<ReportId>('composition');
   const [setId, setSetId] = useState(sets[0]?.id || '');
   const [department, setDepartment] = useState('ALL');
   const [specialty, setSpecialty] = useState('ALL');
   const [assetKind, setAssetKind] = useState('ALL');
   const [status, setStatus] = useState('ALL');
+  const [issueStatus, setIssueStatus] = useState('ALL');
   const [issueType, setIssueType] = useState('ALL');
   const [usageFilter, setUsageFilter] = useState('ALL');
   const [patientCode, setPatientCode] = useState('');
@@ -177,16 +184,20 @@ export default function ReportsPage() {
         .filter(a => specialty === 'ALL' || a.specialty === specialty)
         .filter(a => assetKind === 'ALL' || (assetKind === 'SET' ? a.kind === 'Σετ' : a.kind === 'Εργαλείο'))
         .filter(a => status === 'ALL' || a.state === status);
-      const sorted = assets.sort((a, b) =>
-        active === 'department'
-          ? a.department.localeCompare(b.department, 'el')
-          : a.specialty.localeCompare(b.specialty, 'el'),
+      // Grouped by department (or specialty), Sets before instruments, then by name.
+      const sorted = assets.sort(
+        (a, b) =>
+          (active === 'department'
+            ? a.department.localeCompare(b.department, 'el')
+            : (a.specialty || '').localeCompare(b.specialty || '', 'el')) ||
+          b.kind.localeCompare(a.kind, 'el') ||
+          a.name.localeCompare(b.name, 'el'),
       );
       return {
         columns: [
           {
             key: active === 'department' ? 'department' : 'specialty',
-            label: active === 'department' ? 'Τμήμα' : 'Ειδικότητα',
+            label: active === 'department' ? tr('Τμήμα') : tr('Ειδικότητα'),
           },
           {key: 'kind', label: tr('Τύπος')},
           {key: 'barcode', label: 'Barcode'},
@@ -201,7 +212,7 @@ export default function ReportsPage() {
       const rows = issues
         .filter(i => department === 'ALL' || i.department === department)
         .filter(i => issueType === 'ALL' || i.type === issueType)
-        .filter(i => status === 'ALL' || i.status === status)
+        .filter(i => issueStatus === 'ALL' || i.status === issueStatus)
         .map(i => ({
           asset: i.asset,
           type: i.type,
@@ -248,7 +259,10 @@ export default function ReportsPage() {
         .map(a => ({...a, remaining: Math.max(0, a.maxUses - a.uses)}))
         .filter(a => department === 'ALL' || a.department === department)
         .filter(a => assetKind === 'ALL' || (assetKind === 'SET' ? a.kind === 'Σετ' : a.kind === 'Εργαλείο'))
-        .filter(a => usageFilter === 'ALL' || (usageFilter === 'CRITICAL' ? a.remaining <= 3 : a.remaining === 0))
+        .filter(
+          a =>
+            usageFilter === 'ALL' || (usageFilter === 'CRITICAL' ? a.remaining <= warningThreshold : a.remaining === 0),
+        )
         .sort((a, b) => a.remaining - b.remaining);
       return {
         columns: [
@@ -331,9 +345,11 @@ export default function ReportsPage() {
     specialty,
     assetKind,
     status,
+    issueStatus,
     issueType,
     usageFilter,
     patientCode,
+    warningThreshold,
   ]);
 
   const buildPreview = () => {
@@ -427,7 +443,7 @@ export default function ReportsPage() {
               {value: 'OPEN', label: tr('Ανοιχτές')},
               {value: 'RESOLVED', label: tr('Ολοκληρωμένες')},
             ],
-            ...choice(status, setStatus),
+            ...choice(issueStatus, setIssueStatus),
           },
         ]
       : []),
@@ -437,16 +453,23 @@ export default function ReportsPage() {
             key: 'usage',
             placeholder: tr('Όλα τα όρια'),
             options: [
-              {value: 'CRITICAL', label: tr('Κρίσιμο · ≤ 3')},
-              {value: 'EXHAUSTED', label: tr('Εξαντλημένα · 0')},
+              {value: 'CRITICAL', label: tr('Κρίσιμο · ≤ {0}', warningThreshold)},
+              {value: 'EXHAUSTED', label: tr('Συμπληρωμένο όριο · 0')},
             ],
             ...choice(usageFilter, setUsageFilter),
           },
         ]
       : []),
   ];
+  const shownRows = useProgressiveList(
+    reportData.rows,
+    [active, setId, department, specialty, assetKind, status, issueStatus, issueType, usageFilter, patientCode].join(
+      '|',
+    ),
+  );
   const exportExcel = () => {
-    const {title} = buildPreview();
+    const title =
+      active === 'composition' && selectedSet ? tr('Σύνθεση {0}', selectedSet.barcode) : tr(activeMeta.title);
     downloadXlsx({
       title,
       subtitle: `${reportData.rows.length} ${tr('εγγραφές')}`,
@@ -514,9 +537,9 @@ export default function ReportsPage() {
               <label className="reports-filter-wide">
                 <span>{tr('Σετ')}</span>
                 <select value={selectedSet?.id || ''} onChange={e => setSetId(e.target.value)}>
-                  {sets.map(s => (
+                  {setsByName.map(s => (
                     <option key={s.id} value={s.id}>
-                      {s.barcode} · {s.name}
+                      {s.name} · {s.barcode}
                     </option>
                   ))}
                 </select>
@@ -549,7 +572,7 @@ export default function ReportsPage() {
                   {reportData.rows.length} {tr('εγγραφές')}
                 </span>
               </div>
-              {active === 'usage' && reportData.rows.some((r: Row) => Number(r.remaining) <= 3) && (
+              {active === 'usage' && reportData.rows.some((r: Row) => Number(r.remaining) <= warningThreshold) && (
                 <span className="reports-warning">
                   <AlertTriangle size={14} /> {tr('Υπάρχουν κρίσιμα όρια')}
                 </span>
@@ -566,7 +589,7 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {reportData.rows.map((row, index) => (
+                    {shownRows.visible.map((row, index) => (
                       <tr key={index}>
                         {reportData.columns.map(c => (
                           <td key={c.key} className={c.key === 'barcode' ? 'mono' : ''}>
@@ -575,6 +598,9 @@ export default function ReportsPage() {
                         ))}
                       </tr>
                     ))}
+                    {shownRows.hasMore && (
+                      <MoreRows colSpan={reportData.columns.length} onVisible={shownRows.showMore} />
+                    )}
                   </tbody>
                 </table>
               ) : (

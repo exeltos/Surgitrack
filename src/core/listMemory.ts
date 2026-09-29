@@ -1,5 +1,5 @@
 import {useEffect, useLayoutEffect, useRef, useState, type Dispatch, type SetStateAction} from 'react';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 /**
  * Coming back to a list (browser back or "Back to list") finds it as it was left: same filters,
@@ -26,11 +26,23 @@ const write = (key: string, value: unknown) => {
   }
 };
 
+const PRESET = 'preset';
+
+/**
+ * A link that opens a list with exactly these filters (the others cleared), e.g. from a KPI:
+ * presetPath('/tools', {usage: 'LOW'}) → "/tools?preset=1&usage=LOW".
+ */
+export const presetPath = (path: string, filters: Record<string, string> = {}) =>
+  `${path}?${new URLSearchParams({[PRESET]: '1', ...filters}).toString()}`;
+
 /** useState that the list keeps while the user opens a record and comes back. */
 export function useRememberedState<T>(key: string, initial: T): [T, Dispatch<SetStateAction<T>>] {
-  const {pathname} = useLocation();
+  const {pathname, search} = useLocation();
   const storageKey = `${pathname}|${key}`;
   const [value, setValue] = useState<T>(() => {
+    const params = new URLSearchParams(search);
+    // Arriving through a preset link: its filters win and every other text filter starts empty.
+    if (params.get(PRESET) === '1' && typeof initial === 'string') return (params.get(key) ?? initial) as T;
     const saved = read<T>(STATE_KEY)[storageKey];
     return saved === undefined ? initial : saved;
   });
@@ -58,8 +70,26 @@ const ROW = 'tr, article, li, [role="row"], .ledger-row, .registry-row, .set-too
 /** Mounted once in the app shell around the page content. */
 export function useListMemory(contentRef: React.RefObject<HTMLElement>) {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
   const previous = useRef(path);
+
+  // A preset link has set the page's filters; start at the top and drop the parameters so a
+  // later "back" returns to the list as the user leaves it.
+  const preset = new URLSearchParams(location.search).get(PRESET) === '1';
+  if (preset) {
+    const scroll = read<unknown>(SCROLL_KEY);
+    const visited = read<unknown>(VISITED_KEY);
+    if (path in scroll || path in visited) {
+      delete scroll[path];
+      delete visited[path];
+      write(SCROLL_KEY, scroll);
+      write(VISITED_KEY, visited);
+    }
+  }
+  useEffect(() => {
+    if (preset) navigate(path, {replace: true});
+  }, [preset, path, navigate]);
 
   // Remember scroll positions as the user scrolls.
   useEffect(() => {

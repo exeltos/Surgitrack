@@ -5,7 +5,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
 import {tr, trData} from '../../i18n';
-import {useRememberedState} from '../../core/listMemory';
+import {presetPath, useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
@@ -114,22 +114,28 @@ export default function DepartmentPage() {
       </header>
 
       <section className="department-kpis">
-        <div>
-          <span>{tr('Στο τμήμα')}</span>
-          <strong>{atDepartment}</strong>
-        </div>
-        <div>
-          <span>{tr('Προς / στην Αποστείρωση')}</span>
-          <strong>{inSterilization}</strong>
-        </div>
-        <div>
-          <span>{tr('Έτοιμα για παραλαβή')}</span>
-          <strong>{ready}</strong>
-        </div>
-        <div>
+        {(
+          [
+            {filter: 'IN_DEPARTMENT', label: tr('Στο τμήμα'), value: atDepartment},
+            {filter: 'STERILIZATION', label: tr('Προς / στην Αποστείρωση'), value: inSterilization},
+            {filter: 'READY', label: tr('Έτοιμα για παραλαβή'), value: ready},
+          ] as const
+        ).map(k => (
+          <button
+            key={k.filter}
+            type="button"
+            className={statusFilter === k.filter ? 'active' : ''}
+            aria-pressed={statusFilter === k.filter}
+            onClick={() => setStatusFilter(statusFilter === k.filter ? 'ALL' : k.filter)}
+          >
+            <span>{k.label}</span>
+            <strong>{k.value}</strong>
+          </button>
+        ))}
+        <Link to={presetPath('/issues', {status: 'OPEN'})}>
           <span>{tr('Ανοικτές εκκρεμότητες')}</span>
           <strong>{openIssues}</strong>
-        </div>
+        </Link>
       </section>
 
       <section className="department-assets-panel">

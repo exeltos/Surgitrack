@@ -21,6 +21,7 @@ import {demoDepartments} from '../../config/demoRoles';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {AssetState} from '../../types/domain';
 import {trData} from '../../i18n';
+import {presetPath} from '../../core/listMemory';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -32,6 +33,18 @@ const PROCESS_STATES: AssetState[] = [
   'AWAITING_RELEASE',
   'IN_STORAGE',
 ];
+
+/** The Sterilization workspace tab that shows items in each state. */
+const QUEUE_OF: Partial<Record<AssetState, string>> = {
+  PENDING_STERILIZATION: 'INCOMING',
+  IN_WASHING: 'WASHING',
+  IN_PREPARATION: 'PREP',
+  IN_PACKAGING: 'PACKAGING',
+  IN_STERILIZATION: 'PROCESS',
+  AWAITING_RELEASE: 'RELEASE',
+  IN_STORAGE: 'STORAGE',
+  READY_FOR_PICKUP: 'READY',
+};
 
 const movementStamp = (at: string) => {
   const m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4}),?\s+(\d{1,2}):(\d{2})(?:\s*(π\.?μ\.?|μ\.?μ\.?|am|pm))?/i.exec(at.trim());
@@ -78,6 +91,7 @@ export default function HospitalOverviewPage() {
           const mine = tracked.filter(a => a.department === d.el);
           return {
             id: d.id,
+            key: d.el,
             name: lang === 'el' ? d.el : d.en,
             total: mine.length,
             atDepartment: mine.filter(a => a.state === 'IN_DEPARTMENT').length,
@@ -104,27 +118,27 @@ export default function HospitalOverviewPage() {
   const pipelineMax = Math.max(1, ...pipeline.map(p => p.count));
 
   const kpis = [
-    {icon: Layers3, label: L('Σετ', 'Sets'), value: sets.length, to: '/sets'},
-    {icon: Wrench, label: L('Εργαλεία', 'Instruments'), value: tools.length, to: '/tools'},
+    {icon: Layers3, label: L('Σετ', 'Sets'), value: sets.length, to: presetPath('/sets')},
+    {icon: Wrench, label: L('Εργαλεία', 'Instruments'), value: tools.length, to: presetPath('/tools')},
     {icon: Sparkles, label: L('Στην Αποστείρωση', 'In sterilization'), value: inProcess.length, to: '/sterilization'},
     {
       icon: PackageCheck,
       label: L('Έτοιμα για παραλαβή', 'Ready for pickup'),
       value: ready.length,
-      to: '/sterilization',
+      to: '/sterilization?queue=READY',
     },
     {
       icon: TriangleAlert,
       label: L('Ανοικτές εκκρεμότητες', 'Open issues'),
       value: openIssues.length,
-      to: '/issues',
+      to: presetPath('/issues', {status: 'OPEN'}),
       warn: openIssues.length > 0,
     },
     {
       icon: Gauge,
       label: L('Κοντά στο όριο χρήσεων', 'Near usage limit'),
       value: lifecycleAlerts.length,
-      to: '/reports',
+      to: presetPath('/tools', {usage: 'LOW'}),
       warn: lifecycleAlerts.length > 0,
     },
   ];
@@ -203,7 +217,9 @@ export default function HospitalOverviewPage() {
             </div>
             {byDepartment.map(d => (
               <div key={d.id} className="overview-row">
-                <span className="overview-name">{d.name}</span>
+                <Link className="overview-name" to={presetPath('/sets', {department: d.key})}>
+                  {d.name}
+                </Link>
                 <span>{d.total}</span>
                 <span>{d.atDepartment}</span>
                 <span>{d.inProcess}</span>
@@ -226,13 +242,13 @@ export default function HospitalOverviewPage() {
             <Activity size={18} />
           </header>
           {pipeline.map(p => (
-            <div key={p.state} className="overview-bar">
+            <Link key={p.state} className="overview-bar" to={`/sterilization?queue=${QUEUE_OF[p.state]}`}>
               <StatusBadge value={p.state} />
               <div>
                 <i style={{width: `${(p.count / pipelineMax) * 100}%`}} />
               </div>
               <strong>{p.count}</strong>
-            </div>
+            </Link>
           ))}
           {lost.length > 0 && (
             <small className="overview-lost">
@@ -283,7 +299,7 @@ export default function HospitalOverviewPage() {
                 {L('Ελλείψεις, φθορές και βλάβες προς διαχείριση.', 'Missing, damaged or faulty items to handle.')}
               </small>
             </div>
-            <Link to="/issues">{L('Όλες', 'All')}</Link>
+            <Link to={presetPath('/issues', {status: 'OPEN'})}>{L('Όλες', 'All')}</Link>
           </header>
           {openIssues.slice(0, 6).map(i => (
             <div key={i.id} className="overview-line">

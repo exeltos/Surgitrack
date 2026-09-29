@@ -3,6 +3,10 @@ import {Link, useNavigate} from 'react-router-dom';
 import {Layers3, Plus, ChevronRight, List} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
+import {kpiFilters} from '../../core/kpiFilters';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
+import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -29,6 +33,15 @@ export default function ToolsPage() {
   const [usage, setUsage] = useRememberedState('usage', '');
   const {systemSettings} = useLibraries();
   const [mode, setMode] = useRememberedState('mode', '');
+  const kpi = kpiFilters({
+    q: [q, setQ],
+    department: [department, setDepartment],
+    specialty: [specialty, setSpecialty],
+    manufacturer: [manufacturer, setManufacturer],
+    state: [state, setState],
+    mode: [mode, setMode],
+    usage: [usage, setUsage],
+  });
   const filtered = tools.filter(
     t =>
       (!department || t.department === department) &&
@@ -51,6 +64,10 @@ export default function ToolsPage() {
     });
     return [...m.values()];
   }, [filtered]);
+  const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
+  const filterKey = [q, department, specialty, manufacturer, state, mode, usage, grouped].join('|');
+  const rows = useProgressiveList(filtered, filterKey);
+  const groupRows = useProgressiveList(groups, filterKey, 'shownGroups');
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -70,10 +87,14 @@ export default function ToolsPage() {
       <KpiStrip
         compact
         items={[
-          {label: tr('Σύνολο εργαλείων'), value: tools.length},
-          {label: tr('Σε Σετ'), value: tools.filter(t => t.mode === 'SET_MEMBER').length},
-          {label: tr('Μεμονωμένα σε χρήση'), value: tools.filter(t => t.mode === 'STANDALONE').length},
-          {label: 'Stock', value: tools.filter(t => t.mode === 'STOCK').length},
+          {label: tr('Σύνολο εργαλείων'), value: tools.length, ...kpi()},
+          {label: tr('Σε Σετ'), value: tools.filter(t => t.mode === 'SET_MEMBER').length, ...kpi({mode: 'SET_MEMBER'})},
+          {
+            label: tr('Μεμονωμένα σε χρήση'),
+            value: tools.filter(t => t.mode === 'STANDALONE').length,
+            ...kpi({mode: 'STANDALONE'}),
+          },
+          {label: 'Stock', value: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
         ]}
       />
       <div className="asset-list-controls">
@@ -86,14 +107,14 @@ export default function ToolsPage() {
               key: 'department',
               value: department,
               placeholder: tr('Όλα τα τμήματα'),
-              options: values('department').map(value => ({value, label: value})),
+              options: values('department').map(value => ({value, label: trData(value)})),
               onChange: setDepartment,
             },
             {
               key: 'specialty',
               value: specialty,
               placeholder: tr('Όλες οι ειδικότητες'),
-              options: values('specialty').map(value => ({value, label: value})),
+              options: values('specialty').map(value => ({value, label: trData(value)})),
               onChange: setSpecialty,
             },
             {
@@ -118,7 +139,7 @@ export default function ToolsPage() {
               key: 'state',
               value: state,
               placeholder: tr('Όλες οι καταστάσεις'),
-              options: values('state').map(value => ({value, label: value})),
+              options: values('state').map(value => ({value, label: statusLabel(value)})),
               onChange: setState,
             },
             {
@@ -156,7 +177,7 @@ export default function ToolsPage() {
           </thead>
           <tbody>
             {grouped
-              ? groups.map(g => {
+              ? groupRows.visible.map(g => {
                   const t = g[0];
                   return (
                     <tr key={`${t.code}-${t.name}`}>
@@ -188,8 +209,8 @@ export default function ToolsPage() {
                     </tr>
                   );
                 })
-              : filtered.map(t => {
-                  const set = sets.find(s => s.id === t.setId);
+              : rows.visible.map(t => {
+                  const set = t.setId ? setsById.get(t.setId) : undefined;
                   return (
                     <tr key={t.id}>
                       <td>
@@ -199,13 +220,7 @@ export default function ToolsPage() {
                             <Link className="row-title-link" to={`/tools/${t.id}`}>
                               {t.name}
                             </Link>
-                            <ColorMarker
-                              tapes={effectiveToolMarker(
-                                t,
-                                sets.find(s => s.id === t.setId),
-                              )}
-                              size="sm"
-                            />
+                            <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
                             {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                           </span>
                         </div>
@@ -256,6 +271,9 @@ export default function ToolsPage() {
                     </tr>
                   );
                 })}
+            {(grouped ? groupRows.hasMore : rows.hasMore) && (
+              <MoreRows colSpan={9} onVisible={grouped ? groupRows.showMore : rows.showMore} />
+            )}
           </tbody>
         </table>
       </ScrollableListPanel>

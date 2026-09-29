@@ -32,7 +32,7 @@ describe('instrument lives', () => {
     const retired = result.current.retiredTools.find(t => t.id === tool.id)!;
     expect(retired.state).toBe('RETIRED');
     expect(retired.uses).toBe(tool.maxUses);
-    expect(retired.retiredReason).toBe('Εξάντληση ζωών');
+    expect(retired.retiredReason).toBe('Συμπλήρωση ορίου χρήσεων');
 
     act(() => result.current.acknowledgeOutOfUse(tool.id));
     expect(result.current.retiredTools.find(t => t.id === tool.id)!.retiredNoticeSeenAt).toBeTruthy();

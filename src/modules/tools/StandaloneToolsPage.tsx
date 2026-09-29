@@ -3,6 +3,10 @@ import {Link, useNavigate} from 'react-router-dom';
 import {ChevronRight, Layers3, List, Plus} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
+import {kpiFilters} from '../../core/kpiFilters';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
+import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -31,6 +35,14 @@ export default function StandaloneToolsPage() {
   const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(standalone.map(t => String(t[key] || '')).filter(Boolean))].sort();
+  const kpi = kpiFilters({
+    q: [q, setQ],
+    department: [department, setDepartment],
+    specialty: [specialty, setSpecialty],
+    manufacturer: [manufacturer, setManufacturer],
+    state: [state, setState],
+    usage: [usage, setUsage],
+  });
   const filtered = standalone.filter(
     t =>
       (!department || t.department === department) &&
@@ -42,6 +54,7 @@ export default function StandaloneToolsPage() {
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
+  const filterKey = [q, department, specialty, manufacturer, state, usage, grouped].join('|');
   const groups = useMemo(() => {
     const m = new Map<string, typeof tools>();
     filtered.forEach(t => {
@@ -50,6 +63,8 @@ export default function StandaloneToolsPage() {
     });
     return [...m.values()];
   }, [filtered]);
+  const rows = useProgressiveList(filtered, filterKey);
+  const groupRows = useProgressiveList(groups, filterKey, 'shownGroups');
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -69,12 +84,17 @@ export default function StandaloneToolsPage() {
       <KpiStrip
         compact
         items={[
-          {label: tr('Σε χρήση'), value: standalone.length},
+          {label: tr('Σε χρήση'), value: standalone.length, ...kpi()},
           {label: tr('Τμήματα'), value: new Set(standalone.map(t => t.department).filter(Boolean)).size},
-          {label: tr('Περιορισμένων χρήσεων'), value: standalone.filter(t => t.maxUses).length},
           {
-            label: tr('≤ 3 χρήσεις'),
-            value: standalone.filter(t => t.maxUses !== undefined && t.maxUses - t.uses <= 3).length,
+            label: tr('Πολλαπλών χρήσεων (με ζωές)'),
+            value: standalone.filter(t => t.maxUses).length,
+            ...kpi({usage: 'LIMITED'}),
+          },
+          {
+            label: tr('Λίγες ζωές'),
+            value: standalone.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+            ...kpi({usage: 'LOW'}),
           },
         ]}
       />
@@ -88,14 +108,14 @@ export default function StandaloneToolsPage() {
               key: 'department',
               value: department,
               placeholder: tr('Όλα τα τμήματα'),
-              options: values('department').map(value => ({value, label: value})),
+              options: values('department').map(value => ({value, label: trData(value)})),
               onChange: setDepartment,
             },
             {
               key: 'specialty',
               value: specialty,
               placeholder: tr('Όλες οι ειδικότητες'),
-              options: values('specialty').map(value => ({value, label: value})),
+              options: values('specialty').map(value => ({value, label: trData(value)})),
               onChange: setSpecialty,
             },
             {
@@ -109,7 +129,7 @@ export default function StandaloneToolsPage() {
               key: 'state',
               value: state,
               placeholder: tr('Όλες οι καταστάσεις'),
-              options: values('state').map(value => ({value, label: value})),
+              options: values('state').map(value => ({value, label: statusLabel(value)})),
               onChange: setState,
             },
             {
@@ -146,7 +166,7 @@ export default function StandaloneToolsPage() {
           </thead>
           <tbody>
             {grouped
-              ? groups.map(g => {
+              ? groupRows.visible.map(g => {
                   const t = g[0];
                   return (
                     <tr key={`${t.code}-${t.name}`}>
@@ -169,7 +189,7 @@ export default function StandaloneToolsPage() {
                     </tr>
                   );
                 })
-              : filtered.map(t => (
+              : rows.visible.map(t => (
                   <tr key={t.id}>
                     <td>
                       <div className="registry-asset-name">
@@ -206,6 +226,9 @@ export default function StandaloneToolsPage() {
                     </td>
                   </tr>
                 ))}
+            {(grouped ? groupRows.hasMore : rows.hasMore) && (
+              <MoreRows colSpan={8} onVisible={grouped ? groupRows.showMore : rows.showMore} />
+            )}
           </tbody>
         </table>
       </ScrollableListPanel>

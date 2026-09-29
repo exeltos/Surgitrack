@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import type {WorkflowStageId} from '../../core/workflow';
@@ -116,7 +116,13 @@ export default function SterilizationPage() {
                 : id === 'STORAGE'
                   ? 'STORAGE'
                   : 'READY';
-  const [queue, setQueue] = useState<Queue>('INCOMING');
+  const QUEUES: Queue[] = ['INCOMING', 'WASHING', 'PREP', 'PACKAGING', 'PROCESS', 'RELEASE', 'STORAGE', 'READY'];
+  const [searchParams] = useSearchParams();
+  // A link can open a given stage, e.g. /sterilization?queue=READY from the overview.
+  const requestedQueue = searchParams.get('queue') as Queue | null;
+  const [queue, setQueue] = useState<Queue>(
+    requestedQueue && QUEUES.includes(requestedQueue) ? requestedQueue : 'INCOMING',
+  );
   const [query, setQuery] = useState('');
   const [quickBarcode, setQuickBarcode] = useState('');
   const [quickScanFeedback, setQuickScanFeedback] = useState('');
