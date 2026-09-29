@@ -5,15 +5,16 @@ import type {SessionUser, UserRole} from '../store/types';
 const STERILIZATION_DEPARTMENT_CODE = 'STER';
 
 /** Header choice in Demo: Admin, Sterilization (staff or supervisor), or one department from the library. */
-export type DemoView = 'ADMIN' | 'STERILIZATION' | 'STERILIZATION_SUPERVISOR' | `DEPARTMENT:${string}`;
+export type DemoView = 'ADMIN' | 'VIEWER' | 'STERILIZATION' | 'STERILIZATION_SUPERVISOR' | `DEPARTMENT:${string}`;
 
-/** The four kinds of hospital user, named the same everywhere (Demo buttons, "view as", Studio). */
-export type HospitalRoleKind = 'ADMIN' | 'STERILIZATION_SUPERVISOR' | 'STERILIZATION' | 'DEPARTMENT';
+/** The kinds of hospital user, named the same everywhere (Demo buttons, "view as", Studio). */
+export type HospitalRoleKind = 'ADMIN' | 'STERILIZATION_SUPERVISOR' | 'STERILIZATION' | 'DEPARTMENT' | 'VIEWER';
 export const hospitalRoleNames: Record<HospitalRoleKind, {el: string; en: string}> = {
   ADMIN: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
   STERILIZATION_SUPERVISOR: {el: 'Προϊστάμενος Αποστείρωσης', en: 'Sterilization supervisor'},
   STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
   DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
+  VIEWER: {el: 'Παρατηρητής (μόνο προβολή)', en: 'Viewer (read only)'},
 };
 export const hospitalRoleKinds = Object.keys(hospitalRoleNames) as HospitalRoleKind[];
 
@@ -23,6 +24,8 @@ export const demoDepartments = (departments: readonly LibraryItem[]) =>
 /** The demo identity for a header choice; a department view works as that department's user. */
 export const demoSessionUser = (view: DemoView, departments: readonly LibraryItem[]): SessionUser => {
   if (view === 'ADMIN') return {id: 'demo-admin', name: 'Demo Διαχειριστής', role: 'ADMIN', department: 'Διαχείριση'};
+  if (view === 'VIEWER')
+    return {id: 'demo-viewer', name: 'Demo Νοσηλευτική Διεύθυνση', role: 'VIEWER', department: 'Διοίκηση'};
   const sterilization = departments.find(d => (d.code || '').toUpperCase() === STERILIZATION_DEPARTMENT_CODE);
   if (view === 'STERILIZATION')
     return {

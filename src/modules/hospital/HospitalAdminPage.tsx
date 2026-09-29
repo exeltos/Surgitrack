@@ -37,10 +37,19 @@ const roles: Array<{id: UserRole; el: string; en: string}> = [
   {id: 'DEPARTMENT', ...hospitalRoleNames.DEPARTMENT},
   {id: 'STERILIZATION', ...hospitalRoleNames.STERILIZATION},
   {id: 'ADMIN', ...hospitalRoleNames.ADMIN},
+  {id: 'VIEWER', ...hospitalRoleNames.VIEWER},
 ];
+/** Roles that see the whole hospital rather than one department. */
+const wholeHospital = (role: UserRole) => role === 'ADMIN' || role === 'VIEWER';
 /** In the users list Sterilization splits into staff and supervisor (who registers assets and changes Sets). */
 const SUPERVISOR = 'STERILIZATION_SUPERVISOR';
-const memberRoles = [roles[0], roles[1], {id: SUPERVISOR, ...hospitalRoleNames.STERILIZATION_SUPERVISOR}, roles[2]];
+const memberRoles = [
+  roles[0],
+  roles[1],
+  {id: SUPERVISOR, ...hospitalRoleNames.STERILIZATION_SUPERVISOR},
+  roles[2],
+  roles[3],
+];
 
 /**
  * Hospital administration for the hospital's own admin (or the platform admin working in it):
@@ -134,7 +143,7 @@ export default function HospitalAdminPage() {
       p_approve: approve,
       p_role: approve ? d.role : null,
       // A hospital admin belongs to no department (the database enforces it too).
-      p_department: approve && d.role !== 'ADMIN' ? d.departmentId || null : null,
+      p_department: approve && !wholeHospital(d.role) ? d.departmentId || null : null,
       p_note: d.note || null,
     });
     if (!fail(error)) {
@@ -270,7 +279,7 @@ export default function HospitalAdminPage() {
                 </label>
                 <label>
                   {L('Τμήμα', 'Department')}
-                  {d.role === 'ADMIN' ? (
+                  {wholeHospital(d.role) ? (
                     <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
                   ) : (
                     <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
@@ -422,7 +431,7 @@ export default function HospitalAdminPage() {
                     <small>{m.email}</small>
                   </span>
                   <code>{m.user_code || '—'}</code>
-                  {m.role === 'ADMIN' ? (
+                  {wholeHospital(m.role) ? (
                     <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
                   ) : (
                     <select

@@ -262,6 +262,18 @@ const departmentPermissions: readonly Permission[] = [
   'counts.record',
 ];
 
+/** Read-only: every screen that only shows data; never an action. */
+export const viewerPermissions: readonly Permission[] = [
+  'asset.registry.view',
+  'asset.detail.view',
+  'stock.manage',
+  'issue.view',
+  'history.view',
+  'reports.view',
+  'traceability.view',
+  'overview.view',
+];
+
 const sterilizationPermissions: readonly Permission[] = [
   'asset.registry.view',
   'asset.detail.view',
@@ -309,6 +321,7 @@ export const defaultRolePermissions: Record<UserRole, readonly Permission[]> = {
   DEPARTMENT: departmentPermissions,
   STERILIZATION: sterilizationPermissions,
   ADMIN: permissionKeys,
+  VIEWER: viewerPermissions,
 };
 
 // These permissions protect tenant isolation and the minimum chain-of-custody path.
@@ -324,11 +337,14 @@ export const protectedRolePermissions: Record<UserRole, readonly Permission[]> =
     'traceability.view',
   ],
   DEPARTMENT: ['asset.detail.view', 'department.workspace', 'department.dispatch', 'issue.create', 'history.view'],
+  VIEWER: ['asset.detail.view', 'history.view'],
 };
 
 export const rolePermissions = defaultRolePermissions;
 export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]> = {
   ADMIN: [],
+  // A viewer can never be given an action, whatever the role settings say.
+  VIEWER: permissionKeys.filter(p => !viewerPermissions.includes(p)),
   STERILIZATION: ['department.workspace', 'department.dispatch', 'studio.manage'],
   DEPARTMENT: [
     'asset.registry.view',
@@ -387,6 +403,7 @@ const sanitize = (role: UserRole, permissions: readonly Permission[]) => {
   if (role === 'STERILIZATION') {
     (['department.workspace', 'department.dispatch', 'studio.manage'] as Permission[]).forEach(p => allowed.delete(p));
   }
+  if (role === 'VIEWER') roleUnavailablePermissions.VIEWER.forEach(p => allowed.delete(p));
   return permissionKeys.filter(p => allowed.has(p));
 };
 
@@ -411,4 +428,10 @@ export const hasPermission = (
 ) => permissionsForRole(role, overrides, supervisor).includes(permission);
 
 export const roleHomePath = (role: UserRole) =>
-  role === 'STERILIZATION' ? '/sterilization' : role === 'DEPARTMENT' ? '/department' : '/studio';
+  role === 'STERILIZATION'
+    ? '/sterilization'
+    : role === 'DEPARTMENT'
+      ? '/department'
+      : role === 'VIEWER'
+        ? '/overview'
+        : '/studio';

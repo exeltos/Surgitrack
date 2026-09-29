@@ -93,6 +93,15 @@ const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string;
     descriptionEl: 'Προβολή των assets του τμήματος, αναφορές και ηλεκτρονική αποστολή προς Αποστείρωση.',
     descriptionEn: 'View department assets, report issues and electronically dispatch to Sterilization.',
   },
+  {
+    id: 'VIEWER',
+    el: 'Παρατηρητής',
+    en: 'Viewer',
+    descriptionEl:
+      'Μόνο προβολή (π.χ. Νοσηλευτική Διεύθυνση, Διεύθυνση Λειτουργιών): επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό και αναφορές όλου του νοσοκομείου. Δεν αλλάζει τίποτα.',
+    descriptionEn:
+      'Read only (e.g. Nursing Directorate, Operations): overview, registries, issues, history and reports of the whole hospital. Changes nothing.',
+  },
 ];
 const permissionGroupMeta: Record<PermissionGroup, {el: string; en: string}> = {
   ASSETS: {el: 'Assets & Stock', en: 'Assets & Stock'},
@@ -356,7 +365,7 @@ export default function StudioPage() {
           )
         : undefined;
       const role = (
-        ['ADMIN', 'STERILIZATION', 'DEPARTMENT'].includes(String(roleRaw || '').toUpperCase())
+        ['ADMIN', 'STERILIZATION', 'DEPARTMENT', 'VIEWER'].includes(String(roleRaw || '').toUpperCase())
           ? String(roleRaw).toUpperCase()
           : 'DEPARTMENT'
       ) as UserRole;
@@ -1630,15 +1639,20 @@ export default function StudioPage() {
                           'Ο Διαχειριστής διατηρεί πάντα πλήρη πρόσβαση στο SurgiTrack.',
                           'Administrator always retains full SurgiTrack access.',
                         )
-                      : selectedRole === 'DEPARTMENT'
+                      : selectedRole === 'VIEWER'
                         ? L(
-                            'Ο ρόλος Τμήματος περιορίζεται πάντα στα assets του δηλωμένου τμήματος και δεν μπορεί να αποκτήσει δικαιώματα CSSD ή Studio.',
-                            'Department role is always scoped to its assigned department and cannot gain CSSD or Studio administration permissions.',
+                            'Ο Παρατηρητής δεν μπορεί ποτέ να αποκτήσει δικαίωμα ενέργειας· εδώ ορίζετε μόνο ποιες ενότητες βλέπει. Οι αλλαγές δεδομένων μπλοκάρονται και στον server.',
+                            'A viewer can never be given an action; here you only choose which sections they see. Data changes are also blocked on the server.',
                           )
-                        : L(
-                            'Τα κρίσιμα δικαιώματα chain of custody παραμένουν κλειδωμένα. Τα υπόλοιπα μπορούν να προσαρμοστούν στην πολιτική της μονάδας.',
-                            'Critical chain-of-custody permissions remain locked. Other permissions can follow facility policy.',
-                          )}
+                        : selectedRole === 'DEPARTMENT'
+                          ? L(
+                              'Ο ρόλος Τμήματος περιορίζεται πάντα στα assets του δηλωμένου τμήματος και δεν μπορεί να αποκτήσει δικαιώματα CSSD ή Studio.',
+                              'Department role is always scoped to its assigned department and cannot gain CSSD or Studio administration permissions.',
+                            )
+                          : L(
+                              'Τα κρίσιμα δικαιώματα chain of custody παραμένουν κλειδωμένα. Τα υπόλοιπα μπορούν να προσαρμοστούν στην πολιτική της μονάδας.',
+                              'Critical chain-of-custody permissions remain locked. Other permissions can follow facility policy.',
+                            )}
                   </span>
                 </div>
               </div>
@@ -2168,9 +2182,19 @@ function UserEditor({
               <option value="DEPARTMENT">{tr('Τμήμα')}</option>
               <option value="STERILIZATION">{tr('Αποστείρωση')}</option>
               <option value="ADMIN">{tr('Διαχειριστής')}</option>
+              <option value="VIEWER">{tr('Παρατηρητής (μόνο προβολή)')}</option>
             </select>
           </label>
-          {role === 'ADMIN' ? (
+          {role === 'VIEWER' ? (
+            <div className="studio-form-note">
+              <ShieldCheck size={16} />
+              <span>
+                {tr(
+                  'Ο Παρατηρητής βλέπει όλο το νοσοκομείο (επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό, αναφορές) χωρίς να μπορεί να αλλάξει τίποτα.',
+                )}
+              </span>
+            </div>
+          ) : role === 'ADMIN' ? (
             <div className="studio-form-note">
               <ShieldCheck size={16} />
               <span>
@@ -2226,7 +2250,7 @@ function UserEditor({
               onSave({
                 name: name.trim(),
                 email: email.trim(),
-                department: role === 'ADMIN' ? '' : department,
+                department: role === 'ADMIN' || role === 'VIEWER' ? '' : department,
                 role,
                 active,
                 organizationId,

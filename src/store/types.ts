@@ -31,7 +31,8 @@ export type SurgicalCount = {
   signed: boolean;
 };
 
-export type UserRole = 'DEPARTMENT' | 'STERILIZATION' | 'ADMIN';
+/** VIEWER: read-only (e.g. Nursing Directorate, Operations): sees the hospital, changes nothing. */
+export type UserRole = 'DEPARTMENT' | 'STERILIZATION' | 'ADMIN' | 'VIEWER';
 
 export type Toast = {
   id: number;

@@ -38,6 +38,7 @@ const createDemoInitialData = (): LibraryState => ({
     ADMIN: [...defaultRolePermissions.ADMIN],
     STERILIZATION: [...defaultRolePermissions.STERILIZATION],
     DEPARTMENT: [...defaultRolePermissions.DEPARTMENT],
+    VIEWER: [...defaultRolePermissions.VIEWER],
   },
   rolePermissionAudit: [],
   configurationAudit: [],
