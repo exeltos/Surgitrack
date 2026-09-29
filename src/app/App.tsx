@@ -1,4 +1,4 @@
-import {lazy, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
+import {Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
 import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
@@ -12,6 +12,8 @@ import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import Spinner from '../components/ui/Spinner';
+import {lazyPage} from '../core/resilience';
+import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
 import {
   type AccessRequest,
   canViewAs,
@@ -22,25 +24,25 @@ import {
 } from '../data/cloud/identity';
 
 // Route pages are code-split so the sign-in screen and each workspace load only what they need.
-const SetsPage = lazy(() => import('../modules/sets/SetsPage'));
-const SetDetailPage = lazy(() => import('../modules/sets/SetDetailPage'));
-const ToolsPage = lazy(() => import('../modules/tools/ToolsPage'));
-const ToolDetailPage = lazy(() => import('../modules/tools/ToolDetailPage'));
-const AssetCreatePage = lazy(() => import('../components/assets/AssetCreatePage'));
-const StandaloneToolsPage = lazy(() => import('../modules/tools/StandaloneToolsPage'));
-const StockPage = lazy(() => import('../modules/stock/StockPage'));
-const SterilizationPage = lazy(() => import('../modules/sterilization/SterilizationPage'));
-const DepartmentPage = lazy(() => import('../modules/department/DepartmentPage'));
-const CountPage = lazy(() => import('../modules/counts/CountPage'));
-const IssuesPage = lazy(() => import('../modules/issues/IssuesPage'));
-const MovementsPage = lazy(() => import('../modules/movements/MovementsPage'));
-const TraceabilityPage = lazy(() => import('../modules/traceability/TraceabilityPage'));
-const ReportsPage = lazy(() => import('../modules/reports/ReportsPage'));
-const StudioPage = lazy(() => import('../modules/studio/StudioPage'));
-const HospitalAdminPage = lazy(() => import('../modules/hospital/HospitalAdminPage'));
-const HospitalsPage = lazy(() => import('../modules/hospital/HospitalsPage'));
-const HospitalOverviewPage = lazy(() => import('../modules/hospital/HospitalOverviewPage'));
-const JoinPage = lazy(() => import('../modules/auth/JoinPage'));
+const SetsPage = lazyPage(() => import('../modules/sets/SetsPage'));
+const SetDetailPage = lazyPage(() => import('../modules/sets/SetDetailPage'));
+const ToolsPage = lazyPage(() => import('../modules/tools/ToolsPage'));
+const ToolDetailPage = lazyPage(() => import('../modules/tools/ToolDetailPage'));
+const AssetCreatePage = lazyPage(() => import('../components/assets/AssetCreatePage'));
+const StandaloneToolsPage = lazyPage(() => import('../modules/tools/StandaloneToolsPage'));
+const StockPage = lazyPage(() => import('../modules/stock/StockPage'));
+const SterilizationPage = lazyPage(() => import('../modules/sterilization/SterilizationPage'));
+const DepartmentPage = lazyPage(() => import('../modules/department/DepartmentPage'));
+const CountPage = lazyPage(() => import('../modules/counts/CountPage'));
+const IssuesPage = lazyPage(() => import('../modules/issues/IssuesPage'));
+const MovementsPage = lazyPage(() => import('../modules/movements/MovementsPage'));
+const TraceabilityPage = lazyPage(() => import('../modules/traceability/TraceabilityPage'));
+const ReportsPage = lazyPage(() => import('../modules/reports/ReportsPage'));
+const StudioPage = lazyPage(() => import('../modules/studio/StudioPage'));
+const HospitalAdminPage = lazyPage(() => import('../modules/hospital/HospitalAdminPage'));
+const HospitalsPage = lazyPage(() => import('../modules/hospital/HospitalsPage'));
+const HospitalOverviewPage = lazyPage(() => import('../modules/hospital/HospitalOverviewPage'));
+const JoinPage = lazyPage(() => import('../modules/auth/JoinPage'));
 
 const readDemoSessionUser = (): SessionUser | undefined => {
   try {
@@ -58,7 +60,9 @@ function RoleHome() {
 }
 const Guard = ({permission, children}: {permission: Permission; children: ReactNode}) => (
   <ProtectedRoute permission={permission}>
-    <Suspense fallback={<Spinner />}>{children}</Suspense>
+    <RouteErrorBoundary>
+      <Suspense fallback={<Spinner />}>{children}</Suspense>
+    </RouteErrorBoundary>
   </ProtectedRoute>
 );
 

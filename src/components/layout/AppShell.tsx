@@ -1,4 +1,4 @@
-import {lazy, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
+import {Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {
   Accessibility,
@@ -27,9 +27,10 @@ import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
+import {lazyPage} from '../../core/resilience';
 
 // The user manual is loaded only when first opened.
-const HelpCenter = lazy(() => import('../../core/help/HelpCenter'));
+const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
   STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},

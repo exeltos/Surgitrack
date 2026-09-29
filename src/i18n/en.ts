@@ -1,5 +1,13 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
+  'Υπάρχει νέα έκδοση της εφαρμογής': 'A new version of the app is available',
+  'Η σελίδα δεν μπόρεσε να ανοίξει': 'The page could not open',
+  'Ανανεώστε για να φορτώσει η τελευταία έκδοση. Τα δεδομένα σας είναι αποθηκευμένα.':
+    'Reload to load the latest version. Your data is saved.',
+  'Δοκιμάστε ξανά ή ανανεώστε τη σελίδα. Τα δεδομένα σας είναι αποθηκευμένα.':
+    'Try again or reload the page. Your data is saved.',
+  'Δοκιμή ξανά': 'Try again',
+  Ανανέωση: 'Reload',
   ΜΕΓΕΘΟΣ: 'SIZE',
   ΚΕΦΑΛΙΔΑ: 'HEADER',
   'Π.χ. όνομα νοσοκομείου': "E.g. the hospital's name",

@@ -2376,3 +2376,28 @@ a.overview-bar:hover {
   justify-content: flex-end;
   gap: 8px;
 }
+
+/* A page that failed to open: the menu stays usable. */
+.route-error {
+  max-width: 560px;
+  margin: 48px auto;
+  padding: 24px;
+  border: 1px solid #e3d6c4;
+  border-radius: 14px;
+  background: #fffaf2;
+  text-align: center;
+}
+.route-error h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: #5b3d12;
+}
+.route-error p {
+  margin: 0 0 16px;
+  color: #6b5a44;
+}
+.route-error div {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}

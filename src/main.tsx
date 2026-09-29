@@ -8,6 +8,10 @@ import {LibraryStoreProvider} from './core/LibraryStore';
 import {getRuntimeDataMode} from './config/dataMode';
 import CloudWorkspaceGate from './data/cloud/CloudWorkspaceGate';
 import './styles/global.css';
+import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
+
+installChunkRecovery();
+installEscapeClosesDialogs();
 const root = document.getElementById('root');
 const runtimeDataMode = getRuntimeDataMode();
 if (!root) throw new Error('SurgiTrack: root element was not found.');
