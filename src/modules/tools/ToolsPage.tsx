@@ -1,6 +1,8 @@
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Layers3, Plus, ChevronRight, List} from 'lucide-react';
+import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -24,12 +26,15 @@ export default function ToolsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [usage, setUsage] = useRememberedState('usage', '');
+  const {systemSettings} = useLibraries();
   const [mode, setMode] = useRememberedState('mode', '');
   const filtered = tools.filter(
     t =>
       (!department || t.department === department) &&
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       (!mode || t.mode === mode) &&
       `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''} ${t.ownerName || ''}`
@@ -115,6 +120,13 @@ export default function ToolsPage() {
               placeholder: tr('Όλες οι καταστάσεις'),
               options: values('state').map(value => ({value, label: value})),
               onChange: setState,
+            },
+            {
+              key: 'usage',
+              value: usage,
+              placeholder: tr('Όλοι οι τύποι χρήσης'),
+              options: usageFilterOptions(),
+              onChange: setUsage,
             },
           ]}
         />

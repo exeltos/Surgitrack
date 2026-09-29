@@ -1248,4 +1248,7 @@ export const en: Record<string, string> = {
     '{0}: a patient code is required for limited-use instruments.',
   '{0} προωθήθηκε προς Αποστείρωση. Εξαντλήθηκαν οι ζωές: {1} — τέθηκε εκτός χρήσης.':
     '{0} was sent to Sterilization. No lives left: {1} — taken out of use.',
+  'Πολλαπλών χρήσεων (με ζωές)': 'Multi-use (with lives)',
+  'Λίγες ζωές': 'Few lives left',
+  'Όλοι οι τύποι χρήσης': 'All usage types',
 };

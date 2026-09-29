@@ -1,6 +1,8 @@
 import {useState} from 'react';
 import {ArrowRightLeft, FileUp, Plus, ChevronRight} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
+import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
@@ -33,12 +35,15 @@ export default function StockPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [usage, setUsage] = useRememberedState('usage', '');
+  const {systemSettings} = useLibraries();
   const values = (key: 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(stock.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const filtered = stock.filter(
     t =>
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       `${t.name} ${t.code} ${t.barcode} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty}`
         .toLowerCase()
@@ -93,6 +98,13 @@ export default function StockPage() {
             placeholder: tr('Όλες οι καταστάσεις'),
             options: values('state').map(value => ({value, label: value})),
             onChange: setState,
+          },
+          {
+            key: 'usage',
+            value: usage,
+            placeholder: tr('Όλοι οι τύποι χρήσης'),
+            options: usageFilterOptions(),
+            onChange: setUsage,
           },
         ]}
       />
