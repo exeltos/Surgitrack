@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react';
 import {
   Activity,
   AlertTriangle,
+  Archive,
   Boxes,
   FileSpreadsheet,
   FileText,
@@ -20,7 +21,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {compositionHtml} from '../sterilization/printUtils';
 import {getI18nLang, tr, trData} from '../../i18n';
 
-type ReportId = 'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'traceability';
+type ReportId = 'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'traceability';
 type Row = Record<string, string | number>;
 
 const stateLabel: Record<string, string> = {
@@ -36,6 +37,7 @@ const stateLabel: Record<string, string> = {
   IN_STOCK: 'Stock',
   SERVICE: 'Service',
   LOST: 'Απώλεια',
+  RETIRED: 'Εκτός χρήσης',
 };
 
 const reports: Array<{id: ReportId; title: string; description: string; icon: typeof FileText}> = [
@@ -45,6 +47,12 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
   {id: 'issues', title: 'Service & Βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
   {id: 'usage', title: 'Όρια Χρήσεων', description: 'Υπόλοιπο κύκλου ζωής και κρίσιμα όρια.', icon: Activity},
   {
+    id: 'retired',
+    title: 'Εργαλεία εκτός χρήσης',
+    description: 'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. εξάντληση ζωών).',
+    icon: Archive,
+  },
+  {
     id: 'traceability',
     title: 'Ιχνηλασιμότητα Ασθενούς',
     description: 'Κινήσεις Σετ/εργαλείων βάσει κωδικού ασθενούς.',
@@ -53,7 +61,17 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
 ];
 
 /** Report cells holding stored Greek values (type, department, state…) are shown in the UI language. */
-const TRANSLATED_COLUMNS = new Set(['kind', 'department', 'specialty', 'stateLabel', 'type', 'status', 'from', 'to']);
+const TRANSLATED_COLUMNS = new Set([
+  'kind',
+  'department',
+  'specialty',
+  'stateLabel',
+  'type',
+  'status',
+  'from',
+  'to',
+  'reason',
+]);
 const cellText = (key: string, value: unknown) => {
   const text = String(value ?? '—');
   return TRANSLATED_COLUMNS.has(key) ? trData(text) : text;
@@ -77,7 +95,7 @@ function genericReportHtml(title: string, subtitle: string, columns: Array<{key:
 }
 
 export default function ReportsPage() {
-  const {sets, tools, issues, movements, currentUser} = useSurgi();
+  const {sets, tools, retiredTools, issues, movements, currentUser} = useSurgi();
   const [active, setActive] = useState<ReportId>('composition');
   const [setId, setSetId] = useState(sets[0]?.id || '');
   const [department, setDepartment] = useState('ALL');
@@ -101,10 +119,10 @@ export default function ReportsPage() {
   );
   const specialties = useMemo(
     () =>
-      Array.from(new Set([...sets.map(x => x.specialty), ...tools.map(x => x.specialty)])).sort((a, b) =>
-        a.localeCompare(b, 'el'),
-      ),
-    [sets, tools],
+      Array.from(
+        new Set([...sets.map(x => x.specialty), ...tools.map(x => x.specialty), ...retiredTools.map(x => x.specialty)]),
+      ).sort((a, b) => a.localeCompare(b, 'el')),
+    [sets, tools, retiredTools],
   );
   const issueTypes = useMemo(
     () => Array.from(new Set(issues.map(x => x.type))).sort((a, b) => a.localeCompare(b, 'el')),
@@ -245,6 +263,36 @@ export default function ReportsPage() {
         rows: assets as Row[],
       };
     }
+    if (active === 'retired') {
+      const rows = retiredTools
+        .filter(t => specialty === 'ALL' || t.specialty === specialty)
+        .map(t => ({
+          barcode: t.barcode,
+          name: t.name,
+          code: t.code,
+          manufacturer: t.manufacturer || '—',
+          specialty: t.specialty || '—',
+          uses: t.maxUses !== undefined ? `${t.uses}/${t.maxUses}` : String(t.uses),
+          retiredAt: t.retiredAt || '—',
+          reason: t.retiredReason || '—',
+          notes: t.notes || '',
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name, 'el') || a.barcode.localeCompare(b.barcode));
+      return {
+        columns: [
+          {key: 'barcode', label: 'Barcode'},
+          {key: 'name', label: tr('Εργαλείο')},
+          {key: 'code', label: tr('Κωδικός')},
+          {key: 'manufacturer', label: tr('Κατασκευαστής')},
+          {key: 'specialty', label: tr('Ειδικότητα')},
+          {key: 'uses', label: tr('Χρήσεις')},
+          {key: 'retiredAt', label: tr('Εκτός χρήσης από')},
+          {key: 'reason', label: tr('Αιτία')},
+          {key: 'notes', label: tr('Σημειώσεις')},
+        ],
+        rows: rows as Row[],
+      };
+    }
     const q = patientCode.trim().toLowerCase();
     const rows = movements
       .filter(m => m.patientCode && (!q || m.patientCode.toLowerCase().includes(q)))
@@ -276,6 +324,7 @@ export default function ReportsPage() {
     setId,
     sets,
     tools,
+    retiredTools,
     issues,
     movements,
     department,
@@ -328,7 +377,7 @@ export default function ReportsPage() {
           },
         ]
       : []),
-    ...(byDepartment
+    ...(byDepartment || active === 'retired'
       ? [
           {
             key: 'specialty',
@@ -356,7 +405,9 @@ export default function ReportsPage() {
           {
             key: 'status',
             placeholder: tr('Όλες οι καταστάσεις'),
-            options: Object.entries(stateLabel).map(([k, v]) => ({value: k, label: tr(v)})),
+            options: Object.entries(stateLabel)
+              .filter(([k]) => k !== 'RETIRED')
+              .map(([k, v]) => ({value: k, label: tr(v)})),
             ...choice(status, setStatus),
           },
         ]

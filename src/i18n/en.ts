@@ -1233,4 +1233,19 @@ export const en: Record<string, string> = {
   Ιατρός: 'Doctor',
   'Όνομα ιατρού': "Doctor's name",
   'Σε ποιον ανήκει': 'Owned by',
+  'Εξάντληση ζωών': 'No lives left',
+  'Εκτός χρήσης': 'Out of use',
+  'Εργαλεία εκτός χρήσης': 'Out-of-use instruments',
+  'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. εξάντληση ζωών).':
+    'History of instruments taken out of use (e.g. no lives left).',
+  'Εκτός χρήσης από': 'Out of use since',
+  'Μείωση ζωών': 'Lives reduction',
+  'Τελευταία ζωή · θα τεθεί εκτός χρήσης': 'Last life · will be taken out of use',
+  'Επιβεβαιώνω τη μείωση κατά μία ζωή': 'I confirm reducing one life',
+  'υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο':
+    'required · limited-use instrument, no patient name',
+  '{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.':
+    '{0}: a patient code is required for limited-use instruments.',
+  '{0} προωθήθηκε προς Αποστείρωση. Εξαντλήθηκαν οι ζωές: {1} — τέθηκε εκτός χρήσης.':
+    '{0} was sent to Sterilization. No lives left: {1} — taken out of use.',
 };

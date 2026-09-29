@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
+import {Gauge, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import type {AssetKind} from '../../types/domain';
@@ -18,10 +18,18 @@ export default function DepartmentDispatchModal({
   name: string;
   onClose: () => void;
 }) {
-  const {currentUser, sendToSterilization} = useSurgi();
+  const {currentUser, sendToSterilization, sets, tools} = useSurgi();
   const [patientCode, setPatientCode] = useState('');
   const [note, setNote] = useState('');
+  const [livesConfirmed, setLivesConfirmed] = useState(false);
+  // Limited-use (multi-use with lives) instruments lose one life on every dispatch after a procedure.
+  const limitedTools =
+    kind === 'TOOL' ? tools.filter(t => t.id === id && t.maxUses) : tools.filter(t => t.setId === id && t.maxUses);
+  const limitedSet = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
+  const consumesLives = limitedTools.length > 0 || limitedSet;
+  const canSend = !consumesLives || (patientCode.trim().length > 0 && livesConfirmed);
   const send = () => {
+    if (!canSend) return;
     sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined);
     onClose();
   };
@@ -57,13 +65,45 @@ export default function DepartmentDispatchModal({
           </div>
           <label className="department-patient-code">
             {tr('Κωδικός ασθενούς') + ' '}
-            <small>{tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}</small>
+            <small>
+              {consumesLives
+                ? tr('υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο')
+                : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
+            </small>
             <input
               value={patientCode}
               onChange={e => setPatientCode(e.target.value)}
               placeholder={tr('π.χ. PT-2026-00125')}
             />
           </label>
+          {consumesLives && (
+            <div className="department-lives-card">
+              <div className="department-lives-head">
+                <Gauge size={18} />
+                <strong>{tr('Μείωση ζωών')}</strong>
+              </div>
+              <ul>
+                {limitedTools.map(t => {
+                  const remaining = Math.max(0, (t.maxUses || 0) - t.uses);
+                  return (
+                    <li key={t.id} className={remaining <= 1 ? 'last-life' : ''}>
+                      <span>
+                        {t.barcode} · {t.name}
+                      </span>
+                      <b>
+                        {remaining} → {Math.max(0, remaining - 1)}
+                      </b>
+                      {remaining <= 1 && <small>{tr('Τελευταία ζωή · θα τεθεί εκτός χρήσης')}</small>}
+                    </li>
+                  );
+                })}
+              </ul>
+              <label className="department-lives-confirm">
+                <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
+                {tr('Επιβεβαιώνω τη μείωση κατά μία ζωή')}
+              </label>
+            </div>
+          )}
           <div className="department-signature-card">
             <ShieldCheck size={21} />
             <div>
@@ -89,7 +129,7 @@ export default function DepartmentDispatchModal({
         </div>
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
-          <AppButton variant="primary" icon={<Send size={17} />} onClick={send}>
+          <AppButton variant="primary" icon={<Send size={17} />} onClick={send} disabled={!canSend}>
             {tr('Αποστολή προς Αποστείρωση')}
           </AppButton>
         </footer>

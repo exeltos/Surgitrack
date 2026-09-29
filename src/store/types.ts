@@ -207,6 +207,8 @@ export type ToolUpdatePatch = Partial<
 export type SurgiStoreValue = {
   sets: SetAsset[];
   tools: Tool[];
+  /** Tools taken out of circulation, kept only as history. */
+  retiredTools: Tool[];
   movements: Movement[];
   issues: Issue[];
   counts: SurgicalCount[];
@@ -277,6 +279,7 @@ export type SurgiStoreValue = {
   duplicateTool: (id: string) => string | undefined;
   deleteSet: (id: string, deleteTools?: boolean) => void;
   deleteTool: (id: string) => void;
+  acknowledgeOutOfUse: (id: string) => void;
   reportSetIssue: (
     setId: string,
     targetToolIds: string[],

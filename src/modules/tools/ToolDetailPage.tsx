@@ -241,6 +241,7 @@ export default function ToolDetailPage() {
                 : undefined
           }
           onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
+          canEditUsage={can('asset.usage.configure')}
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />

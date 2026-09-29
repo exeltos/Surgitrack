@@ -50,7 +50,19 @@ const navEN: Record<string, string> = {
 /** Pages the platform admin can use without having entered a hospital. */
 const PLATFORM_ONLY_PAGES = ['/studio', '/hospitals'];
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
-  const {issues, lifecycleAlerts, sets, tools, currentUser, toast, clearToast, role, can} = useSurgi();
+  const {
+    issues,
+    lifecycleAlerts,
+    sets,
+    tools,
+    retiredTools,
+    acknowledgeOutOfUse,
+    currentUser,
+    toast,
+    clearToast,
+    role,
+    can,
+  } = useSurgi();
   const syncStatus = useSyncStatus();
   const {lang, setLang, fontScale, setFontScale, highContrast, setHighContrast, reducedMotion, setReducedMotion} =
     useAppPreferences();
@@ -112,10 +124,15 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
   const departmentUsage = lifecycleAlerts.filter(a => departmentAssets.some(asset => asset.id === a.assetId));
   const accessRequests = hospitalId ? pendingAccess : 0;
+  // Instruments that just ran out of lives: Sterilization must set them aside and confirm.
+  const outOfUseNotices = role === 'DEPARTMENT' ? [] : retiredTools.filter(t => !t.retiredNoticeSeenAt);
   const openNotifications =
     role === 'DEPARTMENT'
       ? departmentReady.length + departmentIssues.length + departmentUsage.length
-      : issues.filter(i => i.status === 'OPEN').length + lifecycleAlerts.length + accessRequests;
+      : issues.filter(i => i.status === 'OPEN').length +
+        lifecycleAlerts.length +
+        accessRequests +
+        outOfUseNotices.length;
   useEffect(() => {
     if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
       setDepartmentReadyToast(undefined);
@@ -466,11 +483,33 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                           </button>
                         </div>
                       )}
+                      {outOfUseNotices.length > 0 && (
+                        <div className="notification-list">
+                          {outOfUseNotices.slice(0, 8).map(t => (
+                            <div key={`out-${t.id}`} className="notification-item out-of-use">
+                              <Gauge size={17} />
+                              <span>
+                                <strong>
+                                  {t.barcode} · {t.name}
+                                </strong>
+                                <small>
+                                  {lang === 'el'
+                                    ? `Εκτός χρήσης · ${trData(t.retiredReason || '')} · ${t.retiredAt || ''}`
+                                    : `Out of use · ${trData(t.retiredReason || '')} · ${t.retiredAt || ''}`}
+                                </small>
+                              </span>
+                              <button type="button" onClick={() => acknowledgeOutOfUse(t.id)}>
+                                {lang === 'el' ? 'Ενημερώθηκα' : 'Got it'}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <div className="notification-empty">
-                        {openNotifications - accessRequests
+                        {openNotifications - accessRequests - outOfUseNotices.length
                           ? lang === 'el'
-                            ? `${openNotifications - accessRequests} ενεργές ειδοποιήσεις`
-                            : `${openNotifications - accessRequests} active notifications`
+                            ? `${openNotifications - accessRequests - outOfUseNotices.length} ενεργές ειδοποιήσεις`
+                            : `${openNotifications - accessRequests - outOfUseNotices.length} active notifications`
                           : lang === 'el'
                             ? 'Δεν υπάρχουν νέες ειδοποιήσεις.'
                             : 'No new notifications.'}

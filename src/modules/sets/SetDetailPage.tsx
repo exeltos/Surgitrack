@@ -294,6 +294,7 @@ export default function SetDetailPage() {
           onSave={can('asset.edit') ? patch => updateSet(set.id, patch) : undefined}
           markerTapes={set.colorTapes}
           onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
+          canEditUsage={can('asset.usage.configure')}
         />
         <section className="asset-workbench-main">
           <AssetTabs
