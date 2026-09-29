@@ -1233,4 +1233,20 @@ export const en: Record<string, string> = {
   Ιατρός: 'Doctor',
   'Όνομα ιατρού': "Doctor's name",
   'Σε ποιον ανήκει': 'Owned by',
+  Αποσυρμένο: 'Retired',
+  'Αποσυρμένα εργαλεία': 'Retired instruments',
+  'Ιστορικό εργαλείων εκτός κυκλοφορίας (π.χ. χωρίς ζωές).':
+    'History of instruments out of circulation (e.g. no lives left).',
+  Απόσυρση: 'Retirement',
+  'Απόσυρση εργαλείου': 'Retire instrument',
+  'Απόσυρση (ιστορικό)': 'Retire (history)',
+  'Φεύγει από τις λίστες, μένει στις αναφορές': 'Leaves the lists, stays in reports',
+  'Ναι, απόσυρση': 'Yes, retire',
+  'Εξάντληση ζωών': 'No lives left',
+  'Απόσυρση από χρήση': 'Withdrawn from use',
+  'Η απόσυρση είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.':
+    'Retirement is locked while the instrument is in an active sterilization process.',
+  'Το {0} θα βγει από όλες τις λίστες και θα κρατηθεί μόνο ως ιστορικό στην αναφορά «Αποσυρμένα εργαλεία». Θέλεις να συνεχίσεις;':
+    '{0} will leave every list and be kept only as history in the "Retired instruments" report. Continue?',
+  '{0}: το εργαλείο αποσύρθηκε και κρατήθηκε στο ιστορικό.': '{0}: the instrument was retired and kept in history.',
 };

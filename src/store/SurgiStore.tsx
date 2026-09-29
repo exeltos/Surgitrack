@@ -1392,6 +1392,28 @@ export function SurgiProvider({
     });
     notify(tr('{0}: το εργαλείο διαγράφηκε.', src.barcode));
   };
+  const retireTool = (id: string, reason: string) => {
+    const src = tools.find(t => t.id === id);
+    if (!src || src.state === 'RETIRED') return;
+    const parentSet = src.setId ? sets.find(s => s.id === src.setId) : undefined;
+    setTools(x =>
+      x.map(t =>
+        t.id === id
+          ? {...t, state: 'RETIRED' as const, retiredAt: formatStoreDateTime(), retiredReason: reason, setId: undefined}
+          : t,
+      ),
+    );
+    if (parentSet) setSets(x => x.map(s => (s.id === parentSet.id ? {...s, actual: Math.max(0, s.actual - 1)} : s)));
+    addMovement({
+      asset: `${src.barcode} · ${src.name}`,
+      assetKind: 'TOOL',
+      from: parentSet ? `Set ${parentSet.barcode}` : src.mode === 'STOCK' ? 'Stock' : src.department || 'Μεμονωμένο',
+      to: 'Απόσυρση',
+      status: `Απόσυρση εργαλείου · ${reason}`,
+      by: currentUser.name,
+    });
+    notify(tr('{0}: το εργαλείο αποσύρθηκε και κρατήθηκε στο ιστορικό.', src.barcode));
+  };
   const reportSetIssue = (
     setId: string,
     targetToolIds: string[],
@@ -1754,7 +1776,12 @@ export function SurgiProvider({
     notify(tr('{0} εργαλεία προστέθηκαν στο {1}.', chosen.length, target.barcode));
   };
   const lifecycleAlerts = useMemo(
-    () => getLifecycleAlerts(sets, tools, systemSettings.usageWarningThreshold),
+    () =>
+      getLifecycleAlerts(
+        sets,
+        tools.filter(t => t.state !== 'RETIRED'),
+        systemSettings.usageWarningThreshold,
+      ),
     [sets, tools, systemSettings.usageWarningThreshold],
   );
 
@@ -1767,10 +1794,13 @@ export function SurgiProvider({
     }
     notify(normalized ? tr('Ορίστηκε όριο {0} χρήσεων.', normalized) : tr('Το όριο χρήσεων αφαιρέθηκε.'));
   };
+  const activeTools = useMemo(() => tools.filter(t => t.state !== 'RETIRED'), [tools]);
+  const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
   const value = useMemo(
     () => ({
       sets,
-      tools,
+      tools: activeTools,
+      retiredTools,
       movements,
       issues,
       counts,
@@ -1817,6 +1847,7 @@ export function SurgiProvider({
       duplicateTool,
       deleteSet,
       deleteTool,
+      retireTool,
       reportSetIssue,
       retireAsset,
       setColorMarker,

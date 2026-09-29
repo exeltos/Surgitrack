@@ -11,7 +11,9 @@ export type AssetState =
   | 'READY_FOR_PICKUP'
   | 'IN_STOCK'
   | 'SERVICE'
-  | 'LOST';
+  | 'LOST'
+  /** Out of circulation (e.g. no lives left); kept only as history for reports. */
+  | 'RETIRED';
 export type ToolMode = 'STANDALONE' | 'SET_MEMBER' | 'STOCK';
 /** Who owns a Set or instrument: the hospital, a doctor, or someone else (named in ownerName). */
 export type Ownership = 'HOSPITAL' | 'DOCTOR' | 'OTHER';
@@ -48,6 +50,8 @@ export interface Tool {
   colorTapes?: string[];
   ownership?: Ownership;
   ownerName?: string;
+  retiredAt?: string;
+  retiredReason?: string;
 }
 export interface SetCompositionRequirement {
   code: string;

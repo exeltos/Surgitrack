@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {
+  Archive,
   ArrowLeft,
   ArrowRightLeft,
   Barcode,
@@ -52,6 +53,7 @@ export default function ToolDetailPage() {
     updateTool,
     duplicateTool,
     deleteTool,
+    retireTool,
     role,
     currentUser,
     can,
@@ -66,6 +68,7 @@ export default function ToolDetailPage() {
   const [photosOpen, setPhotosOpen] = useState(false);
   const [preview, setPreview] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [retireOpen, setRetireOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
   const [newBarcodeOpen, setNewBarcodeOpen] = useState(false);
   const [markerOpen, setMarkerOpen] = useState(false);
@@ -190,6 +193,16 @@ export default function ToolDetailPage() {
                 : []),
               ...(can('asset.delete')
                 ? [
+                    {
+                      key: 'retire',
+                      icon: <Archive size={16} />,
+                      label: tr('Απόσυρση (ιστορικό)'),
+                      hint: tr('Φεύγει από τις λίστες, μένει στις αναφορές'),
+                      title: workflowLocked
+                        ? tr('Η απόσυρση είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
+                        : undefined,
+                      onSelect: () => (workflowLocked ? setDeleteBlockedOpen(true) : setRetireOpen(true)),
+                    },
                     {
                       key: 'delete',
                       icon: <Trash2 size={16} />,
@@ -451,6 +464,25 @@ export default function ToolDetailPage() {
           confirmLabel={tr('Κατάλαβα')}
           onConfirm={() => setDeleteBlockedOpen(false)}
           onClose={() => setDeleteBlockedOpen(false)}
+        />
+      )}
+      {can('asset.delete') && retireOpen && (
+        <ConfirmDialog
+          title={tr('Απόσυρση εργαλείου')}
+          message={tr(
+            'Το {0} θα βγει από όλες τις λίστες και θα κρατηθεί μόνο ως ιστορικό στην αναφορά «Αποσυρμένα εργαλεία». Θέλεις να συνεχίσεις;',
+            tool.barcode,
+          )}
+          confirmLabel={tr('Ναι, απόσυρση')}
+          onConfirm={() => {
+            retireTool(
+              tool.id,
+              tool.maxUses !== undefined && tool.uses >= tool.maxUses ? 'Εξάντληση ζωών' : 'Απόσυρση από χρήση',
+            );
+            setRetireOpen(false);
+            navigate('/tools');
+          }}
+          onClose={() => setRetireOpen(false)}
         />
       )}
       {can('asset.delete') && deleteOpen && (
