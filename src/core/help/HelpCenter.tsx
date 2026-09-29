@@ -205,17 +205,30 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
             <div className="manual-side-label">{tx.sections}</div>
             <nav className="manual-nav">
               {filtered.length ? (
-                filtered.map(s => (
-                  <button
-                    key={s.to}
-                    className={selected === s.to && mode === 'manual' ? 'active' : ''}
-                    onClick={() => select(s.to)}
-                  >
-                    <BookOpen size={15} />
-                    <span>{s.title[L]}</span>
-                    <ChevronRight size={13} />
-                  </button>
-                ))
+                filtered.map(s => {
+                  const open = selected === s.to && mode === 'manual';
+                  return (
+                    <div key={s.to} className="manual-nav-item">
+                      <button className={open ? 'active' : ''} aria-expanded={open} onClick={() => select(s.to)}>
+                        <BookOpen size={15} />
+                        <span>{s.title[L]}</span>
+                        <ChevronRight size={13} />
+                      </button>
+                      {/* Related sections open right under the section being read. */}
+                      {open && related.length > 0 && (
+                        <div className="manual-nav-related" role="group" aria-label={tx.related}>
+                          <small>{tx.related}</small>
+                          {related.map(r => (
+                            <button key={r.to} onClick={() => select(r.to)}>
+                              <ChevronRight size={12} />
+                              <span>{r.title[L]}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               ) : (
                 <div className="manual-nav-empty">{tx.noResults}</div>
               )}
@@ -352,23 +365,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                 </footer>
               </article>
             </main>
-          )}
-
-          {mode === 'manual' && current && (
-            <aside className="manual-side-pane">
-              {related.length > 0 && (
-                <section className="manual-related">
-                  <h3>{tx.related}</h3>
-                  {related.map(s => (
-                    <button key={s.to} onClick={() => select(s.to)}>
-                      <BookOpen size={14} />
-                      <span>{s.title[L]}</span>
-                      <ChevronRight size={13} />
-                    </button>
-                  ))}
-                </section>
-              )}
-            </aside>
           )}
 
           {mode === 'glossary' && (
