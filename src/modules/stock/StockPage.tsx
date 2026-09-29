@@ -1,4 +1,4 @@
-import {FileUp, Plus, ChevronRight} from 'lucide-react';
+import {Plus, ChevronRight} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
@@ -57,7 +57,6 @@ export default function StockPage() {
         description={tr('Διαθέσιμα φυσικά εργαλεία για αντικατάσταση, σύνθεση Σετ ή αυτόνομη διάθεση.')}
         actions={
           <div className="actions asset-page-actions">
-            <AppButton icon={<FileUp size={16} />}>{tr('Μαζικό upload')}</AppButton>
             {can('asset.create') && (
               <AppButton variant="primary" icon={<Plus size={16} />} onClick={() => navigate('/tools/new')}>
                 {tr('Νέο Εργαλείο')}

@@ -42,6 +42,16 @@ export function lazyPage<T extends ComponentType<any>>(load: () => Promise<{defa
   );
 }
 
+/** Every kind of dialog backdrop in the app. */
+const DIALOG_BACKDROPS = [
+  '.modal-backdrop',
+  '.movement-modal-backdrop',
+  '.nested-modal-backdrop',
+  '.studio-drawer-backdrop',
+  '.camera-modal-backdrop',
+  '.auth-info-backdrop',
+].join(',');
+
 const CLOSE_LABELS = /^(Κλείσιμο|Ακύρωση|Close|Cancel|Άκυρο|Όχι|No)$/i;
 
 /**
@@ -54,8 +64,8 @@ export function installEscapeClosesDialogs() {
     'keydown',
     event => {
       if (event.key !== 'Escape' || event.defaultPrevented) return;
-      const backdrops = [...document.querySelectorAll<HTMLElement>('.modal-backdrop')].filter(
-        el => el.offsetParent !== null || getComputedStyle(el).position === 'fixed',
+      const backdrops = [...document.querySelectorAll<HTMLElement>(DIALOG_BACKDROPS)].filter(
+        el => el.getClientRects().length > 0,
       );
       const top = backdrops[backdrops.length - 1];
       if (!top) return;
@@ -65,10 +75,12 @@ export function installEscapeClosesDialogs() {
         buttons.find(b => /^(Κλείσιμο|Close)/i.test(b.getAttribute('aria-label') || '')) ||
         buttons.find(b => CLOSE_LABELS.test((b.textContent || '').trim())) ||
         top.querySelector<HTMLButtonElement>('header .icon-button:not([disabled]), .modal-x:not([disabled])');
-      if (!close) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      close.click();
+      if (close) return close.click();
+      // No close button inside (e.g. a drawer beside its backdrop): the backdrop itself closes it.
+      top.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}));
+      top.click();
     },
     true,
   );
