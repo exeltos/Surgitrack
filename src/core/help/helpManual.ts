@@ -476,24 +476,24 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσθήκη σε Σετ',
-          'Από τη στήλη «Προσθήκη σε Σετ» επιλέξτε το Σετ και το εργαλείο μετακινείται αμέσως. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
+          'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Stock. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
         ],
         en: [
           'Add to a Set',
-          'In the "Add to Set" column pick the Set and the instrument moves at once. The "Sets with missing items" indicator opens the Sets that need completing.',
+          'Adding happens from the Set: open the Set, press "Add instruments" and pick from the Stock tab. The "Sets with missing items" indicator opens the Sets that need completing.',
         ],
       },
     ],
     steps: {
       el: [
         'Ανοίξτε «Σετ με έλλειψη» για να δείτε τι λείπει.',
-        'Βρείτε το εργαλείο στο Stock.',
-        'Προσθέστε το στο Σετ.',
+        'Ανοίξτε το Σετ και πατήστε «Προσθήκη εργαλείων».',
+        'Διαλέξτε το εργαλείο από την καρτέλα Stock.',
       ],
       en: [
         'Open "Sets with missing items" to see what is missing.',
-        'Find the instrument in Stock.',
-        'Add it to the Set.',
+        'Open the Set and press "Add instruments".',
+        'Pick the instrument from the Stock tab.',
       ],
     },
     related: ['/sets', '/tools'],
