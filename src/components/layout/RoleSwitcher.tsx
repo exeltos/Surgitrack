@@ -92,7 +92,7 @@ export default function RoleSwitcher() {
           aria-label={L('Προβολή ως', 'View as')}
         >
           {ownerInHospital && <option value="OWNER">{L('Owner (εσείς)', 'Owner (you)')}</option>}
-          {(['ADMIN', 'STERILIZATION_SUPERVISOR', 'STERILIZATION'] as const).map(kind => (
+          {(['ADMIN', 'STERILIZATION_SUPERVISOR', 'STERILIZATION', 'VIEWER'] as const).map(kind => (
             <option key={kind} value={kind}>
               {L(hospitalRoleNames[kind].el, hospitalRoleNames[kind].en)}
             </option>

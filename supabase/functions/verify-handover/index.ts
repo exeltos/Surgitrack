@@ -98,6 +98,8 @@ Deno.serve(async req => {
     await settle();
     if (!verified || !person) return json({error: "invalid_credentials"}, 401);
     if (person.id === auth.user.id) return json({error: "same_user"}, 409);
+    // Read-only viewers take no part in a handover.
+    if (person.role === "VIEWER") return json({error: "invalid_credentials"}, 401);
 
     const department = person.department as {name?: string} | {name?: string}[] | null;
     return json({

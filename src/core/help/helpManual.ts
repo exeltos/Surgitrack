@@ -657,6 +657,11 @@ export const helpManual: ManualSection[] = [
 
 export const glossary: Array<{term: string; el: string; en: string}> = [
   {
+    term: 'Παρατηρητής / Viewer',
+    el: 'Λογαριασμός μόνο προβολής (π.χ. Νοσηλευτική Διεύθυνση): βλέπει επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό και αναφορές όλου του νοσοκομείου, χωρίς να αλλάζει τίποτα. Τον δημιουργεί ο διαχειριστής του νοσοκομείου.',
+    en: 'A read-only account (e.g. Nursing Directorate): sees the overview, registries, issues, history and reports of the whole hospital and changes nothing. The hospital administrator creates it.',
+  },
+  {
     term: 'Σετ / Set',
     el: 'Ομάδα εργαλείων με συγκεκριμένη σύνθεση που αποστειρώνεται και κυκλοφορεί μαζί.',
     en: 'A group of instruments with a defined composition, sterilized and circulated together.',

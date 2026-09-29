@@ -159,3 +159,27 @@ describe('roleHomePath', () => {
     expect(roleHomePath('ADMIN')).toBe('/studio');
   });
 });
+
+describe('viewer (read only)', () => {
+  it('sees the hospital and can never be given an action', () => {
+    const tryEverything = {VIEWER: [...permissionKeys]};
+    const granted = permissionsForRole('VIEWER', tryEverything);
+    expect(granted).toEqual(
+      expect.arrayContaining(['overview.view', 'reports.view', 'history.view', 'asset.registry.view']),
+    );
+    for (const action of [
+      'asset.create',
+      'asset.edit',
+      'asset.delete',
+      'asset.photos.manage',
+      'issue.create',
+      'department.dispatch',
+      'sterilization.receive',
+      'sterilization.deliver',
+      'counts.record',
+      'studio.manage',
+    ] as const)
+      expect(granted).not.toContain(action);
+    expect(roleHomePath('VIEWER')).toBe('/overview');
+  });
+});

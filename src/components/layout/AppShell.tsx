@@ -35,6 +35,7 @@ const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
   STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
   ADMIN: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
+  VIEWER: {el: 'Παρατηρητής (μόνο προβολή)', en: 'Viewer (read only)'},
 };
 const navEN: Record<string, string> = {
   'Εξοπλισμός τμήματος': 'Department Equipment',
