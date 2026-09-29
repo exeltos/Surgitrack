@@ -27,6 +27,9 @@ const seedDemoOrganization = async (organizationId: string) => {
     tools: store.tools,
     movements: store.movements,
     issues: store.issues,
+    processLoads: store.processLoads || [],
+    receipts: store.receipts || [],
+    deliveries: store.deliveries || [],
     library: [library],
   } as Partial<CloudRecords>);
 };

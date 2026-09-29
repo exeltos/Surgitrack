@@ -23,9 +23,8 @@ import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
-import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import AppButton from '../../components/ui/AppButton';
-import {barcodeLabelHtml} from '../sterilization/printUtils';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -411,13 +410,7 @@ export default function ToolDetailPage() {
           </div>
         </div>
       )}
-      {preview && (
-        <PrintPreviewModal
-          title={`Barcode ${tool.barcode}`}
-          html={barcodeLabelHtml(tool, 'TOOL')}
-          onClose={() => setPreview(false)}
-        />
-      )}
+      {preview && <BarcodeLabelPreview asset={tool} kind="TOOL" onClose={() => setPreview(false)} />}
       {dispatchOpen && (
         <DepartmentDispatchModal
           kind="TOOL"

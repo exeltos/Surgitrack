@@ -42,30 +42,15 @@ import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr, trc, trData} from '../../i18n';
 import {useSetColorQuestion} from '../../components/assets/useSetColorQuestion';
 import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
+import type {HandoverSigner} from '../../data/cloud/handover';
+import HandoverSignature from './HandoverSignature';
+import {useCompositionOptions} from '../../components/assets/usePrintLook';
 
 type Queue = 'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'RELEASE' | 'STORAGE' | 'READY';
 type Kind = AssetKind;
 type SterilizationRow = (SetAsset & {kind: 'SET'}) | (Tool & {kind: 'TOOL'});
 type AssetDraft = {kind: 'SET'; asset: SetAsset} | {kind: 'TOOL'; asset: Tool};
-type Identity = {code: string; userId: string; name: string; department: string; role: string};
-
-const identityDirectory: Identity[] = [
-  {
-    code: 'OR-2187',
-    userId: 'u-or-2187',
-    name: 'Demo Χρήστης Χειρουργείου',
-    department: 'Χειρουργείο',
-    role: 'Χρήστης Τμήματος',
-  },
-  {
-    code: 'TOK-1042',
-    userId: 'u-tok-1042',
-    name: 'Demo Χρήστης Αίθουσας Τοκετών',
-    department: 'Αίθουσα Τοκετών',
-    role: 'Χρήστης Τμήματος',
-  },
-  {code: 'IVF-1130', userId: 'u-ivf-1130', name: 'Demo Χρήστης IVF', department: 'IVF', role: 'Χρήστης Τμήματος'},
-];
+type Identity = HandoverSigner;
 
 export default function SterilizationPage() {
   const {
@@ -97,7 +82,8 @@ export default function SterilizationPage() {
   const colorQuestion = useSetColorQuestion();
   // Set changes (cover a shortage, replace, service, stock, another Set) are the supervisor's.
   const canCompose = can('asset.composition.manage');
-  const {sterilizationWorkflow} = useLibraries();
+  const {sterilizationWorkflow, systemSettings} = useLibraries();
+  const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
   const queueForStage = (id: WorkflowStageId): Queue =>
@@ -133,7 +119,7 @@ export default function SterilizationPage() {
   const [receiptView, setReceiptView] = useState<ReceiptRecord | null>(null);
   const [receiptBatchOpen, setReceiptBatchOpen] = useState(false);
   const [receiptBatchSelected, setReceiptBatchSelected] = useState<Set<string>>(new Set());
-  const [receiptBatchDelivererCode, setReceiptBatchDelivererCode] = useState('');
+  const [receiptBatchDeliverer, setReceiptBatchDeliverer] = useState<Identity | null>(null);
   const [receiptBatchNote, setReceiptBatchNote] = useState('');
   const [receiptBatchMismatchReason, setReceiptBatchMismatchReason] = useState('');
   const [receiptBatchDeviations, setReceiptBatchDeviations] = useState<Set<string>>(new Set());
@@ -142,7 +128,7 @@ export default function SterilizationPage() {
     message: string;
   } | null>(null);
   const [prepDraft, setPrepDraft] = useState<AssetDraft | null>(null);
-  const [handoverCode, setHandoverCode] = useState('');
+  const [deliverer, setDeliverer] = useState<Identity | null>(null);
   const [note, setNote] = useState('');
   const [receiptNoteOpen, setReceiptNoteOpen] = useState(false);
   const [visibleDeviation, setVisibleDeviation] = useState(false);
@@ -202,11 +188,11 @@ export default function SterilizationPage() {
   >('NOT_REQUIRED');
   const [releaseNote, setReleaseNote] = useState('');
   const [deliveryDraft, setDeliveryDraft] = useState<AssetDraft | null>(null);
-  const [receiverCode, setReceiverCode] = useState('');
+  const [receiver, setReceiver] = useState<Identity | null>(null);
   const [deliveryNote, setDeliveryNote] = useState('');
   const [deliveryBatchOpen, setDeliveryBatchOpen] = useState(false);
   const [deliverySelected, setDeliverySelected] = useState<Set<string>>(new Set());
-  const [deliveryBatchReceiverCode, setDeliveryBatchReceiverCode] = useState('');
+  const [deliveryBatchReceiver, setDeliveryBatchReceiver] = useState<Identity | null>(null);
   const [deliveryBatchNote, setDeliveryBatchNote] = useState('');
   const [deliveryScanFeedback, setDeliveryScanFeedback] = useState<{
     type: 'OK' | 'WARN' | 'ERROR';
@@ -279,7 +265,6 @@ export default function SterilizationPage() {
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
-  const deliverer = identityDirectory.find(x => x.code === handoverCode.trim().toUpperCase());
   const delivererMatches = !receiptDraft || !deliverer || deliverer.department === receiptDraft.asset.department;
   const receiptPolicy = sterilizationWorkflow.receiptPolicy || {
     countSetsAtReceipt: false,
@@ -290,7 +275,6 @@ export default function SterilizationPage() {
   const receiptIdentityValid = !!deliverer && (delivererMatches || departmentExceptionAllowed);
   const receiptBatchAssets = incoming.filter(item => receiptBatchSelected.has(`${item.kind}:${item.id}`));
   const receiptBatchDepartment = receiptBatchAssets[0]?.department || '';
-  const receiptBatchDeliverer = identityDirectory.find(x => x.code === receiptBatchDelivererCode.trim().toUpperCase());
   const receiptBatchDelivererMatches =
     !!receiptBatchDeliverer && !!receiptBatchDepartment && receiptBatchDeliverer.department === receiptBatchDepartment;
   const receiptBatchDepartmentException =
@@ -300,13 +284,6 @@ export default function SterilizationPage() {
     !!receiptBatchMismatchReason.trim();
   const receiptBatchIdentityValid =
     !!receiptBatchDeliverer && (receiptBatchDelivererMatches || receiptBatchDepartmentException);
-  const receiptBatchDemoIdentity = receiptBatchDepartment
-    ? identityDirectory.find(x => x.department === receiptBatchDepartment)
-    : undefined;
-  const demoIdentity = receiptDraft
-    ? identityDirectory.find(x => x.department === receiptDraft.asset.department)
-    : undefined;
-  const receiver = identityDirectory.find(x => x.code === receiverCode.trim().toUpperCase());
   const receiverMatches = !deliveryDraft || !receiver || receiver.department === deliveryDraft.asset.department;
   const loadCandidates = loadModal === 'WASHING' ? washing : loadModal === 'STERILIZATION' ? processing : [];
   const awaitingLoads = processLoads.filter(
@@ -331,19 +308,12 @@ export default function SterilizationPage() {
     (!releasePolicy.requireChemicalIndicator || releaseLoadChecks.chemicalIndicatorOk) &&
     releaseLoadChecks.packagingIntegrityOk &&
     releaseBiOk;
-  const deliveryDemoIdentity = deliveryDraft
-    ? identityDirectory.find(x => x.department === deliveryDraft.asset.department)
-    : undefined;
   const deliverySelectedAssets = ready.filter(item => deliverySelected.has(`${item.kind}:${item.id}`));
   const deliveryBatchDepartment = deliverySelectedAssets[0]?.department || '';
-  const deliveryBatchReceiver = identityDirectory.find(x => x.code === deliveryBatchReceiverCode.trim().toUpperCase());
   const deliveryBatchReceiverMatches =
     !!deliveryBatchReceiver &&
     !!deliveryBatchDepartment &&
     deliveryBatchReceiver.department === deliveryBatchDepartment;
-  const deliveryBatchDemoIdentity = deliveryBatchDepartment
-    ? identityDirectory.find(x => x.department === deliveryBatchDepartment)
-    : undefined;
 
   const receiptTools = receiptDraft?.kind === 'SET' ? tools.filter(t => t.setId === receiptDraft.asset.id) : [];
   const receiptExpectedCount = receiptDraft?.kind === 'SET' ? receiptTools.length : 1;
@@ -510,7 +480,7 @@ export default function SterilizationPage() {
   const openReceiptBatch = () => {
     setReceiptBatchOpen(true);
     setReceiptBatchSelected(new Set());
-    setReceiptBatchDelivererCode('');
+    setReceiptBatchDeliverer(null);
     setReceiptBatchNote('');
     setReceiptBatchMismatchReason('');
     setReceiptBatchDeviations(new Set());
@@ -519,7 +489,7 @@ export default function SterilizationPage() {
   const closeReceiptBatch = () => {
     setReceiptBatchOpen(false);
     setReceiptBatchSelected(new Set());
-    setReceiptBatchDelivererCode('');
+    setReceiptBatchDeliverer(null);
     setReceiptBatchNote('');
     setReceiptBatchMismatchReason('');
     setReceiptBatchDeviations(new Set());
@@ -627,7 +597,7 @@ export default function SterilizationPage() {
     setReceiptDraft(draft);
     setReceiptView(null);
     setPrepDraft(null);
-    setHandoverCode('');
+    setDeliverer(null);
     setNote('');
     setReceiptNoteOpen(false);
     setVisibleDeviation(false);
@@ -645,7 +615,7 @@ export default function SterilizationPage() {
     setReceiptDraft(null);
     setReceiptNoteOpen(false);
     setReceiptView(null);
-    setHandoverCode('');
+    setDeliverer(null);
     setNote('');
     setVisibleDeviation(false);
     setReceiptDeviationRecorded(false);
@@ -769,7 +739,7 @@ export default function SterilizationPage() {
       checkNote: visibleDeviation ? 'Δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.' : undefined,
     });
     setReceiptDraft(null);
-    setHandoverCode('');
+    setDeliverer(null);
     setNote('');
     setVisibleDeviation(false);
     setReceiptDeviationRecorded(false);
@@ -1066,7 +1036,7 @@ export default function SterilizationPage() {
     const draft = resolveAssetDraft(kind, asset.id);
     if (!draft) return;
     setDeliveryDraft(draft);
-    setReceiverCode('');
+    setReceiver(null);
     setDeliveryNote('');
   };
   const openLoad = (kind: 'WASHING' | 'STERILIZATION') => {
@@ -1173,7 +1143,7 @@ export default function SterilizationPage() {
   };
   const closeDelivery = () => {
     setDeliveryDraft(null);
-    setReceiverCode('');
+    setReceiver(null);
     setDeliveryNote('');
   };
   const completeDelivery = () => {
@@ -1191,14 +1161,14 @@ export default function SterilizationPage() {
   const openDeliveryBatch = () => {
     setDeliveryBatchOpen(true);
     setDeliverySelected(new Set());
-    setDeliveryBatchReceiverCode('');
+    setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
     setDeliveryScanFeedback(null);
   };
   const closeDeliveryBatch = () => {
     setDeliveryBatchOpen(false);
     setDeliverySelected(new Set());
-    setDeliveryBatchReceiverCode('');
+    setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
     setDeliveryScanFeedback(null);
   };
@@ -1236,7 +1206,7 @@ export default function SterilizationPage() {
       return false;
     }
     setDeliverySelected(current => new Set([...current, key]));
-    setDeliveryBatchReceiverCode('');
+    setDeliveryBatchReceiver(null);
     setDeliveryScanFeedback({
       type: 'OK',
       message: tr('{0} · {1} προστέθηκε στην παράδοση προς {2}.', barcode, eligible.name, trData(eligible.department)),
@@ -1251,7 +1221,7 @@ export default function SterilizationPage() {
         next.delete(key);
         return next;
       });
-      setDeliveryBatchReceiverCode('');
+      setDeliveryBatchReceiver(null);
       return;
     }
     if (deliveryBatchDepartment && item.department !== deliveryBatchDepartment) {
@@ -1266,7 +1236,7 @@ export default function SterilizationPage() {
       return;
     }
     setDeliverySelected(current => new Set([...current, key]));
-    setDeliveryBatchReceiverCode('');
+    setDeliveryBatchReceiver(null);
   };
   const toggleAllDeliveryDepartment = () => {
     const department = deliveryBatchDepartment;
@@ -1280,7 +1250,7 @@ export default function SterilizationPage() {
       else compatibleKeys.forEach(key => next.add(key));
       return next;
     });
-    setDeliveryBatchReceiverCode('');
+    setDeliveryBatchReceiver(null);
   };
   const completeDeliveryBatch = () => {
     if (!deliverySelectedAssets.length || !deliveryBatchReceiver || !deliveryBatchReceiverMatches) return;
@@ -2139,35 +2109,15 @@ export default function SterilizationPage() {
                     <IdCard size={18} />
                   </div>
                   <div className="identity-section">
-                    <label>
-                      {tr('Κωδικός ταυτοποίησης')}
-                      <div className="identity-input-row">
-                        <input
-                          autoFocus
-                          value={handoverCode}
-                          onChange={e => setHandoverCode(e.target.value.toUpperCase())}
-                          placeholder={tr('Κωδικός χρήστη')}
-                        />
-                        {demoIdentity && (
-                          <button
-                            type="button"
-                            className="demo-fill-btn"
-                            onClick={() => setHandoverCode(demoIdentity.code)}
-                          >
-                            Demo
-                          </button>
-                        )}
-                      </div>
-                    </label>
-                    {demoIdentity && (
-                      <small className="demo-code">
-                        Demo: {demoIdentity.code} · {trData(demoIdentity.department)}
-                      </small>
-                    )}
-                    {handoverCode &&
-                      (!deliverer ? (
-                        <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
-                      ) : !delivererMatches ? (
+                    <HandoverSignature
+                      autoFocus
+                      label={tr('Υπογραφή παραδίδοντα (κωδικός χρήστη + συνθηματικό)')}
+                      department={receiptDraft.asset.department}
+                      signer={deliverer}
+                      onSigned={setDeliverer}
+                    />
+                    {deliverer &&
+                      (!delivererMatches ? (
                         <div className="identity-mismatch-box">
                           <div className="identity-warning">
                             <TriangleAlert size={16} />
@@ -2793,6 +2743,7 @@ export default function SterilizationPage() {
                             prepTools
                               .filter(t => issues.some(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode)))
                               .map(t => t.barcode),
+                            compositionOptions(prepDraft.asset.colorTapes),
                           )
                         }
                       >
@@ -2806,6 +2757,7 @@ export default function SterilizationPage() {
                           prepDraft.asset,
                           prepDraft.kind,
                           prepDraft.kind === 'SET' ? prepTools.length : undefined,
+                          systemSettings.label,
                         )
                       }
                     >
@@ -3922,32 +3874,15 @@ export default function SterilizationPage() {
                     </div>
                   </div>
                   <section className="delivery-auth">
-                    <label>
-                      {tr('Κωδικός παραδίδοντα')}
-                      <div className="identity-input-row">
-                        <input
-                          disabled={!receiptBatchDepartment}
-                          value={receiptBatchDelivererCode}
-                          onChange={e => setReceiptBatchDelivererCode(e.target.value.toUpperCase())}
-                          placeholder={
-                            receiptBatchDepartment ? tr('Προσωπικός κωδικός') : tr('Πρώτα σκάναρε αντικείμενο')
-                          }
-                        />
-                        {receiptBatchDemoIdentity && (
-                          <button
-                            type="button"
-                            className="demo-fill-btn"
-                            onClick={() => setReceiptBatchDelivererCode(receiptBatchDemoIdentity.code)}
-                          >
-                            Demo
-                          </button>
-                        )}
-                      </div>
-                    </label>
-                    {receiptBatchDelivererCode &&
-                      (!receiptBatchDeliverer ? (
-                        <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
-                      ) : !receiptBatchDelivererMatches ? (
+                    <HandoverSignature
+                      label={tr('Υπογραφή παραδίδοντα (κωδικός χρήστη + συνθηματικό)')}
+                      department={receiptBatchDepartment}
+                      disabled={!receiptBatchDepartment}
+                      signer={receiptBatchDeliverer}
+                      onSigned={setReceiptBatchDeliverer}
+                    />
+                    {receiptBatchDeliverer &&
+                      (!receiptBatchDelivererMatches ? (
                         <div className="identity-mismatch-box">
                           <div className="identity-warning">
                             <TriangleAlert size={15} />
@@ -4155,37 +4090,15 @@ export default function SterilizationPage() {
                     </div>
                   </div>
                   <section className="delivery-auth">
-                    <label>
-                      {tr('Κωδικός παραλαμβάνοντα')}
-                      <div className="identity-input-row">
-                        <input
-                          disabled={!deliveryBatchDepartment}
-                          value={deliveryBatchReceiverCode}
-                          onChange={e => setDeliveryBatchReceiverCode(e.target.value.toUpperCase())}
-                          placeholder={
-                            deliveryBatchDepartment ? tr('Προσωπικός κωδικός') : tr('Πρώτα σκάναρε αντικείμενο')
-                          }
-                        />
-                        {deliveryBatchDemoIdentity && (
-                          <button
-                            type="button"
-                            className="demo-fill-btn"
-                            onClick={() => setDeliveryBatchReceiverCode(deliveryBatchDemoIdentity.code)}
-                          >
-                            Demo
-                          </button>
-                        )}
-                      </div>
-                    </label>
-                    {deliveryBatchDemoIdentity && (
-                      <small className="demo-code">
-                        Demo: {deliveryBatchDemoIdentity.code} · {trData(deliveryBatchDemoIdentity.department)}
-                      </small>
-                    )}
-                    {deliveryBatchReceiverCode &&
-                      (!deliveryBatchReceiver ? (
-                        <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
-                      ) : !deliveryBatchReceiverMatches ? (
+                    <HandoverSignature
+                      label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
+                      department={deliveryBatchDepartment}
+                      disabled={!deliveryBatchDepartment}
+                      signer={deliveryBatchReceiver}
+                      onSigned={setDeliveryBatchReceiver}
+                    />
+                    {deliveryBatchReceiver &&
+                      (!deliveryBatchReceiverMatches ? (
                         <div className="identity-error">
                           {tr('Ο χρήστης ανήκει στο') + ' '}
                           {trData(deliveryBatchReceiver.department)}
@@ -4282,35 +4195,15 @@ export default function SterilizationPage() {
                 </div>
               </div>
               <section className="delivery-auth">
-                <label>
-                  {tr('Κωδικός παραλαμβάνοντα')}
-                  <div className="identity-input-row">
-                    <input
-                      autoFocus
-                      value={receiverCode}
-                      onChange={e => setReceiverCode(e.target.value.toUpperCase())}
-                      placeholder={tr('Προσωπικός κωδικός')}
-                    />
-                    {deliveryDemoIdentity && (
-                      <button
-                        type="button"
-                        className="demo-fill-btn"
-                        onClick={() => setReceiverCode(deliveryDemoIdentity.code)}
-                      >
-                        Demo
-                      </button>
-                    )}
-                  </div>
-                </label>
-                {deliveryDemoIdentity && (
-                  <small className="demo-code">
-                    Demo: {deliveryDemoIdentity.code} · {trData(deliveryDemoIdentity.department)}
-                  </small>
-                )}
-                {receiverCode &&
-                  (!receiver ? (
-                    <div className="identity-error">{tr('Ο κωδικός δεν αναγνωρίστηκε.')}</div>
-                  ) : !receiverMatches ? (
+                <HandoverSignature
+                  autoFocus
+                  label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
+                  department={deliveryDraft.asset.department}
+                  signer={receiver}
+                  onSigned={setReceiver}
+                />
+                {receiver &&
+                  (!receiverMatches ? (
                     <div className="identity-error">
                       {tr('Ο χρήστης ανήκει στο') + ' '}
                       {trData(receiver.department)}

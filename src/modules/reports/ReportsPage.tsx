@@ -22,6 +22,7 @@ import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
 import {compositionHtml} from '../sterilization/printUtils';
+import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {getI18nLang, tr, trData} from '../../i18n';
 
 type ReportId = 'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'traceability';
@@ -100,6 +101,7 @@ function genericReportHtml(title: string, subtitle: string, columns: Array<{key:
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, movements, currentUser} = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
+  const compositionOptions = useCompositionOptions();
   // Sets in the composition picker, by name.
   const setsByName = useMemo(() => [...sets].sort((a, b) => a.name.localeCompare(b.name, 'el')), [sets]);
   const [active, setActive] = useState<ReportId>('composition');
@@ -361,6 +363,8 @@ export default function ReportsPage() {
           tools.filter(t => t.setId === selectedSet.id),
           currentUser.name,
           new Date().toLocaleString('el-GR'),
+          [],
+          compositionOptions(selectedSet.colorTapes),
         ),
       };
     }

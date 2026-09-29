@@ -1,4 +1,4 @@
-import type {Issue, Movement, SetAsset, Tool} from '../types/domain';
+import type {DeliveryRecord, Issue, Movement, ProcessLoadRecord, ReceiptRecord, SetAsset, Tool} from '../types/domain';
 export const sets: SetAsset[] = [
   {
     id: 's1',
@@ -222,6 +222,257 @@ add(catalog[6], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses
 // Put one standalone instrument already in the sterilization flow and one ready for pickup.
 tools[tools.length - 2].state = 'PENDING_STERILIZATION';
 tools[tools.length - 1].state = 'READY_FOR_PICKUP';
+
+// A fuller demo hospital: Sets in every Sterilization stage, more departments, color markers,
+// sterilizer loads, handover history and instruments out of use. Appended after the original
+// demo so earlier barcodes stay the same.
+type ExtraSet = {
+  id: string;
+  code: string;
+  name: string;
+  department: string;
+  specialty: string;
+  manufacturer: string;
+  state: SetAsset['state'];
+  count: number;
+  category: string;
+  colorTapes?: string[];
+  uses?: number;
+  maxUses?: number;
+};
+const extraSets: ExtraSet[] = [
+  {
+    id: 's8',
+    code: 'ORTHO-HIP',
+    name: 'ΟΡΘΟΠΕΔΙΚΟ ΙΣΧΙΟΥ',
+    department: 'Ορθοπεδική Κλινική',
+    specialty: 'Ορθοπεδική',
+    manufacturer: 'AESCULAP',
+    state: 'PENDING_STERILIZATION',
+    count: 16,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['solid-02', 'solid-05'],
+  },
+  {
+    id: 's9',
+    code: 'IVF-OPU',
+    name: 'SET ΩΟΛΗΨΙΑΣ',
+    department: 'Μονάδα IVF',
+    specialty: 'Γυναικολογική',
+    manufacturer: 'KARL STORZ',
+    state: 'PENDING_STERILIZATION',
+    count: 8,
+    category: 'Μαιευτικά Σετ',
+    colorTapes: ['solid-11'],
+  },
+  {
+    id: 's10',
+    code: 'LAP-CHOLE',
+    name: 'ΛΑΠΑΡΟΣΚΟΠΙΚΗ ΧΟΛΟΚΥΣΤΕΚΤΟΜΗ',
+    department: 'Χειρουργείο',
+    specialty: 'Γενική Χειρουργική',
+    manufacturer: 'KARL STORZ',
+    state: 'IN_WASHING',
+    count: 13,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['solid-03'],
+  },
+  {
+    id: 's11',
+    code: 'ER-SUTURE',
+    name: 'SET ΣΥΡΡΑΦΗΣ ΤΕΠ',
+    department: 'ΤΕΠ',
+    specialty: 'Γενική Χειρουργική',
+    manufacturer: 'DEWIMED',
+    state: 'IN_WASHING',
+    count: 7,
+    category: 'Μικρά Σετ',
+  },
+  {
+    id: 's12',
+    code: 'ORTHO-KNEE',
+    name: 'ΟΡΘΟΠΕΔΙΚΟ ΓΟΝΑΤΟΣ',
+    department: 'Ορθοπεδική Κλινική',
+    specialty: 'Ορθοπεδική',
+    manufacturer: 'AESCULAP',
+    state: 'IN_PREPARATION',
+    count: 15,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['solid-02', 'number-05-2'],
+  },
+  {
+    id: 's13',
+    code: 'URO-TUR',
+    name: 'ΟΥΡΟΛΟΓΙΚΟ TUR',
+    department: 'Χειρουργείο',
+    specialty: 'Ουρολογία',
+    manufacturer: 'KARL STORZ',
+    state: 'IN_PACKAGING',
+    count: 11,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['solid-14'],
+  },
+  {
+    id: 's14',
+    code: 'GYN-HYST',
+    name: 'ΥΣΤΕΡΟΣΚΟΠΗΣΗΣ',
+    department: 'Γυναικολογική Κλινική',
+    specialty: 'Γυναικολογική',
+    manufacturer: 'KARL STORZ',
+    state: 'IN_STERILIZATION',
+    count: 9,
+    category: 'Χειρουργικά Σετ',
+    uses: 41,
+    maxUses: 60,
+  },
+  {
+    id: 's15',
+    code: 'GEN-LAPAROT',
+    name: 'ΓΕΝΙΚΗΣ ΛΑΠΑΡΟΤΟΜΙΑΣ',
+    department: 'Χειρουργείο',
+    specialty: 'Γενική Χειρουργική',
+    manufacturer: 'B. BRAUN',
+    state: 'IN_STERILIZATION',
+    count: 18,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['stripes-01-02'],
+  },
+  {
+    id: 's16',
+    code: 'CSECTION-02',
+    name: 'SET ΚΑΙΣΑΡΙΚΗΣ ΤΟΜΗΣ Β',
+    department: 'Αίθουσα Τοκετών',
+    specialty: 'Μαιευτική',
+    manufacturer: 'DEWIMED',
+    state: 'AWAITING_RELEASE',
+    count: 12,
+    category: 'Μαιευτικά Σετ',
+    uses: 12,
+    maxUses: 30,
+  },
+  {
+    id: 's17',
+    code: 'NEURO-02',
+    name: 'ΝΕΥΡΟΧΕΙΡΟΥΡΓΙΚΟ ΚΡΑΝΙΟΤΟΜΙΑΣ',
+    department: 'Χειρουργείο',
+    specialty: 'Νευροχειρουργική',
+    manufacturer: 'KLS MARTIN',
+    state: 'AWAITING_RELEASE',
+    count: 14,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['solid-06'],
+  },
+  {
+    id: 's18',
+    code: 'ICU-TRACH',
+    name: 'SET ΤΡΑΧΕΙΟΣΤΟΜΙΑΣ',
+    department: 'ΜΕΘ',
+    specialty: 'Γενική Χειρουργική',
+    manufacturer: 'AESCULAP',
+    state: 'READY_FOR_PICKUP',
+    count: 9,
+    category: 'Μικρά Σετ',
+  },
+  {
+    id: 's19',
+    code: 'IVF-ET',
+    name: 'SET ΕΜΒΡΥΟΜΕΤΑΦΟΡΑΣ',
+    department: 'Μονάδα IVF',
+    specialty: 'Γυναικολογική',
+    manufacturer: 'KARL STORZ',
+    state: 'IN_DEPARTMENT',
+    count: 6,
+    category: 'Μαιευτικά Σετ',
+    colorTapes: ['solid-11', 'solid-01'],
+  },
+  {
+    id: 's20',
+    code: 'ER-MINOR',
+    name: 'SET ΜΙΚΡΟΕΠΕΜΒΑΣΕΩΝ ΤΕΠ',
+    department: 'ΤΕΠ',
+    specialty: 'Γενική Χειρουργική',
+    manufacturer: 'DEWIMED',
+    state: 'IN_DEPARTMENT',
+    count: 10,
+    category: 'Μικρά Σετ',
+  },
+  {
+    id: 's21',
+    code: 'VASC-01',
+    name: 'ΑΓΓΕΙΟΧΕΙΡΟΥΡΓΙΚΟ',
+    department: 'Χειρουργείο',
+    specialty: 'Γενική Χειρουργική',
+    manufacturer: 'B. BRAUN',
+    state: 'IN_DEPARTMENT',
+    count: 17,
+    category: 'Χειρουργικά Σετ',
+    colorTapes: ['solid-04'],
+    uses: 55,
+    maxUses: 60,
+  },
+  {
+    id: 's22',
+    code: 'GYN-DC',
+    name: 'SET ΑΠΟΞΕΣΗΣ',
+    department: 'Γυναικολογική Κλινική',
+    specialty: 'Γυναικολογική',
+    manufacturer: 'AESCULAP',
+    state: 'READY_FOR_PICKUP',
+    count: 8,
+    category: 'Μικρά Σετ',
+  },
+];
+let setSerial = 327;
+for (const extra of extraSets) {
+  setSerial++;
+  sets.push({
+    id: extra.id,
+    barcode: `S${String(setSerial).padStart(6, '0')}`,
+    code: extra.code,
+    name: extra.name,
+    department: extra.department,
+    specialty: extra.specialty,
+    manufacturer: extra.manufacturer,
+    state: extra.state,
+    expected: extra.count,
+    actual: extra.count,
+    category: extra.category,
+    createdAt: '15/05/2026',
+    colorTapes: extra.colorTapes,
+    uses: extra.uses,
+    maxUses: extra.maxUses,
+  });
+  for (let i = 0; i < extra.count; i++)
+    add(catalog[(i + setSerial) % catalog.length], 'SET_MEMBER', {
+      setId: extra.id,
+      department: extra.department,
+      state: extra.state,
+      uses: 6 + ((i * 7) % 30),
+    });
+}
+// Standalone instruments across the Sterilization stages and more departments.
+const flowStates: Tool['state'][] = [
+  'PENDING_STERILIZATION',
+  'IN_WASHING',
+  'IN_PREPARATION',
+  'IN_PACKAGING',
+  'IN_STERILIZATION',
+  'READY_FOR_PICKUP',
+];
+flowStates.forEach((state, i) =>
+  add(catalog[i % catalog.length], 'STANDALONE', {department: standDeps[i % standDeps.length], state, uses: 8 + i}),
+);
+for (let i = 0; i < 6; i++)
+  add(catalog[(i + 2) % catalog.length], 'STANDALONE', {department: 'Μονάδα IVF', uses: 5 + i * 3});
+// More stock, and instruments that reached their use limit (kept out of the lists, in reports).
+for (let i = 0; i < 8; i++) add(catalog[(i + 3) % catalog.length], 'STOCK', {uses: 0});
+for (const [i, department] of ['Χειρουργείο', 'ΤΕΠ', 'Αίθουσα Τοκετών'].entries()) {
+  add(catalog[6], 'STANDALONE', {department, uses: 30, maxUses: 30});
+  const retired = tools[tools.length - 1];
+  retired.state = 'RETIRED';
+  retired.retiredAt = `0${i + 2}/09/2026 1${i}:20`;
+  retired.retiredReason = 'Συμπλήρωση ορίου χρήσεων';
+}
 export {tools};
 export const movements: Movement[] = [
   {
@@ -316,3 +567,341 @@ export const issues: Issue[] = [
     note: 'Παρατηρήθηκε φθορά σε ένα εργαλείο της σύνθεσης. Demo αναφορά για έλεγχο της ροής.',
   },
 ];
+
+// History for the fuller demo: movements, issues, sterilizer loads and signed handovers.
+const setByCode = (code: string) => sets.find(set => set.code === code)!;
+const label = (set: SetAsset) => `${set.barcode} · ${set.name}`;
+const people = {
+  ster: 'Demo Χρήστης Αποστείρωσης',
+  supervisor: 'Demo Προϊστάμενος Αποστείρωσης',
+  or: 'Demo Χρήστης Χειρουργείου',
+  ortho: 'Demo Χρήστης Ορθοπεδικής',
+  tok: 'Demo Χρήστης Αίθουσας Τοκετών',
+  ivf: 'Demo Χρήστης IVF',
+  er: 'Demo Χρήστης ΤΕΠ',
+  icu: 'Demo Χρήστης ΜΕΘ',
+  gyn: 'Demo Χρήστης Γυναικολογικής',
+};
+const story: Array<[string, string, string, string, string, string, string?]> = [
+  // [set code, from, to, status, at, by, patient code]
+  [
+    'ORTHO-HIP',
+    'Ορθοπεδική Κλινική',
+    'Κεντρική Αποστείρωση',
+    'Αποστολή προς αποστείρωση',
+    '29/09/2026 08:10',
+    people.ortho,
+    'PT-2026-0188',
+  ],
+  [
+    'IVF-OPU',
+    'Μονάδα IVF',
+    'Κεντρική Αποστείρωση',
+    'Αποστολή προς αποστείρωση',
+    '29/09/2026 08:32',
+    people.ivf,
+    'PT-2026-0191',
+  ],
+  ['LAP-CHOLE', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Παραλαβή στην Αποστείρωση', '29/09/2026 07:55', people.ster],
+  [
+    'LAP-CHOLE',
+    'Κεντρική Αποστείρωση',
+    'Καθαρισμός & Απολύμανση',
+    'Έναρξη καθαρισμού',
+    '29/09/2026 08:05',
+    people.ster,
+  ],
+  ['ER-SUTURE', 'ΤΕΠ', 'Κεντρική Αποστείρωση', 'Παραλαβή στην Αποστείρωση', '29/09/2026 08:12', people.ster],
+  [
+    'ORTHO-KNEE',
+    'Καθαρισμός & Απολύμανση',
+    'Έλεγχος & Σύνθεση',
+    'Ολοκλήρωση καθαρισμού',
+    '29/09/2026 07:40',
+    people.ster,
+  ],
+  ['URO-TUR', 'Έλεγχος & Σύνθεση', 'Συσκευασία & Σήμανση', 'Σύνθεση πλήρης', '29/09/2026 07:20', people.ster],
+  ['GYN-HYST', 'Συσκευασία & Σήμανση', 'Αποστείρωση', 'Φόρτωση στον Κλίβανο Ατμού 01', '29/09/2026 07:05', people.ster],
+  [
+    'GEN-LAPAROT',
+    'Συσκευασία & Σήμανση',
+    'Αποστείρωση',
+    'Φόρτωση στον Κλίβανο Ατμού 01',
+    '29/09/2026 07:05',
+    people.ster,
+  ],
+  [
+    'CSECTION-02',
+    'Αποστείρωση',
+    'Αποδέσμευση φορτίου',
+    'Κύκλος 2026-0931 ολοκληρώθηκε · αναμονή αποδέσμευσης',
+    '29/09/2026 06:48',
+    people.ster,
+  ],
+  [
+    'NEURO-02',
+    'Αποστείρωση',
+    'Αποδέσμευση φορτίου',
+    'Κύκλος 2026-0931 ολοκληρώθηκε · αναμονή αποδέσμευσης',
+    '29/09/2026 06:48',
+    people.ster,
+  ],
+  [
+    'ICU-TRACH',
+    'Αποδέσμευση φορτίου',
+    'Έτοιμο για παραλαβή',
+    'Αποδέσμευση φορτίου 2026-0928',
+    '28/09/2026 19:30',
+    people.supervisor,
+  ],
+  [
+    'GYN-DC',
+    'Αποδέσμευση φορτίου',
+    'Έτοιμο για παραλαβή',
+    'Αποδέσμευση φορτίου 2026-0928',
+    '28/09/2026 19:30',
+    people.supervisor,
+  ],
+  [
+    'IVF-ET',
+    'Κεντρική Αποστείρωση',
+    'Μονάδα IVF',
+    'Παράδοση στο τμήμα · υπογραφή παραλαμβάνοντα',
+    '28/09/2026 14:10',
+    people.ster,
+  ],
+  [
+    'ER-MINOR',
+    'Κεντρική Αποστείρωση',
+    'ΤΕΠ',
+    'Παράδοση στο τμήμα · υπογραφή παραλαμβάνοντα',
+    '28/09/2026 12:45',
+    people.ster,
+  ],
+  [
+    'VASC-01',
+    'Κεντρική Αποστείρωση',
+    'Χειρουργείο',
+    'Παράδοση στο τμήμα · υπογραφή παραλαμβάνοντα',
+    '28/09/2026 09:30',
+    people.ster,
+  ],
+  [
+    'VASC-01',
+    'Χειρουργείο',
+    'Κεντρική Αποστείρωση',
+    'Αποστολή προς αποστείρωση',
+    '27/09/2026 16:20',
+    people.or,
+    'PT-2026-0177',
+  ],
+  [
+    'ORTHO-BASIC',
+    'Κεντρική Αποστείρωση',
+    'Χειρουργείο',
+    'Παράδοση στο τμήμα · υπογραφή παραλαμβάνοντα',
+    '27/09/2026 11:05',
+    people.ster,
+  ],
+  [
+    'DELIVERY-01',
+    'Αίθουσα Τοκετών',
+    'Κεντρική Αποστείρωση',
+    'Αποστολή προς αποστείρωση',
+    '26/09/2026 22:40',
+    people.tok,
+    'PT-2026-0170',
+  ],
+  [
+    'DELIVERY-01',
+    'Κεντρική Αποστείρωση',
+    'Αίθουσα Τοκετών',
+    'Παράδοση στο τμήμα · υπογραφή παραλαμβάνοντα',
+    '27/09/2026 10:15',
+    people.ster,
+  ],
+  [
+    'ICU-TRACH',
+    'ΜΕΘ',
+    'Κεντρική Αποστείρωση',
+    'Αποστολή προς αποστείρωση',
+    '27/09/2026 18:05',
+    people.icu,
+    'PT-2026-0180',
+  ],
+  [
+    'GYN-DC',
+    'Γυναικολογική Κλινική',
+    'Κεντρική Αποστείρωση',
+    'Αποστολή προς αποστείρωση',
+    '27/09/2026 13:30',
+    people.gyn,
+    'PT-2026-0175',
+  ],
+];
+story.forEach(([code, from, to, status, at, by, patientCode], i) => {
+  const set = setByCode(code);
+  movements.push({id: `m${100 + i}`, asset: label(set), assetKind: 'SET', from, to, status, at, by, patientCode});
+});
+const outOfUse = tools.filter(tool => tool.state === 'RETIRED');
+outOfUse.forEach((tool, i) =>
+  movements.push({
+    id: `m${200 + i}`,
+    asset: `${tool.barcode} · ${tool.name}`,
+    assetKind: 'TOOL',
+    from: tool.department || 'Τμήμα',
+    to: 'Εκτός χρήσης',
+    status: 'Συμπλήρωση ορίου χρήσεων',
+    at: tool.retiredAt || '01/09/2026 10:00',
+    by: people.ster,
+  }),
+);
+issues.push(
+  {
+    id: 'i4',
+    asset: `${setByCode('ORTHO-KNEE').barcode} · ${setByCode('ORTHO-KNEE').name}`,
+    type: 'Έλλειψη',
+    status: 'OPEN',
+    created: '29/09/2026 07:45',
+    department: 'Ορθοπεδική Κλινική',
+    note: 'Λείπει ένα άγκιστρο Langenbeck από τη σύνθεση.',
+  },
+  {
+    id: 'i5',
+    asset: `${setByCode('LAP-CHOLE').barcode} · ${setByCode('LAP-CHOLE').name}`,
+    type: 'Φθορά',
+    status: 'OPEN',
+    created: '29/09/2026 08:06',
+    department: 'Χειρουργείο',
+    note: 'Φθαρμένη μόνωση σε λαπαροσκοπική λαβίδα 5mm.',
+  },
+  {
+    id: 'i6',
+    asset: `${setByCode('ICU-TRACH').barcode} · ${setByCode('ICU-TRACH').name}`,
+    type: 'Service',
+    status: 'RESOLVED',
+    created: '25/09/2026 12:00',
+    department: 'ΜΕΘ',
+    note: 'Επισκευή ψαλιδιού από τον προμηθευτή. Επέστρεψε.',
+  },
+  {
+    id: 'i7',
+    asset: `${setByCode('VASC-01').barcode} · ${setByCode('VASC-01').name}`,
+    type: 'Έλλειψη',
+    status: 'RESOLVED',
+    created: '24/09/2026 09:40',
+    department: 'Χειρουργείο',
+    note: 'Αντικαταστάθηκε από το stock.',
+  },
+);
+const loadItem = (set: SetAsset) => ({
+  assetId: set.id,
+  assetKind: 'SET' as const,
+  barcode: set.barcode,
+  assetName: set.name,
+  department: set.department,
+});
+export const processLoads: ProcessLoadRecord[] = [
+  {
+    id: 'L-DEMO-0931',
+    workflowVersion: 1,
+    kind: 'STERILIZATION',
+    equipment: 'Κλίβανος Ατμού 02',
+    cycleNumber: '2026-0931',
+    program: '134°C · 5′',
+    status: 'AWAITING_RELEASE',
+    items: [loadItem(setByCode('CSECTION-02')), loadItem(setByCode('NEURO-02'))],
+    chemicalIndicatorResult: 'PASS',
+    createdByUserId: 'demo-sterilization',
+    createdByName: people.ster,
+    createdAt: '29/09/2026 05:55',
+    completedAt: '29/09/2026 06:48',
+  },
+  {
+    id: 'L-DEMO-0928',
+    workflowVersion: 1,
+    kind: 'STERILIZATION',
+    equipment: 'Κλίβανος Ατμού 01',
+    cycleNumber: '2026-0928',
+    program: '134°C · 5′',
+    status: 'RELEASED',
+    items: [loadItem(setByCode('ICU-TRACH')), loadItem(setByCode('GYN-DC'))],
+    chemicalIndicatorResult: 'PASS',
+    biologicalIndicatorResult: 'PASS',
+    physicalParametersOk: true,
+    packagingIntegrityOk: true,
+    createdByUserId: 'demo-sterilization',
+    createdByName: people.ster,
+    createdAt: '28/09/2026 17:40',
+    completedAt: '28/09/2026 18:35',
+    releasedAt: '28/09/2026 19:30',
+  },
+  {
+    id: 'L-DEMO-0927',
+    workflowVersion: 1,
+    kind: 'STERILIZATION',
+    equipment: 'Κλίβανος Ατμού 02',
+    cycleNumber: '2026-0927',
+    program: '121°C · 20′',
+    status: 'RELEASED',
+    items: [loadItem(setByCode('IVF-ET')), loadItem(setByCode('ER-MINOR')), loadItem(setByCode('VASC-01'))],
+    chemicalIndicatorResult: 'PASS',
+    biologicalIndicatorResult: 'NOT_REQUIRED',
+    physicalParametersOk: true,
+    packagingIntegrityOk: true,
+    createdByUserId: 'demo-sterilization',
+    createdByName: people.ster,
+    createdAt: '28/09/2026 06:10',
+    completedAt: '28/09/2026 07:05',
+    releasedAt: '28/09/2026 07:40',
+  },
+];
+const handover = {workflowVersion: 1, assetKind: 'SET' as const};
+export const receipts: ReceiptRecord[] = [
+  ['LAP-CHOLE', people.or, 'Χειρουργείο', '29/09/2026 07:55'],
+  ['ER-SUTURE', people.er, 'ΤΕΠ', '29/09/2026 08:12'],
+  ['VASC-01', people.or, 'Χειρουργείο', '27/09/2026 16:40'],
+].map(([code, deliveredByName, department, at], i) => {
+  const set = setByCode(code);
+  return {
+    ...handover,
+    id: `rc-demo-${i + 1}`,
+    assetId: set.id,
+    barcode: set.barcode,
+    assetName: set.name,
+    fromDepartment: department,
+    toDepartment: 'Κεντρική Αποστείρωση',
+    deliveredByUserId: `demo-${i + 1}`,
+    deliveredByName,
+    deliveredByDepartment: department,
+    receivedByUserId: 'demo-sterilization',
+    receivedByName: people.ster,
+    receivedByDepartment: 'Κεντρική Αποστείρωση',
+    at,
+    visibleDeviation: false,
+  };
+});
+export const deliveries: DeliveryRecord[] = [
+  ['IVF-ET', people.ivf, 'Μονάδα IVF', '28/09/2026 14:10'],
+  ['ER-MINOR', people.er, 'ΤΕΠ', '28/09/2026 12:45'],
+  ['VASC-01', people.or, 'Χειρουργείο', '28/09/2026 09:30'],
+  ['ORTHO-BASIC', people.or, 'Χειρουργείο', '27/09/2026 11:05'],
+  ['DELIVERY-01', people.tok, 'Αίθουσα Τοκετών', '27/09/2026 10:15'],
+].map(([code, receivedByName, department, at], i) => {
+  const set = setByCode(code);
+  return {
+    ...handover,
+    id: `dl-demo-${i + 1}`,
+    assetId: set.id,
+    barcode: set.barcode,
+    assetName: set.name,
+    department,
+    deliveredByUserId: 'demo-sterilization',
+    deliveredByName: people.ster,
+    deliveredByDepartment: 'Κεντρική Αποστείρωση',
+    receivedByUserId: `demo-r-${i + 1}`,
+    receivedByName,
+    receivedByDepartment: department,
+    at,
+  };
+});
