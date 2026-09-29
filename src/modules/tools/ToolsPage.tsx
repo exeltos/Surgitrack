@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {Layers3, Plus, ChevronRight, List} from 'lucide-react';
+import {Plus, ChevronRight} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
@@ -14,7 +14,6 @@ import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
-import IconToggleButton from '../../components/ui/IconToggleButton';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
@@ -24,7 +23,6 @@ import {effectiveToolMarker} from '../../core/colorTapes';
 export default function ToolsPage() {
   const {tools, sets, can} = useSurgi();
   const navigate = useNavigate();
-  const [grouped, setGrouped] = useRememberedState('grouped', false);
   const [q, setQ] = useRememberedState('q', '');
   const [department, setDepartment] = useRememberedState('department', '');
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
@@ -56,18 +54,9 @@ export default function ToolsPage() {
   );
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state' | 'mode') =>
     [...new Set(tools.map(t => String(t[key] || '')).filter(Boolean))].sort();
-  const groups = useMemo(() => {
-    const m = new Map<string, typeof tools>();
-    filtered.forEach(t => {
-      const k = `${t.code}|${t.name}|${t.manufacturer}`;
-      m.set(k, [...(m.get(k) || []), t]);
-    });
-    return [...m.values()];
-  }, [filtered]);
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
-  const filterKey = [q, department, specialty, manufacturer, state, mode, usage, grouped].join('|');
+  const filterKey = [q, department, specialty, manufacturer, state, mode, usage].join('|');
   const rows = useProgressiveList(filtered, filterKey);
-  const groupRows = useProgressiveList(groups, filterKey, 'shownGroups');
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -151,21 +140,13 @@ export default function ToolsPage() {
             },
           ]}
         />
-        <IconToggleButton
-          active={grouped}
-          activeIcon={<List size={17} />}
-          inactiveIcon={<Layers3 size={17} />}
-          activeTitle={tr('Εμφάνιση φυσικών εγγραφών')}
-          inactiveTitle={tr('Ομαδοποίηση ίδιων εργαλείων')}
-          onClick={() => setGrouped(x => !x)}
-        />
       </div>
       <ScrollableListPanel withKpis ariaLabel={tr('Λίστα εργαλείων')}>
         <table className="asset-registry-table">
           <thead>
             <tr>
               <th>{tr('Ονομασία')}</th>
-              <th>{grouped ? tr('Ποσότητα') : tr('Κωδικός')}</th>
+              <th>{tr('Κωδικός')}</th>
               <th>Barcode</th>
               <th>{tr('Εταιρεία')}</th>
               <th>{tr('Ειδικότητα')}</th>
@@ -176,104 +157,69 @@ export default function ToolsPage() {
             </tr>
           </thead>
           <tbody>
-            {grouped
-              ? groupRows.visible.map(g => {
-                  const t = g[0];
-                  return (
-                    <tr key={`${t.code}-${t.name}`}>
-                      <td>
-                        <b>{t.name}</b>
-                      </td>
-                      <td>
-                        <span className="qty-badge">{g.length}</span>
-                      </td>
-                      <td className="muted">{tr('πολλαπλά')}</td>
-                      <td>{t.manufacturer || '—'}</td>
-                      <td>{trData(t.specialty) || '—'}</td>
-                      <td className="muted">
-                        {new Set(g.map(x => x.mode)).size === 1
-                          ? t.mode === 'STOCK'
-                            ? 'Stock'
-                            : t.mode === 'SET_MEMBER'
-                              ? tr('Σετ')
-                              : tr('Μεμονωμένα')
-                          : tr('Μικτή')}
-                      </td>
-                      <td>—</td>
-                      <td className="muted">{tr('Μικτή')}</td>
-                      <td>
-                        <Link className="icon-link" to={`/tools/${t.id}`}>
-                          <ChevronRight size={17} />
+            {rows.visible.map(t => {
+              const set = t.setId ? setsById.get(t.setId) : undefined;
+              return (
+                <tr key={t.id}>
+                  <td>
+                    <div className="registry-asset-name">
+                      <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                      <span>
+                        <Link className="row-title-link" to={`/tools/${t.id}`}>
+                          {t.name}
                         </Link>
-                      </td>
-                    </tr>
-                  );
-                })
-              : rows.visible.map(t => {
-                  const set = t.setId ? setsById.get(t.setId) : undefined;
-                  return (
-                    <tr key={t.id}>
-                      <td>
-                        <div className="registry-asset-name">
-                          <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
-                          <span>
-                            <Link className="row-title-link" to={`/tools/${t.id}`}>
-                              {t.name}
-                            </Link>
-                            <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
-                            {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="cell-nowrap">{t.code}</td>
-                      <td>
-                        <Link className="mono strong-link" to={`/tools/${t.id}`}>
-                          {t.barcode}
-                        </Link>
-                      </td>
-                      <td>{t.manufacturer || '—'}</td>
-                      <td>{trData(t.specialty) || '—'}</td>
-                      <td>
-                        {t.mode === 'SET_MEMBER' && set ? (
-                          <>
-                            <b>{tr('Σετ')}</b>
-                            <small className="row-sub">
-                              {set.barcode} · {set.name}
-                            </small>
-                          </>
-                        ) : t.mode === 'STOCK' ? (
-                          <b>Stock</b>
-                        ) : (
-                          <>
-                            <b>{tr('Μεμονωμένο')}</b>
-                            <small className="row-sub">{trData(t.department) || '—'}</small>
-                          </>
-                        )}
-                      </td>
-                      <td className="cell-nowrap">
-                        {t.maxUses ? (
-                          <>
-                            <b>{Math.max(0, t.maxUses - t.uses)}</b>
-                            <span className="muted"> / {t.maxUses}</span>
-                          </>
-                        ) : (
-                          <span className="muted">{tr('Χωρίς όριο')}</span>
-                        )}
-                      </td>
-                      <td>
-                        <StatusBadge value={t.state} />
-                      </td>
-                      <td>
-                        <Link className="icon-link" to={`/tools/${t.id}`}>
-                          <ChevronRight size={17} />
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-            {(grouped ? groupRows.hasMore : rows.hasMore) && (
-              <MoreRows colSpan={9} onVisible={grouped ? groupRows.showMore : rows.showMore} />
-            )}
+                        <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
+                        {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="cell-nowrap">{t.code}</td>
+                  <td>
+                    <Link className="mono strong-link" to={`/tools/${t.id}`}>
+                      {t.barcode}
+                    </Link>
+                  </td>
+                  <td>{t.manufacturer || '—'}</td>
+                  <td>{trData(t.specialty) || '—'}</td>
+                  <td>
+                    {t.mode === 'SET_MEMBER' && set ? (
+                      <>
+                        <b>{tr('Σετ')}</b>
+                        <small className="row-sub">
+                          {set.barcode} · {set.name}
+                        </small>
+                      </>
+                    ) : t.mode === 'STOCK' ? (
+                      <b>Stock</b>
+                    ) : (
+                      <>
+                        <b>{tr('Μεμονωμένο')}</b>
+                        <small className="row-sub">{trData(t.department) || '—'}</small>
+                      </>
+                    )}
+                  </td>
+                  <td className="cell-nowrap">
+                    {t.maxUses ? (
+                      <>
+                        <b>{Math.max(0, t.maxUses - t.uses)}</b>
+                        <span className="muted"> / {t.maxUses}</span>
+                      </>
+                    ) : (
+                      <span className="muted">{tr('Χωρίς όριο')}</span>
+                    )}
+                  </td>
+                  <td>
+                    <StatusBadge value={t.state} />
+                  </td>
+                  <td>
+                    <Link className="icon-link" to={`/tools/${t.id}`}>
+                      <ChevronRight size={17} />
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+            {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
           </tbody>
         </table>
       </ScrollableListPanel>

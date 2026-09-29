@@ -1568,7 +1568,8 @@ a.overview-bar:hover {
 /* Management of an instrument or Set (admin / sterilization supervisor). */
 .asset-manage-modal {
   width: min(620px, calc(100vw - 32px));
-  max-height: calc(100dvh - 48px);
+  /* Fixed size: switching between actions must not resize the dialog. */
+  height: min(640px, calc(100dvh - 48px));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -1632,7 +1633,9 @@ a.overview-bar:hover {
   box-shadow: inset 0 0 0 1px #b42318;
 }
 .asset-manage-target {
-  display: grid;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   min-height: 0;
 }
@@ -1653,9 +1656,11 @@ a.overview-bar:hover {
   font: inherit;
 }
 .asset-manage-sets {
-  display: grid;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  max-height: 220px;
   overflow-y: auto;
 }
 .asset-manage-sets button {
@@ -1679,19 +1684,25 @@ a.overview-bar:hover {
   background: #eef7f9;
 }
 .asset-manage-note {
-  display: grid;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
   font-size: 12.5px;
   color: #51626c;
 }
 .asset-manage-note textarea {
+  flex: 1;
+  min-height: 80px;
   border: 1px solid #d8e3e8;
   border-radius: 10px;
   padding: 9px 11px;
   font: inherit;
-  resize: vertical;
+  resize: none;
 }
 .asset-manage-modal > footer {
+  margin-top: auto;
   display: flex;
   justify-content: flex-end;
   gap: 8px;

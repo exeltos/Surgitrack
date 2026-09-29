@@ -1,8 +1,9 @@
-import {useEffect, useRef, useState, type ReactNode} from 'react';
+import {lazy, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {
   Accessibility,
   Bell,
+  BookOpen,
   Home,
   LogOut,
   Menu,
@@ -26,6 +27,9 @@ import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
+
+// The user manual is loaded only when first opened.
+const HelpCenter = lazy(() => import('../../core/help/HelpCenter'));
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
   STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
@@ -69,6 +73,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const [mobileOpen, setMobileOpen] = useState(false);
   const [a11y, setA11y] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [departmentReadyToast, setDepartmentReadyToast] = useState<{id: string; text: string}>();
   const [scan, setScan] = useState('');
   const [scanMatches, setScanMatches] = useState<
@@ -344,6 +349,14 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>
               {lang === 'el' ? 'EN' : 'EL'}
             </button>
+            <button
+              className="icon-btn help-btn"
+              onClick={() => setHelpOpen(true)}
+              title={lang === 'el' ? 'Κέντρο Βοήθειας & Πληροφοριών' : 'Help & Information Center'}
+              aria-label={lang === 'el' ? 'Κέντρο Βοήθειας & Πληροφοριών' : 'Help & Information Center'}
+            >
+              <BookOpen size={18} />
+            </button>
             <div className="a11y-wrap">
               <button
                 className="icon-btn"
@@ -530,6 +543,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         </section>
         <footer>© 2026 SurgiTrack · Healthcare Suite</footer>
       </main>
+      {helpOpen && (
+        <Suspense fallback={null}>
+          <HelpCenter onClose={() => setHelpOpen(false)} screens={navigation.map(item => item.to)} />
+        </Suspense>
+      )}
       {toast && (
         <div className="toast">
           <strong>{lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}</strong>
