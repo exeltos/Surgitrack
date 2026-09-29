@@ -37,7 +37,7 @@ const stateLabel: Record<string, string> = {
   IN_STOCK: 'Stock',
   SERVICE: 'Service',
   LOST: 'Απώλεια',
-  RETIRED: 'Αποσυρμένο',
+  RETIRED: 'Εκτός χρήσης',
 };
 
 const reports: Array<{id: ReportId; title: string; description: string; icon: typeof FileText}> = [
@@ -48,8 +48,8 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
   {id: 'usage', title: 'Όρια Χρήσεων', description: 'Υπόλοιπο κύκλου ζωής και κρίσιμα όρια.', icon: Activity},
   {
     id: 'retired',
-    title: 'Αποσυρμένα εργαλεία',
-    description: 'Ιστορικό εργαλείων εκτός κυκλοφορίας (π.χ. χωρίς ζωές).',
+    title: 'Εργαλεία εκτός χρήσης',
+    description: 'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. εξάντληση ζωών).',
     icon: Archive,
   },
   {
@@ -286,7 +286,7 @@ export default function ReportsPage() {
           {key: 'manufacturer', label: tr('Κατασκευαστής')},
           {key: 'specialty', label: tr('Ειδικότητα')},
           {key: 'uses', label: tr('Χρήσεις')},
-          {key: 'retiredAt', label: tr('Απόσυρση')},
+          {key: 'retiredAt', label: tr('Εκτός χρήσης από')},
           {key: 'reason', label: tr('Αιτία')},
           {key: 'notes', label: tr('Σημειώσεις')},
         ],

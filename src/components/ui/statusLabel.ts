@@ -13,7 +13,7 @@ const labels: Record<string, string> = {
   IN_STOCK: 'Stock',
   SERVICE: 'Service',
   LOST: 'Απολεσθέν',
-  RETIRED: 'Αποσυρμένο',
+  RETIRED: 'Εκτός χρήσης',
 };
 /** The label of an asset state in the current language. */
 export const statusLabel = (value: string) => tr(labels[value] || value);

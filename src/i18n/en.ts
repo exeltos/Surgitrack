@@ -1233,20 +1233,19 @@ export const en: Record<string, string> = {
   Ιατρός: 'Doctor',
   'Όνομα ιατρού': "Doctor's name",
   'Σε ποιον ανήκει': 'Owned by',
-  Αποσυρμένο: 'Retired',
-  'Αποσυρμένα εργαλεία': 'Retired instruments',
-  'Ιστορικό εργαλείων εκτός κυκλοφορίας (π.χ. χωρίς ζωές).':
-    'History of instruments out of circulation (e.g. no lives left).',
-  Απόσυρση: 'Retirement',
-  'Απόσυρση εργαλείου': 'Retire instrument',
-  'Απόσυρση (ιστορικό)': 'Retire (history)',
-  'Φεύγει από τις λίστες, μένει στις αναφορές': 'Leaves the lists, stays in reports',
-  'Ναι, απόσυρση': 'Yes, retire',
   'Εξάντληση ζωών': 'No lives left',
-  'Απόσυρση από χρήση': 'Withdrawn from use',
-  'Η απόσυρση είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.':
-    'Retirement is locked while the instrument is in an active sterilization process.',
-  'Το {0} θα βγει από όλες τις λίστες και θα κρατηθεί μόνο ως ιστορικό στην αναφορά «Αποσυρμένα εργαλεία». Θέλεις να συνεχίσεις;':
-    '{0} will leave every list and be kept only as history in the "Retired instruments" report. Continue?',
-  '{0}: το εργαλείο αποσύρθηκε και κρατήθηκε στο ιστορικό.': '{0}: the instrument was retired and kept in history.',
+  'Εκτός χρήσης': 'Out of use',
+  'Εργαλεία εκτός χρήσης': 'Out-of-use instruments',
+  'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. εξάντληση ζωών).':
+    'History of instruments taken out of use (e.g. no lives left).',
+  'Εκτός χρήσης από': 'Out of use since',
+  'Μείωση ζωών': 'Lives reduction',
+  'Τελευταία ζωή · θα τεθεί εκτός χρήσης': 'Last life · will be taken out of use',
+  'Επιβεβαιώνω τη μείωση κατά μία ζωή': 'I confirm reducing one life',
+  'υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο':
+    'required · limited-use instrument, no patient name',
+  '{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.':
+    '{0}: a patient code is required for limited-use instruments.',
+  '{0} προωθήθηκε προς Αποστείρωση. Εξαντλήθηκαν οι ζωές: {1} — τέθηκε εκτός χρήσης.':
+    '{0} was sent to Sterilization. No lives left: {1} — taken out of use.',
 };

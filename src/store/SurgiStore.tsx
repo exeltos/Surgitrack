@@ -197,22 +197,92 @@ export function SurgiProvider({
     }
     setTools(x => x.map(a => (a.id === id ? {...a, state} : a)));
   };
+  /** Tools whose lives (limited uses) are consumed when this asset is dispatched after a procedure. */
+  const livesConsumedBy = (kind: AssetKind, id: string) =>
+    kind === 'TOOL'
+      ? tools.filter(t => t.id === id && !!t.maxUses)
+      : tools.filter(t => t.setId === id && !!t.maxUses && t.state !== 'RETIRED');
   const sendToSterilization = (kind: AssetKind, id: string, patientCode?: string, note?: string) => {
     const a = assetName(kind, id);
     if (!a || !assertCirculationAllowed(kind, id)) return;
-    updateState(kind, id, 'PENDING_STERILIZATION');
+    const limited = livesConsumedBy(kind, id);
+    const setLimited = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
+    if ((limited.length || setLimited) && !patientCode?.trim()) {
+      notify(tr('{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.', a.barcode));
+      return;
+    }
+    const at = formatStoreDateTime();
+    const exhausted = limited.filter(t => t.uses + 1 >= (t.maxUses || 0));
+    const exhaustedIds = new Set(exhausted.map(t => t.id));
+    const limitedIds = new Set(limited.map(t => t.id));
+    const dispatchedToolExhausted = kind === 'TOOL' && exhaustedIds.has(id);
+    if (!dispatchedToolExhausted) updateState(kind, id, 'PENDING_STERILIZATION');
+    if (limited.length) {
+      setTools(list =>
+        list.map(t => {
+          if (!limitedIds.has(t.id)) return t;
+          const used = {...t, uses: t.uses + 1};
+          return exhaustedIds.has(t.id)
+            ? {...used, state: 'RETIRED' as const, retiredAt: at, retiredReason: 'Εξάντληση ζωών', setId: undefined}
+            : used;
+        }),
+      );
+    }
+    if (setLimited || (kind === 'SET' && exhausted.length)) {
+      setSets(list =>
+        list.map(s =>
+          s.id === id
+            ? {
+                ...s,
+                uses: setLimited ? (s.uses || 0) + 1 : s.uses,
+                actual: Math.max(0, s.actual - exhausted.length),
+              }
+            : s,
+        ),
+      );
+    }
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
       from: a.department || currentUser.department || 'Τμήμα',
       to: 'Κεντρική Αποστείρωση',
-      status: `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής`,
+      status: `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής${
+        limited.length ? ` · −1 ζωή σε ${limited.length} εργαλεί${limited.length === 1 ? 'ο' : 'α'}` : ''
+      }`,
       by: currentUser.name,
       patientCode,
       note,
     });
-    notify(tr('{0} προωθήθηκε ηλεκτρονικά προς Αποστείρωση από {1}.', a.barcode, currentUser.name));
+    exhausted.forEach(t =>
+      addMovement({
+        asset: `${t.barcode} · ${t.name}`,
+        assetKind: 'TOOL',
+        from: kind === 'SET' ? `Set ${a.barcode}` : a.department || currentUser.department || 'Τμήμα',
+        to: 'Εκτός χρήσης',
+        status: `Εξάντληση ζωών (${t.maxUses}/${t.maxUses}) · αυτόματα εκτός χρήσης`,
+        by: currentUser.name,
+        patientCode,
+      }),
+    );
+    notify(
+      exhausted.length
+        ? tr(
+            '{0} προωθήθηκε προς Αποστείρωση. Εξαντλήθηκαν οι ζωές: {1} — τέθηκε εκτός χρήσης.',
+            a.barcode,
+            exhausted.map(t => t.barcode).join(', '),
+          )
+        : tr('{0} προωθήθηκε ηλεκτρονικά προς Αποστείρωση από {1}.', a.barcode, currentUser.name),
+    );
   };
+  /** Sterilization confirms it saw an out-of-use notice (the tool was physically set aside). */
+  const acknowledgeOutOfUse = (id: string) =>
+    setTools(list =>
+      list.map(t =>
+        t.id === id && t.state === 'RETIRED'
+          ? {...t, retiredNoticeSeenAt: formatStoreDateTime(), retiredNoticeSeenBy: currentUser.name}
+          : t,
+      ),
+    );
   const receiveAtSterilization = (kind: AssetKind, id: string, payload: ReceivePayload) => {
     const a = assetName(kind, id);
     if (!a) return;
@@ -1394,28 +1464,6 @@ export function SurgiProvider({
     });
     notify(tr('{0}: το εργαλείο διαγράφηκε.', src.barcode));
   };
-  const retireTool = (id: string, reason: string) => {
-    const src = tools.find(t => t.id === id);
-    if (!src || src.state === 'RETIRED') return;
-    const parentSet = src.setId ? sets.find(s => s.id === src.setId) : undefined;
-    setTools(x =>
-      x.map(t =>
-        t.id === id
-          ? {...t, state: 'RETIRED' as const, retiredAt: formatStoreDateTime(), retiredReason: reason, setId: undefined}
-          : t,
-      ),
-    );
-    if (parentSet) setSets(x => x.map(s => (s.id === parentSet.id ? {...s, actual: Math.max(0, s.actual - 1)} : s)));
-    addMovement({
-      asset: `${src.barcode} · ${src.name}`,
-      assetKind: 'TOOL',
-      from: parentSet ? `Set ${parentSet.barcode}` : src.mode === 'STOCK' ? 'Stock' : src.department || 'Μεμονωμένο',
-      to: 'Απόσυρση',
-      status: `Απόσυρση εργαλείου · ${reason}`,
-      by: currentUser.name,
-    });
-    notify(tr('{0}: το εργαλείο αποσύρθηκε και κρατήθηκε στο ιστορικό.', src.barcode));
-  };
   const reportSetIssue = (
     setId: string,
     targetToolIds: string[],
@@ -1627,7 +1675,15 @@ export function SurgiProvider({
     });
     notify(tr('{0}: αποσύρθηκε από ενεργή χρήση.', a.barcode));
   };
-  const updateSet = (id: string, patch: SetUpdatePatch) => {
+  /** Lives (usage limits) change only by the admin or the Sterilization supervisor. */
+  const withoutUsageUnlessAllowed = <T extends {maxUses?: number}>(patch: T): T => {
+    if (!('maxUses' in patch) || can('asset.usage.configure')) return patch;
+    const rest = {...patch};
+    delete rest.maxUses;
+    return rest;
+  };
+  const updateSet = (id: string, rawPatch: SetUpdatePatch) => {
+    const patch = withoutUsageUnlessAllowed(rawPatch);
     const before = sets.find(s => s.id === id);
     if (!before) return;
     const barcodeChanged = patch.barcode && patch.barcode !== before.barcode;
@@ -1678,7 +1734,8 @@ export function SurgiProvider({
     });
     notify(tr('{0}: οι αλλαγές αποθηκεύτηκαν.', normalizedBarcode || before.barcode));
   };
-  const updateTool = (id: string, patch: ToolUpdatePatch) => {
+  const updateTool = (id: string, rawPatch: ToolUpdatePatch) => {
+    const patch = withoutUsageUnlessAllowed(rawPatch);
     const before = tools.find(t => t.id === id);
     if (!before) return;
     const barcodeChanged = patch.barcode && patch.barcode !== before.barcode;
@@ -1788,6 +1845,7 @@ export function SurgiProvider({
   );
 
   const configureUsageLimit = (kind: AssetKind, id: string, maxUses?: number) => {
+    if (!can('asset.usage.configure')) return;
     const normalized = normalizeUsageLimit(maxUses);
     if (kind === 'SET') {
       setSets(list => list.map(item => (item.id === id ? {...item, maxUses: normalized, uses: item.uses || 0} : item)));
@@ -1849,7 +1907,7 @@ export function SurgiProvider({
       duplicateTool,
       deleteSet,
       deleteTool,
-      retireTool,
+      acknowledgeOutOfUse,
       reportSetIssue,
       retireAsset,
       setColorMarker,

@@ -12,7 +12,7 @@ export type AssetState =
   | 'IN_STOCK'
   | 'SERVICE'
   | 'LOST'
-  /** Out of circulation (e.g. no lives left); kept only as history for reports. */
+  /** Out of use (e.g. no lives left); kept only as history for reports. */
   | 'RETIRED';
 export type ToolMode = 'STANDALONE' | 'SET_MEMBER' | 'STOCK';
 /** Who owns a Set or instrument: the hospital, a doctor, or someone else (named in ownerName). */
@@ -52,6 +52,9 @@ export interface Tool {
   ownerName?: string;
   retiredAt?: string;
   retiredReason?: string;
+  /** When Sterilization acknowledged the out-of-use notice (the tool was physically removed). */
+  retiredNoticeSeenAt?: string;
+  retiredNoticeSeenBy?: string;
 }
 export interface SetCompositionRequirement {
   code: string;

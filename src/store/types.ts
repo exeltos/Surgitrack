@@ -279,7 +279,7 @@ export type SurgiStoreValue = {
   duplicateTool: (id: string) => string | undefined;
   deleteSet: (id: string, deleteTools?: boolean) => void;
   deleteTool: (id: string) => void;
-  retireTool: (id: string, reason: string) => void;
+  acknowledgeOutOfUse: (id: string) => void;
   reportSetIssue: (
     setId: string,
     targetToolIds: string[],

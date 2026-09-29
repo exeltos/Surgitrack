@@ -27,6 +27,8 @@ type Props = {
   markerTapes?: string[];
   markerNote?: string;
   onEditMarker?: () => void;
+  /** Lives (usage limit) are editable only by the admin and the Sterilization supervisor. */
+  canEditUsage?: boolean;
 };
 const states: Array<{value: AssetState; label: string}> = [
   {value: 'IN_DEPARTMENT', label: 'Στο τμήμα'},
@@ -66,6 +68,7 @@ export default function AssetWorkbenchSidebar({
   markerTapes,
   markerNote,
   onEditMarker,
+  canEditUsage = false,
 }: Props) {
   const {systemSettings} = useLibraries();
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
@@ -111,7 +114,11 @@ export default function AssetWorkbenchSidebar({
     />
   );
   const save = () => {
-    const maxUses = draft.usageType === 'LIMITED' ? Math.max(1, Number(draft.maxUses) || 1) : undefined;
+    const maxUses = !canEditUsage
+      ? asset.maxUses
+      : draft.usageType === 'LIMITED'
+        ? Math.max(1, Number(draft.maxUses) || 1)
+        : undefined;
     onSave?.({
       name: draft.name.trim(),
       code: draft.code.trim(),
@@ -119,7 +126,7 @@ export default function AssetWorkbenchSidebar({
       specialty: draft.specialty.trim(),
       manufacturer: draft.manufacturer.trim(),
       state: draft.state,
-      maxUses,
+      ...(canEditUsage ? {maxUses} : {}),
       ownership: draft.ownership || undefined,
       ownerName: ((draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && draft.ownerName.trim()) || undefined,
       ...(kind === 'TOOL' ? {serialNumber: draft.serialNumber.trim() || undefined} : {}),
@@ -308,7 +315,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-usage-field">
           <dt>{tr('Τύπος χρήσης')}</dt>
           <dd>
-            {editing ? (
+            {editing && canEditUsage ? (
               <select
                 className="asset-inline-input"
                 value={draft.usageType}
@@ -333,7 +340,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-usage-field">
           <dt>{tr('Αρχικό όριο χρήσεων')}</dt>
           <dd>
-            {editing && draft.usageType === 'LIMITED' ? (
+            {editing && canEditUsage && draft.usageType === 'LIMITED' ? (
               <input
                 className="asset-inline-input"
                 type="number"
