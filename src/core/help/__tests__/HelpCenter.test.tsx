@@ -42,7 +42,7 @@ describe('Help Center', () => {
     const onClose = vi.fn();
     setup('ADMIN', '/tools', <HelpCenter onClose={onClose} screens={['/overview', '/tools', '/sets', '/reports']} />);
     expect(screen.getByRole('heading', {level: 1, name: 'Εργαλεία'})).toBeInTheDocument();
-    // Related sections sit in the menu, under the open section.
+    // Related sections are links at the end of the article.
     const related = screen.getByRole('group', {name: 'Σχετικές ενότητες'});
     fireEvent.click(within(related).getByRole('button', {name: /Σετ εργαλείων/}));
     expect(screen.getByRole('heading', {level: 1, name: 'Σετ εργαλείων'})).toBeInTheDocument();

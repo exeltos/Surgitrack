@@ -352,16 +352,6 @@ export const helpManual: ManualSection[] = [
           'Opening an instrument shows history, photos, uses, color marker and ownership. Lives can be changed only by the Administrator and the Sterilization supervisor.',
         ],
       },
-      {
-        el: [
-          'Ομαδοποίηση',
-          'Το κουμπί δίπλα στα φίλτρα ομαδοποιεί τα ίδια εργαλεία (ίδιος κωδικός, όνομα, εταιρεία) με την ποσότητά τους.',
-        ],
-        en: [
-          'Grouping',
-          'The button next to the filters groups identical instruments (same code, name, manufacturer) with their quantity.',
-        ],
-      },
     ],
     steps: {
       el: [

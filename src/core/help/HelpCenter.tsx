@@ -205,30 +205,17 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
             <div className="manual-side-label">{tx.sections}</div>
             <nav className="manual-nav">
               {filtered.length ? (
-                filtered.map(s => {
-                  const open = selected === s.to && mode === 'manual';
-                  return (
-                    <div key={s.to} className="manual-nav-item">
-                      <button className={open ? 'active' : ''} aria-expanded={open} onClick={() => select(s.to)}>
-                        <BookOpen size={15} />
-                        <span>{s.title[L]}</span>
-                        <ChevronRight size={13} />
-                      </button>
-                      {/* Related sections open right under the section being read. */}
-                      {open && related.length > 0 && (
-                        <div className="manual-nav-related" role="group" aria-label={tx.related}>
-                          <small>{tx.related}</small>
-                          {related.map(r => (
-                            <button key={r.to} onClick={() => select(r.to)}>
-                              <ChevronRight size={12} />
-                              <span>{r.title[L]}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
+                filtered.map(s => (
+                  <button
+                    key={s.to}
+                    className={selected === s.to && mode === 'manual' ? 'active' : ''}
+                    onClick={() => select(s.to)}
+                  >
+                    <BookOpen size={15} />
+                    <span>{s.title[L]}</span>
+                    <ChevronRight size={13} />
+                  </button>
+                ))
               ) : (
                 <div className="manual-nav-empty">{tx.noResults}</div>
               )}
@@ -347,6 +334,19 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                     <span>{tx.roleAwareBody}</span>
                   </p>
                 </div>
+                {related.length > 0 && (
+                  <section className="manual-see-also" role="group" aria-label={tx.related}>
+                    <b>{tx.related}</b>
+                    <div>
+                      {related.map(r => (
+                        <button key={r.to} onClick={() => select(r.to)}>
+                          <BookOpen size={14} />
+                          {r.title[L]}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
                 <footer className="manual-chapter-footer">
                   <button disabled={chapter === 0} onClick={() => setChapter(i => Math.max(0, i - 1))}>
                     <ChevronLeft size={14} />

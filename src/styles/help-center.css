@@ -614,25 +614,36 @@
   }
 }
 
-/* Related sections, nested under the open section in the menu. */
-.manual-nav-related {
+/* Related sections: fixed links at the end of the article (the menu never shifts). */
+.manual-see-also {
   display: grid;
-  gap: 1px;
-  margin: 2px 0 8px 26px;
-  padding-left: 8px;
-  border-left: 2px solid #cfe3e7;
+  gap: 8px;
+  margin-top: 18px;
 }
-.manual-nav-related small {
-  padding: 4px 6px 2px;
-  font-size: 9.5px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #7a8a94;
+.manual-see-also > b {
+  font-size: 13px;
+  color: #1c3341;
 }
-.manual-nav .manual-nav-related button {
-  grid-template-columns: 14px minmax(0, 1fr);
-  padding: 6px;
+.manual-see-also > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.manual-see-also button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border: 1px solid #d6e0e6;
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
   font-size: 12.5px;
-  color: #3f6573;
+  font-weight: 700;
+  color: #1d6b7a;
+  cursor: pointer;
+}
+.manual-see-also button:hover {
+  background: #eef6f7;
+  border-color: #b9d6dc;
 }
