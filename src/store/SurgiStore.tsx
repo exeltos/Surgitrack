@@ -223,7 +223,13 @@ export function SurgiProvider({
           if (!limitedIds.has(t.id)) return t;
           const used = {...t, uses: t.uses + 1};
           return exhaustedIds.has(t.id)
-            ? {...used, state: 'RETIRED' as const, retiredAt: at, retiredReason: 'Εξάντληση ζωών', setId: undefined}
+            ? {
+                ...used,
+                state: 'RETIRED' as const,
+                retiredAt: at,
+                retiredReason: 'Συμπλήρωση ορίου χρήσεων',
+                setId: undefined,
+              }
             : used;
         }),
       );
@@ -259,7 +265,7 @@ export function SurgiProvider({
         assetKind: 'TOOL',
         from: kind === 'SET' ? `Set ${a.barcode}` : a.department || currentUser.department || 'Τμήμα',
         to: 'Εκτός χρήσης',
-        status: `Εξάντληση ζωών (${t.maxUses}/${t.maxUses}) · αυτόματα εκτός χρήσης`,
+        status: `Συμπλήρωση ορίου χρήσεων (${t.maxUses}/${t.maxUses}) · αυτόματα εκτός χρήσης`,
         by: currentUser.name,
         patientCode,
       }),
@@ -267,7 +273,7 @@ export function SurgiProvider({
     notify(
       exhausted.length
         ? tr(
-            '{0} προωθήθηκε προς Αποστείρωση. Εξαντλήθηκαν οι ζωές: {1} — τέθηκε εκτός χρήσης.',
+            '{0} προωθήθηκε προς Αποστείρωση. Συμπληρώθηκε το όριο χρήσεων: {1} — τέθηκε εκτός χρήσης.',
             a.barcode,
             exhausted.map(t => t.barcode).join(', '),
           )

@@ -1,5 +1,5 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
-import {getI18nLang, tr} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
 
 const escapeHtml = (value: string) =>
   value.replace(/[&<>'"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'})[ch] || ch);
@@ -169,7 +169,8 @@ type PrintAsset =
   | Pick<SetAsset, 'barcode' | 'name' | 'department'>
   | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>;
 
-export function barcodeLabelHtml(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
+/** The barcode label's print CSS and body (the part after <title>). */
+function barcodeLabelBody(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
   const details =
     kind === 'SET'
       ? tr('{0} εργαλεία', toolCount ?? 0)
@@ -178,20 +179,19 @@ export function barcodeLabelHtml(asset: PrintAsset, kind: AssetKind, toolCount?:
   const smallBarcode = code128Svg(asset.barcode, 42);
   const body = `<style>
   @page{size:100mm 50mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{width:100mm;height:50mm;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111;overflow:hidden}.sheet{width:100mm;height:50mm;display:grid;grid-template-rows:25mm 25mm}.main{position:relative;border-bottom:.2mm solid #bbb;padding:2.2mm 3mm 1.4mm}.main-head{display:flex;justify-content:space-between;align-items:flex-start;gap:3mm}.name{font-size:8.8pt;font-weight:700;line-height:1.05;max-width:72mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand{font-size:10pt;font-weight:800;letter-spacing:.02em}.main-barcode{width:62mm;height:12.8mm;margin:1.1mm auto 0;display:flex;flex-direction:column;align-items:center}.main-barcode svg{width:62mm;height:9.5mm;display:block}.code{font-size:8pt;line-height:1;margin-top:.6mm}.detail{position:absolute;left:3mm;bottom:1.6mm;font-size:6.6pt;color:#555}.bottom{display:grid;grid-template-columns:50mm 50mm}.small{padding:1.5mm 2.2mm 1mm;position:relative;overflow:hidden}.small:first-child{border-right:.2mm solid #bbb}.small .name{font-size:6.8pt;max-width:45mm}.small-barcode{width:39.5mm;height:13.5mm;margin:1.1mm auto 0;display:flex;flex-direction:column;align-items:center}.small-barcode svg{width:39.5mm;height:8.2mm;display:block}.small .code{font-size:6.7pt;margin-top:.5mm}.small .detail{left:2.2mm;bottom:1.2mm;font-size:5.8pt}@media print{html,body,.sheet{width:100mm;height:50mm}}</style></head><body><div class="sheet"><section class="main"><div class="main-head"><div class="name">${escapeHtml(asset.name)}</div><div class="brand">SurgiTrack</div></div><div class="main-barcode">${mainBarcode}<div class="code">${escapeHtml(asset.barcode)}</div></div><div class="detail">${escapeHtml(details)}</div></section><div class="bottom"><section class="small"><div class="name">${escapeHtml(asset.name)}</div><div class="small-barcode">${smallBarcode}<div class="code">${escapeHtml(asset.barcode)}</div></div><div class="detail">${escapeHtml(details)}</div></section><section class="small"><div class="name">${escapeHtml(asset.name)}</div><div class="small-barcode">${smallBarcode}<div class="code">${escapeHtml(asset.barcode)}</div></div><div class="detail">${escapeHtml(details)}</div></section></div></div>`;
-  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barcode ${asset.barcode}</title>${body}</body></html>`;
+  return body;
+}
+
+export function barcodeLabelHtml(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barcode ${escapeHtml(asset.barcode)}</title>${barcodeLabelBody(asset, kind, toolCount)}</body></html>`;
 }
 
 export function printBarcodeLabel(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
-  return openPrintWindow(
-    `Barcode ${asset.barcode}`,
-    barcodeLabelHtml(asset, kind, toolCount).replace(
-      /^<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>[^<]*<\/title>/,
-      '',
-    ),
-  );
+  return openPrintWindow(`Barcode ${asset.barcode}`, barcodeLabelBody(asset, kind, toolCount));
 }
 
-export function compositionHtml(
+/** The composition sheet's print CSS and body (the part after <title>), shared by the preview and the print window. */
+function compositionBody(
   set: SetAsset,
   tools: Tool[],
   preparedBy: string,
@@ -223,8 +223,18 @@ export function compositionHtml(
     .join('');
   const barcode = code128Svg(set.barcode, 48);
   const body = `<style>
-  @page{size:A4 portrait;margin:11mm 10mm 13mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,sans-serif;color:#111;font-size:9pt}.sheet{width:100%}.top{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;margin-bottom:5mm}.brand{font-size:16pt;font-weight:800;letter-spacing:.03em}.barcode{text-align:center}.barcode svg{width:42mm;height:12mm}.barcode-code{font-size:8pt;margin-top:1mm}.meta-actions{text-align:right;font-size:7pt;color:#555}.title{font-size:12pt;font-weight:700;margin:1mm 0 2mm}.submeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;margin-bottom:4mm;font-size:8pt}.submeta b{display:block;font-size:7pt;color:#666;margin-bottom:.5mm}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}th{font-size:7.5pt;text-align:left;padding:2.1mm 1.5mm;border-bottom:.35mm solid #777}td{padding:1.75mm 1.5mm;border-bottom:.2mm solid #d4d4d4;vertical-align:top}th:nth-child(1),td:nth-child(1){width:43%}th:nth-child(2),td:nth-child(2){width:20%}th:nth-child(3),td:nth-child(3){width:27%}.qty{width:10%;text-align:center;font-weight:700}.issue{color:#c62828;font-style:italic}.footer{margin-top:5mm;border-top:.2mm solid #ccc;padding-top:2mm;display:flex;justify-content:space-between;font-size:7pt;color:#555}@media print{.sheet{break-inside:auto}tr{break-inside:avoid}}</style></head><body><div class="sheet"><div class="top"><div class="brand">SurgiTrack</div><div class="barcode">${barcode}<div class="barcode-code">${escapeHtml(set.barcode)}</div></div><div class="meta-actions">${tr('Φύλλο σύνθεσης & προετοιμασίας')}</div></div><div class="title">${escapeHtml(set.name)}</div><div class="submeta"><div><b>${tr('Σύνολο εργαλείων')}</b>${tools.length}</div><div><b>${tr('Προετοίμασε')}</b>${escapeHtml(preparedBy)}</div><div><b>${tr('Ημερομηνία / ώρα')}</b>${escapeHtml(preparedAt)}</div></div><table><thead><tr><th>${tr('Ονομασία')}</th><th>${tr('Κωδικός')}</th><th>${tr('Εταιρεία')}</th><th class="qty">${tr('Σύνολο')}</th></tr></thead><tbody>${rows}</tbody></table><div class="footer"><span>${escapeHtml(set.department)}</span><span>${escapeHtml(set.barcode)} · ${tools.length} φυσικές εγγραφές</span></div></div>`;
-  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${tr('Σύνθεση {0}', set.barcode)}</title>${body}</body></html>`;
+  @page{size:A4 portrait;margin:11mm 10mm 13mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,sans-serif;color:#111;font-size:9pt}.sheet{width:100%}.top{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;margin-bottom:5mm}.brand{font-size:16pt;font-weight:800;letter-spacing:.03em}.barcode{text-align:center}.barcode svg{width:42mm;height:12mm}.barcode-code{font-size:8pt;margin-top:1mm}.meta-actions{text-align:right;font-size:7pt;color:#555}.title{font-size:12pt;font-weight:700;margin:1mm 0 2mm}.submeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;margin-bottom:4mm;font-size:8pt}.submeta b{display:block;font-size:7pt;color:#666;margin-bottom:.5mm}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}th{font-size:7.5pt;text-align:left;padding:2.1mm 1.5mm;border-bottom:.35mm solid #777}td{padding:1.75mm 1.5mm;border-bottom:.2mm solid #d4d4d4;vertical-align:top}th:nth-child(1),td:nth-child(1){width:43%}th:nth-child(2),td:nth-child(2){width:20%}th:nth-child(3),td:nth-child(3){width:27%}.qty{width:10%;text-align:center;font-weight:700}.issue{color:#c62828;font-style:italic}.footer{margin-top:5mm;border-top:.2mm solid #ccc;padding-top:2mm;display:flex;justify-content:space-between;font-size:7pt;color:#555}@media print{.sheet{break-inside:auto}tr{break-inside:avoid}}</style></head><body><div class="sheet"><div class="top"><div class="brand">SurgiTrack</div><div class="barcode">${barcode}<div class="barcode-code">${escapeHtml(set.barcode)}</div></div><div class="meta-actions">${tr('Φύλλο σύνθεσης & προετοιμασίας')}</div></div><div class="title">${escapeHtml(set.name)}</div><div class="submeta"><div><b>${tr('Σύνολο εργαλείων')}</b>${tools.length}</div><div><b>${tr('Προετοίμασε')}</b>${escapeHtml(preparedBy)}</div><div><b>${tr('Ημερομηνία / ώρα')}</b>${escapeHtml(preparedAt)}</div></div><table><thead><tr><th>${tr('Ονομασία')}</th><th>${tr('Κωδικός')}</th><th>${tr('Εταιρεία')}</th><th class="qty">${tr('Σύνολο')}</th></tr></thead><tbody>${rows}</tbody></table><div class="footer"><span>${escapeHtml(trData(set.department))}</span><span>${escapeHtml(set.barcode)} · ${escapeHtml(tr('{0} φυσικές εγγραφές', tools.length))}</span></div></div>`;
+  return body;
+}
+
+export function compositionHtml(
+  set: SetAsset,
+  tools: Tool[],
+  preparedBy: string,
+  preparedAt: string,
+  issueBarcodes: string[] = [],
+) {
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(tr('Σύνθεση {0}', set.barcode))}</title>${compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes)}</body></html>`;
 }
 
 export function printCompositionA4(
@@ -236,9 +246,6 @@ export function printCompositionA4(
 ) {
   return openPrintWindow(
     tr('Σύνθεση {0}', set.barcode),
-    compositionHtml(set, tools, preparedBy, preparedAt, issueBarcodes).replace(
-      /^<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>[^<]*<\/title>/,
-      '',
-    ),
+    compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes),
   );
 }

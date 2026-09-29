@@ -3,6 +3,8 @@ import {ChevronRight, Clock3, FileSpreadsheet, MapPin, Printer, Route, ShieldChe
 import {useSurgi} from '../../store/SurgiStore';
 import type {Movement} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
 import {useRememberedState} from '../../core/listMemory';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -113,6 +115,7 @@ export default function MovementsPage() {
       }),
     };
   };
+  const rows = useProgressiveList(filtered, [q, from, to, status, kind, dateFrom, dateTo].join('|'));
   return (
     <div className="movements-workspace">
       <div className="page-head movements-head">
@@ -205,7 +208,7 @@ export default function MovementsPage() {
         </div>
         <div className="ledger-scroll">
           {filtered.length ? (
-            filtered.map(m => {
+            rows.visible.map(m => {
               const asset = assetParts(m.asset);
               return (
                 <button className="ledger-row" key={m.id} onClick={() => setSelected(m)}>
@@ -244,6 +247,7 @@ export default function MovementsPage() {
               <span>{tr('Αλλάξτε ή καθαρίστε τα φίλτρα αναζήτησης.')}</span>
             </div>
           )}
+          {rows.hasMore && <MoreRows onVisible={rows.showMore} />}
         </div>
       </div>
       {selected && (

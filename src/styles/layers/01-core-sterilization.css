@@ -504,7 +504,7 @@ td {
   gap: 12px;
   margin-bottom: 18px;
 }
-.kpis > div {
+.kpis > * {
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -9664,4 +9664,34 @@ td {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+/* Clickable KPIs: open or filter the matching list. */
+.kpis > .kpi-link {
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.kpis > .kpi-link:hover {
+  border-color: #9cc3cc;
+  box-shadow: 0 2px 8px rgba(25, 57, 72, 0.08);
+}
+.kpis > .kpi-link.active {
+  border-color: #1d6b7a;
+  box-shadow: inset 0 0 0 1px #1d6b7a;
+}
+.more-rows td {
+  padding: 0 !important;
+  border: 0 !important;
+}
+.more-rows .app-spinner-wrap {
+  padding: 18px 0;
+}
+.more-rows .app-spinner {
+  width: 26px;
+  height: 26px;
 }

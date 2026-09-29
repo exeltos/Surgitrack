@@ -1233,11 +1233,11 @@ export const en: Record<string, string> = {
   Ιατρός: 'Doctor',
   'Όνομα ιατρού': "Doctor's name",
   'Σε ποιον ανήκει': 'Owned by',
-  'Εξάντληση ζωών': 'No lives left',
+  'Συμπλήρωση ορίου χρήσεων': 'Usage limit reached',
   'Εκτός χρήσης': 'Out of use',
   'Εργαλεία εκτός χρήσης': 'Out-of-use instruments',
-  'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. εξάντληση ζωών).':
-    'History of instruments taken out of use (e.g. no lives left).',
+  'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. συμπλήρωση ορίου χρήσεων).':
+    'History of instruments taken out of use (e.g. usage limit reached).',
   'Εκτός χρήσης από': 'Out of use since',
   'Μείωση ζωών': 'Lives reduction',
   'Τελευταία ζωή · θα τεθεί εκτός χρήσης': 'Last life · will be taken out of use',
@@ -1246,10 +1246,16 @@ export const en: Record<string, string> = {
     'required · limited-use instrument, no patient name',
   '{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.':
     '{0}: a patient code is required for limited-use instruments.',
-  '{0} προωθήθηκε προς Αποστείρωση. Εξαντλήθηκαν οι ζωές: {1} — τέθηκε εκτός χρήσης.':
-    '{0} was sent to Sterilization. No lives left: {1} — taken out of use.',
+  '{0} προωθήθηκε προς Αποστείρωση. Συμπληρώθηκε το όριο χρήσεων: {1} — τέθηκε εκτός χρήσης.':
+    '{0} was sent to Sterilization. Usage limit reached: {1} — taken out of use.',
   'Πολλαπλών χρήσεων (με ζωές)': 'Multi-use (with lives)',
   'Λίγες ζωές': 'Few lives left',
   'Όλοι οι τύποι χρήσης': 'All usage types',
   'Φόρτωση…': 'Loading…',
+  'Κρίσιμο · ≤ {0}': 'Critical · ≤ {0}',
+  'Συμπληρωμένο όριο · 0': 'Limit reached · 0',
+  'Όλα τα Σετ': 'All Sets',
+  Πλήρη: 'Complete',
+  'Με έλλειψη': 'Missing items',
+  '{0} φυσικές εγγραφές': '{0} physical records',
 };

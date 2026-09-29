@@ -3,6 +3,8 @@ import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -23,6 +25,7 @@ export default function SetsPage() {
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
   const [usage, setUsage] = useRememberedState('usage', '');
+  const [completeness, setCompleteness] = useRememberedState('completeness', '');
   // Limited-use instruments per Set, for the usage filter.
   const limitedBySet = useMemo(() => {
     const map = new Map<string, typeof tools>();
@@ -41,9 +44,20 @@ export default function SetsPage() {
       (!manufacturer || s.manufacturer === manufacturer) &&
       matchesUsage(usage, [s, ...(limitedBySet.get(s.id) || [])], systemSettings.usageWarningThreshold) &&
       (!state || s.state === state) &&
+      (!completeness || (completeness === 'SHORT' ? s.actual < s.expected : s.actual >= s.expected)) &&
       `${s.barcode} ${s.name} ${s.code} ${s.manufacturer || ''} ${s.specialty} ${s.department} ${s.ownerName || ''}`
         .toLowerCase()
         .includes(q.toLowerCase()),
+  );
+  // Instruments per Set, counted once instead of per row.
+  const memberCount = useMemo(() => {
+    const map = new Map<string, number>();
+    tools.forEach(t => t.setId && map.set(t.setId, (map.get(t.setId) || 0) + 1));
+    return map;
+  }, [tools]);
+  const rows = useProgressiveList(
+    filtered,
+    [q, department, specialty, manufacturer, state, usage, completeness].join('|'),
   );
   return (
     <div className="tools-list-workspace">
@@ -75,7 +89,7 @@ export default function SetsPage() {
             key: 'specialty',
             value: specialty,
             placeholder: tr('Όλες οι ειδικότητες'),
-            options: values('specialty').map(value => ({value, label: value})),
+            options: values('specialty').map(value => ({value, label: trData(value)})),
             onChange: setSpecialty,
           },
           {
@@ -99,6 +113,16 @@ export default function SetsPage() {
             options: usageFilterOptions(),
             onChange: setUsage,
           },
+          {
+            key: 'completeness',
+            value: completeness,
+            placeholder: tr('Όλα τα Σετ'),
+            options: [
+              {value: 'COMPLETE', label: tr('Πλήρη')},
+              {value: 'SHORT', label: tr('Με έλλειψη')},
+            ],
+            onChange: setCompleteness,
+          },
         ]}
       />
       <ScrollableListPanel ariaLabel={tr('Λίστα Σετ εργαλείων')}>
@@ -117,8 +141,8 @@ export default function SetsPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(s => {
-              const count = tools.filter(t => t.setId === s.id).length;
+            {rows.visible.map(s => {
+              const count = memberCount.get(s.id) || 0;
               return (
                 <tr key={s.id}>
                   <td>
@@ -162,6 +186,7 @@ export default function SetsPage() {
                 </tr>
               );
             })}
+            {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
           </tbody>
         </table>
       </ScrollableListPanel>
