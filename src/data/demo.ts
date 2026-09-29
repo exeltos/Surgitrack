@@ -905,3 +905,14 @@ export const deliveries: DeliveryRecord[] = [
     at,
   };
 });
+
+// Histories are read newest first (live records are prepended), so keep the demo in that order.
+const newestFirst = (value: string) => {
+  const [date = '', time = '00:00'] = value.split(' ');
+  const [day, month, year] = date.split('/');
+  return `${year}${month}${day}${time}`;
+};
+movements.sort((a, b) => newestFirst(b.at).localeCompare(newestFirst(a.at)));
+issues.sort((a, b) => newestFirst(b.created).localeCompare(newestFirst(a.created)));
+receipts.sort((a, b) => newestFirst(b.at).localeCompare(newestFirst(a.at)));
+deliveries.sort((a, b) => newestFirst(b.at).localeCompare(newestFirst(a.at)));
