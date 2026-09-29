@@ -844,6 +844,31 @@
   margin: 2px 0 0;
   font-size: 17px;
 }
+.print-preview-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.print-preview-main.with-aside {
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+.print-preview-aside {
+  min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border-left: 1px solid #e5ecef;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 14px;
+}
+.print-preview-modal.compact {
+  width: min(880px, calc(100vw - 40px));
+  height: min(520px, calc(100vh - 34px));
+}
 .print-preview-body {
   flex: 1;
   min-height: 0;
@@ -897,6 +922,15 @@
   }
   .print-preview-body {
     padding: 8px;
+  }
+  .print-preview-main.with-aside {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(180px, 1fr) auto;
+  }
+  .print-preview-aside {
+    border-left: 0;
+    border-top: 1px solid #e5ecef;
+    max-height: 42vh;
   }
   .composer-list-tall {
     max-height: 300px;
@@ -2510,4 +2544,111 @@ td {
   color: #365c6d;
   font-size: 11px;
   font-weight: 800;
+}
+
+/* Barcode label options */
+.label-option-group {
+  display: grid;
+  gap: 6px;
+}
+.label-option-group > span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #6a7c86;
+}
+.label-segments {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+.label-segments button {
+  padding: 7px 6px;
+  border: 1px solid #d6e0e6;
+  border-radius: 7px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  color: #3f5c6a;
+  cursor: pointer;
+  display: grid;
+  gap: 1px;
+  text-align: center;
+}
+.label-segments button small {
+  font-size: 10px;
+  color: #7a8a94;
+}
+.label-segments button.active {
+  border-color: #1d6b7a;
+  background: #e3f0f2;
+  color: #1a5f6c;
+  font-weight: 700;
+}
+.label-segments.sizes {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.label-segments button {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.label-option-group input[type='text'] {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+}
+.label-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.label-logo-row img {
+  height: 30px;
+  max-width: 110px;
+  object-fit: contain;
+  border: 1px solid #e3eaee;
+  border-radius: 6px;
+  padding: 2px;
+  background: #fff;
+}
+.label-logo-row label {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d6b7a;
+}
+.label-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #3f5c6a;
+}
+.label-zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #3f5c6a;
+}
+.label-zoom input {
+  flex: 1;
+  min-width: 0;
+}
+.print-preview-aside .app-button {
+  height: auto;
+  min-height: 36px;
+  padding: 8px 10px;
+  white-space: normal;
+  line-height: 1.3;
+  justify-content: center;
+  text-align: center;
+}
+.label-default-note {
+  font-size: 11px;
+  color: #6a7c86;
+  line-height: 1.4;
 }

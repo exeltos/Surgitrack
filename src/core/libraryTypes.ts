@@ -22,7 +22,22 @@ export type AdminUser = {
   demoEnabled: boolean;
 };
 export type RolePermissionAudit = {id: string; role: UserRole; at: string; by: string; permissions: Permission[]};
-export type SystemSettings = {usageWarningThreshold: number};
+/** What the top of a barcode label shows. */
+export type LabelHeader = 'BRAND' | 'LOGO' | 'TEXT' | 'NONE';
+/** SMALL 50×25 mm, MEDIUM 70×35 mm, SHEET 100×50 mm (one large + two small labels). */
+export type LabelSize = 'SMALL' | 'MEDIUM' | 'SHEET';
+export type LabelSettings = {
+  size: LabelSize;
+  header: LabelHeader;
+  /** Custom header text (e.g. the hospital's name). */
+  text?: string;
+  /** Hospital logo as a small image data URL. */
+  logo?: string;
+  /** Uses / tool count line. */
+  showDetails: boolean;
+};
+export const DEFAULT_LABEL_SETTINGS: LabelSettings = {size: 'SMALL', header: 'BRAND', showDetails: true};
+export type SystemSettings = {usageWarningThreshold: number; label?: LabelSettings};
 export type ConfigurationAuditEvent = {
   id: string;
   entityType: 'WORKFLOW' | 'SYSTEM_SETTING' | 'LIBRARY' | 'USER' | 'ORGANIZATION' | 'ROLE_PERMISSIONS';

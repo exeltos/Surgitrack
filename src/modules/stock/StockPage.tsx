@@ -1,5 +1,4 @@
-import {useState} from 'react';
-import {ArrowRightLeft, FileUp, Plus, ChevronRight} from 'lucide-react';
+import {FileUp, Plus, ChevronRight} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
@@ -17,24 +16,13 @@ import PageHeader from '../../components/ui/PageHeader';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
 import {presetPath, useRememberedState} from '../../core/listMemory';
-import {useSetColorQuestion} from '../../components/assets/useSetColorQuestion';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function StockPage() {
-  const {tools, sets, moveTool, applyColorPlan, can} = useSurgi();
-  const colorQuestion = useSetColorQuestion();
-  // A stock instrument with its own color joining a Set: ask whether it keeps it.
-  const addToSet = async (toolId: string, setId: string) => {
-    const plan = await colorQuestion.ask([toolId], setId);
-    if (!plan) return;
-    moveTool(toolId, 'SET', setId);
-    applyColorPlan(plan, sets.find(s => s.id === setId)?.barcode || '');
-  };
-  const canCompose = can('asset.composition.manage');
+  const {tools, sets, can} = useSurgi();
   const navigate = useNavigate();
   const stock = tools.filter(t => t.mode === 'STOCK');
-  const [target, setTarget] = useState<Record<string, string>>({});
   const [q, setQ] = useRememberedState('q', '');
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
@@ -139,7 +127,6 @@ export default function StockPage() {
               <th>{tr('Ειδικότητα')}</th>
               <th>{tr('Χρήσεις')}</th>
               <th>{tr('Κατάσταση')}</th>
-              {canCompose && <th>{tr('Προσθήκη σε Σετ')}</th>}
               <th></th>
             </tr>
           </thead>
@@ -163,31 +150,6 @@ export default function StockPage() {
                 <td>
                   <StatusBadge value={t.state} />
                 </td>
-                {canCompose && (
-                  <td>
-                    <div className="inline-action">
-                      <select
-                        value={target[t.id] || ''}
-                        onChange={e => setTarget(x => ({...x, [t.id]: e.target.value}))}
-                      >
-                        <option value="">{tr('Επιλογή Σετ...')}</option>
-                        {sets.map(s => (
-                          <option key={s.id} value={s.id}>
-                            {s.barcode} · {s.name}
-                          </option>
-                        ))}
-                      </select>
-                      <AppButton
-                        size="sm"
-                        disabled={!target[t.id]}
-                        icon={<ArrowRightLeft size={15} />}
-                        onClick={() => void addToSet(t.id, target[t.id])}
-                      >
-                        {tr('Προσθήκη')}
-                      </AppButton>
-                    </div>
-                  </td>
-                )}
                 <td>
                   <Link className="icon-link" to={`/tools/${t.id}`}>
                     <ChevronRight size={17} />
@@ -195,11 +157,10 @@ export default function StockPage() {
                 </td>
               </tr>
             ))}
-            {rows.hasMore && <MoreRows colSpan={canCompose ? 9 : 8} onVisible={rows.showMore} />}
+            {rows.hasMore && <MoreRows colSpan={8} onVisible={rows.showMore} />}
           </tbody>
         </table>
       </ScrollableListPanel>
-      {colorQuestion.dialog}
     </div>
   );
 }

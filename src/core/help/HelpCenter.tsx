@@ -1,11 +1,12 @@
 import '../../styles/help-center.css';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Info, Search, ShieldCheck, Sparkles, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../AppPreferences';
 import {APP_EDITION, APP_VERSION} from '../../config/appMeta';
 import {glossary, helpManual, type ManualSection} from './helpManual';
+import ScreenPreview from './ScreenPreview';
 
 const ui = {
   el: {
@@ -123,6 +124,11 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
     .filter((s): s is ManualSection => Boolean(s));
 
   const panelRef = useRef<HTMLElement>(null);
+  // While the screen preview is open, Escape closes it rather than the whole manual.
+  const previewOpen = useRef(false);
+  const onPreviewChange = useCallback((open: boolean) => {
+    previewOpen.current = open;
+  }, []);
   // Focus moves into the manual while it is open and returns to the Help button when it closes.
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
@@ -151,7 +157,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
         event.preventDefault();
         searchRef.current?.focus();
       }
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape' && !previewOpen.current) onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -246,6 +252,13 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                   <b>{tx.forRole}:</b> {current.audience[L]}
                 </span>
               </div>
+              <ScreenPreview
+                key={current.to}
+                src={`${import.meta.env.BASE_URL}help/${current.to.replace(/^\//, '')}.jpg`}
+                title={current.title[L]}
+                lang={L}
+                onOpenChange={onPreviewChange}
+              />
               {screenSection?.to !== current.to && !current.detailOf && (
                 <button
                   className="manual-open-screen"
@@ -321,6 +334,19 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                     <span>{tx.roleAwareBody}</span>
                   </p>
                 </div>
+                {related.length > 0 && (
+                  <section className="manual-see-also" role="group" aria-label={tx.related}>
+                    <b>{tx.related}</b>
+                    <div>
+                      {related.map(r => (
+                        <button key={r.to} onClick={() => select(r.to)}>
+                          <BookOpen size={14} />
+                          {r.title[L]}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
                 <footer className="manual-chapter-footer">
                   <button disabled={chapter === 0} onClick={() => setChapter(i => Math.max(0, i - 1))}>
                     <ChevronLeft size={14} />
@@ -339,23 +365,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                 </footer>
               </article>
             </main>
-          )}
-
-          {mode === 'manual' && current && (
-            <aside className="manual-side-pane">
-              {related.length > 0 && (
-                <section className="manual-related">
-                  <h3>{tx.related}</h3>
-                  {related.map(s => (
-                    <button key={s.to} onClick={() => select(s.to)}>
-                      <BookOpen size={14} />
-                      <span>{s.title[L]}</span>
-                      <ChevronRight size={13} />
-                    </button>
-                  ))}
-                </section>
-              )}
-            </aside>
           )}
 
           {mode === 'glossary' && (

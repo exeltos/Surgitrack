@@ -204,13 +204,13 @@ export const helpManual: ManualSection[] = [
         'Βρείτε το Σετ ή το εργαλείο (αναζήτηση ή σάρωση barcode).',
         'Πατήστε «Αποστολή προς Αποστείρωση».',
         'Συμπληρώστε κωδικό ασθενούς όπου ζητείται και επιβεβαιώστε.',
-        'Όταν γίνει «Έτοιμο για παραλαβή», παραλάβετε το από την Αποστείρωση.',
+        'Όταν γίνει «Έτοιμο για παραλαβή», παραλάβετε το από την Αποστείρωση υπογράφοντας με τον κωδικό χρήστη και το συνθηματικό σας.',
       ],
       en: [
         'Find the Set or instrument (search or scan the barcode).',
         'Press "Send to Sterilization".',
         'Enter the patient code where asked and confirm.',
-        'When it shows "Ready for pickup", collect it from Sterilization.',
+        'When it shows "Ready for pickup", collect it from Sterilization, signing with your user code and password.',
       ],
     },
     checks: {
@@ -252,11 +252,21 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Φυσική παραλαβή',
-          'Στην «Παραλαβή» σαρώστε το Σετ, ελέγξτε τη σύνθεση και καταγράψτε ποιος το παρέδωσε. Αποκλίσεις (έλλειψη, φθορά) δημιουργούν εκκρεμότητα.',
+          'Στην «Παραλαβή» σαρώστε το Σετ και δηλώστε τυχόν εμφανή απόκλιση. Εσείς καταγράφεστε αυτόματα ως παραλαμβάνων· ο παραδίδων του τμήματος υπογράφει με τον κωδικό χρήστη και το συνθηματικό του. Αποκλίσεις (έλλειψη, φθορά) δημιουργούν εκκρεμότητα.',
         ],
         en: [
           'Physical receipt',
-          'In "Receipt" scan the Set, check its composition and record who delivered it. Deviations (missing, damaged) create an issue.',
+          'In "Receipt" scan the Set and declare any visible deviation. You are recorded automatically as the receiver; the department person handing it over signs with their user code and password. Deviations (missing, damaged) create an issue.',
+        ],
+      },
+      {
+        el: [
+          'Παράδοση στο τμήμα',
+          'Στην «Παράδοση» εσείς καταγράφεστε αυτόματα ως παραδίδων. Ο παραλαμβάνων του τμήματος υπογράφει με τον κωδικό χρήστη και το συνθηματικό του στην ίδια οθόνη· χωρίς υπογραφή η παράδοση δεν ολοκληρώνεται.',
+        ],
+        en: [
+          'Delivery to the department',
+          'In "Delivery" you are recorded automatically as the person handing over. The department person collecting signs with their user code and password on the same screen; without the signature the delivery cannot be completed.',
         ],
       },
       {
@@ -270,8 +280,14 @@ export const helpManual: ManualSection[] = [
         ],
       },
       {
-        el: ['Εκτυπώσεις', 'Από τη σύνθεση εκτυπώνεται το φύλλο σύνθεσης (A4) και η ετικέτα barcode.'],
-        en: ['Printing', 'The composition sheet (A4) and the barcode label print from the preparation step.'],
+        el: [
+          'Εκτυπώσεις',
+          'Από τη σύνθεση εκτυπώνεται το φύλλο σύνθεσης (A4, με στήλη ελέγχου και υπογραφές) και η ετικέτα barcode. Η ετικέτα έχει τρία μεγέθη (50×25, 70×35, 100×50 mm) και κεφαλίδα SurgiTrack, λογότυπο, δικό σας κείμενο ή καμία· ο διαχειριστής ορίζει την προεπιλογή του νοσοκομείου.',
+        ],
+        en: [
+          'Printing',
+          'The composition sheet (A4, with a check column and signatures) and the barcode label print from the preparation step. The label comes in three sizes (50×25, 70×35, 100×50 mm) with a SurgiTrack, logo, custom text or no header; the administrator sets the hospital default.',
+        ],
       },
     ],
     steps: {
@@ -334,16 +350,6 @@ export const helpManual: ManualSection[] = [
         en: [
           'Instrument card',
           'Opening an instrument shows history, photos, uses, color marker and ownership. Lives can be changed only by the Administrator and the Sterilization supervisor.',
-        ],
-      },
-      {
-        el: [
-          'Ομαδοποίηση',
-          'Το κουμπί δίπλα στα φίλτρα ομαδοποιεί τα ίδια εργαλεία (ίδιος κωδικός, όνομα, εταιρεία) με την ποσότητά τους.',
-        ],
-        en: [
-          'Grouping',
-          'The button next to the filters groups identical instruments (same code, name, manufacturer) with their quantity.',
         ],
       },
     ],
@@ -470,24 +476,24 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσθήκη σε Σετ',
-          'Από τη στήλη «Προσθήκη σε Σετ» επιλέξτε το Σετ και το εργαλείο μετακινείται αμέσως. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
+          'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Stock. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
         ],
         en: [
           'Add to a Set',
-          'In the "Add to Set" column pick the Set and the instrument moves at once. The "Sets with missing items" indicator opens the Sets that need completing.',
+          'Adding happens from the Set: open the Set, press "Add instruments" and pick from the Stock tab. The "Sets with missing items" indicator opens the Sets that need completing.',
         ],
       },
     ],
     steps: {
       el: [
         'Ανοίξτε «Σετ με έλλειψη» για να δείτε τι λείπει.',
-        'Βρείτε το εργαλείο στο Stock.',
-        'Προσθέστε το στο Σετ.',
+        'Ανοίξτε το Σετ και πατήστε «Προσθήκη εργαλείων».',
+        'Διαλέξτε το εργαλείο από την καρτέλα Stock.',
       ],
       en: [
         'Open "Sets with missing items" to see what is missing.',
-        'Find the instrument in Stock.',
-        'Add it to the Set.',
+        'Open the Set and press "Add instruments".',
+        'Pick the instrument from the Stock tab.',
       ],
     },
     related: ['/sets', '/tools'],

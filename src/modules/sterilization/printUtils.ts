@@ -1,5 +1,6 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
+import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
 const escapeHtml = (value: string) =>
   value.replace(/[&<>'"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'})[ch] || ch);
@@ -169,26 +170,95 @@ type PrintAsset =
   | Pick<SetAsset, 'barcode' | 'name' | 'department'>
   | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>;
 
-/** The barcode label's print CSS and body (the part after <title>). */
-function barcodeLabelBody(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
+const LABEL_MM: Record<LabelSize, {w: number; h: number}> = {
+  SMALL: {w: 50, h: 25},
+  MEDIUM: {w: 70, h: 35},
+  SHEET: {w: 100, h: 50},
+};
+
+const labelHeaderHtml = (settings: LabelSettings) => {
+  if (settings.header === 'NONE') return '';
+  if (settings.header === 'LOGO' && settings.logo && /^data:image\/(png|jpeg|webp|svg\+xml);/.test(settings.logo))
+    return `<img class="logo" src="${escapeHtml(settings.logo)}" alt="">`;
+  if (settings.header === 'TEXT' && settings.text?.trim())
+    return `<div class="brand">${escapeHtml(settings.text.trim())}</div>`;
+  return '<div class="brand">SurgiTrack</div>';
+};
+
+/** One label cell: name + header on top, barcode, code and (optionally) the details line. */
+const labelCell = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
+  `<section class="label ${className}"><div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${escapeHtml(details)}</span>` : ''}</div></section>`;
+
+/**
+ * The barcode label's print CSS and body (the part after <title>). `screenZoom` enlarges it on
+ * screen only (the preview); the printed size stays in millimetres.
+ */
+function barcodeLabelBody(
+  asset: PrintAsset,
+  kind: AssetKind,
+  toolCount?: number,
+  settings: LabelSettings = DEFAULT_LABEL_SETTINGS,
+  screenZoom = 1,
+) {
   const details =
     kind === 'SET'
       ? tr('{0} εργαλεία', toolCount ?? 0)
       : `${tr('Χρήσεις')}: ${'uses' in asset ? asset.uses : 0}${'maxUses' in asset && asset.maxUses ? ` / ${asset.maxUses}` : ''}`;
-  const mainBarcode = code128Svg(asset.barcode, 54);
-  const smallBarcode = code128Svg(asset.barcode, 42);
-  const body = `<style>
-  @page{size:100mm 50mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{width:100mm;height:50mm;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111;overflow:hidden}.sheet{width:100mm;height:50mm;display:grid;grid-template-rows:25mm 25mm}.main{position:relative;border-bottom:.2mm solid #bbb;padding:2.2mm 3mm 1.4mm}.main-head{display:flex;justify-content:space-between;align-items:flex-start;gap:3mm}.name{font-size:8.8pt;font-weight:700;line-height:1.05;max-width:72mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand{font-size:10pt;font-weight:800;letter-spacing:.02em}.main-barcode{width:62mm;height:12.8mm;margin:1.1mm auto 0;display:flex;flex-direction:column;align-items:center}.main-barcode svg{width:62mm;height:9.5mm;display:block}.code{font-size:8pt;line-height:1;margin-top:.6mm}.detail{position:absolute;left:3mm;bottom:1.6mm;font-size:6.6pt;color:#555}.bottom{display:grid;grid-template-columns:50mm 50mm}.small{padding:1.5mm 2.2mm 1mm;position:relative;overflow:hidden}.small:first-child{border-right:.2mm solid #bbb}.small .name{font-size:6.8pt;max-width:45mm}.small-barcode{width:39.5mm;height:13.5mm;margin:1.1mm auto 0;display:flex;flex-direction:column;align-items:center}.small-barcode svg{width:39.5mm;height:8.2mm;display:block}.small .code{font-size:6.7pt;margin-top:.5mm}.small .detail{left:2.2mm;bottom:1.2mm;font-size:5.8pt}@media print{html,body,.sheet{width:100mm;height:50mm}}</style></head><body><div class="sheet"><section class="main"><div class="main-head"><div class="name">${escapeHtml(asset.name)}</div><div class="brand">SurgiTrack</div></div><div class="main-barcode">${mainBarcode}<div class="code">${escapeHtml(asset.barcode)}</div></div><div class="detail">${escapeHtml(details)}</div></section><div class="bottom"><section class="small"><div class="name">${escapeHtml(asset.name)}</div><div class="small-barcode">${smallBarcode}<div class="code">${escapeHtml(asset.barcode)}</div></div><div class="detail">${escapeHtml(details)}</div></section><section class="small"><div class="name">${escapeHtml(asset.name)}</div><div class="small-barcode">${smallBarcode}<div class="code">${escapeHtml(asset.barcode)}</div></div><div class="detail">${escapeHtml(details)}</div></section></div></div>`;
-  return body;
+  const {w, h} = LABEL_MM[settings.size] || LABEL_MM.SMALL;
+  // Type scales with the label height so the three sizes keep the same proportions.
+  const k = settings.size === 'SHEET' ? 1 : h / 25;
+  const cells =
+    settings.size === 'SHEET'
+      ? `<div class="sheet-grid">${labelCell(asset, details, settings, 'main')}<div class="pair">${labelCell(asset, details, settings, 'mini')}${labelCell(asset, details, settings, 'mini')}</div></div>`
+      : labelCell(asset, details, settings, 'single');
+  const pt = (value: number) => `${(value * k).toFixed(2)}pt`;
+  return `<style>
+  @page{size:${w}mm ${h}mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111}body{width:${w}mm;height:${h}mm;overflow:hidden}
+  .label{position:relative;width:100%;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:1.4mm 2mm 1.1mm;overflow:hidden}
+  .head{display:flex;justify-content:space-between;align-items:center;gap:1.5mm;min-height:0}
+  .name{font-size:${pt(6.6)};font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .brand{font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
+  .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
+  .bc{display:flex;align-items:stretch;justify-content:center;min-height:0;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
+  .foot{display:flex;justify-content:space-between;align-items:baseline;gap:1.5mm}
+  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#444;white-space:nowrap}
+  .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:25mm 25mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
+  .pair{display:grid;grid-template-columns:50mm 50mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
+  .sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}
+  @media screen{html{background:#eef2f5;zoom:${screenZoom}}body{margin:4mm;background:#fff;box-shadow:0 0 0 .2mm #c8d2d9,0 1mm 3mm rgba(0,0,0,.08)}}
+  </style></head><body>${cells}`;
 }
 
-export function barcodeLabelHtml(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
-  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barcode ${escapeHtml(asset.barcode)}</title>${barcodeLabelBody(asset, kind, toolCount)}</body></html>`;
+export function barcodeLabelHtml(
+  asset: PrintAsset,
+  kind: AssetKind,
+  toolCount?: number,
+  settings?: LabelSettings,
+  screenZoom = 1,
+) {
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barcode ${escapeHtml(asset.barcode)}</title>${barcodeLabelBody(asset, kind, toolCount, settings, screenZoom)}</body></html>`;
 }
 
-export function printBarcodeLabel(asset: PrintAsset, kind: AssetKind, toolCount?: number) {
-  return openPrintWindow(`Barcode ${asset.barcode}`, barcodeLabelBody(asset, kind, toolCount));
+export function printBarcodeLabel(asset: PrintAsset, kind: AssetKind, toolCount?: number, settings?: LabelSettings) {
+  return openPrintWindow(`Barcode ${asset.barcode}`, barcodeLabelBody(asset, kind, toolCount, settings));
 }
+
+/** Extra look for the composition sheet: the label header (logo / text) and the Set's color marker. */
+export type CompositionOptions = {
+  label?: LabelSettings;
+  marker?: Array<{name: string; colors: string[]; label?: string}>;
+};
+
+const markerChips = (marker: CompositionOptions['marker'] = []) =>
+  marker
+    .map(tape => {
+      const stops = tape.colors.length ? tape.colors : ['#ccc'];
+      const band = stops.map(
+        (c, i) => `${escapeHtml(c)} ${(i * 100) / stops.length}% ${((i + 1) * 100) / stops.length}%`,
+      );
+      return `<span class="tape"><i style="background:linear-gradient(90deg,${band.join(',')})">${tape.label ? escapeHtml(tape.label) : ''}</i>${escapeHtml(tape.name)}</span>`;
+    })
+    .join('');
 
 /** The composition sheet's print CSS and body (the part after <title>), shared by the preview and the print window. */
 function compositionBody(
@@ -197,34 +267,84 @@ function compositionBody(
   preparedBy: string,
   preparedAt: string,
   issueBarcodes: string[] = [],
+  options: CompositionOptions = {},
 ) {
   const groups = new Map<string, {name: string; code: string; manufacturer: string; count: number; issue: boolean}>();
   for (const tool of tools) {
     const key = `${tool.name}__${tool.code}__${tool.manufacturer}`;
+    const issue = issueBarcodes.includes(tool.barcode);
     const current = groups.get(key);
     if (current) {
       current.count += 1;
-      if (issueBarcodes.includes(tool.barcode)) current.issue = true;
+      if (issue) current.issue = true;
     } else
       groups.set(key, {
         name: tool.name,
-        code: tool.code,
+        code: tool.code || '—',
         manufacturer: tool.manufacturer || '—',
         count: 1,
-        issue: issueBarcodes.includes(tool.barcode),
+        issue,
       });
   }
-  const rows = [...groups.values()]
-    .sort((a, b) => a.name.localeCompare(b.name, 'el'))
+  const sorted = [...groups.values()].sort(
+    (a, b) => a.name.localeCompare(b.name, 'el') || a.code.localeCompare(b.code),
+  );
+  const rows = sorted
     .map(
-      row =>
-        `<tr class="${row.issue ? 'issue' : ''}"><td>${escapeHtml(row.name)}</td><td>${escapeHtml(row.code)}</td><td>${escapeHtml(row.manufacturer)}</td><td class="qty">${row.count}</td></tr>`,
+      (row, index) =>
+        `<tr class="${row.issue ? 'issue' : ''}"><td class="num">${index + 1}</td><td class="name">${escapeHtml(row.name)}${row.issue ? `<em>${tr('Ανοιχτή εκκρεμότητα')}</em>` : ''}</td><td>${escapeHtml(row.code)}</td><td>${escapeHtml(row.manufacturer)}</td><td class="qty">${row.count}</td><td class="chk"><span></span></td></tr>`,
     )
     .join('');
+  const issueCount = sorted.filter(row => row.issue).length;
+  const label = {...DEFAULT_LABEL_SETTINGS, ...(options.label || {})};
+  const header =
+    label.header === 'LOGO' && label.logo && /^data:image\/(png|jpeg|webp);/.test(label.logo)
+      ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
+      : label.header === 'TEXT' && label.text?.trim()
+        ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
+        : '<div class="brand">SurgiTrack</div>';
+  const marker = markerChips(options.marker);
+  const meta = [
+    [tr('Τμήμα'), trData(set.department) || '—'],
+    [tr('Ειδικότητα'), trData(set.specialty) || '—'],
+    [tr('Σύνολο εργαλείων'), String(tools.length)],
+    [tr('Είδη εργαλείων'), String(sorted.length)],
+    [tr('Προετοίμασε'), preparedBy],
+    [tr('Ημερομηνία / ώρα'), preparedAt],
+  ]
+    .map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`)
+    .join('');
   const barcode = code128Svg(set.barcode, 48);
-  const body = `<style>
-  @page{size:A4 portrait;margin:11mm 10mm 13mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,sans-serif;color:#111;font-size:9pt}.sheet{width:100%}.top{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;margin-bottom:5mm}.brand{font-size:16pt;font-weight:800;letter-spacing:.03em}.barcode{text-align:center}.barcode svg{width:42mm;height:12mm}.barcode-code{font-size:8pt;margin-top:1mm}.meta-actions{text-align:right;font-size:7pt;color:#555}.title{font-size:12pt;font-weight:700;margin:1mm 0 2mm}.submeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm;margin-bottom:4mm;font-size:8pt}.submeta b{display:block;font-size:7pt;color:#666;margin-bottom:.5mm}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}th{font-size:7.5pt;text-align:left;padding:2.1mm 1.5mm;border-bottom:.35mm solid #777}td{padding:1.75mm 1.5mm;border-bottom:.2mm solid #d4d4d4;vertical-align:top}th:nth-child(1),td:nth-child(1){width:43%}th:nth-child(2),td:nth-child(2){width:20%}th:nth-child(3),td:nth-child(3){width:27%}.qty{width:10%;text-align:center;font-weight:700}.issue{color:#c62828;font-style:italic}.footer{margin-top:5mm;border-top:.2mm solid #ccc;padding-top:2mm;display:flex;justify-content:space-between;font-size:7pt;color:#555}@media print{.sheet{break-inside:auto}tr{break-inside:avoid}}</style></head><body><div class="sheet"><div class="top"><div class="brand">SurgiTrack</div><div class="barcode">${barcode}<div class="barcode-code">${escapeHtml(set.barcode)}</div></div><div class="meta-actions">${tr('Φύλλο σύνθεσης & προετοιμασίας')}</div></div><div class="title">${escapeHtml(set.name)}</div><div class="submeta"><div><b>${tr('Σύνολο εργαλείων')}</b>${tools.length}</div><div><b>${tr('Προετοίμασε')}</b>${escapeHtml(preparedBy)}</div><div><b>${tr('Ημερομηνία / ώρα')}</b>${escapeHtml(preparedAt)}</div></div><table><thead><tr><th>${tr('Ονομασία')}</th><th>${tr('Κωδικός')}</th><th>${tr('Εταιρεία')}</th><th class="qty">${tr('Σύνολο')}</th></tr></thead><tbody>${rows}</tbody></table><div class="footer"><span>${escapeHtml(trData(set.department))}</span><span>${escapeHtml(set.barcode)} · ${escapeHtml(tr('{0} φυσικές εγγραφές', tools.length))}</span></div></div>`;
-  return body;
+  return `<style>
+  @page{size:A4 portrait;margin:12mm 11mm 14mm;@bottom-right{content:counter(page) " / " counter(pages);font:7pt Arial,sans-serif;color:#667}}
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#15232b;font-size:9pt}
+  .sheet{width:100%}
+  .top{display:grid;grid-template-columns:1fr auto;gap:6mm;align-items:start;padding-bottom:3.5mm;border-bottom:.6mm solid #1d6b7a}
+  .brand-row{display:flex;align-items:center;gap:3mm;min-height:9mm}.brand{font-size:13pt;font-weight:800;letter-spacing:.03em;color:#1d6b7a}.logo{max-height:11mm;max-width:55mm;object-fit:contain}
+  .doc{font-size:7pt;font-weight:700;letter-spacing:.12em;color:#5f707b;text-transform:uppercase;margin-top:2.5mm}
+  h1{margin:1mm 0 0;font-size:15pt;line-height:1.15}
+  .marker{display:flex;flex-wrap:wrap;gap:2mm;margin-top:2mm}.tape{display:inline-flex;align-items:center;gap:1.2mm;font-size:7.5pt;color:#3d4f5a}.tape i{display:inline-grid;place-items:center;min-width:7mm;height:3.6mm;border-radius:.8mm;border:.2mm solid rgba(0,0,0,.25);font-style:normal;font-size:6pt;font-weight:800;color:#fff;text-shadow:0 0 1px #000}
+  .barcode{text-align:center;padding:2mm 3mm;border:.25mm solid #cfd9df;border-radius:2mm}.barcode svg{width:48mm;height:13mm;display:block}.barcode-code{font-size:9pt;font-weight:700;letter-spacing:.08em;margin-top:1mm}
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:4mm 0 5mm;border:.25mm solid #d7e0e5;border-radius:2mm;overflow:hidden}.meta div{padding:2mm 3mm;border-right:.25mm solid #e3e9ec;border-bottom:.25mm solid #e3e9ec}.meta div:nth-child(3n){border-right:0}.meta div:nth-last-child(-n+3){border-bottom:0}.meta b{display:block;font-size:6.5pt;font-weight:700;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.6mm}.meta span{font-size:9pt;font-weight:700}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}
+  th{font-size:7pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:2mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
+  td{padding:1.8mm 1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nth-child(even) td{background:#f8fafb}
+  .num{width:7%;color:#6a7a84;text-align:right;padding-right:2.5mm}th:nth-child(2),td.name{width:39%}td.name{font-weight:700}th:nth-child(3),td:nth-child(3){width:17%}th:nth-child(4),td:nth-child(4){width:20%}.qty{width:8%;text-align:center}td.qty{font-weight:800;font-size:10pt}.chk{width:9%;text-align:center}.chk span{display:inline-block;width:3.6mm;height:3.6mm;border:.3mm solid #6d808b;border-radius:.6mm}
+  .issue td{color:#b3261e}.issue td.name em{display:block;font-size:6.5pt;font-style:normal;font-weight:700;letter-spacing:.04em}
+  tfoot td{border-bottom:0;border-top:.35mm solid #9fb3bd;font-weight:800;background:#fff!important}
+  .notes{margin-top:4mm;font-size:7.5pt;color:#5f707b}
+  .signs{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:8mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:5mm}
+  .footer{margin-top:5mm;padding-top:2mm;border-top:.2mm solid #d7e0e5;display:flex;justify-content:space-between;font-size:7pt;color:#6a7a84}
+  @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}}
+  @media print{tr{break-inside:avoid}}
+  </style></head><body><div class="sheet">
+  <div class="top"><div><div class="brand-row">${header}</div><div class="doc">${tr('Φύλλο σύνθεσης & προετοιμασίας')}</div><h1>${escapeHtml(set.name)}</h1>${marker ? `<div class="marker">${marker}</div>` : ''}</div><div class="barcode">${barcode}<div class="barcode-code">${escapeHtml(set.barcode)}</div></div></div>
+  <div class="meta">${meta}</div>
+  <table><thead><tr><th class="num">#</th><th>${tr('Ονομασία')}</th><th>${tr('Κωδικός')}</th><th>${tr('Εταιρεία')}</th><th class="qty">${tr('Τεμ.')}</th><th class="chk">${tr('Έλεγχος')}</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td><td>${tr('Σύνολο')}</td><td></td><td></td><td class="qty">${tools.length}</td><td></td></tr></tfoot></table>
+  ${issueCount ? `<div class="notes">${escapeHtml(tr('Με κόκκινο: εργαλεία με ανοιχτή εκκρεμότητα ({0}).', issueCount))}</div>` : ''}
+  <div class="signs"><div><b>${tr('Προετοιμασία / σύνθεση')}</b>${tr('Ονοματεπώνυμο & υπογραφή')}</div><div><b>${tr('Έλεγχος σύνθεσης')}</b>${tr('Ονοματεπώνυμο & υπογραφή')}</div><div><b>${tr('Κλίβανος / κύκλος')}</b>${tr('Αριθμός κύκλου & ημερομηνία')}</div></div>
+  <div class="footer"><span>SurgiTrack · ${escapeHtml(set.barcode)}</span><span>${escapeHtml(tr('{0} φυσικές εγγραφές', tools.length))}</span></div>
+  </div>`;
 }
 
 export function compositionHtml(
@@ -233,8 +353,9 @@ export function compositionHtml(
   preparedBy: string,
   preparedAt: string,
   issueBarcodes: string[] = [],
+  options?: CompositionOptions,
 ) {
-  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(tr('Σύνθεση {0}', set.barcode))}</title>${compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes)}</body></html>`;
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(tr('Σύνθεση {0}', set.barcode))}</title>${compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes, options)}</body></html>`;
 }
 
 export function printCompositionA4(
@@ -243,9 +364,10 @@ export function printCompositionA4(
   preparedBy: string,
   preparedAt: string,
   issueBarcodes: string[] = [],
+  options?: CompositionOptions,
 ) {
   return openPrintWindow(
     tr('Σύνθεση {0}', set.barcode),
-    compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes),
+    compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes, options),
   );
 }

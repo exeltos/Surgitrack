@@ -28,10 +28,12 @@ import UsageLimitCard from '../../components/assets/UsageLimitCard';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import AddToolsToSetModal from '../../components/assets/AddToolsToSetModal';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
+import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import AppButton from '../../components/ui/AppButton';
 import IconToggleButton from '../../components/ui/IconToggleButton';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
-import {barcodeLabelHtml, compositionHtml} from '../sterilization/printUtils';
+import {compositionHtml} from '../sterilization/printUtils';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -76,6 +78,7 @@ export default function SetDetailPage() {
   const [newBarcodeOpen, setNewBarcodeOpen] = useState(false);
   const [markerOpen, setMarkerOpen] = useState(false);
   const tapesById = useColorTapes();
+  const compositionOptions = useCompositionOptions();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [dispatchOpen, setDispatchOpen] = useState(false);
@@ -638,16 +641,13 @@ export default function SetDetailPage() {
             currentUser.name,
             preparedAt,
             memberIssues.map(issue => issue.asset.split(' · ')[0]),
+            compositionOptions(set.colorTapes),
           )}
           onClose={() => setPreview(null)}
         />
       )}
       {preview === 'BARCODE' && (
-        <PrintPreviewModal
-          title={`Barcode ${set.barcode}`}
-          html={barcodeLabelHtml(set, 'SET', members.length)}
-          onClose={() => setPreview(null)}
-        />
+        <BarcodeLabelPreview asset={set} kind="SET" toolCount={members.length} onClose={() => setPreview(null)} />
       )}
       {photosOpen && (
         <div className="modal-backdrop" onMouseDown={e => e.currentTarget === e.target && setPhotosOpen(false)}>
