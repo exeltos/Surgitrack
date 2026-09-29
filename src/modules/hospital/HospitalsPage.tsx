@@ -6,6 +6,7 @@ import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {activeHospitalId, switchHospital} from '../../data/cloud/hospitalSwitch';
+import Spinner from '../../components/ui/Spinner';
 
 type Hospital = {id: string; name: string; code: string; active: boolean; demo_enabled: boolean};
 type Stats = {departments: number; users: number; activeUsers: number; pending: number; linkUntil?: string};
@@ -217,6 +218,7 @@ export default function HospitalsPage() {
           <span>{L('Κατάσταση', 'Status')}</span>
           <span></span>
         </div>
+        {loading && <Spinner />}
         {!loading && shown.length === 0 && (
           <p className="hospital-empty hospitals-empty">
             {query

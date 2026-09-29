@@ -1251,4 +1251,5 @@ export const en: Record<string, string> = {
   'Πολλαπλών χρήσεων (με ζωές)': 'Multi-use (with lives)',
   'Λίγες ζωές': 'Few lives left',
   'Όλοι οι τύποι χρήσης': 'All usage types',
+  'Φόρτωση…': 'Loading…',
 };

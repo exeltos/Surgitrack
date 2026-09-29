@@ -7,6 +7,7 @@ import type {LibraryItem} from '../../core/libraries';
 import {getCloudOrganizationId, loadAppRecords, seedAppRecords, type CloudRecords} from './appRecords';
 import {productionOrganizationFor, resolveIdentity} from './identity';
 import {translateToEnglish} from '../../core/glossary';
+import Spinner from '../../components/ui/Spinner';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -119,24 +120,20 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
 
   if (status === 'local') return <>{children(null)}</>;
   if (status === 'ready' && workspace) return <>{children(workspace)}</>;
+  if (status === 'loading')
+    return <Spinner fullScreen label={lang === 'el' ? 'Φόρτωση δεδομένων…' : 'Loading data…'} />;
   return (
     <div className="cloud-gate">
-      {status === 'loading' ? (
-        <p>{lang === 'el' ? 'Φόρτωση δεδομένων…' : 'Loading data…'}</p>
-      ) : (
-        <>
-          <strong>
-            {lang === 'el' ? 'Δεν ήταν δυνατή η φόρτωση των δεδομένων.' : 'The data could not be loaded.'}
-          </strong>
-          <small>{error}</small>
-          <div>
-            <button onClick={() => void load()}>{lang === 'el' ? 'Δοκιμή ξανά' : 'Try again'}</button>
-            <button onClick={exitWorkspace}>
-              {lang === 'el' ? 'Επιστροφή στη Διαχείριση' : 'Back to Platform Admin'}
-            </button>
-          </div>
-        </>
-      )}
+      <>
+        <strong>{lang === 'el' ? 'Δεν ήταν δυνατή η φόρτωση των δεδομένων.' : 'The data could not be loaded.'}</strong>
+        <small>{error}</small>
+        <div>
+          <button onClick={() => void load()}>{lang === 'el' ? 'Δοκιμή ξανά' : 'Try again'}</button>
+          <button onClick={exitWorkspace}>
+            {lang === 'el' ? 'Επιστροφή στη Διαχείριση' : 'Back to Platform Admin'}
+          </button>
+        </div>
+      </>
     </div>
   );
 }

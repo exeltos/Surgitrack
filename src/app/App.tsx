@@ -11,6 +11,7 @@ import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
+import Spinner from '../components/ui/Spinner';
 import {
   type AccessRequest,
   canViewAs,
@@ -57,7 +58,7 @@ function RoleHome() {
 }
 const Guard = ({permission, children}: {permission: Permission; children: ReactNode}) => (
   <ProtectedRoute permission={permission}>
-    <Suspense fallback={null}>{children}</Suspense>
+    <Suspense fallback={<Spinner />}>{children}</Suspense>
   </ProtectedRoute>
 );
 
@@ -180,11 +181,11 @@ export default function App() {
   const joinToken = /^\/join\/([0-9a-f]{16,})$/.exec(location.pathname)?.[1];
   if (joinToken)
     return (
-      <Suspense fallback={null}>
+      <Suspense fallback={<Spinner fullScreen />}>
         <JoinPage token={joinToken} />
       </Suspense>
     );
-  if (!authReady) return null;
+  if (!authReady) return <Spinner fullScreen />;
   if (accessRequest)
     return (
       <PendingAccess
