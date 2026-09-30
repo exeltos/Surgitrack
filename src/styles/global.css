@@ -1152,6 +1152,18 @@ a.overview-bar:hover {
 .overview-usage b {
   color: #b54708;
 }
+.overview-usage a {
+  color: inherit;
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 2px 4px;
+  margin: 0 -4px;
+}
+.overview-usage a:hover,
+.overview-usage a:focus-visible {
+  background: #fff4e5;
+  text-decoration: underline;
+}
 @media (max-width: 1200px) {
   .overview-kpis {
     grid-template-columns: repeat(3, minmax(0, 1fr));

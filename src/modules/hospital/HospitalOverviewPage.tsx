@@ -320,9 +320,9 @@ export default function HospitalOverviewPage() {
             <div className="overview-usage">
               <b>{L('Κοντά στο όριο χρήσεων', 'Near usage limit')}</b>
               {lifecycleAlerts.slice(0, 4).map(a => (
-                <span key={a.id}>
+                <Link key={a.id} to={a.assetKind === 'SET' ? `/sets/${a.assetId}` : `/tools/${a.assetId}`}>
                   {a.barcode} · {a.name} — {L(`απομένουν ${a.remaining}`, `${a.remaining} left`)}
-                </span>
+                </Link>
               ))}
             </div>
           )}

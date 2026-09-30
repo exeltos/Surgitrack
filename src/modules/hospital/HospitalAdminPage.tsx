@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
-import {Pencil, Plus, RefreshCw, Save, UserCheck, UserX, X} from 'lucide-react';
+import {Building2, Pencil, Plus, RefreshCw, Save, Trash2, UserCheck, UserX, Users, X} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import SignupLinkCard from './SignupLinkCard';
@@ -71,6 +71,7 @@ export default function HospitalAdminPage() {
   const [notice, setNotice] = useState<{kind: 'ok' | 'warn' | 'error'; text: string} | null>(null);
   const [busy, setBusy] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [tab, setTab] = useState<'SETUP' | 'USERS'>('SETUP');
 
   const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
@@ -220,6 +221,32 @@ export default function HospitalAdminPage() {
   const date = (iso: string) =>
     new Date(iso).toLocaleString(el ? 'el-GR' : 'en-GB', {dateStyle: 'medium', timeStyle: 'short'});
 
+  /** Deletes the account for good; the history the user left stays. */
+  const deleteMember = async (m: Member) => {
+    if (
+      !window.confirm(
+        L(
+          `Οριστική διαγραφή του λογαριασμού ${m.name}; Δεν θα μπορεί πλέον να συνδεθεί. Το ιστορικό του παραμένει.`,
+          `Delete ${m.name}'s account for good? They will no longer be able to sign in. Their history stays.`,
+        ),
+      )
+    )
+      return;
+    setBusy(true);
+    setNotice(null);
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('delete-staff', {body: {user_id: m.id}});
+    setBusy(false);
+    if (error || !data?.ok) {
+      setNotice({
+        kind: 'error',
+        text: L(`Η διαγραφή του ${m.name} δεν ολοκληρώθηκε.`, `${m.name} could not be deleted.`),
+      });
+      return;
+    }
+    setNotice({kind: 'ok', text: L(`Ο λογαριασμός ${m.name} διαγράφηκε.`, `${m.name}'s account was deleted.`)});
+    await load();
+  };
+
   return (
     <div className="hospital-admin">
       <PageHeader
@@ -250,245 +277,287 @@ export default function HospitalAdminPage() {
         </div>
       )}
 
-      <div className="hospital-grid">
-        <section className="hospital-card hospital-requests">
-          <header>
-            <div>
-              <b>{L('Αιτήματα πρόσβασης', 'Access requests')}</b>
-              <small>
-                {L(
-                  'Επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης λαμβάνει email με το όνομα χρήστη του.',
-                  'Pick a role and department, then approve. The user gets an email with their username.',
-                )}
-              </small>
-            </div>
-            <span className="hospital-count">{pending.length}</span>
-          </header>
-          {pending.length === 0 && (
-            <p className="hospital-empty">{L('Δεν υπάρχουν αιτήματα σε αναμονή.', 'No requests waiting.')}</p>
-          )}
-          {pending.map(r => {
-            const d = decisionFor(r);
-            return (
-              <article key={r.id} className="hospital-request">
-                <div className="hospital-request-who">
-                  <strong>{r.full_name}</strong>
-                  <small>
-                    {r.email} · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b> ·{' '}
-                    {date(r.requested_at)}
-                  </small>
-                </div>
-                <label>
-                  {L('Ρόλος', 'Role')}
-                  <select value={d.role} onChange={e => setDecision(r, {role: e.target.value as UserRole})}>
-                    {roles.map(role => (
-                      <option key={role.id} value={role.id}>
-                        {el ? role.el : role.en}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  {L('Τμήμα', 'Department')}
-                  {wholeHospital(d.role) ? (
-                    <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
-                  ) : (
-                    <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
-                      {activeDepartments.map(dep => (
-                        <option key={dep.id} value={dep.id}>
-                          {localizedName(dep.name, lang)}
-                        </option>
-                      ))}
-                    </select>
+      <div className="hospital-tabs" role="tablist" aria-label={L('Ενότητες', 'Sections')}>
+        <button
+          role="tab"
+          aria-selected={tab === 'SETUP'}
+          className={tab === 'SETUP' ? 'active' : ''}
+          onClick={() => setTab('SETUP')}
+        >
+          <Building2 size={16} /> {L('Αιτήματα & τμήματα', 'Requests & departments')}
+          {pending.length > 0 && <span className="hospital-count">{pending.length}</span>}
+        </button>
+        <button
+          role="tab"
+          aria-selected={tab === 'USERS'}
+          className={tab === 'USERS' ? 'active' : ''}
+          onClick={() => setTab('USERS')}
+        >
+          <Users size={16} /> {L('Χρήστες', 'Users')}
+          <span className="hospital-count">{members.length}</span>
+        </button>
+      </div>
+
+      {tab === 'SETUP' && (
+        <div className="hospital-grid">
+          <section className="hospital-card hospital-requests">
+            <header>
+              <div>
+                <b>{L('Αιτήματα πρόσβασης', 'Access requests')}</b>
+                <small>
+                  {L(
+                    'Επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης λαμβάνει email με το όνομα χρήστη του.',
+                    'Pick a role and department, then approve. The user gets an email with their username.',
                   )}
-                </label>
-                <label className="hospital-request-note">
-                  {L('Σχόλιο (προαιρετικό)', 'Note (optional)')}
-                  <input value={d.note} onChange={e => setDecision(r, {note: e.target.value})} />
-                </label>
-                <div className="hospital-request-actions">
-                  <AppButton
-                    variant="primary"
-                    disabled={busy}
-                    onClick={() => void decide(r, true)}
-                    icon={<UserCheck size={15} />}
-                  >
-                    {L('Έγκριση', 'Approve')}
-                  </AppButton>
-                  <AppButton
-                    variant="danger"
-                    disabled={busy}
-                    onClick={() => void decide(r, false)}
-                    icon={<UserX size={15} />}
-                  >
-                    {L('Απόρριψη', 'Reject')}
-                  </AppButton>
-                </div>
-              </article>
-            );
-          })}
-          {unconfirmed.length > 0 && (
-            <div className="hospital-unconfirmed">
-              <b>{L('Αναμονή επιβεβαίωσης email', 'Awaiting email confirmation')}</b>
-              {unconfirmed.map(r => (
-                <span key={r.id}>
-                  {r.full_name} · {r.email} · {departmentName(r.department_id)}
-                </span>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />
-
-        <section className="hospital-card hospital-departments-card">
-          <header>
-            <div>
-              <b>{L('Τμήματα', 'Departments')}</b>
-              <small>
-                {L(
-                  'Εμφανίζονται στη φόρμα εγγραφής και σε Σετ, εργαλεία και ιχνηλασιμότητα. Ο κωδικός STER δηλώνει την Αποστείρωση.',
-                  'Shown on the signup form and across sets, instruments and traceability. Code STER marks Sterilization.',
-                )}
-              </small>
-            </div>
-            <span className="hospital-count">{activeDepartments.length}</span>
-          </header>
-          <div className="hospital-department-add">
-            <input
-              value={newDepartment.name}
-              onChange={e => setNewDepartment(v => ({...v, name: e.target.value}))}
-              placeholder={L('Όνομα τμήματος', 'Department name')}
-            />
-            <input
-              value={newDepartment.code}
-              onChange={e => setNewDepartment(v => ({...v, code: e.target.value}))}
-              placeholder={L('Κωδικός', 'Code')}
-            />
-            <AppButton
-              variant="primary"
-              disabled={!newDepartment.name.trim()}
-              onClick={() => void addDepartment()}
-              icon={<Plus size={15} />}
-            >
-              {L('Προσθήκη', 'Add')}
-            </AppButton>
-          </div>
-          <div className="hospital-rows">
-            {departments.map(d =>
-              editing?.id === d.id ? (
-                <div key={d.id} className="hospital-row editing">
-                  <input value={editing.name} onChange={e => setEditing({...editing, name: e.target.value})} />
-                  <input value={editing.code} onChange={e => setEditing({...editing, code: e.target.value})} />
-                  <button onClick={() => void saveDepartment()} aria-label={L('Αποθήκευση', 'Save')}>
-                    <Save size={14} />
-                  </button>
-                  <button onClick={() => setEditing(null)} aria-label={L('Ακύρωση', 'Cancel')}>
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <div key={d.id} className={`hospital-row ${d.active ? '' : 'inactive'}`}>
-                  <span>
-                    <b>{localizedName(d.name, lang)}</b>
-                    <small>{d.code || '—'}</small>
-                  </span>
-                  <button
-                    className={`studio-access-toggle ${d.active ? 'active' : ''}`}
-                    onClick={() => void toggleDepartment(d)}
-                  >
-                    <span></span>
-                    {d.active ? L('Ενεργό', 'Active') : L('Ανενεργό', 'Inactive')}
-                  </button>
-                  <button
-                    onClick={() => setEditing({id: d.id, name: d.name, code: d.code || ''})}
-                    aria-label={L('Επεξεργασία', 'Edit')}
-                  >
-                    <Pencil size={14} />
-                  </button>
-                </div>
-              ),
+                </small>
+              </div>
+              <span className="hospital-count">{pending.length}</span>
+            </header>
+            {pending.length === 0 && (
+              <p className="hospital-empty">{L('Δεν υπάρχουν αιτήματα σε αναμονή.', 'No requests waiting.')}</p>
             )}
-          </div>
-        </section>
-
-        <section className="hospital-card hospital-members">
-          <header>
-            <div>
-              <b>{L('Χρήστες νοσοκομείου', 'Hospital users')}</b>
-              <small>
-                {L(
-                  'Όνομα χρήστη, τμήμα, ρόλος και πρόσβαση κάθε χρήστη.',
-                  'Username, department, role and access of each user.',
-                )}
-              </small>
-            </div>
-            <span className="hospital-count">{members.length}</span>
-          </header>
-          <div className="hospital-member-head">
-            <span>{L('Χρήστης', 'User')}</span>
-            <span>{L('Όνομα χρήστη', 'Username')}</span>
-            <span>{L('Τμήμα', 'Department')}</span>
-            <span>{L('Ρόλος', 'Role')}</span>
-            <span>{L('Πρόσβαση', 'Access')}</span>
-          </div>
-          <div className="hospital-rows">
-            {members.map(m => {
-              const self = m.id === me?.id;
+            {pending.map(r => {
+              const d = decisionFor(r);
               return (
-                <div key={m.id} className="hospital-member">
-                  <span>
-                    <b>{m.name}</b>
-                    <small>{m.email}</small>
-                  </span>
-                  <code>{m.user_code || '—'}</code>
-                  {wholeHospital(m.role) ? (
-                    <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
-                  ) : (
-                    <select
-                      value={m.department_id || ''}
-                      onChange={e => void updateMember(m, {department_id: e.target.value || null})}
-                    >
-                      <option value="">—</option>
-                      {departments.map(d => (
-                        <option key={d.id} value={d.id}>
-                          {localizedName(d.name, lang)}
+                <article key={r.id} className="hospital-request">
+                  <div className="hospital-request-who">
+                    <strong>{r.full_name}</strong>
+                    <small>
+                      {r.email} · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b> ·{' '}
+                      {date(r.requested_at)}
+                    </small>
+                  </div>
+                  <label>
+                    {L('Ρόλος', 'Role')}
+                    <select value={d.role} onChange={e => setDecision(r, {role: e.target.value as UserRole})}>
+                      {roles.map(role => (
+                        <option key={role.id} value={role.id}>
+                          {el ? role.el : role.en}
                         </option>
                       ))}
                     </select>
-                  )}
-                  <select
-                    value={m.role === 'STERILIZATION' && m.supervisor ? SUPERVISOR : m.role}
-                    disabled={self}
-                    onChange={e =>
-                      void updateMember(
-                        m,
-                        e.target.value === SUPERVISOR
-                          ? {role: 'STERILIZATION', supervisor: true}
-                          : {role: e.target.value as UserRole, supervisor: false},
-                      )
-                    }
-                  >
-                    {memberRoles.map(role => (
-                      <option key={role.id} value={role.id}>
-                        {el ? role.el : role.en}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    className={`studio-access-toggle ${m.active ? 'active' : ''}`}
-                    disabled={self}
-                    onClick={() => void updateMember(m, {active: !m.active})}
-                  >
-                    <span></span>
-                    {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                  </button>
-                </div>
+                  </label>
+                  <label>
+                    {L('Τμήμα', 'Department')}
+                    {wholeHospital(d.role) ? (
+                      <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                    ) : (
+                      <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
+                        {activeDepartments.map(dep => (
+                          <option key={dep.id} value={dep.id}>
+                            {localizedName(dep.name, lang)}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </label>
+                  <label className="hospital-request-note">
+                    {L('Σχόλιο (προαιρετικό)', 'Note (optional)')}
+                    <input value={d.note} onChange={e => setDecision(r, {note: e.target.value})} />
+                  </label>
+                  <div className="hospital-request-actions">
+                    <AppButton
+                      variant="primary"
+                      disabled={busy}
+                      onClick={() => void decide(r, true)}
+                      icon={<UserCheck size={15} />}
+                    >
+                      {L('Έγκριση', 'Approve')}
+                    </AppButton>
+                    <AppButton
+                      variant="danger"
+                      disabled={busy}
+                      onClick={() => void decide(r, false)}
+                      icon={<UserX size={15} />}
+                    >
+                      {L('Απόρριψη', 'Reject')}
+                    </AppButton>
+                  </div>
+                </article>
               );
             })}
-          </div>
-        </section>
-      </div>
+            {unconfirmed.length > 0 && (
+              <div className="hospital-unconfirmed">
+                <b>{L('Αναμονή επιβεβαίωσης email', 'Awaiting email confirmation')}</b>
+                {unconfirmed.map(r => (
+                  <span key={r.id}>
+                    {r.full_name} · {r.email} · {departmentName(r.department_id)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />
+
+          <section className="hospital-card hospital-departments-card">
+            <header>
+              <div>
+                <b>{L('Τμήματα', 'Departments')}</b>
+                <small>
+                  {L(
+                    'Εμφανίζονται στη φόρμα εγγραφής και σε Σετ, εργαλεία και ιχνηλασιμότητα. Ο κωδικός STER δηλώνει την Αποστείρωση.',
+                    'Shown on the signup form and across sets, instruments and traceability. Code STER marks Sterilization.',
+                  )}
+                </small>
+              </div>
+              <span className="hospital-count">{activeDepartments.length}</span>
+            </header>
+            <div className="hospital-department-add">
+              <input
+                value={newDepartment.name}
+                onChange={e => setNewDepartment(v => ({...v, name: e.target.value}))}
+                placeholder={L('Όνομα τμήματος', 'Department name')}
+              />
+              <input
+                value={newDepartment.code}
+                onChange={e => setNewDepartment(v => ({...v, code: e.target.value}))}
+                placeholder={L('Κωδικός', 'Code')}
+              />
+              <AppButton
+                variant="primary"
+                disabled={!newDepartment.name.trim()}
+                onClick={() => void addDepartment()}
+                icon={<Plus size={15} />}
+              >
+                {L('Προσθήκη', 'Add')}
+              </AppButton>
+            </div>
+            <div className="hospital-rows">
+              {departments.map(d =>
+                editing?.id === d.id ? (
+                  <div key={d.id} className="hospital-row editing">
+                    <input value={editing.name} onChange={e => setEditing({...editing, name: e.target.value})} />
+                    <input value={editing.code} onChange={e => setEditing({...editing, code: e.target.value})} />
+                    <button onClick={() => void saveDepartment()} aria-label={L('Αποθήκευση', 'Save')}>
+                      <Save size={14} />
+                    </button>
+                    <button onClick={() => setEditing(null)} aria-label={L('Ακύρωση', 'Cancel')}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div key={d.id} className={`hospital-row ${d.active ? '' : 'inactive'}`}>
+                    <span>
+                      <b>{localizedName(d.name, lang)}</b>
+                      <small>{d.code || '—'}</small>
+                    </span>
+                    <button
+                      className={`studio-access-toggle ${d.active ? 'active' : ''}`}
+                      onClick={() => void toggleDepartment(d)}
+                    >
+                      <span></span>
+                      {d.active ? L('Ενεργό', 'Active') : L('Ανενεργό', 'Inactive')}
+                    </button>
+                    <button
+                      onClick={() => setEditing({id: d.id, name: d.name, code: d.code || ''})}
+                      aria-label={L('Επεξεργασία', 'Edit')}
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  </div>
+                ),
+              )}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {tab === 'USERS' && (
+        <div className="hospital-grid">
+          <section className="hospital-card hospital-members">
+            <header>
+              <div>
+                <b>{L('Χρήστες νοσοκομείου', 'Hospital users')}</b>
+                <small>
+                  {L(
+                    'Όνομα χρήστη, τμήμα, ρόλος και πρόσβαση κάθε χρήστη.',
+                    'Username, department, role and access of each user.',
+                  )}
+                </small>
+              </div>
+              <span className="hospital-count">{members.length}</span>
+            </header>
+            <div className="hospital-member-head">
+              <span>{L('Χρήστης', 'User')}</span>
+              <span>{L('Όνομα χρήστη', 'Username')}</span>
+              <span>{L('Τμήμα', 'Department')}</span>
+              <span>{L('Ρόλος', 'Role')}</span>
+              <span>{L('Πρόσβαση', 'Access')}</span>
+              <span></span>
+            </div>
+            <div className="hospital-rows">
+              {members.map(m => {
+                const self = m.id === me?.id;
+                return (
+                  <div key={m.id} className="hospital-member">
+                    <span>
+                      <b>{m.name}</b>
+                      <small>{m.email}</small>
+                    </span>
+                    <code>{m.user_code || '—'}</code>
+                    {wholeHospital(m.role) ? (
+                      <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                    ) : (
+                      <select
+                        value={m.department_id || ''}
+                        onChange={e => void updateMember(m, {department_id: e.target.value || null})}
+                      >
+                        <option value="">—</option>
+                        {departments.map(d => (
+                          <option key={d.id} value={d.id}>
+                            {localizedName(d.name, lang)}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    <select
+                      value={m.role === 'STERILIZATION' && m.supervisor ? SUPERVISOR : m.role}
+                      disabled={self}
+                      onChange={e =>
+                        void updateMember(
+                          m,
+                          e.target.value === SUPERVISOR
+                            ? {role: 'STERILIZATION', supervisor: true}
+                            : {role: e.target.value as UserRole, supervisor: false},
+                        )
+                      }
+                    >
+                      {memberRoles.map(role => (
+                        <option key={role.id} value={role.id}>
+                          {el ? role.el : role.en}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className={`studio-access-toggle ${m.active ? 'active' : ''}`}
+                      disabled={self}
+                      onClick={() => void updateMember(m, {active: !m.active})}
+                    >
+                      <span></span>
+                      {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                    </button>
+                    <button
+                      type="button"
+                      className="hospital-member-delete"
+                      disabled={self || busy}
+                      title={
+                        self
+                          ? L('Δεν διαγράφετε τον δικό σας λογαριασμό', 'You cannot delete your own account')
+                          : L('Οριστική διαγραφή', 'Delete for good')
+                      }
+                      aria-label={L(`Διαγραφή ${m.name}`, `Delete ${m.name}`)}
+                      onClick={() => void deleteMember(m)}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
