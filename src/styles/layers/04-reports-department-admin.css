@@ -3895,6 +3895,10 @@ a.auth-primary {
   background: #ecfdf3;
   color: #067647;
 }
+.hospital-notice.warn {
+  background: #fffaeb;
+  color: #93370d;
+}
 .hospital-notice.error {
   background: #fef3f2;
   color: #b42318;

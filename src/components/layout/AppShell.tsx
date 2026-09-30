@@ -31,6 +31,14 @@ import {lazyPage} from '../../core/resilience';
 
 // The user manual is loaded only when first opened.
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
+/** Initials of a name, e.g. "ΑΙΚΑΤΕΡΙΝΗ ΜΠΟΥΓΑ" → "ΑΜ". */
+const initialsOf = (name: string) => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  const first = parts[0][0];
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : parts[0][1] || '';
+  return (first + last).toLocaleUpperCase('el');
+};
 const roleLabel: Record<UserRole, {el: string; en: string}> = {
   DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
   STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
@@ -128,6 +136,8 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     ...tools.filter(t => t.department === currentUser.department && t.mode === 'STANDALONE'),
   ];
   const departmentReady = departmentAssets.filter(a => a.state === 'READY_FOR_PICKUP');
+  // The person actually signed in, even while an admin views the app as another role.
+  const signedInName = getRealIdentity()?.name || currentUser.name;
   const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
   const departmentUsage = lifecycleAlerts.filter(a => departmentAssets.some(asset => asset.id === a.assetId));
   const accessRequests = hospitalId ? pendingAccess : 0;
@@ -534,7 +544,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                 </div>
               )}
             </div>
-            <div className="avatar">AF</div>
+            <div className="avatar" title={signedInName}>
+              {initialsOf(signedInName)}
+            </div>
             <button className="icon-btn" onClick={onLogout} title={lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}>
               <LogOut size={17} />
             </button>

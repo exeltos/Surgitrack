@@ -68,7 +68,7 @@ export default function HospitalAdminPage() {
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [newDepartment, setNewDepartment] = useState({name: '', code: ''});
   const [editing, setEditing] = useState<{id: string; name: string; code: string} | null>(null);
-  const [notice, setNotice] = useState<{kind: 'ok' | 'error'; text: string} | null>(null);
+  const [notice, setNotice] = useState<{kind: 'ok' | 'warn' | 'error'; text: string} | null>(null);
   const [busy, setBusy] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -151,13 +151,24 @@ export default function HospitalAdminPage() {
         body: {action: 'notify-decision', request_id: r.id},
       });
       const emailed = !!data?.emailed;
+      // Without email the admin must pass the username on in person.
+      let code = '';
+      if (approve && !emailed) {
+        const {data: profile} = await supabase.from('profiles').select('user_code').eq('email', r.email).maybeSingle();
+        code = (profile as {user_code?: string} | null)?.user_code || '';
+      }
       setNotice({
-        kind: 'ok',
+        kind: approve && !emailed ? 'warn' : 'ok',
         text: approve
-          ? L(
-              `Ο/Η ${r.full_name} εγκρίθηκε.${emailed ? ' Στάλθηκε email με το όνομα χρήστη.' : ''}`,
-              `${r.full_name} was approved.${emailed ? ' An email with the username was sent.' : ''}`,
-            )
+          ? emailed
+            ? L(
+                `Ο/Η ${r.full_name} εγκρίθηκε. Στάλθηκε email με το όνομα χρήστη.`,
+                `${r.full_name} was approved. An email with the username was sent.`,
+              )
+            : L(
+                `Ο/Η ${r.full_name} εγκρίθηκε, αλλά δεν στάλθηκε email (η αποστολή email δεν έχει ρυθμιστεί). Ενημερώστε τον/την ότι μπορεί να συνδεθεί με όνομα χρήστη ${code || '—'} (ή το email του/της) και τον κωδικό που όρισε.`,
+                `${r.full_name} was approved, but no email was sent (email sending is not set up). Tell them they can sign in with username ${code || '—'} (or their email) and the password they chose.`,
+              )
           : L(`Το αίτημα του ${r.full_name} απορρίφθηκε.`, `${r.full_name}'s request was rejected.`),
       });
       window.dispatchEvent(new Event(ACCESS_REQUESTS_CHANGED));
