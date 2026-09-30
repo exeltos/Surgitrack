@@ -167,8 +167,8 @@ export default function HospitalAdminPage() {
                 `${r.full_name} was approved. An email with the username was sent.`,
               )
             : L(
-                `Ο/Η ${r.full_name} εγκρίθηκε, αλλά δεν στάλθηκε email (η αποστολή email δεν έχει ρυθμιστεί). Ενημερώστε τον/την ότι μπορεί να συνδεθεί με όνομα χρήστη ${code || '—'} (ή το email του/της) και τον κωδικό που όρισε.`,
-                `${r.full_name} was approved, but no email was sent (email sending is not set up). Tell them they can sign in with username ${code || '—'} (or their email) and the password they chose.`,
+                `Ο/Η ${r.full_name} εγκρίθηκε, αλλά δεν στάλθηκε email. Ενημερώστε τον/την ότι μπορεί να συνδεθεί με όνομα χρήστη ${code || '—'} (ή το email του/της) και τον κωδικό που όρισε.`,
+                `${r.full_name} was approved, but no email was sent. Tell them they can sign in with username ${code || '—'} (or their email) and the password they chose.`,
               )
           : L(`Το αίτημα του ${r.full_name} απορρίφθηκε.`, `${r.full_name}'s request was rejected.`),
       });
