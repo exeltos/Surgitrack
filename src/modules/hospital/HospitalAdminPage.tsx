@@ -72,6 +72,7 @@ export default function HospitalAdminPage() {
   const [busy, setBusy] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [tab, setTab] = useState<'SETUP' | 'USERS'>('SETUP');
+  const [memberEdit, setMemberEdit] = useState<{id: string; name: string; email: string} | null>(null);
 
   const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
@@ -220,6 +221,36 @@ export default function HospitalAdminPage() {
   const activeDepartments = departments.filter(d => d.active);
   const date = (iso: string) =>
     new Date(iso).toLocaleString(el ? 'el-GR' : 'en-GB', {dateStyle: 'medium', timeStyle: 'short'});
+
+  /** Saves a user's name and sign-in email; the email changes on the sign-in account too. */
+  const saveMember = async () => {
+    if (!memberEdit) return;
+    const name = memberEdit.name.trim();
+    const email = memberEdit.email.trim();
+    if (!name || !email) return;
+    setBusy(true);
+    setNotice(null);
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('update-staff', {
+      body: {user_id: memberEdit.id, name, email},
+    });
+    setBusy(false);
+    if (error || !data?.ok) {
+      const status = (error as {context?: {status?: number}} | null)?.context?.status;
+      setNotice({
+        kind: 'error',
+        text:
+          status === 409
+            ? L('Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.', 'That email is already used by another account.')
+            : status === 400
+              ? L('Ελέγξτε το ονοματεπώνυμο και το email.', 'Check the name and the email.')
+              : L('Οι αλλαγές δεν αποθηκεύτηκαν.', 'The changes were not saved.'),
+      });
+      return;
+    }
+    setMemberEdit(null);
+    setNotice({kind: 'ok', text: L(`Τα στοιχεία του ${name} αποθηκεύτηκαν.`, `${name}'s details were saved.`)});
+    await load();
+  };
 
   /** Deletes the account for good; the history the user left stays. */
   const deleteMember = async (m: Member) => {
@@ -489,12 +520,34 @@ export default function HospitalAdminPage() {
             <div className="hospital-rows">
               {members.map(m => {
                 const self = m.id === me?.id;
+                const editingMember = memberEdit?.id === m.id ? memberEdit : null;
                 return (
                   <div key={m.id} className="hospital-member">
-                    <span>
-                      <b>{m.name}</b>
-                      <small>{m.email}</small>
-                    </span>
+                    {editingMember ? (
+                      <span className="hospital-member-edit">
+                        <input
+                          value={editingMember.name}
+                          onChange={e => setMemberEdit({...editingMember, name: e.target.value})}
+                          placeholder={L('Ονοματεπώνυμο', 'Full name')}
+                          aria-label={L('Ονοματεπώνυμο', 'Full name')}
+                          maxLength={120}
+                          autoFocus
+                        />
+                        <input
+                          type="email"
+                          value={editingMember.email}
+                          onChange={e => setMemberEdit({...editingMember, email: e.target.value})}
+                          onKeyDown={e => e.key === 'Enter' && void saveMember()}
+                          placeholder="email"
+                          aria-label="Email"
+                        />
+                      </span>
+                    ) : (
+                      <span>
+                        <b>{m.name}</b>
+                        <small>{m.email}</small>
+                      </span>
+                    )}
                     <code>{m.user_code || '—'}</code>
                     {wholeHospital(m.role) ? (
                       <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
@@ -537,20 +590,58 @@ export default function HospitalAdminPage() {
                       <span></span>
                       {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
                     </button>
-                    <button
-                      type="button"
-                      className="hospital-member-delete"
-                      disabled={self || busy}
-                      title={
-                        self
-                          ? L('Δεν διαγράφετε τον δικό σας λογαριασμό', 'You cannot delete your own account')
-                          : L('Οριστική διαγραφή', 'Delete for good')
-                      }
-                      aria-label={L(`Διαγραφή ${m.name}`, `Delete ${m.name}`)}
-                      onClick={() => void deleteMember(m)}
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    <span className="hospital-member-actions">
+                      {editingMember ? (
+                        <>
+                          <button
+                            type="button"
+                            className="hospital-member-icon"
+                            disabled={busy || !editingMember.name.trim() || !editingMember.email.trim()}
+                            onClick={() => void saveMember()}
+                            aria-label={L('Αποθήκευση', 'Save')}
+                            title={L('Αποθήκευση', 'Save')}
+                          >
+                            <Save size={15} />
+                          </button>
+                          <button
+                            type="button"
+                            className="hospital-member-icon"
+                            onClick={() => setMemberEdit(null)}
+                            aria-label={L('Ακύρωση', 'Cancel')}
+                            title={L('Ακύρωση', 'Cancel')}
+                          >
+                            <X size={15} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="hospital-member-icon"
+                            disabled={busy}
+                            onClick={() => setMemberEdit({id: m.id, name: m.name, email: m.email || ''})}
+                            aria-label={L(`Επεξεργασία ${m.name}`, `Edit ${m.name}`)}
+                            title={L('Επεξεργασία στοιχείων', 'Edit details')}
+                          >
+                            <Pencil size={15} />
+                          </button>
+                          <button
+                            type="button"
+                            className="hospital-member-delete"
+                            disabled={self || busy}
+                            title={
+                              self
+                                ? L('Δεν διαγράφετε τον δικό σας λογαριασμό', 'You cannot delete your own account')
+                                : L('Οριστική διαγραφή', 'Delete for good')
+                            }
+                            aria-label={L(`Διαγραφή ${m.name}`, `Delete ${m.name}`)}
+                            onClick={() => void deleteMember(m)}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </>
+                      )}
+                    </span>
                   </div>
                 );
               })}

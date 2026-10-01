@@ -4099,7 +4099,7 @@ a.auth-primary {
 .hospital-member-head,
 .hospital-member {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 110px 36px;
+  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 110px 72px;
   align-items: center;
   gap: 10px;
 }
@@ -4233,6 +4233,41 @@ a.auth-primary {
 .hospital-tabs button.active {
   color: #1d6b7a;
   border-bottom-color: #1d6b7a;
+}
+.hospital-member-actions {
+  display: flex !important;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.hospital-member-edit {
+  gap: 4px !important;
+}
+.hospital-member-edit input {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid #cfdbe2;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+}
+.hospital-member-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d6e2e8;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d6b7a;
+  cursor: pointer;
+}
+.hospital-member-icon:hover:not(:disabled) {
+  background: #eef6f8;
+}
+.hospital-member-icon:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 .hospital-member-delete {
   width: 32px;
