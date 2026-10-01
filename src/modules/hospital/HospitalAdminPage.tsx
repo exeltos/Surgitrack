@@ -7,6 +7,8 @@ import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {localizedName} from '../../core/glossary';
 import {getRealIdentity} from '../../data/cloud/identity';
+import {getRuntimeDataMode} from '../../config/dataMode';
+import {useLibraries} from '../../core/LibraryStore';
 import {ACCESS_REQUESTS_CHANGED, managedHospitalId} from '../../data/cloud/accessRequests';
 import type {UserRole} from '../../store/types';
 import {hospitalRoleNames} from '../../config/demoRoles';
@@ -43,6 +45,9 @@ const roles: Array<{id: UserRole; el: string; en: string}> = [
 const wholeHospital = (role: UserRole) => role === 'ADMIN' || role === 'VIEWER';
 /** In the users list Sterilization splits into staff and supervisor (who registers assets and changes Sets). */
 const SUPERVISOR = 'STERILIZATION_SUPERVISOR';
+/** The role as picked in the users list, where a Sterilization supervisor is a role of its own. */
+const roleValue = (m: Pick<Member, 'role' | 'supervisor'>) =>
+  m.role === 'STERILIZATION' && m.supervisor ? SUPERVISOR : m.role;
 const memberRoles = [
   roles[0],
   roles[1],
@@ -60,6 +65,9 @@ export default function HospitalAdminPage() {
   const el = lang === 'el';
   const L = (gr: string, en: string) => (el ? gr : en);
   const organizationId = managedHospitalId();
+  // In Demo the page works on the Demo hospital's own departments and users, kept in this browser.
+  const demo = getRuntimeDataMode() === 'DEMO';
+  const libs = useLibraries();
   const me = getRealIdentity();
   const [hospital, setHospital] = useState('');
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -72,7 +80,8 @@ export default function HospitalAdminPage() {
   const [busy, setBusy] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [tab, setTab] = useState<'SETUP' | 'USERS'>('SETUP');
-  const [memberEdit, setMemberEdit] = useState<{id: string; name: string; email: string} | null>(null);
+  /** The user being edited: every field of a row stays locked until its edit button is pressed. */
+  const [memberEdit, setMemberEdit] = useState<Omit<Member, 'user_code'> | null>(null);
 
   const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
@@ -81,6 +90,26 @@ export default function HospitalAdminPage() {
   };
 
   const load = useCallback(async () => {
+    if (demo) {
+      setHospital(L('Demo νοσοκομείο', 'Demo hospital'));
+      setDepartments(
+        libs.departments.map(d => ({id: d.id, name: d.el, code: d.code || null, active: d.active !== false})),
+      );
+      setRequests([]);
+      setMembers(
+        libs.users.map(u => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          user_code: null,
+          role: u.role,
+          supervisor: false,
+          active: u.active,
+          department_id: libs.departments.find(d => d.el === u.department || d.id === u.department)?.id || null,
+        })),
+      );
+      return;
+    }
     if (!organizationId) return;
     const [org, deps, reqs, profiles] = await Promise.all([
       supabase.from('organizations').select('name').eq('id', organizationId).single(),
@@ -106,13 +135,14 @@ export default function HospitalAdminPage() {
     if (profiles.data) setMembers(profiles.data as Member[]);
     const error = org.error || deps.error || reqs.error || profiles.error;
     if (error) setNotice({kind: 'error', text: error.message});
-  }, [organizationId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organizationId, demo, libs.departments, libs.users, lang]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  if (!organizationId)
+  if (!organizationId && !demo)
     return (
       <div className="hospital-admin">
         <PageHeader
@@ -182,6 +212,11 @@ export default function HospitalAdminPage() {
   const addDepartment = async () => {
     const name = newDepartment.name.trim();
     if (!name) return;
+    if (demo) {
+      libs.addItem('departments', {el: name, en: name, code: newDepartment.code.trim().toUpperCase() || undefined});
+      setNewDepartment({name: '', code: ''});
+      return;
+    }
     const {error} = await supabase.from('departments').insert({
       organization_id: organizationId,
       name,
@@ -194,6 +229,14 @@ export default function HospitalAdminPage() {
   };
   const saveDepartment = async () => {
     if (!editing?.name.trim()) return;
+    if (demo) {
+      libs.updateItem('departments', editing.id, {
+        el: editing.name.trim(),
+        code: editing.code.trim().toUpperCase() || undefined,
+      });
+      setEditing(null);
+      return;
+    }
     const {error} = await supabase
       .from('departments')
       .update({name: editing.name.trim(), code: editing.code.trim().toUpperCase() || null})
@@ -204,15 +247,11 @@ export default function HospitalAdminPage() {
     }
   };
   const toggleDepartment = async (d: Department) => {
+    if (demo) {
+      libs.updateItem('departments', d.id, {active: !d.active});
+      return;
+    }
     const {error} = await supabase.from('departments').update({active: !d.active}).eq('id', d.id);
-    if (!fail(error)) await load();
-  };
-
-  const updateMember = async (
-    m: Member,
-    patch: Partial<Pick<Member, 'role' | 'supervisor' | 'active' | 'department_id'>>,
-  ) => {
-    const {error} = await supabase.from('profiles').update(patch).eq('id', m.id);
     if (!fail(error)) await load();
   };
 
@@ -228,10 +267,27 @@ export default function HospitalAdminPage() {
     const name = memberEdit.name.trim();
     const email = memberEdit.email.trim();
     if (!name || !email) return;
+    if (demo) {
+      const department = wholeHospital(memberEdit.role)
+        ? ''
+        : departments.find(d => d.id === memberEdit.department_id)?.name || '';
+      libs.updateUser(memberEdit.id, {name, email, role: memberEdit.role, active: memberEdit.active, department});
+      setMemberEdit(null);
+      setNotice({kind: 'ok', text: L(`Τα στοιχεία του ${name} αποθηκεύτηκαν.`, `${name}'s details were saved.`)});
+      return;
+    }
     setBusy(true);
     setNotice(null);
     const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('update-staff', {
-      body: {user_id: memberEdit.id, name, email},
+      body: {
+        user_id: memberEdit.id,
+        name,
+        email,
+        role: memberEdit.role,
+        supervisor: memberEdit.supervisor,
+        department_id: wholeHospital(memberEdit.role) ? null : memberEdit.department_id,
+        active: memberEdit.active,
+      },
     });
     setBusy(false);
     if (error || !data?.ok) {
@@ -263,6 +319,11 @@ export default function HospitalAdminPage() {
       )
     )
       return;
+    if (demo) {
+      libs.removeUser(m.id);
+      setNotice({kind: 'ok', text: L(`Ο λογαριασμός ${m.name} διαγράφηκε.`, `${m.name}'s account was deleted.`)});
+      return;
+    }
     setBusy(true);
     setNotice(null);
     const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('delete-staff', {body: {user_id: m.id}});
@@ -419,7 +480,18 @@ export default function HospitalAdminPage() {
             )}
           </section>
 
-          <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />
+          {organizationId && !demo ? (
+            <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />
+          ) : (
+            <section className="hospital-card">
+              <p className="hospital-empty">
+                {L(
+                  'Στο Demo ο σύνδεσμος εγγραφής και τα αιτήματα πρόσβασης δεν είναι διαθέσιμα. Τμήματα και χρήστες αλλάζουν κανονικά, μόνο σε αυτό τον browser.',
+                  'In Demo the signup link and access requests are not available. Departments and users change as usual, in this browser only.',
+                )}
+              </p>
+            </section>
+          )}
 
           <section className="hospital-card hospital-departments-card">
             <header>
@@ -522,7 +594,7 @@ export default function HospitalAdminPage() {
                 const self = m.id === me?.id;
                 const editingMember = memberEdit?.id === m.id ? memberEdit : null;
                 return (
-                  <div key={m.id} className="hospital-member">
+                  <div key={m.id} className={`hospital-member${editingMember ? ' editing' : ''}`}>
                     {editingMember ? (
                       <span className="hospital-member-edit">
                         <input
@@ -549,47 +621,72 @@ export default function HospitalAdminPage() {
                       </span>
                     )}
                     <code>{m.user_code || '—'}</code>
-                    {wholeHospital(m.role) ? (
-                      <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                    {editingMember ? (
+                      <>
+                        {wholeHospital(editingMember.role) ? (
+                          <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                        ) : (
+                          <select
+                            value={editingMember.department_id || ''}
+                            onChange={e => setMemberEdit({...editingMember, department_id: e.target.value || null})}
+                            aria-label={L('Τμήμα', 'Department')}
+                          >
+                            <option value="">—</option>
+                            {departments.map(d => (
+                              <option key={d.id} value={d.id}>
+                                {localizedName(d.name, lang)}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        <select
+                          value={roleValue(editingMember)}
+                          disabled={self}
+                          aria-label={L('Ρόλος', 'Role')}
+                          onChange={e =>
+                            setMemberEdit({
+                              ...editingMember,
+                              ...(e.target.value === SUPERVISOR
+                                ? {role: 'STERILIZATION', supervisor: true}
+                                : {role: e.target.value as UserRole, supervisor: false}),
+                            })
+                          }
+                        >
+                          {memberRoles.map(role => (
+                            <option key={role.id} value={role.id}>
+                              {el ? role.el : role.en}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className={`studio-access-toggle ${editingMember.active ? 'active' : ''}`}
+                          disabled={self}
+                          onClick={() => setMemberEdit({...editingMember, active: !editingMember.active})}
+                        >
+                          <span></span>
+                          {editingMember.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                        </button>
+                      </>
                     ) : (
-                      <select
-                        value={m.department_id || ''}
-                        onChange={e => void updateMember(m, {department_id: e.target.value || null})}
-                      >
-                        <option value="">—</option>
-                        {departments.map(d => (
-                          <option key={d.id} value={d.id}>
-                            {localizedName(d.name, lang)}
-                          </option>
-                        ))}
-                      </select>
+                      <>
+                        <span className={`hospital-member-value${wholeHospital(m.role) ? ' whole' : ''}`}>
+                          {wholeHospital(m.role)
+                            ? L('Όλο το νοσοκομείο', 'Whole hospital')
+                            : localizedName(departments.find(d => d.id === m.department_id)?.name || '—', lang)}
+                        </span>
+                        <span className="hospital-member-value">
+                          {(() => {
+                            const role = memberRoles.find(r => r.id === roleValue(m));
+                            return role ? (el ? role.el : role.en) : m.role;
+                          })()}
+                        </span>
+                        <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
+                          <i></i>
+                          {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                        </span>
+                      </>
                     )}
-                    <select
-                      value={m.role === 'STERILIZATION' && m.supervisor ? SUPERVISOR : m.role}
-                      disabled={self}
-                      onChange={e =>
-                        void updateMember(
-                          m,
-                          e.target.value === SUPERVISOR
-                            ? {role: 'STERILIZATION', supervisor: true}
-                            : {role: e.target.value as UserRole, supervisor: false},
-                        )
-                      }
-                    >
-                      {memberRoles.map(role => (
-                        <option key={role.id} value={role.id}>
-                          {el ? role.el : role.en}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      className={`studio-access-toggle ${m.active ? 'active' : ''}`}
-                      disabled={self}
-                      onClick={() => void updateMember(m, {active: !m.active})}
-                    >
-                      <span></span>
-                      {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                    </button>
                     <span className="hospital-member-actions">
                       {editingMember ? (
                         <>
@@ -619,7 +716,11 @@ export default function HospitalAdminPage() {
                             type="button"
                             className="hospital-member-icon"
                             disabled={busy}
-                            onClick={() => setMemberEdit({id: m.id, name: m.name, email: m.email || ''})}
+                            onClick={() => {
+                              const {user_code: _code, ...draft} = m;
+                              void _code;
+                              setMemberEdit({...draft, email: m.email || ''});
+                            }}
                             aria-label={L(`Επεξεργασία ${m.name}`, `Edit ${m.name}`)}
                             title={L('Επεξεργασία στοιχείων', 'Edit details')}
                           >

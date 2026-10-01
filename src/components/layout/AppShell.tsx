@@ -97,8 +97,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly =
     !isDemo && !!getRealIdentity()?.platform && !sessionStorage.getItem('surgitrack-active-organization');
-  // Hospital administration exists only for a real hospital's admin working as Admin.
+  // Hospital administration: a real hospital's admin working as Admin, or the Admin of Demo.
   const hospitalId = role === 'ADMIN' ? managedHospitalId() : undefined;
+  const hospitalAdmin = !!hospitalId || (isDemo && role === 'ADMIN');
   const [pendingAccess, setPendingAccess] = useState(0);
   useEffect(() => {
     if (!hospitalId) return;
@@ -116,7 +117,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       ? navigationFor(role, can).filter(item => PLATFORM_ONLY_PAGES.includes(item.to))
       : navigationFor(role, can)
   )
-    .filter(item => item.to !== '/hospital' || !!hospitalId)
+    .filter(item => item.to !== '/hospital' || hospitalAdmin)
     // The list of all hospitals is the platform admin's, outside Demo.
     .filter(item => item.to !== '/hospitals' || actingAsPlatformOwner());
   useEffect(() => {
