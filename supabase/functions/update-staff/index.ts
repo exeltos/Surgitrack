@@ -1,9 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 
-// Edits a staff account's details: full name and sign-in email. Only a hospital admin for users
-// of their own hospital, or the platform admin. The email changes on the sign-in account too, so
-// the person signs in with the new one; the username (user code) stays the same.
+// Edits a staff account: full name, sign-in email, department, role and access (and Demo access,
+// for the platform admin only). Only a hospital admin for users of their own hospital, or the
+// platform admin. The email changes on the sign-in account too, so the person signs in with the
+// new one; the username (user code) stays the same. Nobody changes their own role or access.
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -11,6 +12,7 @@ const cors = {
 };
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
+const ROLES = new Set(["DEPARTMENT", "STERILIZATION", "ADMIN", "VIEWER"]);
 const EMAIL_FORMAT = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 Deno.serve(async req => {
@@ -39,14 +41,42 @@ Deno.serve(async req => {
     if (!name || name.length > 120) return json({error: "invalid_name"}, 400);
     if (!EMAIL_FORMAT.test(email) || email.length > 254) return json({error: "invalid_email"}, 400);
 
-    const {data: target} = await admin.from("profiles").select("id, organization_id, email").eq("id", userId).maybeSingle();
+    const {data: target} = await admin
+      .from("profiles")
+      .select("id, organization_id, email, role, supervisor, active, department_id, demo_enabled")
+      .eq("id", userId)
+      .maybeSingle();
     if (!target) return json({error: "not_found"}, 404);
     // A hospital admin only manages their own hospital; the platform admin (no hospital) any.
     if (me.organization_id && target.organization_id !== me.organization_id) return json({error: "forbidden"}, 403);
     if (!target.organization_id) return json({error: "forbidden"}, 403);
 
-    if (email !== String(target.email || "").toLowerCase()) {
-      const {data: taken} = await admin.from("profiles").select("id").ilike("email", email).neq("id", userId).limit(1);
+    // Fields left out keep their value.
+    const role = body?.role === undefined ? target.role : String(body.role);
+    if (!ROLES.has(role)) return json({error: "invalid_role"}, 400);
+    const supervisor = role === "STERILIZATION" && (body?.supervisor === undefined ? !!target.supervisor : !!body.supervisor);
+    const active = body?.active === undefined ? target.active : !!body.active;
+    const wholeHospital = role === "ADMIN" || role === "VIEWER";
+    let departmentId = body?.department_id === undefined ? target.department_id : body.department_id || null;
+    if (wholeHospital) departmentId = null;
+    if (departmentId) {
+      const {data: department} = await admin
+        .from("departments")
+        .select("id")
+        .eq("id", departmentId)
+        .eq("organization_id", target.organization_id)
+        .maybeSingle();
+      if (!department) return json({error: "invalid_department"}, 400);
+    }
+    if (userId === auth.user.id && (role !== target.role || active !== target.active)) return json({error: "self"}, 403);
+    // Demo access is the platform admin's to give.
+    const demoEnabled =
+      !me.organization_id && body?.demo_enabled !== undefined ? !!body.demo_enabled : target.demo_enabled;
+
+    const emailChanged = email !== String(target.email || "").toLowerCase();
+    if (emailChanged) {
+      const pattern = email.replace(/[\\%_]/g, "\\$&");
+      const {data: taken} = await admin.from("profiles").select("id").ilike("email", pattern).neq("id", userId).limit(1);
       if (taken?.length) return json({error: "email_taken"}, 409);
       const {error} = await admin.auth.admin.updateUserById(userId, {email, email_confirm: true});
       if (error) {
@@ -54,8 +84,23 @@ Deno.serve(async req => {
         return json({error: status === 409 ? "email_taken" : "update_failed", message: error.message}, status);
       }
     }
-    const {error} = await admin.from("profiles").update({name, email}).eq("id", userId);
-    if (error) return json({error: "update_failed", message: error.message}, 500);
+    const {error} = await admin
+      .from("profiles")
+      .update({
+        name,
+        email,
+        role,
+        supervisor,
+        active,
+        department_id: departmentId,
+        demo_enabled: demoEnabled,
+      })
+      .eq("id", userId);
+    if (error) {
+      // Keep the sign-in email and the profile in step.
+      if (emailChanged && target.email) await admin.auth.admin.updateUserById(userId, {email: target.email, email_confirm: true});
+      return json({error: "update_failed", message: error.message}, 500);
+    }
     return json({ok: true, name, email});
   } catch (e) {
     return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);

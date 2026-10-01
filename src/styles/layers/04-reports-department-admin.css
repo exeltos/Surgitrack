@@ -3704,7 +3704,7 @@
   .studio-user-head span:nth-child(3),
   .studio-user-row > span:nth-child(3),
   .studio-user-head span:nth-child(6),
-  .studio-user-row > button:nth-of-type(2) {
+  .studio-user-row > span:nth-child(6) {
     display: none;
   }
 }
@@ -4286,4 +4286,42 @@ a.auth-primary {
 .hospital-member-delete:disabled {
   opacity: 0.35;
   cursor: default;
+}
+/* Locked (read-only) values of a user row; they turn into fields with the row's edit button. */
+.hospital-member-value {
+  color: #344054;
+  font-size: 12.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hospital-member-value.whole {
+  color: #667085;
+  font-style: italic;
+}
+.hospital-member-status,
+.hospital-member > span.hospital-member-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #7a8790;
+  font-size: 11px;
+  font-weight: 700;
+}
+.hospital-member-status > i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cdd7dd;
+}
+.hospital-member-status.active {
+  color: #25704f;
+}
+.hospital-member-status.active > i {
+  background: #5ca982;
+}
+.hospital-member.editing {
+  border-color: #9fc9d3;
+  background: #f6fbfc;
 }

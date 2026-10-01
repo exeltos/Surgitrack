@@ -416,18 +416,44 @@ export default function StudioPage() {
     } else setBulkRows([]);
     await loadCloudUsers();
   };
-  const setCloudUserAccess = async (u: AdminUser, patch: {active?: boolean; demoEnabled?: boolean}) => {
+  /** Saves an existing user: in Demo the local registry, otherwise the account itself. */
+  const updateUser = async (u: AdminUser, data: Omit<AdminUser, 'id'>) => {
     if (libs.dataMode === 'DEMO') {
-      libs.updateUser(u.id, patch);
+      libs.updateUser(u.id, data);
+      setUserEditor(undefined);
       return;
     }
-    const {error} = await supabase.rpc('platform_set_profile_access', {
-      p_id: u.id,
-      p_active: patch.active ?? u.active,
-      p_demo_enabled: patch.demoEnabled ?? u.demoEnabled,
+    const {data: result, error} = await supabase.functions.invoke<{ok?: boolean}>('update-staff', {
+      body: {
+        user_id: u.id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        department_id: data.department || null,
+        active: data.active,
+        demo_enabled: data.demoEnabled,
+      },
     });
-    if (error) {
-      setCloudError(error.message);
+    if (error || !result?.ok) {
+      const status = (error as {context?: {status?: number}} | null)?.context?.status;
+      setCloudError(
+        status === 409
+          ? L('Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.', 'That email is already used by another account.')
+          : L('Οι αλλαγές του χρήστη δεν αποθηκεύτηκαν.', "The user's changes were not saved."),
+      );
+      return;
+    }
+    setUserEditor(undefined);
+    await loadCloudUsers();
+  };
+  const deleteUser = async (u: AdminUser) => {
+    if (libs.dataMode === 'DEMO') {
+      libs.removeUser(u.id);
+      return;
+    }
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('delete-staff', {body: {user_id: u.id}});
+    if (error || !data?.ok) {
+      setCloudError(L(`Η διαγραφή του ${u.name} δεν ολοκληρώθηκε.`, `${u.name} could not be deleted.`));
       return;
     }
     await loadCloudUsers();
@@ -1514,49 +1540,43 @@ export default function StudioPage() {
                   <span className="role-chip">
                     {L(roles.find(r => r.id === u.role)?.el || u.role, roles.find(r => r.id === u.role)?.en || u.role)}
                   </span>
-                  <button
-                    className={`studio-access-toggle ${u.active ? 'active' : ''}`}
-                    onClick={() => void setCloudUserAccess(u, {active: !u.active})}
-                  >
-                    <span></span>
+                  <span className={`hospital-member-status ${u.active ? 'active' : ''}`}>
+                    <i></i>
                     {u.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                  </button>
-                  <button
-                    className={`studio-access-toggle demo ${u.demoEnabled ? 'active' : ''}`}
-                    disabled={u.role === 'ADMIN'}
-                    title={
-                      u.role === 'ADMIN'
-                        ? L('Ο Platform Admin έχει πάντα πρόσβαση.', 'Platform Admin always has access.')
-                        : ''
-                    }
-                    onClick={() => void setCloudUserAccess(u, {demoEnabled: !u.demoEnabled})}
-                  >
-                    <span></span>
+                  </span>
+                  <span className={`hospital-member-status ${u.role === 'ADMIN' || u.demoEnabled ? 'active' : ''}`}>
+                    <i></i>
                     {u.role === 'ADMIN' ? L('Admin', 'Admin') : u.demoEnabled ? 'Demo ON' : 'Demo OFF'}
-                  </button>
+                  </span>
                   <div className="studio-row-actions">
-                    {libs.dataMode === 'DEMO' && (
-                      <button onClick={() => setUserEditor(u)}>
-                        <Pencil size={16} />
-                      </button>
-                    )}
-                    {libs.dataMode === 'DEMO' && (
-                      <button
-                        className="danger-icon"
-                        onClick={() =>
-                          setConfirm({
-                            title: L('Διαγραφή χρήστη;', 'Delete user?'),
-                            message: L(
-                              `Ο χρήστης ${u.name} θα αφαιρεθεί από το demo μητρώο χρηστών.`,
-                              `User ${u.name} will be removed from the demo user registry.`,
-                            ),
-                            action: () => libs.removeUser(u.id),
-                          })
-                        }
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setUserEditor(u)}
+                      aria-label={L(`Επεξεργασία ${u.name}`, `Edit ${u.name}`)}
+                      title={L('Επεξεργασία', 'Edit')}
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="danger-icon"
+                      onClick={() =>
+                        setConfirm({
+                          title: L('Διαγραφή χρήστη;', 'Delete user?'),
+                          message:
+                            libs.dataMode === 'DEMO'
+                              ? L(
+                                  `Ο χρήστης ${u.name} θα αφαιρεθεί από το demo μητρώο χρηστών.`,
+                                  `User ${u.name} will be removed from the demo user registry.`,
+                                )
+                              : L(
+                                  `Οριστική διαγραφή του λογαριασμού ${u.name}. Δεν θα μπορεί πλέον να συνδεθεί. Το ιστορικό του παραμένει.`,
+                                  `${u.name}'s account is deleted for good. They will no longer be able to sign in. Their history stays.`,
+                                ),
+                          action: () => void deleteUser(u),
+                        })
+                      }
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -1943,10 +1963,8 @@ export default function StudioPage() {
           cloudDepartments={libs.dataMode === 'PRODUCTION' ? cloudDepartments : undefined}
           onClose={() => setUserEditor(undefined)}
           onSave={data => {
-            if (userEditor && libs.dataMode === 'DEMO') {
-              libs.updateUser(userEditor.id, data);
-              setUserEditor(undefined);
-            } else void inviteUser(data);
+            if (userEditor) void updateUser(userEditor, data);
+            else void inviteUser(data);
           }}
         />
       )}
@@ -2161,7 +2179,7 @@ function UserEditor({
           </label>
           <label>
             {tr('Νοσοκομείο')}
-            <select value={organizationId} onChange={e => setOrganizationId(e.target.value)}>
+            <select value={organizationId} disabled={!!user} onChange={e => setOrganizationId(e.target.value)}>
               {organizations.map(org => (
                 <option key={org.id} value={org.id}>
                   {org.name}
@@ -2232,14 +2250,16 @@ function UserEditor({
             />
             <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
           </label>
-          <div className="studio-form-note">
-            <KeyRound size={16} />
-            <span>
-              {tr(
-                'Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα αρχικά του.',
-              )}
-            </span>
-          </div>
+          {!user && (
+            <div className="studio-form-note">
+              <KeyRound size={16} />
+              <span>
+                {tr(
+                  'Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα αρχικά του.',
+                )}
+              </span>
+            </div>
+          )}
         </div>
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
