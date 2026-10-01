@@ -3704,7 +3704,7 @@
   .studio-user-head span:nth-child(3),
   .studio-user-row > span:nth-child(3),
   .studio-user-head span:nth-child(6),
-  .studio-user-row > button:nth-of-type(2) {
+  .studio-user-row > span:nth-child(6) {
     display: none;
   }
 }

@@ -20,6 +20,8 @@ export type AdminUser = {
   active: boolean;
   organizationId: string;
   demoEnabled: boolean;
+  /** Sterilization supervisor (registers assets and changes Sets). */
+  supervisor?: boolean;
 };
 export type RolePermissionAudit = {id: string; role: UserRole; at: string; by: string; permissions: Permission[]};
 /** What the top of a barcode label shows. */

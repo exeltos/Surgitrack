@@ -103,7 +103,7 @@ export default function HospitalAdminPage() {
           email: u.email,
           user_code: null,
           role: u.role,
-          supervisor: false,
+          supervisor: u.role === 'STERILIZATION' && !!u.supervisor,
           active: u.active,
           department_id: libs.departments.find(d => d.el === u.department || d.id === u.department)?.id || null,
         })),
@@ -271,7 +271,14 @@ export default function HospitalAdminPage() {
       const department = wholeHospital(memberEdit.role)
         ? ''
         : departments.find(d => d.id === memberEdit.department_id)?.name || '';
-      libs.updateUser(memberEdit.id, {name, email, role: memberEdit.role, active: memberEdit.active, department});
+      libs.updateUser(memberEdit.id, {
+        name,
+        email,
+        role: memberEdit.role,
+        supervisor: memberEdit.role === 'STERILIZATION' && memberEdit.supervisor,
+        active: memberEdit.active,
+        department,
+      });
       setMemberEdit(null);
       setNotice({kind: 'ok', text: L(`Τα στοιχεία του ${name} αποθηκεύτηκαν.`, `${name}'s details were saved.`)});
       return;
