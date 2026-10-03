@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {demoSurgiRepository} from '../../repositories/demoRepository';
-import {tableFromRow, tableToRow, type TableCollection} from '../cloudTables';
+import {TABLE_COLLECTIONS, tableFromRow, tableToRow, type TableCollection} from '../cloudTables';
 
 const ORG = '11111111-2222-4333-8444-555555555555';
 type Item = {id: string} & Record<string, unknown>;
@@ -14,11 +14,69 @@ describe('cloud tables', () => {
   const data = demoSurgiRepository.getInitialData();
 
   it('brings every demo record back exactly as it was saved', () => {
-    for (const set of data.sets) expect(roundTrip('sets', set as unknown as Item)).toEqual(set);
-    for (const tool of data.tools) expect(roundTrip('tools', tool as unknown as Item)).toEqual(tool);
-    for (const movement of data.movements)
-      expect(roundTrip('movements', movement as unknown as Item)).toEqual(movement);
-    for (const issue of data.issues) expect(roundTrip('issues', issue as unknown as Item)).toEqual(issue);
+    const initial = data as unknown as Record<string, Item[] | undefined>;
+    let checked = 0;
+    for (const collection of TABLE_COLLECTIONS)
+      for (const item of initial[collection] || []) {
+        expect(roundTrip(collection, item)).toEqual(item);
+        checked++;
+      }
+    expect(checked).toBeGreaterThan(300);
+  });
+
+  it('keeps booleans, id lists and nested checks of the sterilization records', () => {
+    const preparation = {
+      id: 'p1',
+      workflowVersion: 3,
+      assetId: 's1',
+      assetKind: 'SET',
+      barcode: 'S1',
+      assetName: 'Σετ',
+      department: 'Χειρουργείο',
+      preparedByUserId: 'u1',
+      preparedByName: 'Μ.',
+      preparedByDepartment: 'Αποστείρωση',
+      at: '30/9/26, 10:27 π.μ.',
+      toolIds: ['t1', 't2'],
+      checkedToolIds: ['t1'],
+      allOk: false,
+      processChecks: {cleanDry: true, functionIntegrity: false, assembly: true, packaging: true, labelIndicator: true},
+    };
+    const checkpoint = {
+      id: 'w1',
+      workflowVersion: 3,
+      assetId: 's1',
+      assetKind: 'SET',
+      barcode: 'S1',
+      assetName: 'Σετ',
+      department: 'Χειρουργείο',
+      stageId: 'WASHING',
+      checks: [true, false, true],
+      completedByUserId: 'u1',
+      completedByName: 'Μ.',
+      completedByDepartment: 'Αποστείρωση',
+      completedAt: '30/9/26',
+    };
+    const count = {
+      id: 'c1',
+      setId: 's1',
+      patientCode: 'P1',
+      expected: 10,
+      counted: 9,
+      result: 'MISSING',
+      note: '',
+      at: 'x',
+      by: 'Μ.',
+      signed: true,
+    };
+    expect(roundTrip('preparations', preparation)).toEqual(preparation);
+    expect(roundTrip('workflowCheckpoints', checkpoint)).toEqual(checkpoint);
+    expect(roundTrip('counts', count)).toEqual(count);
+    expect(tableToRow(ORG, 'preparations', preparation)).toMatchObject({
+      tool_ids: ['t1', 't2'],
+      all_ok: false,
+      extra: null,
+    });
   });
 
   it('writes history without a change stamp and changeable records with one', () => {

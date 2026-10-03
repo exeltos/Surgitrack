@@ -84,6 +84,100 @@ const ISSUE_FIELDS: readonly Field[] = [
   ['photos', 'photos', 'json'],
 ];
 
+const RECEIPTS_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['batchId', 'batch_id', 'text'],
+  ['assetId', 'asset_id', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['barcode', 'barcode', 'text'],
+  ['assetName', 'asset_name', 'text'],
+  ['fromDepartment', 'from_department', 'text'],
+  ['toDepartment', 'to_department', 'text'],
+  ['deliveredByUserId', 'delivered_by_user_id', 'text'],
+  ['deliveredByName', 'delivered_by_name', 'text'],
+  ['deliveredByDepartment', 'delivered_by_department', 'text'],
+  ['receivedByUserId', 'received_by_user_id', 'text'],
+  ['receivedByName', 'received_by_name', 'text'],
+  ['receivedByDepartment', 'received_by_department', 'text'],
+  ['at', 'at', 'text'],
+  ['note', 'note', 'text'],
+  ['visibleDeviation', 'visible_deviation', 'boolean'],
+  ['departmentMismatch', 'department_mismatch', 'boolean'],
+  ['departmentMismatchReason', 'department_mismatch_reason', 'text'],
+  ['expected', 'expected', 'number'],
+  ['actual', 'actual', 'number'],
+  ['checkPerformed', 'check_performed', 'boolean'],
+  ['checkedCount', 'checked_count', 'number'],
+  ['checkResult', 'check_result', 'text'],
+  ['checkNote', 'check_note', 'text'],
+  ['itemChecks', 'item_checks', 'json'],
+  ['setChecks', 'set_checks', 'json'],
+];
+
+const DELIVERIES_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['batchId', 'batch_id', 'text'],
+  ['assetId', 'asset_id', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['barcode', 'barcode', 'text'],
+  ['assetName', 'asset_name', 'text'],
+  ['department', 'department', 'text'],
+  ['deliveredByUserId', 'delivered_by_user_id', 'text'],
+  ['deliveredByName', 'delivered_by_name', 'text'],
+  ['deliveredByDepartment', 'delivered_by_department', 'text'],
+  ['receivedByUserId', 'received_by_user_id', 'text'],
+  ['receivedByName', 'received_by_name', 'text'],
+  ['receivedByDepartment', 'received_by_department', 'text'],
+  ['at', 'at', 'text'],
+  ['note', 'note', 'text'],
+];
+
+const PREPARATIONS_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['assetId', 'asset_id', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['barcode', 'barcode', 'text'],
+  ['assetName', 'asset_name', 'text'],
+  ['department', 'department', 'text'],
+  ['preparedByUserId', 'prepared_by_user_id', 'text'],
+  ['preparedByName', 'prepared_by_name', 'text'],
+  ['preparedByDepartment', 'prepared_by_department', 'text'],
+  ['at', 'at', 'text'],
+  ['toolIds', 'tool_ids', 'textArray'],
+  ['checkedToolIds', 'checked_tool_ids', 'textArray'],
+  ['allOk', 'all_ok', 'boolean'],
+  ['processChecks', 'process_checks', 'json'],
+  ['note', 'note', 'text'],
+];
+
+const SURGICAL_COUNTS_FIELDS: readonly Field[] = [
+  ['setId', 'set_id', 'text'],
+  ['patientCode', 'patient_code', 'text'],
+  ['expected', 'expected', 'number'],
+  ['counted', 'counted', 'number'],
+  ['result', 'result', 'text'],
+  ['note', 'note', 'text'],
+  ['at', 'at', 'text'],
+  ['by', 'by_name', 'text'],
+  ['signed', 'signed', 'boolean'],
+];
+
+const WORKFLOW_CHECKPOINTS_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['assetId', 'asset_id', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['barcode', 'barcode', 'text'],
+  ['assetName', 'asset_name', 'text'],
+  ['department', 'department', 'text'],
+  ['stageId', 'stage_id', 'text'],
+  ['checks', 'checks', 'json'],
+  ['note', 'note', 'text'],
+  ['completedByUserId', 'completed_by_user_id', 'text'],
+  ['completedByName', 'completed_by_name', 'text'],
+  ['completedByDepartment', 'completed_by_department', 'text'],
+  ['completedAt', 'completed_on', 'text'],
+];
+
 /** Columns a record never carries: the row's identity and bookkeeping. */
 const BOOKKEEPING = ['organization_id', 'id', 'extra', 'created_at', 'updated_at', 'updated_by', 'created_by'];
 
@@ -106,6 +200,11 @@ export const CLOUD_TABLES = {
   tools: {table: 'instruments', fields: TOOL_FIELDS, mutable: true, defaults: {code: '', uses: 0, sterilizations: 0}},
   movements: {table: 'movements', fields: MOVEMENT_FIELDS, mutable: false},
   issues: {table: 'issues', fields: ISSUE_FIELDS, mutable: true, defaults: {note: ''}},
+  receipts: {table: 'receipts', fields: RECEIPTS_FIELDS, mutable: false},
+  deliveries: {table: 'deliveries', fields: DELIVERIES_FIELDS, mutable: false},
+  preparations: {table: 'preparations', fields: PREPARATIONS_FIELDS, mutable: false},
+  counts: {table: 'surgical_counts', fields: SURGICAL_COUNTS_FIELDS, mutable: false},
+  workflowCheckpoints: {table: 'workflow_checkpoints', fields: WORKFLOW_CHECKPOINTS_FIELDS, mutable: false},
 } as const satisfies Record<string, TableSpec>;
 export type TableCollection = keyof typeof CLOUD_TABLES;
 export const TABLE_COLLECTIONS = Object.keys(CLOUD_TABLES) as TableCollection[];
