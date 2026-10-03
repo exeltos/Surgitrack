@@ -1,17 +1,14 @@
 import {supabase} from '../../lib/supabase';
 import {
-  INSTRUMENT_TABLES,
-  instrumentColumns,
-  instrumentFromRow,
-  instrumentToRow,
-  isInstrumentCollection,
-  type InstrumentCollection,
-} from './instrumentTables';
+  CLOUD_TABLES,
+  TABLE_COLLECTIONS,
+  tableColumns,
+  tableFromRow,
+  tableToRow,
+  type TableCollection,
+} from './cloudTables';
 
-/**
- * Store collections saved in the cloud, one row per record. Sets and instruments have their own
- * tables (see instrumentTables); the rest are still rows of `public.app_records`.
- */
+/** Store collections saved in the cloud: each has its own table (see cloudTables), one row per record. */
 export const STORE_COLLECTIONS = [
   'sets',
   'tools',
@@ -31,19 +28,6 @@ export type StoreCollection = (typeof STORE_COLLECTIONS)[number];
 export type CloudCollection = StoreCollection | 'library';
 export type CloudRecord = {id: string};
 
-/**
- * Collections whose records change after creation. Everything else is traceability
- * history: written once and never updated (the database rejects updates too).
- */
-export const MUTABLE_COLLECTIONS: ReadonlySet<CloudCollection> = new Set([
-  'library',
-  'sets',
-  'tools',
-  'issues',
-  'processLoads',
-  'recallCases',
-]);
-
 export type CloudRecords = Record<CloudCollection, CloudRecord[]>;
 
 const PAGE_SIZE = 1000;
@@ -52,20 +36,20 @@ const WRITE_CHUNK = 200;
 const emptyRecords = (): CloudRecords =>
   Object.fromEntries([...STORE_COLLECTIONS, 'library'].map(c => [c, []])) as unknown as CloudRecords;
 
-/** Loads one of the instrument tables, newest first (the store's order). */
-async function loadInstrumentTable(organizationId: string, collection: InstrumentCollection) {
+/** Loads one collection's table, newest first (the store's order). */
+async function loadTable(organizationId: string, collection: TableCollection) {
   const rows: CloudRecord[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const {data, error} = await supabase
-      .from(INSTRUMENT_TABLES[collection].table)
-      .select(instrumentColumns(collection))
+      .from(CLOUD_TABLES[collection].table)
+      .select(tableColumns(collection))
       .eq('organization_id', organizationId)
       .order('created_at', {ascending: false})
       .order('id')
       .range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     const page = data as unknown as Array<Record<string, unknown>>;
-    rows.push(...page.map(row => instrumentFromRow(collection, row)));
+    rows.push(...page.map(row => tableFromRow(collection, row)));
     if (page.length < PAGE_SIZE) return rows;
   }
 }
@@ -73,30 +57,9 @@ async function loadInstrumentTable(organizationId: string, collection: Instrumen
 /** Loads every record of an organization, newest first within each collection (the store's order). */
 export async function loadAppRecords(organizationId: string): Promise<CloudRecords> {
   const records = emptyRecords();
-  const [sets, tools] = await Promise.all([
-    loadInstrumentTable(organizationId, 'sets'),
-    loadInstrumentTable(organizationId, 'tools'),
-  ]);
-  records.sets = sets;
-  records.tools = tools;
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const {data, error} = await supabase
-      .from('app_records')
-      .select('collection,id,data')
-      .eq('organization_id', organizationId)
-      // Sets and instruments come from their own tables.
-      .not('collection', 'in', '(sets,tools)')
-      .order('collection')
-      .order('created_at', {ascending: false})
-      .order('id')
-      .range(from, from + PAGE_SIZE - 1);
-    if (error) throw error;
-    for (const row of data) {
-      const list = records[row.collection as CloudCollection];
-      if (list) list.push({...(row.data as object), id: row.id} as CloudRecord);
-    }
-    if (data.length < PAGE_SIZE) return records;
-  }
+  const loaded = await Promise.all(TABLE_COLLECTIONS.map(collection => loadTable(organizationId, collection)));
+  TABLE_COLLECTIONS.forEach((collection, index) => (records[collection] = loaded[index]));
+  return records;
 }
 
 const chunks = <T>(items: T[]) =>
@@ -104,27 +67,15 @@ const chunks = <T>(items: T[]) =>
     items.slice(i * WRITE_CHUNK, (i + 1) * WRITE_CHUNK),
   );
 
-const toRow = (organizationId: string, collection: CloudCollection, item: CloudRecord, createdAt?: string) => {
-  const {id, ...data} = item;
-  return {
-    organization_id: organizationId,
-    collection,
-    id,
-    data,
-    updated_at: new Date().toISOString(),
-    ...(createdAt ? {created_at: createdAt} : {}),
-  };
-};
-
 const UNIQUE_VIOLATION = '23505';
 const RLS_VIOLATION = '42501';
 
 /**
- * Saves one Set or instrument row: an update when it exists, otherwise an insert. Department users
- * may update (handovers change state) but only Sterilization may create, and an upsert is checked
- * against the create rule even when it ends up updating — hence the separate update.
+ * Saves one row: an update when it exists, otherwise an insert. Department users may update a Set
+ * or instrument (handovers change state) but only Sterilization may create one, and an upsert is
+ * checked against the create rule even when it ends up updating — hence the separate update.
  */
-async function saveInstrumentRow(table: string, row: Record<string, unknown>): Promise<'saved' | 'conflict'> {
+async function saveTableRow(table: string, row: Record<string, unknown>): Promise<'saved' | 'conflict'> {
   const {organization_id: organizationId, id, ...changes} = row;
   const {data, error} = await supabase
     .from(table)
@@ -142,64 +93,34 @@ async function saveInstrumentRow(table: string, row: Record<string, unknown>): P
 }
 
 /**
- * Saves Sets or instruments. Batches go in one request; when the database refuses a batch (a
- * barcode another record already holds, or a department user updating) each record is saved on its
- * own. Returns the ids that could not be saved because of a barcode clash, so the rest still count
- * as saved.
+ * Saves records of a collection. Batches go in one request; history is
+ * insert-only (a record already saved stays as it was). When the database refuses a batch of
+ * changeable records (a barcode another record already holds, or a department user updating),
+ * each record is saved on its own. Returns the ids refused for a barcode clash, so the rest still
+ * count as saved.
  */
-async function writeInstrumentRows(organizationId: string, collection: InstrumentCollection, items: CloudRecord[]) {
-  const table = INSTRUMENT_TABLES[collection].table;
+export async function writeAppRecords(organizationId: string, collection: CloudCollection, items: CloudRecord[]) {
+  const {table, mutable} = CLOUD_TABLES[collection];
   const toRow = (item: CloudRecord) =>
-    instrumentToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
+    tableToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
   const rejected: string[] = [];
   for (const chunk of chunks(items)) {
-    const {error} = await supabase.from(table).upsert(chunk.map(toRow), {onConflict: 'organization_id,id'});
+    const {error} = await supabase
+      .from(table)
+      .upsert(chunk.map(toRow), {onConflict: 'organization_id,id', ignoreDuplicates: !mutable});
     if (!error) continue;
-    if (error.code !== UNIQUE_VIOLATION && error.code !== RLS_VIOLATION) throw error;
-    for (const item of chunk) if ((await saveInstrumentRow(table, toRow(item))) === 'conflict') rejected.push(item.id);
+    if (!mutable || (error.code !== UNIQUE_VIOLATION && error.code !== RLS_VIOLATION)) throw error;
+    for (const item of chunk) if ((await saveTableRow(table, toRow(item))) === 'conflict') rejected.push(item.id);
   }
   return rejected;
 }
 
-/**
- * Inserts new records and updates changed ones; history collections are insert-only. Returns the
- * ids of records the database refused (a barcode already in use); every other record was saved.
- */
-export async function writeAppRecords(
-  organizationId: string,
-  collection: CloudCollection,
-  items: CloudRecord[],
-): Promise<string[]> {
-  if (isInstrumentCollection(collection)) return writeInstrumentRows(organizationId, collection, items);
-  const mutable = MUTABLE_COLLECTIONS.has(collection);
-  for (const chunk of chunks(items)) {
-    const {error} = await supabase.from('app_records').upsert(
-      chunk.map(item => toRow(organizationId, collection, item)),
-      {onConflict: 'organization_id,collection,id', ignoreDuplicates: !mutable},
-    );
-    if (error) throw error;
-  }
-  return [];
-}
-
 export async function deleteAppRecords(organizationId: string, collection: CloudCollection, ids: string[]) {
-  if (isInstrumentCollection(collection)) {
-    for (const chunk of chunks(ids)) {
-      const {error} = await supabase
-        .from(INSTRUMENT_TABLES[collection].table)
-        .delete()
-        .eq('organization_id', organizationId)
-        .in('id', chunk);
-      if (error) throw error;
-    }
-    return;
-  }
   for (const chunk of chunks(ids)) {
     const {error} = await supabase
-      .from('app_records')
+      .from(CLOUD_TABLES[collection].table)
       .delete()
       .eq('organization_id', organizationId)
-      .eq('collection', collection)
       .in('id', chunk);
     if (error) throw error;
   }
@@ -213,30 +134,18 @@ export async function deleteAppRecords(organizationId: string, collection: Cloud
 export async function seedAppRecords(organizationId: string, records: Partial<CloudRecords>) {
   const now = Date.now();
   for (const [collection, items] of Object.entries(records) as Array<[CloudCollection, CloudRecord[]]>) {
-    if (isInstrumentCollection(collection)) {
-      const rows = items.map((item, index) =>
-        instrumentToRow(
-          organizationId,
-          collection,
-          item as CloudRecord & Record<string, unknown>,
-          new Date(now - index * 1000).toISOString(),
-        ),
-      );
-      for (const chunk of chunks(rows)) {
-        const {error} = await supabase
-          .from(INSTRUMENT_TABLES[collection].table)
-          .upsert(chunk, {onConflict: 'organization_id,id', ignoreDuplicates: true});
-        if (error) throw error;
-      }
-      continue;
-    }
     const rows = items.map((item, index) =>
-      toRow(organizationId, collection, item, new Date(now - index * 1000).toISOString()),
+      tableToRow(
+        organizationId,
+        collection,
+        item as CloudRecord & Record<string, unknown>,
+        new Date(now - index * 1000).toISOString(),
+      ),
     );
     for (const chunk of chunks(rows)) {
       const {error} = await supabase
-        .from('app_records')
-        .upsert(chunk, {onConflict: 'organization_id,collection,id', ignoreDuplicates: true});
+        .from(CLOUD_TABLES[collection].table)
+        .upsert(chunk, {onConflict: 'organization_id,id', ignoreDuplicates: true});
       if (error) throw error;
     }
   }
