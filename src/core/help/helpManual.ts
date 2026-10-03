@@ -511,11 +511,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Δημιουργία',
-          'Εκκρεμότητα δημιουργείται από την καρτέλα Σετ ή εργαλείου («Ενέργειες» → «Αναφορά προβλήματος») ή αυτόματα από απόκλιση στην παραλαβή.',
+          'Εκκρεμότητα δημιουργείται από την καρτέλα Σετ ή εργαλείου («Ενέργειες» → «Αναφορά προβλήματος») ή αυτόματα από απόκλιση στην παραλαβή. Απώλεια και αποστολή σε Service η Αποστείρωση τις δηλώνει από «Ενέργειες» → «Διαχείριση», γιατί αλλάζουν την κατάσταση· ένα τμήμα δηλώνει την απώλεια ως αναφορά και η Αποστείρωση την επιβεβαιώνει.',
         ],
         en: [
           'Creating',
-          'An issue is created from a Set or instrument card ("Actions" → "Report a problem") or automatically from a receipt deviation.',
+          'An issue is created from a Set or instrument card ("Actions" → "Report a problem") or automatically from a receipt deviation. Sterilization declares a loss or a Service send-off in "Actions" → "Manage", because they change the state; a department reports a loss and Sterilization confirms it.',
         ],
       },
       {

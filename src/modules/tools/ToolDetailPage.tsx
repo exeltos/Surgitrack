@@ -32,6 +32,7 @@ import DepartmentDispatchModal from '../../components/department/DepartmentDispa
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
+import ReportTypeField from '../../components/assets/ReportTypeField';
 import AssetManageModal from '../../components/assets/AssetManageModal';
 import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
@@ -151,7 +152,9 @@ export default function ToolDetailPage() {
                       key: 'report',
                       icon: <Flag size={16} />,
                       label: tr('Αναφορά προβλήματος'),
-                      hint: tr('Φθορά, έλλειψη ή άλλο πρόβλημα'),
+                      hint: can('asset.composition.manage')
+                        ? tr('Βλάβη, φθορά ή άλλο πρόβλημα')
+                        : tr('Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα'),
                       onSelect: () => setReportOpen(true),
                     },
                   ]
@@ -494,17 +497,20 @@ export default function ToolDetailPage() {
             </header>
             <div className="modal-body">
               <div className="form-grid">
-                <label>
-                  {tr('Τύπος αναφοράς')}
-                  <select value={reportType} onChange={e => setReportType(e.target.value)}>
-                    <option>{tr('Βλάβη')}</option>
-                    <option>{tr('Φθορά')}</option>
-                    <option>{tr('Απώλεια')}</option>
-                    <option>{tr('Έλλειψη')}</option>
-                    <option>Service</option>
-                    <option>{tr('Άλλο')}</option>
-                  </select>
-                </label>
+                <ReportTypeField
+                  kind="TOOL"
+                  value={reportType}
+                  onChange={setReportType}
+                  canManage={can('asset.composition.manage')}
+                  onManage={
+                    workflowLocked
+                      ? undefined
+                      : () => {
+                          setReportOpen(false);
+                          setManageOpen(true);
+                        }
+                  }
+                />
                 <label className="span-2">
                   {tr('Παρατήρηση')}
                   <textarea

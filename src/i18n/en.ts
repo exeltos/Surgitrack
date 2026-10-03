@@ -1,5 +1,11 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
+  'Βλάβη, φθορά ή άλλο πρόβλημα': 'Damage, wear or another problem',
+  'Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα': 'Damage, wear, loss or another problem',
+  'Βλάβη, φθορά, έλλειψη ή άλλο πρόβλημα': 'Damage, wear, shortage or another problem',
+  'Βλάβη, φθορά, έλλειψη, απώλεια ή άλλο πρόβλημα': 'Damage, wear, shortage, loss or another problem',
+  'Απώλεια ή αποστολή σε Service αλλάζουν την κατάσταση: δηλώνονται από τη':
+    'Loss or sending to Service change the state: declare them in',
   'Παρατηρητής (μόνο προβολή)': 'Viewer (read only)',
   'Ο Παρατηρητής βλέπει όλο το νοσοκομείο (επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό, αναφορές) χωρίς να μπορεί να αλλάξει τίποτα.':
     'The viewer sees the whole hospital (overview, registries, issues, history, reports) and cannot change anything.',
@@ -1313,7 +1319,6 @@ export const en: Record<string, string> = {
   '{0} φυσικές εγγραφές': '{0} physical records',
   'Τμήμα, Σετ, Stock, Service, απώλεια': 'Department, Set, Stock, Service, loss',
   'Τμήμα, Service, απώλεια, επιστροφή': 'Department, Service, loss, return',
-  'Φθορά, έλλειψη ή άλλο πρόβλημα': 'Wear, missing part or another problem',
   'Καταχώρηση σε τμήμα': 'Assign to a department',
   'Αλλαγή τμήματος': 'Change department',
   'Το εργαλείο ανήκει πλέον στο τμήμα που επιλέγετε.': 'The instrument now belongs to the department you choose.',
