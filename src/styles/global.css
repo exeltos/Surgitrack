@@ -1661,11 +1661,15 @@ a.overview-bar:hover {
   border-radius: 10px;
   color: #6b7c86;
 }
-.asset-manage-target input {
+.asset-manage-target input,
+.asset-manage-target select {
   flex: 1;
   border: 0;
   outline: 0;
   font: inherit;
+  background: transparent;
+  color: #1d2939;
+  min-height: 38px;
 }
 .asset-manage-sets {
   flex: 1;

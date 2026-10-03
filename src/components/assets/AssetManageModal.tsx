@@ -1,19 +1,21 @@
 import {useMemo, useState, type ReactNode} from 'react';
-import {ArrowRightLeft, CircleCheck, Layers3, PackageOpen, SearchX, Unlink, Wrench, X} from 'lucide-react';
+import {ArrowRightLeft, Building2, CircleCheck, Layers3, PackageOpen, SearchX, Unlink, Wrench, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
+import {useLibraries} from '../../core/LibraryStore';
 import {tr, trData} from '../../i18n';
 import {useSetColorQuestion} from './useSetColorQuestion';
 import type {SetAsset, Tool} from '../../types/domain';
 import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
 
-type ToolAction = 'MOVE' | 'REMOVE' | 'STOCK' | 'SERVICE' | 'LOST' | 'RETURN';
-type SetAction = 'SERVICE' | 'LOST' | 'RETURN';
+type ToolAction = 'DEPARTMENT' | 'MOVE' | 'REMOVE' | 'STOCK' | 'SERVICE' | 'LOST' | 'RETURN';
+type SetAction = 'DEPARTMENT' | 'SERVICE' | 'LOST' | 'RETURN';
 type Choice<T> = {id: T; icon: ReactNode; title: string; hint: string; danger?: boolean};
 
 /**
  * Management of one instrument or Set by the hospital admin or the sterilization supervisor:
- * move between Sets, back to stock, service, lost / found. Every change is written to the history.
+ * department, move between Sets, back to stock, service, lost / found. Every change is written to the
+ * history and can be taken back for a few seconds.
  */
 export default function AssetManageModal({
   kind,
@@ -24,8 +26,19 @@ export default function AssetManageModal({
   asset: Tool | SetAsset;
   onClose: () => void;
 }) {
-  const {sets, issues, moveTool, markLost, returnToService, sendSetToService, resolveIssues, applyColorPlan} =
-    useSurgi();
+  const {
+    sets,
+    issues,
+    moveTool,
+    markLost,
+    returnToService,
+    sendSetToService,
+    assignDepartment,
+    resolveIssues,
+    applyColorPlan,
+    undoable,
+  } = useSurgi();
+  const {departments} = useLibraries();
   const colorQuestion = useSetColorQuestion();
   const tool = kind === 'TOOL' ? (asset as Tool) : undefined;
   const out = asset.state === 'LOST' || asset.state === 'SERVICE';
@@ -44,6 +57,16 @@ export default function AssetManageModal({
         },
       ]
     : [
+        ...(!inSet
+          ? [
+              {
+                id: 'DEPARTMENT' as const,
+                icon: <Building2 size={18} />,
+                title: tool?.mode === 'STOCK' ? tr('Καταχώρηση σε τμήμα') : tr('Αλλαγή τμήματος'),
+                hint: tr('Το εργαλείο ανήκει πλέον στο τμήμα που επιλέγετε.'),
+              },
+            ]
+          : []),
         {
           id: 'MOVE',
           icon: <ArrowRightLeft size={18} />,
@@ -95,6 +118,12 @@ export default function AssetManageModal({
       ]
     : [
         {
+          id: 'DEPARTMENT',
+          icon: <Building2 size={18} />,
+          title: asset.department ? tr('Αλλαγή τμήματος') : tr('Καταχώρηση σε τμήμα'),
+          hint: tr('Το Σετ και τα εργαλεία του ανήκουν πλέον στο τμήμα που επιλέγετε.'),
+        },
+        {
           id: 'SERVICE',
           icon: <Wrench size={18} />,
           title: tr('Αποστολή Σετ σε Service'),
@@ -134,6 +163,9 @@ export default function AssetManageModal({
   const [targetSetId, setTargetSetId] = useState('');
   const [setQuery, setSetQuery] = useState('');
   const [note, setNote] = useState('');
+  const [department, setDepartment] = useState('');
+  // A department change waits for the item to be back from any reprocessing.
+  const placeable = asset.state === 'IN_DEPARTMENT' || asset.state === 'IN_STOCK';
   const targets = useMemo(
     () =>
       sets
@@ -143,7 +175,12 @@ export default function AssetManageModal({
     [sets, tool?.setId, setQuery],
   );
   const needsNote = action === 'LOST' || action === 'SERVICE';
-  const ready = action === 'MOVE' ? !!targetSetId : !needsNote || note.trim().length > 0;
+  const ready =
+    action === 'MOVE'
+      ? !!targetSetId
+      : action === 'DEPARTMENT'
+        ? placeable && !!department && department !== asset.department
+        : !needsNote || note.trim().length > 0;
 
   const confirm = async () => {
     if (!ready || followsSet) return;
@@ -151,24 +188,27 @@ export default function AssetManageModal({
     const plan =
       kind === 'TOOL' && action === 'MOVE' ? await colorQuestion.ask([asset.id], targetSetId) : EMPTY_COLOR_PLAN;
     if (!plan) return;
-    // Settle the chosen reports first, so the action can open its own issue where it needs one.
     const chosen = choices.find(c => c.id === action)?.title || '';
-    resolveIssues(
-      openReports.filter(i => closing.has(i.id)).map(i => i.id),
-      `${chosen}${note.trim() ? ` · ${note.trim()}` : ''}`,
-    );
-    if (kind === 'TOOL') {
-      if (action === 'MOVE') {
-        moveTool(asset.id, 'SET', targetSetId);
-        applyColorPlan(plan, sets.find(s => s.id === targetSetId)?.barcode || '');
-      } else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
-      else if (action === 'STOCK') moveTool(asset.id, 'STOCK');
-      else if (action === 'SERVICE') moveTool(asset.id, 'SERVICE', undefined, note.trim());
-      else if (action === 'LOST') markLost('TOOL', asset.id, note.trim());
-      else returnToService('TOOL', asset.id, note.trim());
-    } else if (action === 'SERVICE') sendSetToService(asset.id, note.trim());
-    else if (action === 'LOST') markLost('SET', asset.id, note.trim());
-    else returnToService('SET', asset.id, note.trim());
+    undoable(`${asset.barcode} · ${chosen}`, () => {
+      // Settle the chosen reports first, so the action can open its own issue where it needs one.
+      resolveIssues(
+        openReports.filter(i => closing.has(i.id)).map(i => i.id),
+        `${chosen}${note.trim() ? ` · ${note.trim()}` : ''}`,
+      );
+      if (action === 'DEPARTMENT') assignDepartment(kind, asset.id, department, note.trim());
+      else if (kind === 'TOOL') {
+        if (action === 'MOVE') {
+          moveTool(asset.id, 'SET', targetSetId);
+          applyColorPlan(plan, sets.find(s => s.id === targetSetId)?.barcode || '');
+        } else if (action === 'REMOVE') moveTool(asset.id, 'REMOVE');
+        else if (action === 'STOCK') moveTool(asset.id, 'STOCK');
+        else if (action === 'SERVICE') moveTool(asset.id, 'SERVICE', undefined, note.trim());
+        else if (action === 'LOST') markLost('TOOL', asset.id, note.trim());
+        else returnToService('TOOL', asset.id, note.trim());
+      } else if (action === 'SERVICE') sendSetToService(asset.id, note.trim());
+      else if (action === 'LOST') markLost('SET', asset.id, note.trim());
+      else returnToService('SET', asset.id, note.trim());
+    });
     onClose();
   };
 
@@ -252,6 +292,33 @@ export default function AssetManageModal({
               ))}
               {targets.length === 0 && <p>{tr('Δεν βρέθηκαν Σετ.')}</p>}
             </div>
+          </div>
+        )}
+        {!followsSet && action === 'DEPARTMENT' && (
+          <div className="asset-manage-target">
+            {placeable ? (
+              <label>
+                <Building2 size={16} />
+                <select value={department} onChange={e => setDepartment(e.target.value)} aria-label={tr('Τμήμα')}>
+                  <option value="">{tr('Επιλέξτε τμήμα...')}</option>
+                  {departments
+                    .filter(d => d.active !== false)
+                    .map(d => (
+                      <option key={d.id} value={d.el} disabled={d.el === asset.department}>
+                        {trData(d.el)}
+                        {d.el === asset.department ? ` · ${tr('τωρινό')}` : ''}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            ) : (
+              <p className="asset-manage-follows">
+                {tr(
+                  'Το τμήμα αλλάζει όταν το {0} δεν βρίσκεται σε διαδικασία αποστείρωσης ή εκτός χρήσης.',
+                  asset.barcode,
+                )}
+              </p>
+            )}
           </div>
         )}
         {!followsSet && action !== 'MOVE' && (

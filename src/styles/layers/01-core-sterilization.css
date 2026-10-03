@@ -9758,3 +9758,23 @@ td {
   opacity: 0.5;
   cursor: default;
 }
+/* A management action can be taken back for a few seconds. */
+.toast .toast-undo {
+  position: static;
+  align-self: flex-start;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+}
+.toast .toast-undo:hover {
+  background: rgba(255, 255, 255, 0.22);
+}

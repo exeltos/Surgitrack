@@ -15,6 +15,7 @@ import {
   TriangleAlert,
   Gauge,
   UserPlus,
+  Undo2,
 } from 'lucide-react';
 import {navigationFor} from '../../config/navigation';
 import {useSurgi, type UserRole} from '../../store/SurgiStore';
@@ -567,7 +568,12 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         <div className="toast">
           <strong>{lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}</strong>
           <span>{toast.text}</span>
-          <button onClick={clearToast}>
+          {toast.undo && (
+            <button type="button" className="toast-undo" onClick={toast.undo}>
+              <Undo2 size={14} /> {lang === 'el' ? 'Αναίρεση' : 'Undo'}
+            </button>
+          )}
+          <button onClick={clearToast} aria-label={lang === 'el' ? 'Κλείσιμο' : 'Close'}>
             <X size={16} />
           </button>
         </div>

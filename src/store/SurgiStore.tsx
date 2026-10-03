@@ -57,7 +57,7 @@ import {
   workflowStageState,
   type WorkflowStageId,
 } from '../core/workflow';
-import {tr} from '../i18n';
+import {tr, trData} from '../i18n';
 import type {ColorPlan} from '../core/colorTapes';
 
 export type {
@@ -72,6 +72,8 @@ export type {
   WorkflowCheckpointPayload,
 } from './types';
 
+/** How long a management action can be taken back. */
+const UNDO_SECONDS = 10;
 const Ctx = createContext<SurgiStoreValue | null>(null);
 export function SurgiProvider({
   children,
@@ -155,7 +157,8 @@ export function SurgiProvider({
   const notify = (text: string) => setToast({id: Date.now(), text});
   useEffect(() => {
     if (!toast) return;
-    const timer = window.setTimeout(() => setToast(undefined), 3200);
+    // An offer to undo stays long enough to read it and change one's mind.
+    const timer = window.setTimeout(() => setToast(undefined), toast.undo ? UNDO_SECONDS * 1000 : 3200);
     return () => window.clearTimeout(timer);
   }, [toast]);
   const addMovement = (m: Omit<Movement, 'id' | 'at'>) =>
@@ -1595,6 +1598,77 @@ export function SurgiProvider({
     });
     notify(tr('{0}: επέστρεψε σε χρήση.', a.barcode));
   };
+  const assignDepartment = (kind: AssetKind, id: string, department: string, note = '') => {
+    const target = department.trim();
+    const a = assetName(kind, id);
+    if (!a || !target || a.department === target) return;
+    if (a.state !== 'IN_DEPARTMENT' && a.state !== 'IN_STOCK') {
+      notify(tr('{0}: το τμήμα αλλάζει μόνο όταν δεν βρίσκεται σε διαδικασία ή εκτός χρήσης.', a.barcode));
+      return;
+    }
+    if (kind === 'SET') {
+      // The Set's instruments go with it.
+      setSets(x => x.map(s => (s.id === id ? {...s, department: target, state: 'IN_DEPARTMENT'} : s)));
+      setTools(x => x.map(t => (t.setId === id ? {...t, department: target, state: 'IN_DEPARTMENT'} : t)));
+    } else {
+      const tool = tools.find(t => t.id === id);
+      if (!tool || tool.mode === 'SET_MEMBER') return;
+      setTools(x =>
+        x.map(t =>
+          t.id === id ? {...t, mode: 'STANDALONE', setId: undefined, department: target, state: 'IN_DEPARTMENT'} : t,
+        ),
+      );
+    }
+    addMovement({
+      asset: `${a.barcode} · ${a.name}`,
+      assetKind: kind,
+      from: a.department || 'Stock',
+      to: target,
+      status: a.department ? 'Αλλαγή τμήματος' : 'Καταχώρηση σε τμήμα',
+      by: currentUser.name,
+      note: note || undefined,
+    });
+    notify(tr('{0}: καταχωρήθηκε στο τμήμα {1}.', a.barcode, trData(target)));
+  };
+  const undoable = (label: string, run: () => void) => {
+    const before = {sets, tools, issues};
+    run();
+    const undo = () => {
+      const revert =
+        <T extends {id: string}>(previous: T[]) =>
+        (list: T[]) => {
+          const old = new Map(previous.map(r => [r.id, r]));
+          const now = new Set(list.map(r => r.id));
+          // Records the action created go; changed ones get their earlier version; removed ones return.
+          return [...previous.filter(r => !now.has(r.id)), ...list.filter(r => old.has(r.id)).map(r => old.get(r.id)!)];
+        };
+      setSets(revert(before.sets));
+      setTools(revert(before.tools));
+      // Problem reports are never deleted: one the action opened is closed as taken back.
+      const oldIssues = new Map(before.issues.map(i => [i.id, i]));
+      setIssues(list =>
+        list.map(i =>
+          oldIssues.has(i.id)
+            ? oldIssues.get(i.id)!
+            : i.status === 'OPEN'
+              ? {...i, status: 'RESOLVED', note: `${i.note} · Αναιρέθηκε`}
+              : i,
+        ),
+      );
+      addMovement({
+        asset: label,
+        assetKind: 'TOOL',
+        from: '—',
+        to: '—',
+        status: 'Αναίρεση ενέργειας',
+        by: currentUser.name,
+        note: label,
+      });
+      setToast({id: Date.now(), text: tr('Η ενέργεια αναιρέθηκε.')});
+    };
+    // The action's own message, now with the offer to take it back.
+    setToast(current => ({id: Date.now(), text: current?.text || label, undo}));
+  };
   /** Sends a whole Set to service: it leaves circulation until it comes back. */
   const sendSetToService = (id: string, note = '') => {
     const s = sets.find(x => x.id === id);
@@ -1921,6 +1995,8 @@ export function SurgiProvider({
       markLost,
       returnToService,
       sendSetToService,
+      assignDepartment,
+      undoable,
       updateSet,
       updateTool,
       addToolsToSet,

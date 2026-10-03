@@ -29,7 +29,7 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
-import {tr, trc, trData} from '../../i18n';
+import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
 import AssetManageModal from '../../components/assets/AssetManageModal';
@@ -140,23 +140,29 @@ export default function ToolDetailPage() {
                 : []),
             ]}
           />
-          {can('issue.create') && (
-            <AppButton icon={<Flag size={18} />} onClick={() => setReportOpen(true)}>
-              {tr('Αναφορά προβλήματος')}
-            </AppButton>
-          )}
           <ActionMenu
             icon={<Settings2 size={18} />}
-            label={trc('action', 'Διαχείριση')}
+            label={tr('Ενέργειες')}
             align="right"
             items={[
+              ...(can('issue.create')
+                ? [
+                    {
+                      key: 'report',
+                      icon: <Flag size={16} />,
+                      label: tr('Αναφορά προβλήματος'),
+                      hint: tr('Φθορά, έλλειψη ή άλλο πρόβλημα'),
+                      onSelect: () => setReportOpen(true),
+                    },
+                  ]
+                : []),
               ...(can('asset.composition.manage')
                 ? [
                     {
                       key: 'moves',
                       icon: <ArrowRightLeft size={16} />,
-                      label: tr('Κινήσεις'),
-                      hint: tr('Άλλο Σετ, Stock, Service, απώλεια'),
+                      label: tr('Διαχείριση'),
+                      hint: tr('Τμήμα, Σετ, Stock, Service, απώλεια'),
                       disabled: workflowLocked,
                       title: workflowLocked
                         ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
