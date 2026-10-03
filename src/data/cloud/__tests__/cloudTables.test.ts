@@ -1,25 +1,49 @@
 import {describe, expect, it} from 'vitest';
 import {demoSurgiRepository} from '../../repositories/demoRepository';
-import {instrumentFromRow, instrumentToRow} from '../instrumentTables';
+import {tableFromRow, tableToRow, type TableCollection} from '../cloudTables';
 
 const ORG = '11111111-2222-4333-8444-555555555555';
 type Item = {id: string} & Record<string, unknown>;
 /** What the database hands back: the written row, minus the bookkeeping it fills in itself. */
-const roundTrip = (collection: 'sets' | 'tools', item: Item) => {
-  const row = instrumentToRow(ORG, collection, item);
-  return instrumentFromRow(collection, JSON.parse(JSON.stringify(row)));
+const roundTrip = (collection: TableCollection, item: Item) => {
+  const row = tableToRow(ORG, collection, item);
+  return tableFromRow(collection, JSON.parse(JSON.stringify(row)));
 };
 
-describe('instrument tables', () => {
+describe('cloud tables', () => {
   const data = demoSurgiRepository.getInitialData();
 
-  it('brings every demo Set and instrument back exactly as it was saved', () => {
+  it('brings every demo record back exactly as it was saved', () => {
     for (const set of data.sets) expect(roundTrip('sets', set as unknown as Item)).toEqual(set);
     for (const tool of data.tools) expect(roundTrip('tools', tool as unknown as Item)).toEqual(tool);
+    for (const movement of data.movements)
+      expect(roundTrip('movements', movement as unknown as Item)).toEqual(movement);
+    for (const issue of data.issues) expect(roundTrip('issues', issue as unknown as Item)).toEqual(issue);
+  });
+
+  it('writes history without a change stamp and changeable records with one', () => {
+    const movement = tableToRow(ORG, 'movements', {
+      id: 'm1',
+      asset: 'S1 · Σετ',
+      assetKind: 'SET',
+      from: 'A',
+      to: 'B',
+      status: 'x',
+      at: '1/1/26',
+      by: 'N',
+    });
+    expect(movement).not.toHaveProperty('updated_at');
+    expect(movement).toMatchObject({from_location: 'A', to_location: 'B', by_name: 'N', extra: null});
+    expect(
+      tableToRow(ORG, 'issues', {id: 'i1', asset: 'a', type: 't', status: 'OPEN', created: 'c', department: 'd'}),
+    ).toMatchObject({
+      note: '',
+      updated_at: expect.any(String),
+    });
   });
 
   it('puts known fields in columns and keeps unknown ones in extra', () => {
-    const row = instrumentToRow(ORG, 'tools', {
+    const row = tableToRow(ORG, 'tools', {
       id: 't1',
       barcode: 'T000001',
       code: 'C1',
@@ -54,14 +78,14 @@ describe('instrument tables', () => {
       uses: '4',
       sterilizations: 0,
     };
-    const row = instrumentToRow(ORG, 'tools', tool);
+    const row = tableToRow(ORG, 'tools', tool);
     expect(row.uses).toBe(0);
     expect(row.extra).toEqual({uses: '4'});
     expect(roundTrip('tools', tool)).toEqual(tool);
   });
 
   it('reads numeric columns sent as text as numbers', () => {
-    const record = instrumentFromRow('tools', {id: 't3', barcode: 'T3', cost: '12.50', extra: null});
+    const record = tableFromRow('tools', {id: 't3', barcode: 'T3', cost: '12.50', extra: null});
     expect(record).toEqual({id: 't3', barcode: 'T3', cost: 12.5});
   });
 });

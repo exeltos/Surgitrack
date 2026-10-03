@@ -1,9 +1,9 @@
 /**
- * Sets and instruments live in their own tables (instrument_sets, instruments), one column per
- * field. The store keeps working with records; this maps a record to a row and back. Fields with
- * no column yet are kept in `extra`, so a record always comes back exactly as it was saved.
+ * Store collections that live in their own tables, one column per field. The store keeps working
+ * with records; this maps a record to a row and back. Fields with no column yet are kept in
+ * `extra`, so a record always comes back exactly as it was saved.
  */
-type FieldKind = 'text' | 'number' | 'json' | 'textArray';
+type FieldKind = 'text' | 'number' | 'boolean' | 'json' | 'textArray';
 type Field = readonly [field: string, column: string, kind: FieldKind];
 type Row = Record<string, unknown>;
 
@@ -62,73 +62,104 @@ const TOOL_FIELDS: readonly Field[] = [
   ['retiredNoticeSeenBy', 'retired_notice_seen_by', 'text'],
 ];
 
+const MOVEMENT_FIELDS: readonly Field[] = [
+  ['asset', 'asset', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['from', 'from_location', 'text'],
+  ['to', 'to_location', 'text'],
+  ['status', 'status', 'text'],
+  ['at', 'at', 'text'],
+  ['by', 'by_name', 'text'],
+  ['patientCode', 'patient_code', 'text'],
+  ['note', 'note', 'text'],
+];
+
+const ISSUE_FIELDS: readonly Field[] = [
+  ['asset', 'asset', 'text'],
+  ['type', 'type', 'text'],
+  ['status', 'status', 'text'],
+  ['created', 'created_on', 'text'],
+  ['department', 'department', 'text'],
+  ['note', 'note', 'text'],
+  ['photos', 'photos', 'json'],
+];
+
 /** Columns a record never carries: the row's identity and bookkeeping. */
-const BOOKKEEPING = ['organization_id', 'id', 'extra', 'created_at', 'updated_at', 'updated_by'];
+const BOOKKEEPING = ['organization_id', 'id', 'extra', 'created_at', 'updated_at', 'updated_by', 'created_by'];
 
-export const INSTRUMENT_TABLES = {
-  sets: {table: 'instrument_sets', fields: SET_FIELDS},
-  tools: {table: 'instruments', fields: TOOL_FIELDS},
-} as const;
-export type InstrumentCollection = keyof typeof INSTRUMENT_TABLES;
+type TableSpec = {
+  table: string;
+  fields: readonly Field[];
+  /** Records change after creation (otherwise history: written once). */
+  mutable: boolean;
+  /** Values for columns the database requires when a record leaves them out. */
+  defaults?: Record<string, unknown>;
+};
 
-export const isInstrumentCollection = (collection: string): collection is InstrumentCollection =>
-  collection in INSTRUMENT_TABLES;
+export const CLOUD_TABLES = {
+  sets: {
+    table: 'instrument_sets',
+    fields: SET_FIELDS,
+    mutable: true,
+    defaults: {code: '', expected: 0, actual: 0},
+  },
+  tools: {table: 'instruments', fields: TOOL_FIELDS, mutable: true, defaults: {code: '', uses: 0, sterilizations: 0}},
+  movements: {table: 'movements', fields: MOVEMENT_FIELDS, mutable: false},
+  issues: {table: 'issues', fields: ISSUE_FIELDS, mutable: true, defaults: {note: ''}},
+} as const satisfies Record<string, TableSpec>;
+export type TableCollection = keyof typeof CLOUD_TABLES;
+export const TABLE_COLLECTIONS = Object.keys(CLOUD_TABLES) as TableCollection[];
+
+export const isTableCollection = (collection: string): collection is TableCollection => collection in CLOUD_TABLES;
 
 /** The columns to read back, so a load never asks for more than the record needs. */
-export const instrumentColumns = (collection: InstrumentCollection) =>
-  ['id', 'extra', ...INSTRUMENT_TABLES[collection].fields.map(([, column]) => column)].join(',');
+export const tableColumns = (collection: TableCollection) =>
+  ['id', 'extra', ...CLOUD_TABLES[collection].fields.map(([, column]) => column)].join(',');
+
+const fits = (kind: FieldKind, value: unknown) =>
+  kind === 'text'
+    ? typeof value === 'string'
+    : kind === 'number'
+      ? typeof value === 'number' && Number.isFinite(value)
+      : kind === 'boolean'
+        ? typeof value === 'boolean'
+        : kind === 'textArray'
+          ? Array.isArray(value) && value.every(item => typeof item === 'string')
+          : true;
 
 /** A store record as a table row. Values the database could not hold as columns stay in `extra`. */
-export function instrumentToRow(
+export function tableToRow(
   organizationId: string,
-  collection: InstrumentCollection,
+  collection: TableCollection,
   record: {id: string} & Record<string, unknown>,
   createdAt?: string,
 ): Row {
+  const spec: TableSpec = CLOUD_TABLES[collection];
   const {id, ...rest} = record;
   const row: Row = {organization_id: organizationId, id};
   const extra: Record<string, unknown> = {...rest};
-  for (const [field, column, kind] of INSTRUMENT_TABLES[collection].fields) {
+  for (const [field, column, kind] of spec.fields) {
     const value = rest[field];
     delete extra[field];
-    if (value === undefined || value === null) {
-      row[column] = null;
-      continue;
-    }
-    const fits =
-      kind === 'text'
-        ? typeof value === 'string'
-        : kind === 'number'
-          ? typeof value === 'number' && Number.isFinite(value)
-          : kind === 'textArray'
-            ? Array.isArray(value) && value.every(item => typeof item === 'string')
-            : true;
-    if (fits) row[column] = value;
+    if (value === undefined || value === null) row[column] = null;
+    else if (fits(kind, value)) row[column] = value;
     else {
       // An unexpected shape is kept as it is rather than lost or rejected.
       row[column] = null;
       extra[field] = value;
     }
   }
-  // Fields the database requires get their neutral value when a record leaves them out.
-  if (row.code === null) row.code = '';
-  if (collection === 'tools') {
-    if (row.uses === null) row.uses = 0;
-    if (row.sterilizations === null) row.sterilizations = 0;
-  } else {
-    if (row.expected === null) row.expected = 0;
-    if (row.actual === null) row.actual = 0;
-  }
+  for (const [column, value] of Object.entries(spec.defaults || {})) if (row[column] === null) row[column] = value;
   row.extra = Object.keys(extra).length ? extra : null;
-  row.updated_at = new Date().toISOString();
+  if (spec.mutable) row.updated_at = new Date().toISOString();
   if (createdAt) row.created_at = createdAt;
   return row;
 }
 
 /** A table row as the store record it was saved from. */
-export function instrumentFromRow(collection: InstrumentCollection, row: Row): {id: string} & Record<string, unknown> {
+export function tableFromRow(collection: TableCollection, row: Row): {id: string} & Record<string, unknown> {
   const record: Record<string, unknown> = {};
-  for (const [field, column, kind] of INSTRUMENT_TABLES[collection].fields) {
+  for (const [field, column, kind] of CLOUD_TABLES[collection].fields) {
     const value = row[column];
     if (value === null || value === undefined) continue;
     // numeric columns can arrive as strings; integers always arrive as numbers.
