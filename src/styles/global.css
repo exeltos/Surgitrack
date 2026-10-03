@@ -2763,3 +2763,82 @@ a.overview-bar:hover {
     width: 100%;
   }
 }
+
+/* Problem report: where Loss and Service are declared instead */
+.report-type-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--st-muted, #6f808c);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.report-type-hint button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--st-teal, #167187);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Phones: every top-bar button stays on screen (language moves into the accessibility panel) */
+.a11y-lang {
+  display: none !important;
+}
+.a11y-row button.active {
+  border-color: var(--st-teal, #167187);
+  background: var(--st-teal-soft, #eaf6f7);
+  color: var(--st-teal, #167187);
+  font-weight: 700;
+}
+@media (max-width: 650px) {
+  .a11y-lang {
+    display: flex !important;
+  }
+  .top-actions > .lang,
+  .top-actions > .avatar,
+  .suite-switcher > span {
+    display: none !important;
+  }
+  .topbar {
+    gap: 6px;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .top-actions {
+    gap: 6px !important;
+  }
+  .role-switch select {
+    max-width: 112px !important;
+  }
+  .a11y-popover,
+  .notification-popover {
+    position: fixed !important;
+    top: 60px !important;
+    right: 12px !important;
+    left: auto !important;
+    max-width: calc(100vw - 24px);
+  }
+}
+@media (max-width: 380px) {
+  .role-switch select {
+    max-width: 92px !important;
+  }
+}
+
+/* Screen-reader-only text stays inside its scrolling list: anchored at the list's corner, it can
+   never widen the page (it did on phones, where a list's spinner sat past the right edge). */
+.table-panel,
+.list-scroll-panel {
+  position: relative;
+}
+.visually-hidden {
+  top: 0;
+  left: 0;
+}

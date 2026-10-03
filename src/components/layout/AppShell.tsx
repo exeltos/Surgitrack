@@ -382,6 +382,18 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               {a11y && (
                 <div className="a11y-popover">
                   <strong>{lang === 'el' ? 'Προσβασιμότητα' : 'Accessibility'}</strong>
+                  {/* On phones the language button leaves the top bar for room; it is here instead. */}
+                  <div className="a11y-row a11y-lang">
+                    <span>{lang === 'el' ? 'Γλώσσα' : 'Language'}</span>
+                    <div>
+                      <button className={lang === 'el' ? 'active' : ''} onClick={() => setLang('el')}>
+                        EL
+                      </button>
+                      <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>
+                        EN
+                      </button>
+                    </div>
+                  </div>
                   <div className="a11y-row">
                     <span>{lang === 'el' ? 'Μέγεθος κειμένου' : 'Text size'}</span>
                     <div>
