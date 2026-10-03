@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 
-// Deletes a staff account for good (sign-in, profile and signup request). Only a hospital admin
+// Deletes a staff account for good (sign-in and profile; the access request goes with them). Only a hospital admin
 // for users of their own hospital, or the platform admin; never one's own account. The history
 // the user left (movements, issues, handovers) stays, with their name as recorded then.
 const cors = {
@@ -41,9 +41,8 @@ Deno.serve(async req => {
     if (me.organization_id && target.organization_id !== me.organization_id) return json({error: "forbidden"}, 403);
     if (!target.organization_id) return json({error: "forbidden"}, 403);
 
-    // References that would block the delete keep the record but lose the link.
+    // An invitation the user sent keeps its record but loses the link.
     await admin.from("user_invitations").update({invited_by: null}).eq("invited_by", userId);
-    await admin.from("registration_requests").update({reviewed_by: null}).eq("reviewed_by", userId);
 
     const {error} = await admin.auth.admin.deleteUser(userId);
     if (error) return json({error: "delete_failed", message: error.message}, 500);

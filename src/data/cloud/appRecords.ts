@@ -2,17 +2,13 @@ import {supabase} from '../../lib/supabase';
 import {
   CLOUD_TABLES,
   TABLE_COLLECTIONS,
-  isTableCollection,
   tableColumns,
   tableFromRow,
   tableToRow,
   type TableCollection,
 } from './cloudTables';
 
-/**
- * Store collections saved in the cloud, one row per record. Those listed in cloudTables have their
- * own tables; the rest are still rows of `public.app_records` until they move too.
- */
+/** Store collections saved in the cloud: each has its own table (see cloudTables), one row per record. */
 export const STORE_COLLECTIONS = [
   'sets',
   'tools',
@@ -31,19 +27,6 @@ export const STORE_COLLECTIONS = [
 export type StoreCollection = (typeof STORE_COLLECTIONS)[number];
 export type CloudCollection = StoreCollection | 'library';
 export type CloudRecord = {id: string};
-
-/**
- * Collections whose records change after creation. Everything else is traceability
- * history: written once and never updated (the database rejects updates too).
- */
-export const MUTABLE_COLLECTIONS: ReadonlySet<CloudCollection> = new Set([
-  'library',
-  'sets',
-  'tools',
-  'issues',
-  'processLoads',
-  'recallCases',
-]);
 
 export type CloudRecords = Record<CloudCollection, CloudRecord[]>;
 
@@ -76,42 +59,13 @@ export async function loadAppRecords(organizationId: string): Promise<CloudRecor
   const records = emptyRecords();
   const loaded = await Promise.all(TABLE_COLLECTIONS.map(collection => loadTable(organizationId, collection)));
   TABLE_COLLECTIONS.forEach((collection, index) => (records[collection] = loaded[index]));
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const {data, error} = await supabase
-      .from('app_records')
-      .select('collection,id,data')
-      .eq('organization_id', organizationId)
-      // Collections with their own table are not read from here, even while old copies remain.
-      .not('collection', 'in', `(${TABLE_COLLECTIONS.join(',')})`)
-      .order('collection')
-      .order('created_at', {ascending: false})
-      .order('id')
-      .range(from, from + PAGE_SIZE - 1);
-    if (error) throw error;
-    for (const row of data) {
-      const list = records[row.collection as CloudCollection];
-      if (list) list.push({...(row.data as object), id: row.id} as CloudRecord);
-    }
-    if (data.length < PAGE_SIZE) return records;
-  }
+  return records;
 }
 
 const chunks = <T>(items: T[]) =>
   Array.from({length: Math.ceil(items.length / WRITE_CHUNK)}, (_, i) =>
     items.slice(i * WRITE_CHUNK, (i + 1) * WRITE_CHUNK),
   );
-
-const toRow = (organizationId: string, collection: CloudCollection, item: CloudRecord, createdAt?: string) => {
-  const {id, ...data} = item;
-  return {
-    organization_id: organizationId,
-    collection,
-    id,
-    data,
-    updated_at: new Date().toISOString(),
-    ...(createdAt ? {created_at: createdAt} : {}),
-  };
-};
 
 const UNIQUE_VIOLATION = '23505';
 const RLS_VIOLATION = '42501';
@@ -139,13 +93,13 @@ async function saveTableRow(table: string, row: Record<string, unknown>): Promis
 }
 
 /**
- * Saves records of a collection with its own table. Batches go in one request; history is
+ * Saves records of a collection. Batches go in one request; history is
  * insert-only (a record already saved stays as it was). When the database refuses a batch of
  * changeable records (a barcode another record already holds, or a department user updating),
  * each record is saved on its own. Returns the ids refused for a barcode clash, so the rest still
  * count as saved.
  */
-async function writeTableRows(organizationId: string, collection: TableCollection, items: CloudRecord[]) {
+export async function writeAppRecords(organizationId: string, collection: CloudCollection, items: CloudRecord[]) {
   const {table, mutable} = CLOUD_TABLES[collection];
   const toRow = (item: CloudRecord) =>
     tableToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
@@ -161,45 +115,12 @@ async function writeTableRows(organizationId: string, collection: TableCollectio
   return rejected;
 }
 
-/**
- * Inserts new records and updates changed ones; history collections are insert-only. Returns the
- * ids of records the database refused (a barcode already in use); every other record was saved.
- */
-export async function writeAppRecords(
-  organizationId: string,
-  collection: CloudCollection,
-  items: CloudRecord[],
-): Promise<string[]> {
-  if (isTableCollection(collection)) return writeTableRows(organizationId, collection, items);
-  const mutable = MUTABLE_COLLECTIONS.has(collection);
-  for (const chunk of chunks(items)) {
-    const {error} = await supabase.from('app_records').upsert(
-      chunk.map(item => toRow(organizationId, collection, item)),
-      {onConflict: 'organization_id,collection,id', ignoreDuplicates: !mutable},
-    );
-    if (error) throw error;
-  }
-  return [];
-}
-
 export async function deleteAppRecords(organizationId: string, collection: CloudCollection, ids: string[]) {
-  if (isTableCollection(collection)) {
-    for (const chunk of chunks(ids)) {
-      const {error} = await supabase
-        .from(CLOUD_TABLES[collection].table)
-        .delete()
-        .eq('organization_id', organizationId)
-        .in('id', chunk);
-      if (error) throw error;
-    }
-    return;
-  }
   for (const chunk of chunks(ids)) {
     const {error} = await supabase
-      .from('app_records')
+      .from(CLOUD_TABLES[collection].table)
       .delete()
       .eq('organization_id', organizationId)
-      .eq('collection', collection)
       .in('id', chunk);
     if (error) throw error;
   }
@@ -213,30 +134,18 @@ export async function deleteAppRecords(organizationId: string, collection: Cloud
 export async function seedAppRecords(organizationId: string, records: Partial<CloudRecords>) {
   const now = Date.now();
   for (const [collection, items] of Object.entries(records) as Array<[CloudCollection, CloudRecord[]]>) {
-    if (isTableCollection(collection)) {
-      const rows = items.map((item, index) =>
-        tableToRow(
-          organizationId,
-          collection,
-          item as CloudRecord & Record<string, unknown>,
-          new Date(now - index * 1000).toISOString(),
-        ),
-      );
-      for (const chunk of chunks(rows)) {
-        const {error} = await supabase
-          .from(CLOUD_TABLES[collection].table)
-          .upsert(chunk, {onConflict: 'organization_id,id', ignoreDuplicates: true});
-        if (error) throw error;
-      }
-      continue;
-    }
     const rows = items.map((item, index) =>
-      toRow(organizationId, collection, item, new Date(now - index * 1000).toISOString()),
+      tableToRow(
+        organizationId,
+        collection,
+        item as CloudRecord & Record<string, unknown>,
+        new Date(now - index * 1000).toISOString(),
+      ),
     );
     for (const chunk of chunks(rows)) {
       const {error} = await supabase
-        .from('app_records')
-        .upsert(chunk, {onConflict: 'organization_id,collection,id', ignoreDuplicates: true});
+        .from(CLOUD_TABLES[collection].table)
+        .upsert(chunk, {onConflict: 'organization_id,id', ignoreDuplicates: true});
       if (error) throw error;
     }
   }

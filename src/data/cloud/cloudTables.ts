@@ -178,6 +178,104 @@ const WORKFLOW_CHECKPOINTS_FIELDS: readonly Field[] = [
   ['completedAt', 'completed_on', 'text'],
 ];
 
+const STERILIZATION_CYCLES_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['loadId', 'load_id', 'text'],
+  ['assetId', 'asset_id', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['barcode', 'barcode', 'text'],
+  ['assetName', 'asset_name', 'text'],
+  ['department', 'department', 'text'],
+  ['sterilizer', 'sterilizer', 'text'],
+  ['cycleNumber', 'cycle_number', 'text'],
+  ['program', 'program', 'text'],
+  ['indicatorResult', 'indicator_result', 'text'],
+  ['result', 'result', 'text'],
+  ['note', 'note', 'text'],
+  ['completedByUserId', 'completed_by_user_id', 'text'],
+  ['completedByName', 'completed_by_name', 'text'],
+  ['completedByDepartment', 'completed_by_department', 'text'],
+  ['completedAt', 'completed_on', 'text'],
+  ['toolIds', 'tool_ids', 'textArray'],
+];
+
+const STERILIZATION_RELEASES_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['loadId', 'load_id', 'text'],
+  ['assetId', 'asset_id', 'text'],
+  ['assetKind', 'asset_kind', 'text'],
+  ['barcode', 'barcode', 'text'],
+  ['assetName', 'asset_name', 'text'],
+  ['department', 'department', 'text'],
+  ['cycleRecordId', 'cycle_record_id', 'text'],
+  ['cycleNumber', 'cycle_number', 'text'],
+  ['sterilizer', 'sterilizer', 'text'],
+  ['physicalParametersOk', 'physical_parameters_ok', 'boolean'],
+  ['chemicalIndicatorOk', 'chemical_indicator_ok', 'boolean'],
+  ['packagingIntegrityOk', 'packaging_integrity_ok', 'boolean'],
+  ['biologicalIndicatorResult', 'biological_indicator_result', 'text'],
+  ['decision', 'decision', 'text'],
+  ['note', 'note', 'text'],
+  ['releasedByUserId', 'released_by_user_id', 'text'],
+  ['releasedByName', 'released_by_name', 'text'],
+  ['releasedByDepartment', 'released_by_department', 'text'],
+  ['releasedAt', 'released_on', 'text'],
+];
+
+const PROCESS_LOADS_FIELDS: readonly Field[] = [
+  ['workflowVersion', 'workflow_version', 'number'],
+  ['kind', 'kind', 'text'],
+  ['equipment', 'equipment', 'text'],
+  ['cycleNumber', 'cycle_number', 'text'],
+  ['program', 'program', 'text'],
+  ['status', 'status', 'text'],
+  ['items', 'items', 'json'],
+  ['chemicalIndicatorResult', 'chemical_indicator_result', 'text'],
+  ['biologicalIndicatorResult', 'biological_indicator_result', 'text'],
+  ['physicalParametersOk', 'physical_parameters_ok', 'boolean'],
+  ['packagingIntegrityOk', 'packaging_integrity_ok', 'boolean'],
+  ['note', 'note', 'text'],
+  ['createdByUserId', 'created_by_user_id', 'text'],
+  ['createdByName', 'created_by_name', 'text'],
+  ['createdAt', 'created_on', 'text'],
+  ['completedAt', 'completed_on', 'text'],
+  ['releasedAt', 'released_on', 'text'],
+  ['recalledAt', 'recalled_on', 'text'],
+  ['recallReason', 'recall_reason', 'text'],
+];
+
+const RECALL_CASES_FIELDS: readonly Field[] = [
+  ['loadId', 'load_id', 'text'],
+  ['cycleNumber', 'cycle_number', 'text'],
+  ['sterilizer', 'sterilizer', 'text'],
+  ['reason', 'reason', 'text'],
+  ['openedAt', 'opened_on', 'text'],
+  ['openedByUserId', 'opened_by_user_id', 'text'],
+  ['openedByName', 'opened_by_name', 'text'],
+  ['status', 'status', 'text'],
+  ['items', 'items', 'json'],
+  ['closedAt', 'closed_on', 'text'],
+];
+
+/** A hospital's settings: one row per hospital, one column per section. */
+const HOSPITAL_SETTINGS_FIELDS: readonly Field[] = [
+  ['departments', 'departments', 'json'],
+  ['specialties', 'specialties', 'json'],
+  ['manufacturers', 'manufacturers', 'json'],
+  ['suppliers', 'suppliers', 'json'],
+  ['toolCategories', 'tool_categories', 'json'],
+  ['sterilizers', 'sterilizers', 'json'],
+  ['colorTapes', 'color_tapes', 'json'],
+  ['organizations', 'organizations', 'json'],
+  ['users', 'users', 'json'],
+  ['rolePermissions', 'role_permissions', 'json'],
+  ['rolePermissionAudit', 'role_permission_audit', 'json'],
+  ['configurationAudit', 'configuration_audit', 'json'],
+  ['workflowVersions', 'workflow_versions', 'json'],
+  ['sterilizationWorkflow', 'sterilization_workflow', 'json'],
+  ['systemSettings', 'system_settings', 'json'],
+];
+
 /** Columns a record never carries: the row's identity and bookkeeping. */
 const BOOKKEEPING = ['organization_id', 'id', 'extra', 'created_at', 'updated_at', 'updated_by', 'created_by'];
 
@@ -205,6 +303,11 @@ export const CLOUD_TABLES = {
   preparations: {table: 'preparations', fields: PREPARATIONS_FIELDS, mutable: false},
   counts: {table: 'surgical_counts', fields: SURGICAL_COUNTS_FIELDS, mutable: false},
   workflowCheckpoints: {table: 'workflow_checkpoints', fields: WORKFLOW_CHECKPOINTS_FIELDS, mutable: false},
+  sterilizationCycles: {table: 'sterilization_cycles', fields: STERILIZATION_CYCLES_FIELDS, mutable: false},
+  sterilizationReleases: {table: 'sterilization_releases', fields: STERILIZATION_RELEASES_FIELDS, mutable: false},
+  processLoads: {table: 'process_loads', fields: PROCESS_LOADS_FIELDS, mutable: true},
+  recallCases: {table: 'recall_cases', fields: RECALL_CASES_FIELDS, mutable: true},
+  library: {table: 'hospital_settings', fields: HOSPITAL_SETTINGS_FIELDS, mutable: true},
 } as const satisfies Record<string, TableSpec>;
 export type TableCollection = keyof typeof CLOUD_TABLES;
 export const TABLE_COLLECTIONS = Object.keys(CLOUD_TABLES) as TableCollection[];

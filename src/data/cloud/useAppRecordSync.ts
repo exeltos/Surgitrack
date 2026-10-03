@@ -41,7 +41,7 @@ const diff = (known: Map<string, CloudRecord>, items: readonly CloudRecord[]) =>
 };
 
 /**
- * Mirrors one store collection into `app_records`. The store updates records immutably,
+ * Mirrors one store collection into its table. The store updates records immutably,
  * so any record whose object identity changed since the last confirmed write is sent again,
  * and records that disappeared are deleted. Writes run one at a time and always diff against
  * the latest items, so changes made while a write is in flight (even create-then-delete) are
