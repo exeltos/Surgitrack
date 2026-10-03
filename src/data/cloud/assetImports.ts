@@ -82,35 +82,18 @@ export async function runAssetImport(
   await seedAppRecords(organizationId, records as unknown as Partial<CloudRecords>, onProgress);
 }
 
-/** How many of the import's records were already used (handed over, sterilized or counted). */
-export async function usedImportRecords(organizationId: string, batch: string) {
-  const used = (table: string) =>
-    supabase
-      .from(table)
-      .select('id', {count: 'exact', head: true})
-      .eq('organization_id', organizationId)
-      .eq('extra->>importBatch', batch)
-      .or('uses.gt.0,state.not.in.(IN_DEPARTMENT,IN_STOCK)');
-  const [tools, sets] = await Promise.all([used('instruments'), used('instrument_sets')]);
-  if (tools.error) throw tools.error;
-  if (sets.error) throw sets.error;
-  return (tools.count || 0) + (sets.count || 0);
-}
-
-/** Removes every Set and instrument the import created and marks it undone. */
+/**
+ * Removes every Set and instrument the import created and marks it undone, in one database
+ * transaction that refuses when any of them was used. Returns how many were in use (0 = undone).
+ */
 export async function undoAssetImport(organizationId: string, batch: string, byName: string) {
-  for (const table of ['instruments', 'instrument_sets']) {
-    const {error} = await supabase
-      .from(table)
-      .delete()
-      .eq('organization_id', organizationId)
-      .eq('extra->>importBatch', batch);
-    if (error) throw error;
-  }
-  const {error} = await supabase
-    .from('asset_imports')
-    .update({undone_at: new Date().toISOString(), undone_by_name: byName})
-    .eq('organization_id', organizationId)
-    .eq('id', batch);
+  const {error} = await supabase.rpc('platform_undo_asset_import', {
+    p_org: organizationId,
+    p_batch: batch,
+    p_by: byName,
+  });
+  const inUse = error?.message.match(/import_in_use:(\d+)/);
+  if (inUse) return Number(inUse[1]);
   if (error) throw error;
+  return 0;
 }

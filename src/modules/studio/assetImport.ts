@@ -228,13 +228,21 @@ export function buildImportPlan(
           `Barcode ${barcode} already exists in the hospital.`,
         ),
       });
-    else if (usedBarcodes.has(key) && usedBarcodes.get(key) !== rowNumber)
+    // Each barcode is claimed once (a Set's when the Set first appears), so any repeat is a clash,
+    // also a Set and an instrument sharing one on the same row.
+    else if (usedBarcodes.has(key))
       errors.push({
         row: rowNumber,
-        message: L(
-          `Το barcode ${barcode} υπάρχει και στη γραμμή ${usedBarcodes.get(key)}.`,
-          `Barcode ${barcode} is also on row ${usedBarcodes.get(key)}.`,
-        ),
+        message:
+          usedBarcodes.get(key) === rowNumber
+            ? L(
+                `Το Σετ και το εργαλείο έχουν το ίδιο barcode ${barcode}.`,
+                `The Set and the instrument share barcode ${barcode}.`,
+              )
+            : L(
+                `Το barcode ${barcode} υπάρχει και στη γραμμή ${usedBarcodes.get(key)}.`,
+                `Barcode ${barcode} is also on row ${usedBarcodes.get(key)}.`,
+              ),
       });
     else usedBarcodes.set(key, rowNumber);
   };

@@ -113,4 +113,9 @@ describe('asset import', () => {
     expect(result.errors.find(e => e.row === 7)?.message).toMatch(/και στη γραμμή 6/);
     expect(result.errors.find(e => e.row === 9)?.message).toMatch(/άλλο τμήμα στη γραμμή 8/);
   });
+
+  it('refuses a Set and an instrument sharing one barcode on the same row', () => {
+    const result = plan([['Βασικό', 'X900', '', 'Λαβίδα', 1, 'x900', '', '', '', '', '', '']]);
+    expect(result.errors).toEqual([{row: 3, message: 'Το Σετ και το εργαλείο έχουν το ίδιο barcode X900.'}]);
+  });
 });

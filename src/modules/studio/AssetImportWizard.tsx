@@ -10,7 +10,6 @@ import {
   loadHospitalBarcodes,
   runAssetImport,
   undoAssetImport,
-  usedImportRecords,
   type AssetImport,
 } from '../../data/cloud/assetImports';
 import {
@@ -170,29 +169,20 @@ export default function AssetImportWizard({lang, organizations, departments, byN
     }
   };
 
-  const askUndo = async (item: AssetImport) => {
-    setError('');
-    try {
-      const used = await usedImportRecords(organizationId, item.id);
-      if (used) {
-        setError(
-          L(
-            `Η εισαγωγή «${item.fileName}» δεν αναιρείται: ${used} από τα εργαλεία ή Σετ της έχουν ήδη χρησιμοποιηθεί. Διαγράψτε μεμονωμένα όσα δεν χρειάζεστε.`,
-            `Import “${item.fileName}” cannot be undone: ${used} of its instruments or Sets have already been used. Delete the ones you do not need one by one.`,
-          ),
-        );
-        return;
-      }
-      setUndoTarget(item);
-    } catch (e) {
-      setError(messageOf(e));
-    }
-  };
   const undo = async (item: AssetImport) => {
     setUndoTarget(undefined);
     setBusy(L('Αναίρεση εισαγωγής…', 'Undoing import…'));
     try {
-      await undoAssetImport(organizationId, item.id, byName);
+      const used = await undoAssetImport(organizationId, item.id, byName);
+      if (used) {
+        setError(
+          L(
+            `Η εισαγωγή «${item.fileName}» δεν αναιρέθηκε: ${used} από τα εργαλεία ή Σετ της έχουν ήδη χρησιμοποιηθεί ή αλλάξει (κινήσεις, παραλαβές, αναφορές, αλλαγή Σετ). Διαγράψτε μεμονωμένα όσα δεν χρειάζεστε.`,
+            `Import “${item.fileName}” was not undone: ${used} of its instruments or Sets have already been used or changed (movements, receipts, reports, Set changes). Delete the ones you do not need one by one.`,
+          ),
+        );
+        return;
+      }
       setNeedsReload(touchesOpenWorkspace(organizationId));
       await refreshImports();
     } catch (e) {
@@ -552,7 +542,14 @@ export default function AssetImportWizard({lang, organizations, departments, byN
                     {item.undoneByName ? ` · ${item.undoneByName}` : ''}
                   </small>
                 ) : (
-                  <AppButton variant="danger" disabled={Boolean(busy)} onClick={() => void askUndo(item)}>
+                  <AppButton
+                    variant="danger"
+                    disabled={Boolean(busy)}
+                    onClick={() => {
+                      setError('');
+                      setUndoTarget(item);
+                    }}
+                  >
                     <RotateCcw size={15} />
                     {L('Αναίρεση', 'Undo')}
                   </AppButton>
