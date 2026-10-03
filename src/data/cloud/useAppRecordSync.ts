@@ -85,9 +85,14 @@ export function useAppRecordSync(
             pending.delete(key);
             break;
           }
-          if (next.changed.length) await writeAppRecords(organizationId, collection, next.changed);
+          const rejected = new Set(
+            next.changed.length ? await writeAppRecords(organizationId, collection, next.changed) : [],
+          );
+          // What the database took is saved even when one record in the batch was refused.
+          next.changed.filter(item => !rejected.has(item.id)).forEach(item => known.set(item.id, item));
+          if (rejected.size)
+            throw new Error(`${collection}: ${[...rejected].join(', ')} refused (barcode already in use)`);
           if (next.removed.length) await deleteAppRecords(organizationId, collection, next.removed);
-          next.changed.forEach(item => known.set(item.id, item));
           next.removed.forEach(id => known.delete(id));
         }
         failed.delete(key);

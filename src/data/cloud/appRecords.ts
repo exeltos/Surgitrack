@@ -117,31 +117,59 @@ const toRow = (organizationId: string, collection: CloudCollection, item: CloudR
 };
 
 const UNIQUE_VIOLATION = '23505';
+const RLS_VIOLATION = '42501';
 
 /**
- * Saves Sets or instruments. A barcode another record already holds (two people registering at
- * the same moment) fails only that record: the others in the batch are still saved.
+ * Saves one Set or instrument row: an update when it exists, otherwise an insert. Department users
+ * may update (handovers change state) but only Sterilization may create, and an upsert is checked
+ * against the create rule even when it ends up updating — hence the separate update.
+ */
+async function saveInstrumentRow(table: string, row: Record<string, unknown>): Promise<'saved' | 'conflict'> {
+  const {organization_id: organizationId, id, ...changes} = row;
+  const {data, error} = await supabase
+    .from(table)
+    .update(changes)
+    .eq('organization_id', organizationId as string)
+    .eq('id', id as string)
+    .select('id');
+  if (error?.code === UNIQUE_VIOLATION) return 'conflict';
+  if (error) throw error;
+  if (data.length) return 'saved';
+  const {error: insertError} = await supabase.from(table).insert(row);
+  if (insertError?.code === UNIQUE_VIOLATION) return 'conflict';
+  if (insertError) throw insertError;
+  return 'saved';
+}
+
+/**
+ * Saves Sets or instruments. Batches go in one request; when the database refuses a batch (a
+ * barcode another record already holds, or a department user updating) each record is saved on its
+ * own. Returns the ids that could not be saved because of a barcode clash, so the rest still count
+ * as saved.
  */
 async function writeInstrumentRows(organizationId: string, collection: InstrumentCollection, items: CloudRecord[]) {
   const table = INSTRUMENT_TABLES[collection].table;
-  const toRows = (chunk: CloudRecord[]) =>
-    chunk.map(item => instrumentToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>));
-  const conflicts: string[] = [];
+  const toRow = (item: CloudRecord) =>
+    instrumentToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
+  const rejected: string[] = [];
   for (const chunk of chunks(items)) {
-    const {error} = await supabase.from(table).upsert(toRows(chunk), {onConflict: 'organization_id,id'});
+    const {error} = await supabase.from(table).upsert(chunk.map(toRow), {onConflict: 'organization_id,id'});
     if (!error) continue;
-    if (error.code !== UNIQUE_VIOLATION) throw error;
-    for (const item of chunk) {
-      const {error: single} = await supabase.from(table).upsert(toRows([item]), {onConflict: 'organization_id,id'});
-      if (single?.code === UNIQUE_VIOLATION) conflicts.push(String((item as {barcode?: string}).barcode || item.id));
-      else if (single) throw single;
-    }
+    if (error.code !== UNIQUE_VIOLATION && error.code !== RLS_VIOLATION) throw error;
+    for (const item of chunk) if ((await saveInstrumentRow(table, toRow(item))) === 'conflict') rejected.push(item.id);
   }
-  if (conflicts.length) throw new Error(`Barcode already in use: ${conflicts.join(', ')}`);
+  return rejected;
 }
 
-/** Inserts new records and updates changed ones; history collections are insert-only. */
-export async function writeAppRecords(organizationId: string, collection: CloudCollection, items: CloudRecord[]) {
+/**
+ * Inserts new records and updates changed ones; history collections are insert-only. Returns the
+ * ids of records the database refused (a barcode already in use); every other record was saved.
+ */
+export async function writeAppRecords(
+  organizationId: string,
+  collection: CloudCollection,
+  items: CloudRecord[],
+): Promise<string[]> {
   if (isInstrumentCollection(collection)) return writeInstrumentRows(organizationId, collection, items);
   const mutable = MUTABLE_COLLECTIONS.has(collection);
   for (const chunk of chunks(items)) {
@@ -151,6 +179,7 @@ export async function writeAppRecords(organizationId: string, collection: CloudC
     );
     if (error) throw error;
   }
+  return [];
 }
 
 export async function deleteAppRecords(organizationId: string, collection: CloudCollection, ids: string[]) {
