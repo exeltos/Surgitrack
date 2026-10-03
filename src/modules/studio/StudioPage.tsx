@@ -24,6 +24,7 @@ import {
   Lock,
   Save,
   Upload,
+  FileSpreadsheet,
   Send,
   Languages,
   UserCheck,
@@ -67,8 +68,9 @@ import {departments as defaultDepartments} from '../../core/libraries';
 import {tr} from '../../i18n';
 import RolesGuide from './RolesGuide';
 import ColorTapeLibrary from './ColorTapeLibrary';
+import AssetImportWizard from './AssetImportWizard';
 
-type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'GUIDE' | 'ROLES' | 'SYSTEM';
+type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
   {
     id: 'ADMIN',
@@ -688,6 +690,12 @@ export default function StudioPage() {
           <button className={tab === 'USERS' ? 'active' : ''} onClick={() => selectTab('USERS')}>
             <Users size={17} />
             {L('Χρήστες', 'Users')}
+          </button>
+        )}
+        {platformAdmin && libs.dataMode === 'PRODUCTION' && (
+          <button className={tab === 'IMPORT' ? 'active' : ''} onClick={() => selectTab('IMPORT')}>
+            <FileSpreadsheet size={17} />
+            {L('Εισαγωγή', 'Import')}
           </button>
         )}
         <button className={tab === 'GUIDE' ? 'active' : ''} onClick={() => selectTab('GUIDE')}>
@@ -1582,6 +1590,14 @@ export default function StudioPage() {
               ))}
             </div>
           </section>
+        )}
+        {tab === 'IMPORT' && platformAdmin && libs.dataMode === 'PRODUCTION' && (
+          <AssetImportWizard
+            lang={lang === 'el' ? 'el' : 'en'}
+            organizations={displayedOrganizations.filter(o => o.active)}
+            departments={cloudDepartments}
+            byName={currentUser.name}
+          />
         )}
         {tab === 'GUIDE' && <RolesGuide />}
         {tab === 'ROLES' && (

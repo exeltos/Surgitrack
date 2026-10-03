@@ -1362,6 +1362,7 @@ export function SurgiProvider({
       state: 'IN_DEPARTMENT',
       createdAt: new Date().toLocaleDateString('el-GR'),
       photos: [],
+      importBatch: undefined,
     };
     setSets(x => [copy, ...x]);
     if (withTools) {
@@ -1378,6 +1379,7 @@ export function SurgiProvider({
         uses: 0,
         sterilizations: 0,
         photos: [],
+        importBatch: undefined,
       }));
       setTools(x => [...copies, ...x]);
     }
@@ -1414,6 +1416,7 @@ export function SurgiProvider({
       sterilizations: 0,
       serialNumber: undefined,
       photos: [],
+      importBatch: undefined,
     };
     setTools(x => [copy, ...x]);
     addMovement({

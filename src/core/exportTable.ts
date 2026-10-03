@@ -177,10 +177,10 @@ const safeName = (title: string) =>
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-/** Downloads the table as an Excel workbook: title, subtitle, header row, frozen panes, filters. */
-export function downloadXlsx(table: ExportTable) {
+/** The table as an Excel workbook: title, subtitle, header row, frozen panes, filters. */
+export function xlsxBlob(table: ExportTable) {
   const sheetName = xml(table.title.slice(0, 31).replace(/[\\/?*[\]:]/g, ' ') || 'SurgiTrack');
-  const blob = zip([
+  return zip([
     {
       name: '[Content_Types].xml',
       content:
@@ -213,6 +213,11 @@ export function downloadXlsx(table: ExportTable) {
     {name: 'xl/styles.xml', content: STYLES},
     {name: 'xl/worksheets/sheet1.xml', content: sheetXml(table)},
   ]);
+}
+
+/** Downloads the table as an Excel workbook. */
+export function downloadXlsx(table: ExportTable) {
+  const blob = xlsxBlob(table);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `${safeName(table.title)}_${today()}.xlsx`;

@@ -352,6 +352,7 @@ export function tableToRow(
     }
   }
   for (const [column, value] of Object.entries(spec.defaults || {})) if (row[column] === null) row[column] = value;
+  for (const [field, value] of Object.entries(extra)) if (value === undefined) delete extra[field];
   row.extra = Object.keys(extra).length ? extra : null;
   if (spec.mutable) row.updated_at = new Date().toISOString();
   if (createdAt) row.created_at = createdAt;
