@@ -55,6 +55,8 @@ export interface Tool {
   /** When Sterilization acknowledged the out-of-use notice (the tool was physically removed). */
   retiredNoticeSeenAt?: string;
   retiredNoticeSeenBy?: string;
+  /** The Studio import that created it (lets the whole import be undone). */
+  importBatch?: string;
 }
 export interface SetCompositionRequirement {
   code: string;
@@ -85,6 +87,8 @@ export interface SetAsset {
   colorTapes?: string[];
   ownership?: Ownership;
   ownerName?: string;
+  /** The Studio import that created it (lets the whole import be undone). */
+  importBatch?: string;
 }
 export type Asset = SetAsset | Tool;
 export interface Movement {

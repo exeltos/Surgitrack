@@ -131,8 +131,14 @@ export async function deleteAppRecords(organizationId: string, collection: Cloud
  * creation times are spaced backwards from now to keep that order on reload.
  * Existing records are left untouched, so an interrupted seed can simply run again.
  */
-export async function seedAppRecords(organizationId: string, records: Partial<CloudRecords>) {
+export async function seedAppRecords(
+  organizationId: string,
+  records: Partial<CloudRecords>,
+  onProgress?: (done: number, total: number) => void,
+) {
   const now = Date.now();
+  const total = Object.values(records).reduce((sum, items) => sum + (items?.length || 0), 0);
+  let done = 0;
   for (const [collection, items] of Object.entries(records) as Array<[CloudCollection, CloudRecord[]]>) {
     const rows = items.map((item, index) =>
       tableToRow(
@@ -147,6 +153,8 @@ export async function seedAppRecords(organizationId: string, records: Partial<Cl
         .from(CLOUD_TABLES[collection].table)
         .upsert(chunk, {onConflict: 'organization_id,id', ignoreDuplicates: true});
       if (error) throw error;
+      done += chunk.length;
+      onProgress?.(done, total);
     }
   }
 }
