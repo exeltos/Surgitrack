@@ -37,6 +37,8 @@ export type UserRole = 'DEPARTMENT' | 'STERILIZATION' | 'ADMIN' | 'VIEWER';
 export type Toast = {
   id: number;
   text: string;
+  /** Takes the action back (offered for a few seconds after a management action). */
+  undo?: () => void;
 };
 
 export type SessionUser = {
@@ -300,6 +302,13 @@ export type SurgiStoreValue = {
   markLost: (kind: AssetKind, id: string, note?: string) => void;
   returnToService: (kind: AssetKind, id: string, note?: string) => void;
   sendSetToService: (id: string, note?: string) => void;
+  /** Gives a Set (and its instruments) or a standalone / stock instrument to a department. */
+  assignDepartment: (kind: AssetKind, id: string, department: string, note?: string) => void;
+  /**
+   * Runs a management action and offers to take it back for a few seconds. Undoing restores the
+   * Sets, instruments and problem reports as they were; the history keeps both entries.
+   */
+  undoable: (label: string, run: () => void) => void;
   updateSet: (id: string, patch: SetUpdatePatch) => void;
   updateTool: (id: string, patch: ToolUpdatePatch) => void;
   addToolsToSet: (setId: string, toolIds: string[]) => void;

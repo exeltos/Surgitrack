@@ -65,11 +65,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ενέργειες',
-          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, αναφορά προβλήματος, εκτύπωση barcode, διαχείριση (μεταφορά σε Σετ, Stock, Service, απώλεια).',
+          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, εκτύπωση barcode και, στο κουμπί «Ενέργειες», αναφορά προβλήματος και διαχείριση (τμήμα, Σετ, Stock, Service, απώλεια). Μια ενέργεια διαχείρισης αναιρείται από την ειδοποίηση για λίγα δευτερόλεπτα· το ιστορικό κρατά και την αναίρεση.',
         ],
         en: [
           'Actions',
-          'Depending on the role: send to Sterilization, report a problem, print the barcode, manage (move to a Set, Stock, Service, loss).',
+          'Depending on the role: send to Sterilization, print the barcode and, under "Actions", report a problem and manage (department, Set, Stock, Service, loss). A management action can be undone from its notice for a few seconds; the history keeps the undo too.',
         ],
       },
     ],
@@ -191,11 +191,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Αναφορά προβλήματος',
-          'Αν λείπει ή έχει φθορά ένα εργαλείο, ανοίξτε το Σετ και δηλώστε το πρόβλημα. Η Αποστείρωση το βλέπει στις Εκκρεμότητες.',
+          'Αν λείπει ή έχει φθορά ένα εργαλείο, ανοίξτε το Σετ, πατήστε «Ενέργειες» → «Αναφορά προβλήματος» και δηλώστε το. Η Αποστείρωση το βλέπει στις Εκκρεμότητες.',
         ],
         en: [
           'Report a problem',
-          'If an instrument is missing or damaged, open the Set and report it. Sterilization sees it under Issues.',
+          'If an instrument is missing or damaged, open the Set, press "Actions" → "Report a problem" and describe it. Sterilization sees it under Issues.',
         ],
       },
     ],
@@ -511,11 +511,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Δημιουργία',
-          'Εκκρεμότητα δημιουργείται από την καρτέλα Σετ ή εργαλείου («Αναφορά προβλήματος») ή αυτόματα από απόκλιση στην παραλαβή.',
+          'Εκκρεμότητα δημιουργείται από την καρτέλα Σετ ή εργαλείου («Ενέργειες» → «Αναφορά προβλήματος») ή αυτόματα από απόκλιση στην παραλαβή.',
         ],
         en: [
           'Creating',
-          'An issue is created from a Set or instrument card ("Report a problem") or automatically from a receipt deviation.',
+          'An issue is created from a Set or instrument card ("Actions" → "Report a problem") or automatically from a receipt deviation.',
         ],
       },
       {

@@ -1311,4 +1311,20 @@ export const en: Record<string, string> = {
   Πλήρη: 'Complete',
   'Με έλλειψη': 'Missing items',
   '{0} φυσικές εγγραφές': '{0} physical records',
+  'Τμήμα, Σετ, Stock, Service, απώλεια': 'Department, Set, Stock, Service, loss',
+  'Τμήμα, Service, απώλεια, επιστροφή': 'Department, Service, loss, return',
+  'Φθορά, έλλειψη ή άλλο πρόβλημα': 'Wear, missing part or another problem',
+  'Καταχώρηση σε τμήμα': 'Assign to a department',
+  'Αλλαγή τμήματος': 'Change department',
+  'Το εργαλείο ανήκει πλέον στο τμήμα που επιλέγετε.': 'The instrument now belongs to the department you choose.',
+  'Το Σετ και τα εργαλεία του ανήκουν πλέον στο τμήμα που επιλέγετε.':
+    'The Set and its instruments now belong to the department you choose.',
+  'Επιλέξτε τμήμα...': 'Choose a department...',
+  τωρινό: 'current',
+  'Το τμήμα αλλάζει όταν το {0} δεν βρίσκεται σε διαδικασία αποστείρωσης ή εκτός χρήσης.':
+    'The department changes once {0} is not in reprocessing or out of use.',
+  '{0}: το τμήμα αλλάζει μόνο όταν δεν βρίσκεται σε διαδικασία ή εκτός χρήσης.':
+    '{0}: the department changes only when it is not in reprocessing or out of use.',
+  '{0}: καταχωρήθηκε στο τμήμα {1}.': '{0}: assigned to {1}.',
+  'Η ενέργεια αναιρέθηκε.': 'The action was undone.',
 };
