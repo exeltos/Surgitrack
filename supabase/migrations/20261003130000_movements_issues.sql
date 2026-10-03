@@ -113,5 +113,5 @@ revoke execute on function public.copy_legacy_records() from public, anon, authe
 
 select public.copy_legacy_records();
 
--- The Demo reset and department renames are updated for these tables in the final cleanup
--- (20261003190000_finish_app_records.sql), which needs the owner to run it.
+-- The Demo reset and department renames are updated for these tables in
+-- 20261003150500_reset_and_rename_new_tables.sql (run by the owner: it holds deletes).
