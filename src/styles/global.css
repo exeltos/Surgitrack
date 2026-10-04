@@ -3701,3 +3701,10 @@ div.asset-import-hospital b {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.people-row.self {
+  cursor: default;
+  background: #f8fbfc;
+}
+.people-row.self:hover {
+  border-color: #eef2f5;
+}

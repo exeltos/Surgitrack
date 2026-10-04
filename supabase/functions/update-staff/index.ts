@@ -4,7 +4,7 @@ import {createClient} from "jsr:@supabase/supabase-js@2";
 // Edits a staff account: full name, sign-in email, department, role and access (and Demo access,
 // for the platform admin only). Only a hospital admin for users of their own hospital, or the
 // platform admin. The email changes on the sign-in account too, so the person signs in with the
-// new one; the username (user code) stays the same. Nobody changes their own role or access.
+// new one; the username (user code) stays the same. Nobody changes their own account.
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -41,6 +41,9 @@ Deno.serve(async req => {
     if (!name || name.length > 120) return json({error: "invalid_name"}, 400);
     if (!EMAIL_FORMAT.test(email) || email.length > 254) return json({error: "invalid_email"}, 400);
 
+    // Nobody changes their own account: another admin (or the platform owner) does it for them.
+    if (userId === auth.user.id) return json({error: "self"}, 403);
+
     const {data: target} = await admin
       .from("profiles")
       .select("id, organization_id, email, role, supervisor, active, department_id, demo_enabled")
@@ -68,7 +71,6 @@ Deno.serve(async req => {
         .maybeSingle();
       if (!department) return json({error: "invalid_department"}, 400);
     }
-    if (userId === auth.user.id && (role !== target.role || active !== target.active)) return json({error: "self"}, 403);
     // Demo access is the platform admin's to give.
     const demoEnabled =
       !me.organization_id && body?.demo_enabled !== undefined ? !!body.demo_enabled : target.demo_enabled;

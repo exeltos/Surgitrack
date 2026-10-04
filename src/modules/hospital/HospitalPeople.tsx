@@ -4,6 +4,7 @@ import {
   ChevronRight,
   FileSpreadsheet,
   Link2,
+  Lock,
   Mail,
   Pencil,
   Plus,
@@ -767,27 +768,49 @@ export default function HospitalPeople({
                 )}
               </div>
             )}
-            {shown.map(m => (
-              <button key={m.id} type="button" className="people-row" onClick={() => setDrawer({member: m})}>
-                <span className="people-who">
-                  <b>
-                    {m.name}
-                    {m.id === me?.id && <em className="people-you">{L('Εσείς', 'You')}</em>}
-                  </b>
-                  <small>{m.email}</small>
-                </span>
-                <code>{m.user_code || '—'}</code>
-                <span className={`people-value${wholeHospital(m.role) ? ' whole' : ''}`}>
-                  {wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id)}
-                </span>
-                <span className="people-value">{roleLabel(roleValue(m))}</span>
-                <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
-                  <i></i>
-                  {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                </span>
-                <ChevronRight size={16} className="people-open" />
-              </button>
-            ))}
+            {shown.map(m => {
+              // Your own account is changed by another admin (or the platform owner), never by you.
+              const self = m.id === me?.id;
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  className={`people-row${self ? ' self' : ''}`}
+                  disabled={self}
+                  title={
+                    self
+                      ? L(
+                          'Τον δικό σας λογαριασμό τον αλλάζει άλλος διαχειριστής.',
+                          'Another admin changes your own account.',
+                        )
+                      : undefined
+                  }
+                  onClick={() => setDrawer({member: m})}
+                >
+                  <span className="people-who">
+                    <b>
+                      {m.name}
+                      {self && <em className="people-you">{L('Εσείς', 'You')}</em>}
+                    </b>
+                    <small>{m.email}</small>
+                  </span>
+                  <code>{m.user_code || '—'}</code>
+                  <span className={`people-value${wholeHospital(m.role) ? ' whole' : ''}`}>
+                    {wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id)}
+                  </span>
+                  <span className="people-value">{roleLabel(roleValue(m))}</span>
+                  <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
+                    <i></i>
+                    {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                  </span>
+                  {self ? (
+                    <Lock size={15} className="people-open" />
+                  ) : (
+                    <ChevronRight size={16} className="people-open" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
