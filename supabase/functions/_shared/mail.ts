@@ -32,7 +32,12 @@ const sendSmtp = async (to: string[], subject: string, html: string) => {
     console.error("smtp", e instanceof Error ? e.message : e);
     return false;
   } finally {
-    await client.close().catch(() => {});
+    // close() is not always a promise; a failure to close must not undo a sent email.
+    try {
+      await client.close();
+    } catch {
+      // ignore
+    }
   }
 };
 
