@@ -2404,19 +2404,20 @@ function UserEditor({
               </select>
             </label>
           )}
-          <label className="studio-switch-row">
-            <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>{tr('Ενεργή πρόσβαση')}</span>
-          </label>
-          <label className="studio-switch-row">
-            <input
-              type="checkbox"
-              checked={role === 'ADMIN' || demoEnabled}
-              disabled={role === 'ADMIN'}
-              onChange={e => setDemoEnabled(e.target.checked)}
-            />
-            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
-          </label>
+          {/* A new user is active from the start; access is withdrawn later, when editing. */}
+          {user && (
+            <label className="studio-switch-row">
+              <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
+              <span>{tr('Ενεργή πρόσβαση')}</span>
+            </label>
+          )}
+          {/* Demo access is per user only where the hospital opens Demo; its admin always has it. */}
+          {role !== 'ADMIN' && organizations.find(org => org.id === organizationId)?.demoEnabled && (
+            <label className="studio-switch-row">
+              <input type="checkbox" checked={demoEnabled} onChange={e => setDemoEnabled(e.target.checked)} />
+              <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
+            </label>
+          )}
           {!user && (
             <div className="studio-form-note">
               <KeyRound size={16} />
