@@ -3,6 +3,7 @@ import {
   Building2,
   ChevronRight,
   FileSpreadsheet,
+  KeyRound,
   Link2,
   Lock,
   Mail,
@@ -447,6 +448,34 @@ export default function HospitalPeople({
       text: L(`Τα στοιχεία του ${draft.name} αποθηκεύτηκαν.`, `${draft.name}'s details were saved.`),
     });
     await changed();
+  };
+
+  /** Emails a user a link to set a new password (the same email as «Ξέχασα τον κωδικό»). */
+  const passwordReset = async (m: Member) => {
+    setBusy(true);
+    setNotice(null);
+    const {error} = await supabase.auth.resetPasswordForEmail(m.email, {redirectTo: window.location.origin});
+    setBusy(false);
+    if (error) {
+      setNotice({
+        kind: 'error',
+        text: /rate|seconds|too many/i.test(error.message)
+          ? L(
+              'Στάλθηκε σύνδεσμος πριν από λίγο. Δοκιμάστε ξανά σε ένα λεπτό.',
+              'A link was sent a moment ago. Try again in a minute.',
+            )
+          : L(`Ο σύνδεσμος δεν στάλθηκε: ${error.message}`, `The link was not sent: ${error.message}`),
+      });
+      return;
+    }
+    setDrawer(null);
+    setNotice({
+      kind: 'ok',
+      text: L(
+        `Στάλθηκε σύνδεσμος αλλαγής κωδικού στο ${m.email}. Ζητήστε να ελέγξει και τα ανεπιθύμητα (spam).`,
+        `A password reset link was sent to ${m.email}. Ask them to check their spam folder too.`,
+      ),
+    });
   };
 
   /** Deletes the account for good; the history the user left stays. */
@@ -923,6 +952,7 @@ export default function HospitalPeople({
           showDemo={platform && hospitalDemo}
           invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
           onResend={draft => void invite(draft, true)}
+          onPasswordReset={demo ? undefined : m => void passwordReset(m)}
           busy={busy}
           L={L}
           lang={lang}
@@ -1022,6 +1052,7 @@ function MemberDrawer({
   onClose,
   onSave,
   onResend,
+  onPasswordReset,
   onDelete,
 }: {
   member: Member | null;
@@ -1036,6 +1067,8 @@ function MemberDrawer({
   onClose: () => void;
   onSave: (draft: Draft) => void;
   onResend: (draft: Draft) => void;
+  /** Emails the user a link to set a new password; left out in Demo. */
+  onPasswordReset?: (member: Member) => void;
   onDelete: () => void;
 }) {
   const invited = invitedAt !== undefined;
@@ -1148,6 +1181,28 @@ function MemberDrawer({
               <span>
                 {L('Όνομα χρήστη', 'Username')}: <b>{member.user_code}</b>
               </span>
+            </div>
+          )}
+          {member && !invited && onPasswordReset && (
+            <div className="people-password">
+              <KeyRound size={17} />
+              <span>
+                <b>{L('Κωδικός πρόσβασης', 'Password')}</b>
+                <small>
+                  {L(
+                    'Ξέχασε τον κωδικό του; Στείλτε του email με σύνδεσμο για να ορίσει νέο. Ο τωρινός κωδικός ισχύει μέχρι να τον αλλάξει.',
+                    'Forgot their password? Send them an email with a link to set a new one. The current password works until they change it.',
+                  )}
+                </small>
+              </span>
+              <AppButton
+                size="sm"
+                disabled={busy || !member.active}
+                icon={<Send size={14} />}
+                onClick={() => onPasswordReset(member)}
+              >
+                {L('Αποστολή συνδέσμου αλλαγής κωδικού', 'Send password reset link')}
+              </AppButton>
             </div>
           )}
           {!member && (
