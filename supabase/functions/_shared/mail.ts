@@ -1,4 +1,6 @@
-import {SMTPClient} from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+// nodemailer encodes Greek subjects and bodies correctly (denomailer broke long Greek subjects
+// across header lines, so the whole message showed as raw source).
+import nodemailer from "npm:nodemailer@6.9.16";
 
 // The app's own emails (signup invitations, approvals, admin alerts). They go out through the same
 // SMTP server as the sign-in emails (secrets SMTP_HOST, SMTP_PORT, which is 465 since Edge Functions
@@ -22,22 +24,18 @@ export const mailConfigured = () =>
 const sendSmtp = async (to: string[], subject: string, html: string) => {
   const s = smtpSettings();
   if (!s) return undefined;
-  const client = new SMTPClient({
-    connection: {hostname: s.host, port: s.port, tls: s.port === 465, auth: {username: s.user, password: s.pass}},
-  });
   try {
-    await client.send({from: s.from, to, subject, html, content: "auto"});
+    const transport = nodemailer.createTransport({
+      host: s.host,
+      port: s.port,
+      secure: s.port === 465,
+      auth: {user: s.user, pass: s.pass},
+    });
+    await transport.sendMail({from: s.from, to: to.join(", "), subject, html});
     return true;
   } catch (e) {
     console.error("smtp", e instanceof Error ? e.message : e);
     return false;
-  } finally {
-    // close() is not always a promise; a failure to close must not undo a sent email.
-    try {
-      await client.close();
-    } catch {
-      // ignore
-    }
   }
 };
 
