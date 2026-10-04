@@ -4408,3 +4408,20 @@ div.asset-import-hospital b {
     padding-bottom: 7px;
   }
 }
+/* Device card: edit and delete stay together at the end of the row; the row never splits them. */
+.device-card-actions {
+  flex-wrap: nowrap;
+}
+.device-card-actions .app-button {
+  min-width: 0;
+  white-space: nowrap;
+}
+.device-card-tools {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.device-card-actions .icon-button:first-of-type {
+  margin-left: 0;
+}

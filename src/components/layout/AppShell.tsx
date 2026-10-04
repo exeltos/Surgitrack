@@ -18,7 +18,7 @@ import {
   Undo2,
 } from 'lucide-react';
 import {navigationFor} from '../../config/navigation';
-import {useSurgi, type UserRole} from '../../store/SurgiStore';
+import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import RoleSwitcher from './RoleSwitcher';
@@ -40,12 +40,6 @@ const initialsOf = (name: string) => {
   const first = parts[0][0];
   const last = parts.length > 1 ? parts[parts.length - 1][0] : parts[0][1] || '';
   return (first + last).toLocaleUpperCase('el');
-};
-const roleLabel: Record<UserRole, {el: string; en: string}> = {
-  DEPARTMENT: {el: 'Χρήστης Τμήματος', en: 'Department user'},
-  STERILIZATION: {el: 'Χρήστης Αποστείρωσης', en: 'Sterilization user'},
-  ADMIN: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
-  VIEWER: {el: 'Παρατηρητής (μόνο προβολή)', en: 'Viewer (read only)'},
 };
 const navEN: Record<string, string> = {
   'Εξοπλισμός τμήματος': 'Department Equipment',
@@ -241,26 +235,6 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           </button>
         </div>
       )}
-      <div className="workspace-label">
-        <small>{lang === 'el' ? 'ΧΩΡΟΣ ΕΡΓΑΣΙΑΣ' : 'WORKSPACE'}</small>
-        <strong>
-          {role === 'DEPARTMENT'
-            ? `${roleLabel[role][lang]} · ${trData(currentUser.department)}`
-            : platformOnly
-              ? lang === 'el'
-                ? 'Διαχείριση πλατφόρμας'
-                : 'Platform administration'
-              : role === 'ADMIN' && actingAsPlatformOwner()
-                ? lang === 'el'
-                  ? 'Owner πλατφόρμας'
-                  : 'Platform owner'
-                : role === 'STERILIZATION' && currentUser.supervisor
-                  ? lang === 'el'
-                    ? 'Προϊστάμενος Αποστείρωσης'
-                    : 'Sterilization supervisor'
-                  : roleLabel[role][lang]}
-        </strong>
-      </div>
       <nav>
         {navigation.map(item => {
           const [path, query = ''] = item.to.split('?');
