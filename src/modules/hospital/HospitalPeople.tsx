@@ -454,6 +454,18 @@ export default function HospitalPeople({
 
   /** Emails a user a link to set a new password (the same email as «Ξέχασα τον κωδικό»). */
   const passwordReset = async (m: Member) => {
+    // Demo users have no real accounts: the button shows what would happen.
+    if (demo) {
+      setDrawer(null);
+      setNotice({
+        kind: 'ok',
+        text: L(
+          `Demo: σε κανονική χρήση θα στελνόταν τώρα email με σύνδεσμο αλλαγής κωδικού στο ${m.email}.`,
+          `Demo: in real use an email with a password reset link would now go to ${m.email}.`,
+        ),
+      });
+      return;
+    }
     setBusy(true);
     setNotice(null);
     const {error} = await supabase.auth.resetPasswordForEmail(m.email, {redirectTo: window.location.origin});
@@ -482,6 +494,8 @@ export default function HospitalPeople({
 
   /** A one-time invitation or set-new-password link, made without sending any email. */
   const makeLink = async (m: Member) => {
+    // Demo: a sample link of the same shape, which opens nothing.
+    if (demo) return `${window.location.origin}/?st_token=demo-${m.id}&st_link=recovery`;
     setNotice(null);
     const {data, error} = await supabase.functions.invoke<{ok?: boolean; url?: string}>('staff-link', {
       body: {user_id: m.id, origin: window.location.origin},
@@ -970,8 +984,8 @@ export default function HospitalPeople({
           showDemo={platform && hospitalDemo}
           invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
           onResend={draft => void invite(draft, true)}
-          onPasswordReset={demo ? undefined : m => void passwordReset(m)}
-          onMakeLink={demo ? undefined : makeLink}
+          onPasswordReset={m => void passwordReset(m)}
+          onMakeLink={makeLink}
           busy={busy}
           L={L}
           lang={lang}
@@ -1310,6 +1324,8 @@ function LinkCopy({
         {copied ? L('Αντιγράφηκε', 'Copied') : L('Αντιγραφή', 'Copy')}
       </AppButton>
       <small>
+        {url.includes('st_token=demo-') &&
+          L('Demo: ενδεικτικός σύνδεσμος, δεν ανοίγει λογαριασμό. ', 'Demo: a sample link; it opens no account. ')}
         {L(
           'Στείλτε τον με όποιον τρόπο θέλετε (μήνυμα, Viber κλπ.). Ισχύει μία φορά και για περιορισμένο χρόνο· μην τον δώσετε σε άλλον.',
           'Send it any way you like (message, chat). It works once and for a limited time; do not give it to anyone else.',
