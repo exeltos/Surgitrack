@@ -11,7 +11,7 @@ const RECOVERY_KEY = 'surgitrack-password-recovery';
  * app has rendered. Note it here, before the client consumes the link, so the app shows the
  * "new password" form instead of going straight in.
  */
-const markRecovery = () => {
+export const markRecovery = () => {
   try {
     sessionStorage.setItem(RECOVERY_KEY, '1');
   } catch {
