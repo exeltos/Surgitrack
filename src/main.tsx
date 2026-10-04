@@ -7,7 +7,8 @@ import {AppPreferencesProvider} from './core/AppPreferences';
 import {LibraryStoreProvider} from './core/LibraryStore';
 import {getRuntimeDataMode} from './config/dataMode';
 import CloudWorkspaceGate from './data/cloud/CloudWorkspaceGate';
-import EmailLinkPage, {emailLink} from './modules/auth/EmailLinkPage';
+import EmailLinkPage from './modules/auth/EmailLinkPage';
+import {emailLink} from './modules/auth/emailLink';
 import './styles/global.css';
 import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
 

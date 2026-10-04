@@ -3,17 +3,6 @@ import {KeyRound, Mail} from 'lucide-react';
 import {markRecovery, supabase} from '../../lib/supabase';
 
 /**
- * What an emailed link carries: `?st_token=<token hash>&st_link=invite|recovery` (not "type=", which
- * the client would take for a link it has already used).
- */
-export const emailLink = (): {token: string; type: 'invite' | 'recovery'} | undefined => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('st_token');
-  const type = params.get('st_link');
-  return token && (type === 'invite' || type === 'recovery') ? {token, type} : undefined;
-};
-
-/**
  * Opening an invitation or password-reset email lands here, and the one-time link is used only
  * when the person presses the button. Hospital mail filters open every link in a message to check
  * it; a link that signed in on open was spent by the filter before the person ever saw it.
