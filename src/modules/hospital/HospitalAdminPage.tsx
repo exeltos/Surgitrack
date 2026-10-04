@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
-import {FileSpreadsheet, RefreshCw} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {RefreshCw} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import HospitalPeople from './HospitalPeople';
@@ -14,7 +13,6 @@ import {managedHospitalId} from '../../data/cloud/accessRequests';
  * its users (invitations, signups to approve) and its departments.
  */
 export default function HospitalAdminPage() {
-  const navigate = useNavigate();
   const {lang} = useAppPreferences();
   const L = (gr: string, en: string) => (lang === 'el' ? gr : en);
   const organizationId = managedHospitalId();
@@ -55,14 +53,9 @@ export default function HospitalAdminPage() {
           "The hospital's users, invitations and departments.",
         )}
         actions={
-          <div className="page-head-actions">
-            <AppButton onClick={() => navigate('/import')} icon={<FileSpreadsheet size={15} />}>
-              {L('Μαζική εισαγωγή', 'Bulk import')}
-            </AppButton>
-            <AppButton onClick={() => setRefreshKey(k => k + 1)} icon={<RefreshCw size={15} />}>
-              {L('Ανανέωση', 'Refresh')}
-            </AppButton>
-          </div>
+          <AppButton onClick={() => setRefreshKey(k => k + 1)} icon={<RefreshCw size={15} />}>
+            {L('Ανανέωση', 'Refresh')}
+          </AppButton>
         }
       />
       <HospitalPeople organizationId={organizationId} refreshKey={refreshKey} />
