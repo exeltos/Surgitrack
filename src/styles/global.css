@@ -4425,3 +4425,37 @@ div.asset-import-hospital b {
 .device-card-actions .icon-button:first-of-type {
   margin-left: 0;
 }
+.people-invited > .app-button,
+.people-password > .app-button {
+  grid-column: 2;
+  justify-self: start;
+}
+.people-invited > .app-button + .app-button,
+.people-password > .app-button + .app-button {
+  margin-top: -2px;
+}
+.people-link {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+.people-link input {
+  min-width: 0;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid #cfdde3;
+  border-radius: 8px;
+  background: #fff;
+  color: #13303b;
+  font: inherit;
+  font-size: 12px;
+}
+.people-link small {
+  grid-column: 1 / -1;
+  color: #5d717d;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
