@@ -4459,6 +4459,58 @@ div.asset-import-hospital b {
   font-size: 11.5px;
   line-height: 1.4;
 }
+.hospital-notice > span {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.hospital-notice .people-link {
+  margin-top: 0;
+}
+.people-link.compact {
+  grid-column: auto;
+  margin-top: 0;
+  min-width: 0;
+}
+.people-link.compact input {
+  height: 30px;
+}
+/* Signup invitations waiting for the person's details. */
+.people-invitations {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #d5e3ec;
+  border-radius: 12px;
+  background: #f6fafc;
+}
+.people-invitations > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2c5468;
+  font-size: 14px;
+}
+.people-invitation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #e3ecf1;
+  border-radius: 10px;
+  background: #fff;
+}
+@media (max-width: 760px) {
+  .people-invitation {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+  .people-invitation .people-link {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
 /* Hospital people: the page scrolls, the lists inside it do not (one scrollbar, not two). */
 .hospital-people .hospital-rows,
 .hospital-people .people-rows {
