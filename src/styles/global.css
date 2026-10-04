@@ -3554,7 +3554,7 @@ div.asset-import-hospital b {
 .people-head,
 .people-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 100px 18px;
+  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
   align-items: center;
   gap: 10px;
 }
@@ -3999,4 +3999,38 @@ div.asset-import-hospital b {
       padding: 8px 10px !important;
     }
   }
+}
+.hospital-member-status.invited {
+  color: #a6620c;
+}
+.hospital-member-status.invited > i {
+  background: #e3a33b;
+}
+.people-invited {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  padding: 11px 12px;
+  border: 1px solid #f0d9a8;
+  border-radius: 11px;
+  background: #fffaf0;
+  color: #a6620c;
+}
+.people-invited span {
+  display: grid;
+  gap: 3px;
+}
+.people-invited b {
+  color: #7a4a08;
+  font-size: 13px;
+}
+.people-invited small {
+  color: #8a6a3a;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.people-invited > button,
+.people-invited > .app-button {
+  grid-column: 2;
+  justify-self: start;
 }

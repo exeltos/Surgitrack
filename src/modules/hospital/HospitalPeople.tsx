@@ -10,6 +10,7 @@ import {
   Plus,
   Save,
   Search,
+  Send,
   Trash2,
   UserCheck,
   UserPlus,
@@ -117,6 +118,8 @@ export default function HospitalPeople({
   const [drawer, setDrawer] = useState<{member: Member | null} | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
   const [csvRows, setCsvRows] = useState<CsvRow[] | null>(null);
+  /** Invitations sent and not accepted yet, by email: when each was last sent. */
+  const [invitations, setInvitations] = useState<Record<string, string>>({});
 
   const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
@@ -146,7 +149,7 @@ export default function HospitalPeople({
       return;
     }
     if (!organizationId) return;
-    const [deps, reqs, profiles] = await Promise.all([
+    const [deps, reqs, profiles, invites] = await Promise.all([
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
         .from('staff_access_requests')
@@ -159,12 +162,19 @@ export default function HospitalPeople({
         .select('id,name,email,user_code,role,supervisor,active,department_id,demo_enabled')
         .eq('organization_id', organizationId)
         .order('name'),
+      supabase
+        .from('user_invitations')
+        .select('email,last_sent_at,invited_at')
+        .eq('organization_id', organizationId)
+        .eq('status', 'SENT'),
     ]);
     // Each part shows what it could load. Requests need the departments (the suggested role and the
     // department picker come from them), so without those they are not shown.
     if (deps.data) setDepartments(deps.data);
     setRequests(deps.data && reqs.data ? (reqs.data as Request[]) : []);
     if (profiles.data) setMembers(profiles.data as Member[]);
+    const sent = (invites.data || []) as Array<{email: string; last_sent_at: string | null; invited_at: string | null}>;
+    setInvitations(Object.fromEntries(sent.map(i => [i.email.toLowerCase(), i.last_sent_at || i.invited_at || ''])));
     const error = deps.error || reqs.error || profiles.error;
     if (error) setNotice({kind: 'error', text: error.message});
   }, [organizationId, demo, libs.departments, libs.users]);
@@ -180,6 +190,8 @@ export default function HospitalPeople({
   };
 
   const departmentName = (id: string | null) => localizedName(departments.find(d => d.id === id)?.name || '—', lang);
+  /** An invited user who has not accepted yet: the account stays inactive until they do. */
+  const invitedAt = (m: Member) => (m.active ? undefined : invitations[m.email.toLowerCase()]);
   const roleLabel = (id: string) => {
     const role = roles.find(r => r.id === id);
     return role ? (el ? role.el : role.en) : id;
@@ -296,7 +308,7 @@ export default function HospitalPeople({
     wholeHospital(role) ? '' : departments.find(d => d.id === departmentId)?.name || '';
 
   /** Invites one person by email: they get a link to set their own password. */
-  const invite = async (draft: Draft) => {
+  const invite = async (draft: Draft, again = false) => {
     const role = accountRole(draft.role);
     const supervisor = draft.role === SUPERVISOR;
     if (demo) {
@@ -352,22 +364,30 @@ export default function HospitalPeople({
     }
     setBusy(false);
     if (!sent) {
+      const reason = String(result?.results?.[0]?.error || error?.message || '');
       setNotice({
         kind: 'error',
-        text: L(
-          `Η πρόσκληση δεν στάλθηκε: ${result?.results?.[0]?.error || error?.message || ''}`,
-          `The invitation was not sent: ${result?.results?.[0]?.error || error?.message || ''}`,
-        ),
+        text: /already|registered|exists/i.test(reason)
+          ? L(
+              `Το ${draft.email} έχει ήδη λογαριασμό που έχει ενεργοποιηθεί. Δεν χρειάζεται πρόσκληση.`,
+              `${draft.email} already has an activated account. No invitation is needed.`,
+            )
+          : L(`Η πρόσκληση δεν στάλθηκε: ${reason}`, `The invitation was not sent: ${reason}`),
       });
       return;
     }
     setDrawer(null);
     setNotice({
       kind: 'ok',
-      text: L(
-        `Στάλθηκε πρόσκληση στο ${draft.email}. Ο/Η ${draft.name} ορίζει κωδικό από το email και μπαίνει.`,
-        `An invitation was sent to ${draft.email}. ${draft.name} sets a password from the email and signs in.`,
-      ),
+      text: again
+        ? L(
+            `Η πρόσκληση στάλθηκε ξανά στο ${draft.email}. Ζητήστε να ελέγξει και τα ανεπιθύμητα (spam).`,
+            `The invitation was sent again to ${draft.email}. Ask them to check their spam folder too.`,
+          )
+        : L(
+            `Στάλθηκε πρόσκληση στο ${draft.email}. Ο/Η ${draft.name} ορίζει κωδικό από το email και μπαίνει.`,
+            `An invitation was sent to ${draft.email}. ${draft.name} sets a password from the email and signs in.`,
+          ),
     });
     await changed();
   };
@@ -799,10 +819,17 @@ export default function HospitalPeople({
                     {wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id)}
                   </span>
                   <span className="people-value">{roleLabel(roleValue(m))}</span>
-                  <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
-                    <i></i>
-                    {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                  </span>
+                  {invitedAt(m) !== undefined ? (
+                    <span className="hospital-member-status invited">
+                      <i></i>
+                      {L('Εκκρεμεί πρόσκληση', 'Invitation pending')}
+                    </span>
+                  ) : (
+                    <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
+                      <i></i>
+                      {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                    </span>
+                  )}
                   {self ? (
                     <Lock size={15} className="people-open" />
                   ) : (
@@ -894,6 +921,8 @@ export default function HospitalPeople({
           self={!!drawer.member && drawer.member.id === me?.id}
           departments={activeDepartments}
           showDemo={platform && hospitalDemo}
+          invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
+          onResend={draft => void invite(draft, true)}
           busy={busy}
           L={L}
           lang={lang}
@@ -986,24 +1015,30 @@ function MemberDrawer({
   self,
   departments,
   showDemo,
+  invitedAt,
   busy,
   L,
   lang,
   onClose,
   onSave,
+  onResend,
   onDelete,
 }: {
   member: Member | null;
   self: boolean;
   departments: Department[];
   showDemo: boolean;
+  /** When the invitation was last sent, for an invited user who has not accepted yet. */
+  invitedAt?: string;
   busy: boolean;
   L: (gr: string, en: string) => string;
   lang: 'el' | 'en';
   onClose: () => void;
   onSave: (draft: Draft) => void;
+  onResend: (draft: Draft) => void;
   onDelete: () => void;
 }) {
+  const invited = invitedAt !== undefined;
   const [draft, setDraft] = useState<Draft>(() => ({
     name: member?.name || '',
     email: member?.email || '',
@@ -1063,7 +1098,34 @@ function MemberDrawer({
               </select>
             )}
           </label>
-          {member && (
+          {invited && member && (
+            <div className="people-invited">
+              <Mail size={17} />
+              <span>
+                <b>{L('Η πρόσκληση δεν έχει γίνει αποδεκτή ακόμα', 'The invitation is not accepted yet')}</b>
+                <small>
+                  {invitedAt
+                    ? L(
+                        `Στάλθηκε στις ${new Date(invitedAt).toLocaleString('el-GR', {dateStyle: 'medium', timeStyle: 'short'})}. Ο λογαριασμός ενεργοποιείται μόλις ορίσει κωδικό από το email.`,
+                        `Sent on ${new Date(invitedAt).toLocaleString('en-GB', {dateStyle: 'medium', timeStyle: 'short'})}. The account activates once they set a password from the email.`,
+                      )
+                    : L(
+                        'Ο λογαριασμός ενεργοποιείται μόλις ορίσει κωδικό από το email.',
+                        'The account activates once they set a password from the email.',
+                      )}
+                </small>
+              </span>
+              <AppButton
+                size="sm"
+                disabled={busy}
+                icon={<Send size={14} />}
+                onClick={() => onResend({...draft, name: draft.name.trim(), email: member.email})}
+              >
+                {L('Επαναποστολή πρόσκλησης', 'Resend invitation')}
+              </AppButton>
+            </div>
+          )}
+          {member && !invited && (
             <label className="studio-switch-row">
               <input
                 type="checkbox"
