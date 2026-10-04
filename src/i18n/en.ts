@@ -1,5 +1,21 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
+  Χρήση: 'Use',
+  'Κανονική χρήση': 'Standard use',
+  'Χωρίς λήξη.': 'No end date.',
+  'Δοκιμαστική περίοδος': 'Trial period',
+  'Μετά τη λήξη το νοσοκομείο κλειδώνει μέχρι να το ανανεώσετε.': 'When it ends the hospital locks until you renew it.',
+  Διάρκεια: 'Length',
+  '{0} ημέρες': '{0} days',
+  'Λήγει στις': 'Ends on',
+  'Διαχειριστής νοσοκομείου': 'Hospital administrator',
+  'Παίρνει πρόσκληση με email, ορίζει κωδικό και στήνει το νοσοκομείο.':
+    'Receives an email invitation, sets a password and sets up the hospital.',
+  'Μη έγκυρο email.': 'Invalid email.',
+  'Δημιουργία και πρόσκληση': 'Create and invite',
+  'Μαζική εισαγωγή': 'Bulk import',
+  'Προβολή τμήματος': 'Department view',
+  'Πίσω στην Επισκόπηση': 'Back to Overview',
   'Δεδομένα συσκευής': 'Device data',
   'Βλάβη, φθορά ή άλλο πρόβλημα': 'Damage, wear or another problem',
   'Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα': 'Damage, wear, loss or another problem',

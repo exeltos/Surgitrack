@@ -6,7 +6,6 @@ import {
   Factory,
   FlaskConical,
   Gauge,
-  KeyRound,
   Plus,
   RefreshCcw,
   Search,
@@ -23,12 +22,8 @@ import {
   Layers3,
   Lock,
   Save,
-  Upload,
   FileSpreadsheet,
-  Send,
   Languages,
-  UserCheck,
-  UserPlus,
   type LucideIcon,
   Palette,
 } from 'lucide-react';
@@ -51,11 +46,10 @@ import {
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
-import SignupLinkCard from '../hospital/SignupLinkCard';
-import {switchHospital} from '../../data/cloud/hospitalSwitch';
+import HospitalPeople from '../hospital/HospitalPeople';
+import OwnerDashboard from './OwnerDashboard';
 import {actingAsPlatformOwner} from '../../data/cloud/identity';
-import {localizedName, translateToEnglish} from '../../core/glossary';
-import {countPendingAccessRequests} from '../../data/cloud/accessRequests';
+import {translateToEnglish} from '../../core/glossary';
 import {
   applyDemoSessionUser,
   demoSessionUser,
@@ -69,6 +63,8 @@ import {tr} from '../../i18n';
 import RolesGuide from './RolesGuide';
 import ColorTapeLibrary from './ColorTapeLibrary';
 import AssetImportWizard from './AssetImportWizard';
+import PlatformContactSettings from './PlatformContactSettings';
+import {TRIAL_LENGTHS, trialEndAfter, trialEndDate, trialEndOn, trialEnded, trialState} from '../../core/trial';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -181,17 +177,8 @@ export default function StudioPage() {
   const [query, setQuery] = useState('');
   const [editItem, setEditItem] = useState<LibraryItem | null>(null);
   const [newItem, setNewItem] = useState(false);
-  const [userEditor, setUserEditor] = useState<AdminUser | null | undefined>(undefined);
   const [organizationEditor, setOrganizationEditor] = useState<Organization | null | undefined>(undefined);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
-  const [pendingRequests, setPendingRequests] = useState(0);
-  useEffect(() => {
-    setPendingRequests(0);
-    if (libs.dataMode !== 'PRODUCTION' || !selectedOrganizationId) return;
-    void countPendingAccessRequests(selectedOrganizationId).then(setPendingRequests);
-  }, [libs.dataMode, selectedOrganizationId]);
-  // Approvals happen in the hospital's own workspace, which loads that hospital's data.
-  const openHospitalAdministration = (organizationId: string) => switchHospital(organizationId, '#/hospital');
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
@@ -199,18 +186,6 @@ export default function StudioPage() {
   const [cloudDepartments, setCloudDepartments] = useState<
     Array<{id: string; organizationId: string; name: string; code: string; active: boolean}>
   >([]);
-  const [bulkRows, setBulkRows] = useState<
-    Array<{
-      name: string;
-      email: string;
-      organizationId: string;
-      departmentId: string;
-      departmentName: string;
-      role: UserRole;
-      error?: string;
-    }>
-  >([]);
-  const [bulkSending, setBulkSending] = useState(false);
   const [confirm, setConfirm] = useState<{title: string; message: string; action: () => void} | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('STERILIZATION');
   const [roleDraft, setRoleDraft] = useState<Permission[]>(() => [
@@ -224,7 +199,7 @@ export default function StudioPage() {
     // Demo hospitals are sandboxes, not customers: they are managed through the Demo buttons only.
     const {data, error} = await supabase
       .from('organizations')
-      .select('id,name,code,active,demo_enabled')
+      .select('id,name,code,active,demo_enabled,plan,trial_ends_at')
       .eq('is_demo', false)
       .order('name');
     if (error) setCloudError(error.message);
@@ -237,6 +212,8 @@ export default function StudioPage() {
           code: row.code,
           active: row.active,
           demoEnabled: row.demo_enabled,
+          plan: row.plan === 'TRIAL' ? 'TRIAL' : 'STANDARD',
+          trialEndsAt: row.trial_ends_at || undefined,
         })),
       );
     }
@@ -275,8 +252,6 @@ export default function StudioPage() {
   }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
   const selectedOrganization = displayedOrganizations.find(o => o.id === selectedOrganizationId);
-  const selectedOrgDepartments = cloudDepartments.filter(d => d.organizationId === selectedOrganizationId);
-  const selectedOrgUsers = displayedUsers.filter(u => u.organizationId === selectedOrganizationId);
   const loadCloudDepartments = async () => {
     if (libs.dataMode !== 'PRODUCTION') return;
     const {data, error} = await supabase.rpc('platform_list_departments');
@@ -317,174 +292,78 @@ export default function StudioPage() {
     setNewItem(false);
     await loadCloudDepartments();
   };
-  const inviteUser = async (data: Omit<AdminUser, 'id'>) => {
-    if (libs.dataMode === 'DEMO') {
-      libs.addUser(data);
-      setUserEditor(undefined);
-      return;
-    }
-    const {data: result, error} = await supabase.functions.invoke('invite-staff', {
-      body: {
-        users: [
-          {
-            full_name: data.name,
-            email: data.email,
-            organization_id: data.organizationId,
-            department_id: data.department || null,
-            role: data.role,
-          },
-        ],
-        redirect_to: window.location.origin,
-      },
-    });
-    if (error || !result?.results?.[0]?.ok) {
-      setCloudError(result?.results?.[0]?.error || error?.message || 'Invite failed');
-      return;
-    }
-    setUserEditor(undefined);
-    await loadCloudUsers();
-  };
-  const importCsv = async (file: File) => {
-    const text = await file.text();
-    const lines = text
-      .split(/\r?\n/)
-      .map(x => x.trim())
-      .filter(Boolean);
-    const rows = lines.slice(1).map(line => {
-      const parts = line.split(/[;,]/).map(x => x.trim().replace(/^"|"$/g, ''));
-      const [name, email, hospital, department, roleRaw] = parts;
-      const org = displayedOrganizations.find(
-        o =>
-          o.code.toLowerCase() === String(hospital || '').toLowerCase() ||
-          o.name.toLowerCase() === String(hospital || '').toLowerCase(),
-      );
-      const dep = org
-        ? cloudDepartments.find(
-            d =>
-              d.organizationId === org.id &&
-              (d.code.toLowerCase() === String(department || '').toLowerCase() ||
-                d.name.toLowerCase() === String(department || '').toLowerCase()),
-          )
-        : undefined;
-      const role = (
-        ['ADMIN', 'STERILIZATION', 'DEPARTMENT', 'VIEWER'].includes(String(roleRaw || '').toUpperCase())
-          ? String(roleRaw).toUpperCase()
-          : 'DEPARTMENT'
-      ) as UserRole;
-      const error =
-        !name || !email.includes('@')
-          ? L('Μη έγκυρο όνομα/email', 'Invalid name/email')
-          : !org
-            ? L('Άγνωστο νοσοκομείο', 'Unknown hospital')
-            : role === 'DEPARTMENT' && !dep
-              ? L('Άγνωστο τμήμα', 'Unknown department')
-              : undefined;
-      return {
-        name,
-        email,
-        organizationId: org?.id || '',
-        departmentId: dep?.id || '',
-        departmentName: dep?.name || department || '',
-        role,
-        error,
-      };
-    });
-    setBulkRows(rows);
-  };
-  const sendBulkInvites = async () => {
-    if (!bulkRows.length || bulkRows.some(r => r.error)) return;
-    setBulkSending(true);
-    setCloudError('');
-    const {data: result, error} = await supabase.functions.invoke('invite-staff', {
-      body: {
-        users: bulkRows.map(r => ({
-          full_name: r.name,
-          email: r.email,
-          organization_id: r.organizationId,
-          department_id: r.departmentId || null,
-          role: r.role,
-        })),
-        redirect_to: window.location.origin,
-      },
-    });
-    setBulkSending(false);
-    if (error) {
-      setCloudError(error.message);
-      return;
-    }
-    const failed = (result?.results || []).filter((x: {ok: boolean}) => !x.ok);
-    if (failed.length) {
-      setCloudError(tr('{0} προσκλήσεις απέτυχαν.', failed.length));
-    } else setBulkRows([]);
-    await loadCloudUsers();
-  };
-  /** Saves an existing user: in Demo the local registry, otherwise the account itself. */
-  const updateUser = async (u: AdminUser, data: Omit<AdminUser, 'id'>) => {
-    if (libs.dataMode === 'DEMO') {
-      libs.updateUser(u.id, data);
-      setUserEditor(undefined);
-      return;
-    }
-    const {data: result, error} = await supabase.functions.invoke<{ok?: boolean}>('update-staff', {
-      body: {
-        user_id: u.id,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        department_id: data.department || null,
-        active: data.active,
-        demo_enabled: data.demoEnabled,
-      },
-    });
-    if (error || !result?.ok) {
-      const status = (error as {context?: {status?: number}} | null)?.context?.status;
-      setCloudError(
-        status === 409
-          ? L('Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.', 'That email is already used by another account.')
-          : L('Οι αλλαγές του χρήστη δεν αποθηκεύτηκαν.', "The user's changes were not saved."),
-      );
-      return;
-    }
-    setUserEditor(undefined);
-    await loadCloudUsers();
-  };
-  const deleteUser = async (u: AdminUser) => {
-    if (libs.dataMode === 'DEMO') {
-      libs.removeUser(u.id);
-      return;
-    }
-    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('delete-staff', {body: {user_id: u.id}});
-    if (error || !data?.ok) {
-      setCloudError(L(`Η διαγραφή του ${u.name} δεν ολοκληρώθηκε.`, `${u.name} could not be deleted.`));
-      return;
-    }
-    await loadCloudUsers();
-  };
-  const saveOrganization = async (data: Omit<Organization, 'id'>) => {
+  const saveOrganization = async (data: Omit<Organization, 'id'>, hospitalAdmin?: {name: string; email: string}) => {
     if (libs.dataMode === 'DEMO') {
       if (organizationEditor) libs.updateOrganization(organizationEditor.id, data);
       else libs.addOrganization(data);
       setOrganizationEditor(undefined);
       return;
     }
-    const {error} = organizationEditor
-      ? await supabase.rpc('platform_update_organization', {
-          p_id: organizationEditor.id,
-          p_name: data.name,
-          p_code: data.code,
-          p_active: data.active,
-          p_demo_enabled: data.demoEnabled,
-        })
-      : await supabase.rpc('platform_create_organization', {p_name: data.name, p_code: data.code});
-    if (error) {
-      setCloudError(error.message);
-      return;
+    let id = organizationEditor?.id;
+    if (organizationEditor) {
+      const {error} = await supabase.rpc('platform_update_organization', {
+        p_id: organizationEditor.id,
+        p_name: data.name,
+        p_code: data.code,
+        p_active: data.active,
+        p_demo_enabled: data.demoEnabled,
+      });
+      if (error) return setCloudError(error.message);
+    } else {
+      const {data: created, error} = await supabase.rpc('platform_create_organization', {
+        p_name: data.name,
+        p_code: data.code,
+      });
+      if (error || !created) return setCloudError(error?.message || 'create failed');
+      id = String(created);
+      // The create call takes only the name and code; the editor's Active and Demo choices follow.
+      if (!data.active || data.demoEnabled)
+        await updateOrganizationFlags({id, ...data}, {active: data.active, demoEnabled: data.demoEnabled});
     }
-    if (!organizationEditor && data.demoEnabled) {
-      await loadCloudOrganizations();
+    const plan = await setOrganizationPlan(id!, data.plan || 'STANDARD', data.trialEndsAt);
+    if (!plan) return;
+    // The hospital's admin gets an invitation by email and sets their own password.
+    if (hospitalAdmin?.email) {
+      const {data: result, error} = await supabase.functions.invoke('invite-staff', {
+        body: {
+          users: [
+            {
+              full_name: hospitalAdmin.name,
+              email: hospitalAdmin.email,
+              organization_id: id,
+              department_id: null,
+              role: 'ADMIN',
+            },
+          ],
+          redirect_to: window.location.origin,
+        },
+      });
+      if (error || !result?.results?.[0]?.ok)
+        setCloudError(
+          L(
+            'Το νοσοκομείο δημιουργήθηκε, αλλά η πρόσκληση του Διαχειριστή απέτυχε: ',
+            'The hospital was created, but the admin invitation failed: ',
+          ) + (result?.results?.[0]?.error || error?.message || ''),
+        );
+      else await loadCloudUsers();
     }
     setOrganizationEditor(undefined);
     await loadCloudOrganizations();
+  };
+  /** Standard use or a trial with its end; the database locks a trial hospital once it ends. */
+  const setOrganizationPlan = async (id: string, plan: 'STANDARD' | 'TRIAL', trialEndsAt?: string) => {
+    const {error} = await supabase
+      .from('organizations')
+      .update({plan, trial_ends_at: plan === 'TRIAL' ? trialEndsAt || null : null})
+      .eq('id', id);
+    if (error) {
+      setCloudError(error.message);
+      return false;
+    }
+    return true;
+  };
+  const changePlan = async (org: Organization, plan: 'STANDARD' | 'TRIAL', trialEndsAt?: string) => {
+    if (await setOrganizationPlan(org.id, plan, trialEndsAt)) await loadCloudOrganizations();
   };
   const updateOrganizationFlags = async (
     org: Organization,
@@ -566,16 +445,6 @@ export default function StudioPage() {
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
-  const filteredUsers = displayedUsers.filter(u => {
-    if (selectedOrganizationId && u.organizationId !== selectedOrganizationId) return false;
-    const organizationName = displayedOrganizations.find(org => org.id === u.organizationId)?.name || '';
-    return `${u.name} ${u.email} ${u.department} ${u.role} ${organizationName}`
-      .toLowerCase()
-      .includes(query.toLowerCase());
-  });
-  const activeUsers = displayedUsers.filter(u => u.active).length;
-  const totalLibraryRecords = libraryMeta.reduce((sum, m) => sum + libs[m.key].length, 0);
-  const departmentUsers = displayedUsers.filter(u => u.role === 'DEPARTMENT').length;
   const roleCount = useMemo(
     () => roles.map(r => ({role: r.id, count: displayedUsers.filter(u => u.role === r.id && u.active).length})),
     [displayedUsers],
@@ -713,99 +582,29 @@ export default function StudioPage() {
       </div>
       <div className={`studio-body studio-body-${tab.toLowerCase()}`}>
         {tab === 'OVERVIEW' && platformAdmin && (
-          <div className="studio-overview">
-            <div className="studio-kpis">
-              <div>
-                <BookOpen />
-                <span>{L('Εγγραφές βιβλιοθηκών', 'Library records')}</span>
-                <strong>{totalLibraryRecords}</strong>
-              </div>
-              <div>
-                <Users />
-                <span>{L('Ενεργοί χρήστες', 'Active users')}</span>
-                <strong>{activeUsers}</strong>
-              </div>
-              <div>
-                <Building2 />
-                <span>{L('Τμήματα', 'Departments')}</span>
-                <strong>{libs.dataMode === 'PRODUCTION' ? cloudDepartments.length : libs.departments.length}</strong>
-              </div>
-              <div>
-                <ShieldCheck />
-                <span>{L('Ρόλοι', 'Roles')}</span>
-                <strong>{roles.length}</strong>
-              </div>
-            </div>
-            <section className="studio-overview-grid">
-              <div className="studio-overview-card">
-                <header>
-                  <div>
-                    <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΕΣ', 'LIBRARIES')}</span>
-                    <h2>{L('Βιβλιοθήκες SurgiTrack', 'SurgiTrack libraries')}</h2>
-                  </div>
-                  <AppButton onClick={() => selectTab('LIBRARIES')}>{L('Διαχείριση', 'Manage')}</AppButton>
-                </header>
-                <div className="studio-library-summary">
-                  {libraryMeta.map(m => {
-                    const Icon = m.icon;
-                    return (
-                      <button
-                        key={m.key}
-                        onClick={() => {
-                          setLibraryKey(m.key);
-                          selectTab('LIBRARIES');
-                        }}
-                      >
-                        <span>
-                          <Icon size={18} />
-                        </span>
-                        <div>
-                          <b>{L(m.el, m.en)}</b>
-                          <small>
-                            {libs[m.key].length} {L('εγγραφές', 'records')}
-                          </small>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="studio-overview-card">
-                <header>
-                  <div>
-                    <span className="eyebrow">{L('ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ', 'ACCESS CONTROL')}</span>
-                    <h2>{L('Πρόσβαση χρηστών', 'User access')}</h2>
-                  </div>
-                  <AppButton onClick={() => selectTab('USERS')}>{L('Χρήστες', 'Users')}</AppButton>
-                </header>
-                <div className="studio-role-summary">
-                  {roles.map(r => {
-                    const count = roleCount.find(x => x.role === r.id)?.count || 0;
-                    return (
-                      <div key={r.id}>
-                        <span className={`studio-role-dot role-${r.id.toLowerCase()}`}></span>
-                        <div>
-                          <b>{L(r.el, r.en)}</b>
-                          <small>
-                            {count} {L('ενεργοί', 'active')}
-                          </small>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="studio-mini-note">
-                  <KeyRound size={17} />
-                  <span>
-                    {L(
-                      `${departmentUsers} χρήστες Τμήματος έχουν πρόσβαση μόνο στα assets του δηλωμένου τμήματός τους.`,
-                      `${departmentUsers} Department users are restricted to assets assigned to their department.`,
-                    )}
-                  </span>
-                </div>
-              </div>
-            </section>
-          </div>
+          <OwnerDashboard
+            organizations={displayedOrganizations}
+            users={displayedUsers}
+            production={libs.dataMode === 'PRODUCTION'}
+            L={L}
+            onOpenUsers={id => {
+              setSelectedOrganizationId(id);
+              selectTab('USERS');
+            }}
+            onOpenHospitals={() => selectTab('PLATFORM')}
+            onNewHospital={() => setOrganizationEditor(null)}
+            onExtendTrial={(org, endsAt) => void changePlan(org, 'TRIAL', endsAt)}
+            onMakeStandard={org =>
+              setConfirm({
+                title: L('Κανονική χρήση;', 'Standard use?'),
+                message: L(
+                  `Το ${org.name} περνά σε κανονική χρήση, χωρίς λήξη. Αν ήταν κλειδωμένο, ξεκλειδώνει αμέσως.`,
+                  `${org.name} moves to standard use, with no end date. If it was locked, it unlocks at once.`,
+                ),
+                action: () => void changePlan(org, 'STANDARD'),
+              })
+            }
+          />
         )}
         {tab === 'PLATFORM' && platformAdmin && (
           <section className="studio-manager-panel studio-platform-panel">
@@ -895,6 +694,7 @@ export default function StudioPage() {
                         <small>
                           {org.code} · {orgUsers.length} {L('χρήστες', 'users')}
                         </small>
+                        <PlanBadge org={org} L={L} />
                       </div>
                     </div>
                     <div className="platform-org-status">
@@ -913,6 +713,29 @@ export default function StudioPage() {
                         {org.demoEnabled ? L('Demo ανοικτό', 'Demo open') : L('Demo κλειστό', 'Demo closed')}
                       </button>
                     </div>
+                    {org.plan === 'TRIAL' && (
+                      <div className="platform-trial-actions">
+                        <button
+                          onClick={() =>
+                            void changePlan(
+                              org,
+                              'TRIAL',
+                              trialEndAfter(
+                                30,
+                                trialEnded(org.plan, org.trialEndsAt) || !org.trialEndsAt
+                                  ? new Date()
+                                  : new Date(org.trialEndsAt),
+                              ),
+                            )
+                          }
+                        >
+                          {L('+30 ημέρες δοκιμής', '+30 trial days')}
+                        </button>
+                        <button className="primary" onClick={() => void changePlan(org, 'STANDARD')}>
+                          {L('Κανονική χρήση', 'Standard use')}
+                        </button>
+                      </div>
+                    )}
                     <div className="platform-demo-actions">
                       <span>{L('Είσοδος Demo ως:', 'Enter Demo as:')}</span>
                       {hospitalRoleKinds.map(kind => (
@@ -1002,24 +825,6 @@ export default function StudioPage() {
                   </AppButton>
                 </header>
                 {cloudError && <div className="auth-message">{cloudError}</div>}
-                {libs.dataMode === 'PRODUCTION' && bulkRows.length > 0 && (
-                  <div className="studio-mini-note">
-                    <Upload size={17} />
-                    <span>
-                      <b>{bulkRows.length}</b> {L('εγγραφές · ', 'rows · ')}
-                      <b>{bulkRows.filter(r => !r.error).length}</b> {L('έγκυρες', 'valid')} ·{' '}
-                      <b>{bulkRows.filter(r => r.error).length}</b> {L('με σφάλμα', 'with errors')}
-                    </span>
-                    <AppButton
-                      variant="primary"
-                      disabled={bulkSending || bulkRows.some(r => r.error)}
-                      onClick={() => void sendBulkInvites()}
-                    >
-                      <Send size={15} />
-                      {bulkSending ? L('Αποστολή...', 'Sending...') : L('Αποστολή προσκλήσεων', 'Send invitations')}
-                    </AppButton>
-                  </div>
-                )}
                 <div className="studio-search">
                   <Search size={17} />
                   <input
@@ -1362,15 +1167,13 @@ export default function StudioPage() {
           <section className="studio-manager-panel studio-users-panel">
             <header className="studio-panel-head">
               <div>
-                <span className="eyebrow">{L('ΠΡΟΣΒΑΣΗ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL ACCESS')}</span>
-                <h2>
-                  {selectedOrganization ? selectedOrganization.name : L('Χρήστες & Τμήματα', 'Users & Departments')}
-                </h2>
+                <span className="eyebrow">{L('ΧΡΗΣΤΕΣ', 'USERS')}</span>
+                <h2>{selectedOrganization ? selectedOrganization.name : L('Χρήστες νοσοκομείου', 'Hospital users')}</h2>
                 <p>
                   {selectedOrganization
                     ? L(
-                        'Κεντρική διαχείριση τμημάτων, χρηστών και προσκλήσεων.',
-                        'Central management of departments, users and invitations.',
+                        'Χρήστες, προσκλήσεις και τμήματα του νοσοκομείου.',
+                        "The hospital's users, invitations and departments.",
                       )
                     : L('Επιλέξτε νοσοκομείο.', 'Select a hospital.')}
                 </p>
@@ -1385,210 +1188,17 @@ export default function StudioPage() {
               </select>
             </header>
             {selectedOrganization && (
-              <div className="hospital-admin-summary">
-                <div>
-                  <Building2 size={18} />
-                  <span>{L('Τμήματα', 'Departments')}</span>
-                  <strong>{selectedOrgDepartments.length}</strong>
-                </div>
-                <div>
-                  <Users size={18} />
-                  <span>{L('Χρήστες', 'Users')}</span>
-                  <strong>{selectedOrgUsers.length}</strong>
-                </div>
-                <div>
-                  <ShieldCheck size={18} />
-                  <span>{L('Ενεργοί', 'Active')}</span>
-                  <strong>{selectedOrgUsers.filter(u => u.active).length}</strong>
-                </div>
-                <div className={pendingRequests ? 'attention' : ''}>
-                  <UserPlus size={18} />
-                  <span>{L('Αιτήματα σε αναμονή', 'Pending requests')}</span>
-                  <strong>{pendingRequests}</strong>
-                </div>
-              </div>
+              <HospitalPeople
+                key={selectedOrganization.id}
+                organizationId={selectedOrganization.id}
+                platform
+                hospitalDemo={selectedOrganization.demoEnabled}
+                onChanged={() => {
+                  void loadCloudUsers();
+                  void loadCloudDepartments();
+                }}
+              />
             )}
-            {selectedOrganization && (
-              <div className="hospital-access-row">
-                <section className="hospital-departments">
-                  <header>
-                    <div>
-                      <b>{L('Τμήματα νοσοκομείου', 'Hospital departments')}</b>
-                      <small>
-                        {L(
-                          'Τα τμήματα χρησιμοποιούνται σε χρήστες, Σετ και ιχνηλασιμότητα.',
-                          'Departments are used by users, sets and traceability.',
-                        )}
-                      </small>
-                    </div>
-                    <AppButton
-                      onClick={() => {
-                        setLibraryKey('departments');
-                        setEditItem(null);
-                        setNewItem(true);
-                      }}
-                    >
-                      <Plus size={15} />
-                      {L('Νέο τμήμα', 'New department')}
-                    </AppButton>
-                  </header>
-                  <div className="hospital-department-list">
-                    {selectedOrgDepartments.map(d => (
-                      <div key={d.id}>
-                        <span>
-                          <b>{localizedName(d.name, lang)}</b>
-                          <small>{d.code || '—'}</small>
-                        </span>
-                        <button
-                          onClick={() => {
-                            setLibraryKey('departments');
-                            setEditItem({id: d.id, el: d.name, en: d.name, code: d.code});
-                            setNewItem(false);
-                          }}
-                        >
-                          <Pencil size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-                {libs.dataMode === 'PRODUCTION' && (
-                  <SignupLinkCard organizationId={selectedOrganization.id} onError={setCloudError}>
-                    <div className="hospital-link-requests">
-                      <span>
-                        {pendingRequests
-                          ? L(
-                              `${pendingRequests} ${pendingRequests === 1 ? 'αίτημα περιμένει' : 'αιτήματα περιμένουν'} έγκριση`,
-                              `${pendingRequests} ${pendingRequests === 1 ? 'request is' : 'requests are'} awaiting approval`,
-                            )
-                          : L('Κανένα αίτημα σε αναμονή', 'No requests awaiting approval')}
-                      </span>
-                      <AppButton size="sm" onClick={() => openHospitalAdministration(selectedOrganization.id)}>
-                        <UserCheck size={14} />
-                        {L('Αιτήματα & έγκριση', 'Requests & approval')}
-                      </AppButton>
-                    </div>
-                  </SignupLinkCard>
-                )}
-              </div>
-            )}
-            <div className="hospital-users-toolbar">
-              <div className="studio-search">
-                <Search size={17} />
-                <input
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  placeholder={L(
-                    'Αναζήτηση χρήστη, email, τμήματος ή ρόλου...',
-                    'Search user, email, department or role...',
-                  )}
-                />
-              </div>
-              {selectedOrganization && (
-                <>
-                  <AppButton variant="primary" onClick={() => setUserEditor(null)}>
-                    <Plus size={16} />
-                    {L('Πρόσκληση χρήστη', 'Invite user')}
-                  </AppButton>
-                  {libs.dataMode === 'PRODUCTION' && (
-                    <label className="app-button">
-                      <Upload size={16} />
-                      {L('Μαζική εισαγωγή CSV', 'Bulk CSV import')}
-                      <input
-                        type="file"
-                        accept=".csv,text/csv"
-                        hidden
-                        onChange={e => e.target.files?.[0] && void importCsv(e.target.files[0])}
-                      />
-                    </label>
-                  )}
-                </>
-              )}
-            </div>
-            <div className="studio-user-head">
-              <span>{L('Χρήστης', 'User')}</span>
-              <span>{L('Νοσοκομείο', 'Hospital')}</span>
-              <span>{L('Τμήμα', 'Department')}</span>
-              <span>{L('Ρόλος', 'Role')}</span>
-              <span>{L('Πρόσβαση', 'Access')}</span>
-              <span>Demo</span>
-              <span></span>
-            </div>
-            <div className="studio-scroll-list">
-              {filteredUsers.length === 0 && (
-                <div className="hospital-users-empty">
-                  <Users size={22} />
-                  <strong>
-                    {query
-                      ? L('Κανένας χρήστης δεν ταιριάζει στην αναζήτηση.', 'No user matches the search.')
-                      : L('Δεν υπάρχουν χρήστες ακόμα.', 'No users yet.')}
-                  </strong>
-                  {!query && selectedOrganization && (
-                    <small>
-                      {L(
-                        'Στείλτε πρόσκληση στον διαχειριστή του νοσοκομείου ή μοιραστείτε τον σύνδεσμο εγγραφής.',
-                        "Invite the hospital's administrator or share the signup link.",
-                      )}
-                    </small>
-                  )}
-                </div>
-              )}
-              {filteredUsers.map(u => (
-                <div className="studio-user-row" key={u.id}>
-                  <div>
-                    <strong>{u.name}</strong>
-                    <small>{u.email}</small>
-                  </div>
-                  <span>{displayedOrganizations.find(org => org.id === u.organizationId)?.name || '—'}</span>
-                  <span>
-                    {libs.dataMode === 'PRODUCTION'
-                      ? localizedName(cloudDepartments.find(d => d.id === u.department)?.name || '—', lang)
-                      : u.department}
-                  </span>
-                  <span className="role-chip">
-                    {L(roles.find(r => r.id === u.role)?.el || u.role, roles.find(r => r.id === u.role)?.en || u.role)}
-                  </span>
-                  <span className={`hospital-member-status ${u.active ? 'active' : ''}`}>
-                    <i></i>
-                    {u.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                  </span>
-                  <span className={`hospital-member-status ${u.role === 'ADMIN' || u.demoEnabled ? 'active' : ''}`}>
-                    <i></i>
-                    {u.role === 'ADMIN' ? L('Admin', 'Admin') : u.demoEnabled ? 'Demo ON' : 'Demo OFF'}
-                  </span>
-                  <div className="studio-row-actions">
-                    <button
-                      onClick={() => setUserEditor(u)}
-                      aria-label={L(`Επεξεργασία ${u.name}`, `Edit ${u.name}`)}
-                      title={L('Επεξεργασία', 'Edit')}
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      className="danger-icon"
-                      onClick={() =>
-                        setConfirm({
-                          title: L('Διαγραφή χρήστη;', 'Delete user?'),
-                          message:
-                            libs.dataMode === 'DEMO'
-                              ? L(
-                                  `Ο χρήστης ${u.name} θα αφαιρεθεί από το demo μητρώο χρηστών.`,
-                                  `User ${u.name} will be removed from the demo user registry.`,
-                                )
-                              : L(
-                                  `Οριστική διαγραφή του λογαριασμού ${u.name}. Δεν θα μπορεί πλέον να συνδεθεί. Το ιστορικό του παραμένει.`,
-                                  `${u.name}'s account is deleted for good. They will no longer be able to sign in. Their history stays.`,
-                                ),
-                          action: () => void deleteUser(u),
-                        })
-                      }
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
           </section>
         )}
         {tab === 'IMPORT' && platformAdmin && libs.dataMode === 'PRODUCTION' && (
@@ -1804,6 +1414,7 @@ export default function StudioPage() {
             </section>
           </div>
         )}
+        {tab === 'SYSTEM' && platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
         {tab === 'SYSTEM' && (
           <div className="studio-system-grid">
             <section>
@@ -1969,27 +1580,12 @@ export default function StudioPage() {
           }}
         />
       )}
-      {userEditor !== undefined && (
-        <UserEditor
-          user={userEditor || undefined}
-          departments={
-            libs.dataMode === 'PRODUCTION' ? cloudDepartments.map(d => d.name) : libs.departments.map(d => d.el)
-          }
-          organizations={selectedOrganization ? [selectedOrganization] : displayedOrganizations}
-          cloudDepartments={libs.dataMode === 'PRODUCTION' ? cloudDepartments : undefined}
-          onClose={() => setUserEditor(undefined)}
-          onSave={data => {
-            if (userEditor) void updateUser(userEditor, data);
-            else void inviteUser(data);
-          }}
-        />
-      )}
       {organizationEditor !== undefined && (
         <OrganizationEditor
           organization={organizationEditor || undefined}
           onClose={() => setOrganizationEditor(undefined)}
-          onSave={data => {
-            void saveOrganization(data);
+          onSave={(data, hospitalAdmin) => {
+            void saveOrganization(data, hospitalAdmin);
           }}
         />
       )}
@@ -2075,6 +1671,24 @@ function LibraryEditor({
     </div>
   );
 }
+/** Trial state on a hospital card: days left, or locked once ended. */
+function PlanBadge({org, L}: {org: Organization; L: (el: string, en: string) => string}) {
+  if (org.plan !== 'TRIAL') return <span className="plan-badge standard">{L('Κανονική χρήση', 'Standard use')}</span>;
+  const state = trialState(org.plan, org.trialEndsAt);
+  const date = org.trialEndsAt ? new Date(org.trialEndsAt).toLocaleDateString('el-GR') : '—';
+  if (state.ended)
+    return (
+      <span className="plan-badge locked">
+        {L(`Δοκιμή έληξε ${date} · κλειδωμένο`, `Trial ended ${date} · locked`)}
+      </span>
+    );
+  return (
+    <span className={`plan-badge trial${state.warn ? ' warn' : ''}`}>
+      {L(`Δοκιμαστική · λήγει ${date} (${state.daysLeft} ημέρες)`, `Trial · ends ${date} (${state.daysLeft} days)`)}
+    </span>
+  );
+}
+
 function OrganizationEditor({
   organization,
   onClose,
@@ -2082,12 +1696,20 @@ function OrganizationEditor({
 }: {
   organization?: Organization;
   onClose: () => void;
-  onSave: (data: Omit<Organization, 'id'>) => void;
+  onSave: (data: Omit<Organization, 'id'>, hospitalAdmin?: {name: string; email: string}) => void;
 }) {
   const [name, setName] = useState(organization?.name || '');
   const [code, setCode] = useState(organization?.code || '');
-  const [active, setActive] = useState(organization?.active ?? true);
-  const [demoEnabled, setDemoEnabled] = useState(organization?.demoEnabled ?? false);
+  // Active and Demo access are switched on the hospital's card; a new hospital starts active, without Demo.
+  const active = organization?.active ?? true;
+  const demoEnabled = organization?.demoEnabled ?? false;
+  const [plan, setPlan] = useState<'STANDARD' | 'TRIAL'>(organization?.plan || 'STANDARD');
+  const [endDate, setEndDate] = useState(trialEndDate(organization?.trialEndsAt) || trialEndDate(trialEndAfter(30)));
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const emailOk = !adminEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim());
+  const adminOk = !!organization || (adminName.trim() && adminEmail.trim() && emailOk);
+  const ready = name.trim() && code.trim() && adminOk && (plan === 'STANDARD' || endDate);
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <aside className="studio-drawer">
@@ -2113,167 +1735,57 @@ function OrganizationEditor({
               placeholder={tr('π.χ. IASO-TH')}
             />
           </label>
-          <label className="studio-switch-row">
-            <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>{tr('Ενεργό νοσοκομείο')}</span>
-          </label>
-          <label className="studio-switch-row">
-            <input type="checkbox" checked={demoEnabled} onChange={e => setDemoEnabled(e.target.checked)} />
-            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
-          </label>
-          <div className="studio-form-note">
-            <ShieldCheck size={16} />
-            <span>
-              {tr(
-                'Η Demo πρόσβαση δεν εμφανίζεται στη δημόσια αρχική. Ενεργοποιείται κεντρικά ανά νοσοκομείο και ανά χρήστη.',
-              )}
-            </span>
-          </div>
-        </div>
-        <footer>
-          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
-          <AppButton
-            variant="primary"
-            disabled={!name.trim() || !code.trim()}
-            onClick={() => onSave({name: name.trim(), code: code.trim(), active, demoEnabled})}
-          >
-            {tr('Αποθήκευση')}
-          </AppButton>
-        </footer>
-      </aside>
-    </div>
-  );
-}
-
-function UserEditor({
-  user,
-  departments,
-  cloudDepartments = [],
-  organizations,
-  onClose,
-  onSave,
-}: {
-  user?: AdminUser;
-  departments: string[];
-  cloudDepartments?: Array<{id: string; organizationId: string; name: string}>;
-  organizations: Organization[];
-  onClose: () => void;
-  onSave: (data: Omit<AdminUser, 'id'>) => void;
-}) {
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [department, setDepartment] = useState(
-    user?.department ||
-      cloudDepartments.find(d => d.organizationId === (user?.organizationId || organizations[0]?.id))?.id ||
-      departments[0] ||
-      '',
-  );
-  const [organizationId, setOrganizationId] = useState(user?.organizationId || organizations[0]?.id || '');
-  const [role, setRole] = useState<UserRole>(user?.role || 'DEPARTMENT');
-  const [active, setActive] = useState(user?.active ?? true);
-  const [demoEnabled, setDemoEnabled] = useState(user?.demoEnabled ?? false);
-  return (
-    <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
-      <aside className="studio-drawer">
-        <header>
-          <div>
-            <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ')}</span>
-            <h2>{user ? tr('Επεξεργασία χρήστη') : tr('Νέος χρήστης')}</h2>
-          </div>
-          <button onClick={onClose}>
-            <X />
-          </button>
-        </header>
-        <div className="studio-drawer-form">
-          <label>
-            {tr('Ονοματεπώνυμο')}
-            <input autoFocus value={name} onChange={e => setName(e.target.value)} />
-          </label>
-          <label>
-            Email
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
-          </label>
-          <label>
-            {tr('Νοσοκομείο')}
-            <select value={organizationId} disabled={!!user} onChange={e => setOrganizationId(e.target.value)}>
-              {organizations.map(org => (
-                <option key={org.id} value={org.id}>
-                  {org.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {tr('Ρόλος')}
-            <select
-              value={role}
-              onChange={e => {
-                const next = e.target.value as UserRole;
-                setRole(next);
-                if (next === 'ADMIN') setDemoEnabled(true);
-              }}
-            >
-              <option value="DEPARTMENT">{tr('Τμήμα')}</option>
-              <option value="STERILIZATION">{tr('Αποστείρωση')}</option>
-              <option value="ADMIN">{tr('Διαχειριστής')}</option>
-              <option value="VIEWER">{tr('Παρατηρητής (μόνο προβολή)')}</option>
-            </select>
-          </label>
-          {role === 'VIEWER' ? (
-            <div className="studio-form-note">
-              <ShieldCheck size={16} />
+          <fieldset className="studio-plan">
+            <legend>{tr('Χρήση')}</legend>
+            <label className={plan === 'STANDARD' ? 'active' : ''}>
+              <input type="radio" name="plan" checked={plan === 'STANDARD'} onChange={() => setPlan('STANDARD')} />
               <span>
-                {tr(
-                  'Ο Παρατηρητής βλέπει όλο το νοσοκομείο (επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό, αναφορές) χωρίς να μπορεί να αλλάξει τίποτα.',
-                )}
+                <b>{tr('Κανονική χρήση')}</b>
+                <small>{tr('Χωρίς λήξη.')}</small>
               </span>
-            </div>
-          ) : role === 'ADMIN' ? (
-            <div className="studio-form-note">
-              <ShieldCheck size={16} />
-              <span>
-                {tr(
-                  'Ο Διαχειριστής δεν ανήκει σε τμήμα: διαχειρίζεται όλο το νοσοκομείο και δημιουργεί τους χρήστες του.',
-                )}
-              </span>
-            </div>
-          ) : (
-            <label>
-              {tr('Τμήμα')}
-              <select value={department} onChange={e => setDepartment(e.target.value)}>
-                {cloudDepartments.length
-                  ? cloudDepartments
-                      .filter(d => d.organizationId === organizationId)
-                      .map(d => (
-                        <option key={d.id} value={d.id}>
-                          {d.name}
-                        </option>
-                      ))
-                  : departments.map(d => <option key={d}>{d}</option>)}
-              </select>
             </label>
-          )}
-          <label className="studio-switch-row">
-            <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>{tr('Ενεργή πρόσβαση')}</span>
-          </label>
-          <label className="studio-switch-row">
-            <input
-              type="checkbox"
-              checked={role === 'ADMIN' || demoEnabled}
-              disabled={role === 'ADMIN'}
-              onChange={e => setDemoEnabled(e.target.checked)}
-            />
-            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
-          </label>
-          {!user && (
-            <div className="studio-form-note">
-              <KeyRound size={16} />
+            <label className={plan === 'TRIAL' ? 'active' : ''}>
+              <input type="radio" name="plan" checked={plan === 'TRIAL'} onChange={() => setPlan('TRIAL')} />
               <span>
-                {tr(
-                  'Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα αρχικά του.',
-                )}
+                <b>{tr('Δοκιμαστική περίοδος')}</b>
+                <small>{tr('Μετά τη λήξη το νοσοκομείο κλειδώνει μέχρι να το ανανεώσετε.')}</small>
               </span>
+            </label>
+          </fieldset>
+          {plan === 'TRIAL' && (
+            <div className="studio-trial-length">
+              <span>{tr('Διάρκεια')}</span>
+              <div>
+                {TRIAL_LENGTHS.map(days => (
+                  <button
+                    key={days}
+                    type="button"
+                    className={endDate === trialEndDate(trialEndAfter(days)) ? 'active' : ''}
+                    onClick={() => setEndDate(trialEndDate(trialEndAfter(days)))}
+                  >
+                    {tr('{0} ημέρες', days)}
+                  </button>
+                ))}
+              </div>
+              <label>
+                {tr('Λήγει στις')}
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+              </label>
+            </div>
+          )}
+          {!organization && (
+            <div className="studio-admin-invite">
+              <b>{tr('Διαχειριστής νοσοκομείου')}</b>
+              <small>{tr('Παίρνει πρόσκληση με email, ορίζει κωδικό και στήνει το νοσοκομείο.')}</small>
+              <label>
+                {tr('Ονοματεπώνυμο')}
+                <input value={adminName} onChange={e => setAdminName(e.target.value)} />
+              </label>
+              <label>
+                Email
+                <input type="email" value={adminEmail} onChange={e => setAdminEmail(e.target.value)} />
+                {!emailOk && <small className="studio-field-error">{tr('Μη έγκυρο email.')}</small>}
+              </label>
             </div>
           )}
         </div>
@@ -2281,20 +1793,22 @@ function UserEditor({
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
-            disabled={!name.trim() || !email.trim()}
+            disabled={!ready}
             onClick={() =>
-              onSave({
-                name: name.trim(),
-                email: email.trim(),
-                department: role === 'ADMIN' || role === 'VIEWER' ? '' : department,
-                role,
-                active,
-                organizationId,
-                demoEnabled: role === 'ADMIN' ? true : demoEnabled,
-              })
+              onSave(
+                {
+                  name: name.trim(),
+                  code: code.trim(),
+                  active,
+                  demoEnabled,
+                  plan,
+                  trialEndsAt: plan === 'TRIAL' ? trialEndOn(endDate) : undefined,
+                },
+                organization ? undefined : {name: adminName.trim(), email: adminEmail.trim().toLowerCase()},
+              )
             }
           >
-            {tr('Αποθήκευση')}
+            {organization ? tr('Αποθήκευση') : tr('Δημιουργία και πρόσκληση')}
           </AppButton>
         </footer>
       </aside>

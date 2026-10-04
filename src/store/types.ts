@@ -210,6 +210,7 @@ export type ToolUpdatePatch = Partial<
 export type SurgiStoreValue = {
   /** The hospital whose data is open (cloud workspaces only). */
   organizationId?: string;
+  organizationName?: string;
   sets: SetAsset[];
   tools: Tool[];
   /** Tools taken out of circulation, kept only as history. */

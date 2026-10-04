@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {Plus, ChevronRight} from 'lucide-react';
+import {Plus, ChevronRight, FileSpreadsheet} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
@@ -21,7 +21,7 @@ import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function ToolsPage() {
-  const {tools, sets, can} = useSurgi();
+  const {tools, sets, can, organizationId} = useSurgi();
   const navigate = useNavigate();
   const [q, setQ] = useRememberedState('q', '');
   const [department, setDepartment] = useRememberedState('department', '');
@@ -67,9 +67,16 @@ export default function ToolsPage() {
         )}
         actions={
           can('asset.create') ? (
-            <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
-              {tr('Νέο Εργαλείο')}
-            </AppButton>
+            <div className="page-head-actions">
+              {organizationId && (
+                <AppButton icon={<FileSpreadsheet size={17} />} onClick={() => navigate('/import')}>
+                  {tr('Μαζική εισαγωγή')}
+                </AppButton>
+              )}
+              <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
+                {tr('Νέο Εργαλείο')}
+              </AppButton>
+            </div>
           ) : undefined
         }
       />

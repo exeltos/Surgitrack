@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {Link} from 'react-router-dom';
-import {ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wrench} from 'lucide-react';
+import {Link, useSearchParams} from 'react-router-dom';
+import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wrench} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
@@ -27,8 +27,11 @@ const departmentStateLabel: Record<string, string> = {
 };
 
 export default function DepartmentPage() {
-  const {sets, tools, issues, currentUser} = useSurgi();
-  const dept = currentUser.department;
+  const {sets, tools, issues, currentUser, role} = useSurgi();
+  // From the Overview, the admin and Sterilization look at one department as the department sees it.
+  const [params] = useSearchParams();
+  const viewing = role === 'DEPARTMENT' ? '' : params.get('d') || '';
+  const dept = viewing || currentUser.department;
   const lastOpenedKey =
     typeof window !== 'undefined' ? sessionStorage.getItem('surgitrack.department.lastAsset') : null;
   const initialCategory: Category = lastOpenedKey?.startsWith('TOOL:') ? 'TOOLS' : 'SETS';
@@ -106,11 +109,19 @@ export default function DepartmentPage() {
             )}
           </p>
         </div>
-        <div className="department-user-sign">
-          <ShieldCheck size={18} />
-          <span>{tr('Συνδεδεμένος χρήστης')}</span>
-          <strong>{trData(currentUser.name)}</strong>
-        </div>
+        {viewing ? (
+          <Link className="department-user-sign department-back" to="/overview">
+            <ArrowLeft size={18} />
+            <span>{tr('Προβολή τμήματος')}</span>
+            <strong>{tr('Πίσω στην Επισκόπηση')}</strong>
+          </Link>
+        ) : (
+          <div className="department-user-sign">
+            <ShieldCheck size={18} />
+            <span>{tr('Συνδεδεμένος χρήστης')}</span>
+            <strong>{trData(currentUser.name)}</strong>
+          </div>
+        )}
       </header>
 
       <section className="department-kpis">
@@ -132,7 +143,7 @@ export default function DepartmentPage() {
             <strong>{k.value}</strong>
           </button>
         ))}
-        <Link to={presetPath('/issues', {status: 'OPEN'})}>
+        <Link to={presetPath('/issues', {status: 'OPEN', department: dept})}>
           <span>{tr('Ανοικτές εκκρεμότητες')}</span>
           <strong>{openIssues}</strong>
         </Link>

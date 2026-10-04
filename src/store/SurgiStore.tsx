@@ -1956,6 +1956,7 @@ export function SurgiProvider({
       workflowCheckpoints,
       deliveries,
       organizationId: cloudOrganizationId,
+      organizationName: cloud?.organizationName,
       lifecycleAlerts,
       toast,
       role,

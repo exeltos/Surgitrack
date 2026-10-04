@@ -3194,3 +3194,932 @@ a.overview-bar:hover {
   font-weight: 700;
   cursor: pointer;
 }
+/* Device dialogs: title left, close button in the corner; the "active" box sits beside its words. */
+.devices-modal > header {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+.form-grid label.devices-check {
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.form-grid label.devices-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  flex: none;
+}
+/* Department view opened from the Overview: the corner card leads back. */
+a.department-back {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+a.department-back:hover {
+  border-color: var(--st-teal, #167187);
+}
+div.asset-import-hospital b {
+  color: var(--st-ink, #20313f);
+  font-size: 15px;
+}
+.import-page {
+  display: grid;
+}
+.import-page .asset-import {
+  padding-inline: 0;
+}
+.page-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Trial hospitals */
+.trial-strip {
+  padding: 9px 28px;
+  border-bottom: 1px solid #f4c27a;
+  background: var(--st-amber-soft, #fff6e7);
+  color: var(--st-amber, #a66b16);
+  font-size: 13px;
+  font-weight: 600;
+}
+.trial-strip.ended {
+  border-color: #f1c6c6;
+  background: var(--st-red-soft, #fff0f0);
+  color: var(--st-red, #b44747);
+}
+@media (max-width: 650px) {
+  .trial-strip {
+    padding: 8px 12px;
+  }
+}
+.cloud-gate.trial-locked {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: left;
+  gap: 14px;
+}
+.cloud-gate.trial-locked p {
+  margin: 0;
+  color: var(--st-muted, #6f808c);
+  line-height: 1.55;
+}
+.trial-contact {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 14px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--st-canvas, #f3f7f8);
+}
+.trial-contact dt {
+  color: var(--st-muted, #6f808c);
+  font-size: 12.5px;
+}
+.trial-contact dd {
+  margin: 0;
+  font-weight: 700;
+}
+.plan-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: var(--st-canvas, #f3f7f8);
+  color: var(--st-muted, #6f808c);
+}
+.plan-badge.trial {
+  background: var(--st-teal-soft, #eaf6f7);
+  color: var(--st-teal, #167187);
+}
+.plan-badge.trial.warn {
+  background: var(--st-amber-soft, #fff6e7);
+  color: var(--st-amber, #a66b16);
+}
+.plan-badge.locked {
+  background: var(--st-red-soft, #fff0f0);
+  color: var(--st-red, #b44747);
+}
+.platform-trial-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.platform-trial-actions button {
+  padding: 6px 12px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.platform-trial-actions button.primary {
+  border-color: var(--st-teal, #167187);
+  background: var(--st-teal, #167187);
+  color: #fff;
+}
+.studio-plan {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.studio-plan legend {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.studio-plan label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.studio-plan label.active {
+  border-color: var(--st-teal, #167187);
+  background: var(--st-teal-soft, #eaf6f7);
+}
+.studio-plan input {
+  width: auto !important;
+  margin-top: 3px;
+}
+.studio-plan span {
+  display: grid;
+  gap: 2px;
+}
+.studio-plan small,
+.studio-admin-invite > small {
+  color: var(--st-muted, #6f808c);
+  font-weight: 500;
+}
+.studio-trial-length {
+  display: grid;
+  gap: 8px;
+}
+.studio-trial-length > span {
+  font-size: 13px;
+  font-weight: 700;
+}
+.studio-trial-length > div {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.studio-trial-length button {
+  padding: 6px 12px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.studio-trial-length button.active {
+  border-color: var(--st-teal, #167187);
+  background: var(--st-teal, #167187);
+  color: #fff;
+}
+.studio-admin-invite {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed #b9d4dc;
+  border-radius: 12px;
+  background: var(--st-cyan-soft, #f2fafb);
+}
+.studio-field-error {
+  color: var(--st-red, #b44747) !important;
+}
+.platform-contact {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 14px;
+  background: #fff;
+}
+.platform-contact > header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  color: var(--st-teal, #167187);
+}
+.platform-contact h3 {
+  margin: 0 0 4px;
+  color: var(--st-ink, #20313f);
+  font-size: 16px;
+}
+.platform-contact p {
+  margin: 0;
+  color: var(--st-muted, #6f808c);
+  font-size: 13px;
+}
+.platform-contact-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.platform-contact-fields label {
+  display: grid;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--st-muted, #6f808c);
+}
+.platform-contact-fields input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 9px;
+  font: inherit;
+}
+.platform-contact > footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.platform-contact > footer small {
+  color: var(--st-muted, #6f808c);
+}
+
+/* Hospital people: one users list (rows open a drawer), invitations, signups to approve, departments. */
+.hospital-people {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.studio-users-panel .hospital-people {
+  padding: 0 16px 16px;
+}
+.hospital-count.attention {
+  background: #fff1dc;
+  color: #a6620c;
+}
+.people-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.people-toolbar .studio-search {
+  flex: 1;
+  margin: 0 !important;
+}
+.people-invite {
+  position: relative;
+}
+.people-invite-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  width: min(320px, 86vw);
+  display: grid;
+  padding: 6px;
+  border: 1px solid #dfe8ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(19, 44, 57, 0.16);
+}
+.people-invite-menu > button,
+.people-invite-menu > label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: #0e6d82;
+  cursor: pointer;
+}
+.people-invite-menu > button:hover,
+.people-invite-menu > label:hover {
+  background: #f1f7f9;
+}
+.people-invite-menu span {
+  display: grid;
+  gap: 2px;
+}
+.people-invite-menu b {
+  color: #1d2939;
+  font-size: 13px;
+}
+.people-invite-menu small {
+  color: #7b8794;
+  font-size: 11px;
+}
+.people-requests {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #f0d9a8;
+  border-radius: 12px;
+  background: #fffaf0;
+}
+.people-requests > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  color: #a6620c;
+}
+.people-requests > header b {
+  color: #7a4a08;
+  font-size: 14px;
+}
+.people-requests > header small {
+  grid-column: 2;
+  color: #8a6a3a;
+  font-size: 12px;
+}
+.people-requests .hospital-request {
+  background: #fff;
+}
+.people-head,
+.people-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
+  align-items: center;
+  gap: 10px;
+}
+.people-head {
+  padding: 0 12px;
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.people-rows {
+  display: grid;
+  gap: 6px;
+}
+.people-row {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #eef2f5;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  color: #1d2939;
+  cursor: pointer;
+}
+.people-row:hover {
+  border-color: #b9d7df;
+  background: #f7fbfc;
+}
+.people-row code {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #0e6d82;
+}
+.people-who {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.people-who b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.people-who small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 600;
+}
+.people-you {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #e6f3f6;
+  color: #0e6d82;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+.people-value {
+  min-width: 0;
+  color: #364152;
+  font-size: 12.5px;
+}
+.people-value.whole {
+  color: #7b8794;
+  font-style: italic;
+}
+.people-open {
+  color: #9aabb6;
+}
+.people-csv {
+  display: grid;
+  gap: 6px;
+}
+.people-csv > div {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid #e3e9ee;
+  border-radius: 9px;
+}
+.people-csv > div.error {
+  border-color: #f2c4c4;
+  background: #fff6f6;
+}
+.people-csv small {
+  color: #7b8794;
+}
+.people-csv em {
+  color: #b42318;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+.people-drawer-gap {
+  flex: 1;
+}
+@media (max-width: 760px) {
+  .people-head {
+    display: none;
+  }
+  .people-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 4px;
+  }
+  .people-row > code,
+  .people-row > .people-value {
+    display: none;
+  }
+  .people-row > .hospital-member-status {
+    grid-column: 1;
+  }
+  .people-row > .people-open {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+}
+.hospital-people .hospital-request select,
+.hospital-people .hospital-request input,
+.hospital-people .hospital-department-add input,
+.hospital-people .hospital-row input {
+  height: 36px;
+  min-width: 0;
+  border: 1px solid #d9e1e8;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 9px;
+  color: #1d2939;
+  font: inherit;
+  font-size: 13px;
+}
+.hospital-people .people-toolbar .studio-search input {
+  height: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+@media (max-width: 760px) {
+  .hospital-people .hospital-request {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.people-row.self {
+  cursor: default;
+  background: #f8fbfc;
+}
+.people-row.self:hover {
+  border-color: #eef2f5;
+}
+
+/* The platform owner's start page in Studio. */
+.owner-dashboard {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.owner-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+.owner-kpi {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid #dbe7ec;
+  border-radius: 14px;
+  background: #fff;
+  color: #0e6d82;
+}
+.owner-kpi span {
+  color: #5d717d;
+  font-size: 12px;
+  font-weight: 700;
+}
+.owner-kpi strong {
+  grid-column: 1 / -1;
+  color: #13303b;
+  font-size: 26px;
+  line-height: 1;
+}
+.owner-kpi.warn {
+  border-color: #f0d9a8;
+  background: #fffaf0;
+  color: #a6620c;
+}
+.owner-kpi.stop {
+  border-color: #f2c4c4;
+  background: #fff6f6;
+  color: #b42318;
+}
+.owner-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 14px;
+}
+.owner-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid #dbe7ec;
+  border-radius: 16px;
+  background: #fff;
+}
+.owner-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.owner-card h2 {
+  margin: 2px 0 0;
+  color: #13303b;
+  font-size: 18px;
+}
+.owner-count {
+  min-width: 30px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #eef6f8;
+  color: #0e6d82;
+  font-weight: 800;
+  text-align: center;
+}
+.owner-count.warn {
+  background: #fff1dc;
+  color: #a6620c;
+}
+.owner-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #5d717d;
+  font-size: 13px;
+}
+.owner-attention {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.owner-attention li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e3e9ee;
+  border-radius: 11px;
+  color: #0e6d82;
+  font-size: 13px;
+}
+.owner-attention li span {
+  color: #1d2939;
+}
+.owner-attention li.warn {
+  border-color: #f0d9a8;
+  background: #fffaf0;
+  color: #a6620c;
+}
+.owner-attention li.stop {
+  border-color: #f2c4c4;
+  background: #fff6f6;
+  color: #b42318;
+}
+.owner-actions {
+  display: grid;
+  gap: 8px;
+}
+.owner-actions button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid #e3e9ee;
+  border-radius: 11px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  color: #0e6d82;
+  cursor: pointer;
+}
+.owner-actions button:hover {
+  border-color: #b9d7df;
+  background: #f7fbfc;
+}
+.owner-actions span {
+  display: grid;
+  gap: 2px;
+}
+.owner-actions b {
+  color: #1d2939;
+  font-size: 13px;
+}
+.owner-actions small {
+  color: #7b8794;
+  font-size: 11.5px;
+}
+.owner-hospital-head,
+.owner-hospital {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) 90px 90px minmax(150px, auto);
+  align-items: center;
+  gap: 10px;
+}
+.owner-hospital-head {
+  padding: 0 12px;
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.owner-hospitals {
+  display: grid;
+  gap: 6px;
+}
+.owner-hospital {
+  padding: 9px 12px;
+  border: 1px solid #eef2f5;
+  border-radius: 10px;
+}
+.owner-hospital.inactive {
+  opacity: 0.6;
+}
+.owner-hospital-name {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.owner-hospital-name b {
+  color: #1d2939;
+  font-size: 13.5px;
+}
+.owner-hospital-name small {
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 600;
+}
+.owner-num b {
+  color: #1d2939;
+  font-size: 14px;
+}
+.owner-num small {
+  margin-left: 3px;
+  color: #7b8794;
+}
+.owner-num.warn b {
+  color: #a6620c;
+}
+.owner-hospital-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.owner-open {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e3e9ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #526174;
+  cursor: pointer;
+}
+.owner-footnote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #7b8794;
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  .owner-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .owner-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .owner-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .owner-attention li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .owner-attention li > :last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .owner-hospital-head {
+    display: none;
+  }
+  .owner-hospital {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .owner-hospital > .owner-num {
+    display: none;
+  }
+  .owner-hospital-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+/* All ten Studio tabs on one row from tablet width up: tighter spacing, and the icons go first
+   when the row is short of room. Phones keep the wrapped grid. */
+@media (min-width: 761px) {
+  .studio-tabs {
+    container-type: inline-size;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+  .studio-tabs button {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 4px !important;
+    gap: 5px;
+  }
+  @container (max-width: 1080px) {
+    .studio-tabs button svg {
+      display: none;
+    }
+  }
+  /* Narrower still (tablets): the tabs keep their size and the row scrolls sideways. */
+  @container (max-width: 900px) {
+    .studio-tabs button {
+      flex: 0 0 auto;
+      padding: 8px 10px !important;
+    }
+  }
+}
+.hospital-member-status.invited {
+  color: #a6620c;
+}
+.hospital-member-status.invited > i {
+  background: #e3a33b;
+}
+.people-invited {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  padding: 11px 12px;
+  border: 1px solid #f0d9a8;
+  border-radius: 11px;
+  background: #fffaf0;
+  color: #a6620c;
+}
+.people-invited span {
+  display: grid;
+  gap: 3px;
+}
+.people-invited b {
+  color: #7a4a08;
+  font-size: 13px;
+}
+.people-invited small {
+  color: #8a6a3a;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.people-invited > button,
+.people-invited > .app-button {
+  grid-column: 2;
+  justify-self: start;
+}
+
+/* The page an emailed invitation or password-reset link opens: one button spends the link. */
+.email-link-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: #f4f7fa;
+  font-family: inherit;
+}
+.email-link-card {
+  width: min(440px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 30px 28px;
+  border: 1px solid #e1e7ed;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(19, 44, 57, 0.08);
+  text-align: center;
+}
+.email-link-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+.email-link-brand > span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: #183b56;
+  color: #fff;
+  font-weight: 800;
+}
+.email-link-brand b {
+  display: block;
+  color: #152c41;
+  font-size: 16px;
+}
+.email-link-brand small {
+  color: #738396;
+  font-size: 11px;
+}
+.email-link-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #eaf6f8;
+  color: #0e6d82;
+}
+.email-link-card h1 {
+  margin: 4px 0 0;
+  color: #152c41;
+  font-size: 22px;
+}
+.email-link-card p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.email-link-card p.email-link-error {
+  color: #b42318;
+}
+.email-link-button {
+  margin-top: 8px;
+  min-width: 180px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: #183b56;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.email-link-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
