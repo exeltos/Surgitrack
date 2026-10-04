@@ -3903,7 +3903,7 @@ a.auth-primary {
   background: #fef3f2;
   color: #b42318;
 }
-.hospital-notice button {
+.hospital-notice > button {
   border: 0;
   background: transparent;
   color: inherit;

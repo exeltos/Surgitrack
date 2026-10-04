@@ -9,8 +9,8 @@ export const en: Record<string, string> = {
   '{0} ημέρες': '{0} days',
   'Λήγει στις': 'Ends on',
   'Διαχειριστής νοσοκομείου': 'Hospital administrator',
-  'Παίρνει πρόσκληση με email, ορίζει κωδικό και στήνει το νοσοκομείο.':
-    'Receives an email invitation, sets a password and sets up the hospital.',
+  'Λαμβάνει email με το όνομα χρήστη του και κουμπί «Αποδοχή και ορισμός κωδικού», και στήνει το νοσοκομείο.':
+    'Gets an email with their username and an «Accept and set password» button, and sets up the hospital.',
   'Μη έγκυρο email.': 'Invalid email.',
   'Δημιουργία και πρόσκληση': 'Create and invite',
   'Μαζική εισαγωγή': 'Bulk import',

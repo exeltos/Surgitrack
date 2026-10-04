@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Building2, Eye, EyeOff, Languages, LockKeyhole, Mail, MailCheck, ShieldCheck, UserRound} from 'lucide-react';
+import {Building2, Clock3, Languages, Mail, ShieldCheck, UserRound} from 'lucide-react';
 import {FunctionsHttpError} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -8,7 +8,12 @@ import {APP_VERSION} from '../../config/appMeta';
 
 type LinkInfo = {
   organization_name: string;
-  expires_at: string;
+  /** The hospital link's expiry; none for a personal invitation. */
+  expires_at: string | null;
+  /** A personal invitation's address, fixed. */
+  email: string | null;
+  department_id: string | null;
+  needs_department: boolean;
   departments: Array<{id: string; name: string; code: string | null}>;
 };
 
@@ -28,10 +33,10 @@ const errorText = (code: string, el: boolean) => {
       return el ? 'Ο σύνδεσμος εγγραφής έληξε ή ανακλήθηκε.' : 'This signup link has expired or was revoked.';
     case 'department_invalid':
       return el ? 'Το τμήμα δεν είναι πλέον διαθέσιμο.' : 'The department is no longer available.';
-    case 'confirmation_failed':
+    case 'already_pending':
       return el
-        ? 'Δεν ήταν δυνατή η αποστολή του email επιβεβαίωσης. Δοκιμάστε ξανά σε λίγο.'
-        : 'The confirmation email could not be sent. Please try again shortly.';
+        ? 'Υπάρχει ήδη αίτηση με αυτό το email που περιμένει έγκριση.'
+        : 'A request with this email is already waiting for approval.';
     case 'too_many_attempts':
       return el ? 'Πολλές προσπάθειες. Δοκιμάστε ξανά αργότερα.' : 'Too many attempts. Try again later.';
     case 'invalid_input':
@@ -42,8 +47,9 @@ const errorText = (code: string, el: boolean) => {
 };
 
 /**
- * Public signup through a hospital's link (#/join/<token>). The applicant picks their department;
- * after confirming their email the hospital admin approves them and sets their role.
+ * Public signup (#/join/<token>), through a hospital's link or a personal email invitation. The
+ * applicant fills in their details only; the hospital admin checks and approves them, and then the
+ * applicant gets an email with their username and a link to set their password.
  */
 export default function JoinPage({token}: {token: string}) {
   const {lang, setLang} = useAppPreferences();
@@ -53,14 +59,14 @@ export default function JoinPage({token}: {token: string}) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [departmentId, setDepartmentId] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [sentTo, setSentTo] = useState('');
 
   useEffect(() => {
-    void supabase.rpc('signup_link_info', {p_token: token}).then(({data, error}) => {
-      setInfo(error ? null : ((data as LinkInfo | null) ?? null));
+    void supabase.functions.invoke<LinkInfo>('staff-signup', {body: {action: 'info', token}}).then(({data, error}) => {
+      setInfo(error || !data ? null : data);
+      if (data?.department_id) setDepartmentId(data.department_id);
     });
   }, [token]);
 
@@ -68,22 +74,11 @@ export default function JoinPage({token}: {token: string}) {
     e.preventDefault();
     setMessage('');
     const form = new FormData(e.currentTarget);
-    const email = String(form.get('email') || '')
-      .trim()
-      .toLowerCase();
-    const password = String(form.get('password') || '');
+    const email = (info?.email || String(form.get('email') || '')).trim().toLowerCase();
     const first = firstName.trim();
     const last = lastName.trim();
-    if (!first || !last || !departmentId) {
+    if (!first || !last || (info?.needs_department && !departmentId)) {
       setMessage(L('Συμπληρώστε όλα τα πεδία.', 'Fill in all fields.'));
-      return;
-    }
-    if (password.length < 8) {
-      setMessage(L('Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.', 'Password must be at least 8 characters.'));
-      return;
-    }
-    if (password !== String(form.get('confirmPassword') || '')) {
-      setMessage(L('Οι κωδικοί δεν είναι ίδιοι.', 'Passwords do not match.'));
       return;
     }
     setBusy(true);
@@ -93,9 +88,8 @@ export default function JoinPage({token}: {token: string}) {
         first_name: first,
         last_name: last,
         email,
-        password,
         department_id: departmentId,
-        redirect_to: window.location.origin,
+        origin: window.location.origin,
       },
     });
     setBusy(false);
@@ -110,7 +104,7 @@ export default function JoinPage({token}: {token: string}) {
     setSentTo(email);
   };
 
-  const expires = info ? new Date(info.expires_at).toLocaleDateString(el ? 'el-GR' : 'en-GB') : '';
+  const expires = info?.expires_at ? new Date(info.expires_at).toLocaleDateString(el ? 'el-GR' : 'en-GB') : '';
   return (
     <div className="auth-page">
       <header className="auth-topbar">
@@ -133,8 +127,8 @@ export default function JoinPage({token}: {token: string}) {
           <h1>{info?.organization_name || 'SurgiTrack'}</h1>
           <p className="auth-product-subtitle">
             {L(
-              'Δημιουργήστε λογαριασμό και επιλέξτε το τμήμα σας. Ο διαχειριστής του νοσοκομείου θα εγκρίνει την πρόσβασή σας.',
-              'Create your account and pick your department. The hospital administrator will approve your access.',
+              'Συμπληρώστε τα στοιχεία σας. Μετά την έγκριση από τον διαχειριστή του νοσοκομείου θα λάβετε email με το όνομα χρήστη σας και σύνδεσμο για να ορίσετε τον κωδικό σας.',
+              'Fill in your details. Once the hospital administrator approves you, you will get an email with your username and a link to set your password.',
             )}
           </p>
           <div className="auth-security">
@@ -154,8 +148,8 @@ export default function JoinPage({token}: {token: string}) {
                 <h2>{L('Ο σύνδεσμος δεν είναι έγκυρος', 'This link is not valid')}</h2>
                 <p>
                   {L(
-                    'Ο σύνδεσμος εγγραφής έληξε ή ανακλήθηκε. Ζητήστε νέο σύνδεσμο από τον διαχειριστή του νοσοκομείου σας.',
-                    'The signup link has expired or was revoked. Ask your hospital administrator for a new link.',
+                    'Ο σύνδεσμος εγγραφής έληξε, ανακλήθηκε ή έχει ήδη χρησιμοποιηθεί. Αν στείλατε ήδη τα στοιχεία σας, περιμένετε το email έγκρισης. Αλλιώς ζητήστε νέο σύνδεσμο από τον διαχειριστή του νοσοκομείου σας.',
+                    'The signup link has expired, was revoked or was already used. If you already sent your details, wait for the approval email. Otherwise ask your hospital administrator for a new link.',
                   )}
                 </p>
                 <a className="auth-primary" href="#/">
@@ -165,14 +159,14 @@ export default function JoinPage({token}: {token: string}) {
             ) : sentTo ? (
               <div className="auth-status-card">
                 <div className="auth-status-icon">
-                  <MailCheck size={24} />
+                  <Clock3 size={24} />
                 </div>
-                <span className="auth-eyebrow">{L('ΣΧΕΔΟΝ ΕΤΟΙΜΟ', 'ALMOST DONE')}</span>
-                <h2>{L('Επιβεβαιώστε το email σας', 'Confirm your email')}</h2>
+                <span className="auth-eyebrow">{L('ΤΟ ΑΙΤΗΜΑ ΣΤΑΛΘΗΚΕ', 'REQUEST SENT')}</span>
+                <h2>{L('Αναμονή έγκρισης', 'Awaiting approval')}</h2>
                 <p>
                   {L(
-                    `Στείλαμε σύνδεσμο επιβεβαίωσης στο ${sentTo}. Μετά την επιβεβαίωση, το αίτημά σας πηγαίνει στον διαχειριστή του νοσοκομείου. Όταν εγκριθεί, θα λάβετε email με το όνομα χρήστη σας.`,
-                    `We sent a confirmation link to ${sentTo}. Once confirmed, your request goes to the hospital administrator. When approved, you will receive an email with your username.`,
+                    `Παρακαλούμε αναμείνατε την έγκριση και την έκδοση του ονόματος χρήστη σας. Μόλις ο διαχειριστής του νοσοκομείου εγκρίνει το αίτημα, θα λάβετε email στο ${sentTo} με το όνομα χρήστη και σύνδεσμο για να ορίσετε τον κωδικό σας.`,
+                    `Please wait for approval and your username. Once the hospital administrator approves the request, you will get an email at ${sentTo} with your username and a link to set your password.`,
                   )}
                 </p>
                 <a className="auth-primary" href="#/">
@@ -185,7 +179,9 @@ export default function JoinPage({token}: {token: string}) {
                   <div>
                     <span className="auth-eyebrow">{L('ΝΕΟΣ ΛΟΓΑΡΙΑΣΜΟΣ', 'NEW ACCOUNT')}</span>
                     <h2>{L('Αίτημα πρόσβασης', 'Request access')}</h2>
-                    <p>{L(`Ο σύνδεσμος ισχύει έως ${expires}.`, `This link is valid until ${expires}.`)}</p>
+                    {expires && (
+                      <p>{L(`Ο σύνδεσμος ισχύει έως ${expires}.`, `This link is valid until ${expires}.`)}</p>
+                    )}
                   </div>
                   <UserRound size={22} />
                 </div>
@@ -224,53 +220,31 @@ export default function JoinPage({token}: {token: string}) {
                       'Capital letters only. Your username is generated from your initials (e.g. GN4827).',
                     )}
                   </small>
-                  <label>
-                    {L('Τμήμα', 'Department')}
-                    <div className="auth-input">
-                      <Building2 size={17} />
-                      <select value={departmentId} onChange={e => setDepartmentId(e.target.value)} required>
-                        <option value="">{L('— Επιλέξτε τμήμα —', '— Pick your department —')}</option>
-                        {info.departments.map(d => (
-                          <option key={d.id} value={d.id}>
-                            {localizedName(d.name, lang)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </label>
+                  {info.needs_department && (
+                    <label>
+                      {L('Τμήμα', 'Department')}
+                      <div className="auth-input">
+                        <Building2 size={17} />
+                        <select value={departmentId} onChange={e => setDepartmentId(e.target.value)} required>
+                          <option value="">{L('— Επιλέξτε τμήμα —', '— Pick your department —')}</option>
+                          {info.departments.map(d => (
+                            <option key={d.id} value={d.id}>
+                              {localizedName(d.name, lang)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </label>
+                  )}
                   <label>
                     Email
                     <div className="auth-input">
                       <Mail size={17} />
-                      <input name="email" type="email" required autoComplete="email" />
-                    </div>
-                  </label>
-                  <label>
-                    {L('Κωδικός πρόσβασης', 'Password')}
-                    <div className="auth-input">
-                      <LockKeyhole size={17} />
-                      <input
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        minLength={8}
-                        autoComplete="new-password"
-                      />
-                      <button type="button" onClick={() => setShowPassword(v => !v)}>
-                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                      </button>
-                    </div>
-                  </label>
-                  <label>
-                    {L('Επιβεβαίωση κωδικού', 'Confirm password')}
-                    <div className="auth-input">
-                      <LockKeyhole size={17} />
-                      <input
-                        name="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        autoComplete="new-password"
-                      />
+                      {info.email ? (
+                        <input name="email" type="email" value={info.email} readOnly />
+                      ) : (
+                        <input name="email" type="email" required autoComplete="email" />
+                      )}
                     </div>
                   </label>
                   {message && <div className="auth-message">{message}</div>}

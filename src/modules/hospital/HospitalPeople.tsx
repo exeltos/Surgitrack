@@ -41,6 +41,12 @@ type Request = {
   status: 'PENDING_EMAIL' | 'PENDING' | 'APPROVED' | 'REJECTED';
   department_id: string | null;
   requested_at: string;
+  /** An account made at signup (the older signup); none until approval now. */
+  user_id: string | null;
+  /** A personal signup invitation: its form's link, and the role the admin picked. */
+  invite_token: string | null;
+  invited_role: UserRole | null;
+  invited_at: string | null;
 };
 type Member = {
   id: string;
@@ -53,7 +59,8 @@ type Member = {
   department_id: string | null;
   demo_enabled: boolean;
 };
-type Decision = {role: UserRole; departmentId: string; note: string};
+/** The role as picked (a Sterilization supervisor is a role of its own here). */
+type Decision = {role: string; departmentId: string; note: string};
 /** What the drawer edits: the role as picked (a Sterilization supervisor is a role of its own here). */
 type Draft = {
   name: string;
@@ -80,6 +87,28 @@ const roleValue = (m: Pick<Member, 'role' | 'supervisor'>) =>
   m.role === 'STERILIZATION' && m.supervisor ? SUPERVISOR : m.role;
 const accountRole = (role: string) => (role === SUPERVISOR ? 'STERILIZATION' : role) as UserRole;
 const EMAIL_FORMAT = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** A hospital admin's account is made at once; anyone else invited by email fills in a form first. */
+const directInvite = (role: string) => role === 'ADMIN';
+type InviteResult = {
+  email: string;
+  ok: boolean;
+  mode?: 'account' | 'signup';
+  user_code?: string;
+  emailed?: boolean;
+  url?: string;
+  error?: string;
+};
+
+/** The reason an Edge Function gave, from its JSON body when it answered with an error status. */
+const functionError = async (error: unknown, given?: string) => {
+  if (given) return given;
+  const context = (error as {context?: Response} | null)?.context;
+  if (context && typeof context.json === 'function') {
+    const body = (await context.json().catch(() => null)) as {error?: string} | null;
+    if (body?.error) return String(body.error);
+  }
+  return (error as {message?: string} | null)?.message || '';
+};
 
 /**
  * A hospital's people, the same for its admin (Διαχείριση νοσοκομείου) and for the platform owner
@@ -113,7 +142,8 @@ export default function HospitalPeople({
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [newDepartment, setNewDepartment] = useState({name: '', code: ''});
   const [editing, setEditing] = useState<{id: string; name: string; code: string} | null>(null);
-  const [notice, setNotice] = useState<{kind: 'ok' | 'warn' | 'error'; text: string} | null>(null);
+  /** A message over the list; `link` is one to pass on by hand when the email did not go out. */
+  const [notice, setNotice] = useState<{kind: 'ok' | 'warn' | 'error'; text: string; link?: string} | null>(null);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<'USERS' | 'DEPARTMENTS'>('USERS');
   const [query, setQuery] = useState('');
@@ -156,7 +186,7 @@ export default function HospitalPeople({
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
         .from('staff_access_requests')
-        .select('id,full_name,email,status,department_id,requested_at')
+        .select('id,full_name,email,status,department_id,requested_at,user_id,invite_token,invited_role,invited_at')
         .eq('organization_id', organizationId)
         .in('status', ['PENDING', 'PENDING_EMAIL'])
         .order('requested_at'),
@@ -201,7 +231,10 @@ export default function HospitalPeople({
   };
   const activeDepartments = departments.filter(d => d.active);
   const pending = requests.filter(r => r.status === 'PENDING');
-  const unconfirmed = requests.filter(r => r.status === 'PENDING_EMAIL');
+  // Signup invitations not filled in yet, and (older signups) accounts whose email is not confirmed.
+  const invitedToSignup = requests.filter(r => r.status === 'PENDING_EMAIL' && !r.user_id);
+  const unconfirmed = requests.filter(r => r.status === 'PENDING_EMAIL' && !!r.user_id);
+  const signupFormUrl = (token: string) => `${window.location.origin}/#/join/${token}`;
   const date = (iso: string) =>
     new Date(iso).toLocaleString(el ? 'el-GR' : 'en-GB', {dateStyle: 'medium', timeStyle: 'short'});
 
@@ -211,21 +244,78 @@ export default function HospitalPeople({
       ? 'STERILIZATION'
       : 'DEPARTMENT';
   const decisionFor = (r: Request): Decision =>
-    decisions[r.id] || {role: suggestedRole(r.department_id), departmentId: r.department_id || '', note: ''};
+    decisions[r.id] || {
+      role: r.invited_role || suggestedRole(r.department_id),
+      departmentId: r.department_id || activeDepartments[0]?.id || '',
+      note: '',
+    };
   const setDecision = (r: Request, patch: Partial<Decision>) =>
     setDecisions(all => ({...all, [r.id]: {...decisionFor(r), ...patch}}));
 
   const decide = async (r: Request, approve: boolean) => {
     const d = decisionFor(r);
     if (!approve && !window.confirm(L(`Απόρριψη του αιτήματος του ${r.full_name};`, `Reject ${r.full_name}?`))) return;
+    const role = accountRole(d.role);
+    // A hospital admin belongs to no department (the database enforces it too).
+    const departmentId = wholeHospital(d.role) ? null : d.departmentId || null;
     setBusy(true);
     setNotice(null);
+    if (approve && !r.user_id) {
+      // The account is made now: the email carries the username and the link to set the password.
+      const {data, error} = await supabase.functions.invoke<{
+        ok?: boolean;
+        user_id?: string;
+        user_code?: string;
+        emailed?: boolean;
+        url?: string;
+        error?: string;
+      }>('invite-staff', {
+        body: {approve_request: r.id, role, department_id: departmentId, redirect_to: window.location.origin},
+      });
+      if (error || !data?.ok) {
+        const reason = await functionError(error, data?.error);
+        setBusy(false);
+        setNotice({
+          kind: 'error',
+          text: /already|registered|exists/i.test(reason)
+            ? L(`Το ${r.email} έχει ήδη λογαριασμό.`, `${r.email} already has an account.`)
+            : L(`Η έγκριση δεν ολοκληρώθηκε: ${reason}`, `The approval did not go through: ${reason}`),
+        });
+        return;
+      }
+      if (d.role === SUPERVISOR && data.user_id)
+        await supabase.functions.invoke('update-staff', {
+          body: {user_id: data.user_id, name: r.full_name, email: r.email, supervisor: true},
+        });
+      setNotice(
+        data.emailed
+          ? {
+              kind: 'ok',
+              text: L(
+                `Ο/Η ${r.full_name} εγκρίθηκε με όνομα χρήστη ${data.user_code}. Στάλθηκε email με το όνομα χρήστη και σύνδεσμο για να ορίσει κωδικό.`,
+                `${r.full_name} was approved as ${data.user_code}. An email with the username and a link to set a password was sent.`,
+              ),
+            }
+          : {
+              kind: 'warn',
+              text: L(
+                `Ο/Η ${r.full_name} εγκρίθηκε με όνομα χρήστη ${data.user_code}, αλλά το email δεν στάλθηκε. Στείλτε του/της τον σύνδεσμο για να ορίσει κωδικό:`,
+                `${r.full_name} was approved as ${data.user_code}, but the email was not sent. Send them the link to set a password:`,
+              ),
+              link: data.url,
+            },
+      );
+      window.dispatchEvent(new Event(ACCESS_REQUESTS_CHANGED));
+      setBusy(false);
+      await changed();
+      return;
+    }
+    // A rejection, or an older signup whose account already exists.
     const {error} = await supabase.rpc('hospital_decide_access_request', {
       p_request: r.id,
       p_approve: approve,
-      p_role: approve ? d.role : null,
-      // A hospital admin belongs to no department (the database enforces it too).
-      p_department: approve && !wholeHospital(d.role) ? d.departmentId || null : null,
+      p_role: approve ? role : null,
+      p_department: approve ? departmentId : null,
       p_note: d.note || null,
     });
     if (!fail(error)) {
@@ -257,6 +347,25 @@ export default function HospitalPeople({
       await changed();
     }
     setBusy(false);
+  };
+
+  /** Withdraws a signup invitation that was not filled in yet. */
+  const cancelInvitation = async (r: Request) => {
+    if (!window.confirm(L(`Ακύρωση της πρόσκλησης προς ${r.email};`, `Cancel the invitation to ${r.email}?`))) return;
+    setBusy(true);
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('access-requests', {
+      body: {action: 'cancel-invite', request_id: r.id},
+    });
+    setBusy(false);
+    if (error || !data?.ok) {
+      showError(L('Η πρόσκληση δεν ακυρώθηκε.', 'The invitation was not cancelled.'));
+      return;
+    }
+    setNotice({
+      kind: 'ok',
+      text: L(`Η πρόσκληση προς ${r.email} ακυρώθηκε.`, `The invitation to ${r.email} was cancelled.`),
+    });
+    await changed();
   };
 
   // ---- Departments ----
@@ -310,7 +419,11 @@ export default function HospitalPeople({
   const departmentLabel = (role: string, departmentId: string) =>
     wholeHospital(role) ? '' : departments.find(d => d.id === departmentId)?.name || '';
 
-  /** Invites one person by email: they get a link to set their own password. */
+  /**
+   * Invites one person by email. A hospital admin gets their username at once with a link to accept
+   * and set a password; anyone else gets a signup form, and their request then waits here for
+   * approval. `again` sends a waiting invitation once more.
+   */
   const invite = async (draft: Draft, again = false) => {
     const role = accountRole(draft.role);
     const supervisor = draft.role === SUPERVISOR;
@@ -329,24 +442,30 @@ export default function HospitalPeople({
       setNotice({kind: 'ok', text: L(`Ο/Η ${draft.name} προστέθηκε.`, `${draft.name} was added.`)});
       return;
     }
+    // An account already invited (not accepted yet) is sent its accept link again, whatever its role.
+    const direct =
+      directInvite(draft.role) || (again && members.some(m => m.email.toLowerCase() === draft.email.toLowerCase()));
     setBusy(true);
     setNotice(null);
-    const {data: result, error} = await supabase.functions.invoke('invite-staff', {
+    const {data: result, error} = await supabase.functions.invoke<{results?: InviteResult[]}>('invite-staff', {
       body: {
         users: [
           {
             full_name: draft.name,
             email: draft.email,
             organization_id: organizationId,
-            department_id: wholeHospital(role) ? null : draft.departmentId || null,
+            department_id: wholeHospital(role) || !direct ? null : draft.departmentId || null,
             role,
+            direct,
           },
         ],
+        again,
         redirect_to: window.location.origin,
       },
     });
-    const sent = !error && result?.results?.[0]?.ok;
-    if (sent && (supervisor || (platform && draft.demoEnabled))) {
+    const r = result?.results?.[0];
+    const sent = !error && !!r?.ok;
+    if (sent && r?.mode === 'account' && (supervisor || (platform && draft.demoEnabled))) {
       // The invitation knows only the role; the supervisor flag and Demo access follow on the account.
       const {data: profile} = await supabase
         .from('profiles')
@@ -366,32 +485,59 @@ export default function HospitalPeople({
         });
     }
     setBusy(false);
-    if (!sent) {
-      const reason = String(result?.results?.[0]?.error || error?.message || '');
+    if (!sent || !r) {
+      const reason = await functionError(error, r?.error);
       setNotice({
         kind: 'error',
-        text: /already|registered|exists/i.test(reason)
+        text: /already registered|exists/i.test(reason)
           ? L(
               `Το ${draft.email} έχει ήδη λογαριασμό που έχει ενεργοποιηθεί. Δεν χρειάζεται πρόσκληση.`,
               `${draft.email} already has an activated account. No invitation is needed.`,
             )
-          : L(`Η πρόσκληση δεν στάλθηκε: ${reason}`, `The invitation was not sent: ${reason}`),
+          : /waiting for approval/i.test(reason)
+            ? L(
+                `Το ${draft.email} έχει ήδη στείλει τα στοιχεία του και περιμένει έγκριση εδώ.`,
+                `${draft.email} has already sent their details and waits for approval here.`,
+              )
+            : L(`Η πρόσκληση δεν στάλθηκε: ${reason}`, `The invitation was not sent: ${reason}`),
       });
       return;
     }
     setDrawer(null);
-    setNotice({
-      kind: 'ok',
-      text: again
-        ? L(
-            `Η πρόσκληση στάλθηκε ξανά στο ${draft.email}. Ζητήστε να ελέγξει και τα ανεπιθύμητα (spam).`,
-            `The invitation was sent again to ${draft.email}. Ask them to check their spam folder too.`,
-          )
-        : L(
-            `Στάλθηκε πρόσκληση στο ${draft.email}. Ο/Η ${draft.name} ορίζει κωδικό από το email και μπαίνει.`,
-            `An invitation was sent to ${draft.email}. ${draft.name} sets a password from the email and signs in.`,
-          ),
-    });
+    if (!r.emailed) {
+      setNotice({
+        kind: 'warn',
+        text:
+          r.mode === 'signup'
+            ? L(
+                `Η πρόσκληση για το ${draft.email} ετοιμάστηκε, αλλά το email δεν στάλθηκε. Στείλτε του αυτόν τον σύνδεσμο για να συμπληρώσει τα στοιχεία του:`,
+                `The invitation for ${draft.email} is ready, but the email was not sent. Send them this link to fill in their details:`,
+              )
+            : L(
+                `Ο λογαριασμός ${r.user_code || ''} ετοιμάστηκε, αλλά το email δεν στάλθηκε. Στείλτε του αυτόν τον σύνδεσμο για να ορίσει κωδικό:`,
+                `Account ${r.user_code || ''} is ready, but the email was not sent. Send them this link to set a password:`,
+              ),
+        link: r.url,
+      });
+    } else
+      setNotice({
+        kind: 'ok',
+        text:
+          r.mode === 'signup'
+            ? L(
+                `Στάλθηκε πρόσκληση εγγραφής στο ${draft.email}. Μόλις συμπληρώσει τα στοιχεία του, το αίτημα εμφανίζεται εδώ για έγκριση.`,
+                `A signup invitation was sent to ${draft.email}. Once they fill in their details, the request shows here for approval.`,
+              )
+            : again
+              ? L(
+                  `Η πρόσκληση στάλθηκε ξανά στο ${draft.email}. Ζητήστε να ελέγξει και τα ανεπιθύμητα (spam).`,
+                  `The invitation was sent again to ${draft.email}. Ask them to check their spam folder too.`,
+                )
+              : L(
+                  `Στάλθηκε πρόσκληση στο ${draft.email} με όνομα χρήστη ${r.user_code || ''}. Ο/Η ${draft.name} αποδέχεται και ορίζει κωδικό από το email.`,
+                  `An invitation was sent to ${draft.email} with username ${r.user_code || ''}. ${draft.name} accepts and sets a password from the email.`,
+                ),
+      });
     await changed();
   };
 
@@ -585,6 +731,8 @@ export default function HospitalPeople({
           department_id: wholeHospital(r.role) ? null : r.departmentId || null,
           role: accountRole(r.role),
         })),
+        // The list is the admin's own: accounts are made at once, no approval.
+        direct: true,
         redirect_to: window.location.origin,
       },
     });
@@ -593,13 +741,25 @@ export default function HospitalPeople({
       setNotice({kind: 'error', text: error.message});
       return;
     }
-    const failed = (result?.results || []).filter((x: {ok: boolean}) => !x.ok).length;
+    const results = (result?.results || []) as InviteResult[];
+    const failed = results.filter(x => !x.ok).length;
+    const unsent = results.filter(x => x.ok && !x.emailed).length;
     const sent = csvRows.length - failed;
     setNotice({
-      kind: failed ? 'warn' : 'ok',
-      text: failed
-        ? L(`Στάλθηκαν ${sent} προσκλήσεις, ${failed} απέτυχαν.`, `${sent} invitations sent, ${failed} failed.`)
-        : L(`Στάλθηκαν ${sent} προσκλήσεις.`, `${sent} invitations sent.`),
+      kind: failed || unsent ? 'warn' : 'ok',
+      text:
+        (failed
+          ? L(`Δημιουργήθηκαν ${sent} λογαριασμοί, ${failed} απέτυχαν.`, `${sent} accounts made, ${failed} failed.`)
+          : L(
+              `Δημιουργήθηκαν ${sent} λογαριασμοί και στάλθηκαν προσκλήσεις με το όνομα χρήστη.`,
+              `${sent} accounts made and invitations with the username sent.`,
+            )) +
+        (unsent
+          ? L(
+              ` ${unsent} email δεν στάλθηκαν: ανοίξτε τον χρήστη και πατήστε «Αντιγραφή συνδέσμου».`,
+              ` ${unsent} emails were not sent: open the user and press «Copy link».`,
+            )
+          : ''),
     });
     if (!failed) setCsvRows(null);
     await changed();
@@ -620,7 +780,10 @@ export default function HospitalPeople({
     <div className="hospital-people">
       {notice && (
         <div className={`hospital-notice ${notice.kind}`} role="status">
-          {notice.text}
+          <span>
+            {notice.text}
+            {notice.link && <CopyField value={notice.link} L={L} />}
+          </span>
           <button onClick={() => setNotice(null)} aria-label={L('Κλείσιμο', 'Close')}>
             <X size={14} />
           </button>
@@ -681,8 +844,8 @@ export default function HospitalPeople({
                       <b>{L('Με email', 'By email')}</b>
                       <small>
                         {L(
-                          'Ένα άτομο: παίρνει email και ορίζει κωδικό.',
-                          'One person: gets an email, sets a password.',
+                          'Ένα άτομο: λαμβάνει φόρμα εγγραφής και το εγκρίνετε.',
+                          'One person: gets a signup form, you approve.',
                         )}
                       </small>
                     </span>
@@ -709,7 +872,12 @@ export default function HospitalPeople({
                       <FileSpreadsheet size={16} />
                       <span>
                         <b>{L('Από αρχείο CSV', 'From a CSV file')}</b>
-                        <small>{L('Ονοματεπώνυμο; Email; Τμήμα; Ρόλος', 'Name; Email; Department; Role')}</small>
+                        <small>
+                          {L(
+                            'Λίστα: λογαριασμοί αμέσως. Ονοματεπώνυμο; Email; Τμήμα; Ρόλος',
+                            'A list: accounts at once. Name; Email; Department; Role',
+                          )}
+                        </small>
                       </span>
                       <input
                         type="file"
@@ -740,8 +908,8 @@ export default function HospitalPeople({
                 </b>
                 <small>
                   {L(
-                    'Επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης λαμβάνει email με το όνομα χρήστη του.',
-                    'Pick a role and department, then approve. The user gets an email with their username.',
+                    'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης λαμβάνει email με το όνομα χρήστη του και σύνδεσμο για να ορίσει κωδικό.',
+                    'Check the details, pick a role and department, then approve. The user gets an email with their username and a link to set a password.',
                   )}
                 </small>
               </header>
@@ -752,20 +920,24 @@ export default function HospitalPeople({
                     <div className="hospital-request-who">
                       <strong>{r.full_name}</strong>
                       <small>
-                        {r.email} · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b> ·{' '}
-                        {date(r.requested_at)}
+                        {r.email}
+                        {r.department_id && (
+                          <>
+                            {' '}
+                            · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b>
+                          </>
+                        )}{' '}
+                        · {date(r.requested_at)}
                       </small>
                     </div>
                     <label>
                       {L('Ρόλος', 'Role')}
-                      <select value={d.role} onChange={e => setDecision(r, {role: e.target.value as UserRole})}>
-                        {roles
-                          .filter(role => role.id !== SUPERVISOR)
-                          .map(role => (
-                            <option key={role.id} value={role.id}>
-                              {el ? role.el : role.en}
-                            </option>
-                          ))}
+                      <select value={d.role} onChange={e => setDecision(r, {role: e.target.value})}>
+                        {roles.map(role => (
+                          <option key={role.id} value={role.id}>
+                            {el ? role.el : role.en}
+                          </option>
+                        ))}
                       </select>
                     </label>
                     <label>
@@ -807,6 +979,60 @@ export default function HospitalPeople({
                   </article>
                 );
               })}
+            </div>
+          )}
+          {invitedToSignup.length > 0 && (
+            <div className="people-invitations">
+              <header>
+                <Mail size={16} />
+                <b>
+                  {L(
+                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'πρόσκληση περιμένει' : 'προσκλήσεις περιμένουν'} τα στοιχεία του χρήστη`,
+                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'invitation waits' : 'invitations wait'} for the person's details`,
+                  )}
+                </b>
+              </header>
+              {invitedToSignup.map(r => (
+                <article key={r.id} className="people-invitation">
+                  <span className="people-who">
+                    <b>{r.email}</b>
+                    <small>
+                      {r.invited_role ? roleLabel(r.invited_role) : ''}
+                      {r.invited_at ? ` · ${L('στάλθηκε', 'sent')} ${date(r.invited_at)}` : ''}
+                    </small>
+                  </span>
+                  {r.invite_token && <CopyField value={signupFormUrl(r.invite_token)} L={L} compact />}
+                  <AppButton
+                    size="sm"
+                    disabled={busy}
+                    icon={<Send size={14} />}
+                    onClick={() =>
+                      void invite(
+                        {
+                          name: '',
+                          email: r.email,
+                          role: r.invited_role || 'DEPARTMENT',
+                          departmentId: '',
+                          active: true,
+                          demoEnabled: false,
+                        },
+                        true,
+                      )
+                    }
+                  >
+                    {L('Επαναποστολή', 'Resend')}
+                  </AppButton>
+                  <AppButton
+                    size="sm"
+                    variant="danger"
+                    disabled={busy}
+                    icon={<X size={14} />}
+                    onClick={() => void cancelInvitation(r)}
+                  >
+                    {L('Ακύρωση', 'Cancel')}
+                  </AppButton>
+                </article>
+              ))}
             </div>
           )}
           {unconfirmed.length > 0 && (
@@ -982,6 +1208,7 @@ export default function HospitalPeople({
           self={!!drawer.member && drawer.member.id === me?.id}
           departments={activeDepartments}
           showDemo={platform && hospitalDemo}
+          demo={demo}
           invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
           onResend={draft => void invite(draft, true)}
           onPasswordReset={m => void passwordReset(m)}
@@ -1078,6 +1305,7 @@ function MemberDrawer({
   self,
   departments,
   showDemo,
+  demo,
   invitedAt,
   busy,
   L,
@@ -1093,6 +1321,8 @@ function MemberDrawer({
   self: boolean;
   departments: Department[];
   showDemo: boolean;
+  /** The local Demo: no emails, a new user is added at once. */
+  demo: boolean;
   /** When the invitation was last sent, for an invited user who has not accepted yet. */
   invitedAt?: string;
   busy: boolean;
@@ -1117,10 +1347,24 @@ function MemberDrawer({
     demoEnabled: member?.demo_enabled ?? false,
   }));
   const set = (patch: Partial<Draft>) => setDraft(d => ({...d, ...patch}));
+  // A new user invited to the signup form fills in their own name and department.
+  const signupInvite = !member && !demo && !directInvite(draft.role);
   const valid =
-    draft.name.trim().length >= 2 &&
+    (signupInvite || draft.name.trim().length >= 2) &&
     EMAIL_FORMAT.test(draft.email.trim()) &&
-    (wholeHospital(draft.role) || !!draft.departmentId);
+    (signupInvite || wholeHospital(draft.role) || !!draft.departmentId);
+  const roleField = (
+    <label>
+      {L('Ρόλος', 'Role')}
+      <select value={draft.role} disabled={self} onChange={e => set({role: e.target.value})}>
+        {roles.map(role => (
+          <option key={role.id} value={role.id}>
+            {lang === 'el' ? role.el : role.en}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <aside className="studio-drawer">
@@ -1134,39 +1378,40 @@ function MemberDrawer({
           </button>
         </header>
         <div className="studio-drawer-form">
-          <label>
-            {L('Ονοματεπώνυμο', 'Full name')}
-            <input autoFocus value={draft.name} maxLength={120} onChange={e => set({name: e.target.value})} />
-          </label>
+          {!member && roleField}
+          {!signupInvite && (
+            <label>
+              {L('Ονοματεπώνυμο', 'Full name')}
+              <input autoFocus value={draft.name} maxLength={120} onChange={e => set({name: e.target.value})} />
+            </label>
+          )}
           <label>
             Email
-            <input type="email" value={draft.email} onChange={e => set({email: e.target.value})} />
+            <input
+              type="email"
+              autoFocus={signupInvite}
+              value={draft.email}
+              onChange={e => set({email: e.target.value})}
+            />
           </label>
-          <label>
-            {L('Ρόλος', 'Role')}
-            <select value={draft.role} disabled={self} onChange={e => set({role: e.target.value})}>
-              {roles.map(role => (
-                <option key={role.id} value={role.id}>
-                  {lang === 'el' ? role.el : role.en}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {L('Τμήμα', 'Department')}
-            {wholeHospital(draft.role) ? (
-              <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
-            ) : (
-              <select value={draft.departmentId} onChange={e => set({departmentId: e.target.value})}>
-                <option value="">—</option>
-                {departments.map(d => (
-                  <option key={d.id} value={d.id}>
-                    {localizedName(d.name, lang)}
-                  </option>
-                ))}
-              </select>
-            )}
-          </label>
+          {member && roleField}
+          {!signupInvite && (
+            <label>
+              {L('Τμήμα', 'Department')}
+              {wholeHospital(draft.role) ? (
+                <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+              ) : (
+                <select value={draft.departmentId} onChange={e => set({departmentId: e.target.value})}>
+                  <option value="">—</option>
+                  {departments.map(d => (
+                    <option key={d.id} value={d.id}>
+                      {localizedName(d.name, lang)}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </label>
+          )}
           {invited && member && (
             <div className="people-invited">
               <Mail size={17} />
@@ -1243,14 +1488,19 @@ function MemberDrawer({
               {onMakeLink && <LinkCopy member={member} make={onMakeLink} busy={busy || !member.active} L={L} />}
             </div>
           )}
-          {!member && (
+          {!member && !demo && (
             <div className="studio-form-note">
               <Mail size={16} />
               <span>
-                {L(
-                  'Ο χρήστης λαμβάνει email για να ορίσει τον δικό του κωδικό. Το όνομα χρήστη δημιουργείται αυτόματα από τα αρχικά του.',
-                  'The user gets an email to set their own password. The username is made from their initials.',
-                )}
+                {signupInvite
+                  ? L(
+                      'Ο χρήστης λαμβάνει email με φόρμα εγγραφής και συμπληρώνει όνομα και τμήμα. Το αίτημα εμφανίζεται εδώ για έγκριση· με την έγκριση λαμβάνει email με το όνομα χρήστη και ορίζει κωδικό.',
+                      'The user gets an email with a signup form and fills in their name and department. The request shows here for approval; on approval they get an email with their username and set a password.',
+                    )
+                  : L(
+                      'Το όνομα χρήστη δημιουργείται τώρα από τα αρχικά. Ο διαχειριστής λαμβάνει ένα email με το όνομα χρήστη και το κουμπί «Αποδοχή και ορισμός κωδικού».',
+                      'The username is made now from the initials. The admin gets one email with the username and an «Accept and set password» button.',
+                    )}
               </span>
             </div>
           )}
@@ -1269,7 +1519,11 @@ function MemberDrawer({
             icon={member ? <Save size={15} /> : <Mail size={15} />}
             onClick={() => onSave({...draft, name: draft.name.trim(), email: draft.email.trim()})}
           >
-            {member ? L('Αποθήκευση', 'Save') : L('Αποστολή πρόσκλησης', 'Send invitation')}
+            {member
+              ? L('Αποθήκευση', 'Save')
+              : signupInvite
+                ? L('Αποστολή πρόσκλησης εγγραφής', 'Send signup invitation')
+                : L('Αποστολή πρόσκλησης', 'Send invitation')}
           </AppButton>
         </footer>
       </aside>
@@ -1332,5 +1586,34 @@ function LinkCopy({
         )}
       </small>
     </div>
+  );
+}
+
+/** A link shown in a field, with a button that copies it. */
+function CopyField({
+  value,
+  L,
+  compact = false,
+}: {
+  value: string;
+  L: (gr: string, en: string) => string;
+  compact?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <span className={`people-link${compact ? ' compact' : ''}`}>
+      <input readOnly value={value} onFocus={e => e.currentTarget.select()} aria-label={L('Σύνδεσμος', 'Link')} />
+      <AppButton size="sm" icon={copied ? <Check size={14} /> : <Copy size={14} />} onClick={() => void copy()}>
+        {copied ? L('Αντιγράφηκε', 'Copied') : compact ? L('Σύνδεσμος', 'Link') : L('Αντιγραφή', 'Copy')}
+      </AppButton>
+    </span>
   );
 }

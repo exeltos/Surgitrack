@@ -322,7 +322,7 @@ export default function StudioPage() {
     }
     const plan = await setOrganizationPlan(id!, data.plan || 'STANDARD', data.trialEndsAt);
     if (!plan) return;
-    // The hospital's admin gets an invitation by email and sets their own password.
+    // The hospital's admin gets one email with their username and a button to accept and set a password.
     if (hospitalAdmin?.email) {
       const {data: result, error} = await supabase.functions.invoke('invite-staff', {
         body: {
@@ -345,7 +345,17 @@ export default function StudioPage() {
             'The hospital was created, but the admin invitation failed: ',
           ) + (result?.results?.[0]?.error || error?.message || ''),
         );
-      else await loadCloudUsers();
+      else {
+        // The account and username exist; only the email may have failed.
+        if (!result.results[0].emailed)
+          setCloudError(
+            L(
+              'Το νοσοκομείο και ο λογαριασμός του Διαχειριστή δημιουργήθηκαν, αλλά το email δεν στάλθηκε. Ανοίξτε τον στο «Χρήστες» και πατήστε «Αντιγραφή συνδέσμου».',
+              "The hospital and its admin's account were created, but the email was not sent. Open them in «Users» and press «Copy link».",
+            ),
+          );
+        await loadCloudUsers();
+      }
     }
     setOrganizationEditor(undefined);
     await loadCloudOrganizations();
@@ -1776,7 +1786,11 @@ function OrganizationEditor({
           {!organization && (
             <div className="studio-admin-invite">
               <b>{tr('Διαχειριστής νοσοκομείου')}</b>
-              <small>{tr('Παίρνει πρόσκληση με email, ορίζει κωδικό και στήνει το νοσοκομείο.')}</small>
+              <small>
+                {tr(
+                  'Λαμβάνει email με το όνομα χρήστη του και κουμπί «Αποδοχή και ορισμός κωδικού», και στήνει το νοσοκομείο.',
+                )}
+              </small>
               <label>
                 {tr('Ονοματεπώνυμο')}
                 <input value={adminName} onChange={e => setAdminName(e.target.value)} />
