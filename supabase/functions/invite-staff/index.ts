@@ -14,12 +14,15 @@ const ROLES = ["ADMIN", "STERILIZATION", "DEPARTMENT", "VIEWER"];
 const cors = {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
+// The role names the app shows (a Sterilization supervisor is a Sterilization user with a flag).
 const ROLE_NAMES: Record<string, string> = {
   ADMIN: "Διαχειριστής νοσοκομείου",
-  STERILIZATION: "Αποστείρωση",
-  DEPARTMENT: "Τμήμα",
-  VIEWER: "Παρατηρητής",
+  STERILIZATION: "Χρήστης Αποστείρωσης",
+  DEPARTMENT: "Χρήστης Τμήματος",
+  VIEWER: "Παρατηρητής (μόνο προβολή)",
 };
+const roleName = (role: string, supervisor: boolean) =>
+  role === "STERILIZATION" && supervisor ? "Προϊστάμενος Αποστείρωσης" : ROLE_NAMES[role] || role;
 
 type Grant = {
   email: string;
@@ -31,6 +34,7 @@ type Grant = {
   invitedBy: string;
   site: string;
   approved?: boolean;
+  supervisor?: boolean;
 };
 
 /**
@@ -56,7 +60,24 @@ async function grantAccess(admin: SupabaseClient, g: Grant) {
     if (error || !code) throw new Error("Username failed");
     userCode = String(code);
   }
-  const meta = {full_name: g.name, organization_id: g.org, department_id: g.dept, role: g.role, user_code: userCode};
+  const roleLabel = roleName(g.role, !!g.supervisor);
+  let departmentName = "Όλο το νοσοκομείο";
+  if (g.dept) {
+    const {data: d} = await admin.from("departments").select("name").eq("id", g.dept).maybeSingle();
+    if (d?.name) departmentName = d.name;
+  }
+  // The sign-in service's own invitation email (used without our mail settings) reads these as
+  // {{ .Data.user_code }}, {{ .Data.organization_name }}, {{ .Data.role_label }}, {{ .Data.department_name }}.
+  const meta = {
+    full_name: g.name,
+    organization_id: g.org,
+    department_id: g.dept,
+    role: g.role,
+    user_code: userCode,
+    organization_name: g.orgName,
+    role_label: roleLabel,
+    department_name: departmentName,
+  };
 
   if (ownMail) {
     let link = await admin.auth.admin.generateLink({type: "invite", email: g.email, options: {redirectTo: g.site, data: meta}});
@@ -98,8 +119,9 @@ async function grantAccess(admin: SupabaseClient, g: Grant) {
       layout(
         g.approved ? "ΕΓΚΡΙΣΗ ΠΡΟΣΒΑΣΗΣ" : "ΠΡΟΣΚΛΗΣΗ",
         g.approved ? "Η πρόσβασή σας εγκρίθηκε" : "Καλώς ήρθατε στο SurgiTrack",
-        `<p>${g.approved ? "Ο διαχειριστής ενέκρινε την πρόσβασή σας" : "Σας δόθηκε πρόσβαση"} στο SurgiTrack του <b>${esc(g.orgName)}</b> ως <b>${esc(ROLE_NAMES[g.role] || g.role)}</b>.</p>
+        `<p>${g.approved ? "Ο διαχειριστής ενέκρινε την πρόσβασή σας" : "Σας δόθηκε πρόσβαση"} στο SurgiTrack του <b>${esc(g.orgName)}</b>.</p>
          ${usernameBox(userCode)}
+         <p>Ρόλος: <b>${esc(roleLabel)}</b><br>Τμήμα: <b>${esc(departmentName)}</b></p>
          <p>Πατήστε το κουμπί για να ορίσετε τον κωδικό σας. Μετά συνδέεστε με το όνομα χρήστη (ή με το email σας) και τον κωδικό.</p>`,
         {href: url, label: g.approved ? "Ορισμός κωδικού" : "Αποδοχή και ορισμός κωδικού"},
       ),
@@ -198,6 +220,7 @@ Deno.serve(async req => {
       const dept = await department(r.organization_id, role, body.department_id ?? r.department_id);
       const out = await grantAccess(admin, {
         email: r.email, name: r.full_name, org: r.organization_id, orgName, role, dept, invitedBy: user.id, site, approved: true,
+        supervisor: body.supervisor === true,
       });
       await admin.from("staff_access_requests").update({
         status: "APPROVED", user_id: out.userId, granted_role: role, department_id: dept, decided_at: new Date().toISOString(),
@@ -220,7 +243,9 @@ Deno.serve(async req => {
         const orgName = await hospital(org);
         const dept = await department(org, role, row.department_id);
         if (direct) {
-          const r = await grantAccess(admin, {email, name: name.toLocaleUpperCase("el-GR"), org, orgName, role, dept, invitedBy: user.id, site});
+          const r = await grantAccess(admin, {
+            email, name: name.toLocaleUpperCase("el-GR"), org, orgName, role, dept, invitedBy: user.id, site, supervisor: row.supervisor === true,
+          });
           out.push({email, ok: true, mode: "account", user_code: r.userCode, emailed: r.emailed, url: r.url});
         } else {
           const r = await inviteToSignup(admin, {email, org, orgName, role, dept, invitedBy: user.id, site}, !!body.again);
