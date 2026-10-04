@@ -6,7 +6,6 @@ import {
   Factory,
   FlaskConical,
   Gauge,
-  KeyRound,
   Plus,
   RefreshCcw,
   Search,
@@ -48,6 +47,7 @@ import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
 import HospitalPeople from '../hospital/HospitalPeople';
+import OwnerDashboard from './OwnerDashboard';
 import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {translateToEnglish} from '../../core/glossary';
 import {
@@ -445,9 +445,6 @@ export default function StudioPage() {
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
-  const activeUsers = displayedUsers.filter(u => u.active).length;
-  const totalLibraryRecords = libraryMeta.reduce((sum, m) => sum + libs[m.key].length, 0);
-  const departmentUsers = displayedUsers.filter(u => u.role === 'DEPARTMENT').length;
   const roleCount = useMemo(
     () => roles.map(r => ({role: r.id, count: displayedUsers.filter(u => u.role === r.id && u.active).length})),
     [displayedUsers],
@@ -585,99 +582,29 @@ export default function StudioPage() {
       </div>
       <div className={`studio-body studio-body-${tab.toLowerCase()}`}>
         {tab === 'OVERVIEW' && platformAdmin && (
-          <div className="studio-overview">
-            <div className="studio-kpis">
-              <div>
-                <BookOpen />
-                <span>{L('Εγγραφές βιβλιοθηκών', 'Library records')}</span>
-                <strong>{totalLibraryRecords}</strong>
-              </div>
-              <div>
-                <Users />
-                <span>{L('Ενεργοί χρήστες', 'Active users')}</span>
-                <strong>{activeUsers}</strong>
-              </div>
-              <div>
-                <Building2 />
-                <span>{L('Τμήματα', 'Departments')}</span>
-                <strong>{libs.dataMode === 'PRODUCTION' ? cloudDepartments.length : libs.departments.length}</strong>
-              </div>
-              <div>
-                <ShieldCheck />
-                <span>{L('Ρόλοι', 'Roles')}</span>
-                <strong>{roles.length}</strong>
-              </div>
-            </div>
-            <section className="studio-overview-grid">
-              <div className="studio-overview-card">
-                <header>
-                  <div>
-                    <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΕΣ', 'LIBRARIES')}</span>
-                    <h2>{L('Βιβλιοθήκες SurgiTrack', 'SurgiTrack libraries')}</h2>
-                  </div>
-                  <AppButton onClick={() => selectTab('LIBRARIES')}>{L('Διαχείριση', 'Manage')}</AppButton>
-                </header>
-                <div className="studio-library-summary">
-                  {libraryMeta.map(m => {
-                    const Icon = m.icon;
-                    return (
-                      <button
-                        key={m.key}
-                        onClick={() => {
-                          setLibraryKey(m.key);
-                          selectTab('LIBRARIES');
-                        }}
-                      >
-                        <span>
-                          <Icon size={18} />
-                        </span>
-                        <div>
-                          <b>{L(m.el, m.en)}</b>
-                          <small>
-                            {libs[m.key].length} {L('εγγραφές', 'records')}
-                          </small>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="studio-overview-card">
-                <header>
-                  <div>
-                    <span className="eyebrow">{L('ΕΛΕΓΧΟΣ ΠΡΟΣΒΑΣΗΣ', 'ACCESS CONTROL')}</span>
-                    <h2>{L('Πρόσβαση χρηστών', 'User access')}</h2>
-                  </div>
-                  <AppButton onClick={() => selectTab('USERS')}>{L('Χρήστες', 'Users')}</AppButton>
-                </header>
-                <div className="studio-role-summary">
-                  {roles.map(r => {
-                    const count = roleCount.find(x => x.role === r.id)?.count || 0;
-                    return (
-                      <div key={r.id}>
-                        <span className={`studio-role-dot role-${r.id.toLowerCase()}`}></span>
-                        <div>
-                          <b>{L(r.el, r.en)}</b>
-                          <small>
-                            {count} {L('ενεργοί', 'active')}
-                          </small>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="studio-mini-note">
-                  <KeyRound size={17} />
-                  <span>
-                    {L(
-                      `${departmentUsers} χρήστες Τμήματος έχουν πρόσβαση μόνο στα assets του δηλωμένου τμήματός τους.`,
-                      `${departmentUsers} Department users are restricted to assets assigned to their department.`,
-                    )}
-                  </span>
-                </div>
-              </div>
-            </section>
-          </div>
+          <OwnerDashboard
+            organizations={displayedOrganizations}
+            users={displayedUsers}
+            production={libs.dataMode === 'PRODUCTION'}
+            L={L}
+            onOpenUsers={id => {
+              setSelectedOrganizationId(id);
+              selectTab('USERS');
+            }}
+            onOpenHospitals={() => selectTab('PLATFORM')}
+            onNewHospital={() => setOrganizationEditor(null)}
+            onExtendTrial={(org, endsAt) => void changePlan(org, 'TRIAL', endsAt)}
+            onMakeStandard={org =>
+              setConfirm({
+                title: L('Κανονική χρήση;', 'Standard use?'),
+                message: L(
+                  `Το ${org.name} περνά σε κανονική χρήση, χωρίς λήξη. Αν ήταν κλειδωμένο, ξεκλειδώνει αμέσως.`,
+                  `${org.name} moves to standard use, with no end date. If it was locked, it unlocks at once.`,
+                ),
+                action: () => void changePlan(org, 'STANDARD'),
+              })
+            }
+          />
         )}
         {tab === 'PLATFORM' && platformAdmin && (
           <section className="studio-manager-panel studio-platform-panel">
