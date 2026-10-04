@@ -3456,3 +3456,248 @@ div.asset-import-hospital b {
 .platform-contact > footer small {
   color: var(--st-muted, #6f808c);
 }
+
+/* Hospital people: one users list (rows open a drawer), invitations, signups to approve, departments. */
+.hospital-people {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.studio-users-panel .hospital-people {
+  padding: 0 16px 16px;
+}
+.hospital-count.attention {
+  background: #fff1dc;
+  color: #a6620c;
+}
+.people-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.people-toolbar .studio-search {
+  flex: 1;
+  margin: 0 !important;
+}
+.people-invite {
+  position: relative;
+}
+.people-invite-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  width: min(320px, 86vw);
+  display: grid;
+  padding: 6px;
+  border: 1px solid #dfe8ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(19, 44, 57, 0.16);
+}
+.people-invite-menu > button,
+.people-invite-menu > label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: #0e6d82;
+  cursor: pointer;
+}
+.people-invite-menu > button:hover,
+.people-invite-menu > label:hover {
+  background: #f1f7f9;
+}
+.people-invite-menu span {
+  display: grid;
+  gap: 2px;
+}
+.people-invite-menu b {
+  color: #1d2939;
+  font-size: 13px;
+}
+.people-invite-menu small {
+  color: #7b8794;
+  font-size: 11px;
+}
+.people-requests {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #f0d9a8;
+  border-radius: 12px;
+  background: #fffaf0;
+}
+.people-requests > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  color: #a6620c;
+}
+.people-requests > header b {
+  color: #7a4a08;
+  font-size: 14px;
+}
+.people-requests > header small {
+  grid-column: 2;
+  color: #8a6a3a;
+  font-size: 12px;
+}
+.people-requests .hospital-request {
+  background: #fff;
+}
+.people-head,
+.people-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 100px 18px;
+  align-items: center;
+  gap: 10px;
+}
+.people-head {
+  padding: 0 12px;
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.people-rows {
+  display: grid;
+  gap: 6px;
+}
+.people-row {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #eef2f5;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  color: #1d2939;
+  cursor: pointer;
+}
+.people-row:hover {
+  border-color: #b9d7df;
+  background: #f7fbfc;
+}
+.people-row code {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #0e6d82;
+}
+.people-who {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.people-who b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.people-who small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #7b8794;
+  font-size: 11px;
+  font-weight: 600;
+}
+.people-you {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #e6f3f6;
+  color: #0e6d82;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+.people-value {
+  min-width: 0;
+  color: #364152;
+  font-size: 12.5px;
+}
+.people-value.whole {
+  color: #7b8794;
+  font-style: italic;
+}
+.people-open {
+  color: #9aabb6;
+}
+.people-csv {
+  display: grid;
+  gap: 6px;
+}
+.people-csv > div {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid #e3e9ee;
+  border-radius: 9px;
+}
+.people-csv > div.error {
+  border-color: #f2c4c4;
+  background: #fff6f6;
+}
+.people-csv small {
+  color: #7b8794;
+}
+.people-csv em {
+  color: #b42318;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+.people-drawer-gap {
+  flex: 1;
+}
+@media (max-width: 760px) {
+  .people-head {
+    display: none;
+  }
+  .people-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 4px;
+  }
+  .people-row > code,
+  .people-row > .people-value {
+    display: none;
+  }
+  .people-row > .hospital-member-status {
+    grid-column: 1;
+  }
+  .people-row > .people-open {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+}
+.hospital-people .hospital-request select,
+.hospital-people .hospital-request input,
+.hospital-people .hospital-department-add input,
+.hospital-people .hospital-row input {
+  height: 36px;
+  min-width: 0;
+  border: 1px solid #d9e1e8;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 9px;
+  color: #1d2939;
+  font: inherit;
+  font-size: 13px;
+}
+.hospital-people .people-toolbar .studio-search input {
+  height: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+@media (max-width: 760px) {
+  .hospital-people .hospital-request {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
