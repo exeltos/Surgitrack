@@ -76,6 +76,11 @@ Deno.serve(async req => {
     if (!found) return json({error: "unknown_device_key"}, 401);
     const {data: device} = await admin.from("devices").select("id, organization_id, active").eq("id", found.device_id).maybeSingle();
     if (!device?.active) return json({error: "device_inactive"}, 403);
+    // A trial hospital whose trial has ended takes no data until it is renewed.
+    const {data: org} = await admin.from("organizations").select("plan, trial_ends_at").eq("id", device.organization_id).maybeSingle();
+    if (org?.plan === "TRIAL" && org.trial_ends_at && Date.parse(org.trial_ends_at) <= Date.now()) {
+      return json({error: "hospital_locked"}, 403);
+    }
 
     const rows = [];
     const rejected: number[] = [];

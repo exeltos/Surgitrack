@@ -10,6 +10,9 @@ export type Organization = {
   code: string;
   active: boolean;
   demoEnabled: boolean;
+  /** Standard use, or a trial that locks the hospital after trialEndsAt. */
+  plan?: 'STANDARD' | 'TRIAL';
+  trialEndsAt?: string;
 };
 export type AdminUser = {
   id: string;

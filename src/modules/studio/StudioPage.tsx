@@ -69,6 +69,8 @@ import {tr} from '../../i18n';
 import RolesGuide from './RolesGuide';
 import ColorTapeLibrary from './ColorTapeLibrary';
 import AssetImportWizard from './AssetImportWizard';
+import PlatformContactSettings from './PlatformContactSettings';
+import {TRIAL_LENGTHS, trialEndAfter, trialEndDate, trialEndOn, trialEnded, trialState} from '../../core/trial';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM';
 const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
@@ -224,7 +226,7 @@ export default function StudioPage() {
     // Demo hospitals are sandboxes, not customers: they are managed through the Demo buttons only.
     const {data, error} = await supabase
       .from('organizations')
-      .select('id,name,code,active,demo_enabled')
+      .select('id,name,code,active,demo_enabled,plan,trial_ends_at')
       .eq('is_demo', false)
       .order('name');
     if (error) setCloudError(error.message);
@@ -237,6 +239,8 @@ export default function StudioPage() {
           code: row.code,
           active: row.active,
           demoEnabled: row.demo_enabled,
+          plan: row.plan === 'TRIAL' ? 'TRIAL' : 'STANDARD',
+          trialEndsAt: row.trial_ends_at || undefined,
         })),
       );
     }
@@ -460,31 +464,76 @@ export default function StudioPage() {
     }
     await loadCloudUsers();
   };
-  const saveOrganization = async (data: Omit<Organization, 'id'>) => {
+  const saveOrganization = async (data: Omit<Organization, 'id'>, hospitalAdmin?: {name: string; email: string}) => {
     if (libs.dataMode === 'DEMO') {
       if (organizationEditor) libs.updateOrganization(organizationEditor.id, data);
       else libs.addOrganization(data);
       setOrganizationEditor(undefined);
       return;
     }
-    const {error} = organizationEditor
-      ? await supabase.rpc('platform_update_organization', {
-          p_id: organizationEditor.id,
-          p_name: data.name,
-          p_code: data.code,
-          p_active: data.active,
-          p_demo_enabled: data.demoEnabled,
-        })
-      : await supabase.rpc('platform_create_organization', {p_name: data.name, p_code: data.code});
-    if (error) {
-      setCloudError(error.message);
-      return;
+    let id = organizationEditor?.id;
+    if (organizationEditor) {
+      const {error} = await supabase.rpc('platform_update_organization', {
+        p_id: organizationEditor.id,
+        p_name: data.name,
+        p_code: data.code,
+        p_active: data.active,
+        p_demo_enabled: data.demoEnabled,
+      });
+      if (error) return setCloudError(error.message);
+    } else {
+      const {data: created, error} = await supabase.rpc('platform_create_organization', {
+        p_name: data.name,
+        p_code: data.code,
+      });
+      if (error || !created) return setCloudError(error?.message || 'create failed');
+      id = String(created);
+      if (data.demoEnabled) await updateOrganizationFlags({id, ...data}, {demoEnabled: true});
     }
-    if (!organizationEditor && data.demoEnabled) {
-      await loadCloudOrganizations();
+    const plan = await setOrganizationPlan(id!, data.plan || 'STANDARD', data.trialEndsAt);
+    if (!plan) return;
+    // The hospital's admin gets an invitation by email and sets their own password.
+    if (hospitalAdmin?.email) {
+      const {data: result, error} = await supabase.functions.invoke('invite-staff', {
+        body: {
+          users: [
+            {
+              full_name: hospitalAdmin.name,
+              email: hospitalAdmin.email,
+              organization_id: id,
+              department_id: null,
+              role: 'ADMIN',
+            },
+          ],
+          redirect_to: window.location.origin,
+        },
+      });
+      if (error || !result?.results?.[0]?.ok)
+        setCloudError(
+          L(
+            'Το νοσοκομείο δημιουργήθηκε, αλλά η πρόσκληση του Διαχειριστή απέτυχε: ',
+            'The hospital was created, but the admin invitation failed: ',
+          ) + (result?.results?.[0]?.error || error?.message || ''),
+        );
+      else await loadCloudUsers();
     }
     setOrganizationEditor(undefined);
     await loadCloudOrganizations();
+  };
+  /** Standard use or a trial with its end; the database locks a trial hospital once it ends. */
+  const setOrganizationPlan = async (id: string, plan: 'STANDARD' | 'TRIAL', trialEndsAt?: string) => {
+    const {error} = await supabase
+      .from('organizations')
+      .update({plan, trial_ends_at: plan === 'TRIAL' ? trialEndsAt || null : null})
+      .eq('id', id);
+    if (error) {
+      setCloudError(error.message);
+      return false;
+    }
+    return true;
+  };
+  const changePlan = async (org: Organization, plan: 'STANDARD' | 'TRIAL', trialEndsAt?: string) => {
+    if (await setOrganizationPlan(org.id, plan, trialEndsAt)) await loadCloudOrganizations();
   };
   const updateOrganizationFlags = async (
     org: Organization,
@@ -895,6 +944,7 @@ export default function StudioPage() {
                         <small>
                           {org.code} · {orgUsers.length} {L('χρήστες', 'users')}
                         </small>
+                        <PlanBadge org={org} L={L} />
                       </div>
                     </div>
                     <div className="platform-org-status">
@@ -913,6 +963,29 @@ export default function StudioPage() {
                         {org.demoEnabled ? L('Demo ανοικτό', 'Demo open') : L('Demo κλειστό', 'Demo closed')}
                       </button>
                     </div>
+                    {org.plan === 'TRIAL' && (
+                      <div className="platform-trial-actions">
+                        <button
+                          onClick={() =>
+                            void changePlan(
+                              org,
+                              'TRIAL',
+                              trialEndAfter(
+                                30,
+                                trialEnded(org.plan, org.trialEndsAt) || !org.trialEndsAt
+                                  ? new Date()
+                                  : new Date(org.trialEndsAt),
+                              ),
+                            )
+                          }
+                        >
+                          {L('+30 ημέρες δοκιμής', '+30 trial days')}
+                        </button>
+                        <button className="primary" onClick={() => void changePlan(org, 'STANDARD')}>
+                          {L('Κανονική χρήση', 'Standard use')}
+                        </button>
+                      </div>
+                    )}
                     <div className="platform-demo-actions">
                       <span>{L('Είσοδος Demo ως:', 'Enter Demo as:')}</span>
                       {hospitalRoleKinds.map(kind => (
@@ -1804,6 +1877,7 @@ export default function StudioPage() {
             </section>
           </div>
         )}
+        {tab === 'SYSTEM' && platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
         {tab === 'SYSTEM' && (
           <div className="studio-system-grid">
             <section>
@@ -1988,8 +2062,8 @@ export default function StudioPage() {
         <OrganizationEditor
           organization={organizationEditor || undefined}
           onClose={() => setOrganizationEditor(undefined)}
-          onSave={data => {
-            void saveOrganization(data);
+          onSave={(data, hospitalAdmin) => {
+            void saveOrganization(data, hospitalAdmin);
           }}
         />
       )}
@@ -2075,6 +2149,24 @@ function LibraryEditor({
     </div>
   );
 }
+/** Trial state on a hospital card: days left, or locked once ended. */
+function PlanBadge({org, L}: {org: Organization; L: (el: string, en: string) => string}) {
+  if (org.plan !== 'TRIAL') return <span className="plan-badge standard">{L('Κανονική χρήση', 'Standard use')}</span>;
+  const state = trialState(org.plan, org.trialEndsAt);
+  const date = org.trialEndsAt ? new Date(org.trialEndsAt).toLocaleDateString('el-GR') : '—';
+  if (state.ended)
+    return (
+      <span className="plan-badge locked">
+        {L(`Δοκιμή έληξε ${date} · κλειδωμένο`, `Trial ended ${date} · locked`)}
+      </span>
+    );
+  return (
+    <span className={`plan-badge trial${state.warn ? ' warn' : ''}`}>
+      {L(`Δοκιμαστική · λήγει ${date} (${state.daysLeft} ημέρες)`, `Trial · ends ${date} (${state.daysLeft} days)`)}
+    </span>
+  );
+}
+
 function OrganizationEditor({
   organization,
   onClose,
@@ -2082,12 +2174,19 @@ function OrganizationEditor({
 }: {
   organization?: Organization;
   onClose: () => void;
-  onSave: (data: Omit<Organization, 'id'>) => void;
+  onSave: (data: Omit<Organization, 'id'>, hospitalAdmin?: {name: string; email: string}) => void;
 }) {
   const [name, setName] = useState(organization?.name || '');
   const [code, setCode] = useState(organization?.code || '');
   const [active, setActive] = useState(organization?.active ?? true);
   const [demoEnabled, setDemoEnabled] = useState(organization?.demoEnabled ?? false);
+  const [plan, setPlan] = useState<'STANDARD' | 'TRIAL'>(organization?.plan || 'STANDARD');
+  const [endDate, setEndDate] = useState(trialEndDate(organization?.trialEndsAt) || trialEndDate(trialEndAfter(30)));
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const emailOk = !adminEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim());
+  const adminOk = !!organization || (adminName.trim() && adminEmail.trim() && emailOk);
+  const ready = name.trim() && code.trim() && adminOk && (plan === 'STANDARD' || endDate);
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <aside className="studio-drawer">
@@ -2113,6 +2212,59 @@ function OrganizationEditor({
               placeholder={tr('π.χ. IASO-TH')}
             />
           </label>
+          <fieldset className="studio-plan">
+            <legend>{tr('Χρήση')}</legend>
+            <label className={plan === 'STANDARD' ? 'active' : ''}>
+              <input type="radio" name="plan" checked={plan === 'STANDARD'} onChange={() => setPlan('STANDARD')} />
+              <span>
+                <b>{tr('Κανονική χρήση')}</b>
+                <small>{tr('Χωρίς λήξη.')}</small>
+              </span>
+            </label>
+            <label className={plan === 'TRIAL' ? 'active' : ''}>
+              <input type="radio" name="plan" checked={plan === 'TRIAL'} onChange={() => setPlan('TRIAL')} />
+              <span>
+                <b>{tr('Δοκιμαστική περίοδος')}</b>
+                <small>{tr('Μετά τη λήξη το νοσοκομείο κλειδώνει μέχρι να το ανανεώσετε.')}</small>
+              </span>
+            </label>
+          </fieldset>
+          {plan === 'TRIAL' && (
+            <div className="studio-trial-length">
+              <span>{tr('Διάρκεια')}</span>
+              <div>
+                {TRIAL_LENGTHS.map(days => (
+                  <button
+                    key={days}
+                    type="button"
+                    className={endDate === trialEndDate(trialEndAfter(days)) ? 'active' : ''}
+                    onClick={() => setEndDate(trialEndDate(trialEndAfter(days)))}
+                  >
+                    {tr('{0} ημέρες', days)}
+                  </button>
+                ))}
+              </div>
+              <label>
+                {tr('Λήγει στις')}
+                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+              </label>
+            </div>
+          )}
+          {!organization && (
+            <div className="studio-admin-invite">
+              <b>{tr('Διαχειριστής νοσοκομείου')}</b>
+              <small>{tr('Παίρνει πρόσκληση με email, ορίζει κωδικό και στήνει το νοσοκομείο.')}</small>
+              <label>
+                {tr('Ονοματεπώνυμο')}
+                <input value={adminName} onChange={e => setAdminName(e.target.value)} />
+              </label>
+              <label>
+                Email
+                <input type="email" value={adminEmail} onChange={e => setAdminEmail(e.target.value)} />
+                {!emailOk && <small className="studio-field-error">{tr('Μη έγκυρο email.')}</small>}
+              </label>
+            </div>
+          )}
           <label className="studio-switch-row">
             <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
             <span>{tr('Ενεργό νοσοκομείο')}</span>
@@ -2134,10 +2286,22 @@ function OrganizationEditor({
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
-            disabled={!name.trim() || !code.trim()}
-            onClick={() => onSave({name: name.trim(), code: code.trim(), active, demoEnabled})}
+            disabled={!ready}
+            onClick={() =>
+              onSave(
+                {
+                  name: name.trim(),
+                  code: code.trim(),
+                  active,
+                  demoEnabled,
+                  plan,
+                  trialEndsAt: plan === 'TRIAL' ? trialEndOn(endDate) : undefined,
+                },
+                organization ? undefined : {name: adminName.trim(), email: adminEmail.trim().toLowerCase()},
+              )
+            }
           >
-            {tr('Αποθήκευση')}
+            {organization ? tr('Αποθήκευση') : tr('Δημιουργία και πρόσκληση')}
           </AppButton>
         </footer>
       </aside>

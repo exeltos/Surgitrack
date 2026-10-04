@@ -25,6 +25,7 @@ import RoleSwitcher from './RoleSwitcher';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
+import {useTrial} from '../../data/cloud/trialContext';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
@@ -66,6 +67,7 @@ const navEN: Record<string, string> = {
 /** Pages the platform admin can use without having entered a hospital. */
 const PLATFORM_ONLY_PAGES = ['/studio', '/hospitals'];
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
+  const trial = useTrial();
   const {
     issues,
     lifecycleAlerts,
@@ -567,6 +569,17 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             </button>
           </div>
         </header>
+        {trial && (trial.warn || trial.ended) && (
+          <div className={`trial-strip${trial.ended ? ' ended' : ''}`} role="status">
+            {trial.ended
+              ? lang === 'el'
+                ? 'Η δοκιμαστική περίοδος έληξε: το νοσοκομείο είναι κλειδωμένο για τους χρήστες του μέχρι να το ανανεώσετε από το Studio.'
+                : 'The trial has ended: the hospital is locked for its users until you renew it in Studio.'
+              : lang === 'el'
+                ? `Δοκιμαστική περίοδος: ${trial.daysLeft === 1 ? 'απομένει 1 ημέρα' : `απομένουν ${trial.daysLeft} ημέρες`} (λήγει ${new Date(trial.endsAt || '').toLocaleDateString('el-GR')}). Μετά τη λήξη το νοσοκομείο κλειδώνει· για συνέχεια επικοινωνήστε με τον διαχειριστή του SurgiTrack.`
+                : `Trial period: ${trial.daysLeft === 1 ? '1 day left' : `${trial.daysLeft} days left`} (ends ${new Date(trial.endsAt || '').toLocaleDateString('en-GB')}). The hospital locks when it ends; to continue, contact the SurgiTrack administrator.`}
+          </div>
+        )}
         <section className="content" ref={contentRef}>
           {children}
         </section>

@@ -33,6 +33,7 @@ const StandaloneToolsPage = lazyPage(() => import('../modules/tools/StandaloneTo
 const StockPage = lazyPage(() => import('../modules/stock/StockPage'));
 const SterilizationPage = lazyPage(() => import('../modules/sterilization/SterilizationPage'));
 const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
+const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
 const DepartmentPage = lazyPage(() => import('../modules/department/DepartmentPage'));
 const CountPage = lazyPage(() => import('../modules/counts/CountPage'));
 const IssuesPage = lazyPage(() => import('../modules/issues/IssuesPage'));
@@ -295,10 +296,26 @@ export default function App() {
           }
         />
         <Route
+          path="/import"
+          element={
+            <Guard permission="asset.create">
+              <ImportPage />
+            </Guard>
+          }
+        />
+        <Route
           path="/devices"
           element={
             <Guard permission="sterilization.workspace">
               <DevicesPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/overview/department"
+          element={
+            <Guard permission="overview.view">
+              <DepartmentPage />
             </Guard>
           }
         />

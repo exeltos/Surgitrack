@@ -1,5 +1,18 @@
 import {useCallback, useEffect, useState} from 'react';
-import {Building2, Pencil, Plus, RefreshCw, Save, Trash2, UserCheck, UserX, Users, X} from 'lucide-react';
+import {
+  Building2,
+  FileSpreadsheet,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Save,
+  Trash2,
+  UserCheck,
+  UserX,
+  Users,
+  X,
+} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import SignupLinkCard from './SignupLinkCard';
@@ -61,6 +74,7 @@ const memberRoles = [
  * departments, the 10-day staff signup link, approval of signups, and the hospital's users.
  */
 export default function HospitalAdminPage() {
+  const navigate = useNavigate();
   const {lang} = useAppPreferences();
   const el = lang === 'el';
   const L = (gr: string, en: string) => (el ? gr : en);
@@ -356,15 +370,20 @@ export default function HospitalAdminPage() {
           'Departments, the staff signup link and approval of new users.',
         )}
         actions={
-          <AppButton
-            onClick={() => {
-              setRefreshKey(k => k + 1);
-              void load();
-            }}
-            icon={<RefreshCw size={15} />}
-          >
-            {L('Ανανέωση', 'Refresh')}
-          </AppButton>
+          <div className="page-head-actions">
+            <AppButton onClick={() => navigate('/import')} icon={<FileSpreadsheet size={15} />}>
+              {L('Μαζική εισαγωγή', 'Bulk import')}
+            </AppButton>
+            <AppButton
+              onClick={() => {
+                setRefreshKey(k => k + 1);
+                void load();
+              }}
+              icon={<RefreshCw size={15} />}
+            >
+              {L('Ανανέωση', 'Refresh')}
+            </AppButton>
+          </div>
         }
       />
       {notice && (

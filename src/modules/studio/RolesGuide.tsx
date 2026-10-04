@@ -1,4 +1,4 @@
-import {Building2, Crown, ShieldCheck, Sparkles, Stethoscope} from 'lucide-react';
+import {Building2, Crown, Eye, ShieldCheck, Sparkles, Stethoscope} from 'lucide-react';
 import type {ReactNode} from 'react';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {hospitalRoleNames} from '../../config/demoRoles';
@@ -86,9 +86,25 @@ const rows: Row[] = [
       en: 'Sending to sterilization, receiving back and problem reports.',
     },
   },
+  {
+    icon: <Eye size={18} />,
+    name: hospitalRoleNames.VIEWER,
+    who: {
+      el: 'Όποιος χρειάζεται να βλέπει χωρίς να αλλάζει: διεύθυνση, γραφείο ποιότητας, ελεγκτής, επιθεωρητής.',
+      en: 'Anyone who needs to look without changing anything: management, quality office, auditor, inspector.',
+    },
+    sees: {
+      el: 'Όλο το νοσοκομείο: Επισκόπηση, Εργαλεία, Σετ, Stock, Εκκρεμότητες, Αναφορές, Ιστορικό, Ιχνηλασιμότητα.',
+      en: 'The whole hospital: Overview, Instruments, Sets, Stock, Issues, Reports, History, Traceability.',
+    },
+    does: {
+      el: 'Τίποτα δεν αλλάζει: ούτε αποστολή, ούτε παραλαβή, ούτε αναφορά. Εκτυπώνει και εξάγει αναφορές. Δεν μπορεί να του δοθεί ενέργεια, ούτε από τα Δικαιώματα.',
+      en: 'Changes nothing: no sending, receiving or reporting. Prints and exports reports. No action can be granted, not even in Permissions.',
+    },
+  },
 ];
 
-/** Who is who in SurgiTrack: the platform owner and the four kinds of hospital user. */
+/** Who is who in SurgiTrack: the platform owner and the five kinds of hospital user. */
 export default function RolesGuide() {
   const {lang} = useAppPreferences();
   const L = (text: {el: string; en: string}) => (lang === 'el' ? text.el : text.en);

@@ -44,7 +44,8 @@ const SHOWN_ERRORS = 200;
  */
 export default function AssetImportWizard({lang, organizations, departments, byName}: Props) {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
-  const [organizationId, setOrganizationId] = useState('');
+  // Inside a hospital there is one choice, already made.
+  const [organizationId, setOrganizationId] = useState(organizations.length === 1 ? organizations[0].id : '');
   const [step, setStep] = useState<Step>('FILE');
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<SheetRows>([]);
@@ -210,24 +211,31 @@ export default function AssetImportWizard({lang, organizations, departments, byN
             )}
           </p>
         </div>
-        <label className="asset-import-hospital">
-          {L('Νοσοκομείο', 'Hospital')}
-          <select
-            value={organizationId}
-            disabled={step !== 'FILE' || Boolean(busy)}
-            onChange={e => {
-              setOrganizationId(e.target.value);
-              setNeedsReload(false);
-            }}
-          >
-            <option value="">{L('Επιλέξτε νοσοκομείο', 'Choose a hospital')}</option>
-            {organizations.map(o => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {organizations.length === 1 ? (
+          <div className="asset-import-hospital">
+            {L('Νοσοκομείο', 'Hospital')}
+            <b>{organizations[0].name}</b>
+          </div>
+        ) : (
+          <label className="asset-import-hospital">
+            {L('Νοσοκομείο', 'Hospital')}
+            <select
+              value={organizationId}
+              disabled={step !== 'FILE' || Boolean(busy)}
+              onChange={e => {
+                setOrganizationId(e.target.value);
+                setNeedsReload(false);
+              }}
+            >
+              <option value="">{L('Επιλέξτε νοσοκομείο', 'Choose a hospital')}</option>
+              {organizations.map(o => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </header>
 
       <ol className="asset-import-steps">

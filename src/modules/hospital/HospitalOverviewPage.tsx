@@ -217,7 +217,7 @@ export default function HospitalOverviewPage() {
             </div>
             {byDepartment.map(d => (
               <div key={d.id} className="overview-row">
-                <Link className="overview-name" to={presetPath('/sets', {department: d.key})}>
+                <Link className="overview-name" to={`/overview/department?d=${encodeURIComponent(d.key)}`}>
                   {d.name}
                 </Link>
                 <span>{d.total}</span>
