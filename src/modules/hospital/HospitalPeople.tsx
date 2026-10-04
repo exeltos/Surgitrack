@@ -270,7 +270,13 @@ export default function HospitalPeople({
         url?: string;
         error?: string;
       }>('invite-staff', {
-        body: {approve_request: r.id, role, department_id: departmentId, redirect_to: window.location.origin},
+        body: {
+          approve_request: r.id,
+          role,
+          supervisor: d.role === SUPERVISOR,
+          department_id: departmentId,
+          redirect_to: window.location.origin,
+        },
       });
       if (error || !data?.ok) {
         const reason = await functionError(error, data?.error);
@@ -456,6 +462,7 @@ export default function HospitalPeople({
             organization_id: organizationId,
             department_id: wholeHospital(role) || !direct ? null : draft.departmentId || null,
             role,
+            supervisor,
             direct,
           },
         ],
@@ -730,6 +737,7 @@ export default function HospitalPeople({
           organization_id: organizationId,
           department_id: wholeHospital(r.role) ? null : r.departmentId || null,
           role: accountRole(r.role),
+          supervisor: r.role === SUPERVISOR,
         })),
         // The list is the admin's own: accounts are made at once, no approval.
         direct: true,
