@@ -45,12 +45,25 @@ import {EMPTY_COLOR_PLAN} from '../../core/colorTapes';
 import type {HandoverSigner} from '../../data/cloud/handover';
 import HandoverSignature from './HandoverSignature';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
+import DeviceCyclePicker from '../devices/DeviceCyclePicker';
+import type {DeviceReading} from '../../core/deviceData';
 
 type Queue = 'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'RELEASE' | 'STORAGE' | 'READY';
 type Kind = AssetKind;
 type SterilizationRow = (SetAsset & {kind: 'SET'}) | (Tool & {kind: 'TOOL'});
 type AssetDraft = {kind: 'SET'; asset: SetAsset} | {kind: 'TOOL'; asset: Tool};
 type Identity = HandoverSigner;
+
+/** What the device measured, kept as the record's note when a device cycle fills the form. */
+const deviceNote = (reading: DeviceReading) =>
+  [
+    tr('Δεδομένα συσκευής'),
+    reading.maxTemperature !== undefined && `${reading.maxTemperature}°C`,
+    reading.maxPressure !== undefined && `${reading.maxPressure} bar`,
+    reading.durationMinutes !== undefined && `${reading.durationMinutes}′`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
 export default function SterilizationPage() {
   const {
@@ -1714,6 +1727,17 @@ export default function SterilizationPage() {
               </div>
             </div>
             <div className="load-modal-body">
+              <DeviceCyclePicker
+                kind={loadModal === 'WASHING' ? 'WASHER' : 'STERILIZER'}
+                equipment={loadEquipment}
+                onPick={(reading, device) => {
+                  setLoadEquipment(device.name);
+                  setLoadCycleNumber(reading.cycleNumber);
+                  if (reading.program) setLoadProgram(reading.program);
+                  if (reading.result === 'FAIL') setLoadChemical('FAIL');
+                  setLoadNote(note => note || deviceNote(reading));
+                }}
+              />
               <div className="cycle-clean-fields">
                 <label>
                   {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}
@@ -3502,6 +3526,17 @@ export default function SterilizationPage() {
                   <strong>{new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}</strong>
                 </div>
               </div>
+              <DeviceCyclePicker
+                kind="STERILIZER"
+                equipment={sterilizer}
+                onPick={(reading, device) => {
+                  setSterilizer(device.name);
+                  setCycleNumber(reading.cycleNumber);
+                  if (reading.program) setCycleProgram(reading.program);
+                  if (reading.result === 'FAIL') setIndicatorResult('FAIL');
+                  setCycleNote(note => note || deviceNote(reading));
+                }}
+              />
               <div className="cycle-clean-fields">
                 <label>
                   {tr('Κλίβανος')}
@@ -3509,6 +3544,7 @@ export default function SterilizationPage() {
                     <option>{tr('Κλίβανος 1')}</option>
                     <option>{tr('Κλίβανος 2')}</option>
                     <option>{tr('Κλίβανος 3')}</option>
+                    {!['Κλίβανος 1', 'Κλίβανος 2', 'Κλίβανος 3'].includes(sterilizer) && <option>{sterilizer}</option>}
                   </select>
                 </label>
                 <label>
@@ -3527,6 +3563,9 @@ export default function SterilizationPage() {
                     <option>134°C · 18 min</option>
                     <option>121°C · 20 min</option>
                     <option>{tr('Άλλο πρόγραμμα')}</option>
+                    {!['134°C · 5 min', '134°C · 18 min', '121°C · 20 min', tr('Άλλο πρόγραμμα')].includes(
+                      cycleProgram,
+                    ) && <option>{cycleProgram}</option>}
                   </select>
                 </label>
                 <label>

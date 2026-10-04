@@ -9,3 +9,7 @@ verify_jwt = false
 # The function validates the link token and throttles by IP itself.
 [functions.staff-signup]
 verify_jwt = false
+
+[functions.device-ingest]
+# Devices sign in with their own device key (checked in the function), not a user session.
+verify_jwt = false

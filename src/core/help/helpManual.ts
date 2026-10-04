@@ -313,6 +313,61 @@ export const helpManual: ManualSection[] = [
     related: ['/issues', '/sets', '/movements'],
   },
   {
+    to: '/devices',
+    permission: 'sterilization.workspace',
+    title: {el: 'Συνδεδεμένες συσκευές', en: 'Connected devices'},
+    summary: {
+      el: 'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν τα δεδομένα των κύκλων τους στο SurgiTrack.',
+      en: 'Sterilizers, washers and other devices that send their cycle data to SurgiTrack.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Τρεις τρόποι σύνδεσης',
+          'Δίκτυο: η συσκευή ή το λογισμικό του κατασκευαστή στέλνει κάθε κύκλο αυτόματα με ένα κλειδί συσκευής. Αρχείο: εξάγετε τους κύκλους σε USB (CSV ή Excel) και τους ανεβάζετε. Καλώδιο: η συσκευή συνδέεται σε υπολογιστή της Αποστείρωσης (Chrome ή Edge) και ό,τι τυπώνει διαβάζεται αυτόματα.',
+        ],
+        en: [
+          'Three ways to connect',
+          'Network: the device or the manufacturer software sends every cycle automatically with a device key. File: export the cycles to USB (CSV or Excel) and upload them. Cable: the device connects to a Sterilization computer (Chrome or Edge) and what it prints is read automatically.',
+        ],
+      },
+      {
+        el: [
+          'Αυτόματη συμπλήρωση κύκλου',
+          'Στην καταγραφή κύκλου ή φορτίου εμφανίζονται οι νέοι κύκλοι των συσκευών. Το «Χρήση» συμπληρώνει κλίβανο, αριθμό κύκλου και πρόγραμμα· εσείς ελέγχετε και επιβεβαιώνετε. Αποτυχημένος κύκλος της συσκευής σημειώνεται ως αποτυχία.',
+        ],
+        en: [
+          'Cycle auto-fill',
+          'When recording a cycle or a load, the devices’ new cycles are listed. “Use” fills in sterilizer, cycle number and program; you check and confirm. A cycle the device failed is marked as failed.',
+        ],
+      },
+      {
+        el: [
+          'Αρχείο',
+          'Κάθε συσκευή κρατά τους κύκλους της με θερμοκρασία, πίεση, διάρκεια και αποτέλεσμα. Το «Εξαγωγή Excel» τους κατεβάζει για έλεγχο ή επιθεώρηση.',
+        ],
+        en: [
+          'Record',
+          'Each device keeps its cycles with temperature, pressure, duration and result. “Export Excel” downloads them for review or audit.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Ο διαχειριστής προσθέτει τη συσκευή και διαλέγει τρόπο σύνδεσης.',
+        'Για δίκτυο: «Κλειδί δικτύου» και το δίνετε στον τεχνικό του κατασκευαστή.',
+        'Για αρχείο ή καλώδιο: «Αρχείο» ή «Καλώδιο» στην κάρτα της συσκευής.',
+      ],
+      en: [
+        'The admin adds the device and picks how it connects.',
+        'For network: “Network key”, given to the manufacturer’s technician.',
+        'For file or cable: “File” or “Cable” on the device card.',
+      ],
+    },
+    related: ['/sterilization', '/reports'],
+  },
+  {
     to: '/tools',
     permission: 'asset.registry.view',
     title: {el: 'Εργαλεία', en: 'Instruments'},

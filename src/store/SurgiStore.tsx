@@ -1955,6 +1955,7 @@ export function SurgiProvider({
       sterilizationReleases,
       workflowCheckpoints,
       deliveries,
+      organizationId: cloudOrganizationId,
       lifecycleAlerts,
       toast,
       role,
@@ -2023,6 +2024,7 @@ export function SurgiProvider({
       toast,
       role,
       identityVersion,
+      cloudOrganizationId,
     ],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

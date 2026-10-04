@@ -11,6 +11,7 @@ import {
   Building2,
   Hospital,
   LayoutDashboard,
+  Cable,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -27,6 +28,7 @@ export type NavigationItem = {
 
 const assetNavigation: NavigationItem[] = [
   {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace'},
+  {to: '/devices', label: 'Συνδεδεμένες συσκευές', icon: Cable, permission: 'sterilization.workspace'},
   {to: '/tools', label: 'Εργαλεία', icon: Wrench, exactSearch: '', permission: 'asset.registry.view'},
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view'},
   {to: '/standalone-tools', label: 'Μεμονωμένα σε χρήση', icon: Wrench, permission: 'asset.registry.view'},

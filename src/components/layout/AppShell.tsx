@@ -49,6 +49,7 @@ const roleLabel: Record<UserRole, {el: string; en: string}> = {
 const navEN: Record<string, string> = {
   'Εξοπλισμός τμήματος': 'Department Equipment',
   Αποστείρωση: 'Sterilization',
+  'Συνδεδεμένες συσκευές': 'Connected devices',
   Εργαλεία: 'Instruments',
   'Σετ εργαλείων': 'Instrument Sets',
   'Μεμονωμένα σε χρήση': 'Standalone in Use',

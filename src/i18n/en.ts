@@ -1,5 +1,6 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
+  'Δεδομένα συσκευής': 'Device data',
   'Βλάβη, φθορά ή άλλο πρόβλημα': 'Damage, wear or another problem',
   'Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα': 'Damage, wear, loss or another problem',
   'Βλάβη, φθορά, έλλειψη ή άλλο πρόβλημα': 'Damage, wear, shortage or another problem',
