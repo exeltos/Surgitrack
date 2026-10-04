@@ -49,13 +49,11 @@ export default function PlatformContactSettings({L}: {L: (el: string, en: string
           {L('Τηλέφωνο', 'Phone')}
           <input value={contact.phone || ''} onChange={e => set('phone', e.target.value)} />
         </label>
-      </div>
-      <footer>
-        {status && <small>{status}</small>}
         <AppButton variant="primary" icon={<Save size={15} />} onClick={() => void save()}>
           {L('Αποθήκευση', 'Save')}
         </AppButton>
-      </footer>
+      </div>
+      {status && <small className="platform-contact-status">{status}</small>}
     </section>
   );
 }

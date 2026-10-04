@@ -3403,58 +3403,51 @@ div.asset-import-hospital b {
 .studio-field-error {
   color: var(--st-red, #b44747) !important;
 }
-.platform-contact {
-  display: grid;
-  gap: 14px;
-  margin-bottom: 16px;
-  padding: 18px;
-  border: 1px solid var(--st-line, #dce7eb);
-  border-radius: 14px;
-  background: #fff;
+/* The owner's contact for locked trial hospitals: first card of Studio → Settings, full width,
+   fields and Save on one row. It takes the look of the other Settings cards. */
+.studio-system-grid:has(> .platform-contact) {
+  grid-template-rows: auto minmax(0, 1fr);
 }
-.platform-contact > header {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  color: var(--st-teal, #167187);
-}
-.platform-contact h3 {
-  margin: 0 0 4px;
-  color: var(--st-ink, #20313f);
-  font-size: 16px;
-}
-.platform-contact p {
-  margin: 0;
-  color: var(--st-muted, #6f808c);
-  font-size: 13px;
+.studio-system-grid > .platform-contact {
+  grid-column: 1 / -1;
+  overflow: visible;
 }
 .platform-contact-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
-}
-.platform-contact-fields label {
-  display: grid;
-  gap: 5px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--st-muted, #6f808c);
-}
-.platform-contact-fields input {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--st-line, #dce7eb);
-  border-radius: 9px;
-  font: inherit;
-}
-.platform-contact > footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
   gap: 12px;
 }
-.platform-contact > footer small {
-  color: var(--st-muted, #6f808c);
+.studio-system-grid .platform-contact-fields label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.platform-contact-fields input {
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid #dce7eb;
+  border-radius: 10px;
+  font: inherit;
+  color: #20313f;
+}
+.platform-contact-fields .app-button,
+.platform-contact-fields > button {
+  min-height: 40px;
+}
+.platform-contact-status {
+  display: block;
+  margin-top: 8px;
+  color: #3f7d56;
+  font-weight: 700;
+}
+@media (max-width: 900px) {
+  .platform-contact-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .platform-contact-fields > :last-child {
+    justify-self: end;
+  }
 }
 
 /* Hospital people: one users list (rows open a drawer), invitations, signups to approve, departments. */
@@ -4122,4 +4115,18 @@ div.asset-import-hospital b {
 .email-link-button:disabled {
   opacity: 0.6;
   cursor: default;
+}
+/* One column (tablets, phones): the Settings cards keep their full height and the tab scrolls. */
+@media (max-width: 1100px) {
+  .studio-body-system {
+    overflow-y: auto !important;
+  }
+  .studio-system-grid,
+  .studio-system-grid:has(> .platform-contact) {
+    height: auto;
+    grid-template-rows: none;
+  }
+  .studio-system-grid > section {
+    overflow: visible;
+  }
 }

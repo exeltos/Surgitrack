@@ -1414,9 +1414,9 @@ export default function StudioPage() {
             </section>
           </div>
         )}
-        {tab === 'SYSTEM' && platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
         {tab === 'SYSTEM' && (
           <div className="studio-system-grid">
+            {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
             <section>
               <header>
                 <Settings2 />
