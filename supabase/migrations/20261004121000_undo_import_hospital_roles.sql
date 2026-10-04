@@ -11,6 +11,8 @@ declare
   v_deleted integer;
 begin
   if not public.can_import_assets(p_org) then raise exception 'forbidden'; end if;
+  -- Runs with the owner's rights, so the trial lock the tables enforce is checked here too.
+  if not public.is_platform_admin() and (select public.current_org_locked()) then raise exception 'hospital_locked'; end if;
   perform 1 from public.asset_imports where organization_id = p_org and id = p_batch and undone_at is null for update;
   if not found then raise exception 'import_not_found'; end if;
 

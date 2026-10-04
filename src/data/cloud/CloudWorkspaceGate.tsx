@@ -135,6 +135,21 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
     void load();
   }, [load]);
 
+  // A tab left open past the trial's end reloads then, so it locks without waiting for a refresh
+  // (and picks up an extension the owner made meanwhile). Timers cap at ~24 days, so a later end
+  // only re-arms the timer.
+  const [rearm, setRearm] = useState(0);
+  useEffect(() => {
+    if (!trial?.endsAt || trial.ended) return;
+    const left = Date.parse(trial.endsAt) - Date.now() + 1000;
+    const cap = 2 ** 31 - 1;
+    const timer = window.setTimeout(
+      () => (left > cap ? setRearm(n => n + 1) : void load()),
+      Math.min(Math.max(left, 0), cap),
+    );
+    return () => window.clearTimeout(timer);
+  }, [trial, load, rearm]);
+
   if (status === 'local') return <>{children(null)}</>;
   if (status === 'ready' && workspace)
     return <TrialContext.Provider value={trial}>{children(workspace)}</TrialContext.Provider>;

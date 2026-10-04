@@ -143,7 +143,7 @@ export default function DepartmentPage() {
             <strong>{k.value}</strong>
           </button>
         ))}
-        <Link to={presetPath('/issues', {status: 'OPEN'})}>
+        <Link to={presetPath('/issues', {status: 'OPEN', department: dept})}>
           <span>{tr('Ανοικτές εκκρεμότητες')}</span>
           <strong>{openIssues}</strong>
         </Link>

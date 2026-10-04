@@ -488,7 +488,9 @@ export default function StudioPage() {
       });
       if (error || !created) return setCloudError(error?.message || 'create failed');
       id = String(created);
-      if (data.demoEnabled) await updateOrganizationFlags({id, ...data}, {demoEnabled: true});
+      // The create call takes only the name and code; the editor's Active and Demo choices follow.
+      if (!data.active || data.demoEnabled)
+        await updateOrganizationFlags({id, ...data}, {active: data.active, demoEnabled: data.demoEnabled});
     }
     const plan = await setOrganizationPlan(id!, data.plan || 'STANDARD', data.trialEndsAt);
     if (!plan) return;
