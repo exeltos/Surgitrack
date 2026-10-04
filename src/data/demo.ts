@@ -473,6 +473,103 @@ for (const [i, department] of ['Χειρουργείο', 'ΤΕΠ', 'Αίθουσ
   retired.retiredAt = `0${i + 2}/09/2026 1${i}:20`;
   retired.retiredReason = 'Συμπλήρωση ορίου χρήσεων';
 }
+// Resuscitation (Ambu): reusable bags, masks and laryngoscope blades that each take a limited number
+// of sterilizations, as their makers set. Two Sets, bags in the departments that resuscitate, one
+// bag near its limit, one that reached it, and new ones in Stock.
+const ambu = {
+  bagAdult: {code: 'AMBU-MK4-A', name: 'ΑΣΚΟΣ ΑΝΑΖΩΟΓΟΝΗΣΗΣ AMBU MARK IV ΕΝΗΛΙΚΩΝ', maxUses: 30},
+  bagChild: {code: 'AMBU-MK4-P', name: 'ΑΣΚΟΣ ΑΝΑΖΩΟΓΟΝΗΣΗΣ AMBU MARK IV ΠΑΙΔΙΚΟΣ', maxUses: 30},
+  bagBaby: {code: 'AMBU-MK4-N', name: 'ΑΣΚΟΣ ΑΝΑΖΩΟΓΟΝΗΣΗΣ AMBU MARK IV ΝΕΟΓΝΙΚΟΣ', maxUses: 30},
+  mask4: {code: 'AMBU-MSK-4', name: 'ΜΑΣΚΑ ΣΙΛΙΚΟΝΗΣ AMBU No 4', maxUses: 50},
+  mask5: {code: 'AMBU-MSK-5', name: 'ΜΑΣΚΑ ΣΙΛΙΚΟΝΗΣ AMBU No 5', maxUses: 50},
+  mask2: {code: 'AMBU-MSK-2', name: 'ΜΑΣΚΑ ΣΙΛΙΚΟΝΗΣ AMBU No 2', maxUses: 50},
+  peep: {code: 'AMBU-PEEP-20', name: 'ΒΑΛΒΙΔΑ PEEP 20 AMBU', maxUses: 40},
+  reservoir: {code: 'AMBU-RES-1500', name: 'ΑΣΚΟΣ ΑΠΟΘΕΜΑΤΟΣ Ο2 1500 ML', maxUses: 30},
+  blade3: {code: 'MAC-3', name: 'ΛΑΜΑ ΛΑΡΥΓΓΟΣΚΟΠΙΟΥ MACINTOSH No 3', maxUses: 200},
+  blade4: {code: 'MAC-4', name: 'ΛΑΜΑ ΛΑΡΥΓΓΟΣΚΟΠΙΟΥ MACINTOSH No 4', maxUses: 200},
+  blade1: {code: 'MIL-1', name: 'ΛΑΜΑ ΛΑΡΥΓΓΟΣΚΟΠΙΟΥ MILLER No 1', maxUses: 200},
+};
+const airway = (item: {code: string; name: string; maxUses: number}): ToolSeed => ({
+  ...item,
+  manufacturer: item.code.startsWith('AMBU') ? 'AMBU' : 'KARL STORZ',
+  specialty: 'Αναισθησιολογία',
+});
+const resuscitationSets: Array<{
+  id: string;
+  code: string;
+  name: string;
+  department: string;
+  state: SetAsset['state'];
+  items: Array<[keyof typeof ambu, number]>;
+}> = [
+  {
+    id: 's23',
+    code: 'RESUS-ADULT',
+    name: 'ΣΕΤ ΑΝΑΖΩΟΓΟΝΗΣΗΣ ΕΝΗΛΙΚΩΝ (AMBU)',
+    department: 'ΤΕΠ',
+    state: 'IN_DEPARTMENT',
+    items: [
+      ['bagAdult', 26],
+      ['mask4', 41],
+      ['mask5', 18],
+      ['peep', 33],
+      ['reservoir', 26],
+      ['blade3', 120],
+      ['blade4', 96],
+    ],
+  },
+  {
+    id: 's24',
+    code: 'RESUS-PAED',
+    name: 'ΣΕΤ ΑΝΑΖΩΟΓΟΝΗΣΗΣ ΠΑΙΔΙΚΟ (AMBU)',
+    department: 'ΜΕΘ',
+    state: 'PENDING_STERILIZATION',
+    items: [
+      ['bagChild', 14],
+      ['mask2', 22],
+      ['reservoir', 14],
+      ['blade1', 61],
+    ],
+  },
+];
+for (const resus of resuscitationSets) {
+  setSerial++;
+  sets.push({
+    id: resus.id,
+    barcode: `S${String(setSerial).padStart(6, '0')}`,
+    code: resus.code,
+    name: resus.name,
+    department: resus.department,
+    specialty: 'Αναισθησιολογία',
+    manufacturer: 'AMBU',
+    state: resus.state,
+    expected: resus.items.length,
+    actual: resus.items.length,
+    category: 'Σετ Αναζωογόνησης',
+    createdAt: '01/06/2026',
+    colorTapes: ['solid-01'],
+  });
+  for (const [key, uses] of resus.items)
+    add(airway(ambu[key]), 'SET_MEMBER', {setId: resus.id, department: resus.department, state: resus.state, uses});
+}
+// Ambu bags kept in the departments, one per resuscitation trolley.
+add(airway(ambu.bagAdult), 'STANDALONE', {department: 'ΜΕΘ', uses: 28});
+add(airway(ambu.bagAdult), 'STANDALONE', {department: 'Χειρουργείο', uses: 29});
+add(airway(ambu.bagAdult), 'STANDALONE', {department: 'ΤΕΠ', uses: 11, state: 'IN_WASHING'});
+add(airway(ambu.bagBaby), 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 17});
+add(airway(ambu.bagBaby), 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 24, state: 'READY_FOR_PICKUP'});
+add(airway(ambu.mask4), 'STANDALONE', {department: 'ΜΕΘ', uses: 47});
+add(airway(ambu.blade3), 'STANDALONE', {department: 'Χειρουργείο', uses: 188});
+// New bags in Stock, ready to replace the ones that reach their limit.
+for (let i = 0; i < 3; i++) add(airway(i === 2 ? ambu.bagChild : ambu.bagAdult), 'STOCK', {uses: 0});
+// A bag that reached its 30 sterilizations: out of use, kept in the reports.
+add(airway(ambu.bagAdult), 'STANDALONE', {department: 'ΜΕΘ', uses: 30});
+{
+  const retired = tools[tools.length - 1];
+  retired.state = 'RETIRED';
+  retired.retiredAt = '28/09/2026 09:40';
+  retired.retiredReason = 'Συμπλήρωση ορίου χρήσεων';
+}
 export {tools};
 export const movements: Movement[] = [
   {

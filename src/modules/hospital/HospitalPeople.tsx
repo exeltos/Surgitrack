@@ -1,7 +1,9 @@
 import {useCallback, useEffect, useState} from 'react';
 import {
   Building2,
+  Check,
   ChevronRight,
+  Copy,
   FileSpreadsheet,
   KeyRound,
   Link2,
@@ -476,6 +478,22 @@ export default function HospitalPeople({
         `A password reset link was sent to ${m.email}. Ask them to check their spam folder too.`,
       ),
     });
+  };
+
+  /** A one-time invitation or set-new-password link, made without sending any email. */
+  const makeLink = async (m: Member) => {
+    setNotice(null);
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean; url?: string}>('staff-link', {
+      body: {user_id: m.id, origin: window.location.origin},
+    });
+    if (error || !data?.url) {
+      setNotice({
+        kind: 'error',
+        text: L('Ο σύνδεσμος δεν δημιουργήθηκε. Δοκιμάστε ξανά.', 'The link was not made. Try again.'),
+      });
+      return undefined;
+    }
+    return data.url;
   };
 
   /** Deletes the account for good; the history the user left stays. */
@@ -953,6 +971,7 @@ export default function HospitalPeople({
           invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
           onResend={draft => void invite(draft, true)}
           onPasswordReset={demo ? undefined : m => void passwordReset(m)}
+          onMakeLink={demo ? undefined : makeLink}
           busy={busy}
           L={L}
           lang={lang}
@@ -1053,6 +1072,7 @@ function MemberDrawer({
   onSave,
   onResend,
   onPasswordReset,
+  onMakeLink,
   onDelete,
 }: {
   member: Member | null;
@@ -1069,6 +1089,8 @@ function MemberDrawer({
   onResend: (draft: Draft) => void;
   /** Emails the user a link to set a new password; left out in Demo. */
   onPasswordReset?: (member: Member) => void;
+  /** Makes the same kind of link without sending it, to pass on by hand; left out in Demo. */
+  onMakeLink?: (member: Member) => Promise<string | undefined>;
   onDelete: () => void;
 }) {
   const invited = invitedAt !== undefined;
@@ -1156,6 +1178,7 @@ function MemberDrawer({
               >
                 {L('Επαναποστολή πρόσκλησης', 'Resend invitation')}
               </AppButton>
+              {onMakeLink && <LinkCopy member={member} make={onMakeLink} busy={busy} L={L} />}
             </div>
           )}
           {member && !invited && (
@@ -1203,6 +1226,7 @@ function MemberDrawer({
               >
                 {L('Αποστολή συνδέσμου αλλαγής κωδικού', 'Send password reset link')}
               </AppButton>
+              {onMakeLink && <LinkCopy member={member} make={onMakeLink} busy={busy || !member.active} L={L} />}
             </div>
           )}
           {!member && (
@@ -1235,6 +1259,62 @@ function MemberDrawer({
           </AppButton>
         </footer>
       </aside>
+    </div>
+  );
+}
+
+/**
+ * «Αντιγραφή συνδέσμου»: makes the link and copies it, for the admin to send by message or phone.
+ * The link stays on screen too, in case the browser does not allow copying.
+ */
+function LinkCopy({
+  member,
+  make,
+  busy,
+  L,
+}: {
+  member: Member;
+  make: (member: Member) => Promise<string | undefined>;
+  busy: boolean;
+  L: (gr: string, en: string) => string;
+}) {
+  const [url, setUrl] = useState('');
+  const [working, setWorking] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+  const create = async () => {
+    setWorking(true);
+    const made = await make(member);
+    setWorking(false);
+    if (!made) return;
+    setUrl(made);
+    await copy(made);
+  };
+  if (!url)
+    return (
+      <AppButton size="sm" disabled={busy || working} icon={<Copy size={14} />} onClick={() => void create()}>
+        {working ? L('Δημιουργία…', 'Making…') : L('Αντιγραφή συνδέσμου', 'Copy link')}
+      </AppButton>
+    );
+  return (
+    <div className="people-link">
+      <input readOnly value={url} onFocus={e => e.currentTarget.select()} aria-label={L('Σύνδεσμος', 'Link')} />
+      <AppButton size="sm" icon={copied ? <Check size={14} /> : <Copy size={14} />} onClick={() => void copy(url)}>
+        {copied ? L('Αντιγράφηκε', 'Copied') : L('Αντιγραφή', 'Copy')}
+      </AppButton>
+      <small>
+        {L(
+          'Στείλτε τον με όποιον τρόπο θέλετε (μήνυμα, Viber κλπ.). Ισχύει μία φορά και για περιορισμένο χρόνο· μην τον δώσετε σε άλλον.',
+          'Send it any way you like (message, chat). It works once and for a limited time; do not give it to anyone else.',
+        )}
+      </small>
     </div>
   );
 }

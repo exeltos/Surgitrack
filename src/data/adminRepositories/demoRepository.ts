@@ -11,6 +11,11 @@ import type {AdminUser, LibraryState} from '../../core/libraryTypes';
 import type {AdminRepository} from './types';
 import {defaultSterilizationWorkflow} from '../../core/workflow';
 import {defaultRolePermissions} from '../../core/permissions';
+
+/** The sample hospital of the local Demo: a neutral name, never a real hospital's. */
+export const DEMO_ORGANIZATION = {id: 'org-demo-main', name: 'SurgiTrack Demo', code: 'SURGITRACK-DEMO'};
+/** Ids an earlier Demo stored in this browser for its sample hospital. */
+export const LEGACY_DEMO_ORGANIZATION_IDS = ['org-iaso-thessalias'];
 import {colorTapeCatalog} from '../../core/colorTapes';
 
 const cloneItems = <T extends {id: string}>(items: readonly T[]): T[] => items.map(item => ({...item}));
@@ -24,14 +29,20 @@ const createDemoInitialData = (): LibraryState => ({
   sterilizers: cloneItems(sterilizers),
   colorTapes: colorTapeCatalog.map(tape => ({...tape, colors: [...tape.colors]})),
   organizations: [
-    {id: 'org-iaso-thessalias', name: 'ΙΑΣΩ Θεσσαλίας', code: 'IASO-TH', active: true, demoEnabled: true},
+    {
+      id: DEMO_ORGANIZATION.id,
+      name: DEMO_ORGANIZATION.name,
+      code: DEMO_ORGANIZATION.code,
+      active: true,
+      demoEnabled: true,
+    },
     {id: 'org-demo-athens', name: 'Demo Hospital Athens', code: 'DEMO-ATH', active: true, demoEnabled: false},
     {id: 'org-demo-north', name: 'Demo Hospital North', code: 'DEMO-NORTH', active: true, demoEnabled: false},
   ],
-  users: demoUsers.map((user, index) => ({
+  users: demoUsers.map(user => ({
     ...user,
     active: true,
-    organizationId: index === 0 ? 'org-iaso-thessalias' : 'org-iaso-thessalias',
+    organizationId: DEMO_ORGANIZATION.id,
     demoEnabled: user.role === 'ADMIN',
   })) as AdminUser[],
   rolePermissions: {

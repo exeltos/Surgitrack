@@ -314,7 +314,7 @@ export default function DevicesPage() {
                     </AppButton>
                   )}
                   {isAdmin && (
-                    <>
+                    <span className="device-card-tools">
                       <button
                         className="icon-button"
                         title={L('Επεξεργασία', 'Edit')}
@@ -331,7 +331,7 @@ export default function DevicesPage() {
                       >
                         <Trash2 size={15} />
                       </button>
-                    </>
+                    </span>
                   )}
                 </div>
               </article>

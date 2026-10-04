@@ -1,5 +1,6 @@
 import {createContext, useContext, useMemo, useState, type ReactNode} from 'react';
 import {getAdminRepository} from '../data/adminRepositories';
+import {DEMO_ORGANIZATION, LEGACY_DEMO_ORGANIZATION_IDS} from '../data/adminRepositories/demoRepository';
 import type {SurgiDataMode} from '../data/repositories';
 import type {LibraryItem} from './libraries';
 import type {ColorTape} from './colorTapes';
@@ -45,19 +46,28 @@ const load = (repository: ReturnType<typeof getAdminRepository>): LibraryState =
       repository.mode === 'DEMO' && repository.storageKey ? localStorage.getItem(repository.storageKey) : null;
     if (raw) {
       const saved = JSON.parse(raw);
-      const organizations = Array.isArray(saved.organizations) ? saved.organizations : initial.organizations;
+      // An earlier Demo named its sample hospital after a real one; it takes the neutral name.
+      const legacyDemo = (id?: string) => !!id && LEGACY_DEMO_ORGANIZATION_IDS.includes(id);
+      const organizations = (Array.isArray(saved.organizations) ? saved.organizations : initial.organizations).map(
+        (org: Organization) => (legacyDemo(org.id) ? {...org, ...DEMO_ORGANIZATION} : org),
+      );
       const defaultOrganizationId = organizations[0]?.id || '';
-      return {
+      const state = {
         ...initial,
         ...saved,
         organizations,
         users: (saved.users || initial.users).map((user: AdminUser) => ({
           ...user,
-          organizationId: user.organizationId || defaultOrganizationId,
+          organizationId: legacyDemo(user.organizationId)
+            ? DEMO_ORGANIZATION.id
+            : user.organizationId || defaultOrganizationId,
           demoEnabled: user.demoEnabled ?? user.role === 'ADMIN',
         })),
         systemSettings: {...initial.systemSettings, ...(saved.systemSettings || {})},
       } as LibraryState;
+      if ((saved.organizations || []).some((org: Organization) => legacyDemo(org.id)))
+        localStorage.setItem(repository.storageKey!, JSON.stringify(state));
+      return state;
     }
     for (const legacyKey of repository.legacyStorageKeys || []) {
       const legacyRaw = localStorage.getItem(legacyKey);
