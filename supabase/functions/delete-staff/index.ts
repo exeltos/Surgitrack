@@ -1,7 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 
-// Deletes a staff account for good (sign-in and profile; the access request goes with them). Only a hospital admin
+// Deletes a staff account for good: sign-in, profile, invitation and access requests, so nothing of
+// the account stays and the same email can be invited again from scratch. Only a hospital admin
 // for users of their own hospital, or the platform admin; never one's own account. The history
 // the user left (movements, issues, handovers) stays, with their name as recorded then.
 const cors = {
@@ -35,7 +36,7 @@ Deno.serve(async req => {
     if (!userId) return json({error: "user_required"}, 400);
     if (userId === auth.user.id) return json({error: "self"}, 409);
 
-    const {data: target} = await admin.from("profiles").select("id, organization_id, name").eq("id", userId).maybeSingle();
+    const {data: target} = await admin.from("profiles").select("id, organization_id, name, email").eq("id", userId).maybeSingle();
     if (!target) return json({error: "not_found"}, 404);
     // A hospital admin only manages their own hospital; the platform admin (no hospital) any.
     if (me.organization_id && target.organization_id !== me.organization_id) return json({error: "forbidden"}, 403);
@@ -47,6 +48,11 @@ Deno.serve(async req => {
     const {error} = await admin.auth.admin.deleteUser(userId);
     if (error) return json({error: "delete_failed", message: error.message}, 500);
     await admin.from("profiles").delete().eq("id", userId);
+    const email = String(target.email || "").toLowerCase();
+    if (email) {
+      await admin.from("user_invitations").delete().eq("organization_id", target.organization_id).eq("email", email);
+      await admin.from("staff_access_requests").delete().eq("organization_id", target.organization_id).eq("email", email);
+    }
     return json({ok: true, name: target.name});
   } catch (e) {
     return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);
