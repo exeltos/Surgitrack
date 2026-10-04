@@ -1732,7 +1732,7 @@ function OrganizationEditor({
             <input
               value={code}
               onChange={e => setCode(e.target.value.toUpperCase())}
-              placeholder={tr('π.χ. IASO-TH')}
+              placeholder={tr('π.χ. HOSP-01')}
             />
           </label>
           <fieldset className="studio-plan">
