@@ -4130,3 +4130,262 @@ div.asset-import-hospital b {
     overflow: visible;
   }
 }
+
+/* Bulk import, first step: the file on the left (drop or choose, template below), and a worked
+   example of how rows become Sets and instruments on the right. Steps read as one progress line. */
+.asset-import-hospital.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid #cfe3e8;
+  border-radius: 999px;
+  background: #f2fafb;
+  color: var(--st-teal, #167187);
+}
+.asset-import-hospital.chip b {
+  color: #13303b;
+  font-size: 14px;
+}
+.asset-import-steps {
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.asset-import-steps li {
+  flex: 1 1 0;
+  min-width: max-content;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 4px 10px 4px 0;
+  position: relative;
+}
+.asset-import-steps li:not(:last-child)::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  margin-left: 8px;
+  background: var(--st-line, #dce7eb);
+  border-radius: 2px;
+}
+.asset-import-steps li.done::after {
+  background: var(--st-green, #23845d);
+}
+.asset-import-steps li span {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--st-line, #dce7eb);
+  background: #fff;
+}
+.asset-import-steps li.active span {
+  border-color: var(--st-teal, #167187);
+}
+.asset-import-steps li.done span {
+  border-color: var(--st-green, #23845d);
+}
+.asset-import-file {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.asset-import-start {
+  display: grid;
+  gap: 12px;
+}
+.asset-import-drop {
+  min-height: 210px;
+  align-content: center;
+  gap: 8px;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.asset-import-drop:not(.disabled):hover,
+.asset-import-drop.dragging {
+  border-color: var(--st-teal, #167187);
+  background: #e7f5f8;
+}
+.asset-import-drop b {
+  color: #13303b;
+  font-size: 15px;
+}
+.asset-import-drop small {
+  color: var(--st-muted, #6f808c);
+  font-size: 12.5px;
+}
+.asset-import-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(19, 44, 57, 0.08);
+  color: var(--st-teal, #167187);
+}
+.asset-import-drop.disabled .asset-import-drop-icon {
+  color: var(--st-muted, #6f808c);
+}
+.asset-import-template {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--st-teal, #167187);
+}
+.asset-import-template span {
+  display: grid;
+  gap: 2px;
+}
+.asset-import-template b {
+  color: #13303b;
+  font-size: 13.5px;
+}
+.asset-import-template small {
+  color: var(--st-muted, #6f808c);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.asset-import-guide {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 14px;
+  background: #fbfdfd;
+}
+.asset-import-guide > b {
+  font-size: 14px;
+  color: #13303b;
+}
+.asset-import-guide > small {
+  margin-top: -6px;
+  color: var(--st-muted, #6f808c);
+  font-size: 12px;
+}
+.asset-import-guide table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--st-line, #dce7eb);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  font-size: 12px;
+}
+.asset-import-guide th {
+  padding: 7px 9px;
+  background: #f1f6f8;
+  color: #5d717d;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-align: left;
+  text-transform: uppercase;
+}
+.asset-import-guide td {
+  padding: 7px 9px;
+  border-top: 1px solid #eef2f5;
+  color: #1d2939;
+}
+.asset-import-guide td:last-child,
+.asset-import-guide th:last-child {
+  text-align: right;
+  font-weight: 800;
+}
+.asset-import-guide td.blank {
+  color: #a3b1ba;
+}
+.asset-import-guide tr.set-a td:first-child {
+  box-shadow: inset 3px 0 0 #2f9fb5;
+  background: #eef8fa;
+  font-weight: 700;
+}
+.asset-import-guide ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #475467;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.asset-import-guide li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 9px;
+}
+.asset-import-guide li i {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #b9cbd3;
+}
+.asset-import-guide li i.set-a {
+  background: #2f9fb5;
+}
+@media (max-width: 1000px) {
+  .asset-import-file {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .asset-import-template {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .asset-import-template > :last-child {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  /* Phones: four numbered dots on a line, the current step's name under them. */
+  .asset-import-steps li {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0;
+    gap: 0;
+  }
+  .asset-import-steps li.active {
+    font-size: 12.5px;
+    gap: 6px;
+  }
+  .asset-import-steps li span {
+    font-size: 12px;
+  }
+  .asset-import-steps li:not(:last-child)::after {
+    margin-left: 6px;
+  }
+}
+.people-password {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  padding: 11px 12px;
+  border: 1px solid #dce7eb;
+  border-radius: 11px;
+  background: #f7fbfc;
+  color: #0e6d82;
+}
+.people-password span {
+  display: grid;
+  gap: 3px;
+}
+.people-password b {
+  color: #13303b;
+  font-size: 13px;
+}
+.people-password small {
+  color: #5d717d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.people-password > :last-child {
+  grid-column: 2;
+  justify-self: start;
+}
