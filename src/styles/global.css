@@ -3973,3 +3973,30 @@ div.asset-import-hospital b {
     justify-content: flex-start;
   }
 }
+/* All ten Studio tabs on one row from tablet width up: tighter spacing, and the icons go first
+   when the row is short of room. Phones keep the wrapped grid. */
+@media (min-width: 761px) {
+  .studio-tabs {
+    container-type: inline-size;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+  .studio-tabs button {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 4px !important;
+    gap: 5px;
+  }
+  @container (max-width: 1080px) {
+    .studio-tabs button svg {
+      display: none;
+    }
+  }
+  /* Narrower still (tablets): the tabs keep their size and the row scrolls sideways. */
+  @container (max-width: 900px) {
+    .studio-tabs button {
+      flex: 0 0 auto;
+      padding: 8px 10px !important;
+    }
+  }
+}
