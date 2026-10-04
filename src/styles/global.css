@@ -4459,3 +4459,9 @@ div.asset-import-hospital b {
   font-size: 11.5px;
   line-height: 1.4;
 }
+/* Hospital people: the page scrolls, the lists inside it do not (one scrollbar, not two). */
+.hospital-people .hospital-rows,
+.hospital-people .people-rows {
+  max-height: none;
+  overflow: visible;
+}
