@@ -17,6 +17,7 @@ export const specialties: LibraryItem[] = [
   {id: 'gyn', el: 'Γυναικολογική', en: 'Gynaecology'},
   {id: 'neuro', el: 'Νευροχειρουργική', en: 'Neurosurgery'},
   {id: 'uro', el: 'Ουρολογία', en: 'Urology'},
+  {id: 'anaes', el: 'Αναισθησιολογία', en: 'Anaesthesiology'},
 ];
 export const manufacturers: LibraryItem[] = [
   {id: 'aesculap', el: 'AESCULAP', en: 'AESCULAP'},
@@ -24,6 +25,7 @@ export const manufacturers: LibraryItem[] = [
   {id: 'kls', el: 'KLS MARTIN', en: 'KLS MARTIN'},
   {id: 'storz', el: 'KARL STORZ', en: 'KARL STORZ'},
   {id: 'bbraun', el: 'B. BRAUN', en: 'B. BRAUN'},
+  {id: 'ambu', el: 'AMBU', en: 'AMBU'},
 ];
 export const suppliers: LibraryItem[] = [
   {id: 'medline', el: 'MedLine Surgical', en: 'MedLine Surgical'},
@@ -36,6 +38,7 @@ export const toolCategories: LibraryItem[] = [
   {id: 'holders', el: 'Βελονοκάτοχα', en: 'Needle Holders'},
   {id: 'retractors', el: 'Άγκιστρα / Διαστολείς', en: 'Retractors'},
   {id: 'lap', el: 'Λαπαροσκοπικά', en: 'Laparoscopic'},
+  {id: 'airway', el: 'Αναζωογόνηση / Αεραγωγός', en: 'Resuscitation / Airway'},
 ];
 export const sterilizers: LibraryItem[] = [
   {id: 'aut1', code: 'AUT-01', el: 'Κλίβανος Ατμού 01', en: 'Steam Sterilizer 01'},
