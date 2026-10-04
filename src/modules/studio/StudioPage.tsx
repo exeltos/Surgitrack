@@ -2180,8 +2180,9 @@ function OrganizationEditor({
 }) {
   const [name, setName] = useState(organization?.name || '');
   const [code, setCode] = useState(organization?.code || '');
-  const [active, setActive] = useState(organization?.active ?? true);
-  const [demoEnabled, setDemoEnabled] = useState(organization?.demoEnabled ?? false);
+  // Active and Demo access are switched on the hospital's card; a new hospital starts active, without Demo.
+  const active = organization?.active ?? true;
+  const demoEnabled = organization?.demoEnabled ?? false;
   const [plan, setPlan] = useState<'STANDARD' | 'TRIAL'>(organization?.plan || 'STANDARD');
   const [endDate, setEndDate] = useState(trialEndDate(organization?.trialEndsAt) || trialEndDate(trialEndAfter(30)));
   const [adminName, setAdminName] = useState('');
@@ -2267,22 +2268,6 @@ function OrganizationEditor({
               </label>
             </div>
           )}
-          <label className="studio-switch-row">
-            <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-            <span>{tr('Ενεργό νοσοκομείο')}</span>
-          </label>
-          <label className="studio-switch-row">
-            <input type="checkbox" checked={demoEnabled} onChange={e => setDemoEnabled(e.target.checked)} />
-            <span>{tr('Επιτρέπεται Demo πρόσβαση')}</span>
-          </label>
-          <div className="studio-form-note">
-            <ShieldCheck size={16} />
-            <span>
-              {tr(
-                'Η Demo πρόσβαση δεν εμφανίζεται στη δημόσια αρχική. Ενεργοποιείται κεντρικά ανά νοσοκομείο και ανά χρήστη.',
-              )}
-            </span>
-          </div>
         </div>
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
