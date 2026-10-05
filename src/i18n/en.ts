@@ -1470,4 +1470,6 @@ export const en: Record<string, string> = {
   'Παραλήφθηκε με {0}': 'Received with {0}',
   'Λείπει 1': '1 missing',
   'Λείπει 1 εργαλείο': '1 instrument missing',
+  'ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ': 'DAMAGE · SERVICE · LOSS',
+  Αντικαταστάσεις: 'Replacements',
 };

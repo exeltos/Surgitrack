@@ -177,8 +177,8 @@ export default function HospitalOverviewPage() {
             </b>
             <small>
               {L(
-                'Εγκρίνετε ή απορρίψτε από τη Διαχείριση νοσοκομείου.',
-                'Approve or reject in Hospital administration.',
+                'Εγκρίνετε ή απορρίψτε από «Χρήστες & Τμήματα».',
+                'Approve or reject in “Users & departments”.',
               )}
             </small>
           </span>

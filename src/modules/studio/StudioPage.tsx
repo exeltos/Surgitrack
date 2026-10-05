@@ -523,8 +523,8 @@ export default function StudioPage() {
                   'Central administration of hospitals, users, demo access, libraries and core SurgiTrack settings.',
                 )
               : L(
-                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου σας. Τμήματα και χρήστες διαχειρίζεστε από τη «Διαχείριση νοσοκομείου».',
-                  "Your hospital's libraries, sterilization flow, role permissions and settings. Departments and users are managed in “Hospital administration”.",
+                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου σας. Τμήματα και χρήστες διαχειρίζεστε από «Χρήστες & Τμήματα».',
+                  "Your hospital's libraries, sterilization flow, role permissions and settings. Departments and users are managed in “Users & departments”.",
                 )}
           </p>
         </div>

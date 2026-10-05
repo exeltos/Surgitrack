@@ -194,8 +194,8 @@ export default function ReplacementsPage() {
   return (
     <div className="replacements">
       <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
-        title={tr('Βλάβες & Αντικαταστάσεις')}
+        eyebrow={tr('ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ')}
+        title={tr('Αντικαταστάσεις')}
         description={tr(
           'Εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης. Για καθένα φαίνεται αν υπάρχει ίδιο στο Απόθεμα: αντικαθίσταται με ένα κλικ, αλλιώς καταχωρείται παραγγελία αγοράς.',
         )}

@@ -5405,3 +5405,42 @@ div.asset-import-hospital b {
 .receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-tools-scroll {
   min-height: 260px !important;
 }
+
+/* Desktop menu: one line per item and tighter rows, so the whole menu fits without scrolling. */
+@media (min-width: 901px) {
+  .sidebar nav {
+    gap: 2px !important;
+  }
+  .sidebar .nav-item {
+    min-height: 0 !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  .sidebar .nav-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar .demo-exit-panel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+  .sidebar .demo-exit-panel button {
+    text-align: left;
+  }
+}
+
+/* Studio → Settings on every screen: each card keeps its full height and the tab scrolls, rather
+   than the cards sharing the window's height and scrolling inside themselves. */
+.studio-system-grid,
+.studio-system-grid:has(> .platform-contact) {
+  height: auto;
+  grid-template-rows: none;
+  align-items: start;
+}
+.studio-system-grid > section {
+  overflow: visible;
+}

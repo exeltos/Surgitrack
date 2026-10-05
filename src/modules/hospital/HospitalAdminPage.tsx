@@ -46,7 +46,7 @@ export default function HospitalAdminPage() {
   return (
     <div className="hospital-admin">
       <PageHeader
-        eyebrow={L('ΔΙΑΧΕΙΡΙΣΗ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL ADMINISTRATION')}
+        eyebrow={L('ΧΡΗΣΤΕΣ & ΤΜΗΜΑΤΑ', 'USERS & DEPARTMENTS')}
         title={(demo ? L('Demo νοσοκομείο', 'Demo hospital') : hospital) || L('Νοσοκομείο', 'Hospital')}
         description={L(
           'Χρήστες, προσκλήσεις και τμήματα του νοσοκομείου.',

@@ -128,11 +128,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τμήματα και βιβλιοθήκες',
-          'Στη Διαχείριση νοσοκομείου → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους και χρωματικές ταινίες· στη Ροή Αποστείρωσης τα στάδια.',
+          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους και χρωματικές ταινίες· στη Ροή Αποστείρωσης τα στάδια.',
         ],
         en: [
           'Departments and libraries',
-          'In Hospital administration → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers and color tapes; in Sterilization Flow the stages.',
+          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers and color tapes; in Sterilization Flow the stages.',
         ],
       },
       {
@@ -148,11 +148,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσωπικό',
-          'Στη Διαχείριση νοσοκομείου → Χρήστες: «Πρόσκληση» για έναν έναν, «Σύνδεσμος εγγραφής» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τις αιτήσεις (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
+          'Στη Χρήστες & Τμήματα → Χρήστες: «Πρόσκληση» για έναν έναν, «Σύνδεσμος εγγραφής» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τις αιτήσεις (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
         ],
         en: [
           'Staff',
-          'In Hospital administration → Users: "Invite" one by one, "Signup link" for many or "From CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
+          'In Users & departments → Users: "Invite" one by one, "Signup link" for many or "From CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
         ],
       },
       {
@@ -168,11 +168,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εκπαίδευση και έναρξη',
-          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Διαχείριση νοσοκομείου. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
+          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Χρήστες & Τμήματα. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
         ],
         en: [
           'Training and go-live',
-          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Hospital administration. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
+          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Users & departments. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
         ],
       },
     ],
@@ -758,7 +758,7 @@ export const helpManual: ManualSection[] = [
         'Μετά την εισαγωγή: «Έλεγχος ονομασιών».',
       ],
       en: [
-        'Department names match those in Hospital administration.',
+        'Department names match those in Users & departments.',
         'Rows with problems were fixed or are not needed.',
         'After importing: "Name check".',
       ],
@@ -902,7 +902,7 @@ export const helpManual: ManualSection[] = [
   {
     to: '/replacements',
     permission: 'stock.manage',
-    title: {el: 'Βλάβες & Αντικαταστάσεις', en: 'Repairs & replacements'},
+    title: {el: 'Αντικαταστάσεις', en: 'Replacements'},
     summary: {
       el: 'Τα εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης: αν υπάρχει ίδιο στο Απόθεμα, αντικατάσταση με ένα κλικ, αλλιώς παραγγελία αγοράς.',
       en: 'Instruments in Service, damaged or worn, lost or out of use: replace from Stock in one click when it holds the same instrument, otherwise record a purchase order.',
@@ -1138,7 +1138,7 @@ export const helpManual: ManualSection[] = [
   {
     to: '/hospital',
     permission: 'studio.manage',
-    title: {el: 'Διαχείριση νοσοκομείου', en: 'Hospital administration'},
+    title: {el: 'Χρήστες & Τμήματα', en: 'Users & departments'},
     summary: {
       el: 'Οι χρήστες, οι προσκλήσεις, οι αιτήσεις πρόσβασης και τα τμήματα του νοσοκομείου.',
       en: "The hospital's users, invitations, access requests and departments.",
