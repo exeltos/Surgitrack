@@ -82,7 +82,6 @@ export default function SterilizationPage() {
     processLoads,
     recallCases,
     issues,
-    receipts,
     sterilizationCycles,
     currentUser,
     reportIssue,
@@ -100,22 +99,6 @@ export default function SterilizationPage() {
   const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
-  const queueForStage = (id: WorkflowStageId): Queue =>
-    id === 'RECEIPT'
-      ? 'INCOMING'
-      : id === 'WASHING'
-        ? 'WASHING'
-        : id === 'PREPARATION'
-          ? 'PREP'
-          : id === 'PACKAGING'
-            ? 'PACKAGING'
-            : id === 'STERILIZATION'
-              ? 'PROCESS'
-              : id === 'RELEASE'
-                ? 'RELEASE'
-                : id === 'STORAGE'
-                  ? 'STORAGE'
-                  : 'READY';
   const QUEUES: Queue[] = ['INCOMING', 'WASHING', 'PREP', 'PACKAGING', 'PROCESS', 'RELEASE', 'STORAGE', 'READY'];
   const [searchParams] = useSearchParams();
   // A link can open a given stage, e.g. /sterilization?queue=READY from the overview.
@@ -150,11 +133,11 @@ export default function SterilizationPage() {
   const [departmentMismatchReason, setDepartmentMismatchReason] = useState('');
   const [checkEnabled, setCheckEnabled] = useState(false);
   const [checkedCount, setCheckedCount] = useState<number>(0);
-  const [checkResult, setCheckResult] = useState<ReceiptCheckResult>('OK');
-  const [checkNote, setCheckNote] = useState('');
+  const [, setCheckResult] = useState<ReceiptCheckResult>('OK');
+  const [, setCheckNote] = useState('');
   const [receiptCheckedToolIds, setReceiptCheckedToolIds] = useState<Set<string>>(new Set());
   const [receiptProblemToolIds, setReceiptProblemToolIds] = useState<Set<string>>(new Set());
-  const [receiptSetChecks, setReceiptSetChecks] = useState({containerOk: false, compositionOk: false, visualOk: false});
+  const [, setReceiptSetChecks] = useState({containerOk: false, compositionOk: false, visualOk: false});
   const [issueTarget, setIssueTarget] = useState<{kind: Kind; id: string} | null>(null);
   const [issueType, setIssueType] = useState('Βλάβη / μη λειτουργικό');
   const [issueNote, setIssueNote] = useState('');
@@ -331,19 +314,6 @@ export default function SterilizationPage() {
 
   const receiptTools = receiptDraft?.kind === 'SET' ? tools.filter(t => t.setId === receiptDraft.asset.id) : [];
   const receiptExpectedCount = receiptDraft?.kind === 'SET' ? receiptTools.length : 1;
-  const receiptProblemCount = receiptTools.reduce(
-    (sum, t) => sum + issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode)).length,
-    0,
-  );
-  const receiptItemCheckedCount = receiptDraft?.kind === 'SET' ? receiptCheckedToolIds.size : checkEnabled ? 1 : 0;
-  const receiptMissingCount = receiptDraft?.kind === 'SET' ? Math.max(0, receiptExpectedCount - checkedCount) : 0;
-  const receiptAllItemsChecked = !receiptDraft
-    ? true
-    : receiptDraft.kind === 'SET'
-      ? receiptTools.length > 0 && receiptTools.every(t => receiptCheckedToolIds.has(t.id))
-      : receiptCheckedToolIds.has(receiptDraft.asset.id);
-  const receiptAllSetChecks = receiptDraft?.kind !== 'SET' || Object.values(receiptSetChecks).every(Boolean);
-  const latestReceipt = (assetId: string) => receipts.find(r => r.assetId === assetId);
   const latestPassedCycle = (assetId: string) =>
     sterilizationCycles.find(c => c.assetId === assetId && c.result === 'PASSED');
   const prepTools = prepDraft?.kind === 'SET' ? tools.filter(t => t.setId === prepDraft.asset.id) : [];
@@ -562,13 +532,6 @@ export default function SterilizationPage() {
     setReceiptBatchScanFeedback({type: 'OK', message: tr('{0} · {1} προστέθηκε στην παραλαβή.', barcode, item.name)});
     return true;
   };
-  const toggleReceiptBatchDeviation = (key: string) =>
-    setReceiptBatchDeviations(current => {
-      const next = new Set(current);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
   const completeReceiptBatch = () => {
     if (!receiptBatchAssets.length || !receiptBatchDeliverer || !receiptBatchIdentityValid) return;
     const batchId = `RB-${Date.now()}`;
@@ -681,48 +644,6 @@ export default function SterilizationPage() {
     closeIssueReport();
     setIssueType('Βλάβη / μη λειτουργικό');
     setIssueNote('');
-  };
-  const toggleReceiptToolCheck = (id: string) =>
-    setReceiptCheckedToolIds(current => {
-      const next = new Set(current);
-      if (next.has(id)) {
-        next.delete(id);
-        setReceiptProblemToolIds(problems => {
-          const p = new Set(problems);
-          p.delete(id);
-          return p;
-        });
-      } else next.add(id);
-      return next;
-    });
-  const receiptAllOk =
-    receiptDraft?.kind === 'SET' &&
-    receiptTools.length > 0 &&
-    receiptTools.every(t => receiptCheckedToolIds.has(t.id) && !receiptProblemToolIds.has(t.id));
-  const toggleAllReceiptChecks = () => {
-    if (receiptAllOk) {
-      setReceiptCheckedToolIds(new Set());
-      setReceiptProblemToolIds(new Set());
-      setCheckedCount(0);
-      return;
-    }
-    const ids =
-      receiptDraft?.kind === 'SET' ? receiptTools.map(t => t.id) : receiptDraft ? [receiptDraft.asset.id] : [];
-    setReceiptCheckedToolIds(new Set(ids));
-    setReceiptProblemToolIds(new Set());
-    setCheckedCount(ids.length);
-    setCheckResult('OK');
-  };
-  const toggleReceiptToolProblem = (id: string) => {
-    const isProblem = receiptProblemToolIds.has(id);
-    setReceiptCheckedToolIds(current => new Set(current).add(id));
-    setReceiptProblemToolIds(current => {
-      const next = new Set(current);
-      if (isProblem) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    if (!isProblem) openIssueReport('TOOL', id, 'Αποστείρωση · έλεγχος κατά την παραλαβή');
   };
   const confirmReceipt = () => {
     if (!receiptDraft || !deliverer || !receiptIdentityValid) return;

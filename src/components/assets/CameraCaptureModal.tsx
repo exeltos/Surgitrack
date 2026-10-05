@@ -37,6 +37,8 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
   useEffect(() => {
     start();
     return stop;
+    // Restart the camera only when the facing side changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facing]);
   const capture = () => {
     const video = videoRef.current;

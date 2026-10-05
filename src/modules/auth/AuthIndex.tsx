@@ -128,8 +128,6 @@ export default function AuthIndex({
   const [view, setView] = useState<View>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
-  const [pendingEmail, setPendingEmail] = useState('');
-  const [sentKind, setSentKind] = useState<'reset'>('reset');
   useEffect(() => {
     const {data: listener} = supabase.auth.onAuthStateChange(event => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -238,8 +236,6 @@ export default function AuthIndex({
       setMessage(error.message);
       return;
     }
-    setPendingEmail(email);
-    setSentKind('reset');
     setMessage('');
     setView('sent');
   };

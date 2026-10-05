@@ -368,10 +368,13 @@ export function LibraryStoreProvider({
       updateSystemSettings,
       resetData,
     }),
+    // The actions are recreated every render and close over `state`, so this list is the state they read.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state, dataMode, localStorageKey],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLibraries() {
   const v = useContext(Ctx);
   if (!v) throw new Error('useLibraries must be used inside LibraryStoreProvider');

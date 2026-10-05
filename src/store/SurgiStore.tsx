@@ -2253,6 +2253,9 @@ export function SurgiProvider({
       addToolsToSet,
       clearToast: () => setToast(undefined),
     }),
+    // The actions are recreated every render and close over the state listed here, so keep this list in
+    // sync with the state they read.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       sets,
       tools,
@@ -2277,6 +2280,7 @@ export function SurgiProvider({
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSurgi = () => {
   const x = useContext(Ctx);
   if (!x) throw new Error('useSurgi outside provider');

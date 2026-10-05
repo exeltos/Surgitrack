@@ -181,7 +181,6 @@ export default function StudioPage() {
   const [organizationEditor, setOrganizationEditor] = useState<Organization | null | undefined>(undefined);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
   const [cloudOrganizations, setCloudOrganizations] = useState<Organization[]>([]);
-  const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState('');
   const [cloudUsers, setCloudUsers] = useState<AdminUser[]>([]);
   const [cloudDepartments, setCloudDepartments] = useState<
@@ -196,7 +195,6 @@ export default function StudioPage() {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const loadCloudOrganizations = async () => {
     if (libs.dataMode !== 'PRODUCTION') return;
-    setCloudLoading(true);
     // Demo hospitals are sandboxes, not customers: they are managed through the Demo buttons only.
     const {data, error} = await supabase
       .from('organizations')
@@ -218,10 +216,11 @@ export default function StudioPage() {
         })),
       );
     }
-    setCloudLoading(false);
   };
   useEffect(() => {
     if (platformAdmin) void loadCloudOrganizations();
+    // Reload when the data mode changes, not on every render of the loader.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libs.dataMode]);
   const displayedOrganizations = libs.dataMode === 'PRODUCTION' ? cloudOrganizations : libs.organizations;
   const loadCloudUsers = async () => {
@@ -250,6 +249,7 @@ export default function StudioPage() {
   };
   useEffect(() => {
     if (platformAdmin) void loadCloudUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;
   const selectedOrganization = displayedOrganizations.find(o => o.id === selectedOrganizationId);
@@ -274,6 +274,7 @@ export default function StudioPage() {
   };
   useEffect(() => {
     if (platformAdmin) void loadCloudDepartments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libs.dataMode]);
   const saveCloudDepartment = async (item: Omit<LibraryItem, 'id'>) => {
     const org = selectedOrganization || displayedOrganizations[0];

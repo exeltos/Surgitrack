@@ -2,6 +2,11 @@ import {useEffect, useRef, useState} from 'react';
 import {Barcode, Camera, CheckCircle2, TriangleAlert} from 'lucide-react';
 import {tr} from '../../i18n';
 
+// The browser's BarcodeDetector is not in the TypeScript DOM typings yet.
+type BarcodeDetectorConstructor = new (options: {formats: string[]}) => {
+  detect: (source: HTMLVideoElement) => Promise<{rawValue?: string}[]>;
+};
+
 export type BarcodeFeedback = {type: 'OK' | 'WARN' | 'ERROR'; message: string};
 
 type Props = {
@@ -70,7 +75,7 @@ export default function BarcodeCapture({
       }
       video.srcObject = stream;
       await video.play();
-      const Detector = (window as any).BarcodeDetector;
+      const Detector = (window as unknown as {BarcodeDetector?: BarcodeDetectorConstructor}).BarcodeDetector;
       if (!Detector) {
         setCameraError(
           tr(

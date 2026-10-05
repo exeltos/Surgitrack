@@ -92,6 +92,8 @@ export default function AssetWorkbenchSidebar({
   const [draft, setDraft] = useState(makeDraft);
   useEffect(() => {
     if (!editing) setDraft(makeDraft());
+    // makeDraft is rebuilt every render; the fields it reads are listed instead.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     asset.id,
     asset.name,
