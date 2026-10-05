@@ -10,6 +10,10 @@ export type ManualSection = {
   permission?: Permission;
   /** A record card rather than a menu page: the paths it covers (e.g. '/tools/'), no "Open screen". */
   detailOf?: string[];
+  /** A screen opened from other pages rather than the menu: shown when one of them is in the menu. */
+  openedFrom?: string[];
+  /** A guide rather than a screen (no screen preview, no "Open screen"); `to` is only its id. */
+  guide?: boolean;
   title: {el: string; en: string};
   summary: {el: string; en: string};
   audience: {el: string; en: string};
@@ -21,6 +25,197 @@ export type ManualSection = {
 };
 
 export const helpManual: ManualSection[] = [
+  {
+    to: '/start',
+    guide: true,
+    title: {el: 'Ξεκινώντας', en: 'Getting started'},
+    summary: {
+      el: 'Η πρώτη σας σύνδεση, τι βλέπετε στην οθόνη και πού ζητάτε βοήθεια.',
+      en: 'Your first sign-in, what you see on screen and where to ask for help.',
+    },
+    audience: {el: 'Όλοι οι χρήστες', en: 'All users'},
+    chapters: [
+      {
+        el: [
+          'Λογαριασμός',
+          'Λογαριασμό ανοίγει μόνο ο διαχειριστής του νοσοκομείου σας. Αν σας έστειλε πρόσκληση ή σύνδεσμο εγγραφής, συμπληρώνετε ονοματεπώνυμο και τμήμα και περιμένετε την έγκρισή του· κωδικό δεν ορίζετε ακόμη.',
+        ],
+        en: [
+          'Account',
+          'Only your hospital administrator opens accounts. If you got an invitation or a signup link, you fill in your name and department and wait for approval; you do not set a password yet.',
+        ],
+      },
+      {
+        el: [
+          'Πρώτη σύνδεση',
+          'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234), τον ρόλο και το τμήμα σας. Πατήστε «Ορισμός κωδικού», ορίστε κωδικό τουλάχιστον 8 χαρακτήρων και συνδεθείτε με το όνομα χρήστη ή το email σας.',
+        ],
+        en: [
+          'First sign-in',
+          'Once approved you get an "Access approved" email with your username (e.g. GN1234), your role and your department. Press "Set password", choose a password of at least 8 characters and sign in with your username or email.',
+        ],
+      },
+      {
+        el: [
+          'Η οθόνη σας',
+          'Το μενού αριστερά δείχνει μόνο όσα επιτρέπει ο ρόλος σας. Στο πεδίο σάρωσης της πάνω μπάρας σαρώνετε ή γράφετε barcode και ανοίγει αμέσως το Σετ ή το εργαλείο. Πάνω δεξιά: γλώσσα (EL/EN), Βοήθεια, προσβασιμότητα (μέγεθος κειμένου, αντίθεση) και ειδοποιήσεις.',
+        ],
+        en: [
+          'Your screen',
+          'The menu on the left shows only what your role allows. In the scan field of the top bar, scan or type a barcode and the Set or instrument opens at once. Top right: language (EL/EN), Help, accessibility (text size, contrast) and notifications.',
+        ],
+      },
+      {
+        el: [
+          'Ξεχάσατε τον κωδικό',
+          'Στη σελίδα σύνδεσης πατήστε «Ξέχασα τον κωδικό» και γράψτε το email σας· θα λάβετε σύνδεσμο για νέο κωδικό. Μετά από πολλές λάθος προσπάθειες η σύνδεση κλειδώνει για 15 λεπτά. Ο διαχειριστής μπορεί επίσης να σας στείλει σύνδεσμο αλλαγής κωδικού.',
+        ],
+        en: [
+          'Forgotten password',
+          'On the sign-in page press "Forgot password" and enter your email; you will get a link to a new password. After many wrong attempts sign-in locks for 15 minutes. The administrator can also send you a password change link.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Ανοίξτε το email έγκρισης και κρατήστε το όνομα χρήστη.',
+        'Πατήστε «Ορισμός κωδικού» και ορίστε κωδικό.',
+        'Συνδεθείτε και ανοίξτε τη Βοήθεια (το βιβλίο πάνω δεξιά) σε κάθε οθόνη που δεν γνωρίζετε.',
+      ],
+      en: [
+        'Open the approval email and keep your username.',
+        'Press "Set password" and choose a password.',
+        'Sign in and open Help (the book icon, top right) on any screen you do not know.',
+      ],
+    },
+    checks: {
+      el: [
+        'Βλέπετε το σωστό τμήμα και ρόλο; Αν όχι, ενημερώστε τον διαχειριστή του νοσοκομείου.',
+        'Μην μοιράζεστε τον κωδικό σας: κάθε κίνηση καταγράφεται με το όνομά σας.',
+      ],
+      en: [
+        'Do you see the right department and role? If not, tell the hospital administrator.',
+        'Do not share your password: every movement is recorded under your name.',
+      ],
+    },
+    tip: {
+      el: 'Η Βοήθεια ανοίγει πάντα στη σελίδα της οθόνης που βλέπετε. Για πρόσβαση, κωδικό ή δικαιώματα απευθυνθείτε στον διαχειριστή του νοσοκομείου· για τεχνικό πρόβλημα δείτε «Υποστήριξη».',
+      en: 'Help always opens on the page of the screen you are on. For access, password or permissions ask the hospital administrator; for a technical problem see "Support".',
+    },
+  },
+  {
+    to: '/start-admin',
+    guide: true,
+    permission: 'studio.manage',
+    openedFrom: ['/hospital'],
+    title: {el: 'Από την αγορά στη λειτουργία', en: 'From purchase to go-live'},
+    summary: {
+      el: 'Τα βήματα του διαχειριστή του νοσοκομείου, με τη σειρά, από τον πρώτο λογαριασμό έως την πρώτη μέρα πραγματικής χρήσης.',
+      en: "The hospital administrator's steps, in order, from the first account to the first day of real use.",
+    },
+    audience: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
+    chapters: [
+      {
+        el: [
+          'Ο λογαριασμός σας',
+          'Η Exeltos δημιουργεί το νοσοκομείο σας και σας στέλνει πρόσκληση διαχειριστή. Από το email ορίζετε κωδικό και συνδέεστε. Αν το νοσοκομείο είναι σε δοκιμαστική περίοδο, όταν λήξει η εφαρμογή κλειδώνει μέχρι την ενεργοποίηση.',
+        ],
+        en: [
+          'Your account',
+          'Exeltos creates your hospital and sends you an administrator invitation. From the email you set a password and sign in. If the hospital is on a trial, the app locks when it ends until activation.',
+        ],
+      },
+      {
+        el: [
+          'Τμήματα και βιβλιοθήκες',
+          'Στη Διαχείριση νοσοκομείου → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους και χρωματικές ταινίες· στη Ροή Αποστείρωσης τα στάδια.',
+        ],
+        en: [
+          'Departments and libraries',
+          'In Hospital administration → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers and color tapes; in Sterilization Flow the stages.',
+        ],
+      },
+      {
+        el: [
+          'Εργαλεία και Σετ',
+          'Ετοιμάστε το Excel με το «Πρότυπο Excel» της Μαζικής εισαγωγής (Εργαλεία ή Σετ → «Μαζική εισαγωγή»): μία γραμμή ανά εργαλείο, το όνομα του Σετ σε κάθε γραμμή του. Ελέγξτε την προεπισκόπηση και εισάγετε. Μετά τρέξτε τον «Έλεγχο ονομασιών» ώστε κάθε κωδικός να έχει μία ονομασία.',
+        ],
+        en: [
+          'Instruments and Sets',
+          'Prepare the Excel file with the "Excel template" of Bulk import (Instruments or Sets → "Bulk import"): one row per instrument, the Set name on each of its rows. Check the preview and import. Then run the "Name check" so each code has one name.',
+        ],
+      },
+      {
+        el: [
+          'Προσωπικό',
+          'Στη Διαχείριση νοσοκομείου → Χρήστες: «Πρόσκληση» για έναν έναν, «Σύνδεσμος εγγραφής» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τις αιτήσεις (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
+        ],
+        en: [
+          'Staff',
+          'In Hospital administration → Users: "Invite" one by one, "Signup link" for many or "From CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
+        ],
+      },
+      {
+        el: [
+          'Εξοπλισμός',
+          'Εκτυπωτής ετικετών barcode στην Αποστείρωση, σαρωτής barcode (USB ή Bluetooth, λειτουργεί ως πληκτρολόγιο) σε κάθε σημείο παράδοσης-παραλαβής, υπολογιστής ή tablet με Chrome ή Edge. Αν οι κλίβανοι θα συνδεθούν, δείτε «Συνδεδεμένες συσκευές».',
+        ],
+        en: [
+          'Equipment',
+          'A barcode label printer in Sterilization, a barcode scanner (USB or Bluetooth, works as a keyboard) at every handover point, a computer or tablet with Chrome or Edge. If sterilizers will be connected, see "Connected devices".',
+        ],
+      },
+      {
+        el: [
+          'Εκπαίδευση και έναρξη',
+          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Διαχείριση νοσοκομείου. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
+        ],
+        en: [
+          'Training and go-live',
+          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Hospital administration. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Συνδεθείτε ως διαχειριστής από την πρόσκληση της Exeltos.',
+        'Τμήματα, βιβλιοθήκες και ροή αποστείρωσης.',
+        'Μαζική εισαγωγή εργαλείων και Σετ, μετά Έλεγχος ονομασιών.',
+        'Προσκλήσεις και εγκρίσεις προσωπικού.',
+        'Εκτυπωτής, σαρωτές, ετικέτες.',
+        'Εκπαίδευση στο Demo και μέρα έναρξης.',
+      ],
+      en: [
+        'Sign in as administrator from the Exeltos invitation.',
+        'Departments, libraries and sterilization flow.',
+        'Bulk import of instruments and Sets, then Name check.',
+        'Staff invitations and approvals.',
+        'Printer, scanners, labels.',
+        'Training in the Demo and a start day.',
+      ],
+    },
+    checks: {
+      el: [
+        'Όλα τα τμήματα υπάρχουν και είναι ενεργά.',
+        'Τα Σετ έχουν σωστή σύνθεση και τμήμα· ο Έλεγχος ονομασιών δεν δείχνει εκκρεμότητες.',
+        'Κάθε χρήστης έχει ρόλο και τμήμα· τουλάχιστον ένας Προϊστάμενος Αποστείρωσης.',
+        'Ο εκτυπωτής τυπώνει ετικέτα και ο σαρωτής ανοίγει το Σετ από την πάνω μπάρα.',
+        'Μία δοκιμαστική αποστολή και παραλαβή ολοκληρώθηκε από τμήμα και Αποστείρωση.',
+      ],
+      en: [
+        'Every department exists and is active.',
+        'Sets have the right composition and department; the Name check shows nothing pending.',
+        'Every user has a role and department; at least one Sterilization supervisor.',
+        'The printer prints a label and the scanner opens the Set from the top bar.',
+        'One test dispatch and receipt was completed by a department and Sterilization.',
+      ],
+    },
+    tip: {
+      el: 'Για οποιοδήποτε βήμα χρειάζεστε βοήθεια, γράψτε στην Exeltos στο info@exeltos.com (δείτε «Υποστήριξη»).',
+      en: 'For help with any step, write to Exeltos at info@exeltos.com (see "Support").',
+    },
+    related: ['/hospital', '/import', '/tools/names', '/studio'],
+  },
   {
     to: '/asset-card',
     detailOf: ['/tools/', '/sets/'],
@@ -407,6 +602,16 @@ export const helpManual: ManualSection[] = [
           'Opening an instrument shows history, photos, uses, color marker and ownership. Lives can be changed only by the Administrator and the Sterilization supervisor.',
         ],
       },
+      {
+        el: [
+          'Εισαγωγή και ονομασίες',
+          'Το «Μαζική εισαγωγή» φέρνει εργαλεία και Σετ από Excel. Το «Έλεγχος ονομασιών» βρίσκει γραφές που διαφέρουν και κωδικούς με πολλές ονομασίες και τα ενοποιεί.',
+        ],
+        en: [
+          'Import and names',
+          '"Bulk import" brings instruments and Sets from Excel. "Name check" finds names written differently and codes with many names, and unifies them.',
+        ],
+      },
     ],
     steps: {
       el: [
@@ -424,7 +629,7 @@ export const helpManual: ManualSection[] = [
       el: 'Η λίστα φορτώνει σταδιακά καθώς κάνετε κύλιση· για να βρείτε κάτι γρήγορα χρησιμοποιήστε την αναζήτηση.',
       en: 'The list loads progressively as you scroll; to find something quickly, use search.',
     },
-    related: ['/sets', '/stock', '/standalone-tools'],
+    related: ['/sets', '/stock', '/standalone-tools', '/import', '/tools/names'],
   },
   {
     to: '/sets',
@@ -479,7 +684,151 @@ export const helpManual: ManualSection[] = [
         'Print the composition sheet when needed.',
       ],
     },
-    related: ['/tools', '/stock', '/reports'],
+    related: ['/tools', '/stock', '/reports', '/import'],
+  },
+  {
+    to: '/import',
+    permission: 'asset.create',
+    openedFrom: ['/tools', '/sets'],
+    title: {el: 'Μαζική εισαγωγή', en: 'Bulk import'},
+    summary: {
+      el: 'Εισαγωγή εργαλείων και Σετ από Excel ή CSV, με προεπισκόπηση πριν γραφτεί οτιδήποτε.',
+      en: 'Import instruments and Sets from Excel or CSV, with a preview before anything is written.',
+    },
+    audience: {el: 'Διαχειριστής και Προϊστάμενος Αποστείρωσης', en: 'Administrator and Sterilization supervisor'},
+    chapters: [
+      {
+        el: [
+          'Το αρχείο',
+          'Κατεβάστε το «Πρότυπο Excel». Μία γραμμή ανά εργαλείο: Σετ, κωδικός, όνομα εργαλείου (υποχρεωτικό), ποσότητα, τμήμα, ειδικότητα, κατασκευαστής, μέγιστες χρήσεις, σειριακός αριθμός. Ίδιο όνομα Σετ = ίδιο Σετ· κενό Σετ = μεμονωμένο εργαλείο· κενό τμήμα = Απόθεμα.',
+        ],
+        en: [
+          'The file',
+          'Download the "Excel template". One row per instrument: Set, code, instrument name (required), quantity, department, specialty, manufacturer, max uses, serial number. Same Set name = same Set; no Set = standalone instrument; no department = Stock.',
+        ],
+      },
+      {
+        el: [
+          'Προεπισκόπηση',
+          'Πριν την εισαγωγή βλέπετε πόσα Σετ, μεμονωμένα και εργαλεία Αποθέματος θα δημιουργηθούν, τη λίστα εργαλείων με αναζήτηση και τις γραμμές με πρόβλημα. Οι στήλες αναγνωρίζονται αυτόματα· αν μια στήλη δεν βρέθηκε, την αντιστοιχίζετε με το χέρι.',
+        ],
+        en: [
+          'Preview',
+          'Before importing you see how many Sets, standalone and Stock instruments will be created, the instrument list with search and the rows with problems. Columns are recognized automatically; if one is not found, you map it by hand.',
+        ],
+      },
+      {
+        el: [
+          'Ονομασίες',
+          'Η εισαγωγή μπορεί να γράψει τις ονομασίες ενιαία (κεφαλαία χωρίς τόνους, ίδια γραφή μονάδων) και να χρησιμοποιήσει την ονομασία που ήδη έχει το νοσοκομείο για τον ίδιο κωδικό, ώστε να μη δημιουργηθούν διπλές ονομασίες.',
+        ],
+        en: [
+          'Names',
+          'The import can write names uniformly (capitals without accents, units written the same way) and use the name the hospital already has for the same code, so no duplicate names are created.',
+        ],
+      },
+      {
+        el: [
+          'Αναίρεση',
+          'Κάθε εισαγωγή εμφανίζεται στις «Εισαγωγές σε αυτό το νοσοκομείο» και αναιρείται ολόκληρη με «Αναίρεση εισαγωγής», όσο κανένα αντικείμενό της δεν έχει χρησιμοποιηθεί.',
+        ],
+        en: [
+          'Undo',
+          'Every import appears under "Imports in this hospital" and can be undone in full with "Undo import", as long as none of its items has been used.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Εργαλεία ή Σετ → «Μαζική εισαγωγή».',
+        'Κατεβάστε το πρότυπο και συμπληρώστε το.',
+        'Σύρετε το αρχείο στη σελίδα.',
+        'Ελέγξτε προεπισκόπηση, προβλήματα και ονομασίες.',
+        'Πατήστε «Εισαγωγή».',
+      ],
+      en: [
+        'Instruments or Sets → "Bulk import".',
+        'Download the template and fill it in.',
+        'Drag the file onto the page.',
+        'Check the preview, problems and names.',
+        'Press "Import".',
+      ],
+    },
+    checks: {
+      el: [
+        'Τα ονόματα τμημάτων είναι ίδια με αυτά της Διαχείρισης νοσοκομείου.',
+        'Οι γραμμές με πρόβλημα διορθώθηκαν ή δεν χρειάζονται.',
+        'Μετά την εισαγωγή: «Έλεγχος ονομασιών».',
+      ],
+      en: [
+        'Department names match those in Hospital administration.',
+        'Rows with problems were fixed or are not needed.',
+        'After importing: "Name check".',
+      ],
+    },
+    related: ['/tools/names', '/sets', '/tools'],
+  },
+  {
+    to: '/tools/names',
+    permission: 'asset.edit',
+    openedFrom: ['/tools'],
+    title: {el: 'Έλεγχος ονομασιών', en: 'Name check'},
+    summary: {
+      el: 'Ενιαίες ονομασίες εργαλείων: διορθώσεις γραφής και κωδικοί που έχουν περισσότερες από μία ονομασίες.',
+      en: 'Consistent instrument names: spelling fixes and codes that carry more than one name.',
+    },
+    audience: {el: 'Διαχειριστής και Προϊστάμενος Αποστείρωσης', en: 'Administrator and Sterilization supervisor'},
+    chapters: [
+      {
+        el: [
+          'Διορθώσεις γραφής',
+          'Διορθώσεις χωρίς ρίσκο: διπλά κενά, τόνοι, πεζά, λατινικά γράμματα μέσα σε ελληνική λέξη (και αντίστροφα), «12cm» → «12 CM». Αφήστε επιλεγμένες όσες θέλετε και πατήστε «Εφαρμογή σε … εργαλεία».',
+        ],
+        en: [
+          'Spelling fixes',
+          'Risk-free fixes: double spaces, accents, lower case, Latin letters inside a Greek word (and the reverse), "12cm" → "12 CM". Keep the ones you want ticked and press "Apply to … instruments".',
+        ],
+      },
+      {
+        el: [
+          'Ίδιος κωδικός',
+          'Για κάθε κωδικό με πολλές ονομασίες η εφαρμογή προτείνει την πιο συχνή. Επιλέξτε ποιες ονομασίες μπαίνουν στην ενοποίηση, την τελική ονομασία (ή γράψτε άλλη) και πατήστε «Ενοποίηση». Το «Πιθανό λάθος κωδικός» σημαίνει άλλο εργαλείο με λάθος κωδικό: διορθώστε το από την καρτέλα του.',
+        ],
+        en: [
+          'Same code',
+          'For each code with many names the app suggests the most used one. Choose which names join, the final name (or type another) and press "Unify". "Possibly wrong code" means another instrument with the wrong code: fix it from its card.',
+        ],
+      },
+      {
+        el: [
+          'Συνθέσεις Σετ',
+          'Η αλλαγή ονομασίας περνά και στις πρότυπες συνθέσεις των Σετ. Αν εμφανιστεί «Συνθέσεις Σετ με παλιές ονομασίες», πατήστε «Ενημέρωση συνθέσεων».',
+        ],
+        en: [
+          'Set compositions',
+          'A rename also reaches the Set template compositions. If "Set compositions with old names" appears, press "Update compositions".',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Εργαλεία → «Έλεγχος ονομασιών».',
+        'Εφαρμόστε τις διορθώσεις γραφής.',
+        'Περάστε τους κωδικούς με πολλές ονομασίες· ο αριθμός εργαλείων ανοίγει τη λίστα τους.',
+        'Ενημερώστε τις συνθέσεις αν το ζητήσει.',
+      ],
+      en: [
+        'Instruments → "Name check".',
+        'Apply the spelling fixes.',
+        'Go through the codes with many names; the instrument count opens their list.',
+        'Update the compositions if asked.',
+      ],
+    },
+    tip: {
+      el: 'Κάθε αλλαγή αναιρείται από την ειδοποίηση που εμφανίζεται αμέσως μετά.',
+      en: 'Every change can be undone from the notice that appears right after it.',
+    },
+    related: ['/tools', '/import', '/sets'],
   },
   {
     to: '/standalone-tools',
@@ -701,16 +1050,201 @@ export const helpManual: ManualSection[] = [
           'Set what each role can do. Some permissions (creation, composition, lives) belong only to the Sterilization supervisor.',
         ],
       },
+      {
+        el: [
+          'Ροή Αποστείρωσης',
+          'Τα στάδια από την παραλαβή έως την αποδέσμευση. Ενεργοποιήστε μόνο τα στάδια και τους ελέγχους που κάνει η Κεντρική Αποστείρωση του νοσοκομείου σας.',
+        ],
+        en: [
+          'Sterilization Flow',
+          'The stages from receipt to release. Turn on only the stages and checks your hospital’s Central Sterilization performs.',
+        ],
+      },
+      {
+        el: [
+          'Ρόλοι και Ρυθμίσεις',
+          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες ζωές».',
+        ],
+        en: [
+          'Roles and Settings',
+          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few lives left".',
+        ],
+      },
     ],
     steps: {
       el: ['Επιλέξτε ενότητα.', 'Κάντε τις αλλαγές.', 'Αποθηκεύστε· οι αλλαγές ισχύουν αμέσως.'],
       en: ['Pick a section.', 'Make your changes.', 'Save; changes apply at once.'],
     },
-    related: ['/overview'],
+    related: ['/hospital', '/start-admin', '/overview'],
+  },
+  {
+    to: '/hospital',
+    permission: 'studio.manage',
+    title: {el: 'Διαχείριση νοσοκομείου', en: 'Hospital administration'},
+    summary: {
+      el: 'Οι χρήστες, οι προσκλήσεις, οι αιτήσεις πρόσβασης και τα τμήματα του νοσοκομείου.',
+      en: "The hospital's users, invitations, access requests and departments.",
+    },
+    audience: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
+    chapters: [
+      {
+        el: [
+          'Πρόσκληση',
+          '«Πρόσκληση» → διαλέξτε πρώτα ρόλο και τμήμα, μετά το email. Ο χρήστης λαμβάνει email, συμπληρώνει ονοματεπώνυμο και η αίτησή του έρχεται σε εσάς για έγκριση. Μέχρι τότε φαίνεται στις προσκλήσεις, όπου την ξαναστέλνετε, αντιγράφετε τον σύνδεσμο ή την ακυρώνετε.',
+        ],
+        en: [
+          'Invitation',
+          '"Invite" → choose the role and department first, then the email. The user gets an email, fills in their name and the request comes to you for approval. Until then it shows under invitations, where you resend it, copy the link or cancel it.',
+        ],
+      },
+      {
+        el: [
+          'Σύνδεσμος εγγραφής και CSV',
+          'Για πολλούς μαζί: ο «Σύνδεσμος εγγραφής» μοιράζεται στο προσωπικό, κάνουν εγγραφή και τους εγκρίνετε. «Από αρχείο CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
+        ],
+        en: [
+          'Signup link and CSV',
+          'For many at once: share the "Signup link" with staff, they sign up and you approve them. "From CSV file" (Name; Email; Department; Role) creates the accounts at once and each person gets an email with a username and a password link.',
+        ],
+      },
+      {
+        el: [
+          'Έγκριση',
+          'Οι αιτήσεις εμφανίζονται πορτοκαλί και λαμβάνετε email για κάθε νέα. Ελέγξτε όνομα, email και τμήμα, ορίστε ρόλο και πατήστε «Έγκριση» ή «Απόρριψη». Με την έγκριση ο χρήστης λαμβάνει email με το όνομα χρήστη, τον ρόλο, το τμήμα και σύνδεσμο «Ορισμός κωδικού».',
+        ],
+        en: [
+          'Approval',
+          'Requests show in orange and you get an email for each new one. Check the name, email and department, set the role and press "Approve" or "Reject". On approval the user gets an email with the username, role, department and a "Set password" link.',
+        ],
+      },
+      {
+        el: [
+          'Χρήστες',
+          'Πατώντας έναν χρήστη αλλάζετε ρόλο, τμήμα, πρόσβαση Demo ή τον απενεργοποιείτε. «Αποστολή συνδέσμου αλλαγής κωδικού» βοηθά όποιον ξέχασε τον κωδικό. Η «Διαγραφή» αφαιρεί εντελώς τον λογαριασμό· το ιστορικό κινήσεών του μένει.',
+        ],
+        en: [
+          'Users',
+          'Open a user to change the role, department or Demo access, or to deactivate them. "Send password change link" helps someone who forgot their password. "Delete" removes the account completely; their movement history stays.',
+        ],
+      },
+      {
+        el: [
+          'Τμήματα',
+          'Προσθέστε, μετονομάστε ή απενεργοποιήστε τμήματα. Τα ονόματα εμφανίζονται στις εγγραφές, στις εισαγωγές και σε όλες τις λίστες· απενεργοποιημένο τμήμα δεν προσφέρεται σε νέους χρήστες.',
+        ],
+        en: [
+          'Departments',
+          'Add, rename or deactivate departments. The names appear in signups, imports and every list; a deactivated department is not offered to new users.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Τμήματα: βεβαιωθείτε ότι υπάρχουν όλα.',
+        'Χρήστες → «Πρόσκληση», «Σύνδεσμος εγγραφής» ή «Από αρχείο CSV».',
+        'Εγκρίνετε τις αιτήσεις με τον σωστό ρόλο.',
+        'Πατήστε «Ανανέωση» για τις τελευταίες αιτήσεις.',
+      ],
+      en: [
+        'Departments: make sure they all exist.',
+        'Users → "Invite", "Signup link" or "From CSV file".',
+        'Approve the requests with the right role.',
+        'Press "Refresh" for the latest requests.',
+      ],
+    },
+    checks: {
+      el: [
+        'Κάθε χρήστης τμήματος έχει το σωστό τμήμα.',
+        'Όσοι έφυγαν από το νοσοκομείο είναι ανενεργοί ή διαγραμμένοι.',
+      ],
+      en: ['Every department user has the right department.', 'People who left the hospital are inactive or deleted.'],
+    },
+    tip: {
+      el: 'Αν ένα email πρόσκλησης δεν φτάνει, ζητήστε να ελέγξουν τα ανεπιθύμητα ή αντιγράψτε τον σύνδεσμο και στείλτε τον εσείς.',
+      en: 'If an invitation email does not arrive, ask them to check spam or copy the link and send it yourself.',
+    },
+    related: ['/start-admin', '/studio'],
+  },
+  {
+    to: '/hospitals',
+    permission: 'studio.manage',
+    title: {el: 'Νοσοκομεία', en: 'Hospitals'},
+    summary: {
+      el: 'Όλα τα νοσοκομεία της πλατφόρμας: δημιουργία, κατάσταση και είσοδος για εργασία μέσα σε ένα νοσοκομείο.',
+      en: 'Every hospital on the platform: creation, status and entering one to work with its data.',
+    },
+    audience: {el: 'Διαχειριστής πλατφόρμας (Exeltos)', en: 'Platform administrator (Exeltos)'},
+    chapters: [
+      {
+        el: [
+          'Νέο νοσοκομείο',
+          '«Νέο νοσοκομείο» με όνομα και κωδικό. Στο Studio → Νοσοκομεία & Demo ορίζετε κανονική χρήση ή δοκιμαστική περίοδο· στο Studio → Επισκόπηση βλέπετε τα νοσοκομεία σε δοκιμαστική περίοδο και την παρατείνετε κατά 30 ημέρες· μετά τη λήξη το νοσοκομείο κλειδώνει για όλους εκτός από εσάς, τα δεδομένα μένουν.',
+        ],
+        en: [
+          'New hospital',
+          '"New hospital" with a name and code. In Studio → Hospitals & Demo you set standard use or a trial; in Studio → Overview you see the hospitals on trial and extend them by 30 days; after it ends the hospital locks for everyone but you, the data stays.',
+        ],
+      },
+      {
+        el: [
+          'Διαχειριστής νοσοκομείου',
+          'Από το Studio → Χρήστες επιλέξτε το νοσοκομείο και στείλτε πρόσκληση στον διαχειριστή του. Λαμβάνει απευθείας όνομα χρήστη και σύνδεσμο κωδικού· από εκεί και πέρα προσκαλεί ο ίδιος το προσωπικό του.',
+        ],
+        en: [
+          'Hospital administrator',
+          'In Studio → Users pick the hospital and invite its administrator. They get a username and a password link straight away; from then on they invite their own staff.',
+        ],
+      },
+      {
+        el: [
+          'Είσοδος',
+          '«Είσοδος» σας μεταφέρει μέσα στο νοσοκομείο, με τα δικά του δεδομένα και μενού. Η πάνω μπάρα δείχνει πού εργάζεστε· «Έξοδος στο Studio» επιστρέφει.',
+        ],
+        en: [
+          'Enter',
+          '"Enter" takes you into the hospital, with its own data and menu. The top bar shows where you are working; "Exit to Studio" takes you back.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Δημιουργήστε το νοσοκομείο.',
+        'Ορίστε δοκιμαστική περίοδο ή κανονική χρήση.',
+        'Προσκαλέστε τον διαχειριστή του.',
+        'Μπείτε για να βοηθήσετε στην εισαγωγή δεδομένων αν χρειάζεται.',
+      ],
+      en: [
+        'Create the hospital.',
+        'Set a trial or standard use.',
+        'Invite its administrator.',
+        'Enter it to help with the data import if needed.',
+      ],
+    },
+    related: ['/studio'],
   },
 ];
 
 export const glossary: Array<{term: string; el: string; en: string}> = [
+  {
+    term: 'Όνομα χρήστη / Username',
+    el: 'Ο προσωπικός κωδικός σύνδεσης (π.χ. GN1234: τα αρχικά και τέσσερα ψηφία). Έρχεται με το email έγκρισης· συνδέεστε με αυτό ή με το email σας.',
+    en: 'Your personal sign-in code (e.g. GN1234: your initials and four digits). It comes with the approval email; you sign in with it or with your email.',
+  },
+  {
+    term: 'Αίτηση πρόσβασης',
+    el: 'Η εγγραφή ενός νέου χρήστη που περιμένει την έγκριση του διαχειριστή του νοσοκομείου. Μέχρι την έγκριση δεν υπάρχει λογαριασμός ούτε κωδικός.',
+    en: 'A new user signup waiting for the hospital administrator to approve it. Until approval there is no account and no password.',
+  },
+  {
+    term: 'Πρότυπη σύνθεση',
+    el: 'Τι πρέπει να περιέχει ένα Σετ (κωδικός, ονομασία, ποσότητα). Συγκρίνεται με τα πραγματικά εργαλεία του για να φανούν οι ελλείψεις.',
+    en: 'What a Set should contain (code, name, quantity). It is compared with its actual instruments to show what is missing.',
+  },
+  {
+    term: 'Έλεγχος ονομασιών',
+    el: 'Εργαλείο που κάνει ενιαίες τις ονομασίες: ίδια γραφή και μία ονομασία για κάθε κωδικό.',
+    en: 'A tool that makes names consistent: the same spelling and one name per code.',
+  },
   {
     term: 'Παρατηρητής / Viewer',
     el: 'Λογαριασμός μόνο προβολής (π.χ. Νοσηλευτική Διεύθυνση): βλέπει επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό και αναφορές όλου του νοσοκομείου, χωρίς να αλλάζει τίποτα. Τον δημιουργεί ο διαχειριστής του νοσοκομείου.',

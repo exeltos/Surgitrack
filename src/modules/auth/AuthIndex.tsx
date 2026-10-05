@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, LogIn} from 'lucide-react';
 import type {SessionUser, UserRole} from '../../store/types';
-import {APP_VERSION} from '../../config/appMeta';
+import {APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
 import {FunctionsHttpError, type User} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 import {loadMyAccessRequest} from '../../data/cloud/identity';
@@ -499,8 +499,9 @@ export default function AuthIndex({
               ) : (
                 <p>
                   {lang === 'el'
-                    ? 'Για υποστήριξη στην έκδοση Demo, απευθυνθείτε στον διαχειριστή της εγκατάστασης. Τα στοιχεία help desk θα οριστούν στην παραγωγική έκδοση.'
-                    : 'For support in the Demo build, contact the installation administrator. Help desk contact details will be configured in production.'}
+                    ? 'Για λογαριασμό, όνομα χρήστη, κωδικό ή δικαιώματα απευθυνθείτε στον διαχειριστή του νοσοκομείου σας. Αν ξεχάσατε τον κωδικό, πατήστε «Ξέχασα τον κωδικό». Για τεχνικό πρόβλημα γράψτε στο '
+                    : 'For your account, username, password or permissions, contact your hospital administrator. If you forgot your password, press "Forgot password". For a technical problem write to '}
+                  <a href={`mailto:${SUPPORT_CONTACT.email}`}>{SUPPORT_CONTACT.email}</a>.
                 </p>
               )}
             </div>
