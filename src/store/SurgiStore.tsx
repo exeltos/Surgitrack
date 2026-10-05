@@ -1884,6 +1884,24 @@ export function SurgiProvider({
     });
     notify(tr('{0}: οι αλλαγές αποθηκεύτηκαν.', normalizedBarcode || before.barcode));
   };
+  const renameTools = (changes: Array<{id: string; name: string}>, label: string) => {
+    const byId = new Map(changes.map(c => [c.id, c.name.trim()]));
+    const changing = tools.filter(t => byId.has(t.id) && byId.get(t.id) && byId.get(t.id) !== t.name);
+    if (!changing.length) return;
+    undoable(label, () => {
+      setTools(list => list.map(t => (byId.has(t.id) && byId.get(t.id) ? {...t, name: byId.get(t.id)!} : t)));
+      addMovement({
+        asset: label,
+        assetKind: 'TOOL',
+        from: 'Ονομασίες εργαλείων',
+        to: 'Ονομασίες εργαλείων',
+        status: `Έλεγχος ονομασιών · ${changing.length} εργαλεία`,
+        by: currentUser.name,
+        note: label,
+      });
+      notify(tr('Άλλαξε η ονομασία σε {0} εργαλεία.', changing.length));
+    });
+  };
   const addToolsToSet = (setId: string, toolIds: string[]) => {
     const target = sets.find(item => item.id === setId);
     if (!target || !toolIds.length) return;
@@ -2012,6 +2030,7 @@ export function SurgiProvider({
       undoable,
       updateSet,
       updateTool,
+      renameTools,
       addToolsToSet,
       clearToast: () => setToast(undefined),
     }),

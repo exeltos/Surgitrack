@@ -314,6 +314,8 @@ export type SurgiStoreValue = {
   undoable: (label: string, run: () => void) => void;
   updateSet: (id: string, patch: SetUpdatePatch) => void;
   updateTool: (id: string, patch: ToolUpdatePatch) => void;
+  /** Renames many instruments at once (the name check), with one history entry and an undo. */
+  renameTools: (changes: Array<{id: string; name: string}>, label: string) => void;
   addToolsToSet: (setId: string, toolIds: string[]) => void;
   clearToast: () => void;
 };
