@@ -268,6 +268,7 @@ const PURCHASE_ORDERS_FIELDS: readonly Field[] = [
   ['orderedAt', 'ordered_on', 'text'],
   ['receivedAt', 'received_on', 'text'],
   ['cancelledAt', 'cancelled_on', 'text'],
+  ['receivedBarcodes', 'received_barcodes', 'textArray'],
 ];
 
 /** A hospital's settings: one row per hospital, one column per section. */

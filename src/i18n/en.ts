@@ -1482,4 +1482,12 @@ export const en: Record<string, string> = {
   'Μεγάλη ετικέτα': 'Large label',
   'Ύψος μεγάλης ετικέτας': 'Large label height',
   'Κωδικός (cod.) πάνω από το όνομα': 'Code (cod.) above the name',
+  '1 τεμάχιο': '1 piece',
+  '1 είδος': '1 kind',
+  'Επιλέξτε ή γράψτε (προαιρετικό)': 'Choose or type (optional)',
+  'Ακυρωμένες παραγγελίες ({0})': 'Cancelled orders ({0})',
+  'Παραλαβή στο Απόθεμα': 'Receive into Stock',
+  'Παραλήφθηκε {0} · Νέα εργαλεία στο Απόθεμα: {1}': 'Received {0} · New instruments in Stock: {1}',
+  'Παραλήφθηκε {0}': 'Received {0}',
+  'Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.': 'Order {0} received: {1} new instruments in Stock.',
 };

@@ -118,6 +118,6 @@ export function purchaseOrderHtml(order: PurchaseOrder, hospital?: string) {
 <tbody>${rows}</tbody><tfoot><tr><td></td><td></td><td class="name">${esc(tr('Σύνολο'))}</td><td></td><td class="qty">${total}</td><td></td><td></td></tr></tfoot></table>
 ${order.note ? `<div class="note"><b>${esc(tr('Σημείωση'))}:</b> ${esc(order.note)}</div>` : ''}
 <div class="signs"><div><b>${esc(tr('Συντάχθηκε'))}</b>${esc(tr('Ονοματεπώνυμο & υπογραφή'))}</div><div><b>${esc(tr('Έγκριση'))}</b>${esc(tr('Ονοματεπώνυμο & υπογραφή'))}</div><div><b>${esc(tr('Παραλαβή'))}</b>${esc(tr('Ημερομηνία & υπογραφή'))}</div></div>
-<div class="footer"><span>SurgiTrack · ${esc(order.number)}</span><span>${esc(tr('{0} τεμάχια', total))}</span></div>`,
+<div class="footer"><span>SurgiTrack · ${esc(order.number)}</span><span>${esc(total === 1 ? tr('1 τεμάχιο') : tr('{0} τεμάχια', total))}</span></div>`,
   );
 }

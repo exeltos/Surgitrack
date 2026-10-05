@@ -17,6 +17,7 @@ import AppButton from '../../components/ui/AppButton';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {useSurgi} from '../../store/SurgiStore';
+import {useLibraries} from '../../core/LibraryStore';
 import {downloadXlsx} from '../../core/exportTable';
 import {
   REASON_LABEL,
@@ -412,6 +413,7 @@ export default function ReplacementsPage() {
           orders={purchaseOrders}
           editable={editable}
           onStatus={store.setPurchaseOrderStatus}
+          onReceive={store.receivePurchaseOrder}
           onPrint={order =>
             setPreview({title: tr('Παραγγελία {0}', order.number), html: purchaseOrderHtml(order, organizationName)})
           }
@@ -435,6 +437,8 @@ export default function ReplacementsPage() {
   );
 }
 
+const pieces = (count: number) => (count === 1 ? tr('1 τεμάχιο') : tr('{0} τεμάχια', count));
+
 const statusText = (item: ReplacementItem) =>
   item.status === 'REPLACED'
     ? item.tool.replacedBy
@@ -455,6 +459,8 @@ function OrderDialog({
   onSave: (lines: PurchaseOrderLine[], details: {supplier?: string; note?: string}) => void;
 }) {
   const [lines, setLines] = useState<PurchaseOrderLine[]>(() => orderLines(items));
+  // The Studio suppliers library, as suggestions; any other name can be typed.
+  const suppliers = useLibraries().suppliers.map(item => item.el);
   const [supplier, setSupplier] = useState('');
   const [note, setNote] = useState('');
   const total = lines.reduce((sum, line) => sum + line.quantity, 0);
@@ -491,7 +497,7 @@ function OrderDialog({
                     <small>{line.manufacturer || ''}</small>
                   </td>
                   <td>{line.reason}</td>
-                  <td className="mono small">{line.barcodes.join(', ')}</td>
+                  <td className="mono barcodes">{line.barcodes.join(', ')}</td>
                   <td>
                     <input
                       type="number"
@@ -516,7 +522,17 @@ function OrderDialog({
         <div className="replacements-order-fields">
           <label>
             {tr('Προμηθευτής')}
-            <input value={supplier} onChange={e => setSupplier(e.target.value)} placeholder={tr('Προαιρετικό')} />
+            <input
+              value={supplier}
+              onChange={e => setSupplier(e.target.value)}
+              placeholder={tr('Επιλέξτε ή γράψτε (προαιρετικό)')}
+              list="replacement-suppliers"
+            />
+            <datalist id="replacement-suppliers">
+              {suppliers.map(name => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
           </label>
           <label>
             {tr('Σημείωση')}
@@ -528,7 +544,7 @@ function OrderDialog({
           </label>
         </div>
         <footer>
-          <span>{tr('{0} τεμάχια', total)}</span>
+          <span>{pieces(total)}</span>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
@@ -549,11 +565,13 @@ function Orders({
   orders,
   editable,
   onStatus,
+  onReceive,
   onPrint,
 }: {
   orders: PurchaseOrder[];
   editable: boolean;
   onStatus: (id: string, status: PurchaseOrder['status']) => void;
+  onReceive: (id: string) => void;
   onPrint: (order: PurchaseOrder) => void;
 }) {
   const [open, setOpen] = useState<string | null>(orders[0]?.id || null);
@@ -565,74 +583,92 @@ function Orders({
         <span>{tr('Επιλέξτε εργαλεία στην καρτέλα «Εργαλεία» και πατήστε «Παραγγελία αγοράς».')}</span>
       </section>
     );
+  const active = orders.filter(o => o.status !== 'CANCELLED');
+  const cancelled = orders.filter(o => o.status === 'CANCELLED');
+  const card = (order: PurchaseOrder) => {
+    const total = order.lines.reduce((sum, line) => sum + line.quantity, 0);
+    const expanded = open === order.id;
+    return (
+      <article key={order.id} className={`replacements-order o-${order.status}`}>
+        <header onClick={() => setOpen(expanded ? null : order.id)}>
+          <div>
+            <strong className="mono">{order.number}</strong>
+            <small>
+              {order.createdAt} · {order.createdByName}
+              {order.supplier ? ` · ${order.supplier}` : ''}
+            </small>
+          </div>
+          <span className="replacements-order-count">
+            {order.lines.length === 1 ? tr('1 είδος') : tr('{0} είδη', order.lines.length)} · {pieces(total)}
+          </span>
+          <span className={`replacement-order-status o-${order.status}`}>{orderStatusLabel(order.status)}</span>
+        </header>
+        {expanded && (
+          <div className="replacements-order-body">
+            <table>
+              <tbody>
+                {order.lines.map(line => (
+                  <tr key={`${line.code}-${line.name}`}>
+                    <td className="mono">{line.code || '—'}</td>
+                    <td>
+                      <strong>{line.name}</strong>
+                      <small>{line.manufacturer || ''}</small>
+                    </td>
+                    <td className="qty">{line.quantity}</td>
+                    <td>{line.reason}</td>
+                    <td className="mono barcodes">{line.barcodes.join(', ')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {order.note && <p className="replacements-order-note">{order.note}</p>}
+            <div className="replacements-order-actions">
+              <AppButton icon={<Printer size={15} />} onClick={() => onPrint(order)}>
+                {tr('Εκτύπωση')}
+              </AppButton>
+              {editable && order.status === 'OPEN' && (
+                <AppButton variant="primary" onClick={() => onStatus(order.id, 'ORDERED')}>
+                  {tr('Σημείωση ως παραγγελθείσα')}
+                </AppButton>
+              )}
+              {editable && (order.status === 'OPEN' || order.status === 'ORDERED') && (
+                <>
+                  <AppButton
+                    variant={order.status === 'ORDERED' ? 'primary' : undefined}
+                    icon={<PackageCheck size={15} />}
+                    onClick={() => onReceive(order.id)}
+                  >
+                    {tr('Παραλαβή στο Απόθεμα')}
+                  </AppButton>
+                  <AppButton onClick={() => onStatus(order.id, 'CANCELLED')}>{tr('Ακύρωση παραγγελίας')}</AppButton>
+                </>
+              )}
+              {order.status === 'RECEIVED' && (
+                <small>
+                  {order.receivedBarcodes?.length
+                    ? tr(
+                        'Παραλήφθηκε {0} · Νέα εργαλεία στο Απόθεμα: {1}',
+                        order.receivedAt || '',
+                        order.receivedBarcodes.join(', '),
+                      )
+                    : tr('Παραλήφθηκε {0}', order.receivedAt || '')}
+                </small>
+              )}
+            </div>
+          </div>
+        )}
+      </article>
+    );
+  };
   return (
     <section className="replacements-orders">
-      {orders.map(order => {
-        const total = order.lines.reduce((sum, line) => sum + line.quantity, 0);
-        const expanded = open === order.id;
-        return (
-          <article key={order.id} className={`replacements-order o-${order.status}`}>
-            <header onClick={() => setOpen(expanded ? null : order.id)}>
-              <div>
-                <strong className="mono">{order.number}</strong>
-                <small>
-                  {order.createdAt} · {order.createdByName}
-                  {order.supplier ? ` · ${order.supplier}` : ''}
-                </small>
-              </div>
-              <span className="replacements-order-count">
-                {tr('{0} είδη', order.lines.length)} · {tr('{0} τεμάχια', total)}
-              </span>
-              <span className={`replacement-order-status o-${order.status}`}>{orderStatusLabel(order.status)}</span>
-            </header>
-            {expanded && (
-              <div className="replacements-order-body">
-                <table>
-                  <tbody>
-                    {order.lines.map(line => (
-                      <tr key={`${line.code}-${line.name}`}>
-                        <td className="mono">{line.code || '—'}</td>
-                        <td>
-                          <strong>{line.name}</strong>
-                          <small>{line.manufacturer || ''}</small>
-                        </td>
-                        <td className="qty">{line.quantity}</td>
-                        <td>{line.reason}</td>
-                        <td className="mono small">{line.barcodes.join(', ')}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {order.note && <p className="replacements-order-note">{order.note}</p>}
-                <div className="replacements-order-actions">
-                  <AppButton icon={<Printer size={15} />} onClick={() => onPrint(order)}>
-                    {tr('Εκτύπωση')}
-                  </AppButton>
-                  {editable && order.status === 'OPEN' && (
-                    <AppButton variant="primary" onClick={() => onStatus(order.id, 'ORDERED')}>
-                      {tr('Σημείωση ως παραγγελθείσα')}
-                    </AppButton>
-                  )}
-                  {editable && (order.status === 'OPEN' || order.status === 'ORDERED') && (
-                    <>
-                      <AppButton onClick={() => onStatus(order.id, 'RECEIVED')}>{tr('Παραλήφθηκε')}</AppButton>
-                      <AppButton onClick={() => onStatus(order.id, 'CANCELLED')}>{tr('Ακύρωση παραγγελίας')}</AppButton>
-                    </>
-                  )}
-                  {order.status === 'RECEIVED' && (
-                    <small>
-                      {tr(
-                        'Παραλήφθηκε {0}. Καταχωρήστε τα νέα εργαλεία από «Εργαλεία → Νέο εργαλείο» ή «Μαζική εισαγωγή» ώστε να μπουν στο Απόθεμα.',
-                        order.receivedAt || '',
-                      )}
-                    </small>
-                  )}
-                </div>
-              </div>
-            )}
-          </article>
-        );
-      })}
+      {active.map(card)}
+      {cancelled.length > 0 && (
+        <details className="replacements-cancelled">
+          <summary>{tr('Ακυρωμένες παραγγελίες ({0})', cancelled.length)}</summary>
+          {cancelled.map(card)}
+        </details>
+      )}
     </section>
   );
 }

@@ -932,11 +932,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Παραγγελία αγοράς',
-          'Για όσα δεν υπάρχουν στο Απόθεμα: επιλέξτε τα και «Παραγγελία αγοράς». Γίνεται μία γραμμή ανά είδος με την ποσότητα, συμπληρώνετε προμηθευτή και σημείωση. Στην καρτέλα «Παραγγελίες» η παραγγελία εκτυπώνεται και σημειώνεται ως παραγγελθείσα, παραληφθείσα ή ακυρωμένη.',
+          'Για όσα δεν υπάρχουν στο Απόθεμα: επιλέξτε τα και «Παραγγελία αγοράς». Γίνεται μία γραμμή ανά είδος με την ποσότητα, συμπληρώνετε προμηθευτή και σημείωση. Στην καρτέλα «Παραγγελίες» η παραγγελία εκτυπώνεται, σημειώνεται ως παραγγελθείσα ή ακυρωμένη, και με «Παραλαβή στο Απόθεμα» τα νέα εργαλεία καταχωρούνται αυτόματα στο Απόθεμα.',
         ],
         en: [
           'Purchase order',
-          'For what Stock lacks: select it and "Purchase order". One line per kind with its quantity; add supplier and note. In the "Orders" tab the order prints and is marked ordered, received or cancelled.',
+          'For what Stock lacks: select it and "Purchase order". One line per kind with its quantity; add supplier and note. In the "Orders" tab the order prints, is marked ordered or cancelled, and "Receive into Stock" registers the new instruments in Stock.',
         ],
       },
     ],
@@ -945,13 +945,13 @@ export const helpManual: ManualSection[] = [
         'Φιλτράρετε με αιτία, τμήμα ή διαθεσιμότητα στο Απόθεμα.',
         'Αντικαταστήστε από το Απόθεμα όσα έχουν διαθέσιμο.',
         'Για τα υπόλοιπα καταχωρήστε παραγγελία αγοράς και εκτυπώστε την.',
-        'Όταν έρθουν, «Παραλήφθηκε» και καταχωρήστε τα νέα εργαλεία στο Απόθεμα.',
+        'Όταν έρθουν, «Παραλαβή στο Απόθεμα»: τα νέα εργαλεία μπαίνουν στο Απόθεμα με δικά τους barcodes.',
       ],
       en: [
         'Filter by reason, department or Stock availability.',
         'Replace from Stock what it holds.',
         'Record a purchase order for the rest and print it.',
-        'When they arrive, "Received", and register the new instruments in Stock.',
+        'When they arrive, "Receive into Stock": the new instruments enter Stock with their own barcodes.',
       ],
     },
     tip: {

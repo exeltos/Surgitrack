@@ -2112,6 +2112,54 @@ export function SurgiProvider({
     notify(tr('Καταχωρήθηκε η παραγγελία {0}.', number));
     return number;
   };
+  /**
+   * An order arrives: its instruments go into Stock as new instruments (one per piece, unique
+   * barcodes, the details of the instruments they replace) and the order is marked received.
+   */
+  const receivePurchaseOrder = (id: string) => {
+    const order = purchaseOrders.find(o => o.id === id);
+    if (!order || order.status === 'RECEIVED' || order.status === 'CANCELLED') return;
+    let max = tools
+      .flatMap(t => [t.barcode, ...(t.legacyBarcodes || [])])
+      .reduce((m, barcode) => Math.max(m, Number(barcode.replace(/\D/g, '')) || 0), 0);
+    const stamp = Date.now();
+    const created: Tool[] = order.lines.flatMap((line, lineIndex) => {
+      const model = tools.find(t => line.toolIds.includes(t.id));
+      return Array.from({length: line.quantity}, (_, i) => ({
+        id: `tool-${stamp}-${lineIndex}-${i}`,
+        barcode: `T${String(++max).padStart(6, '0')}`,
+        code: line.code,
+        name: line.name,
+        specialty: model?.specialty || '',
+        manufacturer: line.manufacturer || model?.manufacturer,
+        mode: 'STOCK' as const,
+        state: 'IN_STOCK' as const,
+        uses: 0,
+        maxUses: model?.maxUses,
+        sterilizations: 0,
+        notes: `Παραγγελία ${order.number}`,
+      }));
+    });
+    setTools(x => [...created, ...x]);
+    created.forEach(t =>
+      addMovement({
+        asset: `${t.barcode} · ${t.name}`,
+        assetKind: 'TOOL',
+        from: `Παραγγελία ${order.number}`,
+        to: 'Απόθεμα εργαλείων',
+        status: 'Παραλαβή παραγγελίας · νέο εργαλείο στο Απόθεμα',
+        by: currentUser.name,
+      }),
+    );
+    setPurchaseOrders(x =>
+      x.map(o =>
+        o.id === id
+          ? {...o, status: 'RECEIVED', receivedAt: formatStoreDateTime(), receivedBarcodes: created.map(t => t.barcode)}
+          : o,
+      ),
+    );
+    notify(tr('Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.', order.number, created.length));
+  };
   const setPurchaseOrderStatus = (id: string, status: PurchaseOrderStatus) => {
     const at = formatStoreDateTime();
     setPurchaseOrders(x =>
@@ -2148,6 +2196,7 @@ export function SurgiProvider({
       deliveries,
       purchaseOrders,
       replaceFromStock,
+      receivePurchaseOrder,
       createPurchaseOrder,
       setPurchaseOrderStatus,
       organizationId: cloudOrganizationId,

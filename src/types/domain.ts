@@ -343,4 +343,6 @@ export interface PurchaseOrder {
   orderedAt?: string;
   receivedAt?: string;
   cancelledAt?: string;
+  /** The new instruments put into Stock when the order arrived. */
+  receivedBarcodes?: string[];
 }

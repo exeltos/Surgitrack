@@ -5353,10 +5353,11 @@ div.asset-import-hospital b {
   border-radius: 8px;
   font: inherit;
 }
-.replacements .small,
-.replacements-order-modal .small {
+.replacements .barcodes,
+.replacements-order-modal .barcodes {
   font-size: 11px;
   color: #4b5d69;
+  word-break: break-word;
 }
 .replacements-order-fields {
   display: grid;
@@ -5385,7 +5386,8 @@ div.asset-import-hospital b {
   gap: 8px;
 }
 .replacements-order-modal > footer span {
-  margin-right: auto;
+  margin: 0 auto 0 0 !important;
+  padding: 0 !important;
   font-weight: 700;
   color: #155a6e;
 }
@@ -5443,4 +5445,18 @@ div.asset-import-hospital b {
 }
 .studio-system-grid > section {
   overflow: visible;
+}
+.replacements-cancelled {
+  display: grid;
+  gap: 10px;
+}
+.replacements-cancelled > summary {
+  padding: 6px 2px;
+  color: #6f808c;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.replacements-order.o-CANCELLED {
+  opacity: 0.75;
 }
