@@ -4888,3 +4888,88 @@ div.asset-import-hospital b {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Name check: a count opens its instruments. */
+.name-check-count {
+  min-width: 34px;
+  padding: 2px 8px;
+  border: 1px solid #cfe0e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #155a6e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.name-check-count:hover {
+  background: #e8f3f6;
+}
+.name-check-list {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  width: min(980px, 100%);
+  max-height: min(80vh, 760px);
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+}
+.name-check-list > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.name-check-list > header span {
+  color: #6f808c;
+  font-size: 12px;
+  font-weight: 700;
+}
+.name-check-list > header h3 {
+  margin: 2px 0 0;
+  color: #152c41;
+  font-size: 17px;
+}
+.name-check-list-table {
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid #e3ecf1;
+  border-radius: 10px;
+}
+.name-check-list-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.name-check-list-table th {
+  position: sticky;
+  top: 0;
+  padding: 8px 10px;
+  background: #f3f7f8;
+  color: #6f808c;
+  font-size: 11px;
+  text-align: left;
+  text-transform: uppercase;
+}
+.name-check-list-table td {
+  padding: 8px 10px;
+  border-top: 1px solid #edf2f4;
+}
+.name-check-list-table tbody tr {
+  cursor: pointer;
+}
+.name-check-list-table tbody tr:hover {
+  background: #f3f9fb;
+}
+.name-check-list-table td.mono {
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+}
+.name-check-list-table td.go {
+  color: #98a2b3;
+  width: 20px;
+}
+.name-check-list > small {
+  color: #6f808c;
+}
