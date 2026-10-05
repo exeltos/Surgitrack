@@ -4,6 +4,7 @@ import {beforeEach, describe, expect, it} from 'vitest';
 import {LibraryStoreProvider} from '../../core/LibraryStore';
 import {SurgiProvider, useSurgi} from '../SurgiStore';
 import type {AssetKind} from '../../types/domain';
+import type {ReleaseProcessLoadPayload} from '../types';
 
 const wrapper = ({children}: {children: ReactNode}) => (
   <LibraryStoreProvider>
@@ -13,12 +14,12 @@ const wrapper = ({children}: {children: ReactNode}) => (
 
 const deliverer = {deliveredByUserId: 'u-dept', deliveredByName: 'ΝΟΣΗΛΕΥΤΗΣ ΤΕΣΤ', deliveredByDepartment: 'Τμήμα'};
 const receiver = {receivedByUserId: 'u-dept', receivedByName: 'ΝΟΣΗΛΕΥΤΗΣ ΤΕΣΤ', receivedByDepartment: 'Τμήμα'};
-const passingRelease = {
+const passingRelease: ReleaseProcessLoadPayload = {
   physicalParametersOk: true,
   chemicalIndicatorOk: true,
   packagingIntegrityOk: true,
-  biologicalIndicatorResult: 'NOT_REQUIRED' as const,
-  decision: 'RELEASED' as const,
+  biologicalIndicatorResult: 'NOT_REQUIRED',
+  decision: 'RELEASED',
 };
 
 /** Drives the store like the Sterilization screens do, one action at a time (state updates between actions). */
@@ -70,7 +71,7 @@ const setup = () => {
         chemicalIndicatorResult,
       }),
     );
-  const release = (loadId: string, over: Partial<typeof passingRelease> = {}) =>
+  const release = (loadId: string, over: Partial<ReleaseProcessLoadPayload> = {}) =>
     act1(() => s().releaseProcessLoad(loadId, {...passingRelease, ...over}));
   const deliver = () => act1(() => s().completeDeliveryToDepartment(kind, asset.id, receiver));
   /** Runs the asset through to a sterilization load awaiting release. */
@@ -219,7 +220,7 @@ describe('sterilization flow', () => {
             indicatorResult,
           }),
       );
-    const releaseCycle = (f: ReturnType<typeof setup>, over: Partial<typeof passingRelease> = {}) =>
+    const releaseCycle = (f: ReturnType<typeof setup>, over: Partial<ReleaseProcessLoadPayload> = {}) =>
       act(
         () =>
           void f.s().releaseSterilization(f.kind, f.asset.id, {
