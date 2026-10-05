@@ -16,7 +16,7 @@ import {readSheetFile, type SheetRows} from '../../core/sheetImport';
 import {getCloudOrganizationId} from '../../data/cloud/appRecords';
 import {
   listAssetImports,
-  loadHospitalBarcodes,
+  loadHospitalAssets,
   runAssetImport,
   undoAssetImport,
   type AssetImport,
@@ -30,6 +30,8 @@ import {
   type ImportMapping,
   type ImportPlan,
 } from './assetImport';
+import {cleanName} from '../../core/nameCheck';
+import type {SetAsset, Tool} from '../../types/domain';
 
 type Props = {
   lang: 'el' | 'en';
@@ -68,6 +70,10 @@ export default function AssetImportWizard({lang, organizations, departments, byN
   const [undoTarget, setUndoTarget] = useState<AssetImport>();
   const [needsReload, setNeedsReload] = useState(false);
   const [dragging, setDragging] = useState(false);
+  // Names as the hospital writes them: one spelling, and the name it already has for a code.
+  const [existingNames, setExistingNames] = useState<Map<string, string>>(new Map());
+  const [uniform, setUniform] = useState(true);
+  const [useExisting, setUseExisting] = useState(true);
 
   const organization = organizations.find(o => o.id === organizationId);
   const headers = rows[headerRow] || [];
@@ -128,7 +134,8 @@ export default function AssetImportWizard({lang, organizations, departments, byN
     setBusy(L('Έλεγχος barcodes του νοσοκομείου…', "Checking the hospital's barcodes…"));
     setError('');
     try {
-      const existingBarcodes = await loadHospitalBarcodes(organizationId);
+      const {barcodes: existingBarcodes, names} = await loadHospitalAssets(organizationId);
+      setExistingNames(names);
       setPlan(
         buildImportPlan(dataRows, headerRow + 2, mapping, {
           lang,
@@ -147,6 +154,46 @@ export default function AssetImportWizard({lang, organizations, departments, byN
     }
   };
 
+  /** The name an imported line gets, with the two name choices applied. */
+  const finalName = (code: string, name: string) => {
+    const existing = useExisting ? existingNames.get(code.trim().toUpperCase()) : undefined;
+    return existing || (uniform ? cleanName(name) : name);
+  };
+  const final = useMemo(() => {
+    if (!plan) return undefined;
+    const tools: Tool[] = plan.tools.map(t => ({...t, name: finalName(t.code, t.name)}));
+    const sets: SetAsset[] = plan.sets.map(set => {
+      if (!set.compositionTemplate) return set;
+      const merged = new Map<string, {code: string; name: string; quantity: number}>();
+      for (const line of set.compositionTemplate) {
+        const name = finalName(line.code, line.name);
+        const key = `${line.code}|${name}`;
+        const item = merged.get(key) || {code: line.code, name, quantity: 0};
+        item.quantity += line.quantity;
+        merged.set(key, item);
+      }
+      return {...set, compositionTemplate: [...merged.values()]};
+    });
+    return {tools, sets};
+    // finalName reads only these.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan, existingNames, uniform, useExisting]);
+  /** Lines whose name differs from the one the hospital already uses for that code. */
+  const nameWarnings = useMemo(() => {
+    if (!plan) return [];
+    const seen = new Map<string, {code: string; name: string; existing: string; count: number}>();
+    for (const t of plan.tools) {
+      const existing = existingNames.get(t.code.trim().toUpperCase());
+      if (!existing || cleanName(t.name) === existing) continue;
+      const key = `${t.code}|${t.name}`;
+      const item = seen.get(key) || {code: t.code, name: t.name, existing, count: 0};
+      item.count += 1;
+      seen.set(key, item);
+    }
+    return [...seen.values()];
+  }, [plan, existingNames]);
+  const respelled = useMemo(() => (plan ? plan.tools.filter(t => cleanName(t.name) !== t.name).length : 0), [plan]);
+
   const start = async () => {
     if (!plan || plan.errors.length || !organizationId) return;
     const batch = plan.tools[0]?.importBatch || plan.sets[0]?.importBatch;
@@ -160,7 +207,7 @@ export default function AssetImportWizard({lang, organizations, departments, byN
         batch,
         fileName,
         byName,
-        {sets: plan.sets, tools: plan.tools},
+        final || {sets: plan.sets, tools: plan.tools},
         (done, total) => setProgress({done, total}),
       );
       setNeedsReload(touchesOpenWorkspace(organizationId));
@@ -553,7 +600,55 @@ export default function AssetImportWizard({lang, organizations, departments, byN
                     </small>
                   )}
                 </div>
-                <ToolsPreview plan={plan} L={L} />
+                {(respelled > 0 || nameWarnings.length > 0) && (
+                  <div className="asset-import-names">
+                    <b>{L('Ονομασίες', 'Names')}</b>
+                    {respelled > 0 && (
+                      <label>
+                        <input type="checkbox" checked={uniform} onChange={e => setUniform(e.target.checked)} />
+                        <span>
+                          {L(
+                            `Ενιαία γραφή σε ${respelled} εργαλεία (κεφαλαία χωρίς τόνους, κενά, γράμματα από λάθος πληκτρολόγιο, 12cm → 12 CM).`,
+                            `One spelling for ${respelled} instruments (capitals without accents, spacing, letters typed on the wrong keyboard, 12cm → 12 CM).`,
+                          )}
+                        </span>
+                      </label>
+                    )}
+                    {nameWarnings.length > 0 && (
+                      <>
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={useExisting}
+                            onChange={e => setUseExisting(e.target.checked)}
+                          />
+                          <span>
+                            {L(
+                              `Χρήση της ονομασίας που έχει ήδη ο ίδιος κωδικός στο νοσοκομείο (${nameWarnings.length} διαφορές).`,
+                              `Use the name the same code already has in the hospital (${nameWarnings.length} differences).`,
+                            )}
+                          </span>
+                        </label>
+                        <div className="asset-import-name-diffs">
+                          {nameWarnings.slice(0, 8).map(w => (
+                            <div key={`${w.code}|${w.name}`}>
+                              <code>{w.code}</code>
+                              <span className="from">{w.name}</span>
+                              <span className="to">{w.existing}</span>
+                              <small>×{w.count}</small>
+                            </div>
+                          ))}
+                          {nameWarnings.length > 8 && (
+                            <small>
+                              {L(`…και ${nameWarnings.length - 8} ακόμη.`, `…and ${nameWarnings.length - 8} more.`)}
+                            </small>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+                <ToolsPreview plan={final ? {...plan, ...final} : plan} L={L} />
               </>
             )}
             {progress && (

@@ -1,3 +1,4 @@
+import {namesByCode} from '../../core/nameCheck';
 import {supabase} from '../../lib/supabase';
 import type {SetAsset, Tool} from '../../types/domain';
 import {seedAppRecords, type CloudRecords} from './appRecords';
@@ -18,25 +19,39 @@ export type AssetImport = {
 const PAGE = 1000;
 
 /** Every barcode the hospital uses, current and old, upper case. */
-export async function loadHospitalBarcodes(organizationId: string) {
+/**
+ * What an import is checked against: every barcode in use in the hospital (old ones too), and the
+ * name the hospital already gives each instrument code.
+ */
+export async function loadHospitalAssets(organizationId: string) {
   const barcodes = new Set<string>();
+  const instruments: Array<{id: string; code: string; name: string}> = [];
   for (const table of ['instruments', 'instrument_sets']) {
     for (let from = 0; ; from += PAGE) {
       const {data, error} = await supabase
         .from(table)
-        .select('id,barcode,legacy_barcodes')
+        .select(table === 'instruments' ? 'id,barcode,legacy_barcodes,code,name' : 'id,barcode,legacy_barcodes')
         .eq('organization_id', organizationId)
         .order('id')
         .range(from, from + PAGE - 1);
       if (error) throw error;
-      for (const row of data as Array<{barcode: string | null; legacy_barcodes: string[] | null}>) {
+      const rows = data as unknown as Array<{
+        id: string;
+        barcode: string | null;
+        legacy_barcodes: string[] | null;
+        code?: string | null;
+        name?: string | null;
+      }>;
+      for (const row of rows) {
         if (row.barcode) barcodes.add(row.barcode.toUpperCase());
         for (const old of row.legacy_barcodes || []) barcodes.add(old.toUpperCase());
+        if (table === 'instruments' && row.code && row.name)
+          instruments.push({id: row.id, code: row.code, name: row.name});
       }
-      if (data.length < PAGE) break;
+      if (rows.length < PAGE) break;
     }
   }
-  return barcodes;
+  return {barcodes, names: namesByCode(instruments)};
 }
 
 export async function listAssetImports(organizationId: string): Promise<AssetImport[]> {

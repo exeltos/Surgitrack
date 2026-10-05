@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {Plus, ChevronRight, FileSpreadsheet} from 'lucide-react';
+import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
@@ -68,6 +68,11 @@ export default function ToolsPage() {
         actions={
           can('asset.create') ? (
             <div className="page-head-actions">
+              {can('asset.edit') && (
+                <AppButton icon={<SpellCheck2 size={17} />} onClick={() => navigate('/tools/names')}>
+                  {tr('Έλεγχος ονομασιών')}
+                </AppButton>
+              )}
               {organizationId && (
                 <AppButton icon={<FileSpreadsheet size={17} />} onClick={() => navigate('/import')}>
                   {tr('Μαζική εισαγωγή')}

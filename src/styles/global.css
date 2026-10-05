@@ -2679,6 +2679,46 @@ a.overview-bar:hover {
 .asset-import-preview small {
   color: var(--st-muted, #6f808c);
 }
+/* Import check step: the name choices. */
+.asset-import-names {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #f0d9a8;
+  border-radius: 12px;
+  background: #fffaf0;
+  font-size: 13px;
+}
+.asset-import-names label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #4b3a14;
+}
+.asset-import-name-diffs {
+  display: grid;
+  gap: 4px;
+  padding-left: 24px;
+}
+.asset-import-name-diffs > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12.5px;
+}
+.asset-import-name-diffs .from {
+  color: #8a4a3a;
+  text-decoration: line-through;
+}
+.asset-import-name-diffs .to {
+  color: #1d6a45;
+  font-weight: 600;
+}
 /* The instruments an import will create, shown at the check step. */
 .asset-import-tools {
   display: grid;
@@ -4586,4 +4626,263 @@ div.asset-import-hospital b {
 .hospital-people .people-rows {
   max-height: none;
   overflow: visible;
+}
+
+/* Έλεγχος ονομασιών: spelling fixes and codes with several names. */
+.name-check {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+.name-check-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.name-check-kpis > div {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid #e1eaef;
+  border-radius: 12px;
+  background: #fff;
+}
+.name-check-kpis span,
+.name-check-kpis small {
+  color: #6f808c;
+  font-size: 12px;
+}
+.name-check-kpis strong {
+  color: #152c41;
+  font-size: 24px;
+}
+.name-check-kpis .warn strong {
+  color: #b36b00;
+}
+.name-check-kpis .good strong {
+  color: #1d7a4d;
+}
+.name-check-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid #e1eaef;
+}
+.name-check-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #4b5d69;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.name-check-tabs button.active {
+  border-bottom-color: #155a6e;
+  color: #155a6e;
+}
+.name-check-tabs b {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #fff4dd;
+  color: #9a5b00;
+  font-size: 12px;
+}
+.name-check-card,
+.name-check-group {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e1eaef;
+  border-radius: 12px;
+  background: #fff;
+}
+.name-check-card > header,
+.name-check-group > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.name-check-card > header > div {
+  display: grid;
+  gap: 3px;
+  max-width: 760px;
+}
+.name-check-card > header small {
+  color: #6f808c;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.name-check-table {
+  max-height: 560px;
+  overflow: auto;
+  border: 1px solid #edf2f4;
+  border-radius: 10px;
+}
+.name-check-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.name-check-table th {
+  position: sticky;
+  top: 0;
+  padding: 8px 10px;
+  background: #f3f7f8;
+  color: #6f808c;
+  font-size: 11px;
+  text-align: left;
+  text-transform: uppercase;
+}
+.name-check-table td {
+  padding: 7px 10px;
+  border-top: 1px solid #edf2f4;
+}
+.name-check-table td.from {
+  color: #8a4a3a;
+}
+.name-check-table td.to {
+  color: #1d6a45;
+  font-weight: 600;
+}
+.name-check-table td.arrow {
+  color: #98a2b3;
+  width: 20px;
+}
+.name-check-table td.num {
+  text-align: right;
+  font-weight: 700;
+}
+.name-check-table tr.skipped td {
+  opacity: 0.45;
+}
+.name-check-codes {
+  display: grid;
+  gap: 10px;
+}
+.name-check-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.name-check-filter small {
+  color: #6f808c;
+}
+.name-check-search,
+.name-check-group footer input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: min(340px, 100%);
+  padding: 0 10px;
+  border: 1px solid #d6e2e7;
+  border-radius: 9px;
+  background: #fff;
+  color: #6f808c;
+}
+.name-check-search input {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+}
+.name-check-only {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #4b5d69;
+}
+.name-check-group header > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.name-check-group code {
+  font-size: 15px;
+  font-weight: 800;
+  color: #152c41;
+}
+.name-check-group header small {
+  color: #6f808c;
+}
+.name-check-odd {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #fdecea;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 700;
+}
+.name-check-group ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.name-check-group li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f6f9fa;
+  font-size: 13px;
+}
+.name-check-group li label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.name-check-group li.odd {
+  background: #fff5f3;
+}
+.name-check-group li em {
+  color: #b42318;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+.name-check-group footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.name-check-group footer input {
+  flex: 1;
+  height: 34px;
+  color: #152c41;
+  font: inherit;
+  font-size: 13px;
+}
+.name-check-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px;
+  border: 1px dashed #d6e2e7;
+  border-radius: 12px;
+  color: #1d7a4d;
+}
+@media (max-width: 760px) {
+  .name-check-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
