@@ -228,13 +228,13 @@ function barcodeLabelBody(
   const pt = (value: number) => `${(value * k).toFixed(2)}pt`;
   return `<style>
   @page{size:${w}mm ${h}mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111}body{width:${w}mm;height:${h}mm;overflow:hidden}
-  .label{position:relative;width:100%;height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;padding:1.4mm ${(2 + right).toFixed(1)}mm 1.1mm 2mm;overflow:hidden}
+  .label{position:relative;width:100%;height:100%;display:flex;flex-direction:column;padding:1.4mm ${(2 + right).toFixed(1)}mm 1.1mm 2mm;overflow:hidden}
   .cod{font-size:${pt(5)};color:#444;line-height:1.1}
   .head{display:flex;justify-content:space-between;align-items:center;gap:1.5mm;min-height:0}
   .name{font-size:${pt(6.6)};font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .brand{font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
-  .bc{display:flex;align-items:stretch;justify-content:center;min-height:0;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
+  .head,.foot,.cod{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:flex;justify-content:space-between;align-items:baseline;gap:1.5mm}
   .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#444;white-space:nowrap}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}

@@ -2673,3 +2673,11 @@ td {
   border-radius: 7px;
   font: inherit;
 }
+/* Size choices: the triple's description wraps instead of being cut. */
+.label-segments.sizes button {
+  white-space: normal;
+  line-height: 1.2;
+}
+.label-segments.sizes button small {
+  white-space: normal;
+}
