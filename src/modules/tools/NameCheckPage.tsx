@@ -14,7 +14,14 @@ import {
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
-import {cleanName, cleanUps, codeGroups, type CodeGroup} from '../../core/nameCheck';
+import {
+  cleanName,
+  cleanUps,
+  codeGroups,
+  renameComposition,
+  staleCompositionLines,
+  type CodeGroup,
+} from '../../core/nameCheck';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 
@@ -45,7 +52,12 @@ const PAGE = 40;
  */
 export default function NameCheckPage() {
   const navigate = useNavigate();
-  const {tools, sets, can, renameTools} = useSurgi();
+  const {tools, sets, can, renameTools, syncCompositionNames} = useSurgi();
+  // Sets whose composition still lists an instrument under a name it no longer carries.
+  const staleSets = useMemo(() => {
+    const follow = staleCompositionLines(tools);
+    return sets.filter(set => renameComposition(set.compositionTemplate, follow)).length;
+  }, [tools, sets]);
   const [list, setList] = useState<{ids: string[]; title: string}>();
   const [tab, setTab] = useState<'CLEAN' | 'CODES'>('CLEAN');
   const fixes = useMemo(() => cleanUps(tools), [tools]);
@@ -95,6 +107,24 @@ export default function NameCheckPage() {
             <small>{tr('{0} με πιθανό λάθος κωδικό', odd)}</small>
           </div>
         </div>
+        {staleSets > 0 && (
+          <div className="name-check-sets">
+            <AlertTriangle size={18} />
+            <span>
+              <b>{tr('Συνθέσεις Σετ με παλιές ονομασίες: {0} Σετ', staleSets)}</b>
+              <small>
+                {tr(
+                  'Η σύνθεση κάθε Σετ γράφει τα εργαλεία που πρέπει να περιέχει. Σε αυτά τα Σετ αναφέρει ακόμα ονομασίες που άλλαξαν. Η ενημέρωση τις ευθυγραμμίζει με τα εργαλεία.',
+                )}
+              </small>
+            </span>
+            {editable && (
+              <AppButton variant="primary" icon={<CheckCheck size={15} />} onClick={syncCompositionNames}>
+                {tr('Ενημέρωση συνθέσεων')}
+              </AppButton>
+            )}
+          </div>
+        )}
         <div className="name-check-tabs" role="tablist">
           <button
             role="tab"

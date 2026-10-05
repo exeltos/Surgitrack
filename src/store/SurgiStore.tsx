@@ -57,6 +57,7 @@ import {
   workflowStageState,
   type WorkflowStageId,
 } from '../core/workflow';
+import {renameComposition, staleCompositionLines} from '../core/nameCheck';
 import {tr, trData} from '../i18n';
 import type {ColorPlan} from '../core/colorTapes';
 
@@ -1888,8 +1889,17 @@ export function SurgiProvider({
     const byId = new Map(changes.map(c => [c.id, c.name.trim()]));
     const changing = tools.filter(t => byId.has(t.id) && byId.get(t.id) && byId.get(t.id) !== t.name);
     if (!changing.length) return;
+    // A Set's composition lists the same instruments by code and name: those names follow.
+    const renamed = new Map(changing.map(t => [`${(t.code || '').trim().toUpperCase()}|${t.name}`, byId.get(t.id)!]));
+    const follow = (code: string, name: string) => renamed.get(`${code.trim().toUpperCase()}|${name}`);
     undoable(label, () => {
       setTools(list => list.map(t => (byId.has(t.id) && byId.get(t.id) ? {...t, name: byId.get(t.id)!} : t)));
+      setSets(list =>
+        list.map(set => {
+          const compositionTemplate = renameComposition(set.compositionTemplate, follow);
+          return compositionTemplate ? {...set, compositionTemplate} : set;
+        }),
+      );
       addMovement({
         asset: label,
         assetKind: 'TOOL',
@@ -1900,6 +1910,27 @@ export function SurgiProvider({
         note: label,
       });
       notify(tr('Άλλαξε η ονομασία σε {0} εργαλεία.', changing.length));
+    });
+  };
+  /** Brings Set compositions in line with the instruments' names (for names changed before they followed). */
+  const syncCompositionNames = () => {
+    const follow = staleCompositionLines(tools);
+    const updated = sets
+      .map(set => ({set, compositionTemplate: renameComposition(set.compositionTemplate, follow)}))
+      .filter(x => x.compositionTemplate);
+    if (!updated.length) return;
+    const byId = new Map(updated.map(x => [x.set.id, x.compositionTemplate!]));
+    undoable(tr('Συνθέσεις Σετ: ονομασίες σε {0} Σετ', updated.length), () => {
+      setSets(list => list.map(set => (byId.has(set.id) ? {...set, compositionTemplate: byId.get(set.id)} : set)));
+      addMovement({
+        asset: tr('Συνθέσεις Σετ'),
+        assetKind: 'SET',
+        from: 'Ονομασίες εργαλείων',
+        to: 'Συνθέσεις Σετ',
+        status: `Έλεγχος ονομασιών · συνθέσεις ${updated.length} Σετ`,
+        by: currentUser.name,
+      });
+      notify(tr('Ενημερώθηκαν οι συνθέσεις {0} Σετ.', updated.length));
     });
   };
   const addToolsToSet = (setId: string, toolIds: string[]) => {
@@ -2031,6 +2062,7 @@ export function SurgiProvider({
       updateSet,
       updateTool,
       renameTools,
+      syncCompositionNames,
       addToolsToSet,
       clearToast: () => setToast(undefined),
     }),
