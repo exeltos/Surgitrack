@@ -3061,7 +3061,7 @@ export default function SterilizationPage() {
                   <ArrowRight size={16} />
                   <span>
                     <b>{tr('Κάλυψη έλλειψης')}</b>
-                    <small>{tr('Επιλογή εργαλείου από Stock, άλλο Set ή μεμονωμένο')}</small>
+                    <small>{tr('Επιλογή εργαλείου από Απόθεμα, άλλο Set ή μεμονωμένο')}</small>
                   </span>
                 </button>
               )}
@@ -3092,7 +3092,7 @@ export default function SterilizationPage() {
             </div>
             {!canCompose && (
               <p className="prep-supervisor-note">
-                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Stock) κάνει ο Προϊστάμενος Αποστείρωσης.')}
+                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
               </p>
             )}
           </div>
@@ -3197,7 +3197,7 @@ export default function SterilizationPage() {
                   >
                     <PackageOpen size={16} />
                     <span>
-                      <b>Stock</b>
+                      <b>{tr('Απόθεμα')}</b>
                       <small>{tr('Επιστροφή στο κεντρικό stock')}</small>
                     </span>
                   </button>
@@ -3219,7 +3219,7 @@ export default function SterilizationPage() {
             </div>
             {!canCompose && prepDraft.kind === 'SET' && (
               <p className="prep-supervisor-note">
-                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Stock) κάνει ο Προϊστάμενος Αποστείρωσης.')}
+                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
               </p>
             )}
           </div>
@@ -3255,7 +3255,7 @@ export default function SterilizationPage() {
                 : prepToolAction === 'SERVICE'
                   ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα μεταφερθεί στα Χαλασμένα / Service.')
                   : prepToolAction === 'STOCK'
-                    ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Stock.')
+                    ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Απόθεμα.')
                     : tr('Το εργαλείο θα αφαιρεθεί από το τρέχον Set και θα προστεθεί σε άλλο Set.')}
             </p>
             {prepToolAction === 'REPLACE' && (
@@ -3292,7 +3292,7 @@ export default function SterilizationPage() {
                             setPrepOutgoingSetId('');
                           }}
                         >
-                          Stock
+                          {tr('Απόθεμα')}
                         </button>
                         <button
                           type="button"
@@ -3337,7 +3337,7 @@ export default function SterilizationPage() {
                         setPrepReplacementId('');
                       }}
                     >
-                      Stock
+                      {tr('Απόθεμα')}
                     </button>
                     <button
                       type="button"
@@ -3395,7 +3395,7 @@ export default function SterilizationPage() {
                       const sourceSet = t.setId ? sets.find(s => s.id === t.setId) : undefined;
                       const source =
                         prepReplacementSource === 'STOCK'
-                          ? 'Stock'
+                          ? 'Απόθεμα'
                           : prepReplacementSource === 'SET'
                             ? `Set ${sourceSet?.barcode || '—'} · ${sourceSet?.name || ''}`
                             : `${t.department || 'Τμήμα'} · μεμονωμένο`;
@@ -3468,7 +3468,7 @@ export default function SterilizationPage() {
                   : prepToolAction === 'SERVICE'
                     ? tr('Μεταφορά στα Χαλασμένα / Service')
                     : prepToolAction === 'STOCK'
-                      ? tr('Μεταφορά στο Stock')
+                      ? tr('Μεταφορά στο Απόθεμα')
                       : tr('Μεταφορά σε άλλο Set')}
               </button>
             </div>

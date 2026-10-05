@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {Plus, ChevronRight} from 'lucide-react';
+import {Plus, ChevronRight, FileSpreadsheet} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -17,7 +17,7 @@ import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 export default function SetsPage() {
-  const {sets, tools, can} = useSurgi();
+  const {sets, tools, can, organizationId} = useSurgi();
   const navigate = useNavigate();
   const [q, setQ] = useRememberedState('q', '');
   const [department, setDepartment] = useRememberedState('department', '');
@@ -67,9 +67,16 @@ export default function SetsPage() {
         description={tr('Μητρώο Σετ με ξεχωριστά πεδία Ονομασίας, Κωδικού και μοναδικού Barcode.')}
         actions={
           can('asset.create') ? (
-            <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/sets/new')}>
-              {tr('Νέο Σετ')}
-            </AppButton>
+            <div className="page-head-actions">
+              {organizationId && (
+                <AppButton icon={<FileSpreadsheet size={17} />} onClick={() => navigate('/import')}>
+                  {tr('Μαζική εισαγωγή')}
+                </AppButton>
+              )}
+              <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/sets/new')}>
+                {tr('Νέο Σετ')}
+              </AppButton>
+            </div>
           ) : undefined
         }
       />
@@ -165,7 +172,7 @@ export default function SetsPage() {
                   <td>{s.manufacturer || '—'}</td>
                   <td>
                     {s.state === 'IN_STOCK' ? (
-                      <span className="asset-field-na">{tr('Stock Σετ')}</span>
+                      <span className="asset-field-na">{tr('Απόθεμα Σετ')}</span>
                     ) : (
                       trData(s.department) || '—'
                     )}

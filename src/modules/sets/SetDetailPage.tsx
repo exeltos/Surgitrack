@@ -765,7 +765,7 @@ export default function SetDetailPage() {
                 }}
               >
                 <strong>{tr('Διαγραφή μόνο του Σετ')}</strong>
-                <span>{tr('Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Stock.')}</span>
+                <span>{tr('Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Απόθεμα.')}</span>
               </button>
               <button
                 className="danger-option"

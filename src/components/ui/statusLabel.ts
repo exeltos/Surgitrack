@@ -10,7 +10,7 @@ const labels: Record<string, string> = {
   AWAITING_RELEASE: 'Αναμονή αποδέσμευσης',
   IN_STORAGE: 'Αποθήκευση',
   READY_FOR_PICKUP: 'Έτοιμο για παραλαβή',
-  IN_STOCK: 'Stock',
+  IN_STOCK: 'Απόθεμα',
   SERVICE: 'Service',
   LOST: 'Απολεσθέν',
   RETIRED: 'Εκτός χρήσης',

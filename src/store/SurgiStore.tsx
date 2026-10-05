@@ -980,7 +980,7 @@ export function SurgiProvider({
     if (!t) return;
     const sourceSetId = t.mode === 'SET_MEMBER' ? t.setId : undefined;
     const sourceSet = sourceSetId ? sets.find(s => s.id === sourceSetId) : undefined;
-    const from = sourceSet ? `Set ${sourceSet.barcode}` : t.mode === 'STOCK' ? 'Stock' : t.department || 'Τμήμα';
+    const from = sourceSet ? `Set ${sourceSet.barcode}` : t.mode === 'STOCK' ? 'Απόθεμα' : t.department || 'Τμήμα';
     if (destination === 'SET') {
       const target = sets.find(x => x.id === setId);
       if (!target || target.id === sourceSetId) return;
@@ -1028,11 +1028,11 @@ export function SurgiProvider({
         asset: `${t.barcode} · ${t.name}`,
         assetKind: 'TOOL',
         from,
-        to: 'Stock',
-        status: 'Μεταφορά εργαλείου στο Stock',
+        to: 'Απόθεμα',
+        status: 'Μεταφορά εργαλείου στο Απόθεμα',
         by: currentUser.name,
       });
-      notify(tr('{0} μετακινήθηκε στο Stock.', t.barcode));
+      notify(tr('{0} μετακινήθηκε στο Απόθεμα.', t.barcode));
       return;
     }
     if (destination === 'REMOVE') {
@@ -1146,7 +1146,7 @@ export function SurgiProvider({
       from: `Set ${target.barcode}`,
       to:
         outgoingDestination === 'STOCK'
-          ? 'Stock'
+          ? 'Απόθεμα'
           : outgoingDestination === 'SERVICE'
             ? 'Χαλασμένα / Service'
             : `Set ${outgoingTargetSet!.barcode}`,
@@ -1156,7 +1156,7 @@ export function SurgiProvider({
     const replacementFrom = replacementSourceSetId
       ? `Set ${sets.find(s => s.id === replacementSourceSetId)?.barcode || ''}`
       : replacement.mode === 'STOCK'
-        ? 'Stock'
+        ? 'Απόθεμα'
         : replacement.department || 'Μεμονωμένο σε χρήση';
     addMovement({
       asset: `${replacement.barcode} · ${replacement.name}`,
@@ -1185,7 +1185,7 @@ export function SurgiProvider({
         type,
         status: 'OPEN',
         created: formatStoreDateTime(),
-        department: sourceSet?.department || t.department || 'Stock',
+        department: sourceSet?.department || t.department || 'Απόθεμα',
         note: `${source}: ${note || type}`,
         photos,
       },
@@ -1265,14 +1265,14 @@ export function SurgiProvider({
         asset: `${t.barcode} · ${t.name}`,
         assetKind: 'TOOL',
         from: 'Δημιουργία',
-        to: mode === 'STOCK' ? 'Stock εργαλείων' : department,
-        status: `Δημιουργία φυσικού εργαλείου · ${mode === 'STOCK' ? 'αυτόματα στο Stock' : 'μεμονωμένο σε χρήση'}`,
+        to: mode === 'STOCK' ? 'Απόθεμα εργαλείων' : department,
+        status: `Δημιουργία φυσικού εργαλείου · ${mode === 'STOCK' ? 'αυτόματα στο Απόθεμα' : 'μεμονωμένο σε χρήση'}`,
         by: currentUser.name,
       }),
     );
     notify(
       mode === 'STOCK'
-        ? tr('Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes στο Stock.', created.length)
+        ? tr('Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes στο Απόθεμα.', created.length)
         : tr('Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes.', created.length),
     );
     return created.map(t => t.id);
@@ -1312,13 +1312,13 @@ export function SurgiProvider({
       asset: `${barcode} · ${p.name}`,
       assetKind: 'SET',
       from: 'Δημιουργία',
-      to: inStock ? 'Stock Σετ' : department,
-      status: `Δημιουργία Set · ${p.toolIds.length} εργαλεία${inStock ? ' · αυτόματα ως ενιαίο Stock Σετ' : ''}`,
+      to: inStock ? 'Απόθεμα Σετ' : department,
+      status: `Δημιουργία Set · ${p.toolIds.length} εργαλεία${inStock ? ' · αυτόματα ως ενιαίο Απόθεμα Σετ' : ''}`,
       by: currentUser.name,
     });
     notify(
       inStock
-        ? tr('{0}: το νέο Set δημιουργήθηκε αυτόματα στο Stock Σετ.', barcode)
+        ? tr('{0}: το νέο Set δημιουργήθηκε αυτόματα στο Απόθεμα Σετ.', barcode)
         : tr('{0}: το νέο Set δημιουργήθηκε.', barcode),
     );
     return id;
@@ -1423,11 +1423,11 @@ export function SurgiProvider({
       asset: `${barcode} · ${copy.name}`,
       assetKind: 'TOOL',
       from: `Αντίγραφο ${src.barcode}`,
-      to: 'Stock',
+      to: 'Απόθεμα',
       status: 'Δημιουργία νέου φυσικού εργαλείου από υπάρχουσα καρτέλα',
       by: currentUser.name,
     });
-    notify(tr('{0}: δημιουργήθηκε νέο αντίγραφο εργαλείου στο Stock.', barcode));
+    notify(tr('{0}: δημιουργήθηκε νέο αντίγραφο εργαλείου στο Απόθεμα.', barcode));
     return newId;
   };
   const deleteSet = (id: string, deleteTools = false) => {
@@ -1448,16 +1448,16 @@ export function SurgiProvider({
       asset: `${src.barcode} · ${src.name}`,
       assetKind: 'SET',
       from: src.department,
-      to: deleteTools ? 'Διαγραφή' : 'Stock',
+      to: deleteTools ? 'Διαγραφή' : 'Απόθεμα',
       status: deleteTools
         ? `Διαγραφή Σετ και ${members.length} εργαλείων`
-        : `Διαγραφή Σετ · ${members.length} εργαλεία μεταφέρθηκαν στο Stock`,
+        : `Διαγραφή Σετ · ${members.length} εργαλεία μεταφέρθηκαν στο Απόθεμα`,
       by: currentUser.name,
     });
     notify(
       deleteTools
         ? tr('Το Σετ και τα εργαλεία του διαγράφηκαν.')
-        : tr('Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Stock.'),
+        : tr('Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Απόθεμα.'),
     );
   };
   const deleteTool = (id: string) => {
@@ -1469,7 +1469,7 @@ export function SurgiProvider({
     addMovement({
       asset: `${src.barcode} · ${src.name}`,
       assetKind: 'TOOL',
-      from: parentSet ? `Set ${parentSet.barcode}` : src.mode === 'STOCK' ? 'Stock' : src.department || 'Μεμονωμένο',
+      from: parentSet ? `Set ${parentSet.barcode}` : src.mode === 'STOCK' ? 'Απόθεμα' : src.department || 'Μεμονωμένο',
       to: 'Διαγραφή',
       status: 'Οριστική διαγραφή φυσικού εργαλείου',
       by: currentUser.name,
@@ -1544,7 +1544,7 @@ export function SurgiProvider({
     if (!a) return;
     const tool = kind === 'TOOL' ? tools.find(t => t.id === id) : undefined;
     const sourceSet = tool?.setId ? sets.find(s => s.id === tool.setId) : undefined;
-    const from = sourceSet ? `Set ${sourceSet.barcode}` : a.department || 'Stock';
+    const from = sourceSet ? `Set ${sourceSet.barcode}` : a.department || 'Απόθεμα';
     if (tool) {
       setTools(x =>
         x.map(t =>
@@ -1594,7 +1594,7 @@ export function SurgiProvider({
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
       from: was,
-      to: kind === 'TOOL' || !a.department ? 'Stock' : a.department,
+      to: kind === 'TOOL' || !a.department ? 'Απόθεμα' : a.department,
       status: a.state === 'LOST' ? 'Βρέθηκε · επιστροφή σε χρήση' : 'Επιστροφή από Service',
       by: currentUser.name,
       note: note || undefined,
@@ -1625,7 +1625,7 @@ export function SurgiProvider({
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
-      from: a.department || 'Stock',
+      from: a.department || 'Απόθεμα',
       to: target,
       status: a.department ? 'Αλλαγή τμήματος' : 'Καταχώρηση σε τμήμα',
       by: currentUser.name,
@@ -1681,7 +1681,7 @@ export function SurgiProvider({
     addMovement({
       asset: `${s.barcode} · ${s.name}`,
       assetKind: 'SET',
-      from: s.department || 'Stock',
+      from: s.department || 'Απόθεμα',
       to: 'Χαλασμένα / Service',
       status: 'Αποστολή Σετ σε Service',
       by: currentUser.name,
@@ -1708,8 +1708,8 @@ export function SurgiProvider({
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
-      from: a.department || 'Stock',
-      to: a.department || 'Stock',
+      from: a.department || 'Απόθεμα',
+      to: a.department || 'Απόθεμα',
       status: `Χρωματικός μάρτυρας: ${description}`,
       by: currentUser.name,
     });
@@ -1751,7 +1751,7 @@ export function SurgiProvider({
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
-      from: a.department || 'Stock',
+      from: a.department || 'Απόθεμα',
       to: 'Απόσυρση / Service',
       status: 'Απόσυρση από ενεργή χρήση',
       by: currentUser.name,
@@ -1785,7 +1785,7 @@ export function SurgiProvider({
     const inStock = nextState === 'IN_STOCK';
     const department = inStock ? '' : requestedDepartment;
     if (!inStock && !department) {
-      notify(tr('Ορίστε Τμήμα για να βγει το Σετ από το Stock.'));
+      notify(tr('Ορίστε Τμήμα για να βγει το Σετ από το Απόθεμα.'));
       return;
     }
     const nextPatch = {
@@ -1806,12 +1806,16 @@ export function SurgiProvider({
       );
     const changedBarcode = barcodeChanged ? ` · Barcode ${before.barcode} → ${normalizedBarcode}` : '';
     const stockChange =
-      before.state !== nextState ? (inStock ? ' · Μεταφορά ολόκληρου Σετ στο Stock' : ' · Έξοδος Σετ από Stock') : '';
+      before.state !== nextState
+        ? inStock
+          ? ' · Μεταφορά ολόκληρου Σετ στο Απόθεμα'
+          : ' · Έξοδος Σετ από Απόθεμα'
+        : '';
     addMovement({
       asset: `${before.barcode} · ${patch.name || before.name}`,
       assetKind: 'SET',
       from: 'Στοιχεία Σετ',
-      to: inStock ? 'Stock Σετ' : 'Στοιχεία Σετ',
+      to: inStock ? 'Απόθεμα Σετ' : 'Στοιχεία Σετ',
       status: `Επεξεργασία στοιχείων Σετ${changedBarcode}${stockChange}`,
       by: currentUser.name,
     });
@@ -1865,12 +1869,16 @@ export function SurgiProvider({
     setTools(list => list.map(t => (t.id === id ? {...t, ...nextPatch} : t)));
     const changedBarcode = barcodeChanged ? ` · Barcode ${before.barcode} → ${normalizedBarcode}` : '';
     const locationChange =
-      before.mode !== mode ? (mode === 'STOCK' ? ' · Μεταφορά στο Stock' : ' · Μετατροπή σε μεμονωμένο σε χρήση') : '';
+      before.mode !== mode
+        ? mode === 'STOCK'
+          ? ' · Μεταφορά στο Απόθεμα'
+          : ' · Μετατροπή σε μεμονωμένο σε χρήση'
+        : '';
     addMovement({
       asset: `${before.barcode} · ${patch.name || before.name}`,
       assetKind: 'TOOL',
       from: 'Στοιχεία Εργαλείου',
-      to: mode === 'STOCK' ? 'Stock εργαλείων' : 'Στοιχεία Εργαλείου',
+      to: mode === 'STOCK' ? 'Απόθεμα εργαλείων' : 'Στοιχεία Εργαλείου',
       status: `Επεξεργασία στοιχείων εργαλείου${changedBarcode}${locationChange}`,
       by: currentUser.name,
     });
@@ -1902,7 +1910,7 @@ export function SurgiProvider({
     chosen.forEach(tool => {
       const from =
         tool.mode === 'STOCK'
-          ? 'Stock'
+          ? 'Απόθεμα'
           : tool.mode === 'SET_MEMBER'
             ? `Set ${sets.find(item => item.id === tool.setId)?.barcode || ''}`
             : tool.department || 'Μεμονωμένο σε χρήση';

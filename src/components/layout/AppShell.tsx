@@ -48,7 +48,7 @@ const navEN: Record<string, string> = {
   Εργαλεία: 'Instruments',
   'Σετ εργαλείων': 'Instrument Sets',
   'Μεμονωμένα σε χρήση': 'Standalone in Use',
-  'Stock εργαλείων': 'Instrument Stock',
+  'Απόθεμα εργαλείων': 'Instrument Stock',
   Εκκρεμότητες: 'Issues',
   Αναφορές: 'Reports',
   Ιστορικό: 'History',

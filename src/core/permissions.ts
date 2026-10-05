@@ -119,15 +119,15 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'ASSETS',
     el: 'Αλλαγές σύνθεσης Σετ & Service',
     en: 'Set changes & service',
-    hintEl: 'Προσθήκη, αντικατάσταση ή αφαίρεση εργαλείων από Σετ, αποστολή σε Service και επιστροφή στο Stock.',
+    hintEl: 'Προσθήκη, αντικατάσταση ή αφαίρεση εργαλείων από Σετ, αποστολή σε Service και επιστροφή στο Απόθεμα.',
     hintEn: 'Add, replace or remove instruments in Sets, send to service and return to stock.',
   },
   {
     key: 'stock.manage',
     group: 'ASSETS',
-    el: 'Διαχείριση Stock',
+    el: 'Διαχείριση Απόθεμα',
     en: 'Manage stock',
-    hintEl: 'Μετακινήσεις και διαθέσιμα εργαλεία Stock.',
+    hintEl: 'Μετακινήσεις και διαθέσιμα εργαλεία Απόθεμα.',
     hintEn: 'Stock availability and movements.',
   },
   {

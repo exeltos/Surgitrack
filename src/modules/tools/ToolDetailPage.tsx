@@ -107,7 +107,7 @@ export default function ToolDetailPage() {
   const location = set
     ? `Set ${set.barcode}`
     : tool.mode === 'STOCK'
-      ? 'Stock'
+      ? 'Απόθεμα'
       : tool.department
         ? trData(tool.department)
         : tr('Μεμονωμένο');
@@ -165,7 +165,7 @@ export default function ToolDetailPage() {
                       key: 'moves',
                       icon: <ArrowRightLeft size={16} />,
                       label: tr('Διαχείριση'),
-                      hint: tr('Τμήμα, Σετ, Stock, Service, απώλεια'),
+                      hint: tr('Τμήμα, Σετ, Απόθεμα, Service, απώλεια'),
                       disabled: workflowLocked,
                       title: workflowLocked
                         ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
@@ -433,7 +433,7 @@ export default function ToolDetailPage() {
         <ConfirmDialog
           title={tr('Επιβεβαίωση αντιγράφου εργαλείου')}
           message={tr(
-            'Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Stock. Θέλεις να συνεχίσεις;',
+            'Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Απόθεμα. Θέλεις να συνεχίσεις;',
           )}
           confirmLabel={tr('Ναι, δημιουργία αντιγράφου')}
           onConfirm={() => {

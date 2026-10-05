@@ -53,7 +53,7 @@ export default function StockPage() {
     <div className="tools-list-workspace">
       <PageHeader
         eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
-        title={tr('Stock εργαλείων')}
+        title={tr('Απόθεμα εργαλείων')}
         description={tr('Διαθέσιμα φυσικά εργαλεία για αντικατάσταση, σύνθεση Σετ ή αυτόνομη διάθεση.')}
         actions={
           <div className="actions asset-page-actions">
@@ -115,7 +115,7 @@ export default function StockPage() {
           },
         ]}
       />
-      <ScrollableListPanel withKpis ariaLabel={tr('Stock εργαλείων')}>
+      <ScrollableListPanel withKpis ariaLabel={tr('Απόθεμα εργαλείων')}>
         <table className="asset-registry-table">
           <thead>
             <tr>

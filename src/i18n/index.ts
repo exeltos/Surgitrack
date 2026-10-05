@@ -101,7 +101,8 @@ const trDataSegment = (value: string) => (current === 'en' ? translateSegment(va
  */
 export function trData(text: string | null | undefined): string {
   if (!text) return text ?? '';
-  if (current !== 'en') return text;
+  // Records written before «Stock» was renamed «Απόθεμα» still say Stock.
+  if (current !== 'en') return text.replace(/\bStock\b/g, 'Απόθεμα');
   const whole = en[text.trim()];
   if (whole) return whole;
   return text

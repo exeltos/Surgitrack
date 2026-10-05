@@ -63,7 +63,7 @@ export default function ToolsPage() {
         eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
         title={tr('Εργαλεία')}
         description={tr(
-          'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Stock, σε Σετ ή χρησιμοποιούνται μεμονωμένα.',
+          'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Απόθεμα, σε Σετ ή χρησιμοποιούνται μεμονωμένα.',
         )}
         actions={
           can('asset.create') ? (
@@ -90,7 +90,7 @@ export default function ToolsPage() {
             value: tools.filter(t => t.mode === 'STANDALONE').length,
             ...kpi({mode: 'STANDALONE'}),
           },
-          {label: 'Stock', value: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
+          {label: 'Απόθεμα', value: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
         ]}
       />
       <div className="asset-list-controls">
@@ -125,7 +125,7 @@ export default function ToolsPage() {
               value: mode,
               placeholder: tr('Όλες οι θέσεις'),
               options: [
-                {value: 'STOCK', label: 'Stock'},
+                {value: 'STOCK', label: 'Απόθεμα'},
                 {value: 'SET_MEMBER', label: tr('Σετ εργαλείων')},
                 {value: 'STANDALONE', label: tr('Μεμονωμένα σε χρήση')},
               ],
@@ -197,7 +197,7 @@ export default function ToolsPage() {
                         </small>
                       </>
                     ) : t.mode === 'STOCK' ? (
-                      <b>Stock</b>
+                      <b>{tr('Απόθεμα')}</b>
                     ) : (
                       <>
                         <b>{tr('Μεμονωμένο')}</b>

@@ -32,7 +32,7 @@ type Props = {
 };
 const states: Array<{value: AssetState; label: string}> = [
   {value: 'IN_DEPARTMENT', label: 'Στο τμήμα'},
-  {value: 'IN_STOCK', label: 'Stock'},
+  {value: 'IN_STOCK', label: 'Απόθεμα'},
   {value: 'PENDING_STERILIZATION', label: 'Αναμονή αποστείρωσης'},
   {value: 'IN_WASHING', label: 'Καθαρισμός & Απολύμανση'},
   {value: 'IN_PREPARATION', label: 'Προετοιμασία'},
@@ -233,7 +233,7 @@ export default function AssetWorkbenchSidebar({
             ) : tool?.mode === 'SET_MEMBER' ? (
               trData(setDepartment || asset.department) || '—'
             ) : kind === 'SET' && (editing ? draft.state : asset.state) === 'IN_STOCK' ? (
-              <span className="asset-field-na">{tr('— Stock Σετ')}</span>
+              <span className="asset-field-na">{tr('— Απόθεμα Σετ')}</span>
             ) : editing ? (
               textField('department', draft.department)
             ) : (
@@ -297,7 +297,7 @@ export default function AssetWorkbenchSidebar({
             <div>
               <dt>{tr('Τύπος')}</dt>
               <dd>
-                {tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : tool?.mode === 'STOCK' ? 'Stock' : tr('Μεμονωμένο')}
+                {tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : tool?.mode === 'STOCK' ? 'Απόθεμα' : tr('Μεμονωμένο')}
               </dd>
             </div>
             {setName && (

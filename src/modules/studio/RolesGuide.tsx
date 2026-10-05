@@ -49,7 +49,7 @@ const rows: Row[] = [
       en: 'A sterilization user named by the hospital administrator.',
     },
     sees: {
-      el: 'Επισκόπηση νοσοκομείου, Αποστείρωση, Εργαλεία, Σετ, Stock, Αναφορές, Ιστορικό.',
+      el: 'Επισκόπηση νοσοκομείου, Αποστείρωση, Εργαλεία, Σετ, Απόθεμα, Αναφορές, Ιστορικό.',
       en: 'Hospital overview, sterilization, instruments, Sets, stock, reports, history.',
     },
     does: {
@@ -62,7 +62,7 @@ const rows: Row[] = [
     name: hospitalRoleNames.STERILIZATION,
     who: {el: 'Υπάλληλος της Αποστείρωσης.', en: 'Sterilization staff.'},
     sees: {
-      el: 'Αποστείρωση, Εργαλεία, Σετ, Stock, Αναφορές, Ιστορικό όλου του νοσοκομείου.',
+      el: 'Αποστείρωση, Εργαλεία, Σετ, Απόθεμα, Αναφορές, Ιστορικό όλου του νοσοκομείου.',
       en: 'Sterilization, instruments, Sets, stock, reports and history of the whole hospital.',
     },
     does: {
@@ -94,7 +94,7 @@ const rows: Row[] = [
       en: 'Anyone who needs to look without changing anything: management, quality office, auditor, inspector.',
     },
     sees: {
-      el: 'Όλο το νοσοκομείο: Επισκόπηση, Εργαλεία, Σετ, Stock, Εκκρεμότητες, Αναφορές, Ιστορικό, Ιχνηλασιμότητα.',
+      el: 'Όλο το νοσοκομείο: Επισκόπηση, Εργαλεία, Σετ, Απόθεμα, Εκκρεμότητες, Αναφορές, Ιστορικό, Ιχνηλασιμότητα.',
       en: 'The whole hospital: Overview, Instruments, Sets, Stock, Issues, Reports, History, Traceability.',
     },
     does: {
