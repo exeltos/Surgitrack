@@ -1472,4 +1472,14 @@ export const en: Record<string, string> = {
   'Λείπει 1 εργαλείο': '1 instrument missing',
   'ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ': 'DAMAGE · SERVICE · LOSS',
   Αντικαταστάσεις: 'Replacements',
+  '1 μεγάλη + 2 μικρές': '1 large + 2 small',
+  'ΧΑΡΤΙ ΕΚΤΥΠΩΤΗ (mm)': 'PRINTER PAPER (mm)',
+  Πλάτος: 'Width',
+  Ύψος: 'Height',
+  'Κενό δεξιά': 'Right margin',
+  'Κενό στη δεξιά άκρη κάθε ετικέτας, π.χ. για τη λωρίδα δείκτη που είναι ήδη τυπωμένη στο χαρτί.':
+    'Empty space at the right edge of each label, e.g. for an indicator strip already printed on the paper.',
+  'Μεγάλη ετικέτα': 'Large label',
+  'Ύψος μεγάλης ετικέτας': 'Large label height',
+  'Κωδικός (cod.) πάνω από το όνομα': 'Code (cod.) above the name',
 };

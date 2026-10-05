@@ -6,11 +6,12 @@ import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import {DEFAULT_LABEL_SETTINGS} from '../../core/libraryTypes';
+import {labelPaper} from '../sterilization/printUtils';
 
 const SIZE_LABEL = {
   SMALL: ['Μικρή', 'Small', '50×25 mm'],
   MEDIUM: ['Μεσαία', 'Medium', '70×35 mm'],
-  SHEET: ['Τριπλή', 'Large', '100×50 mm'],
+  SHEET: ['Τριπλή (1 μεγάλη + 2 μικρές)', 'Triple (1 large + 2 small)', '100×50 mm'],
 };
 const HEADER_LABEL = {
   BRAND: ['SurgiTrack', 'SurgiTrack'],
@@ -28,7 +29,9 @@ export default function LabelSettingsCard({L}: {L: (el: string, en: string) => s
   const {sets, tools} = useSurgi();
   const [open, setOpen] = useState(false);
   const label = {...DEFAULT_LABEL_SETTINGS, ...(libs.systemSettings.label || {})};
-  const [sizeEl, sizeEn, mm] = SIZE_LABEL[label.size] || SIZE_LABEL.SMALL;
+  const [sizeEl, sizeEn] = SIZE_LABEL[label.size] || SIZE_LABEL.SMALL;
+  const paper = labelPaper(label);
+  const mm = `${paper.w}×${paper.h} mm`;
   const [headerEl, headerEn] = HEADER_LABEL[label.header] || HEADER_LABEL.BRAND;
   const sample = sets[0] || {
     barcode: 'S000001',

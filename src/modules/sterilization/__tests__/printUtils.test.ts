@@ -77,3 +77,29 @@ describe('composition sheet', () => {
     expect(html).toContain('class="missing"');
   });
 });
+
+describe('label paper', () => {
+  it('uses the printer roll size, keeps room on the right and splits 1 + 2', () => {
+    const html = barcodeLabelHtml(
+      {barcode: 'S000001', name: 'ΒΑΣΙΚΟ', department: 'Χειρουργείο', code: '041993'},
+      'SET',
+      12,
+      {
+        size: 'SHEET',
+        header: 'BRAND',
+        showDetails: false,
+        showCode: true,
+        width: 105,
+        height: 55,
+        reserveRight: 6,
+        mainShare: 60,
+      },
+    );
+    expect(html).toContain('size:105mm 55mm');
+    expect(html).toContain('grid-template-rows:33mm 22mm');
+    expect(html).toContain('8.0mm 1.1mm 2mm');
+    expect(html).toContain('cod. 041993');
+    // The code line is on the large label only.
+    expect(html.match(/cod\. 041993/g)).toHaveLength(1);
+  });
+});

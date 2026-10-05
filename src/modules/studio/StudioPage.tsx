@@ -605,16 +605,6 @@ export default function StudioPage() {
             onOpenHospitals={() => selectTab('PLATFORM')}
             onNewHospital={() => setOrganizationEditor(null)}
             onExtendTrial={(org, endsAt) => void changePlan(org, 'TRIAL', endsAt)}
-            onMakeStandard={org =>
-              setConfirm({
-                title: L('Κανονική χρήση;', 'Standard use?'),
-                message: L(
-                  `Το ${org.name} περνά σε κανονική χρήση, χωρίς λήξη. Αν ήταν κλειδωμένο, ξεκλειδώνει αμέσως.`,
-                  `${org.name} moves to standard use, with no end date. If it was locked, it unlocks at once.`,
-                ),
-                action: () => void changePlan(org, 'STANDARD'),
-              })
-            }
           />
         )}
         {tab === 'PLATFORM' && platformAdmin && (

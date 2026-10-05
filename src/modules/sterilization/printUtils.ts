@@ -167,9 +167,17 @@ function openPrintWindow(title: string, html: string) {
   return true;
 }
 
-type PrintAsset =
-  | Pick<SetAsset, 'barcode' | 'name' | 'department'>
-  | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>;
+type PrintAsset = (
+  Pick<SetAsset, 'barcode' | 'name' | 'department'> | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
+) & {code?: string};
+
+/** The label's paper size: the chosen size, or the printer roll's own when set (20–150 mm). */
+export const labelPaper = (settings: LabelSettings) => {
+  const preset = LABEL_MM[settings.size] || LABEL_MM.SMALL;
+  const fit = (value: number | undefined, fallback: number) =>
+    value && Number.isFinite(value) ? Math.min(150, Math.max(20, value)) : fallback;
+  return {w: fit(settings.width, preset.w), h: fit(settings.height, preset.h)};
+};
 
 const LABEL_MM: Record<LabelSize, {w: number; h: number}> = {
   SMALL: {w: 50, h: 25},
@@ -188,7 +196,7 @@ const labelHeaderHtml = (settings: LabelSettings) => {
 
 /** One label cell: name + header on top, barcode, code and (optionally) the details line. */
 const labelCell = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
-  `<section class="label ${className}"><div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${escapeHtml(details)}</span>` : ''}</div></section>`;
+  `<section class="label ${className}">${settings.showCode && asset.code && className !== 'mini' ? `<div class="cod">cod. ${escapeHtml(asset.code)}</div>` : ''}<div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${escapeHtml(details)}</span>` : ''}</div></section>`;
 
 /**
  * The barcode label's print CSS and body (the part after <title>). `screenZoom` enlarges it on
@@ -205,9 +213,14 @@ function barcodeLabelBody(
     kind === 'SET'
       ? tr('{0} εργαλεία', toolCount ?? 0)
       : `${tr('Χρήσεις')}: ${'uses' in asset ? asset.uses : 0}${'maxUses' in asset && asset.maxUses ? ` / ${asset.maxUses}` : ''}`;
-  const {w, h} = LABEL_MM[settings.size] || LABEL_MM.SMALL;
-  // Type scales with the label height so the three sizes keep the same proportions.
-  const k = settings.size === 'SHEET' ? 1 : h / 25;
+  const {w, h} = labelPaper(settings);
+  // 1 + 2: the large label on top, two small ones side by side below.
+  const share = Math.min(70, Math.max(35, settings.mainShare || 50)) / 100;
+  const mainH = +(h * share).toFixed(2);
+  const miniH = +(h - mainH).toFixed(2);
+  // Type scales with the label height so every size keeps the same proportions.
+  const k = settings.size === 'SHEET' ? Math.min(1.25, Math.max(0.8, miniH / 25)) : h / 25;
+  const right = Math.min(15, Math.max(0, settings.reserveRight || 0));
   const cells =
     settings.size === 'SHEET'
       ? `<div class="sheet-grid">${labelCell(asset, details, settings, 'main')}<div class="pair">${labelCell(asset, details, settings, 'mini')}${labelCell(asset, details, settings, 'mini')}</div></div>`
@@ -215,7 +228,8 @@ function barcodeLabelBody(
   const pt = (value: number) => `${(value * k).toFixed(2)}pt`;
   return `<style>
   @page{size:${w}mm ${h}mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111}body{width:${w}mm;height:${h}mm;overflow:hidden}
-  .label{position:relative;width:100%;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:1.4mm 2mm 1.1mm;overflow:hidden}
+  .label{position:relative;width:100%;height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;padding:1.4mm ${(2 + right).toFixed(1)}mm 1.1mm 2mm;overflow:hidden}
+  .cod{font-size:${pt(5)};color:#444;line-height:1.1}
   .head{display:flex;justify-content:space-between;align-items:center;gap:1.5mm;min-height:0}
   .name{font-size:${pt(6.6)};font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .brand{font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
@@ -223,8 +237,8 @@ function barcodeLabelBody(
   .bc{display:flex;align-items:stretch;justify-content:center;min-height:0;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:flex;justify-content:space-between;align-items:baseline;gap:1.5mm}
   .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#444;white-space:nowrap}
-  .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:25mm 25mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
-  .pair{display:grid;grid-template-columns:50mm 50mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
+  .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
+  .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
   .sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}
   @media screen{html{background:#eef2f5;zoom:${screenZoom}}body{margin:4mm;background:#fff;box-shadow:0 0 0 .2mm #c8d2d9,0 1mm 3mm rgba(0,0,0,.08)}}
   </style></head><body>${cells}`;

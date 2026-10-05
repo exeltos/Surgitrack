@@ -1,17 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {
-  AlertTriangle,
-  Building2,
-  CalendarClock,
-  ChevronRight,
-  Clock,
-  Lock,
-  Mail,
-  Plus,
-  UserCheck,
-  UserX,
-  Users,
-} from 'lucide-react';
+import {Building2, CalendarClock, Clock, Lock, Mail, Plus, UserCheck, UserX, Users} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
 import {trialState} from '../../core/trial';
@@ -32,8 +20,8 @@ const TRIAL_EXTENSION_DAYS = 30;
 
 /**
  * The platform owner's start page: how the hospitals are doing, what needs the owner now (trials
- * ending or ended, signups to approve, hospitals without an admin, invitations not accepted) and
- * every hospital with its plan and users, each one a click from its users or its card.
+ * ending or ended, signups to approve, hospitals without an admin, invitations not accepted) — each
+ * a click from what it needs. The hospitals themselves are listed in Νοσοκομεία.
  */
 export default function OwnerDashboard({
   organizations,
@@ -44,7 +32,6 @@ export default function OwnerDashboard({
   onOpenHospitals,
   onNewHospital,
   onExtendTrial,
-  onMakeStandard,
 }: {
   organizations: Organization[];
   users: AdminUser[];
@@ -54,7 +41,6 @@ export default function OwnerDashboard({
   onOpenHospitals: () => void;
   onNewHospital: () => void;
   onExtendTrial: (org: Organization, endsAt: string) => void;
-  onMakeStandard: (org: Organization) => void;
 }) {
   const [pending, setPending] = useState<Pending[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -256,86 +242,6 @@ export default function OwnerDashboard({
           </div>
         </section>
       </div>
-
-      <section className="owner-card">
-        <header>
-          <div>
-            <span className="eyebrow">{L('ΠΕΛΑΤΕΣ', 'CUSTOMERS')}</span>
-            <h2>{L('Νοσοκομεία', 'Hospitals')}</h2>
-          </div>
-          <span className="owner-count">{rows.length}</span>
-        </header>
-        <div className="owner-hospital-head">
-          <span>{L('Νοσοκομείο', 'Hospital')}</span>
-          <span>{L('Τύπος', 'Plan')}</span>
-          <span>{L('Χρήστες', 'Users')}</span>
-          <span>{L('Αιτήματα', 'Requests')}</span>
-          <span></span>
-        </div>
-        <div className="owner-hospitals">
-          {rows.length === 0 && (
-            <p className="owner-empty">
-              {L(
-                'Δεν υπάρχουν νοσοκομεία ακόμα. Ξεκινήστε με «Νέο νοσοκομείο».',
-                'No hospitals yet. Start with «New hospital».',
-              )}
-            </p>
-          )}
-          {rows.map(r => (
-            <div key={r.org.id} className={`owner-hospital${r.org.active ? '' : ' inactive'}`}>
-              <span className="owner-hospital-name">
-                <b>{r.org.name}</b>
-                <small>
-                  {r.org.code}
-                  {!r.org.active && ` · ${L('ανενεργό', 'inactive')}`}
-                </small>
-              </span>
-              <span>
-                {r.trial.plan !== 'TRIAL' ? (
-                  <span className="plan-badge standard">{L('Κανονική χρήση', 'Standard use')}</span>
-                ) : r.trial.ended ? (
-                  <span className="plan-badge locked">{L('Κλειδωμένο', 'Locked')}</span>
-                ) : (
-                  <span className={`plan-badge trial${r.trial.warn ? ' warn' : ''}`}>
-                    {L(`Δοκιμή · ${r.trial.daysLeft} ημ.`, `Trial · ${r.trial.daysLeft} d`)}
-                  </span>
-                )}
-              </span>
-              <span className="owner-num">
-                <b>{r.active}</b>
-                <small>/ {r.users}</small>
-              </span>
-              <span className={`owner-num${r.requests ? ' warn' : ''}`}>
-                <b>{r.requests}</b>
-              </span>
-              <span className="owner-hospital-actions">
-                {r.trial.plan === 'TRIAL' && (
-                  <AppButton size="sm" onClick={() => onMakeStandard(r.org)}>
-                    {L('Κανονική χρήση', 'Standard use')}
-                  </AppButton>
-                )}
-                <button
-                  className="owner-open"
-                  onClick={() => onOpenUsers(r.org.id)}
-                  aria-label={L(`Χρήστες ${r.org.name}`, `${r.org.name} users`)}
-                  title={L('Χρήστες', 'Users')}
-                >
-                  <ChevronRight size={17} />
-                </button>
-              </span>
-            </div>
-          ))}
-        </div>
-        {locked.length + ending.length > 0 && (
-          <p className="owner-footnote">
-            <AlertTriangle size={14} />
-            {L(
-              'Μετά τη λήξη της δοκιμαστικής περιόδου το νοσοκομείο κλειδώνει για όλους εκτός από εσάς. Τα δεδομένα μένουν.',
-              'After a trial ends the hospital locks for everyone but you. The data stays.',
-            )}
-          </p>
-        )}
-      </section>
     </div>
   );
 }
