@@ -35,7 +35,7 @@ export default function TraceabilityPage() {
             <small>{asset.barcode.startsWith('S') ? 'SET' : tr('ΕΡΓΑΛΕΙΟ')}</small>
             <h2>{asset.barcode}</h2>
             <p>
-              {asset.name} · {'department' in asset ? asset.department || 'Stock' : 'Stock'} · {asset.state}
+              {asset.name} · {'department' in asset ? asset.department || 'Απόθεμα' : 'Απόθεμα'} · {asset.state}
             </p>
           </div>
         </div>

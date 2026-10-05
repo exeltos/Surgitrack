@@ -65,7 +65,7 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ενέργειες',
-          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, εκτύπωση barcode και, στο κουμπί «Ενέργειες», αναφορά προβλήματος και διαχείριση (τμήμα, Σετ, Stock, Service, απώλεια). Μια ενέργεια διαχείρισης αναιρείται από την ειδοποίηση για λίγα δευτερόλεπτα· το ιστορικό κρατά και την αναίρεση.',
+          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, εκτύπωση barcode και, στο κουμπί «Ενέργειες», αναφορά προβλήματος και διαχείριση (τμήμα, Σετ, Απόθεμα, Service, απώλεια). Μια ενέργεια διαχείρισης αναιρείται από την ειδοποίηση για λίγα δευτερόλεπτα· το ιστορικό κρατά και την αναίρεση.',
         ],
         en: [
           'Actions',
@@ -372,7 +372,7 @@ export const helpManual: ManualSection[] = [
     permission: 'asset.registry.view',
     title: {el: 'Εργαλεία', en: 'Instruments'},
     summary: {
-      el: 'Το γενικό μητρώο όλων των φυσικών εργαλείων, σε Σετ, μεμονωμένα ή στο Stock.',
+      el: 'Το γενικό μητρώο όλων των φυσικών εργαλείων, σε Σετ, μεμονωμένα ή στο Απόθεμα.',
       en: 'The register of every physical instrument, in Sets, standalone or in Stock.',
     },
     audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
@@ -449,7 +449,7 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Διαχείριση σύνθεσης',
-          'Ο Προϊστάμενος Αποστείρωσης προσθέτει εργαλεία από το Stock ή αφαιρεί εργαλεία. Εργαλείο με δικό του χρώμα που μπαίνει σε Σετ ρωτά αν κρατά το χρώμα του.',
+          'Ο Προϊστάμενος Αποστείρωσης προσθέτει εργαλεία από το Απόθεμα ή αφαιρεί εργαλεία. Εργαλείο με δικό του χρώμα που μπαίνει σε Σετ ρωτά αν κρατά το χρώμα του.',
         ],
         en: [
           'Managing composition',
@@ -521,7 +521,7 @@ export const helpManual: ManualSection[] = [
   {
     to: '/stock',
     permission: 'stock.manage',
-    title: {el: 'Stock εργαλείων', en: 'Instrument Stock'},
+    title: {el: 'Απόθεμα εργαλείων', en: 'Instrument Stock'},
     summary: {
       el: 'Διαθέσιμα εργαλεία εκτός Σετ και τμημάτων, έτοιμα να συμπληρώσουν Σετ.',
       en: 'Available instruments outside Sets and departments, ready to complete a Set.',
@@ -531,7 +531,7 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσθήκη σε Σετ',
-          'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Stock. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
+          'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Απόθεμα. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
         ],
         en: [
           'Add to a Set',
@@ -543,7 +543,7 @@ export const helpManual: ManualSection[] = [
       el: [
         'Ανοίξτε «Σετ με έλλειψη» για να δείτε τι λείπει.',
         'Ανοίξτε το Σετ και πατήστε «Προσθήκη εργαλείων».',
-        'Διαλέξτε το εργαλείο από την καρτέλα Stock.',
+        'Διαλέξτε το εργαλείο από την καρτέλα Απόθεμα.',
       ],
       en: [
         'Open "Sets with missing items" to see what is missing.',
@@ -727,7 +727,7 @@ export const glossary: Array<{term: string; el: string; en: string}> = [
     en: 'An instrument that belongs to a department and circulates on its own.',
   },
   {
-    term: 'Stock',
+    term: 'Απόθεμα / Stock',
     el: 'Διαθέσιμα εργαλεία εκτός Σετ και τμημάτων, για συμπλήρωση Σετ.',
     en: 'Available instruments outside Sets and departments, used to complete Sets.',
   },

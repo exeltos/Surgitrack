@@ -52,7 +52,8 @@ export default function AssetManageModal({
         {
           id: 'RETURN',
           icon: <CircleCheck size={18} />,
-          title: asset.state === 'LOST' ? tr('Βρέθηκε · επιστροφή στο Stock') : tr('Επιστροφή από Service στο Stock'),
+          title:
+            asset.state === 'LOST' ? tr('Βρέθηκε · επιστροφή στο Απόθεμα') : tr('Επιστροφή από Service στο Απόθεμα'),
           hint: tr('Το εργαλείο ξαναμπαίνει σε χρήση και μπορεί να μπει σε Σετ.'),
         },
       ]
@@ -88,7 +89,7 @@ export default function AssetManageModal({
               {
                 id: 'STOCK' as const,
                 icon: <PackageOpen size={18} />,
-                title: tr('Επιστροφή στο Stock'),
+                title: tr('Επιστροφή στο Απόθεμα'),
                 hint: tr('Διαθέσιμο για αντικατάσταση ή για νέο Σετ.'),
               },
             ]
@@ -287,7 +288,7 @@ export default function AssetManageModal({
                 >
                   <b className="mono">{s.barcode}</b>
                   <span>{s.name}</span>
-                  <small>{s.department || 'Stock'}</small>
+                  <small>{s.department || 'Απόθεμα'}</small>
                 </button>
               ))}
               {targets.length === 0 && <p>{tr('Δεν βρέθηκαν Σετ.')}</p>}

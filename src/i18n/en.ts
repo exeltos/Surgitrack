@@ -115,8 +115,9 @@ export const en: Record<string, string> = {
   'Set / Εργαλείο': 'Set / Instrument',
   'Set προορισμού': 'Destination set',
   Stock: 'Stock',
-  'Stock Σετ': 'Stock set',
-  'Stock εργαλείων': 'Instrument stock',
+  Απόθεμα: 'Stock',
+  'Απόθεμα Σετ': 'Stock set',
+  'Απόθεμα εργαλείων': 'Instrument stock',
   'T + 6 ψηφία': 'T + 6 digits',
   'Upload φωτογραφιών': 'Upload photos',
   'stage|Καθαρισμός': 'Cleaning',
@@ -143,7 +144,7 @@ export const en: Record<string, string> = {
   '{0} εκκρεμότητες επιλύθηκαν.': '{0} issues resolved.',
   '{0} εργαλεία': '{0} instruments',
   '{0} εργαλεία προστέθηκαν στο {1}.': '{0} instruments added to {1}.',
-  '{0} μετακινήθηκε στο Stock.': '{0} moved to stock.',
+  '{0} μετακινήθηκε στο Απόθεμα.': '{0} moved to stock.',
   '{0} μετακινήθηκε στο {1}.': '{0} moved to {1}.',
   '{0} μεταφέρθηκε στα Χαλασμένα / Service.': '{0} moved to Damaged / Service.',
   '{0} προσκλήσεις απέτυχαν.': '{0} invitations failed.',
@@ -161,7 +162,7 @@ export const en: Record<string, string> = {
     '{0}: cannot circulate — it is under an active recall.',
   '{0}: δημιουργήθηκε με αντίγραφα εργαλείων και νέα barcodes.':
     '{0}: created with copies of the instruments and new barcodes.',
-  '{0}: δημιουργήθηκε νέο αντίγραφο εργαλείου στο Stock.': '{0}: a new instrument copy was created in stock.',
+  '{0}: δημιουργήθηκε νέο αντίγραφο εργαλείου στο Απόθεμα.': '{0}: a new instrument copy was created in stock.',
   '{0}: δημιουργήθηκε ως κενό Σετ.': '{0}: created as an empty set.',
   '{0}: καταγράφηκε επανέκδοση barcode.': '{0}: barcode reissue recorded.',
   '{0}: ο κύκλος ολοκληρώθηκε και αναμένει έλεγχο αποδέσμευσης.':
@@ -169,7 +170,8 @@ export const en: Record<string, string> = {
   '{0}: οι αλλαγές αποθηκεύτηκαν.': '{0}: changes saved.',
   '{0}: ολοκληρώθηκε το στάδιο «{1}».': '{0}: stage “{1}” completed.',
   '{0}: το εργαλείο διαγράφηκε.': '{0}: the instrument was deleted.',
-  '{0}: το νέο Set δημιουργήθηκε αυτόματα στο Stock Σετ.': '{0}: the new set was created automatically as a stock set.',
+  '{0}: το νέο Set δημιουργήθηκε αυτόματα στο Απόθεμα Σετ.':
+    '{0}: the new set was created automatically as a stock set.',
   '{0}: το νέο Set δημιουργήθηκε.': '{0}: the new set was created.',
   '· Κωδικός:': '· Code:',
   '· αναμενόμενο εργαλείο που λείπει από τη φυσική σύνθεση':
@@ -209,7 +211,7 @@ export const en: Record<string, string> = {
   'Έλλειψη {0}': 'Missing {0}',
   'Έλλειψη {0} εργαλείων. Θα δημιουργηθεί εκκρεμότητα.': '{0} instruments missing. An issue will be created.',
   'Έλλειψη σύνθεσης': 'Composition shortage',
-  'Έξοδος Σετ από Stock': 'Set taken out of stock',
+  'Έξοδος Σετ από Απόθεμα': 'Set taken out of stock',
   Έτοιμα: 'Ready',
   'Έτοιμα για παραλαβή': 'Ready for pickup',
   'Έτοιμο για έλεγχο': 'Ready for check',
@@ -352,7 +354,7 @@ export const en: Record<string, string> = {
   'Βλάβη / Service': 'Damage / Service',
   'Βλάβη / μη λειτουργικό': 'Damaged / not working',
   'Βλάβη, φθορά ή άλλη απόκλιση': 'Damage, wear or other deviation',
-  'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Stock, σε Σετ ή χρησιμοποιούνται μεμονωμένα.':
+  'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Απόθεμα, σε Σετ ή χρησιμοποιούνται μεμονωμένα.':
     'General registry of every physical instrument, whether in stock, in a set or used on its own.',
   'Γρήγορη σάρωση barcode': 'Quick barcode scan',
   'Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.':
@@ -400,7 +402,7 @@ export const en: Record<string, string> = {
   'Δηλώθηκε εμφανής απόκλιση κατά τη μαζική φυσική παραλαβή.':
     'A visible deviation was declared at the batch physical receipt.',
   'Δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.': 'A visible deviation was declared at physical receipt.',
-  'Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes στο Stock.':
+  'Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes στο Απόθεμα.':
     '{0} instruments created in stock with unique barcodes.',
   'Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes.': '{0} instruments created with unique barcodes.',
   Δημιουργήθηκε: 'Created',
@@ -490,7 +492,7 @@ export const en: Record<string, string> = {
   Επιλεγμένα: 'Selected',
   'Επιλογή Set…': 'Select set…',
   'Επιλογή Σετ...': 'Select set...',
-  'Επιλογή εργαλείου από Stock, άλλο Set ή μεμονωμένο': 'Pick an instrument from stock, another set or standalone',
+  'Επιλογή εργαλείου από Απόθεμα, άλλο Set ή μεμονωμένο': 'Pick an instrument from stock, another set or standalone',
   'Επιλογή εργαλείου…': 'Select instrument…',
   'Επιλογή όλων': 'Select all',
   'Επιλογή όλων του τμήματος': 'Select all of the department',
@@ -587,7 +589,7 @@ export const en: Record<string, string> = {
   'Ημερομηνία / ώρα': 'Date / time',
   Θέση: 'Location',
   'Θα αφαιρεθεί από το Set': 'Will be removed from set',
-  'Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Stock. Θέλεις να συνεχίσεις;':
+  'Θα δημιουργηθεί νέο φυσικό εργαλείο με τα ίδια βασικά στοιχεία, νέο μοναδικό barcode και χωρίς ιστορικό ή καταγεγραμμένες χρήσεις. Το νέο εργαλείο θα τοποθετηθεί στο Απόθεμα. Θέλεις να συνεχίσεις;':
     'A new physical instrument will be created with the same core details, a new unique barcode and no history or recorded uses. The new instrument will be placed in stock. Continue?',
   'Θα καταχωρηθεί στο τμήμα {0}.': 'It will be registered to department {0}.',
   'Θα μετακινηθούν {0} φυσικά εργαλεία στο {1}. Η προηγούμενη θέση τους θα καταγραφεί στο ιστορικό.':
@@ -715,12 +717,12 @@ export const en: Record<string, string> = {
     'After recording, the item moves to “Release” for the final check.',
   'Μετατροπή σε μεμονωμένο σε χρήση': 'Converted to standalone in use',
   'Μεταφορά εργαλείου σε Set': 'Instrument moved to a set',
-  'Μεταφορά εργαλείου στο Stock': 'Instrument moved to stock',
-  'Μεταφορά ολόκληρου Σετ στο Stock': 'Whole set moved to stock',
+  'Μεταφορά εργαλείου στο Απόθεμα': 'Instrument moved to stock',
+  'Μεταφορά ολόκληρου Σετ στο Απόθεμα': 'Whole set moved to stock',
   'Μεταφορά σε άλλο Set': 'Move to another set',
   'Μεταφορά σε διαφορετικό Set': 'Move to a different set',
   'Μεταφορά στα Χαλασμένα / Service': 'Move to Damaged / Service',
-  'Μεταφορά στο Stock': 'Moved to stock',
+  'Μεταφορά στο Απόθεμα': 'Moved to stock',
   'Μη αποδέσμευση': 'Not released',
   'Μη αποδέσμευση · Επανεπεξεργασία': 'Do not release · Reprocess',
   'Μη αποδέσμευση · όλο το φορτίο': 'Do not release · whole load',
@@ -799,7 +801,7 @@ export const en: Record<string, string> = {
   'Ονομασία, κωδικός, barcode ή serial...': 'Name, code, barcode or serial...',
   'Ονομασία, κωδικός, barcode, serial...': 'Name, code, barcode, serial...',
   Ονοματεπώνυμο: 'Full name',
-  'Ορίστε Τμήμα για να βγει το Σετ από το Stock.': 'Set a department to take the set out of stock.',
+  'Ορίστε Τμήμα για να βγει το Σετ από το Απόθεμα.': 'Set a department to take the set out of stock.',
   'Ορίστηκε όριο {0} χρήσεων.': 'Usage limit set to {0}.',
   'Οριστική αφαίρεση και των φυσικών εργαλείων.': 'Also permanently removes the physical instruments.',
   'Οριστική διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του;': 'Permanently delete the set AND all its instruments?',
@@ -985,7 +987,7 @@ export const en: Record<string, string> = {
     "The department's sets and standalone instruments, reports and electronic dispatch to Central Sterile Services.",
   'Τα βασικά στοιχεία εμφανίζονται σε μία καθαρή γραμμή · αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα':
     'Key details on one clear line · report only if a visible problem is found',
-  'Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Stock.': 'The instruments are released and moved to stock.',
+  'Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Απόθεμα.': 'The instruments are released and moved to stock.',
   'Τα εργαλεία είναι οπτικά καθαρά και πλήρως στεγνά.': 'The instruments are visibly clean and fully dry.',
   'Ταυτοποίησε τον παραδίδοντα μία φορά και σκάναρε διαδοχικά τα αντικείμενα του ίδιου τμήματος.':
     'Identify the sender once and scan the items of the same department one after another.',
@@ -1008,12 +1010,12 @@ export const en: Record<string, string> = {
   'Το barcode δεν βρέθηκε στην ενεργή ροή.': 'Barcode not found in the active workflow.',
   'Το {0} βρίσκεται σε ενεργή διαδικασία αποστείρωσης. Η διαδικασία πρέπει να ολοκληρωθεί ή να ακυρωθεί με καταγεγραμμένο τρόπο πριν επιτραπεί η διαγραφή του εργαλείου.':
     '{0} is in an active sterilization process. The process must be completed or cancelled in a recorded way before the instrument can be deleted.',
-  'Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Stock.':
+  'Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Απόθεμα.':
     'The set was deleted and its instruments moved to stock.',
   'Το Σετ και τα εργαλεία του διαγράφηκαν.': 'The set and its instruments were deleted.',
   'Το αποτέλεσμα συμφωνεί με τα κριτήρια της μονάδας.': "The result meets the unit's criteria.",
   'Το εργαλείο δεν βρέθηκε.': 'Instrument not found.',
-  'Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Stock.':
+  'Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Απόθεμα.':
     'The instrument will be removed from the set and returned to central stock.',
   'Το εργαλείο θα αφαιρεθεί από το Set και θα μεταφερθεί στα Χαλασμένα / Service.':
     'The instrument will be removed from the set and moved to Damaged / Service.',
@@ -1094,13 +1096,13 @@ export const en: Record<string, string> = {
     'Use the camera or pick several images from the device.',
   'Χρησιμοποιήθηκε {0}% του ορίου': '{0}% of the limit used',
   'Χωρίς serial': 'No serial',
-  'Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Stock εργαλείων.':
+  'Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Απόθεμα εργαλείων.':
     'Without a department, it will be registered automatically in instrument stock.',
-  'Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Stock Σετ.':
+  'Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Απόθεμα Σετ.':
     'Without a department, it will be registered automatically as a whole stock set.',
-  'Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Stock Σετ και παραμένει ενιαίο.':
+  'Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Απόθεμα Σετ και παραμένει ενιαίο.':
     'Without a department, the set is registered automatically as a stock set and stays whole.',
-  'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Stock εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.':
+  'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Απόθεμα εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.':
     'Without a department, the instrument goes to instrument stock automatically. With a department, it is registered as standalone in use.',
   'Χωρίς απόκλιση': 'No deviation',
   'Χωρίς ειδικότητα': 'No specialty',
@@ -1118,8 +1120,8 @@ export const en: Record<string, string> = {
   ανοικτή: 'open',
   αντικείμενα: 'items',
   από: 'of',
-  'αυτόματα στο Stock': 'automatically to stock',
-  'αυτόματα ως ενιαίο Stock Σετ': 'automatically as a whole stock set',
+  'αυτόματα στο Απόθεμα': 'automatically to stock',
+  'αυτόματα ως ενιαίο Απόθεμα Σετ': 'automatically as a whole stock set',
   διαθέσιμες: 'available',
   εγγραφές: 'records',
   εγγραφή: 'record',
@@ -1168,13 +1170,13 @@ export const en: Record<string, string> = {
   'χρήσεις. Το αντικείμενο εμφανίζεται στις ειδοποιήσεις.': 'uses left. The item appears in notifications.',
   'χωρίς εμφανή απόκλιση': 'no visible deviation',
   'χωρίς τμήμα': 'no department',
-  '— Stock Σετ': '— Stock set',
+  '— Απόθεμα Σετ': '— Stock set',
   '— Χωρίς ειδικότητα —': '— No specialty —',
   '— Χωρίς κατασκευαστή —': '— No manufacturer —',
-  '— Χωρίς τμήμα / Stock —': '— No department / Stock —',
+  '— Χωρίς τμήμα / Απόθεμα —': '— No department / Stock —',
   '→ Κεντρική Αποστείρωση': '→ Central Sterile Services',
   '≤ 3 χρήσεις': '≤ 3 uses',
-  'Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Stock) κάνει ο Προϊστάμενος Αποστείρωσης.':
+  'Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.':
     'Set changes (replacement, service, stock) are made by the Sterilization supervisor.',
   'Εξαγωγή Excel': 'Export to Excel',
   'Από ημερομηνία': 'From date',
@@ -1185,8 +1187,8 @@ export const en: Record<string, string> = {
   'Αντίγραφο Σετ': 'Duplicate Set',
   'Επιβεβαίωση αντιγράφου εργαλείου': 'Confirm instrument duplicate',
   'Εκτύπωση / Αποθήκευση PDF': 'Print / Save as PDF',
-  'Βρέθηκε · επιστροφή στο Stock': 'Found · back to stock',
-  'Επιστροφή από Service στο Stock': 'Back from service to stock',
+  'Βρέθηκε · επιστροφή στο Απόθεμα': 'Found · back to stock',
+  'Επιστροφή από Service στο Απόθεμα': 'Back from service to stock',
   'Το εργαλείο ξαναμπαίνει σε χρήση και μπορεί να μπει σε Σετ.':
     'The instrument returns to use and can be placed in a Set.',
   'Μετακίνηση σε άλλο Σετ': 'Move to another Set',
@@ -1195,7 +1197,7 @@ export const en: Record<string, string> = {
     'The instrument leaves its current Set and joins the new one.',
   'Αφαίρεση από το Σετ ως μεμονωμένο': 'Remove from the Set as standalone',
   'Μένει στο ίδιο τμήμα ως μεμονωμένο εργαλείο.': 'It stays in the same department as a standalone instrument.',
-  'Επιστροφή στο Stock': 'Return to stock',
+  'Επιστροφή στο Απόθεμα': 'Return to stock',
   'Διαθέσιμο για αντικατάσταση ή για νέο Σετ.': 'Available for replacement or a new Set.',
   'Αποστολή σε Service': 'Send to service',
   'Για επισκευή ή έλεγχο· ανοίγει εκκρεμότητα.': 'For repair or inspection; opens an issue.',
@@ -1292,7 +1294,7 @@ export const en: Record<string, string> = {
   'Νέο Σετ με τα ίδια στοιχεία': 'New Set with the same details',
   'Σαρώθηκε παλιό barcode {0}. Το τωρινό barcode είναι {1}: κολλήστε τη νέα ετικέτα.':
     'Old barcode {0} was scanned. The current barcode is {1}: attach the new label.',
-  'Άλλο Σετ, Stock, Service, απώλεια': 'Other Set, stock, service, loss',
+  'Άλλο Σετ, Απόθεμα, Service, απώλεια': 'Other Set, stock, service, loss',
   'Νέο εργαλείο με τα ίδια στοιχεία': 'New instrument with the same details',
   'ΝΕΟ BARCODE': 'NEW BARCODE',
   Τωρινό: 'Current',
@@ -1334,7 +1336,7 @@ export const en: Record<string, string> = {
   Πλήρη: 'Complete',
   'Με έλλειψη': 'Missing items',
   '{0} φυσικές εγγραφές': '{0} physical records',
-  'Τμήμα, Σετ, Stock, Service, απώλεια': 'Department, Set, Stock, Service, loss',
+  'Τμήμα, Σετ, Απόθεμα, Service, απώλεια': 'Department, Set, Stock, Service, loss',
   'Τμήμα, Service, απώλεια, επιστροφή': 'Department, Service, loss, return',
   'Καταχώρηση σε τμήμα': 'Assign to a department',
   'Αλλαγή τμήματος': 'Change department',

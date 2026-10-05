@@ -2679,6 +2679,76 @@ a.overview-bar:hover {
 .asset-import-preview small {
   color: var(--st-muted, #6f808c);
 }
+/* The instruments an import will create, shown at the check step. */
+.asset-import-tools {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.asset-import-tools > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.asset-import-tools-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: min(320px, 100%);
+  padding: 0 10px;
+  border: 1px solid #d6e2e7;
+  border-radius: 9px;
+  background: #fff;
+  color: #6f808c;
+}
+.asset-import-tools-search input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+}
+.asset-import-tools-table {
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid #e3ecf1;
+  border-radius: 10px;
+}
+.asset-import-tools-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.asset-import-tools-table th {
+  position: sticky;
+  top: 0;
+  padding: 8px 10px;
+  background: #f3f7f8;
+  color: #6f808c;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.asset-import-tools-table td {
+  padding: 7px 10px;
+  border-top: 1px solid #edf2f4;
+  color: #1d3340;
+}
+.asset-import-tools-table td.mono {
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+}
+.asset-import-tools > small {
+  color: #6f808c;
+  font-size: 12px;
+}
 .asset-import-progress {
   position: relative;
   height: 22px;

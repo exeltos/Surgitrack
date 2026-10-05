@@ -32,7 +32,7 @@ const assetNavigation: NavigationItem[] = [
   {to: '/tools', label: 'Εργαλεία', icon: Wrench, exactSearch: '', permission: 'asset.registry.view'},
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view'},
   {to: '/standalone-tools', label: 'Μεμονωμένα σε χρήση', icon: Wrench, permission: 'asset.registry.view'},
-  {to: '/stock', label: 'Stock εργαλείων', icon: Warehouse, permission: 'stock.manage'},
+  {to: '/stock', label: 'Απόθεμα εργαλείων', icon: Warehouse, permission: 'stock.manage'},
   {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view'},
   {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},

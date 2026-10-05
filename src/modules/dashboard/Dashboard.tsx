@@ -131,7 +131,7 @@ export default function Dashboard() {
             <strong>{ready}</strong>
           </div>
           <div>
-            <small>Διαθέσιμα στο Stock</small>
+            <small>Διαθέσιμα στο Απόθεμα</small>
             <strong>{stock}</strong>
           </div>
         </div>

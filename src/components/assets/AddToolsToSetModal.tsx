@@ -38,7 +38,7 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
     [sourceTools, q, department, specialty, manufacturer],
   );
   const label = tr(
-    source === 'STOCK' ? 'Stock εργαλείων' : source === 'SET_MEMBER' ? 'άλλα Σετ' : 'Μεμονωμένα σε χρήση',
+    source === 'STOCK' ? 'Απόθεμα εργαλείων' : source === 'SET_MEMBER' ? 'άλλα Σετ' : 'Μεμονωμένα σε χρήση',
   );
   const sourceCount = (value: Source) => tools.filter(t => t.setId !== setId && t.mode === value).length;
   const chooseSource = (value: Source) => {
@@ -166,7 +166,7 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
                         ? tr('{0} · {1}', set?.barcode || 'Σετ', set?.name || '')
                         : source === 'STANDALONE'
                           ? t.department || '—'
-                          : 'Stock'}
+                          : 'Απόθεμα'}
                     </span>
                   </button>
                 );

@@ -83,7 +83,7 @@ export const IMPORT_FIELDS: ReadonlyArray<{
     key: 'department',
     el: 'Τμήμα',
     en: 'Department',
-    hintEl: 'Όπως στο Studio· κενό = Stock',
+    hintEl: 'Όπως στο Studio· κενό = Απόθεμα',
     hintEn: 'As in Studio; empty = Stock',
     aliases: ['τμημα', 'department', 'κλινικη', 'dept'],
   },
@@ -461,7 +461,7 @@ export const templateTable = (lang: 'el' | 'en') => ({
   title: lang === 'el' ? 'Πρότυπο εισαγωγής εργαλείων' : 'Instrument import template',
   subtitle:
     lang === 'el'
-      ? 'Μία γραμμή ανά εργαλείο. Ίδιο όνομα Σετ = ίδιο Σετ. Κενό Σετ = μεμονωμένο εργαλείο· κενό τμήμα = Stock.'
+      ? 'Μία γραμμή ανά εργαλείο. Ίδιο όνομα Σετ = ίδιο Σετ. Κενό Σετ = μεμονωμένο εργαλείο· κενό τμήμα = Απόθεμα.'
       : 'One row per instrument. Same Set name = same Set. No Set = standalone instrument; no department = Stock.',
   headers: IMPORT_FIELDS.map(f => (lang === 'el' ? f.el : f.en)),
   rows: [

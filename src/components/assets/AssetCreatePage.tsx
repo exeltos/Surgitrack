@@ -160,7 +160,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             <label>
               <span>{tr('Τμήμα')}</span>
               <select className="asset-inline-input" value={department} onChange={e => setDepartment(e.target.value)}>
-                <option value="">{tr('— Χωρίς τμήμα / Stock —')}</option>
+                <option value="">{tr('— Χωρίς τμήμα / Απόθεμα —')}</option>
                 {allowedDepartments.map(x => (
                   <option key={x.id} value={x.el}>
                     {x.el}
@@ -169,9 +169,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               </select>
               <small>
                 {kind === 'SET'
-                  ? tr('Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Stock Σετ και παραμένει ενιαίο.')
+                  ? tr('Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Απόθεμα Σετ και παραμένει ενιαίο.')
                   : tr(
-                      'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Stock εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.',
+                      'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Απόθεμα εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.',
                     )}
               </small>
             </label>
@@ -250,7 +250,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 <AssetTypeIcon kind="TOOL" maxUses={limited ? Number(maxUses) || 1 : undefined} size={17} />
                 <div>
                   <span>{tr('Καταχώριση')}</span>
-                  <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Stock εργαλείων')}</strong>
+                  <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}</strong>
                 </div>
               </div>
             )}
@@ -316,22 +316,22 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                   <div className="form-grid form-grid-comfortable">
                     {kind === 'SET' && (
                       <div className="asset-inline-info">
-                        <strong>{department.trim() ? tr('Σετ σε χρήση') : tr('Stock Σετ')}</strong>
+                        <strong>{department.trim() ? tr('Σετ σε χρήση') : tr('Απόθεμα Σετ')}</strong>
                         <small>
                           {department.trim()
                             ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
-                            : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Stock Σετ.')}
+                            : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Απόθεμα Σετ.')}
                         </small>
                       </div>
                     )}
                     {kind === 'TOOL' && (
                       <>
                         <div className="asset-inline-info">
-                          <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Stock εργαλείων')}</strong>
+                          <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}</strong>
                           <small>
                             {department.trim()
                               ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
-                              : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Stock εργαλείων.')}
+                              : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Απόθεμα εργαλείων.')}
                           </small>
                         </div>
                         <label>
@@ -404,7 +404,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                       const parent = sets.find(s => s.id === t.setId);
                       const sourceLabel =
                         t.mode === 'STOCK'
-                          ? 'Stock'
+                          ? 'Απόθεμα'
                           : t.mode === 'SET_MEMBER'
                             ? `${parent?.barcode || tr('Σετ')} · ${parent?.name || ''}`
                             : trData(t.department) || '—';
