@@ -1,11 +1,40 @@
-import {useMemo, useState} from 'react';
+import {createContext, useContext, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {AlertTriangle, ArrowLeft, ArrowRight, CheckCheck, Search, SpellCheck2, Wand2} from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  CheckCheck,
+  ChevronRight,
+  Search,
+  SpellCheck2,
+  Wand2,
+  X,
+} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {cleanName, cleanUps, codeGroups, type CodeGroup} from '../../core/nameCheck';
-import {tr} from '../../i18n';
+import {tr, trData} from '../../i18n';
+import {statusLabel} from '../../components/ui/statusLabel';
+
+/** Opens the list of the instruments behind a count. */
+const ShowTools = createContext<(ids: string[], title: string) => void>(() => {});
+
+/** A count that opens its instruments. */
+function CountButton({ids, title}: {ids: string[]; title: string}) {
+  const show = useContext(ShowTools);
+  return (
+    <button
+      type="button"
+      className="name-check-count"
+      title={tr('Εμφάνιση εργαλείων')}
+      onClick={() => show(ids, title)}
+    >
+      {ids.length}
+    </button>
+  );
+}
 
 const PAGE = 40;
 
@@ -16,7 +45,8 @@ const PAGE = 40;
  */
 export default function NameCheckPage() {
   const navigate = useNavigate();
-  const {tools, can, renameTools} = useSurgi();
+  const {tools, sets, can, renameTools} = useSurgi();
+  const [list, setList] = useState<{ids: string[]; title: string}>();
   const [tab, setTab] = useState<'CLEAN' | 'CODES'>('CLEAN');
   const fixes = useMemo(() => cleanUps(tools), [tools]);
   const groups = useMemo(() => codeGroups(tools), [tools]);
@@ -26,68 +56,73 @@ export default function NameCheckPage() {
   const currentName = useMemo(() => new Map(tools.map(t => [t.id, t.name])), [tools]);
 
   return (
-    <div className="name-check">
-      <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
-        title={tr('Έλεγχος ονομασιών')}
-        description={tr(
-          'Ενιαίες ονομασίες για τα ίδια εργαλεία: πρώτα οι διορθώσεις γραφής, μετά οι κωδικοί με περισσότερες από μία ονομασίες. Κάθε αλλαγή γράφεται στο ιστορικό και αναιρείται.',
+    <ShowTools.Provider value={(ids, title) => setList({ids, title})}>
+      <div className="name-check">
+        <PageHeader
+          eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+          title={tr('Έλεγχος ονομασιών')}
+          description={tr(
+            'Ενιαίες ονομασίες για τα ίδια εργαλεία: πρώτα οι διορθώσεις γραφής, μετά οι κωδικοί με περισσότερες από μία ονομασίες. Κάθε αλλαγή γράφεται στο ιστορικό και αναιρείται.',
+          )}
+          actions={
+            <AppButton icon={<ArrowLeft size={16} />} onClick={() => navigate('/tools')}>
+              {tr('Εργαλεία')}
+            </AppButton>
+          }
+        />
+        <div className="name-check-kpis">
+          <div>
+            <span>{tr('Εργαλεία')}</span>
+            <strong>{tools.length}</strong>
+          </div>
+          <div>
+            <span>{tr('Διαφορετικές ονομασίες')}</span>
+            <strong>{distinct}</strong>
+          </div>
+          <div className={fixes.length ? 'warn' : 'good'}>
+            <span>{tr('Διορθώσεις γραφής')}</span>
+            <strong>{fixes.length}</strong>
+            <small>
+              {tr(
+                '{0} εργαλεία',
+                fixes.reduce((sum, f) => sum + f.items.length, 0),
+              )}
+            </small>
+          </div>
+          <div className={groups.length ? 'warn' : 'good'}>
+            <span>{tr('Κωδικοί με πολλές ονομασίες')}</span>
+            <strong>{groups.length}</strong>
+            <small>{tr('{0} με πιθανό λάθος κωδικό', odd)}</small>
+          </div>
+        </div>
+        <div className="name-check-tabs" role="tablist">
+          <button
+            role="tab"
+            aria-selected={tab === 'CLEAN'}
+            className={tab === 'CLEAN' ? 'active' : ''}
+            onClick={() => setTab('CLEAN')}
+          >
+            <Wand2 size={16} /> {tr('Διορθώσεις γραφής')} <b>{fixes.length}</b>
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'CODES'}
+            className={tab === 'CODES' ? 'active' : ''}
+            onClick={() => setTab('CODES')}
+          >
+            <SpellCheck2 size={16} /> {tr('Ίδιος κωδικός, πολλές ονομασίες')} <b>{groups.length}</b>
+          </button>
+        </div>
+        {tab === 'CLEAN' ? (
+          <CleanUps fixes={fixes} editable={editable} onApply={renameTools} />
+        ) : (
+          <CodeGroups groups={groups} currentName={currentName} editable={editable} onApply={renameTools} />
         )}
-        actions={
-          <AppButton icon={<ArrowLeft size={16} />} onClick={() => navigate('/tools')}>
-            {tr('Εργαλεία')}
-          </AppButton>
-        }
-      />
-      <div className="name-check-kpis">
-        <div>
-          <span>{tr('Εργαλεία')}</span>
-          <strong>{tools.length}</strong>
-        </div>
-        <div>
-          <span>{tr('Διαφορετικές ονομασίες')}</span>
-          <strong>{distinct}</strong>
-        </div>
-        <div className={fixes.length ? 'warn' : 'good'}>
-          <span>{tr('Διορθώσεις γραφής')}</span>
-          <strong>{fixes.length}</strong>
-          <small>
-            {tr(
-              '{0} εργαλεία',
-              fixes.reduce((sum, f) => sum + f.items.length, 0),
-            )}
-          </small>
-        </div>
-        <div className={groups.length ? 'warn' : 'good'}>
-          <span>{tr('Κωδικοί με πολλές ονομασίες')}</span>
-          <strong>{groups.length}</strong>
-          <small>{tr('{0} με πιθανό λάθος κωδικό', odd)}</small>
-        </div>
       </div>
-      <div className="name-check-tabs" role="tablist">
-        <button
-          role="tab"
-          aria-selected={tab === 'CLEAN'}
-          className={tab === 'CLEAN' ? 'active' : ''}
-          onClick={() => setTab('CLEAN')}
-        >
-          <Wand2 size={16} /> {tr('Διορθώσεις γραφής')} <b>{fixes.length}</b>
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'CODES'}
-          className={tab === 'CODES' ? 'active' : ''}
-          onClick={() => setTab('CODES')}
-        >
-          <SpellCheck2 size={16} /> {tr('Ίδιος κωδικός, πολλές ονομασίες')} <b>{groups.length}</b>
-        </button>
-      </div>
-      {tab === 'CLEAN' ? (
-        <CleanUps fixes={fixes} editable={editable} onApply={renameTools} />
-      ) : (
-        <CodeGroups groups={groups} currentName={currentName} editable={editable} onApply={renameTools} />
+      {list && (
+        <ToolsList ids={list.ids} title={list.title} tools={tools} sets={sets} onClose={() => setList(undefined)} />
       )}
-    </div>
+    </ShowTools.Provider>
   );
 }
 
@@ -163,7 +198,9 @@ function CleanUps({fixes, editable, onApply}: {fixes: ReturnType<typeof cleanUps
                   <ArrowRight size={14} />
                 </td>
                 <td className="to">{f.to}</td>
-                <td className="num">{f.items.length}</td>
+                <td className="num">
+                  <CountButton ids={f.items.map(t => t.id)} title={f.from} />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -312,7 +349,7 @@ function CodeGroupCard({
               )}
               <span>{n.name}</span>
             </label>
-            <b>{n.count}</b>
+            <CountButton ids={n.ids} title={`${group.code} · ${n.name}`} />
             {n.odd && <em>{tr('Άλλο εργαλείο;')}</em>}
           </li>
         ))}
@@ -335,5 +372,73 @@ function CodeGroupCard({
         </footer>
       )}
     </article>
+  );
+}
+
+const LIST_ROWS = 300;
+
+/** The instruments behind a count: where each one is now, opening its page on a click. */
+function ToolsList({
+  ids,
+  title,
+  tools,
+  sets,
+  onClose,
+}: {
+  ids: string[];
+  title: string;
+  tools: ReturnType<typeof useSurgi>['tools'];
+  sets: ReturnType<typeof useSurgi>['sets'];
+  onClose: () => void;
+}) {
+  const navigate = useNavigate();
+  const wanted = new Set(ids);
+  const rows = tools.filter(t => wanted.has(t.id));
+  const setName = new Map(sets.map(x => [x.id, `${x.barcode} · ${x.name}`]));
+  const place = (t: (typeof rows)[number]) =>
+    t.setId ? setName.get(t.setId) || tr('Σετ') : t.mode === 'STOCK' ? tr('Απόθεμα') : trData(t.department) || '—';
+  return (
+    <div className="modal-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
+      <div className="name-check-list" role="dialog" aria-modal="true">
+        <header>
+          <div>
+            <span>{tr('{0} εργαλεία', rows.length)}</span>
+            <h3>{title}</h3>
+          </div>
+          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
+            <X size={18} />
+          </button>
+        </header>
+        <div className="name-check-list-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Barcode</th>
+                <th>{tr('Ονομασία')}</th>
+                <th>{tr('Κωδικός')}</th>
+                <th>{tr('Θέση')}</th>
+                <th>{tr('Κατάσταση')}</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {rows.slice(0, LIST_ROWS).map(t => (
+                <tr key={t.id} onClick={() => navigate(`/tools/${t.id}`)}>
+                  <td className="mono">{t.barcode}</td>
+                  <td>{t.name}</td>
+                  <td>{t.code || '—'}</td>
+                  <td>{place(t)}</td>
+                  <td>{statusLabel(t.state)}</td>
+                  <td className="go">
+                    <ChevronRight size={15} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {rows.length > LIST_ROWS && <small>{tr('Εμφανίζονται {0} από {1}.', LIST_ROWS, rows.length)}</small>}
+      </div>
+    </div>
   );
 }
