@@ -5460,3 +5460,22 @@ div.asset-import-hospital b {
 .replacements-order.o-CANCELLED {
   opacity: 0.75;
 }
+/* Order dialog: rows centred on one line, the footer flush with the table (a general footer rule
+   added side padding), the quantity column at the right. */
+.replacements-order-modal > footer {
+  padding: 4px 0 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+.replacements-order-lines td,
+.replacements-order-body td {
+  vertical-align: middle;
+}
+.replacements-order-lines th:last-child,
+.replacements-order-lines td:last-child {
+  width: 90px;
+  text-align: right;
+}
+.replacements-order-lines td.mono {
+  white-space: nowrap;
+}
