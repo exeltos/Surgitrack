@@ -64,6 +64,7 @@ import RolesGuide from './RolesGuide';
 import ColorTapeLibrary from './ColorTapeLibrary';
 import AssetImportWizard from './AssetImportWizard';
 import PlatformContactSettings from './PlatformContactSettings';
+import LabelSettingsCard from './LabelSettingsCard';
 import {TRIAL_LENGTHS, trialEndAfter, trialEndDate, trialEndOn, trialEnded, trialState} from '../../core/trial';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM';
@@ -522,8 +523,8 @@ export default function StudioPage() {
                   'Central administration of hospitals, users, demo access, libraries and core SurgiTrack settings.',
                 )
               : L(
-                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου σας. Τμήματα και χρήστες διαχειρίζεστε από τη «Διαχείριση νοσοκομείου».',
-                  "Your hospital's libraries, sterilization flow, role permissions and settings. Departments and users are managed in “Hospital administration”.",
+                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου σας. Τμήματα και χρήστες διαχειρίζεστε από «Χρήστες & Τμήματα».',
+                  "Your hospital's libraries, sterilization flow, role permissions and settings. Departments and users are managed in “Users & departments”.",
                 )}
           </p>
         </div>
@@ -604,16 +605,6 @@ export default function StudioPage() {
             onOpenHospitals={() => selectTab('PLATFORM')}
             onNewHospital={() => setOrganizationEditor(null)}
             onExtendTrial={(org, endsAt) => void changePlan(org, 'TRIAL', endsAt)}
-            onMakeStandard={org =>
-              setConfirm({
-                title: L('Κανονική χρήση;', 'Standard use?'),
-                message: L(
-                  `Το ${org.name} περνά σε κανονική χρήση, χωρίς λήξη. Αν ήταν κλειδωμένο, ξεκλειδώνει αμέσως.`,
-                  `${org.name} moves to standard use, with no end date. If it was locked, it unlocks at once.`,
-                ),
-                action: () => void changePlan(org, 'STANDARD'),
-              })
-            }
           />
         )}
         {tab === 'PLATFORM' && platformAdmin && (
@@ -1481,6 +1472,7 @@ export default function StudioPage() {
                 </div>
               </label>
             </section>
+            <LabelSettingsCard L={L} />
             <section>
               <header>
                 <ShieldCheck />

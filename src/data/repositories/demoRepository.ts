@@ -1,9 +1,10 @@
-import {deliveries, issues, movements, processLoads, receipts, sets, tools} from '../demo';
+import {deliveries, issues, movements, processLoads, purchaseOrders, receipts, sets, tools} from '../demo';
 import type {SurgiInitialData, SurgiRepository} from './types';
 
 const cloneInitialData = (): SurgiInitialData => ({
   sets: sets.map(item => ({
     ...item,
+    compositionTemplate: item.compositionTemplate?.map(line => ({...line})),
     legacyBarcodes: item.legacyBarcodes ? [...item.legacyBarcodes] : undefined,
     photos: item.photos ? item.photos.map(photo => ({...photo})) : undefined,
   })),
@@ -17,6 +18,7 @@ const cloneInitialData = (): SurgiInitialData => ({
   processLoads: processLoads.map(load => ({...load, items: load.items.map(item => ({...item}))})),
   receipts: receipts.map(item => ({...item})),
   deliveries: deliveries.map(item => ({...item})),
+  purchaseOrders: purchaseOrders.map(order => ({...order, lines: order.lines.map(line => ({...line}))})),
 });
 
 export const demoSurgiRepository: SurgiRepository = {

@@ -128,11 +128,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τμήματα και βιβλιοθήκες',
-          'Στη Διαχείριση νοσοκομείου → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους και χρωματικές ταινίες· στη Ροή Αποστείρωσης τα στάδια.',
+          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους και χρωματικές ταινίες· στη Ροή Αποστείρωσης τα στάδια.',
         ],
         en: [
           'Departments and libraries',
-          'In Hospital administration → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers and color tapes; in Sterilization Flow the stages.',
+          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers and color tapes; in Sterilization Flow the stages.',
         ],
       },
       {
@@ -148,11 +148,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσωπικό',
-          'Στη Διαχείριση νοσοκομείου → Χρήστες: «Πρόσκληση» για έναν έναν, «Σύνδεσμος εγγραφής» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τις αιτήσεις (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
+          'Στη Χρήστες & Τμήματα → Χρήστες: «Πρόσκληση» για έναν έναν, «Σύνδεσμος εγγραφής» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τις αιτήσεις (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
         ],
         en: [
           'Staff',
-          'In Hospital administration → Users: "Invite" one by one, "Signup link" for many or "From CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
+          'In Users & departments → Users: "Invite" one by one, "Signup link" for many or "From CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
         ],
       },
       {
@@ -168,11 +168,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εκπαίδευση και έναρξη',
-          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Διαχείριση νοσοκομείου. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
+          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Χρήστες & Τμήματα. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
         ],
         en: [
           'Training and go-live',
-          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Hospital administration. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
+          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Users & departments. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
         ],
       },
     ],
@@ -376,11 +376,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εργαλεία με ζωές',
-          'Για εργαλεία πολλαπλών χρήσεων με όριο (π.χ. ρομποτικά), η αποστολή ζητά υποχρεωτικά κωδικό ασθενούς και επιβεβαίωση μείωσης μίας ζωής. Στην τελευταία ζωή το εργαλείο τίθεται αυτόματα εκτός χρήσης.',
+          'Για εργαλεία πολλαπλών χρήσεων με όριο (π.χ. ρομποτικά), η αποστολή ζητά υποχρεωτικά κωδικό ασθενούς και επιβεβαίωση ότι χρησιμοποιήθηκε: καταγράφεται μία χρήση και φαίνεται το υπόλοιπο. Όταν εξαντληθούν οι χρήσεις, το εργαλείο τίθεται αυτόματα εκτός χρήσης.',
         ],
         en: [
           'Instruments with lives',
-          'For limited multi-use instruments (e.g. robotic), sending requires a patient code and confirming one life is used. On the last life the instrument is taken out of use automatically.',
+          'For limited multi-use instruments (e.g. robotic), sending requires a patient code and confirming it was used: one use is recorded and the uses left are shown. When no uses are left the instrument is taken out of use automatically.',
         ],
       },
       {
@@ -411,12 +411,9 @@ export const helpManual: ManualSection[] = [
     checks: {
       el: [
         'Ο κωδικός ασθενούς δεν περιέχει ονοματεπώνυμο.',
-        'Η μείωση ζωής επιβεβαιώθηκε για τα εργαλεία περιορισμένων χρήσεων.',
+        'Η χρήση καταγράφηκε για τα εργαλεία περιορισμένων χρήσεων.',
       ],
-      en: [
-        'The patient code contains no patient name.',
-        'The life reduction was confirmed for limited-use instruments.',
-      ],
+      en: ['The patient code contains no patient name.', 'The use was recorded for limited-use instruments.'],
     },
     tip: {
       el: 'Σαρώστε το barcode αντί να ψάχνετε με το όνομα: είναι πιο γρήγορο και αποφεύγει λάθη.',
@@ -761,7 +758,7 @@ export const helpManual: ManualSection[] = [
         'Μετά την εισαγωγή: «Έλεγχος ονομασιών».',
       ],
       en: [
-        'Department names match those in Hospital administration.',
+        'Department names match those in Users & departments.',
         'Rows with problems were fixed or are not needed.',
         'After importing: "Name check".',
       ],
@@ -900,7 +897,68 @@ export const helpManual: ManualSection[] = [
         'Pick the instrument from the Stock tab.',
       ],
     },
-    related: ['/sets', '/tools'],
+    related: ['/sets', '/tools', '/replacements'],
+  },
+  {
+    to: '/replacements',
+    permission: 'stock.manage',
+    title: {el: 'Αντικαταστάσεις', en: 'Replacements'},
+    summary: {
+      el: 'Τα εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης: αν υπάρχει ίδιο στο Απόθεμα, αντικατάσταση με ένα κλικ, αλλιώς παραγγελία αγοράς.',
+      en: 'Instruments in Service, damaged or worn, lost or out of use: replace from Stock in one click when it holds the same instrument, otherwise record a purchase order.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Τι εμφανίζεται',
+          'Εργαλεία σε Service, με ανοιχτή αναφορά βλάβης ή φθοράς, χαμένα και εκτός χρήσης. Για καθένα: το Σετ στο οποίο ανήκει (ή από το οποίο βγήκε), η αιτία, από πότε, και αν το Απόθεμα έχει ίδιο εργαλείο (ίδιος κωδικός ή, χωρίς κωδικό, ίδια ονομασία).',
+        ],
+        en: [
+          'What it lists',
+          'Instruments in Service, with an open damage or wear report, lost and out of use. For each: the Set it belongs to (or left), the reason, since when, and whether Stock holds the same instrument (same code or, with no code, the same name).',
+        ],
+      },
+      {
+        el: [
+          'Αντικατάσταση από Απόθεμα',
+          '«Αντικατάσταση» βάζει ένα ίδιο εργαλείο από το Απόθεμα στο Σετ. Αν το χαλασμένο ήταν ακόμα μέσα, βγαίνει για Service. Επιλέξτε πολλά και πατήστε «Αντικατάσταση από Απόθεμα» για όλα μαζί· το ίδιο εργαλείο Αποθέματος δεν δίνεται δύο φορές.',
+        ],
+        en: [
+          'Replace from Stock',
+          '"Replace" puts a matching Stock instrument into the Set. If the damaged one was still in it, it leaves for Service. Select several and press "Replace from Stock" for all at once; one Stock instrument is never used twice.',
+        ],
+      },
+      {
+        el: [
+          'Παραγγελία αγοράς',
+          'Για όσα δεν υπάρχουν στο Απόθεμα: επιλέξτε τα και «Παραγγελία αγοράς». Γίνεται μία γραμμή ανά είδος με την ποσότητα, συμπληρώνετε προμηθευτή και σημείωση. Στην καρτέλα «Παραγγελίες» η παραγγελία εκτυπώνεται, σημειώνεται ως παραγγελθείσα ή ακυρωμένη, και με «Παραλαβή στο Απόθεμα» τα νέα εργαλεία καταχωρούνται αυτόματα στο Απόθεμα.',
+        ],
+        en: [
+          'Purchase order',
+          'For what Stock lacks: select it and "Purchase order". One line per kind with its quantity; add supplier and note. In the "Orders" tab the order prints, is marked ordered or cancelled, and "Receive into Stock" registers the new instruments in Stock.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Φιλτράρετε με αιτία, τμήμα ή διαθεσιμότητα στο Απόθεμα.',
+        'Αντικαταστήστε από το Απόθεμα όσα έχουν διαθέσιμο.',
+        'Για τα υπόλοιπα καταχωρήστε παραγγελία αγοράς και εκτυπώστε την.',
+        'Όταν έρθουν, «Παραλαβή στο Απόθεμα»: τα νέα εργαλεία μπαίνουν στο Απόθεμα με δικά τους barcodes.',
+      ],
+      en: [
+        'Filter by reason, department or Stock availability.',
+        'Replace from Stock what it holds.',
+        'Record a purchase order for the rest and print it.',
+        'When they arrive, "Receive into Stock": the new instruments enter Stock with their own barcodes.',
+      ],
+    },
+    tip: {
+      el: 'Η «Εκτύπωση λίστας» και το Excel παίρνουν ό,τι έχετε επιλέξει, αλλιώς ό,τι δείχνουν τα φίλτρα.',
+      en: '"Print list" and Excel take your selection, otherwise what the filters show.',
+    },
+    related: ['/stock', '/issues', '/reports'],
   },
   {
     to: '/issues',
@@ -1063,11 +1121,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ρόλοι και Ρυθμίσεις',
-          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες ζωές».',
+          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες ζωές» και την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο).',
         ],
         en: [
           'Roles and Settings',
-          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few lives left".',
+          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few lives left" and the hospital’s barcode label (size, header, logo).',
         ],
       },
     ],
@@ -1080,7 +1138,7 @@ export const helpManual: ManualSection[] = [
   {
     to: '/hospital',
     permission: 'studio.manage',
-    title: {el: 'Διαχείριση νοσοκομείου', en: 'Hospital administration'},
+    title: {el: 'Χρήστες & Τμήματα', en: 'Users & departments'},
     summary: {
       el: 'Οι χρήστες, οι προσκλήσεις, οι αιτήσεις πρόσβασης και τα τμήματα του νοσοκομείου.',
       en: "The hospital's users, invitations, access requests and departments.",

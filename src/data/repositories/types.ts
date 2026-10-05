@@ -4,6 +4,7 @@ import type {
   Movement,
   PreparationRecord,
   ProcessLoadRecord,
+  PurchaseOrder,
   RecallCase,
   ReceiptRecord,
   SetAsset,
@@ -31,6 +32,7 @@ export type SurgiInitialData = {
   sterilizationReleases?: SterilizationReleaseRecord[];
   workflowCheckpoints?: WorkflowCheckpointRecord[];
   deliveries?: DeliveryRecord[];
+  purchaseOrders?: PurchaseOrder[];
 };
 
 /**

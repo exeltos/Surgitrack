@@ -57,6 +57,8 @@ export interface Tool {
   retiredNoticeSeenBy?: string;
   /** The Studio import that created it (lets the whole import be undone). */
   importBatch?: string;
+  /** Barcode of the Stock instrument that took its place in its Set. */
+  replacedBy?: string;
 }
 export interface SetCompositionRequirement {
   code: string;
@@ -315,4 +317,32 @@ export interface RecallCase {
   status: 'OPEN' | 'CLOSED';
   items: RecallCaseItem[];
   closedAt?: string;
+}
+export type PurchaseOrderStatus = 'OPEN' | 'ORDERED' | 'RECEIVED' | 'CANCELLED';
+/** One instrument type to buy: how many, and which out-of-circulation instruments it replaces. */
+export interface PurchaseOrderLine {
+  code: string;
+  name: string;
+  manufacturer?: string;
+  quantity: number;
+  /** Why it is needed: Service, Βλάβη, Απώλεια, Εκτός χρήσης… */
+  reason?: string;
+  toolIds: string[];
+  barcodes: string[];
+}
+/** A purchase order for replacement instruments, recorded by Sterilization. */
+export interface PurchaseOrder {
+  id: string;
+  number: string;
+  status: PurchaseOrderStatus;
+  supplier?: string;
+  note?: string;
+  lines: PurchaseOrderLine[];
+  createdAt: string;
+  createdByName: string;
+  orderedAt?: string;
+  receivedAt?: string;
+  cancelledAt?: string;
+  /** The new instruments put into Stock when the order arrived. */
+  receivedBarcodes?: string[];
 }

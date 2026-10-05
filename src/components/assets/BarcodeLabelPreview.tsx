@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {ImagePlus, Trash2} from 'lucide-react';
 import PrintPreviewModal from './PrintPreviewModal';
 import AppButton from '../ui/AppButton';
-import {barcodeLabelHtml} from '../../modules/sterilization/printUtils';
+import {barcodeLabelHtml, labelPaper} from '../../modules/sterilization/printUtils';
 import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import {DEFAULT_LABEL_SETTINGS, type LabelHeader, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
@@ -12,7 +12,7 @@ import {tr} from '../../i18n';
 const SIZES: Array<{id: LabelSize; label: string; mm: string}> = [
   {id: 'SMALL', label: 'Μικρή', mm: '50×25 mm'},
   {id: 'MEDIUM', label: 'Μεσαία', mm: '70×35 mm'},
-  {id: 'SHEET', label: 'Τριπλή', mm: '100×50 mm'},
+  {id: 'SHEET', label: 'Τριπλή', mm: '1 μεγάλη + 2 μικρές'},
 ];
 /** Preview zoom that fits each size in the dialog. */
 const ZOOM_FOR: Record<LabelSize, number> = {SMALL: 3, MEDIUM: 2.2, SHEET: 1.4};
@@ -44,7 +44,7 @@ const logoDataUrl = (file: File) =>
     reader.readAsDataURL(file);
   });
 
-type LabelAsset = Pick<SetAsset, 'barcode' | 'name' | 'department'> | Tool;
+type LabelAsset = (Pick<SetAsset, 'barcode' | 'name' | 'department'> & {code?: string}) | Tool;
 
 /** Barcode label preview with its options: size, header (logo / text / none) and details line. */
 export default function BarcodeLabelPreview({
@@ -67,6 +67,7 @@ export default function BarcodeLabelPreview({
   const canSaveDefault = can('studio.manage');
   const changed = JSON.stringify(settings) !== JSON.stringify(saved);
   const set = (patch: Partial<LabelSettings>) => setSettings(current => ({...current, ...patch}));
+  const paper = labelPaper(settings);
 
   const aside = (
     <>
@@ -80,15 +81,68 @@ export default function BarcodeLabelPreview({
               className={settings.size === size.id ? 'active' : ''}
               aria-pressed={settings.size === size.id}
               onClick={() => {
-                set({size: size.id});
+                set({size: size.id, width: undefined, height: undefined});
                 setZoom(ZOOM_FOR[size.id]);
               }}
             >
               {tr(size.label)}
-              <small>{size.mm}</small>
+              <small>{tr(size.mm)}</small>
             </button>
           ))}
         </div>
+      </div>
+      <div className="label-option-group">
+        <span>{tr('ΧΑΡΤΙ ΕΚΤΥΠΩΤΗ (mm)')}</span>
+        <div className="label-numbers">
+          <label>
+            {tr('Πλάτος')}
+            <input
+              type="number"
+              min={20}
+              max={150}
+              value={paper.w}
+              onChange={e => set({width: Number(e.target.value) || undefined})}
+            />
+          </label>
+          <label>
+            {tr('Ύψος')}
+            <input
+              type="number"
+              min={20}
+              max={150}
+              value={paper.h}
+              onChange={e => set({height: Number(e.target.value) || undefined})}
+            />
+          </label>
+          <label
+            title={tr('Κενό στη δεξιά άκρη κάθε ετικέτας, π.χ. για τη λωρίδα δείκτη που είναι ήδη τυπωμένη στο χαρτί.')}
+          >
+            {tr('Κενό δεξιά')}
+            <input
+              type="number"
+              min={0}
+              max={15}
+              step={0.5}
+              value={settings.reserveRight || 0}
+              onChange={e => set({reserveRight: Number(e.target.value) || undefined})}
+            />
+          </label>
+        </div>
+        {settings.size === 'SHEET' && (
+          <label className="label-zoom">
+            {tr('Μεγάλη ετικέτα')}
+            <input
+              type="range"
+              min={35}
+              max={70}
+              step={5}
+              value={settings.mainShare || 50}
+              onChange={e => set({mainShare: Number(e.target.value)})}
+              aria-label={tr('Ύψος μεγάλης ετικέτας')}
+            />
+            <b>{settings.mainShare || 50}%</b>
+          </label>
+        )}
       </div>
       <div className="label-option-group">
         <span>{tr('ΚΕΦΑΛΙΔΑ')}</span>
@@ -151,6 +205,10 @@ export default function BarcodeLabelPreview({
         )}
         {logoError && <small className="identity-error">{logoError}</small>}
       </div>
+      <label className="label-check">
+        <input type="checkbox" checked={!!settings.showCode} onChange={e => set({showCode: e.target.checked})} />
+        {tr('Κωδικός (cod.) πάνω από το όνομα')}
+      </label>
       <label className="label-check">
         <input type="checkbox" checked={settings.showDetails} onChange={e => set({showDetails: e.target.checked})} />
         {kind === 'SET' ? tr('Πλήθος εργαλείων') : tr('Χρήσεις')}

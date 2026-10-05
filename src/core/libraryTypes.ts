@@ -40,6 +40,15 @@ export type LabelSettings = {
   logo?: string;
   /** Uses / tool count line. */
   showDetails: boolean;
+  /** The Set's or instrument's code above its name ("cod. 041993"). */
+  showCode?: boolean;
+  /** Paper size in mm when it differs from the size's own (e.g. the printer's label roll). */
+  width?: number;
+  height?: number;
+  /** Space kept empty on the right of each label (mm), e.g. for a pre-printed indicator strip. */
+  reserveRight?: number;
+  /** 1 + 2 layout: the large label's share of the height, in percent. */
+  mainShare?: number;
 };
 export const DEFAULT_LABEL_SETTINGS: LabelSettings = {size: 'SMALL', header: 'BRAND', showDetails: true};
 export type SystemSettings = {usageWarningThreshold: number; label?: LabelSettings};

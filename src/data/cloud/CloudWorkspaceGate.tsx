@@ -33,6 +33,7 @@ const seedDemoOrganization = async (organizationId: string) => {
     processLoads: store.processLoads || [],
     receipts: store.receipts || [],
     deliveries: store.deliveries || [],
+    purchaseOrders: store.purchaseOrders || [],
     library: [library],
   } as Partial<CloudRecords>);
 };

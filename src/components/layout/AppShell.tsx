@@ -44,17 +44,18 @@ const initialsOf = (name: string) => {
 const navEN: Record<string, string> = {
   'Εξοπλισμός τμήματος': 'Department Equipment',
   Αποστείρωση: 'Sterilization',
-  'Συνδεδεμένες συσκευές': 'Connected devices',
+  Συσκευές: 'Devices',
+  Αντικαταστάσεις: 'Replacements',
   Εργαλεία: 'Instruments',
   'Σετ εργαλείων': 'Instrument Sets',
-  'Μεμονωμένα σε χρήση': 'Standalone in Use',
+  Μεμονωμένα: 'Standalone',
   'Απόθεμα εργαλείων': 'Instrument Stock',
   Εκκρεμότητες: 'Issues',
   Αναφορές: 'Reports',
   Ιστορικό: 'History',
   'SurgiTrack Studio': 'Management Center',
   'Σετ & Εργαλεία': 'Sets & Instruments',
-  'Διαχείριση νοσοκομείου': 'Hospital Administration',
+  'Χρήστες & Τμήματα': 'Users & departments',
   Νοσοκομεία: 'Hospitals',
   Επισκόπηση: 'Overview',
 };
@@ -140,15 +141,13 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
   const departmentUsage = lifecycleAlerts.filter(a => departmentAssets.some(asset => asset.id === a.assetId));
   const accessRequests = hospitalId ? pendingAccess : 0;
+  const openIssues = issues.filter(i => i.status === 'OPEN');
   // Instruments that just ran out of lives: Sterilization must set them aside and confirm.
   const outOfUseNotices = role === 'DEPARTMENT' ? [] : retiredTools.filter(t => !t.retiredNoticeSeenAt);
   const openNotifications =
     role === 'DEPARTMENT'
       ? departmentReady.length + departmentIssues.length + departmentUsage.length
-      : issues.filter(i => i.status === 'OPEN').length +
-        lifecycleAlerts.length +
-        accessRequests +
-        outOfUseNotices.length;
+      : openIssues.length + lifecycleAlerts.length + accessRequests + outOfUseNotices.length;
   useEffect(() => {
     if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
       setDepartmentReadyToast(undefined);
@@ -521,15 +520,79 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                           ))}
                         </div>
                       )}
-                      <div className="notification-empty">
-                        {openNotifications - accessRequests - outOfUseNotices.length
-                          ? lang === 'el'
-                            ? `${openNotifications - accessRequests - outOfUseNotices.length} ενεργές ειδοποιήσεις`
-                            : `${openNotifications - accessRequests - outOfUseNotices.length} active notifications`
-                          : lang === 'el'
-                            ? 'Δεν υπάρχουν νέες ειδοποιήσεις.'
-                            : 'No new notifications.'}
-                      </div>
+                      {openIssues.length > 0 && (
+                        <div className="notification-list">
+                          <span className="notification-group">
+                            {lang === 'el' ? 'Ανοιχτές εκκρεμότητες' : 'Open issues'} · {openIssues.length}
+                          </span>
+                          {openIssues.slice(0, 6).map(i => (
+                            <button
+                              key={i.id}
+                              className="notification-item"
+                              onClick={() => {
+                                setNotificationOpen(false);
+                                navigate('/issues');
+                              }}
+                            >
+                              <TriangleAlert size={17} />
+                              <span>
+                                <strong>{i.asset}</strong>
+                                <small>
+                                  {trData(i.type)} · {trData(i.department)} · {i.created}
+                                </small>
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {lifecycleAlerts.length > 0 && (
+                        <div className="notification-list">
+                          <span className="notification-group">
+                            {lang === 'el' ? 'Λίγες χρήσεις απομένουν' : 'Few uses left'} · {lifecycleAlerts.length}
+                          </span>
+                          {lifecycleAlerts.slice(0, 6).map(a => (
+                            <button
+                              key={a.id}
+                              className="notification-item"
+                              onClick={() => {
+                                setNotificationOpen(false);
+                                navigate(a.assetKind === 'SET' ? `/sets/${a.assetId}` : `/tools/${a.assetId}`);
+                              }}
+                            >
+                              <Gauge size={17} />
+                              <span>
+                                <strong>
+                                  {a.barcode} · {a.name}
+                                </strong>
+                                <small>
+                                  {lang === 'el'
+                                    ? `${a.remaining} από ${a.maxUses} χρήσεις απομένουν`
+                                    : `${a.remaining} of ${a.maxUses} uses left`}
+                                </small>
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {openNotifications === 0 ? (
+                        <div className="notification-empty">
+                          {lang === 'el' ? 'Δεν υπάρχουν νέες ειδοποιήσεις.' : 'No new notifications.'}
+                        </div>
+                      ) : (
+                        openIssues.length > 6 && (
+                          <button
+                            className="notification-more"
+                            onClick={() => {
+                              setNotificationOpen(false);
+                              navigate('/issues');
+                            }}
+                          >
+                            {lang === 'el'
+                              ? `Όλες οι εκκρεμότητες (${openIssues.length})`
+                              : `All issues (${openIssues.length})`}
+                          </button>
+                        )
+                      )}
                     </>
                   )}
                 </div>

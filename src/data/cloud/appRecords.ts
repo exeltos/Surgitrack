@@ -23,6 +23,7 @@ export const STORE_COLLECTIONS = [
   'sterilizationReleases',
   'workflowCheckpoints',
   'deliveries',
+  'purchaseOrders',
 ] as const;
 export type StoreCollection = (typeof STORE_COLLECTIONS)[number];
 export type CloudCollection = StoreCollection | 'library';

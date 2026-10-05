@@ -257,6 +257,20 @@ const RECALL_CASES_FIELDS: readonly Field[] = [
   ['closedAt', 'closed_on', 'text'],
 ];
 
+const PURCHASE_ORDERS_FIELDS: readonly Field[] = [
+  ['number', 'number', 'text'],
+  ['status', 'status', 'text'],
+  ['supplier', 'supplier', 'text'],
+  ['note', 'note', 'text'],
+  ['lines', 'lines', 'json'],
+  ['createdAt', 'created_on', 'text'],
+  ['createdByName', 'created_by_name', 'text'],
+  ['orderedAt', 'ordered_on', 'text'],
+  ['receivedAt', 'received_on', 'text'],
+  ['cancelledAt', 'cancelled_on', 'text'],
+  ['receivedBarcodes', 'received_barcodes', 'textArray'],
+];
+
 /** A hospital's settings: one row per hospital, one column per section. */
 const HOSPITAL_SETTINGS_FIELDS: readonly Field[] = [
   ['departments', 'departments', 'json'],
@@ -307,6 +321,7 @@ export const CLOUD_TABLES = {
   sterilizationReleases: {table: 'sterilization_releases', fields: STERILIZATION_RELEASES_FIELDS, mutable: false},
   processLoads: {table: 'process_loads', fields: PROCESS_LOADS_FIELDS, mutable: true},
   recallCases: {table: 'recall_cases', fields: RECALL_CASES_FIELDS, mutable: true},
+  purchaseOrders: {table: 'purchase_orders', fields: PURCHASE_ORDERS_FIELDS, mutable: true},
   library: {table: 'hospital_settings', fields: HOSPITAL_SETTINGS_FIELDS, mutable: true},
 } as const satisfies Record<string, TableSpec>;
 export type TableCollection = keyof typeof CLOUD_TABLES;

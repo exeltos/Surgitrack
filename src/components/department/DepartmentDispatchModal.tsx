@@ -80,7 +80,8 @@ export default function DepartmentDispatchModal({
             <div className="department-lives-card">
               <div className="department-lives-head">
                 <Gauge size={18} />
-                <strong>{tr('Μείωση ζωών')}</strong>
+                <strong>{tr('Καταγραφή χρήσης')}</strong>
+                <small>{tr('Υπόλοιπο χρήσεων')}</small>
               </div>
               <ul>
                 {limitedTools.map(t => {
@@ -93,14 +94,14 @@ export default function DepartmentDispatchModal({
                       <b>
                         {remaining} → {Math.max(0, remaining - 1)}
                       </b>
-                      {remaining <= 1 && <small>{tr('Τελευταία ζωή · θα τεθεί εκτός χρήσης')}</small>}
+                      {remaining <= 1 && <small>{tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}</small>}
                     </li>
                   );
                 })}
               </ul>
               <label className="department-lives-confirm">
                 <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
-                {tr('Επιβεβαιώνω τη μείωση κατά μία ζωή')}
+                {tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}
               </label>
             </div>
           )}

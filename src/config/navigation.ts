@@ -12,6 +12,7 @@ import {
   Hospital,
   LayoutDashboard,
   Cable,
+  PackageX,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -28,11 +29,12 @@ export type NavigationItem = {
 
 const assetNavigation: NavigationItem[] = [
   {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace'},
-  {to: '/devices', label: 'Συνδεδεμένες συσκευές', icon: Cable, permission: 'sterilization.workspace'},
+  {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace'},
   {to: '/tools', label: 'Εργαλεία', icon: Wrench, exactSearch: '', permission: 'asset.registry.view'},
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view'},
-  {to: '/standalone-tools', label: 'Μεμονωμένα σε χρήση', icon: Wrench, permission: 'asset.registry.view'},
+  {to: '/standalone-tools', label: 'Μεμονωμένα', icon: Wrench, permission: 'asset.registry.view'},
   {to: '/stock', label: 'Απόθεμα εργαλείων', icon: Warehouse, permission: 'stock.manage'},
+  {to: '/replacements', label: 'Αντικαταστάσεις', icon: PackageX, permission: 'stock.manage'},
   {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view'},
   {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},
@@ -58,7 +60,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
   const adminNavigation: NavigationItem[] = [
     overview,
     ...assetNavigation,
-    {to: '/hospital', label: 'Διαχείριση νοσοκομείου', icon: Building2, permission: 'studio.manage'},
+    {to: '/hospital', label: 'Χρήστες & Τμήματα', icon: Building2, permission: 'studio.manage'},
     {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage'},
     {to: '/studio', label: 'SurgiTrack Studio', icon: Settings, permission: 'studio.manage'},
   ];
