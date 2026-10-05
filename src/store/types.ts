@@ -316,6 +316,8 @@ export type SurgiStoreValue = {
   updateTool: (id: string, patch: ToolUpdatePatch) => void;
   /** Renames many instruments at once (the name check), with one history entry and an undo. */
   renameTools: (changes: Array<{id: string; name: string}>, label: string) => void;
+  /** Set compositions take the names their instruments now carry. */
+  syncCompositionNames: () => void;
   addToolsToSet: (setId: string, toolIds: string[]) => void;
   clearToast: () => void;
 };

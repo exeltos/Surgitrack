@@ -4973,3 +4973,32 @@ div.asset-import-hospital b {
 .name-check-list > small {
   color: #6f808c;
 }
+.name-check-sets {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #f0d9a8;
+  border-radius: 12px;
+  background: #fffaf0;
+  color: #9a5b00;
+}
+.name-check-sets span {
+  display: grid;
+  gap: 3px;
+  color: #4b3a14;
+}
+.name-check-sets small {
+  color: #7a6235;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+@media (max-width: 760px) {
+  .name-check-sets {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .name-check-sets > :last-child {
+    grid-column: 1 / -1;
+  }
+}

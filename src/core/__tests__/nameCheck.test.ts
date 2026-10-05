@@ -1,5 +1,13 @@
 import {describe, expect, it} from 'vitest';
-import {cleanName, cleanUps, codeGroups, nameKey, namesByCode} from '../nameCheck';
+import {
+  cleanName,
+  cleanUps,
+  codeGroups,
+  nameKey,
+  namesByCode,
+  renameComposition,
+  staleCompositionLines,
+} from '../nameCheck';
 
 describe('cleanName', () => {
   it('writes capitals without accents and one space between words', () => {
@@ -74,5 +82,38 @@ describe('codeGroups', () => {
 
   it('knows the name the hospital uses for each code', () => {
     expect(namesByCode(items).get('08.281.18')).toBe('ΨΑΛΙΔΙ METZENBAUM ΚΥΡΤΟ 18 CM');
+  });
+});
+
+describe('Set composition names', () => {
+  const lines = [
+    {code: '12.221.12', name: 'MOSQUITOE', quantity: 4},
+    {code: '12.221.12', name: 'MOSQUITOE ΚΥΡΤΗ', quantity: 2},
+    {code: '08.281.18', name: 'ΨΑΛΙΔΙ METZENBAUM', quantity: 1},
+  ];
+
+  it('renames lines and merges those that become the same', () => {
+    const renamed = renameComposition(lines, code => (code === '12.221.12' ? 'ΛΑΒΙΔΑ MOSQUITO' : undefined));
+    expect(renamed).toEqual([
+      {code: '12.221.12', name: 'ΛΑΒΙΔΑ MOSQUITO', quantity: 6},
+      {code: '08.281.18', name: 'ΨΑΛΙΔΙ METZENBAUM', quantity: 1},
+    ]);
+  });
+
+  it('returns nothing when no line changes', () => {
+    expect(renameComposition(lines, () => undefined)).toBeUndefined();
+  });
+
+  it('finds lines whose code now has a single instrument name', () => {
+    const stale = staleCompositionLines([
+      {id: '1', code: '12.221.12', name: 'ΛΑΒΙΔΑ MOSQUITO'},
+      {id: '2', code: '12.221.12', name: 'ΛΑΒΙΔΑ MOSQUITO'},
+      {id: '3', code: '08.281.18', name: 'ΨΑΛΙΔΙ METZENBAUM'},
+      {id: '4', code: '08.281.18', name: 'ΨΑΛΙΔΙ ΚΥΡΤΟ'},
+    ]);
+    expect(stale('12.221.12', 'MOSQUITOE')).toBe('ΛΑΒΙΔΑ MOSQUITO');
+    expect(stale('12.221.12', 'ΛΑΒΙΔΑ MOSQUITO')).toBeUndefined();
+    // Two names still in use: nothing to follow.
+    expect(stale('08.281.18', 'ΨΑΛΙΔΙ')).toBeUndefined();
   });
 });

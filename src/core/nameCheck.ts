@@ -160,3 +160,50 @@ export function namesByCode<T extends Named>(items: readonly T[]) {
     result.set(code, [...names.entries()].sort((a, b) => b[1] - a[1] || b[0].length - a[0].length)[0][0]);
   return result;
 }
+
+type Line = {code: string; name: string; quantity: number};
+
+/**
+ * A Set's composition with names renamed: `rename(code, name)` gives a line's new name or undefined
+ * to keep it. Lines that end up with the same code and name are merged into one, quantities added.
+ * Returns undefined when nothing changes.
+ */
+export function renameComposition<T extends Line>(
+  lines: readonly T[] | undefined,
+  rename: (code: string, name: string) => string | undefined,
+): T[] | undefined {
+  if (!lines?.length) return undefined;
+  let changed = false;
+  const merged = new Map<string, T>();
+  for (const line of lines) {
+    const next = rename(line.code, line.name);
+    const name = next && next !== line.name ? next : line.name;
+    if (name !== line.name) changed = true;
+    const key = `${line.code.trim().toUpperCase()}|${name}`;
+    const existing = merged.get(key);
+    if (existing) {
+      changed = true;
+      merged.set(key, {...existing, quantity: existing.quantity + line.quantity});
+    } else merged.set(key, {...line, name});
+  }
+  return changed ? [...merged.values()] : undefined;
+}
+
+/**
+ * The composition lines still carrying an old name: a line whose code the hospital's instruments
+ * now give one single name, but written another way. `name` is that single name.
+ */
+export function staleCompositionLines<T extends Named>(items: readonly T[]) {
+  const names = new Map<string, Set<string>>();
+  for (const item of items) {
+    const code = (item.code || '').trim().toUpperCase();
+    if (!code) continue;
+    names.set(code, (names.get(code) || new Set()).add(item.name));
+  }
+  const single = new Map<string, string>();
+  for (const [code, set] of names) if (set.size === 1) single.set(code, [...set][0]);
+  return (code: string, name: string) => {
+    const target = single.get(code.trim().toUpperCase());
+    return target && target !== name ? target : undefined;
+  };
+}
