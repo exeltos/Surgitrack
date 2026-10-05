@@ -730,11 +730,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Αναίρεση',
-          'Κάθε εισαγωγή εμφανίζεται στις «Εισαγωγές σε αυτό το νοσοκομείο» και αναιρείται ολόκληρη με «Αναίρεση εισαγωγής», αν διαπιστώσετε λάθος.',
+          'Κάθε εισαγωγή εμφανίζεται στις «Εισαγωγές σε αυτό το νοσοκομείο» και αναιρείται ολόκληρη με «Αναίρεση εισαγωγής», όσο κανένα αντικείμενό της δεν έχει χρησιμοποιηθεί.',
         ],
         en: [
           'Undo',
-          'Every import appears under "Imports in this hospital" and can be undone in full with "Undo import" if you find a mistake.',
+          'Every import appears under "Imports in this hospital" and can be undone in full with "Undo import", as long as none of its items has been used.',
         ],
       },
     ],
@@ -1053,11 +1053,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ροή Αποστείρωσης',
-          'Τα στάδια από την παραλαβή έως την αποδέσμευση, με τη σειρά που ακολουθεί η Κεντρική Αποστείρωση. Αλλάξτε τα μόνο αν η διαδικασία του νοσοκομείου διαφέρει.',
+          'Τα στάδια από την παραλαβή έως την αποδέσμευση. Ενεργοποιήστε μόνο τα στάδια και τους ελέγχους που κάνει η Κεντρική Αποστείρωση του νοσοκομείου σας.',
         ],
         en: [
           'Sterilization Flow',
-          'The stages from receipt to release, in the order Central Sterilization follows. Change them only if the hospital process differs.',
+          'The stages from receipt to release. Turn on only the stages and checks your hospital’s Central Sterilization performs.',
         ],
       },
       {
