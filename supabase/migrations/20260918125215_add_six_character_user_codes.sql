@@ -16,7 +16,7 @@ declare
   n integer;
 begin
   clean := upper(translate(coalesce(p_name,''),'ΑΆΒΓΔΕΈΖΗΉΘΙΊΪΚΛΜΝΞΟΌΠΡΣΤΥΎΫΦΧΨΩΏ','AABGDEEZIITIIKLMNXOOPRSTYYYFXPSOO'));
-  parts := regexp_split_to_array(trim(clean), '\\s+');
+  parts := regexp_split_to_array(trim(clean), '\s+');
   if array_length(parts,1) >= 2 then
     initials := left(parts[1],1) || left(parts[array_length(parts,1)],1);
   else
