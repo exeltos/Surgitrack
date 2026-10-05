@@ -1,10 +1,24 @@
 import '../../styles/help-center.css';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Info, Search, ShieldCheck, Sparkles, X} from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  LifeBuoy,
+  Mail,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../AppPreferences';
-import {APP_EDITION, APP_VERSION} from '../../config/appMeta';
+import {APP_EDITION, APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
+import {getRuntimeDataMode} from '../../config/dataMode';
+import {loadPlatformContact, type PlatformContact} from '../../data/cloud/platformContact';
 import {glossary, helpManual, type ManualSection} from './helpManual';
 import ScreenPreview from './ScreenPreview';
 
@@ -39,6 +53,24 @@ const ui = {
       'Το SurgiTrack παρακολουθεί Σετ και χειρουργικά εργαλεία από το τμήμα έως την Κεντρική Αποστείρωση και πίσω, με πλήρη ιχνηλασιμότητα, όρια χρήσεων και αναφορές.',
     noResults: 'Δεν βρέθηκε ενότητα με αυτόν τον όρο.',
     close: 'Κλείσιμο Κέντρου Βοήθειας',
+    support: 'Υποστήριξη',
+    supportTitle: 'Χρειάζεστε βοήθεια;',
+    supportBody:
+      'Ξεκινήστε από το εγχειρίδιο: ανοίγει στη σελίδα της οθόνης που βλέπετε. Αν δεν λυθεί, απευθυνθείτε στο σωστό σημείο.',
+    hospitalAdmin: 'Στο νοσοκομείο σας',
+    hospitalAdminBody:
+      'Λογαριασμός, όνομα χρήστη, κωδικός, ρόλος, τμήμα και δικαιώματα: ο διαχειριστής του νοσοκομείου σας.',
+    technical: 'Τεχνική υποστήριξη',
+    technicalBody: 'Σφάλμα της εφαρμογής, κάτι που δεν αποθηκεύεται, εισαγωγή δεδομένων, συσκευές ή συμβόλαιο:',
+    writeEmail: 'Αποστολή email',
+    include: 'Για γρηγορότερη απάντηση γράψτε',
+    includeItems: [
+      'το νοσοκομείο και το όνομα χρήστη σας',
+      'την οθόνη και τι κάνατε, με ημερομηνία και ώρα',
+      'το barcode του Σετ ή του εργαλείου, αν αφορά κάποιο',
+      'το μήνυμα που εμφανίστηκε, ιδανικά με στιγμιότυπο οθόνης',
+    ],
+    mailSubject: 'SurgiTrack: αίτημα υποστήριξης',
   },
   en: {
     center: 'Help & Information Center',
@@ -70,16 +102,33 @@ const ui = {
       'SurgiTrack tracks Sets and surgical instruments from the department to Central Sterilization and back, with full traceability, usage limits and reports.',
     noResults: 'No section matches this search.',
     close: 'Close Help Center',
+    support: 'Support',
+    supportTitle: 'Need help?',
+    supportBody:
+      'Start with the user guide: it opens on the page of the screen you are on. If that does not solve it, contact the right place.',
+    hospitalAdmin: 'At your hospital',
+    hospitalAdminBody: "Account, username, password, role, department and permissions: your hospital's administrator.",
+    technical: 'Technical support',
+    technicalBody: 'An application error, something that does not save, data import, devices or your contract:',
+    writeEmail: 'Send email',
+    include: 'For a faster answer include',
+    includeItems: [
+      'your hospital and username',
+      'the screen and what you did, with date and time',
+      'the barcode of the Set or instrument, if one is involved',
+      'the message shown, ideally with a screenshot',
+    ],
+    mailSubject: 'SurgiTrack: support request',
   },
 };
 
-type Mode = 'manual' | 'glossary' | 'about';
+type Mode = 'manual' | 'glossary' | 'about' | 'support';
 
 /** Pages from which Set and instrument cards open. */
 const RECORD_LISTS = ['/department', '/tools', '/sets', '/standalone-tools', '/stock', '/sterilization'];
 
-/** The role-aware user manual, opened from the header; it starts on the section of the current screen. */
 /**
+ * The role-aware user manual, opened from the header; it starts on the section of the current screen.
  * `screens` are the pages the user can open from the menu now (the platform admin outside a
  * hospital has only a few); sections for other pages are left out. Detail sections, which open
  * from a record rather than the menu, only need their permission.
@@ -96,11 +145,16 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
       helpManual.filter(
         s =>
           (!s.permission || can(s.permission)) &&
-          (s.detailOf ? screens.some(x => RECORD_LISTS.includes(x)) : screens.includes(s.to)),
+          (s.detailOf
+            ? screens.some(x => RECORD_LISTS.includes(x))
+            : s.openedFrom
+              ? s.openedFrom.some(x => screens.includes(x))
+              : s.guide || screens.includes(s.to)),
       ),
     [can, screens],
   );
   const sectionFor = (path: string): ManualSection | undefined =>
+    visible.find(s => !s.guide && path === s.to) ||
     visible.find(s => s.detailOf?.some(prefix => path.startsWith(prefix))) ||
     visible.find(s => path === s.to || path.startsWith(`${s.to}/`)) ||
     (path.startsWith('/standalone') ? visible.find(s => s.to === '/standalone-tools') : undefined);
@@ -109,6 +163,12 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
   const [chapter, setChapter] = useState(0);
   const [mode, setMode] = useState<Mode>('manual');
   const [query, setQuery] = useState('');
+  // Who to contact: the platform's contact (Studio → Settings), else the default.
+  const [contact, setContact] = useState<PlatformContact>(SUPPORT_CONTACT);
+  useEffect(() => {
+    if (getRuntimeDataMode() !== 'PRODUCTION') return;
+    void loadPlatformContact().then(c => c.email && setContact(c));
+  }, []);
   const searchRef = useRef<HTMLInputElement>(null);
   const q = query.trim().toLowerCase();
   const filtered = visible.filter(s =>
@@ -225,6 +285,10 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                 <BookOpen size={15} />
                 <span>{tx.glossary}</span>
               </button>
+              <button className={mode === 'support' ? 'active' : ''} onClick={() => setMode('support')}>
+                <LifeBuoy size={15} />
+                <span>{tx.support}</span>
+              </button>
               <button className={mode === 'about' ? 'active' : ''} onClick={() => setMode('about')}>
                 <Info size={15} />
                 <span>{tx.about}</span>
@@ -252,14 +316,16 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                   <b>{tx.forRole}:</b> {current.audience[L]}
                 </span>
               </div>
-              <ScreenPreview
-                key={current.to}
-                src={`${import.meta.env.BASE_URL}help/${current.to.replace(/^\//, '')}.jpg`}
-                title={current.title[L]}
-                lang={L}
-                onOpenChange={onPreviewChange}
-              />
-              {screenSection?.to !== current.to && !current.detailOf && (
+              {!current.guide && (
+                <ScreenPreview
+                  key={current.to}
+                  src={`${import.meta.env.BASE_URL}help/${current.to.replace(/^\//, '')}.jpg`}
+                  title={current.title[L]}
+                  lang={L}
+                  onOpenChange={onPreviewChange}
+                />
+              )}
+              {screenSection?.to !== current.to && !current.detailOf && !current.guide && (
                 <button
                   className="manual-open-screen"
                   onClick={() => {
@@ -380,6 +446,50 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                   </div>
                 ))}
               </div>
+            </main>
+          )}
+
+          {mode === 'support' && (
+            <main className="manual-special">
+              <span className="manual-step-label">{tx.support.toUpperCase()}</span>
+              <h1>{tx.supportTitle}</h1>
+              <p>{tx.supportBody}</p>
+              <div className="manual-support-grid">
+                <section>
+                  <small>{tx.hospitalAdmin}</small>
+                  <span>{tx.hospitalAdminBody}</span>
+                </section>
+                <section>
+                  <small>{tx.technical}</small>
+                  <span>{tx.technicalBody}</span>
+                  <strong>
+                    {contact.name ? `${contact.name} · ` : ''}
+                    <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                    {contact.phone ? ` · ${contact.phone}` : ''}
+                  </strong>
+                  <a
+                    className="manual-support-mail"
+                    href={`mailto:${contact.email}?subject=${encodeURIComponent(`${tx.mailSubject} (v${APP_VERSION})`)}`}
+                  >
+                    <Mail size={15} />
+                    {tx.writeEmail}
+                  </a>
+                </section>
+              </div>
+              <section className="manual-check-section">
+                <h3>
+                  <CheckCircle2 size={15} />
+                  {tx.include}
+                </h3>
+                <ul>
+                  {tx.includeItems.map(item => (
+                    <li key={item}>
+                      <CheckCircle2 size={14} />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             </main>
           )}
 

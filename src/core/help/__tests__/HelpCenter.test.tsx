@@ -72,4 +72,48 @@ describe('Help Center', () => {
     expect(screen.queryByText('Αποστείρωση')).not.toBeInTheDocument();
     expect(screen.queryByText('Καρτέλα Σετ / εργαλείου')).not.toBeInTheDocument();
   });
+
+  it('starts with the getting-started guide and gives the admin the go-live path', () => {
+    setup(
+      'ADMIN',
+      '/',
+      <HelpCenter onClose={() => {}} screens={['/overview', '/tools', '/sets', '/hospital', '/studio']} />,
+    );
+    const nav = screen.getByRole('navigation');
+    expect(within(nav).getAllByRole('button')[0]).toHaveTextContent('Ξεκινώντας');
+    fireEvent.click(within(nav).getByRole('button', {name: /Από την αγορά στη λειτουργία/}));
+    expect(screen.getByRole('heading', {level: 1, name: 'Από την αγορά στη λειτουργία'})).toBeInTheDocument();
+    // A guide is not a screen: no screen to open.
+    expect(screen.queryByRole('button', {name: /Άνοιγμα οθόνης/})).not.toBeInTheDocument();
+    // Screens opened from Instruments and Sets are listed with them.
+    expect(within(nav).getByRole('button', {name: /Μαζική εισαγωγή/})).toBeInTheDocument();
+    expect(within(nav).getByRole('button', {name: /Έλεγχος ονομασιών/})).toBeInTheDocument();
+  });
+
+  it('opens on the name check rather than the record card', () => {
+    setup('ADMIN', '/tools/names', <HelpCenter onClose={() => {}} screens={['/overview', '/tools', '/sets']} />);
+    expect(screen.getByRole('heading', {level: 1, name: 'Έλεγχος ονομασιών'})).toBeInTheDocument();
+  });
+
+  it('shows department users the start guide but not the admin guides', () => {
+    setup(
+      'DEPARTMENT',
+      '/department',
+      <HelpCenter onClose={() => {}} screens={['/department', '/issues', '/movements']} />,
+    );
+    const nav = screen.getByRole('navigation');
+    expect(within(nav).getByRole('button', {name: /Ξεκινώντας/})).toBeInTheDocument();
+    expect(within(nav).queryByRole('button', {name: /Από την αγορά/})).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('button', {name: /Μαζική εισαγωγή/})).not.toBeInTheDocument();
+  });
+
+  it('tells who to contact for support', () => {
+    setup('DEPARTMENT', '/department', <HelpCenter onClose={() => {}} screens={['/department']} />);
+    fireEvent.click(screen.getByRole('button', {name: 'Υποστήριξη'}));
+    expect(screen.getByRole('heading', {level: 1, name: 'Χρειάζεστε βοήθεια;'})).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: 'info@exeltos.com'})).toHaveAttribute('href', 'mailto:info@exeltos.com');
+    expect(screen.getByRole('link', {name: /Αποστολή email/}).getAttribute('href')).toMatch(
+      /^mailto:info@exeltos\.com\?subject=/,
+    );
+  });
 });
