@@ -1,6 +1,7 @@
 // nodemailer encodes Greek subjects and bodies correctly (denomailer broke long Greek subjects
 // across header lines, so the whole message showed as raw source).
 import nodemailer from "npm:nodemailer@6.9.16";
+import {APP_ORIGIN, SITE} from "./http.ts";
 
 // The app's own emails (signup invitations, approvals, admin alerts). They go out through the same
 // SMTP server as the sign-in emails (secrets SMTP_HOST, SMTP_PORT, which is 465 since Edge Functions
@@ -74,9 +75,9 @@ export const usernameBox = (code: string) =>
 <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#738396">ΟΝΟΜΑ ΧΡΗΣΤΗ</div>
 <div style="font-size:22px;font-weight:800;letter-spacing:2px;color:#152c41">${esc(code)}</div></td></tr></table>`;
 
-export const SITE = "https://surgitrack-med.netlify.app";
+export {SITE};
 // Links may point only at the app itself (production, its deploy previews, or local development).
-const ALLOWED_ORIGIN = /^(https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
+const ALLOWED_ORIGIN = APP_ORIGIN;
 export const appSite = (origin: unknown) => {
   const o = String(origin || "").replace(/\/$/, "");
   return ALLOWED_ORIGIN.test(o) ? o : SITE;

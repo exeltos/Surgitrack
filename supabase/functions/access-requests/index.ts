@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {corsFor, jsonWith} from "../_shared/http.ts";
 import {esc, layout, sendEmail, usernameBox} from "../_shared/mail.ts";
 
 // Email notifications and housekeeping for staff signup:
@@ -8,15 +9,14 @@ import {esc, layout, sendEmail, usernameBox} from "../_shared/mail.ts";
 //  - "notify-decision": a hospital admin, after approving/rejecting, informs the applicant.
 //  - "cancel-invite": a hospital admin withdraws a signup invitation not filled in yet.
 // Without mail settings the call succeeds with emailed=false and the admin passes it on in person.
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   try {

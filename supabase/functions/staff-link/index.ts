@@ -1,23 +1,23 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {corsFor, jsonWith} from "../_shared/http.ts";
 
 // Makes a one-time link for a staff member, to pass on by hand (message, phone) when email does
 // not reach them: an invitation link for someone who has not accepted yet, or a set-new-password
 // link for an active user. No email is sent. Only a hospital admin for users of their own hospital,
 // or the platform admin; never for one's own account. The link opens the app's «Συνέχεια» page,
 // which spends it only when the person presses the button.
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 const SITE = "https://surgitrack-med.netlify.app";
 // The link may point only at the app itself (production, its deploy previews, or local development).
 const ALLOWED_ORIGIN = /^(https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   try {

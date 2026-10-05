@@ -1,19 +1,19 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {corsFor, jsonWith} from "../_shared/http.ts";
 
 // Deletes a staff account for good: sign-in, profile, invitation and access requests, so nothing of
 // the account stays and the same email can be invited again from scratch. Only a hospital admin
 // for users of their own hospital, or the platform admin; never one's own account. The history
 // the user left (movements, issues, handovers) stays, with their name as recorded then.
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   try {
