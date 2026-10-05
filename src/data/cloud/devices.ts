@@ -1,4 +1,4 @@
-import {supabase} from '../../lib/supabase';
+import {supabase, supabaseUrl} from '../../lib/supabase';
 import type {Device, DeviceConnection, DeviceReading, ReadingDraft} from '../../core/deviceData';
 
 /** Connected devices of a hospital and the cycle data they sent (tables devices / device_readings). */
@@ -158,5 +158,4 @@ export async function storeReadings(
 }
 
 /** Where a device sends its data over the network. */
-export const deviceIngestUrl = () =>
-  `${import.meta.env.VITE_SUPABASE_URL || 'https://oklyqnoqzbhjudqbkulq.supabase.co'}/functions/v1/device-ingest`;
+export const deviceIngestUrl = () => `${supabaseUrl}/functions/v1/device-ingest`;

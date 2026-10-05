@@ -1,8 +1,15 @@
 import {createClient} from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oklyqnoqzbhjudqbkulq.supabase.co';
-const supabasePublishableKey =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_lX-2PbTn72vDo6bDvjxvLQ_dpkLcJYR';
+// No built-in fallback: a build without these settings must not quietly talk to a real project.
+// See .env.example; production builds are also checked in vite.config.ts.
+const configuredUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+if (!configuredUrl || !supabasePublishableKey) {
+  throw new Error(
+    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY. Copy .env.example to .env.local and fill them in.',
+  );
+}
+export const supabaseUrl: string = configuredUrl.replace(/\/$/, '');
 
 const RECOVERY_KEY = 'surgitrack-password-recovery';
 
