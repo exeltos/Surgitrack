@@ -38,7 +38,7 @@ type StatusFilter = '' | 'NEEDED' | 'IN_ORDER' | 'REPLACED';
  * Instruments in Service, damaged, lost or out of use: whether the same instrument waits in Stock,
  * replacing them from Stock in one step, and recording purchase orders for the rest.
  */
-export default function ReplacementsPage() {
+export default function ReplacementsPage({embedded = false}: {embedded?: boolean}) {
   const store = useSurgi();
   const {tools, retiredTools, sets, issues, movements, purchaseOrders, can, organizationName} = store;
   const editable = can('stock.manage');
@@ -193,14 +193,16 @@ export default function ReplacementsPage() {
     });
 
   return (
-    <div className="replacements">
-      <PageHeader
-        eyebrow={tr('ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ')}
-        title={tr('Αντικαταστάσεις')}
-        description={tr(
-          'Εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης. Για καθένα φαίνεται αν υπάρχει ίδιο στο Απόθεμα: αντικαθίσταται με ένα κλικ, αλλιώς καταχωρείται παραγγελία αγοράς.',
-        )}
-      />
+    <div className={embedded ? 'replacements embedded' : 'replacements'}>
+      {!embedded && (
+        <PageHeader
+          eyebrow={tr('ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ')}
+          title={tr('Αντικαταστάσεις')}
+          description={tr(
+            'Εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης. Για καθένα φαίνεται αν υπάρχει ίδιο στο Απόθεμα: αντικαθίσταται με ένα κλικ, αλλιώς καταχωρείται παραγγελία αγοράς.',
+          )}
+        />
+      )}
       <div className="replacements-kpis">
         <button
           type="button"

@@ -1490,4 +1490,8 @@ export const en: Record<string, string> = {
   'Παραλήφθηκε {0} · Νέα εργαλεία στο Απόθεμα: {1}': 'Received {0} · New instruments in Stock: {1}',
   'Παραλήφθηκε {0}': 'Received {0}',
   'Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.': 'Order {0} received: {1} new instruments in Stock.',
+  'Αναφορές προβλημάτων': 'Problem reports',
+  'Αντικαταστάσεις & Παραγγελίες': 'Replacements & orders',
+  'Τα προβλήματα που αναφέρθηκαν (ελλείψεις, φθορές, βλάβες, απώλειες) και τα εργαλεία που πρέπει να αντικατασταθούν από το Απόθεμα ή με παραγγελία.':
+    'The problems reported (missing, worn, damaged, lost) and the instruments to replace from Stock or with an order.',
 };

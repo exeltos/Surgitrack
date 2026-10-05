@@ -35,7 +35,6 @@ const SterilizationPage = lazyPage(() => import('../modules/sterilization/Steril
 const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
 const NameCheckPage = lazyPage(() => import('../modules/tools/NameCheckPage'));
-const ReplacementsPage = lazyPage(() => import('../modules/replacements/ReplacementsPage'));
 const DepartmentPage = lazyPage(() => import('../modules/department/DepartmentPage'));
 const CountPage = lazyPage(() => import('../modules/counts/CountPage'));
 const IssuesPage = lazyPage(() => import('../modules/issues/IssuesPage'));
@@ -305,14 +304,7 @@ export default function App() {
             </Guard>
           }
         />
-        <Route
-          path="/replacements"
-          element={
-            <Guard permission="stock.manage">
-              <ReplacementsPage />
-            </Guard>
-          }
-        />
+        <Route path="/replacements" element={<Navigate to="/issues?tab=replacements" replace />} />
         <Route
           path="/import"
           element={

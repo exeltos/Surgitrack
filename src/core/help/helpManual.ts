@@ -902,7 +902,8 @@ export const helpManual: ManualSection[] = [
   {
     to: '/replacements',
     permission: 'stock.manage',
-    title: {el: 'Αντικαταστάσεις', en: 'Replacements'},
+    openedFrom: ['/issues'],
+    title: {el: 'Αντικαταστάσεις & Παραγγελίες', en: 'Replacements & orders'},
     summary: {
       el: 'Τα εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης: αν υπάρχει ίδιο στο Απόθεμα, αντικατάσταση με ένα κλικ, αλλιώς παραγγελία αγοράς.',
       en: 'Instruments in Service, damaged or worn, lost or out of use: replace from Stock in one click when it holds the same instrument, otherwise record a purchase order.',
@@ -990,6 +991,16 @@ export const helpManual: ManualSection[] = [
           'Sterilization resolves the issue (replacement, service, return) and closes it. Everything is recorded in History.',
         ],
       },
+      {
+        el: [
+          'Δύο καρτέλες',
+          'Η Αποστείρωση και ο Διαχειριστής βλέπουν δύο καρτέλες: «Αναφορές προβλημάτων» (ό,τι αναφέρθηκε) και «Αντικαταστάσεις & Παραγγελίες» (τα εργαλεία που πρέπει να αντικατασταθούν, από το Απόθεμα ή με παραγγελία αγοράς).',
+        ],
+        en: [
+          'Two tabs',
+          'Sterilization and the Administrator see two tabs: "Problem reports" (what was reported) and "Replacements & orders" (the instruments to replace, from Stock or with a purchase order).',
+        ],
+      },
     ],
     steps: {
       el: [
@@ -999,7 +1010,7 @@ export const helpManual: ManualSection[] = [
       ],
       en: ['Filter "Open".', 'Open the issue and see its note and photos.', 'Resolve and close it.'],
     },
-    related: ['/sterilization', '/movements'],
+    related: ['/replacements', '/sterilization', '/movements'],
   },
   {
     to: '/reports',
