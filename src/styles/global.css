@@ -5479,3 +5479,14 @@ div.asset-import-hospital b {
 .replacements-order-lines td.mono {
   white-space: nowrap;
 }
+/* Εκκρεμότητες: the problem reports and, for Sterilization and admins, the replacements tab. */
+.issues-tabs {
+  flex: none;
+  margin-bottom: 12px;
+}
+.replacements.embedded {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+}
