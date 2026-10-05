@@ -649,7 +649,7 @@ export default function SetDetailPage() {
             members,
             currentUser.name,
             preparedAt,
-            memberIssues.map(issue => issue.asset.split(' · ')[0]),
+            memberIssues.map(issue => ({barcode: issue.asset.split(' · ')[0], type: issue.type})),
             compositionOptions(set.colorTapes),
           )}
           onClose={() => setPreview(null)}

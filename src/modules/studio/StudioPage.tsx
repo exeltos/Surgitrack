@@ -64,6 +64,7 @@ import RolesGuide from './RolesGuide';
 import ColorTapeLibrary from './ColorTapeLibrary';
 import AssetImportWizard from './AssetImportWizard';
 import PlatformContactSettings from './PlatformContactSettings';
+import LabelSettingsCard from './LabelSettingsCard';
 import {TRIAL_LENGTHS, trialEndAfter, trialEndDate, trialEndOn, trialEnded, trialState} from '../../core/trial';
 
 type Tab = 'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM';
@@ -1481,6 +1482,7 @@ export default function StudioPage() {
                 </div>
               </label>
             </section>
+            <LabelSettingsCard L={L} />
             <section>
               <header>
                 <ShieldCheck />

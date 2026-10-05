@@ -8930,7 +8930,8 @@ td {
   padding-bottom: 18px !important;
 }
 .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column > .receipt-right-panel {
-  align-self: start !important;
+  /* Stretched to the row (the left column's height) so the instrument list below has room. */
+  align-self: stretch !important;
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
@@ -9777,4 +9778,82 @@ td {
 }
 .toast .toast-undo:hover {
   background: rgba(255, 255, 255, 0.22);
+}
+/* Batch receipt: a selected Set's instruments under its row. */
+.batch-set-tools {
+  margin: -2px 0 6px 34px;
+  padding: 6px 8px 8px;
+  border-left: 2px solid #cfe5dc;
+  background: #f8fbfa;
+  border-radius: 0 8px 8px 0;
+}
+.batch-set-tools-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  color: #3d5866;
+  cursor: pointer;
+}
+.batch-set-tools ul {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.batch-set-tools li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 80px auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #40525d;
+}
+.batch-set-tools li:nth-child(even) {
+  background: #fff;
+}
+.batch-set-tools li.has-issue {
+  background: #fdf1f0;
+  color: #9b2c22;
+}
+.batch-set-tools li strong {
+  font-size: 10.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.batch-set-tools-state {
+  display: inline-flex;
+  gap: 4px;
+}
+.batch-set-tools-state em {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 9px;
+}
+.batch-set-tools li button {
+  padding: 2px 8px;
+  border: 1px solid #e4c9c5;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 9.5px;
+  color: #a2382c;
+  cursor: pointer;
+}
+.batch-set-tools p {
+  margin: 4px 0 0;
+  font-size: 10px;
+  color: #71848d;
 }

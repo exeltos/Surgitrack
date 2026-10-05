@@ -7,6 +7,9 @@ import type {
   Movement,
   PreparationRecord,
   ProcessLoadRecord,
+  PurchaseOrder,
+  PurchaseOrderLine,
+  PurchaseOrderStatus,
   RecallCase,
   ReceiptRecord,
   SetAsset,
@@ -226,6 +229,10 @@ export type SurgiStoreValue = {
   sterilizationReleases: SterilizationReleaseRecord[];
   workflowCheckpoints: WorkflowCheckpointRecord[];
   deliveries: DeliveryRecord[];
+  purchaseOrders: PurchaseOrder[];
+  replaceFromStock: (pairs: Array<{toolId: string; stockToolId: string; setId: string}>) => void;
+  createPurchaseOrder: (lines: PurchaseOrderLine[], details?: {supplier?: string; note?: string}) => string;
+  setPurchaseOrderStatus: (id: string, status: PurchaseOrderStatus) => void;
   lifecycleAlerts: LifecycleAlert[];
   toast?: Toast;
   role: UserRole;

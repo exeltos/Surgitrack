@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {Fragment, useMemo, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
@@ -8,6 +8,7 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import BarcodeCapture from '../../components/barcode/BarcodeCapture';
+import BatchSetTools from './BatchSetTools';
 import {
   CheckCircle2,
   ScanBarcode,
@@ -2764,9 +2765,15 @@ export default function SterilizationPage() {
                             prepTools,
                             currentUser.name,
                             new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'}),
-                            prepTools
-                              .filter(t => issues.some(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode)))
-                              .map(t => t.barcode),
+                            issues
+                              .filter(
+                                i =>
+                                  i.status === 'OPEN' &&
+                                  [prepDraft.asset.barcode, ...prepTools.map(t => t.barcode)].some(b =>
+                                    i.asset.startsWith(b),
+                                  ),
+                              )
+                              .map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
                             compositionOptions(prepDraft.asset.colorTapes),
                           )
                         }
@@ -3839,54 +3846,65 @@ export default function SterilizationPage() {
                       const incompatible =
                         !!receiptBatchDepartment && !selected && item.department !== receiptBatchDepartment;
                       const deviation = receiptBatchDeviations.has(key);
+                      const setTools = item.kind === 'SET' ? tools.filter(t => t.setId === item.id) : [];
                       return (
-                        <label
-                          key={key}
-                          className={`${selected ? 'selected ' : ''}${incompatible ? 'incompatible ' : ''}${deviation ? 'has-issue' : ''}`.trim()}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            disabled={incompatible}
-                            onChange={() => toggleReceiptBatchAsset(item)}
-                          />
-                          <AssetTypeIcon
-                            kind={item.kind}
-                            maxUses={item.kind === 'TOOL' ? item.maxUses : undefined}
-                            size={16}
-                          />
-                          <div>
-                            <span>
-                              <b className="mono">{item.barcode}</b>
-                              <strong>{item.name}</strong>
-                            </span>
-                            <small>
-                              {trData(item.department) || tr('Χωρίς τμήμα')} ·{' '}
-                              {item.kind === 'SET' ? tr('Σετ') : tr('Μεμονωμένο εργαλείο')}
-                            </small>
-                          </div>
-                          {selected && (
-                            <button
-                              type="button"
-                              className={deviation ? 'set-report-btn active' : 'set-report-btn'}
-                              onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (!deviation) openIssueReport(item.kind, item.id, 'Αποστείρωση · μαζική παραλαβή');
-                              }}
-                            >
-                              {deviation ? (
-                                <>
-                                  <TriangleAlert size={13} /> {tr('Απόκλιση καταγράφηκε')}
-                                </>
-                              ) : (
-                                <>
-                                  <TriangleAlert size={13} /> {tr('Αναφορά απόκλισης')}
-                                </>
-                              )}
-                            </button>
+                        <Fragment key={key}>
+                          <label
+                            className={`${selected ? 'selected ' : ''}${incompatible ? 'incompatible ' : ''}${deviation ? 'has-issue' : ''}`.trim()}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              disabled={incompatible}
+                              onChange={() => toggleReceiptBatchAsset(item)}
+                            />
+                            <AssetTypeIcon
+                              kind={item.kind}
+                              maxUses={item.kind === 'TOOL' ? item.maxUses : undefined}
+                              size={16}
+                            />
+                            <div>
+                              <span>
+                                <b className="mono">{item.barcode}</b>
+                                <strong>{item.name}</strong>
+                              </span>
+                              <small>
+                                {trData(item.department) || tr('Χωρίς τμήμα')} ·{' '}
+                                {item.kind === 'SET'
+                                  ? `${tr('Σετ')} · ${tr('{0} εργαλεία', setTools.length)}`
+                                  : tr('Μεμονωμένο εργαλείο')}
+                              </small>
+                            </div>
+                            {selected && (
+                              <button
+                                type="button"
+                                className={deviation ? 'set-report-btn active' : 'set-report-btn'}
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (!deviation) openIssueReport(item.kind, item.id, 'Αποστείρωση · μαζική παραλαβή');
+                                }}
+                              >
+                                {deviation ? (
+                                  <>
+                                    <TriangleAlert size={13} /> {tr('Απόκλιση καταγράφηκε')}
+                                  </>
+                                ) : (
+                                  <>
+                                    <TriangleAlert size={13} /> {tr('Αναφορά απόκλισης')}
+                                  </>
+                                )}
+                              </button>
+                            )}
+                          </label>
+                          {selected && item.kind === 'SET' && (
+                            <BatchSetTools
+                              tools={setTools}
+                              issues={issues}
+                              onReport={toolId => openIssueReport('TOOL', toolId, 'Αποστείρωση · μαζική παραλαβή')}
+                            />
                           )}
-                        </label>
+                        </Fragment>
                       );
                     })}
                   </div>

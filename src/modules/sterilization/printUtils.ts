@@ -1,5 +1,6 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
+import {compositionLines} from '../../core/compositionCheck';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
 const escapeHtml = (value: string) =>
@@ -260,42 +261,54 @@ const markerChips = (marker: CompositionOptions['marker'] = []) =>
     })
     .join('');
 
+/** An open issue on the Set or one of its instruments, by barcode, for the composition sheet. */
+export type CompositionProblem = {barcode: string; type: string};
+
 /** The composition sheet's print CSS and body (the part after <title>), shared by the preview and the print window. */
 function compositionBody(
   set: SetAsset,
   tools: Tool[],
   preparedBy: string,
   preparedAt: string,
-  issueBarcodes: string[] = [],
+  problems: CompositionProblem[] = [],
   options: CompositionOptions = {},
 ) {
-  const groups = new Map<string, {name: string; code: string; manufacturer: string; count: number; issue: boolean}>();
-  for (const tool of tools) {
-    const key = `${tool.name}__${tool.code}__${tool.manufacturer}`;
-    const issue = issueBarcodes.includes(tool.barcode);
-    const current = groups.get(key);
-    if (current) {
-      current.count += 1;
-      if (issue) current.issue = true;
-    } else
-      groups.set(key, {
-        name: tool.name,
-        code: tool.code || '—',
-        manufacturer: tool.manufacturer || '—',
-        count: 1,
-        issue,
-      });
-  }
-  const sorted = [...groups.values()].sort(
-    (a, b) => a.name.localeCompare(b.name, 'el') || a.code.localeCompare(b.code),
-  );
-  const rows = sorted
-    .map(
-      (row, index) =>
-        `<tr class="${row.issue ? 'issue' : ''}"><td class="num">${index + 1}</td><td class="name">${escapeHtml(row.name)}${row.issue ? `<em>${tr('Ανοιχτή εκκρεμότητα')}</em>` : ''}</td><td>${escapeHtml(row.code)}</td><td>${escapeHtml(row.manufacturer)}</td><td class="qty">${row.count}</td><td class="chk"><span></span></td></tr>`,
-    )
+  const byBarcode = new Map<string, string[]>();
+  for (const p of problems) byBarcode.set(p.barcode, [...(byBarcode.get(p.barcode) || []), trData(p.type)]);
+  const lines = compositionLines(set.compositionTemplate, tools, byBarcode);
+  const templated = !!set.compositionTemplate?.length;
+  const missingTotal = templated
+    ? lines.reduce((sum, line) => sum + line.missing, 0)
+    : Math.max(0, (set.expected || 0) - tools.length);
+  const problemLines = lines.filter(line => line.problems.length).length;
+  const setProblems = byBarcode.get(set.barcode) || [];
+  const rows = lines
+    .map((row, index) => {
+      const flags = [
+        row.missing
+          ? `<em class="miss">${escapeHtml(row.missing === 1 ? tr('Λείπει 1') : tr('Λείπουν {0}', row.missing))}</em>`
+          : '',
+        row.problems.length ? `<em class="prob">${escapeHtml(row.problems.join(' · '))}</em>` : '',
+        row.expected === undefined && templated
+          ? `<em class="extra">${escapeHtml(tr('Εκτός πρότυπης σύνθεσης'))}</em>`
+          : '',
+      ].join('');
+      const cls = [row.missing ? 'missing' : '', row.problems.length ? 'issue' : ''].join(' ').trim();
+      return `<tr class="${cls}"><td class="num">${index + 1}</td><td class="name">${escapeHtml(row.name)}${flags}</td><td>${escapeHtml(row.code)}</td><td>${escapeHtml(row.manufacturer)}</td><td class="qty exp">${row.expected ?? '—'}</td><td class="qty">${row.present}</td><td class="chk"><span></span></td></tr>`;
+    })
     .join('');
-  const issueCount = sorted.filter(row => row.issue).length;
+  const alert =
+    missingTotal || problemLines || setProblems.length
+      ? `<div class="alert">${[
+          missingTotal
+            ? `<b>${escapeHtml(missingTotal === 1 ? tr('Λείπει 1 εργαλείο') : tr('Λείπουν {0} εργαλεία', missingTotal))}</b>`
+            : '',
+          problemLines ? `<b>${escapeHtml(tr('{0} γραμμές με πρόβλημα', problemLines))}</b>` : '',
+          setProblems.length ? `<b>${escapeHtml(tr('Εκκρεμότητα Σετ: {0}', setProblems.join(' · ')))}</b>` : '',
+        ]
+          .filter(Boolean)
+          .join('<span>·</span>')}</div>`
+      : '';
   const label = {...DEFAULT_LABEL_SETTINGS, ...(options.label || {})};
   const header =
     label.header === 'LOGO' && label.logo && /^data:image\/(png|jpeg|webp);/.test(label.logo)
@@ -307,8 +320,13 @@ function compositionBody(
   const meta = [
     [tr('Τμήμα'), trData(set.department) || '—'],
     [tr('Ειδικότητα'), trData(set.specialty) || '—'],
-    [tr('Σύνολο εργαλείων'), String(tools.length)],
-    [tr('Είδη εργαλείων'), String(sorted.length)],
+    [
+      tr('Σύνολο εργαλείων'),
+      templated || set.expected
+        ? `${tools.length} / ${templated ? lines.reduce((sum, line) => sum + (line.expected || 0), 0) : set.expected}`
+        : String(tools.length),
+    ],
+    [tr('Είδη εργαλείων'), String(lines.length)],
     [tr('Προετοίμασε'), preparedBy],
     [tr('Ημερομηνία / ώρα'), preparedAt],
   ]
@@ -329,8 +347,11 @@ function compositionBody(
   table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}
   th{font-size:7pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:2mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
   td{padding:1.8mm 1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nth-child(even) td{background:#f8fafb}
-  .num{width:7%;color:#6a7a84;text-align:right;padding-right:2.5mm}th:nth-child(2),td.name{width:39%}td.name{font-weight:700}th:nth-child(3),td:nth-child(3){width:17%}th:nth-child(4),td:nth-child(4){width:20%}.qty{width:8%;text-align:center}td.qty{font-weight:800;font-size:10pt}.chk{width:9%;text-align:center}.chk span{display:inline-block;width:3.6mm;height:3.6mm;border:.3mm solid #6d808b;border-radius:.6mm}
-  .issue td{color:#b3261e}.issue td.name em{display:block;font-size:6.5pt;font-style:normal;font-weight:700;letter-spacing:.04em}
+  .num{width:7%;color:#6a7a84;text-align:right;padding-right:2.5mm}th:nth-child(2),td.name{width:35%}td.name{font-weight:700}th:nth-child(3),td:nth-child(3){width:17%}th:nth-child(4),td:nth-child(4){width:18%}.qty{width:7%;text-align:center}td.qty{font-weight:800;font-size:10pt}.chk{width:9%;text-align:center}.chk span{display:inline-block;width:3.6mm;height:3.6mm;border:.3mm solid #6d808b;border-radius:.6mm}
+  td.name em{display:inline-block;margin:.8mm 1.5mm 0 0;padding:.2mm 1.4mm;border-radius:.8mm;font-size:6.5pt;font-style:normal;font-weight:800;letter-spacing:.03em}
+  em.miss{background:#fde8e6;color:#b3261e;border:.2mm solid #e8a59e}em.prob{background:#fff3df;color:#8a4b00;border:.2mm solid #e9c27f}em.extra{background:#eef2f4;color:#4b5d68}
+  tr.missing td{background:#fdf3f2!important}tr.missing td.qty:not(.exp){color:#b3261e}tr.issue td{background:#fff9ef!important}td.exp{color:#6a7a84}
+  .alert{display:flex;flex-wrap:wrap;gap:2mm;align-items:center;margin:-2mm 0 4mm;padding:2.2mm 3mm;border:.3mm solid #e8a59e;border-left:1.2mm solid #b3261e;border-radius:1.5mm;background:#fdf3f2;color:#8f1f17;font-size:8.5pt}.alert span{color:#c98a84}
   tfoot td{border-bottom:0;border-top:.35mm solid #9fb3bd;font-weight:800;background:#fff!important}
   .notes{margin-top:4mm;font-size:7.5pt;color:#5f707b}
   .signs{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:8mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:5mm}
@@ -339,9 +360,9 @@ function compositionBody(
   @media print{tr{break-inside:avoid}}
   </style></head><body><div class="sheet">
   <div class="top"><div><div class="brand-row">${header}</div><div class="doc">${tr('Φύλλο σύνθεσης & προετοιμασίας')}</div><h1>${escapeHtml(set.name)}</h1>${marker ? `<div class="marker">${marker}</div>` : ''}</div><div class="barcode">${barcode}<div class="barcode-code">${escapeHtml(set.barcode)}</div></div></div>
-  <div class="meta">${meta}</div>
-  <table><thead><tr><th class="num">#</th><th>${tr('Ονομασία')}</th><th>${tr('Κωδικός')}</th><th>${tr('Εταιρεία')}</th><th class="qty">${tr('Τεμ.')}</th><th class="chk">${tr('Έλεγχος')}</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td><td>${tr('Σύνολο')}</td><td></td><td></td><td class="qty">${tools.length}</td><td></td></tr></tfoot></table>
-  ${issueCount ? `<div class="notes">${escapeHtml(tr('Με κόκκινο: εργαλεία με ανοιχτή εκκρεμότητα ({0}).', issueCount))}</div>` : ''}
+  <div class="meta">${meta}</div>${alert}
+  <table><thead><tr><th class="num">#</th><th>${tr('Ονομασία')}</th><th>${tr('Κωδικός')}</th><th>${tr('Εταιρεία')}</th><th class="qty">${tr('Αναμ.')}</th><th class="qty">${tr('Παρόντα')}</th><th class="chk">${tr('Έλεγχος')}</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td><td>${tr('Σύνολο')}</td><td></td><td></td><td class="qty exp">${templated ? lines.reduce((sum, line) => sum + (line.expected || 0), 0) : '—'}</td><td class="qty">${tools.length}</td><td></td></tr></tfoot></table>
+  ${alert ? `<div class="notes">${escapeHtml(tr('Με κόκκινο: γραμμές με ελλείψεις. Με πορτοκαλί: εργαλεία με ανοιχτή εκκρεμότητα (βλάβη, φθορά κ.ά.).'))}</div>` : ''}
   <div class="signs"><div><b>${tr('Προετοιμασία / σύνθεση')}</b>${tr('Ονοματεπώνυμο & υπογραφή')}</div><div><b>${tr('Έλεγχος σύνθεσης')}</b>${tr('Ονοματεπώνυμο & υπογραφή')}</div><div><b>${tr('Κλίβανος / κύκλος')}</b>${tr('Αριθμός κύκλου & ημερομηνία')}</div></div>
   <div class="footer"><span>SurgiTrack · ${escapeHtml(set.barcode)}</span><span>${escapeHtml(tr('{0} φυσικές εγγραφές', tools.length))}</span></div>
   </div>`;
@@ -352,10 +373,10 @@ export function compositionHtml(
   tools: Tool[],
   preparedBy: string,
   preparedAt: string,
-  issueBarcodes: string[] = [],
+  problems: CompositionProblem[] = [],
   options?: CompositionOptions,
 ) {
-  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(tr('Σύνθεση {0}', set.barcode))}</title>${compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes, options)}</body></html>`;
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(tr('Σύνθεση {0}', set.barcode))}</title>${compositionBody(set, tools, preparedBy, preparedAt, problems, options)}</body></html>`;
 }
 
 export function printCompositionA4(
@@ -363,11 +384,11 @@ export function printCompositionA4(
   tools: Tool[],
   preparedBy: string,
   preparedAt: string,
-  issueBarcodes: string[] = [],
+  problems: CompositionProblem[] = [],
   options?: CompositionOptions,
 ) {
   return openPrintWindow(
     tr('Σύνθεση {0}', set.barcode),
-    compositionBody(set, tools, preparedBy, preparedAt, issueBarcodes, options),
+    compositionBody(set, tools, preparedBy, preparedAt, problems, options),
   );
 }

@@ -1184,6 +1184,7 @@ a.overview-bar:hover {
 .hospital-overview,
 .hospital-admin,
 .name-check,
+.replacements,
 .import-page {
   height: 100%;
   min-height: 0;
@@ -5001,4 +5002,406 @@ div.asset-import-hospital b {
   .name-check-sets > :last-child {
     grid-column: 1 / -1;
   }
+}
+
+/* Βλάβες & Αντικαταστάσεις: instruments to replace, Stock availability and purchase orders. */
+.replacements {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 24px;
+}
+.replacements-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.replacements-kpis button {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid #e1eaef;
+  border-radius: 12px;
+  background: #fff;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.replacements-kpis button.active {
+  border-color: #155a6e;
+  box-shadow: 0 0 0 2px rgba(21, 90, 110, 0.12);
+}
+.replacements-kpis span {
+  color: #6f808c;
+  font-size: 12px;
+}
+.replacements-kpis strong {
+  color: #152c41;
+  font-size: 24px;
+}
+.replacements-kpis .warn strong {
+  color: #b36b00;
+}
+.replacements-kpis .good strong {
+  color: #1d7a4d;
+}
+.replacements-kpis .bad strong {
+  color: #b3261e;
+}
+.replacements-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #e1eaef;
+  border-radius: 12px;
+  background: #fff;
+}
+.replacements-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.replacements-spacer {
+  flex: 1;
+}
+.replacements-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: min(360px, 100%);
+  padding: 0 11px;
+  min-height: 38px;
+  border: 1px solid #dce7eb;
+  border-radius: 10px;
+  color: #6f808c;
+}
+.replacements-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 13px;
+  background: transparent;
+}
+.replacements-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eef6f8;
+}
+.replacements-bulk b {
+  margin-right: 6px;
+  color: #155a6e;
+}
+.replacements-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: #4b5d69;
+  cursor: pointer;
+}
+.replacements-table {
+  max-height: 620px;
+  overflow: auto;
+  border: 1px solid #edf2f4;
+  border-radius: 10px;
+}
+.replacements-table table,
+.replacements-order-lines table,
+.replacements-order-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.replacements-table th,
+.replacements-order-lines th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 10px;
+  background: #f3f7f8;
+  color: #6f808c;
+  font-size: 11px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.replacements-table td,
+.replacements-order-lines td,
+.replacements-order-body td {
+  padding: 7px 10px;
+  border-top: 1px solid #edf2f4;
+  vertical-align: top;
+}
+.replacements-table tr.selected td {
+  background: #f1f8fa;
+}
+.replacements-table td small,
+.replacements-order-lines td small,
+.replacements-order-body td small {
+  display: block;
+  color: #6f808c;
+  font-size: 11.5px;
+}
+.replacements-table td a {
+  color: #155a6e;
+  text-decoration: none;
+}
+.replacements-table .pick {
+  width: 34px;
+}
+.replacements-table .since {
+  color: #4b5d69;
+  font-size: 12px;
+}
+.replacements-table .replacement-status {
+  white-space: normal;
+}
+.replacements-table .empty {
+  padding: 26px;
+  text-align: center;
+  color: #6f808c;
+}
+.replacement-reason,
+.replacement-status,
+.replacement-stock,
+.replacement-order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.r-SERVICE {
+  background: #e7f0fb;
+  color: #1f4f8a;
+}
+.r-DAMAGED {
+  background: #fff3df;
+  color: #8a4b00;
+}
+.r-LOST {
+  background: #fde8e6;
+  color: #b3261e;
+}
+.r-RETIRED {
+  background: #eef2f4;
+  color: #4b5d68;
+}
+.replacement-stock.yes {
+  background: #e6f5ec;
+  color: #1d7a4d;
+}
+.replacement-stock.no {
+  background: #fdeceb;
+  color: #b3261e;
+}
+.replacement-status.s-NEEDED {
+  background: #fff4dd;
+  color: #9a5b00;
+}
+.replacement-status.s-IN_ORDER,
+.replacement-order-status.o-OPEN,
+.replacement-order-status.o-ORDERED {
+  background: #e7f0fb;
+  color: #1f4f8a;
+}
+.replacement-status.s-REPLACED,
+.replacement-order-status.o-RECEIVED {
+  background: #e6f5ec;
+  color: #1d7a4d;
+}
+.replacement-order-status.o-CANCELLED {
+  background: #eef2f4;
+  color: #6f808c;
+}
+.replacements-table .row-actions {
+  width: 132px;
+}
+.replacements-table td:nth-child(3) {
+  min-width: 190px;
+}
+.replacements-table .row-actions button {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  padding: 4px 9px;
+  border: 1px solid #d5e2e7;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #20313f;
+  cursor: pointer;
+}
+.replacements-table .row-actions button.primary {
+  border-color: #155a6e;
+  background: #155a6e;
+  color: #fff;
+}
+.replacements-orders {
+  display: grid;
+  gap: 10px;
+}
+.replacements-order {
+  border: 1px solid #e1eaef;
+  border-radius: 12px;
+  background: #fff;
+}
+.replacements-order > header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.replacements-order > header small {
+  display: block;
+  color: #6f808c;
+  font-size: 12px;
+}
+.replacements-order-count {
+  color: #4b5d69;
+  font-size: 12.5px;
+}
+.replacements-order-body {
+  display: grid;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+.replacements-order-body .qty {
+  text-align: center;
+  font-weight: 800;
+}
+.replacements-order-note {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f6f9fa;
+  font-size: 12.5px;
+}
+.replacements-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.replacements-order-actions small {
+  color: #4b5d69;
+  font-size: 12px;
+}
+.replacements-empty {
+  justify-items: center;
+  padding: 34px;
+  text-align: center;
+  color: #6f808c;
+}
+.replacements-empty strong {
+  color: #20313f;
+}
+.replacements-order-modal {
+  position: relative;
+  width: min(860px, 94vw);
+  max-height: 90vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(20, 40, 52, 0.25);
+}
+.replacements-order-modal > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.replacements-order-modal h2 {
+  margin: 2px 0 4px;
+  font-size: 19px;
+}
+.replacements-order-modal header p {
+  margin: 0;
+  color: #6f808c;
+  font-size: 12.5px;
+}
+.replacements-order-lines {
+  overflow: auto;
+  border: 1px solid #edf2f4;
+  border-radius: 10px;
+}
+.replacements-order-lines input {
+  width: 64px;
+  padding: 5px 7px;
+  border: 1px solid #d5e2e7;
+  border-radius: 8px;
+  font: inherit;
+}
+.replacements .small,
+.replacements-order-modal .small {
+  font-size: 11px;
+  color: #4b5d69;
+}
+.replacements-order-fields {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}
+.replacements-order-fields label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5d69;
+}
+.replacements-order-fields input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d5e2e7;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 400;
+}
+.replacements-order-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.replacements-order-modal > footer span {
+  margin-right: auto;
+  font-weight: 700;
+  color: #155a6e;
+}
+@media (max-width: 900px) {
+  .replacements-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .replacements-order-fields {
+    grid-template-columns: 1fr;
+  }
+  .replacements-order > header {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Receipt card: the Set's instrument list always keeps room for several rows. */
+.receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-tools-scroll {
+  min-height: 260px !important;
 }

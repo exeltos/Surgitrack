@@ -4325,3 +4325,34 @@ a.auth-primary {
   border-color: #9fc9d3;
   background: #f6fbfc;
 }
+/* Studio → Settings: the barcode label card, a summary of the hospital default and its editor. */
+.label-settings-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+}
+.label-settings-summary div {
+  padding: 10px 11px;
+  border: 1px solid #dce7eb;
+  border-radius: 10px;
+}
+.label-settings-summary dt {
+  font-size: 11px;
+  color: #687f8e;
+}
+.label-settings-summary dd {
+  margin: 3px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #20313f;
+}
+.label-settings-summary small {
+  font-weight: 500;
+  color: #7c8e9c;
+}
+.department-lives-head small {
+  margin-left: auto;
+  font-weight: 600;
+  color: #8a6a2e;
+}

@@ -43,7 +43,7 @@ describe('composition sheet', () => {
       {barcode: 'T2', name: 'KOCHER', code: '12.320.20', manufacturer: 'DEWIMED'},
       {barcode: 'T3', name: 'RICHARSON', code: '', manufacturer: 'DEWIMED'},
     ] as Tool[];
-    const html = compositionHtml(set, tools, 'Demo', '29/09/2026', ['T3'], {
+    const html = compositionHtml(set, tools, 'Demo', '29/09/2026', [{barcode: 'T3', type: 'Βλάβη'}], {
       marker: [{name: 'Μπλε', colors: ['#1f5fbf']}],
     });
     expect(html).toContain('<td class="qty">2</td>');
@@ -51,5 +51,29 @@ describe('composition sheet', () => {
     expect(html).toContain('class="issue"');
     expect(html).toContain('Ονοματεπώνυμο & υπογραφή');
     expect(html).toContain('Μπλε');
+    expect(html).toContain('Βλάβη');
+  });
+
+  it('marks what the template expects but the Set does not hold', () => {
+    const set = {
+      barcode: 'S000002',
+      name: 'ΛΑΠΑΡΟΤΟΜΙΑΣ',
+      department: 'Χειρουργείο',
+      specialty: 'Γενική',
+      expected: 4,
+      compositionTemplate: [
+        {code: 'BH110R', name: 'ΛΑΒΙΔΑ KOCHER', quantity: 3},
+        {code: 'BC260R', name: 'ΨΑΛΙΔΙ METZENBAUM', quantity: 1},
+      ],
+    } as SetAsset;
+    const tools = [
+      {barcode: 'T1', name: 'ΛΑΒΙΔΑ KOCHER', code: 'bh110r', manufacturer: 'Aesculap'},
+      {barcode: 'T2', name: 'ΛΑΒΙΔΑ KOCHER', code: 'BH110R', manufacturer: 'Aesculap'},
+    ] as Tool[];
+    const html = compositionHtml(set, tools, 'Demo', '29/09/2026', [{barcode: 'S000002', type: 'Έλλειψη'}]);
+    expect(html).toContain('Λείπει 1</em>');
+    expect(html).toContain('Λείπουν 2 εργαλεία');
+    expect(html).toContain('Εκκρεμότητα Σετ: Έλλειψη');
+    expect(html).toContain('class="missing"');
   });
 });

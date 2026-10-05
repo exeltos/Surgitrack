@@ -363,7 +363,7 @@ export default function ReportsPage() {
           tools.filter(t => t.setId === selectedSet.id),
           currentUser.name,
           new Date().toLocaleString('el-GR'),
-          [],
+          issues.filter(i => i.status === 'OPEN').map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
           compositionOptions(selectedSet.colorTapes),
         ),
       };

@@ -1,4 +1,13 @@
-import type {DeliveryRecord, Issue, Movement, ProcessLoadRecord, ReceiptRecord, SetAsset, Tool} from '../types/domain';
+import type {
+  DeliveryRecord,
+  Issue,
+  Movement,
+  ProcessLoadRecord,
+  PurchaseOrder,
+  ReceiptRecord,
+  SetAsset,
+  Tool,
+} from '../types/domain';
 export const sets: SetAsset[] = [
   {
     id: 's1',
@@ -570,6 +579,59 @@ add(airway(ambu.bagAdult), 'STANDALONE', {department: 'ΜΕΘ', uses: 30});
   retired.retiredAt = '28/09/2026 09:40';
   retired.retiredReason = 'Συμπλήρωση ορίου χρήσεων';
 }
+// Instruments a Set misses because they are in Service or lost, and kinds the Stock does not hold.
+const extraKinds: ToolSeed[] = [
+  {code: '05.220.18', name: 'ΨΑΛΙΔΙ METZENBAUM ΚΥΡΤΟ 18 CM', manufacturer: 'AESCULAP', specialty: 'Γενική Χειρουργική'},
+  {code: '42.310.02', name: 'ΑΓΚΙΣΤΡΟ FARABEUF', manufacturer: 'DEWIMED', specialty: 'Γενική Χειρουργική'},
+  {
+    code: '15.140.14',
+    name: 'ΑΙΜΟΣΤΑΤΙΚΗ ΛΑΒΙΔΑ PEAN 14 CM',
+    manufacturer: 'KLS MARTIN',
+    specialty: 'Γενική Χειρουργική',
+  },
+];
+const setOf = (code: string) => sets.find(set => set.code === code)!;
+// Each Set's template composition: what it should hold, written from its instruments.
+for (const set of sets) {
+  const lines = new Map<string, {code: string; name: string; quantity: number}>();
+  for (const tool of tools)
+    if (tool.setId === set.id) {
+      const line = lines.get(tool.code) || {code: tool.code, name: tool.name, quantity: 0};
+      line.quantity += 1;
+      lines.set(tool.code, line);
+    }
+  set.compositionTemplate = [...lines.values()];
+}
+/** One more of this kind in the Set's template than it holds: shown as missing. */
+const expectOneMore = (set: SetAsset, seed: ToolSeed) => {
+  const line = set.compositionTemplate!.find(l => l.code === seed.code);
+  if (line) line.quantity += 1;
+  else set.compositionTemplate!.push({code: seed.code, name: seed.name, quantity: 1});
+  set.expected += 1;
+};
+// Two new kinds join the vascular Set; its Metzenbaum is worn and the Stock has none.
+const vascular = setOf('VASC-01');
+for (const seed of extraKinds.slice(0, 2)) {
+  add(seed, 'SET_MEMBER', {setId: vascular.id, department: vascular.department, state: vascular.state, uses: 14});
+  expectOneMore(vascular, seed);
+  vascular.actual += 1;
+}
+const wornMetzenbaum = tools[tools.length - 2];
+// Taken out of a Set: in Service or lost, so the Set misses one.
+const takenOut: Array<{set: SetAsset; seed: ToolSeed; state: 'SERVICE' | 'LOST'; at: string}> = [
+  {set: setOf('ORTHO-BASIC'), seed: extraKinds[2], state: 'SERVICE', at: '22/09/2026 10:15'},
+  {set: sets.find(set => set.id === 's3')!, seed: catalog[3], state: 'SERVICE', at: '25/09/2026 12:40'},
+  {set: sets.find(set => set.id === 's5')!, seed: catalog[4], state: 'LOST', at: '26/09/2026 09:05'},
+];
+const takenOutTools = takenOut.map(item => {
+  add(item.seed, 'STANDALONE', {
+    department: item.state === 'SERVICE' ? 'Service' : undefined,
+    state: item.state,
+    uses: 21,
+  });
+  expectOneMore(item.set, item.seed);
+  return tools[tools.length - 1];
+});
 export {tools};
 export const movements: Movement[] = [
   {
@@ -891,6 +953,135 @@ issues.push(
     note: 'Αντικαταστάθηκε από το stock.',
   },
 );
+// Instruments to replace: damaged in their Set, in Service, lost.
+const damagedMayo = tools.find(tool => tool.setId === 's1' && tool.code === '08.280.18')!;
+issues.push(
+  {
+    id: 'i8',
+    asset: `${damagedMayo.barcode} · ${damagedMayo.name}`,
+    type: 'Βλάβη',
+    status: 'OPEN',
+    created: '27/09/2026 15:10',
+    department: 'Χειρουργείο',
+    note: 'Χαλαρή άρθρωση, δεν κόβει καθαρά.',
+  },
+  {
+    id: 'i9',
+    asset: `${wornMetzenbaum.barcode} · ${wornMetzenbaum.name}`,
+    type: 'Φθορά',
+    status: 'OPEN',
+    created: '28/09/2026 11:30',
+    department: 'Χειρουργείο',
+    note: 'Φθαρμένες λεπίδες στην άκρη.',
+  },
+  ...takenOut.map((item, i) => {
+    const tool = takenOutTools[i];
+    return {
+      id: `i${10 + i}`,
+      asset: `${tool.barcode} · ${tool.name}`,
+      type: item.state === 'LOST' ? 'Απώλεια' : 'Βλάβη / Service',
+      status: 'OPEN' as const,
+      created: item.at,
+      department: item.set.department,
+      note:
+        item.state === 'LOST'
+          ? 'Δεν επέστρεψε με το Σετ μετά τον τοκετό.'
+          : 'Αποστείρωση · σύνθεση & προετοιμασία: μεταφέρθηκε στα χαλασμένα / Service.',
+    };
+  }),
+  {
+    id: 'i13',
+    asset: `${setOf('ER-SUTURE').barcode} · ${setOf('ER-SUTURE').name}`,
+    type: 'Φθορά',
+    status: 'RESOLVED',
+    created: '15/09/2026 13:20',
+    department: 'ΤΕΠ',
+    note: 'Ακονίστηκε το ψαλίδι. Επέστρεψε στη σύνθεση.',
+  },
+  {
+    id: 'i14',
+    asset: `${setOf('GYN-HYST').barcode} · ${setOf('GYN-HYST').name}`,
+    type: 'Έλλειψη',
+    status: 'RESOLVED',
+    created: '10/09/2026 08:50',
+    department: 'Γυναικολογική Κλινική',
+    note: 'Βρέθηκε στο χειρουργείο, επέστρεψε.',
+  },
+);
+takenOut.forEach((item, i) => {
+  const tool = takenOutTools[i];
+  movements.push({
+    id: `m${260 + i}`,
+    asset: `${tool.barcode} · ${tool.name}`,
+    assetKind: 'TOOL',
+    from: `Set ${item.set.barcode}`,
+    to: item.state === 'LOST' ? 'Απολεσθέντα' : 'Χαλασμένα / Service',
+    status: item.state === 'LOST' ? 'Δήλωση απώλειας' : 'Αφαίρεση από σύνθεση · προς Service',
+    at: item.at,
+    by: people.ster,
+  });
+});
+
+// A month of circulation for every Set: sent after a procedure, received, sterilized, delivered back.
+const personOf: Record<string, string> = {
+  Χειρουργείο: people.or,
+  'Ορθοπεδική Κλινική': people.ortho,
+  'Αίθουσα Τοκετών': people.tok,
+  'Μονάδα IVF': people.ivf,
+  ΤΕΠ: people.er,
+  ΜΕΘ: people.icu,
+  'Γυναικολογική Κλινική': people.gyn,
+};
+const two = (value: number) => String(value).padStart(2, '0');
+const historyReceipts: Array<[SetAsset, string, string]> = [];
+const historyDeliveries: Array<[SetAsset, string, string]> = [];
+let patient = 100;
+sets.forEach((set, index) => {
+  for (let k = 0; k < 3; k++) {
+    const day = 2 + ((index * 3 + k * 8) % 21);
+    const hour = 8 + ((index + k * 5) % 9);
+    const sent = `${two(day)}/09/2026 ${two(hour)}:${two((index * 7) % 60)}`;
+    const received = `${two(day)}/09/2026 ${two(hour + 1)}:${two((index * 11) % 60)}`;
+    const back = `${two(day + 1)}/09/2026 ${two(9 + (index % 5))}:${two((index * 13) % 60)}`;
+    const by = personOf[set.department] || people.or;
+    patient += 1;
+    movements.push(
+      {
+        id: `mh-${set.id}-${k}-1`,
+        asset: label(set),
+        assetKind: 'SET',
+        from: set.department,
+        to: 'Κεντρική Αποστείρωση',
+        status: 'Αποστολή προς αποστείρωση',
+        at: sent,
+        by,
+        patientCode: `PT-2026-0${patient}`,
+      },
+      {
+        id: `mh-${set.id}-${k}-2`,
+        asset: label(set),
+        assetKind: 'SET',
+        from: set.department,
+        to: 'Κεντρική Αποστείρωση',
+        status: 'Παραλαβή στην Αποστείρωση',
+        at: received,
+        by: people.ster,
+      },
+      {
+        id: `mh-${set.id}-${k}-3`,
+        asset: label(set),
+        assetKind: 'SET',
+        from: 'Κεντρική Αποστείρωση',
+        to: set.department,
+        status: 'Παράδοση στο τμήμα · υπογραφή παραλαμβάνοντα',
+        at: back,
+        by: people.ster,
+      },
+    );
+    historyReceipts.push([set, by, received]);
+    historyDeliveries.push([set, by, back]);
+  }
+});
 const loadItem = (set: SetAsset) => ({
   assetId: set.id,
   assetKind: 'SET' as const,
@@ -1002,6 +1193,80 @@ export const deliveries: DeliveryRecord[] = [
     at,
   };
 });
+
+historyReceipts.forEach(([set, deliveredByName, at], i) =>
+  receipts.push({
+    ...handover,
+    id: `rc-hist-${i + 1}`,
+    assetId: set.id,
+    barcode: set.barcode,
+    assetName: set.name,
+    fromDepartment: set.department,
+    toDepartment: 'Κεντρική Αποστείρωση',
+    deliveredByUserId: `demo-h-${i + 1}`,
+    deliveredByName,
+    deliveredByDepartment: set.department,
+    receivedByUserId: 'demo-sterilization',
+    receivedByName: people.ster,
+    receivedByDepartment: 'Κεντρική Αποστείρωση',
+    at,
+    visibleDeviation: false,
+  }),
+);
+historyDeliveries.forEach(([set, receivedByName, at], i) =>
+  deliveries.push({
+    ...handover,
+    id: `dl-hist-${i + 1}`,
+    assetId: set.id,
+    barcode: set.barcode,
+    assetName: set.name,
+    department: set.department,
+    deliveredByUserId: 'demo-sterilization',
+    deliveredByName: people.ster,
+    deliveredByDepartment: 'Κεντρική Αποστείρωση',
+    receivedByUserId: `demo-hr-${i + 1}`,
+    receivedByName,
+    receivedByDepartment: set.department,
+    at,
+  }),
+);
+
+// Purchase orders for replacements: one received, one waiting for the supplier.
+const retiredLap = outOfUse.filter(tool => tool.code === '70.510.05');
+const retiredBag = outOfUse.filter(tool => tool.code !== '70.510.05');
+const orderLine = (list: Tool[]) => ({
+  code: list[0].code,
+  name: list[0].name,
+  manufacturer: list[0].manufacturer,
+  quantity: list.length,
+  reason: 'Εκτός χρήσης',
+  toolIds: list.map(tool => tool.id),
+  barcodes: list.map(tool => tool.barcode),
+});
+export const purchaseOrders: PurchaseOrder[] = [
+  {
+    id: 'po-demo-2',
+    number: 'ΠΑ-2026-002',
+    status: 'ORDERED',
+    supplier: 'Προμηθευτής Δοκιμής',
+    note: 'Επείγον για το καρότσι ανάνηψης της ΜΕΘ.',
+    lines: [orderLine(retiredBag)],
+    createdAt: '28/09/2026 10:05',
+    createdByName: people.supervisor,
+    orderedAt: '28/09/2026 12:30',
+  },
+  {
+    id: 'po-demo-1',
+    number: 'ΠΑ-2026-001',
+    status: 'RECEIVED',
+    supplier: 'Προμηθευτής Δοκιμής',
+    lines: [orderLine(retiredLap.slice(0, 2))],
+    createdAt: '04/09/2026 09:20',
+    createdByName: people.supervisor,
+    orderedAt: '04/09/2026 11:00',
+    receivedAt: '18/09/2026 08:45',
+  },
+];
 
 // Histories are read newest first (live records are prepended), so keep the demo in that order.
 const newestFirst = (value: string) => {
