@@ -1182,7 +1182,9 @@ a.overview-bar:hover {
 /* The app shell's content pane does not scroll, so these pages scroll themselves. */
 .hospitals-page,
 .hospital-overview,
-.hospital-admin {
+.hospital-admin,
+.name-check,
+.import-page {
   height: 100%;
   min-height: 0;
   overflow-y: auto;
