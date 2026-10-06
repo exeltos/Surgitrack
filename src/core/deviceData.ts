@@ -95,11 +95,11 @@ export const readingResult = (value: unknown): ReadingResult => {
 
 const toNumber = (value: unknown) => {
   if (value === undefined || value === null || String(value).trim() === '') return undefined;
-  const n = Number(
-    String(value)
-      .replace(',', '.')
-      .replace(/[^\d.+-]/g, ''),
-  );
+  // Text with no digits at all ("N/A") is unknown, not 0: Number('') is 0.
+  const digits = String(value)
+    .replace(',', '.')
+    .replace(/[^\d.+-]/g, '');
+  const n = digits ? Number(digits) : NaN;
   return Number.isFinite(n) ? n : undefined;
 };
 
