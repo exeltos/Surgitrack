@@ -6462,12 +6462,6 @@ html body .studio-workspace {
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
-/* On wide screens the Sets columns fit on one line, so every row is one line tall. */
-@media (min-width: 1700px) {
-  html body .asset-registry-table .cell-wide-nowrap {
-    white-space: nowrap;
-  }
-}
 /* Set detail: tighter tool rows, names on one line. */
 html body .asset-detail-body .set-tool-row {
   min-height: 0;
@@ -6616,72 +6610,72 @@ html body .devices-readings header small {
   font-size: 12px;
 }
 /* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
-html body .tools-table td:nth-child(4) .row-sub {
+html body .registry-fixed td:nth-child(4) .row-sub {
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-html body .tools-table td:last-child,
-html body .tools-table th:last-child {
+html body .registry-fixed td:last-child,
+html body .registry-fixed th:last-child {
   width: 36px;
   padding-left: 0;
   padding-right: 8px;
 }
 @media (max-width: 1299px) {
-  html body .tools-table th:nth-child(3),
-  html body .tools-table td:nth-child(3),
-  html body .tools-table th:nth-child(7),
-  html body .tools-table td:nth-child(7) {
+  html body .registry-fixed th:nth-child(3),
+  html body .registry-fixed td:nth-child(3),
+  html body .registry-fixed th:nth-child(7),
+  html body .registry-fixed td:nth-child(7) {
     display: none;
   }
 }
-html body .tools-table {
+html body .registry-fixed {
   table-layout: fixed;
   width: 100%;
   min-width: 0 !important;
 }
-html body .tools-table th:first-child,
-html body .tools-table td:first-child {
+html body .registry-fixed th:first-child,
+html body .registry-fixed td:first-child {
   width: auto;
   max-width: none;
 }
-html body .tools-table th:not(:first-child),
-html body .tools-table td:not(:first-child) {
+html body .registry-fixed th:not(:first-child),
+html body .registry-fixed td:not(:first-child) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-html body .tools-table th:nth-child(2) {
+html body .registry-fixed th:nth-child(2) {
   width: 96px;
 }
-html body .tools-table th:nth-child(3) {
-  width: 170px;
+html body .registry-fixed th:nth-child(3) {
+  width: 165px;
 }
-html body .tools-table th:nth-child(4) {
-  width: 230px;
+html body .registry-fixed th:nth-child(4) {
+  width: 190px;
 }
-html body .tools-table th:nth-child(5) {
-  width: 96px;
+html body .registry-fixed th:nth-child(5) {
+  width: 90px;
 }
-html body .tools-table th:nth-child(6) {
+html body .registry-fixed th:nth-child(6) {
   width: 150px;
 }
-html body .tools-table th:nth-child(7) {
+html body .registry-fixed th:nth-child(7) {
   width: 40px;
 }
 @media (max-width: 1299px) {
-  html body .tools-table th:nth-child(4) {
-    width: 120px;
+  html body .registry-fixed th:nth-child(4) {
+    width: 170px;
   }
-  html body .tools-table th:nth-child(5) {
+  html body .registry-fixed th:nth-child(5) {
     width: 100px;
   }
-  html body .tools-table th:nth-child(6) {
-    width: 120px;
+  html body .registry-fixed th:nth-child(6) {
+    width: 220px;
   }
 }
-html body .tools-table .badge {
+html body .registry-fixed .badge {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
@@ -6690,7 +6684,7 @@ html body .tools-table .badge {
   vertical-align: middle;
 }
 @media (min-width: 1300px) {
-  html body .tools-table th:nth-child(6) {
-    width: 190px;
+  html body .registry-fixed th:nth-child(6) {
+    width: 205px;
   }
 }

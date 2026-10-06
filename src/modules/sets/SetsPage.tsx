@@ -164,15 +164,13 @@ export default function SetsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table">
+          <table className="asset-registry-table registry-fixed">
             <thead>
               <tr>
                 <th>{tr('Όνομα Σετ')}</th>
-                <th>{tr('Κωδικός')}</th>
                 <th>Barcode</th>
-                <th>{tr('Εταιρεία')}</th>
-                <th>{tr('Τμήμα')}</th>
                 <th>{tr('Ειδικότητα')}</th>
+                <th>{tr('Τμήμα')}</th>
                 <th>{tr('Εργαλεία')}</th>
                 <th>{tr('Κατάσταση')}</th>
                 <th>
@@ -193,24 +191,23 @@ export default function SetsPage() {
                             {s.name}
                           </Link>
                           <ColorMarker tapes={s.colorTapes} size="sm" />
+                          <small className="row-sub">{[s.manufacturer, s.code].filter(Boolean).join(' · ')}</small>
                         </span>
                       </div>
                     </td>
-                    <td className="cell-nowrap">{s.code}</td>
                     <td>
                       <Link className="mono strong-link" to={`/sets/${s.id}`}>
                         {s.barcode}
                       </Link>
                     </td>
-                    <td className="cell-wide-nowrap">{s.manufacturer || '—'}</td>
-                    <td className="cell-wide-nowrap">
+                    <td>{trData(s.specialty) || '—'}</td>
+                    <td>
                       {s.state === 'IN_STOCK' ? (
                         <span className="asset-field-na">{tr('Απόθεμα Σετ')}</span>
                       ) : (
                         trData(s.department) || '—'
                       )}
                     </td>
-                    <td className="cell-wide-nowrap">{trData(s.specialty) || '—'}</td>
                     <td>
                       <b>{count}</b>
                       <span className="muted"> / {s.expected}</span>
@@ -226,7 +223,7 @@ export default function SetsPage() {
                   </tr>
                 );
               })}
-              {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
+              {rows.hasMore && <MoreRows colSpan={5} onVisible={rows.showMore} />}
             </tbody>
           </table>
         )}

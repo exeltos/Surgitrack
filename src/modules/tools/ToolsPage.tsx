@@ -182,7 +182,7 @@ export default function ToolsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table tools-table">
+          <table className="asset-registry-table registry-fixed">
             <thead>
               <tr>
                 <th>{tr('Ονομασία')}</th>
