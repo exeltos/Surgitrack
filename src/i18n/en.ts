@@ -1166,8 +1166,8 @@ export const en: Record<string, string> = {
   'Σύνολο εργαλείων': 'Total instruments',
   Σύνοψη: 'Summary',
   ΤΕΚΜΗΡΙΩΣΗ: 'DOCUMENTATION',
-  'Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος, οι αναφορές και η ηλεκτρονική αποστολή προς Κεντρική Αποστείρωση.':
-    "The department's sets and standalone instruments, reports and electronic dispatch to Central Sterile Services.",
+  'Τα Σετ και τα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.':
+    "The department's Sets and instruments, and sending them to Sterilization.",
   'Τα βασικά στοιχεία εμφανίζονται σε μία καθαρή γραμμή · αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα':
     'Key details on one clear line · report only if a visible problem is found',
   'Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Απόθεμα.': 'The instruments are released and moved to stock.',

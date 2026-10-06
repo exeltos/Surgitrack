@@ -6971,3 +6971,68 @@ html body .count-card .scanbox small {
 html body .count-card .scanbox .set-select {
   min-width: 340px;
 }
+/* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
+html body .department-kpis > * {
+  display: grid !important;
+  align-content: start;
+  gap: 6px !important;
+  min-width: 0;
+  padding: 12px 16px !important;
+  border: 1px solid #d5e3e8;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 42, 67, 0.08);
+  text-align: left;
+}
+html body .department-kpis > * span,
+html body .department-kpis > * small {
+  color: var(--st-muted);
+  font-size: 13px !important;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .department-kpis > * strong {
+  margin: 0 !important;
+  color: #152c41;
+  font-size: 26px !important;
+  line-height: 1.1;
+}
+html body .department-kpis > .active {
+  border-color: #1d6b7a;
+  box-shadow:
+    0 0 0 1px #1d6b7a,
+    0 1px 3px rgba(16, 42, 67, 0.08);
+}
+html body .department-header .department-user-sign {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+html body .department-header .department-user-sign span {
+  display: none;
+}
+html body .department-header {
+  align-items: center;
+}
+html body .department-header > div:first-child > p {
+  white-space: normal;
+}
+html body .department-asset-row {
+  min-height: 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+html body .department-asset-state > small,
+html body .department-asset-uses > small {
+  display: none;
+}
+html body .department-asset-open,
+html body .department-asset-list article > a {
+  min-height: 0 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
