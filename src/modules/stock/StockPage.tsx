@@ -4,7 +4,6 @@ import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import {useLibraries} from '../../core/LibraryStore';
-import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -17,14 +16,13 @@ import AppButton from '../../components/ui/AppButton';
 import StatusBadge from '../../components/ui/StatusBadge';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
-import KpiStrip from '../../components/ui/KpiStrip';
 import {tr, trData} from '../../i18n';
-import {presetPath, useRememberedState} from '../../core/listMemory';
+import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function StockPage() {
-  const {tools, retiredTools, sets, can, purchaseOrders} = useSurgi();
+  const {tools, retiredTools, can, purchaseOrders} = useSurgi();
   const [params, setParams] = useSearchParams();
   const view = params.get('view') === 'minimums' ? 'MIN' : 'LIST';
   const navigate = useNavigate();
@@ -41,13 +39,6 @@ export default function StockPage() {
   );
   const values = (key: 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(stock.map(t => String(t[key] || '')).filter(Boolean))].sort();
-  const kpi = kpiFilters({
-    q: [q, setQ],
-    specialty: [specialty, setSpecialty],
-    manufacturer: [manufacturer, setManufacturer],
-    state: [state, setState],
-    usage: [usage, setUsage],
-  });
   const filtered = stock.filter(
     t =>
       (!specialty || t.specialty === specialty) &&
@@ -97,21 +88,6 @@ export default function StockPage() {
         <StockMinimums />
       ) : (
         <>
-          <KpiStrip
-            items={[
-              {label: tr('Διαθέσιμα'), value: stock.length, ...kpi()},
-              {
-                label: tr('Με όριο χρήσεων'),
-                value: stock.filter(t => t.maxUses).length,
-                ...kpi({usage: 'LIMITED'}),
-              },
-              {
-                label: tr('Σετ με έλλειψη'),
-                value: sets.filter(s => s.actual < s.expected).length,
-                to: presetPath('/sets', {completeness: 'SHORT'}),
-              },
-            ]}
-          />
           <AssetFilterBar
             query={q}
             onQueryChange={setQ}
