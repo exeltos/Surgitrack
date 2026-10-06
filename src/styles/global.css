@@ -6839,3 +6839,34 @@ html body .name-check-kpis > div {
 html body .name-check-kpis strong {
   font-size: 20px;
 }
+/* Movements: one-line rows (route and chip never wrap), header buttons like everywhere else. */
+html body .ledger-columns,
+html body .ledger-row {
+  grid-template-columns: 110px minmax(130px, 1fr) minmax(200px, 1.5fr) 170px minmax(120px, 0.8fr) 24px;
+  gap: 10px;
+}
+html body .ledger-route i,
+html body .ledger-route {
+  white-space: nowrap;
+}
+html body .ledger-route i {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+html body .ledger-row .movement-chip {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .ledger-row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+html body .movements-actions button {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 13px;
+}
