@@ -48,6 +48,22 @@ describe('device data', () => {
     expect(new Date(readings[0].startedAt!).getDate()).toBe(4);
   });
 
+  it('reads a number with no digits ("N/A") as unknown, never as 0', () => {
+    expect(
+      readingFromValues({cycle_number: '1', max_temperature: 'N/A', max_pressure: 'abc', duration_minutes: '°C'}),
+    ).toMatchObject({maxTemperature: undefined, maxPressure: undefined, durationMinutes: undefined});
+
+    const {readings} = readingsFromSheet([
+      ['Κύκλος', 'Θερμοκρασία (°C)', 'Πίεση'],
+      ['1301', 'N/A', '—'],
+      ['1302', '134,2', '3.05'],
+    ]);
+    expect(readings.map(r => [r.cycleNumber, r.maxTemperature, r.maxPressure])).toEqual([
+      ['1301', undefined, undefined],
+      ['1302', 134.2, 3.05],
+    ]);
+  });
+
   it('reads a serial printout of tickets and JSON lines', () => {
     const printout = [
       'MELAG Vacuklav',
