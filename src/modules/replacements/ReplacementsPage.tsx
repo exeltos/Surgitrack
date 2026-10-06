@@ -406,14 +406,20 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                             </button>
                           )}
                           {item.status === 'NEEDED' && (
-                            <button type="button" onClick={() => setOrdering(orderLines([item]))}>
-                              <ShoppingCart size={13} /> {tr('Παραγγελία')}
+                            <button
+                              type="button"
+                              title={tr('Παραγγελία')}
+                              aria-label={tr('Παραγγελία')}
+                              onClick={() => setOrdering(orderLines([item]))}
+                            >
+                              <ShoppingCart size={13} /> <span className="btn-label">{tr('Παραγγελία')}</span>
                             </button>
                           )}
                           {item.reason === 'SERVICE' && item.status !== 'REPLACED' && (
                             <button
                               type="button"
                               title={tr('Επέστρεψε επισκευασμένο: πάει στο Απόθεμα')}
+                              aria-label={tr('Επιστροφή')}
                               onClick={() =>
                                 ask({
                                   title: tr('Επιστροφή από Service;'),
@@ -426,7 +432,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                                 })
                               }
                             >
-                              <Undo2 size={13} /> {tr('Επιστροφή')}
+                              <Undo2 size={13} /> <span className="btn-label">{tr('Επιστροφή')}</span>
                             </button>
                           )}
                         </td>

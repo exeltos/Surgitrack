@@ -6242,3 +6242,171 @@ html body .content .movements-actions button {
   padding-right: 4px;
   scrollbar-gutter: stable;
 }
+
+/* Density: more of the page for the content. A slimmer top bar, header, KPI strips and filter bar, smaller
+   page titles and sidebar, and tighter table rows (the list keeps its own scroll, so a row saved is a row shown). */
+:root {
+  --st-topbar-h: 56px;
+}
+html body .topbar {
+  height: 56px;
+}
+html body .content {
+  padding-top: 16px;
+  padding-bottom: 10px;
+}
+html body .page-head h1,
+html body .ster-work-head h1,
+html body .department-header h1,
+html body .studio-head h1 {
+  font-size: 20px !important;
+}
+html body .page-head p,
+html body .ster-work-head p,
+html body .department-header p,
+html body .studio-head p {
+  font-size: 13px !important;
+}
+html body .page-head,
+html body .ster-work-head,
+html body .department-header,
+html body .studio-head {
+  margin-bottom: 10px;
+}
+html body .sidebar {
+  padding-top: 14px;
+}
+html body .nav-item {
+  padding: 7px 11px;
+  font-size: 13px;
+}
+html body .sidebar nav {
+  gap: 2px;
+}
+/* KPI strips on the list pages: label and number on one row. */
+html body .tools-list-workspace .kpis {
+  margin-bottom: 8px;
+}
+html body .tools-list-workspace .kpis > * {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0;
+  padding: 8px 14px;
+}
+html body .tools-list-workspace .kpis strong {
+  margin-top: 0;
+  font-size: 20px;
+}
+html body .tools-list-workspace > .asset-filter-bar,
+html body .tools-list-workspace > .asset-list-controls {
+  margin-bottom: 8px;
+}
+html body .asset-filter-bar {
+  padding: 5px 8px;
+}
+html body .asset-list-controls > .icon-toggle {
+  min-height: 46px;
+}
+/* Table rows. */
+html body .asset-registry-table tbody td {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+html body .asset-registry-table td small.row-sub {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Overview dashboard. */
+html body .dash-kpis {
+  gap: 10px;
+  margin-bottom: 10px;
+}
+html body .dash-kpi {
+  padding: 10px 14px;
+}
+html body .dash-kpi strong {
+  font-size: 28px;
+}
+html body .dash-kpi-label {
+  min-height: 0;
+}
+html body .dash-grid {
+  gap: 10px;
+}
+html body .dash-card {
+  gap: 8px;
+  padding: 12px 16px;
+}
+html body .dash-bar {
+  min-height: 24px;
+}
+html body .dash-dept {
+  min-height: 26px;
+}
+html body .dash-legend li {
+  min-height: 26px;
+}
+html body .dash-list li {
+  padding: 5px 0;
+}
+html body .dash-activity .dash-columns {
+  height: 120px;
+}
+/* A page description is one line (the full text is its tooltip) so the header stays slim. */
+html body .page-head > div:first-child > p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Replacements: KPI tiles in one row, tighter rows. */
+html body .replacements-kpis > * {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+}
+html body .replacements-kpis strong {
+  font-size: 20px;
+}
+html body .replacements-table td small,
+html body .replacements-table td .replacement-stage {
+  display: block;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .replacements-table tbody td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+html body .replacements-table .row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: auto;
+}
+html body .replacements-table .row-actions button {
+  white-space: nowrap;
+}
+@media (max-width: 1700px) {
+  /* Only the main action keeps its words; the others are icons with a tooltip. */
+  html body .replacements-table .row-actions button:not(.primary) .btn-label {
+    display: none;
+  }
+}
+/* A one-line page description must not widen a grid page. */
+html body .devices-page {
+  grid-template-columns: minmax(0, 1fr);
+}
+html body .reports-catalog {
+  overflow-y: auto;
+}
+html body .asset-registry-table td:first-child {
+  min-width: 260px;
+}
