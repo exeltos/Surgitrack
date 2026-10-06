@@ -262,6 +262,7 @@ export default function AssetImportWizard({lang, organizations, departments, byN
     <div className="asset-import">
       <header className="asset-import-head">
         <div>
+          {asPage && <span className="eyebrow">{L('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ', 'EQUIPMENT REGISTER')}</span>}
           <h2 {...(asPage ? {role: 'heading', 'aria-level': 1} : {})}>
             {L('Μαζική εισαγωγή εργαλείων και Σετ', 'Bulk import of instruments and Sets')}
           </h2>
