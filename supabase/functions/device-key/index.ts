@@ -1,20 +1,20 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {corsFor, jsonWith} from "../_shared/http.ts";
 
 // Issues a new network key for a connected device (sterilizer, washer…). The key is returned once;
 // only its SHA-256 is stored, and the previous key stops working. Only a hospital admin for a device
 // of their own hospital, or the platform admin.
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 const hex = (bytes: ArrayBuffer | Uint8Array) =>
   Array.from(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), b => b.toString(16).padStart(2, "0")).join("");
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   try {

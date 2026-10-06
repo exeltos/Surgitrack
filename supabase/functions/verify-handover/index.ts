@@ -1,17 +1,15 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {corsFor, jsonWith} from "../_shared/http.ts";
 
 // Signs a handover between Sterilization and a department. The signed-in Sterilization user is
 // one party; the other party confirms with their own user code + password on the same screen.
 // Returns who signed, never a session: the password check's session is revoked at once.
 // Failed attempts share the login limiter (per code, and per signed-in caller).
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 
 const WINDOW_MINUTES = 15;
 const MAX_FAILS_PER_CODE = 5;
@@ -24,6 +22,8 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   const started = Date.now();

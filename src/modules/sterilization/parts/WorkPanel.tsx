@@ -1,0 +1,290 @@
+import {Link} from 'react-router-dom';
+import StatusBadge from '../../../components/ui/StatusBadge';
+import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
+import {
+  CheckCircle2,
+  ScanBarcode,
+  PackageCheck,
+  Flame,
+  TriangleAlert,
+  ArrowRight,
+  Box,
+  UserRoundCheck,
+  ShieldCheck,
+  Layers3,
+  PackageOpen,
+} from 'lucide-react';
+import {tr, trData} from '../../../i18n';
+import type {SterilizationPageState} from '../useSterilizationPage';
+
+export default function WorkPanel({s}: {s: SterilizationPageState}) {
+  const {
+    awaitingLoads,
+    incoming,
+    issues,
+    openCheckpoint,
+    openCycleCompletion,
+    openDelivery,
+    openDeliveryBatch,
+    openLoad,
+    openLoadRelease,
+    openPreparation,
+    openReceipt,
+    openReceiptBatch,
+    openRelease,
+    processing,
+    queue,
+    queueStageLabel,
+    queueTitle,
+    ready,
+    recallCases,
+    recallLoad,
+    releasedLoads,
+    rows,
+    washing,
+  } = s;
+  return (
+    <div className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}`}>
+      <div className="ster-panel-head">
+        <div>
+          <strong>{queueTitle}</strong>
+          <span>
+            {rows.length} {rows.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
+          </span>
+        </div>
+        <div className="ster-panel-head-actions">
+          {queue === 'INCOMING' && (
+            <>
+              <span className="ster-hint">
+                {tr('Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.')}
+              </span>
+              {incoming.length > 0 && (
+                <button className="primary compact" onClick={openReceiptBatch}>
+                  <ScanBarcode size={15} /> {tr('Μαζική παραλαβή')}
+                </button>
+              )}
+            </>
+          )}
+          {queue === 'WASHING' && (
+            <>
+              <span className="ster-hint">{tr('Τεκμηριωμένο quality gate καθαρισμού / απολύμανσης.')}</span>
+              {washing.length > 0 && (
+                <button className="primary compact" onClick={() => openLoad('WASHING')}>
+                  <Layers3 size={15} /> {tr('Νέο φορτίο πλυντηρίου')}
+                </button>
+              )}
+            </>
+          )}
+          {queue === 'PREP' && (
+            <span className="ster-hint">{tr('Έλεγχος λειτουργικότητας, σύνθεση και διαχείριση αποκλίσεων.')}</span>
+          )}
+          {queue === 'PACKAGING' && (
+            <span className="ster-hint">{tr('Έλεγχος sterile barrier, σήμανσης και δείκτη πριν τον κύκλο.')}</span>
+          )}
+          {queue === 'PROCESS' && processing.length > 0 && (
+            <button className="primary compact" onClick={() => openLoad('STERILIZATION')}>
+              <Flame size={15} /> {tr('Δημιουργία φορτίου')}
+            </button>
+          )}
+          {queue === 'STORAGE' && (
+            <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
+          )}
+          {queue === 'READY' && ready.length > 0 && (
+            <button className="primary compact" onClick={openDeliveryBatch}>
+              <ScanBarcode size={15} /> {tr('Νέα παράδοση')}
+            </button>
+          )}
+          {queue === 'RELEASE' && (
+            <span className="ster-hint">
+              {tr('Αποδέσμευση ανά φορτίο με ενιαία τεκμηρίωση CI/BI και φυσικών παραμέτρων.')}
+            </span>
+          )}
+        </div>
+      </div>
+      {queue === 'RELEASE' && awaitingLoads.length > 0 && (
+        <div className="load-release-strip">
+          {awaitingLoads.map(load => (
+            <div className="load-release-card" key={load.id}>
+              <div>
+                <span>
+                  {tr('ΦΟΡΤΙΟ ·') + ' '}
+                  {load.id}
+                </span>
+                <strong>
+                  {load.equipment} · {load.cycleNumber}
+                </strong>
+                <small>
+                  {load.program} · {load.items.length} {tr('αντικείμενα')}
+                </small>
+              </div>
+              <button className="primary compact" onClick={() => openLoadRelease(load.id)}>
+                <ShieldCheck size={15} /> {tr('Αποδέσμευση φορτίου')}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {queue === 'RELEASE' && recallCases.some(item => item.status === 'OPEN') && (
+        <details className="released-loads" open>
+          <summary>
+            {tr('Ενεργές ανακλήσεις ·') + ' '}
+            {recallCases.filter(item => item.status === 'OPEN').length}
+          </summary>
+          <div>
+            {recallCases
+              .filter(item => item.status === 'OPEN')
+              .map(recall => (
+                <div key={recall.id}>
+                  <span>
+                    <b>{recall.id}</b> {tr('· φορτίο') + ' '}
+                    {recall.loadId} · {recall.items.filter(item => item.status !== 'CLOSED').length} {tr('εκκρεμή')}
+                    <small style={{display: 'block'}}>{recall.reason}</small>
+                  </span>
+                  <span>
+                    {recall.items.filter(item => item.status === 'OUTSTANDING').length} {tr('προς επιστροφή')}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </details>
+      )}
+      {queue === 'RELEASE' && releasedLoads.length > 0 && (
+        <details className="released-loads">
+          <summary>{tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}</summary>
+          <div>
+            {releasedLoads.map(load => (
+              <div key={load.id}>
+                <span>
+                  <b>{load.id}</b> · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
+                </span>
+                <button onClick={() => recallLoad(load.id)}>
+                  <TriangleAlert size={14} /> {tr('Ανάκληση')}
+                </button>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+      {rows.length === 0 ? (
+        <div className="empty ster-empty">
+          <PackageCheck size={32} />
+          <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>
+          <span>{tr('Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.')}</span>
+        </div>
+      ) : (
+        <>
+          <div className="ster-list-head">
+            <span>{tr('Αντικείμενο')}</span>
+            <span>{tr('Τμήμα')}</span>
+            <span>{tr('Ειδικότητα')}</span>
+            <span>{queue === 'INCOMING' ? tr('Σύνθεση / κατάσταση') : tr('Κατάσταση')}</span>
+            <span>{tr('Στάδιο')}</span>
+            <span>{tr('Ενέργειες')}</span>
+          </div>
+          <div className="ster-list-scroll">
+            {rows.map(x => {
+              const assetIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(x.barcode));
+              const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
+              return (
+                <div className="ster-work-row" key={`${x.kind}-${x.id}`}>
+                  <div className="ster-asset-cell">
+                    <AssetTypeIcon
+                      kind={x.kind}
+                      maxUses={x.kind === 'TOOL' ? x.maxUses : undefined}
+                      framed
+                      className="ster-kind"
+                      size={18}
+                    />
+                    <div className="ster-asset">
+                      <div>
+                        <Link to={detail} className="mono ster-code">
+                          {x.barcode}
+                        </Link>
+                        <span className="ster-type">{x.kind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</span>
+                      </div>
+                      <Link to={detail} className="ster-asset-name">
+                        {x.name}
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="ster-cell-text ster-cell-department">
+                    <strong>{trData(x.department) || tr('Χωρίς τμήμα')}</strong>
+                    <span className="ster-tablet-specialty">{trData(x.specialty) || '—'}</span>
+                  </div>
+                  <div className="ster-cell-text ster-cell-specialty">
+                    <span>{trData(x.specialty) || '—'}</span>
+                  </div>
+                  <div className="ster-meta">
+                    {queue === 'INCOMING' ? (
+                      x.kind === 'SET' ? (
+                        <>
+                          <small>{tr('Σύνθεση')}</small>
+                          <strong className={x.actual !== x.expected ? 'warn-text' : ''}>
+                            {x.actual} / {x.expected}
+                          </strong>
+                        </>
+                      ) : (
+                        <span className="ster-object-state">{tr('Μεμονωμένο εργαλείο')}</span>
+                      )
+                    ) : (
+                      <StatusBadge value={x.state} />
+                    )}{' '}
+                    {assetIssues.length > 0 && (
+                      <span className="issue-inline">
+                        <TriangleAlert size={14} />
+                        {assetIssues.length} {tr('ανοικτή')}
+                      </span>
+                    )}
+                    <small className="ster-tablet-stage">{queueStageLabel}</small>
+                  </div>
+                  <div className="ster-status">
+                    <small>{queueStageLabel}</small>
+                  </div>
+                  <div className="ster-row-action">
+                    {queue === 'INCOMING' ? (
+                      <button className="primary compact" onClick={() => openReceipt(x.kind, x)}>
+                        <CheckCircle2 size={15} /> {tr('Παραλαβή')}
+                      </button>
+                    ) : queue === 'WASHING' ? (
+                      <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'WASHING')}>
+                        <PackageOpen size={15} /> {tr('Έλεγχος σταδίου')}
+                      </button>
+                    ) : queue === 'PREP' ? (
+                      <button
+                        className="primary compact ster-primary-action"
+                        onClick={() => openPreparation(x.kind, x)}
+                      >
+                        <Layers3 size={15} /> {tr('Έλεγχος & Σύνθεση') + ' '}
+                        <ArrowRight size={14} />
+                      </button>
+                    ) : queue === 'PACKAGING' ? (
+                      <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'PACKAGING')}>
+                        <Box size={15} /> {tr('Έλεγχος συσκευασίας')}
+                      </button>
+                    ) : queue === 'PROCESS' ? (
+                      <button className="primary compact" onClick={() => openCycleCompletion(x.kind, x)}>
+                        <PackageCheck size={15} /> {tr('Καταχώρηση κύκλου')}
+                      </button>
+                    ) : queue === 'RELEASE' ? (
+                      <button className="primary compact" onClick={() => openRelease(x.kind, x)}>
+                        <ShieldCheck size={15} /> {tr('Έλεγχος αποδέσμευσης')}
+                      </button>
+                    ) : queue === 'STORAGE' ? (
+                      <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'STORAGE')}>
+                        <PackageCheck size={15} /> {tr('Έλεγχος αποθήκευσης')}
+                      </button>
+                    ) : (
+                      <button className="primary compact" onClick={() => openDelivery(x.kind, x)}>
+                        <UserRoundCheck size={15} /> {tr('Παράδοση στο τμήμα')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

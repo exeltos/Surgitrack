@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {clientIp, corsFor, jsonWith} from "../_shared/http.ts";
 import {appSite, esc, layout, sendEmail} from "../_shared/mail.ts";
 
 // Public signup form (#/join/<token>): through a hospital's signup link, or a personal email
@@ -8,13 +9,10 @@ import {appSite, esc, layout, sendEmail} from "../_shared/mail.ts";
 // email; on approval the applicant gets their username and a link to set their password.
 //  - action "info": what the form shows for a token.
 //  - otherwise: the form itself.
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Names are stored in capitals (Greek or Latin letters, spaces, hyphens), as on hospital records.
@@ -22,6 +20,8 @@ const NAME = /^[A-ZΑ-ΩΆΈΉΊΌΎΏΪΫ][A-ZΑ-ΩΆΈΉΊΌΎΏΪΫ -]*$/u;
 const upperName = (value: unknown) => String(value || "").trim().replace(/\s+/g, " ").toLocaleUpperCase("el-GR");
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   try {
@@ -83,7 +83,7 @@ Deno.serve(async req => {
       return json({error: "invalid_input"}, 400);
 
     // Throttle signups per IP (the same atomic limiter as sign-in).
-    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const ip = clientIp(req);
     const {data: attemptId, error: limitError} = await admin.rpc("reserve_login_attempt", {
       p_user_code: "SIGNUP",
       p_ip: `signup:${ip}`,

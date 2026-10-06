@@ -19,3 +19,5 @@ npm run ci
 This intentionally normalizes formatting before verification, so formatting drift does not abort the CI pipeline before the functional checks run. GitHub Actions uses the same command.
 
 The project is pinned to Node.js 22 via `.nvmrc`.
+
+Builds need `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example`). Put them in `.env.local` for `npm run ci` locally; the GitHub workflow sets placeholders.

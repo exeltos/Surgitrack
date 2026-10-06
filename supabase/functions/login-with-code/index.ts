@@ -1,16 +1,14 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
+import {clientIp, corsFor, jsonWith} from "../_shared/http.ts";
 
 // Signs a user in with their 6-character user code + password without ever
 // revealing the email behind the code. Public endpoint (no JWT): the password
 // check is the authentication, and failed attempts are rate limited per code and per IP.
-const cors = {
-  "Access-Control-Allow-Origin": "*",
+const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
 
 const WINDOW_MINUTES = 15;
 const MAX_FAILS_PER_CODE = 5;
@@ -18,6 +16,8 @@ const MAX_FAILS_PER_IP = 20;
 const CODE_FORMAT = /^[A-Z]{2}[0-9]{4}$/;
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   if (req.method !== "POST") return json({error: "method_not_allowed"}, 405);
   const started = Date.now();
@@ -35,7 +35,7 @@ Deno.serve(async req => {
     const body = await req.json().catch(() => ({}));
     const code = String(body?.user_code || "").trim().toUpperCase();
     const password = String(body?.password || "");
-    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const ip = clientIp(req);
     if (!CODE_FORMAT.test(code) || !password) {
       await settle();
       return json({error: "invalid_credentials"}, 401);

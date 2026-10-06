@@ -38,3 +38,7 @@ jobs:
         run: npm run test
       - name: Build
         run: npm run build
+        env:
+          # Placeholders: the build only checks that the settings exist.
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci

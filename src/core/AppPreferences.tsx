@@ -51,6 +51,7 @@ export function AppPreferencesProvider({children}: {children: ReactNode}) {
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppPreferences = () => {
   const x = useContext(Ctx);
   if (!x) throw new Error('useAppPreferences outside provider');

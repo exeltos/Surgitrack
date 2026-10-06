@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient, type SupabaseClient} from "jsr:@supabase/supabase-js@2";
+import {corsFor, jsonWith} from "../_shared/http.ts";
 import {appSite, esc, layout, mailConfigured, sendEmail, usernameBox} from "../_shared/mail.ts";
 
 // Staff invitations (platform admin, or a hospital admin for their own hospital).
@@ -11,9 +12,7 @@ import {appSite, esc, layout, mailConfigured, sendEmail, usernameBox} from "../_
 //    carries the username and the button to set the password.
 // Roles: ADMIN, STERILIZATION, DEPARTMENT, VIEWER (read only). Admins and viewers have no department.
 const ROLES = ["ADMIN", "STERILIZATION", "DEPARTMENT", "VIEWER"];
-const cors = {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {status, headers: {...cors, "Content-Type": "application/json"}});
+const corsBase = {"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
 // The role names the app shows (a Sterilization supervisor is a Sterilization user with a flag).
 const ROLE_NAMES: Record<string, string> = {
   ADMIN: "Διαχειριστής νοσοκομείου",
@@ -179,6 +178,8 @@ async function inviteToSignup(admin: SupabaseClient, g: Omit<Grant, "name">, aga
 }
 
 Deno.serve(async req => {
+  const cors = corsFor(req, corsBase);
+  const json = jsonWith(cors);
   if (req.method === "OPTIONS") return new Response("ok", {headers: cors});
   try {
     const url = Deno.env.get("SUPABASE_URL")!, anon = Deno.env.get("SUPABASE_ANON_KEY")!, service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

@@ -148,6 +148,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     role === 'DEPARTMENT'
       ? departmentReady.length + departmentIssues.length + departmentUsage.length
       : openIssues.length + lifecycleAlerts.length + accessRequests + outOfUseNotices.length;
+  const readyKey = departmentReady.map(asset => asset.id).join('|');
   useEffect(() => {
     if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
       setDepartmentReadyToast(undefined);
@@ -175,7 +176,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     window.sessionStorage.setItem(storageKey, JSON.stringify([...seen]));
     const timer = window.setTimeout(() => setDepartmentReadyToast(undefined), 5200);
     return () => window.clearTimeout(timer);
-  }, [role, currentUser.department, departmentReady.map(asset => asset.id).join('|'), lang]);
+    // Keyed on the ids of the ready assets (readyKey), not on the array itself, which is new every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, currentUser.department, readyKey, lang]);
   const assetDetailMode = /^\/(tools|sets)\/[^/]+$/.test(location.pathname);
   const departmentMode = location.pathname === '/department';
   const runGlobalSearch = () => {

@@ -1,0 +1,146 @@
+import {RefreshCcw, Settings2, ShieldCheck, CheckCircle2} from 'lucide-react';
+import AppButton from '../../../components/ui/AppButton';
+import {tr} from '../../../i18n';
+import PlatformContactSettings from '../PlatformContactSettings';
+import LabelSettingsCard from '../LabelSettingsCard';
+import type {StudioPageState} from '../useStudioPage';
+
+export default function SystemTab({s}: {s: StudioPageState}) {
+  const {L, currentUser, lang, libs, platformAdmin, setConfirm, tab} = s;
+  return (
+    <>
+      {tab === 'SYSTEM' && (
+        <div className="studio-system-grid">
+          {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
+          <section>
+            <header>
+              <Settings2 />
+              <div>
+                <h3>{L('Κανόνες κύκλου ζωής', 'Lifecycle rules')}</h3>
+                <p>
+                  {L(
+                    'Κεντρικές παράμετροι που πρέπει να είναι κοινές σε όλη την εφαρμογή.',
+                    'Central parameters shared across the application.',
+                  )}
+                </p>
+              </div>
+            </header>
+            <label>
+              {L('Προειδοποίηση υπολοίπου χρήσεων', 'Remaining-use warning')}
+              <div className="studio-setting-input">
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={libs.systemSettings.usageWarningThreshold}
+                  onChange={e =>
+                    libs.updateSystemSettings(
+                      {
+                        usageWarningThreshold: Math.max(1, Math.min(20, Number(e.target.value) || 1)),
+                      },
+                      currentUser.name,
+                    )
+                  }
+                />
+                <span>{L('χρήσεις', 'uses')}</span>
+              </div>
+              <small>
+                {L(
+                  'Εφαρμόζεται στις ειδοποιήσεις και στις καρτέλες περιορισμένων χρήσεων.',
+                  'Applied to alerts and limited-use asset cards.',
+                )}
+              </small>
+            </label>
+            <label>
+              {L('Barcode Σετ', 'Set barcode')}
+              <div className="studio-static-field">
+                <b>{tr('S + 6 ψηφία')}</b>
+                <span>S000321</span>
+              </div>
+            </label>
+            <label>
+              {L('Barcode Εργαλείου', 'Instrument barcode')}
+              <div className="studio-static-field">
+                <b>{tr('T + 6 ψηφία')}</b>
+                <span>T001250</span>
+              </div>
+            </label>
+          </section>
+          <LabelSettingsCard L={L} />
+          <section>
+            <header>
+              <ShieldCheck />
+              <div>
+                <h3>{L('Ασφάλεια & Audit', 'Security & Audit')}</h3>
+                <p>
+                  {L(
+                    'Οι μεταφορές και οι κρίσιμες ενέργειες διατηρούν ταυτότητα χρήστη και χρονική σήμανση.',
+                    'Transfers and critical actions retain user identity and timestamps.',
+                  )}
+                </p>
+              </div>
+            </header>
+            <div className="studio-check-row">
+              <CheckCircle2 />
+              <span>{L('Ηλεκτρονική υπογραφή χρήστη σε μεταφορά', 'User electronic signature on transfer')}</span>
+            </div>
+            <div className="studio-check-row">
+              <CheckCircle2 />
+              <span>{L('Καταγραφή chain of custody', 'Chain-of-custody logging')}</span>
+            </div>
+            <details className="released-loads">
+              <summary>
+                {L('Ιστορικό παραμετροποίησης', 'Configuration audit')} · {libs.configurationAudit.length}
+              </summary>
+              <div>
+                {libs.configurationAudit.slice(0, 10).map(event => (
+                  <div key={event.id}>
+                    <span>
+                      <b>{event.entityType}</b> · {event.entityId}
+                    </span>
+                    <span>
+                      {event.by} · {new Date(event.at).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB')}
+                    </span>
+                  </div>
+                ))}
+                {!libs.configurationAudit.length && (
+                  <small>{L('Δεν υπάρχουν ακόμη αλλαγές.', 'No changes recorded yet.')}</small>
+                )}
+              </div>
+            </details>
+            <div className="studio-check-row">
+              <CheckCircle2 />
+              <span>{L('Δεν αποθηκεύονται κωδικοί πρόσβασης στο Studio', 'Passwords are not stored in Studio')}</span>
+            </div>
+            <AppButton
+              onClick={() =>
+                setConfirm({
+                  title:
+                    libs.dataMode === 'DEMO'
+                      ? L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?')
+                      : L('Καθαρισμός τοπικών ρυθμίσεων;', 'Clear local settings?'),
+                  message:
+                    libs.dataMode === 'DEMO'
+                      ? L(
+                          'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
+                          'Initial libraries and demo users will be restored.',
+                        )
+                      : L(
+                          'Οι τοπικές βιβλιοθήκες και οι χρήστες θα επανέλθουν σε καθαρή production κατάσταση.',
+                          'Local libraries and users will return to a clean production state.',
+                        ),
+                  action: libs.resetData,
+                })
+              }
+            >
+              <RefreshCcw size={16} />
+              {libs.dataMode === 'DEMO'
+                ? L('Επαναφορά demo δεδομένων', 'Reset demo data')
+                : L('Καθαρισμός τοπικών δεδομένων', 'Clear local data')}
+            </AppButton>
+          </section>
+        </div>
+      )}
+    </>
+  );
+}
