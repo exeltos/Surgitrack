@@ -1,3 +1,4 @@
+import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet} from 'lucide-react';
@@ -133,71 +134,102 @@ export default function SetsPage() {
         ]}
       />
       <ScrollableListPanel ariaLabel={tr('Λίστα Σετ εργαλείων')}>
-        <table className="asset-registry-table">
-          <thead>
-            <tr>
-              <th>{tr('Όνομα Σετ')}</th>
-              <th>{tr('Κωδικός')}</th>
-              <th>Barcode</th>
-              <th>{tr('Εταιρεία')}</th>
-              <th>{tr('Τμήμα')}</th>
-              <th>{tr('Ειδικότητα')}</th>
-              <th>{tr('Εργαλεία')}</th>
-              <th>{tr('Κατάσταση')}</th>
-              <th>
-                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.visible.map(s => {
-              const count = memberCount.get(s.id) || 0;
-              return (
-                <tr key={s.id}>
-                  <td>
-                    <div className="registry-asset-name">
-                      <AssetTypeIcon kind="SET" framed size={15} />
-                      <span>
-                        <Link className="row-title-link" to={`/sets/${s.id}`}>
-                          {s.name}
-                        </Link>
-                        <ColorMarker tapes={s.colorTapes} size="sm" />
-                      </span>
-                    </div>
-                  </td>
-                  <td className="cell-nowrap">{s.code}</td>
-                  <td>
-                    <Link className="mono strong-link" to={`/sets/${s.id}`}>
-                      {s.barcode}
-                    </Link>
-                  </td>
-                  <td>{s.manufacturer || '—'}</td>
-                  <td>
-                    {s.state === 'IN_STOCK' ? (
-                      <span className="asset-field-na">{tr('Απόθεμα Σετ')}</span>
-                    ) : (
-                      trData(s.department) || '—'
-                    )}
-                  </td>
-                  <td>{trData(s.specialty) || '—'}</td>
-                  <td>
-                    <b>{count}</b>
-                    <span className="muted"> / {s.expected}</span>
-                  </td>
-                  <td>
-                    <StatusBadge value={s.state} />
-                  </td>
-                  <td>
-                    <Link className="icon-link" to={`/sets/${s.id}`} aria-label={tr('Άνοιγμα {0}', s.barcode)}>
-                      <ChevronRight size={17} />
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-            {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
-          </tbody>
-        </table>
+        {filtered.length === 0 ? (
+          <ListEmpty
+            total={sets.length}
+            none={{
+              title: tr('Δεν υπάρχουν Σετ ακόμα'),
+              description: tr('Δημιούργησε το πρώτο Σετ εργαλείων ή φόρτωσε τα Σετ σου από ένα αρχείο Excel.'),
+              actions: can('asset.create') ? (
+                <>
+                  <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/sets/new')}>
+                    {tr('Νέο Σετ')}
+                  </AppButton>
+                  {organizationId && (
+                    <AppButton icon={<FileSpreadsheet size={17} />} onClick={() => navigate('/import')}>
+                      {tr('Μαζική εισαγωγή')}
+                    </AppButton>
+                  )}
+                </>
+              ) : undefined,
+            }}
+            onClear={() => {
+              setQ('');
+              setDepartment('');
+              setSpecialty('');
+              setManufacturer('');
+              setState('');
+              setUsage('');
+              setCompleteness('');
+            }}
+          />
+        ) : (
+          <table className="asset-registry-table">
+            <thead>
+              <tr>
+                <th>{tr('Όνομα Σετ')}</th>
+                <th>{tr('Κωδικός')}</th>
+                <th>Barcode</th>
+                <th>{tr('Εταιρεία')}</th>
+                <th>{tr('Τμήμα')}</th>
+                <th>{tr('Ειδικότητα')}</th>
+                <th>{tr('Εργαλεία')}</th>
+                <th>{tr('Κατάσταση')}</th>
+                <th>
+                  <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.visible.map(s => {
+                const count = memberCount.get(s.id) || 0;
+                return (
+                  <tr key={s.id}>
+                    <td>
+                      <div className="registry-asset-name">
+                        <AssetTypeIcon kind="SET" framed size={15} />
+                        <span>
+                          <Link className="row-title-link" to={`/sets/${s.id}`}>
+                            {s.name}
+                          </Link>
+                          <ColorMarker tapes={s.colorTapes} size="sm" />
+                        </span>
+                      </div>
+                    </td>
+                    <td className="cell-nowrap">{s.code}</td>
+                    <td>
+                      <Link className="mono strong-link" to={`/sets/${s.id}`}>
+                        {s.barcode}
+                      </Link>
+                    </td>
+                    <td>{s.manufacturer || '—'}</td>
+                    <td>
+                      {s.state === 'IN_STOCK' ? (
+                        <span className="asset-field-na">{tr('Απόθεμα Σετ')}</span>
+                      ) : (
+                        trData(s.department) || '—'
+                      )}
+                    </td>
+                    <td>{trData(s.specialty) || '—'}</td>
+                    <td>
+                      <b>{count}</b>
+                      <span className="muted"> / {s.expected}</span>
+                    </td>
+                    <td>
+                      <StatusBadge value={s.state} />
+                    </td>
+                    <td>
+                      <Link className="icon-link" to={`/sets/${s.id}`} aria-label={tr('Άνοιγμα {0}', s.barcode)}>
+                        <ChevronRight size={17} />
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+              {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
+            </tbody>
+          </table>
+        )}
       </ScrollableListPanel>
     </div>
   );

@@ -13,6 +13,7 @@ import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/s
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import Spinner from '../components/ui/Spinner';
 import {lazyPage} from '../core/resilience';
+import NotFoundPage from '../modules/NotFoundPage';
 import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
 import {
   type AccessRequest,
@@ -418,7 +419,7 @@ export default function App() {
             </Guard>
           }
         />
-        <Route path="*" element={<RoleHome />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AppShell>
   );
