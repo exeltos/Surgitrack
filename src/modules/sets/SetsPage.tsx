@@ -144,7 +144,9 @@ export default function SetsPage() {
               <th>{tr('Ειδικότητα')}</th>
               <th>{tr('Εργαλεία')}</th>
               <th>{tr('Κατάσταση')}</th>
-              <th></th>
+              <th>
+                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+              </th>
             </tr>
           </thead>
           <tbody>

@@ -582,7 +582,7 @@ export default function ReportsPage() {
                 </span>
               )}
             </div>
-            <div className="reports-result-body">
+            <div className="reports-result-body" role="region" tabIndex={0} aria-label={tr('Αποτελέσματα')}>
               {reportData.rows.length ? (
                 <table className="reports-table">
                   <thead>

@@ -316,7 +316,7 @@ export default function SetDetailPage() {
             showContents
             className="asset-detail-tabs"
           />
-          <main className="asset-detail-body">
+          <div className="asset-detail-body">
             {tab === 'SUMMARY' && (
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
@@ -637,7 +637,7 @@ export default function SetDetailPage() {
                 </div>
               </section>
             )}
-          </main>
+          </div>
         </section>
       </div>
       {!departmentView && addToolsOpen && <AddToolsToSetModal setId={set.id} onClose={() => setAddToolsOpen(false)} />}

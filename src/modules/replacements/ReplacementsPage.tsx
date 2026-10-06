@@ -315,7 +315,11 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                   <th>{tr('Από')}</th>
                   <th>{tr('Απόθεμα')}</th>
                   <th>{tr('Κατάσταση')}</th>
-                  {editable && <th />}
+                  {editable && (
+                    <th>
+                      <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>

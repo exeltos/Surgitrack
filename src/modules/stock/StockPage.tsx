@@ -126,7 +126,9 @@ export default function StockPage() {
               <th>{tr('Ειδικότητα')}</th>
               <th>{tr('Χρήσεις')}</th>
               <th>{tr('Κατάσταση')}</th>
-              <th></th>
+              <th>
+                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -150,7 +152,7 @@ export default function StockPage() {
                   <StatusBadge value={t.state} />
                 </td>
                 <td>
-                  <Link className="icon-link" to={`/tools/${t.id}`}>
+                  <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
                     <ChevronRight size={17} />
                   </Link>
                 </td>

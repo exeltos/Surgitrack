@@ -184,7 +184,7 @@ button {
 }
 .page-header p {
   margin: 6px 0 0;
-  color: #7b8494;
+  color: var(--st-muted);
   font-size: 13px;
 }
 .primary {
@@ -229,7 +229,7 @@ button {
 }
 .kpi span {
   font-size: 11px;
-  color: #7c8797;
+  color: var(--st-muted);
 }
 .kpi strong {
   font-size: 20px;
@@ -254,7 +254,7 @@ button {
 }
 .surface-title span {
   font-size: 11px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .flow-list {
   display: grid;
@@ -313,7 +313,7 @@ button {
 }
 footer {
   padding: 18px 32px 24px;
-  color: #a0a8b5;
+  color: var(--st-muted);
   font-size: 10px;
 }
 .mobile-menu {
@@ -911,7 +911,7 @@ td {
 }
 .workspace-label small {
   font-size: 10px;
-  color: #8fa0b7;
+  color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1031,7 +1031,7 @@ td {
 }
 .asset-main small,
 .asset-location small {
-  color: #718096;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .asset-location {
@@ -1045,7 +1045,7 @@ td {
 }
 .muted-action {
   font-size: 11px;
-  color: #98a2b3;
+  color: var(--st-muted);
 }
 .sterile-queues {
   display: grid;
@@ -1079,7 +1079,7 @@ td {
 }
 .sterile-queues button small {
   font-size: 10px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .sterile-queues button.active {
   border-color: #244d68;
@@ -1101,7 +1101,7 @@ td {
 }
 .sterile-row small {
   font-size: 11px;
-  color: #7a8494;
+  color: var(--st-muted);
 }
 .issue-inline {
   display: inline-flex !important;
@@ -1180,7 +1180,7 @@ td {
 }
 .record-identity p {
   margin: 0;
-  color: #7c8795;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .eyebrow {
@@ -1188,7 +1188,7 @@ td {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.11em;
-  color: #8793a2;
+  color: var(--st-muted);
 }
 .barcode-box {
   min-width: 118px;
@@ -1242,7 +1242,7 @@ td {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #8b96a5;
+  color: var(--st-muted);
   margin-bottom: 5px;
 }
 .record-fields strong,
@@ -1328,7 +1328,7 @@ td {
 }
 .panel-head p {
   margin: 0;
-  color: #7d8794;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .composition-total {
@@ -1371,11 +1371,11 @@ td {
 .row-sub {
   display: block;
   margin-top: 3px;
-  color: #8a94a4;
+  color: var(--st-muted);
   font-size: 10px;
 }
 .muted {
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .icon-link {
   display: inline-grid;
@@ -1418,7 +1418,7 @@ td {
   font-size: 11px;
 }
 .history-row small {
-  color: #8a94a4;
+  color: var(--st-muted);
   font-size: 10px;
 }
 .record-note {
@@ -1434,7 +1434,7 @@ td {
   border: 1px solid #dfe6ec;
   display: grid;
   place-items: center;
-  color: #78909c;
+  color: var(--st-muted);
 }
 .tool-photo-placeholder span {
   font-size: 30px;
@@ -1476,7 +1476,7 @@ td {
 }
 .usage-head span {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -1520,7 +1520,7 @@ td {
   justify-content: space-between;
   border-top: 1px solid #edf1f5;
   padding-top: 10px;
-  color: #718096;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .usage-meta strong {
@@ -1533,7 +1533,7 @@ td {
   display: flex;
   gap: 8px;
   align-items: center;
-  color: #8a94a4;
+  color: var(--st-muted);
   font-size: 11px;
   padding: 10px 0;
 }
@@ -1673,7 +1673,7 @@ td {
 }
 .auth-eyebrow {
   display: block;
-  color: #7c8999;
+  color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.11em;
   font-weight: 800;
@@ -1687,7 +1687,7 @@ td {
 }
 .auth-product-subtitle {
   margin: 5px 0 24px;
-  color: #708092;
+  color: var(--st-muted);
   font-size: 15px;
 }
 .auth-security {
@@ -1717,7 +1717,7 @@ td {
   margin-bottom: 23px;
 }
 .auth-card-title > svg {
-  color: #8290a1;
+  color: var(--st-muted);
   margin-top: 5px;
 }
 .auth-card-title h2 {
@@ -1727,7 +1727,7 @@ td {
 }
 .auth-card-title p {
   margin: 0;
-  color: #7b8796;
+  color: var(--st-muted);
   font-size: 12px;
   line-height: 1.55;
 }
@@ -1765,7 +1765,7 @@ td {
   border: 1px solid #d9e1e8;
   border-radius: 9px;
   padding: 0 11px;
-  color: #8793a1;
+  color: var(--st-muted);
 }
 .auth-input:focus-within {
   border-color: #67869a;
@@ -1781,7 +1781,7 @@ td {
 .auth-input button {
   border: 0;
   background: transparent;
-  color: #8793a1;
+  color: var(--st-muted);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -1834,7 +1834,7 @@ td {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #a0a9b5;
+  color: var(--st-muted);
   font-size: 9px;
   margin: 19px 0;
 }
@@ -1870,7 +1870,7 @@ td {
   margin-top: 18px;
   padding-top: 17px;
   border-top: 1px solid #eef1f4;
-  color: #7c8795;
+  color: var(--st-muted);
   font-size: 10px;
 }
 .auth-back {
@@ -1903,7 +1903,7 @@ td {
   align-items: center;
   padding: 20px 34px;
   border-top: 1px solid #e5e9ee;
-  color: #9aa4b1;
+  color: var(--st-muted);
   font-size: 9px;
 }
 .auth-footer nav {
@@ -1913,7 +1913,7 @@ td {
 .auth-footer button {
   border: 0;
   background: transparent;
-  color: #8290a1;
+  color: var(--st-muted);
   font-size: 9px;
   cursor: pointer;
   padding: 0;
@@ -1998,7 +1998,7 @@ td {
 .auth-status-card p {
   max-width: 360px;
   margin: 0 0 4px;
-  color: #7b8796;
+  color: var(--st-muted);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -2051,7 +2051,7 @@ td {
 }
 .ster-work-head p {
   margin: 0;
-  color: #778294;
+  color: var(--st-muted);
   font-size: 13px;
 }
 .eyebrow {
@@ -2076,7 +2076,7 @@ td {
 }
 .ster-shift small {
   font-size: 10px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .ster-shift strong {
   font-size: 12px;
@@ -2173,7 +2173,7 @@ td {
 }
 .ster-panel-head span {
   font-size: 10px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .ster-hint {
   background: #f8fafc;
@@ -2227,7 +2227,7 @@ td {
   font-size: 8px;
   letter-spacing: 0.08em;
   background: #f1f4f7;
-  color: #7b8494;
+  color: var(--st-muted);
   border-radius: 4px;
   padding: 2px 5px;
 }
@@ -2241,7 +2241,7 @@ td {
 .ster-meta small,
 .ster-status small {
   font-size: 10px;
-  color: #8791a3;
+  color: var(--st-muted);
 }
 .ster-meta,
 .ster-status {
@@ -2330,7 +2330,7 @@ td {
   font-size: 9px;
   letter-spacing: 0.1em;
   font-weight: 800;
-  color: #748396;
+  color: var(--st-muted);
 }
 .handover-title h2 {
   font-size: 17px;
@@ -2339,7 +2339,7 @@ td {
 }
 .handover-title p {
   margin: 0;
-  color: #7a8494;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .handover-warning {
@@ -2401,7 +2401,7 @@ td {
 .receipt-composition small {
   grid-column: 1/3;
   font-size: 9px;
-  color: #929baa;
+  color: var(--st-muted);
 }
 .modal-actions {
   display: flex;
@@ -2474,7 +2474,7 @@ td {
 /* v0.8 Sterilization entry + receipt identity */
 .ster-shift span {
   font-size: 9px;
-  color: #97a2b0;
+  color: var(--st-muted);
   margin-top: 2px;
 }
 .receipt-card-modal {
@@ -2498,7 +2498,7 @@ td {
   font-size: 9px;
   letter-spacing: 0.11em;
   font-weight: 800;
-  color: #718096;
+  color: var(--st-muted);
 }
 .receipt-card-head h2 {
   font-size: 18px;
@@ -2507,7 +2507,7 @@ td {
 }
 .receipt-card-head p {
   margin: 0;
-  color: #7a8494;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .receipt-summary-grid {
@@ -2531,13 +2531,13 @@ td {
   position: absolute;
   left: 13px;
   top: 15px;
-  color: #667f91;
+  color: var(--st-muted);
 }
 .receipt-summary-grid span,
 .receipt-facts span,
 .receipt-note-read > span {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2547,7 +2547,7 @@ td {
 }
 .receipt-summary-grid small {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .identity-section {
   border: 1px solid #dfe7ed;
@@ -2573,7 +2573,7 @@ td {
 }
 .identity-title span {
   font-size: 10px;
-  color: #8290a1;
+  color: var(--st-muted);
   margin-top: 2px;
 }
 .identity-section label {
@@ -2622,7 +2622,7 @@ td {
 }
 .identity-result span {
   font-size: 9px;
-  color: #5f806d;
+  color: var(--st-muted);
   margin-top: 1px;
 }
 .identity-error {
@@ -2682,7 +2682,7 @@ td {
 }
 .receipt-facts small {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .receipt-note-read {
   margin-top: 12px;
@@ -2754,7 +2754,7 @@ td {
 }
 .check-toggle small {
   font-size: 9px;
-  color: #8290a1;
+  color: var(--st-muted);
 }
 .receipt-check-body {
   border-top: 1px solid #e8edf1;
@@ -2802,7 +2802,7 @@ td {
 }
 .count-field > span {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .count-field > strong {
   font-size: 18px;
@@ -2868,11 +2868,11 @@ td {
   position: absolute;
   left: 13px;
   top: 17px;
-  color: #667f91;
+  color: var(--st-muted);
 }
 .prep-summary span {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .prep-summary strong {
   font-size: 17px;
@@ -2890,7 +2890,7 @@ td {
 }
 .prep-list-head span {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .prep-tool-list {
   border: 1px solid #e4e9ee;
@@ -2919,7 +2919,7 @@ td {
 }
 .prep-tool-list small {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .prep-note {
   display: flex;
@@ -2953,7 +2953,7 @@ td {
 }
 .prep-single span {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
   margin-top: 2px;
 }
 .compact-empty {
@@ -3031,7 +3031,7 @@ td {
 }
 .receipt-tools-head span {
   font-size: 9px;
-  color: #8290a1;
+  color: var(--st-muted);
 }
 .receipt-tools-list {
   max-height: 300px;
@@ -3068,7 +3068,7 @@ td {
 }
 .receipt-tool-row > div:first-child small {
   font-size: 9px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .receipt-tool-flags {
   display: flex;
@@ -3369,7 +3369,7 @@ td {
 }
 .receipt-section-title span {
   font-size: 9px;
-  color: #8491a1;
+  color: var(--st-muted);
   font-weight: 500;
 }
 .receipt-card-body .receipt-summary-grid {
@@ -3427,7 +3427,7 @@ td {
 }
 .receipt-tools-count span {
   font-size: 9px !important;
-  color: #8290a1;
+  color: var(--st-muted);
 }
 .receipt-card-body .receipt-check-section {
   margin: 0 0 16px;
@@ -3455,7 +3455,7 @@ td {
 }
 .receipt-count-summary span {
   font-size: 9px;
-  color: #8793a3;
+  color: var(--st-muted);
 }
 .receipt-count-summary strong {
   font-size: 18px;
@@ -3887,7 +3887,7 @@ td {
 .prep-section-head span,
 .prep-tools-head span {
   font-size: 9px;
-  color: #8491a1;
+  color: var(--st-muted);
 }
 .prep-facts {
   display: grid;
@@ -3914,12 +3914,12 @@ td {
   position: absolute;
   left: 11px;
   top: 12px;
-  color: #668195;
+  color: var(--st-muted);
 }
 .prep-facts span {
   font-size: 8px;
   text-transform: uppercase;
-  color: #8b96a5;
+  color: var(--st-muted);
   letter-spacing: 0.02em;
 }
 .prep-facts strong {
@@ -3929,7 +3929,7 @@ td {
 }
 .prep-facts small {
   font-size: 8px;
-  color: #8b96a5;
+  color: var(--st-muted);
 }
 .prep-check-summary {
   display: flex;
@@ -3945,7 +3945,7 @@ td {
 }
 .prep-check-summary span {
   font-size: 9px;
-  color: #8491a1;
+  color: var(--st-muted);
 }
 .prep-check-summary strong {
   font-size: 18px;
@@ -4121,7 +4121,7 @@ td {
 }
 .prep-tool-main small {
   font-size: 8.5px;
-  color: #8a94a4;
+  color: var(--st-muted);
 }
 .prep-tool-state {
   display: flex;
@@ -4566,7 +4566,7 @@ td {
 .cycle-summary span,
 .cycle-summary small {
   font-size: 10px;
-  color: #738592;
+  color: var(--st-muted);
 }
 .cycle-summary strong {
   font-size: 12px;
@@ -4636,7 +4636,7 @@ td {
 }
 .cycle-clean-head p {
   margin: 0;
-  color: #6d7f8b;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .cycle-clean-summary {
@@ -4657,7 +4657,7 @@ td {
 }
 .cycle-clean-summary span {
   font-size: 10px;
-  color: #71828e;
+  color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -4737,7 +4737,7 @@ td {
 .delivery-person span,
 .delivery-person small {
   font-size: 10px;
-  color: #758692;
+  color: var(--st-muted);
 }
 .delivery-person strong {
   font-size: 12px;
@@ -4881,7 +4881,7 @@ td {
 .workflow-modal-title p {
   margin: 4px 0 0;
   font-size: 11.5px;
-  color: #768792;
+  color: var(--st-muted);
 }
 .workflow-modal-body {
   padding: 16px 22px 18px;
@@ -5034,7 +5034,7 @@ td {
 }
 .asset-profile-title p {
   margin: 0;
-  color: #72838f;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .asset-profile-status {
@@ -5067,12 +5067,12 @@ td {
   grid-row: 1/4;
   width: 16px;
   height: 16px;
-  color: #648091;
+  color: var(--st-muted);
 }
 .asset-profile-facts span,
 .asset-profile-facts small {
   font-size: 9px;
-  color: #7b8b96;
+  color: var(--st-muted);
 }
 .asset-profile-facts strong {
   font-size: 11.5px;
@@ -5131,7 +5131,7 @@ td {
 .asset-section-head p {
   margin: 0;
   font-size: 11px;
-  color: #788994;
+  color: var(--st-muted);
 }
 .asset-count-state {
   display: grid;
@@ -5149,7 +5149,7 @@ td {
   color: #317257;
 }
 .asset-count-state.warning {
-  color: #a46b1c;
+  color: var(--st-amber);
 }
 .warn-text {
   color: #a56c1c !important;
@@ -5204,7 +5204,7 @@ td {
 }
 .asset-definition-list dt {
   font-size: 11px;
-  color: #758692;
+  color: var(--st-muted);
 }
 .asset-definition-list dd {
   margin: 0;
@@ -5244,14 +5244,14 @@ td {
 }
 .asset-history-row small {
   font-size: 9.5px;
-  color: #8a98a1;
+  color: var(--st-muted);
 }
 .asset-empty {
   display: flex;
   gap: 8px;
   align-items: center;
   padding: 14px;
-  color: #7d8e98;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .primary-link {
@@ -5284,7 +5284,7 @@ td {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #687b87;
+  color: var(--st-muted);
   font-size: 10.5px;
   font-weight: 700;
   padding: 0 8px;
@@ -5346,7 +5346,7 @@ td {
 }
 .asset-issue-row small {
   font-size: 9.5px;
-  color: #7c8d97;
+  color: var(--st-muted);
   line-height: 1.35;
 }
 .asset-notes-tab {
@@ -5381,7 +5381,7 @@ td {
 }
 .usage-config-head span {
   font-size: 9.5px;
-  color: #7b8c96;
+  color: var(--st-muted);
 }
 .usage-config-head select {
   min-width: 135px;
@@ -5403,7 +5403,7 @@ td {
   display: grid;
   gap: 5px;
   font-size: 9.5px;
-  color: #72838e;
+  color: var(--st-muted);
   font-weight: 700;
 }
 .usage-config-limit input {
@@ -5425,7 +5425,7 @@ td {
 }
 .usage-inline-stats span {
   font-size: 10px;
-  color: #788994;
+  color: var(--st-muted);
 }
 .usage-inline-stats strong {
   font-size: 11px;
@@ -5514,7 +5514,7 @@ td {
   place-items: center;
   font-size: 10px;
   font-weight: 800;
-  color: #71838e;
+  color: var(--st-muted);
 }
 .set-tool-code,
 .set-tool-name {
@@ -5532,7 +5532,7 @@ td {
 .set-tool-code small,
 .set-tool-name small {
   font-size: 9.5px;
-  color: #84939c;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5543,7 +5543,7 @@ td {
 }
 .set-tool-uses span {
   font-size: 9px;
-  color: #82919a;
+  color: var(--st-muted);
 }
 .set-tool-uses strong {
   font-size: 11px;
@@ -5555,7 +5555,7 @@ td {
 }
 .set-tool-state small {
   font-size: 8.5px;
-  color: #9b6b24;
+  color: var(--st-amber);
   font-weight: 700;
 }
 .set-detail-workspace {
@@ -5814,7 +5814,7 @@ td {
 }
 .receipt-tool-main small {
   font-size: 9px;
-  color: #8996a4;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5835,7 +5835,7 @@ td {
 }
 .receipt-tool-usage small {
   font-size: 8px;
-  color: #98a2b3;
+  color: var(--st-muted);
 }
 .receipt-tool-usage strong {
   font-size: 11px;
@@ -5846,7 +5846,7 @@ td {
 }
 .receipt-no-issue {
   font-size: 9px;
-  color: #7b8c96;
+  color: var(--st-muted);
   background: #f5f8f9;
   border-radius: 999px;
   padding: 5px 8px;
@@ -5899,7 +5899,7 @@ td {
   border-radius: 9px;
   padding: 8px 10px;
   margin: -6px 0 12px;
-  color: #6a7b87;
+  color: var(--st-muted);
   font-size: 10px;
 }
 @media (max-width: 1250px) {
@@ -6759,7 +6759,7 @@ td {
 }
 .release-check-row small {
   font-size: 10px;
-  color: #7d8897;
+  color: var(--st-muted);
   font-weight: 400;
 }
 .release-biological {
@@ -6868,14 +6868,14 @@ td {
 }
 .workflow-checkpoint-user small {
   font-size: 9px;
-  color: #8798a4;
+  color: var(--st-muted);
 }
 .workflow-checkpoint-user strong {
   font-size: 12px;
 }
 .workflow-checkpoint-user span {
   font-size: 10px;
-  color: #728591;
+  color: var(--st-muted);
   margin-top: 2px;
 }
 .badge-in_washing,
@@ -6923,7 +6923,7 @@ td {
   font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.08em;
-  color: #6f8794;
+  color: var(--st-muted);
 }
 .load-release-card strong {
   font-size: 12px;
@@ -6934,7 +6934,7 @@ td {
 }
 .load-release-card small {
   font-size: 10px;
-  color: #718692;
+  color: var(--st-muted);
 }
 .released-loads {
   margin: 10px 14px;
@@ -6948,7 +6948,7 @@ td {
   padding: 9px 11px;
   font-size: 10px;
   font-weight: 750;
-  color: #607784;
+  color: var(--st-muted);
 }
 .released-loads > div {
   border-top: 1px solid #e8eef1;
@@ -7029,7 +7029,7 @@ td {
 }
 .load-assets-head span {
   font-size: 9px;
-  color: #758a96;
+  color: var(--st-muted);
 }
 .load-assets-head button {
   border: 0;
@@ -7083,7 +7083,7 @@ td {
 }
 .load-assets-list small {
   font-size: 9px;
-  color: #728793;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7123,7 +7123,7 @@ td {
 }
 .load-manifest small {
   font-size: 9px;
-  color: #718693;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7388,7 +7388,7 @@ td {
 }
 .delivery-batch-count span {
   font-size: 9px;
-  color: #70838d;
+  color: var(--st-muted);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -7424,7 +7424,7 @@ td {
 }
 .delivery-batch-assets .load-assets-head > small {
   font-size: 9px;
-  color: #71848d;
+  color: var(--st-muted);
 }
 .delivery-batch-list {
   overflow: auto;
@@ -7469,7 +7469,7 @@ td {
 }
 .delivery-batch-list small {
   font-size: 9px;
-  color: #71848d;
+  color: var(--st-muted);
 }
 .delivery-batch-confirm {
   padding: 12px;
@@ -7564,14 +7564,14 @@ td {
 }
 .barcode-capture-head small {
   font-size: 9px;
-  color: #778b94;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .barcode-capture-help {
   font-size: 9px;
-  color: #7a8d95;
+  color: var(--st-muted);
   padding-left: 2px;
 }
 @media (max-width: 760px) {
@@ -7812,7 +7812,7 @@ td {
 }
 .delivery-batch-confirm .identity-input-row input::placeholder,
 .receipt-card-modal.workflow-modal .delivery-auth .identity-input-row input::placeholder {
-  color: #8b9aa3;
+  color: var(--st-muted);
 }
 .delivery-batch-confirm .identity-input-row .demo-fill-btn,
 .receipt-card-modal.workflow-modal .delivery-auth .identity-input-row .demo-fill-btn {
@@ -7983,7 +7983,7 @@ td {
 .receipt-count-only span,
 .receipt-count-only label {
   font-size: 10px;
-  color: #667b85;
+  color: var(--st-muted);
 }
 .receipt-count-only strong {
   font-size: 18px;
@@ -8072,7 +8072,7 @@ td {
   padding: 10px 22px;
   border-bottom: 1px solid #e4eaf0;
   background: #f8fafc;
-  color: #748396;
+  color: var(--st-muted);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.045em;
@@ -8244,7 +8244,7 @@ td {
   padding: 8px 13px;
   border-bottom: 1px solid #e7edf1;
   background: #f8fafb;
-  color: #748493;
+  color: var(--st-muted);
   font-size: 8.5px;
   font-weight: 800;
   letter-spacing: 0.045em;
@@ -8285,7 +8285,7 @@ td {
 }
 .receipt-tool-name small {
   font-size: 8.5px;
-  color: #8794a1;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8559,14 +8559,14 @@ td {
   .sterilization-workspace .ster-tablet-specialty {
     display: block;
     font-size: 9px;
-    color: #84919f;
+    color: var(--st-muted);
     font-weight: 500;
   }
   .sterilization-workspace .ster-tablet-stage {
     display: block;
     margin-top: 2px;
     font-size: 9px;
-    color: #84919f;
+    color: var(--st-muted);
     line-height: 1.3;
   }
   .sterilization-workspace .ster-row-action {
@@ -9049,7 +9049,7 @@ td {
 .receipt-final-note small {
   font-size: 9px;
   font-weight: 600;
-  color: #8a9aa3;
+  color: var(--st-muted);
 }
 .receipt-final-note input {
   width: 100% !important;
@@ -9429,7 +9429,7 @@ td {
 }
 .receipt-add-note-btn small {
   font-size: 9.5px !important;
-  color: #83949d !important;
+  color: var(--st-muted) !important;
   font-weight: 500 !important;
 }
 .receipt-inline-note-editor {
@@ -9456,7 +9456,7 @@ td {
 }
 .receipt-inline-note-head small {
   font-size: 9px !important;
-  color: #8a9aa3 !important;
+  color: var(--st-muted) !important;
 }
 .receipt-note-close {
   width: 28px !important;
@@ -9516,7 +9516,7 @@ td {
 .workflow-modal-cycle .cycle-clean-summary span {
   font-size: 10px;
   line-height: 1.2;
-  color: #71828e;
+  color: var(--st-muted);
 }
 .workflow-modal-cycle .cycle-clean-summary strong {
   font-size: 12.5px;
@@ -9855,5 +9855,5 @@ td {
 .batch-set-tools p {
   margin: 4px 0 0;
   font-size: 10px;
-  color: #71848d;
+  color: var(--st-muted);
 }

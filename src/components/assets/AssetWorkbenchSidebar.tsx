@@ -405,7 +405,7 @@ export default function AssetWorkbenchSidebar({
               className="asset-tool-photo-card"
               type="button"
               onClick={onPhotos}
-              aria-label={tr('Άνοιγμα φωτογραφιών')}
+              aria-label={cover ? `${tr('Άνοιγμα φωτογραφιών')} ${photos.length}` : undefined}
             >
               {cover ? (
                 <img src={cover} alt={asset.name} />
@@ -427,7 +427,12 @@ export default function AssetWorkbenchSidebar({
         )}
       </div>
       {kind === 'SET' && (
-        <button className="asset-cover" type="button" onClick={onPhotos} aria-label={tr('Άνοιγμα φωτογραφιών')}>
+        <button
+          className="asset-cover"
+          type="button"
+          onClick={onPhotos}
+          aria-label={cover ? `${tr('Άνοιγμα φωτογραφιών')} ${photos.length}` : undefined}
+        >
           {cover ? (
             <img src={cover} alt={asset.name} />
           ) : (

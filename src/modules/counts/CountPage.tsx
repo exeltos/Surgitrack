@@ -52,9 +52,10 @@ export default function CountPage() {
         <div className="scanbox">
           <ScanBarcode size={22} />
           <div>
-            <small>SET</small>
+            <small>{tr('Σετ')}</small>
             <select
               className="set-select"
+              aria-label={tr('Σετ')}
               value={setId}
               onChange={e => {
                 setSetId(e.target.value);

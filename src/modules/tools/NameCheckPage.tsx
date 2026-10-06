@@ -208,9 +208,13 @@ function CleanUps({fixes, editable, onApply}: {fixes: ReturnType<typeof cleanUps
         <table>
           <thead>
             <tr>
-              {editable && <th />}
+              {editable && (
+                <th>
+                  <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                </th>
+              )}
               <th>{tr('Σήμερα')}</th>
-              <th />
+              <th aria-hidden="true" />
               <th>{tr('Θα γίνει')}</th>
               <th>{tr('Εργαλεία')}</th>
             </tr>
@@ -220,7 +224,12 @@ function CleanUps({fixes, editable, onApply}: {fixes: ReturnType<typeof cleanUps
               <tr key={f.from} className={skipped.has(f.from) ? 'skipped' : ''}>
                 {editable && (
                   <td>
-                    <input type="checkbox" checked={!skipped.has(f.from)} onChange={() => toggle(f.from)} />
+                    <input
+                      type="checkbox"
+                      aria-label={tr('Μπαίνει στην ενοποίηση')}
+                      checked={!skipped.has(f.from)}
+                      onChange={() => toggle(f.from)}
+                    />
                   </td>
                 )}
                 <td className="from">{f.from}</td>
@@ -386,7 +395,12 @@ function CodeGroupCard({
       </ul>
       {editable && (
         <footer>
-          <input value={custom} onChange={e => setCustom(e.target.value)} placeholder={tr('Ή γράψτε άλλη ονομασία…')} />
+          <input
+            value={custom}
+            onChange={e => setCustom(e.target.value)}
+            placeholder={tr('Ή γράψτε άλλη ονομασία…')}
+            aria-label={tr('Ή γράψτε άλλη ονομασία…')}
+          />
           <AppButton size="sm" onClick={onSkip}>
             {tr('Παράλειψη')}
           </AppButton>
@@ -448,7 +462,9 @@ function ToolsList({
                 <th>{tr('Κωδικός')}</th>
                 <th>{tr('Θέση')}</th>
                 <th>{tr('Κατάσταση')}</th>
-                <th />
+                <th>
+                  <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                </th>
               </tr>
             </thead>
             <tbody>

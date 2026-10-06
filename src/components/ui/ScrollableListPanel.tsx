@@ -12,6 +12,8 @@ export default function ScrollableListPanel({children, className = '', withKpis 
     <div
       className={`panel table-panel list-scroll-panel${withKpis ? ' list-scroll-panel-kpis' : ''}${className ? ` ${className}` : ''}`}
       aria-label={ariaLabel}
+      role={ariaLabel ? 'region' : undefined}
+      tabIndex={0}
     >
       {children}
     </div>

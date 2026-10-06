@@ -30,7 +30,7 @@
 }
 .tools-list-workspace .kpis small {
   font-size: 11px;
-  color: #70838e;
+  color: var(--st-muted);
 }
 .tools-list-workspace .kpis strong {
   font-size: 24px;
@@ -164,7 +164,7 @@
   margin-top: 3px;
   font-size: 9.5px;
   line-height: 1.3;
-  color: #8697a1;
+  color: var(--st-muted);
 }
 .asset-registry-table .mono {
   font-size: 11.5px;
@@ -172,7 +172,7 @@
   white-space: nowrap;
 }
 .asset-registry-table .muted {
-  color: #84959f;
+  color: var(--st-muted);
 }
 .asset-registry-table .badge {
   font-size: 10px;
@@ -182,7 +182,7 @@
   height: 32px;
   padding: 0;
   border-radius: 8px;
-  color: #607986;
+  color: var(--st-muted);
 }
 .asset-registry-table .icon-link:hover {
   background: #eaf4f6;
@@ -393,7 +393,7 @@
 }
 .asset-photo-tile figcaption small {
   font-size: 9px;
-  color: #80929c;
+  color: var(--st-muted);
 }
 .photo-remove {
   position: absolute;
@@ -422,7 +422,7 @@
   align-items: center;
   justify-content: center;
   gap: 11px;
-  color: #6b818c;
+  color: var(--st-muted);
 }
 .asset-photo-empty > div {
   display: grid;
@@ -460,7 +460,7 @@
 }
 .issue-photo-head span {
   font-size: 10px;
-  color: #7b8d96;
+  color: var(--st-muted);
 }
 .issue-photo-actions {
   display: flex;
@@ -530,7 +530,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #9aabb3;
+  color: var(--st-muted);
 }
 .issues-registry-table th:nth-child(5) {
   min-width: 260px;
@@ -1083,7 +1083,7 @@ body {
   border: 0;
   border-radius: 10px 10px 0 0;
   background: transparent;
-  color: #607784;
+  color: var(--st-muted);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
@@ -1458,7 +1458,7 @@ body {
 }
 .asset-workbench-title p {
   margin: 0;
-  color: #708590;
+  color: var(--st-muted);
   font-size: 12px;
   font-weight: 750;
 }
@@ -1476,7 +1476,7 @@ body {
 }
 .asset-workbench-fields dt {
   font-size: 11px;
-  color: #6d818c;
+  color: var(--st-muted);
   font-weight: 700;
 }
 .asset-workbench-fields dd {
@@ -1510,7 +1510,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #7d929c;
+  color: var(--st-muted);
 }
 .asset-cover-empty strong {
   font-size: 13px;
@@ -1549,7 +1549,7 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #607986;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 750;
 }
@@ -1704,7 +1704,7 @@ body {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #718690;
+  color: var(--st-muted);
 }
 .asset-inline-edit {
   display: inline-flex;
@@ -1818,7 +1818,7 @@ body {
 .choice-dialog-body span {
   font-size: 11px;
   line-height: 1.45;
-  color: #71848e;
+  color: var(--st-muted);
 }
 .choice-dialog-body .danger-option {
   border-color: #efd0ce;
@@ -1896,7 +1896,7 @@ body {
 }
 .report-tool-picker small {
   font-size: 9.5px;
-  color: #718690;
+  color: var(--st-muted);
 }
 .report-photo-input {
   position: relative;
@@ -1915,7 +1915,7 @@ body {
 }
 .report-photo-input small {
   grid-column: 2;
-  color: #718690;
+  color: var(--st-muted);
 }
 @media (max-width: 1180px) {
   .asset-sidebar-quickfacts {
@@ -1959,7 +1959,7 @@ body {
 .asset-inline-cancel {
   width: 28px;
   padding: 0;
-  color: #667e89;
+  color: var(--st-muted);
 }
 .asset-inline-input {
   width: 100%;
@@ -2100,7 +2100,7 @@ body {
 }
 .asset-create-page-head p {
   margin: 0;
-  color: #71838d;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .asset-create-page-workspace {
@@ -2413,7 +2413,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  color: #78909b;
+  color: var(--st-muted);
 }
 .asset-tool-photo-empty div {
   display: flex;
@@ -2427,7 +2427,7 @@ body {
 }
 .asset-tool-photo-empty span {
   font-size: 10px;
-  color: #82949d;
+  color: var(--st-muted);
 }
 .asset-workbench-sidebar-tool .asset-cover-count {
   right: 7px;
