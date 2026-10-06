@@ -2570,3 +2570,36 @@ body {
     padding: 0 5px;
   }
 }
+
+.bin-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #304d5d;
+}
+.bin-by {
+  display: block;
+  color: var(--st-muted);
+  font-size: 11px;
+}
+.bin-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.issue-action.wide {
+  width: auto;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.issue-action.danger {
+  color: #b3261e;
+}
+.issue-action.danger:hover {
+  border-color: #b3261e;
+  background: #fdf1f0;
+}

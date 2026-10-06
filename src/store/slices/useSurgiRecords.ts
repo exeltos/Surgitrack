@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import type {
+  BinEntry,
   DeliveryRecord,
   PurchaseOrder,
   PreparationRecord,
@@ -47,6 +48,7 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
   );
   const [deliveries, setDeliveries] = useState<DeliveryRecord[]>(initialData.deliveries || []);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(initialData.purchaseOrders || []);
+  const [recycleBin, setRecycleBin] = useState<BinEntry[]>(initialData.recycleBin || []);
   const cloudOrganizationId = cloud?.organizationId;
   useAppRecordSync(cloudOrganizationId, 'sets', sets);
   useAppRecordSync(cloudOrganizationId, 'tools', tools);
@@ -62,6 +64,7 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
   useAppRecordSync(cloudOrganizationId, 'workflowCheckpoints', workflowCheckpoints);
   useAppRecordSync(cloudOrganizationId, 'deliveries', deliveries);
   useAppRecordSync(cloudOrganizationId, 'purchaseOrders', purchaseOrders);
+  useAppRecordSync(cloudOrganizationId, 'recycleBin', recycleBin);
   return {
     cloudOrganizationId,
     counts,
@@ -72,6 +75,7 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
     processLoads,
     purchaseOrders,
     recallCases,
+    recycleBin,
     receipts,
     setCounts,
     setDeliveries,
@@ -80,6 +84,7 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
     setPreparations,
     setProcessLoads,
     setPurchaseOrders,
+    setRecycleBin,
     setRecallCases,
     setReceipts,
     setSets,

@@ -31,6 +31,7 @@ const ToolDetailPage = lazyPage(() => import('../modules/tools/ToolDetailPage'))
 const AssetCreatePage = lazyPage(() => import('../components/assets/AssetCreatePage'));
 const StandaloneToolsPage = lazyPage(() => import('../modules/tools/StandaloneToolsPage'));
 const StockPage = lazyPage(() => import('../modules/stock/StockPage'));
+const BinPage = lazyPage(() => import('../modules/bin/BinPage'));
 const SterilizationPage = lazyPage(() => import('../modules/sterilization/SterilizationPage'));
 const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
@@ -280,6 +281,14 @@ export default function App() {
           }
         />
         <Route path="/assets" element={<Navigate to="/sets" replace />} />
+        <Route
+          path="/bin"
+          element={
+            <Guard permission="asset.delete">
+              <BinPage />
+            </Guard>
+          }
+        />
         <Route
           path="/stock"
           element={

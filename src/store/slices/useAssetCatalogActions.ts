@@ -2,6 +2,7 @@ import type {AssetKind, AssetPhoto, AssetState, SetAsset, Tool} from '../../type
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
 import type {CreateSetPayload, CreateToolPayload, SurgicalCount} from '../types';
 import {tr} from '../../i18n';
+import {binEntryForSet, binEntryForTool} from '../../core/recycleBin';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
 import type {useSurgiHelpers} from './useSurgiHelpers';
@@ -26,6 +27,7 @@ export function useAssetCatalogActions(
     openIssue,
     setCounts,
     setIssues,
+    setRecycleBin,
     setSets,
     setTools,
     sets,
@@ -533,6 +535,7 @@ export function useAssetCatalogActions(
     const src = sets.find(s => s.id === id);
     if (!src) return;
     const members = tools.filter(t => t.setId === id);
+    setRecycleBin(x => [binEntryForSet(src, members, deleteTools, currentUser.name), ...x]);
     setSets(x => x.filter(s => s.id !== id));
     if (deleteTools) setTools(x => x.filter(t => t.setId !== id));
     else
@@ -555,14 +558,15 @@ export function useAssetCatalogActions(
     });
     notify(
       deleteTools
-        ? tr('Το Σετ και τα εργαλεία του διαγράφηκαν.')
-        : tr('Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Απόθεμα.'),
+        ? tr('Το Σετ και τα εργαλεία του διαγράφηκαν. Μπορείς να τα επαναφέρεις από τον Κάδο.')
+        : tr('Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Απόθεμα. Μπορείς να το επαναφέρεις από τον Κάδο.'),
     );
   };
   const deleteTool = (id: string) => {
     const src = tools.find(t => t.id === id);
     if (!src) return;
     const parentSet = src.setId ? sets.find(s => s.id === src.setId) : undefined;
+    setRecycleBin(x => [binEntryForTool(src, parentSet, currentUser.name), ...x]);
     setTools(x => x.filter(t => t.id !== id));
     if (parentSet) setSets(x => x.map(s => (s.id === parentSet.id ? {...s, actual: Math.max(0, s.actual - 1)} : s)));
     addMovement({
@@ -573,7 +577,7 @@ export function useAssetCatalogActions(
       status: 'Οριστική διαγραφή φυσικού εργαλείου',
       by: currentUser.name,
     });
-    notify(tr('{0}: το εργαλείο διαγράφηκε.', src.barcode));
+    notify(tr('{0}: το εργαλείο διαγράφηκε. Μπορείς να το επαναφέρεις από τον Κάδο.', src.barcode));
   };
   return {
     addAssetPhotos,

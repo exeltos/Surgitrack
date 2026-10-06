@@ -271,6 +271,15 @@ const PURCHASE_ORDERS_FIELDS: readonly Field[] = [
   ['receivedBarcodes', 'received_barcodes', 'textArray'],
 ];
 
+const RECYCLE_BIN_FIELDS: readonly Field[] = [
+  ['kind', 'kind', 'text'],
+  ['label', 'label', 'text'],
+  ['detail', 'detail', 'text'],
+  ['payload', 'payload', 'json'],
+  ['deletedAt', 'deleted_on', 'text'],
+  ['deletedByName', 'deleted_by_name', 'text'],
+];
+
 /** A hospital's settings: one row per hospital, one column per section. */
 const HOSPITAL_SETTINGS_FIELDS: readonly Field[] = [
   ['departments', 'departments', 'json'],
@@ -322,6 +331,7 @@ export const CLOUD_TABLES = {
   processLoads: {table: 'process_loads', fields: PROCESS_LOADS_FIELDS, mutable: true},
   recallCases: {table: 'recall_cases', fields: RECALL_CASES_FIELDS, mutable: true},
   purchaseOrders: {table: 'purchase_orders', fields: PURCHASE_ORDERS_FIELDS, mutable: true},
+  recycleBin: {table: 'recycle_bin', fields: RECYCLE_BIN_FIELDS, mutable: false},
   library: {table: 'hospital_settings', fields: HOSPITAL_SETTINGS_FIELDS, mutable: true},
 } as const satisfies Record<string, TableSpec>;
 export type TableCollection = keyof typeof CLOUD_TABLES;

@@ -760,9 +760,17 @@ export default function SetDetailPage() {
             <div className="choice-dialog-body">
               <button
                 onClick={() => {
-                  deleteSet(set.id, false);
-                  setDeleteOpen(false);
-                  navigate('/sets');
+                  if (
+                    window.confirm(
+                      tr(
+                        'Διαγραφή του Σετ; Τα εργαλεία του πάνε στο Απόθεμα και το Σετ μένει στον Κάδο για 30 ημέρες.',
+                      ),
+                    )
+                  ) {
+                    deleteSet(set.id, false);
+                    setDeleteOpen(false);
+                    navigate('/sets');
+                  }
                 }}
               >
                 <strong>{tr('Διαγραφή μόνο του Σετ')}</strong>
@@ -771,7 +779,11 @@ export default function SetDetailPage() {
               <button
                 className="danger-option"
                 onClick={() => {
-                  if (window.confirm(tr('Οριστική διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του;'))) {
+                  if (
+                    window.confirm(
+                      tr('Διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του; Θα μείνουν στον Κάδο για 30 ημέρες.'),
+                    )
+                  ) {
                     deleteSet(set.id, true);
                     setDeleteOpen(false);
                     navigate('/sets');
@@ -779,7 +791,7 @@ export default function SetDetailPage() {
                 }}
               >
                 <strong>{tr('Διαγραφή Σετ + εργαλείων')}</strong>
-                <span>{tr('Οριστική αφαίρεση και των φυσικών εργαλείων.')}</span>
+                <span>{tr('Διαγράφονται και τα φυσικά εργαλεία (επαναφορά από τον Κάδο).')}</span>
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import type {Permission} from '../core/permissions';
 import type {
   AssetKind,
+  BinEntry,
   AssetPhoto,
   DeliveryRecord,
   Issue,
@@ -230,6 +231,10 @@ export type SurgiStoreValue = {
   workflowCheckpoints: WorkflowCheckpointRecord[];
   deliveries: DeliveryRecord[];
   purchaseOrders: PurchaseOrder[];
+  recycleBin: BinEntry[];
+  restoreFromBin: (id: string) => boolean;
+  purgeFromBin: (id: string) => void;
+  purgeExpiredBin: () => number;
   replaceFromStock: (pairs: Array<{toolId: string; stockToolId: string; setId: string}>) => void;
   receivePurchaseOrder: (id: string) => void;
   createPurchaseOrder: (lines: PurchaseOrderLine[], details?: {supplier?: string; note?: string}) => string;

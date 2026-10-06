@@ -24,6 +24,7 @@ export const STORE_COLLECTIONS = [
   'workflowCheckpoints',
   'deliveries',
   'purchaseOrders',
+  'recycleBin',
 ] as const;
 export type StoreCollection = (typeof STORE_COLLECTIONS)[number];
 export type CloudCollection = StoreCollection | 'library';

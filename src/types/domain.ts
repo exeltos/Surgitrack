@@ -346,3 +346,26 @@ export interface PurchaseOrder {
   /** The new instruments put into Stock when the order arrived. */
   receivedBarcodes?: string[];
 }
+
+export type BinKind = 'SET' | 'TOOL';
+/** What a deletion keeps so it can be undone: the Set or instrument as it was, and the instruments with it. */
+export interface BinPayload {
+  set?: SetAsset;
+  /** A Set's instruments as they were (or the one instrument deleted on its own). */
+  tools: Tool[];
+  /** The instruments were deleted too, rather than moved to Stock. */
+  toolsDeleted: boolean;
+  /** The Set an instrument deleted on its own belonged to. */
+  parentSetId?: string;
+}
+/** One deleted Set or instrument, kept in the recycle bin for 30 days. */
+export interface BinEntry {
+  id: string;
+  kind: BinKind;
+  label: string;
+  detail?: string;
+  payload: BinPayload;
+  /** ISO time of the deletion. */
+  deletedAt: string;
+  deletedByName: string;
+}
