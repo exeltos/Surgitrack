@@ -2603,3 +2603,101 @@ body {
   border-color: #b3261e;
   background: #fdf1f0;
 }
+
+.stock-min-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: 1px solid #dce7eb;
+  border-radius: 14px;
+  background: #fff;
+}
+.stock-min-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.stock-min-summary .warn {
+  color: #b4560f;
+}
+.stock-min-summary .good {
+  color: #1b7a52;
+}
+.stock-min-add {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.stock-min-add label {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 4px;
+  max-width: 460px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5d69;
+}
+.stock-min-add input,
+.stock-min-table input {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #d5e2e7;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+.stock-min-table input {
+  width: 78px;
+  text-align: right;
+}
+.stock-min-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.stock-min-table th:nth-child(2),
+.stock-min-table th:nth-child(3),
+.stock-min-table th:nth-child(4) {
+  text-align: right;
+}
+.stock-min-sub {
+  display: block;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.stock-min-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.stock-min-status.ok {
+  background: #e4f5ec;
+  color: #1b6b48;
+}
+.stock-min-status.low {
+  background: #fdf1de;
+  color: #9a5200;
+}
+.stock-min-status.out {
+  background: #fdecec;
+  color: #b3261e;
+}
+.stock-min-status.none {
+  background: #eef2f4;
+  color: var(--st-muted);
+}
+.stock-tabs b.warn {
+  background: #fdf1de;
+  color: #9a5200;
+}
+.issue-action.wide {
+  white-space: nowrap;
+}
