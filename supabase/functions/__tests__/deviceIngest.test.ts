@@ -53,7 +53,7 @@ describe('device-ingest: the request', () => {
     expect((await handle(new Request('http://localhost/fn', {method: 'GET'}))).status).toBe(405);
   });
 
-  it.each([
+  it.each<[string, Record<string, string>]>([
     ['no key', {}],
     ['a key without the stk_ prefix', {'x-device-key': 'ab12'.repeat(12)}],
     ['a key that is too short', {'x-device-key': `stk_${'ab12'.repeat(11)}`}],
