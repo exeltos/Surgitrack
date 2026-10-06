@@ -6786,3 +6786,56 @@ html body .kpis > *,
 html body .replacements-kpis > * {
   min-width: 0;
 }
+/* Detail pages: labels on one line with a fixed column, tighter rows, eyebrow never wraps. */
+html body .asset-detail-workspace .asset-definition-list dt {
+  white-space: nowrap;
+  flex: 0 0 150px;
+}
+html body .asset-detail-workspace .asset-definition-list > div {
+  padding: 7px 0;
+  gap: 12px;
+}
+html body .asset-detail-workspace .asset-definition-list dd {
+  flex: 1;
+  min-width: 0;
+}
+html body .asset-detail-workspace .eyebrow {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .asset-workbench-fields dt {
+  white-space: nowrap;
+}
+html body .asset-workbench-fields > div {
+  grid-template-columns: 150px minmax(0, 1fr);
+  min-height: 32px;
+}
+html body .asset-cover {
+  height: 150px;
+}
+html body .asset-detail-body .set-tool-uses strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .asset-detail-body .set-tool-row {
+  grid-template-columns: 34px minmax(96px, 125px) minmax(150px, 1fr) minmax(130px, 150px) minmax(118px, 145px) !important;
+}
+/* New Set / instrument form: the hint sits under the field, in the field's column, and stays short. */
+html body .asset-create-field-list label > small {
+  grid-column: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: -2px;
+}
+/* Name check KPIs: same slim look as the other pages. */
+html body .name-check-kpis > div {
+  padding: 8px 14px;
+}
+html body .name-check-kpis strong {
+  font-size: 20px;
+}

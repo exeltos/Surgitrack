@@ -147,13 +147,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-workbench-title-main">
           <AssetTypeIcon kind={kind} maxUses={asset.maxUses} framed size={19} />
           <div>
-            <span className="eyebrow">
-              {kind === 'SET'
-                ? tr('ΚΑΡΤΕΛΑ ΣΕΤ')
-                : asset.maxUses !== undefined
-                  ? tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ · ΠΕΡΙΟΡΙΣΜΕΝΩΝ ΧΡΗΣΕΩΝ')
-                  : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}
-            </span>
+            <span className="eyebrow">{kind === 'SET' ? tr('ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h1>{asset.name}</h1>
             <p>{asset.code}</p>
           </div>
