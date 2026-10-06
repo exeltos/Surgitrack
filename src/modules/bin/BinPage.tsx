@@ -4,7 +4,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import PageHeader from '../../components/ui/PageHeader';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
-import AssetEmptyState from '../../components/assets/AssetEmptyState';
+import EmptyState from '../../components/ui/EmptyState';
 import {useConfirm} from '../../components/ui/useConfirm';
 import {BIN_DAYS, daysLeft, isExpired} from '../../core/recycleBin';
 import {restoreDevice, type DeviceSnapshot} from '../../data/cloud/devices';
@@ -188,7 +188,11 @@ export default function BinPage() {
             </tbody>
           </table>
         ) : (
-          <AssetEmptyState>{tr('Ο Κάδος είναι άδειος. Ό,τι διαγράφεις θα εμφανίζεται εδώ.')}</AssetEmptyState>
+          <EmptyState
+            icon={<Trash2 size={22} />}
+            title={tr('Ο Κάδος είναι άδειος')}
+            description={tr('Ό,τι διαγράφεις θα εμφανίζεται εδώ.')}
+          />
         )}
       </ScrollableListPanel>
       {confirm}

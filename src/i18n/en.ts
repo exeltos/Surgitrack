@@ -932,7 +932,8 @@ export const en: Record<string, string> = {
   'Οριστική διαγραφή': 'Delete for good',
   'Οριστική διαγραφή;': 'Delete for good?',
   'Το «{0}» διαγράφεται για πάντα και δεν θα μπορεί να επανέλθει.': '«{0}» is deleted for good and cannot come back.',
-  'Ο Κάδος είναι άδειος. Ό,τι διαγράφεις θα εμφανίζεται εδώ.': 'The bin is empty. Whatever you delete shows up here.',
+  'Ο Κάδος είναι άδειος': 'The bin is empty',
+  'Ό,τι διαγράφεις θα εμφανίζεται εδώ.': 'Whatever you delete shows up here.',
   'Δεν έγινε επαναφορά: υπάρχει ήδη Σετ με barcode {0}.': 'Not restored: a Set with barcode {0} already exists.',
   'Δεν έγινε επαναφορά: υπάρχει ήδη εργαλείο με barcode {0}.':
     'Not restored: an instrument with barcode {0} already exists.',
