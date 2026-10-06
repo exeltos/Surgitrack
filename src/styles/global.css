@@ -7342,3 +7342,25 @@ html body .asset-workbench-sidebar .asset-cover {
     grid-column: auto;
   }
 }
+/* Studio > Settings: the cards sit side by side so the tab fits one screen. */
+@media (min-width: 1100px) {
+  html body .studio-system-grid,
+  html body .studio-system-grid:has(> .platform-contact) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  html body .studio-system-grid > section {
+    grid-column: auto;
+    padding: 12px 14px;
+  }
+  html body .studio-system-grid > .platform-contact {
+    grid-column: 1 / -1;
+  }
+}
+html body .studio-body-import .asset-import {
+  gap: 10px;
+}
+html body .studio-body-import .asset-import-head {
+  margin: 0;
+  padding-top: 0;
+}
