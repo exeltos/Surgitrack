@@ -103,11 +103,7 @@ export default function DepartmentPage() {
         <div>
           <span className="eyebrow">{tr('ΣΕΤ & ΕΡΓΑΛΕΙΑ ΤΜΗΜΑΤΟΣ')}</span>
           <h1>{trData(dept)}</h1>
-          <p>
-            {tr(
-              'Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος, οι αναφορές και η ηλεκτρονική αποστολή προς Κεντρική Αποστείρωση.',
-            )}
-          </p>
+          <p>{tr('Τα Σετ και τα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.')}</p>
         </div>
         {viewing ? (
           <Link className="department-user-sign department-back" to="/overview">
