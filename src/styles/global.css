@@ -6462,3 +6462,21 @@ html body .studio-workspace {
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
+/* On wide screens the Sets columns fit on one line, so every row is one line tall. */
+@media (min-width: 1700px) {
+  html body .asset-registry-table .cell-wide-nowrap {
+    white-space: nowrap;
+  }
+}
+/* Set detail: tighter tool rows, names on one line. */
+html body .asset-detail-body .set-tool-row {
+  min-height: 0;
+  padding: 7px 14px !important;
+}
+html body .asset-detail-body .set-tool-name strong,
+html body .asset-detail-body .set-tool-code strong {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
