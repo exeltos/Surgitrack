@@ -486,7 +486,7 @@ export default function SetDetailPage() {
                                         <small>{tool.code}</small>
                                       </div>
                                       <div className="set-tool-name">
-                                        <strong>{tool.name}</strong>
+                                        <strong title={tool.name}>{tool.name}</strong>
                                         <small>
                                           {tool.serialNumber ? `S/N ${tool.serialNumber}` : tr('Χωρίς serial')}
                                         </small>
@@ -526,7 +526,7 @@ export default function SetDetailPage() {
                               <small>{tool.code}</small>
                             </div>
                             <div className="set-tool-name">
-                              <strong>{tool.name}</strong>
+                              <strong title={tool.name}>{tool.name}</strong>
                               <small>
                                 {tool.manufacturer}
                                 {tool.serialNumber ? ` · S/N ${tool.serialNumber}` : ''}

@@ -202,15 +202,15 @@ export default function SetsPage() {
                         {s.barcode}
                       </Link>
                     </td>
-                    <td>{s.manufacturer || '—'}</td>
-                    <td>
+                    <td className="cell-wide-nowrap">{s.manufacturer || '—'}</td>
+                    <td className="cell-wide-nowrap">
                       {s.state === 'IN_STOCK' ? (
                         <span className="asset-field-na">{tr('Απόθεμα Σετ')}</span>
                       ) : (
                         trData(s.department) || '—'
                       )}
                     </td>
-                    <td>{trData(s.specialty) || '—'}</td>
+                    <td className="cell-wide-nowrap">{trData(s.specialty) || '—'}</td>
                     <td>
                       <b>{count}</b>
                       <span className="muted"> / {s.expected}</span>
