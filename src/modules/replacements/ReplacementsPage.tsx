@@ -320,7 +320,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
             </div>
           )}
           <div className="replacements-table">
-            <table>
+            <table className="replacements-fixed">
               <thead>
                 <tr>
                   {editable && (
@@ -328,15 +328,13 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                       <input type="checkbox" checked={allShown} onChange={toggleAll} aria-label={tr('Επιλογή όλων')} />
                     </th>
                   )}
-                  <th>Barcode</th>
                   <th>{tr('Εργαλείο')}</th>
-                  <th>{tr('Σετ / τμήμα')}</th>
-                  <th>{tr('Αιτία')}</th>
-                  <th>{tr('Από')}</th>
-                  <th>{tr('Απόθεμα')}</th>
-                  <th>{tr('Κατάσταση')}</th>
+                  <th className="col-set">{tr('Σετ / τμήμα')}</th>
+                  <th className="col-reason">{tr('Αιτία')}</th>
+                  <th className="col-stock">{tr('Απόθεμα')}</th>
+                  <th className="col-status">{tr('Κατάσταση')}</th>
                   {editable && (
-                    <th>
+                    <th className="col-actions">
                       <span className="visually-hidden">{tr('Ενέργειες')}</span>
                     </th>
                   )}
@@ -357,13 +355,13 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                           />
                         </td>
                       )}
-                      <td className="mono">
-                        <Link to={`/tools/${item.tool.id}`}>{item.tool.barcode}</Link>
-                      </td>
                       <td>
-                        <strong>{item.tool.name}</strong>
+                        <strong title={item.tool.name}>
+                          <Link to={`/tools/${item.tool.id}`}>{item.tool.name}</Link>
+                        </strong>
                         <small>
-                          {item.tool.code || '—'}
+                          <span className="mono">{item.tool.barcode}</span>
+                          {item.tool.code ? ` · ${item.tool.code}` : ''}
                           {item.tool.manufacturer ? ` · ${item.tool.manufacturer}` : ''}
                         </small>
                       </td>
@@ -383,7 +381,6 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                           <small>{item.issueTypes.map(trData).join(' · ')}</small>
                         )}
                       </td>
-                      <td className="since">{item.since || '—'}</td>
                       <td>
                         {item.stock.length ? (
                           <span className="replacement-stock yes" title={item.stock.map(s => s.barcode).join(', ')}>
@@ -395,6 +392,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                       </td>
                       <td>
                         <span className={`replacement-status s-${item.status}`}>{statusText(item)}</span>
+                        {item.since && <small title={tr('Από')}>{item.since}</small>}
                       </td>
                       {editable && (
                         <td className="row-actions">
@@ -440,7 +438,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                 })}
                 {!shown.length && (
                   <tr>
-                    <td colSpan={editable ? 9 : 7} className="empty">
+                    <td colSpan={editable ? 7 : 5} className="empty">
                       {items.length
                         ? tr('Κανένα εργαλείο δεν ταιριάζει στα φίλτρα.')
                         : tr('Δεν υπάρχουν εργαλεία σε Service, με βλάβη, χαμένα ή εκτός χρήσης.')}

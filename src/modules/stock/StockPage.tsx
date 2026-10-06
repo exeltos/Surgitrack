@@ -169,14 +169,13 @@ export default function StockPage() {
                 }}
               />
             ) : (
-              <table className="asset-registry-table">
+              <table className="asset-registry-table registry-fixed">
                 <thead>
                   <tr>
-                    <th>Barcode</th>
-                    <th>{tr('Κωδικός')}</th>
                     <th>{tr('Εργαλείο')}</th>
-                    <th>{tr('Κατασκευαστής')}</th>
+                    <th>Barcode</th>
                     <th>{tr('Ειδικότητα')}</th>
+                    <th>{tr('Κατασκευαστής')}</th>
                     <th>{tr('Χρήσεις')}</th>
                     <th>{tr('Κατάσταση')}</th>
                     <th>
@@ -187,20 +186,22 @@ export default function StockPage() {
                 <tbody>
                   {rows.visible.map(t => (
                     <tr key={t.id}>
-                      <td className="mono cell-nowrap">{t.barcode}</td>
-                      <td className="cell-nowrap">{t.code}</td>
                       <td>
                         <div className="registry-asset-name">
                           <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
                           <span>
-                            <strong>{t.name}</strong>
+                            <strong className="row-title-link" title={t.name}>
+                              {t.name}
+                            </strong>
                             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
+                            <small className="row-sub">{t.code}</small>
                           </span>
                         </div>
                       </td>
-                      <td>{t.manufacturer}</td>
+                      <td className="mono">{t.barcode}</td>
                       <td>{trData(t.specialty) || '—'}</td>
-                      <td>{t.maxUses ? `${t.uses}/${t.maxUses}` : '—'}</td>
+                      <td>{t.manufacturer || '—'}</td>
+                      <td>{t.maxUses ? `${t.uses} / ${t.maxUses}` : '—'}</td>
                       <td>
                         <StatusBadge value={t.state} />
                       </td>
@@ -211,7 +212,7 @@ export default function StockPage() {
                       </td>
                     </tr>
                   ))}
-                  {rows.hasMore && <MoreRows colSpan={8} onVisible={rows.showMore} />}
+                  {rows.hasMore && <MoreRows colSpan={5} onVisible={rows.showMore} />}
                 </tbody>
               </table>
             )}

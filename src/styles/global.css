@@ -6622,7 +6622,7 @@ html body .registry-fixed th:last-child {
   padding-left: 0;
   padding-right: 8px;
 }
-@media (max-width: 1299px) {
+@media (max-width: 1279px) {
   html body .registry-fixed th:nth-child(3),
   html body .registry-fixed td:nth-child(3),
   html body .registry-fixed th:nth-child(7),
@@ -6664,7 +6664,7 @@ html body .registry-fixed th:nth-child(6) {
 html body .registry-fixed th:nth-child(7) {
   width: 40px;
 }
-@media (max-width: 1299px) {
+@media (max-width: 1279px) {
   html body .registry-fixed th:nth-child(4) {
     width: 170px;
   }
@@ -6687,4 +6687,90 @@ html body .registry-fixed .badge {
   html body .registry-fixed th:nth-child(6) {
     width: 205px;
   }
+}
+/* Issues table: object + type/department on two lines, note takes the free width, actions never cut off. */
+html body .issues-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0 !important;
+}
+html body .issues-fixed th:nth-child(1) {
+  width: 30%;
+}
+html body .issues-fixed th:nth-child(2) {
+  width: auto;
+}
+html body .issues-fixed th:nth-child(3) {
+  width: 150px;
+}
+html body .issues-fixed th:nth-child(4) {
+  width: 110px;
+}
+html body .issues-fixed th:nth-child(5) {
+  width: 100px;
+}
+html body .issues-fixed th:nth-child(6) {
+  width: 132px;
+}
+html body .issues-fixed td {
+  min-width: 0;
+}
+html body .issues-fixed .issue-note {
+  max-width: 0;
+}
+html body .issues-fixed .issue-asset,
+html body .issues-fixed .row-sub {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .issues-fixed .issue-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Replacements table: fixed layout, the tool name takes the free width, actions are always fully visible. */
+html body .replacements-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0 !important;
+}
+html body .replacements-fixed th.pick {
+  width: 40px;
+}
+html body .replacements-fixed th.col-set {
+  width: 14%;
+}
+html body .replacements-fixed th.col-reason {
+  width: 120px;
+}
+html body .replacements-fixed th.col-since {
+  width: 100px;
+}
+html body .replacements-fixed th.col-stock {
+  width: 80px;
+}
+html body .replacements-fixed th.col-status {
+  width: 180px;
+}
+html body .replacements-fixed th.col-actions {
+  width: 225px;
+}
+html body .replacements-fixed .row-actions {
+  white-space: nowrap;
+}
+html body .replacements-fixed .replacement-status {
+  white-space: normal;
+}
+html body .replacements-fixed td {
+  min-width: 0;
+}
+html body .replacements-fixed td strong,
+html body .replacements-fixed td small,
+html body .replacements-fixed td > a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
