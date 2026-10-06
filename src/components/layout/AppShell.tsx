@@ -53,6 +53,7 @@ const navEN: Record<string, string> = {
   Εκκρεμότητες: 'Issues',
   Αναφορές: 'Reports',
   Ιστορικό: 'History',
+  Κάδος: 'Recycle bin',
   'SurgiTrack Studio': 'Management Center',
   'Σετ & Εργαλεία': 'Sets & Instruments',
   'Χρήστες & Τμήματα': 'Users & departments',

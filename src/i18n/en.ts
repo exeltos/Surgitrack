@@ -1583,6 +1583,7 @@ export const en: Record<string, string> = {
     'One line per kind of instrument. Change the quantity if you need more or fewer.',
   'Με κόκκινο: γραμμές με ελλείψεις. Με πορτοκαλί: εργαλεία με ανοιχτή εκκρεμότητα (βλάβη, φθορά κ.ά.).':
     'In red: lines with missing instruments. In orange: instruments with an open issue (damage, wear etc.).',
+  'Νέα παραγγελία': 'New order',
   'Νέα παραγγελία αγοράς': 'New purchase order',
   'Ναι · {0}': 'Yes · {0}',
   'Π.χ. επείγον, προϋπολογισμός…': 'E.g. urgent, budget…',

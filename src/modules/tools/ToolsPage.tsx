@@ -93,7 +93,7 @@ export default function ToolsPage() {
             value: tools.filter(t => t.mode === 'STANDALONE').length,
             ...kpi({mode: 'STANDALONE'}),
           },
-          {label: 'Απόθεμα', value: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
+          {label: tr('Απόθεμα'), value: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
         ]}
       />
       <div className="asset-list-controls">
@@ -128,7 +128,7 @@ export default function ToolsPage() {
               value: mode,
               placeholder: tr('Όλες οι θέσεις'),
               options: [
-                {value: 'STOCK', label: 'Απόθεμα'},
+                {value: 'STOCK', label: tr('Απόθεμα')},
                 {value: 'SET_MEMBER', label: tr('Σετ εργαλείων')},
                 {value: 'STANDALONE', label: tr('Μεμονωμένα σε χρήση')},
               ],
