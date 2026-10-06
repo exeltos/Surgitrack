@@ -6774,3 +6774,15 @@ html body .replacements-fixed td > a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* One KPI look everywhere: one-line label (truncated with a tooltip-free ellipsis), number on the right. */
+html body .kpis > * small,
+html body .replacements-kpis > * span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .kpis > *,
+html body .replacements-kpis > * {
+  min-width: 0;
+}
