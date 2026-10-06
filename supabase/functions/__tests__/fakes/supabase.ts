@@ -22,6 +22,7 @@ const initial = {
     updateUserById: (_id: string, _attrs: unknown): Result => ({error: null}),
     generateLink: (_args: unknown): Result => ({data: {properties: {hashed_token: 'tok'}}, error: null}),
     inviteUserByEmail: (_email: string, _options: unknown): Result => ({data: {user: {id: 'invited-user'}}, error: null}),
+    signOut: (_token: string, _scope: unknown): Result => ({error: null}),
   },
   resetPassword: (_email: string, _options: unknown): Result => ({error: null}),
   calls: [] as Array<{what: string; args: unknown[]}>,
@@ -35,6 +36,7 @@ const initial = {
       updateUserById: () => ({error: null}),
       generateLink: () => ({data: {properties: {hashed_token: 'tok'}}, error: null}),
       inviteUserByEmail: () => ({data: {user: {id: 'invited-user'}}, error: null}),
+      signOut: () => ({error: null}),
     };
     this.resetPassword = () => ({error: null});
     this.calls = [];
@@ -123,6 +125,10 @@ export const createClient = (_url: string, _key: string, options?: {global?: {he
       generateLink: (args: unknown) => {
         record('generateLink', args);
         return Promise.resolve(fake.admin.generateLink(args));
+      },
+      signOut: (token: string, scope: unknown) => {
+        record('signOut', token, scope);
+        return Promise.resolve().then(() => fake.admin.signOut(token, scope));
       },
       inviteUserByEmail: (email: string, options: unknown) => {
         record('inviteUserByEmail', email, options);
