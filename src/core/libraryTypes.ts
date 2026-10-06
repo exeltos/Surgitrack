@@ -51,7 +51,12 @@ export type LabelSettings = {
   mainShare?: number;
 };
 export const DEFAULT_LABEL_SETTINGS: LabelSettings = {size: 'SMALL', header: 'BRAND', showDetails: true};
-export type SystemSettings = {usageWarningThreshold: number; label?: LabelSettings};
+export type SystemSettings = {
+  usageWarningThreshold: number;
+  label?: LabelSettings;
+  /** The least the hospital wants in Stock of each instrument kind (key: see kindKey in core/replacements). */
+  stockMinimums?: Record<string, number>;
+};
 export type ConfigurationAuditEvent = {
   id: string;
   entityType: 'WORKFLOW' | 'SYSTEM_SETTING' | 'LIBRARY' | 'USER' | 'ORGANIZATION' | 'ROLE_PERMISSIONS';

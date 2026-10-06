@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {
   Activity,
   ArrowRight,
+  Boxes,
   Gauge,
   History,
   Layers3,
@@ -22,6 +23,7 @@ import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} 
 import type {AssetState} from '../../types/domain';
 import {trData} from '../../i18n';
 import {presetPath} from '../../core/listMemory';
+import {belowMinimum, minimumRows} from '../../core/stockMinimums';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -62,8 +64,8 @@ const movementStamp = (at: string) => {
  * are, what each department holds, what is stuck, and the latest movements.
  */
 export default function HospitalOverviewPage() {
-  const {sets, tools, issues, movements, lifecycleAlerts} = useSurgi();
-  const {departments} = useLibraries();
+  const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders} = useSurgi();
+  const {departments, systemSettings} = useLibraries();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const hospitalId = managedHospitalId();
@@ -82,6 +84,10 @@ export default function HospitalOverviewPage() {
   const inProcess = tracked.filter(a => PROCESS_STATES.includes(a.state));
   const ready = tracked.filter(a => a.state === 'READY_FOR_PICKUP');
   const openIssues = issues.filter(i => i.status === 'OPEN');
+  const lowStock = useMemo(
+    () => belowMinimum(minimumRows([...tools, ...retiredTools], purchaseOrders, systemSettings.stockMinimums)),
+    [tools, retiredTools, purchaseOrders, systemSettings.stockMinimums],
+  );
   const lost = tracked.filter(a => a.state === 'LOST' || a.state === 'SERVICE');
 
   const byDepartment = useMemo(
@@ -430,6 +436,25 @@ export default function HospitalOverviewPage() {
                 </span>
               </li>
             ))}
+            {lowStock.length > 0 && (
+              <li>
+                <Boxes size={15} className="warn" />
+                <Link to="/stock?view=minimums">
+                  <b>
+                    {L(
+                      `${lowStock.length} είδη κάτω από το ελάχιστο απόθεμα`,
+                      `${lowStock.length} kinds below their minimum stock`,
+                    )}
+                  </b>
+                  <small>
+                    {lowStock
+                      .slice(0, 3)
+                      .map(r => r.name)
+                      .join(' · ')}
+                  </small>
+                </Link>
+              </li>
+            )}
             {lifecycleAlerts.slice(0, 3).map(a => (
               <li key={a.id}>
                 <Gauge size={15} className="warn" />
@@ -441,7 +466,7 @@ export default function HospitalOverviewPage() {
                 </Link>
               </li>
             ))}
-            {openIssues.length === 0 && lifecycleAlerts.length === 0 && (
+            {openIssues.length === 0 && lifecycleAlerts.length === 0 && lowStock.length === 0 && (
               <li className="ok">
                 <PackageCheck size={15} />
                 <span>{L('Όλα εντάξει: τίποτα δεν περιμένει.', 'All clear: nothing is waiting.')}</span>
