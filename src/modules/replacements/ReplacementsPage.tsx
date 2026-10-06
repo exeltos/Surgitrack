@@ -29,6 +29,8 @@ import {
 } from '../../core/replacements';
 import type {PurchaseOrder, PurchaseOrderLine} from '../../types/domain';
 import OrderDialog from './OrderDialog';
+import ReceiveDialog from './ReceiveDialog';
+import {isReceivable} from '../../core/purchaseReceipt';
 import {useConfirm} from '../../components/ui/useConfirm';
 import {pieces} from './pieces';
 import {orderStatusLabel, purchaseOrderHtml, replacementListHtml} from './replacementPrint';
@@ -59,6 +61,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
   const [status, setStatus] = useState<StatusFilter>('NEEDED');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
+  const [receiving, setReceiving] = useState<PurchaseOrder | null>(null);
   const [preview, setPreview] = useState<{title: string; html: string} | null>(null);
 
   const departments = useMemo(
@@ -267,8 +270,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
           className={tab === 'ORDERS' ? 'active' : ''}
           onClick={() => setTab('ORDERS')}
         >
-          <ClipboardList size={16} /> {tr('Παραγγελίες')}{' '}
-          <b>{purchaseOrders.filter(o => o.status === 'OPEN' || o.status === 'ORDERED').length}</b>
+          <ClipboardList size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
         </button>
       </div>
 
@@ -454,24 +456,27 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
               title: status === 'CANCELLED' ? tr('Ακύρωση παραγγελίας;') : tr('Σημείωση ως παραγγελθείσα;'),
               message:
                 status === 'CANCELLED'
-                  ? tr(
-                      'Η παραγγελία {0} ακυρώνεται και τα εργαλεία της ξαναγίνονται «Χρειάζεται αντικατάσταση».',
-                      order.number,
-                    )
+                  ? order.status === 'PARTIAL'
+                    ? tr(
+                        'Τα υπόλοιπα της παραγγελίας {0} δεν θα έρθουν. Όσα παραλήφθηκαν μένουν στο Απόθεμα.',
+                        order.number,
+                      )
+                    : tr(
+                        'Η παραγγελία {0} ακυρώνεται και τα εργαλεία της ξαναγίνονται «Χρειάζεται αντικατάσταση».',
+                        order.number,
+                      )
                   : tr('Η παραγγελία {0} στάλθηκε στον προμηθευτή.', order.number),
-              confirmLabel: status === 'CANCELLED' ? tr('Ακύρωση παραγγελίας') : tr('Επιβεβαίωση'),
+              confirmLabel:
+                status === 'CANCELLED'
+                  ? order.status === 'PARTIAL'
+                    ? tr('Ακύρωση υπολοίπων')
+                    : tr('Ακύρωση παραγγελίας')
+                  : tr('Επιβεβαίωση'),
               danger: status === 'CANCELLED',
               onConfirm: () => store.setPurchaseOrderStatus(order.id, status),
             })
           }
-          onReceive={order =>
-            ask({
-              title: tr('Παραλαβή στο Απόθεμα;'),
-              message: tr('Τα εργαλεία της παραγγελίας {0} μπαίνουν στο Απόθεμα με νέα barcode.', order.number),
-              confirmLabel: tr('Παραλαβή'),
-              onConfirm: () => store.receivePurchaseOrder(order.id),
-            })
-          }
+          onReceive={order => setReceiving(order)}
           onNew={() => setOrdering([])}
           onPrint={order =>
             setPreview({title: tr('Παραγγελία {0}', order.number), html: purchaseOrderHtml(order, organizationName)})
@@ -493,6 +498,27 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                 setOrdering(null);
                 setSelected(new Set());
                 if (number) setTab('ORDERS');
+              },
+            })
+          }
+        />
+      )}
+      {receiving && (
+        <ReceiveDialog
+          order={receiving}
+          onClose={() => setReceiving(null)}
+          onReceive={quantities =>
+            ask({
+              title: tr('Παραλαβή στο Απόθεμα;'),
+              message: tr(
+                'Τα {0} τεμάχια της παραγγελίας {1} μπαίνουν στο Απόθεμα με νέα barcode.',
+                quantities.reduce((sum, n) => sum + n, 0),
+                receiving.number,
+              ),
+              confirmLabel: tr('Παραλαβή'),
+              onConfirm: () => {
+                store.receivePurchaseOrder(receiving.id, quantities);
+                setReceiving(null);
               },
             })
           }
@@ -574,7 +600,7 @@ function Orders({
                       <strong>{line.name}</strong>
                       <small>{line.manufacturer || ''}</small>
                     </td>
-                    <td className="qty">{line.quantity}</td>
+                    <td className="qty">{line.received ? `${line.received}/${line.quantity}` : line.quantity}</td>
                     <td>{line.reason}</td>
                     <td className="mono barcodes">{line.barcodes.join(', ')}</td>
                   </tr>
@@ -591,18 +617,23 @@ function Orders({
                   {tr('Σημείωση ως παραγγελθείσα')}
                 </AppButton>
               )}
-              {editable && (order.status === 'OPEN' || order.status === 'ORDERED') && (
+              {editable && isReceivable(order) && (
                 <>
                   <AppButton
-                    variant={order.status === 'ORDERED' ? 'primary' : undefined}
+                    variant={order.status === 'OPEN' ? undefined : 'primary'}
                     icon={<PackageCheck size={15} />}
                     onClick={() => onReceive(order)}
                   >
-                    {tr('Παραλαβή στο Απόθεμα')}
+                    {order.status === 'PARTIAL' ? tr('Παραλαβή υπολοίπων') : tr('Παραλαβή στο Απόθεμα')}
                   </AppButton>
-                  <AppButton onClick={() => onStatus(order, 'CANCELLED')}>{tr('Ακύρωση παραγγελίας')}</AppButton>
+                  <AppButton onClick={() => onStatus(order, 'CANCELLED')}>
+                    {order.status === 'PARTIAL' ? tr('Ακύρωση υπολοίπων') : tr('Ακύρωση παραγγελίας')}
+                  </AppButton>
                 </>
               )}
+              {order.status === 'PARTIAL' && order.receivedBarcodes?.length ? (
+                <small>{tr('Έχουν παραληφθεί: {0}', order.receivedBarcodes.join(', '))}</small>
+              ) : null}
               {order.status === 'RECEIVED' && (
                 <small>
                   {order.receivedBarcodes?.length

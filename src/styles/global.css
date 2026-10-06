@@ -5227,6 +5227,10 @@ div.asset-import-hospital b {
   background: #e7f0fb;
   color: #1f4f8a;
 }
+.replacement-order-status.o-PARTIAL {
+  background: #fdf1de;
+  color: #9a5200;
+}
 .replacement-status.s-REPLACED,
 .replacement-order-status.o-RECEIVED {
   background: #e6f5ec;
@@ -6208,4 +6212,23 @@ html body .content .asset-list-controls .icon-toggle {
 html body .content .movements-actions button {
   height: 38px;
   padding-block: 0;
+}
+.receive-modal .replacements-order-lines input {
+  width: 72px;
+  margin-right: 8px;
+}
+.receive-modal .link-button {
+  border: 0;
+  background: none;
+  color: #155a6e;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.receive-modal .link-button:disabled {
+  color: var(--st-muted);
+  cursor: default;
+  text-decoration: none;
 }

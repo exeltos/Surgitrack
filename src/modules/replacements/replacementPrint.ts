@@ -84,6 +84,7 @@ export function replacementListHtml(items: readonly ReplacementItem[], subtitle:
 const ORDER_STATUS: Record<PurchaseOrder['status'], string> = {
   OPEN: 'Ανοιχτή',
   ORDERED: 'Παραγγέλθηκε',
+  PARTIAL: 'Παραλήφθηκε μερικώς',
   RECEIVED: 'Παραλήφθηκε',
   CANCELLED: 'Ακυρώθηκε',
 };
@@ -99,7 +100,7 @@ export function purchaseOrderHtml(order: PurchaseOrder, hospital?: string) {
 <td class="mono">${esc(line.code || '—')}</td>
 <td class="name">${esc(line.name)}</td>
 <td>${esc(line.manufacturer || '—')}</td>
-<td class="qty">${line.quantity}</td>
+<td class="qty">${line.received ? `${line.received}/${line.quantity}` : line.quantity}</td>
 <td>${esc(line.reason ? tr(line.reason) : '—')}</td>
 <td class="mono" style="font-weight:400">${esc(line.barcodes.join(', ') || '—')}</td>
 </tr>`,

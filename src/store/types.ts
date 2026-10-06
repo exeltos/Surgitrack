@@ -236,7 +236,7 @@ export type SurgiStoreValue = {
   purgeFromBin: (id: string) => void;
   purgeExpiredBin: () => number;
   replaceFromStock: (pairs: Array<{toolId: string; stockToolId: string; setId: string}>) => void;
-  receivePurchaseOrder: (id: string) => void;
+  receivePurchaseOrder: (id: string, quantities?: number[]) => void;
   createPurchaseOrder: (lines: PurchaseOrderLine[], details?: {supplier?: string; note?: string}) => string;
   setPurchaseOrderStatus: (id: string, status: PurchaseOrderStatus) => void;
   lifecycleAlerts: LifecycleAlert[];
