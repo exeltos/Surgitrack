@@ -22,7 +22,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
         <Send />
         <span>{tr('Παραλαβή')}</span>
         <strong>{incoming.length}</strong>
-        <small>Chain of custody</small>
+        <small>{tr('Αλυσίδα φύλαξης')}</small>
       </button>
       {(stageEnabled('WASHING') || washing.length > 0) && (
         <button className={queue === 'WASHING' ? 'active' : ''} onClick={() => setQueue('WASHING')}>
@@ -59,7 +59,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <ShieldCheck />
           <span>{tr('Αποδέσμευση')}</span>
           <strong>{awaitingRelease.length}</strong>
-          <small>Quality gate</small>
+          <small>{tr('Πύλη ποιότητας')}</small>
         </button>
       )}
       {(stageEnabled('STORAGE') || storage.length > 0) && (

@@ -189,29 +189,40 @@ export default function IssuesPage() {
                     </td>
                     {withReplacements && (
                       <td className="issue-actions">
-                        {subject(i).to && (
-                          <Link className="issue-action" to={subject(i).to!}>
-                            <ExternalLink size={13} /> {tr('Άνοιγμα')}
-                          </Link>
-                        )}
-                        {subject(i).tool && (
-                          <button
-                            type="button"
-                            className="issue-action"
-                            onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
-                          >
-                            <ShoppingCart size={13} /> {tr('Παραγγελία')}
-                          </button>
-                        )}
-                        {i.status === 'OPEN' && (
-                          <button
-                            type="button"
-                            className="issue-action"
-                            onClick={() => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα'))}
-                          >
-                            <CheckCircle2 size={13} /> {tr('Επίλυση')}
-                          </button>
-                        )}
+                        <div className="issue-actions-row">
+                          {subject(i).to && (
+                            <Link
+                              className="issue-action"
+                              to={subject(i).to!}
+                              title={tr('Άνοιγμα')}
+                              aria-label={tr('Άνοιγμα')}
+                            >
+                              <ExternalLink size={14} />
+                            </Link>
+                          )}
+                          {subject(i).tool && (
+                            <button
+                              type="button"
+                              className="issue-action"
+                              title={tr('Παραγγελία')}
+                              aria-label={tr('Παραγγελία')}
+                              onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
+                            >
+                              <ShoppingCart size={14} />
+                            </button>
+                          )}
+                          {i.status === 'OPEN' && (
+                            <button
+                              type="button"
+                              className="issue-action"
+                              title={tr('Επίλυση')}
+                              aria-label={tr('Επίλυση')}
+                              onClick={() => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα'))}
+                            >
+                              <CheckCircle2 size={14} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     )}
                   </tr>

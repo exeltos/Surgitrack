@@ -99,7 +99,7 @@
   border: 1px solid #d8e1e6;
   border-radius: 5px;
   background: #fff;
-  font-size: 10px;
+  font-size: 11px;
   color: #68747e;
 }
 .manual-actions {
@@ -138,7 +138,7 @@
 }
 .manual-side-label {
   padding: 14px 14px 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.11em;
   color: #68727a;
@@ -207,7 +207,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
   color: #657580;
@@ -287,7 +287,7 @@
   padding-top: 18px;
 }
 .manual-step-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.1em;
   color: var(--st-muted);
@@ -443,7 +443,7 @@
   border-radius: 9px;
 }
 .manual-about-grid small {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--st-muted);
@@ -469,7 +469,7 @@
   color: #394c58;
 }
 .manual-support-grid small {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;

@@ -61,7 +61,7 @@ button {
   font-size: 15px;
 }
 .brand span {
-  font-size: 10px;
+  font-size: 11px;
   color: #8791a3;
   margin-top: 2px;
   letter-spacing: 0.02em;
@@ -314,7 +314,7 @@ button {
 footer {
   padding: 18px 32px 24px;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 .mobile-menu {
   display: none;
@@ -845,7 +845,7 @@ td {
   min-width: 17px;
   height: 17px;
   border-radius: 9px;
-  font-size: 10px;
+  font-size: 11px;
   display: grid;
   place-items: center;
   padding: 0 4px;
@@ -910,7 +910,7 @@ td {
   gap: 3px;
 }
 .workspace-label small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1002,7 +1002,7 @@ td {
   background: #eef2f6;
   padding: 2px 6px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 11px;
 }
 .asset-work-row {
   display: grid;
@@ -1078,7 +1078,7 @@ td {
   font-size: 18px;
 }
 .sterile-queues button small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .sterile-queues button.active {
@@ -1185,7 +1185,7 @@ td {
 }
 .eyebrow {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.11em;
   color: var(--st-muted);
@@ -1239,7 +1239,7 @@ td {
 }
 .record-fields label {
   display: block;
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--st-muted);
@@ -1314,7 +1314,7 @@ td {
   background: #edf2f5;
   padding: 2px 6px;
   border-radius: 999px;
-  font-size: 9px;
+  font-size: 11px;
 }
 .panel-head {
   display: flex;
@@ -1351,7 +1351,7 @@ td {
   font-size: 17px;
 }
 .composition-total span {
-  font-size: 9px;
+  font-size: 11px;
 }
 .strong-link,
 .row-title-link {
@@ -1372,7 +1372,7 @@ td {
   display: block;
   margin-top: 3px;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 .muted {
   color: var(--st-muted);
@@ -1419,7 +1419,7 @@ td {
 }
 .history-row small {
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 .record-note {
   font-size: 12px;
@@ -1475,7 +1475,7 @@ td {
   align-items: flex-end;
 }
 .usage-head span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1500,7 +1500,7 @@ td {
   font-size: 22px;
 }
 .usage-remaining span {
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 .usage-bar {
@@ -1619,7 +1619,7 @@ td {
   font-size: 14px;
 }
 .auth-mini-brand span {
-  font-size: 9px;
+  font-size: 11px;
   color: #8b95a5;
   margin-top: 2px;
 }
@@ -1677,7 +1677,7 @@ td {
   text-transform: uppercase;
   letter-spacing: 0.11em;
   font-weight: 800;
-  font-size: 9px;
+  font-size: 11px;
 }
 .auth-intro h1 {
   font-size: 44px;
@@ -1798,7 +1798,7 @@ td {
   grid-template-columns: auto minmax(0, 1fr) !important;
   align-items: flex-start;
   gap: 8px !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
   color: #687587 !important;
   font-weight: 500 !important;
 }
@@ -1812,7 +1812,7 @@ td {
   background: transparent;
   padding: 0;
   color: #176079;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -1835,7 +1835,7 @@ td {
   align-items: center;
   gap: 10px;
   color: var(--st-muted);
-  font-size: 9px;
+  font-size: 11px;
   margin: 19px 0;
 }
 .auth-divider:before,
@@ -1860,7 +1860,7 @@ td {
   display: block;
   margin-top: 3px;
   color: #8793a1;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
 }
 .auth-bottom-question {
@@ -1871,7 +1871,7 @@ td {
   padding-top: 17px;
   border-top: 1px solid #eef1f4;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 .auth-back {
   display: inline-flex;
@@ -1893,7 +1893,7 @@ td {
   color: #326848;
   border-radius: 8px;
   padding: 9px 11px;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.45;
 }
 .auth-footer {
@@ -1904,7 +1904,7 @@ td {
   padding: 20px 34px;
   border-top: 1px solid #e5e9ee;
   color: var(--st-muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .auth-footer nav {
   display: flex;
@@ -1914,7 +1914,7 @@ td {
   border: 0;
   background: transparent;
   color: var(--st-muted);
-  font-size: 9px;
+  font-size: 11px;
   cursor: pointer;
   padding: 0;
 }
@@ -2055,7 +2055,7 @@ td {
   font-size: 13px;
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
   color: #60778b;
@@ -2075,7 +2075,7 @@ td {
   flex-direction: column;
 }
 .ster-shift small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .ster-shift strong {
@@ -2111,7 +2111,7 @@ td {
   font-size: 13px;
 }
 .ster-scan-copy span {
-  font-size: 10px;
+  font-size: 11px;
   color: #b8c8d2;
   margin-top: 2px;
 }
@@ -2172,7 +2172,7 @@ td {
   font-size: 13px;
 }
 .ster-panel-head span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .ster-hint {
@@ -2224,7 +2224,7 @@ td {
   font-weight: 800;
 }
 .ster-type {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   background: #f1f4f7;
   color: var(--st-muted);
@@ -2240,7 +2240,7 @@ td {
 .ster-asset small,
 .ster-meta small,
 .ster-status small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .ster-meta,
@@ -2273,14 +2273,14 @@ td {
   gap: 3px;
   color: #60778b;
   text-decoration: none;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .ready-note {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   color: #2d7650;
   background: #edf8f1;
   padding: 7px 9px;
@@ -2327,7 +2327,7 @@ td {
   padding-right: 35px;
 }
 .handover-title span {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   font-weight: 800;
   color: var(--st-muted);
@@ -2400,7 +2400,7 @@ td {
 }
 .receipt-composition small {
   grid-column: 1/3;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .modal-actions {
@@ -2473,7 +2473,7 @@ td {
 
 /* v0.8 Sterilization entry + receipt identity */
 .ster-shift span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   margin-top: 2px;
 }
@@ -2495,7 +2495,7 @@ td {
   margin-bottom: 18px;
 }
 .receipt-card-head > div:last-child > span {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.11em;
   font-weight: 800;
   color: var(--st-muted);
@@ -2536,7 +2536,7 @@ td {
 .receipt-summary-grid span,
 .receipt-facts span,
 .receipt-note-read > span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -2546,7 +2546,7 @@ td {
   color: #344054;
 }
 .receipt-summary-grid small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .identity-section {
@@ -2572,7 +2572,7 @@ td {
   color: #344054;
 }
 .identity-title span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
   margin-top: 2px;
 }
@@ -2580,7 +2580,7 @@ td {
   display: grid;
   gap: 6px;
   color: #526070;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .identity-section input {
@@ -2600,7 +2600,7 @@ td {
   display: block;
   margin-top: 5px;
   color: #98a2b3;
-  font-size: 9px;
+  font-size: 11px;
 }
 .identity-result {
   display: flex;
@@ -2621,7 +2621,7 @@ td {
   font-size: 11px;
 }
 .identity-result span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   margin-top: 1px;
 }
@@ -2632,7 +2632,7 @@ td {
   color: #9d4532;
   border-radius: 8px;
   padding: 8px 10px;
-  font-size: 10px;
+  font-size: 11px;
 }
 .receipt-complete-banner {
   display: flex;
@@ -2653,7 +2653,7 @@ td {
   font-size: 12px;
 }
 .receipt-complete-banner span {
-  font-size: 9px;
+  font-size: 11px;
   margin-top: 1px;
   color: #6e8b78;
 }
@@ -2681,7 +2681,7 @@ td {
   color: #344054;
 }
 .receipt-facts small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-note-read {
@@ -2702,7 +2702,7 @@ td {
   border: 0;
   background: transparent;
   color: #60778b;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
   padding: 5px 0;
@@ -2753,7 +2753,7 @@ td {
   color: #344054;
 }
 .check-toggle small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-check-body {
@@ -2768,7 +2768,7 @@ td {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #526070;
 }
@@ -2801,7 +2801,7 @@ td {
   background: #fff;
 }
 .count-field > span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .count-field > strong {
@@ -2812,7 +2812,7 @@ td {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 9px;
+  font-size: 11px;
   color: #667085;
 }
 .count-field input {
@@ -2838,7 +2838,7 @@ td {
 }
 .receipt-check-read span,
 .receipt-check-read p {
-  font-size: 10px;
+  font-size: 11px;
   margin: 0;
 }
 .receipt-check-read p {
@@ -2871,7 +2871,7 @@ td {
   color: var(--st-muted);
 }
 .prep-summary span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-summary strong {
@@ -2889,7 +2889,7 @@ td {
   font-size: 11px;
 }
 .prep-list-head span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-tool-list {
@@ -2910,15 +2910,15 @@ td {
   border-bottom: 0;
 }
 .prep-tool-list span {
-  font-size: 10px;
+  font-size: 11px;
   color: #31536a;
 }
 .prep-tool-list strong {
-  font-size: 10px;
+  font-size: 11px;
   color: #344054;
 }
 .prep-tool-list small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-note {
@@ -2931,7 +2931,7 @@ td {
   border-radius: 8px;
   padding: 9px 10px;
   color: #667085;
-  font-size: 9px;
+  font-size: 11px;
 }
 .prep-single {
   display: flex;
@@ -2952,13 +2952,13 @@ td {
   color: #344054;
 }
 .prep-single span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   margin-top: 2px;
 }
 .compact-empty {
   min-height: 100px !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
 }
 @media (max-width: 700px) {
   .receipt-check-body,
@@ -3030,7 +3030,7 @@ td {
   color: #344054;
 }
 .receipt-tools-head span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-tools-list {
@@ -3059,15 +3059,15 @@ td {
 }
 .receipt-tool-row > div:first-child span {
   grid-row: 1/3;
-  font-size: 10px;
+  font-size: 11px;
   color: #31536a;
 }
 .receipt-tool-row > div:first-child strong {
-  font-size: 10px;
+  font-size: 11px;
   color: #344054;
 }
 .receipt-tool-row > div:first-child small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-tool-flags {
@@ -3077,7 +3077,7 @@ td {
   align-items: flex-start;
 }
 .receipt-tool-flags > span {
-  font-size: 9px;
+  font-size: 11px;
   color: #667085;
 }
 .receipt-tool-flags .dept-issue {
@@ -3100,7 +3100,7 @@ td {
   color: #52697a;
   border-radius: 7px;
   padding: 7px 9px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -3133,7 +3133,7 @@ td {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #526070;
   margin-top: 10px;
@@ -3368,7 +3368,7 @@ td {
   color: #344054;
 }
 .receipt-section-title span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   font-weight: 500;
 }
@@ -3400,7 +3400,7 @@ td {
   color: #35566c;
   border-radius: 8px;
   padding: 0 12px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
@@ -3426,7 +3426,7 @@ td {
   color: #344054;
 }
 .receipt-tools-count span {
-  font-size: 9px !important;
+  font-size: 11px !important;
   color: var(--st-muted);
 }
 .receipt-card-body .receipt-check-section {
@@ -3454,7 +3454,7 @@ td {
   gap: 3px;
 }
 .receipt-count-summary span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-count-summary strong {
@@ -3886,7 +3886,7 @@ td {
 }
 .prep-section-head span,
 .prep-tools-head span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-facts {
@@ -3917,7 +3917,7 @@ td {
   color: var(--st-muted);
 }
 .prep-facts span {
-  font-size: 8px;
+  font-size: 11px;
   text-transform: uppercase;
   color: var(--st-muted);
   letter-spacing: 0.02em;
@@ -3928,7 +3928,7 @@ td {
   line-height: 1.25;
 }
 .prep-facts small {
-  font-size: 8px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-check-summary {
@@ -3944,7 +3944,7 @@ td {
   gap: 2px;
 }
 .prep-check-summary span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-check-summary strong {
@@ -3962,7 +3962,7 @@ td {
   color: #31536a;
   border-radius: 8px;
   padding: 9px 11px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -3984,7 +3984,7 @@ td {
   border-radius: 8px;
   padding: 9px 10px;
   color: #8a5a19;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.4;
 }
 .prep-block-warning svg {
@@ -4001,7 +4001,7 @@ td {
   border-radius: 8px;
   padding: 9px 10px;
   color: #2f6f53;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.4;
 }
 .prep-accepted-warning svg {
@@ -4013,7 +4013,7 @@ td {
   flex-direction: column;
   gap: 5px;
   padding: 0 12px 12px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: #526070;
 }
@@ -4113,14 +4113,14 @@ td {
 }
 .prep-tool-main > .mono {
   grid-row: 1/3;
-  font-size: 10px;
+  font-size: 11px;
 }
 .prep-tool-main strong {
-  font-size: 10px;
+  font-size: 11px;
   color: #344054;
 }
 .prep-tool-main small {
-  font-size: 8.5px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .prep-tool-state {
@@ -4136,7 +4136,7 @@ td {
   gap: 5px;
   border-radius: 6px;
   padding: 5px 7px;
-  font-size: 8.5px;
+  font-size: 11px;
 }
 .prep-ok-chip {
   background: #f1f7f4;
@@ -4237,7 +4237,7 @@ td {
   color: #526070;
   border-radius: 7px;
   padding: 7px 9px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -4296,7 +4296,7 @@ td {
   color: #526070;
   border-radius: 7px;
   padding: 7px 9px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -4316,7 +4316,7 @@ td {
   border-radius: 6px;
   background: #f4f7f9;
   color: #526070 !important;
-  font-size: 8.5px !important;
+  font-size: 11px !important;
   font-weight: 700;
 }
 .prep-tool-row {
@@ -4341,7 +4341,7 @@ td {
 .prep-action-intro {
   margin: -8px 34px 14px 0;
   color: #697586;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.45;
 }
 .prep-replacement-note {
@@ -4354,7 +4354,7 @@ td {
   background: #f5faf7;
   border-radius: 8px;
   color: #52705f;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.4;
 }
 .prep-replacement-note svg {
@@ -4565,7 +4565,7 @@ td {
 }
 .cycle-summary span,
 .cycle-summary small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .cycle-summary strong {
@@ -4656,7 +4656,7 @@ td {
   border-right: 0;
 }
 .cycle-clean-summary span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -4736,7 +4736,7 @@ td {
 }
 .delivery-person span,
 .delivery-person small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .delivery-person strong {
@@ -5071,7 +5071,7 @@ td {
 }
 .asset-profile-facts span,
 .asset-profile-facts small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .asset-profile-facts strong {
@@ -5142,7 +5142,7 @@ td {
   font-size: 18px;
 }
 .asset-count-state span {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .asset-count-state.ok {
@@ -5239,11 +5239,11 @@ td {
 }
 .asset-history-row p {
   margin: 2px 0;
-  font-size: 10.5px;
+  font-size: 11px;
   color: #637783;
 }
 .asset-history-row small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .asset-empty {
@@ -5285,7 +5285,7 @@ td {
   border-radius: 8px;
   background: transparent;
   color: var(--st-muted);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   padding: 0 8px;
   white-space: nowrap;
@@ -5304,7 +5304,7 @@ td {
   place-items: center;
   background: #fff1d6;
   color: #9b6718;
-  font-size: 9px;
+  font-size: 11px;
 }
 .asset-tab-panel {
   flex: 1 1 auto;
@@ -5337,15 +5337,15 @@ td {
   gap: 2px;
 }
 .asset-issue-row strong {
-  font-size: 10.5px;
+  font-size: 11px;
   color: #314755;
 }
 .asset-issue-row span {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .asset-issue-row small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--st-muted);
   line-height: 1.35;
 }
@@ -5380,7 +5380,7 @@ td {
   font-size: 11.5px;
 }
 .usage-config-head span {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .usage-config-head select {
@@ -5402,7 +5402,7 @@ td {
 .usage-config-limit label {
   display: grid;
   gap: 5px;
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--st-muted);
   font-weight: 700;
 }
@@ -5424,7 +5424,7 @@ td {
   background: #fff;
 }
 .usage-inline-stats span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .usage-inline-stats strong {
@@ -5458,7 +5458,7 @@ td {
   border-radius: 8px;
   background: #fff6e3;
   color: #8b5c16;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .set-workspace-grid {
@@ -5512,7 +5512,7 @@ td {
   background: #f1f5f7;
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--st-muted);
 }
@@ -5531,7 +5531,7 @@ td {
 }
 .set-tool-code small,
 .set-tool-name small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -5542,7 +5542,7 @@ td {
   gap: 2px;
 }
 .set-tool-uses span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .set-tool-uses strong {
@@ -5554,7 +5554,7 @@ td {
   gap: 2px;
 }
 .set-tool-state small {
-  font-size: 8.5px;
+  font-size: 11px;
   color: var(--st-amber);
   font-weight: 700;
 }
@@ -5759,7 +5759,7 @@ td {
   color: #8a5816;
   border-radius: 8px;
   padding: 8px 10px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
@@ -5785,7 +5785,7 @@ td {
   color: #2c6575;
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 .receipt-tool-main {
@@ -5801,26 +5801,26 @@ td {
   min-width: 0;
 }
 .receipt-tool-main .mono {
-  font-size: 10px;
+  font-size: 11px;
   color: #1d6b7c;
   font-weight: 800;
 }
 .receipt-tool-main strong {
-  font-size: 10px;
+  font-size: 11px;
   color: #344054;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .receipt-tool-main small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .limited-tag {
-  font-size: 8px !important;
+  font-size: 11px !important;
   color: #9a641b !important;
   background: #fff1d4;
   padding: 2px 5px;
@@ -5834,7 +5834,7 @@ td {
   align-items: flex-start;
 }
 .receipt-tool-usage small {
-  font-size: 8px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-tool-usage strong {
@@ -5845,7 +5845,7 @@ td {
   min-width: 0;
 }
 .receipt-no-issue {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   background: #f5f8f9;
   border-radius: 999px;
@@ -5862,10 +5862,10 @@ td {
   grid-row: 1/3;
 }
 .receipt-tool-flags .dept-issue b {
-  font-size: 9px;
+  font-size: 11px;
 }
 .receipt-tool-flags .dept-issue small {
-  font-size: 8px;
+  font-size: 11px;
   color: #9b743e;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5900,7 +5900,7 @@ td {
   padding: 8px 10px;
   margin: -6px 0 12px;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 @media (max-width: 1250px) {
   .receipt-tool-row {
@@ -5995,7 +5995,7 @@ td {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--muted);
   cursor: pointer;
@@ -6171,7 +6171,7 @@ td {
   color: var(--text);
 }
 .prep-process-checks small {
-  font-size: 9.5px;
+  font-size: 11px;
   line-height: 1.35;
   color: var(--muted);
 }
@@ -6200,7 +6200,7 @@ td {
   font-size: 11px;
 }
 .prep-missing-items small {
-  font-size: 9.5px;
+  font-size: 11px;
   opacity: 0.78;
 }
 .prep-missing-accept {
@@ -6230,7 +6230,7 @@ td {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
-  font-size: 10px;
+  font-size: 11px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -6299,7 +6299,7 @@ td {
   font-size: 12px;
 }
 .prep-deviations-head span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
 }
 .prep-deviation-count {
@@ -6338,7 +6338,7 @@ td {
   font-size: 11px;
 }
 .prep-deviation-item small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -6350,7 +6350,7 @@ td {
   background: #fff;
   min-height: 30px;
   padding: 5px 9px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .prep-manage-card {
@@ -6386,7 +6386,7 @@ td {
   font-size: 12px;
 }
 .prep-manage-grid small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   line-height: 1.35;
 }
@@ -6421,7 +6421,7 @@ td {
   border: 1px solid rgba(177, 116, 24, 0.28);
   border-radius: 8px;
   background: #fff;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #7a5216;
 }
@@ -6491,7 +6491,7 @@ td {
   margin-top: 4px !important;
 }
 .prep-composition-status.missing .prep-missing-accept small {
-  font-size: 9px !important;
+  font-size: 11px !important;
 }
 
 /* Cleanup 23 — open issues live on the instrument row, not in a second large panel */
@@ -6507,7 +6507,7 @@ td {
   border-radius: 999px;
   background: #fff8e8;
   color: #8a5b14;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
 }
 .prep-open-issue-state {
@@ -6518,7 +6518,7 @@ td {
   min-width: 0;
 }
 .prep-open-issue-state small {
-  font-size: 8.5px;
+  font-size: 11px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -6550,10 +6550,10 @@ td {
   gap: 1px;
 }
 .prep-manage-open-issues b {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 .prep-manage-open-issues small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--muted);
 }
 
@@ -6570,7 +6570,7 @@ td {
   font-size: 11px !important;
 }
 .prep-composition-status.compact span {
-  font-size: 9px !important;
+  font-size: 11px !important;
 }
 .prep-missing-row {
   background: #fffaf0 !important;
@@ -6597,7 +6597,7 @@ td {
   min-height: 25px;
   padding: 4px 8px;
   border-radius: 999px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 .prep-missing-chip {
@@ -6614,7 +6614,7 @@ td {
   color: #8b5b10;
 }
 .tool-manage-btn.subtle {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--muted);
   background: #fafafa;
 }
@@ -6643,7 +6643,7 @@ td {
   background: #eef3f1;
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 .prep-replace-step > div {
@@ -6655,7 +6655,7 @@ td {
   font-size: 11px;
 }
 .prep-replace-step small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--muted);
 }
 .prep-replace-destination {
@@ -6668,7 +6668,7 @@ td {
 .prep-replace-destination > strong {
   display: block;
   margin-bottom: 7px;
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 /* Preparation exception acceptance */
@@ -6716,7 +6716,7 @@ td {
   font-size: 16px;
 }
 .sterile-queues.modern button small {
-  font-size: 9px;
+  font-size: 11px;
 }
 .sterilization-workspace > .ster-work-panel {
   min-height: 150px;
@@ -6758,7 +6758,7 @@ td {
   color: #344054;
 }
 .release-check-row small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
   font-weight: 400;
 }
@@ -6798,7 +6798,7 @@ td {
   font-size: 12px;
 }
 .release-pending span {
-  font-size: 10px;
+  font-size: 11px;
 }
 .release-actions {
   align-items: center;
@@ -6867,14 +6867,14 @@ td {
   display: grid;
 }
 .workflow-checkpoint-user small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .workflow-checkpoint-user strong {
   font-size: 12px;
 }
 .workflow-checkpoint-user span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
   margin-top: 2px;
 }
@@ -6920,7 +6920,7 @@ td {
   min-width: 0;
 }
 .load-release-card span {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 850;
   letter-spacing: 0.08em;
   color: var(--st-muted);
@@ -6933,7 +6933,7 @@ td {
   text-overflow: ellipsis;
 }
 .load-release-card small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .released-loads {
@@ -6946,7 +6946,7 @@ td {
 .released-loads summary {
   cursor: pointer;
   padding: 9px 11px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
   color: var(--st-muted);
 }
@@ -6959,7 +6959,7 @@ td {
   justify-content: space-between;
   gap: 10px;
   padding: 8px 11px;
-  font-size: 10px;
+  font-size: 11px;
 }
 .released-loads button {
   display: inline-flex;
@@ -6991,7 +6991,7 @@ td {
 .load-modal .cycle-clean-fields label {
   display: grid;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   color: #627887;
 }
 .load-modal .cycle-clean-fields input,
@@ -7028,14 +7028,14 @@ td {
   color: #294a5a;
 }
 .load-assets-head span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .load-assets-head button {
   border: 0;
   background: transparent;
   color: #2e7588;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -7072,7 +7072,7 @@ td {
 .load-assets-list b {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   color: #2c7588;
-  font-size: 10px;
+  font-size: 11px;
 }
 .load-assets-list strong {
   font-size: 11px;
@@ -7082,7 +7082,7 @@ td {
   text-overflow: ellipsis;
 }
 .load-assets-list small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -7103,7 +7103,7 @@ td {
   padding: 9px 11px;
   background: #f7fafb;
   border-bottom: 1px solid #e5edf1;
-  font-size: 10px;
+  font-size: 11px;
   color: #536e7d;
 }
 .load-manifest > div {
@@ -7118,11 +7118,11 @@ td {
   border-bottom: 0;
 }
 .load-manifest b {
-  font-size: 10px;
+  font-size: 11px;
   color: #203e4d;
 }
 .load-manifest small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -7182,7 +7182,7 @@ td {
   color: #244653;
 }
 .load-scan-console-head small {
-  font-size: 9px;
+  font-size: 11px;
   color: #728692;
   white-space: nowrap;
   overflow: hidden;
@@ -7236,7 +7236,7 @@ td {
   border-radius: 9px;
   background: #fff8e9;
   color: #845b16;
-  font-size: 9.5px;
+  font-size: 11px;
 }
 .load-barcode-entry {
   display: grid;
@@ -7264,7 +7264,7 @@ td {
   border-radius: 8px;
   background: #eef7f9;
   color: #2d7080;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   padding: 0 11px;
   cursor: pointer;
@@ -7275,7 +7275,7 @@ td {
   gap: 8px;
   padding: 8px 10px;
   border-radius: 9px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 .load-scan-feedback.ok {
@@ -7297,7 +7297,7 @@ td {
   display: inline-flex !important;
   align-items: center;
   gap: 5px;
-  font-size: 9px !important;
+  font-size: 11px !important;
   color: #5f7b86 !important;
   font-weight: 700;
 }
@@ -7387,7 +7387,7 @@ td {
   color: #285e6b;
 }
 .delivery-batch-count span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   font-weight: 800;
   text-transform: uppercase;
@@ -7423,7 +7423,7 @@ td {
   border-bottom: 1px solid #e6edef;
 }
 .delivery-batch-assets .load-assets-head > small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .delivery-batch-list {
@@ -7459,7 +7459,7 @@ td {
   min-width: 0;
 }
 .delivery-batch-list b {
-  font-size: 10px;
+  font-size: 11px;
 }
 .delivery-batch-list strong {
   font-size: 11px;
@@ -7468,7 +7468,7 @@ td {
   text-overflow: ellipsis;
 }
 .delivery-batch-list small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .delivery-batch-confirm {
@@ -7496,7 +7496,7 @@ td {
   background: #f3f8fa;
   border: 1px solid #d7e5e9;
   color: #56717b;
-  font-size: 9.5px;
+  font-size: 11px;
   line-height: 1.45;
 }
 .delivery-trace-note svg {
@@ -7563,14 +7563,14 @@ td {
   color: #294b56;
 }
 .barcode-capture-head small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .barcode-capture-help {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
   padding-left: 2px;
 }
@@ -7584,7 +7584,7 @@ td {
     justify-content: center;
   }
   .barcode-capture-help {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 
@@ -7923,7 +7923,7 @@ td {
 }
 .ster-scan-feedback-inline {
   grid-column: 3;
-  font-size: 10px;
+  font-size: 11px;
   color: #d8e6ec;
   margin-top: -6px;
   padding-left: 2px;
@@ -7982,7 +7982,7 @@ td {
 }
 .receipt-count-only span,
 .receipt-count-only label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .receipt-count-only strong {
@@ -8011,13 +8011,13 @@ td {
   background: #fff7ed;
   border: 1px solid #f0d0a2;
   color: #8c5a22;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.4;
 }
 .identity-mismatch-box label {
   display: grid;
   gap: 5px;
-  font-size: 10px;
+  font-size: 11px;
   color: #586e78;
 }
 .identity-mismatch-box textarea {
@@ -8073,7 +8073,7 @@ td {
   border-bottom: 1px solid #e4eaf0;
   background: #f8fafc;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.045em;
   text-transform: uppercase;
@@ -8167,10 +8167,10 @@ td {
     padding: 7px 11px !important;
   }
   .receipt-card-modal:not(.prep-workspace-modal) .receipt-section-title strong {
-    font-size: 10.5px;
+    font-size: 11px;
   }
   .receipt-card-modal:not(.prep-workspace-modal) .receipt-section-title span {
-    font-size: 8.5px;
+    font-size: 11px;
   }
   .receipt-card-modal:not(.prep-workspace-modal) .receipt-summary-grid.compact-summary {
     gap: 6px !important;
@@ -8245,7 +8245,7 @@ td {
   border-bottom: 1px solid #e7edf1;
   background: #f8fafb;
   color: var(--st-muted);
-  font-size: 8.5px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.045em;
   text-transform: uppercase;
@@ -8269,7 +8269,7 @@ td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 10px;
+  font-size: 11px;
 }
 .receipt-tool-name {
   display: flex;
@@ -8278,13 +8278,13 @@ td {
   min-width: 0;
 }
 .receipt-tool-name strong {
-  font-size: 10.5px;
+  font-size: 11px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .receipt-tool-name small {
-  font-size: 8.5px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -8394,7 +8394,7 @@ td {
   white-space: nowrap;
 }
 .global-scan-results small {
-  font-size: 9px;
+  font-size: 11px;
   color: #8b95a5;
 }
 .suite-switcher {
@@ -8522,7 +8522,7 @@ td {
   white-space: nowrap;
 }
 .sterilization-workspace .ster-object-state {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #657786;
   line-height: 1.3;
@@ -8558,14 +8558,14 @@ td {
   }
   .sterilization-workspace .ster-tablet-specialty {
     display: block;
-    font-size: 9px;
+    font-size: 11px;
     color: var(--st-muted);
     font-weight: 500;
   }
   .sterilization-workspace .ster-tablet-stage {
     display: block;
     margin-top: 2px;
-    font-size: 9px;
+    font-size: 11px;
     color: var(--st-muted);
     line-height: 1.3;
   }
@@ -8704,7 +8704,7 @@ td {
   font-size: 11.5px !important;
 }
 .ster-asset .ster-type {
-  font-size: 9px !important;
+  font-size: 11px !important;
 }
 .ster-asset-name {
   font-size: 15px !important;
@@ -8718,7 +8718,7 @@ td {
 .ster-cell-text small,
 .ster-status small,
 .ster-meta small {
-  font-size: 10.5px !important;
+  font-size: 11px !important;
 }
 .ster-meta strong {
   font-size: 15px !important;
@@ -8727,7 +8727,7 @@ td {
   font-size: 11.5px !important;
 }
 .issue-inline {
-  font-size: 10.5px !important;
+  font-size: 11px !important;
 }
 .ster-row-action > .primary.compact {
   min-height: 38px !important;
@@ -8814,10 +8814,10 @@ td {
   gap: 9px !important;
 }
 .sterilization-workspace .ster-asset .ster-code {
-  font-size: 10.5px !important;
+  font-size: 11px !important;
 }
 .sterilization-workspace .ster-asset .ster-type {
-  font-size: 8.5px !important;
+  font-size: 11px !important;
 }
 .sterilization-workspace .ster-asset-name {
   font-size: 13px !important;
@@ -8831,16 +8831,16 @@ td {
 .sterilization-workspace .ster-cell-text small,
 .sterilization-workspace .ster-status small,
 .sterilization-workspace .ster-meta small {
-  font-size: 9.5px !important;
+  font-size: 11px !important;
 }
 .sterilization-workspace .ster-meta strong {
   font-size: 13px !important;
 }
 .sterilization-workspace .ster-object-state {
-  font-size: 10.5px !important;
+  font-size: 11px !important;
 }
 .sterilization-workspace .issue-inline {
-  font-size: 9.5px !important;
+  font-size: 11px !important;
 }
 .sterilization-workspace .ster-row-action > .primary.compact {
   min-height: 34px !important;
@@ -9038,7 +9038,7 @@ td {
   display: grid !important;
   gap: 4px !important;
   color: #405b68 !important;
-  font-size: 10.5px !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
 }
 .receipt-final-note span {
@@ -9047,7 +9047,7 @@ td {
   gap: 5px;
 }
 .receipt-final-note small {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--st-muted);
 }
@@ -9428,7 +9428,7 @@ td {
   color: #274754 !important;
 }
 .receipt-add-note-btn small {
-  font-size: 9.5px !important;
+  font-size: 11px !important;
   color: var(--st-muted) !important;
   font-weight: 500 !important;
 }
@@ -9455,7 +9455,7 @@ td {
   color: #274754 !important;
 }
 .receipt-inline-note-head small {
-  font-size: 9px !important;
+  font-size: 11px !important;
   color: var(--st-muted) !important;
 }
 .receipt-note-close {
@@ -9514,7 +9514,7 @@ td {
   border-right: 1px solid #dfe8ec;
 }
 .workflow-modal-cycle .cycle-clean-summary span {
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.2;
   color: var(--st-muted);
 }
@@ -9605,7 +9605,7 @@ td {
   gap: 6px;
 }
 .demo-exit-panel span {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #fdb022;
@@ -9704,7 +9704,7 @@ td {
   margin: 0;
 }
 .handover-signature-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: #486273;
 }
@@ -9795,7 +9795,7 @@ td {
   border: 0;
   background: none;
   font: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #3d5866;
   cursor: pointer;
@@ -9814,7 +9814,7 @@ td {
   align-items: center;
   padding: 4px 6px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 11px;
   color: #40525d;
 }
 .batch-set-tools li:nth-child(even) {
@@ -9825,7 +9825,7 @@ td {
   color: #9b2c22;
 }
 .batch-set-tools li strong {
-  font-size: 10.5px;
+  font-size: 11px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -9840,7 +9840,7 @@ td {
   gap: 3px;
   font-style: normal;
   font-weight: 700;
-  font-size: 9px;
+  font-size: 11px;
 }
 .batch-set-tools li button {
   padding: 2px 8px;
@@ -9848,12 +9848,12 @@ td {
   border-radius: 6px;
   background: #fff;
   font: inherit;
-  font-size: 9.5px;
+  font-size: 11px;
   color: #a2382c;
   cursor: pointer;
 }
 .batch-set-tools p {
   margin: 4px 0 0;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }

@@ -193,7 +193,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             </label>
             {kind === 'TOOL' && (
               <label>
-                <span>Serial</span>
+                <span>{tr('Σειριακός αριθμός')}</span>
                 <input
                   className="asset-inline-input"
                   value={serialNumber}
@@ -231,7 +231,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
           <div className="asset-sidebar-quickfacts">
             <div className="asset-barcode-card">
               <div>
-                <span>Barcode {kind === 'SET' ? 'Set' : 'Tool'}</span>
+                <span>{kind === 'SET' ? tr('Barcode Set') : tr('Barcode εργαλείου')}</span>
               </div>
               <strong className="mono">{barcode}</strong>
             </div>
