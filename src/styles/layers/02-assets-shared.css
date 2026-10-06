@@ -323,7 +323,7 @@
   border-radius: 999px;
   background: #f0f4f6;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 .asset-scope-bar button:hover {
   border-color: #bed0d6;
@@ -756,7 +756,7 @@
   padding: 0 6px;
   border-radius: 999px;
   background: #f0f4f6;
-  font-size: 10px;
+  font-size: 11px;
 }
 .source-tabs button.active {
   background: #eaf4f6;
@@ -1158,7 +1158,7 @@
   color: var(--st-muted);
 }
 .add-tools-summary span {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .add-tools-summary strong {
@@ -2105,7 +2105,7 @@ td {
   border-bottom: 1px solid #e4ecef;
   background: #f7fafb;
   color: var(--st-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -2126,7 +2126,7 @@ td {
   font-size: 12px;
 }
 .create-set-tool-row small {
-  font-size: 10px;
+  font-size: 11px;
 }
 .create-set-footer {
   min-height: 68px;
@@ -2552,7 +2552,7 @@ td {
   gap: 6px;
 }
 .label-option-group > span {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
   color: var(--st-muted);
@@ -2576,7 +2576,7 @@ td {
   text-align: center;
 }
 .label-segments button small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .label-segments button.active {

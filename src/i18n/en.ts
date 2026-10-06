@@ -895,6 +895,12 @@ export const en: Record<string, string> = {
   'Πλυντήριο / απολυμαντής': 'Washer / disinfector',
   'Πλυντήριο 1': 'Washer 1',
   'Πλύση / απολύμανση': 'Washing / disinfection',
+  'Ασθενής {0}': 'Patient {0}',
+  'Σειριακός αριθμός': 'Serial number',
+  'Barcode Set': 'Set barcode',
+  'Barcode εργαλείου': 'Tool barcode',
+  'Αλυσίδα φύλαξης': 'Chain of custody',
+  'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',
   'Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.':
     'Multiple photos. Capture turns on the device camera.',

@@ -233,7 +233,7 @@ export default function MovementsPage() {
                     <UserRound size={15} />
                     <span>
                       <b>{trData(m.by)}</b>
-                      {m.patientCode && <small>Patient {m.patientCode}</small>}
+                      {m.patientCode && <small>{tr('Ασθενής {0}', m.patientCode)}</small>}
                     </span>
                   </span>
                   <ChevronRight className="ledger-open" size={18} />

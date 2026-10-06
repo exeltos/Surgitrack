@@ -60,7 +60,7 @@
   border-bottom: 1px solid #e7edf1;
   background: #f8fafb;
   color: var(--st-muted);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.055em;
   text-transform: uppercase;
@@ -166,7 +166,7 @@
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation button {
     padding: 8px 9px;
     min-height: 42px;
-    font-size: 10px;
+    font-size: 11px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-check-section > .handover-warning {
     margin: 0 10px 9px !important;
@@ -201,7 +201,7 @@
   border-top: 1px solid #e9eef2;
   border-bottom: 1px solid #e4eaee;
   color: var(--st-muted);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.055em;
   text-transform: uppercase;
@@ -222,13 +222,13 @@
   background: #fffaf2;
 }
 .receipt-tool-barcode {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: #16627d;
 }
 .receipt-tool-code,
 .receipt-tool-manufacturer {
-  font-size: 10px;
+  font-size: 11px;
   color: #677687;
   white-space: nowrap;
   overflow: hidden;
@@ -241,14 +241,14 @@
   gap: 2px;
 }
 .receipt-tool-name strong {
-  font-size: 10px;
+  font-size: 11px;
   color: #29384a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .receipt-tool-name small {
-  font-size: 8px;
+  font-size: 11px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -399,7 +399,7 @@
 }
 .sterilization-workspace .receipt-queue-panel .ster-tablet-specialty {
   display: block !important;
-  font-size: 9px !important;
+  font-size: 11px !important;
   color: var(--st-muted) !important;
   font-weight: 500 !important;
   line-height: 1.3 !important;
@@ -460,7 +460,7 @@
   .sterilization-workspace .receipt-queue-panel .ster-tablet-stage {
     display: block !important;
     margin-top: 2px;
-    font-size: 9px;
+    font-size: 11px;
     color: var(--st-muted);
     line-height: 1.3;
   }
@@ -604,7 +604,7 @@
   font-size: 12px;
 }
 .hospital-department-list small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .hospital-department-list button {
@@ -1795,7 +1795,7 @@ a.overview-bar:hover {
 .tape-lg {
   width: 40px;
   height: 16px;
-  font-size: 10px;
+  font-size: 11px;
 }
 .tape-swatch.missing {
   background: repeating-linear-gradient(45deg, #ddd 0 4px, #f5f5f5 4px 8px);
@@ -3721,7 +3721,7 @@ div.asset-import-hospital b {
   border-radius: 999px;
   background: #e6f3f6;
   color: #0e6d82;
-  font-size: 10px;
+  font-size: 11px;
   font-style: normal;
   font-weight: 800;
 }
@@ -4399,7 +4399,7 @@ div.asset-import-hospital b {
   padding: 7px 9px;
   background: #f1f6f8;
   color: #5d717d;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   text-align: left;
   text-transform: uppercase;
@@ -5540,4 +5540,76 @@ div.asset-import-hospital b {
   height: auto;
   min-height: 0;
   overflow-y: auto;
+}
+
+/* One page header everywhere: the same title, description and spacing whichever page builds it. */
+.page-head,
+.ster-work-head,
+.department-header,
+.studio-head {
+  margin-bottom: 16px;
+}
+.page-head h1,
+.ster-work-head h1,
+.department-header h1,
+.studio-head h1 {
+  margin: 0 0 5px !important;
+  color: #17384a !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: normal !important;
+  letter-spacing: -0.025em !important;
+}
+.page-head p,
+.ster-work-head p,
+.department-header p,
+.studio-head p {
+  max-width: 920px;
+  margin: 0 !important;
+  color: var(--st-muted) !important;
+  font-size: 16px !important;
+  line-height: 1.45 !important;
+}
+.page-head .eyebrow,
+.ster-work-head .eyebrow,
+.department-header .eyebrow,
+.studio-head .eyebrow {
+  margin: 0 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.12em !important;
+}
+@media (max-width: 1180px) {
+  .page-head p,
+  .ster-work-head p,
+  .department-header p,
+  .studio-head p {
+    font-size: 15px !important;
+  }
+}
+
+/* Sterilization stage cards: the title wraps inside its column instead of running under the count. */
+.sterile-queues.modern button {
+  grid-template-columns: 24px minmax(0, 1fr) auto !important;
+  column-gap: 7px !important;
+}
+.sterile-queues.modern button > svg {
+  width: 22px;
+  height: 22px;
+}
+.sterile-queues.modern button > span,
+.sterile-queues.modern button > small {
+  min-width: 0;
+  line-height: 1.2;
+}
+@media (max-width: 1700px) {
+  /* Seven cards in a row leave no room for the icon: titles keep their whole word. */
+  .sterile-queues.modern button {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+  .sterile-queues.modern button > svg {
+    display: none;
+  }
+  .sterile-queues.modern button > small {
+    grid-column: 1 / -1;
+  }
 }

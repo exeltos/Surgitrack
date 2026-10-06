@@ -309,7 +309,7 @@ export default function AssetWorkbenchSidebar({
               </div>
             )}
             <div>
-              <dt>Serial</dt>
+              <dt>{tr('Σειριακός αριθμός')}</dt>
               <dd>{editing ? textField('serialNumber', draft.serialNumber) : tool?.serialNumber || '—'}</dd>
             </div>
           </>
@@ -376,7 +376,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-barcode-card">
           <div>
             <Barcode size={17} />
-            <span>Barcode {kind === 'SET' ? 'Set' : 'Tool'}</span>
+            <span>{kind === 'SET' ? tr('Barcode Set') : tr('Barcode εργαλείου')}</span>
           </div>
           <strong className="mono">{asset.barcode}</strong>
         </div>

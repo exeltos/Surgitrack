@@ -107,7 +107,7 @@
   vertical-align: middle;
   background: #f7fafb !important;
   color: #5f7581;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -162,7 +162,7 @@
 }
 .asset-registry-table .row-sub {
   margin-top: 3px;
-  font-size: 9.5px;
+  font-size: 11px;
   line-height: 1.3;
   color: var(--st-muted);
 }
@@ -175,7 +175,7 @@
   color: var(--st-muted);
 }
 .asset-registry-table .badge {
-  font-size: 10px;
+  font-size: 11px;
 }
 .asset-registry-table .icon-link {
   width: 32px;
@@ -204,13 +204,13 @@
   border-radius: 8px;
   background: #fff;
   padding: 0 8px;
-  font-size: 10.5px;
+  font-size: 11px;
   color: #425d69;
 }
 .asset-registry-table .inline-action .small {
   min-height: 34px;
   padding: 0 9px;
-  font-size: 10.5px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -306,7 +306,7 @@
 .asset-registry-table .inline-action .app-button {
   min-height: 34px;
   padding: 0 10px;
-  font-size: 10.5px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -384,7 +384,7 @@
   min-width: 0;
 }
 .asset-photo-tile figcaption span {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 750;
   white-space: nowrap;
   overflow: hidden;
@@ -392,7 +392,7 @@
   color: #304957;
 }
 .asset-photo-tile figcaption small {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .photo-remove {
@@ -433,7 +433,7 @@
   color: #48616e;
 }
 .asset-photo-empty span {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .issue-photo-field {
@@ -459,7 +459,7 @@
   font-size: 12px;
 }
 .issue-photo-head span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .issue-photo-actions {
@@ -519,7 +519,7 @@
   border: 1px solid #d7e2e6;
 }
 .issue-table-photos span {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   color: #5e7682;
   background: #edf3f5;
@@ -1073,7 +1073,7 @@ body {
 }
 .asset-detail-workspace .asset-profile-facts span,
 .asset-detail-workspace .asset-profile-facts small {
-  font-size: 10px;
+  font-size: 11px;
 }
 .asset-detail-workspace .asset-profile-facts strong {
   font-size: 13px;
@@ -1142,7 +1142,7 @@ body {
   border-radius: 999px;
   background: #fff1e7;
   color: #9a5127;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .asset-detail-body {
@@ -1184,7 +1184,7 @@ body {
   max-width: 760px;
 }
 .asset-detail-workspace .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.11em;
 }
 .asset-detail-workspace .asset-definition-list {
@@ -1230,7 +1230,7 @@ body {
   font-size: 12px;
 }
 .asset-detail-full-panel .asset-photo-tile figcaption small {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* Set composition now owns the full working canvas. Only the instruments list scrolls. */
@@ -1272,16 +1272,16 @@ body {
 }
 .asset-detail-body .set-tool-code small,
 .asset-detail-body .set-tool-name small {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 .asset-detail-body .set-tool-uses span {
-  font-size: 10px;
+  font-size: 11px;
 }
 .asset-detail-body .set-tool-uses strong {
   font-size: 13px;
 }
 .asset-detail-body .set-tool-state small {
-  font-size: 9.5px;
+  font-size: 11px;
 }
 .asset-detail-body .set-composition-actions .app-button {
   min-height: 42px;
@@ -1556,7 +1556,7 @@ body {
   border-radius: 999px;
   background: rgba(15, 53, 70, 0.88);
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 .asset-barcode-card {
@@ -1601,7 +1601,7 @@ body {
   gap: 2px;
 }
 .asset-workbench-mini span {
-  font-size: 10px;
+  font-size: 11px;
 }
 .asset-workbench-mini strong {
   font-size: 12px;
@@ -1727,7 +1727,7 @@ body {
   padding: 8px 0 3px;
 }
 .asset-fields-heading > strong {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--st-muted);
@@ -1756,7 +1756,7 @@ body {
   grid-template-columns: 104px minmax(0, 1fr);
 }
 .asset-workbench-fields dt {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 .asset-workbench-fields dd {
   font-size: 11.5px;
@@ -1784,10 +1784,10 @@ body {
   align-items: center;
 }
 .asset-sidebar-quickfacts .asset-workbench-mini span {
-  font-size: 9px;
+  font-size: 11px;
 }
 .asset-sidebar-quickfacts .asset-workbench-mini strong {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 .asset-workbench-sidebar .asset-cover {
   height: min(170px, 22vh);
@@ -1921,7 +1921,7 @@ body {
   font-size: 11.5px;
 }
 .report-tool-picker small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .report-photo-input {
@@ -1973,7 +1973,7 @@ body {
   border-radius: 7px;
   background: #fff;
   color: #176f82;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -1997,7 +1997,7 @@ body {
   background: #fff;
   color: #203d4c;
   font: inherit;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   outline: none;
 }
@@ -2252,7 +2252,7 @@ body {
   min-width: 0;
 }
 .asset-workbench-title-status small {
-  font-size: 9.5px;
+  font-size: 11px;
   color: #8a6a38;
   font-weight: 700;
 }
@@ -2452,7 +2452,7 @@ body {
   color: #516b78;
 }
 .asset-tool-photo-empty span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--st-muted);
 }
 .asset-workbench-sidebar-tool .asset-cover-count {
