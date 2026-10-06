@@ -6160,3 +6160,52 @@ div.asset-import-hospital b {
   letter-spacing: 0.02em !important;
   text-transform: none !important;
 }
+
+/* Two button heights everywhere: 38px for page-level buttons, 32px inside tables and rows. */
+html
+  body
+  .content
+  :is(
+    .app-button-md,
+    .asset-page-actions button,
+    .page-head > .primary,
+    .movements-actions button,
+    .set-composition-actions .app-button,
+    .hospital-users-toolbar .app-button,
+    .hospital-user-actions .app-button,
+    .asset-filter-toggle,
+    .count-sign,
+    .device-actions .app-button
+  ) {
+  min-height: 38px !important;
+  height: auto;
+}
+html
+  body
+  .content
+  :is(
+    .app-button-sm,
+    .replacements-table .row-actions button,
+    .issue-action,
+    .ster-row-action .primary,
+    .ster-row-action button,
+    .danger-icon,
+    .studio-icon-button
+  ) {
+  min-height: 32px !important;
+}
+html body .content .sign-row .primary {
+  min-height: 38px !important;
+}
+html body .content .ster-work-panel .primary.compact {
+  min-height: 32px !important;
+  padding-block: 0 !important;
+}
+html body .content .asset-list-controls .icon-toggle {
+  align-self: center;
+  height: 38px;
+}
+html body .content .movements-actions button {
+  height: 38px;
+  padding-block: 0;
+}
