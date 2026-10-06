@@ -253,7 +253,7 @@ export default function ToolDetailPage() {
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />
-          <main className="asset-detail-body">
+          <div className="asset-detail-body">
             {tab === 'HISTORY' && (
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
@@ -385,7 +385,7 @@ export default function ToolDetailPage() {
                 </div>
               </section>
             )}
-          </main>
+          </div>
         </section>
       </div>
 

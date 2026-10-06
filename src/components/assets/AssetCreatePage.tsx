@@ -260,7 +260,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             className="asset-cover"
             type="button"
             onClick={() => setTab('PHOTOS')}
-            aria-label={tr('Προσθήκη φωτογραφιών')}
+            aria-label={cover ? `${tr('Προσθήκη φωτογραφιών')} ${photos.length}` : undefined}
           >
             {cover ? (
               <img src={cover} alt={name || tr('Νέο αντικείμενο')} />
@@ -298,7 +298,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             </button>
           </div>
 
-          <main className="asset-detail-body">
+          <div className="asset-detail-body">
             {tab === 'DETAILS' && (
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
@@ -469,7 +469,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 </div>
               </section>
             )}
-          </main>
+          </div>
         </section>
       </div>
     </div>

@@ -362,7 +362,12 @@ export default function DevicesPage() {
               {L('Δεν υπάρχουν κύκλοι για αυτή τη συσκευή.', 'No cycles for this device.')}
             </div>
           ) : (
-            <div className="devices-table-wrap">
+            <div
+              className="devices-table-wrap"
+              role="region"
+              tabIndex={0}
+              aria-label={L('Τελευταίοι κύκλοι', 'Latest cycles')}
+            >
               <table className="devices-table">
                 <thead>
                   <tr>

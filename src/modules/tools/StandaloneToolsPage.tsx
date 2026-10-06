@@ -161,7 +161,9 @@ export default function StandaloneToolsPage() {
               <th>{tr('Τμήμα')}</th>
               <th>{tr('Υπόλοιπο χρήσεων')}</th>
               <th>{tr('Κατάσταση')}</th>
-              <th></th>
+              <th>
+                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -182,7 +184,7 @@ export default function StandaloneToolsPage() {
                       <td>—</td>
                       <td className="muted">{tr('Μικτή')}</td>
                       <td>
-                        <Link className="icon-link" to={`/tools/${t.id}`}>
+                        <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
                           <ChevronRight size={17} />
                         </Link>
                       </td>
@@ -220,7 +222,7 @@ export default function StandaloneToolsPage() {
                       <StatusBadge value={t.state} />
                     </td>
                     <td>
-                      <Link className="icon-link" to={`/tools/${t.id}`}>
+                      <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
                         <ChevronRight size={17} />
                       </Link>
                     </td>

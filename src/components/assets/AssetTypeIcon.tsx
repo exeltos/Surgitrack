@@ -18,6 +18,7 @@ export default function AssetTypeIcon({kind, maxUses, size = 18, className = '',
     return (
       <span
         className={`asset-type-icon-inline ${kind.toLowerCase()} ${limited ? 'limited' : ''} ${className}`.trim()}
+        role="img"
         title={label}
         aria-label={label}
       >
@@ -27,6 +28,7 @@ export default function AssetTypeIcon({kind, maxUses, size = 18, className = '',
   return (
     <span
       className={`asset-type-icon ${kind.toLowerCase()} ${limited ? 'limited' : ''} ${className}`.trim()}
+      role="img"
       title={label}
       aria-label={label}
     >

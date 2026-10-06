@@ -13,7 +13,7 @@ export default function ProtectedRoute({permission, children}: {permission: Perm
   return (
     <div className="empty access-denied">
       <ShieldAlert size={34} />
-      <strong>
+      <strong role="heading" aria-level={1}>
         {lang === 'el' ? 'Δεν υπάρχει πρόσβαση σε αυτή την ενότητα.' : 'You do not have access to this section.'}
       </strong>
       <span>

@@ -38,6 +38,8 @@ type Props = {
   organizations: Array<{id: string; name: string}>;
   departments: Array<{organizationId: string; name: string; code: string; active: boolean}>;
   byName: string;
+  /** Standing alone on its own page (not inside Studio): its title is then the page's main heading. */
+  asPage?: boolean;
 };
 
 type Step = 'FILE' | 'MAP' | 'CHECK' | 'DONE';
@@ -53,7 +55,7 @@ const SHOWN_ERRORS = 200;
  * Studio → Εισαγωγή: Sets and instruments from an Excel or CSV file into a hospital, in four steps
  * (file, columns, check, import). Every import is logged and can be undone as a whole.
  */
-export default function AssetImportWizard({lang, organizations, departments, byName}: Props) {
+export default function AssetImportWizard({lang, organizations, departments, byName, asPage = false}: Props) {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   // Inside a hospital there is one choice, already made.
   const [organizationId, setOrganizationId] = useState(organizations.length === 1 ? organizations[0].id : '');
@@ -260,7 +262,9 @@ export default function AssetImportWizard({lang, organizations, departments, byN
     <div className="asset-import">
       <header className="asset-import-head">
         <div>
-          <h2>{L('Μαζική εισαγωγή εργαλείων και Σετ', 'Bulk import of instruments and Sets')}</h2>
+          <h2 {...(asPage ? {role: 'heading', 'aria-level': 1} : {})}>
+            {L('Μαζική εισαγωγή εργαλείων και Σετ', 'Bulk import of instruments and Sets')}
+          </h2>
           <p>
             {L(
               'Από αρχείο Excel (.xlsx) ή CSV: μία γραμμή ανά εργαλείο. Πριν γραφτεί οτιδήποτε, κάθε γραμμή ελέγχεται. Κάθε εισαγωγή αναιρείται ολόκληρη.',
@@ -701,7 +705,9 @@ export default function AssetImportWizard({lang, organizations, departments, byN
 
       {organizationId && (
         <section className="asset-import-history">
-          <h3>{L('Εισαγωγές σε αυτό το νοσοκομείο', 'Imports into this hospital')}</h3>
+          <h3 {...(asPage ? {role: 'heading', 'aria-level': 2} : {})}>
+            {L('Εισαγωγές σε αυτό το νοσοκομείο', 'Imports into this hospital')}
+          </h3>
           {imports.length === 0 ? (
             <small>{L('Καμία εισαγωγή ακόμη.', 'No imports yet.')}</small>
           ) : (

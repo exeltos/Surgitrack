@@ -18,7 +18,7 @@
   font-size: 13px;
 }
 .asset-field-na {
-  color: #7a8a94;
+  color: var(--st-muted);
   font-weight: 600;
 }
 
@@ -59,7 +59,7 @@
   padding: 9px 16px;
   border-bottom: 1px solid #e7edf1;
   background: #f8fafb;
-  color: #7c8997;
+  color: var(--st-muted);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.055em;
@@ -109,7 +109,7 @@
 }
 .ster-status small {
   line-height: 1.35;
-  color: #718095;
+  color: var(--st-muted);
 }
 .ster-row-action {
   flex-wrap: nowrap;
@@ -200,7 +200,7 @@
   background: #f7f9fb;
   border-top: 1px solid #e9eef2;
   border-bottom: 1px solid #e4eaee;
-  color: #7d8996;
+  color: var(--st-muted);
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.055em;
@@ -249,7 +249,7 @@
 }
 .receipt-tool-name small {
   font-size: 8px;
-  color: #8a96a4;
+  color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -400,7 +400,7 @@
 .sterilization-workspace .receipt-queue-panel .ster-tablet-specialty {
   display: block !important;
   font-size: 9px !important;
-  color: #84919f !important;
+  color: var(--st-muted) !important;
   font-weight: 500 !important;
   line-height: 1.3 !important;
 }
@@ -461,7 +461,7 @@
     display: block !important;
     margin-top: 2px;
     font-size: 9px;
-    color: #84919f;
+    color: var(--st-muted);
     line-height: 1.3;
   }
 }
@@ -544,7 +544,7 @@
 }
 .hospital-admin-summary span {
   font-size: 11px;
-  color: #7d8d9c;
+  color: var(--st-muted);
 }
 .hospital-admin-summary strong {
   font-size: 21px;
@@ -577,7 +577,7 @@
 }
 .hospital-departments > header small {
   font-size: 11px;
-  color: #7d8d9c;
+  color: var(--st-muted);
 }
 .hospital-department-list {
   display: grid !important;
@@ -605,7 +605,7 @@
 }
 .hospital-department-list small {
   font-size: 10px;
-  color: #8a98a5;
+  color: var(--st-muted);
 }
 .hospital-department-list button {
   width: 32px;
@@ -729,7 +729,7 @@
   justify-items: center;
   gap: 6px;
   padding: 34px 16px;
-  color: #7d8d9c;
+  color: var(--st-muted);
   text-align: center;
 }
 .hospital-users-empty svg {
@@ -825,7 +825,7 @@
 }
 .hospitals-head {
   padding: 0 12px;
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -869,7 +869,7 @@
   white-space: nowrap;
 }
 .hospitals-name small {
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 700;
 }
@@ -1043,7 +1043,7 @@
   background: #f8fbfc;
 }
 .overview-row.head {
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   white-space: nowrap;
   font-weight: 800;
@@ -1138,7 +1138,7 @@ a.overview-bar:hover {
   white-space: nowrap;
 }
 .overview-line small {
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .overview-usage {
@@ -1630,7 +1630,7 @@ a.overview-bar:hover {
   font-size: 13.5px;
 }
 .asset-manage-choices button small {
-  color: #6b7c86;
+  color: var(--st-muted);
   font-size: 12px;
   line-height: 1.35;
 }
@@ -1662,7 +1662,7 @@ a.overview-bar:hover {
   min-height: 40px;
   border: 1px solid #d8e3e8;
   border-radius: 10px;
-  color: #6b7c86;
+  color: var(--st-muted);
 }
 .asset-manage-target input,
 .asset-manage-target select {
@@ -1696,7 +1696,7 @@ a.overview-bar:hover {
   font-size: 13px;
 }
 .asset-manage-sets button small {
-  color: #6b7c86;
+  color: var(--st-muted);
 }
 .asset-manage-sets button.active {
   border-color: #1d6b7a;
@@ -1762,7 +1762,7 @@ a.overview-bar:hover {
 }
 .asset-manage-reports label small,
 .asset-manage-reports > small {
-  color: #6b7c86;
+  color: var(--st-muted);
   font-size: 12px;
 }
 
@@ -1799,7 +1799,7 @@ a.overview-bar:hover {
 }
 .tape-swatch.missing {
   background: repeating-linear-gradient(45deg, #ddd 0 4px, #f5f5f5 4px 8px);
-  color: #888;
+  color: var(--st-muted);
 }
 .color-marker {
   display: inline-flex;
@@ -1853,7 +1853,7 @@ a.overview-bar:hover {
   color: #9a5b00;
 }
 .member-marker.none small {
-  color: #6b7c86;
+  color: var(--st-muted);
 }
 
 /* Marker picker */
@@ -1913,7 +1913,7 @@ a.overview-bar:hover {
   font-size: 13px;
 }
 .color-mode-choices label small {
-  color: #6b7c86;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .color-mode-choices label.active {
@@ -1932,7 +1932,7 @@ a.overview-bar:hover {
   color: #51626c;
 }
 .color-selection em {
-  color: #8a99a2;
+  color: var(--st-muted);
 }
 .color-selection-item {
   display: inline-flex;
@@ -1980,7 +1980,7 @@ a.overview-bar:hover {
   min-height: 38px;
   border: 1px solid #d8e3e8;
   border-radius: 10px;
-  color: #6b7c86;
+  color: var(--st-muted);
 }
 .color-search input {
   flex: 1;
@@ -2286,7 +2286,7 @@ a.overview-bar:hover {
   font-size: 13.5px;
 }
 .action-menu-panel button small {
-  color: #6b7c86;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .action-menu-panel button.danger,
@@ -2341,7 +2341,7 @@ a.overview-bar:hover {
   padding: 14px;
   border-radius: 12px;
   background: #f5f9fa;
-  color: #6b7c86;
+  color: var(--st-muted);
 }
 .new-barcode-swap span {
   display: grid;
@@ -2355,7 +2355,7 @@ a.overview-bar:hover {
 }
 .new-barcode-swap b {
   font-size: 18px;
-  color: #6b7c86;
+  color: var(--st-muted);
   text-decoration: line-through;
 }
 .new-barcode-swap .new b {
@@ -2744,7 +2744,7 @@ a.overview-bar:hover {
   border: 1px solid #d6e2e7;
   border-radius: 9px;
   background: #fff;
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .asset-import-tools-search input {
   flex: 1;
@@ -2772,7 +2772,7 @@ a.overview-bar:hover {
   top: 0;
   padding: 8px 10px;
   background: #f3f7f8;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 700;
   text-align: left;
@@ -2789,7 +2789,7 @@ a.overview-bar:hover {
   white-space: nowrap;
 }
 .asset-import-tools > small {
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .asset-import-progress {
@@ -3628,7 +3628,7 @@ div.asset-import-hospital b {
   font-size: 13px;
 }
 .people-invite-menu small {
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
 }
 .people-requests {
@@ -3666,7 +3666,7 @@ div.asset-import-hospital b {
 }
 .people-head {
   padding: 0 12px;
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -3709,7 +3709,7 @@ div.asset-import-hospital b {
 .people-who small {
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 600;
 }
@@ -3728,11 +3728,11 @@ div.asset-import-hospital b {
   font-size: 12.5px;
 }
 .people-value.whole {
-  color: #7b8794;
+  color: var(--st-muted);
   font-style: italic;
 }
 .people-open {
-  color: #9aabb6;
+  color: var(--st-muted);
 }
 .people-csv {
   display: grid;
@@ -3750,7 +3750,7 @@ div.asset-import-hospital b {
   background: #fff6f6;
 }
 .people-csv small {
-  color: #7b8794;
+  color: var(--st-muted);
 }
 .people-csv em {
   color: #b42318;
@@ -3967,7 +3967,7 @@ div.asset-import-hospital b {
   font-size: 13px;
 }
 .owner-actions small {
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11.5px;
 }
 .owner-hospital-head,
@@ -3979,7 +3979,7 @@ div.asset-import-hospital b {
 }
 .owner-hospital-head {
   padding: 0 12px;
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -4006,7 +4006,7 @@ div.asset-import-hospital b {
   font-size: 13.5px;
 }
 .owner-hospital-name small {
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 11px;
   font-weight: 600;
 }
@@ -4016,7 +4016,7 @@ div.asset-import-hospital b {
 }
 .owner-num small {
   margin-left: 3px;
-  color: #7b8794;
+  color: var(--st-muted);
 }
 .owner-num.warn b {
   color: #a6620c;
@@ -4043,7 +4043,7 @@ div.asset-import-hospital b {
   align-items: center;
   gap: 6px;
   margin: 0;
-  color: #7b8794;
+  color: var(--st-muted);
   font-size: 12px;
 }
 @media (max-width: 1100px) {
@@ -4652,7 +4652,7 @@ div.asset-import-hospital b {
 }
 .name-check-kpis span,
 .name-check-kpis small {
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .name-check-kpis strong {
@@ -4718,7 +4718,7 @@ div.asset-import-hospital b {
   max-width: 760px;
 }
 .name-check-card > header small {
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12.5px;
   line-height: 1.45;
 }
@@ -4738,7 +4738,7 @@ div.asset-import-hospital b {
   top: 0;
   padding: 8px 10px;
   background: #f3f7f8;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 11px;
   text-align: left;
   text-transform: uppercase;
@@ -4755,7 +4755,7 @@ div.asset-import-hospital b {
   font-weight: 600;
 }
 .name-check-table td.arrow {
-  color: #98a2b3;
+  color: var(--st-muted);
   width: 20px;
 }
 .name-check-table td.num {
@@ -4776,7 +4776,7 @@ div.asset-import-hospital b {
   gap: 12px;
 }
 .name-check-filter small {
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .name-check-search,
 .name-check-group footer input {
@@ -4788,7 +4788,7 @@ div.asset-import-hospital b {
   border: 1px solid #d6e2e7;
   border-radius: 9px;
   background: #fff;
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .name-check-search input {
   flex: 1;
@@ -4816,7 +4816,7 @@ div.asset-import-hospital b {
   color: #152c41;
 }
 .name-check-group header small {
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .name-check-odd {
   display: inline-flex;
@@ -4923,7 +4923,7 @@ div.asset-import-hospital b {
   gap: 12px;
 }
 .name-check-list > header span {
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12px;
   font-weight: 700;
 }
@@ -4948,7 +4948,7 @@ div.asset-import-hospital b {
   top: 0;
   padding: 8px 10px;
   background: #f3f7f8;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 11px;
   text-align: left;
   text-transform: uppercase;
@@ -4968,11 +4968,11 @@ div.asset-import-hospital b {
   white-space: nowrap;
 }
 .name-check-list-table td.go {
-  color: #98a2b3;
+  color: var(--st-muted);
   width: 20px;
 }
 .name-check-list > small {
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .name-check-sets {
   display: grid;
@@ -5031,7 +5031,7 @@ div.asset-import-hospital b {
   box-shadow: 0 0 0 2px rgba(21, 90, 110, 0.12);
 }
 .replacements-kpis span {
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .replacements-kpis strong {
@@ -5073,7 +5073,7 @@ div.asset-import-hospital b {
   min-height: 38px;
   border: 1px solid #dce7eb;
   border-radius: 10px;
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .replacements-search input {
   flex: 1;
@@ -5127,7 +5127,7 @@ div.asset-import-hospital b {
   z-index: 1;
   padding: 8px 10px;
   background: #f3f7f8;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 11px;
   text-align: left;
   text-transform: uppercase;
@@ -5147,7 +5147,7 @@ div.asset-import-hospital b {
 .replacements-order-lines td small,
 .replacements-order-body td small {
   display: block;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 11.5px;
 }
 .replacements-table td a {
@@ -5167,7 +5167,7 @@ div.asset-import-hospital b {
 .replacements-table .empty {
   padding: 26px;
   text-align: center;
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .replacement-reason,
 .replacement-status,
@@ -5223,7 +5223,7 @@ div.asset-import-hospital b {
 }
 .replacement-order-status.o-CANCELLED {
   background: #eef2f4;
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .replacements-table .row-actions {
   width: 132px;
@@ -5273,7 +5273,7 @@ div.asset-import-hospital b {
 }
 .replacements-order > header small {
   display: block;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12px;
 }
 .replacements-order-count {
@@ -5310,7 +5310,7 @@ div.asset-import-hospital b {
   justify-items: center;
   padding: 34px;
   text-align: center;
-  color: #6f808c;
+  color: var(--st-muted);
 }
 .replacements-empty strong {
   color: #20313f;
@@ -5338,7 +5338,7 @@ div.asset-import-hospital b {
 }
 .replacements-order-modal header p {
   margin: 0;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12.5px;
 }
 .replacements-order-lines {
@@ -5452,7 +5452,7 @@ div.asset-import-hospital b {
 }
 .replacements-cancelled > summary {
   padding: 6px 2px;
-  color: #6f808c;
+  color: var(--st-muted);
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;

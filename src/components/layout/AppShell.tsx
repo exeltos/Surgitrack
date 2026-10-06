@@ -225,7 +225,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           <strong>SurgiTrack</strong>
           <span>Trace Every Instrument</span>
         </div>
-        <button className="icon-btn mobile-sidebar-close" onClick={() => setMobileOpen(false)}>
+        <button
+          className="icon-btn mobile-sidebar-close"
+          onClick={() => setMobileOpen(false)}
+          aria-label={lang === 'el' ? 'Κλείσιμο μενού' : 'Close menu'}
+        >
           <X size={18} />
         </button>
       </div>
@@ -276,7 +280,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
       {mobileOpen && <button className="mobile-sidebar-backdrop" onClick={() => setMobileOpen(false)} />}
       <main className="main">
         <header className="topbar">
-          <button className="icon-btn mobile-menu" onClick={() => setMobileOpen(true)}>
+          <button
+            className="icon-btn mobile-menu"
+            onClick={() => setMobileOpen(true)}
+            aria-label={lang === 'el' ? 'Μενού' : 'Menu'}
+          >
             <Menu size={19} />
           </button>
           <button
@@ -399,7 +407,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               <button
                 className="icon-btn notification-btn"
                 onClick={() => setNotificationOpen(v => !v)}
-                aria-label={lang === 'el' ? 'Ειδοποιήσεις' : 'Notifications'}
+                aria-label={`${lang === 'el' ? 'Ειδοποιήσεις' : 'Notifications'}${openNotifications > 0 ? ` ${openNotifications}` : ''}`}
               >
                 <Bell size={18} />
                 {openNotifications > 0 && <span>{openNotifications}</span>}
@@ -631,7 +639,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         </Suspense>
       )}
       {toast && (
-        <div className="toast">
+        <div className="toast" role="status">
           <strong>{lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}</strong>
           <span>{toast.text}</span>
           {toast.undo && (
@@ -645,10 +653,10 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         </div>
       )}
       {!toast && departmentReadyToast && role === 'DEPARTMENT' && (
-        <div className="toast department-ready-toast">
+        <div className="toast department-ready-toast" role="status">
           <strong>{lang === 'el' ? 'Έτοιμο για παραλαβή' : 'Ready for pickup'}</strong>
           <span>{departmentReadyToast.text}</span>
-          <button onClick={() => setDepartmentReadyToast(undefined)}>
+          <button onClick={() => setDepartmentReadyToast(undefined)} aria-label={lang === 'el' ? 'Κλείσιμο' : 'Close'}>
             <X size={16} />
           </button>
         </div>
