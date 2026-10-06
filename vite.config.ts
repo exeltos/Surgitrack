@@ -11,6 +11,19 @@ export default defineConfig(({command, mode}) => {
   return {
     plugins: [react()],
     base: './',
+    build: {
+      rollupOptions: {
+        output: {
+          // Libraries change rarely; in their own files a release re-downloads only the app code.
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+            if (/node_modules\/(react|react-dom|scheduler|react-router|react-router-dom)\//.test(id)) return 'react';
+            if (id.includes('node_modules/@supabase/')) return 'supabase';
+            return undefined;
+          },
+        },
+      },
+    },
     server: {
       host: '0.0.0.0',
       port: 5174,
