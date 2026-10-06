@@ -14,6 +14,8 @@ import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import {statusLabel} from '../../components/ui/statusLabel';
 import PageHeader from '../../components/ui/PageHeader';
+import KpiStrip from '../../components/ui/KpiStrip';
+import {kpiFilters} from '../../core/kpiFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
@@ -38,6 +40,15 @@ export default function SetsPage() {
   const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(sets.map(s => String(s[key] || '')).filter(Boolean))].sort();
+  const kpi = kpiFilters({
+    q: [q, setQ],
+    department: [department, setDepartment],
+    specialty: [specialty, setSpecialty],
+    manufacturer: [manufacturer, setManufacturer],
+    state: [state, setState],
+    usage: [usage, setUsage],
+    completeness: [completeness, setCompleteness],
+  });
   const filtered = sets.filter(
     s =>
       (!department || s.department === department) &&
@@ -80,6 +91,27 @@ export default function SetsPage() {
             </div>
           ) : undefined
         }
+      />
+      <KpiStrip
+        compact
+        items={[
+          {label: tr('Σύνολο Σετ'), value: sets.length, ...kpi()},
+          {
+            label: tr('Στο τμήμα'),
+            value: sets.filter(x => x.state === 'IN_DEPARTMENT').length,
+            ...kpi({state: 'IN_DEPARTMENT'}),
+          },
+          {
+            label: tr('Έτοιμα για παραλαβή'),
+            value: sets.filter(x => x.state === 'READY_FOR_PICKUP').length,
+            ...kpi({state: 'READY_FOR_PICKUP'}),
+          },
+          {
+            label: tr('Σετ με έλλειψη'),
+            value: sets.filter(x => x.actual < x.expected).length,
+            ...kpi({completeness: 'SHORT'}),
+          },
+        ]}
       />
       <AssetFilterBar
         query={q}

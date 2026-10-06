@@ -1126,6 +1126,7 @@ export const en: Record<string, string> = {
   'Σετ και εργαλεία ανά τμήμα': 'Sets and instruments by department',
   'Σετ και εργαλεία οργανωμένα ανά τμήμα.': 'Sets and instruments organised by department.',
   'Σετ με έλλειψη': 'Sets with shortage',
+  'Σύνολο Σετ': 'Total Sets',
   'Σετ σε χρήση': 'Set in use',
   'Σετ του τμήματος': 'Department sets',
   Σημείωση: 'Note',
