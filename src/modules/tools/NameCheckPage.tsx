@@ -73,9 +73,7 @@ export default function NameCheckPage() {
         <PageHeader
           eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
           title={tr('Έλεγχος ονομασιών')}
-          description={tr(
-            'Ενιαίες ονομασίες για τα ίδια εργαλεία: πρώτα οι διορθώσεις γραφής, μετά οι κωδικοί με περισσότερες από μία ονομασίες. Κάθε αλλαγή γράφεται στο ιστορικό και αναιρείται.',
-          )}
+          description={tr('Μία ονομασία ανά εργαλείο. Κάθε αλλαγή καταγράφεται και αναιρείται.')}
           actions={
             <AppButton icon={<ArrowLeft size={16} />} onClick={() => navigate('/tools')}>
               {tr('Εργαλεία')}

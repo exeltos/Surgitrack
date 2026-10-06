@@ -77,9 +77,7 @@ export default function IssuesPage() {
         description={
           role === 'DEPARTMENT'
             ? tr('Αναφορές και εκκρεμότητες του τμήματος {0}.', trData(currentUser.department))
-            : tr(
-                'Τα προβλήματα που αναφέρθηκαν (ελλείψεις, φθορές, βλάβες, απώλειες) και τα εργαλεία που πρέπει να αντικατασταθούν από το Απόθεμα ή με παραγγελία.',
-              )
+            : tr('Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.')
         }
       />
       {withReplacements && (
@@ -162,14 +160,12 @@ export default function IssuesPage() {
                 }}
               />
             ) : (
-              <table className="asset-registry-table issues-registry-table">
+              <table className="asset-registry-table issues-registry-table issues-fixed">
                 <thead>
                   <tr>
                     <th>{tr('Αντικείμενο')}</th>
-                    <th>{tr('Τύπος')}</th>
-                    <th>{tr('Τμήμα')}</th>
-                    <th>{tr('Δημιουργήθηκε')}</th>
                     <th>{tr('Σημείωση')}</th>
+                    <th>{tr('Δημιουργήθηκε')}</th>
                     <th>{tr('Φωτογραφίες')}</th>
                     <th>{tr('Κατάσταση')}</th>
                     {withReplacements && (
@@ -183,12 +179,17 @@ export default function IssuesPage() {
                   {filtered.map(i => (
                     <tr key={i.id}>
                       <td>
-                        <strong>{i.asset}</strong>
+                        <strong className="issue-asset" title={i.asset}>
+                          {i.asset}
+                        </strong>
+                        <small className="row-sub">
+                          {[trData(i.type), trData(i.department)].filter(Boolean).join(' · ')}
+                        </small>
                       </td>
-                      <td>{trData(i.type)}</td>
-                      <td>{trData(i.department)}</td>
+                      <td className="issue-note" title={i.note}>
+                        {i.note}
+                      </td>
                       <td>{i.created}</td>
-                      <td>{i.note}</td>
                       <td>
                         {i.photos?.length ? (
                           <div className="issue-table-photos">

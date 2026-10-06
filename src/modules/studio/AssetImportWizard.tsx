@@ -262,14 +262,13 @@ export default function AssetImportWizard({lang, organizations, departments, byN
     <div className="asset-import">
       <header className="asset-import-head">
         <div>
-          {asPage && <span className="eyebrow">{L('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ', 'EQUIPMENT REGISTER')}</span>}
           <h2 {...(asPage ? {role: 'heading', 'aria-level': 1} : {})}>
             {L('Μαζική εισαγωγή εργαλείων και Σετ', 'Bulk import of instruments and Sets')}
           </h2>
           <p>
             {L(
-              'Από αρχείο Excel (.xlsx) ή CSV: μία γραμμή ανά εργαλείο. Πριν γραφτεί οτιδήποτε, κάθε γραμμή ελέγχεται. Κάθε εισαγωγή αναιρείται ολόκληρη.',
-              'From an Excel (.xlsx) or CSV file: one row per instrument. Every row is checked before anything is written. Each import can be undone as a whole.',
+              'Από Excel ή CSV, μία γραμμή ανά εργαλείο. Ελέγχεται πριν γραφτεί και αναιρείται ολόκληρη.',
+              'From Excel or CSV, one row per instrument. Checked before writing and undone as a whole.',
             )}
           </p>
         </div>

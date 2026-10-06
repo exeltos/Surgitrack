@@ -4,7 +4,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import PageHeader from '../../components/ui/PageHeader';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
-import AssetEmptyState from '../../components/assets/AssetEmptyState';
+import EmptyState from '../../components/ui/EmptyState';
 import {useConfirm} from '../../components/ui/useConfirm';
 import {BIN_DAYS, daysLeft, isExpired} from '../../core/recycleBin';
 import {restoreDevice, type DeviceSnapshot} from '../../data/cloud/devices';
@@ -98,10 +98,7 @@ export default function BinPage() {
       <PageHeader
         eyebrow={tr('ΔΙΑΓΡΑΦΕΣ')}
         title={tr('Κάδος')}
-        description={tr(
-          'Ό,τι διαγράφεται (Σετ, εργαλεία, συσκευές, εγγραφές βιβλιοθηκών) μένει εδώ {0} ημέρες και μπορεί να επανέλθει όπως ήταν.',
-          BIN_DAYS,
-        )}
+        description={tr('Ό,τι διαγράφεται μένει εδώ {0} ημέρες και μπορεί να επανέλθει.', BIN_DAYS)}
       />
       {notice && (
         <div className={`bin-notice ${notice.ok ? 'ok' : 'bad'}`} role="status">
@@ -191,7 +188,11 @@ export default function BinPage() {
             </tbody>
           </table>
         ) : (
-          <AssetEmptyState>{tr('Ο Κάδος είναι άδειος. Ό,τι διαγράφεις θα εμφανίζεται εδώ.')}</AssetEmptyState>
+          <EmptyState
+            icon={<Trash2 size={22} />}
+            title={tr('Ο Κάδος είναι άδειος')}
+            description={tr('Ό,τι διαγράφεις θα εμφανίζεται εδώ.')}
+          />
         )}
       </ScrollableListPanel>
       {confirm}

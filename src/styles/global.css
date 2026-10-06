@@ -6462,12 +6462,6 @@ html body .studio-workspace {
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
-/* On wide screens the Sets columns fit on one line, so every row is one line tall. */
-@media (min-width: 1700px) {
-  html body .asset-registry-table .cell-wide-nowrap {
-    white-space: nowrap;
-  }
-}
 /* Set detail: tighter tool rows, names on one line. */
 html body .asset-detail-body .set-tool-row {
   min-height: 0;
@@ -6479,4 +6473,316 @@ html body .asset-detail-body .set-tool-code strong {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Sterilization density: slimmer scan bar, queue cards and rows. */
+html body .sterilization-workspace .ster-work-row,
+html body .sterilization-workspace .receipt-queue-panel .ster-work-row {
+  padding: 8px 22px !important;
+  min-height: 0 !important;
+}
+html body .sterilization-workspace .ster-list-head {
+  padding: 7px 22px;
+}
+html body .sterilization-workspace .ster-scan {
+  padding: 8px 16px;
+  min-height: 0;
+}
+html body .sterilization-workspace .sterile-queues.modern button {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+/* Page standard: no eyebrow above titles; the title and one short sentence are enough. */
+html body .page-head .eyebrow,
+html body .ster-work-head .eyebrow,
+html body .department-header .eyebrow,
+html body .studio-head .eyebrow {
+  display: none;
+}
+/* Registry tables: the name column takes the free width and truncates; every other column stays on one line. */
+html body .asset-registry-table td:first-child {
+  width: 55%;
+  max-width: 0;
+}
+html body .asset-registry-table .row-title-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Header standard: 22px title, one short sentence that is never clipped. */
+html body .page-head h1,
+html body .ster-work-head h1,
+html body .department-header h1,
+html body .studio-head h1 {
+  font-size: 22px !important;
+  line-height: 1.2;
+}
+html body .page-head > div:first-child > p,
+html body .studio-head p {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+/* Header standard: 22px title, one short sentence that is never clipped. */
+html body .page-head h1,
+html body .ster-work-head h1,
+html body .department-header h1,
+html body .studio-head h1 {
+  font-size: 22px !important;
+  line-height: 1.2;
+}
+html body .page-head > div:first-child > p,
+html body .studio-head p {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+/* Overview KPIs: one-line labels, same tile height everywhere. */
+html body .dash-kpi-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .dash-kpi {
+  min-width: 0;
+  padding: 8px 14px;
+  gap: 2px;
+}
+html body .dash-kpi strong {
+  font-size: 26px;
+}
+html body .dash-dept-name {
+  font-weight: 500;
+  font-size: 13px;
+}
+/* Sterilization header: logged-in user as a slim pill, one-line stage labels. */
+html body .ster-shift {
+  padding: 6px 12px;
+  border-radius: 12px;
+  gap: 8px;
+  align-items: center;
+}
+html body .ster-shift > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+html body .ster-shift small {
+  display: none;
+}
+html body .sterile-queues.modern button > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+@media (max-width: 1699px) {
+  html body .sterilization-workspace .ster-hint {
+    display: none;
+  }
+}
+/* Devices: compact cards and a section title that matches the other panels. */
+html body .devices-page {
+  gap: 10px;
+}
+html body .devices-grid {
+  gap: 10px;
+}
+html body .device-card {
+  padding: 12px 14px;
+  gap: 8px;
+}
+html body .device-card-main b {
+  font-size: 15px;
+}
+html body .device-card-actions {
+  padding-top: 8px;
+}
+html body .devices-readings {
+  padding: 12px 16px;
+  gap: 8px;
+}
+html body .devices-readings h2 {
+  font-size: 15px;
+}
+html body .devices-readings header small {
+  font-size: 12px;
+}
+/* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
+html body .registry-fixed td:nth-child(4) .row-sub {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .registry-fixed td:last-child,
+html body .registry-fixed th:last-child {
+  width: 36px;
+  padding-left: 0;
+  padding-right: 8px;
+}
+@media (max-width: 1279px) {
+  html body .registry-fixed th:nth-child(3),
+  html body .registry-fixed td:nth-child(3),
+  html body .registry-fixed th:nth-child(7),
+  html body .registry-fixed td:nth-child(7) {
+    display: none;
+  }
+}
+html body .registry-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0 !important;
+}
+html body .registry-fixed th:first-child,
+html body .registry-fixed td:first-child {
+  width: auto;
+  max-width: none;
+}
+html body .registry-fixed th:not(:first-child),
+html body .registry-fixed td:not(:first-child) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .registry-fixed th:nth-child(2) {
+  width: 96px;
+}
+html body .registry-fixed th:nth-child(3) {
+  width: 165px;
+}
+html body .registry-fixed th:nth-child(4) {
+  width: 190px;
+}
+html body .registry-fixed th:nth-child(5) {
+  width: 90px;
+}
+html body .registry-fixed th:nth-child(6) {
+  width: 150px;
+}
+html body .registry-fixed th:nth-child(7) {
+  width: 40px;
+}
+@media (max-width: 1279px) {
+  html body .registry-fixed th:nth-child(4) {
+    width: 170px;
+  }
+  html body .registry-fixed th:nth-child(5) {
+    width: 100px;
+  }
+  html body .registry-fixed th:nth-child(6) {
+    width: 220px;
+  }
+}
+html body .registry-fixed .badge {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+@media (min-width: 1300px) {
+  html body .registry-fixed th:nth-child(6) {
+    width: 205px;
+  }
+}
+/* Issues table: object + type/department on two lines, note takes the free width, actions never cut off. */
+html body .issues-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0 !important;
+}
+html body .issues-fixed th:nth-child(1) {
+  width: 30%;
+}
+html body .issues-fixed th:nth-child(2) {
+  width: auto;
+}
+html body .issues-fixed th:nth-child(3) {
+  width: 150px;
+}
+html body .issues-fixed th:nth-child(4) {
+  width: 110px;
+}
+html body .issues-fixed th:nth-child(5) {
+  width: 100px;
+}
+html body .issues-fixed th:nth-child(6) {
+  width: 132px;
+}
+html body .issues-fixed td {
+  min-width: 0;
+}
+html body .issues-fixed .issue-note {
+  max-width: 0;
+}
+html body .issues-fixed .issue-asset,
+html body .issues-fixed .row-sub {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .issues-fixed .issue-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Replacements table: fixed layout, the tool name takes the free width, actions are always fully visible. */
+html body .replacements-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0 !important;
+}
+html body .replacements-fixed th.pick {
+  width: 40px;
+}
+html body .replacements-fixed th.col-set {
+  width: 14%;
+}
+html body .replacements-fixed th.col-reason {
+  width: 120px;
+}
+html body .replacements-fixed th.col-since {
+  width: 100px;
+}
+html body .replacements-fixed th.col-stock {
+  width: 80px;
+}
+html body .replacements-fixed th.col-status {
+  width: 180px;
+}
+html body .replacements-fixed th.col-actions {
+  width: 225px;
+}
+html body .replacements-fixed .row-actions {
+  white-space: nowrap;
+}
+html body .replacements-fixed .replacement-status {
+  white-space: normal;
+}
+html body .replacements-fixed td {
+  min-width: 0;
+}
+html body .replacements-fixed td strong,
+html body .replacements-fixed td small,
+html body .replacements-fixed td > a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* One KPI look everywhere: one-line label (truncated with a tooltip-free ellipsis), number on the right. */
+html body .kpis > * small,
+html body .replacements-kpis > * span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .kpis > *,
+html body .replacements-kpis > * {
+  min-width: 0;
 }

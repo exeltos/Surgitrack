@@ -9,7 +9,6 @@ import {
   Menu,
   Minus,
   Plus,
-  Search,
   X,
   PackageCheck,
   TriangleAlert,
@@ -85,10 +84,6 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [departmentReadyToast, setDepartmentReadyToast] = useState<{id: string; text: string}>();
-  const [scan, setScan] = useState('');
-  const [scanMatches, setScanMatches] = useState<
-    Array<{id: string; kind: 'SET' | 'TOOL'; barcode: string; code: string; name: string}>
-  >([]);
   const navigate = useNavigate();
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
@@ -182,42 +177,6 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   }, [role, currentUser.department, readyKey, lang]);
   const assetDetailMode = /^\/(tools|sets)\/[^/]+$/.test(location.pathname);
   const departmentMode = location.pathname === '/department';
-  const runGlobalSearch = () => {
-    const q = scan.trim().toLowerCase();
-    if (!q) {
-      setScanMatches([]);
-      return;
-    }
-    const assets = [
-      ...sets.map(a => ({...a, kind: 'SET' as const})),
-      ...tools.map(a => ({...a, kind: 'TOOL' as const})),
-    ];
-    const exact = assets.find(
-      a =>
-        a.barcode.toLowerCase() === q ||
-        a.code.toLowerCase() === q ||
-        (a.legacyBarcodes || []).some(b => b.toLowerCase() === q),
-    );
-    if (exact) {
-      setScanMatches([]);
-      // An old (replaced) label still finds the item; its page says the barcode was replaced.
-      const replaced = exact.barcode.toLowerCase() !== q && exact.code.toLowerCase() !== q;
-      const path = exact.kind === 'SET' ? `/sets/${exact.id}` : `/tools/${exact.id}`;
-      navigate(replaced ? `${path}?replaced=${encodeURIComponent(scan.trim().toUpperCase())}` : path);
-      return;
-    }
-    const matches = assets
-      .filter(a => `${a.barcode} ${a.code} ${a.name} ${(a.legacyBarcodes || []).join(' ')}`.toLowerCase().includes(q))
-      .slice(0, 8)
-      .map(a => ({id: a.id, kind: a.kind, barcode: a.barcode, code: a.code, name: a.name}));
-    if (matches.length === 1) {
-      const a = matches[0];
-      setScanMatches([]);
-      navigate(a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`);
-      return;
-    }
-    setScanMatches(matches);
-  };
   const sidebar = (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="brand">
@@ -296,45 +255,6 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             <Home size={15} />
             <span>SurgiTrack</span>
           </button>
-          {!platformOnly && (
-            <div className="global-scan-wrap">
-              <form
-                className="global-scan"
-                onSubmit={e => {
-                  e.preventDefault();
-                  runGlobalSearch();
-                }}
-              >
-                <Search size={16} />
-                <input
-                  value={scan}
-                  onChange={e => {
-                    setScan(e.target.value);
-                    if (!e.target.value.trim()) setScanMatches([]);
-                  }}
-                  placeholder={lang === 'el' ? 'Scan / αναζήτηση S..., T...' : 'Scan / search S..., T...'}
-                />
-              </form>
-              {scanMatches.length > 1 && (
-                <div className="global-scan-results">
-                  {scanMatches.map(a => (
-                    <button
-                      key={`${a.kind}-${a.id}`}
-                      onClick={() => {
-                        setScanMatches([]);
-                        setScan('');
-                        navigate(a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`);
-                      }}
-                    >
-                      <strong className="mono">{a.barcode}</strong>
-                      <span>{a.name}</span>
-                      <small>{a.code}</small>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
           <RoleSwitcher />
           {syncStatus !== 'saved' && (
             <span className={`sync-status ${syncStatus}`} role="status">

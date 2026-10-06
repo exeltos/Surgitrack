@@ -71,9 +71,7 @@ export default function StandaloneToolsPage() {
       <PageHeader
         eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
         title={tr('Μεμονωμένα εργαλεία σε χρήση')}
-        description={tr(
-          'Μόνο φυσικά εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα και δεν ανήκουν αυτή τη στιγμή σε Σετ.',
-        )}
+        description={tr('Εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα, εκτός Σετ.')}
         actions={
           can('asset.create') ? (
             <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
@@ -169,15 +167,14 @@ export default function StandaloneToolsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table">
+          <table className="asset-registry-table registry-fixed">
             <thead>
               <tr>
                 <th>{tr('Ονομασία')}</th>
-                <th>{grouped ? tr('Ποσότητα') : tr('Κωδικός')}</th>
                 <th>Barcode</th>
-                <th>{tr('Εταιρεία')}</th>
+                <th>{tr('Ειδικότητα')}</th>
                 <th>{tr('Τμήμα')}</th>
-                <th>{tr('Υπόλοιπο χρήσεων')}</th>
+                <th>{tr('Χρήσεις')}</th>
                 <th>{tr('Κατάσταση')}</th>
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
@@ -191,13 +188,21 @@ export default function StandaloneToolsPage() {
                     return (
                       <tr key={`${t.code}-${t.name}`}>
                         <td>
-                          <b>{t.name}</b>
-                        </td>
-                        <td>
-                          <span className="qty-badge">{g.length}</span>
+                          <div className="registry-asset-name">
+                            <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                            <span>
+                              <b className="row-title-link" title={t.name}>
+                                {t.name}
+                              </b>
+                              <small className="row-sub">
+                                <span className="qty-badge">{g.length}</span>
+                                {[t.manufacturer, t.code].filter(Boolean).map(x => ` · ${x}`)}
+                              </small>
+                            </span>
+                          </div>
                         </td>
                         <td className="muted">{tr('πολλαπλά')}</td>
-                        <td>{t.manufacturer || '—'}</td>
+                        <td>{trData(t.specialty) || '—'}</td>
                         <td>{new Set(g.map(x => x.department)).size === 1 ? t.department : tr('Πολλά τμήματα')}</td>
                         <td>—</td>
                         <td className="muted">{tr('Μικτή')}</td>
@@ -219,12 +224,12 @@ export default function StandaloneToolsPage() {
                               {t.name}
                             </Link>
                             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
+                            <small className="row-sub">{[t.manufacturer, t.code].filter(Boolean).join(' · ')}</small>
                           </span>
                         </div>
                       </td>
-                      <td className="cell-nowrap">{t.code}</td>
-                      <td className="mono cell-nowrap">{t.barcode}</td>
-                      <td>{t.manufacturer || '—'}</td>
+                      <td className="mono">{t.barcode}</td>
+                      <td>{trData(t.specialty) || '—'}</td>
                       <td>{trData(t.department) || '—'}</td>
                       <td>
                         {t.maxUses ? (
@@ -247,7 +252,7 @@ export default function StandaloneToolsPage() {
                     </tr>
                   ))}
               {(grouped ? groupRows.hasMore : rows.hasMore) && (
-                <MoreRows colSpan={8} onVisible={grouped ? groupRows.showMore : rows.showMore} />
+                <MoreRows colSpan={5} onVisible={grouped ? groupRows.showMore : rows.showMore} />
               )}
             </tbody>
           </table>

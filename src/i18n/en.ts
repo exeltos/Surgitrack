@@ -118,8 +118,8 @@ export const en: Record<string, string> = {
   Απόθεμα: 'Stock',
   'Άλλαξε η ονομασία σε {0} εργαλεία.': 'Renamed {0} instruments.',
   'Έλεγχος ονομασιών': 'Name check',
-  'Ενιαίες ονομασίες για τα ίδια εργαλεία: πρώτα οι διορθώσεις γραφής, μετά οι κωδικοί με περισσότερες από μία ονομασίες. Κάθε αλλαγή γράφεται στο ιστορικό και αναιρείται.':
-    'One name for the same instrument: first the spelling fixes, then the codes with more than one name. Every change is written to the history and can be undone.',
+  'Μία ονομασία ανά εργαλείο. Κάθε αλλαγή καταγράφεται και αναιρείται.':
+    'One name per instrument. Every change is logged and can be undone.',
   'Διαφορετικές ονομασίες': 'Distinct names',
   'Διορθώσεις γραφής': 'Spelling fixes',
   'Κωδικοί με πολλές ονομασίες': 'Codes with several names',
@@ -394,8 +394,8 @@ export const en: Record<string, string> = {
   'Βλάβη / Service': 'Damage / Service',
   'Βλάβη / μη λειτουργικό': 'Damaged / not working',
   'Βλάβη, φθορά ή άλλη απόκλιση': 'Damage, wear or other deviation',
-  'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Απόθεμα, σε Σετ ή χρησιμοποιούνται μεμονωμένα.':
-    'General registry of every physical instrument, whether in stock, in a set or used on its own.',
+  'Όλα τα φυσικά εργαλεία: σε απόθεμα, σε σετ ή μεμονωμένα.':
+    'Every physical instrument: in stock, in a set or on its own.',
   'Γρήγορη σάρωση barcode': 'Quick barcode scan',
   'Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.':
     'Quick physical receipt · declare visible deviation · optional count by policy.',
@@ -583,8 +583,7 @@ export const en: Record<string, string> = {
   'Η εκκρεμότητα επιλύθηκε.': 'The issue was resolved.',
   'Η εμφανής απόκλιση έχει καταγραφεί. Μπορείς να ολοκληρώσεις την παραλαβή.':
     'The visible deviation has been recorded. You can complete the receipt.',
-  'Η ενεργή ροή του νοσοκομείου εφαρμόζεται αυτόματα από το SurgiTrack Studio με πλήρη ιχνηλασιμότητα.':
-    "The hospital's active workflow is applied automatically from SurgiTrack Studio, with full traceability.",
+  'Η ροή του νοσοκομείου από το Studio, με πλήρη ιχνηλασιμότητα.': "Your hospital's flow from Studio, fully traceable.",
   'Η κάμερα δεν είναι διαθέσιμη': 'Camera not available',
   'Η κάμερα δεν υποστηρίζεται εδώ. Χρησιμοποίησε χειροκίνητη εισαγωγή ή scanner υπολογιστή.':
     'The camera is not supported here. Use manual entry or a computer scanner.',
@@ -782,8 +781,8 @@ export const en: Record<string, string> = {
   'Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.':
     "The set's operational summary only; identity details stay on the left.",
   'Μόνο το Σετ': 'Set only',
-  'Μόνο φυσικά εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα και δεν ανήκουν αυτή τη στιγμή σε Σετ.':
-    'Only physical instruments used on their own in departments and not currently in a set.',
+  'Εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα, εκτός Σετ.':
+    'Instruments used on their own in departments, outside a set.',
   'ΝΕΑ ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ': 'NEW INSTRUMENT CARD',
   'ΝΕΑ ΚΑΡΤΕΛΑ ΣΕΤ': 'NEW SET CARD',
   'ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ': 'NEW ENTRY',
@@ -933,7 +932,8 @@ export const en: Record<string, string> = {
   'Οριστική διαγραφή': 'Delete for good',
   'Οριστική διαγραφή;': 'Delete for good?',
   'Το «{0}» διαγράφεται για πάντα και δεν θα μπορεί να επανέλθει.': '«{0}» is deleted for good and cannot come back.',
-  'Ο Κάδος είναι άδειος. Ό,τι διαγράφεις θα εμφανίζεται εδώ.': 'The bin is empty. Whatever you delete shows up here.',
+  'Ο Κάδος είναι άδειος': 'The bin is empty',
+  'Ό,τι διαγράφεις θα εμφανίζεται εδώ.': 'Whatever you delete shows up here.',
   'Δεν έγινε επαναφορά: υπάρχει ήδη Σετ με barcode {0}.': 'Not restored: a Set with barcode {0} already exists.',
   'Δεν έγινε επαναφορά: υπάρχει ήδη εργαλείο με barcode {0}.':
     'Not restored: an instrument with barcode {0} already exists.',
@@ -1034,8 +1034,8 @@ export const en: Record<string, string> = {
     'Device «{0}» is back. Create a new network key on the Devices page.',
   'Δεν έγινε επαναφορά: {0}': 'Not restored: {0}',
   'Μόνο ο Διαχειριστής επαναφέρει εγγραφές βιβλιοθηκών.': 'Only the administrator restores library records.',
-  'Ό,τι διαγράφεται (Σετ, εργαλεία, συσκευές, εγγραφές βιβλιοθηκών) μένει εδώ {0} ημέρες και μπορεί να επανέλθει όπως ήταν.':
-    'Whatever is deleted (Sets, instruments, devices, library records) stays here for {0} days and can come back as it was.',
+  'Ό,τι διαγράφεται μένει εδώ {0} ημέρες και μπορεί να επανέλθει.':
+    'Deleted items stay here for {0} days and can be restored.',
   'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',
@@ -1126,6 +1126,7 @@ export const en: Record<string, string> = {
   'Σετ και εργαλεία ανά τμήμα': 'Sets and instruments by department',
   'Σετ και εργαλεία οργανωμένα ανά τμήμα.': 'Sets and instruments organised by department.',
   'Σετ με έλλειψη': 'Sets with shortage',
+  'Σύνολο Σετ': 'Total Sets',
   'Σετ σε χρήση': 'Set in use',
   'Σετ του τμήματος': 'Department sets',
   Σημείωση: 'Note',
@@ -1567,8 +1568,8 @@ export const en: Record<string, string> = {
   'Επιλέξτε εργαλεία στην καρτέλα «Εργαλεία» και πατήστε «Παραγγελία αγοράς».':
     'Select instruments in the "Instruments" tab and press "Purchase order".',
   Επιστροφή: 'Return',
-  'Εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης. Για καθένα φαίνεται αν υπάρχει ίδιο στο Απόθεμα: αντικαθίσταται με ένα κλικ, αλλιώς καταχωρείται παραγγελία αγοράς.':
-    'Instruments in Service, damaged or worn, lost or out of use. Each shows whether the same instrument waits in Stock: replace it in one click, otherwise record a purchase order.',
+  'Εργαλεία σε Service, με βλάβη ή χαμένα: αντικατάσταση από το Απόθεμα ή παραγγελία.':
+    'Instruments in Service, damaged or lost: replace from Stock or order.',
   'Εργαλείο / κωδικός': 'Instrument / code',
   'Ημερομηνία & υπογραφή': 'Date & signature',
   'Καθαρισμός επιλογής': 'Clear selection',
@@ -1635,6 +1636,6 @@ export const en: Record<string, string> = {
   'Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.': 'Order {0} received: {1} new instruments in Stock.',
   'Αναφορές προβλημάτων': 'Problem reports',
   'Αντικαταστάσεις & Παραγγελίες': 'Replacements & orders',
-  'Τα προβλήματα που αναφέρθηκαν (ελλείψεις, φθορές, βλάβες, απώλειες) και τα εργαλεία που πρέπει να αντικατασταθούν από το Απόθεμα ή με παραγγελία.':
-    'The problems reported (missing, worn, damaged, lost) and the instruments to replace from Stock or with an order.',
+  'Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.':
+    'Reported problems and instruments that need replacing.',
 };
