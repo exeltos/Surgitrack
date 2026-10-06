@@ -12,6 +12,7 @@ import {
   Hospital,
   LayoutDashboard,
   Cable,
+  Trash2,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -36,6 +37,7 @@ const assetNavigation: NavigationItem[] = [
   {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view'},
   {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},
+  {to: '/bin', label: 'Κάδος', icon: Trash2, permission: 'asset.delete'},
 ];
 
 export const navigationFor = (role: UserRole, can?: (permission: Permission) => boolean): NavigationItem[] => {

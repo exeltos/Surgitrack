@@ -1,4 +1,5 @@
 import type {
+  BinEntry,
   DeliveryRecord,
   Issue,
   Movement,
@@ -33,6 +34,7 @@ export type SurgiInitialData = {
   workflowCheckpoints?: WorkflowCheckpointRecord[];
   deliveries?: DeliveryRecord[];
   purchaseOrders?: PurchaseOrder[];
+  recycleBin?: BinEntry[];
 };
 
 /**

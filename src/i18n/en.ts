@@ -920,6 +920,43 @@ export const en: Record<string, string> = {
   'Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.': 'The issue «{0}» for {1} will be marked as resolved.',
   Επίλυση: 'Resolve',
   'Επιλύθηκε χειροκίνητα': 'Resolved manually',
+  Κάδος: 'Recycle bin',
+  ΔΙΑΓΡΑΦΕΣ: 'DELETIONS',
+  'Τα Σετ και τα εργαλεία που διαγράφηκαν μένουν εδώ {0} ημέρες και μπορούν να επανέλθουν όπως ήταν.':
+    'Deleted Sets and instruments stay here for {0} days and can come back as they were.',
+  Λεπτομέρεια: 'Detail',
+  Διαγράφηκε: 'Deleted',
+  'Λήγει σε': 'Expires in',
+  'Επαναφορά;': 'Restore?',
+  'Το «{0}» επανέρχεται όπως ήταν πριν τη διαγραφή.': '«{0}» comes back as it was before it was deleted.',
+  Επαναφορά: 'Restore',
+  'Οριστική διαγραφή': 'Delete for good',
+  'Οριστική διαγραφή;': 'Delete for good?',
+  'Το «{0}» διαγράφεται για πάντα και δεν θα μπορεί να επανέλθει.': '«{0}» is deleted for good and cannot come back.',
+  'Ο Κάδος είναι άδειος. Ό,τι διαγράφεις θα εμφανίζεται εδώ.': 'The bin is empty. Whatever you delete shows up here.',
+  'Δεν έγινε επαναφορά: υπάρχει ήδη Σετ με barcode {0}.': 'Not restored: a Set with barcode {0} already exists.',
+  'Δεν έγινε επαναφορά: υπάρχει ήδη εργαλείο με barcode {0}.':
+    'Not restored: an instrument with barcode {0} already exists.',
+  'Έγινε επαναφορά. {0} εργαλεία δεν επανήλθαν: {1}.': 'Restored. {0} instruments did not come back: {1}.',
+  'Έγινε επαναφορά: {0}.': 'Restored: {0}.',
+  'Διαγράφηκε οριστικά από τον Κάδο.': 'Deleted for good from the bin.',
+  'Το Σετ και τα εργαλεία του διαγράφηκαν. Μπορείς να τα επαναφέρεις από τον Κάδο.':
+    'The Set and its instruments were deleted. You can restore them from the bin.',
+  'Το Σετ διαγράφηκε και τα εργαλεία μεταφέρθηκαν στο Απόθεμα. Μπορείς να το επαναφέρεις από τον Κάδο.':
+    'The Set was deleted and its instruments moved to Stock. You can restore it from the bin.',
+  '{0}: το εργαλείο διαγράφηκε. Μπορείς να το επαναφέρεις από τον Κάδο.':
+    '{0}: the instrument was deleted. You can restore it from the bin.',
+  'Το {0} διαγράφεται και αφαιρείται από τη σύνθεση του {1}. Θα μείνει στον Κάδο για 30 ημέρες και μπορείς να το επαναφέρεις. Θέλεις να συνεχίσεις;':
+    '{0} is deleted and removed from the composition of {1}. It stays in the bin for 30 days and you can restore it. Continue?',
+  'Το {0} διαγράφεται. Θα μείνει στον Κάδο για 30 ημέρες και μπορείς να το επαναφέρεις. Θέλεις να συνεχίσεις;':
+    '{0} is deleted. It stays in the bin for 30 days and you can restore it. Continue?',
+  'Ναι, διαγραφή': 'Yes, delete',
+  'Διαγραφή του Σετ; Τα εργαλεία του πάνε στο Απόθεμα και το Σετ μένει στον Κάδο για 30 ημέρες.':
+    'Delete the Set? Its instruments go to Stock and the Set stays in the bin for 30 days.',
+  'Διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του; Θα μείνουν στον Κάδο για 30 ημέρες.':
+    'Delete the Set AND all its instruments? They stay in the bin for 30 days.',
+  'Διαγράφονται και τα φυσικά εργαλεία (επαναφορά από τον Κάδο).':
+    'The physical instruments are deleted too (restore from the bin).',
   'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',
