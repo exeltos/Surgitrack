@@ -1,5 +1,6 @@
 import {vi} from 'vitest';
 import {fake} from './fakes/supabase';
+import {mailState} from './fakes/nodemailer';
 
 type Handler = (req: Request) => Response | Promise<Response>;
 
@@ -28,6 +29,8 @@ export async function loadFunction(name: string): Promise<Handler> {
 
 export const resetFake = () => {
   fake.reset();
+  mailState.outbox.length = 0;
+  mailState.fail = false;
   for (const key of Object.keys(env)) delete env[key];
   env.SUPABASE_URL = 'http://localhost:54321';
   env.SUPABASE_SERVICE_ROLE_KEY = 'service-key';
@@ -40,3 +43,5 @@ export const post = (body: unknown, headers: Record<string, string> = {}) =>
     headers: {'Content-Type': 'application/json', Authorization: 'Bearer caller-token', ...headers},
     body: JSON.stringify(body),
   });
+
+export {mailState};
