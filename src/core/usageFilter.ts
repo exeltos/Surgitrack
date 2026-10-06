@@ -4,8 +4,8 @@ export type UsageFilter = '' | 'LIMITED' | 'LOW' | 'UNLIMITED';
 
 /** Options of the "usage type" list filter: instruments with lives, few lives left, or no limit. */
 export const usageFilterOptions = () => [
-  {value: 'LIMITED', label: tr('Πολλαπλών χρήσεων (με ζωές)')},
-  {value: 'LOW', label: tr('Λίγες ζωές')},
+  {value: 'LIMITED', label: tr('Με όριο χρήσεων')},
+  {value: 'LOW', label: tr('Λίγες χρήσεις')},
   {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
 ];
 

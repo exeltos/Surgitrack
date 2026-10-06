@@ -101,7 +101,7 @@ export default function StockPage() {
             items={[
               {label: tr('Διαθέσιμα'), value: stock.length, ...kpi()},
               {
-                label: tr('Πολλαπλών χρήσεων (με ζωές)'),
+                label: tr('Με όριο χρήσεων'),
                 value: stock.filter(t => t.maxUses).length,
                 ...kpi({usage: 'LIMITED'}),
               },
