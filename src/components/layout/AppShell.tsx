@@ -14,6 +14,7 @@ import {
   PackageCheck,
   TriangleAlert,
   Gauge,
+  Eye,
   UserPlus,
   Undo2,
 } from 'lucide-react';
@@ -626,6 +627,14 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               : lang === 'el'
                 ? `Δοκιμαστική περίοδος: ${trial.daysLeft === 1 ? 'απομένει 1 ημέρα' : `απομένουν ${trial.daysLeft} ημέρες`} (λήγει ${new Date(trial.endsAt || '').toLocaleDateString('el-GR')}). Μετά τη λήξη το νοσοκομείο κλειδώνει· για συνέχεια επικοινωνήστε με τον διαχειριστή του SurgiTrack.`
                 : `Trial period: ${trial.daysLeft === 1 ? '1 day left' : `${trial.daysLeft} days left`} (ends ${new Date(trial.endsAt || '').toLocaleDateString('en-GB')}). The hospital locks when it ends; to continue, contact the SurgiTrack administrator.`}
+          </div>
+        )}
+        {role === 'VIEWER' && (
+          <div className="readonly-strip" role="status">
+            <Eye size={15} />
+            {lang === 'el'
+              ? 'Μόνο προβολή: βλέπεις όλα τα δεδομένα, αλλά δεν μπορείς να τα αλλάξεις.'
+              : 'View only: you can see all the data but not change it.'}
           </div>
         )}
         <section className="content" ref={contentRef}>

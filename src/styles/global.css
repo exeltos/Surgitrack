@@ -6110,3 +6110,53 @@ div.asset-import-hospital b {
   border: 0;
   background: none;
 }
+
+/* View-only users are told so on every page. */
+.readonly-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px;
+  border-bottom: 1px solid #cfe0e6;
+  background: #eef6f9;
+  color: #155a6e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* The bulk-import page title looks like every other page title. */
+.asset-import-head h2 {
+  margin: 0 0 4px !important;
+  color: #17384a !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em !important;
+}
+.asset-import-head p {
+  max-width: 720px;
+  margin: 0 !important;
+  color: var(--st-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+.asset-import-head .eyebrow {
+  display: block;
+  margin: 0 0 2px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+/* One table header style on every list: small, bold, sentence case. */
+.reports-table th,
+.devices-table th,
+.replacements-table th,
+.bin-table th,
+.ledger-columns span,
+.sterilization-workspace .ster-list-head span {
+  color: var(--st-muted) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+}
