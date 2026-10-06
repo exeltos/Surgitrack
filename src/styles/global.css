@@ -7215,3 +7215,44 @@ html body .asset-workbench-sidebar .asset-cover {
   min-height: 0;
   height: 96px;
 }
+/* Overview as one screen: six cards in a 3x2 grid that fills the height; long lists scroll inside their card. */
+@media (min-width: 1100px) {
+  html body .hospital-overview.dash {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  html body .hospital-overview.dash > * {
+    flex: 0 0 auto;
+  }
+  html body .hospital-overview.dash > .dash-grid {
+    flex: 1 1 auto;
+    min-height: 540px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  html body .dash-grid > .dash-card {
+    grid-column: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden;
+    padding: 12px 14px;
+  }
+  html body .dash-card > * {
+    flex: 0 0 auto;
+  }
+  html body .dash-card .dash-depts-list,
+  html body .dash-card .dash-list,
+  html body .dash-card .dash-bars,
+  html body .dash-card .dash-legend {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  html body .dash-card .dash-columns {
+    flex: 1 1 auto;
+    min-height: 60px;
+  }
+}
