@@ -69,7 +69,8 @@ describe('device-ingest: the request', () => {
   });
 
   it('takes the key from x-device-key or from a bearer token (any letter case of "Bearer")', async () => {
-    for (const headers of [{'x-device-key': KEY}, {Authorization: `Bearer ${KEY}`}, {Authorization: `bearer ${KEY}`}]) {
+    const accepted: Array<Record<string, string>> = [{'x-device-key': KEY}, {Authorization: `Bearer ${KEY}`}, {Authorization: `bearer ${KEY}`}];
+    for (const headers of accepted) {
       expect((await ingest({cycle_number: '1'}, headers)).status).toBe(200);
     }
   });
