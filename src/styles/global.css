@@ -7036,3 +7036,178 @@ html body .department-asset-list article > a {
   padding-top: 8px !important;
   padding-bottom: 8px !important;
 }
+/* Users & departments: the title, tabs and add row stay put; only the list scrolls. */
+html body .hospital-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+html body .hospital-admin > .page-head {
+  flex: 0 0 auto;
+}
+html body .hospital-admin .hospital-people {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 10px;
+}
+html body .hospital-admin .hospital-people > .hospital-tabs,
+html body .hospital-admin .hospital-people > .hospital-notice {
+  flex: 0 0 auto;
+}
+html body .hospital-admin .hospital-people > section.hospital-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+html body .hospital-admin .hospital-people > section.hospital-card > * {
+  flex: 0 0 auto;
+}
+html body .hospital-admin .hospital-people .hospital-rows,
+html body .hospital-admin .hospital-people .people-rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* Studio: tighter vertical rhythm so a tab fits the screen (the tab bar and header stay fixed). */
+html body .roles-guide {
+  gap: 8px;
+}
+html body .roles-guide .eyebrow {
+  display: none;
+}
+html body .roles-guide h2 {
+  font-size: 18px;
+  margin: 0;
+}
+html body .roles-guide-row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+html body .roles-guide-row p,
+html body .roles-guide-row span {
+  line-height: 1.4;
+}
+html body .studio-workflow-page {
+  gap: 10px;
+}
+html body .studio-workflow-hero {
+  padding: 10px 16px;
+}
+html body .studio-workflow-hero p {
+  margin-top: 2px;
+}
+html body .studio-workflow-policy,
+html body .studio-release-policy {
+  padding: 10px 14px;
+  gap: 8px;
+}
+html body .studio-workflow-stage {
+  padding: 10px 14px;
+}
+/* Replacements: the page holds still; only the table scrolls. */
+html body .replacements {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 10px;
+}
+html body .replacements > * {
+  flex: 0 0 auto;
+}
+html body .replacements > section {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+html body .replacements .replacements-table {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+html body .replacements-fixed th.col-status {
+  width: 215px;
+}
+html body .replacements-fixed .replacement-status {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+/* Asset card: compact enough to fit a laptop screen without its own scrollbar. */
+html body .asset-workbench-sidebar {
+  padding: 12px 14px;
+}
+html body .asset-workbench-title {
+  gap: 8px;
+}
+html body .asset-workbench-fields {
+  margin: 6px 0 8px;
+}
+html body .asset-workbench-fields > div {
+  min-height: 27px;
+}
+html body .asset-cover {
+  height: 84px;
+}
+html body .asset-cover-empty small {
+  display: none;
+}
+html body .asset-cover-empty svg {
+  width: 20px;
+  height: 20px;
+}
+/* Set composition rows: the "Uses" label is repeated on every row, so only the value is shown. */
+html body .asset-detail-body .set-tool-uses > span {
+  display: none;
+}
+html body .asset-detail-body .set-tool-row {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+  grid-template-columns: 150px minmax(0, 1fr);
+  min-height: 25px;
+}
+html body .asset-workbench-sidebar-tool .asset-workbench-fields dt {
+  white-space: nowrap;
+}
+html body .asset-workbench-sidebar-tool .asset-workbench-title-status small {
+  display: none;
+}
+html body .asset-workbench-fields > div,
+html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+  min-height: 23px;
+}
+html body .asset-workbench-fields dd {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .asset-workbench-title {
+  padding-bottom: 6px;
+}
+html body .asset-cover {
+  height: 60px;
+}
+/* "14/15 · Shortage 1": the count and its note each stay on one line. */
+html body .asset-count-state {
+  display: grid;
+  justify-items: end;
+  gap: 0;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+html body .asset-count-state span {
+  white-space: nowrap;
+  font-size: 12px;
+}
