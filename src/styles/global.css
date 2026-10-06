@@ -6933,3 +6933,29 @@ html body .name-check-kpis .good strong {
 html body .replacements-kpis .bad strong {
   color: #c0322f;
 }
+/* Replacement rows: same-size buttons, right-aligned, never stretched or cut off. */
+html body .replacements-fixed td.row-actions {
+  text-align: right;
+}
+html body .replacements-fixed .row-actions {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: auto;
+}
+html body .replacements-fixed .row-actions button {
+  flex: 0 0 auto;
+  width: auto !important;
+  min-width: 34px;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  font-size: 12px;
+}
+html body .replacements-fixed th.col-actions {
+  width: 250px;
+}
+html body .replacements-fixed td {
+  vertical-align: middle;
+}
