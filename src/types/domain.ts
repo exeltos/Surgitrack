@@ -349,7 +349,7 @@ export interface PurchaseOrder {
   receivedBarcodes?: string[];
 }
 
-export type BinKind = 'SET' | 'TOOL';
+export type BinKind = 'SET' | 'TOOL' | 'LIBRARY' | 'COLOR_TAPE' | 'DEVICE';
 /** What a deletion keeps so it can be undone: the Set or instrument as it was, and the instruments with it. */
 export interface BinPayload {
   set?: SetAsset;
@@ -359,6 +359,12 @@ export interface BinPayload {
   toolsDeleted: boolean;
   /** The Set an instrument deleted on its own belonged to. */
   parentSetId?: string;
+  /** A Studio library record (department, specialty, manufacturer…) and the library it came from. */
+  library?: {key: string; item: Record<string, unknown>};
+  /** A hospital colour tape. */
+  colorTape?: Record<string, unknown>;
+  /** A connected device with its newest readings (`readingsTotal` counts every reading it had). */
+  device?: {device: Record<string, unknown>; readings: Record<string, unknown>[]; readingsTotal: number};
 }
 /** One deleted Set or instrument, kept in the recycle bin for 30 days. */
 export interface BinEntry {

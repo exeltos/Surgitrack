@@ -113,8 +113,8 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                           setConfirm({
                             title: L('Διαγραφή εγγραφής;', 'Delete record?'),
                             message: L(
-                              `Η εγγραφή «${item.el}» θα αφαιρεθεί από τη βιβλιοθήκη.`,
-                              `“${item.en}” will be removed from the library.`,
+                              `Η εγγραφή «${item.el}» θα αφαιρεθεί από τη βιβλιοθήκη και θα μείνει στον Κάδο για 30 ημέρες.`,
+                              `“${item.en}” will be removed from the library and stay in the bin for 30 days.`,
                             ),
                             action: () => libs.removeItem(libraryKey, item.id),
                           })

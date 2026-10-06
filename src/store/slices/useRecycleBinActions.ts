@@ -1,4 +1,7 @@
-import {planRestore, isExpired} from '../../core/recycleBin';
+import {useEffect} from 'react';
+import {entryFromDraft, planRestore, isExpired} from '../../core/recycleBin';
+import {onBinDraft} from '../../core/binBridge';
+import type {BinEntry} from '../../types/domain';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -9,10 +12,20 @@ export function useRecycleBinActions(
 ) {
   const {addMovement, currentUser, notify, recycleBin, setRecycleBin, setSets, setTools, sets, tools} = p;
 
+  // Deletions made in the Studio libraries (a store above this one) arrive here.
+  useEffect(
+    () => onBinDraft(draft => setRecycleBin(x => [entryFromDraft(draft, currentUser.name), ...x])),
+    [currentUser.name, setRecycleBin],
+  );
+  /** Keeps something deleted elsewhere (a device) for 30 days. */
+  const addToBin = (entry: BinEntry) => setRecycleBin(x => [entry, ...x]);
+  /** Takes an entry out of the bin without a message (after it was restored somewhere else). */
+  const removeFromBin = (id: string) => setRecycleBin(x => x.filter(e => e.id !== id));
   /** Undoes a deletion: the Set or instrument comes back as it was, and leaves the bin. Returns false when it cannot. */
   const restoreFromBin = (id: string) => {
     const entry = recycleBin.find(e => e.id === id);
-    if (!entry) return false;
+    // Libraries and devices are put back by the bin page, which can reach them.
+    if (!entry || (entry.kind !== 'SET' && entry.kind !== 'TOOL')) return false;
     const plan = planRestore(entry, {sets, tools});
     if (!plan.ok) {
       notify(
@@ -56,5 +69,5 @@ export function useRecycleBinActions(
     if (expired.length) setRecycleBin(x => x.filter(e => !isExpired(e)));
     return expired.length;
   };
-  return {purgeExpiredBin, purgeFromBin, restoreFromBin};
+  return {addToBin, purgeExpiredBin, purgeFromBin, removeFromBin, restoreFromBin};
 }

@@ -157,7 +157,12 @@ export default function ColorTapeLibrary() {
                           className="danger"
                           title={tr('Διαγραφή')}
                           onClick={() => {
-                            if (window.confirm(tr('Διαγραφή της ταινίας «{0}»;', tape.el))) removeColorTape(tape.id);
+                            if (
+                              window.confirm(
+                                tr('Διαγραφή της ταινίας «{0}»; Θα μείνει στον Κάδο για 30 ημέρες.', tape.el),
+                              )
+                            )
+                              removeColorTape(tape.id);
                           }}
                         >
                           <Trash2 size={14} />

@@ -28,6 +28,7 @@ import {
 } from '../../core/deviceData';
 import {
   deleteDevice,
+  snapshotDevice,
   issueDeviceKey,
   listDevices,
   listReadings,
@@ -36,6 +37,7 @@ import {
   type DeviceInput,
 } from '../../data/cloud/devices';
 import {DeviceEditor, FileDialog, KeyDialog, SerialDialog} from './DeviceDialogs';
+import {binEntryForDevice} from '../../core/recycleBin';
 import {messageOf} from './deviceUi';
 
 const emptyDevice: DeviceInput = {name: '', kind: 'STERILIZER', connection: 'FILE', active: true};
@@ -46,7 +48,7 @@ const emptyDevice: DeviceInput = {name: '', kind: 'STERILIZER', connection: 'FIL
  * is kept per device and fills in the cycle when Sterilization records it.
  */
 export default function DevicesPage() {
-  const {organizationId, role, can, sterilizationCycles, processLoads} = useSurgi();
+  const {organizationId, role, can, sterilizationCycles, processLoads, addToBin, currentUser} = useSurgi();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const locale = lang === 'el' ? 'el-GR' : 'en-GB';
@@ -117,6 +119,16 @@ export default function DevicesPage() {
     if (!organizationId) return;
     setRemoving(undefined);
     try {
+      // Kept in the recycle bin first (with its newest cycles), so it can be put back for 30 days.
+      const snapshot = await snapshotDevice(organizationId, device);
+      addToBin(
+        binEntryForDevice(
+          snapshot.device as unknown as Record<string, unknown>,
+          snapshot.readings as unknown as Record<string, unknown>[],
+          snapshot.readingsTotal,
+          currentUser.name,
+        ),
+      );
       await deleteDevice(organizationId, device.id);
       await load();
     } catch (e) {
@@ -411,8 +423,8 @@ export default function DevicesPage() {
         <ConfirmDialog
           title={L('Διαγραφή συσκευής', 'Delete device')}
           message={L(
-            `Θα διαγραφεί η «${removing.name}» μαζί με τους κύκλους που έχει στείλει. Οι καταγραφές της Αποστείρωσης μένουν. Συνέχεια;`,
-            `“${removing.name}” will be deleted with the cycles it sent. Sterilization records stay. Continue?`,
+            `Θα διαγραφεί η «${removing.name}» μαζί με τους κύκλους που έχει στείλει. Θα μείνει στον Κάδο για 30 ημέρες (το κλειδί δικτύου δεν επανέρχεται). Οι καταγραφές της Αποστείρωσης μένουν. Συνέχεια;`,
+            `“${removing.name}” will be deleted with the cycles it sent. It stays in the bin for 30 days (its network key does not come back). Sterilization records stay. Continue?`,
           )}
           confirmLabel={L('Διαγραφή', 'Delete')}
           danger

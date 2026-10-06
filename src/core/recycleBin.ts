@@ -112,3 +112,60 @@ export function planRestore(
   }
   return {ok: true, set: {...set, actual: add.length + revert.length}, add, revert, skipped};
 }
+
+export function binEntryForLibraryItem(
+  key: string,
+  item: Record<string, unknown> & {el?: string; en?: string},
+  by: string,
+  now = new Date(),
+): BinEntry {
+  return {
+    id: stamp(),
+    kind: 'LIBRARY',
+    label: String(item.el || item.en || item.id),
+    detail: key,
+    payload: {tools: [], toolsDeleted: false, library: {key, item}},
+    deletedAt: now.toISOString(),
+    deletedByName: by,
+  };
+}
+
+export function binEntryForColorTape(
+  tape: Record<string, unknown> & {el?: string},
+  by: string,
+  now = new Date(),
+): BinEntry {
+  return {
+    id: stamp(),
+    kind: 'COLOR_TAPE',
+    label: String(tape.el || tape.id),
+    payload: {tools: [], toolsDeleted: false, colorTape: tape},
+    deletedAt: now.toISOString(),
+    deletedByName: by,
+  };
+}
+
+export function binEntryForDevice(
+  device: Record<string, unknown> & {name?: string},
+  readings: Record<string, unknown>[],
+  readingsTotal: number,
+  by: string,
+  now = new Date(),
+): BinEntry {
+  return {
+    id: stamp(),
+    kind: 'DEVICE',
+    label: String(device.name || device.id),
+    detail: `${readingsTotal} κύκλοι`,
+    payload: {tools: [], toolsDeleted: false, device: {device, readings, readingsTotal}},
+    deletedAt: now.toISOString(),
+    deletedByName: by,
+  };
+}
+
+/** Turns a draft from outside the store into an entry. */
+export const entryFromDraft = (draft: Omit<BinEntry, 'id' | 'deletedByName'>, by: string): BinEntry => ({
+  ...draft,
+  id: stamp(),
+  deletedByName: by,
+});

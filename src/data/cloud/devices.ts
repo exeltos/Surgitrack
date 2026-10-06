@@ -159,3 +159,58 @@ export async function storeReadings(
 
 /** Where a device sends its data over the network. */
 export const deviceIngestUrl = () => `${supabaseUrl}/functions/v1/device-ingest`;
+
+/** The rows a device is kept as in the recycle bin, and what it takes to put them back. */
+export type DeviceSnapshot = {device: Device; readings: DeviceReading[]; readingsTotal: number};
+
+/** A device with its newest readings (up to `limit`) and how many it had in all, before it is deleted. */
+export async function snapshotDevice(organizationId: string, device: Device, limit = 500): Promise<DeviceSnapshot> {
+  const readings = await listReadings(organizationId, {deviceId: device.id, limit});
+  const {count, error} = await supabase
+    .from('device_readings')
+    .select('id', {count: 'exact', head: true})
+    .eq('organization_id', organizationId)
+    .eq('device_id', device.id);
+  if (error) throw error;
+  return {device, readings, readingsTotal: count ?? readings.length};
+}
+
+/** Puts a deleted device back with the same id and its kept readings. Its network key is gone: issue a new one. */
+export async function restoreDevice(organizationId: string, snapshot: DeviceSnapshot) {
+  const d = snapshot.device;
+  const {error} = await supabase.from('devices').insert({
+    organization_id: organizationId,
+    id: d.id,
+    name: d.name,
+    kind: d.kind,
+    manufacturer: d.manufacturer ?? null,
+    model: d.model ?? null,
+    serial_number: d.serialNumber ?? null,
+    location: d.location ?? null,
+    connection: d.connection,
+    active: d.active,
+    last_seen_at: d.lastSeenAt ?? null,
+  });
+  if (error) throw error;
+  for (let i = 0; i < snapshot.readings.length; i += 200) {
+    const rows = snapshot.readings.slice(i, i + 200).map(r => ({
+      organization_id: organizationId,
+      id: r.id,
+      device_id: d.id,
+      cycle_number: r.cycleNumber,
+      program: r.program ?? null,
+      started_at: r.startedAt ?? null,
+      ended_at: r.endedAt ?? null,
+      result: r.result,
+      max_temperature: r.maxTemperature ?? null,
+      max_pressure: r.maxPressure ?? null,
+      duration_minutes: r.durationMinutes ?? null,
+      source: r.source,
+      created_at: r.createdAt,
+    }));
+    const {error: readingsError} = await supabase
+      .from('device_readings')
+      .upsert(rows, {onConflict: 'device_id,cycle_number', ignoreDuplicates: true});
+    if (readingsError) throw readingsError;
+  }
+}
