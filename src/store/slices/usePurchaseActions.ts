@@ -1,6 +1,7 @@
 import type {PurchaseOrderLine, PurchaseOrderStatus, Tool} from '../../types/domain';
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
 import {kindKey} from '../../core/replacements';
+import {applyReceipt, isReceivable} from '../../core/purchaseReceipt';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -150,19 +151,22 @@ export function usePurchaseActions(
     return number;
   };
   /**
-   * An order arrives: its instruments go into Stock as new instruments (one per piece, unique
-   * barcodes, the details of the instruments they replace) and the order is marked received.
+   * An order arrives, wholly or in part: `quantities` are the pieces coming in now per line (by default
+   * everything still expected). Each piece goes into Stock as a new instrument (unique barcode, the details of
+   * the instruments it replaces). The order is received once nothing is left to come, part-received before that.
    */
-  const receivePurchaseOrder = (id: string) => {
+  const receivePurchaseOrder = (id: string, quantities?: number[]) => {
     const order = purchaseOrders.find(o => o.id === id);
-    if (!order || order.status === 'RECEIVED' || order.status === 'CANCELLED') return;
+    if (!order || !isReceivable(order)) return;
+    const receipt = applyReceipt(order, quantities || order.lines.map(line => line.quantity - (line.received || 0)));
+    if (!receipt.total) return;
     let max = tools
       .flatMap(t => [t.barcode, ...(t.legacyBarcodes || [])])
       .reduce((m, barcode) => Math.max(m, Number(barcode.replace(/\D/g, '')) || 0), 0);
     const stamp = Date.now();
     const created: Tool[] = order.lines.flatMap((line, lineIndex) => {
       const model = tools.find(t => line.toolIds.includes(t.id)) || tools.find(t => kindKey(t) === kindKey(line));
-      return Array.from({length: line.quantity}, (_, i) => ({
+      return Array.from({length: receipt.arriving[lineIndex]}, (_, i) => ({
         id: `tool-${stamp}-${lineIndex}-${i}`,
         barcode: `T${String(++max).padStart(6, '0')}`,
         code: line.code,
@@ -188,14 +192,25 @@ export function usePurchaseActions(
         by: currentUser.name,
       }),
     );
+    const at = formatStoreDateTime();
     setPurchaseOrders(x =>
       x.map(o =>
         o.id === id
-          ? {...o, status: 'RECEIVED', receivedAt: formatStoreDateTime(), receivedBarcodes: created.map(t => t.barcode)}
+          ? {
+              ...o,
+              lines: receipt.lines,
+              status: receipt.status,
+              receivedAt: receipt.status === 'RECEIVED' ? at : o.receivedAt,
+              receivedBarcodes: [...(o.receivedBarcodes || []), ...created.map(t => t.barcode)],
+            }
           : o,
       ),
     );
-    notify(tr('Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.', order.number, created.length));
+    notify(
+      receipt.status === 'RECEIVED'
+        ? tr('Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.', order.number, created.length)
+        : tr('Μερική παραλαβή της {0}: {1} νέα εργαλεία στο Απόθεμα.', order.number, created.length),
+    );
   };
   const setPurchaseOrderStatus = (id: string, status: PurchaseOrderStatus) => {
     const at = formatStoreDateTime();

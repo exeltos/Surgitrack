@@ -318,13 +318,15 @@ export interface RecallCase {
   items: RecallCaseItem[];
   closedAt?: string;
 }
-export type PurchaseOrderStatus = 'OPEN' | 'ORDERED' | 'RECEIVED' | 'CANCELLED';
+export type PurchaseOrderStatus = 'OPEN' | 'ORDERED' | 'PARTIAL' | 'RECEIVED' | 'CANCELLED';
 /** One instrument type to buy: how many, and which out-of-circulation instruments it replaces. */
 export interface PurchaseOrderLine {
   code: string;
   name: string;
   manufacturer?: string;
   quantity: number;
+  /** Pieces that have arrived so far (a partial receipt); the line is complete when it reaches `quantity`. */
+  received?: number;
   /** Why it is needed: Service, Βλάβη, Απώλεια, Εκτός χρήσης… */
   reason?: string;
   toolIds: string[];

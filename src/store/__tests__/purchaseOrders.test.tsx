@@ -60,4 +60,36 @@ describe('purchase orders', () => {
     expect(made.filter(t => t.name === known.name).every(t => t.specialty === known.specialty)).toBe(true);
     expect(made.find(t => t.name === 'ΕΛΕΥΘΕΡΟ ΕΙΔΟΣ')?.state).toBe('IN_STOCK');
   });
+
+  it('receives an order in parts: pieces by line, partial until nothing is left, with unique barcodes', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const [a, b] = result.current.retiredTools;
+    const stockBefore = result.current.tools.filter(t => t.state === 'IN_STOCK').length;
+    act(() => {
+      result.current.createPurchaseOrder([
+        {code: a.code, name: a.name, quantity: 3, toolIds: [a.id], barcodes: [a.barcode]},
+        {code: 'NEW-2', name: 'ΑΛΛΟ ΕΡΓΑΛΕΙΟ', quantity: 2, toolIds: [b.id], barcodes: [b.barcode]},
+      ]);
+    });
+    const id = result.current.purchaseOrders[0].id;
+    act(() => result.current.receivePurchaseOrder(id, [2, 0]));
+    let order = result.current.purchaseOrders.find(o => o.id === id)!;
+    expect(order.status).toBe('PARTIAL');
+    expect(order.lines.map(l => l.received)).toEqual([2, 0]);
+    expect(order.receivedBarcodes).toHaveLength(2);
+    expect(result.current.tools.filter(t => t.state === 'IN_STOCK').length).toBe(stockBefore + 2);
+
+    // Nothing arriving does nothing; the rest completes it.
+    act(() => result.current.receivePurchaseOrder(id, [0, 0]));
+    expect(result.current.purchaseOrders.find(o => o.id === id)!.status).toBe('PARTIAL');
+    act(() => result.current.receivePurchaseOrder(id));
+    order = result.current.purchaseOrders.find(o => o.id === id)!;
+    expect(order.status).toBe('RECEIVED');
+    expect(order.lines.map(l => l.received)).toEqual([3, 2]);
+    expect(order.receivedBarcodes).toHaveLength(5);
+    expect(order.receivedAt).toBeTruthy();
+    const all = [...result.current.tools, ...result.current.retiredTools].map(t => t.barcode);
+    expect(new Set(all).size).toBe(all.length);
+    expect(result.current.tools.filter(t => t.state === 'IN_STOCK').length).toBe(stockBefore + 5);
+  });
 });

@@ -1,4 +1,5 @@
 import {kindKey, toolKinds} from './replacements';
+import {isReceivable, lineRemaining} from './purchaseReceipt';
 import type {PurchaseOrder, PurchaseOrderLine, Tool} from '../types/domain';
 
 export type MinimumStatus = 'OK' | 'LOW' | 'OUT' | 'NONE';
@@ -13,7 +14,7 @@ export type MinimumRow = {
   stock: number;
   /** The minimum the hospital wants in Stock (0 = none set). */
   min: number;
-  /** Pieces in orders still open or placed (not yet received). */
+  /** Pieces still to arrive from orders open, placed or part-received. */
   onOrder: number;
   /** How many more to order to reach the minimum, counting what is already on order. */
   missing: number;
@@ -35,8 +36,9 @@ export function minimumRows(
     if (t.mode === 'STOCK' && t.state === 'IN_STOCK') stock.set(kindKey(t), (stock.get(kindKey(t)) || 0) + 1);
   const onOrder = new Map<string, number>();
   for (const order of purchaseOrders)
-    if (order.status === 'OPEN' || order.status === 'ORDERED')
-      for (const line of order.lines) onOrder.set(kindKey(line), (onOrder.get(kindKey(line)) || 0) + line.quantity);
+    if (isReceivable(order))
+      for (const line of order.lines)
+        onOrder.set(kindKey(line), (onOrder.get(kindKey(line)) || 0) + lineRemaining(line));
   const kinds = new Map(toolKinds(tools).map(t => [kindKey(t), t]));
   const keys = new Set([...kinds.keys(), ...Object.keys(mins)]);
   const rows: MinimumRow[] = [];
