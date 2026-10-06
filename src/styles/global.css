@@ -7215,8 +7215,8 @@ html body .asset-workbench-sidebar .asset-cover {
   min-height: 0;
   height: 96px;
 }
-/* Overview as one screen: six cards in a 3x2 grid that fills the height; long lists scroll inside their card. */
-@media (min-width: 1100px) {
+/* Overview as one screen: six cards in a 3x2 grid that fills the height (only on screens tall enough for it). */
+@media (min-width: 1100px) and (min-height: 840px) {
   html body .hospital-overview.dash {
     display: flex;
     flex-direction: column;
@@ -7243,13 +7243,18 @@ html body .asset-workbench-sidebar .asset-cover {
   html body .dash-card > * {
     flex: 0 0 auto;
   }
-  html body .dash-card .dash-depts-list,
+  html body .dash-card .dash-depts-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
   html body .dash-card .dash-list,
   html body .dash-card .dash-bars,
   html body .dash-card .dash-legend {
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
   }
   html body .dash-card .dash-columns {
     flex: 1 1 auto;
@@ -7326,5 +7331,14 @@ html body .asset-workbench-sidebar .asset-cover {
   }
   html body .studio-body-workflow .studio-workflow-stage {
     padding: 8px 12px !important;
+  }
+}
+/* Shorter screens: same 3-column cards at natural height, one page scroll and no scrollbars inside the cards. */
+@media (min-width: 1100px) and (max-height: 839px) {
+  html body .hospital-overview.dash > .dash-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  html body .dash-grid > .dash-card {
+    grid-column: auto;
   }
 }
