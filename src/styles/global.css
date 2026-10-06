@@ -7143,3 +7143,59 @@ html body .replacements-fixed .replacement-status {
   text-overflow: ellipsis;
   vertical-align: middle;
 }
+/* Asset card: compact enough to fit a laptop screen without its own scrollbar. */
+html body .asset-workbench-sidebar {
+  padding: 12px 14px;
+}
+html body .asset-workbench-title {
+  gap: 8px;
+}
+html body .asset-workbench-fields {
+  margin: 6px 0 8px;
+}
+html body .asset-workbench-fields > div {
+  min-height: 27px;
+}
+html body .asset-cover {
+  height: 84px;
+}
+html body .asset-cover-empty small {
+  display: none;
+}
+html body .asset-cover-empty svg {
+  width: 20px;
+  height: 20px;
+}
+/* Set composition rows: the "Uses" label is repeated on every row, so only the value is shown. */
+html body .asset-detail-body .set-tool-uses > span {
+  display: none;
+}
+html body .asset-detail-body .set-tool-row {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+  grid-template-columns: 150px minmax(0, 1fr);
+  min-height: 25px;
+}
+html body .asset-workbench-sidebar-tool .asset-workbench-fields dt {
+  white-space: nowrap;
+}
+html body .asset-workbench-sidebar-tool .asset-workbench-title-status small {
+  display: none;
+}
+html body .asset-workbench-fields > div,
+html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+  min-height: 23px;
+}
+html body .asset-workbench-fields dd {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .asset-workbench-title {
+  padding-bottom: 6px;
+}
+html body .asset-cover {
+  height: 60px;
+}
