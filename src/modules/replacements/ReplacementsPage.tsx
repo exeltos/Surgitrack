@@ -216,9 +216,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
         <PageHeader
           eyebrow={tr('ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ')}
           title={tr('Αντικαταστάσεις')}
-          description={tr(
-            'Εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης. Για καθένα φαίνεται αν υπάρχει ίδιο στο Απόθεμα: αντικαθίσταται με ένα κλικ, αλλιώς καταχωρείται παραγγελία αγοράς.',
-          )}
+          description={tr('Εργαλεία σε Service, με βλάβη ή χαμένα: αντικατάσταση από το Απόθεμα ή παραγγελία.')}
         />
       )}
       <div className="replacements-kpis">

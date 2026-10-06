@@ -209,8 +209,8 @@ export default function DevicesPage() {
         eyebrow={L('ΕΞΟΠΛΙΣΜΟΣ', 'EQUIPMENT')}
         title={L('Συνδεδεμένες συσκευές', 'Connected devices')}
         description={L(
-          'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν τα δεδομένα των κύκλων τους στο SurgiTrack. Τα δεδομένα συμπληρώνουν αυτόματα τον κύκλο στην Αποστείρωση και μένουν ως αρχείο.',
-          'Sterilizers, washers and other devices that send their cycle data to SurgiTrack. The data fills in the cycle in Sterilization and is kept on record.',
+          'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν δεδομένα κύκλων στην Αποστείρωση.',
+          'Sterilizers, washers and other devices that send cycle data to Sterilization.',
         )}
         actions={
           <div className="devices-head-actions">

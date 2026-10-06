@@ -51,9 +51,7 @@ export default function SterilizationPage() {
         <div>
           <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
           <h1>{tr('Χώρος εργασίας Αποστείρωσης')}</h1>
-          <p>
-            {tr('Η ενεργή ροή του νοσοκομείου εφαρμόζεται αυτόματα από το SurgiTrack Studio με πλήρη ιχνηλασιμότητα.')}
-          </p>
+          <p>{tr('Η ροή του νοσοκομείου από το Studio, με πλήρη ιχνηλασιμότητα.')}</p>
         </div>
         <div className="ster-shift">
           <ShieldCheck size={18} />

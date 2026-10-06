@@ -71,9 +71,7 @@ export default function StandaloneToolsPage() {
       <PageHeader
         eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
         title={tr('Μεμονωμένα εργαλεία σε χρήση')}
-        description={tr(
-          'Μόνο φυσικά εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα και δεν ανήκουν αυτή τη στιγμή σε Σετ.',
-        )}
+        description={tr('Εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα, εκτός Σετ.')}
         actions={
           can('asset.create') ? (
             <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>

@@ -6515,3 +6515,49 @@ html body .asset-registry-table .row-title-link {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Header standard: 22px title, one short sentence that is never clipped. */
+html body .page-head h1,
+html body .ster-work-head h1,
+html body .department-header h1,
+html body .studio-head h1 {
+  font-size: 22px !important;
+  line-height: 1.2;
+}
+html body .page-head > div:first-child > p,
+html body .studio-head p {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+/* Header standard: 22px title, one short sentence that is never clipped. */
+html body .page-head h1,
+html body .ster-work-head h1,
+html body .department-header h1,
+html body .studio-head h1 {
+  font-size: 22px !important;
+  line-height: 1.2;
+}
+html body .page-head > div:first-child > p,
+html body .studio-head p {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+/* Overview KPIs: one-line labels, same tile height everywhere. */
+html body .dash-kpi-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .dash-kpi {
+  min-width: 0;
+  padding: 8px 14px;
+  gap: 2px;
+}
+html body .dash-kpi strong {
+  font-size: 26px;
+}
+html body .dash-dept-name {
+  font-weight: 500;
+  font-size: 13px;
+}

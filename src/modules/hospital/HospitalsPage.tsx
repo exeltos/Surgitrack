@@ -139,8 +139,8 @@ export default function HospitalsPage() {
         eyebrow={L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')}
         title={L('Νοσοκομεία', 'Hospitals')}
         description={L(
-          'Όλα τα νοσοκομεία της πλατφόρμας. Πατήστε «Είσοδος» για να δουλέψετε μέσα σε ένα νοσοκομείο με τα δικά του δεδομένα.',
-          'Every hospital on the platform. Press "Enter" to work inside a hospital with its own data.',
+          'Όλα τα νοσοκομεία της πλατφόρμας. Πατήστε «Είσοδος» για να εργαστείτε σε ένα.',
+          'Every hospital on the platform. Press "Enter" to work inside one.',
         )}
         actions={
           <div className="hospitals-actions">

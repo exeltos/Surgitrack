@@ -98,10 +98,7 @@ export default function BinPage() {
       <PageHeader
         eyebrow={tr('ΔΙΑΓΡΑΦΕΣ')}
         title={tr('Κάδος')}
-        description={tr(
-          'Ό,τι διαγράφεται (Σετ, εργαλεία, συσκευές, εγγραφές βιβλιοθηκών) μένει εδώ {0} ημέρες και μπορεί να επανέλθει όπως ήταν.',
-          BIN_DAYS,
-        )}
+        description={tr('Ό,τι διαγράφεται μένει εδώ {0} ημέρες και μπορεί να επανέλθει.', BIN_DAYS)}
       />
       {notice && (
         <div className={`bin-notice ${notice.ok ? 'ok' : 'bad'}`} role="status">
