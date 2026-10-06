@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   ArrowRightLeft,
   Barcode,
-  Camera,
   ChevronDown,
   ChevronRight,
   Copy,
@@ -21,7 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
-import type {AssetPhoto, SetAsset, Tool} from '../../types/domain';
+import type {SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
@@ -41,7 +40,7 @@ import DepartmentDispatchModal from '../../components/department/DepartmentDispa
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
-import ReportTypeField from '../../components/assets/ReportTypeField';
+import {SetDeleteDialog, SetReportModal} from './SetDialogs';
 import AssetManageModal from '../../components/assets/AssetManageModal';
 import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import ColorMarker from '../../components/assets/ColorMarker';
@@ -83,11 +82,6 @@ export default function SetDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [dispatchOpen, setDispatchOpen] = useState(false);
-  const [reportTarget, setReportTarget] = useState<'SET' | 'TOOLS'>('SET');
-  const [reportToolIds, setReportToolIds] = useState<string[]>([]);
-  const [reportType, setReportType] = useState('Βλάβη');
-  const [reportNote, setReportNote] = useState('');
-  const [reportPhotos, setReportPhotos] = useState<AssetPhoto[]>([]);
   const [addToolsOpen, setAddToolsOpen] = useState(false);
 
   const [preview, setPreview] = useState<'COMPOSITION' | 'BARCODE' | null>(null);
@@ -740,174 +734,32 @@ export default function SetDetailPage() {
         </div>
       )}
       {can('asset.delete') && deleteOpen && (
-        <div className="modal-backdrop">
-          <div className="confirm-dialog choice-dialog danger-choice">
-            <header>
-              <div className="confirm-icon">
-                <Trash2 size={20} />
-              </div>
-              <div>
-                <h3>{tr('Διαγραφή Σετ')}</h3>
-                <p>
-                  {tr('Επίλεξε τι θα γίνει με τα') + ' '}
-                  {members.length} {tr('φυσικά εργαλεία του Σετ.')}
-                </p>
-              </div>
-              <button className="icon-button" onClick={() => setDeleteOpen(false)}>
-                <X size={18} />
-              </button>
-            </header>
-            <div className="choice-dialog-body">
-              <button
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      tr(
-                        'Διαγραφή του Σετ; Τα εργαλεία του πάνε στο Απόθεμα και το Σετ μένει στον Κάδο για 30 ημέρες.',
-                      ),
-                    )
-                  ) {
-                    deleteSet(set.id, false);
-                    setDeleteOpen(false);
-                    navigate('/sets');
-                  }
-                }}
-              >
-                <strong>{tr('Διαγραφή μόνο του Σετ')}</strong>
-                <span>{tr('Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Απόθεμα.')}</span>
-              </button>
-              <button
-                className="danger-option"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      tr('Διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του; Θα μείνουν στον Κάδο για 30 ημέρες.'),
-                    )
-                  ) {
-                    deleteSet(set.id, true);
-                    setDeleteOpen(false);
-                    navigate('/sets');
-                  }
-                }}
-              >
-                <strong>{tr('Διαγραφή Σετ + εργαλείων')}</strong>
-                <span>{tr('Διαγράφονται και τα φυσικά εργαλεία (επαναφορά από τον Κάδο).')}</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <SetDeleteDialog
+          memberCount={members.length}
+          onClose={() => setDeleteOpen(false)}
+          onDelete={deleteTools => {
+            deleteSet(set.id, deleteTools);
+            setDeleteOpen(false);
+            navigate('/sets');
+          }}
+        />
       )}
       {can('issue.create') && reportOpen && (
-        <div className="modal-backdrop">
-          <div className="asset-modal set-report-modal">
-            <header>
-              <div>
-                <h2>{tr('Νέα αναφορά')}</h2>
-                <p>
-                  {set.barcode} {tr('· επίλεξε αν αφορά το Σετ ή εργαλεία της σύνθεσης.')}
-                </p>
-              </div>
-              <button className="icon-button" onClick={() => setReportOpen(false)}>
-                <X size={18} />
-              </button>
-            </header>
-            <div className="modal-body">
-              <div className="report-target-switch">
-                <button className={reportTarget === 'SET' ? 'active' : ''} onClick={() => setReportTarget('SET')}>
-                  {tr('Ολόκληρο Σετ')}
-                </button>
-                <button className={reportTarget === 'TOOLS' ? 'active' : ''} onClick={() => setReportTarget('TOOLS')}>
-                  {tr('Εργαλεία του Σετ')}
-                </button>
-              </div>
-              {reportTarget === 'TOOLS' && (
-                <div className="report-tool-picker">
-                  {members.map(tool => (
-                    <label key={tool.id}>
-                      <input
-                        type="checkbox"
-                        checked={reportToolIds.includes(tool.id)}
-                        onChange={e =>
-                          setReportToolIds(ids =>
-                            e.target.checked ? [...ids, tool.id] : ids.filter(id => id !== tool.id),
-                          )
-                        }
-                      />
-                      <span>
-                        <strong>{tool.name}</strong>
-                        <small>
-                          {tool.barcode} · {tool.code}
-                        </small>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-              <div className="form-grid">
-                <ReportTypeField
-                  kind="SET"
-                  value={reportType}
-                  onChange={setReportType}
-                  canManage={can('asset.composition.manage')}
-                  onManage={
-                    workflowLocked
-                      ? undefined
-                      : () => {
-                          setReportOpen(false);
-                          setManageOpen(true);
-                        }
-                  }
-                />
-                <label className="span-2">
-                  {tr('Παρατήρηση')}
-                  <textarea
-                    rows={3}
-                    value={reportNote}
-                    onChange={e => setReportNote(e.target.value)}
-                    placeholder={tr('Περιγραφή συμβάντος...')}
-                  />
-                </label>
-                <label className="span-2 report-photo-input">
-                  <Camera size={17} /> {tr('Φωτογραφίες')}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    multiple
-                    onChange={async e => setReportPhotos(await filesToAssetPhotos(Array.from(e.target.files || [])))}
-                  />
-                  <small>
-                    {reportPhotos.length
-                      ? tr('{0} φωτογραφίες έτοιμες', reportPhotos.length)
-                      : tr('Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών')}
-                  </small>
-                </label>
-              </div>
-            </div>
-            <footer>
-              <AppButton onClick={() => setReportOpen(false)}>{tr('Ακύρωση')}</AppButton>
-              <AppButton
-                variant="primary"
-                disabled={reportTarget === 'TOOLS' && !reportToolIds.length}
-                onClick={() => {
-                  reportSetIssue(
-                    set.id,
-                    reportTarget === 'TOOLS' ? reportToolIds : [],
-                    reportType,
-                    reportNote,
-                    reportPhotos,
-                  );
-                  setReportOpen(false);
-                  setReportToolIds([]);
-                  setReportNote('');
-                  setReportPhotos([]);
-                }}
-              >
-                {tr('Καταχώρηση αναφοράς')}
-              </AppButton>
-            </footer>
-          </div>
-        </div>
+        <SetReportModal
+          set={set}
+          members={members}
+          canManage={can('asset.composition.manage')}
+          canOpenManage={!workflowLocked}
+          onClose={() => setReportOpen(false)}
+          onManage={() => {
+            setReportOpen(false);
+            setManageOpen(true);
+          }}
+          onSubmit={(toolIds, type, note, photos) => {
+            reportSetIssue(set.id, toolIds, type, note, photos);
+            setReportOpen(false);
+          }}
+        />
       )}
       {manageOpen && <AssetManageModal kind="SET" asset={set} onClose={() => setManageOpen(false)} />}
       {markerOpen && (
