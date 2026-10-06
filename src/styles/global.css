@@ -7199,3 +7199,15 @@ html body .asset-workbench-title {
 html body .asset-cover {
   height: 60px;
 }
+/* "14/15 · Shortage 1": the count and its note each stay on one line. */
+html body .asset-count-state {
+  display: grid;
+  justify-items: end;
+  gap: 0;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+html body .asset-count-state span {
+  white-space: nowrap;
+  font-size: 12px;
+}
