@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import {ShieldAlert} from 'lucide-react';
-import {Link} from 'react-router-dom';
+import {Link, Navigate, useLocation} from 'react-router-dom';
 import type {Permission} from '../../core/permissions';
 import {roleHomePath} from '../../core/permissions';
 import {useSurgi} from '../../store/SurgiStore';
@@ -9,7 +9,11 @@ import {useAppPreferences} from '../../core/AppPreferences';
 export default function ProtectedRoute({permission, children}: {permission: Permission; children: ReactNode}) {
   const {can, role} = useSurgi();
   const {lang} = useAppPreferences();
+  const {pathname} = useLocation();
   if (can(permission)) return <>{children}</>;
+  // A page the role may not open sends it to its own home; the notice stays only when the home itself is closed.
+  const home = roleHomePath(role);
+  if (pathname !== home) return <Navigate to={home} replace />;
   return (
     <div className="empty access-denied">
       <ShieldAlert size={34} />
