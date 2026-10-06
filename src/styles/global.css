@@ -6480,3 +6480,20 @@ html body .asset-detail-body .set-tool-code strong {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Sterilization density: slimmer scan bar, queue cards and rows. */
+html body .sterilization-workspace .ster-work-row,
+html body .sterilization-workspace .receipt-queue-panel .ster-work-row {
+  padding: 8px 22px !important;
+  min-height: 0 !important;
+}
+html body .sterilization-workspace .ster-list-head {
+  padding: 7px 22px;
+}
+html body .sterilization-workspace .ster-scan {
+  padding: 8px 16px;
+  min-height: 0;
+}
+html body .sterilization-workspace .sterile-queues.modern button {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
