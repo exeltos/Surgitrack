@@ -3015,13 +3015,16 @@ a.overview-bar:hover {
 }
 .devices-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 14px;
+  align-items: stretch;
 }
 .device-card {
   display: grid;
-  gap: 10px;
-  padding: 14px;
+  grid-template-rows: 1fr auto;
+  min-width: 0;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--st-line, #dce7eb);
   border-radius: 14px;
   background: #fff;
@@ -4521,9 +4524,12 @@ div.asset-import-hospital b {
     padding-bottom: 7px;
   }
 }
-/* Device card: edit and delete stay together at the end of the row; the row never splits them. */
+/* Device card actions: the labelled buttons come first and the edit/delete pair stays together at
+   the end. When the card is too narrow the row wraps onto a second line; nothing leaves the card. */
 .device-card-actions {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  column-gap: 8px;
 }
 .device-card-actions .app-button {
   min-width: 0;
@@ -4537,6 +4543,11 @@ div.asset-import-hospital b {
 }
 .device-card-actions .icon-button:first-of-type {
   margin-left: 0;
+}
+.device-card-main {
+  min-width: 0;
+  align-content: start;
+  overflow-wrap: anywhere;
 }
 .people-invited > .app-button,
 .people-password > .app-button {
