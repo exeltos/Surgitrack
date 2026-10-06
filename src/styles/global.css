@@ -5549,42 +5549,54 @@ div.asset-import-hospital b {
 .studio-head {
   margin-bottom: 16px;
 }
+/* The title block gives way to the buttons, never the other way round: buttons stay on one row. */
+.page-head > div:first-child,
+.ster-work-head > div:first-child,
+.department-header > div:first-child,
+.studio-head > div:first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.page-head > :not(:first-child),
+.ster-work-head > :not(:first-child),
+.department-header > :not(:first-child),
+.studio-head > :not(:first-child) {
+  flex: 0 0 auto;
+}
+.page-head-actions {
+  flex-wrap: nowrap;
+}
+.page-head-actions > * {
+  white-space: nowrap;
+}
 .page-head h1,
 .ster-work-head h1,
 .department-header h1,
 .studio-head h1 {
-  margin: 0 0 5px !important;
+  margin: 0 0 4px !important;
   color: #17384a !important;
-  font-size: 26px !important;
+  font-size: 22px !important;
   font-weight: 700 !important;
-  line-height: normal !important;
-  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em !important;
 }
 .page-head p,
 .ster-work-head p,
 .department-header p,
 .studio-head p {
-  max-width: 920px;
+  max-width: 720px;
   margin: 0 !important;
   color: var(--st-muted) !important;
-  font-size: 16px !important;
+  font-size: 14px !important;
   line-height: 1.45 !important;
 }
 .page-head .eyebrow,
 .ster-work-head .eyebrow,
 .department-header .eyebrow,
 .studio-head .eyebrow {
-  margin: 0 !important;
+  margin: 0 0 2px !important;
   font-size: 11px !important;
   letter-spacing: 0.12em !important;
-}
-@media (max-width: 1180px) {
-  .page-head p,
-  .ster-work-head p,
-  .department-header p,
-  .studio-head p {
-    font-size: 15px !important;
-  }
 }
 
 /* Sterilization stage cards: the title wraps inside its column instead of running under the count. */
@@ -5611,5 +5623,40 @@ div.asset-import-hospital b {
   }
   .sterile-queues.modern button > small {
     grid-column: 1 / -1;
+  }
+}
+
+/* The toolbar of the replacements list keeps its buttons on one row: Excel and print shrink to icons. */
+.replacements-toolbar {
+  flex-wrap: nowrap;
+}
+.replacements-toolbar > * {
+  flex-shrink: 0;
+}
+.replacements-toolbar .replacements-search {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+@media (max-width: 1180px) {
+  .replacements-toolbar .label-wide {
+    display: none;
+  }
+}
+
+/* A tablet keeps the page buttons beside the title; only a phone stacks them. */
+@media (min-width: 641px) and (max-width: 900px) {
+  .page-head {
+    flex-direction: row;
+  }
+  /* With buttons beside it, the short description gives way to them on a portrait tablet. */
+  .page-head:has(> :nth-child(2)) > div:first-child p {
+    display: none;
+  }
+  .asset-page-actions {
+    width: auto;
+    flex-wrap: nowrap;
+  }
+  .asset-page-actions button {
+    flex: 0 0 auto;
   }
 }

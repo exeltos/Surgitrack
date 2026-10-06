@@ -278,11 +278,11 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                 {tr('Νέα παραγγελία')}
               </AppButton>
             )}
-            <AppButton icon={<FileSpreadsheet size={15} />} onClick={exportExcel}>
-              {tr('Excel')}
+            <AppButton icon={<FileSpreadsheet size={15} />} title="Excel" onClick={exportExcel}>
+              <span className="label-wide">{tr('Excel')}</span>
             </AppButton>
-            <AppButton icon={<Printer size={15} />} onClick={printList}>
-              {picked.length ? tr('Εκτύπωση επιλεγμένων') : tr('Εκτύπωση λίστας')}
+            <AppButton icon={<Printer size={15} />} title={tr('Εκτύπωση λίστας')} onClick={printList}>
+              <span className="label-wide">{picked.length ? tr('Εκτύπωση επιλεγμένων') : tr('Εκτύπωση λίστας')}</span>
             </AppButton>
           </div>
           {editable && picked.length > 0 && (

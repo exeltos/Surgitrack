@@ -386,7 +386,8 @@ export default function SetDetailPage() {
                         }
                         onClick={() => setAddToolsOpen(true)}
                       >
-                        {tr('Προσθήκη εργαλείων')}
+                        <span className="label-wide">{tr('Προσθήκη εργαλείων')}</span>
+                        <span className="label-narrow">{tr('Προσθήκη')}</span>
                       </AppButton>
                     )}
                     <IconToggleButton

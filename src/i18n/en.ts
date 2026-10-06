@@ -899,6 +899,7 @@ export const en: Record<string, string> = {
   'Σειριακός αριθμός': 'Serial number',
   'Barcode Set': 'Set barcode',
   'Barcode εργαλείου': 'Tool barcode',
+  Προσθήκη: 'Add',
   'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',

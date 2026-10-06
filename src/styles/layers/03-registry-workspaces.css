@@ -535,18 +535,19 @@
 .issues-registry-table th:nth-child(5) {
   min-width: 260px;
 }
-.issues-registry-table .issue-actions {
+.issues-registry-table .issue-actions-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
-  min-width: 150px;
+  min-width: 112px;
 }
 .issue-action {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  min-height: 30px;
-  padding: 0 10px;
+  justify-content: center;
+  width: 32px;
+  min-height: 32px;
+  padding: 0;
   border: 1px solid #d5e2e7;
   border-radius: 8px;
   background: #fff;
@@ -2527,22 +2528,33 @@ body {
   }
 }
 
-/* Set and tool detail on a tablet: the composition title gets the full width with its buttons under it
-   (instead of a one-word-per-line column), and the tabs get a little tighter so they all fit. */
+/* Set and tool detail on a tablet: the composition title and its buttons stay on one row; the short
+   description gives way and the add button uses its short label. */
+.label-narrow {
+  display: none;
+}
 @media (max-width: 1180px) {
   .asset-detail-body .set-composition-head {
-    flex-wrap: wrap;
-    row-gap: 10px;
+    flex-wrap: nowrap;
   }
   .asset-detail-body .set-composition-head > div:first-child {
-    flex: 1 1 100%;
+    flex: 1 1 0;
     min-width: 0;
   }
+  .asset-detail-body .set-composition-head > div:first-child p {
+    display: none;
+  }
   .asset-detail-body .set-composition-actions {
-    flex: 1 1 100%;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
     gap: 10px;
+  }
+  .asset-detail-body .set-composition-actions .label-wide {
+    display: none;
+  }
+  .asset-detail-body .set-composition-actions .label-narrow {
+    display: inline;
   }
 }
 @media (max-width: 1320px) {
