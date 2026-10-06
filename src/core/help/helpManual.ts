@@ -242,12 +242,12 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Χρήσεις και ζωές',
-          'Για εργαλεία περιορισμένων χρήσεων φαίνεται το υπόλοιπο ζωών. Κάθε αποστολή μετά από χρήση αφαιρεί μία ζωή· στο μηδέν το εργαλείο τίθεται αυτόματα εκτός χρήσης.',
+          'Χρήσεις και όρια',
+          'Για εργαλεία περιορισμένων χρήσεων φαίνεται το υπόλοιπο χρήσεων. Κάθε αποστολή μετά από χρήση αφαιρεί μία χρήση· στο μηδέν το εργαλείο τίθεται αυτόματα εκτός χρήσης.',
         ],
         en: [
-          'Uses and lives',
-          'Limited-use instruments show their remaining lives. Each dispatch after use takes one life; at zero the instrument is taken out of use automatically.',
+          'Uses and limits',
+          'Limited-use instruments show their remaining uses. Each dispatch after use takes one use; at zero the instrument is taken out of use automatically.',
         ],
       },
       {
@@ -270,12 +270,12 @@ export const helpManual: ManualSection[] = [
     ],
     steps: {
       el: [
-        'Ελέγξτε την κατάσταση και το υπόλοιπο ζωών.',
+        'Ελέγξτε την κατάσταση και το υπόλοιπο χρήσεων.',
         'Δείτε το ιστορικό για την τελευταία κίνηση.',
         'Χρησιμοποιήστε την ενέργεια που χρειάζεστε από πάνω δεξιά.',
       ],
       en: [
-        'Check the state and remaining lives.',
+        'Check the state and remaining uses.',
         'See the history for the last movement.',
         'Use the action you need from the top right.',
       ],
@@ -297,11 +297,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Δείκτες (KPIs)',
-          'Κάθε δείκτης στην κορυφή είναι σύνδεσμος. Πατώντας τον ανοίγει η αντίστοιχη λίστα με τα σωστά φίλτρα ήδη εφαρμοσμένα, π.χ. «Κοντά στο όριο χρήσεων» ανοίγει τα Εργαλεία με φίλτρο «Λίγες ζωές».',
+          'Κάθε δείκτης στην κορυφή είναι σύνδεσμος. Πατώντας τον ανοίγει η αντίστοιχη λίστα με τα σωστά φίλτρα ήδη εφαρμοσμένα, π.χ. «Κοντά στο όριο χρήσεων» ανοίγει τα Εργαλεία με φίλτρο «Λίγες χρήσεις».',
         ],
         en: [
           'Indicators (KPIs)',
-          'Every indicator at the top is a link. It opens the matching list with its filters already applied, e.g. "Near usage limit" opens Instruments filtered to "Few lives left".',
+          'Every indicator at the top is a link. It opens the matching list with its filters already applied, e.g. "Near usage limit" opens Instruments filtered to "Few uses left".',
         ],
       },
       {
@@ -375,11 +375,11 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Εργαλεία με ζωές',
+          'Εργαλεία με όριο χρήσεων',
           'Για εργαλεία πολλαπλών χρήσεων με όριο (π.χ. ρομποτικά), η αποστολή ζητά υποχρεωτικά κωδικό ασθενούς και επιβεβαίωση ότι χρησιμοποιήθηκε: καταγράφεται μία χρήση και φαίνεται το υπόλοιπο. Όταν εξαντληθούν οι χρήσεις, το εργαλείο τίθεται αυτόματα εκτός χρήσης.',
         ],
         en: [
-          'Instruments with lives',
+          'Instruments with a usage limit',
           'For limited multi-use instruments (e.g. robotic), sending requires a patient code and confirming it was used: one use is recorded and the uses left are shown. When no uses are left the instrument is taken out of use automatically.',
         ],
       },
@@ -499,8 +499,8 @@ export const helpManual: ManualSection[] = [
       en: ['The Set composition was checked before packaging.', 'The cycle was recorded with number and sterilizer.'],
     },
     tip: {
-      el: 'Ένα αντικείμενο σε ενεργή ανάκληση ή χωρίς υπόλοιπο ζωών δεν μπορεί να κυκλοφορήσει: η εφαρμογή το σταματά.',
-      en: 'An item under an active recall or with no lives left cannot circulate: the app stops it.',
+      el: 'Ένα αντικείμενο σε ενεργή ανάκληση ή χωρίς υπόλοιπο χρήσεων δεν μπορεί να κυκλοφορήσει: η εφαρμογή το σταματά.',
+      en: 'An item under an active recall or with no uses left cannot circulate: the app stops it.',
     },
     related: ['/issues', '/sets', '/movements'],
   },
@@ -582,21 +582,21 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τύπος χρήσης',
-          '«Πολλαπλών χρήσεων (με ζωές)» δείχνει εργαλεία με όριο χρήσεων, «Λίγες ζωές» όσα πλησιάζουν στο όριο και «Χωρίς όριο» τα υπόλοιπα.',
+          '«Με όριο χρήσεων» δείχνει εργαλεία με όριο χρήσεων, «Λίγες χρήσεις» όσα πλησιάζουν στο όριο και «Χωρίς όριο» τα υπόλοιπα.',
         ],
         en: [
           'Usage type',
-          '"Multi-use (with lives)" shows instruments with a usage limit, "Few lives left" those near it and "No limit" the rest.',
+          '"With a usage limit" shows instruments with a usage limit, "Few uses left" those near it and "No limit" the rest.',
         ],
       },
       {
         el: [
           'Καρτέλα εργαλείου',
-          'Πατώντας ένα εργαλείο βλέπετε ιστορικό, φωτογραφίες, χρήσεις, χρωματική σήμανση και ιδιοκτησία. Οι ζωές αλλάζουν μόνο από τον Διαχειριστή και τον Προϊστάμενο Αποστείρωσης.',
+          'Πατώντας ένα εργαλείο βλέπετε ιστορικό, φωτογραφίες, χρήσεις, χρωματική σήμανση και ιδιοκτησία. Το όριο και οι χρήσεις αλλάζουν μόνο από τον Διαχειριστή και τον Προϊστάμενο Αποστείρωσης.',
         ],
         en: [
           'Instrument card',
-          'Opening an instrument shows history, photos, uses, color marker and ownership. Lives can be changed only by the Administrator and the Sterilization supervisor.',
+          'Opening an instrument shows history, photos, uses, color marker and ownership. The limit and uses can be changed only by the Administrator and the Sterilization supervisor.',
         ],
       },
       {
@@ -840,21 +840,21 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τι είναι',
-          'Μεμονωμένο είναι ένα εργαλείο που ανήκει σε τμήμα και κυκλοφορεί μόνο του. Πολλά ρομποτικά εργαλεία με ζωές είναι μεμονωμένα.',
+          'Μεμονωμένο είναι ένα εργαλείο που ανήκει σε τμήμα και κυκλοφορεί μόνο του. Πολλά ρομποτικά εργαλεία με όριο χρήσεων είναι μεμονωμένα.',
         ],
         en: [
           'What it is',
-          'A standalone instrument belongs to a department and circulates on its own. Many robotic instruments with lives are standalone.',
+          'A standalone instrument belongs to a department and circulates on its own. Many robotic instruments with a usage limit are standalone.',
         ],
       },
       {
         el: [
           'Ζωές',
-          'Οι δείκτες «Πολλαπλών χρήσεων» και «Λίγες ζωές» φιλτράρουν τη λίστα. Το υπόλοιπο φαίνεται σε κάθε γραμμή.',
+          'Οι δείκτες «Με όριο χρήσεων» και «Λίγες χρήσεις» φιλτράρουν τη λίστα. Το υπόλοιπο φαίνεται σε κάθε γραμμή.',
         ],
         en: [
-          'Lives',
-          'The "Multi-use" and "Few lives left" indicators filter the list. Remaining lives show on each row.',
+          'Usage limits',
+          'The "With a usage limit" and "Few uses left" indicators filter the list. Remaining uses show on each row.',
         ],
       },
     ],
@@ -1112,11 +1112,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Δικαιώματα',
-          'Ορίστε τι κάνει κάθε ρόλος. Κάποια δικαιώματα (δημιουργία, σύνθεση, ζωές) ανήκουν μόνο στον Προϊστάμενο Αποστείρωσης.',
+          'Ορίστε τι κάνει κάθε ρόλος. Κάποια δικαιώματα (δημιουργία, σύνθεση, όρια χρήσεων) ανήκουν μόνο στον Προϊστάμενο Αποστείρωσης.',
         ],
         en: [
           'Permissions',
-          'Set what each role can do. Some permissions (creation, composition, lives) belong only to the Sterilization supervisor.',
+          'Set what each role can do. Some permissions (creation, composition, usage limits) belong only to the Sterilization supervisor.',
         ],
       },
       {
@@ -1132,11 +1132,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ρόλοι και Ρυθμίσεις',
-          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες ζωές» και την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο).',
+          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις» και την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο).',
         ],
         en: [
           'Roles and Settings',
-          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few lives left" and the hospital’s barcode label (size, header, logo).',
+          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few uses left" and the hospital’s barcode label (size, header, logo).',
         ],
       },
     ],

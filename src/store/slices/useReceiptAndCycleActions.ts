@@ -97,7 +97,7 @@ export function useReceiptAndCycleActions(
       from: a.department || currentUser.department || 'Τμήμα',
       to: 'Κεντρική Αποστείρωση',
       status: `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής${
-        limited.length ? ` · −1 ζωή σε ${limited.length} εργαλεί${limited.length === 1 ? 'ο' : 'α'}` : ''
+        limited.length ? ` · −1 χρήση σε ${limited.length} εργαλεί${limited.length === 1 ? 'ο' : 'α'}` : ''
       }`,
       by: currentUser.name,
       patientCode,

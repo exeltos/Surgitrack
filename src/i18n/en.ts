@@ -1232,7 +1232,7 @@ export const en: Record<string, string> = {
   'Υπογραφή & ολοκλήρωση': 'Sign & complete',
   'Υποχρεωτική αιτιολόγηση…': 'Mandatory reason…',
   Υπόλοιπο: 'Remaining',
-  'Υπόλοιπο κύκλου ζωής και κρίσιμα όρια.': 'Remaining life cycle and critical limits.',
+  'Υπόλοιπο χρήσεων και κρίσιμα όρια.': 'Remaining uses and critical limits.',
   'Υπόλοιπο χρήσεων': 'Uses left',
   'ΦΟΡΤΙΟ ·': 'LOAD ·',
   'ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ': 'STERILIZATION LOAD',
@@ -1510,8 +1510,7 @@ export const en: Record<string, string> = {
     '{0}: a patient code is required for limited-use instruments.',
   '{0} προωθήθηκε προς Αποστείρωση. Συμπληρώθηκε το όριο χρήσεων: {1} — τέθηκε εκτός χρήσης.':
     '{0} was sent to Sterilization. Usage limit reached: {1} — taken out of use.',
-  'Πολλαπλών χρήσεων (με ζωές)': 'Multi-use (with lives)',
-  'Λίγες ζωές': 'Few lives left',
+  'Λίγες χρήσεις': 'Few uses left',
   'Όλοι οι τύποι χρήσης': 'All usage types',
   'Φόρτωση…': 'Loading…',
   'Κρίσιμο · ≤ {0}': 'Critical · ≤ {0}',

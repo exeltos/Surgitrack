@@ -49,7 +49,7 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
   {id: 'department', title: 'Ανά Τμήμα', description: 'Σετ και εργαλεία οργανωμένα ανά τμήμα.', icon: UsersRound},
   {id: 'specialty', title: 'Ανά Ειδικότητα', description: 'Κατανομή εξοπλισμού ανά ειδικότητα.', icon: Stethoscope},
   {id: 'issues', title: 'Service & Βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
-  {id: 'usage', title: 'Όρια Χρήσεων', description: 'Υπόλοιπο κύκλου ζωής και κρίσιμα όρια.', icon: Activity},
+  {id: 'usage', title: 'Όρια Χρήσεων', description: 'Υπόλοιπο χρήσεων και κρίσιμα όρια.', icon: Activity},
   {
     id: 'retired',
     title: 'Εργαλεία εκτός χρήσης',

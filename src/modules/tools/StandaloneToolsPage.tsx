@@ -86,12 +86,12 @@ export default function StandaloneToolsPage() {
           {label: tr('Σε χρήση'), value: standalone.length, ...kpi()},
           {label: tr('Τμήματα'), value: new Set(standalone.map(t => t.department).filter(Boolean)).size},
           {
-            label: tr('Πολλαπλών χρήσεων (με ζωές)'),
+            label: tr('Με όριο χρήσεων'),
             value: standalone.filter(t => t.maxUses).length,
             ...kpi({usage: 'LIMITED'}),
           },
           {
-            label: tr('Λίγες ζωές'),
+            label: tr('Λίγες χρήσεις'),
             value: standalone.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
             ...kpi({usage: 'LOW'}),
           },

@@ -120,7 +120,6 @@ export default function MovementsPage() {
     <div className="movements-workspace">
       <div className="page-head movements-head">
         <div>
-          <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
           <h1>{tr('Ιστορικό κινήσεων')}</h1>
           <p>
             {role === 'DEPARTMENT'
@@ -189,7 +188,6 @@ export default function MovementsPage() {
       <div className="movement-ledger">
         <div className="ledger-head">
           <div>
-            <strong>{tr('Ιστορικό κινήσεων')}</strong>
             <span>
               {filtered.length} {filtered.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
             </span>
