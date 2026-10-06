@@ -11,6 +11,8 @@ import Spinner from '../../components/ui/Spinner';
 import {orderLineFromTool, replacementItems} from '../../core/replacements';
 import type {Issue, PurchaseOrderLine} from '../../types/domain';
 import OrderDialog from '../replacements/OrderDialog';
+import {pieces} from '../replacements/pieces';
+import {useConfirm} from '../../components/ui/useConfirm';
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 
@@ -29,6 +31,7 @@ export default function IssuesPage() {
     createPurchaseOrder,
   } = useSurgi();
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
+  const [confirm, ask] = useConfirm();
   // Sterilization and admins also see the instruments to replace, as a second tab.
   const withReplacements = can('stock.manage');
   const [params, setParams] = useSearchParams();
@@ -217,7 +220,18 @@ export default function IssuesPage() {
                               className="issue-action"
                               title={tr('Επίλυση')}
                               aria-label={tr('Επίλυση')}
-                              onClick={() => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα'))}
+                              onClick={() =>
+                                ask({
+                                  title: tr('Επίλυση εκκρεμότητας;'),
+                                  message: tr(
+                                    'Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.',
+                                    trData(i.type),
+                                    i.asset,
+                                  ),
+                                  confirmLabel: tr('Επίλυση'),
+                                  onConfirm: () => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα')),
+                                })
+                              }
                             >
                               <CheckCircle2 size={14} />
                             </button>
@@ -243,13 +257,21 @@ export default function IssuesPage() {
         <OrderDialog
           initialLines={ordering}
           onClose={() => setOrdering(null)}
-          onSave={(lines, details) => {
-            const number = createPurchaseOrder(lines, details);
-            setOrdering(null);
-            if (number) goToOrders();
-          }}
+          onSave={(lines, details) =>
+            ask({
+              title: tr('Καταχώρηση παραγγελίας;'),
+              message: tr('{0} είδη, {1}.', lines.length, pieces(lines.reduce((sum, line) => sum + line.quantity, 0))),
+              confirmLabel: tr('Καταχώρηση'),
+              onConfirm: () => {
+                const number = createPurchaseOrder(lines, details);
+                setOrdering(null);
+                if (number) goToOrders();
+              },
+            })
+          }
         />
       )}
+      {confirm}
     </div>
   );
 }

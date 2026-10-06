@@ -900,6 +900,26 @@ export const en: Record<string, string> = {
   'Barcode Set': 'Set barcode',
   'Barcode εργαλείου': 'Tool barcode',
   Προσθήκη: 'Add',
+  'Αντικατάσταση από το Απόθεμα;': 'Replace from Stock?',
+  '{0} εργαλεία από το Απόθεμα μπαίνουν στα Σετ και τα εργαλεία που αντικαθίστανται πάνε σε Service. Οι αλλαγές καταγράφονται στο Ιστορικό.':
+    '{0} instruments from Stock go into the Sets and the instruments they replace go to Service. The changes are recorded in the History.',
+  'Επιστροφή από Service;': 'Return from Service?',
+  'Το εργαλείο {0} επέστρεψε επισκευασμένο και μπαίνει στο Απόθεμα.':
+    'Instrument {0} came back repaired and goes into Stock.',
+  'Ακύρωση παραγγελίας;': 'Cancel the order?',
+  'Σημείωση ως παραγγελθείσα;': 'Mark as ordered?',
+  'Η παραγγελία {0} ακυρώνεται και τα εργαλεία της ξαναγίνονται «Χρειάζεται αντικατάσταση».':
+    'Order {0} is cancelled and its instruments go back to «Needs replacement».',
+  'Η παραγγελία {0} στάλθηκε στον προμηθευτή.': 'Order {0} was sent to the supplier.',
+  'Παραλαβή στο Απόθεμα;': 'Receive into Stock?',
+  'Τα εργαλεία της παραγγελίας {0} μπαίνουν στο Απόθεμα με νέα barcode.':
+    'The instruments of order {0} go into Stock with new barcodes.',
+  'Καταχώρηση παραγγελίας;': 'Record the order?',
+  '{0} είδη, {1}.': '{0} kinds, {1}.',
+  'Επίλυση εκκρεμότητας;': 'Resolve the issue?',
+  'Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.': 'The issue «{0}» for {1} will be marked as resolved.',
+  Επίλυση: 'Resolve',
+  'Επιλύθηκε χειροκίνητα': 'Resolved manually',
   'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',

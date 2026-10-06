@@ -29,6 +29,7 @@ import {
 } from '../../core/replacements';
 import type {PurchaseOrder, PurchaseOrderLine} from '../../types/domain';
 import OrderDialog from './OrderDialog';
+import {useConfirm} from '../../components/ui/useConfirm';
 import {pieces} from './pieces';
 import {orderStatusLabel, purchaseOrderHtml, replacementListHtml} from './replacementPrint';
 import {tr, trData} from '../../i18n';
@@ -48,6 +49,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
     () => replacementItems({tools, retiredTools, sets, issues, movements, purchaseOrders}),
     [tools, retiredTools, sets, issues, movements, purchaseOrders],
   );
+  const [confirm, ask] = useConfirm();
   const [params] = useSearchParams();
   const [tab, setTab] = useState<Tab>(params.get('view') === 'orders' ? 'ORDERS' : 'ITEMS');
   const [query, setQuery] = useState('');
@@ -151,8 +153,18 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
   const replace = (list: ReplacementItem[]) => {
     const pairs = allocateStock(list);
     if (!pairs.length) return;
-    store.replaceFromStock(pairs);
-    setSelected(new Set());
+    ask({
+      title: tr('Αντικατάσταση από το Απόθεμα;'),
+      message: tr(
+        '{0} εργαλεία από το Απόθεμα μπαίνουν στα Σετ και τα εργαλεία που αντικαθίστανται πάνε σε Service. Οι αλλαγές καταγράφονται στο Ιστορικό.',
+        pairs.length,
+      ),
+      confirmLabel: tr('Αντικατάσταση'),
+      onConfirm: () => {
+        store.replaceFromStock(pairs);
+        setSelected(new Set());
+      },
+    });
   };
   const printList = () =>
     setPreview({
@@ -400,7 +412,17 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                             <button
                               type="button"
                               title={tr('Επέστρεψε επισκευασμένο: πάει στο Απόθεμα')}
-                              onClick={() => store.returnToService('TOOL', item.tool.id)}
+                              onClick={() =>
+                                ask({
+                                  title: tr('Επιστροφή από Service;'),
+                                  message: tr(
+                                    'Το εργαλείο {0} επέστρεψε επισκευασμένο και μπαίνει στο Απόθεμα.',
+                                    item.tool.barcode,
+                                  ),
+                                  confirmLabel: tr('Επιστροφή στο Απόθεμα'),
+                                  onConfirm: () => store.returnToService('TOOL', item.tool.id),
+                                })
+                              }
                             >
                               <Undo2 size={13} /> {tr('Επιστροφή')}
                             </button>
@@ -427,8 +449,29 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
         <Orders
           orders={purchaseOrders}
           editable={editable}
-          onStatus={store.setPurchaseOrderStatus}
-          onReceive={store.receivePurchaseOrder}
+          onStatus={(order, status) =>
+            ask({
+              title: status === 'CANCELLED' ? tr('Ακύρωση παραγγελίας;') : tr('Σημείωση ως παραγγελθείσα;'),
+              message:
+                status === 'CANCELLED'
+                  ? tr(
+                      'Η παραγγελία {0} ακυρώνεται και τα εργαλεία της ξαναγίνονται «Χρειάζεται αντικατάσταση».',
+                      order.number,
+                    )
+                  : tr('Η παραγγελία {0} στάλθηκε στον προμηθευτή.', order.number),
+              confirmLabel: status === 'CANCELLED' ? tr('Ακύρωση παραγγελίας') : tr('Επιβεβαίωση'),
+              danger: status === 'CANCELLED',
+              onConfirm: () => store.setPurchaseOrderStatus(order.id, status),
+            })
+          }
+          onReceive={order =>
+            ask({
+              title: tr('Παραλαβή στο Απόθεμα;'),
+              message: tr('Τα εργαλεία της παραγγελίας {0} μπαίνουν στο Απόθεμα με νέα barcode.', order.number),
+              confirmLabel: tr('Παραλαβή'),
+              onConfirm: () => store.receivePurchaseOrder(order.id),
+            })
+          }
           onNew={() => setOrdering([])}
           onPrint={order =>
             setPreview({title: tr('Παραγγελία {0}', order.number), html: purchaseOrderHtml(order, organizationName)})
@@ -440,14 +483,22 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
         <OrderDialog
           initialLines={ordering}
           onClose={() => setOrdering(null)}
-          onSave={(lines, details) => {
-            const number = store.createPurchaseOrder(lines, details);
-            setOrdering(null);
-            setSelected(new Set());
-            if (number) setTab('ORDERS');
-          }}
+          onSave={(lines, details) =>
+            ask({
+              title: tr('Καταχώρηση παραγγελίας;'),
+              message: tr('{0} είδη, {1}.', lines.length, pieces(lines.reduce((sum, line) => sum + line.quantity, 0))),
+              confirmLabel: tr('Καταχώρηση'),
+              onConfirm: () => {
+                const number = store.createPurchaseOrder(lines, details);
+                setOrdering(null);
+                setSelected(new Set());
+                if (number) setTab('ORDERS');
+              },
+            })
+          }
         />
       )}
+      {confirm}
       {preview && <PrintPreviewModal title={preview.title} html={preview.html} onClose={() => setPreview(null)} />}
     </div>
   );
@@ -473,8 +524,8 @@ function Orders({
 }: {
   orders: PurchaseOrder[];
   editable: boolean;
-  onStatus: (id: string, status: PurchaseOrder['status']) => void;
-  onReceive: (id: string) => void;
+  onStatus: (order: PurchaseOrder, status: PurchaseOrder['status']) => void;
+  onReceive: (order: PurchaseOrder) => void;
   onNew: () => void;
   onPrint: (order: PurchaseOrder) => void;
 }) {
@@ -536,7 +587,7 @@ function Orders({
                 {tr('Εκτύπωση')}
               </AppButton>
               {editable && order.status === 'OPEN' && (
-                <AppButton variant="primary" onClick={() => onStatus(order.id, 'ORDERED')}>
+                <AppButton variant="primary" onClick={() => onStatus(order, 'ORDERED')}>
                   {tr('Σημείωση ως παραγγελθείσα')}
                 </AppButton>
               )}
@@ -545,11 +596,11 @@ function Orders({
                   <AppButton
                     variant={order.status === 'ORDERED' ? 'primary' : undefined}
                     icon={<PackageCheck size={15} />}
-                    onClick={() => onReceive(order.id)}
+                    onClick={() => onReceive(order)}
                   >
                     {tr('Παραλαβή στο Απόθεμα')}
                   </AppButton>
-                  <AppButton onClick={() => onStatus(order.id, 'CANCELLED')}>{tr('Ακύρωση παραγγελίας')}</AppButton>
+                  <AppButton onClick={() => onStatus(order, 'CANCELLED')}>{tr('Ακύρωση παραγγελίας')}</AppButton>
                 </>
               )}
               {order.status === 'RECEIVED' && (
