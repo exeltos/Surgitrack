@@ -32,220 +32,226 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
               <span>v{libs.sterilizationWorkflow.version}</span>
             </div>
           </section>
-          <section className="studio-workflow-policy">
-            <ShieldCheck size={19} />
-            <div>
-              <strong>{L('Ασφαλής βασικός κορμός', 'Protected core workflow')}</strong>
-              <span>
-                {L(
-                  'Παραλαβή, Αποστείρωση και Παράδοση αποτελούν βασικά σημεία chain of custody και παραμένουν ενεργά. Τα ενδιάμεσα quality gates προσαρμόζονται ανά νοσοκομείο.',
-                  'Receipt, Sterilization and Delivery are protected chain-of-custody milestones. Intermediate quality gates can be configured per hospital.',
-                )}
-              </span>
-            </div>
-          </section>
-          <section className="studio-release-policy">
-            <header>
-              <ShieldCheck size={18} />
+          <div className="studio-workflow-side">
+            <section className="studio-workflow-policy">
+              <ShieldCheck size={19} />
               <div>
-                <strong>{L('Πολιτική παραλαβής', 'Receipt policy')}</strong>
+                <strong>{L('Ασφαλής βασικός κορμός', 'Protected core workflow')}</strong>
                 <span>
                   {L(
-                    'Η βασική παραλαβή παραμένει γρήγορη. Η καταμέτρηση Σετ ενεργοποιείται μόνο αν απαιτείται από την πολιτική της μονάδας.',
-                    'Keep routine receipt fast. Set counting is enabled only when required by facility policy.',
+                    'Παραλαβή, Αποστείρωση και Παράδοση αποτελούν βασικά σημεία chain of custody και παραμένουν ενεργά. Τα ενδιάμεσα quality gates προσαρμόζονται ανά νοσοκομείο.',
+                    'Receipt, Sterilization and Delivery are protected chain-of-custody milestones. Intermediate quality gates can be configured per hospital.',
                   )}
                 </span>
               </div>
-            </header>
-            <div className="studio-release-policy-grid">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={libs.sterilizationWorkflow.receiptPolicy?.countSetsAtReceipt ?? false}
-                  onChange={e =>
-                    libs.updateSterilizationWorkflow({
-                      receiptPolicy: {
-                        ...(libs.sterilizationWorkflow.receiptPolicy || {
-                          countSetsAtReceipt: false,
-                          allowCrossDepartmentHandover: true,
-                        }),
-                        countSetsAtReceipt: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                <span>
-                  <b>{L('Καταμέτρηση Σετ κατά την παραλαβή', 'Count sets at receipt')}</b>
-                  <small>
+            </section>
+            <section className="studio-release-policy">
+              <header>
+                <ShieldCheck size={18} />
+                <div>
+                  <strong>{L('Πολιτική παραλαβής', 'Receipt policy')}</strong>
+                  <span>
                     {L(
-                      'Εμφανίζει μόνο αναμενόμενα / παραληφθέντα τεμάχια. Δεν αντικαθιστά τον Έλεγχο & Σύνθεση.',
-                      'Shows expected / received quantity only. It does not replace Inspection & Assembly.',
+                      'Η βασική παραλαβή παραμένει γρήγορη. Η καταμέτρηση Σετ ενεργοποιείται μόνο αν απαιτείται από την πολιτική της μονάδας.',
+                      'Keep routine receipt fast. Set counting is enabled only when required by facility policy.',
                     )}
-                  </small>
-                </span>
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={libs.sterilizationWorkflow.receiptPolicy?.allowCrossDepartmentHandover ?? true}
-                  onChange={e =>
-                    libs.updateSterilizationWorkflow({
-                      receiptPolicy: {
-                        ...(libs.sterilizationWorkflow.receiptPolicy || {
-                          countSetsAtReceipt: false,
-                          allowCrossDepartmentHandover: true,
-                        }),
-                        allowCrossDepartmentHandover: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                <span>
-                  <b>{L('Ελεγχόμενη παραλαβή από άλλο τμήμα', 'Controlled cross-department handover')}</b>
-                  <small>
-                    {L(
-                      'Επιτρέπεται μόνο με προειδοποίηση και υποχρεωτική αιτιολόγηση.',
-                      'Allowed only with warning and mandatory justification.',
-                    )}
-                  </small>
-                </span>
-              </label>
-            </div>
-          </section>
-          <section className="studio-release-policy">
-            <header>
-              <ShieldCheck size={18} />
-              <div>
-                <strong>{L('Πολιτική αποδέσμευσης φορτίου', 'Load release policy')}</strong>
-                <span>
-                  {L(
-                    'Κεντρικοί κανόνες CI/BI που εφαρμόζονται σε κάθε φορτίο του νοσοκομείου.',
-                    'Central CI/BI rules applied to every load in this facility.',
-                  )}
-                </span>
-              </div>
-            </header>
-            <div className="studio-release-policy-grid">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={libs.sterilizationWorkflow.releasePolicy?.requireChemicalIndicator ?? true}
-                  onChange={e =>
-                    libs.updateSterilizationWorkflow({
-                      releasePolicy: {
-                        ...(libs.sterilizationWorkflow.releasePolicy || {
-                          requireChemicalIndicator: true,
-                          biologicalIndicator: 'OPTIONAL',
-                          allowReleaseWhileBiPending: false,
-                        }),
-                        requireChemicalIndicator: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                <span>
-                  <b>{L('Υποχρεωτικός χημικός δείκτης', 'Chemical indicator required')}</b>
-                  <small>
-                    {L(
-                      'Η αποδέσμευση μπλοκάρει αν ο CI δεν είναι αποδεκτός.',
-                      'Release is blocked unless CI is acceptable.',
-                    )}
-                  </small>
-                </span>
-              </label>
-              <label>
-                <span>
-                  <b>{L('Βιολογικός δείκτης (BI)', 'Biological indicator (BI)')}</b>
-                  <small>
-                    {L(
-                      'Ορίζεται σύμφωνα με την πολιτική του νοσοκομείου και τον τύπο κύκλου.',
-                      'Defined by facility policy and cycle type.',
-                    )}
-                  </small>
-                </span>
-                <select
-                  value={libs.sterilizationWorkflow.releasePolicy?.biologicalIndicator || 'OPTIONAL'}
-                  onChange={e =>
-                    libs.updateSterilizationWorkflow({
-                      releasePolicy: {
-                        ...(libs.sterilizationWorkflow.releasePolicy || {
-                          requireChemicalIndicator: true,
-                          biologicalIndicator: 'OPTIONAL',
-                          allowReleaseWhileBiPending: false,
-                        }),
-                        biologicalIndicator: e.target.value as 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED',
-                      },
-                    })
-                  }
-                >
-                  <option value="OPTIONAL">{L('Κατά περίπτωση', 'As required')}</option>
-                  <option value="REQUIRED">{L('Υποχρεωτικός', 'Required')}</option>
-                  <option value="NOT_REQUIRED">{L('Δεν χρησιμοποιείται ως release gate', 'Not a release gate')}</option>
-                </select>
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={libs.sterilizationWorkflow.releasePolicy?.allowReleaseWhileBiPending ?? false}
-                  disabled={
-                    (libs.sterilizationWorkflow.releasePolicy?.biologicalIndicator || 'OPTIONAL') === 'NOT_REQUIRED'
-                  }
-                  onChange={e =>
-                    libs.updateSterilizationWorkflow({
-                      releasePolicy: {
-                        ...(libs.sterilizationWorkflow.releasePolicy || {
-                          requireChemicalIndicator: true,
-                          biologicalIndicator: 'OPTIONAL',
-                          allowReleaseWhileBiPending: false,
-                        }),
-                        allowReleaseWhileBiPending: e.target.checked,
-                      },
-                    })
-                  }
-                />
-                <span>
-                  <b>{L('Επιτρέπεται αποδέσμευση με BI σε αναμονή', 'Allow release while BI is pending')}</b>
-                  <small>
-                    {L(
-                      'Να ενεργοποιείται μόνο αν προβλέπεται από την εγκεκριμένη πολιτική της μονάδας.',
-                      'Enable only when permitted by the facility approved policy.',
-                    )}
-                  </small>
-                </span>
-              </label>
-            </div>
-          </section>
-          <div className="studio-workflow-list">
-            {libs.sterilizationWorkflow.stages.map((stage, index) => (
-              <section key={stage.id} className={`studio-workflow-stage ${stage.enabled ? 'enabled' : 'disabled'}`}>
-                <div className="workflow-stage-index">{String(index + 1).padStart(2, '0')}</div>
-                <div className="workflow-stage-main">
-                  <div>
-                    <strong>{L(stage.labelEl, stage.labelEn)}</strong>
-                    {stage.locked && <span className="workflow-core-chip">CORE</span>}
-                  </div>
-                  <p>{L(stage.descriptionEl, stage.descriptionEn)}</p>
-                  <div className="workflow-check-preview">
-                    {(lang === 'el' ? stage.checksEl : stage.checksEn).map(check => (
-                      <span key={check}>
-                        <CheckCircle2 size={14} />
-                        {check}
-                      </span>
-                    ))}
-                  </div>
+                  </span>
                 </div>
-                <label className={`workflow-stage-toggle ${stage.locked ? 'locked' : ''}`}>
+              </header>
+              <div className="studio-release-policy-grid">
+                <label>
                   <input
                     type="checkbox"
-                    checked={stage.enabled}
-                    disabled={stage.locked}
-                    onChange={e => libs.setWorkflowStageEnabled(stage.id, e.target.checked, currentUser.name)}
+                    checked={libs.sterilizationWorkflow.receiptPolicy?.countSetsAtReceipt ?? false}
+                    onChange={e =>
+                      libs.updateSterilizationWorkflow({
+                        receiptPolicy: {
+                          ...(libs.sterilizationWorkflow.receiptPolicy || {
+                            countSetsAtReceipt: false,
+                            allowCrossDepartmentHandover: true,
+                          }),
+                          countSetsAtReceipt: e.target.checked,
+                        },
+                      })
+                    }
                   />
-                  <span></span>
-                  <b>{stage.enabled ? L('Ενεργό', 'Active') : L('Παράκαμψη', 'Skipped')}</b>
+                  <span>
+                    <b>{L('Καταμέτρηση Σετ κατά την παραλαβή', 'Count sets at receipt')}</b>
+                    <small>
+                      {L(
+                        'Εμφανίζει μόνο αναμενόμενα / παραληφθέντα τεμάχια. Δεν αντικαθιστά τον Έλεγχο & Σύνθεση.',
+                        'Shows expected / received quantity only. It does not replace Inspection & Assembly.',
+                      )}
+                    </small>
+                  </span>
                 </label>
-              </section>
-            ))}
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={libs.sterilizationWorkflow.receiptPolicy?.allowCrossDepartmentHandover ?? true}
+                    onChange={e =>
+                      libs.updateSterilizationWorkflow({
+                        receiptPolicy: {
+                          ...(libs.sterilizationWorkflow.receiptPolicy || {
+                            countSetsAtReceipt: false,
+                            allowCrossDepartmentHandover: true,
+                          }),
+                          allowCrossDepartmentHandover: e.target.checked,
+                        },
+                      })
+                    }
+                  />
+                  <span>
+                    <b>{L('Ελεγχόμενη παραλαβή από άλλο τμήμα', 'Controlled cross-department handover')}</b>
+                    <small>
+                      {L(
+                        'Επιτρέπεται μόνο με προειδοποίηση και υποχρεωτική αιτιολόγηση.',
+                        'Allowed only with warning and mandatory justification.',
+                      )}
+                    </small>
+                  </span>
+                </label>
+              </div>
+            </section>
+            <section className="studio-release-policy">
+              <header>
+                <ShieldCheck size={18} />
+                <div>
+                  <strong>{L('Πολιτική αποδέσμευσης φορτίου', 'Load release policy')}</strong>
+                  <span>
+                    {L(
+                      'Κεντρικοί κανόνες CI/BI που εφαρμόζονται σε κάθε φορτίο του νοσοκομείου.',
+                      'Central CI/BI rules applied to every load in this facility.',
+                    )}
+                  </span>
+                </div>
+              </header>
+              <div className="studio-release-policy-grid">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={libs.sterilizationWorkflow.releasePolicy?.requireChemicalIndicator ?? true}
+                    onChange={e =>
+                      libs.updateSterilizationWorkflow({
+                        releasePolicy: {
+                          ...(libs.sterilizationWorkflow.releasePolicy || {
+                            requireChemicalIndicator: true,
+                            biologicalIndicator: 'OPTIONAL',
+                            allowReleaseWhileBiPending: false,
+                          }),
+                          requireChemicalIndicator: e.target.checked,
+                        },
+                      })
+                    }
+                  />
+                  <span>
+                    <b>{L('Υποχρεωτικός χημικός δείκτης', 'Chemical indicator required')}</b>
+                    <small>
+                      {L(
+                        'Η αποδέσμευση μπλοκάρει αν ο CI δεν είναι αποδεκτός.',
+                        'Release is blocked unless CI is acceptable.',
+                      )}
+                    </small>
+                  </span>
+                </label>
+                <label>
+                  <span>
+                    <b>{L('Βιολογικός δείκτης (BI)', 'Biological indicator (BI)')}</b>
+                    <small>
+                      {L(
+                        'Ορίζεται σύμφωνα με την πολιτική του νοσοκομείου και τον τύπο κύκλου.',
+                        'Defined by facility policy and cycle type.',
+                      )}
+                    </small>
+                  </span>
+                  <select
+                    value={libs.sterilizationWorkflow.releasePolicy?.biologicalIndicator || 'OPTIONAL'}
+                    onChange={e =>
+                      libs.updateSterilizationWorkflow({
+                        releasePolicy: {
+                          ...(libs.sterilizationWorkflow.releasePolicy || {
+                            requireChemicalIndicator: true,
+                            biologicalIndicator: 'OPTIONAL',
+                            allowReleaseWhileBiPending: false,
+                          }),
+                          biologicalIndicator: e.target.value as 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED',
+                        },
+                      })
+                    }
+                  >
+                    <option value="OPTIONAL">{L('Κατά περίπτωση', 'As required')}</option>
+                    <option value="REQUIRED">{L('Υποχρεωτικός', 'Required')}</option>
+                    <option value="NOT_REQUIRED">
+                      {L('Δεν χρησιμοποιείται ως release gate', 'Not a release gate')}
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={libs.sterilizationWorkflow.releasePolicy?.allowReleaseWhileBiPending ?? false}
+                    disabled={
+                      (libs.sterilizationWorkflow.releasePolicy?.biologicalIndicator || 'OPTIONAL') === 'NOT_REQUIRED'
+                    }
+                    onChange={e =>
+                      libs.updateSterilizationWorkflow({
+                        releasePolicy: {
+                          ...(libs.sterilizationWorkflow.releasePolicy || {
+                            requireChemicalIndicator: true,
+                            biologicalIndicator: 'OPTIONAL',
+                            allowReleaseWhileBiPending: false,
+                          }),
+                          allowReleaseWhileBiPending: e.target.checked,
+                        },
+                      })
+                    }
+                  />
+                  <span>
+                    <b>{L('Επιτρέπεται αποδέσμευση με BI σε αναμονή', 'Allow release while BI is pending')}</b>
+                    <small>
+                      {L(
+                        'Να ενεργοποιείται μόνο αν προβλέπεται από την εγκεκριμένη πολιτική της μονάδας.',
+                        'Enable only when permitted by the facility approved policy.',
+                      )}
+                    </small>
+                  </span>
+                </label>
+              </div>
+            </section>
+          </div>
+          <div className="studio-workflow-main">
+            <div className="studio-workflow-list">
+              {libs.sterilizationWorkflow.stages.map((stage, index) => (
+                <section key={stage.id} className={`studio-workflow-stage ${stage.enabled ? 'enabled' : 'disabled'}`}>
+                  <div className="workflow-stage-index">{String(index + 1).padStart(2, '0')}</div>
+                  <div className="workflow-stage-main">
+                    <div>
+                      <strong>{L(stage.labelEl, stage.labelEn)}</strong>
+                      {stage.locked && <span className="workflow-core-chip">CORE</span>}
+                    </div>
+                    <p>{L(stage.descriptionEl, stage.descriptionEn)}</p>
+                    <div className="workflow-check-preview">
+                      {(lang === 'el' ? stage.checksEl : stage.checksEn).map(check => (
+                        <span key={check}>
+                          <CheckCircle2 size={14} />
+                          {check}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <label className={`workflow-stage-toggle ${stage.locked ? 'locked' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={stage.enabled}
+                      disabled={stage.locked}
+                      onChange={e => libs.setWorkflowStageEnabled(stage.id, e.target.checked, currentUser.name)}
+                    />
+                    <span></span>
+                    <b>{stage.enabled ? L('Ενεργό', 'Active') : L('Παράκαμψη', 'Skipped')}</b>
+                  </label>
+                </section>
+              ))}
+            </div>
           </div>
           <details className="released-loads">
             <summary>

@@ -7215,8 +7215,8 @@ html body .asset-workbench-sidebar .asset-cover {
   min-height: 0;
   height: 96px;
 }
-/* Overview as one screen: six cards in a 3x2 grid that fills the height; long lists scroll inside their card. */
-@media (min-width: 1100px) {
+/* Overview as one screen: six cards in a 3x2 grid that fills the height (only on screens tall enough for it). */
+@media (min-width: 1100px) and (min-height: 840px) {
   html body .hospital-overview.dash {
     display: flex;
     flex-direction: column;
@@ -7243,16 +7243,102 @@ html body .asset-workbench-sidebar .asset-cover {
   html body .dash-card > * {
     flex: 0 0 auto;
   }
-  html body .dash-card .dash-depts-list,
+  html body .dash-card .dash-depts-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
   html body .dash-card .dash-list,
   html body .dash-card .dash-bars,
   html body .dash-card .dash-legend {
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
   }
   html body .dash-card .dash-columns {
     flex: 1 1 auto;
     min-height: 60px;
+  }
+}
+/* Studio > Workflow on one screen: policies on the left, the stage list scrolls on the right. */
+@media (min-width: 1100px) {
+  html body .studio-body-workflow .studio-workflow-page {
+    display: grid !important;
+    grid-template-columns: 400px minmax(0, 1fr);
+    grid-template-rows: auto minmax(220px, 1fr) auto auto;
+    gap: 10px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+  html body .studio-body-workflow .studio-workflow-hero,
+  html body .studio-body-workflow .released-loads,
+  html body .studio-body-workflow .studio-workflow-footer {
+    grid-column: 1 / -1;
+  }
+  html body .studio-body-workflow .studio-workflow-side,
+  html body .studio-body-workflow .studio-workflow-main {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html body .studio-body-workflow .studio-workflow-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  html body .studio-body-workflow .studio-workflow-side > * {
+    flex: 0 0 auto;
+  }
+  html body .studio-body-workflow .studio-workflow-list {
+    overflow: visible !important;
+  }
+  /* Policy options: the title is enough here; the explanation stays in the tooltip-sized second line. */
+  html body .studio-body-workflow .studio-release-policy-grid {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  html body .studio-body-workflow .studio-release-policy-grid small {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-release-policy > header span {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-workflow-hero p {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-workflow-policy span {
+    display: none;
+  }
+}
+@media (min-width: 1100px) {
+  html body .studio-body-workflow .studio-release-policy-grid > label {
+    padding: 7px 10px !important;
+    min-height: 0 !important;
+    gap: 8px !important;
+  }
+  html body .studio-body-workflow .studio-release-policy {
+    padding: 8px 12px !important;
+    gap: 6px !important;
+  }
+  html body .studio-body-workflow .studio-workflow-policy {
+    padding: 7px 12px !important;
+  }
+  html body .studio-body-workflow .studio-release-policy-grid select {
+    min-width: 0;
+    max-width: 130px;
+    padding: 3px 6px;
+  }
+  html body .studio-body-workflow .studio-workflow-stage {
+    padding: 8px 12px !important;
+  }
+}
+/* Shorter screens: same 3-column cards at natural height, one page scroll and no scrollbars inside the cards. */
+@media (min-width: 1100px) and (max-height: 839px) {
+  html body .hospital-overview.dash > .dash-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  html body .dash-grid > .dash-card {
+    grid-column: auto;
   }
 }
