@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {allocateStock, orderLines, replacementItems} from '../replacements';
+import {addOrderLine, allocateStock, orderLineFromTool, orderLines, replacementItems, toolKinds} from '../replacements';
 import type {Issue, Movement, PurchaseOrder, SetAsset, Tool} from '../../types/domain';
 
 const tool = (id: string, patch: Partial<Tool> = {}): Tool => ({
@@ -97,5 +97,39 @@ describe('allocateStock and orderLines', () => {
         barcodes: ['T1', 'T2'],
       },
     ]);
+  });
+});
+
+describe('ordering from anywhere', () => {
+  it('turns any instrument into an order line, even one that needs no replacement', () => {
+    const t = tool('1', {state: 'IN_STOCK', mode: 'STOCK', manufacturer: 'Aesculap'});
+    expect(orderLineFromTool(t, 'Έλλειψη')).toEqual({
+      code: 'BH110R',
+      name: 'ΛΑΒΙΔΑ KOCHER',
+      manufacturer: 'Aesculap',
+      quantity: 1,
+      reason: 'Έλλειψη',
+      toolIds: ['1'],
+      barcodes: ['T1'],
+    });
+  });
+
+  it('adds the same kind to its line and a new kind as a new line', () => {
+    const a = orderLineFromTool(tool('1'), 'Βλάβη');
+    const b = orderLineFromTool(tool('2'), 'Απώλεια');
+    const c = {code: '', name: 'ΝΕΟ ΕΡΓΑΛΕΙΟ', quantity: 3, toolIds: [], barcodes: []};
+    const lines = addOrderLine(addOrderLine(addOrderLine([], a), b), c);
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatchObject({
+      quantity: 2,
+      reason: 'Βλάβη, Απώλεια',
+      toolIds: ['1', '2'],
+      barcodes: ['T1', 'T2'],
+    });
+    expect(lines[1].quantity).toBe(3);
+  });
+
+  it('lists each kind once', () => {
+    expect(toolKinds([tool('1'), tool('2'), tool('3', {code: 'X', name: 'ΑΛΛΟ'})]).map(t => t.id)).toEqual(['3', '1']);
   });
 });

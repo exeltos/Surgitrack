@@ -1,5 +1,6 @@
 import type {PurchaseOrderLine, PurchaseOrderStatus, Tool} from '../../types/domain';
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
+import {kindKey} from '../../core/replacements';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -160,7 +161,7 @@ export function usePurchaseActions(
       .reduce((m, barcode) => Math.max(m, Number(barcode.replace(/\D/g, '')) || 0), 0);
     const stamp = Date.now();
     const created: Tool[] = order.lines.flatMap((line, lineIndex) => {
-      const model = tools.find(t => line.toolIds.includes(t.id));
+      const model = tools.find(t => line.toolIds.includes(t.id)) || tools.find(t => kindKey(t) === kindKey(line));
       return Array.from({length: line.quantity}, (_, i) => ({
         id: `tool-${stamp}-${lineIndex}-${i}`,
         barcode: `T${String(++max).padStart(6, '0')}`,

@@ -1,5 +1,5 @@
 import {nameKey} from './nameCheck';
-import type {Issue, Movement, PurchaseOrder, SetAsset, Tool} from '../types/domain';
+import type {Issue, Movement, PurchaseOrder, PurchaseOrderLine, SetAsset, Tool} from '../types/domain';
 
 /** Why an instrument is out of circulation (or about to be) and may need replacing. */
 export type ReplacementReason = 'SERVICE' | 'DAMAGED' | 'LOST' | 'RETIRED';
@@ -153,4 +153,40 @@ export function orderLines(items: readonly ReplacementItem[]) {
   return [...lines.values()]
     .map(({reasons, ...line}) => ({...line, reason: [...reasons].join(', ')}))
     .sort((a, b) => a.name.localeCompare(b.name, 'el'));
+}
+
+/** An order line for one instrument, wherever the order is started from (an issue, a Set, Stock). */
+export const orderLineFromTool = (tool: Tool, reason = ''): PurchaseOrderLine => ({
+  code: tool.code || '',
+  name: tool.name,
+  manufacturer: tool.manufacturer,
+  quantity: 1,
+  reason,
+  toolIds: [tool.id],
+  barcodes: [tool.barcode],
+});
+
+/** Adds a line to an order; the same kind (code, else name) joins the line already there. */
+export function addOrderLine(lines: readonly PurchaseOrderLine[], line: PurchaseOrderLine): PurchaseOrderLine[] {
+  const key = kindKey(line);
+  const at = lines.findIndex(l => kindKey(l) === key);
+  if (at < 0) return [...lines, line];
+  return lines.map((l, i) =>
+    i === at
+      ? {
+          ...l,
+          quantity: l.quantity + line.quantity,
+          reason: [...new Set([l.reason, line.reason].filter(Boolean))].join(', '),
+          toolIds: [...new Set([...l.toolIds, ...line.toolIds])],
+          barcodes: [...new Set([...l.barcodes, ...line.barcodes])],
+        }
+      : l,
+  );
+}
+
+/** The instrument kinds the hospital already knows (one per code, else name), for choosing what to order. */
+export function toolKinds(tools: readonly Tool[]) {
+  const kinds = new Map<string, Tool>();
+  for (const tool of tools) if (!kinds.has(kindKey(tool))) kinds.set(kindKey(tool), tool);
+  return [...kinds.values()].sort((a, b) => a.name.localeCompare(b.name, 'el'));
 }

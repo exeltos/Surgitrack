@@ -41,4 +41,23 @@ describe('purchase orders', () => {
     act(() => result.current.receivePurchaseOrder(order.id));
     expect(result.current.tools.filter(t => t.state === 'IN_STOCK').length).toBe(stockBefore + 3);
   });
+
+  it("receives a free-typed line of a known kind with that kind's details", () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const known = result.current.tools.find(t => t.code && t.specialty)!;
+    act(() => {
+      result.current.createPurchaseOrder([
+        {code: known.code, name: known.name, quantity: 2, toolIds: [], barcodes: []},
+        {code: '', name: 'ΕΛΕΥΘΕΡΟ ΕΙΔΟΣ', quantity: 1, toolIds: [], barcodes: []},
+      ]);
+    });
+    const order = result.current.purchaseOrders[0];
+    act(() => result.current.receivePurchaseOrder(order.id));
+    const made = result.current.tools.filter(t =>
+      result.current.purchaseOrders[0].receivedBarcodes?.includes(t.barcode),
+    );
+    expect(made).toHaveLength(3);
+    expect(made.filter(t => t.name === known.name).every(t => t.specialty === known.specialty)).toBe(true);
+    expect(made.find(t => t.name === 'ΕΛΕΥΘΕΡΟ ΕΙΔΟΣ')?.state).toBe('IN_STOCK');
+  });
 });

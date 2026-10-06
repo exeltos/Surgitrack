@@ -535,6 +535,32 @@
 .issues-registry-table th:nth-child(5) {
   min-width: 260px;
 }
+.issues-registry-table .issue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 150px;
+}
+.issue-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #d5e2e7;
+  border-radius: 8px;
+  background: #fff;
+  color: #155a6e;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.issue-action:hover {
+  border-color: #155a6e;
+  background: #f1f8fa;
+}
 
 @media (max-width: 760px) {
   .photo-section-head,
