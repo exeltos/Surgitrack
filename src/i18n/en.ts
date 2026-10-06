@@ -937,7 +937,6 @@ export const en: Record<string, string> = {
   'Προς συσκευασία / σήμανση': 'To packaging / labelling',
   'Προς τμήμα': 'To department',
   'Προς όλα τα τμήματα': 'To all departments',
-  Προσθήκη: 'Add',
   'Προσθήκη εργαλείου στη σύνθεση Set': 'Instrument added to set composition',
   'Προσθήκη εργαλείων': 'Add instruments',
   'Προσθήκη εργαλείων στο Σετ': 'Add instruments to set',
