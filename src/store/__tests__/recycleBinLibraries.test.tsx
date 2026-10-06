@@ -9,7 +9,7 @@ const wrapper = ({children}: {children: ReactNode}) => (
     <SurgiProvider dataMode="DEMO">{children}</SurgiProvider>
   </LibraryStoreProvider>
 );
-const both = () => ({surgi: useSurgi(), libs: useLibraries()});
+const useBoth = () => ({surgi: useSurgi(), libs: useLibraries()});
 
 describe('recycle bin: libraries', () => {
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('recycle bin: libraries', () => {
   });
 
   it('keeps a deleted library record in the bin, and putting it back does not duplicate it', () => {
-    const {result} = renderHook(both, {wrapper});
+    const {result} = renderHook(useBoth, {wrapper});
     const item = result.current.libs.suppliers[0];
     const count = result.current.libs.suppliers.length;
     act(() => result.current.libs.removeItem('suppliers', item.id));
@@ -35,7 +35,7 @@ describe('recycle bin: libraries', () => {
   });
 
   it('keeps only hospital-made colour tapes (catalogue ones are hidden, not deleted)', () => {
-    const {result} = renderHook(both, {wrapper});
+    const {result} = renderHook(useBoth, {wrapper});
     act(() => result.current.libs.addColorTape({el: 'ΔΟΚΙΜΗ', en: 'Test', colors: ['#112233'], group: 'SOLID'}));
     const tape = result.current.libs.colorTapes.find(t => t.custom)!;
     const catalogue = result.current.libs.colorTapes.find(t => !t.custom)!;
