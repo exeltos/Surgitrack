@@ -1,6 +1,6 @@
-import {ClipboardList, Images, PackageX} from 'lucide-react';
-import {useSearchParams} from 'react-router-dom';
-import {lazy, Suspense, useMemo} from 'react';
+import {CheckCircle2, ClipboardList, ExternalLink, Images, PackageX, ShoppingCart} from 'lucide-react';
+import {Link, useSearchParams} from 'react-router-dom';
+import {lazy, Suspense, useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
@@ -8,12 +8,27 @@ import PageHeader from '../../components/ui/PageHeader';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import Spinner from '../../components/ui/Spinner';
-import {replacementItems} from '../../core/replacements';
+import {orderLineFromTool, replacementItems} from '../../core/replacements';
+import type {Issue, PurchaseOrderLine} from '../../types/domain';
+import OrderDialog from '../replacements/OrderDialog';
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 
 export default function IssuesPage() {
-  const {issues, role, currentUser, can, tools, retiredTools, sets, movements, purchaseOrders} = useSurgi();
+  const {
+    issues,
+    role,
+    currentUser,
+    can,
+    tools,
+    retiredTools,
+    sets,
+    movements,
+    purchaseOrders,
+    resolveIssues,
+    createPurchaseOrder,
+  } = useSurgi();
+  const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
   // Sterilization and admins also see the instruments to replace, as a second tab.
   const withReplacements = can('stock.manage');
   const [params, setParams] = useSearchParams();
@@ -42,6 +57,14 @@ export default function IssuesPage() {
       (!status || i.status === status) &&
       `${i.asset} ${i.type} ${i.department} ${i.note}`.toLowerCase().includes(q.toLowerCase()),
   );
+  /** What an issue is about: the instrument or Set named by its barcode, to open it or order it. */
+  const subject = (issue: Issue) => {
+    const barcode = issue.asset.split(' ')[0];
+    const tool = [...tools, ...retiredTools].find(t => t.barcode === barcode);
+    const set = tool ? undefined : sets.find(s => s.barcode === barcode);
+    return {tool, set, to: tool ? `/tools/${tool.id}` : set ? `/sets/${set.id}` : undefined};
+  };
+  const goToOrders = () => setParams({tab: 'replacements', view: 'orders'}, {replace: true});
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -128,6 +151,11 @@ export default function IssuesPage() {
                   <th>{tr('Σημείωση')}</th>
                   <th>{tr('Φωτογραφίες')}</th>
                   <th>{tr('Κατάσταση')}</th>
+                  {withReplacements && (
+                    <th>
+                      <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -159,12 +187,57 @@ export default function IssuesPage() {
                         {i.status === 'OPEN' ? tr('Ανοικτή') : tr('Επιλυμένη')}
                       </span>
                     </td>
+                    {withReplacements && (
+                      <td className="issue-actions">
+                        {subject(i).to && (
+                          <Link className="issue-action" to={subject(i).to!}>
+                            <ExternalLink size={13} /> {tr('Άνοιγμα')}
+                          </Link>
+                        )}
+                        {subject(i).tool && (
+                          <button
+                            type="button"
+                            className="issue-action"
+                            onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
+                          >
+                            <ShoppingCart size={13} /> {tr('Παραγγελία')}
+                          </button>
+                        )}
+                        {i.status === 'OPEN' && (
+                          <button
+                            type="button"
+                            className="issue-action"
+                            onClick={() => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα'))}
+                          >
+                            <CheckCircle2 size={13} /> {tr('Επίλυση')}
+                          </button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
+                {!filtered.length && (
+                  <tr>
+                    <td colSpan={withReplacements ? 8 : 7} className="empty">
+                      {tr('Καμία εκκρεμότητα δεν ταιριάζει στα φίλτρα.')}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </ScrollableListPanel>
         </>
+      )}
+      {ordering && (
+        <OrderDialog
+          initialLines={ordering}
+          onClose={() => setOrdering(null)}
+          onSave={(lines, details) => {
+            const number = createPurchaseOrder(lines, details);
+            setOrdering(null);
+            if (number) goToOrders();
+          }}
+        />
       )}
     </div>
   );

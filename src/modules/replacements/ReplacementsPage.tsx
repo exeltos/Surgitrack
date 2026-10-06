@@ -1,10 +1,11 @@
 import {useMemo, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {
   CheckCircle2,
   ClipboardList,
   FileSpreadsheet,
   PackageCheck,
+  Plus,
   Printer,
   RefreshCcw,
   Search,
@@ -17,7 +18,6 @@ import AppButton from '../../components/ui/AppButton';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {useSurgi} from '../../store/SurgiStore';
-import {useLibraries} from '../../core/LibraryStore';
 import {downloadXlsx} from '../../core/exportTable';
 import {
   REASON_LABEL,
@@ -28,6 +28,8 @@ import {
   type ReplacementReason,
 } from '../../core/replacements';
 import type {PurchaseOrder, PurchaseOrderLine} from '../../types/domain';
+import OrderDialog from './OrderDialog';
+import {pieces} from './pieces';
 import {orderStatusLabel, purchaseOrderHtml, replacementListHtml} from './replacementPrint';
 import {tr, trData} from '../../i18n';
 
@@ -46,14 +48,15 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
     () => replacementItems({tools, retiredTools, sets, issues, movements, purchaseOrders}),
     [tools, retiredTools, sets, issues, movements, purchaseOrders],
   );
-  const [tab, setTab] = useState<Tab>('ITEMS');
+  const [params] = useSearchParams();
+  const [tab, setTab] = useState<Tab>(params.get('view') === 'orders' ? 'ORDERS' : 'ITEMS');
   const [query, setQuery] = useState('');
   const [reason, setReason] = useState('');
   const [department, setDepartment] = useState('');
   const [stock, setStock] = useState('');
   const [status, setStatus] = useState<StatusFilter>('NEEDED');
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [ordering, setOrdering] = useState<ReplacementItem[] | null>(null);
+  const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
   const [preview, setPreview] = useState<{title: string; html: string} | null>(null);
 
   const departments = useMemo(
@@ -270,6 +273,11 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
             </label>
             <FilterMenu filters={filters} />
             <span className="replacements-spacer" />
+            {editable && (
+              <AppButton icon={<Plus size={15} />} onClick={() => setOrdering([])}>
+                {tr('Νέα παραγγελία')}
+              </AppButton>
+            )}
             <AppButton icon={<FileSpreadsheet size={15} />} onClick={exportExcel}>
               {tr('Excel')}
             </AppButton>
@@ -290,7 +298,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
               </AppButton>
               <AppButton
                 icon={<ShoppingCart size={15} />}
-                onClick={() => setOrdering(picked.filter(item => item.status !== 'REPLACED'))}
+                onClick={() => setOrdering(orderLines(picked.filter(item => item.status !== 'REPLACED')))}
               >
                 {tr('Παραγγελία αγοράς')}
               </AppButton>
@@ -378,15 +386,16 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                       </td>
                       {editable && (
                         <td className="row-actions">
-                          {canReplace ? (
+                          {canReplace && (
                             <button type="button" className="primary" onClick={() => replace([item])}>
                               <PackageCheck size={13} /> {tr('Αντικατάσταση')}
                             </button>
-                          ) : item.status === 'NEEDED' ? (
-                            <button type="button" onClick={() => setOrdering([item])}>
+                          )}
+                          {item.status === 'NEEDED' && (
+                            <button type="button" onClick={() => setOrdering(orderLines([item]))}>
                               <ShoppingCart size={13} /> {tr('Παραγγελία')}
                             </button>
-                          ) : null}
+                          )}
                           {item.reason === 'SERVICE' && item.status !== 'REPLACED' && (
                             <button
                               type="button"
@@ -420,6 +429,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
           editable={editable}
           onStatus={store.setPurchaseOrderStatus}
           onReceive={store.receivePurchaseOrder}
+          onNew={() => setOrdering([])}
           onPrint={order =>
             setPreview({title: tr('Παραγγελία {0}', order.number), html: purchaseOrderHtml(order, organizationName)})
           }
@@ -428,7 +438,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
 
       {ordering && (
         <OrderDialog
-          items={ordering}
+          initialLines={ordering}
           onClose={() => setOrdering(null)}
           onSave={(lines, details) => {
             const number = store.createPurchaseOrder(lines, details);
@@ -443,8 +453,6 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
   );
 }
 
-const pieces = (count: number) => (count === 1 ? tr('1 τεμάχιο') : tr('{0} τεμάχια', count));
-
 const statusText = (item: ReplacementItem) =>
   item.status === 'REPLACED'
     ? item.tool.replacedBy
@@ -454,130 +462,20 @@ const statusText = (item: ReplacementItem) =>
       ? tr('Σε παραγγελία {0}', item.order?.number || '')
       : tr('Χρειάζεται αντικατάσταση');
 
-/** The order being recorded: one line per instrument kind, quantities editable, supplier and note. */
-function OrderDialog({
-  items,
-  onClose,
-  onSave,
-}: {
-  items: ReplacementItem[];
-  onClose: () => void;
-  onSave: (lines: PurchaseOrderLine[], details: {supplier?: string; note?: string}) => void;
-}) {
-  const [lines, setLines] = useState<PurchaseOrderLine[]>(() => orderLines(items));
-  // The Studio suppliers library, as suggestions; any other name can be typed.
-  const suppliers = useLibraries().suppliers.map(item => item.el);
-  const [supplier, setSupplier] = useState('');
-  const [note, setNote] = useState('');
-  const total = lines.reduce((sum, line) => sum + line.quantity, 0);
-  return (
-    <div className="modal-backdrop" onMouseDown={e => e.target === e.currentTarget && onClose()}>
-      <div className="replacements-order-modal" role="dialog" aria-label={tr('Νέα παραγγελία αγοράς')}>
-        <header>
-          <div>
-            <span className="eyebrow">{tr('ΠΑΡΑΓΓΕΛΙΑ ΑΓΟΡΑΣ')}</span>
-            <h2>{tr('Νέα παραγγελία αγοράς')}</h2>
-            <p>{tr('Μία γραμμή ανά είδος εργαλείου. Αλλάξτε την ποσότητα αν χρειάζεστε περισσότερα ή λιγότερα.')}</p>
-          </div>
-          <button type="button" className="modal-x" aria-label={tr('Κλείσιμο')} onClick={onClose}>
-            <X size={18} />
-          </button>
-        </header>
-        <div className="replacements-order-lines">
-          <table>
-            <thead>
-              <tr>
-                <th>{tr('Κωδικός')}</th>
-                <th>{tr('Εργαλείο')}</th>
-                <th>{tr('Αιτία')}</th>
-                <th>{tr('Αντικαθιστά')}</th>
-                <th>{tr('Ποσ.')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lines.map((line, index) => (
-                <tr key={`${line.code}-${line.name}`}>
-                  <td className="mono">{line.code || '—'}</td>
-                  <td>
-                    <strong>{line.name}</strong>
-                    <small>{line.manufacturer || ''}</small>
-                  </td>
-                  <td>{line.reason}</td>
-                  <td className="mono barcodes">{line.barcodes.join(', ')}</td>
-                  <td>
-                    <input
-                      type="number"
-                      min={0}
-                      max={999}
-                      value={line.quantity}
-                      aria-label={tr('Ποσότητα')}
-                      onChange={e =>
-                        setLines(current =>
-                          current.map((l, i) =>
-                            i === index ? {...l, quantity: Math.max(0, Math.min(999, Number(e.target.value) || 0))} : l,
-                          ),
-                        )
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="replacements-order-fields">
-          <label>
-            {tr('Προμηθευτής')}
-            <input
-              value={supplier}
-              onChange={e => setSupplier(e.target.value)}
-              placeholder={tr('Επιλέξτε ή γράψτε (προαιρετικό)')}
-              list="replacement-suppliers"
-            />
-            <datalist id="replacement-suppliers">
-              {suppliers.map(name => (
-                <option key={name} value={name} />
-              ))}
-            </datalist>
-          </label>
-          <label>
-            {tr('Σημείωση')}
-            <input
-              value={note}
-              onChange={e => setNote(e.target.value)}
-              placeholder={tr('Π.χ. επείγον, προϋπολογισμός…')}
-            />
-          </label>
-        </div>
-        <footer>
-          <span>{pieces(total)}</span>
-          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
-          <AppButton
-            variant="primary"
-            icon={<ShoppingCart size={15} />}
-            disabled={!total}
-            onClick={() => onSave(lines, {supplier, note})}
-          >
-            {tr('Καταχώρηση παραγγελίας')}
-          </AppButton>
-        </footer>
-      </div>
-    </div>
-  );
-}
-
 /** The purchase orders, newest first, with their status and print. */
 function Orders({
   orders,
   editable,
   onStatus,
   onReceive,
+  onNew,
   onPrint,
 }: {
   orders: PurchaseOrder[];
   editable: boolean;
   onStatus: (id: string, status: PurchaseOrder['status']) => void;
   onReceive: (id: string) => void;
+  onNew: () => void;
   onPrint: (order: PurchaseOrder) => void;
 }) {
   const [open, setOpen] = useState<string | null>(orders[0]?.id || null);
@@ -586,7 +484,12 @@ function Orders({
       <section className="replacements-card replacements-empty">
         <ClipboardList size={26} />
         <strong>{tr('Δεν υπάρχουν παραγγελίες ακόμη.')}</strong>
-        <span>{tr('Επιλέξτε εργαλεία στην καρτέλα «Εργαλεία» και πατήστε «Παραγγελία αγοράς».')}</span>
+        <span>{tr('Ξεκινήστε μια παραγγελία από οποιοδήποτε εργαλείο ή από το κουμπί «Νέα παραγγελία».')}</span>
+        {editable && (
+          <AppButton variant="primary" icon={<Plus size={15} />} onClick={onNew}>
+            {tr('Νέα παραγγελία')}
+          </AppButton>
+        )}
       </section>
     );
   const active = orders.filter(o => o.status !== 'CANCELLED');
@@ -668,6 +571,13 @@ function Orders({
   };
   return (
     <section className="replacements-orders">
+      {editable && (
+        <div className="replacements-orders-bar">
+          <AppButton icon={<Plus size={15} />} onClick={onNew}>
+            {tr('Νέα παραγγελία')}
+          </AppButton>
+        </div>
+      )}
       {active.map(card)}
       {cancelled.length > 0 && (
         <details className="replacements-cancelled">
