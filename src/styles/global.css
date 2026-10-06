@@ -6506,7 +6506,7 @@ html body .studio-head .eyebrow {
 }
 /* Registry tables: the name column takes the free width and truncates; every other column stays on one line. */
 html body .asset-registry-table td:first-child {
-  width: 42%;
+  width: 55%;
   max-width: 0;
 }
 html body .asset-registry-table .row-title-link {
@@ -6614,4 +6614,83 @@ html body .devices-readings h2 {
 }
 html body .devices-readings header small {
   font-size: 12px;
+}
+/* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
+html body .tools-table td:nth-child(4) .row-sub {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .tools-table td:last-child,
+html body .tools-table th:last-child {
+  width: 36px;
+  padding-left: 0;
+  padding-right: 8px;
+}
+@media (max-width: 1299px) {
+  html body .tools-table th:nth-child(3),
+  html body .tools-table td:nth-child(3),
+  html body .tools-table th:nth-child(7),
+  html body .tools-table td:nth-child(7) {
+    display: none;
+  }
+}
+html body .tools-table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0 !important;
+}
+html body .tools-table th:first-child,
+html body .tools-table td:first-child {
+  width: auto;
+  max-width: none;
+}
+html body .tools-table th:not(:first-child),
+html body .tools-table td:not(:first-child) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .tools-table th:nth-child(2) {
+  width: 96px;
+}
+html body .tools-table th:nth-child(3) {
+  width: 170px;
+}
+html body .tools-table th:nth-child(4) {
+  width: 230px;
+}
+html body .tools-table th:nth-child(5) {
+  width: 96px;
+}
+html body .tools-table th:nth-child(6) {
+  width: 150px;
+}
+html body .tools-table th:nth-child(7) {
+  width: 40px;
+}
+@media (max-width: 1299px) {
+  html body .tools-table th:nth-child(4) {
+    width: 120px;
+  }
+  html body .tools-table th:nth-child(5) {
+    width: 100px;
+  }
+  html body .tools-table th:nth-child(6) {
+    width: 120px;
+  }
+}
+html body .tools-table .badge {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+@media (min-width: 1300px) {
+  html body .tools-table th:nth-child(6) {
+    width: 190px;
+  }
 }

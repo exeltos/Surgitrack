@@ -11,9 +11,11 @@ import EmailLinkPage from './modules/auth/EmailLinkPage';
 import {emailLink} from './modules/auth/emailLink';
 import './styles/global.css';
 import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
+import {installTabletViewport} from './core/tabletViewport';
 
 installChunkRecovery();
 installEscapeClosesDialogs();
+installTabletViewport();
 const root = document.getElementById('root');
 const runtimeDataMode = getRuntimeDataMode();
 if (!root) throw new Error('SurgiTrack: root element was not found.');

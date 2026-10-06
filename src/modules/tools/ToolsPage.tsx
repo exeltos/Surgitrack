@@ -182,14 +182,14 @@ export default function ToolsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table">
+          <table className="asset-registry-table tools-table">
             <thead>
               <tr>
                 <th>{tr('Ονομασία')}</th>
                 <th>Barcode</th>
                 <th>{tr('Ειδικότητα')}</th>
                 <th>{tr('Θέση')}</th>
-                <th>{tr('Υπόλοιπο χρήσεων')}</th>
+                <th>{tr('Χρήσεις')}</th>
                 <th>{tr('Κατάσταση')}</th>
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
@@ -261,7 +261,7 @@ export default function ToolsPage() {
                   </tr>
                 );
               })}
-              {rows.hasMore && <MoreRows colSpan={7} onVisible={rows.showMore} />}
+              {rows.hasMore && <MoreRows colSpan={5} onVisible={rows.showMore} />}
             </tbody>
           </table>
         )}
