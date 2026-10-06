@@ -21,7 +21,9 @@ const initial = {
     deleteUser: (_id: string): Result => ({error: null}),
     updateUserById: (_id: string, _attrs: unknown): Result => ({error: null}),
     generateLink: (_args: unknown): Result => ({data: {properties: {hashed_token: 'tok'}}, error: null}),
+    inviteUserByEmail: (_email: string, _options: unknown): Result => ({data: {user: {id: 'invited-user'}}, error: null}),
   },
+  resetPassword: (_email: string, _options: unknown): Result => ({error: null}),
   calls: [] as Array<{what: string; args: unknown[]}>,
   reset() {
     this.user = null;
@@ -32,7 +34,9 @@ const initial = {
       deleteUser: () => ({error: null}),
       updateUserById: () => ({error: null}),
       generateLink: () => ({data: {properties: {hashed_token: 'tok'}}, error: null}),
+      inviteUserByEmail: () => ({data: {user: {id: 'invited-user'}}, error: null}),
     };
+    this.resetPassword = () => ({error: null});
     this.calls = [];
   },
   /** Database calls so far, optionally only those of one operation. */
@@ -120,6 +124,14 @@ export const createClient = (_url: string, _key: string, options?: {global?: {he
         record('generateLink', args);
         return Promise.resolve(fake.admin.generateLink(args));
       },
+      inviteUserByEmail: (email: string, options: unknown) => {
+        record('inviteUserByEmail', email, options);
+        return Promise.resolve(fake.admin.inviteUserByEmail(email, options));
+      },
+    },
+    resetPasswordForEmail: (email: string, options: unknown) => {
+      record('resetPasswordForEmail', email, options);
+      return Promise.resolve(fake.resetPassword(email, options));
     },
   },
   _authorization: options?.global?.headers?.Authorization,
