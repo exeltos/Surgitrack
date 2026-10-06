@@ -31,7 +31,9 @@ const pick = (row: Raw, ...names: string[]) => {
 const text = (value: unknown) => (value === undefined ? null : String(value).trim().slice(0, 200));
 const number = (value: unknown) => {
   if (value === undefined) return null;
-  const n = Number(String(value).replace(",", ".").replace(/[^\d.+-]/g, ""));
+  // Text with no digits at all ("N/A") is unknown, not 0: Number("") is 0.
+  const digits = String(value).replace(",", ".").replace(/[^\d.+-]/g, "");
+  const n = digits ? Number(digits) : NaN;
   return Number.isFinite(n) ? n : null;
 };
 const time = (value: unknown) => {
