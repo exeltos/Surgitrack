@@ -1,3 +1,4 @@
+import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
@@ -154,88 +155,119 @@ export default function ToolsPage() {
         />
       </div>
       <ScrollableListPanel withKpis ariaLabel={tr('Λίστα εργαλείων')}>
-        <table className="asset-registry-table">
-          <thead>
-            <tr>
-              <th>{tr('Ονομασία')}</th>
-              <th>{tr('Κωδικός')}</th>
-              <th>Barcode</th>
-              <th>{tr('Εταιρεία')}</th>
-              <th>{tr('Ειδικότητα')}</th>
-              <th>{tr('Θέση')}</th>
-              <th>{tr('Υπόλοιπο χρήσεων')}</th>
-              <th>{tr('Κατάσταση')}</th>
-              <th>
-                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.visible.map(t => {
-              const set = t.setId ? setsById.get(t.setId) : undefined;
-              return (
-                <tr key={t.id}>
-                  <td>
-                    <div className="registry-asset-name">
-                      <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
-                      <span>
-                        <Link className="row-title-link" to={`/tools/${t.id}`}>
-                          {t.name}
-                        </Link>
-                        <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
-                        {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="cell-nowrap">{t.code}</td>
-                  <td>
-                    <Link className="mono strong-link" to={`/tools/${t.id}`}>
-                      {t.barcode}
-                    </Link>
-                  </td>
-                  <td>{t.manufacturer || '—'}</td>
-                  <td>{trData(t.specialty) || '—'}</td>
-                  <td>
-                    {t.mode === 'SET_MEMBER' && set ? (
-                      <>
-                        <b>{tr('Σετ')}</b>
-                        <small className="row-sub">
-                          {set.barcode} · {set.name}
-                        </small>
-                      </>
-                    ) : t.mode === 'STOCK' ? (
-                      <b>{tr('Απόθεμα')}</b>
-                    ) : (
-                      <>
-                        <b>{tr('Μεμονωμένο')}</b>
-                        <small className="row-sub">{trData(t.department) || '—'}</small>
-                      </>
-                    )}
-                  </td>
-                  <td className="cell-nowrap">
-                    {t.maxUses ? (
-                      <>
-                        <b>{Math.max(0, t.maxUses - t.uses)}</b>
-                        <span className="muted"> / {t.maxUses}</span>
-                      </>
-                    ) : (
-                      <span className="muted">{tr('Χωρίς όριο')}</span>
-                    )}
-                  </td>
-                  <td>
-                    <StatusBadge value={t.state} />
-                  </td>
-                  <td>
-                    <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
-                      <ChevronRight size={17} />
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-            {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
-          </tbody>
-        </table>
+        {filtered.length === 0 ? (
+          <ListEmpty
+            total={tools.length}
+            none={{
+              title: tr('Δεν υπάρχουν εργαλεία ακόμα'),
+              description: tr('Πρόσθεσε το πρώτο εργαλείο ή φόρτωσε όλο το μητρώο σου από ένα αρχείο Excel.'),
+              actions: can('asset.create') ? (
+                <>
+                  <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
+                    {tr('Νέο Εργαλείο')}
+                  </AppButton>
+                  {organizationId && (
+                    <AppButton icon={<FileSpreadsheet size={17} />} onClick={() => navigate('/import')}>
+                      {tr('Μαζική εισαγωγή')}
+                    </AppButton>
+                  )}
+                </>
+              ) : undefined,
+            }}
+            onClear={() => {
+              setQ('');
+              setDepartment('');
+              setSpecialty('');
+              setManufacturer('');
+              setState('');
+              setMode('');
+              setUsage('');
+            }}
+          />
+        ) : (
+          <table className="asset-registry-table">
+            <thead>
+              <tr>
+                <th>{tr('Ονομασία')}</th>
+                <th>{tr('Κωδικός')}</th>
+                <th>Barcode</th>
+                <th>{tr('Εταιρεία')}</th>
+                <th>{tr('Ειδικότητα')}</th>
+                <th>{tr('Θέση')}</th>
+                <th>{tr('Υπόλοιπο χρήσεων')}</th>
+                <th>{tr('Κατάσταση')}</th>
+                <th>
+                  <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.visible.map(t => {
+                const set = t.setId ? setsById.get(t.setId) : undefined;
+                return (
+                  <tr key={t.id}>
+                    <td>
+                      <div className="registry-asset-name">
+                        <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                        <span>
+                          <Link className="row-title-link" to={`/tools/${t.id}`}>
+                            {t.name}
+                          </Link>
+                          <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
+                          {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="cell-nowrap">{t.code}</td>
+                    <td>
+                      <Link className="mono strong-link" to={`/tools/${t.id}`}>
+                        {t.barcode}
+                      </Link>
+                    </td>
+                    <td>{t.manufacturer || '—'}</td>
+                    <td>{trData(t.specialty) || '—'}</td>
+                    <td>
+                      {t.mode === 'SET_MEMBER' && set ? (
+                        <>
+                          <b>{tr('Σετ')}</b>
+                          <small className="row-sub">
+                            {set.barcode} · {set.name}
+                          </small>
+                        </>
+                      ) : t.mode === 'STOCK' ? (
+                        <b>{tr('Απόθεμα')}</b>
+                      ) : (
+                        <>
+                          <b>{tr('Μεμονωμένο')}</b>
+                          <small className="row-sub">{trData(t.department) || '—'}</small>
+                        </>
+                      )}
+                    </td>
+                    <td className="cell-nowrap">
+                      {t.maxUses ? (
+                        <>
+                          <b>{Math.max(0, t.maxUses - t.uses)}</b>
+                          <span className="muted"> / {t.maxUses}</span>
+                        </>
+                      ) : (
+                        <span className="muted">{tr('Χωρίς όριο')}</span>
+                      )}
+                    </td>
+                    <td>
+                      <StatusBadge value={t.state} />
+                    </td>
+                    <td>
+                      <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
+                        <ChevronRight size={17} />
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+              {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
+            </tbody>
+          </table>
+        )}
       </ScrollableListPanel>
     </div>
   );

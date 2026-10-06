@@ -1,3 +1,4 @@
+import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronRight, Layers3, List, Plus} from 'lucide-react';
@@ -151,88 +152,106 @@ export default function StandaloneToolsPage() {
         />
       </div>
       <ScrollableListPanel withKpis ariaLabel={tr('Μεμονωμένα εργαλεία σε χρήση')}>
-        <table className="asset-registry-table">
-          <thead>
-            <tr>
-              <th>{tr('Ονομασία')}</th>
-              <th>{grouped ? tr('Ποσότητα') : tr('Κωδικός')}</th>
-              <th>Barcode</th>
-              <th>{tr('Εταιρεία')}</th>
-              <th>{tr('Τμήμα')}</th>
-              <th>{tr('Υπόλοιπο χρήσεων')}</th>
-              <th>{tr('Κατάσταση')}</th>
-              <th>
-                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {grouped
-              ? groupRows.visible.map(g => {
-                  const t = g[0];
-                  return (
-                    <tr key={`${t.code}-${t.name}`}>
+        {filtered.length === 0 ? (
+          <ListEmpty
+            total={standalone.length}
+            none={{
+              title: tr('Δεν υπάρχουν μεμονωμένα εργαλεία σε χρήση'),
+              description: tr('Τα εργαλεία που δίνονται σε τμήμα χωρίς Σετ εμφανίζονται εδώ.'),
+            }}
+            onClear={() => {
+              setQ('');
+              setDepartment('');
+              setSpecialty('');
+              setManufacturer('');
+              setState('');
+              setUsage('');
+            }}
+          />
+        ) : (
+          <table className="asset-registry-table">
+            <thead>
+              <tr>
+                <th>{tr('Ονομασία')}</th>
+                <th>{grouped ? tr('Ποσότητα') : tr('Κωδικός')}</th>
+                <th>Barcode</th>
+                <th>{tr('Εταιρεία')}</th>
+                <th>{tr('Τμήμα')}</th>
+                <th>{tr('Υπόλοιπο χρήσεων')}</th>
+                <th>{tr('Κατάσταση')}</th>
+                <th>
+                  <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {grouped
+                ? groupRows.visible.map(g => {
+                    const t = g[0];
+                    return (
+                      <tr key={`${t.code}-${t.name}`}>
+                        <td>
+                          <b>{t.name}</b>
+                        </td>
+                        <td>
+                          <span className="qty-badge">{g.length}</span>
+                        </td>
+                        <td className="muted">{tr('πολλαπλά')}</td>
+                        <td>{t.manufacturer || '—'}</td>
+                        <td>{new Set(g.map(x => x.department)).size === 1 ? t.department : tr('Πολλά τμήματα')}</td>
+                        <td>—</td>
+                        <td className="muted">{tr('Μικτή')}</td>
+                        <td>
+                          <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
+                            <ChevronRight size={17} />
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })
+                : rows.visible.map(t => (
+                    <tr key={t.id}>
                       <td>
-                        <b>{t.name}</b>
+                        <div className="registry-asset-name">
+                          <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                          <span>
+                            <Link className="row-title-link" to={`/tools/${t.id}`}>
+                              {t.name}
+                            </Link>
+                            <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
+                          </span>
+                        </div>
                       </td>
-                      <td>
-                        <span className="qty-badge">{g.length}</span>
-                      </td>
-                      <td className="muted">{tr('πολλαπλά')}</td>
+                      <td className="cell-nowrap">{t.code}</td>
+                      <td className="mono cell-nowrap">{t.barcode}</td>
                       <td>{t.manufacturer || '—'}</td>
-                      <td>{new Set(g.map(x => x.department)).size === 1 ? t.department : tr('Πολλά τμήματα')}</td>
-                      <td>—</td>
-                      <td className="muted">{tr('Μικτή')}</td>
+                      <td>{trData(t.department) || '—'}</td>
+                      <td>
+                        {t.maxUses ? (
+                          <>
+                            <b>{Math.max(0, t.maxUses - t.uses)}</b>
+                            <span className="muted"> / {t.maxUses}</span>
+                          </>
+                        ) : (
+                          <span className="muted">{tr('Χωρίς όριο')}</span>
+                        )}
+                      </td>
+                      <td>
+                        <StatusBadge value={t.state} />
+                      </td>
                       <td>
                         <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
                           <ChevronRight size={17} />
                         </Link>
                       </td>
                     </tr>
-                  );
-                })
-              : rows.visible.map(t => (
-                  <tr key={t.id}>
-                    <td>
-                      <div className="registry-asset-name">
-                        <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
-                        <span>
-                          <Link className="row-title-link" to={`/tools/${t.id}`}>
-                            {t.name}
-                          </Link>
-                          <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
-                        </span>
-                      </div>
-                    </td>
-                    <td className="cell-nowrap">{t.code}</td>
-                    <td className="mono cell-nowrap">{t.barcode}</td>
-                    <td>{t.manufacturer || '—'}</td>
-                    <td>{trData(t.department) || '—'}</td>
-                    <td>
-                      {t.maxUses ? (
-                        <>
-                          <b>{Math.max(0, t.maxUses - t.uses)}</b>
-                          <span className="muted"> / {t.maxUses}</span>
-                        </>
-                      ) : (
-                        <span className="muted">{tr('Χωρίς όριο')}</span>
-                      )}
-                    </td>
-                    <td>
-                      <StatusBadge value={t.state} />
-                    </td>
-                    <td>
-                      <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
-                        <ChevronRight size={17} />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-            {(grouped ? groupRows.hasMore : rows.hasMore) && (
-              <MoreRows colSpan={8} onVisible={grouped ? groupRows.showMore : rows.showMore} />
-            )}
-          </tbody>
-        </table>
+                  ))}
+              {(grouped ? groupRows.hasMore : rows.hasMore) && (
+                <MoreRows colSpan={8} onVisible={grouped ? groupRows.showMore : rows.showMore} />
+              )}
+            </tbody>
+          </table>
+        )}
       </ScrollableListPanel>
     </div>
   );

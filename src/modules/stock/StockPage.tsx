@@ -1,3 +1,4 @@
+import {ListEmpty} from '../../components/ui/EmptyState';
 import {Plus, ChevronRight} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
@@ -116,51 +117,73 @@ export default function StockPage() {
         ]}
       />
       <ScrollableListPanel withKpis ariaLabel={tr('Απόθεμα εργαλείων')}>
-        <table className="asset-registry-table">
-          <thead>
-            <tr>
-              <th>Barcode</th>
-              <th>{tr('Κωδικός')}</th>
-              <th>{tr('Εργαλείο')}</th>
-              <th>{tr('Κατασκευαστής')}</th>
-              <th>{tr('Ειδικότητα')}</th>
-              <th>{tr('Χρήσεις')}</th>
-              <th>{tr('Κατάσταση')}</th>
-              <th>
-                <span className="visually-hidden">{tr('Άνοιγμα')}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.visible.map(t => (
-              <tr key={t.id}>
-                <td className="mono cell-nowrap">{t.barcode}</td>
-                <td className="cell-nowrap">{t.code}</td>
-                <td>
-                  <div className="registry-asset-name">
-                    <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
-                    <span>
-                      <strong>{t.name}</strong>
-                      <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
-                    </span>
-                  </div>
-                </td>
-                <td>{t.manufacturer}</td>
-                <td>{trData(t.specialty) || '—'}</td>
-                <td>{t.maxUses ? `${t.uses}/${t.maxUses}` : '—'}</td>
-                <td>
-                  <StatusBadge value={t.state} />
-                </td>
-                <td>
-                  <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
-                    <ChevronRight size={17} />
-                  </Link>
-                </td>
+        {filtered.length === 0 ? (
+          <ListEmpty
+            total={stock.length}
+            none={{
+              title: tr('Το Απόθεμα είναι άδειο'),
+              description: tr('Τα εργαλεία που δεν ανήκουν σε Σετ ή τμήμα εμφανίζονται εδώ.'),
+              actions: can('asset.create') ? (
+                <AppButton variant="primary" icon={<Plus size={16} />} onClick={() => navigate('/tools/new')}>
+                  {tr('Νέο Εργαλείο')}
+                </AppButton>
+              ) : undefined,
+            }}
+            onClear={() => {
+              setQ('');
+              setSpecialty('');
+              setManufacturer('');
+              setState('');
+              setUsage('');
+            }}
+          />
+        ) : (
+          <table className="asset-registry-table">
+            <thead>
+              <tr>
+                <th>Barcode</th>
+                <th>{tr('Κωδικός')}</th>
+                <th>{tr('Εργαλείο')}</th>
+                <th>{tr('Κατασκευαστής')}</th>
+                <th>{tr('Ειδικότητα')}</th>
+                <th>{tr('Χρήσεις')}</th>
+                <th>{tr('Κατάσταση')}</th>
+                <th>
+                  <span className="visually-hidden">{tr('Άνοιγμα')}</span>
+                </th>
               </tr>
-            ))}
-            {rows.hasMore && <MoreRows colSpan={8} onVisible={rows.showMore} />}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.visible.map(t => (
+                <tr key={t.id}>
+                  <td className="mono cell-nowrap">{t.barcode}</td>
+                  <td className="cell-nowrap">{t.code}</td>
+                  <td>
+                    <div className="registry-asset-name">
+                      <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                      <span>
+                        <strong>{t.name}</strong>
+                        <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
+                      </span>
+                    </div>
+                  </td>
+                  <td>{t.manufacturer}</td>
+                  <td>{trData(t.specialty) || '—'}</td>
+                  <td>{t.maxUses ? `${t.uses}/${t.maxUses}` : '—'}</td>
+                  <td>
+                    <StatusBadge value={t.state} />
+                  </td>
+                  <td>
+                    <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
+                      <ChevronRight size={17} />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+              {rows.hasMore && <MoreRows colSpan={8} onVisible={rows.showMore} />}
+            </tbody>
+          </table>
+        )}
       </ScrollableListPanel>
     </div>
   );

@@ -1,8 +1,9 @@
 import {useEffect, useMemo, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {
   Activity,
   ArrowRight,
+  FileSpreadsheet,
   Gauge,
   History,
   Layers3,
@@ -13,6 +14,8 @@ import {
   Wrench,
 } from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
+import EmptyState from '../../components/ui/EmptyState';
+import AppButton from '../../components/ui/AppButton';
 import StatusBadge from '../../components/ui/StatusBadge';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
@@ -62,7 +65,8 @@ const movementStamp = (at: string) => {
  * are, what each department holds, what is stuck, and the latest movements.
  */
 export default function HospitalOverviewPage() {
-  const {sets, tools, issues, movements, lifecycleAlerts} = useSurgi();
+  const {sets, tools, issues, movements, lifecycleAlerts, can, organizationId} = useSurgi();
+  const navigate = useNavigate();
   const {departments} = useLibraries();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
@@ -164,6 +168,40 @@ export default function HospitalOverviewPage() {
           </div>
         }
       />
+
+      {sets.length === 0 && tools.length === 0 && (
+        <section className="overview-welcome">
+          <EmptyState
+            icon={<Layers3 size={22} />}
+            title={L('Ξεκινήστε προσθέτοντας εξοπλισμό', 'Start by adding your equipment')}
+            description={L(
+              'Το νοσοκομείο δεν έχει ακόμα Σετ ή εργαλεία. Φορτώστε το μητρώο σας από ένα αρχείο Excel ή προσθέστε το πρώτο εργαλείο.',
+              'The hospital has no Sets or instruments yet. Load your register from an Excel file or add the first instrument.',
+            )}
+            actions={
+              can('asset.create') ? (
+                <>
+                  {organizationId && (
+                    <AppButton
+                      variant="primary"
+                      icon={<FileSpreadsheet size={16} />}
+                      onClick={() => navigate('/import')}
+                    >
+                      {L('Μαζική εισαγωγή', 'Bulk import')}
+                    </AppButton>
+                  )}
+                  <AppButton icon={<Wrench size={16} />} onClick={() => navigate('/tools/new')}>
+                    {L('Νέο Εργαλείο', 'New instrument')}
+                  </AppButton>
+                  <AppButton icon={<Layers3 size={16} />} onClick={() => navigate('/sets/new')}>
+                    {L('Νέο Σετ', 'New Set')}
+                  </AppButton>
+                </>
+              ) : undefined
+            }
+          />
+        </section>
+      )}
 
       {pendingAccess > 0 && (
         <Link className="overview-alert" to="/hospital">

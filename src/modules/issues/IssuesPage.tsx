@@ -4,6 +4,7 @@ import {lazy, Suspense, useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
+import {ListEmpty} from '../../components/ui/EmptyState';
 import PageHeader from '../../components/ui/PageHeader';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
@@ -144,112 +145,123 @@ export default function IssuesPage() {
             ]}
           />
           <ScrollableListPanel ariaLabel={tr('Λίστα εκκρεμοτήτων')}>
-            <table className="asset-registry-table issues-registry-table">
-              <thead>
-                <tr>
-                  <th>{tr('Αντικείμενο')}</th>
-                  <th>{tr('Τύπος')}</th>
-                  <th>{tr('Τμήμα')}</th>
-                  <th>{tr('Δημιουργήθηκε')}</th>
-                  <th>{tr('Σημείωση')}</th>
-                  <th>{tr('Φωτογραφίες')}</th>
-                  <th>{tr('Κατάσταση')}</th>
-                  {withReplacements && (
-                    <th>
-                      <span className="visually-hidden">{tr('Ενέργειες')}</span>
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(i => (
-                  <tr key={i.id}>
-                    <td>
-                      <strong>{i.asset}</strong>
-                    </td>
-                    <td>{trData(i.type)}</td>
-                    <td>{trData(i.department)}</td>
-                    <td>{i.created}</td>
-                    <td>{i.note}</td>
-                    <td>
-                      {i.photos?.length ? (
-                        <div className="issue-table-photos">
-                          {i.photos.slice(0, 3).map(photo => (
-                            <img key={photo.id} src={photo.dataUrl} alt={photo.name} />
-                          ))}
-                          {i.photos.length > 3 && <span>+{i.photos.length - 3}</span>}
-                        </div>
-                      ) : (
-                        <span className="issue-no-photo">
-                          <Images size={14} />—
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      <span className={`badge ${i.status === 'OPEN' ? 'warning' : ''}`}>
-                        {i.status === 'OPEN' ? tr('Ανοικτή') : tr('Επιλυμένη')}
-                      </span>
-                    </td>
+            {filtered.length === 0 ? (
+              <ListEmpty
+                total={scopedIssues.length}
+                none={{
+                  title: tr('Δεν υπάρχουν εκκρεμότητες'),
+                  description: tr(
+                    'Όταν κάποιος αναφέρει φθορά, έλλειψη ή απώλεια σε Σετ ή εργαλείο, θα εμφανιστεί εδώ.',
+                  ),
+                }}
+                onClear={() => {
+                  setQ('');
+                  setDepartment('');
+                  setType('');
+                  setStatus('');
+                }}
+              />
+            ) : (
+              <table className="asset-registry-table issues-registry-table">
+                <thead>
+                  <tr>
+                    <th>{tr('Αντικείμενο')}</th>
+                    <th>{tr('Τύπος')}</th>
+                    <th>{tr('Τμήμα')}</th>
+                    <th>{tr('Δημιουργήθηκε')}</th>
+                    <th>{tr('Σημείωση')}</th>
+                    <th>{tr('Φωτογραφίες')}</th>
+                    <th>{tr('Κατάσταση')}</th>
                     {withReplacements && (
-                      <td className="issue-actions">
-                        <div className="issue-actions-row">
-                          {subject(i).to && (
-                            <Link
-                              className="issue-action"
-                              to={subject(i).to!}
-                              title={tr('Άνοιγμα')}
-                              aria-label={tr('Άνοιγμα')}
-                            >
-                              <ExternalLink size={14} />
-                            </Link>
-                          )}
-                          {subject(i).tool && (
-                            <button
-                              type="button"
-                              className="issue-action"
-                              title={tr('Παραγγελία')}
-                              aria-label={tr('Παραγγελία')}
-                              onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
-                            >
-                              <ShoppingCart size={14} />
-                            </button>
-                          )}
-                          {i.status === 'OPEN' && (
-                            <button
-                              type="button"
-                              className="issue-action"
-                              title={tr('Επίλυση')}
-                              aria-label={tr('Επίλυση')}
-                              onClick={() =>
-                                ask({
-                                  title: tr('Επίλυση εκκρεμότητας;'),
-                                  message: tr(
-                                    'Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.',
-                                    trData(i.type),
-                                    i.asset,
-                                  ),
-                                  confirmLabel: tr('Επίλυση'),
-                                  onConfirm: () => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα')),
-                                })
-                              }
-                            >
-                              <CheckCircle2 size={14} />
-                            </button>
-                          )}
-                        </div>
-                      </td>
+                      <th>
+                        <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                      </th>
                     )}
                   </tr>
-                ))}
-                {!filtered.length && (
-                  <tr>
-                    <td colSpan={withReplacements ? 8 : 7} className="empty">
-                      {tr('Καμία εκκρεμότητα δεν ταιριάζει στα φίλτρα.')}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map(i => (
+                    <tr key={i.id}>
+                      <td>
+                        <strong>{i.asset}</strong>
+                      </td>
+                      <td>{trData(i.type)}</td>
+                      <td>{trData(i.department)}</td>
+                      <td>{i.created}</td>
+                      <td>{i.note}</td>
+                      <td>
+                        {i.photos?.length ? (
+                          <div className="issue-table-photos">
+                            {i.photos.slice(0, 3).map(photo => (
+                              <img key={photo.id} src={photo.dataUrl} alt={photo.name} />
+                            ))}
+                            {i.photos.length > 3 && <span>+{i.photos.length - 3}</span>}
+                          </div>
+                        ) : (
+                          <span className="issue-no-photo">
+                            <Images size={14} />—
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <span className={`badge ${i.status === 'OPEN' ? 'warning' : ''}`}>
+                          {i.status === 'OPEN' ? tr('Ανοικτή') : tr('Επιλυμένη')}
+                        </span>
+                      </td>
+                      {withReplacements && (
+                        <td className="issue-actions">
+                          <div className="issue-actions-row">
+                            {subject(i).to && (
+                              <Link
+                                className="issue-action"
+                                to={subject(i).to!}
+                                title={tr('Άνοιγμα')}
+                                aria-label={tr('Άνοιγμα')}
+                              >
+                                <ExternalLink size={14} />
+                              </Link>
+                            )}
+                            {subject(i).tool && (
+                              <button
+                                type="button"
+                                className="issue-action"
+                                title={tr('Παραγγελία')}
+                                aria-label={tr('Παραγγελία')}
+                                onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
+                              >
+                                <ShoppingCart size={14} />
+                              </button>
+                            )}
+                            {i.status === 'OPEN' && (
+                              <button
+                                type="button"
+                                className="issue-action"
+                                title={tr('Επίλυση')}
+                                aria-label={tr('Επίλυση')}
+                                onClick={() =>
+                                  ask({
+                                    title: tr('Επίλυση εκκρεμότητας;'),
+                                    message: tr(
+                                      'Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.',
+                                      trData(i.type),
+                                      i.asset,
+                                    ),
+                                    confirmLabel: tr('Επίλυση'),
+                                    onConfirm: () => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα')),
+                                  })
+                                }
+                              >
+                                <CheckCircle2 size={14} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </ScrollableListPanel>
         </>
       )}

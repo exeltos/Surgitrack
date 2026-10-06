@@ -957,6 +957,29 @@ export const en: Record<string, string> = {
     'Delete the Set AND all its instruments? They stay in the bin for 30 days.',
   'Διαγράφονται και τα φυσικά εργαλεία (επαναφορά από τον Κάδο).':
     'The physical instruments are deleted too (restore from the bin).',
+  'Κανένα αποτέλεσμα': 'No results',
+  'Τίποτα δεν ταιριάζει στην αναζήτηση ή στα φίλτρα. Δοκίμασε να τα αλλάξεις ή να τα καθαρίσεις.':
+    'Nothing matches the search or the filters. Try changing or clearing them.',
+  'Καθαρισμός φίλτρων': 'Clear filters',
+  'Δεν υπάρχουν εργαλεία ακόμα': 'No instruments yet',
+  'Πρόσθεσε το πρώτο εργαλείο ή φόρτωσε όλο το μητρώο σου από ένα αρχείο Excel.':
+    'Add the first instrument or load your whole register from an Excel file.',
+  'Δεν υπάρχουν Σετ ακόμα': 'No Sets yet',
+  'Δημιούργησε το πρώτο Σετ εργαλείων ή φόρτωσε τα Σετ σου από ένα αρχείο Excel.':
+    'Create the first instrument Set or load your Sets from an Excel file.',
+  'Το Απόθεμα είναι άδειο': 'Stock is empty',
+  'Τα εργαλεία που δεν ανήκουν σε Σετ ή τμήμα εμφανίζονται εδώ.':
+    'Instruments that belong to no Set or department show up here.',
+  'Δεν υπάρχουν μεμονωμένα εργαλεία σε χρήση': 'No standalone instruments in use',
+  'Τα εργαλεία που δίνονται σε τμήμα χωρίς Σετ εμφανίζονται εδώ.':
+    'Instruments given to a department without a Set show up here.',
+  'Δεν υπάρχουν εκκρεμότητες': 'No issues',
+  'Όταν κάποιος αναφέρει φθορά, έλλειψη ή απώλεια σε Σετ ή εργαλείο, θα εμφανιστεί εδώ.':
+    'When someone reports damage, a shortage or a loss on a Set or instrument, it shows up here.',
+  'Η σελίδα δεν βρέθηκε': 'Page not found',
+  'Ο σύνδεσμος δεν υπάρχει ή δεν έχεις πρόσβαση σε αυτή τη σελίδα.':
+    'The link does not exist or you do not have access to this page.',
+  'Αρχική σελίδα': 'Home',
   'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',

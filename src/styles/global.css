@@ -5660,3 +5660,49 @@ div.asset-import-hospital b {
     flex: 0 0 auto;
   }
 }
+
+/* Empty lists: one look for «nothing here yet» and «nothing matches». */
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  text-align: center;
+}
+.empty-state-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background: #eaf3f6;
+  color: #155a6e;
+}
+.empty-state strong {
+  color: #17384a;
+  font-size: 16px;
+}
+.empty-state p {
+  max-width: 460px;
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.overview-welcome {
+  margin-bottom: 16px;
+  border: 1px dashed #c7dbe2;
+  border-radius: 14px;
+  background: #fff;
+}
+.empty-state-actions a {
+  text-decoration: none;
+}
