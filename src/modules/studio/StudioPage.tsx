@@ -67,7 +67,17 @@ export default function StudioPage() {
                 )}
           </p>
         </div>
-        <div className="studio-health">
+        <div
+          className="studio-health"
+          title={
+            libs.dataMode === 'DEMO'
+              ? L(
+                  'Ξεχωριστό Demo νοσοκομείο· οι αλλαγές αποθηκεύονται μόνο εδώ.',
+                  'Separate Demo hospital; changes are saved only here.',
+                )
+              : L('Πραγματικά νοσοκομεία, χρήστες και δεδομένα.', 'Real hospitals, users and data.')
+          }
+        >
           <ShieldCheck size={20} />
           <div>
             <strong>
