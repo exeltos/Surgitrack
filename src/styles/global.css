@@ -6235,3 +6235,10 @@ html body .content .movements-actions button {
 .receive-modal td:last-child {
   white-space: nowrap;
 }
+
+/* The Overview dashboard is taller than the screen: it scrolls instead of cutting off its lower cards. */
+.hospital-overview.dash {
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-gutter: stable;
+}
