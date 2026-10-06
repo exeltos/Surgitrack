@@ -35,7 +35,6 @@ export default function SterilizationPage() {
     quickBarcode,
     quickScan,
     quickScanFeedback,
-    scan,
     setDepartmentFilter,
     setIssueCameraOpen,
     setKindFilter,
@@ -99,7 +98,6 @@ export default function SterilizationPage() {
         query={query}
         onQueryChange={setQuery}
         placeholder={tr('Αναζήτηση με ονομασία, κωδικό, barcode ή τμήμα...')}
-        onSubmitQuery={() => scan()}
         filters={[
           {
             key: 'department',

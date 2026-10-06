@@ -297,7 +297,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             <span>SurgiTrack</span>
           </button>
           {!platformOnly && (
-            <div className="global-scan-wrap">
+            <div
+              className={`global-scan-wrap${location.pathname.startsWith('/sterilization') ? ' on-sterilization' : ''}`}
+            >
               <form
                 className="global-scan"
                 onSubmit={e => {

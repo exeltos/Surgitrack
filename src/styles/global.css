@@ -6588,3 +6588,7 @@ html body .sterile-queues.modern button > span {
     display: none;
   }
 }
+/* Sterilization already has a scan card; the top-bar search would be a third copy. */
+html body .global-scan-wrap.on-sterilization {
+  display: none;
+}
