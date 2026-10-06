@@ -14,7 +14,7 @@ export default function PageHeader({eyebrow, title, description, actions, classN
       <div>
         {eyebrow && <span className="eyebrow">{eyebrow}</span>}
         <h1>{title}</h1>
-        {description && <p>{description}</p>}
+        {description && <p title={typeof description === 'string' ? description : undefined}>{description}</p>}
       </div>
       {actions}
     </div>
