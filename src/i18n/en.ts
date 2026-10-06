@@ -394,8 +394,8 @@ export const en: Record<string, string> = {
   'Βλάβη / Service': 'Damage / Service',
   'Βλάβη / μη λειτουργικό': 'Damaged / not working',
   'Βλάβη, φθορά ή άλλη απόκλιση': 'Damage, wear or other deviation',
-  'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Απόθεμα, σε Σετ ή χρησιμοποιούνται μεμονωμένα.':
-    'General registry of every physical instrument, whether in stock, in a set or used on its own.',
+  'Όλα τα φυσικά εργαλεία: σε απόθεμα, σε σετ ή μεμονωμένα.':
+    'Every physical instrument: in stock, in a set or on its own.',
   'Γρήγορη σάρωση barcode': 'Quick barcode scan',
   'Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.':
     'Quick physical receipt · declare visible deviation · optional count by policy.',

@@ -61,11 +61,8 @@ export default function ToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
         title={tr('Εργαλεία')}
-        description={tr(
-          'Γενικό μητρώο όλων των φυσικών εργαλείων, ανεξάρτητα αν βρίσκονται σε Απόθεμα, σε Σετ ή χρησιμοποιούνται μεμονωμένα.',
-        )}
+        description={tr('Όλα τα φυσικά εργαλεία: σε απόθεμα, σε σετ ή μεμονωμένα.')}
         actions={
           can('asset.create') ? (
             <div className="page-head-actions">
@@ -189,9 +186,7 @@ export default function ToolsPage() {
             <thead>
               <tr>
                 <th>{tr('Ονομασία')}</th>
-                <th>{tr('Κωδικός')}</th>
                 <th>Barcode</th>
-                <th>{tr('Εταιρεία')}</th>
                 <th>{tr('Ειδικότητα')}</th>
                 <th>{tr('Θέση')}</th>
                 <th>{tr('Υπόλοιπο χρήσεων')}</th>
@@ -214,18 +209,20 @@ export default function ToolsPage() {
                             {t.name}
                           </Link>
                           <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
-                          {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
+                          <small className="row-sub">
+                            {[t.manufacturer, t.code, t.serialNumber && `S/N ${t.serialNumber}`]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </small>
                         </span>
                       </div>
                     </td>
-                    <td className="cell-nowrap">{t.code}</td>
                     <td>
                       <Link className="mono strong-link" to={`/tools/${t.id}`}>
                         {t.barcode}
                       </Link>
                     </td>
-                    <td>{t.manufacturer || '—'}</td>
-                    <td>{trData(t.specialty) || '—'}</td>
+                    <td className="cell-nowrap">{trData(t.specialty) || '—'}</td>
                     <td>
                       {t.mode === 'SET_MEMBER' && set ? (
                         <>
@@ -264,7 +261,7 @@ export default function ToolsPage() {
                   </tr>
                 );
               })}
-              {rows.hasMore && <MoreRows colSpan={9} onVisible={rows.showMore} />}
+              {rows.hasMore && <MoreRows colSpan={7} onVisible={rows.showMore} />}
             </tbody>
           </table>
         )}

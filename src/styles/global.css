@@ -6497,3 +6497,21 @@ html body .sterilization-workspace .sterile-queues.modern button {
   padding-top: 7px;
   padding-bottom: 7px;
 }
+/* Page standard: no eyebrow above titles; the title and one short sentence are enough. */
+html body .page-head .eyebrow,
+html body .ster-work-head .eyebrow,
+html body .department-header .eyebrow,
+html body .studio-head .eyebrow {
+  display: none;
+}
+/* Registry tables: the name column takes the free width and truncates; every other column stays on one line. */
+html body .asset-registry-table td:first-child {
+  width: 42%;
+  max-width: 0;
+}
+html body .asset-registry-table .row-title-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
