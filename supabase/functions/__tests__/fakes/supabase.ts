@@ -5,6 +5,8 @@ export type DbCall = {
   op: 'select' | 'insert' | 'update' | 'delete' | 'upsert';
   filters: Array<[string, string, unknown]>;
   values?: unknown;
+  /** The options of an upsert (`onConflict`, `ignoreDuplicates`). */
+  options?: unknown;
 };
 type Result = {data?: unknown; error?: {message: string} | null};
 
@@ -72,9 +74,10 @@ class Query implements PromiseLike<Result> {
     this.call.values = values;
     return this;
   }
-  upsert(values: unknown) {
+  upsert(values: unknown, options?: unknown) {
     this.call.op = 'upsert';
     this.call.values = values;
+    this.call.options = options;
     return this;
   }
   delete() {
