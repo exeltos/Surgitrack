@@ -6561,3 +6561,30 @@ html body .dash-dept-name {
   font-weight: 500;
   font-size: 13px;
 }
+/* Sterilization header: logged-in user as a slim pill, one-line stage labels. */
+html body .ster-shift {
+  padding: 6px 12px;
+  border-radius: 12px;
+  gap: 8px;
+  align-items: center;
+}
+html body .ster-shift > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+html body .ster-shift small {
+  display: none;
+}
+html body .sterile-queues.modern button > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+@media (max-width: 1699px) {
+  html body .sterilization-workspace .ster-hint {
+    display: none;
+  }
+}

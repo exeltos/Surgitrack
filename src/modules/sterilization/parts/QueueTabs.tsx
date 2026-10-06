@@ -35,7 +35,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
       {(stageEnabled('PREPARATION') || preparation.length > 0) && (
         <button className={queue === 'PREP' ? 'active' : ''} onClick={() => setQueue('PREP')}>
           <Layers3 />
-          <span>{tr('Έλεγχος & Σύνθεση')}</span>
+          <span title={tr('Έλεγχος & Σύνθεση')}>{tr('Σύνθεση')}</span>
           <strong>{preparation.length}</strong>
           <small>{tr('Εργαλεία / αποκλίσεις')}</small>
         </button>
