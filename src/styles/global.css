@@ -6232,3 +6232,6 @@ html body .content .movements-actions button {
   cursor: default;
   text-decoration: none;
 }
+.receive-modal td:last-child {
+  white-space: nowrap;
+}
