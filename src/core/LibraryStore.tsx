@@ -1,3 +1,4 @@
+import {emitBinDraft} from './binBridge';
 import {createContext, useContext, useMemo, useState, type ReactNode} from 'react';
 import {getAdminRepository} from '../data/adminRepositories';
 import {DEMO_ORGANIZATION, LEGACY_DEMO_ORGANIZATION_IDS} from '../data/adminRepositories/demoRepository';
@@ -20,9 +21,12 @@ type LibraryStore = LibraryState & {
   addItem: (key: LibraryKey, item: Omit<LibraryItem, 'id'>) => void;
   updateItem: (key: LibraryKey, id: string, item: Partial<LibraryItem>) => void;
   removeItem: (key: LibraryKey, id: string) => void;
+  /** Puts back a library record from the recycle bin (nothing happens if its id is taken). */
+  restoreItem: (key: LibraryKey, item: LibraryItem) => void;
   addColorTape: (tape: Omit<ColorTape, 'id' | 'custom'>) => void;
   updateColorTape: (id: string, patch: Partial<ColorTape>) => void;
   removeColorTape: (id: string) => void;
+  restoreColorTape: (tape: ColorTape) => void;
   addOrganization: (organization: Omit<Organization, 'id'>) => void;
   updateOrganization: (id: string, patch: Partial<Organization>) => void;
   removeOrganization: (id: string) => void;
@@ -179,7 +183,16 @@ export function LibraryStoreProvider({
         {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'UPDATE', by: 'Admin', before, after},
       );
     });
-  const removeItem = (key: LibraryKey, id: string) =>
+  const removeItem = (key: LibraryKey, id: string) => {
+    const item = state[key].find(x => x.id === id);
+    if (item)
+      emitBinDraft({
+        kind: 'LIBRARY',
+        label: item.el || item.en || item.id,
+        detail: key,
+        payload: {tools: [], toolsDeleted: false, library: {key, item: item as unknown as Record<string, unknown>}},
+        deletedAt: new Date().toISOString(),
+      });
     commit(s => {
       const before = s[key].find(x => x.id === id);
       return appendAudit(
@@ -187,6 +200,23 @@ export function LibraryStoreProvider({
         {entityType: 'LIBRARY', entityId: `${key}:${id}`, action: 'DELETE', by: 'Admin', before},
       );
     });
+  };
+  const restoreItem = (key: LibraryKey, item: LibraryItem) =>
+    commit(s =>
+      s[key].some(x => x.id === item.id)
+        ? s
+        : appendAudit(
+            {...s, [key]: [...s[key], item]},
+            {
+              entityType: 'LIBRARY',
+              entityId: `${key}:${item.id}`,
+              action: 'CREATE',
+              by: 'Admin',
+              after: item,
+              reason: 'Restore',
+            },
+          ),
+    );
   const addColorTape = (tape: Omit<ColorTape, 'id' | 'custom'>) =>
     commit(s => {
       const created: ColorTape = {...tape, id: `tape-${Date.now()}`, custom: true};
@@ -204,7 +234,15 @@ export function LibraryStoreProvider({
       );
     });
   /** Only the hospital's own tapes can be deleted; catalogue ones are hidden instead. */
-  const removeColorTape = (id: string) =>
+  const removeColorTape = (id: string) => {
+    const tape = (state.colorTapes || []).find(x => x.id === id);
+    if (tape?.custom)
+      emitBinDraft({
+        kind: 'COLOR_TAPE',
+        label: tape.el || tape.id,
+        payload: {tools: [], toolsDeleted: false, colorTape: tape as unknown as Record<string, unknown>},
+        deletedAt: new Date().toISOString(),
+      });
     commit(s => {
       const before = (s.colorTapes || []).find(x => x.id === id);
       if (!before?.custom) return s;
@@ -213,6 +251,23 @@ export function LibraryStoreProvider({
         {entityType: 'LIBRARY', entityId: `colorTapes:${id}`, action: 'DELETE', by: 'Admin', before},
       );
     });
+  };
+  const restoreColorTape = (tape: ColorTape) =>
+    commit(s =>
+      (s.colorTapes || []).some(x => x.id === tape.id)
+        ? s
+        : appendAudit(
+            {...s, colorTapes: [...(s.colorTapes || []), tape]},
+            {
+              entityType: 'LIBRARY',
+              entityId: `colorTapes:${tape.id}`,
+              action: 'CREATE',
+              by: 'Admin',
+              after: tape,
+              reason: 'Restore',
+            },
+          ),
+    );
   const addOrganization = (organization: Omit<Organization, 'id'>) =>
     commit(s => {
       const created = {...organization, id: `org-${Date.now()}`};
@@ -352,11 +407,13 @@ export function LibraryStoreProvider({
       addColorTape,
       updateColorTape,
       removeColorTape,
+      restoreColorTape,
       updateItem,
       addOrganization,
       updateOrganization,
       removeOrganization,
       removeItem,
+      restoreItem,
       addUser,
       updateUser,
       removeUser,

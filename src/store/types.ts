@@ -233,6 +233,8 @@ export type SurgiStoreValue = {
   purchaseOrders: PurchaseOrder[];
   recycleBin: BinEntry[];
   restoreFromBin: (id: string) => boolean;
+  addToBin: (entry: BinEntry) => void;
+  removeFromBin: (id: string) => void;
   purgeFromBin: (id: string) => void;
   purgeExpiredBin: () => number;
   replaceFromStock: (pairs: Array<{toolId: string; stockToolId: string; setId: string}>) => void;

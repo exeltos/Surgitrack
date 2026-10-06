@@ -1021,6 +1021,21 @@ export const en: Record<string, string> = {
   'Τα υπόλοιπα της παραγγελίας {0} δεν θα έρθουν. Όσα παραλήφθηκαν μένουν στο Απόθεμα.':
     'The rest of order {0} will not come. What arrived stays in Stock.',
   'Μερική παραλαβή της {0}: {1} νέα εργαλεία στο Απόθεμα.': 'Partial receipt of {0}: {1} new instruments in Stock.',
+  'Βιβλιοθήκη Studio': 'Studio library',
+  'Ταινία χρώματος': 'Colour tape',
+  Συσκευή: 'Device',
+  Ειδικότητες: 'Specialties',
+  Κατασκευαστές: 'Manufacturers',
+  Προμηθευτές: 'Suppliers',
+  'Κατηγορίες εργαλείων': 'Instrument categories',
+  Κλίβανοι: 'Sterilizers',
+  '{0} κύκλοι': '{0} cycles',
+  'Η συσκευή «{0}» επανήλθε. Δημιούργησε νέο κλειδί δικτύου από τη σελίδα Συσκευές.':
+    'Device «{0}» is back. Create a new network key on the Devices page.',
+  'Δεν έγινε επαναφορά: {0}': 'Not restored: {0}',
+  'Μόνο ο Διαχειριστής επαναφέρει εγγραφές βιβλιοθηκών.': 'Only the administrator restores library records.',
+  'Ό,τι διαγράφεται (Σετ, εργαλεία, συσκευές, εγγραφές βιβλιοθηκών) μένει εδώ {0} ημέρες και μπορεί να επανέλθει όπως ήταν.':
+    'Whatever is deleted (Sets, instruments, devices, library records) stays here for {0} days and can come back as it was.',
   'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλά τμήματα': 'Several departments',
@@ -1419,7 +1434,8 @@ export const en: Record<string, string> = {
   'π.χ. ΟΡΘ, 5, ★': 'e.g. ORTH, 5, ★',
   'Εμφάνιση στις επιλογές': 'Show in choices',
   'Απόκρυψη από τις επιλογές': 'Hide from choices',
-  'Διαγραφή της ταινίας «{0}»;': 'Delete tape “{0}”?',
+  'Διαγραφή της ταινίας «{0}»; Θα μείνει στον Κάδο για 30 ημέρες.':
+    'Delete tape “{0}”? It stays in the bin for 30 days.',
   'ΧΡΩΜΑΤΙΚΟΣ ΜΑΡΤΥΡΑΣ': 'COLOR MARKER',
   'Όπως το Σετ': 'As the Set',
   'Το Σετ δεν έχει χρώμα': 'The Set has no color',

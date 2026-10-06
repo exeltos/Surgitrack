@@ -2701,3 +2701,22 @@ body {
 .issue-action.wide {
   white-space: nowrap;
 }
+.bin-notice {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.bin-notice.ok {
+  background: #e4f5ec;
+  color: #1b6b48;
+}
+.bin-notice.bad {
+  background: #fdecec;
+  color: #b3261e;
+}
+.issue-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
