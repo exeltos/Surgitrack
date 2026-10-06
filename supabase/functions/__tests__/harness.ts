@@ -1,5 +1,5 @@
 import {vi} from 'vitest';
-import {fake} from './fakes/supabase';
+import {fake, type DbCall} from './fakes/supabase';
 import {mailState} from './fakes/nodemailer';
 
 type Handler = (req: Request) => Response | Promise<Response>;
@@ -45,3 +45,14 @@ export const post = (body: unknown, headers: Record<string, string> = {}) =>
   });
 
 export {mailState};
+
+/** The value a query compared a column with (`.eq(column, value)`), if it did. */
+export const eqValue = (call: DbCall, column: string) => call.filters.find(([op, name]) => op === 'eq' && name === column)?.[2];
+
+/** Answers table queries from a map keyed "table:op"; a function gets the query and picks its answer. */
+export const answerTables = (routes: Record<string, unknown | ((call: DbCall) => unknown)>) => {
+  fake.db = call => {
+    const answer = routes[`${call.table}:${call.op}`];
+    return {data: typeof answer === 'function' ? (answer as (c: DbCall) => unknown)(call) : (answer ?? null), error: null};
+  };
+};
