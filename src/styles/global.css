@@ -309,7 +309,7 @@
   }
   .ster-work-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 10px 14px;
   }
   .ster-asset-cell {
@@ -323,7 +323,7 @@
     display: none;
   }
   .receipt-verification-row:not(.single) {
-    grid-template-columns: 105px 1fr auto;
+    grid-template-columns: 105px minmax(0, 1fr) auto;
     gap: 8px;
   }
   .receipt-tool-code,
@@ -438,7 +438,7 @@
 @media (max-width: 1180px) and (min-width: 761px) {
   .sterilization-workspace .receipt-queue-panel .ster-list-head,
   .sterilization-workspace .receipt-queue-panel .ster-work-row {
-    grid-template-columns: minmax(230px, 1.85fr) minmax(140px, 1fr) minmax(140px, 0.9fr) minmax(188px, 1.15fr) !important;
+    grid-template-columns: minmax(180px, 1.85fr) minmax(110px, 1fr) minmax(110px, 0.9fr) minmax(150px, 1.15fr) !important;
     column-gap: 11px !important;
   }
   .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5),
@@ -529,7 +529,7 @@
 }
 .hospital-admin-summary > div {
   display: grid !important;
-  grid-template-columns: 34px 1fr auto !important;
+  grid-template-columns: 34px minmax(0, 1fr) auto !important;
   align-items: center !important;
   gap: 9px !important;
   min-height: 58px !important;
@@ -636,7 +636,7 @@
 }
 @media (max-width: 900px) {
   .hospital-admin-summary {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
   .studio-users-panel > .studio-panel-head {
     flex-direction: column !important;
@@ -961,7 +961,7 @@
 }
 .overview-kpis > a {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: auto auto;
   column-gap: 10px;
   align-items: center;
@@ -1295,7 +1295,7 @@ a.overview-bar:hover {
 }
 .asset-filter-panel footer {
   display: grid !important;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
   width: 100%;
   margin: 0 !important;
@@ -1358,7 +1358,7 @@ a.overview-bar:hover {
 .roles-guide-head,
 .roles-guide-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1.2fr) minmax(200px, 1.4fr) minmax(220px, 1.8fr);
+  grid-template-columns: minmax(120px, 1fr) minmax(130px, 1.2fr) minmax(150px, 1.4fr) minmax(170px, 1.8fr);
   gap: 16px;
   padding: 14px 18px;
   align-items: start;
@@ -1389,7 +1389,7 @@ a.overview-bar:hover {
     display: none;
   }
   .roles-guide-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 6px;
   }
 }
@@ -5372,7 +5372,7 @@ div.asset-import-hospital b {
 }
 .replacements-order-fields {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   gap: 10px;
 }
 .replacements-order-fields label {
@@ -5407,10 +5407,10 @@ div.asset-import-hospital b {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .replacements-order-fields {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .replacements-order > header {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

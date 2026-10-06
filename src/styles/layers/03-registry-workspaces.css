@@ -236,7 +236,7 @@
 }
 @media (max-width: 1040px) {
   .asset-filter-bar {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
   .asset-filter-search {
     grid-column: 1/2;
@@ -256,11 +256,11 @@
 }
 @media (max-width: 760px) {
   .asset-filter-bar {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     padding: 8px;
   }
   .asset-filter-selects {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .asset-list-controls {
     gap: 7px;
@@ -698,7 +698,7 @@ body {
 }
 .asset-tab-panel > .asset-photos-card .photo-section-head {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 .asset-tab-panel > .asset-photos-card .photo-actions {
@@ -920,7 +920,7 @@ body {
 
 @media (max-width: 900px) {
   .app-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .sidebar {
     position: fixed;
@@ -963,7 +963,7 @@ body {
   }
   .tool-workspace-grid,
   .set-workspace-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     overflow: auto;
     overscroll-behavior: contain;
   }
@@ -1274,7 +1274,7 @@ body {
     min-width: 0;
   }
   .asset-summary-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .asset-detail-body .set-tool-row {
     grid-template-columns: 38px 135px minmax(220px, 1fr) 90px 125px !important;
@@ -1294,7 +1294,7 @@ body {
   }
   .asset-detail-workspace .asset-profile-facts {
     padding: 9px 16px;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .asset-detail-workspace .asset-profile-actions {
     padding: 9px 16px 11px;
@@ -1337,14 +1337,14 @@ body {
 }
 @media (max-width: 620px) {
   .asset-detail-workspace .asset-profile-facts {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .asset-detail-workspace .asset-profile-icon {
     width: 42px;
     height: 42px;
   }
   .asset-detail-full-panel .asset-photo-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -1737,7 +1737,7 @@ body {
 }
 .asset-sidebar-quickfacts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
   margin: 3px 0 8px;
 }
@@ -1850,7 +1850,7 @@ body {
 }
 .report-target-switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
   margin-bottom: 14px;
 }
@@ -1901,7 +1901,7 @@ body {
 .report-photo-input {
   position: relative;
   display: grid !important;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 4px 7px;
   padding: 11px 12px !important;
@@ -1919,7 +1919,7 @@ body {
 }
 @media (max-width: 1180px) {
   .asset-sidebar-quickfacts {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .asset-workbench-sidebar .asset-cover {
     height: 140px;
@@ -2186,7 +2186,7 @@ body {
     bottom: 0;
   }
   .asset-create-tool-body .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .asset-create-tool-body .span-2 {
     grid-column: span 1;
@@ -2463,4 +2463,72 @@ body {
 }
 .asset-workbench-sidebar-tool .asset-barcode-card strong {
   font-size: 15px;
+}
+
+/* Set detail: when the instrument list is narrow (tablet), a row becomes two lines instead of pushing
+   its last column out of the card: the use count moves under the name. */
+.asset-detail-body .set-tool-list {
+  container-type: inline-size;
+  container-name: set-tools;
+}
+@container set-tools (max-width: 560px) {
+  .asset-detail-body .set-tool-row {
+    grid-template-columns: 30px minmax(86px, 112px) minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      'index code name state'
+      'index code uses uses';
+    row-gap: 2px;
+  }
+  .asset-detail-body .set-tool-row .set-tool-index {
+    grid-area: index;
+  }
+  .asset-detail-body .set-tool-row .set-tool-code {
+    grid-area: code;
+  }
+  .asset-detail-body .set-tool-row .set-tool-name {
+    grid-area: name;
+    min-width: 0;
+  }
+  .asset-detail-body .set-tool-row .set-tool-state {
+    grid-area: state;
+  }
+  .asset-detail-body .set-tool-row .set-tool-uses {
+    grid-area: uses;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    justify-items: start;
+  }
+}
+
+/* Set and tool detail on a tablet: the composition title gets the full width with its buttons under it
+   (instead of a one-word-per-line column), and the tabs get a little tighter so they all fit. */
+@media (max-width: 1180px) {
+  .asset-detail-body .set-composition-head {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .asset-detail-body .set-composition-head > div:first-child {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .asset-detail-body .set-composition-actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+}
+@media (max-width: 1320px) {
+  .asset-workbench-main > .asset-detail-tabs {
+    gap: 0;
+  }
+  .asset-workbench-main > .asset-detail-tabs button {
+    padding: 0 7px !important;
+    font-size: 12px;
+  }
+  .asset-workbench-main > .asset-detail-tabs button b {
+    margin-left: 4px;
+    padding: 0 5px;
+  }
 }

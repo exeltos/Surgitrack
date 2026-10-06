@@ -185,7 +185,7 @@
   border-top: 1px solid #dce4e9;
 }
 .manual-side-bottom button {
-  grid-template-columns: 19px 1fr;
+  grid-template-columns: 19px minmax(0, 1fr);
 }
 .manual-version {
   display: flex;
@@ -322,7 +322,7 @@
 }
 .manual-detail-section li {
   display: grid;
-  grid-template-columns: 24px 1fr;
+  grid-template-columns: 24px minmax(0, 1fr);
   gap: 8px;
   align-items: start;
   font-size: 13px;
@@ -508,7 +508,7 @@
 }
 @media (max-width: 700px) {
   .manual-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
   }
   .manual-sidebar {
