@@ -8662,8 +8662,10 @@ html body .prep-block-open {
 /* Sterile dates with their symbols (ISO 15223-1: STERILE box, hourglass for use-by). */
 .sterile-dates {
   display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
+  flex-wrap: nowrap;
+  gap: 10px;
+  font-size: 0.86em;
+  white-space: nowrap;
   align-items: center;
   font-variant-numeric: tabular-nums;
 }
