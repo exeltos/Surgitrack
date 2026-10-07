@@ -45,7 +45,13 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                 </span>
               </div>
             </section>
-            <section className="studio-release-policy">
+            <section
+              className="studio-release-policy"
+              title={L(
+                'Αρκεί ένας επιτυχής δείκτης (χημικός ή βιολογικός)· ανεπιτυχής δείκτης στέλνει όλο το φορτίο σε επανεπεξεργασία.',
+                'One passed indicator (chemical or biological) is enough; a failed one sends the whole load back.',
+              )}
+            >
               <header>
                 <ShieldCheck size={18} />
                 <div>
