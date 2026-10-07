@@ -1,3 +1,4 @@
+import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
 import type {
   AssetKind,
   PreparationRecord,
@@ -339,17 +340,14 @@ export function useReceiptAndCycleActions(
       biologicalIndicator: 'OPTIONAL' as const,
       allowReleaseWhileBiPending: false,
     };
-    const chemicalOk = !policy.requireChemicalIndicator || payload.chemicalIndicatorOk;
-    const biologicalOk =
-      policy.biologicalIndicator === 'NOT_REQUIRED' ||
-      payload.biologicalIndicatorResult === 'PASS' ||
-      (policy.biologicalIndicator === 'OPTIONAL' && payload.biologicalIndicatorResult === 'NOT_REQUIRED') ||
-      (policy.allowReleaseWhileBiPending && payload.biologicalIndicatorResult === 'PENDING');
     const canRelease =
       payload.physicalParametersOk &&
-      chemicalOk &&
       payload.packagingIntegrityOk &&
-      biologicalOk &&
+      releaseIndicatorVerdict(
+        policy,
+        payload.chemicalIndicatorOk ? 'PASS' : 'NOT_RECORDED',
+        payload.biologicalIndicatorResult,
+      ).ok &&
       payload.decision === 'RELEASED';
     const decision = canRelease ? 'RELEASED' : 'REPROCESS';
     const record: SterilizationReleaseRecord = {

@@ -94,20 +94,13 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   {tr('Πρόγραμμα')}
                   <input value={loadProgram} onChange={e => setLoadProgram(e.target.value)} />
                 </label>
-                {loadModal === 'STERILIZATION' && (
-                  <label>
-                    {tr('Χημικός δείκτης κύκλου')}
-                    <select
-                      value={loadChemical}
-                      onChange={e => setLoadChemical(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
-                    >
-                      <option value="PASS">{tr('Αποδεκτός')}</option>
-                      <option value="FAIL">{tr('Αποτυχία')}</option>
-                      <option value="NOT_RECORDED">{tr('Δεν καταγράφηκε')}</option>
-                    </select>
-                  </label>
-                )}
               </div>
+              {loadModal === 'STERILIZATION' && loadChemical === 'FAIL' && (
+                <div className="load-device-fail" role="alert">
+                  <TriangleAlert size={16} />
+                  {tr('Η συσκευή δήλωσε αποτυχία κύκλου: το φορτίο θα επιστρέψει σε επανεπεξεργασία.')}
+                </div>
+              )}
               {loadModal === 'STERILIZATION' && (
                 <BarcodeCapture
                   title={tr('Προσθήκη στο φορτίο')}

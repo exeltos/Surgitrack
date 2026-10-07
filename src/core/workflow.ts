@@ -32,7 +32,7 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
   version: 1,
   updatedAt: '',
   receiptPolicy: {countSetsAtReceipt: false, allowCrossDepartmentHandover: true},
-  releasePolicy: {requireChemicalIndicator: true, biologicalIndicator: 'OPTIONAL', allowReleaseWhileBiPending: false},
+  releasePolicy: {requireChemicalIndicator: false, biologicalIndicator: 'OPTIONAL', allowReleaseWhileBiPending: false},
   stages: [
     {
       id: 'RECEIPT',

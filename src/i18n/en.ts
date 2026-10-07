@@ -1608,6 +1608,18 @@ export const en: Record<string, string> = {
   Φόρτωση: 'Load',
   'Μπαίνει στο φορτίο': 'Goes in the load',
   'Εκτός φορτίου': 'Left out',
+  'Δεν έγινε': 'Not done',
+  Επιτυχής: 'Passed',
+  Ανεπιτυχής: 'Failed',
+  'Οι δείκτες επιτρέπουν την αποδέσμευση.': 'The indicators allow release.',
+  'Ανεπιτυχής δείκτης: το φορτίο δεν αποδεσμεύεται, επιστρέφει σε επανεπεξεργασία.':
+    'A failed indicator: the load is not released and goes back to reprocessing.',
+  'Η μονάδα απαιτεί επιτυχή χημικό δείκτη.': 'The unit requires a passed chemical indicator.',
+  'Η μονάδα απαιτεί επιτυχή βιολογικό δείκτη.': 'The unit requires a passed biological indicator.',
+  'Αρκεί ένας από τους δύο δείκτες: συμπλήρωσε τουλάχιστον έναν ως επιτυχή.':
+    'One of the two indicators is enough: record at least one as passed.',
+  'Η συσκευή δήλωσε αποτυχία κύκλου: το φορτίο θα επιστρέψει σε επανεπεξεργασία.':
+    'The device reported a failed cycle: the load will go back to reprocessing.',
   'Νέα παραγγελία αγοράς': 'New purchase order',
   'Ναι · {0}': 'Yes · {0}',
   'Π.χ. επείγον, προϋπολογισμός…': 'E.g. urgent, budget…',

@@ -1,4 +1,5 @@
 import type {Asset} from '../../../types/domain';
+import {releaseIndicatorVerdict} from '../../../core/releaseIndicators';
 import type {Kind} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
 import type {useSterilizationQueues} from './useSterilizationQueues';
@@ -43,6 +44,7 @@ export function useCycleFlow(
     releaseChecks,
     releaseDraft,
     releaseLoadBi,
+    releaseLoadChem,
     releaseLoadChecks,
     releaseLoadId,
     releaseNote,
@@ -83,16 +85,9 @@ export function useCycleFlow(
     biologicalIndicator: 'OPTIONAL' as const,
     allowReleaseWhileBiPending: false,
   };
-  const releaseBiOk =
-    releasePolicy.biologicalIndicator === 'NOT_REQUIRED' ||
-    releaseLoadBi === 'PASS' ||
-    (releasePolicy.biologicalIndicator === 'OPTIONAL' && releaseLoadBi === 'NOT_REQUIRED') ||
-    (releasePolicy.allowReleaseWhileBiPending && releaseLoadBi === 'PENDING');
+  const releaseVerdict = releaseIndicatorVerdict(releasePolicy, releaseLoadChem, releaseLoadBi);
   const releaseLoadReady =
-    releaseLoadChecks.physicalParametersOk &&
-    (!releasePolicy.requireChemicalIndicator || releaseLoadChecks.chemicalIndicatorOk) &&
-    releaseLoadChecks.packagingIntegrityOk &&
-    releaseBiOk;
+    releaseLoadChecks.physicalParametersOk && releaseLoadChecks.packagingIntegrityOk && releaseVerdict.ok;
   const latestPassedCycle = (assetId: string) =>
     sterilizationCycles.find(c => c.assetId === assetId && c.result === 'PASSED');
   const moveToProcess = (kind: Kind, id: string) => {
@@ -242,6 +237,7 @@ export function useCycleFlow(
     openCycleCompletion,
     openRelease,
     releaseLoadReady,
+    releaseVerdict,
     releasePolicy,
     releaseReady,
     selectedReleaseLoad,

@@ -9,11 +9,14 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
     completeLoadRelease,
     releaseLoadBi,
     releaseLoadChecks,
+    releaseLoadChem,
     releaseLoadNote,
+    releaseVerdict,
     releaseLoadReady,
     selectedReleaseLoad,
     setReleaseLoadBi,
     setReleaseLoadChecks,
+    setReleaseLoadChem,
     setReleaseLoadId,
     setReleaseLoadNote,
   } = s;
@@ -77,16 +80,6 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 <label className="release-check-row">
                   <input
                     type="checkbox"
-                    checked={releaseLoadChecks.chemicalIndicatorOk}
-                    onChange={e => setReleaseLoadChecks(v => ({...v, chemicalIndicatorOk: e.target.checked}))}
-                  />
-                  <span>
-                    <strong>{tr('Χημικός δείκτης αποδεκτός')}</strong>
-                  </span>
-                </label>
-                <label className="release-check-row">
-                  <input
-                    type="checkbox"
                     checked={releaseLoadChecks.packagingIntegrityOk}
                     onChange={e => setReleaseLoadChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
                   />
@@ -94,18 +87,42 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                     <strong>{tr('Συσκευασίες στεγνές και ακέραιες')}</strong>
                   </span>
                 </label>
-                <label className="release-biological">
-                  {tr('Βιολογικός δείκτης')}
-                  <select
-                    value={releaseLoadBi}
-                    onChange={e => setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')}
-                  >
-                    <option value="NOT_REQUIRED">{tr('Δεν απαιτείται βάσει πολιτικής / κύκλου')}</option>
-                    <option value="PASS">{tr('Αρνητικός / επιτυχής')}</option>
-                    <option value="PENDING">{tr('Σε αναμονή')}</option>
-                    <option value="FAIL">{tr('Θετικός / αποτυχία')}</option>
-                  </select>
-                </label>
+                <div className="release-indicators">
+                  <label>
+                    {tr('Χημικός δείκτης')}
+                    <select
+                      value={releaseLoadChem}
+                      onChange={e => setReleaseLoadChem(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
+                    >
+                      <option value="NOT_RECORDED">{tr('Δεν έγινε')}</option>
+                      <option value="PASS">{tr('Επιτυχής')}</option>
+                      <option value="FAIL">{tr('Ανεπιτυχής')}</option>
+                    </select>
+                  </label>
+                  <label>
+                    {tr('Βιολογικός δείκτης')}
+                    <select
+                      value={releaseLoadBi}
+                      onChange={e => setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')}
+                    >
+                      <option value="NOT_REQUIRED">{tr('Δεν έγινε')}</option>
+                      <option value="PASS">{tr('Επιτυχής')}</option>
+                      <option value="PENDING">{tr('Σε αναμονή')}</option>
+                      <option value="FAIL">{tr('Ανεπιτυχής')}</option>
+                    </select>
+                  </label>
+                </div>
+                <p className={`release-indicator-hint${releaseVerdict.ok ? ' ok' : ''}`}>
+                  {releaseVerdict.ok
+                    ? tr('Οι δείκτες επιτρέπουν την αποδέσμευση.')
+                    : releaseVerdict.reason === 'FAILED'
+                      ? tr('Ανεπιτυχής δείκτης: το φορτίο δεν αποδεσμεύεται, επιστρέφει σε επανεπεξεργασία.')
+                      : releaseVerdict.reason === 'CHEMICAL_REQUIRED'
+                        ? tr('Η μονάδα απαιτεί επιτυχή χημικό δείκτη.')
+                        : releaseVerdict.reason === 'BIOLOGICAL_REQUIRED'
+                          ? tr('Η μονάδα απαιτεί επιτυχή βιολογικό δείκτη.')
+                          : tr('Αρκεί ένας από τους δύο δείκτες: συμπλήρωσε τουλάχιστον έναν ως επιτυχή.')}
+                </p>
               </section>
               <div className="load-manifest">
                 <strong>{tr('Manifest φορτίου')}</strong>

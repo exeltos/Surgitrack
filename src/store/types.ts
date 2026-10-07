@@ -119,6 +119,8 @@ export type CreateProcessLoadPayload = {
 export type ReleaseProcessLoadPayload = {
   physicalParametersOk: boolean;
   chemicalIndicatorOk: boolean;
+  /** The chemical indicator as recorded at release; when absent, `chemicalIndicatorOk` decides (pass / not recorded). */
+  chemicalIndicatorResult?: SterilizationIndicatorResult;
   packagingIntegrityOk: boolean;
   biologicalIndicatorResult: BiologicalIndicatorResult;
   decision: 'RELEASED' | 'REPROCESS';
