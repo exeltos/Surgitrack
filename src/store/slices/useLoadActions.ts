@@ -245,7 +245,7 @@ export function useLoadActions(
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
     if (!load || load.status !== 'AWAITING_RELEASE') return;
     const policy = sterilizationWorkflow.releasePolicy || {
-      requireChemicalIndicator: true,
+      requireChemicalIndicator: false,
       biologicalIndicator: 'OPTIONAL' as const,
       allowReleaseWhileBiPending: false,
     };

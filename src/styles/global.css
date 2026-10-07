@@ -8136,3 +8136,17 @@ html body .release-actions .release-print {
   display: inline-flex;
   gap: 6px;
 }
+/* Sterilization stage tabs on narrower screens (tablet): less inner padding so every label fits whole. */
+@media (max-width: 1366px) {
+  html body .sterilization-workspace .sterile-queues.modern {
+    gap: 5px;
+  }
+  html body .sterilization-workspace .sterile-queues.modern button {
+    padding-left: 6px;
+    padding-right: 6px;
+    column-gap: 3px;
+  }
+  html body .sterile-queues.modern button > span {
+    letter-spacing: 0;
+  }
+}
