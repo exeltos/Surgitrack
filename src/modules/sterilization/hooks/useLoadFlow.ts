@@ -196,7 +196,7 @@ export function useLoadFlow(
         name: item.assetName,
         kind: item.assetKind,
         department: item.department,
-        shelfLifeMonths: release?.shelfLifeMonths ?? asset?.shelfLifeMonths,
+        shelfLifeMonths: release?.shelfLifeMonths ?? asset?.shelfLifeMonths ?? p.defaultShelfLife,
         sterileUntil: release?.sterileUntil,
         sterilizedOn: release?.sterilizedOn,
       };

@@ -514,11 +514,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Έντυπο αποδέσμευσης',
-          'Το κουμπί «Έντυπο» (στο «Στον κλίβανο», στην Αποδέσμευση και στα πρόσφατα αποδεσμευμένα φορτία) τυπώνει σε A4 το έντυπο του φορτίου: τύπο φορτίου, κλίβανο, κύκλο, πρόγραμμα, διάρκεια αποστείρωσης, τους δείκτες με χώρο για να κολλήσετε την ταινία τους, τους ελέγχους, τα αντικείμενα με τη λήξη τους, την απόφαση και την έγκριση με τα στοιχεία του χρήστη και υπογραφή. Πριν την αποδέσμευση βγαίνει κενό για συμπλήρωση· μετά βγαίνει συμπληρωμένο.',
+          'Το κουμπί «Έντυπο» (στο «Στον κλίβανο», στην Αποδέσμευση και στα πρόσφατα αποδεσμευμένα φορτία) τυπώνει σε A4 το έντυπο του φορτίου: τύπο φορτίου, κλίβανο, κύκλο, πρόγραμμα, διάρκεια αποστείρωσης, τους δείκτες με χώρο για να κολλήσετε την ταινία τους, τους ελέγχους, τα αντικείμενα με τη λήξη τους, την απόφαση και την έγκριση με τα στοιχεία του χρήστη και υπογραφή. Από το «Στον κλίβανο» βγαίνει κενό για συμπλήρωση· από την Αποδέσμευση βγαίνει συμπληρωμένο με ό,τι έχετε επιλέξει εκεί (δείκτες, έλεγχοι) και τα στοιχεία του συνδεδεμένου χρήστη· μετά την αποδέσμευση βγαίνει με την καταχωρημένη απόφαση. Τα αντικείμενα δείχνουν την ημερομηνία αποστείρωσης (STERILE) και λήξης (κλεψύδρα)· αν δεν έχει οριστεί διάρκεια, εμφανίζεται η προεπιλογή του νοσοκομείου.',
         ],
         en: [
           'Release form',
-          'The "Form" button (in "In the sterilizer", in Release and in the recently released loads) prints the load’s A4 form: load type, sterilizer, cycle, program, shelf life, the indicators with a place to stick their strip, the checks, the items with their expiry, the decision and the approval with the user’s details and signature. Before release it prints blank to fill in; afterwards it prints filled in.',
+          'The "Form" button (in "In the sterilizer", in Release and in the recently released loads) prints the load’s A4 form: load type, sterilizer, cycle, program, shelf life, the indicators with a place to stick their strip, the checks, the items with their expiry, the decision and the approval with the user’s details and signature. From "In the sterilizer" it prints blank to fill in; from Release it prints filled in with what you have ticked there (indicators, checks) and the signed-in user’s details; after the release it prints with the recorded decision. Items show the sterilization date (STERILE) and the expiry date (hourglass); when no shelf life is set, the hospital default is shown.',
         ],
       },
       {
