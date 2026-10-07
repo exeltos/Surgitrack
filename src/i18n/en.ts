@@ -1817,4 +1817,19 @@ export const en: Record<string, string> = {
   'Τι διορθώθηκε; (καταγράφεται στο ιστορικό)': 'What was fixed? (recorded in the history)',
   'Το Σετ έχει {0} από {1} εργαλεία': 'The Set has {0} of {1} instruments',
   'Συμπληρώνεται στην αποδέσμευση από τον κλίβανο': 'Filled in at release from the sterilizer',
+  'Barcode εργαλείου + Enter': 'Instrument barcode + Enter',
+  '{0} · καταμετρήθηκε': '{0} · counted',
+  '{0} από {1} καταμετρημένα': '{0} of {1} counted',
+  'Όλα τα εργαλεία του Σετ καταμετρήθηκαν.': 'All the Set’s instruments have been counted.',
+  'Βλάβη ή φθορά σε εργαλείο (γράψτε ποιο στις παρατηρήσεις)':
+    'Damage or wear on an instrument (note which one in the remarks)',
+  'Θα δημιουργηθεί εκκρεμότητα βλάβης.': 'A damage issue will be created.',
+  'Λείπουν {0} εργαλεία. Θα δημιουργηθεί εκκρεμότητα.': '{0} instruments are missing. An issue will be created.',
+  'Λείπουν {0} εργαλεία. Υπογραφή της καταμέτρησης με έλλειψη;':
+    '{0} instruments are missing. Sign the count with a shortage?',
+  'Λείπουν: {0}': 'Missing: {0}',
+  'Σάρωση εργαλείου': 'Scan instrument',
+  'Το {0} δεν ανήκει σε αυτό το Σετ.': '{0} does not belong to this Set.',
+  'Τσεκάρετε ή σαρώστε κάθε εργαλείο που καταμετράτε.': 'Tick or scan each instrument you count.',
+  'πρότυπο {0}': 'template {0}',
 };

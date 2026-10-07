@@ -65,7 +65,7 @@ export function useAssetCatalogActions(
         from: s.department,
         to: s.department,
         status: 'Καταμέτρηση χειρουργείου υπογεγραμμένη',
-        by: 'OR User',
+        by: currentUser.name,
         patientCode: p.patientCode,
       });
       notify(tr('Η καταμέτρηση {0} καταγράφηκε και υπογράφηκε.', s.barcode));

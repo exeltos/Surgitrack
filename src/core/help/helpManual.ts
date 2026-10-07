@@ -375,6 +375,26 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Άλλο τμήμα',
+          'Ο διαχειριστής και η Αποστείρωση διαλέγουν το τμήμα από τον τίτλο της σελίδας και βλέπουν τα Σετ και τα εργαλεία του όπως τα βλέπει το ίδιο το τμήμα. Αν το δικό τους τμήμα δεν έχει Σετ, ανοίγει το τμήμα με τα περισσότερα.',
+        ],
+        en: [
+          'Another department',
+          'The administrator and Sterilization pick the department in the page title and see its Sets and instruments as the department does. If their own department holds no Sets, the busiest department opens.',
+        ],
+      },
+      {
+        el: [
+          'Καταμέτρηση χειρουργείου',
+          'Στην «Καταμέτρηση» διαλέγετε το Σετ, γράφετε τον κωδικό ασθενούς και τσεκάρετε ή σαρώνετε κάθε εργαλείο που μετράτε· τίποτα δεν είναι προτσεκαρισμένο. Αν λείπουν εργαλεία, η εφαρμογή ζητά επιβεβαίωση και ανοίγει εκκρεμότητα με τα εργαλεία που λείπουν. Για βλάβη τσεκάρετε «Βλάβη ή φθορά» και γράψτε ποιο εργαλείο. Η υπογραφή καταγράφεται με το όνομά σας και την ώρα.',
+        ],
+        en: [
+          'Surgical count',
+          'In "Count" pick the Set, enter the patient code and tick or scan every instrument you count; nothing starts ticked. If instruments are missing, the app asks to confirm and opens an issue listing them. For damage tick "Damage or wear" and note which instrument. The signature is recorded with your name and the time.',
+        ],
+      },
+      {
+        el: [
           'Αποστολή προς Αποστείρωση',
           'Μετά τη χρήση πατήστε «Αποστολή προς Αποστείρωση». Ο κωδικός ασθενούς είναι προαιρετικός, εκτός αν το Σετ ή το εργαλείο έχει περιορισμένες χρήσεις.',
         ],

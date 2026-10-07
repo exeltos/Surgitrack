@@ -2,8 +2,13 @@ import {useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import {Check, ScanBarcode, Signature, TriangleAlert} from 'lucide-react';
 import {tr, trData} from '../../i18n';
+
+/**
+ * The final surgical count: every instrument of the Set is ticked one by one (by hand or by scanning its
+ * barcode). Nothing starts counted, so a count cannot be signed as complete without counting.
+ */
 export default function CountPage() {
-  const {sets: allSets, recordCount, counts: allCounts, role, currentUser} = useSurgi();
+  const {sets: allSets, tools: allTools, recordCount, counts: allCounts, role, currentUser} = useSurgi();
   // A department counts only its own sets and sees only its own counts (patient codes included).
   const sets = useMemo(
     () => (role === 'DEPARTMENT' ? allSets.filter(x => x.department === currentUser.department) : allSets),
@@ -15,9 +20,16 @@ export default function CountPage() {
   }, [allCounts, sets]);
   const [setId, setSetId] = useState(sets[0]?.id || '');
   const s = useMemo(() => sets.find(x => x.id === setId), [sets, setId]);
+  // The instruments physically in the Set right now: what the count is against.
+  const members = useMemo(
+    () => (s ? allTools.filter(t => t.setId === s.id && t.state !== 'RETIRED') : []),
+    [allTools, s],
+  );
   const [patientCode, setPatientCode] = useState('');
-  const [counted, setCounted] = useState(s?.expected || 0);
-  const [result, setResult] = useState<'OK' | 'MISSING' | 'DAMAGE'>('OK');
+  const [ticked, setTicked] = useState<Set<string>>(new Set());
+  const [scan, setScan] = useState('');
+  const [scanMessage, setScanMessage] = useState('');
+  const [damage, setDamage] = useState(false);
   const [note, setNote] = useState('');
   if (!s)
     return (
@@ -29,16 +41,53 @@ export default function CountPage() {
         </span>
       </div>
     );
-  const diff = counted - s.expected;
-  const submit = () =>
+  const expected = members.length;
+  const counted = members.filter(t => ticked.has(t.id)).length;
+  const missing = members.filter(t => !ticked.has(t.id));
+  const complete = counted === expected && !damage;
+  const reset = () => {
+    setTicked(new Set());
+    setScan('');
+    setScanMessage('');
+    setDamage(false);
+    setNote('');
+  };
+  const toggle = (id: string) =>
+    setTicked(current => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const scanTool = () => {
+    const code = scan.trim().toUpperCase();
+    if (!code) return;
+    const tool = members.find(t => t.barcode.toUpperCase() === code);
+    if (!tool) setScanMessage(tr('Το {0} δεν ανήκει σε αυτό το Σετ.', code));
+    else {
+      setTicked(current => new Set(current).add(tool.id));
+      setScanMessage(tr('{0} · καταμετρήθηκε', `${tool.barcode} ${tool.name}`));
+    }
+    setScan('');
+  };
+  const submit = () => {
+    if (
+      missing.length &&
+      !window.confirm(tr('Λείπουν {0} εργαλεία. Υπογραφή της καταμέτρησης με έλλειψη;', missing.length))
+    )
+      return;
+    const missingNote = missing.length ? tr('Λείπουν: {0}', missing.map(t => `${t.barcode} ${t.name}`).join(', ')) : '';
     recordCount({
       setId: s.id,
-      patientCode,
-      expected: s.expected,
+      patientCode: patientCode.trim(),
+      expected,
       counted,
-      result: counted === s.expected && result === 'OK' ? 'OK' : result === 'DAMAGE' ? 'DAMAGE' : 'MISSING',
-      note,
+      result: damage ? 'DAMAGE' : counted === expected ? 'OK' : 'MISSING',
+      note: [note.trim(), missingNote].filter(Boolean).join(' · '),
     });
+    setPatientCode('');
+    reset();
+  };
   return (
     <>
       <div className="page-head">
@@ -59,8 +108,7 @@ export default function CountPage() {
               value={setId}
               onChange={e => {
                 setSetId(e.target.value);
-                const n = sets.find(x => x.id === e.target.value);
-                setCounted(n?.expected || 0);
+                reset();
               }}
             >
               {sets.map(x => (
@@ -77,34 +125,61 @@ export default function CountPage() {
             <input value={patientCode} onChange={e => setPatientCode(e.target.value)} placeholder="P-..." />
           </label>
           <label>
-            {tr('Αναμενόμενα')}
-            <input value={s.expected} readOnly />
-          </label>
-          <label>
-            {tr('Καταμετρημένα')}
-            <input type="number" value={counted} onChange={e => setCounted(Number(e.target.value))} />
-          </label>
-          <label>
-            {tr('Αποτέλεσμα')}
-            <select value={result} onChange={e => setResult(e.target.value as 'OK' | 'MISSING' | 'DAMAGE')}>
-              <option value="OK">{tr('Πλήρης καταμέτρηση')}</option>
-              <option value="MISSING">{tr('Έλλειψη')}</option>
-              <option value="DAMAGE">{tr('Βλάβη')}</option>
-            </select>
+            {tr('Σάρωση εργαλείου')}
+            <input
+              value={scan}
+              onChange={e => setScan(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  scanTool();
+                }
+              }}
+              placeholder={tr('Barcode εργαλείου + Enter')}
+            />
+            {scanMessage && <small className="count-scan-message">{scanMessage}</small>}
           </label>
         </div>
-        <div className={`count-result ${diff === 0 && result === 'OK' ? 'ok' : 'warning-result'}`}>
-          {diff === 0 && result === 'OK' ? <Check size={20} /> : <TriangleAlert size={20} />}
+        <div className="count-list" role="group" aria-label={tr('Εργαλεία Σετ')}>
+          <div className="count-list-head">
+            <strong>{tr('Εργαλεία Σετ')}</strong>
+            <span>
+              {tr('{0} από {1} καταμετρημένα', counted, expected)}
+              {s.expected && s.expected !== expected ? ` · ${tr('πρότυπο {0}', s.expected)}` : ''}
+            </span>
+            {ticked.size > 0 && (
+              <button type="button" className="count-clear" onClick={() => setTicked(new Set())}>
+                {tr('Καθαρισμός')}
+              </button>
+            )}
+          </div>
+          {members.map(t => (
+            <label key={t.id} className={`count-item ${ticked.has(t.id) ? 'on' : ''}`}>
+              <input type="checkbox" checked={ticked.has(t.id)} onChange={() => toggle(t.id)} />
+              <span className="mono">{t.barcode}</span>
+              <strong>{t.name}</strong>
+              <small>{t.code}</small>
+            </label>
+          ))}
+        </div>
+        <label className="count-damage">
+          <input type="checkbox" checked={damage} onChange={e => setDamage(e.target.checked)} />
+          {tr('Βλάβη ή φθορά σε εργαλείο (γράψτε ποιο στις παρατηρήσεις)')}
+        </label>
+        <div className={`count-result ${complete ? 'ok' : 'warning-result'}`}>
+          {complete ? <Check size={20} /> : <TriangleAlert size={20} />}
           <div>
             <strong>
-              {counted}/{s.expected} {tr('εργαλεία')}
+              {counted}/{expected} {tr('εργαλεία')}
             </strong>
             <span>
-              {diff === 0 && result === 'OK'
-                ? tr('Η σύνθεση συμφωνεί με το πρότυπο του Set.')
-                : diff < 0
-                  ? tr('Έλλειψη {0} εργαλείων. Θα δημιουργηθεί εκκρεμότητα.', Math.abs(diff))
-                  : tr('Υπάρχουν {0} επιπλέον εργαλεία. Απαιτείται έλεγχος.', diff)}
+              {complete
+                ? tr('Όλα τα εργαλεία του Σετ καταμετρήθηκαν.')
+                : damage
+                  ? tr('Θα δημιουργηθεί εκκρεμότητα βλάβης.')
+                  : counted === 0
+                    ? tr('Τσεκάρετε ή σαρώστε κάθε εργαλείο που καταμετράτε.')
+                    : tr('Λείπουν {0} εργαλεία. Θα δημιουργηθεί εκκρεμότητα.', missing.length)}
             </span>
           </div>
         </div>
@@ -121,7 +196,7 @@ export default function CountPage() {
             <Signature size={20} />
             <span>{tr('Η υπογραφή συνδέεται με τον συνδεδεμένο χρήστη και timestamp.')}</span>
           </div>
-          <button className="primary" onClick={submit} disabled={!patientCode.trim()}>
+          <button className="primary" onClick={submit} disabled={!patientCode.trim() || expected === 0}>
             {tr('Υπογραφή & ολοκλήρωση')}
           </button>
         </div>
