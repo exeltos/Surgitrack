@@ -12,6 +12,7 @@ import {emailLink} from './modules/auth/emailLink';
 import './styles/global.css';
 import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
 import {installTabletViewport} from './core/tabletViewport';
+import {getI18nLang, loadEnglish, setI18nLang} from './i18n';
 
 installChunkRecovery();
 installEscapeClosesDialogs();
@@ -21,26 +22,34 @@ const runtimeDataMode = getRuntimeDataMode();
 if (!root) throw new Error('SurgiTrack: root element was not found.');
 // An emailed invitation or password-reset link opens its own page first (see EmailLinkPage).
 const link = emailLink();
-ReactDOM.createRoot(root).render(
-  link ? (
-    <React.StrictMode>
-      <EmailLinkPage token={link.token} type={link.type} />
-    </React.StrictMode>
-  ) : (
-    <React.StrictMode>
-      <HashRouter>
-        <AppPreferencesProvider>
-          <CloudWorkspaceGate>
-            {cloud => (
-              <LibraryStoreProvider dataMode={runtimeDataMode} cloud={cloud}>
-                <SurgiProvider dataMode={runtimeDataMode} cloud={cloud}>
-                  <App />
-                </SurgiProvider>
-              </LibraryStoreProvider>
-            )}
-          </CloudWorkspaceGate>
-        </AppPreferencesProvider>
-      </HashRouter>
-    </React.StrictMode>
-  ),
-);
+const render = () =>
+  ReactDOM.createRoot(root).render(
+    link ? (
+      <React.StrictMode>
+        <EmailLinkPage token={link.token} type={link.type} />
+      </React.StrictMode>
+    ) : (
+      <React.StrictMode>
+        <HashRouter>
+          <AppPreferencesProvider>
+            <CloudWorkspaceGate>
+              {cloud => (
+                <LibraryStoreProvider dataMode={runtimeDataMode} cloud={cloud}>
+                  <SurgiProvider dataMode={runtimeDataMode} cloud={cloud}>
+                    <App />
+                  </SurgiProvider>
+                </LibraryStoreProvider>
+              )}
+            </CloudWorkspaceGate>
+          </AppPreferencesProvider>
+        </HashRouter>
+      </React.StrictMode>
+    ),
+  );
+// English users get their dictionary before the first paint; if it cannot be downloaded the app opens in Greek.
+if (getI18nLang() === 'en')
+  loadEnglish().then(render, () => {
+    setI18nLang('el');
+    render();
+  });
+else render();

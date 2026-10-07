@@ -1,4 +1,4 @@
-import {setI18nLang} from '../i18n';
+import {loadEnglish, setI18nLang} from '../i18n';
 import {createContext, useContext, useEffect, useMemo, useState, type ReactNode} from 'react';
 export type AppLang = 'el' | 'en';
 type Prefs = {
@@ -22,10 +22,15 @@ export function AppPreferencesProvider({children}: {children: ReactNode}) {
   const [highContrast, setHighContrastState] = useState(() => localStorage.getItem('surgitrack-contrast') === '1');
   const [reducedMotion, setReducedMotionState] = useState(() => localStorage.getItem('surgitrack-motion') === '1');
   const setLang = (v: AppLang) => {
-    // The t() helper reads the language directly, so it must switch before the re-render.
-    setI18nLang(v);
-    setLangState(v);
-    localStorage.setItem('surgitrack-lang', v);
+    // The t() helper reads the language directly, so it must switch before the re-render;
+    // English waits for its dictionary (and stays Greek if it cannot be downloaded).
+    const apply = () => {
+      setI18nLang(v);
+      setLangState(v);
+      localStorage.setItem('surgitrack-lang', v);
+    };
+    if (v === 'en') loadEnglish().then(apply, () => undefined);
+    else apply();
   };
   const setFontScale = (v: number) => {
     setFontScaleState(v);
