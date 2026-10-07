@@ -5,6 +5,7 @@ import type {SterilizationPageState} from '../useSterilizationPage';
 export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
   const {
     closeLoadRelease,
+    awaitingLoads,
     completeLoadRelease,
     releaseLoadBi,
     releaseLoadChecks,
@@ -13,6 +14,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
     selectedReleaseLoad,
     setReleaseLoadBi,
     setReleaseLoadChecks,
+    setReleaseLoadId,
     setReleaseLoadNote,
   } = s;
   return (
@@ -40,6 +42,18 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
               </div>
             </div>
             <div className="workflow-modal-body">
+              {awaitingLoads.length > 1 && (
+                <label className="release-load-picker">
+                  {tr('Φορτίο / κλίβανος')}
+                  <select value={selectedReleaseLoad.id} onChange={e => setReleaseLoadId(e.target.value)}>
+                    {awaitingLoads.map(load => (
+                      <option key={load.id} value={load.id}>
+                        {load.id} · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <section className="release-check-card">
                 <div className="receipt-section-title">
                   <div>

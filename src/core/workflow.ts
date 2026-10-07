@@ -90,10 +90,10 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       id: 'STERILIZATION',
       enabled: true,
       locked: true,
-      labelEl: 'Αποστείρωση',
-      labelEn: 'Sterilization',
-      descriptionEl: 'Καταχώρηση κλιβάνου, φορτίου, προγράμματος και αποτελέσματος κύκλου.',
-      descriptionEn: 'Record sterilizer, load, program and cycle result.',
+      labelEl: 'Φόρτωση κλιβάνου',
+      labelEn: 'Sterilizer load',
+      descriptionEl: 'Επιλογή κλιβάνου, φορτίου και προγράμματος· όλα τα Σετ και εργαλεία μπαίνουν μαζί σε έναν κύκλο.',
+      descriptionEn: 'Choose the sterilizer, load and program; all Sets and instruments go into one cycle together.',
       checksEl: ['Καταγραφή κύκλου'],
       checksEn: ['Cycle record'],
     },
@@ -131,6 +131,30 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       checksEn: ['Receiver identification'],
     },
   ],
+};
+
+/**
+ * A workflow saved before the stage was renamed keeps its old wording: «Αποστείρωση» becomes
+ * «Φόρτωση κλιβάνου» (only when the hospital has not renamed it itself).
+ */
+export const upgradeWorkflowLabels = (workflow: SterilizationWorkflowConfig): SterilizationWorkflowConfig => {
+  const fresh = defaultSterilizationWorkflow.stages.find(stage => stage.id === 'STERILIZATION');
+  if (!fresh || !workflow.stages?.some(stage => stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση'))
+    return workflow;
+  return {
+    ...workflow,
+    stages: workflow.stages.map(stage =>
+      stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση'
+        ? {
+            ...stage,
+            labelEl: fresh.labelEl,
+            labelEn: fresh.labelEn,
+            descriptionEl: fresh.descriptionEl,
+            descriptionEn: fresh.descriptionEn,
+          }
+        : stage,
+    ),
+  };
 };
 
 export const workflowStageState: Record<WorkflowStageId, string> = {
