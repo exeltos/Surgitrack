@@ -225,7 +225,9 @@ export default function MovementsPage() {
                     <i>{trData(m.to)}</i>
                   </span>
                   <span>
-                    <mark className="movement-chip">{trData(m.status)}</mark>
+                    <mark className="movement-chip" title={trData(m.status)}>
+                      {trData(m.status)}
+                    </mark>
                   </span>
                   <span className="ledger-user">
                     <UserRound size={15} />

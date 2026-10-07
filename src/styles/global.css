@@ -8525,3 +8525,62 @@ html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
     height: auto !important;
   }
 }
+/* Movements: the action column gets the room (up to two lines, full text on hover), the date stays on one
+   line, the route takes only what it needs. */
+html body .ledger-columns,
+html body .ledger-row {
+  grid-template-columns: 150px minmax(140px, 0.9fr) minmax(190px, 1.1fr) minmax(230px, 1.6fr) minmax(150px, 1fr) 24px;
+}
+html body .ledger-date b {
+  white-space: nowrap;
+}
+html body .ledger-row .movement-chip {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  line-height: 1.3;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  overflow: hidden;
+}
+@media (max-width: 1280px) {
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 128px minmax(120px, 0.9fr) minmax(150px, 1fr) minmax(190px, 1.5fr) minmax(130px, 0.9fr) 20px;
+  }
+  html body .ledger-date b {
+    font-size: 12px;
+  }
+}
+html body .ledger-row .movement-chip {
+  max-height: calc(2 * 1.3em + 6px);
+}
+@media (max-width: 1280px) {
+  html body .ledger-date svg {
+    display: none;
+  }
+  html body .ledger-date {
+    gap: 0;
+  }
+  html body .ledger-route {
+    flex-wrap: wrap;
+    white-space: normal;
+    row-gap: 0;
+  }
+  html body .ledger-route i {
+    white-space: nowrap;
+    max-width: 100%;
+  }
+}
+@media (max-width: 1600px) {
+  html body .ledger-route {
+    flex-wrap: wrap;
+    white-space: normal;
+    row-gap: 0;
+  }
+  html body .ledger-route i {
+    white-space: nowrap;
+    max-width: 100%;
+  }
+}
