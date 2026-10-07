@@ -1,4 +1,5 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
+import SterileDates from '../../components/ui/SterileDates';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {Link, useSearchParams} from 'react-router-dom';
@@ -264,7 +265,9 @@ export default function DepartmentPage() {
                           {(() => {
                             const status = expiryStatus(asset.sterileUntil, asset.shelfLifeMonths);
                             return status.state === 'OK' ? (
-                              <small>{tr('Έως {0}', formatExpiry(asset.sterileUntil))}</small>
+                              <small>
+                                <SterileDates sterilizedOn={asset.sterilizedOn} sterileUntil={asset.sterileUntil} />
+                              </small>
                             ) : (
                               <ExpiryBadge entry={status} />
                             );

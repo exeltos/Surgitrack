@@ -1792,4 +1792,9 @@ export const en: Record<string, string> = {
   'BI ανεπιτυχής': 'BI failed',
   'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;':
     'Failed biological indicator: the whole load {0} will be recalled. Continue?',
+  'Αποστείρωση / λήξη': 'Sterilized / expires',
+  'Ημερομηνία αποστείρωσης': 'Sterilization date',
+  'Ημερομηνία λήξης': 'Use-by date',
+  'Αφορά το ίδιο το Σετ: κάλυψε την έλλειψη από τη λίστα εργαλείων (γραμμή «Λείπει» → Αντικατάσταση) ή κάνε «Αποδοχή καταγεγραμμένης έλλειψης» πάνω δεξιά.':
+    'It concerns the Set itself: cover the shortage from the instrument list (the "Missing" line → Replace) or tick "Accept the recorded shortage" at the top right.',
 };

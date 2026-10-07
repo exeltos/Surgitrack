@@ -183,7 +183,7 @@ export function useLoadFlow(
     recallProcessLoad(id, reason.trim());
   };
   /** Prints the release form of a load: blank while in the sterilizer, filled in once released. */
-  const printLoadForm = (loadId: string) => {
+  const printLoadForm = (loadId: string, fromReleaseDialog = false) => {
     const load = p.processLoads.find(item => item.id === loadId);
     if (!load) return;
     const releases = p.sterilizationReleases.filter(r => r.loadId === loadId);
@@ -198,6 +198,7 @@ export function useLoadFlow(
         department: item.department,
         shelfLifeMonths: release?.shelfLifeMonths ?? asset?.shelfLifeMonths,
         sterileUntil: release?.sterileUntil,
+        sterilizedOn: release?.sterilizedOn,
       };
     });
     const first = releases[0];
@@ -214,6 +215,16 @@ export function useLoadFlow(
           ? {at: load.releasedAt, decision: load.status === 'REPROCESS' ? 'REPROCESS' : 'RELEASED'}
           : undefined,
       label: p.systemSettings.label,
+      // From the release dialog: what is ticked there now, signed by the user printing it.
+      draft: fromReleaseDialog
+        ? {
+            chemical: releaseLoadChem,
+            biological: releaseLoadBi,
+            physicalOk: releaseLoadChecks.physicalParametersOk,
+            packagingOk: releaseLoadChecks.packagingIntegrityOk,
+            at: new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'}),
+          }
+        : undefined,
     });
   };
   return {

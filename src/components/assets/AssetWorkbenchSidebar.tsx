@@ -1,11 +1,12 @@
 import {useLibraries} from '../../core/LibraryStore';
+import SterileDates from '../ui/SterileDates';
 import {useEffect, useState} from 'react';
 import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
 import ExpiryBadge from '../ui/ExpiryBadge';
-import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
+import {STERILE_STATES, expiryStatus} from '../../core/sterileExpiry';
 import AssetTypeIcon from './AssetTypeIcon';
 import {tr, trData} from '../../i18n';
 
@@ -219,9 +220,9 @@ export default function AssetWorkbenchSidebar({
         </div>
         {sterile && asset.sterileUntil && (
           <div>
-            <dt>{tr('Αποστειρωμένο έως')}</dt>
+            <dt>{tr('Αποστείρωση / λήξη')}</dt>
             <dd>
-              {formatExpiry(asset.sterileUntil)}
+              <SterileDates sterilizedOn={asset.sterilizedOn} sterileUntil={asset.sterileUntil} />
               {asset.shelfLifeMonths ? ` · ${tr('{0} μήνες', asset.shelfLifeMonths)}` : ''}
             </dd>
           </div>

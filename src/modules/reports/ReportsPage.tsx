@@ -27,6 +27,7 @@ import {compositionHtml} from '../sterilization/printUtils';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
+import {EXPIRY_MARK, STERILE_MARK} from '../../core/sterileSymbols';
 
 const LOAD_STATUS: Record<string, string> = {
   OPEN: 'Στον κλίβανο',
@@ -400,6 +401,7 @@ export default function ReportsPage() {
           department: e.department || '—',
           stateLabel: stateLabel[e.assetState] || e.assetState,
           shelfLife: e.shelfLifeMonths ? tr('{0} μήνες', e.shelfLifeMonths) : '—',
+          sterilized: e.sterilizedOn ? formatExpiry(e.sterilizedOn) : '—',
           until: formatExpiry(e.sterileUntil),
           left:
             e.state === 'EXPIRED'
@@ -416,7 +418,8 @@ export default function ReportsPage() {
           {key: 'department', label: tr('Τμήμα')},
           {key: 'stateLabel', label: tr('Θέση')},
           {key: 'shelfLife', label: tr('Διάρκεια')},
-          {key: 'until', label: tr('Λήγει')},
+          {key: 'sterilized', label: `${STERILE_MARK} · ${tr('Αποστείρωση')}`},
+          {key: 'until', label: `${EXPIRY_MARK} ${tr('Λήγει')}`},
           {key: 'left', label: tr('Υπόλοιπο')},
         ],
         rows: rows as Row[],

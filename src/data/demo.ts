@@ -740,6 +740,9 @@ const demoSterile = (code: string, daysFromToday: number, months: number) => {
   until.setDate(until.getDate() + daysFromToday);
   set.sterileUntil = isoDate(until);
   set.shelfLifeMonths = months;
+  const on = new Date(until);
+  on.setMonth(on.getMonth() - months);
+  set.sterilizedOn = isoDate(on);
 };
 demoSterile('ORTHO-BASIC', 120, 6);
 demoSterile('LAP-GEN', 8, 2);
