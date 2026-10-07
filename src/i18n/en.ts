@@ -1816,4 +1816,5 @@ export const en: Record<string, string> = {
   'Παραμονή ως έχει': 'Keep as is',
   'Τι διορθώθηκε; (καταγράφεται στο ιστορικό)': 'What was fixed? (recorded in the history)',
   'Το Σετ έχει {0} από {1} εργαλεία': 'The Set has {0} of {1} instruments',
+  'Συμπληρώνεται στην αποδέσμευση από τον κλίβανο': 'Filled in at release from the sterilizer',
 };
