@@ -1,6 +1,7 @@
 import {CheckCircle2, TriangleAlert, ArrowRight, X} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import {SET_SHORTAGE_CODE} from '../hooks/usePreparationChecks';
 
 export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
   const {
@@ -33,9 +34,9 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
             <h3>{prepManageMissing.name}</h3>
             <div className="prep-manage-summary">
               <span>
-                {prepManageMissing.code} {tr('· λείπουν') + ' '}
-                {prepManageMissing.missing} {tr('από') + ' '}
-                {prepManageMissing.quantity}
+                {prepManageMissing.code === SET_SHORTAGE_CODE
+                  ? tr('Λείπουν {0} από {1} εργαλεία του Σετ', prepManageMissing.missing, prepManageMissing.quantity)
+                  : `${prepManageMissing.code} ${tr('· λείπουν')} ${prepManageMissing.missing} ${tr('από')} ${prepManageMissing.quantity}`}
               </span>
             </div>
             <div className="prep-manage-grid">
@@ -82,7 +83,7 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
               >
                 <CheckCircle2 size={16} />
                 <span>
-                  <b>{tr('Χωρίς ενέργεια')}</b>
+                  <b>{tr('Παραμονή ως έχει')}</b>
                   <small>{tr('Καταγραφή της έλλειψης και συνέχιση της διαδικασίας')}</small>
                 </span>
               </button>

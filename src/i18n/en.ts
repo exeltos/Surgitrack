@@ -1802,10 +1802,18 @@ export const en: Record<string, string> = {
     'What you record is kept on this page and saved as soon as the connection is back; changes from other devices are not shown. Do not close or reload the page.',
   'Οι τελευταίες αλλαγές δεν έχουν αποθηκευτεί ακόμη· θα αποθηκευτούν μόλις επανέλθει η σύνδεση. Μην κλείσετε και μην ανανεώσετε τη σελίδα.':
     'Your latest changes are not saved yet; they will be saved as soon as the connection is back. Do not close or reload the page.',
-  'Πώς επιλύθηκε η εκκρεμότητα; (καταγράφεται στο ιστορικό)': 'How was the issue resolved? (recorded in the history)',
-  'Για έλλειψη: «Αντιμετώπιση» στη γραμμή «Λείπει» της λίστας (αντικατάσταση ή αποδοχή), ή «Επίλυση» εδώ όταν το πρόβλημα έχει λυθεί.':
-    'For a shortage: "Handle" on the "Missing" row of the list (replace or accept), or "Resolve" here once the problem is solved.',
-  'Για έλλειψη: τσέκαρε «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση πάνω δεξιά, ή «Επίλυση» εδώ όταν το εργαλείο βρεθεί.':
-    'For a shortage: tick "Accept the recorded shortage" in the notice at the top right, or "Resolve" here once the instrument is found.',
-  'Πάτησε «Επίλυση» όταν το πρόβλημα έχει λυθεί.': 'Press "Resolve" once the problem is solved.',
+  'Υπόλ. χρήσεων: {0}': 'Uses left: {0}',
+  Διορθώθηκε: 'Fixed',
+  'ΕΚΚΡΕΜΟΤΗΤΑ ΣΕΤ': 'SET ISSUE',
+  'Εκκρεμότητα Σετ': 'Set issue',
+  'Εκκρεμότητα του Σετ': 'Issue on the Set',
+  'Εργαλείο που λείπει': 'Missing instrument',
+  'Η εκκρεμότητα μένει ανοιχτή και η διαδικασία συνεχίζει': 'The issue stays open and the process goes on',
+  'Κλείνει την εκκρεμότητα με σημείωση για το τι έγινε': 'Closes the issue with a note on what was done',
+  'Λείπουν {0} από {1} εργαλεία του Σετ': '{0} of the Set’s {1} instruments are missing',
+  'Οι γραμμές με χρώμα στη λίστα δείχνουν τι χρειάζεται ενέργεια· πατήστε «Αντιμετώπιση».':
+    'The coloured rows in the list show what needs action; press "Handle".',
+  'Παραμονή ως έχει': 'Keep as is',
+  'Τι διορθώθηκε; (καταγράφεται στο ιστορικό)': 'What was fixed? (recorded in the history)',
+  'Το Σετ έχει {0} από {1} εργαλεία': 'The Set has {0} of {1} instruments',
 };

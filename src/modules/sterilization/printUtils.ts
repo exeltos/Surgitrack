@@ -1,8 +1,8 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
-import {sterileDatesHtml} from '../../core/sterileSymbols';
-import {sterilizedOnOf} from '../../core/sterileExpiry';
+import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
+import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
 export const escapeHtml = (value: string) =>
@@ -170,7 +170,8 @@ export function openPrintWindow(title: string, html: string) {
 }
 
 type PrintAsset = (
-  Pick<SetAsset, 'barcode' | 'name' | 'department'> | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
+  | Pick<SetAsset, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
+  | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
 ) & {code?: string; sterileUntil?: string; sterilizedOn?: string; shelfLifeMonths?: number};
 
 /** The label's paper size: the chosen size, or the printer roll's own when set (20–150 mm). */
@@ -214,8 +215,11 @@ function barcodeLabelBody(
   screenZoom = 1,
 ) {
   // Once released, the label carries the sterilization and expiry dates with their symbols instead of the count.
+  // Bottom line: the remaining uses on the left (limited-use Sets and instruments), the two dates side by side on the right.
+  const maxUses = 'maxUses' in asset ? asset.maxUses : undefined;
+  const usesLeft = maxUses ? Math.max(0, maxUses - (('uses' in asset ? asset.uses : 0) || 0)) : undefined;
   const datesHtml = asset.sterileUntil
-    ? sterileDatesHtml(sterilizedOnOf(asset), asset.sterileUntil, '0.95em', true)
+    ? `${usesLeft !== undefined ? `<span class="left">${escapeHtml(tr('Υπόλ. χρήσεων: {0}', usesLeft))}</span>` : ''}<span class="dates">${sterileDatesHtml(sterilizedOnOf(asset), asset.sterileUntil, '0.95em', true)}</span>`
     : '';
   const details =
     kind === 'SET'
@@ -246,7 +250,7 @@ function barcodeLabelBody(
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
   .head,.foot,.cod{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:flex;justify-content:space-between;align-items:baseline;gap:1.5mm}
-  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{flex-wrap:wrap;row-gap:.2mm}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;gap:1.5mm}
+  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{flex-wrap:wrap;row-gap:.2mm}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
   .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
   .sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}
@@ -284,6 +288,27 @@ const markerChips = (marker: CompositionOptions['marker'] = []) =>
       return `<span class="tape"><i style="background:linear-gradient(90deg,${band.join(',')})">${tape.label ? escapeHtml(tape.label) : ''}</i>${escapeHtml(tape.name)}</span>`;
     })
     .join('');
+
+/** Sterilization (date and time), expiry and remaining uses, with their symbols, for the composition sheet. */
+const sterileMetaHtml = (set: SetAsset) => {
+  const on = set.sterileUntil ? sterilizedOnOf(set) : undefined;
+  const cell = (label: string, value: string) => `<div><b>${label}</b><span class="symv">${value}</span></div>`;
+  const usesLeft = set.maxUses ? Math.max(0, set.maxUses - (set.uses || 0)) : undefined;
+  return [
+    cell(
+      `${sterileSymbolSvg('1em')} ${escapeHtml(tr('Αποστείρωση'))}`,
+      on ? escapeHtml(`${formatExpiry(on)}${set.sterilizedTime ? `, ${set.sterilizedTime}` : ''}`) : '—',
+    ),
+    cell(
+      `${expirySymbolSvg('1em')} ${escapeHtml(tr('Λήξη'))}`,
+      set.sterileUntil ? escapeHtml(formatExpiry(set.sterileUntil)) : '—',
+    ),
+    cell(
+      escapeHtml(tr('Υπόλοιπο χρήσεων')),
+      escapeHtml(usesLeft !== undefined ? `${usesLeft} / ${set.maxUses}` : tr('Χωρίς όριο')),
+    ),
+  ].join('');
+};
 
 /** An open issue on the Set or one of its instruments, by barcode, for the composition sheet. */
 export type CompositionProblem = {barcode: string; type: string};
@@ -341,21 +366,22 @@ function compositionBody(
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
         : '<div class="brand">SurgiTrack</div>';
   const marker = markerChips(options.marker);
-  const meta = [
-    [tr('Τμήμα'), trData(set.department) || '—'],
-    [tr('Ειδικότητα'), trData(set.specialty) || '—'],
+  const meta =
     [
-      tr('Σύνολο εργαλείων'),
-      templated || set.expected
-        ? `${tools.length} / ${templated ? lines.reduce((sum, line) => sum + (line.expected || 0), 0) : set.expected}`
-        : String(tools.length),
-    ],
-    [tr('Είδη εργαλείων'), String(lines.length)],
-    [tr('Προετοίμασε'), preparedBy],
-    [tr('Ημερομηνία / ώρα'), preparedAt],
-  ]
-    .map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`)
-    .join('');
+      [tr('Τμήμα'), trData(set.department) || '—'],
+      [tr('Ειδικότητα'), trData(set.specialty) || '—'],
+      [
+        tr('Σύνολο εργαλείων'),
+        templated || set.expected
+          ? `${tools.length} / ${templated ? lines.reduce((sum, line) => sum + (line.expected || 0), 0) : set.expected}`
+          : String(tools.length),
+      ],
+      [tr('Είδη εργαλείων'), String(lines.length)],
+      [tr('Προετοίμασε'), preparedBy],
+      [tr('Ημερομηνία / ώρα'), preparedAt],
+    ]
+      .map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`)
+      .join('') + sterileMetaHtml(set);
   const barcode = code128Svg(set.barcode, 48);
   return `<style>
   @page{size:A4 portrait;margin:12mm 11mm 14mm;@bottom-right{content:counter(page) " / " counter(pages);font:7pt Arial,sans-serif;color:#667}}
@@ -367,7 +393,7 @@ function compositionBody(
   h1{margin:1mm 0 0;font-size:15pt;line-height:1.15}
   .marker{display:flex;flex-wrap:wrap;gap:2mm;margin-top:2mm}.tape{display:inline-flex;align-items:center;gap:1.2mm;font-size:7.5pt;color:#3d4f5a}.tape i{display:inline-grid;place-items:center;min-width:7mm;height:3.6mm;border-radius:.8mm;border:.2mm solid rgba(0,0,0,.25);font-style:normal;font-size:6pt;font-weight:800;color:#fff;text-shadow:0 0 1px #000}
   .barcode{text-align:center;padding:2mm 3mm;border:.25mm solid #cfd9df;border-radius:2mm}.barcode svg{width:48mm;height:13mm;display:block}.barcode-code{font-size:9pt;font-weight:700;letter-spacing:.08em;margin-top:1mm}
-  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:4mm 0 5mm;border:.25mm solid #d7e0e5;border-radius:2mm;overflow:hidden}.meta div{padding:2mm 3mm;border-right:.25mm solid #e3e9ec;border-bottom:.25mm solid #e3e9ec}.meta div:nth-child(3n){border-right:0}.meta div:nth-last-child(-n+3){border-bottom:0}.meta b{display:block;font-size:6.5pt;font-weight:700;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.6mm}.meta span{font-size:9pt;font-weight:700}
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:4mm 0 5mm;border:.25mm solid #d7e0e5;border-radius:2mm;overflow:hidden}.meta div{padding:2mm 3mm;border-right:.25mm solid #e3e9ec;border-bottom:.25mm solid #e3e9ec}.meta div:nth-child(3n){border-right:0}.meta div:nth-last-child(-n+3){border-bottom:0}.meta b{display:block;font-size:6.5pt;font-weight:700;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.6mm}.meta span{font-size:9pt;font-weight:700}.meta b svg{vertical-align:-.18em}
   table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}
   th{font-size:7pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:2mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
   td{padding:1.8mm 1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nth-child(even) td{background:#f8fafb}

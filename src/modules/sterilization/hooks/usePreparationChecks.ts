@@ -1,4 +1,14 @@
+import {tr} from '../../../i18n';
+import type {Issue} from '../../../types/domain';
 import type {useSterilizationState} from './useSterilizationState';
+
+/** A Set without a composition template still shows its shortage as rows to handle (replace or keep as is). */
+export const SET_SHORTAGE_CODE = '__SET_SHORTAGE__';
+/** An issue that records a shortage (handled through the Missing rows). */
+const isShortageIssue = (i: Issue) =>
+  i.type.toLowerCase().includes('έλλει') ||
+  i.note.toLowerCase().includes('έλλει') ||
+  i.note.toLowerCase().includes('αναμενόμενα');
 import type {useSterilizationQueues} from './useSterilizationQueues';
 
 export function usePreparationChecks(
@@ -10,6 +20,8 @@ export function usePreparationChecks(
     issues,
     prepCheckedIds,
     prepDraft,
+    prepKeptIssueIds,
+    prepManageIssueId,
     prepManageMissingCode,
     prepManageToolId,
     prepProcessChecks,
@@ -39,7 +51,7 @@ export function usePreparationChecks(
   const prepAllChecked = prepItemIds.length > 0 && prepItemIds.every(id => prepCheckedIds.has(id));
   const prepExpectedCount = prepDraft?.kind === 'SET' ? prepDraft.asset.expected : 1;
   const prepMissingCount = prepDraft?.kind === 'SET' ? Math.max(0, prepExpectedCount - prepTools.length) : 0;
-  const prepMissingRequirements =
+  const templateMissing =
     prepDraft?.kind === 'SET' && prepDraft.asset.compositionTemplate
       ? prepDraft.asset.compositionTemplate.flatMap(req => {
           const actual = prepTools.filter(t => t.code === req.code).length;
@@ -47,6 +59,15 @@ export function usePreparationChecks(
           return missing ? [{...req, missing}] : [];
         })
       : [];
+  // What the template does not explain (no template, or fewer instruments than the Set's expected count).
+  const unexplained = prepMissingCount - templateMissing.reduce((sum, req) => sum + req.missing, 0);
+  const prepMissingRequirements =
+    prepDraft?.kind === 'SET' && unexplained > 0
+      ? [
+          ...templateMissing,
+          {code: SET_SHORTAGE_CODE, name: tr('Εργαλείο που λείπει'), quantity: prepExpectedCount, missing: unexplained},
+        ]
+      : templateMissing;
   const prepTemplateComplete =
     prepDraft?.kind !== 'SET' || !prepDraft.asset.compositionTemplate?.length || prepMissingRequirements.length === 0;
   const prepCompositionComplete =
@@ -62,16 +83,23 @@ export function usePreparationChecks(
     !!prepDraft && prepDraft.kind === 'SET' && !prepCompositionComplete && prepMissingAccepted;
   const prepResolvedShortageIssues =
     prepDraft?.kind === 'SET' && (prepCompositionComplete || prepAcceptedDeviation)
+      ? prepOpenIssues.filter(i => i.asset.startsWith(prepDraft.asset.barcode) && isShortageIssue(i))
+      : [];
+  const prepResolvedShortageIssueIds = new Set(prepResolvedShortageIssues.map(i => i.id));
+  const prepBlockingIssues = prepOpenIssues.filter(
+    i => !prepResolvedShortageIssueIds.has(i.id) && !prepKeptIssueIds.has(i.id),
+  );
+  // Issues about the Set itself (not one of its instruments, not a shortage): listed as rows to handle.
+  const prepSetIssues =
+    prepDraft?.kind === 'SET'
       ? prepOpenIssues.filter(
           i =>
             i.asset.startsWith(prepDraft.asset.barcode) &&
-            (i.type.toLowerCase().includes('έλλει') ||
-              i.note.toLowerCase().includes('έλλει') ||
-              i.note.toLowerCase().includes('αναμενόμενα')),
+            !isShortageIssue(i) &&
+            !prepTools.some(t => i.asset.startsWith(t.barcode)),
         )
       : [];
-  const prepResolvedShortageIssueIds = new Set(prepResolvedShortageIssues.map(i => i.id));
-  const prepBlockingIssues = prepOpenIssues.filter(i => !prepResolvedShortageIssueIds.has(i.id));
+  const prepManageIssue = prepManageIssueId ? prepSetIssues.find(i => i.id === prepManageIssueId) : undefined;
   const prepProcessReady =
     prepProcessChecks.functionIntegrity &&
     prepProcessChecks.assembly &&
@@ -121,6 +149,9 @@ export function usePreparationChecks(
       : [];
   return {
     prepAcceptedDeviation,
+    prepMissingAccepted,
+    prepSetIssues,
+    prepManageIssue,
     prepBlockingIssues,
     prepCompositionComplete,
     prepExpectedCount,

@@ -8758,35 +8758,6 @@ html body .offline-strip svg {
     display: inline-block;
   }
 }
-/* Preparation: an issue about the Set itself, resolved in place. */
-html body .prep-block-warning .prep-block-set {
-  grid-column: 2;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 6px;
-  width: 100%;
-}
-html body .prep-block-issue {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border: 1px solid #f1d59b;
-  border-radius: 8px;
-  background: #fff;
-  color: #5c3a00;
-  font-size: 12.5px;
-}
-html body .prep-block-issue > span {
-  flex: 1 1 160px;
-  min-width: 0;
-}
-html body .prep-block-issue .prep-block-open {
-  margin-left: auto;
-  flex: 0 0 auto;
-}
 /* Preparation: the side column and the list move only up and down (see keepLeft); long texts wrap. */
 html body .prep-workspace-modal .prep-control-panel,
 html body .prep-workspace-modal .prep-tools-scroll {
@@ -8810,4 +8781,9 @@ html body dd.sterile-dd small {
   font-size: 0.82em;
   font-weight: 600;
   white-space: nowrap;
+}
+/* Preparation list: the Handle button of a Missing or Set-issue row matches the other row buttons. */
+html body .prep-tools-scroll .prep-missing-row .tool-manage-btn {
+  font-size: 11px;
+  border: 1px solid #e9bf78;
 }

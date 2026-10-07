@@ -60,11 +60,11 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
     kind: AssetKind,
     id: string,
     state: AssetState,
-    sterile?: {sterileUntil: string; shelfLifeMonths: number; sterilizedOn?: string},
+    sterile?: {sterileUntil: string; shelfLifeMonths: number; sterilizedOn?: string; sterilizedTime?: string},
   ) => {
     const expiry = (STERILE_STATES as readonly AssetState[]).includes(state)
       ? sterile || {}
-      : {sterileUntil: undefined, sterilizedOn: undefined};
+      : {sterileUntil: undefined, sterilizedOn: undefined, sterilizedTime: undefined};
     if (kind === 'SET') {
       setSets(x => x.map(a => (a.id === id ? {...a, state, ...expiry} : a)));
       setTools(x => x.map(t => (t.setId === id ? {...t, state} : t)));
@@ -92,6 +92,7 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
       shelfLifeMonths,
       sterileUntil: sterileUntil(releasedOn, shelfLifeMonths),
       sterilizedOn: isoDate(releasedOn),
+      sterilizedTime: releasedOn.toTimeString().slice(0, 5),
     };
   };
   return {

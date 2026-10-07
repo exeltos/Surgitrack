@@ -65,6 +65,8 @@ export function usePreparationFlow(
     setPrepManageToolId(null);
     setPrepManageMissingCode(null);
     setAcceptedMissingCodes(new Set());
+    p.setPrepKeptIssueIds(new Set());
+    p.setPrepManageIssueId(null);
     setPrepToolAction(null);
     setPrepNote('');
     p.setShelfLife(asset.shelfLifeMonths || p.defaultShelfLife);

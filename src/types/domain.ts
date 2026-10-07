@@ -65,6 +65,8 @@ export interface Tool {
   sterileUntil?: string;
   /** Sterilization (release) date (YYYY-MM-DD), kept with the expiry date. */
   sterilizedOn?: string;
+  /** Time of the release that sterilized it (HH:MM, local). */
+  sterilizedTime?: string;
 }
 export interface SetCompositionRequirement {
   code: string;
@@ -103,6 +105,8 @@ export interface SetAsset {
   sterileUntil?: string;
   /** Sterilization (release) date (YYYY-MM-DD), kept with the expiry date. */
   sterilizedOn?: string;
+  /** Time of the release that sterilized it (HH:MM, local). */
+  sterilizedTime?: string;
 }
 export type Asset = SetAsset | Tool;
 export interface Movement {
@@ -215,6 +219,8 @@ export interface SterilizationReleaseRecord {
   shelfLifeMonths?: number;
   sterileUntil?: string;
   sterilizedOn?: string;
+  /** Time of the release that sterilized it (HH:MM, local). */
+  sterilizedTime?: string;
 }
 export type ProcessLoadKind = 'WASHING' | 'STERILIZATION';
 export type ProcessLoadStatus =
