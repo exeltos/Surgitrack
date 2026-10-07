@@ -17,9 +17,8 @@ import {
   UserPlus,
   Undo2,
   CalendarClock,
-  Trash,
-  Trash2,
 } from 'lucide-react';
+import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, formatExpiry, sterileExpiryList, type ExpiryEntry} from '../../core/sterileExpiry';
 import {navSectionFor, navigationFor} from '../../config/navigation';
@@ -262,7 +261,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           title={binLabel}
         >
           <span className="sidebar-bin-icon">
-            {binCount ? <Trash2 size={24} /> : <Trash size={24} />}
+            <RecycleBinIcon full={binCount > 0} />
             {binCount > 0 && <em>{binCount}</em>}
           </span>
           <span>{binLabel}</span>

@@ -312,15 +312,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                           const load = awaitingLoads.find(l =>
                             l.items.some(i => `${i.assetKind}:${i.assetId}` === keyOf(x)),
                           );
-                          return load ? (
-                            <button
-                              className="primary compact"
-                              title={`${load.equipment} · ${load.cycleNumber}`}
-                              onClick={() => openLoadRelease(load.id)}
-                            >
-                              <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
-                            </button>
-                          ) : null;
+                          // One release per load, from the header button: the row only says which load it is in.
+                          return (
+                            <span className="ster-row-note" title={load?.id}>
+                              {load ? `${trData(load.equipment)} · ${tr('Κύκλος')} ${load.cycleNumber}` : ''}
+                            </span>
+                          );
                         })()
                       ) : (
                         <button className="primary compact" onClick={() => openRelease(x.kind, x)}>
