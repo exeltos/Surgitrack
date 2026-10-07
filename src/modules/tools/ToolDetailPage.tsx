@@ -40,7 +40,6 @@ import {effectiveToolMarker} from '../../core/colorTapes';
 import ActionMenu from '../../components/ui/ActionMenu';
 import {useConfirm} from '../../components/ui/useConfirm';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
-import ToolReplacementPanel from './ToolReplacementPanel';
 
 export default function ToolDetailPage() {
   const {
@@ -298,7 +297,6 @@ export default function ToolDetailPage() {
                     <h2>{tr('Ανοικτές αναφορές')}</h2>
                   </div>
                 </div>
-                <ToolReplacementPanel tool={tool} />
                 <div className="asset-detail-scroll asset-issue-list">
                   {toolIssues.length ? (
                     toolIssues.map(issue => (

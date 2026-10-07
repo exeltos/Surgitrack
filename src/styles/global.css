@@ -7364,41 +7364,6 @@ html body .studio-body-import .asset-import-head {
   margin: 0;
   padding-top: 0;
 }
-/* Replacement panel on an instrument's page: what is wrong, whether Stock has one, and the actions. */
-.tool-replacement-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin: 0 0 10px;
-  padding: 10px 14px;
-  border: 1px solid #f0d9b5;
-  border-radius: 12px;
-  background: #fffaf2;
-}
-.tool-replacement-panel > div:first-child {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.tool-replacement-panel strong {
-  color: #17384a;
-  font-size: 14px;
-}
-.tool-replacement-panel span {
-  color: #b4560f;
-  font-size: 13px;
-  font-weight: 700;
-}
-.tool-replacement-panel small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.tool-replacement-actions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 8px;
-}
 /* Owner dashboard: fills the screen. KPI row, attention + actions, and the hospitals table taking the rest. */
 html body .studio-body-overview .owner-dashboard {
   display: flex;
@@ -7483,4 +7448,22 @@ html body .owner-hospitals > header {
 .owner-hospitals td.owner-none {
   padding: 14px 12px;
   color: var(--st-muted);
+}
+/* Asset manage dialog: the buttons never sit on the note field. The dialog is as tall as its content (up to
+   the screen) and the Note field keeps its own room above the footer. */
+html body .asset-manage-modal {
+  height: auto;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+html body .asset-manage-modal > footer {
+  margin-top: 4px;
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: -20px;
+  padding: 10px 0 2px;
+  background: #fff;
+}
+html body .asset-manage-note {
+  flex: 0 0 auto;
 }
