@@ -292,7 +292,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                     <div className="prep-tools-head prep-tools-toolbar receipt-tools-toolbar">
                       <div className="receipt-tools-title-block">
                         <div>
-                          <strong>{tr('Φυσική σύνθεση Σετ')}</strong>
+                          <strong>{tr('Φυσική σύνθεση Σετ')}</strong>{' '}
                           <span>
                             {receiptTools.length} {tr('εργαλεία — αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα')}
                           </span>
