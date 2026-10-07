@@ -397,6 +397,30 @@ export function useLoadActions(
     notify(tr('Άνοιξε η ανάκληση {0} για το φορτίο {1} ({2} αντικείμενα).', recallCase.id, loadId, load.items.length));
   };
   /**
+   * A stage the hospital turns off: what is in it moves on to the next stage it runs, so the stage's tab
+   * empties and goes away. Each move is in the history.
+   */
+  const advanceStageItems = (fromState: AssetState, toState: AssetState, stageLabel: string) => {
+    const moving = [
+      ...p.sets.filter(set => set.state === fromState).map(set => ({kind: 'SET' as AssetKind, asset: set})),
+      ...tools
+        .filter(tool => tool.mode === 'STANDALONE' && tool.state === fromState)
+        .map(tool => ({kind: 'TOOL' as AssetKind, asset: tool})),
+    ];
+    moving.forEach(({kind, asset}) => {
+      updateState(kind, asset.id, toState);
+      addMovement({
+        asset: `${asset.barcode} · ${asset.name}`,
+        assetKind: kind,
+        from: stageLabel,
+        to: sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === toState)?.labelEl || toState,
+        status: `Το στάδιο «${stageLabel}» απενεργοποιήθηκε`,
+        by: currentUser.name,
+      });
+    });
+    return moving.length;
+  };
+  /**
    * The biological indicator of a load released while it was pending: a pass is recorded on the load;
    * a failure records it and recalls the whole load.
    */
@@ -493,6 +517,7 @@ export function useLoadActions(
     return record;
   };
   return {
+    advanceStageItems,
     recordBiologicalResult,
     finishProcessLoad,
     completeDeliveryToDepartment,
