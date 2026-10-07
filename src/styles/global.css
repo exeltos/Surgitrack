@@ -8203,3 +8203,229 @@ html body .sidebar-bin.active {
   line-height: 18px;
   text-align: center;
 }
+/* Sterilizer load: the dialog fits the screen; only the list of instruments (and the device cycles) scroll.
+   The barcode entry is one compact row. */
+html body .load-modal .load-modal-body {
+  overflow: hidden;
+}
+html body .load-modal .load-assets {
+  min-height: 0;
+}
+html body .load-modal .load-assets-list {
+  min-height: 0;
+  overflow-y: auto;
+}
+html body .load-modal .device-cycle-picker ul {
+  max-height: 84px;
+}
+html body .load-modal .barcode-capture {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+html body .load-modal .barcode-capture-head {
+  display: contents;
+}
+html body .load-modal .barcode-capture-head small,
+html body .load-modal .barcode-capture-help {
+  display: none;
+}
+html body .load-modal .barcode-capture-head > div {
+  grid-column: 1;
+  grid-row: 1;
+  white-space: nowrap;
+}
+html body .load-modal .barcode-capture .load-barcode-entry {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+}
+html body .load-modal .barcode-camera-btn {
+  grid-column: 3;
+  grid-row: 1;
+}
+html body .load-modal .barcode-capture .load-camera-panel,
+html body .load-modal .barcode-capture .load-scan-feedback {
+  grid-column: 1 / -1;
+}
+html body .load-modal .cycle-note textarea {
+  min-height: 38px;
+  height: 38px;
+}
+/* Sterilization: one bar for search and scanning, with the filters next to it. */
+html body .ster-scan.ster-scan-restored {
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+}
+html body .ster-scan-filters {
+  display: flex;
+  align-items: center;
+}
+html body .ster-scan-filters .filter-menu-button,
+html body .ster-scan-filters > div > button {
+  min-height: 42px;
+}
+html body .ster-scan-input .ster-scan-clear {
+  background: transparent;
+  border: 0;
+  color: #6c8592;
+  padding: 0 6px;
+  min-width: 0;
+}
+html body .ster-scan-feedback-inline {
+  grid-column: 1 / -1;
+}
+/* Composition & preparation: one compact line for who/when/how many, checks as tidy cards, the accepted
+   shortage on the action bar, select-all next to the counter. */
+.prep-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid #e1e9ed;
+  border-radius: 12px;
+  background: #f8fbfc;
+  color: #2d4b5a;
+  font-size: 12.5px;
+}
+.prep-meta-line > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.prep-meta-line svg {
+  color: #1d6b7a;
+  flex: 0 0 auto;
+}
+.prep-meta-line strong {
+  color: #17384a;
+}
+.prep-meta-line small {
+  color: var(--st-muted);
+}
+html body .prep-process-checks {
+  display: grid;
+  gap: 6px;
+  padding: 0 14px 4px;
+}
+html body .prep-process-checks > strong {
+  margin: 4px 0 2px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: #294a5a;
+}
+html body .prep-process-checks > label {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #e3ebef;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+html body .prep-process-checks > label:has(input:checked) {
+  border-color: #9fd0bd;
+  background: #f1faf6;
+}
+html body .prep-process-checks > label input {
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: #1d6b7a;
+}
+html body .prep-process-checks > label span {
+  display: grid;
+  gap: 1px;
+}
+html body .prep-process-checks > label b {
+  font-size: 12.5px;
+  color: #17384a;
+}
+html body .prep-process-checks > label small {
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--st-muted);
+}
+html body .prep-note-field textarea {
+  min-height: 48px;
+  height: 48px;
+}
+html body .prep-workspace-modal .modal-actions.prep-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+html body .prep-actions .prep-accept-missing {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 auto 0 0;
+  padding: 7px 12px;
+  border: 1px solid #f0d199;
+  border-radius: 10px;
+  background: #fff8ea;
+  color: #7a4a00;
+  max-width: 62%;
+  cursor: pointer;
+}
+html body .prep-actions .prep-accept-missing input {
+  width: 17px;
+  height: 17px;
+  accent-color: #b26a00;
+  flex: 0 0 auto;
+}
+html body .prep-actions .prep-accept-missing span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+}
+html body .prep-actions .prep-accept-missing strong {
+  font-size: 13px;
+}
+html body .prep-actions .prep-accept-missing small {
+  font-size: 12px;
+  color: #8a5a10;
+}
+html body .prep-tools-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+html body .prep-tools-heading-block {
+  display: block;
+}
+html body .prep-tools-heading-block > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+html body .prep-tools-heading-block > div > span {
+  margin-left: 2px;
+}
+html body .prep-workspace-modal .prep-tools-toolbar-actions {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+html body .prep-workspace-modal .prep-tools-toolbar-actions .prep-bulk-select {
+  margin: 0;
+}
+html body .prep-control-panel .shelf-life-picker {
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 4px 14px 2px;
+  padding: 10px 12px;
+}
+html body .prep-control-panel .shelf-life-options button {
+  flex: 1 1 0;
+  min-height: 36px;
+}

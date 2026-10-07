@@ -43,7 +43,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
               </div>
               <div className="workflow-modal-title">
                 <span className="eyebrow">{tr('ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ')}</span>
-                <h2>{tr('Νέα παράδοση')}</h2>
+                <h2>{tr('Μαζική παράδοση')}</h2>
                 <p>
                   {tr(
                     'Πρόσθεσε τα αντικείμενα με barcode, scanner υπολογιστή ή χειροκίνητα από τη λίστα. Κάθε παράδοση αφορά ένα τμήμα.',

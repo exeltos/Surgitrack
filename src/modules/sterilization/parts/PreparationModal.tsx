@@ -82,37 +82,21 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
             </div>
             <div className="prep-workspace-body">
               <aside className="prep-control-panel">
-                <section className="prep-card-section">
-                  <div className="prep-section-head">
-                    <div>
-                      <strong>{tr('Στοιχεία προετοιμασίας')}</strong>
-                      <span>{tr('Ο χρήστης καταγράφεται αυτόματα στην καρτέλα.')}</span>
-                    </div>
-                  </div>
-                  <div className="prep-facts">
-                    <div>
-                      <UserCheck />
-                      <span>{tr('Προετοιμάζει')}</span>
-                      <strong>{trData(currentUser.name)}</strong>
-                      <small>{trData(currentUser.department)}</small>
-                    </div>
-                    <div>
-                      <Clock3 />
-                      <span>{tr('Ημερομηνία / ώρα')}</span>
-                      <strong>{new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}</strong>
-                    </div>
-                    <div>
-                      <Layers3 />
-                      <span>{tr('Φυσικά εργαλεία')}</span>
-                      <strong>{prepItemIds.length}</strong>
-                    </div>
-                    <div className={prepBlockingIssues.length ? 'warning' : ''}>
-                      <TriangleAlert />
-                      <span>{tr('Εκκρεμότητες που μπλοκάρουν')}</span>
-                      <strong>{prepBlockingIssues.length}</strong>
-                    </div>
-                  </div>
-                </section>
+                <div className="prep-meta-line">
+                  <span title={tr('Προετοιμάζει')}>
+                    <UserCheck size={15} />
+                    <strong>{trData(currentUser.name)}</strong>
+                    <small>{trData(currentUser.department)}</small>
+                  </span>
+                  <span title={tr('Ημερομηνία / ώρα')}>
+                    <Clock3 size={15} />
+                    {new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}
+                  </span>
+                  <span title={tr('Φυσικά εργαλεία')}>
+                    <Layers3 size={15} />
+                    {tr('{0} εργαλεία', prepItemIds.length)}
+                  </span>
+                </div>
                 <section className="prep-card-section prep-quality-section">
                   <div className="prep-section-head">
                     <div>
@@ -325,6 +309,8 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                         </button>
                       )}
                     </div>
+                  </div>
+                  <div className="prep-tools-toolbar-actions">
                     <div className="prep-bulk-select">
                       <button
                         type="button"
@@ -343,8 +329,6 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                         )}
                       </button>
                     </div>
-                  </div>
-                  <div className="prep-tools-toolbar-actions">
                     <span className="prep-tools-progress">
                       {prepCheckedIds.size}/{prepItemIds.length}
                     </span>
@@ -490,19 +474,19 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                 </div>
               </section>
             </div>
-            {prepDraft.kind === 'SET' && prepMissingCount > 0 && prepMissingRequirements.length === 0 && (
-              <label className="prep-accept-missing">
-                <input type="checkbox" checked={allowMissing} onChange={e => setAllowMissing(e.target.checked)} />
-                <span>
-                  <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
-                  <small>
-                    {tr('Το Set θα προχωρήσει με') + ' '}
-                    {prepMissingCount} {tr('λιγότερα εργαλεία. Η απόκλιση καταγράφεται στο ιστορικό.')}
-                  </small>
-                </span>
-              </label>
-            )}
-            <div className="modal-actions">
+            <div className="modal-actions prep-actions">
+              {prepDraft.kind === 'SET' && prepMissingCount > 0 && prepMissingRequirements.length === 0 && (
+                <label className="prep-accept-missing" title={tr('Η απόκλιση καταγράφεται στο ιστορικό.')}>
+                  <input type="checkbox" checked={allowMissing} onChange={e => setAllowMissing(e.target.checked)} />
+                  <span>
+                    <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
+                    <small>
+                      {tr('Το Set θα προχωρήσει με') + ' '}
+                      {prepMissingCount} {tr('λιγότερα εργαλεία.')}
+                    </small>
+                  </span>
+                </label>
+              )}
               <button onClick={() => setPrepDraft(null)}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"

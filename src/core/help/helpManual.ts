@@ -47,6 +47,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Πολλές συσκευές',
+          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει ό,τι αποθήκευσαν οι άλλες κάθε λίγα δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο· ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα.',
+        ],
+        en: [
+          'Several devices',
+          'You can work from several computers and tablets at once. Each screen takes what the others saved every few seconds and as soon as you come back to the window; your own changes are saved first.',
+        ],
+      },
+      {
+        el: [
           'Πρώτη σύνδεση',
           'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234), τον ρόλο και το τμήμα σας. Πατήστε «Ορισμός κωδικού», ορίστε κωδικό τουλάχιστον 8 χαρακτήρων και συνδεθείτε με το όνομα χρήστη ή το email σας.',
         ],
@@ -434,11 +444,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καρτέλες σταδίων',
-          'Κάθε καρτέλα είναι ένα στάδιο. Ο αριθμός δείχνει πόσα περιμένουν. Τα στάδια που είναι απενεργοποιημένα στο Studio δεν εμφανίζονται.',
+          'Κάθε καρτέλα είναι ένα στάδιο. Ο αριθμός δείχνει πόσα περιμένουν. Τα στάδια που είναι απενεργοποιημένα στο Studio δεν εμφανίζονται. Η μπλε μπάρα «Αναζήτηση & σάρωση» φιλτράρει την καρτέλα καθώς γράφετε· με σάρωση barcode και Enter ανοίγει το αντικείμενο στο στάδιο όπου βρίσκεται. Δίπλα της είναι τα Φίλτρα (τμήμα, ειδικότητα, Σετ ή εργαλεία).',
         ],
         en: [
           'Stage tabs',
-          'Each tab is a stage and its number shows how many are waiting. Stages disabled in Studio are not shown.',
+          'Each tab is a stage and its number shows how many are waiting. Stages disabled in Studio are not shown. The blue "Search & scan" bar filters the tab as you type; scanning a barcode and pressing Enter opens the item in its stage. The Filters (department, specialty, Sets or instruments) sit next to it.',
         ],
       },
       {

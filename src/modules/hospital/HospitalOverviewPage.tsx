@@ -18,6 +18,7 @@ import {expiryAlerts, formatExpiry, sterileExpiryList} from '../../core/sterileE
 import PageHeader from '../../components/ui/PageHeader';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
+import {workflowStageState} from '../../core/workflow';
 import {useLibraries} from '../../core/LibraryStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {demoDepartments} from '../../config/demoRoles';
@@ -66,8 +67,8 @@ const movementStamp = (at: string) => {
  * are, what each department holds, what is stuck, and the latest movements.
  */
 export default function HospitalOverviewPage() {
-  const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders} = useSurgi();
-  const {departments, systemSettings} = useLibraries();
+  const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();
+  const {departments, systemSettings, sterilizationWorkflow} = useLibraries();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const hospitalId = managedHospitalId();
@@ -122,7 +123,32 @@ export default function HospitalOverviewPage() {
         .map(x => x.m),
     [movements],
   );
-  const pipeline = PROCESS_STATES.map(state => ({state, count: tracked.filter(a => a.state === state).length}));
+  // Only the stages this hospital runs (Studio › Sterilization Flow); the sterilizer stage shows what waits
+  // to be loaded and what is in the sterilizer now.
+  const inSterilizer = new Set(
+    processLoads
+      .filter(load => load.kind === 'STERILIZATION' && load.status === 'OPEN')
+      .flatMap(load => load.items.map(item => item.assetId)),
+  );
+  const pipeline = sterilizationWorkflow.stages
+    .filter(stage => stage.id !== 'DELIVERY')
+    .flatMap((stage): Array<{key: string; label: string; queue?: string; count: number}> => {
+      const state = workflowStageState[stage.id] as AssetState;
+      const here = tracked.filter(a => a.state === state);
+      if (!stage.enabled && !here.length) return [];
+      if (stage.id !== 'STERILIZATION')
+        return [{key: stage.id, label: statusLabel(state), queue: QUEUE_OF[state], count: here.length}];
+      const running = here.filter(a => inSterilizer.has(a.id)).length;
+      return [
+        {
+          key: 'PROCESS',
+          label: L('Αναμονή φόρτωσης', 'Waiting to load'),
+          queue: 'PROCESS',
+          count: here.length - running,
+        },
+        {key: 'IN_STERILIZER', label: L('Στον κλίβανο', 'In the sterilizer'), queue: 'IN_STERILIZER', count: running},
+      ];
+    });
   const pipelineMax = Math.max(1, ...pipeline.map(p => p.count));
 
   const shortSets = sets.filter(x => x.actual < x.expected).length;
@@ -275,12 +301,12 @@ export default function HospitalOverviewPage() {
           <div className="dash-bars">
             {pipeline.map(p => (
               <Link
-                key={p.state}
+                key={p.key}
                 className="dash-bar"
-                to={`/sterilization?queue=${QUEUE_OF[p.state]}`}
-                title={`${statusLabel(p.state)}: ${p.count}`}
+                to={`/sterilization?queue=${p.queue}`}
+                title={`${p.label}: ${p.count}`}
               >
-                <span className="dash-bar-name">{statusLabel(p.state)}</span>
+                <span className="dash-bar-name">{p.label}</span>
                 <span className="dash-bar-track">
                   <i style={{width: `${(p.count / pipelineMax) * 100}%`}} />
                 </span>

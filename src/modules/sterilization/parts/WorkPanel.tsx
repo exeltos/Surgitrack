@@ -123,7 +123,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           )}
           {queue === 'READY' && ready.length > 0 && (
             <button className="primary compact" onClick={openDeliveryBatch}>
-              <ScanBarcode size={15} /> {tr('Νέα παράδοση')}
+              <ScanBarcode size={15} /> {tr('Μαζική παράδοση')}
             </button>
           )}
           {queue === 'RELEASE' && (
