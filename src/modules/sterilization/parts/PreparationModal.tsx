@@ -276,7 +276,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                               prepTools.length,
                               prepExpectedCount,
                               prepMissingCount,
-                              prepMissingCount === 1 ? 'έλλειψη' : 'ελλείψεις',
+                              prepMissingCount === 1 ? tr('έλλειψη') : tr('ελλείψεις'),
                             )
                           : tr('Σύνθεση πλήρης · {0}/{1}', prepTools.length, prepExpectedCount)}
                       </strong>

@@ -76,6 +76,14 @@ const DATA_PATTERNS: Array<[RegExp, string]> = [
   [/^Επίλυση: (.+)$/, 'Resolved: $1'],
   [/^Σετ (.+?): (.+)$/, 'Set $1: $2'],
   [/^(.+) \(ως (.+)\)$/, '$1 (as $2)'],
+  // Sterilizer loads (load, in the sterilizer, end of cycle, release).
+  [/^Φορτίο (.+)$/, 'Load $1'],
+  [/^κύκλος (.+)$/, 'cycle $1'],
+  [/^Κύκλος (.+) ολοκληρώθηκε$/, 'Cycle $1 completed'],
+  [/^Φόρτωση στον (.+)$/, 'Loaded into $1'],
+  [/^Αποδέσμευση φορτίου (.+)$/, 'Load $1 released'],
+  [/^Μη αποδέσμευση φορτίου (.+)$/, 'Load $1 not released'],
+  [/^Αποδεσμεύτηκε$/, 'Released'],
 ];
 
 const translateSegment = (segment: string): string => {

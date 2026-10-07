@@ -1,7 +1,7 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {CheckCircle2, X, ShieldCheck, UserCheck} from 'lucide-react';
-import {tr, trData} from '../../../i18n';
+import {getI18nLang, tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
 
@@ -18,6 +18,7 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
     setCheckpointChecks,
     setCheckpointNote,
   } = s;
+  const en = getI18nLang() === 'en';
   return (
     <>
       {checkpointDraft && checkpointStage && (
@@ -38,11 +39,13 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
                 size={19}
               />
               <div className="workflow-modal-title">
-                <span className="eyebrow">QUALITY GATE · {tr(checkpointStage.labelEl).toUpperCase()}</span>
+                <span className="eyebrow">
+                  QUALITY GATE · {(en ? checkpointStage.labelEn : checkpointStage.labelEl).toUpperCase()}
+                </span>
                 <h2>
                   {checkpointDraft.draft.asset.barcode} · {checkpointDraft.draft.asset.name}
                 </h2>
-                <p>{checkpointStage.descriptionEl}</p>
+                <p>{en ? checkpointStage.descriptionEn : checkpointStage.descriptionEl}</p>
               </div>
               <StatusBadge value={checkpointDraft.draft.asset.state} />
             </div>
@@ -66,7 +69,7 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
                   </div>
                   <ShieldCheck size={18} />
                 </div>
-                {checkpointStage.checksEl.map((check, index) => (
+                {(en ? checkpointStage.checksEn : checkpointStage.checksEl).map((check, index) => (
                   <label className="release-check-row" key={check}>
                     <input
                       type="checkbox"
