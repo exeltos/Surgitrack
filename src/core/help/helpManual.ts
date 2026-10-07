@@ -463,6 +463,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Διάρκεια αποστείρωσης',
+          'Στη «Συσκευασία & Σήμανση» διαλέγετε για κάθε Σετ ή εργαλείο διάρκεια 2, 3 ή 6 μηνών· προτείνεται η προεπιλογή του νοσοκομείου. Η διάρκεια μετρά από την αποδέσμευση και η ημερομηνία λήξης φαίνεται στην καρτέλα του. Αν το νοσοκομείο δεν έχει στάδιο συσκευασίας, η διάρκεια επιλέγεται στην προετοιμασία.',
+        ],
+        en: [
+          'Sterile shelf life',
+          'At "Packaging & Labelling" you choose a shelf life of 2, 3 or 6 months for each Set or instrument; the hospital default is suggested. It counts from the release and the expiry date shows on its card. If the hospital has no packaging stage, the shelf life is chosen at preparation.',
+        ],
+      },
+      {
+        el: [
           'Φόρτωση κλιβάνου',
           'Στην καρτέλα «Φόρτωση» όλα τα έτοιμα Σετ και εργαλεία είναι ήδη τσεκαρισμένα· ξετσεκάρετε όσα δεν μπαίνουν και πατήστε ένα κουμπί, «Φόρτωση κλιβάνου». Διαλέγετε τον κλίβανο από τη λίστα του νοσοκομείου, τον αριθμό κύκλου και το πρόγραμμα, και δηλώνετε ποιοι δείκτες μπήκαν στο φορτίο (χημικός, βιολογικός). Αποτέλεσμα δεικτών εδώ δεν δίνεται. Αν μια συνδεδεμένη συσκευή δηλώσει αποτυχία κύκλου, το φορτίο επιστρέφει σε επανεπεξεργασία.',
         ],
@@ -520,7 +530,56 @@ export const helpManual: ManualSection[] = [
       el: 'Ένα αντικείμενο σε ενεργή ανάκληση ή χωρίς υπόλοιπο χρήσεων δεν μπορεί να κυκλοφορήσει: η εφαρμογή το σταματά.',
       en: 'An item under an active recall or with no uses left cannot circulate: the app stops it.',
     },
-    related: ['/issues', '/sets', '/movements'],
+    related: ['/issues', '/sets', '/movements', '/expiry'],
+  },
+  {
+    to: '/expiry',
+    permission: 'asset.registry.view',
+    title: {el: 'Λήξεις αποστείρωσης', en: 'Sterile expiry'},
+    summary: {
+      el: 'Τα αποστειρωμένα Σετ και εργαλεία με την ημερομηνία λήξης τους: όσα λήγουν σύντομα και όσα έληξαν.',
+      en: 'Sterile Sets and instruments with their expiry date: the ones expiring soon and the expired ones.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Πότε ειδοποιεί',
+          'Ένα Σετ ή εργαλείο «λήγει σύντομα» τον τελευταίο μήνα της αποστείρωσής του (τις τελευταίες 10 ημέρες για δίμηνη). Τότε εμφανίζεται στο καμπανάκι, στο «Χρειάζεται προσοχή» της Επισκόπησης και σε αυτή τη λίστα· το τμήμα το βλέπει στις δικές του ειδοποιήσεις.',
+        ],
+        en: [
+          'When it warns',
+          'A Set or instrument is "expiring soon" in the last month of its sterility (the last 10 days for 2 months). It then shows in the bell, in the Overview "Needs attention" and in this list; the department sees it in its own notifications.',
+        ],
+      },
+      {
+        el: [
+          'Όταν λήξει',
+          'Η εφαρμογή μόνο ειδοποιεί και το κρατά στη λίστα «Έληξαν»· δεν το στέλνει αυτόματα για επανεπεξεργασία. Μόλις σταλεί ξανά στην Αποστείρωση, η λήξη σβήνει και ορίζεται νέα στην επόμενη αποδέσμευση.',
+        ],
+        en: [
+          'When it expires',
+          'The app only warns and keeps it in the "Expired" list; it does not send it for reprocessing by itself. Once it is sent to Sterilization again, the expiry is cleared and a new one is set at the next release.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Πατήστε «Λήγουν σύντομα» ή «Έληξαν» για να δείτε μόνο αυτά.',
+        'Φιλτράρετε ανά τμήμα και ανοίξτε το Σετ ή το εργαλείο.',
+        'Ενημερώστε το τμήμα να το στείλει στην Αποστείρωση πριν χρησιμοποιηθεί.',
+      ],
+      en: [
+        'Press "Expiring soon" or "Expired" to see only those.',
+        'Filter by department and open the Set or instrument.',
+        'Ask the department to send it to Sterilization before it is used.',
+      ],
+    },
+    tip: {
+      el: 'Η προεπιλεγμένη διάρκεια του νοσοκομείου ορίζεται στο Studio → Ρυθμίσεις.',
+      en: 'The hospital’s default shelf life is set in Studio → Settings.',
+    },
+    related: ['/sterilization', '/sets', '/studio'],
   },
   {
     to: '/devices',
@@ -1150,11 +1209,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ρόλοι και Ρυθμίσεις',
-          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις» και την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο).',
+          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις», την προεπιλεγμένη διάρκεια αποστείρωσης (2, 3 ή 6 μήνες) και την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο).',
         ],
         en: [
           'Roles and Settings',
-          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few uses left" and the hospital’s barcode label (size, header, logo).',
+          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few uses left", the default sterile shelf life (2, 3 or 6 months) and the hospital’s barcode label (size, header, logo).',
         ],
       },
     ],
@@ -1386,6 +1445,11 @@ export const glossary: Array<{term: string; el: string; en: string}> = [
     term: 'Χημικός / βιολογικός δείκτης',
     el: 'Δείκτες που μπαίνουν στο φορτίο και δείχνουν αν ο κύκλος πέτυχε. Δηλώνονται στη φόρτωση, το αποτέλεσμά τους γράφεται στην αποδέσμευση· αρκεί ένας επιτυχής.',
     en: 'Indicators placed in the load that show whether the cycle worked. They are declared at loading and their result is recorded at release; one passed indicator is enough.',
+  },
+  {
+    term: 'Διάρκεια / λήξη αποστείρωσης',
+    el: 'Πόσο μένει αποστειρωμένο ένα Σετ ή εργαλείο (2, 3 ή 6 μήνες από την αποδέσμευση). Ειδοποίηση τον τελευταίο μήνα (10 ημέρες για δίμηνη).',
+    en: 'How long a Set or instrument stays sterile (2, 3 or 6 months from the release). It warns in the last month (10 days for 2 months).',
   },
   {
     term: 'Ανάκληση',

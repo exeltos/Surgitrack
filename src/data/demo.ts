@@ -1,3 +1,4 @@
+import {isoDate} from '../core/sterileExpiry';
 import type {
   DeliveryRecord,
   Issue,
@@ -729,6 +730,22 @@ export const issues: Issue[] = [
 
 // History for the fuller demo: movements, issues, sterilizer loads and signed handovers.
 const setByCode = (code: string) => sets.find(set => set.code === code)!;
+
+// Sterile shelf life (step 4): dates relative to today, so the demo always has Sets that are fine,
+// expiring (last month, or last 10 days for 2 months) and expired.
+const demoSterile = (code: string, daysFromToday: number, months: number) => {
+  const set = sets.find(item => item.code === code);
+  if (!set) return;
+  const until = new Date();
+  until.setDate(until.getDate() + daysFromToday);
+  set.sterileUntil = isoDate(until);
+  set.shelfLifeMonths = months;
+};
+demoSterile('ORTHO-BASIC', 120, 6);
+demoSterile('LAP-GEN', 8, 2);
+demoSterile('GYN-LAP', -3, 3);
+demoSterile('DELIVERY-01', 24, 6);
+demoSterile('CSECTION-01', 168, 6);
 const label = (set: SetAsset) => `${set.barcode} · ${set.name}`;
 const people = {
   ster: 'Demo Χρήστης Αποστείρωσης',

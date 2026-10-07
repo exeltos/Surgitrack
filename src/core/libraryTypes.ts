@@ -58,6 +58,8 @@ export type SystemSettings = {
   stockMinimums?: Record<string, number>;
   /** How new sterilizers are named (base name and A, B, C… or 1, 2, 3…). */
   sterilizerNaming?: import('./sterilizerNaming').SterilizerNaming;
+  /** Default sterile shelf life in months (2, 3 or 6), changeable per Set or instrument at packaging. */
+  sterileShelfLifeMonths?: number;
 };
 export type ConfigurationAuditEvent = {
   id: string;

@@ -45,6 +45,8 @@ export function useReceiptAndCycleActions(
     sterilizationWorkflow,
     tools,
     updateState,
+    releaseShelfLife,
+    chooseShelfLife,
   } = p;
 
   const sendToSterilization = (kind: AssetKind, id: string, patientCode?: string, note?: string) => {
@@ -255,6 +257,7 @@ export function useReceiptAndCycleActions(
       note: payload.note,
     };
     setPreparations(x => [record, ...x]);
+    chooseShelfLife(kind, id, payload.shelfLifeMonths);
     updateState(kind, id, nextStateAfter('PREPARATION'));
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
@@ -350,6 +353,7 @@ export function useReceiptAndCycleActions(
       ).ok &&
       payload.decision === 'RELEASED';
     const decision = canRelease ? 'RELEASED' : 'REPROCESS';
+    const shelfLife = decision === 'RELEASED' ? releaseShelfLife(kind, id) : undefined;
     const record: SterilizationReleaseRecord = {
       id: `sr${uniqueStamp()}`,
       workflowVersion: sterilizationWorkflow.version,
@@ -372,10 +376,11 @@ export function useReceiptAndCycleActions(
       releasedByName: currentUser.name,
       releasedByDepartment: currentUser.department,
       releasedAt: formatStoreDateTime(),
+      ...shelfLife,
     };
     setSterilizationReleases(x => [record, ...x]);
-    if (decision === 'RELEASED') {
-      updateState(kind, id, nextStateAfter('RELEASE'));
+    if (shelfLife) {
+      updateState(kind, id, nextStateAfter('RELEASE'), shelfLife);
       addMovement({
         asset: `${a.barcode} · ${a.name}`,
         assetKind: kind,

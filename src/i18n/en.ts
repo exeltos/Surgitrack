@@ -1684,4 +1684,25 @@ export const en: Record<string, string> = {
   'Ονόματα που υπάρχουν ήδη παραλείπονται· η μονάδα κρατά την επιλογή για τις επόμενες φορές.':
     'Names already in the list are skipped; the unit keeps this choice for next time.',
   'Προσθήκη · {0}': 'Add · {0}',
+  'Διάρκεια αποστείρωσης': 'Sterile shelf life',
+  'Μετρά από την αποδέσμευση· σήμερα θα έληγε στις {0}.':
+    'Counted from the release; released today it would expire on {0}.',
+  '{0} μήνες': '{0} months',
+  'Λήξεις αποστείρωσης': 'Sterile expiry',
+  'Σετ και εργαλεία που λήγουν ή έληξαν· όταν λήξουν χρειάζονται νέα επεξεργασία.':
+    'Sets and instruments expiring or expired; once expired they need reprocessing.',
+  'Χρειάζονται προσοχή': 'Need attention',
+  'Λήγουν σύντομα': 'Expiring soon',
+  Έληξαν: 'Expired',
+  Αποστειρωμένα: 'Sterile',
+  'Ονομασία ή barcode...': 'Name or barcode...',
+  'Τίποτα δεν λήγει σύντομα': 'Nothing is expiring soon',
+  'Εδώ εμφανίζονται τα Σετ και τα εργαλεία στον τελευταίο μήνα της αποστείρωσής τους (10 ημέρες για δίμηνη) και όσα έληξαν.':
+    'Sets and instruments in the last month of their sterility (10 days for 2 months) and the expired ones show here.',
+  Λήγει: 'Expires',
+  'Έληξε πριν {0} ημ.': 'Expired {0} d ago',
+  Λήξεις: 'Expiry',
+  'Λήγει σήμερα': 'Expires today',
+  'Λήγει σε {0} ημ.': 'Expires in {0} d',
+  'Αποστειρωμένο έως': 'Sterile until',
 };

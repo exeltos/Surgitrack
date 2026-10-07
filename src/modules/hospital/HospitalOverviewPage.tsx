@@ -12,7 +12,9 @@ import {
   TriangleAlert,
   UserPlus,
   Wrench,
+  CalendarClock,
 } from 'lucide-react';
+import {expiryAlerts, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import PageHeader from '../../components/ui/PageHeader';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
@@ -124,6 +126,8 @@ export default function HospitalOverviewPage() {
   const pipelineMax = Math.max(1, ...pipeline.map(p => p.count));
 
   const shortSets = sets.filter(x => x.actual < x.expected).length;
+  const expiry = expiryAlerts(sterileExpiryList(sets, tools));
+  const expired = expiry.filter(e => e.state === 'EXPIRED').length;
   const kpis = [
     {
       icon: Layers3,
@@ -417,14 +421,35 @@ export default function HospitalOverviewPage() {
               <b>{L('Χρειάζεται προσοχή', 'Needs attention')}</b>
               <small>
                 {L(
-                  'Εκκρεμότητες και εργαλεία κοντά στο όριο χρήσεων.',
-                  'Issues and instruments near their usage limit.',
+                  'Εκκρεμότητες, λήξεις αποστείρωσης και εργαλεία κοντά στο όριο χρήσεων.',
+                  'Issues, sterile expiry and instruments near their usage limit.',
                 )}
               </small>
             </div>
             <Link to={presetPath('/issues', {status: 'OPEN'})}>{L('Όλες', 'All')}</Link>
           </header>
           <ul className="dash-list">
+            {expiry.length > 0 && (
+              <li>
+                <CalendarClock size={15} className={expired ? 'bad' : 'warn'} />
+                <Link to="/expiry">
+                  <b>
+                    {expired
+                      ? L(
+                          `${expired} έληξαν · ${expiry.length - expired} λήγουν σύντομα`,
+                          `${expired} expired · ${expiry.length - expired} expiring soon`,
+                        )
+                      : L(`${expiry.length} λήγουν σύντομα`, `${expiry.length} expiring soon`)}
+                  </b>
+                  <small>
+                    {expiry
+                      .slice(0, 3)
+                      .map(e => `${e.barcode} · ${formatExpiry(e.sterileUntil)}`)
+                      .join(' · ')}
+                  </small>
+                </Link>
+              </li>
+            )}
             {openIssues.slice(0, 5).map(i => (
               <li key={i.id}>
                 <TriangleAlert size={15} className="bad" />
@@ -466,7 +491,7 @@ export default function HospitalOverviewPage() {
                 </Link>
               </li>
             ))}
-            {openIssues.length === 0 && lifecycleAlerts.length === 0 && lowStock.length === 0 && (
+            {openIssues.length === 0 && lifecycleAlerts.length === 0 && lowStock.length === 0 && !expiry.length && (
               <li className="ok">
                 <PackageCheck size={15} />
                 <span>{L('Όλα εντάξει: τίποτα δεν περιμένει.', 'All clear: nothing is waiting.')}</span>

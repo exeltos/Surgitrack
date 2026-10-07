@@ -59,6 +59,10 @@ export interface Tool {
   importBatch?: string;
   /** Barcode of the Stock instrument that took its place in its Set. */
   replacedBy?: string;
+  /** Sterile shelf life in months, chosen at Packaging & Labelling (the hospital default otherwise). */
+  shelfLifeMonths?: number;
+  /** Sterile until (YYYY-MM-DD): set at release, cleared when it goes back for reprocessing. */
+  sterileUntil?: string;
 }
 export interface SetCompositionRequirement {
   code: string;
@@ -91,6 +95,10 @@ export interface SetAsset {
   ownerName?: string;
   /** The Studio import that created it (lets the whole import be undone). */
   importBatch?: string;
+  /** Sterile shelf life in months, chosen at Packaging & Labelling (the hospital default otherwise). */
+  shelfLifeMonths?: number;
+  /** Sterile until (YYYY-MM-DD): set at release, cleared when it goes back for reprocessing. */
+  sterileUntil?: string;
 }
 export type Asset = SetAsset | Tool;
 export interface Movement {
@@ -199,6 +207,9 @@ export interface SterilizationReleaseRecord {
   releasedByName: string;
   releasedByDepartment: string;
   releasedAt: string;
+  /** The shelf life applied at release and the date it runs to (YYYY-MM-DD). */
+  shelfLifeMonths?: number;
+  sterileUntil?: string;
 }
 export type ProcessLoadKind = 'WASHING' | 'STERILIZATION';
 export type ProcessLoadStatus =
@@ -296,6 +307,8 @@ export interface WorkflowCheckpointRecord {
   completedByName: string;
   completedByDepartment: string;
   completedAt: string;
+  /** At Packaging & Labelling: the sterile shelf life chosen (months). */
+  shelfLifeMonths?: number;
 }
 
 export type RecallItemStatus = 'OUTSTANDING' | 'RETURNED' | 'REPROCESSING' | 'CLOSED';

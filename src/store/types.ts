@@ -84,6 +84,8 @@ export type PreparationPayload = {
     packaging: boolean;
     labelIndicator: boolean;
   };
+  /** Sterile shelf life chosen when packaging is part of this step (2, 3 or 6 months). */
+  shelfLifeMonths?: number;
   note?: string;
 };
 
@@ -133,6 +135,8 @@ export type ReleaseProcessLoadPayload = {
 export type WorkflowCheckpointPayload = {
   stageId: 'WASHING' | 'PACKAGING' | 'STORAGE';
   checks: boolean[];
+  /** At Packaging & Labelling: the sterile shelf life (2, 3 or 6 months). */
+  shelfLifeMonths?: number;
   note?: string;
 };
 

@@ -15,6 +15,7 @@ import {
 import {printBarcodeLabel, printCompositionA4} from '../printUtils';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import ShelfLifePicker from './ShelfLifePicker';
 
 export default function PreparationModal({s}: {s: SterilizationPageState}) {
   const {
@@ -220,6 +221,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                       </>
                     )}
                   </div>
+                  {!stageEnabled('PACKAGING') && <ShelfLifePicker value={s.shelfLife} onChange={s.setShelfLife} />}
                   <label className="prep-note-field">
                     {tr('Παρατήρηση προετοιμασίας')}
                     <textarea

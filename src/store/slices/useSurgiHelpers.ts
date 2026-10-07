@@ -3,6 +3,7 @@ import type {AssetKind, AssetState, Movement} from '../../types/domain';
 import {findAsset, formatStoreDateTime, uniqueStamp} from '../helpers';
 import type {Toast} from '../types';
 import {tr} from '../../i18n';
+import {DEFAULT_SHELF_LIFE, STERILE_STATES, isShelfLife, sterileUntil} from '../../core/sterileExpiry';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
 
@@ -51,18 +52,54 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
     }
     return true;
   };
-  const updateState = (kind: AssetKind, id: string, state: AssetState) => {
+  /**
+   * Moves an asset to a state. `sterile` (at release) sets its shelf life; any state outside sterile storage
+   * clears the expiry date, since the item is being reprocessed.
+   */
+  const updateState = (
+    kind: AssetKind,
+    id: string,
+    state: AssetState,
+    sterile?: {sterileUntil: string; shelfLifeMonths: number},
+  ) => {
+    const expiry = (STERILE_STATES as readonly AssetState[]).includes(state)
+      ? sterile || {}
+      : {sterileUntil: undefined};
     if (kind === 'SET') {
-      setSets(x => x.map(a => (a.id === id ? {...a, state} : a)));
+      setSets(x => x.map(a => (a.id === id ? {...a, state, ...expiry} : a)));
       setTools(x => x.map(t => (t.setId === id ? {...t, state} : t)));
       return;
     }
-    setTools(x => x.map(a => (a.id === id ? {...a, state} : a)));
+    setTools(x => x.map(a => (a.id === id ? {...a, state, ...expiry} : a)));
   };
   /** Tools whose lives (limited uses) are consumed when this asset is dispatched after a procedure. */
   const livesConsumedBy = (kind: AssetKind, id: string) =>
     kind === 'TOOL'
       ? tools.filter(t => t.id === id && !!t.maxUses)
       : tools.filter(t => t.setId === id && !!t.maxUses && t.state !== 'RETIRED');
-  return {addMovement, assertCirculationAllowed, assetName, livesConsumedBy, notify, setToast, toast, updateState};
+  /** Keeps the shelf life chosen at Packaging & Labelling until the release. */
+  const chooseShelfLife = (kind: AssetKind, id: string, months?: number) => {
+    if (!isShelfLife(months)) return;
+    if (kind === 'SET') setSets(x => x.map(a => (a.id === id ? {...a, shelfLifeMonths: months} : a)));
+    else setTools(x => x.map(a => (a.id === id ? {...a, shelfLifeMonths: months} : a)));
+  };
+  /** The shelf life a release gives: the months chosen at packaging, else the hospital default. */
+  const releaseShelfLife = (kind: AssetKind, id: string, releasedOn: Date = new Date()) => {
+    const chosen = assetName(kind, id)?.shelfLifeMonths;
+    const fallback = p.systemSettings.sterileShelfLifeMonths;
+    const shelfLifeMonths = isShelfLife(chosen) ? chosen : isShelfLife(fallback) ? fallback : DEFAULT_SHELF_LIFE;
+    return {shelfLifeMonths, sterileUntil: sterileUntil(releasedOn, shelfLifeMonths)};
+  };
+  return {
+    addMovement,
+    assertCirculationAllowed,
+    assetName,
+    chooseShelfLife,
+    livesConsumedBy,
+    notify,
+    releaseShelfLife,
+    setToast,
+    toast,
+    updateState,
+  };
 }
