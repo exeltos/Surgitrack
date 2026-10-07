@@ -17,6 +17,7 @@ import {printBarcodeLabel, printCompositionA4} from '../printUtils';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
+import {SET_SHORTAGE_CODE} from '../hooks/usePreparationChecks';
 
 // The side column and the list scroll only up and down: a tap (focus) must never shift them sideways.
 const keepLeft = (event: UIEvent<HTMLElement>) => {
@@ -25,7 +26,12 @@ const keepLeft = (event: UIEvent<HTMLElement>) => {
 
 export default function PreparationModal({s}: {s: SterilizationPageState}) {
   const {
-    resolveIssues,
+    prepSetIssues,
+    prepKeptIssueIds,
+    setPrepKeptIssueIds,
+    setPrepManageIssueId,
+    setAcceptedMissingCodes,
+    prepMissingAccepted,
     acceptedMissingCodes,
     allowMissing,
     compositionOptions,
@@ -132,50 +138,9 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                         {tr('Υπάρχουν') + ' '}
                         {prepBlockingIssues.length} {tr('εκκρεμότητες που απαιτούν ενέργεια πριν την προώθηση.')}
                       </span>
-                      {(() => {
-                        // Straight to the instrument with the problem: replace it, send it to service or stock.
-                        const tool = prepTools.find(t => prepBlockingIssues.some(i => i.asset.startsWith(t.barcode)));
-                        if (tool)
-                          return (
-                            <button type="button" className="prep-block-open" onClick={() => openPrepManage(tool.id)}>
-                              {tr('Διαχείριση')} · {tool.barcode}
-                            </button>
-                          );
-                        // About the Set itself: show it and resolve it here (with a note for the history).
-                        const resolve = (id: string) => {
-                          const note = window.prompt(
-                            tr('Πώς επιλύθηκε η εκκρεμότητα; (καταγράφεται στο ιστορικό)'),
-                            '',
-                          );
-                          if (note?.trim()) resolveIssues([id], note.trim());
-                        };
-                        return (
-                          <div className="prep-block-set">
-                            {prepBlockingIssues.map(issue => (
-                              <div className="prep-block-issue" key={issue.id}>
-                                <span>
-                                  <strong>{trData(issue.type)}</strong>
-                                  {issue.note ? ` · ${trData(issue.note)}` : ''}
-                                </span>
-                                <button type="button" className="prep-block-open" onClick={() => resolve(issue.id)}>
-                                  {tr('Επίλυση')}
-                                </button>
-                              </div>
-                            ))}
-                            <small className="prep-block-hint">
-                              {prepMissingRequirements.length > 0
-                                ? tr(
-                                    'Για έλλειψη: «Αντιμετώπιση» στη γραμμή «Λείπει» της λίστας (αντικατάσταση ή αποδοχή), ή «Επίλυση» εδώ όταν το πρόβλημα έχει λυθεί.',
-                                  )
-                                : prepMissingCount > 0
-                                  ? tr(
-                                      'Για έλλειψη: τσέκαρε «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση πάνω δεξιά, ή «Επίλυση» εδώ όταν το εργαλείο βρεθεί.',
-                                    )
-                                  : tr('Πάτησε «Επίλυση» όταν το πρόβλημα έχει λυθεί.')}
-                            </small>
-                          </div>
-                        );
-                      })()}
+                      <small className="prep-block-hint">
+                        {tr('Οι γραμμές με χρώμα στη λίστα δείχνουν τι χρειάζεται ενέργεια· πατήστε «Αντιμετώπιση».')}
+                      </small>
                     </div>
                   )}
                   {prepAcceptedDeviation && prepBlockingIssues.length === 0 && (
@@ -337,12 +302,19 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                           : tr('Όλες οι αναμενόμενες θέσεις της σύνθεσης είναι καλυμμένες.')}
                       </span>
                     </div>
-                    {prepMissingCount > 0 && prepMissingRequirements.length === 0 && (
+                    {prepMissingCount > 0 && (
                       <label className="prep-accept-missing" title={tr('Η απόκλιση καταγράφεται στο ιστορικό.')}>
                         <input
                           type="checkbox"
-                          checked={allowMissing}
-                          onChange={e => setAllowMissing(e.target.checked)}
+                          checked={prepMissingRequirements.length ? prepMissingAccepted : allowMissing}
+                          onChange={e => {
+                            // Accepts (or clears) every Missing row at once.
+                            if (prepMissingRequirements.length)
+                              setAcceptedMissingCodes(
+                                e.target.checked ? new Set(prepMissingRequirements.map(req => req.code)) : new Set(),
+                              );
+                            else setAllowMissing(e.target.checked);
+                          }}
                         />
                         <span>
                           <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
@@ -404,6 +376,102 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                 <div className="prep-tools-scroll" onScroll={keepLeft}>
                   {prepDraft.kind === 'SET' ? (
                     <>
+                      {prepSetIssues.map(issue => {
+                        const kept = prepKeptIssueIds.has(issue.id);
+                        return (
+                          <div
+                            className={`prep-tool-row prep-missing-row prep-set-issue-row ${kept ? 'accepted' : ''}`}
+                            key={`set-issue-${issue.id}`}
+                          >
+                            <div className="prep-missing-placeholder">
+                              <TriangleAlert size={15} />
+                            </div>
+                            <div className="prep-tool-main">
+                              <span className="mono">{prepDraft.asset.barcode}</span>
+                              <strong>{trData(issue.type)}</strong>
+                              <small>{issue.note ? trData(issue.note) : tr('Εκκρεμότητα του Σετ')}</small>
+                            </div>
+                            <div className="prep-tool-state">
+                              {kept ? (
+                                <span className="prep-missing-accepted">{tr('Παραμονή ως έχει')}</span>
+                              ) : (
+                                <span className="prep-missing-chip">{tr('Εκκρεμότητα Σετ')}</span>
+                              )}
+                            </div>
+                            {kept ? (
+                              <button
+                                className="tool-manage-btn subtle"
+                                type="button"
+                                onClick={() =>
+                                  setPrepKeptIssueIds(current => {
+                                    const next = new Set(current);
+                                    next.delete(issue.id);
+                                    return next;
+                                  })
+                                }
+                              >
+                                {tr('Αναίρεση')}
+                              </button>
+                            ) : (
+                              <button
+                                className="tool-manage-btn warning prep-attention-action"
+                                type="button"
+                                onClick={() => setPrepManageIssueId(issue.id)}
+                              >
+                                <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {prepMissingRequirements.flatMap(req =>
+                        Array.from({length: req.missing}, (_, idx) => {
+                          const accepted = acceptedMissingCodes.has(req.code);
+                          return (
+                            <div
+                              className={`prep-tool-row prep-missing-row ${accepted ? 'accepted' : ''}`}
+                              key={`missing-${req.code}-${idx}`}
+                            >
+                              <div className="prep-missing-placeholder">
+                                <TriangleAlert size={15} />
+                              </div>
+                              <div className="prep-tool-main">
+                                <span className="mono">—</span>
+                                <strong>{req.name}</strong>
+                                <small>
+                                  {req.code === SET_SHORTAGE_CODE
+                                    ? tr('Το Σετ έχει {0} από {1} εργαλεία', prepTools.length, req.quantity)
+                                    : `${req.code} ${tr('· αναμενόμενο εργαλείο που λείπει από τη φυσική σύνθεση')}`}
+                                </small>
+                              </div>
+                              <div className="prep-tool-state">
+                                {accepted ? (
+                                  <span className="prep-missing-accepted">{tr('Αποδεκτή απόκλιση')}</span>
+                                ) : (
+                                  <span className="prep-missing-chip">{tr('Λείπει')}</span>
+                                )}
+                              </div>
+                              {accepted ? (
+                                <button
+                                  className="tool-manage-btn subtle"
+                                  type="button"
+                                  onClick={() => undoAcceptedMissing(req.code)}
+                                >
+                                  {tr('Αναίρεση')}
+                                </button>
+                              ) : (
+                                <button
+                                  className="tool-manage-btn warning prep-attention-action"
+                                  type="button"
+                                  onClick={() => openMissingManage(req.code)}
+                                >
+                                  <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
+                                </button>
+                              )}
+                            </div>
+                          );
+                        }),
+                      )}
                       {prepTools.map(t => {
                         const toolIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode));
                         const checked = prepCheckedIds.has(t.id);
@@ -461,52 +529,6 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                           </div>
                         );
                       })}
-                      {prepMissingRequirements.flatMap(req =>
-                        Array.from({length: req.missing}, (_, idx) => {
-                          const accepted = acceptedMissingCodes.has(req.code);
-                          return (
-                            <div
-                              className={`prep-tool-row prep-missing-row ${accepted ? 'accepted' : ''}`}
-                              key={`missing-${req.code}-${idx}`}
-                            >
-                              <div className="prep-missing-placeholder">
-                                <TriangleAlert size={15} />
-                              </div>
-                              <div className="prep-tool-main">
-                                <span className="mono">—</span>
-                                <strong>{req.name}</strong>
-                                <small>
-                                  {req.code} {tr('· αναμενόμενο εργαλείο που λείπει από τη φυσική σύνθεση')}
-                                </small>
-                              </div>
-                              <div className="prep-tool-state">
-                                {accepted ? (
-                                  <span className="prep-missing-accepted">{tr('Αποδεκτή απόκλιση')}</span>
-                                ) : (
-                                  <span className="prep-missing-chip">{tr('Λείπει')}</span>
-                                )}
-                              </div>
-                              {accepted ? (
-                                <button
-                                  className="tool-manage-btn subtle"
-                                  type="button"
-                                  onClick={() => undoAcceptedMissing(req.code)}
-                                >
-                                  {tr('Αναίρεση')}
-                                </button>
-                              ) : (
-                                <button
-                                  className="tool-manage-btn warning prep-attention-action"
-                                  type="button"
-                                  onClick={() => openMissingManage(req.code)}
-                                >
-                                  <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
-                                </button>
-                              )}
-                            </div>
-                          );
-                        }),
-                      )}
                     </>
                   ) : (
                     <div className={`prep-tool-row single ${prepCheckedIds.has(prepDraft.asset.id) ? 'checked' : ''}`}>

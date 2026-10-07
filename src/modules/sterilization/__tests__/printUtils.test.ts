@@ -103,3 +103,16 @@ describe('label paper', () => {
     expect(html.match(/cod\. 041993/g)).toHaveLength(1);
   });
 });
+
+describe('sterile label', () => {
+  it('puts the remaining uses on the left and both dates side by side on the right', () => {
+    const html = barcodeLabelHtml({...tool, sterileUntil: '2027-02-04', shelfLifeMonths: 6}, 'TOOL', undefined, {
+      size: 'SMALL',
+      header: 'BRAND',
+      showDetails: true,
+    });
+    expect(html).toContain('<span class="left">Υπόλ. χρήσεων: 27</span><span class="dates">');
+    expect(html).toContain('04/08/26');
+    expect(html).toContain('04/02/27');
+  });
+});

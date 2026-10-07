@@ -464,11 +464,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εκκρεμότητες στη Σύνθεση',
-          'Μια ανοιχτή εκκρεμότητα σταματά τη Σύνθεση μέχρι να αντιμετωπιστεί. Αν αφορά εργαλείο, πατήστε «Διαχείριση» στην ειδοποίηση (ή «Αντιμετώπιση» στη γραμμή του) για αντικατάσταση, service ή απόσυρση. Αν αφορά το ίδιο το Σετ, η ειδοποίηση τη δείχνει με κουμπί «Επίλυση»: γράφετε πώς λύθηκε και καταγράφεται στο ιστορικό. Για έλλειψη μπορείτε εναλλακτικά να αντικαταστήσετε από τη γραμμή «Λείπει» ή να τσεκάρετε «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση της σύνθεσης.',
+          'Ό,τι χρειάζεται ενέργεια εμφανίζεται ως χρωματισμένη γραμμή στη λίστα εργαλείων του Σετ, με κουμπί «Αντιμετώπιση». Εργαλείο με βλάβη ή άλλη εκκρεμότητα: αντικατάσταση, Service, Απόθεμα ή μεταφορά σε άλλο Σετ. Εργαλείο που λείπει (γραμμή «Λείπει»): «Κάλυψη έλλειψης» με εργαλείο από Απόθεμα, άλλο Σετ ή μεμονωμένο, «Αναφορά», ή «Παραμονή ως έχει» για να συνεχίσει το Σετ με λιγότερα εργαλεία (το ίδιο κάνει και η «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση της σύνθεσης). Εκκρεμότητα του ίδιου του Σετ: «Διορθώθηκε» με σημείωση για το ιστορικό, ή «Παραμονή ως έχει» (η εκκρεμότητα μένει ανοιχτή).',
         ],
         en: [
           'Issues during Composition',
-          'An open issue stops Composition until it is handled. If it concerns an instrument, press "Manage" in the notice (or "Handle" on its row) to replace it, send it to service or retire it. If it concerns the Set itself, the notice shows it with a "Resolve" button: you write how it was solved and it is recorded in the history. For a shortage you can instead replace from the "Missing" row or tick "Accept the recorded shortage" in the composition notice.',
+          'Whatever needs action shows as a coloured row in the Set’s instrument list, with a "Handle" button. An instrument with damage or another issue: replace it, send it to Service or Stock, or move it to another Set. A missing instrument ("Missing" row): "Cover the shortage" with an instrument from Stock, another Set or a standalone one, "Report", or "Keep as is" so the Set goes on with fewer instruments (the same as "Accept the recorded shortage" in the composition notice). An issue on the Set itself: "Fixed" with a note for the history, or "Keep as is" (the issue stays open).',
         ],
       },
       {

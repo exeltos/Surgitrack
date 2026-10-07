@@ -166,7 +166,7 @@ export default function AssetWorkbenchSidebar({
           ) : (
             <StatusBadge value={asset.state} />
           )}{' '}
-          {sterile && <ExpiryBadge entry={sterile} />}
+          {sterile && sterile.state !== 'OK' && <ExpiryBadge entry={sterile} />}
           {workflowLocked && <small>{tr('Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες')}</small>}
         </div>
       </div>
@@ -227,7 +227,6 @@ export default function AssetWorkbenchSidebar({
                 sterileUntil={asset.sterileUntil}
                 shelfLifeMonths={asset.shelfLifeMonths}
               />
-              {asset.shelfLifeMonths ? <small>{tr('{0} μήνες', asset.shelfLifeMonths)}</small> : null}
             </dd>
           </div>
         )}

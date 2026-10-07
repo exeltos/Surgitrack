@@ -109,6 +109,9 @@ export function useSterilizationState() {
   const [prepManageToolId, setPrepManageToolId] = useState<string | null>(null);
   const [prepManageMissingCode, setPrepManageMissingCode] = useState<string | null>(null);
   const [acceptedMissingCodes, setAcceptedMissingCodes] = useState<Set<string>>(new Set());
+  // Issues about the Set itself: the one being handled, and those kept as they are for this preparation.
+  const [prepManageIssueId, setPrepManageIssueId] = useState<string | null>(null);
+  const [prepKeptIssueIds, setPrepKeptIssueIds] = useState<Set<string>>(new Set());
   const [prepReplacementId, setPrepReplacementId] = useState('');
   const [prepReplacementRequirement, setPrepReplacementRequirement] = useState<{code: string; name: string} | null>(
     null,
@@ -189,6 +192,8 @@ export function useSterilizationState() {
     finishProcessLoad,
     can,
     acceptedMissingCodes,
+    prepManageIssueId,
+    prepKeptIssueIds,
     allowMissing,
     applyColorPlan,
     biologicalIndicatorResult,
@@ -291,6 +296,8 @@ export function useSterilizationState() {
     reportSetIssue,
     resolveIssues,
     setAcceptedMissingCodes,
+    setPrepManageIssueId,
+    setPrepKeptIssueIds,
     setAllowMissing,
     setBiologicalIndicatorResult,
     setCheckEnabled,
