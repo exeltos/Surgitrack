@@ -117,6 +117,8 @@ export type CreateProcessLoadPayload = {
   program: string;
   /** Set when the chemical indicator is part of the load; its result is recorded at release. */
   chemicalIndicatorResult?: SterilizationIndicatorResult;
+  /** The cycle already ended (taken from a connected device): the load goes straight to release. */
+  cycleCompleted?: boolean;
   /** 'PENDING' when a biological indicator is part of the load; its result is recorded at release. */
   biologicalIndicatorResult?: BiologicalIndicatorResult;
   note?: string;
@@ -270,6 +272,8 @@ export type SurgiStoreValue = {
   ) => SterilizationCycleRecord | undefined;
   createProcessLoad: (payload: CreateProcessLoadPayload) => ProcessLoadRecord | undefined;
   releaseProcessLoad: (loadId: string, payload: ReleaseProcessLoadPayload) => ProcessLoadRecord | undefined;
+  /** End of cycle for a load in the sterilizer: on to release, or the whole load back to reprocessing. */
+  finishProcessLoad: (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => ProcessLoadRecord | undefined;
   recallProcessLoad: (loadId: string, reason: string) => void;
   releaseSterilization: (
     kind: AssetKind,

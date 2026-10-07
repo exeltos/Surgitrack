@@ -3,7 +3,8 @@ import {tr} from '../../i18n';
 import type {HandoverSigner} from '../../data/cloud/handover';
 import type {DeviceReading} from '../../core/deviceData';
 
-export type Queue = 'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'RELEASE' | 'STORAGE' | 'READY';
+export type Queue =
+  'INCOMING' | 'WASHING' | 'PREP' | 'PACKAGING' | 'PROCESS' | 'IN_STERILIZER' | 'RELEASE' | 'STORAGE' | 'READY';
 
 export type Kind = AssetKind;
 

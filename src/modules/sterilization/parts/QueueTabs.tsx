@@ -1,10 +1,21 @@
-import {PackageCheck, Flame, Send, Box, UserRoundCheck, ShieldCheck, Layers3, PackageOpen} from 'lucide-react';
+import {
+  PackageCheck,
+  Flame,
+  Send,
+  Box,
+  UserRoundCheck,
+  ShieldCheck,
+  Layers3,
+  PackageOpen,
+  Hourglass,
+} from 'lucide-react';
 import {tr, trc} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function QueueTabs({s}: {s: SterilizationPageState}) {
   const {
     awaitingRelease,
+    inSterilizer,
     incoming,
     packaging,
     preparation,
@@ -53,6 +64,12 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
         <span title={tr('Φόρτωση κλιβάνου')}>{tr('Φόρτωση')}</span>
         <strong>{processing.length}</strong>
         <small>{tr('Κλίβανος / φορτίο')}</small>
+      </button>
+      <button className={queue === 'IN_STERILIZER' ? 'active' : ''} onClick={() => setQueue('IN_STERILIZER')}>
+        <Hourglass />
+        <span>{tr('Στον κλίβανο')}</span>
+        <strong>{inSterilizer.length}</strong>
+        <small>{tr('Κύκλος σε εξέλιξη')}</small>
       </button>
       {(stageEnabled('RELEASE') || awaitingRelease.length > 0) && (
         <button className={queue === 'RELEASE' ? 'active' : ''} onClick={() => setQueue('RELEASE')}>

@@ -126,24 +126,69 @@ export function useLoadActions(
       notify(tr('Το φορτίο {0} ολοκληρώθηκε για {1} αντικείμενα.', loadId, items.length));
       return record;
     }
-    const result = payload.chemicalIndicatorResult === 'FAIL' ? 'FAILED' : 'PASSED';
+    // A load stays "in the sterilizer" until its cycle ends; a cycle taken from a connected device has ended.
+    const deviceFailed = payload.chemicalIndicatorResult === 'FAIL';
+    const running = !deviceFailed && !payload.cycleCompleted;
+    const record: ProcessLoadRecord = {
+      id: loadId,
+      workflowVersion: sterilizationWorkflow.version,
+      kind: 'STERILIZATION',
+      equipment: payload.equipment,
+      cycleNumber: payload.cycleNumber,
+      program: payload.program,
+      status: running ? 'OPEN' : deviceFailed ? 'FAILED' : 'AWAITING_RELEASE',
+      items,
+      chemicalIndicatorResult: payload.chemicalIndicatorResult,
+      biologicalIndicatorResult: payload.biologicalIndicatorResult,
+      note: payload.note,
+      createdByUserId: currentUser.id,
+      createdByName: currentUser.name,
+      createdAt: now,
+      ...(running ? {} : {completedAt: now}),
+    };
+    setProcessLoads(list => [record, ...list]);
+    if (running) {
+      refs.forEach(({ref, asset}) =>
+        addMovement({
+          asset: `${asset.barcode} · ${asset.name}`,
+          assetKind: ref.kind,
+          from: 'Φόρτωση κλιβάνου',
+          to: 'Στον κλίβανο',
+          status: `Φορτίο ${loadId} · ${payload.equipment} · κύκλος ${payload.cycleNumber} · σε εξέλιξη`,
+          by: currentUser.name,
+        }),
+      );
+      notify(tr('Το φορτίο {0} μπήκε στον κλίβανο {1}.', loadId, payload.equipment));
+      return record;
+    }
+    recordCycleResult(record, refs, deviceFailed ? 'FAILED' : 'PASSED', now);
+    notify(
+      deviceFailed
+        ? tr('Το φορτίο {0} απέτυχε και επέστρεψε σε επανεπεξεργασία.', loadId)
+        : tr('Το φορτίο {0} ολοκληρώθηκε και αναμένει αποδέσμευση.', loadId),
+    );
+    return record;
+  };
+  type LoadRef = {ref: {kind: AssetKind; id: string}; asset: NonNullable<ReturnType<typeof assetName>>};
+  /** The end of a sterilizer cycle: one cycle record per item; a passed cycle goes on to release. */
+  const recordCycleResult = (load: ProcessLoadRecord, refs: LoadRef[], result: 'PASSED' | 'FAILED', now: string) => {
     refs.forEach(({ref, asset}, index) => {
       const toolIds = ref.kind === 'SET' ? tools.filter(t => t.setId === ref.id).map(t => t.id) : [ref.id];
       const cycle: SterilizationCycleRecord = {
         id: `sc${uniqueStamp()}-${index}`,
         workflowVersion: sterilizationWorkflow.version,
-        loadId,
+        loadId: load.id,
         assetId: ref.id,
         assetKind: ref.kind,
         barcode: asset.barcode,
         assetName: asset.name,
         department: asset.department || 'Τμήμα',
-        sterilizer: payload.equipment,
-        cycleNumber: payload.cycleNumber,
-        program: payload.program,
-        indicatorResult: payload.chemicalIndicatorResult || 'NOT_RECORDED',
+        sterilizer: load.equipment,
+        cycleNumber: load.cycleNumber,
+        program: load.program,
+        indicatorResult: load.chemicalIndicatorResult || 'NOT_RECORDED',
         result,
-        note: payload.note,
+        note: load.note,
         completedByUserId: currentUser.id,
         completedByName: currentUser.name,
         completedByDepartment: currentUser.department,
@@ -162,40 +207,39 @@ export function useLoadActions(
       addMovement({
         asset: `${asset.barcode} · ${asset.name}`,
         assetKind: ref.kind,
-        from: 'Αποστείρωση',
+        from: 'Στον κλίβανο',
         to:
           result === 'PASSED'
             ? sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === nextStateAfter('STERILIZATION'))
                 ?.labelEl || 'Αποδέσμευση'
             : 'Επανεπεξεργασία',
-        status: `Φορτίο ${loadId} · ${payload.equipment} · ${payload.cycleNumber} · ${result === 'PASSED' ? 'επιτυχές' : 'ΑΠΟΤΥΧΙΑ'}`,
+        status: `Φορτίο ${load.id} · ${load.equipment} · ${load.cycleNumber} · ${result === 'PASSED' ? 'επιτυχές' : 'ΑΠΟΤΥΧΙΑ'}`,
         by: currentUser.name,
       });
     });
-    const record: ProcessLoadRecord = {
-      id: loadId,
-      workflowVersion: sterilizationWorkflow.version,
-      kind: 'STERILIZATION',
-      equipment: payload.equipment,
-      cycleNumber: payload.cycleNumber,
-      program: payload.program,
+  };
+  /** "End of cycle" for a load in the sterilizer: it goes to release, or back to reprocessing if it failed. */
+  const finishProcessLoad = (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => {
+    const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
+    if (!load || load.status !== 'OPEN') return;
+    const refs = load.items
+      .map(item => ({ref: {kind: item.assetKind, id: item.assetId}, asset: assetName(item.assetKind, item.assetId)}))
+      .filter((entry): entry is LoadRef => !!entry.asset && entry.asset.state === 'IN_STERILIZATION');
+    const now = formatStoreDateTime();
+    const finished: ProcessLoadRecord = {
+      ...load,
       status: result === 'PASSED' ? 'AWAITING_RELEASE' : 'FAILED',
-      items,
-      chemicalIndicatorResult: payload.chemicalIndicatorResult,
-      biologicalIndicatorResult: payload.biologicalIndicatorResult,
-      note: payload.note,
-      createdByUserId: currentUser.id,
-      createdByName: currentUser.name,
-      createdAt: now,
+      note: [load.note, note?.trim()].filter(Boolean).join(' · ') || undefined,
       completedAt: now,
     };
-    setProcessLoads(list => [record, ...list]);
+    recordCycleResult(finished, refs, result, now);
+    setProcessLoads(list => list.map(item => (item.id === loadId ? finished : item)));
     notify(
       result === 'PASSED'
-        ? tr('Το φορτίο {0} ολοκληρώθηκε και αναμένει αποδέσμευση.', loadId)
-        : tr('Το φορτίο {0} απέτυχε και επέστρεψε σε επανεπεξεργασία.', loadId),
+        ? tr('Ο κύκλος του φορτίου {0} τελείωσε: αναμένει αποδέσμευση.', loadId)
+        : tr('Ο κύκλος του φορτίου {0} απέτυχε: όλο το φορτίο επιστρέφει σε επανεπεξεργασία.', loadId),
     );
-    return record;
+    return finished;
   };
   const releaseProcessLoad = (loadId: string, payload: ReleaseProcessLoadPayload) => {
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
@@ -425,6 +469,7 @@ export function useLoadActions(
     return record;
   };
   return {
+    finishProcessLoad,
     completeDeliveryToDepartment,
     completeWorkflowCheckpoint,
     createProcessLoad,

@@ -66,7 +66,8 @@ const setup = () => {
         shelfLifeMonths,
       }),
     );
-  const sterilize = (chemicalIndicatorResult: 'PASS' | 'FAIL' = 'PASS', cycleNumber = 'S-1') =>
+  /** Loads the sterilizer; the load stays in the sterilizer until its cycle ends. */
+  const load = (chemicalIndicatorResult: 'PASS' | 'FAIL' = 'PASS', cycleNumber = 'S-1') =>
     act1(() =>
       s().createProcessLoad({
         kind: 'STERILIZATION',
@@ -77,6 +78,13 @@ const setup = () => {
         chemicalIndicatorResult,
       }),
     );
+  const finish = (loadId: string, result: 'PASSED' | 'FAILED' = 'PASSED') =>
+    act1(() => s().finishProcessLoad(loadId, result));
+  /** Loads the sterilizer and ends the cycle (a failed device cycle ends at once). */
+  const sterilize = (chemicalIndicatorResult: 'PASS' | 'FAIL' = 'PASS', cycleNumber = 'S-1') => {
+    const created = load(chemicalIndicatorResult, cycleNumber);
+    return created?.status === 'OPEN' ? finish(created.id) : created;
+  };
   const release = (loadId: string, over: Partial<ReleaseProcessLoadPayload> = {}) =>
     act1(() => s().releaseProcessLoad(loadId, {...passingRelease, ...over}));
   const deliver = () => act1(() => s().completeDeliveryToDepartment(kind, asset.id, receiver));
@@ -100,6 +108,8 @@ const setup = () => {
     wash,
     prepare,
     pack,
+    load,
+    finish,
     sterilize,
     release,
     deliver,
@@ -506,5 +516,41 @@ describe('sterilization flow', () => {
     const load = f.toAwaitingRelease();
     f.release(load.id);
     expect(f.instrument().shelfLifeMonths).toBe(6);
+  });
+
+  it('keeps a load in the sterilizer until the end of its cycle, then sends it to release', () => {
+    const f = setup();
+    f.send();
+    f.receive();
+    f.wash();
+    f.prepare();
+    f.pack();
+    const running = f.load()!;
+    expect(running.status).toBe('OPEN');
+    expect(f.state()).toBe('IN_STERILIZATION');
+    expect(f.s().sterilizationCycles.some(c => c.loadId === running.id)).toBe(false);
+    // A load still in the sterilizer cannot be released.
+    expect(f.release(running.id)).toBeUndefined();
+    const finished = f.finish(running.id)!;
+    expect(finished.status).toBe('AWAITING_RELEASE');
+    expect(finished.completedAt).toBeTruthy();
+    expect(f.state()).toBe('AWAITING_RELEASE');
+    expect(f.s().sterilizationCycles.find(c => c.loadId === running.id)?.result).toBe('PASSED');
+    f.release(running.id);
+    expect(f.state()).toBe('READY_FOR_PICKUP');
+  });
+
+  it('sends the whole load back to reprocessing when the cycle fails', () => {
+    const f = setup();
+    f.send();
+    f.receive();
+    f.wash();
+    f.prepare();
+    f.pack();
+    const running = f.load()!;
+    const failed = f.finish(running.id, 'FAILED')!;
+    expect(failed.status).toBe('FAILED');
+    expect(f.state()).not.toBe('AWAITING_RELEASE');
+    expect(f.state()).not.toBe('IN_STERILIZATION');
   });
 });

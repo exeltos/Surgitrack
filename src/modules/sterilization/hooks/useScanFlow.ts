@@ -23,7 +23,6 @@ export function useScanFlow(
   const {
     all,
     openCheckpoint,
-    openCycleCompletion,
     openDelivery,
     openPreparation,
     openReceipt,
@@ -53,11 +52,17 @@ export function useScanFlow(
       setQueue('PACKAGING');
       openCheckpoint(found.kind, found, 'PACKAGING');
     } else if (found.state === 'IN_STERILIZATION') {
-      setQueue('PROCESS');
-      openCycleCompletion(found.kind, found);
+      // In a running load it stays locked; otherwise it is loaded into the sterilizer.
+      if (p.inSterilizer.some(x => x.kind === found.kind && x.id === found.id)) setQueue('IN_STERILIZER');
+      else {
+        setQueue('PROCESS');
+        p.openLoad('STERILIZATION', [`${found.kind}:${found.id}`]);
+      }
     } else if (found.state === 'AWAITING_RELEASE') {
       setQueue('RELEASE');
-      openRelease(found.kind, found);
+      const load = p.awaitingLoads.find(l => l.items.some(i => i.assetKind === found.kind && i.assetId === found.id));
+      if (load) p.openLoadRelease(load.id);
+      else openRelease(found.kind, found);
     } else if (found.state === 'IN_STORAGE') {
       setQueue('STORAGE');
       openCheckpoint(found.kind, found, 'STORAGE');

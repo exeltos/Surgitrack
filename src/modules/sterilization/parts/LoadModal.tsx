@@ -68,6 +68,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   if (reading.program) setLoadProgram(reading.program);
                   if (reading.result === 'FAIL') setLoadChemical('FAIL');
                   setLoadNote(note => note || deviceNote(reading));
+                  s.setLoadFromDevice(true);
                 }}
               />
               <div className="cycle-clean-fields">
@@ -208,7 +209,9 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 ) : (
                   <CheckCircle2 size={16} />
                 )}{' '}
-                {tr('Ολοκλήρωση φορτίου ·') + ' '}
+                {loadModal === 'STERILIZATION' && !s.loadFromDevice && loadChemical !== 'FAIL'
+                  ? tr('Έναρξη κύκλου ·') + ' '
+                  : tr('Ολοκλήρωση φορτίου ·') + ' '}
                 {loadSelected.size}
               </button>
             </div>

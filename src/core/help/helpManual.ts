@@ -474,21 +474,31 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Φόρτωση κλιβάνου',
-          'Στην καρτέλα «Φόρτωση» όλα τα έτοιμα Σετ και εργαλεία είναι ήδη τσεκαρισμένα· ξετσεκάρετε όσα δεν μπαίνουν και πατήστε ένα κουμπί, «Φόρτωση κλιβάνου». Διαλέγετε τον κλίβανο από τη λίστα του νοσοκομείου, τον αριθμό κύκλου και το πρόγραμμα, και δηλώνετε ποιοι δείκτες μπήκαν στο φορτίο (χημικός, βιολογικός). Αποτέλεσμα δεικτών εδώ δεν δίνεται. Αν μια συνδεδεμένη συσκευή δηλώσει αποτυχία κύκλου, το φορτίο επιστρέφει σε επανεπεξεργασία.',
+          'Στην καρτέλα «Φόρτωση» όλα τα έτοιμα Σετ και εργαλεία είναι ήδη τσεκαρισμένα· ξετσεκάρετε όσα δεν μπαίνουν και πατήστε ένα κουμπί, «Φόρτωση κλιβάνου». Διαλέγετε τον κλίβανο από τη λίστα του νοσοκομείου, τον αριθμό κύκλου και το πρόγραμμα, και δηλώνετε ποιοι δείκτες μπήκαν στο φορτίο (χημικός, βιολογικός). Αποτέλεσμα δεικτών εδώ δεν δίνεται. Με «Έναρξη κύκλου» το φορτίο μπαίνει στον κλίβανο. Αν διαλέξετε κύκλο από συνδεδεμένη συσκευή, ο κύκλος έχει ήδη τελειώσει και το φορτίο πάει κατευθείαν στην Αποδέσμευση· αν η συσκευή δήλωσε αποτυχία, επιστρέφει σε επανεπεξεργασία.',
         ],
         en: [
           'Sterilizer load',
-          'In the "Load" tab every ready Set and instrument is already ticked; untick what does not go in and press one button, "Sterilizer load". Pick the sterilizer from the hospital list, the cycle number and the program, and declare which indicators are in the load (chemical, biological). No indicator result is given here. If a connected device reports a failed cycle, the load goes back to reprocessing.',
+          'In the "Load" tab every ready Set and instrument is already ticked; untick what does not go in and press one button, "Sterilizer load". Pick the sterilizer from the hospital list, the cycle number and the program, and declare which indicators are in the load (chemical, biological). No indicator result is given here. "Start cycle" puts the load in the sterilizer. If you pick a cycle from a connected device, that cycle has already ended and the load goes straight to Release; if the device reported a failure, it goes back to reprocessing.',
+        ],
+      },
+      {
+        el: [
+          'Στον κλίβανο',
+          'Η καρτέλα «Στον κλίβανο» δείχνει τα φορτία που κλιβανίζονται τώρα: κλίβανο, κύκλο, πρόγραμμα, ποιος φόρτωσε και πότε, και τα αντικείμενα. Είναι κλειδωμένα· κανείς δεν μπορεί να τα αλλάξει. Όταν τελειώσει ο κύκλος πατήστε «Τέλος κύκλου» και το φορτίο περνά στην Αποδέσμευση· με «Αποτυχία κύκλου» όλο το φορτίο επιστρέφει σε επανεπεξεργασία.',
+        ],
+        en: [
+          'In the sterilizer',
+          'The "In the sterilizer" tab shows the loads being sterilized now: sterilizer, cycle, program, who loaded it and when, and the items. They are locked; nobody can change them. When the cycle ends press "End of cycle" and the load moves to Release; "Cycle failed" sends the whole load back to reprocessing.',
         ],
       },
       {
         el: [
           'Αποδέσμευση φορτίου',
-          'Στην καρτέλα «Αποδέσμευση» ένα κουμπί, «Αποδέσμευση φορτίου», ανοίγει τα φορτία που περιμένουν· διαλέγετε φορτίο και κλίβανο. Επιβεβαιώνετε φυσικές παραμέτρους και συσκευασίες και γράφετε το αποτέλεσμα των δεικτών που μπήκαν στο φορτίο. Αρκεί ένας επιτυχής δείκτης, εκτός αν η μονάδα απαιτεί συγκεκριμένο. Ανεπιτυχής δείκτης ή «Μη αποδέσμευση» στέλνει όλο το φορτίο σε επανεπεξεργασία. Μετά την αποδέσμευση τα αντικείμενα πάνε σε αποθήκευση ή είναι έτοιμα για παραλαβή.',
+          'Στην καρτέλα «Αποδέσμευση» ένα κουμπί, «Αποδέσμευση φορτίου», ανοίγει τα φορτία που περιμένουν· διαλέγετε φορτίο και κλίβανο. Επιβεβαιώνετε φυσικές παραμέτρους και συσκευασίες και γράφετε το αποτέλεσμα των δεικτών που μπήκαν στο φορτίο. Αρκεί ένας επιτυχής δείκτης, εκτός αν η μονάδα απαιτεί συγκεκριμένο. Ανεπιτυχής δείκτης ή «Μη αποδέσμευση» στέλνει όλο το φορτίο σε επανεπεξεργασία. Κλείνοντας την αποδέσμευση τα αντικείμενα περνούν στην «Παράδοση» για να παραδοθούν στο τμήμα (ή πρώτα στην Αποθήκευση, αν το νοσοκομείο την έχει ενεργή).',
         ],
         en: [
           'Load release',
-          'In the "Release" tab one button, "Release load", opens the loads that are waiting; pick the load and sterilizer. Confirm the physical parameters and the packaging and record the result of the indicators placed in the load. One passed indicator is enough, unless the unit requires a specific one. A failed indicator or "Do not release" sends the whole load back to reprocessing. After release the items go to storage or are ready for pickup.',
+          'In the "Release" tab one button, "Release load", opens the loads that are waiting; pick the load and sterilizer. Confirm the physical parameters and the packaging and record the result of the indicators placed in the load. One passed indicator is enough, unless the unit requires a specific one. A failed indicator or "Do not release" sends the whole load back to reprocessing. Closing the release moves the items to "Delivery" to be handed to the department (or first to Storage, if the hospital uses it).',
         ],
       },
       {

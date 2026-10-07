@@ -75,6 +75,7 @@ export function useLoadFlow(
     setLoadChemical('NOT_RECORDED');
     setLoadChemicalOn(true);
     setLoadBiologicalOn(releasePolicy.biologicalIndicator === 'REQUIRED');
+    p.setLoadFromDevice(false);
     setLoadNote('');
     setLoadScanFeedback(null);
   };
@@ -133,6 +134,7 @@ export function useLoadFlow(
       chemicalIndicatorResult:
         loadModal === 'STERILIZATION' && (loadChemicalOn || loadChemical === 'FAIL') ? loadChemical : undefined,
       biologicalIndicatorResult: loadModal === 'STERILIZATION' && loadBiologicalOn ? 'PENDING' : undefined,
+      cycleCompleted: loadModal === 'STERILIZATION' && p.loadFromDevice,
       note: loadNote.trim() || undefined,
     });
     if (created) closeLoad();

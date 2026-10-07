@@ -1705,4 +1705,26 @@ export const en: Record<string, string> = {
   'Λήγει σήμερα': 'Expires today',
   'Λήγει σε {0} ημ.': 'Expires in {0} d',
   'Αποστειρωμένο έως': 'Sterile until',
+  'Στον κλίβανο': 'In the sterilizer',
+  'Κύκλος σε εξέλιξη': 'Cycle running',
+  'Σε εξέλιξη': 'Running',
+  'Κανένας κλίβανος σε λειτουργία': 'No sterilizer running',
+  'Μετά τη «Φόρτωση κλιβάνου» το φορτίο εμφανίζεται εδώ μέχρι το τέλος του κύκλου.':
+    'After "Sterilizer load" the load shows here until its cycle ends.',
+  'Φορτώθηκε {0} από {1}': 'Loaded {0} by {1}',
+  Δείκτες: 'Indicators',
+  'Παρατήρηση τέλους κύκλου (προαιρετικά)…': 'End-of-cycle note (optional)…',
+  'Παρατήρηση τέλους κύκλου': 'End-of-cycle note',
+  'Αποτυχία κύκλου;': 'Cycle failed?',
+  'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.':
+    'The whole load ({0} items) goes back to reprocessing. This is recorded in the history.',
+  'Αποτυχία κύκλου': 'Cycle failed',
+  'Τέλος κύκλου · {0}': 'End of cycle · {0}',
+  'Τα αντικείμενα είναι κλειδωμένα μέχρι το τέλος του κύκλου· μετά περνούν στην Αποδέσμευση.':
+    'Items are locked until the cycle ends; then they move to Release.',
+  'Έναρξη κύκλου ·': 'Start cycle ·',
+  'Το φορτίο {0} μπήκε στον κλίβανο {1}.': 'Load {0} is in sterilizer {1}.',
+  'Ο κύκλος του φορτίου {0} τελείωσε: αναμένει αποδέσμευση.': 'The cycle of load {0} ended: it awaits release.',
+  'Ο κύκλος του φορτίου {0} απέτυχε: όλο το φορτίο επιστρέφει σε επανεπεξεργασία.':
+    'The cycle of load {0} failed: the whole load goes back to reprocessing.',
 };
