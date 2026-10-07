@@ -8787,87 +8787,6 @@ html body .prep-tools-scroll .prep-missing-row .tool-manage-btn {
   font-size: 11px;
   border: 1px solid #e9bf78;
 }
-/* Send to Sterilization: the operating theatre's instrument count (ticking and sending is the signature). */
-html body .department-count-card {
-  border: 1px solid #b7dfc8;
-  border-radius: 12px;
-  background: #f6fbf8;
-  overflow: hidden;
-}
-html body .department-count-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #d5ece0;
-  color: #1a6b3c;
-}
-html body .department-count-head small {
-  color: #475467;
-  font-weight: 600;
-}
-html body .department-count-all {
-  margin-left: auto;
-  padding: 5px 10px;
-  border: 1px solid #1a6b3c;
-  border-radius: 8px;
-  background: #fff;
-  color: #1a6b3c;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-html body .department-count-scan {
-  display: grid;
-  gap: 4px;
-  padding: 8px 12px 0;
-}
-html body .department-count-scan input {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid #d0d5dd;
-  border-radius: 8px;
-  font: inherit;
-}
-html body .department-count-scan small {
-  color: #1d6b7a;
-  font-weight: 600;
-}
-html body .department-count-list {
-  display: grid;
-  max-height: 34vh;
-  overflow-y: auto;
-  padding: 6px 4px 6px 12px;
-}
-html body .department-count-list label {
-  display: grid;
-  grid-template-columns: 20px 82px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-  border-bottom: 1px solid #e3f1e9;
-  font-size: 13px;
-  cursor: pointer;
-}
-html body .department-count-list label.on {
-  color: #1a6b3c;
-}
-html body .department-count-list input {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-}
-html body .department-count-missing {
-  margin: 0;
-  padding: 8px 12px;
-  background: #fff6e6;
-  color: #8a4b00;
-  font-size: 12.5px;
-  font-weight: 600;
-}
-html body .department-send-modal footer .department-count-print {
-  margin-right: auto;
-}
 /* Studio → Departments: which ones count the instruments (operating theatres). */
 html body .studio-list-row button.studio-count-toggle {
   width: auto !important;
@@ -8910,5 +8829,275 @@ html body .ster-count-shortage {
   html body .studio-list-head.with-count,
   html body .studio-list-row.with-count {
     grid-template-columns: minmax(140px, 1fr) 80px 196px;
+  }
+}
+/* Send to Sterilization: the count step (operating theatres), signed in its own window first. */
+html body .department-count-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #f1d59b;
+  border-radius: 12px;
+  background: #fffaf0;
+  color: #8a4b00;
+}
+html body .department-count-step.signed {
+  border-color: #b7dfc8;
+  background: #f6fbf8;
+  color: #1a6b3c;
+}
+html body .department-count-step > div {
+  flex: 1 1 auto;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+html body .department-count-step small {
+  color: #475467;
+}
+html body .department-count-step small.missing {
+  color: #b42318;
+  font-weight: 700;
+}
+/* The count window: laid out like the printed count form. */
+html body .count-form-backdrop {
+  z-index: 1450;
+}
+html body .count-form-modal {
+  width: min(980px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(16, 24, 40, 0.28);
+  overflow: hidden;
+}
+html body .count-form-modal > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px 12px;
+  border-bottom: 2px solid #1d6b7a;
+}
+html body .count-form-modal > header h2 {
+  margin: 2px 0 0;
+  font-size: 20px;
+}
+html body .count-form-modal > header p {
+  margin: 2px 0 0;
+  color: #1d6b7a;
+  font-weight: 700;
+}
+html body .count-form-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 20px;
+  overflow: hidden;
+}
+html body .count-form-body h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4b5d68;
+}
+html body .count-form-body h3 small {
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 700;
+}
+html body .count-form-body .signed {
+  color: #1a6b3c;
+}
+html body .count-form-body .pending {
+  color: #a66b16;
+}
+html body .count-form-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid #d7e0e5;
+  border-radius: 10px;
+  overflow: hidden;
+}
+html body .count-form-meta > div {
+  padding: 7px 12px;
+  border-right: 1px solid #e3e9ec;
+  border-bottom: 1px solid #e3e9ec;
+}
+html body .count-form-meta > div:nth-child(3n) {
+  border-right: 0;
+}
+html body .count-form-meta > div:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+html body .count-form-meta b {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6a7a84;
+}
+html body .count-form-meta span {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+html body .count-form-meta small {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5d68;
+}
+html body .count-form-b {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+html body .count-form-tools {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+html body .count-form-tools label {
+  display: grid;
+  gap: 3px;
+  flex: 1 1 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475467;
+}
+html body .count-form-tools label span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+html body .count-form-tools input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 500;
+}
+html body .count-form-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #1a6b3c;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a6b3c;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .count-form-all:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+html body .count-form-scan-message {
+  margin: -4px 0 6px;
+  color: #1d6b7a;
+  font-size: 12px;
+  font-weight: 600;
+}
+html body .count-form-table {
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+}
+html body .count-form-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+}
+html body .count-form-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 7px 8px;
+  background: #eef4f6;
+  border-bottom: 1px solid #9fb3bd;
+  color: #4b5d68;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: left;
+}
+html body .count-form-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eef1f4;
+  cursor: pointer;
+}
+html body .count-form-table tr.on td {
+  background: #ecfdf3;
+}
+html body .count-form-table .num {
+  width: 44px;
+  color: #6a7a84;
+  text-align: right;
+}
+html body .count-form-table th:nth-child(2) {
+  width: 96px;
+}
+html body .count-form-table th:nth-child(4) {
+  width: 110px;
+}
+html body .count-form-table .chk {
+  width: 132px;
+  text-align: center;
+}
+html body .count-form-table td.name {
+  font-weight: 700;
+}
+html body .count-form-table input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+html body .count-form-sent {
+  color: #1a6b3c;
+  font-weight: 800;
+}
+html body .count-form-sum {
+  margin: 8px 0 0;
+  font-weight: 700;
+}
+html body .count-form-sum.short {
+  color: #b42318;
+}
+html body .count-form-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #e4e7ec;
+}
+html body .count-form-modal > footer .count-form-print {
+  margin-right: auto;
+}
+@media (max-width: 700px) {
+  html body .count-form-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html body .count-form-tools {
+    flex-wrap: wrap;
   }
 }

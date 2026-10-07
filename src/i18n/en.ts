@@ -1845,10 +1845,12 @@ export const en: Record<string, string> = {
   'Σάρωση barcode εργαλείου + Enter': 'Scan instrument barcode + Enter',
   'Υπογεγραμμένη {0}': 'Signed {0}',
   'Υπογεγραμμένο ηλεκτρονικά': 'Signed electronically',
-  'Υπογραφή & αποστολή': 'Sign & send',
   'Χωρίς αποδέσμευση': 'Not released',
   'ανά εργαλείο': 'one by one',
   'μαζική («Όλα παρόντα»)': 'all at once ("All present")',
-  'υποχρεωτικός · καταμέτρηση χειρουργείου, όχι ονοματεπώνυμο':
-    'required · operating theatre count, not the patient’s name',
+  'Απαιτείται πριν την αποστολή · χειρουργείο': 'Required before sending · operating theatre',
+  'ΕΝΤΥΠΟ ΚΑΤΑΜΕΤΡΗΣΗΣ ΕΡΓΑΛΕΙΩΝ': 'INSTRUMENT COUNT FORM',
+  Καταμέτρηση: 'Count',
+  'Υπογεγραμμένη · {0} από {1} · {2} {3}': 'Signed · {0} of {1} · {2} {3}',
+  'Υπογραφή καταμέτρησης': 'Sign the count',
 };

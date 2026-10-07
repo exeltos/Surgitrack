@@ -303,7 +303,7 @@ export type SurgiStoreValue = {
   ) => WorkflowCheckpointRecord | undefined;
   completeDeliveryToDepartment: (kind: AssetKind, id: string, payload: DeliveryPayload) => DeliveryRecord | undefined;
   configureUsageLimit: (kind: AssetKind, id: string, maxUses?: number) => void;
-  recordCount: (payload: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => void;
+  recordCount: (payload: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => SurgicalCount | undefined;
   moveTool: (
     toolId: string,
     destination: 'STOCK' | 'SET' | 'SERVICE' | 'REMOVE',

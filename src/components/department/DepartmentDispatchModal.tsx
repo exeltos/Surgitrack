@@ -1,8 +1,9 @@
 import {useState} from 'react';
-import {ClipboardCheck, Gauge, Printer, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
+import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
 import {countsAtDepartment} from '../../core/surgicalCount';
-import {sterilizedOnOf} from '../../core/sterileExpiry';
+import type {SurgicalCount} from '../../store/types';
+import CountModal from './CountModal';
 import {printCountForm} from './printCountForm';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
@@ -22,94 +23,36 @@ export default function DepartmentDispatchModal({
   name: string;
   onClose: () => void;
 }) {
-  const {
-    currentUser,
-    sendToSterilization,
-    sets,
-    tools,
-    recordCount,
-    preparations,
-    sterilizationReleases,
-    organizationName,
-  } = useSurgi();
+  const {currentUser, sendToSterilization, sets, tools, preparations, sterilizationReleases, organizationName} =
+    useSurgi();
   const {systemSettings} = useLibraries();
   const [patientCode, setPatientCode] = useState('');
   const [note, setNote] = useState('');
   const [livesConfirmed, setLivesConfirmed] = useState(false);
-  // Operating theatres count the instruments here; ticking them and sending is the signature.
+  // Operating theatres sign the instrument count (its own window) before the Set can be sent.
   const asset = kind === 'SET' ? sets.find(x => x.id === id) : tools.find(x => x.id === id);
   const counting = countsAtDepartment(asset?.department, systemSettings.surgicalCountDepartments);
-  const members = kind === 'SET' ? tools.filter(t => t.setId === id && t.state !== 'RETIRED') : asset ? [asset] : [];
-  const [ticked, setTicked] = useState<Set<string>>(new Set());
-  const [bulk, setBulk] = useState(false);
-  const [scan, setScan] = useState('');
-  const [scanMessage, setScanMessage] = useState('');
-  const counted = members.filter(t => ticked.has(t.id)).length;
-  const missing = members.filter(t => !ticked.has(t.id));
-  const toggle = (toolId: string) =>
-    setTicked(current => {
-      const next = new Set(current);
-      if (next.has(toolId)) next.delete(toolId);
-      else next.add(toolId);
-      return next;
-    });
-  const allPresent = () => {
-    if (!window.confirm(tr('Επιβεβαιώνετε ότι καταμετρήθηκαν και τα {0} εργαλεία;', members.length))) return;
-    setTicked(new Set(members.map(t => t.id)));
-    setBulk(true);
-  };
-  const scanTool = () => {
-    const code = scan.trim().toUpperCase();
-    if (!code) return;
-    const tool = members.find(t => t.barcode.toUpperCase() === code);
-    if (!tool) setScanMessage(tr('Το {0} δεν ανήκει σε αυτό το Σετ.', code));
-    else {
-      setTicked(current => new Set(current).add(tool.id));
-      setScanMessage(tr('{0} · καταμετρήθηκε', `${tool.barcode} ${tool.name}`));
-    }
-    setScan('');
-  };
-  const printForm = () =>
+  const [countOpen, setCountOpen] = useState(false);
+  const [count, setCount] = useState<SurgicalCount | null>(null);
+  const printSigned = () =>
     asset &&
+    count &&
     printCountForm({
       asset,
-      items: members,
+      items: kind === 'SET' ? tools.filter(t => t.setId === id && t.state !== 'RETIRED') : [asset],
       hospital: organizationName,
       preparation: preparations.find(r => r.assetId === id),
       release: sterilizationReleases.find(r => r.assetId === id && r.decision === 'RELEASED'),
-      draft: {checkedToolIds: [...ticked], patientCode: patientCode.trim()},
+      count,
     });
   // Limited-use (multi-use with lives) instruments lose one life on every dispatch after a procedure.
   const limitedTools =
     kind === 'TOOL' ? tools.filter(t => t.id === id && t.maxUses) : tools.filter(t => t.setId === id && t.maxUses);
   const limitedSet = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
   const consumesLives = limitedTools.length > 0 || limitedSet;
-  const countReady = !counting || (patientCode.trim().length > 0 && counted > 0);
-  const canSend = countReady && (!consumesLives || (patientCode.trim().length > 0 && livesConfirmed));
+  const canSend = (!counting || !!count) && (!consumesLives || (patientCode.trim().length > 0 && livesConfirmed));
   const send = () => {
     if (!canSend) return;
-    if (counting) {
-      if (
-        missing.length &&
-        !window.confirm(tr('Λείπουν {0} εργαλεία. Υπογραφή της καταμέτρησης με έλλειψη;', missing.length))
-      )
-        return;
-      recordCount({
-        setId: id,
-        assetKind: kind,
-        patientCode: patientCode.trim(),
-        expected: members.length,
-        counted,
-        result: missing.length ? 'MISSING' : 'OK',
-        note: missing.length ? tr('Λείπουν: {0}', missing.map(t => `${t.barcode} ${t.name}`).join(', ')) : '',
-        checkedToolIds: [...ticked],
-        missing: missing.map(t => t.barcode),
-        mode: bulk ? 'BULK' : 'ITEM',
-        sterilizedOn: asset?.sterileUntil ? sterilizedOnOf(asset) : undefined,
-        sterilizedTime: asset?.sterileUntil ? asset.sterilizedTime : undefined,
-        sterileUntil: asset?.sterileUntil,
-      });
-    }
     sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined);
     onClose();
   };
@@ -146,11 +89,9 @@ export default function DepartmentDispatchModal({
           <label className="department-patient-code">
             {tr('Κωδικός ασθενούς') + ' '}
             <small>
-              {counting
-                ? tr('υποχρεωτικός · καταμέτρηση χειρουργείου, όχι ονοματεπώνυμο')
-                : consumesLives
-                  ? tr('υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο')
-                  : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
+              {consumesLives
+                ? tr('υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο')
+                : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
             </small>
             <input
               value={patientCode}
@@ -159,47 +100,27 @@ export default function DepartmentDispatchModal({
             />
           </label>
           {counting && (
-            <div className="department-count-card">
-              <div className="department-count-head">
-                <ClipboardCheck size={18} />
+            <div className={`department-count-step ${count ? 'signed' : ''}`}>
+              {count ? <CheckCircle2 size={20} /> : <ClipboardCheck size={20} />}
+              <div>
                 <strong>{tr('Καταμέτρηση εργαλείων')}</strong>
-                <small>{tr('{0} από {1} καταμετρημένα', counted, members.length)}</small>
-                {members.length > 1 && counted < members.length && (
-                  <button type="button" className="department-count-all" onClick={allPresent}>
-                    {tr('Όλα παρόντα')}
-                  </button>
-                )}
+                <small>
+                  {count
+                    ? tr('Υπογεγραμμένη · {0} από {1} · {2} {3}', count.counted, count.expected, count.by, count.at)
+                    : tr('Απαιτείται πριν την αποστολή · χειρουργείο')}
+                </small>
+                {count?.missing?.length ? (
+                  <small className="missing">{tr('Λείπουν: {0}', count.missing.join(', '))}</small>
+                ) : null}
               </div>
-              {kind === 'SET' && (
-                <label className="department-count-scan">
-                  <input
-                    value={scan}
-                    onChange={e => setScan(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        scanTool();
-                      }
-                    }}
-                    placeholder={tr('Σάρωση barcode εργαλείου + Enter')}
-                    aria-label={tr('Σάρωση εργαλείου')}
-                  />
-                  {scanMessage && <small>{scanMessage}</small>}
-                </label>
-              )}
-              <div className="department-count-list">
-                {members.map(t => (
-                  <label key={t.id} className={ticked.has(t.id) ? 'on' : ''}>
-                    <input type="checkbox" checked={ticked.has(t.id)} onChange={() => toggle(t.id)} />
-                    <span className="mono">{t.barcode}</span>
-                    <strong>{t.name}</strong>
-                  </label>
-                ))}
-              </div>
-              {counted > 0 && missing.length > 0 && (
-                <p className="department-count-missing">
-                  {tr('Λείπουν {0} εργαλεία. Θα δημιουργηθεί εκκρεμότητα.', missing.length)}
-                </p>
+              {count ? (
+                <AppButton icon={<Printer size={15} />} onClick={printSigned}>
+                  {tr('Έντυπο')}
+                </AppButton>
+              ) : (
+                <AppButton variant="primary" icon={<ClipboardCheck size={15} />} onClick={() => setCountOpen(true)}>
+                  {tr('Καταμέτρηση')}
+                </AppButton>
               )}
             </div>
           )}
@@ -256,17 +177,25 @@ export default function DepartmentDispatchModal({
           </label>
         </div>
         <footer>
-          {counting && (
-            <AppButton icon={<Printer size={16} />} onClick={printForm} className="department-count-print">
-              {tr('Έντυπο καταμέτρησης')}
-            </AppButton>
-          )}
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton variant="primary" icon={<Send size={17} />} onClick={send} disabled={!canSend}>
-            {counting ? tr('Υπογραφή & αποστολή') : tr('Αποστολή προς Αποστείρωση')}
+            {tr('Αποστολή προς Αποστείρωση')}
           </AppButton>
         </footer>
       </div>
+      {countOpen && (
+        <CountModal
+          kind={kind}
+          id={id}
+          patientCode={patientCode}
+          onClose={() => setCountOpen(false)}
+          onSigned={signed => {
+            setCount(signed);
+            setPatientCode(signed.patientCode);
+            setCountOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

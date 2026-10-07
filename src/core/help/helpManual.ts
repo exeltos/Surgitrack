@@ -376,11 +376,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καταμέτρηση χειρουργείου',
-          'Στα χειρουργεία (Studio → Βιβλιοθήκες → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» περιέχει την καταμέτρηση: γράφετε τον κωδικό ασθενούς και τσεκάρετε ή σαρώνετε κάθε εργαλείο, ή πατάτε «Όλα παρόντα» με επιβεβαίωση. Το «Υπογραφή & αποστολή» είναι η υπογραφή σας (όνομα και ώρα). Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το «Έντυπο καταμέτρησης» (και από την Εκτύπωση του Σετ) έχει το μέρος της Αποστείρωσης προϋπογεγραμμένο (σύνθεση, αποδέσμευση, ημερομηνίες) και το μέρος του χειρουργείου κενό ή συμπληρωμένο.',
+          'Στα χειρουργεία (Studio → Βιβλιοθήκες → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» ζητά πρώτα καταμέτρηση. Το κουμπί «Καταμέτρηση» ανοίγει το έντυπο: πάνω το μέρος της Αποστείρωσης (σύνθεση, αποδέσμευση, αποστείρωση και λήξη, κύκλος), κάτω τα εργαλεία με «Εστάλη» και «Καταμετρήθηκε». Γράφετε τον κωδικό ασθενούς, τσεκάρετε ή σαρώνετε κάθε εργαλείο ή πατάτε «Όλα παρόντα», και «Υπογραφή καταμέτρησης» (όνομα και ώρα). Μετά ενεργοποιείται η αποστολή. Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το έντυπο τυπώνεται κενό ή υπογεγραμμένο, και από την Εκτύπωση του Σετ.',
         ],
         en: [
           'Surgical count',
-          'In operating theatres (Studio → Libraries → Departments → "Count") "Send to Sterilization" includes the count: enter the patient code and tick or scan each instrument, or press "All present" and confirm. "Sign & send" is your signature (name and time). If instruments are missing, an issue opens and Sterilization sees it at Receipt. The "Count form" (also from the Set’s Print menu) has the Sterilization part pre-signed (composition, release, dates) and the operating theatre part blank or filled in.',
+          'In operating theatres (Studio → Libraries → Departments → "Count") "Send to Sterilization" asks for the count first. The "Count" button opens the form: Sterilization’s part on top (composition, release, sterilization and expiry, cycle), the instruments below with "Sent" and "Counted". Enter the patient code, tick or scan each instrument or press "All present", then "Sign the count" (name and time). Sending is then enabled. If instruments are missing, an issue opens and Sterilization sees it at Receipt. The form prints blank or signed, also from the Set’s Print menu.',
         ],
       },
       {

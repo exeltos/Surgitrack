@@ -45,7 +45,7 @@ export function useAssetCatalogActions(
     };
     const kind = p.assetKind || 'SET';
     const asset = kind === 'SET' ? sets.find(x => x.id === p.setId) : tools.find(x => x.id === p.setId);
-    if (!asset) return;
+    if (!asset) return undefined;
     setCounts(x => [c, ...x]);
     if (kind === 'SET')
       setSets(x => x.map(a => (a.id === p.setId ? {...a, actual: p.counted, patientCode: p.patientCode} : a)));
@@ -73,6 +73,7 @@ export function useAssetCatalogActions(
       by: currentUser.name,
       patientCode: p.patientCode,
     });
+    return c;
   };
   const moveTool = (
     toolId: string,
