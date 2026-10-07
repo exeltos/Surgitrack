@@ -15,6 +15,8 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
     completeLoad,
     loadCandidates,
     loadChemical,
+    loadChemicalOn,
+    loadBiologicalOn,
     loadCycleNumber,
     loadEquipment,
     loadModal,
@@ -23,6 +25,8 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
     loadScanFeedback,
     loadSelected,
     setLoadChemical,
+    setLoadChemicalOn,
+    setLoadBiologicalOn,
     setLoadCycleNumber,
     setLoadEquipment,
     setLoadNote,
@@ -95,19 +99,35 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   <input value={loadProgram} onChange={e => setLoadProgram(e.target.value)} />
                 </label>
                 {loadModal === 'STERILIZATION' && (
-                  <label>
-                    {tr('Χημικός δείκτης κύκλου')}
-                    <select
-                      value={loadChemical}
-                      onChange={e => setLoadChemical(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
-                    >
-                      <option value="PASS">{tr('Αποδεκτός')}</option>
-                      <option value="FAIL">{tr('Αποτυχία')}</option>
-                      <option value="NOT_RECORDED">{tr('Δεν καταγράφηκε')}</option>
-                    </select>
-                  </label>
+                  <div className="load-indicator-pick" role="group" aria-labelledby="load-indicator-title">
+                    <span id="load-indicator-title">{tr('Δείκτες στο φορτίο')}</span>
+                    <div className="load-indicator-chips">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={loadChemicalOn}
+                          onChange={e => setLoadChemicalOn(e.target.checked)}
+                        />
+                        {tr('Χημικός')}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={loadBiologicalOn}
+                          onChange={e => setLoadBiologicalOn(e.target.checked)}
+                        />
+                        {tr('Βιολογικός')}
+                      </label>
+                    </div>
+                  </div>
                 )}
               </div>
+              {loadModal === 'STERILIZATION' && loadChemical === 'FAIL' && (
+                <div className="load-device-fail" role="alert">
+                  <TriangleAlert size={16} />
+                  {tr('Η συσκευή δήλωσε αποτυχία κύκλου: το φορτίο θα επιστρέψει σε επανεπεξεργασία.')}
+                </div>
+              )}
               {loadModal === 'STERILIZATION' && (
                 <BarcodeCapture
                   title={tr('Προσθήκη στο φορτίο')}

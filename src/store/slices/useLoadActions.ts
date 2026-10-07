@@ -1,3 +1,4 @@
+import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
 import type {
   AssetKind,
   AssetState,
@@ -178,7 +179,8 @@ export function useLoadActions(
       program: payload.program,
       status: result === 'PASSED' ? 'AWAITING_RELEASE' : 'FAILED',
       items,
-      chemicalIndicatorResult: payload.chemicalIndicatorResult || 'NOT_RECORDED',
+      chemicalIndicatorResult: payload.chemicalIndicatorResult,
+      biologicalIndicatorResult: payload.biologicalIndicatorResult,
       note: payload.note,
       createdByUserId: currentUser.id,
       createdByName: currentUser.name,
@@ -201,17 +203,11 @@ export function useLoadActions(
       biologicalIndicator: 'OPTIONAL' as const,
       allowReleaseWhileBiPending: false,
     };
-    const chemicalOk = !policy.requireChemicalIndicator || payload.chemicalIndicatorOk;
-    const biologicalOk =
-      policy.biologicalIndicator === 'NOT_REQUIRED' ||
-      payload.biologicalIndicatorResult === 'PASS' ||
-      (policy.biologicalIndicator === 'OPTIONAL' && payload.biologicalIndicatorResult === 'NOT_REQUIRED') ||
-      (policy.allowReleaseWhileBiPending && payload.biologicalIndicatorResult === 'PENDING');
+    const chemical = payload.chemicalIndicatorResult ?? (payload.chemicalIndicatorOk ? 'PASS' : 'NOT_RECORDED');
     const canRelease =
       payload.physicalParametersOk &&
-      chemicalOk &&
       payload.packagingIntegrityOk &&
-      biologicalOk &&
+      releaseIndicatorVerdict(policy, chemical, payload.biologicalIndicatorResult).ok &&
       payload.decision === 'RELEASED';
     const decision = canRelease ? 'RELEASED' : 'REPROCESS';
     const now = formatStoreDateTime();
@@ -233,7 +229,7 @@ export function useLoadActions(
         cycleNumber: cycle.cycleNumber,
         sterilizer: cycle.sterilizer,
         physicalParametersOk: payload.physicalParametersOk,
-        chemicalIndicatorOk: payload.chemicalIndicatorOk,
+        chemicalIndicatorOk: chemical === 'PASS',
         packagingIntegrityOk: payload.packagingIntegrityOk,
         biologicalIndicatorResult: payload.biologicalIndicatorResult,
         decision,
@@ -263,6 +259,7 @@ export function useLoadActions(
       status: decision,
       physicalParametersOk: payload.physicalParametersOk,
       packagingIntegrityOk: payload.packagingIntegrityOk,
+      chemicalIndicatorResult: chemical,
       biologicalIndicatorResult: payload.biologicalIndicatorResult,
       note: payload.note || load.note,
       releasedAt: now,

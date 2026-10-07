@@ -309,6 +309,40 @@ describe('sterilization flow', () => {
       expect(f.deliver()).toBeUndefined();
     });
 
+    it('releases with only the biological indicator passed, and records both indicators', () => {
+      const f = setup();
+      const load = f.toAwaitingRelease();
+      const result = f.release(load.id, {
+        chemicalIndicatorOk: false,
+        chemicalIndicatorResult: 'NOT_RECORDED',
+        biologicalIndicatorResult: 'PASS',
+      })!;
+      expect(result.status).toBe('RELEASED');
+      expect(result.chemicalIndicatorResult).toBe('NOT_RECORDED');
+      expect(result.biologicalIndicatorResult).toBe('PASS');
+    });
+
+    it('does not release with no indicator recorded as passed, or with a failed chemical one', () => {
+      const none = setup();
+      const noneLoad = none.toAwaitingRelease();
+      expect(
+        none.release(noneLoad.id, {
+          chemicalIndicatorOk: false,
+          chemicalIndicatorResult: 'NOT_RECORDED',
+          biologicalIndicatorResult: 'NOT_REQUIRED',
+        })!.status,
+      ).toBe('REPROCESS');
+      const failed = setup();
+      const failedLoad = failed.toAwaitingRelease();
+      expect(
+        failed.release(failedLoad.id, {
+          chemicalIndicatorOk: false,
+          chemicalIndicatorResult: 'FAIL',
+          biologicalIndicatorResult: 'PASS',
+        })!.status,
+      ).toBe('REPROCESS');
+    });
+
     it('releases only once: a released load cannot be released again', () => {
       const f = setup();
       const load = f.toAwaitingRelease();

@@ -20,6 +20,10 @@ export function useLoadFlow(
     all,
     createProcessLoad,
     loadChemical,
+    loadChemicalOn,
+    loadBiologicalOn,
+    setLoadChemicalOn,
+    setLoadBiologicalOn,
     loadCycleNumber,
     loadEquipment,
     loadModal,
@@ -31,6 +35,7 @@ export function useLoadFlow(
     recallProcessLoad,
     releaseLoadBi,
     releaseLoadChecks,
+    releaseLoadChem,
     releaseLoadId,
     releaseLoadNote,
     releasePolicy,
@@ -44,6 +49,7 @@ export function useLoadFlow(
     setLoadScanFeedback,
     setLoadSelected,
     setReleaseLoadBi,
+    setReleaseLoadChem,
     setReleaseLoadChecks,
     setReleaseLoadId,
     setReleaseLoadNote,
@@ -66,7 +72,9 @@ export function useLoadFlow(
     setLoadEquipment(kind === 'WASHING' ? 'Πλυντήριο 1' : 'Κλίβανος 1');
     setLoadCycleNumber('');
     setLoadProgram(kind === 'WASHING' ? 'Θερμική απολύμανση' : '134°C · 5 min');
-    setLoadChemical('PASS');
+    setLoadChemical('NOT_RECORDED');
+    setLoadChemicalOn(true);
+    setLoadBiologicalOn(releasePolicy.biologicalIndicator === 'REQUIRED');
     setLoadNote('');
     setLoadScanFeedback(null);
   };
@@ -122,24 +130,29 @@ export function useLoadFlow(
       equipment: loadEquipment.trim(),
       cycleNumber: loadCycleNumber.trim(),
       program: loadProgram.trim(),
-      chemicalIndicatorResult: loadModal === 'STERILIZATION' ? loadChemical : undefined,
+      chemicalIndicatorResult:
+        loadModal === 'STERILIZATION' && (loadChemicalOn || loadChemical === 'FAIL') ? loadChemical : undefined,
+      biologicalIndicatorResult: loadModal === 'STERILIZATION' && loadBiologicalOn ? 'PENDING' : undefined,
       note: loadNote.trim() || undefined,
     });
     if (created) closeLoad();
   };
   const openLoadRelease = (id: string) => {
     setReleaseLoadId(id);
-    setReleaseLoadChecks({
-      physicalParametersOk: false,
-      chemicalIndicatorOk: !releasePolicy.requireChemicalIndicator,
-      packagingIntegrityOk: false,
-    });
-    setReleaseLoadBi(releasePolicy.biologicalIndicator === 'REQUIRED' ? 'PENDING' : 'NOT_REQUIRED');
+    setReleaseLoadChecks({physicalParametersOk: false, chemicalIndicatorOk: false, packagingIntegrityOk: false});
+    setReleaseLoadChem('NOT_RECORDED');
+    const planned = processLoads.find(load => load.id === id);
+    setReleaseLoadBi(
+      planned?.biologicalIndicatorResult === 'PENDING' || releasePolicy.biologicalIndicator === 'REQUIRED'
+        ? 'PENDING'
+        : 'NOT_REQUIRED',
+    );
     setReleaseLoadNote('');
   };
   const closeLoadRelease = () => {
     setReleaseLoadId(null);
     setReleaseLoadChecks({physicalParametersOk: false, chemicalIndicatorOk: false, packagingIntegrityOk: false});
+    setReleaseLoadChem('NOT_RECORDED');
     setReleaseLoadBi('NOT_REQUIRED');
     setReleaseLoadNote('');
   };
@@ -147,6 +160,8 @@ export function useLoadFlow(
     if (!releaseLoadId) return;
     const done = releaseProcessLoad(releaseLoadId, {
       ...releaseLoadChecks,
+      chemicalIndicatorOk: releaseLoadChem === 'PASS',
+      chemicalIndicatorResult: releaseLoadChem,
       biologicalIndicatorResult: releaseLoadBi,
       decision,
       note: releaseLoadNote.trim() || undefined,

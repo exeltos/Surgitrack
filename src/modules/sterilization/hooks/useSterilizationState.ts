@@ -148,7 +148,9 @@ export function useSterilizationState() {
   const [loadEquipment, setLoadEquipment] = useState('');
   const [loadCycleNumber, setLoadCycleNumber] = useState('');
   const [loadProgram, setLoadProgram] = useState('');
-  const [loadChemical, setLoadChemical] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('PASS');
+  const [loadChemical, setLoadChemical] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('NOT_RECORDED');
+  const [loadChemicalOn, setLoadChemicalOn] = useState(true);
+  const [loadBiologicalOn, setLoadBiologicalOn] = useState(false);
   const [loadNote, setLoadNote] = useState('');
   const [loadScanFeedback, setLoadScanFeedback] = useState<{type: 'OK' | 'WARN' | 'ERROR'; message: string} | null>(
     null,
@@ -159,6 +161,7 @@ export function useSterilizationState() {
     chemicalIndicatorOk: false,
     packagingIntegrityOk: false,
   });
+  const [releaseLoadChem, setReleaseLoadChem] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('NOT_RECORDED');
   const [releaseLoadBi, setReleaseLoadBi] = useState<'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL'>('NOT_REQUIRED');
   const [releaseLoadNote, setReleaseLoadNote] = useState('');
   return {
@@ -203,6 +206,8 @@ export function useSterilizationState() {
     issues,
     kindFilter,
     loadChemical,
+    loadChemicalOn,
+    loadBiologicalOn,
     loadCycleNumber,
     loadEquipment,
     loadModal,
@@ -253,6 +258,7 @@ export function useSterilizationState() {
     releaseChecks,
     releaseDraft,
     releaseLoadBi,
+    releaseLoadChem,
     releaseLoadChecks,
     releaseLoadId,
     releaseLoadNote,
@@ -296,6 +302,8 @@ export function useSterilizationState() {
     setIssueType,
     setKindFilter,
     setLoadChemical,
+    setLoadChemicalOn,
+    setLoadBiologicalOn,
     setLoadCycleNumber,
     setLoadEquipment,
     setLoadModal,
@@ -341,6 +349,7 @@ export function useSterilizationState() {
     setReleaseChecks,
     setReleaseDraft,
     setReleaseLoadBi,
+    setReleaseLoadChem,
     setReleaseLoadChecks,
     setReleaseLoadId,
     setReleaseLoadNote,

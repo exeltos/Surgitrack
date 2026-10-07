@@ -113,12 +113,17 @@ export type CreateProcessLoadPayload = {
   equipment: string;
   cycleNumber: string;
   program: string;
+  /** Set when the chemical indicator is part of the load; its result is recorded at release. */
   chemicalIndicatorResult?: SterilizationIndicatorResult;
+  /** 'PENDING' when a biological indicator is part of the load; its result is recorded at release. */
+  biologicalIndicatorResult?: BiologicalIndicatorResult;
   note?: string;
 };
 export type ReleaseProcessLoadPayload = {
   physicalParametersOk: boolean;
   chemicalIndicatorOk: boolean;
+  /** The chemical indicator as recorded at release; when absent, `chemicalIndicatorOk` decides (pass / not recorded). */
+  chemicalIndicatorResult?: SterilizationIndicatorResult;
   packagingIntegrityOk: boolean;
   biologicalIndicatorResult: BiologicalIndicatorResult;
   decision: 'RELEASED' | 'REPROCESS';
