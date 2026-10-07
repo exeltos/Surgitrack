@@ -32,21 +32,9 @@ const departmentStateLabel: Record<string, string> = {
 export default function DepartmentPage() {
   const {sets, tools, issues, currentUser, role} = useSurgi();
   // From the Overview, the admin and Sterilization look at one department as the department sees it.
-  const [params, setParams] = useSearchParams();
-  const canPick = role !== 'DEPARTMENT';
-  const viewing = canPick ? params.get('d') || '' : '';
-  // Departments that hold Sets or standalone instruments, the busiest first: what the admin and Sterilization pick from.
-  const departmentOptions = useMemo(() => {
-    const countBy = new Map<string, number>();
-    for (const item of [...sets, ...tools.filter(t => t.mode === 'STANDALONE')])
-      if (item.department) countBy.set(item.department, (countBy.get(item.department) || 0) + 1);
-    return [...countBy.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
-  }, [sets, tools]);
-  // The user's own department, unless it holds nothing here (e.g. Central Sterilization): then the busiest one.
-  const dept =
-    viewing ||
-    (canPick && !departmentOptions.includes(currentUser.department) && departmentOptions[0]) ||
-    currentUser.department;
+  const [params] = useSearchParams();
+  const viewing = role === 'DEPARTMENT' ? '' : params.get('d') || '';
+  const dept = viewing || currentUser.department;
   const lastOpenedKey =
     typeof window !== 'undefined' ? sessionStorage.getItem('surgitrack.department.lastAsset') : null;
   const initialCategory: Category = lastOpenedKey?.startsWith('TOOL:') ? 'TOOLS' : 'SETS';
@@ -117,24 +105,7 @@ export default function DepartmentPage() {
       <header className="department-header">
         <div>
           <span className="eyebrow">{tr('ΣΕΤ & ΕΡΓΑΛΕΙΑ ΤΜΗΜΑΤΟΣ')}</span>
-          {canPick && departmentOptions.length > 0 ? (
-            <h1 className="department-picker-title">
-              <select
-                className="department-picker"
-                aria-label={tr('Τμήμα')}
-                value={dept}
-                onChange={e => setParams({d: e.target.value}, {replace: true})}
-              >
-                {(departmentOptions.includes(dept) ? departmentOptions : [dept, ...departmentOptions]).map(name => (
-                  <option key={name} value={name}>
-                    {trData(name)}
-                  </option>
-                ))}
-              </select>
-            </h1>
-          ) : (
-            <h1>{trData(dept)}</h1>
-          )}
+          <h1>{trData(dept)}</h1>
           <p>{tr('Τα Σετ και τα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.')}</p>
         </div>
         {viewing ? (

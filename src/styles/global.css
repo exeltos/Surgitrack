@@ -8856,22 +8856,6 @@ html body .count-scan-message {
   color: #1d6b7a;
   font-weight: 600;
 }
-/* Department page: the admin and Sterilization pick the department in the title. */
-html body .department-picker-title {
-  margin: 0;
-}
-html body .department-picker {
-  font: inherit;
-  font-size: inherit;
-  font-weight: 800;
-  color: inherit;
-  max-width: 100%;
-  padding: 2px 34px 2px 10px;
-  border: 1px solid #d0d5dd;
-  border-radius: 10px;
-  background-color: #fff;
-  cursor: pointer;
-}
 html body .count-card > label.count-damage {
   display: flex !important;
   flex-direction: row !important;
