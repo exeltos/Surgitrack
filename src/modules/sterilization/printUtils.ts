@@ -249,8 +249,8 @@ function barcodeLabelBody(
   .brand{font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
   .head,.foot,.cod{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
-  .foot{display:flex;justify-content:space-between;align-items:baseline;gap:1.5mm}
-  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{flex-wrap:wrap;row-gap:.2mm}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
+  .foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:1.5mm}.foot .code{grid-column:2;text-align:center}.foot .detail{grid-column:3;justify-self:end}
+  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{display:flex;flex-wrap:wrap;row-gap:.2mm;justify-content:center}.foot.dated .code{flex:1 1 100%;text-align:center}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
   .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
   .sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}

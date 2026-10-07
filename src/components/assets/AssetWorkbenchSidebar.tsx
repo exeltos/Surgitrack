@@ -218,18 +218,23 @@ export default function AssetWorkbenchSidebar({
             )}
           </dd>
         </div>
-        {sterile && asset.sterileUntil && (
-          <div>
-            <dt>{tr('Αποστείρωση / λήξη')}</dt>
-            <dd className="sterile-dd">
+        {/* Always shown: the dates once released, a dash while the item is not sterile. */}
+        <div>
+          <dt>{tr('Αποστείρωση / λήξη')}</dt>
+          <dd className="sterile-dd">
+            {sterile && asset.sterileUntil ? (
               <SterileDates
                 sterilizedOn={asset.sterilizedOn}
                 sterileUntil={asset.sterileUntil}
                 shelfLifeMonths={asset.shelfLifeMonths}
               />
-            </dd>
-          </div>
-        )}
+            ) : (
+              <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
+                —
+              </span>
+            )}
+          </dd>
+        </div>
         <div>
           <dt>{tr('Κωδικός')}</dt>
           <dd>{editing ? textField('code', draft.code) : asset.code}</dd>
