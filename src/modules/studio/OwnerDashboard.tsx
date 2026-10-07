@@ -242,6 +242,75 @@ export default function OwnerDashboard({
           </div>
         </section>
       </div>
+
+      <section className="owner-card owner-hospitals">
+        <header>
+          <div>
+            <span className="eyebrow">{L('ΝΟΣΟΚΟΜΕΙΑ', 'HOSPITALS')}</span>
+            <h2>{L('Κατάσταση ανά νοσοκομείο', 'Status by hospital')}</h2>
+          </div>
+          <AppButton size="sm" onClick={onOpenHospitals}>
+            {L('Όλα τα νοσοκομεία', 'All hospitals')}
+          </AppButton>
+        </header>
+        <div className="owner-hospitals-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>{L('Νοσοκομείο', 'Hospital')}</th>
+                <th>{L('Κατάσταση', 'Status')}</th>
+                <th>{L('Χρήστες', 'Users')}</th>
+                <th>{L('Διαχειριστής', 'Admin')}</th>
+                <th>{L('Αιτήματα', 'Requests')}</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.org.id}>
+                  <td>
+                    <b>{r.org.name}</b>
+                    <small>{r.org.code}</small>
+                  </td>
+                  <td>
+                    <span
+                      className={`owner-status ${
+                        r.trial.ended ? 'stop' : !r.org.active ? 'off' : r.trial.warn ? 'warn' : ''
+                      }`}
+                    >
+                      {r.trial.ended
+                        ? L('Κλειδωμένο', 'Locked')
+                        : !r.org.active
+                          ? L('Ανενεργό', 'Inactive')
+                          : r.trial.plan === 'TRIAL'
+                            ? L(`Δοκιμή · ${r.trial.daysLeft} ημ.`, `Trial · ${r.trial.daysLeft} d`)
+                            : L('Κανονική χρήση', 'Standard')}
+                    </span>
+                  </td>
+                  <td>
+                    {r.active}
+                    <span className="muted"> / {r.users}</span>
+                  </td>
+                  <td>{r.admins ? '✓' : <span className="owner-missing">{L('Λείπει', 'Missing')}</span>}</td>
+                  <td>{r.requests || '—'}</td>
+                  <td>
+                    <AppButton size="sm" onClick={() => onOpenUsers(r.org.id)}>
+                      {L('Χρήστες', 'Users')}
+                    </AppButton>
+                  </td>
+                </tr>
+              ))}
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="owner-none">
+                    {L('Δεν υπάρχουν νοσοκομεία ακόμα.', 'No hospitals yet.')}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }

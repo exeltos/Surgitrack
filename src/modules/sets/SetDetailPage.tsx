@@ -48,6 +48,7 @@ import {sameMarker} from '../../core/colorTapes';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
 import ActionMenu from '../../components/ui/ActionMenu';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
+import {useConfirm} from '../../components/ui/useConfirm';
 
 export default function SetDetailPage() {
   const {
@@ -59,6 +60,7 @@ export default function SetDetailPage() {
     duplicateSet,
     deleteSet,
     reportSetIssue,
+    markLost,
     addAssetPhotos,
     removeAssetPhoto,
     updateSet,
@@ -67,6 +69,7 @@ export default function SetDetailPage() {
     setColorMarker,
   } = useSurgi();
   const navigate = useNavigate();
+  const [confirmNode, ask] = useConfirm();
   const {id} = useParams();
   const [searchParams] = useSearchParams();
   const scannedOldBarcode = searchParams.get('replaced');
@@ -756,11 +759,28 @@ export default function SetDetailPage() {
             setManageOpen(true);
           }}
           onSubmit={(toolIds, type, note, photos) => {
+            if (type === 'Απώλεια' && can('asset.composition.manage')) {
+              ask({
+                title: tr('Δήλωση απώλειας;'),
+                message: toolIds.length
+                  ? tr('Τα {0} εργαλεία δηλώνονται ως χαμένα και αφαιρούνται από το Σετ.', toolIds.length)
+                  : tr('Το Σετ {0} δηλώνεται ως χαμένο.', set.barcode),
+                confirmLabel: tr('Δήλωση απώλειας'),
+                danger: true,
+                onConfirm: () => {
+                  if (toolIds.length) toolIds.forEach(toolId => markLost('TOOL', toolId, note.trim()));
+                  else markLost('SET', set.id, note.trim());
+                  setReportOpen(false);
+                },
+              });
+              return;
+            }
             reportSetIssue(set.id, toolIds, type, note, photos);
             setReportOpen(false);
           }}
         />
       )}
+      {confirmNode}
       {manageOpen && <AssetManageModal kind="SET" asset={set} onClose={() => setManageOpen(false)} />}
       {markerOpen && (
         <ColorMarkerPicker

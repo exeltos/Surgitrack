@@ -21,8 +21,8 @@ export const en: Record<string, string> = {
   'Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα': 'Damage, wear, loss or another problem',
   'Βλάβη, φθορά, έλλειψη ή άλλο πρόβλημα': 'Damage, wear, shortage or another problem',
   'Βλάβη, φθορά, έλλειψη, απώλεια ή άλλο πρόβλημα': 'Damage, wear, shortage, loss or another problem',
-  'Απώλεια ή αποστολή σε Service αλλάζουν την κατάσταση: δηλώνονται από τη':
-    'Loss or sending to Service change the state: declare them in',
+  'Η αποστολή σε Service αλλάζει την κατάσταση: δηλώνεται από τη':
+    'Sending to Service changes the state: declare it from',
   'Παρατηρητής (μόνο προβολή)': 'Viewer (read only)',
   'Ο Παρατηρητής βλέπει όλο το νοσοκομείο (επισκόπηση, μητρώα, εκκρεμότητες, ιστορικό, αναφορές) χωρίς να μπορεί να αλλάξει τίποτα.':
     'The viewer sees the whole hospital (overview, registries, issues, history, reports) and cannot change anything.',
@@ -1584,6 +1584,20 @@ export const en: Record<string, string> = {
   'Με κόκκινο: γραμμές με ελλείψεις. Με πορτοκαλί: εργαλεία με ανοιχτή εκκρεμότητα (βλάβη, φθορά κ.ά.).':
     'In red: lines with missing instruments. In orange: instruments with an open issue (damage, wear etc.).',
   'Νέα παραγγελία': 'New order',
+  'Δήλωση απώλειας;': 'Declare as lost?',
+  'Το {0} δηλώνεται ως χαμένο και αφαιρείται από το Σετ του. Μπορείς να το επαναφέρεις αν βρεθεί.':
+    '{0} is declared lost and removed from its Set. You can restore it if it is found.',
+  'Τα {0} εργαλεία δηλώνονται ως χαμένα και αφαιρούνται από το Σετ.':
+    'The {0} instruments are declared lost and removed from the Set.',
+  'Το Σετ {0} δηλώνεται ως χαμένο.': 'Set {0} is declared lost.',
+  Βρέθηκε: 'Found',
+  'Το εργαλείο {0} βρέθηκε και μπαίνει στο Απόθεμα.': 'Instrument {0} was found and goes into Stock.',
+  'Δεν υπάρχει ίδιο εργαλείο στο Απόθεμα': 'No matching instrument in Stock',
+  'Βρέθηκε το εργαλείο;': 'Instrument found?',
+  'Ένα ίδιο εργαλείο από το Απόθεμα μπαίνει στο Σετ και το {0} πάει σε Service. Οι αλλαγές καταγράφονται στο Ιστορικό.':
+    'A matching instrument from Stock goes into the Set and {0} goes to Service. The changes are recorded in the History.',
+  'Στο Απόθεμα: {0}': 'In Stock: {0}',
+  'Χωρίς Σετ': 'No Set',
   'Νέα παραγγελία αγοράς': 'New purchase order',
   'Ναι · {0}': 'Yes · {0}',
   'Π.χ. επείγον, προϋπολογισμός…': 'E.g. urgent, budget…',
