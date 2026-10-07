@@ -8758,3 +8758,56 @@ html body .offline-strip svg {
     display: inline-block;
   }
 }
+/* Preparation: an issue about the Set itself, resolved in place. */
+html body .prep-block-warning .prep-block-set {
+  grid-column: 2;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px;
+  width: 100%;
+}
+html body .prep-block-issue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #f1d59b;
+  border-radius: 8px;
+  background: #fff;
+  color: #5c3a00;
+  font-size: 12.5px;
+}
+html body .prep-block-issue > span {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+html body .prep-block-issue .prep-block-open {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+/* Preparation: the side column and the list move only up and down (see keepLeft); long texts wrap. */
+html body .prep-workspace-modal .prep-control-panel,
+html body .prep-workspace-modal .prep-tools-scroll {
+  touch-action: pan-y pinch-zoom;
+}
+html body .prep-workspace-modal aside * {
+  overflow-wrap: break-word;
+}
+/* Set / instrument card: the two dates on one line; the shelf life beside them, or below when it does not fit. */
+html body dd.sterile-dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+html body dd.sterile-dd small {
+  color: #667085;
+  font-size: 0.82em;
+  font-weight: 600;
+  white-space: nowrap;
+}

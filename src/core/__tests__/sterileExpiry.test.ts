@@ -1,5 +1,13 @@
 import {describe, expect, it} from 'vitest';
-import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList, sterileUntil, warningDays} from '../sterileExpiry';
+import {
+  expiryAlerts,
+  expiryStatus,
+  formatExpiry,
+  sterileExpiryList,
+  sterileUntil,
+  sterilizedOnOf,
+  warningDays,
+} from '../sterileExpiry';
 
 describe('sterile shelf life', () => {
   it('counts months from the release date', () => {
@@ -46,5 +54,16 @@ describe('sterile expiry list', () => {
       ['S1', 'OK'],
     ]);
     expect(expiryAlerts(list).map(item => item.barcode)).toEqual(['S2', 'T1']);
+  });
+});
+
+describe('sterilization date', () => {
+  it('keeps the stored date and derives it from the expiry and shelf life for older records', () => {
+    expect(sterilizedOnOf({sterilizedOn: '2026-08-01', sterileUntil: '2027-02-04', shelfLifeMonths: 6})).toBe(
+      '2026-08-01',
+    );
+    expect(sterilizedOnOf({sterileUntil: '2027-02-04', shelfLifeMonths: 6})).toBe('2026-08-04');
+    expect(sterilizedOnOf({sterileUntil: '2027-02-04'})).toBeUndefined();
+    expect(sterilizedOnOf({})).toBeUndefined();
   });
 });

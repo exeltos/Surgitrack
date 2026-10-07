@@ -463,6 +463,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Εκκρεμότητες στη Σύνθεση',
+          'Μια ανοιχτή εκκρεμότητα σταματά τη Σύνθεση μέχρι να αντιμετωπιστεί. Αν αφορά εργαλείο, πατήστε «Διαχείριση» στην ειδοποίηση (ή «Αντιμετώπιση» στη γραμμή του) για αντικατάσταση, service ή απόσυρση. Αν αφορά το ίδιο το Σετ, η ειδοποίηση τη δείχνει με κουμπί «Επίλυση»: γράφετε πώς λύθηκε και καταγράφεται στο ιστορικό. Για έλλειψη μπορείτε εναλλακτικά να αντικαταστήσετε από τη γραμμή «Λείπει» ή να τσεκάρετε «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση της σύνθεσης.',
+        ],
+        en: [
+          'Issues during Composition',
+          'An open issue stops Composition until it is handled. If it concerns an instrument, press "Manage" in the notice (or "Handle" on its row) to replace it, send it to service or retire it. If it concerns the Set itself, the notice shows it with a "Resolve" button: you write how it was solved and it is recorded in the history. For a shortage you can instead replace from the "Missing" row or tick "Accept the recorded shortage" in the composition notice.',
+        ],
+      },
+      {
+        el: [
           'Παράδοση στο τμήμα',
           'Στην «Παράδοση» εσείς καταγράφεστε αυτόματα ως παραδίδων. Ο παραλαμβάνων του τμήματος υπογράφει με τον κωδικό χρήστη και το συνθηματικό του στην ίδια οθόνη· χωρίς υπογραφή η παράδοση δεν ολοκληρώνεται.',
         ],
