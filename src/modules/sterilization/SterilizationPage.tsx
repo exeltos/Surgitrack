@@ -14,7 +14,6 @@ import PreparationModal from './parts/PreparationModal';
 import PrepMissingModal from './parts/PrepMissingModal';
 import PrepToolManageModal from './parts/PrepToolManageModal';
 import PrepToolActionModal from './parts/PrepToolActionModal';
-import CycleModal from './parts/CycleModal';
 import ReleaseModal from './parts/ReleaseModal';
 import ReceiptBatchModal from './parts/ReceiptBatchModal';
 import DeliveryBatchModal from './parts/DeliveryBatchModal';
@@ -151,7 +150,6 @@ export default function SterilizationPage() {
       <PrepMissingModal s={s} />
       <PrepToolManageModal s={s} />
       <PrepToolActionModal s={s} />
-      <CycleModal s={s} />
       <ReleaseModal s={s} />
       <ReceiptBatchModal s={s} />
       <DeliveryBatchModal s={s} />

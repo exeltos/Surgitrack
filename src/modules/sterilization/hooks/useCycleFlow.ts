@@ -21,13 +21,7 @@ export function useCycleFlow(
     checkpointChecks,
     checkpointDraft,
     checkpointNote,
-    completeSterilizationCycle,
     completeWorkflowCheckpoint,
-    cycleDraft,
-    cycleNote,
-    cycleNumber,
-    cycleProgram,
-    indicatorResult,
     prepAcceptedDeviation,
     prepCheckedIds,
     prepCompositionComplete,
@@ -56,11 +50,6 @@ export function useCycleFlow(
     setCheckpointChecks,
     setCheckpointDraft,
     setCheckpointNote,
-    setCycleDraft,
-    setCycleNote,
-    setCycleNumber,
-    setCycleProgram,
-    setIndicatorResult,
     setPrepCheckedIds,
     setPrepDraft,
     setPrepManageMissingCode,
@@ -73,10 +62,8 @@ export function useCycleFlow(
     setReleaseChecks,
     setReleaseDraft,
     setReleaseNote,
-    setSterilizer,
     sterilizationCycles,
     sterilizationWorkflow,
-    sterilizer,
   } = p;
 
   const selectedReleaseLoad = releaseLoadId ? processLoads.find(load => load.id === releaseLoadId) : undefined;
@@ -133,33 +120,6 @@ export function useCycleFlow(
       packaging: false,
       labelIndicator: false,
     });
-  };
-  const openCycleCompletion = (kind: Kind, asset: Asset) => {
-    const draft = resolveAssetDraft(kind, asset.id);
-    if (!draft) return;
-    setCycleDraft(draft);
-    setSterilizer(p.defaultSterilizer);
-    setCycleNumber('');
-    setCycleProgram('134°C · 5 min');
-    setIndicatorResult('PASS');
-    setCycleNote('');
-  };
-  const closeCycleCompletion = () => {
-    setCycleDraft(null);
-    setCycleNumber('');
-    setCycleNote('');
-  };
-  const finishCycle = () => {
-    if (!cycleDraft || !sterilizer || !cycleNumber.trim() || !cycleProgram) return;
-    const record = completeSterilizationCycle(cycleDraft.kind, cycleDraft.asset.id, {
-      sterilizer,
-      cycleNumber: cycleNumber.trim(),
-      program: cycleProgram,
-      indicatorResult,
-      note: cycleNote,
-    });
-    if (!record) return;
-    closeCycleCompletion();
   };
   const openRelease = (kind: Kind, asset: Asset) => {
     const draft = resolveAssetDraft(kind, asset.id);
@@ -232,15 +192,12 @@ export function useCycleFlow(
     checkpointReady,
     checkpointStage,
     closeCheckpoint,
-    closeCycleCompletion,
     closeRelease,
     completeRelease,
     finishCheckpoint,
-    finishCycle,
     latestPassedCycle,
     moveToProcess,
     openCheckpoint,
-    openCycleCompletion,
     openRelease,
     releaseLoadReady,
     releaseVerdict,
