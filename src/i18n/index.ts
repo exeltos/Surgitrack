@@ -84,6 +84,8 @@ const DATA_PATTERNS: Array<[RegExp, string]> = [
   [/^Αποδέσμευση φορτίου (.+)$/, 'Load $1 released'],
   [/^Μη αποδέσμευση φορτίου (.+)$/, 'Load $1 not released'],
   [/^Αποδεσμεύτηκε$/, 'Released'],
+  [/^Βιολογικός δείκτης επιτυχής$/, 'Biological indicator passed'],
+  [/^Βιολογικός δείκτης ανεπιτυχής$/, 'Biological indicator failed'],
 ];
 
 const translateSegment = (segment: string): string => {

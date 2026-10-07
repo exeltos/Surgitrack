@@ -166,8 +166,15 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
         </details>
       )}
       {queue === 'RELEASE' && releasedLoads.length > 0 && (
-        <details className="released-loads">
-          <summary>{tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}</summary>
+        <details
+          className="released-loads"
+          open={releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') || undefined}
+        >
+          <summary>
+            {tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}
+            {releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') &&
+              ` · ${tr('{0} με βιολογικό σε αναμονή', releasedLoads.filter(load => load.biologicalIndicatorResult === 'PENDING').length)}`}
+          </summary>
           <div>
             {releasedLoads.map(load => (
               <div key={load.id}>
@@ -175,6 +182,27 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   <b>{load.id}</b> · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
                 </span>
                 <span className="released-load-actions">
+                  {load.biologicalIndicatorResult === 'PENDING' && (
+                    <>
+                      <span className="released-load-bi">{tr('Βιολογικός σε αναμονή')}</span>
+                      <button className="bi-pass" onClick={() => s.recordBiologicalResult(load.id, 'PASS')}>
+                        <CheckCircle2 size={14} /> {tr('BI επιτυχής')}
+                      </button>
+                      <button
+                        className="bi-fail"
+                        onClick={() =>
+                          window.confirm(
+                            tr(
+                              'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;',
+                              load.cycleNumber,
+                            ),
+                          ) && s.recordBiologicalResult(load.id, 'FAIL')
+                        }
+                      >
+                        <TriangleAlert size={14} /> {tr('BI ανεπιτυχής')}
+                      </button>
+                    </>
+                  )}
                   <button onClick={() => s.printLoadForm(load.id)}>
                     <Printer size={14} /> {tr('Έντυπο')}
                   </button>

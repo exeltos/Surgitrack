@@ -1,4 +1,5 @@
 import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
+import {STERILE_STATES} from '../../core/sterileExpiry';
 import type {
   AssetKind,
   AssetState,
@@ -344,6 +345,9 @@ export function useLoadActions(
       return;
     }
     const now = formatStoreDateTime();
+    // Only what is still sterile from this load is called back; an item already sent back and in a new
+    // cycle stays where it is (it is being reprocessed anyway).
+    const stillSterile = (state?: AssetState) => !!state && (STERILE_STATES as readonly string[]).includes(state);
     const caseItems = load.items.map(item => {
       const asset = assetName(item.assetKind, item.assetId);
       const currentState = asset?.state || ('IN_DEPARTMENT' as AssetState);
@@ -369,7 +373,7 @@ export function useLoadActions(
     setRecallCases(list => [recallCase, ...list]);
     load.items.forEach(item => {
       const asset = assetName(item.assetKind, item.assetId);
-      if (!asset) return;
+      if (!asset || !stillSterile(asset.state)) return;
       updateState(
         item.assetKind,
         item.assetId,
@@ -391,6 +395,29 @@ export function useLoadActions(
       ),
     );
     notify(tr('Άνοιξε η ανάκληση {0} για το φορτίο {1} ({2} αντικείμενα).', recallCase.id, loadId, load.items.length));
+  };
+  /**
+   * The biological indicator of a load released while it was pending: a pass is recorded on the load;
+   * a failure records it and recalls the whole load.
+   */
+  const recordBiologicalResult = (loadId: string, result: 'PASS' | 'FAIL') => {
+    const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
+    if (!load || load.status !== 'RELEASED' || load.biologicalIndicatorResult !== 'PENDING') return;
+    setProcessLoads(list =>
+      list.map(item => (item.id === loadId ? {...item, biologicalIndicatorResult: result} : item)),
+    );
+    load.items.forEach(item =>
+      addMovement({
+        asset: `${item.barcode} · ${item.assetName}`,
+        assetKind: item.assetKind,
+        from: 'Αποδέσμευση φορτίου',
+        to: result === 'PASS' ? 'Αποδεσμεύτηκε' : 'Ανάκληση / Επανεπεξεργασία',
+        status: `Βιολογικός δείκτης ${result === 'PASS' ? 'επιτυχής' : 'ανεπιτυχής'} · φορτίο ${loadId} · κύκλος ${load.cycleNumber}`,
+        by: currentUser.name,
+      }),
+    );
+    if (result === 'FAIL') recallProcessLoad(loadId, 'Ανεπιτυχής βιολογικός δείκτης');
+    else notify(tr('Ο βιολογικός δείκτης του φορτίου {0} καταγράφηκε επιτυχής.', loadId));
   };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
     const a = assetName(kind, id);
@@ -466,6 +493,7 @@ export function useLoadActions(
     return record;
   };
   return {
+    recordBiologicalResult,
     finishProcessLoad,
     completeDeliveryToDepartment,
     completeWorkflowCheckpoint,

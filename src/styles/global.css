@@ -8592,3 +8592,20 @@ html body .ledger-row .movement-chip {
   color: var(--st-muted);
   font-size: 11.5px;
 }
+.released-load-bi {
+  align-self: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #fff1dc;
+  color: #8a4d00;
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .released-load-actions .bi-pass {
+  border-color: #9fd0bd;
+  color: #1f6b47;
+}
+html body .released-load-actions .bi-fail {
+  border-color: #efc6b2;
+  color: #a1401d;
+}

@@ -62,9 +62,12 @@ export function useLoadFlow(
   const awaitingLoads = processLoads.filter(
     load => load.kind === 'STERILIZATION' && load.status === 'AWAITING_RELEASE',
   );
-  const releasedLoads = processLoads
-    .filter(load => load.kind === 'STERILIZATION' && load.status === 'RELEASED')
-    .slice(0, 5);
+  // Released loads still waiting for their biological indicator come first (all of them), then the latest.
+  const released = processLoads.filter(load => load.kind === 'STERILIZATION' && load.status === 'RELEASED');
+  const releasedLoads = [
+    ...released.filter(load => load.biologicalIndicatorResult === 'PENDING'),
+    ...released.filter(load => load.biologicalIndicatorResult !== 'PENDING').slice(0, 5),
+  ];
   /** Opens a load with everything of the stage preselected, or only the given `kind:id` keys. */
   const openLoad = (kind: 'WASHING' | 'STERILIZATION', preselected?: readonly string[]) => {
     const candidates = kind === 'WASHING' ? washing : processing;

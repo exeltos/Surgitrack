@@ -1784,4 +1784,12 @@ export const en: Record<string, string> = {
   'Ολοκλήρωση καθαρισμού': 'Washing completed',
   'αναμονή αποδέσμευσης': 'awaiting release',
   'σε εξέλιξη': 'running',
+  'Ο βιολογικός δείκτης του φορτίου {0} καταγράφηκε επιτυχής.':
+    'The biological indicator of load {0} was recorded as passed.',
+  '{0} με βιολογικό σε αναμονή': '{0} with the biological indicator pending',
+  'Βιολογικός σε αναμονή': 'Biological pending',
+  'BI επιτυχής': 'BI passed',
+  'BI ανεπιτυχής': 'BI failed',
+  'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;':
+    'Failed biological indicator: the whole load {0} will be recalled. Continue?',
 };

@@ -23,6 +23,7 @@ export function useSterilizationState() {
     createProcessLoad,
     releaseProcessLoad,
     finishProcessLoad,
+    recordBiologicalResult,
     recallProcessLoad,
     processLoads,
     recallCases,
@@ -182,6 +183,7 @@ export function useSterilizationState() {
   const [releaseLoadBi, setReleaseLoadBi] = useState<'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL'>('NOT_REQUIRED');
   const [releaseLoadNote, setReleaseLoadNote] = useState('');
   return {
+    recordBiologicalResult,
     sterilizationReleases,
     organizationName,
     finishProcessLoad,
