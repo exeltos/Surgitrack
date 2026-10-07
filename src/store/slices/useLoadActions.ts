@@ -50,6 +50,8 @@ export function useLoadActions(
     sterilizationWorkflow,
     tools,
     updateState,
+    releaseShelfLife,
+    chooseShelfLife,
   } = p;
 
   const createProcessLoad = (payload: CreateProcessLoadPayload) => {
@@ -216,6 +218,7 @@ export function useLoadActions(
         c => c.loadId === loadId && c.assetId === item.assetId && c.result === 'PASSED',
       );
       if (!cycle) return;
+      const shelfLife = decision === 'RELEASED' ? releaseShelfLife(item.assetKind, item.assetId) : undefined;
       const record: SterilizationReleaseRecord = {
         id: `sr${uniqueStamp()}-${index}`,
         workflowVersion: sterilizationWorkflow.version,
@@ -238,9 +241,11 @@ export function useLoadActions(
         releasedByName: currentUser.name,
         releasedByDepartment: currentUser.department,
         releasedAt: now,
+        ...shelfLife,
       };
       setSterilizationReleases(list => [record, ...list]);
-      updateState(item.assetKind, item.assetId, decision === 'RELEASED' ? nextStateAfter('RELEASE') : reprocessState());
+      if (shelfLife) updateState(item.assetKind, item.assetId, nextStateAfter('RELEASE'), shelfLife);
+      else updateState(item.assetKind, item.assetId, reprocessState());
       addMovement({
         asset: `${item.barcode} · ${item.assetName}`,
         assetKind: item.assetKind,
@@ -364,12 +369,14 @@ export function useLoadActions(
       stageId: payload.stageId,
       checks: payload.checks,
       note: payload.note,
+      ...(payload.stageId === 'PACKAGING' && payload.shelfLifeMonths ? {shelfLifeMonths: payload.shelfLifeMonths} : {}),
       completedByUserId: currentUser.id,
       completedByName: currentUser.name,
       completedByDepartment: currentUser.department,
       completedAt: formatStoreDateTime(),
     };
     setWorkflowCheckpoints(x => [record, ...x]);
+    if (payload.stageId === 'PACKAGING') chooseShelfLife(kind, id, payload.shelfLifeMonths);
     const nextState = nextStateAfter(payload.stageId);
     updateState(kind, id, nextState);
     addMovement({

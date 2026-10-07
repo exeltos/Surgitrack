@@ -4,6 +4,8 @@ import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
+import ExpiryBadge from '../ui/ExpiryBadge';
+import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import AssetTypeIcon from './AssetTypeIcon';
 import {tr, trData} from '../../i18n';
 
@@ -75,6 +77,11 @@ export default function AssetWorkbenchSidebar({
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
   const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Set') : null;
+  // A released Set or instrument shows how long it stays sterile.
+  const sterile =
+    asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
+      ? expiryStatus(asset.sterileUntil, asset.shelfLifeMonths)
+      : undefined;
   const makeDraft = () => ({
     name: asset.name,
     code: asset.code,
@@ -158,6 +165,7 @@ export default function AssetWorkbenchSidebar({
           ) : (
             <StatusBadge value={asset.state} />
           )}{' '}
+          {sterile && <ExpiryBadge entry={sterile} />}
           {workflowLocked && <small>{tr('Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες')}</small>}
         </div>
       </div>
@@ -209,6 +217,15 @@ export default function AssetWorkbenchSidebar({
             )}
           </dd>
         </div>
+        {sterile && asset.sterileUntil && (
+          <div>
+            <dt>{tr('Αποστειρωμένο έως')}</dt>
+            <dd>
+              {formatExpiry(asset.sterileUntil)}
+              {asset.shelfLifeMonths ? ` · ${tr('{0} μήνες', asset.shelfLifeMonths)}` : ''}
+            </dd>
+          </div>
+        )}
         <div>
           <dt>{tr('Κωδικός')}</dt>
           <dd>{editing ? textField('code', draft.code) : asset.code}</dd>

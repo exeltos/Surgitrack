@@ -4,6 +4,7 @@ import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
+import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, lang, libs, platformAdmin, setConfirm, tab} = s;
@@ -48,6 +49,29 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 {L(
                   'Εφαρμόζεται στις ειδοποιήσεις και στις καρτέλες περιορισμένων χρήσεων.',
                   'Applied to alerts and limited-use asset cards.',
+                )}
+              </small>
+            </label>
+            <label>
+              {L('Διάρκεια αποστείρωσης (προεπιλογή)', 'Sterile shelf life (default)')}
+              <div className="studio-setting-input">
+                <select
+                  value={libs.systemSettings.sterileShelfLifeMonths || DEFAULT_SHELF_LIFE}
+                  onChange={e =>
+                    libs.updateSystemSettings({sterileShelfLifeMonths: Number(e.target.value)}, currentUser.name)
+                  }
+                >
+                  {SHELF_LIFE_OPTIONS.map(months => (
+                    <option key={months} value={months}>
+                      {L(`${months} μήνες`, `${months} months`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <small>
+                {L(
+                  'Προτείνεται στη Συσκευασία & Σήμανση και αλλάζει ανά Σετ ή εργαλείο. Μετρά από την αποδέσμευση.',
+                  'Suggested at Packaging & Labelling and changeable per Set or instrument. Counted from the release.',
                 )}
               </small>
             </label>

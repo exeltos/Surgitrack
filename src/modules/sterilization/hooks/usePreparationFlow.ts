@@ -67,6 +67,7 @@ export function usePreparationFlow(
     setAcceptedMissingCodes(new Set());
     setPrepToolAction(null);
     setPrepNote('');
+    p.setShelfLife(asset.shelfLifeMonths || p.defaultShelfLife);
     setPrepProcessChecks({
       cleanDry: false,
       functionIntegrity: false,

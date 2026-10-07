@@ -16,7 +16,9 @@ import {
   Eye,
   UserPlus,
   Undo2,
+  CalendarClock,
 } from 'lucide-react';
+import {expiryAlerts, formatExpiry, sterileExpiryList, type ExpiryEntry} from '../../core/sterileExpiry';
 import {navSectionFor, navigationFor} from '../../config/navigation';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -59,9 +61,18 @@ const navEN: Record<string, string> = {
   'Χρήστες & Τμήματα': 'Users & departments',
   Νοσοκομεία: 'Hospitals',
   Επισκόπηση: 'Overview',
+  Λήξεις: 'Expiry',
 };
 /** Pages the platform admin can use without having entered a hospital. */
 const PLATFORM_ONLY_PAGES = ['/studio', '/hospitals'];
+const expiryText = (e: ExpiryEntry, lang: string) =>
+  e.state === 'EXPIRED'
+    ? lang === 'el'
+      ? `Η αποστείρωση έληξε στις ${formatExpiry(e.sterileUntil)}`
+      : `Sterility expired on ${formatExpiry(e.sterileUntil)}`
+    : lang === 'el'
+      ? `Η αποστείρωση λήγει στις ${formatExpiry(e.sterileUntil)} (${e.daysLeft} ημ.)`
+      : `Sterility expires on ${formatExpiry(e.sterileUntil)} (${e.daysLeft} d)`;
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
   const trial = useTrial();
   const {
@@ -138,14 +149,17 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const signedInName = getRealIdentity()?.name || currentUser.name;
   const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
   const departmentUsage = lifecycleAlerts.filter(a => departmentAssets.some(asset => asset.id === a.assetId));
+  // Sterile Sets and instruments in their last month (10 days for 2 months) or expired.
+  const expiryNotices = expiryAlerts(sterileExpiryList(sets, tools));
+  const departmentExpiry = expiryNotices.filter(e => departmentAssets.some(asset => asset.id === e.id));
   const accessRequests = hospitalId ? pendingAccess : 0;
   const openIssues = issues.filter(i => i.status === 'OPEN');
   // Instruments that just ran out of lives: Sterilization must set them aside and confirm.
   const outOfUseNotices = role === 'DEPARTMENT' ? [] : retiredTools.filter(t => !t.retiredNoticeSeenAt);
   const openNotifications =
     role === 'DEPARTMENT'
-      ? departmentReady.length + departmentIssues.length + departmentUsage.length
-      : openIssues.length + lifecycleAlerts.length + accessRequests + outOfUseNotices.length;
+      ? departmentReady.length + departmentIssues.length + departmentUsage.length + departmentExpiry.length
+      : openIssues.length + lifecycleAlerts.length + accessRequests + outOfUseNotices.length + expiryNotices.length;
   const readyKey = departmentReady.map(asset => asset.id).join('|');
   useEffect(() => {
     if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
@@ -385,6 +399,24 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                           </span>
                         </button>
                       ))}
+                      {departmentExpiry.slice(0, 5).map(e => (
+                        <button
+                          key={`exp-${e.kind}-${e.id}`}
+                          className={`notification-item expiry ${e.state.toLowerCase()}`}
+                          onClick={() => {
+                            setNotificationOpen(false);
+                            navigate(e.kind === 'SET' ? `/sets/${e.id}` : `/tools/${e.id}`);
+                          }}
+                        >
+                          <CalendarClock size={17} />
+                          <span>
+                            <strong>
+                              {e.barcode} · {e.name}
+                            </strong>
+                            <small>{expiryText(e, lang)}</small>
+                          </span>
+                        </button>
+                      ))}
                       {departmentUsage.slice(0, 5).map(a => (
                         <button
                           key={a.id}
@@ -432,6 +464,31 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                               <small>{lang === 'el' ? 'Αναμένουν την έγκρισή σας' : 'Waiting for your approval'}</small>
                             </span>
                           </button>
+                        </div>
+                      )}
+                      {expiryNotices.length > 0 && (
+                        <div className="notification-list">
+                          <span className="notification-group">
+                            {lang === 'el' ? 'Λήξη αποστείρωσης' : 'Sterile expiry'} · {expiryNotices.length}
+                          </span>
+                          {expiryNotices.slice(0, 6).map(e => (
+                            <button
+                              key={`exp-${e.kind}-${e.id}`}
+                              className={`notification-item expiry ${e.state.toLowerCase()}`}
+                              onClick={() => {
+                                setNotificationOpen(false);
+                                navigate('/expiry');
+                              }}
+                            >
+                              <CalendarClock size={17} />
+                              <span>
+                                <strong>
+                                  {e.barcode} · {e.name}
+                                </strong>
+                                <small>{expiryText(e, lang)}</small>
+                              </span>
+                            </button>
+                          ))}
                         </div>
                       )}
                       {outOfUseNotices.length > 0 && (

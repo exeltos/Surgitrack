@@ -3,6 +3,7 @@ import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {CheckCircle2, X, ShieldCheck, UserCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import ShelfLifePicker from './ShelfLifePicker';
 
 export default function CheckpointModal({s}: {s: SterilizationPageState}) {
   const {
@@ -80,6 +81,9 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
                   </label>
                 ))}
               </section>
+              {checkpointDraft.stageId === 'PACKAGING' && (
+                <ShelfLifePicker value={s.shelfLife} onChange={s.setShelfLife} />
+              )}
               <label className="cycle-note">
                 {tr('Παρατήρηση σταδίου')}
                 <textarea

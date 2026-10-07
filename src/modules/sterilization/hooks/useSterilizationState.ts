@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
+import {DEFAULT_SHELF_LIFE, isShelfLife} from '../../../core/sterileExpiry';
 import type {WorkflowStageId} from '../../../core/workflow';
 import type {AssetPhoto, ReceiptCheckResult, ReceiptRecord} from '../../../types/domain';
 import {useSetColorQuestion} from '../../../components/assets/useSetColorQuestion';
@@ -146,6 +147,11 @@ export function useSterilizationState() {
   } | null>(null);
   const [checkpointChecks, setCheckpointChecks] = useState<boolean[]>([]);
   const [checkpointNote, setCheckpointNote] = useState('');
+  /** The hospital's default sterile shelf life (months), chosen again per Set or instrument at packaging. */
+  const defaultShelfLife = isShelfLife(systemSettings.sterileShelfLifeMonths)
+    ? systemSettings.sterileShelfLifeMonths
+    : DEFAULT_SHELF_LIFE;
+  const [shelfLife, setShelfLife] = useState<number>(defaultShelfLife);
   const [loadModal, setLoadModal] = useState<'WASHING' | 'STERILIZATION' | null>(null);
   const [loadSelected, setLoadSelected] = useState<Set<string>>(new Set());
   const [loadEquipment, setLoadEquipment] = useState('');
@@ -178,6 +184,8 @@ export function useSterilizationState() {
     checkpointChecks,
     checkpointDraft,
     checkpointNote,
+    shelfLife,
+    defaultShelfLife,
     colorQuestion,
     completeDeliveryToDepartment,
     completeSterilizationCycle,
@@ -282,6 +290,7 @@ export function useSterilizationState() {
     setCheckpointChecks,
     setCheckpointDraft,
     setCheckpointNote,
+    setShelfLife,
     setCycleDraft,
     setCycleNote,
     setCycleNumber,

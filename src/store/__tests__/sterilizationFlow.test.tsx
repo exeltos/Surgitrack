@@ -58,8 +58,14 @@ const setup = () => {
         allOk: true,
       }),
     );
-  const pack = () =>
-    act1(() => s().completeWorkflowCheckpoint(kind, asset.id, {stageId: 'PACKAGING', checks: [true, true, true]}));
+  const pack = (shelfLifeMonths?: number) =>
+    act1(() =>
+      s().completeWorkflowCheckpoint(kind, asset.id, {
+        stageId: 'PACKAGING',
+        checks: [true, true, true],
+        shelfLifeMonths,
+      }),
+    );
   const sterilize = (chemicalIndicatorResult: 'PASS' | 'FAIL' = 'PASS', cycleNumber = 'S-1') =>
     act1(() =>
       s().createProcessLoad({
@@ -468,5 +474,37 @@ describe('sterilization flow', () => {
       expect(f.s().issues.length).toBe(issuesBefore);
       expect(f.s().receipts.find(r => r.assetId === set.id)!.checkResult).toBe('OK');
     });
+  });
+
+  it('gives the shelf life chosen at packaging from the release, and clears it when sent back', () => {
+    const f = setup();
+    f.send();
+    f.receive();
+    f.wash();
+    f.prepare();
+    f.pack(2);
+    expect(f.instrument().shelfLifeMonths).toBe(2);
+    const load = f.sterilize()!;
+    expect(f.instrument().sterileUntil).toBeUndefined();
+    f.release(load.id);
+    const expected = new Date();
+    expected.setMonth(expected.getMonth() + 2);
+    expect(f.instrument().sterileUntil?.slice(0, 7)).toBe(
+      `${expected.getFullYear()}-${String(expected.getMonth() + 1).padStart(2, '0')}`,
+    );
+    const release = f.s().sterilizationReleases.find(r => r.loadId === load.id)!;
+    expect(release.shelfLifeMonths).toBe(2);
+    expect(release.sterileUntil).toBe(f.instrument().sterileUntil);
+    f.deliver();
+    expect(f.instrument().sterileUntil).toBe(release.sterileUntil);
+    f.send();
+    expect(f.instrument().sterileUntil).toBeUndefined();
+  });
+
+  it('uses the hospital default shelf life when none was chosen', () => {
+    const f = setup();
+    const load = f.toAwaitingRelease();
+    f.release(load.id);
+    expect(f.instrument().shelfLifeMonths).toBe(6);
   });
 });

@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Cable,
   Trash2,
+  CalendarClock,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -30,6 +31,7 @@ export type NavigationItem = {
 const assetNavigation: NavigationItem[] = [
   {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace'},
   {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace'},
+  {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'asset.registry.view'},
   {to: '/tools', label: 'Εργαλεία', icon: Wrench, exactSearch: '', permission: 'asset.registry.view'},
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view'},
   {to: '/standalone-tools', label: 'Μεμονωμένα', icon: Wrench, permission: 'asset.registry.view'},

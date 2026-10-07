@@ -104,6 +104,10 @@ export function useCycleFlow(
       checkedToolIds: [...prepCheckedIds],
       allOk: prepCompositionComplete,
       processChecks: prepProcessChecks,
+      // Without a Packaging & Labelling stage the shelf life is chosen here.
+      shelfLifeMonths: sterilizationWorkflow.stages.some(stage => stage.id === 'PACKAGING' && stage.enabled)
+        ? undefined
+        : p.shelfLife,
       note: [
         prepNote,
         prepAcceptedDeviation
@@ -201,6 +205,7 @@ export function useCycleFlow(
     setCheckpointDraft({draft, stageId});
     setCheckpointChecks(new Array(stage?.checksEl.length || 0).fill(false));
     setCheckpointNote('');
+    p.setShelfLife(asset.shelfLifeMonths || p.defaultShelfLife);
   };
   const closeCheckpoint = () => {
     setCheckpointDraft(null);
@@ -217,6 +222,7 @@ export function useCycleFlow(
     const done = completeWorkflowCheckpoint(checkpointDraft.draft.kind, checkpointDraft.draft.asset.id, {
       stageId: checkpointDraft.stageId,
       checks: checkpointChecks,
+      shelfLifeMonths: checkpointDraft.stageId === 'PACKAGING' ? p.shelfLife : undefined,
       note: checkpointNote,
     });
     if (!done) return;

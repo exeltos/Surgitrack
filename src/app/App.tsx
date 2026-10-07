@@ -33,6 +33,7 @@ const AssetCreatePage = lazyPage(() => import('../components/assets/AssetCreateP
 const StandaloneToolsPage = lazyPage(() => import('../modules/tools/StandaloneToolsPage'));
 const StockPage = lazyPage(() => import('../modules/stock/StockPage'));
 const BinPage = lazyPage(() => import('../modules/bin/BinPage'));
+const SterileExpiryPage = lazyPage(() => import('../modules/expiry/SterileExpiryPage'));
 const SterilizationPage = lazyPage(() => import('../modules/sterilization/SterilizationPage'));
 const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
@@ -278,6 +279,14 @@ export default function App() {
           element={
             <Guard permission="asset.registry.view">
               <StandaloneToolsPage />
+            </Guard>
+          }
+        />
+        <Route
+          path="/expiry"
+          element={
+            <Guard permission="asset.registry.view">
+              <SterileExpiryPage />
             </Guard>
           }
         />
