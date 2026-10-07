@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import StatusBadge from '../../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
@@ -23,7 +24,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     incoming,
     issues,
     openCheckpoint,
-    openCycleCompletion,
     openDelivery,
     openDeliveryBatch,
     openLoad,
@@ -43,6 +43,19 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     rows,
     washing,
   } = s;
+  // The instruments of «Φόρτωση κλιβάνου» are all picked by default; unticking leaves one out of the load.
+  const [left, setLeft] = useState<Set<string>>(new Set());
+  const keyOf = (x: {kind: string; id: string}) => `${x.kind}:${x.id}`;
+  const pickedKeys = rows.map(keyOf).filter(key => !left.has(key));
+  const toggleLeft = (key: string) =>
+    setLeft(current => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  // Assets that sit in a load waiting for release; a record without a load keeps its own release button.
+  const inLoad = new Set(awaitingLoads.flatMap(load => load.items.map(item => `${item.assetKind}:${item.assetId}`)));
   return (
     <div className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}`}>
       <div className="ster-panel-head">
@@ -82,9 +95,21 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             <span className="ster-hint">{tr('Έλεγχος sterile barrier, σήμανσης και δείκτη πριν τον κύκλο.')}</span>
           )}
           {queue === 'PROCESS' && processing.length > 0 && (
-            <button className="primary compact" onClick={() => openLoad('STERILIZATION')}>
-              <Flame size={15} /> {tr('Δημιουργία φορτίου')}
-            </button>
+            <>
+              <button
+                className="ster-pick-all"
+                onClick={() => setLeft(pickedKeys.length === rows.length ? new Set(rows.map(keyOf)) : new Set())}
+              >
+                {pickedKeys.length === rows.length ? tr('Αποεπιλογή όλων') : tr('Επιλογή όλων')}
+              </button>
+              <button
+                className="primary compact"
+                disabled={!pickedKeys.length}
+                onClick={() => openLoad('STERILIZATION', pickedKeys)}
+              >
+                <Flame size={15} /> {tr('Φόρτωση κλιβάνου')} · {pickedKeys.length}
+              </button>
+            </>
           )}
           {queue === 'STORAGE' && (
             <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
@@ -95,35 +120,20 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             </button>
           )}
           {queue === 'RELEASE' && (
-            <span className="ster-hint">
-              {tr('Αποδέσμευση ανά φορτίο με ενιαία τεκμηρίωση CI/BI και φυσικών παραμέτρων.')}
-            </span>
+            <>
+              <span className="ster-hint">
+                {tr('Αποδέσμευση ανά φορτίο με ενιαία τεκμηρίωση CI/BI και φυσικών παραμέτρων.')}
+              </span>
+              {awaitingLoads.length > 0 && (
+                <button className="primary compact" onClick={() => openLoadRelease(awaitingLoads[0].id)}>
+                  <ShieldCheck size={15} /> {tr('Αποδέσμευση φορτίου')}
+                  {awaitingLoads.length > 1 ? ` · ${awaitingLoads.length}` : ''}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
-      {queue === 'RELEASE' && awaitingLoads.length > 0 && (
-        <div className="load-release-strip">
-          {awaitingLoads.map(load => (
-            <div className="load-release-card" key={load.id}>
-              <div>
-                <span>
-                  {tr('ΦΟΡΤΙΟ ·') + ' '}
-                  {load.id}
-                </span>
-                <strong>
-                  {load.equipment} · {load.cycleNumber}
-                </strong>
-                <small>
-                  {load.program} · {load.items.length} {tr('αντικείμενα')}
-                </small>
-              </div>
-              <button className="primary compact" onClick={() => openLoadRelease(load.id)}>
-                <ShieldCheck size={15} /> {tr('Αποδέσμευση φορτίου')}
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
       {queue === 'RELEASE' && recallCases.some(item => item.status === 'OPEN') && (
         <details className="released-loads" open>
           <summary>
@@ -187,7 +197,16 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
               const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
               return (
                 <div className="ster-work-row" key={`${x.kind}-${x.id}`}>
-                  <div className="ster-asset-cell">
+                  <div className={`ster-asset-cell${queue === 'PROCESS' ? ' with-pick' : ''}`}>
+                    {queue === 'PROCESS' && (
+                      <input
+                        type="checkbox"
+                        className="ster-row-pick"
+                        checked={!left.has(keyOf(x))}
+                        onChange={() => toggleLeft(keyOf(x))}
+                        aria-label={tr('Στη φόρτωση: {0}', x.barcode)}
+                      />
+                    )}
                     <AssetTypeIcon
                       kind={x.kind}
                       maxUses={x.kind === 'TOOL' ? x.maxUses : undefined}
@@ -262,13 +281,26 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <Box size={15} /> {tr('Έλεγχος συσκευασίας')}
                       </button>
                     ) : queue === 'PROCESS' ? (
-                      <button className="primary compact" onClick={() => openCycleCompletion(x.kind, x)}>
-                        <PackageCheck size={15} /> {tr('Καταχώρηση κύκλου')}
-                      </button>
+                      <span className="ster-row-note">
+                        {pickedKeys.includes(keyOf(x)) ? tr('Μπαίνει στο φορτίο') : tr('Εκτός φορτίου')}
+                      </span>
                     ) : queue === 'RELEASE' ? (
-                      <button className="primary compact" onClick={() => openRelease(x.kind, x)}>
-                        <ShieldCheck size={15} /> {tr('Έλεγχος αποδέσμευσης')}
-                      </button>
+                      inLoad.has(keyOf(x)) ? (
+                        (() => {
+                          const load = awaitingLoads.find(l =>
+                            l.items.some(i => `${i.assetKind}:${i.assetId}` === keyOf(x)),
+                          );
+                          return (
+                            <span className="ster-row-note" title={load?.id}>
+                              {load ? `${load.equipment} · ${load.cycleNumber}` : ''}
+                            </span>
+                          );
+                        })()
+                      ) : (
+                        <button className="primary compact" onClick={() => openRelease(x.kind, x)}>
+                          <ShieldCheck size={15} /> {tr('Έλεγχος αποδέσμευσης')}
+                        </button>
+                      )
                     ) : queue === 'STORAGE' ? (
                       <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'STORAGE')}>
                         <PackageCheck size={15} /> {tr('Έλεγχος αποθήκευσης')}

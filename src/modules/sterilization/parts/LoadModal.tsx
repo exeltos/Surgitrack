@@ -1,12 +1,14 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
-import {CheckCircle2, ScanBarcode, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
+import {CheckCircle2, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
+import {useLibraries} from '../../../core/LibraryStore';
 import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
 import {deviceNote} from '../sterilizationTypes';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function LoadModal({s}: {s: SterilizationPageState}) {
+  const {sterilizers} = useLibraries();
   const {
     addBarcodeToLoad,
     closeLoad,
@@ -44,7 +46,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 <span className="eyebrow">
                   {loadModal === 'WASHING' ? tr('ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ') : tr('ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ')}
                 </span>
-                <h2>{tr('Δημιουργία ενιαίου φορτίου')}</h2>
+                <h2>{loadModal === 'WASHING' ? tr('Δημιουργία ενιαίου φορτίου') : tr('Φόρτωση κλιβάνου')}</h2>
                 <p>
                   {tr(
                     'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.',
@@ -67,7 +69,18 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               <div className="cycle-clean-fields">
                 <label>
                   {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}
-                  <input value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)} />
+                  <input
+                    value={loadEquipment}
+                    list={loadModal === 'STERILIZATION' ? 'sterilizer-names' : undefined}
+                    onChange={e => setLoadEquipment(e.target.value)}
+                  />
+                  {loadModal === 'STERILIZATION' && (
+                    <datalist id="sterilizer-names">
+                      {sterilizers.map(item => (
+                        <option key={item.id} value={item.el} />
+                      ))}
+                    </datalist>
+                  )}
                 </label>
                 <label>
                   {tr('Αριθμός κύκλου / φορτίου')}
@@ -113,23 +126,17 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                       {loadCandidates.length} {tr('επιλεγμένα')}
                     </span>
                   </div>
-                  {loadModal === 'STERILIZATION' ? (
-                    <span className="load-assets-mode">
-                      <ScanBarcode size={14} /> {tr('Barcode / χειροκίνητη επιλογή')}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() =>
-                        setLoadSelected(
-                          loadSelected.size === loadCandidates.length
-                            ? new Set()
-                            : new Set(loadCandidates.map(item => `${item.kind}:${item.id}`)),
-                        )
-                      }
-                    >
-                      {loadSelected.size === loadCandidates.length ? tr('Αποεπιλογή όλων') : tr('Επιλογή όλων')}
-                    </button>
-                  )}
+                  <button
+                    onClick={() =>
+                      setLoadSelected(
+                        loadSelected.size === loadCandidates.length
+                          ? new Set()
+                          : new Set(loadCandidates.map(item => `${item.kind}:${item.id}`)),
+                      )
+                    }
+                  >
+                    {loadSelected.size === loadCandidates.length ? tr('Αποεπιλογή όλων') : tr('Επιλογή όλων')}
+                  </button>
                 </div>
                 <div className="load-assets-list">
                   {loadCandidates.map(item => {

@@ -7467,3 +7467,55 @@ html body .asset-manage-modal > footer {
 html body .asset-manage-note {
   flex: 0 0 auto;
 }
+/* Sterilizer load: tick the instruments to include, one button loads them all. */
+.ster-row-pick {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  accent-color: #1d6b7a;
+  flex: 0 0 auto;
+}
+.ster-pick-all {
+  border: 0;
+  background: transparent;
+  color: #155a6e;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.ster-row-note {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.release-load-picker {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.release-load-picker select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d5e2e7;
+  border-radius: 10px;
+  background: #fff;
+  color: #17384a;
+  font-size: 13px;
+}
+html body .sterilization-workspace .ster-asset-cell.with-pick {
+  grid-template-columns: 22px 44px minmax(0, 1fr);
+}
+html body .ster-asset-cell.with-pick .ster-row-pick {
+  margin-right: 0;
+}
+html body .ster-row-action .ster-row-note {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}

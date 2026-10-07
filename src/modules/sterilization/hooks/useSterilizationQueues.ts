@@ -66,7 +66,7 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
           : queue === 'PACKAGING'
             ? tr('Συσκευασία & Σήμανση')
             : queue === 'PROCESS'
-              ? tr('Αποστείρωση')
+              ? tr('Φόρτωση κλιβάνου')
               : queue === 'RELEASE'
                 ? tr('Έλεγχος & Αποδέσμευση')
                 : queue === 'STORAGE'
@@ -82,7 +82,7 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
           : queue === 'PACKAGING'
             ? tr('Προς συσκευασία / σήμανση')
             : queue === 'PROCESS'
-              ? tr('Σε αποστείρωση')
+              ? tr('Προς φόρτωση στον κλίβανο')
               : queue === 'RELEASE'
                 ? tr('Αναμένει αποδέσμευση')
                 : queue === 'STORAGE'

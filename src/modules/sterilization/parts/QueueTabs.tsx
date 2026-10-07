@@ -50,9 +50,9 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
       )}
       <button className={queue === 'PROCESS' ? 'active' : ''} onClick={() => setQueue('PROCESS')}>
         <Flame />
-        <span>{tr('Αποστείρωση')}</span>
+        <span title={tr('Φόρτωση κλιβάνου')}>{tr('Φόρτωση')}</span>
         <strong>{processing.length}</strong>
-        <small>{tr('Κύκλος / φορτίο')}</small>
+        <small>{tr('Κλίβανος / φορτίο')}</small>
       </button>
       {(stageEnabled('RELEASE') || awaitingRelease.length > 0) && (
         <button className={queue === 'RELEASE' ? 'active' : ''} onClick={() => setQueue('RELEASE')}>

@@ -9,7 +9,7 @@ import type {AdminUser, ConfigurationAuditEvent, LibraryKey, LibraryState, Organ
 import type {Permission} from './permissions';
 import {defaultRolePermissions, sanitizeRolePermissions} from './permissions';
 import type {UserRole} from '../store/types';
-import type {SterilizationWorkflowConfig, WorkflowStageId} from './workflow';
+import {upgradeWorkflowLabels, type SterilizationWorkflowConfig, type WorkflowStageId} from './workflow';
 import {libraryFromRecords} from '../data/cloud/appRecords';
 import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
 import {useAppRecordSync} from '../data/cloud/useAppRecordSync';
@@ -109,8 +109,11 @@ export function LibraryStoreProvider({
           systemSettings: {...initial.systemSettings, ...(saved.systemSettings as object)},
         } as LibraryState)
       : load(repository);
+    const upgraded = state.sterilizationWorkflow
+      ? {...state, sterilizationWorkflow: upgradeWorkflowLabels(state.sterilizationWorkflow)}
+      : state;
     // A real hospital's departments are managed in Studio; they always win over a stored copy.
-    return cloud?.departments ? {...state, departments: cloud.departments} : state;
+    return cloud?.departments ? {...upgraded, departments: cloud.departments} : upgraded;
   });
   // With a cloud workspace the library is saved to Supabase instead of this browser.
   const localStorageKey = !cloud && repository.mode === 'DEMO' ? repository.storageKey : '';

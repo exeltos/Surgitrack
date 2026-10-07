@@ -58,10 +58,11 @@ export function useLoadFlow(
   const releasedLoads = processLoads
     .filter(load => load.kind === 'STERILIZATION' && load.status === 'RELEASED')
     .slice(0, 5);
-  const openLoad = (kind: 'WASHING' | 'STERILIZATION') => {
+  /** Opens a load with everything of the stage preselected, or only the given `kind:id` keys. */
+  const openLoad = (kind: 'WASHING' | 'STERILIZATION', preselected?: readonly string[]) => {
     const candidates = kind === 'WASHING' ? washing : processing;
     setLoadModal(kind);
-    setLoadSelected(kind === 'STERILIZATION' ? new Set() : new Set(candidates.map(item => `${item.kind}:${item.id}`)));
+    setLoadSelected(new Set(preselected ?? candidates.map(item => `${item.kind}:${item.id}`)));
     setLoadEquipment(kind === 'WASHING' ? 'Πλυντήριο 1' : 'Κλίβανος 1');
     setLoadCycleNumber('');
     setLoadProgram(kind === 'WASHING' ? 'Θερμική απολύμανση' : '134°C · 5 min');
