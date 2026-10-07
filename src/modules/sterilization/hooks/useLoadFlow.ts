@@ -69,7 +69,7 @@ export function useLoadFlow(
     const candidates = kind === 'WASHING' ? washing : processing;
     setLoadModal(kind);
     setLoadSelected(new Set(preselected ?? candidates.map(item => `${item.kind}:${item.id}`)));
-    setLoadEquipment(kind === 'WASHING' ? 'Πλυντήριο 1' : 'Κλίβανος 1');
+    setLoadEquipment(kind === 'WASHING' ? 'Πλυντήριο 1' : p.defaultSterilizer);
     setLoadCycleNumber('');
     setLoadProgram(kind === 'WASHING' ? 'Θερμική απολύμανση' : '134°C · 5 min');
     setLoadChemical('NOT_RECORDED');

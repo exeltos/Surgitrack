@@ -426,8 +426,8 @@ export const helpManual: ManualSection[] = [
     permission: 'sterilization.workspace',
     title: {el: 'Αποστείρωση', en: 'Sterilization'},
     summary: {
-      el: 'Η ροή της Κεντρικής Αποστείρωσης: παραλαβή, καθαρισμός, σύνθεση, συσκευασία, κύκλος, αποδέσμευση, αποθήκευση και παράδοση.',
-      en: 'The Central Sterilization flow: receipt, washing, preparation, packaging, cycle, release, storage and delivery.',
+      el: 'Η ροή της Κεντρικής Αποστείρωσης: παραλαβή, καθαρισμός, σύνθεση, συσκευασία, φόρτωση κλιβάνου, αποδέσμευση φορτίου, αποθήκευση και παράδοση.',
+      en: 'The Central Sterilization flow: receipt, washing, preparation, packaging, sterilizer load, load release, storage and delivery.',
     },
     audience: {el: 'Χρήστες και Προϊστάμενος Αποστείρωσης', en: 'Sterilization users and supervisor'},
     chapters: [
@@ -463,12 +463,22 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Κύκλος & αποδέσμευση',
-          'Καταγράψτε τον κύκλο (αποστειρωτής, αριθμός κύκλου). Αποτυχημένος κύκλος επιστρέφει τα αντικείμενα για επανεπεξεργασία. Μετά την αποδέσμευση το αντικείμενο πάει σε αποθήκευση ή είναι έτοιμο για παραλαβή.',
+          'Φόρτωση κλιβάνου',
+          'Στην καρτέλα «Φόρτωση» όλα τα έτοιμα Σετ και εργαλεία είναι ήδη τσεκαρισμένα· ξετσεκάρετε όσα δεν μπαίνουν και πατήστε ένα κουμπί, «Φόρτωση κλιβάνου». Διαλέγετε τον κλίβανο από τη λίστα του νοσοκομείου, τον αριθμό κύκλου και το πρόγραμμα, και δηλώνετε ποιοι δείκτες μπήκαν στο φορτίο (χημικός, βιολογικός). Αποτέλεσμα δεικτών εδώ δεν δίνεται. Αν μια συνδεδεμένη συσκευή δηλώσει αποτυχία κύκλου, το φορτίο επιστρέφει σε επανεπεξεργασία.',
         ],
         en: [
-          'Cycle & release',
-          'Record the cycle (sterilizer, cycle number). A failed cycle sends items back for reprocessing. After release the item goes to storage or is ready for pickup.',
+          'Sterilizer load',
+          'In the "Load" tab every ready Set and instrument is already ticked; untick what does not go in and press one button, "Sterilizer load". Pick the sterilizer from the hospital list, the cycle number and the program, and declare which indicators are in the load (chemical, biological). No indicator result is given here. If a connected device reports a failed cycle, the load goes back to reprocessing.',
+        ],
+      },
+      {
+        el: [
+          'Αποδέσμευση φορτίου',
+          'Στην καρτέλα «Αποδέσμευση» ένα κουμπί, «Αποδέσμευση φορτίου», ανοίγει τα φορτία που περιμένουν· διαλέγετε φορτίο και κλίβανο. Επιβεβαιώνετε φυσικές παραμέτρους και συσκευασίες και γράφετε το αποτέλεσμα των δεικτών που μπήκαν στο φορτίο. Αρκεί ένας επιτυχής δείκτης, εκτός αν η μονάδα απαιτεί συγκεκριμένο. Ανεπιτυχής δείκτης ή «Μη αποδέσμευση» στέλνει όλο το φορτίο σε επανεπεξεργασία. Μετά την αποδέσμευση τα αντικείμενα πάνε σε αποθήκευση ή είναι έτοιμα για παραλαβή.',
+        ],
+        en: [
+          'Load release',
+          'In the "Release" tab one button, "Release load", opens the loads that are waiting; pick the load and sterilizer. Confirm the physical parameters and the packaging and record the result of the indicators placed in the load. One passed indicator is enough, unless the unit requires a specific one. A failed indicator or "Do not release" sends the whole load back to reprocessing. After release the items go to storage or are ready for pickup.',
         ],
       },
       {
@@ -495,8 +505,16 @@ export const helpManual: ManualSection[] = [
       ],
     },
     checks: {
-      el: ['Η σύνθεση του Σετ ελέγχθηκε πριν τη συσκευασία.', 'Ο κύκλος καταγράφηκε με αριθμό και αποστειρωτή.'],
-      en: ['The Set composition was checked before packaging.', 'The cycle was recorded with number and sterilizer.'],
+      el: [
+        'Η σύνθεση του Σετ ελέγχθηκε πριν τη συσκευασία.',
+        'Το φορτίο καταγράφηκε με κλίβανο, αριθμό κύκλου και δείκτες.',
+        'Στην αποδέσμευση συμπληρώθηκε τουλάχιστον ένας δείκτης ως επιτυχής.',
+      ],
+      en: [
+        'The Set composition was checked before packaging.',
+        'The load was recorded with sterilizer, cycle number and indicators.',
+        'At release at least one indicator was recorded as passed.',
+      ],
     },
     tip: {
       el: 'Ένα αντικείμενο σε ενεργή ανάκληση ή χωρίς υπόλοιπο χρήσεων δεν μπορεί να κυκλοφορήσει: η εφαρμογή το σταματά.',
@@ -849,7 +867,7 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Ζωές',
+          'Όριο χρήσεων',
           'Οι δείκτες «Με όριο χρήσεων» και «Λίγες χρήσεις» φιλτράρουν τη λίστα. Το υπόλοιπο φαίνεται σε κάθε γραμμή.',
         ],
         en: [
@@ -1102,11 +1120,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Βιβλιοθήκες',
-          'Τμήματα, ειδικότητες, κατασκευαστές και τύποι εκκρεμοτήτων. Ό,τι ορίζεται εδώ εμφανίζεται στις επιλογές όλης της εφαρμογής.',
+          'Τμήματα, ειδικότητες, κατασκευαστές, προμηθευτές, κατηγορίες εργαλείων και κλίβανοι. Ό,τι ορίζεται εδώ εμφανίζεται στις επιλογές όλης της εφαρμογής. Στους «Κλιβάνους», η «Προσθήκη κλιβάνων» προσθέτει πολλούς μαζί με τον τρόπο ονομασίας του νοσοκομείου (Κλίβανος A, B, C… ή 1, 2, 3…)· η επιλογή μένει για τις επόμενες φορές και οι κλίβανοι εμφανίζονται στη Φόρτωση κλιβάνου.',
         ],
         en: [
           'Libraries',
-          'Departments, specialties, manufacturers and issue types. Whatever you define here appears in the choices across the app.',
+          'Departments, specialties, manufacturers, suppliers, instrument categories and sterilizers. Whatever you define here appears in the choices across the app. In "Sterilizers", "Add sterilizers" adds several at once in the hospital’s naming (Sterilizer A, B, C… or 1, 2, 3…); the choice is kept for next time and the sterilizers appear in the Sterilizer load.',
         ],
       },
       {
@@ -1122,11 +1140,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ροή Αποστείρωσης',
-          'Τα στάδια από την παραλαβή έως την αποδέσμευση. Ενεργοποιήστε μόνο τα στάδια και τους ελέγχους που κάνει η Κεντρική Αποστείρωση του νοσοκομείου σας.',
+          'Τα στάδια από την παραλαβή έως την αποδέσμευση. Ενεργοποιήστε μόνο τα στάδια και τους ελέγχους που κάνει η Κεντρική Αποστείρωση του νοσοκομείου σας. Στην πολιτική αποδέσμευσης ορίζετε αν απαιτείται συγκεκριμένος δείκτης· χωρίς απαίτηση αρκεί ένας επιτυχής (χημικός ή βιολογικός).',
         ],
         en: [
           'Sterilization Flow',
-          'The stages from receipt to release. Turn on only the stages and checks your hospital’s Central Sterilization performs.',
+          'The stages from receipt to release. Turn on only the stages and checks your hospital’s Central Sterilization performs. In the release policy you set whether a specific indicator is required; without one, one passed indicator (chemical or biological) is enough.',
         ],
       },
       {
@@ -1335,9 +1353,9 @@ export const glossary: Array<{term: string; el: string; en: string}> = [
     en: 'Available instruments outside Sets and departments, used to complete Sets.',
   },
   {
-    term: 'Ζωές / Όριο χρήσεων',
+    term: 'Όριο χρήσεων',
     el: 'Πόσες φορές επιτρέπεται να χρησιμοποιηθεί ένα εργαλείο πολλαπλών χρήσεων. Μειώνεται κατά μία σε κάθε αποστολή μετά από χρήση.',
-    en: 'How many times a limited multi-use instrument may be used. One life is used on each dispatch after use.',
+    en: 'How many times a limited multi-use instrument may be used. One use is counted on each dispatch after use.',
   },
   {
     term: 'Εκτός χρήσης',
@@ -1358,6 +1376,16 @@ export const glossary: Array<{term: string; el: string; en: string}> = [
     term: 'Αποδέσμευση',
     el: 'Έλεγχος μετά τον κύκλο αποστείρωσης που επιτρέπει τη χρήση του αντικειμένου.',
     en: 'The check after a sterilization cycle that allows the item to be used.',
+  },
+  {
+    term: 'Φορτίο',
+    el: 'Τα Σετ και τα εργαλεία που μπαίνουν μαζί στον ίδιο κύκλο κλιβάνου· αποδεσμεύονται ή επιστρέφουν σε επανεπεξεργασία όλα μαζί.',
+    en: 'The Sets and instruments that go into the same sterilizer cycle; they are released or sent back to reprocessing together.',
+  },
+  {
+    term: 'Χημικός / βιολογικός δείκτης',
+    el: 'Δείκτες που μπαίνουν στο φορτίο και δείχνουν αν ο κύκλος πέτυχε. Δηλώνονται στη φόρτωση, το αποτέλεσμά τους γράφεται στην αποδέσμευση· αρκεί ένας επιτυχής.',
+    en: 'Indicators placed in the load that show whether the cycle worked. They are declared at loading and their result is recorded at release; one passed indicator is enough.',
   },
   {
     term: 'Ανάκληση',

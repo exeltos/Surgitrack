@@ -56,6 +56,8 @@ export type SystemSettings = {
   label?: LabelSettings;
   /** The least the hospital wants in Stock of each instrument kind (key: see kindKey in core/replacements). */
   stockMinimums?: Record<string, number>;
+  /** How new sterilizers are named (base name and A, B, C… or 1, 2, 3…). */
+  sterilizerNaming?: import('./sterilizerNaming').SterilizerNaming;
 };
 export type ConfigurationAuditEvent = {
   id: string;

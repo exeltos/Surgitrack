@@ -7729,7 +7729,7 @@ html body .load-modal .device-cycle-picker li {
   padding-block: 5px;
 }
 html body .load-modal .cycle-clean-fields {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(250px, 1.1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(280px, 1.15fr);
   align-items: start;
 }
 html body .load-modal .load-indicator-pick {
@@ -7788,4 +7788,78 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
   margin: 0;
   padding: 0;
   border: 0;
+}
+/* Studio › Libraries › Sterilizers: add several at once in the hospital's naming. */
+.studio-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.sterilizer-batch-style {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #627887;
+}
+.sterilizer-batch-style > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+html body .sterilizer-batch-style label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d5e2e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #17384a;
+  font-size: 14px;
+  cursor: pointer;
+}
+html body .sterilizer-batch-style label.on {
+  border-color: #1d6b7a;
+  background: #eef7f8;
+}
+html body .sterilizer-batch-style input {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  accent-color: #1d6b7a;
+}
+.sterilizer-batch-preview {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #e1e9ed;
+  border-radius: 10px;
+  background: #f8fbfc;
+  font-size: 12px;
+  color: #627887;
+}
+.sterilizer-batch-preview > span {
+  font-weight: 700;
+}
+.sterilizer-batch-preview ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sterilizer-batch-preview li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e3f0f2;
+  color: #155a6e;
+  font-size: 13px;
+  font-weight: 700;
 }

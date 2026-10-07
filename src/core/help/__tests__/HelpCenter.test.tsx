@@ -50,7 +50,7 @@ describe('Help Center', () => {
     fireEvent.click(screen.getByRole('button', {name: /Επόμενο/}));
     expect(screen.getByRole('heading', {level: 2, name: 'Τύπος χρήσης'})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: 'Ορολογία'}));
-    expect(screen.getByText('Ζωές / Όριο χρήσεων')).toBeInTheDocument();
+    expect(screen.getByText('Όριο χρήσεων')).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'Escape'});
     expect(onClose).toHaveBeenCalled();
   });
