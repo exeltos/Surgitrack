@@ -1,5 +1,5 @@
-import AssetFilterBar from '../../components/assets/AssetFilterBar';
-import {ScanBarcode, ShieldCheck, Barcode} from 'lucide-react';
+import FilterMenu from '../../components/assets/FilterMenu';
+import {ScanBarcode, ShieldCheck, Barcode, X} from 'lucide-react';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr, trData} from '../../i18n';
 import {useSterilizationPage} from './useSterilizationPage';
@@ -32,14 +32,11 @@ export default function SterilizationPage() {
     kindFilter,
     query,
     queueValues,
-    quickBarcode,
-    quickScan,
     quickScanFeedback,
     setDepartmentFilter,
     setIssueCameraOpen,
     setKindFilter,
     setQuery,
-    setQuickBarcode,
     setQuickScanFeedback,
     setSpecialtyFilter,
     specialtyFilter,
@@ -66,65 +63,74 @@ export default function SterilizationPage() {
           <ScanBarcode size={23} />
         </div>
         <div className="ster-scan-copy">
-          <strong>{tr('Γρήγορη σάρωση barcode')}</strong>
-          <span>{tr('Scanner υπολογιστή ή χειροκίνητη πληκτρολόγηση · Enter για άμεσο άνοιγμα')}</span>
+          <strong>{tr('Αναζήτηση & σάρωση')}</strong>
+          <span>{tr('Σάρωση barcode ή πληκτρολόγηση · φιλτράρει την καρτέλα · Enter ανοίγει το barcode')}</span>
         </div>
         <div className="ster-scan-input">
           <Barcode size={17} />
           <input
             autoComplete="off"
-            value={quickBarcode}
+            value={query}
             onChange={e => {
-              setQuickBarcode(e.target.value);
+              setQuery(e.target.value);
               setQuickScanFeedback('');
             }}
             onKeyDown={e => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                quickScan();
+                s.scanQuery();
               }
+              if (e.key === 'Escape') setQuery('');
             }}
-            placeholder={tr('S000324 ή T001312')}
-            aria-label={tr('Γρήγορη σάρωση barcode')}
+            placeholder={tr('Barcode, ονομασία, κωδικός ή τμήμα…')}
+            aria-label={tr('Αναζήτηση & σάρωση')}
           />
-          <button type="button" onClick={quickScan}>
+          {query && (
+            <button
+              type="button"
+              className="ster-scan-clear"
+              aria-label={tr('Καθαρισμός')}
+              onClick={() => setQuery('')}
+            >
+              <X size={15} />
+            </button>
+          )}
+          <button type="button" onClick={s.scanQuery}>
             {tr('Άνοιγμα')}
           </button>
         </div>
+        <div className="ster-scan-filters">
+          <FilterMenu
+            filters={[
+              {
+                key: 'department',
+                value: departmentFilter,
+                placeholder: tr('Όλα τα τμήματα'),
+                options: queueValues('department').map(value => ({value, label: value})),
+                onChange: setDepartmentFilter,
+              },
+              {
+                key: 'specialty',
+                value: specialtyFilter,
+                placeholder: tr('Όλες οι ειδικότητες'),
+                options: queueValues('specialty').map(value => ({value, label: value})),
+                onChange: setSpecialtyFilter,
+              },
+              {
+                key: 'kind',
+                value: kindFilter,
+                placeholder: tr('Σετ & εργαλεία'),
+                options: [
+                  {value: 'SET', label: tr('Μόνο Σετ')},
+                  {value: 'TOOL', label: tr('Μόνο εργαλεία')},
+                ],
+                onChange: setKindFilter,
+              },
+            ]}
+          />
+        </div>
         {quickScanFeedback && <div className="ster-scan-feedback-inline">{quickScanFeedback}</div>}
       </div>
-      <AssetFilterBar
-        compact
-        query={query}
-        onQueryChange={setQuery}
-        placeholder={tr('Αναζήτηση με ονομασία, κωδικό, barcode ή τμήμα...')}
-        filters={[
-          {
-            key: 'department',
-            value: departmentFilter,
-            placeholder: tr('Όλα τα τμήματα'),
-            options: queueValues('department').map(value => ({value, label: value})),
-            onChange: setDepartmentFilter,
-          },
-          {
-            key: 'specialty',
-            value: specialtyFilter,
-            placeholder: tr('Όλες οι ειδικότητες'),
-            options: queueValues('specialty').map(value => ({value, label: value})),
-            onChange: setSpecialtyFilter,
-          },
-          {
-            key: 'kind',
-            value: kindFilter,
-            placeholder: tr('Σετ & εργαλεία'),
-            options: [
-              {value: 'SET', label: tr('Μόνο Σετ')},
-              {value: 'TOOL', label: tr('Μόνο εργαλεία')},
-            ],
-            onChange: setKindFilter,
-          },
-        ]}
-      />
       <QueueTabs s={s} />
       <WorkPanel s={s} />
       <LoadModal s={s} />

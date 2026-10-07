@@ -80,5 +80,14 @@ export function useScanFlow(
     setQuickScanFeedback(ok ? tr('Το barcode αναγνωρίστηκε.') : tr('Το barcode δεν βρέθηκε στην ενεργή ροή.'));
     if (ok) setQuickBarcode('');
   };
-  return {quickScan, scan};
+  /** Enter in the search bar: an exact barcode opens that item in its stage; anything else keeps filtering. */
+  const scanQuery = () => {
+    const raw = query.trim();
+    if (!raw) return;
+    if (openBarcodeAsset(raw)) {
+      p.setQuery('');
+      setQuickScanFeedback('');
+    } else setQuickScanFeedback(tr('Δεν βρέθηκε barcode· η λίστα φιλτράρεται με την αναζήτηση.'));
+  };
+  return {quickScan, scan, scanQuery};
 }

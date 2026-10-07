@@ -1746,4 +1746,12 @@ export const en: Record<string, string> = {
   'Ημερομηνία / ώρα: ………………': 'Date / time: ………………',
   'Εκτυπώθηκε {0}': 'Printed {0}',
   'Αποδέσμευση {0}': 'Release {0}',
+  'Αναζήτηση & σάρωση': 'Search & scan',
+  'Σάρωση barcode ή πληκτρολόγηση · φιλτράρει την καρτέλα · Enter ανοίγει το barcode':
+    'Scan a barcode or type · filters the tab · Enter opens the barcode',
+  'Barcode, ονομασία, κωδικός ή τμήμα…': 'Barcode, name, code or department…',
+  'Δεν βρέθηκε barcode· η λίστα φιλτράρεται με την αναζήτηση.': 'No barcode found; the list is filtered by the search.',
+  'Μαζική παράδοση': 'Batch delivery',
+  'λιγότερα εργαλεία.': 'fewer instruments.',
+  'Η απόκλιση καταγράφεται στο ιστορικό.': 'The deviation is recorded in the history.',
 };

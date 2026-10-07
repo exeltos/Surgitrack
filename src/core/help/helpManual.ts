@@ -444,11 +444,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καρτέλες σταδίων',
-          'Κάθε καρτέλα είναι ένα στάδιο. Ο αριθμός δείχνει πόσα περιμένουν. Τα στάδια που είναι απενεργοποιημένα στο Studio δεν εμφανίζονται.',
+          'Κάθε καρτέλα είναι ένα στάδιο. Ο αριθμός δείχνει πόσα περιμένουν. Τα στάδια που είναι απενεργοποιημένα στο Studio δεν εμφανίζονται. Η μπλε μπάρα «Αναζήτηση & σάρωση» φιλτράρει την καρτέλα καθώς γράφετε· με σάρωση barcode και Enter ανοίγει το αντικείμενο στο στάδιο όπου βρίσκεται. Δίπλα της είναι τα Φίλτρα (τμήμα, ειδικότητα, Σετ ή εργαλεία).',
         ],
         en: [
           'Stage tabs',
-          'Each tab is a stage and its number shows how many are waiting. Stages disabled in Studio are not shown.',
+          'Each tab is a stage and its number shows how many are waiting. Stages disabled in Studio are not shown. The blue "Search & scan" bar filters the tab as you type; scanning a barcode and pressing Enter opens the item in its stage. The Filters (department, specialty, Sets or instruments) sit next to it.',
         ],
       },
       {
