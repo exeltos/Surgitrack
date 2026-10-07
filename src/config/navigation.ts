@@ -66,3 +66,20 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
   ];
   return adminNavigation.filter(item => allowed(item.permission));
 };
+
+/**
+ * The menu entry a page belongs to when it is not the entry's own address: opening a Set, an instrument or
+ * a "new" form keeps the Sets, Instruments, Standalone or Stock entry lit (an instrument lives in the list
+ * that matches where it is: standalone, stock or the general registry).
+ */
+export const navSectionFor = (
+  pathname: string,
+  toolMode: (id: string) => 'STANDALONE' | 'SET_MEMBER' | 'STOCK' | undefined,
+): string | undefined => {
+  if (pathname === '/sets/new' || /^\/sets\/[^/]+$/.test(pathname)) return '/sets';
+  if (pathname === '/tools/new' || pathname === '/tools/names') return '/tools';
+  const tool = /^\/tools\/([^/]+)$/.exec(pathname);
+  if (!tool) return undefined;
+  const mode = toolMode(decodeURIComponent(tool[1]));
+  return mode === 'STANDALONE' ? '/standalone-tools' : mode === 'STOCK' ? '/stock' : '/tools';
+};

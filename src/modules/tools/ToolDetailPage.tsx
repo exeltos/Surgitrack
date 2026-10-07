@@ -38,7 +38,9 @@ import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
 import {effectiveToolMarker} from '../../core/colorTapes';
 import ActionMenu from '../../components/ui/ActionMenu';
+import {useConfirm} from '../../components/ui/useConfirm';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
+import ToolReplacementPanel from './ToolReplacementPanel';
 
 export default function ToolDetailPage() {
   const {
@@ -47,6 +49,7 @@ export default function ToolDetailPage() {
     movements,
     issues,
     reportIssue,
+    markLost,
     addAssetPhotos,
     removeAssetPhoto,
     updateTool,
@@ -58,6 +61,7 @@ export default function ToolDetailPage() {
     setColorMarker,
   } = useSurgi();
   const navigate = useNavigate();
+  const [confirmNode, ask] = useConfirm();
   const {id} = useParams();
   const [searchParams] = useSearchParams();
   const scannedOldBarcode = searchParams.get('replaced');
@@ -294,6 +298,7 @@ export default function ToolDetailPage() {
                     <h2>{tr('Ανοικτές αναφορές')}</h2>
                   </div>
                 </div>
+                <ToolReplacementPanel tool={tool} />
                 <div className="asset-detail-scroll asset-issue-list">
                   {toolIssues.length ? (
                     toolIssues.map(issue => (
@@ -542,10 +547,29 @@ export default function ToolDetailPage() {
               <AppButton
                 variant="primary"
                 onClick={() => {
+                  const done = () => {
+                    setReportOpen(false);
+                    setReportNote('');
+                    setReportPhotos([]);
+                  };
+                  if (reportType === 'Απώλεια' && can('asset.composition.manage')) {
+                    ask({
+                      title: tr('Δήλωση απώλειας;'),
+                      message: tr(
+                        'Το {0} δηλώνεται ως χαμένο και αφαιρείται από το Σετ του. Μπορείς να το επαναφέρεις αν βρεθεί.',
+                        tool.barcode,
+                      ),
+                      confirmLabel: tr('Δήλωση απώλειας'),
+                      danger: true,
+                      onConfirm: () => {
+                        markLost('TOOL', tool.id, reportNote.trim());
+                        done();
+                      },
+                    });
+                    return;
+                  }
                   reportIssue(tool.id, reportType, reportNote, 'Καρτέλα Εργαλείου', reportPhotos);
-                  setReportOpen(false);
-                  setReportNote('');
-                  setReportPhotos([]);
+                  done();
                 }}
               >
                 {tr('Καταχώρηση αναφοράς')}
@@ -554,6 +578,7 @@ export default function ToolDetailPage() {
           </div>
         </div>
       )}
+      {confirmNode}
       {manageOpen && <AssetManageModal kind="TOOL" asset={tool} onClose={() => setManageOpen(false)} />}
       {markerOpen && (
         <ColorMarkerPicker

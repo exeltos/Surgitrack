@@ -2,9 +2,9 @@ import {Settings2} from 'lucide-react';
 import {tr} from '../../i18n';
 
 /**
- * The type of a problem report. Loss and Service change the item's state, so whoever may manage
- * the item declares them in «Διαχείριση» (the report would only note them); a department, which
- * cannot, reports a loss here for Sterilization to confirm.
+ * The type of a problem report. A loss is chosen here by everyone: for whoever may manage the item the
+ * page declares it lost (after asking); a department reports it for Sterilization to confirm. Sending to
+ * Service changes the item's state, so it is declared in «Διαχείριση».
  */
 export default function ReportTypeField({
   kind,
@@ -19,7 +19,7 @@ export default function ReportTypeField({
   canManage: boolean;
   onManage?: () => void;
 }) {
-  const types = ['Βλάβη', 'Φθορά', ...(kind === 'SET' ? ['Έλλειψη'] : []), ...(canManage ? [] : ['Απώλεια']), 'Άλλο'];
+  const types = ['Βλάβη', 'Φθορά', ...(kind === 'SET' ? ['Έλλειψη'] : []), 'Απώλεια', 'Άλλο'];
   return (
     <label>
       {tr('Τύπος αναφοράς')}
@@ -32,7 +32,7 @@ export default function ReportTypeField({
       </select>
       {canManage && onManage && (
         <small className="report-type-hint">
-          {tr('Απώλεια ή αποστολή σε Service αλλάζουν την κατάσταση: δηλώνονται από τη')}{' '}
+          {tr('Η αποστολή σε Service αλλάζει την κατάσταση: δηλώνεται από τη')}{' '}
           <button type="button" onClick={onManage}>
             <Settings2 size={13} />
             {tr('Διαχείριση')}

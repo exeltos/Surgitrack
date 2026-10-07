@@ -17,7 +17,7 @@ import {
   UserPlus,
   Undo2,
 } from 'lucide-react';
-import {navigationFor} from '../../config/navigation';
+import {navSectionFor, navigationFor} from '../../config/navigation';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
@@ -110,7 +110,8 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   }, [hospitalId, location.pathname]);
   const navigation = (
     platformOnly
-      ? navigationFor(role, can).filter(item => PLATFORM_ONLY_PAGES.includes(item.to))
+      ? // Studio first, the list of hospitals below it.
+        PLATFORM_ONLY_PAGES.flatMap(page => navigationFor(role, can).filter(item => item.to === page))
       : navigationFor(role, can)
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
@@ -176,6 +177,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     // Keyed on the ids of the ready assets (readyKey), not on the array itself, which is new every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, currentUser.department, readyKey, lang]);
+  const toolModeOf = (id: string) => tools.find(t => t.id === id)?.mode;
   const assetDetailMode = /^\/(tools|sets)\/[^/]+$/.test(location.pathname);
   const departmentMode = location.pathname === '/department';
   const sidebar = (
@@ -206,10 +208,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         {navigation.map(item => {
           const [path, query = ''] = item.to.split('?');
           const active =
-            location.pathname === path &&
-            ((item.exactSearch ?? query) === ''
-              ? location.search === ''
-              : location.search.slice(1) === (item.exactSearch ?? query));
+            (location.pathname === path &&
+              ((item.exactSearch ?? query) === ''
+                ? location.search === ''
+                : location.search.slice(1) === (item.exactSearch ?? query))) ||
+            (query === '' && navSectionFor(location.pathname, toolModeOf) === path);
           return (
             <NavLink
               key={item.to}
