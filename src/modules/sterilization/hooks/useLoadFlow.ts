@@ -1,4 +1,5 @@
 import {tr} from '../../../i18n';
+import {printReleaseForm} from '../printRelease';
 import type {useSterilizationState} from './useSterilizationState';
 import type {useSterilizationQueues} from './useSterilizationQueues';
 import type {usePreparationChecks} from './usePreparationChecks';
@@ -178,7 +179,42 @@ export function useLoadFlow(
     if (!reason?.trim()) return;
     recallProcessLoad(id, reason.trim());
   };
+  /** Prints the release form of a load: blank while in the sterilizer, filled in once released. */
+  const printLoadForm = (loadId: string) => {
+    const load = p.processLoads.find(item => item.id === loadId);
+    if (!load) return;
+    const releases = p.sterilizationReleases.filter(r => r.loadId === loadId);
+    const items = load.items.map(item => {
+      const release = releases.find(r => r.assetId === item.assetId);
+      const asset =
+        item.assetKind === 'SET' ? p.sets.find(x => x.id === item.assetId) : p.tools.find(x => x.id === item.assetId);
+      return {
+        barcode: item.barcode,
+        name: item.assetName,
+        kind: item.assetKind,
+        department: item.department,
+        shelfLifeMonths: release?.shelfLifeMonths ?? asset?.shelfLifeMonths,
+        sterileUntil: release?.sterileUntil,
+      };
+    });
+    const first = releases[0];
+    const released = load.status === 'RELEASED' || load.status === 'REPROCESS' || load.status === 'RECALLED';
+    printReleaseForm({
+      load,
+      items,
+      hospital: p.organizationName,
+      approver: first
+        ? {name: first.releasedByName, department: first.releasedByDepartment}
+        : {name: p.currentUser.name, department: p.currentUser.department},
+      released:
+        released && load.releasedAt
+          ? {at: load.releasedAt, decision: load.status === 'REPROCESS' ? 'REPROCESS' : 'RELEASED'}
+          : undefined,
+      label: p.systemSettings.label,
+    });
+  };
   return {
+    printLoadForm,
     addBarcodeToLoad,
     awaitingLoads,
     closeLoad,

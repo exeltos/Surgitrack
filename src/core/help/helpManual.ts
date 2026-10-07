@@ -503,6 +503,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Έντυπο αποδέσμευσης',
+          'Το κουμπί «Έντυπο» (στο «Στον κλίβανο», στην Αποδέσμευση και στα πρόσφατα αποδεσμευμένα φορτία) τυπώνει σε A4 το έντυπο του φορτίου: τύπο φορτίου, κλίβανο, κύκλο, πρόγραμμα, διάρκεια αποστείρωσης, τους δείκτες με χώρο για να κολλήσετε την ταινία τους, τους ελέγχους, τα αντικείμενα με τη λήξη τους, την απόφαση και την έγκριση με τα στοιχεία του χρήστη και υπογραφή. Πριν την αποδέσμευση βγαίνει κενό για συμπλήρωση· μετά βγαίνει συμπληρωμένο.',
+        ],
+        en: [
+          'Release form',
+          'The "Form" button (in "In the sterilizer", in Release and in the recently released loads) prints the load’s A4 form: load type, sterilizer, cycle, program, shelf life, the indicators with a place to stick their strip, the checks, the items with their expiry, the decision and the approval with the user’s details and signature. Before release it prints blank to fill in; afterwards it prints filled in.',
+        ],
+      },
+      {
+        el: [
           'Εκτυπώσεις',
           'Από τη σύνθεση εκτυπώνεται το φύλλο σύνθεσης (A4, με στήλη ελέγχου και υπογραφές) και η ετικέτα barcode. Η ετικέτα έχει τρία μεγέθη (50×25, 70×35, 100×50 mm) και κεφαλίδα SurgiTrack, λογότυπο, δικό σας κείμενο ή καμία· ο διαχειριστής ορίζει την προεπιλογή του νοσοκομείου.',
         ],

@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {CheckCircle2, Hourglass, Lock, PackageCheck, TriangleAlert} from 'lucide-react';
+import {CheckCircle2, Hourglass, Lock, PackageCheck, Printer, TriangleAlert} from 'lucide-react';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr, trData} from '../../../i18n';
@@ -14,10 +14,12 @@ export default function SterilizerLoads({
   loads,
   canFinish,
   onFinish,
+  onPrint,
 }: {
   loads: ProcessLoadRecord[];
   canFinish: boolean;
   onFinish: (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => void;
+  onPrint: (loadId: string) => void;
 }) {
   const [confirm, ask] = useConfirm();
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -83,6 +85,9 @@ export default function SterilizerLoads({
                 aria-label={tr('Παρατήρηση τέλους κύκλου')}
                 disabled={!canFinish}
               />
+              <button className="sterilizer-load-print" onClick={() => onPrint(load.id)}>
+                <Printer size={15} /> {tr('Έντυπο')}
+              </button>
               <button
                 className="release-reprocess"
                 disabled={!canFinish}

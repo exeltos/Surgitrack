@@ -1,4 +1,4 @@
-import {TriangleAlert, X, ShieldCheck} from 'lucide-react';
+import {Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -153,6 +153,9 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
             </div>
             <div className="modal-actions workflow-modal-actions release-actions">
               <button onClick={closeLoadRelease}>{tr('Ακύρωση')}</button>
+              <button className="release-print" onClick={() => s.printLoadForm(selectedReleaseLoad.id)}>
+                <Printer size={16} /> {tr('Έντυπο')}
+              </button>
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>
                 <TriangleAlert size={16} /> {tr('Μη αποδέσμευση · όλο το φορτίο')}
               </button>

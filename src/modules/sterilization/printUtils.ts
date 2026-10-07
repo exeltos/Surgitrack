@@ -3,7 +3,7 @@ import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
-const escapeHtml = (value: string) =>
+export const escapeHtml = (value: string) =>
   value.replace(/[&<>'"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'})[ch] || ch);
 
 // Code 128 B: same symbology used by the legacy FileMaker Barcode_Code128 webview.
@@ -117,7 +117,7 @@ const CODE128_PATTERNS = [
   '2331112',
 ];
 
-function code128Svg(raw: string, height = 48) {
+export function code128Svg(raw: string, height = 48) {
   const value = raw.replace(/[^\x20-\x7E]/g, '');
   const data = [...value].map(ch => ch.charCodeAt(0) - 32);
   const start = 104;
@@ -142,7 +142,7 @@ function code128Svg(raw: string, height = 48) {
   return `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Code 128 ${escapeHtml(value)}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">${bars.join('')}</svg>`;
 }
 
-function openPrintWindow(title: string, html: string) {
+export function openPrintWindow(title: string, html: string) {
   const win = window.open('', '_blank', 'width=1000,height=800');
   if (!win) return false;
   try {
