@@ -221,9 +221,13 @@ export default function AssetWorkbenchSidebar({
         {sterile && asset.sterileUntil && (
           <div>
             <dt>{tr('Αποστείρωση / λήξη')}</dt>
-            <dd>
-              <SterileDates sterilizedOn={asset.sterilizedOn} sterileUntil={asset.sterileUntil} />
-              {asset.shelfLifeMonths ? ` · ${tr('{0} μήνες', asset.shelfLifeMonths)}` : ''}
+            <dd className="sterile-dd">
+              <SterileDates
+                sterilizedOn={asset.sterilizedOn}
+                sterileUntil={asset.sterileUntil}
+                shelfLifeMonths={asset.shelfLifeMonths}
+              />
+              {asset.shelfLifeMonths ? <small>{tr('{0} μήνες', asset.shelfLifeMonths)}</small> : null}
             </dd>
           </div>
         )}

@@ -190,10 +190,12 @@ export function useAppRecordSync(
     };
     document.addEventListener('visibilitychange', onBack);
     window.addEventListener('focus', onBack);
+    window.addEventListener('online', onBack);
     return () => {
       window.clearInterval(timer);
       document.removeEventListener('visibilitychange', onBack);
       window.removeEventListener('focus', onBack);
+      window.removeEventListener('online', onBack);
     };
   }, [organizationId, collection]);
 }

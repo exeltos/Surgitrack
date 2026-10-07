@@ -17,6 +17,7 @@ import {
   UserPlus,
   Undo2,
   CalendarClock,
+  WifiOff,
 } from 'lucide-react';
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
@@ -29,9 +30,10 @@ import RoleSwitcher from './RoleSwitcher';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
+import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
-import {trData} from '../../i18n';
+import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 
@@ -92,6 +94,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     can,
   } = useSurgi();
   const syncStatus = useSyncStatus();
+  const online = useOnline();
   const {lang, setLang, fontScale, setFontScale, highContrast, setHighContrast, reducedMotion, setReducedMotion} =
     useAppPreferences();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -624,6 +627,21 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             </button>
           </div>
         </header>
+        {!online && (
+          <div className="offline-strip" role="alert">
+            <WifiOff size={18} aria-hidden="true" />
+            <span>
+              <strong>{tr('Χωρίς σύνδεση στο δίκτυο.')}</strong>{' '}
+              {syncStatus === 'saved'
+                ? tr(
+                    'Ό,τι καταχωρίσετε κρατιέται σε αυτή τη σελίδα και αποθηκεύεται μόλις επανέλθει η σύνδεση· αλλαγές άλλων συσκευών δεν φαίνονται. Μην κλείσετε και μην ανανεώσετε τη σελίδα.',
+                  )
+                : tr(
+                    'Οι τελευταίες αλλαγές δεν έχουν αποθηκευτεί ακόμη· θα αποθηκευτούν μόλις επανέλθει η σύνδεση. Μην κλείσετε και μην ανανεώσετε τη σελίδα.',
+                  )}
+            </span>
+          </div>
+        )}
         {trial && (trial.warn || trial.ended) && (
           <div className={`trial-strip${trial.ended ? ' ended' : ''}`} role="status">
             {trial.ended

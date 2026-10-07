@@ -1,4 +1,3 @@
-import {en} from './en';
 import {translateToEnglish} from '../core/glossary';
 
 export type Lang = 'el' | 'en';
@@ -18,6 +17,20 @@ export const setI18nLang = (lang: Lang) => {
   current = lang;
 };
 export const getI18nLang = () => current;
+
+/** The English dictionary is loaded on demand, so Greek users don't download it. */
+let en: Record<string, string> = {};
+let englishLoad: Promise<void> | null = null;
+export const loadEnglish = (): Promise<void> =>
+  (englishLoad ??= import('./en').then(
+    module => {
+      en = module.en;
+    },
+    error => {
+      englishLoad = null;
+      throw error;
+    },
+  ));
 
 /**
  * UI text in the current language. The Greek text is the key: in Greek it is shown as is, in

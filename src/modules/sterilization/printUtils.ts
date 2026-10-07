@@ -2,6 +2,7 @@ import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
 import {sterileDatesHtml} from '../../core/sterileSymbols';
+import {sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
 export const escapeHtml = (value: string) =>
@@ -170,7 +171,7 @@ export function openPrintWindow(title: string, html: string) {
 
 type PrintAsset = (
   Pick<SetAsset, 'barcode' | 'name' | 'department'> | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
-) & {code?: string; sterileUntil?: string; sterilizedOn?: string};
+) & {code?: string; sterileUntil?: string; sterilizedOn?: string; shelfLifeMonths?: number};
 
 /** The label's paper size: the chosen size, or the printer roll's own when set (20–150 mm). */
 export const labelPaper = (settings: LabelSettings) => {
@@ -213,7 +214,9 @@ function barcodeLabelBody(
   screenZoom = 1,
 ) {
   // Once released, the label carries the sterilization and expiry dates with their symbols instead of the count.
-  const datesHtml = asset.sterileUntil ? sterileDatesHtml(asset.sterilizedOn, asset.sterileUntil, '0.95em', true) : '';
+  const datesHtml = asset.sterileUntil
+    ? sterileDatesHtml(sterilizedOnOf(asset), asset.sterileUntil, '0.95em', true)
+    : '';
   const details =
     kind === 'SET'
       ? tr('{0} εργαλεία', toolCount ?? 0)

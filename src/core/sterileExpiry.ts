@@ -61,6 +61,19 @@ export type ExpiryEntry = {
   shelfLifeMonths?: number;
 } & ExpiryStatus;
 
+/**
+ * The sterilization date: the stored one, or — for records saved before it was kept — the expiry date
+ * minus the shelf life.
+ */
+export function sterilizedOnOf(asset: {sterilizedOn?: string; sterileUntil?: string; shelfLifeMonths?: number}) {
+  if (asset.sterilizedOn) return asset.sterilizedOn;
+  if (!asset.sterileUntil || !asset.shelfLifeMonths) return undefined;
+  const [year, month, day] = asset.sterileUntil.split('-').map(Number);
+  if (!year || !month || !day) return undefined;
+  const on = new Date(year, month - 1 - asset.shelfLifeMonths, day);
+  return isoDate(on);
+}
+
 type ExpiryAsset = {
   id: string;
   barcode: string;
@@ -91,7 +104,7 @@ export function sterileExpiryList(
     department: asset.department,
     assetState: asset.state,
     sterileUntil: asset.sterileUntil as string,
-    sterilizedOn: asset.sterilizedOn,
+    sterilizedOn: sterilizedOnOf(asset),
     shelfLifeMonths: asset.shelfLifeMonths,
     ...expiryStatus(asset.sterileUntil as string, asset.shelfLifeMonths, today),
   });

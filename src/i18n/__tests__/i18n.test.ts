@@ -1,7 +1,8 @@
-import {afterEach, describe, expect, it} from 'vitest';
-import {setI18nLang, tr, trc, trData} from '../index';
+import {afterEach, beforeAll, describe, expect, it} from 'vitest';
+import {loadEnglish, setI18nLang, tr, trc, trData} from '../index';
 
 describe('i18n', () => {
+  beforeAll(() => loadEnglish());
   afterEach(() => setI18nLang('el'));
 
   it('shows the Greek text in Greek and its English in English, with arguments in place', () => {

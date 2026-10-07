@@ -1,3 +1,4 @@
+import {sterilizedOnOf} from '../../../core/sterileExpiry';
 import {tr} from '../../../i18n';
 import {printReleaseForm} from '../printRelease';
 import type {useSterilizationState} from './useSterilizationState';
@@ -198,7 +199,7 @@ export function useLoadFlow(
         department: item.department,
         shelfLifeMonths: release?.shelfLifeMonths ?? asset?.shelfLifeMonths ?? p.defaultShelfLife,
         sterileUntil: release?.sterileUntil,
-        sterilizedOn: release?.sterilizedOn,
+        sterilizedOn: release && sterilizedOnOf(release),
       };
     });
     const first = releases[0];

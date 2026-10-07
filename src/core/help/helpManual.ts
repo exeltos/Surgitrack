@@ -48,11 +48,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Πολλές συσκευές',
-          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει ό,τι αποθήκευσαν οι άλλες κάθε λίγα δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο· ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα.',
+          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει ό,τι αποθήκευσαν οι άλλες κάθε λίγα δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο· ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα. Αν χαθεί το δίκτυο, εμφανίζεται κάτω στην οθόνη η ειδοποίηση «Χωρίς σύνδεση στο δίκτυο»: ό,τι καταχωρίσετε κρατιέται στη σελίδα και αποθηκεύεται μόλις επανέλθει η σύνδεση, αρκεί να μην κλείσετε ή ανανεώσετε τη σελίδα. Η πάνω μπάρα δείχνει «Αποθήκευση…» ή «Δεν αποθηκεύτηκε · νέα προσπάθεια» όσο υπάρχουν αλλαγές σε αναμονή.',
         ],
         en: [
           'Several devices',
-          'You can work from several computers and tablets at once. Each screen takes what the others saved every few seconds and as soon as you come back to the window; your own changes are saved first.',
+          'You can work from several computers and tablets at once. Each screen takes what the others saved every few seconds and as soon as you come back to the window; your own changes are saved first. If the network drops, a "No network connection" notice appears at the bottom of the screen: what you record is kept on the page and saved as soon as the connection is back, as long as you do not close or reload the page. The top bar shows "Saving…" or "Not saved · retrying" while changes are waiting.',
         ],
       },
       {
@@ -459,6 +459,16 @@ export const helpManual: ManualSection[] = [
         en: [
           'Physical receipt',
           'In "Receipt" scan the Set and declare any visible deviation. You are recorded automatically as the receiver; the department person handing it over signs with their user code and password. Deviations (missing, damaged) create an issue.',
+        ],
+      },
+      {
+        el: [
+          'Εκκρεμότητες στη Σύνθεση',
+          'Μια ανοιχτή εκκρεμότητα σταματά τη Σύνθεση μέχρι να αντιμετωπιστεί. Αν αφορά εργαλείο, πατήστε «Διαχείριση» στην ειδοποίηση (ή «Αντιμετώπιση» στη γραμμή του) για αντικατάσταση, service ή απόσυρση. Αν αφορά το ίδιο το Σετ, η ειδοποίηση τη δείχνει με κουμπί «Επίλυση»: γράφετε πώς λύθηκε και καταγράφεται στο ιστορικό. Για έλλειψη μπορείτε εναλλακτικά να αντικαταστήσετε από τη γραμμή «Λείπει» ή να τσεκάρετε «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση της σύνθεσης.',
+        ],
+        en: [
+          'Issues during Composition',
+          'An open issue stops Composition until it is handled. If it concerns an instrument, press "Manage" in the notice (or "Handle" on its row) to replace it, send it to service or retire it. If it concerns the Set itself, the notice shows it with a "Resolve" button: you write how it was solved and it is recorded in the history. For a shortage you can instead replace from the "Missing" row or tick "Accept the recorded shortage" in the composition notice.',
         ],
       },
       {

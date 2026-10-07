@@ -1,3 +1,4 @@
+import type {UIEvent} from 'react';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {
   CheckCircle2,
@@ -17,8 +18,14 @@ import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
 
+// The side column and the list scroll only up and down: a tap (focus) must never shift them sideways.
+const keepLeft = (event: UIEvent<HTMLElement>) => {
+  if (event.currentTarget.scrollLeft) event.currentTarget.scrollLeft = 0;
+};
+
 export default function PreparationModal({s}: {s: SterilizationPageState}) {
   const {
+    resolveIssues,
     acceptedMissingCodes,
     allowMissing,
     compositionOptions,
@@ -81,7 +88,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
               </div>
             </div>
             <div className="prep-workspace-body">
-              <aside className="prep-control-panel">
+              <aside className="prep-control-panel" onScroll={keepLeft}>
                 <div className="prep-meta-line">
                   <span title={tr('Προετοιμάζει')}>
                     <UserCheck size={15} />
@@ -128,16 +135,45 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                       {(() => {
                         // Straight to the instrument with the problem: replace it, send it to service or stock.
                         const tool = prepTools.find(t => prepBlockingIssues.some(i => i.asset.startsWith(t.barcode)));
-                        return tool ? (
-                          <button type="button" className="prep-block-open" onClick={() => openPrepManage(tool.id)}>
-                            {tr('Διαχείριση')} · {tool.barcode}
-                          </button>
-                        ) : (
-                          <small className="prep-block-hint">
-                            {tr(
-                              'Αφορά το ίδιο το Σετ: κάλυψε την έλλειψη από τη λίστα εργαλείων (γραμμή «Λείπει» → Αντικατάσταση) ή κάνε «Αποδοχή καταγεγραμμένης έλλειψης» πάνω δεξιά.',
-                            )}
-                          </small>
+                        if (tool)
+                          return (
+                            <button type="button" className="prep-block-open" onClick={() => openPrepManage(tool.id)}>
+                              {tr('Διαχείριση')} · {tool.barcode}
+                            </button>
+                          );
+                        // About the Set itself: show it and resolve it here (with a note for the history).
+                        const resolve = (id: string) => {
+                          const note = window.prompt(
+                            tr('Πώς επιλύθηκε η εκκρεμότητα; (καταγράφεται στο ιστορικό)'),
+                            '',
+                          );
+                          if (note?.trim()) resolveIssues([id], note.trim());
+                        };
+                        return (
+                          <div className="prep-block-set">
+                            {prepBlockingIssues.map(issue => (
+                              <div className="prep-block-issue" key={issue.id}>
+                                <span>
+                                  <strong>{trData(issue.type)}</strong>
+                                  {issue.note ? ` · ${trData(issue.note)}` : ''}
+                                </span>
+                                <button type="button" className="prep-block-open" onClick={() => resolve(issue.id)}>
+                                  {tr('Επίλυση')}
+                                </button>
+                              </div>
+                            ))}
+                            <small className="prep-block-hint">
+                              {prepMissingRequirements.length > 0
+                                ? tr(
+                                    'Για έλλειψη: «Αντιμετώπιση» στη γραμμή «Λείπει» της λίστας (αντικατάσταση ή αποδοχή), ή «Επίλυση» εδώ όταν το πρόβλημα έχει λυθεί.',
+                                  )
+                                : prepMissingCount > 0
+                                  ? tr(
+                                      'Για έλλειψη: τσέκαρε «Αποδοχή καταγεγραμμένης έλλειψης» στην ενημέρωση πάνω δεξιά, ή «Επίλυση» εδώ όταν το εργαλείο βρεθεί.',
+                                    )
+                                  : tr('Πάτησε «Επίλυση» όταν το πρόβλημα έχει λυθεί.')}
+                            </small>
+                          </div>
                         );
                       })()}
                     </div>
@@ -365,7 +401,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                     </span>
                   </div>
                 </div>
-                <div className="prep-tools-scroll">
+                <div className="prep-tools-scroll" onScroll={keepLeft}>
                   {prepDraft.kind === 'SET' ? (
                     <>
                       {prepTools.map(t => {

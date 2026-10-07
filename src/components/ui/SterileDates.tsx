@@ -1,4 +1,4 @@
-import {formatExpiry} from '../../core/sterileExpiry';
+import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {tr} from '../../i18n';
 
 /** The «STERILE» box (ISO 15223-1) for the sterilization date. */
@@ -37,7 +37,9 @@ export function ExpirySymbol() {
 }
 
 /** Sterilization and expiry dates side by side, each with its symbol. */
-export default function SterileDates({sterilizedOn, sterileUntil}: {sterilizedOn?: string; sterileUntil?: string}) {
+export default function SterileDates(asset: {sterilizedOn?: string; sterileUntil?: string; shelfLifeMonths?: number}) {
+  const {sterileUntil} = asset;
+  const sterilizedOn = sterilizedOnOf(asset);
   if (!sterilizedOn && !sterileUntil) return null;
   return (
     <span className="sterile-dates">

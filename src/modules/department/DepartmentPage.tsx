@@ -266,7 +266,11 @@ export default function DepartmentPage() {
                             const status = expiryStatus(asset.sterileUntil, asset.shelfLifeMonths);
                             return status.state === 'OK' ? (
                               <small>
-                                <SterileDates sterilizedOn={asset.sterilizedOn} sterileUntil={asset.sterileUntil} />
+                                <SterileDates
+                                  sterilizedOn={asset.sterilizedOn}
+                                  sterileUntil={asset.sterileUntil}
+                                  shelfLifeMonths={asset.shelfLifeMonths}
+                                />
                               </small>
                             ) : (
                               <ExpiryBadge entry={status} />
