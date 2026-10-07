@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Layers3,
   PackageOpen,
+  Printer,
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -173,9 +174,14 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                 <span>
                   <b>{load.id}</b> · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
                 </span>
-                <button onClick={() => recallLoad(load.id)}>
-                  <TriangleAlert size={14} /> {tr('Ανάκληση')}
-                </button>
+                <span className="released-load-actions">
+                  <button onClick={() => s.printLoadForm(load.id)}>
+                    <Printer size={14} /> {tr('Έντυπο')}
+                  </button>
+                  <button onClick={() => recallLoad(load.id)}>
+                    <TriangleAlert size={14} /> {tr('Ανάκληση')}
+                  </button>
+                </span>
               </div>
             ))}
           </div>
@@ -186,6 +192,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           loads={s.runningLoads}
           canFinish={s.can('sterilization.cycle')}
           onFinish={(id, result, note) => s.finishProcessLoad(id, result, note)}
+          onPrint={s.printLoadForm}
         />
       ) : rows.length === 0 ? (
         <div className="empty ster-empty">

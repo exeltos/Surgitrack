@@ -8119,3 +8119,20 @@ html body .sterilizer-load-card > footer .release-reprocess {
   background: #fff7f3;
   color: #a1401d;
 }
+html body .sterilizer-load-card > footer .sterilizer-load-print,
+html body .release-actions .release-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #cfdde3;
+  background: #fff;
+  color: #155a6e;
+  font-weight: 700;
+}
+html body .release-actions .release-print {
+  margin-right: auto;
+}
+.released-load-actions {
+  display: inline-flex;
+  gap: 6px;
+}

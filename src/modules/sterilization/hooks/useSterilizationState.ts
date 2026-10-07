@@ -13,6 +13,8 @@ export function useSterilizationState() {
   const {
     sets,
     tools,
+    sterilizationReleases,
+    organizationName,
     receiveAtSterilization,
     recordPreparation,
     completeSterilizationCycle,
@@ -187,6 +189,8 @@ export function useSterilizationState() {
   const [releaseLoadBi, setReleaseLoadBi] = useState<'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL'>('NOT_REQUIRED');
   const [releaseLoadNote, setReleaseLoadNote] = useState('');
   return {
+    sterilizationReleases,
+    organizationName,
     finishProcessLoad,
     can,
     acceptedMissingCodes,
