@@ -34,6 +34,7 @@ export function useAssetCatalogActions(
     tools,
   } = p;
 
+  /** A signed surgical count of a Set (or a standalone instrument); a shortage or damage opens an issue. */
   const recordCount = (p: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => {
     const c: SurgicalCount = {
       ...p,
@@ -42,34 +43,36 @@ export function useAssetCatalogActions(
       by: currentUser.name,
       signed: true,
     };
+    const kind = p.assetKind || 'SET';
+    const asset = kind === 'SET' ? sets.find(x => x.id === p.setId) : tools.find(x => x.id === p.setId);
+    if (!asset) return;
     setCounts(x => [c, ...x]);
-    const s = sets.find(x => x.id === p.setId);
-    if (s) {
+    if (kind === 'SET')
       setSets(x => x.map(a => (a.id === p.setId ? {...a, actual: p.counted, patientCode: p.patientCode} : a)));
-      if (p.counted !== p.expected || p.result !== 'OK')
-        setIssues(x => [
-          {
-            id: `i${uniqueStamp()}`,
-            asset: `${s.barcode} · ${s.name}`,
-            type: p.result === 'DAMAGE' ? 'Βλάβη' : 'Έλλειψη',
-            status: 'OPEN',
-            created: formatStoreDateTime(),
-            department: s.department,
-            note: p.note || `Αναμενόμενα ${p.expected} / καταμετρημένα ${p.counted}`,
-          },
-          ...x,
-        ]);
-      addMovement({
-        asset: `${s.barcode} · ${s.name}`,
-        assetKind: 'SET',
-        from: s.department,
-        to: s.department,
-        status: 'Καταμέτρηση χειρουργείου υπογεγραμμένη',
-        by: currentUser.name,
-        patientCode: p.patientCode,
-      });
-      notify(tr('Η καταμέτρηση {0} καταγράφηκε και υπογράφηκε.', s.barcode));
-    }
+    const label = `${asset.barcode} · ${asset.name}`;
+    const department = asset.department || '';
+    if (p.counted !== p.expected || p.result !== 'OK')
+      setIssues(x => [
+        {
+          id: `i${uniqueStamp()}`,
+          asset: label,
+          type: p.result === 'DAMAGE' ? 'Βλάβη' : 'Έλλειψη',
+          status: 'OPEN',
+          created: formatStoreDateTime(),
+          department,
+          note: p.note || `Αναμενόμενα ${p.expected} / καταμετρημένα ${p.counted}`,
+        },
+        ...x,
+      ]);
+    addMovement({
+      asset: label,
+      assetKind: kind,
+      from: department,
+      to: department,
+      status: `Καταμέτρηση χειρουργείου υπογεγραμμένη · ${p.counted}/${p.expected}`,
+      by: currentUser.name,
+      patientCode: p.patientCode,
+    });
   };
   const moveTool = (
     toolId: string,

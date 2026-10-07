@@ -8787,86 +8787,128 @@ html body .prep-tools-scroll .prep-missing-row .tool-manage-btn {
   font-size: 11px;
   border: 1px solid #e9bf78;
 }
-/* Surgical count: the Set's instruments, ticked one by one. */
-html body .count-list {
-  border: 1px solid #e4e7ec;
+/* Send to Sterilization: the operating theatre's instrument count (ticking and sending is the signature). */
+html body .department-count-card {
+  border: 1px solid #b7dfc8;
   border-radius: 12px;
+  background: #f6fbf8;
   overflow: hidden;
-  max-height: 46vh;
-  overflow-y: auto;
 }
-html body .count-list-head {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+html body .department-count-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e4e7ec;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #d5ece0;
+  color: #1a6b3c;
 }
-html body .count-list-head span {
+html body .department-count-head small {
   color: #475467;
-  font-size: 13px;
+  font-weight: 600;
 }
-html body .count-clear {
+html body .department-count-all {
   margin-left: auto;
-  padding: 4px 10px;
-  border: 1px solid #d0d5dd;
+  padding: 5px 10px;
+  border: 1px solid #1a6b3c;
   border-radius: 8px;
   background: #fff;
+  color: #1a6b3c;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
-html body .count-item {
+html body .department-count-scan {
   display: grid;
-  grid-template-columns: 22px 90px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 14px;
-  border-bottom: 1px solid #f2f4f7;
-  cursor: pointer;
-  font-size: 14px;
+  gap: 4px;
+  padding: 8px 12px 0;
 }
-html body .count-item:last-child {
-  border-bottom: 0;
+html body .department-count-scan input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font: inherit;
 }
-html body .count-item input {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-}
-html body .count-item small {
-  color: #667085;
-}
-html body .count-item.on {
-  background: #ecfdf3;
-}
-html body .count-damage {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #344054;
-}
-html body .count-scan-message {
+html body .department-count-scan small {
   color: #1d6b7a;
   font-weight: 600;
 }
-html body .count-card > label.count-damage {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 8px;
-  text-align: left;
+html body .department-count-list {
+  display: grid;
+  max-height: 34vh;
+  overflow-y: auto;
+  padding: 6px 4px 6px 12px;
 }
-html body .count-card > label.count-damage input {
+html body .department-count-list label {
+  display: grid;
+  grid-template-columns: 20px 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #e3f1e9;
+  font-size: 13px;
+  cursor: pointer;
+}
+html body .department-count-list label.on {
+  color: #1a6b3c;
+}
+html body .department-count-list input {
   width: 18px;
   height: 18px;
   margin: 0;
-  flex: 0 0 auto;
+}
+html body .department-count-missing {
+  margin: 0;
+  padding: 8px 12px;
+  background: #fff6e6;
+  color: #8a4b00;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+html body .department-send-modal footer .department-count-print {
+  margin-right: auto;
+}
+/* Studio → Departments: which ones count the instruments (operating theatres). */
+html body .studio-list-row button.studio-count-toggle {
+  width: auto !important;
+  min-width: 112px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  background: #fff;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .studio-list-row button.studio-count-toggle.on {
+  border-color: #1a6b3c;
+  background: #ecfdf3;
+  color: #1a6b3c;
+}
+html body .ster-count-shortage {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+html body .studio-list-head.with-count,
+html body .studio-list-row.with-count {
+  grid-template-columns: minmax(160px, 1.2fr) minmax(140px, 1fr) 90px 196px;
+}
+html body .ster-count-shortage {
+  white-space: nowrap;
+  font-size: 11px;
+}
+@media (max-width: 1100px) {
+  html body .studio-list-head.with-count,
+  html body .studio-list-row.with-count {
+    grid-template-columns: minmax(140px, 1fr) 80px 196px;
+  }
 }

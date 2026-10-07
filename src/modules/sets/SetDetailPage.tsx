@@ -18,6 +18,7 @@ import {
   Trash2,
   TriangleAlert,
   X,
+  ClipboardCheck,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import type {SetAsset, Tool} from '../../types/domain';
@@ -49,6 +50,7 @@ import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtil
 import ActionMenu from '../../components/ui/ActionMenu';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 import {useConfirm} from '../../components/ui/useConfirm';
+import {printCountForm} from '../../components/department/printCountForm';
 
 export default function SetDetailPage() {
   const {
@@ -67,6 +69,10 @@ export default function SetDetailPage() {
     role,
     can,
     setColorMarker,
+    counts,
+    preparations,
+    sterilizationReleases,
+    organizationName,
   } = useSurgi();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
@@ -187,6 +193,25 @@ export default function SetDetailPage() {
                 label: tr('Σύνθεση Σετ'),
                 hint: tr('Λίστα εργαλείων για έλεγχο και αρχειοθέτηση'),
                 onSelect: () => setPreview('COMPOSITION'),
+              },
+              {
+                key: 'count',
+                icon: <ClipboardCheck size={16} />,
+                label: tr('Έντυπο καταμέτρησης'),
+                hint: tr('Αποστείρωση προϋπογεγραμμένη · καταμέτρηση χειρουργείου'),
+                onSelect: () => {
+                  // The latest count since the Set left Sterilization; otherwise part B prints blank.
+                  const release = sterilizationReleases.find(r => r.assetId === set.id && r.decision === 'RELEASED');
+                  const count = counts.find(c => c.setId === set.id);
+                  printCountForm({
+                    asset: set,
+                    items: members.filter(t => t.state !== 'RETIRED'),
+                    hospital: organizationName,
+                    preparation: preparations.find(r => r.assetId === set.id),
+                    release,
+                    count: set.state === 'IN_DEPARTMENT' ? undefined : count,
+                  });
+                },
               },
               ...(can('asset.barcode.reissue')
                 ? [

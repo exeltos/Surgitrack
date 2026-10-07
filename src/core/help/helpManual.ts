@@ -376,11 +376,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καταμέτρηση χειρουργείου',
-          'Στην «Καταμέτρηση» διαλέγετε το Σετ, γράφετε τον κωδικό ασθενούς και τσεκάρετε ή σαρώνετε κάθε εργαλείο που μετράτε· τίποτα δεν είναι προτσεκαρισμένο. Αν λείπουν εργαλεία, η εφαρμογή ζητά επιβεβαίωση και ανοίγει εκκρεμότητα με τα εργαλεία που λείπουν. Για βλάβη τσεκάρετε «Βλάβη ή φθορά» και γράψτε ποιο εργαλείο. Η υπογραφή καταγράφεται με το όνομά σας και την ώρα.',
+          'Στα χειρουργεία (Studio → Βιβλιοθήκες → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» περιέχει την καταμέτρηση: γράφετε τον κωδικό ασθενούς και τσεκάρετε ή σαρώνετε κάθε εργαλείο, ή πατάτε «Όλα παρόντα» με επιβεβαίωση. Το «Υπογραφή & αποστολή» είναι η υπογραφή σας (όνομα και ώρα). Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το «Έντυπο καταμέτρησης» (και από την Εκτύπωση του Σετ) έχει το μέρος της Αποστείρωσης προϋπογεγραμμένο (σύνθεση, αποδέσμευση, ημερομηνίες) και το μέρος του χειρουργείου κενό ή συμπληρωμένο.',
         ],
         en: [
           'Surgical count',
-          'In "Count" pick the Set, enter the patient code and tick or scan every instrument you count; nothing starts ticked. If instruments are missing, the app asks to confirm and opens an issue listing them. For damage tick "Damage or wear" and note which instrument. The signature is recorded with your name and the time.',
+          'In operating theatres (Studio → Libraries → Departments → "Count") "Send to Sterilization" includes the count: enter the patient code and tick or scan each instrument, or press "All present" and confirm. "Sign & send" is your signature (name and time). If instruments are missing, an issue opens and Sterilization sees it at Receipt. The "Count form" (also from the Set’s Print menu) has the Sterilization part pre-signed (composition, release, dates) and the operating theatre part blank or filled in.',
         ],
       },
       {

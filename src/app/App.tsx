@@ -39,7 +39,6 @@ const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
 const NameCheckPage = lazyPage(() => import('../modules/tools/NameCheckPage'));
 const DepartmentPage = lazyPage(() => import('../modules/department/DepartmentPage'));
-const CountPage = lazyPage(() => import('../modules/counts/CountPage'));
 const IssuesPage = lazyPage(() => import('../modules/issues/IssuesPage'));
 const MovementsPage = lazyPage(() => import('../modules/movements/MovementsPage'));
 const TraceabilityPage = lazyPage(() => import('../modules/traceability/TraceabilityPage'));
@@ -353,14 +352,6 @@ export default function App() {
           element={
             <Guard permission="department.workspace">
               <DepartmentPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/counts"
-          element={
-            <Guard permission="counts.record">
-              <CountPage />
             </Guard>
           }
         />

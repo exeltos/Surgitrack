@@ -60,6 +60,8 @@ export type SystemSettings = {
   sterilizerNaming?: import('./sterilizerNaming').SterilizerNaming;
   /** Default sterile shelf life in months (2, 3 or 6), changeable per Set or instrument at packaging. */
   sterileShelfLifeMonths?: number;
+  /** Departments that count the instruments when sending to Sterilization (see core/surgicalCount). */
+  surgicalCountDepartments?: string[];
 };
 export type ConfigurationAuditEvent = {
   id: string;

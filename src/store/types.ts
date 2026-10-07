@@ -25,7 +25,18 @@ import type {
 
 export type SurgicalCount = {
   id: string;
+  /** The Set counted (or the standalone instrument, with assetKind TOOL). */
   setId: string;
+  assetKind?: 'SET' | 'TOOL';
+  /** Instruments ticked as present, and the barcodes of those missing. */
+  checkedToolIds?: string[];
+  missing?: string[];
+  /** Ticked one by one, or all at once ("All present"). */
+  mode?: 'ITEM' | 'BULK';
+  /** The sterile dates the Set carried when it was counted (they are cleared once it is sent). */
+  sterilizedOn?: string;
+  sterilizedTime?: string;
+  sterileUntil?: string;
   patientCode: string;
   expected: number;
   counted: number;

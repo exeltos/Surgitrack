@@ -1,3 +1,4 @@
+import {useSurgi} from '../../../store/SurgiStore';
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import StatusBadge from '../../../components/ui/StatusBadge';
@@ -21,6 +22,7 @@ import type {SterilizationPageState} from '../useSterilizationPage';
 import SterilizerLoads from './SterilizerLoads';
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
+  const {counts} = useSurgi();
   const {
     awaitingLoads,
     incoming,
@@ -308,6 +310,16 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   </div>
                   <div className="ster-status">
                     <small>{queueStageLabel}</small>
+                    {queue === 'INCOMING' &&
+                      (() => {
+                        // The operating theatre's count at sending: a shortage shows here before the receipt.
+                        const last = counts.find(c => c.setId === x.id);
+                        return last?.missing?.length ? (
+                          <span className="ster-count-shortage" title={tr('Λείπουν: {0}', last.missing.join(', '))}>
+                            {tr('Καταμέτρηση: λείπουν {0}', last.missing.length)}
+                          </span>
+                        ) : null;
+                      })()}
                   </div>
                   <div className="ster-row-action">
                     {queue === 'INCOMING' ? (
