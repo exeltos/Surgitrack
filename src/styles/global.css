@@ -8721,3 +8721,40 @@ html body .expiry-table th:nth-child(6) {
 html body .expiry-table th:nth-child(7) {
   width: 118px;
 }
+/* No network: a fixed notice at the bottom, visible wherever the page is scrolled, behind dialogs
+   (so it never covers their buttons); the page gets room below its last row while it shows. */
+html body .offline-strip {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: min(760px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid #f1a9a3;
+  border-radius: 12px;
+  background: #fef3f2;
+  color: #912018;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.18);
+}
+html body .main:has(.offline-strip) {
+  padding-bottom: 120px;
+}
+/* Toasts sit above the notice while it shows. */
+html body:has(.offline-strip) .toast {
+  bottom: 110px;
+}
+html body .offline-strip svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+@media (max-width: 650px) {
+  html body .sync-status.failed {
+    display: inline-block;
+  }
+}

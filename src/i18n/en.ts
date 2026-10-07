@@ -1797,4 +1797,9 @@ export const en: Record<string, string> = {
   'Ημερομηνία λήξης': 'Use-by date',
   'Αφορά το ίδιο το Σετ: κάλυψε την έλλειψη από τη λίστα εργαλείων (γραμμή «Λείπει» → Αντικατάσταση) ή κάνε «Αποδοχή καταγεγραμμένης έλλειψης» πάνω δεξιά.':
     'It concerns the Set itself: cover the shortage from the instrument list (the "Missing" line → Replace) or tick "Accept the recorded shortage" at the top right.',
+  'Χωρίς σύνδεση στο δίκτυο.': 'No network connection.',
+  'Ό,τι καταχωρίσετε κρατιέται σε αυτή τη σελίδα και αποθηκεύεται μόλις επανέλθει η σύνδεση· αλλαγές άλλων συσκευών δεν φαίνονται. Μην κλείσετε και μην ανανεώσετε τη σελίδα.':
+    'What you record is kept on this page and saved as soon as the connection is back; changes from other devices are not shown. Do not close or reload the page.',
+  'Οι τελευταίες αλλαγές δεν έχουν αποθηκευτεί ακόμη· θα αποθηκευτούν μόλις επανέλθει η σύνδεση. Μην κλείσετε και μην ανανεώσετε τη σελίδα.':
+    'Your latest changes are not saved yet; they will be saved as soon as the connection is back. Do not close or reload the page.',
 };

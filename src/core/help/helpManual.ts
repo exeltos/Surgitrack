@@ -48,11 +48,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Πολλές συσκευές',
-          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει ό,τι αποθήκευσαν οι άλλες κάθε λίγα δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο· ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα.',
+          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει ό,τι αποθήκευσαν οι άλλες κάθε λίγα δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο· ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα. Αν χαθεί το δίκτυο, εμφανίζεται κάτω στην οθόνη η ειδοποίηση «Χωρίς σύνδεση στο δίκτυο»: ό,τι καταχωρίσετε κρατιέται στη σελίδα και αποθηκεύεται μόλις επανέλθει η σύνδεση, αρκεί να μην κλείσετε ή ανανεώσετε τη σελίδα. Η πάνω μπάρα δείχνει «Αποθήκευση…» ή «Δεν αποθηκεύτηκε · νέα προσπάθεια» όσο υπάρχουν αλλαγές σε αναμονή.',
         ],
         en: [
           'Several devices',
-          'You can work from several computers and tablets at once. Each screen takes what the others saved every few seconds and as soon as you come back to the window; your own changes are saved first.',
+          'You can work from several computers and tablets at once. Each screen takes what the others saved every few seconds and as soon as you come back to the window; your own changes are saved first. If the network drops, a "No network connection" notice appears at the bottom of the screen: what you record is kept on the page and saved as soon as the connection is back, as long as you do not close or reload the page. The top bar shows "Saving…" or "Not saved · retrying" while changes are waiting.',
         ],
       },
       {
