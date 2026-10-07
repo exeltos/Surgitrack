@@ -47,6 +47,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Πολλές συσκευές',
+          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει ό,τι αποθήκευσαν οι άλλες κάθε λίγα δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο· ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα.',
+        ],
+        en: [
+          'Several devices',
+          'You can work from several computers and tablets at once. Each screen takes what the others saved every few seconds and as soon as you come back to the window; your own changes are saved first.',
+        ],
+      },
+      {
+        el: [
           'Πρώτη σύνδεση',
           'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234), τον ρόλο και το τμήμα σας. Πατήστε «Ορισμός κωδικού», ορίστε κωδικό τουλάχιστον 8 χαρακτήρων και συνδεθείτε με το όνομα χρήστη ή το email σας.',
         ],

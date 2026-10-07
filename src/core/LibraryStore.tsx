@@ -126,7 +126,21 @@ export function LibraryStoreProvider({
       return next;
     });
   const libraryRecord = useMemo(() => [{...state, id: 'state'}], [state]);
-  useAppRecordSync(cloud?.organizationId, 'library', libraryRecord);
+  // Settings another device saved (another admin, another screen) replace this screen's copy.
+  useAppRecordSync(cloud?.organizationId, 'library', libraryRecord, remote => {
+    const saved = remote.find(record => record.id === 'state') as (Partial<LibraryState> & {id: string}) | undefined;
+    if (!saved) return;
+    const {id: _id, ...fields} = saved;
+    void _id;
+    setState(s => ({
+      ...s,
+      ...fields,
+      systemSettings: {...s.systemSettings, ...(fields.systemSettings || {})},
+      sterilizationWorkflow: upgradeWorkflowLabels(fields.sterilizationWorkflow || s.sterilizationWorkflow),
+      // A real hospital's departments are managed in Studio; they always win over a stored copy.
+      departments: cloud?.departments ? s.departments : fields.departments || s.departments,
+    }));
+  });
   const actorName = (actor?: string) => actor?.trim() || 'Admin';
   const appendAudit = (s: LibraryState, event: Omit<ConfigurationAuditEvent, 'id' | 'at'>): LibraryState => ({
     ...s,

@@ -12,6 +12,8 @@ import type {
   RecallCase,
 } from '../../types/domain';
 import {useAppRecordSync} from '../../data/cloud/useAppRecordSync';
+import {mergeRemote} from '../../data/cloud/remoteChanges';
+import type {CloudRecord} from '../../data/cloud/appRecords';
 import type {SurgicalCount} from '../types';
 import type {useSurgiSession} from './useSurgiSession';
 
@@ -50,21 +52,31 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(initialData.purchaseOrders || []);
   const [recycleBin, setRecycleBin] = useState<BinEntry[]>(initialData.recycleBin || []);
   const cloudOrganizationId = cloud?.organizationId;
-  useAppRecordSync(cloudOrganizationId, 'sets', sets);
-  useAppRecordSync(cloudOrganizationId, 'tools', tools);
-  useAppRecordSync(cloudOrganizationId, 'movements', movements);
-  useAppRecordSync(cloudOrganizationId, 'issues', issues);
-  useAppRecordSync(cloudOrganizationId, 'counts', counts);
-  useAppRecordSync(cloudOrganizationId, 'receipts', receipts);
-  useAppRecordSync(cloudOrganizationId, 'preparations', preparations);
-  useAppRecordSync(cloudOrganizationId, 'sterilizationCycles', sterilizationCycles);
-  useAppRecordSync(cloudOrganizationId, 'processLoads', processLoads);
-  useAppRecordSync(cloudOrganizationId, 'recallCases', recallCases);
-  useAppRecordSync(cloudOrganizationId, 'sterilizationReleases', sterilizationReleases);
-  useAppRecordSync(cloudOrganizationId, 'workflowCheckpoints', workflowCheckpoints);
-  useAppRecordSync(cloudOrganizationId, 'deliveries', deliveries);
-  useAppRecordSync(cloudOrganizationId, 'purchaseOrders', purchaseOrders);
-  useAppRecordSync(cloudOrganizationId, 'recycleBin', recycleBin);
+  // What other devices saved goes into the same lists (see useAppRecordSync).
+  const merged =
+    <T extends {id: string}>(set: (update: (list: T[]) => T[]) => void) =>
+    (remote: CloudRecord[], removed: string[]) =>
+      set(list => mergeRemote(list, remote as unknown as T[], removed));
+  useAppRecordSync(cloudOrganizationId, 'sets', sets, merged(setSets));
+  useAppRecordSync(cloudOrganizationId, 'tools', tools, merged(setTools));
+  useAppRecordSync(cloudOrganizationId, 'movements', movements, merged(setMovements));
+  useAppRecordSync(cloudOrganizationId, 'issues', issues, merged(setIssues));
+  useAppRecordSync(cloudOrganizationId, 'counts', counts, merged(setCounts));
+  useAppRecordSync(cloudOrganizationId, 'receipts', receipts, merged(setReceipts));
+  useAppRecordSync(cloudOrganizationId, 'preparations', preparations, merged(setPreparations));
+  useAppRecordSync(cloudOrganizationId, 'sterilizationCycles', sterilizationCycles, merged(setSterilizationCycles));
+  useAppRecordSync(cloudOrganizationId, 'processLoads', processLoads, merged(setProcessLoads));
+  useAppRecordSync(cloudOrganizationId, 'recallCases', recallCases, merged(setRecallCases));
+  useAppRecordSync(
+    cloudOrganizationId,
+    'sterilizationReleases',
+    sterilizationReleases,
+    merged(setSterilizationReleases),
+  );
+  useAppRecordSync(cloudOrganizationId, 'workflowCheckpoints', workflowCheckpoints, merged(setWorkflowCheckpoints));
+  useAppRecordSync(cloudOrganizationId, 'deliveries', deliveries, merged(setDeliveries));
+  useAppRecordSync(cloudOrganizationId, 'purchaseOrders', purchaseOrders, merged(setPurchaseOrders));
+  useAppRecordSync(cloudOrganizationId, 'recycleBin', recycleBin, merged(setRecycleBin));
   return {
     cloudOrganizationId,
     counts,
