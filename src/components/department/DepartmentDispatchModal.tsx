@@ -1,5 +1,10 @@
 import {useState} from 'react';
-import {Gauge, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
+import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
+import {useLibraries} from '../../core/LibraryStore';
+import {countsAtDepartment} from '../../core/surgicalCount';
+import type {SurgicalCount} from '../../store/types';
+import CountModal from './CountModal';
+import {printCountForm} from './printCountForm';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import type {AssetKind} from '../../types/domain';
@@ -18,16 +23,34 @@ export default function DepartmentDispatchModal({
   name: string;
   onClose: () => void;
 }) {
-  const {currentUser, sendToSterilization, sets, tools} = useSurgi();
+  const {currentUser, sendToSterilization, sets, tools, preparations, sterilizationReleases, organizationName} =
+    useSurgi();
+  const {systemSettings} = useLibraries();
   const [patientCode, setPatientCode] = useState('');
   const [note, setNote] = useState('');
   const [livesConfirmed, setLivesConfirmed] = useState(false);
+  // Operating theatres sign the instrument count (its own window) before the Set can be sent.
+  const asset = kind === 'SET' ? sets.find(x => x.id === id) : tools.find(x => x.id === id);
+  const counting = countsAtDepartment(asset?.department, systemSettings.surgicalCountDepartments);
+  const [countOpen, setCountOpen] = useState(false);
+  const [count, setCount] = useState<SurgicalCount | null>(null);
+  const printSigned = () =>
+    asset &&
+    count &&
+    printCountForm({
+      asset,
+      items: kind === 'SET' ? tools.filter(t => t.setId === id && t.state !== 'RETIRED') : [asset],
+      hospital: organizationName,
+      preparation: preparations.find(r => r.assetId === id),
+      release: sterilizationReleases.find(r => r.assetId === id && r.decision === 'RELEASED'),
+      count,
+    });
   // Limited-use (multi-use with lives) instruments lose one life on every dispatch after a procedure.
   const limitedTools =
     kind === 'TOOL' ? tools.filter(t => t.id === id && t.maxUses) : tools.filter(t => t.setId === id && t.maxUses);
   const limitedSet = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
   const consumesLives = limitedTools.length > 0 || limitedSet;
-  const canSend = !consumesLives || (patientCode.trim().length > 0 && livesConfirmed);
+  const canSend = (!counting || !!count) && (!consumesLives || (patientCode.trim().length > 0 && livesConfirmed));
   const send = () => {
     if (!canSend) return;
     sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined);
@@ -76,6 +99,31 @@ export default function DepartmentDispatchModal({
               placeholder={tr('π.χ. PT-2026-00125')}
             />
           </label>
+          {counting && (
+            <div className={`department-count-step ${count ? 'signed' : ''}`}>
+              {count ? <CheckCircle2 size={20} /> : <ClipboardCheck size={20} />}
+              <div>
+                <strong>{tr('Καταμέτρηση εργαλείων')}</strong>
+                <small>
+                  {count
+                    ? tr('Υπογεγραμμένη · {0} από {1} · {2} {3}', count.counted, count.expected, count.by, count.at)
+                    : tr('Απαιτείται πριν την αποστολή · χειρουργείο')}
+                </small>
+                {count?.missing?.length ? (
+                  <small className="missing">{tr('Λείπουν: {0}', count.missing.join(', '))}</small>
+                ) : null}
+              </div>
+              {count ? (
+                <AppButton icon={<Printer size={15} />} onClick={printSigned}>
+                  {tr('Έντυπο')}
+                </AppButton>
+              ) : (
+                <AppButton variant="primary" icon={<ClipboardCheck size={15} />} onClick={() => setCountOpen(true)}>
+                  {tr('Καταμέτρηση')}
+                </AppButton>
+              )}
+            </div>
+          )}
           {consumesLives && (
             <div className="department-lives-card">
               <div className="department-lives-head">
@@ -135,6 +183,19 @@ export default function DepartmentDispatchModal({
           </AppButton>
         </footer>
       </div>
+      {countOpen && (
+        <CountModal
+          kind={kind}
+          id={id}
+          patientCode={patientCode}
+          onClose={() => setCountOpen(false)}
+          onSigned={signed => {
+            setCount(signed);
+            setPatientCode(signed.patientCode);
+            setCountOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

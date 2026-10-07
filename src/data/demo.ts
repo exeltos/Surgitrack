@@ -1,3 +1,4 @@
+import type {SurgicalCount} from '../store/types';
 import {isoDate} from '../core/sterileExpiry';
 import type {
   DeliveryRecord,
@@ -1316,3 +1317,28 @@ movements.sort((a, b) => newestFirst(b.at).localeCompare(newestFirst(a.at)));
 issues.sort((a, b) => newestFirst(b.created).localeCompare(newestFirst(a.created)));
 receipts.sort((a, b) => newestFirst(b.at).localeCompare(newestFirst(a.at)));
 deliveries.sort((a, b) => newestFirst(b.at).localeCompare(newestFirst(a.at)));
+
+/** A signed count from the Orthopaedic ward with one instrument missing: Sterilization sees it at Receipt. */
+export const counts: SurgicalCount[] = (() => {
+  const members = tools.filter(tool => tool.setId === 's8');
+  const lost = members[members.length - 1];
+  if (!lost) return [];
+  return [
+    {
+      id: 'c-demo-ortho-hip',
+      setId: 's8',
+      assetKind: 'SET',
+      patientCode: 'PT-2026-0188',
+      expected: members.length,
+      counted: members.length - 1,
+      result: 'MISSING',
+      note: `Λείπουν: ${lost.barcode} ${lost.name}`,
+      checkedToolIds: members.slice(0, -1).map(tool => tool.id),
+      missing: [lost.barcode],
+      mode: 'ITEM',
+      at: '29/09/2026 08:10',
+      by: people.ortho,
+      signed: true,
+    },
+  ];
+})();
