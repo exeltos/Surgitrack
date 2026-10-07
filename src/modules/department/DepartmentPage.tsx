@@ -1,4 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
+import ExpiryBadge from '../../components/ui/ExpiryBadge';
+import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {Link, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wrench} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -254,6 +256,21 @@ export default function DepartmentPage() {
                       <span className={`badge badge-${asset.state.toLowerCase()}`}>
                         {tr(departmentStateLabel[asset.state] || asset.state)}
                       </span>
+                      {asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state) && (
+                        <span
+                          className="department-expiry"
+                          title={tr('Αποστειρωμένο έως {0}', formatExpiry(asset.sterileUntil))}
+                        >
+                          {(() => {
+                            const status = expiryStatus(asset.sterileUntil, asset.shelfLifeMonths);
+                            return status.state === 'OK' ? (
+                              <small>{tr('Έως {0}', formatExpiry(asset.sterileUntil))}</small>
+                            ) : (
+                              <ExpiryBadge entry={status} />
+                            );
+                          })()}
+                        </span>
+                      )}
                     </div>
                     <div className="department-asset-uses">
                       <small>{tr('Χρήσεις')}</small>

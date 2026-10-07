@@ -4,6 +4,8 @@ import {
   AlertTriangle,
   Archive,
   Boxes,
+  CalendarClock,
+  Flame,
   FileSpreadsheet,
   FileText,
   History,
@@ -24,8 +26,26 @@ import {useProgressiveList} from '../../core/useProgressiveList';
 import {compositionHtml} from '../sterilization/printUtils';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {getI18nLang, tr, trData} from '../../i18n';
+import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 
-type ReportId = 'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'traceability';
+const LOAD_STATUS: Record<string, string> = {
+  OPEN: 'Στον κλίβανο',
+  AWAITING_RELEASE: 'Αναμονή αποδέσμευσης',
+  RELEASED: 'Αποδεσμεύτηκε',
+  REPROCESS: 'Μη αποδέσμευση',
+  FAILED: 'Αποτυχία κύκλου',
+  RECALLED: 'Ανάκληση',
+};
+const INDICATOR: Record<string, string> = {
+  PASS: 'Επιτυχής',
+  FAIL: 'Ανεπιτυχής',
+  NOT_RECORDED: 'Δεν έγινε',
+  PENDING: 'Σε αναμονή',
+};
+const indicatorText = (value?: string) => (value && INDICATOR[value] ? tr(INDICATOR[value]) : '—');
+
+type ReportId =
+  'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'loads' | 'expiry' | 'traceability';
 type Row = Record<string, string | number>;
 
 const stateLabel: Record<string, string> = {
@@ -55,6 +75,18 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
     title: 'Εργαλεία εκτός χρήσης',
     description: 'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. συμπλήρωση ορίου χρήσεων).',
     icon: Archive,
+  },
+  {
+    id: 'loads',
+    title: 'Φορτία κλιβάνου',
+    description: 'Φορτία, κύκλοι, δείκτες και αποδεσμεύσεις ανά κλίβανο.',
+    icon: Flame,
+  },
+  {
+    id: 'expiry',
+    title: 'Λήξεις αποστείρωσης',
+    description: 'Αποστειρωμένα Σετ και εργαλεία με διάρκεια και ημερομηνία λήξης.',
+    icon: CalendarClock,
   },
   {
     id: 'traceability',
@@ -99,7 +131,7 @@ function genericReportHtml(title: string, subtitle: string, columns: Array<{key:
 }
 
 export default function ReportsPage() {
-  const {sets, tools, retiredTools, issues, movements, currentUser} = useSurgi();
+  const {sets, tools, retiredTools, issues, movements, currentUser, processLoads, sterilizationReleases} = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   const compositionOptions = useCompositionOptions();
   // Sets in the composition picker, by name.
@@ -114,6 +146,16 @@ export default function ReportsPage() {
   const [issueType, setIssueType] = useState('ALL');
   const [usageFilter, setUsageFilter] = useState('ALL');
   const [patientCode, setPatientCode] = useState('');
+  const [loadStatus, setLoadStatus] = useState('ALL');
+  const [sterilizerName, setSterilizerName] = useState('ALL');
+  const [expiryState, setExpiryState] = useState('ALL');
+  const sterilizerNames = useMemo(
+    () =>
+      Array.from(new Set(processLoads.filter(l => l.kind === 'STERILIZATION').map(l => l.equipment))).sort((a, b) =>
+        a.localeCompare(b, 'el'),
+      ),
+    [processLoads],
+  );
   const [preview, setPreview] = useState<{title: string; html: string} | null>(null);
 
   const departments = useMemo(
@@ -309,6 +351,77 @@ export default function ReportsPage() {
         rows: rows as Row[],
       };
     }
+    if (active === 'loads') {
+      const rows = processLoads
+        .filter(load => load.kind === 'STERILIZATION')
+        .filter(load => loadStatus === 'ALL' || load.status === loadStatus)
+        .filter(load => sterilizerName === 'ALL' || load.equipment === sterilizerName)
+        .map(load => {
+          const release = sterilizationReleases.find(r => r.loadId === load.id);
+          return {
+            loaded: load.createdAt,
+            equipment: load.equipment,
+            cycle: load.cycleNumber,
+            program: load.program,
+            items: load.items.length,
+            chemical: indicatorText(load.chemicalIndicatorResult),
+            biological: indicatorText(load.biologicalIndicatorResult),
+            loadStatus: tr(LOAD_STATUS[load.status] || load.status),
+            released: load.releasedAt || '—',
+            releasedBy: release?.releasedByName || '—',
+            barcodes: load.items.map(item => item.barcode).join(', '),
+          };
+        });
+      return {
+        columns: [
+          {key: 'loaded', label: tr('Φόρτωση')},
+          {key: 'equipment', label: tr('Κλίβανος')},
+          {key: 'cycle', label: tr('Κύκλος')},
+          {key: 'program', label: tr('Πρόγραμμα')},
+          {key: 'items', label: tr('Αντικείμενα')},
+          {key: 'chemical', label: tr('Χημικός δείκτης')},
+          {key: 'biological', label: tr('Βιολογικός δείκτης')},
+          {key: 'loadStatus', label: tr('Κατάσταση')},
+          {key: 'released', label: tr('Αποδέσμευση')},
+          {key: 'releasedBy', label: tr('Αποδέσμευσε')},
+          {key: 'barcodes', label: 'Barcodes'},
+        ],
+        rows: rows as Row[],
+      };
+    }
+    if (active === 'expiry') {
+      const rows = sterileExpiryList(sets, tools)
+        .filter(e => department === 'ALL' || e.department === department)
+        .filter(e => expiryState === 'ALL' || e.state === expiryState)
+        .map(e => ({
+          kind: e.kind === 'SET' ? 'Σετ' : 'Εργαλείο',
+          barcode: e.barcode,
+          name: e.name,
+          department: e.department || '—',
+          stateLabel: stateLabel[e.assetState] || e.assetState,
+          shelfLife: e.shelfLifeMonths ? tr('{0} μήνες', e.shelfLifeMonths) : '—',
+          until: formatExpiry(e.sterileUntil),
+          left:
+            e.state === 'EXPIRED'
+              ? tr('Έληξε πριν {0} ημ.', -e.daysLeft)
+              : e.state === 'EXPIRING'
+                ? tr('Λήγει σε {0} ημ.', e.daysLeft)
+                : tr('{0} ημέρες', e.daysLeft),
+        }));
+      return {
+        columns: [
+          {key: 'kind', label: tr('Τύπος')},
+          {key: 'barcode', label: 'Barcode'},
+          {key: 'name', label: tr('Ονομασία')},
+          {key: 'department', label: tr('Τμήμα')},
+          {key: 'stateLabel', label: tr('Θέση')},
+          {key: 'shelfLife', label: tr('Διάρκεια')},
+          {key: 'until', label: tr('Λήγει')},
+          {key: 'left', label: tr('Υπόλοιπο')},
+        ],
+        rows: rows as Row[],
+      };
+    }
     const q = patientCode.trim().toLowerCase();
     const rows = movements
       .filter(m => m.patientCode && (!q || m.patientCode.toLowerCase().includes(q)))
@@ -341,6 +454,11 @@ export default function ReportsPage() {
     sets,
     tools,
     retiredTools,
+    processLoads,
+    sterilizationReleases,
+    loadStatus,
+    sterilizerName,
+    expiryState,
     issues,
     movements,
     department,
@@ -387,7 +505,7 @@ export default function ReportsPage() {
   });
   const byDepartment = active === 'department' || active === 'specialty';
   const reportFilters: SelectFilter[] = [
-    ...(byDepartment || active === 'issues' || active === 'usage'
+    ...(byDepartment || active === 'issues' || active === 'usage' || active === 'expiry'
       ? [
           {
             key: 'department',
@@ -451,6 +569,36 @@ export default function ReportsPage() {
           },
         ]
       : []),
+    ...(active === 'loads'
+      ? [
+          {
+            key: 'loadStatus',
+            placeholder: tr('Όλες οι καταστάσεις'),
+            options: Object.entries(LOAD_STATUS).map(([value, label]) => ({value, label: tr(label)})),
+            ...choice(loadStatus, setLoadStatus),
+          },
+          {
+            key: 'sterilizer',
+            placeholder: tr('Όλοι οι κλίβανοι'),
+            options: sterilizerNames.map(x => ({value: x, label: trData(x)})),
+            ...choice(sterilizerName, setSterilizerName),
+          },
+        ]
+      : []),
+    ...(active === 'expiry'
+      ? [
+          {
+            key: 'expiryState',
+            placeholder: tr('Όλες οι λήξεις'),
+            options: [
+              {value: 'EXPIRING', label: tr('Λήγουν σύντομα')},
+              {value: 'EXPIRED', label: tr('Έληξαν')},
+              {value: 'OK', label: tr('Σε ισχύ')},
+            ],
+            ...choice(expiryState, setExpiryState),
+          },
+        ]
+      : []),
     ...(active === 'usage'
       ? [
           {
@@ -467,9 +615,21 @@ export default function ReportsPage() {
   ];
   const shownRows = useProgressiveList(
     reportData.rows,
-    [active, setId, department, specialty, assetKind, status, issueStatus, issueType, usageFilter, patientCode].join(
-      '|',
-    ),
+    [
+      active,
+      setId,
+      department,
+      specialty,
+      assetKind,
+      status,
+      issueStatus,
+      issueType,
+      usageFilter,
+      patientCode,
+      loadStatus,
+      sterilizerName,
+      expiryState,
+    ].join('|'),
   );
   const exportExcel = () => {
     const title =

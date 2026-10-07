@@ -1,6 +1,7 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
+import {formatExpiry} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
 export const escapeHtml = (value: string) =>
@@ -169,7 +170,7 @@ export function openPrintWindow(title: string, html: string) {
 
 type PrintAsset = (
   Pick<SetAsset, 'barcode' | 'name' | 'department'> | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
-) & {code?: string};
+) & {code?: string; sterileUntil?: string};
 
 /** The label's paper size: the chosen size, or the printer roll's own when set (20–150 mm). */
 export const labelPaper = (settings: LabelSettings) => {
@@ -209,8 +210,10 @@ function barcodeLabelBody(
   settings: LabelSettings = DEFAULT_LABEL_SETTINGS,
   screenZoom = 1,
 ) {
-  const details =
-    kind === 'SET'
+  // Once released, the label carries the sterile expiry date instead of the count.
+  const details = asset.sterileUntil
+    ? tr('Λήξη {0}', formatExpiry(asset.sterileUntil))
+    : kind === 'SET'
       ? tr('{0} εργαλεία', toolCount ?? 0)
       : `${tr('Χρήσεις')}: ${'uses' in asset ? asset.uses : 0}${'maxUses' in asset && asset.maxUses ? ` / ${asset.maxUses}` : ''}`;
   const {w, h} = labelPaper(settings);
