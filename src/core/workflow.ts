@@ -100,11 +100,12 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
     {
       id: 'RELEASE',
       enabled: true,
-      locked: false,
+      // Every sterilizer load ends here: indicators and approval before anything goes back to a department.
+      locked: true,
       labelEl: 'Αποδέσμευση φορτίου',
       labelEn: 'Load Release',
-      descriptionEl: 'Ανεξάρτητο quality gate πριν τη διάθεση ως έτοιμο.',
-      descriptionEn: 'Independent quality gate before release as ready.',
+      descriptionEl: 'Υποχρεωτικός έλεγχος δεικτών και έγκριση πριν την παράδοση.',
+      descriptionEn: 'Required indicator check and approval before delivery.',
       checksEl: ['Παράμετροι κύκλου αποδεκτές', 'Χημικός δείκτης αποδεκτός', 'Συσκευασία στεγνή και ακέραιη'],
       checksEn: ['Cycle parameters acceptable', 'Chemical indicator acceptable', 'Packaging dry and intact'],
     },
@@ -139,12 +140,14 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
  */
 export const upgradeWorkflowLabels = (workflow: SterilizationWorkflowConfig): SterilizationWorkflowConfig => {
   const fresh = defaultSterilizationWorkflow.stages.find(stage => stage.id === 'STERILIZATION');
-  if (!fresh || !workflow.stages?.some(stage => stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση'))
-    return workflow;
+  const oldLabel = (stage: WorkflowStageConfig) => stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση';
+  // Load release is required: a saved workflow that left it off (or unlocked) gets it back on and locked.
+  const releaseOff = (stage: WorkflowStageConfig) => stage.id === 'RELEASE' && (!stage.enabled || !stage.locked);
+  if (!workflow.stages?.some(stage => (fresh && oldLabel(stage)) || releaseOff(stage))) return workflow;
   return {
     ...workflow,
     stages: workflow.stages.map(stage =>
-      stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση'
+      fresh && oldLabel(stage)
         ? {
             ...stage,
             labelEl: fresh.labelEl,
@@ -152,7 +155,9 @@ export const upgradeWorkflowLabels = (workflow: SterilizationWorkflowConfig): St
             descriptionEl: fresh.descriptionEl,
             descriptionEn: fresh.descriptionEn,
           }
-        : stage,
+        : releaseOff(stage)
+          ? {...stage, enabled: true, locked: true}
+          : stage,
     ),
   };
 };

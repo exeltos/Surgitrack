@@ -191,7 +191,10 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
         <SterilizerLoads
           loads={s.runningLoads}
           canFinish={s.can('sterilization.cycle')}
-          onFinish={(id, result, note) => s.finishProcessLoad(id, result, note)}
+          onFinish={(id, result, note) => {
+            // A finished cycle goes straight on to Release, where the load is shown ready to release.
+            if (s.finishProcessLoad(id, result, note) && result === 'PASSED') s.setQueue('RELEASE');
+          }}
           onPrint={s.printLoadForm}
         />
       ) : rows.length === 0 ? (
@@ -309,11 +312,15 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                           const load = awaitingLoads.find(l =>
                             l.items.some(i => `${i.assetKind}:${i.assetId}` === keyOf(x)),
                           );
-                          return (
-                            <span className="ster-row-note" title={load?.id}>
-                              {load ? `${load.equipment} · ${load.cycleNumber}` : ''}
-                            </span>
-                          );
+                          return load ? (
+                            <button
+                              className="primary compact"
+                              title={`${load.equipment} · ${load.cycleNumber}`}
+                              onClick={() => openLoadRelease(load.id)}
+                            >
+                              <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
+                            </button>
+                          ) : null;
                         })()
                       ) : (
                         <button className="primary compact" onClick={() => openRelease(x.kind, x)}>

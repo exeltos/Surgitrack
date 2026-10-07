@@ -202,17 +202,14 @@ export function useLoadActions(
             toolIds.includes(tool.id) ? {...tool, sterilizations: (tool.sterilizations || 0) + 1} : tool,
           ),
         );
-        updateState(ref.kind, ref.id, nextStateAfter('STERILIZATION'));
+        // A sterilizer load always goes on to load release (indicators and approval).
+        updateState(ref.kind, ref.id, 'AWAITING_RELEASE');
       } else updateState(ref.kind, ref.id, reprocessState());
       addMovement({
         asset: `${asset.barcode} · ${asset.name}`,
         assetKind: ref.kind,
         from: 'Στον κλίβανο',
-        to:
-          result === 'PASSED'
-            ? sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === nextStateAfter('STERILIZATION'))
-                ?.labelEl || 'Αποδέσμευση'
-            : 'Επανεπεξεργασία',
+        to: result === 'PASSED' ? 'Αποδέσμευση φορτίου' : 'Επανεπεξεργασία',
         status: `Φορτίο ${load.id} · ${load.equipment} · ${load.cycleNumber} · ${result === 'PASSED' ? 'επιτυχές' : 'ΑΠΟΤΥΧΙΑ'}`,
         by: currentUser.name,
       });

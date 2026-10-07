@@ -17,7 +17,10 @@ import {
   UserPlus,
   Undo2,
   CalendarClock,
+  Trash,
+  Trash2,
 } from 'lucide-react';
+import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, formatExpiry, sterileExpiryList, type ExpiryEntry} from '../../core/sterileExpiry';
 import {navSectionFor, navigationFor} from '../../config/navigation';
 import {useSurgi} from '../../store/SurgiStore';
@@ -81,6 +84,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     sets,
     tools,
     retiredTools,
+    recycleBin,
     acknowledgeOutOfUse,
     currentUser,
     toast,
@@ -140,6 +144,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     window.location.hash = '#/studio';
     window.location.reload();
   };
+  const binItem = navigation.find(item => item.to === '/bin');
+  const binLabel = lang === 'en' ? 'Recycle bin' : 'Κάδος';
+  const binCount = recycleBin.filter(entry => !isExpired(entry)).length;
   const departmentAssets = [
     ...sets.filter(s => s.department === currentUser.department),
     ...tools.filter(t => t.department === currentUser.department && t.mode === 'STANDALONE'),
@@ -219,29 +226,48 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         </div>
       )}
       <nav>
-        {navigation.map(item => {
-          const [path, query = ''] = item.to.split('?');
-          const active =
-            (location.pathname === path &&
-              ((item.exactSearch ?? query) === ''
-                ? location.search === ''
-                : location.search.slice(1) === (item.exactSearch ?? query))) ||
-            (query === '' && navSectionFor(location.pathname, toolModeOf) === path);
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end
-              onClick={() => setMobileOpen(false)}
-              className={active ? 'nav-item active' : 'nav-item'}
-            >
-              <item.icon size={18} />
-              <span>{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
-              {item.to === '/hospital' && accessRequests > 0 && <em className="nav-badge">{accessRequests}</em>}
-            </NavLink>
-          );
-        })}
+        {navigation
+          .filter(item => item.to !== '/bin')
+          .map(item => {
+            const [path, query = ''] = item.to.split('?');
+            const active =
+              (location.pathname === path &&
+                ((item.exactSearch ?? query) === ''
+                  ? location.search === ''
+                  : location.search.slice(1) === (item.exactSearch ?? query))) ||
+              (query === '' && navSectionFor(location.pathname, toolModeOf) === path);
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end
+                onClick={() => setMobileOpen(false)}
+                className={active ? 'nav-item active' : 'nav-item'}
+              >
+                <item.icon size={18} />
+                <span>{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
+                {item.to === '/hospital' && accessRequests > 0 && <em className="nav-badge">{accessRequests}</em>}
+              </NavLink>
+            );
+          })}
       </nav>
+      {binItem && (
+        // The recycle bin sits at the bottom left, like a desktop bin: full when something was deleted.
+        <NavLink
+          to="/bin"
+          end
+          onClick={() => setMobileOpen(false)}
+          className={location.pathname === '/bin' ? 'sidebar-bin active' : 'sidebar-bin'}
+          aria-label={`${binLabel}${binCount ? ` · ${binCount}` : ''}`}
+          title={binLabel}
+        >
+          <span className="sidebar-bin-icon">
+            {binCount ? <Trash2 size={24} /> : <Trash size={24} />}
+            {binCount > 0 && <em>{binCount}</em>}
+          </span>
+          <span>{binLabel}</span>
+        </NavLink>
+      )}
       <div className="sidebar-foot">
         <span>Healthcare Suite ready</span>
         <small>
