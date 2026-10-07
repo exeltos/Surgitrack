@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {Cable, Copy, KeyRound, Upload, X} from 'lucide-react';
+import {useLibraries} from '../../core/LibraryStore';
 import AppButton from '../../components/ui/AppButton';
 import {readSheetFile} from '../../core/sheetImport';
 import {
@@ -64,6 +65,9 @@ export function DeviceEditor({
   onClose: () => void;
 }) {
   const set = <K extends keyof DeviceInput>(key: K, v: DeviceInput[K]) => onChange({...value, [key]: v});
+  // A sterilizer device takes a name from the hospital's sterilizer list, so its cycles match the load.
+  const {sterilizers} = useLibraries();
+  const sterilizer = value.kind === 'STERILIZER';
   return (
     <Modal
       title={isNew ? L('Νέα συσκευή', 'New device') : L('Επεξεργασία συσκευής', 'Edit device')}
@@ -83,14 +87,27 @@ export function DeviceEditor({
           <input
             autoFocus
             value={value.name}
+            list={sterilizer ? 'device-sterilizer-names' : undefined}
             onChange={e => set('name', e.target.value)}
             placeholder={L('π.χ. Κλίβανος 1', 'e.g. Sterilizer 1')}
           />
+          {sterilizer && (
+            <datalist id="device-sterilizer-names">
+              {sterilizers.map(item => (
+                <option key={item.id} value={item.el} />
+              ))}
+            </datalist>
+          )}
           <small>
-            {L(
-              'Το ίδιο όνομα εμφανίζεται στην επιλογή κλιβάνου κατά την καταγραφή κύκλου.',
-              'The same name appears in the sterilizer choice when a cycle is recorded.',
-            )}
+            {sterilizer && sterilizers.length && !sterilizers.some(item => item.el === value.name.trim())
+              ? L(
+                  'Διάλεξε όνομα από τους Κλιβάνους του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση κλιβάνου.',
+                  'Pick a name from the Studio sterilizers, so the device cycles match the sterilizer load.',
+                )
+              : L(
+                  'Το ίδιο όνομα εμφανίζεται στην επιλογή κλιβάνου κατά την καταγραφή κύκλου.',
+                  'The same name appears in the sterilizer choice when a cycle is recorded.',
+                )}
           </small>
         </label>
         <label>

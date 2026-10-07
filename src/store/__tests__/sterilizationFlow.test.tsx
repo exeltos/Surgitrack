@@ -553,4 +553,49 @@ describe('sterilization flow', () => {
     expect(f.state()).not.toBe('AWAITING_RELEASE');
     expect(f.state()).not.toBe('IN_STERILIZATION');
   });
+
+  it('records a pending biological indicator later: a pass keeps the release', () => {
+    const f = setup();
+    const load = f.toAwaitingRelease();
+    f.release(load.id, {biologicalIndicatorResult: 'PENDING'});
+    expect(f.s().processLoads.find(l => l.id === load.id)).toMatchObject({
+      status: 'RELEASED',
+      biologicalIndicatorResult: 'PENDING',
+    });
+    act(() => f.s().recordBiologicalResult(load.id, 'PASS'));
+    expect(f.s().processLoads.find(l => l.id === load.id)).toMatchObject({
+      status: 'RELEASED',
+      biologicalIndicatorResult: 'PASS',
+    });
+    expect(f.state()).toBe('READY_FOR_PICKUP');
+  });
+
+  it('recalls the whole load when the pending biological indicator fails', () => {
+    const f = setup();
+    const load = f.toAwaitingRelease();
+    f.release(load.id, {biologicalIndicatorResult: 'PENDING'});
+    f.deliver();
+    expect(f.state()).toBe('IN_DEPARTMENT');
+    act(() => f.s().recordBiologicalResult(load.id, 'FAIL'));
+    expect(f.s().processLoads.find(l => l.id === load.id)).toMatchObject({
+      status: 'RECALLED',
+      biologicalIndicatorResult: 'FAIL',
+    });
+    expect(f.s().recallCases.some(c => c.loadId === load.id && c.status === 'OPEN')).toBe(true);
+    expect(f.state()).toBe('PENDING_STERILIZATION');
+    expect(f.instrument().sterileUntil).toBeUndefined();
+  });
+
+  it('leaves an item already back in a new cycle where it is when its old load is recalled', () => {
+    const f = setup();
+    const load = f.toAwaitingRelease();
+    f.release(load.id);
+    f.deliver();
+    f.send();
+    f.receive();
+    expect(f.state()).toBe('IN_WASHING');
+    act(() => f.s().recallProcessLoad(load.id, 'Έλεγχος'));
+    expect(f.s().processLoads.find(l => l.id === load.id)?.status).toBe('RECALLED');
+    expect(f.state()).toBe('IN_WASHING');
+  });
 });

@@ -125,6 +125,21 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                         {tr('Υπάρχουν') + ' '}
                         {prepBlockingIssues.length} {tr('εκκρεμότητες που απαιτούν ενέργεια πριν την προώθηση.')}
                       </span>
+                      {(() => {
+                        // Straight to the instrument with the problem: replace it, send it to service or stock.
+                        const tool = prepTools.find(t => prepBlockingIssues.some(i => i.asset.startsWith(t.barcode)));
+                        return tool ? (
+                          <button type="button" className="prep-block-open" onClick={() => openPrepManage(tool.id)}>
+                            {tr('Διαχείριση')} · {tool.barcode}
+                          </button>
+                        ) : (
+                          <small className="prep-block-hint">
+                            {tr(
+                              'Αφορά το ίδιο το Σετ: κάλυψε την έλλειψη από τη λίστα εργαλείων (γραμμή «Λείπει» → Αντικατάσταση) ή κάνε «Αποδοχή καταγεγραμμένης έλλειψης» πάνω δεξιά.',
+                            )}
+                          </small>
+                        );
+                      })()}
                     </div>
                   )}
                   {prepAcceptedDeviation && prepBlockingIssues.length === 0 && (
@@ -276,7 +291,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                               prepTools.length,
                               prepExpectedCount,
                               prepMissingCount,
-                              prepMissingCount === 1 ? 'έλλειψη' : 'ελλείψεις',
+                              prepMissingCount === 1 ? tr('έλλειψη') : tr('ελλείψεις'),
                             )
                           : tr('Σύνθεση πλήρης · {0}/{1}', prepTools.length, prepExpectedCount)}
                       </strong>
@@ -286,6 +301,22 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                           : tr('Όλες οι αναμενόμενες θέσεις της σύνθεσης είναι καλυμμένες.')}
                       </span>
                     </div>
+                    {prepMissingCount > 0 && prepMissingRequirements.length === 0 && (
+                      <label className="prep-accept-missing" title={tr('Η απόκλιση καταγράφεται στο ιστορικό.')}>
+                        <input
+                          type="checkbox"
+                          checked={allowMissing}
+                          onChange={e => setAllowMissing(e.target.checked)}
+                        />
+                        <span>
+                          <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
+                          <small>
+                            {tr('Το Set θα προχωρήσει με') + ' '}
+                            {prepMissingCount} {tr('λιγότερα εργαλεία.')}
+                          </small>
+                        </span>
+                      </label>
+                    )}
                   </div>
                 )}
                 <div className="prep-tools-head prep-tools-toolbar prep-tools-toolbar-refined">
@@ -475,18 +506,6 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
               </section>
             </div>
             <div className="modal-actions prep-actions">
-              {prepDraft.kind === 'SET' && prepMissingCount > 0 && prepMissingRequirements.length === 0 && (
-                <label className="prep-accept-missing" title={tr('Η απόκλιση καταγράφεται στο ιστορικό.')}>
-                  <input type="checkbox" checked={allowMissing} onChange={e => setAllowMissing(e.target.checked)} />
-                  <span>
-                    <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
-                    <small>
-                      {tr('Το Set θα προχωρήσει με') + ' '}
-                      {prepMissingCount} {tr('λιγότερα εργαλεία.')}
-                    </small>
-                  </span>
-                </label>
-              )}
               <button onClick={() => setPrepDraft(null)}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"

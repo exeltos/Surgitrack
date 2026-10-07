@@ -3,7 +3,7 @@ import type {AssetKind, AssetState, Movement} from '../../types/domain';
 import {findAsset, formatStoreDateTime, uniqueStamp} from '../helpers';
 import type {Toast} from '../types';
 import {tr} from '../../i18n';
-import {DEFAULT_SHELF_LIFE, STERILE_STATES, isShelfLife, sterileUntil} from '../../core/sterileExpiry';
+import {DEFAULT_SHELF_LIFE, STERILE_STATES, isShelfLife, isoDate, sterileUntil} from '../../core/sterileExpiry';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
 
@@ -60,11 +60,11 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
     kind: AssetKind,
     id: string,
     state: AssetState,
-    sterile?: {sterileUntil: string; shelfLifeMonths: number},
+    sterile?: {sterileUntil: string; shelfLifeMonths: number; sterilizedOn?: string},
   ) => {
     const expiry = (STERILE_STATES as readonly AssetState[]).includes(state)
       ? sterile || {}
-      : {sterileUntil: undefined};
+      : {sterileUntil: undefined, sterilizedOn: undefined};
     if (kind === 'SET') {
       setSets(x => x.map(a => (a.id === id ? {...a, state, ...expiry} : a)));
       setTools(x => x.map(t => (t.setId === id ? {...t, state} : t)));
@@ -88,7 +88,11 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
     const chosen = assetName(kind, id)?.shelfLifeMonths;
     const fallback = p.systemSettings.sterileShelfLifeMonths;
     const shelfLifeMonths = isShelfLife(chosen) ? chosen : isShelfLife(fallback) ? fallback : DEFAULT_SHELF_LIFE;
-    return {shelfLifeMonths, sterileUntil: sterileUntil(releasedOn, shelfLifeMonths)};
+    return {
+      shelfLifeMonths,
+      sterileUntil: sterileUntil(releasedOn, shelfLifeMonths),
+      sterilizedOn: isoDate(releasedOn),
+    };
   };
   return {
     addMovement,

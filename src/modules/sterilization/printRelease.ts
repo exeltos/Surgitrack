@@ -1,7 +1,7 @@
 import type {ProcessLoadRecord} from '../../types/domain';
 import {tr, trData} from '../../i18n';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
-import {formatExpiry} from '../../core/sterileExpiry';
+import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
 import {code128Svg, escapeHtml, openPrintWindow} from './printUtils';
 
 /** One item of the load as the form lists it; `sterileUntil` once released. */
@@ -12,6 +12,7 @@ export type ReleaseFormItem = {
   department?: string;
   shelfLifeMonths?: number;
   sterileUntil?: string;
+  sterilizedOn?: string;
 };
 
 export type ReleaseFormData = {
@@ -22,6 +23,8 @@ export type ReleaseFormData = {
   approver: {name: string; department?: string};
   /** The release, when it happened. */
   released?: {at: string; decision: 'RELEASED' | 'REPROCESS'};
+  /** What is ticked in the release dialog right now (printed before the release is completed). */
+  draft?: {chemical?: string; biological?: string; physicalOk?: boolean; packagingOk?: boolean; at?: string};
   label?: Partial<LabelSettings>;
 };
 
@@ -33,7 +36,15 @@ const choice = (label: string, checked: boolean) => `<span class="choice">${box(
  * to stick each strip, the checks, the items with their expiry, and the approval with the user's details.
  * Printed blank while the load is in the sterilizer; filled in once it is released.
  */
-export function releaseFormBody({load, items, hospital, approver, released, label: labelSettings}: ReleaseFormData) {
+export function releaseFormBody({
+  load,
+  items,
+  hospital,
+  approver,
+  released,
+  draft,
+  label: labelSettings,
+}: ReleaseFormData) {
   const sets = items.filter(item => item.kind === 'SET').length;
   const tools = items.length - sets;
   const loadType = [
@@ -49,8 +60,10 @@ export function releaseFormBody({load, items, hospital, approver, released, labe
   const chemicalUsed = load.chemicalIndicatorResult !== undefined;
   const biologicalUsed =
     load.biologicalIndicatorResult !== undefined && load.biologicalIndicatorResult !== 'NOT_REQUIRED';
-  const chem = released ? load.chemicalIndicatorResult : undefined;
-  const bio = released ? load.biologicalIndicatorResult : undefined;
+  const chem = released ? load.chemicalIndicatorResult : draft?.chemical;
+  const bio = released ? load.biologicalIndicatorResult : draft?.biological;
+  const physicalOk = released ? !!load.physicalParametersOk : !!draft?.physicalOk;
+  const packagingOk = released ? !!load.packagingIntegrityOk : !!draft?.packagingOk;
   const label = {...DEFAULT_LABEL_SETTINGS, ...(labelSettings || {})};
   const header =
     label.header === 'LOGO' && label.logo && /^data:image\/(png|jpeg|webp);/.test(label.logo)
@@ -80,7 +93,7 @@ export function releaseFormBody({load, items, hospital, approver, released, labe
   const rows = items
     .map(
       (item, index) =>
-        `<tr><td class="num">${index + 1}</td><td class="mono">${escapeHtml(item.barcode)}</td><td class="name">${escapeHtml(item.name)}</td><td>${escapeHtml(item.kind === 'SET' ? tr('Σετ') : tr('Εργαλείο'))}</td><td>${escapeHtml(trData(item.department) || '—')}</td><td>${escapeHtml(item.sterileUntil ? formatExpiry(item.sterileUntil) : item.shelfLifeMonths ? tr('{0} μήνες', item.shelfLifeMonths) : '')}</td><td class="chk">${box(false)}</td></tr>`,
+        `<tr><td class="num">${index + 1}</td><td class="mono">${escapeHtml(item.barcode)}</td><td class="name">${escapeHtml(item.name)}</td><td>${escapeHtml(item.kind === 'SET' ? tr('Σετ') : tr('Εργαλείο'))}</td><td>${escapeHtml(trData(item.department) || '—')}</td><td class="dates">${item.sterileUntil ? sterileDatesHtml(item.sterilizedOn, item.sterileUntil) : escapeHtml(item.shelfLifeMonths ? tr('{0} μήνες', item.shelfLifeMonths) : '')}</td><td class="chk">${box(false)}</td></tr>`,
     )
     .join('');
   const decided = released?.decision;
@@ -105,7 +118,7 @@ export function releaseFormBody({load, items, hospital, approver, released, labe
   table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}
   th{font-size:7pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:1.8mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
   td{padding:1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nth-child(even) td{background:#f8fafb}
-  .num{width:6%;color:#6a7a84;text-align:right}th:nth-child(2),td.mono{width:15%}td.mono{font-family:monospace;font-weight:700}td.name{font-weight:700}th:nth-child(4),td:nth-child(4){width:11%}th:nth-child(5),td:nth-child(5){width:18%}th:nth-child(6),td:nth-child(6){width:14%}.chk{width:8%;text-align:center}
+  .num{width:6%;color:#6a7a84;text-align:right}th:nth-child(2),td.mono{width:15%}td.mono{font-family:monospace;font-weight:700}td.name{font-weight:700}th:nth-child(4),td:nth-child(4){width:11%}th:nth-child(5),td:nth-child(5){width:15%}th:nth-child(6),td:nth-child(6){width:24%}td.dates .sym-date{display:inline-flex;align-items:center;gap:1mm;margin-right:2mm;white-space:nowrap}.chk{width:8%;text-align:center}
   .approve{display:grid;grid-template-columns:1.1fr 1fr;gap:5mm;margin-top:4mm;break-inside:avoid}
   .decision{border:.3mm solid #b9c8cf;border-radius:2mm;padding:3mm;display:grid;gap:2.5mm}
   .sign{border:.3mm solid #b9c8cf;border-radius:2mm;padding:3mm;display:grid;gap:1.2mm;font-size:8.5pt}.sign b{font-size:7pt;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68}.sign .line{margin-top:9mm;border-top:.3mm solid #8a9aa3;padding-top:1mm;font-size:7pt;color:#6a7a84}
@@ -123,12 +136,12 @@ export function releaseFormBody({load, items, hospital, approver, released, labe
     choice(tr('Σε αναμονή'), bio === 'PENDING'),
   )}</div>
   <h2>${escapeHtml(tr('Έλεγχοι φορτίου'))}</h2>
-  <div class="checks">${choice(tr('Φυσικές παράμετροι κύκλου αποδεκτές'), !!released && !!load.physicalParametersOk)}${choice(tr('Συσκευασίες στεγνές και ακέραιες'), !!released && !!load.packagingIntegrityOk)}</div>
+  <div class="checks">${choice(tr('Φυσικές παράμετροι κύκλου αποδεκτές'), physicalOk)}${choice(tr('Συσκευασίες στεγνές και ακέραιες'), packagingOk)}</div>
   <h2>${escapeHtml(tr('Περιεχόμενο φορτίου'))} · ${items.length}</h2>
-  <table><thead><tr><th class="num">#</th><th>Barcode</th><th>${escapeHtml(tr('Ονομασία'))}</th><th>${escapeHtml(tr('Τύπος'))}</th><th>${escapeHtml(tr('Τμήμα'))}</th><th>${escapeHtml(tr('Λήξη'))}</th><th class="chk">${escapeHtml(tr('Έλεγχος'))}</th></tr></thead><tbody>${rows}</tbody></table>
+  <table><thead><tr><th class="num">#</th><th>Barcode</th><th>${escapeHtml(tr('Ονομασία'))}</th><th>${escapeHtml(tr('Τύπος'))}</th><th>${escapeHtml(tr('Τμήμα'))}</th><th>${sterileSymbolSvg()} / ${expirySymbolSvg()}</th><th class="chk">${escapeHtml(tr('Έλεγχος'))}</th></tr></thead><tbody>${rows}</tbody></table>
   <div class="approve">
     <div class="decision"><b>${escapeHtml(tr('Απόφαση'))}</b>${choice(tr('Αποδεσμεύεται'), decided === 'RELEASED')}${choice(tr('Μη αποδέσμευση · επανεπεξεργασία όλου του φορτίου'), decided === 'REPROCESS')}${load.note ? `<small>${escapeHtml(load.note)}</small>` : ''}</div>
-    <div class="sign"><b>${escapeHtml(tr('Έγκριση'))}</b><span>${escapeHtml(trData(approver.name))}</span><span>${escapeHtml(trData(approver.department || ''))}</span><span>${escapeHtml(released ? released.at : tr('Ημερομηνία / ώρα: ………………'))}</span><div class="line">${escapeHtml(tr('Υπογραφή'))}</div></div>
+    <div class="sign"><b>${escapeHtml(tr('Έγκριση'))}</b><span>${escapeHtml(trData(approver.name))}</span><span>${escapeHtml(trData(approver.department || ''))}</span><span>${escapeHtml(released ? released.at : draft?.at || tr('Ημερομηνία / ώρα: ………………'))}</span><div class="line">${escapeHtml(tr('Υπογραφή'))}</div></div>
   </div>
   <div class="footer"><span>SurgiTrack · ${escapeHtml(load.id)}</span><span>${escapeHtml(tr('Εκτυπώθηκε {0}', new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})))}</span></div>
   </div>`;

@@ -1,6 +1,7 @@
 import type {Permission} from '../core/permissions';
 import type {
   AssetKind,
+  AssetState,
   BinEntry,
   AssetPhoto,
   DeliveryRecord,
@@ -275,6 +276,10 @@ export type SurgiStoreValue = {
   /** End of cycle for a load in the sterilizer: on to release, or the whole load back to reprocessing. */
   finishProcessLoad: (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => ProcessLoadRecord | undefined;
   recallProcessLoad: (loadId: string, reason: string) => void;
+  /** The biological indicator of a load released while pending: a failure recalls the whole load. */
+  recordBiologicalResult: (loadId: string, result: 'PASS' | 'FAIL') => void;
+  /** Moves what is in a stage being turned off on to the next stage the hospital runs; returns how many. */
+  advanceStageItems: (fromState: AssetState, toState: AssetState, stageLabel: string) => number;
   releaseSterilization: (
     kind: AssetKind,
     id: string,

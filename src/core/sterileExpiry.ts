@@ -57,6 +57,7 @@ export type ExpiryEntry = {
   /** Where the Set or instrument is (asset state); `state` is the expiry state. */
   assetState: string;
   sterileUntil: string;
+  sterilizedOn?: string;
   shelfLifeMonths?: number;
 } & ExpiryStatus;
 
@@ -67,6 +68,7 @@ type ExpiryAsset = {
   department?: string;
   state: string;
   sterileUntil?: string;
+  sterilizedOn?: string;
   shelfLifeMonths?: number;
 };
 
@@ -89,6 +91,7 @@ export function sterileExpiryList(
     department: asset.department,
     assetState: asset.state,
     sterileUntil: asset.sterileUntil as string,
+    sterilizedOn: asset.sterilizedOn,
     shelfLifeMonths: asset.shelfLifeMonths,
     ...expiryStatus(asset.sterileUntil as string, asset.shelfLifeMonths, today),
   });

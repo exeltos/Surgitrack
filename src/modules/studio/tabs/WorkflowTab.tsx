@@ -1,9 +1,41 @@
 import {RefreshCcw, ShieldCheck, CheckCircle2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import type {StudioPageState} from '../useStudioPage';
+import {useSurgi} from '../../../store/SurgiStore';
+import {workflowStageState, type WorkflowStageConfig} from '../../../core/workflow';
+import type {AssetState} from '../../../types/domain';
 
 export default function WorkflowTab({s}: {s: StudioPageState}) {
   const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
+  const {sets, tools, advanceStageItems} = useSurgi();
+  /**
+   * Turning a stage off: what is in it moves on to the next stage the hospital runs (after a confirmation),
+   * so its tab empties; turning one on just takes effect for what comes next.
+   */
+  const toggleStage = (stage: WorkflowStageConfig, enabled: boolean) => {
+    const fromState = workflowStageState[stage.id] as AssetState;
+    const count = enabled
+      ? 0
+      : sets.filter(a => a.state === fromState).length +
+        tools.filter(t => t.mode === 'STANDALONE' && t.state === fromState).length;
+    const stages = libs.sterilizationWorkflow.stages;
+    const next = stages.slice(stages.findIndex(x => x.id === stage.id) + 1).find(x => x.enabled);
+    if (!count || !next) {
+      libs.setWorkflowStageEnabled(stage.id, enabled, currentUser.name);
+      return;
+    }
+    s.setConfirm({
+      title: L('Απενεργοποίηση σταδίου;', 'Turn the stage off?'),
+      message: L(
+        `Στο στάδιο «${stage.labelEl}» υπάρχουν ${count} αντικείμενα. Θα προχωρήσουν στο «${next.labelEl}» και η καρτέλα θα φύγει. Η μετακίνηση καταγράφεται στο ιστορικό.`,
+        `${count} items are at “${stage.labelEn}”. They move on to “${next.labelEn}” and the tab goes away. The move is recorded in the history.`,
+      ),
+      action: () => {
+        libs.setWorkflowStageEnabled(stage.id, false, currentUser.name);
+        advanceStageItems(fromState, workflowStageState[next.id] as AssetState, stage.labelEl);
+      },
+    });
+  };
   return (
     <>
       {tab === 'WORKFLOW' && (
@@ -250,7 +282,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                       type="checkbox"
                       checked={stage.enabled}
                       disabled={stage.locked}
-                      onChange={e => libs.setWorkflowStageEnabled(stage.id, e.target.checked, currentUser.name)}
+                      onChange={e => toggleStage(stage, e.target.checked)}
                     />
                     <span></span>
                     <b>{stage.enabled ? L('Ενεργό', 'Active') : L('Παράκαμψη', 'Skipped')}</b>

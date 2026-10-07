@@ -1,6 +1,7 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
+import {sterileDatesHtml} from '../../core/sterileSymbols';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 
 export const escapeHtml = (value: string) =>
@@ -169,7 +170,7 @@ export function openPrintWindow(title: string, html: string) {
 
 type PrintAsset = (
   Pick<SetAsset, 'barcode' | 'name' | 'department'> | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
-) & {code?: string};
+) & {code?: string; sterileUntil?: string; sterilizedOn?: string};
 
 /** The label's paper size: the chosen size, or the printer roll's own when set (20–150 mm). */
 export const labelPaper = (settings: LabelSettings) => {
@@ -196,7 +197,9 @@ const labelHeaderHtml = (settings: LabelSettings) => {
 
 /** One label cell: name + header on top, barcode, code and (optionally) the details line. */
 const labelCell = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
-  `<section class="label ${className}">${settings.showCode && asset.code && className !== 'mini' ? `<div class="cod">cod. ${escapeHtml(asset.code)}</div>` : ''}<div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${escapeHtml(details)}</span>` : ''}</div></section>`;
+  labelCellHtml(asset, escapeHtml(details), settings, className);
+const labelCellHtml = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
+  `<section class="label ${className}">${settings.showCode && asset.code && className !== 'mini' ? `<div class="cod">cod. ${escapeHtml(asset.code)}</div>` : ''}<div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot${details.includes('sym-date') ? ' dated' : ''}"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${details}</span>` : ''}</div></section>`;
 
 /**
  * The barcode label's print CSS and body (the part after <title>). `screenZoom` enlarges it on
@@ -209,6 +212,8 @@ function barcodeLabelBody(
   settings: LabelSettings = DEFAULT_LABEL_SETTINGS,
   screenZoom = 1,
 ) {
+  // Once released, the label carries the sterilization and expiry dates with their symbols instead of the count.
+  const datesHtml = asset.sterileUntil ? sterileDatesHtml(asset.sterilizedOn, asset.sterileUntil, '0.95em', true) : '';
   const details =
     kind === 'SET'
       ? tr('{0} εργαλεία', toolCount ?? 0)
@@ -221,10 +226,12 @@ function barcodeLabelBody(
   // Type scales with the label height so every size keeps the same proportions.
   const k = settings.size === 'SHEET' ? Math.min(1.25, Math.max(0.8, miniH / 25)) : h / 25;
   const right = Math.min(15, Math.max(0, settings.reserveRight || 0));
+  const cell = (className: string) =>
+    datesHtml ? labelCellHtml(asset, datesHtml, settings, className) : labelCell(asset, details, settings, className);
   const cells =
     settings.size === 'SHEET'
-      ? `<div class="sheet-grid">${labelCell(asset, details, settings, 'main')}<div class="pair">${labelCell(asset, details, settings, 'mini')}${labelCell(asset, details, settings, 'mini')}</div></div>`
-      : labelCell(asset, details, settings, 'single');
+      ? `<div class="sheet-grid">${cell('main')}<div class="pair">${cell('mini')}${cell('mini')}</div></div>`
+      : cell('single');
   const pt = (value: number) => `${(value * k).toFixed(2)}pt`;
   return `<style>
   @page{size:${w}mm ${h}mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111}body{width:${w}mm;height:${h}mm;overflow:hidden}
@@ -236,7 +243,7 @@ function barcodeLabelBody(
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
   .head,.foot,.cod{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:flex;justify-content:space-between;align-items:baseline;gap:1.5mm}
-  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#444;white-space:nowrap}
+  .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{flex-wrap:wrap;row-gap:.2mm}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;gap:1.5mm}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
   .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
   .sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}

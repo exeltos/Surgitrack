@@ -17,13 +17,13 @@ export function useSterilizationState() {
     organizationName,
     receiveAtSterilization,
     recordPreparation,
-    completeSterilizationCycle,
     releaseSterilization,
     completeWorkflowCheckpoint,
     completeDeliveryToDepartment,
     createProcessLoad,
     releaseProcessLoad,
     finishProcessLoad,
+    recordBiologicalResult,
     recallProcessLoad,
     processLoads,
     recallCases,
@@ -127,12 +127,6 @@ export function useSterilizationState() {
     packaging: false,
     labelIndicator: false,
   });
-  const [cycleDraft, setCycleDraft] = useState<AssetDraft | null>(null);
-  const [sterilizer, setSterilizer] = useState(defaultSterilizer);
-  const [cycleNumber, setCycleNumber] = useState('');
-  const [cycleProgram, setCycleProgram] = useState('134°C · 5 min');
-  const [indicatorResult, setIndicatorResult] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('PASS');
-  const [cycleNote, setCycleNote] = useState('');
   const [releaseDraft, setReleaseDraft] = useState<AssetDraft | null>(null);
   const [releaseChecks, setReleaseChecks] = useState({
     physicalParametersOk: false,
@@ -189,6 +183,7 @@ export function useSterilizationState() {
   const [releaseLoadBi, setReleaseLoadBi] = useState<'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL'>('NOT_REQUIRED');
   const [releaseLoadNote, setReleaseLoadNote] = useState('');
   return {
+    recordBiologicalResult,
     sterilizationReleases,
     organizationName,
     finishProcessLoad,
@@ -207,15 +202,10 @@ export function useSterilizationState() {
     defaultShelfLife,
     colorQuestion,
     completeDeliveryToDepartment,
-    completeSterilizationCycle,
     completeWorkflowCheckpoint,
     compositionOptions,
     createProcessLoad,
     currentUser,
-    cycleDraft,
-    cycleNote,
-    cycleNumber,
-    cycleProgram,
     deliverer,
     deliveryBatchNote,
     deliveryBatchOpen,
@@ -226,7 +216,6 @@ export function useSterilizationState() {
     deliverySelected,
     departmentFilter,
     departmentMismatchReason,
-    indicatorResult,
     issueCameraOpen,
     issueNote,
     issuePhotos,
@@ -312,10 +301,6 @@ export function useSterilizationState() {
     setCheckpointDraft,
     setCheckpointNote,
     setShelfLife,
-    setCycleDraft,
-    setCycleNote,
-    setCycleNumber,
-    setCycleProgram,
     setDeliverer,
     setDeliveryBatchNote,
     setDeliveryBatchOpen,
@@ -326,7 +311,6 @@ export function useSterilizationState() {
     setDeliverySelected,
     setDepartmentFilter,
     setDepartmentMismatchReason,
-    setIndicatorResult,
     setIssueCameraOpen,
     setIssueNote,
     setIssuePhotos,
@@ -388,7 +372,6 @@ export function useSterilizationState() {
     setReleaseLoadNote,
     setReleaseNote,
     setSpecialtyFilter,
-    setSterilizer,
     setVisibleDeviation,
     sets,
     specialtyFilter,
@@ -397,7 +380,6 @@ export function useSterilizationState() {
     sterilizationWorkflow,
     sterilizerNames,
     defaultSterilizer,
-    sterilizer,
     systemSettings,
     tools,
     visibleDeviation,
