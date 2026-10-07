@@ -4,7 +4,7 @@ import type {Kind, SterilizationRow, AssetDraft} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
 
 export function useSterilizationQueues(p: ReturnType<typeof useSterilizationState>) {
-  const {departmentFilter, kindFilter, query, queue, sets, specialtyFilter, tools} = p;
+  const {departmentFilter, kindFilter, processLoads, query, queue, sets, specialtyFilter, tools} = p;
 
   const all = useMemo<SterilizationRow[]>(
     () => [
@@ -17,7 +17,12 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
   const washing = all.filter(x => x.state === 'IN_WASHING');
   const preparation = all.filter(x => x.state === 'IN_PREPARATION');
   const packaging = all.filter(x => x.state === 'IN_PACKAGING');
-  const processing = all.filter(x => x.state === 'IN_STERILIZATION');
+  // Loads in the sterilizer (cycle not ended yet): their items are locked until the end of the cycle.
+  const runningLoads = processLoads.filter(load => load.kind === 'STERILIZATION' && load.status === 'OPEN');
+  const inSterilizerKeys = new Set(runningLoads.flatMap(load => load.items.map(i => `${i.assetKind}:${i.assetId}`)));
+  const loaded = (x: SterilizationRow) => inSterilizerKeys.has(`${x.kind}:${x.id}`);
+  const processing = all.filter(x => x.state === 'IN_STERILIZATION' && !loaded(x));
+  const inSterilizer = all.filter(x => x.state === 'IN_STERILIZATION' && loaded(x));
   const awaitingRelease = all.filter(x => x.state === 'AWAITING_RELEASE');
   const storage = all.filter(x => x.state === 'IN_STORAGE');
   const ready = all.filter(x => x.state === 'READY_FOR_PICKUP');
@@ -32,11 +37,13 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
             ? packaging
             : queue === 'PROCESS'
               ? processing
-              : queue === 'RELEASE'
-                ? awaitingRelease
-                : queue === 'STORAGE'
-                  ? storage
-                  : ready;
+              : queue === 'IN_STERILIZER'
+                ? inSterilizer
+                : queue === 'RELEASE'
+                  ? awaitingRelease
+                  : queue === 'STORAGE'
+                    ? storage
+                    : ready;
   const queueValues = (key: 'department' | 'specialty'): string[] =>
     [...new Set<string>(source.map(x => String(x[key] || '')).filter(Boolean))].sort();
   const rows = source.filter(
@@ -67,11 +74,13 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
             ? tr('Συσκευασία & Σήμανση')
             : queue === 'PROCESS'
               ? tr('Φόρτωση κλιβάνου')
-              : queue === 'RELEASE'
-                ? tr('Έλεγχος & Αποδέσμευση')
-                : queue === 'STORAGE'
-                  ? tr('Αποθήκευση')
-                  : tr('Έτοιμα για παραλαβή');
+              : queue === 'IN_STERILIZER'
+                ? tr('Στον κλίβανο')
+                : queue === 'RELEASE'
+                  ? tr('Έλεγχος & Αποδέσμευση')
+                  : queue === 'STORAGE'
+                    ? tr('Αποθήκευση')
+                    : tr('Έτοιμα για παραλαβή');
   const queueStageLabel =
     queue === 'INCOMING'
       ? tr('Αναμένει φυσική παράδοση')
@@ -83,12 +92,16 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
             ? tr('Προς συσκευασία / σήμανση')
             : queue === 'PROCESS'
               ? tr('Προς φόρτωση στον κλίβανο')
-              : queue === 'RELEASE'
-                ? tr('Αναμένει αποδέσμευση')
-                : queue === 'STORAGE'
-                  ? tr('Σε αποθήκευση')
-                  : tr('Έτοιμο για το τμήμα');
+              : queue === 'IN_STERILIZER'
+                ? tr('Κύκλος σε εξέλιξη')
+                : queue === 'RELEASE'
+                  ? tr('Αναμένει αποδέσμευση')
+                  : queue === 'STORAGE'
+                    ? tr('Σε αποθήκευση')
+                    : tr('Έτοιμο για το τμήμα');
   return {
+    inSterilizer,
+    runningLoads,
     all,
     awaitingRelease,
     incoming,

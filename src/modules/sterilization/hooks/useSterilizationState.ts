@@ -21,6 +21,7 @@ export function useSterilizationState() {
     completeDeliveryToDepartment,
     createProcessLoad,
     releaseProcessLoad,
+    finishProcessLoad,
     recallProcessLoad,
     processLoads,
     recallCases,
@@ -45,7 +46,17 @@ export function useSterilizationState() {
   const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
-  const QUEUES: Queue[] = ['INCOMING', 'WASHING', 'PREP', 'PACKAGING', 'PROCESS', 'RELEASE', 'STORAGE', 'READY'];
+  const QUEUES: Queue[] = [
+    'INCOMING',
+    'WASHING',
+    'PREP',
+    'PACKAGING',
+    'PROCESS',
+    'IN_STERILIZER',
+    'RELEASE',
+    'STORAGE',
+    'READY',
+  ];
   const [searchParams] = useSearchParams();
   // A link can open a given stage, e.g. /sterilization?queue=READY from the overview.
   const requestedQueue = searchParams.get('queue') as Queue | null;
@@ -160,6 +171,8 @@ export function useSterilizationState() {
   const [loadChemical, setLoadChemical] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('NOT_RECORDED');
   const [loadChemicalOn, setLoadChemicalOn] = useState(true);
   const [loadBiologicalOn, setLoadBiologicalOn] = useState(false);
+  /** The cycle was taken from a connected device, so it has already ended. */
+  const [loadFromDevice, setLoadFromDevice] = useState(false);
   const [loadNote, setLoadNote] = useState('');
   const [loadScanFeedback, setLoadScanFeedback] = useState<{type: 'OK' | 'WARN' | 'ERROR'; message: string} | null>(
     null,
@@ -174,6 +187,8 @@ export function useSterilizationState() {
   const [releaseLoadBi, setReleaseLoadBi] = useState<'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL'>('NOT_REQUIRED');
   const [releaseLoadNote, setReleaseLoadNote] = useState('');
   return {
+    finishProcessLoad,
+    can,
     acceptedMissingCodes,
     allowMissing,
     applyColorPlan,
@@ -219,6 +234,8 @@ export function useSterilizationState() {
     loadChemical,
     loadChemicalOn,
     loadBiologicalOn,
+    loadFromDevice,
+    setLoadFromDevice,
     loadCycleNumber,
     loadEquipment,
     loadModal,

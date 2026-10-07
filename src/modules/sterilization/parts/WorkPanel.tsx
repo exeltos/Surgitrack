@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import SterilizerLoads from './SterilizerLoads';
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const {
@@ -111,6 +112,11 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
               </button>
             </>
           )}
+          {queue === 'IN_STERILIZER' && (
+            <span className="ster-hint">
+              {tr('Τα αντικείμενα είναι κλειδωμένα μέχρι το τέλος του κύκλου· μετά περνούν στην Αποδέσμευση.')}
+            </span>
+          )}
           {queue === 'STORAGE' && (
             <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
           )}
@@ -175,7 +181,13 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
         </details>
       )}
-      {rows.length === 0 ? (
+      {queue === 'IN_STERILIZER' ? (
+        <SterilizerLoads
+          loads={s.runningLoads}
+          canFinish={s.can('sterilization.cycle')}
+          onFinish={(id, result, note) => s.finishProcessLoad(id, result, note)}
+        />
+      ) : rows.length === 0 ? (
         <div className="empty ster-empty">
           <PackageCheck size={32} />
           <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>

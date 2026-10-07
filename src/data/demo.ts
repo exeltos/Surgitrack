@@ -1108,6 +1108,21 @@ const loadItem = (set: SetAsset) => ({
 });
 export const processLoads: ProcessLoadRecord[] = [
   {
+    // In the sterilizer right now: locked until "End of cycle".
+    id: 'L-DEMO-0932',
+    workflowVersion: 1,
+    kind: 'STERILIZATION',
+    equipment: 'Κλίβανος Ατμού 01',
+    cycleNumber: '2026-0932',
+    program: '134°C · 5′',
+    status: 'OPEN',
+    items: [loadItem(setByCode('GYN-HYST')), loadItem(setByCode('GEN-LAPAROT'))],
+    chemicalIndicatorResult: 'NOT_RECORDED',
+    createdByUserId: 'demo-sterilization',
+    createdByName: people.ster,
+    createdAt: '29/09/2026 07:10',
+  },
+  {
     id: 'L-DEMO-0931',
     workflowVersion: 1,
     kind: 'STERILIZATION',
