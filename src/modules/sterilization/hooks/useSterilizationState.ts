@@ -37,7 +37,10 @@ export function useSterilizationState() {
   const colorQuestion = useSetColorQuestion();
   // Set changes (cover a shortage, replace, service, stock, another Set) are the supervisor's.
   const canCompose = can('asset.composition.manage');
-  const {sterilizationWorkflow, systemSettings} = useLibraries();
+  const {sterilizationWorkflow, systemSettings, sterilizers: sterilizerLibrary} = useLibraries();
+  /** The hospital's sterilizers by name (Studio › Libraries › Sterilizers). */
+  const sterilizerNames = sterilizerLibrary.map(item => item.el);
+  const defaultSterilizer = sterilizerNames[0] || 'Κλίβανος 1';
   const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
@@ -111,7 +114,7 @@ export function useSterilizationState() {
     labelIndicator: false,
   });
   const [cycleDraft, setCycleDraft] = useState<AssetDraft | null>(null);
-  const [sterilizer, setSterilizer] = useState('Κλίβανος 1');
+  const [sterilizer, setSterilizer] = useState(defaultSterilizer);
   const [cycleNumber, setCycleNumber] = useState('');
   const [cycleProgram, setCycleProgram] = useState('134°C · 5 min');
   const [indicatorResult, setIndicatorResult] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('PASS');
@@ -362,6 +365,8 @@ export function useSterilizationState() {
     stageEnabled,
     sterilizationCycles,
     sterilizationWorkflow,
+    sterilizerNames,
+    defaultSterilizer,
     sterilizer,
     systemSettings,
     tools,

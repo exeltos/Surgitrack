@@ -1099,7 +1099,9 @@ export const processLoads: ProcessLoadRecord[] = [
     program: '134°C · 5′',
     status: 'AWAITING_RELEASE',
     items: [loadItem(setByCode('CSECTION-02')), loadItem(setByCode('NEURO-02'))],
-    chemicalIndicatorResult: 'PASS',
+    // Chemical and biological indicators in the load; their results are recorded at release.
+    chemicalIndicatorResult: 'NOT_RECORDED',
+    biologicalIndicatorResult: 'PENDING',
     createdByUserId: 'demo-sterilization',
     createdByName: people.ster,
     createdAt: '29/09/2026 05:55',

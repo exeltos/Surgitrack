@@ -1677,4 +1677,11 @@ export const en: Record<string, string> = {
   'Δείκτες στο φορτίο': 'Indicators in the load',
   Χημικός: 'Chemical',
   Βιολογικός: 'Biological',
+  'Προσθήκη κλιβάνων': 'Add sterilizers',
+  Αρίθμηση: 'Numbering',
+  'Πλήθος κλιβάνων': 'Number of sterilizers',
+  'Θα προστεθούν': 'To be added',
+  'Ονόματα που υπάρχουν ήδη παραλείπονται· η μονάδα κρατά την επιλογή για τις επόμενες φορές.':
+    'Names already in the list are skipped; the unit keeps this choice for next time.',
+  'Προσθήκη · {0}': 'Add · {0}',
 };

@@ -19,6 +19,8 @@ export type {AdminUser, LibraryKey, LibraryState, Organization} from './libraryT
 type LibraryStore = LibraryState & {
   dataMode: SurgiDataMode;
   addItem: (key: LibraryKey, item: Omit<LibraryItem, 'id'>) => void;
+  /** Adds several records at once (one audit entry each). */
+  addItems: (key: LibraryKey, items: Array<Omit<LibraryItem, 'id'>>) => void;
   updateItem: (key: LibraryKey, id: string, item: Partial<LibraryItem>) => void;
   removeItem: (key: LibraryKey, id: string) => void;
   /** Puts back a library record from the recycle bin (nothing happens if its id is taken). */
@@ -175,6 +177,22 @@ export function LibraryStoreProvider({
       return appendAudit(
         {...s, [key]: [...s[key], created]},
         {entityType: 'LIBRARY', entityId: `${key}:${created.id}`, action: 'CREATE', by: 'Admin', after: created},
+      );
+    });
+  const addItems = (key: LibraryKey, items: Array<Omit<LibraryItem, 'id'>>) =>
+    commit(s => {
+      const stamp = Date.now();
+      const created = items.map((item, index) => ({...item, id: `${key}-${stamp}-${index}`}));
+      return created.reduce(
+        (next, item) =>
+          appendAudit(next, {
+            entityType: 'LIBRARY',
+            entityId: `${key}:${item.id}`,
+            action: 'CREATE',
+            by: 'Admin',
+            after: item,
+          }),
+        {...s, [key]: [...s[key], ...created]},
       );
     });
   const updateItem = (key: LibraryKey, id: string, item: Partial<LibraryItem>) =>
@@ -407,6 +425,7 @@ export function LibraryStoreProvider({
       ...state,
       dataMode,
       addItem,
+      addItems,
       addColorTape,
       updateColorTape,
       removeColorTape,

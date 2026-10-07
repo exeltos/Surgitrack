@@ -90,10 +90,14 @@ export default function CycleModal({s}: {s: SterilizationPageState}) {
                 <label>
                   {tr('Κλίβανος')}
                   <select value={sterilizer} onChange={e => setSterilizer(e.target.value)}>
-                    <option>{tr('Κλίβανος 1')}</option>
-                    <option>{tr('Κλίβανος 2')}</option>
-                    <option>{tr('Κλίβανος 3')}</option>
-                    {!['Κλίβανος 1', 'Κλίβανος 2', 'Κλίβανος 3'].includes(sterilizer) && <option>{sterilizer}</option>}
+                    {s.sterilizerNames.map(name => (
+                      <option key={name} value={name}>
+                        {trData(name)}
+                      </option>
+                    ))}
+                    {!s.sterilizerNames.includes(sterilizer) && (
+                      <option value={sterilizer}>{trData(sterilizer)}</option>
+                    )}
                   </select>
                 </label>
                 <label>

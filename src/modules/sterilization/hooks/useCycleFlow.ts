@@ -134,7 +134,7 @@ export function useCycleFlow(
     const draft = resolveAssetDraft(kind, asset.id);
     if (!draft) return;
     setCycleDraft(draft);
-    setSterilizer('Κλίβανος 1');
+    setSterilizer(p.defaultSterilizer);
     setCycleNumber('');
     setCycleProgram('134°C · 5 min');
     setIndicatorResult('PASS');

@@ -73,17 +73,19 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               <div className="cycle-clean-fields">
                 <label>
                   {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}
-                  <input
-                    value={loadEquipment}
-                    list={loadModal === 'STERILIZATION' ? 'sterilizer-names' : undefined}
-                    onChange={e => setLoadEquipment(e.target.value)}
-                  />
-                  {loadModal === 'STERILIZATION' && (
-                    <datalist id="sterilizer-names">
+                  {loadModal === 'STERILIZATION' && sterilizers.length ? (
+                    <select value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)}>
                       {sterilizers.map(item => (
-                        <option key={item.id} value={item.el} />
+                        <option key={item.id} value={item.el}>
+                          {trData(item.el)}
+                        </option>
                       ))}
-                    </datalist>
+                      {!sterilizers.some(item => item.el === loadEquipment) && (
+                        <option value={loadEquipment}>{trData(loadEquipment)}</option>
+                      )}
+                    </select>
+                  ) : (
+                    <input value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)} />
                   )}
                 </label>
                 <label>

@@ -1,6 +1,10 @@
-import {Plus, Search, Trash2, Pencil, Palette} from 'lucide-react';
+import {useState} from 'react';
+import {Plus, Search, Trash2, Pencil, Palette, ListPlus} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import ColorTapeLibrary from '../ColorTapeLibrary';
+import SterilizerBatchDialog from '../SterilizerBatchDialog';
+import {defaultSterilizerNaming} from '../../../core/sterilizerNaming';
+import {translateToEnglish} from '../../../core/glossary';
 import type {StudioPageState} from '../useStudioPage';
 
 export default function LibrariesTab({s}: {s: StudioPageState}) {
@@ -23,6 +27,8 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
     tab,
     tapesOpen,
   } = s;
+  const [batchOpen, setBatchOpen] = useState(false);
+  const naming = libs.systemSettings.sterilizerNaming || defaultSterilizerNaming;
   return (
     <>
       {tab === 'LIBRARIES' && (
@@ -76,10 +82,18 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                   <h2>{L(currentMeta.el, currentMeta.en)}</h2>
                   <p>{L(currentMeta.hintEl, currentMeta.hintEn)}</p>
                 </div>
-                <AppButton variant="primary" onClick={() => setNewItem(true)}>
-                  <Plus size={16} />
-                  {L('Νέα εγγραφή', 'New record')}
-                </AppButton>
+                <div className="studio-panel-actions">
+                  {libraryKey === 'sterilizers' && (
+                    <AppButton onClick={() => setBatchOpen(true)}>
+                      <ListPlus size={16} />
+                      {L('Προσθήκη κλιβάνων', 'Add sterilizers')}
+                    </AppButton>
+                  )}
+                  <AppButton variant="primary" onClick={() => setNewItem(true)}>
+                    <Plus size={16} />
+                    {L('Νέα εγγραφή', 'New record')}
+                  </AppButton>
+                </div>
               </header>
               {cloudError && <div className="auth-message">{cloudError}</div>}
               <div className="studio-search">
@@ -132,6 +146,22 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
             </section>
           )}
         </div>
+      )}
+      {batchOpen && (
+        <SterilizerBatchDialog
+          naming={naming}
+          existing={libs.sterilizers.map(item => item.el)}
+          onClose={() => setBatchOpen(false)}
+          onSave={(next, names) => {
+            const english = translateToEnglish(next.base) || next.base;
+            libs.updateSystemSettings({sterilizerNaming: next}, undefined, 'Ονομασία κλιβάνων');
+            libs.addItems(
+              'sterilizers',
+              names.map(item => ({el: item.name, en: `${english} ${item.mark}`, code: `ST-${item.mark}`})),
+            );
+            setBatchOpen(false);
+          }}
+        />
       )}
     </>
   );
