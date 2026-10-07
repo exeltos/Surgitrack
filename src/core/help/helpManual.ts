@@ -484,11 +484,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Στον κλίβανο',
-          'Η καρτέλα «Στον κλίβανο» δείχνει τα φορτία που κλιβανίζονται τώρα: κλίβανο, κύκλο, πρόγραμμα, ποιος φόρτωσε και πότε, και τα αντικείμενα. Είναι κλειδωμένα· κανείς δεν μπορεί να τα αλλάξει. Όταν τελειώσει ο κύκλος πατήστε «Τέλος κύκλου» και το φορτίο περνά στην Αποδέσμευση· με «Αποτυχία κύκλου» όλο το φορτίο επιστρέφει σε επανεπεξεργασία.',
+          'Η καρτέλα «Στον κλίβανο» δείχνει τα φορτία που κλιβανίζονται τώρα: κλίβανο, κύκλο, πρόγραμμα, ποιος φόρτωσε και πότε, και τα αντικείμενα. Είναι κλειδωμένα· κανείς δεν μπορεί να τα αλλάξει. Όταν τελειώσει ο κύκλος πατήστε «Τέλος κύκλου»: το φορτίο περνά στην Αποδέσμευση και η οθόνη πηγαίνει εκεί (η Αποδέσμευση είναι πάντα υποχρεωτική)· με «Αποτυχία κύκλου» όλο το φορτίο επιστρέφει σε επανεπεξεργασία.',
         ],
         en: [
           'In the sterilizer',
-          'The "In the sterilizer" tab shows the loads being sterilized now: sterilizer, cycle, program, who loaded it and when, and the items. They are locked; nobody can change them. When the cycle ends press "End of cycle" and the load moves to Release; "Cycle failed" sends the whole load back to reprocessing.',
+          'The "In the sterilizer" tab shows the loads being sterilized now: sterilizer, cycle, program, who loaded it and when, and the items. They are locked; nobody can change them. When the cycle ends press "End of cycle": the load moves to Release and the screen goes there (Release is always required); "Cycle failed" sends the whole load back to reprocessing.',
         ],
       },
       {
@@ -600,6 +600,43 @@ export const helpManual: ManualSection[] = [
       en: 'The hospital’s default shelf life is set in Studio → Settings.',
     },
     related: ['/sterilization', '/sets', '/studio'],
+  },
+  {
+    to: '/bin',
+    permission: 'asset.delete',
+    title: {el: 'Κάδος', en: 'Recycle bin'},
+    summary: {
+      el: 'Ό,τι διαγράφεται μένει 30 ημέρες στον Κάδο και μπορεί να επανέλθει όπως ήταν.',
+      en: 'Whatever is deleted stays 30 days in the bin and can be put back as it was.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Πού βρίσκεται',
+          'Ο Κάδος είναι κάτω αριστερά στο μενού, όπως στον υπολογιστή. Όταν έχει κάτι μέσα δείχνει πόσα είναι.',
+        ],
+        en: [
+          'Where it is',
+          'The bin sits at the bottom left of the menu, like on a computer. When something is in it, it shows how many.',
+        ],
+      },
+      {
+        el: [
+          'Επαναφορά',
+          'Σετ, εργαλεία, εγγραφές βιβλιοθηκών, χρωματικές ταινίες και συσκευές επανέρχονται όπως ήταν· μετά από 30 ημέρες σβήνονται οριστικά. Τις βιβλιοθήκες τις επαναφέρει μόνο ο Διαχειριστής.',
+        ],
+        en: [
+          'Restore',
+          'Sets, instruments, library records, color tapes and devices come back as they were; after 30 days they are deleted for good. Only the Administrator restores library records.',
+        ],
+      },
+    ],
+    steps: {
+      el: ['Πατήστε τον Κάδο κάτω αριστερά.', 'Βρείτε την εγγραφή και πατήστε «Επαναφορά».'],
+      en: ['Press the bin at the bottom left.', 'Find the record and press "Restore".'],
+    },
+    related: ['/sets', '/tools', '/studio'],
   },
   {
     to: '/devices',

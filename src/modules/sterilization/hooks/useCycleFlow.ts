@@ -81,7 +81,7 @@ export function useCycleFlow(
 
   const selectedReleaseLoad = releaseLoadId ? processLoads.find(load => load.id === releaseLoadId) : undefined;
   const releasePolicy = sterilizationWorkflow.releasePolicy || {
-    requireChemicalIndicator: true,
+    requireChemicalIndicator: false,
     biologicalIndicator: 'OPTIONAL' as const,
     allowReleaseWhileBiPending: false,
   };

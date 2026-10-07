@@ -339,7 +339,7 @@ export function useReceiptAndCycleActions(
     const cycle = sterilizationCycles.find(c => c.id === payload.cycleRecordId && c.assetId === id);
     if (!cycle) return;
     const policy = sterilizationWorkflow.releasePolicy || {
-      requireChemicalIndicator: true,
+      requireChemicalIndicator: false,
       biologicalIndicator: 'OPTIONAL' as const,
       allowReleaseWhileBiPending: false,
     };

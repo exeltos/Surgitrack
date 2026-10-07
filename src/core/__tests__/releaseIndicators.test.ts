@@ -30,3 +30,20 @@ describe('releaseIndicatorVerdict', () => {
     expect(releaseIndicatorVerdict({...bio, allowReleaseWhileBiPending: true}, 'PASS', 'PENDING')).toEqual({ok: true});
   });
 });
+
+describe('load release is a required stage', () => {
+  it('turns a saved workflow that left release off back on and locked', async () => {
+    const {defaultSterilizationWorkflow, nextStateAfter, upgradeWorkflowLabels} = await import('../workflow');
+    const saved = {
+      ...defaultSterilizationWorkflow,
+      stages: defaultSterilizationWorkflow.stages.map(stage =>
+        stage.id === 'RELEASE' ? {...stage, enabled: false, locked: false} : stage,
+      ),
+    };
+    expect(nextStateAfter(saved.stages, 'STERILIZATION')).toBe('READY_FOR_PICKUP');
+    const upgraded = upgradeWorkflowLabels(saved);
+    expect(upgraded.stages.find(stage => stage.id === 'RELEASE')).toMatchObject({enabled: true, locked: true});
+    expect(nextStateAfter(upgraded.stages, 'STERILIZATION')).toBe('AWAITING_RELEASE');
+    expect(upgradeWorkflowLabels(defaultSterilizationWorkflow)).toBe(defaultSterilizationWorkflow);
+  });
+});

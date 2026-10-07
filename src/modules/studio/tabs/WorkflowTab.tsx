@@ -45,7 +45,13 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                 </span>
               </div>
             </section>
-            <section className="studio-release-policy">
+            <section
+              className="studio-release-policy"
+              title={L(
+                'Αρκεί ένας επιτυχής δείκτης (χημικός ή βιολογικός)· ανεπιτυχής δείκτης στέλνει όλο το φορτίο σε επανεπεξεργασία.',
+                'One passed indicator (chemical or biological) is enough; a failed one sends the whole load back.',
+              )}
+            >
               <header>
                 <ShieldCheck size={18} />
                 <div>
@@ -120,8 +126,8 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                   <strong>{L('Πολιτική αποδέσμευσης φορτίου', 'Load release policy')}</strong>
                   <span>
                     {L(
-                      'Κεντρικοί κανόνες CI/BI που εφαρμόζονται σε κάθε φορτίο του νοσοκομείου.',
-                      'Central CI/BI rules applied to every load in this facility.',
+                      'Αρκεί ένας επιτυχής δείκτης (χημικός ή βιολογικός)· ανεπιτυχής δείκτης στέλνει όλο το φορτίο σε επανεπεξεργασία. Εδώ ορίζετε αν απαιτείται συγκεκριμένος.',
+                      'One passed indicator (chemical or biological) is enough; a failed one sends the whole load back. Here you set whether a specific one is required.',
                     )}
                   </span>
                 </div>
@@ -130,12 +136,12 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                 <label>
                   <input
                     type="checkbox"
-                    checked={libs.sterilizationWorkflow.releasePolicy?.requireChemicalIndicator ?? true}
+                    checked={libs.sterilizationWorkflow.releasePolicy?.requireChemicalIndicator ?? false}
                     onChange={e =>
                       libs.updateSterilizationWorkflow({
                         releasePolicy: {
                           ...(libs.sterilizationWorkflow.releasePolicy || {
-                            requireChemicalIndicator: true,
+                            requireChemicalIndicator: false,
                             biologicalIndicator: 'OPTIONAL',
                             allowReleaseWhileBiPending: false,
                           }),
@@ -148,8 +154,8 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                     <b>{L('Υποχρεωτικός χημικός δείκτης', 'Chemical indicator required')}</b>
                     <small>
                       {L(
-                        'Η αποδέσμευση μπλοκάρει αν ο CI δεν είναι αποδεκτός.',
-                        'Release is blocked unless CI is acceptable.',
+                        'Χωρίς αυτό αρκεί και μόνο ο βιολογικός. Με αυτό, η αποδέσμευση θέλει πάντα επιτυχή χημικό.',
+                        'Without it the biological alone is enough. With it, release always needs a passed chemical one.',
                       )}
                     </small>
                   </span>
@@ -170,7 +176,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                       libs.updateSterilizationWorkflow({
                         releasePolicy: {
                           ...(libs.sterilizationWorkflow.releasePolicy || {
-                            requireChemicalIndicator: true,
+                            requireChemicalIndicator: false,
                             biologicalIndicator: 'OPTIONAL',
                             allowReleaseWhileBiPending: false,
                           }),
@@ -197,7 +203,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                       libs.updateSterilizationWorkflow({
                         releasePolicy: {
                           ...(libs.sterilizationWorkflow.releasePolicy || {
-                            requireChemicalIndicator: true,
+                            requireChemicalIndicator: false,
                             biologicalIndicator: 'OPTIONAL',
                             allowReleaseWhileBiPending: false,
                           }),

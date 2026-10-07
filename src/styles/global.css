@@ -8136,3 +8136,67 @@ html body .release-actions .release-print {
   display: inline-flex;
   gap: 6px;
 }
+/* Sterilization stage tabs on narrower screens (tablet): less inner padding so every label fits whole. */
+@media (max-width: 1366px) {
+  html body .sterilization-workspace .sterile-queues.modern {
+    gap: 5px;
+  }
+  html body .sterilization-workspace .sterile-queues.modern button {
+    padding-left: 6px;
+    padding-right: 6px;
+    column-gap: 3px;
+  }
+  html body .sterile-queues.modern button > span {
+    letter-spacing: 0;
+  }
+}
+/* Recycle bin at the bottom left of the menu, like a desktop bin (full when something was deleted). */
+html body .sidebar-bin {
+  align-self: flex-start;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: auto 0 6px 14px;
+  padding: 8px 10px 6px;
+  border-radius: 12px;
+  color: #cfe0e6;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+html body .sidebar-bin:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+html body .sidebar-bin.active {
+  background: rgba(118, 196, 212, 0.18);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(118, 196, 212, 0.45);
+}
+.sidebar-bin-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.sidebar-bin-icon em {
+  position: absolute;
+  top: -5px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #d64545;
+  color: #fff;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
