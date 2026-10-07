@@ -149,6 +149,8 @@ export function useSterilizationState() {
   const [loadCycleNumber, setLoadCycleNumber] = useState('');
   const [loadProgram, setLoadProgram] = useState('');
   const [loadChemical, setLoadChemical] = useState<'PASS' | 'FAIL' | 'NOT_RECORDED'>('NOT_RECORDED');
+  const [loadChemicalOn, setLoadChemicalOn] = useState(true);
+  const [loadBiologicalOn, setLoadBiologicalOn] = useState(false);
   const [loadNote, setLoadNote] = useState('');
   const [loadScanFeedback, setLoadScanFeedback] = useState<{type: 'OK' | 'WARN' | 'ERROR'; message: string} | null>(
     null,
@@ -204,6 +206,8 @@ export function useSterilizationState() {
     issues,
     kindFilter,
     loadChemical,
+    loadChemicalOn,
+    loadBiologicalOn,
     loadCycleNumber,
     loadEquipment,
     loadModal,
@@ -298,6 +302,8 @@ export function useSterilizationState() {
     setIssueType,
     setKindFilter,
     setLoadChemical,
+    setLoadChemicalOn,
+    setLoadBiologicalOn,
     setLoadCycleNumber,
     setLoadEquipment,
     setLoadModal,

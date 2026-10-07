@@ -7563,3 +7563,229 @@ html body .ster-row-action .ster-row-note {
   font-size: 13px;
   font-weight: 600;
 }
+/* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
+html body .load-modal {
+  width: min(1180px, calc(100vw - 32px));
+  height: min(900px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+}
+html body .load-modal .load-modal-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 22px 10px;
+  overflow: auto;
+  min-height: 0;
+}
+html body .load-modal .cycle-clean-fields {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+html body .load-modal .cycle-clean-fields label,
+html body .load-indicator-pick legend {
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .load-modal .cycle-clean-fields input:not([type='checkbox']) {
+  min-height: 40px;
+  font-size: 14px;
+}
+html body .load-indicator-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+html body .load-indicator-pick legend {
+  width: 100%;
+  padding: 0;
+  margin-bottom: 5px;
+  color: #627887;
+}
+html body .load-modal .load-indicator-pick label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d5e2e8;
+  border-radius: 9px;
+  background: #fff;
+  color: #17384a;
+  font-size: 13px;
+}
+html body .load-indicator-pick input {
+  width: 16px;
+  height: 16px;
+  accent-color: #1d6b7a;
+}
+html body .load-modal .load-assets {
+  flex: 1 1 auto;
+  min-height: 300px;
+  max-height: none;
+}
+html body .load-modal .load-assets-list > label {
+  padding: 11px 14px;
+}
+html body .load-modal .load-assets-list b,
+html body .load-modal .load-assets-list strong,
+html body .load-modal .load-assets-list small,
+html body .load-modal .load-assets-head strong,
+html body .load-modal .load-assets-head span,
+html body .load-modal .load-assets-head button {
+  font-size: 13px;
+}
+html body .load-modal .cycle-note {
+  flex: 0 0 auto;
+}
+html body .load-modal .cycle-note textarea {
+  min-height: 44px;
+  height: 44px;
+}
+html body .load-release-modal {
+  width: min(1100px, calc(100vw - 32px));
+  height: min(760px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+}
+html body .load-release-modal .workflow-modal-body {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px 20px;
+  align-items: start;
+  overflow: hidden;
+}
+html body .load-release-modal .release-load-picker {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+html body .load-release-modal .release-check-card {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0;
+}
+html body .load-release-modal .load-manifest {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+html body .load-release-modal .load-manifest > strong {
+  position: sticky;
+  top: 0;
+  flex: 0 0 auto;
+}
+html body .load-release-modal .load-manifest > div {
+  grid-template-columns: 96px minmax(0, 1fr) 130px;
+  padding: 10px 12px;
+}
+html body .load-release-modal .load-manifest b,
+html body .load-release-modal .load-manifest small {
+  font-size: 13px;
+}
+html body .load-release-modal .cycle-note {
+  grid-column: 1;
+  grid-row: 3;
+  margin: 0;
+}
+html body .load-release-modal .cycle-note textarea {
+  min-height: 64px;
+  height: 64px;
+}
+html body .load-release-modal .release-check-row {
+  min-height: 44px;
+}
+@media (max-width: 760px) {
+  html body .load-release-modal .workflow-modal-body {
+    display: block;
+    overflow: auto;
+  }
+  html body .load-modal .cycle-clean-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* In the load dialog the device cycles stay a short list (two rows, the rest scrolls) so the load content
+   keeps the room. */
+html body .load-modal .device-cycle-picker {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+}
+html body .load-modal .device-cycle-picker ul {
+  max-height: 96px;
+  overflow-y: auto;
+  margin-top: 6px;
+}
+html body .load-modal .device-cycle-picker li {
+  padding-block: 5px;
+}
+html body .load-modal .cycle-clean-fields {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(250px, 1.1fr);
+  align-items: start;
+}
+html body .load-modal .load-indicator-pick {
+  display: grid;
+  gap: 5px;
+}
+html body .load-indicator-pick > span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #627887;
+}
+html body .load-indicator-chips {
+  display: flex;
+  gap: 8px;
+}
+html body .load-modal .load-indicator-pick label {
+  flex: 1 1 0;
+  white-space: nowrap;
+  font-weight: 700;
+}
+html body .load-modal .load-assets-list > label {
+  grid-template-columns: 18px 20px minmax(0, 1fr) 18px;
+}
+html body .load-modal .load-assets-list span {
+  grid-template-columns: 110px minmax(0, 1fr) 200px;
+}
+html body .load-release-modal .workflow-modal-body {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+html body .load-release-modal .cycle-note {
+  align-self: start;
+}
+html body .load-release-modal .release-check-card .receipt-section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+html body .load-release-modal .load-manifest > div {
+  grid-template-columns: 96px minmax(0, 1fr) 160px;
+}
+html body .load-modal .load-modal-body > .cycle-clean-fields {
+  margin: 0;
+  padding: 0;
+}
+html body .load-modal .load-modal-body > .device-cycle-picker {
+  margin: 0;
+}
+html body .load-modal .load-indicator-pick input[type='checkbox'] {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

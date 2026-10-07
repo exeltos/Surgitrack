@@ -1674,4 +1674,7 @@ export const en: Record<string, string> = {
   'Αντικαταστάσεις & Παραγγελίες': 'Replacements & orders',
   'Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.':
     'Reported problems and instruments that need replacing.',
+  'Δείκτες στο φορτίο': 'Indicators in the load',
+  Χημικός: 'Chemical',
+  Βιολογικός: 'Biological',
 };

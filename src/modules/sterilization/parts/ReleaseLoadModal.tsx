@@ -20,6 +20,10 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
     setReleaseLoadId,
     setReleaseLoadNote,
   } = s;
+  const chemPlanned = selectedReleaseLoad?.chemicalIndicatorResult !== undefined;
+  const biPlanned = selectedReleaseLoad?.biologicalIndicatorResult === 'PENDING';
+  const showChem = chemPlanned || !biPlanned;
+  const showBi = biPlanned || !chemPlanned;
   return (
     <>
       {selectedReleaseLoad && (
@@ -88,29 +92,33 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                   </span>
                 </label>
                 <div className="release-indicators">
-                  <label>
-                    {tr('Χημικός δείκτης')}
-                    <select
-                      value={releaseLoadChem}
-                      onChange={e => setReleaseLoadChem(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
-                    >
-                      <option value="NOT_RECORDED">{tr('Δεν έγινε')}</option>
-                      <option value="PASS">{tr('Επιτυχής')}</option>
-                      <option value="FAIL">{tr('Ανεπιτυχής')}</option>
-                    </select>
-                  </label>
-                  <label>
-                    {tr('Βιολογικός δείκτης')}
-                    <select
-                      value={releaseLoadBi}
-                      onChange={e => setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')}
-                    >
-                      <option value="NOT_REQUIRED">{tr('Δεν έγινε')}</option>
-                      <option value="PASS">{tr('Επιτυχής')}</option>
-                      <option value="PENDING">{tr('Σε αναμονή')}</option>
-                      <option value="FAIL">{tr('Ανεπιτυχής')}</option>
-                    </select>
-                  </label>
+                  {showChem && (
+                    <label>
+                      {tr('Χημικός δείκτης')}
+                      <select
+                        value={releaseLoadChem}
+                        onChange={e => setReleaseLoadChem(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
+                      >
+                        <option value="NOT_RECORDED">{tr('Δεν έγινε')}</option>
+                        <option value="PASS">{tr('Επιτυχής')}</option>
+                        <option value="FAIL">{tr('Ανεπιτυχής')}</option>
+                      </select>
+                    </label>
+                  )}
+                  {showBi && (
+                    <label>
+                      {tr('Βιολογικός δείκτης')}
+                      <select
+                        value={releaseLoadBi}
+                        onChange={e => setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')}
+                      >
+                        <option value="NOT_REQUIRED">{tr('Δεν έγινε')}</option>
+                        <option value="PASS">{tr('Επιτυχής')}</option>
+                        <option value="PENDING">{tr('Σε αναμονή')}</option>
+                        <option value="FAIL">{tr('Ανεπιτυχής')}</option>
+                      </select>
+                    </label>
+                  )}
                 </div>
                 <p className={`release-indicator-hint${releaseVerdict.ok ? ' ok' : ''}`}>
                   {releaseVerdict.ok
