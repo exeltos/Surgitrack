@@ -10,6 +10,7 @@ import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
+import {clearCache} from '../data/cloud/localCache';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import {homePathFor} from '../config/navigation';
 import Spinner from '../components/ui/Spinner';
@@ -175,6 +176,8 @@ export default function App() {
     if (!window.confirm(lang === 'el' ? 'Θέλετε να αποσυνδεθείτε από το SurgiTrack;' : 'Sign out of SurgiTrack?'))
       return;
     const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
+    // This device's copy of the hospital (patient codes included) goes with the session.
+    await clearCache();
     if (!wasDemo) await supabase.auth.signOut();
     sessionStorage.removeItem('surgitrack-auth');
     sessionStorage.removeItem('surgitrack-demo-role');
