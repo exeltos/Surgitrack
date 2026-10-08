@@ -14,6 +14,7 @@ const readRecent = (): string[] => {
 };
 import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
+import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 export default function TraceabilityPage() {
   const {sets, tools, movements, counts} = useSurgi();
   const [q, setQ] = useState('');
@@ -47,6 +48,7 @@ export default function TraceabilityPage() {
           <p>{tr('Αναζήτηση από barcode Set/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.')}</p>
         </div>
       </div>
+      <HistoryWindowNote auto />
       <form
         className="trace-search"
         onSubmit={e => {

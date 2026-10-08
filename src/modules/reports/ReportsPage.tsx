@@ -28,6 +28,7 @@ import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {EXPIRY_MARK, STERILE_MARK} from '../../core/sterileSymbols';
+import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 
 const LOAD_STATUS: Record<string, string> = {
   OPEN: 'Στον κλίβανο',
@@ -654,6 +655,7 @@ export default function ReportsPage() {
           <p>{tr('Επίλεξε αναφορά, όρισε φίλτρα και δες τα αποτελέσματα πριν από εκτύπωση ή PDF.')}</p>
         </div>
       </div>
+      <HistoryWindowNote auto />
       <div className="reports-workbench">
         <aside className="reports-catalog" aria-label={tr('Τύποι αναφορών')}>
           <div className="reports-catalog-head">

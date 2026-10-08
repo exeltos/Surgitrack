@@ -9,6 +9,7 @@ import {
 } from './cloudTables';
 import {loadAllPages} from './pages';
 import {rememberVersions, versionOf} from './versions';
+import {freshCutoff, setCutoff} from './historyWindow';
 
 /** Store collections saved in the cloud: each has its own table (see cloudTables), one row per record. */
 export const STORE_COLLECTIONS = [
@@ -39,29 +40,48 @@ const WRITE_CHUNK = 200;
 const emptyRecords = (): CloudRecords =>
   Object.fromEntries([...STORE_COLLECTIONS, 'library'].map(c => [c, []])) as unknown as CloudRecords;
 
-/** Loads one collection's table, newest first (the store's order). */
-async function loadTable(organizationId: string, collection: TableCollection) {
+/**
+ * Loads one collection's table, newest first (the store's order). With `since`, only records created
+ * from then on; with `before`, only older ones (the rest of the history, loaded when asked: T3).
+ */
+export async function loadTable(
+  organizationId: string,
+  collection: TableCollection,
+  range: {since?: string; before?: string} = {},
+) {
   const {mutable} = CLOUD_TABLES[collection];
-  const rows = await loadAllPages<Record<string, unknown>>((from, to, withCount) =>
-    supabase
+  const rows = await loadAllPages<Record<string, unknown>>((from, to, withCount) => {
+    let query = supabase
       .from(CLOUD_TABLES[collection].table)
       // Changeable records come with their version, for the check when they are saved (S4).
       .select(`${tableColumns(collection)}${mutable ? ',updated_at' : ''}`, withCount ? {count: 'exact'} : undefined)
-      .eq('organization_id', organizationId)
+      .eq('organization_id', organizationId);
+    if (range.since) query = query.gte('created_at', range.since);
+    if (range.before) query = query.lt('created_at', range.before);
+    return query
       .order('created_at', {ascending: false})
       .order('id')
       .range(from, to)
-      .then(result => ({...result, data: result.data as unknown as Array<Record<string, unknown>> | null})),
-  );
+      .then(result => ({...result, data: result.data as unknown as Array<Record<string, unknown>> | null}));
+  });
   if (mutable) rememberVersions(collection, rows);
   return rows.map(row => tableFromRow(collection, row));
 }
 
-/** Loads every record of an organization, newest first within each collection (the store's order). */
-export async function loadAppRecords(organizationId: string): Promise<CloudRecords> {
+/**
+ * Loads an organization's records, newest first within each collection (the store's order): every
+ * changeable record, and the recent part of the history (see historyWindow; the rest loads on request).
+ */
+export async function loadAppRecords(organizationId: string, {recentHistory = true} = {}): Promise<CloudRecords> {
   const records = emptyRecords();
-  const loaded = await Promise.all(TABLE_COLLECTIONS.map(collection => loadTable(organizationId, collection)));
-  TABLE_COLLECTIONS.forEach((collection, index) => (records[collection] = loaded[index]));
+  const cutoffs = TABLE_COLLECTIONS.map(collection => (recentHistory ? freshCutoff(collection) : undefined));
+  const loaded = await Promise.all(
+    TABLE_COLLECTIONS.map((collection, index) => loadTable(organizationId, collection, {since: cutoffs[index]})),
+  );
+  TABLE_COLLECTIONS.forEach((collection, index) => {
+    records[collection] = loaded[index];
+    setCutoff(collection, cutoffs[index]);
+  });
   return records;
 }
 

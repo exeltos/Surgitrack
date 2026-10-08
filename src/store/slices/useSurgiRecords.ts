@@ -55,8 +55,8 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
   // What other devices saved goes into the same lists (see useAppRecordSync).
   const merged =
     <T extends {id: string}>(set: (update: (list: T[]) => T[]) => void) =>
-    (remote: CloudRecord[], removed: string[]) =>
-      set(list => mergeRemote(list, remote as unknown as T[], removed));
+    (remote: CloudRecord[], removed: string[], append?: boolean) =>
+      set(list => mergeRemote(list, remote as unknown as T[], removed, append));
   useAppRecordSync(cloudOrganizationId, 'sets', sets, merged(setSets));
   useAppRecordSync(cloudOrganizationId, 'tools', tools, merged(setTools));
   useAppRecordSync(cloudOrganizationId, 'movements', movements, merged(setMovements));

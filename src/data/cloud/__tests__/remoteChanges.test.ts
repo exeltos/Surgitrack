@@ -31,4 +31,9 @@ describe('records from other devices', () => {
     // Untouched records keep their identity (the save step compares objects).
     expect(merged[1]).toBe(list[0]);
   });
+
+  it('puts older history after the list', () => {
+    const merged = mergeRemote([{id: 'new', v: 1}], [{id: 'old', v: 1}], [], true);
+    expect(merged.map(item => item.id)).toEqual(['new', 'old']);
+  });
 });

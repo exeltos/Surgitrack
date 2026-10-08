@@ -9784,3 +9784,34 @@ html body .idle-lock-card .idle-lock-error {
 html body .sync-conflict-toast {
   border-left: 4px solid #b26a00;
 }
+/* Overview, by department: with many departments only the list scrolls, inside its card. */
+html body .dash-card .dash-depts-list {
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+/* Only recent history is loaded (T3): a note, and a button for the rest. */
+html body .history-window-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border: 1px solid #d5e2e7;
+  border-radius: 10px;
+  background: #f6fafb;
+  color: #475467;
+  font-size: 13px;
+}
+html body .history-window-note button {
+  margin-left: auto;
+  padding: 5px 12px;
+  border: 1px solid #c9d8de;
+  border-radius: 8px;
+  background: #fff;
+  color: #155a6e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

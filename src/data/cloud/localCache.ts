@@ -25,6 +25,8 @@ export type CachedCollection = {
   bases?: CloudRecord[];
   /** The server version (updated_at) of each record, sent with a save (S4). */
   versions?: Record<string, string>;
+  /** Only history created from then on is in the copy (T3); none: all of it. */
+  cutoff?: string;
   /** Server time from which to fetch changes and deletions at the next opening. */
   since: string;
   deletedSince: string;

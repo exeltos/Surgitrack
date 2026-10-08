@@ -13,6 +13,7 @@ import {
   type CloudRecords,
 } from './appRecords';
 import {readCache, setCacheOwner, setRestored} from './localCache';
+import {setCutoff} from './historyWindow';
 import {productionOrganizationFor, resolveIdentity} from './identity';
 import {translateToEnglish} from '../../core/glossary';
 import Spinner from '../../components/ui/Spinner';
@@ -120,6 +121,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       let records: CloudRecords;
       if (fromCopy) {
         records = Object.fromEntries(collections.map(c => [c, copy[c]!.items])) as unknown as CloudRecords;
+        collections.forEach(c => setCutoff(c, copy[c]!.cutoff));
         setRestored(organizationId, copy);
       } else records = await loadAppRecords(organizationId);
       if (demo && !records.library.length) {
