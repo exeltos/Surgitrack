@@ -1,14 +1,16 @@
 import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import {deleteAppRecords, writeAppRecords, type CloudCollection, type CloudRecord} from './appRecords';
-import {CLOUD_TABLES} from './cloudTables';
-import {loadChangedRecords, loadRecordIds, recordKey} from './remoteChanges';
+import {loadChangedRecords, loadDeletedIds, recordKey} from './remoteChanges';
+import {isRealtimeLive, onRemoteChange} from './realtime';
 
 const SYNC_DELAY_MS = 400;
 const RETRY_DELAY_MS = 5000;
 /** How often an open screen looks for what other devices saved (and at once when the window comes back). */
 const PULL_INTERVAL_MS = 20000;
-/** Deleted records are checked every few looks (one id list per collection). */
-const DELETE_CHECK_EVERY = 4;
+/** With live changes connected, the periodic look is only a safety net. */
+const LIVE_PULL_INTERVAL_MS = 60000;
+/** A burst of live changes (e.g. a whole Set released) is fetched once. */
+const LIVE_DEBOUNCE_MS = 300;
 /** A record taken from another device is adopted as saved when the store shows it within this time. */
 const ADOPT_MS = 5000;
 // Rounds per flush; later changes are picked up by the next render's flush.
@@ -19,11 +21,23 @@ export type SyncStatus = 'saved' | 'saving' | 'failed';
 // Collections with changes not yet confirmed by the server, and those whose last write failed.
 const pending = new Set<string>();
 const failed = new Set<string>();
+// Records waiting to be saved, per collection, and when this device last heard from the server.
+const pendingRecords = new Map<string, number>();
+let lastSyncAt: number | undefined;
 const listeners = new Set<() => void>();
 let status: SyncStatus = 'saved';
+export type SyncInfo = {status: SyncStatus; pendingRecords: number; lastSyncAt?: number};
+let info: SyncInfo = {status, pendingRecords: 0};
 const publish = () => {
   status = failed.size ? 'failed' : pending.size ? 'saving' : 'saved';
+  const waiting = [...pending].reduce((sum, key) => sum + (pendingRecords.get(key) || 0), 0);
+  if (info.status !== status || info.pendingRecords !== waiting || info.lastSyncAt !== lastSyncAt)
+    info = {status, pendingRecords: waiting, lastSyncAt};
   listeners.forEach(listener => listener());
+};
+const markSynced = () => {
+  lastSyncAt = Date.now();
+  publish();
 };
 const subscribe = (listener: () => void) => {
   listeners.add(listener);
@@ -32,6 +46,8 @@ const subscribe = (listener: () => void) => {
 
 /** Overall save state of the cloud workspace, for a status indicator. */
 export const useSyncStatus = () => useSyncExternalStore(subscribe, () => status);
+/** Save state, records waiting and the last time the server was reached, for the top bar. */
+export const useSyncInfo = () => useSyncExternalStore(subscribe, () => info);
 
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', event => {
@@ -113,8 +129,11 @@ export function useAppRecordSync(
           const next = diff(known, latest.current);
           if (!next.changed.length && !next.removed.length) {
             pending.delete(key);
+            pendingRecords.delete(key);
             break;
           }
+          pendingRecords.set(key, next.changed.length + next.removed.length);
+          publish();
           const rejected = new Set(
             next.changed.length ? await writeAppRecords(organizationId, collection, next.changed) : [],
           );
@@ -126,6 +145,7 @@ export function useAppRecordSync(
           next.removed.forEach(id => known.delete(id));
         }
         failed.delete(key);
+        lastSyncAt = Date.now();
         // Still changing after the last round: run another flush rather than wait for a render.
         const rest = diff(known, latest.current);
         if (rest.changed.length || rest.removed.length) setRetryTick(tick => tick + 1);
@@ -148,11 +168,13 @@ export function useAppRecordSync(
   useEffect(() => {
     if (!organizationId || !applyRef.current) return;
     let since = new Date(Date.now() - 10 * 60000).toISOString();
-    let looks = 0;
+    let deletedSince = since;
+    let lastLook = 0;
     let running = false;
     const pull = async () => {
       const known = confirmed.current;
       if (running || document.hidden || busy.current || !known || !applyRef.current) return;
+      lastLook = Date.now();
       // Local changes first: they are saved before anything is taken from the server.
       const local = diff(known, latest.current);
       if (local.changed.length || local.removed.length) return;
@@ -161,11 +183,13 @@ export function useAppRecordSync(
         const {records, latest: stamp} = await loadChangedRecords(organizationId, collection, since);
         if (stamp) since = new Date(Date.parse(stamp) - 60000).toISOString();
         let removed: string[] = [];
-        looks += 1;
-        if (collection !== 'library' && CLOUD_TABLES[collection].mutable && looks % DELETE_CHECK_EVERY === 0) {
-          const ids = await loadRecordIds(organizationId, collection);
-          removed = latest.current.filter(item => known.get(item.id) === item && !ids.has(item.id)).map(i => i.id);
+        if (collection !== 'library') {
+          const deleted = await loadDeletedIds(organizationId, collection, deletedSince);
+          if (deleted.latest) deletedSince = new Date(Date.parse(deleted.latest) - 60000).toISOString();
+          const gone = new Set(deleted.ids);
+          removed = latest.current.filter(item => known.get(item.id) === item && gone.has(item.id)).map(i => i.id);
         }
+        markSynced();
         const current = new Map(latest.current.map(item => [item.id, item]));
         const fresh = records.filter(record => {
           const mine = current.get(record.id);
@@ -184,15 +208,26 @@ export function useAppRecordSync(
         running = false;
       }
     };
-    const timer = window.setInterval(() => void pull(), PULL_INTERVAL_MS);
+    // The periodic look: every 20 s, or every 60 s while live changes are connected.
+    const timer = window.setInterval(() => {
+      if (isRealtimeLive() && Date.now() - lastLook < LIVE_PULL_INTERVAL_MS) return;
+      void pull();
+    }, PULL_INTERVAL_MS);
     const onBack = () => {
       if (!document.hidden) void pull();
     };
+    let liveTimer: number | undefined;
+    const stopLive = onRemoteChange(organizationId, collection, () => {
+      window.clearTimeout(liveTimer);
+      liveTimer = window.setTimeout(() => void pull(), LIVE_DEBOUNCE_MS);
+    });
     document.addEventListener('visibilitychange', onBack);
     window.addEventListener('focus', onBack);
     window.addEventListener('online', onBack);
     return () => {
       window.clearInterval(timer);
+      window.clearTimeout(liveTimer);
+      stopLive();
       document.removeEventListener('visibilitychange', onBack);
       window.removeEventListener('focus', onBack);
       window.removeEventListener('online', onBack);

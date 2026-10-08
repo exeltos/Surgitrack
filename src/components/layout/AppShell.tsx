@@ -29,11 +29,13 @@ import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import RoleSwitcher from './RoleSwitcher';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
-import {useSyncStatus} from '../../data/cloud/useAppRecordSync';
+import {useSyncInfo} from '../../data/cloud/useAppRecordSync';
+import {getCloudOrganizationId} from '../../data/cloud/appRecords';
+import {useRealtimeLive} from '../../data/cloud/realtime';
 import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
-import {tr, trData} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 
@@ -93,7 +95,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     role,
     can,
   } = useSurgi();
-  const syncStatus = useSyncStatus();
+  const syncInfo = useSyncInfo();
+  const syncStatus = syncInfo.status;
+  const realtimeLive = useRealtimeLive();
   const online = useOnline();
   const {lang, setLang, fontScale, setFontScale, highContrast, setHighContrast, reducedMotion, setReducedMotion} =
     useAppPreferences();
@@ -302,17 +306,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             <span>SurgiTrack</span>
           </button>
           <RoleSwitcher />
-          {syncStatus !== 'saved' && (
-            <span className={`sync-status ${syncStatus}`} role="status">
-              {syncStatus === 'saving'
-                ? lang === 'el'
-                  ? 'Αποθήκευση…'
-                  : 'Saving…'
-                : lang === 'el'
-                  ? 'Δεν αποθηκεύτηκε · νέα προσπάθεια'
-                  : 'Not saved · retrying'}
-            </span>
-          )}
+          {!!getCloudOrganizationId() && <SyncChip info={syncInfo} live={realtimeLive} online={online} />}
           <div className="top-actions">
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>
               {lang === 'el' ? 'EN' : 'EL'}
@@ -695,5 +689,40 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         </div>
       )}
     </div>
+  );
+}
+
+/** Top-bar sync state: live / periodic, records waiting to be saved, last contact with the server. */
+function SyncChip({info, live, online}: {info: ReturnType<typeof useSyncInfo>; live: boolean; online: boolean}) {
+  const last = info.lastSyncAt
+    ? new Date(info.lastSyncAt).toLocaleTimeString(getI18nLang() === 'el' ? 'el-GR' : 'en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+    : '—';
+  const state =
+    info.status === 'failed' ? 'failed' : info.status === 'saving' ? 'saving' : live && online ? 'live' : 'polling';
+  const label =
+    state === 'failed'
+      ? tr('Δεν αποθηκεύτηκε · νέα προσπάθεια')
+      : state === 'saving'
+        ? info.pendingRecords
+          ? tr('Αποθήκευση · {0} αλλαγές', info.pendingRecords)
+          : tr('Αποθήκευση…')
+        : state === 'live'
+          ? tr('Ζωντανά')
+          : tr('Συγχρονισμός');
+  const title =
+    state === 'live'
+      ? tr('Ζωντανός συγχρονισμός: οι αλλαγές των άλλων συσκευών εμφανίζονται αμέσως. Τελευταία επικοινωνία: {0}', last)
+      : state === 'polling'
+        ? tr('Έλεγχος για αλλαγές κάθε 20 δευτερόλεπτα. Τελευταία επικοινωνία: {0}', last)
+        : tr('Αλλαγές σε αναμονή αποθήκευσης: {0}. Τελευταία επικοινωνία: {1}', info.pendingRecords, last);
+  return (
+    <span className={`sync-status sync-chip ${state}`} role="status" title={title} aria-label={`${label}. ${title}`}>
+      <i aria-hidden="true" />
+      {label}
+    </span>
   );
 }
