@@ -9880,3 +9880,80 @@ html body .idle-lock-password button[aria-pressed='true'] {
     white-space: normal;
   }
 }
+/* Studio → Settings: the test email card, full width under the contact card. */
+.studio-system-grid:has(> .mail-test-card) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+.mail-test-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+.mail-test-result {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cfe5d7;
+  background: #f1f9f4;
+  color: #2f6b45;
+}
+.mail-test-result.fail {
+  border-color: #f0d2cf;
+  background: #fdf3f2;
+  color: #a0362d;
+}
+.mail-test-result > svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+.mail-test-result div {
+  display: grid;
+  gap: 3px;
+}
+.mail-test-result small {
+  color: #4f6370;
+  overflow-wrap: anywhere;
+}
+/* Studio → Hospitals: Delete (inactive hospitals only) next to Manage, and its confirmation. */
+.platform-org-meta-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.platform-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #f0d2cf;
+  border-radius: 10px;
+  background: #fff;
+  color: #a0362d;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.platform-delete-btn:hover {
+  background: #fdf3f2;
+  border-color: #e3a9a3;
+}
+.delete-hospital .delete-hospital-warning {
+  margin: 0;
+  font-weight: 700;
+  color: #20313f;
+}
+.delete-hospital .delete-hospital-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: #3d5260;
+}
+.delete-hospital-progress {
+  color: #1d6b7a;
+  font-weight: 700;
+}

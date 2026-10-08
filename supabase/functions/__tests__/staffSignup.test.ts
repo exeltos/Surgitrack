@@ -6,7 +6,7 @@ import {fake} from './fakes/supabase';
 type Handler = (req: Request) => Response | Promise<Response>;
 type Row = Record<string, unknown> | null;
 
-const SITE = 'https://surgitrack-med.netlify.app';
+const SITE = 'https://surgitrack.eu';
 const IN_AN_HOUR = () => new Date(Date.now() + 3_600_000).toISOString();
 const AN_HOUR_AGO = () => new Date(Date.now() - 3_600_000).toISOString();
 const LINK = {id: 'link-1', organization_id: 'org-1', expires_at: IN_AN_HOUR(), revoked_at: null};

@@ -114,8 +114,8 @@ describe('staff-link', () => {
     async origin => {
       answer(TARGET);
       const body = await (await linkRequest(origin)).json();
-      expect(body.url.startsWith('https://surgitrack-med.netlify.app/?st_token=')).toBe(true);
-      expect(generated().every(g => g.options.redirectTo === 'https://surgitrack-med.netlify.app')).toBe(true);
+      expect(body.url.startsWith('https://surgitrack.eu/?st_token=')).toBe(true);
+      expect(generated().every(g => g.options.redirectTo === 'https://surgitrack.eu')).toBe(true);
     },
   );
 

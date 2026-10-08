@@ -12,7 +12,10 @@ import {appSite, esc, layout, mailConfigured, sendEmail, usernameBox} from "../_
 //    carries the username and the button to set the password.
 // Roles: ADMIN, STERILIZATION, DEPARTMENT, VIEWER (read only). Admins and viewers have no department.
 const ROLES = ["ADMIN", "STERILIZATION", "DEPARTMENT", "VIEWER"];
-const corsBase = {"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
+const corsBase = {
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 // The role names the app shows (a Sterilization supervisor is a Sterilization user with a flag).
 const ROLE_NAMES: Record<string, string> = {
   ADMIN: "Διαχειριστής νοσοκομείου",

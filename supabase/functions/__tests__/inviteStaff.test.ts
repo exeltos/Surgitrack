@@ -6,7 +6,7 @@ import {fake, type DbCall} from './fakes/supabase';
 type Handler = (req: Request) => Response | Promise<Response>;
 type Row = Record<string, unknown> | null;
 
-const SITE = 'https://surgitrack-med.netlify.app';
+const SITE = 'https://surgitrack.eu';
 const ADMIN = {id: 'admin-1', role: 'ADMIN', active: true, organization_id: 'org-1'};
 const ORG = {id: 'org-1', name: 'ΙΑΣΩ Θεσσαλίας', active: true};
 

@@ -1,10 +1,12 @@
 // Shared request helpers for the edge functions.
 
-export const SITE = "https://surgitrack-med.netlify.app";
+/** The app's address: emailed links fall back to it. */
+export const SITE = "https://surgitrack.eu";
 
-// The app itself: production, its deploy previews, and local development. Browsers get CORS access
-// from these origins only, and emailed links may point only at them.
-export const APP_ORIGIN = /^(https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
+// The app itself: its domain (surgitrack.eu), its Netlify address and deploy previews, and local
+// development. Browsers get CORS access from these origins only, and emailed links may point only at them.
+export const APP_ORIGIN =
+  /^(https:\/\/(www\.)?surgitrack\.eu|https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
 
 /**
  * CORS headers for one request: the caller's origin when it is the app, otherwise the production

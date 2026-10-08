@@ -11,6 +11,8 @@ beforeEach(resetFake);
 
 describe('corsFor', () => {
   it.each([
+    'https://surgitrack.eu',
+    'https://www.surgitrack.eu',
     'https://surgitrack-med.netlify.app',
     'https://deploy-preview-55--surgitrack-med.netlify.app',
     'http://localhost:5174',
@@ -20,6 +22,9 @@ describe('corsFor', () => {
 
   it.each([
     'https://evil.example',
+    'http://surgitrack.eu',
+    'https://surgitrack.eu.evil.example',
+    'https://evilsurgitrack.eu',
     'https://surgitrack-med.netlify.app.evil.example',
     'https://evilsurgitrack-med.netlify.app',
     'http://surgitrack-med.netlify.app',
@@ -47,8 +52,9 @@ describe('corsFor', () => {
     expect(cors.Vary).toBe('Origin');
   });
 
-  it('matches the pattern emailed links are checked against', () => {
+  it('matches the pattern emailed links are checked against, and is the app domain', () => {
     expect(APP_ORIGIN.test(SITE)).toBe(true);
+    expect(SITE).toBe('https://surgitrack.eu');
   });
 });
 
