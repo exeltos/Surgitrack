@@ -8,6 +8,7 @@ import {
   type TableCollection,
 } from './cloudTables';
 import {loadAllPages} from './pages';
+import {rememberVersions, versionOf} from './versions';
 
 /** Store collections saved in the cloud: each has its own table (see cloudTables), one row per record. */
 export const STORE_COLLECTIONS = [
@@ -40,16 +41,19 @@ const emptyRecords = (): CloudRecords =>
 
 /** Loads one collection's table, newest first (the store's order). */
 async function loadTable(organizationId: string, collection: TableCollection) {
+  const {mutable} = CLOUD_TABLES[collection];
   const rows = await loadAllPages<Record<string, unknown>>((from, to, withCount) =>
     supabase
       .from(CLOUD_TABLES[collection].table)
-      .select(tableColumns(collection), withCount ? {count: 'exact'} : undefined)
+      // Changeable records come with their version, for the check when they are saved (S4).
+      .select(`${tableColumns(collection)}${mutable ? ',updated_at' : ''}`, withCount ? {count: 'exact'} : undefined)
       .eq('organization_id', organizationId)
       .order('created_at', {ascending: false})
       .order('id')
       .range(from, to)
       .then(result => ({...result, data: result.data as unknown as Array<Record<string, unknown>> | null})),
   );
+  if (mutable) rememberVersions(collection, rows);
   return rows.map(row => tableFromRow(collection, row));
 }
 
@@ -68,26 +72,41 @@ const chunks = <T>(items: T[]) =>
 
 const UNIQUE_VIOLATION = '23505';
 const RLS_VIOLATION = '42501';
+/** The database refused a save because the record changed since this device saw it (S4). */
+const STALE_VERSION = '40001';
+const isStale = (error: {code?: string; message?: string} | null) =>
+  !!error && (error.code === STALE_VERSION || /changed on another device/.test(error.message || ''));
 
 /**
  * Saves one row: an update when it exists, otherwise an insert. Department users may update a Set
  * or instrument (handovers change state) but only Sterilization may create one, and an upsert is
  * checked against the create rule even when it ends up updating — hence the separate update.
  */
-async function saveTableRow(table: string, row: Record<string, unknown>): Promise<'saved' | 'conflict'> {
+async function saveTableRow(
+  collection: CloudCollection,
+  row: Record<string, unknown>,
+): Promise<'saved' | 'conflict' | 'stale'> {
+  const {table} = CLOUD_TABLES[collection];
   const {organization_id: organizationId, id, ...changes} = row;
   const {data, error} = await supabase
     .from(table)
     .update(changes)
     .eq('organization_id', organizationId as string)
     .eq('id', id as string)
-    .select('id');
+    .select('id,updated_at');
   if (error?.code === UNIQUE_VIOLATION) return 'conflict';
+  if (isStale(error)) return 'stale';
   if (error) throw error;
-  if (data.length) return 'saved';
-  const {error: insertError} = await supabase.from(table).insert(row);
+  if (data.length) {
+    rememberVersions(collection, data as Array<Record<string, unknown>>);
+    return 'saved';
+  }
+  const {expected_updated_at: _expected, ...fresh} = row;
+  void _expected;
+  const {data: inserted, error: insertError} = await supabase.from(table).insert(fresh).select('id,updated_at');
   if (insertError?.code === UNIQUE_VIOLATION) return 'conflict';
   if (insertError) throw insertError;
+  rememberVersions(collection, (inserted || []) as Array<Record<string, unknown>>);
   return 'saved';
 }
 
@@ -98,20 +117,55 @@ async function saveTableRow(table: string, row: Record<string, unknown>): Promis
  * each record is saved on its own. Returns the ids refused for a barcode clash, so the rest still
  * count as saved.
  */
-export async function writeAppRecords(organizationId: string, collection: CloudCollection, items: CloudRecord[]) {
+export async function writeAppRecords(
+  organizationId: string,
+  collection: CloudCollection,
+  items: CloudRecord[],
+): Promise<{rejected: string[]; stale: string[]}> {
   const {table, mutable} = CLOUD_TABLES[collection];
-  const toRow = (item: CloudRecord) =>
-    tableToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
+  const toRow = (item: CloudRecord) => {
+    const row = tableToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
+    // The version this device saw: the database refuses the save if the record changed since.
+    if (mutable) row.expected_updated_at = versionOf(collection, item.id) ?? null;
+    return row;
+  };
   const rejected: string[] = [];
+  const stale: string[] = [];
   for (const chunk of chunks(items)) {
-    const {error} = await supabase
+    const request = supabase
       .from(table)
       .upsert(chunk.map(toRow), {onConflict: 'organization_id,id', ignoreDuplicates: !mutable});
-    if (!error) continue;
-    if (!mutable || (error.code !== UNIQUE_VIOLATION && error.code !== RLS_VIOLATION)) throw error;
-    for (const item of chunk) if ((await saveTableRow(table, toRow(item))) === 'conflict') rejected.push(item.id);
+    const {data, error} = mutable ? await request.select('id,updated_at') : await request;
+    if (!error) {
+      if (mutable) rememberVersions(collection, (data || []) as Array<Record<string, unknown>>);
+      continue;
+    }
+    if (!mutable || (![UNIQUE_VIOLATION, RLS_VIOLATION].includes(error.code) && !isStale(error))) throw error;
+    // One record of the batch was refused: save them one by one to find which.
+    for (const item of chunk) {
+      const outcome = await saveTableRow(collection, toRow(item));
+      if (outcome === 'conflict') rejected.push(item.id);
+      if (outcome === 'stale') stale.push(item.id);
+    }
   }
-  return rejected;
+  return {rejected, stale};
+}
+
+/** The saved records with these ids (and their versions), to merge a refused save with them. */
+export async function loadRecordsById(organizationId: string, collection: CloudCollection, ids: string[]) {
+  const records: CloudRecord[] = [];
+  for (const chunk of chunks(ids)) {
+    const {data, error} = await supabase
+      .from(CLOUD_TABLES[collection].table)
+      .select(`${tableColumns(collection)},updated_at`)
+      .eq('organization_id', organizationId)
+      .in('id', chunk);
+    if (error) throw error;
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    rememberVersions(collection, rows);
+    records.push(...rows.map(row => tableFromRow(collection, row)));
+  }
+  return records;
 }
 
 export async function deleteAppRecords(organizationId: string, collection: CloudCollection, ids: string[]) {

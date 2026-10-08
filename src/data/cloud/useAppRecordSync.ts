@@ -3,6 +3,9 @@ import {deleteAppRecords, writeAppRecords, type CloudCollection, type CloudRecor
 import {loadChangedRecords, loadDeletedIds, recordKey} from './remoteChanges';
 import {isRealtimeLive, onRemoteChange} from './realtime';
 import {takeRestored, writeCollection} from './localCache';
+import {loadRecordsById} from './appRecords';
+import {exportVersions, importVersions} from './versions';
+import {mergeConcurrent, recordLabel} from './mergeConcurrent';
 
 const SYNC_DELAY_MS = 400;
 const RETRY_DELAY_MS = 5000;
@@ -43,6 +46,17 @@ const markSynced = () => {
 const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
+};
+
+/** A record two devices changed at once, with the fields where the other device's value was kept. */
+export type SyncConflict = {collection: CloudCollection; label: string; fields: string[]};
+const conflictListeners = new Set<(conflict: SyncConflict) => void>();
+/** Calls `listener` for every conflict the sync resolves; returns the unsubscribe. */
+export const onSyncConflict = (listener: (conflict: SyncConflict) => void) => {
+  conflictListeners.add(listener);
+  return () => {
+    conflictListeners.delete(listener);
+  };
 };
 
 /** Overall save state of the cloud workspace, for a status indicator. */
@@ -115,6 +129,8 @@ export function useAppRecordSync(
   applyRef.current = apply;
   // Records just taken from another device: their next appearance in the store is not a local change.
   const adopted = useRef(new Map<string, number>());
+  // Local versions replaced by a merge with another device's save: never sent as they are.
+  const superseded = useRef(new WeakSet<CloudRecord>());
   // Server time from which the next look fetches changes and deletions (kept in the device's copy).
   const since = useRef(new Date(Date.now() - 10 * 60000).toISOString());
   const deletedSince = useRef(since.current);
@@ -130,6 +146,8 @@ export function useAppRecordSync(
       items: [...latest.current],
       changed: changed.map(item => item.id),
       removed,
+      bases: changed.map(item => known.get(item.id)).filter((base): base is CloudRecord => !!base),
+      versions: exportVersions(collection),
       since: since.current,
       deletedSince: deletedSince.current,
     });
@@ -157,8 +175,11 @@ export function useAppRecordSync(
       if (copy) {
         since.current = copy.since;
         deletedSince.current = copy.deletedSince;
-        // Changes the copy kept unsaved: the server does not have them, so they count as changed.
-        for (const id of [...copy.changed, ...copy.removed]) known.set(id, {id});
+        importVersions(collection, copy.versions);
+        // Changes the copy kept unsaved: the server does not have them, so they count as changed
+        // (against the server's version they started from, when the copy kept it).
+        const bases = new Map((copy.bases || []).map(base => [base.id, base]));
+        for (const id of [...copy.changed, ...copy.removed]) known.set(id, bases.get(id) || {id});
       }
       confirmed.current = known;
       scheduleCopy();
@@ -178,6 +199,27 @@ export function useAppRecordSync(
     }
     pending.add(key);
     publish();
+    // Records another device saved since this device saw them: merge field by field (S4).
+    const resolveStale = async (ids: string[]) => {
+      const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
+      const current = new Map(latest.current.map(item => [item.id, item]));
+      const merged: CloudRecord[] = [];
+      for (const id of ids) {
+        const server = saved.get(id);
+        const local = current.get(id);
+        if (!server || !local) continue;
+        const result = mergeConcurrent(known.get(id), local, server);
+        // The other device's save is now the base; what is kept from here is saved on top of it.
+        known.set(id, server);
+        superseded.current.add(local);
+        merged.push(result.keepsLocal ? result.merged : server);
+        if (result.conflicts.length)
+          conflictListeners.forEach(listener =>
+            listener({collection, label: recordLabel(server), fields: result.conflicts}),
+          );
+      }
+      if (merged.length) applyRef.current?.(merged, []);
+    };
     const flush = async () => {
       busy.current = true;
       try {
@@ -190,11 +232,21 @@ export function useAppRecordSync(
           }
           pendingRecords.set(key, next.changed.length + next.removed.length);
           publish();
-          const rejected = new Set(
-            next.changed.length ? await writeAppRecords(organizationId, collection, next.changed) : [],
-          );
+          // A local version already merged with another device's save waits for the merged one (S4).
+          const sendable = next.changed.filter(item => !superseded.current.has(item));
+          const outcome = sendable.length
+            ? await writeAppRecords(organizationId, collection, sendable)
+            : {rejected: [], stale: []};
+          const rejected = new Set(outcome.rejected);
+          const stale = new Set(outcome.stale);
           // What the database took is saved even when one record in the batch was refused.
-          next.changed.filter(item => !rejected.has(item.id)).forEach(item => known.set(item.id, item));
+          sendable
+            .filter(item => !rejected.has(item.id) && !stale.has(item.id))
+            .forEach(item => known.set(item.id, item));
+          if (stale.size) {
+            await resolveStale([...stale]);
+            break;
+          }
           if (rejected.size)
             throw new Error(`${collection}: ${[...rejected].join(', ')} refused (barcode already in use)`);
           if (next.removed.length) await deleteAppRecords(organizationId, collection, next.removed);
