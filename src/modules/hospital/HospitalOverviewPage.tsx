@@ -423,6 +423,18 @@ export default function HospitalOverviewPage() {
             </div>
             <Link to="/movements">{L('Ιστορικό', 'History')}</Link>
           </header>
+          <div className="dash-activity-stats">
+            {[
+              [L('Σήμερα', 'Today'), perDay[perDay.length - 1].n],
+              [L('7 ημέρες', '7 days'), perDay.slice(-7).reduce((sum, x) => sum + x.n, 0)],
+              [L('14 ημέρες', '14 days'), perDayTotal],
+            ].map(([label, n]) => (
+              <span key={String(label)}>
+                <b>{n}</b>
+                <small>{label}</small>
+              </span>
+            ))}
+          </div>
           <div
             className="dash-columns"
             role="img"

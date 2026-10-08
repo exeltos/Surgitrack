@@ -9168,3 +9168,186 @@ html body .movement-ledger.cleaning .ledger-date input {
   margin: 0;
   accent-color: #b42318;
 }
+/* Issues: columns sized by name (the photos column comes and goes); actions read as words. */
+html body .issues-fixed th.col-created {
+  width: 136px;
+}
+html body .issues-fixed th.col-photos {
+  width: 100px;
+}
+html body .issues-fixed th.col-status {
+  width: 104px;
+}
+html body .issues-fixed th.col-actions {
+  width: 300px;
+}
+html body .issues-fixed .issue-actions-row {
+  justify-content: flex-end;
+}
+/* Expiry page: narrower date / duration columns so the name gets the free width. */
+html body .expiry-table th:nth-child(1) {
+  width: auto;
+  min-width: 220px;
+}
+html body .expiry-table th:nth-child(2) {
+  width: 88px;
+}
+html body .expiry-table th:nth-child(3) {
+  width: 14%;
+}
+html body .expiry-table th:nth-child(4) {
+  width: 128px;
+}
+html body .expiry-table th:nth-child(5) {
+  width: 72px;
+}
+html body .expiry-table th:nth-child(6),
+html body .expiry-table th:nth-child(7) {
+  width: 112px;
+}
+html body .expiry-table th:nth-child(8) {
+  width: 138px;
+}
+html body .expiry-table th:nth-child(9) {
+  width: 40px;
+}
+/* Sets list: an expiry column after the state. */
+html body .sets-registry th:nth-child(7) {
+  width: 112px;
+}
+html body .sets-registry th:nth-child(8) {
+  width: 40px;
+}
+html body .sets-expiry {
+  font-variant-numeric: tabular-nums;
+}
+html body .sets-expiry.expiring {
+  color: #b26a00;
+  font-weight: 700;
+}
+html body .sets-expiry.expired {
+  color: #b3261e;
+  font-weight: 700;
+}
+@media (max-width: 1279px) {
+  html body .sets-registry th:nth-child(7),
+  html body .sets-registry td:nth-child(7) {
+    display: table-cell;
+  }
+  html body .sets-registry th:nth-child(8),
+  html body .sets-registry td:nth-child(8) {
+    display: none;
+  }
+}
+/* Sterilization lists: the stage is the tab itself, so no repeated "Stage" column on wide screens. */
+@media (min-width: 1181px) {
+  html body .sterilization-workspace .ster-list-head > span:nth-child(5),
+  html body .sterilization-workspace .ster-work-row > .ster-status {
+    display: none !important;
+  }
+  html body .sterilization-workspace .ster-list-head,
+  html body .sterilization-workspace .ster-work-row {
+    grid-template-columns:
+      minmax(300px, 1.7fr) minmax(145px, 0.8fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr)
+      minmax(210px, 1fr) !important;
+  }
+}
+html body .ster-meta .ster-count-shortage {
+  margin-left: 0;
+}
+/* Overview: the activity card leads with three numbers; the chart below is shorter. */
+html body .dash-activity-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 6px 0 8px;
+}
+html body .dash-activity-stats span {
+  display: grid;
+  gap: 1px;
+  padding: 8px 10px;
+  border: 1px solid #e4ecef;
+  border-radius: 10px;
+  background: #f8fbfc;
+}
+html body .dash-activity-stats b {
+  font-size: 20px;
+  line-height: 1.1;
+  color: #155a6e;
+}
+html body .dash-activity-stats small {
+  color: #667085;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+html body .dash-activity .dash-columns {
+  max-height: 120px;
+}
+/* Traceability: the last searches on this device, one tap to repeat. */
+html body .trace-recent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: -4px 0 12px;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-recent button {
+  padding: 4px 10px;
+  border: 1px solid #d5e2e7;
+  border-radius: 999px;
+  background: #fff;
+  color: #155a6e;
+  font: inherit;
+  font-family: ui-monospace, monospace;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+/* Issues: room for the three worded actions. */
+html body .issues-fixed th.col-actions {
+  width: 372px;
+}
+html body .issues-fixed th.col-created {
+  width: 128px;
+}
+/* Sets list: the name keeps its width next to the new expiry column. */
+html body .sets-registry th:nth-child(3) {
+  width: 132px;
+}
+html body .sets-registry th:nth-child(4) {
+  width: 158px;
+}
+html body .sets-registry th:nth-child(5) {
+  width: 78px;
+}
+html body .sets-registry th:nth-child(6) {
+  width: 158px;
+}
+html body .sets-registry th:nth-child(7) {
+  width: 104px;
+}
+/* Expiry page: names wrap to two lines instead of being cut; headers fit. */
+html body .expiry-table td:first-child .row-title-link {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+html body .expiry-table th:nth-child(5) {
+  width: 84px;
+}
+html body .expiry-table th:nth-child(6) {
+  width: 128px;
+}
+html body .expiry-table th:nth-child(7) {
+  width: 104px;
+}
+html body .expiry-table th:nth-child(8) {
+  width: 132px;
+}
+html body .expiry-table th:nth-child(6) {
+  width: 140px;
+}

@@ -1,3 +1,5 @@
+import {ExpirySymbol} from '../../components/ui/SterileDates';
+import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
@@ -196,7 +198,7 @@ export default function SetsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table registry-fixed">
+          <table className="asset-registry-table registry-fixed sets-registry">
             <thead>
               <tr>
                 <th>{tr('Όνομα Σετ')}</th>
@@ -205,6 +207,9 @@ export default function SetsPage() {
                 <th>{tr('Τμήμα')}</th>
                 <th>{tr('Εργαλεία')}</th>
                 <th>{tr('Κατάσταση')}</th>
+                <th className="th-sym">
+                  <ExpirySymbol /> {tr('Λήξη')}
+                </th>
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                 </th>
@@ -248,6 +253,18 @@ export default function SetsPage() {
                       <StatusBadge value={s.state} />
                     </td>
                     <td>
+                      {(() => {
+                        // The expiry date while the Set is sterile; coloured when it is near or past.
+                        if (!s.sterileUntil || !(STERILE_STATES as readonly string[]).includes(s.state)) return '—';
+                        const status = expiryStatus(s.sterileUntil, s.shelfLifeMonths);
+                        return (
+                          <span className={`sets-expiry ${status.state.toLowerCase()}`}>
+                            {formatExpiry(s.sterileUntil)}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td>
                       <Link className="icon-link" to={`/sets/${s.id}`} aria-label={tr('Άνοιγμα {0}', s.barcode)}>
                         <ChevronRight size={17} />
                       </Link>
@@ -255,7 +272,7 @@ export default function SetsPage() {
                   </tr>
                 );
               })}
-              {rows.hasMore && <MoreRows colSpan={5} onVisible={rows.showMore} />}
+              {rows.hasMore && <MoreRows colSpan={8} onVisible={rows.showMore} />}
             </tbody>
           </table>
         )}

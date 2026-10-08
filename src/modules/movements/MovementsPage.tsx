@@ -13,7 +13,9 @@ import {
   X,
 } from 'lucide-react';
 import {supabase} from '../../lib/supabase';
-import {actingAsPlatformOwner} from '../../data/cloud/identity';
+import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
+import {getCloudOrganizationId} from '../../data/cloud/appRecords';
+import {getRuntimeDataMode} from '../../config/dataMode';
 import {managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSurgi} from '../../store/SurgiStore';
 import type {Movement} from '../../types/domain';
@@ -36,8 +38,11 @@ function assetParts(value: string) {
 
 export default function MovementsPage() {
   const {movements, sets, tools, role, currentUser, forgetMovements} = useSurgi();
-  // Only the platform owner, working in a real hospital, can clean chosen entries out of the history.
-  const ownerHospital = actingAsPlatformOwner() ? managedHospitalId() : undefined;
+  // Only the platform owner can clean chosen entries out of the history: in a hospital, or in Demo.
+  const demo = getRuntimeDataMode() === 'DEMO';
+  const owner = demo ? !!getRealIdentity()?.platform : actingAsPlatformOwner();
+  const ownerHospital = owner ? (demo ? getCloudOrganizationId() : managedHospitalId()) : undefined;
+  const canClean = owner && (demo || !!ownerHospital);
   const [cleaning, setCleaning] = useState(false);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -150,7 +155,7 @@ export default function MovementsPage() {
     setCleanError('');
   };
   const deletePicked = async () => {
-    if (!ownerHospital || !picked.size) return;
+    if (!canClean || !picked.size) return;
     if (
       !window.confirm(
         tr('Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.', picked.size),
@@ -160,7 +165,10 @@ export default function MovementsPage() {
     setBusy(true);
     setCleanError('');
     const ids = [...picked];
-    const {error} = await supabase.rpc('platform_delete_movements', {p_org: ownerHospital, p_ids: ids});
+    // In a hospital (or the Demo stored in the cloud) the server deletes them; a local Demo only forgets them.
+    const {error} = ownerHospital
+      ? await supabase.rpc('platform_delete_movements', {p_org: ownerHospital, p_ids: ids})
+      : {error: null};
     setBusy(false);
     if (error) {
       setCleanError(tr('Η διαγραφή δεν ολοκληρώθηκε: {0}', error.message));
@@ -181,7 +189,7 @@ export default function MovementsPage() {
           </p>
         </div>
         <div className="movements-actions">
-          {ownerHospital && !cleaning && (
+          {canClean && !cleaning && (
             <button onClick={() => setCleaning(true)} title={tr('Μόνο για τον owner της πλατφόρμας')}>
               <Eraser size={16} /> {tr('Καθαρισμός ιστορικού')}
             </button>

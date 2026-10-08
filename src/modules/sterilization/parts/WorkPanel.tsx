@@ -306,10 +306,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         {assetIssues.length} {tr('ανοικτή')}
                       </span>
                     )}
-                    <small className="ster-tablet-stage">{queueStageLabel}</small>
-                  </div>
-                  <div className="ster-status">
-                    <small>{queueStageLabel}</small>
                     {queue === 'INCOMING' &&
                       (() => {
                         // The operating theatre's count at sending: a shortage shows here before the receipt.
@@ -320,6 +316,10 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                           </span>
                         ) : null;
                       })()}
+                    <small className="ster-tablet-stage">{queueStageLabel}</small>
+                  </div>
+                  <div className="ster-status">
+                    <small>{queueStageLabel}</small>
                   </div>
                   <div className="ster-row-action">
                     {queue === 'INCOMING' ? (

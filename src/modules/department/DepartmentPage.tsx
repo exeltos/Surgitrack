@@ -284,7 +284,7 @@ export default function DepartmentPage() {
                       <strong>
                         {asset.maxUses !== undefined
                           ? `${asset.uses || 0}/${asset.maxUses}`
-                          : tr('{0} · χωρίς όριο', asset.uses || 0)}
+                          : tr('{0} χρήσεις', asset.uses || 0)}
                       </strong>
                     </div>
                     <ChevronRight size={19} />

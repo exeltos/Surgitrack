@@ -165,7 +165,6 @@ export const en: Record<string, string> = {
   '{0} · {1} προστέθηκε στην παράδοση προς {2}.': '{0} · {1} added to the delivery to {2}.',
   '{0} · {1} προστέθηκε στην παραλαβή.': '{0} · {1} added to the receipt.',
   '{0} · {1} προστέθηκε στο φορτίο.': '{0} · {1} added to the load.',
-  '{0} · χωρίς όριο': '{0} · no limit',
   '{0} έχει ήδη σαρωθεί για αυτή την παράδοση.': '{0} has already been scanned for this delivery.',
   '{0} ανήκει στο {1}. Η τρέχουσα παράδοση αφορά το {2}. Ολοκλήρωσε πρώτα αυτή την παράδοση.':
     '{0} belongs to {1}. The current delivery is for {2}. Complete this delivery first.',
@@ -1864,4 +1863,7 @@ export const en: Record<string, string> = {
   'Μόνο για τον owner της πλατφόρμας': 'Platform owner only',
   'Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.':
     'Permanently delete {0} history entries? The clean-up will be recorded as a new entry.',
+  '{0} χρήσεις': '{0} uses',
+  'Κάτω από το ελάχιστο': 'Below minimum',
+  'Πρόσφατες αναζητήσεις': 'Recent searches',
 };
