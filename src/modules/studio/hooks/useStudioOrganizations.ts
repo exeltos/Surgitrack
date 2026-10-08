@@ -1,7 +1,6 @@
 import {setRuntimeDataMode} from '../../../config/dataMode';
 import {type Organization} from '../../../core/LibraryStore';
 import type {UserRole} from '../../../store/types';
-import {roleHomePath} from '../../../core/permissions';
 import {supabase} from '../../../lib/supabase';
 import {applyDemoSessionUser, demoSessionUser, type DemoView, type HospitalRoleKind} from '../../../config/demoRoles';
 import {departments as defaultDepartments} from '../../../core/libraries';
@@ -154,8 +153,8 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
     sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
     setRuntimeDataMode('DEMO');
     setRole(role);
-    // An admin opens the Demo hospital on its overview, like a real hospital admin.
-    window.location.hash = `#${role === 'ADMIN' ? '/overview' : roleHomePath(role)}`;
+    // Each role opens on its menu's home (the Overview when its menu has it), like after signing in.
+    window.location.hash = '#/';
     window.location.reload();
   };
   const enterBuiltInDemo = (kind: HospitalRoleKind) => void enterDemo(kind);
