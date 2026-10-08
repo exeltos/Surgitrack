@@ -3,7 +3,6 @@ import {Link, useSearchParams} from 'react-router-dom';
 import {
   CheckCircle2,
   ClipboardList,
-  FileSpreadsheet,
   PackageCheck,
   Plus,
   Printer,
@@ -18,7 +17,8 @@ import AppButton from '../../components/ui/AppButton';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {useSurgi} from '../../store/SurgiStore';
-import {downloadXlsx} from '../../core/exportTable';
+import type {ExportTable} from '../../core/exportTable';
+import DownloadMenu from '../../components/ui/DownloadMenu';
 import {
   REASON_LABEL,
   allocateStock,
@@ -180,35 +180,34 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
         organizationName,
       ),
     });
-  const exportExcel = () =>
-    downloadXlsx({
-      title: tr('Βλάβες & Αντικαταστάσεις'),
-      subtitle: filterText || tr('Όλα τα εργαλεία'),
-      headers: [
-        'Barcode',
-        tr('Εργαλείο'),
-        tr('Κωδικός'),
-        tr('Κατασκευαστής'),
-        tr('Σετ'),
-        tr('Τμήμα'),
-        tr('Αιτία'),
-        tr('Από'),
-        tr('Στο απόθεμα'),
-        tr('Κατάσταση'),
-      ],
-      rows: target.map(item => [
-        item.tool.barcode,
-        item.tool.name,
-        item.tool.code || '',
-        item.tool.manufacturer || '',
-        item.set ? `${item.set.barcode} · ${item.set.name}` : '',
-        trData(item.department || ''),
-        tr(REASON_LABEL[item.reason]),
-        item.since || '',
-        item.stock.length,
-        statusText(item),
-      ]),
-    });
+  const listTable = (): ExportTable => ({
+    title: tr('Βλάβες & Αντικαταστάσεις'),
+    subtitle: filterText || tr('Όλα τα εργαλεία'),
+    headers: [
+      'Barcode',
+      tr('Εργαλείο'),
+      tr('Κωδικός'),
+      tr('Κατασκευαστής'),
+      tr('Σετ'),
+      tr('Τμήμα'),
+      tr('Αιτία'),
+      tr('Από'),
+      tr('Στο απόθεμα'),
+      tr('Κατάσταση'),
+    ],
+    rows: target.map(item => [
+      item.tool.barcode,
+      item.tool.name,
+      item.tool.code || '',
+      item.tool.manufacturer || '',
+      item.set ? `${item.set.barcode} · ${item.set.name}` : '',
+      trData(item.department || ''),
+      tr(REASON_LABEL[item.reason]),
+      item.since || '',
+      item.stock.length,
+      statusText(item),
+    ]),
+  });
 
   return (
     <div className={embedded ? 'replacements embedded' : 'replacements'}>
@@ -290,12 +289,11 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
                 {tr('Νέα παραγγελία')}
               </AppButton>
             )}
-            <AppButton icon={<FileSpreadsheet size={15} />} title="Excel" onClick={exportExcel}>
-              <span className="label-wide">{tr('Excel')}</span>
-            </AppButton>
-            <AppButton icon={<Printer size={15} />} title={tr('Εκτύπωση λίστας')} onClick={printList}>
-              <span className="label-wide">{picked.length ? tr('Εκτύπωση επιλεγμένων') : tr('Εκτύπωση λίστας')}</span>
-            </AppButton>
+            <DownloadMenu
+              table={listTable}
+              onPrint={printList}
+              printLabel={picked.length ? tr('PDF / Εκτύπωση επιλεγμένων') : undefined}
+            />
           </div>
           {editable && picked.length > 0 && (
             <div className="replacements-bulk">

@@ -1,18 +1,5 @@
 import {useMemo, useState} from 'react';
-import {
-  BadgeCheck,
-  ChevronRight,
-  Clock3,
-  Eraser,
-  FileSpreadsheet,
-  MapPin,
-  Printer,
-  Route,
-  ShieldCheck,
-  Trash2,
-  UserRound,
-  X,
-} from 'lucide-react';
+import {BadgeCheck, ChevronRight, Clock3, Eraser, MapPin, Route, ShieldCheck, Trash2, UserRound, X} from 'lucide-react';
 import {supabase} from '../../lib/supabase';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {getCloudOrganizationId} from '../../data/cloud/appRecords';
@@ -28,7 +15,8 @@ import {useProgressiveList} from '../../core/useProgressiveList';
 import {useRememberedState} from '../../core/listMemory';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
-import {downloadXlsx, tableReportHtml, type ExportTable} from '../../core/exportTable';
+import {tableReportHtml, type ExportTable} from '../../core/exportTable';
+import DownloadMenu from '../../components/ui/DownloadMenu';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -201,12 +189,7 @@ export default function MovementsPage() {
               <Eraser size={16} /> {tr('Καθαρισμός ιστορικού')}
             </button>
           )}
-          <button onClick={() => downloadXlsx(exportTable())}>
-            <FileSpreadsheet size={16} /> {tr('Εξαγωγή Excel')}
-          </button>
-          <button onClick={() => setReport(tableReportHtml(exportTable(), getI18nLang()))}>
-            <Printer size={16} /> {tr('Εκτύπωση / PDF')}
-          </button>
+          <DownloadMenu table={exportTable} onPrint={() => setReport(tableReportHtml(exportTable(), getI18nLang()))} />
         </div>
       </div>
       <AssetFilterBar

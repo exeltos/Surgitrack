@@ -1,24 +1,12 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {
-  Cable,
-  CheckCircle2,
-  FileSpreadsheet,
-  KeyRound,
-  Pencil,
-  Plus,
-  RefreshCcw,
-  Trash2,
-  Upload,
-  Wifi,
-  X,
-  XCircle,
-} from 'lucide-react';
+import {Cable, CheckCircle2, KeyRound, Pencil, Plus, RefreshCcw, Trash2, Upload, Wifi, X, XCircle} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
-import {downloadXlsx} from '../../core/exportTable';
+import type {ExportTable} from '../../core/exportTable';
+import DownloadMenu from '../../components/ui/DownloadMenu';
 import {
   connectionLabel,
   deviceKindLabel,
@@ -158,9 +146,9 @@ export default function DevicesPage() {
     setSelectedId(device.id);
     await load();
   };
-  const exportReadings = () => {
-    if (!selected) return;
-    downloadXlsx({
+  const readingsTable = (): ExportTable => {
+    if (!selected) return {title: '', headers: [], rows: []};
+    return {
       title: L(`Κύκλοι ${selected.name}`, `${selected.name} cycles`),
       subtitle: `${L(deviceKindLabel[selected.kind].el, deviceKindLabel[selected.kind].en)} · ${selectedReadings.length}`,
       headers: [
@@ -185,7 +173,7 @@ export default function DevicesPage() {
         r.durationMinutes ?? '',
         L(connectionLabel[r.source].el, connectionLabel[r.source].en),
       ]),
-    });
+    };
   };
   const resultLabel = (result: DeviceReading['result']) =>
     result === 'PASS' ? L('Επιτυχία', 'Pass') : result === 'FAIL' ? L('Αποτυχία', 'Fail') : L('Άγνωστο', 'Unknown');
@@ -352,10 +340,7 @@ export default function DevicesPage() {
                 )}
               </small>
             </div>
-            <AppButton onClick={exportReadings} disabled={!selectedReadings.length}>
-              <FileSpreadsheet size={15} />
-              {L('Εξαγωγή Excel', 'Export Excel')}
-            </AppButton>
+            <DownloadMenu table={readingsTable} disabled={!selectedReadings.length} />
           </header>
           {selectedReadings.length === 0 ? (
             <div className="devices-empty small">
