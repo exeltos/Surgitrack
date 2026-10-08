@@ -2,6 +2,7 @@ import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import {deleteAppRecords, writeAppRecords, type CloudCollection, type CloudRecord} from './appRecords';
 import {loadChangedRecords, loadDeletedIds, recordKey} from './remoteChanges';
 import {isRealtimeLive, onRemoteChange} from './realtime';
+import {takeRestored, writeCollection} from './localCache';
 
 const SYNC_DELAY_MS = 400;
 const RETRY_DELAY_MS = 5000;
@@ -57,6 +58,18 @@ if (typeof window !== 'undefined') {
   });
 }
 
+// Each collection's "save this device's copy now", run when the page is hidden or closed.
+const cacheWriters = new Set<() => void>();
+if (typeof window !== 'undefined') {
+  const writeAll = () => cacheWriters.forEach(write => write());
+  window.addEventListener('pagehide', writeAll);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) writeAll();
+  });
+}
+/** How long the device's copy waits after a change before it is written (changes come in bursts). */
+const CACHE_DELAY_MS = 800;
+
 const diff = (known: Map<string, CloudRecord>, items: readonly CloudRecord[]) => {
   const changed = items.filter(item => known.get(item.id) !== item);
   const currentIds = new Set(items.map(item => item.id));
@@ -102,15 +115,58 @@ export function useAppRecordSync(
   applyRef.current = apply;
   // Records just taken from another device: their next appearance in the store is not a local change.
   const adopted = useRef(new Map<string, number>());
+  // Server time from which the next look fetches changes and deletions (kept in the device's copy).
+  const since = useRef(new Date(Date.now() - 10 * 60000).toISOString());
+  const deletedSince = useRef(since.current);
+  const pullNow = useRef<() => void>(() => undefined);
+  const cacheTimer = useRef<number | undefined>(undefined);
+  // Writes this device's copy: the current records and which of them the server has not confirmed yet.
+  const writeCopy = useRef(() => {
+    const known = confirmed.current;
+    if (!known) return;
+    window.clearTimeout(cacheTimer.current);
+    const {changed, removed} = diff(known, latest.current);
+    void writeCollection(collection, {
+      items: [...latest.current],
+      changed: changed.map(item => item.id),
+      removed,
+      since: since.current,
+      deletedSince: deletedSince.current,
+    });
+  });
+  const scheduleCopy = () => {
+    window.clearTimeout(cacheTimer.current);
+    cacheTimer.current = window.setTimeout(() => writeCopy.current(), CACHE_DELAY_MS);
+  };
+  useEffect(() => {
+    if (!organizationId) return;
+    const write = () => writeCopy.current();
+    cacheWriters.add(write);
+    return () => {
+      cacheWriters.delete(write);
+    };
+  }, [organizationId]);
 
   useEffect(() => {
     latest.current = items;
     if (!organizationId) return;
-    // The first snapshot is what was just loaded from the server.
+    // The first snapshot is what was just loaded from the server, or this device's copy of it.
     if (!confirmed.current) {
-      confirmed.current = new Map(items.map(item => [item.id, item]));
-      return;
+      const known = new Map(items.map(item => [item.id, item]));
+      const copy = takeRestored(organizationId, collection);
+      if (copy) {
+        since.current = copy.since;
+        deletedSince.current = copy.deletedSince;
+        // Changes the copy kept unsaved: the server does not have them, so they count as changed.
+        for (const id of [...copy.changed, ...copy.removed]) known.set(id, {id});
+      }
+      confirmed.current = known;
+      scheduleCopy();
+      // Fetch at once what other devices changed since the copy (or since this load).
+      window.setTimeout(() => pullNow.current(), copy ? 300 : 3000);
+      if (!copy || (!copy.changed.length && !copy.removed.length)) return;
     }
+    scheduleCopy();
     const known = confirmed.current;
     const key = `${organizationId}:${collection}`;
     adopt(known, items, adopted.current);
@@ -156,6 +212,9 @@ export function useAppRecordSync(
       } finally {
         busy.current = false;
         publish();
+        // The copy now records what was confirmed; a look that waited for the save can run.
+        writeCopy.current();
+        pullNow.current();
       }
     };
     const timer = window.setTimeout(() => {
@@ -167,8 +226,6 @@ export function useAppRecordSync(
   // Picks up what other devices saved, so this screen does not keep (and later write back) an old picture.
   useEffect(() => {
     if (!organizationId || !applyRef.current) return;
-    let since = new Date(Date.now() - 10 * 60000).toISOString();
-    let deletedSince = since;
     let lastLook = 0;
     let running = false;
     const pull = async () => {
@@ -180,12 +237,12 @@ export function useAppRecordSync(
       if (local.changed.length || local.removed.length) return;
       running = true;
       try {
-        const {records, latest: stamp} = await loadChangedRecords(organizationId, collection, since);
-        if (stamp) since = new Date(Date.parse(stamp) - 60000).toISOString();
+        const {records, latest: stamp} = await loadChangedRecords(organizationId, collection, since.current);
+        if (stamp) since.current = new Date(Date.parse(stamp) - 60000).toISOString();
         let removed: string[] = [];
         if (collection !== 'library') {
-          const deleted = await loadDeletedIds(organizationId, collection, deletedSince);
-          if (deleted.latest) deletedSince = new Date(Date.parse(deleted.latest) - 60000).toISOString();
+          const deleted = await loadDeletedIds(organizationId, collection, deletedSince.current);
+          if (deleted.latest) deletedSince.current = new Date(Date.parse(deleted.latest) - 60000).toISOString();
           const gone = new Set(deleted.ids);
           removed = latest.current.filter(item => known.get(item.id) === item && gone.has(item.id)).map(i => i.id);
         }
@@ -208,6 +265,7 @@ export function useAppRecordSync(
         running = false;
       }
     };
+    pullNow.current = () => void pull();
     // The periodic look: every 20 s, or every 60 s while live changes are connected.
     const timer = window.setInterval(() => {
       if (isRealtimeLive() && Date.now() - lastLook < LIVE_PULL_INTERVAL_MS) return;

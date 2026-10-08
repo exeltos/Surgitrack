@@ -4,7 +4,15 @@ import {demoAdminRepository} from '../adminRepositories/demoRepository';
 import {demoSurgiRepository} from '../repositories/demoRepository';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import type {LibraryItem} from '../../core/libraries';
-import {getCloudOrganizationId, loadAppRecords, seedAppRecords, type CloudRecords} from './appRecords';
+import {
+  getCloudOrganizationId,
+  loadAppRecords,
+  seedAppRecords,
+  STORE_COLLECTIONS,
+  type CloudCollection,
+  type CloudRecords,
+} from './appRecords';
+import {readCache, setCacheOwner, setRestored} from './localCache';
 import {productionOrganizationFor, resolveIdentity} from './identity';
 import {translateToEnglish} from '../../core/glossary';
 import Spinner from '../../components/ui/Spinner';
@@ -102,7 +110,18 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         return;
       }
       setTrial(plan.plan === 'TRIAL' ? plan : null);
-      let records = await loadAppRecords(organizationId);
+      // This device's copy (less than a day old) opens the hospital at once; the sync then fetches only
+      // what changed since, and sends what was left unsaved when the page closed.
+      const owner = {userId: result.identity.id, organizationId};
+      setCacheOwner(owner);
+      const collections: CloudCollection[] = [...STORE_COLLECTIONS, 'library'];
+      const copy = await readCache(owner, collections);
+      const fromCopy = collections.every(collection => copy[collection]);
+      let records: CloudRecords;
+      if (fromCopy) {
+        records = Object.fromEntries(collections.map(c => [c, copy[c]!.items])) as unknown as CloudRecords;
+        setRestored(organizationId, copy);
+      } else records = await loadAppRecords(organizationId);
       if (demo && !records.library.length) {
         await seedDemoOrganization(organizationId);
         records = await loadAppRecords(organizationId);
