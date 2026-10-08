@@ -1,8 +1,7 @@
 import {supabase} from '../../lib/supabase';
 import {CLOUD_TABLES, tableColumns, tableFromRow} from './cloudTables';
 import type {CloudCollection, CloudRecord} from './appRecords';
-
-const PAGE_SIZE = 1000;
+import {loadAllPages, PAGE_SIZE} from './pages';
 
 /** A record's content in a fixed form (keys sorted, empty values dropped), to tell real changes apart. */
 export const recordKey = (value: unknown): string => {
@@ -53,19 +52,16 @@ export async function loadChangedRecords(
 
 /** Every id of a collection, to notice records another device deleted. */
 export async function loadRecordIds(organizationId: string, collection: CloudCollection): Promise<Set<string>> {
-  const ids = new Set<string>();
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const {data, error} = await supabase
+  const rows = await loadAllPages<{id: string}>((from, to, withCount) =>
+    supabase
       .from(CLOUD_TABLES[collection].table)
-      .select('id')
+      .select('id', withCount ? {count: 'exact'} : undefined)
       .eq('organization_id', organizationId)
       .order('id')
-      .range(from, from + PAGE_SIZE - 1);
-    if (error) throw error;
-    const page = data as unknown as Array<{id: string}>;
-    page.forEach(row => ids.add(String(row.id)));
-    if (page.length < PAGE_SIZE) return ids;
-  }
+      .range(from, to)
+      .then(result => ({...result, data: result.data as unknown as Array<{id: string}> | null})),
+  );
+  return new Set(rows.map(row => String(row.id)));
 }
 
 /** Puts another device's records into a list: changed ones replaced in place, new ones first, deleted ones out. */

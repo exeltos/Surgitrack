@@ -7,6 +7,7 @@ import {
   tableToRow,
   type TableCollection,
 } from './cloudTables';
+import {loadAllPages} from './pages';
 
 /** Store collections saved in the cloud: each has its own table (see cloudTables), one row per record. */
 export const STORE_COLLECTIONS = [
@@ -32,7 +33,6 @@ export type CloudRecord = {id: string};
 
 export type CloudRecords = Record<CloudCollection, CloudRecord[]>;
 
-const PAGE_SIZE = 1000;
 const WRITE_CHUNK = 200;
 
 const emptyRecords = (): CloudRecords =>
@@ -40,20 +40,17 @@ const emptyRecords = (): CloudRecords =>
 
 /** Loads one collection's table, newest first (the store's order). */
 async function loadTable(organizationId: string, collection: TableCollection) {
-  const rows: CloudRecord[] = [];
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const {data, error} = await supabase
+  const rows = await loadAllPages<Record<string, unknown>>((from, to, withCount) =>
+    supabase
       .from(CLOUD_TABLES[collection].table)
-      .select(tableColumns(collection))
+      .select(tableColumns(collection), withCount ? {count: 'exact'} : undefined)
       .eq('organization_id', organizationId)
       .order('created_at', {ascending: false})
       .order('id')
-      .range(from, from + PAGE_SIZE - 1);
-    if (error) throw error;
-    const page = data as unknown as Array<Record<string, unknown>>;
-    rows.push(...page.map(row => tableFromRow(collection, row)));
-    if (page.length < PAGE_SIZE) return rows;
-  }
+      .range(from, to)
+      .then(result => ({...result, data: result.data as unknown as Array<Record<string, unknown>> | null})),
+  );
+  return rows.map(row => tableFromRow(collection, row));
 }
 
 /** Loads every record of an organization, newest first within each collection (the store's order). */
