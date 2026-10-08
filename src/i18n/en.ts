@@ -688,6 +688,15 @@ export const en: Record<string, string> = {
     'Record the cycle result. Release happens in a separate quality gate.',
   'Καταχώρηση αποτυχίας': 'Record failure',
   'Καταχώρηση από': 'Recorded by',
+  'Λάθος συνθηματικό.': 'Wrong password.',
+  'Η οθόνη κλειδώθηκε': 'The screen is locked',
+  'Κλείδωσε λόγω αδράνειας. Οι αλλαγές συνεχίζουν να αποθηκεύονται.':
+    'Locked after inactivity. Changes keep being saved.',
+  'Έλεγχος…': 'Checking…',
+  Ξεκλείδωμα: 'Unlock',
+  'Σύνδεση με άλλο χρήστη': 'Sign in as another user',
+  'Δεν έχουν αποθηκευτεί ακόμη {0} αλλαγές αυτού του χρήστη. Αν συνδεθεί άλλος χρήστης τώρα, θα χαθούν. Συνέχεια;':
+    '{0} changes of this user are not saved yet. If another user signs in now, they will be lost. Continue?',
   'Ό,τι καταχωρίσετε κρατιέται σε αυτή τη συσκευή και αποθηκεύεται μόλις επανέλθει η σύνδεση· αλλαγές άλλων συσκευών δεν φαίνονται μέχρι τότε.':
     'What you record is kept on this device and saved as soon as the connection is back; changes from other devices do not show until then.',
   'Οι τελευταίες αλλαγές κρατιούνται σε αυτή τη συσκευή και θα αποθηκευτούν μόλις επανέλθει η σύνδεση, ακόμη κι αν κλείσει η σελίδα: ανοίξτε την ξανά με τον ίδιο χρήστη.':

@@ -62,7 +62,11 @@ export type SystemSettings = {
   sterileShelfLifeMonths?: number;
   /** Departments that count the instruments when sending to Sterilization (see core/surgicalCount). */
   surgicalCountDepartments?: string[];
+  /** Minutes without use before the screen locks (0: never). Unset: DEFAULT_IDLE_LOCK_MINUTES. */
+  idleLockMinutes?: number;
 };
+export const DEFAULT_IDLE_LOCK_MINUTES = 15;
+export const IDLE_LOCK_OPTIONS = [0, 5, 10, 15, 30, 60] as const;
 export type ConfigurationAuditEvent = {
   id: string;
   entityType: 'WORKFLOW' | 'SYSTEM_SETTING' | 'LIBRARY' | 'USER' | 'ORGANIZATION' | 'ROLE_PERMISSIONS';

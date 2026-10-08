@@ -5,6 +5,7 @@ import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
+import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS} from '../../../core/libraryTypes';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, lang, libs, platformAdmin, setConfirm, tab} = s;
@@ -72,6 +73,27 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 {L(
                   'Προτείνεται στη Συσκευασία & Σήμανση και αλλάζει ανά Σετ ή εργαλείο. Μετρά από την αποδέσμευση.',
                   'Suggested at Packaging & Labelling and changeable per Set or instrument. Counted from the release.',
+                )}
+              </small>
+            </label>
+            <label>
+              {L('Κλείδωμα οθόνης μετά από αδράνεια', 'Screen lock after inactivity')}
+              <div className="studio-setting-input">
+                <select
+                  value={libs.systemSettings.idleLockMinutes ?? DEFAULT_IDLE_LOCK_MINUTES}
+                  onChange={e => libs.updateSystemSettings({idleLockMinutes: Number(e.target.value)}, currentUser.name)}
+                >
+                  {IDLE_LOCK_OPTIONS.map(minutes => (
+                    <option key={minutes} value={minutes}>
+                      {minutes ? L(`${minutes} λεπτά`, `${minutes} minutes`) : L('Ποτέ', 'Never')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <small>
+                {L(
+                  'Για κοινόχρηστα tablet και υπολογιστές: η οθόνη κλειδώνει και ξεκλειδώνει με το συνθηματικό του χρήστη· ο συγχρονισμός συνεχίζει από πίσω.',
+                  'For shared tablets and computers: the screen locks and unlocks with the user’s password; syncing goes on behind it.',
                 )}
               </small>
             </label>
