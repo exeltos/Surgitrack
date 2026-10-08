@@ -207,8 +207,10 @@ export default function SetsPage() {
                 <th>{tr('Τμήμα')}</th>
                 <th>{tr('Εργαλεία')}</th>
                 <th>{tr('Κατάσταση')}</th>
-                <th className="th-sym">
-                  <ExpirySymbol /> {tr('Λήξη')}
+                <th>
+                  <span className="th-sym">
+                    <ExpirySymbol /> {tr('Λήξη')}
+                  </span>
                 </th>
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
