@@ -85,3 +85,12 @@ export const navSectionFor = (
   const mode = toolMode(decodeURIComponent(tool[1]));
   return mode === 'STANDALONE' ? '/standalone-tools' : mode === 'STOCK' ? '/stock' : '/tools';
 };
+
+/**
+ * Where a user lands after signing in: the Overview when their menu has it, otherwise the first entry
+ * of their menu (e.g. Sets & Instruments for a department).
+ */
+export const homePathFor = (role: UserRole, can?: (permission: Permission) => boolean): string | undefined => {
+  const items = navigationFor(role, can);
+  return (items.find(item => item.to === '/overview') || items[0])?.to;
+};

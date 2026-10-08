@@ -11,6 +11,7 @@ import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
+import {homePathFor} from '../config/navigation';
 import Spinner from '../components/ui/Spinner';
 import {lazyPage} from '../core/resilience';
 import NotFoundPage from '../modules/NotFoundPage';
@@ -59,8 +60,12 @@ const readDemoSessionUser = (): SessionUser | undefined => {
 };
 
 function RoleHome() {
-  const {role} = useSurgi();
-  const home = role === 'ADMIN' && hospitalOverviewAvailable() ? '/overview' : roleHomePath(role);
+  const {role, can} = useSurgi();
+  // An admin outside a hospital (the platform owner) starts in Studio; everyone else on their menu's home.
+  const home =
+    role === 'ADMIN' && !hospitalOverviewAvailable()
+      ? roleHomePath(role)
+      : homePathFor(role, can) || roleHomePath(role);
   return <Navigate to={home} replace />;
 }
 const Guard = ({permission, children}: {permission: Permission; children: ReactNode}) => (

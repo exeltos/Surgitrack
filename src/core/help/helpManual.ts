@@ -68,11 +68,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Η οθόνη σας',
-          'Το μενού αριστερά δείχνει μόνο όσα επιτρέπει ο ρόλος σας. Στο πεδίο σάρωσης της πάνω μπάρας σαρώνετε ή γράφετε barcode και ανοίγει αμέσως το Σετ ή το εργαλείο. Πάνω δεξιά: γλώσσα (EL/EN), Βοήθεια, προσβασιμότητα (μέγεθος κειμένου, αντίθεση) και ειδοποιήσεις.',
+          'Το μενού αριστερά δείχνει μόνο όσα επιτρέπει ο ρόλος σας. Μετά τη σύνδεση ανοίγει η Επισκόπηση, αν υπάρχει στο μενού σας· αλλιώς η πρώτη επιλογή του μενού. Στο πεδίο σάρωσης της πάνω μπάρας σαρώνετε ή γράφετε barcode και ανοίγει αμέσως το Σετ ή το εργαλείο. Πάνω δεξιά: γλώσσα (EL/EN), Βοήθεια, προσβασιμότητα (μέγεθος κειμένου, αντίθεση) και ειδοποιήσεις.',
         ],
         en: [
           'Your screen',
-          'The menu on the left shows only what your role allows. In the scan field of the top bar, scan or type a barcode and the Set or instrument opens at once. Top right: language (EL/EN), Help, accessibility (text size, contrast) and notifications.',
+          'The menu on the left shows only what your role allows. After signing in the Overview opens if your menu has it; otherwise the first entry of your menu. In the scan field of the top bar, scan or type a barcode and the Set or instrument opens at once. Top right: language (EL/EN), Help, accessibility (text size, contrast) and notifications.',
         ],
       },
       {
