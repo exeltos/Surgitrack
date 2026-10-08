@@ -6173,7 +6173,7 @@ html
     .app-button-md,
     .asset-page-actions button,
     .page-head > .primary,
-    .movements-actions button,
+    .movements-actions > button,
     .set-composition-actions .app-button,
     .hospital-users-toolbar .app-button,
     .hospital-user-actions .app-button,
@@ -6209,7 +6209,7 @@ html body .content .asset-list-controls .icon-toggle {
   align-self: center;
   height: 38px;
 }
-html body .content .movements-actions button {
+html body .content .movements-actions > button {
   height: 38px;
   padding-block: 0;
 }
@@ -6865,7 +6865,7 @@ html body .ledger-row {
   padding-top: 8px;
   padding-bottom: 8px;
 }
-html body .movements-actions button {
+html body .movements-actions > button {
   min-height: 38px;
   padding: 0 14px;
   font-size: 13px;
@@ -9843,4 +9843,30 @@ html body .idle-lock-password button:hover,
 html body .idle-lock-password button[aria-pressed='true'] {
   background: #eef4f6;
   color: #155a6e;
+}
+
+/* Reports: the results fit the width on tablets and computers (no sideways scrolling). Texts wrap
+   between words; when that is not enough (useFitWidth), cells get tighter and long words may break.
+   Phones keep sideways scrolling, where a dozen columns cannot fit. */
+@media (min-width: 761px) {
+  .reports-result-body {
+    overflow-x: hidden;
+  }
+  .reports-table th,
+  .reports-table td {
+    white-space: normal;
+    overflow-wrap: break-word;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .reports-result-body.fit-tight .reports-table th,
+  .reports-result-body.fit-tight .reports-table td {
+    overflow-wrap: anywhere;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}
+/* Menu icons keep their size next to a long hint. */
+.action-menu-panel button > svg {
+  flex: 0 0 auto;
 }

@@ -1897,4 +1897,12 @@ export const en: Record<string, string> = {
   '{0} χρήσεις': '{0} uses',
   'Κάτω από το ελάχιστο': 'Below minimum',
   'Πρόσφατες αναζητήσεις': 'Recent searches',
+  'Excel (.xlsx)': 'Excel (.xlsx)',
+  'Πίνακας με φίλτρα, για επεξεργασία.': 'A table with filters, for editing.',
+  'PDF / Εκτύπωση': 'PDF / Print',
+  'PDF / Εκτύπωση επιλεγμένων': 'PDF / Print selected',
+  'Προεπισκόπηση, μετά εκτύπωση ή αποθήκευση ως PDF.': 'Preview, then print or save as PDF.',
+  'CSV (.csv)': 'CSV (.csv)',
+  'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
+  'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
 };

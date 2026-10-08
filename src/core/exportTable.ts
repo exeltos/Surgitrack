@@ -215,16 +215,35 @@ export function xlsxBlob(table: ExportTable) {
   ]);
 }
 
-/** Downloads the table as an Excel workbook. */
-export function downloadXlsx(table: ExportTable) {
-  const blob = xlsxBlob(table);
+const save = (blob: Blob, title: string, extension: string) => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `${safeName(table.title)}_${today()}.xlsx`;
+  a.download = `${safeName(title)}_${today()}.${extension}`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   window.setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
+/** Downloads the table as an Excel workbook. */
+export function downloadXlsx(table: ExportTable) {
+  save(xlsxBlob(table), table.title, 'xlsx');
+}
+
+const csvCell = (value: string | number) => {
+  const text = String(value ?? '');
+  return /[";\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+};
+/**
+ * The table as CSV for other programs: header row and data only, separated by ";" (what Excel in
+ * Greek and most European settings expects), with a byte-order mark so Greek opens correctly.
+ */
+export function tableCsv(table: ExportTable) {
+  return '\ufeff' + [table.headers, ...table.rows].map(row => row.map(csvCell).join(';')).join('\r\n') + '\r\n';
+}
+/** Downloads the table as CSV. */
+export function downloadCsv(table: ExportTable) {
+  save(new Blob([tableCsv(table)], {type: 'text/csv;charset=utf-8'}), table.title, 'csv');
 }
 
 const html = (value: string | number) =>

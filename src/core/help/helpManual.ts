@@ -701,11 +701,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Αρχείο',
-          'Κάθε συσκευή κρατά τους κύκλους της με θερμοκρασία, πίεση, διάρκεια και αποτέλεσμα. Το «Εξαγωγή Excel» τους κατεβάζει για έλεγχο ή επιθεώρηση.',
+          'Κάθε συσκευή κρατά τους κύκλους της με θερμοκρασία, πίεση, διάρκεια και αποτέλεσμα. Το «Λήψη» τους κατεβάζει σε Excel ή CSV για έλεγχο ή επιθεώρηση.',
         ],
         en: [
           'Record',
-          'Each device keeps its cycles with temperature, pressure, duration and result. “Export Excel” downloads them for review or audit.',
+          'Each device keeps its cycles with temperature, pressure, duration and result. “Download” saves them as Excel or CSV for review or audit.',
         ],
       },
     ],
@@ -1130,8 +1130,8 @@ export const helpManual: ManualSection[] = [
       ],
     },
     tip: {
-      el: 'Η «Εκτύπωση λίστας» και το Excel παίρνουν ό,τι έχετε επιλέξει, αλλιώς ό,τι δείχνουν τα φίλτρα.',
-      en: '"Print list" and Excel take your selection, otherwise what the filters show.',
+      el: 'Το «Λήψη» (Excel, PDF / Εκτύπωση, CSV) παίρνει ό,τι έχετε επιλέξει, αλλιώς ό,τι δείχνουν τα φίλτρα.',
+      en: '"Download" (Excel, PDF / Print, CSV) takes your selection, otherwise what the filters show.',
     },
     related: ['/stock', '/issues', '/reports'],
   },
@@ -1191,8 +1191,8 @@ export const helpManual: ManualSection[] = [
     permission: 'reports.view',
     title: {el: 'Αναφορές & Εκτυπώσεις', en: 'Reports & Printing'},
     summary: {
-      el: 'Έτοιμες αναφορές με φίλτρα, εκτύπωση/PDF και εξαγωγή σε Excel.',
-      en: 'Ready-made reports with filters, print/PDF and Excel export.',
+      el: 'Έτοιμες αναφορές με φίλτρα και λήψη σε Excel, PDF ή CSV.',
+      en: 'Ready-made reports with filters and download as Excel, PDF or CSV.',
     },
     audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
     chapters: [
@@ -1208,12 +1208,12 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Εκτύπωση & Excel',
-          'Το «Εκτύπωση / PDF» ανοίγει προεπισκόπηση A4. Το «Εξαγωγή Excel» κατεβάζει τα ίδια αποτελέσματα με τα φίλτρα που έχετε ορίσει.',
+          'Λήψη: Excel, PDF, CSV',
+          'Το κουμπί «Λήψη» έχει τρεις επιλογές: «Excel» κατεβάζει τα αποτελέσματα ως πίνακα με φίλτρα, «PDF / Εκτύπωση» ανοίγει προεπισκόπηση A4 για εκτύπωση ή αποθήκευση ως PDF, και «CSV» τα δίνει ως απλό κείμενο για άλλα προγράμματα. Όλες παίρνουν τα αποτελέσματα με τα φίλτρα που έχετε ορίσει. Ο πίνακας χωράει στο πλάτος της οθόνης· τα μεγάλα κείμενα αλλάζουν γραμμή.',
         ],
         en: [
-          'Print & Excel',
-          '"Print / PDF" opens an A4 preview. "Export Excel" downloads the same results with the filters you set.',
+          'Download: Excel, PDF, CSV',
+          'The "Download" button has three options: "Excel" downloads the results as a table with filters, "PDF / Print" opens an A4 preview to print or save as PDF, and "CSV" gives them as plain text for other programs. All take the results with the filters you set. The table fits the screen width; long texts wrap.',
         ],
       },
       {
@@ -1228,8 +1228,8 @@ export const helpManual: ManualSection[] = [
       },
     ],
     steps: {
-      el: ['Επιλέξτε αναφορά από αριστερά.', 'Ορίστε φίλτρα.', 'Εκτυπώστε ή εξάγετε σε Excel.'],
-      en: ['Pick a report on the left.', 'Set the filters.', 'Print or export to Excel.'],
+      el: ['Επιλέξτε αναφορά από αριστερά.', 'Ορίστε φίλτρα.', 'Πατήστε «Λήψη» και διαλέξτε Excel, PDF ή CSV.'],
+      en: ['Pick a report on the left.', 'Set the filters.', 'Press "Download" and choose Excel, PDF or CSV.'],
     },
     related: ['/overview', '/movements'],
   },

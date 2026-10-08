@@ -1,4 +1,5 @@
 import {useMemo, useState} from 'react';
+import {useFitWidth} from '../../components/ui/useFitWidth';
 import {
   Activity,
   AlertTriangle,
@@ -6,19 +7,17 @@ import {
   Boxes,
   CalendarClock,
   Flame,
-  FileSpreadsheet,
   FileText,
   History,
-  Printer,
   Search,
   Stethoscope,
   UsersRound,
   Wrench,
 } from 'lucide-react';
-import AppButton from '../../components/ui/AppButton';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
-import {downloadXlsx} from '../../core/exportTable';
+import type {ExportTable} from '../../core/exportTable';
+import DownloadMenu from '../../components/ui/DownloadMenu';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -635,16 +634,13 @@ export default function ReportsPage() {
       expiryState,
     ].join('|'),
   );
-  const exportExcel = () => {
-    const title =
-      active === 'composition' && selectedSet ? tr('Σύνθεση {0}', selectedSet.barcode) : tr(activeMeta.title);
-    downloadXlsx({
-      title,
-      subtitle: `${reportData.rows.length} ${tr('εγγραφές')}`,
-      headers: reportData.columns.map(c => c.label),
-      rows: reportData.rows.map(row => reportData.columns.map(c => cellText(c.key, row[c.key]))),
-    });
-  };
+  const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
+  const reportTable = (): ExportTable => ({
+    title: active === 'composition' && selectedSet ? tr('Σύνθεση {0}', selectedSet.barcode) : tr(activeMeta.title),
+    subtitle: `${reportData.rows.length} ${tr('εγγραφές')}`,
+    headers: reportData.columns.map(c => c.label),
+    rows: reportData.rows.map(row => reportData.columns.map(c => cellText(c.key, row[c.key]))),
+  });
 
   return (
     <div className="reports-page-workspace">
@@ -693,12 +689,7 @@ export default function ReportsPage() {
               <p>{tr(activeMeta.description)}</p>
             </div>
             <div className="reports-stage-actions">
-              <AppButton icon={<FileSpreadsheet size={16} />} onClick={exportExcel}>
-                {tr('Εξαγωγή Excel')}
-              </AppButton>
-              <AppButton variant="primary" icon={<Printer size={16} />} onClick={openPreview}>
-                {tr('Εκτύπωση / PDF')}
-              </AppButton>
+              <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
             </div>
           </header>
           <div className="reports-filter-strip">
@@ -747,7 +738,13 @@ export default function ReportsPage() {
                 </span>
               )}
             </div>
-            <div className="reports-result-body" role="region" tabIndex={0} aria-label={tr('Αποτελέσματα')}>
+            <div
+              ref={resultBody}
+              className="reports-result-body"
+              role="region"
+              tabIndex={0}
+              aria-label={tr('Αποτελέσματα')}
+            >
               {reportData.rows.length ? (
                 <table className="reports-table">
                   <thead>

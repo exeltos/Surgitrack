@@ -19,11 +19,18 @@ export default function ActionMenu({
   label,
   items,
   align = 'left',
+  variant = 'secondary',
+  disabled,
+  title,
 }: {
   icon: ReactNode;
   label: string;
   items: ActionMenuItem[];
   align?: 'left' | 'right';
+  variant?: 'primary' | 'secondary';
+  disabled?: boolean;
+  /** The button's tooltip (e.g. why it is disabled). */
+  title?: string;
 }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
@@ -48,7 +55,9 @@ export default function ActionMenu({
     <div className="action-menu" ref={wrap}>
       <button
         type="button"
-        className={`app-button app-button-secondary app-button-md action-menu-toggle ${open ? 'open' : ''}`}
+        className={`app-button app-button-${variant} app-button-md action-menu-toggle ${open ? 'open' : ''}`}
+        disabled={disabled}
+        title={title}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}
