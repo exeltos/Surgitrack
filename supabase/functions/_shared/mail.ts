@@ -22,7 +22,10 @@ const smtpSettings = () => {
 export const mailConfigured = () =>
   !!smtpSettings() || !!(Deno.env.get("RESEND_API_KEY") && Deno.env.get("MAIL_FROM"));
 
-const sendSmtp = async (to: string[], subject: string, html: string) => {
+/** How a message went: the way it was sent (none when nothing is set up) and the reason it failed. */
+export type MailResult = {ok: boolean; via: "smtp" | "resend" | null; error?: string};
+
+const sendSmtp = async (to: string[], subject: string, html: string): Promise<MailResult | undefined> => {
   const s = smtpSettings();
   if (!s) return undefined;
   try {
@@ -33,29 +36,43 @@ const sendSmtp = async (to: string[], subject: string, html: string) => {
       auth: {user: s.user, pass: s.pass},
     });
     await transport.sendMail({from: s.from, to: to.join(", "), subject, html});
-    return true;
+    return {ok: true, via: "smtp"};
   } catch (e) {
-    console.error("smtp", e instanceof Error ? e.message : e);
-    return false;
+    const error = e instanceof Error ? e.message : String(e);
+    console.error("smtp", error);
+    return {ok: false, via: "smtp", error};
   }
 };
 
-const sendResend = async (to: string[], subject: string, html: string) => {
+const sendResend = async (to: string[], subject: string, html: string): Promise<MailResult> => {
   const key = Deno.env.get("RESEND_API_KEY");
   const from = Deno.env.get("MAIL_FROM");
-  if (!key || !from) return false;
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {Authorization: `Bearer ${key}`, "Content-Type": "application/json"},
-    body: JSON.stringify({from, to, subject, html}),
-  });
-  return res.ok;
+  if (!key || !from) return {ok: false, via: null, error: "not_configured"};
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {Authorization: `Bearer ${key}`, "Content-Type": "application/json"},
+      body: JSON.stringify({from, to, subject, html}),
+    });
+    if (res.ok) return {ok: true, via: "resend"};
+    const error = `${res.status} ${(await res.text().catch(() => "")).slice(0, 300)}`.trim();
+    console.error("resend", error);
+    return {ok: false, via: "resend", error};
+  } catch (e) {
+    const error = e instanceof Error ? e.message : String(e);
+    console.error("resend", error);
+    return {ok: false, via: "resend", error};
+  }
 };
 
-export const sendEmail = async (to: string[], subject: string, html: string) => {
-  if (!to.length) return false;
+/** Sends one message and says how it went (used where the reason matters, e.g. the test email). */
+export const sendEmailResult = async (to: string[], subject: string, html: string): Promise<MailResult> => {
+  if (!to.length) return {ok: false, via: null, error: "no_recipient"};
   return (await sendSmtp(to, subject, html)) ?? (await sendResend(to, subject, html));
 };
+
+export const sendEmail = async (to: string[], subject: string, html: string) =>
+  (await sendEmailResult(to, subject, html)).ok;
 
 /** The same look as the sign-in emails: a dark header, a white card, one button. */
 export const layout = (eyebrow: string, title: string, body: string, button?: {href: string; label: string}) =>

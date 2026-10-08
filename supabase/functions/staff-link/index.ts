@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
+import {appSite} from "../_shared/mail.ts";
 
 // Makes a one-time link for a staff member, to pass on by hand (message, phone) when email does
 // not reach them: an invitation link for someone who has not accepted yet, or a set-new-password
@@ -11,9 +12,6 @@ const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const SITE = "https://surgitrack-med.netlify.app";
-// The link may point only at the app itself (production, its deploy previews, or local development).
-const ALLOWED_ORIGIN = /^(https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
 
 Deno.serve(async req => {
   const cors = corsFor(req, corsBase);
@@ -39,8 +37,8 @@ Deno.serve(async req => {
     const userId = String(body?.user_id || "");
     if (!userId) return json({error: "user_required"}, 400);
     if (userId === auth.user.id) return json({error: "self"}, 403);
-    const origin = String(body?.origin || "");
-    const site = ALLOWED_ORIGIN.test(origin) ? origin : SITE;
+    // The link may point only at the app itself.
+    const site = appSite(body?.origin);
 
     const {data: target} = await admin.from("profiles").select("id, organization_id, email, active").eq("id", userId).maybeSingle();
     if (!target?.email) return json({error: "not_found"}, 404);

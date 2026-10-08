@@ -1494,6 +1494,26 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Email της εφαρμογής',
+          'Οι προσκλήσεις, οι εγκρίσεις και οι ειδοποιήσεις φεύγουν με email· οι σύνδεσμοί τους οδηγούν στο surgitrack.eu. Στο Studio → Ρυθμίσεις το «Αποστολή δοκιμαστικού email» στέλνει ένα μήνυμα στο email σας και λέει αν στάλθηκε, με ποιον τρόπο (SMTP ή Resend) ή γιατί απέτυχε. Αν λέει ότι δεν έχει οριστεί τρόπος αποστολής, ορίστε τα στοιχεία του email στο Supabase (Edge Functions → Secrets).',
+        ],
+        en: [
+          'App emails',
+          'Invitations, approvals and alerts go out by email; their links lead to surgitrack.eu. In Studio → Settings, "Send a test email" sends a message to your email and says whether it was sent, which way (SMTP or Resend), or why it failed. If it says no way of sending is set up, set the email details in Supabase (Edge Functions → Secrets).',
+        ],
+      },
+      {
+        el: [
+          'Διαγραφή νοσοκομείου',
+          'Ένα νοσοκομείο που δεν χρειάζεται πια (π.χ. δοκιμαστικό) το κάνετε πρώτα «Ανενεργό»· τότε εμφανίζεται το «Διαγραφή» στην κάρτα του. Πληκτρολογείτε τον κωδικό του για επιβεβαίωση και διαγράφονται οριστικά οι χρήστες του (με τους λογαριασμούς εισόδου), τα τμήματα, τα Σετ, τα εργαλεία, το ιστορικό, οι συσκευές και οι ρυθμίσεις του. Δεν αναιρείται.',
+        ],
+        en: [
+          'Deleting a hospital',
+          'A hospital no longer needed (e.g. a test one) you first make "Inactive"; then "Delete" appears on its card. You type its code to confirm, and its users (with their sign-in accounts), departments, Sets, instruments, history, devices and settings are deleted for good. It cannot be undone.',
+        ],
+      },
+      {
+        el: [
           'Είσοδος',
           '«Είσοδος» σας μεταφέρει μέσα στο νοσοκομείο, με τα δικά του δεδομένα και μενού. Η πάνω μπάρα δείχνει πού εργάζεστε· «Έξοδος στο Studio» επιστρέφει.',
         ],

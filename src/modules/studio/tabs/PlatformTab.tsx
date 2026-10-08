@@ -1,8 +1,11 @@
-import {Building2, Plus, Users} from 'lucide-react';
+import {useState} from 'react';
+import {Building2, Plus, Trash2, Users} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {hospitalRoleKinds, hospitalRoleNames} from '../../../config/demoRoles';
 import {trialEndAfter, trialEnded} from '../../../core/trial';
 import PlanBadge from '../PlanBadge';
+import DeleteHospitalDialog from '../DeleteHospitalDialog';
+import type {Organization} from '../../../core/libraryTypes';
 import type {StudioPageState} from '../useStudioPage';
 
 export default function PlatformTab({s}: {s: StudioPageState}) {
@@ -14,6 +17,10 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
     displayedUsers,
     enterBuiltInDemo,
     enterOrganizationDemo,
+    libs,
+    loadCloudOrganizations,
+    loadCloudUsers,
+    loadCloudDepartments,
     openOrganization,
     platformAdmin,
     resetBuiltInDemo,
@@ -22,6 +29,7 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
     tab,
     updateOrganizationFlags,
   } = s;
+  const [deleting, setDeleting] = useState<Organization>();
   return (
     <>
       {tab === 'PLATFORM' && platformAdmin && (
@@ -172,10 +180,22 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
                       <b>{cloudDepartments.filter(d => d.organizationId === org.id).length}</b> ·{' '}
                       {L('Demo χρήστες', 'Demo users')}: <b>{demoUsers}</b>
                     </span>
-                    <button className="platform-manage-btn" onClick={() => openOrganization(org)}>
-                      <Users size={15} />
-                      <span>{L('Διαχείριση', 'Manage')}</span>
-                    </button>
+                    <span className="platform-org-meta-actions">
+                      {!org.active && libs.dataMode === 'PRODUCTION' && (
+                        <button
+                          className="platform-delete-btn"
+                          onClick={() => setDeleting(org)}
+                          title={L('Διαγραφή του ανενεργού νοσοκομείου', 'Delete the inactive hospital')}
+                        >
+                          <Trash2 size={15} />
+                          <span>{L('Διαγραφή', 'Delete')}</span>
+                        </button>
+                      )}
+                      <button className="platform-manage-btn" onClick={() => openOrganization(org)}>
+                        <Users size={15} />
+                        <span>{L('Διαχείριση', 'Manage')}</span>
+                      </button>
+                    </span>
                   </div>
                 </article>
               );
@@ -185,6 +205,21 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
             <div className="studio-empty">{L('Δεν υπάρχουν νοσοκομεία.', 'No hospitals yet.')}</div>
           )}
         </section>
+      )}
+      {deleting && (
+        <DeleteHospitalDialog
+          org={deleting}
+          members={displayedUsers.filter(user => user.organizationId === deleting.id)}
+          departments={cloudDepartments.filter(d => d.organizationId === deleting.id).length}
+          L={L}
+          onClose={() => setDeleting(undefined)}
+          onDeleted={() => {
+            setDeleting(undefined);
+            void loadCloudOrganizations();
+            void loadCloudUsers();
+            void loadCloudDepartments();
+          }}
+        />
       )}
     </>
   );

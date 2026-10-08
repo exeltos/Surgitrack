@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
-import {corsFor, jsonWith} from "../_shared/http.ts";
+import {SITE, corsFor, jsonWith} from "../_shared/http.ts";
 import {esc, layout, sendEmail, usernameBox} from "../_shared/mail.ts";
 
 // Email notifications and housekeeping for staff signup:
@@ -23,7 +23,7 @@ Deno.serve(async req => {
     const url = Deno.env.get("SUPABASE_URL")!;
     const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY") || service;
-    const appUrl = (Deno.env.get("APP_URL") || "https://surgitrack-med.netlify.app").replace(/\/$/, "");
+    const appUrl = (Deno.env.get("APP_URL") || SITE).replace(/\/$/, "");
     const admin = createClient(url, service, {auth: {persistSession: false}});
     const caller = createClient(url, anon, {global: {headers: {Authorization: req.headers.get("Authorization") || ""}}});
     const {data: auth} = await caller.auth.getUser();
