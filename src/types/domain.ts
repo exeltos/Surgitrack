@@ -120,6 +120,8 @@ export interface Movement {
   by: string;
   patientCode?: string;
   note?: string;
+  /** The account the database recorded this entry under (set by the database, never by the device). */
+  accountId?: string;
 }
 export interface Issue {
   id: string;

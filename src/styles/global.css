@@ -9606,3 +9606,11 @@ html body .handover-signature .demo-code .demo-fill-btn {
   width: auto;
   flex: 0 0 auto;
 }
+/* History: the account the database recorded, shown when it is not the name the device wrote. */
+html body .ledger-user small.ledger-account-differs {
+  color: #b26a00;
+  font-weight: 700;
+}
+html body .movement-detail-grid .movement-account.differs strong {
+  color: #b26a00;
+}

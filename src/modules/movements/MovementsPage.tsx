@@ -1,5 +1,6 @@
 import {useMemo, useState} from 'react';
 import {
+  BadgeCheck,
   ChevronRight,
   Clock3,
   Eraser,
@@ -18,6 +19,7 @@ import {getCloudOrganizationId} from '../../data/cloud/appRecords';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import {managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSurgi} from '../../store/SurgiStore';
+import {accountDiffers, useAccountNames} from './useAccountNames';
 import type {Movement} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -43,6 +45,10 @@ export default function MovementsPage() {
   const owner = demo ? !!getRealIdentity()?.platform : actingAsPlatformOwner();
   const ownerHospital = owner ? (demo ? getCloudOrganizationId() : managedHospitalId()) : undefined;
   const canClean = owner && (demo || !!ownerHospital);
+  // The account the database recorded on each entry (Demo has no accounts: the written name stands in).
+  const accountNames = useAccountNames(demo ? undefined : getCloudOrganizationId());
+  const accountOf = (m: Movement) =>
+    demo ? m.by : m.accountId ? accountNames.get(m.accountId) || tr('Λογαριασμός υποστήριξης SurgiTrack') : undefined;
   const [cleaning, setCleaning] = useState(false);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -332,6 +338,9 @@ export default function MovementsPage() {
                     <UserRound size={15} />
                     <span>
                       <b>{trData(m.by)}</b>
+                      {accountDiffers(m.by, accountOf(m)) && (
+                        <small className="ledger-account-differs">{tr('Λογαριασμός: {0}', accountOf(m) || '')}</small>
+                      )}
                       {m.patientCode && <small>{tr('Ασθενής {0}', m.patientCode)}</small>}
                     </span>
                   </span>
@@ -392,6 +401,15 @@ export default function MovementsPage() {
                 <UserRound />
                 <span>{tr('Καταχώρηση από')}</span>
                 <strong>{trData(selected.by)}</strong>
+              </div>
+              <div
+                className={
+                  accountDiffers(selected.by, accountOf(selected)) ? 'movement-account differs' : 'movement-account'
+                }
+              >
+                <BadgeCheck />
+                <span>{tr('Λογαριασμός (από τη βάση)')}</span>
+                <strong>{accountOf(selected) || '—'}</strong>
               </div>
               <div>
                 <ShieldCheck />

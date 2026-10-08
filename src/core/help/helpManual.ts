@@ -168,11 +168,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εξοπλισμός',
-          'Εκτυπωτής ετικετών barcode στην Αποστείρωση, σαρωτής barcode (USB ή Bluetooth, λειτουργεί ως πληκτρολόγιο) σε κάθε σημείο παράδοσης-παραλαβής, υπολογιστής ή tablet με Chrome ή Edge. Αν οι κλίβανοι θα συνδεθούν, δείτε «Συνδεδεμένες συσκευές».',
+          'Εκτυπωτής ετικετών barcode στην Αποστείρωση, σαρωτής barcode (USB ή Bluetooth, λειτουργεί ως πληκτρολόγιο) σε κάθε σημείο παράδοσης-παραλαβής, υπολογιστής ή tablet με Chrome ή Edge. Αν οι κλίβανοι θα συνδεθούν, δείτε «Συνδεδεμένες συσκευές». Για το τμήμα πληροφορικής: η εφαρμογή επικοινωνεί μόνο με τον δικό της ιστότοπο και με το Supabase (https και wss στο *.supabase.co), δεν φορτώνει τίποτα από τρίτους και δεν ανοίγει μέσα σε ξένες σελίδες· αυτό το επιβάλλουν οι κεφαλίδες ασφαλείας του ιστότοπου.',
         ],
         en: [
           'Equipment',
-          'A barcode label printer in Sterilization, a barcode scanner (USB or Bluetooth, works as a keyboard) at every handover point, a computer or tablet with Chrome or Edge. If sterilizers will be connected, see "Connected devices".',
+          'A barcode label printer in Sterilization, a barcode scanner (USB or Bluetooth, works as a keyboard) at every handover point, a computer or tablet with Chrome or Edge. If sterilizers will be connected, see "Connected devices". For the IT department: the app talks only to its own site and to Supabase (https and wss on *.supabase.co), loads nothing from third parties and does not open inside other sites; the site’s security headers enforce this.',
         ],
       },
       {
@@ -1236,6 +1236,16 @@ export const helpManual: ManualSection[] = [
       en: 'All users (department users see only their department)',
     },
     chapters: [
+      {
+        el: [
+          'Ποιος έκανε την κίνηση',
+          'Κάθε εγγραφή κρατά τον λογαριασμό με τον οποίο καταχωρήθηκε· τον γράφει η ίδια η βάση δεδομένων, όχι η συσκευή, και δεν αλλάζει. Στις λεπτομέρειες της κίνησης φαίνεται ως «Λογαριασμός (από τη βάση)». Αν το όνομα της καταχώρησης δεν είναι του λογαριασμού, ο λογαριασμός εμφανίζεται και στη λίστα με πορτοκαλί χρώμα.',
+        ],
+        en: [
+          'Who made the movement',
+          'Every entry keeps the account it was recorded under; the database itself writes it, not the device, and it never changes. The movement details show it as "Account (from the database)". When the recorded name is not the account’s, the account also shows in the list, in orange.',
+        ],
+      },
       {
         el: [
           'Καθαρισμός ιστορικού (owner)',

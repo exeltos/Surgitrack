@@ -72,6 +72,8 @@ const MOVEMENT_FIELDS: readonly Field[] = [
   ['by', 'by_name', 'text'],
   ['patientCode', 'patient_code', 'text'],
   ['note', 'note', 'text'],
+  // Read back only: the database stamps the signed-in account on every new entry.
+  ['accountId', 'created_by', 'text'],
 ];
 
 const ISSUE_FIELDS: readonly Field[] = [
