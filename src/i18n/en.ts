@@ -1905,4 +1905,6 @@ export const en: Record<string, string> = {
   'CSV (.csv)': 'CSV (.csv)',
   'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
   'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
+  'Ανοικτές πάνω από {0} ημέρες': 'Open over {0} days',
+  'Οποιαδήποτε ημερομηνία': 'Any date',
 };

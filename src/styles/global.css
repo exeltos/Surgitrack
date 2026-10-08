@@ -9870,3 +9870,13 @@ html body .idle-lock-password button[aria-pressed='true'] {
 .action-menu-panel button > svg {
   flex: 0 0 auto;
 }
+/* Issues cards: two per row on phones, like the Replacements cards next to them. */
+@media (max-width: 900px) {
+  html body .kpis.issues-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  html body .kpis.issues-kpis > * small {
+    white-space: normal;
+  }
+}

@@ -1175,14 +1175,28 @@ export const helpManual: ManualSection[] = [
           'Sterilization and the Administrator see two tabs: "Problem reports" (what was reported) and "Replacements & orders" (the instruments to replace, from Stock or with a purchase order).',
         ],
       },
+      {
+        el: [
+          'Αριθμοί',
+          'Πάνω από τη λίστα των αναφορών, τέσσερις κάρτες: Σύνολο, Ανοικτές, Ανοικτές πάνω από 7 ημέρες (αυτές που περιμένουν πολύ) και Επιλυμένες. Μετρούν μέσα στο τμήμα, τον τύπο και την αναζήτηση που έχετε επιλέξει· πατώντας μία, η λίστα δείχνει μόνο αυτές. Το ίδιο φίλτρο ημερομηνίας υπάρχει και στα «Φίλτρα».',
+        ],
+        en: [
+          'Numbers',
+          'Above the list of reports, four cards: Total, Open, Open over 7 days (those waiting long) and Resolved. They count within the department, type and search you chose; pressing one shows only those in the list. The same date filter is also in "Filters".',
+        ],
+      },
     ],
     steps: {
       el: [
-        'Φιλτράρετε «Ανοιχτές».',
+        'Πατήστε την κάρτα «Ανοικτές» (ή «Ανοικτές πάνω από 7 ημέρες» για όσες περιμένουν πολύ).',
         'Ανοίξτε την εκκρεμότητα και δείτε σημείωση και φωτογραφίες.',
         'Επιλύστε και κλείστε την.',
       ],
-      en: ['Filter "Open".', 'Open the issue and see its note and photos.', 'Resolve and close it.'],
+      en: [
+        'Press the "Open" card (or "Open over 7 days" for those waiting long).',
+        'Open the issue and see its note and photos.',
+        'Resolve and close it.',
+      ],
     },
     related: ['/replacements', '/sterilization', '/movements'],
   },

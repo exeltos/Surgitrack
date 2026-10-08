@@ -14,6 +14,11 @@ import type {Issue, PurchaseOrderLine} from '../../types/domain';
 import OrderDialog from '../replacements/OrderDialog';
 import {pieces} from '../replacements/pieces';
 import {useConfirm} from '../../components/ui/useConfirm';
+import KpiStrip from '../../components/ui/KpiStrip';
+import {daysSince} from '../../core/displayDate';
+
+/** An open issue older than this many days is "waiting long" (its own card and filter). */
+const OLD_ISSUE_DAYS = 7;
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 
@@ -52,6 +57,8 @@ export default function IssuesPage() {
   const [department, setDepartment] = useRememberedState('department', '');
   const [type, setType] = useRememberedState('type', '');
   const [status, setStatus] = useRememberedState('status', '');
+  const [age, setAge] = useRememberedState('age', '');
+  const isOld = (issue: Issue) => issue.status === 'OPEN' && (daysSince(issue.created) ?? 0) > OLD_ISSUE_DAYS;
   const values = (key: 'department' | 'type' | 'status') =>
     [...new Set(scopedIssues.map(i => i[key]).filter(Boolean))].sort();
   const filtered = scopedIssues.filter(
@@ -59,6 +66,7 @@ export default function IssuesPage() {
       (!department || i.department === department) &&
       (!type || i.type === type) &&
       (!status || i.status === status) &&
+      (age !== 'OLD' || isOld(i)) &&
       `${i.asset} ${i.type} ${i.department} ${i.note}`.toLowerCase().includes(q.toLowerCase()),
   );
   // The photos column shows only when some listed issue has photos.
@@ -70,6 +78,20 @@ export default function IssuesPage() {
     const set = tool ? undefined : sets.find(s => s.barcode === barcode);
     return {tool, set, to: tool ? `/tools/${tool.id}` : set ? `/sets/${set.id}` : undefined};
   };
+  // The cards count within the department/type/search chosen, and set the status (and age) filters.
+  const counted = scopedIssues.filter(
+    i =>
+      (!department || i.department === department) &&
+      (!type || i.type === type) &&
+      `${i.asset} ${i.type} ${i.department} ${i.note}`.toLowerCase().includes(q.toLowerCase()),
+  );
+  const card = (nextStatus: string, nextAge = '') => ({
+    onClick: () => {
+      setStatus(nextStatus);
+      setAge(nextAge);
+    },
+    active: status === nextStatus && age === nextAge,
+  });
   const goToOrders = () => setParams({tab: 'replacements', view: 'orders'}, {replace: true});
   return (
     <div className="tools-list-workspace">
@@ -109,6 +131,23 @@ export default function IssuesPage() {
         </Suspense>
       ) : (
         <>
+          <KpiStrip
+            className="issues-kpis"
+            items={[
+              {label: tr('Σύνολο'), value: counted.length, ...card('')},
+              {label: tr('Ανοικτές'), value: counted.filter(i => i.status === 'OPEN').length, ...card('OPEN')},
+              {
+                label: tr('Ανοικτές πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
+                value: counted.filter(isOld).length,
+                ...card('OPEN', 'OLD'),
+              },
+              {
+                label: tr('Επιλυμένες'),
+                value: counted.filter(i => i.status === 'RESOLVED').length,
+                ...card('RESOLVED'),
+              },
+            ]}
+          />
           <AssetFilterBar
             query={q}
             onQueryChange={setQ}
@@ -142,6 +181,13 @@ export default function IssuesPage() {
                 ],
                 onChange: setStatus,
               },
+              {
+                key: 'age',
+                value: age,
+                placeholder: tr('Οποιαδήποτε ημερομηνία'),
+                options: [{value: 'OLD', label: tr('Ανοικτές πάνω από {0} ημέρες', OLD_ISSUE_DAYS)}],
+                onChange: setAge,
+              },
             ]}
           />
           <ScrollableListPanel ariaLabel={tr('Λίστα εκκρεμοτήτων')}>
@@ -159,6 +205,7 @@ export default function IssuesPage() {
                   setDepartment('');
                   setType('');
                   setStatus('');
+                  setAge('');
                 }}
               />
             ) : (
