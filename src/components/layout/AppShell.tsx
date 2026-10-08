@@ -39,9 +39,10 @@ import {useRealtimeLive} from '../../data/cloud/realtime';
 import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
-import {getI18nLang, tr, trData} from '../../i18n';
+import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
+import {formatDate, formatTime} from '../../core/displayDate';
 
 // The user manual is loaded only when first opened.
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
@@ -658,8 +659,8 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                 ? 'Η δοκιμαστική περίοδος έληξε: το νοσοκομείο είναι κλειδωμένο για τους χρήστες του μέχρι να το ανανεώσετε από το Studio.'
                 : 'The trial has ended: the hospital is locked for its users until you renew it in Studio.'
               : lang === 'el'
-                ? `Δοκιμαστική περίοδος: ${trial.daysLeft === 1 ? 'απομένει 1 ημέρα' : `απομένουν ${trial.daysLeft} ημέρες`} (λήγει ${new Date(trial.endsAt || '').toLocaleDateString('el-GR')}). Μετά τη λήξη το νοσοκομείο κλειδώνει· για συνέχεια επικοινωνήστε με τον διαχειριστή του SurgiTrack.`
-                : `Trial period: ${trial.daysLeft === 1 ? '1 day left' : `${trial.daysLeft} days left`} (ends ${new Date(trial.endsAt || '').toLocaleDateString('en-GB')}). The hospital locks when it ends; to continue, contact the SurgiTrack administrator.`}
+                ? `Δοκιμαστική περίοδος: ${trial.daysLeft === 1 ? 'απομένει 1 ημέρα' : `απομένουν ${trial.daysLeft} ημέρες`} (λήγει ${formatDate(trial.endsAt || '')}). Μετά τη λήξη το νοσοκομείο κλειδώνει· για συνέχεια επικοινωνήστε με τον διαχειριστή του SurgiTrack.`
+                : `Trial period: ${trial.daysLeft === 1 ? '1 day left' : `${trial.daysLeft} days left`} (ends ${formatDate(trial.endsAt || '')}). The hospital locks when it ends; to continue, contact the SurgiTrack administrator.`}
           </div>
         )}
         {role === 'VIEWER' && (
@@ -725,13 +726,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
 
 /** Top-bar sync state: live / periodic, records waiting to be saved, last contact with the server. */
 function SyncChip({info, live, online}: {info: ReturnType<typeof useSyncInfo>; live: boolean; online: boolean}) {
-  const last = info.lastSyncAt
-    ? new Date(info.lastSyncAt).toLocaleTimeString(getI18nLang() === 'el' ? 'el-GR' : 'en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      })
-    : '—';
+  const last = info.lastSyncAt ? formatTime(info.lastSyncAt, true) : '—';
   const state =
     info.status === 'failed' ? 'failed' : info.status === 'saving' ? 'saving' : live && online ? 'live' : 'polling';
   const label =

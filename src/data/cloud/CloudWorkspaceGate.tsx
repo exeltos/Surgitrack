@@ -20,6 +20,7 @@ import Spinner from '../../components/ui/Spinner';
 import {trialState, type HospitalPlan, type TrialState} from '../../core/trial';
 import {loadPlatformContact, type PlatformContact} from './platformContact';
 import {TrialContext} from './trialContext';
+import {formatDate} from '../../core/displayDate';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -207,7 +208,7 @@ function TrialLocked({
   contact: PlatformContact;
 }) {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
-  const date = endsAt ? new Date(endsAt).toLocaleDateString(lang === 'el' ? 'el-GR' : 'en-GB') : '';
+  const date = endsAt ? formatDate(endsAt) : '';
   const signOut = async () => {
     await supabase.auth.signOut();
     sessionStorage.removeItem('surgitrack-active-organization');

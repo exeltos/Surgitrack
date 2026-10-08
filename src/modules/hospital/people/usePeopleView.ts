@@ -4,6 +4,7 @@ import {STERILIZATION_CODE, roles, roleValue} from '../hospitalPeopleMeta';
 import type {Request, Member, Decision} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
 import type {usePeopleData} from './usePeopleData';
+import {formatDateTime} from '../../../core/displayDate';
 
 export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<typeof usePeopleData>) {
   const {decisions, departments, el, invitations, lang, members, query, requests, setDecisions} = p;
@@ -21,8 +22,7 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
   const invitedToSignup = requests.filter(r => r.status === 'PENDING_EMAIL' && !r.user_id);
   const unconfirmed = requests.filter(r => r.status === 'PENDING_EMAIL' && !!r.user_id);
   const signupFormUrl = (token: string) => `${window.location.origin}/#/join/${token}`;
-  const date = (iso: string) =>
-    new Date(iso).toLocaleString(el ? 'el-GR' : 'en-GB', {dateStyle: 'medium', timeStyle: 'short'});
+  const date = (iso: string) => formatDateTime(iso);
 
   // ---- Signups waiting for approval ----
   const suggestedRole = (departmentId: string | null): UserRole =>

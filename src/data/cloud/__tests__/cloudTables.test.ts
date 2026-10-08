@@ -36,7 +36,7 @@ describe('cloud tables', () => {
       preparedByUserId: 'u1',
       preparedByName: 'Μ.',
       preparedByDepartment: 'Αποστείρωση',
-      at: '30/9/26, 10:27 π.μ.',
+      at: '30/09/2026 10:27',
       toolIds: ['t1', 't2'],
       checkedToolIds: ['t1'],
       allOk: false,
@@ -145,5 +145,14 @@ describe('cloud tables', () => {
   it('reads numeric columns sent as text as numbers', () => {
     const record = tableFromRow('tools', {id: 't3', barcode: 'T3', cost: '12.50', extra: null});
     expect(record).toEqual({id: 't3', barcode: 'T3', cost: 12.5});
+  });
+
+  it('reads dates saved by older versions the one way, nested ones included', () => {
+    const record = tableFromRow('movements', {
+      id: 'm1',
+      at: '8/10/26, 1:05 μ.μ.',
+      extra: {photos: [{id: 'p1', createdAt: '7/10/26, 10:58 π.μ.'}]},
+    });
+    expect(record).toMatchObject({at: '08/10/2026 13:05', photos: [{id: 'p1', createdAt: '07/10/2026 10:58'}]});
   });
 });

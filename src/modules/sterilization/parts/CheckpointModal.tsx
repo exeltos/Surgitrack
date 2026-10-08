@@ -4,6 +4,7 @@ import {CheckCircle2, X, ShieldCheck, UserCheck} from 'lucide-react';
 import {getI18nLang, tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
+import {formatDateTime} from '../../../core/displayDate';
 
 export default function CheckpointModal({s}: {s: SterilizationPageState}) {
   const {
@@ -56,8 +57,7 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
                   <small>{tr('Καταγράφεται από')}</small>
                   <strong>{trData(currentUser.name)}</strong>
                   <span>
-                    {trData(currentUser.department)} ·{' '}
-                    {new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}
+                    {trData(currentUser.department)} · {formatDateTime()}
                   </span>
                 </div>
               </div>

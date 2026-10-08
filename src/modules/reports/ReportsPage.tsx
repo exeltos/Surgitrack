@@ -28,6 +28,7 @@ import {getI18nLang, tr, trData} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {EXPIRY_MARK, STERILE_MARK} from '../../core/sterileSymbols';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
+import {formatDateTime} from '../../core/displayDate';
 
 const LOAD_STATUS: Record<string, string> = {
   OPEN: 'Στον κλίβανο',
@@ -128,7 +129,7 @@ function genericReportHtml(title: string, subtitle: string, columns: Array<{key:
         )
         .join('')
     : `<tr><td colspan="${columns.length}" class="empty">${escapeHtml(tr('Δεν υπάρχουν εγγραφές για τα επιλεγμένα φίλτρα.'))}</td></tr>`;
-  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#172b38;margin:0;font-size:9pt}.brand{font-size:16pt;font-weight:800;color:#153f51}.head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid #d8e1e5;padding-bottom:5mm;margin-bottom:5mm}.head h1{font-size:15pt;margin:2mm 0 1mm}.head p{margin:0;color:#687b87}.meta{text-align:right;color:#72838d;font-size:8pt}.count{margin:0 0 3mm;color:#526975}table{width:100%;border-collapse:collapse;table-layout:auto}th{text-align:left;background:#f1f5f7;color:#526975;font-size:8pt;padding:2.5mm 2mm;border-bottom:.4mm solid #c9d5da}td{padding:2.4mm 2mm;border-bottom:.2mm solid #e3eaed;vertical-align:top}.empty{text-align:center;padding:15mm;color:#81909a}.footer{margin-top:5mm;padding-top:3mm;border-top:.2mm solid #d8e1e5;display:flex;justify-content:space-between;color:#7a8a94;font-size:7.5pt}</style></head><body><div class="head"><div><div class="brand">SurgiTrack</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></div><div class="meta">${escapeHtml(tr('Αναφορά συστήματος'))}<br>${escapeHtml(new Date().toLocaleString(getI18nLang() === 'en' ? 'en-GB' : 'el-GR'))}</div></div><p class="count">${escapeHtml(tr('{0} εγγραφές', rows.length))}</p><table><thead><tr>${columns.map(c => `<th>${escapeHtml(c.label)}</th>`).join('')}</tr></thead><tbody>${bodyRows}</tbody></table><div class="footer"><span>SurgiTrack · Asset Management</span><span>${escapeHtml(title)}</span></div></body></html>`;
+  return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#172b38;margin:0;font-size:9pt}.brand{font-size:16pt;font-weight:800;color:#153f51}.head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid #d8e1e5;padding-bottom:5mm;margin-bottom:5mm}.head h1{font-size:15pt;margin:2mm 0 1mm}.head p{margin:0;color:#687b87}.meta{text-align:right;color:#72838d;font-size:8pt}.count{margin:0 0 3mm;color:#526975}table{width:100%;border-collapse:collapse;table-layout:auto}th{text-align:left;background:#f1f5f7;color:#526975;font-size:8pt;padding:2.5mm 2mm;border-bottom:.4mm solid #c9d5da}td{padding:2.4mm 2mm;border-bottom:.2mm solid #e3eaed;vertical-align:top}.empty{text-align:center;padding:15mm;color:#81909a}.footer{margin-top:5mm;padding-top:3mm;border-top:.2mm solid #d8e1e5;display:flex;justify-content:space-between;color:#7a8a94;font-size:7.5pt}</style></head><body><div class="head"><div><div class="brand">SurgiTrack</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></div><div class="meta">${escapeHtml(tr('Αναφορά συστήματος'))}<br>${escapeHtml(formatDateTime())}</div></div><p class="count">${escapeHtml(tr('{0} εγγραφές', rows.length))}</p><table><thead><tr>${columns.map(c => `<th>${escapeHtml(c.label)}</th>`).join('')}</tr></thead><tbody>${bodyRows}</tbody></table><div class="footer"><span>SurgiTrack · Asset Management</span><span>${escapeHtml(title)}</span></div></body></html>`;
 }
 
 export default function ReportsPage() {
@@ -483,7 +484,7 @@ export default function ReportsPage() {
           selectedSet,
           tools.filter(t => t.setId === selectedSet.id),
           currentUser.name,
-          new Date().toLocaleString('el-GR'),
+          formatDateTime(),
           issues.filter(i => i.status === 'OPEN').map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
           compositionOptions(selectedSet.colorTapes),
         ),

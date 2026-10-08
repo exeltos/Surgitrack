@@ -12,10 +12,10 @@ import type {ColorTape} from '../../core/colorTapes';
 import type {LibraryItem} from '../../core/libraries';
 import type {LibraryKey} from '../../core/libraryTypes';
 import type {BinEntry} from '../../types/domain';
-import {getI18nLang, tr, trData} from '../../i18n';
+import {tr, trData} from '../../i18n';
+import {formatDateTime} from '../../core/displayDate';
 
-const when = (iso: string) =>
-  new Date(iso).toLocaleString(getI18nLang() === 'en' ? 'en-GB' : 'el-GR', {dateStyle: 'short', timeStyle: 'short'});
+const when = (iso: string) => formatDateTime(iso);
 
 const LIBRARY_NAME: Record<string, string> = {
   departments: 'Τμήματα',

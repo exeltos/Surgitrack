@@ -51,6 +51,7 @@ import ActionMenu from '../../components/ui/ActionMenu';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 import {useConfirm} from '../../components/ui/useConfirm';
 import {printCountForm} from '../../components/department/printCountForm';
+import {formatDateTime} from '../../core/displayDate';
 
 export default function SetDetailPage() {
   const {
@@ -159,7 +160,7 @@ export default function SetDetailPage() {
   );
   const missing = Math.max(0, set.expected - members.length);
   const complete = missing === 0;
-  const preparedAt = new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'});
+  const preparedAt = formatDateTime();
   const uses = set.uses || 0;
   const memberValues = (key: 'manufacturer' | 'specialty' | 'state') =>
     [...new Set(members.map(tool => String(tool[key] || '')).filter(Boolean))].sort();

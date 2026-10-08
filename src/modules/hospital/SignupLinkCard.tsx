@@ -4,6 +4,7 @@ import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {signupUrl} from '../../data/cloud/accessRequests';
+import {formatDateTime} from '../../core/displayDate';
 
 type Link = {token: string; expires_at: string};
 
@@ -80,9 +81,7 @@ export default function SignupLinkCard({
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
-  const expires = link
-    ? new Date(link.expires_at).toLocaleString(el ? 'el-GR' : 'en-GB', {dateStyle: 'medium', timeStyle: 'short'})
-    : '';
+  const expires = link ? formatDateTime(link.expires_at) : '';
 
   return (
     <section className="hospital-card hospital-link">

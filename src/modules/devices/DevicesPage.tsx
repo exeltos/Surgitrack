@@ -27,6 +27,7 @@ import {
 import {DeviceEditor, FileDialog, KeyDialog, SerialDialog} from './DeviceDialogs';
 import {binEntryForDevice} from '../../core/recycleBin';
 import {messageOf} from './deviceUi';
+import {formatDateTime} from '../../core/displayDate';
 
 const emptyDevice: DeviceInput = {name: '', kind: 'STERILIZER', connection: 'FILE', active: true};
 
@@ -39,7 +40,6 @@ export default function DevicesPage() {
   const {organizationId, role, can, sterilizationCycles, processLoads, addToBin, currentUser} = useSurgi();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
-  const locale = lang === 'el' ? 'el-GR' : 'en-GB';
   const isAdmin = role === 'ADMIN';
   const canRecord = can('sterilization.workspace');
   const [devices, setDevices] = useState<Device[]>([]);
@@ -90,8 +90,7 @@ export default function DevicesPage() {
   const selected = devices.find(d => d.id === selectedId);
   const selectedReadings = readings.filter(r => r.deviceId === selectedId);
   const lastReading = (id: string) => readings.find(r => r.deviceId === id);
-  const when = (iso?: string) =>
-    iso ? new Date(iso).toLocaleString(locale, {dateStyle: 'short', timeStyle: 'short'}) : '—';
+  const when = (iso?: string) => (iso ? formatDateTime(iso) : '—');
 
   const save = async () => {
     if (!organizationId || !editor || !editor.value.name.trim()) return;

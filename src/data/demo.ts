@@ -1,5 +1,6 @@
 import type {SurgicalCount} from '../store/types';
 import {isoDate} from '../core/sterileExpiry';
+import {formatDate} from '../core/displayDate';
 import type {
   DeliveryRecord,
   Issue,
@@ -750,7 +751,7 @@ const demoSterile = (code: string, daysFromToday: number, months: number) => {
   set.sterilizedOn = isoDate(on);
   set.sterilizedTime = '10:30';
   // Who composed and who released it: part A of the count form, already signed by Sterilization.
-  const day = on.toLocaleDateString('en-GB');
+  const day = formatDate(on);
   const base = {workflowVersion: 1, assetId: set.id, assetKind: 'SET' as const, barcode: set.barcode};
   const members = tools.filter(tool => tool.setId === set.id);
   preparations.push({

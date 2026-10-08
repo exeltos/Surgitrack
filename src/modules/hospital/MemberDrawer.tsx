@@ -5,6 +5,7 @@ import {localizedName} from '../../core/glossary';
 import {roles, wholeHospital, roleValue, EMAIL_FORMAT, directInvite} from './hospitalPeopleMeta';
 import type {Department, Member, Draft} from './hospitalPeopleMeta';
 import LinkCopy from './LinkCopy';
+import {formatDateTime} from '../../core/displayDate';
 
 export default function MemberDrawer({
   member,
@@ -126,8 +127,8 @@ export default function MemberDrawer({
                 <small>
                   {invitedAt
                     ? L(
-                        `Στάλθηκε στις ${new Date(invitedAt).toLocaleString('el-GR', {dateStyle: 'medium', timeStyle: 'short'})}. Ο λογαριασμός ενεργοποιείται μόλις ορίσει κωδικό από το email.`,
-                        `Sent on ${new Date(invitedAt).toLocaleString('en-GB', {dateStyle: 'medium', timeStyle: 'short'})}. The account activates once they set a password from the email.`,
+                        `Στάλθηκε στις ${formatDateTime(invitedAt)}. Ο λογαριασμός ενεργοποιείται μόλις ορίσει κωδικό από το email.`,
+                        `Sent on ${formatDateTime(invitedAt)}. The account activates once they set a password from the email.`,
                       )
                     : L(
                         'Ο λογαριασμός ενεργοποιείται μόλις ορίσει κωδικό από το email.',

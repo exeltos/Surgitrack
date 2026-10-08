@@ -6,9 +6,10 @@ import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS} from '../../../core/libraryTypes';
+import {formatDateTime} from '../../../core/displayDate';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
-  const {L, currentUser, lang, libs, platformAdmin, setConfirm, tab} = s;
+  const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
   return (
     <>
       {tab === 'SYSTEM' && (
@@ -145,7 +146,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                       <b>{event.entityType}</b> · {event.entityId}
                     </span>
                     <span>
-                      {event.by} · {new Date(event.at).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB')}
+                      {event.by} · {formatDateTime(event.at)}
                     </span>
                   </div>
                 ))}

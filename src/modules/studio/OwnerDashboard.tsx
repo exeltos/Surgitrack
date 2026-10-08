@@ -4,6 +4,7 @@ import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
 import {trialState} from '../../core/trial';
 import type {AdminUser, Organization} from '../../core/libraryTypes';
+import {formatDate} from '../../core/displayDate';
 
 type Pending = {organization_id: string};
 type Invitation = {organization_id: string; email: string; full_name: string; last_sent_at: string | null};
@@ -59,7 +60,7 @@ export default function OwnerDashboard({
       .then(({data}) => setInvitations((data as Invitation[]) || []));
   }, [production]);
 
-  const date = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString('el-GR') : '—');
+  const date = (iso?: string | null) => (iso ? formatDate(iso) : '—');
   const rows = useMemo(
     () =>
       organizations.map(org => {

@@ -7,6 +7,7 @@ import {useAppPreferences} from '../../core/AppPreferences';
 import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {activeHospitalId, switchHospital} from '../../data/cloud/hospitalSwitch';
 import Spinner from '../../components/ui/Spinner';
+import {formatDate} from '../../core/displayDate';
 
 type Hospital = {id: string; name: string; code: string; active: boolean; demo_enabled: boolean};
 type Stats = {departments: number; users: number; activeUsers: number; pending: number; linkUntil?: string};
@@ -130,7 +131,7 @@ export default function HospitalsPage() {
     if (toggleError) setError(toggleError.message);
     else await load();
   };
-  const date = (iso: string) => new Date(iso).toLocaleDateString(el ? 'el-GR' : 'en-GB');
+  const date = (iso: string) => formatDate(iso);
   const currentHospital = hospitals.find(h => h.id === current);
 
   return (

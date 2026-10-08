@@ -4,6 +4,7 @@ import type {StudioPageState} from '../useStudioPage';
 import {useSurgi} from '../../../store/SurgiStore';
 import {workflowStageState, type WorkflowStageConfig} from '../../../core/workflow';
 import type {AssetState} from '../../../types/domain';
+import {formatDateTime} from '../../../core/displayDate';
 
 export default function WorkflowTab({s}: {s: StudioPageState}) {
   const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
@@ -306,9 +307,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                   </span>
                   <span>
                     {version.changedBy} ·{' '}
-                    {version.effectiveFrom
-                      ? new Date(version.effectiveFrom).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB')
-                      : L('Αρχική', 'Initial')}
+                    {version.effectiveFrom ? formatDateTime(version.effectiveFrom) : L('Αρχική', 'Initial')}
                   </span>
                 </div>
               ))}
