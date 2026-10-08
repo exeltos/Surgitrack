@@ -1018,6 +1018,33 @@ issues.push(
     note: 'Αντικαταστάθηκε από το stock.',
   },
 );
+// Two recent reports (dated from today), so the Issues cards show "open" apart from "open over 7 days".
+const demoDaysAgo = (days: number, time: string) => {
+  const day = new Date();
+  day.setDate(day.getDate() - days);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(day.getDate())}/${pad(day.getMonth() + 1)}/${day.getFullYear()} ${time}`;
+};
+issues.push(
+  {
+    id: 'i-recent-1',
+    asset: `${setByCode('GYN-HYST').barcode} · ${setByCode('GYN-HYST').name}`,
+    type: 'Φθορά',
+    status: 'OPEN',
+    created: demoDaysAgo(1, '10:20'),
+    department: setByCode('GYN-HYST').department,
+    note: 'Χαλαρή άρθρωση σε λαβίδα Kocher.',
+  },
+  {
+    id: 'i-recent-2',
+    asset: `${setByCode('ER-MINOR').barcode} · ${setByCode('ER-MINOR').name}`,
+    type: 'Έλλειψη',
+    status: 'OPEN',
+    created: demoDaysAgo(3, '18:45'),
+    department: setByCode('ER-MINOR').department,
+    note: 'Λείπει ένα ψαλίδι ραμμάτων.',
+  },
+);
 // Instruments to replace: damaged in their Set, in Service, lost.
 const damagedMayo = tools.find(tool => tool.setId === 's1' && tool.code === '08.280.18')!;
 issues.push(
