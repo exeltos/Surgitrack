@@ -9614,3 +9614,8 @@ html body .ledger-user small.ledger-account-differs {
 html body .movement-detail-grid .movement-account.differs strong {
   color: #b26a00;
 }
+/* Movement details: the patient row has no icon; its label and value sit in the text column. */
+html body .movement-detail-grid .movement-patient > span,
+html body .movement-detail-grid .movement-patient > strong {
+  grid-column: 2;
+}
