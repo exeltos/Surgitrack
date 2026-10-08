@@ -11,6 +11,7 @@ import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
 import {clearCache} from '../data/cloud/localCache';
+import {clearIdleLock} from '../components/layout/IdleLock';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import {homePathFor} from '../config/navigation';
 import Spinner from '../components/ui/Spinner';
@@ -178,6 +179,7 @@ export default function App() {
     const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
     // This device's copy of the hospital (patient codes included) goes with the session.
     await clearCache();
+    clearIdleLock();
     if (!wasDemo) await supabase.auth.signOut();
     sessionStorage.removeItem('surgitrack-auth');
     sessionStorage.removeItem('surgitrack-demo-role');

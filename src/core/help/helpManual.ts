@@ -1316,11 +1316,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ρόλοι και Ρυθμίσεις',
-          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις», την προεπιλεγμένη διάρκεια αποστείρωσης (2, 3 ή 6 μήνες) και την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο).',
+          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις», την προεπιλεγμένη διάρκεια αποστείρωσης (2, 3 ή 6 μήνες), την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο) και το «Κλείδωμα οθόνης μετά από αδράνεια» (προεπιλογή 15 λεπτά, ή Ποτέ): σε κοινόχρηστα tablet η οθόνη κλειδώνει όταν δεν χρησιμοποιείται, ξεκλειδώνει με το συνθηματικό του ίδιου χρήστη ή άλλος χρήστης συνδέεται ως ο εαυτός του· ο συγχρονισμός συνεχίζει από πίσω και τίποτα δεν χάνεται.',
         ],
         en: [
           'Roles and Settings',
-          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few uses left", the default sterile shelf life (2, 3 or 6 months) and the hospital’s barcode label (size, header, logo).',
+          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few uses left", the default sterile shelf life (2, 3 or 6 months) and the hospital’s barcode label (size, header, logo), and "Screen lock after inactivity" (default 15 minutes, or Never): on shared tablets the screen locks when not in use and unlocks with the same user’s password, or another user signs in as themselves; syncing goes on behind it and nothing is lost.',
         ],
       },
     ],

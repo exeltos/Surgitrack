@@ -30,6 +30,9 @@ import RoleSwitcher from './RoleSwitcher';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSyncInfo} from '../../data/cloud/useAppRecordSync';
+import IdleLock from './IdleLock';
+import {useLibraries} from '../../core/LibraryStore';
+import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
 import {getCloudOrganizationId} from '../../data/cloud/appRecords';
 import {useRealtimeLive} from '../../data/cloud/realtime';
 import {useOnline} from '../../core/useOnline';
@@ -94,8 +97,11 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     clearToast,
     role,
     can,
+    organizationName,
   } = useSurgi();
   const syncInfo = useSyncInfo();
+  const {systemSettings} = useLibraries();
+  const idleLockMinutes = systemSettings.idleLockMinutes ?? DEFAULT_IDLE_LOCK_MINUTES;
   const syncStatus = syncInfo.status;
   const realtimeLive = useRealtimeLive();
   const online = useOnline();
@@ -688,6 +694,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           </button>
         </div>
       )}
+      <IdleLock minutes={idleLockMinutes} userName={signedInName} hospital={organizationName} onSwitchUser={onLogout} />
     </div>
   );
 }
