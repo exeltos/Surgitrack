@@ -11,6 +11,7 @@ import {
 import {autoMapping, buildImportPlan, findHeaderRow, type ImportMapping, type ImportPlan} from '../assetImport';
 import {cleanName} from '../../../core/nameCheck';
 import type {SetAsset, Tool} from '../../../types/domain';
+import {formatDateTime} from '../../../core/displayDate';
 
 export type Step = 'FILE' | 'MAP' | 'CHECK' | 'DONE';
 export const STEPS: Array<{id: Step; el: string; en: string}> = [
@@ -233,7 +234,7 @@ export function useAssetImport({lang, organizations, departments, byName}: Impor
   const mappedName = mapping.name >= 0;
   const filledRows = dataRows.filter(row => row.some(Boolean));
   const sample = filledRows.slice(0, 3);
-  const formatDate = (iso: string) => new Date(iso).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB');
+  const formatDate = (iso: string) => formatDateTime(iso);
 
   return {
     lang,

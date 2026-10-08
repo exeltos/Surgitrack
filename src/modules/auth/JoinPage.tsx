@@ -5,6 +5,7 @@ import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {localizedName} from '../../core/glossary';
 import {APP_VERSION} from '../../config/appMeta';
+import {formatDate} from '../../core/displayDate';
 
 type LinkInfo = {
   organization_name: string;
@@ -104,7 +105,7 @@ export default function JoinPage({token}: {token: string}) {
     setSentTo(email);
   };
 
-  const expires = info?.expires_at ? new Date(info.expires_at).toLocaleDateString(el ? 'el-GR' : 'en-GB') : '';
+  const expires = info?.expires_at ? formatDate(info.expires_at) : '';
   return (
     <div className="auth-page">
       <header className="auth-topbar">

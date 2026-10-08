@@ -4,6 +4,8 @@
  * a picture of the screen.
  */
 
+import {formatDateTime} from './displayDate';
+
 export type ExportTable = {
   /** Document title, e.g. "Ιστορικό κινήσεων". */
   title: string;
@@ -251,10 +253,7 @@ const html = (value: string | number) =>
 
 /** A printable report page (A4 landscape) of the table, for "Print / PDF". */
 export function tableReportHtml(table: ExportTable, lang: string) {
-  const printed = new Date().toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
+  const printed = formatDateTime();
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${html(table.title)}</title>
 <style>
 @page { size: A4 landscape; margin: 14mm 12mm; }

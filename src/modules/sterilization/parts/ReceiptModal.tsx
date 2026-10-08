@@ -14,6 +14,7 @@ import {
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import {formatDateTime} from '../../../core/displayDate';
 
 export default function ReceiptModal({s}: {s: SterilizationPageState}) {
   const {
@@ -90,7 +91,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                     <div>
                       <Clock3 />
                       <span>{tr('Ημερομηνία / ώρα')}</span>
-                      <strong>{new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}</strong>
+                      <strong>{formatDateTime()}</strong>
                     </div>
                     <div>
                       <UserCheck />

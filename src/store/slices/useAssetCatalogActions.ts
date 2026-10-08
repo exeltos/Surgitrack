@@ -9,6 +9,7 @@ import type {useSurgiHelpers} from './useSurgiHelpers';
 import type {useReceiptAndCycleActions} from './useReceiptAndCycleActions';
 import type {useLoadActions} from './useLoadActions';
 import type {useAssetHelpers} from './useAssetHelpers';
+import {formatDate} from '../../core/displayDate';
 
 export function useAssetCatalogActions(
   p: ReturnType<typeof useSurgiSession> &
@@ -419,7 +420,7 @@ export function useAssetCatalogActions(
       expected: p.toolIds.length,
       actual: p.toolIds.length,
       category: 'Χειρουργικά Set',
-      createdAt: new Date().toLocaleDateString('el-GR'),
+      createdAt: formatDate(),
       uses: 0,
       maxUses: p.maxUses,
       notes: p.notes,
@@ -484,7 +485,7 @@ export function useAssetCatalogActions(
       actual: withTools ? sourceTools.length : 0,
       expected: withTools ? sourceTools.length : src.expected,
       state: 'IN_DEPARTMENT',
-      createdAt: new Date().toLocaleDateString('el-GR'),
+      createdAt: formatDate(),
       photos: [],
       importBatch: undefined,
     };

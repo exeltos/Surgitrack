@@ -18,6 +18,7 @@ import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
 import {SET_SHORTAGE_CODE} from '../hooks/usePreparationChecks';
+import {formatDateTime} from '../../../core/displayDate';
 
 // The side column and the list scroll only up and down: a tap (focus) must never shift them sideways.
 const keepLeft = (event: UIEvent<HTMLElement>) => {
@@ -103,7 +104,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                   </span>
                   <span title={tr('Ημερομηνία / ώρα')}>
                     <Clock3 size={15} />
-                    {new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})}
+                    {formatDateTime()}
                   </span>
                   <span title={tr('Φυσικά εργαλεία')}>
                     <Layers3 size={15} />
@@ -247,7 +248,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                             prepDraft.asset,
                             prepTools,
                             currentUser.name,
-                            new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'}),
+                            formatDateTime(),
                             issues
                               .filter(
                                 i =>

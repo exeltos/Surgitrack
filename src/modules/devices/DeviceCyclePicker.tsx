@@ -4,6 +4,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {unusedReadings, type Device, type DeviceKind, type DeviceReading} from '../../core/deviceData';
 import {listDevices, listReadings} from '../../data/cloud/devices';
+import {formatDateTime} from '../../core/displayDate';
 
 const SHOWN = 5;
 
@@ -57,10 +58,7 @@ export default function DeviceCyclePicker({
 
   if (!devices.length) return null;
   const deviceOf = (r: DeviceReading) => devices.find(d => d.id === r.deviceId)!;
-  const time = (iso?: string) =>
-    iso
-      ? new Date(iso).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB', {dateStyle: 'short', timeStyle: 'short'})
-      : '';
+  const time = (iso?: string) => (iso ? formatDateTime(iso) : '');
 
   return (
     <div className="device-cycle-picker">

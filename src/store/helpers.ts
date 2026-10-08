@@ -1,7 +1,8 @@
 import type {Asset, AssetKind, SetAsset, Tool} from '../types/domain';
 import type {LifecycleAlert, SessionUser, UserRole} from './types';
+import {formatDateTime} from '../core/displayDate';
 
-export const formatStoreDateTime = () => new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'});
+export const formatStoreDateTime = () => formatDateTime();
 
 export const getActiveDepartment = (role: UserRole, user: SessionUser) =>
   role === 'DEPARTMENT' ? user.department : 'Όλα τα τμήματα';

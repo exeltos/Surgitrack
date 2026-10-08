@@ -1,5 +1,6 @@
 import type {SetAsset, Tool} from '../../types/domain';
 import type {SheetRows} from '../../core/sheetImport';
+import {formatDate} from '../../core/displayDate';
 
 /**
  * Bulk import of Sets and instruments from a spreadsheet: one row per instrument (with a quantity
@@ -375,7 +376,7 @@ export function buildImportPlan(
   let nextSet = highest(allBarcodes, 'S');
   const newBarcode = (prefix: 'T' | 'S') =>
     `${prefix}${String(prefix === 'T' ? ++nextTool : ++nextSet).padStart(6, '0')}`;
-  const createdAt = (context.now || new Date()).toLocaleDateString('el-GR');
+  const createdAt = formatDate(context.now || new Date());
   let toolNumber = 0;
   const tools: Tool[] = [];
   const pieces = (line: Line, make: (barcode: string) => Tool) => {

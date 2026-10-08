@@ -1,5 +1,6 @@
 import {supabase} from '../../lib/supabase';
 import type {CloudCollection, CloudRecord} from './appRecords';
+import {normalizeDates} from '../../core/displayDate';
 
 /**
  * This device's copy of the hospital's records (IndexedDB), per signed-in user and hospital:
@@ -80,7 +81,8 @@ export async function readCache(
         request.onsuccess = () => {
           const entry = request.result as CachedCollection | undefined;
           if (entry && entry.version === CACHE_VERSION && Date.now() - entry.savedAt < CACHE_MAX_AGE_MS)
-            out[collection] = entry;
+            // A copy saved by an older version may hold dates in the older form.
+            out[collection] = {...entry, items: normalizeDates(entry.items), bases: normalizeDates(entry.bases)};
         };
       }
       tx.oncomplete = () => resolve(out);

@@ -1,4 +1,5 @@
 import type {AssetPhoto} from '../../types/domain';
+import {formatDateTime} from '../../core/displayDate';
 
 export async function filesToAssetPhotos(files: File[]): Promise<AssetPhoto[]> {
   const images = files.filter(file => file.type.startsWith('image/'));
@@ -12,7 +13,7 @@ export async function filesToAssetPhotos(files: File[]): Promise<AssetPhoto[]> {
               id: `ph-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`,
               name: file.name || `Φωτογραφία ${index + 1}`,
               dataUrl: String(reader.result || ''),
-              createdAt: new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'}),
+              createdAt: formatDateTime(),
             });
           reader.onerror = () => reject(reader.error);
           reader.readAsDataURL(file);

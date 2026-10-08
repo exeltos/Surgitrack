@@ -2,6 +2,7 @@ import type {PurchaseOrder} from '../../types/domain';
 import type {ReplacementItem} from '../../core/replacements';
 import {REASON_LABEL} from '../../core/replacements';
 import {getI18nLang, tr, trData} from '../../i18n';
+import {formatDateTime} from '../../core/displayDate';
 
 const esc = (value: unknown) =>
   String(value ?? '').replace(
@@ -35,7 +36,7 @@ td{padding:1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nt
 const page = (title: string, body: string) =>
   `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${STYLE}</style></head><body>${body}</body></html>`;
 
-const now = () => new Date().toLocaleString(getI18nLang() === 'en' ? 'en-GB' : 'el-GR');
+const now = () => formatDateTime();
 
 /** The list of instruments to replace, as filtered or selected on screen, for print or PDF. */
 export function replacementListHtml(items: readonly ReplacementItem[], subtitle: string, hospital?: string) {

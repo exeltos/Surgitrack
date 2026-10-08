@@ -3,6 +3,7 @@ import {tr, trData} from '../../i18n';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
 import {code128Svg, escapeHtml, openPrintWindow} from './printUtils';
+import {formatDateTime} from '../../core/displayDate';
 
 /** One item of the load as the form lists it; `sterileUntil` once released. */
 export type ReleaseFormItem = {
@@ -143,7 +144,7 @@ export function releaseFormBody({
     <div class="decision"><b>${escapeHtml(tr('Απόφαση'))}</b>${choice(tr('Αποδεσμεύεται'), decided === 'RELEASED')}${choice(tr('Μη αποδέσμευση · επανεπεξεργασία όλου του φορτίου'), decided === 'REPROCESS')}${load.note ? `<small>${escapeHtml(load.note)}</small>` : ''}</div>
     <div class="sign"><b>${escapeHtml(tr('Έγκριση'))}</b><span>${escapeHtml(trData(approver.name))}</span><span>${escapeHtml(trData(approver.department || ''))}</span><span>${escapeHtml(released ? released.at : draft?.at || tr('Ημερομηνία / ώρα: ………………'))}</span><div class="line">${escapeHtml(tr('Υπογραφή'))}</div></div>
   </div>
-  <div class="footer"><span>SurgiTrack · ${escapeHtml(load.id)}</span><span>${escapeHtml(tr('Εκτυπώθηκε {0}', new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'})))}</span></div>
+  <div class="footer"><span>SurgiTrack · ${escapeHtml(load.id)}</span><span>${escapeHtml(tr('Εκτυπώθηκε {0}', formatDateTime()))}</span></div>
   </div>`;
 }
 

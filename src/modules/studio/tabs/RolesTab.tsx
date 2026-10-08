@@ -3,11 +3,11 @@ import {permissionCatalog, type PermissionGroup} from '../../../core/permissions
 import AppButton from '../../../components/ui/AppButton';
 import {roles, permissionGroupMeta} from '../studioMeta';
 import type {StudioPageState} from '../useStudioPage';
+import {formatDateTime} from '../../../core/displayDate';
 
 export default function RolesTab({s}: {s: StudioPageState}) {
   const {
     L,
-    lang,
     libs,
     protectedPermissionSet,
     resetSelectedRole,
@@ -202,12 +202,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                 .slice(0, 5)
                 .map(entry => (
                   <div className="studio-role-audit-row" key={entry.id}>
-                    <span>
-                      {new Date(entry.at).toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB', {
-                        dateStyle: 'short',
-                        timeStyle: 'short',
-                      })}
-                    </span>
+                    <span>{formatDateTime(entry.at)}</span>
                     <strong>{entry.by}</strong>
                     <small>
                       {entry.permissions.length} {L('δικαιώματα', 'permissions')}

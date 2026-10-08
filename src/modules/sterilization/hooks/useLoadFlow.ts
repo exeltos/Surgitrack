@@ -8,6 +8,7 @@ import type {useIssueReport} from './useIssueReport';
 import type {useReceiptFlow} from './useReceiptFlow';
 import type {usePreparationFlow} from './usePreparationFlow';
 import type {useCycleFlow} from './useCycleFlow';
+import {formatDateTime} from '../../../core/displayDate';
 
 export function useLoadFlow(
   p: ReturnType<typeof useSterilizationState> &
@@ -223,7 +224,7 @@ export function useLoadFlow(
             biological: releaseLoadBi,
             physicalOk: releaseLoadChecks.physicalParametersOk,
             packagingOk: releaseLoadChecks.packagingIntegrityOk,
-            at: new Date().toLocaleString('el-GR', {dateStyle: 'short', timeStyle: 'short'}),
+            at: formatDateTime(),
           }
         : undefined,
     });

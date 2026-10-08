@@ -1,8 +1,10 @@
 /**
  * Store collections that live in their own tables, one column per field. The store keeps working
  * with records; this maps a record to a row and back. Fields with no column yet are kept in
- * `extra`, so a record always comes back exactly as it was saved.
+ * `extra`, so a record always comes back as it was saved (dates in older forms read the one way).
  */
+import {normalizeDates} from '../../core/displayDate';
+
 type FieldKind = 'text' | 'number' | 'boolean' | 'json' | 'textArray';
 type Field = readonly [field: string, column: string, kind: FieldKind];
 type Row = Record<string, unknown>;
@@ -398,5 +400,6 @@ export function tableFromRow(collection: TableCollection, row: Row): {id: string
   // A value kept in `extra` (one the columns could not hold) wins over the column's placeholder.
   Object.assign(record, (row.extra as Record<string, unknown> | null) || {});
   for (const column of BOOKKEEPING) delete record[column];
-  return {...record, id: String(row.id)};
+  // Dates saved by older versions ("8/10/26, 1:05 μ.μ.") read the one way (08/10/2026 13:05).
+  return normalizeDates({...record, id: String(row.id)});
 }
