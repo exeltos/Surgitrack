@@ -60,6 +60,17 @@ export default function StockPage() {
     state: [state, setState],
     usage: [usage, setUsage],
   });
+  // A filter card shows the list (from the minimums view too); the minimums view lights its own card.
+  const listKpi = (preset?: Record<string, string>) => {
+    const filter = kpi(preset);
+    return {
+      onClick: () => {
+        filter.onClick();
+        if (view === 'MIN') setParams({}, {replace: true});
+      },
+      active: view === 'LIST' && filter.active,
+    };
+  };
   const stockKinds = new Set(stock.map(t => `${t.code}|${t.name}`)).size;
   return (
     <div className="tools-list-workspace">
@@ -76,6 +87,25 @@ export default function StockPage() {
             )}
           </div>
         }
+      />
+      {/* The numbers first, for both views; then the tabs right above what they switch. */}
+      <KpiStrip
+        compact
+        items={[
+          {label: tr('Εργαλεία Αποθέματος'), value: stock.length, ...listKpi()},
+          {label: tr('Είδη εργαλείων'), value: stockKinds},
+          {
+            label: tr('Με όριο χρήσεων'),
+            value: stock.filter(t => !!t.maxUses).length,
+            ...listKpi({usage: 'LIMITED'}),
+          },
+          {
+            label: tr('Κάτω από το ελάχιστο'),
+            value: lowCount,
+            onClick: () => setParams({view: 'minimums'}, {replace: true}),
+            active: view === 'MIN',
+          },
+        ]}
       />
       <div className="name-check-tabs stock-tabs" role="tablist">
         <button
@@ -99,23 +129,6 @@ export default function StockPage() {
         <StockMinimums />
       ) : (
         <>
-          <KpiStrip
-            compact
-            items={[
-              {label: tr('Εργαλεία Αποθέματος'), value: stock.length, ...kpi()},
-              {label: tr('Είδη εργαλείων'), value: stockKinds},
-              {
-                label: tr('Με όριο χρήσεων'),
-                value: stock.filter(t => !!t.maxUses).length,
-                ...kpi({usage: 'LIMITED'}),
-              },
-              {
-                label: tr('Κάτω από το ελάχιστο'),
-                value: lowCount,
-                onClick: () => setParams({view: 'minimums'}, {replace: true}),
-              },
-            ]}
-          />
           <AssetFilterBar
             query={q}
             onQueryChange={setQ}

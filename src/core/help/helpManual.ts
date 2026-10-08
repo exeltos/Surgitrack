@@ -1040,6 +1040,16 @@ export const helpManual: ManualSection[] = [
     chapters: [
       {
         el: [
+          'Αριθμοί και καρτέλες',
+          'Πάνω βλέπετε τους αριθμούς του Αποθέματος (εργαλεία, είδη, με όριο χρήσεων, κάτω από το ελάχιστο)· πατώντας μια κάρτα φιλτράρεται η λίστα, και το «Κάτω από το ελάχιστο» ανοίγει τα Ελάχιστα αποθέματα. Από κάτω, οι καρτέλες «Εργαλεία Αποθέματος» και «Ελάχιστα αποθέματα» αλλάζουν τη λίστα.',
+        ],
+        en: [
+          'Numbers and tabs',
+          'At the top are the Stock numbers (instruments, kinds, with a usage limit, below the minimum); tapping a card filters the list, and "Below the minimum" opens Minimum stock. Below them, the "Stock instruments" and "Minimum stock" tabs switch the list.',
+        ],
+      },
+      {
+        el: [
           'Προσθήκη σε Σετ',
           'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Απόθεμα. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
         ],
