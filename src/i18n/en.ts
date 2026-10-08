@@ -688,6 +688,8 @@ export const en: Record<string, string> = {
     'Record the cycle result. Release happens in a separate quality gate.',
   'Καταχώρηση αποτυχίας': 'Record failure',
   'Καταχώρηση από': 'Recorded by',
+  'Απόκρυψη συνθηματικού': 'Hide password',
+  'Εμφάνιση συνθηματικού': 'Show password',
   'Φόρτωση του παλαιότερου ιστορικού…': 'Loading the older history…',
   'Εμφανίζεται το ιστορικό των τελευταίων 90 ημερών.': 'Showing the history of the last 90 days.',
   'Φόρτωση παλαιότερων': 'Load older',

@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {Lock, LogIn} from 'lucide-react';
+import {Eye, EyeOff, Lock, LogIn} from 'lucide-react';
 import {supabase} from '../../lib/supabase';
 import {useSyncInfo} from '../../data/cloud/useAppRecordSync';
 import {tr} from '../../i18n';
@@ -96,6 +96,7 @@ function LockScreen({
   const sync = useSyncInfo();
   const [email, setEmail] = useState<string | null | undefined>(undefined);
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -117,6 +118,7 @@ function LockScreen({
     if (signInError || !data.user) {
       setError(tr('Λάθος συνθηματικό.'));
       setPassword('');
+      setShowPassword(false);
       return;
     }
     setPassword('');
@@ -153,14 +155,25 @@ function LockScreen({
         {!passwordless && (
           <label>
             <span>{tr('Συνθηματικό')}</span>
-            <input
-              type="password"
-              autoFocus
-              autoComplete="current-password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              disabled={busy || email === undefined}
-            />
+            <div className="idle-lock-password">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                autoFocus
+                autoComplete="current-password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                disabled={busy || email === undefined}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(shown => !shown)}
+                aria-label={showPassword ? tr('Απόκρυψη συνθηματικού') : tr('Εμφάνιση συνθηματικού')}
+                aria-pressed={showPassword}
+                title={showPassword ? tr('Απόκρυψη συνθηματικού') : tr('Εμφάνιση συνθηματικού')}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </label>
         )}
         {error && (
