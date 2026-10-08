@@ -50,18 +50,27 @@ export async function loadChangedRecords(
   }
 }
 
-/** Every id of a collection, to notice records another device deleted. */
-export async function loadRecordIds(organizationId: string, collection: CloudCollection): Promise<Set<string>> {
-  const rows = await loadAllPages<{id: string}>((from, to, withCount) =>
+/**
+ * Ids of a collection deleted (on any device) since `since`, as the database recorded them, with the latest
+ * stamp seen. One small query instead of downloading every id to find the missing ones.
+ */
+export async function loadDeletedIds(
+  organizationId: string,
+  collection: CloudCollection,
+  since: string,
+): Promise<{ids: string[]; latest?: string}> {
+  const rows = await loadAllPages<{id: string; deleted_at: string}>((from, to, withCount) =>
     supabase
-      .from(CLOUD_TABLES[collection].table)
-      .select('id', withCount ? {count: 'exact'} : undefined)
+      .from('deleted_records')
+      .select('id,deleted_at', withCount ? {count: 'exact'} : undefined)
       .eq('organization_id', organizationId)
-      .order('id')
+      .eq('collection', collection)
+      .gte('deleted_at', since)
+      .order('deleted_at')
       .range(from, to)
-      .then(result => ({...result, data: result.data as unknown as Array<{id: string}> | null})),
+      .then(result => ({...result, data: result.data as unknown as Array<{id: string; deleted_at: string}> | null})),
   );
-  return new Set(rows.map(row => String(row.id)));
+  return {ids: rows.map(row => String(row.id)), latest: rows.length ? rows[rows.length - 1].deleted_at : undefined};
 }
 
 /** Puts another device's records into a list: changed ones replaced in place, new ones first, deleted ones out. */

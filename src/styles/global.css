@@ -9619,3 +9619,50 @@ html body .movement-detail-grid .movement-patient > span,
 html body .movement-detail-grid .movement-patient > strong {
   grid-column: 2;
 }
+/* Top-bar sync chip: live (green), periodic (grey), saving (blue), failed (red). */
+html body .sync-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  cursor: default;
+}
+html body .sync-chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+html body .sync-chip.live {
+  background: #ecfdf3;
+  color: #067647;
+}
+html body .sync-chip.polling {
+  background: #f2f4f7;
+  color: #475467;
+}
+html body .sync-chip.saving i {
+  animation: sync-pulse 1s ease-in-out infinite;
+}
+@keyframes sync-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .sync-chip.saving i {
+    animation: none;
+  }
+}
+@media (max-width: 650px) {
+  html body .sync-chip {
+    display: inline-flex;
+    padding: 4px 7px;
+    font-size: 0;
+    gap: 0;
+  }
+  html body .sync-chip i {
+    width: 9px;
+    height: 9px;
+  }
+}

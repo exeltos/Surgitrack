@@ -688,6 +688,17 @@ export const en: Record<string, string> = {
     'Record the cycle result. Release happens in a separate quality gate.',
   'Καταχώρηση αποτυχίας': 'Record failure',
   'Καταχώρηση από': 'Recorded by',
+  'Αλλαγές σε αναμονή αποθήκευσης: {0}. Τελευταία επικοινωνία: {1}':
+    'Changes waiting to be saved: {0}. Last contact: {1}',
+  'Έλεγχος για αλλαγές κάθε 20 δευτερόλεπτα. Τελευταία επικοινωνία: {0}':
+    'Checking for changes every 20 seconds. Last contact: {0}',
+  'Ζωντανός συγχρονισμός: οι αλλαγές των άλλων συσκευών εμφανίζονται αμέσως. Τελευταία επικοινωνία: {0}':
+    'Live sync: changes from other devices show at once. Last contact: {0}',
+  'Δεν αποθηκεύτηκε · νέα προσπάθεια': 'Not saved · retrying',
+  'Αποθήκευση · {0} αλλαγές': 'Saving · {0} changes',
+  'Αποθήκευση…': 'Saving…',
+  Συγχρονισμός: 'Sync',
+  Ζωντανά: 'Live',
   'Λογαριασμός (από τη βάση)': 'Account (from the database)',
   'Λογαριασμός: {0}': 'Account: {0}',
   'Λογαριασμός υποστήριξης SurgiTrack': 'SurgiTrack support account',
