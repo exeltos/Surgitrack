@@ -1238,6 +1238,16 @@ export const helpManual: ManualSection[] = [
     chapters: [
       {
         el: [
+          'Καθαρισμός ιστορικού (owner)',
+          'Μόνο ο owner της πλατφόρμας, μέσα σε νοσοκομείο, βλέπει το «Καθαρισμός ιστορικού». Τσεκάρει τις εγγραφές (ή «Επιλογή όλων των εμφανιζόμενων» μετά από φίλτρα) και πατά «Διαγραφή επιλεγμένων». Η διαγραφή είναι οριστική και καταγράφεται ως νέα εγγραφή «Καθαρισμός ιστορικού · N εγγραφές». Για όλους τους άλλους το ιστορικό δεν αλλάζει.',
+        ],
+        en: [
+          'Cleaning up history (owner)',
+          'Only the platform owner, inside a hospital, sees "Clean up history". They tick the entries (or "Select all shown" after filtering) and press "Delete selected". The deletion is permanent and is recorded as a new "History clean-up · N entries" entry. For everyone else the history never changes.',
+        ],
+      },
+      {
+        el: [
           'Αμετάβλητο',
           'Οι εγγραφές του ιστορικού δεν τροποποιούνται. Χρησιμοποιήστε τα φίλτρα ημερομηνίας, κατεύθυνσης και ενέργειας για να βρείτε μια κίνηση.',
         ],

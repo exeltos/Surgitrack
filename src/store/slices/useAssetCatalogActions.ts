@@ -32,8 +32,27 @@ export function useAssetCatalogActions(
     setTools,
     sets,
     tools,
+    setMovements,
   } = p;
 
+  /**
+   * The platform owner's clean-up of chosen history entries (already deleted on the server): they leave
+   * the list, and the clean-up itself is recorded as a new entry.
+   */
+  const forgetMovements = (ids: readonly string[]) => {
+    if (!ids.length) return;
+    const gone = new Set(ids);
+    setMovements(list => list.filter(m => !gone.has(m.id)));
+    addMovement({
+      asset: 'Ιστορικό κινήσεων',
+      assetKind: 'SET',
+      from: '—',
+      to: '—',
+      status: `Καθαρισμός ιστορικού · ${ids.length} εγγραφές`,
+      by: currentUser.name,
+    });
+    notify(tr('Διαγράφηκαν {0} εγγραφές του ιστορικού.', ids.length));
+  };
   /** A signed surgical count of a Set (or a standalone instrument); a shortage or damage opens an issue. */
   const recordCount = (p: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => {
     const c: SurgicalCount = {
@@ -584,6 +603,7 @@ export function useAssetCatalogActions(
     notify(tr('{0}: το εργαλείο διαγράφηκε. Μπορείς να το επαναφέρεις από τον Κάδο.', src.barcode));
   };
   return {
+    forgetMovements,
     addAssetPhotos,
     createSet,
     createTool,

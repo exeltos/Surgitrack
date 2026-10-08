@@ -1853,4 +1853,15 @@ export const en: Record<string, string> = {
   Καταμέτρηση: 'Count',
   'Υπογεγραμμένη · {0} από {1} · {2} {3}': 'Signed · {0} of {1} · {2} {3}',
   'Υπογραφή καταμέτρησης': 'Sign the count',
+  Αποεπιλογή: 'Clear selection',
+  'Διαγράφηκαν {0} εγγραφές του ιστορικού.': '{0} history entries deleted.',
+  'Διαγραφή επιλεγμένων': 'Delete selected',
+  'Επιλέξτε τις εγγραφές που θα διαγραφούν οριστικά · {0} επιλεγμένες':
+    'Pick the entries to delete permanently · {0} selected',
+  'Επιλογή όλων των εμφανιζόμενων ({0})': 'Select all shown ({0})',
+  'Η διαγραφή δεν ολοκληρώθηκε: {0}': 'The deletion did not complete: {0}',
+  'Καθαρισμός ιστορικού': 'Clean up history',
+  'Μόνο για τον owner της πλατφόρμας': 'Platform owner only',
+  'Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.':
+    'Permanently delete {0} history entries? The clean-up will be recorded as a new entry.',
 };
