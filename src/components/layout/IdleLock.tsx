@@ -4,8 +4,8 @@ import {Eye, EyeOff, Lock, LogIn} from 'lucide-react';
 import {supabase} from '../../lib/supabase';
 import {useSyncInfo} from '../../data/cloud/useAppRecordSync';
 import {tr} from '../../i18n';
+import {LOCK_KEY} from './idleLockState';
 
-const LOCK_KEY = 'surgitrack-screen-locked';
 const ACTIVITY_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'] as const;
 /** How often the idle time is checked (the lock may come up to this much later than the setting). */
 const CHECK_MS = 15000;
@@ -78,9 +78,6 @@ export default function IdleLock({
     document.body,
   );
 }
-
-/** Clears the lock (sign-out: the next user starts unlocked). */
-export const clearIdleLock = () => sessionStorage.removeItem(LOCK_KEY);
 
 function LockScreen({
   userName,

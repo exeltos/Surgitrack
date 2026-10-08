@@ -9222,7 +9222,7 @@ html body .sets-expiry {
   font-variant-numeric: tabular-nums;
 }
 html body .sets-expiry.expiring {
-  color: #b26a00;
+  color: #9c5c00;
   font-weight: 700;
 }
 html body .sets-expiry.expired {
@@ -9608,11 +9608,11 @@ html body .handover-signature .demo-code .demo-fill-btn {
 }
 /* History: the account the database recorded, shown when it is not the name the device wrote. */
 html body .ledger-user small.ledger-account-differs {
-  color: #b26a00;
+  color: #9c5c00;
   font-weight: 700;
 }
 html body .movement-detail-grid .movement-account.differs strong {
-  color: #b26a00;
+  color: #9c5c00;
 }
 /* Movement details: the patient row has no icon; its label and value sit in the text column. */
 html body .movement-detail-grid .movement-patient > span,
