@@ -11,7 +11,7 @@ import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
 import {clearCache} from '../data/cloud/localCache';
-import {clearIdleLock} from '../components/layout/IdleLock';
+import {clearIdleLock} from '../components/layout/idleLockState';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
 import {homePathFor} from '../config/navigation';
 import Spinner from '../components/ui/Spinner';
