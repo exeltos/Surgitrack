@@ -187,6 +187,7 @@ export default function IssuesPage() {
                         <small className="row-sub">
                           {[trData(i.type), trData(i.department)].filter(Boolean).join(' · ')}
                         </small>
+                        {i.note && <small className="issue-note-inline">{i.note}</small>}
                       </td>
                       <td className="issue-note" title={i.note}>
                         {i.note}
