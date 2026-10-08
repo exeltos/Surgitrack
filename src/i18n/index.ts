@@ -75,6 +75,8 @@ const DATA_PATTERNS: Array<[RegExp, string]> = [
   [/^Ολοκλήρωση ελέγχου$/, 'Check completed'],
   [/^Καταμέτρηση χειρουργείου υπογεγραμμένη · (\d+)\/(\d+)$/, 'Surgical count signed · $1/$2'],
   [/^Λείπουν: (.+)$/, 'Missing: $1'],
+  [/^Καθαρισμός ιστορικού · (\d+) εγγραφές$/, 'History clean-up · $1 entries'],
+  [/^Ιστορικό κινήσεων$/, 'Movement history'],
   [/^Αντικατάσταση στη σύνθεση από (.+)$/, 'Replaced in the composition by $1'],
   [/^Αντικατάσταση εργαλείου (.+)$/, 'Replacement for instrument $1'],
   [/^Δημιουργία από (.+)$/, 'Created from $1'],

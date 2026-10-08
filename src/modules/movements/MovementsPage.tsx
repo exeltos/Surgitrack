@@ -1,5 +1,20 @@
 import {useMemo, useState} from 'react';
-import {ChevronRight, Clock3, FileSpreadsheet, MapPin, Printer, Route, ShieldCheck, UserRound, X} from 'lucide-react';
+import {
+  ChevronRight,
+  Clock3,
+  Eraser,
+  FileSpreadsheet,
+  MapPin,
+  Printer,
+  Route,
+  ShieldCheck,
+  Trash2,
+  UserRound,
+  X,
+} from 'lucide-react';
+import {supabase} from '../../lib/supabase';
+import {actingAsPlatformOwner} from '../../data/cloud/identity';
+import {managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSurgi} from '../../store/SurgiStore';
 import type {Movement} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
@@ -20,7 +35,13 @@ function assetParts(value: string) {
 }
 
 export default function MovementsPage() {
-  const {movements, sets, tools, role, currentUser} = useSurgi();
+  const {movements, sets, tools, role, currentUser, forgetMovements} = useSurgi();
+  // Only the platform owner, working in a real hospital, can clean chosen entries out of the history.
+  const ownerHospital = actingAsPlatformOwner() ? managedHospitalId() : undefined;
+  const [cleaning, setCleaning] = useState(false);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
+  const [cleanError, setCleanError] = useState('');
   const departmentBarcodes = useMemo(
     () =>
       new Set([
@@ -116,6 +137,38 @@ export default function MovementsPage() {
     };
   };
   const rows = useProgressiveList(filtered, [q, from, to, status, kind, dateFrom, dateTo].join('|'));
+  const togglePick = (id: string) =>
+    setPicked(current => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const stopCleaning = () => {
+    setCleaning(false);
+    setPicked(new Set());
+    setCleanError('');
+  };
+  const deletePicked = async () => {
+    if (!ownerHospital || !picked.size) return;
+    if (
+      !window.confirm(
+        tr('Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.', picked.size),
+      )
+    )
+      return;
+    setBusy(true);
+    setCleanError('');
+    const ids = [...picked];
+    const {error} = await supabase.rpc('platform_delete_movements', {p_org: ownerHospital, p_ids: ids});
+    setBusy(false);
+    if (error) {
+      setCleanError(tr('Η διαγραφή δεν ολοκληρώθηκε: {0}', error.message));
+      return;
+    }
+    forgetMovements(ids);
+    stopCleaning();
+  };
   return (
     <div className="movements-workspace">
       <div className="page-head movements-head">
@@ -128,6 +181,11 @@ export default function MovementsPage() {
           </p>
         </div>
         <div className="movements-actions">
+          {ownerHospital && !cleaning && (
+            <button onClick={() => setCleaning(true)} title={tr('Μόνο για τον owner της πλατφόρμας')}>
+              <Eraser size={16} /> {tr('Καθαρισμός ιστορικού')}
+            </button>
+          )}
           <button onClick={() => downloadXlsx(exportTable())}>
             <FileSpreadsheet size={16} /> {tr('Εξαγωγή Excel')}
           </button>
@@ -185,7 +243,31 @@ export default function MovementsPage() {
           },
         ]}
       />
-      <div className="movement-ledger">
+      {cleaning && (
+        <div className="movement-clean-bar" role="region" aria-label={tr('Καθαρισμός ιστορικού')}>
+          <Eraser size={18} />
+          <span>
+            <strong>{tr('Καθαρισμός ιστορικού')}</strong>
+            <small>{tr('Επιλέξτε τις εγγραφές που θα διαγραφούν οριστικά · {0} επιλεγμένες', picked.size)}</small>
+          </span>
+          <button type="button" onClick={() => setPicked(new Set(filtered.map(m => m.id)))}>
+            {tr('Επιλογή όλων των εμφανιζόμενων ({0})', filtered.length)}
+          </button>
+          {picked.size > 0 && (
+            <button type="button" onClick={() => setPicked(new Set())}>
+              {tr('Αποεπιλογή')}
+            </button>
+          )}
+          <button type="button" onClick={stopCleaning}>
+            {tr('Ακύρωση')}
+          </button>
+          <button type="button" className="danger" disabled={!picked.size || busy} onClick={deletePicked}>
+            <Trash2 size={15} /> {tr('Διαγραφή επιλεγμένων')}
+          </button>
+          {cleanError && <p className="movement-clean-error">{cleanError}</p>}
+        </div>
+      )}
+      <div className={`movement-ledger ${cleaning ? 'cleaning' : ''}`}>
         <div className="ledger-head">
           <div>
             <span>
@@ -209,9 +291,18 @@ export default function MovementsPage() {
             rows.visible.map(m => {
               const asset = assetParts(m.asset);
               return (
-                <button className="ledger-row" key={m.id} onClick={() => setSelected(m)}>
+                <button
+                  className={`ledger-row ${picked.has(m.id) ? 'picked' : ''}`}
+                  key={m.id}
+                  onClick={() => (cleaning ? togglePick(m.id) : setSelected(m))}
+                  aria-pressed={cleaning ? picked.has(m.id) : undefined}
+                >
                   <span className="ledger-date">
-                    <Clock3 size={15} />
+                    {cleaning ? (
+                      <input type="checkbox" checked={picked.has(m.id)} readOnly tabIndex={-1} aria-hidden="true" />
+                    ) : (
+                      <Clock3 size={15} />
+                    )}
                     <b>{m.at}</b>
                   </span>
                   <span className="ledger-asset">

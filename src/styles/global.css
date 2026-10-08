@@ -9101,3 +9101,70 @@ html body .count-form-modal > footer .count-form-print {
     flex-wrap: wrap;
   }
 }
+/* Filters: "Clear filters" takes the width its text needs; "Done" fills the rest. */
+html body .asset-filter-panel footer {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+html body .asset-filter-panel footer button {
+  padding: 0 10px;
+}
+/* History: the platform owner's clean-up of chosen entries. */
+html body .movement-clean-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border: 1px solid #f1a9a3;
+  border-radius: 12px;
+  background: #fef3f2;
+  color: #912018;
+}
+html body .movement-clean-bar > span {
+  font-size: 13px;
+  display: grid;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+html body .movement-clean-bar small {
+  color: #7a271a;
+}
+html body .movement-clean-bar button {
+  font-size: 13px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #f1a9a3;
+  border-radius: 8px;
+  background: #fff;
+  color: #912018;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .movement-clean-bar button.danger {
+  border-color: #b42318;
+  background: #b42318;
+  color: #fff;
+}
+html body .movement-clean-bar button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+html body .movement-clean-error {
+  flex: 1 1 100%;
+  margin: 0;
+  font-weight: 700;
+}
+html body .movement-ledger.cleaning .ledger-row.picked {
+  background: #fef3f2;
+}
+html body .movement-ledger.cleaning .ledger-date input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #b42318;
+}
