@@ -1286,11 +1286,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Δικαιώματα',
-          'Ορίστε τι κάνει κάθε ρόλος. Κάποια δικαιώματα (δημιουργία, σύνθεση, όρια χρήσεων) ανήκουν μόνο στον Προϊστάμενο Αποστείρωσης.',
+          'Ορίστε τι κάνει κάθε ρόλος. Κάποια δικαιώματα (δημιουργία, σύνθεση, όρια χρήσεων) ανήκουν μόνο στον Προϊστάμενο Αποστείρωσης. Τον χρήστη τμήματος τον περιορίζει και η ίδια η βάση δεδομένων: σε Σετ και εργαλεία αλλάζει μόνο ό,τι αλλάζει η δική του ροή (αποστολή προς Αποστείρωση από το τμήμα, χρήσεις, εκτός χρήσης στο όριο, καταμέτρηση) και τις εκκρεμότητες μόνο τις δημιουργεί· οτιδήποτε άλλο στείλει μένει όπως ήταν.',
         ],
         en: [
           'Permissions',
-          'Set what each role can do. Some permissions (creation, composition, usage limits) belong only to the Sterilization supervisor.',
+          'Set what each role can do. Some permissions (creation, composition, usage limits) belong only to the Sterilization supervisor. The database itself also limits a department user: on Sets and instruments it changes only what its own workflow changes (dispatch to Sterilization from the department, uses, out of use at the limit, the count), and issues it can only report; anything else it sends stays as it was.',
         ],
       },
       {
