@@ -127,7 +127,7 @@ export default function DepartmentPage() {
         {(
           [
             {filter: 'IN_DEPARTMENT', label: tr('Στο τμήμα'), value: atDepartment},
-            {filter: 'STERILIZATION', label: tr('Προς / στην Αποστείρωση'), value: inSterilization},
+            {filter: 'STERILIZATION', label: tr('Σε αποστείρωση'), value: inSterilization},
             {filter: 'READY', label: tr('Έτοιμα για παραλαβή'), value: ready},
           ] as const
         ).map(k => (

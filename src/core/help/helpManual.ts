@@ -366,11 +366,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τι βλέπω',
-          'Στις δύο καρτέλες βλέπετε τα Σετ και τα μεμονωμένα εργαλεία του τμήματός σας. Οι δείκτες πάνω φιλτράρουν τη λίστα: «Στο τμήμα», «Προς / στην Αποστείρωση», «Έτοιμα για παραλαβή».',
+          'Στις δύο καρτέλες βλέπετε τα Σετ και τα μεμονωμένα εργαλεία του τμήματός σας. Οι δείκτες πάνω φιλτράρουν τη λίστα: «Στο τμήμα», «Σε αποστείρωση» (καθ’ οδόν ή μέσα στην Αποστείρωση), «Έτοιμα για παραλαβή».',
         ],
         en: [
           'What I see',
-          'The two tabs list your Sets and standalone instruments. The indicators above filter the list: "At department", "To / in Sterilization", "Ready for pickup".',
+          'The two tabs list your Sets and standalone instruments. The indicators above filter the list: "At department", "In sterilization" (on the way to or inside Sterilization), "Ready for pickup".',
         ],
       },
       {

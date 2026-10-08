@@ -9561,3 +9561,48 @@ html body .issues-fixed .issue-note-inline {
     min-height: 560px;
   }
 }
+/* Handover signature: user code and password fields drawn like every other field. */
+html body .handover-signature-row input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cfdbe1;
+  border-radius: 10px;
+  background: #fff;
+  color: #15232b;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+html body .handover-signature-row input::placeholder {
+  color: #8a9aa3;
+}
+html body .handover-signature-row input:focus {
+  border-color: #1d6b7a;
+  box-shadow: 0 0 0 3px rgba(29, 107, 122, 0.15);
+}
+html body .handover-signature-row input:disabled {
+  background: #f3f6f8;
+}
+html body .handover-signature-row button {
+  height: 40px;
+  border-radius: 10px;
+}
+html body .cycle-note textarea {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+html body .handover-signature .demo-code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+html body .handover-signature .demo-code .demo-fill-btn {
+  width: auto;
+  flex: 0 0 auto;
+}
