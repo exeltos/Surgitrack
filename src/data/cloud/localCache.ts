@@ -21,6 +21,10 @@ export type CachedCollection = {
   changed: string[];
   /** Records deleted here and not yet deleted on the server. */
   removed: string[];
+  /** The server's version of each changed record before it changed here (the merge base, S4). */
+  bases?: CloudRecord[];
+  /** The server version (updated_at) of each record, sent with a save (S4). */
+  versions?: Record<string, string>;
   /** Server time from which to fetch changes and deletions at the next opening. */
   since: string;
   deletedSince: string;

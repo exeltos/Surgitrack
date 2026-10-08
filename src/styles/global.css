@@ -9780,3 +9780,7 @@ html body .idle-lock-card .idle-lock-error {
   font-weight: 700;
   font-size: 13px;
 }
+/* A record changed on two devices at once (S4). */
+html body .sync-conflict-toast {
+  border-left: 4px solid #b26a00;
+}

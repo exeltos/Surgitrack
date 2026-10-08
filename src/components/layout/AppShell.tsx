@@ -29,7 +29,8 @@ import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import RoleSwitcher from './RoleSwitcher';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
-import {useSyncInfo} from '../../data/cloud/useAppRecordSync';
+import {onSyncConflict, useSyncInfo, type SyncConflict} from '../../data/cloud/useAppRecordSync';
+import {fieldName} from '../../data/cloud/mergeConcurrent';
 import IdleLock from './IdleLock';
 import {useLibraries} from '../../core/LibraryStore';
 import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
@@ -112,6 +113,14 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [departmentReadyToast, setDepartmentReadyToast] = useState<{id: string; text: string}>();
+  // A record changed on two devices at once: say where the other device's value was kept (S4).
+  const [conflict, setConflict] = useState<SyncConflict>();
+  useEffect(() => onSyncConflict(setConflict), []);
+  useEffect(() => {
+    if (!conflict) return;
+    const timer = window.setTimeout(() => setConflict(undefined), 15000);
+    return () => window.clearTimeout(timer);
+  }, [conflict]);
   const navigate = useNavigate();
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
@@ -690,6 +699,21 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           <strong>{lang === 'el' ? 'Έτοιμο για παραλαβή' : 'Ready for pickup'}</strong>
           <span>{departmentReadyToast.text}</span>
           <button onClick={() => setDepartmentReadyToast(undefined)} aria-label={lang === 'el' ? 'Κλείσιμο' : 'Close'}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      {conflict && (
+        <div className="toast sync-conflict-toast" role="alert">
+          <strong>{tr('Ταυτόχρονη αλλαγή από άλλη συσκευή')}</strong>
+          <span>
+            {tr(
+              '{0}: κρατήθηκε η αλλαγή της άλλης συσκευής σε: {1}. Οι υπόλοιπες αλλαγές σας αποθηκεύτηκαν.',
+              conflict.label,
+              conflict.fields.map(field => fieldName(field, lang)).join(', '),
+            )}
+          </span>
+          <button onClick={() => setConflict(undefined)} aria-label={lang === 'el' ? 'Κλείσιμο' : 'Close'}>
             <X size={16} />
           </button>
         </div>

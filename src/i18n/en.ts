@@ -688,6 +688,9 @@ export const en: Record<string, string> = {
     'Record the cycle result. Release happens in a separate quality gate.',
   'Καταχώρηση αποτυχίας': 'Record failure',
   'Καταχώρηση από': 'Recorded by',
+  'Ταυτόχρονη αλλαγή από άλλη συσκευή': 'Changed on another device at the same time',
+  '{0}: κρατήθηκε η αλλαγή της άλλης συσκευής σε: {1}. Οι υπόλοιπες αλλαγές σας αποθηκεύτηκαν.':
+    '{0}: the other device’s change was kept for: {1}. Your other changes were saved.',
   'Λάθος συνθηματικό.': 'Wrong password.',
   'Η οθόνη κλειδώθηκε': 'The screen is locked',
   'Κλείδωσε λόγω αδράνειας. Οι αλλαγές συνεχίζουν να αποθηκεύονται.':

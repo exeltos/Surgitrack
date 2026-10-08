@@ -2,6 +2,7 @@ import {supabase} from '../../lib/supabase';
 import {CLOUD_TABLES, tableColumns, tableFromRow} from './cloudTables';
 import type {CloudCollection, CloudRecord} from './appRecords';
 import {loadAllPages, PAGE_SIZE} from './pages';
+import {rememberVersions} from './versions';
 
 /** A record's content in a fixed form (keys sorted, empty values dropped), to tell real changes apart. */
 export const recordKey = (value: unknown): string => {
@@ -41,6 +42,7 @@ export async function loadChangedRecords(
       .range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     const page = data as unknown as Array<Record<string, unknown>>;
+    if (CLOUD_TABLES[collection].mutable) rememberVersions(collection, page);
     for (const row of page) {
       for (const stamp of [row.updated_at, row.created_at])
         if (typeof stamp === 'string' && (!latest || stamp > latest)) latest = stamp;
