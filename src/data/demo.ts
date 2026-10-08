@@ -4,10 +4,12 @@ import type {
   DeliveryRecord,
   Issue,
   Movement,
+  PreparationRecord,
   ProcessLoadRecord,
   PurchaseOrder,
   ReceiptRecord,
   SetAsset,
+  SterilizationReleaseRecord,
   Tool,
 } from '../types/domain';
 export const sets: SetAsset[] = [
@@ -734,6 +736,8 @@ const setByCode = (code: string) => sets.find(set => set.code === code)!;
 
 // Sterile shelf life (step 4): dates relative to today, so the demo always has Sets that are fine,
 // expiring (last month, or last 10 days for 2 months) and expired.
+export const preparations: PreparationRecord[] = [];
+export const sterilizationReleases: SterilizationReleaseRecord[] = [];
 const demoSterile = (code: string, daysFromToday: number, months: number) => {
   const set = sets.find(item => item.code === code);
   if (!set) return;
@@ -745,6 +749,45 @@ const demoSterile = (code: string, daysFromToday: number, months: number) => {
   on.setMonth(on.getMonth() - months);
   set.sterilizedOn = isoDate(on);
   set.sterilizedTime = '10:30';
+  // Who composed and who released it: part A of the count form, already signed by Sterilization.
+  const day = on.toLocaleDateString('en-GB');
+  const base = {workflowVersion: 1, assetId: set.id, assetKind: 'SET' as const, barcode: set.barcode};
+  const members = tools.filter(tool => tool.setId === set.id);
+  preparations.push({
+    ...base,
+    id: `prep-demo-${set.id}`,
+    assetName: set.name,
+    department: set.department,
+    preparedByUserId: 'demo-sterilization',
+    preparedByName: 'Demo Χρήστης Αποστείρωσης',
+    preparedByDepartment: 'Κεντρική Αποστείρωση',
+    at: `${day} 08:40`,
+    toolIds: members.map(tool => tool.id),
+    checkedToolIds: members.map(tool => tool.id),
+    allOk: true,
+  });
+  sterilizationReleases.push({
+    ...base,
+    id: `rel-demo-${set.id}`,
+    assetName: set.name,
+    department: set.department,
+    cycleRecordId: `cyc-demo-${set.id}`,
+    cycleNumber: `2026-${set.barcode.slice(-3)}`,
+    sterilizer: 'Κλίβανος Ατμού 01',
+    physicalParametersOk: true,
+    chemicalIndicatorOk: true,
+    packagingIntegrityOk: true,
+    biologicalIndicatorResult: 'NOT_REQUIRED',
+    decision: 'RELEASED',
+    releasedByUserId: 'demo-sterilization-supervisor',
+    releasedByName: 'Demo Προϊστάμενος Αποστείρωσης',
+    releasedByDepartment: 'Κεντρική Αποστείρωση',
+    releasedAt: `${day} 10:30`,
+    shelfLifeMonths: months,
+    sterileUntil: set.sterileUntil,
+    sterilizedOn: set.sterilizedOn,
+    sterilizedTime: '10:30',
+  });
 };
 demoSterile('ORTHO-BASIC', 120, 6);
 demoSterile('LAP-GEN', 8, 2);

@@ -1,4 +1,16 @@
-import {counts, deliveries, issues, movements, processLoads, purchaseOrders, receipts, sets, tools} from '../demo';
+import {
+  counts,
+  deliveries,
+  issues,
+  movements,
+  preparations,
+  processLoads,
+  purchaseOrders,
+  receipts,
+  sets,
+  sterilizationReleases,
+  tools,
+} from '../demo';
 import type {SurgiInitialData, SurgiRepository} from './types';
 
 const cloneInitialData = (): SurgiInitialData => ({
@@ -19,6 +31,12 @@ const cloneInitialData = (): SurgiInitialData => ({
   receipts: receipts.map(item => ({...item})),
   deliveries: deliveries.map(item => ({...item})),
   purchaseOrders: purchaseOrders.map(order => ({...order, lines: order.lines.map(line => ({...line}))})),
+  preparations: preparations.map(item => ({
+    ...item,
+    toolIds: [...item.toolIds],
+    checkedToolIds: [...item.checkedToolIds],
+  })),
+  sterilizationReleases: sterilizationReleases.map(item => ({...item})),
   counts: counts.map(count => ({
     ...count,
     checkedToolIds: [...(count.checkedToolIds || [])],

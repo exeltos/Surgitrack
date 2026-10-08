@@ -9351,3 +9351,258 @@ html body .expiry-table th:nth-child(8) {
 html body .expiry-table th:nth-child(6) {
   width: 140px;
 }
+html body .issues-fixed .issue-note-inline {
+  display: none;
+}
+/* Tablet (landscape, laid out at 1280px, portrait ≤900px): every list keeps its key columns, names get two lines. */
+@media (max-width: 1280px) {
+  html body .sidebar:not(.mobile-open) {
+    box-shadow: none;
+  }
+  html body .registry-fixed td:first-child .row-title-link,
+  html body .registry-fixed td:first-child .registry-asset-name strong,
+  html body .issues-fixed .issue-asset {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.25;
+  }
+  /* Tools, stock, standalone tools: 1 name, 2 barcode, 3 specialty, 4 place, 5 uses, 6 state, 7 open. */
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(3) {
+    width: 128px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(4) {
+    width: 168px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(5) {
+    width: 92px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(6) {
+    width: 132px;
+  }
+  /* Sets: the specialty is in the card; the name gets the room. */
+  html body .sets-registry th:nth-child(3),
+  html body .sets-registry td:nth-child(3) {
+    display: none !important;
+  }
+  /* Expiry: name, barcode, department, sterilized, expires, remaining. */
+  html body .expiry-table th:nth-child(4),
+  html body .expiry-table td:nth-child(4),
+  html body .expiry-table th:nth-child(5),
+  html body .expiry-table td:nth-child(5) {
+    display: none !important;
+  }
+  html body .expiry-table th:nth-child(3),
+  html body .expiry-table td:nth-child(3),
+  html body .expiry-table th:nth-child(7),
+  html body .expiry-table td:nth-child(7) {
+    display: table-cell !important;
+  }
+  html body .expiry-table th:nth-child(3) {
+    width: 150px;
+  }
+  html body .expiry-table th:nth-child(6) {
+    width: 140px;
+  }
+  html body .expiry-table th:nth-child(8) {
+    width: 156px;
+  }
+  /* Issues: the note goes under the item instead of its own squeezed column. */
+  html body .issues-fixed th:nth-child(2),
+  html body .issues-fixed td.issue-note {
+    display: none !important;
+  }
+  html body .issues-fixed .issue-note-inline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 2px;
+    color: #475467;
+    font-size: 12px;
+    font-style: italic;
+  }
+  /* Set card: the open-report note wraps instead of being cut, and is never hidden. */
+  html body .asset-detail-body .set-tool-state {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 112px;
+    white-space: normal;
+    text-align: right;
+  }
+  html body .asset-detail-body .set-tool-state small {
+    white-space: normal;
+    line-height: 1.2;
+  }
+}
+@container set-tools (min-width: 561px) and (max-width: 760px) {
+  html body .asset-detail-body .set-tool-row {
+    grid-template-columns: 30px 84px minmax(0, 1fr) auto auto !important;
+  }
+}
+@container set-tools (max-width: 560px) {
+  html body .asset-detail-body .set-tool-row {
+    grid-template-columns: 30px 76px minmax(0, 1fr) auto !important;
+  }
+}
+@media (max-width: 900px) {
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(4) {
+    width: 150px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(6) {
+    width: 124px;
+  }
+  html body .sets-registry th:nth-child(4) {
+    width: 130px;
+  }
+  html body .sets-registry th:nth-child(6) {
+    width: 132px;
+  }
+  html body .expiry-table th:nth-child(3),
+  html body .expiry-table td:nth-child(3) {
+    display: none !important;
+  }
+  html body .issues-fixed th.col-actions {
+    width: 236px;
+  }
+  html body .issues-fixed .issue-actions-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  html body .issues-fixed th.col-created {
+    width: 104px;
+  }
+  /* Movements: two lines per entry, so the action and the user stay visible. */
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1.1fr) 20px !important;
+  }
+  html body .ledger-row {
+    grid-template-areas: 'date asset route open' 'date user action open';
+    row-gap: 4px;
+  }
+  html body .ledger-row > .ledger-date {
+    grid-area: date;
+  }
+  html body .ledger-row > .ledger-asset {
+    grid-area: asset;
+  }
+  html body .ledger-row > .ledger-route {
+    grid-area: route;
+  }
+  html body .ledger-row > span:nth-child(4) {
+    grid-area: action;
+    display: block !important;
+  }
+  html body .ledger-row > .ledger-user {
+    grid-area: user;
+    display: flex !important;
+  }
+  html body .ledger-row > svg:last-child {
+    grid-area: open;
+  }
+  html body .ledger-columns span:nth-child(4),
+  html body .ledger-columns span:nth-child(5) {
+    display: none !important;
+  }
+  /* Studio libraries: the library picker becomes a row of chips above the list. */
+  html body .studio-manager {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  html body .studio-manager-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: auto !important;
+  }
+  html body .studio-manager-nav button {
+    flex: 0 0 auto;
+    min-width: 168px;
+    width: auto;
+  }
+  html body .studio-list-head.with-count,
+  html body .studio-list-row.with-count {
+    grid-template-columns: minmax(0, 1fr) 70px 196px !important;
+    align-items: center;
+  }
+  html body .studio-list-head.with-count > span:nth-child(2),
+  html body .studio-list-row.with-count > span:nth-child(2) {
+    display: none !important;
+  }
+  /* Set card: the sterile dates take the full row under their label, side by side. */
+  html body .asset-workbench-fields > div:has(> .sterile-dd) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    row-gap: 2px;
+  }
+}
+/* Composition window on a portrait tablet: the checks and the tool list stack and scroll together
+   (the checks no longer slide under the list), and the window fits the screen. */
+@media (max-width: 1100px) {
+  html body .prep-workspace-modal {
+    height: calc(100dvh - 48px) !important;
+    max-height: calc(100dvh - 48px) !important;
+  }
+  html body .receipt-card-modal > .prep-workspace-body {
+    height: auto;
+    grid-template-rows: max-content max-content;
+    align-content: start;
+  }
+  html body .prep-workspace-body > .prep-control-panel {
+    height: auto;
+    min-height: max-content;
+  }
+  html body .prep-workspace-body > .prep-tools-panel {
+    height: auto;
+    min-height: 560px;
+  }
+}
+/* Handover signature: user code and password fields drawn like every other field. */
+html body .handover-signature-row input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cfdbe1;
+  border-radius: 10px;
+  background: #fff;
+  color: #15232b;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+html body .handover-signature-row input::placeholder {
+  color: #8a9aa3;
+}
+html body .handover-signature-row input:focus {
+  border-color: #1d6b7a;
+  box-shadow: 0 0 0 3px rgba(29, 107, 122, 0.15);
+}
+html body .handover-signature-row input:disabled {
+  background: #f3f6f8;
+}
+html body .handover-signature-row button {
+  height: 40px;
+  border-radius: 10px;
+}
+html body .cycle-note textarea {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+html body .handover-signature .demo-code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+html body .handover-signature .demo-code .demo-fill-btn {
+  width: auto;
+  flex: 0 0 auto;
+}
