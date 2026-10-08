@@ -416,9 +416,7 @@ export default function AssetWorkbenchSidebar({
               <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} size={17} />
               <div>
                 <span>{tr('Χρήσεις')}</span>
-                <strong>
-                  {tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} · χωρίς όριο', tool?.uses || 0)}
-                </strong>
+                <strong>{tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool?.uses || 0)}</strong>
               </div>
             </div>
             <button

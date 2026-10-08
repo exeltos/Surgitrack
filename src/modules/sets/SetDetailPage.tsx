@@ -522,9 +522,7 @@ export default function SetDetailPage() {
                                       <div className="set-tool-uses">
                                         <span>{tr('Χρήσεις')}</span>
                                         <strong>
-                                          {tool.maxUses
-                                            ? `${tool.uses}/${tool.maxUses}`
-                                            : tr('{0} · χωρίς όριο', tool.uses)}
+                                          {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool.uses)}
                                         </strong>
                                       </div>
                                       <div className="set-tool-state">
@@ -563,7 +561,7 @@ export default function SetDetailPage() {
                             <div className="set-tool-uses">
                               <span>{tr('Χρήσεις')}</span>
                               <strong>
-                                {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} · χωρίς όριο', tool.uses)}
+                                {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool.uses)}
                               </strong>
                             </div>
                             <div className="set-tool-state">

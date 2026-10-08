@@ -61,6 +61,8 @@ export default function IssuesPage() {
       (!status || i.status === status) &&
       `${i.asset} ${i.type} ${i.department} ${i.note}`.toLowerCase().includes(q.toLowerCase()),
   );
+  // The photos column shows only when some listed issue has photos.
+  const withPhotos = filtered.some(i => i.photos?.length);
   /** What an issue is about: the instrument or Set named by its barcode, to open it or order it. */
   const subject = (issue: Issue) => {
     const barcode = issue.asset.split(' ')[0];
@@ -165,11 +167,11 @@ export default function IssuesPage() {
                   <tr>
                     <th>{tr('Αντικείμενο')}</th>
                     <th>{tr('Σημείωση')}</th>
-                    <th>{tr('Δημιουργήθηκε')}</th>
-                    <th>{tr('Φωτογραφίες')}</th>
-                    <th>{tr('Κατάσταση')}</th>
+                    <th className="col-created">{tr('Δημιουργήθηκε')}</th>
+                    {withPhotos && <th className="col-photos">{tr('Φωτογραφίες')}</th>}
+                    <th className="col-status">{tr('Κατάσταση')}</th>
                     {withReplacements && (
-                      <th>
+                      <th className="col-actions">
                         <span className="visually-hidden">{tr('Ενέργειες')}</span>
                       </th>
                     )}
@@ -190,20 +192,22 @@ export default function IssuesPage() {
                         {i.note}
                       </td>
                       <td>{i.created}</td>
-                      <td>
-                        {i.photos?.length ? (
-                          <div className="issue-table-photos">
-                            {i.photos.slice(0, 3).map(photo => (
-                              <img key={photo.id} src={photo.dataUrl} alt={photo.name} />
-                            ))}
-                            {i.photos.length > 3 && <span>+{i.photos.length - 3}</span>}
-                          </div>
-                        ) : (
-                          <span className="issue-no-photo">
-                            <Images size={14} />—
-                          </span>
-                        )}
-                      </td>
+                      {withPhotos && (
+                        <td>
+                          {i.photos?.length ? (
+                            <div className="issue-table-photos">
+                              {i.photos.slice(0, 3).map(photo => (
+                                <img key={photo.id} src={photo.dataUrl} alt={photo.name} />
+                              ))}
+                              {i.photos.length > 3 && <span>+{i.photos.length - 3}</span>}
+                            </div>
+                          ) : (
+                            <span className="issue-no-photo">
+                              <Images size={14} />—
+                            </span>
+                          )}
+                        </td>
+                      )}
                       <td>
                         <span className={`badge ${i.status === 'OPEN' ? 'warning' : ''}`}>
                           {i.status === 'OPEN' ? tr('Ανοικτή') : tr('Επιλυμένη')}
@@ -214,29 +218,31 @@ export default function IssuesPage() {
                           <div className="issue-actions-row">
                             {subject(i).to && (
                               <Link
-                                className="issue-action"
+                                className="issue-action wide"
                                 to={subject(i).to!}
                                 title={tr('Άνοιγμα')}
                                 aria-label={tr('Άνοιγμα')}
                               >
                                 <ExternalLink size={14} />
+                                {tr('Άνοιγμα')}
                               </Link>
                             )}
                             {subject(i).tool && (
                               <button
                                 type="button"
-                                className="issue-action"
+                                className="issue-action wide"
                                 title={tr('Παραγγελία')}
                                 aria-label={tr('Παραγγελία')}
                                 onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
                               >
                                 <ShoppingCart size={14} />
+                                {tr('Παραγγελία')}
                               </button>
                             )}
                             {i.status === 'OPEN' && (
                               <button
                                 type="button"
-                                className="issue-action"
+                                className="issue-action wide"
                                 title={tr('Επίλυση')}
                                 aria-label={tr('Επίλυση')}
                                 onClick={() =>
@@ -253,6 +259,7 @@ export default function IssuesPage() {
                                 }
                               >
                                 <CheckCircle2 size={14} />
+                                {tr('Επίλυση')}
                               </button>
                             )}
                           </div>

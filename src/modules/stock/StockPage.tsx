@@ -16,6 +16,8 @@ import AppButton from '../../components/ui/AppButton';
 import StatusBadge from '../../components/ui/StatusBadge';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
+import KpiStrip from '../../components/ui/KpiStrip';
+import {kpiFilters} from '../../core/kpiFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
@@ -50,6 +52,15 @@ export default function StockPage() {
         .includes(q.toLowerCase()),
   );
   const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, usage].join('|'));
+  // The same number cards as the other lists: each one filters the list, the last opens the minimums.
+  const kpi = kpiFilters({
+    q: [q, setQ],
+    specialty: [specialty, setSpecialty],
+    manufacturer: [manufacturer, setManufacturer],
+    state: [state, setState],
+    usage: [usage, setUsage],
+  });
+  const stockKinds = new Set(stock.map(t => `${t.code}|${t.name}`)).size;
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -88,6 +99,23 @@ export default function StockPage() {
         <StockMinimums />
       ) : (
         <>
+          <KpiStrip
+            compact
+            items={[
+              {label: tr('Εργαλεία Αποθέματος'), value: stock.length, ...kpi()},
+              {label: tr('Είδη εργαλείων'), value: stockKinds},
+              {
+                label: tr('Με όριο χρήσεων'),
+                value: stock.filter(t => !!t.maxUses).length,
+                ...kpi({usage: 'LIMITED'}),
+              },
+              {
+                label: tr('Κάτω από το ελάχιστο'),
+                value: lowCount,
+                onClick: () => setParams({view: 'minimums'}, {replace: true}),
+              },
+            ]}
+          />
           <AssetFilterBar
             query={q}
             onQueryChange={setQ}
