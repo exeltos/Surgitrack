@@ -80,11 +80,13 @@ export function mergeRemote<T extends {id: string}>(
   list: readonly T[],
   remote: readonly T[],
   removed: readonly string[],
+  /** Older records (the rest of the history): they go after the list, not before it. */
+  append = false,
 ) {
   const byId = new Map(remote.map(item => [item.id, item]));
   const gone = new Set(removed);
   const kept = list.filter(item => !gone.has(item.id)).map(item => byId.get(item.id) ?? item);
   const present = new Set(list.map(item => item.id));
   const added = remote.filter(item => !present.has(item.id));
-  return [...added, ...kept];
+  return append ? [...kept, ...added] : [...added, ...kept];
 }

@@ -3,7 +3,9 @@ import {deleteAppRecords, writeAppRecords, type CloudCollection, type CloudRecor
 import {loadChangedRecords, loadDeletedIds, recordKey} from './remoteChanges';
 import {isRealtimeLive, onRemoteChange} from './realtime';
 import {takeRestored, writeCollection} from './localCache';
-import {loadRecordsById} from './appRecords';
+import {loadRecordsById, loadTable} from './appRecords';
+import {cutoffOf, HISTORY_WINDOW_DAYS, registerOlderLoader, setCutoff} from './historyWindow';
+import type {TableCollection} from './cloudTables';
 import {exportVersions, importVersions} from './versions';
 import {mergeConcurrent, recordLabel} from './mergeConcurrent';
 
@@ -118,7 +120,7 @@ export function useAppRecordSync(
   collection: CloudCollection,
   items: readonly CloudRecord[],
   /** Puts records saved by other devices into the store (changed and new records, deleted ids). */
-  apply?: (remote: CloudRecord[], removed: string[]) => void,
+  apply?: (remote: CloudRecord[], removed: string[], append?: boolean) => void,
 ) {
   const confirmed = useRef<Map<string, CloudRecord> | null>(null);
   const latest = useRef(items);
@@ -147,6 +149,7 @@ export function useAppRecordSync(
       changed: changed.map(item => item.id),
       removed,
       bases: changed.map(item => known.get(item.id)).filter((base): base is CloudRecord => !!base),
+      cutoff: cutoffOf(collection),
       versions: exportVersions(collection),
       since: since.current,
       deletedSince: deletedSince.current,
@@ -156,6 +159,22 @@ export function useAppRecordSync(
     window.clearTimeout(cacheTimer.current);
     cacheTimer.current = window.setTimeout(() => writeCopy.current(), CACHE_DELAY_MS);
   };
+  // The rest of the history, older than what the opening loaded (T3): fetched on request, added after.
+  useEffect(() => {
+    if (!organizationId || !HISTORY_WINDOW_DAYS[collection]) return;
+    return registerOlderLoader(collection, async () => {
+      const cutoff = cutoffOf(collection);
+      if (!cutoff) return;
+      const older = await loadTable(organizationId, collection as TableCollection, {before: cutoff});
+      // Taken from the server: their appearance in the store is not a local change to save.
+      const until = Date.now() + 60000;
+      older.forEach(record => adopted.current.set(record.id, until));
+      if (older.length) applyRef.current?.(older, [], true);
+      setCutoff(collection, undefined);
+      scheduleCopy();
+    });
+  }, [organizationId, collection]);
+
   useEffect(() => {
     if (!organizationId) return;
     const write = () => writeCopy.current();

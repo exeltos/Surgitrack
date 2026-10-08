@@ -20,6 +20,7 @@ import {getRuntimeDataMode} from '../../config/dataMode';
 import {managedHospitalId} from '../../data/cloud/accessRequests';
 import {useSurgi} from '../../store/SurgiStore';
 import {accountDiffers, useAccountNames} from './useAccountNames';
+import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import type {Movement} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -281,6 +282,7 @@ export default function MovementsPage() {
           {cleanError && <p className="movement-clean-error">{cleanError}</p>}
         </div>
       )}
+      <HistoryWindowNote />
       <div className={`movement-ledger ${cleaning ? 'cleaning' : ''}`}>
         <div className="ledger-head">
           <div>
