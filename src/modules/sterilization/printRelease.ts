@@ -2,7 +2,8 @@ import type {ProcessLoadRecord} from '../../types/domain';
 import {tr, trData} from '../../i18n';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
-import {code128Svg, escapeHtml, openPrintWindow} from './printUtils';
+import {code128Svg, openPrintWindow} from './printUtils';
+import {escapeHtml} from '../../core/escapeHtml';
 import {formatDateTime} from '../../core/displayDate';
 
 /** One item of the load as the form lists it; `sterileUntil` once released. */

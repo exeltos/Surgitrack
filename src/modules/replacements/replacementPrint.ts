@@ -3,12 +3,7 @@ import type {ReplacementItem} from '../../core/replacements';
 import {REASON_LABEL} from '../../core/replacements';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {formatDateTime} from '../../core/displayDate';
-
-const esc = (value: unknown) =>
-  String(value ?? '').replace(
-    /[&<>'"]/g,
-    ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'})[ch] || ch,
-  );
+import {escapeHtml as esc} from '../../core/escapeHtml';
 
 const STYLE = `
 @page{size:A4 landscape;margin:11mm 10mm 13mm;@bottom-right{content:counter(page) " / " counter(pages);font:7pt Arial,sans-serif;color:#667}}

@@ -3,7 +3,7 @@
  * formatted report page for printing or saving as PDF. Both are built from the rows, never from
  * a picture of the screen.
  */
-
+import {escapeHtml as html} from './escapeHtml';
 import {formatDateTime} from './displayDate';
 import {markPrintHtml, markTable} from './sampleDataMark';
 
@@ -96,6 +96,8 @@ const sheetXml = (table: ExportTable) => {
   const lengths = table.headers.map((header, i) =>
     Math.min(60, Math.max(header.length, ...table.rows.map(row => String(row[i] ?? '').length)) + 2),
   );
+  // Text goes in as an inline string: Excel shows it as text and never evaluates it, even when it starts
+  // with = + - or @, so exported records cannot carry formulas. Never write text cells as <f>.
   const cell = (value: string | number, ref: string, style: number) =>
     typeof value === 'number'
       ? `<c r="${ref}" s="${style}"><v>${value}</v></c>`
@@ -234,8 +236,12 @@ export function downloadXlsx(table: ExportTable) {
   save(xlsxBlob(table), markTable(table).title, 'xlsx');
 }
 
+// Text that Excel or LibreOffice would read as a formula (= + - @, or a leading tab / carriage return).
+const FORMULA_START = /^[=+\-@\t\r]/;
 const csvCell = (value: string | number) => {
-  const text = String(value ?? '');
+  // Numbers stay numbers (negative ones too); text that looks like a formula gets a leading ' so it opens as text.
+  const raw = String(value ?? '');
+  const text = typeof value !== 'number' && FORMULA_START.test(raw) ? `'${raw}` : raw;
   return /[";\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 /**
@@ -250,9 +256,6 @@ export function downloadCsv(table: ExportTable) {
   // CSV is data for other programs: the mark goes in the file name only.
   save(new Blob([tableCsv(table)], {type: 'text/csv;charset=utf-8'}), markTable(table).title, 'csv');
 }
-
-const html = (value: string | number) =>
-  String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** A printable report page (A4 landscape) of the table, for "Print / PDF". */
 export function tableReportHtml(source: ExportTable, lang: string) {

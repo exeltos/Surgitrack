@@ -1,13 +1,11 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
+import {escapeHtml} from '../../core/escapeHtml';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
 import {markPrintHtml} from '../../core/sampleDataMark';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
 import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
-
-export const escapeHtml = (value: string) =>
-  value.replace(/[&<>'"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'})[ch] || ch);
 
 // Code 128 B: same symbology used by the legacy FileMaker Barcode_Code128 webview.
 const CODE128_PATTERNS = [

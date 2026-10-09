@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
+import {escapeHtml} from '../../core/escapeHtml';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {useSurgi} from '../../store/SurgiStore';
@@ -114,12 +115,6 @@ const cellText = (key: string, value: unknown) => {
   const text = String(value ?? '—');
   return TRANSLATED_COLUMNS.has(key) ? trData(text) : text;
 };
-
-const escapeHtml = (value: unknown) =>
-  String(value ?? '').replace(
-    /[&<>'"]/g,
-    ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'})[ch] || ch,
-  );
 
 function genericReportHtml(title: string, subtitle: string, columns: Array<{key: string; label: string}>, rows: Row[]) {
   const bodyRows = rows.length
