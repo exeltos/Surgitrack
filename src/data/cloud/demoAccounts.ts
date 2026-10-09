@@ -12,8 +12,10 @@ type DemoRow = {
   contact_email: string;
   contact_phone: string | null;
   notes: string | null;
-  status: 'PREPARING' | 'SENT';
+  status: 'PREPARING' | 'SENT' | 'CONVERTED';
   max_extra_users: number;
+  auto_delete: boolean;
+  converted_at: string | null;
   seeded_at: string | null;
   invited_at: string | null;
   evaluator_id: string | null;
@@ -28,7 +30,7 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   const {data, error} = await supabase
     .from('demo_accounts')
     .select(
-      'id,organization_id,hospital_name,contact_name,contact_email,contact_phone,notes,status,max_extra_users,seeded_at,invited_at,evaluator_id,created_at,organization:organizations(name,code,active,trial_ends_at)',
+      'id,organization_id,hospital_name,contact_name,contact_email,contact_phone,notes,status,max_extra_users,auto_delete,converted_at,seeded_at,invited_at,evaluator_id,created_at,organization:organizations(name,code,active,trial_ends_at)',
     )
     .order('created_at', {ascending: false});
   if (error) throw error;
@@ -171,6 +173,8 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
       notes: row.notes || undefined,
       status: row.status,
       maxExtraUsers: row.max_extra_users,
+      autoDelete: row.auto_delete,
+      convertedAt: row.converted_at || undefined,
       endsAt: row.organization?.trial_ends_at || undefined,
       active: row.organization?.active ?? false,
       seededAt: row.seeded_at || undefined,
@@ -291,5 +295,37 @@ export const markDemoRequestHandled = async (requestId: string) => {
     .from('demo_requests')
     .update({status: 'HANDLED', handled_at: new Date().toISOString()})
     .eq('id', requestId);
+  if (error) throw error;
+};
+
+/** Whether the daily round deletes this Demo 30 days after its end. */
+export const setDemoAutoDelete = async (demoId: string, autoDelete: boolean) => {
+  const {error} = await supabase
+    .from('demo_accounts')
+    .update({auto_delete: autoDelete, updated_at: new Date().toISOString()})
+    .eq('id', demoId);
+  if (error) throw error;
+};
+
+export type DemoConversion = {
+  name: string;
+  code: string;
+  plan: 'STANDARD' | 'TRIAL';
+  /** For a trial: when it ends. */
+  trialEndsAt?: string;
+  /** Keep the Demo's records; otherwise only its users and departments stay. */
+  keepData: boolean;
+};
+
+/** The Demo becomes a customer hospital (one step in the database). */
+export const convertDemoAccount = async (demoId: string, c: DemoConversion) => {
+  const {error} = await supabase.rpc('platform_convert_demo', {
+    p_demo: demoId,
+    p_name: c.name,
+    p_code: c.code,
+    p_plan: c.plan,
+    p_trial_ends_at: c.plan === 'TRIAL' ? c.trialEndsAt || null : null,
+    p_keep_data: c.keepData,
+  });
   if (error) throw error;
 };

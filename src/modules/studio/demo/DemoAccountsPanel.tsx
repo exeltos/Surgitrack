@@ -1,12 +1,15 @@
 import {useState} from 'react';
-import {Check, Copy, LogIn, Mail, Plus, RotateCcw, Send} from 'lucide-react';
+import {BadgeCheck, Check, Copy, LogIn, Mail, Plus, RotateCcw, Send} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr} from '../../../i18n';
 import {formatDate} from '../../../core/displayDate';
 import {
+  DEMO_DELETE_AFTER_DAYS,
   DEMO_EXTENSION_DAYS,
   demoDaysLeft,
+  demoDeleteOn,
+  demoFunnel,
   demoStage,
   type DemoAccount,
   type DemoStage,
@@ -14,6 +17,7 @@ import {
 import {trialEndDate, trialEndOn} from '../../../core/trial';
 import {MODULES, npsGroup} from '../../../core/demoFeedback';
 import NewDemoDialog from './NewDemoDialog';
+import ConvertDemoDialog from './ConvertDemoDialog';
 import {useDemoAccounts} from './useDemoAccounts';
 
 const STAGE_LABEL: Record<DemoStage, string> = {
@@ -21,6 +25,17 @@ const STAGE_LABEL: Record<DemoStage, string> = {
   INVITED: 'Στάλθηκε',
   ACTIVE: 'Σε αξιολόγηση',
   ENDED: 'Έληξε',
+  CONVERTED: 'Έγινε πελάτης',
+};
+
+const FUNNEL_LABEL: Record<ReturnType<typeof demoFunnel>['steps'][number]['key'], string> = {
+  opened: 'Demo',
+  sent: 'Email',
+  signedIn: 'Σύνδεση',
+  tried: 'Δοκιμή',
+  evaluated: 'Αξιολόγηση',
+  wanted: 'Θέλουν την εφαρμογή',
+  converted: 'Πελάτες',
 };
 
 /** Studio → Platform: the prospects' evaluation Demos, each with its own hospital and sample data. */
@@ -37,6 +52,7 @@ export default function DemoAccountsPanel({
   const creating = creatingProp ?? creatingOwn;
   const setCreating = (open: boolean) => (onCreatingChange ? onCreatingChange(open) : setCreatingOwn(open));
   const [confirmNode, ask] = useConfirm();
+  const [converting, setConverting] = useState<DemoAccount | null>(null);
   const counts = d.demos.reduce(
     (acc, demo) => ({...acc, [demoStage(demo)]: (acc[demoStage(demo)] || 0) + 1}),
     {} as Partial<Record<DemoStage, number>>,
@@ -68,6 +84,7 @@ export default function DemoAccountsPanel({
           ))}
         </div>
       )}
+      {d.demos.length > 1 && <DemoFunnel demos={d.demos} />}
       {d.busy?.id === 'new' && <p className="evaluation-demo-busy">{d.busy.label}</p>}
       {d.notice && (
         <div
@@ -107,6 +124,8 @@ export default function DemoAccountsPanel({
               onChangeEnd={date => void d.changeEnd(demo, trialEndOn(date))}
               onChangeLimit={limit => void d.changeLimit(demo, limit)}
               onHandled={requestId => void d.handleRequest(demo, requestId)}
+              onAutoDelete={autoDelete => void d.changeAutoDelete(demo, autoDelete)}
+              onConvert={() => setConverting(demo)}
               onEnter={() => d.enter(demo)}
               onReset={() =>
                 ask({
@@ -133,6 +152,28 @@ export default function DemoAccountsPanel({
           }}
         />
       )}
+      {converting && (
+        <ConvertDemoDialog
+          demo={converting}
+          onClose={() => setConverting(null)}
+          onConvert={conversion => {
+            const demo = converting;
+            setConverting(null);
+            ask({
+              title: tr('Μετατροπή σε πελάτη'),
+              message: conversion.keepData
+                ? tr('Το «{0}» γίνεται κανονικό νοσοκομείο με τα δεδομένα του Demo.', conversion.name)
+                : tr(
+                    'Το «{0}» γίνεται κανονικό νοσοκομείο και τα δοκιμαστικά δεδομένα διαγράφονται. Οι χρήστες και τα τμήματα μένουν.',
+                    conversion.name,
+                  ),
+              confirmLabel: tr('Μετατροπή'),
+              danger: !conversion.keepData,
+              onConfirm: () => void d.convert(demo, conversion),
+            });
+          }}
+        />
+      )}
       {confirmNode}
     </section>
   );
@@ -147,6 +188,8 @@ function DemoCard({
   onChangeEnd,
   onChangeLimit,
   onHandled,
+  onAutoDelete,
+  onConvert,
   onEnter,
   onReset,
 }: {
@@ -159,6 +202,8 @@ function DemoCard({
   onChangeEnd: (date: string) => void;
   onChangeLimit: (limit: number) => void;
   onHandled: (requestId: string) => void;
+  onAutoDelete: (autoDelete: boolean) => void;
+  onConvert: () => void;
   onEnter: () => void;
   onReset: () => void;
 }) {
@@ -167,6 +212,8 @@ function DemoCard({
   const disabled = !!busy;
   const [showColleagues, setShowColleagues] = useState(false);
   const newRequests = demo.requests.filter(r => r.status === 'NEW').length;
+  const converted = stage === 'CONVERTED';
+  const deleteOn = demoDeleteOn(demo);
   return (
     <article className={`evaluation-demo-card ${stage.toLowerCase()}`}>
       <div className="evaluation-demo-main">
@@ -223,6 +270,29 @@ function DemoCard({
           <dd>{demo.invitedAt ? formatDate(demo.invitedAt) : '—'}</dd>
         </div>
         <div>
+          <dt>{converted ? tr('Πελάτης από') : tr('Διαγραφή')}</dt>
+          <dd>
+            {converted ? (
+              demo.convertedAt ? (
+                formatDate(demo.convertedAt)
+              ) : (
+                '—'
+              )
+            ) : (
+              <label className="evaluation-demo-keep">
+                <input
+                  type="checkbox"
+                  disabled={disabled}
+                  checked={demo.autoDelete}
+                  onChange={e => onAutoDelete(e.target.checked)}
+                  aria-label={tr('Αυτόματη διαγραφή {0} ημέρες μετά τη λήξη', DEMO_DELETE_AFTER_DAYS)}
+                />
+                {deleteOn ? formatDate(deleteOn) : tr('Διατηρείται')}
+              </label>
+            )}
+          </dd>
+        </div>
+        <div>
           <dt>{tr('Δεδομένα')}</dt>
           <dd>
             {demo.lastLoad ? (
@@ -258,6 +328,13 @@ function DemoCard({
       <DemoFeedback demo={demo} disabled={disabled} onHandled={onHandled} />
       {busy && busy !== 'other' ? (
         <p className="evaluation-demo-busy">{busy}</p>
+      ) : converted ? (
+        <div className="evaluation-demo-actions">
+          <button disabled={disabled} onClick={onEnter}>
+            <LogIn size={14} />
+            {tr('Είσοδος')}
+          </button>
+        </div>
       ) : (
         <div className="evaluation-demo-actions">
           {stage === 'PREPARING' && (
@@ -302,6 +379,12 @@ function DemoCard({
             <LogIn size={14} />
             {tr('Είσοδος')}
           </button>
+          {demo.status === 'SENT' && (
+            <button className="primary" disabled={disabled} onClick={onConvert}>
+              <BadgeCheck size={14} />
+              {tr('Μετατροπή σε πελάτη')}
+            </button>
+          )}
           <button className="danger" disabled={disabled} onClick={onReset}>
             <RotateCcw size={14} />
             {tr('Επαναφορά δεδομένων')}
@@ -393,6 +476,31 @@ function DemoFeedback({
             ))}
           </ul>
         </section>
+      )}
+    </div>
+  );
+}
+
+/** How far the Demos went: each step with how many Demos reached it, and the average NPS. */
+function DemoFunnel({demos}: {demos: DemoAccount[]}) {
+  const funnel = demoFunnel(demos);
+  const total = Math.max(1, funnel.steps[0].count);
+  return (
+    <div className="evaluation-demo-funnel" aria-label={tr('Πορεία των Demo')}>
+      <ol>
+        {funnel.steps.map(step => (
+          <li key={step.key}>
+            <span>{tr(FUNNEL_LABEL[step.key])}</span>
+            <b>{step.count}</b>
+            <small>{Math.round((step.count / total) * 100)}%</small>
+            <i aria-hidden="true" style={{width: `${(step.count / total) * 100}%`}} />
+          </li>
+        ))}
+      </ol>
+      {funnel.averageNps !== undefined && (
+        <p>
+          {tr('Μέση σύσταση')}: <b>{funnel.averageNps.toFixed(1).replace('.', ',')}/10</b>
+        </p>
       )}
     </div>
   );

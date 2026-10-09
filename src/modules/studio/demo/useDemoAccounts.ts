@@ -2,6 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {DEMO_EXTENSION_DAYS, demoNextStep, type DemoAccount} from '../../../core/demoAccounts';
 import {trialEndAfter, trialEnded} from '../../../core/trial';
 import {
+  convertDemoAccount,
   createDemoAccount,
   loadDemoAccounts,
   resetDemoAccount,
@@ -9,7 +10,9 @@ import {
   sendDemoInvite,
   setDemoEnd,
   markDemoRequestHandled,
+  setDemoAutoDelete,
   setDemoUserLimit,
+  type DemoConversion,
   type NewDemo,
 } from '../../../data/cloud/demoAccounts';
 import {switchHospital} from '../../../data/cloud/hospitalSwitch';
@@ -107,6 +110,20 @@ export function useDemoAccounts() {
     });
   const changeLimit = (demo: DemoAccount, limit: number) =>
     run(demo.id, tr('Αποθήκευση…'), () => setDemoUserLimit(demo.id, limit));
+  const changeAutoDelete = (demo: DemoAccount, autoDelete: boolean) =>
+    run(demo.id, tr('Αποθήκευση…'), () => setDemoAutoDelete(demo.id, autoDelete));
+  const convert = (demo: DemoAccount, conversion: DemoConversion) =>
+    run(demo.id, tr('Μετατροπή σε πελάτη…'), async () => {
+      try {
+        await convertDemoAccount(demo.id, conversion);
+      } catch (e) {
+        throw /organizations_code_key/.test(message(e)) ? new Error(tr('Ο κωδικός νοσοκομείου υπάρχει ήδη.')) : e;
+      }
+      setNotice({
+        kind: 'ok',
+        text: tr('Το «{0}» έγινε πελάτης και εμφανίζεται στα Νοσοκομεία.', conversion.name),
+      });
+    });
   const handleRequest = (demo: DemoAccount, requestId: string) =>
     run(demo.id, tr('Αποθήκευση…'), () => markDemoRequestHandled(requestId));
   const enter = (demo: DemoAccount) => switchHospital(demo.organizationId, '#/');
@@ -124,6 +141,8 @@ export function useDemoAccounts() {
     changeEnd,
     changeLimit,
     handleRequest,
+    changeAutoDelete,
+    convert,
     reset,
     enter,
   };

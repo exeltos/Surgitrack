@@ -13,6 +13,8 @@ const service = vi.hoisted(() => ({
   setDemoUserLimit: vi.fn(),
   resetDemoAccount: vi.fn(),
   markDemoRequestHandled: vi.fn(),
+  setDemoAutoDelete: vi.fn(),
+  convertDemoAccount: vi.fn(),
 }));
 vi.mock('../../../data/cloud/demoAccounts', () => service);
 vi.mock('../../../data/cloud/hospitalSwitch', () => ({switchHospital: vi.fn()}));
@@ -30,6 +32,7 @@ const demo = (patch: Partial<DemoAccount> = {}): DemoAccount => ({
   contactEmail: 'maria@hospital.gr',
   status: 'SENT',
   maxExtraUsers: 5,
+  autoDelete: true,
   endsAt: inDays(10),
   active: true,
   seededAt: inDays(-1),
@@ -204,5 +207,80 @@ describe('Studio: evaluation Demos', () => {
     expect(screen.getByText('Σετ 400 · Αίθουσες —')).toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: 'Διεκπεραιώθηκε'}));
     await waitFor(() => expect(service.markDemoRequestHandled).toHaveBeenCalledWith('req-1'));
+  });
+
+  it('shows when an ended Demo is deleted, and keeps it on request', async () => {
+    service.loadDemoAccounts.mockResolvedValue([demo({endsAt: '2026-10-01T20:59:59.000Z'})]);
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    const keep = await screen.findByRole('checkbox', {name: 'Αυτόματη διαγραφή 30 ημέρες μετά τη λήξη'});
+    expect(keep).toBeChecked();
+    expect(screen.getByText('31/10/2026')).toBeInTheDocument();
+    await user.click(keep);
+    await waitFor(() => expect(service.setDemoAutoDelete).toHaveBeenCalledWith('demo-1', false));
+  });
+
+  it('turns a Demo into a customer hospital, with a clean start by default', async () => {
+    service.loadDemoAccounts.mockResolvedValue([demo({evaluatorActive: true})]);
+    service.convertDemoAccount.mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    await user.click(await screen.findByRole('button', {name: 'Μετατροπή σε πελάτη'}));
+    const form = screen.getByRole('complementary', {name: 'Μετατροπή σε πελάτη'});
+    expect(within(form).getByLabelText('Όνομα νοσοκομείου')).toHaveValue('Γ.Ν. Λάρισας');
+    expect((within(form).getByLabelText('Κωδικός νοσοκομείου') as HTMLInputElement).value).toMatch(/^GNL-\d{4}$/);
+    await user.clear(within(form).getByLabelText('Κωδικός νοσοκομείου'));
+    await user.type(within(form).getByLabelText('Κωδικός νοσοκομείου'), 'gnl-1');
+    await user.click(within(form).getByRole('button', {name: 'Μετατροπή'}));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('τα δοκιμαστικά δεδομένα διαγράφονται');
+    await user.click(within(dialog).getByRole('button', {name: 'Μετατροπή'}));
+    await waitFor(() =>
+      expect(service.convertDemoAccount).toHaveBeenCalledWith('demo-1', {
+        name: 'Γ.Ν. Λάρισας',
+        code: 'GNL-1',
+        plan: 'STANDARD',
+        trialEndsAt: undefined,
+        keepData: false,
+      }),
+    );
+    expect(await screen.findByText(/έγινε πελάτης/)).toBeInTheDocument();
+  });
+
+  it('says when the hospital code is taken', async () => {
+    service.loadDemoAccounts.mockResolvedValue([demo()]);
+    service.convertDemoAccount.mockRejectedValue({
+      message: 'duplicate key value violates unique constraint "organizations_code_key"',
+    });
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    await user.click(await screen.findByRole('button', {name: 'Μετατροπή σε πελάτη'}));
+    const form = screen.getByRole('complementary', {name: 'Μετατροπή σε πελάτη'});
+    await user.click(within(form).getByRole('radio', {name: /Διατήρηση δεδομένων/}));
+    await user.click(within(form).getByRole('button', {name: 'Μετατροπή'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Μετατροπή'}));
+    expect(await screen.findByText('Ο κωδικός νοσοκομείου υπάρχει ήδη.')).toBeInTheDocument();
+    expect(service.convertDemoAccount.mock.calls[0][1]).toMatchObject({keepData: true});
+  });
+
+  it('shows a converted Demo as a customer, with only "Enter"', async () => {
+    service.loadDemoAccounts.mockResolvedValue([demo({status: 'CONVERTED', convertedAt: '2026-10-09T10:00:00Z'})]);
+    render(<DemoAccountsPanel />);
+    expect(await screen.findAllByText('Έγινε πελάτης')).not.toHaveLength(0);
+    expect(screen.getByText('Πελάτης από')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Μετατροπή σε πελάτη'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /Επαναφορά δεδομένων/})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Είσοδος'})).toBeEnabled();
+  });
+
+  it('shows how far the Demos went', async () => {
+    service.loadDemoAccounts.mockResolvedValue([
+      demo({id: 'a', evaluatorActive: true, evaluations: [{name: 'Μ', nps: 8}]}),
+      demo({id: 'b', status: 'PREPARING'}),
+    ]);
+    render(<DemoAccountsPanel />);
+    const funnel = await screen.findByLabelText('Πορεία των Demo');
+    expect(within(funnel).getByText('Σύνδεση').parentElement).toHaveTextContent('Σύνδεση150%');
+    expect(funnel).toHaveTextContent('Μέση σύσταση: 8,0/10');
   });
 });

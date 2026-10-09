@@ -2,6 +2,7 @@ import type {ReactNode} from 'react';
 import {Printer, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
+import {markPrintHtml} from '../../core/sampleDataMark';
 export default function PrintPreviewModal({
   title,
   html,
@@ -37,7 +38,7 @@ export default function PrintPreviewModal({
         </header>
         <div className={`print-preview-main${aside ? ' with-aside' : ''}`}>
           <div className="print-preview-body">
-            <iframe id={frameId} title={title} srcDoc={html} />
+            <iframe id={frameId} title={title} srcDoc={markPrintHtml(html)} />
           </div>
           {aside && <aside className="print-preview-aside">{aside}</aside>}
         </div>

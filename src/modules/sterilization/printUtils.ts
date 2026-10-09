@@ -1,6 +1,7 @@
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
+import {markPrintHtml} from '../../core/sampleDataMark';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
 import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
@@ -157,7 +158,9 @@ export function openPrintWindow(title: string, html: string) {
   // `html` contains the print CSS, closes <head>, opens <body> and contains the print sheet.
   // Keep the outer document valid so browsers do not silently rearrange print CSS/body nodes.
   win.document.write(
-    `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title>${html}</body></html>`,
+    markPrintHtml(
+      `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title>${html}</body></html>`,
+    ),
   );
   win.document.close();
   const doPrint = () => {

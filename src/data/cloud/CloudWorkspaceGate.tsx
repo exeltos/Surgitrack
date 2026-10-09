@@ -21,6 +21,7 @@ import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
 import {seedDemoOrganization} from './demoSeed';
 import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
+import {setSampleDataMark} from '../../core/sampleDataMark';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -63,6 +64,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
 
   const load = useCallback(async () => {
     setStatus('loading');
+    setSampleDataMark(false);
     try {
       const result = await resolveIdentity();
       if (result.status !== 'ok') {
@@ -110,6 +112,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         setStatus('locked');
         return;
       }
+      setSampleDataMark(demo || evaluation);
       setTrial(plan.plan === 'TRIAL' ? plan : null);
       setEvaluationDemo(
         evaluation ? {organizationId, hospitalName: org.name, endsAt: org.trial_ends_at || undefined} : null,

@@ -5,6 +5,7 @@
  */
 
 import {formatDateTime} from './displayDate';
+import {markPrintHtml, markTable} from './sampleDataMark';
 
 export type ExportTable = {
   /** Document title, e.g. "Ιστορικό κινήσεων". */
@@ -180,7 +181,8 @@ const safeName = (title: string) =>
 const today = () => new Date().toISOString().slice(0, 10);
 
 /** The table as an Excel workbook: title, subtitle, header row, frozen panes, filters. */
-export function xlsxBlob(table: ExportTable) {
+export function xlsxBlob(source: ExportTable) {
+  const table = markTable(source);
   const sheetName = xml(table.title.slice(0, 31).replace(/[\\/?*[\]:]/g, ' ') || 'SurgiTrack');
   return zip([
     {
@@ -229,7 +231,7 @@ const save = (blob: Blob, title: string, extension: string) => {
 
 /** Downloads the table as an Excel workbook. */
 export function downloadXlsx(table: ExportTable) {
-  save(xlsxBlob(table), table.title, 'xlsx');
+  save(xlsxBlob(table), markTable(table).title, 'xlsx');
 }
 
 const csvCell = (value: string | number) => {
@@ -245,16 +247,18 @@ export function tableCsv(table: ExportTable) {
 }
 /** Downloads the table as CSV. */
 export function downloadCsv(table: ExportTable) {
-  save(new Blob([tableCsv(table)], {type: 'text/csv;charset=utf-8'}), table.title, 'csv');
+  // CSV is data for other programs: the mark goes in the file name only.
+  save(new Blob([tableCsv(table)], {type: 'text/csv;charset=utf-8'}), markTable(table).title, 'csv');
 }
 
 const html = (value: string | number) =>
   String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** A printable report page (A4 landscape) of the table, for "Print / PDF". */
-export function tableReportHtml(table: ExportTable, lang: string) {
+export function tableReportHtml(source: ExportTable, lang: string) {
+  const table = markTable(source);
   const printed = formatDateTime();
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${html(table.title)}</title>
+  return markPrintHtml(`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${html(table.title)}</title>
 <style>
 @page { size: A4 landscape; margin: 14mm 12mm; }
 * { box-sizing: border-box; }
@@ -276,5 +280,5 @@ footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
 <table><thead><tr>${table.headers.map(h => `<th>${html(h)}</th>`).join('')}</tr></thead>
 <tbody>${table.rows.map(row => `<tr>${row.map(v => `<td>${html(v ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>
 <footer>${table.rows.length} ${lang === 'el' ? (table.rows.length === 1 ? 'εγγραφή' : 'εγγραφές') : table.rows.length === 1 ? 'record' : 'records'}</footer>
-</body></html>`;
+</body></html>`);
 }
