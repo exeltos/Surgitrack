@@ -34,7 +34,18 @@ export type DemoAccount = {
   /** Accounts in the Demo besides the prospect's. */
   extraUsers: number;
   /** Those accounts, for the owner's view. */
-  colleagues: Array<{id: string; name: string; email: string; role: string; active: boolean; userCode?: string}>;
+  colleagues: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    active: boolean;
+    userCode?: string;
+    /** First-steps guide: steps done of those for their role. */
+    guide: {done: number; total: number};
+  }>;
+  /** The prospect's own first-steps progress. */
+  evaluatorGuide?: {done: number; total: number};
   /** The latest load of the sample hospital: first fill or reset. */
   lastLoad?: {kind: 'SEED' | 'RESET'; at: string; records: number};
 };

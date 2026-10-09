@@ -38,6 +38,8 @@ import {getCloudOrganizationId} from '../../data/cloud/appRecords';
 import {useRealtimeLive} from '../../data/cloud/realtime';
 import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
+import {useEvaluationDemo} from '../../data/cloud/demoContext';
+import DemoBar from './DemoBar';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
@@ -86,6 +88,7 @@ const expiryText = (e: ExpiryEntry, lang: string) =>
       : `Sterility expires on ${formatExpiry(e.sterileUntil)} (${e.daysLeft} d)`;
 export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
   const trial = useTrial();
+  const evaluationDemo = useEvaluationDemo();
   const {
     issues,
     lifecycleAlerts,
@@ -652,7 +655,16 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             </span>
           </div>
         )}
-        {trial && (trial.warn || trial.ended) && (
+        {evaluationDemo && (
+          <DemoBar
+            role={role}
+            onShowMe={to => {
+              navigate(to);
+              setHelpOpen(true);
+            }}
+          />
+        )}
+        {!evaluationDemo && trial && (trial.warn || trial.ended) && (
           <div className={`trial-strip${trial.ended ? ' ended' : ''}`} role="status">
             {trial.ended
               ? lang === 'el'

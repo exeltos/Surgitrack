@@ -17,6 +17,7 @@ import Spinner from '../../components/ui/Spinner';
 import {trialState, type HospitalPlan, type TrialState} from '../../core/trial';
 import {loadPlatformContact, type PlatformContact} from './platformContact';
 import {TrialContext} from './trialContext';
+import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
 import {seedDemoOrganization} from './demoSeed';
 
@@ -47,6 +48,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
   const [workspace, setWorkspace] = useState<CloudWorkspace | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'local' | 'error' | 'locked'>('loading');
   const [trial, setTrial] = useState<TrialState | null>(null);
+  const [evaluationDemo, setEvaluationDemo] = useState<EvaluationDemo | null>(null);
   const [lock, setLock] = useState<{
     hospital: string;
     endsAt?: string;
@@ -99,6 +101,9 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         return;
       }
       setTrial(plan.plan === 'TRIAL' ? plan : null);
+      setEvaluationDemo(
+        evaluation ? {organizationId, hospitalName: org.name, endsAt: org.trial_ends_at || undefined} : null,
+      );
       // This device's copy (less than a day old) opens the hospital at once; the sync then fetches only
       // what changed since, and sends what was left unsaved when the page closed.
       const owner = {userId: result.identity.id, organizationId};
@@ -164,7 +169,11 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
 
   if (status === 'local') return <>{children(null)}</>;
   if (status === 'ready' && workspace)
-    return <TrialContext.Provider value={trial}>{children(workspace)}</TrialContext.Provider>;
+    return (
+      <TrialContext.Provider value={trial}>
+        <EvaluationDemoContext.Provider value={evaluationDemo}>{children(workspace)}</EvaluationDemoContext.Provider>
+      </TrialContext.Provider>
+    );
   if (status === 'locked' && lock) return <TrialLocked lang={lang} {...lock} />;
   if (status === 'loading')
     return <Spinner fullScreen label={lang === 'el' ? 'Φόρτωση δεδομένων…' : 'Loading data…'} />;

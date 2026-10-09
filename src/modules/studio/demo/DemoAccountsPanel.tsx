@@ -188,6 +188,10 @@ function DemoCard({
           <dd>{demo.evaluatorCode || '—'}</dd>
         </div>
         <div>
+          <dt>{tr('Πρώτα βήματα')}</dt>
+          <dd>{demo.evaluatorGuide ? `${demo.evaluatorGuide.done} / ${demo.evaluatorGuide.total}` : '—'}</dd>
+        </div>
+        <div>
           <dt>{tr('Συνάδελφοι')}</dt>
           <dd>
             {demo.colleagues.length ? (
@@ -235,6 +239,7 @@ function DemoCard({
               <b>{c.name}</b>
               <span>{c.email}</span>
               <span>{c.userCode || '—'}</span>
+              <span>{tr('Βήματα {0}/{1}', c.guide.done, c.guide.total)}</span>
               <span>{c.active ? tr('Ενεργός') : tr('Περιμένει έγκριση ή ανενεργός')}</span>
             </li>
           ))}
