@@ -4,6 +4,9 @@
 #
 #   bash supabase/tests/run-local.sh            # temporary cluster, removed afterwards
 #   KEEP=1 bash supabase/tests/run-local.sh     # keep the cluster running and print how to connect
+#   RESTORE_DUMP=backup.dump bash supabase/tests/run-local.sh
+#       # restore test of a data-only backup (pg_dump --data-only --schema=public -Fc): loads it onto the
+#       # replayed schema and writes "table rows" lines to RESTORE_COUNTS (default restore-counts.txt)
 #
 # Needs the PostgreSQL 16 server binaries (initdb, pg_ctl) and psql. When run as root, the cluster
 # runs as the `postgres` OS user.
@@ -55,6 +58,21 @@ for f in "${MIGRATIONS_DIR:-$repo/supabase/migrations}"/*.sql; do
   count=$((count + 1))
 done
 echo "Replayed $count migrations."
+
+if [ -n "${RESTORE_DUMP:-}" ]; then
+  # Rows the migrations seed (settings, libraries) come back from the backup itself.
+  psql_su -d surgitrack_test -c "do \$\$ begin execute (select 'truncate ' || string_agg(format('public.%I', relname), ', ')
+      || ' cascade' from pg_class where relnamespace = 'public'::regnamespace and relkind in ('r', 'p')); end \$\$"
+  # Superuser, so that --disable-triggers also skips the foreign keys to auth.users (not in the backup).
+  "$pgbin/pg_restore" --data-only --disable-triggers --exit-on-error --no-owner --no-privileges -h "$work" -p "$port" \
+    -U supabase_admin -d surgitrack_test "$RESTORE_DUMP"
+  psql_su -d surgitrack_test -tA -F ' ' -c "select format('%s %s', c.relname,
+      (xpath('/row/n/text()', query_to_xml(format('select count(*) as n from public.%I', c.relname), false, true, '')))[1]::text)
+    from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') order by 1" \
+    >"${RESTORE_COUNTS:-restore-counts.txt}"
+  echo "Restored $(basename "$RESTORE_DUMP"): $(wc -l <"${RESTORE_COUNTS:-restore-counts.txt}") tables counted."
+  exit 0
+fi
 
 failed=0
 shopt -s nullglob

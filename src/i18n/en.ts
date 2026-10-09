@@ -1901,6 +1901,7 @@ export const en: Record<string, string> = {
   'Υπάρχουν αλλαγές που δεν αποθηκεύτηκαν': 'Some changes are not saved',
   'Αν φύγετε από αυτή τη σελίδα, οι αλλαγές θα χαθούν.': 'If you leave this page, the changes will be lost.',
   'Έξοδος χωρίς αποθήκευση': 'Leave without saving',
+  'Σετ και εργαλεία του τμήματος': 'Sets and instruments of the department',
   'Όλα τα Σετ και εργαλεία του φορτίου ανακαλούνται για επανεπεξεργασία.':
     'Every Set and instrument in the load is recalled for reprocessing.',
   'Ανάκληση φορτίου': 'Recall load',

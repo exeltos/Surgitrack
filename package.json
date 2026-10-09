@@ -13,9 +13,10 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ci": "npm run format:check && npm run typecheck && npm run lint && npm run css:unused && npm run test && npm run build",
+    "ci": "npm run format:check && npm run typecheck && npm run lint && npm run css:unused && npm run i18n:check && npm run test && npm run build",
     "screens": "node scripts/screens/capture.mjs",
-    "css:unused": "node scripts/css-unused.mjs"
+    "css:unused": "node scripts/css-unused.mjs",
+    "i18n:check": "node scripts/i18n-check.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
@@ -32,6 +33,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "axe-core": "^4.10.3",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.4",

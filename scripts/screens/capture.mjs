@@ -5,7 +5,9 @@
  * role that can open it, at desktop and mobile size. See README.md.
  *
  *   node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,...|all]
- *        [--viewport desktop|mobile|both] [--out dir] [--only route] [--rebuild] [--no-extras]
+ *        [--viewport desktop|mobile|both] [--out dir] [--only route] [--rebuild] [--no-extras] [--a11y]
+ *
+ * --a11y also runs axe-core (WCAG 2 A/AA) on every route and exits 1 on any serious or critical finding.
  */
 import {spawnSync} from 'node:child_process';
 import {createServer} from 'node:http';
@@ -50,6 +52,23 @@ const ONLY = arg('only', undefined);
 const REBUILD = !!arg('rebuild', false);
 const EXTRAS = !arg('no-extras', false);
 const SETTLE_MS = Number(arg('settle', 600));
+const A11Y = !!arg('a11y', false);
+const AXE = join(ROOT, 'node_modules/axe-core/axe.min.js');
+
+/** axe-core findings for the page as it is now: rule, impact, how many elements and a few of them. */
+async function accessibility(page) {
+  if (!(await page.evaluate(() => 'axe' in window))) await page.addScriptTag({path: AXE});
+  return page.evaluate(async () => {
+    const result = await window.axe.run(document, {runOnly: {type: 'tag', values: ['wcag2a', 'wcag2aa']}});
+    return result.violations.map(v => ({
+      rule: v.id,
+      impact: v.impact,
+      help: v.help,
+      count: v.nodes.length,
+      examples: v.nodes.slice(0, 3).map(n => n.target.join(' ')),
+    }));
+  });
+}
 // Tallest screenshot: long lists (hundreds of instruments) are cut here rather than producing 20,000px images.
 const MAX_HEIGHT = Number(arg('max-height', 4000));
 
@@ -402,6 +421,7 @@ async function main() {
         await settle(page);
         await page.evaluate(() => window.scrollTo(0, 0));
         const state = await pageState(page);
+        if (A11Y) state.a11y = await accessibility(page);
         const file = `${LANG}_${role.toLowerCase()}_${viewport}_${slug(route)}.png`;
         await shoot(page, file, viewport);
         const landed = decodeURIComponent(state.hash.replace(/^#/, ''));
@@ -438,6 +458,23 @@ async function main() {
       e.consoleErrors.some(c => c.startsWith('[error]') || c.startsWith('[pageerror]')),
   );
   console.log(`\n${index.length} screenshots in ${OUT} (index.json). ${problems.length} with something to look at.`);
+  if (A11Y) {
+    const rules = new Map();
+    for (const e of index)
+      for (const v of e.state?.a11y || []) {
+        const r = rules.get(v.rule) || {...v, pages: new Set(), count: 0};
+        r.count += v.count;
+        r.pages.add(`${e.role.toLowerCase()} ${e.viewport} ${e.route}`);
+        rules.set(v.rule, r);
+      }
+    for (const r of [...rules.values()].sort((a, b) => b.count - a.count))
+      console.log(
+        `  a11y ${r.impact.padEnd(8)} ${r.rule}: ${r.help} · ${r.count} elements on ${r.pages.size} screens · e.g. ${r.examples[0]}`,
+      );
+    const blocking = [...rules.values()].filter(r => r.impact === 'serious' || r.impact === 'critical');
+    console.log(`Accessibility: ${rules.size} rules broken, ${blocking.length} serious or critical.`);
+    if (blocking.length) process.exitCode = 1;
+  }
 }
 
 /** A few dialogs reachable with one click, captured where the role has them. */
