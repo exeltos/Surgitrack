@@ -4,7 +4,7 @@ import type {UserRole} from '../../store/types';
 import {type PermissionGroup} from '../../core/permissions';
 
 export type Tab =
-  'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM';
+  'OVERVIEW' | 'PLATFORM' | 'LIBRARIES' | 'WORKFLOW' | 'USERS' | 'IMPORT' | 'GUIDE' | 'ROLES' | 'SYSTEM' | 'ERRORS';
 
 export const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
   {

@@ -1,4 +1,5 @@
-import {Component, type ReactNode} from 'react';
+import {Component, type ErrorInfo, type ReactNode} from 'react';
+import {reportError} from '../../data/cloud/errorReporting';
 import {RefreshCcw} from 'lucide-react';
 import {isChunkLoadError} from '../../core/resilience';
 import {tr} from '../../i18n';
@@ -29,8 +30,10 @@ export default class RouteErrorBoundary extends Component<{children: ReactNode},
     window.removeEventListener('hashchange', this.onHashChange);
   }
 
-  componentDidCatch(error: unknown) {
+  componentDidCatch(error: unknown, info: ErrorInfo) {
     console.error('SurgiTrack page error', error);
+    if (!isChunkLoadError(error))
+      reportError('render', error, [error instanceof Error ? error.stack : '', info.componentStack].join('\n'));
   }
 
   render() {

@@ -8,6 +8,7 @@ import {
   Users,
   Layers3,
   FileSpreadsheet,
+  Bug,
 } from 'lucide-react';
 import type {StudioPageState} from '../useStudioPage';
 
@@ -75,6 +76,17 @@ export default function StudioTabs({s}: {s: StudioPageState}) {
         >
           <FileSpreadsheet size={17} />
           {L('Εισαγωγή', 'Import')}
+        </button>
+      )}
+      {platformAdmin && libs.dataMode === 'PRODUCTION' && (
+        <button
+          role="tab"
+          aria-selected={tab === 'ERRORS'}
+          className={tab === 'ERRORS' ? 'active' : ''}
+          onClick={() => selectTab('ERRORS')}
+        >
+          <Bug size={17} />
+          {L('Σφάλματα', 'Errors')}
         </button>
       )}
       <button

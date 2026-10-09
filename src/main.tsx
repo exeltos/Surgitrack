@@ -11,11 +11,13 @@ import EmailLinkPage from './modules/auth/EmailLinkPage';
 import {emailLink} from './modules/auth/emailLink';
 import './styles/global.css';
 import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
+import {installErrorReporting} from './data/cloud/errorReporting';
 import {installTabletViewport} from './core/tabletViewport';
 import {getI18nLang, loadEnglish, setI18nLang} from './i18n';
 import {loadDemoRepository} from './data/repositories';
 
 installChunkRecovery();
+installErrorReporting();
 installEscapeClosesDialogs();
 installTabletViewport();
 const root = document.getElementById('root');
