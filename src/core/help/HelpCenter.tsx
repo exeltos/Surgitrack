@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  FileDown,
   Info,
   LifeBuoy,
   Mail,
@@ -21,6 +22,8 @@ import {getRuntimeDataMode} from '../../config/dataMode';
 import {loadPlatformContact, type PlatformContact} from '../../data/cloud/platformContact';
 import {glossary, helpManual, type ManualSection} from './helpManual';
 import ScreenPreview from './ScreenPreview';
+import OwnerManuals from './OwnerManuals';
+import {getRealIdentity} from '../../data/cloud/identity';
 
 const ui = {
   el: {
@@ -122,7 +125,7 @@ const ui = {
   },
 };
 
-type Mode = 'manual' | 'glossary' | 'about' | 'support';
+type Mode = 'manual' | 'glossary' | 'about' | 'support' | 'pdf';
 
 /** Pages from which Set and instrument cards open. */
 const RECORD_LISTS = ['/department', '/tools', '/sets', '/standalone-tools', '/stock', '/sterilization'];
@@ -162,6 +165,8 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
   const [selected, setSelected] = useState(() => (screenSection || visible[0])?.to || '');
   const [chapter, setChapter] = useState(0);
   const [mode, setMode] = useState<Mode>('manual');
+  // The PDF manuals are for the platform owner's own account only (not when viewing as a role, not in Demo).
+  const owner = !!getRealIdentity()?.platform && getRuntimeDataMode() !== 'DEMO';
   const [query, setQuery] = useState('');
   // Who to contact: the platform's contact (Studio → Settings), else the default.
   const [contact, setContact] = useState<PlatformContact>(SUPPORT_CONTACT);
@@ -289,6 +294,12 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                 <LifeBuoy size={15} />
                 <span>{tx.support}</span>
               </button>
+              {owner && (
+                <button className={mode === 'pdf' ? 'active' : ''} onClick={() => setMode('pdf')}>
+                  <FileDown size={15} />
+                  <span>{L === 'el' ? 'Εγχειρίδια PDF' : 'PDF manuals'}</span>
+                </button>
+              )}
               <button className={mode === 'about' ? 'active' : ''} onClick={() => setMode('about')}>
                 <Info size={15} />
                 <span>{tx.about}</span>
@@ -492,6 +503,8 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
               </section>
             </main>
           )}
+
+          {mode === 'pdf' && owner && <OwnerManuals lang={L} />}
 
           {mode === 'about' && (
             <main className="manual-special">

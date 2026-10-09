@@ -9,7 +9,7 @@
  */
 import {spawnSync} from 'node:child_process';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
-import {dirname, join, resolve} from 'node:path';
+import {basename, dirname, join, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {chromium} from 'playwright';
 
@@ -22,7 +22,8 @@ const arg = (name, fallback) => {
   return i < 0 ? fallback : argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : true;
 };
 const LANG = arg('lang', 'el') === 'en' ? 'en' : 'el';
-const OUT = resolve(String(arg('out', join(ROOT, `docs/SurgiTrack-manual-${LANG}.pdf`))));
+// public/manuals: shipped with the app, downloaded from the Help Center by the platform owner.
+const OUT = resolve(String(arg('out', join(ROOT, `public/manuals/SurgiTrack-manual-${LANG}.pdf`))));
 const SHOTS = join(CACHE, `shots-${LANG}`);
 const version = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 
@@ -239,6 +240,20 @@ async function main() {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath: process.env.CHROMIUM_PATH} : {});
   const tab = await browser.newPage();
   await tab.setContent(page, {waitUntil: 'load'});
+  // Screenshots as JPEG: a manual small enough to email (PNG made it four times larger).
+  await tab.evaluate(async () => {
+    for (const img of document.images) {
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      // An A4 column is ~180 mm: 1200 px is ~170 dpi, sharp in print.
+      const scale = Math.min(1, 1200 / img.naturalWidth);
+      canvas.width = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = canvas.toDataURL('image/jpeg', 0.8);
+      await img.decode();
+    }
+  });
   await tab.pdf({
     path: OUT,
     format: 'A4',
@@ -249,7 +264,13 @@ async function main() {
     margin: {top: '18mm', bottom: '20mm', left: '16mm', right: '16mm'},
   });
   await browser.close();
-  console.log(`Manual: ${OUT}`);
+  const pdf = readFileSync(OUT);
+  const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+  const metaFile = join(dirname(OUT), 'manuals.json');
+  const meta = existsSync(metaFile) ? JSON.parse(readFileSync(metaFile, 'utf8')) : {};
+  meta[LANG] = {file: basename(OUT), pages, bytes: pdf.length, version, built: new Date().toISOString().slice(0, 10)};
+  writeFileSync(metaFile, `${JSON.stringify(meta, null, 2)}\n`);
+  console.log(`Manual: ${OUT} (${pages} pages, ${(pdf.length / 1048576).toFixed(1)} MB)`);
 }
 
 main().catch(error => {

@@ -8,5 +8,3 @@ Thumbs.db
 *.tsbuildinfo
 .claude/worktrees/
 
-# Built by npm run manual
-docs/*.pdf

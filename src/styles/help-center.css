@@ -690,3 +690,46 @@
   background: var(--c-gray-95-3);
   border-color: var(--c-cyan-85);
 }
+
+/* Platform owner: the PDF manuals */
+.owner-manuals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+.owner-manuals section {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.owner-manual-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--st-teal);
+}
+.owner-manual-head b {
+  display: block;
+  color: var(--st-ink);
+  font-size: 15px;
+}
+.owner-manual-head small {
+  color: var(--st-muted);
+}
+.owner-manual-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.owner-manual-actions a.app-button {
+  text-decoration: none;
+}
+.manual-special .owner-manuals-note {
+  margin-top: 14px;
+  color: var(--st-muted);
+  font-size: 13px;
+}

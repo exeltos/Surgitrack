@@ -65,10 +65,9 @@ nothing in the schema changed). With the CLI the same is
 
 They were applied through the Supabase MCP `execute_sql`, with their own versions recorded by hand, because that tool
 times out on any statement it treats as destructive (`drop`). The `drop ... if exists` lines guarding new objects
-were skipped (nothing to drop). The nine `drop policy` lines of `20261009120000` that remove the replaced Demo
-policies are run from the SQL editor (the new policies are already live and allow exactly the same, so until then
-the only effect is the advisor's `multiple_permissive_policies` warning); that script also records
-`20261009120000` in the history:
+were skipped (nothing to drop). The nine `drop policy` lines of `20261009120000` that removed the replaced Demo
+policies have since been run and the version is recorded (checked 09/10/2026: each Demo table has exactly one
+policy per action). For the record, they were:
 
 ```sql
 drop policy if exists demo_accounts_owner on public.demo_accounts;
