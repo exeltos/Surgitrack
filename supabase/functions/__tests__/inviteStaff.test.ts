@@ -253,7 +253,7 @@ describe('invite-staff: an account made at once (hospital admin role or direct l
 
   it('fails when no username can be made, before any account exists', async () => {
     mailOn();
-    fake.rpc = () => ({data: null, error: {message: 'nope'}});
+    fake.rpc = name => (name === 'generate_user_code' ? {data: null, error: {message: 'nope'}} : {data: null, error: null});
     expect(await result(await invite(handle, body))).toMatchObject({ok: false, error: 'Username failed'});
     expect(fake.calls.filter(c => ['generateLink', 'inviteUserByEmail'].includes(c.what))).toHaveLength(0);
   });
@@ -494,5 +494,30 @@ describe('invite-staff: rejecting a request', () => {
     routes({'staff_access_requests:select': {...WAITING, status: 'APPROVED'}});
     expect((await reject()).status).toBe(409);
     expect(fake.calls.filter(c => c.what === 'deleteUser')).toHaveLength(0);
+  });
+});
+
+describe('invite-staff: a Demo user limit', () => {
+  const body = {email: 'colleague@hospital.gr', organization_id: 'org-1', role: 'DEPARTMENT'};
+
+  it('refuses a new invitation once the evaluation Demo has no place left', async () => {
+    fake.rpc = name => ({data: name === 'demo_seats_left' ? 0 : 'AB1234', error: null});
+    const row = await result(await invite(handle, body));
+    expect(row).toMatchObject({ok: false, error: 'Demo user limit reached'});
+    expect(fake.dbCalls('insert')).toHaveLength(0);
+  });
+
+  it('invites while places are left, and any other hospital has no limit', async () => {
+    for (const left of [2, null]) {
+      fake.calls = [];
+      fake.rpc = name => ({data: name === 'demo_seats_left' ? left : 'AB1234', error: null});
+      expect(await result(await invite(handle, body))).toMatchObject({ok: true, mode: 'signup'});
+    }
+  });
+
+  it('sends a waiting invitation again even when the Demo is full (it holds its place already)', async () => {
+    fake.rpc = name => ({data: name === 'demo_seats_left' ? 0 : 'AB1234', error: null});
+    routes({'staff_access_requests:select': {id: 'r1', status: 'PENDING_EMAIL', invite_token: 'known-token'}});
+    expect(await result(await invite(handle, body))).toMatchObject({ok: true});
   });
 });

@@ -28,6 +28,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
     decide,
     decisionFor,
     demo,
+    demoSeats,
     departmentName,
     el,
     invite,
@@ -67,7 +68,17 @@ export default function UsersSection({s}: {s: PeopleState}) {
               />
             </div>
             <div className="people-invite">
-              <AppButton variant="primary" icon={<UserPlus size={16} />} onClick={() => setInviteMenu(v => !v)}>
+              <AppButton
+                variant="primary"
+                icon={<UserPlus size={16} />}
+                disabled={demoSeats?.left === 0}
+                title={
+                  demoSeats?.left === 0
+                    ? L('Το Demo έχει φτάσει το όριο συναδέλφων.', 'The Demo has reached its colleague limit.')
+                    : undefined
+                }
+                onClick={() => setInviteMenu(v => !v)}
+              >
                 {L('Προσθήκη χρήστη', 'Add user')}
               </AppButton>
               {inviteMenu && (
@@ -92,7 +103,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       </small>
                     </span>
                   </button>
-                  {!demo && (
+                  {!demo && !demoSeats && (
                     <button
                       role="menuitem"
                       onClick={() => {
@@ -112,7 +123,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       </span>
                     </button>
                   )}
-                  {!demo && (
+                  {!demo && !demoSeats && (
                     <label role="menuitem" className="people-invite-file">
                       <FileSpreadsheet size={16} />
                       <span>
@@ -140,6 +151,30 @@ export default function UsersSection({s}: {s: PeopleState}) {
               )}
             </div>
           </div>
+          {demoSeats && (
+            <div className={`people-demo-seats ${demoSeats.left === 0 ? 'full' : ''}`}>
+              <Users size={16} />
+              <span>
+                <b>
+                  {L(
+                    `Συνάδελφοι στο Demo: ${demoSeats.max - demoSeats.left} / ${demoSeats.max}`,
+                    `Colleagues in the Demo: ${demoSeats.max - demoSeats.left} / ${demoSeats.max}`,
+                  )}
+                </b>
+                <small>
+                  {demoSeats.left === 0
+                    ? L(
+                        'Το όριο συμπληρώθηκε. Για περισσότερους συναδέλφους επικοινωνήστε μαζί μας.',
+                        'The limit is reached. For more colleagues, contact us.',
+                      )
+                    : L(
+                        `Μπορείτε να προσκαλέσετε ακόμα ${demoSeats.left}. Οι προσκλήσεις που περιμένουν εγγραφή μετράνε κι αυτές.`,
+                        `You can invite ${demoSeats.left} more. Invitations waiting for signup count too.`,
+                      )}
+                </small>
+              </span>
+            </div>
+          )}
 
           {pending.length > 0 && (
             <div className="people-requests">

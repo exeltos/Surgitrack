@@ -93,12 +93,17 @@ export function usePeopleMembers(
               `Το ${draft.email} έχει ήδη λογαριασμό που έχει ενεργοποιηθεί. Δεν χρειάζεται πρόσκληση.`,
               `${draft.email} already has an activated account. No invitation is needed.`,
             )
-          : /waiting for approval/i.test(reason)
+          : /demo user limit/i.test(reason)
             ? L(
-                `Το ${draft.email} έχει ήδη στείλει τα στοιχεία του και περιμένει έγκριση εδώ.`,
-                `${draft.email} has already sent their details and waits for approval here.`,
+                'Το Demo έχει φτάσει το όριο συναδέλφων. Για περισσότερους, επικοινωνήστε μαζί μας.',
+                'The Demo has reached its colleague limit. For more, contact us.',
               )
-            : L(`Η πρόσκληση δεν στάλθηκε: ${reason}`, `The invitation was not sent: ${reason}`),
+            : /waiting for approval/i.test(reason)
+              ? L(
+                  `Το ${draft.email} έχει ήδη στείλει τα στοιχεία του και περιμένει έγκριση εδώ.`,
+                  `${draft.email} has already sent their details and waits for approval here.`,
+                )
+              : L(`Η πρόσκληση δεν στάλθηκε: ${reason}`, `The invitation was not sent: ${reason}`),
       });
       return;
     }

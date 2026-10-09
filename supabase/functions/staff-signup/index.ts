@@ -58,8 +58,15 @@ Deno.serve(async req => {
       | string
       | undefined;
     if (!organizationId) return json({error: "link_invalid"}, 410);
-    const {data: org} = await admin.from("organizations").select("name, active, is_demo").eq("id", organizationId).maybeSingle();
-    if (!org?.active || org.is_demo) return json({error: "link_invalid"}, 410);
+    const {data: org} = await admin
+      .from("organizations")
+      .select("name, active, is_demo, evaluation")
+      .eq("id", organizationId)
+      .maybeSingle();
+    // Demo hospitals take no signups, except a prospect's evaluation Demo through a personal
+    // invitation (the prospect's colleagues, within the Demo's user limit).
+    const demoOk = !org?.is_demo || (org.evaluation && !!invitation);
+    if (!org?.active || !demoOk) return json({error: "link_invalid"}, 410);
     // Admins and viewers see the whole hospital: no department to pick.
     const needsDepartment = !invitation || !["ADMIN", "VIEWER"].includes(String(invitation.invited_role));
 
@@ -167,6 +174,8 @@ Deno.serve(async req => {
     });
     if (profileError) {
       await undo();
+      // The Demo's user limit (the database refuses a profile over it).
+      if (/demo_user_limit/.test(profileError.message || "")) return json({error: "demo_user_limit"}, 409);
       return json({error: "signup_failed"}, 500);
     }
 

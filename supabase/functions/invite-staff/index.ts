@@ -18,6 +18,13 @@ const ROLES = ["ADMIN", "STERILIZATION", "DEPARTMENT", "VIEWER"];
 const corsBase = {"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
 const randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => b.toString(16).padStart(2, "0")).join("");
 
+/** A prospect's evaluation Demo holds a limited number of colleagues; any other hospital has no limit. */
+async function seatLeft(admin: SupabaseClient, org: string) {
+  const {data: left, error} = await admin.rpc("demo_seats_left", {p_org: org});
+  if (error) throw error;
+  if (left !== null && left !== undefined && Number(left) <= 0) throw new Error("Demo user limit reached");
+}
+
 /** A signup invitation: the email carries the form; the request waits there for the person. */
 async function inviteToSignup(admin: SupabaseClient, g: Omit<Grant, "name">, send: boolean) {
   const {data: existing} = await admin.from("profiles").select("id").eq("email", g.email).maybeSingle();
@@ -41,6 +48,7 @@ async function inviteToSignup(admin: SupabaseClient, g: Omit<Grant, "name">, sen
     invited_at: new Date().toISOString(),
   };
   if (!open) {
+    await seatLeft(admin, g.org);
     token = randomToken();
     const {error} = await admin
       .from("staff_access_requests")
@@ -203,6 +211,8 @@ Deno.serve(async req => {
         const orgName = await hospital(org);
         const dept = await department(org, role, row.department_id);
         if (direct) {
+          const {data: known} = await admin.from("profiles").select("id").eq("email", email).maybeSingle();
+          if (!known) await seatLeft(admin, org);
           const r = await grantAccess(admin, {
             email, name: name.toLocaleUpperCase("el-GR"), org, orgName, role, dept, invitedBy: user.id, site, supervisor: row.supervisor === true,
           });

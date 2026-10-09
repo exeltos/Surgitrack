@@ -39,6 +39,8 @@ export function usePeopleState(props: {
   const [csvRows, setCsvRows] = useState<CsvRow[] | null>(null);
   /** Invitations sent and not accepted yet, by email: when each was last sent. */
   const [invitations, setInvitations] = useState<Record<string, string>>({});
+  /** A prospect's evaluation Demo: its colleague limit and how many places are left. */
+  const [demoSeats, setDemoSeats] = useState<{max: number; left: number} | null>(null);
 
   const showError = useCallback((text: string) => setNotice({kind: 'error', text}), []);
   const fail = (e: {message?: string} | null | undefined) => {
@@ -51,6 +53,7 @@ export function usePeopleState(props: {
     csvRows,
     decisions,
     demo,
+    demoSeats,
     departments,
     drawer,
     editing,
@@ -75,6 +78,7 @@ export function usePeopleState(props: {
     setBusy,
     setCsvRows,
     setDecisions,
+    setDemoSeats,
     setDepartments,
     setDrawer,
     setEditing,

@@ -10,6 +10,7 @@ const service = vi.hoisted(() => ({
   seedDemoAccount: vi.fn(),
   sendDemoInvite: vi.fn(),
   setDemoEnd: vi.fn(),
+  setDemoUserLimit: vi.fn(),
   resetDemoAccount: vi.fn(),
 }));
 vi.mock('../../../data/cloud/demoAccounts', () => service);
@@ -35,6 +36,7 @@ const demo = (patch: Partial<DemoAccount> = {}): DemoAccount => ({
   createdAt: inDays(-1),
   evaluatorActive: false,
   extraUsers: 0,
+  colleagues: [],
   ...patch,
 });
 
@@ -138,5 +140,23 @@ describe('Studio: evaluation Demos', () => {
     const [org, end] = service.setDemoEnd.mock.calls[0];
     expect(org).toBe('org-demo');
     expect(Date.parse(end) - Date.parse(endsAt)).toBeGreaterThan(6.5 * 864e5);
+  });
+
+  it("lists the prospect's colleagues and changes how many they may add", async () => {
+    service.loadDemoAccounts.mockResolvedValue([
+      demo({
+        extraUsers: 1,
+        colleagues: [
+          {id: 'c1', name: 'ΝΙΚΟΣ ΡΗΓΑΣ', email: 'n@h.gr', role: 'STERILIZATION', active: true, userCode: 'NR1111'},
+        ],
+      }),
+    ]);
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    await user.click(await screen.findByRole('button', {name: '1 / 5'}));
+    expect(screen.getByText('ΝΙΚΟΣ ΡΗΓΑΣ')).toBeInTheDocument();
+    expect(screen.getByText('NR1111')).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText('Όριο συναδέλφων'), '8');
+    await waitFor(() => expect(service.setDemoUserLimit).toHaveBeenCalledWith('demo-1', 8));
   });
 });

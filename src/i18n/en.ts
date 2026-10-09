@@ -1956,4 +1956,6 @@ export const en: Record<string, string> = {
   Δεδομένα: 'Data',
   ' · επαναφορά, {0} εγγραφές': ' · reset, {0} records',
   ' · {0} εγγραφές': ' · {0} records',
+  'Περιμένει έγκριση ή ανενεργός': 'Awaiting approval or inactive',
+  'Όριο συναδέλφων': 'Colleague limit',
 };

@@ -40,6 +40,10 @@ const errorText = (code: string, el: boolean) => {
         : 'A request with this email is already waiting for approval.';
     case 'too_many_attempts':
       return el ? 'Πολλές προσπάθειες. Δοκιμάστε ξανά αργότερα.' : 'Too many attempts. Try again later.';
+    case 'demo_user_limit':
+      return el
+        ? 'Το Demo έχει φτάσει το όριο χρηστών. Ενημερώστε όποιον σας προσκάλεσε.'
+        : 'The Demo has reached its user limit. Tell whoever invited you.';
     case 'password_invalid':
       return el ? 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.' : 'The password needs at least 8 characters.';
     case 'invalid_input':
