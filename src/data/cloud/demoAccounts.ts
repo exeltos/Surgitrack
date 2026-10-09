@@ -31,7 +31,8 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
     .order('created_at', {ascending: false});
   if (error) throw error;
   const rows = (data || []) as unknown as DemoRow[];
-  const people = new Map<string, Array<{id: string; active: boolean; user_code: string | null}>>();
+  type Person = {id: string; name: string; email: string; role: string; active: boolean; user_code: string | null};
+  const people = new Map<string, Person[]>();
   const lastRun = new Map<string, SeedRunRow>();
   if (rows.length) {
     const {data: runs, error: runsError} = await supabase
@@ -47,13 +48,13 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
       if (!lastRun.has(run.organization_id)) lastRun.set(run.organization_id, run);
     const {data: profiles, error: profilesError} = await supabase
       .from('profiles')
-      .select('id,active,user_code,organization_id')
+      .select('id,name,email,role,active,user_code,organization_id')
       .in(
         'organization_id',
         rows.map(row => row.organization_id),
       );
     if (profilesError) throw profilesError;
-    for (const p of profiles || []) {
+    for (const p of (profiles || []) as Array<Person & {organization_id: string}>) {
       const list = people.get(p.organization_id) || [];
       list.push(p);
       people.set(p.organization_id, list);
@@ -83,6 +84,16 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
       evaluatorActive: !!evaluator?.active,
       evaluatorCode: evaluator?.user_code || undefined,
       extraUsers: members.filter(p => p.id !== row.evaluator_id).length,
+      colleagues: members
+        .filter(p => p.id !== row.evaluator_id)
+        .map(p => ({
+          id: p.id,
+          name: p.name,
+          email: p.email,
+          role: p.role,
+          active: p.active,
+          userCode: p.user_code || undefined,
+        })),
       lastLoad: lastRun.get(row.organization_id)
         ? {
             kind: lastRun.get(row.organization_id)!.kind,
@@ -164,4 +175,13 @@ export const resetDemoAccount = async (demo: Pick<DemoAccount, 'id' | 'organizat
   const {error} = await supabase.rpc('platform_reset_demo_organization', {p_org: demo.organizationId});
   if (error) throw error;
   await seedDemoAccount(demo, undefined, 'RESET');
+};
+
+/** How many colleagues the prospect may add (the database refuses accounts over it). */
+export const setDemoUserLimit = async (demoId: string, limit: number) => {
+  const {error} = await supabase
+    .from('demo_accounts')
+    .update({max_extra_users: limit, updated_at: new Date().toISOString()})
+    .eq('id', demoId);
+  if (error) throw error;
 };

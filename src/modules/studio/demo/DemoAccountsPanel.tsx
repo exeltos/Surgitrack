@@ -104,6 +104,7 @@ export default function DemoAccountsPanel({
               onResend={() => void d.resend(demo)}
               onExtend={() => void d.extend(demo)}
               onChangeEnd={date => void d.changeEnd(demo, trialEndOn(date))}
+              onChangeLimit={limit => void d.changeLimit(demo, limit)}
               onEnter={() => d.enter(demo)}
               onReset={() =>
                 ask({
@@ -142,6 +143,7 @@ function DemoCard({
   onResend,
   onExtend,
   onChangeEnd,
+  onChangeLimit,
   onEnter,
   onReset,
 }: {
@@ -152,12 +154,14 @@ function DemoCard({
   onResend: () => void;
   onExtend: () => void;
   onChangeEnd: (date: string) => void;
+  onChangeLimit: (limit: number) => void;
   onEnter: () => void;
   onReset: () => void;
 }) {
   const stage = demoStage(demo);
   const days = demoDaysLeft(demo);
   const disabled = !!busy;
+  const [showColleagues, setShowColleagues] = useState(false);
   return (
     <article className={`evaluation-demo-card ${stage.toLowerCase()}`}>
       <div className="evaluation-demo-main">
@@ -186,7 +190,18 @@ function DemoCard({
         <div>
           <dt>{tr('Συνάδελφοι')}</dt>
           <dd>
-            {demo.extraUsers} / {demo.maxExtraUsers}
+            {demo.colleagues.length ? (
+              <button
+                type="button"
+                className="evaluation-demo-link"
+                aria-expanded={showColleagues}
+                onClick={() => setShowColleagues(v => !v)}
+              >
+                {demo.extraUsers} / {demo.maxExtraUsers}
+              </button>
+            ) : (
+              `${demo.extraUsers} / ${demo.maxExtraUsers}`
+            )}
           </dd>
         </div>
         <div>
@@ -213,6 +228,18 @@ function DemoCard({
           </dd>
         </div>
       </dl>
+      {showColleagues && demo.colleagues.length > 0 && (
+        <ul className="evaluation-demo-colleagues">
+          {demo.colleagues.map(c => (
+            <li key={c.id}>
+              <b>{c.name}</b>
+              <span>{c.email}</span>
+              <span>{c.userCode || '—'}</span>
+              <span>{c.active ? tr('Ενεργός') : tr('Περιμένει έγκριση ή ανενεργός')}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {busy && busy !== 'other' ? (
         <p className="evaluation-demo-busy">{busy}</p>
       ) : (
@@ -240,6 +267,20 @@ function DemoCard({
               value={trialEndDate(demo.endsAt)}
               onChange={e => e.target.value && onChangeEnd(e.target.value)}
             />
+          </label>
+          <label className="evaluation-demo-end">
+            {tr('Όριο συναδέλφων')}
+            <select
+              disabled={disabled}
+              value={demo.maxExtraUsers}
+              onChange={e => onChangeLimit(Number(e.target.value))}
+            >
+              {[0, 1, 2, 3, 4, 5, 8, 10, 15, 20].map(n => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
           </label>
           <button disabled={disabled || !demo.seededAt} onClick={onEnter}>
             <LogIn size={14} />

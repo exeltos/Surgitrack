@@ -3887,6 +3887,35 @@
   }
 }
 
+/* Users of a prospect's evaluation Demo: how many colleagues it may still take */
+.people-demo-seats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border: 1px solid #d9d2f2;
+  border-radius: 10px;
+  background: #faf9ff;
+  color: #3f3477;
+}
+.people-demo-seats > span {
+  display: grid;
+  gap: 2px;
+}
+.people-demo-seats b {
+  font-size: 13px;
+}
+.people-demo-seats small {
+  color: #6b6688;
+  font-size: 11.5px;
+}
+.people-demo-seats.full {
+  border-color: #f3d0cc;
+  background: #fff7f6;
+  color: #a1281e;
+}
+
 /* Studio → Platform: the prospects' evaluation Demos */
 .platform-evaluation-demos {
   min-height: 0;
@@ -4103,6 +4132,35 @@
   color: #b42318;
   border-color: #fecdca;
 }
+.evaluation-demo-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #4a3d8f;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.evaluation-demo-colleagues {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f7f6fc;
+  list-style: none;
+  font-size: 12px;
+}
+.evaluation-demo-colleagues li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 70px minmax(0, 1fr);
+  gap: 8px;
+  color: #4b4766;
+}
+.evaluation-demo-colleagues b {
+  color: #1d2939;
+}
+.evaluation-demo-end select,
 .evaluation-demo-end input {
   border: 0;
   background: transparent;

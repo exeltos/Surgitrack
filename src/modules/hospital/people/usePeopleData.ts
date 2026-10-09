@@ -10,6 +10,7 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
     onChanged,
     organizationId,
     refreshKey,
+    setDemoSeats,
     setDepartments,
     setInvitations,
     setMembers,
@@ -39,7 +40,7 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
       return;
     }
     if (!organizationId) return;
-    const [deps, reqs, profiles, invites] = await Promise.all([
+    const [deps, reqs, profiles, invites, demoAccount, seats] = await Promise.all([
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
         .from('staff_access_requests')
@@ -59,7 +60,14 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
         .select('email,last_sent_at,invited_at')
         .eq('organization_id', organizationId)
         .eq('status', 'SENT'),
+      // A prospect's evaluation Demo: how many colleagues it may hold.
+      supabase.from('demo_accounts').select('max_extra_users').eq('organization_id', organizationId).maybeSingle(),
+      supabase.rpc('demo_seats_left', {p_org: organizationId}),
     ]);
+    const limit = (demoAccount.data as {max_extra_users?: number} | null)?.max_extra_users;
+    setDemoSeats(
+      typeof limit === 'number' && typeof seats.data === 'number' ? {max: limit, left: Math.max(0, seats.data)} : null,
+    );
     // Each part shows what it could load. Requests need the departments (the suggested role and the
     // department picker come from them), so without those they are not shown.
     if (deps.data) setDepartments(deps.data);
@@ -79,6 +87,7 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
     setMembers,
     setInvitations,
     setNotice,
+    setDemoSeats,
   ]);
 
   useEffect(() => {

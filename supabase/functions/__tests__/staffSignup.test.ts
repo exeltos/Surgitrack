@@ -373,3 +373,32 @@ describe('staff-signup: the account and username', () => {
     expect((await handle(post(form))).status).toBe(200);
   });
 });
+
+describe('staff-signup: a prospect evaluation Demo', () => {
+  const DEMO_ORG = {...ORG, is_demo: true, evaluation: true};
+
+  it("takes a colleague's personal invitation, but never the hospital link", async () => {
+    world({link: null, invitation: INVITATION, org: DEMO_ORG});
+    expect((await handle(post(form))).status).toBe(200);
+    world({org: DEMO_ORG});
+    expect((await handle(post(form))).status).toBe(410);
+  });
+
+  it('refuses any other Demo hospital', async () => {
+    world({link: null, invitation: INVITATION, org: {...ORG, is_demo: true, evaluation: false}});
+    expect((await handle(post(form))).status).toBe(410);
+  });
+
+  it('says so when the Demo is full, and removes the new account', async () => {
+    world({link: null, invitation: INVITATION, org: DEMO_ORG});
+    const answers = fake.db;
+    fake.db = call =>
+      call.op === 'insert' && call.table === 'profiles'
+        ? {data: null, error: {message: 'demo_user_limit'}}
+        : answers(call);
+    const response = await handle(post(form));
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({error: 'demo_user_limit'});
+    expect(fake.calls.find(c => c.what === 'deleteUser')?.args[0]).toBe('new-user');
+  });
+});

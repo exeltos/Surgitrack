@@ -8,6 +8,7 @@ import {
   seedDemoAccount,
   sendDemoInvite,
   setDemoEnd,
+  setDemoUserLimit,
   type NewDemo,
 } from '../../../data/cloud/demoAccounts';
 import {switchHospital} from '../../../data/cloud/hospitalSwitch';
@@ -103,7 +104,23 @@ export function useDemoAccounts() {
         text: tr('Τα δεδομένα του «{0}» επανήλθαν στα αρχικά δοκιμαστικά.', demo.organizationName),
       });
     });
+  const changeLimit = (demo: DemoAccount, limit: number) =>
+    run(demo.id, tr('Αποθήκευση…'), () => setDemoUserLimit(demo.id, limit));
   const enter = (demo: DemoAccount) => switchHospital(demo.organizationId, '#/');
 
-  return {demos, loading, busy, notice, setNotice, create, continuePreparing, resend, extend, changeEnd, reset, enter};
+  return {
+    demos,
+    loading,
+    busy,
+    notice,
+    setNotice,
+    create,
+    continuePreparing,
+    resend,
+    extend,
+    changeEnd,
+    changeLimit,
+    reset,
+    enter,
+  };
 }
