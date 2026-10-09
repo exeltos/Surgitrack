@@ -1794,15 +1794,15 @@ body {
 .asset-inline-input {
   width: 100%;
   min-width: 0;
-  height: 25px;
-  padding: 2px 6px;
+  height: 34px;
+  padding: 4px 10px;
   border: 1px solid #b9d0d7;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #fff;
   color: #203d4c;
   font: inherit;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   outline: none;
 }
 .asset-inline-input:focus {
@@ -1879,19 +1879,6 @@ body {
 }
 
 /* Full-page create workspaces: use the same focus-shell behavior as existing Set / Tool cards. */
-.asset-create-mode-label {
-  display: inline-flex;
-  align-items: center;
-  min-height: 38px;
-  padding: 0 13px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #f7fafb;
-  color: #607783;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
 
 /* v0.26.6 — asset card QA: readable identity column, workflow locks and no horizontal composition scroll. */
 .asset-workbench-grid {

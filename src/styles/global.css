@@ -5857,10 +5857,12 @@ html body .asset-registry-table td:first-child {
   max-width: 0;
 }
 html body .asset-registry-table .row-title-link {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.25;
 }
 /* Header standard: 22px title, one short sentence that is never clipped. */
 html body .page-head h1,
@@ -5964,10 +5966,8 @@ html body .devices-readings header small {
 }
 /* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
 html body .registry-fixed td:nth-child(4) .row-sub {
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: none;
+  white-space: normal;
 }
 html body .registry-fixed td:last-child,
 html body .registry-fixed th:last-child {
@@ -5993,11 +5993,18 @@ html body .registry-fixed td:first-child {
   width: auto;
   max-width: none;
 }
-html body .registry-fixed th:not(:first-child),
-html body .registry-fixed td:not(:first-child) {
+html body .registry-fixed th:not(:first-child) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Cells wrap to a second line instead of ending in «…»; a barcode stays on one line. */
+html body .registry-fixed td:not(:first-child) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+html body .registry-fixed td .mono {
+  white-space: nowrap;
 }
 html body .registry-fixed th:nth-child(2) {
   width: 96px;
@@ -6031,9 +6038,8 @@ html body .registry-fixed th:nth-child(7) {
 html body .registry-fixed .badge {
   display: inline-block;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.25;
   vertical-align: middle;
 }
 @media (min-width: 1300px) {
@@ -8799,9 +8805,22 @@ html body .issues-fixed .issue-note-inline {
     grid-template-columns: 30px 84px minmax(0, 1fr) auto auto !important;
   }
 }
+/* Narrow list: barcode and state on the first line, the name on its own line (it was squeezed
+   into ~90 px and cut), then the uses. */
 @container set-tools (max-width: 560px) {
   html body .asset-detail-body .set-tool-row {
-    grid-template-columns: 30px 76px minmax(0, 1fr) auto !important;
+    grid-template-columns: 30px minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      'index code state'
+      'index name name'
+      'index uses uses';
+  }
+  html body .asset-detail-body .set-tool-row .set-tool-name strong {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 @media (max-width: 900px) {
@@ -9270,5 +9289,102 @@ html body .idle-lock-password button[aria-pressed='true'] {
   }
   html body .ster-scan.ster-scan-restored .ster-scan-copy span {
     display: none;
+  }
+}
+
+/* Sets list: a Set short of instruments shows its count in amber. */
+html body .sets-registry .set-count-short b,
+html body .sets-registry .set-count-short .muted {
+  color: #9c5c00;
+}
+
+/* Registry lists on a phone (Sets, Instruments, Standalone, Stock, Expiry): each row is a card,
+   the name on top, then barcode, department, count, state and dates, the arrow on the right.
+   As a table its fixed columns took more than the phone width and left the name 0 px wide. */
+@media (max-width: 700px) {
+  html body .registry-fixed thead {
+    display: none;
+  }
+  html body .registry-fixed,
+  html body .registry-fixed tbody {
+    display: block;
+    width: 100%;
+  }
+  html body .registry-fixed tbody tr {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 10px 40px 10px 12px;
+    border-bottom: 1px solid #edf1f4;
+  }
+  html body .registry-fixed tbody td {
+    display: block;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    font-size: 12.5px;
+  }
+  html body .registry-fixed tbody td:first-child {
+    flex: 1 0 100%;
+  }
+  html body .registry-fixed tbody td:last-child {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+  }
+  html body .registry-fixed tbody td[colspan] {
+    flex: 1 0 100%;
+    position: static;
+    transform: none;
+  }
+}
+
+/* Set and instrument cards on a phone: the action bar wraps (it ran 255 px past the edge and hid
+   «Προς Αποστείρωση»), and the five tabs sit in two rows instead of cutting «Σημειώσεις». */
+@media (max-width: 700px) {
+  html body .asset-workbench-actions {
+    flex-wrap: wrap !important;
+    overflow-x: visible;
+  }
+  /* The composition title above its buttons («Φυσικά εργαλεία» ran into «Προσθήκη»). */
+  html body .asset-detail-body .set-composition-head {
+    flex-wrap: wrap;
+  }
+  html body .asset-detail-body .set-composition-head > div:first-child {
+    flex: 1 0 100%;
+  }
+  html body .asset-workbench-actions .asset-action-group {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  html body .asset-workbench-actions .asset-action-group > * {
+    flex: 1 1 auto;
+  }
+  html body .asset-workbench-main > .asset-detail-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    overflow: visible;
+  }
+}
+
+/* New Set / instrument: why «Αποθήκευση» is not available yet. */
+html body .asset-create-hint {
+  color: #8a5a00;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Page header buttons wrap on a phone instead of running off the left edge
+   (Instruments: «Έλεγχος ονομασιών» was 120 px out of view). */
+@media (max-width: 700px) {
+  html body .page-head-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 100%;
   }
 }

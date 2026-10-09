@@ -91,13 +91,15 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
     <div className="asset-detail-workspace asset-create-card-workspace legacy-inspired-workspace">
       <div className="asset-workbench-actions asset-create-card-actions">
         <div className="asset-action-group">
-          <span className="asset-create-mode-label">{tr('ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ')}</span>
           <AppButton variant="primary" icon={<Save size={17} />} disabled={!valid} onClick={save}>
             {tr('Αποθήκευση')}
           </AppButton>
           <AppButton icon={<X size={17} />} onClick={() => navigate(backTo)}>
             {tr('Ακύρωση')}
           </AppButton>
+          {!valid && (
+            <small className="asset-create-hint">{tr('Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.')}</small>
+          )}
         </div>
         <div className="asset-action-group">
           <button className="asset-action-link" onClick={() => navigate(backTo)}>

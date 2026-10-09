@@ -247,7 +247,7 @@ export default function SetsPage() {
                         trData(s.department) || '—'
                       )}
                     </td>
-                    <td>
+                    <td className={count < s.expected ? 'set-count-short' : undefined}>
                       <b>{count}</b>
                       <span className="muted"> / {s.expected}</span>
                     </td>

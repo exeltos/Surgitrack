@@ -84,6 +84,7 @@ export const en: Record<string, string> = {
   'Audit trail · οι εγγραφές δεν τροποποιούνται': 'Audit trail · records cannot be changed',
   'Barcode / Κωδικός': 'Barcode / Code',
   'Σαρώστε barcode': 'Scan a barcode',
+  'Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.': 'Fill in Code and Name to save.',
   'Barcode · π.χ. S000324': 'Barcode · e.g. S000324',
   'Barcode, Set/εργαλείο, χρήστης ή κωδικός ασθενούς...': 'Barcode, set/instrument, user or patient code...',
   'Barcode, κωδικός ή ονομασία εργαλείου...': 'Barcode, code or instrument name...',
