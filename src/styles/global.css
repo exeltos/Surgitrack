@@ -6331,9 +6331,6 @@ html body .department-kpis > * small {
   color: var(--st-muted);
   font-size: 13px !important;
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 html body .department-kpis > * strong {
   margin: 0 !important;

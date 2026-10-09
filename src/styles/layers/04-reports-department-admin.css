@@ -1015,10 +1015,10 @@
   min-width: 0;
 }
 .department-asset-identity .mono {
-  font-size: 11px;
+  font-size: 12px;
 }
 .department-asset-identity strong {
-  font-size: 11px;
+  font-size: 13px;
   color: #233f51;
   white-space: nowrap;
   overflow: hidden;
@@ -1027,7 +1027,7 @@
 .department-asset-identity small,
 .department-asset-state small,
 .department-asset-uses small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .department-asset-state,
@@ -1231,12 +1231,6 @@
   .department-asset-row {
     grid-template-columns: minmax(0, 1fr);
   }
-  .department-asset-open {
-    grid-template-columns: 34px minmax(0, 1fr) 20px;
-  }
-  .department-asset-state {
-    display: none;
-  }
   .department-search {
     min-width: 100%;
   }
@@ -1434,6 +1428,24 @@
   .department-asset-list {
     min-height: 0 !important;
     overflow-y: auto !important;
+  } /* Phone: the state goes under the name instead of a column that does not fit. */
+  .department-asset-open {
+    grid-template-columns: 34px minmax(0, 1fr) 20px;
+    gap: 6px 12px;
+  }
+  .department-asset-open > .department-asset-icon {
+    grid-row: 1 / span 2;
+  }
+  .department-asset-open > svg:last-child {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+  .department-asset-state {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
   }
 }
 
