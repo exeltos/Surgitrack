@@ -2010,4 +2010,5 @@ export const en: Record<string, string> = {
   'Διαγραφή Demo': 'Delete Demo',
   'Το «{0}» θα διαγραφεί οριστικά: όλες οι εγγραφές του, οι αξιολογήσεις, τα αιτήματα και οι λογαριασμοί των {1} χρηστών του. Δεν αναιρείται.':
     '“{0}” will be deleted for good: all its records, evaluations, requests and the accounts of its {1} users. This cannot be undone.',
+  'Για επιβεβαίωση, πληκτρολογήστε «{0}»': 'To confirm, type “{0}”',
 };

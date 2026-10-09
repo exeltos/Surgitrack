@@ -20,6 +20,7 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
     setOrganizationEditor,
     setQuery,
     setRole,
+    selectedOrganizationId,
     setSelectedOrganizationId,
     setTab,
   } = p;
@@ -137,6 +138,24 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
     }
     await loadCloudOrganizations();
   };
+  /** Deletes a hospital for good, with every record and its people's accounts (the name confirms it). */
+  const deleteOrganization = async (org: Organization) => {
+    setCloudError('');
+    const {error} = await supabase.functions.invoke('delete-hospital', {
+      body: {organization_id: org.id, confirm_name: org.name},
+    });
+    if (error) {
+      const context = (error as {context?: Response}).context;
+      const body = context && typeof context.json === 'function' ? await context.json().catch(() => null) : null;
+      setCloudError(body?.error || error.message);
+      return;
+    }
+    if (selectedOrganizationId === org.id) setSelectedOrganizationId('');
+    if (sessionStorage.getItem('surgitrack-active-organization') === org.id)
+      sessionStorage.removeItem('surgitrack-active-organization');
+    await loadCloudOrganizations();
+    await loadCloudUsers();
+  };
   const openOrganization = (org: Organization) => {
     setSelectedOrganizationId(org.id);
     setTab('USERS');
@@ -189,6 +208,7 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
   };
   return {
     changePlan,
+    deleteOrganization,
     enterBuiltInDemo,
     enterOrganizationDemo,
     handleResetSterilizationWorkflow,

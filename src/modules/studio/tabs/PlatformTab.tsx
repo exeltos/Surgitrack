@@ -10,6 +10,7 @@ import {
   Plus,
   Power,
   RotateCcw,
+  Trash2,
   Users,
 } from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
@@ -190,7 +191,16 @@ function HospitalList({s}: {s: StudioPageState}) {
 
 /** Everything else a hospital's row can do, behind one menu instead of a row of buttons. */
 function hospitalActions(s: StudioPageState, org: Organization): ActionMenuItem[] {
-  const {L, changePlan, enterOrganizationDemo, setConfirm, setOrganizationEditor, updateOrganizationFlags} = s;
+  const {
+    L,
+    changePlan,
+    deleteOrganization,
+    enterOrganizationDemo,
+    libs,
+    setConfirm,
+    setOrganizationEditor,
+    updateOrganizationFlags,
+  } = s;
   const items: ActionMenuItem[] = [
     {
       key: 'edit',
@@ -255,6 +265,26 @@ function hospitalActions(s: StudioPageState, org: Organization): ActionMenuItem[
       label: L('Είσοδος στο ιδιωτικό Demo', 'Enter the private Demo'),
       hint: L('Ως Διαχειριστής νοσοκομείου', 'As Hospital administrator'),
       onSelect: () => enterOrganizationDemo(org, 'ADMIN'),
+    });
+  if (libs.dataMode === 'PRODUCTION')
+    items.push({
+      key: 'delete',
+      icon: <Trash2 size={15} />,
+      label: L('Διαγραφή νοσοκομείου', 'Delete hospital'),
+      hint: L('Οριστικά, με όλα τα δεδομένα και τους χρήστες', 'For good, with all its data and users'),
+      danger: true,
+      onSelect: () =>
+        setConfirm({
+          title: L('Διαγραφή νοσοκομείου', 'Delete hospital'),
+          message: L(
+            `Το «${org.name}» θα διαγραφεί οριστικά: όλες οι εγγραφές του (Σετ, εργαλεία, κύκλοι, διακινήσεις, ιστορικό), τα τμήματα, το ιδιωτικό Demo του και οι λογαριασμοί όλων των χρηστών του. Δεν αναιρείται.`,
+            `“${org.name}” will be deleted for good: all its records (Sets, instruments, cycles, movements, history), its departments, its private Demo and the accounts of all its users. This cannot be undone.`,
+          ),
+          confirmLabel: L('Οριστική διαγραφή', 'Delete for good'),
+          danger: true,
+          confirmText: org.name,
+          action: () => void deleteOrganization(org),
+        }),
     });
   return items;
 }

@@ -2681,3 +2681,19 @@ td {
 .label-segments.sizes button small {
   white-space: normal;
 }
+/* Typing the name to confirm what cannot be undone (e.g. deleting a hospital). */
+.confirm-dialog-type {
+  display: grid;
+  gap: 6px;
+  padding: 0 20px 16px 68px;
+  font-size: 12px;
+  color: var(--st-muted);
+}
+.confirm-dialog-type input {
+  padding: 8px 10px;
+  border: 1px solid #d4dde3;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  color: #203744;
+}

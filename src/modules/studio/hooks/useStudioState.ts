@@ -35,7 +35,15 @@ export function useStudioState() {
   const [cloudDepartments, setCloudDepartments] = useState<
     Array<{id: string; organizationId: string; name: string; code: string; active: boolean}>
   >([]);
-  const [confirm, setConfirm] = useState<{title: string; message: string; action: () => void} | null>(null);
+  const [confirm, setConfirm] = useState<{
+    title: string;
+    message: string;
+    action: () => void;
+    confirmLabel?: string;
+    danger?: boolean;
+    /** Typed to enable the button, for what cannot be undone. */
+    confirmText?: string;
+  } | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole>('STERILIZATION');
   const [roleDraft, setRoleDraft] = useState<Permission[]>(() => [
     ...(libs.rolePermissions?.STERILIZATION || defaultRolePermissions.STERILIZATION),
