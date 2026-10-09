@@ -1,21 +1,18 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
-import {corsFor, jsonWith} from "../_shared/http.ts";
+import {APP_ORIGIN, corsFor, jsonWith, SITE} from "../_shared/http.ts";
 import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.ts";
 
 // Makes a one-time link for a staff member, to pass on by hand (message, phone) when email does
 // not reach them: an invitation link for someone who has not accepted yet, or a set-new-password
-// link for an active user. The link itself is never emailed. Only a hospital admin for users of their own hospital,
-// or the platform admin; never for one's own account. The link opens the app's «Συνέχεια» page,
+// link for an active user. The link itself is never emailed. Only a hospital admin for users of
+// their own hospital, or the platform admin; never for one's own account. The link opens the app's «Συνέχεια» page,
 // which spends it only when the person presses the button. Every link is recorded in account_events
 // (no record, no link) and the person is told by email, so a link cannot be used in their name unseen.
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const SITE = "https://surgitrack-med.netlify.app";
-// The link may point only at the app itself (production, its deploy previews, or local development).
-const ALLOWED_ORIGIN = /^(https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
 
 Deno.serve(async req => {
   const cors = corsFor(req, corsBase);
@@ -42,7 +39,8 @@ Deno.serve(async req => {
     if (!userId) return json({error: "user_required"}, 400);
     if (userId === auth.user.id) return json({error: "self"}, 403);
     const origin = String(body?.origin || "");
-    const site = ALLOWED_ORIGIN.test(origin) ? origin : SITE;
+    // The link may point only at the app itself.
+    const site = APP_ORIGIN.test(origin) ? origin : SITE;
 
     const {data: target} = await admin.from("profiles").select("id, organization_id, email, active").eq("id", userId).maybeSingle();
     if (!target?.email) return json({error: "not_found"}, 404);
