@@ -431,6 +431,16 @@ async function captureModals(page, {role, viewport, record, log, wanted}) {
           .first()
           .click({timeout: 3000}),
     });
+  // Every signed-in role: the in-app sign-out question.
+  modals.push({
+    name: 'signout-modal',
+    route: '/',
+    open: () =>
+      page
+        .getByTitle(/^(Αποσύνδεση|Sign out)$/)
+        .first()
+        .click({timeout: 3000}),
+  });
   for (const modal of modals) {
     if (!wanted(modal.name) && !wanted(modal.route)) continue;
     // A fresh page for each dialog, so one left open cannot hide the next one's button.
