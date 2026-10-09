@@ -90,7 +90,10 @@ export async function grantAccess(admin: SupabaseClient, g: Grant) {
 
   if (!existing) {
     const {error: pe} = await admin.from("profiles").upsert(
-      {id: userId, organization_id: g.org, department_id: g.dept, name: g.name, email: g.email, role: g.role, user_code: userCode, active: false, demo_enabled: false},
+      {
+        id: userId, organization_id: g.org, department_id: g.dept, name: g.name, email: g.email, role: g.role, user_code: userCode,
+        supervisor: g.role === "STERILIZATION" && !!g.supervisor, active: false, demo_enabled: false,
+      },
       {onConflict: "id"},
     );
     if (pe) throw pe;

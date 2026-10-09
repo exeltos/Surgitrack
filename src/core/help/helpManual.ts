@@ -158,11 +158,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσωπικό',
-          'Στη Χρήστες & Τμήματα → Χρήστες: «Πρόσκληση» για έναν έναν, «Σύνδεσμος εγγραφής» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τις αιτήσεις (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
+          'Στη Χρήστες & Τμήματα → Χρήστες → «Προσθήκη χρήστη»: «Πρόσκληση ατόμου» για έναν έναν (email ή σύνδεσμος), «Κοινός σύνδεσμος νοσοκομείου» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τα αιτήματα (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
         ],
         en: [
           'Staff',
-          'In Users & departments → Users: "Invite" one by one, "Signup link" for many or "From CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
+          'In Users & departments → Users → "Add user": "Invite a person" one by one (email or link), "Hospital signup link" for many, or "From a CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
         ],
       },
       {
@@ -1387,31 +1387,31 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Πρόσκληση',
-          '«Πρόσκληση» → διαλέξτε πρώτα ρόλο και τμήμα, μετά το email. Ο χρήστης λαμβάνει email, συμπληρώνει ονοματεπώνυμο και η αίτησή του έρχεται σε εσάς για έγκριση. Μέχρι τότε φαίνεται στις προσκλήσεις, όπου την ξαναστέλνετε, αντιγράφετε τον σύνδεσμο ή την ακυρώνετε.',
+          '«Προσθήκη χρήστη» → «Πρόσκληση ατόμου»: ρόλος, email και (αν θέλετε) τμήμα. «Αποστολή email» στέλνει τον σύνδεσμο εγγραφής· «Αντιγραφή συνδέσμου» τον αντιγράφει για να τον στείλετε όπως θέλετε (Viber, SMS). Ισχύει 7 ημέρες. Ο χρήστης συμπληρώνει όνομα, τμήμα και κωδικό και βλέπει αμέσως το όνομα χρήστη του. Μέχρι να κάνει εγγραφή η πρόσκληση φαίνεται εδώ, όπου την ξαναστέλνετε, αντιγράφετε τον σύνδεσμο ή την ακυρώνετε.',
         ],
         en: [
           'Invitation',
-          '"Invite" → choose the role and department first, then the email. The user gets an email, fills in their name and the request comes to you for approval. Until then it shows under invitations, where you resend it, copy the link or cancel it.',
+          '"Add user" → "Invite a person": role, email and (if you like) department. "Send email" sends the signup link; "Copy link" copies it to send any way you like (Viber, SMS). It is valid 7 days. The user fills in their name, department and password and sees their username at once. Until they sign up the invitation shows here, where you resend it, copy the link or cancel it.',
         ],
       },
       {
         el: [
-          'Σύνδεσμος εγγραφής και CSV',
-          'Για πολλούς μαζί: ο «Σύνδεσμος εγγραφής» μοιράζεται στο προσωπικό, κάνουν εγγραφή και τους εγκρίνετε. «Από αρχείο CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
+          'Κοινός σύνδεσμος και CSV',
+          'Για πολλούς μαζί: ο «Κοινός σύνδεσμος νοσοκομείου» (10 ημέρες) μοιράζεται στο προσωπικό, κάνουν εγγραφή με τον ίδιο τρόπο και τους εγκρίνετε. «Από αρχείο CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς χωρίς έγκριση και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
         ],
         en: [
-          'Signup link and CSV',
-          'For many at once: share the "Signup link" with staff, they sign up and you approve them. "From CSV file" (Name; Email; Department; Role) creates the accounts at once and each person gets an email with a username and a password link.',
+          'Hospital link and CSV',
+          'For many at once: share the "Hospital signup link" (10 days) with staff; they sign up the same way and you approve them. "From a CSV file" (Name; Email; Department; Role) creates the accounts at once, without approval, and each person gets an email with a username and a password link.',
         ],
       },
       {
         el: [
           'Έγκριση',
-          'Οι αιτήσεις εμφανίζονται πορτοκαλί και λαμβάνετε email για κάθε νέα. Ελέγξτε όνομα, email και τμήμα, ορίστε ρόλο και πατήστε «Έγκριση» ή «Απόρριψη». Με την έγκριση ο χρήστης λαμβάνει email με το όνομα χρήστη, τον ρόλο, το τμήμα και σύνδεσμο «Ορισμός κωδικού».',
+          'Τα αιτήματα εμφανίζονται πορτοκαλί, με αριθμό στο καμπανάκι (δεν στέλνεται email). Ελέγξτε όνομα, email και τμήμα, ορίστε ρόλο και πατήστε «Έγκριση» ή «Απόρριψη». Με την έγκριση ο χρήστης λαμβάνει ένα email και συνδέεται με το όνομα χρήστη και τον κωδικό που όρισε· με την απόρριψη λαμβάνει ένα email και ο λογαριασμός του διαγράφεται.',
         ],
         en: [
           'Approval',
-          'Requests show in orange and you get an email for each new one. Check the name, email and department, set the role and press "Approve" or "Reject". On approval the user gets an email with the username, role, department and a "Set password" link.',
+          'Requests show in orange, with a count on the bell (no email is sent). Check the name, email and department, set the role and press "Approve" or "Reject". On approval the user gets one email and signs in with their username and the password they set; on rejection they get one email and their account is removed.',
         ],
       },
       {
@@ -1438,13 +1438,13 @@ export const helpManual: ManualSection[] = [
     steps: {
       el: [
         'Τμήματα: βεβαιωθείτε ότι υπάρχουν όλα.',
-        'Χρήστες → «Πρόσκληση», «Σύνδεσμος εγγραφής» ή «Από αρχείο CSV».',
+        'Χρήστες → «Προσθήκη χρήστη»: πρόσκληση ατόμου, κοινός σύνδεσμος ή CSV.',
         'Εγκρίνετε τις αιτήσεις με τον σωστό ρόλο.',
         'Πατήστε «Ανανέωση» για τις τελευταίες αιτήσεις.',
       ],
       en: [
         'Departments: make sure they all exist.',
-        'Users → "Invite", "Signup link" or "From CSV file".',
+        'Users → "Add user": invite a person, the hospital link or CSV.',
         'Approve the requests with the right role.',
         'Press "Refresh" for the latest requests.',
       ],

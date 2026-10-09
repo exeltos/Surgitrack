@@ -12,7 +12,10 @@ const allowAttempts = () => {
   fake.rpc = () => ({data: 'attempt-1', error: null});
 };
 const knownUser = () => {
-  fake.db = call => (call.table === 'profiles' ? {data: {email: 'nurse@hospital.gr'}, error: null} : {data: null, error: null});
+  fake.db = call =>
+    call.table === 'profiles'
+      ? {data: {id: 'u1', email: 'nurse@hospital.gr', active: true}, error: null}
+      : {data: null, error: null};
 };
 
 beforeEach(async () => {
@@ -79,13 +82,33 @@ describe('login-with-code', () => {
     expect(fake.calls.filter(c => c.what === 'signIn')).toHaveLength(0);
   });
 
-  it('only looks for active profiles', async () => {
+  it('looks the account up by its code', async () => {
     allowAttempts();
     fake.db = () => ({data: null, error: null});
     await handle(post({user_code: 'AM8704', password: 'x'}));
     const lookup = fake.dbCalls().find(c => c.table === 'profiles');
-    expect(lookup?.filters).toContainEqual(['eq', 'active', true]);
     expect(lookup?.filters).toContainEqual(['eq', 'user_code', 'AM8704']);
+  });
+
+  it('lets an inactive account in only while its signup waits for approval', async () => {
+    allowAttempts();
+    fake.signIn = () => ({data: {session}, error: null});
+    const inactive = (waiting: boolean) => {
+      fake.db = call =>
+        call.table === 'profiles'
+          ? {data: {id: 'u1', email: 'nurse@hospital.gr', active: false}, error: null}
+          : call.table === 'staff_access_requests'
+            ? {data: waiting ? {id: 'r1'} : null, error: null}
+            : {data: null, error: null};
+    };
+    inactive(false);
+    expect((await handle(post({user_code: 'AM8704', password: 'secret'}))).status).toBe(401);
+    expect(fake.calls.filter(c => c.what === 'signIn')).toHaveLength(0);
+    inactive(true);
+    expect((await handle(post({user_code: 'AM8704', password: 'secret'}))).status).toBe(200);
+    const request = fake.dbCalls().find(c => c.table === 'staff_access_requests');
+    expect(request?.filters).toContainEqual(['eq', 'user_id', 'u1']);
+    expect(request?.filters).toContainEqual(['eq', 'status', 'PENDING']);
   });
 
   it('stops with 429 when a limit is reached, before checking the password', async () => {

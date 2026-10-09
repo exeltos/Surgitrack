@@ -43,7 +43,9 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
         .from('staff_access_requests')
-        .select('id,full_name,email,status,department_id,requested_at,user_id,invite_token,invited_role,invited_at')
+        .select(
+          'id,full_name,email,status,department_id,requested_at,user_id,user_code,invite_token,invited_role,supervisor,invited_at',
+        )
         .eq('organization_id', organizationId)
         .in('status', ['PENDING', 'PENDING_EMAIL'])
         .order('requested_at'),

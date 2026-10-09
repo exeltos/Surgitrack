@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {localizedName} from '../../../core/glossary';
-import {roles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
+import {SUPERVISOR, roles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
 import type {PeopleState} from './usePeople';
 
@@ -49,7 +49,6 @@ export default function UsersSection({s}: {s: PeopleState}) {
     shown,
     signupFormUrl,
     tab,
-    unconfirmed,
   } = s;
   return (
     <>
@@ -69,7 +68,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
             </div>
             <div className="people-invite">
               <AppButton variant="primary" icon={<UserPlus size={16} />} onClick={() => setInviteMenu(v => !v)}>
-                {L('Πρόσκληση', 'Invite')}
+                {L('Προσθήκη χρήστη', 'Add user')}
               </AppButton>
               {inviteMenu && (
                 <div className="people-invite-menu" role="menu" onMouseLeave={() => setInviteMenu(false)}>
@@ -82,12 +81,14 @@ export default function UsersSection({s}: {s: PeopleState}) {
                   >
                     <Mail size={16} />
                     <span>
-                      <b>{L('Με email', 'By email')}</b>
+                      <b>{demo ? L('Νέος χρήστης', 'New user') : L('Πρόσκληση ατόμου', 'Invite a person')}</b>
                       <small>
-                        {L(
-                          'Ένα άτομο: λαμβάνει φόρμα εγγραφής και το εγκρίνετε.',
-                          'One person: gets a signup form, you approve.',
-                        )}
+                        {demo
+                          ? L('Προστίθεται αμέσως στο Demo.', 'Added at once in the Demo.')
+                          : L(
+                              'Με email ή με σύνδεσμο που στέλνετε εσείς. Κάνει εγγραφή και το εγκρίνετε.',
+                              'By email, or a link you send. They sign up and you approve.',
+                            )}
                       </small>
                     </span>
                   </button>
@@ -101,9 +102,12 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     >
                       <Link2 size={16} />
                       <span>
-                        <b>{L('Σύνδεσμος εγγραφής', 'Signup link')}</b>
+                        <b>{L('Κοινός σύνδεσμος νοσοκομείου', 'Hospital signup link')}</b>
                         <small>
-                          {L('Για πολλούς: κάνουν εγγραφή και τους εγκρίνετε.', 'For many: they sign up, you approve.')}
+                          {L(
+                            'Ένας σύνδεσμος για πολλούς (10 ημέρες). Κάνουν εγγραφή και τους εγκρίνετε.',
+                            'One link for many people (10 days). They sign up and you approve.',
+                          )}
                         </small>
                       </span>
                     </button>
@@ -115,8 +119,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
                         <b>{L('Από αρχείο CSV', 'From a CSV file')}</b>
                         <small>
                           {L(
-                            'Λίστα: λογαριασμοί αμέσως. Ονοματεπώνυμο; Email; Τμήμα; Ρόλος',
-                            'A list: accounts at once. Name; Email; Department; Role',
+                            'Μαζική εισαγωγή: λογαριασμοί αμέσως, χωρίς έγκριση. Ονοματεπώνυμο; Email; Τμήμα; Ρόλος',
+                            'Bulk import: accounts at once, no approval. Name; Email; Department; Role',
                           )}
                         </small>
                       </span>
@@ -149,8 +153,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
                 </b>
                 <small>
                   {L(
-                    'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης λαμβάνει email με το όνομα χρήστη του και σύνδεσμο για να ορίσει κωδικό.',
-                    'Check the details, pick a role and department, then approve. The user gets an email with their username and a link to set a password.',
+                    'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης έχει ήδη όνομα χρήστη και κωδικό· με την έγκριση λαμβάνει ένα email και συνδέεται.',
+                    'Check the details, pick a role and department, then approve. The user already has a username and password; on approval they get one email and can sign in.',
                   )}
                 </small>
               </header>
@@ -161,6 +165,11 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     <div className="hospital-request-who">
                       <strong>{r.full_name}</strong>
                       <small>
+                        {r.user_code && (
+                          <>
+                            <code>{r.user_code}</code> ·{' '}
+                          </>
+                        )}
                         {r.email}
                         {r.department_id && (
                           <>
@@ -228,8 +237,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
                 <Mail size={16} />
                 <b>
                   {L(
-                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'πρόσκληση περιμένει' : 'προσκλήσεις περιμένουν'} τα στοιχεία του χρήστη`,
-                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'invitation waits' : 'invitations wait'} for the person's details`,
+                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'πρόσκληση περιμένει' : 'προσκλήσεις περιμένουν'} την εγγραφή του χρήστη`,
+                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'invitation waits' : 'invitations wait'} for the person to sign up`,
                   )}
                 </b>
               </header>
@@ -252,8 +261,11 @@ export default function UsersSection({s}: {s: PeopleState}) {
                         {
                           name: '',
                           email: r.email,
-                          role: r.invited_role || 'DEPARTMENT',
-                          departmentId: '',
+                          role:
+                            r.invited_role === 'STERILIZATION' && r.supervisor
+                              ? SUPERVISOR
+                              : r.invited_role || 'DEPARTMENT',
+                          departmentId: r.department_id || '',
                           active: true,
                           demoEnabled: false,
                         },
@@ -273,21 +285,6 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     {L('Ακύρωση', 'Cancel')}
                   </AppButton>
                 </article>
-              ))}
-            </div>
-          )}
-          {unconfirmed.length > 0 && (
-            <div className="hospital-unconfirmed">
-              <b>
-                {L(
-                  'Εγγραφές που δεν επιβεβαίωσαν ακόμα το email τους',
-                  'Signups that have not confirmed their email yet',
-                )}
-              </b>
-              {unconfirmed.map(r => (
-                <span key={r.id}>
-                  {r.full_name} · {r.email} · {departmentName(r.department_id)}
-                </span>
               ))}
             </div>
           )}
@@ -311,7 +308,10 @@ export default function UsersSection({s}: {s: PeopleState}) {
                 </strong>
                 {!q && (
                   <small>
-                    {L('Πατήστε «Πρόσκληση» για να προσθέσετε τον πρώτο.', 'Press «Invite» to add the first one.')}
+                    {L(
+                      'Πατήστε «Προσθήκη χρήστη» για να προσθέσετε τον πρώτο.',
+                      'Press «Add user» to add the first one.',
+                    )}
                   </small>
                 )}
               </div>

@@ -71,6 +71,8 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
               organization_id: id,
               department_id: null,
               role: 'ADMIN',
+              // A new hospital's admin gets their account at once (no one there to approve them).
+              direct: true,
             },
           ],
           redirect_to: window.location.origin,

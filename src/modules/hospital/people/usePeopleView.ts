@@ -1,6 +1,6 @@
 import {localizedName} from '../../../core/glossary';
 import type {UserRole} from '../../../store/types';
-import {STERILIZATION_CODE, roles, roleValue} from '../hospitalPeopleMeta';
+import {STERILIZATION_CODE, SUPERVISOR, roles, roleValue} from '../hospitalPeopleMeta';
 import type {Request, Member, Decision} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
 import type {usePeopleData} from './usePeopleData';
@@ -18,9 +18,10 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
   };
   const activeDepartments = departments.filter(d => d.active);
   const pending = requests.filter(r => r.status === 'PENDING');
-  // Signup invitations not filled in yet, and (older signups) accounts whose email is not confirmed.
+  // Invitations whose person has not signed up yet.
   const invitedToSignup = requests.filter(r => r.status === 'PENDING_EMAIL' && !r.user_id);
-  const unconfirmed = requests.filter(r => r.status === 'PENDING_EMAIL' && !!r.user_id);
+  // A signup's account waits among the requests, not among the users.
+  const waitingAccounts = new Set(pending.map(r => r.user_id).filter(Boolean));
   const signupFormUrl = (token: string) => `${window.location.origin}/#/join/${token}`;
   const date = (iso: string) => formatDateTime(iso);
 
@@ -31,7 +32,10 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
       : 'DEPARTMENT';
   const decisionFor = (r: Request): Decision =>
     decisions[r.id] || {
-      role: r.invited_role || suggestedRole(r.department_id),
+      role:
+        r.invited_role === 'STERILIZATION' && r.supervisor
+          ? SUPERVISOR
+          : r.invited_role || suggestedRole(r.department_id),
       departmentId: r.department_id || activeDepartments[0]?.id || '',
       note: '',
     };
@@ -41,10 +45,11 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
   const q = query.trim().toLowerCase();
   const shown = members.filter(
     m =>
-      !q ||
-      `${m.name} ${m.email} ${m.user_code || ''} ${roleLabel(roleValue(m))} ${departmentName(m.department_id)}`
-        .toLowerCase()
-        .includes(q),
+      !waitingAccounts.has(m.id) &&
+      (!q ||
+        `${m.name} ${m.email} ${m.user_code || ''} ${roleLabel(roleValue(m))} ${departmentName(m.department_id)}`
+          .toLowerCase()
+          .includes(q)),
   );
   return {
     activeDepartments,
@@ -59,6 +64,5 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
     setDecision,
     shown,
     signupFormUrl,
-    unconfirmed,
   };
 }

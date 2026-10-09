@@ -97,6 +97,7 @@ export default function HospitalPeople({
           demo={demo}
           invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
           onResend={draft => void invite(draft, true)}
+          onInviteLink={demo ? undefined : draft => void invite(draft, false, false)}
           onPasswordReset={m => void passwordReset(m)}
           onMakeLink={makeLink}
           busy={busy}

@@ -38,12 +38,19 @@ const world = (w: World = {}) => {
         ? (w.admins ?? [{email: 'admin@hospital.gr'}])
         : (w.account ?? null),
   });
-  fake.rpc = () => ({data: 'attempt-1', error: null});
+  fake.rpc = name => ({data: name === 'generate_user_code' ? 'GN1234' : 'attempt-1', error: null});
 };
 const mailOn = () => {
   Object.assign(env, {SMTP_HOST: 'smtp.example', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'SurgiTrack <no-reply@example.gr>'});
 };
-const form = {token: 'link-token', first_name: 'Γιώργος', last_name: 'Νικολάου', email: 'Giorgos@Hospital.GR', department_id: 'dept-1'};
+const form = {
+  token: 'link-token',
+  first_name: 'Γιώργος',
+  last_name: 'Νικολάου',
+  email: 'Giorgos@Hospital.GR',
+  department_id: 'dept-1',
+  password: 'secret-123',
+};
 const requests = (op: 'insert' | 'update') => fake.dbCalls(op).filter(c => c.table === 'staff_access_requests');
 
 let handle: Handler;
@@ -106,7 +113,7 @@ describe('staff-signup: what the form shows', () => {
     expect(lookup?.filters).toContainEqual(['eq', 'active', true]);
   });
 
-  it('shows the invited email, with no expiry, and no department for an admin or viewer', async () => {
+  it('shows the invited email, and no department for an admin or viewer', async () => {
     world({link: null, invitation: {...INVITATION, invited_role: 'VIEWER'}});
     const body = await (await handle(post({token: 'link-token', action: 'info'}))).json();
     expect(body).toMatchObject({email: 'invited@hospital.gr', expires_at: null, needs_department: false});
@@ -140,6 +147,17 @@ describe('staff-signup: checking the form', () => {
     expect(await response.json()).toEqual({error: 'invalid_input'});
     expect(fake.calls.filter(c => c.what === 'rpc')).toHaveLength(0);
     expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
+  });
+
+  it.each([
+    ['a short password', {password: 'short'}],
+    ['no password', {password: undefined}],
+    ['an overlong password', {password: 'x'.repeat(73)}],
+  ])('rejects %s before the limiter or any write', async (_label, override) => {
+    const response = await handle(post({...form, ...override}));
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({error: 'password_invalid'});
+    expect(fake.calls.filter(c => ['rpc', 'createUser'].includes(c.what))).toHaveLength(0);
   });
 
   it.each(['ΜΑΡΙΑ-ΕΛΕΝΗ', 'ΜΑΡΙΑ ΕΛΕΝΗ', 'MARIA'])('accepts the name %s', async first => {
@@ -182,7 +200,7 @@ describe('staff-signup: signing up through the hospital link', () => {
   it('records a request awaiting approval, for the hospital the link belongs to', async () => {
     const response = await handle(post(form));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ok: true});
+    expect(await response.json()).toEqual({ok: true, user_code: 'GN1234'});
     expect(requests('insert')).toHaveLength(1);
     expect(requests('insert')[0].values).toMatchObject({
       organization_id: 'org-1',
@@ -294,58 +312,64 @@ describe('staff-signup: signing up from a personal invitation', () => {
   });
 });
 
-describe('staff-signup: alerting the hospital admins', () => {
+describe('staff-signup: the account and username', () => {
   beforeEach(mailOn);
 
-  it('emails the hospital active admins, naming the applicant and the department', async () => {
-    world({admins: [{email: 'a1@hospital.gr'}, {email: 'a2@hospital.gr'}]});
-    await handle(post(form));
-    expect(mailState.outbox).toHaveLength(1);
-    const mail = mailState.outbox[0];
-    expect(mail.to).toBe('a1@hospital.gr, a2@hospital.gr');
-    expect(mail.subject).toBe('Νέα αίτηση πρόσβασης: ΓΙΩΡΓΟΣ ΝΙΚΟΛΑΟΥ');
-    expect(mail.html).toContain('giorgos@hospital.gr');
-    expect(mail.html).toContain('Χειρουργείο');
-    const lookup = fake.dbCalls().find(c => c.table === 'profiles' && eqValue(c, 'role'));
-    expect(lookup?.filters).toContainEqual(['eq', 'organization_id', 'org-1']);
-    expect(lookup?.filters).toContainEqual(['eq', 'role', 'ADMIN']);
-    expect(lookup?.filters).toContainEqual(['eq', 'active', true]);
-  });
-
-  it('escapes the hospital name in the email', async () => {
-    world({org: {...ORG, name: '<script>alert(1)</script>'}});
-    await handle(post(form));
-    expect(mailState.outbox[0].html).not.toContain('<script>');
-  });
-
-  it('links to the app origin only', async () => {
-    await handle(post({...form, origin: 'https://evil.example'}));
-    expect(mailState.outbox[0].html).toContain(`${SITE}/#/hospital`);
-    expect(mailState.outbox[0].html).not.toContain('evil.example');
-    mailState.outbox.length = 0;
-    await handle(post({...form, origin: 'http://localhost:5174'}));
-    expect(mailState.outbox[0].html).toContain('http://localhost:5174/#/hospital');
-  });
-
-  it('notes the alert on the request only when the mail went out', async () => {
-    await handle(post(form));
-    const noted = fake.dbCalls('update').find(c => c.table === 'staff_access_requests');
-    expect(noted?.values).toEqual({admin_notified_at: expect.any(String)});
-    expect(noted?.filters).toContainEqual(['eq', 'status', 'PENDING']);
-
-    fake.calls = [];
-    mailState.fail = true;
+  it('makes the account with the chosen password, inactive, and returns its username', async () => {
     const response = await handle(post(form));
-    expect(await response.json()).toEqual({ok: true});
-    expect(fake.dbCalls('update').filter(c => c.table === 'staff_access_requests')).toHaveLength(0);
+    expect(await response.json()).toEqual({ok: true, user_code: 'GN1234'});
+    expect(fake.calls.find(c => c.what === 'rpc' && c.args[0] === 'generate_user_code')?.args[1]).toEqual({
+      p_name: 'ΓΙΩΡΓΟΣ ΝΙΚΟΛΑΟΥ',
+    });
+    expect(fake.calls.find(c => c.what === 'createUser')?.args[0]).toMatchObject({
+      email: 'giorgos@hospital.gr',
+      password: 'secret-123',
+      email_confirm: true,
+    });
+    const profile = fake.dbCalls('insert').find(c => c.table === 'profiles');
+    expect(profile?.values).toMatchObject({
+      id: 'new-user',
+      organization_id: 'org-1',
+      department_id: 'dept-1',
+      email: 'giorgos@hospital.gr',
+      user_code: 'GN1234',
+      active: false,
+    });
+    expect(requests('insert')[0].values).toMatchObject({user_id: 'new-user', user_code: 'GN1234'});
   });
 
-  it('still accepts the request when no email is set up or there is no admin to tell', async () => {
-    for (const key of ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']) delete env[key];
-    expect((await handle(post(form))).status).toBe(200);
-    mailOn();
-    world({admins: []});
-    expect((await handle(post(form))).status).toBe(200);
+  it('takes the role the admin invited with', async () => {
+    world({link: null, invitation: {...INVITATION, invited_role: 'STERILIZATION'}});
+    await handle(post(form));
+    expect(fake.dbCalls('insert').find(c => c.table === 'profiles')?.values).toMatchObject({role: 'STERILIZATION'});
+  });
+
+  it('emails no one: the admin sees the request in the app', async () => {
+    await handle(post(form));
     expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('answers 409 when the sign-in service already has that email', async () => {
+    fake.admin.createUser = () => ({data: null, error: {message: 'A user with this email address has already been registered'}});
+    const response = await handle(post(form));
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({error: 'email_exists'});
+    expect(fake.dbCalls('insert')).toHaveLength(0);
+  });
+
+  it('removes the new account when the request cannot be written', async () => {
+    const answers = fake.db;
+    fake.db = call =>
+      call.op === 'insert' && call.table === 'staff_access_requests' ? {data: null, error: {message: 'x'}} : answers(call);
+    expect((await handle(post(form))).status).toBe(500);
+    expect(fake.calls.find(c => c.what === 'deleteUser')?.args[0]).toBe('new-user');
+    expect(fake.dbCalls('delete').find(c => c.table === 'profiles')).toBeTruthy();
+  });
+
+  it('refuses a personal invitation older than 7 days', async () => {
+    world({link: null, invitation: {...INVITATION, invited_at: new Date(Date.now() - 8 * 864e5).toISOString()}});
+    expect((await handle(post(form))).status).toBe(410);
+    world({link: null, invitation: {...INVITATION, invited_at: new Date(Date.now() - 6 * 864e5).toISOString()}});
+    expect((await handle(post(form))).status).toBe(200);
   });
 });
