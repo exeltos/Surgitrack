@@ -77,6 +77,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Αλλαγές που δεν αποθηκεύτηκαν',
+          'Αν φύγετε από μια σελίδα με στοιχεία που δεν έχετε αποθηκεύσει (νέο Σετ ή εργαλείο, επεξεργασία στοιχείων καρτέλας, δικαιώματα ρόλου), η εφαρμογή ρωτά πρώτα «Υπάρχουν αλλαγές που δεν αποθηκεύτηκαν». Η επιλογή «Παραμονή» είναι η προεπιλεγμένη· «Έξοδος χωρίς αποθήκευση» τις απορρίπτει. Το ίδιο ισχύει για την αποσύνδεση· αν κλείσετε ή ανανεώσετε την καρτέλα, ρωτά ο φυλλομετρητής.',
+        ],
+        en: [
+          'Unsaved changes',
+          'If you leave a page with details you have not saved (a new Set or instrument, editing a card’s details, role permissions), the app first asks "Some changes are not saved". "Stay" is the default; "Leave without saving" discards them. The same goes for signing out; if you close or reload the tab, the browser asks.',
+        ],
+      },
+      {
+        el: [
           'Ξεχάσατε τον κωδικό',
           'Στη σελίδα σύνδεσης πατήστε «Ξέχασα τον κωδικό» και γράψτε το email σας· θα λάβετε σύνδεσμο για νέο κωδικό. Μετά από πολλές λάθος προσπάθειες η σύνδεση κλειδώνει για 15 λεπτά. Ο διαχειριστής μπορεί επίσης να σας στείλει σύνδεσμο αλλαγής κωδικού.',
         ],
@@ -275,6 +285,16 @@ export const helpManual: ManualSection[] = [
         en: [
           'Actions',
           'Depending on the role: send to Sterilization, print the barcode and, under "Actions", report a problem and manage (department, Set, Stock, Service, loss). A management action can be undone from its notice for a few seconds; the history keeps the undo too.',
+        ],
+      },
+      {
+        el: [
+          'Προηγούμενη και επόμενη καρτέλα',
+          'Όταν ανοίγετε μια καρτέλα από λίστα (Σετ, Εργαλεία, Μεμονωμένα, Απόθεμα), δίπλα στο «Πίσω στη λίστα» φαίνεται π.χ. «3 από 24» με βελάκια ‹ ›. Περνάτε στην προηγούμενη ή την επόμενη καρτέλα με τη σειρά και τα φίλτρα της λίστας, και από το πληκτρολόγιο με Alt+← / Alt+→. Το «Πίσω στη λίστα» επιστρέφει πάντα στη λίστα.',
+        ],
+        en: [
+          'Previous and next card',
+          'When you open a card from a list (Sets, Instruments, Standalone, Stock), "3 of 24" with ‹ › arrows shows next to "Back to list". You move to the previous or next card in the list’s order and filters, also with Alt+← / Alt+→ on the keyboard. "Back to list" always returns to the list.',
         ],
       },
     ],
@@ -1246,6 +1266,64 @@ export const helpManual: ManualSection[] = [
       en: ['Pick a report on the left.', 'Set the filters.', 'Press "Download" and choose Excel, PDF or CSV.'],
     },
     related: ['/overview', '/movements'],
+  },
+  {
+    to: '/traceability',
+    permission: 'traceability.view',
+    title: {el: 'Ιχνηλάτηση', en: 'Traceability'},
+    summary: {
+      el: 'Η πλήρης διαδρομή ενός Σετ ή εργαλείου, ή όλα όσα χρησιμοποιήθηκαν για έναν ασθενή, σε μια γραμμή χρόνου.',
+      en: 'The full path of a Set or instrument, or everything used for one patient, on a timeline.',
+    },
+    audience: {
+      el: 'Αποστείρωση, Προϊστάμενος, Διαχειριστής, Παρατηρητής',
+      en: 'Sterilization, Supervisor, Admin, Viewer',
+    },
+    chapters: [
+      {
+        el: [
+          'Αναζήτηση',
+          'Σαρώστε ή γράψτε barcode Σετ (S…) ή εργαλείου (T…), ή κωδικό ασθενούς, και πατήστε «Αναζήτηση». Ο ασθενής αναζητείται μόνο με κωδικό· ονοματεπώνυμο δεν καταγράφεται.',
+        ],
+        en: [
+          'Search',
+          'Scan or type a Set (S…) or instrument (T…) barcode, or a patient code, and press "Search". Patients are searched by code only; no names are recorded.',
+        ],
+      },
+      {
+        el: [
+          'Γραμμή χρόνου',
+          'Κάθε κίνηση δείχνει ημερομηνία και ώρα, ενέργεια, από πού προς πού, χρήστη και, όπου υπάρχει, κωδικό ασθενούς. Για Σετ ή εργαλείο, «Άνοιγμα καρτέλας» ανοίγει την καρτέλα του.',
+        ],
+        en: [
+          'Timeline',
+          'Each movement shows date and time, action, from where to where, user and, where there is one, the patient code. For a Set or instrument, "Open card" opens its card.',
+        ],
+      },
+      {
+        el: [
+          'Λήψη και εκτύπωση',
+          'Το κουμπί «Λήψη» δίνει τα αποτελέσματα σε Excel, CSV ή PDF για εκτύπωση, π.χ. για έλεγχο ποιότητας ή για ανάκληση.',
+        ],
+        en: [
+          'Download and print',
+          'The "Download" button gives the results as Excel, CSV or PDF for printing, e.g. for a quality review or a recall.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Σαρώστε το barcode ή γράψτε τον κωδικό ασθενούς.',
+        'Διαβάστε τη γραμμή χρόνου από την πιο πρόσφατη κίνηση.',
+        'Κατεβάστε ή εκτυπώστε τα αποτελέσματα αν χρειάζεται.',
+      ],
+      en: [
+        'Scan the barcode or type the patient code.',
+        'Read the timeline from the most recent movement.',
+        'Download or print the results if needed.',
+      ],
+    },
+    related: ['/movements', '/reports'],
   },
   {
     to: '/movements',
