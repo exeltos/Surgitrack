@@ -51,16 +51,11 @@ And `recycle_bin_more_kinds` was recorded live as `20261006150203`, while its fi
 was renamed to `20261006150203_recycle_bin_more_kinds.sql` to match the live history (the replay order is unchanged:
 it still runs right after `20261006140426_revoke_anon_table_grants`).
 
-To record the seven in the live history without running them again (it only writes rows in
-`supabase_migrations.schema_migrations`; nothing in the schema changes):
+The seven were recorded in the live history on 09/10/2026 (rows in `supabase_migrations.schema_migrations` only;
+nothing in the schema changed). With the CLI the same is
+`supabase migration repair --status applied <versions>`.
 
-```sh
-supabase link --project-ref oklyqnoqzbhjudqbkulq
-supabase migration repair --status applied 20261006130300 20261008080000 20261008120000 20261008130000 20261008140000 20261008150000 20261008160000
-supabase migration list   # local and remote must now match up to 20261009091719
-```
-
-## Waiting to be applied
+## Applied on 09/10/2026
 
 | Version        | Name                     | What it does                                                                                                            |
 | -------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
@@ -68,9 +63,26 @@ supabase migration list   # local and remote must now match up to 20261009091719
 | 20261009120100 | supervisor_rights_in_rls | The Sterilization supervisor's rights and the Studio role settings enforced by the database                             |
 | 20261009120200 | append_only_audit        | `configuration_audit`: the configuration history, copied server side from `hospital_settings`, never changed            |
 
-After the repair above, apply them in this order with `supabase db push` (it applies the files with their own versions
-and names, so local and remote keep matching), then check `supabase migration list` and the advisors. Applying them
-through the Supabase MCP `apply_migration` records a new version instead: rename the files to the versions it reports.
+They were applied through the Supabase MCP `execute_sql`, with their own versions recorded by hand, because that tool
+times out on any statement it treats as destructive (`drop`). The `drop ... if exists` lines guarding new objects
+were skipped (nothing to drop). The nine `drop policy` lines of `20261009120000` that remove the replaced Demo
+policies are run from the SQL editor (the new policies are already live and allow exactly the same, so until then
+the only effect is the advisor's `multiple_permissive_policies` warning); that script also records
+`20261009120000` in the history:
+
+```sql
+drop policy if exists demo_accounts_owner on public.demo_accounts;
+drop policy if exists demo_accounts_own_read on public.demo_accounts;
+drop policy if exists demo_guide_progress_own on public.demo_guide_progress;
+drop policy if exists demo_guide_progress_owner on public.demo_guide_progress;
+drop policy if exists demo_feedback_own on public.demo_feedback;
+drop policy if exists demo_feedback_owner on public.demo_feedback;
+drop policy if exists demo_requests_own_insert on public.demo_requests;
+drop policy if exists demo_requests_own_read on public.demo_requests;
+drop policy if exists demo_requests_owner on public.demo_requests;
+insert into supabase_migrations.schema_migrations (version, name, statements)
+values ('20261009120000', 'lock_default_privileges', array[]::text[]) on conflict (version) do nothing;
+```
 
 ## Testing locally
 
