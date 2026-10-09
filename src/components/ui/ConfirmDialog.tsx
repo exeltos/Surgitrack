@@ -6,6 +6,7 @@ export default function ConfirmDialog({
   title,
   message,
   confirmLabel = tr('Επιβεβαίωση'),
+  cancelLabel = tr('Ακύρωση'),
   danger = false,
   confirmText,
   onConfirm,
@@ -14,6 +15,7 @@ export default function ConfirmDialog({
   title: string;
   message: string;
   confirmLabel?: string;
+  cancelLabel?: string;
   danger?: boolean;
   /** For what cannot be undone: the confirm button waits until this exact text is typed. */
   confirmText?: string;
@@ -47,7 +49,10 @@ export default function ConfirmDialog({
           </label>
         )}
         <footer>
-          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
+          {/* Before something dangerous, the safe choice is the one already selected. */}
+          <AppButton onClick={onClose} autoFocus={danger && !confirmText}>
+            {cancelLabel}
+          </AppButton>
           <AppButton variant={danger ? 'danger' : 'primary'} disabled={!ready} onClick={onConfirm}>
             {confirmLabel}
           </AppButton>

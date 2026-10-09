@@ -1,13 +1,15 @@
 import {supabase} from '../../lib/supabase';
 import type {CloudCollection, CloudRecord} from './appRecords';
 import {normalizeDates} from '../../core/displayDate';
+import {mergeRemote} from './remoteChanges';
 
 /**
  * This device's copy of the hospital's records (IndexedDB), per signed-in user and hospital:
  *  - opening the app shows the copy at once and then fetches only what changed since (T2);
  *  - changes not yet saved when the page was closed or reloaded are kept and sent on the next
  *    opening with a connection (S3).
- * It holds patient codes, so it is wiped on sign-out. A copy older than a day is not used.
+ * It holds patient codes, so it is wiped on sign-out. A copy older than a day is not used as data,
+ * but the changes it kept unsaved are, whatever their age (they exist nowhere else).
  */
 const DB_NAME = 'surgitrack-cache';
 const STORE = 'collections';
@@ -33,6 +35,8 @@ export type CachedCollection = {
   deletedSince: string;
   savedAt: number;
   version: number;
+  /** Older than a day: only its unsaved changes count (see pendingOnto). */
+  expired?: boolean;
 };
 
 let dbPromise: Promise<IDBDatabase | undefined> | undefined;
@@ -64,7 +68,7 @@ export const setCacheOwner = (next: CacheOwner | undefined) => {
 };
 export const cacheOwner = () => owner;
 
-/** The copy of every collection of this user and hospital (fresh ones only). */
+/** The copy of every collection of this user and hospital: fresh ones, and older ones with unsaved changes. */
 export async function readCache(
   forOwner: CacheOwner,
   collections: readonly CloudCollection[],
@@ -80,9 +84,16 @@ export async function readCache(
         const request = store.get(keyFor(forOwner, collection));
         request.onsuccess = () => {
           const entry = request.result as CachedCollection | undefined;
-          if (entry && entry.version === CACHE_VERSION && Date.now() - entry.savedAt < CACHE_MAX_AGE_MS)
-            // A copy saved by an older version may hold dates in the older form.
-            out[collection] = {...entry, items: normalizeDates(entry.items), bases: normalizeDates(entry.bases)};
+          if (!entry || entry.version !== CACHE_VERSION) return;
+          const expired = Date.now() - entry.savedAt >= CACHE_MAX_AGE_MS;
+          if (expired && !entry.changed.length && !entry.removed.length) return;
+          // A copy saved by an older version may hold dates in the older form.
+          out[collection] = {
+            ...entry,
+            items: normalizeDates(entry.items),
+            bases: normalizeDates(entry.bases),
+            expired,
+          };
         };
       }
       tx.oncomplete = () => resolve(out);
@@ -137,6 +148,38 @@ if (typeof window !== 'undefined')
   supabase.auth.onAuthStateChange(event => {
     if (event === 'SIGNED_OUT') void clearCache();
   });
+
+/**
+ * A collection's unsaved changes put onto records just loaded from the server, for when the copy as a
+ * whole is not used (missing collections, or too old): changed and new records replace or join the
+ * server's, deleted ones are left out. Nothing when the copy kept no unsaved changes.
+ */
+export const pendingOnto = (
+  server: CloudRecord[],
+  copy: CachedCollection | undefined,
+  /** Server time the records were loaded from (the sync fetches what changed since). */
+  since: string,
+): CachedCollection | undefined => {
+  if (!copy || (!copy.changed.length && !copy.removed.length)) return undefined;
+  const local = new Map(copy.items.map(item => [item.id, item]));
+  const changed = copy.changed.filter(id => local.has(id));
+  // Only the changed records keep the version they started from; the rest take the server's just loaded.
+  const versions = Object.fromEntries(changed.flatMap(id => (copy.versions?.[id] ? [[id, copy.versions[id]]] : [])));
+  return {
+    ...copy,
+    items: mergeRemote(
+      server,
+      changed.map(id => local.get(id)!),
+      copy.removed,
+    ),
+    changed,
+    versions,
+    cutoff: undefined,
+    since,
+    deletedSince: since,
+    expired: false,
+  };
+};
 
 // What the workspace restored from the copy, handed to each collection's sync when it starts.
 const restored = new Map<string, CachedCollection>();
