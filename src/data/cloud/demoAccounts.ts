@@ -38,7 +38,45 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   const lastRun = new Map<string, SeedRunRow>();
   /** Guide steps done, by person. */
   const stepsDone = new Map<string, Set<string>>();
+  type FeedbackRow = {
+    organization_id: string;
+    user_id: string;
+    topic: string;
+    rating: number | null;
+    nps: number | null;
+    answers: Record<string, unknown> | null;
+    comment: string | null;
+  };
+  type RequestRow = {
+    id: string;
+    organization_id: string;
+    user_id: string | null;
+    kind: 'PURCHASE' | 'EXTENSION';
+    contact_name: string | null;
+    phone: string | null;
+    message: string | null;
+    status: 'NEW' | 'HANDLED';
+    created_at: string;
+  };
+  let feedbackRows: FeedbackRow[] = [];
+  let requestRows: RequestRow[] = [];
   if (rows.length) {
+    const orgIds = rows.map(row => row.organization_id);
+    const [fb, rq] = await Promise.all([
+      supabase
+        .from('demo_feedback')
+        .select('organization_id,user_id,topic,rating,nps,answers,comment')
+        .in('organization_id', orgIds),
+      supabase
+        .from('demo_requests')
+        .select('id,organization_id,user_id,kind,contact_name,phone,message,status,created_at')
+        .in('organization_id', orgIds)
+        .order('created_at', {ascending: false}),
+    ]);
+    if (fb.error) throw fb.error;
+    if (rq.error) throw rq.error;
+    feedbackRows = (fb.data || []) as FeedbackRow[];
+    requestRows = (rq.data || []) as RequestRow[];
     const {data: progress, error: progressError} = await supabase
       .from('demo_guide_progress')
       .select('user_id,step_key')
@@ -74,6 +112,45 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
       people.set(p.organization_id, list);
     }
   }
+  const nameOf = (members: Person[], id: string | null) => members.find(p => p.id === id)?.name || '';
+  const feedbackFor = (organizationId: string, members: Person[]) => {
+    const mine = feedbackRows.filter(f => f.organization_id === organizationId);
+    const byTopic = new Map<string, number[]>();
+    for (const f of mine)
+      if (f.topic !== 'final' && f.rating) byTopic.set(f.topic, [...(byTopic.get(f.topic) || []), f.rating]);
+    const num = (v: unknown) => (typeof v === 'number' ? v : undefined);
+    const text = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
+    return {
+      ratings: [...byTopic].map(([topic, list]) => ({
+        topic,
+        average: list.reduce((a, b) => a + b, 0) / list.length,
+        count: list.length,
+      })),
+      evaluations: mine
+        .filter(f => f.topic === 'final')
+        .map(f => ({
+          name: nameOf(members, f.user_id),
+          nps: f.nps,
+          ease: num(f.answers?.ease),
+          fit: num(f.answers?.fit),
+          missing: text(f.answers?.missing),
+          sets: num(f.answers?.sets),
+          theatres: num(f.answers?.theatres),
+          comment: text(f.comment),
+        })),
+      requests: requestRows
+        .filter(r => r.organization_id === organizationId)
+        .map(r => ({
+          id: r.id,
+          kind: r.kind,
+          name: r.contact_name || nameOf(members, r.user_id),
+          phone: r.phone || undefined,
+          message: r.message || undefined,
+          status: r.status,
+          createdAt: r.created_at,
+        })),
+    };
+  };
   return rows.map(row => {
     const members = people.get(row.organization_id) || [];
     const evaluator = members.find(p => p.id === row.evaluator_id);
@@ -115,6 +192,7 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
           guide: guide(p),
         })),
       evaluatorGuide: evaluator ? guide(evaluator) : undefined,
+      ...feedbackFor(row.organization_id, members),
       lastLoad: lastRun.get(row.organization_id)
         ? {
             kind: lastRun.get(row.organization_id)!.kind,
@@ -204,5 +282,14 @@ export const setDemoUserLimit = async (demoId: string, limit: number) => {
     .from('demo_accounts')
     .update({max_extra_users: limit, updated_at: new Date().toISOString()})
     .eq('id', demoId);
+  if (error) throw error;
+};
+
+/** The owner has dealt with a request (called, extended, …). */
+export const markDemoRequestHandled = async (requestId: string) => {
+  const {error} = await supabase
+    .from('demo_requests')
+    .update({status: 'HANDLED', handled_at: new Date().toISOString()})
+    .eq('id', requestId);
   if (error) throw error;
 };

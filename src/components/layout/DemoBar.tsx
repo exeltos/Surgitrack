@@ -1,6 +1,15 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useLocation} from 'react-router-dom';
-import {CheckCircle2, Circle, FlaskConical, ListChecks, X} from 'lucide-react';
+import {
+  CalendarPlus,
+  CheckCircle2,
+  Circle,
+  FlaskConical,
+  ListChecks,
+  MessageSquareHeart,
+  ShoppingBag,
+  X,
+} from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {guideProgress, guideSteps, visitStepsFor} from '../../core/demoGuide';
 import {demoDaysLeft} from '../../core/demoAccounts';
@@ -9,12 +18,18 @@ import type {UserRole} from '../../store/types';
 import {useEvaluationDemo} from '../../data/cloud/demoContext';
 import {findDoneRecordSteps, loadGuideDone, markGuideSteps} from '../../data/cloud/demoGuide';
 import {getRealIdentity} from '../../data/cloud/identity';
+import {FINAL_TOPIC, modulesToRate, suggestFinal} from '../../core/demoFeedback';
+import {loadMyFeedback, rateModule, type DemoRequestKind, type FeedbackRow} from '../../data/cloud/demoFeedback';
+import StarRating from '../demo/StarRating';
+import DemoRequestDialog from '../demo/DemoRequestDialog';
+import FinalEvaluationDialog from '../demo/FinalEvaluationDialog';
 
 const seenKey = (userId: string) => `surgitrack-demo-guide-seen-${userId}`;
 
 /**
- * The bar of a prospect's evaluation Demo: days left and the first-steps guide. Steps complete
- * themselves when the person does them; "Show me" opens the screen with its Help.
+ * The bar of a prospect's evaluation Demo: days left, the first-steps guide (steps complete
+ * themselves; "Show me" opens the screen with its Help), a 1–5 rating of each part tried, the
+ * final evaluation, and "I want the application" / "Ask for more time".
  */
 export default function DemoBar({role, onShowMe}: {role: UserRole; onShowMe: (to: string) => void}) {
   const demo = useEvaluationDemo();
@@ -25,6 +40,22 @@ export default function DemoBar({role, onShowMe}: {role: UserRole; onShowMe: (to
   const steps = useMemo(() => guideSteps(role), [role]);
   const [done, setDone] = useState<ReadonlySet<string>>(new Set());
   const [open, setOpen] = useState(false);
+  const [feedback, setFeedback] = useState<Map<string, FeedbackRow>>(new Map());
+  const [dialog, setDialog] = useState<'final' | DemoRequestKind | null>(null);
+
+  useEffect(() => {
+    if (!demo || !userId) return;
+    loadMyFeedback(demo.organizationId, userId)
+      .then(setFeedback)
+      .catch(() => undefined);
+  }, [demo, userId]);
+  const rate = (topic: string, rating: number) => {
+    if (!demo || !userId) return;
+    setFeedback(prev =>
+      new Map(prev).set(topic, {topic, nps: null, answers: {}, comment: null, ...prev.get(topic), rating}),
+    );
+    void rateModule(demo.organizationId, userId, topic, rating).catch(() => undefined);
+  };
 
   const add = useCallback(
     async (keys: string[]) => {
@@ -79,6 +110,9 @@ export default function DemoBar({role, onShowMe}: {role: UserRole; onShowMe: (to
   const progress = guideProgress(steps, done);
   const days = demoDaysLeft({endsAt: demo.endsAt});
   const ending = days <= 3;
+  const toRate = modulesToRate(steps, done);
+  const finalDone = feedback.has(FINAL_TOPIC);
+  const askFinal = !finalDone && suggestFinal(progress, days);
   return (
     <>
       <div className={`demo-bar${ending ? ' ending' : ''}`} role="status">
@@ -100,7 +134,42 @@ export default function DemoBar({role, onShowMe}: {role: UserRole; onShowMe: (to
             {progress.done}/{progress.total}
           </b>
         </button>
+        <button
+          type="button"
+          className={`demo-bar-action${askFinal ? ' highlight' : ''}`}
+          onClick={() => setDialog('final')}
+        >
+          <MessageSquareHeart size={15} />
+          {finalDone ? L('Η αξιολόγησή σας', 'Your evaluation') : L('Αξιολόγηση', 'Evaluate')}
+        </button>
+        <button type="button" className="demo-bar-action" onClick={() => setDialog('EXTENSION')}>
+          <CalendarPlus size={15} />
+          {L('Ζητώ παράταση', 'More time')}
+        </button>
+        <button type="button" className="demo-bar-action primary" onClick={() => setDialog('PURCHASE')}>
+          <ShoppingBag size={15} />
+          {L('Θέλω την εφαρμογή', 'I want it')}
+        </button>
       </div>
+      {dialog === 'final' && userId && (
+        <FinalEvaluationDialog
+          organizationId={demo.organizationId}
+          userId={userId}
+          current={feedback.get(FINAL_TOPIC)}
+          L={L}
+          onClose={() => setDialog(null)}
+          onSaved={row => setFeedback(prev => new Map(prev).set(FINAL_TOPIC, row))}
+        />
+      )}
+      {(dialog === 'PURCHASE' || dialog === 'EXTENSION') && userId && (
+        <DemoRequestDialog
+          kind={dialog}
+          organizationId={demo.organizationId}
+          userId={userId}
+          L={L}
+          onClose={() => setDialog(null)}
+        />
+      )}
       {open && (
         <aside className="demo-guide" aria-label={L('Πρώτα βήματα', 'First steps')}>
           <header>
@@ -148,6 +217,27 @@ export default function DemoBar({role, onShowMe}: {role: UserRole; onShowMe: (to
               );
             })}
           </ol>
+          {toRate.length > 0 && (
+            <section className="demo-guide-rate">
+              <strong>{L('Πώς σας φάνηκαν;', 'How did you find them?')}</strong>
+              {toRate.map(m => (
+                <div key={m.key}>
+                  <span>{L(m.title.el, m.title.en)}</span>
+                  <StarRating
+                    label={L(m.title.el, m.title.en)}
+                    value={feedback.get(m.key)?.rating}
+                    onChange={rating => rate(m.key, rating)}
+                  />
+                </div>
+              ))}
+            </section>
+          )}
+          {askFinal && (
+            <button type="button" className="demo-guide-final" onClick={() => setDialog('final')}>
+              <MessageSquareHeart size={16} />
+              {L('Πείτε μας τη γνώμη σας για το SurgiTrack', 'Tell us what you think of SurgiTrack')}
+            </button>
+          )}
         </aside>
       )}
     </>

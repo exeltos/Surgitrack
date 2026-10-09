@@ -146,3 +146,68 @@ describe('demo-account: the invitation', () => {
     expect(mail.html).not.toContain('<b>x</b>');
   });
 });
+
+describe('demo-account: a request from someone in a Demo', () => {
+  const REQUEST = {
+    id: 'req-1',
+    organization_id: 'org-demo',
+    user_id: 'person-1',
+    kind: 'PURCHASE',
+    contact_name: 'Νίκος <b>Ιωάννου</b>',
+    phone: '2410 000000',
+    message: 'Καλέστε με',
+    created_at: new Date().toISOString(),
+  };
+  const routes = (o: {request?: Row; recent?: number; contactEmail?: string | null} = {}) => {
+    fake.db = (call: DbCall) => {
+      if (call.table === 'demo_requests' && call.filters.some(([op]) => op === 'gte'))
+        return {data: null, count: o.recent ?? 1, error: null};
+      const answer: Record<string, unknown> = {
+        demo_requests: o.request === undefined ? REQUEST : o.request,
+        organizations: ORG,
+        profiles: {name: 'ΝΙΚΟΣ ΙΩΑΝΝΟΥ', email: 'nikos@hospital.gr'},
+        platform_settings: o.contactEmail === null ? null : {contact_email: o.contactEmail ?? 'owner@exeltos.com'},
+      };
+      return {data: answer[call.table] ?? null, error: null};
+    };
+  };
+  const notify = () => send(handle, {action: 'notify_request', request_id: 'req-1'});
+  beforeEach(() => {
+    fake.user = {id: 'person-1'};
+    routes();
+  });
+
+  it('emails the platform owner, escaping what the person wrote', async () => {
+    const res = await notify();
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ok: true, emailed: true});
+    const mail = mailState.outbox[0] as {to: string; subject: string; html: string};
+    expect(mail.to).toBe('owner@exeltos.com');
+    expect(mail.subject).toContain('Θέλει την εφαρμογή');
+    expect(mail.html).toContain('nikos@hospital.gr');
+    expect(mail.html).not.toContain('<b>Ιωάννου</b>');
+    expect(writes()).toHaveLength(0);
+  });
+
+  it('falls back to the default address and tells an extension apart', async () => {
+    routes({request: {...REQUEST, kind: 'EXTENSION'}, contactEmail: null});
+    await notify();
+    const mail = mailState.outbox[0] as {to: string; subject: string};
+    expect(mail.to).toBe('info@exeltos.com');
+    expect(mail.subject).toContain('παράταση');
+  });
+
+  it("refuses someone else's request (and needs no owner rights)", async () => {
+    routes({request: {...REQUEST, user_id: 'someone-else'}});
+    expect((await notify()).status).toBe(404);
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('does not email for an old request, or past three in an hour', async () => {
+    routes({request: {...REQUEST, created_at: new Date(Date.now() - 11 * 60_000).toISOString()}});
+    expect(await (await notify()).json()).toMatchObject({ok: true, emailed: false});
+    routes({recent: 4});
+    expect(await (await notify()).json()).toMatchObject({ok: true, emailed: false});
+    expect(mailState.outbox).toHaveLength(0);
+  });
+});

@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
 import type {ReactNode} from 'react';
@@ -10,6 +10,13 @@ const service = vi.hoisted(() => ({
   findDoneRecordSteps: vi.fn(),
 }));
 vi.mock('../../../data/cloud/demoGuide', () => service);
+const feedback = vi.hoisted(() => ({
+  loadMyFeedback: vi.fn(),
+  rateModule: vi.fn(),
+  saveFinalEvaluation: vi.fn(),
+  sendDemoRequest: vi.fn(),
+}));
+vi.mock('../../../data/cloud/demoFeedback', () => feedback);
 vi.mock('../../../data/cloud/identity', () => ({getRealIdentity: () => ({id: 'user-1'})}));
 
 import DemoBar from '../DemoBar';
@@ -35,6 +42,11 @@ beforeEach(() => {
   service.loadGuideDone.mockResolvedValue(new Set(['receive']));
   service.findDoneRecordSteps.mockResolvedValue(['prepare']);
   service.markGuideSteps.mockResolvedValue(undefined);
+  Object.values(feedback).forEach(fn => fn.mockReset());
+  feedback.loadMyFeedback.mockResolvedValue(new Map());
+  feedback.rateModule.mockResolvedValue(undefined);
+  feedback.saveFinalEvaluation.mockResolvedValue(undefined);
+  feedback.sendDemoRequest.mockResolvedValue(undefined);
 });
 
 describe('Demo bar', () => {
@@ -77,5 +89,59 @@ describe('Demo bar', () => {
       </AppPreferencesProvider>,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('rates a part of the app once one of its steps is done', async () => {
+    const user = userEvent.setup();
+    render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
+    const stars = await screen.findByRole('radiogroup', {name: 'Ροή Αποστείρωσης'});
+    expect(screen.queryByRole('radiogroup', {name: 'Αναφορές'})).not.toBeInTheDocument();
+    await user.click(within(stars).getByRole('radio', {name: '4/5'}));
+    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'sterilization', 4);
+    expect(within(stars).getByRole('radio', {name: '4/5'})).toBeChecked();
+  });
+
+  it('sends the final evaluation once ease, fit and NPS are answered', async () => {
+    localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    const user = userEvent.setup();
+    render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
+    await user.click(screen.getByRole('button', {name: 'Αξιολόγηση'}));
+    const dialog = screen.getByRole('dialog', {name: 'Αξιολόγηση'});
+    const send = within(dialog).getByRole('button', {name: 'Αποστολή αξιολόγησης'});
+    expect(send).toBeDisabled();
+    await user.click(
+      within(within(dialog).getByRole('radiogroup', {name: 'Ευκολία χρήσης'})).getByRole('radio', {name: '5/5'}),
+    );
+    await user.click(
+      within(within(dialog).getByRole('radiogroup', {name: 'Καταλληλότητα'})).getByRole('radio', {name: '4/5'}),
+    );
+    await user.click(within(within(dialog).getByRole('radiogroup', {name: 'NPS'})).getByRole('radio', {name: '9'}));
+    await user.type(within(dialog).getByLabelText('Περίπου πόσα Σετ έχει το νοσοκομείο;'), '350');
+    await user.click(send);
+    expect(feedback.saveFinalEvaluation).toHaveBeenCalledWith('org-demo', 'user-1', {
+      nps: 9,
+      answers: {ease: 5, fit: 4, sets: 350},
+      comment: '',
+    });
+    expect(await within(dialog).findByText('Ευχαριστούμε πολύ για την αξιολόγηση!')).toBeInTheDocument();
+    await user.click(within(dialog).getAllByRole('button', {name: 'Κλείσιμο'})[1]);
+    expect(screen.getByRole('button', {name: 'Η αξιολόγησή σας'})).toBeInTheDocument();
+  });
+
+  it('sends "I want the application" with a phone number', async () => {
+    localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    const user = userEvent.setup();
+    render(wrap('/overview', <DemoBar role="ADMIN" onShowMe={() => undefined} />));
+    await user.click(screen.getByRole('button', {name: 'Θέλω την εφαρμογή'}));
+    const dialog = screen.getByRole('dialog', {name: 'Θέλω την εφαρμογή'});
+    await user.type(within(dialog).getByLabelText('Τηλέφωνο'), ' 2410 000000 ');
+    await user.click(within(dialog).getByRole('button', {name: 'Αποστολή'}));
+    expect(feedback.sendDemoRequest).toHaveBeenCalledWith('org-demo', 'user-1', {
+      kind: 'PURCHASE',
+      contactName: '',
+      phone: '2410 000000',
+      message: '',
+    });
+    expect(await within(dialog).findByText(/Λάβαμε το ενδιαφέρον σας/)).toBeInTheDocument();
   });
 });

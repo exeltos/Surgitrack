@@ -46,6 +46,29 @@ export type DemoAccount = {
   }>;
   /** The prospect's own first-steps progress. */
   evaluatorGuide?: {done: number; total: number};
+  /** Average 1–5 rating of each part of the app, over everyone who rated it. */
+  ratings: Array<{topic: string; average: number; count: number}>;
+  /** Final evaluations, one per person who sent one. */
+  evaluations: Array<{
+    name: string;
+    nps: number | null;
+    ease?: number;
+    fit?: number;
+    missing?: string;
+    sets?: number;
+    theatres?: number;
+    comment?: string;
+  }>;
+  /** "I want the application" / "Ask for more time", newest first. */
+  requests: Array<{
+    id: string;
+    kind: 'PURCHASE' | 'EXTENSION';
+    name: string;
+    phone?: string;
+    message?: string;
+    status: 'NEW' | 'HANDLED';
+    createdAt: string;
+  }>;
   /** The latest load of the sample hospital: first fill or reset. */
   lastLoad?: {kind: 'SEED' | 'RESET'; at: string; records: number};
 };

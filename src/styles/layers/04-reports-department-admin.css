@@ -4053,6 +4053,229 @@
   }
 }
 
+.demo-bar-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid #c9c0f2;
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.demo-bar-action.primary {
+  border-color: #4a3d8f;
+  background: #4a3d8f;
+  color: #fff;
+}
+.demo-bar-action.highlight {
+  border-color: #d97706;
+  background: #fff7e6;
+  color: #92400e;
+}
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+}
+.star-rating button {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #c9c3e3;
+  cursor: pointer;
+}
+.star-rating button.on {
+  color: #f59e0b;
+}
+.star-rating button.on svg {
+  fill: currentColor;
+}
+.star-rating button:hover:not(:disabled) {
+  background: #f6f4ff;
+}
+.demo-guide-rate {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #eeeaff;
+}
+.demo-guide-rate strong {
+  color: #2e2563;
+  font-size: 13px;
+}
+.demo-guide-rate > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #4b4766;
+  font-size: 12.5px;
+}
+.demo-guide-final {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border: 1px solid #d97706;
+  border-radius: 10px;
+  background: #fff7e6;
+  color: #92400e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.demo-dialog {
+  display: grid;
+  gap: 12px;
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 18px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(31, 22, 82, 0.25);
+}
+.demo-dialog.wide {
+  width: min(560px, calc(100vw - 32px));
+}
+.demo-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.demo-dialog header h3 {
+  margin: 0;
+  color: #2e2563;
+  font-size: 17px;
+}
+.demo-dialog header button {
+  border: 0;
+  background: none;
+  color: #6b6688;
+  cursor: pointer;
+}
+.demo-dialog label {
+  display: grid;
+  gap: 5px;
+  color: #4b4766;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.demo-dialog input,
+.demo-dialog textarea {
+  padding: 8px 10px;
+  border: 1px solid #d7d2ea;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 400;
+}
+.demo-dialog-intro {
+  margin: 0;
+  color: #6b6688;
+  font-size: 13px;
+}
+.demo-dialog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #4b4766;
+  font-size: 13px;
+  font-weight: 700;
+}
+.demo-dialog-nps {
+  display: grid;
+  gap: 6px;
+  color: #4b4766;
+  font-size: 13px;
+  font-weight: 700;
+}
+.demo-dialog-nps > div {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+  gap: 4px;
+}
+.demo-dialog-nps button {
+  height: 32px;
+  border: 1px solid #d7d2ea;
+  border-radius: 7px;
+  background: #fff;
+  color: #3f3477;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.demo-dialog-nps button.on {
+  border-color: #4a3d8f;
+  background: #4a3d8f;
+  color: #fff;
+}
+.demo-dialog-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.demo-dialog footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.demo-dialog footer button,
+.demo-dialog-done button {
+  padding: 8px 14px;
+  border: 1px solid #d7d2ea;
+  border-radius: 9px;
+  background: #fff;
+  color: #3f3477;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.demo-dialog .demo-dialog-primary {
+  border-color: #4a3d8f;
+  background: #4a3d8f;
+  color: #fff;
+}
+.demo-dialog .demo-dialog-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.demo-dialog-done {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  color: #1d6b43;
+  text-align: center;
+}
+.demo-dialog-done p {
+  margin: 0;
+  color: #344054;
+}
+.demo-dialog-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 12.5px;
+}
+.cloud-gate.trial-locked button.primary {
+  border-color: #4a3d8f;
+  background: #4a3d8f;
+  color: #fff;
+}
+
 /* Users of a prospect's evaluation Demo: how many colleagues it may still take */
 .people-demo-seats {
   display: flex;
@@ -4984,4 +5207,97 @@ a.auth-primary {
   .studio-list-row > div:last-child {
     grid-area: actions;
   }
+}
+
+/* Studio: what the people of an evaluation Demo think of it and ask for. */
+.evaluation-demo-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.evaluation-demo-stage.request {
+  background: #fff1d6;
+  color: #8a4b00;
+}
+.evaluation-demo-feedback {
+  display: grid;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f7f6fc;
+  font-size: 12px;
+  color: #4b4766;
+}
+.evaluation-demo-feedback h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d2939;
+}
+.evaluation-demo-feedback ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.evaluation-demo-feedback li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+.evaluation-demo-feedback li b {
+  color: #1d2939;
+}
+.evaluation-demo-feedback li.new {
+  padding: 6px 8px;
+  border-left: 3px solid #e59a1a;
+  border-radius: 6px;
+  background: #fff;
+}
+.evaluation-demo-feedback q {
+  flex-basis: 100%;
+  font-style: italic;
+}
+.evaluation-demo-feedback em {
+  color: #1d6b43;
+  font-style: normal;
+}
+.evaluation-demo-feedback button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid #c9c4e0;
+  border-radius: 999px;
+  background: #fff;
+  color: #3b3569;
+  font: inherit;
+  cursor: pointer;
+}
+.evaluation-demo-ratings li span {
+  min-width: 160px;
+}
+.evaluation-demo-ratings li b {
+  color: #b7791f;
+}
+.evaluation-demo-nps {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.evaluation-demo-nps.promoter {
+  background: #e5f6ed;
+  color: #1d6b43;
+}
+.evaluation-demo-nps.passive {
+  background: #fff4e0;
+  color: #8a4b00;
+}
+.evaluation-demo-nps.detractor {
+  background: #fdecec;
+  color: #a1281e;
 }

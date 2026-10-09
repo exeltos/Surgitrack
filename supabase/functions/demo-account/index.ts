@@ -1,19 +1,44 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
-import {appSite, esc, layout, usernameBox} from "../_shared/mail.ts";
+import {appSite, esc, layout, sendEmail, usernameBox} from "../_shared/mail.ts";
 import {grantAccess} from "../_shared/grantAccess.ts";
 
 // A prospect's evaluation Demo (platform owner only). Studio opens the Demo hospital and fills it
 // with sample data; this sends the prospect their account: the Demo's administrator, with one
 // email carrying the username, the end date and the button to set the password. Sending it again
 // (before they have signed in) gives a new set-password link.
+//  - action "notify_request": someone in a Demo asked for the application or for more time; the
+//    platform owner is emailed (the request itself is already saved and shows in Studio).
 const corsBase = {"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
 
 const athensDate = (iso: string) =>
   new Intl.DateTimeFormat("el-GR", {timeZone: "Europe/Athens", day: "2-digit", month: "2-digit", year: "numeric"}).format(
     new Date(iso),
   );
+
+const OWNER_EMAIL = "info@exeltos.com";
+
+export const requestEmail = (r: {
+  kind: string;
+  hospital: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  site: string;
+}) => ({
+  subject: r.kind === "PURCHASE" ? `Θέλει την εφαρμογή: ${r.hospital}` : `Ζητά παράταση Demo: ${r.hospital}`,
+  html: layout(
+    "DEMO ΑΞΙΟΛΟΓΗΣΗΣ",
+    r.kind === "PURCHASE" ? "Ενδιαφέρον για την εφαρμογή" : "Αίτημα παράτασης Demo",
+    `<p><b>${esc(r.name)}</b> (${esc(r.email)}${r.phone ? `, ${esc(r.phone)}` : ""}) από το Demo <b>${esc(r.hospital)}</b>
+     ${r.kind === "PURCHASE" ? "θέλει την εφαρμογή." : "ζητά περισσότερο χρόνο αξιολόγησης."}</p>
+     ${r.message ? `<p>Μήνυμα: ${esc(r.message)}</p>` : ""}
+     <p>Το αίτημα φαίνεται στο Studio → Νοσοκομεία &amp; Demo → Demo αξιολόγησης.</p>`,
+    {href: `${r.site}/#/studio`, label: "Άνοιγμα Studio"},
+  ),
+});
 
 export const demoEmail = (d: {contactName: string; hospital: string; endsAt: string; userCode: string; url: string}) => ({
   subject: `Το Demo του SurgiTrack για το ${d.hospital} είναι έτοιμο`,
@@ -40,10 +65,45 @@ Deno.serve(async req => {
     const {data: {user}, error: ue} = await caller.auth.getUser();
     if (ue || !user) return json({error: "Unauthorized"}, 401);
     const admin = createClient(url, service);
+    const body = await req.json();
+
+    // A request from someone in a Demo: only their own, and only once.
+    if (body?.action === "notify_request") {
+      const {data: r} = await admin
+        .from("demo_requests")
+        .select("id, organization_id, user_id, kind, contact_name, phone, message, created_at")
+        .eq("id", String(body.request_id || ""))
+        .maybeSingle();
+      if (!r || r.user_id !== user.id) return json({error: "Request not found"}, 404);
+      if (Date.now() - Date.parse(r.created_at) > 10 * 60_000) return json({ok: true, emailed: false});
+      // At most 3 emails an hour per person, however many requests they send.
+      const {count} = await admin
+        .from("demo_requests")
+        .select("id", {count: "exact", head: true})
+        .eq("user_id", user.id)
+        .gte("created_at", new Date(Date.now() - 3_600_000).toISOString());
+      if ((count || 0) > 3) return json({ok: true, emailed: false});
+      const [{data: org}, {data: who}, {data: settings}] = await Promise.all([
+        admin.from("organizations").select("name").eq("id", r.organization_id).single(),
+        admin.from("profiles").select("name, email").eq("id", user.id).maybeSingle(),
+        admin.from("platform_settings").select("contact_email").maybeSingle(),
+      ]);
+      const m = requestEmail({
+        kind: r.kind,
+        hospital: org?.name || "",
+        name: r.contact_name || who?.name || "",
+        email: who?.email || "",
+        phone: r.phone || "",
+        message: r.message || "",
+        site: appSite(body.redirect_to),
+      });
+      const emailed = await sendEmail([settings?.contact_email || OWNER_EMAIL], m.subject, m.html);
+      return json({ok: true, emailed});
+    }
+
     // The platform owner: an active admin who belongs to no hospital.
     const {data: cp} = await admin.from("profiles").select("id,role,active,organization_id").eq("id", user.id).single();
     if (!cp?.active || cp.role !== "ADMIN" || cp.organization_id) return json({error: "Forbidden"}, 403);
-    const body = await req.json();
     if (body?.action !== "invite") return json({error: "Unknown action"}, 400);
 
     const {data: demo} = await admin
