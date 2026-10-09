@@ -79,7 +79,7 @@ const Guard = ({permission, children}: {permission: Permission; children: ReactN
 );
 
 export default function App() {
-  const {setRole, currentUser} = useSurgi();
+  const {setSessionUser, sessionReady, currentUser} = useSurgi();
   const {lang} = useAppPreferences();
   const navigate = useNavigate();
   const location = useLocation();
@@ -136,7 +136,7 @@ export default function App() {
       sessionStorage.setItem('surgitrack-auth', '1');
       sessionStorage.setItem('surgitrack-demo-role', role);
       sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
-      setRole(role);
+      setSessionUser(user);
       setAuthenticated(true);
       setAuthReady(true);
     };
@@ -158,7 +158,7 @@ export default function App() {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [setRole]);
+  }, [setSessionUser]);
   // After sign-in the page reloads so the workspace gate can load the user's hospital.
   const login = () => {
     // Signing in normally ends any unfinished password reset in this tab.
@@ -230,6 +230,8 @@ export default function App() {
         }}
       />
     );
+  // Never show (or act as) a stand-in person outside Demo: wait until the store has the signed-in user.
+  if (!sessionReady) return <Spinner fullScreen />;
   return (
     <AppShell onLogout={logout}>
       {/* Pages re-render their text in the new language when it changes. */}

@@ -10,16 +10,21 @@ export const getActiveDepartment = (role: UserRole, user: SessionUser) =>
 /** Time-ordered, collision-free suffix for record ids (several records can be created in the same millisecond). */
 export const uniqueStamp = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-export const getDemoSessionUser = (role: UserRole): SessionUser => {
+/** The user App stored for this tab (see App.restoreSession and switchIdentity), when it matches the stored role. */
+export const readStoredSessionUser = (): SessionUser | undefined => {
   try {
-    const raw = sessionStorage.getItem('surgitrack-session-user');
-    if (raw) {
-      const user = JSON.parse(raw) as SessionUser;
-      if (user?.id && user.role === role) return user;
-    }
+    const user = JSON.parse(sessionStorage.getItem('surgitrack-session-user') || 'null') as SessionUser | null;
+    return user?.id && user.role && user.role === sessionStorage.getItem('surgitrack-demo-role') ? user : undefined;
   } catch {
-    // Fall back to the built-in demo identity.
+    return undefined;
   }
+};
+
+/** Outside Demo, before App has set the signed-in user: nobody, never a stand-in person. */
+export const unknownSessionUser = (role: UserRole): SessionUser => ({id: '', name: '', role, department: ''});
+
+/** Demo only: the built-in stand-in identity for a role. */
+export const getDemoSessionUser = (role: UserRole): SessionUser => {
   if (role === 'STERILIZATION') {
     return {
       id: 'u-ster-01',

@@ -1,7 +1,7 @@
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {getSurgiRepository, type SurgiDataMode} from '../../data/repositories';
 import type {AssetState} from '../../types/domain';
-import {getActiveDepartment, getDemoSessionUser} from '../helpers';
+import {getActiveDepartment, getDemoSessionUser, readStoredSessionUser, unknownSessionUser} from '../helpers';
 import {hasPermission, permissionsForRole} from '../../core/permissions';
 import type {SurgiInitialData} from '../../data/repositories';
 import type {CloudWorkspace} from '../../data/cloud/CloudWorkspaceGate';
@@ -30,32 +30,42 @@ export function useSurgiSession(args: {dataMode: SurgiDataMode; cloud?: CloudWor
   const [role, setRole] = useState<UserRole>(
     () => (sessionStorage.getItem('surgitrack-demo-role') as UserRole) || 'STERILIZATION',
   );
-  // Bumped when the demo identity changes without a role change (one department to another).
-  const [identityVersion, setIdentityVersion] = useState(0);
-  const currentUser = getDemoSessionUser(role);
+  // The signed-in user is kept in state (not only in sessionStorage): App sets it after sign-in, and
+  // setting the role alone would not re-render when the user's role equals the default one.
+  const [sessionUser, setSessionUserState] = useState<SessionUser | undefined>(readStoredSessionUser);
+  const setSessionUser = useCallback((user: SessionUser) => {
+    setSessionUserState(user);
+    setRole(user.role);
+  }, []);
+  const realUser = sessionUser?.role === role ? sessionUser : undefined;
+  // Only Demo has stand-in people; outside it nobody is signed in until App has set the real user.
+  const sessionReady = !!realUser || dataMode === 'DEMO';
+  const currentUser = realUser ?? (dataMode === 'DEMO' ? getDemoSessionUser(role) : unknownSessionUser(role));
   const switchIdentity = (user: SessionUser) => {
     applyDemoSessionUser(user);
-    setRole(user.role);
-    setIdentityVersion(v => v + 1);
+    setSessionUser(user);
   };
   const activeDepartment = getActiveDepartment(role, currentUser);
   const supervisor = !!currentUser.supervisor;
-  const permissions = permissionsForRole(role, rolePermissions, supervisor);
+  // Without a known user nothing may be done (and so nothing stamped with an empty name).
+  const permissions = sessionReady ? permissionsForRole(role, rolePermissions, supervisor) : [];
   const can = (permission: import('../../core/permissions').Permission) =>
-    hasPermission(role, permission, rolePermissions, supervisor);
+    sessionReady && hasPermission(role, permission, rolePermissions, supervisor);
   return {
     activeDepartment,
     can,
     cloud,
     currentUser,
     enabledStages,
-    identityVersion,
     initialData,
     nextStateAfter,
     permissions,
     reprocessState,
     role,
+    sessionReady,
+    sessionUser,
     setRole,
+    setSessionUser,
     sterilizationWorkflow,
     switchIdentity,
     systemSettings,
