@@ -88,6 +88,26 @@ export function buildSeed(organizationId: string, scale = 1) {
       return row;
     });
   }
+  // Errors users met, for Studio → Errors (platform owner).
+  const ago = (min: number) => new Date(now - min * 60_000).toISOString();
+  const error = (id: string, min: number, kind: string, message: string, route: string) => ({
+    id,
+    organization_id: organizationId,
+    user_id: null,
+    occurred_at: ago(min),
+    kind,
+    message,
+    detail: kind === 'render' ? `TypeError: ${message}\n    at SetDetailPage (SetDetailPage.tsx:212:31)` : null,
+    route,
+    app_version: '0.29.6',
+    user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/141.0',
+  });
+  tables.client_errors = [
+    error('e1', 12, 'render', "Cannot read properties of undefined (reading 'barcode')", '/sets/s3'),
+    error('e2', 95, 'render', "Cannot read properties of undefined (reading 'barcode')", '/sets/s7'),
+    error('e3', 240, 'sync', 'permission: Σετ S000321 · ΟΡΘΟΠΕΔΙΚΟ ΒΑΣΙΚΟ', '/sterilization'),
+    error('e4', 1500, 'rejection', 'Unexpected token \'<\', "<!doctype "... is not valid JSON', '/reports'),
+  ];
   // What each harness role may open: the hospital's role settings (from the seeded library) as the app
   // applies them, the Sterilization supervisor getting the supervisor-only permissions on top.
   const overrides = (library as unknown as {rolePermissions?: Partial<Record<UserRole, Permission[]>>}).rolePermissions;

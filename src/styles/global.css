@@ -9852,3 +9852,124 @@ html body .stock-table .row-sub {
     display: block;
   }
 }
+
+/* Studio → Errors (platform owner) */
+html body .studio-errors {
+  display: grid;
+  gap: 14px;
+}
+html body .studio-errors-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+html body .studio-errors-head h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+html body .studio-errors-head p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 13px;
+}
+html body .studio-errors-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+html body .studio-errors-failed {
+  color: var(--st-red);
+}
+html body .studio-errors-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 40px 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: var(--st-muted);
+}
+html body .studio-errors-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-errors-list > li {
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-error-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+html body .studio-error-kind {
+  justify-self: start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--st-red-soft);
+  color: var(--st-red);
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .studio-error-kind.kind-sync {
+  background: var(--st-amber-soft);
+  color: var(--st-amber);
+}
+html body .studio-error-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+html body .studio-error-main b {
+  overflow-wrap: anywhere;
+}
+html body .studio-error-main small,
+html body .studio-error-count small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-error-count {
+  display: grid;
+  justify-items: end;
+  white-space: nowrap;
+}
+html body .studio-error-detail {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 0 14px 14px;
+}
+html body .studio-error-detail pre {
+  width: 100%;
+  max-height: 260px;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--c-gray-95);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+@media (max-width: 700px) {
+  html body .studio-error-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .studio-error-kind {
+    grid-column: 1 / -1;
+  }
+}

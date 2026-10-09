@@ -14,6 +14,7 @@ import WorkflowTab from './tabs/WorkflowTab';
 import UsersTab from './tabs/UsersTab';
 import RolesTab from './tabs/RolesTab';
 import SystemTab from './tabs/SystemTab';
+import ErrorsTab from './tabs/ErrorsTab';
 
 export default function StudioPage() {
   const s = useStudioPage();
@@ -126,6 +127,7 @@ export default function StudioPage() {
         {tab === 'GUIDE' && <RolesGuide />}
         <RolesTab s={s} />
         <SystemTab s={s} />
+        <ErrorsTab s={s} />
       </div>
       {(editItem || newItem) && (
         <LibraryEditor

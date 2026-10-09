@@ -22,6 +22,7 @@ import {formatDate} from '../../core/displayDate';
 import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
 import {setSampleDataMark} from '../../core/sampleDataMark';
 import {setPhotoStorageOrganization} from './photoStorage';
+import {setErrorReportingOrganization} from './errorReporting';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -66,6 +67,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
     setStatus('loading');
     setSampleDataMark(false);
     setPhotoStorageOrganization(undefined);
+    setErrorReportingOrganization(undefined);
     try {
       const result = await resolveIdentity();
       if (result.status !== 'ok') {
@@ -168,6 +170,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
           }));
       }
       setPhotoStorageOrganization(organizationId);
+      setErrorReportingOrganization(organizationId);
       setWorkspace({organizationId, organizationName: org.name, records, departments});
       setStatus('ready');
     } catch (e) {
