@@ -64,7 +64,10 @@ export type SystemSettings = {
   surgicalCountDepartments?: string[];
   /** Minutes without use before the screen locks (0: never). Unset: DEFAULT_IDLE_LOCK_MINUTES. */
   idleLockMinutes?: number;
+  /** Who gets the morning reminder email (edge function `reminders`); unset: nobody. */
+  reminderEmails?: ReminderEmails;
 };
+export type ReminderEmails = 'OFF' | 'ADMINS' | 'ADMINS_SUPERVISORS';
 export const DEFAULT_IDLE_LOCK_MINUTES = 15;
 export const IDLE_LOCK_OPTIONS = [0, 5, 10, 15, 30, 60] as const;
 export type ConfigurationAuditEvent = {
