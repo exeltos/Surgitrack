@@ -267,6 +267,12 @@ export function createDatabase(seed) {
         contact_name: 'SurgiTrack Support',
         contact_email: 'support@example.test',
         contact_phone: '210 000 0000',
+        // SCREENS_MAINTENANCE=1 shows the owner's notice to every user.
+        maintenance_message:
+          process.env.SCREENS_MAINTENANCE === '1'
+            ? 'Προγραμματισμένη συντήρηση την Κυριακή 22:00–23:00. Η εφαρμογή θα είναι διαθέσιμη μόνο για ανάγνωση.'
+            : null,
+        maintenance_until: process.env.SCREENS_MAINTENANCE === '1' ? iso(3) : null,
       },
     ],
     deleted_records: [],

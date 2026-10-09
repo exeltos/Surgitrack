@@ -19,3 +19,7 @@ verify_jwt = false
 # accepts the platform owner's session (Studio "run now"), which it verifies on its own.
 [functions.demo-lifecycle]
 verify_jwt = false
+
+# Called by the database scheduler with the cron secret; it checks that (or the platform owner) itself.
+[functions.reminders]
+verify_jwt = false

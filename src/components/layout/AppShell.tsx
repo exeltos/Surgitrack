@@ -1,4 +1,4 @@
-import {Fragment, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
+import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
 import {
@@ -42,6 +42,10 @@ import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
 import {useEvaluationDemo} from '../../data/cloud/demoContext';
 import DemoBar from './DemoBar';
+import MaintenanceStrip from './MaintenanceStrip';
+import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
+import Briefing, {briefingDue} from './Briefing';
+import ScreenGuide from './ScreenGuide';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
@@ -118,6 +122,19 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const [a11y, setA11y] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  // After signing in: first what changed in this version, then what waits today (one at a time).
+  // A moment after the screen opens, so that counts loaded alongside (access requests) are in.
+  const [sinceSignIn, setSinceSignIn] = useState<'pending' | 'news' | 'briefing' | ''>('pending');
+  useEffect(() => {
+    const timer = window.setTimeout(
+      () => setSinceSignIn(whatsNewDue(can) ? 'news' : briefingDue() ? 'briefing' : ''),
+      1200,
+    );
+    return () => window.clearTimeout(timer);
+    // Once per sign-in: the shell stays mounted while the person works.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const closeBriefing = useCallback(() => setSinceSignIn(''), []);
   const [departmentReadyToast, setDepartmentReadyToast] = useState<{id: string; text: string}>();
   // A record changed on two devices at once: say where the other device's value was kept (S4).
   const [conflict, setConflict] = useState<SyncConflict>();
@@ -682,6 +699,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                 : `Trial period: ${trial.daysLeft === 1 ? '1 day left' : `${trial.daysLeft} days left`} (ends ${formatDate(trial.endsAt || '')}). The hospital locks when it ends; to continue, contact the SurgiTrack administrator.`}
           </div>
         )}
+        <MaintenanceStrip />
         {role === 'VIEWER' && (
           <div className="readonly-strip" role="status">
             <Eye size={15} />
@@ -691,6 +709,15 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           </div>
         )}
         <section className="content" ref={contentRef}>
+          {/* Not over the sign-in dialogs: once they are closed. */}
+          {sinceSignIn === '' && (
+            <ScreenGuide
+              pathname={location.pathname}
+              lang={lang === 'en' ? 'en' : 'el'}
+              can={can}
+              onHelp={() => setHelpOpen(true)}
+            />
+          )}
           {children}
         </section>
         <footer>© 2026 SurgiTrack · Healthcare Suite</footer>
@@ -699,6 +726,26 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         <Suspense fallback={null}>
           <HelpCenter onClose={() => setHelpOpen(false)} screens={navigation.map(item => item.to)} />
         </Suspense>
+      )}
+      {sinceSignIn === 'news' && (
+        <WhatsNewDialog
+          lang={lang === 'en' ? 'en' : 'el'}
+          can={can}
+          onClose={() => setSinceSignIn(briefingDue() ? 'briefing' : '')}
+        />
+      )}
+      {sinceSignIn === 'briefing' && (
+        <Briefing
+          lang={lang === 'en' ? 'en' : 'el'}
+          name={signedInName.split(' ')[0]}
+          accessRequests={accessRequests}
+          screens={navigation.map(item => item.to)}
+          onOpen={to => {
+            setSinceSignIn('');
+            navigate(to);
+          }}
+          onClose={closeBriefing}
+        />
       )}
       {toast && (
         <div className="toast" role="status">

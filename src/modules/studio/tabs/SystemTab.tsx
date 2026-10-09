@@ -2,10 +2,11 @@ import {RefreshCcw, Settings2, ShieldCheck, CheckCircle2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
+import MaintenanceNoticeSettings from '../MaintenanceNoticeSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
-import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS} from '../../../core/libraryTypes';
+import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
 import {formatDateTime} from '../../../core/displayDate';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
@@ -15,6 +16,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
       {tab === 'SYSTEM' && (
         <div className="studio-system-grid">
           {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
+          {platformAdmin && libs.dataMode === 'PRODUCTION' && <MaintenanceNoticeSettings L={L} />}
           <section>
             <header>
               <Settings2 />
@@ -95,6 +97,32 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 {L(
                   'Για κοινόχρηστα tablet και υπολογιστές: η οθόνη κλειδώνει και ξεκλειδώνει με το συνθηματικό του χρήστη· ο συγχρονισμός συνεχίζει από πίσω.',
                   'For shared tablets and computers: the screen locks and unlocks with the user’s password; syncing goes on behind it.',
+                )}
+              </small>
+            </label>
+            <label>
+              {L('Email υπενθυμίσεων κάθε πρωί', 'Reminder email every morning')}
+              <div className="studio-setting-input">
+                <select
+                  value={libs.systemSettings.reminderEmails || 'OFF'}
+                  onChange={e =>
+                    libs.updateSystemSettings({reminderEmails: e.target.value as ReminderEmails}, currentUser.name)
+                  }
+                >
+                  <option value="OFF">{L('Όχι', 'Off')}</option>
+                  <option value="ADMINS">{L('Στους διαχειριστές', 'To administrators')}</option>
+                  <option value="ADMINS_SUPERVISORS">
+                    {L(
+                      'Σε διαχειριστές και Προϊστάμενο Αποστείρωσης',
+                      'To administrators and the Sterilization supervisor',
+                    )}
+                  </option>
+                </select>
+              </div>
+              <small>
+                {L(
+                  'Περίπου 8 το πρωί, μόνο όταν κάτι περιμένει: λήξεις αποστείρωσης, έτοιμα που δεν παραλήφθηκαν, σταλμένα χωρίς παραλαβή, εκκρεμότητες άνω της εβδομάδας, συσκευές χωρίς δεδομένα. Χωρίς στοιχεία ασθενών.',
+                  'Around 8 in the morning, only when something is waiting: sterile dates ending, ready items not collected, sent items not received, issues open over a week, devices not reporting. No patient data.',
                 )}
               </small>
             </label>

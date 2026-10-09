@@ -29,3 +29,32 @@ export async function savePlatformContact(contact: PlatformContact) {
     .eq('id', true);
   if (error) throw error;
 }
+
+/** A notice the platform owner shows to every user until a time (Studio → Settings). */
+export type MaintenanceNotice = {message: string; until?: string};
+
+export async function loadMaintenanceNotice(): Promise<MaintenanceNotice | null> {
+  const {data, error} = await supabase
+    .from('platform_settings')
+    .select('maintenance_message,maintenance_until')
+    .eq('id', true)
+    .maybeSingle();
+  if (error || !data?.maintenance_message) return null;
+  return {message: data.maintenance_message, until: data.maintenance_until || undefined};
+}
+
+/** Whether the notice is still to be shown. */
+export const maintenanceActive = (notice: MaintenanceNotice | null, now = Date.now()) =>
+  !!notice?.message && (!notice.until || new Date(notice.until).getTime() > now);
+
+export async function saveMaintenanceNotice(notice: MaintenanceNotice | null) {
+  const {error} = await supabase
+    .from('platform_settings')
+    .update({
+      maintenance_message: notice?.message.trim() || null,
+      maintenance_until: notice?.message.trim() && notice.until ? notice.until : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', true);
+  if (error) throw error;
+}
