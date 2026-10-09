@@ -52,26 +52,7 @@
   min-width: 0;
   flex: none;
 }
-.asset-filter-selects {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  width: 100%;
-  overflow: visible;
-}
 /* Filters keep a readable width ("Όλα τα τμήματα") and wrap to a second line when many. */
-.asset-filter-selects select {
-  flex: 1 1 136px;
-  min-width: 136px;
-  max-width: none;
-  width: 100%;
-  text-overflow: ellipsis;
-}
-.asset-filter-icon {
-  flex: 0 0 17px;
-}
 .asset-filter-clear {
   margin: 0;
 }
@@ -190,29 +171,6 @@
 }
 
 /* The dense Stock action stays usable without making every row tall. */
-.asset-registry-table .inline-action {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 250px;
-}
-.asset-registry-table .inline-action select {
-  min-width: 150px;
-  max-width: 210px;
-  height: 34px;
-  border: 1px solid #d8e4e8;
-  border-radius: 8px;
-  background: #fff;
-  padding: 0 8px;
-  font-size: 11px;
-  color: #425d69;
-}
-.asset-registry-table .inline-action .small {
-  min-height: 34px;
-  padding: 0 9px;
-  font-size: 11px;
-  white-space: nowrap;
-}
 
 /* Useful visual hierarchy on wide asset tables. */
 .asset-registry-table th:nth-child(1) {
@@ -226,13 +184,6 @@
   .asset-filter-bar {
     grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr) auto;
   }
-  .asset-filter-selects {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-  }
-  .asset-filter-icon {
-    display: none;
-  }
 }
 @media (max-width: 1040px) {
   .asset-filter-bar {
@@ -240,11 +191,6 @@
   }
   .asset-filter-search {
     grid-column: 1/2;
-  }
-  .asset-filter-selects {
-    grid-column: 1/-1;
-    grid-row: 2;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .asset-filter-clear {
     grid-column: 2;
@@ -258,9 +204,6 @@
   .asset-filter-bar {
     grid-template-columns: minmax(0, 1fr) auto;
     padding: 8px;
-  }
-  .asset-filter-selects {
-    grid-template-columns: minmax(0, 1fr);
   }
   .asset-list-controls {
     gap: 7px;
@@ -302,12 +245,6 @@
 .asset-registry-table th:first-child,
 .asset-registry-table td:first-child {
   width: auto;
-}
-.asset-registry-table .inline-action .app-button {
-  min-height: 34px;
-  padding: 0 10px;
-  font-size: 11px;
-  white-space: nowrap;
 }
 
 /* Primary buttons inside page actions must keep the same white-on-teal treatment as every other primary action. */
@@ -712,28 +649,6 @@ body {
 }
 
 /* Asset cards no longer place photography above the working content. It lives in its own tab. */
-.asset-tab-panel > .asset-photos-card {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
-.asset-tab-panel > .asset-photos-card .asset-section-head {
-  position: static;
-  background: transparent;
-  padding: 0;
-}
-.asset-tab-panel > .asset-photos-card .photo-section-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-}
-.asset-tab-panel > .asset-photos-card .photo-actions {
-  justify-content: flex-start;
-}
-.asset-tab-panel > .asset-photos-card .asset-photo-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
 .asset-side-tabs {
   overflow-x: auto;
   scrollbar-width: none;
@@ -826,10 +741,6 @@ body {
   flex-direction: column;
   overflow: hidden !important;
 }
-.tool-detail-workspace > .back-link,
-.set-detail-workspace > .back-link,
-.tool-detail-workspace > .asset-profile-card,
-.set-detail-workspace > .asset-profile-card,
 .tool-detail-workspace > .asset-alert {
   flex: 0 0 auto;
 }
@@ -840,13 +751,11 @@ body {
   overflow: hidden;
   align-items: stretch;
 }
-.asset-workspace-left,
 .tool-identity-panel,
 .set-composition-fixed {
   min-height: 0;
   overflow: hidden;
 }
-.asset-tab-panel,
 .tool-identity-panel {
   min-height: 0;
   overflow: auto;
@@ -887,9 +796,6 @@ body {
     padding-left: 18px;
     padding-right: 18px;
   }
-  .global-scan {
-    min-width: 180px;
-  }
   .role-switch select {
     max-width: 155px;
   }
@@ -909,9 +815,6 @@ body {
   .asset-filter-bar {
     padding: 8px 10px;
   }
-  .asset-filter-selects select {
-    min-height: 40px;
-  }
   .app-button,
   .small,
   .primary {
@@ -926,10 +829,6 @@ body {
   .set-workspace-grid {
     grid-template-columns: minmax(280px, 34%) minmax(0, 66%) !important;
   }
-  .asset-profile-actions {
-    gap: 7px;
-  }
-  .asset-profile-actions .app-button,
   .asset-action-link {
     min-height: 40px !important;
   }
@@ -995,11 +894,7 @@ body {
     overscroll-behavior: contain;
   }
   .tool-identity-panel,
-  .asset-workspace-left,
   .set-composition-fixed {
-    overflow: visible;
-  }
-  .asset-tab-panel {
     overflow: visible;
   }
   .set-tool-list {
@@ -1028,27 +923,6 @@ body {
   flex-direction: column;
   overflow: hidden;
 }
-.asset-detail-topline {
-  flex: 0 0 auto;
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.asset-detail-topline .back-link {
-  font-size: 13px;
-  font-weight: 750;
-  gap: 7px;
-}
-.asset-detail-workspace > .asset-profile-card {
-  flex: 0 0 auto;
-  margin-bottom: 10px;
-  border-radius: 18px;
-}
-.asset-detail-workspace .asset-profile-head {
-  padding: 18px 22px 15px;
-  gap: 16px;
-}
 .asset-detail-workspace .asset-profile-icon {
   width: 48px;
   height: 48px;
@@ -1062,29 +936,6 @@ body {
 .asset-detail-workspace .asset-profile-title p {
   font-size: 13px;
 }
-.asset-detail-workspace .asset-profile-facts {
-  padding: 10px 22px;
-  gap: 12px;
-}
-.asset-detail-workspace .asset-profile-facts > div {
-  min-height: 54px;
-  min-width: 170px;
-  padding: 8px 13px;
-  border-radius: 11px;
-}
-.asset-detail-workspace .asset-profile-facts span,
-.asset-detail-workspace .asset-profile-facts small {
-  font-size: 11px;
-}
-.asset-detail-workspace .asset-profile-facts strong {
-  font-size: 13px;
-}
-.asset-detail-workspace .asset-profile-actions {
-  padding: 10px 22px 12px;
-  gap: 9px;
-  flex-wrap: wrap;
-}
-.asset-detail-workspace .asset-profile-actions .app-button,
 .asset-detail-workspace .asset-action-link {
   min-height: 42px !important;
   padding: 0 14px !important;
@@ -1153,21 +1004,9 @@ body {
   display: flex;
   flex-direction: column;
 }
-.asset-detail-body > .asset-section,
-.asset-detail-body > .asset-summary-grid {
+.asset-detail-body > .asset-section {
   flex: 1 1 auto;
   min-height: 0;
-}
-.asset-summary-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: 14px;
-  overflow: auto;
-  padding-bottom: 2px;
-}
-.asset-summary-card {
-  min-height: 0;
-  overflow: auto;
 }
 .asset-section-body {
   padding: 16px 18px 18px;
@@ -1292,41 +1131,14 @@ body {
 }
 
 @media (max-width: 1180px) {
-  .asset-detail-workspace .asset-profile-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .asset-detail-workspace .asset-profile-facts > div {
-    max-width: none;
-    min-width: 0;
-  }
-  .asset-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .asset-detail-body .set-tool-row {
     grid-template-columns: 38px 135px minmax(220px, 1fr) 90px 125px !important;
   }
 }
 @media (max-width: 900px) {
-  .asset-detail-workspace .asset-profile-head {
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 15px 16px 13px;
-  }
-  .asset-detail-workspace .asset-profile-status {
-    grid-column: 2;
-  }
   .asset-detail-workspace .asset-profile-title h1 {
     font-size: 22px;
     white-space: normal;
-  }
-  .asset-detail-workspace .asset-profile-facts {
-    padding: 9px 16px;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .asset-detail-workspace .asset-profile-actions {
-    padding: 9px 16px 11px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
   }
   .asset-detail-tabs {
     min-height: 50px;
@@ -1340,9 +1152,6 @@ body {
   }
   .asset-detail-body {
     overflow: hidden;
-  }
-  .asset-summary-grid {
-    overflow: auto;
   }
   .asset-detail-body .set-composition-fixed {
     overflow: hidden !important;
@@ -1363,9 +1172,6 @@ body {
   }
 }
 @media (max-width: 620px) {
-  .asset-detail-workspace .asset-profile-facts {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .asset-detail-workspace .asset-profile-icon {
     width: 42px;
     height: 42px;
@@ -1642,9 +1448,6 @@ body {
 }
 .asset-workbench-main .set-tool-list {
   border-top: 1px solid #e5ecef;
-}
-.asset-workbench-main .asset-summary-grid {
-  height: 100%;
 }
 
 @media (max-width: 1180px) {
@@ -2076,16 +1879,6 @@ body {
 }
 
 /* Full-page create workspaces: use the same focus-shell behavior as existing Set / Tool cards. */
-.asset-create-page {
-  height: calc(100vh - 108px);
-  min-height: 620px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.asset-create-page .asset-workbench-actions {
-  flex: 0 0 auto;
-}
 .asset-create-mode-label {
   display: inline-flex;
   align-items: center;
@@ -2098,126 +1891,6 @@ body {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
-}
-.asset-create-page-panel {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #dce6ea;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 12px 34px rgba(17, 48, 61, 0.07);
-}
-.asset-create-page-head {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 15px;
-  padding: 17px 20px 15px;
-  border-bottom: 1px solid #e5ecef;
-  background: linear-gradient(105deg, #f6fbfc, #fff 60%);
-}
-.asset-create-page-head h1 {
-  margin: 2px 0 4px;
-  font-size: 23px;
-  line-height: 1.15;
-  color: #20313f;
-}
-.asset-create-page-head p {
-  margin: 0;
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.asset-create-page-workspace {
-  flex: 1;
-  min-height: 0;
-  border-radius: 0;
-  border: 0;
-}
-.asset-create-tool-body {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  padding: 24px;
-  max-width: 1180px;
-  width: 100%;
-  margin: 0 auto;
-}
-.asset-create-tool-body .form-grid {
-  align-content: start;
-}
-.asset-create-page-footer {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 12px 18px;
-  border-top: 1px solid #e5ecef;
-  background: #f8fbfc;
-}
-.asset-create-page .create-set-details-pane,
-.asset-create-page .create-set-tools-pane {
-  min-height: 0;
-}
-.asset-create-page .create-set-tools-list {
-  max-height: none;
-  flex: 1;
-  min-height: 0;
-}
-.asset-create-page .create-set-details-scroll {
-  min-height: 0;
-  overflow: auto;
-}
-@media (max-width: 900px) {
-  .asset-create-page {
-    height: calc(100vh - 86px);
-  }
-  .asset-create-page-head {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .asset-create-page-head > .barcode-preview {
-    grid-column: 2;
-    justify-self: start;
-  }
-  .asset-create-tool-body {
-    padding: 16px;
-  }
-  .asset-create-page-workspace {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-  }
-  .asset-create-page .create-set-details-pane,
-  .asset-create-page .create-set-tools-pane {
-    min-height: auto;
-  }
-  .asset-create-page .create-set-tools-list {
-    max-height: 360px;
-  }
-}
-@media (max-width: 640px) {
-  .asset-create-page {
-    height: calc(100vh - 74px);
-  }
-  .asset-create-page-head {
-    padding: 14px;
-  }
-  .asset-create-page-head h1 {
-    font-size: 20px;
-  }
-  .asset-create-page-footer {
-    padding: 10px;
-    position: sticky;
-    bottom: 0;
-  }
-  .asset-create-tool-body .form-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .asset-create-tool-body .span-2 {
-    grid-column: span 1;
-  }
 }
 
 /* v0.26.6 — asset card QA: readable identity column, workflow locks and no horizontal composition scroll. */

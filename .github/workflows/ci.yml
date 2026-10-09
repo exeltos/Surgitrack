@@ -36,6 +36,8 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Unused CSS
+        run: npm run css:unused
       - name: Test
         run: npm run test
       - name: Build

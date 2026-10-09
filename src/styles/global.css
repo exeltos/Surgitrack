@@ -6,17 +6,6 @@
 @import './layers/04-reports-department-admin.css';
 
 /* Tool ownership invariants */
-.asset-inline-locked {
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  border: 1px solid var(--border, #dbe4ea);
-  border-radius: 9px;
-  background: #f6f8fa;
-  color: #667782;
-  font-size: 13px;
-}
 .asset-field-na {
   color: var(--st-muted);
   font-weight: 600;
@@ -31,7 +20,6 @@
     overflow: hidden !important;
   }
   .sterilization-workspace > .ster-work-panel > .ster-panel-head,
-  .sterilization-workspace > .ster-work-panel > .load-release-strip,
   .sterilization-workspace > .ster-work-panel > .released-loads,
   .sterilization-workspace > .ster-work-panel > .ster-list-head {
     flex: 0 0 auto;
@@ -175,14 +163,6 @@
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-count-only {
     margin: 0 10px 9px;
     padding: 8px;
-  }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-note-section {
-    padding: 9px 11px;
-  }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-note-section textarea {
-    min-height: 42px !important;
-    max-height: 52px !important;
-    resize: none !important;
   }
 }
 
@@ -417,8 +397,7 @@
   flex-wrap: nowrap !important;
   gap: 8px !important;
 }
-.sterilization-workspace .receipt-queue-panel .ster-row-action .primary.compact,
-.sterilization-workspace .receipt-queue-panel .ster-row-action .text-link {
+.sterilization-workspace .receipt-queue-panel .ster-row-action .primary.compact {
   flex: 0 0 auto;
   white-space: nowrap !important;
 }
@@ -519,125 +498,10 @@
   font: inherit;
   font-size: 13px;
 }
-.hospital-admin-summary {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 220px)) !important;
-  gap: 12px !important;
-  padding: 18px 22px !important;
-  border-bottom: 1px solid #e7eef2 !important;
-  background: #fbfdfe !important;
-}
-.hospital-admin-summary > div {
-  display: grid !important;
-  grid-template-columns: 34px minmax(0, 1fr) auto !important;
-  align-items: center !important;
-  gap: 9px !important;
-  min-height: 58px !important;
-  padding: 10px 14px !important;
-  border: 1px solid #e1e9ee !important;
-  border-radius: 12px !important;
-  background: #fff !important;
-}
-.hospital-admin-summary svg {
-  grid-row: 1/3;
-  color: #17758a;
-}
-.hospital-admin-summary span {
-  font-size: 11px;
-  color: var(--st-muted);
-}
-.hospital-admin-summary strong {
-  font-size: 21px;
-  color: #173748;
-}
-.hospital-departments {
-  margin: 18px 22px 0 !important;
-  border: 1px solid #e1e9ee !important;
-  border-radius: 13px !important;
-  background: #fff !important;
-  overflow: hidden !important;
-}
-.hospital-departments > header {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 16px !important;
-  padding: 14px 16px !important;
-  background: #f8fbfc !important;
-  border-bottom: 1px solid #e6edf1 !important;
-}
-.hospital-departments > header > div {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 3px !important;
-}
-.hospital-departments > header b {
-  font-size: 14px;
-  color: #203d4d;
-}
-.hospital-departments > header small {
-  font-size: 11px;
-  color: var(--st-muted);
-}
-.hospital-department-list {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-  gap: 10px !important;
-  padding: 12px 16px !important;
-}
-.hospital-department-list > div {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 10px !important;
-  min-height: 48px !important;
-  padding: 8px 10px 8px 13px !important;
-  border: 1px solid #e5ecef !important;
-  border-radius: 10px !important;
-}
-.hospital-department-list > div > span {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 2px !important;
-}
-.hospital-department-list b {
-  font-size: 12px;
-}
-.hospital-department-list small {
-  font-size: 11px;
-  color: var(--st-muted);
-}
-.hospital-department-list button {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #dce6eb;
-  border-radius: 8px;
-  background: #fff;
-  color: #557486;
-}
-.hospital-user-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 9px !important;
-  padding: 16px 22px 10px !important;
-}
-.hospital-user-actions .app-button {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 7px !important;
-  min-height: 38px !important;
-  cursor: pointer;
-}
 .studio-users-panel > .studio-search {
   margin: 0 22px 12px !important;
 }
 @media (max-width: 900px) {
-  .hospital-admin-summary {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
   .studio-users-panel > .studio-panel-head {
     flex-direction: column !important;
   }
@@ -662,68 +526,6 @@
   flex: 1 1 auto;
   min-height: 120px;
 }
-.hospital-admin-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-}
-.hospital-admin-summary > div.attention {
-  border-color: #f4c27a !important;
-  background: #fffaf2 !important;
-}
-.hospital-admin-summary > div.attention strong {
-  color: #b54708;
-}
-.hospital-access-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
-  gap: 16px;
-  align-items: start;
-  margin: 18px 22px 0;
-}
-.hospital-access-row > .hospital-departments {
-  margin: 0 !important;
-}
-.hospital-access-row .hospital-department-list {
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-}
-.hospital-access-row > .hospital-link {
-  border-color: #e1e9ee;
-  border-radius: 13px;
-}
-.hospital-link-requests {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-top: 12px;
-  border-top: 1px dashed #e3e9ee;
-  color: #526174;
-  font-size: 12px;
-  font-weight: 600;
-}
-.hospital-link-requests .app-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-.hospital-users-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 18px 22px 8px;
-}
-.hospital-users-toolbar > .studio-search {
-  flex: 1;
-  margin: 0 !important;
-}
-.hospital-users-toolbar .app-button {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 7px !important;
-  min-height: 39px !important;
-  white-space: nowrap;
-  cursor: pointer;
-}
 .hospital-users-empty {
   display: grid;
   justify-items: center;
@@ -741,22 +543,6 @@
 }
 .hospital-users-empty small {
   font-size: 12px;
-}
-@media (max-width: 900px) {
-  .hospital-admin-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-  .hospital-access-row {
-    grid-template-columns: minmax(0, 1fr);
-    margin: 14px 14px 0;
-  }
-  .hospital-users-toolbar {
-    flex-wrap: wrap;
-    margin: 14px 14px 8px;
-  }
-  .hospital-users-toolbar > .studio-search {
-    flex-basis: 100%;
-  }
 }
 
 /* Sign-in / signup pages: header and footer stay put, only the middle scrolls (the Greek copy
@@ -954,229 +740,11 @@
 .overview-alert small {
   color: #8a5a1d;
 }
-.overview-kpis {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
-}
-.overview-kpis > a {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  column-gap: 10px;
-  align-items: center;
-  padding: 14px 16px;
-  border: 1px solid #e3e9ee;
-  border-radius: 14px;
-  background: #fff;
-  color: #526174;
-  text-decoration: none;
-  transition: border-color 0.15s;
-}
-.overview-kpis > a:hover {
-  border-color: #8fcfdb;
-}
-.overview-kpis svg {
-  grid-row: 1 / 3;
-  color: #0e6d82;
-}
-.overview-kpis span {
-  font-size: 12px;
-}
-.overview-kpis strong {
-  color: #173748;
-  font-size: 24px;
-  line-height: 1.1;
-}
-.overview-kpis > a.warn {
-  border-color: #f4c27a;
-  background: #fffaf2;
-}
-.overview-kpis > a.warn svg,
-.overview-kpis > a.warn strong {
-  color: #b54708;
-}
-.overview-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  grid-template-areas:
-    'departments departments'
-    'movements pipeline'
-    'movements issues';
-  gap: 16px;
-  align-items: start;
-}
-.overview-departments {
-  grid-area: departments;
-}
-.overview-pipeline {
-  grid-area: pipeline;
-}
-.overview-movements {
-  grid-area: movements;
-}
-.overview-issues {
-  grid-area: issues;
-}
 .hospital-card > header > a {
   color: #0e6d82;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
-}
-.overview-table {
-  display: grid;
-  gap: 4px;
-}
-.overview-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) repeat(5, minmax(0, 0.8fr));
-  gap: 10px;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #33505f;
-  text-align: right;
-}
-.overview-row:not(.head):nth-child(even) {
-  background: #f8fbfc;
-}
-.overview-row.head {
-  color: var(--st-muted);
-  font-size: 11px;
-  white-space: nowrap;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.overview-row > span:first-child {
-  text-align: left;
-}
-.overview-name {
-  font-weight: 700;
-  color: #1d2939;
-  text-align: left;
-  text-decoration: none;
-}
-a.overview-name:hover {
-  color: #17758a;
-  text-decoration: underline;
-}
-.overview-row .good {
-  color: #067647;
-  font-weight: 800;
-}
-.overview-row .bad,
-.overview-line .bad {
-  color: #b42318;
-  font-weight: 800;
-}
-.overview-bar {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr) 36px;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-}
-.overview-bar .badge {
-  justify-self: start;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.overview-bar > div {
-  height: 8px;
-  border-radius: 999px;
-  background: #eef2f5;
-  overflow: hidden;
-}
-.overview-bar i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: #17758a;
-}
-.overview-bar strong {
-  text-align: right;
-  color: #173748;
-}
-a.overview-bar {
-  color: inherit;
-  text-decoration: none;
-  border-radius: 8px;
-  padding: 2px 4px;
-  margin: 0 -4px;
-}
-a.overview-bar:hover {
-  background: #f2f7f9;
-}
-.overview-lost {
-  color: #b42318;
-  font-weight: 700;
-}
-.overview-line {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eef2f5;
-  font-size: 13px;
-}
-.overview-line:last-of-type {
-  border-bottom: 0;
-}
-.overview-line > span {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.overview-line b {
-  color: #1d2939;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.overview-line small {
-  color: var(--st-muted);
-  font-size: 11px;
-}
-.overview-usage {
-  display: grid;
-  gap: 4px;
-  padding-top: 10px;
-  border-top: 1px dashed #e3e9ee;
-  color: #8a5a1d;
-  font-size: 12px;
-}
-.overview-usage b {
-  color: #b54708;
-}
-.overview-usage a {
-  color: inherit;
-  text-decoration: none;
-  border-radius: 6px;
-  padding: 2px 4px;
-  margin: 0 -4px;
-}
-.overview-usage a:hover,
-.overview-usage a:focus-visible {
-  background: #fff4e5;
-  text-decoration: underline;
-}
-@media (max-width: 1200px) {
-  .overview-kpis {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (max-width: 900px) {
-  .overview-grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'departments' 'pipeline' 'movements' 'issues';
-  }
-  .overview-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* The app shell's content pane does not scroll, so these pages scroll themselves. */
@@ -1393,11 +961,6 @@ a.overview-bar:hover {
     gap: 6px;
   }
 }
-.platform-demo-as {
-  font-size: 12px;
-  color: var(--muted);
-  align-self: center;
-}
 .platform-private-demo {
   flex-direction: column;
   align-items: stretch;
@@ -1503,81 +1066,8 @@ a.overview-bar:hover {
   .hospital-overview > * {
     flex-shrink: 0;
   }
-  .hospital-overview > .overview-grid {
-    flex: 1 1 auto;
-    min-height: 0;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1.2fr) minmax(0, 1fr);
-    grid-template-areas:
-      'pipeline pipeline'
-      'departments movements'
-      'departments issues';
-    align-items: stretch;
-  }
-  .overview-grid > .hospital-card {
-    min-height: 0;
-    align-content: start;
-    overflow-y: auto;
-    scrollbar-width: thin;
-  }
   /* Narrower cards: labels wrap between words, lines stack instead of being cut. */
-  .overview-grid .overview-row {
-    gap: 6px;
-    padding: 7px 8px;
-  }
-  .overview-grid .overview-row {
-    grid-template-columns: minmax(0, 1.3fr) repeat(5, minmax(0, 0.85fr));
-  }
-  .overview-grid .overview-row.head {
-    white-space: normal;
-    text-transform: none;
-    letter-spacing: 0;
-    font-size: 11px;
-    line-height: 1.2;
-    align-items: end;
-  }
-  .overview-grid .overview-line {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 3px;
-  }
-  .overview-grid .overview-line b {
-    white-space: normal;
-    overflow: visible;
-  }
   /* The sterilization flow becomes one line of stages with their counts. */
-  .overview-grid > .overview-pipeline {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 14px;
-    overflow: visible;
-    padding-top: 12px;
-    padding-bottom: 12px;
-  }
-  .overview-grid > .overview-pipeline > header {
-    position: static;
-    margin: 0 8px 0 0;
-    padding: 0;
-    border: 0;
-  }
-  .overview-grid > .overview-pipeline > header small,
-  .overview-grid > .overview-pipeline > header svg {
-    display: none;
-  }
-  .overview-grid .overview-bar {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .overview-grid .overview-bar > :nth-child(2) {
-    display: none;
-  }
-  .overview-grid > .hospital-card > header {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: inherit;
-  }
 }
 
 /* Management of an instrument or Set (admin / sterilization supervisor). */
@@ -2542,32 +2032,6 @@ a.overview-bar:hover {
   display: grid;
   gap: 14px;
 }
-.asset-import-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--st-teal-soft, #eaf6f7);
-  color: var(--st-teal, #167187);
-}
-.asset-import-card > div {
-  display: grid;
-  gap: 2px;
-  flex: 1;
-  color: var(--st-ink, #20313f);
-}
-.asset-import-card small,
-.asset-import-rules {
-  color: var(--st-muted, #6f808c);
-  font-size: 12.5px;
-}
-.asset-import-rules {
-  display: grid;
-  gap: 5px;
-  margin: 0;
-  padding-left: 18px;
-}
 .asset-import-drop {
   display: grid;
   justify-items: center;
@@ -2863,7 +2327,6 @@ a.overview-bar:hover {
   .asset-import {
     padding: 14px 12px 20px;
   }
-  .asset-import-card,
   .asset-import-history > div {
     flex-direction: column;
     align-items: stretch;
@@ -3958,81 +3421,9 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 11.5px;
 }
-.owner-hospital-head,
-.owner-hospital {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) 90px 90px minmax(150px, auto);
-  align-items: center;
-  gap: 10px;
-}
-.owner-hospital-head {
-  padding: 0 12px;
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
 .owner-hospitals {
   display: grid;
   gap: 6px;
-}
-.owner-hospital {
-  padding: 9px 12px;
-  border: 1px solid #eef2f5;
-  border-radius: 10px;
-}
-.owner-hospital.inactive {
-  opacity: 0.6;
-}
-.owner-hospital-name {
-  display: grid;
-  gap: 1px;
-  min-width: 0;
-}
-.owner-hospital-name b {
-  color: #1d2939;
-  font-size: 13.5px;
-}
-.owner-hospital-name small {
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 600;
-}
-.owner-num b {
-  color: #1d2939;
-  font-size: 14px;
-}
-.owner-num small {
-  margin-left: 3px;
-  color: var(--st-muted);
-}
-.owner-num.warn b {
-  color: #a6620c;
-}
-.owner-hospital-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-}
-.owner-open {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #e3e9ee;
-  border-radius: 8px;
-  background: #fff;
-  color: #526174;
-  cursor: pointer;
-}
-.owner-footnote {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: var(--st-muted);
-  font-size: 12px;
 }
 @media (max-width: 1100px) {
   .owner-kpis {
@@ -4052,19 +3443,6 @@ div.asset-import-hospital b {
   .owner-attention li > :last-child {
     grid-column: 2;
     justify-self: start;
-  }
-  .owner-hospital-head {
-    display: none;
-  }
-  .owner-hospital {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  .owner-hospital > .owner-num {
-    display: none;
-  }
-  .owner-hospital-actions {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
   }
 }
 /* All ten Studio tabs on one row from tablet width up: tighter spacing, and the icons go first
@@ -5686,12 +5064,6 @@ div.asset-import-hospital b {
   gap: 8px;
   margin-top: 10px;
 }
-.overview-welcome {
-  margin-bottom: 16px;
-  border: 1px dashed #c7dbe2;
-  border-radius: 14px;
-  background: #fff;
-}
 .empty-state-actions a {
   text-decoration: none;
 }
@@ -6183,9 +5555,6 @@ html
   ) {
   min-height: 32px !important;
 }
-html body .content .sign-row .primary {
-  min-height: 38px !important;
-}
 html body .content .ster-work-panel .primary.compact {
   min-height: 32px !important;
   padding-block: 0 !important;
@@ -6358,8 +5727,7 @@ html body .replacements-kpis > * {
 html body .replacements-kpis strong {
   font-size: 20px;
 }
-html body .replacements-table td small,
-html body .replacements-table td .replacement-stage {
+html body .replacements-table td small {
   display: block;
   max-width: 240px;
   overflow: hidden;
@@ -6945,17 +6313,6 @@ html body .replacements-fixed td {
   vertical-align: middle;
 }
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
-html body .count-card .scanbox > div {
-  display: grid;
-  gap: 6px;
-}
-html body .count-card .scanbox small {
-  font-size: 12px;
-  color: var(--st-muted);
-}
-html body .count-card .scanbox .set-select {
-  min-width: 340px;
-}
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
 html body .department-kpis > * {
   display: grid !important;
@@ -8248,7 +7605,6 @@ html body .ster-scan-filters {
   display: flex;
   align-items: center;
 }
-html body .ster-scan-filters .filter-menu-button,
 html body .ster-scan-filters > div > button {
   min-height: 42px;
 }
@@ -8633,17 +7989,6 @@ html body .prep-composition-status .prep-accept-missing small {
 html body .prep-block-warning {
   flex-wrap: wrap;
 }
-html body .prep-block-open {
-  margin-left: auto;
-  padding: 4px 10px;
-  border: 1px solid #e9c27f;
-  border-radius: 8px;
-  background: #fff;
-  color: #7a4a00;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
 /* Sterile dates with their symbols (ISO 15223-1: STERILE box, hourglass for use-by). */
 .sterile-dates {
   display: inline-flex;
@@ -8689,7 +8034,6 @@ html body .prep-block-warning {
   align-items: start;
   gap: 4px 8px;
 }
-html body .prep-block-warning .prep-block-open,
 html body .prep-block-warning .prep-block-hint {
   grid-column: 2;
   justify-self: start;
