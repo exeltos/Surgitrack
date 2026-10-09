@@ -21,6 +21,7 @@ import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
 import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
 import {setSampleDataMark} from '../../core/sampleDataMark';
+import {setPhotoStorageOrganization} from './photoStorage';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -64,6 +65,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
   const load = useCallback(async () => {
     setStatus('loading');
     setSampleDataMark(false);
+    setPhotoStorageOrganization(undefined);
     try {
       const result = await resolveIdentity();
       if (result.status !== 'ok') {
@@ -165,6 +167,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
             en: translateToEnglish(row.name) || row.name,
           }));
       }
+      setPhotoStorageOrganization(organizationId);
       setWorkspace({organizationId, organizationName: org.name, records, departments});
       setStatus('ready');
     } catch (e) {

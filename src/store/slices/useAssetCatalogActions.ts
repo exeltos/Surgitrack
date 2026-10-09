@@ -10,6 +10,7 @@ import type {useReceiptAndCycleActions} from './useReceiptAndCycleActions';
 import type {useLoadActions} from './useLoadActions';
 import type {useAssetHelpers} from './useAssetHelpers';
 import {formatDate} from '../../core/displayDate';
+import {removePhotoFile} from '../../data/cloud/photoStorage';
 
 export function useAssetCatalogActions(
   p: ReturnType<typeof useSurgiSession> &
@@ -339,6 +340,8 @@ export function useAssetCatalogActions(
     notify(photos.length === 1 ? tr('1 φωτογραφία προστέθηκε.') : tr('{0} φωτογραφίες προστέθηκαν.', photos.length));
   };
   const removeAssetPhoto = (kind: AssetKind, id: string, photoId: string) => {
+    const owner = kind === 'SET' ? sets.find(a => a.id === id) : tools.find(a => a.id === id);
+    void removePhotoFile(owner?.photos?.find(photo => photo.id === photoId)?.path);
     if (kind === 'SET')
       setSets(x =>
         x.map(a => (a.id === id ? {...a, photos: (a.photos || []).filter(photo => photo.id !== photoId)} : a)),

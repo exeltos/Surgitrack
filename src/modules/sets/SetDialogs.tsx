@@ -162,7 +162,7 @@ export function SetReportModal({
                 accept="image/*"
                 capture="environment"
                 multiple
-                onChange={async e => setPhotos(await filesToAssetPhotos(Array.from(e.target.files || [])))}
+                onChange={async e => setPhotos(await filesToAssetPhotos(Array.from(e.target.files || []), 'issues'))}
               />
               <small>
                 {photos.length
