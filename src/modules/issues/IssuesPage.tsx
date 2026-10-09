@@ -92,6 +92,27 @@ export default function IssuesPage() {
     },
     active: status === nextStatus && age === nextAge,
   });
+  const tabs = withReplacements ? (
+    <div className="name-check-tabs issues-tabs" role="tablist">
+      <button
+        role="tab"
+        aria-selected={tab === 'REPORTS'}
+        className={tab === 'REPORTS' ? 'active' : ''}
+        onClick={() => setParams({}, {replace: true})}
+      >
+        <ClipboardList size={16} /> {tr('Αναφορές προβλημάτων')}{' '}
+        <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
+      </button>
+      <button
+        role="tab"
+        aria-selected={tab === 'REPLACEMENTS'}
+        className={tab === 'REPLACEMENTS' ? 'active' : ''}
+        onClick={() => setParams({tab: 'replacements'}, {replace: true})}
+      >
+        <PackageX size={16} /> {tr('Αντικαταστάσεις & Παραγγελίες')} <b>{neededReplacements}</b>
+      </button>
+    </div>
+  ) : null;
   const goToOrders = () => setParams({tab: 'replacements', view: 'orders'}, {replace: true});
   return (
     <div className="tools-list-workspace">
@@ -104,30 +125,9 @@ export default function IssuesPage() {
             : tr('Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.')
         }
       />
-      {withReplacements && (
-        <div className="name-check-tabs issues-tabs" role="tablist">
-          <button
-            role="tab"
-            aria-selected={tab === 'REPORTS'}
-            className={tab === 'REPORTS' ? 'active' : ''}
-            onClick={() => setParams({}, {replace: true})}
-          >
-            <ClipboardList size={16} /> {tr('Αναφορές προβλημάτων')}{' '}
-            <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
-          </button>
-          <button
-            role="tab"
-            aria-selected={tab === 'REPLACEMENTS'}
-            className={tab === 'REPLACEMENTS' ? 'active' : ''}
-            onClick={() => setParams({tab: 'replacements'}, {replace: true})}
-          >
-            <PackageX size={16} /> {tr('Αντικαταστάσεις & Παραγγελίες')} <b>{neededReplacements}</b>
-          </button>
-        </div>
-      )}
       {tab === 'REPLACEMENTS' ? (
         <Suspense fallback={<Spinner />}>
-          <ReplacementsPage embedded />
+          <ReplacementsPage embedded tabs={tabs} />
         </Suspense>
       ) : (
         <>
@@ -148,6 +148,7 @@ export default function IssuesPage() {
               },
             ]}
           />
+          {tabs}
           <AssetFilterBar
             query={q}
             onQueryChange={setQ}

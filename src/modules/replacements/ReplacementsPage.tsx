@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {useMemo, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {
@@ -43,7 +44,8 @@ type StatusFilter = '' | 'NEEDED' | 'IN_ORDER' | 'REPLACED';
  * Instruments in Service, damaged, lost or out of use: whether the same instrument waits in Stock,
  * replacing them from Stock in one step, and recording purchase orders for the rest.
  */
-export default function ReplacementsPage({embedded = false}: {embedded?: boolean}) {
+/** `tabs`: the Issues page's tabs when embedded there, shown under these figures like on Issues. */
+export default function ReplacementsPage({embedded = false, tabs}: {embedded?: boolean; tabs?: ReactNode}) {
   const store = useSurgi();
   const {tools, retiredTools, sets, issues, movements, purchaseOrders, can, organizationName} = store;
   const editable = can('stock.manage');
@@ -252,6 +254,7 @@ export default function ReplacementsPage({embedded = false}: {embedded?: boolean
           <strong>{items.filter(i => i.status === 'IN_ORDER').length}</strong>
         </button>
       </div>
+      {tabs}
       <div className="name-check-tabs" role="tablist">
         <button
           role="tab"
