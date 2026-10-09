@@ -4,6 +4,7 @@ import {trialEndAfter, trialEnded} from '../../../core/trial';
 import {
   convertDemoAccount,
   createDemoAccount,
+  deleteDemoAccount,
   loadDemoAccounts,
   resetDemoAccount,
   seedDemoAccount,
@@ -124,6 +125,11 @@ export function useDemoAccounts() {
         text: tr('Το «{0}» έγινε πελάτης και εμφανίζεται στα Νοσοκομεία.', conversion.name),
       });
     });
+  const remove = (demo: DemoAccount) =>
+    run(demo.id, tr('Διαγραφή…'), async () => {
+      await deleteDemoAccount(demo.id);
+      setNotice({kind: 'ok', text: tr('Το «{0}» διαγράφηκε οριστικά.', demo.organizationName)});
+    });
   const handleRequest = (demo: DemoAccount, requestId: string) =>
     run(demo.id, tr('Αποθήκευση…'), () => markDemoRequestHandled(requestId));
   const enter = (demo: DemoAccount) => switchHospital(demo.organizationId, '#/');
@@ -143,6 +149,7 @@ export function useDemoAccounts() {
     handleRequest,
     changeAutoDelete,
     convert,
+    remove,
     reset,
     enter,
   };

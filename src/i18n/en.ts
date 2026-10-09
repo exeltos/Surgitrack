@@ -2005,4 +2005,9 @@ export const en: Record<string, string> = {
   'Ο κωδικός νοσοκομείου υπάρχει ήδη.': 'This hospital code is already in use.',
   'Το «{0}» έγινε πελάτης και εμφανίζεται στα Νοσοκομεία.': '“{0}” is now a customer and appears under Hospitals.',
   'Δοκιμαστικά δεδομένα': 'Sample data',
+  'Διαγραφή…': 'Deleting…',
+  'Το «{0}» διαγράφηκε οριστικά.': '“{0}” was deleted for good.',
+  'Διαγραφή Demo': 'Delete Demo',
+  'Το «{0}» θα διαγραφεί οριστικά: όλες οι εγγραφές του, οι αξιολογήσεις, τα αιτήματα και οι λογαριασμοί των {1} χρηστών του. Δεν αναιρείται.':
+    '“{0}” will be deleted for good: all its records, evaluations, requests and the accounts of its {1} users. This cannot be undone.',
 };

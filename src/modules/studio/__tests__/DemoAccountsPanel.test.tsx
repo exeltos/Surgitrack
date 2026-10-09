@@ -15,6 +15,7 @@ const service = vi.hoisted(() => ({
   markDemoRequestHandled: vi.fn(),
   setDemoAutoDelete: vi.fn(),
   convertDemoAccount: vi.fn(),
+  deleteDemoAccount: vi.fn(),
 }));
 vi.mock('../../../data/cloud/demoAccounts', () => service);
 vi.mock('../../../data/cloud/hospitalSwitch', () => ({switchHospital: vi.fn()}));
@@ -282,5 +283,19 @@ describe('Studio: evaluation Demos', () => {
     const funnel = await screen.findByLabelText('Πορεία των Demo');
     expect(within(funnel).getByText('Σύνδεση').parentElement).toHaveTextContent('Σύνδεση150%');
     expect(funnel).toHaveTextContent('Μέση σύσταση: 8,0/10');
+  });
+
+  it('deletes a Demo for good after a warning', async () => {
+    service.loadDemoAccounts.mockResolvedValue([demo({evaluatorId: 'ev', extraUsers: 2})]);
+    service.deleteDemoAccount.mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    await user.click(await screen.findByRole('button', {name: 'Διαγραφή Demo'}));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('οι λογαριασμοί των 3 χρηστών');
+    expect(dialog).toHaveTextContent('Δεν αναιρείται');
+    await user.click(within(dialog).getByRole('button', {name: 'Οριστική διαγραφή'}));
+    await waitFor(() => expect(service.deleteDemoAccount).toHaveBeenCalledWith('demo-1'));
+    expect(await screen.findByText('Το «Γ.Ν. Λάρισας · Demo» διαγράφηκε οριστικά.')).toBeInTheDocument();
   });
 });

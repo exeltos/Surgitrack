@@ -267,6 +267,16 @@ export const sendDemoInvite = async (demoId: string): Promise<DemoInviteResult> 
   return data as DemoInviteResult;
 };
 
+/** Deletes the Demo for good: the hospital, every record in it and its people's accounts. */
+export const deleteDemoAccount = async (demoId: string) => {
+  const {error} = await supabase.functions.invoke('demo-account', {body: {action: 'delete', demo_account_id: demoId}});
+  if (error) {
+    const context = (error as {context?: Response}).context;
+    const body = context && typeof context.json === 'function' ? await context.json().catch(() => null) : null;
+    throw new Error(body?.error || error.message);
+  }
+};
+
 /** A new end date: the database locks the Demo once it passes and reopens it when moved later. */
 export const setDemoEnd = async (organizationId: string, endsAt: string) => {
   const {error} = await supabase.from('organizations').update({trial_ends_at: endsAt}).eq('id', organizationId);
