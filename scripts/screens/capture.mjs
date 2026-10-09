@@ -340,9 +340,8 @@ async function main() {
         record({file, route: '/ (first load)', role, viewport, lang: LANG, landedOn: home.hash, state: home}, log);
         console.log(`  ${file}`);
       } else log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
-      // The store reads the signed-in identity from sessionStorage when it renders; on the very first load
-      // of a tab it can keep the built-in demo identity (see README, "known app issues"). One reload puts
-      // every role in its steady state, which is what the route screenshots below show.
+      // One reload puts every role in its steady state (as after a refresh), which is what the route
+      // screenshots below show; the first-load shot above covers the sign-in path.
       await page.reload();
       await settle(page);
       log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;

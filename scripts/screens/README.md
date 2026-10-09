@@ -59,10 +59,10 @@ node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,SUPE
 - The data is the Demo sample. Names such as "Demo Χρήστης Αποστείρωσης" in History come from the sample
   movements' `by` field.
 
-## Known app issue reproduced by the harness
+## Fixed: identity on the first load
 
-In a fresh tab, for a Sterilization user (`SurgiStore`'s default role), the store keeps the built-in
-demo identity "Demo Χρήστης Αποστείρωσης". `App.restoreSession` writes the real user to sessionStorage
-and calls `setRole('STERILIZATION')`. That is the same value, so `SurgiProvider` never re-renders and
-`getDemoSessionUser` is not read again. As a result, a supervisor loses the supervisor-only permissions
-until something re-renders the store. See `*_supervisor_*_home-firstload.png`.
+The harness used to show a supervisor on the first load of a tab as the built-in "Demo Χρήστης
+Αποστείρωσης", without the supervisor-only permissions: `App.restoreSession` only called
+`setRole('STERILIZATION')`, the store's default role, so the store never re-rendered. The store now keeps
+the signed-in user in state (`setSessionUser`), and outside Demo it never falls back to a stand-in
+identity. `*_supervisor_*_home-firstload.png` should show the real user.
