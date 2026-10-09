@@ -1905,6 +1905,11 @@ export const en: Record<string, string> = {
   'Τι νέο υπάρχει': "What's new",
   'Η εφαρμογή ενημερώθηκε στην έκδοση {0}.': 'The app was updated to {0}.',
   Εντάξει: 'OK',
+  'Καλημέρα, {0}': 'Good morning, {0}',
+  'Καλό απόγευμα, {0}': 'Good afternoon, {0}',
+  'Καλησπέρα, {0}': 'Good evening, {0}',
+  'Τι σας περιμένει σήμερα, {0}': 'What is waiting for you today, {0}',
+  Ξεκινάμε: "Let's start",
   'Άνοιγμα φωτογραφίας {0}': 'Open photo {0}',
   'Σετ και εργαλεία του τμήματος': 'Sets and instruments of the department',
   'Όλα τα Σετ και εργαλεία του φορτίου ανακαλούνται για επανεπεξεργασία.':

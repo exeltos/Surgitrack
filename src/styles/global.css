@@ -10039,3 +10039,60 @@ html body .whats-new-release h2 small {
   font-weight: 500;
   color: var(--st-muted);
 }
+
+/* The briefing after signing in: what waits today */
+html body .briefing-dialog {
+  width: min(520px, calc(100vw - 32px));
+}
+html body .briefing-icon {
+  background: var(--st-amber-soft, var(--c-amber-95-2));
+  color: var(--st-amber, var(--c-amber-50));
+}
+html body .briefing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 20px 16px;
+  display: grid;
+  gap: 8px;
+}
+html body .briefing-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 6px 12px 6px 6px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  color: var(--st-ink, var(--c-blue-20-3));
+  cursor: pointer;
+}
+html body .briefing-row:hover {
+  border-color: var(--c-cyan-80-2);
+  background: var(--c-gray-95-3);
+}
+html body .briefing-row b {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  border-radius: 9px;
+  font-size: 17px;
+  background: var(--st-cyan-soft, var(--c-teal-90-2));
+  color: var(--st-teal, var(--c-cyan-30-2));
+}
+html body .briefing-row.tone-act b {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red, var(--c-red-45));
+}
+html body .briefing-row.tone-warn b {
+  background: var(--st-amber-soft, var(--c-amber-95-2));
+  color: var(--st-amber, var(--c-amber-50));
+}
+html body .briefing-row svg {
+  color: var(--st-muted);
+}

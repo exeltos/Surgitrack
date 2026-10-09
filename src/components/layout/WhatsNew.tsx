@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {Sparkles, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {APP_VERSION} from '../../config/appMeta';
@@ -49,30 +48,42 @@ export function ReleaseHistory({lang, can}: {lang: 'el' | 'en'; can: (p: Permiss
 }
 
 /**
- * Once after an update, per person (devices are shared on the wards): what changed that they can use.
- * Someone who never saw a version before (a new account or device) is told nothing and starts from this one.
+ * Whether this person should see "What's new": once after an update, per person (devices are shared on the
+ * wards). Someone who never saw a version before (a new account or device) is told nothing and starts from this one.
  */
-export default function WhatsNewDialog({lang, can}: {lang: 'el' | 'en'; can: (p: Permission) => boolean}) {
+export function whatsNewDue(can: (p: Permission) => boolean) {
   const userId = getRuntimeDataMode() === 'PRODUCTION' ? getRealIdentity()?.id : undefined;
-  const [open, setOpen] = useState(() => {
-    if (!userId) return false;
-    try {
-      const seen = localStorage.getItem(seenKey(userId));
-      if (!seen) localStorage.setItem(seenKey(userId), APP_VERSION);
-      return !!seen && olderVersion(seen, APP_VERSION);
-    } catch {
-      return false;
-    }
-  });
   const release = releases.find(r => r.version === APP_VERSION);
-  if (!open || !userId || !release || !notesFor(release, can).length) return null;
+  if (!userId || !release || !notesFor(release, can).length) return false;
+  try {
+    const seen = localStorage.getItem(seenKey(userId));
+    if (!seen) localStorage.setItem(seenKey(userId), APP_VERSION);
+    return !!seen && olderVersion(seen, APP_VERSION);
+  } catch {
+    return false;
+  }
+}
+
+/** What changed in this version that the person can use; closing marks it seen. */
+export default function WhatsNewDialog({
+  lang,
+  can,
+  onClose,
+}: {
+  lang: 'el' | 'en';
+  can: (p: Permission) => boolean;
+  onClose: () => void;
+}) {
+  const release = releases.find(r => r.version === APP_VERSION);
+  if (!release) return null;
   const close = () => {
-    setOpen(false);
+    const userId = getRealIdentity()?.id;
     try {
-      localStorage.setItem(seenKey(userId), APP_VERSION);
+      if (userId) localStorage.setItem(seenKey(userId), APP_VERSION);
     } catch {
       // Private mode: asked again next time.
     }
+    onClose();
   };
   return (
     <div className="modal-backdrop confirm-dialog-backdrop" onMouseDown={e => e.currentTarget === e.target && close()}>

@@ -174,7 +174,7 @@ async function newContext(browser, {viewport, account, db, log}) {
   });
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
-    ({lang, key, session, whatsNew}) => {
+    ({lang, key, session, whatsNew, briefing}) => {
       // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
       window.__longTasks = [];
       try {
@@ -193,8 +193,18 @@ async function newContext(browser, {viewport, account, db, log}) {
       else localStorage.removeItem(key);
       // "What's new" opens only with SCREENS_WHATS_NEW=1 (as after an update); otherwise it was already seen.
       if (session) localStorage.setItem(`surgitrack-seen-version:${session.user.id}`, whatsNew ? '0.0.1' : '999.0.0');
+      // The day's briefing opens only with SCREENS_BRIEFING=1; otherwise it was seen today.
+      const d = new Date();
+      const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (session) localStorage.setItem(`surgitrack-briefing-seen:${session.user.id}`, briefing ? '' : today);
     },
-    {lang: LANG, key: STORAGE_KEY, session, whatsNew: process.env.SCREENS_WHATS_NEW === '1'},
+    {
+      lang: LANG,
+      key: STORAGE_KEY,
+      session,
+      whatsNew: process.env.SCREENS_WHATS_NEW === '1',
+      briefing: process.env.SCREENS_BRIEFING === '1',
+    },
   );
   // Every Supabase call is answered here; anything else off this machine is refused (and logged).
   await context.route(
