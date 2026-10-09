@@ -1953,4 +1953,7 @@ export const en: Record<string, string> = {
   'Επαναφορά δεδομένων…': 'Resetting data…',
   'Τα δεδομένα του «{0}» επανήλθαν στα αρχικά δοκιμαστικά.': 'The data of «{0}» is back to the original sample data.',
   'Ο κωδικός του νοσοκομείου δημιουργείται αυτόματα.': 'The hospital code is made automatically.',
+  Δεδομένα: 'Data',
+  ' · επαναφορά, {0} εγγραφές': ' · reset, {0} records',
+  ' · {0} εγγραφές': ' · {0} records',
 };

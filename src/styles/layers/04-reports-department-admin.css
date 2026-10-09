@@ -4040,7 +4040,7 @@
 }
 .evaluation-demo-facts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 8px;
   margin: 0;
 }
@@ -4113,9 +4113,6 @@
   .platform-evaluation-demos > header {
     align-items: stretch;
     flex-direction: column;
-  }
-  .evaluation-demo-facts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
