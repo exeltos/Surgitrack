@@ -12,3 +12,9 @@ The existing cascade was preserved exactly and split into ordered layers so that
 ## Rule for future changes
 
 Prefer editing the owning layer and existing selector. Do not add a new version-stamped override at the end of the stylesheet unless there is a temporary compatibility reason. Shared UI primitives should live with the shared/core rules; workspace-specific rules should stay in their owning layer.
+
+## Unused selectors
+
+`npm run css:unused` lists the class selectors in these files that no string in `src/` can produce (it exits 1
+when there are some); `node scripts/css-unused.mjs --fix` removes them. Check with the screenshot harness
+(`scripts/screens`) before and after.
