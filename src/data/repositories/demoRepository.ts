@@ -12,6 +12,7 @@ import {
   tools,
 } from '../demo';
 import type {SurgiInitialData, SurgiRepository} from './types';
+import {demoShiftDays, shiftDemoDates} from '../demoDates';
 
 const cloneInitialData = (): SurgiInitialData => ({
   sets: sets.map(item => ({
@@ -46,5 +47,6 @@ const cloneInitialData = (): SurgiInitialData => ({
 
 export const demoSurgiRepository: SurgiRepository = {
   mode: 'DEMO',
-  getInitialData: cloneInitialData,
+  // Written as of one day; every date moves to today's equivalent, so the Demo always looks current.
+  getInitialData: () => shiftDemoDates(cloneInitialData(), demoShiftDays()),
 };

@@ -1,6 +1,6 @@
 import {supabase} from '../../lib/supabase';
 import type {DemoAccount} from '../../core/demoAccounts';
-import {seedDemoOrganization} from './demoSeed';
+import {DEMO_PACK_VERSION, seedDemoOrganization} from './demoSeed';
 
 type DemoRow = {
   id: string;
@@ -19,6 +19,8 @@ type DemoRow = {
   organization: {name: string; code: string; active: boolean; trial_ends_at: string | null} | null;
 };
 
+type SeedRunRow = {organization_id: string; kind: 'SEED' | 'RESET'; records: number; created_at: string};
+
 /** Every evaluation Demo, newest first, with where its prospect and their colleagues stand. */
 export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   const {data, error} = await supabase
@@ -30,7 +32,19 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   if (error) throw error;
   const rows = (data || []) as unknown as DemoRow[];
   const people = new Map<string, Array<{id: string; active: boolean; user_code: string | null}>>();
+  const lastRun = new Map<string, SeedRunRow>();
   if (rows.length) {
+    const {data: runs, error: runsError} = await supabase
+      .from('demo_seed_runs')
+      .select('organization_id,kind,records,created_at')
+      .in(
+        'organization_id',
+        rows.map(row => row.organization_id),
+      )
+      .order('created_at', {ascending: false});
+    if (runsError) throw runsError;
+    for (const run of (runs || []) as SeedRunRow[])
+      if (!lastRun.has(run.organization_id)) lastRun.set(run.organization_id, run);
     const {data: profiles, error: profilesError} = await supabase
       .from('profiles')
       .select('id,active,user_code,organization_id')
@@ -69,6 +83,13 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
       evaluatorActive: !!evaluator?.active,
       evaluatorCode: evaluator?.user_code || undefined,
       extraUsers: members.filter(p => p.id !== row.evaluator_id).length,
+      lastLoad: lastRun.get(row.organization_id)
+        ? {
+            kind: lastRun.get(row.organization_id)!.kind,
+            at: lastRun.get(row.organization_id)!.created_at,
+            records: lastRun.get(row.organization_id)!.records,
+          }
+        : undefined,
     };
   });
 };
@@ -96,15 +117,24 @@ export const createDemoAccount = async (demo: NewDemo) => {
   return data as {id: string; organization_id: string; code: string};
 };
 
-/** Fills the Demo with the sample hospital and notes when it was done. */
+/** Fills the Demo with the sample hospital (dates moved to today) and records the load. */
 export const seedDemoAccount = async (
   demo: Pick<DemoAccount, 'id' | 'organizationId'>,
   onProgress?: (done: number, total: number) => void,
+  kind: 'SEED' | 'RESET' = 'SEED',
 ) => {
-  await seedDemoOrganization(demo.organizationId, {evaluation: true, onProgress});
+  const seeded = await seedDemoOrganization(demo.organizationId, {evaluation: true, onProgress});
   const now = new Date().toISOString();
   const {error} = await supabase.from('demo_accounts').update({seeded_at: now, updated_at: now}).eq('id', demo.id);
   if (error) throw error;
+  // The record of the load is for the owner's view; a failure here does not undo the Demo.
+  await supabase.from('demo_seed_runs').insert({
+    organization_id: demo.organizationId,
+    kind,
+    pack_version: DEMO_PACK_VERSION,
+    shifted_days: seeded.shiftedDays,
+    records: seeded.records,
+  });
 };
 
 export type DemoInviteResult = {ok: true; user_code: string; emailed: boolean; url?: string};
@@ -133,5 +163,5 @@ export const setDemoEnd = async (organizationId: string, endsAt: string) => {
 export const resetDemoAccount = async (demo: Pick<DemoAccount, 'id' | 'organizationId'>) => {
   const {error} = await supabase.rpc('platform_reset_demo_organization', {p_org: demo.organizationId});
   if (error) throw error;
-  await seedDemoAccount(demo);
+  await seedDemoAccount(demo, undefined, 'RESET');
 };

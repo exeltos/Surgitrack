@@ -193,6 +193,25 @@ function DemoCard({
           <dt>{tr('Email')}</dt>
           <dd>{demo.invitedAt ? formatDate(demo.invitedAt) : '—'}</dd>
         </div>
+        <div>
+          <dt>{tr('Δεδομένα')}</dt>
+          <dd>
+            {demo.lastLoad ? (
+              <>
+                {formatDate(demo.lastLoad.at)}
+                <em>
+                  {demo.lastLoad.kind === 'RESET'
+                    ? tr(' · επαναφορά, {0} εγγραφές', demo.lastLoad.records)
+                    : tr(' · {0} εγγραφές', demo.lastLoad.records)}
+                </em>
+              </>
+            ) : demo.seededAt ? (
+              formatDate(demo.seededAt)
+            ) : (
+              '—'
+            )}
+          </dd>
+        </div>
       </dl>
       {busy && busy !== 'other' ? (
         <p className="evaluation-demo-busy">{busy}</p>

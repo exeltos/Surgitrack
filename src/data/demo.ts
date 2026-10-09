@@ -1,6 +1,7 @@
 import type {SurgicalCount} from '../store/types';
 import {isoDate} from '../core/sterileExpiry';
 import {formatDate} from '../core/displayDate';
+import {DEMO_ANCHOR} from './demoDates';
 import type {
   DeliveryRecord,
   Issue,
@@ -735,14 +736,14 @@ export const issues: Issue[] = [
 // History for the fuller demo: movements, issues, sterilizer loads and signed handovers.
 const setByCode = (code: string) => sets.find(set => set.code === code)!;
 
-// Sterile shelf life (step 4): dates relative to today, so the demo always has Sets that are fine,
+// Sterile shelf life (step 4): dates relative to the sample's day (moved to today on loading), so the demo always has Sets that are fine,
 // expiring (last month, or last 10 days for 2 months) and expired.
 export const preparations: PreparationRecord[] = [];
 export const sterilizationReleases: SterilizationReleaseRecord[] = [];
 const demoSterile = (code: string, daysFromToday: number, months: number) => {
   const set = sets.find(item => item.code === code);
   if (!set) return;
-  const until = new Date();
+  const until = new Date(DEMO_ANCHOR);
   until.setDate(until.getDate() + daysFromToday);
   set.sterileUntil = isoDate(until);
   set.shelfLifeMonths = months;
@@ -1019,9 +1020,9 @@ issues.push(
     note: 'Αντικαταστάθηκε από το stock.',
   },
 );
-// Two recent reports (dated from today), so the Issues cards show "open" apart from "open over 7 days".
+// Two recent reports (dated from the sample's day, which loading moves to today), so the Issues cards show "open" apart from "open over 7 days".
 const demoDaysAgo = (days: number, time: string) => {
-  const day = new Date();
+  const day = new Date(DEMO_ANCHOR);
   day.setDate(day.getDate() - days);
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${pad(day.getDate())}/${pad(day.getMonth() + 1)}/${day.getFullYear()} ${time}`;

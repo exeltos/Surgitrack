@@ -33,6 +33,8 @@ export type DemoAccount = {
   evaluatorCode?: string;
   /** Accounts in the Demo besides the prospect's. */
   extraUsers: number;
+  /** The latest load of the sample hospital: first fill or reset. */
+  lastLoad?: {kind: 'SEED' | 'RESET'; at: string; records: number};
 };
 
 /**
