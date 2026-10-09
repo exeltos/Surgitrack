@@ -25,7 +25,7 @@ export default function OrganizationEditor({
   const [adminEmail, setAdminEmail] = useState('');
   const emailOk = !adminEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim());
   const adminOk = !!organization || (adminName.trim() && adminEmail.trim() && emailOk);
-  const ready = name.trim() && code.trim() && adminOk && (plan === 'STANDARD' || endDate);
+  const ready = name.trim() && (!organization || code.trim()) && adminOk && (plan === 'STANDARD' || endDate);
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <aside className="studio-drawer">
@@ -43,14 +43,14 @@ export default function OrganizationEditor({
             {tr('Ονομασία')}
             <input autoFocus value={name} onChange={e => setName(e.target.value)} />
           </label>
-          <label>
-            {tr('Κωδικός')}
-            <input
-              value={code}
-              onChange={e => setCode(e.target.value.toUpperCase())}
-              placeholder={tr('π.χ. HOSP-01')}
-            />
-          </label>
+          {organization ? (
+            <label>
+              {tr('Κωδικός')}
+              <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} />
+            </label>
+          ) : (
+            <small className="studio-field-hint">{tr('Ο κωδικός του νοσοκομείου δημιουργείται αυτόματα.')}</small>
+          )}
           <fieldset className="studio-plan">
             <legend>{tr('Χρήση')}</legend>
             <label className={plan === 'STANDARD' ? 'active' : ''}>

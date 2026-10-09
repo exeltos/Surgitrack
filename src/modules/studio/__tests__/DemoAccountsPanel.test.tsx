@@ -90,7 +90,9 @@ describe('Studio: evaluation Demos', () => {
   });
 
   it('continues a Demo stopped half-way from where it stopped', async () => {
-    service.loadDemoAccounts.mockResolvedValue([demo({status: 'PREPARING', seededAt: undefined, invitedAt: undefined})]);
+    service.loadDemoAccounts.mockResolvedValue([
+      demo({status: 'PREPARING', seededAt: undefined, invitedAt: undefined}),
+    ]);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
     await user.click(await screen.findByRole('button', {name: 'Συνέχεια προετοιμασίας'}));
@@ -99,7 +101,12 @@ describe('Studio: evaluation Demos', () => {
 
   it('shows the link to pass on when the email could not be sent', async () => {
     service.loadDemoAccounts.mockResolvedValue([demo({status: 'PREPARING'})]);
-    service.sendDemoInvite.mockResolvedValue({ok: true, user_code: 'MP1234', emailed: false, url: 'https://x/?st_token=t'});
+    service.sendDemoInvite.mockResolvedValue({
+      ok: true,
+      user_code: 'MP1234',
+      emailed: false,
+      url: 'https://x/?st_token=t',
+    });
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
     await user.click(await screen.findByRole('button', {name: 'Αποστολή email'}));

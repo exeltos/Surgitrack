@@ -1952,4 +1952,5 @@ export const en: Record<string, string> = {
     'The email was not sent. Send the contact person this link:',
   'Επαναφορά δεδομένων…': 'Resetting data…',
   'Τα δεδομένα του «{0}» επανήλθαν στα αρχικά δοκιμαστικά.': 'The data of «{0}» is back to the original sample data.',
+  'Ο κωδικός του νοσοκομείου δημιουργείται αυτόματα.': 'The hospital code is made automatically.',
 };

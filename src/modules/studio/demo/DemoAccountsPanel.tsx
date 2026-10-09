@@ -23,30 +23,40 @@ const STAGE_LABEL: Record<DemoStage, string> = {
 };
 
 /** Studio → Platform: the prospects' evaluation Demos, each with its own hospital and sample data. */
-export default function DemoAccountsPanel() {
+export default function DemoAccountsPanel({
+  creating: creatingProp,
+  onCreatingChange,
+}: {
+  /** Whether the new-Demo form is open, when the page opens it from its own button. */
+  creating?: boolean;
+  onCreatingChange?: (open: boolean) => void;
+} = {}) {
   const d = useDemoAccounts();
-  const [creating, setCreating] = useState(false);
+  const [creatingOwn, setCreatingOwn] = useState(false);
+  const creating = creatingProp ?? creatingOwn;
+  const setCreating = (open: boolean) => (onCreatingChange ? onCreatingChange(open) : setCreatingOwn(open));
   const [confirmNode, ask] = useConfirm();
   const counts = d.demos.reduce(
     (acc, demo) => ({...acc, [demoStage(demo)]: (acc[demoStage(demo)] || 0) + 1}),
     {} as Partial<Record<DemoStage, number>>,
   );
   return (
-    <section className="platform-evaluation-demos" aria-label={tr('Demo αξιολόγησης')}>
+    <section
+      className={`platform-evaluation-demos ${onCreatingChange ? 'embedded' : ''}`}
+      aria-label={tr('Demo αξιολόγησης')}
+    >
       <header>
-        <div>
-          <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
-          <strong>{tr('Demo για υποψήφιους πελάτες')}</strong>
-          <small>
-            {tr(
-              'Κάθε Demo είναι ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα. Ο υπεύθυνος λαμβάνει email με τον λογαριασμό του και το Demo κλειδώνει στη λήξη του.',
-            )}
-          </small>
-        </div>
-        <AppButton variant="primary" onClick={() => setCreating(true)} disabled={!!d.busy}>
-          <Plus size={16} />
-          {tr('Νέο Demo')}
-        </AppButton>
+        <small>
+          {tr(
+            'Κάθε Demo είναι ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα. Ο υπεύθυνος λαμβάνει email με τον λογαριασμό του και το Demo κλειδώνει στη λήξη του.',
+          )}
+        </small>
+        {!onCreatingChange && (
+          <AppButton variant="primary" onClick={() => setCreating(true)} disabled={!!d.busy}>
+            <Plus size={16} />
+            {tr('Νέο Demo')}
+          </AppButton>
+        )}
       </header>
       {!!d.demos.length && (
         <div className="evaluation-demo-counts">

@@ -3536,8 +3536,8 @@
 
 /* v0.29.1 — Platform administration & controlled demo access */
 .studio-platform-panel {
-  /* header, KPIs, private demo, hospital list, empty state: only the list takes the free height */
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  /* header, KPIs, section switch, the section: only the section takes the free height */
+  grid-template-rows: auto auto auto minmax(0, 1fr);
 }
 .platform-kpis {
   display: grid;
@@ -3565,120 +3565,6 @@
 .platform-kpis strong {
   font-size: 17px;
   color: var(--studio-ink, #203d4f);
-}
-.platform-org-list {
-  min-height: 0;
-  overflow: auto;
-  padding: 12px 16px 18px;
-  display: grid;
-  align-content: start;
-  gap: 9px;
-}
-.platform-org-card {
-  /* One row per hospital that wraps instead of overflowing: identity, status, demo entry, summary, manage. */
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 24px;
-  padding: 14px 16px;
-  border: 1px solid #dfe9ed;
-  border-radius: 12px;
-  background: #fff;
-}
-.platform-org-main,
-.platform-org-status,
-.platform-org-meta,
-.platform-demo-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.platform-org-main {
-  flex: 1 1 240px;
-  gap: 12px;
-}
-.platform-org-main > div:last-child {
-  min-width: 0;
-  display: grid;
-  gap: 2px;
-}
-.platform-org-main strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 15px;
-  color: var(--studio-ink, #203d4f);
-}
-.platform-org-main small,
-.platform-org-meta,
-.platform-demo-actions > span {
-  color: #7b8f9d;
-  font-size: 11.5px;
-}
-.platform-org-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  display: grid;
-  place-items: center;
-  background: #edf6f8;
-  color: #176f82;
-  flex: 0 0 auto;
-}
-.platform-org-status {
-  flex: 0 0 auto;
-  gap: 14px;
-  white-space: nowrap;
-}
-.platform-demo-actions {
-  flex: 0 1 auto;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.platform-demo-actions button {
-  border: 1px solid #d6e3e8;
-  background: #f8fbfc;
-  color: #31586a;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 650;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.platform-demo-actions button:not(:disabled):hover {
-  background: #eaf6f8;
-  border-color: #9ccbd5;
-}
-.platform-demo-actions button:disabled {
-  opacity: 0.42;
-  cursor: not-allowed;
-}
-.platform-org-meta {
-  flex: 0 0 auto;
-  margin-left: auto;
-  gap: 16px;
-  white-space: nowrap;
-}
-.platform-manage-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 12px;
-  border: 1px solid #d8e4e9;
-  border-radius: 10px;
-  background: #fff;
-  color: #365d70;
-  font-size: 12.5px;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.platform-manage-btn:hover {
-  background: #eaf6f8;
-  border-color: #9ccbd5;
 }
 .studio-access-toggle.demo.active {
   color: #14764f;
@@ -3735,7 +3621,7 @@
 }
 .platform-private-demo {
   align-self: start;
-  margin: 12px 16px 0;
+  margin: 12px 16px 16px;
   padding: 13px 14px;
   border: 1px solid #cfe5ea;
   border-radius: 12px;
@@ -3761,10 +3647,11 @@
 }
 .platform-private-demo-actions {
   display: flex;
+  align-items: center;
   gap: 7px;
   flex: 0 0 auto;
 }
-.platform-private-demo-actions button {
+.platform-private-demo-actions button:not(.app-button) {
   min-height: 34px;
   padding: 0 11px;
   border: 1px solid #c7dce2;
@@ -3775,15 +3662,15 @@
   font-weight: 700;
   cursor: pointer;
 }
-.platform-private-demo-actions button:hover {
+.platform-private-demo-actions button:not(.app-button):hover {
   background: #eaf6f8;
   border-color: #9ccbd5;
 }
-.platform-private-demo-actions .platform-demo-reset {
+.platform-private-demo-actions button.platform-demo-reset {
   color: #b42318;
   border-color: #fecdca;
 }
-.platform-private-demo-actions .platform-demo-reset:hover {
+.platform-private-demo-actions button.platform-demo-reset:hover {
   background: #fef3f2;
   border-color: #fda29b;
 }
@@ -3797,9 +3684,215 @@
   }
 }
 
+/* Studio → Platform: header buttons, section switch, one row per hospital */
+.platform-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.platform-views {
+  display: flex;
+  gap: 4px;
+  padding: 10px 16px 0;
+  border-bottom: 1px solid #e7eef1;
+}
+.platform-views button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #5b7282;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.platform-views button:hover {
+  color: #1f4d61;
+}
+.platform-views button.active {
+  color: #12546a;
+  border-bottom-color: #167187;
+}
+.platform-views b {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #e8f1f4;
+  color: #36586a;
+  font-size: 11px;
+  text-align: center;
+}
+.platform-hospitals {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 16px 18px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.platform-hospital {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1.4fr) minmax(0, 1.6fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid #dfe9ed;
+  border-radius: 12px;
+  background: #fff;
+}
+.platform-hospital:hover {
+  border-color: #c4dbe2;
+}
+.platform-hospital.inactive {
+  background: #f8fafb;
+}
+.platform-hospital.inactive .platform-hospital-name strong {
+  color: #6f808c;
+}
+.platform-hospital-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #eaf4f7;
+  color: #167187;
+}
+.platform-hospital-name {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.platform-hospital-name strong {
+  color: #1d3a4b;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.platform-hospital-name small {
+  color: #6f808c;
+  font-size: 11.5px;
+}
+.platform-hospital-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.platform-hospital-badges .plan-badge {
+  margin-top: 0;
+}
+.platform-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.platform-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.platform-status.on {
+  background: #e7f6ee;
+  color: #1d6b43;
+}
+.platform-status.off {
+  background: #f1f3f5;
+  color: #6b7785;
+}
+.platform-status.demo {
+  background: #f1eefc;
+  color: #4a3d8f;
+}
+.platform-hospital-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.platform-quick {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid #cfe5ea;
+  border-radius: 10px;
+  background: #f4fafb;
+  color: #1f5d70;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.platform-quick:hover {
+  background: #e6f3f6;
+}
+.platform-private-demo-actions label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #526c79;
+  font-size: 12px;
+  font-weight: 700;
+}
+.platform-private-demo-actions select {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #c7dce2;
+  border-radius: 9px;
+  background: #fff;
+  color: #24485a;
+  font: inherit;
+  font-size: 12.5px;
+}
+.platform-private-demo-actions button.platform-demo-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+@media (max-width: 1100px) {
+  .platform-hospital {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .platform-hospital-badges {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+}
+@media (max-width: 700px) {
+  .platform-hospital {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .platform-hospital-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .platform-head-actions {
+    justify-content: flex-start;
+  }
+}
+
 /* Studio → Platform: the prospects' evaluation Demos */
 .platform-evaluation-demos {
-  margin: 12px 16px 0;
+  min-height: 0;
+  overflow: auto;
+  align-content: start;
+  margin: 12px 16px 16px;
   padding: 13px 14px;
   border: 1px solid #d9d2f2;
   border-radius: 12px;
@@ -3813,14 +3906,12 @@
   justify-content: space-between;
   gap: 18px;
 }
-.platform-evaluation-demos > header > div {
-  min-width: 0;
-  display: grid;
-  gap: 3px;
-}
-.platform-evaluation-demos > header strong {
-  color: #3b2f6b;
-  font-size: 12.5px;
+.platform-evaluation-demos.embedded {
+  margin: 0;
+  padding: 12px 16px 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 .platform-evaluation-demos small {
   color: #6b6688;
