@@ -219,7 +219,16 @@ async function settle(page) {
   await page.waitForTimeout(SETTLE_MS);
 }
 
+// SCREENS_EVAL: a JavaScript expression evaluated on every captured screen, its result kept as
+// state.probe in index.json (for measuring a layout problem, e.g. element widths).
+const PROBE = process.env.SCREENS_EVAL;
+
 async function pageState(page) {
+  const probe = PROBE ? await page.evaluate(PROBE).catch(e => String(e)) : undefined;
+  return {...(await layoutState(page)), ...(probe === undefined ? {} : {probe})};
+}
+
+async function layoutState(page) {
   return page.evaluate(() => {
     const text = document.body.innerText || '';
     return {
@@ -233,6 +242,40 @@ async function pageState(page) {
       textLength: text.trim().length,
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
       scrollWidth: document.documentElement.scrollWidth,
+      // Visible elements that stick out sideways from the window or from a parent that clips them
+      // (overflow hidden or scrolling): cut-off content the page-level check above cannot see.
+      clipped: (() => {
+        const found = [];
+        const describe = el =>
+          el.tagName.toLowerCase() +
+          (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).join('.') : '');
+        for (const el of document.querySelectorAll('body *')) {
+          if (found.length >= 12) break;
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height || getComputedStyle(el).visibility === 'hidden') continue;
+          // Off-canvas on purpose (the phone menu drawer).
+          if (r.right <= 0 || r.left >= window.innerWidth) continue;
+          let limit = window.innerWidth;
+          let left = 0;
+          // A fixed element is laid out against the window, whatever its parents clip.
+          const fixed = getComputedStyle(el).position === 'fixed';
+          for (let p = fixed ? null : el.parentElement; p && p !== document.body; p = p.parentElement) {
+            const s = getComputedStyle(p);
+            if (s.overflowX !== 'visible') {
+              const pr = p.getBoundingClientRect();
+              limit = Math.min(limit, pr.right);
+              left = Math.max(left, pr.left);
+              break;
+            }
+          }
+          const over = Math.round(Math.max(r.right - limit, left - r.left));
+          // Report the outermost offender only: skip elements whose parent already sticks out.
+          const parent = el.parentElement?.getBoundingClientRect();
+          if (over > 2 && !(parent && (parent.right - limit > 2 || left - parent.left > 2)))
+            found.push({el: describe(el), by: over, text: (el.innerText || '').trim().slice(0, 40)});
+        }
+        return found;
+      })(),
     };
   });
 }
@@ -242,7 +285,11 @@ async function pageState(page) {
  * (lists, tables), so "full page" alone would cut them: the window is made taller until no panel
  * scrolls any more (as on a very tall screen), then put back.
  */
+// SCREENS_BEFORE: a JavaScript expression run just before each screenshot (e.g. scroll a panel).
+const BEFORE = process.env.SCREENS_BEFORE;
+
 async function shoot(page, file, viewport) {
+  if (BEFORE) await page.evaluate(BEFORE).catch(() => undefined);
   const size = VIEWPORTS[viewport];
   let height = size.height;
   for (let i = 0; i < 5; i++) {

@@ -7598,6 +7598,23 @@ html body .load-modal .cycle-note textarea {
 html body .ster-scan.ster-scan-restored {
   grid-template-columns: auto auto minmax(0, 1fr) auto;
 }
+/* Phone: title and Filters on the first line, the search field on its own full-width line. */
+@media (max-width: 700px) {
+  html body .ster-scan.ster-scan-restored {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-input,
+  html body .ster-scan.ster-scan-restored .ster-scan-feedback-inline {
+    grid-column: 1 / -1;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-input {
+    grid-row: 2;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-filters {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
 html body .ster-scan-filters {
   display: flex;
   align-items: center;
@@ -7837,6 +7854,19 @@ html body .delivery-batch-modal .barcode-camera-btn {
 html body .delivery-batch-modal .barcode-capture .load-camera-panel,
 html body .delivery-batch-modal .barcode-capture .load-scan-feedback {
   grid-column: 1 / -1;
+}
+/* Phone: the title and Camera on the first line, the barcode field on its own line. */
+@media (max-width: 700px) {
+  html body .delivery-batch-modal .barcode-capture {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .delivery-batch-modal .barcode-camera-btn {
+    grid-column: 2;
+  }
+  html body .delivery-batch-modal .barcode-capture .load-barcode-entry {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 html body .delivery-batch-modal .handover-signature-row {
   display: grid;
@@ -9210,4 +9240,35 @@ html body .idle-lock-password button[aria-pressed='true'] {
 /* Sign-out questions show above the screen lock (z-index 10000), which can start them. */
 .sign-out-guard .confirm-dialog-backdrop {
   z-index: 10001;
+}
+
+/* Sterilization on a phone: the page scrolls as a whole and the queue takes the height its rows
+   need (the desktop layout keeps the page fixed and left the queue a window of about 150 px, with
+   its header squeezed so «Μαζική παραλαβή» sat on the first row). The long scan hint is left out. */
+@media (max-width: 700px) {
+  html body .content:has(> .sterilization-workspace) {
+    overflow-y: auto;
+  }
+  html body .sterilization-workspace {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  html body .sterilization-workspace > .ster-work-panel {
+    flex: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  html body .sterilization-workspace .ster-panel-head {
+    flex-shrink: 0;
+    position: static;
+  }
+  html body .sterilization-workspace .ster-list-scroll {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-copy span {
+    display: none;
+  }
 }

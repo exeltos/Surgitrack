@@ -4725,6 +4725,11 @@ td {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   text-transform: uppercase;
 }
+/* The hint reads as ordinary text; what is typed stays a monospace, capital barcode. */
+.load-barcode-entry input::placeholder {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  text-transform: none;
+}
 .load-barcode-entry button {
   height: 32px;
   border: 1px solid #c8dce2;
@@ -7073,4 +7078,69 @@ td {
   margin: 4px 0 0;
   font-size: 11px;
   color: var(--st-muted);
+}
+
+/* Phone: the rules above keep two columns and left the Set's instrument list 0 px wide. One
+   full-screen column instead, receipt details then the instrument list, scrolling together. */
+@media (max-width: 700px) {
+  .receipt-card-modal:not(.prep-workspace-modal) {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column {
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-content: start;
+    overflow-y: auto !important;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-left-panel,
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel {
+    height: auto !important;
+    min-width: 0;
+    overflow: visible !important;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-set-tools,
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-single-tool-panel {
+    height: auto !important;
+    max-height: none !important;
+  }
+  /* The instrument list grows with its rows; the whole sheet scrolls. */
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-set-tools,
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-tools-scroll {
+    flex: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  /* Each instrument as a small card: barcode, code and Report, then the name, then the state. */
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-tool-columns {
+    display: none !important;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-verification-row:not(.single) {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      'barcode code action'
+      'name name name'
+      'state state state';
+    gap: 4px 10px !important;
+    min-width: 0 !important;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-tool-barcode {
+    grid-area: barcode;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-tool-code {
+    grid-area: code;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-tool-name {
+    grid-area: name;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-tool-manufacturer {
+    display: none;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-tool-state {
+    grid-area: state;
+  }
+  .receipt-card-modal:not(.prep-workspace-modal) .receipt-verification-row .tool-report-btn {
+    grid-area: action;
+  }
 }
