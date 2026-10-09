@@ -10096,3 +10096,84 @@ html body .briefing-row.tone-warn b {
 html body .briefing-row svg {
   color: var(--st-muted);
 }
+
+/* The guide of a screen on its first visit: a card at the bottom right (inline on phones) */
+html body .screen-guide {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 60;
+  width: min(400px, calc(100vw - 48px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 16px 14px 14px 16px;
+  border: 1px solid var(--c-cyan-85);
+  border-radius: 14px;
+  background: var(--c-white);
+  box-shadow: 0 18px 50px rgba(18, 43, 58, 0.2);
+  color: var(--st-ink, var(--c-blue-20-3));
+}
+html body .screen-guide-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--st-cyan-soft, var(--c-teal-90-2));
+  color: var(--st-teal, var(--c-cyan-30-2));
+}
+html body .screen-guide-body small {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--st-teal, var(--c-cyan-30-2));
+}
+html body .screen-guide-body h2 {
+  margin: 2px 0 4px;
+  font-size: 16px;
+}
+html body .screen-guide-body p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+html body .screen-guide-body ol {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+html body .screen-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+html body .screen-guide-off {
+  border: 0;
+  background: none;
+  padding: 6px 4px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--st-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+@media (max-width: 650px) {
+  html body .screen-guide {
+    position: static;
+    width: auto;
+    margin: 0 0 14px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    box-shadow: none;
+    background: var(--st-cyan-soft, var(--c-teal-90-2));
+  }
+  html body .screen-guide-icon {
+    display: none;
+  }
+}

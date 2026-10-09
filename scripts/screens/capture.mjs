@@ -174,7 +174,7 @@ async function newContext(browser, {viewport, account, db, log}) {
   });
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
-    ({lang, key, session, whatsNew, briefing}) => {
+    ({lang, key, session, whatsNew, briefing, guides}) => {
       // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
       window.__longTasks = [];
       try {
@@ -197,6 +197,12 @@ async function newContext(browser, {viewport, account, db, log}) {
       const d = new Date();
       const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       if (session) localStorage.setItem(`surgitrack-briefing-seen:${session.user.id}`, briefing ? '' : today);
+      // Screen guides (first visit) only with SCREENS_GUIDES=1.
+      if (session)
+        localStorage.setItem(
+          `surgitrack-screen-guides:${session.user.id}`,
+          JSON.stringify({off: !guides, screens: []}),
+        );
     },
     {
       lang: LANG,
@@ -204,6 +210,7 @@ async function newContext(browser, {viewport, account, db, log}) {
       session,
       whatsNew: process.env.SCREENS_WHATS_NEW === '1',
       briefing: process.env.SCREENS_BRIEFING === '1',
+      guides: process.env.SCREENS_GUIDES === '1',
     },
   );
   // Every Supabase call is answered here; anything else off this machine is refused (and logged).

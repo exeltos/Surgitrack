@@ -45,6 +45,7 @@ import DemoBar from './DemoBar';
 import MaintenanceStrip from './MaintenanceStrip';
 import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
 import Briefing, {briefingDue} from './Briefing';
+import ScreenGuide from './ScreenGuide';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
@@ -123,7 +124,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   const [helpOpen, setHelpOpen] = useState(false);
   // After signing in: first what changed in this version, then what waits today (one at a time).
   // A moment after the screen opens, so that counts loaded alongside (access requests) are in.
-  const [sinceSignIn, setSinceSignIn] = useState<'news' | 'briefing' | ''>('');
+  const [sinceSignIn, setSinceSignIn] = useState<'pending' | 'news' | 'briefing' | ''>('pending');
   useEffect(() => {
     const timer = window.setTimeout(
       () => setSinceSignIn(whatsNewDue(can) ? 'news' : briefingDue() ? 'briefing' : ''),
@@ -708,6 +709,15 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           </div>
         )}
         <section className="content" ref={contentRef}>
+          {/* Not over the sign-in dialogs: once they are closed. */}
+          {sinceSignIn === '' && (
+            <ScreenGuide
+              pathname={location.pathname}
+              lang={lang === 'en' ? 'en' : 'el'}
+              can={can}
+              onHelp={() => setHelpOpen(true)}
+            />
+          )}
           {children}
         </section>
         <footer>© 2026 SurgiTrack · Healthcare Suite</footer>

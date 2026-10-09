@@ -1910,6 +1910,11 @@ export const en: Record<string, string> = {
   'Καλησπέρα, {0}': 'Good evening, {0}',
   'Τι σας περιμένει σήμερα, {0}': 'What is waiting for you today, {0}',
   Ξεκινάμε: "Let's start",
+  'Οδηγός οθόνης': 'Screen guide',
+  'Πρώτη φορά εδώ': 'First time here',
+  'Το κατάλαβα': 'Got it',
+  'Αναλυτικά στη Βοήθεια': 'More in Help',
+  'Να μην εμφανίζονται οδηγοί': 'Do not show guides',
   'Άνοιγμα φωτογραφίας {0}': 'Open photo {0}',
   'Σετ και εργαλεία του τμήματος': 'Sets and instruments of the department',
   'Όλα τα Σετ και εργαλεία του φορτίου ανακαλούνται για επανεπεξεργασία.':
