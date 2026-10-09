@@ -174,7 +174,9 @@ export default function StudioPage() {
         <ConfirmDialog
           title={confirm.title}
           message={confirm.message}
-          confirmLabel={L('Επιβεβαίωση', 'Confirm')}
+          confirmLabel={confirm.confirmLabel || L('Επιβεβαίωση', 'Confirm')}
+          danger={confirm.danger}
+          confirmText={confirm.confirmText}
           onConfirm={() => {
             confirm.action();
             setConfirm(null);

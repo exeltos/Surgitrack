@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {AlertTriangle, X} from 'lucide-react';
 import AppButton from './AppButton';
 import {tr} from '../../i18n';
@@ -6,6 +7,7 @@ export default function ConfirmDialog({
   message,
   confirmLabel = tr('Επιβεβαίωση'),
   danger = false,
+  confirmText,
   onConfirm,
   onClose,
 }: {
@@ -13,9 +15,13 @@ export default function ConfirmDialog({
   message: string;
   confirmLabel?: string;
   danger?: boolean;
+  /** For what cannot be undone: the confirm button waits until this exact text is typed. */
+  confirmText?: string;
   onConfirm: () => void;
   onClose: () => void;
 }) {
+  const [typed, setTyped] = useState('');
+  const ready = !confirmText || typed.trim() === confirmText.trim();
   return (
     <div
       className="modal-backdrop confirm-dialog-backdrop"
@@ -34,9 +40,15 @@ export default function ConfirmDialog({
             <X size={18} />
           </button>
         </header>
+        {confirmText && (
+          <label className="confirm-dialog-type">
+            {tr('Για επιβεβαίωση, πληκτρολογήστε «{0}»', confirmText)}
+            <input autoFocus value={typed} onChange={e => setTyped(e.target.value)} autoComplete="off" />
+          </label>
+        )}
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
-          <AppButton variant={danger ? 'danger' : 'primary'} onClick={onConfirm}>
+          <AppButton variant={danger ? 'danger' : 'primary'} disabled={!ready} onClick={onConfirm}>
             {confirmLabel}
           </AppButton>
         </footer>
