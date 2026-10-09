@@ -73,7 +73,7 @@ describe('demo-account: who may send', () => {
   });
 
   it('refuses an unknown action', async () => {
-    expect((await send(handle, {action: 'delete', demo_account_id: 'demo-1'})).status).toBe(400);
+    expect((await send(handle, {action: 'destroy', demo_account_id: 'demo-1'})).status).toBe(400);
   });
 });
 
@@ -209,5 +209,49 @@ describe('demo-account: a request from someone in a Demo', () => {
     routes({recent: 4});
     expect(await (await notify()).json()).toMatchObject({ok: true, emailed: false});
     expect(mailState.outbox).toHaveLength(0);
+  });
+});
+
+describe('demo-account: deleting a Demo', () => {
+  const remove = () => send(handle, {action: 'delete', demo_account_id: 'demo-1'});
+  const routes = (o: {demo?: Row; org?: Row} = {}) => {
+    fake.db = (call: DbCall) => {
+      if (call.table === 'profiles' && call.op === 'select')
+        return {data: eqValue(call, 'id') === 'owner-1' ? OWNER : [{id: 'u1'}, {id: 'u2'}], error: null};
+      if (call.table === 'demo_accounts' && call.op === 'select')
+        return {data: o.demo === undefined ? {id: 'demo-1', organization_id: 'org-demo', status: 'SENT'} : o.demo, error: null};
+      if (call.table === 'organizations' && call.op === 'select')
+        return {data: o.org === undefined ? {is_demo: true, evaluation: true} : o.org, error: null};
+      return {data: null, error: null};
+    };
+  };
+  beforeEach(() => routes());
+
+  it("deletes the invitations, then its people's accounts, then the hospital", async () => {
+    const res = await remove();
+    expect(res.status).toBe(200);
+    const order = fake.calls
+      .filter(c => c.what === 'deleteUser' || (c.what === 'db' && (c.args[0] as DbCall).op === 'delete'))
+      .map(c => (c.what === 'deleteUser' ? `user:${c.args[0]}` : (c.args[0] as DbCall).table));
+    expect(order).toEqual(['user_invitations', 'user:u1', 'user:u2', 'profiles', 'organizations']);
+    const org = fake.dbCalls('delete').find(c => c.table === 'organizations')!;
+    expect(eqValue(org, 'id')).toBe('org-demo');
+    expect(eqValue(org, 'is_demo')).toBe(true);
+  });
+
+  it.each([
+    ['a customer now', {demo: {id: 'demo-1', organization_id: 'org-demo', status: 'CONVERTED'}}],
+    ['a real hospital', {org: {is_demo: false, evaluation: false}}],
+  ])('never deletes %s', async (_label, o) => {
+    routes(o);
+    expect((await remove()).status).toBe(409);
+    expect(fake.dbCalls('delete')).toHaveLength(0);
+    expect(fake.calls.filter(c => c.what === 'deleteUser')).toHaveLength(0);
+  });
+
+  it('is for the platform owner only', async () => {
+    fake.user = {id: 'someone'};
+    expect((await remove()).status).toBe(403);
+    expect(fake.dbCalls('delete')).toHaveLength(0);
   });
 });

@@ -3,11 +3,14 @@ import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
 import {appSite, esc, layout, sendEmail, usernameBox} from "../_shared/mail.ts";
 import {grantAccess} from "../_shared/grantAccess.ts";
+import {deleteDemoOrganization} from "../_shared/deleteDemo.ts";
 
 // A prospect's evaluation Demo (platform owner only). Studio opens the Demo hospital and fills it
 // with sample data; this sends the prospect their account: the Demo's administrator, with one
 // email carrying the username, the end date and the button to set the password. Sending it again
 // (before they have signed in) gives a new set-password link.
+//  - action "delete": the owner deletes the Demo for good, with its accounts and every record in it
+//    (not once it has become a customer).
 //  - action "notify_request": someone in a Demo asked for the application or for more time; the
 //    platform owner is emailed (the request itself is already saved and shows in Studio).
 const corsBase = {"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"};
@@ -104,6 +107,18 @@ Deno.serve(async req => {
     // The platform owner: an active admin who belongs to no hospital.
     const {data: cp} = await admin.from("profiles").select("id,role,active,organization_id").eq("id", user.id).single();
     if (!cp?.active || cp.role !== "ADMIN" || cp.organization_id) return json({error: "Forbidden"}, 403);
+    if (body?.action === "delete") {
+      const {data: demo} = await admin
+        .from("demo_accounts")
+        .select("id, organization_id, status")
+        .eq("id", String(body.demo_account_id || ""))
+        .maybeSingle();
+      if (!demo) return json({error: "Demo not found"}, 404);
+      const {data: org} = await admin.from("organizations").select("is_demo, evaluation").eq("id", demo.organization_id).maybeSingle();
+      if (demo.status === "CONVERTED" || !org?.is_demo || !org.evaluation) return json({error: "Not an evaluation Demo"}, 409);
+      await deleteDemoOrganization(admin, demo.organization_id);
+      return json({ok: true});
+    }
     if (body?.action !== "invite") return json({error: "Unknown action"}, 400);
 
     const {data: demo} = await admin

@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient, type SupabaseClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith, SITE} from "../_shared/http.ts";
 import {esc, layout, sendEmail} from "../_shared/mail.ts";
+import {deleteDemoOrganization} from "../_shared/deleteDemo.ts";
 
 // The daily round of the prospects' evaluation Demos (run by the database scheduler, with the
 // secret it keeps in the Vault, or by the platform owner from Studio):
@@ -76,20 +77,6 @@ const recipients = async (admin: SupabaseClient, organizationId: string) => {
   return [...new Set(((data || []) as Array<{email: string | null}>).map(p => p.email).filter((e): e is string => !!e))];
 };
 
-/** The Demo hospital, its people's accounts and everything in it. */
-const deleteDemo = async (admin: SupabaseClient, organizationId: string) => {
-  const {data: people} = await admin.from("profiles").select("id").eq("organization_id", organizationId);
-  for (const p of (people || []) as Array<{id: string}>) {
-    const {error} = await admin.auth.admin.deleteUser(p.id);
-    if (error) throw error;
-  }
-  // Accounts gone, their profiles go with them; any left (none expected) would block the hospital.
-  const {error: pe} = await admin.from("profiles").delete().eq("organization_id", organizationId);
-  if (pe) throw pe;
-  const {error: oe} = await admin.from("organizations").delete().eq("id", organizationId).eq("is_demo", true);
-  if (oe) throw oe;
-};
-
 Deno.serve(async req => {
   const cors = corsFor(req, corsBase);
   const json = jsonWith(cors);
@@ -120,7 +107,7 @@ Deno.serve(async req => {
       try {
         const org = d.organizations!;
         if (step === "DELETE") {
-          await deleteDemo(admin, d.organization_id);
+          await deleteDemoOrganization(admin, d.organization_id);
           done.deleted++;
           continue;
         }

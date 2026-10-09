@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {BadgeCheck, Check, Copy, LogIn, Mail, Plus, RotateCcw, Send} from 'lucide-react';
+import {BadgeCheck, Check, Copy, LogIn, Mail, Plus, RotateCcw, Send, Trash2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr} from '../../../i18n';
@@ -126,6 +126,19 @@ export default function DemoAccountsPanel({
               onHandled={requestId => void d.handleRequest(demo, requestId)}
               onAutoDelete={autoDelete => void d.changeAutoDelete(demo, autoDelete)}
               onConvert={() => setConverting(demo)}
+              onDelete={() =>
+                ask({
+                  title: tr('Διαγραφή Demo'),
+                  message: tr(
+                    'Το «{0}» θα διαγραφεί οριστικά: όλες οι εγγραφές του, οι αξιολογήσεις, τα αιτήματα και οι λογαριασμοί των {1} χρηστών του. Δεν αναιρείται.',
+                    demo.organizationName,
+                    demo.extraUsers + (demo.evaluatorId ? 1 : 0),
+                  ),
+                  confirmLabel: tr('Οριστική διαγραφή'),
+                  danger: true,
+                  onConfirm: () => void d.remove(demo),
+                })
+              }
               onEnter={() => d.enter(demo)}
               onReset={() =>
                 ask({
@@ -190,6 +203,7 @@ function DemoCard({
   onHandled,
   onAutoDelete,
   onConvert,
+  onDelete,
   onEnter,
   onReset,
 }: {
@@ -204,6 +218,7 @@ function DemoCard({
   onHandled: (requestId: string) => void;
   onAutoDelete: (autoDelete: boolean) => void;
   onConvert: () => void;
+  onDelete: () => void;
   onEnter: () => void;
   onReset: () => void;
 }) {
@@ -388,6 +403,10 @@ function DemoCard({
           <button className="danger" disabled={disabled} onClick={onReset}>
             <RotateCcw size={14} />
             {tr('Επαναφορά δεδομένων')}
+          </button>
+          <button className="danger" disabled={disabled} onClick={onDelete}>
+            <Trash2 size={14} />
+            {tr('Διαγραφή Demo')}
           </button>
         </div>
       )}
