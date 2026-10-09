@@ -1,4 +1,5 @@
 import {useMemo, useState} from 'react';
+import BrowseArrows from '../../components/assets/BrowseArrows';
 import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {
   ArrowLeft,
@@ -182,6 +183,7 @@ export default function SetDetailPage() {
           <BackLink fallback={backTo} className="asset-action-link">
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </BackLink>
+          {!departmentView && <BrowseArrows base="/sets" id={set.id} />}
         </div>
         <div className="asset-action-group">
           <ActionMenu

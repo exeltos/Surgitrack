@@ -1,3 +1,4 @@
+import {useUnsavedChanges} from '../../../app/UnsavedChanges';
 import {RefreshCcw, ShieldCheck, Users, CheckCircle2, Lock, Save} from 'lucide-react';
 import {permissionCatalog, type PermissionGroup} from '../../../core/permissions';
 import AppButton from '../../../components/ui/AppButton';
@@ -22,6 +23,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
     toggleRolePermission,
     visiblePermissionGroups,
   } = s;
+  useUnsavedChanges(roleDirty && selectedRole !== 'ADMIN');
   return (
     <>
       {tab === 'ROLES' && (

@@ -1,4 +1,5 @@
 import {ExpirySymbol} from '../../components/ui/SterileDates';
+import {useBrowseList} from '../../core/browseList';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
@@ -69,6 +70,7 @@ export default function SetsPage() {
     tools.forEach(t => t.setId && map.set(t.setId, (map.get(t.setId) || 0) + 1));
     return map;
   }, [tools]);
+  useBrowseList('/sets', filtered);
   const rows = useProgressiveList(
     filtered,
     [q, department, specialty, manufacturer, state, usage, completeness].join('|'),

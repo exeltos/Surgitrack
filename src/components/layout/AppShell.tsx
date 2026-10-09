@@ -1,5 +1,6 @@
 import {Fragment, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
-import {NavLink, useLocation, useNavigate} from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
+import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
 import {
   Accessibility,
   Bell,
@@ -129,7 +130,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   // Barcodes the sync renumbered and changes the server refused: kept until closed (a label to reprint).
   const [notices, setNotices] = useState<Array<{title: string; text: string}>>([]);
   useEffect(() => onSyncNotice(notice => setNotices(list => [...list, syncNoticeMessage(notice)].slice(-3))), []);
-  const navigate = useNavigate();
+  const navigate = useGuardedNavigate();
+  const leave = useLeave();
+  const logout = onLogout && (() => leave(onLogout));
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
   useListMemory(contentRef);
@@ -639,7 +642,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             <div className="avatar" title={signedInName}>
               {initialsOf(signedInName)}
             </div>
-            <button className="icon-btn" onClick={onLogout} title={lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}>
+            <button className="icon-btn" onClick={logout} title={lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}>
               <LogOut size={17} />
             </button>
           </div>
@@ -748,7 +751,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           </button>
         </div>
       )}
-      <IdleLock minutes={idleLockMinutes} userName={signedInName} hospital={organizationName} onSwitchUser={onLogout} />
+      <IdleLock minutes={idleLockMinutes} userName={signedInName} hospital={organizationName} onSwitchUser={logout} />
     </div>
   );
 }

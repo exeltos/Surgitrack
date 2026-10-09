@@ -9670,3 +9670,26 @@ html body .roles-guide header h2 {
     width: 44px;
   }
 }
+
+/* Previous / next record of the list the card was opened from */
+html body .browse-arrows {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line, #e3e8ee);
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+html body .browse-arrows .icon-btn {
+  width: 34px;
+  height: 34px;
+}
+html body .browse-arrows .icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

@@ -1,6 +1,7 @@
 import {useLibraries} from '../../core/LibraryStore';
 import SterileDates from '../ui/SterileDates';
 import {useEffect, useState} from 'react';
+import {useUnsavedChanges} from '../../app/UnsavedChanges';
 import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
@@ -116,6 +117,7 @@ export default function AssetWorkbenchSidebar({
     asset.ownerName,
     editing,
   ]);
+  useUnsavedChanges(editing && JSON.stringify(draft) !== JSON.stringify(makeDraft()));
   const textField = (key: keyof typeof draft, value: string) => (
     <input
       className="asset-inline-input"

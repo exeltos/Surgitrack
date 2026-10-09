@@ -1,4 +1,5 @@
 import {ListEmpty} from '../../components/ui/EmptyState';
+import {useBrowseList} from '../../core/browseList';
 import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
@@ -51,6 +52,7 @@ export default function StockPage() {
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
+  useBrowseList('/tools', filtered);
   const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, usage].join('|'));
   // The same number cards as the other lists: each one filters the list, the last opens the minimums.
   const kpi = kpiFilters({

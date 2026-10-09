@@ -1,4 +1,5 @@
 import {useMemo, useState} from 'react';
+import {useLeave, useUnsavedChanges} from '../../app/UnsavedChanges';
 import {useNavigate} from 'react-router-dom';
 import {ArrowLeft, Check, Images, Save, Search, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -35,6 +36,10 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [tab, setTab] = useState<CreateTab>(kind === 'SET' ? 'COMPOSITION' : 'DETAILS');
   const barcode = nextBarcode(kind);
   const valid = !!name.trim() && !!code.trim();
+  const leave = useLeave();
+  useUnsavedChanges(
+    !!(name.trim() || code.trim() || notes.trim() || serialNumber.trim() || photos.length || selected.length),
+  );
   const cover = photos[0]?.dataUrl;
   const candidates = useMemo(
     () =>
@@ -94,7 +99,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
           <AppButton variant="primary" icon={<Save size={17} />} disabled={!valid} onClick={save}>
             {tr('Αποθήκευση')}
           </AppButton>
-          <AppButton icon={<X size={17} />} onClick={() => navigate(backTo)}>
+          <AppButton icon={<X size={17} />} onClick={() => leave(() => navigate(backTo))}>
             {tr('Ακύρωση')}
           </AppButton>
           {!valid && (
@@ -102,7 +107,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
           )}
         </div>
         <div className="asset-action-group">
-          <button className="asset-action-link" onClick={() => navigate(backTo)}>
+          <button className="asset-action-link" onClick={() => leave(() => navigate(backTo))}>
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </button>
         </div>
