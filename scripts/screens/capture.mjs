@@ -174,7 +174,7 @@ async function newContext(browser, {viewport, account, db, log}) {
   });
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
-    ({lang, key, session}) => {
+    ({lang, key, session, whatsNew}) => {
       // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
       window.__longTasks = [];
       try {
@@ -191,8 +191,10 @@ async function newContext(browser, {viewport, account, db, log}) {
       localStorage.setItem('surgitrack-motion', '1');
       if (session) localStorage.setItem(key, JSON.stringify(session));
       else localStorage.removeItem(key);
+      // "What's new" opens only with SCREENS_WHATS_NEW=1 (as after an update); otherwise it was already seen.
+      if (session) localStorage.setItem(`surgitrack-seen-version:${session.user.id}`, whatsNew ? '0.0.1' : '999.0.0');
     },
-    {lang: LANG, key: STORAGE_KEY, session},
+    {lang: LANG, key: STORAGE_KEY, session, whatsNew: process.env.SCREENS_WHATS_NEW === '1'},
   );
   // Every Supabase call is answered here; anything else off this machine is refused (and logged).
   await context.route(

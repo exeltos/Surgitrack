@@ -2,6 +2,7 @@ import {RefreshCcw, Settings2, ShieldCheck, CheckCircle2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
+import MaintenanceNoticeSettings from '../MaintenanceNoticeSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
@@ -15,6 +16,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
       {tab === 'SYSTEM' && (
         <div className="studio-system-grid">
           {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
+          {platformAdmin && libs.dataMode === 'PRODUCTION' && <MaintenanceNoticeSettings L={L} />}
           <section>
             <header>
               <Settings2 />

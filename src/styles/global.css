@@ -9973,3 +9973,69 @@ html body .studio-error-detail pre {
     grid-column: 1 / -1;
   }
 }
+
+/* The platform owner's notice to every user */
+html body .maintenance-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-color: var(--c-cyan-85);
+  background: var(--st-cyan-soft, var(--c-teal-90-2));
+  color: var(--st-ink, var(--c-blue-20-3));
+}
+html body .maintenance-strip > span {
+  flex: 1;
+}
+html body .maintenance-strip .icon-button {
+  flex: none;
+}
+html body .maintenance-notice-settings .platform-contact-fields {
+  grid-template-columns: minmax(0, 300px) auto auto minmax(0, 1fr);
+}
+html body .maintenance-notice-settings .maintenance-message {
+  grid-column: 1 / -1;
+}
+@media (max-width: 900px) {
+  html body .maintenance-notice-settings .platform-contact-fields {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  html body .maintenance-notice-settings .platform-contact-fields > label {
+    grid-column: 1 / -1;
+  }
+  html body .maintenance-notice-settings .platform-contact-fields > :last-child {
+    justify-self: stretch;
+  }
+}
+
+/* What's new: after an update and in Help */
+html body .whats-new-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+html body .whats-new-icon {
+  background: var(--st-cyan-soft, var(--c-teal-90-2));
+  color: var(--st-teal, var(--c-cyan-30-2));
+}
+html body .whats-new-notes {
+  margin: 0;
+  padding: 0 24px 16px 40px;
+  display: grid;
+  gap: 8px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--st-ink, var(--c-blue-20-3));
+}
+html body .whats-new-help .whats-new-notes {
+  padding: 0 0 8px 20px;
+  max-height: none;
+}
+html body .whats-new-release h2 {
+  margin: 18px 0 8px;
+  font-size: 15px;
+}
+html body .whats-new-release h2 small {
+  margin-left: 6px;
+  font-weight: 500;
+  color: var(--st-muted);
+}

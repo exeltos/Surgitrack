@@ -42,6 +42,8 @@ import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
 import {useEvaluationDemo} from '../../data/cloud/demoContext';
 import DemoBar from './DemoBar';
+import MaintenanceStrip from './MaintenanceStrip';
+import WhatsNewDialog from './WhatsNew';
 import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
 import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
@@ -682,6 +684,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
                 : `Trial period: ${trial.daysLeft === 1 ? '1 day left' : `${trial.daysLeft} days left`} (ends ${formatDate(trial.endsAt || '')}). The hospital locks when it ends; to continue, contact the SurgiTrack administrator.`}
           </div>
         )}
+        <MaintenanceStrip />
         {role === 'VIEWER' && (
           <div className="readonly-strip" role="status">
             <Eye size={15} />
@@ -700,6 +703,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           <HelpCenter onClose={() => setHelpOpen(false)} screens={navigation.map(item => item.to)} />
         </Suspense>
       )}
+      <WhatsNewDialog lang={lang === 'en' ? 'en' : 'el'} can={can} />
       {toast && (
         <div className="toast" role="status">
           <strong>{lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}</strong>

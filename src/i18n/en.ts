@@ -1901,6 +1901,10 @@ export const en: Record<string, string> = {
   'Υπάρχουν αλλαγές που δεν αποθηκεύτηκαν': 'Some changes are not saved',
   'Αν φύγετε από αυτή τη σελίδα, οι αλλαγές θα χαθούν.': 'If you leave this page, the changes will be lost.',
   'Έξοδος χωρίς αποθήκευση': 'Leave without saving',
+  'Απόκρυψη ειδοποίησης': 'Hide notice',
+  'Τι νέο υπάρχει': "What's new",
+  'Η εφαρμογή ενημερώθηκε στην έκδοση {0}.': 'The app was updated to {0}.',
+  Εντάξει: 'OK',
   'Άνοιγμα φωτογραφίας {0}': 'Open photo {0}',
   'Σετ και εργαλεία του τμήματος': 'Sets and instruments of the department',
   'Όλα τα Σετ και εργαλεία του φορτίου ανακαλούνται για επανεπεξεργασία.':

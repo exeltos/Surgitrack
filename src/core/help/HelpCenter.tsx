@@ -23,6 +23,7 @@ import {loadPlatformContact, type PlatformContact} from '../../data/cloud/platfo
 import {glossary, helpManual, type ManualSection} from './helpManual';
 import ScreenPreview from './ScreenPreview';
 import OwnerManuals from './OwnerManuals';
+import {ReleaseHistory} from '../../components/layout/WhatsNew';
 import {getRealIdentity} from '../../data/cloud/identity';
 
 const ui = {
@@ -34,6 +35,7 @@ const ui = {
     roleGuide: 'Εγχειρίδιο προσαρμοσμένο στον ρόλο σας',
     sections: 'ΕΝΟΤΗΤΕΣ ΓΙΑ ΤΟΝ ΡΟΛΟ ΣΑΣ',
     glossary: 'Ορολογία',
+    whatsNew: 'Τι νέο υπάρχει',
     about: 'Σχετικά / Έκδοση',
     version: 'Έκδοση',
     userGuide: 'ΟΔΗΓΟΣ ΧΡΗΣΗΣ',
@@ -83,6 +85,7 @@ const ui = {
     roleGuide: 'User guide tailored to your role',
     sections: 'SECTIONS AVAILABLE TO YOUR ROLE',
     glossary: 'Glossary',
+    whatsNew: "What's new",
     about: 'About / Version',
     version: 'Version',
     userGuide: 'USER GUIDE',
@@ -125,7 +128,7 @@ const ui = {
   },
 };
 
-type Mode = 'manual' | 'glossary' | 'about' | 'support' | 'pdf';
+type Mode = 'manual' | 'news' | 'glossary' | 'about' | 'support' | 'pdf';
 
 /** Pages from which Set and instrument cards open. */
 const RECORD_LISTS = ['/department', '/tools', '/sets', '/standalone-tools', '/stock', '/sterilization'];
@@ -286,6 +289,10 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
               )}
             </nav>
             <div className="manual-side-bottom">
+              <button className={mode === 'news' ? 'active' : ''} onClick={() => setMode('news')}>
+                <Sparkles size={15} />
+                <span>{tx.whatsNew}</span>
+              </button>
               <button className={mode === 'glossary' ? 'active' : ''} onClick={() => setMode('glossary')}>
                 <BookOpen size={15} />
                 <span>{tx.glossary}</span>
@@ -501,6 +508,14 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                   ))}
                 </ul>
               </section>
+            </main>
+          )}
+
+          {mode === 'news' && (
+            <main className="manual-special whats-new-help">
+              <span className="manual-step-label">SURGITRACK</span>
+              <h1>{tx.whatsNew}</h1>
+              <ReleaseHistory lang={L} can={can} />
             </main>
           )}
 
