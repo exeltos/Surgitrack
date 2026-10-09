@@ -9865,3 +9865,8 @@ html body .idle-lock-password button[aria-pressed='true'] {
     white-space: normal;
   }
 }
+
+/* Sign-out questions show above the screen lock (z-index 10000), which can start them. */
+.sign-out-guard .confirm-dialog-backdrop {
+  z-index: 10001;
+}

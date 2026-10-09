@@ -1,4 +1,5 @@
 import {Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
+import {createPortal} from 'react-dom';
 import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
@@ -435,7 +436,8 @@ export default function App() {
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      {signOutGuard}
+      {/* On top of the screen lock too: "switch user" there signs out through it. */}
+      {createPortal(<div className="sign-out-guard">{signOutGuard}</div>, document.body)}
     </AppShell>
   );
 }
