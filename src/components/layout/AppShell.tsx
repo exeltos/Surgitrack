@@ -1,4 +1,4 @@
-import {Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
+import {Fragment, Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
 import {
   Accessibility,
@@ -29,7 +29,8 @@ import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import RoleSwitcher from './RoleSwitcher';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {ACCESS_REQUESTS_CHANGED, countPendingAccessRequests, managedHospitalId} from '../../data/cloud/accessRequests';
-import {onSyncConflict, useSyncInfo, type SyncConflict} from '../../data/cloud/useAppRecordSync';
+import {onSyncConflict, onSyncNotice, useSyncInfo, type SyncConflict} from '../../data/cloud/useAppRecordSync';
+import {syncNoticeMessage} from './syncNoticeMessage';
 import {fieldName} from '../../data/cloud/mergeConcurrent';
 import IdleLock from './IdleLock';
 import {useLibraries} from '../../core/LibraryStore';
@@ -125,6 +126,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
     const timer = window.setTimeout(() => setConflict(undefined), 15000);
     return () => window.clearTimeout(timer);
   }, [conflict]);
+  // Barcodes the sync renumbered and changes the server refused: kept until closed (a label to reprint).
+  const [notices, setNotices] = useState<Array<{title: string; text: string}>>([]);
+  useEffect(() => onSyncNotice(notice => setNotices(list => [...list, syncNoticeMessage(notice)].slice(-3))), []);
   const navigate = useNavigate();
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
@@ -727,6 +731,19 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
             )}
           </span>
           <button onClick={() => setConflict(undefined)} aria-label={lang === 'el' ? 'Κλείσιμο' : 'Close'}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      {notices.length > 0 && (
+        <div className="toast sync-conflict-toast sync-notice-toast" role="alert">
+          {notices.map((notice, index) => (
+            <Fragment key={index}>
+              <strong>{notice.title}</strong>
+              <span>{notice.text}</span>
+            </Fragment>
+          ))}
+          <button onClick={() => setNotices([])} aria-label={lang === 'el' ? 'Κλείσιμο' : 'Close'}>
             <X size={16} />
           </button>
         </div>

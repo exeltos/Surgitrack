@@ -2011,4 +2011,30 @@ export const en: Record<string, string> = {
   'Το «{0}» θα διαγραφεί οριστικά: όλες οι εγγραφές του, οι αξιολογήσεις, τα αιτήματα και οι λογαριασμοί των {1} χρηστών του. Δεν αναιρείται.':
     '“{0}” will be deleted for good: all its records, evaluations, requests and the accounts of its {1} users. This cannot be undone.',
   'Για επιβεβαίωση, πληκτρολογήστε «{0}»': 'To confirm, type “{0}”',
+  'Barcode σε χρήση από άλλον σταθμό': 'Barcode already used by another station',
+  'Το barcode {0} είχε ήδη δοθεί από άλλον σταθμό. Το νέο Σετ πήρε το {1} — τυπώστε ξανά την ετικέτα.':
+    'Barcode {0} had already been given out by another station. The new Set got {1} — print the label again.',
+  'Το barcode {0} είχε ήδη δοθεί από άλλον σταθμό. Το νέο εργαλείο πήρε το {1} — τυπώστε ξανά την ετικέτα.':
+    'Barcode {0} had already been given out by another station. The new instrument got {1} — print the label again.',
+  'Τα barcodes {0} είχαν ήδη δοθεί από άλλον σταθμό. Τα νέα Σετ πήραν τα {1} — τυπώστε ξανά τις ετικέτες.':
+    'Barcodes {0} had already been given out by another station. The new Sets got {1} — print the labels again.',
+  'Τα barcodes {0} είχαν ήδη δοθεί από άλλον σταθμό. Τα νέα εργαλεία πήραν τα {1} — τυπώστε ξανά τις ετικέτες.':
+    'Barcodes {0} had already been given out by another station. The new instruments got {1} — print the labels again.',
+  'Αλλαγή που δεν έγινε δεκτή': 'Change not accepted',
+  '{0}: η αλλαγή δεν αποθηκεύτηκε ({1}) και επανήλθε η αποθηκευμένη μορφή.':
+    '{0}: the change was not saved ({1}) and the saved version is back.',
+  '{0}: δεν αποθηκεύτηκε ({1}) και αφαιρέθηκε από αυτή τη συσκευή.':
+    '{0}: not saved ({1}) and removed from this device.',
+  'δεν έχετε δικαίωμα για αυτή την αλλαγή': 'you are not allowed to make this change',
+  'η βάση δεδομένων δεν δέχτηκε τα στοιχεία': 'the database did not accept the data',
+  'ο διακομιστής την απέρριψε': 'the server refused it',
+  'Και {0} ακόμη.': 'And {0} more.',
+  Αποσύνδεση: 'Sign out',
+  'Θέλετε να αποσυνδεθείτε από το SurgiTrack;': 'Sign out of SurgiTrack?',
+  'Αποθήκευση αλλαγών πριν την αποσύνδεση…': 'Saving changes before signing out…',
+  'Υπάρχουν αλλαγές που δεν αποθηκεύτηκαν': 'Some changes are not saved',
+  '{0} αλλαγές δεν έχουν αποθηκευτεί ακόμη στον διακομιστή (π.χ. λόγω σύνδεσης). Αν αποσυνδεθείτε τώρα, θα χαθούν.':
+    '{0} changes have not reached the server yet (e.g. because of the connection). If you sign out now, they will be lost.',
+  Παραμονή: 'Stay',
+  'Αποσύνδεση χωρίς αποθήκευση': 'Sign out without saving',
 };

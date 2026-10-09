@@ -9,7 +9,7 @@ import {
   type CloudCollection,
   type CloudRecords,
 } from './appRecords';
-import {readCache, setCacheOwner, setRestored} from './localCache';
+import {pendingOnto, readCache, setCacheOwner, setRestored, type CachedCollection} from './localCache';
 import {setCutoff} from './historyWindow';
 import {productionOrganizationFor, resolveIdentity} from './identity';
 import {translateToEnglish} from '../../core/glossary';
@@ -123,13 +123,25 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       setCacheOwner(owner);
       const collections: CloudCollection[] = [...STORE_COLLECTIONS, 'library'];
       const copy = await readCache(owner, collections);
-      const fromCopy = collections.every(collection => copy[collection]);
+      const fromCopy = collections.every(collection => copy[collection] && !copy[collection]!.expired);
       let records: CloudRecords;
       if (fromCopy) {
         records = Object.fromEntries(collections.map(c => [c, copy[c]!.items])) as unknown as CloudRecords;
         collections.forEach(c => setCutoff(c, copy[c]!.cutoff));
         setRestored(organizationId, copy);
-      } else records = await loadAppRecords(organizationId);
+      } else {
+        // From the server, with each collection's unsaved changes (kept by the copy) put back on top.
+        const since = new Date(Date.now() - 60000).toISOString();
+        records = await loadAppRecords(organizationId);
+        const unsaved: Partial<Record<CloudCollection, CachedCollection>> = {};
+        for (const collection of collections) {
+          const entry = pendingOnto(records[collection], copy[collection], since);
+          if (!entry) continue;
+          unsaved[collection] = entry;
+          records[collection] = entry.items;
+        }
+        setRestored(organizationId, unsaved);
+      }
       // An empty Demo is filled on entry; an evaluation Demo only by the platform owner (Studio fills
       // it before the prospect is invited), so the prospect never records the sample history.
       if ((demo || (evaluation && result.identity.platform)) && !records.library.length) {

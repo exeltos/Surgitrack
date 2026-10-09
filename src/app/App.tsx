@@ -18,6 +18,7 @@ import Spinner from '../components/ui/Spinner';
 import {lazyPage} from '../core/resilience';
 import NotFoundPage from '../modules/NotFoundPage';
 import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
+import {useSignOutGuard} from './useSignOutGuard';
 import {
   type AccessRequest,
   canViewAs,
@@ -91,6 +92,7 @@ export default function App() {
     () => passwordRecoveryPending() || /type=(recovery|invite)/.test(window.location.hash),
   );
   const recoveryRef = useRef(passwordRecovery);
+  const [signOutGuard, guardSignOut] = useSignOutGuard();
   useEffect(() => {
     recoveryRef.current = passwordRecovery;
   }, [passwordRecovery]);
@@ -169,13 +171,13 @@ export default function App() {
     window.location.hash = '#/';
     window.location.reload();
   };
-  const logout = async () => {
+  // Asked in the app, after what is still unsaved has had a chance to reach the server (see useSignOutGuard).
+  const logout = () => guardSignOut(() => void signOut());
+  const signOut = async () => {
     const msg =
       lang === 'el'
         ? `Καλή συνέχεια, ${currentUser.name.split(' ')[0]}.`
         : `See you soon, ${currentUser.name.split(' ')[0]}.`;
-    if (!window.confirm(lang === 'el' ? 'Θέλετε να αποσυνδεθείτε από το SurgiTrack;' : 'Sign out of SurgiTrack?'))
-      return;
     const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
     // This device's copy of the hospital (patient codes included) goes with the session.
     await clearCache();
@@ -433,6 +435,7 @@ export default function App() {
         />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      {signOutGuard}
     </AppShell>
   );
 }
