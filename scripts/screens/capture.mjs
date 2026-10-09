@@ -412,9 +412,12 @@ async function main() {
       }
 
       // First load: the app restores the session and loads the hospital.
+      const opened = Date.now();
       await page.goto(base + '#/');
       await settle(page);
       const home = await pageState(page);
+      home.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
+      home.settledMs = Date.now() - opened - SETTLE_MS;
       if (wanted('home') || wanted('/')) {
         const file = `${LANG}_${role.toLowerCase()}_${viewport}_home-firstload.png`;
         await shoot(page, file, viewport);
@@ -423,8 +426,25 @@ async function main() {
       } else log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
       // One reload puts every role in its steady state (as after a refresh), which is what the route
       // screenshots below show; the first-load shot above covers the sign-in path.
+      const reloaded = Date.now();
       await page.reload();
       await settle(page);
+      // Opening again, from this device's copy of the data.
+      if (wanted('home') || wanted('/'))
+        record(
+          {
+            file: '',
+            route: '/ (reload)',
+            role,
+            viewport,
+            lang: LANG,
+            state: {
+              blockedMs: Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0))),
+              settledMs: Date.now() - reloaded - SETTLE_MS,
+            },
+          },
+          log,
+        );
       log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
 
       for (const route of list) {
