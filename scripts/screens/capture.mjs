@@ -44,9 +44,14 @@ const LANG = arg('lang', 'el') === 'en' ? 'en' : 'el';
 const ALL_ROLES = ['ADMIN', 'STERILIZATION', 'SUPERVISOR', 'DEPARTMENT', 'VIEWER', 'PLATFORM'];
 const roleArg = String(arg('role', 'all')).toUpperCase();
 const ROLES = roleArg === 'ALL' ? ALL_ROLES : roleArg.split(',').filter(r => ALL_ROLES.includes(r));
-const VIEWPORTS = {desktop: {width: 1440, height: 900}, mobile: {width: 390, height: 844}};
+const VIEWPORTS = {
+  desktop: {width: 1440, height: 900},
+  mobile: {width: 390, height: 844},
+  // A common laptop window (1366×768 screen minus the browser's bars); only when asked for.
+  laptop: {width: 1366, height: 650},
+};
 const vpArg = String(arg('viewport', 'both'));
-const VIEWPORT_NAMES = vpArg === 'both' ? Object.keys(VIEWPORTS) : vpArg.split(',').filter(v => VIEWPORTS[v]);
+const VIEWPORT_NAMES = vpArg === 'both' ? ['desktop', 'mobile'] : vpArg.split(',').filter(v => VIEWPORTS[v]);
 const OUT = resolve(String(arg('out', join(CACHE, 'out'))));
 const ONLY = arg('only', undefined);
 const REBUILD = !!arg('rebuild', false);
@@ -111,7 +116,7 @@ async function loadSeed() {
     logLevel: 'warning',
   });
   const mod = await import(`${pathToFileURL(outfile).href}?t=${Date.now()}`);
-  return mod.buildSeed(ORG_ID);
+  return mod.buildSeed(ORG_ID, Number(process.env.SCREENS_SCALE || 1));
 }
 
 /** The routes declared in App.tsx with the permission each needs. */
@@ -168,6 +173,16 @@ async function newContext(browser, {viewport, account, db, log}) {
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
     ({lang, key, session}) => {
+      // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
+      window.__longTasks = [];
+      try {
+        new PerformanceObserver(list => window.__longTasks.push(...list.getEntries().map(e => e.duration))).observe({
+          type: 'longtask',
+          buffered: true,
+        });
+      } catch {
+        // No long task timing in this browser.
+      }
       if (sessionStorage.getItem('__harness_init')) return;
       sessionStorage.setItem('__harness_init', '1');
       localStorage.setItem('surgitrack-lang', lang);
@@ -397,9 +412,12 @@ async function main() {
       }
 
       // First load: the app restores the session and loads the hospital.
+      const opened = Date.now();
       await page.goto(base + '#/');
       await settle(page);
       const home = await pageState(page);
+      home.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
+      home.settledMs = Date.now() - opened - SETTLE_MS;
       if (wanted('home') || wanted('/')) {
         const file = `${LANG}_${role.toLowerCase()}_${viewport}_home-firstload.png`;
         await shoot(page, file, viewport);
@@ -408,8 +426,25 @@ async function main() {
       } else log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
       // One reload puts every role in its steady state (as after a refresh), which is what the route
       // screenshots below show; the first-load shot above covers the sign-in path.
+      const reloaded = Date.now();
       await page.reload();
       await settle(page);
+      // Opening again, from this device's copy of the data.
+      if (wanted('home') || wanted('/'))
+        record(
+          {
+            file: '',
+            route: '/ (reload)',
+            role,
+            viewport,
+            lang: LANG,
+            state: {
+              blockedMs: Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0))),
+              settledMs: Date.now() - reloaded - SETTLE_MS,
+            },
+          },
+          log,
+        );
       log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
 
       for (const route of list) {
@@ -417,10 +452,14 @@ async function main() {
         const target = route
           .replace('/sets/:id', `/sets/${seed.firstSetId}`)
           .replace('/tools/:id', `/tools/${seed.firstToolId}`);
+        await page.evaluate(() => (window.__longTasks = []));
+        const started = Date.now();
         await page.evaluate(h => (location.hash = h), `#${target}`);
         await settle(page);
         await page.evaluate(() => window.scrollTo(0, 0));
         const state = await pageState(page);
+        state.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
+        state.settledMs = Date.now() - started - SETTLE_MS;
         if (A11Y) state.a11y = await accessibility(page);
         const file = `${LANG}_${role.toLowerCase()}_${viewport}_${slug(route)}.png`;
         await shoot(page, file, viewport);

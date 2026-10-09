@@ -35,7 +35,7 @@ export function useIssueReport(
   } = p;
 
   const addIssuePhotos = async (files: File[]) => {
-    const photos = await filesToAssetPhotos(files);
+    const photos = await filesToAssetPhotos(files, 'issues');
     setIssuePhotos(current => [...current, ...photos]);
   };
   const openIssueReport = (kind: Kind, id: string, source: string) => {

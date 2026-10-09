@@ -532,7 +532,9 @@ export default function ToolDetailPage() {
                     accept="image/*"
                     capture="environment"
                     multiple
-                    onChange={async e => setReportPhotos(await filesToAssetPhotos(Array.from(e.target.files || [])))}
+                    onChange={async e =>
+                      setReportPhotos(await filesToAssetPhotos(Array.from(e.target.files || []), 'issues'))
+                    }
                   />
                   <small>
                     {reportPhotos.length

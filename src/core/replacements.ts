@@ -54,14 +54,28 @@ export function replacementItems(data: {
   purchaseOrders: readonly PurchaseOrder[];
 }): ReplacementItem[] {
   const {tools, retiredTools, sets, issues, movements, purchaseOrders} = data;
+  // Indexes, so a hospital with tens of thousands of instruments is read once, not once per instrument.
   const stockByKind = new Map<string, Tool[]>();
   for (const tool of tools)
-    if (tool.state === 'IN_STOCK' && tool.mode === 'STOCK')
-      stockByKind.set(kindKey(tool), [...(stockByKind.get(kindKey(tool)) || []), tool]);
-  const openIssues = issues.filter(i => i.status === 'OPEN');
+    if (tool.state === 'IN_STOCK' && tool.mode === 'STOCK') {
+      const list = stockByKind.get(kindKey(tool));
+      if (list) list.push(tool);
+      else stockByKind.set(kindKey(tool), [tool]);
+    }
+  // An issue names its asset as "<barcode> <name>" (or the barcode alone).
+  const openByBarcode = new Map<string, Issue[]>();
+  for (const issue of issues)
+    if (issue.status === 'OPEN') {
+      const barcode = issue.asset.split(' ')[0];
+      const list = openByBarcode.get(barcode);
+      if (list) list.push(issue);
+      else openByBarcode.set(barcode, [issue]);
+    }
+  const setsById = new Map(sets.map(s => [s.id, s]));
+  const setsByBarcode = new Map(sets.map(s => [s.barcode, s]));
   const items: ReplacementItem[] = [];
   for (const tool of [...tools, ...retiredTools]) {
-    const own = openIssues.filter(i => i.asset.startsWith(`${tool.barcode} `) || i.asset === tool.barcode);
+    const own = openByBarcode.get(tool.barcode) || [];
     const damage = own.filter(i => DAMAGE_TYPES.has(i.type));
     const reason: ReplacementReason | undefined =
       tool.state === 'RETIRED'
@@ -75,10 +89,10 @@ export function replacementItems(data: {
               : undefined;
     if (!reason) continue;
     const set = tool.setId
-      ? sets.find(s => s.id === tool.setId)
+      ? setsById.get(tool.setId)
       : (() => {
           const barcode = lastSetBarcode(tool.barcode, movements);
-          return barcode ? sets.find(s => s.barcode === barcode) : undefined;
+          return barcode ? setsByBarcode.get(barcode) : undefined;
         })();
     const order = purchaseOrders.find(o => o.status !== 'CANCELLED' && o.lines.some(l => l.toolIds.includes(tool.id)));
     items.push({

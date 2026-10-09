@@ -1,6 +1,6 @@
 name: Nightly backup
 
-# Every night: a data-only dump of the live database's public schema, restored onto a fresh database built
+# Every night: integrity checks (supabase/integrity.sql) and a data-only dump of the live database's public schema, restored onto a fresh database built
 # from supabase/migrations (which also proves the repository's schema still matches production), row counts
 # compared table by table, then encrypted and kept as a workflow artifact for 14 days.
 #
@@ -92,3 +92,16 @@ jobs:
             backup-${{ env.STAMP }}.dump.gpg
             live-counts.txt
           retention-days: 14
+
+      # Last, so the backup is kept either way: a failed run here emails the repository owner.
+      - name: Integrity checks
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          /usr/lib/postgresql/17/bin/psql "$SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -tA -F ' | ' \
+            -f supabase/integrity.sql > integrity.txt
+          if [ -s integrity.txt ]; then
+            echo "::error::Data integrity problems found (hospital | check | count):"
+            cat integrity.txt
+            exit 1
+          fi
+          echo "No data integrity problem found."

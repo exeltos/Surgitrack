@@ -3,6 +3,7 @@ import {Camera, ImagePlus, Trash2, Images} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import type {AssetPhoto} from '../../types/domain';
 import CameraCaptureModal from './CameraCaptureModal';
+import PhotoViewer from './PhotoViewer';
 import {tr} from '../../i18n';
 
 type Props = {
@@ -27,6 +28,7 @@ export default function AssetPhotosCard({
   const cameraRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [viewing, setViewing] = useState<AssetPhoto | null>(null);
   const acceptFiles = (list: FileList | null) => {
     if (!list?.length) return;
     onAdd([...list].filter(file => file.type.startsWith('image/')));
@@ -85,7 +87,14 @@ export default function AssetPhotosCard({
         <div className="asset-photo-grid">
           {photos.map(photo => (
             <figure className="asset-photo-tile" key={photo.id}>
-              <img src={photo.dataUrl} alt={photo.name || tr('Φωτογραφία αντικειμένου')} />
+              <button
+                type="button"
+                className="asset-photo-open"
+                onClick={() => setViewing(photo)}
+                aria-label={tr('Άνοιγμα φωτογραφίας {0}', photo.name || '')}
+              >
+                <img src={photo.dataUrl} alt={photo.name || tr('Φωτογραφία αντικειμένου')} />
+              </button>
               <figcaption>
                 <span>{photo.name || tr('Φωτογραφία')}</span>
                 <small>{photo.createdAt}</small>
@@ -117,6 +126,7 @@ export default function AssetPhotosCard({
           </div>
         </div>
       )}
+      {viewing && <PhotoViewer photo={viewing} onClose={() => setViewing(null)} />}
     </section>
   );
 }

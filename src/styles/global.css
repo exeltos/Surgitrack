@@ -6572,8 +6572,9 @@ html body .asset-workbench-sidebar .asset-cover {
   min-height: 0;
   height: 96px;
 }
-/* Overview as one screen: six cards in a 3x2 grid that fills the height (only on screens tall enough for it). */
-@media (min-width: 1100px) and (min-height: 840px) {
+/* Overview as one screen: six cards in a 3x2 grid that fills the window's height; what a card cannot show
+   scrolls inside the card, never the page. */
+@media (min-width: 1100px) and (min-height: 600px) {
   html body .hospital-overview.dash {
     display: flex;
     flex-direction: column;
@@ -6584,7 +6585,7 @@ html body .asset-workbench-sidebar .asset-cover {
   }
   html body .hospital-overview.dash > .dash-grid {
     flex: 1 1 auto;
-    min-height: 540px;
+    min-height: 300px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
   }
@@ -6690,8 +6691,8 @@ html body .asset-workbench-sidebar .asset-cover {
     padding: 8px 12px !important;
   }
 }
-/* Shorter screens: same 3-column cards at natural height, one page scroll and no scrollbars inside the cards. */
-@media (min-width: 1100px) and (max-height: 839px) {
+/* Very short windows: same 3-column cards at natural height, one page scroll and no scrollbars inside the cards. */
+@media (min-width: 1100px) and (max-height: 599px) {
   html body .hospital-overview.dash > .dash-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -9693,4 +9694,109 @@ html body .browse-arrows .icon-btn {
 html body .browse-arrows .icon-btn:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* Photos: the preview opens the full photo */
+html body .asset-photo-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+html body .asset-photo-open img {
+  display: block;
+  width: 100%;
+}
+html body .photo-viewer {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+html body .photo-viewer figure {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  max-width: min(1200px, 100%);
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .photo-viewer img {
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  object-fit: contain;
+}
+html body .photo-viewer figcaption {
+  color: var(--st-muted);
+  font-size: 13px;
+}
+html body .photo-viewer .icon-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--c-white);
+}
+
+/* Overview on one screen: the card's last block (list, chart) takes the room left and scrolls inside. */
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview.dash {
+    overflow: hidden;
+  }
+  html body .dash-grid > .dash-card > * {
+    flex: 0 0 auto;
+  }
+  html body .dash-flow > .dash-bars,
+  html body .dash-depts > .dash-depts-list,
+  html body .dash-where > .dash-legend,
+  html body .dash-attention > .dash-list,
+  html body .dash-latest > .dash-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    align-content: start;
+  }
+  html body .dash-bars > *,
+  html body .dash-depts-list > * {
+    flex-shrink: 0;
+  }
+  html body .dash-activity > .dash-columns {
+    flex: 1 1 auto;
+    min-height: 40px;
+    height: auto;
+  }
+  html body .dash-flow .dash-bar-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+@media (min-width: 1100px) and (min-height: 600px) and (max-height: 760px) {
+  html body .dash-kpi {
+    padding: 6px 12px;
+  }
+  html body .dash-kpi strong {
+    font-size: 22px;
+  }
+  html body .dash-kpi small {
+    display: none;
+  }
+  html body .hospital-overview .overview-alert {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  html body .dash-activity-stats {
+    margin: 2px 0 4px;
+  }
+  html body .dash-activity-stats span {
+    padding: 4px 8px;
+  }
+  html body .dash-activity-stats b {
+    font-size: 16px;
+  }
+  html body .dash-activity > .dash-axis {
+    display: none;
+  }
 }

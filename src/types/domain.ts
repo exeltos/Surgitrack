@@ -20,7 +20,10 @@ export type Ownership = 'HOSPITAL' | 'DOCTOR' | 'OTHER';
 export interface AssetPhoto {
   id: string;
   name: string;
+  /** The photo itself, or only a small preview when the full photo is in Storage (`path`). */
   dataUrl: string;
+  /** The full photo in the hospital's Storage folder. */
+  path?: string;
   createdAt: string;
 }
 export interface Tool {
