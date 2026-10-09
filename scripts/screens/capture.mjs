@@ -49,6 +49,8 @@ const VIEWPORTS = {
   mobile: {width: 390, height: 844},
   // A common laptop window (1366×768 screen minus the browser's bars); only when asked for.
   laptop: {width: 1366, height: 650},
+  // A 1920×1080 screen at 125% scaling, as many hospital PCs are set.
+  wide: {width: 1536, height: 760},
 };
 const vpArg = String(arg('viewport', 'both'));
 const VIEWPORT_NAMES = vpArg === 'both' ? ['desktop', 'mobile'] : vpArg.split(',').filter(v => VIEWPORTS[v]);
