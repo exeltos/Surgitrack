@@ -1,16 +1,22 @@
 import {CheckCircle2, ArrowRight, X} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import {askConfirm} from '../../../components/ui/confirmService';
 
 /** Handling an issue about the Set itself during Preparation: it was fixed, or the Set goes on as it is. */
 export default function PrepSetIssueModal({s}: {s: SterilizationPageState}) {
   const {prepManageIssue, prepDraft, resolveIssues, setPrepKeptIssueIds, setPrepManageIssueId} = s;
   if (!prepManageIssue || prepDraft?.kind !== 'SET') return null;
   const close = () => setPrepManageIssueId(null);
-  const resolve = () => {
-    const note = window.prompt(tr('Τι διορθώθηκε; (καταγράφεται στο ιστορικό)'), '');
-    if (!note?.trim()) return;
-    resolveIssues([prepManageIssue.id], note.trim());
+  const resolve = async () => {
+    const note = await askConfirm({
+      title: tr('Επίλυση εκκρεμότητας'),
+      message: trData(prepManageIssue.type),
+      note: {label: tr('Τι διορθώθηκε; (καταγράφεται στο ιστορικό)'), required: true},
+      confirmLabel: tr('Επιλύθηκε'),
+    });
+    if (!note) return;
+    resolveIssues([prepManageIssue.id], note);
     close();
   };
   const keep = () => {

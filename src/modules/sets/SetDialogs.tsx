@@ -5,6 +5,7 @@ import ReportTypeField from '../../components/assets/ReportTypeField';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import {tr} from '../../i18n';
 import type {AssetPhoto, SetAsset, Tool} from '../../types/domain';
+import {askConfirm} from '../../components/ui/confirmService';
 
 /** Deleting a Set: keep its instruments (they go to Stock) or delete them with it; both stay in the bin for 30 days. */
 export function SetDeleteDialog({
@@ -36,26 +37,30 @@ export function SetDeleteDialog({
         </header>
         <div className="choice-dialog-body">
           <button
-            onClick={() => {
-              if (
-                window.confirm(
-                  tr('Διαγραφή του Σετ; Τα εργαλεία του πάνε στο Απόθεμα και το Σετ μένει στον Κάδο για 30 ημέρες.'),
-                )
-              )
-                onDelete(false);
-            }}
+            onClick={() =>
+              void askConfirm({
+                title: tr('Διαγραφή μόνο του Σετ'),
+                message: tr(
+                  'Διαγραφή του Σετ; Τα εργαλεία του πάνε στο Απόθεμα και το Σετ μένει στον Κάδο για 30 ημέρες.',
+                ),
+                confirmLabel: tr('Διαγραφή'),
+                danger: true,
+              }).then(sure => sure !== false && onDelete(false))
+            }
           >
             <strong>{tr('Διαγραφή μόνο του Σετ')}</strong>
             <span>{tr('Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Απόθεμα.')}</span>
           </button>
           <button
             className="danger-option"
-            onClick={() => {
-              if (
-                window.confirm(tr('Διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του; Θα μείνουν στον Κάδο για 30 ημέρες.'))
-              )
-                onDelete(true);
-            }}
+            onClick={() =>
+              void askConfirm({
+                title: tr('Διαγραφή Σετ + εργαλείων'),
+                message: tr('Διαγραφή του Σετ ΚΑΙ όλων των εργαλείων του; Θα μείνουν στον Κάδο για 30 ημέρες.'),
+                confirmLabel: tr('Διαγραφή'),
+                danger: true,
+              }).then(sure => sure !== false && onDelete(true))
+            }
           >
             <strong>{tr('Διαγραφή Σετ + εργαλείων')}</strong>
             <span>{tr('Διαγράφονται και τα φυσικά εργαλεία (επαναφορά από τον Κάδο).')}</span>

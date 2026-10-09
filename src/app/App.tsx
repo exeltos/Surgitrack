@@ -3,6 +3,7 @@ import {createPortal} from 'react-dom';
 import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
 import {UnsavedChangesProvider} from './UnsavedChanges';
+import {ConfirmHost} from '../components/ui/confirmService';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import AuthIndex from '../modules/auth/AuthIndex';
 import PendingAccess from '../modules/auth/PendingAccess';
@@ -439,7 +440,13 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         {/* On top of the screen lock too: "switch user" there signs out through it. */}
-        {createPortal(<div className="sign-out-guard">{signOutGuard}</div>, document.body)}
+        {createPortal(
+          <div className="sign-out-guard">
+            {signOutGuard}
+            <ConfirmHost />
+          </div>,
+          document.body,
+        )}
       </AppShell>
     </UnsavedChangesProvider>
   );

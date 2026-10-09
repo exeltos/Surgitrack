@@ -5,6 +5,7 @@ import type {useSterilizationState} from './useSterilizationState';
 import type {useSterilizationQueues} from './useSterilizationQueues';
 import type {usePreparationChecks} from './usePreparationChecks';
 import type {useIssueReport} from './useIssueReport';
+import {tellUser} from '../../../components/ui/confirmService';
 
 export function useReceiptFlow(
   p: ReturnType<typeof useSterilizationState> &
@@ -226,7 +227,10 @@ export function useReceiptFlow(
   const confirmReceipt = () => {
     if (!receiptDraft || !deliverer || !receiptIdentityValid) return;
     if (visibleDeviation && !receiptDeviationRecorded) {
-      window.alert(tr('Κατέγραψε πρώτα την εμφανή απόκλιση με αναφορά στο Σετ ή στο συγκεκριμένο εργαλείο.'));
+      void tellUser(
+        tr('Λείπει η καταγραφή απόκλισης'),
+        tr('Κατέγραψε πρώτα την εμφανή απόκλιση με αναφορά στο Σετ ή στο συγκεκριμένο εργαλείο.'),
+      );
       return;
     }
     const countPerformed = receiptDraft.kind === 'SET' && receiptPolicy.countSetsAtReceipt;

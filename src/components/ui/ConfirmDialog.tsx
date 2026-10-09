@@ -10,6 +10,7 @@ export default function ConfirmDialog({
   danger = false,
   confirmText,
   note,
+  notice = false,
   onConfirm,
   onClose,
 }: {
@@ -20,14 +21,16 @@ export default function ConfirmDialog({
   danger?: boolean;
   /** For what cannot be undone: the confirm button waits until this exact text is typed. */
   confirmText?: string;
-  /** An optional free-text field (e.g. how an issue was resolved), handed to onConfirm. */
-  note?: {label: string; placeholder?: string};
+  /** A free-text field (e.g. how an issue was resolved), handed to onConfirm; `required` keeps confirm off while empty. */
+  note?: {label: string; placeholder?: string; initial?: string; required?: boolean};
+  /** Only the confirm button: a message to acknowledge, not a choice. */
+  notice?: boolean;
   onConfirm: (note: string) => void;
   onClose: () => void;
 }) {
   const [typed, setTyped] = useState('');
-  const [noteText, setNoteText] = useState('');
-  const ready = !confirmText || typed.trim() === confirmText.trim();
+  const [noteText, setNoteText] = useState(note?.initial || '');
+  const ready = (!confirmText || typed.trim() === confirmText.trim()) && (!note?.required || !!noteText.trim());
   return (
     <div
       className="modal-backdrop confirm-dialog-backdrop"
@@ -66,12 +69,15 @@ export default function ConfirmDialog({
         )}
         <footer>
           {/* Before something dangerous, the safe choice is the one already selected. */}
-          <AppButton onClick={onClose} autoFocus={danger && !confirmText}>
-            {cancelLabel}
-          </AppButton>
+          {!notice && (
+            <AppButton onClick={onClose} autoFocus={danger && !confirmText}>
+              {cancelLabel}
+            </AppButton>
+          )}
           <AppButton
             variant={danger ? 'danger' : 'primary'}
             disabled={!ready}
+            autoFocus={notice}
             onClick={() => onConfirm(noteText.trim())}
           >
             {confirmLabel}

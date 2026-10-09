@@ -9,6 +9,7 @@ import type {useReceiptFlow} from './useReceiptFlow';
 import type {usePreparationFlow} from './usePreparationFlow';
 import type {useCycleFlow} from './useCycleFlow';
 import {formatDateTime} from '../../../core/displayDate';
+import {askConfirm} from '../../../components/ui/confirmService';
 
 export function useLoadFlow(
   p: ReturnType<typeof useSterilizationState> &
@@ -176,13 +177,20 @@ export function useLoadFlow(
     });
     if (done) closeLoadRelease();
   };
-  const recallLoad = (id: string) => {
-    const reason = window.prompt(
-      tr('Αιτιολογία ανάκλησης φορτίου:'),
-      'Μη αποδεκτό αποτέλεσμα δείκτη / απόκλιση μετά την αποδέσμευση',
-    );
-    if (!reason?.trim()) return;
-    recallProcessLoad(id, reason.trim());
+  const recallLoad = async (id: string) => {
+    const reason = await askConfirm({
+      title: tr('Ανάκληση φορτίου'),
+      message: tr('Όλα τα Σετ και εργαλεία του φορτίου ανακαλούνται για επανεπεξεργασία.'),
+      note: {
+        label: tr('Αιτιολογία ανάκλησης φορτίου:'),
+        initial: tr('Μη αποδεκτό αποτέλεσμα δείκτη / απόκλιση μετά την αποδέσμευση'),
+        required: true,
+      },
+      confirmLabel: tr('Ανάκληση φορτίου'),
+      danger: true,
+    });
+    if (!reason) return;
+    recallProcessLoad(id, reason);
   };
   /** Prints the release form of a load: blank while in the sterilizer, filled in once released. */
   const printLoadForm = (loadId: string, fromReleaseDialog = false) => {

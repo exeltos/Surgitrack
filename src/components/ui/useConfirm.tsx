@@ -7,8 +7,11 @@ type Ask = {
   confirmLabel?: string;
   cancelLabel?: string;
   danger?: boolean;
-  note?: {label: string; placeholder?: string};
+  note?: {label: string; placeholder?: string; initial?: string; required?: boolean};
+  notice?: boolean;
   onConfirm: (note: string) => void;
+  /** Runs when the dialog closes without confirming. */
+  onCancel?: () => void;
 };
 
 /**
@@ -26,7 +29,12 @@ export function useConfirm(): [ReactNode, (ask: Ask) => void] {
       cancelLabel={pending.cancelLabel}
       danger={pending.danger}
       note={pending.note}
-      onClose={() => setPending(null)}
+      notice={pending.notice}
+      onClose={() => {
+        const cancel = pending.onCancel;
+        setPending(null);
+        cancel?.();
+      }}
       onConfirm={text => {
         const run = pending.onConfirm;
         setPending(null);

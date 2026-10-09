@@ -9,6 +9,7 @@ import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {activeHospitalId, switchHospital} from '../../data/cloud/hospitalSwitch';
 import Spinner from '../../components/ui/Spinner';
 import {formatDate} from '../../core/displayDate';
+import {askConfirm} from '../../components/ui/confirmService';
 
 type Hospital = {id: string; name: string; code: string; active: boolean; demo_enabled: boolean};
 type Stats = {departments: number; users: number; activeUsers: number; pending: number; linkUntil?: string};
@@ -106,12 +107,12 @@ export default function HospitalsPage() {
   const toggleActive = async (h: Hospital) => {
     if (
       h.active &&
-      !window.confirm(
-        L(
-          `Απενεργοποίηση του ${h.name}; Οι χρήστες του δεν θα μπορούν να εργαστούν.`,
-          `Deactivate ${h.name}? Its users will not be able to work.`,
-        ),
-      )
+      (await askConfirm({
+        title: L(`Απενεργοποίηση: ${h.name}`, `Deactivate ${h.name}`),
+        message: L('Οι χρήστες του δεν θα μπορούν να εργαστούν.', 'Its users will not be able to work.'),
+        confirmLabel: L('Απενεργοποίηση', 'Deactivate'),
+        danger: true,
+      })) === false
     )
       return;
     const {error: toggleError} = await supabase.rpc('platform_update_organization', {

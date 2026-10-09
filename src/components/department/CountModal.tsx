@@ -8,6 +8,7 @@ import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {ExpirySymbol, SterileSymbol} from '../ui/SterileDates';
 import {printCountForm} from './printCountForm';
 import {tr, trData} from '../../i18n';
+import {askConfirm} from '../../components/ui/confirmService';
 
 /**
  * The operating theatre's instrument count, laid out like the printed count form: part A is what
@@ -48,8 +49,12 @@ export default function CountModal({
       else next.add(toolId);
       return next;
     });
-  const allPresent = () => {
-    if (!window.confirm(tr('Επιβεβαιώνετε ότι καταμετρήθηκαν και τα {0} εργαλεία;', members.length))) return;
+  const allPresent = async () => {
+    const sure = await askConfirm({
+      title: tr('Πλήρης καταμέτρηση'),
+      message: tr('Επιβεβαιώνετε ότι καταμετρήθηκαν και τα {0} εργαλεία;', members.length),
+    });
+    if (sure === false) return;
     setTicked(new Set(members.map(t => t.id)));
     setBulk(true);
   };
@@ -74,11 +79,16 @@ export default function CountModal({
       draft: {checkedToolIds: [...ticked], patientCode: patientCode.trim()},
     });
   const canSign = patientCode.trim().length > 0 && counted > 0;
-  const sign = () => {
+  const sign = async () => {
     if (!canSign) return;
     if (
       missing.length &&
-      !window.confirm(tr('Λείπουν {0} εργαλεία. Υπογραφή της καταμέτρησης με έλλειψη;', missing.length))
+      (await askConfirm({
+        title: tr('Υπογραφή με έλλειψη'),
+        message: tr('Λείπουν {0} εργαλεία. Υπογραφή της καταμέτρησης με έλλειψη;', missing.length),
+        confirmLabel: tr('Υπογραφή & ολοκλήρωση'),
+        danger: true,
+      })) === false
     )
       return;
     const count = recordCount({

@@ -17,6 +17,7 @@ import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
+import {askConfirm} from '../../components/ui/confirmService';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -151,12 +152,16 @@ export default function MovementsPage() {
   };
   const deletePicked = async () => {
     if (!canClean || !picked.size) return;
-    if (
-      !window.confirm(
-        tr('Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.', picked.size),
-      )
-    )
-      return;
+    const sure = await askConfirm({
+      title: tr('Οριστική διαγραφή από το ιστορικό'),
+      message: tr(
+        'Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.',
+        picked.size,
+      ),
+      confirmLabel: tr('Οριστική διαγραφή'),
+      danger: true,
+    });
+    if (sure === false) return;
     setBusy(true);
     setCleanError('');
     const ids = [...picked];

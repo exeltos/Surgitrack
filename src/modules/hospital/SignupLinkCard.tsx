@@ -5,6 +5,7 @@ import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {signupUrl} from '../../data/cloud/accessRequests';
 import {formatDateTime} from '../../core/displayDate';
+import {askConfirm} from '../../components/ui/confirmService';
 
 type Link = {token: string; expires_at: string};
 
@@ -60,9 +61,11 @@ export default function SignupLinkCard({
   const create = async () => {
     if (
       link &&
-      !window.confirm(
-        L('Ο τρέχων σύνδεσμος θα πάψει να ισχύει. Συνέχεια;', 'The current link will stop working. Continue?'),
-      )
+      (await askConfirm({
+        title: L('Νέος σύνδεσμος εγγραφής', 'New signup link'),
+        message: L('Ο τρέχων σύνδεσμος θα πάψει να ισχύει.', 'The current link will stop working.'),
+        confirmLabel: L('Νέος σύνδεσμος', 'New link'),
+      })) === false
     )
       return;
     const {error} = await supabase.rpc('hospital_create_signup_link', {p_org: organizationId});
@@ -70,7 +73,16 @@ export default function SignupLinkCard({
     else reload();
   };
   const revoke = async () => {
-    if (!window.confirm(L('Ανάκληση του συνδέσμου εγγραφής;', 'Revoke the signup link?'))) return;
+    const sure = await askConfirm({
+      title: L('Ανάκληση συνδέσμου εγγραφής', 'Revoke signup link'),
+      message: L(
+        'Όποιος έχει τον σύνδεσμο δεν θα μπορεί πια να εγγραφεί.',
+        'Whoever has the link can no longer sign up.',
+      ),
+      confirmLabel: L('Ανάκληση', 'Revoke'),
+      danger: true,
+    });
+    if (sure === false) return;
     const {error} = await supabase.rpc('hospital_revoke_signup_links', {p_org: organizationId});
     if (error) onError?.(error.message);
     else reload();
