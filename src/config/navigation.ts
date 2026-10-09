@@ -14,6 +14,7 @@ import {
   Cable,
   Trash2,
   CalendarClock,
+  ScanSearch,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -39,6 +40,7 @@ const assetNavigation: NavigationItem[] = [
   {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view'},
   {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},
+  {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view'},
   {to: '/bin', label: 'Κάδος', icon: Trash2, permission: 'asset.delete'},
 ];
 
