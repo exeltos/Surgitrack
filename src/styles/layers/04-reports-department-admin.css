@@ -3887,6 +3887,172 @@
   }
 }
 
+/* The bar and first-steps guide of a prospect's evaluation Demo */
+.demo-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  background: #f3f0ff;
+  border-bottom: 1px solid #ddd6fb;
+  color: #3f3477;
+  font-size: 12.5px;
+}
+.demo-bar.ending {
+  background: #fff4e5;
+  border-bottom-color: #f6d4a2;
+  color: #7a4300;
+}
+.demo-bar-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #4a3d8f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.demo-bar.ending .demo-bar-chip {
+  background: #a85d00;
+}
+.demo-bar-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.demo-bar-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.demo-bar-guide b {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ece8ff;
+  font-size: 11px;
+}
+.demo-guide {
+  position: fixed;
+  z-index: 60;
+  top: 108px;
+  right: 18px;
+  width: min(400px, calc(100vw - 32px));
+  max-height: calc(100vh - 130px);
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid #ddd6fb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(31, 22, 82, 0.18);
+}
+.demo-guide header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.demo-guide header > div {
+  display: grid;
+  gap: 2px;
+}
+.demo-guide header strong {
+  color: #2e2563;
+  font-size: 15px;
+}
+.demo-guide header small {
+  color: #6b6688;
+  font-size: 12px;
+}
+.demo-guide header button {
+  border: 0;
+  background: none;
+  color: #6b6688;
+  cursor: pointer;
+}
+.demo-guide-meter {
+  height: 6px;
+  margin: 10px 0 8px;
+  border-radius: 999px;
+  background: #eeeaff;
+  overflow: hidden;
+}
+.demo-guide-meter span {
+  display: block;
+  height: 100%;
+  background: #4a3d8f;
+}
+.demo-guide ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.demo-guide li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: 10px;
+  color: #8c87a8;
+}
+.demo-guide li > div {
+  display: grid;
+  gap: 2px;
+}
+.demo-guide li b {
+  color: #2e2563;
+  font-size: 13px;
+}
+.demo-guide li small {
+  color: #6b6688;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.demo-guide li.done {
+  color: #1d6b43;
+}
+.demo-guide li.done b {
+  color: #1d6b43;
+  text-decoration: line-through;
+}
+.demo-guide li.next {
+  background: #f6f4ff;
+}
+.demo-guide li button {
+  padding: 4px 10px;
+  border: 1px solid #c9c0f2;
+  border-radius: 8px;
+  background: #fff;
+  color: #3f3477;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+@media (max-width: 700px) {
+  .demo-bar {
+    flex-wrap: wrap;
+  }
+  .demo-guide {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+  }
+}
+
 /* Users of a prospect's evaluation Demo: how many colleagues it may still take */
 .people-demo-seats {
   display: flex;
@@ -4153,7 +4319,7 @@
 }
 .evaluation-demo-colleagues li {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 70px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 70px 90px minmax(0, 1fr);
   gap: 8px;
   color: #4b4766;
 }

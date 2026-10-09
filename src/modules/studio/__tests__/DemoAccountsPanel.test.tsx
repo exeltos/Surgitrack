@@ -147,7 +147,15 @@ describe('Studio: evaluation Demos', () => {
       demo({
         extraUsers: 1,
         colleagues: [
-          {id: 'c1', name: 'ΝΙΚΟΣ ΡΗΓΑΣ', email: 'n@h.gr', role: 'STERILIZATION', active: true, userCode: 'NR1111'},
+          {
+            id: 'c1',
+            name: 'ΝΙΚΟΣ ΡΗΓΑΣ',
+            email: 'n@h.gr',
+            role: 'STERILIZATION',
+            active: true,
+            userCode: 'NR1111',
+            guide: {done: 3, total: 7},
+          },
         ],
       }),
     ]);
@@ -156,6 +164,7 @@ describe('Studio: evaluation Demos', () => {
     await user.click(await screen.findByRole('button', {name: '1 / 5'}));
     expect(screen.getByText('ΝΙΚΟΣ ΡΗΓΑΣ')).toBeInTheDocument();
     expect(screen.getByText('NR1111')).toBeInTheDocument();
+    expect(screen.getByText('Βήματα 3/7')).toBeInTheDocument();
     await user.selectOptions(screen.getByLabelText('Όριο συναδέλφων'), '8');
     await waitFor(() => expect(service.setDemoUserLimit).toHaveBeenCalledWith('demo-1', 8));
   });

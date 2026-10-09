@@ -1,6 +1,8 @@
 import {supabase} from '../../lib/supabase';
 import type {DemoAccount} from '../../core/demoAccounts';
 import {DEMO_PACK_VERSION, seedDemoOrganization} from './demoSeed';
+import {guideSteps} from '../../core/demoGuide';
+import type {UserRole} from '../../store/types';
 
 type DemoRow = {
   id: string;
@@ -34,7 +36,19 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   type Person = {id: string; name: string; email: string; role: string; active: boolean; user_code: string | null};
   const people = new Map<string, Person[]>();
   const lastRun = new Map<string, SeedRunRow>();
+  /** Guide steps done, by person. */
+  const stepsDone = new Map<string, Set<string>>();
   if (rows.length) {
+    const {data: progress, error: progressError} = await supabase
+      .from('demo_guide_progress')
+      .select('user_id,step_key')
+      .in(
+        'organization_id',
+        rows.map(row => row.organization_id),
+      );
+    if (progressError) throw progressError;
+    for (const p of (progress || []) as Array<{user_id: string; step_key: string}>)
+      stepsDone.set(p.user_id, (stepsDone.get(p.user_id) || new Set()).add(p.step_key));
     const {data: runs, error: runsError} = await supabase
       .from('demo_seed_runs')
       .select('organization_id,kind,records,created_at')
@@ -63,6 +77,11 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   return rows.map(row => {
     const members = people.get(row.organization_id) || [];
     const evaluator = members.find(p => p.id === row.evaluator_id);
+    const guide = (p: Person) => {
+      const steps = guideSteps(p.role as UserRole);
+      const done = stepsDone.get(p.id) || new Set<string>();
+      return {done: steps.filter(s => done.has(s.key)).length, total: steps.length};
+    };
     return {
       id: row.id,
       organizationId: row.organization_id,
@@ -93,7 +112,9 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
           role: p.role,
           active: p.active,
           userCode: p.user_code || undefined,
+          guide: guide(p),
         })),
+      evaluatorGuide: evaluator ? guide(evaluator) : undefined,
       lastLoad: lastRun.get(row.organization_id)
         ? {
             kind: lastRun.get(row.organization_id)!.kind,
