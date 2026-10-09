@@ -3422,26 +3422,6 @@ div.asset-import-hospital b {
   background: var(--st-red-soft, #fff0f0);
   color: var(--st-red, #b44747);
 }
-.platform-trial-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.platform-trial-actions button {
-  padding: 6px 12px;
-  border: 1px solid var(--st-line, #dce7eb);
-  border-radius: 8px;
-  background: #fff;
-  font: inherit;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.platform-trial-actions button.primary {
-  border-color: var(--st-teal, #167187);
-  background: var(--st-teal, #167187);
-  color: #fff;
-}
 .studio-plan {
   display: grid;
   gap: 8px;
@@ -3515,6 +3495,11 @@ div.asset-import-hospital b {
   border: 1px dashed #b9d4dc;
   border-radius: 12px;
   background: var(--st-cyan-soft, #f2fafb);
+}
+.studio-field-hint {
+  margin: -4px 0 2px;
+  color: var(--st-muted, #6f808c);
+  font-size: 12px;
 }
 .studio-field-error {
   color: var(--st-red, #b44747) !important;

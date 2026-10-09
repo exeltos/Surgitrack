@@ -4,6 +4,7 @@ import type {UserRole} from '../../../store/types';
 import {supabase} from '../../../lib/supabase';
 import {applyDemoSessionUser, demoSessionUser, type DemoView, type HospitalRoleKind} from '../../../config/demoRoles';
 import {departments as defaultDepartments} from '../../../core/libraries';
+import {organizationCode} from '../../../core/organizationCode';
 import type {useStudioState} from './useStudioState';
 import type {useStudioCloud} from './useStudioCloud';
 
@@ -41,10 +42,16 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
       });
       if (error) return setCloudError(error.message);
     } else {
-      const {data: created, error} = await supabase.rpc('platform_create_organization', {
-        p_name: data.name,
-        p_code: data.code,
-      });
+      // The code is made from the name; on the rare clash with an existing code, another is tried.
+      let created: unknown;
+      let error: {code?: string; message: string} | null = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        ({data: created, error} = await supabase.rpc('platform_create_organization', {
+          p_name: data.name,
+          p_code: data.code || organizationCode(data.name),
+        }));
+        if (error?.code !== '23505' || data.code) break;
+      }
       if (error || !created) return setCloudError(error?.message || 'create failed');
       id = String(created);
       // The create call takes only the name and code; the editor's Active and Demo choices follow.
