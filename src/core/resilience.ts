@@ -12,7 +12,7 @@ export const isChunkLoadError = (error: unknown) =>
  * Reloads the page once to pick up the new version. Returns false when a reload happened in the
  * last 30 seconds, so a real outage shows an error instead of reloading forever.
  */
-export function reloadForNewVersion() {
+function reloadForNewVersion() {
   try {
     const last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
     if (Date.now() - last < 30_000) return false;

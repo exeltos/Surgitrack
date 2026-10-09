@@ -201,7 +201,12 @@ export default function DepartmentPage() {
             </button>
           </div>
         </div>
-        <div className="department-asset-list">
+        <div
+          className="department-asset-list"
+          role="region"
+          tabIndex={0}
+          aria-label={tr('Σετ και εργαλεία του τμήματος')}
+        >
           {visibleItems.length ? (
             visibleItems.map(({kind, asset}) => {
               const memberCount = kind === 'SET' ? tools.filter(tool => tool.setId === asset.id).length : undefined;

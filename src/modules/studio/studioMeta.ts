@@ -42,7 +42,7 @@ export const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: 
 ];
 
 export const permissionGroupMeta: Record<PermissionGroup, {el: string; en: string}> = {
-  ASSETS: {el: 'Assets & Stock', en: 'Assets & Stock'},
+  ASSETS: {el: 'Σετ, εργαλεία & Απόθεμα', en: 'Assets & Stock'},
   WORKFLOW: {el: 'Ροές εργασίας', en: 'Workflow'},
   TRACEABILITY: {el: 'Ιχνηλασιμότητα & Αναφορές', en: 'Traceability & Reports'},
   ADMIN: {el: 'Διαχείριση συστήματος', en: 'System administration'},

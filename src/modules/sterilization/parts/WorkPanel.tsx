@@ -20,6 +20,7 @@ import {
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import SterilizerLoads from './SterilizerLoads';
+import {askConfirm} from '../../../components/ui/confirmService';
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const {counts} = useSurgi();
@@ -193,12 +194,15 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       <button
                         className="bi-fail"
                         onClick={() =>
-                          window.confirm(
-                            tr(
+                          void askConfirm({
+                            title: tr('BI ανεπιτυχής'),
+                            message: tr(
                               'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;',
                               load.cycleNumber,
                             ),
-                          ) && s.recordBiologicalResult(load.id, 'FAIL')
+                            confirmLabel: tr('Ανάκληση φορτίου'),
+                            danger: true,
+                          }).then(sure => sure !== false && s.recordBiologicalResult(load.id, 'FAIL'))
                         }
                       >
                         <TriangleAlert size={14} /> {tr('BI ανεπιτυχής')}

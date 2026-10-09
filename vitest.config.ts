@@ -1,4 +1,4 @@
-import {defineConfig} from 'vitest/config';
+import {configDefaults, defineConfig} from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import {fileURLToPath} from 'node:url';
 
@@ -22,6 +22,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    exclude: [...configDefaults.exclude, '.claude/**'],
     css: false,
     env: {
       VITE_SUPABASE_URL: 'http://localhost:54321',

@@ -6,6 +6,7 @@ import {useLibraries} from '../../core/LibraryStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {colorTapeGroups, MAX_MARKER_TAPES, type ColorTape} from '../../core/colorTapes';
 import {tr} from '../../i18n';
+import {askConfirm} from '../../components/ui/confirmService';
 
 /**
  * The hospital's color tape palette. It starts full; unused tapes are hidden (they stay on
@@ -156,14 +157,14 @@ export default function ColorTapeLibrary() {
                           type="button"
                           className="danger"
                           title={tr('Διαγραφή')}
-                          onClick={() => {
-                            if (
-                              window.confirm(
-                                tr('Διαγραφή της ταινίας «{0}»; Θα μείνει στον Κάδο για 30 ημέρες.', tape.el),
-                              )
-                            )
-                              removeColorTape(tape.id);
-                          }}
+                          onClick={() =>
+                            void askConfirm({
+                              title: tr('Διαγραφή'),
+                              message: tr('Διαγραφή της ταινίας «{0}»; Θα μείνει στον Κάδο για 30 ημέρες.', tape.el),
+                              confirmLabel: tr('Διαγραφή'),
+                              danger: true,
+                            }).then(sure => sure !== false && removeColorTape(tape.id))
+                          }
                         >
                           <Trash2 size={14} />
                         </button>

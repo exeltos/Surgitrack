@@ -1,7 +1,18 @@
 import {useCallback, useState, type ReactNode} from 'react';
 import ConfirmDialog from './ConfirmDialog';
 
-type Ask = {title: string; message: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void};
+type Ask = {
+  title: string;
+  message: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  danger?: boolean;
+  note?: {label: string; placeholder?: string; initial?: string; required?: boolean};
+  notice?: boolean;
+  onConfirm: (note: string) => void;
+  /** Runs when the dialog closes without confirming. */
+  onCancel?: () => void;
+};
 
 /**
  * Asks before an action runs: `ask({...})` opens the confirmation; the action runs only on the confirm
@@ -15,12 +26,19 @@ export function useConfirm(): [ReactNode, (ask: Ask) => void] {
       title={pending.title}
       message={pending.message}
       confirmLabel={pending.confirmLabel}
+      cancelLabel={pending.cancelLabel}
       danger={pending.danger}
-      onClose={() => setPending(null)}
-      onConfirm={() => {
+      note={pending.note}
+      notice={pending.notice}
+      onClose={() => {
+        const cancel = pending.onCancel;
+        setPending(null);
+        cancel?.();
+      }}
+      onConfirm={text => {
         const run = pending.onConfirm;
         setPending(null);
-        run();
+        run(text);
       }}
     />
   ) : null;

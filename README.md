@@ -22,8 +22,16 @@ cp .env.example .env.local   # VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_K
 npm run dev
 ```
 
-The build needs those two variables. Demo mode (a sample hospital that exists only in Demo organizations) is chosen at sign-in. `npm run ci` is what GitHub Actions
-runs: format, typecheck (`tsc -b`), lint, tests, build (see `CI_CHECKS.md`).
+The build needs those two variables (in `.env.local`; the GitHub workflow uses placeholders). Demo mode (a sample hospital
+that exists only in Demo organizations) is chosen at sign-in. `npm run ci` runs what GitHub Actions runs: format check
+(`npm run format` fixes it), typecheck (`tsc -b`), lint, tests, build.
+
+Other checks:
+
+- `bash supabase/tests/run-local.sh` replays every migration on a throwaway Postgres 16 and runs the SQL tests
+  (grants, tenants, viewers, supervisor rights, configuration history). See `supabase/MIGRATIONS.md`.
+- `npm run screens` captures every screen for every role, desktop and mobile, against a mocked Supabase
+  (see `scripts/screens/README.md`).
 
 ## How it is organised
 
@@ -44,12 +52,18 @@ Data flow: the store holds records in memory; in a cloud workspace each collecti
 
 ## Security model
 
-- Row level security on every table; `anon` has no table privileges. Access is by hospital (`current_org_id()`) and role (`app_record_writable`, `is_cssd_operator`, `is_viewer`); an ended trial locks a hospital for its users.
+- Row level security on every table; `anon` has no table privileges, and new tables and functions get none by default
+  (only `signup_link_info` is callable signed out). Access is by hospital (`current_org_id()`) and role
+  (`app_record_writable`, `is_cssd_operator`, `is_viewer`); an ended trial locks a hospital for its users.
+- The Sterilization supervisor's rights and the Studio role settings are enforced by the database too
+  (`is_asset_manager()`, `role_has_permission()` and the `*_supervisor_guard*` triggers), not only by the screens.
 - Privileged actions go through edge functions with the service role or `security definer` functions with explicit grants.
+- History tables are append-only; who recorded an entry is stamped by the database. The configuration history is kept in
+  `configuration_audit`, which nobody signed in can change or delete.
 - Deleted Sets and instruments are kept in `recycle_bin` for 30 days.
-- Recommended: turn on two-factor authentication for the platform owner account.
 
 ## Tests
 
-`npm test` runs Vitest (unit tests for the core logic, the store, the cloud layer and every edge function). Layout
-checks (no cut-off content, accessibility) were run with Playwright and axe-core against the built app.
+`npm test` runs Vitest (unit tests for the core logic, the store, the cloud layer with its sync engine and local copy,
+and every edge function). `bash supabase/tests/run-local.sh` tests the database itself, and `npm run screens` captures
+every screen for visual review.

@@ -38,7 +38,7 @@ export function binEntryForTool(tool: Tool, parentSet: SetAsset | undefined, by:
   };
 }
 
-export const expiresAt = (entry: BinEntry) => new Date(new Date(entry.deletedAt).getTime() + BIN_DAYS * DAY);
+const expiresAt = (entry: BinEntry) => new Date(new Date(entry.deletedAt).getTime() + BIN_DAYS * DAY);
 export const isExpired = (entry: BinEntry, now = new Date()) => expiresAt(entry).getTime() <= now.getTime();
 export const daysLeft = (entry: BinEntry, now = new Date()) =>
   Math.max(0, Math.ceil((expiresAt(entry).getTime() - now.getTime()) / DAY));
@@ -111,38 +111,6 @@ export function planRestore(
     else skipped.push(member.barcode);
   }
   return {ok: true, set: {...set, actual: add.length + revert.length}, add, revert, skipped};
-}
-
-export function binEntryForLibraryItem(
-  key: string,
-  item: Record<string, unknown> & {el?: string; en?: string},
-  by: string,
-  now = new Date(),
-): BinEntry {
-  return {
-    id: stamp(),
-    kind: 'LIBRARY',
-    label: String(item.el || item.en || item.id),
-    detail: key,
-    payload: {tools: [], toolsDeleted: false, library: {key, item}},
-    deletedAt: now.toISOString(),
-    deletedByName: by,
-  };
-}
-
-export function binEntryForColorTape(
-  tape: Record<string, unknown> & {el?: string},
-  by: string,
-  now = new Date(),
-): BinEntry {
-  return {
-    id: stamp(),
-    kind: 'COLOR_TAPE',
-    label: String(tape.el || tape.id),
-    payload: {tools: [], toolsDeleted: false, colorTape: tape},
-    deletedAt: now.toISOString(),
-    deletedByName: by,
-  };
 }
 
 export function binEntryForDevice(

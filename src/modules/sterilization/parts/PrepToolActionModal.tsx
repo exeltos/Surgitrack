@@ -58,10 +58,10 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                       'Επίλεξε το φυσικό εργαλείο που θα καλύψει την έλλειψη. Με την επιβεβαίωση θα προστεθεί στο Set.',
                     )
                 : prepToolAction === 'SERVICE'
-                  ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα μεταφερθεί στα Χαλασμένα / Service.')
+                  ? tr('Το εργαλείο θα αφαιρεθεί από το Σετ και θα μεταφερθεί στα Χαλασμένα / Service.')
                   : prepToolAction === 'STOCK'
-                    ? tr('Το εργαλείο θα αφαιρεθεί από το Set και θα επιστρέψει στο κεντρικό Απόθεμα.')
-                    : tr('Το εργαλείο θα αφαιρεθεί από το τρέχον Set και θα προστεθεί σε άλλο Set.')}
+                    ? tr('Το εργαλείο θα αφαιρεθεί από το Σετ και θα επιστρέψει στο κεντρικό Απόθεμα.')
+                    : tr('Το εργαλείο θα αφαιρεθεί από το τρέχον Σετ και θα προστεθεί σε άλλο Σετ.')}
             </p>
             {prepToolAction === 'REPLACE' && (
               <>
@@ -104,14 +104,14 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                           className={prepOutgoingDestination === 'SET' ? 'active' : ''}
                           onClick={() => setPrepOutgoingDestination('SET')}
                         >
-                          {tr('Άλλο Set')}
+                          {tr('Άλλο Σετ')}
                         </button>
                       </div>
                       {prepOutgoingDestination === 'SET' && (
                         <label>
-                          {tr('Set προορισμού')}
+                          {tr('Σετ προορισμού')}
                           <select value={prepOutgoingSetId} onChange={e => setPrepOutgoingSetId(e.target.value)}>
-                            <option value="">{tr('Επιλογή Set…')}</option>
+                            <option value="">{tr('Επιλογή Σετ…')}</option>
                             {prepOtherSets.map(s => (
                               <option key={s.id} value={s.id}>
                                 {s.barcode} · {s.name}
@@ -153,7 +153,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                         setPrepReplacementId('');
                       }}
                     >
-                      {tr('Άλλο Set')}
+                      {tr('Άλλο Σετ')}
                     </button>
                     <button
                       type="button"
@@ -170,7 +170,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                 </div>
                 {prepReplacementSource === 'SET' && (
                   <label>
-                    {tr('1. Επιλογή Set')}
+                    {tr('1. Επιλογή Σετ')}
                     <select
                       value={prepReplacementSetId}
                       onChange={e => {
@@ -178,7 +178,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                         setPrepReplacementId('');
                       }}
                     >
-                      <option value="">{tr('Επιλογή Set…')}</option>
+                      <option value="">{tr('Επιλογή Σετ…')}</option>
                       {prepReplacementSourceSets.map(set => (
                         <option key={set.id} value={set.id}>
                           {set.barcode} · {set.name} ·{' '}
@@ -232,7 +232,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                     <div className="prep-block-warning">
                       <TriangleAlert size={16} />
                       <span>
-                        {tr('Θα αφαιρεθεί από το Set') + ' '}
+                        {tr('Θα αφαιρεθεί από το Σετ') + ' '}
                         {sourceSet.barcode}
                         {tr(', το οποίο θα μείνει με έλλειψη.')}
                       </span>
@@ -243,9 +243,9 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
             )}
             {prepToolAction === 'SET' && (
               <label>
-                {tr('Set προορισμού')}
+                {tr('Σετ προορισμού')}
                 <select value={prepTargetSetId} onChange={e => setPrepTargetSetId(e.target.value)}>
-                  <option value="">{tr('Επιλογή Set…')}</option>
+                  <option value="">{tr('Επιλογή Σετ…')}</option>
                   {prepOtherSets.map(s => (
                     <option key={s.id} value={s.id}>
                       {s.barcode} · {s.name}
@@ -274,7 +274,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                     ? tr('Μεταφορά στα Χαλασμένα / Service')
                     : prepToolAction === 'STOCK'
                       ? tr('Μεταφορά στο Απόθεμα')
-                      : tr('Μεταφορά σε άλλο Set')}
+                      : tr('Μεταφορά σε άλλο Σετ')}
               </button>
             </div>
           </div>

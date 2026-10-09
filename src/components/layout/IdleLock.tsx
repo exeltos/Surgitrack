@@ -2,7 +2,6 @@ import {useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {Eye, EyeOff, Lock, LogIn} from 'lucide-react';
 import {supabase} from '../../lib/supabase';
-import {useSyncInfo} from '../../data/cloud/useAppRecordSync';
 import {tr} from '../../i18n';
 import {LOCK_KEY} from './idleLockState';
 
@@ -90,7 +89,6 @@ function LockScreen({
   onUnlock: () => void;
   onSwitchUser?: () => void;
 }) {
-  const sync = useSyncInfo();
   const [email, setEmail] = useState<string | null | undefined>(undefined);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -121,18 +119,9 @@ function LockScreen({
     setPassword('');
     onUnlock();
   };
+  // Signing out asks about unsaved changes itself (useSignOutGuard).
   const switchUser = () => {
     if (!onSwitchUser) return;
-    if (
-      sync.status !== 'saved' &&
-      !window.confirm(
-        tr(
-          'Δεν έχουν αποθηκευτεί ακόμη {0} αλλαγές αυτού του χρήστη. Αν συνδεθεί άλλος χρήστης τώρα, θα χαθούν. Συνέχεια;',
-          sync.pendingRecords || 1,
-        ),
-      )
-    )
-      return;
     sessionStorage.removeItem(LOCK_KEY);
     onSwitchUser();
   };

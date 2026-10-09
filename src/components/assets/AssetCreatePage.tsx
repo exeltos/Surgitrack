@@ -1,4 +1,5 @@
 import {useMemo, useState} from 'react';
+import {useLeave, useUnsavedChanges} from '../../app/UnsavedChanges';
 import {useNavigate} from 'react-router-dom';
 import {ArrowLeft, Check, Images, Save, Search, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -35,6 +36,10 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [tab, setTab] = useState<CreateTab>(kind === 'SET' ? 'COMPOSITION' : 'DETAILS');
   const barcode = nextBarcode(kind);
   const valid = !!name.trim() && !!code.trim();
+  const leave = useLeave();
+  useUnsavedChanges(
+    !!(name.trim() || code.trim() || notes.trim() || serialNumber.trim() || photos.length || selected.length),
+  );
   const cover = photos[0]?.dataUrl;
   const candidates = useMemo(
     () =>
@@ -91,16 +96,18 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
     <div className="asset-detail-workspace asset-create-card-workspace legacy-inspired-workspace">
       <div className="asset-workbench-actions asset-create-card-actions">
         <div className="asset-action-group">
-          <span className="asset-create-mode-label">{tr('ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ')}</span>
           <AppButton variant="primary" icon={<Save size={17} />} disabled={!valid} onClick={save}>
             {tr('Αποθήκευση')}
           </AppButton>
-          <AppButton icon={<X size={17} />} onClick={() => navigate(backTo)}>
+          <AppButton icon={<X size={17} />} onClick={() => leave(() => navigate(backTo))}>
             {tr('Ακύρωση')}
           </AppButton>
+          {!valid && (
+            <small className="asset-create-hint">{tr('Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.')}</small>
+          )}
         </div>
         <div className="asset-action-group">
-          <button className="asset-action-link" onClick={() => navigate(backTo)}>
+          <button className="asset-action-link" onClick={() => leave(() => navigate(backTo))}>
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </button>
         </div>
@@ -231,7 +238,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
           <div className="asset-sidebar-quickfacts">
             <div className="asset-barcode-card">
               <div>
-                <span>{kind === 'SET' ? tr('Barcode Set') : tr('Barcode εργαλείου')}</span>
+                <span>{kind === 'SET' ? tr('Barcode Σετ') : tr('Barcode εργαλείου')}</span>
               </div>
               <strong className="mono">{barcode}</strong>
             </div>

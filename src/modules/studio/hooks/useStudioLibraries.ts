@@ -1,5 +1,6 @@
 import {useMemo} from 'react';
 import {roles, libraryMeta} from '../studioMeta';
+import {activeHospitalId} from '../../../data/cloud/hospitalSwitch';
 import type {Tab} from '../studioMeta';
 import type {useStudioState} from './useStudioState';
 import type {useStudioCloud} from './useStudioCloud';
@@ -18,10 +19,12 @@ export function useStudioLibraries(
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );
-  const roleCount = useMemo(
-    () => roles.map(r => ({role: r.id, count: displayedUsers.filter(u => u.role === r.id && u.active).length})),
-    [displayedUsers],
-  );
+  const roleCount = useMemo(() => {
+    // The platform owner loads every hospital's users; the counts are for the hospital in view.
+    const hospital = activeHospitalId();
+    const here = hospital ? displayedUsers.filter(u => u.organizationId === hospital) : displayedUsers;
+    return roles.map(r => ({role: r.id, count: here.filter(u => u.role === r.id && u.active).length}));
+  }, [displayedUsers]);
   const resetQuery = () => setQuery('');
   const selectTab = (next: Tab) => {
     setTab(next);

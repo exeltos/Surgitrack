@@ -1,4 +1,5 @@
 import {ListEmpty} from '../../components/ui/EmptyState';
+import {useBrowseList} from '../../core/browseList';
 import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
@@ -51,6 +52,7 @@ export default function StockPage() {
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
+  useBrowseList('/tools', filtered);
   const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, usage].join('|'));
   // The same number cards as the other lists: each one filters the list, the last opens the minimums.
   const kpi = kpiFilters({
@@ -207,9 +209,9 @@ export default function StockPage() {
                         <div className="registry-asset-name">
                           <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
                           <span>
-                            <strong className="row-title-link" title={t.name}>
+                            <Link className="row-title-link" to={`/tools/${t.id}`}>
                               {t.name}
-                            </strong>
+                            </Link>
                             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
                             <small className="row-sub">{t.code}</small>
                           </span>
@@ -229,7 +231,7 @@ export default function StockPage() {
                       </td>
                     </tr>
                   ))}
-                  {rows.hasMore && <MoreRows colSpan={5} onVisible={rows.showMore} />}
+                  {rows.hasMore && <MoreRows colSpan={7} onVisible={rows.showMore} />}
                 </tbody>
               </table>
             )}

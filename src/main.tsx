@@ -13,6 +13,7 @@ import './styles/global.css';
 import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
 import {installTabletViewport} from './core/tabletViewport';
 import {getI18nLang, loadEnglish, setI18nLang} from './i18n';
+import {loadDemoRepository} from './data/repositories';
 
 installChunkRecovery();
 installEscapeClosesDialogs();
@@ -47,9 +48,12 @@ const render = () =>
     ),
   );
 // English users get their dictionary before the first paint; if it cannot be downloaded the app opens in Greek.
-if (getI18nLang() === 'en')
-  loadEnglish().then(render, () => {
-    setI18nLang('el');
-    render();
-  });
-else render();
+const english =
+  getI18nLang() === 'en'
+    ? loadEnglish().catch(() => {
+        setI18nLang('el');
+      })
+    : undefined;
+// Demo mode needs the sample hospital before the stores start.
+const demo = runtimeDataMode === 'DEMO' ? loadDemoRepository() : undefined;
+void Promise.all([english, demo]).then(render, render);

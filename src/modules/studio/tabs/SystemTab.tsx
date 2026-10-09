@@ -133,7 +133,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             </div>
             <div className="studio-check-row">
               <CheckCircle2 />
-              <span>{L('Καταγραφή chain of custody', 'Chain-of-custody logging')}</span>
+              <span>{L('Καταγραφή αλυσίδας παράδοσης', 'Chain-of-custody logging')}</span>
             </div>
             <details className="released-loads">
               <summary>

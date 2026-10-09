@@ -1,6 +1,10 @@
 import {useState} from 'react';
-import {Search, Route, History} from 'lucide-react';
+import {Link} from 'react-router-dom';
+import {Search, Route, History, ExternalLink} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
+import DownloadMenu from '../../components/ui/DownloadMenu';
+import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 
 const RECENT_KEY = 'surgitrack.trace.recent';
 /** The last searches on this device (barcodes and patient codes), newest first. */
@@ -13,12 +17,13 @@ const readRecent = (): string[] => {
   }
 };
 import {useSurgi} from '../../store/SurgiStore';
-import {tr, trData} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 export default function TraceabilityPage() {
   const {sets, tools, movements, counts} = useSurgi();
   const [q, setQ] = useState('');
   const [recent, setRecent] = useState<string[]>(readRecent);
+  const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
     const term = value.trim();
     if (!term) return;
@@ -39,14 +44,44 @@ export default function TraceabilityPage() {
   const asset = needle
     ? [...sets, ...tools].find(x => x.barcode.toLowerCase() === needle || x.name.toLowerCase().includes(needle))
     : undefined;
+  const isSet = !!asset && sets.some(s => s.id === asset.id);
+  // One item's trail: its name is in the card above, so each step shows only what happened.
+  const singleAsset = !!asset && related.every(m => m.asset.startsWith(asset.barcode));
+  const traceTable = (): ExportTable => ({
+    title: tr('Ιχνηλάτηση · {0}', q.trim()),
+    subtitle: tr('{0} κινήσεις', related.length),
+    headers: [
+      tr('Ημερομηνία / ώρα'),
+      tr('Σετ / Εργαλείο'),
+      tr('Ενέργεια'),
+      tr('Από'),
+      tr('Προς'),
+      tr('Χρήστης'),
+      tr('Κωδικός ασθενούς'),
+    ],
+    rows: related.map(m => [
+      m.at,
+      m.asset,
+      trData(m.status),
+      trData(m.from),
+      trData(m.to),
+      trData(m.by),
+      m.patientCode || '',
+    ]),
+  });
   return (
     <>
       <div className="page-head">
         <div>
           <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
           <h1>{tr('Ιχνηλάτηση')}</h1>
-          <p>{tr('Αναζήτηση από barcode Set/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.')}</p>
+          <p>{tr('Αναζήτηση από barcode Σετ/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.')}</p>
         </div>
+        {related.length > 0 && (
+          <div className="page-head-actions">
+            <DownloadMenu table={traceTable} onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))} />
+          </div>
+        )}
       </div>
       <HistoryWindowNote auto />
       <form
@@ -82,12 +117,15 @@ export default function TraceabilityPage() {
         <div className="trace-card">
           <Route size={24} />
           <div>
-            <small>{asset.barcode.startsWith('S') ? 'SET' : tr('ΕΡΓΑΛΕΙΟ')}</small>
+            <small>{isSet ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
             <h2>{asset.barcode}</h2>
             <p>
               {asset.name} · {trData(asset.department) || tr('Απόθεμα')} · {statusLabel(asset.state)}
             </p>
           </div>
+          <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
+            <ExternalLink size={16} /> {tr('Άνοιγμα καρτέλας')}
+          </Link>
         </div>
       )}
       {countHits.map(c => (
@@ -97,7 +135,7 @@ export default function TraceabilityPage() {
             <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
             <h2>{c.patientCode}</h2>
             <p>
-              {tr('Υπογεγραμμένη καταμέτρηση Set') + ' '}
+              {tr('Υπογεγραμμένη καταμέτρηση Σετ') + ' '}
               {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/{c.expected} {tr('εργαλεία ·') + ' '}
               {c.at}.
             </p>
@@ -107,20 +145,22 @@ export default function TraceabilityPage() {
       <div className="timeline list-scroll-region">
         {related.length ? (
           related.map(m => (
-            <div className="timeline-item" key={m.id}>
+            <div className="timeline-item trace-step" key={m.id}>
+              <time>{m.at}</time>
               <div className="dot" />
               <div>
-                <strong>{m.asset}</strong>
-                <p>{trData(m.status)}</p>
+                <strong>{trData(m.status)}</strong>
+                {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
                 <small>
-                  {trData(m.from)} → {trData(m.to)} · {m.at} · {trData(m.by)}
+                  {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
+                  {m.patientCode ? ` · ${tr('Ασθενής {0}', m.patientCode)}` : ''}
                 </small>
               </div>
             </div>
           ))
         ) : (
           <div className="empty">
-            <strong>{needle ? tr('Δεν βρέθηκαν κινήσεις') : tr('Αναζητήστε Set, εργαλείο ή ασθενή')}</strong>
+            <strong>{needle ? tr('Δεν βρέθηκαν κινήσεις') : tr('Αναζητήστε Σετ, εργαλείο ή ασθενή')}</strong>
             <span>
               {needle
                 ? tr('Δοκιμάστε άλλο barcode ή κωδικό ασθενούς.')
@@ -129,6 +169,7 @@ export default function TraceabilityPage() {
           </div>
         )}
       </div>
+      {report && <PrintPreviewModal title={tr('Ιχνηλάτηση')} html={report} onClose={() => setReport(null)} />}
     </>
   );
 }

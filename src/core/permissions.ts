@@ -45,7 +45,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
   {
     key: 'asset.registry.view',
     group: 'ASSETS',
-    el: 'Προβολή μητρώου assets',
+    el: 'Προβολή μητρώων',
     en: 'View asset registry',
     hintEl: 'Λίστες εργαλείων, Σετ και βασικά φίλτρα.',
     hintEn: 'Instrument and Set lists with core filters.',
@@ -53,7 +53,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
   {
     key: 'asset.detail.view',
     group: 'ASSETS',
-    el: 'Προβολή καρτέλας asset',
+    el: 'Προβολή καρτέλας',
     en: 'View asset details',
     hintEl: 'Άνοιγμα πλήρους καρτέλας Σετ ή εργαλείου.',
     hintEn: 'Open full Set or instrument card.',
@@ -61,7 +61,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
   {
     key: 'asset.create',
     group: 'ASSETS',
-    el: 'Δημιουργία assets',
+    el: 'Δημιουργία Σετ και εργαλείων',
     en: 'Create assets',
     hintEl: 'Νέα Σετ και εργαλεία.',
     hintEn: 'Create new Sets and instruments.',
@@ -77,7 +77,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
   {
     key: 'asset.delete',
     group: 'ASSETS',
-    el: 'Διαγραφή assets',
+    el: 'Διαγραφή Σετ και εργαλείων',
     en: 'Delete assets',
     hintEl: 'Οριστική διαγραφή με επιβεβαίωση.',
     hintEn: 'Permanent deletion with confirmation.',
@@ -85,9 +85,9 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
   {
     key: 'asset.duplicate',
     group: 'ASSETS',
-    el: 'Διπλασιασμός assets',
+    el: 'Αντίγραφο Σετ ή εργαλείου',
     en: 'Duplicate assets',
-    hintEl: 'Δημιουργία νέου φυσικού asset από υπάρχον.',
+    hintEl: 'Νέο Σετ ή εργαλείο με βάση ένα υπάρχον.',
     hintEn: 'Create a new physical asset from an existing one.',
   },
   {
@@ -95,7 +95,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'ASSETS',
     el: 'Διαχείριση φωτογραφιών',
     en: 'Manage photos',
-    hintEl: 'Λήψη, upload και διαχείριση φωτογραφιών.',
+    hintEl: 'Λήψη, ανέβασμα και διαχείριση φωτογραφιών.',
     hintEn: 'Capture, upload and manage photos.',
   },
   {
@@ -127,7 +127,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'ASSETS',
     el: 'Διαχείριση Απόθεμα',
     en: 'Manage stock',
-    hintEl: 'Μετακινήσεις και διαθέσιμα εργαλεία Απόθεμα.',
+    hintEl: 'Μετακινήσεις και διαθέσιμα εργαλεία του Αποθέματος.',
     hintEn: 'Stock availability and movements.',
   },
   {
@@ -135,7 +135,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'WORKFLOW',
     el: 'Χώρος εργασίας Τμήματος',
     en: 'Department workspace',
-    hintEl: 'Πρόσβαση στο ειδικό workspace του Τμήματος.',
+    hintEl: 'Πρόσβαση στον χώρο εργασίας του Τμήματος.',
     hintEn: 'Access the Department workspace.',
   },
   {
@@ -143,7 +143,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'WORKFLOW',
     el: 'Αποστολή προς Αποστείρωση',
     en: 'Dispatch to Sterilization',
-    hintEl: 'Ηλεκτρονική προώθηση με chain of custody.',
+    hintEl: 'Ηλεκτρονική αποστολή με αλυσίδα παράδοσης.',
     hintEn: 'Electronic dispatch with chain of custody.',
   },
   {
@@ -183,7 +183,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'WORKFLOW',
     el: 'Παράδοση προς Τμήμα',
     en: 'Deliver to Department',
-    hintEl: 'Τελική παράδοση και κλείσιμο chain of custody.',
+    hintEl: 'Τελική παράδοση και κλείσιμο της αλυσίδας παράδοσης.',
     hintEn: 'Final delivery and chain-of-custody closure.',
   },
   {
@@ -223,7 +223,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'TRACEABILITY',
     el: 'Πλήρης ιχνηλασιμότητα',
     en: 'Full traceability',
-    hintEl: 'Chain of custody και ιστορικό φυσικού asset.',
+    hintEl: 'Αλυσίδα παράδοσης και ιστορικό κάθε Σετ και εργαλείου.',
     hintEn: 'Chain of custody and physical asset traceability.',
   },
   {
@@ -263,7 +263,7 @@ const departmentPermissions: readonly Permission[] = [
 ];
 
 /** Read-only: every screen that only shows data; never an action. */
-export const viewerPermissions: readonly Permission[] = [
+const viewerPermissions: readonly Permission[] = [
   'asset.registry.view',
   'asset.detail.view',
   'stock.manage',
@@ -340,7 +340,6 @@ export const protectedRolePermissions: Record<UserRole, readonly Permission[]> =
   VIEWER: ['asset.detail.view', 'history.view'],
 };
 
-export const rolePermissions = defaultRolePermissions;
 export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]> = {
   ADMIN: [],
   // A viewer can never be given an action, whatever the role settings say.

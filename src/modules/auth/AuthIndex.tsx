@@ -20,7 +20,7 @@ type Props = {
 const copy = {
   el: {
     product: 'SurgiTrack',
-    subtitle: 'Surgical Instrument Traceability',
+    subtitle: 'Ιχνηλασιμότητα χειρουργικών εργαλείων',
     suite: 'Healthcare Suite',
     login: 'Σύνδεση',
     register: 'Εγγραφή',
@@ -30,7 +30,6 @@ const copy = {
     email: 'Email',
     loginId: 'Κωδικός χρήστη ή Email',
     password: 'Κωδικός πρόσβασης',
-    remember: 'Να παραμείνω συνδεδεμένος',
     forgotLink: 'Ξέχασα τον κωδικό μου',
     signIn: 'Σύνδεση',
     noAccount: 'Δεν έχετε λογαριασμό;',
@@ -55,7 +54,7 @@ const copy = {
     privacy: 'Απόρρητο',
     termsLink: 'Όροι χρήσης',
     support: 'Υποστήριξη',
-    secure: 'Ασφαλής πρόσβαση · Role-based permissions',
+    secure: 'Ασφαλής πρόσβαση · Δικαιώματα ανά ρόλο',
     required: 'Συμπληρώστε τα υποχρεωτικά πεδία.',
     mismatch: 'Οι κωδικοί δεν είναι ίδιοι.',
     invalidCredentials: 'Το email ή ο κωδικός πρόσβασης δεν είναι σωστά.',
@@ -79,7 +78,6 @@ const copy = {
     email: 'Email',
     loginId: 'User ID or Email',
     password: 'Password',
-    remember: 'Keep me signed in',
     forgotLink: 'Forgot my password',
     signIn: 'Sign in',
     noAccount: "Don't have an account?",
@@ -104,7 +102,7 @@ const copy = {
     privacy: 'Privacy',
     termsLink: 'Terms of use',
     support: 'Support',
-    secure: 'Secure access · Role-based permissions',
+    secure: 'Secure access · Permissions by role',
     required: 'Please complete the required fields.',
     mismatch: 'Passwords do not match.',
     invalidCredentials: 'The email or password is incorrect.',
@@ -345,10 +343,6 @@ export default function AuthIndex({
                     </div>
                   </label>
                   <div className="auth-form-row">
-                    <label className="auth-check">
-                      <input type="checkbox" />
-                      <span>{t.remember}</span>
-                    </label>
                     <button type="button" className="auth-text-btn" onClick={() => changeView('forgot')}>
                       {t.forgotLink}
                     </button>

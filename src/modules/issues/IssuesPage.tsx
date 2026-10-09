@@ -228,16 +228,20 @@ export default function IssuesPage() {
                   {filtered.map(i => (
                     <tr key={i.id}>
                       <td>
-                        <strong className="issue-asset" title={i.asset}>
-                          {i.asset}
-                        </strong>
+                        {subject(i).to ? (
+                          <Link className="issue-asset" to={subject(i).to!}>
+                            {i.asset}
+                          </Link>
+                        ) : (
+                          <strong className="issue-asset">{i.asset}</strong>
+                        )}
                         <small className="row-sub">
                           {[trData(i.type), trData(i.department)].filter(Boolean).join(' · ')}
                         </small>
                         {i.note && <small className="issue-note-inline">{i.note}</small>}
                       </td>
                       <td className="issue-note" title={i.note}>
-                        {i.note}
+                        <span>{i.note}</span>
                       </td>
                       <td>{i.created}</td>
                       {withPhotos && (
@@ -266,13 +270,12 @@ export default function IssuesPage() {
                           <div className="issue-actions-row">
                             {subject(i).to && (
                               <Link
-                                className="issue-action wide"
+                                className="issue-action"
                                 to={subject(i).to!}
-                                title={tr('Άνοιγμα')}
-                                aria-label={tr('Άνοιγμα')}
+                                title={tr('Άνοιγμα καρτέλας')}
+                                aria-label={tr('Άνοιγμα καρτέλας')}
                               >
                                 <ExternalLink size={14} />
-                                {tr('Άνοιγμα')}
                               </Link>
                             )}
                             {subject(i).tool && (
@@ -302,7 +305,11 @@ export default function IssuesPage() {
                                       i.asset,
                                     ),
                                     confirmLabel: tr('Επίλυση'),
-                                    onConfirm: () => resolveIssues([i.id], tr('Επιλύθηκε χειροκίνητα')),
+                                    note: {
+                                      label: tr('Πώς επιλύθηκε (προαιρετικό)'),
+                                      placeholder: tr('π.χ. Αντικαταστάθηκε από το Απόθεμα'),
+                                    },
+                                    onConfirm: how => resolveIssues([i.id], how || tr('Επιλύθηκε χειροκίνητα')),
                                   })
                                 }
                               >

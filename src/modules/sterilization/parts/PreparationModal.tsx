@@ -320,7 +320,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                         <span>
                           <strong>{tr('Αποδοχή καταγεγραμμένης έλλειψης')}</strong>
                           <small>
-                            {tr('Το Set θα προχωρήσει με') + ' '}
+                            {tr('Το Σετ θα προχωρήσει με') + ' '}
                             {prepMissingCount} {tr('λιγότερα εργαλεία.')}
                           </small>
                         </span>

@@ -3,7 +3,8 @@ import type {SurgicalCount} from '../../store/types';
 import {tr, trData} from '../../i18n';
 import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {expirySymbolSvg, sterileSymbolSvg} from '../../core/sterileSymbols';
-import {code128Svg, escapeHtml, openPrintWindow} from '../../modules/sterilization/printUtils';
+import {code128Svg, openPrintWindow} from '../../modules/sterilization/printUtils';
+import {escapeHtml} from '../../core/escapeHtml';
 
 export type CountFormItem = {id: string; barcode: string; name: string; code?: string};
 export type CountFormData = {

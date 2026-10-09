@@ -1,4 +1,5 @@
 import {ListEmpty} from '../../components/ui/EmptyState';
+import {useBrowseList} from '../../core/browseList';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
@@ -57,6 +58,7 @@ export default function ToolsPage() {
     [...new Set(tools.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
   const filterKey = [q, department, specialty, manufacturer, state, mode, usage].join('|');
+  useBrowseList('/tools', filtered);
   const rows = useProgressiveList(filtered, filterKey);
   return (
     <div className="tools-list-workspace">

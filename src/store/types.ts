@@ -269,9 +269,16 @@ export type SurgiStoreValue = {
   role: UserRole;
   activeDepartment: string;
   currentUser: SessionUser;
+  /**
+   * Whether currentUser is a real person: the signed-in user, or a Demo identity in Demo. Outside Demo it
+   * stays false until App has set the signed-in user, and nothing is permitted meanwhile.
+   */
+  sessionReady: boolean;
   permissions: readonly Permission[];
   can: (permission: Permission) => boolean;
   setRole: (role: UserRole) => void;
+  /** The signed-in user (or who an admin views the app as), with their role. */
+  setSessionUser: (user: SessionUser) => void;
   /** Demo only: work as another identity (role and department). */
   switchIdentity: (user: SessionUser) => void;
   sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => void;

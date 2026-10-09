@@ -20,7 +20,7 @@ type Props = {
 export default function BarcodeCapture({
   title,
   subtitle,
-  placeholder = tr('Barcode · S… ή T…'),
+  placeholder = tr('Σαρώστε barcode'),
   feedback,
   onBarcode,
 }: Props) {

@@ -1,6 +1,7 @@
 import {useLibraries} from '../../core/LibraryStore';
 import SterileDates from '../ui/SterileDates';
 import {useEffect, useState} from 'react';
+import {useUnsavedChanges} from '../../app/UnsavedChanges';
 import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
@@ -77,7 +78,7 @@ export default function AssetWorkbenchSidebar({
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
-  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Set') : null;
+  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : null;
   // A released Set or instrument shows how long it stays sterile.
   const sterile =
     asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
@@ -116,6 +117,7 @@ export default function AssetWorkbenchSidebar({
     asset.ownerName,
     editing,
   ]);
+  useUnsavedChanges(editing && JSON.stringify(draft) !== JSON.stringify(makeDraft()));
   const textField = (key: keyof typeof draft, value: string) => (
     <input
       className="asset-inline-input"
@@ -396,7 +398,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-barcode-card">
           <div>
             <Barcode size={17} />
-            <span>{kind === 'SET' ? tr('Barcode Set') : tr('Barcode εργαλείου')}</span>
+            <span>{kind === 'SET' ? tr('Barcode Σετ') : tr('Barcode εργαλείου')}</span>
           </div>
           <strong className="mono">{asset.barcode}</strong>
         </div>

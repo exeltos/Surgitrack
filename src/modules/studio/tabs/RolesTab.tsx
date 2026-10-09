@@ -1,3 +1,4 @@
+import {useUnsavedChanges} from '../../../app/UnsavedChanges';
 import {RefreshCcw, ShieldCheck, Users, CheckCircle2, Lock, Save} from 'lucide-react';
 import {permissionCatalog, type PermissionGroup} from '../../../core/permissions';
 import AppButton from '../../../components/ui/AppButton';
@@ -22,6 +23,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
     toggleRolePermission,
     visiblePermissionGroups,
   } = s;
+  useUnsavedChanges(roleDirty && selectedRole !== 'ADMIN');
   return (
     <>
       {tab === 'ROLES' && (
@@ -47,7 +49,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                   <div>
                     <b>{L(r.el, r.en)}</b>
                     <small>
-                      {count} {L('ενεργοί χρήστες', 'active users')}
+                      {count} {count === 1 ? L('ενεργός χρήστης', 'active user') : L('ενεργοί χρήστες', 'active users')}
                     </small>
                   </div>
                 </button>
@@ -69,7 +71,9 @@ export default function RolesTab({s}: {s: StudioPageState}) {
               <div className="studio-role-head-actions">
                 <span className="studio-role-user-count">
                   <Users size={15} />
-                  {roleCount.find(x => x.role === selectedRole)?.count || 0} {L('ενεργοί', 'active')}
+                  {(n => `${n} ${n === 1 ? L('ενεργός', 'active') : L('ενεργοί', 'active')}`)(
+                    roleCount.find(x => x.role === selectedRole)?.count || 0,
+                  )}
                 </span>
                 <AppButton onClick={resetSelectedRole}>
                   <RefreshCcw size={15} />

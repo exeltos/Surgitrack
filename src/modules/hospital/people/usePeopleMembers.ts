@@ -6,6 +6,7 @@ import type {usePeopleData} from './usePeopleData';
 import type {usePeopleView} from './usePeopleView';
 import type {usePeopleDecisions} from './usePeopleDecisions';
 import type {usePeopleDepartments} from './usePeopleDepartments';
+import {askConfirm} from '../../../components/ui/confirmService';
 
 export function usePeopleMembers(
   p: ReturnType<typeof usePeopleState> &
@@ -268,15 +269,16 @@ export function usePeopleMembers(
 
   /** Deletes the account for good; the history the user left stays. */
   const remove = async (m: Member) => {
-    if (
-      !window.confirm(
-        L(
-          `Οριστική διαγραφή του λογαριασμού ${m.name}; Δεν θα μπορεί πλέον να συνδεθεί. Το ιστορικό του παραμένει.`,
-          `Delete ${m.name}'s account for good? They will no longer be able to sign in. Their history stays.`,
-        ),
-      )
-    )
-      return;
+    const sure = await askConfirm({
+      title: L(`Οριστική διαγραφή: ${m.name}`, `Delete ${m.name} for good`),
+      message: L(
+        'Δεν θα μπορεί πλέον να συνδεθεί. Το ιστορικό του παραμένει.',
+        'They will no longer be able to sign in. Their history stays.',
+      ),
+      confirmLabel: L('Οριστική διαγραφή', 'Delete for good'),
+      danger: true,
+    });
+    if (sure === false) return;
     if (demo) {
       libs.removeUser(m.id);
       setDrawer(null);

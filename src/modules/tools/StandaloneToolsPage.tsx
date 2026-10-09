@@ -1,4 +1,5 @@
 import {ListEmpty} from '../../components/ui/EmptyState';
+import {useBrowseList} from '../../core/browseList';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronRight, Layers3, List, Plus} from 'lucide-react';
@@ -64,6 +65,7 @@ export default function StandaloneToolsPage() {
     });
     return [...m.values()];
   }, [filtered]);
+  useBrowseList('/tools', filtered);
   const rows = useProgressiveList(filtered, filterKey);
   const groupRows = useProgressiveList(groups, filterKey, 'shownGroups');
   return (

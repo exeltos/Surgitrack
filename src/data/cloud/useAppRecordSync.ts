@@ -1,5 +1,12 @@
 import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
-import {deleteAppRecords, writeAppRecords, type CloudCollection, type CloudRecord} from './appRecords';
+import {
+  deleteAppRecords,
+  loadBarcodes,
+  writeAppRecords,
+  type CloudCollection,
+  type CloudRecord,
+  type RefusedRecord,
+} from './appRecords';
 import {loadChangedRecords, loadDeletedIds, recordKey} from './remoteChanges';
 import {isRealtimeLive, onRemoteChange} from './realtime';
 import {takeRestored, writeCollection} from './localCache';
@@ -10,7 +17,9 @@ import {exportVersions, importVersions} from './versions';
 import {mergeConcurrent, recordLabel} from './mergeConcurrent';
 
 const SYNC_DELAY_MS = 400;
+/** A failed save is tried again after 5 s, then 10 s, 20 s … up to 2 minutes, until one succeeds. */
 const RETRY_DELAY_MS = 5000;
+const MAX_RETRY_DELAY_MS = 120000;
 /** How often an open screen looks for what other devices saved (and at once when the window comes back). */
 const PULL_INTERVAL_MS = 20000;
 /** With live changes connected, the periodic look is only a safety net. */
@@ -61,8 +70,46 @@ export const onSyncConflict = (listener: (conflict: SyncConflict) => void) => {
   };
 };
 
-/** Overall save state of the cloud workspace, for a status indicator. */
-export const useSyncStatus = () => useSyncExternalStore(subscribe, () => status);
+export type RefusalReason = 'permission' | 'invalid' | 'other';
+/** What the sync changed or gave up on by itself, and the user must hear about. */
+export type SyncNotice =
+  | {kind: 'barcode'; collection: 'sets' | 'tools'; changes: Array<{from: string; to: string}>}
+  | {kind: 'refused'; records: Array<{label: string; reverted: boolean; reason: RefusalReason}>};
+const noticeListeners = new Set<(notice: SyncNotice) => void>();
+/** Calls `listener` for every barcode the sync had to change and every record the server refused. */
+export const onSyncNotice = (listener: (notice: SyncNotice) => void) => {
+  noticeListeners.add(listener);
+  return () => {
+    noticeListeners.delete(listener);
+  };
+};
+const notify = (notice: SyncNotice) => noticeListeners.forEach(listener => listener(notice));
+const reasonOf = (code: string): RefusalReason =>
+  code === '42501' ? 'permission' : /^2[23]/.test(code) ? 'invalid' : 'other';
+
+// Each collection's "save now", for a sign-out that first saves what is waiting.
+const flushers = new Set<() => void>();
+/** Changes not yet confirmed by the server (at least one per collection still saving). */
+export const unsavedChanges = () =>
+  [...pending].reduce((sum, key) => sum + Math.max(pendingRecords.get(key) || 0, 1), 0);
+/** Saves what is waiting at once and waits up to `timeoutMs` for it; resolves with what is still unsaved. */
+export const flushPendingWrites = (timeoutMs: number) =>
+  new Promise<number>(resolve => {
+    if (!pending.size) return resolve(0);
+    let stop: () => void = () => undefined;
+    const timer = window.setTimeout(() => {
+      stop();
+      resolve(unsavedChanges());
+    }, timeoutMs);
+    stop = subscribe(() => {
+      if (pending.size) return;
+      window.clearTimeout(timer);
+      stop();
+      resolve(0);
+    });
+    flushers.forEach(flush => flush());
+  });
+
 /** Save state, records waiting and the last time the server was reached, for the top bar. */
 export const useSyncInfo = () => useSyncExternalStore(subscribe, () => info);
 
@@ -113,7 +160,8 @@ const adopt = (known: Map<string, CloudRecord>, items: readonly CloudRecord[], a
  * so any record whose object identity changed since the last confirmed write is sent again,
  * and records that disappeared are deleted. Writes run one at a time and always diff against
  * the latest items, so changes made while a write is in flight (even create-then-delete) are
- * reconciled once it lands. Failed writes are retried until they succeed.
+ * reconciled once it lands. Failed writes are retried, further and further apart, until they succeed;
+ * a record the server refuses for good is put back (a barcode clash renumbered), so it never blocks the rest.
  */
 export function useAppRecordSync(
   organizationId: string | undefined,
@@ -127,6 +175,8 @@ export function useAppRecordSync(
   const queue = useRef<Promise<void>>(Promise.resolve());
   const busy = useRef(false);
   const [retryTick, setRetryTick] = useState(0);
+  // Failed saves in a row, for the growing wait before the next try.
+  const failures = useRef(0);
   const applyRef = useRef(apply);
   applyRef.current = apply;
   // Records just taken from another device: their next appearance in the store is not a local change.
@@ -178,9 +228,12 @@ export function useAppRecordSync(
   useEffect(() => {
     if (!organizationId) return;
     const write = () => writeCopy.current();
+    const flushNow = () => setRetryTick(tick => tick + 1);
     cacheWriters.add(write);
+    flushers.add(flushNow);
     return () => {
       cacheWriters.delete(write);
+      flushers.delete(flushNow);
     };
   }, [organizationId]);
 
@@ -239,6 +292,70 @@ export function useAppRecordSync(
       }
       if (merged.length) applyRef.current?.(merged, []);
     };
+    // Records the server will not take (permission, invalid data): sent again they would block the
+    // collection for good, so they go back to the server's version, or away if never saved there.
+    const dropRefused = async (refusals: RefusedRecord[]) => {
+      const ids = refusals.map(refusal => refusal.id);
+      const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
+      const current = new Map(latest.current.map(item => [item.id, item]));
+      const back: CloudRecord[] = [];
+      const gone: string[] = [];
+      const records = refusals.map(({id, code}) => {
+        const server = saved.get(id);
+        const local = current.get(id);
+        if (local) superseded.current.add(local);
+        if (server) {
+          known.set(id, server);
+          back.push(server);
+        } else {
+          known.delete(id);
+          if (local) gone.push(id);
+        }
+        return {label: recordLabel(server || local || {id}), reverted: !!server, reason: reasonOf(code)};
+      });
+      applyRef.current?.(back, gone);
+      notify({kind: 'refused', records});
+    };
+    // Barcodes another station handed out first (both took the highest + 1): the record takes the next
+    // free one, counting this device's records and the server's, and is saved again.
+    const renumber = async (ids: string[]) => {
+      type Coded = CloudRecord & {barcode?: unknown; legacyBarcodes?: string[]};
+      const current = new Map(latest.current.map(item => [item.id, item as Coded]));
+      const clashing: Array<Coded & {barcode: string}> = [];
+      const others: RefusedRecord[] = [];
+      for (const id of ids) {
+        const item = current.get(id);
+        // Only a barcode this device gave (new, or changed here) is renumbered; any other clash is refused.
+        const own =
+          (collection === 'sets' || collection === 'tools') &&
+          !!applyRef.current &&
+          typeof item?.barcode === 'string' &&
+          (known.get(id) as Coded | undefined)?.barcode !== item.barcode;
+        if (own) clashing.push(item as Coded & {barcode: string});
+        else others.push({id, code: '23505', message: 'unique violation'});
+      }
+      if (others.length) await dropRefused(others);
+      if (!clashing.length || (collection !== 'sets' && collection !== 'tools')) return;
+      const taken = [
+        ...latest.current.flatMap(item => [(item as Coded).barcode, ...((item as Coded).legacyBarcodes || [])]),
+        ...(await loadBarcodes(organizationId, collection)),
+      ];
+      let max = taken.reduce<number>((m, barcode) => {
+        const numeric = typeof barcode === 'string' ? Number(barcode.replace(/\D/g, '')) : NaN;
+        return Number.isFinite(numeric) ? Math.max(m, numeric) : m;
+      }, 0);
+      const prefix = collection === 'sets' ? 'S' : 'T';
+      const changes: Array<{from: string; to: string}> = [];
+      const renumbered = clashing.map(item => {
+        const barcode = `${prefix}${String(++max).padStart(6, '0')}`;
+        changes.push({from: item.barcode, to: barcode});
+        superseded.current.add(item);
+        return {...item, barcode};
+      });
+      // Not marked as saved: the store's new version differs from `known`, so the next flush sends it.
+      applyRef.current?.(renumbered, []);
+      notify({kind: 'barcode', collection, changes});
+    };
     const flush = async () => {
       busy.current = true;
       try {
@@ -255,23 +372,31 @@ export function useAppRecordSync(
           const sendable = next.changed.filter(item => !superseded.current.has(item));
           const outcome = sendable.length
             ? await writeAppRecords(organizationId, collection, sendable)
-            : {rejected: [], stale: []};
+            : {rejected: [], stale: [], refused: []};
           const rejected = new Set(outcome.rejected);
           const stale = new Set(outcome.stale);
+          const refused = new Set(outcome.refused.map(refusal => refusal.id));
           // What the database took is saved even when one record in the batch was refused.
           sendable
-            .filter(item => !rejected.has(item.id) && !stale.has(item.id))
+            .filter(item => !rejected.has(item.id) && !stale.has(item.id) && !refused.has(item.id))
             .forEach(item => known.set(item.id, item));
-          if (stale.size) {
-            await resolveStale([...stale]);
-            break;
+          if (refused.size) await dropRefused(outcome.refused);
+          if (stale.size) await resolveStale([...stale]);
+          if (rejected.size) await renumber([...rejected]);
+          // The store is taking the restored, merged or renumbered records: the next flush sends what is left.
+          if (refused.size || stale.size || rejected.size) break;
+          if (next.removed.length) {
+            const kept = await deleteAppRecords(organizationId, collection, next.removed);
+            const keptIds = new Set(kept.map(refusal => refusal.id));
+            next.removed.filter(id => !keptIds.has(id)).forEach(id => known.delete(id));
+            if (kept.length) {
+              await dropRefused(kept);
+              break;
+            }
           }
-          if (rejected.size)
-            throw new Error(`${collection}: ${[...rejected].join(', ')} refused (barcode already in use)`);
-          if (next.removed.length) await deleteAppRecords(organizationId, collection, next.removed);
-          next.removed.forEach(id => known.delete(id));
         }
         failed.delete(key);
+        failures.current = 0;
         lastSyncAt = Date.now();
         // Still changing after the last round: run another flush rather than wait for a render.
         const rest = diff(known, latest.current);
@@ -279,7 +404,9 @@ export function useAppRecordSync(
       } catch (error) {
         console.error(`SurgiTrack: saving ${collection} failed`, error);
         failed.add(key);
-        window.setTimeout(() => setRetryTick(tick => tick + 1), RETRY_DELAY_MS);
+        const delay = Math.min(RETRY_DELAY_MS * 2 ** failures.current, MAX_RETRY_DELAY_MS);
+        failures.current += 1;
+        window.setTimeout(() => setRetryTick(tick => tick + 1), delay);
       } finally {
         busy.current = false;
         publish();

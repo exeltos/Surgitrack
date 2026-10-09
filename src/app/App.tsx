@@ -1,6 +1,9 @@
 import {Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
+import {createPortal} from 'react-dom';
 import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import AppShell from '../components/layout/AppShell';
+import {UnsavedChangesProvider} from './UnsavedChanges';
+import {ConfirmHost} from '../components/ui/confirmService';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import AuthIndex from '../modules/auth/AuthIndex';
 import PendingAccess from '../modules/auth/PendingAccess';
@@ -18,6 +21,7 @@ import Spinner from '../components/ui/Spinner';
 import {lazyPage} from '../core/resilience';
 import NotFoundPage from '../modules/NotFoundPage';
 import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
+import {useSignOutGuard} from './useSignOutGuard';
 import {
   type AccessRequest,
   canViewAs,
@@ -79,7 +83,7 @@ const Guard = ({permission, children}: {permission: Permission; children: ReactN
 );
 
 export default function App() {
-  const {setRole, currentUser} = useSurgi();
+  const {setSessionUser, sessionReady, currentUser} = useSurgi();
   const {lang} = useAppPreferences();
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,6 +95,7 @@ export default function App() {
     () => passwordRecoveryPending() || /type=(recovery|invite)/.test(window.location.hash),
   );
   const recoveryRef = useRef(passwordRecovery);
+  const [signOutGuard, guardSignOut] = useSignOutGuard();
   useEffect(() => {
     recoveryRef.current = passwordRecovery;
   }, [passwordRecovery]);
@@ -136,7 +141,7 @@ export default function App() {
       sessionStorage.setItem('surgitrack-auth', '1');
       sessionStorage.setItem('surgitrack-demo-role', role);
       sessionStorage.setItem('surgitrack-session-user', JSON.stringify(user));
-      setRole(role);
+      setSessionUser(user);
       setAuthenticated(true);
       setAuthReady(true);
     };
@@ -158,7 +163,7 @@ export default function App() {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [setRole]);
+  }, [setSessionUser]);
   // After sign-in the page reloads so the workspace gate can load the user's hospital.
   const login = () => {
     // Signing in normally ends any unfinished password reset in this tab.
@@ -169,13 +174,13 @@ export default function App() {
     window.location.hash = '#/';
     window.location.reload();
   };
-  const logout = async () => {
+  // Asked in the app, after what is still unsaved has had a chance to reach the server (see useSignOutGuard).
+  const logout = () => guardSignOut(() => void signOut());
+  const signOut = async () => {
     const msg =
       lang === 'el'
         ? `Καλή συνέχεια, ${currentUser.name.split(' ')[0]}.`
         : `See you soon, ${currentUser.name.split(' ')[0]}.`;
-    if (!window.confirm(lang === 'el' ? 'Θέλετε να αποσυνδεθείτε από το SurgiTrack;' : 'Sign out of SurgiTrack?'))
-      return;
     const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
     // This device's copy of the hospital (patient codes included) goes with the session.
     await clearCache();
@@ -230,207 +235,219 @@ export default function App() {
         }}
       />
     );
+  // Never show (or act as) a stand-in person outside Demo: wait until the store has the signed-in user.
+  if (!sessionReady) return <Spinner fullScreen />;
   return (
-    <AppShell onLogout={logout}>
-      {/* Pages re-render their text in the new language when it changes. */}
-      <Routes key={lang}>
-        <Route path="/" element={<RoleHome />} />
-        <Route
-          path="/sets"
-          element={
-            <Guard permission="asset.registry.view">
-              <SetsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/sets/new"
-          element={
-            <Guard permission="asset.create">
-              <AssetCreatePage kind="SET" />
-            </Guard>
-          }
-        />
-        <Route
-          path="/sets/:id"
-          element={
-            <Guard permission="asset.detail.view">
-              <SetDetailPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/tools"
-          element={
-            <Guard permission="asset.registry.view">
-              <ToolsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/tools/new"
-          element={
-            <Guard permission="asset.create">
-              <AssetCreatePage kind="TOOL" />
-            </Guard>
-          }
-        />
-        <Route
-          path="/tools/:id"
-          element={
-            <Guard permission="asset.detail.view">
-              <ToolDetailPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/standalone-tools"
-          element={
-            <Guard permission="asset.registry.view">
-              <StandaloneToolsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/expiry"
-          element={
-            <Guard permission="asset.registry.view">
-              <SterileExpiryPage />
-            </Guard>
-          }
-        />
-        <Route path="/assets" element={<Navigate to="/sets" replace />} />
-        <Route
-          path="/bin"
-          element={
-            <Guard permission="asset.delete">
-              <BinPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/stock"
-          element={
-            <Guard permission="stock.manage">
-              <StockPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/sterilization"
-          element={
-            <Guard permission="sterilization.workspace">
-              <SterilizationPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/tools/names"
-          element={
-            <Guard permission="asset.edit">
-              <NameCheckPage />
-            </Guard>
-          }
-        />
-        <Route path="/replacements" element={<Navigate to="/issues?tab=replacements" replace />} />
-        <Route
-          path="/import"
-          element={
-            <Guard permission="asset.create">
-              <ImportPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/devices"
-          element={
-            <Guard permission="sterilization.workspace">
-              <DevicesPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/overview/department"
-          element={
-            <Guard permission="overview.view">
-              <DepartmentPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/department"
-          element={
-            <Guard permission="department.workspace">
-              <DepartmentPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/issues"
-          element={
-            <Guard permission="issue.view">
-              <IssuesPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/movements"
-          element={
-            <Guard permission="history.view">
-              <MovementsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/traceability"
-          element={
-            <Guard permission="traceability.view">
-              <TraceabilityPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/reports"
-          element={
-            <Guard permission="reports.view">
-              <ReportsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/studio"
-          element={
-            <Guard permission="studio.manage">
-              <StudioPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/overview"
-          element={
-            <Guard permission="overview.view">
-              <HospitalOverviewPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/hospitals"
-          element={
-            <Guard permission="studio.manage">
-              <HospitalsPage />
-            </Guard>
-          }
-        />
-        <Route
-          path="/hospital"
-          element={
-            <Guard permission="studio.manage">
-              <HospitalAdminPage />
-            </Guard>
-          }
-        />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AppShell>
+    <UnsavedChangesProvider>
+      <AppShell onLogout={logout}>
+        {/* Pages re-render their text in the new language when it changes. */}
+        <Routes key={lang}>
+          <Route path="/" element={<RoleHome />} />
+          <Route
+            path="/sets"
+            element={
+              <Guard permission="asset.registry.view">
+                <SetsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/sets/new"
+            element={
+              <Guard permission="asset.create">
+                <AssetCreatePage kind="SET" />
+              </Guard>
+            }
+          />
+          <Route
+            path="/sets/:id"
+            element={
+              <Guard permission="asset.detail.view">
+                <SetDetailPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/tools"
+            element={
+              <Guard permission="asset.registry.view">
+                <ToolsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/tools/new"
+            element={
+              <Guard permission="asset.create">
+                <AssetCreatePage kind="TOOL" />
+              </Guard>
+            }
+          />
+          <Route
+            path="/tools/:id"
+            element={
+              <Guard permission="asset.detail.view">
+                <ToolDetailPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/standalone-tools"
+            element={
+              <Guard permission="asset.registry.view">
+                <StandaloneToolsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/expiry"
+            element={
+              <Guard permission="asset.registry.view">
+                <SterileExpiryPage />
+              </Guard>
+            }
+          />
+          <Route path="/assets" element={<Navigate to="/sets" replace />} />
+          <Route
+            path="/bin"
+            element={
+              <Guard permission="asset.delete">
+                <BinPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/stock"
+            element={
+              <Guard permission="stock.manage">
+                <StockPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/sterilization"
+            element={
+              <Guard permission="sterilization.workspace">
+                <SterilizationPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/tools/names"
+            element={
+              <Guard permission="asset.edit">
+                <NameCheckPage />
+              </Guard>
+            }
+          />
+          <Route path="/replacements" element={<Navigate to="/issues?tab=replacements" replace />} />
+          <Route
+            path="/import"
+            element={
+              <Guard permission="asset.create">
+                <ImportPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/devices"
+            element={
+              <Guard permission="sterilization.workspace">
+                <DevicesPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/overview/department"
+            element={
+              <Guard permission="overview.view">
+                <DepartmentPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/department"
+            element={
+              <Guard permission="department.workspace">
+                <DepartmentPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/issues"
+            element={
+              <Guard permission="issue.view">
+                <IssuesPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/movements"
+            element={
+              <Guard permission="history.view">
+                <MovementsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/traceability"
+            element={
+              <Guard permission="traceability.view">
+                <TraceabilityPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <Guard permission="reports.view">
+                <ReportsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/studio"
+            element={
+              <Guard permission="studio.manage">
+                <StudioPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/overview"
+            element={
+              <Guard permission="overview.view">
+                <HospitalOverviewPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/hospitals"
+            element={
+              <Guard permission="studio.manage">
+                <HospitalsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/hospital"
+            element={
+              <Guard permission="studio.manage">
+                <HospitalAdminPage />
+              </Guard>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+        {/* On top of the screen lock too: "switch user" there signs out through it. */}
+        {createPortal(
+          <div className="sign-out-guard">
+            {signOutGuard}
+            <ConfirmHost />
+          </div>,
+          document.body,
+        )}
+      </AppShell>
+    </UnsavedChangesProvider>
   );
 }

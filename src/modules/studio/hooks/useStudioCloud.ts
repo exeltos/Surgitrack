@@ -74,7 +74,8 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
     );
   };
   useEffect(() => {
-    if (platformAdmin) void loadCloudUsers();
+    // A hospital admin reads only their own hospital's profiles (RLS): the role counts need them too.
+    void loadCloudUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libs.dataMode]);
   const displayedUsers = libs.dataMode === 'PRODUCTION' ? cloudUsers : libs.users;

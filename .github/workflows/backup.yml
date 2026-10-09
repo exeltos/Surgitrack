@@ -1,0 +1,94 @@
+name: Nightly backup
+
+# Every night: a data-only dump of the live database's public schema, restored onto a fresh database built
+# from supabase/migrations (which also proves the repository's schema still matches production), row counts
+# compared table by table, then encrypted and kept as a workflow artifact for 14 days.
+#
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL     the Session pooler connection string (Supabase → Connect), with the database password
+#   BACKUP_PASSPHRASE   a long passphrase; keep a copy outside GitHub, it is needed to open a backup:
+#                       gpg --decrypt backup.dump.gpg > backup.dump
+# Without them the run says so and stops without failing.
+# Accounts (auth.users) are not in the backup: after a restore, people sign in again through a reset link.
+
+on:
+  schedule:
+    - cron: '23 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Backup and restore test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+
+    steps:
+      - name: Check the secrets
+        id: secrets
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::warning::SUPABASE_DB_URL or BACKUP_PASSPHRASE is not set; no backup was made."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.secrets.outputs.ready == 'true'
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL 17 (same major version as the live project)
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-17
+
+      - name: Dump the live data
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          stamp="$(date -u +%Y-%m-%d)"
+          echo "STAMP=$stamp" >> "$GITHUB_ENV"
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" --data-only --schema=public -Fc -f backup.dump
+          /usr/lib/postgresql/17/bin/psql "$SUPABASE_DB_URL" -X -tA -F ' ' -c "select format('%s %s', c.relname,
+              (xpath('/row/n/text()', query_to_xml(format('select count(*) as n from public.%I', c.relname), false, true, '')))[1]::text)
+            from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') order by 1" > live-counts.txt
+          echo "Dump: $(du -h backup.dump | cut -f1), $(wc -l < live-counts.txt) tables."
+
+      - name: Restore onto the schema built from the migrations
+        if: steps.secrets.outputs.ready == 'true'
+        run: PGBIN=/usr/lib/postgresql/17/bin RESTORE_DUMP=backup.dump RESTORE_COUNTS=restored-counts.txt bash supabase/tests/run-local.sh
+
+      - name: Compare row counts
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          if ! diff -u live-counts.txt restored-counts.txt; then
+            echo "::error::The restored database does not match the live one (see the diff above)."
+            exit 1
+          fi
+          echo "All $(wc -l < live-counts.txt) tables restored with the same number of rows."
+
+      - name: Encrypt
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase-fd 0 -o "backup-$STAMP.dump.gpg" backup.dump <<< "$BACKUP_PASSPHRASE"
+          rm backup.dump
+
+      - name: Keep the backup for 14 days
+        if: steps.secrets.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: surgitrack-backup-${{ env.STAMP }}
+          path: |
+            backup-${{ env.STAMP }}.dump.gpg
+            live-counts.txt
+          retention-days: 14

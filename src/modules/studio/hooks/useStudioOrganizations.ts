@@ -7,6 +7,7 @@ import {departments as defaultDepartments} from '../../../core/libraries';
 import {organizationCode} from '../../../core/organizationCode';
 import type {useStudioState} from './useStudioState';
 import type {useStudioCloud} from './useStudioCloud';
+import {tellUser} from '../../../components/ui/confirmService';
 
 export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & ReturnType<typeof useStudioCloud>) {
   const {
@@ -199,10 +200,11 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
       : await supabase.rpc('platform_reset_demo_organization', {p_org: demoOrganizationId});
     setCloudError(resetError ? resetError.message : '');
     if (!resetError)
-      window.alert(
+      void tellUser(
+        L('Το Demo επανήλθε', 'The Demo was reset'),
         L(
-          'Το Demo επανήλθε. Την επόμενη φορά που θα μπείτε θα έχει ξανά τα αρχικά δοκιμαστικά δεδομένα.',
-          'The Demo was reset. Next time you enter it will have the original sample data again.',
+          'Την επόμενη φορά που θα μπείτε θα έχει ξανά τα αρχικά δοκιμαστικά δεδομένα.',
+          'Next time you enter it will have the original sample data again.',
         ),
       );
   };

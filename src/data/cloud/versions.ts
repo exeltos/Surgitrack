@@ -12,7 +12,7 @@ const of = (collection: CloudCollection) => {
 };
 
 export const versionOf = (collection: CloudCollection, id: string) => versions.get(collection)?.get(id);
-export const setVersion = (collection: CloudCollection, id: string, version: unknown) => {
+const setVersion = (collection: CloudCollection, id: string, version: unknown) => {
   if (typeof version === 'string' && version) of(collection).set(id, version);
 };
 /** Remembers the versions of rows read from or returned by the database. */

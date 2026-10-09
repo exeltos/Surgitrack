@@ -94,8 +94,23 @@ const UNIQUE_VIOLATION = '23505';
 const RLS_VIOLATION = '42501';
 /** The database refused a save because the record changed since this device saw it (S4). */
 const STALE_VERSION = '40001';
-const isStale = (error: {code?: string; message?: string} | null) =>
+type DbError = {code?: string; message?: string; details?: string};
+const isStale = (error: DbError | null) =>
   !!error && (error.code === STALE_VERSION || /changed on another device/.test(error.message || ''));
+/**
+ * A refusal that sending again will not change: permission (RLS), a constraint or invalid data, or a
+ * rule raised by a trigger. Anything else (network, timeouts, server errors, a schema the client does
+ * not know yet) is worth another try.
+ */
+const isPermanentRefusal = (error: DbError | null) =>
+  !!error && (error.code === RLS_VIOLATION || error.code === 'P0001' || /^2[23]/.test(error.code || ''));
+/** A unique clash is the barcode's unless the database names the primary key (the id). */
+const isBarcodeClash = (error: DbError) =>
+  error.code === UNIQUE_VIOLATION && !/_pkey|primary key/i.test(`${error.message || ''} ${error.details || ''}`);
+
+/** A record the database will not take, and why (its error code). */
+export type RefusedRecord = {id: string; code: string; message: string};
+export type WriteOutcome = {rejected: string[]; stale: string[]; refused: RefusedRecord[]};
 
 /**
  * Saves one row: an update when it exists, otherwise an insert. Department users may update a Set
@@ -114,7 +129,7 @@ async function saveTableRow(
     .eq('organization_id', organizationId as string)
     .eq('id', id as string)
     .select('id,updated_at');
-  if (error?.code === UNIQUE_VIOLATION) return 'conflict';
+  if (error && isBarcodeClash(error)) return 'conflict';
   if (isStale(error)) return 'stale';
   if (error) throw error;
   if (data.length) {
@@ -124,7 +139,7 @@ async function saveTableRow(
   const {expected_updated_at: _expected, ...fresh} = row;
   void _expected;
   const {data: inserted, error: insertError} = await supabase.from(table).insert(fresh).select('id,updated_at');
-  if (insertError?.code === UNIQUE_VIOLATION) return 'conflict';
+  if (insertError && isBarcodeClash(insertError)) return 'conflict';
   if (insertError) throw insertError;
   rememberVersions(collection, (inserted || []) as Array<Record<string, unknown>>);
   return 'saved';
@@ -132,16 +147,16 @@ async function saveTableRow(
 
 /**
  * Saves records of a collection. Batches go in one request; history is
- * insert-only (a record already saved stays as it was). When the database refuses a batch of
- * changeable records (a barcode another record already holds, or a department user updating),
- * each record is saved on its own. Returns the ids refused for a barcode clash, so the rest still
- * count as saved.
+ * insert-only (a record already saved stays as it was). When the database refuses a batch, it is
+ * halved until the refused records are found, so the rest are still saved. Returns the ids refused
+ * for a barcode clash, those changed meanwhile on another device, and those refused for good
+ * (permission, invalid data). Anything worth another try (network, server) is thrown.
  */
 export async function writeAppRecords(
   organizationId: string,
   collection: CloudCollection,
   items: CloudRecord[],
-): Promise<{rejected: string[]; stale: string[]}> {
+): Promise<WriteOutcome> {
   const {table, mutable} = CLOUD_TABLES[collection];
   const toRow = (item: CloudRecord) => {
     const row = tableToRow(organizationId, collection, item as CloudRecord & Record<string, unknown>);
@@ -149,26 +164,66 @@ export async function writeAppRecords(
     if (mutable) row.expected_updated_at = versionOf(collection, item.id) ?? null;
     return row;
   };
-  const rejected: string[] = [];
-  const stale: string[] = [];
-  for (const chunk of chunks(items)) {
+  const outcome: WriteOutcome = {rejected: [], stale: [], refused: []};
+  const send = async (batch: CloudRecord[]) => {
     const request = supabase
       .from(table)
-      .upsert(chunk.map(toRow), {onConflict: 'organization_id,id', ignoreDuplicates: !mutable});
+      .upsert(batch.map(toRow), {onConflict: 'organization_id,id', ignoreDuplicates: !mutable});
     const {data, error} = mutable ? await request.select('id,updated_at') : await request;
-    if (!error) {
-      if (mutable) rememberVersions(collection, (data || []) as Array<Record<string, unknown>>);
-      continue;
+    if (!error && mutable) rememberVersions(collection, (data || []) as Array<Record<string, unknown>>);
+    return error;
+  };
+  const saveOne = async (item: CloudRecord) => {
+    try {
+      if (!mutable) {
+        const error = await send([item]);
+        if (error) throw error;
+        return;
+      }
+      const result = await saveTableRow(collection, toRow(item));
+      if (result === 'conflict') outcome.rejected.push(item.id);
+      if (result === 'stale') outcome.stale.push(item.id);
+    } catch (error) {
+      const refusal = error as DbError;
+      if (!isPermanentRefusal(refusal)) throw error;
+      outcome.refused.push({id: item.id, code: refusal.code || '', message: refusal.message || ''});
     }
-    if (!mutable || (![UNIQUE_VIOLATION, RLS_VIOLATION].includes(error.code) && !isStale(error))) throw error;
-    // One record of the batch was refused: save them one by one to find which.
-    for (const item of chunk) {
-      const outcome = await saveTableRow(collection, toRow(item));
-      if (outcome === 'conflict') rejected.push(item.id);
-      if (outcome === 'stale') stale.push(item.id);
+  };
+  const settle = async (batch: CloudRecord[], error: DbError) => {
+    if (!isStale(error) && !isPermanentRefusal(error)) throw error;
+    // A department user's upsert is refused as a whole (see saveTableRow): each record goes on its own.
+    if (batch.length === 1 || (mutable && error.code === RLS_VIOLATION)) {
+      for (const item of batch) await saveOne(item);
+      return;
     }
+    const half = Math.ceil(batch.length / 2);
+    for (const part of [batch.slice(0, half), batch.slice(half)]) {
+      const partError = await send(part);
+      if (partError) await settle(part, partError);
+    }
+  };
+  for (const chunk of chunks(items)) {
+    const error = await send(chunk);
+    if (error) await settle(chunk, error);
   }
-  return {rejected, stale};
+  return outcome;
+}
+
+/** Every barcode of the hospital's Sets or instruments, retired ones included (never handed out again). */
+export async function loadBarcodes(organizationId: string, collection: 'sets' | 'tools') {
+  const rows = await loadAllPages<{barcode: string; legacy_barcodes: string[] | null}>((from, to, withCount) =>
+    supabase
+      .from(CLOUD_TABLES[collection].table)
+      .select('barcode,legacy_barcodes', withCount ? {count: 'exact'} : undefined)
+      .eq('organization_id', organizationId)
+      .order('id')
+      .range(from, to)
+      .then(result => ({
+        ...result,
+        data: result.data as unknown as Array<{barcode: string; legacy_barcodes: string[] | null}> | null,
+      })),
+  );
+  return rows.flatMap(row => [row.barcode, ...(row.legacy_barcodes || [])]);
 }
 
 /** The saved records with these ids (and their versions), to merge a refused save with them. */
@@ -188,15 +243,25 @@ export async function loadRecordsById(organizationId: string, collection: CloudC
   return records;
 }
 
+/** Deletes records; returns those the database refuses for good (the rest are deleted). */
 export async function deleteAppRecords(organizationId: string, collection: CloudCollection, ids: string[]) {
+  const remove = async (batch: string[]) =>
+    (await supabase.from(CLOUD_TABLES[collection].table).delete().eq('organization_id', organizationId).in('id', batch))
+      .error as DbError | null;
+  const refused: RefusedRecord[] = [];
   for (const chunk of chunks(ids)) {
-    const {error} = await supabase
-      .from(CLOUD_TABLES[collection].table)
-      .delete()
-      .eq('organization_id', organizationId)
-      .in('id', chunk);
-    if (error) throw error;
+    const error = await remove(chunk);
+    if (!error) continue;
+    if (!isPermanentRefusal(error)) throw error;
+    // Refusals of a delete are rare (a record still referenced): find which one by one.
+    for (const id of chunk) {
+      const one = chunk.length === 1 ? error : await remove([id]);
+      if (!one) continue;
+      if (!isPermanentRefusal(one)) throw one;
+      refused.push({id, code: one.code || '', message: one.message || ''});
+    }
   }
+  return refused;
 }
 
 /**

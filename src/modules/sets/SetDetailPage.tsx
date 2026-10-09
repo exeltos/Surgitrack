@@ -1,4 +1,5 @@
 import {useMemo, useState} from 'react';
+import BrowseArrows from '../../components/assets/BrowseArrows';
 import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {
   ArrowLeft,
@@ -131,8 +132,8 @@ export default function SetDetailPage() {
   if (!set)
     return (
       <div className="empty">
-        <strong>{tr('Το Set δεν βρέθηκε.')}</strong>
-        <span>{tr('Επιστρέψτε στη λίστα των Set και επιλέξτε ξανά.')}</span>
+        <strong>{tr('Το Σετ δεν βρέθηκε.')}</strong>
+        <span>{tr('Επιστρέψτε στη λίστα των Σετ και επιλέξτε ξανά.')}</span>
         <Link className="primary-link" to={role === 'DEPARTMENT' ? '/department' : '/sets'}>
           {tr('Πίσω στη λίστα')}
         </Link>
@@ -182,6 +183,7 @@ export default function SetDetailPage() {
           <BackLink fallback={backTo} className="asset-action-link">
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </BackLink>
+          {!departmentView && <BrowseArrows base="/sets" id={set.id} />}
         </div>
         <div className="asset-action-group">
           <ActionMenu
@@ -654,7 +656,7 @@ export default function SetDetailPage() {
                   {set.notes ? (
                     <p>{set.notes}</p>
                   ) : (
-                    <AssetEmptyState>{tr('Δεν υπάρχουν σημειώσεις για το Set.')}</AssetEmptyState>
+                    <AssetEmptyState>{tr('Δεν υπάρχουν σημειώσεις για το Σετ.')}</AssetEmptyState>
                   )}
                 </div>
               </section>

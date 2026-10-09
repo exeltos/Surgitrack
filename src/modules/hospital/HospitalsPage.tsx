@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Check, LogIn, LogOut, Pencil, Plus, RefreshCw, Search, X} from 'lucide-react';
+import {Navigate} from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
@@ -8,6 +9,7 @@ import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {activeHospitalId, switchHospital} from '../../data/cloud/hospitalSwitch';
 import Spinner from '../../components/ui/Spinner';
 import {formatDate} from '../../core/displayDate';
+import {askConfirm} from '../../components/ui/confirmService';
 
 type Hospital = {id: string; name: string; code: string; active: boolean; demo_enabled: boolean};
 type Stats = {departments: number; users: number; activeUsers: number; pending: number; linkUntil?: string};
@@ -79,15 +81,7 @@ export default function HospitalsPage() {
     return hospitals.filter(h => !q || `${h.name} ${h.code}`.toLowerCase().includes(q));
   }, [hospitals, query]);
 
-  if (!platform)
-    return (
-      <div className="hospitals-page">
-        <PageHeader
-          title={L('Νοσοκομεία', 'Hospitals')}
-          description={L('Διαθέσιμο μόνο στον διαχειριστή πλατφόρμας.', 'Available to the platform admin only.')}
-        />
-      </div>
-    );
+  if (!platform) return <Navigate to="/hospital" replace />;
 
   const save = async () => {
     if (!draft?.name.trim() || !draft.code.trim()) return;
@@ -113,12 +107,12 @@ export default function HospitalsPage() {
   const toggleActive = async (h: Hospital) => {
     if (
       h.active &&
-      !window.confirm(
-        L(
-          `Απενεργοποίηση του ${h.name}; Οι χρήστες του δεν θα μπορούν να εργαστούν.`,
-          `Deactivate ${h.name}? Its users will not be able to work.`,
-        ),
-      )
+      (await askConfirm({
+        title: L(`Απενεργοποίηση: ${h.name}`, `Deactivate ${h.name}`),
+        message: L('Οι χρήστες του δεν θα μπορούν να εργαστούν.', 'Its users will not be able to work.'),
+        confirmLabel: L('Απενεργοποίηση', 'Deactivate'),
+        danger: true,
+      })) === false
     )
       return;
     const {error: toggleError} = await supabase.rpc('platform_update_organization', {

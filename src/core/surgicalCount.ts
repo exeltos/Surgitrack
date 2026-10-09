@@ -12,7 +12,7 @@ export function countsAtDepartment(department: string | undefined, configured?: 
 }
 
 /** The default for departments not yet configured: names that say operating theatre. */
-export const isOperatingTheatre = (department: string) => normalizeGreek(department).includes('ΧΕΙΡΟΥΡΓΕΙ');
+const isOperatingTheatre = (department: string) => normalizeGreek(department).includes('ΧΕΙΡΟΥΡΓΕΙ');
 
 /** The configured list, or the default one built from the hospital's departments. */
 export const countDepartments = (departments: readonly string[], configured?: readonly string[]) =>

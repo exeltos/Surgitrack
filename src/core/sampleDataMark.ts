@@ -11,7 +11,6 @@ let marked = false;
 export const setSampleDataMark = (on: boolean) => {
   marked = on;
 };
-export const sampleDataMarked = () => marked;
 
 /** The table with "DEMO" in its title and a line saying the data are sample data. */
 export const markTable = (table: ExportTable): ExportTable =>

@@ -5,6 +5,7 @@ import type {Request} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
 import type {usePeopleData} from './usePeopleData';
 import type {usePeopleView} from './usePeopleView';
+import {askConfirm} from '../../../components/ui/confirmService';
 
 export function usePeopleDecisions(
   p: ReturnType<typeof usePeopleState> & ReturnType<typeof usePeopleData> & ReturnType<typeof usePeopleView>,
@@ -17,7 +18,19 @@ export function usePeopleDecisions(
    */
   const decide = async (r: Request, approve: boolean) => {
     const d = decisionFor(r);
-    if (!approve && !window.confirm(L(`Απόρριψη του αιτήματος του ${r.full_name};`, `Reject ${r.full_name}?`))) return;
+    if (
+      !approve &&
+      (await askConfirm({
+        title: L('Απόρριψη αιτήματος', 'Reject request'),
+        message: L(
+          `Το αίτημα του/της ${r.full_name} απορρίπτεται και ενημερώνεται με email.`,
+          `${r.full_name}'s request is rejected and they are told by email.`,
+        ),
+        confirmLabel: L('Απόρριψη', 'Reject'),
+        danger: true,
+      })) === false
+    )
+      return;
     const role = accountRole(d.role);
     // A hospital admin belongs to no department (the database enforces it too).
     const departmentId = wholeHospital(d.role) ? null : d.departmentId || null;
@@ -78,7 +91,14 @@ export function usePeopleDecisions(
 
   /** Withdraws a signup invitation that was not filled in yet. */
   const cancelInvitation = async (r: Request) => {
-    if (!window.confirm(L(`Ακύρωση της πρόσκλησης προς ${r.email};`, `Cancel the invitation to ${r.email}?`))) return;
+    const sure = await askConfirm({
+      title: L('Ακύρωση πρόσκλησης', 'Cancel invitation'),
+      message: L(`Η πρόσκληση προς ${r.email} δεν θα ισχύει πια.`, `The invitation to ${r.email} will no longer work.`),
+      confirmLabel: L('Ακύρωση πρόσκλησης', 'Cancel invitation'),
+      cancelLabel: L('Πίσω', 'Back'),
+      danger: true,
+    });
+    if (sure === false) return;
     setBusy(true);
     const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('access-requests', {
       body: {action: 'cancel-invite', request_id: r.id},

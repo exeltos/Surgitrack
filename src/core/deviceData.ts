@@ -84,7 +84,7 @@ const fieldOf = (name: string) => {
   return (Object.keys(NAMES) as Field[]).find(field => NAMES[field].includes(k));
 };
 
-export const readingResult = (value: unknown): ReadingResult => {
+const readingResult = (value: unknown): ReadingResult => {
   if (value === true) return 'PASS';
   if (value === false) return 'FAIL';
   const v = key(String(value ?? ''));

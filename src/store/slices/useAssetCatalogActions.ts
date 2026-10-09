@@ -183,7 +183,7 @@ export function useAssetCatalogActions(
         status: 'Αφαίρεση εργαλείου από Set',
         by: currentUser.name,
       });
-      notify(tr('{0} αφαιρέθηκε από το Set.', t.barcode));
+      notify(tr('{0} αφαιρέθηκε από το Σετ.', t.barcode));
       return;
     }
     setTools(x =>
@@ -443,8 +443,8 @@ export function useAssetCatalogActions(
     });
     notify(
       inStock
-        ? tr('{0}: το νέο Set δημιουργήθηκε αυτόματα στο Απόθεμα Σετ.', barcode)
-        : tr('{0}: το νέο Set δημιουργήθηκε.', barcode),
+        ? tr('{0}: το νέο Σετ δημιουργήθηκε αυτόματα στο Απόθεμα Σετ.', barcode)
+        : tr('{0}: το νέο Σετ δημιουργήθηκε.', barcode),
     );
     return id;
   };

@@ -2,7 +2,7 @@ import {supabase} from '../../lib/supabase';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import type {SessionUser, UserRole} from '../../store/types';
 
-export const PLATFORM_ADMIN_EMAIL = 'info@exeltos.com';
+const PLATFORM_ADMIN_EMAIL = 'info@exeltos.com';
 
 /** Who is actually signed in, independent of any role they are currently viewing the app as. */
 export type RealIdentity = {
