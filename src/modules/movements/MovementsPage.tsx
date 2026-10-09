@@ -196,7 +196,7 @@ export default function MovementsPage() {
         className="movement-filter-bar"
         query={q}
         onQueryChange={setQ}
-        placeholder={tr('Barcode, Set/εργαλείο, χρήστης ή κωδικός ασθενούς...')}
+        placeholder={tr('Barcode, Σετ/εργαλείο, χρήστης ή κωδικός ασθενούς...')}
         filters={[
           {
             key: 'kind',
@@ -279,7 +279,7 @@ export default function MovementsPage() {
         </div>
         <div className="ledger-columns">
           <span>{tr('Ημερομηνία / ώρα')}</span>
-          <span>{tr('Set / Εργαλείο')}</span>
+          <span>{tr('Σετ / Εργαλείο')}</span>
           <span>{tr('Διαδρομή')}</span>
           <span>{tr('Ενέργεια')}</span>
           <span>{tr('Χρήστης')}</span>
@@ -305,7 +305,7 @@ export default function MovementsPage() {
                     <b>{m.at}</b>
                   </span>
                   <span className="ledger-asset">
-                    <small>{m.assetKind === 'SET' ? 'SET' : tr('ΕΡΓΑΛΕΙΟ')}</small>
+                    <small>{m.assetKind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
                     <b>{asset.barcode}</b>
                     {asset.name !== asset.barcode && <em>{asset.name}</em>}
                   </span>

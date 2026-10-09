@@ -59,7 +59,7 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
                   <ArrowRight size={16} />
                   <span>
                     <b>{tr('Κάλυψη έλλειψης')}</b>
-                    <small>{tr('Επιλογή εργαλείου από Απόθεμα, άλλο Set ή μεμονωμένο')}</small>
+                    <small>{tr('Επιλογή εργαλείου από Απόθεμα, άλλο Σετ ή μεμονωμένο')}</small>
                   </span>
                 </button>
               )}
@@ -73,7 +73,7 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
                 <TriangleAlert size={16} />
                 <span>
                   <b>{tr('Αναφορά')}</b>
-                  <small>{tr('Καταγραφή της έλλειψης ως απόκλιση του Set')}</small>
+                  <small>{tr('Καταγραφή της έλλειψης ως απόκλιση του Σετ')}</small>
                 </span>
               </button>
               <button
@@ -90,7 +90,7 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
             </div>
             {!canCompose && (
               <p className="prep-supervisor-note">
-                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
+                {tr('Αλλαγές στη σύνθεση του Σετ (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
               </p>
             )}
           </div>

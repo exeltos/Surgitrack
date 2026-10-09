@@ -233,7 +233,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
           <div className="asset-sidebar-quickfacts">
             <div className="asset-barcode-card">
               <div>
-                <span>{kind === 'SET' ? tr('Barcode Set') : tr('Barcode εργαλείου')}</span>
+                <span>{kind === 'SET' ? tr('Barcode Σετ') : tr('Barcode εργαλείου')}</span>
               </div>
               <strong className="mono">{barcode}</strong>
             </div>

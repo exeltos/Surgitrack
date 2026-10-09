@@ -555,9 +555,12 @@
   font-style: normal;
   font-size: 11px;
   color: var(--st-muted);
-  white-space: nowrap;
+  /* The name reads in full (two lines at most) instead of ending in «…». */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 .ledger-route {
   display: flex;
@@ -590,9 +593,8 @@
   min-width: 0;
 }
 .ledger-user b {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 .ledger-user small {
   font-size: 11px;

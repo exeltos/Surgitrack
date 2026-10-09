@@ -9472,3 +9472,125 @@ html body .asset-create-hint {
     display: none;
   }
 }
+
+/* Traceability trail: date and time in their own column, a line joining the steps, the step
+   itself as the headline; the item's card has «Άνοιγμα καρτέλας» on the right. */
+html body .trace-card .trace-open {
+  text-decoration: none;
+  margin-left: auto;
+  align-self: center;
+  white-space: nowrap;
+}
+html body .timeline-item.trace-step {
+  grid-template-columns: 132px 18px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 0 16px;
+}
+html body .trace-step time {
+  padding-top: 1px;
+  color: #1d2939;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-step .dot {
+  position: relative;
+  justify-self: center;
+}
+html body .trace-step:not(:last-child) .dot::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 4px;
+  width: 2px;
+  height: calc(100% + 40px);
+  background: #b7cdd6;
+}
+html body .trace-step > div:last-child {
+  display: grid;
+  gap: 2px;
+}
+html body .trace-step strong {
+  color: #152c41;
+  font-size: 14px;
+}
+html body .trace-step-asset {
+  color: #155a6e;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-step small {
+  color: #64748b;
+  font-size: 12.5px;
+}
+@media (max-width: 700px) {
+  html body .timeline-item.trace-step {
+    grid-template-columns: 18px minmax(0, 1fr);
+  }
+  html body .trace-step time {
+    grid-column: 2;
+    order: -1;
+  }
+  html body .trace-step .dot {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+  }
+  html body .trace-card {
+    flex-wrap: wrap;
+  }
+  html body .trace-card .trace-open {
+    margin-left: 0;
+  }
+}
+
+/* Reports on phone: every report type visible, result rows as cards */
+@media (max-width: 700px) {
+  html body .reports-catalog-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  html body .reports-catalog-item {
+    min-width: 0;
+  }
+  html body .reports-catalog-item strong {
+    white-space: normal;
+    line-height: 1.2;
+  }
+  html body .reports-table thead {
+    display: none;
+  }
+  html body .reports-table,
+  html body .reports-table tbody,
+  html body .reports-table tr,
+  html body .reports-table td {
+    display: block;
+    width: 100%;
+  }
+  html body .reports-table tr {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line, #e3e8ee);
+  }
+  html body .reports-table td {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 8px;
+    padding: 2px 0;
+    border: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  html body .reports-table td::before {
+    content: attr(data-label);
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: Inter, system-ui, sans-serif;
+  }
+  html body .reports-table td:not([data-label])::before {
+    content: none;
+  }
+  html body .reports-table td:not([data-label]) {
+    display: block;
+  }
+}

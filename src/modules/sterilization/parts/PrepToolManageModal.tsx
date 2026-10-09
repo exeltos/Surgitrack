@@ -117,8 +117,8 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
                   >
                     <Layers3 size={16} />
                     <span>
-                      <b>{tr('Άλλο Set')}</b>
-                      <small>{tr('Μεταφορά σε διαφορετικό Set')}</small>
+                      <b>{tr('Άλλο Σετ')}</b>
+                      <small>{tr('Μεταφορά σε διαφορετικό Σετ')}</small>
                     </span>
                   </button>
                 </>
@@ -126,7 +126,7 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
             </div>
             {!canCompose && prepDraft.kind === 'SET' && (
               <p className="prep-supervisor-note">
-                {tr('Αλλαγές στη σύνθεση του Set (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
+                {tr('Αλλαγές στη σύνθεση του Σετ (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
               </p>
             )}
           </div>

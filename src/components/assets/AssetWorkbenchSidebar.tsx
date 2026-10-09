@@ -77,7 +77,7 @@ export default function AssetWorkbenchSidebar({
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
-  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Set') : null;
+  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : null;
   // A released Set or instrument shows how long it stays sterile.
   const sterile =
     asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
@@ -396,7 +396,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-barcode-card">
           <div>
             <Barcode size={17} />
-            <span>{kind === 'SET' ? tr('Barcode Set') : tr('Barcode εργαλείου')}</span>
+            <span>{kind === 'SET' ? tr('Barcode Σετ') : tr('Barcode εργαλείου')}</span>
           </div>
           <strong className="mono">{asset.barcode}</strong>
         </div>

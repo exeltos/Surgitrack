@@ -754,7 +754,7 @@ export default function ReportsPage() {
                     {shownRows.visible.map((row, index) => (
                       <tr key={index}>
                         {reportData.columns.map(c => (
-                          <td key={c.key} className={c.key === 'barcode' ? 'mono' : ''}>
+                          <td key={c.key} data-label={c.label} className={c.key === 'barcode' ? 'mono' : ''}>
                             {cellText(c.key, row[c.key])}
                           </td>
                         ))}
