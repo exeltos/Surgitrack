@@ -14,6 +14,7 @@ set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
+export SURGITRACK_REPO="$repo"
 pgbin="${PGBIN:-/usr/lib/postgresql/16/bin}"
 [ -x "$pgbin/initdb" ] || pgbin="$(dirname "$(command -v initdb)")"
 

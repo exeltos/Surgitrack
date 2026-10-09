@@ -108,3 +108,18 @@ back. `KEEP=1` leaves the database running to look around; `MIGRATIONS_DIR=...` 
 - Run `bash supabase/tests/run-local.sh` before applying a migration, and add a test for what it changes.
 - A new function that signed-out visitors must call needs an explicit `grant execute ... to anon`; nothing gets it by
   default any more.
+
+## Data fixes applied by hand
+
+- **09/10/2026, date format.** Ten `movements.at` and four `receipts.at` values written by an older version in the
+  browser's Greek short form (`8/10/26, 1:06 μ.μ.`) were rewritten in the app's single format (`08/10/2026 13:06`),
+  checked against the time inside each record's id. The app still reads the old form, so cached copies on devices
+  are harmless.
+
+## Integrity checks
+
+`supabase/integrity.sql` lists, per hospital, what foreign keys would have refused (instruments in a missing Set,
+Set members without a Set, Set counts that differ from their instruments). There are deliberately no such keys:
+devices sync offline and send each collection on its own. The nightly backup workflow runs the checks against the
+live database and fails (emailing the owner) when any row comes back; `supabase/tests/sql/07_integrity.sql` tests
+them. Checked live on 09/10/2026: no problem.
