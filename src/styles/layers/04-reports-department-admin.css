@@ -4067,9 +4067,11 @@
 }
 .auth-name-row label {
   display: grid;
+  /* The field may shrink below its natural width, so the two fit side by side on a phone. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   color: #526174;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .auth-name-row .auth-input input {
@@ -4099,11 +4101,12 @@
 .auth-hint {
   margin-top: -6px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
 }
 .auth-input select {
   flex: 1;
+  min-width: 0;
   height: 100%;
   border: 0;
   outline: none;

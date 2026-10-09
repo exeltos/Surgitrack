@@ -953,7 +953,7 @@ td {
   display: grid;
   gap: 6px;
   color: #526174;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .auth-form input:not([type='checkbox']) {
@@ -987,6 +987,8 @@ td {
   border: 0 !important;
   box-shadow: none !important;
   flex: 1;
+  /* Without it an input keeps its natural width and two side by side overflow a phone-width card. */
+  min-width: 0;
   padding: 0 9px !important;
 }
 .auth-input button {
@@ -1000,21 +1002,9 @@ td {
 }
 .auth-form-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   align-items: center;
-}
-.auth-check {
-  display: flex !important;
-  grid-template-columns: auto minmax(0, 1fr) !important;
-  align-items: flex-start;
-  gap: 8px !important;
-  font-size: 11px !important;
-  color: #687587 !important;
-  font-weight: 500 !important;
-}
-.auth-check input {
-  margin: 1px 0 0;
 }
 .auth-text-btn,
 .auth-back {
@@ -1022,7 +1012,8 @@ td {
   background: transparent;
   padding: 0;
   color: #176079;
-  font-size: 11px;
+  font-size: 12px;
+  white-space: nowrap;
   font-weight: 750;
   cursor: pointer;
 }
