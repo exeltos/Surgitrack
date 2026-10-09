@@ -10,8 +10,53 @@ import {permissionsForRole, type Permission} from '../../src/core/permissions';
 import {navigationFor} from '../../src/config/navigation';
 import type {UserRole} from '../../src/store/types';
 
-export function buildSeed(organizationId: string) {
-  const store = demoSurgiRepository.getInitialData() as unknown as Record<string, Array<{id: string}>>;
+type Item = {id: string} & Record<string, unknown>;
+
+/**
+ * SCREENS_SCALE=n: the sample hospital n times over (each Set with its instruments, standalone and Stock
+ * instruments, their movements and issues), with new ids and barcodes, to see the app at a large hospital's
+ * size (n = 40 gives ~13,000 instruments).
+ */
+function scaled(store: Record<string, Item[]>, n: number) {
+  if (n <= 1) return store;
+  const bump = (code: unknown, k: number) =>
+    typeof code === 'string' && /^[ST]\d{6}$/.test(code)
+      ? `${code[0]}${String(Number(code.slice(1)) + k * 20000).padStart(6, '0')}`
+      : code;
+  const copy = (items: Item[], k: number, fix: (x: Item) => Item) =>
+    items.map(x => fix({...x, id: k ? `${x.id}~${k}` : x.id}));
+  const out = {...store};
+  out.sets = [];
+  out.tools = [];
+  out.movements = [];
+  out.issues = [];
+  for (let k = 0; k < n; k++) {
+    out.sets.push(...copy(store.sets, k, x => ({...x, barcode: bump(x.barcode, k)})));
+    out.tools.push(
+      ...copy(store.tools, k, x => ({
+        ...x,
+        barcode: bump(x.barcode, k),
+        ...(x.setId && k ? {setId: `${x.setId}~${k}`} : {}),
+      })),
+    );
+    out.movements.push(
+      ...copy(store.movements || [], k, x => ({
+        ...x,
+        asset: bump(String(x.asset).slice(0, 7), k) + String(x.asset).slice(7),
+      })),
+    );
+    out.issues.push(
+      ...copy(store.issues || [], k, x => ({
+        ...x,
+        asset: bump(String(x.asset).slice(0, 7), k) + String(x.asset).slice(7),
+      })),
+    );
+  }
+  return out;
+}
+
+export function buildSeed(organizationId: string, scale = 1) {
+  const store = scaled(demoSurgiRepository.getInitialData() as unknown as Record<string, Item[]>, scale);
   const library = {...demoAdminRepository.getInitialData(), id: 'state'} as unknown as {id: string};
   const collections: Record<string, Array<{id: string}>> = {
     sets: store.sets,

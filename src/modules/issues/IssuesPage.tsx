@@ -15,6 +15,8 @@ import OrderDialog from '../replacements/OrderDialog';
 import {pieces} from '../replacements/pieces';
 import {useConfirm} from '../../components/ui/useConfirm';
 import KpiStrip from '../../components/ui/KpiStrip';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
 import {daysSince} from '../../core/displayDate';
 
 /** An open issue older than this many days is "waiting long" (its own card and filter). */
@@ -69,13 +71,20 @@ export default function IssuesPage() {
       (age !== 'OLD' || isOld(i)) &&
       `${i.asset} ${i.type} ${i.department} ${i.note}`.toLowerCase().includes(q.toLowerCase()),
   );
+  // Long lists render in steps as they scroll into view (a large hospital has hundreds of issues).
+  const rows = useProgressiveList(filtered, [q, department, type, status, age].join('|'));
   // The photos column shows only when some listed issue has photos.
   const withPhotos = filtered.some(i => i.photos?.length);
   /** What an issue is about: the instrument or Set named by its barcode, to open it or order it. */
+  const toolsByBarcode = useMemo(
+    () => new Map([...tools, ...retiredTools].map(t => [t.barcode, t] as const)),
+    [tools, retiredTools],
+  );
+  const setsByBarcode = useMemo(() => new Map(sets.map(s => [s.barcode, s] as const)), [sets]);
   const subject = (issue: Issue) => {
     const barcode = issue.asset.split(' ')[0];
-    const tool = [...tools, ...retiredTools].find(t => t.barcode === barcode);
-    const set = tool ? undefined : sets.find(s => s.barcode === barcode);
+    const tool = toolsByBarcode.get(barcode);
+    const set = tool ? undefined : setsByBarcode.get(barcode);
     return {tool, set, to: tool ? `/tools/${tool.id}` : set ? `/sets/${set.id}` : undefined};
   };
   // The cards count within the department/type/search chosen, and set the status (and age) filters.
@@ -226,7 +235,7 @@ export default function IssuesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map(i => (
+                  {rows.visible.map(i => (
                     <tr key={i.id}>
                       <td>
                         {subject(i).to ? (
@@ -323,6 +332,12 @@ export default function IssuesPage() {
                       )}
                     </tr>
                   ))}
+                  {rows.hasMore && (
+                    <MoreRows
+                      colSpan={4 + (withPhotos ? 1 : 0) + (withReplacements ? 1 : 0)}
+                      onVisible={rows.showMore}
+                    />
+                  )}
                 </tbody>
               </table>
             )}

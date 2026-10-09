@@ -116,7 +116,7 @@ async function loadSeed() {
     logLevel: 'warning',
   });
   const mod = await import(`${pathToFileURL(outfile).href}?t=${Date.now()}`);
-  return mod.buildSeed(ORG_ID);
+  return mod.buildSeed(ORG_ID, Number(process.env.SCREENS_SCALE || 1));
 }
 
 /** The routes declared in App.tsx with the permission each needs. */
@@ -173,6 +173,16 @@ async function newContext(browser, {viewport, account, db, log}) {
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
     ({lang, key, session}) => {
+      // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
+      window.__longTasks = [];
+      try {
+        new PerformanceObserver(list => window.__longTasks.push(...list.getEntries().map(e => e.duration))).observe({
+          type: 'longtask',
+          buffered: true,
+        });
+      } catch {
+        // No long task timing in this browser.
+      }
       if (sessionStorage.getItem('__harness_init')) return;
       sessionStorage.setItem('__harness_init', '1');
       localStorage.setItem('surgitrack-lang', lang);
@@ -422,10 +432,14 @@ async function main() {
         const target = route
           .replace('/sets/:id', `/sets/${seed.firstSetId}`)
           .replace('/tools/:id', `/tools/${seed.firstToolId}`);
+        await page.evaluate(() => (window.__longTasks = []));
+        const started = Date.now();
         await page.evaluate(h => (location.hash = h), `#${target}`);
         await settle(page);
         await page.evaluate(() => window.scrollTo(0, 0));
         const state = await pageState(page);
+        state.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
+        state.settledMs = Date.now() - started - SETTLE_MS;
         if (A11Y) state.a11y = await accessibility(page);
         const file = `${LANG}_${role.toLowerCase()}_${viewport}_${slug(route)}.png`;
         await shoot(page, file, viewport);
