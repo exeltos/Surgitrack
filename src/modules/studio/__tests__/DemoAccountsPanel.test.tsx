@@ -12,6 +12,7 @@ const service = vi.hoisted(() => ({
   setDemoEnd: vi.fn(),
   setDemoUserLimit: vi.fn(),
   resetDemoAccount: vi.fn(),
+  markDemoRequestHandled: vi.fn(),
 }));
 vi.mock('../../../data/cloud/demoAccounts', () => service);
 vi.mock('../../../data/cloud/hospitalSwitch', () => ({switchHospital: vi.fn()}));
@@ -37,6 +38,9 @@ const demo = (patch: Partial<DemoAccount> = {}): DemoAccount => ({
   evaluatorActive: false,
   extraUsers: 0,
   colleagues: [],
+  ratings: [],
+  evaluations: [],
+  requests: [],
   ...patch,
 });
 
@@ -167,5 +171,38 @@ describe('Studio: evaluation Demos', () => {
     expect(screen.getByText('Βήματα 3/7')).toBeInTheDocument();
     await user.selectOptions(screen.getByLabelText('Όριο συναδέλφων'), '8');
     await waitFor(() => expect(service.setDemoUserLimit).toHaveBeenCalledWith('demo-1', 8));
+  });
+
+  it('shows what the Demo thinks of SurgiTrack and handles its requests', async () => {
+    service.loadDemoAccounts.mockResolvedValue([
+      demo({
+        ratings: [{topic: 'sterilization', average: 4.5, count: 2}],
+        evaluations: [{name: 'ΜΑΡΙΑ ΠΑΠΠΑ', nps: 9, ease: 4, fit: 5, missing: 'Σύνδεση με ERP', sets: 400}],
+        requests: [
+          {
+            id: 'req-1',
+            kind: 'PURCHASE',
+            name: 'Μαρία Παππά',
+            phone: '2410 000000',
+            message: 'Καλέστε με',
+            status: 'NEW',
+            createdAt: inDays(0),
+          },
+          {id: 'req-0', kind: 'EXTENSION', name: 'Μαρία Παππά', status: 'HANDLED', createdAt: inDays(-2)},
+        ],
+      }),
+    ]);
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    expect(await screen.findByText('Νέα αιτήματα: 1')).toBeInTheDocument();
+    expect(screen.getByText('Θέλει την εφαρμογή')).toBeInTheDocument();
+    expect(screen.getByText('Καλέστε με')).toBeInTheDocument();
+    expect(screen.getByText('Ροή Αποστείρωσης')).toBeInTheDocument();
+    expect(screen.getByText('4,5 ★')).toBeInTheDocument();
+    expect(screen.getByText('Σύσταση 9/10')).toHaveClass('promoter');
+    expect(screen.getByText('Λείπει: Σύνδεση με ERP')).toBeInTheDocument();
+    expect(screen.getByText('Σετ 400 · Αίθουσες —')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Διεκπεραιώθηκε'}));
+    await waitFor(() => expect(service.markDemoRequestHandled).toHaveBeenCalledWith('req-1'));
   });
 });

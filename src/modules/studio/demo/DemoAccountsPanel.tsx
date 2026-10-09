@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Copy, LogIn, Mail, Plus, RotateCcw, Send} from 'lucide-react';
+import {Check, Copy, LogIn, Mail, Plus, RotateCcw, Send} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr} from '../../../i18n';
@@ -12,6 +12,7 @@ import {
   type DemoStage,
 } from '../../../core/demoAccounts';
 import {trialEndDate, trialEndOn} from '../../../core/trial';
+import {MODULES, npsGroup} from '../../../core/demoFeedback';
 import NewDemoDialog from './NewDemoDialog';
 import {useDemoAccounts} from './useDemoAccounts';
 
@@ -105,6 +106,7 @@ export default function DemoAccountsPanel({
               onExtend={() => void d.extend(demo)}
               onChangeEnd={date => void d.changeEnd(demo, trialEndOn(date))}
               onChangeLimit={limit => void d.changeLimit(demo, limit)}
+              onHandled={requestId => void d.handleRequest(demo, requestId)}
               onEnter={() => d.enter(demo)}
               onReset={() =>
                 ask({
@@ -144,6 +146,7 @@ function DemoCard({
   onExtend,
   onChangeEnd,
   onChangeLimit,
+  onHandled,
   onEnter,
   onReset,
 }: {
@@ -155,6 +158,7 @@ function DemoCard({
   onExtend: () => void;
   onChangeEnd: (date: string) => void;
   onChangeLimit: (limit: number) => void;
+  onHandled: (requestId: string) => void;
   onEnter: () => void;
   onReset: () => void;
 }) {
@@ -162,6 +166,7 @@ function DemoCard({
   const days = demoDaysLeft(demo);
   const disabled = !!busy;
   const [showColleagues, setShowColleagues] = useState(false);
+  const newRequests = demo.requests.filter(r => r.status === 'NEW').length;
   return (
     <article className={`evaluation-demo-card ${stage.toLowerCase()}`}>
       <div className="evaluation-demo-main">
@@ -173,7 +178,12 @@ function DemoCard({
           </small>
           {demo.notes && <small className="evaluation-demo-notes">{demo.notes}</small>}
         </div>
-        <span className={`evaluation-demo-stage ${stage.toLowerCase()}`}>{tr(STAGE_LABEL[stage])}</span>
+        <span className="evaluation-demo-badges">
+          {newRequests > 0 && (
+            <span className="evaluation-demo-stage request">{tr('Νέα αιτήματα: {0}', newRequests)}</span>
+          )}
+          <span className={`evaluation-demo-stage ${stage.toLowerCase()}`}>{tr(STAGE_LABEL[stage])}</span>
+        </span>
       </div>
       <dl className="evaluation-demo-facts">
         <div>
@@ -245,6 +255,7 @@ function DemoCard({
           ))}
         </ul>
       )}
+      <DemoFeedback demo={demo} disabled={disabled} onHandled={onHandled} />
       {busy && busy !== 'other' ? (
         <p className="evaluation-demo-busy">{busy}</p>
       ) : (
@@ -298,5 +309,91 @@ function DemoCard({
         </div>
       )}
     </article>
+  );
+}
+
+const moduleTitle = (key: string) => {
+  const m = MODULES.find(x => x.key === key);
+  return m ? tr(m.title.el) : key;
+};
+const stars = (n: number) => `${n.toFixed(1).replace('.', ',')} ★`;
+
+/** What the people of the Demo think of it, and what they asked for. */
+function DemoFeedback({
+  demo,
+  disabled,
+  onHandled,
+}: {
+  demo: DemoAccount;
+  disabled: boolean;
+  onHandled: (requestId: string) => void;
+}) {
+  if (!demo.ratings.length && !demo.evaluations.length && !demo.requests.length) return null;
+  return (
+    <div className="evaluation-demo-feedback">
+      {demo.requests.length > 0 && (
+        <section aria-label={tr('Αιτήματα')}>
+          <h4>{tr('Αιτήματα')}</h4>
+          <ul>
+            {demo.requests.map(r => (
+              <li key={r.id} className={r.status === 'NEW' ? 'new' : 'handled'}>
+                <b>{r.kind === 'PURCHASE' ? tr('Θέλει την εφαρμογή') : tr('Ζητά παράταση')}</b>
+                <span>
+                  {r.name || '—'}
+                  {r.phone ? ` · ${r.phone}` : ''} · {formatDate(r.createdAt)}
+                </span>
+                {r.message && <q>{r.message}</q>}
+                {r.status === 'NEW' ? (
+                  <button disabled={disabled} onClick={() => onHandled(r.id)}>
+                    <Check size={14} />
+                    {tr('Διεκπεραιώθηκε')}
+                  </button>
+                ) : (
+                  <em>{tr('Διεκπεραιώθηκε')}</em>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {demo.ratings.length > 0 && (
+        <section aria-label={tr('Βαθμολογίες')}>
+          <h4>{tr('Βαθμολογίες')}</h4>
+          <ul className="evaluation-demo-ratings">
+            {demo.ratings.map(r => (
+              <li key={r.topic}>
+                <span>{moduleTitle(r.topic)}</span>
+                <b>{stars(r.average)}</b>
+                <small>({r.count})</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {demo.evaluations.length > 0 && (
+        <section aria-label={tr('Τελική αξιολόγηση')}>
+          <h4>{tr('Τελική αξιολόγηση')}</h4>
+          <ul>
+            {demo.evaluations.map((e, i) => (
+              <li key={i}>
+                <b>{e.name || '—'}</b>
+                {e.nps !== null && (
+                  <span className={`evaluation-demo-nps ${npsGroup(e.nps).toLowerCase()}`}>
+                    {tr('Σύσταση {0}/10', e.nps)}
+                  </span>
+                )}
+                {e.ease !== undefined && <span>{tr('Ευκολία {0}/5', e.ease)}</span>}
+                {e.fit !== undefined && <span>{tr('Ταιριάζει {0}/5', e.fit)}</span>}
+                {(e.sets !== undefined || e.theatres !== undefined) && (
+                  <span>{tr('Σετ {0} · Αίθουσες {1}', e.sets ?? '—', e.theatres ?? '—')}</span>
+                )}
+                {e.missing && <q>{tr('Λείπει: {0}', e.missing)}</q>}
+                {e.comment && <q>{e.comment}</q>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   seedDemoAccount,
   sendDemoInvite,
   setDemoEnd,
+  markDemoRequestHandled,
   setDemoUserLimit,
   type NewDemo,
 } from '../../../data/cloud/demoAccounts';
@@ -106,6 +107,8 @@ export function useDemoAccounts() {
     });
   const changeLimit = (demo: DemoAccount, limit: number) =>
     run(demo.id, tr('Αποθήκευση…'), () => setDemoUserLimit(demo.id, limit));
+  const handleRequest = (demo: DemoAccount, requestId: string) =>
+    run(demo.id, tr('Αποθήκευση…'), () => markDemoRequestHandled(requestId));
   const enter = (demo: DemoAccount) => switchHospital(demo.organizationId, '#/');
 
   return {
@@ -120,6 +123,7 @@ export function useDemoAccounts() {
     extend,
     changeEnd,
     changeLimit,
+    handleRequest,
     reset,
     enter,
   };

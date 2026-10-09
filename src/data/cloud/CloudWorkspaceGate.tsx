@@ -20,6 +20,7 @@ import {TrialContext} from './trialContext';
 import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
 import {seedDemoOrganization} from './demoSeed';
+import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -54,6 +55,8 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
     endsAt?: string;
     evaluation: boolean;
     contact: PlatformContact;
+    organizationId: string;
+    userId: string;
   }>();
   const [error, setError] = useState('');
   const lang = localStorage.getItem('surgitrack-lang') === 'en' ? 'en' : 'el';
@@ -96,7 +99,14 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       // A trial that has ended locks the hospital for everyone but the platform owner (the
       // database refuses its data too); the owner still gets in, to extend it or switch it.
       if (plan.ended && !result.identity.platform) {
-        setLock({hospital: org.name, endsAt: plan.endsAt, evaluation, contact: await loadPlatformContact()});
+        setLock({
+          hospital: org.name,
+          endsAt: plan.endsAt,
+          evaluation,
+          contact: await loadPlatformContact(),
+          organizationId,
+          userId: result.identity.id,
+        });
         setStatus('locked');
         return;
       }
@@ -200,14 +210,19 @@ function TrialLocked({
   endsAt,
   evaluation,
   contact,
+  organizationId,
+  userId,
 }: {
   lang: 'el' | 'en';
   hospital: string;
   endsAt?: string;
   evaluation: boolean;
   contact: PlatformContact;
+  organizationId: string;
+  userId: string;
 }) {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
+  const [request, setRequest] = useState<'PURCHASE' | 'EXTENSION' | null>(null);
   const date = endsAt ? formatDate(endsAt) : '';
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -260,8 +275,25 @@ function TrialLocked({
         </dl>
       )}
       <div>
+        {evaluation && (
+          <>
+            <button className="primary" onClick={() => setRequest('PURCHASE')}>
+              {L('Θέλω την εφαρμογή', 'I want the application')}
+            </button>
+            <button onClick={() => setRequest('EXTENSION')}>{L('Ζητώ παράταση', 'Ask for more time')}</button>
+          </>
+        )}
         <button onClick={() => void signOut()}>{L('Αποσύνδεση', 'Sign out')}</button>
       </div>
+      {request && (
+        <DemoRequestDialog
+          kind={request}
+          organizationId={organizationId}
+          userId={userId}
+          L={L}
+          onClose={() => setRequest(null)}
+        />
+      )}
     </div>
   );
 }
