@@ -3,6 +3,7 @@ import AppButton from '../../../components/ui/AppButton';
 import {hospitalRoleKinds, hospitalRoleNames} from '../../../config/demoRoles';
 import {trialEndAfter, trialEnded} from '../../../core/trial';
 import PlanBadge from '../PlanBadge';
+import DemoAccountsPanel from '../demo/DemoAccountsPanel';
 import type {StudioPageState} from '../useStudioPage';
 
 export default function PlatformTab({s}: {s: StudioPageState}) {
@@ -14,6 +15,7 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
     displayedUsers,
     enterBuiltInDemo,
     enterOrganizationDemo,
+    libs,
     openOrganization,
     platformAdmin,
     resetBuiltInDemo,
@@ -97,6 +99,7 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
               </button>
             </div>
           </section>
+          {libs.dataMode === 'PRODUCTION' && <DemoAccountsPanel />}
           <div className="platform-org-list">
             {displayedOrganizations.map(org => {
               const orgUsers = displayedUsers.filter(user => user.organizationId === org.id);

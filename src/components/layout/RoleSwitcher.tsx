@@ -43,7 +43,8 @@ export default function RoleSwitcher() {
     void supabase
       .from('organizations')
       .select('id,name')
-      .eq('is_demo', false)
+      // Real hospitals, and the prospects' evaluation Demos the owner may enter to help.
+      .or('is_demo.eq.false,evaluation.eq.true')
       .eq('active', true)
       .order('name')
       .then(({data}) => setHospitals(data || []));
