@@ -9800,3 +9800,52 @@ html body .photo-viewer .icon-button {
     display: none;
   }
 }
+
+/* Stock: rows like Issues (barcode · name, code and manufacturer under it); columns named, not numbered,
+   since the specialty and uses columns show only when some instrument has them. */
+html body .stock-table a.issue-asset {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: inherit;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  white-space: normal;
+}
+html body .stock-table a.issue-asset:hover {
+  text-decoration: underline;
+}
+html body .stock-table .row-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: none;
+}
+@media (min-width: 701px) {
+  html body .registry-fixed.stock-table.stock-table th:nth-child(n),
+  html body .registry-fixed.stock-table.stock-table td:nth-child(n) {
+    display: table-cell;
+  }
+  html body .registry-fixed.stock-table.stock-table th:nth-child(n) {
+    width: auto;
+  }
+  html body .registry-fixed.stock-table.stock-table th.col-specialty {
+    width: 22%;
+  }
+  html body .registry-fixed.stock-table.stock-table th.col-uses {
+    width: 110px;
+  }
+  html body .registry-fixed.stock-table.stock-table th.col-status {
+    width: 150px;
+  }
+  html body .registry-fixed.stock-table.stock-table th.col-open {
+    width: 40px;
+  }
+}
+@media (max-width: 700px) {
+  html body .registry-fixed.stock-table.stock-table tbody td:nth-child(n) {
+    display: block;
+  }
+}
