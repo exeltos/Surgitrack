@@ -3,3 +3,4 @@ node_modules
 package-lock.json
 supabase/email-templates
 supabase/functions
+.claude/worktrees
