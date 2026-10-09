@@ -132,9 +132,15 @@ export default function SterileExpiryPage() {
                     <td>
                       <StatusBadge value={item.assetState} />
                     </td>
-                    <td>{item.shelfLifeMonths ? tr('{0} μήνες', item.shelfLifeMonths) : '—'}</td>
-                    <td className="mono">{item.sterilizedOn ? formatExpiry(item.sterilizedOn) : '—'}</td>
-                    <td className="mono">{formatExpiry(item.sterileUntil)}</td>
+                    <td data-label={tr('Διάρκεια')}>
+                      {item.shelfLifeMonths ? tr('{0} μήνες', item.shelfLifeMonths) : '—'}
+                    </td>
+                    <td className="mono" data-label={tr('Αποστείρωση')}>
+                      {item.sterilizedOn ? formatExpiry(item.sterilizedOn) : '—'}
+                    </td>
+                    <td className="mono" data-label={tr('Λήγει')}>
+                      {formatExpiry(item.sterileUntil)}
+                    </td>
                     <td>
                       <ExpiryBadge entry={item} />
                     </td>

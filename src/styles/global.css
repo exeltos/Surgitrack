@@ -9341,6 +9341,16 @@ html body .sets-registry .set-count-short .muted {
     flex: 1 0 100%;
     position: static;
     transform: none;
+  } /* A cell that needs its column name once the header is gone (dates, durations). */
+  html body .registry-fixed tbody td[data-label]::before {
+    content: attr(data-label) ' ';
+    color: #667085;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+  }
+  /* Expiry: every field of the card is shown (the tablet layout hides some columns). */
+  html body .expiry-table tbody td:nth-child(n) {
+    display: block !important;
   }
 }
 
