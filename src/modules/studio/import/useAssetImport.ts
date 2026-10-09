@@ -22,7 +22,7 @@ export const STEPS: Array<{id: Step; el: string; en: string}> = [
 ];
 export const SHOWN_ERRORS = 200;
 
-export const messageOf = (e: unknown) =>
+const messageOf = (e: unknown) =>
   e instanceof Error ? e.message : String((e as {message?: string} | null)?.message || e);
 
 export type ImportProps = {

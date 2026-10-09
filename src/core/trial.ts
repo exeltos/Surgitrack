@@ -7,7 +7,7 @@
 export type HospitalPlan = 'STANDARD' | 'TRIAL';
 
 /** From this many days before the end, every user of the hospital sees how many days are left. */
-export const TRIAL_WARNING_DAYS = 7;
+const TRIAL_WARNING_DAYS = 7;
 export const TRIAL_LENGTHS = [14, 30, 60, 90] as const;
 
 const DAY = 864e5;

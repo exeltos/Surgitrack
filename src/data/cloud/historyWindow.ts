@@ -52,7 +52,7 @@ export const registerOlderLoader = (collection: CloudCollection, load: () => Pro
 
 /** Loads the older history of every windowed collection (once; later calls wait for the same load). */
 let running: Promise<void> | undefined;
-export const loadOlderHistory = () => {
+const loadOlderHistory = () => {
   if (!cutoffs.size) return Promise.resolve();
   if (!running) {
     loading = true;

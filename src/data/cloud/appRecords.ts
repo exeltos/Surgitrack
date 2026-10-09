@@ -102,7 +102,7 @@ const isStale = (error: DbError | null) =>
  * rule raised by a trigger. Anything else (network, timeouts, server errors, a schema the client does
  * not know yet) is worth another try.
  */
-export const isPermanentRefusal = (error: DbError | null) =>
+const isPermanentRefusal = (error: DbError | null) =>
   !!error && (error.code === RLS_VIOLATION || error.code === 'P0001' || /^2[23]/.test(error.code || ''));
 /** A unique clash is the barcode's unless the database names the primary key (the id). */
 const isBarcodeClash = (error: DbError) =>

@@ -110,8 +110,6 @@ export const flushPendingWrites = (timeoutMs: number) =>
     flushers.forEach(flush => flush());
   });
 
-/** Overall save state of the cloud workspace, for a status indicator. */
-export const useSyncStatus = () => useSyncExternalStore(subscribe, () => status);
 /** Save state, records waiting and the last time the server was reached, for the top bar. */
 export const useSyncInfo = () => useSyncExternalStore(subscribe, () => info);
 

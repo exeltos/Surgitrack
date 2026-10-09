@@ -19,7 +19,6 @@ import {loadPlatformContact, type PlatformContact} from './platformContact';
 import {TrialContext} from './trialContext';
 import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
-import {seedDemoOrganization} from './demoSeed';
 import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
 import {setSampleDataMark} from '../../core/sampleDataMark';
 
@@ -145,6 +144,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       // An empty Demo is filled on entry; an evaluation Demo only by the platform owner (Studio fills
       // it before the prospect is invited), so the prospect never records the sample history.
       if ((demo || (evaluation && result.identity.platform)) && !records.library.length) {
+        const {seedDemoOrganization} = await import('./demoSeed');
         await seedDemoOrganization(organizationId, {evaluation});
         records = await loadAppRecords(organizationId);
       }

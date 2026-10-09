@@ -133,7 +133,7 @@ export const IMPORT_FIELDS: ReadonlyArray<{
 export type ImportMapping = Record<ImportField, number>;
 
 /** Lower case, no accents, final sigma as sigma, letters and digits only. */
-export const normalize = (value: string) =>
+const normalize = (value: string) =>
   value
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')

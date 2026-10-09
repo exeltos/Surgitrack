@@ -17,7 +17,7 @@ import {deviceIngestUrl, type DeviceInput} from '../../data/cloud/devices';
 import {openSerialPort, serialSupported, type SerialSession} from './serialPort';
 import {BAUD_RATES, CONNECTIONS, KINDS, messageOf, type Lang} from './deviceUi';
 
-export function Modal({
+function Modal({
   title,
   subtitle,
   onClose,
@@ -268,7 +268,7 @@ Content-Type: application/json
   );
 }
 
-export function ReadingPreview({L, drafts}: {L: Lang; drafts: ReadingDraft[]}) {
+function ReadingPreview({L, drafts}: {L: Lang; drafts: ReadingDraft[]}) {
   return (
     <div className="devices-table-wrap small">
       <table className="devices-table">

@@ -66,7 +66,6 @@ let owner: CacheOwner | undefined;
 export const setCacheOwner = (next: CacheOwner | undefined) => {
   owner = next;
 };
-export const cacheOwner = () => owner;
 
 /** The copy of every collection of this user and hospital: fresh ones, and older ones with unsaved changes. */
 export async function readCache(

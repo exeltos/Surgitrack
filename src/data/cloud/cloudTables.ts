@@ -341,8 +341,6 @@ export const CLOUD_TABLES = {
 export type TableCollection = keyof typeof CLOUD_TABLES;
 export const TABLE_COLLECTIONS = Object.keys(CLOUD_TABLES) as TableCollection[];
 
-export const isTableCollection = (collection: string): collection is TableCollection => collection in CLOUD_TABLES;
-
 /** The columns to read back, so a load never asks for more than the record needs. */
 export const tableColumns = (collection: TableCollection) =>
   ['id', 'extra', ...CLOUD_TABLES[collection].fields.map(([, column]) => column)].join(',');

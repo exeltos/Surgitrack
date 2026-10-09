@@ -263,7 +263,7 @@ const departmentPermissions: readonly Permission[] = [
 ];
 
 /** Read-only: every screen that only shows data; never an action. */
-export const viewerPermissions: readonly Permission[] = [
+const viewerPermissions: readonly Permission[] = [
   'asset.registry.view',
   'asset.detail.view',
   'stock.manage',
@@ -340,7 +340,6 @@ export const protectedRolePermissions: Record<UserRole, readonly Permission[]> =
   VIEWER: ['asset.detail.view', 'history.view'],
 };
 
-export const rolePermissions = defaultRolePermissions;
 export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]> = {
   ADMIN: [],
   // A viewer can never be given an action, whatever the role settings say.
