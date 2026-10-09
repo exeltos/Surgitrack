@@ -4042,8 +4042,11 @@ div.asset-import-hospital b {
 }
 .name-check-tabs {
   display: flex;
+  flex: none;
   flex-wrap: wrap;
   gap: 6px;
+  /* Every tab bar keeps the same room before what follows it (search, list), as on Issues. */
+  margin-bottom: 12px;
   border-bottom: 1px solid var(--c-gray-90);
 }
 .name-check-tabs button {
