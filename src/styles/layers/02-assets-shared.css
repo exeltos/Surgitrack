@@ -2026,7 +2026,8 @@ td {
   font-size: 12px;
   color: var(--st-muted);
 }
-.confirm-dialog-type input {
+.confirm-dialog-type input,
+.confirm-dialog-type textarea {
   padding: 8px 10px;
   border: 1px solid #d4dde3;
   border-radius: 8px;

@@ -7,7 +7,8 @@ type Ask = {
   confirmLabel?: string;
   cancelLabel?: string;
   danger?: boolean;
-  onConfirm: () => void;
+  note?: {label: string; placeholder?: string};
+  onConfirm: (note: string) => void;
 };
 
 /**
@@ -24,11 +25,12 @@ export function useConfirm(): [ReactNode, (ask: Ask) => void] {
       confirmLabel={pending.confirmLabel}
       cancelLabel={pending.cancelLabel}
       danger={pending.danger}
+      note={pending.note}
       onClose={() => setPending(null)}
-      onConfirm={() => {
+      onConfirm={text => {
         const run = pending.onConfirm;
         setPending(null);
-        run();
+        run(text);
       }}
     />
   ) : null;
