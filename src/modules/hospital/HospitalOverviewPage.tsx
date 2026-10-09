@@ -298,7 +298,7 @@ export default function HospitalOverviewPage() {
             </div>
             <Activity size={18} />
           </header>
-          <div className="dash-bars">
+          <div className="dash-bars" tabIndex={0} aria-label={L('Ροή Αποστείρωσης', 'Sterilization flow')}>
             {pipeline.map(p => (
               <Link
                 key={p.key}
@@ -335,7 +335,11 @@ export default function HospitalOverviewPage() {
                 ))
             )}
           </div>
-          <ul className="dash-legend">
+          <ul
+            className="dash-legend"
+            tabIndex={0}
+            aria-label={L('Πού βρίσκεται ο εξοπλισμός', 'Where the equipment is')}
+          >
             {location.map(x => (
               <li key={x.key}>
                 <span className={`dot seg-${x.key}`} />
@@ -356,7 +360,7 @@ export default function HospitalOverviewPage() {
               </small>
             </div>
           </header>
-          <div className="dash-depts-list">
+          <div className="dash-depts-list" tabIndex={0} aria-label={L('Ανά τμήμα', 'By department')}>
             {byDepartment.map(d => {
               const other = Math.max(0, d.total - d.atDepartment - d.inProcess - d.ready);
               return (
@@ -466,7 +470,7 @@ export default function HospitalOverviewPage() {
             </div>
             <Link to={presetPath('/issues', {status: 'OPEN'})}>{L('Όλες', 'All')}</Link>
           </header>
-          <ul className="dash-list">
+          <ul className="dash-list" tabIndex={0} aria-label={L('Χρειάζεται προσοχή', 'Needs attention')}>
             {expiry.length > 0 && (
               <li>
                 <CalendarClock size={15} className={expired ? 'bad' : 'warn'} />
@@ -551,7 +555,7 @@ export default function HospitalOverviewPage() {
             </div>
             <Link to="/movements">{L('Όλο το ιστορικό', 'Full history')}</Link>
           </header>
-          <ul className="dash-list">
+          <ul className="dash-list" tabIndex={0} aria-label={L('Τελευταίες κινήσεις', 'Latest movements')}>
             {latestMovements.slice(0, 6).map(m => (
               <li key={m.id}>
                 <History size={15} />

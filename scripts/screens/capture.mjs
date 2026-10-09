@@ -44,9 +44,14 @@ const LANG = arg('lang', 'el') === 'en' ? 'en' : 'el';
 const ALL_ROLES = ['ADMIN', 'STERILIZATION', 'SUPERVISOR', 'DEPARTMENT', 'VIEWER', 'PLATFORM'];
 const roleArg = String(arg('role', 'all')).toUpperCase();
 const ROLES = roleArg === 'ALL' ? ALL_ROLES : roleArg.split(',').filter(r => ALL_ROLES.includes(r));
-const VIEWPORTS = {desktop: {width: 1440, height: 900}, mobile: {width: 390, height: 844}};
+const VIEWPORTS = {
+  desktop: {width: 1440, height: 900},
+  mobile: {width: 390, height: 844},
+  // A common laptop window (1366×768 screen minus the browser's bars); only when asked for.
+  laptop: {width: 1366, height: 650},
+};
 const vpArg = String(arg('viewport', 'both'));
-const VIEWPORT_NAMES = vpArg === 'both' ? Object.keys(VIEWPORTS) : vpArg.split(',').filter(v => VIEWPORTS[v]);
+const VIEWPORT_NAMES = vpArg === 'both' ? ['desktop', 'mobile'] : vpArg.split(',').filter(v => VIEWPORTS[v]);
 const OUT = resolve(String(arg('out', join(CACHE, 'out'))));
 const ONLY = arg('only', undefined);
 const REBUILD = !!arg('rebuild', false);
