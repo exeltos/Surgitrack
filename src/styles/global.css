@@ -3111,7 +3111,7 @@ div.asset-import-hospital b {
 .people-head,
 .people-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 90px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
+  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
   align-items: center;
   gap: 10px;
 }
@@ -9592,5 +9592,81 @@ html body .trace-step small {
   }
   html body .reports-table td:not([data-label]) {
     display: block;
+  }
+}
+
+/* Users list: header on one line; on phone the department and role stay visible */
+html body .people-head span {
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  html body .people-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0;
+  }
+  html body .people-row > .people-who,
+  html body .people-row > .hospital-member-status {
+    grid-column: 1 / span 2;
+  }
+  html body .people-row > .people-value {
+    display: block;
+    grid-row: 2;
+    font-size: 12px;
+    color: #475467;
+    white-space: normal;
+  }
+  html body .people-row > .people-value + .people-value::before {
+    content: '\00a0·\00a0';
+  }
+  html body .people-row > .people-open {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    margin-left: 8px;
+  }
+}
+@media (max-width: 700px) {
+  html body .people-toolbar {
+    flex-wrap: wrap;
+  }
+  html body .people-toolbar .studio-search {
+    flex: 1 1 100%;
+  }
+  html body .people-toolbar .people-invite,
+  html body .people-toolbar .people-invite > .app-button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+/* Studio libraries on phone: all six libraries visible in two columns */
+@media (max-width: 700px) {
+  html body .studio-manager-nav {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  html body .studio-manager-nav button {
+    min-width: 0;
+  }
+}
+html body .roles-guide header h2 {
+  margin: 6px 0 14px;
+}
+@media (max-width: 700px) {
+  html body .asset-import-guide table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  html body .asset-import-guide th,
+  html body .asset-import-guide td {
+    padding-left: 6px;
+    padding-right: 6px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+  }
+  html body .asset-import-guide th:last-child,
+  html body .asset-import-guide td:last-child {
+    width: 44px;
   }
 }

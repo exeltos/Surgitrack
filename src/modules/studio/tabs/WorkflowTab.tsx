@@ -266,7 +266,14 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                   <div className="workflow-stage-main">
                     <div>
                       <strong>{L(stage.labelEl, stage.labelEn)}</strong>
-                      {stage.locked && <span className="workflow-core-chip">CORE</span>}
+                      {stage.locked && (
+                        <span
+                          className="workflow-core-chip"
+                          title={L('Βασικό στάδιο: δεν απενεργοποιείται', 'Core stage: cannot be turned off')}
+                        >
+                          {L('ΒΑΣΙΚΟ', 'CORE')}
+                        </span>
+                      )}
                     </div>
                     <p>{L(stage.descriptionEl, stage.descriptionEn)}</p>
                     <div className="workflow-check-preview">
