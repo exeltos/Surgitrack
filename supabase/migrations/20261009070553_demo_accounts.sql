@@ -2,15 +2,11 @@
 -- hospital that wants to try SurgiTrack: its own isolated Demo hospital (is_demo, evaluation),
 -- filled with sample data, with a real admin account for the prospect. It runs as a trial
 -- (plan TRIAL, trial_ends_at), so the existing trial lock closes it on its last day.
+-- The index change and the anon revokes follow in 20261009071000_demo_accounts_index_and_grants.
 
 -- An evaluation Demo is a Demo hospital that real people sign in to (the built-in SurgiTrack Demo
 -- and a hospital's private demo copy are only entered by the platform owner).
 alter table public.organizations add column if not exists evaluation boolean not null default false;
-
--- There is still one built-in Demo; evaluation Demos are as many as the owner opens.
-drop index if exists public.organizations_one_builtin_demo;
-create unique index organizations_one_builtin_demo on public.organizations(is_demo)
-  where is_demo and demo_of is null and not evaluation;
 
 -- The built-in Demo is found among the Demo hospitals that are not evaluation Demos.
 create or replace function public.platform_ensure_demo_organization(p_source uuid default null) returns uuid
@@ -35,7 +31,6 @@ begin
   end if;
   return v;
 end $$;
-revoke execute on function public.platform_ensure_demo_organization(uuid) from public, anon;
 grant execute on function public.platform_ensure_demo_organization(uuid) to authenticated;
 
 -- One row per evaluation Demo: who it is for and how far its preparation has got.
@@ -67,7 +62,6 @@ create policy demo_accounts_owner on public.demo_accounts for all to authenticat
   using ((select public.is_platform_admin())) with check ((select public.is_platform_admin()));
 create policy demo_accounts_own_read on public.demo_accounts for select to authenticated
   using (organization_id = (select public.current_org_id()));
-revoke all on public.demo_accounts from anon;
 grant select, insert, update, delete on public.demo_accounts to authenticated;
 
 -- Opens an evaluation Demo in one step: the Demo hospital (a trial ending on p_ends_at), the
@@ -110,5 +104,4 @@ begin
   returning id into v_account;
   return json_build_object('id', v_account, 'organization_id', v_org, 'code', v_code);
 end $$;
-revoke execute on function public.platform_create_demo_account(text, text, text, text, timestamptz, text) from public, anon;
 grant execute on function public.platform_create_demo_account(text, text, text, text, timestamptz, text) to authenticated;
