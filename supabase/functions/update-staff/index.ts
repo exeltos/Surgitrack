@@ -1,11 +1,13 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
+import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.ts";
 
 // Edits a staff account: full name, sign-in email, department, role and access (and Demo access,
 // for the platform admin only). Only a hospital admin for users of their own hospital, or the
 // platform admin. The email changes on the sign-in account too, so the person signs in with the
-// new one; the username (user code) stays the same. Nobody changes their own account.
+// new one; the username (user code) stays the same. Nobody changes their own account. An email change
+// is recorded in account_events (no record, no change) and the old address is told.
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -30,7 +32,7 @@ Deno.serve(async req => {
     const {data: auth} = await caller.auth.getUser();
     if (!auth.user) return json({error: "unauthorized"}, 401);
 
-    const {data: me} = await admin.from("profiles").select("id, role, active, organization_id").eq("id", auth.user.id).maybeSingle();
+    const {data: me} = await admin.from("profiles").select("id, name, role, active, organization_id").eq("id", auth.user.id).maybeSingle();
     if (!me?.active || me.role !== "ADMIN") return json({error: "forbidden"}, 403);
 
     const body = await req.json().catch(() => ({}));
@@ -80,10 +82,18 @@ Deno.serve(async req => {
       const pattern = email.replace(/[\\%_]/g, "\\$&");
       const {data: taken} = await admin.from("profiles").select("id").ilike("email", pattern).neq("id", userId).limit(1);
       if (taken?.length) return json({error: "email_taken"}, 409);
+      const recorded = await recordAccountEvent(admin, {
+        organizationId: target.organization_id,
+        targetId: userId,
+        actorId: auth.user.id,
+        action: "email_changed",
+        detail: {from: target.email ?? null, to: email},
+      });
+      if (!recorded) return json({error: "audit_failed"}, 500);
       const {error} = await admin.auth.admin.updateUserById(userId, {email, email_confirm: true});
       if (error) {
         const status = /already|registered|exists/i.test(error.message) ? 409 : 500;
-        return json({error: status === 409 ? "email_taken" : "update_failed", message: error.message}, status);
+        return json({error: status === 409 ? "email_taken" : "update_failed"}, status);
       }
     }
     const {error} = await admin
@@ -101,10 +111,12 @@ Deno.serve(async req => {
     if (error) {
       // Keep the sign-in email and the profile in step.
       if (emailChanged && target.email) await admin.auth.admin.updateUserById(userId, {email: target.email, email_confirm: true});
-      return json({error: "update_failed", message: error.message}, 500);
+      return json({error: "update_failed"}, 500);
     }
+    if (emailChanged && target.email) await notifyAccountEvent(target.email, "email_changed", me.name);
     return json({ok: true, name, email});
   } catch (e) {
-    return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);
+    console.error("update-staff", e instanceof Error ? e.message : e);
+    return json({error: "failed"}, 500);
   }
 });

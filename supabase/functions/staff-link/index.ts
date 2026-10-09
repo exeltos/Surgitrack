@@ -1,12 +1,14 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
+import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.ts";
 
 // Makes a one-time link for a staff member, to pass on by hand (message, phone) when email does
 // not reach them: an invitation link for someone who has not accepted yet, or a set-new-password
-// link for an active user. No email is sent. Only a hospital admin for users of their own hospital,
+// link for an active user. The link itself is never emailed. Only a hospital admin for users of their own hospital,
 // or the platform admin; never for one's own account. The link opens the app's «Συνέχεια» page,
-// which spends it only when the person presses the button.
+// which spends it only when the person presses the button. Every link is recorded in account_events
+// (no record, no link) and the person is told by email, so a link cannot be used in their name unseen.
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -32,7 +34,7 @@ Deno.serve(async req => {
     const {data: auth} = await caller.auth.getUser();
     if (!auth.user) return json({error: "unauthorized"}, 401);
 
-    const {data: me} = await admin.from("profiles").select("id, role, active, organization_id").eq("id", auth.user.id).maybeSingle();
+    const {data: me} = await admin.from("profiles").select("id, name, role, active, organization_id").eq("id", auth.user.id).maybeSingle();
     if (!me?.active || me.role !== "ADMIN") return json({error: "forbidden"}, 403);
 
     const body = await req.json().catch(() => ({}));
@@ -63,9 +65,19 @@ Deno.serve(async req => {
       link = await admin.auth.admin.generateLink({type: kind, email: target.email, options: {redirectTo: site}});
     }
     const token = link.data?.properties?.hashed_token;
-    if (link.error || !token) return json({error: "link_failed", message: link.error?.message}, 500);
+    if (link.error || !token) return json({error: "link_failed"}, 500);
+    const action = kind === "recovery" ? "password_link" : "invite_link";
+    const recorded = await recordAccountEvent(admin, {
+      organizationId: target.organization_id,
+      targetId: userId,
+      actorId: auth.user.id,
+      action,
+    });
+    if (!recorded) return json({error: "audit_failed"}, 500);
+    await notifyAccountEvent(target.email, action, me.name);
     return json({ok: true, kind, url: `${site}/?st_token=${encodeURIComponent(token)}&st_link=${kind}`});
   } catch (e) {
-    return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);
+    console.error("staff-link", e instanceof Error ? e.message : e);
+    return json({error: "failed"}, 500);
   }
 });
