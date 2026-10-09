@@ -23,6 +23,8 @@ export type AccessRequest = {
   status: 'PENDING_EMAIL' | 'PENDING' | 'APPROVED' | 'REJECTED';
   full_name: string;
   email: string;
+  /** The username, made at signup (older requests have none until approved). */
+  user_code?: string | null;
   organization_name: string;
   department_name: string | null;
   decision_note: string | null;
@@ -86,7 +88,16 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
         }
         return {status: 'inactive'};
       }
-      if (!profile.active) return {status: 'inactive'};
+      if (!profile.active) {
+        // Signed up and waiting for the hospital admin's approval: the waiting screen.
+        try {
+          const request = await loadMyAccessRequest();
+          if (request && request.status === 'PENDING') return {status: 'pending', request};
+        } catch {
+          // Without the request it is simply an inactive account.
+        }
+        return {status: 'inactive'};
+      }
       const department = profile.department as {name?: string} | {name?: string}[] | null;
       identity = {
         id: profile.id,

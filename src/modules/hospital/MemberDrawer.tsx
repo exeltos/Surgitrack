@@ -1,8 +1,8 @@
 import {useState} from 'react';
-import {KeyRound, Mail, Save, Send, Trash2, UserCheck, X} from 'lucide-react';
+import {Copy, KeyRound, Mail, Save, Send, Trash2, UserCheck, X} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {localizedName} from '../../core/glossary';
-import {roles, wholeHospital, roleValue, EMAIL_FORMAT, directInvite} from './hospitalPeopleMeta';
+import {roles, wholeHospital, roleValue, EMAIL_FORMAT} from './hospitalPeopleMeta';
 import type {Department, Member, Draft} from './hospitalPeopleMeta';
 import LinkCopy from './LinkCopy';
 import {formatDateTime} from '../../core/displayDate';
@@ -20,6 +20,7 @@ export default function MemberDrawer({
   onClose,
   onSave,
   onResend,
+  onInviteLink,
   onPasswordReset,
   onMakeLink,
   onDelete,
@@ -38,6 +39,8 @@ export default function MemberDrawer({
   onClose: () => void;
   onSave: (draft: Draft) => void;
   onResend: (draft: Draft) => void;
+  /** A new user's invitation as a link to pass on by hand, instead of an email; left out in Demo. */
+  onInviteLink?: (draft: Draft) => void;
   /** Emails the user a link to set a new password; left out in Demo. */
   onPasswordReset?: (member: Member) => void;
   /** Makes the same kind of link without sending it, to pass on by hand; left out in Demo. */
@@ -54,12 +57,13 @@ export default function MemberDrawer({
     demoEnabled: member?.demo_enabled ?? false,
   }));
   const set = (patch: Partial<Draft>) => setDraft(d => ({...d, ...patch}));
-  // A new user invited to the signup form fills in their own name and department.
-  const signupInvite = !member && !demo && !directInvite(draft.role);
+  // A new user is invited to the signup form and fills in their own name (the department is offered).
+  const signupInvite = !member && !demo;
   const valid =
     (signupInvite || draft.name.trim().length >= 2) &&
     EMAIL_FORMAT.test(draft.email.trim()) &&
     (signupInvite || wholeHospital(draft.role) || !!draft.departmentId);
+  const clean = () => ({...draft, name: draft.name.trim(), email: draft.email.trim()});
   const roleField = (
     <label>
       {L('Ρόλος', 'Role')}
@@ -78,7 +82,7 @@ export default function MemberDrawer({
         <header>
           <div>
             <span className="eyebrow">{member ? L('ΧΡΗΣΤΗΣ', 'USER') : L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
-            <h2>{member ? member.name : L('Νέος χρήστης', 'New user')}</h2>
+            <h2>{member ? member.name : L('Προσθήκη χρήστη', 'Add user')}</h2>
           </div>
           <button onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
             <X />
@@ -102,14 +106,14 @@ export default function MemberDrawer({
             />
           </label>
           {member && roleField}
-          {!signupInvite && (
+          {
             <label>
               {L('Τμήμα', 'Department')}
               {wholeHospital(draft.role) ? (
                 <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
               ) : (
                 <select value={draft.departmentId} onChange={e => set({departmentId: e.target.value})}>
-                  <option value="">—</option>
+                  <option value="">{signupInvite ? L('— Το επιλέγει ο ίδιος —', '— They pick it —') : '—'}</option>
                   {departments.map(d => (
                     <option key={d.id} value={d.id}>
                       {localizedName(d.name, lang)}
@@ -118,7 +122,7 @@ export default function MemberDrawer({
                 </select>
               )}
             </label>
-          )}
+          }
           {invited && member && (
             <div className="people-invited">
               <Mail size={17} />
@@ -199,15 +203,10 @@ export default function MemberDrawer({
             <div className="studio-form-note">
               <Mail size={16} />
               <span>
-                {signupInvite
-                  ? L(
-                      'Ο χρήστης λαμβάνει email με φόρμα εγγραφής και συμπληρώνει όνομα και τμήμα. Το αίτημα εμφανίζεται εδώ για έγκριση· με την έγκριση λαμβάνει email με το όνομα χρήστη και ορίζει κωδικό.',
-                      'The user gets an email with a signup form and fills in their name and department. The request shows here for approval; on approval they get an email with their username and set a password.',
-                    )
-                  : L(
-                      'Το όνομα χρήστη δημιουργείται τώρα από τα αρχικά. Ο διαχειριστής λαμβάνει ένα email με το όνομα χρήστη και το κουμπί «Αποδοχή και ορισμός κωδικού».',
-                      'The username is made now from the initials. The admin gets one email with the username and an «Accept and set password» button.',
-                    )}
+                {L(
+                  'Στείλτε την πρόσκληση με email ή αντιγράψτε τον σύνδεσμο για να τον στείλετε όπως θέλετε (ισχύει 7 ημέρες). Ο χρήστης συμπληρώνει όνομα, τμήμα και κωδικό και βλέπει αμέσως το όνομα χρήστη του. Το αίτημα εμφανίζεται εδώ για έγκριση· με την έγκριση λαμβάνει ένα email και συνδέεται.',
+                  'Email the invitation, or copy its link to send any way you like (valid 7 days). The user fills in their name, department and password and sees their username at once. The request shows here for approval; on approval they get one email and can sign in.',
+                )}
               </span>
             </div>
           )}
@@ -220,17 +219,18 @@ export default function MemberDrawer({
           )}
           <span className="people-drawer-gap" />
           <AppButton onClick={onClose}>{L('Ακύρωση', 'Cancel')}</AppButton>
+          {signupInvite && onInviteLink && (
+            <AppButton disabled={busy || !valid} icon={<Copy size={15} />} onClick={() => onInviteLink(clean())}>
+              {L('Αντιγραφή συνδέσμου', 'Copy link')}
+            </AppButton>
+          )}
           <AppButton
             variant="primary"
             disabled={busy || !valid}
             icon={member ? <Save size={15} /> : <Mail size={15} />}
-            onClick={() => onSave({...draft, name: draft.name.trim(), email: draft.email.trim()})}
+            onClick={() => onSave(clean())}
           >
-            {member
-              ? L('Αποθήκευση', 'Save')
-              : signupInvite
-                ? L('Αποστολή πρόσκλησης εγγραφής', 'Send signup invitation')
-                : L('Αποστολή πρόσκλησης', 'Send invitation')}
+            {member ? L('Αποθήκευση', 'Save') : signupInvite ? L('Αποστολή email', 'Send email') : L('Προσθήκη', 'Add')}
           </AppButton>
         </footer>
       </aside>

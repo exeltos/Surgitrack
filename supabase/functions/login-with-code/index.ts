@@ -59,15 +59,26 @@ Deno.serve(async req => {
       return json({error: "too_many_attempts", retry_after_minutes: WINDOW_MINUTES}, 429);
     }
 
-    const {data: profile, error: profileError} = await admin
+    const {data: found, error: profileError} = await admin
       .from("profiles")
-      .select("email")
+      .select("id, email, active")
       .eq("user_code", code)
-      .eq("active", true)
       .maybeSingle();
     if (profileError) {
       await settle();
       return json({error: "login_unavailable"}, 503);
+    }
+    // An active account, or one that signed up and waits for the hospital admin's approval (it
+    // signs in to see the waiting screen; the database gives it no hospital data).
+    let profile = found?.active ? found : null;
+    if (found && !found.active) {
+      const {data: request} = await admin
+        .from("staff_access_requests")
+        .select("id")
+        .eq("user_id", found.id)
+        .eq("status", "PENDING")
+        .maybeSingle();
+      if (request) profile = found;
     }
 
     let session = null;

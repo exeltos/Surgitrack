@@ -10,11 +10,14 @@ export type Request = {
   status: 'PENDING_EMAIL' | 'PENDING' | 'APPROVED' | 'REJECTED';
   department_id: string | null;
   requested_at: string;
-  /** An account made at signup (the older signup); none until approval now. */
+  /** The account made at signup, inactive until approval. */
   user_id: string | null;
-  /** A personal signup invitation: its form's link, and the role the admin picked. */
+  /** The username made at signup. */
+  user_code: string | null;
+  /** A personal invitation: its form's link, the role the admin picked (and supervisor). */
   invite_token: string | null;
   invited_role: UserRole | null;
+  supervisor: boolean;
   invited_at: string | null;
 };
 
@@ -70,8 +73,6 @@ export const roleValue = (m: Pick<Member, 'role' | 'supervisor'>) =>
 export const accountRole = (role: string) => (role === SUPERVISOR ? 'STERILIZATION' : role) as UserRole;
 
 export const EMAIL_FORMAT = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export const directInvite = (role: string) => role === 'ADMIN';
 
 export type InviteResult = {
   email: string;

@@ -4135,6 +4135,27 @@
 .auth-name-row .auth-input input {
   padding: 0 2px !important;
 }
+.join-username {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  margin: 4px 0 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #f4f7fa;
+}
+.join-username span {
+  color: var(--st-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.join-username strong {
+  color: #152c41;
+  font-size: 26px;
+  letter-spacing: 3px;
+}
 .auth-hint {
   margin-top: -6px;
   color: var(--st-muted);

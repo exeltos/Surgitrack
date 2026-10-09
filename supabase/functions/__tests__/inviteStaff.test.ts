@@ -323,17 +323,37 @@ describe('invite-staff: a signup invitation (anyone but an admin, not from a lis
     expect(await result(await invite(handle, body))).toMatchObject({ok: false, error: 'Request already waiting for approval'});
   });
 
-  it('sends the same link again for an open invitation, changing the role only when asked to', async () => {
+  it('sends the same link again for an open invitation, starting its 7 days again', async () => {
     mailOn();
     routes({'staff_access_requests:select': {id: 'r1', status: 'PENDING_EMAIL', invite_token: 'known-token'}});
-    const first = await result(await invite(handle, body));
+    const first = await result(await invite(handle, {...body, role: 'STERILIZATION'}));
     expect(first.url).toBe(`${SITE}/#/join/known-token`);
     expect(fake.dbCalls('insert')).toHaveLength(0);
-    expect(fake.dbCalls('update')).toHaveLength(0);
-    await invite(handle, {...body, again: true, role: 'STERILIZATION'});
     const update = fake.dbCalls('update').find(c => c.table === 'staff_access_requests');
-    expect(update?.values).toMatchObject({invited_role: 'STERILIZATION'});
+    expect(update?.values).toMatchObject({invited_role: 'STERILIZATION', invited_at: expect.any(String)});
     expect(update?.filters).toContainEqual(['eq', 'id', 'r1']);
+  });
+
+  it('only returns the link, without an email, when asked to', async () => {
+    mailOn();
+    const row = await result(await invite(handle, {...body, send_email: false}));
+    expect(row).toMatchObject({ok: true, mode: 'signup', emailed: false});
+    expect(String(row.url)).toContain('/#/join/');
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('invites an admin to the signup form too, unless told to make the account at once', async () => {
+    mailOn();
+    const row = await result(await invite(handle, {...body, role: 'ADMIN', full_name: 'Μαρία'}));
+    expect(row).toMatchObject({ok: true, mode: 'signup'});
+    expect(fake.calls.filter(c => c.what === 'generateLink')).toHaveLength(0);
+  });
+
+  it('keeps the supervisor flag on the invitation', async () => {
+    mailOn();
+    await invite(handle, {...body, role: 'STERILIZATION', supervisor: true});
+    const insert = fake.dbCalls('insert').find(c => c.table === 'staff_access_requests');
+    expect(insert?.values).toMatchObject({invited_role: 'STERILIZATION', supervisor: true});
   });
 
   it('refuses an open request that has no token to resend', async () => {
@@ -360,8 +380,23 @@ describe('invite-staff: approving a request', () => {
     expect((await approve()).status).toBe(404);
     asRequest({...REQUEST, status: 'APPROVED'});
     expect((await approve()).status).toBe(409);
-    asRequest({...REQUEST, user_id: 'u1'});
-    expect((await approve()).status).toBe(409);
+  });
+
+  it('activates the account made at signup and emails the person once', async () => {
+    mailOn();
+    asRequest({...REQUEST, user_id: 'u1', user_code: 'MP1234', supervisor: true});
+    const response = await approve({role: 'STERILIZATION', department_id: null});
+    expect(await response.json()).toMatchObject({ok: true, user_code: 'MP1234', emailed: true});
+    const profile = fake.dbCalls('update').find(c => c.table === 'profiles');
+    expect(profile?.values).toMatchObject({role: 'STERILIZATION', supervisor: true, active: true});
+    expect(profile?.filters).toContainEqual(['eq', 'id', 'u1']);
+    expect(profile?.filters).toContainEqual(['eq', 'organization_id', 'org-1']);
+    expect(fake.calls.filter(c => c.what === 'generateLink')).toHaveLength(0);
+    expect(mailState.outbox).toHaveLength(1);
+    expect(mailState.outbox[0].subject).toBe('Η πρόσβασή σας στο SurgiTrack εγκρίθηκε');
+    expect(mailState.outbox[0].html).toContain('MP1234');
+    const request = fake.dbCalls('update').find(c => c.table === 'staff_access_requests');
+    expect(request?.values).toMatchObject({status: 'APPROVED', granted_role: 'STERILIZATION'});
   });
 
   it('needs a valid role', async () => {
@@ -412,5 +447,52 @@ describe('invite-staff: approving a request', () => {
     await approve({department_id: 'dept-9'});
     expect(upserts('profiles')[0].values).toMatchObject({department_id: 'dept-9'});
     expect(fake.dbCalls().find(c => c.table === 'departments')?.filters).toContainEqual(['eq', 'organization_id', 'org-1']);
+  });
+});
+
+describe('invite-staff: rejecting a request', () => {
+  const WAITING = {
+    id: 'req-1',
+    organization_id: 'org-1',
+    user_id: 'u1',
+    user_code: 'MP1234',
+    full_name: 'ΜΑΡΙΑ ΠΑΠΑ',
+    email: 'maria@hospital.gr',
+    status: 'PENDING',
+    department_id: null,
+    supervisor: false,
+  };
+  const reject = (extra: Record<string, unknown> = {}) => invite(handle, {reject_request: 'req-1', ...extra});
+
+  it('declines it, removes the waiting account and emails the person once', async () => {
+    mailOn();
+    routes({
+      'staff_access_requests:select': WAITING,
+      'profiles:select': call => (filter(call, 'id') === 'admin-1' ? ADMIN : filter(call, 'id') === 'u1' ? {active: false} : null),
+    });
+    const response = await reject({note: 'Λάθος τμήμα'});
+    expect(await response.json()).toMatchObject({ok: true, emailed: true});
+    const request = fake.dbCalls('update').find(c => c.table === 'staff_access_requests');
+    expect(request?.values).toMatchObject({status: 'REJECTED', user_id: null, decision_note: 'Λάθος τμήμα'});
+    expect(fake.calls.find(c => c.what === 'deleteUser')?.args[0]).toBe('u1');
+    expect(mailState.outbox).toHaveLength(1);
+    expect(mailState.outbox[0].html).toContain('Λάθος τμήμα');
+  });
+
+  it('never removes an account already in use', async () => {
+    routes({
+      'staff_access_requests:select': WAITING,
+      'profiles:select': call => (filter(call, 'id') === 'admin-1' ? ADMIN : filter(call, 'id') === 'u1' ? {active: true} : null),
+    });
+    await reject();
+    expect(fake.calls.filter(c => c.what === 'deleteUser')).toHaveLength(0);
+  });
+
+  it("refuses another hospital's request, and one not waiting", async () => {
+    routes({'staff_access_requests:select': {...WAITING, organization_id: 'org-2'}});
+    expect((await reject()).status).toBe(400);
+    routes({'staff_access_requests:select': {...WAITING, status: 'APPROVED'}});
+    expect((await reject()).status).toBe(409);
+    expect(fake.calls.filter(c => c.what === 'deleteUser')).toHaveLength(0);
   });
 });

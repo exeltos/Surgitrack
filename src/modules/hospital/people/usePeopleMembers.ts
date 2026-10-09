@@ -1,5 +1,5 @@
 import {supabase} from '../../../lib/supabase';
-import {SUPERVISOR, wholeHospital, accountRole, directInvite, functionError} from '../hospitalPeopleMeta';
+import {SUPERVISOR, wholeHospital, accountRole, functionError} from '../hospitalPeopleMeta';
 import type {Member, Draft, InviteResult} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
 import type {usePeopleData} from './usePeopleData';
@@ -17,11 +17,12 @@ export function usePeopleMembers(
   const {L, changed, demo, departmentLabel, libs, members, organizationId, platform, setBusy, setDrawer, setNotice} = p;
 
   /**
-   * Invites one person by email. A hospital admin gets their username at once with a link to accept
-   * and set a password; anyone else gets a signup form, and their request then waits here for
-   * approval. `again` sends a waiting invitation once more.
+   * Invites one person: a personal link to the signup form (valid 7 days), emailed or, with
+   * `send` false, only returned to pass on by hand. They fill in their details and set their
+   * password; the request then waits here for approval. `again` sends a waiting invitation once
+   * more (an older account made at once gets its accept link again).
    */
-  const invite = async (draft: Draft, again = false) => {
+  const invite = async (draft: Draft, again = false, send = true) => {
     const role = accountRole(draft.role);
     const supervisor = draft.role === SUPERVISOR;
     if (demo) {
@@ -39,9 +40,8 @@ export function usePeopleMembers(
       setNotice({kind: 'ok', text: L(`Ο/Η ${draft.name} προστέθηκε.`, `${draft.name} was added.`)});
       return;
     }
-    // An account already invited (not accepted yet) is sent its accept link again, whatever its role.
-    const direct =
-      directInvite(draft.role) || (again && members.some(m => m.email.toLowerCase() === draft.email.toLowerCase()));
+    // An older account made at once (not accepted yet) is sent its accept link again.
+    const direct = again && members.some(m => m.email.toLowerCase() === draft.email.toLowerCase());
     setBusy(true);
     setNotice(null);
     const {data: result, error} = await supabase.functions.invoke<{results?: InviteResult[]}>('invite-staff', {
@@ -51,13 +51,14 @@ export function usePeopleMembers(
             full_name: draft.name,
             email: draft.email,
             organization_id: organizationId,
-            department_id: wholeHospital(role) || !direct ? null : draft.departmentId || null,
+            department_id: wholeHospital(role) ? null : draft.departmentId || null,
             role,
             supervisor,
             direct,
           },
         ],
         again,
+        send_email: send,
         redirect_to: window.location.origin,
       },
     });
@@ -102,14 +103,25 @@ export function usePeopleMembers(
       return;
     }
     setDrawer(null);
-    if (!r.emailed) {
+    if (r.mode === 'signup' && !send) {
+      // Copied for the admin to pass on (Viber, SMS, …); shown as well in case the copy is blocked.
+      void navigator.clipboard?.writeText(r.url || '').catch(() => undefined);
+      setNotice({
+        kind: 'ok',
+        text: L(
+          `Ο σύνδεσμος εγγραφής για το ${draft.email} αντιγράφηκε (ισχύει 7 ημέρες). Στείλτε τον όπως θέλετε· μόλις κάνει εγγραφή, το αίτημα εμφανίζεται εδώ για έγκριση.`,
+          `The signup link for ${draft.email} was copied (valid 7 days). Send it any way you like; once they sign up, the request shows here for approval.`,
+        ),
+        link: r.url,
+      });
+    } else if (!r.emailed) {
       setNotice({
         kind: 'warn',
         text:
           r.mode === 'signup'
             ? L(
-                `Η πρόσκληση για το ${draft.email} ετοιμάστηκε, αλλά το email δεν στάλθηκε. Στείλτε του αυτόν τον σύνδεσμο για να συμπληρώσει τα στοιχεία του:`,
-                `The invitation for ${draft.email} is ready, but the email was not sent. Send them this link to fill in their details:`,
+                `Η πρόσκληση για το ${draft.email} ετοιμάστηκε, αλλά το email δεν στάλθηκε. Στείλτε του αυτόν τον σύνδεσμο εγγραφής:`,
+                `The invitation for ${draft.email} is ready, but the email was not sent. Send them this signup link:`,
               )
             : L(
                 `Ο λογαριασμός ${r.user_code || ''} ετοιμάστηκε, αλλά το email δεν στάλθηκε. Στείλτε του αυτόν τον σύνδεσμο για να ορίσει κωδικό:`,
@@ -123,18 +135,13 @@ export function usePeopleMembers(
         text:
           r.mode === 'signup'
             ? L(
-                `Στάλθηκε πρόσκληση εγγραφής στο ${draft.email}. Μόλις συμπληρώσει τα στοιχεία του, το αίτημα εμφανίζεται εδώ για έγκριση.`,
-                `A signup invitation was sent to ${draft.email}. Once they fill in their details, the request shows here for approval.`,
+                `Στάλθηκε πρόσκληση στο ${draft.email}. Μόλις κάνει εγγραφή, το αίτημα εμφανίζεται εδώ για έγκριση.`,
+                `An invitation was sent to ${draft.email}. Once they sign up, the request shows here for approval.`,
               )
-            : again
-              ? L(
-                  `Η πρόσκληση στάλθηκε ξανά στο ${draft.email}. Ζητήστε να ελέγξει και τα ανεπιθύμητα (spam).`,
-                  `The invitation was sent again to ${draft.email}. Ask them to check their spam folder too.`,
-                )
-              : L(
-                  `Στάλθηκε πρόσκληση στο ${draft.email} με όνομα χρήστη ${r.user_code || ''}. Ο/Η ${draft.name} αποδέχεται και ορίζει κωδικό από το email.`,
-                  `An invitation was sent to ${draft.email} with username ${r.user_code || ''}. ${draft.name} accepts and sets a password from the email.`,
-                ),
+            : L(
+                `Η πρόσκληση στάλθηκε ξανά στο ${draft.email}. Ζητήστε να ελέγξει και τα ανεπιθύμητα (spam).`,
+                `The invitation was sent again to ${draft.email}. Ask them to check their spam folder too.`,
+              ),
       });
     await changed();
   };

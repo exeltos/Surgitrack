@@ -1,6 +1,4 @@
-import {useEffect} from 'react';
-import {Clock3, LogOut, MailWarning, XCircle} from 'lucide-react';
-import {supabase} from '../../lib/supabase';
+import {Clock3, LogOut, XCircle} from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
 import type {AccessRequest} from '../../data/cloud/identity';
 
@@ -12,14 +10,7 @@ export default function PendingAccess({request, onSignOut}: {request: AccessRequ
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
 
-  // After the email is confirmed the hospital admins get the email alert (once).
-  useEffect(() => {
-    if (request.status === 'PENDING' && !request.admin_notified)
-      void supabase.functions.invoke('access-requests', {body: {action: 'notify-admins'}});
-  }, [request.status, request.admin_notified]);
-
   const rejected = request.status === 'REJECTED';
-  const unconfirmed = request.status === 'PENDING_EMAIL';
   return (
     <div className="auth-page">
       <main className="auth-main pending-access">
@@ -27,15 +18,13 @@ export default function PendingAccess({request, onSignOut}: {request: AccessRequ
           <div className="auth-card">
             <div className="auth-status-card">
               <div className={`auth-status-icon ${rejected ? 'danger' : ''}`}>
-                {rejected ? <XCircle size={24} /> : unconfirmed ? <MailWarning size={24} /> : <Clock3 size={24} />}
+                {rejected ? <XCircle size={24} /> : <Clock3 size={24} />}
               </div>
               <span className="auth-eyebrow">{request.organization_name}</span>
               <h2>
                 {rejected
                   ? L('Το αίτημα δεν εγκρίθηκε', 'Request not approved')
-                  : unconfirmed
-                    ? L('Επιβεβαιώστε το email σας', 'Confirm your email')
-                    : L('Αναμονή έγκρισης', 'Awaiting approval')}
+                  : L('Αναμονή έγκρισης', 'Awaiting approval')}
               </h2>
               <p>
                 {rejected
@@ -43,17 +32,20 @@ export default function PendingAccess({request, onSignOut}: {request: AccessRequ
                       'Ο διαχειριστής του νοσοκομείου απέρριψε το αίτημα πρόσβασης.',
                       'The hospital administrator declined the access request.',
                     )
-                  : unconfirmed
-                    ? L(
-                        'Ανοίξτε τον σύνδεσμο επιβεβαίωσης που στάλθηκε στο email σας.',
-                        'Open the confirmation link sent to your email.',
-                      )
-                    : L(
-                        'Το αίτημά σας στάλθηκε στον διαχειριστή του νοσοκομείου. Θα λάβετε email με το όνομα χρήστη σας μόλις εγκριθεί.',
-                        'Your request was sent to the hospital administrator. You will get an email with your username once approved.',
-                      )}
+                  : L(
+                      'Ο λογαριασμός σας περιμένει την έγκριση του διαχειριστή του νοσοκομείου. Θα λάβετε email μόλις εγκριθεί· μετά συνδέεστε με το όνομα χρήστη και τον κωδικό σας.',
+                      'Your account is waiting for the hospital administrator’s approval. You will get an email once approved; then sign in with your username and password.',
+                    )}
               </p>
               <dl className="pending-access-details">
+                {request.user_code && (
+                  <>
+                    <dt>{L('Όνομα χρήστη', 'Username')}</dt>
+                    <dd>
+                      <b>{request.user_code}</b>
+                    </dd>
+                  </>
+                )}
                 <dt>{L('Ονοματεπώνυμο', 'Name')}</dt>
                 <dd>{request.full_name}</dd>
                 <dt>Email</dt>

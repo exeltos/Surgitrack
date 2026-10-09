@@ -24,6 +24,7 @@ const initial = {
     updateUserById: (_id: string, _attrs: unknown): Result => ({error: null}),
     generateLink: (_args: unknown): Result => ({data: {properties: {hashed_token: 'tok'}}, error: null}),
     inviteUserByEmail: (_email: string, _options: unknown): Result => ({data: {user: {id: 'invited-user'}}, error: null}),
+    createUser: (_attrs: unknown): Result => ({data: {user: {id: 'new-user'}}, error: null}),
     signOut: (_token: string, _scope: unknown): Result => ({error: null}),
   },
   resetPassword: (_email: string, _options: unknown): Result => ({error: null}),
@@ -38,6 +39,7 @@ const initial = {
       updateUserById: () => ({error: null}),
       generateLink: () => ({data: {properties: {hashed_token: 'tok'}}, error: null}),
       inviteUserByEmail: () => ({data: {user: {id: 'invited-user'}}, error: null}),
+      createUser: () => ({data: {user: {id: 'new-user'}}, error: null}),
       signOut: () => ({error: null}),
     };
     this.resetPassword = () => ({error: null});
@@ -136,6 +138,10 @@ export const createClient = (_url: string, _key: string, options?: {global?: {he
       inviteUserByEmail: (email: string, options: unknown) => {
         record('inviteUserByEmail', email, options);
         return Promise.resolve(fake.admin.inviteUserByEmail(email, options));
+      },
+      createUser: (attrs: unknown) => {
+        record('createUser', attrs);
+        return Promise.resolve(fake.admin.createUser(attrs));
       },
     },
     resetPasswordForEmail: (email: string, options: unknown) => {
