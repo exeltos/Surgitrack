@@ -275,7 +275,7 @@ export default function AssetWorkbenchSidebar({
           <dt>{tr('Τμήμα')}</dt>
           <dd>
             {tool?.mode === 'STOCK' ? (
-              <span className="asset-field-na">— Stock</span>
+              <span className="asset-field-na">{tr('Απόθεμα εργαλείων')}</span>
             ) : tool?.mode === 'SET_MEMBER' ? (
               trData(setDepartment || asset.department) || '—'
             ) : kind === 'SET' && (editing ? draft.state : asset.state) === 'IN_STOCK' ? (

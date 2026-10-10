@@ -770,6 +770,12 @@ export const en: Record<string, string> = {
   'Μόνο για 1 τεμάχιο': 'Only for 1 piece',
   'Συμπληρώστε Κωδικό, Ονομασία και Τμήμα για να αποθηκευτεί.': 'Fill in Code, Name and Department to save.',
   'Τμήμα *': 'Department *',
+  'Είδος που δεν υπάρχει στο Απόθεμα': 'A kind not in Stock',
+  'Τα είδη του Αποθέματος είναι ήδη στη λίστα: συμπληρώστε το Ελάχιστο δίπλα τους.':
+    'The kinds in Stock are already listed: fill in the Minimum next to them.',
+  'Δεν έχει οριστεί ελάχιστο για κανένα είδος. Συμπληρώστε το Ελάχιστο σε όσα είδη θέλετε να παρακολουθείτε.':
+    'No minimum is set for any kind. Fill in the Minimum for the kinds you want to keep track of.',
+  'Δεν έχει οριστεί ελάχιστο για κανένα είδος.': 'No minimum is set for any kind.',
   'Επιλέξτε το τμήμα στο οποίο δίνεται.': 'Choose the department it is given to.',
   '— Επιλέξτε τμήμα —': '— Choose a department —',
   'Το τμήμα στο οποίο δίνεται το εργαλείο.': 'The department the instrument is given to.',
@@ -972,7 +978,6 @@ export const en: Record<string, string> = {
   'Όλα τα είδη με ορισμένο ελάχιστο είναι επαρκή.': 'Every kind with a minimum set is sufficient.',
   'Για να φτάσουν στο ελάχιστο λείπουν {0}.': '{0} are missing to reach the minimum.',
   'Παραγγελία για όσα λείπουν': 'Order what is missing',
-  'Ορισμός ελάχιστου για είδος': 'Set a minimum for a kind',
   'Κωδικός ή ονομασία εργαλείου': 'Instrument code or name',
   'Δεν υπάρχουν ελάχιστα αποθέματα ακόμα': 'No minimum stock levels yet',
   'Διαλέξτε ένα είδος παραπάνω και ορίστε πόσα θέλετε να υπάρχουν πάντα στο Απόθεμα.':
