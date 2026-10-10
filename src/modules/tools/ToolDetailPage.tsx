@@ -107,6 +107,11 @@ export default function ToolDetailPage() {
   const history = movements
     .filter(movement => knownBarcodes.some(barcode => movement.asset.includes(barcode)))
     .slice(0, 30);
+  // A member instrument travels inside its Set: the Set's own moves are shown too, apart.
+  const setHistory =
+    tool.mode === 'SET_MEMBER' && set
+      ? movements.filter(m => m.asset.includes(set.barcode) && !history.includes(m)).slice(0, 30)
+      : [];
   const toolIssues = issues.filter(issue => issue.status === 'OPEN' && issue.asset.startsWith(tool.barcode));
   const location = set
     ? `Set ${set.barcode}`
@@ -115,6 +120,20 @@ export default function ToolDetailPage() {
       : tool.department
         ? trData(tool.department)
         : tr('Μεμονωμένο');
+  const historyRow = (item: (typeof movements)[number]) => (
+    <div className="asset-history-row" key={item.id}>
+      <span className="history-dot" />
+      <div>
+        <strong>{trData(item.status)}</strong>
+        <p>
+          {trData(item.from)} → {trData(item.to)}
+        </p>
+        <small>
+          {item.at} · {trData(item.by)}
+        </small>
+      </div>
+    </div>
+  );
   const departmentView = role === 'DEPARTMENT';
   const backTo = departmentView ? '/department' : '/tools';
   const workflowLocked = !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(tool.state);
@@ -242,6 +261,7 @@ export default function ToolDetailPage() {
           asset={tool}
           setName={set ? `${set.barcode} · ${set.name}` : undefined}
           setDepartment={trData(set?.department)}
+          memberOf={tool.mode === 'SET_MEMBER' ? set : undefined}
           onPhotos={() => setPhotosOpen(true)}
           workflowLocked={workflowLocked}
           onSave={can('asset.edit') ? patch => updateTool(tool.id, patch) : undefined}
@@ -271,22 +291,17 @@ export default function ToolDetailPage() {
                 </div>
                 <div className="asset-history asset-detail-scroll">
                   {history.length ? (
-                    history.map(item => (
-                      <div className="asset-history-row" key={item.id}>
-                        <span className="history-dot" />
-                        <div>
-                          <strong>{trData(item.status)}</strong>
-                          <p>
-                            {trData(item.from)} → {trData(item.to)}
-                          </p>
-                          <small>
-                            {item.at} · {trData(item.by)}
-                          </small>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
+                    history.map(historyRow)
+                  ) : setHistory.length ? null : (
                     <AssetEmptyState>{tr('Δεν υπάρχει καταγεγραμμένη κίνηση.')}</AssetEmptyState>
+                  )}
+                  {setHistory.length > 0 && set && (
+                    <>
+                      <h3 className="asset-history-group">
+                        {tr('Κινήσεις του Σετ {0}', `${set.barcode} · ${set.name}`)}
+                      </h3>
+                      {setHistory.map(historyRow)}
+                    </>
                   )}
                 </div>
               </section>

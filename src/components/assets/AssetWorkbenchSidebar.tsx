@@ -23,6 +23,8 @@ type Props = {
   expectedCount?: number;
   setName?: string;
   setDepartment?: string;
+  /** The Set a member instrument travels in: its state and sterile dates are the instrument's. */
+  memberOf?: SetAsset;
   onPhotos: () => void;
   onSave?: (patch: EditablePatch) => void;
   workflowLocked?: boolean;
@@ -65,6 +67,7 @@ export default function AssetWorkbenchSidebar({
   expectedCount,
   setName,
   setDepartment,
+  memberOf,
   onPhotos,
   onSave,
   workflowLocked = false,
@@ -77,11 +80,14 @@ export default function AssetWorkbenchSidebar({
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
-  const displayStateLabel = tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : null;
+  // A member instrument is where its Set is, and sterile with it.
+  const carrier = tool?.mode === 'SET_MEMBER' && memberOf ? memberOf : asset;
+  const fromSet = carrier !== asset;
+  const displayStateLabel = tool?.mode === 'SET_MEMBER' && !memberOf ? tr('Μέλος Σετ') : null;
   // A released Set or instrument shows how long it stays sterile.
   const sterile =
-    asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
-      ? expiryStatus(asset.sterileUntil, asset.shelfLifeMonths)
+    carrier.sterileUntil && (STERILE_STATES as readonly string[]).includes(carrier.state)
+      ? expiryStatus(carrier.sterileUntil, carrier.shelfLifeMonths)
       : undefined;
   const makeDraft = () => ({
     name: asset.name,
@@ -165,7 +171,7 @@ export default function AssetWorkbenchSidebar({
           {displayStateLabel ? (
             <span className="status-badge asset-member-status">{displayStateLabel}</span>
           ) : (
-            <StatusBadge value={asset.state} />
+            <StatusBadge value={carrier.state} />
           )}{' '}
           {sterile && sterile.state !== 'OK' && <ExpiryBadge entry={sterile} />}
           {workflowLocked && <small>{tr('Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες')}</small>}
@@ -215,7 +221,10 @@ export default function AssetWorkbenchSidebar({
                 ))}
               </select>
             ) : (
-              <StatusBadge value={asset.state} />
+              <>
+                <StatusBadge value={carrier.state} />
+                {fromSet && <small className="muted"> {tr('με το Σετ')}</small>}
+              </>
             )}
           </dd>
         </div>
@@ -223,8 +232,11 @@ export default function AssetWorkbenchSidebar({
         <div>
           <dt>{tr('Αποστείρωση')}</dt>
           <dd className="sterile-dd">
-            {sterile && asset.sterileUntil && sterilizedOnOf(asset) ? (
-              formatExpiry(sterilizedOnOf(asset)!)
+            {sterile && carrier.sterileUntil && sterilizedOnOf(carrier) ? (
+              <>
+                {formatExpiry(sterilizedOnOf(carrier)!)}
+                {fromSet && <small className="muted">{tr('από το Σετ')}</small>}
+              </>
             ) : (
               <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
                 —
@@ -235,8 +247,11 @@ export default function AssetWorkbenchSidebar({
         <div>
           <dt>{tr('Λήξη')}</dt>
           <dd className="sterile-dd">
-            {sterile && asset.sterileUntil ? (
-              formatExpiry(asset.sterileUntil)
+            {sterile && carrier.sterileUntil ? (
+              <>
+                {formatExpiry(carrier.sterileUntil)}
+                {fromSet && <small className="muted">{tr('από το Σετ')}</small>}
+              </>
             ) : (
               <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
                 —
@@ -314,8 +329,16 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-marker-field">
           <dt>{tr('Χρωματικός μάρτυρας')}</dt>
           <dd>
-            <ColorMarker tapes={markerTapes} empty={tr('Χωρίς χρώμα')} />
-            {markerNote && <small>{markerNote}</small>}
+            {markerTapes?.length ? (
+              <>
+                <ColorMarker tapes={markerTapes} />
+                {markerNote && <small>{markerNote}</small>}
+              </>
+            ) : (
+              <span className="color-marker-empty">
+                {markerNote ? tr('Χωρίς χρώμα, {0}', markerNote) : tr('Χωρίς χρώμα')}
+              </span>
+            )}
             {onEditMarker && (
               <button type="button" className="asset-marker-edit" onClick={onEditMarker} title={tr('Αλλαγή χρώματος')}>
                 <Palette size={14} />

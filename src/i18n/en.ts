@@ -552,7 +552,7 @@ export const en: Record<string, string> = {
   'Η κάμερα δεν είναι διαθέσιμη': 'Camera not available',
   'Η κάμερα δεν υποστηρίζεται εδώ. Χρησιμοποίησε χειροκίνητη εισαγωγή ή scanner υπολογιστή.':
     'The camera is not supported here. Use manual entry or a computer scanner.',
-  'Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείς αργότερα στην προβολή και επεξεργασία.':
+  'Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείτε αργότερα στην προβολή και επεξεργασία.':
     'The card is created with the same fields you will later use to view and edit it.',
   'Η καρτέλα καταγράφηκε στο ιστορικό.': 'The card was recorded in the history.',
   'Η λειτουργική εικόνα του εργαλείου χωρίς επανάληψη των στοιχείων ταυτότητας.':
@@ -769,6 +769,12 @@ export const en: Record<string, string> = {
   'Μόνιμες παρατηρήσεις': 'Permanent notes',
   'Μόνο Σετ': 'Sets only',
   'Μόνο για 1 τεμάχιο': 'Only for 1 piece',
+  'Με περισσότερα τεμάχια, ο σειριακός συμπληρώνεται στην καρτέλα του καθενός.':
+    'With more pieces, the serial number is filled in on each piece’s card.',
+  'με το Σετ': 'with the Set',
+  'από το Σετ': 'from the Set',
+  'Χωρίς χρώμα, {0}': 'No color, {0}',
+  'Κινήσεις του Σετ {0}': 'Moves of the Set {0}',
   'Μόνο εργαλεία': 'Instruments only',
   'Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.':
     "The set's operational summary only; identity details stay on the left.",

@@ -76,7 +76,8 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
         quantity,
         maxUses: limit,
         notes: notes.trim() || undefined,
-        serialNumber: serialNumber.trim() || undefined,
+        // One serial number cannot belong to several pieces.
+        serialNumber: (quantity === 1 && serialNumber.trim()) || undefined,
       });
       if (photos.length) ids.forEach(id => addAssetPhotos('TOOL', id, photos));
       if (ids.length === 1) navigate(`/tools/${ids[0]}`);
@@ -215,6 +216,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                   onChange={e => setSerialNumber(e.target.value)}
                   placeholder={quantity > 1 ? tr('Μόνο για 1 τεμάχιο') : tr('Προαιρετικό')}
                 />
+                {quantity > 1 && (
+                  <small>{tr('Με περισσότερα τεμάχια, ο σειριακός συμπληρώνεται στην καρτέλα του καθενός.')}</small>
+                )}
               </label>
             )}
             <label>
@@ -321,7 +325,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                     <h2>{kind === 'SET' ? tr('Ρυθμίσεις νέου Σετ') : tr('Ρυθμίσεις νέου εργαλείου')}</h2>
                     <p>
                       {tr(
-                        'Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείς αργότερα στην προβολή και επεξεργασία.',
+                        'Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείτε αργότερα στην προβολή και επεξεργασία.',
                       )}
                     </p>
                   </div>
