@@ -5,7 +5,6 @@ import {useSurgi} from '../../store/SurgiStore';
 import type {SurgicalCount} from '../../store/types';
 import type {AssetKind} from '../../types/domain';
 import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
-import {ExpirySymbol, SterileSymbol} from '../ui/SterileDates';
 import {printCountForm} from './printCountForm';
 import {tr, trData} from '../../i18n';
 import {askConfirm} from '../../components/ui/confirmService';
@@ -133,17 +132,10 @@ export default function CountModal({
       ),
     ],
     [
-      <>
-        <SterileSymbol /> {tr('Αποστείρωση')}
-      </>,
+      tr('Αποστείρωση'),
       sterilizedOn ? `${formatExpiry(sterilizedOn)}${asset.sterilizedTime ? `, ${asset.sterilizedTime}` : ''}` : '—',
     ],
-    [
-      <>
-        <ExpirySymbol /> {tr('Λήξη')}
-      </>,
-      asset.sterileUntil ? formatExpiry(asset.sterileUntil) : '—',
-    ],
+    [tr('Λήξη'), asset.sterileUntil ? formatExpiry(asset.sterileUntil) : '—'],
     [tr('Κύκλος / κλίβανος'), release ? `${release.cycleNumber} · ${trData(release.sterilizer)}` : '—'],
   ];
   return (

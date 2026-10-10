@@ -125,7 +125,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
                       <span>2</span>
                       <div>
                         <strong>{tr('Εργαλείο αντικατάστασης')}</strong>
-                        <small>{tr('Επίλεξε πηγή και φυσικό εργαλείο.')}</small>
+                        <small>{tr('Επιλέξτε πηγή και φυσικό εργαλείο.')}</small>
                       </div>
                     </div>
                   </div>

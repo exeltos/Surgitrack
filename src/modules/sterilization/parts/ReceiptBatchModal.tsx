@@ -180,7 +180,7 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                         <strong>
                           {receiptBatchIdentityValid ? receiptBatchDeliverer?.name : tr('Αναμονή ταυτοποίησης')}
                         </strong>
-                        <small>{receiptBatchDepartment || tr('Σκάναρε πρώτα αντικείμενο')}</small>
+                        <small>{receiptBatchDepartment || tr('Σκανάρετε πρώτα αντικείμενο')}</small>
                       </div>
                     </div>
                   </div>

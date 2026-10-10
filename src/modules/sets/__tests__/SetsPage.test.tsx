@@ -25,10 +25,10 @@ describe('Sets', () => {
 
   it('finds a Set by barcode', () => {
     renderPage(<SetsPage />, {path: '/sets'});
-    const barcode = within(rows()[1]).getByText(/^S\d+$/).textContent!;
+    const barcode = within(rows()[1]).getByRole('link', {name: /^S\d+$/}).textContent!;
     fireEvent.change(screen.getByPlaceholderText('Όνομα Σετ, κωδικός ή barcode...'), {target: {value: barcode}});
     expect(rows()).toHaveLength(1);
-    expect(within(rows()[0]).getByText(barcode)).toBeInTheDocument();
+    expect(within(rows()[0]).getByRole('link', {name: barcode})).toBeInTheDocument();
   });
 
   it('shows what each count names when it is pressed, and everything again under «Σύνολο Σετ»', () => {

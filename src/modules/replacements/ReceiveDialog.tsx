@@ -26,7 +26,7 @@ export default function ReceiveDialog({
           <div>
             <span className="eyebrow">{order.number}</span>
             <h2>{tr('Παραλαβή παραγγελίας')}</h2>
-            <p>{tr('Γράψε πόσα τεμάχια ήρθαν από κάθε είδος. Όσα λείπουν μένουν σε αναμονή.')}</p>
+            <p>{tr('Γράψτε πόσα τεμάχια ήρθαν από κάθε είδος. Όσα λείπουν μένουν σε αναμονή.')}</p>
           </div>
           <button type="button" className="modal-x" aria-label={tr('Κλείσιμο')} onClick={onClose}>
             <X size={18} />

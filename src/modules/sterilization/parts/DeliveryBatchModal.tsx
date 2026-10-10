@@ -90,7 +90,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                       <small>
                         {deliveryBatchDepartment
                           ? tr('Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.')
-                          : tr('Επίλεξε το πρώτο αντικείμενο για να οριστεί το τμήμα.')}
+                          : tr('Επιλέξτε το πρώτο αντικείμενο για να οριστεί το τμήμα.')}
                       </small>
                     </div>
                   </div>
@@ -159,7 +159,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                         <strong>
                           {deliveryBatchReceiverMatches ? deliveryBatchReceiver?.name : tr('Αναμονή ταυτοποίησης')}
                         </strong>
-                        <small>{deliveryBatchDepartment || tr('Σκάναρε πρώτα αντικείμενο')}</small>
+                        <small>{deliveryBatchDepartment || tr('Σκανάρετε πρώτα αντικείμενο')}</small>
                       </div>
                     </div>
                   </div>
