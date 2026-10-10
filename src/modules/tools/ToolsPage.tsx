@@ -184,7 +184,7 @@ export default function ToolsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table registry-fixed">
+          <table className="asset-registry-table registry-fixed tools-registry">
             <thead>
               <tr>
                 <th>{tr('Ονομασία')}</th>
@@ -211,11 +211,8 @@ export default function ToolsPage() {
                             {t.name}
                           </Link>
                           <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
-                          <small className="row-sub">
-                            {[t.manufacturer, t.code, t.serialNumber && `S/N ${t.serialNumber}`]
-                              .filter(Boolean)
-                              .join(' · ')}
-                          </small>
+                          <small className="row-sub">{[t.manufacturer, t.code].filter(Boolean).join(' · ')}</small>
+                          {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                         </span>
                       </div>
                     </td>
@@ -228,10 +225,10 @@ export default function ToolsPage() {
                     <td>
                       {t.mode === 'SET_MEMBER' && set ? (
                         <>
-                          <b>{tr('Σετ')}</b>
-                          <small className="row-sub">
-                            {set.barcode} · {set.name}
-                          </small>
+                          <Link className="row-title-link tools-place-set" to={`/sets/${set.id}`}>
+                            {set.name}
+                          </Link>
+                          <small className="row-sub mono">{set.barcode}</small>
                         </>
                       ) : t.mode === 'STOCK' ? (
                         <b>{tr('Απόθεμα')}</b>
@@ -245,7 +242,7 @@ export default function ToolsPage() {
                     <td className="cell-nowrap">
                       {t.maxUses ? (
                         <>
-                          <b>{Math.max(0, t.maxUses - t.uses)}</b>
+                          <b>{t.uses}</b>
                           <span className="muted"> / {t.maxUses}</span>
                         </>
                       ) : (

@@ -10834,3 +10834,31 @@ html body .sets-registry .sets-row-barcode {
     margin-top: 0;
   }
 }
+/* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
+html body .tools-registry .tools-place-set {
+  font-size: 12.5px;
+  white-space: normal;
+}
+/* Instruments list on a phone: name on top; barcode and place on one line; uses and state below. */
+@media (max-width: 700px) {
+  html body .tools-registry tbody td:nth-child(4) {
+    flex: 1 0 60%;
+    min-width: 0;
+  }
+  html body .tools-registry tbody td:nth-child(4) .row-title-link,
+  html body .tools-registry tbody td:nth-child(4) .row-sub {
+    display: inline;
+  }
+  html body .tools-registry tbody td:nth-child(4) .row-sub {
+    margin-left: 6px;
+  }
+}
+/* Instrument card: the moves of the Set it travels in, under its own. */
+html body .asset-history-group {
+  margin: 14px 0 4px;
+  color: var(--c-blue-45);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

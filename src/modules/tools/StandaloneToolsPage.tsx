@@ -238,7 +238,7 @@ export default function StandaloneToolsPage() {
                       <td>
                         {t.maxUses ? (
                           <>
-                            <b>{Math.max(0, t.maxUses - t.uses)}</b>
+                            <b>{t.uses}</b>
                             <span className="muted"> / {t.maxUses}</span>
                           </>
                         ) : (
