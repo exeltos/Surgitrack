@@ -15,9 +15,8 @@ import {
   type DemoStage,
 } from '../../../core/demoAccounts';
 import {trialEndDate, trialEndOn} from '../../../core/trial';
-import {MODULES, moduleOfStep, npsGroup, stepOfTopic} from '../../../core/demoFeedback';
-import {tourOrScreenTitle} from '../../../core/demoTours';
-import {guideStep} from '../../../core/demoGuide';
+import {npsGroup} from '../../../core/demoFeedback';
+import {moduleTitle, stars} from './ratingTitles';
 import NewDemoDialog from './NewDemoDialog';
 import ConvertDemoDialog from './ConvertDemoDialog';
 import {useDemoAccounts} from './useDemoAccounts';
@@ -418,22 +417,6 @@ function DemoCard({
     </article>
   );
 }
-
-/** A rating's subject: a part of the app, or a guide step under its part («Ροή Αποστείρωσης · Παραλαβή»). */
-const moduleTitle = (topic: string) => {
-  // A guided tour or a whole screen (evaluation Demo «Ξενάγηση» and «Αξιολογήστε την οθόνη»).
-  const tourOrScreen = tourOrScreenTitle(topic, key => guideStep(key)?.title);
-  if (tourOrScreen) return tr(tourOrScreen.el);
-  const stepKey = stepOfTopic(topic);
-  if (stepKey) {
-    const step = guideStep(stepKey);
-    const part = moduleOfStep(stepKey);
-    return [part && tr(part.title.el), step ? tr(step.title.el) : stepKey].filter(Boolean).join(' · ');
-  }
-  const m = MODULES.find(x => x.key === topic);
-  return m ? tr(m.title.el) : topic;
-};
-const stars = (n: number) => `${n.toFixed(1).replace('.', ',')} ★`;
 
 /** What the people of the Demo think of it, and what they asked for. */
 function DemoFeedback({

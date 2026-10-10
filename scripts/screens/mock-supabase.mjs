@@ -310,9 +310,78 @@ export function createDatabase(seed) {
         : [],
     deleted_records: [],
     asset_imports: [],
-    demo_accounts: [],
-    demo_requests: [],
-    demo_feedback: [],
+    // SCREENS_EVALUATION=1: the test hospital is an evaluation Demo with ratings and a request, for the
+    // owner's Studio views (Ratings, Hospitals & Demo).
+    demo_accounts:
+      process.env.SCREENS_EVALUATION === '1'
+        ? [
+            {
+              id: 'demo-account-1',
+              organization_id: ORG_ID,
+              hospital_name: 'Γενικό Νοσοκομείο Δοκιμών',
+              contact_name: 'Αριστείδης Φιλοκώστας',
+              contact_email: 'admin@hospital.test',
+              contact_phone: '2410 000000',
+              notes: null,
+              status: 'ACTIVE',
+              max_extra_users: 5,
+              auto_delete: true,
+              converted_at: null,
+              seeded_at: iso(-3),
+              invited_at: iso(-3),
+              evaluator_id: ACCOUNTS.ADMIN.id,
+              created_at: iso(-3),
+            },
+          ]
+        : [],
+    demo_requests:
+      process.env.SCREENS_EVALUATION === '1'
+        ? [
+            {
+              id: 'demo-request-1',
+              organization_id: ORG_ID,
+              user_id: ACCOUNTS.ADMIN.id,
+              kind: 'EXTENSION',
+              contact_name: 'Αριστείδης Φιλοκώστας',
+              phone: '2410 000000',
+              message: 'Θέλουμε μια εβδομάδα ακόμη για να το δοκιμάσει και η νυχτερινή βάρδια.',
+              status: 'NEW',
+              created_at: iso(-0.2),
+            },
+          ]
+        : [],
+    demo_feedback:
+      process.env.SCREENS_EVALUATION === '1'
+        ? [
+            ['tour_receive', 5, 'Πολύ καθαρό, το κατάλαβα αμέσως.'],
+            ['tour_prepare', 3, 'Η λίστα εργαλείων θέλει μεγαλύτερα κουμπιά στο tablet.'],
+            ['tour_cycle', 4, null],
+            ['step_receive', 5, null],
+            ['step_prepare', 4, null],
+            ['screen_sterilization', 4, 'Πολλές καρτέλες στην αρχή, μετά συνηθίζεις.'],
+            ['screen_reports', 2, 'Θα θέλαμε αναφορά ανά χειρουργό.'],
+          ]
+            .map(([topic, rating, comment]) => ({
+              organization_id: ORG_ID,
+              user_id: ACCOUNTS.ADMIN.id,
+              topic,
+              rating,
+              nps: null,
+              answers: {},
+              comment,
+            }))
+            .concat([
+              {
+                organization_id: ORG_ID,
+                user_id: ACCOUNTS.ADMIN.id,
+                topic: 'final',
+                rating: null,
+                nps: 9,
+                answers: {ease: 4, fit: 5, missing: 'Σύνδεση με το πληροφοριακό σύστημα', sets: 420, theatres: 8},
+                comment: 'Μας καλύπτει, θέλουμε προσφορά.',
+              },
+            ])
+        : [],
     demo_guide_progress: [],
     demo_seed_runs: [],
   };
