@@ -5,15 +5,15 @@ import ReportsPage from '../ReportsPage';
 
 const REPORTS = [
   'Σύνθεση Σετ',
-  'Ανά Τμήμα',
-  'Ανά Ειδικότητα',
-  'Service & Βλάβες',
-  'Όρια Χρήσεων',
+  'Ανά τμήμα',
+  'Ανά ειδικότητα',
+  'Service & βλάβες',
+  'Όρια χρήσεων',
   'Εργαλεία εκτός χρήσης',
   'Φορτία κλιβάνου',
   'Λήξεις αποστείρωσης',
   'Παραδόσεις & παραλαβές',
-  'Ιχνηλασιμότητα Ασθενούς',
+  'Ιχνηλασιμότητα ασθενούς',
 ];
 
 const results = () => screen.getByRole('region', {name: 'Αποτελέσματα'});
@@ -60,7 +60,7 @@ describe('Reports', () => {
 
   it('lists only the department filtered on', () => {
     renderPage(<ReportsPage />);
-    choose('Ανά Τμήμα');
+    choose('Ανά τμήμα');
     const all = count();
     const department = column('Τμήμα')[0]!;
     filter('Όλα τα τμήματα', department);
@@ -70,10 +70,10 @@ describe('Reports', () => {
 
   it('traces by patient code: every coded movement, then only that patient, then nothing for an unknown code', () => {
     renderPage(<ReportsPage />);
-    choose('Ιχνηλασιμότητα Ασθενούς');
+    choose('Ιχνηλασιμότητα ασθενούς');
     const everyone = count();
     expect(everyone).toBeGreaterThan(0);
-    const code = screen.getByPlaceholderText('π.χ. PAT-2026-001');
+    const code = screen.getByPlaceholderText('π.χ. PT-2026-0041');
     fireEvent.change(code, {target: {value: 'pt-2026-0041'}});
     expect(count()).toBeGreaterThan(0);
     expect(count()).toBeLessThan(everyone);

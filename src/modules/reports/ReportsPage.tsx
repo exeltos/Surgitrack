@@ -81,10 +81,10 @@ const stateLabel: Record<string, string> = {
 
 const reports: Array<{id: ReportId; title: string; description: string; icon: typeof FileText}> = [
   {id: 'composition', title: 'Σύνθεση Σετ', description: 'Αναλυτική σύνθεση συγκεκριμένου Σετ.', icon: Boxes},
-  {id: 'department', title: 'Ανά Τμήμα', description: 'Σετ και εργαλεία οργανωμένα ανά τμήμα.', icon: UsersRound},
-  {id: 'specialty', title: 'Ανά Ειδικότητα', description: 'Κατανομή εξοπλισμού ανά ειδικότητα.', icon: Stethoscope},
-  {id: 'issues', title: 'Service & Βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
-  {id: 'usage', title: 'Όρια Χρήσεων', description: 'Υπόλοιπο χρήσεων και κρίσιμα όρια.', icon: Activity},
+  {id: 'department', title: 'Ανά τμήμα', description: 'Σετ και εργαλεία οργανωμένα ανά τμήμα.', icon: UsersRound},
+  {id: 'specialty', title: 'Ανά ειδικότητα', description: 'Κατανομή εξοπλισμού ανά ειδικότητα.', icon: Stethoscope},
+  {id: 'issues', title: 'Service & βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
+  {id: 'usage', title: 'Όρια χρήσεων', description: 'Υπόλοιπο χρήσεων και κρίσιμα όρια.', icon: Activity},
   {
     id: 'retired',
     title: 'Εργαλεία εκτός χρήσης',
@@ -111,7 +111,7 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
   },
   {
     id: 'traceability',
-    title: 'Ιχνηλασιμότητα Ασθενούς',
+    title: 'Ιχνηλασιμότητα ασθενούς',
     description: 'Κινήσεις Σετ/εργαλείων βάσει κωδικού ασθενούς.',
     icon: History,
   },
@@ -226,7 +226,7 @@ export default function ReportsPage() {
           name: t.name,
           code: t.code,
           manufacturer: t.manufacturer || '—',
-          uses: t.maxUses ? `${t.uses}/${t.maxUses}` : String(t.uses),
+          uses: t.maxUses ? `${t.uses}/${t.maxUses}` : tr('{0} · χωρίς όριο', t.uses),
         })) as Row[],
       };
     }
@@ -397,6 +397,12 @@ export default function ReportsPage() {
             released: load.releasedAt || '—',
             releasedBy: release?.releasedByName || '—',
             barcodes: load.items.map(item => item.barcode).join(', '),
+            // On screen fewer, fuller columns; the download and print keep every column.
+            cycleProgram: [load.cycleNumber, load.program].filter(Boolean).join(' · '),
+            indicators: `${tr('Χημ.')} ${indicatorText(load.chemicalIndicatorResult)} · ${tr('Βιολ.')} ${indicatorText(load.biologicalIndicatorResult)}`,
+            releasedInfo: load.releasedAt
+              ? [load.releasedAt, release?.releasedByName].filter(Boolean).join(' · ')
+              : '—',
           };
         });
       return {
@@ -517,7 +523,7 @@ export default function ReportsPage() {
     return {
       columns: [
         {key: 'patientCode', label: tr('Κωδικός ασθενούς')},
-        {key: 'asset', label: 'Asset'},
+        {key: 'asset', label: tr('Σετ / Εργαλείο')},
         {key: 'kind', label: tr('Τύπος')},
         {key: 'from', label: tr('Από')},
         {key: 'to', label: tr('Προς')},
@@ -708,6 +714,28 @@ export default function ReportsPage() {
         ]
       : []),
   ];
+  // On screen: the sterilizer loads in fewer, fuller columns, and no column that is empty in every row.
+  const screenColumns = useMemo(() => {
+    const columns =
+      active === 'loads'
+        ? [
+            {key: 'loaded', label: tr('Φόρτωση')},
+            {key: 'equipment', label: tr('Κλίβανος')},
+            {key: 'cycleProgram', label: tr('Κύκλος')},
+            {key: 'items', label: tr('Αντικείμενα')},
+            {key: 'indicators', label: tr('Δείκτες')},
+            {key: 'loadStatus', label: tr('Κατάσταση')},
+            {key: 'releasedInfo', label: tr('Αποδέσμευση')},
+            {key: 'barcodes', label: 'Barcodes'},
+          ]
+        : reportData.columns;
+    return columns.filter(c =>
+      reportData.rows.some((row: Row) => {
+        const value = String(row[c.key] ?? '').trim();
+        return value !== '' && value !== '—';
+      }),
+    );
+  }, [active, reportData]);
   const shownRows = useProgressiveList(
     reportData.rows,
     [
@@ -740,7 +768,7 @@ export default function ReportsPage() {
       <div className="page-head reports-page-head">
         <div>
           <span className="eyebrow">{tr('ΑΝΑΛΥΣΗ ΔΕΔΟΜΕΝΩΝ')}</span>
-          <h1>{tr('Αναφορές & Εκτυπώσεις')}</h1>
+          <h1>{tr('Αναφορές')}</h1>
           <p>{tr('Επιλέξτε αναφορά, ορίστε φίλτρα και δείτε τα αποτελέσματα πριν από εκτύπωση ή PDF.')}</p>
         </div>
       </div>
@@ -807,7 +835,7 @@ export default function ReportsPage() {
                   <input
                     value={patientCode}
                     onChange={e => setPatientCode(e.target.value)}
-                    placeholder={tr('π.χ. PAT-2026-001')}
+                    placeholder={tr('π.χ. PT-2026-0041')}
                   />
                 </div>
               </label>
@@ -842,7 +870,7 @@ export default function ReportsPage() {
                 <table className="reports-table">
                   <thead>
                     <tr>
-                      {reportData.columns.map(c => (
+                      {screenColumns.map(c => (
                         <th key={c.key}>{c.label}</th>
                       ))}
                     </tr>
@@ -850,7 +878,7 @@ export default function ReportsPage() {
                   <tbody>
                     {shownRows.visible.map((row, index) => (
                       <tr key={index}>
-                        {reportData.columns.map(c => (
+                        {screenColumns.map(c => (
                           <td
                             key={c.key}
                             data-label={c.label}
@@ -867,9 +895,7 @@ export default function ReportsPage() {
                         ))}
                       </tr>
                     ))}
-                    {shownRows.hasMore && (
-                      <MoreRows colSpan={reportData.columns.length} onVisible={shownRows.showMore} />
-                    )}
+                    {shownRows.hasMore && <MoreRows colSpan={screenColumns.length} onVisible={shownRows.showMore} />}
                   </tbody>
                 </table>
               ) : (
