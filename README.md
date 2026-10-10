@@ -32,6 +32,9 @@ Other checks:
   (grants, tenants, viewers, supervisor rights, configuration history). See `supabase/MIGRATIONS.md`.
 - `npm run screens` captures every screen for every role, desktop and mobile, against a mocked Supabase
   (see `scripts/screens/README.md`).
+- `npm run e2e` runs the main flow through the real screens: a department sends a Set, Sterilization receives,
+  washes, prepares, packs, loads, ends the cycle, releases and delivers it, each person in their own browser,
+  checking what was saved after every step (`scripts/e2e/flow.mjs`, same mocked Supabase).
 
 ## How it is organised
 

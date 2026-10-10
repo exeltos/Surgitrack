@@ -66,3 +66,14 @@ The harness used to show a supervisor on the first load of a tab as the built-in
 `setRole('STERILIZATION')`, the store's default role, so the store never re-rendered. The store now keeps
 the signed-in user in state (`setSessionUser`), and outside Demo it never falls back to a stand-in
 identity. `*_supervisor_*_home-firstload.png` should show the real user.
+
+## Column alignment
+
+`alignment-probe.js` lists, per screen, the column titles that line up with their column neither on the left
+nor on the right (tables, and grid lists with a `*-head` row):
+
+```sh
+SCREENS_EVAL="$(cat scripts/screens/alignment-probe.js)" node scripts/screens/capture.mjs --viewport desktop --no-extras
+```
+
+Each screen's findings are in `index.json` as `state.probe`.

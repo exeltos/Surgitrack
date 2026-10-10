@@ -369,8 +369,6 @@
 }
 .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(6) {
   grid-column: 5;
-  text-align: left;
-  padding-right: 0;
 }
 .sterilization-workspace .receipt-queue-panel .ster-cell-department {
   display: flex;
@@ -4114,8 +4112,11 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   width: 20px;
 }
-.name-check-table td.num {
+.name-check-table td.num,
+.name-check-table th:last-child {
   text-align: right;
+}
+.name-check-table td.num {
   font-weight: 700;
 }
 .name-check-table tr.skipped td {
@@ -5801,8 +5802,12 @@ html body .sterilization-workspace .receipt-queue-panel .ster-work-row {
   padding: 8px 22px !important;
   min-height: 0 !important;
 }
+/* Column titles over their columns: the rows' side padding (an older 16px !important rule matched the head
+   only) and the room the list keeps for its scrollbar, so the fractions of both grids come out the same. */
 html body .sterilization-workspace .ster-list-head {
-  padding: 7px 22px;
+  padding: 7px 22px !important;
+  overflow: hidden;
+  scrollbar-gutter: stable;
 }
 html body .sterilization-workspace .ster-scan {
   padding: 8px 16px;
@@ -8495,8 +8500,9 @@ html body .sets-expiry.expired {
       minmax(300px, 1.7fr) minmax(145px, 0.8fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr)
       minmax(210px, 1fr);
   }
-  /* The stage column is gone: the action takes the last of the five (not a sixth, zero-width one). */
-  html body .sterilization-workspace .ster-row-action {
+  /* The stage column is gone: the action and its title take the last of the five (not a sixth one). */
+  html body .sterilization-workspace .ster-row-action,
+  html body .sterilization-workspace .ster-list-head > span:nth-child(6) {
     grid-column: 5;
   }
 }

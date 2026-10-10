@@ -4,7 +4,8 @@
  *  - PostgREST (/rest/v1/<table>, /rest/v1/rpc/<fn>): rows from the app's own Demo sample hospital,
  *    with the filters, ordering, ranges, counts and single-row reads the app uses. Writes are applied
  *    to memory, so the app stays consistent while a page is open.
- *  - Edge functions (/functions/v1/*): canned answers (the signup link, otherwise {ok:true}).
+ *  - Edge functions (/functions/v1/*): canned answers (the signup link; a hand-over signature checked against
+ *    the hospital's people and HANDOVER_PASSWORD; otherwise {ok:true}).
  *  - Realtime (wss://…/realtime/v1/websocket): joins are acknowledged with the client's own bindings.
  * Nothing here talks to the network.
  */
@@ -446,7 +447,25 @@ const FUNCTIONS = {
           departments: db.departments.map(d => ({id: d.id, name: d.name, code: d.code})),
         }
       : {ok: true, user_code: 'newuser'},
+  // A hand-over signed by a colleague of the hospital: their user code and HANDOVER_PASSWORD.
+  'verify-handover': (db, body, account) => {
+    const signer = db.profiles.find(
+      p =>
+        p.active && p.organization_id === ORG_ID && p.user_code.toUpperCase() === String(body?.user_code).toUpperCase(),
+    );
+    if (!signer || body?.password !== HANDOVER_PASSWORD) return {status: 401, body: {error: 'invalid'}};
+    if (signer.id === account?.id) return {status: 409, body: {error: 'same_user'}};
+    return {
+      user_id: signer.id,
+      name: signer.name,
+      user_code: signer.user_code.toUpperCase(),
+      role: signer.role,
+      department: signer.department?.name || '',
+    };
+  },
 };
+/** The password every account signs a hand-over with (verify-handover). */
+export const HANDOVER_PASSWORD = 'handover-pass';
 
 /**
  * Handles one request to the Supabase origin. Returns {status, headers, body}.
@@ -491,7 +510,9 @@ export function handleSupabase(db, account, {method, url, headers, body}) {
   if (path.startsWith('/functions/v1/')) {
     const name = path.slice('/functions/v1/'.length);
     const fn = FUNCTIONS[name];
-    return json(200, fn ? fn(db, payload) : {ok: true});
+    const out = fn ? fn(db, payload, account) : {ok: true};
+    // A function answers {status, body} to refuse, else the body itself.
+    return out && typeof out.status === 'number' && 'body' in out ? json(out.status, out.body) : json(200, out);
   }
 
   // ----- Storage (photos): an empty 1x1 PNG
