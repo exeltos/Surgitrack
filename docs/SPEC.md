@@ -195,6 +195,9 @@ UX rules the current product follows (keep them):
 - Usage limit: warning at the configured remaining uses (default 3); retire at zero.
 - Sterile expiry from release date; notice in the last month (10 days for 2-month duration).
 - A failed BI or a recall blocks the load's items from use and lists the patients reached.
+- Released only on acceptable checks: a release that says RELEASED needs acceptable cycle parameters, intact
+  packaging and no failed BI, and a Set or standalone instrument becomes ready (storage or pickup) from a
+  sterilization stage only with an unused release of a passed cycle of it. Both are enforced by the database.
 - Viewers write nothing; department users see only their department; supervisor-only actions are enforced by
   the database.
 - Settings changes are audited (who, when, what) in an append-only table.

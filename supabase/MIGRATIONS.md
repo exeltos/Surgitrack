@@ -5,7 +5,8 @@ folder on an empty Postgres gives the same public schema as the live project. La
 local replay below: policies, triggers and table and function privileges are identical, and function bodies differ
 only in whitespace (`platform_delete_movements`).
 
-The folder has 88 files, all applied to the live project and recorded in its history (checked 10/10/2026).
+The folder has 89 files: the 88 applied to the live project and recorded in its history (checked 10/10/2026), and
+one not yet applied (see [Waiting to be applied](#waiting-to-be-applied)).
 
 ## How the versions line up
 
@@ -96,6 +97,31 @@ Before it, no saved release broke the new check (one release, a REPROCESS), so t
 Checked afterwards: the check is validated, `release_transitions` has row level security and no grants to `anon`
 or `authenticated`, the trigger function is not callable by them, and `supabase/integrity.sql` finds nothing. The
 security advisor notes `release_transitions` as "RLS enabled, no policy", on purpose, like `device_keys`.
+
+## Waiting to be applied
+
+| Version        | Name             | What it does                                                                                                                                   |
+| -------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261010170000 | release_required | A Set or standalone instrument becomes ready from a sterilization stage only with an unused release of a passed cycle of it; otherwise refused |
+
+**Apply it only once no open page saves a Set before its release.** An older version of the app saves the Set
+first, and the database would refuse it; a page left open does not reload by itself. The soft check that is live
+since `release_integrity` shows which order each device used: after the new app is published, run this every day
+and apply the migration when it has returned nothing for a week of normal work (rows are release changes of the
+last 7 days whose release reached the server after the Set):
+
+```sql
+select t.organization_id, t.asset_id, t.changed_at, min(r.created_at) as release_saved
+  from public.release_transitions t
+  join public.sterilization_releases r
+    on r.organization_id = t.organization_id and r.asset_id = t.asset_id and r.decision = 'RELEASED'
+   and r.created_at between t.changed_at - interval '12 hours' and t.changed_at + interval '12 hours'
+ where t.changed_at > now() - interval '7 days'
+ group by 1, 2, 3
+having min(r.created_at) > t.changed_at;
+```
+
+The version the tool records replaces `20261010170000` in the file name.
 
 ## Testing locally
 

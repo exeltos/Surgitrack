@@ -23,12 +23,14 @@ with problems(organization_id, check_name, n) as (
                        where i.organization_id = s.organization_id and i.set_id = s.id and i.state <> 'RETIRED')
    group by 1
   union all
-  -- Ready straight from a sterilization stage (logged by the database) with no release of a passed cycle
-  -- within 12 hours either side. Each change is looked at by two nightly runs, once it is 12 hours old, so a
-  -- device that syncs late is not blamed.
+  -- Ready straight from a sterilization stage with no release of a passed cycle within 12 hours either side.
+  -- Since 20261010170000_release_required the database refuses such a change and records the release it
+  -- used, so only changes logged before it can show here. Each change is looked at by two nightly runs, once
+  -- it is 12 hours old, so a device that syncs late is not blamed.
   select t.organization_id, 'ready without a passed release', count(*)
     from public.release_transitions t
    where t.changed_at between now() - interval '60 hours' and now() - interval '12 hours'
+     and t.release_id is null
      and not exists (
        select 1 from public.sterilization_releases r
          join public.sterilization_cycles c

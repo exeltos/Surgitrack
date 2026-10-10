@@ -35,5 +35,8 @@ here and to that test's list. State checked against the live project on 09/10/20
 `accept_surgitrack_invitation`, `asset_manufacturers_to_library`, `assign_user_code`, `demo_cron_secret_ok`,
 `demo_user_limit`, `generate_user_code`, `handle_new_user`, `handover_counterparty_stamp`, `hospital_settings_keep_manufacturers`,
 `hospital_settings_to_audit`, `merge_used_manufacturers`, `purge_recycle_bin`, `record_deletion`,
-`rename_department_references`, `reserve_login_attempt`, `staff_request_email_confirmed`,
+`rename_department_references`, `require_release`, `reserve_login_attempt`, `staff_request_email_confirmed`,
 `supervisor_guard_insert`, `supervisor_guard_instrument`, `supervisor_guard_set`.
+
+`require_release` (trigger on `instrument_sets` and `instruments`) runs with its owner's rights to read the
+releases and cycles and to write `release_transitions`, which users can neither read nor write.
