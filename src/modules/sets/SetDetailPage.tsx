@@ -590,7 +590,12 @@ export default function SetDetailPage() {
                   </div>
                   <History size={19} />
                 </div>
-                <div className="asset-history asset-detail-scroll">
+                <div
+                  className="asset-history asset-detail-scroll"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={tr('Ιστορικό κινήσεων')}
+                >
                   {history.length ? (
                     history.map(item => (
                       <div className="asset-history-row" key={item.id}>

@@ -289,7 +289,12 @@ export default function ToolDetailPage() {
                   </div>
                   <History size={19} />
                 </div>
-                <div className="asset-history asset-detail-scroll">
+                <div
+                  className="asset-history asset-detail-scroll"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={tr('Ιστορικό κινήσεων')}
+                >
                   {history.length ? (
                     history.map(historyRow)
                   ) : setHistory.length ? null : (
