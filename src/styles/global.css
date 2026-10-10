@@ -3006,7 +3006,7 @@ div.asset-import-hospital b {
 }
 .hospital-count.attention {
   background: var(--c-amber-95);
-  color: var(--c-orange-50);
+  color: var(--c-orange-35);
 }
 .people-toolbar {
   display: flex;
