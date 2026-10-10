@@ -100,22 +100,23 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
 
   return (
     <div className="asset-detail-workspace asset-create-card-workspace legacy-inspired-workspace">
+      {/* As on a Set's card: back to the list on the left, the actions on the right. */}
       <div className="asset-workbench-actions asset-create-card-actions">
-        <div className="asset-action-group">
-          <AppButton variant="primary" icon={<Save size={17} />} disabled={!valid} onClick={save}>
-            {tr('Αποθήκευση')}
-          </AppButton>
-          <AppButton icon={<X size={17} />} onClick={() => leave(() => navigate(backTo))}>
-            {tr('Ακύρωση')}
-          </AppButton>
-          {!valid && (
-            <small className="asset-create-hint">{tr('Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.')}</small>
-          )}
-        </div>
         <div className="asset-action-group">
           <button className="asset-action-link" onClick={() => leave(() => navigate(backTo))}>
             <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
           </button>
+        </div>
+        <div className="asset-action-group">
+          {!valid && (
+            <small className="asset-create-hint">{tr('Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.')}</small>
+          )}
+          <AppButton icon={<X size={17} />} onClick={() => leave(() => navigate(backTo))}>
+            {tr('Ακύρωση')}
+          </AppButton>
+          <AppButton variant="primary" icon={<Save size={17} />} disabled={!valid} onClick={save}>
+            {tr('Αποθήκευση')}
+          </AppButton>
         </div>
       </div>
 
@@ -127,7 +128,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <div>
                 <span className="eyebrow">{kind === 'SET' ? tr('ΝΕΑ ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΝΕΑ ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
                 <h1>{name || tr('Χωρίς ονομασία')}</h1>
-                <p>{code || tr('Συμπλήρωσε κωδικό')}</p>
+                <p>{code || tr('Συμπληρώστε κωδικό')}</p>
               </div>
             </div>
             <div className="asset-workbench-title-status">
@@ -380,7 +381,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                   <div>
                     <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ')}</span>
                     <h2>{tr('Εργαλεία νέου Σετ')}</h2>
-                    <p>{tr('Επίλεξε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.')}</p>
+                    <p>{tr('Επιλέξτε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.')}</p>
                   </div>
                   <span className="selection-count">
                     {selected.length} {tr('επιλεγμένα')}
@@ -389,7 +390,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 <div className="create-card-composition-body">
                   <div className="source-tabs create-set-source-tabs">
                     <button className={source === 'STOCK' ? 'active' : ''} onClick={() => setSource('STOCK')}>
-                      Stock <span>{tools.filter(t => t.mode === 'STOCK').length}</span>
+                      {tr('Απόθεμα')} <span>{tools.filter(t => t.mode === 'STOCK').length}</span>
                     </button>
                     <button className={source === 'SET_MEMBER' ? 'active' : ''} onClick={() => setSource('SET_MEMBER')}>
                       {tr('Από άλλο Σετ')}

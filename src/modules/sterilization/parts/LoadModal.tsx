@@ -136,7 +136,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               {loadModal === 'STERILIZATION' && (
                 <BarcodeCapture
                   title={tr('Προσθήκη στο φορτίο')}
-                  subtitle={tr('Σκάναρε, πληκτρολόγησε ή χρησιμοποίησε scanner υπολογιστή.')}
+                  subtitle={tr('Σκανάρετε, πληκτρολογήστε ή χρησιμοποιήστε scanner υπολογιστή.')}
                   placeholder={tr('Barcode · π.χ. S000324')}
                   feedback={loadScanFeedback}
                   onBarcode={addBarcodeToLoad}

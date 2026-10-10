@@ -474,15 +474,15 @@ export const en: Record<string, string> = {
   'Ενεργές ανακλήσεις ·': 'Active recalls ·',
   'Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες': 'Active process · detail changes locked',
   'Ενεργή πρόσβαση': 'Active access',
-  'Επίλεξε αναφορά, όρισε φίλτρα και δες τα αποτελέσματα πριν από εκτύπωση ή PDF.':
+  'Επιλέξτε αναφορά, ορίστε φίλτρα και δείτε τα αποτελέσματα πριν από εκτύπωση ή PDF.':
     'Pick a report, set filters and review the results before printing or PDF.',
-  'Επίλεξε πηγή και φυσικό εργαλείο.': 'Choose a source and a physical instrument.',
+  'Επιλέξτε πηγή και φυσικό εργαλείο.': 'Choose a source and a physical instrument.',
   'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.':
     'Select the sets/instruments going into the same cycle. The cycle record will be linked to all selected barcodes.',
-  'Επίλεξε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.':
+  'Επιλέξτε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.':
     'Select the physical instruments that will belong to the set from the first save.',
-  'Επίλεξε τι θα γίνει με τα': 'Choose what happens to the',
-  'Επίλεξε το πρώτο αντικείμενο για να οριστεί το τμήμα.': 'Select the first item to set the department.',
+  'Επιλέξτε τι θα γίνει με τα': 'Choose what happens to the',
+  'Επιλέξτε το πρώτο αντικείμενο για να οριστεί το τμήμα.': 'Select the first item to set the department.',
   'Επίλεξε το φυσικό εργαλείο που θα καλύψει την έλλειψη. Με την επιβεβαίωση θα προστεθεί στο Set.':
     'Select the physical instrument that will cover the shortage. On confirmation it will be added to the set.',
   'Επανέκδοση ετικέτας': 'Label reissue',
@@ -623,8 +623,7 @@ export const en: Record<string, string> = {
   'ΚΑΡΤΕΛΑ ΣΕΤ': 'SET CARD',
   'ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ': 'CENTRAL STERILE SERVICES',
   'ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ': 'PATIENT CODE',
-  'Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο. Η λίστα αξιοποιεί όλο τον διαθέσιμο χώρο.':
-    'Each barcode is a separate physical instrument. The list uses all the available space.',
+  'Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο.': 'Each barcode is a separate physical instrument.',
   'Κάθε φυσικό τεμάχιο παίρνει δικό του barcode.': 'Each physical piece gets its own barcode.',
   'Κάλυψη έλλειψης': 'Cover shortage',
   'Κάλυψη έλλειψης · {0}': 'Cover shortage · {0}',
@@ -761,8 +760,8 @@ export const en: Record<string, string> = {
   'Μη αποδεκτό αποτέλεσμα δείκτη / απόκλιση μετά την αποδέσμευση':
     'Unacceptable indicator result / deviation after release',
   'Μη πλήρης σύνθεση': 'Incomplete composition',
-  'Μητρώο Σετ με ξεχωριστά πεδία Ονομασίας, Κωδικού και μοναδικού Barcode.':
-    'Set registry with separate Name, Code and unique Barcode fields.',
+  'Όλα τα Σετ του νοσοκομείου: πού βρίσκονται, τι τους λείπει, πότε λήγουν.':
+    'Every Set of the hospital: where it is, what it is missing, when it expires.',
   Μικτή: 'Mixed',
   'Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.': 'You can select many items of the same department.',
   'Μπορείς να κάνεις λήψη με την κάμερα ή upload πολλών φωτογραφιών πριν από την πρώτη αποθήκευση.':
@@ -934,7 +933,7 @@ export const en: Record<string, string> = {
     'Nothing matches the search or the filters. Try changing or clearing them.',
   'Καθαρισμός φίλτρων': 'Clear filters',
   'Δεν υπάρχουν εργαλεία ακόμα': 'No instruments yet',
-  'Πρόσθεσε το πρώτο εργαλείο ή φόρτωσε όλο το μητρώο σου από ένα αρχείο Excel.':
+  'Προσθέστε το πρώτο εργαλείο ή φορτώστε όλο το μητρώο σας από ένα αρχείο Excel.':
     'Add the first instrument or load your whole register from an Excel file.',
   'Δεν υπάρχουν Σετ ακόμα': 'No Sets yet',
   'Δημιούργησε το πρώτο Σετ εργαλείων ή φόρτωσε τα Σετ σου από ένα αρχείο Excel.':
@@ -961,7 +960,7 @@ export const en: Record<string, string> = {
   'Ορισμός ελάχιστου για είδος': 'Set a minimum for a kind',
   'Κωδικός ή ονομασία εργαλείου': 'Instrument code or name',
   'Δεν υπάρχουν ελάχιστα αποθέματα ακόμα': 'No minimum stock levels yet',
-  'Διάλεξε ένα είδος παραπάνω και όρισε πόσα θέλεις να υπάρχουν πάντα στο Απόθεμα.':
+  'Διαλέξτε ένα είδος παραπάνω και ορίστε πόσα θέλετε να υπάρχουν πάντα στο Απόθεμα.':
     'Pick a kind above and set how many you always want in Stock.',
   'Ο διαχειριστής ορίζει πόσα εργαλεία κάθε είδους πρέπει να υπάρχουν πάντα στο Απόθεμα.':
     'The administrator sets how many instruments of each kind must always be in Stock.',
@@ -977,7 +976,7 @@ export const en: Record<string, string> = {
   'Νέα προμήθεια': 'New purchase',
   'Παραλήφθηκε μερικώς': 'Partly received',
   'Παραλαβή παραγγελίας': 'Receipt of the order',
-  'Γράψε πόσα τεμάχια ήρθαν από κάθε είδος. Όσα λείπουν μένουν σε αναμονή.':
+  'Γράψτε πόσα τεμάχια ήρθαν από κάθε είδος. Όσα λείπουν μένουν σε αναμονή.':
     'Enter how many pieces of each kind arrived. The rest stay pending.',
   Παραγγέλθηκαν: 'Ordered',
   'Έχουν ήρθει': 'Arrived so far',
@@ -1095,8 +1094,8 @@ export const en: Record<string, string> = {
   'Σετ του τμήματος': 'Department sets',
   Σημείωση: 'Note',
   Σημειώσεις: 'Notes',
-  'Σκάναρε πρώτα αντικείμενο': 'Scan an item first',
-  'Σκάναρε, πληκτρολόγησε ή χρησιμοποίησε scanner υπολογιστή.': 'Scan, type, or use a computer scanner.',
+  'Σκανάρετε πρώτα αντικείμενο': 'Scan an item first',
+  'Σκανάρετε, πληκτρολογήστε ή χρησιμοποιήστε scanner υπολογιστή.': 'Scan, type, or use a computer scanner.',
   'Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή κωδικό ασθενούς.':
     'Scan or type a barcode (S..., T...) or patient code.',
   Στάδιο: 'Stage',
@@ -1107,7 +1106,7 @@ export const en: Record<string, string> = {
   'Στοιχεία Εργαλείου': 'Instrument details',
   'Στοιχεία Σετ': 'Set details',
   'Στοιχεία παραλαβής': 'Receipt details',
-  'Συμπλήρωσε κωδικό': 'Enter a code',
+  'Συμπληρώστε κωδικό': 'Enter a code',
   'Συνδεδεμένος χρήστης': 'Signed-in user',
   Συσκευασία: 'Packaging',
   'Συσκευασία & Σήμανση': 'Packaging & Labelling',
@@ -1711,7 +1710,6 @@ export const en: Record<string, string> = {
   'BI ανεπιτυχής': 'BI failed',
   'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;':
     'Failed biological indicator: the whole load {0} will be recalled. Continue?',
-  'Αποστείρωση / λήξη': 'Sterilized / expires',
   'Ημερομηνία αποστείρωσης': 'Sterilization date',
   'Ημερομηνία λήξης': 'Use-by date',
   'Χωρίς σύνδεση στο δίκτυο.': 'No network connection.',
@@ -1776,6 +1774,7 @@ export const en: Record<string, string> = {
   'Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.':
     'Permanently delete {0} history entries? The clean-up will be recorded as a new entry.',
   '{0} χρήσεις': '{0} uses',
+  '{0}/{1} χρήσεις': '{0}/{1} uses',
   'Κάτω από το ελάχιστο': 'Below minimum',
   'Πρόσφατες αναζητήσεις': 'Recent searches',
   'Excel (.xlsx)': 'Excel (.xlsx)',

@@ -395,9 +395,7 @@ export default function SetDetailPage() {
                   <div>
                     <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ ΣΕΤ')}</span>
                     <h2>{tr('Φυσικά εργαλεία')}</h2>
-                    <p>
-                      {tr('Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο. Η λίστα αξιοποιεί όλο τον διαθέσιμο χώρο.')}
-                    </p>
+                    <p>{tr('Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο.')}</p>
                   </div>
                   <div className="set-composition-actions">
                     {can('asset.composition.manage') && (
@@ -525,7 +523,9 @@ export default function SetDetailPage() {
                                       <div className="set-tool-uses">
                                         <span>{tr('Χρήσεις')}</span>
                                         <strong>
-                                          {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool.uses)}
+                                          {tool.maxUses
+                                            ? tr('{0}/{1} χρήσεις', tool.uses, tool.maxUses)
+                                            : tr('{0} χρήσεις', tool.uses)}
                                         </strong>
                                       </div>
                                       <div className="set-tool-state">
@@ -564,7 +564,9 @@ export default function SetDetailPage() {
                             <div className="set-tool-uses">
                               <span>{tr('Χρήσεις')}</span>
                               <strong>
-                                {tool.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool.uses)}
+                                {tool.maxUses
+                                  ? tr('{0}/{1} χρήσεις', tool.uses, tool.maxUses)
+                                  : tr('{0} χρήσεις', tool.uses)}
                               </strong>
                             </div>
                             <div className="set-tool-state">

@@ -741,7 +741,7 @@ export default function ReportsPage() {
         <div>
           <span className="eyebrow">{tr('ΑΝΑΛΥΣΗ ΔΕΔΟΜΕΝΩΝ')}</span>
           <h1>{tr('Αναφορές & Εκτυπώσεις')}</h1>
-          <p>{tr('Επίλεξε αναφορά, όρισε φίλτρα και δες τα αποτελέσματα πριν από εκτύπωση ή PDF.')}</p>
+          <p>{tr('Επιλέξτε αναφορά, ορίστε φίλτρα και δείτε τα αποτελέσματα πριν από εκτύπωση ή PDF.')}</p>
         </div>
       </div>
       <HistoryWindowNote auto />

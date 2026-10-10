@@ -8699,15 +8699,22 @@ html body .issues-fixed .issue-note-inline {
     grid-template-columns: 30px 84px minmax(0, 1fr) auto auto !important;
   }
 }
-/* Narrow list: barcode and state on the first line, the name on its own line (it was squeezed
-   into ~90 px and cut), then the uses. */
+/* Narrow list (a tablet): two lines per instrument: barcode and code on the left, the name and its maker
+   in the middle, the uses and the state on the right. */
 @container set-tools (max-width: 560px) {
   html body .asset-detail-body .set-tool-row {
-    grid-template-columns: 30px minmax(0, 1fr) auto !important;
+    grid-template-columns: 30px 78px minmax(0, 1fr) auto !important;
     grid-template-areas:
-      'index code state'
-      'index name name'
-      'index uses uses';
+      'index code name uses'
+      'index code name state';
+    align-items: center;
+  }
+  html body .asset-detail-body .set-tool-row .set-tool-uses {
+    justify-self: end;
+  }
+  html body .asset-detail-body .set-tool-row .set-tool-state {
+    justify-self: end;
+    max-width: 120px;
   }
   html body .asset-detail-body .set-tool-row .set-tool-name strong {
     white-space: normal;
@@ -8802,11 +8809,6 @@ html body .issues-fixed .issue-note-inline {
   html body .studio-list-head.with-count > span:nth-child(2),
   html body .studio-list-row.with-count > span:nth-child(2) {
     display: none !important;
-  }
-  /* Set card: the sterile dates take the full row under their label, side by side. */
-  html body .asset-workbench-fields > div:has(> .sterile-dd) {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 2px;
   }
 }
 /* Composition window on a portrait tablet: the checks and the tool list stack and scroll together
@@ -10772,5 +10774,63 @@ html body .studio-ratings .studio-errors-actions select {
   html body .studio-rating-bar,
   html body .studio-rating-row small {
     display: none;
+  }
+}
+
+/* Sets list: the state on one line on a computer; on a tablet the barcode goes under the name, so the
+   name is never cut in the middle of a word. */
+html body .sets-registry .sets-row-barcode {
+  display: none;
+}
+@media (min-width: 1280px) {
+  html body .sets-registry th:nth-child(6) {
+    width: 236px;
+  }
+  html body .sets-registry td:nth-child(6) .badge {
+    white-space: nowrap;
+  }
+}
+@media (max-width: 1279px) {
+  html body .sets-registry th:nth-child(2),
+  html body .sets-registry td:nth-child(2) {
+    display: none;
+  }
+  html body .sets-registry .sets-row-barcode {
+    display: block;
+    color: var(--c-cyan-45);
+    font-weight: 700;
+  }
+  html body .sets-registry td:first-child .row-title-link {
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: manual;
+  }
+}
+
+/* Set and instrument cards on a tablet: the action bar wraps instead of pushing «Προς Αποστείρωση» off the
+   screen, and the fields wrap their values instead of cutting them («ΟΡΘΟΠΕΔΙΚΟ ΒΑ…»). */
+@media (max-width: 1279px) {
+  html body .asset-workbench-actions {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  html body .asset-workbench-fields dd {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+}
+/* New Set / instrument form on a tablet: the label above its field, so the field gets the full width
+   and its placeholder is not cut; the hint below it, in full. */
+@media (max-width: 1279px) {
+  html body .asset-create-field-list label {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  html body .asset-create-field-list label > small {
+    grid-column: 1;
+    display: block;
+    margin-top: 0;
   }
 }

@@ -82,7 +82,7 @@ export default function SetsPage() {
       <PageHeader
         eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
         title={tr('Σετ εργαλείων')}
-        description={tr('Μητρώο Σετ με ξεχωριστά πεδία Ονομασίας, Κωδικού και μοναδικού Barcode.')}
+        description={tr('Όλα τα Σετ του νοσοκομείου: πού βρίσκονται, τι τους λείπει, πότε λήγουν.')}
         actions={
           can('asset.create') ? (
             <div className="page-head-actions">
@@ -231,6 +231,8 @@ export default function SetsPage() {
                           </Link>
                           <ColorMarker tapes={s.colorTapes} size="sm" />
                           <small className="row-sub">{[s.manufacturer, s.code].filter(Boolean).join(' · ')}</small>
+                          {/* On a tablet the barcode sits here, so the name keeps the room of its column. */}
+                          <small className="row-sub mono sets-row-barcode">{s.barcode}</small>
                         </span>
                       </div>
                     </td>

@@ -1,5 +1,4 @@
 import {useLibraries} from '../../core/LibraryStore';
-import SterileDates from '../ui/SterileDates';
 import {useEffect, useState} from 'react';
 import {useUnsavedChanges} from '../../app/UnsavedChanges';
 import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
@@ -7,7 +6,7 @@ import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
 import ExpiryBadge from '../ui/ExpiryBadge';
-import {STERILE_STATES, expiryStatus} from '../../core/sterileExpiry';
+import {STERILE_STATES, expiryStatus, formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import AssetTypeIcon from './AssetTypeIcon';
 import {tr, trData} from '../../i18n';
 
@@ -222,14 +221,22 @@ export default function AssetWorkbenchSidebar({
         </div>
         {/* Always shown: the dates once released, a dash while the item is not sterile. */}
         <div>
-          <dt>{tr('Αποστείρωση / λήξη')}</dt>
+          <dt>{tr('Αποστείρωση')}</dt>
+          <dd className="sterile-dd">
+            {sterile && asset.sterileUntil && sterilizedOnOf(asset) ? (
+              formatExpiry(sterilizedOnOf(asset)!)
+            ) : (
+              <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
+                —
+              </span>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>{tr('Λήξη')}</dt>
           <dd className="sterile-dd">
             {sterile && asset.sterileUntil ? (
-              <SterileDates
-                sterilizedOn={asset.sterilizedOn}
-                sterileUntil={asset.sterileUntil}
-                shelfLifeMonths={asset.shelfLifeMonths}
-              />
+              formatExpiry(asset.sterileUntil)
             ) : (
               <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
                 —

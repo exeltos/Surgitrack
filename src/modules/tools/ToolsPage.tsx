@@ -159,7 +159,7 @@ export default function ToolsPage() {
             total={tools.length}
             none={{
               title: tr('Δεν υπάρχουν εργαλεία ακόμα'),
-              description: tr('Πρόσθεσε το πρώτο εργαλείο ή φόρτωσε όλο το μητρώο σου από ένα αρχείο Excel.'),
+              description: tr('Προσθέστε το πρώτο εργαλείο ή φορτώστε όλο το μητρώο σας από ένα αρχείο Excel.'),
               actions: can('asset.create') ? (
                 <>
                   <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
