@@ -730,7 +730,7 @@
   transform: translateY(1px);
 }
 .app-button:focus-visible {
-  outline: 3px solid rgba(29, 101, 122, 0.18);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 .app-button-primary {
