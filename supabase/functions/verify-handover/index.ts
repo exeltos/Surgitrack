@@ -4,7 +4,8 @@ import {corsFor, jsonWith} from "../_shared/http.ts";
 
 // Signs a handover between Sterilization and a department. The signed-in Sterilization user is
 // one party; the other party confirms with their own user code + password on the same screen.
-// Returns who signed, never a session: the password check's session is revoked at once.
+// Returns who signed, never a session: the password check's session is revoked at once. Each
+// confirmed signature is recorded in handover_signatures, against which the records are stamped.
 // Failed attempts share the login limiter (per code, and per signed-in caller).
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -100,6 +101,12 @@ Deno.serve(async req => {
     if (person.id === auth.user.id) return json({error: "same_user"}, 409);
     // Read-only viewers take no part in a handover.
     if (person.role === "VIEWER") return json({error: "invalid_credentials"}, 401);
+    // The database stamps the receipt or delivery as verified only against this record (see
+    // handover_counterparty_stamp). Not recording it leaves the handover unverified, not refused.
+    const {error: signatureError} = await admin
+      .from("handover_signatures")
+      .insert({organization_id: organizationId, signer_id: person.id, witness_id: auth.user.id});
+    if (signatureError) console.error("handover_signatures", signatureError.message);
 
     const department = person.department as {name?: string} | {name?: string}[] | null;
     return json({

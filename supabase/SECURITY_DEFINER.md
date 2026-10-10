@@ -33,7 +33,7 @@ here and to that test's list. State checked against the live project on 09/10/20
 ## Not callable by users (triggers, cron, service role)
 
 `accept_surgitrack_invitation`, `asset_manufacturers_to_library`, `assign_user_code`, `demo_cron_secret_ok`,
-`demo_user_limit`, `generate_user_code`, `handle_new_user`, `hospital_settings_keep_manufacturers`,
+`demo_user_limit`, `generate_user_code`, `handle_new_user`, `handover_counterparty_stamp`, `hospital_settings_keep_manufacturers`,
 `hospital_settings_to_audit`, `merge_used_manufacturers`, `purge_recycle_bin`, `record_deletion`,
 `rename_department_references`, `reserve_login_attempt`, `staff_request_email_confirmed`,
 `supervisor_guard_insert`, `supervisor_guard_instrument`, `supervisor_guard_set`.
