@@ -176,6 +176,28 @@ describe('verify-handover: a confirmed handover', () => {
     expect((await sign()).status).toBe(200);
   });
 
+  it('records the signature: who signed, for whom, in which hospital', async () => {
+    await sign();
+    const record = fake.dbCalls('insert').find(c => c.table === 'handover_signatures');
+    expect(record?.values).toEqual({organization_id: 'org-1', signer_id: 'person-2', witness_id: 'sterilization-1'});
+  });
+
+  it('still answers when the signature could not be recorded (the handover is then unverified)', async () => {
+    const answer = fake.db;
+    fake.db = call => (call.table === 'handover_signatures' ? {data: null, error: {message: 'down'}} : answer(call));
+    expect((await sign()).status).toBe(200);
+  });
+
+  it.each([
+    ['a wrong password', () => (fake.signIn = () => ({data: {session: null}, error: {message: 'invalid'}}))],
+    ['the same person', () => world({person: {...PERSON, id: 'sterilization-1'}})],
+    ['a viewer', () => world({person: {...PERSON, role: 'VIEWER'}})],
+  ])('records no signature for %s', async (_label, arrange) => {
+    arrange();
+    await sign();
+    expect(fake.dbCalls('insert').some(c => c.table === 'handover_signatures')).toBe(false);
+  });
+
   it('marks the attempt as succeeded', async () => {
     await sign();
     const update = fake.dbCalls('update').find(c => c.table === 'login_attempts');
