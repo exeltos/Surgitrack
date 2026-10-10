@@ -7866,16 +7866,8 @@ html body .ledger-row .movement-chip {
   html body .ledger-date {
     gap: 0;
   }
-  html body .ledger-route {
-    flex-wrap: wrap;
-    white-space: normal;
-    row-gap: 0;
-  }
-  html body .ledger-route i {
-    white-space: nowrap;
-    max-width: 100%;
-  }
 }
+/* The route is written in full (it was cut to «Καθαρισμός & Απολύμα…»), on two lines when needed. */
 @media (max-width: 1600px) {
   html body .ledger-route {
     flex-wrap: wrap;
@@ -7883,7 +7875,9 @@ html body .ledger-row .movement-chip {
     row-gap: 0;
   }
   html body .ledger-route i {
-    white-space: nowrap;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
     max-width: 100%;
   }
 }
@@ -11132,4 +11126,63 @@ html body .trace-pick > small {
   margin-top: 8px;
   color: var(--c-blue-50);
   font-size: 12px;
+}
+
+/* Movements on a tablet: two lines per entry, so who did it stays in view (the user column was hidden). */
+@media (max-width: 1180px) and (min-width: 901px) {
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1.1fr) 20px;
+  }
+  html body .ledger-row {
+    grid-template-areas: 'date asset route open' 'date user action open';
+    row-gap: 4px;
+  }
+  html body .ledger-row > .ledger-date {
+    grid-area: date;
+  }
+  html body .ledger-row > .ledger-asset {
+    grid-area: asset;
+  }
+  html body .ledger-row > .ledger-route {
+    grid-area: route;
+  }
+  html body .ledger-row > span:nth-child(4) {
+    grid-area: action;
+    display: block;
+  }
+  html body .ledger-row > .ledger-user {
+    grid-area: user;
+  }
+  html body .ledger-row > svg:last-child {
+    grid-area: open;
+  }
+  html body .ledger-columns span:nth-child(4),
+  html body .ledger-columns span:nth-child(5) {
+    display: none;
+  }
+}
+/* Movements on a phone: each entry a card (when and what happened, the item, the route, who). */
+@media (max-width: 700px) {
+  html body .ledger-columns {
+    display: none;
+  }
+  html body .ledger-row {
+    grid-template-columns: minmax(0, 1fr) 20px;
+    grid-template-areas: 'date open' 'action open' 'asset open' 'route open' 'user open';
+    row-gap: 4px;
+  }
+  html body .ledger-row .movement-chip {
+    white-space: normal;
+  }
+}
+/* Movement details: straight to the item's card or its trail. */
+html body .movement-detail-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 24px 0;
+}
+html body .movement-detail-links .app-button {
+  text-decoration: none;
 }

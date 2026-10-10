@@ -1,5 +1,5 @@
 import {Fragment, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {Search, Route, History, ExternalLink, Flame, UserRound} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
@@ -48,7 +48,9 @@ const time = (value: string | undefined) => parseDisplayDate(value)?.getTime() ?
 const barcodeOf = (m: Movement) => m.asset.split(' · ')[0].trim();
 export default function TraceabilityPage() {
   const {sets, tools, movements, counts, sterilizationCycles, processLoads} = useSurgi();
-  const [q, setQ] = useState('');
+  // Opened from a movement: the item to look up comes in the address (?q=S000321).
+  const [params] = useSearchParams();
+  const [q, setQ] = useState(() => params.get('q') || '');
   const [recent, setRecent] = useState<string[]>(readRecent);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {

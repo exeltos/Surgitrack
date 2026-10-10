@@ -701,16 +701,6 @@
   color: var(--st-muted);
   font-size: 11px;
 }
-@media (max-width: 1180px) {
-  .ledger-columns,
-  .ledger-row {
-    grid-template-columns: 130px minmax(170px, 1fr) minmax(220px, 1.25fr) minmax(150px, 0.8fr) 24px;
-  }
-  .ledger-columns span:nth-child(5),
-  .ledger-row > .ledger-user {
-    display: none;
-  }
-}
 @media (max-width: 900px) {
   .ledger-columns,
   .ledger-row {

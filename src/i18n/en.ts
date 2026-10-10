@@ -86,7 +86,6 @@ export const en: Record<string, string> = {
   '1 φωτογραφία προστέθηκε.': '1 photo added.',
   '1. Επιλογή Σετ': '1. Select set',
   '2. Επιλογή εργαλείου': '2. Select instrument',
-  'Audit trail · οι εγγραφές δεν τροποποιούνται': 'Audit trail · records cannot be changed',
   'Barcode / Κωδικός': 'Barcode / Code',
   'Σαρώστε barcode': 'Scan a barcode',
   'Ιχνηλάτηση · {0}': 'Trace · {0}',
@@ -542,8 +541,6 @@ export const en: Record<string, string> = {
     'Deletion is locked while the instrument is in an active sterilization process.',
   'Η διαφορά ποσότητας θα καταγραφεί αυτόματα ως έλλειψη.':
     'The quantity difference will be recorded automatically as missing.',
-  'Η εγγραφή αποτελεί μέρος του audit trail και είναι μόνο για ανάγνωση.':
-    'This record is part of the audit trail and is read-only.',
   'Η εγγραφή παραμένει σε αναμονή αποδέσμευσης.': 'The record stays awaiting release.',
   'Η εκκρεμότητα επιλύθηκε.': 'The issue was resolved.',
   'Η εμφανής απόκλιση έχει καταγραφεί. Μπορείς να ολοκληρώσεις την παραλαβή.':
@@ -688,7 +685,6 @@ export const en: Record<string, string> = {
   'Αποθήκευση…': 'Saving…',
   Συγχρονισμός: 'Sync',
   Ζωντανά: 'Live',
-  'Λογαριασμός (από τη βάση)': 'Account (from the database)',
   'Λογαριασμός: {0}': 'Account: {0}',
   'Λογαριασμός υποστήριξης SurgiTrack': 'SurgiTrack support account',
   Καταχώριση: 'Register',
@@ -770,6 +766,10 @@ export const en: Record<string, string> = {
   'Μόνο για 1 τεμάχιο': 'Only for 1 piece',
   'Συμπληρώστε Κωδικό, Ονομασία και Τμήμα για να αποθηκευτεί.': 'Fill in Code, Name and Department to save.',
   'Τμήμα *': 'Department *',
+  'Οι εγγραφές δεν αλλάζουν': 'Records cannot be changed',
+  'Η εγγραφή είναι μόνο για ανάγνωση: οι κινήσεις δεν αλλάζουν ούτε σβήνονται.':
+    'This record is read-only: movements are never changed or deleted.',
+  'Λογαριασμός που την καταχώρησε': 'Account that recorded it',
   '{0} · χωρίς όριο': '{0} · no limit',
   'Χημ.': 'Chem.',
   'Βιολ.': 'Biol.',
