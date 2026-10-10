@@ -31,6 +31,16 @@ describe('loading every page', () => {
     }
   });
 
+  it('reports how far it has come after each page, up to the total', async () => {
+    const t = table(13_923);
+    const seen: Array<[number, number]> = [];
+    await loadAllPages(t.fetchPage, (loaded, total) => seen.push([loaded, total]));
+    expect(seen).toHaveLength(14);
+    expect(seen[0]).toEqual([PAGE_SIZE, 13_923]);
+    expect(seen.at(-1)).toEqual([13_923, 13_923]);
+    expect(seen.every(([loaded], i) => i === 0 || loaded > seen[i - 1][0])).toBe(true);
+  });
+
   it('asks for the pages after the first together, a few at a time', async () => {
     const t = table(13_923, {delayMs: 2});
     await loadAllPages(t.fetchPage);

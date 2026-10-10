@@ -66,6 +66,7 @@ export async function loadTable(
   organizationId: string,
   collection: TableCollection,
   range: {since?: string; before?: string} = {},
+  onProgress?: (loaded: number, total: number) => void,
 ) {
   const {mutable} = CLOUD_TABLES[collection];
   const load = (strip: boolean) =>
@@ -82,7 +83,7 @@ export async function loadTable(
         ...result,
         data: result.data as unknown as Array<Record<string, unknown>> | null,
       }));
-    });
+    }, onProgress);
   const rows = await loadStripped(load);
   if (mutable) rememberVersions(collection, rows);
   return rows.map(row => tableFromRow(collection, row));
@@ -92,11 +93,31 @@ export async function loadTable(
  * Loads an organization's records, newest first within each collection (the store's order): every
  * changeable record, and the recent part of the history (see historyWindow; the rest loads on request).
  */
-export async function loadAppRecords(organizationId: string, {recentHistory = true} = {}): Promise<CloudRecords> {
+export async function loadAppRecords(
+  organizationId: string,
+  {
+    recentHistory = true,
+    onProgress,
+  }: {
+    recentHistory?: boolean;
+    /** Records arrived so far and the total, across every table (for the loading screen). */
+    onProgress?: (loaded: number, total: number) => void;
+  } = {},
+): Promise<CloudRecords> {
   const records = emptyRecords();
   const cutoffs = TABLE_COLLECTIONS.map(collection => (recentHistory ? freshCutoff(collection) : undefined));
+  const progress = TABLE_COLLECTIONS.map(() => ({loaded: 0, total: 0}));
+  const report = (index: number) => (loaded: number, total: number) => {
+    progress[index] = {loaded, total};
+    onProgress?.(
+      progress.reduce((sum, item) => sum + item.loaded, 0),
+      progress.reduce((sum, item) => sum + item.total, 0),
+    );
+  };
   const loaded = await Promise.all(
-    TABLE_COLLECTIONS.map((collection, index) => loadTable(organizationId, collection, {since: cutoffs[index]})),
+    TABLE_COLLECTIONS.map((collection, index) =>
+      loadTable(organizationId, collection, {since: cutoffs[index]}, onProgress && report(index)),
+    ),
   );
   TABLE_COLLECTIONS.forEach((collection, index) => {
     records[collection] = loaded[index];

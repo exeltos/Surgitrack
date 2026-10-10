@@ -10228,3 +10228,14 @@ html body .prep-workspace-modal .prep-head-prints button {
     margin: 6px 0 0;
   }
 }
+
+/* Loading screen: how far a large hospital's load has come, under the spinner. */
+html body .app-spinner-wrap.full {
+  align-content: center;
+  gap: 14px;
+}
+html body .app-spinner-detail {
+  font-size: 14px;
+  color: var(--st-muted);
+  font-variant-numeric: tabular-nums;
+}

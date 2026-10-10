@@ -12,12 +12,16 @@ export type PageResult<Row> = {data: Row[] | null; error: unknown; count?: numbe
  */
 export async function loadAllPages<Row>(
   fetchPage: (from: number, to: number, withCount: boolean) => PromiseLike<PageResult<Row>>,
+  /** Rows arrived so far and the total, after each page (for a progress line). */
+  onProgress?: (loaded: number, total: number) => void,
 ): Promise<Row[]> {
   const first = await fetchPage(0, PAGE_SIZE - 1, true);
   if (first.error) throw first.error;
   const rows = [...(first.data || [])];
-  if (rows.length < PAGE_SIZE) return rows;
   const total = typeof first.count === 'number' ? first.count : undefined;
+  let loaded = rows.length;
+  onProgress?.(loaded, Math.max(total ?? loaded, loaded));
+  if (rows.length < PAGE_SIZE) return rows;
   if (total === undefined) {
     // No total (should not happen): one page after the other, as before.
     for (let from = PAGE_SIZE; ; from += PAGE_SIZE) {
@@ -38,6 +42,8 @@ export async function loadAllPages<Row>(
       const page = await fetchPage(from, from + PAGE_SIZE - 1, false);
       if (page.error) throw page.error;
       pages[index] = page.data || [];
+      loaded += pages[index].length;
+      onProgress?.(loaded, Math.max(total, loaded));
     }
   };
   await Promise.all(Array.from({length: Math.min(PARALLEL_PAGES, starts.length)}, worker));

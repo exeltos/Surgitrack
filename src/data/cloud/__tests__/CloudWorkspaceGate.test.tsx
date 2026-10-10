@@ -79,7 +79,10 @@ describe('opening the hospital', () => {
     );
     await waitFor(() => expect(workspace).not.toBeNull());
     const records = workspace!.records as unknown as Record<string, Array<{id: string; name?: string}>>;
-    expect(mocks.loadAppRecords).toHaveBeenCalledWith('org-1');
+    expect(mocks.loadAppRecords).toHaveBeenCalledWith(
+      'org-1',
+      expect.objectContaining({onProgress: expect.any(Function)}),
+    );
     expect(records.tools).toEqual([{id: 't1', name: 'Edited here'}]);
     expect(records.sets).toEqual([{id: 's1', name: 'Server set'}]);
     const [organizationId, restored] = mocks.setRestored.mock.calls[0];
