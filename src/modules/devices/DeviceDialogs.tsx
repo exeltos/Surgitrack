@@ -103,11 +103,11 @@ export function DeviceEditor({
             {named?.length && !named.some(item => item.el === value.name.trim())
               ? washer
                 ? L(
-                    'Διάλεξε όνομα από τα Πλυντήρια του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση πλυντηρίου.',
+                    'Διαλέξτε όνομα από τα Πλυντήρια του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση πλυντηρίου.',
                     'Pick a name from the Studio washers, so the device cycles match the washer load.',
                   )
                 : L(
-                    'Διάλεξε όνομα από τους Κλιβάνους του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση κλιβάνου.',
+                    'Διαλέξτε όνομα από τους Κλιβάνους του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση κλιβάνου.',
                     'Pick a name from the Studio sterilizers, so the device cycles match the sterilizer load.',
                   )
               : L(
