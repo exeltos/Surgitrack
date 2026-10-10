@@ -7,7 +7,7 @@ import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.t
 // for the platform admin only). Only a hospital admin for users of their own hospital, or the
 // platform admin. The email changes on the sign-in account too, so the person signs in with the
 // new one; the username (user code) stays the same. Nobody changes their own account. An email change
-// is recorded in account_events (no record, no change) and the old address is told.
+// is recorded in account_events (no record, no change) and both the old and the new address are told.
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -113,7 +113,10 @@ Deno.serve(async req => {
       if (emailChanged && target.email) await admin.auth.admin.updateUserById(userId, {email: target.email, email_confirm: true});
       return json({error: "update_failed"}, 500);
     }
-    if (emailChanged && target.email) await notifyAccountEvent(target.email, "email_changed", me.name);
+    if (emailChanged) {
+      if (target.email) await notifyAccountEvent(target.email, "email_changed", me.name);
+      await notifyAccountEvent(email, "email_changed_to", me.name);
+    }
     return json({ok: true, name, email});
   } catch (e) {
     console.error("update-staff", e instanceof Error ? e.message : e);

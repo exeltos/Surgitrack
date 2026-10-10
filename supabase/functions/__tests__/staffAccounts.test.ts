@@ -169,7 +169,7 @@ describe('update-staff: the sign-in email', () => {
   });
   const update = (email: string) => handle(post({user_id: 'user-2', name: 'Nurse', email}));
 
-  it('records the change and tells the old address', async () => {
+  it('records the change and tells the old address and the new one', async () => {
     answer({...TARGET, role: 'DEPARTMENT'});
     const response = await update('new@hospital.gr');
     expect(response.status).toBe(200);
@@ -180,7 +180,9 @@ describe('update-staff: the sign-in email', () => {
       action: 'email_changed',
       detail: {from: 'Nurse@Hospital.gr', to: 'new@hospital.gr'},
     });
-    expect(mailState.outbox.map(m => m.to)).toEqual(['Nurse@Hospital.gr']);
+    expect(mailState.outbox.map(m => m.to)).toEqual(['Nurse@Hospital.gr', 'new@hospital.gr']);
+    expect(mailState.outbox[0].html).toContain('άλλαξε από');
+    expect(mailState.outbox[1].html).toContain('ορίστηκε σε αυτή τη διεύθυνση');
   });
 
   it('changes nothing when the change could not be recorded', async () => {

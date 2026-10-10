@@ -416,28 +416,28 @@
 }
 
 @media (max-width: 1180px) and (min-width: 761px) {
-  .sterilization-workspace .receipt-queue-panel .ster-list-head,
-  .sterilization-workspace .receipt-queue-panel .ster-work-row {
+  .sterilization-workspace .ster-work-panel .ster-list-head,
+  .sterilization-workspace .ster-work-panel .ster-work-row {
     grid-template-columns: minmax(180px, 1.85fr) minmax(110px, 1fr) minmax(110px, 0.9fr) minmax(150px, 1.15fr) !important;
     column-gap: 11px !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5),
-  .sterilization-workspace .receipt-queue-panel .ster-status {
+  .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(5),
+  .sterilization-workspace .ster-work-panel .ster-status {
     display: none !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4) {
+  .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(4) {
     grid-column: 3;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(6) {
+  .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(6) {
     grid-column: 4;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-row-action {
+  .sterilization-workspace .ster-work-panel .ster-row-action {
     grid-column: 4 !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-meta {
+  .sterilization-workspace .ster-work-panel .ster-meta {
     grid-column: 3 !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-tablet-stage {
+  .sterilization-workspace .ster-work-panel .ster-tablet-stage {
     display: block !important;
     margin-top: 2px;
     font-size: 11px;
@@ -447,30 +447,30 @@
 }
 
 @media (max-width: 760px) {
-  .sterilization-workspace .receipt-queue-panel .ster-list-head {
+  .sterilization-workspace .ster-work-panel .ster-list-head {
     display: none !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-work-row {
+  .sterilization-workspace .ster-work-panel .ster-work-row {
     display: grid !important;
     grid-template-columns: 44px minmax(0, 1fr) !important;
     gap: 8px 10px !important;
     padding: 13px 14px !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-asset-cell {
+  .sterilization-workspace .ster-work-panel .ster-asset-cell {
     grid-column: 1/-1 !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-cell-department,
-  .sterilization-workspace .receipt-queue-panel .ster-meta,
-  .sterilization-workspace .receipt-queue-panel .ster-row-action {
+  .sterilization-workspace .ster-work-panel .ster-cell-department,
+  .sterilization-workspace .ster-work-panel .ster-meta,
+  .sterilization-workspace .ster-work-panel .ster-row-action {
     grid-column: 2/-1 !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-status {
+  .sterilization-workspace .ster-work-panel .ster-status {
     display: none !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-tablet-stage {
+  .sterilization-workspace .ster-work-panel .ster-tablet-stage {
     display: block !important;
   }
-  .sterilization-workspace .receipt-queue-panel .ster-row-action {
+  .sterilization-workspace .ster-work-panel .ster-row-action {
     flex-wrap: wrap !important;
   }
 }
@@ -8494,6 +8494,10 @@ html body .sets-expiry.expired {
     grid-template-columns:
       minmax(300px, 1.7fr) minmax(145px, 0.8fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr)
       minmax(210px, 1fr) !important;
+  }
+  /* The stage column is gone: the action takes the last of the five (not a sixth, zero-width one). */
+  html body .sterilization-workspace .ster-row-action {
+    grid-column: 5 !important;
   }
 }
 html body .ster-meta .ster-count-shortage {

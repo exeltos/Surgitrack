@@ -33,12 +33,23 @@ const athensTime = (now: Date) =>
     minute: "2-digit",
   }).format(now);
 
-/** Tells the person (best effort: a failed email does not undo what was done). */
-export const notifyAccountEvent = async (to: string, action: AccountAction, by: string, now = new Date()) => {
+/**
+ * Tells the person (best effort: a failed email does not undo what was done). An email change is told
+ * to both addresses: the old one so its owner learns of it, the new one ("email_changed_to") in case
+ * the old one is no longer read.
+ */
+export const notifyAccountEvent = async (
+  to: string,
+  action: AccountAction | "email_changed_to",
+  by: string,
+  now = new Date(),
+) => {
   const who = esc(by || "τον διαχειριστή του νοσοκομείου");
   const when = esc(athensTime(now));
   const what =
-    action === "email_changed"
+    action === "email_changed_to"
+      ? `Το email σύνδεσης του λογαριασμού σας στο SurgiTrack ορίστηκε σε αυτή τη διεύθυνση από ${who} (${when}). Από εδώ και πέρα συνδέεστε με αυτό το email· το όνομα χρήστη και ο κωδικός σας μένουν ίδια.`
+      : action === "email_changed"
       ? `Το email σύνδεσης του λογαριασμού σας στο SurgiTrack άλλαξε από ${who} (${when}). Από εδώ και πέρα συνδέεστε με το νέο email.`
       : action === "password_link"
         ? `Δημιουργήθηκε σύνδεσμος ορισμού νέου κωδικού για τον λογαριασμό σας στο SurgiTrack από ${who} (${when}).`
