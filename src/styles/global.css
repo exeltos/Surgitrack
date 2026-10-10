@@ -7975,11 +7975,6 @@ html body .prep-block-warning {
 .sym.sym-sterile {
   height: 1.05em;
 }
-.th-sym {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
 html body .prep-block-warning {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);

@@ -1,4 +1,3 @@
-import {ExpirySymbol} from '../../components/ui/SterileDates';
 import {useBrowseList} from '../../core/browseList';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {ListEmpty} from '../../components/ui/EmptyState';
@@ -212,11 +211,7 @@ export default function SetsPage() {
                 <th>{tr('Τμήμα')}</th>
                 <th>{tr('Εργαλεία')}</th>
                 <th>{tr('Κατάσταση')}</th>
-                <th>
-                  <span className="th-sym">
-                    <ExpirySymbol /> {tr('Λήξη')}
-                  </span>
-                </th>
+                <th>{tr('Λήξη')}</th>
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                 </th>

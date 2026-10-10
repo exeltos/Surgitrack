@@ -12,7 +12,6 @@ import {kpiFilters} from '../../core/kpiFilters';
 import {useRememberedState} from '../../core/listMemory';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
-import {ExpirySymbol, SterileSymbol} from '../../components/ui/SterileDates';
 import {tr, trData} from '../../i18n';
 
 const VIEWS = ['ALERT', 'EXPIRING', 'EXPIRED', 'ALL'] as const;
@@ -95,16 +94,8 @@ export default function SterileExpiryPage() {
                 <th>{tr('Τμήμα')}</th>
                 <th>{tr('Θέση')}</th>
                 <th>{tr('Διάρκεια')}</th>
-                <th>
-                  <span className="th-sym">
-                    <SterileSymbol /> {tr('Αποστείρωση')}
-                  </span>
-                </th>
-                <th>
-                  <span className="th-sym">
-                    <ExpirySymbol /> {tr('Λήγει')}
-                  </span>
-                </th>
+                <th>{tr('Αποστείρωση')}</th>
+                <th>{tr('Λήξη')}</th>
                 <th>{tr('Υπόλοιπο')}</th>
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
@@ -138,7 +129,7 @@ export default function SterileExpiryPage() {
                     <td className="mono" data-label={tr('Αποστείρωση')}>
                       {item.sterilizedOn ? formatExpiry(item.sterilizedOn) : '—'}
                     </td>
-                    <td className="mono" data-label={tr('Λήγει')}>
+                    <td className="mono" data-label={tr('Λήξη')}>
                       {formatExpiry(item.sterileUntil)}
                     </td>
                     <td>
