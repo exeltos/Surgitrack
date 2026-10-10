@@ -13,6 +13,7 @@ export default function NewDemoDialog({onClose, onCreate}: {onClose: () => void;
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [notes, setNotes] = useState('');
+  const [screenGuides, setScreenGuides] = useState(true);
   const [endDate, setEndDate] = useState(trialEndDate(trialEndAfter(DEFAULT_DEMO_DAYS)));
   const emailOk = !contactEmail.trim() || isValidEmail(contactEmail);
   const future = !!endDate && Date.parse(trialEndOn(endDate)) > Date.now();
@@ -84,6 +85,18 @@ export default function NewDemoDialog({onClose, onCreate}: {onClose: () => void;
             </label>
           </div>
           <label>
+            {tr('Οδηγοί οθόνης')}
+            <select value={screenGuides ? 'ON' : 'OFF'} onChange={e => setScreenGuides(e.target.value === 'ON')}>
+              <option value="ON">{tr('Εμφανίζονται')}</option>
+              <option value="OFF">{tr('Δεν εμφανίζονται')}</option>
+            </select>
+            <small>
+              {tr(
+                'Οι σύντομες οδηγίες την πρώτη φορά σε κάθε οθόνη. Αλλάζουν αργότερα από τις Ρυθμίσεις του νοσοκομείου.',
+              )}
+            </small>
+          </label>
+          <label>
             {tr('Σημειώσεις')}
             <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} />
           </label>
@@ -101,6 +114,7 @@ export default function NewDemoDialog({onClose, onCreate}: {onClose: () => void;
                 contactPhone: contactPhone.trim() || undefined,
                 notes: notes.trim() || undefined,
                 endsAt: trialEndOn(endDate),
+                screenGuides,
               })
             }
           >

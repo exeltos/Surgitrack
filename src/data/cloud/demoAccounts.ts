@@ -215,6 +215,8 @@ export type NewDemo = {
   contactPhone?: string;
   notes?: string;
   endsAt: string;
+  /** The on-screen guides in the Demo (off for a prospect who already knows the app); on when left out. */
+  screenGuides?: boolean;
 };
 
 /** Opens the Demo hospital, its departments and its row in one step (still PREPARING). */
@@ -236,8 +238,9 @@ export const seedDemoAccount = async (
   demo: Pick<DemoAccount, 'id' | 'organizationId'>,
   onProgress?: (done: number, total: number) => void,
   kind: 'SEED' | 'RESET' = 'SEED',
+  screenGuides?: boolean,
 ) => {
-  const seeded = await seedDemoOrganization(demo.organizationId, {evaluation: true, onProgress});
+  const seeded = await seedDemoOrganization(demo.organizationId, {evaluation: true, onProgress, screenGuides});
   const now = new Date().toISOString();
   const {error} = await supabase.from('demo_accounts').update({seeded_at: now, updated_at: now}).eq('id', demo.id);
   if (error) throw error;

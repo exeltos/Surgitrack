@@ -85,6 +85,24 @@ describe('Studio: evaluation Demos', () => {
     expect(days).toBeLessThanOrEqual(15);
   });
 
+  it('opens a Demo with the screen guides off when chosen, and fills it so', async () => {
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    await user.click(await screen.findByRole('button', {name: /Νέο Demo/}));
+    const form = screen.getByRole('complementary', {name: 'Νέο Demo αξιολόγησης'});
+    const guides = within(form).getByLabelText(/^Οδηγοί οθόνης/) as HTMLSelectElement;
+    // On unless chosen otherwise.
+    expect(guides.value).toBe('ON');
+    await user.type(within(form).getByLabelText('Νοσοκομείο'), 'Γ.Ν. Λάρισας');
+    await user.type(within(form).getByLabelText('Ονοματεπώνυμο'), 'Μαρία Παππά');
+    await user.type(within(form).getByLabelText('Email'), 'maria@hospital.gr');
+    await user.selectOptions(guides, 'OFF');
+    await user.click(within(form).getByRole('button', {name: 'Δημιουργία και αποστολή'}));
+    await screen.findByText(/το email στάλθηκε/);
+    expect(service.createDemoAccount.mock.calls[0][0]).toMatchObject({screenGuides: false});
+    expect(service.seedDemoAccount.mock.calls[0][3]).toBe(false);
+  });
+
   it('does not send the email when the sample data fails, and says why', async () => {
     service.seedDemoAccount.mockRejectedValue(new Error('network down'));
     const user = userEvent.setup();
