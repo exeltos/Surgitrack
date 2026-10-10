@@ -3,6 +3,7 @@ import {createClient, type SupabaseClient} from "jsr:@supabase/supabase-js@2";
 import {grantAccess, roleName, type Grant} from "../_shared/grantAccess.ts";
 import {corsFor, jsonWith} from "../_shared/http.ts";
 import {appSite, esc, layout, sendEmail, usernameBox} from "../_shared/mail.ts";
+import {releaseUnconfirmedSignup} from "../_shared/unconfirmedSignup.ts";
 
 // Staff invitations (platform admin, or a hospital admin for their own hospital).
 //  - An invitation: a personal link to the signup form, emailed (or, with send_email false, only
@@ -27,6 +28,9 @@ async function seatLeft(admin: SupabaseClient, org: string) {
 
 /** A signup invitation: the email carries the form; the request waits there for the person. */
 async function inviteToSignup(admin: SupabaseClient, g: Omit<Grant, "name">, send: boolean) {
+  // Someone who signed up with this address through a hospital link but never confirmed it does not
+  // keep its owner out.
+  await releaseUnconfirmedSignup(admin, g.email);
   const {data: existing} = await admin.from("profiles").select("id").eq("email", g.email).maybeSingle();
   if (existing) throw new Error("Email already registered");
   const {data: open} = await admin
@@ -211,6 +215,7 @@ Deno.serve(async req => {
         const orgName = await hospital(org);
         const dept = await department(org, role, row.department_id);
         if (direct) {
+          await releaseUnconfirmedSignup(admin, email);
           const {data: known} = await admin.from("profiles").select("id").eq("email", email).maybeSingle();
           if (!known) await seatLeft(admin, org);
           const r = await grantAccess(admin, {

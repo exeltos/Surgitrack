@@ -1,13 +1,19 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 import {clientIp, corsFor, jsonWith} from "../_shared/http.ts";
+import {appSite, esc, layout, mailConfigured, sendEmail} from "../_shared/mail.ts";
+import {releaseUnconfirmedSignup} from "../_shared/unconfirmedSignup.ts";
 
 // Public signup form (#/join/<token>): through a hospital's signup link, or a personal invitation
 // (emailed, or its link passed on by hand). The person fills in their name, department (and email
 // for the hospital link) and sets their password. Their account and username are made at once,
 // inactive; the form shows the username. The request waits for the hospital admin, who sees it in
 // the app (no email); approval activates the account and emails the person once.
+// Through the hospital link the email is not the admin's choice, so it is confirmed first: the request
+// waits (PENDING_EMAIL, with a one-time confirm_token) until the person opens the emailed link, and only
+// then reaches the admin. Without our own mail settings it goes straight to the admin, as before.
 //  - action "info": what the form shows for a token.
+//  - action "confirm": the emailed link (token = the request's confirm_token).
 //  - otherwise: the form itself.
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -19,6 +25,9 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NAME = /^[A-ZΑ-ΩΆΈΉΊΌΎΏΪΫ][A-ZΑ-ΩΆΈΉΊΌΎΏΪΫ -]*$/u;
 // A personal invitation is valid for 7 days (the hospital link carries its own end, 10 days).
 export const INVITE_DAYS = 7;
+// An emailed confirmation link works for 7 days too.
+export const CONFIRM_DAYS = 7;
+const randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => b.toString(16).padStart(2, "0")).join("");
 const PASSWORD_MIN = 8;
 const upperName = (value: unknown) => String(value || "").trim().replace(/\s+/g, " ").toLocaleUpperCase("el-GR");
 
@@ -34,6 +43,29 @@ Deno.serve(async req => {
     const body = await req.json().catch(() => ({}));
     const token = String(body?.token || "").trim();
     if (!token) return json({error: "link_invalid"}, 410);
+
+    if (body?.action === "confirm") {
+      const {data: waiting, error: waitingError} = await admin
+        .from("staff_access_requests")
+        .select("id, user_id, organization_id, requested_at")
+        .eq("confirm_token", token)
+        .eq("status", "PENDING_EMAIL")
+        .maybeSingle();
+      if (waitingError) return json({error: "unavailable"}, 503);
+      if (!waiting?.user_id || Date.parse(waiting.requested_at) + CONFIRM_DAYS * 864e5 < Date.now())
+        return json({error: "link_invalid"}, 410);
+      const {error: confirmError} = await admin.auth.admin.updateUserById(waiting.user_id, {email_confirm: true});
+      if (confirmError) return json({error: "unavailable"}, 503);
+      // The database moves it to PENDING on the confirmed email too; the token is spent either way.
+      const {error: moveError} = await admin
+        .from("staff_access_requests")
+        .update({status: "PENDING", email_confirmed_at: new Date().toISOString(), confirm_token: null})
+        .eq("id", waiting.id)
+        .in("status", ["PENDING_EMAIL", "PENDING"]);
+      if (moveError) return json({error: "unavailable"}, 503);
+      const {data: org} = await admin.from("organizations").select("name").eq("id", waiting.organization_id).maybeSingle();
+      return json({ok: true, organization_name: org?.name || ""});
+    }
 
     // The token is a hospital signup link, or a personal invitation still waiting for the form.
     const {data: link, error: linkError} = await admin
@@ -127,6 +159,8 @@ Deno.serve(async req => {
       department = data;
     }
 
+    // An earlier signup with this email that was never confirmed does not keep its owner out.
+    await releaseUnconfirmedSignup(admin, email);
     const {data: account} = await admin.from("profiles").select("id").eq("email", email).maybeSingle();
     if (account) return json({error: "email_exists"}, 409);
 
@@ -146,10 +180,13 @@ Deno.serve(async req => {
     const {data: code, error: codeError} = await admin.rpc("generate_user_code", {p_name: fullName});
     if (codeError || !code) return json({error: "signup_failed"}, 500);
     const userCode = String(code);
+    // The hospital link: the address is confirmed by email first (when this server can send email).
+    const confirmByEmail = !invitation && mailConfigured();
+    const confirmToken = confirmByEmail ? randomToken() : null;
     const {data: created, error: createError} = await admin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
+      email_confirm: !confirmByEmail,
       user_metadata: {full_name: fullName, user_code: userCode},
     });
     if (createError || !created?.user) {
@@ -183,7 +220,8 @@ Deno.serve(async req => {
     const row = {
       full_name: fullName,
       department_id: department?.id ?? null,
-      status: "PENDING",
+      status: confirmByEmail ? "PENDING_EMAIL" : "PENDING",
+      confirm_token: confirmToken,
       requested_at: now,
       user_id: userId,
       user_code: userCode,
@@ -200,7 +238,24 @@ Deno.serve(async req => {
       return json({error: "signup_failed"}, 500);
     }
     await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
-    return json({ok: true, user_code: userCode});
+    if (confirmByEmail) {
+      const url = `${appSite(body?.origin)}/#/join/confirm/${confirmToken}`;
+      const emailed = await sendEmail(
+        [email],
+        `Επιβεβαίωση email για το SurgiTrack · ${org.name}`,
+        layout(
+          "ΕΠΙΒΕΒΑΙΩΣΗ EMAIL",
+          "Επιβεβαιώστε το email σας",
+          `<p>Κάνατε εγγραφή στο SurgiTrack του <b>${esc(org.name)}</b> ως <b>${esc(fullName)}</b>.</p>
+           <p>Πατήστε το κουμπί για να επιβεβαιώσετε ότι το email είναι δικό σας. Μετά η αίτησή σας πηγαίνει στον διαχειριστή του νοσοκομείου για έγκριση.</p>
+           <p>Ο σύνδεσμος ισχύει ${CONFIRM_DAYS} ημέρες. Αν δεν κάνατε εσείς την εγγραφή, αγνοήστε αυτό το μήνυμα.</p>`,
+          {href: url, label: "Επιβεβαίωση email"},
+        ),
+      );
+      // Not sent: the person can fill in the form again (the unconfirmed signup is replaced).
+      if (!emailed) return json({error: "email_failed"}, 503);
+    }
+    return json({ok: true, user_code: userCode, confirm: confirmByEmail});
   } catch {
     return json({error: "signup_failed"}, 500);
   }
