@@ -36,7 +36,10 @@ export default function SetsPage() {
   const limitedBySet = useMemo(() => {
     const map = new Map<string, typeof tools>();
     tools.forEach(t => {
-      if (t.setId && t.maxUses) map.set(t.setId, [...(map.get(t.setId) || []), t]);
+      if (!t.setId || !t.maxUses) return;
+      const list = map.get(t.setId);
+      if (list) list.push(t);
+      else map.set(t.setId, [t]);
     });
     return map;
   }, [tools]);

@@ -20,6 +20,8 @@ import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {useSurgi} from '../../store/SurgiStore';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
+import {MoreRows} from '../../components/ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
 import {
   REASON_LABEL,
   allocateStock,
@@ -85,6 +87,8 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
           .toLowerCase()
           .includes(q)),
   );
+  // The table renders the first rows at once and the rest as it scrolls; selection and exports use them all.
+  const rows = useProgressiveList(shown, [reason, department, stock, status, q].join('|'), 'replacements');
   const picked = shown.filter(item => selected.has(item.tool.id));
   const target = picked.length ? picked : shown;
   const fromStock = allocateStock(picked.filter(item => item.status !== 'REPLACED'));
@@ -342,7 +346,7 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
                 </tr>
               </thead>
               <tbody>
-                {shown.map(item => {
+                {rows.visible.map(item => {
                   const canReplace = item.status !== 'REPLACED' && !!item.set && item.stock.length > 0;
                   return (
                     <tr key={item.tool.id} className={selected.has(item.tool.id) ? 'selected' : ''}>
@@ -446,6 +450,7 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
                     </td>
                   </tr>
                 )}
+                {rows.hasMore && <MoreRows colSpan={editable ? 7 : 5} onVisible={rows.showMore} />}
               </tbody>
             </table>
           </div>

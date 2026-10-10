@@ -21,17 +21,18 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
   const {cloud, initialData} = p;
 
   const [sets, setSets] = useState(initialData.sets);
-  const [tools, setTools] = useState(() =>
-    initialData.tools.map(tool =>
+  const [tools, setTools] = useState(() => {
+    const departmentOfSet = new Map(initialData.sets.map(set => [set.id, set.department]));
+    return initialData.tools.map(tool =>
       tool.state === 'RETIRED'
         ? tool
         : tool.mode === 'STOCK'
           ? {...tool, department: undefined, state: 'IN_STOCK' as const}
           : tool.mode === 'SET_MEMBER'
-            ? {...tool, department: initialData.sets.find(set => set.id === tool.setId)?.department || tool.department}
+            ? {...tool, department: (tool.setId && departmentOfSet.get(tool.setId)) || tool.department}
             : tool,
-    ),
-  );
+    );
+  });
   const [movements, setMovements] = useState(initialData.movements);
   const [issues, setIssues] = useState(initialData.issues);
   const [counts, setCounts] = useState<SurgicalCount[]>(initialData.counts || []);

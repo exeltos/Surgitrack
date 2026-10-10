@@ -56,12 +56,18 @@ const oneAlphabet = (word: string) => {
   return word;
 };
 
+// A hospital has tens of thousands of instruments but a few hundred names: each is cleaned once.
+const cleaned = new Map<string, string>();
+const CLEANED_MAX = 50000;
+
 /**
  * The safe clean-up: one space between words, capitals without accents, each word in one alphabet,
  * and lengths written the same way ("12cm", "12 cm" → "12 CM").
  */
 export function cleanName(name: string) {
-  return capitals(name)
+  let clean = cleaned.get(name);
+  if (clean !== undefined) return clean;
+  clean = capitals(name)
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/\s*-\s+|\s+-\s*/g, ' - ')
@@ -69,6 +75,9 @@ export function cleanName(name: string) {
     .map(oneAlphabet)
     .join(' ')
     .replace(/(\d)\s*(CM|MM)\b/g, '$1 $2');
+  if (cleaned.size >= CLEANED_MAX) cleaned.clear();
+  cleaned.set(name, clean);
+  return clean;
 }
 
 /** What two names have in common once punctuation and spacing are set aside. */
@@ -85,7 +94,9 @@ export function cleanUps<T extends Named>(items: readonly T[]) {
   const byName = new Map<string, T[]>();
   for (const item of items) {
     if (cleanName(item.name) === item.name) continue;
-    byName.set(item.name, [...(byName.get(item.name) || []), item]);
+    const list = byName.get(item.name);
+    if (list) list.push(item);
+    else byName.set(item.name, [item]);
   }
   return [...byName.entries()]
     .map(([from, list]) => ({from, to: cleanName(from), items: list}))
@@ -119,7 +130,9 @@ export function codeGroups<T extends Named>(items: readonly T[]): CodeGroup[] {
     if (!code) continue;
     const names = byCode.get(code) || new Map<string, string[]>();
     const name = cleanName(item.name);
-    names.set(name, [...(names.get(name) || []), item.id]);
+    const ids = names.get(name);
+    if (ids) ids.push(item.id);
+    else names.set(name, [item.id]);
     byCode.set(code, names);
   }
   const groups: CodeGroup[] = [];

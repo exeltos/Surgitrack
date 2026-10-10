@@ -10,6 +10,7 @@ const api = vi.hoisted(() => ({
   loadRecordsById: vi.fn(),
   loadBarcodes: vi.fn(),
   loadChangedRecords: vi.fn(),
+  writeCollection: vi.fn(),
 }));
 
 vi.mock('../appRecords', () => ({
@@ -25,7 +26,7 @@ vi.mock('../remoteChanges', async importOriginal => ({
   loadDeletedIds: async () => ({ids: []}),
 }));
 vi.mock('../realtime', () => ({isRealtimeLive: () => false, onRemoteChange: () => () => undefined}));
-vi.mock('../localCache', () => ({takeRestored: () => undefined, writeCollection: async () => undefined}));
+vi.mock('../localCache', () => ({takeRestored: () => undefined, writeCollection: api.writeCollection}));
 
 const {useAppRecordSync, onSyncNotice, unsavedChanges} = await import('../useAppRecordSync');
 const {syncNoticeMessage} = await import('../../../components/layout/syncNoticeMessage');
@@ -62,6 +63,7 @@ describe('saving a collection to the cloud', () => {
     api.loadRecordsById.mockResolvedValue([]);
     api.loadBarcodes.mockResolvedValue([]);
     api.loadChangedRecords.mockResolvedValue({records: []});
+    api.writeCollection.mockResolvedValue(undefined);
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -191,5 +193,28 @@ describe('saving a collection to the cloud', () => {
     await wait(1000);
     expect(collections()).toEqual(['sterilizationReleases', 'sterilizationReleases', 'sets']);
     expect(unsavedChanges()).toBe(0);
+  });
+
+  it('writes the device copy again only when something changed, or after a while', async () => {
+    render(<Harness initial={[tool(1)]} />);
+    await wait(2000);
+    expect(api.writeCollection).toHaveBeenCalledTimes(1);
+    // Hiding the page writes the copy, unless it already holds exactly these records, all saved.
+    await act(async () => window.dispatchEvent(new Event('pagehide')));
+    expect(api.writeCollection).toHaveBeenCalledTimes(1);
+
+    await change(list => list.map(item => ({...item, name: 'Edited'})));
+    await act(async () => window.dispatchEvent(new Event('pagehide')));
+    // Not saved yet: written with the change marked unsaved.
+    expect(api.writeCollection).toHaveBeenLastCalledWith('tools', expect.objectContaining({changed: ['t1']}));
+    await wait(2000);
+    const afterSave = api.writeCollection.mock.calls.length;
+    expect(api.writeCollection).toHaveBeenLastCalledWith('tools', expect.objectContaining({changed: []}));
+
+    await act(async () => window.dispatchEvent(new Event('pagehide')));
+    expect(api.writeCollection).toHaveBeenCalledTimes(afterSave);
+    await act(() => vi.advanceTimersByTimeAsync(11 * 60000));
+    await act(async () => window.dispatchEvent(new Event('pagehide')));
+    expect(api.writeCollection).toHaveBeenCalledTimes(afterSave + 1);
   });
 });
