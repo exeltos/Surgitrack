@@ -152,6 +152,11 @@ if (typeof window !== 'undefined') {
 }
 /** How long the device's copy waits after a change before it is written (changes come in bursts). */
 const CACHE_DELAY_MS = 800;
+/**
+ * A copy that already holds exactly these records, all saved, is written again only after this long (a
+ * large hospital's copy is megabytes): enough to keep it from expiring and to carry the latest `since`.
+ */
+const COPY_REFRESH_MS = 10 * 60000;
 
 const diff = (known: Map<string, CloudRecord>, items: readonly CloudRecord[]) => {
   const changed = items.filter(item => known.get(item.id) !== item);
@@ -208,12 +213,18 @@ export function useAppRecordSync(
   const deletedSince = useRef(since.current);
   const pullNow = useRef<() => void>(() => undefined);
   const cacheTimer = useRef<number | undefined>(undefined);
+  // The records the copy last written holds, all saved, and when it was written.
+  const lastCopy = useRef<{items: readonly CloudRecord[]; at: number} | null>(null);
   // Writes this device's copy: the current records and which of them the server has not confirmed yet.
   const writeCopy = useRef(() => {
     const known = confirmed.current;
     if (!known) return;
     window.clearTimeout(cacheTimer.current);
     const {changed, removed} = diff(known, latest.current);
+    const clean = !changed.length && !removed.length;
+    const last = lastCopy.current;
+    if (clean && last?.items === latest.current && Date.now() - last.at < COPY_REFRESH_MS) return;
+    lastCopy.current = clean ? {items: latest.current, at: Date.now()} : null;
     void writeCollection(collection, {
       items: [...latest.current],
       changed: changed.map(item => item.id),
@@ -272,6 +283,8 @@ export function useAppRecordSync(
         // (against the server's version they started from, when the copy kept it).
         const bases = new Map((copy.bases || []).map(base => [base.id, base]));
         for (const id of [...copy.changed, ...copy.removed]) known.set(id, bases.get(id) || {id});
+        // Opened from a copy with nothing unsaved: it already holds these records.
+        if (!copy.changed.length && !copy.removed.length) lastCopy.current = {items, at: copy.savedAt};
       }
       confirmed.current = known;
       scheduleCopy();

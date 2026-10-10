@@ -61,7 +61,9 @@ export default function StandaloneToolsPage() {
     const m = new Map<string, typeof tools>();
     filtered.forEach(t => {
       const k = `${t.code}|${t.name}|${t.manufacturer}`;
-      m.set(k, [...(m.get(k) || []), t]);
+      const list = m.get(k);
+      if (list) list.push(t);
+      else m.set(k, [t]);
     });
     return [...m.values()];
   }, [filtered]);

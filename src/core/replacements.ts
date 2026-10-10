@@ -35,11 +35,20 @@ export const kindKey = (tool: Pick<Tool, 'code' | 'name'>) => {
   return code ? `C:${code}` : `N:${nameKey(tool.name)}`;
 };
 
-const lastSetBarcode = (barcode: string, movements: readonly Movement[]) => {
-  // Movements are newest first: the latest one that took it out of a Set names that Set.
-  const out = movements.find(m => m.asset.startsWith(barcode) && m.from.startsWith('Set '));
-  return out?.from.slice(4).trim();
+/**
+ * Per instrument barcode, the Set its latest move out of a Set came from. Movements are newest first and
+ * name their asset as "<barcode> · <name>", so the first one seen for a barcode is the latest.
+ */
+const lastSetBarcodes = (movements: readonly Movement[]) => {
+  const out = new Map<string, string>();
+  for (const m of movements) {
+    if (!m.from.startsWith('Set ')) continue;
+    const barcode = m.asset.split(' ')[0];
+    if (!out.has(barcode)) out.set(barcode, m.from.slice(4).trim());
+  }
+  return out;
 };
+const byGreekName = new Intl.Collator('el');
 
 /**
  * Instruments in Service, damaged (an open damage report), lost or out of use, each with the Set it
@@ -73,6 +82,13 @@ export function replacementItems(data: {
     }
   const setsById = new Map(sets.map(s => [s.id, s]));
   const setsByBarcode = new Map(sets.map(s => [s.barcode, s]));
+  let lastSets: Map<string, string> | undefined;
+  // The first order (not cancelled) that covers each instrument.
+  const orderByTool = new Map<string, PurchaseOrder>();
+  for (const order of purchaseOrders)
+    if (order.status !== 'CANCELLED')
+      for (const line of order.lines)
+        for (const id of line.toolIds) if (!orderByTool.has(id)) orderByTool.set(id, order);
   const items: ReplacementItem[] = [];
   for (const tool of [...tools, ...retiredTools]) {
     const own = openByBarcode.get(tool.barcode) || [];
@@ -91,10 +107,10 @@ export function replacementItems(data: {
     const set = tool.setId
       ? setsById.get(tool.setId)
       : (() => {
-          const barcode = lastSetBarcode(tool.barcode, movements);
+          const barcode = (lastSets ??= lastSetBarcodes(movements)).get(tool.barcode);
           return barcode ? setsByBarcode.get(barcode) : undefined;
         })();
-    const order = purchaseOrders.find(o => o.status !== 'CANCELLED' && o.lines.some(l => l.toolIds.includes(tool.id)));
+    const order = orderByTool.get(tool.id);
     items.push({
       tool,
       reason,
@@ -111,7 +127,7 @@ export function replacementItems(data: {
   return items.sort(
     (a, b) =>
       (a.status === 'NEEDED' ? 0 : 1) - (b.status === 'NEEDED' ? 0 : 1) ||
-      a.tool.name.localeCompare(b.tool.name, 'el') ||
+      byGreekName.compare(a.tool.name, b.tool.name) ||
       a.tool.barcode.localeCompare(b.tool.barcode),
   );
 }

@@ -5,6 +5,8 @@ import {ArrowLeft, Check, Images, Save, Search, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import AppButton from '../ui/AppButton';
+import {MoreRows} from '../ui/ProgressiveList';
+import {useProgressiveList} from '../../core/useProgressiveList';
 import AssetPhotosCard from './AssetPhotosCard';
 import AssetTypeIcon from './AssetTypeIcon';
 import {filesToAssetPhotos} from './photoUtils';
@@ -50,6 +52,10 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
       ),
     [tools, query, source],
   );
+  // Thousands of Stock instruments at a large hospital: the first rows at once, the rest as the list scrolls.
+  const shown = useProgressiveList(candidates, `${source}|${query}`, 'candidates');
+  const setsById = useMemo(() => new Map(sets.map(set => [set.id, set])), [sets]);
+  const chosen = useMemo(() => new Set(selected), [selected]);
   const allowedDepartments = departments.filter(x => !['ster', 'biomed', 'proc'].includes(x.id));
 
   const removePhoto = (id: string) => setPhotos(list => list.filter(photo => photo.id !== id));
@@ -407,15 +413,15 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                     <span>{tr('Προέλευση')}</span>
                   </div>
                   <div className="composer-list create-set-tools-list">
-                    {candidates.map(t => {
-                      const parent = sets.find(s => s.id === t.setId);
+                    {shown.visible.map(t => {
+                      const parent = t.setId ? setsById.get(t.setId) : undefined;
                       const sourceLabel =
                         t.mode === 'STOCK'
                           ? 'Απόθεμα'
                           : t.mode === 'SET_MEMBER'
                             ? `${parent?.barcode || tr('Σετ')} · ${parent?.name || ''}`
                             : trData(t.department) || '—';
-                      const active = selected.includes(t.id);
+                      const active = chosen.has(t.id);
                       return (
                         <button
                           type="button"
@@ -436,6 +442,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                         </button>
                       );
                     })}
+                    {shown.hasMore && <MoreRows onVisible={shown.showMore} />}
                     {!candidates.length && (
                       <div className="empty-inline">{tr('Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την κατηγορία.')}</div>
                     )}
