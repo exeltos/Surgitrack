@@ -1,11 +1,13 @@
 import {useEffect, useState} from 'react';
-import {Building2, Clock3, KeyRound, Languages, Mail, ShieldCheck, UserRound} from 'lucide-react';
+import {Building2, Clock3, Languages, Mail, ShieldCheck, UserRound} from 'lucide-react';
 import {FunctionsHttpError} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {localizedName} from '../../core/glossary';
 import {APP_VERSION} from '../../config/appMeta';
 import {formatDate} from '../../core/displayDate';
+import {passwordOk} from '../../core/passwordRules';
+import {PasswordFields} from '../../components/auth/PasswordFields';
 
 type LinkInfo = {
   organization_name: string;
@@ -45,7 +47,9 @@ const errorText = (code: string, el: boolean) => {
         ? 'Το Demo έχει φτάσει το όριο χρηστών. Ενημερώστε όποιον σας προσκάλεσε.'
         : 'The Demo has reached its user limit. Tell whoever invited you.';
     case 'password_invalid':
-      return el ? 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.' : 'The password needs at least 8 characters.';
+      return el
+        ? 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό.'
+        : 'The password needs at least 8 characters, with a letter and a number.';
     case 'email_failed':
       return el
         ? 'Δεν στάλθηκε το email επιβεβαίωσης. Δοκιμάστε ξανά σε λίγο.'
@@ -107,7 +111,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
       setMessage(L('Συμπληρώστε όλα τα πεδία.', 'Fill in all fields.'));
       return;
     }
-    if (password.length < 8) {
+    if (!passwordOk(password)) {
       setMessage(errorText('password_invalid', el));
       return;
     }
@@ -345,38 +349,18 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                       )}
                     </div>
                   </label>
-                  <div className="auth-name-row">
-                    <label>
-                      {L('Κωδικός', 'Password')}
-                      <div className="auth-input">
-                        <KeyRound size={17} />
-                        <input
-                          type="password"
-                          value={password}
-                          onChange={e => setPassword(e.target.value)}
-                          required
-                          minLength={8}
-                          autoComplete="new-password"
-                        />
-                      </div>
-                    </label>
-                    <label>
-                      {L('Επανάληψη κωδικού', 'Repeat password')}
-                      <div className="auth-input">
-                        <KeyRound size={17} />
-                        <input
-                          type="password"
-                          value={password2}
-                          onChange={e => setPassword2(e.target.value)}
-                          required
-                          minLength={8}
-                          autoComplete="new-password"
-                        />
-                      </div>
-                    </label>
-                  </div>
-                  <small className="auth-hint">{L('Τουλάχιστον 8 χαρακτήρες.', 'At least 8 characters.')}</small>
-                  {message && <div className="auth-message">{message}</div>}
+                  <PasswordFields
+                    el={el}
+                    password={password}
+                    confirm={password2}
+                    onPassword={setPassword}
+                    onConfirm={setPassword2}
+                  />
+                  {message && (
+                    <div className="auth-message is-error" role="alert">
+                      {message}
+                    </div>
+                  )}
                   <button className="auth-primary" type="submit" disabled={busy}>
                     {busy ? L('Εγγραφή…', 'Signing up…') : L('Εγγραφή', 'Sign up')}
                   </button>

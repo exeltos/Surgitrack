@@ -21,6 +21,8 @@ type World = {
   org?: Row;
   department?: Row;
   account?: Row;
+  /** A confirmed signup of that account, waiting for the admin. */
+  awaiting?: Row;
   admins?: Array<{email: string}>;
   /** An earlier hospital-link signup with this email, never confirmed. */
   unconfirmed?: Row;
@@ -39,7 +41,9 @@ const world = (w: World = {}) => {
         : call.filters.some(([op, column]) => op === 'eq' && column === 'confirm_token')
           ? (w.waiting ?? null)
           : call.filters.some(([, column]) => column === 'user_id')
-            ? (w.unconfirmed ?? null)
+            ? call.filters.some(([op, column, value]) => op === 'eq' && column === 'status' && value === 'PENDING')
+              ? (w.awaiting ?? null)
+              : (w.unconfirmed ?? null)
             : (w.open ?? null),
     'departments:select': (call: {filters: Array<[string, string, unknown]>}) =>
       call.filters.some(([, column]) => column === 'id') ? (has('department') ? w.department : DEPARTMENT) : [DEPARTMENT],
@@ -164,7 +168,9 @@ describe('staff-signup: checking the form', () => {
   it.each([
     ['a short password', {password: 'short'}],
     ['no password', {password: undefined}],
-    ['an overlong password', {password: 'x'.repeat(73)}],
+    ['an overlong password', {password: 'x1'.repeat(37)}],
+    ['a password without a number', {password: 'only-letters'}],
+    ['a password without a letter', {password: '12345678'}],
   ])('rejects %s before the limiter or any write', async (_label, override) => {
     const response = await handle(post({...form, ...override}));
     expect(response.status).toBe(400);
@@ -254,6 +260,13 @@ describe('staff-signup: signing up through the hospital link', () => {
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({error: 'email_exists'});
     expect(requests('insert')).toHaveLength(0);
+  });
+
+  it('says a confirmed signup already waits for approval, rather than that an account exists', async () => {
+    world({account: {id: 'u1', active: false}, awaiting: {id: 'r1'}});
+    const response = await handle(post(form));
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({error: 'already_pending'});
   });
 
   it('refuses a second request while one waits for approval', async () => {
