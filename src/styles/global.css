@@ -11001,3 +11001,137 @@ html body .device-cycle-free {
     font-weight: 600;
   }
 }
+/* Traceability: several items fit a name, so they are listed to choose from. */
+html body .trace-pick {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .trace-pick ul,
+html body .trace-patient ul,
+html body .trace-cycles ul {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+html body .trace-pick button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--c-gray-95);
+  border-radius: 10px;
+  background: none;
+  color: var(--c-blue-15-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+html body .trace-pick button:hover {
+  background: var(--c-gray-95-3);
+}
+html body .trace-pick button .mono {
+  color: var(--c-cyan-35);
+}
+html body .trace-pick button small {
+  color: var(--c-blue-50);
+  font-size: 12px;
+}
+/* A patient: what was used, each with the last sterilization cycle before the use. */
+html body .trace-patient li {
+  display: grid;
+  gap: 2px;
+}
+html body .trace-patient li a {
+  color: var(--c-cyan-35);
+  font-weight: 700;
+  text-decoration: none;
+}
+html body .trace-patient li small {
+  color: var(--c-blue-50);
+  font-size: 12.5px;
+}
+/* The sterilization cycles an item went through. */
+html body .trace-cycles {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .trace-cycles h3,
+html body .trace-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--c-blue-45);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+html body .trace-group {
+  margin: 10px 0 8px;
+}
+html body .trace-cycles li {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13px;
+}
+html body .trace-cycles time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-cycles b.ok {
+  color: var(--c-green-40-3);
+}
+html body .trace-cycles b.bad {
+  color: var(--c-red-40-2);
+}
+@media (max-width: 700px) {
+  html body .trace-cycles li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .trace-cycles li span {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  /* The item's card stays small, so its trail shows at once. */
+  html body .trace-card {
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  html body .trace-card > svg {
+    display: none;
+  }
+  html body .trace-card h2 {
+    font-size: 19px;
+  }
+  html body .trace-card p {
+    font-size: 13.5px;
+  }
+  html body .trace-card .trace-open {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+}
+html body .trace-patient li a,
+html body .trace-patient li b {
+  font-size: 14px;
+}
+html body .trace-pick > small {
+  display: block;
+  margin-top: 8px;
+  color: var(--c-blue-50);
+  font-size: 12px;
+}
