@@ -9139,9 +9139,10 @@ html body .idle-lock-password button[aria-pressed='true'] {
   }
 }
 
-/* Sign-out questions show above the screen lock (z-index 10000), which can start them. */
+/* Sign-out questions show above the screen lock (z-index 10000), which can start them ("Sign in as someone
+   else"). Important: the rule for every confirmation (02-assets-shared.css) puts them at 1600 with !important. */
 .sign-out-guard .confirm-dialog-backdrop {
-  z-index: 10001;
+  z-index: 10001 !important;
 }
 
 /* Sterilization on a phone: the page scrolls as a whole and the queue takes the height its rows
