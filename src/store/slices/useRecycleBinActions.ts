@@ -32,6 +32,7 @@ export function useRecycleBinActions(
         entry.kind === 'SET'
           ? tr('Δεν έγινε επαναφορά: υπάρχει ήδη Σετ με barcode {0}.', plan.barcode)
           : tr('Δεν έγινε επαναφορά: υπάρχει ήδη εργαλείο με barcode {0}.', plan.barcode),
+        true,
       );
       return false;
     }

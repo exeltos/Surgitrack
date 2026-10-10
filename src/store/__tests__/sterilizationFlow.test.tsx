@@ -536,6 +536,10 @@ describe('sterilization flow', () => {
     expect(finished.completedAt).toBeTruthy();
     expect(f.state()).toBe('AWAITING_RELEASE');
     expect(f.s().sterilizationCycles.find(c => c.loadId === running.id)?.result).toBe('PASSED');
+    // The notice names the load by its sterilizer and cycle, not its id, and is not a warning.
+    expect(f.s().toast?.text).toContain('«ΚΛΙΒΑΝΟΣ 1 · κύκλος S-1»');
+    expect(f.s().toast?.text).not.toContain(running.id);
+    expect(f.s().toast?.warning).toBe(false);
     f.release(running.id);
     expect(f.state()).toBe('READY_FOR_PICKUP');
   });
@@ -550,6 +554,8 @@ describe('sterilization flow', () => {
     const running = f.load()!;
     const failed = f.finish(running.id, 'FAILED')!;
     expect(failed.status).toBe('FAILED');
+    // Told as a warning («Προσοχή»), not as «Ολοκληρώθηκε».
+    expect(f.s().toast?.warning).toBe(true);
     expect(f.state()).not.toBe('AWAITING_RELEASE');
     expect(f.state()).not.toBe('IN_STERILIZATION');
   });

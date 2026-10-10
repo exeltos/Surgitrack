@@ -14,7 +14,8 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
   const {recallCases, setMovements, setSets, setTools, sets, tools} = p;
 
   const [toast, setToast] = useState<Toast>();
-  const notify = (text: string) => setToast({id: Date.now(), text});
+  /** Tells the user what happened; `warning` for a refusal or a failed outcome. */
+  const notify = (text: string, warning = false) => setToast({id: Date.now(), text, warning});
   useEffect(() => {
     if (!toast) return;
     // An offer to undo stays long enough to read it and change one's mind.
@@ -43,11 +44,11 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
     const asset = assetName(kind, id);
     if (!asset) return false;
     if (isUsageExhausted(kind, id)) {
-      notify(tr('{0}: δεν επιτρέπεται η κυκλοφορία — έχει εξαντληθεί το όριο χρήσεων.', asset.barcode));
+      notify(tr('{0}: δεν επιτρέπεται η κυκλοφορία — έχει εξαντληθεί το όριο χρήσεων.', asset.barcode), true);
       return false;
     }
     if (isAssetRecalled(kind, id)) {
-      notify(tr('{0}: δεν επιτρέπεται η κυκλοφορία — βρίσκεται σε ενεργή ανάκληση.', asset.barcode));
+      notify(tr('{0}: δεν επιτρέπεται η κυκλοφορία — βρίσκεται σε ενεργή ανάκληση.', asset.barcode), true);
       return false;
     }
     return true;

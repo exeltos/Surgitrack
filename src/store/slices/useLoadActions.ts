@@ -1,3 +1,4 @@
+import {loadLabel} from '../../core/loadLabel';
 import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
 import {STERILE_STATES} from '../../core/sterileExpiry';
 import type {
@@ -54,6 +55,11 @@ export function useLoadActions(
     releaseShelfLife,
     chooseShelfLife,
   } = p;
+  // A load in a notice: its sterilizer and cycle, not its id (see loadLabel).
+  const named = (loadId: string) => {
+    const load = processLoads.find(item => item.id === loadId);
+    return load ? `«${loadLabel(load)}»` : loadId;
+  };
 
   const createProcessLoad = (payload: CreateProcessLoadPayload) => {
     const expectedState: AssetState = payload.kind === 'WASHING' ? 'IN_WASHING' : 'IN_STERILIZATION';
@@ -64,7 +70,7 @@ export function useLoadActions(
           !!entry.asset && entry.asset.state === expectedState,
       );
     if (!refs.length) {
-      notify(tr('Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.'));
+      notify(tr('Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.'), true);
       return;
     }
     const loadId = `L${uniqueStamp()}`;
@@ -124,7 +130,7 @@ export function useLoadActions(
         completedAt: now,
       };
       setProcessLoads(list => [record, ...list]);
-      notify(tr('Το φορτίο {0} ολοκληρώθηκε για {1} αντικείμενα.', loadId, items.length));
+      notify(tr('Το φορτίο {0} ολοκληρώθηκε για {1} αντικείμενα.', `«${loadLabel(payload)}»`, items.length));
       return record;
     }
     // A load stays "in the sterilizer" until its cycle ends; a cycle taken from a connected device has ended.
@@ -159,14 +165,17 @@ export function useLoadActions(
           by: currentUser.name,
         }),
       );
-      notify(tr('Το φορτίο {0} μπήκε στον κλίβανο {1}.', loadId, payload.equipment));
+      notify(
+        tr('Το φορτίο {0} μπήκε στον κλίβανο {1}.', `«${tr('κύκλος {0}', payload.cycleNumber)}»`, payload.equipment),
+      );
       return record;
     }
     recordCycleResult(record, refs, deviceFailed ? 'FAILED' : 'PASSED', now);
     notify(
       deviceFailed
-        ? tr('Το φορτίο {0} απέτυχε και επέστρεψε σε επανεπεξεργασία.', loadId)
-        : tr('Το φορτίο {0} ολοκληρώθηκε και αναμένει αποδέσμευση.', loadId),
+        ? tr('Το φορτίο {0} απέτυχε και επέστρεψε σε επανεπεξεργασία.', `«${loadLabel(payload)}»`)
+        : tr('Το φορτίο {0} ολοκληρώθηκε και αναμένει αποδέσμευση.', `«${loadLabel(payload)}»`),
+      deviceFailed,
     );
     return record;
   };
@@ -234,8 +243,9 @@ export function useLoadActions(
     setProcessLoads(list => list.map(item => (item.id === loadId ? finished : item)));
     notify(
       result === 'PASSED'
-        ? tr('Ο κύκλος του φορτίου {0} τελείωσε: αναμένει αποδέσμευση.', loadId)
-        : tr('Ο κύκλος του φορτίου {0} απέτυχε: όλο το φορτίο επιστρέφει σε επανεπεξεργασία.', loadId),
+        ? tr('Ο κύκλος του φορτίου {0} τελείωσε: αναμένει αποδέσμευση.', named(loadId))
+        : tr('Ο κύκλος του φορτίου {0} απέτυχε: όλο το φορτίο επιστρέφει σε επανεπεξεργασία.', named(loadId)),
+      result !== 'PASSED',
     );
     return finished;
   };
@@ -332,8 +342,9 @@ export function useLoadActions(
     }
     notify(
       decision === 'RELEASED'
-        ? tr('Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).', loadId, load.items.length)
-        : tr('Το φορτίο {0} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.', loadId),
+        ? tr('Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).', named(loadId), load.items.length)
+        : tr('Το φορτίο {0} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.', named(loadId)),
+      decision !== 'RELEASED',
     );
     return updated;
   };
@@ -341,7 +352,7 @@ export function useLoadActions(
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
     if (!load || load.status !== 'RELEASED' || !reason.trim()) return;
     if (recallCases.some(c => c.loadId === loadId && c.status === 'OPEN')) {
-      notify(tr('Υπάρχει ήδη ενεργή ανάκληση για το φορτίο {0}.', loadId));
+      notify(tr('Υπάρχει ήδη ενεργή ανάκληση για το φορτίο {0}.', named(loadId)), true);
       return;
     }
     const now = formatStoreDateTime();
@@ -394,7 +405,9 @@ export function useLoadActions(
         item.id === loadId ? {...item, status: 'RECALLED', recalledAt: now, recallReason: reason.trim()} : item,
       ),
     );
-    notify(tr('Άνοιξε η ανάκληση {0} για το φορτίο {1} ({2} αντικείμενα).', recallCase.id, loadId, load.items.length));
+    notify(
+      tr('Άνοιξε η ανάκληση {0} για το φορτίο {1} ({2} αντικείμενα).', recallCase.id, named(loadId), load.items.length),
+    );
   };
   /**
    * A stage the hospital turns off: what is in it moves on to the next stage it runs, so the stage's tab
@@ -441,7 +454,7 @@ export function useLoadActions(
       }),
     );
     if (result === 'FAIL') recallProcessLoad(loadId, 'Ανεπιτυχής βιολογικός δείκτης');
-    else notify(tr('Ο βιολογικός δείκτης του φορτίου {0} καταγράφηκε επιτυχής.', loadId));
+    else notify(tr('Ο βιολογικός δείκτης του φορτίου {0} καταγράφηκε επιτυχής.', named(loadId)));
   };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
     const a = assetName(kind, id);

@@ -53,6 +53,8 @@ export type UserRole = 'DEPARTMENT' | 'STERILIZATION' | 'ADMIN' | 'VIEWER';
 export type Toast = {
   id: number;
   text: string;
+  /** A refusal or a failed outcome: titled «Προσοχή», not «Ολοκληρώθηκε». */
+  warning?: boolean;
   /** Takes the action back (offered for a few seconds after a management action). */
   undo?: () => void;
 };

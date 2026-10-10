@@ -82,7 +82,7 @@ export default function HandoverSignature({
           disabled={disabled || busy}
           value={code}
           onChange={e => setCode(e.target.value.toUpperCase())}
-          placeholder={disabled ? tr('Πρώτα σκάναρε αντικείμενο') : tr('Κωδικός χρήστη')}
+          placeholder={tr('Κωδικός χρήστη')}
           aria-label={tr('Κωδικός χρήστη')}
           autoComplete="off"
           spellCheck={false}

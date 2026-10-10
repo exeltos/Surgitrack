@@ -55,7 +55,7 @@ export function useReceiptAndCycleActions(
     const limited = livesConsumedBy(kind, id);
     const setLimited = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
     if ((limited.length || setLimited) && !patientCode?.trim()) {
-      notify(tr('{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.', a.barcode));
+      notify(tr('{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.', a.barcode), true);
       return;
     }
     const at = formatStoreDateTime();
@@ -313,6 +313,7 @@ export function useReceiptAndCycleActions(
           payload.cycleNumber,
           a.barcode,
         ),
+        true,
       );
       return record;
     }
@@ -405,7 +406,7 @@ export function useReceiptAndCycleActions(
       status: `Μη αποδέσμευση · προς επανεπεξεργασία · κύκλος ${cycle.cycleNumber}`,
       by: currentUser.name,
     });
-    notify(tr('{0}: δεν αποδεσμεύτηκε και επέστρεψε για επανεπεξεργασία.', a.barcode));
+    notify(tr('{0}: δεν αποδεσμεύτηκε και επέστρεψε για επανεπεξεργασία.', a.barcode), true);
     return record;
   };
   return {

@@ -1,3 +1,4 @@
+import {loadLabel} from '../../../core/loadLabel';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
@@ -182,7 +183,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             {releasedLoads.map(load => (
               <div key={load.id}>
                 <span>
-                  <b>{load.id}</b> · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
+                  <b>{loadLabel(load)}</b> · {load.items.length} {tr('αντικείμενα')}
                 </span>
                 <span className="released-load-actions">
                   {load.biologicalIndicatorResult === 'PENDING' && (

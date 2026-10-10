@@ -39,7 +39,7 @@ export function useAssetEditActions(
     const barcodeChanged = patch.barcode && patch.barcode !== before.barcode;
     const normalizedBarcode = patch.barcode?.trim().toUpperCase();
     if (normalizedBarcode && sets.some(s => s.id !== id && s.barcode === normalizedBarcode)) {
-      notify(tr('Το barcode {0} χρησιμοποιείται ήδη.', normalizedBarcode));
+      notify(tr('Το barcode {0} χρησιμοποιείται ήδη.', normalizedBarcode), true);
       return;
     }
     const requestedDepartment = (patch.department ?? before.department).trim();
@@ -52,7 +52,7 @@ export function useAssetEditActions(
     const inStock = nextState === 'IN_STOCK';
     const department = inStock ? '' : requestedDepartment;
     if (!inStock && !department) {
-      notify(tr('Ορίστε Τμήμα για να βγει το Σετ από το Απόθεμα.'));
+      notify(tr('Ορίστε Τμήμα για να βγει το Σετ από το Απόθεμα.'), true);
       return;
     }
     const nextPatch = {
@@ -95,7 +95,7 @@ export function useAssetEditActions(
     const barcodeChanged = patch.barcode && patch.barcode !== before.barcode;
     const normalizedBarcode = patch.barcode?.trim().toUpperCase();
     if (normalizedBarcode && tools.some(t => t.id !== id && t.barcode === normalizedBarcode)) {
-      notify(tr('Το barcode {0} χρησιμοποιείται ήδη.', normalizedBarcode));
+      notify(tr('Το barcode {0} χρησιμοποιείται ήδη.', normalizedBarcode), true);
       return;
     }
     const parentSet = before.setId ? sets.find(s => s.id === before.setId) : undefined;

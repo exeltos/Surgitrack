@@ -1149,6 +1149,10 @@ td {
 .confirm-dialog footer {
   background: var(--c-white);
 }
+/* The footer's white must follow the dialog's rounded bottom corners (16px less the 1px border). */
+.confirm-dialog > footer {
+  border-radius: 0 0 15px 15px;
+}
 .source-tabs {
   background: var(--c-white);
 }
