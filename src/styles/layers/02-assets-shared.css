@@ -1434,9 +1434,13 @@ td {
 .create-set-search input {
   font-size: 13px;
 }
+/* Head and rows share one fixed grid (an auto last column sized to the title in one, the pill in the other),
+   and the head keeps the scrollbar room the list keeps. */
 .create-set-list-head {
   display: grid;
-  grid-template-columns: 34px 140px minmax(0, 1fr) minmax(96px, auto);
+  grid-template-columns: 34px 140px minmax(0, 1fr) 200px;
+  overflow: hidden;
+  scrollbar-gutter: stable;
   gap: 12px;
   align-items: center;
   min-height: 38px;
@@ -1450,6 +1454,7 @@ td {
   text-transform: uppercase;
 }
 .create-set-tools-list {
+  scrollbar-gutter: stable;
   flex: 1;
   max-height: none;
   min-height: 0;
@@ -1457,9 +1462,16 @@ td {
   background: var(--c-white);
 }
 .create-set-tool-row {
-  grid-template-columns: 34px 140px minmax(0, 1fr) minmax(96px, auto);
+  grid-template-columns: 34px 140px minmax(0, 1fr) 200px;
   min-height: 66px;
   padding: 12px 18px;
+}
+.create-set-tool-row .source-pill {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  justify-self: start;
 }
 .create-set-tool-row b {
   font-size: 12px;
