@@ -41,7 +41,7 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
               />
               <div className="workflow-modal-title">
                 <span className="eyebrow">
-                  QUALITY GATE · {(en ? checkpointStage.labelEn : checkpointStage.labelEl).toUpperCase()}
+                  {tr('ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ')} · {(en ? checkpointStage.labelEn : checkpointStage.labelEl).toUpperCase()}
                 </span>
                 <h2>
                   {checkpointDraft.draft.asset.barcode} · {checkpointDraft.draft.asset.name}

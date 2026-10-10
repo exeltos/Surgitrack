@@ -65,6 +65,47 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
     togglePrepItem,
     undoAcceptedMissing,
   } = s;
+  // The prints: in the side column on a computer, in the header on a tablet (where the column moves below the list).
+  const printButtons = prepDraft && (
+    <>
+      {prepDraft.kind === 'SET' && (
+        <button
+          type="button"
+          onClick={() =>
+            printCompositionA4(
+              prepDraft.asset,
+              prepTools,
+              currentUser.name,
+              formatDateTime(),
+              issues
+                .filter(
+                  i =>
+                    i.status === 'OPEN' &&
+                    [prepDraft.asset.barcode, ...prepTools.map(t => t.barcode)].some(b => i.asset.startsWith(b)),
+                )
+                .map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
+              compositionOptions(prepDraft.asset.colorTapes),
+            )
+          }
+        >
+          <Printer size={16} /> {tr('Εκτύπωση')}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() =>
+          printBarcodeLabel(
+            prepDraft.asset,
+            prepDraft.kind,
+            prepDraft.kind === 'SET' ? prepTools.length : undefined,
+            systemSettings.label,
+          )
+        }
+      >
+        <Barcode size={16} /> {tr('Εκτύπωση barcode')}
+      </button>
+    </>
+  );
   return (
     <>
       {prepDraft && (
@@ -93,6 +134,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                 </h2>
                 <p>{tr('Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.')}</p>
               </div>
+              <div className="prep-print-actions prep-head-prints">{printButtons}</div>
             </div>
             <div className="prep-workspace-body">
               <aside className="prep-control-panel" onScroll={keepLeft}>
@@ -232,53 +274,14 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                     />
                   </label>
                 </section>
-                <section className="prep-card-section">
+                <section className="prep-card-section prep-side-prints">
                   <div className="prep-section-head">
                     <div>
                       <strong>{tr('Εκτυπώσεις')}</strong>
                       <span>{tr('Φύλλο σύνθεσης Α4 και barcode.')}</span>
                     </div>
                   </div>
-                  <div className="prep-print-actions">
-                    {prepDraft.kind === 'SET' && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          printCompositionA4(
-                            prepDraft.asset,
-                            prepTools,
-                            currentUser.name,
-                            formatDateTime(),
-                            issues
-                              .filter(
-                                i =>
-                                  i.status === 'OPEN' &&
-                                  [prepDraft.asset.barcode, ...prepTools.map(t => t.barcode)].some(b =>
-                                    i.asset.startsWith(b),
-                                  ),
-                              )
-                              .map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
-                            compositionOptions(prepDraft.asset.colorTapes),
-                          )
-                        }
-                      >
-                        <Printer size={16} /> {tr('Εκτύπωση')}
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        printBarcodeLabel(
-                          prepDraft.asset,
-                          prepDraft.kind,
-                          prepDraft.kind === 'SET' ? prepTools.length : undefined,
-                          systemSettings.label,
-                        )
-                      }
-                    >
-                      <Barcode size={16} /> {tr('Εκτύπωση barcode')}
-                    </button>
-                  </div>
+                  <div className="prep-print-actions">{printButtons}</div>
                 </section>
               </aside>
               <section className="prep-tools-panel">

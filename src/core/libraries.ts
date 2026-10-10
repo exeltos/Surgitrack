@@ -44,6 +44,10 @@ export const sterilizers: LibraryItem[] = [
   {id: 'aut1', code: 'AUT-01', el: 'Κλίβανος Ατμού 01', en: 'Steam Sterilizer 01'},
   {id: 'aut2', code: 'AUT-02', el: 'Κλίβανος Ατμού 02', en: 'Steam Sterilizer 02'},
 ];
+export const washers: LibraryItem[] = [
+  {id: 'wd1', code: 'WD-01', el: 'Πλυντήριο 1', en: 'Washer 1'},
+  {id: 'wd2', code: 'WD-02', el: 'Πλυντήριο 2', en: 'Washer 2'},
+];
 export const demoUsers = [
   {
     id: 'u-admin',

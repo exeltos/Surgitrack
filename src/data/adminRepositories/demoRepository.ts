@@ -5,6 +5,7 @@ import {
   suppliers,
   toolCategories,
   sterilizers,
+  washers,
   demoUsers,
 } from '../../core/libraries';
 import type {AdminUser, LibraryState} from '../../core/libraryTypes';
@@ -27,6 +28,7 @@ const createDemoInitialData = (): LibraryState => ({
   suppliers: cloneItems(suppliers),
   toolCategories: cloneItems(toolCategories),
   sterilizers: cloneItems(sterilizers),
+  washers: cloneItems(washers),
   colorTapes: colorTapeCatalog.map(tape => ({...tape, colors: [...tape.colors]})),
   organizations: [
     {

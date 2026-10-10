@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
-import {LibraryStoreProvider} from '../../core/LibraryStore';
+import {LibraryStoreProvider, useLibraries} from '../../core/LibraryStore';
 import {SurgiProvider, useSurgi} from '../SurgiStore';
 import type {AssetKind} from '../../types/domain';
 import type {ReleaseProcessLoadPayload} from '../types';
@@ -214,6 +214,31 @@ describe('sterilization flow', () => {
     ).toBeUndefined();
     expect(f.s().workflowCheckpoints.length).toBe(before);
     expect(f.state()).toBe('IN_PACKAGING');
+  });
+
+  it('washes through a washer load, and without a washer only where the hospital allows it', () => {
+    const {result} = renderHook(() => ({s: useSurgi(), l: useLibraries()}), {wrapper});
+    const asset = result.current.s.tools.find(
+      t => t.mode === 'STANDALONE' && t.state === 'IN_DEPARTMENT' && !t.maxUses,
+    )!;
+    const state = () => result.current.s.tools.find(t => t.id === asset.id)!.state;
+    act(() => void result.current.s.sendToSterilization('TOOL', asset.id));
+    act(() => void result.current.s.receiveAtSterilization('TOOL', asset.id, deliverer));
+    expect(state()).toBe('IN_WASHING');
+    const washWithoutWasher = () =>
+      act(
+        () =>
+          void result.current.s.completeWorkflowCheckpoint('TOOL', asset.id, {
+            stageId: 'WASHING',
+            checks: [true, true, true],
+          }),
+      );
+    washWithoutWasher();
+    expect(state()).toBe('IN_WASHING');
+    expect(result.current.s.toast?.warning).toBe(true);
+    act(() => result.current.l.updateSterilizationWorkflow({washingPolicy: {allowWithoutWasher: true}}));
+    washWithoutWasher();
+    expect(state()).toBe('IN_PREPARATION');
   });
 
   describe('single-asset cycle (outside a load)', () => {

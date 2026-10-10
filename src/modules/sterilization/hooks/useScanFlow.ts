@@ -43,8 +43,9 @@ export function useScanFlow(
       setQueue('INCOMING');
       openReceipt(found.kind, found);
     } else if (found.state === 'IN_WASHING') {
+      // Washing is a washer load (the item preselected), as sterilizing is a sterilizer load.
       setQueue('WASHING');
-      openCheckpoint(found.kind, found, 'WASHING');
+      p.openLoad('WASHING', [`${found.kind}:${found.id}`]);
     } else if (found.state === 'IN_PREPARATION') {
       setQueue('PREP');
       openPreparation(found.kind, found);

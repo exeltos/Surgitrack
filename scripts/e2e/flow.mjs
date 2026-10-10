@@ -316,8 +316,11 @@ async function main() {
 
     await step('Sterilization washes it', async () => {
       await queue('Καθαρισμός');
-      await queueRow().getByRole('button', {name: 'Έλεγχος σταδίου'}).click();
-      await passChecks();
+      // Washing goes through a washer load, with the row's item already picked.
+      await queueRow().getByRole('button', {name: 'Φόρτωση πλυντηρίου'}).click();
+      const modal = sterilization.page.locator('.load-modal');
+      await modal.getByPlaceholder('π.χ. 2026-0815-07').fill('W-E2E-1');
+      await modal.getByRole('button', {name: /^Ολοκλήρωση φορτίου/}).click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'IN_PREPARATION', 'state saved');
     });

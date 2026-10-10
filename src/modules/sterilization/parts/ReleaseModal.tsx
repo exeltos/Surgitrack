@@ -33,7 +33,7 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
                 {releaseDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ')}</span>
+                <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ')}</span>
                 <h2>
                   {releaseDraft.asset.barcode} · {releaseDraft.asset.name}
                 </h2>
@@ -111,7 +111,9 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
                   />
                   <span>
                     <strong>{tr('Συσκευασία στεγνή και ακέραιη')}</strong>
-                    <small>{tr('Δεν διαπιστώθηκε υγρασία, ρήξη ή άλλη απόκλιση του sterile barrier.')}</small>
+                    <small>
+                      {tr('Δεν διαπιστώθηκε υγρασία, ρήξη ή άλλη απόκλιση της αποστειρωμένης συσκευασίας.')}
+                    </small>
                   </span>
                 </label>
                 <label className="release-biological">

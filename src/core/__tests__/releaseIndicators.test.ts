@@ -47,3 +47,23 @@ describe('load release is a required stage', () => {
     expect(upgradeWorkflowLabels(defaultSterilizationWorkflow)).toBe(defaultSterilizationWorkflow);
   });
 });
+
+describe('stage descriptions in their old default wording', () => {
+  it("take the current default, and a hospital's own wording stays", async () => {
+    const {defaultSterilizationWorkflow, upgradeWorkflowLabels} = await import('../workflow');
+    const saved = {
+      ...defaultSterilizationWorkflow,
+      stages: defaultSterilizationWorkflow.stages.map(stage =>
+        stage.id === 'PACKAGING'
+          ? {...stage, descriptionEl: 'Έλεγχος περιέκτη / sterile barrier, σήμανσης και δείκτη.'}
+          : stage.id === 'DELIVERY'
+            ? {...stage, descriptionEl: 'Δική μας περιγραφή'}
+            : stage,
+      ),
+    };
+    const upgraded = upgradeWorkflowLabels(saved);
+    const description = (id: string) => upgraded.stages.find(stage => stage.id === id)?.descriptionEl;
+    expect(description('PACKAGING')).toBe('Έλεγχος περιέκτη / αποστειρωμένης συσκευασίας, σήμανσης και δείκτη.');
+    expect(description('DELIVERY')).toBe('Δική μας περιγραφή');
+  });
+});

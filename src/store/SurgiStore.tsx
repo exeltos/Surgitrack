@@ -3,6 +3,7 @@ import {type SurgiDataMode} from '../data/repositories';
 import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
 import type {SurgiStoreValue} from './types';
 import {useSurgiStore} from './slices/useSurgiStore';
+import {useLibraries} from '../core/LibraryStore';
 
 export type {
   DeliveryPayload,
@@ -116,6 +117,8 @@ export function SurgiProvider({
     updateTool,
     workflowCheckpoints,
   } = useSurgiStore({dataMode, cloud});
+  // Studio settings the actions read (workflow stages and policies, permissions): a change must reach them.
+  const {sterilizationWorkflow, rolePermissions, systemSettings} = useLibraries();
 
   const activeTools = useMemo(() => tools.filter(t => t.state !== 'RETIRED'), [tools]);
   const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
@@ -230,6 +233,9 @@ export function SurgiProvider({
       role,
       sessionUser,
       cloudOrganizationId,
+      sterilizationWorkflow,
+      rolePermissions,
+      systemSettings,
     ],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

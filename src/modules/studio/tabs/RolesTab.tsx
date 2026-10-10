@@ -114,7 +114,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                             'Department role is always scoped to its assigned department and cannot gain CSSD or Studio administration permissions.',
                           )
                         : L(
-                            'Τα κρίσιμα δικαιώματα chain of custody παραμένουν κλειδωμένα. Τα υπόλοιπα μπορούν να προσαρμοστούν στην πολιτική της μονάδας.',
+                            'Τα κρίσιμα δικαιώματα της αλυσίδας φύλαξης παραμένουν κλειδωμένα. Τα υπόλοιπα μπορούν να προσαρμοστούν στην πολιτική της μονάδας.',
                             'Critical chain-of-custody permissions remain locked. Other permissions can follow facility policy.',
                           )}
                 </span>

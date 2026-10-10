@@ -461,6 +461,11 @@ export function useLoadActions(
     if (!a) return;
     const stage = sterilizationWorkflow.stages.find(s => s.id === payload.stageId);
     if (!stage) return;
+    // Washing goes through a washer load; on its own only where the hospital allows it (Studio).
+    if (payload.stageId === 'WASHING' && !sterilizationWorkflow.washingPolicy?.allowWithoutWasher) {
+      notify(tr('{0}: ο καθαρισμός καταγράφεται με φόρτωση πλυντηρίου.', a.barcode), true);
+      return;
+    }
     const requiredCount = stage.checksEl.length;
     if (payload.checks.length < requiredCount || payload.checks.slice(0, requiredCount).some(value => !value)) return;
     const record: WorkflowCheckpointRecord = {

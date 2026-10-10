@@ -28,7 +28,6 @@ import {compositionHtml} from '../sterilization/printUtils';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
-import {EXPIRY_MARK, STERILE_MARK} from '../../core/sterileSymbols';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import {formatDateTime, parseDisplayDate} from '../../core/displayDate';
 
@@ -445,8 +444,8 @@ export default function ReportsPage() {
           {key: 'department', label: tr('Τμήμα')},
           {key: 'stateLabel', label: tr('Θέση')},
           {key: 'shelfLife', label: tr('Διάρκεια')},
-          {key: 'sterilized', label: `${STERILE_MARK} · ${tr('Αποστείρωση')}`},
-          {key: 'until', label: `${EXPIRY_MARK} ${tr('Λήγει')}`},
+          {key: 'sterilized', label: tr('Αποστείρωση')},
+          {key: 'until', label: tr('Λήξη')},
           {key: 'left', label: tr('Υπόλοιπο')},
         ],
         rows: rows as Row[],

@@ -1387,7 +1387,7 @@ td {
   padding-right: 42px;
   margin-bottom: 18px;
 }
-.receipt-card-head > div:last-child > span {
+.receipt-card-head > div:not(.prep-head-prints) > span {
   font-size: 11px;
   letter-spacing: 0.11em;
   font-weight: 800;

@@ -8,7 +8,7 @@ import {deviceNote} from '../sterilizationTypes';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function LoadModal({s}: {s: SterilizationPageState}) {
-  const {sterilizers} = useLibraries();
+  const {sterilizers, washers} = useLibraries();
   const {
     addBarcodeToLoad,
     closeLoad,
@@ -34,6 +34,8 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
     setLoadSelected,
     toggleLoadAsset,
   } = s;
+  // The equipment comes from the hospital's list (Studio › Libraries), typed only when the list is empty.
+  const equipmentList = loadModal === 'WASHING' ? washers : sterilizers;
   return (
     <>
       {loadModal && (
@@ -50,7 +52,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 <span className="eyebrow">
                   {loadModal === 'WASHING' ? tr('ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ') : tr('ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ')}
                 </span>
-                <h2>{loadModal === 'WASHING' ? tr('Δημιουργία ενιαίου φορτίου') : tr('Φόρτωση κλιβάνου')}</h2>
+                <h2>{loadModal === 'WASHING' ? tr('Φόρτωση πλυντηρίου') : tr('Φόρτωση κλιβάνου')}</h2>
                 <p>
                   {tr(
                     'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.',
@@ -74,14 +76,14 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               <div className="cycle-clean-fields">
                 <label>
                   {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}
-                  {loadModal === 'STERILIZATION' && sterilizers.length ? (
+                  {equipmentList.length ? (
                     <select value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)}>
-                      {sterilizers.map(item => (
+                      {equipmentList.map(item => (
                         <option key={item.id} value={item.el}>
                           {trData(item.el)}
                         </option>
                       ))}
-                      {!sterilizers.some(item => item.el === loadEquipment) && (
+                      {!equipmentList.some(item => item.el === loadEquipment) && (
                         <option value={loadEquipment}>{trData(loadEquipment)}</option>
                       )}
                     </select>

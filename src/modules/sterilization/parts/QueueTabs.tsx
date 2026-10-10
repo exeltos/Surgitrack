@@ -56,7 +56,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <Box />
           <span>{tr('Συσκευασία')}</span>
           <strong>{packaging.length}</strong>
-          <small>{tr('Barrier / σήμανση')}</small>
+          <small>{tr('Συσκευασία / σήμανση')}</small>
         </button>
       )}
       <button className={queue === 'PROCESS' ? 'active' : ''} onClick={() => setQueue('PROCESS')}>

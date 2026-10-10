@@ -84,7 +84,7 @@ export type ConfigurationAuditEvent = {
   reason?: string;
 };
 export type LibraryKey =
-  'departments' | 'specialties' | 'manufacturers' | 'suppliers' | 'toolCategories' | 'sterilizers';
+  'departments' | 'specialties' | 'manufacturers' | 'suppliers' | 'toolCategories' | 'sterilizers' | 'washers';
 export type LibraryState = {
   departments: LibraryItem[];
   specialties: LibraryItem[];
@@ -92,6 +92,8 @@ export type LibraryState = {
   suppliers: LibraryItem[];
   toolCategories: LibraryItem[];
   sterilizers: LibraryItem[];
+  /** Washer-disinfectors, picked in the washer load like sterilizers in the sterilizer load. */
+  washers: LibraryItem[];
   /** The hospital's color tape palette for instrument and Set markers. */
   colorTapes: ColorTape[];
   organizations: Organization[];
