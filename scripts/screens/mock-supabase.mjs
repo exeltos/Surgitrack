@@ -163,11 +163,12 @@ export function createDatabase(seed) {
         name: 'Γενικό Νοσοκομείο Δοκιμών',
         code: 'GN-TEST',
         active: true,
-        is_demo: false,
-        evaluation: false,
+        // SCREENS_EVALUATION=1: the hospital is an evaluation Demo (Demo bar, first steps, ratings).
+        is_demo: process.env.SCREENS_EVALUATION === '1',
+        evaluation: process.env.SCREENS_EVALUATION === '1',
         demo_enabled: false,
         plan: 'STANDARD',
-        trial_ends_at: null,
+        trial_ends_at: process.env.SCREENS_EVALUATION === '1' ? iso(12) : null,
         created_at: iso(-200),
       },
       {
