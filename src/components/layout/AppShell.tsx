@@ -682,6 +682,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         {evaluationDemo && (
           <DemoBar
             role={role}
+            savedAt={syncInfo.status === 'saved' ? syncInfo.lastSyncAt : undefined}
             onShowMe={to => {
               navigate(to);
               setHelpOpen(true);

@@ -198,7 +198,10 @@ describe('Studio: evaluation Demos', () => {
   it('shows what the Demo thinks of SurgiTrack and handles its requests', async () => {
     service.loadDemoAccounts.mockResolvedValue([
       demo({
-        ratings: [{topic: 'sterilization', average: 4.5, count: 2}],
+        ratings: [
+          {topic: 'sterilization', average: 4.5, count: 2, comments: []},
+          {topic: 'step_receive', average: 3, count: 1, comments: ['Θέλω σάρωση από κινητό']},
+        ],
         evaluations: [{name: 'ΜΑΡΙΑ ΠΑΠΠΑ', nps: 9, ease: 4, fit: 5, missing: 'Σύνδεση με ERP', sets: 400}],
         requests: [
           {
@@ -221,6 +224,9 @@ describe('Studio: evaluation Demos', () => {
     expect(screen.getByText('Καλέστε με')).toBeInTheDocument();
     expect(screen.getByText('Ροή Αποστείρωσης')).toBeInTheDocument();
     expect(screen.getByText('4,5 ★')).toBeInTheDocument();
+    // A step's rating, under its part of the app, with its comment.
+    expect(screen.getByText('Ροή Αποστείρωσης · Παραλαβή από τμήμα')).toBeInTheDocument();
+    expect(screen.getByText('Θέλω σάρωση από κινητό')).toBeInTheDocument();
     expect(screen.getByText('Σύσταση 9/10')).toHaveClass('promoter');
     expect(screen.getByText('Λείπει: Σύνδεση με ERP')).toBeInTheDocument();
     expect(screen.getByText('Σετ 400 · Αίθουσες —')).toBeInTheDocument();

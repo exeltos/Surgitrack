@@ -53,7 +53,8 @@ export type DemoAccount = {
   /** The prospect's own first-steps progress. */
   evaluatorGuide?: {done: number; total: number};
   /** Average 1–5 rating of each part of the app, over everyone who rated it. */
-  ratings: Array<{topic: string; average: number; count: number}>;
+  /** Per part of the app or per guide step (topic `step_<key>`), with the comments left with them. */
+  ratings: Array<{topic: string; average: number; count: number; comments: string[]}>;
   /** Final evaluations, one per person who sent one. */
   evaluations: Array<{
     name: string;

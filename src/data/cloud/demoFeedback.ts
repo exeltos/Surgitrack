@@ -21,14 +21,25 @@ export const loadMyFeedback = async (organizationId: string, userId: string) => 
   return new Map(((data || []) as FeedbackRow[]).map(row => [row.topic, row]));
 };
 
-/** A 1–5 rating of one part of the app (changeable). */
-export const rateModule = async (organizationId: string, userId: string, topic: string, rating: number) => {
-  const {error} = await supabase
-    .from('demo_feedback')
-    .upsert(
-      {organization_id: organizationId, user_id: userId, topic, rating, updated_at: new Date().toISOString()},
-      {onConflict: 'organization_id,user_id,topic'},
-    );
+/** A 1–5 rating of one part of the app or one guide step, with an optional comment (changeable). */
+export const rateModule = async (
+  organizationId: string,
+  userId: string,
+  topic: string,
+  rating: number,
+  comment?: string,
+) => {
+  const {error} = await supabase.from('demo_feedback').upsert(
+    {
+      organization_id: organizationId,
+      user_id: userId,
+      topic,
+      rating,
+      ...(comment === undefined ? {} : {comment: comment.trim().slice(0, 2000) || null}),
+      updated_at: new Date().toISOString(),
+    },
+    {onConflict: 'organization_id,user_id,topic'},
+  );
   if (error) throw error;
 };
 

@@ -3526,25 +3526,6 @@
 .star-rating button:hover:not(:disabled) {
   background: var(--c-gray-95-9);
 }
-.demo-guide-rate {
-  display: grid;
-  gap: 4px;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--c-violet-95);
-}
-.demo-guide-rate strong {
-  color: var(--c-violet-20);
-  font-size: 13px;
-}
-.demo-guide-rate > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--c-violet-30-2);
-  font-size: 12.5px;
-}
 .demo-guide-final {
   display: flex;
   align-items: center;
@@ -4722,4 +4703,80 @@ a.auth-primary {
 html body .report-cell-warn {
   color: var(--c-red-40);
   font-weight: 700;
+}
+
+/* Demo: the card that asks how a guide step was, as soon as it is done (bottom right, never covering the screen). */
+.step-rating-card {
+  position: fixed;
+  z-index: 61;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 8px;
+  width: min(340px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid var(--c-violet-85-2);
+  border-radius: 14px;
+  background: var(--c-white);
+  box-shadow: 0 18px 40px rgba(31, 22, 82, 0.18);
+}
+.step-rating-card header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--c-green-40-5);
+}
+.step-rating-card header strong {
+  flex: 1;
+  color: var(--c-violet-20);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.step-rating-card header button {
+  border: 0;
+  background: none;
+  color: var(--st-muted);
+  cursor: pointer;
+}
+.step-rating-card p {
+  margin: 0;
+  color: var(--c-violet-30-2);
+  font-size: 13px;
+}
+.step-rating-card textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px 10px;
+  border: 1px solid var(--c-violet-85-2);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+}
+.step-rating-card footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.step-rating-card footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--c-violet-85-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-violet-20);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.step-rating-card footer button.primary {
+  border-color: var(--c-violet-20);
+  background: var(--c-violet-20);
+  color: var(--c-white);
+}
+.step-rating-card footer button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }

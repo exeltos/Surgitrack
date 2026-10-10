@@ -91,21 +91,66 @@ describe('Demo bar', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('rates a part of the app once one of its steps is done', async () => {
+  it('rates each step done, in the guide', async () => {
     const user = userEvent.setup();
     render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
-    const stars = await screen.findByRole('radiogroup', {name: 'Ροή Αποστείρωσης'});
-    expect(screen.queryByRole('radiogroup', {name: 'Αναφορές'})).not.toBeInTheDocument();
+    const stars = await screen.findByRole('radiogroup', {name: 'Παραλαβή από τμήμα'});
+    // A step not done yet has "Show me" instead of stars.
+    expect(screen.queryByRole('radiogroup', {name: 'Αποδέσμευση'})).not.toBeInTheDocument();
     await user.click(within(stars).getByRole('radio', {name: '4/5'}));
-    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'sterilization', 4);
+    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'step_receive', 4, undefined);
     expect(within(stars).getByRole('radio', {name: '4/5'})).toBeChecked();
+  });
+
+  it('asks how a step was as soon as it is done, with a comment, and «Later» leaves it', async () => {
+    localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    service.findDoneRecordSteps.mockResolvedValue([]);
+    const user = userEvent.setup();
+    const bar = (savedAt?: number) =>
+      wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} savedAt={savedAt} />);
+    const {rerender} = render(bar());
+    await waitFor(() => expect(service.loadGuideDone).toHaveBeenCalled());
+    // Steps already done on opening the app bring no card, and there is no «Evaluate» yet.
+    expect(screen.queryByRole('complementary', {name: 'Αξιολόγηση βήματος'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Αξιολόγηση'})).not.toBeInTheDocument();
+    // The person records a preparation; once the app has saved it, the step is found done.
+    service.findDoneRecordSteps.mockResolvedValue(['prepare']);
+    rerender(bar(Date.now()));
+    const card = await screen.findByRole('complementary', {name: 'Αξιολόγηση βήματος'}, {timeout: 3000});
+    expect(within(card).getByText('Ολοκληρώσατε: Σύνθεση και έλεγχος')).toBeInTheDocument();
+    expect(within(card).getByRole('button', {name: 'Αποστολή'})).toBeDisabled();
+    await user.click(within(card).getByRole('radio', {name: '5/5'}));
+    await user.type(within(card).getByRole('textbox', {name: 'Σχόλιο'}), 'Πολύ καθαρό');
+    await user.click(within(card).getByRole('button', {name: 'Αποστολή'}));
+    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'step_prepare', 5, 'Πολύ καθαρό');
+    expect(screen.queryByRole('complementary', {name: 'Αξιολόγηση βήματος'})).not.toBeInTheDocument();
+  });
+
+  it('after the last step, asks for the final evaluation', async () => {
+    localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    service.loadGuideDone.mockResolvedValue(new Set(['receive', 'prepare', 'cycle', 'release', 'trace', 'reports']));
+    service.findDoneRecordSteps.mockResolvedValue([]);
+    const user = userEvent.setup();
+    const bar = (savedAt?: number) =>
+      wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} savedAt={savedAt} />);
+    const {rerender} = render(bar());
+    await waitFor(() => expect(service.loadGuideDone).toHaveBeenCalled());
+    service.findDoneRecordSteps.mockResolvedValue(['deliver']);
+    rerender(bar(Date.now()));
+    const card = await screen.findByRole('complementary', {name: 'Αξιολόγηση βήματος'}, {timeout: 3000});
+    await user.click(within(card).getByRole('button', {name: 'Αργότερα'}));
+    const final = await screen.findByRole('complementary', {name: 'Τελική αξιολόγηση'});
+    await user.click(within(final).getByRole('button', {name: 'Κάντε την τελική αξιολόγηση'}));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
   it('sends the final evaluation once ease, fit and NPS are answered', async () => {
     localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    // Most of the guide done: «Evaluate» appears at the top.
+    service.loadGuideDone.mockResolvedValue(new Set(['receive', 'prepare', 'cycle', 'release', 'deliver', 'trace']));
     const user = userEvent.setup();
     render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
-    await user.click(screen.getByRole('button', {name: 'Αξιολόγηση'}));
+    await user.click(await screen.findByRole('button', {name: 'Αξιολόγηση'}));
     const dialog = screen.getByRole('dialog', {name: 'Αξιολόγηση'});
     const send = within(dialog).getByRole('button', {name: 'Αποστολή αξιολόγησης'});
     expect(send).toBeDisabled();

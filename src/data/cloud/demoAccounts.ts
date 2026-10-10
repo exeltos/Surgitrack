@@ -118,8 +118,12 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
   const feedbackFor = (organizationId: string, members: Person[]) => {
     const mine = feedbackRows.filter(f => f.organization_id === organizationId);
     const byTopic = new Map<string, number[]>();
+    const commentsOf = new Map<string, string[]>();
     for (const f of mine)
-      if (f.topic !== 'final' && f.rating) byTopic.set(f.topic, [...(byTopic.get(f.topic) || []), f.rating]);
+      if (f.topic !== 'final' && f.rating) {
+        byTopic.set(f.topic, [...(byTopic.get(f.topic) || []), f.rating]);
+        if (f.comment?.trim()) commentsOf.set(f.topic, [...(commentsOf.get(f.topic) || []), f.comment.trim()]);
+      }
     const num = (v: unknown) => (typeof v === 'number' ? v : undefined);
     const text = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
     return {
@@ -127,6 +131,7 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
         topic,
         average: list.reduce((a, b) => a + b, 0) / list.length,
         count: list.length,
+        comments: commentsOf.get(topic) || [],
       })),
       evaluations: mine
         .filter(f => f.topic === 'final')
