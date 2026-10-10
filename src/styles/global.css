@@ -10040,3 +10040,40 @@ html body .screen-guide-off {
     display: none;
   }
 }
+
+/* Visible focus (WCAG 2.4.7). Whatever has keyboard focus shows one ring in --focus-ring. Fields that drop the
+   browser's own outline get it on the box that draws them: the search boxes (the input inside is borderless)
+   through :focus-within, the bordered fields on themselves. */
+:where(
+  a,
+  button,
+  summary,
+  [role='button'],
+  [role='tab'],
+  [role='menuitem'],
+  [tabindex]:not([tabindex='-1'])
+):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.color-search:focus-within,
+.asset-import-tools-search:focus-within,
+.name-check-search:focus-within,
+.replacements-search:focus-within,
+.trace-search:focus-within,
+.ster-scan-input:focus-within,
+.load-barcode-entry:focus-within,
+.composer-search:focus-within,
+.asset-filter-search:focus-within,
+.department-search:focus-within,
+.studio-search:focus-within,
+.manual-search:focus-within,
+.studio-setting-input:focus-within,
+.asset-manage-target:focus-within,
+.asset-filter-panel select:focus-visible,
+.tool-issue-card select:focus-visible,
+.tool-issue-card textarea:focus-visible,
+.prep-note-field textarea:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -1px;
+}
