@@ -15,7 +15,8 @@ import {
   type DemoStage,
 } from '../../../core/demoAccounts';
 import {trialEndDate, trialEndOn} from '../../../core/trial';
-import {MODULES, npsGroup} from '../../../core/demoFeedback';
+import {MODULES, moduleOfStep, npsGroup, stepOfTopic} from '../../../core/demoFeedback';
+import {guideStep} from '../../../core/demoGuide';
 import NewDemoDialog from './NewDemoDialog';
 import ConvertDemoDialog from './ConvertDemoDialog';
 import {useDemoAccounts} from './useDemoAccounts';
@@ -414,9 +415,16 @@ function DemoCard({
   );
 }
 
-const moduleTitle = (key: string) => {
-  const m = MODULES.find(x => x.key === key);
-  return m ? tr(m.title.el) : key;
+/** A rating's subject: a part of the app, or a guide step under its part («Ροή Αποστείρωσης · Παραλαβή»). */
+const moduleTitle = (topic: string) => {
+  const stepKey = stepOfTopic(topic);
+  if (stepKey) {
+    const step = guideStep(stepKey);
+    const part = moduleOfStep(stepKey);
+    return [part && tr(part.title.el), step ? tr(step.title.el) : stepKey].filter(Boolean).join(' · ');
+  }
+  const m = MODULES.find(x => x.key === topic);
+  return m ? tr(m.title.el) : topic;
 };
 const stars = (n: number) => `${n.toFixed(1).replace('.', ',')} ★`;
 
@@ -462,13 +470,19 @@ function DemoFeedback({
         <section aria-label={tr('Βαθμολογίες')}>
           <h4>{tr('Βαθμολογίες')}</h4>
           <ul className="evaluation-demo-ratings">
-            {demo.ratings.map(r => (
-              <li key={r.topic}>
-                <span>{moduleTitle(r.topic)}</span>
-                <b>{stars(r.average)}</b>
-                <small>({r.count})</small>
-              </li>
-            ))}
+            {/* By part of the app, its steps together. */}
+            {[...demo.ratings]
+              .sort((a, b) => moduleTitle(a.topic).localeCompare(moduleTitle(b.topic), 'el'))
+              .map(r => (
+                <li key={r.topic}>
+                  <span>{moduleTitle(r.topic)}</span>
+                  <b>{stars(r.average)}</b>
+                  <small>({r.count})</small>
+                  {r.comments.map((c, i) => (
+                    <q key={i}>{c}</q>
+                  ))}
+                </li>
+              ))}
           </ul>
         </section>
       )}

@@ -30,6 +30,13 @@ export const modulesToRate = (steps: GuideStep[], done: ReadonlySet<string>) => 
 
 export const FINAL_TOPIC = 'final';
 
+/** A guide step's own rating, asked for as soon as the step is done (topic `step_<key>`). */
+export const stepTopic = (key: string) => `step_${key}`;
+/** The step a rating topic is about, if it is a step's. */
+export const stepOfTopic = (topic: string) => (topic.startsWith('step_') ? topic.slice(5) : undefined);
+/** The part of the app a step belongs to. */
+export const moduleOfStep = (key: string) => MODULES.find(m => m.steps.includes(key));
+
 export type FinalAnswers = {ease?: number; fit?: number; missing?: string; sets?: number; theatres?: number};
 
 /** The final evaluation is offered when most of the guide is done, or in the Demo's last days. */

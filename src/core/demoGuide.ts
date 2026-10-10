@@ -186,6 +186,10 @@ export const guideSteps = (role: UserRole): GuideStep[] =>
         ? DEPARTMENT
         : VIEWER;
 
+/** A step by its key, whichever role's guide it is in. */
+export const guideStep = (key: string): GuideStep | undefined =>
+  [...STERILIZATION, INVITE, ...DEPARTMENT, ...VIEWER].find(s => s.key === key);
+
 /** The visit steps a screen completes (a path and anything under it). */
 export const visitStepsFor = (steps: GuideStep[], pathname: string) =>
   steps.filter(s => s.check.kind === 'visit' && (pathname === s.to || pathname.startsWith(`${s.to}/`)));
