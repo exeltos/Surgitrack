@@ -9115,23 +9115,21 @@ html body .idle-lock-password button[aria-pressed='true'] {
   color: var(--c-cyan-35);
 }
 
-/* Reports: the results fit the width on tablets and computers (no sideways scrolling). Texts wrap
-   between words; when that is not enough (useFitWidth), cells get tighter and long words may break.
-   Phones keep sideways scrolling, where a dozen columns cannot fit. */
+/* Reports: texts wrap between words only, never inside a word («Κύκλο-ς», «09/10/202-6»); when a
+   table still does not fit (useFitWidth), cells get tighter and the results scroll sideways. */
 @media (min-width: 761px) {
   .reports-result-body {
-    overflow-x: hidden;
+    overflow-x: auto;
   }
   .reports-table th,
   .reports-table td {
     white-space: normal;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
     padding-left: 8px;
     padding-right: 8px;
   }
   .reports-result-body.fit-tight .reports-table th,
   .reports-result-body.fit-tight .reports-table td {
-    overflow-wrap: anywhere;
     padding-left: 6px;
     padding-right: 6px;
   }
