@@ -15,11 +15,21 @@ import {
   Trash2,
   CalendarClock,
   ScanSearch,
+  Scissors,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
 import type {Permission} from '../core/permissions';
 import {hasPermission} from '../core/permissions';
+
+/** The menu's sections, in the order of how often they are used: the day's work first, administration last. */
+export type NavigationGroup = 'WORK' | 'EQUIPMENT' | 'INSIGHT' | 'ADMIN';
+export const navigationGroupLabel: Record<NavigationGroup, [string, string]> = {
+  WORK: ['Καθημερινή εργασία', 'Daily work'],
+  EQUIPMENT: ['Εξοπλισμός', 'Equipment'],
+  INSIGHT: ['Ανάλυση', 'Insight'],
+  ADMIN: ['Διαχείριση', 'Administration'],
+};
 
 export type NavigationItem = {
   to: string;
@@ -27,23 +37,30 @@ export type NavigationItem = {
   icon: LucideIcon;
   exactSearch?: string;
   permission: Permission;
+  group?: NavigationGroup;
 };
 
 const assetNavigation: NavigationItem[] = [
-  {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace'},
-  {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace'},
-  {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'asset.registry.view'},
-  {to: '/tools', label: 'Εργαλεία', icon: Wrench, exactSearch: '', permission: 'asset.registry.view'},
-  {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view'},
-  {to: '/standalone-tools', label: 'Μεμονωμένα', icon: Wrench, permission: 'asset.registry.view'},
-  {to: '/stock', label: 'Απόθεμα εργαλείων', icon: Warehouse, permission: 'stock.manage'},
-  {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
-  {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view'},
-  {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},
-  {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view'},
+  {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace', group: 'WORK'},
+  {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view', group: 'WORK'},
+  {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'asset.registry.view', group: 'WORK'},
+  {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view', group: 'EQUIPMENT'},
+  {
+    to: '/tools',
+    label: 'Εργαλεία',
+    icon: Wrench,
+    exactSearch: '',
+    permission: 'asset.registry.view',
+    group: 'EQUIPMENT',
+  },
+  {to: '/standalone-tools', label: 'Μεμονωμένα', icon: Scissors, permission: 'asset.registry.view', group: 'EQUIPMENT'},
+  {to: '/stock', label: 'Απόθεμα εργαλείων', icon: Warehouse, permission: 'stock.manage', group: 'EQUIPMENT'},
+  {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace', group: 'EQUIPMENT'},
+  {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view', group: 'INSIGHT'},
+  {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view', group: 'INSIGHT'},
+  {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view', group: 'INSIGHT'},
   {to: '/bin', label: 'Κάδος', icon: Trash2, permission: 'asset.delete'},
 ];
-
 export const navigationFor = (role: UserRole, can?: (permission: Permission) => boolean): NavigationItem[] => {
   const allowed = (permission: Permission) => (can ? can(permission) : hasPermission(role, permission));
   const overview: NavigationItem = {
@@ -51,6 +68,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     label: 'Επισκόπηση',
     icon: LayoutDashboard,
     permission: 'overview.view',
+    group: 'WORK',
   };
   if (role === 'STERILIZATION') return [overview, ...assetNavigation].filter(item => allowed(item.permission));
   if (role === 'DEPARTMENT') {
@@ -64,9 +82,9 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
   const adminNavigation: NavigationItem[] = [
     overview,
     ...assetNavigation,
-    {to: '/hospital', label: 'Χρήστες & Τμήματα', icon: Building2, permission: 'studio.manage'},
-    {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage'},
-    {to: '/studio', label: 'SurgiTrack Studio', icon: Settings, permission: 'studio.manage'},
+    {to: '/hospital', label: 'Χρήστες & Τμήματα', icon: Building2, permission: 'studio.manage', group: 'ADMIN'},
+    {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'ADMIN'},
+    {to: '/studio', label: 'SurgiTrack Studio', icon: Settings, permission: 'studio.manage', group: 'ADMIN'},
   ];
   return adminNavigation.filter(item => allowed(item.permission));
 };

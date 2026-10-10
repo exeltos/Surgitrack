@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {ShieldCheck} from 'lucide-react';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {supabase} from '../../lib/supabase';
@@ -19,6 +20,7 @@ import NoticesTab from './tabs/NoticesTab';
 
 export default function StudioPage() {
   const s = useStudioPage();
+  const [rolesView, setRolesView] = useState<'PERMISSIONS' | 'GUIDE'>('PERMISSIONS');
   const {
     L,
     changePlan,
@@ -125,8 +127,28 @@ export default function StudioPage() {
             byName={currentUser.name}
           />
         )}
-        {tab === 'GUIDE' && <RolesGuide />}
-        <RolesTab s={s} />
+        {tab === 'ROLES' && (
+          // Roles and permissions in one tab: who does what, or each role's permissions to change.
+          <div className="studio-roles-switch" role="group" aria-label={L('Προβολή', 'View')}>
+            <button
+              type="button"
+              aria-pressed={rolesView === 'PERMISSIONS'}
+              className={rolesView === 'PERMISSIONS' ? 'active' : ''}
+              onClick={() => setRolesView('PERMISSIONS')}
+            >
+              {L('Δικαιώματα ανά ρόλο', 'Permissions by role')}
+            </button>
+            <button
+              type="button"
+              aria-pressed={rolesView === 'GUIDE'}
+              className={rolesView === 'GUIDE' ? 'active' : ''}
+              onClick={() => setRolesView('GUIDE')}
+            >
+              {L('Ποιος κάνει τι', 'Who does what')}
+            </button>
+          </div>
+        )}
+        {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide /> : <RolesTab s={s} />}
         <SystemTab s={s} />
         <ErrorsTab s={s} />
         <NoticesTab s={s} />

@@ -10337,3 +10337,94 @@ html body .studio-notice-actions {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Menu sections (the day's work, equipment, insight, administration): a short title over each. */
+html body .sidebar .nav-group {
+  display: block;
+  margin: 10px 11px 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 45%);
+}
+html body .sidebar .nav-group.first {
+  margin-top: 0;
+}
+/* Short screens: a little space between sections instead of a title, so the whole menu still fits. */
+@media (min-width: 901px) and (max-height: 820px) {
+  html body .sidebar .nav-group {
+    height: 0;
+    margin: 6px 11px 4px;
+    overflow: hidden;
+    border-top: 1px solid rgb(255 255 255 / 10%);
+  }
+  html body .sidebar .nav-group.first {
+    display: none;
+  }
+}
+
+/* Studio tabs in two titled rows for the platform owner: the platform's own work, then the set-up. */
+html body .studio-tab-rows {
+  display: grid;
+  gap: 6px;
+}
+html body .studio-tab-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+html body .studio-tab-group {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .studio-tab-row .studio-tabs {
+  justify-content: flex-start;
+}
+html body .studio-tab-row .studio-tabs button {
+  flex: 0 0 auto;
+  padding: 7px 14px !important;
+}
+/* Roles & permissions: one tab, two views. */
+html body .studio-roles-switch {
+  display: inline-flex;
+  justify-self: start;
+  gap: 2px;
+  margin-bottom: 10px;
+  padding: 3px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .studio-roles-switch button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--c-cyan-50);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .studio-roles-switch button.active {
+  background: var(--c-gray-95-3);
+  color: var(--c-cyan-45);
+  box-shadow: inset 0 0 0 1px var(--c-teal-90-2);
+}
+@media (max-width: 760px) {
+  html body .studio-tab-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+/* In the two rows there is room for the icons on a computer screen. */
+@media (min-width: 1280px) {
+  html body .studio-tab-row .studio-tabs button svg {
+    display: inline-block;
+  }
+}

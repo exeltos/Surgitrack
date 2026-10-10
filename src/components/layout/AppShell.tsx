@@ -23,7 +23,7 @@ import {
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, formatExpiry, sterileExpiryList, type ExpiryEntry} from '../../core/sterileExpiry';
-import {navSectionFor, navigationFor} from '../../config/navigation';
+import {navSectionFor, navigationFor, navigationGroupLabel} from '../../config/navigation';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
@@ -286,7 +286,10 @@ export default function AppShell({
       <nav>
         {navigation
           .filter(item => item.to !== '/bin')
-          .map(item => {
+          .map((item, index, shown) => {
+            // A short title where a new section of the menu starts (only when the menu has more than one).
+            const sections = new Set(shown.map(entry => entry.group).filter(Boolean)).size;
+            const startsSection = sections > 1 && item.group && item.group !== shown[index - 1]?.group;
             const [path, query = ''] = item.to.split('?');
             const active =
               (location.pathname === path &&
@@ -294,7 +297,7 @@ export default function AppShell({
                   ? location.search === ''
                   : location.search.slice(1) === (item.exactSearch ?? query))) ||
               (query === '' && navSectionFor(location.pathname, toolModeOf) === path);
-            return (
+            const link = (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -306,6 +309,14 @@ export default function AppShell({
                 <span>{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
                 {item.to === '/hospital' && accessRequests > 0 && <em className="nav-badge">{accessRequests}</em>}
               </NavLink>
+            );
+            if (!startsSection || !item.group) return link;
+            const [el, en] = navigationGroupLabel[item.group];
+            return (
+              <Fragment key={item.to}>
+                <span className={index ? 'nav-group' : 'nav-group first'}>{lang === 'en' ? en : el}</span>
+                {link}
+              </Fragment>
             );
           })}
       </nav>
