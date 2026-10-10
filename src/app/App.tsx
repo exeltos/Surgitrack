@@ -175,7 +175,7 @@ export default function App() {
     window.location.reload();
   };
   // Asked in the app, after what is still unsaved has had a chance to reach the server (see useSignOutGuard).
-  const logout = () => guardSignOut(() => void signOut());
+  const logout = (direct?: boolean) => guardSignOut(() => void signOut(), {direct});
   const signOut = async () => {
     const msg =
       lang === 'el'
