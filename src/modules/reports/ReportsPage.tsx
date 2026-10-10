@@ -781,7 +781,7 @@ export default function ReportsPage() {
               <h2>{tr(activeMeta.title)}</h2>
               <p>{tr(activeMeta.description)}</p>
             </div>
-            <div className="reports-stage-actions">
+            <div className="reports-stage-actions" data-tour="report-download">
               <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
             </div>
           </header>

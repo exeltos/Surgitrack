@@ -6,6 +6,8 @@ type Props = {
   L: (el: string, en: string) => string;
   /** The step just done; none when every step is done and the final evaluation is next. */
   step?: {title: string};
+  /** The card's title when it is not about a step just done (e.g. «Αξιολογήστε αυτή την οθόνη»). */
+  heading?: string;
   onRate: (rating: number, comment?: string) => void;
   onLater: () => void;
   onFinal: () => void;
@@ -16,7 +18,7 @@ type Props = {
  * an optional comment. It never covers the screen; "Later" leaves the rating in the guide. After the
  * last step it asks for the final evaluation instead.
  */
-export default function StepRatingCard({L, step, onRate, onLater, onFinal}: Props) {
+export default function StepRatingCard({L, step, heading, onRate, onLater, onFinal}: Props) {
   const [rating, setRating] = useState<number>();
   const [comment, setComment] = useState('');
   if (!step)
@@ -47,7 +49,7 @@ export default function StepRatingCard({L, step, onRate, onLater, onFinal}: Prop
     <aside className="step-rating-card" aria-label={L('Αξιολόγηση βήματος', 'Rate this step')}>
       <header>
         <CheckCircle2 size={18} />
-        <strong>{L(`Ολοκληρώσατε: ${step.title}`, `Done: ${step.title}`)}</strong>
+        <strong>{heading || L(`Ολοκληρώσατε: ${step.title}`, `Done: ${step.title}`)}</strong>
         <button type="button" onClick={onLater} aria-label={L('Κλείσιμο', 'Close')}>
           <X size={15} />
         </button>

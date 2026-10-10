@@ -48,7 +48,8 @@ export type DemoAccount = {
     active: boolean;
     userCode?: string;
     /** First-steps guide: steps done of those for their role. */
-    guide: {done: number; total: number};
+    /** First-steps done of their role's, and guided tours finished. */
+    guide: {done: number; total: number; tours?: number};
   }>;
   /** The prospect's own first-steps progress. */
   evaluatorGuide?: {done: number; total: number};

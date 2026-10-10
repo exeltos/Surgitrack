@@ -16,6 +16,7 @@ import {
 } from '../../../core/demoAccounts';
 import {trialEndDate, trialEndOn} from '../../../core/trial';
 import {MODULES, moduleOfStep, npsGroup, stepOfTopic} from '../../../core/demoFeedback';
+import {tourOrScreenTitle} from '../../../core/demoTours';
 import {guideStep} from '../../../core/demoGuide';
 import NewDemoDialog from './NewDemoDialog';
 import ConvertDemoDialog from './ConvertDemoDialog';
@@ -335,7 +336,10 @@ function DemoCard({
               <b>{c.name}</b>
               <span>{c.email}</span>
               <span>{c.userCode || '—'}</span>
-              <span>{tr('Βήματα {0}/{1}', c.guide.done, c.guide.total)}</span>
+              <span>
+                {tr('Βήματα {0}/{1}', c.guide.done, c.guide.total)}
+                {c.guide.tours ? ` · ${tr('Ξεναγήσεις {0}', c.guide.tours)}` : ''}
+              </span>
               <span>{c.active ? tr('Ενεργός') : tr('Περιμένει έγκριση ή ανενεργός')}</span>
             </li>
           ))}
@@ -417,6 +421,9 @@ function DemoCard({
 
 /** A rating's subject: a part of the app, or a guide step under its part («Ροή Αποστείρωσης · Παραλαβή»). */
 const moduleTitle = (topic: string) => {
+  // A guided tour or a whole screen (evaluation Demo «Ξενάγηση» and «Αξιολογήστε την οθόνη»).
+  const tourOrScreen = tourOrScreenTitle(topic, key => guideStep(key)?.title);
+  if (tourOrScreen) return tr(tourOrScreen.el);
   const stepKey = stepOfTopic(topic);
   if (stepKey) {
     const step = guideStep(stepKey);

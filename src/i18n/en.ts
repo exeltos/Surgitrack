@@ -1841,6 +1841,7 @@ export const en: Record<string, string> = {
   'Όριο συναδέλφων': 'Colleague limit',
   'Πρώτα βήματα': 'First steps',
   'Βήματα {0}/{1}': 'Steps {0}/{1}',
+  'Ξεναγήσεις {0}': 'Tours {0}',
   'Ροή Αποστείρωσης': 'Sterilization workflow',
   Ιχνηλασιμότητα: 'Traceability',
   Χρήστες: 'Users',

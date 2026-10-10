@@ -77,6 +77,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     ? L('Το Demo έχει φτάσει το όριο συναδέλφων.', 'The Demo has reached its colleague limit.')
                     : undefined
                 }
+                data-tour="add-user"
                 onClick={() => setInviteMenu(v => !v)}
               >
                 {L('Προσθήκη χρήστη', 'Add user')}
