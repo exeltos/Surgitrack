@@ -1,12 +1,12 @@
 // @vitest-environment node
 import {beforeEach, describe, expect, it} from 'vitest';
-import {loadFunction, post, resetFake} from './harness';
+import {env, loadFunction, mailState, post, resetFake} from './harness';
 import {fake, type DbCall} from './fakes/supabase';
 
 type Handler = (req: Request) => Response | Promise<Response>;
 type Profile = Record<string, unknown>;
 
-const ADMIN = {id: 'admin-1', role: 'ADMIN', active: true, organization_id: 'org-1'};
+const ADMIN = {id: 'admin-1', name: 'Admin One', role: 'ADMIN', active: true, organization_id: 'org-1'};
 const TARGET = {id: 'user-2', organization_id: 'org-1', name: 'Nurse', email: 'Nurse@Hospital.gr', active: true};
 
 const answer = (target: Profile, invitation: Profile | null = null) => {
@@ -71,7 +71,7 @@ describe('staff-link', () => {
   const linkRequest = (origin?: string) => handle(post({user_id: 'user-2', origin}));
   const generated = () => fake.calls.filter(c => c.what === 'generateLink').map(c => c.args[0] as {type: string; options: {redirectTo: string}});
 
-  it('makes a set-new-password link for an active user, without sending any email', async () => {
+  it('makes a set-new-password link for an active user and hands it back', async () => {
     answer(TARGET);
     const response = await linkRequest('https://surgitrack-med.netlify.app');
     const body = await response.json();
@@ -124,11 +124,79 @@ describe('staff-link', () => {
     expect((await linkRequest()).status).toBe(404);
   });
 
+  it('records every link and tells the person by email', async () => {
+    Object.assign(env, {SMTP_HOST: 'smtp.test', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'app@test'});
+    answer(TARGET);
+    await linkRequest();
+    const event = fake.dbCalls('insert').find(c => c.table === 'account_events');
+    expect(event?.values).toEqual({
+      organization_id: 'org-1',
+      target_id: 'user-2',
+      actor_id: 'admin-1',
+      action: 'password_link',
+      detail: {},
+    });
+    expect(mailState.outbox).toHaveLength(1);
+    expect(mailState.outbox[0].to).toBe('Nurse@Hospital.gr');
+    expect(mailState.outbox[0].html).toContain('Admin One');
+    expect(mailState.outbox[0].html).not.toContain('st_token');
+  });
+
+  it('gives no link when it could not be recorded', async () => {
+    answer(TARGET);
+    const db = fake.db;
+    fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+    const response = await linkRequest();
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body).toEqual({error: 'audit_failed'});
+  });
+
   it('reports link_failed when no link could be made', async () => {
     answer(TARGET);
     fake.admin.generateLink = () => ({data: null, error: {message: 'nope'}});
     const response = await linkRequest();
     expect(response.status).toBe(500);
     expect(await response.json()).toMatchObject({error: 'link_failed'});
+  });
+});
+
+describe('update-staff: the sign-in email', () => {
+  let handle: Handler;
+  beforeEach(async () => {
+    handle = await loadFunction('update-staff');
+    Object.assign(env, {SMTP_HOST: 'smtp.test', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'app@test'});
+  });
+  const update = (email: string) => handle(post({user_id: 'user-2', name: 'Nurse', email}));
+
+  it('records the change and tells the old address', async () => {
+    answer({...TARGET, role: 'DEPARTMENT'});
+    const response = await update('new@hospital.gr');
+    expect(response.status).toBe(200);
+    const event = fake.dbCalls('insert').find(c => c.table === 'account_events');
+    expect(event?.values).toMatchObject({
+      target_id: 'user-2',
+      actor_id: 'admin-1',
+      action: 'email_changed',
+      detail: {from: 'Nurse@Hospital.gr', to: 'new@hospital.gr'},
+    });
+    expect(mailState.outbox.map(m => m.to)).toEqual(['Nurse@Hospital.gr']);
+  });
+
+  it('changes nothing when the change could not be recorded', async () => {
+    answer({...TARGET, role: 'DEPARTMENT'});
+    const db = fake.db;
+    fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+    const response = await update('new@hospital.gr');
+    expect(response.status).toBe(500);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  it('records nothing and sends nothing when the email stays the same', async () => {
+    answer({...TARGET, role: 'DEPARTMENT'});
+    expect((await update('nurse@hospital.gr')).status).toBe(200);
+    expect(fake.dbCalls('insert')).toHaveLength(0);
+    expect(mailState.outbox).toHaveLength(0);
   });
 });

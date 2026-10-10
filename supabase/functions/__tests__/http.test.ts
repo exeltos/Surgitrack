@@ -11,6 +11,8 @@ beforeEach(resetFake);
 
 describe('corsFor', () => {
   it.each([
+    'https://www.surgitrack.eu',
+    'https://surgitrack.eu',
     'https://surgitrack-med.netlify.app',
     'https://deploy-preview-55--surgitrack-med.netlify.app',
     'http://localhost:5174',
@@ -23,6 +25,9 @@ describe('corsFor', () => {
     'https://surgitrack-med.netlify.app.evil.example',
     'https://evilsurgitrack-med.netlify.app',
     'http://surgitrack-med.netlify.app',
+    'http://www.surgitrack.eu',
+    'https://www.surgitrack.eu.evil.example',
+    'https://evilsurgitrack.eu',
     'http://localhost.evil.example:5174',
     'null',
   ])('refuses %s by naming the production site instead', origin => {

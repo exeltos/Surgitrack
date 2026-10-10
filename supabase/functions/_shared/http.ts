@@ -2,9 +2,10 @@
 
 export const SITE = "https://surgitrack-med.netlify.app";
 
-// The app itself: production, its deploy previews, and local development. Browsers get CORS access
-// from these origins only, and emailed links may point only at them.
-export const APP_ORIGIN = /^(https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
+// The app itself: production (www.surgitrack.eu, and its Netlify address with the deploy previews) and
+// local development. Browsers get CORS access from these origins only, and emailed links may point only at them.
+export const APP_ORIGIN =
+  /^(https:\/\/(www\.)?surgitrack\.eu|https:\/\/([a-z0-9-]+--)?surgitrack-med\.netlify\.app|http:\/\/localhost:\d+)$/;
 
 /**
  * CORS headers for one request: the caller's origin when it is the app, otherwise the production

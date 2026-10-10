@@ -61,6 +61,10 @@ Data flow: the store holds records in memory; in a cloud workspace each collecti
 - History tables are append-only; who recorded an entry is stamped by the database. The configuration history is kept in
   `configuration_audit`, which nobody signed in can change or delete.
 - Deleted Sets and instruments are kept in `recycle_bin` for 30 days.
+- Who a person is cannot be changed quietly: the sign-in email and username change only through `update-staff`
+  (a trigger refuses a direct write), and every set-password or invitation link an admin makes and every email
+  change is kept in `account_events` (read by the hospital's admins, changed by nobody) and emailed to the person.
+- The platform owner's account is made or claimed only with a confirmed email and only while no other exists.
 
 ## Tests
 
