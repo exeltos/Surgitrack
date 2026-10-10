@@ -10956,3 +10956,48 @@ html body .name-check-tabs button {
     display: none;
   }
 }
+/* Devices: the chosen device stands out. */
+html body .device-card.selected {
+  background: var(--c-gray-95-3);
+}
+/* No cycles yet: ordinary text size, with what to do next. */
+html body .devices-empty.small {
+  font-size: 13.5px;
+}
+html body .device-cycle-used {
+  color: var(--c-cyan-35);
+}
+html body .device-cycle-free {
+  color: var(--c-green-40-3);
+  font-weight: 600;
+}
+/* Cycles on a phone: each one a card (the table ran past the edge after «Αποτέλεσμα»). */
+@media (max-width: 700px) {
+  html body .devices-table thead {
+    display: none;
+  }
+  html body .devices-table,
+  html body .devices-table tbody {
+    display: block;
+  }
+  html body .devices-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--c-gray-95);
+  }
+  html body .devices-table tbody td {
+    display: block;
+    padding: 0;
+    border: 0;
+    white-space: normal;
+  }
+  html body .devices-table tbody td[data-label]::before {
+    content: attr(data-label) ' ';
+    color: var(--c-blue-45);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+}

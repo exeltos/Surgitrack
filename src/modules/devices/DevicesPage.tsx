@@ -180,7 +180,7 @@ export default function DevicesPage() {
   if (!organizationId)
     return (
       <div className="devices-page">
-        <PageHeader eyebrow={L('ΕΞΟΠΛΙΣΜΟΣ', 'EQUIPMENT')} title={L('Συνδεδεμένες συσκευές', 'Connected devices')} />
+        <PageHeader eyebrow={L('ΕΞΟΠΛΙΣΜΟΣ', 'EQUIPMENT')} title={L('Συσκευές', 'Devices')} />
         <div className="devices-empty">
           {L(
             'Οι συνδεδεμένες συσκευές λειτουργούν μέσα σε νοσοκομείο. Επιλέξτε νοσοκομείο από την πάνω μπάρα.',
@@ -194,7 +194,7 @@ export default function DevicesPage() {
     <div className="devices-page">
       <PageHeader
         eyebrow={L('ΕΞΟΠΛΙΣΜΟΣ', 'EQUIPMENT')}
-        title={L('Συνδεδεμένες συσκευές', 'Connected devices')}
+        title={L('Συσκευές', 'Devices')}
         description={L(
           'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν δεδομένα κύκλων στην Αποστείρωση.',
           'Sterilizers, washers and other devices that send cycle data to Sterilization.',
@@ -334,8 +334,8 @@ export default function DevicesPage() {
               <h2>{L(`Κύκλοι · ${selected.name}`, `Cycles · ${selected.name}`)}</h2>
               <small>
                 {L(
-                  '«Καταχωρήθηκε» σημαίνει ότι ο κύκλος έχει ήδη χρησιμοποιηθεί σε καταγραφή της Αποστείρωσης.',
-                  '“Recorded” means the cycle is already used in a Sterilization record.',
+                  '«Σε φόρτωση»: ο κύκλος έχει ήδη συνδεθεί με φόρτωση της Αποστείρωσης. «Διαθέσιμος»: μπορεί να επιλεγεί στην επόμενη φόρτωση.',
+                  '“In a load”: the cycle is already linked to a Sterilization load. “Available”: it can be chosen for the next load.',
                 )}
               </small>
             </div>
@@ -343,7 +343,10 @@ export default function DevicesPage() {
           </header>
           {selectedReadings.length === 0 ? (
             <div className="devices-empty small">
-              {L('Δεν υπάρχουν κύκλοι για αυτή τη συσκευή.', 'No cycles for this device.')}
+              <span>{L('Δεν υπάρχουν κύκλοι για αυτή τη συσκευή.', 'No cycles for this device.')}</span>
+              {canRecord && selected.active && selected.connection !== 'API' && (
+                <span>{L('Ανεβάστε τους κύκλους με «Αρχείο».', 'Upload the cycles with “File”.')}</span>
+              )}
             </div>
           ) : (
             <div
@@ -359,11 +362,11 @@ export default function DevicesPage() {
                     <th>{L('Κύκλος', 'Cycle')}</th>
                     <th>{L('Πρόγραμμα', 'Program')}</th>
                     <th>{L('Αποτέλεσμα', 'Result')}</th>
-                    <th>°C</th>
-                    <th>bar</th>
-                    <th>{L('Λεπτά', 'Min')}</th>
+                    <th>{L('Θερμ. (°C)', 'Temp. (°C)')}</th>
+                    <th>{L('Πίεση (bar)', 'Pressure (bar)')}</th>
+                    <th>{L('Διάρκεια (λεπτά)', 'Duration (min)')}</th>
                     <th>{L('Πηγή', 'Source')}</th>
-                    <th>{L('Χρήση', 'Use')}</th>
+                    <th>{L('Φόρτωση', 'Load')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -371,18 +374,22 @@ export default function DevicesPage() {
                     <tr key={r.id}>
                       <td>{when(r.startedAt || r.createdAt)}</td>
                       <td className="mono">{r.cycleNumber}</td>
-                      <td>{r.program || '—'}</td>
+                      <td data-label={L('Πρόγραμμα', 'Program')}>{r.program || '—'}</td>
                       <td>
                         <span className={`device-result ${r.result.toLowerCase()}`}>{resultLabel(r.result)}</span>
                       </td>
-                      <td>{r.maxTemperature ?? '—'}</td>
-                      <td>{r.maxPressure ?? '—'}</td>
-                      <td>{r.durationMinutes ?? '—'}</td>
-                      <td>{L(connectionLabel[r.source].el, connectionLabel[r.source].en)}</td>
+                      <td data-label="°C">{r.maxTemperature ?? '—'}</td>
+                      <td data-label="bar">{r.maxPressure ?? '—'}</td>
+                      <td data-label={L('Λεπτά', 'Min')}>{r.durationMinutes ?? '—'}</td>
+                      <td data-label={L('Πηγή', 'Source')}>
+                        {L(connectionLabel[r.source].el, connectionLabel[r.source].en)}
+                      </td>
                       <td>
-                        {usedNumbers.has(r.cycleNumber.trim().toUpperCase())
-                          ? L('Καταχωρήθηκε', 'Recorded')
-                          : L('Ελεύθερος', 'Unused')}
+                        {usedNumbers.has(r.cycleNumber.trim().toUpperCase()) ? (
+                          <b className="device-cycle-used">{L('Σε φόρτωση', 'In a load')}</b>
+                        ) : (
+                          <span className="device-cycle-free">{L('Διαθέσιμος', 'Available')}</span>
+                        )}
                       </td>
                     </tr>
                   ))}
