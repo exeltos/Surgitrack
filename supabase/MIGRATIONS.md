@@ -86,6 +86,21 @@ insert into supabase_migrations.schema_migrations (version, name, statements)
 values ('20261009120000', 'lock_default_privileges', array[]::text[]) on conflict (version) do nothing;
 ```
 
+## Waiting to be applied
+
+| Version        | Name              | What it does                                                                                                                                                                    |
+| -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261010180000 | release_integrity | A RELEASED release needs acceptable parameters, intact packaging and no failed biological indicator; ready straight from a sterilization stage is logged for the nightly checks |
+
+The release check is `not valid`: rows already saved are not re-checked. To see whether any would fail (then
+`alter table public.sterilization_releases validate constraint sterilization_releases_released_checks`):
+
+```sql
+select organization_id, id from public.sterilization_releases
+ where decision = 'RELEASED' and not (coalesce(physical_parameters_ok, false) and coalesce(packaging_integrity_ok, false)
+   and biological_indicator_result is distinct from 'FAIL');
+```
+
 ## Testing locally
 
 ```sh
