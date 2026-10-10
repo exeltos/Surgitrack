@@ -12,6 +12,7 @@ const REPORTS = [
   'Εργαλεία εκτός χρήσης',
   'Φορτία κλιβάνου',
   'Λήξεις αποστείρωσης',
+  'Παραδόσεις & παραλαβές',
   'Ιχνηλασιμότητα Ασθενούς',
 ];
 
@@ -26,7 +27,11 @@ const column = (label: string) => {
     .map(h => h.textContent);
   const index = headers.indexOf(label);
   expect(index).toBeGreaterThanOrEqual(0);
-  return bodyRows().map(row => within(row).getAllByRole('cell')[index].textContent);
+  // The "more rows" marker at the end of a long list is a single cell, not a record.
+  return bodyRows()
+    .map(row => within(row).getAllByRole('cell'))
+    .filter(cells => cells.length > index)
+    .map(cells => cells[index].textContent);
 };
 const choose = (report: string) => fireEvent.click(screen.getByRole('button', {name: new RegExp(`^${report}`)}));
 const filter = (placeholder: string, value: string) => {
@@ -76,5 +81,20 @@ describe('Reports', () => {
     fireEvent.change(code, {target: {value: 'NOBODY-0000'}});
     expect(count()).toBe(0);
     expect(screen.getByText('Άλλαξε τα φίλτρα ή επίλεξε διαφορετική αναφορά.')).toBeInTheDocument();
+  });
+
+  it('lists handovers with the other party signature, and filters to the unconfirmed ones', () => {
+    renderPage(<ReportsPage />);
+    choose('Παραδόσεις & παραλαβές');
+    const all = count();
+    expect(all).toBeGreaterThan(2);
+    const signatures = column('Υπογραφή άλλου μέρους');
+    expect(signatures).toContain('Επιβεβαιωμένη');
+    expect(signatures).toContain('Μη επιβεβαιωμένη');
+    filter('Όλες οι υπογραφές', 'UNVERIFIED');
+    expect(count()).toBe(2);
+    expect(new Set(column('Υπογραφή άλλου μέρους'))).toEqual(new Set(['Μη επιβεβαιωμένη']));
+    expect(new Set(column('Κίνηση'))).toEqual(new Set(['Παραλαβή', 'Παράδοση']));
+    for (const cell of within(results()).getAllByText('Μη επιβεβαιωμένη')) expect(cell).toHaveClass('report-cell-warn');
   });
 });

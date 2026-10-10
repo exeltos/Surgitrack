@@ -1278,6 +1278,8 @@ export const receipts: ReceiptRecord[] = [
     receivedByDepartment: 'Κεντρική Αποστείρωση',
     at,
     visibleDeviation: false,
+    // The department user signed with their own password, except once (to show it in the reports).
+    counterpartyVerified: i !== 2,
   };
 });
 export const deliveries: DeliveryRecord[] = [
@@ -1302,6 +1304,7 @@ export const deliveries: DeliveryRecord[] = [
     receivedByName,
     receivedByDepartment: department,
     at,
+    counterpartyVerified: i !== 1,
   };
 });
 

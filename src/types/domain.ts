@@ -288,6 +288,11 @@ export interface ReceiptRecord {
   checkNote?: string;
   itemChecks?: ReceiptItemCheck[];
   setChecks?: ReceiptSetChecks;
+  /**
+   * Set by the server when the record is saved: true when the other party confirmed with their own
+   * password (verify-handover), false when not; absent on older records and until the record syncs.
+   */
+  counterpartyVerified?: boolean;
 }
 export interface DeliveryRecord {
   id: string;
@@ -306,6 +311,11 @@ export interface DeliveryRecord {
   receivedByDepartment: string;
   at: string;
   note?: string;
+  /**
+   * Set by the server when the record is saved: true when the other party confirmed with their own
+   * password (verify-handover), false when not; absent on older records and until the record syncs.
+   */
+  counterpartyVerified?: boolean;
 }
 
 export interface WorkflowCheckpointRecord {
