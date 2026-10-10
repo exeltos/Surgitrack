@@ -716,6 +716,7 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
               lang={lang === 'en' ? 'en' : 'el'}
               can={can}
               onHelp={() => setHelpOpen(true)}
+              enabled={systemSettings.screenGuides !== false}
             />
           )}
           {children}

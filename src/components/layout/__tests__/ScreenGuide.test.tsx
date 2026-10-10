@@ -45,6 +45,11 @@ describe('screen guide on first visit', () => {
     expect(screen.queryByRole('complementary')).toBeNull();
   });
 
+  it('stays hidden when the hospital turned the guides off', () => {
+    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} enabled={false} />);
+    expect(screen.queryByRole('complementary')).toBeNull();
+  });
+
   it('only for menu screens the person may open', () => {
     expect(screenSection('/studio', () => false)).toBeUndefined();
     expect(screenSection('/start', all)).toBeUndefined();

@@ -127,6 +127,24 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </small>
             </label>
             <label>
+              {L('Οδηγοί οθόνης', 'Screen guides')}
+              <div className="studio-setting-input">
+                <select
+                  value={libs.systemSettings.screenGuides === false ? 'OFF' : 'ON'}
+                  onChange={e => libs.updateSystemSettings({screenGuides: e.target.value === 'ON'}, currentUser.name)}
+                >
+                  <option value="ON">{L('Εμφανίζονται', 'Shown')}</option>
+                  <option value="OFF">{L('Δεν εμφανίζονται', 'Not shown')}</option>
+                </select>
+              </div>
+              <small>
+                {L(
+                  'Η πρώτη φορά σε κάθε οθόνη: τι κάνει και τα πρώτα βήματα, πάνω από την οθόνη. Για όλους τους χρήστες του νοσοκομείου· όταν εμφανίζονται, ο καθένας μπορεί να τους κλείσει για τον εαυτό του.',
+                  'The first time on each screen: what it does and the first steps, above the screen. For everyone in the hospital; when shown, each person can still turn them off for themselves.',
+                )}
+              </small>
+            </label>
+            <label>
               {L('Barcode Σετ', 'Set barcode')}
               <div className="studio-static-field">
                 <b>{tr('S + 6 ψηφία')}</b>
