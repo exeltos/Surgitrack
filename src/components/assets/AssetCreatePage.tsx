@@ -1,6 +1,6 @@
 import {useMemo, useState} from 'react';
 import {useLeave, useUnsavedChanges} from '../../app/UnsavedChanges';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, Check, Images, Save, Search, X} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
@@ -20,7 +20,10 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const navigate = useNavigate();
   const {departments, manufacturers, specialties} = useLibraries();
   const {sets, tools, createTool, createSet, nextBarcode, addAssetPhotos} = useSurgi();
-  const backTo = kind === 'SET' ? '/sets' : '/tools';
+  // Opened from the Standalone list: an instrument given to a department, so the department is required.
+  const [params] = useSearchParams();
+  const standaloneOnly = kind === 'TOOL' && params.get('for') === 'standalone';
+  const backTo = kind === 'SET' ? '/sets' : standaloneOnly ? '/standalone-tools' : '/tools';
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
   const [department, setDepartment] = useState('');
@@ -37,7 +40,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [source, setSource] = useState<Source>('STOCK');
   const [tab, setTab] = useState<CreateTab>(kind === 'SET' ? 'COMPOSITION' : 'DETAILS');
   const barcode = nextBarcode(kind);
-  const valid = !!name.trim() && !!code.trim();
+  const valid = !!name.trim() && !!code.trim() && (!standaloneOnly || !!department.trim());
   const leave = useLeave();
   useUnsavedChanges(
     !!(name.trim() || code.trim() || notes.trim() || serialNumber.trim() || photos.length || selected.length),
@@ -110,7 +113,11 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
         </div>
         <div className="asset-action-group">
           {!valid && (
-            <small className="asset-create-hint">{tr('Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.')}</small>
+            <small className="asset-create-hint">
+              {standaloneOnly
+                ? tr('Συμπληρώστε Κωδικό, Ονομασία και Τμήμα για να αποθηκευτεί.')
+                : tr('Συμπληρώστε Κωδικό και Ονομασία για να αποθηκευτεί.')}
+            </small>
           )}
           <AppButton icon={<X size={17} />} onClick={() => leave(() => navigate(backTo))}>
             {tr('Ακύρωση')}
@@ -173,9 +180,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <small>{tr('Προαιρετικό για Σετ και εργαλεία.')}</small>
             </label>
             <label>
-              <span>{tr('Τμήμα')}</span>
+              <span>{standaloneOnly ? tr('Τμήμα *') : tr('Τμήμα')}</span>
               <select className="asset-inline-input" value={department} onChange={e => setDepartment(e.target.value)}>
-                <option value="">{tr('— Χωρίς τμήμα / Απόθεμα —')}</option>
+                <option value="">{standaloneOnly ? tr('— Επιλέξτε τμήμα —') : tr('— Χωρίς τμήμα / Απόθεμα —')}</option>
                 {allowedDepartments.map(x => (
                   <option key={x.id} value={x.el}>
                     {x.el}
@@ -183,11 +190,13 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 ))}
               </select>
               <small>
-                {kind === 'SET'
-                  ? tr('Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Απόθεμα Σετ και παραμένει ενιαίο.')
-                  : tr(
-                      'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Απόθεμα εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.',
-                    )}
+                {standaloneOnly
+                  ? tr('Το τμήμα στο οποίο δίνεται το εργαλείο.')
+                  : kind === 'SET'
+                    ? tr('Χωρίς Τμήμα, το Σετ καταχωρείται αυτόματα ως Απόθεμα Σετ και παραμένει ενιαίο.')
+                    : tr(
+                        'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Απόθεμα εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.',
+                      )}
               </small>
             </label>
             <label>
@@ -268,7 +277,9 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 <AssetTypeIcon kind="TOOL" maxUses={limited ? Number(maxUses) || 1 : undefined} size={17} />
                 <div>
                   <span>{tr('Καταχώριση')}</span>
-                  <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}</strong>
+                  <strong>
+                    {department.trim() || standaloneOnly ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}
+                  </strong>
                 </div>
               </div>
             )}
@@ -345,11 +356,15 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                     {kind === 'TOOL' && (
                       <>
                         <div className="asset-inline-info">
-                          <strong>{department.trim() ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}</strong>
+                          <strong>
+                            {department.trim() || standaloneOnly ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}
+                          </strong>
                           <small>
                             {department.trim()
                               ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
-                              : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Απόθεμα εργαλείων.')}
+                              : standaloneOnly
+                                ? tr('Επιλέξτε το τμήμα στο οποίο δίνεται.')
+                                : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Απόθεμα εργαλείων.')}
                           </small>
                         </div>
                         <label>

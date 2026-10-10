@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {Search, X} from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
 import FilterMenu, {type SelectFilter} from './FilterMenu';
@@ -10,6 +11,8 @@ type Props = {
   compact?: boolean;
   className?: string;
   onSubmitQuery?: (value: string) => void;
+  /** A control of the list's own, after «Φίλτρα» (e.g. grouping). */
+  extra?: ReactNode;
 };
 
 /** Search box plus one "Filters" button that opens the filter choices, with a count of active ones. */
@@ -21,6 +24,7 @@ export default function AssetFilterBar({
   compact = false,
   className = '',
   onSubmitQuery,
+  extra,
 }: Props) {
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
@@ -50,6 +54,7 @@ export default function AssetFilterBar({
         />
       </div>
       <FilterMenu filters={filters} />
+      {extra}
       {active && (
         <button
           type="button"

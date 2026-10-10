@@ -10862,3 +10862,48 @@ html body .asset-history-group {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+/* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
+html body .standalone-registry th:nth-child(5) {
+  width: 96px;
+}
+html body .standalone-registry button.row-title-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+html body .standalone-registry tr.standalone-group.open,
+html body .standalone-registry tr.standalone-group.open td {
+  background: var(--c-gray-95-3);
+}
+html body .standalone-registry tr.standalone-piece td:first-child {
+  padding-left: 28px;
+}
+html body .standalone-states {
+  color: var(--c-blue-45);
+  font-size: 12px;
+  font-weight: 600;
+}
+/* On a phone the grouping button keeps only its icon, so search, filters and grouping share one row. */
+@media (max-width: 700px) {
+  html body .asset-filter-bar:has(.asset-filter-toggle[aria-pressed]) {
+    flex-wrap: nowrap;
+  }
+  html body .asset-filter-bar:has(.asset-filter-toggle[aria-pressed]) .asset-filter-search {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  html body .asset-filter-bar .asset-filter-toggle[aria-pressed] span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
+html body .standalone-registry button.icon-link {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
