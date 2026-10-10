@@ -38,6 +38,7 @@ const useView = (members: unknown[], requests: unknown[]) =>
     lang: 'el',
     members,
     query: '',
+    filters: {department: '', role: '', access: ''},
     requests,
     setDecisions: () => undefined,
   } as unknown as Input);

@@ -2,6 +2,7 @@ import {Pencil, Plus, Save, X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {localizedName} from '../../../core/glossary';
 import type {PeopleState} from './usePeople';
+import {useSurgi} from '../../../store/SurgiStore';
 
 export default function DepartmentsSection({s}: {s: PeopleState}) {
   const {
@@ -11,6 +12,7 @@ export default function DepartmentsSection({s}: {s: PeopleState}) {
     departments,
     editing,
     lang,
+    members,
     newDepartment,
     saveDepartment,
     setEditing,
@@ -18,6 +20,16 @@ export default function DepartmentsSection({s}: {s: PeopleState}) {
     tab,
     toggleDepartment,
   } = s;
+  const {sets} = useSurgi();
+  // What a department holds, so it is clear what changes before it is turned off.
+  const holds = (d: {id: string; name: string}) => {
+    const users = members.filter(m => m.department_id === d.id).length;
+    const setCount = sets.filter(x => x.department === d.name).length;
+    return [
+      users === 1 ? L('1 χρήστης', '1 user') : L(`${users} χρήστες`, `${users} users`),
+      setCount === 1 ? L('1 Σετ', '1 Set') : L(`${setCount} Σετ`, `${setCount} Sets`),
+    ].join(' · ');
+  };
   return (
     <>
       {tab === 'DEPARTMENTS' && (
@@ -27,8 +39,8 @@ export default function DepartmentsSection({s}: {s: PeopleState}) {
               <b>{L('Τμήματα', 'Departments')}</b>
               <small>
                 {L(
-                  'Εμφανίζονται στη φόρμα εγγραφής και σε Σετ, εργαλεία και ιχνηλασιμότητα. Ο κωδικός STER δηλώνει την Αποστείρωση.',
-                  'Shown on the signup form and across sets, instruments and traceability. Code STER marks Sterilization.',
+                  'Εμφανίζονται στη φόρμα εγγραφής, στα Σετ, στα εργαλεία και στην ιχνηλάτηση. Το τμήμα της Αποστείρωσης έχει κωδικό STER.',
+                  'Shown on the signup form, on Sets, instruments and traceability. The Sterilization department has the code STER.',
                 )}
               </small>
             </div>
@@ -71,7 +83,9 @@ export default function DepartmentsSection({s}: {s: PeopleState}) {
                 <div key={d.id} className={`hospital-row ${d.active ? '' : 'inactive'}`}>
                   <span>
                     <b>{localizedName(d.name, lang)}</b>
-                    <small>{d.code || '—'}</small>
+                    <small>
+                      {d.code || '—'} · {holds(d)}
+                    </small>
                   </span>
                   <button
                     className={`studio-access-toggle ${d.active ? 'active' : ''}`}

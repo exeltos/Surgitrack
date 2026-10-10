@@ -78,7 +78,7 @@ export default function MemberDrawer({
   );
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
-      <aside className="studio-drawer">
+      <aside className="studio-drawer people-drawer">
         <header>
           <div>
             <span className="eyebrow">{member ? L('ΧΡΗΣΤΗΣ', 'USER') : L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>

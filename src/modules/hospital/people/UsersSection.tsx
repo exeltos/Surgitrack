@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
+import FilterMenu from '../../../components/assets/FilterMenu';
 import {localizedName} from '../../../core/glossary';
 import {SUPERVISOR, roles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
@@ -31,6 +32,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
     demoSeats,
     departmentName,
     el,
+    filters,
+    setFilters,
     invite,
     inviteMenu,
     invitedAt,
@@ -67,6 +70,35 @@ export default function UsersSection({s}: {s: PeopleState}) {
                 )}
               />
             </div>
+            <FilterMenu
+              filters={[
+                {
+                  key: 'department',
+                  value: filters.department,
+                  placeholder: L('Όλα τα τμήματα', 'Every department'),
+                  options: activeDepartments.map(d => ({value: d.id, label: localizedName(d.name, lang)})),
+                  onChange: department => setFilters(f => ({...f, department})),
+                },
+                {
+                  key: 'role',
+                  value: filters.role,
+                  placeholder: L('Όλοι οι ρόλοι', 'Every role'),
+                  options: roles.map(r => ({value: r.id, label: el ? r.el : r.en})),
+                  onChange: role => setFilters(f => ({...f, role})),
+                },
+                {
+                  key: 'access',
+                  value: filters.access,
+                  placeholder: L('Όλοι οι χρήστες', 'Every user'),
+                  options: [
+                    {value: 'ACTIVE', label: L('Ενεργοί', 'Active')},
+                    {value: 'INACTIVE', label: L('Ανενεργοί', 'Inactive')},
+                    {value: 'INVITED', label: L('Εκκρεμεί πρόσκληση', 'Invitation pending')},
+                  ],
+                  onChange: access => setFilters(f => ({...f, access})),
+                },
+              ]}
+            />
             <div className="people-invite">
               <AppButton
                 variant="primary"
@@ -338,8 +370,11 @@ export default function UsersSection({s}: {s: PeopleState}) {
               <div className="hospital-users-empty">
                 <Users size={22} />
                 <strong>
-                  {q
-                    ? L('Κανένας χρήστης δεν ταιριάζει στην αναζήτηση.', 'No user matches the search.')
+                  {q || filters.department || filters.role || filters.access
+                    ? L(
+                        'Κανένας χρήστης δεν ταιριάζει στην αναζήτηση ή στα φίλτρα.',
+                        'No user matches the search or filters.',
+                      )
                     : L('Δεν υπάρχουν χρήστες ακόμα.', 'No users yet.')}
                 </strong>
                 {!q && (
