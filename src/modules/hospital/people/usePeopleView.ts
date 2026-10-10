@@ -20,8 +20,14 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
   const pending = requests.filter(r => r.status === 'PENDING');
   // Invitations whose person has not signed up yet.
   const invitedToSignup = requests.filter(r => r.status === 'PENDING_EMAIL' && !r.user_id);
-  // A signup's account waits among the requests, not among the users.
-  const waitingAccounts = new Set(pending.map(r => r.user_id).filter(Boolean));
+  // A signup's account waits among the requests, not among the users; one whose email is not confirmed
+  // yet (signed up through the hospital link) is not shown at all until it is.
+  const waitingAccounts = new Set(
+    requests
+      .filter(r => r.status === 'PENDING' || r.status === 'PENDING_EMAIL')
+      .map(r => r.user_id)
+      .filter(Boolean),
+  );
   const signupFormUrl = (token: string) => `${window.location.origin}/#/join/${token}`;
   const date = (iso: string) => formatDateTime(iso);
 

@@ -197,7 +197,12 @@ export function usePeopleMembers(
             ? L('Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.', 'That email is already used by another account.')
             : status === 400
               ? L('Ελέγξτε το ονοματεπώνυμο και το email.', 'Check the name and the email.')
-              : L('Οι αλλαγές δεν αποθηκεύτηκαν.', 'The changes were not saved.'),
+              : status === 412
+                ? L(
+                    'Ο χρήστης δεν έχει επιβεβαιώσει ακόμα το email του. Μόλις το επιβεβαιώσει, η αίτηση θα εμφανιστεί εδώ για έγκριση.',
+                    'This user has not confirmed their email yet. Once they do, the request will appear here for approval.',
+                  )
+                : L('Οι αλλαγές δεν αποθηκεύτηκαν.', 'The changes were not saved.'),
       });
       return;
     }

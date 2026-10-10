@@ -73,6 +73,17 @@ Deno.serve(async req => {
         .maybeSingle();
       if (!department) return json({error: "invalid_department"}, 400);
     }
+    // An account from a hospital-link signup whose email was never confirmed is not activated: the
+    // address is not proven to be the person's (approval comes through the request, once confirmed).
+    if (active && !target.active) {
+      const {data: unconfirmed} = await admin
+        .from("staff_access_requests")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("status", "PENDING_EMAIL")
+        .limit(1);
+      if (unconfirmed?.length) return json({error: "email_unconfirmed"}, 412);
+    }
     // Demo access is the platform admin's to give.
     const demoEnabled =
       !me.organization_id && body?.demo_enabled !== undefined ? !!body.demo_enabled : target.demo_enabled;
