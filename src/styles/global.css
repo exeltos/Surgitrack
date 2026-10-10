@@ -18,7 +18,7 @@
   .sterilization-workspace > .ster-work-panel {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .sterilization-workspace > .ster-work-panel > .ster-panel-head,
   .sterilization-workspace > .ster-work-panel > .released-loads,
@@ -108,14 +108,14 @@
 /* Receipt modal: fixed left controls, only Set tools list scrolls. */
 @media (min-width: 1101px) {
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) {
-    height: min(94vh, 940px);
+    height: min(94vh, 940px) !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
     grid-template-columns: minmax(410px, 35%) minmax(0, 65%);
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-left-panel {
-    overflow: hidden;
+    overflow: hidden !important;
     padding-right: 0 !important;
     gap: 8px;
   }
@@ -135,7 +135,7 @@
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary svg {
     left: 10px !important;
-    top: 10px;
+    top: 10px !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section {
     padding: 9px 11px !important;
@@ -256,11 +256,11 @@
   flex: 0 0 auto;
 }
 .receipt-right-panel .receipt-tools-scroll {
-  flex: 1 1 auto;
-  height: 0;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  flex: 1 1 auto !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 
 /* Report modal: the camera action opens the in-app camera instead of a file picker. */
@@ -324,27 +324,27 @@
    This block intentionally sits after every layer import and replaces the old
    v0.26.2 horizontal-scroll hotfix. The queue must fit the available workspace. */
 .sterilization-workspace > .ster-work-panel {
-  min-width: 0;
-  overflow: hidden;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 .sterilization-workspace .ster-list-scroll {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
 .sterilization-workspace .ster-list-head,
 .sterilization-workspace .ster-work-row {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 .sterilization-workspace .ster-list-head > *,
 .sterilization-workspace .ster-work-row > * {
-  min-width: 0;
+  min-width: 0 !important;
 }
 
 /* Receipt queue: Specialty is secondary information and lives under Department.
@@ -355,11 +355,11 @@
       190px,
       1.15fr
     ) !important;
-  column-gap: 14px;
+  column-gap: 14px !important;
 }
 .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(3),
 .sterilization-workspace .receipt-queue-panel .ster-cell-specialty {
-  display: none;
+  display: none !important;
 }
 .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4) {
   grid-column: 3;
@@ -373,17 +373,17 @@
   padding-right: 0;
 }
 .sterilization-workspace .receipt-queue-panel .ster-cell-department {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 3px !important;
 }
 .sterilization-workspace .receipt-queue-panel .ster-tablet-specialty {
-  display: block;
-  font-size: 11px;
-  color: var(--st-muted);
-  font-weight: 500;
-  line-height: 1.3;
+  display: block !important;
+  font-size: 11px !important;
+  color: var(--st-muted) !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
 }
 /* The generic queue pins cells to its six columns; with Specialty hidden, this queue has five. */
 .sterilization-workspace .receipt-queue-panel .ster-meta {
@@ -393,14 +393,14 @@
   grid-column: 4 !important;
 }
 .sterilization-workspace .receipt-queue-panel .ster-row-action {
-  grid-column: 5;
+  grid-column: 5 !important;
   justify-content: flex-start !important;
-  flex-wrap: nowrap;
-  gap: 8px;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
 }
 .sterilization-workspace .receipt-queue-panel .ster-row-action .primary.compact {
   flex: 0 0 auto;
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 .sterilization-workspace .receipt-queue-panel .ster-asset strong {
   white-space: normal !important;
@@ -410,7 +410,7 @@
   line-height: 1.25;
 }
 .sterilization-workspace .receipt-queue-panel .ster-status small {
-  white-space: normal;
+  white-space: normal !important;
   overflow-wrap: anywhere;
   line-height: 1.3;
 }
@@ -418,12 +418,12 @@
 @media (max-width: 1180px) and (min-width: 761px) {
   .sterilization-workspace .ster-work-panel .ster-list-head,
   .sterilization-workspace .ster-work-panel .ster-work-row {
-    grid-template-columns: minmax(180px, 1.85fr) minmax(110px, 1fr) minmax(110px, 0.9fr) minmax(150px, 1.15fr);
-    column-gap: 11px;
+    grid-template-columns: minmax(180px, 1.85fr) minmax(110px, 1fr) minmax(110px, 0.9fr) minmax(150px, 1.15fr) !important;
+    column-gap: 11px !important;
   }
   .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(5),
   .sterilization-workspace .ster-work-panel .ster-status {
-    display: none;
+    display: none !important;
   }
   .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(4) {
     grid-column: 3;
@@ -432,13 +432,13 @@
     grid-column: 4;
   }
   .sterilization-workspace .ster-work-panel .ster-row-action {
-    grid-column: 4;
+    grid-column: 4 !important;
   }
   .sterilization-workspace .ster-work-panel .ster-meta {
-    grid-column: 3;
+    grid-column: 3 !important;
   }
   .sterilization-workspace .ster-work-panel .ster-tablet-stage {
-    display: block;
+    display: block !important;
     margin-top: 2px;
     font-size: 11px;
     color: var(--st-muted);
@@ -451,10 +451,10 @@
     display: none !important;
   }
   .sterilization-workspace .ster-work-panel .ster-work-row {
-    display: grid;
+    display: grid !important;
     grid-template-columns: 44px minmax(0, 1fr) !important;
     gap: 8px 10px !important;
-    padding: 13px 14px;
+    padding: 13px 14px !important;
   }
   .sterilization-workspace .ster-work-panel .ster-asset-cell {
     grid-column: 1/-1 !important;
@@ -465,10 +465,10 @@
     grid-column: 2/-1 !important;
   }
   .sterilization-workspace .ster-work-panel .ster-status {
-    display: none;
+    display: none !important;
   }
   .sterilization-workspace .ster-work-panel .ster-tablet-stage {
-    display: block;
+    display: block !important;
   }
   .sterilization-workspace .ster-work-panel .ster-row-action {
     flex-wrap: wrap !important;
@@ -974,7 +974,7 @@
 /* Eight Studio tabs fit one row on desktop. */
 @media (min-width: 1100px) {
   .studio-tabs button {
-    padding: 8px 6px;
+    padding: 8px 6px !important;
     gap: 5px;
   }
 }
@@ -1022,21 +1022,21 @@
 /* Tool / Set card: when editing makes the fields taller than the screen, the card scrolls
    instead of squeezing the barcode, uses and photo tiles out of sight. */
 .asset-workbench-sidebar {
-  overflow-x: hidden;
+  overflow-x: hidden !important;
   overflow-y: auto !important;
 }
 .asset-workbench-sidebar > * {
-  flex-shrink: 0;
+  flex-shrink: 0 !important;
 }
 /* The photo count sits in the corner, clear of the "Photo" label. */
 .asset-tool-photo-card {
   position: relative;
 }
 .asset-tool-photo-card .asset-cover-count {
-  top: 6px;
-  right: 6px;
-  bottom: auto;
-  left: auto;
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  left: auto !important;
   transform: scale(0.85);
   transform-origin: top right;
 }
@@ -2364,7 +2364,7 @@
   .top-actions > .lang,
   .top-actions > .avatar,
   .suite-switcher > span {
-    display: none;
+    display: none !important;
   }
   .topbar {
     gap: 6px;
@@ -2372,10 +2372,10 @@
     padding-right: 12px !important;
   }
   .top-actions {
-    gap: 6px;
+    gap: 6px !important;
   }
   .role-switch select {
-    max-width: 112px;
+    max-width: 112px !important;
   }
   .a11y-popover,
   .notification-popover {
@@ -2388,7 +2388,7 @@
 }
 @media (max-width: 380px) {
   .role-switch select {
-    max-width: 92px;
+    max-width: 92px !important;
   }
 }
 
@@ -3429,8 +3429,8 @@ div.asset-import-hospital b {
 @media (min-width: 761px) {
   .studio-tabs {
     container-type: inline-size;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
   }
   .studio-tabs button {
     flex: 1 1 auto;
@@ -4810,12 +4810,12 @@ div.asset-import-hospital b {
 /* Desktop menu: one line per item and tighter rows, so the whole menu fits without scrolling. */
 @media (min-width: 901px) {
   .sidebar nav {
-    gap: 2px;
+    gap: 2px !important;
   }
   .sidebar .nav-item {
-    min-height: 0;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    min-height: 0 !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
   }
   .sidebar .nav-item span {
     white-space: nowrap;
@@ -4923,33 +4923,33 @@ div.asset-import-hospital b {
 .studio-head h1 {
   margin: 0 0 4px !important;
   color: var(--c-cyan-20) !important;
-  font-size: 22px;
+  font-size: 22px !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.02em !important;
 }
 .page-head p,
 .ster-work-head p,
 .department-header p,
 .studio-head p {
   max-width: 720px;
-  margin: 0;
-  color: var(--st-muted);
-  font-size: 14px;
-  line-height: 1.45;
+  margin: 0 !important;
+  color: var(--st-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
 }
 .page-head .eyebrow,
 .ster-work-head .eyebrow,
 .department-header .eyebrow,
 .studio-head .eyebrow {
-  margin: 0 0 2px;
-  font-size: 11px;
+  margin: 0 0 2px !important;
+  font-size: 11px !important;
   letter-spacing: 0.12em !important;
 }
 
 /* Sterilization stage cards: the title wraps inside its column instead of running under the count. */
 .sterile-queues.modern button {
-  grid-template-columns: 24px minmax(0, 1fr) auto;
+  grid-template-columns: 24px minmax(0, 1fr) auto !important;
   column-gap: 7px !important;
 }
 .sterile-queues.modern button > svg {
@@ -5467,19 +5467,19 @@ div.asset-import-hospital b {
 
 /* The bulk-import page title looks like every other page title. */
 .asset-import-head h2 {
-  margin: 0 0 4px;
-  color: var(--c-cyan-20);
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  margin: 0 0 4px !important;
+  color: var(--c-cyan-20) !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em !important;
 }
 .asset-import-head p {
   max-width: 720px;
-  margin: 0;
-  color: var(--st-muted);
-  font-size: 14px;
-  line-height: 1.45;
+  margin: 0 !important;
+  color: var(--st-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
 }
 .asset-import-head .eyebrow {
   display: block;
@@ -5495,11 +5495,11 @@ div.asset-import-hospital b {
 .bin-table th,
 .ledger-columns span,
 .sterilization-workspace .ster-list-head span {
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: none;
+  color: var(--st-muted) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
 }
 
 /* Two button heights everywhere: 38px for page-level buttons, 32px inside tables and rows. */
@@ -5537,7 +5537,7 @@ html
 }
 html body .content .ster-work-panel .primary.compact {
   min-height: 32px !important;
-  padding-block: 0;
+  padding-block: 0 !important;
 }
 html body .content .asset-list-controls .icon-toggle {
   align-self: center;
@@ -5838,7 +5838,7 @@ html body .page-head h1,
 html body .ster-work-head h1,
 html body .department-header h1,
 html body .studio-head h1 {
-  font-size: 22px;
+  font-size: 22px !important;
   line-height: 1.2;
 }
 html body .page-head > div:first-child > p,
@@ -6060,7 +6060,7 @@ html body .issues-fixed a.issue-asset:hover {
 html body .replacements-fixed {
   table-layout: fixed;
   width: 100%;
-  min-width: 0;
+  min-width: 0 !important;
 }
 html body .replacements-fixed th.pick {
   width: 40px;
@@ -6213,7 +6213,7 @@ html body .kpis > * strong,
 html body .replacements-kpis > * strong,
 html body .name-check-kpis strong,
 html body .dash-kpi strong {
-  margin: 0;
+  margin: 0 !important;
   color: var(--c-blue-15-2);
   font-size: 26px !important;
   font-weight: 750;
@@ -6247,7 +6247,7 @@ html body .replacements-fixed td.row-actions {
   text-align: right;
 }
 html body .replacements-fixed .row-actions {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
@@ -6255,11 +6255,11 @@ html body .replacements-fixed .row-actions {
 }
 html body .replacements-fixed .row-actions button {
   flex: 0 0 auto;
-  width: auto;
+  width: auto !important;
   min-width: 34px;
   height: 34px;
-  margin: 0;
-  padding: 0 10px;
+  margin: 0 !important;
+  padding: 0 10px !important;
   font-size: 12px;
 }
 html body .replacements-fixed th.col-actions {
@@ -6271,11 +6271,11 @@ html body .replacements-fixed td {
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
 html body .department-kpis > * {
-  display: grid;
+  display: grid !important;
   align-content: start;
-  gap: 6px;
+  gap: 6px !important;
   min-width: 0;
-  padding: 12px 16px;
+  padding: 12px 16px !important;
   border: 1px solid var(--c-gray-90-4);
   border-radius: 14px;
   background: var(--c-white);
@@ -6285,13 +6285,13 @@ html body .department-kpis > * {
 html body .department-kpis > * span,
 html body .department-kpis > * small {
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13px !important;
   font-weight: 500;
 }
 html body .department-kpis > * strong {
-  margin: 0;
+  margin: 0 !important;
   color: var(--c-blue-15-2);
-  font-size: 26px;
+  font-size: 26px !important;
   line-height: 1.1;
 }
 html body .department-kpis > .active {
@@ -6327,9 +6327,9 @@ html body .department-asset-uses > small {
 }
 html body .department-asset-open,
 html body .department-asset-list article > a {
-  min-height: 0;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  min-height: 0 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
 }
 /* Users & departments: the title, tabs and add row stay put; only the list scrolls. */
 html body .hospital-admin {
@@ -8487,17 +8487,17 @@ html body .sets-expiry.expired {
 @media (min-width: 1181px) {
   html body .sterilization-workspace .ster-list-head > span:nth-child(5),
   html body .sterilization-workspace .ster-work-row > .ster-status {
-    display: none;
+    display: none !important;
   }
   html body .sterilization-workspace .ster-list-head,
   html body .sterilization-workspace .ster-work-row {
     grid-template-columns:
       minmax(300px, 1.7fr) minmax(145px, 0.8fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr)
-      minmax(210px, 1fr);
+      minmax(210px, 1fr) !important;
   }
   /* The stage column is gone: the action takes the last of the five (not a sixth, zero-width one). */
   html body .sterilization-workspace .ster-row-action {
-    grid-column: 5;
+    grid-column: 5 !important;
   }
 }
 html body .ster-meta .ster-count-shortage {
@@ -8630,20 +8630,20 @@ html body .issues-fixed .issue-note-inline {
   /* Sets: the specialty is in the card; the name gets the room. */
   html body .sets-registry th:nth-child(3),
   html body .sets-registry td:nth-child(3) {
-    display: none;
+    display: none !important;
   }
   /* Expiry: name, barcode, department, sterilized, expires, remaining. */
   html body .expiry-table th:nth-child(4),
   html body .expiry-table td:nth-child(4),
   html body .expiry-table th:nth-child(5),
   html body .expiry-table td:nth-child(5) {
-    display: none;
+    display: none !important;
   }
   html body .expiry-table th:nth-child(3),
   html body .expiry-table td:nth-child(3),
   html body .expiry-table th:nth-child(7),
   html body .expiry-table td:nth-child(7) {
-    display: table-cell;
+    display: table-cell !important;
   }
   html body .expiry-table th:nth-child(3) {
     width: 150px;
@@ -8657,7 +8657,7 @@ html body .issues-fixed .issue-note-inline {
   /* Issues: the note goes under the item instead of its own squeezed column. */
   html body .issues-fixed th:nth-child(2),
   html body .issues-fixed td.issue-note {
-    display: none;
+    display: none !important;
   }
   html body .issues-fixed .issue-note-inline {
     display: -webkit-box;
@@ -8671,7 +8671,7 @@ html body .issues-fixed .issue-note-inline {
   }
   /* Set card: the open-report note wraps instead of being cut, and is never hidden. */
   html body .asset-detail-body .set-tool-state {
-    display: flex;
+    display: flex !important;
     flex-wrap: wrap;
     justify-content: flex-end;
     max-width: 112px;
@@ -8736,7 +8736,7 @@ html body .issues-fixed .issue-note-inline {
   /* Movements: two lines per entry, so the action and the user stay visible. */
   html body .ledger-columns,
   html body .ledger-row {
-    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1.1fr) 20px;
+    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1.1fr) 20px !important;
   }
   html body .ledger-row {
     grid-template-areas: 'date asset route open' 'date user action open';
@@ -8753,18 +8753,18 @@ html body .issues-fixed .issue-note-inline {
   }
   html body .ledger-row > span:nth-child(4) {
     grid-area: action;
-    display: block;
+    display: block !important;
   }
   html body .ledger-row > .ledger-user {
     grid-area: user;
-    display: flex;
+    display: flex !important;
   }
   html body .ledger-row > svg:last-child {
     grid-area: open;
   }
   html body .ledger-columns span:nth-child(4),
   html body .ledger-columns span:nth-child(5) {
-    display: none;
+    display: none !important;
   }
   /* Studio libraries: the library picker becomes a row of chips above the list. */
   html body .studio-manager {
@@ -8772,11 +8772,11 @@ html body .issues-fixed .issue-note-inline {
     grid-template-rows: auto minmax(0, 1fr);
   }
   html body .studio-manager-nav {
-    display: flex;
-    flex-direction: row;
+    display: flex !important;
+    flex-direction: row !important;
     overflow-x: auto;
     overflow-y: hidden;
-    height: auto;
+    height: auto !important;
   }
   html body .studio-manager-nav button {
     flex: 0 0 auto;
@@ -8794,7 +8794,7 @@ html body .issues-fixed .issue-note-inline {
   }
   /* Set card: the sterile dates take the full row under their label, side by side. */
   html body .asset-workbench-fields > div:has(> .sterile-dd) {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) !important;
     row-gap: 2px;
   }
 }
@@ -9152,13 +9152,13 @@ html body .idle-lock-password button[aria-pressed='true'] {
     overflow-y: auto;
   }
   html body .sterilization-workspace {
-    height: auto;
-    overflow: visible;
+    height: auto !important;
+    overflow: visible !important;
   }
   html body .sterilization-workspace > .ster-work-panel {
-    flex: none;
-    height: auto;
-    max-height: none;
+    flex: none !important;
+    height: auto !important;
+    max-height: none !important;
     overflow: visible !important;
   }
   html body .sterilization-workspace .ster-panel-head {
@@ -9166,8 +9166,8 @@ html body .idle-lock-password button[aria-pressed='true'] {
     position: static;
   }
   html body .sterilization-workspace .ster-list-scroll {
-    height: auto;
-    max-height: none;
+    height: auto !important;
+    max-height: none !important;
     overflow: visible !important;
   }
   html body .ster-scan.ster-scan-restored .ster-scan-copy span {
@@ -9206,9 +9206,9 @@ html body .sets-registry .set-count-short .muted {
     display: block;
     width: auto !important;
     min-width: 0 !important;
-    max-width: none;
+    max-width: none !important;
     padding: 0 !important;
-    border: 0;
+    border: 0 !important;
     font-size: 12.5px;
   }
   html body .registry-fixed tbody td:first-child {
@@ -9241,7 +9241,7 @@ html body .sets-registry .set-count-short .muted {
    «Προς Αποστείρωση»), and the five tabs sit in two rows instead of cutting «Σημειώσεις». */
 @media (max-width: 700px) {
   html body .asset-workbench-actions {
-    flex-wrap: wrap;
+    flex-wrap: wrap !important;
     overflow-x: visible;
   }
   /* The composition title above its buttons («Φυσικά εργαλεία» ran into «Προσθήκη»). */
@@ -9259,7 +9259,7 @@ html body .sets-registry .set-count-short .muted {
     flex: 1 1 auto;
   }
   html body .asset-workbench-main > .asset-detail-tabs {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     overflow: visible;
   }
@@ -9311,7 +9311,7 @@ html body .asset-create-hint {
     min-width: 0 !important;
     max-width: none !important;
     padding: 0 !important;
-    border: 0;
+    border: 0 !important;
     font-size: 12.5px;
   }
   html body .issues-fixed tbody td:first-child {
@@ -9326,7 +9326,7 @@ html body .asset-create-hint {
   }
   html body .issues-fixed .issue-actions-row,
   html body .replacements-fixed .row-actions {
-    justify-content: flex-start;
+    justify-content: flex-start !important;
     flex-wrap: wrap;
   }
 }

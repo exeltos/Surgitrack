@@ -729,7 +729,7 @@
   .topbar,
   .movements-actions,
   .ledger-open {
-    display: none;
+    display: none !important;
   }
   .movements-workspace {
     height: auto;
@@ -737,22 +737,22 @@
   }
   .movement-ledger,
   .ledger-scroll {
-    overflow: visible;
-    height: auto;
+    overflow: visible !important;
+    height: auto !important;
   }
   .ledger-row {
     break-inside: avoid;
   }
   .main {
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   .ledger-columns,
   .ledger-row {
     grid-template-columns: 130px minmax(0, 1fr) minmax(0, 1.3fr) 180px 160px;
   }
   .ledger-row > .ledger-user {
-    display: flex;
+    display: flex !important;
   }
 }
 
@@ -1266,8 +1266,8 @@
   background: var(--c-gray-95-3);
 }
 .department-asset-list {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
@@ -1383,19 +1383,19 @@
     overflow: hidden !important;
   }
   .department-shell .content {
-    overflow: hidden;
-    min-height: 0;
+    overflow: hidden !important;
+    min-height: 0 !important;
   }
   .department-workspace {
-    height: 100%;
-    min-height: 0;
+    height: 100% !important;
+    min-height: 0 !important;
   }
   .department-assets-panel {
-    min-height: 0;
+    min-height: 0 !important;
   }
   .department-asset-list {
-    min-height: 0;
-    overflow-y: auto;
+    min-height: 0 !important;
+    overflow-y: auto !important;
   } /* Phone: the state goes under the name instead of a column that does not fit. */
   .department-asset-open {
     grid-template-columns: 34px minmax(0, 1fr) 20px;
@@ -2216,7 +2216,7 @@
 /* Workflow and System are settings documents: the Studio body owns vertical scrolling.
    This avoids a small inner scrollbar that hides stages/policies. */
 .studio-workspace {
-  min-height: 0;
+  min-height: 0 !important;
 }
 .studio-body.studio-body-workflow,
 .studio-body.studio-body-system {
@@ -2344,34 +2344,34 @@
   --studio-accent: var(--c-cyan-45);
 }
 .studio-workspace .eyebrow {
-  font-size: 11px;
+  font-size: 11px !important;
   line-height: 1.2;
-  font-weight: 750;
-  letter-spacing: 0.09em;
-  color: var(--st-muted);
+  font-weight: 750 !important;
+  letter-spacing: 0.09em !important;
+  color: var(--st-muted) !important;
 }
 .studio-head h1 {
-  font-size: 27px;
-  line-height: 1.12;
-  font-weight: 720;
+  font-size: 27px !important;
+  line-height: 1.12 !important;
+  font-weight: 720 !important;
   letter-spacing: -0.025em;
-  color: var(--studio-ink);
+  color: var(--studio-ink) !important;
 }
 .studio-head p {
-  font-size: 13px;
-  line-height: 1.45;
-  font-weight: 400;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+  font-weight: 400 !important;
 }
 .studio-health strong {
-  font-size: 12px;
-  font-weight: 680;
+  font-size: 12px !important;
+  font-weight: 680 !important;
 }
 .studio-health span {
-  font-size: 11px;
+  font-size: 11px !important;
 }
 .studio-tabs {
-  gap: 4px;
-  padding: 4px;
+  gap: 4px !important;
+  padding: 4px !important;
   /* All tabs stay visible: they share the row and wrap rather than hide off-screen. */
   flex-wrap: wrap;
   overflow-x: visible;
@@ -2382,30 +2382,30 @@
   min-height: 38px;
   gap: 6px;
   padding: 8px 9px !important;
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 620;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  font-weight: 620 !important;
 }
 .studio-tabs button.active {
   font-weight: 680 !important;
 }
 .studio-panel-head h2,
 .studio-workflow-hero h2 {
-  color: var(--studio-ink);
-  font-weight: 680;
+  color: var(--studio-ink) !important;
+  font-weight: 680 !important;
   letter-spacing: -0.012em;
 }
 .studio-panel-head h2,
 .studio-workflow-hero h2 {
-  font-size: 19px;
+  font-size: 19px !important;
 }
 .studio-panel-head p,
 .studio-workflow-hero p {
-  font-size: 11.5px;
-  line-height: 1.45;
+  font-size: 11.5px !important;
+  line-height: 1.45 !important;
 }
 .studio-manager {
-  grid-template-columns: 235px minmax(0, 1fr);
+  grid-template-columns: 235px minmax(0, 1fr) !important;
 }
 .studio-manager-nav {
   padding: 7px !important;
@@ -2414,23 +2414,23 @@
   padding: 9px !important;
 }
 .studio-manager-nav button b {
-  font-size: 11.5px;
-  font-weight: 640;
+  font-size: 11.5px !important;
+  font-weight: 640 !important;
   color: var(--studio-text);
 }
 .studio-manager-nav button.active b {
-  color: var(--studio-accent);
+  color: var(--studio-accent) !important;
 }
 .studio-manager-nav button small {
-  font-size: 11px;
+  font-size: 11px !important;
 }
 .studio-panel-head {
-  padding: 14px 16px 11px;
+  padding: 14px 16px 11px !important;
 }
 .studio-search {
-  margin: 9px 13px;
+  margin: 9px 13px !important;
   min-height: 39px;
-  padding: 8px 10px;
+  padding: 8px 10px !important;
 }
 .studio-search input {
   font-size: 12px !important;
@@ -2440,38 +2440,38 @@
   color: var(--st-muted);
 }
 .studio-list-head {
-  padding: 7px 16px;
-  font-size: 11px;
-  font-weight: 680;
-  letter-spacing: 0.055em;
+  padding: 7px 16px !important;
+  font-size: 11px !important;
+  font-weight: 680 !important;
+  letter-spacing: 0.055em !important;
 }
 .studio-scroll-list {
-  padding: 0 13px 9px;
+  padding: 0 13px 9px !important;
 }
 .studio-list-row {
   min-height: 48px;
-  padding: 9px 3px;
-  font-size: 11.5px;
+  padding: 9px 3px !important;
+  font-size: 11.5px !important;
 }
 .studio-list-row strong {
-  font-weight: 620;
-  color: var(--studio-ink);
+  font-weight: 620 !important;
+  color: var(--studio-ink) !important;
 }
 .studio-list-row > span {
-  font-size: 11px;
+  font-size: 11px !important;
 }
 .studio-list-row code {
-  font-size: 11px;
+  font-size: 11px !important;
 }
 .studio-list-row button {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 8px !important;
 }
 .studio-access-toggle,
 .role-chip {
-  font-size: 11px;
-  font-weight: 620;
+  font-size: 11px !important;
+  font-weight: 620 !important;
 }
 .studio-system-grid h3 {
   font-size: 15px !important;
@@ -2495,24 +2495,24 @@
   font-size: 11px !important;
 }
 .studio-drawer h2 {
-  font-size: 19px;
-  font-weight: 680;
+  font-size: 19px !important;
+  font-weight: 680 !important;
 }
 .studio-drawer-form label {
-  font-size: 11.5px;
-  font-weight: 620;
+  font-size: 11.5px !important;
+  font-weight: 620 !important;
 }
 .studio-drawer-form input,
 .studio-drawer-form select {
   font-size: 11.5px !important;
 }
 .studio-form-note {
-  font-size: 11px;
+  font-size: 11px !important;
 }
 .studio-workspace .app-button,
 .studio-workspace button.primary,
 .studio-workspace button.secondary {
-  font-weight: 620;
+  font-weight: 620 !important;
 }
 .studio-panel-head .app-button,
 .studio-workflow-footer .app-button {
@@ -4478,7 +4478,7 @@ a.auth-primary {
 @media (max-width: 1180px) {
   .studio-list-head,
   .studio-list-row {
-    grid-template-columns: minmax(0, 1fr) 84px 72px;
+    grid-template-columns: minmax(0, 1fr) 84px 72px !important;
   }
   .studio-list-head span:nth-child(2) {
     display: none;
@@ -4495,7 +4495,7 @@ a.auth-primary {
   }
   .studio-list-row > span:nth-child(2) {
     grid-area: english;
-    display: block;
+    display: block !important;
     min-width: 0;
   }
   .studio-list-row > code {

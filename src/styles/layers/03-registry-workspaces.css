@@ -75,15 +75,15 @@
 }
 .asset-registry-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
   font-size: 12.5px;
 }
 .asset-registry-table thead th {
   height: 46px;
   padding: 0 10px;
   vertical-align: middle;
-  background: var(--c-white);
+  background: var(--c-white) !important;
   color: var(--c-cyan-45-2);
   font-size: 11px;
   font-weight: 800;
@@ -211,7 +211,7 @@
     flex-basis: 42px;
   }
   .asset-registry-table {
-    min-width: 920px;
+    min-width: 920px !important;
   }
 }
 
@@ -219,14 +219,14 @@
 /* Registry pages use the document/page scroll. Avoid a second vertical scrollbar inside the list card. */
 .list-scroll-panel,
 .list-scroll-panel-kpis {
-  max-height: none;
-  overflow-x: auto;
-  overflow-y: visible;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
   overscroll-behavior: auto;
   scrollbar-gutter: auto;
 }
 .list-scroll-panel thead th {
-  position: static;
+  position: static !important;
 }
 
 /* Do not force the first column to be oversized: each registry can size itself naturally. */
@@ -235,7 +235,7 @@
   min-width: 0;
 }
 .asset-registry-table {
-  min-width: 960px;
+  min-width: 960px !important;
 }
 
 /* Stock has a compact barcode first column and gives the useful space to the asset/action columns. */
@@ -589,8 +589,8 @@ body {
 .tools-list-workspace > .list-scroll-region {
   flex: 1 1 auto;
   min-height: 0;
-  max-height: none;
-  overflow: auto;
+  max-height: none !important;
+  overflow: auto !important;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   padding-top: 0;
@@ -629,7 +629,7 @@ body {
   flex: 0 0 auto;
 }
 .sterilization-workspace > .ster-work-panel {
-  max-height: none;
+  max-height: none !important;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   margin-bottom: 0;
@@ -754,8 +754,8 @@ body {
   scrollbar-gutter: stable;
 }
 .set-composition-fixed {
-  height: auto;
-  max-height: none;
+  height: auto !important;
+  max-height: none !important;
 }
 .set-tool-list {
   min-height: 0;
@@ -812,7 +812,7 @@ body {
     min-height: 40px;
   }
   .asset-registry-table {
-    min-width: 900px;
+    min-width: 900px !important;
   }
   .tool-workspace-grid {
     grid-template-columns: minmax(270px, 38%) minmax(0, 62%);
@@ -821,7 +821,7 @@ body {
     grid-template-columns: minmax(280px, 34%) minmax(0, 66%) !important;
   }
   .asset-action-link {
-    min-height: 40px;
+    min-height: 40px !important;
   }
   .ster-scan {
     margin-bottom: 10px;
@@ -871,11 +871,11 @@ body {
   }
   .tools-list-workspace > .list-scroll-panel,
   .tools-list-workspace > .list-scroll-panel-kpis {
-    overflow: auto;
+    overflow: auto !important;
   }
   .tool-detail-workspace,
   .set-detail-workspace {
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .tool-workspace-grid,
   .set-workspace-grid {
@@ -927,8 +927,8 @@ body {
   font-size: 13px;
 }
 .asset-detail-workspace .asset-action-link {
-  min-height: 42px;
-  padding: 0 14px;
+  min-height: 42px !important;
+  padding: 0 14px !important;
   font-size: 12.5px;
 }
 
@@ -1065,8 +1065,8 @@ body {
 
 /* Set composition now owns the full working canvas. Only the instruments list scrolls. */
 .asset-detail-body .set-composition-fixed {
-  height: 100%;
-  max-height: none;
+  height: 100% !important;
+  max-height: none !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1128,21 +1128,21 @@ body {
   }
   .asset-detail-tabs button {
     min-height: 48px;
-    padding: 0 15px;
+    padding: 0 15px !important;
     font-size: 12.5px;
   }
   .asset-detail-body {
     overflow: hidden;
   }
   .asset-detail-body .set-composition-fixed {
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .asset-detail-body .set-composition-filters {
     margin: 0 10px 8px;
   }
   .asset-detail-body .set-tool-list {
-    max-height: none;
-    overflow: auto;
+    max-height: none !important;
+    overflow: auto !important;
   }
   .asset-detail-full-panel .asset-photo-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1200,8 +1200,8 @@ body {
 
 /* v0.21.5 — FileMaker-inspired asset workbench: fixed identity left, working canvas right. */
 .asset-focus-shell .content {
-  padding-top: 14px;
-  padding-bottom: 14px;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
 }
 /* Only the page footer: dialog footers (report, duplicate, delete) keep their buttons. */
 .asset-focus-shell .main > footer {
@@ -1402,7 +1402,7 @@ body {
   box-shadow: none;
 }
 .asset-workbench-main .set-composition-fixed {
-  border: 0;
+  border: 0 !important;
 }
 .asset-workbench-main .set-composition-head {
   padding-top: 10px;
@@ -1444,7 +1444,7 @@ body {
   }
   .asset-workbench-actions .app-button,
   .asset-workbench-actions .asset-action-link {
-    min-height: 46px;
+    min-height: 46px !important;
   }
 }
 @media (max-width: 700px) {
@@ -1569,7 +1569,7 @@ body {
   font-size: 12px;
 }
 .asset-workbench-main > .asset-detail-tabs {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
 }
 .asset-workbench-main > .asset-detail-tabs button {
   justify-content: center;
@@ -1864,15 +1864,15 @@ body {
   font-weight: 700;
 }
 .asset-detail-body .set-tool-list {
-  overflow-y: auto;
+  overflow-y: auto !important;
   overflow-x: hidden !important;
 }
 .asset-detail-body .set-tool-row {
   width: 100%;
-  min-width: 0;
-  grid-template-columns: 34px minmax(96px, 125px) minmax(150px, 1fr) minmax(92px, 115px) minmax(118px, 145px);
+  min-width: 0 !important;
+  grid-template-columns: 34px minmax(96px, 125px) minmax(150px, 1fr) minmax(92px, 115px) minmax(118px, 145px) !important;
   gap: 10px;
-  padding: 11px 14px;
+  padding: 11px 14px !important;
 }
 .asset-detail-body .set-tool-row > * {
   min-width: 0;
@@ -1908,22 +1908,22 @@ body {
     grid-template-columns: 310px minmax(0, 1fr);
   }
   .asset-detail-body .set-tool-row {
-    grid-template-columns: 30px minmax(86px, 105px) minmax(130px, 1fr) minmax(82px, 96px) minmax(105px, 125px);
+    grid-template-columns: 30px minmax(86px, 105px) minmax(130px, 1fr) minmax(82px, 96px) minmax(105px, 125px) !important;
     gap: 8px;
-    padding-inline: 10px;
+    padding-inline: 10px !important;
   }
 }
 @media (max-width: 900px) {
   .asset-workbench-grid {
     grid-template-columns: minmax(280px, 34%) minmax(0, 1fr) !important;
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .asset-workbench-main {
-    min-width: 0;
+    min-width: 0 !important;
   }
   .asset-detail-body .set-tool-row {
-    min-width: 0;
-    grid-template-columns: 28px minmax(82px, 100px) minmax(125px, 1fr) minmax(78px, 92px);
+    min-width: 0 !important;
+    grid-template-columns: 28px minmax(82px, 100px) minmax(125px, 1fr) minmax(78px, 92px) !important;
   }
   .asset-detail-body .set-tool-state {
     display: none;
@@ -1931,7 +1931,7 @@ body {
 }
 @media (max-width: 720px) {
   .asset-workbench-grid {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     overflow: auto !important;
   }
@@ -2064,26 +2064,26 @@ body {
 
 /* v0.27.0 — tool quick facts are one fixed row: barcode | uses | photo */
 .asset-workbench-sidebar-tool .asset-sidebar-quickfacts {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 104px;
-  gap: 9px;
-  align-items: stretch;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 104px !important;
+  gap: 9px !important;
+  align-items: stretch !important;
 }
 .asset-workbench-sidebar-tool .asset-tool-photo-card {
-  margin-top: 0;
-  min-height: 78px;
-  height: 78px;
+  margin-top: 0 !important;
+  min-height: 78px !important;
+  height: 78px !important;
 }
 .asset-workbench-sidebar-tool .asset-tool-photo-card img {
   height: 76px !important;
 }
 .asset-workbench-sidebar-tool .asset-tool-photo-empty {
-  min-height: 76px;
-  gap: 5px;
-  flex-direction: column;
+  min-height: 76px !important;
+  gap: 5px !important;
+  flex-direction: column !important;
 }
 .asset-workbench-sidebar-tool .asset-tool-photo-empty div {
-  align-items: center;
+  align-items: center !important;
 }
 .asset-workbench-sidebar-tool .asset-tool-photo-empty span {
   display: none;
