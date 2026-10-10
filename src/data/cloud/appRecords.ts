@@ -41,6 +41,24 @@ const emptyRecords = (): CloudRecords =>
   Object.fromEntries([...STORE_COLLECTIONS, 'library'].map(c => [c, []])) as unknown as CloudRecords;
 
 /**
+ * Empty fields are left out of what the server sends (a missing field reads as an empty one, see
+ * tableFromRow): an instrument has many, so a large hospital downloads about half as much. A server that
+ * does not know the option (406) gets the plain request, and is not asked again.
+ */
+let stripNulls = true;
+const loadStripped = async <T>(load: (strip: boolean) => Promise<T>): Promise<T> => {
+  if (!stripNulls) return load(false);
+  try {
+    return await load(true);
+  } catch (error) {
+    const {code, status} = (error || {}) as {code?: string; status?: number};
+    if (status !== 406 && code !== 'PGRST107') throw error;
+    stripNulls = false;
+    return load(false);
+  }
+};
+
+/**
  * Loads one collection's table, newest first (the store's order). With `since`, only records created
  * from then on; with `before`, only older ones (the rest of the history, loaded when asked: T3).
  */
@@ -48,22 +66,25 @@ export async function loadTable(
   organizationId: string,
   collection: TableCollection,
   range: {since?: string; before?: string} = {},
+  onProgress?: (loaded: number, total: number) => void,
 ) {
   const {mutable} = CLOUD_TABLES[collection];
-  const rows = await loadAllPages<Record<string, unknown>>((from, to, withCount) => {
-    let query = supabase
-      .from(CLOUD_TABLES[collection].table)
-      // Changeable records come with their version, for the check when they are saved (S4).
-      .select(`${tableColumns(collection)}${mutable ? ',updated_at' : ''}`, withCount ? {count: 'exact'} : undefined)
-      .eq('organization_id', organizationId);
-    if (range.since) query = query.gte('created_at', range.since);
-    if (range.before) query = query.lt('created_at', range.before);
-    return query
-      .order('created_at', {ascending: false})
-      .order('id')
-      .range(from, to)
-      .then(result => ({...result, data: result.data as unknown as Array<Record<string, unknown>> | null}));
-  });
+  const load = (strip: boolean) =>
+    loadAllPages<Record<string, unknown>>((from, to, withCount) => {
+      let query = supabase
+        .from(CLOUD_TABLES[collection].table)
+        // Changeable records come with their version, for the check when they are saved (S4).
+        .select(`${tableColumns(collection)}${mutable ? ',updated_at' : ''}`, withCount ? {count: 'exact'} : undefined)
+        .eq('organization_id', organizationId);
+      if (range.since) query = query.gte('created_at', range.since);
+      if (range.before) query = query.lt('created_at', range.before);
+      query = query.order('created_at', {ascending: false}).order('id').range(from, to);
+      return (strip ? query.stripNulls() : query).then(result => ({
+        ...result,
+        data: result.data as unknown as Array<Record<string, unknown>> | null,
+      }));
+    }, onProgress);
+  const rows = await loadStripped(load);
   if (mutable) rememberVersions(collection, rows);
   return rows.map(row => tableFromRow(collection, row));
 }
@@ -72,11 +93,31 @@ export async function loadTable(
  * Loads an organization's records, newest first within each collection (the store's order): every
  * changeable record, and the recent part of the history (see historyWindow; the rest loads on request).
  */
-export async function loadAppRecords(organizationId: string, {recentHistory = true} = {}): Promise<CloudRecords> {
+export async function loadAppRecords(
+  organizationId: string,
+  {
+    recentHistory = true,
+    onProgress,
+  }: {
+    recentHistory?: boolean;
+    /** Records arrived so far and the total, across every table (for the loading screen). */
+    onProgress?: (loaded: number, total: number) => void;
+  } = {},
+): Promise<CloudRecords> {
   const records = emptyRecords();
   const cutoffs = TABLE_COLLECTIONS.map(collection => (recentHistory ? freshCutoff(collection) : undefined));
+  const progress = TABLE_COLLECTIONS.map(() => ({loaded: 0, total: 0}));
+  const report = (index: number) => (loaded: number, total: number) => {
+    progress[index] = {loaded, total};
+    onProgress?.(
+      progress.reduce((sum, item) => sum + item.loaded, 0),
+      progress.reduce((sum, item) => sum + item.total, 0),
+    );
+  };
   const loaded = await Promise.all(
-    TABLE_COLLECTIONS.map((collection, index) => loadTable(organizationId, collection, {since: cutoffs[index]})),
+    TABLE_COLLECTIONS.map((collection, index) =>
+      loadTable(organizationId, collection, {since: cutoffs[index]}, onProgress && report(index)),
+    ),
   );
   TABLE_COLLECTIONS.forEach((collection, index) => {
     records[collection] = loaded[index];

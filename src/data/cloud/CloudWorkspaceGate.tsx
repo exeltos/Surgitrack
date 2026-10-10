@@ -47,6 +47,9 @@ const exitWorkspace = () => {
  * otherwise the user's own hospital (or the one the platform admin picked in the header).
  * Without a session or a hospital the app runs on its local, empty data (Studio only).
  */
+/** From how many records the loading screen shows how far it has come. */
+const LARGE_LOAD = 2000;
+
 export default function CloudWorkspaceGate({children}: {children: (workspace: CloudWorkspace | null) => ReactNode}) {
   const [workspace, setWorkspace] = useState<CloudWorkspace | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'local' | 'error' | 'locked'>('loading');
@@ -61,6 +64,8 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
     userId: string;
   }>();
   const [error, setError] = useState('');
+  // Records arrived so far while a large hospital opens from the server (for the loading line).
+  const [progress, setProgress] = useState<{loaded: number; total: number} | null>(null);
   const lang = localStorage.getItem('surgitrack-lang') === 'en' ? 'en' : 'el';
 
   const load = useCallback(async () => {
@@ -135,7 +140,9 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       } else {
         // From the server, with each collection's unsaved changes (kept by the copy) put back on top.
         const since = new Date(Date.now() - 60000).toISOString();
-        records = await loadAppRecords(organizationId);
+        records = await loadAppRecords(organizationId, {
+          onProgress: (loaded, total) => setProgress({loaded, total}),
+        });
         const unsaved: Partial<Record<CloudCollection, CachedCollection>> = {};
         for (const collection of collections) {
           const entry = pendingOnto(records[collection], copy[collection], since);
@@ -206,8 +213,16 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       </TrialContext.Provider>
     );
   if (status === 'locked' && lock) return <TrialLocked lang={lang} {...lock} />;
-  if (status === 'loading')
-    return <Spinner fullScreen label={lang === 'el' ? 'Φόρτωση δεδομένων…' : 'Loading data…'} />;
+  if (status === 'loading') {
+    const loading = lang === 'el' ? 'Φόρτωση δεδομένων…' : 'Loading data…';
+    // A large hospital takes a while on a slow line: how far it has come, so it does not look stuck.
+    const count = (n: number) => n.toLocaleString(lang === 'el' ? 'el-GR' : 'en-GB');
+    const detail =
+      progress && progress.total > LARGE_LOAD
+        ? `${loading} ${count(progress.loaded)} / ${count(progress.total)} ${lang === 'el' ? 'εγγραφές' : 'records'}`
+        : undefined;
+    return <Spinner fullScreen label={loading} detail={detail} />;
+  }
   return (
     <div className="cloud-gate">
       <>
