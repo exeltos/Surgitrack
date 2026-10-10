@@ -132,7 +132,9 @@ Deno.serve(async req => {
     const password = typeof body?.password === "string" ? body.password : "";
     if (!NAME.test(firstName) || !NAME.test(lastName) || !EMAIL.test(email) || (needsDepartment && !departmentId))
       return json({error: "invalid_input"}, 400);
-    if (password.length < PASSWORD_MIN || password.length > 72) return json({error: "password_invalid"}, 400);
+    // At least 8 characters, with a letter and a number (the app's form checks the same).
+    if (password.length < PASSWORD_MIN || password.length > 72 || !/\p{L}/u.test(password) || !/\d/.test(password))
+      return json({error: "password_invalid"}, 400);
 
     // Throttle signups per IP (the same atomic limiter as sign-in).
     const ip = clientIp(req);
@@ -161,8 +163,14 @@ Deno.serve(async req => {
 
     // An earlier signup with this email that was never confirmed does not keep its owner out.
     await releaseUnconfirmedSignup(admin, email);
-    const {data: account} = await admin.from("profiles").select("id").eq("email", email).maybeSingle();
-    if (account) return json({error: "email_exists"}, 409);
+    const {data: account} = await admin.from("profiles").select("id, active").eq("email", email).maybeSingle();
+    if (account) {
+      // Not active yet: an earlier signup that waits for the admin, which the person should be told.
+      const {data: waiting} = account.active
+        ? {data: null}
+        : await admin.from("staff_access_requests").select("id").eq("user_id", account.id).eq("status", "PENDING").maybeSingle();
+      return json({error: waiting ? "already_pending" : "email_exists"}, 409);
+    }
 
     let open: {id: string; status: string} | null = null;
     if (!invitation) {

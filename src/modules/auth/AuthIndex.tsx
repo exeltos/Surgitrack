@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, LogIn} from 'lucide-react';
+import {passwordOk} from '../../core/passwordRules';
 import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
 import {FunctionsHttpError, type User} from '@supabase/supabase-js';
@@ -243,11 +244,11 @@ export default function AuthIndex({
     const data = new FormData(e.currentTarget);
     const password = String(data.get('password') || '');
     const confirmPassword = String(data.get('confirmPassword') || '');
-    if (password.length < 8) {
+    if (!passwordOk(password)) {
       setMessage(
         lang === 'el'
-          ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.'
-          : 'The new password must be at least 8 characters.',
+          ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό.'
+          : 'The new password must be at least 8 characters, with a letter and a number.',
       );
       return;
     }

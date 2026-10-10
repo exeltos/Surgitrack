@@ -71,3 +71,43 @@ describe('Signup email confirmation', () => {
     );
   });
 });
+
+describe('Signup password', () => {
+  const form = async () => {
+    invoke.mockImplementation(async (_name: string, {body}: {body: Record<string, unknown>}) =>
+      body.action === 'info' ? {data: INFO, error: null} : {data: {ok: true, user_code: 'GN1234'}, error: null},
+    );
+    const view = open({token: 'aaaaaaaaaaaaaaaa'});
+    await screen.findByText('ΙΑΣΩ Θεσσαλίας');
+    return view;
+  };
+
+  it('shows and hides both passwords with one button', async () => {
+    const {container} = await form();
+    expect(container.querySelectorAll('input[type="password"]')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', {name: 'Εμφάνιση κωδικού'}));
+    expect(container.querySelectorAll('input[type="password"]')).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', {name: 'Απόκρυψη κωδικού'}));
+    expect(container.querySelectorAll('input[type="password"]')).toHaveLength(2);
+  });
+
+  it('ticks off the rules as they are met, and refuses a weak password before sending', async () => {
+    const {container} = await form();
+    const inputs = container.querySelectorAll('input');
+    fireEvent.change(inputs[0], {target: {value: 'Γιώργος'}});
+    fireEvent.change(inputs[1], {target: {value: 'Νικολάου'}});
+    fireEvent.change(container.querySelector('input[name="email"]')!, {target: {value: 'g@hospital.gr'}});
+    fireEvent.change(container.querySelector('select')!, {target: {value: 'dept-1'}});
+    const [password, confirm] = container.querySelectorAll('input[type="password"]');
+    fireEvent.change(password, {target: {value: 'onlyletters'}});
+    fireEvent.change(confirm, {target: {value: 'onlyletters'}});
+    const rule = (text: string) => screen.getByText(text).closest('li')!;
+    expect(rule('Τουλάχιστον 8 χαρακτήρες')).toHaveClass('is-ok');
+    expect(rule('Ένα γράμμα')).toHaveClass('is-ok');
+    expect(rule('Ένας αριθμός')).not.toHaveClass('is-ok');
+    expect(rule('Οι δύο κωδικοί ταιριάζουν')).toHaveClass('is-ok');
+    fireEvent.submit(container.querySelector('form')!);
+    expect(await screen.findByRole('alert')).toHaveTextContent('με ένα γράμμα και έναν αριθμό');
+    expect(invoke.mock.calls.every(([, {body}]) => body.action === 'info')).toBe(true);
+  });
+});
