@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, LogIn} from 'lucide-react';
 import {passwordOk} from '../../core/passwordRules';
+import {PasswordFields} from '../../components/auth/PasswordFields';
 import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
 import {FunctionsHttpError, type User} from '@supabase/supabase-js';
@@ -126,6 +127,9 @@ export default function AuthIndex({
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
   const [view, setView] = useState<View>('login');
   const [showPassword, setShowPassword] = useState(false);
+  // The new password (set from a reset or invitation link), and its repetition.
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordAgain, setNewPasswordAgain] = useState('');
   const [message, setMessage] = useState('');
   useEffect(() => {
     const {data: listener} = supabase.auth.onAuthStateChange(event => {
@@ -241,9 +245,8 @@ export default function AuthIndex({
   const submitReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
-    const data = new FormData(e.currentTarget);
-    const password = String(data.get('password') || '');
-    const confirmPassword = String(data.get('confirmPassword') || '');
+    const password = newPassword;
+    const confirmPassword = newPasswordAgain;
     if (!passwordOk(password)) {
       setMessage(
         lang === 'el'
@@ -262,6 +265,8 @@ export default function AuthIndex({
       return;
     }
     await supabase.auth.signOut();
+    setNewPassword('');
+    setNewPasswordAgain('');
     onPasswordRecoveryHandled?.();
     setMessage(
       lang === 'el'
@@ -403,34 +408,19 @@ export default function AuthIndex({
                   <ShieldCheck size={22} />
                 </div>
                 <form className="auth-form" onSubmit={submitReset}>
-                  <label>
-                    {lang === 'el' ? 'Νέος κωδικός' : 'New password'}
-                    <div className="auth-input">
-                      <LockKeyhole size={17} />
-                      <input
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        autoComplete="new-password"
-                      />
-                      <button type="button" onClick={() => setShowPassword(v => !v)}>
-                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                      </button>
+                  <PasswordFields
+                    el={lang === 'el'}
+                    label={lang === 'el' ? 'Νέος κωδικός' : 'New password'}
+                    password={newPassword}
+                    confirm={newPasswordAgain}
+                    onPassword={setNewPassword}
+                    onConfirm={setNewPasswordAgain}
+                  />
+                  {message && (
+                    <div className="auth-message is-error" role="alert">
+                      {message}
                     </div>
-                  </label>
-                  <label>
-                    {t.confirmPassword}
-                    <div className="auth-input">
-                      <LockKeyhole size={17} />
-                      <input
-                        name="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        autoComplete="new-password"
-                      />
-                    </div>
-                  </label>
-                  {message && <div className="auth-message">{message}</div>}
+                  )}
                   <button className="auth-primary" type="submit">
                     {lang === 'el' ? 'Αποθήκευση νέου κωδικού' : 'Save new password'}
                   </button>
