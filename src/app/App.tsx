@@ -203,10 +203,12 @@ export default function App() {
   };
   // A hospital's signup link is public: it works signed in or not.
   const joinToken = /^\/join\/([0-9a-f]{16,})$/.exec(location.pathname)?.[1];
-  if (joinToken)
+  // The emailed link that confirms a signup's email (also public).
+  const confirmToken = /^\/join\/confirm\/([0-9a-f]{16,})$/.exec(location.pathname)?.[1];
+  if (joinToken || confirmToken)
     return (
       <Suspense fallback={<Spinner fullScreen />}>
-        <JoinPage token={joinToken} />
+        <JoinPage token={(joinToken || confirmToken)!} confirm={!!confirmToken} />
       </Suspense>
     );
   if (!authReady) return <Spinner fullScreen />;

@@ -64,6 +64,7 @@ nothing in the schema changed). With the CLI the same is
 | 20261009120200 | append_only_audit            | `configuration_audit`: the configuration history, copied server side from `hospital_settings`, never changed                                   |
 | 20261010090000 | account_safety               | Sign-in email and username change only through the staff functions; `account_events`; platform owner claimed only once, with a confirmed email |
 | 20261010120000 | handover_and_usage_integrity | Usage counts never go down; `handover_signatures` and the `counterparty_verified` stamp on receipts and deliveries                             |
+| 20261010150000 | signup_email_confirmation    | `confirm_token` on staff_access_requests: a hospital-link signup reaches the admin only after its email is confirmed                           |
 
 They were applied through the Supabase MCP `execute_sql`, with their own versions recorded by hand, because that tool
 times out on any statement it treats as destructive (`drop`). The `drop ... if exists` lines guarding new objects

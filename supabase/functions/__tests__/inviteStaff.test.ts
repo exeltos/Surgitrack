@@ -286,6 +286,19 @@ describe('invite-staff: an account made at once (hospital admin role or direct l
 describe('invite-staff: a signup invitation (anyone but an admin, not from a list)', () => {
   const body = {email: 'Nurse@Hospital.gr', organization_id: 'org-1', role: 'DEPARTMENT'};
 
+  it('first removes a signup someone made with this address through the hospital link and never confirmed', async () => {
+    const removed = () => fake.dbCalls('delete').some(c => c.table === 'profiles');
+    routes({
+      'profiles:select': call =>
+        filter(call, 'id') === 'admin-1' ? ADMIN : filter(call, 'email') && !removed() ? {id: 'squatter', active: false} : null,
+      'staff_access_requests:select': call =>
+        call.filters.some(([op, name]) => op === 'not' && name === 'confirm_token') ? {id: 'req-old'} : null,
+    });
+    const row = await result(await invite(handle, body));
+    expect(row).toMatchObject({ok: true, mode: 'signup'});
+    expect(fake.calls.filter(c => c.what === 'deleteUser').map(c => c.args[0])).toEqual(['squatter']);
+  });
+
   it('records a request awaiting the person, and emails the signup form link', async () => {
     mailOn();
     const row = await result(await invite(handle, body));

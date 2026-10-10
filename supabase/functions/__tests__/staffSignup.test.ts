@@ -22,6 +22,10 @@ type World = {
   department?: Row;
   account?: Row;
   admins?: Array<{email: string}>;
+  /** An earlier hospital-link signup with this email, never confirmed. */
+  unconfirmed?: Row;
+  /** The request an emailed confirmation link points at. */
+  waiting?: Row;
 };
 /** The database as the form sees it: one signup link, no invitation, no earlier request, nobody registered. */
 const world = (w: World = {}) => {
@@ -30,13 +34,21 @@ const world = (w: World = {}) => {
     'signup_links:select': has('link') ? w.link : LINK,
     'organizations:select': has('org') ? w.org : ORG,
     'staff_access_requests:select': (call: {filters: Array<[string, string, unknown]>}) =>
-      call.filters.some(([, column]) => column === 'invite_token') ? (w.invitation ?? null) : (w.open ?? null),
+      call.filters.some(([, column]) => column === 'invite_token')
+        ? (w.invitation ?? null)
+        : call.filters.some(([op, column]) => op === 'eq' && column === 'confirm_token')
+          ? (w.waiting ?? null)
+          : call.filters.some(([, column]) => column === 'user_id')
+            ? (w.unconfirmed ?? null)
+            : (w.open ?? null),
     'departments:select': (call: {filters: Array<[string, string, unknown]>}) =>
       call.filters.some(([, column]) => column === 'id') ? (has('department') ? w.department : DEPARTMENT) : [DEPARTMENT],
     'profiles:select': (call: {filters: Array<[string, string, unknown]>}) =>
       call.filters.some(([, column]) => column === 'role')
         ? (w.admins ?? [{email: 'admin@hospital.gr'}])
-        : (w.account ?? null),
+        : fake.dbCalls('delete').some(c => c.table === 'profiles')
+          ? null
+          : (w.account ?? null),
   });
   fake.rpc = name => ({data: name === 'generate_user_code' ? 'GN1234' : 'attempt-1', error: null});
 };
@@ -200,7 +212,8 @@ describe('staff-signup: signing up through the hospital link', () => {
   it('records a request awaiting approval, for the hospital the link belongs to', async () => {
     const response = await handle(post(form));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ok: true, user_code: 'GN1234'});
+    // Without mail settings nothing can be confirmed by email: straight to the admin, as before.
+    expect(await response.json()).toEqual({ok: true, user_code: 'GN1234', confirm: false});
     expect(requests('insert')).toHaveLength(1);
     expect(requests('insert')[0].values).toMatchObject({
       organization_id: 'org-1',
@@ -315,16 +328,16 @@ describe('staff-signup: signing up from a personal invitation', () => {
 describe('staff-signup: the account and username', () => {
   beforeEach(mailOn);
 
-  it('makes the account with the chosen password, inactive, and returns its username', async () => {
+  it('makes the account with the chosen password, inactive and unconfirmed, and returns its username', async () => {
     const response = await handle(post(form));
-    expect(await response.json()).toEqual({ok: true, user_code: 'GN1234'});
+    expect(await response.json()).toEqual({ok: true, user_code: 'GN1234', confirm: true});
     expect(fake.calls.find(c => c.what === 'rpc' && c.args[0] === 'generate_user_code')?.args[1]).toEqual({
       p_name: 'ΓΙΩΡΓΟΣ ΝΙΚΟΛΑΟΥ',
     });
     expect(fake.calls.find(c => c.what === 'createUser')?.args[0]).toMatchObject({
       email: 'giorgos@hospital.gr',
       password: 'secret-123',
-      email_confirm: true,
+      email_confirm: false,
     });
     const profile = fake.dbCalls('insert').find(c => c.table === 'profiles');
     expect(profile?.values).toMatchObject({
@@ -344,9 +357,9 @@ describe('staff-signup: the account and username', () => {
     expect(fake.dbCalls('insert').find(c => c.table === 'profiles')?.values).toMatchObject({role: 'STERILIZATION'});
   });
 
-  it('emails no one: the admin sees the request in the app', async () => {
+  it('emails only the person who signed up, to confirm; never the admins', async () => {
     await handle(post(form));
-    expect(mailState.outbox).toHaveLength(0);
+    expect(mailState.outbox.map(m => m.to)).toEqual(['giorgos@hospital.gr']);
   });
 
   it('answers 409 when the sign-in service already has that email', async () => {
@@ -400,5 +413,79 @@ describe('staff-signup: a prospect evaluation Demo', () => {
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({error: 'demo_user_limit'});
     expect(fake.calls.find(c => c.what === 'deleteUser')?.args[0]).toBe('new-user');
+  });
+});
+
+describe('staff-signup: confirming the email (hospital link)', () => {
+  beforeEach(mailOn);
+  const confirm = (token = 'c0ffee') => handle(post({action: 'confirm', token}));
+  const WAITING = {id: 'req-7', user_id: 'user-7', organization_id: 'org-1', requested_at: AN_HOUR_AGO()};
+
+  it('keeps the request from the admin until the emailed link is opened', async () => {
+    await handle(post(form));
+    const row = requests('insert')[0].values as Record<string, unknown>;
+    expect(row.status).toBe('PENDING_EMAIL');
+    expect(row.confirm_token).toMatch(/^[0-9a-f]{36}$/);
+    const mail = mailState.outbox[0];
+    expect(mail.html).toContain(`${SITE}/#/join/confirm/${row.confirm_token}`);
+    expect(mail.html).toContain('ΓΙΩΡΓΟΣ ΝΙΚΟΛΑΟΥ');
+  });
+
+  it('points the link at the app the form was filled in on', async () => {
+    await handle(post({...form, origin: 'https://www.surgitrack.eu'}));
+    expect(mailState.outbox[0].html).toContain('https://www.surgitrack.eu/#/join/confirm/');
+  });
+
+  it('asks nothing of a personal invitation: the admin chose that address', async () => {
+    world({link: null, invitation: INVITATION});
+    const response = await handle(post(form));
+    expect(await response.json()).toMatchObject({confirm: false});
+    expect(fake.calls.find(c => c.what === 'createUser')?.args[0]).toMatchObject({email_confirm: true});
+    expect(requests('update')[0].values).toMatchObject({status: 'PENDING', confirm_token: null});
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('says so when the confirmation email could not be sent', async () => {
+    mailState.fail = true;
+    const response = await handle(post(form));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({error: 'email_failed'});
+  });
+
+  it('confirms the sign-in email and hands the request to the admin', async () => {
+    world({waiting: WAITING});
+    const response = await confirm();
+    expect(await response.json()).toEqual({ok: true, organization_name: 'ΙΑΣΩ Θεσσαλίας'});
+    expect(fake.calls.find(c => c.what === 'updateUserById')?.args).toEqual(['user-7', {email_confirm: true}]);
+    const update = requests('update')[0];
+    expect(update.values).toMatchObject({status: 'PENDING', confirm_token: null});
+    expect(eqValue(update, 'id')).toBe('req-7');
+  });
+
+  it.each([
+    ['an unknown link', null],
+    ['a link older than 7 days', {...WAITING, requested_at: new Date(Date.now() - 8 * 864e5).toISOString()}],
+  ])('refuses %s, changing nothing', async (_label, waiting) => {
+    world({waiting});
+    const response = await confirm();
+    expect(response.status).toBe(410);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(requests('update')).toHaveLength(0);
+  });
+
+  it('lets the owner of an address sign up over an unconfirmed signup someone made with it', async () => {
+    world({account: {id: 'squatter', active: false}, unconfirmed: {id: 'req-old'}});
+    const response = await handle(post(form));
+    expect(response.status).toBe(200);
+    expect(fake.dbCalls('delete').map(c => c.table)).toEqual(['staff_access_requests', 'profiles']);
+    expect(fake.calls.filter(c => c.what === 'deleteUser').map(c => c.args[0])).toEqual(['squatter']);
+  });
+
+  it('never removes an account in use or a signup already confirmed', async () => {
+    world({account: {id: 'someone', active: true}});
+    expect((await handle(post(form))).status).toBe(409);
+    world({account: {id: 'someone', active: false}, unconfirmed: null});
+    expect((await handle(post(form))).status).toBe(409);
+    expect(fake.calls.some(c => c.what === 'deleteUser')).toBe(false);
   });
 });

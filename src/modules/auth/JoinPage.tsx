@@ -46,6 +46,10 @@ const errorText = (code: string, el: boolean) => {
         : 'The Demo has reached its user limit. Tell whoever invited you.';
     case 'password_invalid':
       return el ? 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.' : 'The password needs at least 8 characters.';
+    case 'email_failed':
+      return el
+        ? 'Δεν στάλθηκε το email επιβεβαίωσης. Δοκιμάστε ξανά σε λίγο.'
+        : 'The confirmation email could not be sent. Please try again shortly.';
     case 'invalid_input':
       return el ? 'Ελέγξτε τα στοιχεία της φόρμας.' : 'Check the form fields.';
     default:
@@ -56,9 +60,10 @@ const errorText = (code: string, el: boolean) => {
 /**
  * Public signup (#/join/<token>), through a hospital's link or a personal invitation. The person
  * fills in their details and sets their password; the form then shows their username. They can
- * sign in once the hospital admin approves (one email tells them).
+ * sign in once the hospital admin approves (one email tells them). Through the hospital link they
+ * first confirm their email: the emailed link opens #/join/confirm/<token> (`confirm`).
  */
-export default function JoinPage({token}: {token: string}) {
+export default function JoinPage({token, confirm = false}: {token: string; confirm?: boolean}) {
   const {lang, setLang} = useAppPreferences();
   const el = lang === 'el';
   const L = (gr: string, en: string) => (el ? gr : en);
@@ -70,14 +75,26 @@ export default function JoinPage({token}: {token: string}) {
   const [busy, setBusy] = useState(false);
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
-  const [done, setDone] = useState<{email: string; userCode: string} | null>(null);
+  const [done, setDone] = useState<{email: string; userCode: string; confirm: boolean} | null>(null);
+  // The emailed confirmation link: undefined while it is checked.
+  const [confirmed, setConfirmed] = useState<{organization: string} | 'invalid' | 'failed'>();
 
   useEffect(() => {
+    if (confirm) {
+      void supabase.functions
+        .invoke<{ok: boolean; organization_name: string}>('staff-signup', {body: {action: 'confirm', token}})
+        .then(async ({data, error}) => {
+          if (data?.ok) return setConfirmed({organization: data.organization_name});
+          const status = error instanceof FunctionsHttpError ? (error.context as Response).status : 0;
+          setConfirmed(status === 410 ? 'invalid' : 'failed');
+        });
+      return;
+    }
     void supabase.functions.invoke<LinkInfo>('staff-signup', {body: {action: 'info', token}}).then(({data, error}) => {
       setInfo(error || !data ? null : data);
       if (data?.department_id) setDepartmentId(data.department_id);
     });
-  }, [token]);
+  }, [token, confirm]);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,16 +116,21 @@ export default function JoinPage({token}: {token: string}) {
       return;
     }
     setBusy(true);
-    const {data, error} = await supabase.functions.invoke<{ok: boolean; user_code: string}>('staff-signup', {
-      body: {
-        token,
-        first_name: first,
-        last_name: last,
-        email,
-        department_id: departmentId,
-        password,
+    const {data, error} = await supabase.functions.invoke<{ok: boolean; user_code: string; confirm?: boolean}>(
+      'staff-signup',
+      {
+        body: {
+          token,
+          // The confirmation email links back to the address the form was filled in on.
+          origin: window.location.origin,
+          first_name: first,
+          last_name: last,
+          email,
+          department_id: departmentId,
+          password,
+        },
       },
-    });
+    );
     setBusy(false);
     if (error) {
       let code = '';
@@ -118,7 +140,7 @@ export default function JoinPage({token}: {token: string}) {
       setMessage(errorText(code, el));
       return;
     }
-    setDone({email, userCode: data?.user_code || ''});
+    setDone({email, userCode: data?.user_code || '', confirm: !!data?.confirm});
   };
 
   const expires = info?.expires_at ? formatDate(info.expires_at) : '';
@@ -155,7 +177,46 @@ export default function JoinPage({token}: {token: string}) {
         </section>
         <section className="auth-card-wrap">
           <div className="auth-card">
-            {info === undefined ? (
+            {confirm ? (
+              <div className="auth-status-card">
+                <div className="auth-status-icon">
+                  {confirmed && typeof confirmed === 'object' ? <Clock3 size={24} /> : <Mail size={24} />}
+                </div>
+                {confirmed === undefined ? (
+                  <p>{L('Επιβεβαίωση email…', 'Confirming your email…')}</p>
+                ) : typeof confirmed === 'object' ? (
+                  <>
+                    <span className="auth-eyebrow">{L('ΤΟ EMAIL ΕΠΙΒΕΒΑΙΩΘΗΚΕ', 'EMAIL CONFIRMED')}</span>
+                    <h2>{L('Αναμονή έγκρισης', 'Awaiting approval')}</h2>
+                    <p>
+                      {L(
+                        `Η αίτησή σας πήγε στον διαχειριστή του ${confirmed.organization || 'νοσοκομείου'}. Μόλις την εγκρίνει θα λάβετε email και θα συνδέεστε με το όνομα χρήστη (ή το email σας) και τον κωδικό που ορίσατε.`,
+                        `Your request went to the administrator of ${confirmed.organization || 'the hospital'}. Once approved, you will get an email; then sign in with your username (or email) and the password you set.`,
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2>
+                      {confirmed === 'invalid'
+                        ? L('Ο σύνδεσμος δεν είναι έγκυρος', 'This link is not valid')
+                        : L('Η επιβεβαίωση δεν ολοκληρώθηκε', 'Confirmation failed')}
+                    </h2>
+                    <p>
+                      {confirmed === 'invalid'
+                        ? L(
+                            'Ο σύνδεσμος επιβεβαίωσης έληξε ή έχει ήδη χρησιμοποιηθεί. Αν δεν έχετε επιβεβαιώσει, κάντε ξανά την εγγραφή από τον σύνδεσμο του νοσοκομείου.',
+                            'The confirmation link has expired or was already used. If you have not confirmed yet, sign up again through the hospital link.',
+                          )
+                        : L('Δοκιμάστε ξανά σε λίγο.', 'Please try again shortly.')}
+                    </p>
+                  </>
+                )}
+                <a className="auth-primary" href="#/">
+                  {L('Μετάβαση στη σύνδεση', 'Go to sign in')}
+                </a>
+              </div>
+            ) : info === undefined ? (
               <p>{L('Έλεγχος συνδέσμου…', 'Checking link…')}</p>
             ) : info === null ? (
               <div className="auth-status-card">
@@ -179,12 +240,26 @@ export default function JoinPage({token}: {token: string}) {
                   <Clock3 size={24} />
                 </div>
                 <span className="auth-eyebrow">{L('Η ΕΓΓΡΑΦΗ ΟΛΟΚΛΗΡΩΘΗΚΕ', 'SIGNED UP')}</span>
-                <h2>{L('Αναμονή έγκρισης', 'Awaiting approval')}</h2>
+                <h2>
+                  {done.confirm
+                    ? L('Ελέγξτε το email σας', 'Check your email')
+                    : L('Αναμονή έγκρισης', 'Awaiting approval')}
+                </h2>
                 {done.userCode && (
                   <div className="join-username">
                     <span>{L('Το όνομα χρήστη σας', 'Your username')}</span>
                     <strong>{done.userCode}</strong>
                   </div>
+                )}
+                {done.confirm && (
+                  <p>
+                    <b>
+                      {L(
+                        `Στείλαμε email στο ${done.email}. Πατήστε «Επιβεβαίωση email» μέσα σε αυτό: μόνο τότε η αίτησή σας πηγαίνει για έγκριση. Δείτε και στα ανεπιθύμητα.`,
+                        `We sent an email to ${done.email}. Press «Confirm email» in it: only then does your request go for approval. Check your spam folder too.`,
+                      )}
+                    </b>
+                  </p>
                 )}
                 <p>
                   {L(
