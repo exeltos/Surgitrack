@@ -1,6 +1,9 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
   '{0} · κύκλος {1}': '{0} · cycle {1}',
+  'ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ': 'QUALITY GATE',
+  'Χωρίς πλυντήριο': 'Without a washer',
+  '{0}: ο καθαρισμός καταγράφεται με φόρτωση πλυντηρίου.': '{0}: washing is recorded with a washer load.',
   'κύκλος {0}': 'cycle {0}',
   Χρήση: 'Use',
   'Κανονική χρήση': 'Standard use',
@@ -95,7 +98,7 @@ export const en: Record<string, string> = {
   'Barcode · π.χ. S000324': 'Barcode · e.g. S000324',
   'Barcode, Σετ/εργαλείο, χρήστης ή κωδικός ασθενούς...': 'Barcode, set/instrument, user or patient code...',
   'Barcode, κωδικός ή ονομασία εργαλείου...': 'Barcode, code or instrument name...',
-  'Barrier / σήμανση': 'Barrier / labelling',
+  'Συσκευασία / σήμανση': 'Barrier / labelling',
   'Demo Αποστείρωση': 'Demo Sterilization',
   'Demo Προϊστάμενος Αποστείρωσης': 'Demo Sterilization Supervisor',
   'Demo Διαχειριστής': 'Demo Administrator',
@@ -104,9 +107,9 @@ export const en: Record<string, string> = {
   'Demo Χρήστης Αποστείρωσης': 'Demo Sterilization User',
   'Demo Χρήστης Τμήματος': 'Demo Department User',
   'Demo Χρήστης Χειρουργείου': 'Demo Operating Theatre User',
-  'Manifest φορτίου': 'Load manifest',
-  'QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ': 'QUALITY GATE · RELEASE',
-  'QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ': 'QUALITY GATE · LOAD RELEASE',
+  'Περιεχόμενο φορτίου': 'Load contents',
+  'ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ': 'QUALITY GATE · RELEASE',
+  'ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ': 'QUALITY GATE · LOAD RELEASE',
   'S + 6 ψηφία': 'S + 6 digits',
   'S..., T... ή κωδικός ασθενούς': 'S..., T... or patient code',
   'Service & Βλάβες': 'Service & Damage',
@@ -230,13 +233,12 @@ export const en: Record<string, string> = {
   'Έλεγχος & Αποδέσμευση': 'Check & Release',
   'Έλεγχος & Σύνθεση': 'Inspection & Assembly',
   'Έλεγχος & προετοιμασία': 'Inspection & preparation',
-  'Έλεγχος sterile barrier, σήμανσης και δείκτη πριν τον κύκλο.':
+  'Έλεγχος αποστειρωμένης συσκευασίας, σήμανσης και δείκτη πριν τον κύκλο.':
     'Check of sterile barrier, labelling and indicator before the cycle.',
   'Έλεγχος αποδέσμευσης': 'Release check',
   'Έλεγχος αποθήκευσης': 'Storage check',
   'Έλεγχος και επιβεβαίωση πριν τη συσκευασία': 'Check and confirm before packaging',
   'Έλεγχος λειτουργικότητας, σύνθεση και διαχείριση αποκλίσεων.': 'Function check, assembly and deviation handling.',
-  'Έλεγχος σταδίου': 'Stage check',
   'Έλεγχος συσκευασίας': 'Packaging check',
   'Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.':
     'Check of the physical instruments after washing and before sterilization.',
@@ -397,7 +399,7 @@ export const en: Record<string, string> = {
   'Δεν βρέθηκε επιτυχής κύκλος': 'No successful cycle found',
   'Δεν δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.': 'No visible deviation was declared at physical receipt.',
   'Δεν διαπιστώθηκε βλάβη και η λειτουργία είναι αποδεκτή.': 'No damage found and function is acceptable.',
-  'Δεν διαπιστώθηκε υγρασία, ρήξη ή άλλη απόκλιση του sterile barrier.':
+  'Δεν διαπιστώθηκε υγρασία, ρήξη ή άλλη απόκλιση της αποστειρωμένης συσκευασίας.':
     'No moisture, tear or other sterile-barrier deviation found.',
   'Δεν επιλέχθηκαν έγκυρα αντικείμενα για το φορτίο.': 'No valid items were selected for the load.',
   'Δεν επιτρέπεται αποδέσμευση': 'Release not allowed',
@@ -430,7 +432,6 @@ export const en: Record<string, string> = {
   Δημιουργήθηκε: 'Created',
   Δημιουργία: 'Creation',
   'Δημιουργία Set': 'Set created',
-  'Δημιουργία ενιαίου φορτίου': 'Create a single load',
   'Δημιουργία νέου φυσικού εργαλείου από υπάρχουσα καρτέλα': 'New physical instrument created from an existing card',
   'Δημιουργία φυσικού εργαλείου': 'Physical instrument created',
   'Δημιουργεί νέα φυσικά εργαλεία με νέα μοναδικά barcodes.':
@@ -509,7 +510,7 @@ export const en: Record<string, string> = {
   Επιλυμένη: 'Resolved',
   'Επιστρέψτε στη λίστα εργαλείων και επιλέξτε ξανά.': 'Go back to the instrument list and select again.',
   'Επιστρέψτε στη λίστα των Σετ και επιλέξτε ξανά.': 'Go back to the set list and select again.',
-  'Επιστροφή στο κεντρικό stock': 'Return to central stock',
+  'Επιστροφή στο κεντρικό Απόθεμα': 'Return to central stock',
   'Επιτρέπεται Demo πρόσβαση': 'Demo access allowed',
   'Επόμενο στάδιο': 'Next stage',
   Εργαλεία: 'Instruments',
@@ -568,7 +569,7 @@ export const en: Record<string, string> = {
   'Υπογραφή άλλου μέρους': "Other party's signature",
   'Όλες οι υπογραφές': 'All signatures',
   'Με τον δικό του κωδικό': 'With their own password',
-  'Χωρίς επιβεβαίωση κωδικού από τον server': 'Password not confirmed by the server',
+  'Χωρίς επιβεβαίωση κωδικού από τον διακομιστή': 'Password not confirmed by the server',
   'Οδηγοί οθόνης': 'Screen guides',
   Εμφανίζονται: 'Shown',
   'Δεν εμφανίζονται': 'Not shown',
@@ -735,7 +736,7 @@ export const en: Record<string, string> = {
     'On confirmation, the selected physical instrument is added to the set and covers the shortage.',
   'Με την ολοκλήρωση καταγράφονται κοινό ID παράδοσης, χρήστης αποστείρωσης, παραλαμβάνων, τμήμα, ημερομηνία/ώρα και σύνδεση κάθε barcode με το ιστορικό κύκλου του.':
     'Completing records a shared delivery ID, the sterilization user, the receiver, department, date/time and links each barcode to its cycle history.',
-  'Με την ολοκλήρωση καταγράφονται κοινό batch ID, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.':
+  'Με την ολοκλήρωση καταγράφονται κοινός κωδικός, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.':
     'Completing records a shared batch ID, sender, receiver, department, time and the visible-deviation declaration per barcode.',
   'Με όριο χρήσεων': 'With usage limit',
   Μεμονωμένα: 'Standalone',
@@ -786,7 +787,7 @@ export const en: Record<string, string> = {
   'Νέο Σετ': 'New set',
   'Νέο αντικείμενο': 'New item',
   'Νέο νοσοκομείο': 'New hospital',
-  'Νέο φορτίο πλυντηρίου': 'New washer load',
+  'Φόρτωση πλυντηρίου': 'Washer load',
   'Νέος χρήστης': 'New user',
   'Ναι, δημιουργία αντιγράφου': 'Yes, create copy',
   'Ναι, προσθήκη': 'Yes, add',
@@ -862,7 +863,6 @@ export const en: Record<string, string> = {
   'Περιέγραψε το πρόβλημα που αφορά το Σετ…': 'Describe the problem with the set…',
   'Περιγραφή συμβάντος...': 'Describe what happened...',
   'Περιεχόμενα Σετ': 'Set contents',
-  'Περιεχόμενο φορτίου': 'Load contents',
   'Περιορισμένων χρήσεων': 'Limited-use',
   'Πηγή εργαλείων': 'Instrument source',
   Πλήρες: 'Complete',
@@ -1139,7 +1139,7 @@ export const en: Record<string, string> = {
     'Identify the sender once and scan the items of the same department one after another.',
   'Ταυτοποίηση παραδίδοντα': 'Sender identification',
   'Τεκμηρίωση πριν από συσκευασία και κλιβανισμό.': 'Documentation before packaging and sterilization.',
-  'Τεκμηριωμένο quality gate καθαρισμού / απολύμανσης.': 'Documented cleaning / disinfection quality gate.',
+  'Τεκμηριωμένος έλεγχος καθαρισμού / απολύμανσης.': 'Documented cleaning / disinfection quality gate.',
   'Τεκμηριωμένος τελικός έλεγχος πριν χαρακτηριστεί έτοιμο για παράδοση.':
     'Documented final check before marking ready for delivery.',
   'Τεχνικές ή μόνιμες παρατηρήσεις...': 'Technical or permanent notes...',
@@ -1217,8 +1217,8 @@ export const en: Record<string, string> = {
     'Photo documentation of the instrument. Visible to the active role only.',
   'Φωτογραφική τεκμηρίωση του φυσικού αντικειμένου. Μπορείς να κρατήσεις περισσότερες από μία φωτογραφίες.':
     'Photo documentation of the physical item. You can keep more than one photo.',
-  'Φύλλο σύνθεσης & προετοιμασίας': 'Composition & preparation sheet',
   'Φύλλο σύνθεσης Α4 και barcode.': 'A4 composition sheet and barcode.',
+  'Φύλλο σύνθεσης & προετοιμασίας': 'Composition & preparation sheet',
   ΧΕΙΡΟΥΡΓΕΙΟ: 'OPERATING THEATRE',
   'Χαλασμένα / Service': 'Damaged / Service',
   'Χειροκίνητα ή με USB/Bluetooth scanner: σάρωση στο πεδίο και Enter.':

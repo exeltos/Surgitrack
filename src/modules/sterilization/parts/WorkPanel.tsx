@@ -1,5 +1,6 @@
 import {loadLabel} from '../../../core/loadLabel';
 import {useSurgi} from '../../../store/SurgiStore';
+import {useLibraries} from '../../../core/LibraryStore';
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import StatusBadge from '../../../components/ui/StatusBadge';
@@ -15,7 +16,6 @@ import {
   UserRoundCheck,
   ShieldCheck,
   Layers3,
-  PackageOpen,
   Printer,
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
@@ -25,6 +25,7 @@ import {askConfirm} from '../../../components/ui/confirmService';
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const {counts} = useSurgi();
+  const washWithoutWasher = !!useLibraries().sterilizationWorkflow.washingPolicy?.allowWithoutWasher;
   const {
     awaitingLoads,
     incoming,
@@ -86,10 +87,10 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           )}
           {queue === 'WASHING' && (
             <>
-              <span className="ster-hint">{tr('Τεκμηριωμένο quality gate καθαρισμού / απολύμανσης.')}</span>
+              <span className="ster-hint">{tr('Τεκμηριωμένος έλεγχος καθαρισμού / απολύμανσης.')}</span>
               {washing.length > 0 && (
                 <button className="primary compact" onClick={() => openLoad('WASHING')}>
-                  <Layers3 size={15} /> {tr('Νέο φορτίο πλυντηρίου')}
+                  <Layers3 size={15} /> {tr('Φόρτωση πλυντηρίου')}
                 </button>
               )}
             </>
@@ -98,7 +99,9 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             <span className="ster-hint">{tr('Έλεγχος λειτουργικότητας, σύνθεση και διαχείριση αποκλίσεων.')}</span>
           )}
           {queue === 'PACKAGING' && (
-            <span className="ster-hint">{tr('Έλεγχος sterile barrier, σήμανσης και δείκτη πριν τον κύκλο.')}</span>
+            <span className="ster-hint">
+              {tr('Έλεγχος αποστειρωμένης συσκευασίας, σήμανσης και δείκτη πριν τον κύκλο.')}
+            </span>
           )}
           {queue === 'PROCESS' && processing.length > 0 && (
             <>
@@ -332,9 +335,17 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <CheckCircle2 size={15} /> {tr('Παραλαβή')}
                       </button>
                     ) : queue === 'WASHING' ? (
-                      <button className="primary compact" onClick={() => openCheckpoint(x.kind, x, 'WASHING')}>
-                        <PackageOpen size={15} /> {tr('Έλεγχος σταδίου')}
-                      </button>
+                      <>
+                        {/* A washer load with this item in it; washing without a washer only where Studio allows. */}
+                        <button className="primary compact" onClick={() => openLoad('WASHING', [`${x.kind}:${x.id}`])}>
+                          <Layers3 size={15} /> {tr('Φόρτωση πλυντηρίου')}
+                        </button>
+                        {washWithoutWasher && (
+                          <button className="ster-row-alt" onClick={() => openCheckpoint(x.kind, x, 'WASHING')}>
+                            {tr('Χωρίς πλυντήριο')}
+                          </button>
+                        )}
+                      </>
                     ) : queue === 'PREP' ? (
                       <button
                         className="primary compact ster-primary-action"

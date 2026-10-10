@@ -8823,7 +8823,6 @@ html body .issues-fixed .issue-note-inline {
   }
   html body .receipt-card-modal > .prep-workspace-body {
     height: auto;
-    grid-template-rows: max-content max-content;
     align-content: start;
   }
   html body .prep-workspace-body > .prep-control-panel {
@@ -10149,4 +10148,88 @@ html body .delivery-batch-assets .load-assets-head > small {
   text-align: right;
   text-overflow: clip;
   white-space: normal;
+}
+
+/* Washing row: the washer load is the action; washing without a washer (where Studio allows it) is a link under it. */
+html body .ster-row-action:has(.ster-row-alt) {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+html body .ster-row-action .ster-row-alt {
+  min-height: 0 !important;
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--st-teal);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* Composition window: on a computer the prints stay in the side column; on a tablet (one column, the list
+   first) they sit in the header, beside the title and clear of the close button. */
+@media (min-width: 1101px) {
+  html body .prep-workspace-modal .prep-head-prints {
+    display: none !important;
+  }
+}
+@media (max-width: 1100px) {
+  html body .prep-workspace-modal .prep-side-prints {
+    display: none;
+  }
+}
+html body .prep-workspace-modal > .receipt-card-head {
+  display: flex;
+  align-items: flex-start;
+}
+html body .prep-workspace-modal > .receipt-card-head > div:not(.prep-head-prints) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+html body .prep-workspace-modal .prep-head-prints {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  margin: 2px 60px 0 auto;
+}
+html body .prep-workspace-modal .prep-head-prints button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+/* One column (tablet): the instruments first, then the checks and the note right above the complete button. */
+@media (max-width: 1100px) {
+  html body .receipt-card-modal > .prep-workspace-body {
+    grid-template-rows: none;
+    grid-auto-rows: max-content;
+  }
+  html body .prep-workspace-body > .prep-control-panel {
+    display: contents;
+  }
+  html body .prep-workspace-body .prep-meta-line {
+    order: 1;
+  }
+  html body .prep-workspace-body > .prep-tools-panel {
+    order: 2;
+  }
+  html body .prep-workspace-body .prep-quality-section {
+    order: 3;
+  }
+}
+@media (max-width: 700px) {
+  html body .prep-workspace-modal > .receipt-card-head {
+    flex-wrap: wrap;
+  }
+  html body .prep-workspace-modal .prep-head-prints {
+    order: 3;
+    flex-basis: 100%;
+    margin: 6px 0 0;
+  }
 }

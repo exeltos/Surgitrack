@@ -17,6 +17,11 @@ export type SterilizationReleasePolicy = {
   allowReleaseWhileBiPending: boolean;
 };
 export type SterilizationReceiptPolicy = {countSetsAtReceipt: boolean; allowCrossDepartmentHandover: boolean};
+/**
+ * Washing goes through a washer load (washer, cycle and program recorded for every item). Washing an item
+ * without one (manual cleaning) is offered only where the hospital allows it.
+ */
+export type SterilizationWashingPolicy = {allowWithoutWasher: boolean};
 export type SterilizationWorkflowConfig = {
   profileName: string;
   version: number;
@@ -24,6 +29,8 @@ export type SterilizationWorkflowConfig = {
   updatedBy?: string;
   receiptPolicy: SterilizationReceiptPolicy;
   releasePolicy: SterilizationReleasePolicy;
+  /** Absent in workflows saved before it: washing without a washer is then not allowed. */
+  washingPolicy?: SterilizationWashingPolicy;
   stages: WorkflowStageConfig[];
 };
 
@@ -33,6 +40,7 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
   updatedAt: '',
   receiptPolicy: {countSetsAtReceipt: false, allowCrossDepartmentHandover: true},
   releasePolicy: {requireChemicalIndicator: false, biologicalIndicator: 'OPTIONAL', allowReleaseWhileBiPending: false},
+  washingPolicy: {allowWithoutWasher: false},
   stages: [
     {
       id: 'RECEIPT',
@@ -77,7 +85,7 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       locked: false,
       labelEl: 'Συσκευασία & Σήμανση',
       labelEn: 'Packaging & Labelling',
-      descriptionEl: 'Έλεγχος περιέκτη / sterile barrier, σήμανσης και δείκτη.',
+      descriptionEl: 'Έλεγχος περιέκτη / αποστειρωμένης συσκευασίας, σήμανσης και δείκτη.',
       descriptionEn: 'Check container / sterile barrier, labelling and indicator.',
       checksEl: [
         'Κατάλληλη και ακέραιη συσκευασία',
@@ -126,7 +134,7 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       locked: true,
       labelEl: 'Παράδοση στο Τμήμα',
       labelEn: 'Department Delivery',
-      descriptionEl: 'Ταυτοποίηση παραλαμβάνοντα και ολοκλήρωση chain of custody.',
+      descriptionEl: 'Ταυτοποίηση παραλαμβάνοντα και ολοκλήρωση της αλυσίδας φύλαξης.',
       descriptionEn: 'Receiver identification and chain-of-custody completion.',
       checksEl: ['Ταυτοποίηση παραλαμβάνοντα'],
       checksEn: ['Receiver identification'],
@@ -136,29 +144,36 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
 
 /**
  * A workflow saved before the stage was renamed keeps its old wording: «Αποστείρωση» becomes
- * «Φόρτωση κλιβάνου» (only when the hospital has not renamed it itself).
+ * «Φόρτωση κλιβάνου» (only when the hospital has not renamed it itself). Stage descriptions still in their
+ * old default wording (English terms since put in Greek) take the current default, and only those.
  */
+const OLD_DESCRIPTIONS_EL = new Set([
+  'Έλεγχος περιέκτη / sterile barrier, σήμανσης και δείκτη.',
+  'Ταυτοποίηση παραλαμβάνοντα και ολοκλήρωση chain of custody.',
+]);
 export const upgradeWorkflowLabels = (workflow: SterilizationWorkflowConfig): SterilizationWorkflowConfig => {
   const fresh = defaultSterilizationWorkflow.stages.find(stage => stage.id === 'STERILIZATION');
   const oldLabel = (stage: WorkflowStageConfig) => stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση';
   // Load release is required: a saved workflow that left it off (or unlocked) gets it back on and locked.
   const releaseOff = (stage: WorkflowStageConfig) => stage.id === 'RELEASE' && (!stage.enabled || !stage.locked);
-  if (!workflow.stages?.some(stage => (fresh && oldLabel(stage)) || releaseOff(stage))) return workflow;
+  const oldDescription = (stage: WorkflowStageConfig) => OLD_DESCRIPTIONS_EL.has(stage.descriptionEl);
+  if (!workflow.stages?.some(stage => (fresh && oldLabel(stage)) || releaseOff(stage) || oldDescription(stage)))
+    return workflow;
   return {
     ...workflow,
-    stages: workflow.stages.map(stage =>
-      fresh && oldLabel(stage)
-        ? {
-            ...stage,
-            labelEl: fresh.labelEl,
-            labelEn: fresh.labelEn,
-            descriptionEl: fresh.descriptionEl,
-            descriptionEn: fresh.descriptionEn,
-          }
-        : releaseOff(stage)
-          ? {...stage, enabled: true, locked: true}
-          : stage,
-    ),
+    stages: workflow.stages.map(stage => {
+      if (fresh && oldLabel(stage))
+        return {
+          ...stage,
+          labelEl: fresh.labelEl,
+          labelEn: fresh.labelEn,
+          descriptionEl: fresh.descriptionEl,
+          descriptionEn: fresh.descriptionEn,
+        };
+      const upgraded = releaseOff(stage) ? {...stage, enabled: true, locked: true} : stage;
+      const current = defaultSterilizationWorkflow.stages.find(item => item.id === stage.id);
+      return oldDescription(stage) && current ? {...upgraded, descriptionEl: current.descriptionEl} : upgraded;
+    }),
   };
 };
 

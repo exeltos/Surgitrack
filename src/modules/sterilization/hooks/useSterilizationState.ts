@@ -41,10 +41,12 @@ export function useSterilizationState() {
   const colorQuestion = useSetColorQuestion();
   // Set changes (cover a shortage, replace, service, stock, another Set) are the supervisor's.
   const canCompose = can('asset.composition.manage');
-  const {sterilizationWorkflow, systemSettings, sterilizers: sterilizerLibrary} = useLibraries();
+  const {sterilizationWorkflow, systemSettings, sterilizers: sterilizerLibrary, washers} = useLibraries();
   /** The hospital's sterilizers by name (Studio › Libraries › Sterilizers). */
   const sterilizerNames = sterilizerLibrary.map(item => item.el);
   const defaultSterilizer = sterilizerNames[0] || 'Κλίβανος 1';
+  /** The first washer of Studio › Libraries › Washers, or the usual name when the hospital lists none. */
+  const defaultWasher = washers[0]?.el || 'Πλυντήριο 1';
   const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
@@ -387,6 +389,7 @@ export function useSterilizationState() {
     sterilizationWorkflow,
     sterilizerNames,
     defaultSterilizer,
+    defaultWasher,
     systemSettings,
     tools,
     visibleDeviation,

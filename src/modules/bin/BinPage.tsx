@@ -24,6 +24,7 @@ const LIBRARY_NAME: Record<string, string> = {
   suppliers: 'Προμηθευτές',
   toolCategories: 'Κατηγορίες εργαλείων',
   sterilizers: 'Κλίβανοι',
+  washers: 'Πλυντήρια',
 };
 
 const KIND: Record<BinEntry['kind'], {label: string; icon: typeof Layers3}> = {

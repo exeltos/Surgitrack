@@ -1,4 +1,13 @@
-import {BookOpen, Building2, Factory, FlaskConical, Stethoscope, Warehouse, type LucideIcon} from 'lucide-react';
+import {
+  BookOpen,
+  Building2,
+  Factory,
+  FlaskConical,
+  Stethoscope,
+  Warehouse,
+  WashingMachine,
+  type LucideIcon,
+} from 'lucide-react';
 import {type LibraryKey} from '../../core/LibraryStore';
 import type {UserRole} from '../../store/types';
 import {type PermissionGroup} from '../../core/permissions';
@@ -103,5 +112,13 @@ export const libraryMeta: Array<{
     icon: FlaskConical,
     hintEl: 'Κλίβανοι που χρησιμοποιούνται στους κύκλους αποστείρωσης.',
     hintEn: 'Sterilizers available for sterilization cycles.',
+  },
+  {
+    key: 'washers',
+    el: 'Πλυντήρια',
+    en: 'Washers',
+    icon: WashingMachine,
+    hintEl: 'Πλυντήρια / απολυμαντές που επιλέγονται στη φόρτωση πλυντηρίου.',
+    hintEn: 'Washer-disinfectors picked in the washer load.',
   },
 ];

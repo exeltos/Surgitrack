@@ -38,7 +38,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 <ShieldCheck size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ')}</span>
+                <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ')}</span>
                 <h2>{loadLabel(selectedReleaseLoad)}</h2>
                 <p>
                   {selectedReleaseLoad.program} · {selectedReleaseLoad.items.length} {tr('αντικείμενα')}
@@ -130,7 +130,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 </p>
               </section>
               <div className="load-manifest">
-                <strong>{tr('Manifest φορτίου')}</strong>
+                <strong>{tr('Περιεχόμενο φορτίου')}</strong>
                 {selectedReleaseLoad.items.map(item => (
                   <div key={`${item.assetKind}:${item.assetId}`}>
                     <span className="mono">{item.barcode}</span>

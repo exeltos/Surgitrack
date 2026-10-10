@@ -65,7 +65,7 @@ export default function ReceiptViewModal({s}: {s: SterilizationPageState}) {
                   <small>
                     {receiptView.counterpartyVerified
                       ? tr('Με τον δικό του κωδικό')
-                      : tr('Χωρίς επιβεβαίωση κωδικού από τον server')}
+                      : tr('Χωρίς επιβεβαίωση κωδικού από τον διακομιστή')}
                   </small>
                 </div>
               )}

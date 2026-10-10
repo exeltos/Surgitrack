@@ -105,7 +105,7 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
                     <PackageOpen size={16} />
                     <span>
                       <b>{tr('Απόθεμα')}</b>
-                      <small>{tr('Επιστροφή στο κεντρικό stock')}</small>
+                      <small>{tr('Επιστροφή στο κεντρικό Απόθεμα')}</small>
                     </span>
                   </button>
                   <button

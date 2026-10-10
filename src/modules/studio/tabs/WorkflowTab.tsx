@@ -1,4 +1,4 @@
-import {RefreshCcw, ShieldCheck, CheckCircle2} from 'lucide-react';
+import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import type {StudioPageState} from '../useStudioPage';
 import {useSurgi} from '../../../store/SurgiStore';
@@ -72,7 +72,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                 <strong>{L('Ασφαλής βασικός κορμός', 'Protected core workflow')}</strong>
                 <span>
                   {L(
-                    'Παραλαβή, Αποστείρωση και Παράδοση αποτελούν βασικά σημεία chain of custody και παραμένουν ενεργά. Τα ενδιάμεσα quality gates προσαρμόζονται ανά νοσοκομείο.',
+                    'Παραλαβή, Αποστείρωση και Παράδοση αποτελούν βασικά σημεία της αλυσίδας φύλαξης και παραμένουν ενεργά. Οι ενδιάμεσοι έλεγχοι ποιότητας προσαρμόζονται ανά νοσοκομείο.',
                     'Receipt, Sterilization and Delivery are protected chain-of-custody milestones. Intermediate quality gates can be configured per hospital.',
                   )}
                 </span>
@@ -146,6 +146,40 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                       {L(
                         'Επιτρέπεται μόνο με προειδοποίηση και υποχρεωτική αιτιολόγηση.',
                         'Allowed only with warning and mandatory justification.',
+                      )}
+                    </small>
+                  </span>
+                </label>
+              </div>
+            </section>
+            <section className="studio-release-policy">
+              <header>
+                <WashingMachine size={18} />
+                <div>
+                  <strong>{L('Πολιτική καθαρισμού', 'Washing policy')}</strong>
+                  <span>
+                    {L(
+                      'Ο καθαρισμός γίνεται με φόρτωση πλυντηρίου: καταγράφονται πλυντήριο, κύκλος και πρόγραμμα για κάθε αντικείμενο.',
+                      'Washing goes through a washer load: the washer, cycle and program are recorded for every item.',
+                    )}
+                  </span>
+                </div>
+              </header>
+              <div className="studio-release-policy-grid">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={libs.sterilizationWorkflow.washingPolicy?.allowWithoutWasher ?? false}
+                    onChange={e =>
+                      libs.updateSterilizationWorkflow({washingPolicy: {allowWithoutWasher: e.target.checked}})
+                    }
+                  />
+                  <span>
+                    <b>{L('Επιτρέπεται καθαρισμός χωρίς πλυντήριο', 'Washing without a washer allowed')}</b>
+                    <small>
+                      {L(
+                        'Για χειροκίνητο καθαρισμό: κάθε αντικείμενο προχωρά με τους ελέγχους του σταδίου, χωρίς πλυντήριο και κύκλο.',
+                        'For manual cleaning: an item moves on with the stage checks, without a washer or cycle.',
                       )}
                     </small>
                   </span>

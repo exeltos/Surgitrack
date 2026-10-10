@@ -1408,11 +1408,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Βιβλιοθήκες',
-          'Τμήματα, ειδικότητες, κατασκευαστές, προμηθευτές, κατηγορίες εργαλείων και κλίβανοι. Ό,τι ορίζεται εδώ εμφανίζεται στις επιλογές όλης της εφαρμογής. Στους «Κλιβάνους», η «Προσθήκη κλιβάνων» προσθέτει πολλούς μαζί με τον τρόπο ονομασίας του νοσοκομείου (Κλίβανος A, B, C… ή 1, 2, 3…)· η επιλογή μένει για τις επόμενες φορές και οι κλίβανοι εμφανίζονται στη Φόρτωση κλιβάνου.',
+          'Τμήματα, ειδικότητες, κατασκευαστές, προμηθευτές, κατηγορίες εργαλείων, κλίβανοι και πλυντήρια. Ό,τι ορίζεται εδώ εμφανίζεται στις επιλογές όλης της εφαρμογής. Στους «Κλιβάνους», η «Προσθήκη κλιβάνων» προσθέτει πολλούς μαζί με τον τρόπο ονομασίας του νοσοκομείου (Κλίβανος A, B, C… ή 1, 2, 3…)· η επιλογή μένει για τις επόμενες φορές και οι κλίβανοι εμφανίζονται στη Φόρτωση κλιβάνου. Τα «Πλυντήρια» εμφανίζονται με τον ίδιο τρόπο στη Φόρτωση πλυντηρίου.',
         ],
         en: [
           'Libraries',
-          'Departments, specialties, manufacturers, suppliers, instrument categories and sterilizers. Whatever you define here appears in the choices across the app. In "Sterilizers", "Add sterilizers" adds several at once in the hospital’s naming (Sterilizer A, B, C… or 1, 2, 3…); the choice is kept for next time and the sterilizers appear in the Sterilizer load.',
+          'Departments, specialties, manufacturers, suppliers, instrument categories, sterilizers and washers. Whatever you define here appears in the choices across the app. In "Sterilizers", "Add sterilizers" adds several at once in the hospital’s naming (Sterilizer A, B, C… or 1, 2, 3…); the choice is kept for next time and the sterilizers appear in the Sterilizer load. "Washers" appear the same way in the Washer load.',
         ],
       },
       {

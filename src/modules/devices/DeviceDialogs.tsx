@@ -65,9 +65,10 @@ export function DeviceEditor({
   onClose: () => void;
 }) {
   const set = <K extends keyof DeviceInput>(key: K, v: DeviceInput[K]) => onChange({...value, [key]: v});
-  // A sterilizer device takes a name from the hospital's sterilizer list, so its cycles match the load.
-  const {sterilizers} = useLibraries();
-  const sterilizer = value.kind === 'STERILIZER';
+  // A sterilizer or washer takes a name from the hospital's list of them, so its cycles match the load.
+  const {sterilizers, washers} = useLibraries();
+  const named = value.kind === 'STERILIZER' ? sterilizers : value.kind === 'WASHER' ? washers : null;
+  const washer = value.kind === 'WASHER';
   return (
     <Modal
       title={isNew ? L('Νέα συσκευή', 'New device') : L('Επεξεργασία συσκευής', 'Edit device')}
@@ -87,23 +88,28 @@ export function DeviceEditor({
           <input
             autoFocus
             value={value.name}
-            list={sterilizer ? 'device-sterilizer-names' : undefined}
+            list={named ? 'device-equipment-names' : undefined}
             onChange={e => set('name', e.target.value)}
-            placeholder={L('π.χ. Κλίβανος 1', 'e.g. Sterilizer 1')}
+            placeholder={washer ? L('π.χ. Πλυντήριο 1', 'e.g. Washer 1') : L('π.χ. Κλίβανος 1', 'e.g. Sterilizer 1')}
           />
-          {sterilizer && (
-            <datalist id="device-sterilizer-names">
-              {sterilizers.map(item => (
+          {named && (
+            <datalist id="device-equipment-names">
+              {named.map(item => (
                 <option key={item.id} value={item.el} />
               ))}
             </datalist>
           )}
           <small>
-            {sterilizer && sterilizers.length && !sterilizers.some(item => item.el === value.name.trim())
-              ? L(
-                  'Διάλεξε όνομα από τους Κλιβάνους του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση κλιβάνου.',
-                  'Pick a name from the Studio sterilizers, so the device cycles match the sterilizer load.',
-                )
+            {named?.length && !named.some(item => item.el === value.name.trim())
+              ? washer
+                ? L(
+                    'Διάλεξε όνομα από τα Πλυντήρια του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση πλυντηρίου.',
+                    'Pick a name from the Studio washers, so the device cycles match the washer load.',
+                  )
+                : L(
+                    'Διάλεξε όνομα από τους Κλιβάνους του Studio, ώστε οι κύκλοι της συσκευής να ταιριάζουν με τη Φόρτωση κλιβάνου.',
+                    'Pick a name from the Studio sterilizers, so the device cycles match the sterilizer load.',
+                  )
               : L(
                   'Το ίδιο όνομα εμφανίζεται στην επιλογή κλιβάνου κατά την καταγραφή κύκλου.',
                   'The same name appears in the sterilizer choice when a cycle is recorded.',

@@ -14,6 +14,7 @@ export const productionAdminRepository: AdminRepository = {
     suppliers: [],
     toolCategories: [],
     sterilizers: [],
+    washers: [],
     colorTapes: colorTapeCatalog.map(tape => ({...tape, colors: [...tape.colors]})),
     organizations: [],
     users: [],
