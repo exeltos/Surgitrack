@@ -202,3 +202,30 @@ describe('update-staff: the sign-in email', () => {
     expect(mailState.outbox).toHaveLength(0);
   });
 });
+
+describe('update-staff: an unconfirmed signup', () => {
+  let handle: Handler;
+  beforeEach(async () => {
+    handle = await loadFunction('update-staff');
+  });
+  const activate = () => handle(post({user_id: 'user-2', name: 'Nurse', email: 'nurse@hospital.gr', active: true}));
+  const withRequest = (request: Profile | null) => {
+    answer({...TARGET, active: false, role: 'DEPARTMENT'});
+    const db = fake.db;
+    fake.db = call =>
+      call.table === 'staff_access_requests' && call.op === 'select' ? {data: request ? [request] : [], error: null} : db(call);
+  };
+
+  it('is not activated while its email is not confirmed', async () => {
+    withRequest({id: 'req-1'});
+    const response = await activate();
+    expect(response.status).toBe(412);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  it('is activated as before when no signup waits for its email', async () => {
+    withRequest(null);
+    expect((await activate()).status).toBe(200);
+    expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).toMatchObject({active: true});
+  });
+});
