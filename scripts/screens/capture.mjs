@@ -575,6 +575,24 @@ async function captureModals(page, {role, viewport, record, log, wanted}) {
           .first()
           .click({timeout: 3000}),
     });
+  if (role === 'ADMIN')
+    modals.push({
+      // The add-user drawer (the same one Studio → Χρήστες opens for the platform owner).
+      name: 'hospital-add-user-drawer',
+      route: '/hospital',
+      open: async () => {
+        await page
+          .locator('button')
+          .filter({hasText: /Προσθήκη χρήστη|Add user/})
+          .first()
+          .click({timeout: 3000});
+        await page
+          .locator('button')
+          .filter({hasText: /Πρόσκληση ατόμου|Invite a person/})
+          .first()
+          .click({timeout: 3000});
+      },
+    });
   // Every signed-in role: the in-app sign-out question.
   modals.push({
     name: 'signout-modal',
@@ -594,9 +612,12 @@ async function captureModals(page, {role, viewport, record, log, wanted}) {
     log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
     try {
       await modal.open();
-      await page.waitForSelector('.modal-backdrop, [role="dialog"], [aria-modal="true"], dialog[open]', {
-        timeout: 3000,
-      });
+      await page.waitForSelector(
+        '.modal-backdrop, .studio-drawer, [role="dialog"], [aria-modal="true"], dialog[open]',
+        {
+          timeout: 3000,
+        },
+      );
       await page.waitForTimeout(SETTLE_MS);
       const file = `${LANG}_${role.toLowerCase()}_${viewport}_${modal.name}.png`;
       await shoot(page, file, viewport);
