@@ -13,11 +13,12 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ci": "npm run format:check && npm run typecheck && npm run lint && npm run css:unused && npm run i18n:check && npm run test && npm run build",
+    "ci": "npm run format:check && npm run typecheck && npm run lint && npm run css:unused && npm run css:dead && npm run i18n:check && npm run test && npm run build",
     "screens": "node scripts/screens/capture.mjs",
     "css:unused": "node scripts/css-unused.mjs",
     "i18n:check": "node scripts/i18n-check.mjs",
-    "manual": "node scripts/manual/build.mjs && node scripts/manual/build.mjs --lang en"
+    "manual": "node scripts/manual/build.mjs && node scripts/manual/build.mjs --lang en",
+    "css:dead": "node scripts/css-dedupe.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

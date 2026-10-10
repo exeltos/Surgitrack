@@ -27,3 +27,9 @@ semantic layer on top (ink, muted, line, teal, red…) and are the ones to prefe
 `npm run css:unused` lists the class selectors in these files that no string in `src/` can produce (it exits 1
 when there are some); `node scripts/css-unused.mjs --fix` removes them. Check with the screenshot harness
 (`scripts/screens`) before and after.
+
+## Dead declarations
+
+`npm run css:dead` lists declarations that can never apply: a later rule with exactly the same selector, in the
+same `@media`, sets the same property (it exits 1 when there are some, and runs in CI); `node scripts/css-dedupe.mjs
+--fix` removes them. Change the existing rule instead of adding a later copy of its selector.
