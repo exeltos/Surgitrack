@@ -3,8 +3,9 @@
  * Drops the !important of declarations that the screenshot harness proved need it nowhere.
  *
  *   SCREENS_EVAL="$(cat scripts/screens/important-probe.js)" node scripts/screens/capture.mjs --out <dir> …
- *   node scripts/css-important.mjs <dir>/index.json [more index.json…]          report
- *   node scripts/css-important.mjs <dir>/index.json [more index.json…] --fix    drop them
+ *   node scripts/css-important.mjs <dir>/index.json … --candidates <probe.js>    report; write the second pass
+ *   SCREENS_EVAL="$(cat <probe.js>)" node scripts/screens/capture.mjs --out <dir2> …
+ *   node scripts/css-important.mjs <dir>/index.json … <dir2>/index.json --fix    drop them
  *
  * The probe, on every captured page, drops each !important on its own and compares what the browser
  * computes; it reports each declaration it could check ("context|selector|longhand") and those that
@@ -23,23 +24,29 @@ const root = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const styles = join(root, 'src/styles');
 const entry = join(styles, 'global.css');
 const fix = process.argv.includes('--fix');
-const indexes = process.argv.slice(2).filter(a => !a.startsWith('--'));
+const candidatesAt = process.argv.indexOf('--candidates');
+const candidatesFile = candidatesAt > 0 ? process.argv[candidatesAt + 1] : undefined;
+const indexes = process.argv.slice(2).filter(a => !a.startsWith('--') && a !== candidatesFile);
 if (!indexes.length) {
   console.error('Give the index.json of a capture run with the important probe.');
   process.exit(2);
 }
 
 // What the pages showed.
+// First pass ({seen, changed}): each declaration on its own. Second pass ({kept}): the candidates of
+// the first pass dropped together; those that then changed something keep their !important.
 const seen = new Set();
 const changed = new Set();
+const kept = new Set();
 let pages = 0;
 for (const file of indexes) {
   for (const shot of JSON.parse(readFileSync(file, 'utf8'))) {
     const probe = shot.state?.probe;
     if (!probe || typeof probe !== 'object') continue;
     pages++;
-    probe.seen.forEach(k => seen.add(k));
-    probe.changed.forEach(k => changed.add(k));
+    probe.seen?.forEach(k => seen.add(k));
+    probe.changed?.forEach(k => changed.add(k));
+    probe.kept?.forEach(k => kept.add(k));
   }
 }
 if (!pages) {
@@ -77,7 +84,11 @@ for (const {file, tree} of trees)
 // The longhands each property sets, as the browser expands it.
 const browser = await chromium.launch();
 const page = await browser.newPage();
-const pairs = [...new Map(decls.map(({decl}) => [`${decl.prop}:${decl.value}`, [decl.prop, decl.value]])).values()];
+// Every declaration of the rules concerned: a later one in the same rule matters too (below).
+const ruleDecls = [...new Set(decls.map(({decl}) => decl.parent))].flatMap(rule =>
+  rule.nodes.filter(n => n.type === 'decl'),
+);
+const pairs = [...new Map(ruleDecls.map(decl => [`${decl.prop}:${decl.value}`, [decl.prop, decl.value]])).values()];
 const longhands = new Map(
   await page.evaluate(list => {
     const el = document.createElement('div');
@@ -93,13 +104,25 @@ const longhands = new Map(
 await browser.close();
 
 const byFile = new Map();
+const candidateKeys = new Set();
 let removable = 0;
 for (const {file, decl} of decls) {
-  const keys = longhands
-    .get(`${decl.prop}:${decl.value}`)
-    .map(name => `${contextOf(decl.parent)}|${normSelector(decl.parent.selector)}|${name}`);
-  if (!keys.every(k => seen.has(k) && !changed.has(k))) continue;
+  // The probe names a declaration as the browser serializes it: the property itself (a shorthand
+  // where it can), or its longhands.
+  const at = `${contextOf(decl.parent)}|${normSelector(decl.parent.selector)}|`;
+  const keys = seen.has(at + decl.prop)
+    ? [at + decl.prop]
+    : longhands.get(`${decl.prop}:${decl.value}`).map(name => at + name);
+  if (!keys.every(k => seen.has(k) && !changed.has(k) && !kept.has(k))) continue;
+  // A later declaration of the same rule setting the same longhand: the browser drops it while this
+  // one is !important, so the pages could not show it; without the !important it would win.
+  const mine = new Set(longhands.get(`${decl.prop}:${decl.value}`));
+  let later = false;
+  for (let n = decl.next(); n; n = n.next())
+    if (n.type === 'decl' && longhands.get(`${n.prop}:${n.value}`).some(name => mine.has(name))) later = true;
+  if (later) continue;
   removable++;
+  keys.forEach(k => candidateKeys.add(k));
   byFile.set(file, (byFile.get(file) || 0) + 1);
   if (fix) decl.important = false;
 }
@@ -107,6 +130,15 @@ for (const {file, decl} of decls) {
 console.log(`${pages} pages checked; ${decls.length} !important declarations in the stylesheets.`);
 for (const [file, n] of byFile) console.log(`${relative(root, file)}: ${n} not needed`);
 console.log(`${removable} !important not needed on any page checked.`);
+if (candidatesFile) {
+  // The second pass's input: the group probe with these keys in place of __CANDIDATES__.
+  const probe = readFileSync(join(root, 'scripts/screens/important-group-probe.js'), 'utf8');
+  writeFileSync(
+    candidatesFile,
+    probe.replace('new Set(__CANDIDATES__)', `new Set(${JSON.stringify([...candidateKeys])})`),
+  );
+  console.log(`Second-pass probe with ${candidateKeys.size} keys written to ${candidatesFile}.`);
+}
 if (fix) {
   for (const {file, tree} of trees) writeFileSync(file, tree.toString());
   console.log('Dropped.');

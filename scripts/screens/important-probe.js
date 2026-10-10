@@ -1,7 +1,8 @@
 // Run in a captured page (capture.mjs SCREENS_EVAL): for each !important declaration of the app's
 // stylesheet whose rule matches something on the page, drop the importance on its own and compare
 // what the browser computes for the matched elements (all properties) and their descendants (the
-// inherited ones). Returns the declarations seen ("context|selector|property") and those that changed
+// inherited ones). Returns the declarations seen ("context|selector|property", the property as the browser
+// serializes it, a shorthand where it can) and those that changed
 // something. Rules for states a still page cannot show (:hover, :focus, …) are left out: never removed.
 (() => {
   const STATE =
@@ -26,6 +27,43 @@
     'direction',
     'list-style-type',
   ];
+  // A rule's declarations as the browser serializes them (shorthands kept, e.g. `background: var(--x)`).
+  // Changing and restoring a rule goes through cssText: a longhand of a shorthand that uses var() reads
+  // as empty on its own, so setProperty could not put it back.
+  const declsOf = style => {
+    const out = [];
+    let depth = 0;
+    let quote = null;
+    let cur = '';
+    for (const ch of style.cssText) {
+      if (quote) {
+        cur += ch;
+        if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === '"' || ch === "'") quote = ch;
+      else if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      else if (ch === ';' && depth === 0) {
+        if (cur.trim()) out.push(cur.trim());
+        cur = '';
+        continue;
+      }
+      cur += ch;
+    }
+    if (cur.trim()) out.push(cur.trim());
+    return out.map(text => {
+      const at = text.indexOf(':');
+      const value = text.slice(at + 1).trim();
+      const important = /!\s*important$/i.test(value);
+      return {name: text.slice(0, at).trim(), value: value.replace(/\s*!\s*important$/i, ''), important};
+    });
+  };
+  /** The rule's text with the !important of these declarations dropped. */
+  const withoutImportance = (style, names) =>
+    declsOf(style)
+      .map(d => `${d.name}: ${d.value}${d.important && !names.has(d.name) ? ' !important' : ''}`)
+      .join('; ');
   const space = s => s.replace(/\s+/g, ' ').trim();
   const normSelector = s => space(s).replace(/\s*([>+~,])\s*/g, '$1');
   const normContext = s => s.replace(/\s+/g, '');
@@ -36,10 +74,7 @@
       else if (rule instanceof CSSSupportsRule)
         walk(rule.cssRules, [...context, `@supports ${normContext(rule.conditionText)}`]);
       else if (rule instanceof CSSStyleRule) {
-        for (let i = 0; i < rule.style.length; i++) {
-          const prop = rule.style[i];
-          if (rule.style.getPropertyPriority(prop) === 'important') items.push({rule, prop, context});
-        }
+        for (const d of declsOf(rule.style)) if (d.important) items.push({rule, prop: d.name, context});
       }
     }
   };
@@ -84,11 +119,11 @@
         .join('|') +
       '#' +
       descendants.map(inheritedStyle).join('|');
-    const value = rule.style.getPropertyValue(prop);
+    const saved = rule.style.cssText;
     const before = snapshot();
-    rule.style.setProperty(prop, value, '');
+    rule.style.cssText = withoutImportance(rule.style, new Set([prop]));
     const after = snapshot();
-    rule.style.setProperty(prop, value, 'important');
+    rule.style.cssText = saved;
     if (before !== after) changed.push(key);
   }
   return {seen, changed};
