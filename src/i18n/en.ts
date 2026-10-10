@@ -1,5 +1,7 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
+  '{0} · κύκλος {1}': '{0} · cycle {1}',
+  'κύκλος {0}': 'cycle {0}',
   Χρήση: 'Use',
   'Κανονική χρήση': 'Standard use',
   'Χωρίς λήξη.': 'No end date.',
@@ -1059,7 +1061,6 @@ export const en: Record<string, string> = {
     'Add items by barcode, computer scanner or manually from the list. Each delivery is for one department.',
   'Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης': 'Recently released loads · recall available',
   Πρότυπο: 'Template',
-  'Πρώτα σκάναρε αντικείμενο': 'Scan an item first',
   'Ρυθμίσεις νέου Σετ': 'New set settings',
   'Ρυθμίσεις νέου εργαλείου': 'New instrument settings',
   Ρόλος: 'Role',

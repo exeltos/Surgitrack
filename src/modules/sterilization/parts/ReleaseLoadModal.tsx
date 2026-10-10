@@ -1,3 +1,4 @@
+import {loadLabel} from '../../../core/loadLabel';
 import {Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -38,13 +39,9 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
               </div>
               <div className="workflow-modal-title">
                 <span className="eyebrow">{tr('QUALITY GATE · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ')}</span>
-                <h2>
-                  {selectedReleaseLoad.id} · {selectedReleaseLoad.equipment}
-                </h2>
+                <h2>{loadLabel(selectedReleaseLoad)}</h2>
                 <p>
-                  {tr('Κύκλος') + ' '}
-                  {selectedReleaseLoad.cycleNumber} · {selectedReleaseLoad.program} · {selectedReleaseLoad.items.length}{' '}
-                  {tr('αντικείμενα')}
+                  {selectedReleaseLoad.program} · {selectedReleaseLoad.items.length} {tr('αντικείμενα')}
                 </p>
               </div>
             </div>
@@ -55,7 +52,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                   <select value={selectedReleaseLoad.id} onChange={e => setReleaseLoadId(e.target.value)}>
                     {awaitingLoads.map(load => (
                       <option key={load.id} value={load.id}>
-                        {load.id} · {load.equipment} · {load.cycleNumber} · {load.items.length} {tr('αντικείμενα')}
+                        {loadLabel(load)} · {load.items.length} {tr('αντικείμενα')}
                       </option>
                     ))}
                   </select>

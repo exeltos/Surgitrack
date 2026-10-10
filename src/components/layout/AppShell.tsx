@@ -750,8 +750,10 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
         />
       )}
       {toast && (
-        <div className="toast" role="status">
-          <strong>{lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}</strong>
+        <div className={`toast${toast.warning ? ' warning' : ''}`} role="status">
+          <strong>
+            {toast.warning ? (lang === 'el' ? 'Προσοχή' : 'Attention') : lang === 'el' ? 'Ολοκληρώθηκε' : 'Completed'}
+          </strong>
           <span>{toast.text}</span>
           {toast.undo && (
             <button type="button" className="toast-undo" onClick={toast.undo}>

@@ -113,7 +113,7 @@ export function useAssetCatalogActions(
       // A Set in the middle of reprocessing (or out of use) takes no new instrument: it would
       // inherit a sterile state without having gone through that Set's recorded cycle.
       if (target.state !== 'IN_DEPARTMENT' && target.state !== 'IN_STOCK') {
-        notify(tr('Το Σετ {0} δεν δέχεται εργαλεία όσο βρίσκεται σε διαδικασία ή εκτός χρήσης.', target.barcode));
+        notify(tr('Το Σετ {0} δεν δέχεται εργαλεία όσο βρίσκεται σε διαδικασία ή εκτός χρήσης.', target.barcode), true);
         return;
       }
       setTools(x =>

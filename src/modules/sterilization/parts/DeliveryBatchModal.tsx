@@ -1,3 +1,4 @@
+import {loadLabel} from '../../../core/loadLabel';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, ScanBarcode, UserRoundCheck, X, ShieldCheck, IdCard, UserCheck} from 'lucide-react';
@@ -131,9 +132,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                             </span>
                             <small>
                               {trData(item.department)} ·{' '}
-                              {lastLoad
-                                ? `Load ${lastLoad.id} / ${lastLoad.cycleNumber}`
-                                : tr('Αποδεσμευμένο μεμονωμένα')}
+                              {lastLoad ? loadLabel(lastLoad) : tr('Αποδεσμευμένο μεμονωμένα')}
                               {incompatible ? tr(' · Άλλο τμήμα') : ''}
                             </small>
                           </div>

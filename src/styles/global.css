@@ -303,9 +303,13 @@
   .receipt-tool-columns {
     display: none;
   }
+  /* Code and manufacturer are hidden here: three columns, against the six-column !important rule of
+     01-core-sterilization.css that put the name into the narrow code column. */
   .receipt-verification-row:not(.single) {
-    grid-template-columns: 105px minmax(0, 1fr) auto;
+    grid-template-columns: 105px minmax(0, 1fr) auto !important;
     gap: 8px;
+    /* Fits the panel: the older 860px minimum (a horizontal-scroll fix) pushed the report button out. */
+    min-width: 0;
   }
   .receipt-tool-code,
   .receipt-tool-manufacturer {
@@ -7328,9 +7332,15 @@ html body .studio-setting-input select {
 .sterilizer-load-items li:last-child {
   border-bottom: 0;
 }
+/* The barcode reads like every other queue's (no underline until pointed at; it opens the record). */
 .sterilizer-load-items a {
   color: var(--c-cyan-45-3);
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.sterilizer-load-items a:hover {
+  text-decoration: underline;
 }
 .sterilizer-load-items b {
   color: var(--c-cyan-25-2);
@@ -10087,4 +10097,56 @@ html body .screen-guide-off {
 .prep-note-field textarea:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: -1px;
+}
+
+/* Dialog action bars: one type size and height for every button. Plain ones (Cancel, Print, Do not release)
+   fell back to the browser's 16px next to 12px primary ones. */
+html body .modal-backdrop .modal-actions > button {
+  font-size: 13px;
+  min-height: 40px;
+}
+html body .modal-backdrop .modal-actions > button:not(.primary) {
+  font-weight: 600;
+}
+/* The preparation note reads like every other note field. */
+html body .prep-note-field textarea {
+  font-size: 13px;
+}
+
+/* Hand-over signature where it has little room (the receipt card's left column, bulk receipt and delivery):
+   code and password side by side, the button under them, so neither field cuts its text. */
+html body .handover-signature {
+  container-type: inline-size;
+}
+@container (max-width: 440px) {
+  html body .handover-signature-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  html body .handover-signature-row > button {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+}
+/* The typed code is in capitals; the hints are not. */
+html body .handover-signature-row input::placeholder {
+  text-transform: none;
+}
+/* Visible deviation at receipt: two choices in the type of the rest of the card. */
+html body .receipt-visible-deviation button {
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: normal;
+}
+/* Bulk receipt and delivery: the hint beside the list title wraps in the type of the title's own hint
+   instead of running out of room in a larger one. */
+html body .delivery-list-actions small,
+html body .delivery-batch-assets .load-assets-head > small {
+  max-width: 340px;
+  overflow: visible;
+  color: var(--st-muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+  text-align: right;
+  text-overflow: clip;
+  white-space: normal;
 }

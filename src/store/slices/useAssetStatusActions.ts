@@ -144,7 +144,7 @@ export function useAssetStatusActions(
     const a = assetName(kind, id);
     if (!a || !target || a.department === target) return;
     if (a.state !== 'IN_DEPARTMENT' && a.state !== 'IN_STOCK') {
-      notify(tr('{0}: το τμήμα αλλάζει μόνο όταν δεν βρίσκεται σε διαδικασία ή εκτός χρήσης.', a.barcode));
+      notify(tr('{0}: το τμήμα αλλάζει μόνο όταν δεν βρίσκεται σε διαδικασία ή εκτός χρήσης.', a.barcode), true);
       return;
     }
     if (kind === 'SET') {
@@ -199,7 +199,7 @@ export function useAssetStatusActions(
     if (!a) return;
     // Like every other change to the item, the marker is locked during a reprocessing cycle.
     if (!['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(a.state)) {
-      notify(tr('{0}: ο χρωματικός μάρτυρας δεν αλλάζει όσο βρίσκεται σε διαδικασία αποστείρωσης.', a.barcode));
+      notify(tr('{0}: ο χρωματικός μάρτυρας δεν αλλάζει όσο βρίσκεται σε διαδικασία αποστείρωσης.', a.barcode), true);
       return;
     }
     if (kind === 'SET') setSets(x => x.map(s => (s.id === id ? {...s, colorTapes: value.tapes} : s)));
