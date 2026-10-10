@@ -22,7 +22,8 @@ export const recordKey = (value: unknown): string => {
 
 /**
  * Records of a collection saved by anyone since `since` (server time: the database stamps every update).
- * Returns them with the latest stamp seen, which moves the next look forward.
+ * Returns them with the latest stamp seen, which moves the next look forward. History tables are
+ * append-only and have no updated_at: only their created_at counts.
  */
 export async function loadChangedRecords(
   organizationId: string,
@@ -31,18 +32,21 @@ export async function loadChangedRecords(
 ): Promise<{records: CloudRecord[]; latest?: string}> {
   const records: CloudRecord[] = [];
   let latest: string | undefined;
+  const {mutable} = CLOUD_TABLES[collection];
   for (let from = 0; ; from += PAGE_SIZE) {
-    const {data, error} = await supabase
+    const query = supabase
       .from(CLOUD_TABLES[collection].table)
-      .select(`${tableColumns(collection)},updated_at,created_at`)
-      .eq('organization_id', organizationId)
-      .or(`updated_at.gte.${since},created_at.gte.${since}`)
+      .select(`${tableColumns(collection)},${mutable ? 'updated_at,' : ''}created_at`)
+      .eq('organization_id', organizationId);
+    const {data, error} = await (
+      mutable ? query.or(`updated_at.gte.${since},created_at.gte.${since}`) : query.gte('created_at', since)
+    )
       .order('created_at', {ascending: false})
       .order('id')
       .range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     const page = data as unknown as Array<Record<string, unknown>>;
-    if (CLOUD_TABLES[collection].mutable) rememberVersions(collection, page);
+    if (mutable) rememberVersions(collection, page);
     for (const row of page) {
       for (const stamp of [row.updated_at, row.created_at])
         if (typeof stamp === 'string' && (!latest || stamp > latest)) latest = stamp;
