@@ -28,6 +28,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
     tab,
     tapesOpen,
   } = s;
+  const withCodes = filteredItems.some(item => item.code);
   const [batchOpen, setBatchOpen] = useState(false);
   // Departments that count the instruments when sending to Sterilization (operating theatres).
   const counting = countDepartments(
@@ -123,7 +124,8 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
               <div className={`studio-list-head${libraryKey === 'departments' ? ' with-count' : ''}`}>
                 <span>{L('Ονομασία', 'Name')}</span>
                 <span>{L('Αγγλικά', 'English')}</span>
-                <span>{L('Κωδικός', 'Code')}</span>
+                {/* No item has a code: the column stays empty instead of a dash on every row. */}
+                <span>{withCodes ? L('Κωδικός', 'Code') : ''}</span>
                 <span></span>
               </div>
               <div className="studio-scroll-list">
@@ -131,7 +133,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                   <div className={`studio-list-row${libraryKey === 'departments' ? ' with-count' : ''}`} key={item.id}>
                     <strong>{item.el}</strong>
                     <span>{item.en}</span>
-                    <code>{item.code || '—'}</code>
+                    <code>{withCodes ? item.code || '—' : ''}</code>
                     <div>
                       {libraryKey === 'departments' && (
                         <button

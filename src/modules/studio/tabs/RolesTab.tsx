@@ -110,7 +110,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                         )
                       : selectedRole === 'DEPARTMENT'
                         ? L(
-                            'Ο ρόλος Τμήματος περιορίζεται πάντα στα assets του δηλωμένου τμήματος και δεν μπορεί να αποκτήσει δικαιώματα CSSD ή Studio.',
+                            'Ο ρόλος Τμήματος βλέπει πάντα μόνο τα Σετ και τα εργαλεία του τμήματός του και δεν μπορεί να πάρει δικαιώματα Αποστείρωσης ή Studio.',
                             'Department role is always scoped to its assigned department and cannot gain CSSD or Studio administration permissions.',
                           )
                         : L(

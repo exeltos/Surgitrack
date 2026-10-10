@@ -35,7 +35,7 @@ export type SterilizationWorkflowConfig = {
 };
 
 export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
-  profileName: 'Πλήρης ροή CSSD',
+  profileName: 'Πλήρης ροή',
   version: 1,
   updatedAt: '',
   receiptPolicy: {countSetsAtReceipt: false, allowCrossDepartmentHandover: true},
