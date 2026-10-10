@@ -1,5 +1,18 @@
 import {useMemo, useState} from 'react';
-import {BadgeCheck, ChevronRight, Clock3, Eraser, MapPin, Route, ShieldCheck, Trash2, UserRound, X} from 'lucide-react';
+import {
+  BadgeCheck,
+  ChevronRight,
+  Clock3,
+  Eraser,
+  ExternalLink,
+  MapPin,
+  Route,
+  ShieldCheck,
+  Trash2,
+  UserRound,
+  X,
+} from 'lucide-react';
+import {Link} from 'react-router-dom';
 import {supabase} from '../../lib/supabase';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
 import {getCloudOrganizationId} from '../../data/cloud/appRecords';
@@ -181,7 +194,7 @@ export default function MovementsPage() {
     <div className="movements-workspace">
       <div className="page-head movements-head">
         <div>
-          <h1>{tr('Ιστορικό κινήσεων')}</h1>
+          <h1>{tr('Ιστορικό')}</h1>
           <p>
             {role === 'DEPARTMENT'
               ? tr('Ιστορικό ιχνηλασιμότητας του τμήματος {0}.', trData(currentUser.department))
@@ -279,7 +292,7 @@ export default function MovementsPage() {
             </span>
           </div>
           <small>
-            <ShieldCheck size={14} /> {tr('Audit trail · οι εγγραφές δεν τροποποιούνται')}
+            <ShieldCheck size={14} /> {tr('Οι εγγραφές δεν αλλάζουν')}
           </small>
         </div>
         <div className="ledger-columns">
@@ -358,7 +371,7 @@ export default function MovementsPage() {
           <div className="movement-detail" role="dialog" aria-modal="true">
             <div className="movement-detail-head">
               <div>
-                <small>CHAIN OF CUSTODY</small>
+                <small>{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</small>
                 <h2>{tr('Λεπτομέρειες κίνησης')}</h2>
                 <span>{selected.asset}</span>
               </div>
@@ -392,15 +405,14 @@ export default function MovementsPage() {
                 <span>{tr('Καταχώρηση από')}</span>
                 <strong>{trData(selected.by)}</strong>
               </div>
-              <div
-                className={
-                  accountDiffers(selected.by, accountOf(selected)) ? 'movement-account differs' : 'movement-account'
-                }
-              >
-                <BadgeCheck />
-                <span>{tr('Λογαριασμός (από τη βάση)')}</span>
-                <strong>{accountOf(selected) || '—'}</strong>
-              </div>
+              {/* The signed-in account only matters when it is not the person named on the entry. */}
+              {accountDiffers(selected.by, accountOf(selected)) && (
+                <div className="movement-account differs">
+                  <BadgeCheck />
+                  <span>{tr('Λογαριασμός που την καταχώρησε')}</span>
+                  <strong>{accountOf(selected)}</strong>
+                </div>
+              )}
               <div>
                 <ShieldCheck />
                 <span>{tr('Τύπος αντικειμένου')}</span>
@@ -413,9 +425,26 @@ export default function MovementsPage() {
                 </div>
               )}
             </div>
+            {(() => {
+              const code = assetParts(selected.asset).barcode;
+              const set = sets.find(x => x.barcode === code);
+              const tool = set ? undefined : tools.find(x => x.barcode === code);
+              return (
+                <div className="movement-detail-links">
+                  {(set || tool) && (
+                    <Link className="app-button" to={set ? `/sets/${set.id}` : `/tools/${tool!.id}`}>
+                      <ExternalLink size={15} /> {tr('Άνοιγμα καρτέλας')}
+                    </Link>
+                  )}
+                  <Link className="app-button" to={`/traceability?q=${encodeURIComponent(code)}`}>
+                    <Route size={15} /> {tr('Ιχνηλάτηση')}
+                  </Link>
+                </div>
+              );
+            })()}
             <div className="movement-detail-foot">
               <ShieldCheck size={17} />
-              <span>{tr('Η εγγραφή αποτελεί μέρος του audit trail και είναι μόνο για ανάγνωση.')}</span>
+              <span>{tr('Η εγγραφή είναι μόνο για ανάγνωση: οι κινήσεις δεν αλλάζουν ούτε σβήνονται.')}</span>
             </div>
           </div>
         </div>
