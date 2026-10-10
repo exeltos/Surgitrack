@@ -1,18 +1,35 @@
 import {useMemo} from 'react';
 import {tr} from '../../../i18n';
+import {effectiveState} from '../../../core/workflow';
+import type {AssetState} from '../../../types/domain';
 import type {Kind, SterilizationRow, AssetDraft} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
 
 export function useSterilizationQueues(p: ReturnType<typeof useSterilizationState>) {
-  const {departmentFilter, kindFilter, processLoads, query, queue, sets, specialtyFilter, tools} = p;
+  const {
+    departmentFilter,
+    kindFilter,
+    processLoads,
+    query,
+    queue,
+    sets,
+    specialtyFilter,
+    sterilizationWorkflow,
+    tools,
+  } = p;
 
-  const all = useMemo<SterilizationRow[]>(
-    () => [
-      ...sets.map(x => ({...x, kind: 'SET' as const})),
-      ...tools.filter(t => t.mode === 'STANDALONE').map(x => ({...x, kind: 'TOOL' as const})),
-    ],
-    [sets, tools],
-  );
+  // An item left in a stage since turned off in Studio shows (and is handled) in the next enabled stage.
+  const stages = sterilizationWorkflow.stages;
+  const all = useMemo<SterilizationRow[]>(() => {
+    const inStage = <T extends {state: AssetState}>(x: T): T => ({
+      ...x,
+      state: effectiveState(stages, x.state) as AssetState,
+    });
+    return [
+      ...sets.map(x => ({...inStage(x), kind: 'SET' as const})),
+      ...tools.filter(t => t.mode === 'STANDALONE').map(x => ({...inStage(x), kind: 'TOOL' as const})),
+    ];
+  }, [sets, tools, stages]);
   const incoming = all.filter(x => x.state === 'PENDING_STERILIZATION');
   const washing = all.filter(x => x.state === 'IN_WASHING');
   const preparation = all.filter(x => x.state === 'IN_PREPARATION');

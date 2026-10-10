@@ -6,12 +6,13 @@ import {tr} from '../../i18n';
 import {DEFAULT_SHELF_LIFE, STERILE_STATES, isShelfLife, isoDate, sterileUntil} from '../../core/sterileExpiry';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
+import {effectiveState} from '../../core/workflow';
 
 /** How long a management action can be taken back. */
 const UNDO_SECONDS = 10;
 
 export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnType<typeof useSurgiRecords>) {
-  const {recallCases, setMovements, setSets, setTools, sets, tools} = p;
+  const {recallCases, setMovements, setSets, setTools, sets, sterilizationWorkflow, tools} = p;
 
   const [toast, setToast] = useState<Toast>();
   /** Tells the user what happened; `warning` for a refusal or a failed outcome. */
@@ -24,7 +25,13 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
   }, [toast]);
   const addMovement = (m: Omit<Movement, 'id' | 'at'>) =>
     setMovements(x => [{...m, id: `m${uniqueStamp()}`, at: formatStoreDateTime()}, ...x]);
-  const assetName = (kind: AssetKind, id: string) => findAsset(kind, id, sets, tools);
+  // The asset as the actions see it: one left in a stage since turned off is in the next enabled stage.
+  const assetName = (kind: AssetKind, id: string) => {
+    const asset = findAsset(kind, id, sets, tools);
+    if (!asset) return asset;
+    const state = effectiveState(sterilizationWorkflow.stages, asset.state) as AssetState;
+    return state === asset.state ? asset : {...asset, state};
+  };
   const isUsageExhausted = (kind: AssetKind, id: string) => {
     const asset = assetName(kind, id);
     if (!asset) return false;

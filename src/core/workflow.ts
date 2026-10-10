@@ -201,6 +201,16 @@ export function nextStateAfter(stages: readonly WorkflowStageConfig[], stageId: 
 }
 
 /**
+ * The state an item is handled in. An item left in a stage that has since been turned off (e.g. in packaging
+ * when the hospital no longer packs separately) is handled by the next enabled stage, so nothing stays stuck in a
+ * stage no screen shows and no stage step (e.g. the sterile duration) is asked twice.
+ */
+export function effectiveState(stages: readonly WorkflowStageConfig[], state: string): string {
+  const stage = stages.find(item => workflowStageState[item.id] === state);
+  return !stage || stage.enabled ? state : nextStateAfter(stages, stage.id);
+}
+
+/**
  * Returns the asset state an item should return to when a load fails release/QA and
  * must be reprocessed. This is always the first enabled stage after RECEIPT (never
  * RECEIPT itself, since the item never physically left the facility), falling back to
