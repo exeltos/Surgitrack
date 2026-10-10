@@ -241,6 +241,60 @@ describe('sterilization flow', () => {
     expect(state()).toBe('IN_PREPARATION');
   });
 
+  it('handles an item left in a stage since turned off in the next enabled stage', () => {
+    const {result} = renderHook(() => ({s: useSurgi(), l: useLibraries()}), {wrapper});
+    const asset = result.current.s.tools.find(
+      t => t.mode === 'STANDALONE' && t.state === 'IN_DEPARTMENT' && !t.maxUses,
+    )!;
+    const ref = {kind: 'TOOL' as const, id: asset.id};
+    const state = () => result.current.s.tools.find(t => t.id === asset.id)!.state;
+    act(() => void result.current.s.sendToSterilization('TOOL', asset.id));
+    act(() => void result.current.s.receiveAtSterilization('TOOL', asset.id, deliverer));
+    act(
+      () =>
+        void result.current.s.createProcessLoad({
+          kind: 'WASHING',
+          assetRefs: [ref],
+          equipment: 'ΠΛΥΝΤΗΡΙΟ 1',
+          cycleNumber: 'W-1',
+          program: 'ΘΕΡΜΙΚΗ',
+        }),
+    );
+    act(
+      () =>
+        void result.current.s.recordPreparation('TOOL', asset.id, {
+          toolIds: [asset.id],
+          checkedToolIds: [asset.id],
+          allOk: true,
+        }),
+    );
+    expect(state()).toBe('IN_PACKAGING');
+    // The hospital stops packing separately: the item waits for the sterilizer, not in a hidden stage.
+    act(() =>
+      result.current.l.updateSterilizationWorkflow({
+        stages: result.current.l.sterilizationWorkflow.stages.map(stage =>
+          stage.id === 'PACKAGING' ? {...stage, enabled: false} : stage,
+        ),
+      }),
+    );
+    act(
+      () =>
+        void result.current.s.createProcessLoad({
+          kind: 'STERILIZATION',
+          assetRefs: [ref],
+          equipment: 'ΚΛΙΒΑΝΟΣ 1',
+          cycleNumber: 'C-1',
+          program: '134°C',
+        }),
+    );
+    const load = result.current.s.processLoads.find(l =>
+      l.items.some(i => i.assetId === asset.id && l.kind === 'STERILIZATION'),
+    )!;
+    expect(load).toBeTruthy();
+    act(() => void result.current.s.finishProcessLoad(load.id, 'PASSED'));
+    expect(state()).toBe('AWAITING_RELEASE');
+  });
+
   describe('single-asset cycle (outside a load)', () => {
     const toSterilization = () => {
       const f = setup();
