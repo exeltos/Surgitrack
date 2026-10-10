@@ -3,9 +3,10 @@
 -- 1. A release record that says RELEASED has acceptable cycle parameters, intact packaging and no failed
 --    biological indicator. The app never writes anything else (useLoadActions and useReceiptAndCycleActions
 --    turn such a decision into REPROCESS); a direct write through the API that tries is refused with a check
---    violation, which the app's sync reports as refused and does not send again. NOT VALID: rows already
---    saved are not re-checked. The chemical indicator is not part of it: a hospital may release on the
---    biological one alone, and the record keeps only whether the chemical one passed.
+--    violation, which the app's sync reports as refused and does not send again. Added NOT VALID and then
+--    validated (checked live first: no saved row breaks it), so the scan does not hold up writes. The
+--    chemical indicator is not part of it: a hospital may release on the biological one alone, and the
+--    record keeps only whether the chemical one passed.
 --
 -- 2. A Set or standalone instrument that goes from a sterilization stage straight to a ready state
 --    (IN_STORAGE or READY_FOR_PICKUP) through the API is logged in release_transitions. Not refused: a device
@@ -19,6 +20,7 @@ alter table public.sterilization_releases add constraint sterilization_releases_
   or (coalesce(physical_parameters_ok, false) and coalesce(packaging_integrity_ok, false)
       and biological_indicator_result is distinct from 'FAIL')
 ) not valid;
+alter table public.sterilization_releases validate constraint sterilization_releases_released_checks;
 
 -- 2 -----------------------------------------------------------------------------------------------
 create table public.release_transitions (

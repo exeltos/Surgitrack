@@ -5,8 +5,7 @@ folder on an empty Postgres gives the same public schema as the live project. La
 local replay below: policies, triggers and table and function privileges are identical, and function bodies differ
 only in whitespace (`platform_delete_movements`).
 
-The folder has 80 files: the 77 whose effects are live, and three not yet applied (see
-[Waiting to be applied](#waiting-to-be-applied)).
+The folder has 88 files, all applied to the live project and recorded in its history (checked 10/10/2026).
 
 ## How the versions line up
 
@@ -86,20 +85,17 @@ insert into supabase_migrations.schema_migrations (version, name, statements)
 values ('20261009120000', 'lock_default_privileges', array[]::text[]) on conflict (version) do nothing;
 ```
 
-## Waiting to be applied
+## Applied on 10/10/2026
 
 | Version        | Name              | What it does                                                                                                                                                                    |
 | -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 20261010180000 | release_integrity | A RELEASED release needs acceptable parameters, intact packaging and no failed biological indicator; ready straight from a sterilization stage is logged for the nightly checks |
+| 20261010152714 | release_integrity | A RELEASED release needs acceptable parameters, intact packaging and no failed biological indicator; ready straight from a sterilization stage is logged for the nightly checks |
 
-The release check is `not valid`: rows already saved are not re-checked. To see whether any would fail (then
-`alter table public.sterilization_releases validate constraint sterilization_releases_released_checks`):
-
-```sql
-select organization_id, id from public.sterilization_releases
- where decision = 'RELEASED' and not (coalesce(physical_parameters_ok, false) and coalesce(packaging_integrity_ok, false)
-   and biological_indicator_result is distinct from 'FAIL');
-```
+Applied with the Supabase MCP `apply_migration`, which recorded the version itself; the file carries that version.
+Before it, no saved release broke the new check (one release, a REPROCESS), so the migration validates it at once.
+Checked afterwards: the check is validated, `release_transitions` has row level security and no grants to `anon`
+or `authenticated`, the trigger function is not callable by them, and `supabase/integrity.sql` finds nothing. The
+security advisor notes `release_transitions` as "RLS enabled, no policy", on purpose, like `device_keys`.
 
 ## Testing locally
 
