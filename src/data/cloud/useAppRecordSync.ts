@@ -30,6 +30,15 @@ const LIVE_DEBOUNCE_MS = 300;
 const ADOPT_MS = 5000;
 // Rounds per flush; later changes are picked up by the next render's flush.
 const MAX_ROUNDS = 5;
+/**
+ * Collections whose saves wait until these have nothing left to save on this device: a cycle and its
+ * release reach the server before the Set or instrument they make ready, so the database can require a
+ * release of a passed cycle when a Set becomes ready.
+ */
+const SAVED_AFTER: Partial<Record<CloudCollection, CloudCollection[]>> = {
+  sets: ['sterilizationCycles', 'sterilizationReleases'],
+  tools: ['sterilizationCycles', 'sterilizationReleases'],
+};
 
 export type SyncStatus = 'saved' | 'saving' | 'failed';
 
@@ -58,6 +67,17 @@ const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
+/** Resolves once none of these collections has a change waiting to be saved (or a save under way). */
+const settled = (keys: string[]) =>
+  new Promise<void>(resolve => {
+    const done = () => !keys.some(key => pending.has(key));
+    if (done()) return resolve();
+    const stop = subscribe(() => {
+      if (!done()) return;
+      stop();
+      resolve();
+    });
+  });
 
 /** A record two devices changed at once, with the fields where the other device's value was kept. */
 export type SyncConflict = {collection: CloudCollection; label: string; fields: string[]};
@@ -356,10 +376,12 @@ export function useAppRecordSync(
       applyRef.current?.(renumbered, []);
       notify({kind: 'barcode', collection, changes});
     };
+    const before = (SAVED_AFTER[collection] || []).map(other => `${organizationId}:${other}`);
     const flush = async () => {
       busy.current = true;
       try {
         for (let round = 0; round < MAX_ROUNDS; round++) {
+          if (before.length) await settled(before);
           const next = diff(known, latest.current);
           if (!next.changed.length && !next.removed.length) {
             pending.delete(key);

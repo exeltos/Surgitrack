@@ -153,4 +153,43 @@ describe('saving a collection to the cloud', () => {
     await wait(10000);
     expect(times[1] - times[0]).toBe(5400);
   });
+
+  it('saves a Set only once the cycles and releases made with it are saved', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    type Records = {sets: Tool[]; releases: CloudRecord[]};
+    let setRecords: (update: (state: Records) => Records) => void = () => undefined;
+    function Released() {
+      const [state, setState] = useState<Records>({sets: [tool(1)], releases: []});
+      setRecords = setState;
+      // In the store's order: Sets before the sterilization records.
+      useAppRecordSync('org-1', 'sets', state.sets);
+      useAppRecordSync('org-1', 'sterilizationReleases', state.releases);
+      return null;
+    }
+    render(<Released />);
+    let releaseSaved: (outcome: WriteOutcome) => void = () => undefined;
+    let releaseTries = 0;
+    api.writeAppRecords.mockImplementation(async (_org: string, collection: string) => {
+      if (collection !== 'sterilizationReleases') return saved();
+      // The first try fails (network), the second waits until the test lets it through.
+      if (releaseTries++ === 0) throw new Error('Failed to fetch');
+      return new Promise<WriteOutcome>(resolve => (releaseSaved = resolve));
+    });
+    const collections = () => api.writeAppRecords.mock.calls.map(call => call[1]);
+
+    await act(() =>
+      setRecords(state => ({
+        sets: state.sets.map(item => ({...item, name: 'Released'})),
+        releases: [{id: 'sr1'}],
+      })),
+    );
+    await wait(8000);
+    expect(collections()).toEqual(['sterilizationReleases', 'sterilizationReleases']);
+    expect(unsavedChanges()).toBe(2);
+
+    await act(async () => releaseSaved(saved()));
+    await wait(1000);
+    expect(collections()).toEqual(['sterilizationReleases', 'sterilizationReleases', 'sets']);
+    expect(unsavedChanges()).toBe(0);
+  });
 });
