@@ -116,6 +116,8 @@ const RECEIPTS_FIELDS: readonly Field[] = [
   ['checkNote', 'check_note', 'text'],
   ['itemChecks', 'item_checks', 'json'],
   ['setChecks', 'set_checks', 'json'],
+  // Stamped by the database on insert (handover_counterparty_stamp), whatever the device sends.
+  ['counterpartyVerified', 'counterparty_verified', 'boolean'],
 ];
 
 const DELIVERIES_FIELDS: readonly Field[] = [
@@ -134,6 +136,7 @@ const DELIVERIES_FIELDS: readonly Field[] = [
   ['receivedByDepartment', 'received_by_department', 'text'],
   ['at', 'at', 'text'],
   ['note', 'note', 'text'],
+  ['counterpartyVerified', 'counterparty_verified', 'boolean'],
 ];
 
 const PREPARATIONS_FIELDS: readonly Field[] = [

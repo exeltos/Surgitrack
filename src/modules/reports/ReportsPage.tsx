@@ -9,6 +9,7 @@ import {
   Flame,
   FileText,
   History,
+  PenLine,
   Search,
   Stethoscope,
   UsersRound,
@@ -29,7 +30,10 @@ import {getI18nLang, tr, trData} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {EXPIRY_MARK, STERILE_MARK} from '../../core/sterileSymbols';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
-import {formatDateTime} from '../../core/displayDate';
+import {formatDateTime, parseDisplayDate} from '../../core/displayDate';
+
+/** A record's date as a number for sorting (newest first); unreadable dates go last. */
+const sortableTime = (value: string) => parseDisplayDate(value)?.getTime() ?? 0;
 
 const LOAD_STATUS: Record<string, string> = {
   OPEN: 'Στον κλίβανο',
@@ -48,7 +52,16 @@ const INDICATOR: Record<string, string> = {
 const indicatorText = (value?: string) => (value && INDICATOR[value] ? tr(INDICATOR[value]) : '—');
 
 type ReportId =
-  'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'loads' | 'expiry' | 'traceability';
+  | 'composition'
+  | 'department'
+  | 'specialty'
+  | 'issues'
+  | 'usage'
+  | 'retired'
+  | 'loads'
+  | 'expiry'
+  | 'handovers'
+  | 'traceability';
 type Row = Record<string, string | number>;
 
 const stateLabel: Record<string, string> = {
@@ -92,6 +105,12 @@ const reports: Array<{id: ReportId; title: string; description: string; icon: ty
     icon: CalendarClock,
   },
   {
+    id: 'handovers',
+    title: 'Παραδόσεις & παραλαβές',
+    description: 'Ποιος παρέδωσε σε ποιον, και αν ο άλλος υπέγραψε με τον δικό του κωδικό.',
+    icon: PenLine,
+  },
+  {
     id: 'traceability',
     title: 'Ιχνηλασιμότητα Ασθενούς',
     description: 'Κινήσεις Σετ/εργαλείων βάσει κωδικού ασθενούς.',
@@ -128,7 +147,18 @@ function genericReportHtml(title: string, subtitle: string, columns: Array<{key:
 }
 
 export default function ReportsPage() {
-  const {sets, tools, retiredTools, issues, movements, currentUser, processLoads, sterilizationReleases} = useSurgi();
+  const {
+    sets,
+    tools,
+    retiredTools,
+    issues,
+    movements,
+    currentUser,
+    processLoads,
+    sterilizationReleases,
+    receipts,
+    deliveries,
+  } = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   const compositionOptions = useCompositionOptions();
   // Sets in the composition picker, by name.
@@ -146,6 +176,7 @@ export default function ReportsPage() {
   const [loadStatus, setLoadStatus] = useState('ALL');
   const [sterilizerName, setSterilizerName] = useState('ALL');
   const [expiryState, setExpiryState] = useState('ALL');
+  const [signature, setSignature] = useState('ALL');
   const sterilizerNames = useMemo(
     () =>
       Array.from(new Set(processLoads.filter(l => l.kind === 'STERILIZATION').map(l => l.equipment))).sort((a, b) =>
@@ -421,6 +452,56 @@ export default function ReportsPage() {
         rows: rows as Row[],
       };
     }
+    if (active === 'handovers') {
+      // Receipts (department → Sterilization) and deliveries (Sterilization → department), each with
+      // whether the server confirmed the other party's signature (see handover_counterparty_stamp).
+      const signatureText = (verified?: boolean) =>
+        verified === true ? tr('Επιβεβαιωμένη') : verified === false ? tr('Μη επιβεβαιωμένη') : '—';
+      const rows = [
+        ...receipts.map(r => ({
+          type: 'Παραλαβή',
+          department: r.fromDepartment,
+          verified: r.counterpartyVerified,
+          record: r,
+        })),
+        ...deliveries.map(d => ({
+          type: 'Παράδοση',
+          department: d.department,
+          verified: d.counterpartyVerified,
+          record: d,
+        })),
+      ]
+        .filter(h => department === 'ALL' || h.department === department)
+        .filter(
+          h =>
+            signature === 'ALL' ||
+            (signature === 'VERIFIED' ? h.verified === true : signature === 'UNVERIFIED' ? h.verified === false : true),
+        )
+        .sort((a, b) => sortableTime(b.record.at) - sortableTime(a.record.at))
+        .map(h => ({
+          at: h.record.at,
+          type: h.type,
+          barcode: h.record.barcode,
+          name: h.record.assetName,
+          department: h.department || '—',
+          deliveredBy: h.record.deliveredByName || '—',
+          receivedBy: h.record.receivedByName || '—',
+          signature: signatureText(h.verified),
+        }));
+      return {
+        columns: [
+          {key: 'at', label: tr('Ημερομηνία')},
+          {key: 'type', label: tr('Κίνηση')},
+          {key: 'barcode', label: 'Barcode'},
+          {key: 'name', label: tr('Ονομασία')},
+          {key: 'department', label: tr('Τμήμα')},
+          {key: 'deliveredBy', label: tr('Παρέδωσε')},
+          {key: 'receivedBy', label: tr('Παρέλαβε')},
+          {key: 'signature', label: tr('Υπογραφή άλλου μέρους')},
+        ],
+        rows: rows as Row[],
+      };
+    }
     const q = patientCode.trim().toLowerCase();
     const rows = movements
       .filter(m => m.patientCode && (!q || m.patientCode.toLowerCase().includes(q)))
@@ -469,6 +550,9 @@ export default function ReportsPage() {
     usageFilter,
     patientCode,
     warningThreshold,
+    receipts,
+    deliveries,
+    signature,
   ]);
 
   const buildPreview = () => {
@@ -504,7 +588,7 @@ export default function ReportsPage() {
   });
   const byDepartment = active === 'department' || active === 'specialty';
   const reportFilters: SelectFilter[] = [
-    ...(byDepartment || active === 'issues' || active === 'usage' || active === 'expiry'
+    ...(byDepartment || active === 'issues' || active === 'usage' || active === 'expiry' || active === 'handovers'
       ? [
           {
             key: 'department',
@@ -598,6 +682,19 @@ export default function ReportsPage() {
           },
         ]
       : []),
+    ...(active === 'handovers'
+      ? [
+          {
+            key: 'signature',
+            placeholder: tr('Όλες οι υπογραφές'),
+            options: [
+              {value: 'UNVERIFIED', label: tr('Μη επιβεβαιωμένη')},
+              {value: 'VERIFIED', label: tr('Επιβεβαιωμένη')},
+            ],
+            ...choice(signature, setSignature),
+          },
+        ]
+      : []),
     ...(active === 'usage'
       ? [
           {
@@ -628,6 +725,7 @@ export default function ReportsPage() {
       loadStatus,
       sterilizerName,
       expiryState,
+      signature,
     ].join('|'),
   );
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
@@ -754,7 +852,17 @@ export default function ReportsPage() {
                     {shownRows.visible.map((row, index) => (
                       <tr key={index}>
                         {reportData.columns.map(c => (
-                          <td key={c.key} data-label={c.label} className={c.key === 'barcode' ? 'mono' : ''}>
+                          <td
+                            key={c.key}
+                            data-label={c.label}
+                            className={
+                              c.key === 'barcode'
+                                ? 'mono'
+                                : c.key === 'signature' && row.signature === tr('Μη επιβεβαιωμένη')
+                                  ? 'report-cell-warn'
+                                  : ''
+                            }
+                          >
                             {cellText(c.key, row[c.key])}
                           </td>
                         ))}

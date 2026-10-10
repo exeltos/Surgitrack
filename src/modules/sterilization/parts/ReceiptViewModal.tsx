@@ -56,6 +56,19 @@ export default function ReceiptViewModal({s}: {s: SterilizationPageState}) {
                 <strong>{receiptView.receivedByName}</strong>
                 <small>{receiptView.receivedByDepartment}</small>
               </div>
+              {receiptView.counterpartyVerified !== undefined && (
+                <div>
+                  <span>{tr('Υπογραφή άλλου μέρους')}</span>
+                  <strong className={receiptView.counterpartyVerified ? '' : 'report-cell-warn'}>
+                    {receiptView.counterpartyVerified ? tr('Επιβεβαιωμένη') : tr('Μη επιβεβαιωμένη')}
+                  </strong>
+                  <small>
+                    {receiptView.counterpartyVerified
+                      ? tr('Με τον δικό του κωδικό')
+                      : tr('Χωρίς επιβεβαίωση κωδικού από τον server')}
+                  </small>
+                </div>
+              )}
               {receiptView.assetKind === 'SET' && (
                 <div>
                   <span>{tr('Σύνθεση κατά την παραλαβή')}</span>

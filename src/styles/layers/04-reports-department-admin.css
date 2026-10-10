@@ -4718,3 +4718,8 @@ a.auth-primary {
   background: var(--c-gray-95-2);
   color: var(--c-red-40);
 }
+/* Reports: a handover whose other party did not confirm with their own password (over the table's text colour). */
+html body .report-cell-warn {
+  color: var(--c-red-40);
+  font-weight: 700;
+}
