@@ -567,6 +567,11 @@ export const en: Record<string, string> = {
   'Όλες οι υπογραφές': 'All signatures',
   'Με τον δικό του κωδικό': 'With their own password',
   'Χωρίς επιβεβαίωση κωδικού από τον server': 'Password not confirmed by the server',
+  'Οδηγοί οθόνης': 'Screen guides',
+  Εμφανίζονται: 'Shown',
+  'Δεν εμφανίζονται': 'Not shown',
+  'Οι σύντομες οδηγίες την πρώτη φορά σε κάθε οθόνη. Αλλάζουν αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
+    "The short guides the first time on each screen. They can be changed later in the hospital's settings.",
   'Η παραλαβή ολοκληρώθηκε': 'Receipt completed',
   'Η παραλαβή ολοκληρώνεται μόνο μετά την ταυτοποίηση.': 'The receipt completes only after identification.',
   'Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.': 'Unit policy does not allow this exception.',

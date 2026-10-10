@@ -45,11 +45,18 @@ export function useDemoAccounts() {
   }, [load]);
 
   /** The sample data first, then the email: a Demo stopped half-way carries on from where it stopped. */
-  const prepare = async (demo: Pick<DemoAccount, 'id' | 'organizationId' | 'seededAt' | 'status'>) => {
+  const prepare = async (
+    demo: Pick<DemoAccount, 'id' | 'organizationId' | 'seededAt' | 'status'>,
+    screenGuides?: boolean,
+  ) => {
     if (demoNextStep(demo) === 'SEED') {
       setBusy({id: demo.id, label: tr('Φόρτωση δοκιμαστικών δεδομένων…')});
-      await seedDemoAccount(demo, (done, total) =>
-        setBusy({id: demo.id, label: tr('Φόρτωση δοκιμαστικών δεδομένων… {0}%', Math.round((done / total) * 100))}),
+      await seedDemoAccount(
+        demo,
+        (done, total) =>
+          setBusy({id: demo.id, label: tr('Φόρτωση δοκιμαστικών δεδομένων… {0}%', Math.round((done / total) * 100))}),
+        'SEED',
+        screenGuides,
       );
     }
     setBusy({id: demo.id, label: tr('Αποστολή email…')});
@@ -81,7 +88,7 @@ export function useDemoAccounts() {
   const create = (demo: NewDemo) =>
     run('new', tr('Δημιουργία Demo…'), async () => {
       const created = await createDemoAccount(demo);
-      await prepare({id: created.id, organizationId: created.organization_id, status: 'PREPARING'});
+      await prepare({id: created.id, organizationId: created.organization_id, status: 'PREPARING'}, demo.screenGuides);
     });
   const continuePreparing = (demo: DemoAccount) => run(demo.id, tr('Προετοιμασία…'), () => prepare(demo));
   const resend = (demo: DemoAccount) =>

@@ -16,13 +16,16 @@ export const DEMO_PACK_VERSION = 2;
  */
 export const seedDemoOrganization = async (
   organizationId: string,
-  options: {evaluation?: boolean; onProgress?: (done: number, total: number) => void} = {},
+  options: {evaluation?: boolean; onProgress?: (done: number, total: number) => void; screenGuides?: boolean} = {},
 ): Promise<{records: number; shiftedDays: number}> => {
   const store = demoSurgiRepository.getInitialData();
   const sample = demoAdminRepository.getInitialData();
-  const library = options.evaluation
-    ? {...sample, organizations: [], users: [], id: 'state'}
-    : {...sample, id: 'state'};
+  const base = options.evaluation ? {...sample, organizations: [], users: [], id: 'state'} : {...sample, id: 'state'};
+  // The on-screen guides, when the Demo was opened with them chosen on or off.
+  const library =
+    options.screenGuides === undefined
+      ? base
+      : {...base, systemSettings: {...base.systemSettings, screenGuides: options.screenGuides}};
   // The library document is written last: its presence marks a completed seed.
   const records = {
     sets: store.sets,
