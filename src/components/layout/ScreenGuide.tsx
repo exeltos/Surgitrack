@@ -33,23 +33,26 @@ export const screenSection = (pathname: string, can: (p: Permission) => boolean)
 /**
  * The first time a person opens a screen: what it is for and its first steps, from the manual, above the
  * screen (it does not block it). Once closed it does not come back for that screen; it can be turned off
- * for every screen. Remembered per person, as ward devices are shared.
+ * for every screen. Remembered per person, as ward devices are shared. A hospital can turn the guides off for
+ * everyone (Studio → Ρυθμίσεις → Οδηγοί οθόνης): `enabled` false.
  */
 export default function ScreenGuide({
   pathname,
   lang,
   can,
   onHelp,
+  enabled = true,
 }: {
   pathname: string;
   lang: 'el' | 'en';
   can: (p: Permission) => boolean;
   onHelp: () => void;
+  enabled?: boolean;
 }) {
   const userId = getRuntimeDataMode() === 'PRODUCTION' ? getRealIdentity()?.id : undefined;
   const [seen, setSeen] = useState<Seen>(() => (userId ? read(userId) : {off: true, screens: []}));
   const section = screenSection(pathname, can);
-  if (!userId || !section || seen.off || seen.screens.includes(section.to)) return null;
+  if (!enabled || !userId || !section || seen.off || seen.screens.includes(section.to)) return null;
   const save = (next: Seen) => {
     setSeen(next);
     write(userId, next);

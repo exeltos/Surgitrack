@@ -66,6 +66,8 @@ export type SystemSettings = {
   idleLockMinutes?: number;
   /** Who gets the morning reminder email (edge function `reminders`); unset: nobody. */
   reminderEmails?: ReminderEmails;
+  /** The first-visit guide above each screen (ScreenGuide); unset: shown. Each person can still turn it off. */
+  screenGuides?: boolean;
 };
 export type ReminderEmails = 'OFF' | 'ADMINS' | 'ADMINS_SUPERVISORS';
 export const DEFAULT_IDLE_LOCK_MINUTES = 15;
