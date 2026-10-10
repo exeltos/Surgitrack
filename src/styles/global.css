@@ -10428,3 +10428,349 @@ html body .studio-roles-switch button.active {
     display: inline-block;
   }
 }
+
+/* Evaluation Demo: the guided tour over the real screen (the place stands out, the rest dims). */
+html body .guided-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  pointer-events: none;
+}
+html body .guided-tour-spot {
+  position: fixed;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 3px var(--c-cyan-45),
+    0 0 0 9999px rgb(10 30 40 / 42%);
+  transition:
+    top 0.2s ease,
+    left 0.2s ease,
+    width 0.2s ease,
+    height 0.2s ease;
+}
+html body .guided-tour-dim {
+  position: fixed;
+  inset: 0;
+  background: rgb(10 30 40 / 32%);
+}
+html body .guided-tour-note {
+  position: fixed;
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--c-white);
+  box-shadow: 0 18px 50px rgb(10 30 40 / 28%);
+  pointer-events: auto;
+}
+html body .guided-tour-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+html body .guided-tour-head small {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .guided-tour-head button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--c-gray-95-4);
+  cursor: pointer;
+}
+html body .guided-tour-note strong {
+  font-size: 15px;
+  color: var(--c-blue-15);
+}
+html body .guided-tour-note p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--c-gray-15);
+}
+html body .guided-tour-wait {
+  color: var(--st-muted);
+  font-size: 12px;
+  font-style: italic;
+}
+html body .guided-tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+html body .guided-tour-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 9px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .guided-tour-actions button.primary {
+  border-color: var(--c-cyan-35);
+  background: var(--c-cyan-35);
+  color: var(--c-white);
+}
+/* The welcome of an evaluation Demo. */
+html body .demo-welcome-backdrop {
+  z-index: 2000;
+}
+html body .demo-welcome {
+  display: grid;
+  gap: 14px;
+  width: min(760px, calc(100vw - 32px));
+  padding: 26px 28px 20px;
+  border-radius: 18px;
+  background: var(--c-white);
+}
+html body .demo-welcome h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--c-blue-15);
+}
+html body .demo-welcome-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+html body .demo-welcome-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-gray-100-2);
+  color: var(--c-gray-15);
+  font-size: 13px;
+  line-height: 1.45;
+}
+html body .demo-welcome-card svg {
+  color: var(--c-cyan-45);
+}
+html body .demo-welcome-card strong {
+  font-size: 14px;
+  color: var(--c-blue-15);
+}
+html body .demo-welcome-actions {
+  justify-content: flex-end;
+}
+@media (max-width: 700px) {
+  html body .demo-welcome-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* «Αξιολογήστε την οθόνη»: always at hand in an evaluation Demo, bottom right. */
+html body .demo-rate-screen {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--c-amber-70, #f2c36b);
+  border-radius: 999px;
+  background: var(--c-white);
+  box-shadow: 0 8px 24px rgb(10 30 40 / 16%);
+  color: var(--c-blue-15);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .demo-rate-screen svg {
+  color: var(--c-amber-50, #c98a00);
+}
+html body .demo-rate-screen b {
+  color: var(--c-amber-50, #c98a00);
+}
+/* In an evaluation Demo the rating card (after a step or a tour) shows above an open dialog. */
+html body .step-rating-card {
+  z-index: 1700;
+}
+
+/* Studio › Αξιολογήσεις: every Demo's ratings together. */
+html body .studio-ratings-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+html body .studio-ratings-kpis > * {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+  font: inherit;
+  text-align: left;
+}
+html body .studio-ratings-kpis > button {
+  cursor: pointer;
+}
+html body .studio-ratings-kpis > .attention {
+  border-color: var(--c-amber-70);
+  background: var(--st-amber-soft);
+}
+html body .studio-ratings-kpis span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-muted);
+}
+html body .studio-ratings-kpis strong {
+  font-size: 24px;
+  color: var(--c-blue-15);
+}
+html body .studio-ratings-kpis strong.negative {
+  color: var(--st-red);
+}
+html body .studio-ratings-kpis small {
+  font-size: 12px;
+  color: var(--st-muted);
+}
+html body .studio-ratings-body {
+  display: grid;
+  gap: 14px;
+}
+html body .studio-ratings-group {
+  display: grid;
+  gap: 8px;
+}
+html body .studio-ratings-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+html body .studio-ratings-group h3 span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+  font-size: 12px;
+  text-align: center;
+}
+html body .studio-rating-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px 70px 110px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+}
+html body .studio-rating-title {
+  font-weight: 700;
+  color: var(--c-blue-15);
+}
+html body .studio-rating-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  overflow: hidden;
+}
+html body .studio-rating-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--c-amber-70);
+}
+html body .studio-rating-bar i.low {
+  background: var(--st-red);
+}
+html body .studio-rating-row b {
+  color: var(--c-amber-50);
+}
+html body .studio-rating-row small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-rating-comments,
+html body .studio-rating-final {
+  display: grid;
+  gap: 6px;
+}
+html body .studio-rating-comments {
+  grid-column: 1/-1;
+}
+html body .studio-rating-comment,
+html body .studio-rating-final q {
+  padding: 6px 10px;
+  border-left: 3px solid var(--c-amber-70);
+  border-radius: 6px;
+  background: var(--c-gray-100-2);
+  font-size: 13px;
+  color: var(--c-gray-15);
+}
+html body .studio-rating-comment {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+html body .studio-rating-comment cite {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--st-muted);
+}
+html body .studio-rating-final {
+  padding: 12px 14px;
+}
+html body .studio-rating-final > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+html body .studio-rating-final > div:first-child small {
+  color: var(--st-muted);
+}
+html body .studio-rating-final-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+}
+html body .studio-rating-final-scores > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+}
+html body .studio-ratings .studio-errors-actions select {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+}
+@media (max-width: 900px) {
+  html body .studio-ratings-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html body .studio-rating-row {
+    grid-template-columns: minmax(0, 1fr) 70px;
+  }
+  html body .studio-rating-bar,
+  html body .studio-rating-row small {
+    display: none;
+  }
+}

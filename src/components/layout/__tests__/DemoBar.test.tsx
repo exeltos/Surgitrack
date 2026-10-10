@@ -50,10 +50,23 @@ beforeEach(() => {
 });
 
 describe('Demo bar', () => {
-  it('shows the days left and opens the guide by itself the first time', async () => {
+  it('shows the days left and welcomes the person the first time, then the steps', async () => {
+    const user = userEvent.setup();
     render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
     expect(screen.getByText(/Απομένουν 10 ημέρες/)).toBeInTheDocument();
+    const welcome = await screen.findByRole('dialog', {name: 'Καλώς ήρθατε στο SurgiTrack'});
+    await user.click(within(welcome).getByRole('button', {name: 'Δείτε τα βήματα'}));
     expect(await screen.findByRole('complementary', {name: 'Πρώτα βήματα'})).toBeInTheDocument();
+  });
+
+  it('from the welcome, starts the guided tour of the first step', async () => {
+    const user = userEvent.setup();
+    service.loadGuideDone.mockResolvedValue(new Set());
+    service.findDoneRecordSteps.mockResolvedValue([]);
+    render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
+    const welcome = await screen.findByRole('dialog', {name: 'Καλώς ήρθατε στο SurgiTrack'});
+    await user.click(within(welcome).getByRole('button', {name: /Ξεκινήστε/}));
+    expect(await screen.findByText('Τι έρχεται από τα τμήματα')).toBeInTheDocument();
   });
 
   it('marks steps done from the person’s own records', async () => {
@@ -74,7 +87,13 @@ describe('Demo bar', () => {
     const user = userEvent.setup();
     render(wrap('/overview', <DemoBar role="DEPARTMENT" onShowMe={onShowMe} />));
     await user.click(screen.getByRole('button', {name: /Πρώτα βήματα/}));
+    // A step with a guided tour starts it; one without opens the screen with its Help.
     await user.click((await screen.findAllByRole('button', {name: 'Δείξε μου'}))[0]);
+    expect(await screen.findByText('Με μια ματιά')).toBeInTheDocument();
+    expect(onShowMe).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', {name: 'Τέλος ξενάγησης'}));
+    await user.click(screen.getByRole('button', {name: /Πρώτα βήματα/}));
+    await user.click((await screen.findAllByRole('button', {name: 'Δείξε μου'}))[1]);
     expect(onShowMe).toHaveBeenCalledWith('/department');
   });
 
@@ -91,9 +110,22 @@ describe('Demo bar', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('rates the screen the person is on', async () => {
+    localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    const user = userEvent.setup();
+    render(wrap('/sets', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
+    await user.click(await screen.findByRole('button', {name: /Αξιολογήστε την οθόνη/}));
+    const card = screen.getByRole('complementary', {name: 'Αξιολόγηση βήματος'});
+    await user.click(within(card).getByRole('radio', {name: '5/5'}));
+    await user.click(within(card).getByRole('button', {name: 'Αποστολή'}));
+    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'screen_sets', 5, undefined);
+  });
+
   it('rates each step done, in the guide', async () => {
+    localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
     const user = userEvent.setup();
     render(wrap('/overview', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
+    await user.click(screen.getByRole('button', {name: /Πρώτα βήματα/}));
     const stars = await screen.findByRole('radiogroup', {name: 'Παραλαβή από τμήμα'});
     // A step not done yet has "Show me" instead of stars.
     expect(screen.queryByRole('radiogroup', {name: 'Αποδέσμευση'})).not.toBeInTheDocument();

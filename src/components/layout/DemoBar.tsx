@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {
   CalendarPlus,
   CheckCircle2,
@@ -8,10 +8,12 @@ import {
   ListChecks,
   MessageSquareHeart,
   ShoppingBag,
+  Star,
   X,
 } from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
-import {guideProgress, guideSteps, visitStepsFor} from '../../core/demoGuide';
+import {guideProgress, guideSteps, visitStepsFor, type GuideStep} from '../../core/demoGuide';
+import {screenTopic, tourFor, tourTopic, type Tour} from '../../core/demoTours';
 import {demoDaysLeft} from '../../core/demoAccounts';
 import {formatDate} from '../../core/displayDate';
 import type {UserRole} from '../../store/types';
@@ -24,6 +26,8 @@ import StarRating from '../demo/StarRating';
 import DemoRequestDialog from '../demo/DemoRequestDialog';
 import FinalEvaluationDialog from '../demo/FinalEvaluationDialog';
 import StepRatingCard from '../demo/StepRatingCard';
+import GuidedTour from '../demo/GuidedTour';
+import DemoWelcome from '../demo/DemoWelcome';
 
 const seenKey = (userId: string) => `surgitrack-demo-guide-seen-${userId}`;
 
@@ -50,6 +54,7 @@ export default function DemoBar({
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const {pathname} = useLocation();
+  const navigate = useNavigate();
   const userId = getRealIdentity()?.id;
   const steps = useMemo(() => guideSteps(role), [role]);
   const [done, setDone] = useState<ReadonlySet<string>>(new Set());
@@ -62,6 +67,12 @@ export default function DemoBar({
   // Steps found on opening the app were done earlier: only steps done from then on bring the card.
   const ready = useRef(false);
   const lastCheck = useRef(0);
+  // The guided tour on the screen, the step whose tour just ended (its rating card), the welcome on
+  // the first visit, and the person's own rating of the screen they are on.
+  const [tour, setTour] = useState<{step: GuideStep; tour: Tour} | null>(null);
+  const [toursDone, setToursDone] = useState<string[]>([]);
+  const [welcome, setWelcome] = useState(false);
+  const [rateScreen, setRateScreen] = useState<{topic: string; title: string} | null>(null);
 
   useEffect(() => {
     if (!demo || !userId) return;
@@ -146,13 +157,13 @@ export default function DemoBar({
     if (keys.length) void add(keys);
   }, [pathname, steps, done, add]);
 
-  // The guide opens by itself the first time, once per person and browser.
+  // The welcome shows by itself the first time, once per person and browser.
   useEffect(() => {
     if (!userId) return;
     try {
       if (!localStorage.getItem(seenKey(userId))) {
         localStorage.setItem(seenKey(userId), '1');
-        setOpen(true);
+        setWelcome(true);
       }
     } catch {
       // Without storage it simply stays closed.
@@ -160,6 +171,18 @@ export default function DemoBar({
   }, [userId]);
 
   if (!demo) return null;
+  // "Show me": the tour on the real screen when the step has one, else the screen with its Help.
+  const showMe = (step: GuideStep) => {
+    const stepTour = tourFor(step.key);
+    if (!stepTour) return onShowMe(step.to);
+    navigate(stepTour.to);
+    setTour({step, tour: stepTour});
+  };
+  const tourEnded = (step: GuideStep) => {
+    setTour(null);
+    setToursDone(list => (list.includes(step.key) ? list : [...list, step.key]));
+    if (userId) void markGuideSteps(demo.organizationId, userId, [tourTopic(step.key)]).catch(() => undefined);
+  };
   const progress = guideProgress(steps, done);
   const days = demoDaysLeft({endsAt: demo.endsAt});
   const ending = days <= 3;
@@ -169,6 +192,9 @@ export default function DemoBar({
   const asking = steps.find(s => s.key === toAsk.find(k => !feedback.get(stepTopic(k))?.rating));
   const cardFinal = !asking && askFinalNow && !finalDone;
   const later = (key?: string) => (key ? setToAsk(queue => queue.filter(k => k !== key)) : setAskFinalNow(false));
+  // After a tour, how it was (once per tour and session), unless a step's own card is asking.
+  const tourToRate = !asking && !cardFinal ? steps.find(s => toursDone.includes(s.key)) : undefined;
+  const cardBusy = !!(asking || cardFinal || tourToRate || tour || welcome);
   return (
     <>
       <div className={`demo-bar${ending ? ' ending' : ''}`} role="status">
@@ -223,6 +249,76 @@ export default function DemoBar({
           onFinal={() => {
             later();
             setDialog('final');
+          }}
+        />
+      )}
+      {tourToRate && !dialog && (
+        <StepRatingCard
+          key={`tour-${tourToRate.key}`}
+          L={L}
+          heading={L(`Ξενάγηση: ${tourToRate.title.el}`, `Tour: ${tourToRate.title.en}`)}
+          step={{title: L(tourToRate.title.el, tourToRate.title.en)}}
+          onRate={(rating, comment) => {
+            rate(tourTopic(tourToRate.key), rating, comment);
+            setToursDone(list => list.filter(k => k !== tourToRate.key));
+          }}
+          onLater={() => setToursDone(list => list.filter(k => k !== tourToRate.key))}
+          onFinal={() => undefined}
+        />
+      )}
+      {rateScreen && !cardBusy && !dialog && (
+        <StepRatingCard
+          key={rateScreen.topic}
+          L={L}
+          heading={L(`Αξιολογήστε: ${rateScreen.title}`, `Rate: ${rateScreen.title}`)}
+          step={{title: rateScreen.title}}
+          onRate={(rating, comment) => {
+            rate(rateScreen.topic, rating, comment);
+            setRateScreen(null);
+          }}
+          onLater={() => setRateScreen(null)}
+          onFinal={() => undefined}
+        />
+      )}
+      {!rateScreen && !cardBusy && !dialog && (
+        <button
+          type="button"
+          className="demo-rate-screen"
+          onClick={() =>
+            setRateScreen({
+              topic: screenTopic(pathname),
+              title: document.querySelector('.content h1')?.textContent?.trim() || 'SurgiTrack',
+            })
+          }
+        >
+          <Star size={15} />
+          {L('Αξιολογήστε την οθόνη', 'Rate this screen')}
+          {feedback.get(screenTopic(pathname))?.rating ? <b>{feedback.get(screenTopic(pathname))!.rating}★</b> : null}
+        </button>
+      )}
+      {tour && (
+        <GuidedTour
+          key={tour.step.key}
+          tour={tour.tour}
+          L={L}
+          onClose={() => setTour(null)}
+          onDone={() => tourEnded(tour.step)}
+        />
+      )}
+      {welcome && (
+        <DemoWelcome
+          L={L}
+          hospitalName={demo.hospitalName}
+          days={days}
+          firstStep={progress.next && L(progress.next.title.el, progress.next.title.en)}
+          onTour={() => {
+            setWelcome(false);
+            if (progress.next) showMe(progress.next);
+            else setOpen(true);
+          }}
+          onSteps={() => {
+            setWelcome(false);
+            setOpen(true);
           }}
         />
       )}
@@ -288,7 +384,7 @@ export default function DemoBar({
                       type="button"
                       onClick={() => {
                         setOpen(false);
-                        onShowMe(step.to);
+                        showMe(step);
                       }}
                     >
                       {L('Δείξε μου', 'Show me')}

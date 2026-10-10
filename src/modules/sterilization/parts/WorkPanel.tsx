@@ -72,7 +72,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             {rows.length} {rows.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
           </span>
         </div>
-        <div className="ster-panel-head-actions">
+        <div className="ster-panel-head-actions" data-tour="ster-panel-actions">
           {queue === 'INCOMING' && (
             <>
               <span className="ster-hint">

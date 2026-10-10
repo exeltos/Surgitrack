@@ -6,6 +6,7 @@ import {
   Gauge,
   Layers3,
   Megaphone,
+  MessageSquareHeart,
   Settings2,
   UserCog,
   Users,
@@ -25,6 +26,7 @@ const TABS: TabDef[] = [
   {id: 'PLATFORM', el: 'Νοσοκομεία & Demo', en: 'Hospitals & Demo', icon: Building2, group: 'PLATFORM'},
   {id: 'USERS', el: 'Χρήστες', en: 'Users', icon: Users, group: 'PLATFORM'},
   {id: 'IMPORT', el: 'Εισαγωγή', en: 'Import', icon: FileSpreadsheet, group: 'PLATFORM'},
+  {id: 'RATINGS', el: 'Αξιολογήσεις', en: 'Ratings', icon: MessageSquareHeart, group: 'PLATFORM'},
   {id: 'NOTICES', el: 'Ειδοποιήσεις', en: 'Notices', icon: Megaphone, group: 'PLATFORM'},
   {id: 'ERRORS', el: 'Σφάλματα', en: 'Errors', icon: Bug, group: 'PLATFORM'},
   {id: 'LIBRARIES', el: 'Βιβλιοθήκες', en: 'Libraries', icon: BookOpen, group: 'SETUP'},
@@ -37,7 +39,7 @@ const GROUPS = [
   {id: 'SETUP', el: 'Διαμόρφωση', en: 'Set-up'},
 ] as const;
 /** The platform tabs that exist only with the real hospitals (not in Demo). */
-const PRODUCTION_ONLY: Tab[] = ['IMPORT', 'NOTICES', 'ERRORS'];
+const PRODUCTION_ONLY: Tab[] = ['IMPORT', 'RATINGS', 'NOTICES', 'ERRORS'];
 
 export default function StudioTabs({s}: {s: StudioPageState}) {
   const {L, libs, platformAdmin, selectTab, tab} = s;

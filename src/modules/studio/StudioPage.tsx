@@ -17,6 +17,7 @@ import RolesTab from './tabs/RolesTab';
 import SystemTab from './tabs/SystemTab';
 import ErrorsTab from './tabs/ErrorsTab';
 import NoticesTab from './tabs/NoticesTab';
+import RatingsTab from './tabs/RatingsTab';
 
 export default function StudioPage() {
   const s = useStudioPage();
@@ -151,6 +152,7 @@ export default function StudioPage() {
         {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide /> : <RolesTab s={s} />}
         <SystemTab s={s} />
         <ErrorsTab s={s} />
+        <RatingsTab s={s} />
         <NoticesTab s={s} />
       </div>
       {(editItem || newItem) && (

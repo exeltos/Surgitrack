@@ -66,7 +66,7 @@ export default function SterilizationPage() {
           <strong>{tr('Αναζήτηση & σάρωση')}</strong>
           <span>{tr('Σάρωση barcode ή πληκτρολόγηση · φιλτράρει την καρτέλα · Enter ανοίγει το barcode')}</span>
         </div>
-        <div className="ster-scan-input">
+        <div className="ster-scan-input" data-tour="ster-scan">
           <Barcode size={17} />
           <input
             autoComplete="off"

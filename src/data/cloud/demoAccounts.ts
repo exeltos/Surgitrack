@@ -164,7 +164,11 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
     const guide = (p: Person) => {
       const steps = guideSteps(p.role as UserRole);
       const done = stepsDone.get(p.id) || new Set<string>();
-      return {done: steps.filter(s => done.has(s.key)).length, total: steps.length};
+      return {
+        done: steps.filter(s => done.has(s.key)).length,
+        total: steps.length,
+        tours: [...done].filter(key => key.startsWith('tour_')).length,
+      };
     };
     return {
       id: row.id,
