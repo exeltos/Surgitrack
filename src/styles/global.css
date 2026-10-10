@@ -9867,23 +9867,6 @@ html body .maintenance-strip > span {
 html body .maintenance-strip .icon-button {
   flex: none;
 }
-html body .maintenance-notice-settings .platform-contact-fields {
-  grid-template-columns: minmax(0, 300px) auto auto minmax(0, 1fr);
-}
-html body .maintenance-notice-settings .maintenance-message {
-  grid-column: 1 / -1;
-}
-@media (max-width: 900px) {
-  html body .maintenance-notice-settings .platform-contact-fields {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  html body .maintenance-notice-settings .platform-contact-fields > label {
-    grid-column: 1 / -1;
-  }
-  html body .maintenance-notice-settings .platform-contact-fields > :last-child {
-    justify-self: stretch;
-  }
-}
 
 /* What's new: after an update and in Help */
 html body .whats-new-dialog {
@@ -10238,4 +10221,210 @@ html body .app-spinner-detail {
   font-size: 14px;
   color: var(--st-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* Studio › Ειδοποιήσεις: a new notice with its window, then the list (showing, scheduled, ended). */
+html body .studio-notice-new {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px 200px auto;
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-notice-new label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-gray-15);
+}
+html body .studio-notice-new input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-weight: 500;
+}
+html body .studio-notice-new label small {
+  font-weight: 500;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-notice-new > .app-button {
+  align-self: start;
+  margin-top: 25px;
+  min-height: 40px;
+}
+html body .studio-notice-warning {
+  grid-column: 1/-1;
+  color: var(--st-red);
+  font-size: 13px;
+}
+html body .studio-notice-group {
+  display: grid;
+  gap: 8px;
+}
+html body .studio-notice-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+html body .studio-notice-group h3 span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+  font-size: 12px;
+  text-align: center;
+}
+html body .studio-notice-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+}
+html body .studio-notice-row.status-ended {
+  background: var(--c-gray-100-2);
+}
+html body .studio-notice-row.status-ended b {
+  color: var(--st-muted);
+  font-weight: 600;
+}
+html body .studio-notice-status {
+  justify-self: start;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .studio-notice-status.status-active {
+  background: var(--st-green-soft);
+  color: var(--st-green);
+}
+html body .studio-notice-status.status-scheduled {
+  background: var(--st-amber-soft);
+  color: var(--st-amber);
+}
+html body .studio-notice-status.status-ended {
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+}
+html body .studio-notice-actions {
+  display: flex;
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  html body .studio-notice-new {
+    grid-template-columns: 1fr 1fr;
+  }
+  html body .studio-notice-new .studio-notice-message {
+    grid-column: 1/-1;
+  }
+  html body .studio-notice-new > .app-button {
+    grid-column: 1/-1;
+    margin-top: 0;
+  }
+  html body .studio-notice-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Menu sections (the day's work, equipment, insight, administration): a short title over each. */
+html body .sidebar .nav-group {
+  display: block;
+  margin: 10px 11px 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 45%);
+}
+html body .sidebar .nav-group.first {
+  margin-top: 0;
+}
+/* Short screens: a little space between sections instead of a title, so the whole menu still fits. */
+@media (min-width: 901px) and (max-height: 820px) {
+  html body .sidebar .nav-group {
+    height: 0;
+    margin: 6px 11px 4px;
+    overflow: hidden;
+    border-top: 1px solid rgb(255 255 255 / 10%);
+  }
+  html body .sidebar .nav-group.first {
+    display: none;
+  }
+}
+
+/* Studio tabs in two titled rows for the platform owner: the platform's own work, then the set-up. */
+html body .studio-tab-rows {
+  display: grid;
+  gap: 6px;
+}
+html body .studio-tab-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+html body .studio-tab-group {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .studio-tab-row .studio-tabs {
+  justify-content: flex-start;
+}
+html body .studio-tab-row .studio-tabs button {
+  flex: 0 0 auto;
+  padding: 7px 14px !important;
+}
+/* Roles & permissions: one tab, two views. */
+html body .studio-roles-switch {
+  display: inline-flex;
+  justify-self: start;
+  gap: 2px;
+  margin-bottom: 10px;
+  padding: 3px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .studio-roles-switch button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--c-cyan-50);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .studio-roles-switch button.active {
+  background: var(--c-gray-95-3);
+  color: var(--c-cyan-45);
+  box-shadow: inset 0 0 0 1px var(--c-teal-90-2);
+}
+@media (max-width: 760px) {
+  html body .studio-tab-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+/* In the two rows there is room for the icons on a computer screen. */
+@media (min-width: 1280px) {
+  html body .studio-tab-row .studio-tabs button svg {
+    display: inline-block;
+  }
 }
