@@ -19,7 +19,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             <header>
               <Settings2 />
               <div>
-                <h3>{L('Κανόνες κύκλου ζωής', 'Lifecycle rules')}</h3>
+                <h3>{L('Γενικές ρυθμίσεις', 'General settings')}</h3>
                 <p>
                   {L(
                     'Κεντρικές παράμετροι που πρέπει να είναι κοινές σε όλη την εφαρμογή.',
@@ -162,7 +162,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             <header>
               <ShieldCheck />
               <div>
-                <h3>{L('Ασφάλεια & Audit', 'Security & Audit')}</h3>
+                <h3>{L('Ασφάλεια & ιχνηλασιμότητα', 'Security & traceability')}</h3>
                 <p>
                   {L(
                     'Οι μεταφορές και οι κρίσιμες ενέργειες διατηρούν ταυτότητα χρήστη και χρονική σήμανση.',
@@ -203,32 +203,25 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               <CheckCircle2 />
               <span>{L('Δεν αποθηκεύονται κωδικοί πρόσβασης στο Studio', 'Passwords are not stored in Studio')}</span>
             </div>
-            <AppButton
-              onClick={() =>
-                setConfirm({
-                  title:
-                    libs.dataMode === 'DEMO'
-                      ? L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?')
-                      : L('Καθαρισμός τοπικών ρυθμίσεων;', 'Clear local settings?'),
-                  message:
-                    libs.dataMode === 'DEMO'
-                      ? L(
-                          'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
-                          'Initial libraries and demo users will be restored.',
-                        )
-                      : L(
-                          'Οι τοπικές βιβλιοθήκες και οι χρήστες θα επανέλθουν σε καθαρή production κατάσταση.',
-                          'Local libraries and users will return to a clean production state.',
-                        ),
-                  action: libs.resetData,
-                })
-              }
-            >
-              <RefreshCcw size={16} />
-              {libs.dataMode === 'DEMO'
-                ? L('Επαναφορά demo δεδομένων', 'Reset demo data')
-                : L('Καθαρισμός τοπικών δεδομένων', 'Clear local data')}
-            </AppButton>
+            {/* Only in Demo: in a real hospital the libraries are the hospital's, saved for everyone, and a
+                reset here would empty them for every user. */}
+            {libs.dataMode === 'DEMO' && (
+              <AppButton
+                onClick={() =>
+                  setConfirm({
+                    title: L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?'),
+                    message: L(
+                      'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
+                      'Initial libraries and demo users will be restored.',
+                    ),
+                    action: libs.resetData,
+                  })
+                }
+              >
+                <RefreshCcw size={16} />
+                {L('Επαναφορά demo δεδομένων', 'Reset demo data')}
+              </AppButton>
+            )}
           </section>
         </div>
       )}

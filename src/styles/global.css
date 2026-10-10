@@ -5757,7 +5757,6 @@ html body .studio-health {
   min-width: 0;
   max-width: 320px;
   flex: 0 0 auto;
-  padding: 7px 12px;
   border-radius: 12px;
 }
 html body .studio-health > div > span {
@@ -6568,9 +6567,7 @@ html body .asset-workbench-sidebar .asset-cover {
   html body .studio-body-workflow .studio-workflow-page {
     display: grid !important;
     grid-template-columns: 400px minmax(0, 1fr);
-    grid-template-rows: auto minmax(220px, 1fr) auto auto;
     gap: 10px !important;
-    height: 100% !important;
     min-height: 0 !important;
   }
   html body .studio-body-workflow .studio-workflow-hero,
@@ -11248,4 +11245,44 @@ html body .hospital-tabs .hospital-count {
   html body .hospital-tabs button > svg {
     display: none;
   }
+}
+/* Studio: column names in sentence case, as on the other lists. */
+html body .studio-list-head {
+  text-transform: none;
+}
+/* Studio > Settings on a tablet: the general settings on the left, the label and security cards
+   stacked on the right (security fell below the long settings column). */
+@media (min-width: 701px) and (max-width: 1099px) {
+  html body .studio-system-grid > section:first-child {
+    grid-row: span 2;
+  }
+}
+/* Studio > Sterilization flow on a computer: one page scroll, instead of the policies and the stages
+   each scrolling in their own box with the version history out of sight below. */
+@media (min-width: 1100px) {
+  html body .studio-body-workflow {
+    overflow-y: auto !important;
+  }
+  html body .studio-body-workflow .studio-workflow-page {
+    height: auto !important;
+    grid-template-rows: auto auto auto auto;
+    align-items: start;
+  }
+  html body .studio-body-workflow .studio-workflow-side,
+  html body .studio-body-workflow .studio-workflow-main {
+    overflow: visible;
+  }
+}
+/* Studio: «Πραγματικά δεδομένα» / «Demo» is a small label, not something to press. */
+html body .studio-health {
+  border: 0;
+  box-shadow: none;
+  background: var(--c-gray-95);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: default;
+}
+html body .studio-health svg {
+  width: 15px;
+  height: 15px;
 }

@@ -85,9 +85,7 @@ export default function StudioPage() {
         >
           <ShieldCheck size={20} />
           <div>
-            <strong>
-              {libs.dataMode === 'DEMO' ? L('Περιβάλλον Demo', 'Demo environment') : L('Παραγωγή', 'Production')}
-            </strong>
+            <strong>{libs.dataMode === 'DEMO' ? L('Demo', 'Demo') : L('Πραγματικά δεδομένα', 'Real data')}</strong>
             <span>
               {libs.dataMode === 'DEMO'
                 ? L(

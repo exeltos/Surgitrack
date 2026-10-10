@@ -151,7 +151,7 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     group: 'WORKFLOW',
     el: 'Χώρος Αποστείρωσης',
     en: 'Sterilization workspace',
-    hintEl: 'Πρόσβαση στη βασική ροή CSSD.',
+    hintEl: 'Πρόσβαση στη βασική ροή της Αποστείρωσης.',
     hintEn: 'Access the core CSSD workflow.',
   },
   {

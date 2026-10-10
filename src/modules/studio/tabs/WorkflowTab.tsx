@@ -43,8 +43,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
         <div className="studio-workflow-page">
           <section className="studio-workflow-hero">
             <div>
-              <span className="eyebrow">{L('ΡΟΗ ΕΡΓΑΣΙΑΣ CSSD', 'CSSD WORKFLOW')}</span>
-              <h2>{L('Ροή επανεπεξεργασίας', 'Reprocessing workflow')}</h2>
+              <h2>{L('Ροή Αποστείρωσης', 'Sterilization flow')}</h2>
               <p>
                 {L(
                   'Το κάθε νοσοκομείο επιλέγει ποια στάδια θα αποτελούν υποχρεωτικό σημείο ελέγχου. Τα απενεργοποιημένα στάδια παρακάμπτονται αυτόματα χωρίς να χάνεται η ιχνηλασιμότητα.',
@@ -55,7 +54,8 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
             <div className="studio-workflow-profile">
               <small>{L('Προφίλ μονάδας', 'Facility profile')}</small>
               <input
-                defaultValue={libs.sterilizationWorkflow.profileName}
+                // Older hospitals keep the first default name («… CSSD»); it reads without the acronym.
+                defaultValue={libs.sterilizationWorkflow.profileName.replace(/\s*CSSD$/, '')}
                 onBlur={e => {
                   const name = e.target.value.trim();
                   if (name && name !== libs.sterilizationWorkflow.profileName)
