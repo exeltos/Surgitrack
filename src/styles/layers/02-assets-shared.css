@@ -27,8 +27,6 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 30, 40, 0.38);
-  backdrop-filter: blur(4px);
   z-index: 1000;
   display: grid;
   place-items: center;
@@ -100,8 +98,6 @@
   grid-column: span 2;
 }
 .selection-count {
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-35-6);
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 12px;
@@ -137,10 +133,6 @@
   border-radius: 0;
   background: var(--c-white);
 }
-.composer-row:hover,
-.composer-row.selected {
-  background: var(--c-gray-100-2);
-}
 .composer-row span {
   display: flex;
   flex-direction: column;
@@ -158,17 +150,13 @@
   place-items: center;
 }
 .selected .select-mark {
-  background: var(--c-cyan-40-3);
   color: var(--c-white);
-  border-color: var(--c-cyan-40-3);
 }
 .source-pill {
   display: inline-flex !important;
   flex-direction: row !important;
-  background: var(--c-gray-95);
   border-radius: 999px;
   padding: 6px 9px;
-  color: var(--c-cyan-45-4);
   font-size: 12px;
 }
 .asset-modal > footer {
@@ -277,8 +265,6 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--c-gray-95);
-  color: var(--c-cyan-45-5);
   display: grid;
   place-items: center;
 }
@@ -320,11 +306,6 @@
 }
 .nav-item svg {
   flex: 0 0 auto;
-}
-.nav-item.active {
-  background: var(--c-gray-95-7);
-  color: #102d54;
-  box-shadow: inset 3px 0 0 var(--c-cyan-40-4);
 }
 .asset-page-actions {
   display: flex;
@@ -428,8 +409,6 @@
   font-size: 11px;
   padding: 5px 8px;
   border-radius: 999px;
-  background: var(--c-gray-100-2);
-  color: var(--c-cyan-40-5);
 }
 .secondary.compact {
   align-self: flex-start;
@@ -491,7 +470,6 @@
   gap: 7px;
   padding: 11px 14px;
   border-top: 1px solid var(--c-gray-95);
-  background: var(--c-white);
   overflow-x: auto;
 }
 .source-tabs button {
@@ -517,11 +495,6 @@
   background: var(--c-gray-95);
   font-size: 11px;
 }
-.source-tabs button.active {
-  background: var(--c-gray-95-3);
-  border-color: var(--c-cyan-80-2);
-  color: var(--c-cyan-30-2);
-}
 .source-tabs button.active span {
   background: var(--c-white);
   color: var(--c-cyan-30-2);
@@ -532,7 +505,6 @@
   border: 1px solid var(--c-gray-90);
   border-radius: 16px;
   box-shadow: 0 24px 70px rgba(18, 43, 58, 0.22);
-  overflow: hidden;
 }
 .confirm-dialog header {
   display: grid;
@@ -556,8 +528,6 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: var(--c-amber-95);
-  color: var(--c-amber-50-2);
   display: grid;
   place-items: center;
 }
@@ -650,9 +620,6 @@
 .table-panel tbody tr {
   cursor: pointer;
 }
-.table-panel tbody tr:hover {
-  background: var(--c-white);
-}
 .row-actions {
   width: 48px;
   text-align: right;
@@ -707,7 +674,6 @@
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: var(--c-white);
 }
 .usage-view-stats span {
   font-size: 11px;
@@ -715,9 +681,6 @@
 }
 .usage-view-stats strong {
   font-size: 18px;
-}
-.usage-view-stats .warning strong {
-  color: #a56600;
 }
 .compact-kpis {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -770,10 +733,6 @@
   outline: 3px solid rgba(29, 101, 122, 0.18);
   outline-offset: 2px;
 }
-.app-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
 .app-button-primary {
   background: var(--c-cyan-25);
   border-color: var(--c-cyan-25);
@@ -782,15 +741,6 @@
 .app-button-primary:hover:not(:disabled) {
   background: var(--c-cyan-20-4);
   border-color: var(--c-cyan-20-4);
-}
-.app-button-danger {
-  background: var(--c-red-40-3);
-  border-color: var(--c-red-40-3);
-  color: var(--c-white);
-}
-.app-button-danger:hover:not(:disabled) {
-  background: var(--c-red-35-2);
-  border-color: var(--c-red-35-2);
 }
 .app-button-ghost {
   background: transparent;
@@ -806,7 +756,6 @@
 }
 .asset-modal-backdrop-workspace {
   place-items: start center;
-  padding: 84px 34px 28px;
   overflow: auto;
 }
 .asset-modal-add-tools {
@@ -839,7 +788,6 @@
   align-items: center;
   gap: 10px;
   padding: 9px 20px;
-  background: var(--c-white);
   border-bottom: 1px solid var(--c-gray-95);
 }
 .add-tools-summary > div {
@@ -1161,9 +1109,6 @@ body {
   background: var(--c-gray-95-3);
   color: var(--c-cyan-45-6);
 }
-.table-panel tbody tr:hover {
-  background: var(--c-gray-100-2);
-}
 th {
   background: var(--c-white);
   color: var(--c-cyan-50-2);
@@ -1259,12 +1204,8 @@ td {
 
 /* v0.20.5 — unified filtering, roomier workspaces and action polish */
 .asset-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 9px;
   min-width: 0;
   margin: 0 0 14px;
-  padding: 9px 10px;
   background: linear-gradient(105deg, var(--c-white), var(--c-white));
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
@@ -1274,8 +1215,6 @@ td {
   display: flex;
   align-items: center;
   gap: 9px;
-  flex: 1 1 320px;
-  min-width: 220px;
   padding: 0 4px;
   color: var(--c-cyan-45-5);
 }
@@ -1327,7 +1266,6 @@ td {
 }
 .asset-list-controls {
   display: flex;
-  align-items: stretch;
   gap: 9px;
   margin-bottom: 14px;
 }
@@ -1337,7 +1275,6 @@ td {
 }
 .asset-list-controls > .icon-toggle {
   height: auto;
-  min-height: 58px;
   width: 44px;
   flex-basis: 44px;
   border-radius: 12px;
@@ -1467,9 +1404,6 @@ td {
   .asset-list-controls {
     align-items: stretch;
   }
-  .asset-list-controls > .icon-toggle {
-    min-height: 48px;
-  }
   .asset-modal-backdrop-workspace {
     padding: 0;
   }
@@ -1554,7 +1488,6 @@ td {
 
 /* v0.20.9 — full layout audit: natural pages, shared scroll regions, no clipped workspaces */
 :root {
-  --st-topbar-h: 64px;
   --st-page-gap: 18px;
   --st-list-max: 680px;
 }
@@ -1563,7 +1496,6 @@ td {
 .list-scroll-panel {
   min-height: 0;
   max-height: min(var(--st-list-max), calc(100dvh - 300px));
-  overflow: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   padding-top: 0;
@@ -1577,7 +1509,6 @@ td {
   border-spacing: 0;
 }
 .list-scroll-panel thead th {
-  position: sticky;
   top: 0;
   z-index: 3;
   background: var(--c-white);
@@ -1609,14 +1540,8 @@ td {
   overflow: visible;
   align-items: stretch;
 }
-.set-composition-fixed {
-  height: auto;
-  max-height: min(720px, calc(100dvh - 300px));
-}
 .set-tool-list {
-  min-height: 260px;
   max-height: none;
-  overflow: auto;
 }
 .asset-notes-tab {
   max-height: 520px;
@@ -1624,9 +1549,6 @@ td {
 }
 
 /* Consistent room at the bottom of every working page. */
-.content {
-  padding-bottom: 42px;
-}
 .panel,
 .asset-section {
   min-width: 0;
@@ -1714,12 +1636,6 @@ td {
   height: 30px;
   flex-basis: 30px;
   border-radius: 8px;
-}
-.asset-workbench-title-main {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  min-width: 0;
 }
 .asset-workbench-title-main > .asset-type-icon {
   width: 38px;
