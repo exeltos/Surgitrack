@@ -16,8 +16,13 @@ create index if not exists platform_notices_ends_idx on public.platform_notices 
 alter table public.platform_notices enable row level security;
 -- Everyone signed in reads them (the app shows the current ones); only the platform owner writes.
 create policy platform_notices_read on public.platform_notices for select to authenticated using (true);
-create policy platform_notices_write on public.platform_notices for all to authenticated
+-- One policy per action (a write policy "for all" would add a second one on reading).
+create policy platform_notices_insert on public.platform_notices for insert to authenticated
+  with check ((select public.is_platform_admin()));
+create policy platform_notices_update on public.platform_notices for update to authenticated
   using ((select public.is_platform_admin())) with check ((select public.is_platform_admin()));
+create policy platform_notices_delete on public.platform_notices for delete to authenticated
+  using ((select public.is_platform_admin()));
 grant select, insert, update, delete on public.platform_notices to authenticated;
 
 -- The notice set the old way carries over.
