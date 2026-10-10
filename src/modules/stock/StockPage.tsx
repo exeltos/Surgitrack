@@ -21,6 +21,7 @@ import {kpiFilters} from '../../core/kpiFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
+import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function StockPage() {
@@ -52,9 +53,6 @@ export default function StockPage() {
         .includes(q.toLowerCase()),
   );
   useBrowseList('/tools', filtered);
-  // A column that is empty for every listed instrument only takes room: it shows when some row has a value.
-  const showSpecialty = filtered.some(t => t.specialty);
-  const showUses = filtered.some(t => t.maxUses);
   const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, usage].join('|'));
   // The same number cards as the other lists: each one filters the list, the last opens the minimums.
   const kpi = kpiFilters({
@@ -97,7 +95,11 @@ export default function StockPage() {
         compact
         items={[
           {label: tr('Εργαλεία Αποθέματος'), value: stock.length, ...listKpi()},
-          {label: tr('Είδη εργαλείων'), value: stockKinds},
+          {
+            label: tr('Είδη εργαλείων'),
+            value: stockKinds,
+            onClick: () => setParams({view: 'minimums'}, {replace: true}),
+          },
           {
             label: tr('Με όριο χρήσεων'),
             value: stock.filter(t => !!t.maxUses).length,
@@ -190,14 +192,16 @@ export default function StockPage() {
                 }}
               />
             ) : (
-              <table className="asset-registry-table registry-fixed stock-table">
+              <table className="asset-registry-table registry-fixed">
                 <thead>
                   <tr>
-                    <th>{tr('Εργαλείο')}</th>
-                    {showSpecialty && <th className="col-specialty">{tr('Ειδικότητα')}</th>}
-                    {showUses && <th className="col-uses">{tr('Χρήσεις')}</th>}
-                    <th className="col-status">{tr('Κατάσταση')}</th>
-                    <th className="col-open">
+                    <th>{tr('Ονομασία')}</th>
+                    <th>Barcode</th>
+                    <th>{tr('Ειδικότητα')}</th>
+                    <th>{tr('Κατασκευαστής')}</th>
+                    <th>{tr('Χρήσεις')}</th>
+                    <th>{tr('Κατάσταση')}</th>
+                    <th>
                       <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                     </th>
                   </tr>
@@ -206,17 +210,36 @@ export default function StockPage() {
                   {rows.visible.map(t => (
                     <tr key={t.id}>
                       <td>
-                        <Link className="issue-asset" to={`/tools/${t.id}`}>
-                          {t.barcode} · {t.name}
-                        </Link>
-                        <small className="row-sub">
-                          {[t.code, t.manufacturer].filter(Boolean).join(' · ')}
-                          <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
-                        </small>
+                        <div className="registry-asset-name">
+                          <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                          <span>
+                            <Link className="row-title-link" to={`/tools/${t.id}`}>
+                              {t.name}
+                            </Link>
+                            <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
+                            <small className="row-sub">{t.code}</small>
+                            {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
+                          </span>
+                        </div>
                       </td>
-                      {showSpecialty && <td data-label={tr('Ειδικότητα')}>{trData(t.specialty) || '—'}</td>}
-                      {showUses && <td data-label={tr('Χρήσεις')}>{t.maxUses ? `${t.uses} / ${t.maxUses}` : '—'}</td>}
-                      <td data-label={tr('Κατάσταση')}>
+                      <td>
+                        <Link className="mono strong-link" to={`/tools/${t.id}`}>
+                          {t.barcode}
+                        </Link>
+                      </td>
+                      <td className="cell-nowrap">{trData(t.specialty) || '—'}</td>
+                      <td>{t.manufacturer || '—'}</td>
+                      <td className="cell-nowrap">
+                        {t.maxUses ? (
+                          <>
+                            <b>{t.uses}</b>
+                            <span className="muted"> / {t.maxUses}</span>
+                          </>
+                        ) : (
+                          <span className="muted">{tr('Χωρίς όριο')}</span>
+                        )}
+                      </td>
+                      <td>
                         <StatusBadge value={t.state} />
                       </td>
                       <td>
@@ -226,9 +249,7 @@ export default function StockPage() {
                       </td>
                     </tr>
                   ))}
-                  {rows.hasMore && (
-                    <MoreRows colSpan={3 + (showSpecialty ? 1 : 0) + (showUses ? 1 : 0)} onVisible={rows.showMore} />
-                  )}
+                  {rows.hasMore && <MoreRows colSpan={7} onVisible={rows.showMore} />}
                 </tbody>
               </table>
             )}
