@@ -9,6 +9,7 @@ import {
   Layers3,
   FileSpreadsheet,
   Bug,
+  Megaphone,
 } from 'lucide-react';
 import type {StudioPageState} from '../useStudioPage';
 
@@ -87,6 +88,17 @@ export default function StudioTabs({s}: {s: StudioPageState}) {
         >
           <Bug size={17} />
           {L('Σφάλματα', 'Errors')}
+        </button>
+      )}
+      {platformAdmin && libs.dataMode === 'PRODUCTION' && (
+        <button
+          role="tab"
+          aria-selected={tab === 'NOTICES'}
+          className={tab === 'NOTICES' ? 'active' : ''}
+          onClick={() => selectTab('NOTICES')}
+        >
+          <Megaphone size={17} />
+          {L('Ειδοποιήσεις', 'Notices')}
         </button>
       )}
       <button

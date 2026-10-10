@@ -1,26 +1,28 @@
 import {useEffect, useState} from 'react';
 import {Megaphone, X} from 'lucide-react';
 import {getRuntimeDataMode} from '../../config/dataMode';
-import {loadMaintenanceNotice, maintenanceActive, type MaintenanceNotice} from '../../data/cloud/platformContact';
+import {loadActiveNotices, type PlatformNotice} from '../../data/cloud/platformNotices';
 import {tr} from '../../i18n';
 
-const DISMISSED = 'surgitrack-notice-dismissed';
+const DISMISSED = 'surgitrack-notices-dismissed';
 const REFRESH_MS = 5 * 60_000;
 
-/** The platform owner's notice to every user (Studio → Settings), until its time; each user can hide it. */
+const readDismissed = (): string[] => {
+  try {
+    return JSON.parse(sessionStorage.getItem(DISMISSED) || '[]') as string[];
+  } catch {
+    return [];
+  }
+};
+
+/** The platform owner's notices to every user (Studio → Ειδοποιήσεις), while they run; each user can hide one. */
 export default function MaintenanceStrip() {
-  const [notice, setNotice] = useState<MaintenanceNotice | null>(null);
-  const [dismissed, setDismissed] = useState(() => {
-    try {
-      return sessionStorage.getItem(DISMISSED) || '';
-    } catch {
-      return '';
-    }
-  });
+  const [notices, setNotices] = useState<PlatformNotice[]>([]);
+  const [dismissed, setDismissed] = useState<string[]>(readDismissed);
   useEffect(() => {
     if (getRuntimeDataMode() !== 'PRODUCTION') return;
     let live = true;
-    const load = () => void loadMaintenanceNotice().then(n => live && setNotice(n));
+    const load = () => void loadActiveNotices().then(list => live && setNotices(list));
     load();
     const timer = window.setInterval(load, REFRESH_MS);
     return () => {
@@ -28,22 +30,33 @@ export default function MaintenanceStrip() {
       window.clearInterval(timer);
     };
   }, []);
-  if (!notice || !maintenanceActive(notice) || dismissed === notice.message) return null;
-  const hide = () => {
-    setDismissed(notice.message);
+  const shown = notices.filter(notice => !dismissed.includes(notice.id));
+  if (!shown.length) return null;
+  const hide = (id: string) => {
+    const next = [...dismissed, id];
+    setDismissed(next);
     try {
-      sessionStorage.setItem(DISMISSED, notice.message);
+      sessionStorage.setItem(DISMISSED, JSON.stringify(next));
     } catch {
       // Private mode: hidden until the page reloads.
     }
   };
   return (
-    <div className="trial-strip maintenance-strip" role="status">
-      <Megaphone size={16} aria-hidden="true" />
-      <span>{notice.message}</span>
-      <button type="button" className="icon-button" onClick={hide} aria-label={tr('Απόκρυψη ειδοποίησης')}>
-        <X size={15} />
-      </button>
-    </div>
+    <>
+      {shown.map(notice => (
+        <div key={notice.id} className="trial-strip maintenance-strip" role="status">
+          <Megaphone size={16} aria-hidden="true" />
+          <span>{notice.message}</span>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={() => hide(notice.id)}
+            aria-label={tr('Απόκρυψη ειδοποίησης')}
+          >
+            <X size={15} />
+          </button>
+        </div>
+      ))}
+    </>
   );
 }

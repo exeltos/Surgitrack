@@ -15,6 +15,7 @@ import UsersTab from './tabs/UsersTab';
 import RolesTab from './tabs/RolesTab';
 import SystemTab from './tabs/SystemTab';
 import ErrorsTab from './tabs/ErrorsTab';
+import NoticesTab from './tabs/NoticesTab';
 
 export default function StudioPage() {
   const s = useStudioPage();
@@ -128,6 +129,7 @@ export default function StudioPage() {
         <RolesTab s={s} />
         <SystemTab s={s} />
         <ErrorsTab s={s} />
+        <NoticesTab s={s} />
       </div>
       {(editItem || newItem) && (
         <LibraryEditor

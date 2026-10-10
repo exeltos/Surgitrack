@@ -276,6 +276,37 @@ export function createDatabase(seed) {
         maintenance_until: process.env.SCREENS_MAINTENANCE === '1' ? iso(3) : null,
       },
     ],
+    // SCREENS_MAINTENANCE=1 shows the owner's notices to every user (one showing, one scheduled, one ended).
+    platform_notices:
+      process.env.SCREENS_MAINTENANCE === '1'
+        ? [
+            {
+              id: 'notice-1',
+              message:
+                'Προγραμματισμένη συντήρηση την Κυριακή 22:00–23:00. Η εφαρμογή θα είναι διαθέσιμη μόνο για ανάγνωση.',
+              starts_at: iso(-0.5),
+              ends_at: iso(3),
+              created_at: iso(-0.5),
+              created_by_name: 'Platform Admin',
+            },
+            {
+              id: 'notice-2',
+              message: 'Νέα έκδοση με φόρτωση πλυντηρίου την Τρίτη.',
+              starts_at: iso(4),
+              ends_at: iso(6),
+              created_at: iso(-0.2),
+              created_by_name: 'Platform Admin',
+            },
+            {
+              id: 'notice-3',
+              message: 'Διακοπή ρεύματος στο data center, 15 λεπτά.',
+              starts_at: iso(-9),
+              ends_at: iso(-8.9),
+              created_at: iso(-9),
+              created_by_name: 'Platform Admin',
+            },
+          ]
+        : [],
     deleted_records: [],
     asset_imports: [],
     demo_accounts: [],

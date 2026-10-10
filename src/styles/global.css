@@ -9867,23 +9867,6 @@ html body .maintenance-strip > span {
 html body .maintenance-strip .icon-button {
   flex: none;
 }
-html body .maintenance-notice-settings .platform-contact-fields {
-  grid-template-columns: minmax(0, 300px) auto auto minmax(0, 1fr);
-}
-html body .maintenance-notice-settings .maintenance-message {
-  grid-column: 1 / -1;
-}
-@media (max-width: 900px) {
-  html body .maintenance-notice-settings .platform-contact-fields {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  html body .maintenance-notice-settings .platform-contact-fields > label {
-    grid-column: 1 / -1;
-  }
-  html body .maintenance-notice-settings .platform-contact-fields > :last-child {
-    justify-self: stretch;
-  }
-}
 
 /* What's new: after an update and in Help */
 html body .whats-new-dialog {
@@ -10238,4 +10221,119 @@ html body .app-spinner-detail {
   font-size: 14px;
   color: var(--st-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* Studio › Ειδοποιήσεις: a new notice with its window, then the list (showing, scheduled, ended). */
+html body .studio-notice-new {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px 200px auto;
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-notice-new label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-gray-15);
+}
+html body .studio-notice-new input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-weight: 500;
+}
+html body .studio-notice-new label small {
+  font-weight: 500;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-notice-new > .app-button {
+  align-self: start;
+  margin-top: 25px;
+  min-height: 40px;
+}
+html body .studio-notice-warning {
+  grid-column: 1/-1;
+  color: var(--st-red);
+  font-size: 13px;
+}
+html body .studio-notice-group {
+  display: grid;
+  gap: 8px;
+}
+html body .studio-notice-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+html body .studio-notice-group h3 span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+  font-size: 12px;
+  text-align: center;
+}
+html body .studio-notice-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+}
+html body .studio-notice-row.status-ended {
+  background: var(--c-gray-100-2);
+}
+html body .studio-notice-row.status-ended b {
+  color: var(--st-muted);
+  font-weight: 600;
+}
+html body .studio-notice-status {
+  justify-self: start;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .studio-notice-status.status-active {
+  background: var(--st-green-soft);
+  color: var(--st-green);
+}
+html body .studio-notice-status.status-scheduled {
+  background: var(--st-amber-soft);
+  color: var(--st-amber);
+}
+html body .studio-notice-status.status-ended {
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+}
+html body .studio-notice-actions {
+  display: flex;
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  html body .studio-notice-new {
+    grid-template-columns: 1fr 1fr;
+  }
+  html body .studio-notice-new .studio-notice-message {
+    grid-column: 1/-1;
+  }
+  html body .studio-notice-new > .app-button {
+    grid-column: 1/-1;
+    margin-top: 0;
+  }
+  html body .studio-notice-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
