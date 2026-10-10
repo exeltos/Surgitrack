@@ -92,7 +92,14 @@ const expiryText = (e: ExpiryEntry, lang: string) =>
     : lang === 'el'
       ? `Η αποστείρωση λήγει στις ${formatExpiry(e.sterileUntil)} (${e.daysLeft} ημ.)`
       : `Sterility expires on ${formatExpiry(e.sterileUntil)} (${e.daysLeft} d)`;
-export default function AppShell({children, onLogout}: {children: ReactNode; onLogout?: () => void}) {
+export default function AppShell({
+  children,
+  onLogout,
+}: {
+  children: ReactNode;
+  /** `direct`: no «Αποσύνδεση;» question (the user already chose to leave). */
+  onLogout?: (direct?: boolean) => void;
+}) {
   const trial = useTrial();
   const evaluationDemo = useEvaluationDemo();
   const {
@@ -149,7 +156,9 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
   useEffect(() => onSyncNotice(notice => setNotices(list => [...list, syncNoticeMessage(notice)].slice(-3))), []);
   const navigate = useGuardedNavigate();
   const leave = useLeave();
-  const logout = onLogout && (() => leave(onLogout));
+  const logout = onLogout && (() => leave(() => onLogout()));
+  // From the screen lock the user already chose to sign in as someone else: no second question.
+  const switchUser = onLogout && (() => leave(() => onLogout(true)));
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
   useListMemory(contentRef);
@@ -802,7 +811,12 @@ export default function AppShell({children, onLogout}: {children: ReactNode; onL
           </button>
         </div>
       )}
-      <IdleLock minutes={idleLockMinutes} userName={signedInName} hospital={organizationName} onSwitchUser={logout} />
+      <IdleLock
+        minutes={idleLockMinutes}
+        userName={signedInName}
+        hospital={organizationName}
+        onSwitchUser={switchUser}
+      />
     </div>
   );
 }

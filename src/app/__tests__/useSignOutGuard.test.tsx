@@ -12,6 +12,7 @@ function Harness({signOut}: {signOut: () => void}) {
   return (
     <>
       <button onClick={() => guard(signOut)}>Έξοδος</button>
+      <button onClick={() => guard(signOut, {direct: true})}>Άλλος χρήστης</button>
       {node}
     </>
   );
@@ -37,6 +38,16 @@ describe('signing out', () => {
     await start(signOut);
     expect(signOut).toHaveBeenCalledTimes(1);
     expect(sync.flushPendingWrites).not.toHaveBeenCalled();
+  });
+
+  it('signs out without the question when the user already chose to (screen lock)', async () => {
+    sync.unsavedChanges.mockReturnValue(0);
+    const signOut = vi.fn();
+    const user = userEvent.setup();
+    render(<Harness signOut={signOut} />);
+    await user.click(screen.getByRole('button', {name: 'Άλλος χρήστης'}));
+    expect(screen.queryByText('Θέλετε να αποσυνδεθείτε από το SurgiTrack;')).not.toBeInTheDocument();
+    expect(signOut).toHaveBeenCalledTimes(1);
   });
 
   it('saves what is waiting first, then signs out', async () => {

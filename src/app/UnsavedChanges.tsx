@@ -1,3 +1,4 @@
+import {createPortal} from 'react-dom';
 import {createContext, useCallback, useContext, useEffect, useMemo, useRef, type ReactNode} from 'react';
 import {useNavigate, type NavigateOptions} from 'react-router-dom';
 import {useConfirm} from '../components/ui/useConfirm';
@@ -85,7 +86,8 @@ export function UnsavedChangesProvider({children}: {children: ReactNode}) {
   return (
     <LeaveContext.Provider value={value}>
       {children}
-      {confirm}
+      {/* Above the screen lock too: «Σύνδεση με άλλο χρήστη» there leaves through this question. */}
+      {createPortal(<div className="sign-out-guard">{confirm}</div>, document.body)}
     </LeaveContext.Provider>
   );
 }

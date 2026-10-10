@@ -12,7 +12,7 @@ const FLUSH_WAIT_MS = 8000;
  * saved first (a few seconds at most), and if some of it still cannot be saved the user is asked again,
  * with staying as the default. Render the returned node once.
  */
-export function useSignOutGuard(): [ReactNode, (signOut: () => void) => void] {
+export function useSignOutGuard(): [ReactNode, (signOut: () => void, options?: {direct?: boolean}) => void] {
   const [confirm, ask] = useConfirm();
   const [saving, setSaving] = useState(false);
   const afterSaving = async (signOut: () => void) => {
@@ -35,13 +35,17 @@ export function useSignOutGuard(): [ReactNode, (signOut: () => void) => void] {
     }
     signOut();
   };
-  const guard = (signOut: () => void) =>
-    ask({
-      title: tr('Αποσύνδεση'),
-      message: tr('Θέλετε να αποσυνδεθείτε από το SurgiTrack;'),
-      confirmLabel: tr('Αποσύνδεση'),
-      onConfirm: () => void afterSaving(signOut),
-    });
+  // `direct`: the user already chose to leave (e.g. «Σύνδεση με άλλο χρήστη» on the screen lock), so only
+  // unsaved changes are asked about.
+  const guard = (signOut: () => void, options?: {direct?: boolean}) =>
+    options?.direct
+      ? void afterSaving(signOut)
+      : ask({
+          title: tr('Αποσύνδεση'),
+          message: tr('Θέλετε να αποσυνδεθείτε από το SurgiTrack;'),
+          confirmLabel: tr('Αποσύνδεση'),
+          onConfirm: () => void afterSaving(signOut),
+        });
   const node = (
     <>
       {confirm}
