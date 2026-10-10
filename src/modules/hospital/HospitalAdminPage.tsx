@@ -46,12 +46,11 @@ export default function HospitalAdminPage() {
   return (
     <div className="hospital-admin">
       <PageHeader
-        eyebrow={L('ΧΡΗΣΤΕΣ & ΤΜΗΜΑΤΑ', 'USERS & DEPARTMENTS')}
-        title={(demo ? L('Demo νοσοκομείο', 'Demo hospital') : hospital) || L('Νοσοκομείο', 'Hospital')}
-        description={L(
-          'Χρήστες, προσκλήσεις και τμήματα του νοσοκομείου.',
-          "The hospital's users, invitations and departments.",
-        )}
+        title={L('Χρήστες & Τμήματα', 'Users & departments')}
+        description={`${(demo ? L('Demo νοσοκομείο', 'Demo hospital') : hospital) || L('Νοσοκομείο', 'Hospital')} · ${L(
+          'χρήστες, προσκλήσεις και τμήματα.',
+          'users, invitations and departments.',
+        )}`}
         actions={
           <AppButton onClick={() => setRefreshKey(k => k + 1)} icon={<RefreshCw size={15} />}>
             {L('Ανανέωση', 'Refresh')}

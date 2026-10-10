@@ -74,7 +74,13 @@ export default function HospitalPeople({
         >
           <Users size={16} /> {L('Χρήστες', 'Users')}
           <span className="hospital-count">{members.length}</span>
-          {pending.length > 0 && <span className="hospital-count attention">{pending.length}</span>}
+          {pending.length > 0 && (
+            <span className="hospital-count attention">
+              {pending.length === 1
+                ? L('1 αίτημα', '1 request')
+                : L(`${pending.length} αιτήματα`, `${pending.length} requests`)}
+            </span>
+          )}
         </button>
         <button
           role="tab"

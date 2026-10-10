@@ -33,6 +33,8 @@ export function usePeopleState(props: {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<'USERS' | 'DEPARTMENTS'>('USERS');
   const [query, setQuery] = useState('');
+  /** List filters: department id, role, and access (ACTIVE, INACTIVE, INVITED). */
+  const [filters, setFilters] = useState({department: '', role: '', access: ''});
   const [inviteMenu, setInviteMenu] = useState(false);
   const [drawer, setDrawer] = useState<{member: Member | null} | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -73,6 +75,8 @@ export function usePeopleState(props: {
     organizationId,
     platform,
     query,
+    filters,
+    setFilters,
     refreshKey,
     requests,
     setBusy,

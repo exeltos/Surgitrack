@@ -3006,7 +3006,7 @@ div.asset-import-hospital b {
 }
 .hospital-count.attention {
   background: var(--c-amber-95);
-  color: var(--c-orange-50);
+  color: var(--c-orange-35);
 }
 .people-toolbar {
   display: flex;
@@ -11185,4 +11185,67 @@ html body .movement-detail-links {
 }
 html body .movement-detail-links .app-button {
   text-decoration: none;
+}
+/* Users list: column names in sentence case, as on the other lists. */
+html body .people-head {
+  text-transform: none;
+}
+/* Page title on a phone stays on the left (a short title was pushed right, next to the buttons' edge). */
+@media (max-width: 700px) {
+  html body .page-head > div:first-child {
+    align-self: stretch;
+  }
+  /* Users: a signup request is shorter, role and department side by side, so the list shows below it. */
+  html body .hospital-people .hospital-request {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    padding: 10px;
+  }
+  html body .hospital-people .hospital-request-note {
+    grid-column: 1 / -1;
+  }
+  html body .people-requests > header small {
+    display: none;
+  }
+  html body .hospital-admin .hospital-people > section.hospital-card {
+    overflow-y: auto;
+  }
+  html body .hospital-admin .hospital-people .people-rows {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  /* Departments: the name on its own line, the code and «Προσθήκη» below it. */
+  html body .hospital-department-add {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .hospital-department-add > input:first-child {
+    grid-column: 1 / -1;
+  }
+  /* User card: the three buttons on one row. */
+  html body .people-drawer footer {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  html body .people-drawer footer .app-button {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+html body .hospital-tabs .hospital-count {
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  /* The two tabs fit the phone width (the page slid sideways with «1 αίτημα»). */
+  html body .hospital-tabs {
+    overflow-x: auto;
+  }
+  html body .hospital-tabs button {
+    gap: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+  html body .hospital-tabs button > svg {
+    display: none;
+  }
 }
