@@ -2,14 +2,14 @@
   "el": {
     "file": "SurgiTrack-manual-el.pdf",
     "pages": 44,
-    "bytes": 2297913,
+    "bytes": 2297710,
     "version": "0.30.0",
     "built": "2026-10-11"
   },
   "en": {
     "file": "SurgiTrack-manual-en.pdf",
     "pages": 43,
-    "bytes": 2149086,
+    "bytes": 2148925,
     "version": "0.30.0",
     "built": "2026-10-11"
   }
