@@ -30,7 +30,12 @@ import postcss from 'postcss';
 import ts from 'typescript';
 
 const ROOT = join(fileURLToPath(import.meta.url), '../..');
-const CSS_FILES = ['src/styles/global.css', ...listFiles('src/styles/layers', ['.css']).sort()];
+const CSS_FILES = [
+  'src/styles/global.css',
+  'src/styles/overrides.css',
+  ...listFiles('src/styles/layers', ['.css']).sort(),
+  ...listFiles('src/styles/sections', ['.css']).sort(),
+];
 const SOURCE_DIRS = ['src', 'scripts/screens'];
 const HTML_FILES = ['index.html', ...listFiles('public', ['.html'])];
 /** Classes added by libraries, not by our code: lucide-react puts `lucide lucide-<icon>` on every icon. */

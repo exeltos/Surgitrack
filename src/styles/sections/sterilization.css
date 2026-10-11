@@ -1,0 +1,1544 @@
+/* Sterilization. Moved together from overrides.css; cascade order is intentional. */
+@media (min-width: 1101px) {
+  .sterilization-workspace > .ster-work-panel > .ster-panel-head,
+  .sterilization-workspace > .ster-work-panel > .released-loads,
+  .sterilization-workspace > .ster-work-panel > .ster-list-head {
+    flex: 0 0 auto;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) {
+    height: min(94vh, 940px) !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
+    grid-template-columns: minmax(410px, 35%) minmax(0, 65%);
+    overflow: hidden !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-left-panel {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+    gap: 8px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-left-panel .receipt-work-section {
+    margin: 0 !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-section-title {
+    padding: 9px 12px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary {
+    padding: 9px !important;
+    gap: 7px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary > div {
+    min-height: 48px !important;
+    padding: 7px 8px 7px 35px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary svg {
+    left: 10px !important;
+    top: 10px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section {
+    padding: 9px 11px !important;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section input,
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .demo-fill-btn {
+    height: 36px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-work-section .handover-warning {
+    margin: 0 11px 9px !important;
+    padding: 7px 9px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation {
+    margin: 8px 10px 9px;
+    gap: 7px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation button {
+    padding: 8px 9px;
+    min-height: 42px;
+    font-size: 11px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-check-section > .handover-warning {
+    margin: 0 10px 9px !important;
+    padding: 7px 9px;
+  }
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-count-only {
+    margin: 0 10px 9px;
+    padding: 8px;
+  }
+  html body .prep-workspace-modal .prep-head-prints {
+    display: none !important;
+  }
+}
+
+.ster-list-head,
+.ster-work-row {
+  display: grid;
+  grid-template-columns:
+    minmax(320px, 1.55fr) minmax(145px, 0.72fr) minmax(145px, 0.72fr) minmax(150px, 0.72fr) minmax(170px, 0.82fr)
+    minmax(210px, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+.ster-list-head {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--c-gray-95);
+  background: var(--c-white);
+  color: var(--st-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.ster-work-row {
+  padding: 14px 16px;
+}
+.ster-asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.ster-cell-text {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.ster-cell-text strong,
+.ster-cell-text span {
+  font-size: 11px;
+  color: var(--c-blue-40);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ster-cell-text strong {
+  font-weight: 700;
+  color: var(--c-blue-25);
+}
+.ster-meta {
+  min-width: 0;
+}
+.ster-meta .status-badge {
+  max-width: 100%;
+}
+.ster-status {
+  min-width: 0;
+}
+.ster-status small {
+  line-height: 1.35;
+  color: var(--st-muted);
+}
+
+/* Receipt Set composition: explicit, stable columns. */
+.receipt-tool-columns,
+.receipt-verification-row:not(.single) {
+  display: grid;
+  grid-template-columns: 105px 120px minmax(190px, 1.35fr) minmax(130px, 0.9fr) minmax(145px, 0.95fr) 92px;
+  gap: 12px;
+  align-items: center;
+}
+.receipt-verification-row:not(.single) {
+  min-height: 58px;
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--c-gray-95);
+  background: var(--c-white);
+}
+.receipt-verification-row:not(.single):last-child {
+  border-bottom: 0;
+}
+.receipt-verification-row.has-issue {
+  background: var(--c-gray-100);
+}
+.receipt-tool-barcode {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--c-cyan-40-6);
+}
+.receipt-tool-code,
+.receipt-tool-manufacturer {
+  font-size: 11px;
+  color: var(--c-blue-50-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-tool-name strong {
+  font-size: 11px;
+  color: var(--c-blue-25-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-tool-name small {
+  font-size: 11px;
+  color: var(--st-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-tool-state .prep-ok-chip,
+.receipt-tool-state .prep-issue-chip {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.receipt-verification-row .tool-report-btn {
+  justify-self: end;
+}
+.receipt-right-panel .receipt-tools-scroll {
+  flex: 1 1 auto !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* v0.26.5 — CSSD receipt queue structural fix.
+   This block intentionally sits after every layer import and replaces the old
+   v0.26.2 horizontal-scroll hotfix. The queue must fit the available workspace. */
+.sterilization-workspace > .ster-work-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+.sterilization-workspace .ster-list-head,
+.sterilization-workspace .ster-work-row {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+@media (max-width: 1320px) and (min-width: 1101px) {
+  .ster-list-head,
+  .ster-work-row {
+    grid-template-columns: minmax(270px, 1.4fr) 135px 125px 135px 150px 190px;
+    gap: 11px;
+  }
+  .receipt-tool-columns,
+  .receipt-verification-row:not(.single) {
+    grid-template-columns: 92px 105px minmax(165px, 1.3fr) minmax(110px, 0.85fr) 130px 86px;
+    gap: 9px;
+  }
+}
+@media (max-width: 1100px) {
+  .ster-list-head {
+    display: none;
+  }
+  .ster-list-scroll {
+    overflow: visible;
+  }
+  .ster-work-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px 14px;
+  }
+  .ster-asset-cell {
+    grid-column: 1/-1;
+  }
+  .ster-row-action {
+    grid-column: 1/-1;
+    justify-content: flex-start;
+  }
+  .receipt-tool-columns {
+    display: none;
+  }
+  /* Code and manufacturer are hidden here: three columns, against the six-column !important rule of
+     01-core-sterilization.css that put the name into the narrow code column. */
+  .receipt-verification-row:not(.single) {
+    grid-template-columns: 105px minmax(0, 1fr) auto !important;
+    gap: 8px;
+    /* Fits the panel: the older 860px minimum (a horizontal-scroll fix) pushed the report button out. */
+    min-width: 0;
+  }
+  .receipt-tool-code,
+  .receipt-tool-manufacturer {
+    display: none;
+  }
+  .receipt-tool-state {
+    grid-column: 2;
+  }
+  .receipt-verification-row .tool-report-btn {
+    grid-column: 3;
+    grid-row: 1/3;
+  }
+}
+.sterilization-workspace .ster-list-head > *,
+.sterilization-workspace .ster-work-row > * {
+  min-width: 0;
+}
+
+/* Receipt queue: Specialty is secondary information and lives under Department.
+   Five columns are more readable and leave the action area permanently visible. */
+.sterilization-workspace .receipt-queue-panel .ster-list-head,
+.sterilization-workspace .receipt-queue-panel .ster-work-row {
+  grid-template-columns: minmax(260px, 2.05fr) minmax(145px, 1.05fr) minmax(150px, 0.95fr) minmax(150px, 1fr) minmax(
+      190px,
+      1.15fr
+    ) !important;
+  column-gap: 14px;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(3),
+.sterilization-workspace .receipt-queue-panel .ster-cell-specialty {
+  display: none;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4) {
+  grid-column: 3;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5) {
+  grid-column: 4;
+}
+.sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(6) {
+  grid-column: 5;
+}
+.sterilization-workspace .receipt-queue-panel .ster-cell-department {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.sterilization-workspace .receipt-queue-panel .ster-tablet-specialty {
+  display: block;
+  font-size: 11px;
+  color: var(--st-muted);
+  font-weight: 500;
+  line-height: 1.3;
+}
+/* The generic queue pins cells to its six columns; with Specialty hidden, this queue has five. */
+.sterilization-workspace .receipt-queue-panel .ster-meta {
+  grid-column: 3 !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-status {
+  grid-column: 4 !important;
+}
+.sterilization-workspace .receipt-queue-panel .ster-row-action {
+  grid-column: 5;
+  justify-content: flex-start !important;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.sterilization-workspace .receipt-queue-panel .ster-row-action .primary.compact {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.sterilization-workspace .receipt-queue-panel .ster-asset strong {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+.sterilization-workspace .receipt-queue-panel .ster-status small {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+
+/* Sterilization staff: Set changes are the supervisor's. */
+.prep-supervisor-note {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--line, var(--c-gray-90-2));
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* Receipt card: the Set's instrument list always keeps room for several rows. */
+.receipt-card-modal:not(.prep-workspace-modal) .receipt-right-panel .receipt-tools-scroll {
+  min-height: 260px !important;
+}
+
+/* Sterilization stage cards: the title wraps inside its column instead of running under the count. */
+.sterile-queues.modern button {
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  column-gap: 7px !important;
+}
+.sterile-queues.modern button > span,
+.sterile-queues.modern button > small {
+  min-width: 0;
+  line-height: 1.2;
+}
+html
+  body
+  .content
+  :is(
+    .app-button-sm,
+    .replacements-table .row-actions button,
+    .issue-action,
+    .ster-row-action .primary,
+    .ster-row-action button,
+    .danger-icon,
+    .studio-icon-button
+  ) {
+  min-height: 32px !important;
+}
+html body .content .ster-work-panel .primary.compact {
+  min-height: 32px !important;
+  padding-block: 0;
+}
+/* Sterilization density: slimmer scan bar, queue cards and rows. */
+html body .sterilization-workspace .ster-work-row,
+html body .sterilization-workspace .receipt-queue-panel .ster-work-row {
+  padding: 8px 22px !important;
+  min-height: 0 !important;
+}
+/* Column titles over their columns: the rows' side padding (an older 16px !important rule matched the head
+   only) and the room the list keeps for its scrollbar, so the fractions of both grids come out the same. */
+html body .sterilization-workspace .ster-list-head {
+  padding: 7px 22px !important;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+html body .sterilization-workspace .sterile-queues.modern button {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+html body .ster-shift > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+html body .ster-shift small {
+  display: none;
+}
+html body .sterile-queues.modern button > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.ster-pick-all {
+  border: 0;
+  background: transparent;
+  color: var(--c-cyan-35);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.ster-row-note {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.release-load-picker {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.release-load-picker select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}
+html body .sterilization-workspace .ster-asset-cell.with-pick {
+  grid-template-columns: 22px 44px minmax(0, 1fr);
+}
+html body .ster-asset-cell.with-pick .ster-row-pick {
+  margin-right: 0;
+}
+html body .ster-row-action .ster-row-note {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+/* Release: the two indicators side by side, with what the unit's policy says about them. */
+.release-indicators {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 6px;
+}
+.release-indicators label {
+  display: grid;
+  gap: 4px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.release-indicators select {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}
+.release-indicator-hint {
+  margin: 6px 0 0;
+  color: var(--c-orange-45);
+  font-size: 12px;
+  font-weight: 600;
+}
+.release-indicator-hint.ok {
+  color: var(--c-green-45);
+}
+.load-device-fail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--c-gray-95-5);
+  color: var(--c-red-40-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+/* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
+html body .load-modal {
+  width: min(1180px, calc(100vw - 32px));
+  height: min(900px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+}
+html body .load-modal .load-modal-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 22px 10px;
+  min-height: 0;
+}
+html body .load-modal .cycle-clean-fields {
+  gap: 12px;
+}
+html body .load-modal .cycle-clean-fields input:not([type='checkbox']) {
+  min-height: 40px;
+  font-size: 14px;
+}
+html body .load-indicator-pick legend {
+  width: 100%;
+  padding: 0;
+  margin-bottom: 5px;
+  color: var(--c-cyan-50);
+}
+html body .load-modal .load-assets {
+  flex: 1 1 auto;
+  max-height: none;
+}
+html body .load-modal .load-assets-list > label {
+  padding: 11px 14px;
+}
+html body .load-modal .cycle-note {
+  flex: 0 0 auto;
+}
+html body .load-release-modal {
+  width: min(1100px, calc(100vw - 32px));
+  height: min(760px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+}
+@media (max-width: 1180px) and (min-width: 761px) {
+  .sterilization-workspace .ster-work-panel .ster-list-head,
+  .sterilization-workspace .ster-work-panel .ster-work-row {
+    grid-template-columns: minmax(180px, 1.85fr) minmax(110px, 1fr) minmax(110px, 0.9fr) minmax(150px, 1.15fr);
+    column-gap: 11px;
+  }
+  .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(5),
+  .sterilization-workspace .ster-work-panel .ster-status {
+    display: none;
+  }
+  .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(4) {
+    grid-column: 3;
+  }
+  .sterilization-workspace .ster-work-panel .ster-list-head > span:nth-child(6) {
+    grid-column: 4;
+  }
+  .sterilization-workspace .ster-work-panel .ster-row-action {
+    grid-column: 4;
+  }
+  .sterilization-workspace .ster-work-panel .ster-meta {
+    grid-column: 3;
+  }
+}
+@media (max-width: 760px) {
+  .sterilization-workspace .ster-work-panel .ster-list-head {
+    display: none !important;
+  }
+  .sterilization-workspace .ster-work-panel .ster-work-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    gap: 8px 10px !important;
+    padding: 13px 14px;
+  }
+  .sterilization-workspace .ster-work-panel .ster-asset-cell {
+    grid-column: 1/-1 !important;
+  }
+  .sterilization-workspace .ster-work-panel .ster-cell-department,
+  .sterilization-workspace .ster-work-panel .ster-meta,
+  .sterilization-workspace .ster-work-panel .ster-row-action {
+    grid-column: 2/-1 !important;
+  }
+  .sterilization-workspace .ster-work-panel .ster-status {
+    display: none;
+  }
+  .sterilization-workspace .ster-work-panel .ster-row-action {
+    flex-wrap: wrap !important;
+  }
+}
+@media (max-width: 1700px) {
+  /* Seven cards in a row leave no room for the icon: titles keep their whole word. */
+  .sterile-queues.modern button {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+  .sterile-queues.modern button > small {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 1699px) {
+  html body .sterilization-workspace .ster-hint {
+    display: none;
+  }
+}
+html body .load-release-modal .workflow-modal-body {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 14px 20px;
+  align-items: start;
+  overflow: hidden;
+}
+html body .load-release-modal .release-load-picker {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+html body .load-release-modal .release-check-card {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0;
+}
+html body .load-release-modal .load-manifest {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+html body .load-release-modal .load-manifest > strong {
+  position: sticky;
+  top: 0;
+  flex: 0 0 auto;
+}
+html body .load-release-modal .load-manifest > div {
+  padding: 10px 12px;
+}
+html body .load-release-modal .cycle-note {
+  grid-column: 1;
+  grid-row: 3;
+  margin: 0;
+}
+html body .load-release-modal .cycle-note textarea {
+  min-height: 64px;
+  height: 64px;
+}
+html body .load-release-modal .release-check-row {
+  min-height: 44px;
+}
+/* In the load dialog the device cycles stay a short list (two rows, the rest scrolls) so the load content
+   keeps the room. */
+html body .load-modal .device-cycle-picker {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+}
+html body .load-modal .device-cycle-picker ul {
+  overflow-y: auto;
+  margin-top: 6px;
+}
+html body .load-modal .device-cycle-picker li {
+  padding-block: 5px;
+}
+@media (max-width: 760px) {
+  html body .load-release-modal .workflow-modal-body {
+    display: block;
+    overflow: auto;
+  }
+  html body .load-modal .cycle-clean-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+html body .load-modal .cycle-clean-fields {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(280px, 1.15fr);
+  align-items: start;
+}
+html body .load-modal .load-indicator-pick {
+  display: grid;
+  gap: 5px;
+}
+html body .load-indicator-pick > span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-cyan-50);
+}
+html body .load-modal .load-assets-list > label {
+  grid-template-columns: 18px 20px minmax(0, 1fr) 18px;
+}
+html body .load-modal .load-assets-list span {
+  grid-template-columns: 110px minmax(0, 1fr) 200px;
+}
+html body .load-release-modal .workflow-modal-body {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+html body .load-release-modal .cycle-note {
+  align-self: start;
+}
+html body .load-release-modal .release-check-card .receipt-section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+html body .load-release-modal .load-manifest > div {
+  grid-template-columns: 96px minmax(0, 1fr) 160px;
+}
+html body .load-modal .load-modal-body > .cycle-clean-fields {
+  margin: 0;
+  padding: 0;
+}
+html body .load-modal .load-modal-body > .device-cycle-picker {
+  margin: 0;
+}
+html body .load-modal .load-indicator-pick input[type='checkbox'] {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/* Sterile shelf life (Packaging & Labelling) and expiry. */
+.shelf-life-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-gray-100-2);
+}
+.shelf-life-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--c-cyan-40);
+  min-width: 0;
+}
+.shelf-life-title > div {
+  display: grid;
+  gap: 2px;
+}
+.shelf-life-title strong {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}
+.shelf-life-title span {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.shelf-life-options {
+  display: flex;
+  gap: 6px;
+}
+/* Sterilization › In the sterilizer: running loads, locked until the end of the cycle. */
+.sterilizer-loads {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  overflow: auto;
+  min-height: 0;
+}
+.sterilizer-load-card {
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+  overflow: hidden;
+}
+.sterilizer-load-card > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--c-gray-100-2);
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.sterilizer-load-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sterilizer-load-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sterilizer-load-items li {
+  display: grid;
+  grid-template-columns: 20px 96px minmax(0, 1fr) 200px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+}
+.sterilizer-load-items li:last-child {
+  border-bottom: 0;
+}
+/* The barcode reads like every other queue's (no underline until pointed at; it opens the record). */
+.sterilizer-load-items a {
+  color: var(--c-cyan-45-3);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.sterilizer-load-items a:hover {
+  text-decoration: underline;
+}
+.sterilizer-load-items b {
+  color: var(--c-cyan-25-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sterilizer-load-items small {
+  color: var(--st-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sterilizer-load-card > footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--c-gray-95);
+  background: var(--c-white);
+}
+html body .sterilizer-load-card > footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+html body .release-actions .release-print {
+  margin-right: auto;
+}
+.released-load-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+/* Sterilizer load: the dialog fits the screen; only the list of instruments (and the device cycles) scroll.
+   The barcode entry is one compact row. */
+html body .load-modal .load-modal-body {
+  overflow: hidden;
+}
+html body .load-modal .load-assets {
+  min-height: 0;
+}
+html body .load-modal .load-assets-list {
+  min-height: 0;
+  overflow-y: auto;
+}
+html body .load-modal .device-cycle-picker ul {
+  max-height: 84px;
+}
+html body .load-modal .barcode-capture {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+html body .load-modal .barcode-capture-head {
+  display: contents;
+}
+html body .load-modal .barcode-capture-head small,
+html body .load-modal .barcode-capture-help {
+  display: none;
+}
+html body .load-modal .barcode-capture-head > div {
+  grid-column: 1;
+  grid-row: 1;
+  white-space: nowrap;
+}
+html body .load-modal .barcode-capture .load-barcode-entry {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+}
+html body .load-modal .barcode-camera-btn {
+  grid-column: 3;
+  grid-row: 1;
+}
+html body .load-modal .barcode-capture .load-camera-panel,
+html body .load-modal .barcode-capture .load-scan-feedback {
+  grid-column: 1 / -1;
+}
+html body .load-modal .cycle-note textarea {
+  min-height: 38px;
+  height: 38px;
+}
+/* Sterilization: one bar for search and scanning, with the filters next to it. */
+html body .ster-scan.ster-scan-restored {
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+}
+html body .ster-scan-filters {
+  display: flex;
+  align-items: center;
+}
+html body .ster-scan-filters > div > button {
+  min-height: 42px;
+}
+html body .ster-scan-input .ster-scan-clear {
+  background: transparent;
+  border: 0;
+  color: var(--c-cyan-55-3);
+  padding: 0 6px;
+  min-width: 0;
+}
+html body .ster-scan-feedback-inline {
+  grid-column: 1 / -1;
+}
+.prep-meta-line > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.prep-meta-line svg {
+  color: var(--c-cyan-40);
+  flex: 0 0 auto;
+}
+.prep-meta-line strong {
+  color: var(--c-cyan-20);
+}
+.prep-meta-line small {
+  color: var(--st-muted);
+}
+html body .prep-process-checks {
+  display: grid;
+  gap: 6px;
+  padding: 0 14px 4px;
+}
+html body .prep-process-checks > label:has(input:checked) {
+  border-color: var(--c-teal-80);
+  background: var(--c-gray-95-4);
+}
+html body .prep-process-checks > label input {
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: var(--c-cyan-40);
+}
+html body .prep-process-checks > label span {
+  display: grid;
+  gap: 1px;
+}
+html body .prep-process-checks > label b {
+  font-size: 12.5px;
+  color: var(--c-cyan-20);
+}
+html body .prep-note-field textarea {
+  min-height: 48px;
+  height: 48px;
+}
+html body .prep-workspace-modal .modal-actions.prep-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+html body .prep-actions .prep-accept-missing {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 auto 0 0;
+  padding: 7px 12px;
+  border: 1px solid var(--c-amber-85-2);
+  border-radius: 10px;
+  background: var(--c-amber-95-2);
+  color: var(--c-amber-35);
+  max-width: 62%;
+  cursor: pointer;
+}
+html body .prep-actions .prep-accept-missing input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--c-orange-50-2);
+  flex: 0 0 auto;
+}
+html body .prep-actions .prep-accept-missing span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+}
+html body .prep-actions .prep-accept-missing strong {
+  font-size: 13px;
+}
+html body .prep-actions .prep-accept-missing small {
+  font-size: 12px;
+  color: var(--c-amber-40);
+}
+html body .prep-tools-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+html body .prep-tools-heading-block {
+  display: block;
+}
+html body .prep-tools-heading-block > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+html body .prep-tools-heading-block > div > span {
+  margin-left: 2px;
+}
+html body .prep-workspace-modal .prep-tools-toolbar-actions {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+html body .prep-workspace-modal .prep-tools-toolbar-actions .prep-bulk-select {
+  margin: 0;
+}
+html body .prep-control-panel .shelf-life-picker {
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 4px 14px 2px;
+  padding: 10px 12px;
+}
+/* Stage dialogs (washing, packaging, storage) and delivery: as tall as their content, footer right after. */
+html body .workflow-checkpoint-modal,
+html body .workflow-modal-delivery {
+  height: auto;
+  max-height: calc(100dvh - 32px);
+}
+html body .workflow-checkpoint-modal .release-check-card .receipt-section-title,
+html body .workflow-modal .release-check-card .receipt-section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+html body .workflow-checkpoint-modal .release-check-row,
+html body .load-release-modal .release-check-row {
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+html body .workflow-checkpoint-modal .release-check-row:has(input:checked),
+html body .load-release-modal .release-check-row:has(input:checked) {
+  border-color: var(--c-teal-80);
+  background: var(--c-gray-95-4);
+}
+html body .workflow-checkpoint-modal .release-check-row input,
+html body .load-release-modal .release-check-row input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--c-cyan-40);
+}
+html body .workflow-checkpoint-modal .cycle-note textarea,
+html body .workflow-modal-delivery .cycle-note textarea,
+html body .workflow-modal-delivery textarea {
+  min-height: 56px;
+  height: 56px;
+}
+/* Batch receipt / delivery: the barcode entry is one row, the signature fits its column. */
+html body .delivery-batch-modal .barcode-capture {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+html body .delivery-batch-modal .barcode-capture-head {
+  display: contents;
+}
+html body .delivery-batch-modal .barcode-capture-head > div {
+  grid-column: 1;
+  grid-row: 1;
+  white-space: nowrap;
+}
+html body .delivery-batch-modal .barcode-capture-head small,
+html body .delivery-batch-modal .barcode-capture-help {
+  display: none;
+}
+html body .delivery-batch-modal .barcode-capture .load-barcode-entry {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+}
+html body .delivery-batch-modal .barcode-camera-btn {
+  grid-column: 3;
+  grid-row: 1;
+}
+html body .delivery-batch-modal .barcode-capture .load-camera-panel,
+html body .delivery-batch-modal .barcode-capture .load-scan-feedback {
+  grid-column: 1 / -1;
+}
+html body .delivery-batch-modal .handover-signature-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+html body .delivery-batch-modal .handover-signature-row input {
+  min-width: 0;
+  width: 100%;
+}
+html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
+html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 32px) !important;
+}
+.released-load-bi {
+  align-self: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .released-load-actions .bi-pass {
+  border-color: var(--c-teal-80);
+  color: var(--c-green-40-3);
+}
+html body .released-load-actions .bi-fail {
+  border-color: var(--c-orange-85);
+  color: var(--c-orange-40-2);
+}
+/* Preparation: accepting the shortage sits in the composition notice; the issue notice opens the instrument. */
+html body .prep-composition-status {
+  flex-wrap: wrap;
+}
+html body .prep-composition-status .prep-accept-missing {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1 1 100%;
+  margin: 6px 0 0;
+  padding: 7px 10px;
+  border: 1px solid var(--c-amber-85-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-amber-35);
+  cursor: pointer;
+}
+html body .prep-composition-status .prep-accept-missing input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--c-orange-50-2);
+  flex: 0 0 auto;
+}
+html body .prep-composition-status .prep-accept-missing span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+}
+html body .prep-composition-status .prep-accept-missing strong {
+  font-size: 13px;
+}
+html body .prep-composition-status .prep-accept-missing small {
+  font-size: 12px;
+  color: var(--c-amber-40);
+}
+html body .prep-block-warning {
+  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 4px 8px;
+}
+html body .prep-block-warning .prep-block-hint {
+  grid-column: 2;
+  justify-self: start;
+  margin-left: 0;
+}
+.prep-block-hint {
+  color: var(--c-amber-35);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+/* Preparation: the side column and the list move only up and down (see keepLeft); long texts wrap. */
+html body .prep-workspace-modal .prep-control-panel,
+html body .prep-workspace-modal .prep-tools-scroll {
+  touch-action: pan-y pinch-zoom;
+}
+html body .prep-workspace-modal aside * {
+  overflow-wrap: break-word;
+}
+/* Preparation list: the Handle button of a Missing or Set-issue row matches the other row buttons. */
+html body .prep-tools-scroll .prep-missing-row .tool-manage-btn {
+  font-size: 11px;
+  border: 1px solid var(--c-amber-80-2);
+}
+html body .ster-count-shortage {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95-2);
+  color: var(--c-red-40);
+  font-weight: 700;
+  white-space: nowrap;
+  font-size: 11px;
+}
+html body .ster-meta .ster-count-shortage {
+  margin-left: 0;
+}
+html body .handover-signature-row input::placeholder {
+  color: var(--c-gray-65);
+  /* The typed code is in capitals; the hints are not. */
+  text-transform: none;
+}
+html body .handover-signature-row input:disabled {
+  background: var(--c-gray-100-2);
+}
+html body .cycle-note textarea {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+html body .handover-signature .demo-code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+html body .handover-signature .demo-code .demo-fill-btn {
+  width: auto;
+  flex: 0 0 auto;
+}
+/* The preparation note reads like every other note field. */
+html body .prep-note-field textarea {
+  font-size: 13px;
+}
+
+/* Hand-over signature where it has little room (the receipt card's left column, bulk receipt and delivery):
+   code and password side by side, the button under them, so neither field cuts its text. */
+html body .handover-signature {
+  container-type: inline-size;
+}
+/* Visible deviation at receipt: two choices in the type of the rest of the card. */
+html body .receipt-visible-deviation button {
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: normal;
+}
+/* Bulk receipt and delivery: the hint beside the list title wraps in the type of the title's own hint
+   instead of running out of room in a larger one. */
+html body .delivery-list-actions small,
+html body .delivery-batch-assets .load-assets-head > small {
+  max-width: 340px;
+  overflow: visible;
+  color: var(--st-muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+  text-align: right;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+/* Washing row: the washer load is the action; washing without a washer (where Studio allows it) is a link under it. */
+html body .ster-row-action:has(.ster-row-alt) {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+html body .ster-row-action .ster-row-alt {
+  min-height: 0 !important;
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--st-teal);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+html body .prep-workspace-modal > .receipt-card-head {
+  display: flex;
+  align-items: flex-start;
+}
+html body .prep-workspace-modal > .receipt-card-head > div:not(.prep-head-prints) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+html body .prep-workspace-modal .prep-head-prints {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  margin: 2px 60px 0 auto;
+}
+html body .prep-workspace-modal .prep-head-prints button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+/* Sterilization review: the scan button reads like every other button. */
+html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan-clear) {
+  font-size: 13px;
+  font-weight: 700;
+}
+/* Stage cards: the short description shows whole, on two lines where it needs them; every card in a row keeps
+   the same height. */
+html body .sterilization-workspace .sterile-queues.modern button > small {
+  white-space: normal;
+  overflow: visible;
+  font-size: 11px;
+  line-height: 1.25;
+}
+/* The status column speaks only for an open issue; otherwise a quiet dash. */
+html body .sterilization-workspace .ster-meta-none {
+  color: var(--st-muted);
+}
+/* Loading: each row says whether it goes in the load. */
+html body .ster-load-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+html body .ster-load-badge.in {
+  background: var(--c-cyan-90);
+  color: var(--c-cyan-30-5);
+}
+/* Release: the sterilizer and the cycle on two whole lines. */
+html body .ster-row-action .ster-row-note.ster-row-load {
+  display: grid;
+  gap: 1px;
+  white-space: normal;
+  overflow: visible;
+  line-height: 1.3;
+}
+html body .ster-row-load b {
+  color: var(--c-cyan-20);
+  font-size: 12px;
+  font-weight: 650;
+}
+@media (max-width: 760px) {
+  .shelf-life-picker {
+    grid-template-columns: 1fr;
+  }
+  .sterilizer-load-items li {
+    grid-template-columns: 20px 90px minmax(0, 1fr);
+  }
+  .sterilizer-load-items small {
+    display: none;
+  }
+}
+@media (max-width: 1366px) {
+  html body .sterilization-workspace .sterile-queues.modern {
+    gap: 5px;
+  }
+  html body .sterilization-workspace .sterile-queues.modern button {
+    padding-left: 6px;
+    padding-right: 6px;
+    column-gap: 3px;
+  }
+  html body .sterile-queues.modern button > span {
+    letter-spacing: 0;
+  }
+}
+@media (max-width: 700px) {
+  html body .ster-scan.ster-scan-restored {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-input,
+  html body .ster-scan.ster-scan-restored .ster-scan-feedback-inline {
+    grid-column: 1 / -1;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-input {
+    grid-row: 2;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-filters {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  html body .delivery-batch-modal .barcode-capture {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .delivery-batch-modal .barcode-camera-btn {
+    grid-column: 2;
+  }
+  html body .delivery-batch-modal .barcode-capture .load-barcode-entry {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  html body .content:has(> .sterilization-workspace) {
+    overflow-y: auto;
+  }
+  html body .sterilization-workspace {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  html body .sterilization-workspace > .ster-work-panel {
+    flex: none;
+    height: auto;
+    max-height: none;
+    overflow: visible !important;
+  }
+  html body .sterilization-workspace .ster-panel-head {
+    flex-shrink: 0;
+    position: static;
+  }
+  html body .sterilization-workspace .ster-list-scroll {
+    height: auto;
+    max-height: none;
+    overflow: visible !important;
+  }
+  html body .ster-scan.ster-scan-restored .ster-scan-copy span {
+    display: none;
+  }
+  html body .prep-workspace-modal > .receipt-card-head {
+    flex-wrap: wrap;
+  }
+  html body .prep-workspace-modal .prep-head-prints {
+    order: 3;
+    flex-basis: 100%;
+    margin: 6px 0 0;
+  }
+}
+@media (max-width: 1100px) {
+  html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
+  html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
+    height: auto !important;
+  }
+  html body .prep-workspace-modal {
+    height: calc(100dvh - 48px) !important;
+    max-height: calc(100dvh - 48px) !important;
+  }
+  html body .receipt-card-modal > .prep-workspace-body {
+    height: auto;
+    align-content: start;
+    grid-template-rows: none;
+    grid-auto-rows: max-content;
+  }
+  html body .prep-workspace-body > .prep-control-panel {
+    height: auto;
+    min-height: max-content;
+    display: contents;
+  }
+  html body .prep-workspace-body > .prep-tools-panel {
+    height: auto;
+    min-height: 560px;
+    order: 2;
+  }
+  html body .prep-workspace-modal .prep-side-prints {
+    display: none;
+  }
+  html body .prep-workspace-body .prep-meta-line {
+    order: 1;
+  }
+  html body .prep-workspace-body .prep-quality-section {
+    order: 3;
+  }
+}
+@media (min-width: 1181px) {
+  html body .sterilization-workspace .ster-list-head > span:nth-child(5),
+  html body .sterilization-workspace .ster-work-row > .ster-status {
+    display: none;
+  }
+  html body .sterilization-workspace .ster-list-head,
+  html body .sterilization-workspace .ster-work-row {
+    grid-template-columns:
+      minmax(300px, 1.7fr) minmax(145px, 0.8fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr)
+      minmax(210px, 1fr);
+  }
+  /* The stage column is gone: the action and its title take the last of the five (not a sixth one). */
+  html body .sterilization-workspace .ster-row-action,
+  html body .sterilization-workspace .ster-list-head > span:nth-child(6) {
+    grid-column: 5;
+  }
+}
+@container (max-width: 440px) {
+  html body .handover-signature-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  html body .handover-signature-row > button {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+}
+@media (max-width: 760px) {
+  /* Phone: the stages are one strip that scrolls sideways, so the list starts high on the screen. */
+  html body .sterilization-workspace .sterile-queues.modern {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  html body .sterilization-workspace .sterile-queues.modern button {
+    flex: 0 0 auto;
+    min-width: 128px;
+    scroll-snap-align: start;
+  }
+  /* The user's name is already in the menu. */
+  html body .sterilization-workspace .ster-shift {
+    display: none;
+  }
+  /* In the sterilizer: the cycle under the sterilizer, the badge under the title. */
+  html body .sterilizer-load-card > header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  html body .sterilizer-load-card > header .sterilizer-load-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  html body .sterilizer-load-card .sterilizer-load-sep,
+  html body .sterilization-workspace .ster-work-panel .ster-meta:has(> .ster-meta-none) {
+    display: none;
+  }
+  html body .sterilizer-load-card .sterilizer-load-cycle {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}

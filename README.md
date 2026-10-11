@@ -46,7 +46,7 @@ Other checks:
 | `src/core`            | Pure logic with tests: permissions, replacements, recycle bin, name check, workflow, imports   |
 | `src/data`            | Demo data and the cloud layer: `cloud/cloudTables.ts` maps each store collection to its table  |
 | `src/i18n`            | `tr('Ελληνικό κείμενο')` returns the English text from `en.ts` when the language is English    |
-| `src/styles`          | Global CSS in layers; the last block of `global.css` holds the shared look (headers, buttons)  |
+| `src/styles`          | `global.css` imports, in cascade order: layers, `overrides.css`, then one file per section     |
 | `supabase/migrations` | Every schema change in order (see `supabase/MIGRATIONS.md`)                                    |
 | `supabase/functions`  | Edge functions (staff sign-up and invitations, device ingest, handover verification, …)        |
 
