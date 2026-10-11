@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {BadgeCheck, Check, Copy, LogIn, Mail, Plus, RotateCcw, Send, Trash2} from 'lucide-react';
+import {BadgeCheck, Check, Copy, FlaskConical, LogIn, Mail, Plus, RotateCcw, Send, Trash2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr} from '../../../i18n';
@@ -111,7 +111,20 @@ export default function DemoAccountsPanel({
       {d.loading ? (
         <p className="evaluation-demo-empty">{tr('Φόρτωση…')}</p>
       ) : !d.demos.length ? (
-        <p className="evaluation-demo-empty">{tr('Δεν έχει ανοίξει κανένα Demo αξιολόγησης.')}</p>
+        // An empty list says what a Demo is for and opens the first one from here.
+        <div className="evaluation-demo-empty-card">
+          <FlaskConical size={26} />
+          <strong>{tr('Κανένα Demo αξιολόγησης ακόμη')}</strong>
+          <span>
+            {tr(
+              'Ένα Demo δίνει σε έναν υποψήφιο πελάτη δικό του νοσοκομείο με δοκιμαστικά δεδομένα, για όσες ημέρες ορίσετε.',
+            )}
+          </span>
+          <AppButton variant="primary" onClick={() => setCreating(true)} disabled={!!d.busy}>
+            <Plus size={16} />
+            {tr('Νέο Demo αξιολόγησης')}
+          </AppButton>
+        </div>
       ) : (
         <div className="evaluation-demo-list">
           {d.demos.map(demo => (
