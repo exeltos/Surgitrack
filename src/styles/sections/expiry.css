@@ -85,7 +85,7 @@ html body .expiry-sub-barcode {
   }
   html body .expiry-table th:nth-child(3),
   html body .expiry-table td:nth-child(3) {
-    display: none !important;
+    display: none;
   }
 }
 @media (max-width: 700px) {

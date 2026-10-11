@@ -1448,7 +1448,7 @@ div.asset-import-hospital b {
 }
 .people-toolbar .studio-search {
   flex: 1;
-  margin: 0 !important;
+  margin: 0;
 }
 .people-invite-menu {
   position: absolute;
@@ -1939,8 +1939,8 @@ div.asset-import-hospital b {
   cursor: pointer;
 }
 .replacements-order-modal > footer span {
-  margin: 0 auto 0 0 !important;
-  padding: 0 !important;
+  margin: 0 auto 0 0;
+  padding: 0;
   font-weight: 700;
   color: var(--c-cyan-35);
 }
@@ -2018,10 +2018,10 @@ div.asset-import-hospital b {
 .department-header h1,
 .studio-head h1 {
   margin: 0 0 4px !important;
-  color: var(--c-cyan-20) !important;
+  color: var(--c-cyan-20);
   font-size: 22px;
-  font-weight: 700 !important;
-  line-height: 1.2 !important;
+  font-weight: 700;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 .page-head p,
@@ -2040,7 +2040,7 @@ div.asset-import-hospital b {
 .studio-head .eyebrow {
   margin: 0 0 2px;
   font-size: 11px;
-  letter-spacing: 0.12em !important;
+  letter-spacing: 0.12em;
 }
 
 /* Sterilization stage cards: the title wraps inside its column instead of running under the count. */
@@ -2236,7 +2236,7 @@ html body .page-head p,
 html body .ster-work-head p,
 html body .department-header p,
 html body .studio-head p {
-  font-size: 13px !important;
+  font-size: 13px;
 }
 html body .page-head,
 html body .ster-work-head,
@@ -2455,7 +2455,7 @@ html body .registry-fixed th:last-child {
 html body .registry-fixed {
   table-layout: fixed;
   width: 100%;
-  min-width: 0 !important;
+  min-width: 0;
 }
 html body .registry-fixed th:first-child,
 html body .registry-fixed td:first-child {
@@ -2520,7 +2520,7 @@ html body .registry-fixed .badge {
 html body .issues-fixed {
   table-layout: fixed;
   width: 100%;
-  min-width: 0 !important;
+  min-width: 0;
 }
 html body .issues-fixed th:nth-child(1) {
   width: 30%;
@@ -2608,7 +2608,7 @@ html body .asset-detail-body .set-tool-uses strong {
   text-overflow: ellipsis;
 }
 html body .asset-detail-body .set-tool-row {
-  grid-template-columns: 34px minmax(96px, 125px) minmax(150px, 1fr) minmax(130px, 150px) minmax(118px, 145px) !important;
+  grid-template-columns: 34px minmax(96px, 125px) minmax(150px, 1fr) minmax(130px, 150px) minmax(118px, 145px);
 }
 /* New Set / instrument form: the hint sits under the field, in the field's column, and stays short. */
 html body .asset-create-field-list label > small {
@@ -3804,7 +3804,7 @@ html body .sets-registry .set-count-short .muted {
   }
   html body .asset-workbench-main > .asset-detail-tabs {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow: visible;
   }
 }

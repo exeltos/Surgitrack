@@ -24,26 +24,26 @@
     padding: 9px 12px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary {
-    padding: 9px !important;
-    gap: 7px !important;
+    padding: 9px;
+    gap: 7px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary > div {
     min-height: 48px !important;
     padding: 7px 8px 7px 35px !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary svg {
-    left: 10px !important;
+    left: 10px;
     top: 10px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section {
-    padding: 9px 11px !important;
+    padding: 9px 11px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section input,
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .demo-fill-btn {
     height: 36px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-work-section .handover-warning {
-    margin: 0 11px 9px !important;
+    margin: 0 11px 9px;
     padding: 7px 9px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation {
@@ -185,9 +185,9 @@
   justify-self: end;
 }
 .receipt-right-panel .receipt-tools-scroll {
-  flex: 1 1 auto !important;
-  height: 0 !important;
-  min-height: 0 !important;
+  flex: 1 1 auto;
+  height: 0;
+  min-height: 0;
   overflow-y: auto !important;
   overflow-x: hidden !important;
 }
@@ -242,7 +242,7 @@
   /* Code and manufacturer are hidden here: three columns, against the six-column !important rule of
      01-core-sterilization.css that put the name into the narrow code column. */
   .receipt-verification-row:not(.single) {
-    grid-template-columns: 105px minmax(0, 1fr) auto !important;
+    grid-template-columns: 105px minmax(0, 1fr) auto;
     gap: 8px;
     /* Fits the panel: the older 860px minimum (a horizontal-scroll fix) pushed the report button out. */
     min-width: 0;
@@ -271,7 +271,7 @@
   grid-template-columns: minmax(260px, 2.05fr) minmax(145px, 1.05fr) minmax(150px, 0.95fr) minmax(150px, 1fr) minmax(
       190px,
       1.15fr
-    ) !important;
+    );
   column-gap: 14px;
 }
 .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(3),
@@ -302,14 +302,14 @@
 }
 /* The generic queue pins cells to its six columns; with Specialty hidden, this queue has five. */
 .sterilization-workspace .receipt-queue-panel .ster-meta {
-  grid-column: 3 !important;
+  grid-column: 3;
 }
 .sterilization-workspace .receipt-queue-panel .ster-status {
-  grid-column: 4 !important;
+  grid-column: 4;
 }
 .sterilization-workspace .receipt-queue-panel .ster-row-action {
   grid-column: 5;
-  justify-content: flex-start !important;
+  justify-content: flex-start;
   flex-wrap: nowrap;
   gap: 8px;
 }
@@ -378,7 +378,7 @@ html body .content .ster-work-panel .primary.compact {
 html body .sterilization-workspace .ster-work-row,
 html body .sterilization-workspace .receipt-queue-panel .ster-work-row {
   padding: 8px 22px !important;
-  min-height: 0 !important;
+  min-height: 0;
 }
 /* Column titles over their columns: the rows' side padding (an older 16px !important rule matched the head
    only) and the room the list keeps for its scrollbar, so the fractions of both grids come out the same. */
@@ -561,16 +561,16 @@ html body .load-release-modal {
 }
 @media (max-width: 760px) {
   .sterilization-workspace .ster-work-panel .ster-list-head {
-    display: none !important;
+    display: none;
   }
   .sterilization-workspace .ster-work-panel .ster-work-row {
     display: grid;
     grid-template-columns: 44px minmax(0, 1fr) !important;
-    gap: 8px 10px !important;
+    gap: 8px 10px;
     padding: 13px 14px;
   }
   .sterilization-workspace .ster-work-panel .ster-asset-cell {
-    grid-column: 1/-1 !important;
+    grid-column: 1/-1;
   }
   .sterilization-workspace .ster-work-panel .ster-cell-department,
   .sterilization-workspace .ster-work-panel .ster-meta,
@@ -581,13 +581,13 @@ html body .load-release-modal {
     display: none;
   }
   .sterilization-workspace .ster-work-panel .ster-row-action {
-    flex-wrap: wrap !important;
+    flex-wrap: wrap;
   }
 }
 @media (max-width: 1700px) {
   /* Seven cards in a row leave no room for the icon: titles keep their whole word. */
   .sterile-queues.modern button {
-    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
   .sterile-queues.modern button > small {
     grid-column: 1 / -1;
@@ -1118,7 +1118,7 @@ html body .delivery-batch-modal .handover-signature-row input {
 html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
 html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
   height: auto !important;
-  min-height: 0 !important;
+  min-height: 0;
   max-height: calc(100dvh - 32px) !important;
 }
 .released-load-bi {
@@ -1420,7 +1420,7 @@ html body .ster-row-load b {
     flex: none;
     height: auto;
     max-height: none;
-    overflow: visible !important;
+    overflow: visible;
   }
   html body .sterilization-workspace .ster-panel-head {
     flex-shrink: 0;
@@ -1446,7 +1446,7 @@ html body .ster-row-load b {
 @media (max-width: 1100px) {
   html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
   html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
-    height: auto !important;
+    height: auto;
   }
   html body .prep-workspace-modal {
     height: calc(100dvh - 48px) !important;

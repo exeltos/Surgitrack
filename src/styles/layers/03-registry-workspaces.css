@@ -597,7 +597,7 @@ body {
 }
 .tools-list-workspace > .list-scroll-panel thead th,
 .tools-list-workspace > .list-scroll-panel-kpis thead th {
-  position: sticky !important;
+  position: sticky;
   top: 0;
   z-index: 4;
   background: var(--c-white);
@@ -726,11 +726,11 @@ body {
 /* Detail pages remain inside the app viewport. Their dense working panels manage their own content. */
 .tool-detail-workspace,
 .set-detail-workspace {
-  height: 100% !important;
+  height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden !important;
+  overflow: hidden;
 }
 .tool-detail-workspace > .asset-alert {
   flex: 0 0 auto;
@@ -947,7 +947,7 @@ body {
 .asset-detail-tabs button {
   position: relative;
   min-height: 50px;
-  padding: 0 18px !important;
+  padding: 0 18px;
   border: 0;
   border-radius: 10px 10px 0 0;
   background: transparent;
@@ -1434,7 +1434,7 @@ body {
 }
 @media (max-width: 900px) {
   .asset-focus-shell .content {
-    padding: 10px !important;
+    padding: 10px;
   }
   .asset-workbench-grid {
     overflow-x: auto;
@@ -1564,8 +1564,8 @@ body {
 }
 .asset-workbench-actions .app-button,
 .asset-workbench-actions .asset-action-link {
-  min-height: 40px !important;
-  padding: 0 13px !important;
+  min-height: 40px;
+  padding: 0 13px;
   font-size: 12px;
 }
 .asset-workbench-main > .asset-detail-tabs {
@@ -1681,7 +1681,7 @@ body {
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 4px 7px;
-  padding: 11px 12px !important;
+  padding: 11px 12px;
   border: 1px dashed var(--c-gray-80);
   border-radius: 10px;
   background: var(--c-white);
@@ -1933,7 +1933,7 @@ body {
   .asset-workbench-grid {
     display: flex;
     flex-direction: column;
-    overflow: auto !important;
+    overflow: auto;
   }
   .asset-workbench-title-status {
     padding-left: 0;

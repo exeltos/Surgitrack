@@ -273,7 +273,7 @@
   border-bottom: 1px solid var(--c-gray-95);
 }
 .set-tool-child-row {
-  padding-left: 28px !important;
+  padding-left: 28px;
   background: var(--c-white);
 }
 .set-tool-child-row:hover {
@@ -291,7 +291,7 @@
     min-width: auto;
   }
   .set-tool-child-row {
-    padding-left: 16px !important;
+    padding-left: 16px;
   }
 }
 
@@ -1765,7 +1765,7 @@ td {
 
 /* v0.26.7 — confirmations must always render above the asset workspace/topbar. */
 .confirm-dialog-backdrop {
-  z-index: 1600 !important;
+  z-index: 1600;
 }
 .confirm-dialog-backdrop .confirm-dialog {
   position: relative;
