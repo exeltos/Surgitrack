@@ -140,7 +140,8 @@ pending). Every change of the workflow creates a new version; records keep the v
 6. **Sterilizer load.** Put Sets/instruments into a load: sterilizer, cycle number, program, indicators. Start,
    then complete with PASSED/FAILED. A connected sterilizer can fill the cycle data automatically.
 7. **Release.** Per load: physical parameters, chemical indicator, packaging integrity, BI result. Release or
-   send back to reprocess. A BI that later fails recalls the whole load: a recall case lists every item, where it
+   send back to reprocess. The database refuses a Set or standalone instrument made ready from a sterilization
+   stage without an unused release of a passed cycle (each release makes its item ready once). A BI that later fails recalls the whole load: a recall case lists every item, where it
    is now and which patient it reached.
 8. **Storage and delivery.** Released items wait in storage / ready for pickup; delivery records the person who
    receives them in the department.

@@ -68,6 +68,9 @@ Data flow: the store holds records in memory; in a cloud workspace each collecti
   (a trigger refuses a direct write), and every set-password or invitation link an admin makes and every email
   change is kept in `account_events` (read by the hospital's admins, changed by nobody) and emailed to the person.
 - The platform owner's account is made or claimed only with a confirmed email and only while no other exists.
+- A Set or standalone instrument goes from a sterilization stage to storage or ready for pickup only with a release
+  that says RELEASED, after a PASSED cycle, not used before (`require_release_for_ready`, logged in
+  `release_transitions` with the release it used).
 - Usage counts (uses, sterilizations) never go down through the API. Each receipt and delivery is stamped by the
   database with `counterparty_verified`: whether the other party confirmed with their own password (verify-handover,
   recorded in `handover_signatures`) to the signed-in user in the last 24 hours.
