@@ -264,12 +264,38 @@ export function useLoadActions(
       releaseIndicatorVerdict(policy, chemical, payload.biologicalIndicatorResult).ok &&
       payload.decision === 'RELEASED';
     const decision = canRelease ? 'RELEASED' : 'REPROCESS';
+    const passedCycle = (assetId: string) =>
+      sterilizationCycles.find(c => c.loadId === loadId && c.assetId === assetId && c.result === 'PASSED');
+    // Released only with every item's passed cycle on record: never half a load, and never a load closed while
+    // items stay waiting for it.
+    const noCycle = load.items.filter(item => !passedCycle(item.assetId));
+    if (decision === 'RELEASED' && noCycle.length) {
+      notify(
+        tr(
+          'Το φορτίο {0} δεν αποδεσμεύτηκε: λείπει η καταγραφή κύκλου για {1}.',
+          named(loadId),
+          noCycle.map(item => item.barcode).join(', '),
+        ),
+        true,
+      );
+      return undefined;
+    }
     const now = formatStoreDateTime();
     load.items.forEach((item, index) => {
-      const cycle = sterilizationCycles.find(
-        c => c.loadId === loadId && c.assetId === item.assetId && c.result === 'PASSED',
-      );
-      if (!cycle) return;
+      const cycle = passedCycle(item.assetId);
+      if (!cycle) {
+        // Not released: back to reprocessing like the rest of the load (no release record without a cycle).
+        updateState(item.assetKind, item.assetId, reprocessState());
+        addMovement({
+          asset: `${item.barcode} · ${item.assetName}`,
+          assetKind: item.assetKind,
+          from: 'Αποδέσμευση',
+          to: 'Επανεπεξεργασία',
+          status: `Μη αποδέσμευση φορτίου ${loadId} · κύκλος ${load.cycleNumber}`,
+          by: currentUser.name,
+        });
+        return;
+      }
       const shelfLife = decision === 'RELEASED' ? releaseShelfLife(item.assetKind, item.assetId) : undefined;
       const record: SterilizationReleaseRecord = {
         id: `sr${uniqueStamp()}-${index}`,

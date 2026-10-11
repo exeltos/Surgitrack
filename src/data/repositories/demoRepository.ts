@@ -8,6 +8,7 @@ import {
   purchaseOrders,
   receipts,
   sets,
+  sterilizationCycles,
   sterilizationReleases,
   tools,
 } from '../demo';
@@ -38,6 +39,7 @@ const cloneInitialData = (): SurgiInitialData => ({
     checkedToolIds: [...item.checkedToolIds],
   })),
   sterilizationReleases: sterilizationReleases.map(item => ({...item})),
+  sterilizationCycles: sterilizationCycles.map(item => ({...item, toolIds: [...item.toolIds]})),
   counts: counts.map(count => ({
     ...count,
     checkedToolIds: [...(count.checkedToolIds || [])],

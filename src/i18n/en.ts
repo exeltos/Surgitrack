@@ -1203,6 +1203,8 @@ export const en: Record<string, string> = {
   'Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).': 'Load {0} released ({1} items).',
   'Το φορτίο {0} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.':
     'Load {0} was not released and returned to reprocessing.',
+  'Το φορτίο {0} δεν αποδεσμεύτηκε: λείπει η καταγραφή κύκλου για {1}.':
+    'Load {0} was not released: the cycle record is missing for {1}.',
   'Το φορτίο {0} ολοκληρώθηκε για {1} αντικείμενα.': 'Load {0} completed for {1} items.',
   'Το φορτίο {0} ολοκληρώθηκε και αναμένει αποδέσμευση.': 'Load {0} is complete and awaits release.',
   'Το όριο χρήσεων αφαιρέθηκε.': 'The usage limit was removed.',
