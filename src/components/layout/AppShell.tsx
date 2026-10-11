@@ -79,7 +79,7 @@ const navEN: Record<string, string> = {
   'SurgiTrack Studio': 'SurgiTrack Studio',
   Ιχνηλάτηση: 'Traceability',
   Χρήστες: 'Users',
-  'Demo & τύποι χρήσης': 'Demo & plans',
+  'Demo αξιολόγησης': 'Evaluation Demos',
   Εισαγωγή: 'Import',
   Ειδοποιήσεις: 'Notices',
   Αξιολογήσεις: 'Ratings',
@@ -200,7 +200,16 @@ export default function AppShell({
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
     // The list of all hospitals is the platform admin's, outside Demo.
-    .filter(item => item.to !== '/hospitals' || actingAsPlatformOwner());
+    .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner());
+  // The pages the menu reaches, for Help: a Studio section is the Studio page, and its hospitals list is
+  // what the Hospitals help describes.
+  const helpScreens = [
+    ...new Set(
+      navigation.flatMap(item =>
+        item.to === '/studio?tab=platform' ? ['/studio', '/hospitals'] : [item.to.split('?')[0]],
+      ),
+    ),
+  ];
   useEffect(() => {
     if (!platformOnly) return;
     // The Studio opens on a section, so one menu entry is always lit.
@@ -762,7 +771,7 @@ export default function AppShell({
       </main>
       {helpOpen && (
         <Suspense fallback={null}>
-          <HelpCenter onClose={() => setHelpOpen(false)} screens={navigation.map(item => item.to)} />
+          <HelpCenter onClose={() => setHelpOpen(false)} screens={helpScreens} />
         </Suspense>
       )}
       {sinceSignIn === 'news' && (
@@ -777,7 +786,7 @@ export default function AppShell({
           lang={lang === 'en' ? 'en' : 'el'}
           name={signedInName.split(' ')[0]}
           accessRequests={accessRequests}
-          screens={navigation.map(item => item.to)}
+          screens={helpScreens}
           onOpen={to => {
             setSinceSignIn('');
             navigate(to);

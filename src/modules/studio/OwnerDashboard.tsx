@@ -236,8 +236,8 @@ export default function OwnerDashboard({
             <button onClick={onOpenHospitals}>
               <Building2 size={18} />
               <span>
-                <b>{L('Demo & τύποι χρήσης', 'Demo & plans')}</b>
-                <small>{L('Ενεργό, Demo, τύπος χρήσης', 'Active, Demo, plan')}</small>
+                <b>{L('Νοσοκομεία', 'Hospitals')}</b>
+                <small>{L('Τύπος χρήσης, κατάσταση, είσοδος', 'Plan, state, entry')}</small>
               </span>
             </button>
           </div>

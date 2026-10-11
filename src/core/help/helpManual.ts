@@ -1368,11 +1368,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Νέο νοσοκομείο',
-          '«Νέο νοσοκομείο» με όνομα και κωδικό. Στο «Demo & τύποι χρήσης» ορίζετε κανονική χρήση ή δοκιμαστική περίοδο· στην Επισκόπηση βλέπετε τα νοσοκομεία σε δοκιμαστική περίοδο και την παρατείνετε κατά 30 ημέρες· μετά τη λήξη το νοσοκομείο κλειδώνει για όλους εκτός από εσάς, τα δεδομένα μένουν.',
+          '«Νέο νοσοκομείο» με όνομα, κανονική χρήση ή δοκιμαστική περίοδο, και τον διαχειριστή του. Η δοκιμαστική περίοδος είναι άδειο νοσοκομείο με πραγματικά δεδομένα: στη λίστα «Νοσοκομεία» κάθε γραμμή δείχνει τον τύπο χρήσης και το «+30 ημέρες» την παρατείνει· μετά τη λήξη το νοσοκομείο κλειδώνει για όλους εκτός από εσάς, τα δεδομένα μένουν. Για να δείξετε την εφαρμογή σε υποψήφιο πελάτη χρησιμοποιήστε το «Demo αξιολόγησης», που έχει δοκιμαστικά δεδομένα.',
         ],
         en: [
           'New hospital',
-          '"New hospital" with a name and code. In "Demo & plans" you set standard use or a trial; in Overview you see the hospitals on trial and extend them by 30 days; after it ends the hospital locks for everyone but you, the data stays.',
+          '"New hospital" with a name, standard use or a trial, and its administrator. A trial is an empty hospital with real data: in the "Hospitals" list each row shows its plan and "+30 days" extends it; after it ends the hospital locks for everyone but you, the data stays. To show the app to a prospective customer use an "Evaluation Demo", which has sample data.',
         ],
       },
       {
@@ -1388,11 +1388,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Είσοδος',
-          '«Είσοδος» σας μεταφέρει μέσα στο νοσοκομείο, με τα δικά του δεδομένα και μενού. Η πάνω μπάρα δείχνει πού εργάζεστε· «Έξοδος στο Studio» επιστρέφει.',
+          '«Είσοδος» σε κάθε γραμμή της λίστας σας μεταφέρει μέσα στο νοσοκομείο, με τα δικά του δεδομένα και μενού. Η πάνω μπάρα δείχνει πού εργάζεστε· «Έξοδος στο Studio» επιστρέφει.',
         ],
         en: [
           'Enter',
-          '"Enter" takes you into the hospital, with its own data and menu. The top bar shows where you are working; "Exit to Studio" takes you back.',
+          '"Enter" on a row of the list takes you into the hospital, with its own data and menu. The top bar shows where you are working; "Exit to Studio" takes you back.',
         ],
       },
     ],

@@ -64,7 +64,9 @@ export default function OrganizationEditor({
               <input type="radio" name="plan" checked={plan === 'TRIAL'} onChange={() => setPlan('TRIAL')} />
               <span>
                 <b>{tr('Δοκιμαστική περίοδος')}</b>
-                <small>{tr('Μετά τη λήξη το νοσοκομείο κλειδώνει μέχρι να το ανανεώσετε.')}</small>
+                <small>
+                  {tr('Άδειο νοσοκομείο με πραγματικά δεδομένα. Κλειδώνει στη λήξη μέχρι να το ανανεώσετε.')}
+                </small>
               </span>
             </label>
           </fieldset>

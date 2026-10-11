@@ -9,7 +9,8 @@ export const en: Record<string, string> = {
   'Κανονική χρήση': 'Standard use',
   'Χωρίς λήξη.': 'No end date.',
   'Δοκιμαστική περίοδος': 'Trial period',
-  'Μετά τη λήξη το νοσοκομείο κλειδώνει μέχρι να το ανανεώσετε.': 'When it ends the hospital locks until you renew it.',
+  'Άδειο νοσοκομείο με πραγματικά δεδομένα. Κλειδώνει στη λήξη μέχρι να το ανανεώσετε.':
+    'An empty hospital with real data. It locks when it ends until you renew it.',
   Διάρκεια: 'Length',
   '{0} ημέρες': '{0} days',
   'Λήγει στις': 'Ends on',
