@@ -161,6 +161,7 @@ export function useReceiptFlow(
       const expected = item.kind === 'SET' ? tools.filter(t => t.setId === item.id).length : undefined;
       receiveAtSterilization(item.kind, item.id, {
         batchId,
+        handoverSignatureId: receiptBatchDeliverer.signatureId,
         deliveredByUserId: receiptBatchDeliverer.userId,
         deliveredByName: receiptBatchDeliverer.name,
         deliveredByDepartment: receiptBatchDeliverer.department,
@@ -243,6 +244,7 @@ export function useReceiptFlow(
       .filter(Boolean)
       .join(' · ');
     receiveAtSterilization(receiptDraft.kind, receiptDraft.asset.id, {
+      handoverSignatureId: deliverer.signatureId,
       deliveredByUserId: deliverer.userId,
       deliveredByName: deliverer.name,
       deliveredByDepartment: deliverer.department,

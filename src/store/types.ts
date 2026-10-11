@@ -72,6 +72,8 @@ export type SessionUser = {
 
 export type ReceivePayload = {
   batchId?: string;
+  /** The server's record of the deliverer's signature for this handover (see HandoverSigner). */
+  handoverSignatureId?: string;
   deliveredByUserId: string;
   deliveredByName: string;
   deliveredByDepartment: string;
@@ -158,6 +160,8 @@ export type WorkflowCheckpointPayload = {
 
 export type DeliveryPayload = {
   batchId?: string;
+  /** The server's record of the receiver's signature for this handover (see HandoverSigner). */
+  handoverSignatureId?: string;
   receivedByUserId: string;
   receivedByName: string;
   receivedByDepartment: string;

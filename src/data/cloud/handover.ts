@@ -2,8 +2,19 @@ import {supabase} from '../../lib/supabase';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import {getRealIdentity, productionOrganizationFor} from './identity';
 
-/** The other party of a handover, confirmed with their own user code and password. */
-export type HandoverSigner = {code: string; userId: string; name: string; department: string; role: string};
+/**
+ * The other party of a handover, confirmed with their own user code and password. `signatureId` names the
+ * server's record of that signature, for the items on screen when it was given: each receipt or delivery of
+ * that handover cites it, and the server verifies it once per item (absent in Demo).
+ */
+export type HandoverSigner = {
+  code: string;
+  userId: string;
+  name: string;
+  department: string;
+  role: string;
+  signatureId?: string;
+};
 
 /** Demo only: the department people of the demo hospital. Any password is accepted. */
 export const DEMO_HANDOVER_PEOPLE: HandoverSigner[] = [
@@ -27,7 +38,12 @@ export const isDemoHandover = () => getRuntimeDataMode() === 'DEMO' || !getRealI
 export type HandoverVerifyResult =
   {ok: true; signer: HandoverSigner} | {ok: false; reason: 'invalid' | 'locked' | 'same_user' | 'unavailable'};
 
-export async function verifyHandover(userCode: string, password: string): Promise<HandoverVerifyResult> {
+/** Confirms the other party for the handover of these items (Set and instrument ids). */
+export async function verifyHandover(
+  userCode: string,
+  password: string,
+  assetIds: string[] = [],
+): Promise<HandoverVerifyResult> {
   const code = userCode.trim().toUpperCase();
   if (!code || !password) return {ok: false, reason: 'invalid'};
   if (isDemoHandover()) {
@@ -36,13 +52,19 @@ export async function verifyHandover(userCode: string, password: string): Promis
   }
   const real = getRealIdentity();
   const {data, error} = await supabase.functions.invoke<{
+    signature_id?: string;
     user_id: string;
     name: string;
     user_code: string;
     role: string;
     department: string;
   }>('verify-handover', {
-    body: {user_code: code, password, organization_id: real ? productionOrganizationFor(real) : undefined},
+    body: {
+      user_code: code,
+      password,
+      asset_ids: assetIds,
+      organization_id: real ? productionOrganizationFor(real) : undefined,
+    },
   });
   if (error || !data) {
     const status = (error as {context?: {status?: number}} | null)?.context?.status;
@@ -53,6 +75,13 @@ export async function verifyHandover(userCode: string, password: string): Promis
   }
   return {
     ok: true,
-    signer: {code: data.user_code, userId: data.user_id, name: data.name, department: data.department, role: data.role},
+    signer: {
+      code: data.user_code,
+      userId: data.user_id,
+      name: data.name,
+      department: data.department,
+      role: data.role,
+      signatureId: data.signature_id,
+    },
   };
 }

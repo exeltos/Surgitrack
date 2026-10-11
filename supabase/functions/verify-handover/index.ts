@@ -103,13 +103,21 @@ Deno.serve(async req => {
     if (person.role === "VIEWER") return json({error: "invalid_credentials"}, 401);
     // The database stamps the receipt or delivery as verified only against this record (see
     // handover_counterparty_stamp). Not recording it leaves the handover unverified, not refused.
-    const {error: signatureError} = await admin
+    // What is handed over (the Sets and instruments on screen when the other party signs): the signature
+    // verifies the receipts or deliveries of these items, once each, and nothing else.
+    const assetIds = Array.isArray(body?.asset_ids)
+      ? [...new Set((body.asset_ids as unknown[]).map(id => String(id ?? "").slice(0, 100)).filter(Boolean))].slice(0, 500)
+      : [];
+    const {data: signature, error: signatureError} = await admin
       .from("handover_signatures")
-      .insert({organization_id: organizationId, signer_id: person.id, witness_id: auth.user.id});
+      .insert({organization_id: organizationId, signer_id: person.id, witness_id: auth.user.id, asset_ids: assetIds})
+      .select("id")
+      .single();
     if (signatureError) console.error("handover_signatures", signatureError.message);
 
     const department = person.department as {name?: string} | {name?: string}[] | null;
     return json({
+      signature_id: signature?.id,
       user_id: person.id,
       name: person.name,
       user_code: person.user_code,

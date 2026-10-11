@@ -153,6 +153,7 @@ export function useReceiptAndCycleActions(
       assetName: a.name,
       fromDepartment: a.department || 'Τμήμα',
       toDepartment: 'Κεντρική Αποστείρωση',
+      handoverSignatureId: payload.handoverSignatureId,
       deliveredByUserId: payload.deliveredByUserId,
       deliveredByName: payload.deliveredByName,
       deliveredByDepartment: payload.deliveredByDepartment,

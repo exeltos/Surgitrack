@@ -288,9 +288,12 @@ export interface ReceiptRecord {
   checkNote?: string;
   itemChecks?: ReceiptItemCheck[];
   setChecks?: ReceiptSetChecks;
+  /** The other party's signature for this handover (verify-handover), which the server checks. */
+  handoverSignatureId?: string;
   /**
    * Set by the server when the record is saved: true when the other party confirmed with their own
-   * password (verify-handover), false when not; absent on older records and until the record syncs.
+   * password for this handover (verify-handover), false when not; absent on older records and until the
+   * record syncs.
    */
   counterpartyVerified?: boolean;
 }
@@ -311,9 +314,12 @@ export interface DeliveryRecord {
   receivedByDepartment: string;
   at: string;
   note?: string;
+  /** The other party's signature for this handover (verify-handover), which the server checks. */
+  handoverSignatureId?: string;
   /**
    * Set by the server when the record is saved: true when the other party confirmed with their own
-   * password (verify-handover), false when not; absent on older records and until the record syncs.
+   * password for this handover (verify-handover), false when not; absent on older records and until the
+   * record syncs.
    */
   counterpartyVerified?: boolean;
 }

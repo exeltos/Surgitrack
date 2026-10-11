@@ -65,6 +65,7 @@ export function useDeliveryFlow(
   const completeDelivery = () => {
     if (!deliveryDraft || !receiver || !receiverMatches) return;
     const done = completeDeliveryToDepartment(deliveryDraft.kind, deliveryDraft.asset.id, {
+      handoverSignatureId: receiver.signatureId,
       receivedByUserId: receiver.userId,
       receivedByName: receiver.name,
       receivedByDepartment: receiver.department,
@@ -175,6 +176,7 @@ export function useDeliveryFlow(
     deliverySelectedAssets.forEach(item => {
       const done = completeDeliveryToDepartment(item.kind, item.id, {
         batchId,
+        handoverSignatureId: deliveryBatchReceiver.signatureId,
         receivedByUserId: deliveryBatchReceiver.userId,
         receivedByName: deliveryBatchReceiver.name,
         receivedByDepartment: deliveryBatchReceiver.department,

@@ -68,6 +68,7 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
                   label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
                   department={deliveryDraft.asset.department}
                   signer={receiver}
+                  assetIds={[deliveryDraft.asset.id]}
                   onSigned={setReceiver}
                 />
                 {receiver &&

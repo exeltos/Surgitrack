@@ -169,6 +169,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                       department={deliveryBatchDepartment}
                       disabled={!deliveryBatchDepartment}
                       signer={deliveryBatchReceiver}
+                      assetIds={deliverySelectedAssets.map(item => item.id)}
                       onSigned={setDeliveryBatchReceiver}
                     />
                     {deliveryBatchReceiver &&
