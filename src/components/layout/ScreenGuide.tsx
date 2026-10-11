@@ -1,8 +1,8 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {BookOpen, Compass, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {getRuntimeDataMode} from '../../config/dataMode';
-import {helpManual} from '../../core/help/helpManual';
+import type {ManualSection} from '../../core/help/helpManual';
 import type {Permission} from '../../core/permissions';
 import {getRealIdentity} from '../../data/cloud/identity';
 import {tr} from '../../i18n';
@@ -26,9 +26,20 @@ const write = (userId: string, seen: Seen) => {
   }
 };
 
+// The manual is large: it is loaded the first time a guide may be shown, not with the app.
+let manual: ManualSection[] | undefined;
+let loading: Promise<ManualSection[]> | undefined;
+const loadManual = () =>
+  (loading ??= import('../../core/help/helpManual')
+    .then(module => (manual = module.helpManual))
+    .catch(error => {
+      loading = undefined;
+      throw error;
+    }));
+
 /** The manual section of a menu screen, if this person may open it. */
-export const screenSection = (pathname: string, can: (p: Permission) => boolean) =>
-  helpManual.find(s => !s.guide && !s.detailOf && s.to === pathname && (!s.permission || can(s.permission)));
+export const screenSection = (sections: readonly ManualSection[], pathname: string, can: (p: Permission) => boolean) =>
+  sections.find(s => !s.guide && !s.detailOf && s.to === pathname && (!s.permission || can(s.permission)));
 
 /**
  * The first time a person opens a screen: what it is for and its first steps, from the manual, above the
@@ -51,8 +62,22 @@ export default function ScreenGuide({
 }) {
   const userId = getRuntimeDataMode() === 'PRODUCTION' ? getRealIdentity()?.id : undefined;
   const [seen, setSeen] = useState<Seen>(() => (userId ? read(userId) : {off: true, screens: []}));
-  const section = screenSection(pathname, can);
-  if (!enabled || !userId || !section || seen.off || seen.screens.includes(section.to)) return null;
+  const [sections, setSections] = useState(manual);
+  const wanted = enabled && !!userId && !seen.off;
+  useEffect(() => {
+    if (!wanted || sections) return;
+    let live = true;
+    // Offline or a new release mid-session: no guide this time; the screen itself is unaffected.
+    loadManual().then(
+      loaded => live && setSections(loaded),
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [wanted, sections]);
+  const section = sections && screenSection(sections, pathname, can);
+  if (!wanted || !userId || !section || seen.screens.includes(section.to)) return null;
   const save = (next: Seen) => {
     setSeen(next);
     write(userId, next);

@@ -24,7 +24,6 @@ import {useRealtimeLive} from '../../data/cloud/realtime';
 import {useOnline} from '../../core/useOnline';
 import {useTrial} from '../../data/cloud/trialContext';
 import {useEvaluationDemo} from '../../data/cloud/demoContext';
-import DemoBar from './DemoBar';
 import MaintenanceStrip from './MaintenanceStrip';
 import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
 import Briefing, {briefingDue} from './Briefing';
@@ -35,9 +34,11 @@ import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 import {formatDate, formatTime} from '../../core/displayDate';
 
-// The user manual is loaded only when first opened.
 import NotificationPanel from './NotificationPanel';
+// The user manual is loaded only when first opened.
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
+// Only evaluation Demos show the Demo bar (with its tours and dialogs): loaded for them alone.
+const DemoBar = lazyPage(() => import('./DemoBar'));
 /** Initials of a name, e.g. "ΑΙΚΑΤΕΡΙΝΗ ΜΠΟΥΓΑ" → "ΑΜ". */
 const initialsOf = (name: string) => {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -478,14 +479,16 @@ export default function AppShell({
           </div>
         )}
         {evaluationDemo && (
-          <DemoBar
-            role={role}
-            savedAt={syncInfo.status === 'saved' ? syncInfo.lastSyncAt : undefined}
-            onShowMe={to => {
-              navigate(to);
-              setHelpOpen(true);
-            }}
-          />
+          <Suspense fallback={null}>
+            <DemoBar
+              role={role}
+              savedAt={syncInfo.status === 'saved' ? syncInfo.lastSyncAt : undefined}
+              onShowMe={to => {
+                navigate(to);
+                setHelpOpen(true);
+              }}
+            />
+          </Suspense>
         )}
         {!evaluationDemo && trial && (trial.warn || trial.ended) && (
           <div className={`trial-strip${trial.ended ? ' ended' : ''}`} role="status">
