@@ -16,6 +16,16 @@ import {
   CalendarClock,
   ScanSearch,
   Scissors,
+  Gauge,
+  Users,
+  FlaskConical,
+  FileSpreadsheet,
+  Megaphone,
+  MessageSquareHeart,
+  Bug,
+  BookOpen,
+  UserCog,
+  Settings2,
   type LucideIcon,
 } from 'lucide-react';
 import type {UserRole} from '../store/SurgiStore';
@@ -23,12 +33,16 @@ import type {Permission} from '../core/permissions';
 import {hasPermission} from '../core/permissions';
 
 /** The menu's sections, in the order of how often they are used: the day's work first, administration last. */
-export type NavigationGroup = 'WORK' | 'EQUIPMENT' | 'INSIGHT' | 'ADMIN';
+export type NavigationGroup = 'WORK' | 'EQUIPMENT' | 'INSIGHT' | 'ADMIN' | 'PLATFORM' | 'CONTACT' | 'TEMPLATE';
 export const navigationGroupLabel: Record<NavigationGroup, [string, string]> = {
   WORK: ['Καθημερινή εργασία', 'Daily work'],
   EQUIPMENT: ['Εξοπλισμός', 'Equipment'],
   INSIGHT: ['Ανάλυση', 'Insight'],
   ADMIN: ['Διαχείριση', 'Administration'],
+  // The platform owner's own menu (outside a hospital).
+  PLATFORM: ['Πλατφόρμα', 'Platform'],
+  CONTACT: ['Επικοινωνία & υγεία', 'Communication & health'],
+  TEMPLATE: ['Πρότυπη διαμόρφωση', 'Template set-up'],
 };
 
 export type NavigationItem = {
@@ -114,3 +128,40 @@ export const homePathFor = (role: UserRole, can?: (permission: Permission) => bo
   const items = navigationFor(role, can);
   return (items.find(item => item.to === '/overview') || items[0])?.to;
 };
+
+/**
+ * The platform owner's menu while in no hospital: each Studio section is its own entry (they were eleven tabs
+ * in two rows), the platform's work first, then messages and health, then the set-up new hospitals start from.
+ */
+export const ownerNavigation: NavigationItem[] = [
+  {to: '/studio?tab=overview', label: 'Επισκόπηση', icon: Gauge, permission: 'studio.manage', group: 'PLATFORM'},
+  {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'PLATFORM'},
+  {to: '/studio?tab=users', label: 'Χρήστες', icon: Users, permission: 'studio.manage', group: 'PLATFORM'},
+  {
+    to: '/studio?tab=platform',
+    label: 'Demo & τύποι χρήσης',
+    icon: FlaskConical,
+    permission: 'studio.manage',
+    group: 'PLATFORM',
+  },
+  {to: '/studio?tab=import', label: 'Εισαγωγή', icon: FileSpreadsheet, permission: 'studio.manage', group: 'PLATFORM'},
+  {to: '/studio?tab=notices', label: 'Ειδοποιήσεις', icon: Megaphone, permission: 'studio.manage', group: 'CONTACT'},
+  {
+    to: '/studio?tab=ratings',
+    label: 'Αξιολογήσεις',
+    icon: MessageSquareHeart,
+    permission: 'studio.manage',
+    group: 'CONTACT',
+  },
+  {to: '/studio?tab=errors', label: 'Σφάλματα', icon: Bug, permission: 'studio.manage', group: 'CONTACT'},
+  {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'TEMPLATE'},
+  {
+    to: '/studio?tab=workflow',
+    label: 'Ροή Αποστείρωσης',
+    icon: Layers3,
+    permission: 'studio.manage',
+    group: 'TEMPLATE',
+  },
+  {to: '/studio?tab=roles', label: 'Ρόλοι & δικαιώματα', icon: UserCog, permission: 'studio.manage', group: 'TEMPLATE'},
+  {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'TEMPLATE'},
+];

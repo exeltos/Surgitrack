@@ -1,39 +1,6 @@
-import {
-  BookOpen,
-  Building2,
-  Bug,
-  FileSpreadsheet,
-  Gauge,
-  Layers3,
-  Megaphone,
-  MessageSquareHeart,
-  Settings2,
-  UserCog,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
-import type {Tab} from '../studioMeta';
+import {STUDIO_TABS as TABS, type StudioTabDef as TabDef, type Tab} from '../studioMeta';
 import type {StudioPageState} from '../useStudioPage';
 
-type TabDef = {id: Tab; el: string; en: string; icon: LucideIcon; group: 'PLATFORM' | 'SETUP'};
-
-/**
- * The platform's own work first (hospitals, users, notices…), then the set-up every hospital has
- * (libraries, flow, roles, settings). A hospital admin sees only the set-up, on one row.
- */
-const TABS: TabDef[] = [
-  {id: 'OVERVIEW', el: 'Επισκόπηση', en: 'Overview', icon: Gauge, group: 'PLATFORM'},
-  {id: 'PLATFORM', el: 'Νοσοκομεία & Demo', en: 'Hospitals & Demo', icon: Building2, group: 'PLATFORM'},
-  {id: 'USERS', el: 'Χρήστες', en: 'Users', icon: Users, group: 'PLATFORM'},
-  {id: 'IMPORT', el: 'Εισαγωγή', en: 'Import', icon: FileSpreadsheet, group: 'PLATFORM'},
-  {id: 'RATINGS', el: 'Αξιολογήσεις', en: 'Ratings', icon: MessageSquareHeart, group: 'PLATFORM'},
-  {id: 'NOTICES', el: 'Ειδοποιήσεις', en: 'Notices', icon: Megaphone, group: 'PLATFORM'},
-  {id: 'ERRORS', el: 'Σφάλματα', en: 'Errors', icon: Bug, group: 'PLATFORM'},
-  {id: 'LIBRARIES', el: 'Βιβλιοθήκες', en: 'Libraries', icon: BookOpen, group: 'SETUP'},
-  {id: 'WORKFLOW', el: 'Ροή Αποστείρωσης', en: 'Sterilization Flow', icon: Layers3, group: 'SETUP'},
-  {id: 'ROLES', el: 'Ρόλοι & δικαιώματα', en: 'Roles & permissions', icon: UserCog, group: 'SETUP'},
-  {id: 'SYSTEM', el: 'Ρυθμίσεις', en: 'Settings', icon: Settings2, group: 'SETUP'},
-];
 const GROUPS = [
   {id: 'PLATFORM', el: 'Πλατφόρμα', en: 'Platform'},
   {id: 'SETUP', el: 'Διαμόρφωση', en: 'Set-up'},

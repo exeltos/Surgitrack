@@ -1368,11 +1368,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Νέο νοσοκομείο',
-          '«Νέο νοσοκομείο» με όνομα και κωδικό. Στο Studio → Νοσοκομεία & Demo ορίζετε κανονική χρήση ή δοκιμαστική περίοδο· στο Studio → Επισκόπηση βλέπετε τα νοσοκομεία σε δοκιμαστική περίοδο και την παρατείνετε κατά 30 ημέρες· μετά τη λήξη το νοσοκομείο κλειδώνει για όλους εκτός από εσάς, τα δεδομένα μένουν.',
+          '«Νέο νοσοκομείο» με όνομα και κωδικό. Στο «Demo & τύποι χρήσης» ορίζετε κανονική χρήση ή δοκιμαστική περίοδο· στην Επισκόπηση βλέπετε τα νοσοκομεία σε δοκιμαστική περίοδο και την παρατείνετε κατά 30 ημέρες· μετά τη λήξη το νοσοκομείο κλειδώνει για όλους εκτός από εσάς, τα δεδομένα μένουν.',
         ],
         en: [
           'New hospital',
-          '"New hospital" with a name and code. In Studio → Hospitals & Demo you set standard use or a trial; in Studio → Overview you see the hospitals on trial and extend them by 30 days; after it ends the hospital locks for everyone but you, the data stays.',
+          '"New hospital" with a name and code. In "Demo & plans" you set standard use or a trial; in Overview you see the hospitals on trial and extend them by 30 days; after it ends the hospital locks for everyone but you, the data stays.',
         ],
       },
       {

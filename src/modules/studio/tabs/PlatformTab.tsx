@@ -59,7 +59,7 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
       <header className="studio-panel-head">
         <div>
           <span className="eyebrow">{L('ΠΛΑΤΦΟΡΜΑ', 'PLATFORM')}</span>
-          <h2>{L('Νοσοκομεία & Demo', 'Hospitals & Demo')}</h2>
+          <h2>{L('Demo & τύποι χρήσης', 'Demo & plans')}</h2>
           <p>
             {L(
               'Οι πελάτες της πλατφόρμας, τα Demo των υποψήφιων πελατών και το δικό σας περιβάλλον πρακτικής.',
