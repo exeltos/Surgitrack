@@ -50,7 +50,11 @@ node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,SUPE
    made taller until no panel scrolls (up to `--max-height`, default 4000px). Long lists are cut at that
    height. Lists that load more rows as you scroll show a "more rows" spinner at the cut, which is
    expected.
-7. **Modals** (bonus): Sterilization receipt, bulk receipt, and issue resolve, where the role has them.
+7. **Dialogs and states** (bonus, where the role has them; not with `--no-extras`): Sterilization receipt and bulk
+   receipt, every Sterilization queue (`sterilization-queue-<stage>`) and the dialog its first row or load button
+   opens (`sterilization-<stage>-dialog`; Storage is off in the sample workflow), issue resolve, a purchase order,
+   an instrument's problem report, a Set grouped by instrument kind, the add-user drawer and sign-out. Tools that
+   reason from the captures (such as `scripts/css-important.mjs`) see only these states and the routes.
 
 ## Harness artifacts (not app bugs)
 
