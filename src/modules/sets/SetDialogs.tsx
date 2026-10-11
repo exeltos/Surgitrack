@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Camera, Trash2, X} from 'lucide-react';
+import {Camera, Copy, Trash2, X} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import ReportTypeField from '../../components/assets/ReportTypeField';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -182,6 +182,49 @@ export function SetReportModal({
             {tr('Καταχώρηση αναφοράς')}
           </AppButton>
         </footer>
+      </div>
+    </div>
+  );
+}
+
+/** Copy a Set: the Set alone, or the Set with new instruments (new barcodes). */
+export function SetDuplicateDialog({
+  barcode,
+  onClose,
+  onDuplicate,
+}: {
+  barcode: string;
+  onClose: () => void;
+  onDuplicate: (withTools: boolean) => void;
+}) {
+  return (
+    <div className="modal-backdrop">
+      <div className="confirm-dialog choice-dialog">
+        <header>
+          <div className="confirm-icon">
+            <Copy size={20} />
+          </div>
+          <div>
+            <h3>{tr('Αντίγραφο Σετ')}</h3>
+            <p>
+              {tr('Τι θέλεις να αντιγραφεί από το') + ' '}
+              {barcode};
+            </p>
+          </div>
+          <button className="icon-button" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </header>
+        <div className="choice-dialog-body">
+          <button onClick={() => onDuplicate(false)}>
+            <strong>{tr('Μόνο το Σετ')}</strong>
+            <span>{tr('Δημιουργεί νέο κενό Σετ, χωρίς φυσικά εργαλεία.')}</span>
+          </button>
+          <button onClick={() => onDuplicate(true)}>
+            <strong>{tr('Σετ + εργαλεία')}</strong>
+            <span>{tr('Δημιουργεί νέα φυσικά εργαλεία με νέα μοναδικά barcodes.')}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
