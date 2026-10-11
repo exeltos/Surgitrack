@@ -24,7 +24,7 @@ describe('what is new', () => {
       ['department.workspace', 'issue.create', 'asset.detail.view'].includes(p),
     );
     expect(department.some(n => n.permission === 'studio.manage')).toBe(false);
-    expect(department.some(n => n.permission === 'issue.create')).toBe(true);
+    expect(department.some(n => n.permission === 'department.workspace')).toBe(true);
     expect(department.some(n => !n.permission)).toBe(true);
     expect(notesFor(release, () => true)).toHaveLength(release.notes.length);
   });

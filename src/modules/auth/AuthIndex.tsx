@@ -23,7 +23,7 @@ const copy = {
   el: {
     product: 'SurgiTrack',
     subtitle: 'Ιχνηλασιμότητα χειρουργικών εργαλείων',
-    suite: 'Healthcare Suite',
+    suite: 'Trace Every Instrument',
     login: 'Σύνδεση',
     register: 'Εγγραφή',
     forgot: 'Ξέχασα τον κωδικό',
@@ -71,7 +71,7 @@ const copy = {
   en: {
     product: 'SurgiTrack',
     subtitle: 'Surgical Instrument Traceability',
-    suite: 'Healthcare Suite',
+    suite: 'Trace Every Instrument',
     login: 'Sign in',
     register: 'Register',
     forgot: 'Forgot password',
