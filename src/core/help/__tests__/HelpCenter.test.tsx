@@ -81,8 +81,8 @@ describe('Help Center', () => {
     );
     const nav = screen.getByRole('navigation');
     expect(within(nav).getAllByRole('button')[0]).toHaveTextContent('Ξεκινώντας');
-    fireEvent.click(within(nav).getByRole('button', {name: /Από την αγορά στη λειτουργία/}));
-    expect(screen.getByRole('heading', {level: 1, name: 'Από την αγορά στη λειτουργία'})).toBeInTheDocument();
+    fireEvent.click(within(nav).getByRole('button', {name: /Στήσιμο νοσοκομείου/}));
+    expect(screen.getByRole('heading', {level: 1, name: 'Στήσιμο νοσοκομείου'})).toBeInTheDocument();
     // A guide is not a screen: no screen to open.
     expect(screen.queryByRole('button', {name: /Άνοιγμα οθόνης/})).not.toBeInTheDocument();
     // Screens opened from Instruments and Sets are listed with them.
@@ -103,7 +103,7 @@ describe('Help Center', () => {
     );
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByRole('button', {name: /Ξεκινώντας/})).toBeInTheDocument();
-    expect(within(nav).queryByRole('button', {name: /Από την αγορά/})).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('button', {name: /Στήσιμο νοσοκομείου/})).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', {name: /Μαζική εισαγωγή/})).not.toBeInTheDocument();
   });
 

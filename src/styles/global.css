@@ -11604,3 +11604,118 @@ html body .department-status-tabs button {
     overflow: visible;
   }
 }
+/* Hospitals and the Studio's hospital status on a phone: one card per hospital, every figure labelled and
+   «Είσοδος» always in view (the table hid the requests, the link and the actions past the right edge). */
+@media (max-width: 700px) {
+  html body .hospitals-list {
+    overflow-x: visible;
+  }
+  html body .hospitals-head {
+    display: none;
+  }
+  html body .hospitals-row:not(.editing) {
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 10px;
+  }
+  html body .hospitals-row:not(.editing) > .hospitals-name,
+  html body .hospitals-row:not(.editing) > .hospitals-link {
+    grid-column: 1 / -1;
+  }
+  html body .hospitals-row:not(.editing) > .hospitals-row-actions {
+    grid-column: 2 / -1;
+    justify-content: flex-end;
+  }
+  html body .hospitals-row > [data-label]::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--st-muted);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  html body .owner-hospitals-scroll {
+    overflow-x: visible;
+  }
+  html body .owner-hospitals-table,
+  html body .owner-hospitals-table tbody {
+    display: block;
+    width: 100%;
+  }
+  html body .owner-hospitals-table thead {
+    display: none;
+  }
+  html body .owner-hospitals-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--c-gray-95);
+  }
+  html body .owner-hospitals-table tbody td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+  html body .owner-hospitals-table tbody td:first-child,
+  html body .owner-hospitals-table tbody td.owner-none {
+    grid-column: 1 / -1;
+  }
+  html body .owner-hospitals-table tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--st-muted);
+    font-size: 11px;
+    font-weight: 600;
+  }
+}
+/* Name check on a phone: card titles take two lines, the tabs keep their whole names, and each fix is a small
+   card, today's name above the new one (the table ran 88px past the edge). */
+@media (max-width: 700px) {
+  html body .name-check-kpis span {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+  }
+  html body .name-check-tabs button {
+    white-space: normal;
+    text-align: left;
+  }
+  html body .name-check-table thead {
+    display: none;
+  }
+  html body .name-check-table table,
+  html body .name-check-table tbody {
+    display: block;
+  }
+  html body .name-check-table tbody tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 10px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--c-gray-95);
+  }
+  html body .name-check-table tbody td {
+    padding: 0;
+    border: 0;
+  }
+  html body .name-check-table tbody td:first-child:not(.from) {
+    grid-row: span 2;
+  }
+  html body .name-check-table tbody td.arrow {
+    display: none;
+  }
+  html body .name-check-table tbody td.from,
+  html body .name-check-table tbody td.to {
+    grid-column: 2;
+  }
+  html body .name-check-table tbody td.to::before {
+    content: '→ ';
+    color: var(--st-muted);
+  }
+  html body .name-check-table tbody td.num {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
