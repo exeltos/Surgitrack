@@ -24,6 +24,7 @@ import {type PermissionGroup} from '../../core/permissions';
 export type Tab =
   | 'OVERVIEW'
   | 'PLATFORM'
+  | 'DEMOS'
   | 'LIBRARIES'
   | 'WORKFLOW'
   | 'USERS'
@@ -150,8 +151,9 @@ export type StudioTabDef = {id: Tab; el: string; en: string; icon: LucideIcon; g
  */
 export const STUDIO_TABS: StudioTabDef[] = [
   {id: 'OVERVIEW', el: 'Επισκόπηση', en: 'Overview', icon: Gauge, group: 'PLATFORM'},
-  {id: 'PLATFORM', el: 'Demo & τύποι χρήσης', en: 'Demo & plans', icon: Building2, group: 'PLATFORM'},
+  {id: 'PLATFORM', el: 'Νοσοκομεία', en: 'Hospitals', icon: Building2, group: 'PLATFORM'},
   {id: 'USERS', el: 'Χρήστες', en: 'Users', icon: Users, group: 'PLATFORM'},
+  {id: 'DEMOS', el: 'Demo αξιολόγησης', en: 'Evaluation Demos', icon: FlaskConical, group: 'PLATFORM'},
   {id: 'IMPORT', el: 'Εισαγωγή', en: 'Import', icon: FileSpreadsheet, group: 'PLATFORM'},
   {id: 'RATINGS', el: 'Αξιολογήσεις', en: 'Ratings', icon: MessageSquareHeart, group: 'PLATFORM'},
   {id: 'NOTICES', el: 'Ειδοποιήσεις', en: 'Notices', icon: Megaphone, group: 'PLATFORM'},

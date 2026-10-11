@@ -105,7 +105,7 @@ export default function RatingsTab({s}: {s: StudioPageState}) {
             >
               <span>{L('Νέα αιτήματα', 'New requests')}</span>
               <strong>{summary.newRequests}</strong>
-              <small>{L('Αγορά ή παράταση · Demo & τύποι χρήσης', 'Purchase or more time · Demo & plans')}</small>
+              <small>{L('Αγορά ή παράταση · Demo αξιολόγησης', 'Purchase or more time · Evaluation Demos')}</small>
             </button>
           </div>
 

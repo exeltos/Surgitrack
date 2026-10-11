@@ -52,7 +52,6 @@ const TraceabilityPage = lazyPage(() => import('../modules/traceability/Traceabi
 const ReportsPage = lazyPage(() => import('../modules/reports/ReportsPage'));
 const StudioPage = lazyPage(() => import('../modules/studio/StudioPage'));
 const HospitalAdminPage = lazyPage(() => import('../modules/hospital/HospitalAdminPage'));
-const HospitalsPage = lazyPage(() => import('../modules/hospital/HospitalsPage'));
 const HospitalOverviewPage = lazyPage(() => import('../modules/hospital/HospitalOverviewPage'));
 const JoinPage = lazyPage(() => import('../modules/auth/JoinPage'));
 
@@ -423,14 +422,8 @@ export default function App() {
               </Guard>
             }
           />
-          <Route
-            path="/hospitals"
-            element={
-              <Guard permission="studio.manage">
-                <HospitalsPage />
-              </Guard>
-            }
-          />
+          {/* The hospitals list lives in Studio, with each hospital's plan (it used to be two lists). */}
+          <Route path="/hospitals" element={<Navigate to="/studio?tab=platform" replace />} />
           <Route
             path="/hospital"
             element={

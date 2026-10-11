@@ -24,7 +24,11 @@ import RatingsTab from './tabs/RatingsTab';
 /** With the owner's menu each section is a page: its own one-line description under its title. */
 const SECTION_TEXT: Record<Tab, [string, string]> = {
   OVERVIEW: ['Τι χρειάζεται προσοχή σήμερα σε όλα τα νοσοκομεία.', 'What needs attention today across hospitals.'],
-  PLATFORM: ['Τύπος χρήσης κάθε νοσοκομείου και τα Demo.', 'Each hospital’s plan and the Demos.'],
+  PLATFORM: ['Τύπος χρήσης, κατάσταση και είσοδος σε κάθε νοσοκομείο.', 'Plan, state and entry for each hospital.'],
+  DEMOS: [
+    'Demo με δοκιμαστικά δεδομένα, για παρουσίαση σε υποψήφιους πελάτες.',
+    'Demos with sample data, to show prospective customers.',
+  ],
   USERS: ['Οι χρήστες όλων των νοσοκομείων, ανά νοσοκομείο και ρόλο.', 'Every hospital’s users, by hospital and role.'],
   IMPORT: [
     'Μαζική εισαγωγή Σετ και εργαλείων σε ένα νοσοκομείο.',

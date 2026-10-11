@@ -97,7 +97,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     overview,
     ...assetNavigation,
     {to: '/hospital', label: 'Χρήστες & Τμήματα', icon: Building2, permission: 'studio.manage', group: 'ADMIN'},
-    {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'ADMIN'},
+    {to: '/studio?tab=platform', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'ADMIN'},
     {to: '/studio', label: 'SurgiTrack Studio', icon: Settings, permission: 'studio.manage', group: 'ADMIN'},
   ];
   return adminNavigation.filter(item => allowed(item.permission));
@@ -135,11 +135,11 @@ export const homePathFor = (role: UserRole, can?: (permission: Permission) => bo
  */
 export const ownerNavigation: NavigationItem[] = [
   {to: '/studio?tab=overview', label: 'Επισκόπηση', icon: Gauge, permission: 'studio.manage', group: 'PLATFORM'},
-  {to: '/hospitals', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'PLATFORM'},
+  {to: '/studio?tab=platform', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'PLATFORM'},
   {to: '/studio?tab=users', label: 'Χρήστες', icon: Users, permission: 'studio.manage', group: 'PLATFORM'},
   {
-    to: '/studio?tab=platform',
-    label: 'Demo & τύποι χρήσης',
+    to: '/studio?tab=demos',
+    label: 'Demo αξιολόγησης',
     icon: FlaskConical,
     permission: 'studio.manage',
     group: 'PLATFORM',

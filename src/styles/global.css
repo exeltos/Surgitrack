@@ -563,138 +563,6 @@
 }
 
 /* Platform admin: all hospitals */
-.hospitals-page {
-  display: grid;
-  gap: 16px;
-}
-.hospitals-actions {
-  display: flex;
-  gap: 8px;
-}
-.hospitals-current {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  border: 1px solid var(--c-cyan-90);
-  border-radius: 10px;
-  background: var(--c-gray-95);
-  color: var(--c-cyan-45);
-  font-size: 13px;
-}
-.hospitals-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.hospitals-toolbar > .studio-search {
-  flex: 1;
-  margin: 0 !important;
-}
-.hospitals-head,
-.hospitals-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.8fr) 90px 100px 90px minmax(0, 1.1fr) 110px 170px;
-  align-items: center;
-  gap: 12px;
-}
-.hospitals-head {
-  padding: 0 12px;
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.hospitals-row {
-  padding: 10px 12px;
-  border: 1px solid var(--c-gray-95);
-  border-radius: 10px;
-  font-size: 13px;
-  color: var(--c-cyan-30);
-}
-.hospitals-row.current {
-  border-color: #8fcfdb;
-  background: var(--c-gray-100-2);
-}
-.hospitals-row.inactive {
-  opacity: 0.65;
-}
-.hospitals-row.editing {
-  grid-template-columns: minmax(0, 1.8fr) 160px auto auto;
-  justify-content: start;
-}
-.hospitals-row.editing input {
-  height: 36px;
-  min-width: 0;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 8px;
-  padding: 0 9px;
-  font-size: 13px;
-}
-.hospitals-name {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.hospitals-name b {
-  color: var(--c-blue-15);
-  font-size: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.hospitals-name small {
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 700;
-}
-.hospitals-badge {
-  display: inline-block;
-  min-width: 22px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--c-amber-95-2);
-  color: var(--c-orange-45-4);
-  font-style: normal;
-  font-weight: 800;
-  text-align: center;
-}
-.hospitals-link {
-  color: var(--c-cyan-50-2);
-  font-size: 12px;
-}
-.hospitals-row-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-.hospitals-icon {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 8px;
-  background: var(--c-white);
-  color: var(--c-blue-40);
-  cursor: pointer;
-}
-.hospitals-row-actions .app-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-.hospitals-here {
-  color: var(--c-cyan-45);
-  font-size: 12px;
-  font-weight: 800;
-}
-.hospitals-empty {
-  padding: 20px 12px;
-}
 
 /* Hospital overview (admin home inside a hospital) */
 .hospital-overview {
@@ -738,7 +606,6 @@
 }
 
 /* The app shell's content pane does not scroll, so these pages scroll themselves. */
-.hospitals-page,
 .hospital-overview,
 .hospital-admin,
 .name-check,
@@ -749,15 +616,6 @@
   overflow-y: auto;
   align-content: start;
   padding-bottom: 8px;
-}
-@media (max-width: 1100px) {
-  .hospitals-list {
-    overflow-x: auto;
-  }
-  .hospitals-head,
-  .hospitals-row:not(.editing) {
-    min-width: 900px;
-  }
 }
 .hospital-whole {
   display: flex;
@@ -11604,32 +11462,6 @@ html body .department-status-tabs button {
 /* Hospitals and the Studio's hospital status on a phone: one card per hospital, every figure labelled and
    «Είσοδος» always in view (the table hid the requests, the link and the actions past the right edge). */
 @media (max-width: 700px) {
-  html body .hospitals-list {
-    overflow-x: visible;
-  }
-  html body .hospitals-head {
-    display: none;
-  }
-  html body .hospitals-row:not(.editing) {
-    min-width: 0;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px 10px;
-  }
-  html body .hospitals-row:not(.editing) > .hospitals-name,
-  html body .hospitals-row:not(.editing) > .hospitals-link {
-    grid-column: 1 / -1;
-  }
-  html body .hospitals-row:not(.editing) > .hospitals-row-actions {
-    grid-column: 2 / -1;
-    justify-content: flex-end;
-  }
-  html body .hospitals-row > [data-label]::before {
-    content: attr(data-label);
-    display: block;
-    color: var(--st-muted);
-    font-size: 11px;
-    font-weight: 600;
-  }
   html body .owner-hospitals-scroll {
     overflow-x: visible;
   }
@@ -11782,4 +11614,19 @@ html body .evaluation-demo-empty-card span {
    desktop layout hid it, which left the box empty but for the profile name). */
 html body .studio-section-page .studio-body-workflow .studio-workflow-hero p {
   display: block;
+}
+/* The hospital the owner is working in: said in place of its «Είσοδος». */
+html body .platform-here {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* Hospitals list: the code and counts under a name meet the contrast ratio (the lighter cyan did not). */
+html body .platform-hospital-name small {
+  color: var(--st-muted);
 }

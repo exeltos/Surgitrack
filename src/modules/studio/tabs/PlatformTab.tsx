@@ -19,74 +19,55 @@ import {hospitalRoleKinds, hospitalRoleNames, type HospitalRoleKind} from '../..
 import type {Organization} from '../../../core/LibraryStore';
 import {trialEndAfter, trialEnded} from '../../../core/trial';
 import PlanBadge from '../PlanBadge';
+import {activeHospitalId, switchHospital} from '../../../data/cloud/hospitalSwitch';
 import DemoAccountsPanel from '../demo/DemoAccountsPanel';
 import type {StudioPageState} from '../useStudioPage';
 
-type View = 'HOSPITALS' | 'EVALUATION' | 'PRIVATE';
+type DemoView = 'EVALUATION' | 'PRIVATE';
 const VIEW_KEY = 'surgitrack-platform-view';
-const readView = (): View => {
+const readView = (): DemoView => {
   try {
-    const saved = sessionStorage.getItem(VIEW_KEY);
-    return saved === 'EVALUATION' || saved === 'PRIVATE' ? saved : 'HOSPITALS';
+    return sessionStorage.getItem(VIEW_KEY) === 'PRIVATE' ? 'PRIVATE' : 'EVALUATION';
   } catch {
-    return 'HOSPITALS';
+    return 'EVALUATION';
   }
 };
 
+/**
+ * Two sections of the platform: «Νοσοκομεία», every customer hospital with its plan, state and «Είσοδος»
+ * (one list, where the plan and the hospital list used to be two), and «Demo αξιολόγησης», the prospects'
+ * Demos with sample data plus the owner's own practice Demo.
+ */
 export default function PlatformTab({s}: {s: StudioPageState}) {
   const {L, displayedOrganizations, displayedUsers, libs, platformAdmin, setOrganizationEditor, tab} = s;
-  const [view, setViewState] = useState<View>(readView);
+  const [view, setViewState] = useState<DemoView>(readView);
   const [creatingDemo, setCreatingDemo] = useState(false);
   const cloud = libs.dataMode === 'PRODUCTION';
-  const setView = (next: View) => {
+  const setView = (next: DemoView) => {
     setViewState(next);
     try {
       sessionStorage.setItem(VIEW_KEY, next);
     } catch {
-      // Without storage the view simply opens on Hospitals next time.
+      // Without storage the view simply opens on the evaluation Demos next time.
     }
   };
-  if (tab !== 'PLATFORM' || !platformAdmin) return null;
-  const trials = displayedOrganizations.filter(org => org.plan === 'TRIAL');
-  const views: Array<{id: View; label: string; count?: number}> = [
-    {id: 'HOSPITALS', label: L('Νοσοκομεία', 'Hospitals'), count: displayedOrganizations.length},
-    ...(cloud ? [{id: 'EVALUATION' as const, label: L('Demo αξιολόγησης', 'Evaluation Demos')}] : []),
-    {id: 'PRIVATE', label: L('Δικό μου Demo', 'My Demo')},
-  ];
-  const current = !cloud && view === 'EVALUATION' ? 'HOSPITALS' : view;
-  return (
-    <section className="studio-manager-panel studio-platform-panel">
-      <header className="studio-panel-head">
-        <div>
-          <span className="eyebrow">{L('ΠΛΑΤΦΟΡΜΑ', 'PLATFORM')}</span>
-          <h2>{L('Demo & τύποι χρήσης', 'Demo & plans')}</h2>
-          <p>
-            {L(
-              'Οι πελάτες της πλατφόρμας, τα Demo των υποψήφιων πελατών και το δικό σας περιβάλλον πρακτικής.',
-              'The platform’s customers, the prospects’ Demos and your own practice environment.',
-            )}
-          </p>
-        </div>
-        <div className="platform-head-actions">
-          {cloud && (
-            <AppButton
-              onClick={() => {
-                setView('EVALUATION');
-                setCreatingDemo(true);
-              }}
-            >
-              <FlaskConical size={16} />
-              {L('Νέο Demo αξιολόγησης', 'New evaluation Demo')}
+  if ((tab !== 'PLATFORM' && tab !== 'DEMOS') || !platformAdmin) return null;
+  if (tab === 'PLATFORM') {
+    const trials = displayedOrganizations.filter(org => org.plan === 'TRIAL');
+    return (
+      <section className="studio-manager-panel studio-platform-panel">
+        <header className="studio-panel-head">
+          <div>
+            <span className="eyebrow">{L('ΠΛΑΤΦΟΡΜΑ', 'PLATFORM')}</span>
+            <h2>{L('Νοσοκομεία', 'Hospitals')}</h2>
+          </div>
+          <div className="platform-head-actions">
+            <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}>
+              <Plus size={16} />
+              {L('Νέο νοσοκομείο', 'New hospital')}
             </AppButton>
-          )}
-          <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}>
-            <Plus size={16} />
-            {L('Νέο νοσοκομείο', 'New hospital')}
-          </AppButton>
-        </div>
-      </header>
-      {/* The hospital figures belong with the hospitals, not with the Demos. */}
-      {current === 'HOSPITALS' && (
+          </div>
+        </header>
         <div className="platform-kpis">
           <div>
             <span>{L('Νοσοκομεία', 'Hospitals')}</span>
@@ -105,21 +86,61 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
             <strong>{displayedUsers.length}</strong>
           </div>
         </div>
+        <HospitalList s={s} />
+      </section>
+    );
+  }
+  const views: Array<{id: DemoView; label: string}> = [
+    ...(cloud ? [{id: 'EVALUATION' as const, label: L('Demo υποψήφιων πελατών', 'Prospects’ Demos')}] : []),
+    {id: 'PRIVATE', label: L('Δικό μου Demo', 'My Demo')},
+  ];
+  const current: DemoView = !cloud ? 'PRIVATE' : view;
+  return (
+    <section className="studio-manager-panel studio-platform-panel">
+      <header className="studio-panel-head">
+        <div>
+          <span className="eyebrow">{L('ΠΛΑΤΦΟΡΜΑ', 'PLATFORM')}</span>
+          <h2>{L('Demo αξιολόγησης', 'Evaluation Demos')}</h2>
+          <p>
+            {L(
+              'Δεν είναι πραγματικό νοσοκομείο: για πελάτη που ξεκινά, ανοίξτε «Νέο νοσοκομείο» με δοκιμαστική περίοδο.',
+              'Not a real hospital: for a customer who is starting, open a «New hospital» on trial.',
+            )}
+          </p>
+        </div>
+        {cloud && (
+          <div className="platform-head-actions">
+            <AppButton
+              variant="primary"
+              title={L(
+                'Με δοκιμαστικά δεδομένα, για παρουσίαση σε υποψήφιο πελάτη',
+                'With sample data, to show a prospective customer',
+              )}
+              onClick={() => {
+                setView('EVALUATION');
+                setCreatingDemo(true);
+              }}
+            >
+              <FlaskConical size={16} />
+              {L('Νέο Demo αξιολόγησης', 'New evaluation Demo')}
+            </AppButton>
+          </div>
+        )}
+      </header>
+      {views.length > 1 && (
+        <nav className="platform-views" aria-label={L('Ενότητες', 'Sections')}>
+          {views.map(v => (
+            <button
+              key={v.id}
+              className={current === v.id ? 'active' : ''}
+              aria-pressed={current === v.id}
+              onClick={() => setView(v.id)}
+            >
+              {v.label}
+            </button>
+          ))}
+        </nav>
       )}
-      <nav className="platform-views" aria-label={L('Ενότητες', 'Sections')}>
-        {views.map(v => (
-          <button
-            key={v.id}
-            className={current === v.id ? 'active' : ''}
-            aria-pressed={current === v.id}
-            onClick={() => setView(v.id)}
-          >
-            {v.label}
-            {v.count !== undefined && <b>{v.count}</b>}
-          </button>
-        ))}
-      </nav>
-      {current === 'HOSPITALS' && <HospitalList s={s} />}
       {current === 'EVALUATION' && <DemoAccountsPanel creating={creatingDemo} onCreatingChange={setCreatingDemo} />}
       {current === 'PRIVATE' && <PrivateDemo s={s} />}
     </section>
@@ -178,6 +199,14 @@ function HospitalList({s}: {s: StudioPageState}) {
                 <Users size={15} />
                 {L('Διαχείριση', 'Manage')}
               </AppButton>
+              {org.id === activeHospitalId() ? (
+                <span className="platform-here">{L('Εδώ εργάζεστε', 'Working here')}</span>
+              ) : (
+                <AppButton variant="primary" disabled={!org.active} onClick={() => switchHospital(org.id)}>
+                  <LogIn size={15} />
+                  {L('Είσοδος', 'Enter')}
+                </AppButton>
+              )}
               <ActionMenu
                 icon={<MoreHorizontal size={15} />}
                 label={L('Ενέργειες', 'Actions')}
