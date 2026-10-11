@@ -2,7 +2,10 @@
 /**
  * End-to-end test of the main flow, through the real screens: a department sends a Set to Sterilization,
  * Sterilization receives, washes, prepares, packs, loads the sterilizer, records the cycle, releases and
- * delivers it, and the department finds it ready. Two people, each in their own browser, work on one hospital
+ * delivers it, and the department finds it ready. Then the other paths: a barcode scanner opening an item where it
+ * is (a receipt signed by someone of another department, with the reason), a failed indicator sending a whole load
+ * back, an expired Set shown as expired, and the admin replacing an instrument from Stock and ordering a lost one.
+ * Three people, each in their own browser, work on one hospital
  * (the screens harness's mocked Supabase, see scripts/screens/mock-supabase.mjs); what the app saved is checked
  * in that database after each step. The database's own rules (row security, triggers) are covered by
  * supabase/tests.
@@ -416,6 +419,131 @@ async function main() {
       await page.getByText('Στο τμήμα').first().waitFor();
       const history = db.movements.filter(m => String(m.asset).startsWith(set.barcode)).length;
       if (history < 8) throw new Error(`only ${history} movements recorded for the Set`);
+    });
+
+    // ---------- beyond the main flow
+
+    await step('A scanner opens a Set where it is: receipt', async () => {
+      // A complete Set waiting at Sterilization, with no open issue (those have a flow of their own).
+      const pending = db.instrument_sets.find(
+        s =>
+          s.state === 'PENDING_STERILIZATION' &&
+          members(s.id).length === s.expected &&
+          !db.issues.some(i => i.status === 'OPEN' && String(i.asset).startsWith(s.barcode)),
+      );
+      if (!pending) throw new Error('no complete Set waiting at Sterilization');
+      const {page} = sterilization;
+      await open(sterilization, '/sterilization');
+      // A keyboard-wedge scanner types the barcode and Enter into the focused search field.
+      await page.getByLabel('Αναζήτηση & σάρωση').click();
+      await page.keyboard.type(pending.barcode);
+      await page.keyboard.press('Enter');
+      const modal = page.locator('.modal-backdrop').last();
+      await modal.getByText(pending.barcode).first().waitFor();
+      await signHandover(page, ACCOUNTS.DEPARTMENT);
+      if (pending.department !== ACCOUNTS.DEPARTMENT.department) {
+        // Signed by someone of another department: the receipt waits for the reason.
+        const confirm = page.getByRole('button', {name: 'Επιβεβαίωση φυσικής παραλαβής'});
+        if (await confirm.isEnabled()) throw new Error('receipt possible without the reason for another department');
+        await modal.getByPlaceholder(/εξουσιοδοτημένη μεταφορά/).fill('Μεταφορά από τον τραυματιοφορέα της βάρδιας');
+      }
+      await page.getByRole('button', {name: 'Χωρίς εμφανή απόκλιση'}).click();
+      await page.getByRole('button', {name: 'Επιβεβαίωση φυσικής παραλαβής'}).click();
+      await saved(sterilization);
+      expectEqual(row('instrument_sets', pending.id).state, 'IN_WASHING', 'state saved');
+    });
+
+    await step('A failed indicator sends the whole load back', async () => {
+      const load = db.process_loads.find(l => l.kind === 'STERILIZATION' && l.status === 'AWAITING_RELEASE');
+      if (!load) throw new Error('no load awaiting release');
+      const ids = load.items.map(i => i.assetId);
+      const {page} = sterilization;
+      await queue('Αποδέσμευση');
+      await page.getByRole('button', {name: /^Αποδέσμευση φορτίου/}).click();
+      const modal = page.locator('.modal-backdrop').last();
+      // With one load waiting, the dialog opens on it (no load picker).
+      const picker = modal.locator('select').filter({has: page.locator(`option[value="${load.id}"]`)});
+      if (await picker.count()) await picker.selectOption(load.id);
+      await modal.getByText(`κύκλος ${load.cycle_number}`).waitFor();
+      await modal.getByLabel('Χημικός δείκτης').selectOption('FAIL');
+      await modal.getByText('Ανεπιτυχής δείκτης').waitFor();
+      // Release is refused while an indicator failed: only "not released" is left.
+      if (await modal.getByRole('button', {name: /^Αποδέσμευση φορτίου · /}).isEnabled())
+        throw new Error('release still possible with a failed indicator');
+      await modal.getByRole('button', {name: 'Μη αποδέσμευση · όλο το φορτίο'}).click();
+      await saved(sterilization);
+      expectEqual(row('process_loads', load.id).status, 'REPROCESS', 'load status');
+      for (const id of ids) {
+        // Back to the first stage after receipt (washing), never released.
+        expectEqual(row('instrument_sets', id).state, 'IN_WASHING', `state of ${id}`);
+        const release = db.sterilization_releases.find(r => r.asset_id === id && r.load_id === load.id);
+        expectEqual(release?.decision, 'REPROCESS', `release decision of ${id}`);
+      }
+    });
+
+    await step('An expired Set shows up as expired', async () => {
+      // Its sterility ran out (the date the release gave it, moved into the past).
+      const saved = row('instrument_sets', setId);
+      saved.extra = {...(saved.extra || {}), sterileUntil: '2026-01-15'};
+      saved.updated_at = new Date().toISOString();
+      // The department sees it on its own list…
+      await refresh(department);
+      await open(department, '/department');
+      const mine = department.page.locator('.department-asset-row, tr, li, a').filter({hasText: set.barcode}).first();
+      await mine.getByText(/Έληξε/).first().waitFor();
+      // …and Sterilization on the Expiry screen.
+      await refresh(sterilization);
+      await open(sterilization, '/expiry');
+      await sterilization.page
+        .locator('tr')
+        .filter({hasText: set.barcode})
+        .first()
+        .getByText(/Έληξε/)
+        .first()
+        .waitFor();
+    });
+
+    const admin = await person(browser, base, db, 'ADMIN');
+    people.push(admin);
+
+    await step('Admin replaces an instrument from Stock', async () => {
+      const {page} = admin;
+      await open(admin, '/replacements');
+      // The first instrument that needs replacing and has a Stock instrument of its kind.
+      await page.getByRole('button', {name: /^Με απόθεμα/}).click();
+      const box = page.locator('.replacements-fixed tbody input[type=checkbox]').first();
+      const barcode = await box.getAttribute('aria-label');
+      const out = db.instruments.find(t => t.barcode === barcode);
+      if (!out) throw new Error(`no instrument ${barcode}`);
+      const stockBefore = db.instruments.filter(t => t.state === 'IN_STOCK' && t.code === out.code).map(t => t.id);
+      await box.check();
+      await page.getByRole('button', {name: /^Αντικατάσταση από Απόθεμα \(1\)/}).click();
+      await page.getByRole('button', {name: 'Αντικατάσταση', exact: true}).last().click();
+      await saved(admin);
+      // One Stock instrument of the same code went into a Set; the replaced one names it.
+      const incoming = stockBefore.map(id => row('instruments', id)).find(t => t.state !== 'IN_STOCK');
+      if (!incoming?.set_id) throw new Error('no Stock instrument went into a Set');
+      const replacedBy = row('instruments', out.id).extra?.replacedBy ?? row('instruments', out.id).replaced_by;
+      expectEqual(replacedBy, incoming.barcode, 'replaced by');
+    });
+
+    await step('Admin orders a lost instrument', async () => {
+      const lost = db.instruments.find(t => t.state === 'LOST');
+      if (!lost) throw new Error('no lost instrument');
+      const before = new Set(db.purchase_orders.map(o => o.id));
+      const {page} = admin;
+      await open(admin, '/replacements');
+      await page.getByRole('checkbox', {name: lost.barcode}).check();
+      await page.getByRole('button', {name: 'Παραγγελία αγοράς'}).click();
+      const dialog = page.getByRole('dialog', {name: 'Νέα παραγγελία αγοράς'});
+      await dialog.getByText(lost.code).first().waitFor();
+      await dialog.getByRole('button', {name: 'Καταχώρηση παραγγελίας'}).click();
+      await page.getByRole('button', {name: 'Καταχώρηση', exact: true}).click();
+      await saved(admin);
+      const added = db.purchase_orders.filter(o => !before.has(o.id));
+      expectEqual(added.length, 1, 'new purchase orders');
+      const line = added[0].lines.find(l => l.code === lost.code);
+      if (!line || !line.toolIds?.includes(lost.id)) throw new Error('the order does not name the lost instrument');
     });
 
     if (process.env.E2E_LOOK) {

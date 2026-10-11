@@ -68,6 +68,7 @@ export function buildSeed(organizationId: string, scale = 1) {
     deliveries: store.deliveries || [],
     purchaseOrders: store.purchaseOrders || [],
     preparations: store.preparations || [],
+    sterilizationCycles: store.sterilizationCycles || [],
     sterilizationReleases: store.sterilizationReleases || [],
     counts: store.counts || [],
     library: [library],

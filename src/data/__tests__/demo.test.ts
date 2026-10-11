@@ -29,4 +29,18 @@ describe('demo hospital', () => {
     ])
       expect(states.has(state as never)).toBe(true);
   });
+  it('has the passed cycle of every item of a load waiting for release (a release cites it)', () => {
+    const cycles = data.sterilizationCycles || [];
+    const waiting = (data.processLoads || []).filter(load => load.status === 'AWAITING_RELEASE');
+    expect(waiting.length).toBeGreaterThan(0);
+    for (const load of waiting)
+      for (const item of load.items)
+        expect(cycles.some(c => c.loadId === load.id && c.assetId === item.assetId && c.result === 'PASSED')).toBe(
+          true,
+        );
+  });
+  it('has the cycle each release cites', () => {
+    const cycles = new Set((data.sterilizationCycles || []).map(c => c.id));
+    for (const release of data.sterilizationReleases || []) expect(cycles.has(release.cycleRecordId)).toBe(true);
+  });
 });

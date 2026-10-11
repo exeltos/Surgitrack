@@ -11,6 +11,7 @@ import type {
   PurchaseOrder,
   ReceiptRecord,
   SetAsset,
+  SterilizationCycleRecord,
   SterilizationReleaseRecord,
   Tool,
 } from '../types/domain';
@@ -1254,6 +1255,72 @@ export const processLoads: ProcessLoadRecord[] = [
     completedAt: '28/09/2026 07:05',
     releasedAt: '28/09/2026 07:40',
   },
+];
+/**
+ * The sterilizer cycles behind the finished loads and the sterile Sets: a release cites its cycle, so a load
+ * waiting for release can be released (or sent back) in the Demo like in a hospital.
+ */
+const demoCycle = (
+  id: string,
+  set: SetAsset | undefined,
+  load: {loadId?: string; sterilizer: string; cycleNumber: string; program: string; completedAt: string},
+): SterilizationCycleRecord[] =>
+  set
+    ? [
+        {
+          id,
+          workflowVersion: 1,
+          loadId: load.loadId,
+          assetId: set.id,
+          assetKind: 'SET',
+          barcode: set.barcode,
+          assetName: set.name,
+          department: set.department,
+          sterilizer: load.sterilizer,
+          cycleNumber: load.cycleNumber,
+          program: load.program,
+          indicatorResult: 'PASS',
+          result: 'PASSED',
+          completedByUserId: 'demo-sterilization',
+          completedByName: people.ster,
+          completedByDepartment: 'Κεντρική Αποστείρωση',
+          completedAt: load.completedAt,
+          toolIds: tools.filter(tool => tool.setId === set.id).map(tool => tool.id),
+        },
+      ]
+    : [];
+export const sterilizationCycles: SterilizationCycleRecord[] = [
+  ...processLoads
+    .filter(load => load.status !== 'OPEN' && load.completedAt)
+    .flatMap(load =>
+      load.items.flatMap(item =>
+        demoCycle(
+          `cyc-${load.id}-${item.assetId}`,
+          sets.find(set => set.id === item.assetId),
+          {
+            loadId: load.id,
+            sterilizer: load.equipment,
+            cycleNumber: load.cycleNumber,
+            program: load.program,
+            completedAt: load.completedAt!,
+          },
+        ),
+      ),
+    ),
+  ...sterilizationReleases
+    .filter(release => release.cycleRecordId.startsWith('cyc-demo-'))
+    .flatMap(release =>
+      demoCycle(
+        release.cycleRecordId,
+        sets.find(set => set.id === release.assetId),
+        {
+          sterilizer: release.sterilizer,
+          cycleNumber: release.cycleNumber,
+          program: '134°C · 5′',
+          completedAt: release.releasedAt,
+        },
+      ),
+    ),
 ];
 const handover = {workflowVersion: 1, assetKind: 'SET' as const};
 export const receipts: ReceiptRecord[] = [

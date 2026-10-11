@@ -36,8 +36,9 @@ export const seedDemoOrganization = async (
     receipts: store.receipts || [],
     deliveries: store.deliveries || [],
     purchaseOrders: store.purchaseOrders || [],
-    // Who composed and released the sterile Sets, and the counts in theatre.
+    // Who composed and released the sterile Sets (with the sterilizer cycles they cite), and the counts in theatre.
     preparations: store.preparations || [],
+    sterilizationCycles: store.sterilizationCycles || [],
     sterilizationReleases: store.sterilizationReleases || [],
     counts: store.counts || [],
     library: [library],
