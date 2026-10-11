@@ -38,7 +38,8 @@ export default function PrintPreviewModal({
         </header>
         <div className={`print-preview-main${aside ? ' with-aside' : ''}`}>
           <div className="print-preview-body">
-            <iframe id={frameId} title={title} srcDoc={markPrintHtml(html)} />
+            {/* No script runs in the printed page (its data is escaped too); printing from here stays allowed. */}
+            <iframe id={frameId} title={title} sandbox="allow-same-origin allow-modals" srcDoc={markPrintHtml(html)} />
           </div>
           {aside && <aside className="print-preview-aside">{aside}</aside>}
         </div>

@@ -41,10 +41,14 @@ Deno.serve(async req => {
     const key = `stk_${hex(crypto.getRandomValues(new Uint8Array(24)))}`;
     const hash = hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key)));
     const {error} = await admin.from("device_keys").upsert({device_id: device.id, key_hash: hash, created_at: new Date().toISOString()});
-    if (error) return json({error: "failed", message: error.message}, 500);
+    if (error) {
+      console.error("device-key", error.message);
+      return json({error: "failed"}, 500);
+    }
     await admin.from("devices").update({key_hint: key.slice(-4), connection: "API"}).eq("id", device.id);
     return json({ok: true, key});
   } catch (e) {
-    return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);
+    console.error("device-key", e instanceof Error ? e.message : e);
+    return json({error: "failed"}, 500);
   }
 });
