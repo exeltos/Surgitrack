@@ -131,7 +131,10 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       setCacheOwner(owner);
       const collections: CloudCollection[] = [...STORE_COLLECTIONS, 'library'];
       const copy = await readCache(owner, collections);
-      const fromCopy = collections.every(collection => copy[collection] && !copy[collection]!.expired);
+      // A Demo can be reset (emptied on the server, refilled on the next entry): it always opens from the
+      // server, so a copy kept from before the reset never hides that it is empty and needs refilling.
+      const fromCopy =
+        !demo && !evaluation && collections.every(collection => copy[collection] && !copy[collection]!.expired);
       let records: CloudRecords;
       if (fromCopy) {
         records = Object.fromEntries(collections.map(c => [c, copy[c]!.items])) as unknown as CloudRecords;
