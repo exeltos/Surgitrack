@@ -541,6 +541,7 @@ export function useLoadActions(
       deliveredByUserId: currentUser.id,
       deliveredByName: currentUser.name,
       deliveredByDepartment: currentUser.department,
+      handoverSignatureId: payload.handoverSignatureId,
       receivedByUserId: payload.receivedByUserId,
       receivedByName: payload.receivedByName,
       receivedByDepartment: payload.receivedByDepartment,

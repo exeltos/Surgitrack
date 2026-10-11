@@ -190,6 +190,7 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                       department={receiptBatchDepartment}
                       disabled={!receiptBatchDepartment}
                       signer={receiptBatchDeliverer}
+                      assetIds={receiptBatchAssets.map(item => item.id)}
                       onSigned={setReceiptBatchDeliverer}
                     />
                     {receiptBatchDeliverer &&

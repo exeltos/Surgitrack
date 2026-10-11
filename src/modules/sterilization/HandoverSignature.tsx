@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {KeyRound, PenLine} from 'lucide-react';
 import {DEMO_HANDOVER_PEOPLE, isDemoHandover, verifyHandover, type HandoverSigner} from '../../data/cloud/handover';
 import {tr, trData} from '../../i18n';
@@ -13,6 +13,8 @@ const REASON_TEXT = {
 /**
  * The other party of a handover signs with their own user code + password.
  * The signed-in Sterilization user is recorded automatically as the other side.
+ * One signature covers the items on screen (`assetIds`) for this handover only: when they change after
+ * signing, the signature is dropped and the other party signs again for what is now handed over.
  */
 export default function HandoverSignature({
   label,
@@ -21,8 +23,11 @@ export default function HandoverSignature({
   onSigned,
   disabled,
   autoFocus,
+  assetIds = [],
 }: {
   label: string;
+  /** The Sets and instruments of this handover. */
+  assetIds?: string[];
   /** The department the handover concerns, for the demo hint. */
   department?: string;
   signer: HandoverSigner | null;
@@ -36,16 +41,24 @@ export default function HandoverSignature({
   const [error, setError] = useState('');
   const demo = isDemoHandover();
   const demoPerson = demo && department ? DEMO_HANDOVER_PEOPLE.find(p => p.department === department) : undefined;
+  const itemsKey = [...assetIds].sort().join('|');
+  const signedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!signer) signedFor.current = null;
+    else if (signedFor.current !== null && signedFor.current !== itemsKey) onSigned(null);
+  }, [itemsKey, signer, onSigned]);
 
   const sign = async (userCode = code, secret = password) => {
     if (busy || !userCode.trim() || !secret) return;
     setBusy(true);
     setError('');
-    const result = await verifyHandover(userCode, secret);
+    const result = await verifyHandover(userCode, secret, assetIds);
     setBusy(false);
     setPassword('');
-    if (result.ok) onSigned(result.signer);
-    else setError(tr(REASON_TEXT[result.reason]));
+    if (result.ok) {
+      signedFor.current = itemsKey;
+      onSigned(result.signer);
+    } else setError(tr(REASON_TEXT[result.reason]));
   };
 
   if (signer)

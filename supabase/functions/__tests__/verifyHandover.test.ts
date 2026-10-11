@@ -176,10 +176,25 @@ describe('verify-handover: a confirmed handover', () => {
     expect((await sign()).status).toBe(200);
   });
 
-  it('records the signature: who signed, for whom, in which hospital', async () => {
+  it('records the signature: who signed, for whom, in which hospital, for no item when none is named', async () => {
     await sign();
     const record = fake.dbCalls('insert').find(c => c.table === 'handover_signatures');
-    expect(record?.values).toEqual({organization_id: 'org-1', signer_id: 'person-2', witness_id: 'sterilization-1'});
+    expect(record?.values).toEqual({
+      organization_id: 'org-1',
+      signer_id: 'person-2',
+      witness_id: 'sterilization-1',
+      asset_ids: [],
+    });
+  });
+
+  it('records what is handed over, and returns the signature for the handover records to cite', async () => {
+    const answer = fake.db;
+    fake.db = call =>
+      call.table === 'handover_signatures' ? {data: {id: 'sig-1'}, error: null} : answer(call);
+    const response = await sign({...credentials, asset_ids: ['set-1', 'tool-2', 'set-1', '', 7]});
+    const record = fake.dbCalls('insert').find(c => c.table === 'handover_signatures');
+    expect((record?.values as {asset_ids: string[]}).asset_ids).toEqual(['set-1', 'tool-2', '7']);
+    expect((await response.json()).signature_id).toBe('sig-1');
   });
 
   it('still answers when the signature could not be recorded (the handover is then unverified)', async () => {

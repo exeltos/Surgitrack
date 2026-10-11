@@ -136,6 +136,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                       label={tr('Υπογραφή παραδίδοντα (κωδικός χρήστη + συνθηματικό)')}
                       department={receiptDraft.asset.department}
                       signer={deliverer}
+                      assetIds={[receiptDraft.asset.id]}
                       onSigned={setDeliverer}
                     />
                     {deliverer &&
