@@ -128,10 +128,10 @@ export const helpManual: ManualSection[] = [
     guide: true,
     permission: 'studio.manage',
     openedFrom: ['/hospital'],
-    title: {el: 'Από την αγορά στη λειτουργία', en: 'From purchase to go-live'},
+    title: {el: 'Στήσιμο νοσοκομείου', en: 'Setting up the hospital'},
     summary: {
-      el: 'Τα βήματα του διαχειριστή του νοσοκομείου, με τη σειρά, από τον πρώτο λογαριασμό έως την πρώτη μέρα πραγματικής χρήσης.',
-      en: "The hospital administrator's steps, in order, from the first account to the first day of real use.",
+      el: 'Ο οδηγός του διαχειριστή: τα βήματα με τη σειρά, από την πρώτη σύνδεση έως την πρώτη μέρα πραγματικής χρήσης.',
+      en: "The administrator's guide: the steps in order, from the first sign-in to the first day of real use.",
     },
     audience: {el: 'Διαχειριστής νοσοκομείου', en: 'Hospital administrator'},
     chapters: [

@@ -255,7 +255,7 @@ export default function OwnerDashboard({
           </AppButton>
         </header>
         <div className="owner-hospitals-scroll">
-          <table>
+          <table className="owner-hospitals-table">
             <thead>
               <tr>
                 <th>{L('Νοσοκομείο', 'Hospital')}</th>
@@ -273,7 +273,7 @@ export default function OwnerDashboard({
                     <b>{r.org.name}</b>
                     <small>{r.org.code}</small>
                   </td>
-                  <td>
+                  <td data-label={L('Κατάσταση', 'Status')}>
                     <span
                       className={`owner-status ${
                         r.trial.ended ? 'stop' : !r.org.active ? 'off' : r.trial.warn ? 'warn' : ''
@@ -288,12 +288,14 @@ export default function OwnerDashboard({
                             : L('Κανονική χρήση', 'Standard')}
                     </span>
                   </td>
-                  <td>
+                  <td data-label={L('Χρήστες', 'Users')}>
                     {r.active}
                     <span className="muted"> / {r.users}</span>
                   </td>
-                  <td>{r.admins ? '✓' : <span className="owner-missing">{L('Λείπει', 'Missing')}</span>}</td>
-                  <td>{r.requests || '—'}</td>
+                  <td data-label={L('Διαχειριστής', 'Admin')}>
+                    {r.admins ? '✓' : <span className="owner-missing">{L('Λείπει', 'Missing')}</span>}
+                  </td>
+                  <td data-label={L('Αιτήματα', 'Requests')}>{r.requests || '—'}</td>
                   <td>
                     <AppButton size="sm" onClick={() => onOpenUsers(r.org.id)}>
                       {L('Χρήστες', 'Users')}

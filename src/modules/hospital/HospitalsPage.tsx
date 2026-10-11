@@ -245,10 +245,16 @@ export default function HospitalsPage() {
                 <b>{h.name}</b>
                 <small>{h.code}</small>
               </span>
-              <span>{s?.departments ?? '—'}</span>
-              <span>{s ? `${s.activeUsers} / ${s.users}` : '—'}</span>
-              <span>{s?.pending ? <em className="hospitals-badge">{s.pending}</em> : '0'}</span>
-              <span className="hospitals-link">
+              <span className="hospitals-stat" data-label={L('Τμήματα', 'Departments')}>
+                {s?.departments ?? '—'}
+              </span>
+              <span className="hospitals-stat" data-label={L('Χρήστες', 'Users')}>
+                {s ? `${s.activeUsers} / ${s.users}` : '—'}
+              </span>
+              <span className="hospitals-stat" data-label={L('Αιτήματα', 'Requests')}>
+                {s?.pending ? <em className="hospitals-badge">{s.pending}</em> : '0'}
+              </span>
+              <span className="hospitals-link" data-label={L('Σύνδεσμος εγγραφής', 'Signup link')}>
                 {s?.linkUntil ? L(`Ενεργός έως ${date(s.linkUntil)}`, `Active until ${date(s.linkUntil)}`) : '—'}
               </span>
               <button
