@@ -211,11 +211,11 @@ export default function AppShell({
     ),
   ];
   useEffect(() => {
-    if (!platformOnly) return;
-    // The Studio opens on a section, so one menu entry is always lit.
+    // The Studio opens on a section, so one menu entry is always lit: the platform's overview outside a
+    // hospital, the hospital's libraries inside one.
     if (location.pathname === '/studio' && !new URLSearchParams(location.search).get('tab'))
-      navigate('/studio?tab=overview', {replace: true});
-    else if (!PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
+      navigate(platformOnly ? '/studio?tab=overview' : '/studio?tab=libraries', {replace: true});
+    else if (platformOnly && !PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
       navigate('/studio?tab=overview', {replace: true});
   }, [platformOnly, location.pathname, location.search, navigate]);
   const returnFromDemo = () => {

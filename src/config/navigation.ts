@@ -5,7 +5,6 @@ import {
   Warehouse,
   TriangleAlert,
   BarChart3,
-  Settings,
   History,
   PackageSearch,
   Building2,
@@ -33,12 +32,14 @@ import type {Permission} from '../core/permissions';
 import {hasPermission} from '../core/permissions';
 
 /** The menu's sections, in the order of how often they are used: the day's work first, administration last. */
-export type NavigationGroup = 'WORK' | 'EQUIPMENT' | 'INSIGHT' | 'ADMIN' | 'PLATFORM' | 'CONTACT' | 'TEMPLATE';
+export type NavigationGroup =
+  'WORK' | 'EQUIPMENT' | 'INSIGHT' | 'ADMIN' | 'SETTINGS' | 'PLATFORM' | 'CONTACT' | 'TEMPLATE';
 export const navigationGroupLabel: Record<NavigationGroup, [string, string]> = {
   WORK: ['Καθημερινή εργασία', 'Daily work'],
   EQUIPMENT: ['Εξοπλισμός', 'Equipment'],
   INSIGHT: ['Ανάλυση', 'Insight'],
   ADMIN: ['Διαχείριση', 'Administration'],
+  SETTINGS: ['Ρυθμίσεις νοσοκομείου', 'Hospital settings'],
   // The platform owner's own menu (outside a hospital).
   PLATFORM: ['Πλατφόρμα', 'Platform'],
   CONTACT: ['Επικοινωνία & υγεία', 'Communication & health'],
@@ -98,7 +99,23 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     ...assetNavigation,
     {to: '/hospital', label: 'Χρήστες & Τμήματα', icon: Building2, permission: 'studio.manage', group: 'ADMIN'},
     {to: '/studio?tab=platform', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'ADMIN'},
-    {to: '/studio', label: 'SurgiTrack Studio', icon: Settings, permission: 'studio.manage', group: 'ADMIN'},
+    // The hospital's Studio sections are menu entries of their own (they were four tabs in one page).
+    {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'SETTINGS'},
+    {
+      to: '/studio?tab=workflow',
+      label: 'Ροή Αποστείρωσης',
+      icon: Layers3,
+      permission: 'studio.manage',
+      group: 'SETTINGS',
+    },
+    {
+      to: '/studio?tab=roles',
+      label: 'Ρόλοι & δικαιώματα',
+      icon: UserCog,
+      permission: 'studio.manage',
+      group: 'SETTINGS',
+    },
+    {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'SETTINGS'},
   ];
   return adminNavigation.filter(item => allowed(item.permission));
 };
