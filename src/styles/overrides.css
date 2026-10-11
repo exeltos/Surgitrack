@@ -96,9 +96,6 @@
 }
 
 /* Studio v0.29.6 — Hospital access workspace */
-.studio-users-panel > .studio-panel-head {
-  align-items: flex-start;
-}
 .studio-users-panel > .studio-panel-head select {
   min-width: 260px;
   height: 40px;
@@ -113,48 +110,15 @@
 .studio-users-panel > .studio-search {
   margin: 0 22px 12px !important;
 }
-@media (max-width: 900px) {
-  .studio-users-panel > .studio-panel-head {
-    flex-direction: column !important;
-  }
-  .studio-users-panel > .studio-panel-head select {
-    width: 100% !important;
-  }
-}
 
 /* Studio — hospital access tab: natural height, no stretched gaps */
 .studio-body-users {
   overflow-y: auto !important;
   padding-bottom: 4px;
 }
-.studio-users-panel {
-  display: flex !important;
-  flex-direction: column !important;
-  height: auto !important;
-  min-height: 100%;
-  overflow: visible !important;
-}
 .studio-users-panel > .studio-scroll-list {
   flex: 1 1 auto;
   min-height: 120px;
-}
-.hospital-users-empty {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 34px 16px;
-  color: var(--st-muted);
-  text-align: center;
-}
-.hospital-users-empty svg {
-  color: var(--c-cyan-70);
-}
-.hospital-users-empty strong {
-  color: var(--c-cyan-30);
-  font-size: 13px;
-}
-.hospital-users-empty small {
-  font-size: 12px;
 }
 
 /* Sign-in / signup pages: header and footer stay put, only the middle scrolls (the Greek copy
@@ -191,10 +155,6 @@
   display: grid;
   gap: 16px;
 }
-.overview-links {
-  display: flex;
-  gap: 8px;
-}
 .overview-links .app-button {
   display: inline-flex;
   align-items: center;
@@ -216,9 +176,6 @@
   flex: 1;
   display: grid;
   gap: 2px;
-}
-.overview-alert small {
-  color: var(--c-amber-40-3);
 }
 .hospital-card > header > a {
   color: var(--c-cyan-45);
@@ -370,56 +327,14 @@
 .studio-body-guide {
   overflow-y: auto;
 }
-.roles-guide {
-  padding: 4px 2px 24px;
-}
 .roles-guide header h2 {
   margin: 4px 0 16px;
-}
-.roles-guide-table {
-  border: 1px solid var(--line, var(--c-gray-90-2));
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--panel, var(--c-white));
-}
-.roles-guide-head,
-.roles-guide-row {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) minmax(130px, 1.2fr) minmax(150px, 1.4fr) minmax(170px, 1.8fr);
-  gap: 16px;
-  padding: 14px 18px;
-  align-items: start;
-}
-.roles-guide-head {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  border-bottom: 1px solid var(--line, var(--c-gray-90-2));
-}
-.roles-guide-row + .roles-guide-row {
-  border-top: 1px solid var(--line, var(--c-gray-90-2));
-}
-.roles-guide-row b {
-  display: flex;
-  gap: 8px;
-  align-items: center;
 }
 .roles-guide-row span {
   font-size: 13.5px;
   line-height: 1.5;
 }
 /* Narrow screens: each role becomes a stacked card instead of four columns. */
-@media (max-width: 900px) {
-  .roles-guide-head {
-    display: none;
-  }
-  .roles-guide-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-  }
-}
 .platform-private-demo {
   flex-direction: column;
   align-items: stretch;
@@ -429,16 +344,7 @@
   flex-wrap: wrap;
   align-items: center;
 }
-.platform-private-demo-actions .platform-demo-reset {
-  margin-left: auto;
-}
 /* Eight Studio tabs fit one row on desktop. */
-@media (min-width: 1100px) {
-  .studio-tabs button {
-    padding: 8px 6px;
-    gap: 5px;
-  }
-}
 .roles-guide-row b svg {
   flex-shrink: 0;
   color: var(--primary, var(--c-cyan-40));
@@ -1086,9 +992,6 @@
 .tape-library-groups article button.danger {
   color: var(--c-red-40);
 }
-.tape-library-groups article.hidden-tape {
-  opacity: 0.5;
-}
 .tape-new {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) auto minmax(140px, 0.7fr) auto;
@@ -1369,17 +1272,6 @@
   justify-content: center;
   gap: 8px;
 }
-
-/* Studio — bulk import of instruments and Sets */
-.studio-body-import {
-  overflow-y: auto !important;
-}
-.asset-import {
-  display: grid;
-  gap: 14px;
-  padding: 18px 22px 24px;
-  color: var(--st-ink, var(--c-blue-20));
-}
 .asset-import-head {
   display: flex;
   justify-content: space-between;
@@ -1394,14 +1286,6 @@
   color: var(--st-muted, var(--c-cyan-55));
   font-size: 13px;
 }
-.asset-import-hospital,
-.asset-import-header-row {
-  display: grid;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--st-muted, var(--c-cyan-55));
-}
 .asset-import select {
   min-height: 38px;
   min-width: 240px;
@@ -1414,28 +1298,10 @@
   font: inherit;
   font-size: 13px;
 }
-.asset-import-steps {
-  display: flex;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.asset-import-steps li {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--st-muted, var(--c-cyan-55));
-  font-size: 13px;
-  font-weight: 700;
-}
 .asset-import-steps li span {
   display: grid;
   place-items: center;
   border-radius: 50%;
-}
-.asset-import-steps li.active {
-  border-color: var(--st-teal, var(--c-cyan-45));
-  color: var(--st-teal, var(--c-cyan-45));
 }
 .asset-import-steps li.active span {
   background: var(--st-teal, var(--c-cyan-45));
@@ -1444,39 +1310,6 @@
 .asset-import-steps li.done span {
   background: var(--st-green-soft, var(--c-gray-95-4));
   color: var(--st-green, var(--c-green-50));
-}
-.asset-import-alert,
-.asset-import-note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 11px;
-  font-size: 13px;
-}
-.asset-import-alert {
-  border: 1px solid var(--c-red-85);
-  background: var(--st-red-soft, var(--c-gray-95-2));
-  color: var(--st-red, var(--c-red-45));
-}
-.asset-import-note {
-  justify-content: space-between;
-  border: 1px solid var(--c-amber-80);
-  background: var(--st-amber-soft, var(--c-amber-95-2));
-  color: var(--st-amber, var(--c-amber-50));
-}
-.asset-import-body,
-.asset-import-history {
-  padding: 18px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 14px;
-  background: var(--c-white);
-}
-.asset-import-file,
-.asset-import-map,
-.asset-import-check {
-  display: grid;
-  gap: 14px;
 }
 .asset-import-drop {
   display: grid;
@@ -1495,22 +1328,6 @@
   color: var(--st-muted, var(--c-cyan-55));
   cursor: not-allowed;
 }
-.asset-import-fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px;
-}
-.asset-import-fields label {
-  display: grid;
-  gap: 6px;
-  padding: 10px 12px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 11px;
-}
-.asset-import-fields label.missing {
-  border-color: var(--c-red-85);
-  background: var(--st-red-soft, var(--c-gray-95-2));
-}
 .asset-import-fields label > span {
   display: grid;
   gap: 1px;
@@ -1525,103 +1342,23 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.asset-import-fields select {
-  min-width: 0;
-  width: 100%;
-}
 .asset-import-actions {
   display: flex;
   justify-content: flex-end;
   gap: 9px;
   flex-wrap: wrap;
 }
-.asset-import-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 10px;
-}
-.asset-import-summary > div {
-  display: grid;
-  gap: 2px;
-  padding: 12px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 11px;
-}
 .asset-import-summary span,
 .asset-import-summary small {
   color: var(--st-muted, var(--c-cyan-55));
   font-size: 12px;
 }
-.asset-import-summary strong {
-  font-size: 22px;
-}
-.asset-import-summary .good strong {
-  color: var(--st-green, var(--c-green-50));
-}
-.asset-import-summary .bad {
-  border-color: var(--c-red-85);
-  background: var(--st-red-soft, var(--c-gray-95-2));
-}
-.asset-import-summary .bad strong {
-  color: var(--st-red, var(--c-red-45));
-}
-.asset-import-errors,
-.asset-import-preview {
-  display: grid;
-  gap: 6px;
-  max-height: 340px;
-  overflow-y: auto;
-}
-.asset-import-errors > div,
-.asset-import-preview > div {
-  display: flex;
-  gap: 12px;
-  padding: 8px 10px;
-  border-radius: 9px;
-  background: var(--st-canvas, var(--c-gray-95));
-  font-size: 13px;
-}
 .asset-import-errors b {
   flex: 0 0 90px;
   color: var(--st-red, var(--c-red-45));
 }
-.asset-import-preview > div {
-  justify-content: space-between;
-}
 .asset-import-preview small {
   color: var(--st-muted, var(--c-cyan-55));
-}
-/* Import check step: the name choices. */
-.asset-import-names {
-  display: grid;
-  gap: 8px;
-  margin-top: 14px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-amber-85);
-  border-radius: 12px;
-  background: var(--c-gray-100);
-  font-size: 13px;
-}
-.asset-import-names label {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  color: var(--c-amber-25);
-}
-.asset-import-name-diffs {
-  display: grid;
-  gap: 4px;
-  padding-left: 24px;
-}
-.asset-import-name-diffs > div {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: center;
-  padding: 5px 8px;
-  border-radius: 8px;
-  background: var(--c-white);
-  font-size: 12.5px;
 }
 .asset-import-name-diffs .from {
   color: var(--c-red-40-4);
@@ -1630,51 +1367,6 @@
 .asset-import-name-diffs .to {
   color: var(--c-green-40);
   font-weight: 600;
-}
-/* The instruments an import will create, shown at the check step. */
-.asset-import-tools {
-  display: grid;
-  gap: 8px;
-  margin-top: 14px;
-}
-.asset-import-tools > header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.asset-import-tools-search {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: min(320px, 100%);
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 9px;
-  background: var(--c-white);
-  color: var(--st-muted);
-}
-.asset-import-tools-search input {
-  flex: 1;
-  min-width: 0;
-  height: 34px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 13px;
-}
-.asset-import-tools-table {
-  max-height: 420px;
-  overflow: auto;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-}
-.asset-import-tools-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12.5px;
 }
 .asset-import-tools-table th {
   position: sticky;
@@ -1688,15 +1380,6 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.asset-import-tools-table td {
-  padding: 7px 10px;
-  border-top: 1px solid var(--c-gray-95);
-  color: var(--c-cyan-20-3);
-}
-.asset-import-tools-table td.mono {
-  font-family: ui-monospace, monospace;
-  white-space: nowrap;
-}
 .asset-import-tools > small {
   color: var(--st-muted);
   font-size: 12px;
@@ -1708,11 +1391,6 @@
   background: var(--st-canvas, var(--c-gray-95));
   overflow: hidden;
 }
-.asset-import-progress > div {
-  height: 100%;
-  background: var(--st-teal, var(--c-cyan-45));
-  transition: width 0.2s;
-}
 .asset-import-progress small {
   position: absolute;
   inset: 0;
@@ -1722,39 +1400,14 @@
   font-weight: 700;
   color: var(--st-ink, var(--c-blue-20));
 }
-.asset-import-done {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  padding: 18px;
-  text-align: center;
-  color: var(--st-green, var(--c-green-50));
-}
 .asset-import-done b {
   color: var(--st-ink, var(--c-blue-20));
 }
 .asset-import-done small {
   color: var(--st-muted, var(--c-cyan-55));
 }
-.asset-import-history {
-  display: grid;
-  gap: 8px;
-}
-.asset-import-history h3 {
-  margin: 0;
-  font-size: 15px;
-}
 .asset-import-history > small {
   color: var(--st-muted, var(--c-cyan-55));
-}
-.asset-import-history > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 11px;
 }
 .asset-import-history > div > span {
   display: grid;
@@ -1765,21 +1418,7 @@
   color: var(--st-muted, var(--c-cyan-55));
   font-size: 12px;
 }
-.asset-import-history > div.undone {
-  opacity: 0.65;
-}
 @media (max-width: 640px) {
-  .asset-import {
-    padding: 14px 12px 20px;
-  }
-  .asset-import-history > div {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .asset-import select {
-    min-width: 0;
-    width: 100%;
-  }
   .asset-import-hospital {
     width: 100%;
   }
@@ -2247,9 +1886,6 @@ div.asset-import-hospital b {
 .import-page {
   display: grid;
 }
-.import-page .asset-import {
-  padding-inline: 0;
-}
 .page-head-actions {
   display: flex;
   gap: 8px;
@@ -2303,109 +1939,10 @@ div.asset-import-hospital b {
   margin: 0;
   font-weight: 700;
 }
-.plan-badge {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 700;
-  background: var(--st-canvas, var(--c-gray-95));
-  color: var(--st-muted, var(--c-cyan-55));
-}
-.plan-badge.trial {
-  background: var(--st-teal-soft, var(--c-gray-95-3));
-  color: var(--st-teal, var(--c-cyan-45));
-}
-.plan-badge.trial.warn {
-  background: var(--st-amber-soft, var(--c-amber-95-2));
-  color: var(--st-amber, var(--c-amber-50));
-}
-.plan-badge.locked {
-  background: var(--st-red-soft, var(--c-gray-95-2));
-  color: var(--st-red, var(--c-red-45));
-}
-.studio-plan {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-.studio-plan legend {
-  margin-bottom: 6px;
-  font-size: 13px;
-  font-weight: 700;
-}
-.studio-plan label {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 10px;
-  cursor: pointer;
-}
-.studio-plan label.active {
-  border-color: var(--st-teal, var(--c-cyan-45));
-  background: var(--st-teal-soft, var(--c-gray-95-3));
-}
-.studio-plan input {
-  width: auto !important;
-  margin-top: 3px;
-}
-.studio-plan span {
-  display: grid;
-  gap: 2px;
-}
 .studio-plan small,
 .studio-admin-invite > small {
   color: var(--st-muted, var(--c-cyan-55));
   font-weight: 500;
-}
-.studio-trial-length {
-  display: grid;
-  gap: 8px;
-}
-.studio-trial-length > span {
-  font-size: 13px;
-  font-weight: 700;
-}
-.studio-trial-length > div {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.studio-trial-length button {
-  padding: 6px 12px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 999px;
-  background: var(--c-white);
-  font: inherit;
-  font-size: 12.5px;
-  cursor: pointer;
-}
-.studio-trial-length button.active {
-  border-color: var(--st-teal, var(--c-cyan-45));
-  background: var(--st-teal, var(--c-cyan-45));
-  color: var(--c-white);
-}
-.studio-admin-invite {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
-  border: 1px dashed var(--c-cyan-85);
-  border-radius: 12px;
-  background: var(--st-cyan-soft, var(--c-gray-100-2));
-}
-.studio-field-hint {
-  margin: -4px 0 2px;
-  color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
-}
-.studio-field-error {
-  color: var(--st-red, var(--c-red-45)) !important;
 }
 /* The owner's contact for locked trial hospitals: first card of Studio → Settings, full width,
    fields and Save on one row. It takes the look of the other Settings cards. */
@@ -2416,68 +1953,18 @@ div.asset-import-hospital b {
   grid-column: 1 / -1;
   overflow: visible;
 }
-.platform-contact-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
-  align-items: end;
-  gap: 12px;
-}
-.studio-system-grid .platform-contact-fields label {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-}
-.platform-contact-fields input {
-  min-height: 40px;
-  padding: 0 11px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  font: inherit;
-  color: var(--c-blue-20);
-}
 .platform-contact-fields .app-button,
 .platform-contact-fields > button {
   min-height: 40px;
 }
-.platform-contact-status {
-  display: block;
-  margin-top: 8px;
-  color: #3f7d56;
-  font-weight: 700;
-}
 @media (max-width: 900px) {
-  .platform-contact-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .platform-contact-fields > :last-child {
     justify-self: end;
   }
 }
-
-/* Hospital people: one users list (rows open a drawer), invitations, signups to approve, departments. */
-.hospital-people {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-.studio-users-panel .hospital-people {
-  padding: 0 16px 16px;
-}
-.hospital-count.attention {
-  background: var(--c-amber-95);
-  color: var(--c-orange-35);
-}
-.people-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 .people-toolbar .studio-search {
   flex: 1;
   margin: 0 !important;
-}
-.people-invite {
-  position: relative;
 }
 .people-invite-menu {
   position: absolute;
@@ -2492,50 +1979,6 @@ div.asset-import-hospital b {
   background: var(--c-white);
   box-shadow: 0 16px 40px rgba(19, 44, 57, 0.16);
 }
-.people-invite-menu > button,
-.people-invite-menu > label {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 9px 10px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  font: inherit;
-  text-align: left;
-  color: var(--c-cyan-45);
-  cursor: pointer;
-}
-.people-invite-menu > button:hover,
-.people-invite-menu > label:hover {
-  background: var(--c-gray-100-2);
-}
-.people-invite-menu span {
-  display: grid;
-  gap: 2px;
-}
-.people-invite-menu b {
-  color: var(--c-blue-15);
-  font-size: 13px;
-}
-.people-invite-menu small {
-  color: var(--st-muted);
-  font-size: 11px;
-}
-.people-requests {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid var(--c-amber-85);
-  border-radius: 12px;
-  background: var(--c-gray-100);
-}
-.people-requests > header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: 8px;
-  color: var(--c-orange-50);
-}
 .people-requests > header b {
   color: var(--c-orange-35);
   font-size: 14px;
@@ -2544,27 +1987,6 @@ div.asset-import-hospital b {
   grid-column: 2;
   color: var(--c-amber-45);
   font-size: 12px;
-}
-.people-requests .hospital-request {
-  background: var(--c-white);
-}
-.people-head,
-.people-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
-  align-items: center;
-  gap: 10px;
-}
-.people-head {
-  padding: 0 12px;
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-.people-rows {
-  display: grid;
-  gap: 6px;
 }
 .people-row {
   width: 100%;
@@ -2577,70 +1999,7 @@ div.asset-import-hospital b {
   color: var(--c-blue-15);
   cursor: pointer;
 }
-.people-row:hover {
-  border-color: var(--c-cyan-85);
-  background: var(--c-white);
-}
-.people-row code {
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--c-cyan-45);
-}
-.people-who {
-  display: grid;
-  gap: 1px;
-  min-width: 0;
-}
-.people-who b {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-.people-who small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 600;
-}
-.people-you {
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-45);
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 800;
-}
-.people-value {
-  min-width: 0;
-  color: var(--c-blue-25);
-  font-size: 12.5px;
-}
-.people-value.whole {
-  color: var(--st-muted);
-  font-style: italic;
-}
 .people-open {
-  color: var(--st-muted);
-}
-.people-csv {
-  display: grid;
-  gap: 6px;
-}
-.people-csv > div {
-  display: grid;
-  gap: 2px;
-  padding: 8px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 9px;
-}
-.people-csv > div.error {
-  border-color: var(--c-red-85);
-  background: var(--c-gray-100-4);
-}
-.people-csv small {
   color: var(--st-muted);
 }
 .people-csv em {
@@ -2651,71 +2010,6 @@ div.asset-import-hospital b {
 }
 .people-drawer-gap {
   flex: 1;
-}
-@media (max-width: 760px) {
-  .people-head {
-    display: none;
-  }
-  .people-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 4px;
-  }
-  .people-row > code,
-  .people-row > .people-value {
-    display: none;
-  }
-  .people-row > .hospital-member-status {
-    grid-column: 1;
-  }
-  .people-row > .people-open {
-    grid-row: 1 / span 2;
-    grid-column: 2;
-  }
-}
-.hospital-people .hospital-request select,
-.hospital-people .hospital-request input,
-.hospital-people .hospital-department-add input,
-.hospital-people .hospital-row input {
-  height: 36px;
-  min-width: 0;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 8px;
-  background: var(--c-white);
-  padding: 0 9px;
-  color: var(--c-blue-15);
-  font: inherit;
-  font-size: 13px;
-}
-.hospital-people .people-toolbar .studio-search input {
-  height: auto;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-}
-@media (max-width: 760px) {
-  .hospital-people .hospital-request {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.people-row.self {
-  cursor: default;
-  background: var(--c-white);
-}
-.people-row.self:hover {
-  border-color: var(--c-gray-95);
-}
-
-/* The platform owner's start page in Studio. */
-.owner-dashboard {
-  display: grid;
-  gap: 14px;
-  min-width: 0;
-}
-.owner-kpis {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 10px;
 }
 .owner-kpi {
   display: grid;
@@ -2729,129 +2023,8 @@ div.asset-import-hospital b {
   background: var(--c-white);
   color: var(--c-cyan-45);
 }
-.owner-kpi span {
-  color: var(--c-cyan-45-2);
-  font-size: 12px;
-  font-weight: 700;
-}
-.owner-kpi strong {
-  grid-column: 1 / -1;
-  color: var(--c-cyan-20-2);
-  font-size: 26px;
-  line-height: 1;
-}
-.owner-kpi.warn {
-  border-color: var(--c-amber-85);
-  background: var(--c-gray-100);
-  color: var(--c-orange-50);
-}
-.owner-kpi.stop {
-  border-color: var(--c-red-85);
-  background: var(--c-gray-100-4);
-  color: var(--c-red-40);
-}
-.owner-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 14px;
-}
-.owner-card {
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  min-width: 0;
-  padding: 16px 18px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 16px;
-  background: var(--c-white);
-}
-.owner-card > header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-.owner-card h2 {
-  margin: 2px 0 0;
-  color: var(--c-cyan-20-2);
-  font-size: 18px;
-}
-.owner-count {
-  min-width: 30px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--c-gray-95);
-  color: var(--c-cyan-45);
-  font-weight: 800;
-  text-align: center;
-}
-.owner-count.warn {
-  background: var(--c-amber-95);
-  color: var(--c-orange-50);
-}
-.owner-empty {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  color: var(--c-cyan-45-2);
-  font-size: 13px;
-}
-.owner-attention {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.owner-attention li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 11px;
-  color: var(--c-cyan-45);
-  font-size: 13px;
-}
 .owner-attention li span {
   color: var(--c-blue-15);
-}
-.owner-attention li.warn {
-  border-color: var(--c-amber-85);
-  background: var(--c-gray-100);
-  color: var(--c-orange-50);
-}
-.owner-attention li.stop {
-  border-color: var(--c-red-85);
-  background: var(--c-gray-100-4);
-  color: var(--c-red-40);
-}
-.owner-actions {
-  display: grid;
-  gap: 8px;
-}
-.owner-actions button {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 11px 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 11px;
-  background: var(--c-white);
-  font: inherit;
-  text-align: left;
-  color: var(--c-cyan-45);
-  cursor: pointer;
-}
-.owner-actions button:hover {
-  border-color: var(--c-cyan-85);
-  background: var(--c-white);
-}
-.owner-actions span {
-  display: grid;
-  gap: 2px;
 }
 .owner-actions b {
   color: var(--c-blue-15);
@@ -2861,30 +2034,6 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 11.5px;
 }
-.owner-hospitals {
-  display: grid;
-  gap: 6px;
-}
-@media (max-width: 1100px) {
-  .owner-kpis {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .owner-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-@media (max-width: 760px) {
-  .owner-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .owner-attention li {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .owner-attention li > :last-child {
-    grid-column: 2;
-    justify-self: start;
-  }
-}
 /* All ten Studio tabs on one row from tablet width up: tighter spacing, and the icons go first
    when the row is short of room. Phones keep the wrapped grid. */
 @media (min-width: 761px) {
@@ -2893,58 +2042,12 @@ div.asset-import-hospital b {
     flex-wrap: nowrap;
     overflow-x: auto;
   }
-  .studio-tabs button {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding: 8px 4px !important;
-    gap: 5px;
-  }
   @container (max-width: 1080px) {
     .studio-tabs button svg {
       display: none;
     }
   }
   /* Narrower still (tablets): the tabs keep their size and the row scrolls sideways. */
-  @container (max-width: 900px) {
-    .studio-tabs button {
-      flex: 0 0 auto;
-      padding: 8px 10px !important;
-    }
-  }
-}
-.hospital-member-status.invited {
-  color: var(--c-orange-50);
-}
-.hospital-member-status.invited > i {
-  background: var(--c-amber-70);
-}
-.people-invited {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 6px 10px;
-  padding: 11px 12px;
-  border: 1px solid var(--c-amber-85);
-  border-radius: 11px;
-  background: var(--c-gray-100);
-  color: var(--c-orange-50);
-}
-.people-invited span {
-  display: grid;
-  gap: 3px;
-}
-.people-invited b {
-  color: var(--c-orange-35);
-  font-size: 13px;
-}
-.people-invited small {
-  color: var(--c-amber-45);
-  font-size: 12px;
-  line-height: 1.4;
-}
-.people-invited > button,
-.people-invited > .app-button {
-  grid-column: 2;
-  justify-self: start;
 }
 
 /* The page an emailed invitation or password-reset link opens: one button spends the link. */
@@ -3037,59 +2140,16 @@ div.asset-import-hospital b {
 }
 /* One column (tablets, phones): the Settings cards keep their full height and the tab scrolls. */
 @media (max-width: 1100px) {
-  .studio-body-system {
-    overflow-y: auto !important;
-  }
   .studio-system-grid,
   .studio-system-grid:has(> .platform-contact) {
     height: auto;
     grid-template-rows: none;
   }
-  .studio-system-grid > section {
-    overflow: visible;
-  }
-}
-
-/* Bulk import, first step: the file on the left (drop or choose, template below), and a worked
-   example of how rows become Sets and instruments on the right. Steps read as one progress line. */
-.asset-import-hospital.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 999px;
-  background: var(--c-gray-100-2);
-  color: var(--st-teal, var(--c-cyan-45));
-}
-.asset-import-hospital.chip b {
-  color: var(--c-cyan-20-2);
-  font-size: 14px;
 }
 .asset-import-steps {
   gap: 0;
   flex-wrap: nowrap;
   overflow-x: auto;
-}
-.asset-import-steps li {
-  flex: 1 1 0;
-  min-width: max-content;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 4px 10px 4px 0;
-  position: relative;
-}
-.asset-import-steps li:not(:last-child)::after {
-  content: '';
-  flex: 1;
-  height: 2px;
-  margin-left: 8px;
-  background: var(--st-line, var(--c-gray-90));
-  border-radius: 2px;
-}
-.asset-import-steps li.done::after {
-  background: var(--st-green, var(--c-green-50));
 }
 .asset-import-steps li span {
   width: 28px;
@@ -3102,16 +2162,6 @@ div.asset-import-hospital b {
 }
 .asset-import-steps li.done span {
   border-color: var(--st-green, var(--c-green-50));
-}
-.asset-import-file {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-}
-.asset-import-start {
-  display: grid;
-  gap: 12px;
 }
 .asset-import-drop {
   min-height: 210px;
@@ -3144,60 +2194,6 @@ div.asset-import-hospital b {
   box-shadow: 0 6px 18px rgba(19, 44, 57, 0.08);
   color: var(--st-teal, var(--c-cyan-45));
 }
-.asset-import-drop.disabled .asset-import-drop-icon {
-  color: var(--st-muted, var(--c-cyan-55));
-}
-.asset-import-template {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 12px;
-  background: var(--c-white);
-  color: var(--st-teal, var(--c-cyan-45));
-}
-.asset-import-template span {
-  display: grid;
-  gap: 2px;
-}
-.asset-import-template b {
-  color: var(--c-cyan-20-2);
-  font-size: 13.5px;
-}
-.asset-import-template small {
-  color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
-  line-height: 1.4;
-}
-.asset-import-guide {
-  display: grid;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 14px;
-  background: var(--c-white);
-}
-.asset-import-guide > b {
-  font-size: 14px;
-  color: var(--c-cyan-20-2);
-}
-.asset-import-guide > small {
-  margin-top: -6px;
-  color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
-}
-.asset-import-guide table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--c-white);
-  font-size: 12px;
-}
 .asset-import-guide th {
   padding: 7px 9px;
   background: var(--c-gray-100-2);
@@ -3206,39 +2202,6 @@ div.asset-import-hospital b {
   font-weight: 800;
   text-align: left;
   text-transform: uppercase;
-}
-.asset-import-guide td {
-  padding: 7px 9px;
-  border-top: 1px solid var(--c-gray-95);
-  color: var(--c-blue-15);
-}
-.asset-import-guide td:last-child,
-.asset-import-guide th:last-child {
-  text-align: right;
-  font-weight: 800;
-}
-.asset-import-guide td.blank {
-  color: #a3b1ba;
-}
-.asset-import-guide tr.set-a td:first-child {
-  box-shadow: inset 3px 0 0 var(--c-cyan-60);
-  background: var(--c-gray-95);
-  font-weight: 700;
-}
-.asset-import-guide ul {
-  display: grid;
-  gap: 7px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  color: var(--c-blue-35);
-  font-size: 12.5px;
-  line-height: 1.45;
-}
-.asset-import-guide li {
-  display: grid;
-  grid-template-columns: 10px minmax(0, 1fr);
-  gap: 9px;
 }
 .asset-import-guide li i {
   width: 8px;
@@ -3250,63 +2213,14 @@ div.asset-import-hospital b {
 .asset-import-guide li i.set-a {
   background: var(--c-cyan-60);
 }
-@media (max-width: 1000px) {
-  .asset-import-file {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 @media (max-width: 560px) {
-  .asset-import-template {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
   .asset-import-template > :last-child {
     grid-column: 1 / -1;
     justify-self: start;
   }
-  /* Phones: four numbered dots on a line, the current step's name under them. */
-  .asset-import-steps li {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: 0;
-    gap: 0;
-  }
-  .asset-import-steps li.active {
-    font-size: 12.5px;
-    gap: 6px;
-  }
   .asset-import-steps li span {
     font-size: 12px;
   }
-  .asset-import-steps li:not(:last-child)::after {
-    margin-left: 6px;
-  }
-}
-.people-password {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 6px 10px;
-  padding: 11px 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 11px;
-  background: var(--c-white);
-  color: var(--c-cyan-45);
-}
-.people-password span {
-  display: grid;
-  gap: 3px;
-}
-.people-password b {
-  color: var(--c-cyan-20-2);
-  font-size: 13px;
-}
-.people-password small {
-  color: var(--c-cyan-45-2);
-  font-size: 12px;
-  line-height: 1.4;
-}
-.people-password > :last-child {
-  grid-column: 2;
-  justify-self: start;
 }
 
 /* The slide-in menu (tablets held upright, phones) sits above its dimmed backdrop: two older
@@ -3351,98 +2265,6 @@ div.asset-import-hospital b {
   min-width: 0;
   align-content: start;
   overflow-wrap: anywhere;
-}
-.people-invited > .app-button,
-.people-password > .app-button {
-  grid-column: 2;
-  justify-self: start;
-}
-.people-invited > .app-button + .app-button,
-.people-password > .app-button + .app-button {
-  margin-top: -2px;
-}
-.people-link {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 6px 8px;
-  align-items: center;
-  margin-top: 4px;
-}
-.people-link input {
-  min-width: 0;
-  height: 34px;
-  padding: 0 9px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 8px;
-  background: var(--c-white);
-  color: var(--c-cyan-20-2);
-  font: inherit;
-  font-size: 12px;
-}
-.people-link small {
-  grid-column: 1 / -1;
-  color: var(--c-cyan-45-2);
-  font-size: 11.5px;
-  line-height: 1.4;
-}
-.hospital-notice > span {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-  flex: 1;
-}
-.hospital-notice .people-link {
-  margin-top: 0;
-}
-.people-link.compact {
-  grid-column: auto;
-  margin-top: 0;
-  min-width: 0;
-}
-.people-link.compact input {
-  height: 30px;
-}
-/* Signup invitations waiting for the person's details. */
-.people-invitations {
-  display: grid;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 12px;
-  background: var(--c-gray-100-2);
-}
-.people-invitations > header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--c-cyan-35-4);
-  font-size: 14px;
-}
-.people-invitation {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto auto;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-}
-@media (max-width: 760px) {
-  .people-invitation {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-  }
-  .people-invitation .people-link {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-}
-/* Hospital people: the page scrolls, the lists inside it do not (one scrollbar, not two). */
-.hospital-people .hospital-rows,
-.hospital-people .people-rows {
-  max-height: none;
-  overflow: visible;
 }
 
 /* Έλεγχος ονομασιών: spelling fixes and codes with several names. */
@@ -4301,9 +3123,6 @@ div.asset-import-hospital b {
   grid-template-rows: none;
   align-items: start;
 }
-.studio-system-grid > section {
-  overflow: visible;
-}
 .replacements-cancelled {
   display: grid;
   gap: 10px;
@@ -4495,16 +3314,6 @@ div.asset-import-hospital b {
 
 /* Overview dashboard. One teal for magnitude bars; the categorical hues (blue, orange, aqua, yellow)
    from the validated data-viz palette for «where it is»; red only for service / lost and issues. */
-.dash {
-  --dash-1: #2a78d6;
-  --dash-2: #eb6834;
-  --dash-3: #1baf7a;
-  --dash-4: #eda100;
-  --dash-bad: #e34948;
-  --dash-bar: #1f7a93;
-  --dash-track: var(--c-gray-95);
-  --dash-other: var(--c-gray-85-2);
-}
 .dash .seg-dept {
   background: var(--dash-1);
 }
@@ -4523,73 +3332,12 @@ div.asset-import-hospital b {
 .dash .seg-other {
   background: var(--dash-other);
 }
-.dash-kpis {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
-}
-.dash-kpi {
-  display: grid;
-  align-content: start;
-  gap: 4px;
-  padding: 14px 16px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 14px;
-  background: var(--c-white);
-  color: inherit;
-  text-decoration: none;
-}
 .dash-kpi:hover {
   border-color: var(--c-cyan-75);
-}
-.dash-kpi-label {
-  display: flex;
-  gap: 6px;
-  color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-.dash-kpi strong {
-  color: var(--c-cyan-20);
-  font-size: 34px;
-  font-weight: 750;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-.dash-kpi small {
-  color: var(--st-muted);
-  font-size: 12px;
 }
 .dash-kpi.warn {
   border-color: #f0c9a5;
   background: var(--c-gray-100);
-}
-.dash-kpi.warn strong,
-.dash-kpi.warn .dash-kpi-label {
-  color: var(--c-orange-45);
-}
-.dash-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 12px;
-}
-.dash-card {
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  min-width: 0;
-  padding: 16px 18px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 14px;
-  background: var(--c-white);
-}
-.dash-card > header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--c-cyan-20);
 }
 .dash-card > header b {
   display: block;
@@ -4606,94 +3354,16 @@ div.asset-import-hospital b {
   font-size: 12px;
   font-weight: 700;
 }
-.dash-flow {
-  grid-column: span 7;
-}
-.dash-where {
-  grid-column: span 5;
-}
-.dash-depts {
-  grid-column: span 7;
-}
-.dash-activity {
-  grid-column: span 5;
-}
-.dash-attention,
-.dash-latest {
-  grid-column: span 6;
-}
-.dash-bars {
-  display: grid;
-  gap: 6px;
-}
-.dash-bar {
-  display: grid;
-  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr) 36px;
-  align-items: center;
-  gap: 12px;
-  min-height: 30px;
-  color: var(--c-cyan-30);
-  font-size: 13px;
-  text-decoration: none;
-}
-.dash-bar:hover .dash-bar-name {
-  text-decoration: underline;
-}
 .dash-bar-track {
   height: 14px;
   border-radius: 7px;
   background: var(--dash-track);
   overflow: hidden;
 }
-.dash-bar-track i {
-  display: block;
-  height: 100%;
-  min-width: 2px;
-  border-radius: 0 7px 7px 0;
-  background: var(--dash-bar);
-}
-.dash-bar strong {
-  text-align: right;
-  font-size: 14px;
-}
 .dash-stack {
   display: flex;
   gap: 2px;
   height: 22px;
-}
-.dash-stack i {
-  min-width: 4px;
-  border-radius: 4px;
-}
-.dash-stack i.empty {
-  flex: 1;
-  background: var(--dash-track);
-}
-.dash-legend {
-  display: grid;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.dash-legend li {
-  display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) auto 44px;
-  align-items: center;
-  gap: 8px;
-  min-height: 30px;
-  border-bottom: 1px solid var(--c-gray-95);
-  font-size: 13px;
-}
-.dash-legend li:last-child {
-  border-bottom: 0;
-}
-.dash-legend strong {
-  font-size: 14px;
-}
-.dash-legend small {
-  color: var(--st-muted);
-  text-align: right;
 }
 .dash .dot {
   display: inline-block;
@@ -4709,32 +3379,6 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 12px;
 }
-.dash-legend-inline .dot {
-  margin-right: 6px;
-}
-.dash-depts-list {
-  display: grid;
-  gap: 4px;
-}
-.dash-dept {
-  display: grid;
-  grid-template-columns: minmax(120px, 170px) minmax(0, 1fr) 34px 48px;
-  align-items: center;
-  gap: 12px;
-  min-height: 32px;
-  color: var(--c-cyan-30);
-  font-size: 13px;
-  text-decoration: none;
-}
-.dash-dept:hover .dash-dept-name {
-  text-decoration: underline;
-}
-.dash-dept-name {
-  overflow: hidden;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .dash-dept-track {
   height: 14px;
   border-radius: 7px;
@@ -4746,30 +3390,6 @@ div.asset-import-hospital b {
   gap: 2px;
   height: 100%;
   min-width: 0;
-}
-.dash-dept-fill i {
-  min-width: 0;
-}
-.dash-dept-fill i:last-child {
-  border-radius: 0 7px 7px 0;
-}
-.dash-dept strong {
-  text-align: right;
-  font-size: 14px;
-}
-.dash-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  min-height: 20px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-}
-.dash-pill.bad {
-  background: var(--c-gray-95-2);
-  color: var(--c-red-40-2);
 }
 .dash-columns {
   display: flex;
@@ -4785,115 +3405,13 @@ div.asset-import-hospital b {
   align-items: flex-end;
   height: 100%;
 }
-.dash-col i {
-  display: block;
-  width: 100%;
-  min-height: 2px;
-  border-radius: 4px 4px 0 0;
-  background: var(--dash-bar);
-}
-.dash-col i.zero {
-  background: var(--dash-track);
-}
-.dash-axis {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--st-muted);
-  font-size: 11px;
-}
-.dash-list {
-  display: grid;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.dash-list li {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-  color: var(--c-cyan-30);
-}
-.dash-list li:last-child {
-  border-bottom: 0;
-}
 .dash-list li > a {
   display: block;
   color: inherit;
   text-decoration: none;
 }
-.dash-list li > a:hover b {
-  text-decoration: underline;
-}
-.dash-list b {
-  display: block;
-  overflow: hidden;
-  color: var(--c-cyan-20);
-  font-size: 13px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dash-list small {
-  display: block;
-  overflow: hidden;
-  color: var(--st-muted);
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dash-list .bad {
-  color: var(--c-red-40-2);
-}
-.dash-list .warn {
-  color: var(--c-orange-45);
-}
-.dash-list li.ok {
-  grid-template-columns: minmax(0, 1fr);
-  color: var(--st-muted);
-  font-size: 13px;
-}
-@media (max-width: 1180px) {
-  .dash-kpis {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .dash-flow,
-  .dash-where,
-  .dash-depts,
-  .dash-activity,
-  .dash-attention,
-  .dash-latest {
-    grid-column: 1 / -1;
-  }
-}
-@media (max-width: 640px) {
-  .dash-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .dash-bar {
-    grid-template-columns: minmax(110px, 140px) minmax(0, 1fr) 30px;
-  }
-}
-.dash-kpi-label {
-  align-items: flex-start;
-  min-height: 32px;
-  line-height: 1.25;
-}
-.dash-kpi-label svg {
-  flex: 0 0 auto;
-  margin-top: 1px;
-}
 .dash-activity .dash-columns {
   height: 190px;
-}
-.dash .dash-legend-inline {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
 }
 
 /* View-only users are told so on every page. */
@@ -4907,29 +3425,6 @@ div.asset-import-hospital b {
   color: var(--c-cyan-35);
   font-size: 13px;
   font-weight: 600;
-}
-
-/* The bulk-import page title looks like every other page title. */
-.asset-import-head h2 {
-  margin: 0 0 4px;
-  color: var(--c-cyan-20);
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-.asset-import-head p {
-  max-width: 720px;
-  margin: 0;
-  color: var(--st-muted);
-  font-size: 14px;
-  line-height: 1.45;
-}
-.asset-import-head .eyebrow {
-  display: block;
-  margin: 0 0 2px;
-  font-size: 11px;
-  letter-spacing: 0.12em;
 }
 
 /* One table header style on every list: small, bold, sentence case. */
@@ -4994,13 +3489,6 @@ html body .content .movements-actions > button {
 }
 .receive-modal td:last-child {
   white-space: nowrap;
-}
-
-/* The Overview dashboard is taller than the screen: it scrolls instead of cutting off its lower cards. */
-.hospital-overview.dash {
-  overflow-y: auto;
-  padding-right: 4px;
-  scrollbar-gutter: stable;
 }
 
 /* Density: more of the page for the content. A slimmer top bar, header, KPI strips and filter bar, smaller
@@ -5082,27 +3570,11 @@ html body .dash-kpis {
 html body .dash-kpi-label {
   min-height: 0;
 }
-html body .dash-grid {
-  gap: 10px;
-}
-html body .dash-card {
-  gap: 8px;
-  padding: 12px 16px;
-}
 html body .dash-bar {
   min-height: 24px;
 }
 html body .dash-dept {
   min-height: 26px;
-}
-html body .dash-legend li {
-  min-height: 26px;
-}
-html body .dash-list li {
-  padding: 5px 0;
-}
-html body .dash-activity .dash-columns {
-  height: 120px;
 }
 /* A page description is one line (the full text is its tooltip) so the header stays slim. */
 html body .page-head > div:first-child > p {
@@ -5157,17 +3629,6 @@ html body .reports-catalog {
 html body .asset-registry-table td:first-child {
   min-width: 260px;
 }
-/* Studio density: one-line header, slimmer tabs and library list. */
-html body .studio-head {
-  align-items: center;
-}
-html body .studio-head > div:first-child {
-  min-width: 0;
-  flex: 1;
-}
-html body .studio-head h1 {
-  margin: 0 0 2px;
-}
 html body .studio-head p {
   white-space: nowrap;
   overflow: hidden;
@@ -5180,33 +3641,18 @@ html body .studio-health {
   flex: 0 0 auto;
   border-radius: 12px;
 }
-html body .studio-health > div > span {
-  display: none;
-}
 html body .studio-tabs button {
   padding: 6px 13px;
-}
-html body .studio-manager-nav {
-  gap: 2px;
-  padding: 6px;
 }
 html body .studio-manager-nav button {
   padding: 6px 8px;
   gap: 9px;
-}
-html body .studio-manager-nav button > span {
-  width: 28px;
-  height: 28px;
 }
 html body .tape-library-groups article {
   padding: 4px 8px;
 }
 html body .tape-library-groups section > div {
   gap: 5px;
-}
-html body .studio-workspace {
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
 }
 /* Set detail: tighter tool rows, names on one line. */
 html body .asset-detail-body .set-tool-row {
@@ -5274,10 +3720,6 @@ html body .dash-kpi {
 }
 html body .dash-kpi strong {
   font-size: 26px;
-}
-html body .dash-dept-name {
-  font-weight: 500;
-  font-size: 13px;
 }
 /* Sterilization header: logged-in user as a slim pill, one-line stage labels. */
 html body .ster-shift {
@@ -5742,63 +4184,16 @@ html body .hospital-admin .hospital-people {
   min-height: 0;
   gap: 10px;
 }
-html body .hospital-admin .hospital-people > .hospital-tabs,
-html body .hospital-admin .hospital-people > .hospital-notice {
-  flex: 0 0 auto;
-}
-html body .hospital-admin .hospital-people > section.hospital-card {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-html body .hospital-admin .hospital-people > section.hospital-card > * {
-  flex: 0 0 auto;
-}
-html body .hospital-admin .hospital-people .hospital-rows,
-html body .hospital-admin .hospital-people .people-rows {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: none;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-/* Studio: tighter vertical rhythm so a tab fits the screen (the tab bar and header stay fixed). */
-html body .roles-guide {
-  gap: 8px;
-}
-html body .roles-guide .eyebrow {
-  display: none;
-}
 html body .roles-guide h2 {
   font-size: 18px;
   margin: 0;
-}
-html body .roles-guide-row {
-  padding-top: 8px;
-  padding-bottom: 8px;
 }
 html body .roles-guide-row p,
 html body .roles-guide-row span {
   line-height: 1.4;
 }
-html body .studio-workflow-page {
-  gap: 10px;
-}
-html body .studio-workflow-hero {
-  padding: 10px 16px;
-}
 html body .studio-workflow-hero p {
   margin-top: 2px;
-}
-html body .studio-workflow-policy,
-html body .studio-release-policy {
-  padding: 10px 14px;
-  gap: 8px;
-}
-html body .studio-workflow-stage {
-  padding: 10px 14px;
 }
 /* Replacements: the page holds still; only the table scrolls. */
 html body .replacements {
@@ -5912,12 +4307,6 @@ html body .asset-workbench-sidebar .asset-cover {
   html body .hospital-overview.dash > * {
     flex: 0 0 auto;
   }
-  html body .hospital-overview.dash > .dash-grid {
-    flex: 1 1 auto;
-    min-height: 300px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-  }
   html body .dash-grid > .dash-card {
     grid-column: auto;
     display: flex;
@@ -5950,23 +4339,6 @@ html body .asset-workbench-sidebar .asset-cover {
 }
 /* Studio > Workflow on one screen: policies on the left, the stage list scrolls on the right. */
 @media (min-width: 1100px) {
-  html body .studio-body-workflow .studio-workflow-page {
-    display: grid !important;
-    grid-template-columns: 400px minmax(0, 1fr);
-    gap: 10px !important;
-    min-height: 0 !important;
-  }
-  html body .studio-body-workflow .studio-workflow-hero,
-  html body .studio-body-workflow .released-loads,
-  html body .studio-body-workflow .studio-workflow-footer {
-    grid-column: 1 / -1;
-  }
-  html body .studio-body-workflow .studio-workflow-side,
-  html body .studio-body-workflow .studio-workflow-main {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
   html body .studio-body-workflow .studio-workflow-side {
     display: flex;
     flex-direction: column;
@@ -5975,124 +4347,17 @@ html body .asset-workbench-sidebar .asset-cover {
   html body .studio-body-workflow .studio-workflow-side > * {
     flex: 0 0 auto;
   }
-  html body .studio-body-workflow .studio-workflow-list {
-    overflow: visible !important;
-  }
-  /* Policy options: the title is enough here; the explanation stays in the tooltip-sized second line. */
-  html body .studio-body-workflow .studio-release-policy-grid {
-    grid-template-columns: 1fr !important;
-    gap: 6px !important;
-  }
-  html body .studio-body-workflow .studio-release-policy-grid small {
-    display: none;
-  }
-  html body .studio-body-workflow .studio-release-policy > header span {
-    display: none;
-  }
-  html body .studio-body-workflow .studio-workflow-hero p {
-    display: none;
-  }
-  html body .studio-body-workflow .studio-workflow-policy span {
-    display: none;
-  }
-}
-@media (min-width: 1100px) {
-  html body .studio-body-workflow .studio-release-policy-grid > label {
-    padding: 7px 10px !important;
-    min-height: 0 !important;
-    gap: 8px !important;
-  }
-  html body .studio-body-workflow .studio-release-policy {
-    padding: 8px 12px !important;
-    gap: 6px !important;
-  }
-  html body .studio-body-workflow .studio-workflow-policy {
-    padding: 7px 12px !important;
-  }
-  html body .studio-body-workflow .studio-release-policy-grid select {
-    min-width: 0;
-    max-width: 130px;
-    padding: 3px 6px;
-  }
-  html body .studio-body-workflow .studio-workflow-stage {
-    padding: 8px 12px !important;
-  }
 }
 /* Very short windows: same 3-column cards at natural height, one page scroll and no scrollbars inside the cards. */
-@media (min-width: 1100px) and (max-height: 599px) {
-  html body .hospital-overview.dash > .dash-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  html body .dash-grid > .dash-card {
-    grid-column: auto;
-  }
-}
 /* Studio > Settings: the cards sit side by side so the tab fits one screen. */
-@media (min-width: 1100px) {
-  html body .studio-system-grid,
-  html body .studio-system-grid:has(> .platform-contact) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-  }
-  html body .studio-system-grid > section {
-    grid-column: auto;
-    padding: 12px 14px;
-  }
-  html body .studio-system-grid > .platform-contact {
-    grid-column: 1 / -1;
-  }
-}
-html body .studio-body-import .asset-import {
-  gap: 10px;
-}
-html body .studio-body-import .asset-import-head {
-  margin: 0;
-  padding-top: 0;
-}
 /* Owner dashboard: fills the screen. KPI row, attention + actions, and the hospitals table taking the rest. */
-html body .studio-body-overview .owner-dashboard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  gap: 10px;
-}
 html body .owner-dashboard > * {
-  flex: 0 0 auto;
-}
-html body .owner-dashboard > .owner-hospitals {
-  flex: 1 1 auto;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-html body .owner-hospitals > header {
   flex: 0 0 auto;
 }
 .owner-hospitals-scroll {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-}
-.owner-hospitals table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.owner-hospitals th {
-  position: sticky;
-  top: 0;
-  background: var(--c-white);
-  padding: 7px 12px;
-  text-align: left;
-  color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-.owner-hospitals td {
-  padding: 8px 12px;
-  border-top: 1px solid var(--c-gray-95);
-  vertical-align: middle;
 }
 .owner-hospitals td b {
   display: block;
@@ -6101,38 +4366,6 @@ html body .owner-hospitals > header {
 .owner-hospitals td small {
   color: var(--st-muted);
   font-size: 12px;
-}
-.owner-hospitals td:last-child {
-  text-align: right;
-}
-.owner-status {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: var(--c-gray-95-8);
-  color: var(--c-green-45);
-  font-size: 12px;
-  font-weight: 700;
-}
-.owner-status.warn {
-  background: var(--c-amber-95);
-  color: var(--c-orange-50);
-}
-.owner-status.stop {
-  background: var(--c-gray-95-5);
-  color: var(--c-red-40-2);
-}
-.owner-status.off {
-  background: var(--c-gray-95);
-  color: var(--st-muted);
-}
-.owner-missing {
-  color: var(--c-orange-50);
-  font-weight: 700;
-}
-.owner-hospitals td.owner-none {
-  padding: 14px 12px;
-  color: var(--st-muted);
 }
 /* Asset manage dialog: the buttons never sit on the note field. The dialog is as tall as its content (up to
    the screen) and the Note field keeps its own room above the footer. */
@@ -6221,18 +4454,6 @@ html body .load-modal .load-indicator-pick label {
   gap: 8px;
   align-items: center;
 }
-.sterilizer-batch-style {
-  display: grid;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--c-cyan-50);
-}
-.sterilizer-batch-style > div {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
 html body .sterilizer-batch-style label {
   display: flex;
   flex-direction: row;
@@ -6247,10 +4468,6 @@ html body .sterilizer-batch-style label {
   font-size: 14px;
   cursor: pointer;
 }
-html body .sterilizer-batch-style label.on {
-  border-color: var(--c-cyan-40);
-  background: var(--c-gray-95-3);
-}
 html body .sterilizer-batch-style input {
   flex: 0 0 16px;
   width: 16px;
@@ -6258,35 +4475,6 @@ html body .sterilizer-batch-style input {
   min-height: 0;
   margin: 0;
   accent-color: var(--c-cyan-40);
-}
-.sterilizer-batch-preview {
-  display: grid;
-  gap: 6px;
-  padding: 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-  font-size: 12px;
-  color: var(--c-cyan-50);
-}
-.sterilizer-batch-preview > span {
-  font-weight: 700;
-}
-.sterilizer-batch-preview ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.sterilizer-batch-preview li {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-35);
-  font-size: 13px;
-  font-weight: 700;
 }
 html body .shelf-life-options button {
   min-height: 38px;
@@ -6332,17 +4520,6 @@ html body .notification-item.expiry.expired svg {
 }
 html body .notification-item.expiry.expiring svg {
   color: var(--c-orange-50-2);
-}
-html body .studio-setting-input select {
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 36px;
-  padding: 0 4px;
-  border: 0;
-  outline-offset: 2px;
-  background: transparent;
-  color: var(--c-cyan-20);
-  font-size: 14px;
 }
 @media (max-width: 1100px) {
   html body .expiry-table th:nth-child(3) {
@@ -6650,21 +4827,6 @@ html body .studio-list-row button.studio-count-toggle {
   color: var(--c-blue-45);
   font-size: 12px;
   font-weight: 700;
-}
-html body .studio-list-row button.studio-count-toggle.on {
-  border-color: var(--c-green-40-2);
-  background: var(--c-gray-100-3);
-  color: var(--c-green-40-2);
-}
-html body .studio-list-head.with-count,
-html body .studio-list-row.with-count {
-  grid-template-columns: minmax(160px, 1.2fr) minmax(140px, 1fr) 90px 196px;
-}
-@media (max-width: 1100px) {
-  html body .studio-list-head.with-count,
-  html body .studio-list-row.with-count {
-    grid-template-columns: minmax(140px, 1fr) 80px 196px;
-  }
 }
 /* Send to Sterilization: the count step (operating theatres), signed in its own window first. */
 html body .department-count-step {
@@ -7054,21 +5216,6 @@ html body .sets-expiry.expired {
   }
 }
 /* Sterilization lists: the stage is the tab itself, so no repeated "Stage" column on wide screens. */
-/* Overview: the activity card leads with three numbers; the chart below is shorter. */
-html body .dash-activity-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin: 6px 0 8px;
-}
-html body .dash-activity-stats span {
-  display: grid;
-  gap: 1px;
-  padding: 8px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-}
 html body .dash-activity-stats b {
   font-size: 20px;
   line-height: 1.1;
@@ -7078,9 +5225,6 @@ html body .dash-activity-stats small {
   color: var(--c-blue-45);
   font-size: 11.5px;
   font-weight: 600;
-}
-html body .dash-activity .dash-columns {
-  max-height: 120px;
 }
 /* Traceability: the last searches on this device, one tap to repeat. */
 html body .trace-recent {
@@ -7318,31 +5462,10 @@ html body .issues-fixed .issue-note-inline {
   html body .ledger-columns span:nth-child(5) {
     display: none;
   }
-  /* Studio libraries: the library picker becomes a row of chips above the list. */
-  html body .studio-manager {
-    grid-template-columns: minmax(0, 1fr) !important;
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-  html body .studio-manager-nav {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    height: auto;
-  }
   html body .studio-manager-nav button {
     flex: 0 0 auto;
     min-width: 168px;
     width: auto;
-  }
-  html body .studio-list-head.with-count,
-  html body .studio-list-row.with-count {
-    grid-template-columns: minmax(0, 1fr) 70px 196px !important;
-    align-items: center;
-  }
-  html body .studio-list-head.with-count > span:nth-child(2),
-  html body .studio-list-row.with-count > span:nth-child(2) {
-    display: none !important;
   }
 }
 /* Composition window on a portrait tablet: the checks and the tool list stack and scroll together
@@ -7547,13 +5670,6 @@ html body .idle-lock-card .idle-lock-error {
 /* A record changed on two devices at once (S4). */
 html body .sync-conflict-toast {
   border-left: 4px solid var(--c-orange-50-2);
-}
-/* Overview, by department: with many departments only the list scrolls, inside its card. */
-html body .dash-card .dash-depts-list {
-  max-height: 340px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
 }
 /* Only recent history is loaded (T3): a note, and a button for the rest. */
 html body .history-window-note {
@@ -7943,80 +6059,8 @@ html body .trace-step small {
 }
 
 /* Users list: header on one line; on phone the department and role stay visible */
-html body .people-head span {
-  white-space: nowrap;
-}
-@media (max-width: 760px) {
-  html body .people-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    column-gap: 0;
-  }
-  html body .people-row > .people-who,
-  html body .people-row > .hospital-member-status {
-    grid-column: 1 / span 2;
-  }
-  html body .people-row > .people-value {
-    display: block;
-    grid-row: 2;
-    font-size: 12px;
-    color: var(--c-blue-35);
-    white-space: normal;
-  }
-  html body .people-row > .people-value + .people-value::before {
-    content: '\00a0·\00a0';
-  }
-  html body .people-row > .people-open {
-    grid-column: 3;
-    grid-row: 1 / span 3;
-    margin-left: 8px;
-  }
-}
-@media (max-width: 700px) {
-  html body .people-toolbar {
-    flex-wrap: wrap;
-  }
-  html body .people-toolbar .studio-search {
-    flex: 1 1 100%;
-  }
-  html body .people-toolbar .people-invite,
-  html body .people-toolbar .people-invite > .app-button {
-    flex: 1 1 100%;
-    width: 100%;
-  }
-}
 
 /* Studio libraries on phone: all six libraries visible in two columns */
-@media (max-width: 700px) {
-  html body .studio-manager-nav {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow: visible;
-  }
-  html body .studio-manager-nav button {
-    min-width: 0;
-  }
-}
-html body .roles-guide header h2 {
-  margin: 6px 0 14px;
-}
-@media (max-width: 700px) {
-  html body .asset-import-guide table {
-    table-layout: fixed;
-    width: 100%;
-  }
-  html body .asset-import-guide th,
-  html body .asset-import-guide td {
-    padding-left: 6px;
-    padding-right: 6px;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    font-size: 12px;
-  }
-  html body .asset-import-guide th:last-child,
-  html body .asset-import-guide td:last-child {
-    width: 44px;
-  }
-}
 
 /* Previous / next record of the list the card was opened from */
 html body .browse-arrows {
@@ -8087,35 +6131,12 @@ html body .photo-viewer .icon-button {
 
 /* Overview on one screen: the card's last block (list, chart) takes the room left and scrolls inside. */
 @media (min-width: 1100px) and (min-height: 600px) {
-  html body .hospital-overview.dash {
-    overflow: hidden;
-  }
   html body .dash-grid > .dash-card > * {
     flex: 0 0 auto;
-  }
-  html body .dash-flow > .dash-bars,
-  html body .dash-depts > .dash-depts-list,
-  html body .dash-where > .dash-legend,
-  html body .dash-attention > .dash-list,
-  html body .dash-latest > .dash-list {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    align-content: start;
   }
   html body .dash-bars > *,
   html body .dash-depts-list > * {
     flex-shrink: 0;
-  }
-  html body .dash-activity > .dash-columns {
-    flex: 1 1 auto;
-    min-height: 40px;
-    height: auto;
-  }
-  html body .dash-flow .dash-bar-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
 @media (min-width: 1100px) and (min-height: 600px) and (max-height: 760px) {
@@ -8125,37 +6146,9 @@ html body .photo-viewer .icon-button {
   html body .dash-kpi strong {
     font-size: 22px;
   }
-  html body .dash-kpi small {
-    display: none;
-  }
-  html body .hospital-overview .overview-alert {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-  html body .dash-activity-stats {
-    margin: 2px 0 4px;
-  }
-  html body .dash-activity-stats span {
-    padding: 4px 8px;
-  }
   html body .dash-activity-stats b {
     font-size: 16px;
   }
-  html body .dash-activity > .dash-axis {
-    display: none;
-  }
-}
-
-/* Studio → Errors (platform owner) */
-html body .studio-errors {
-  display: grid;
-  gap: 14px;
-}
-html body .studio-errors-head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
 }
 html body .studio-errors-head h2 {
   margin: 0 0 4px;
@@ -8167,49 +6160,6 @@ html body .studio-errors-head p {
   color: var(--st-muted);
   font-size: 13px;
 }
-html body .studio-errors-actions {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-html body .studio-errors-failed {
-  color: var(--st-red);
-}
-html body .studio-errors-empty {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 40px 16px;
-  border: 1px solid var(--st-line);
-  border-radius: 12px;
-  background: var(--c-white);
-  color: var(--st-muted);
-}
-html body .studio-errors-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-html body .studio-errors-list > li {
-  border: 1px solid var(--st-line);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .studio-error-row {
-  display: grid;
-  grid-template-columns: 110px minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-  width: 100%;
-  padding: 10px 14px;
-  border: 0;
-  background: none;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
 html body .studio-error-kind {
   justify-self: start;
   padding: 2px 8px;
@@ -8219,49 +6169,12 @@ html body .studio-error-kind {
   font-size: 12px;
   font-weight: 700;
 }
-html body .studio-error-kind.kind-sync {
-  background: var(--st-amber-soft);
-  color: var(--st-amber);
-}
-html body .studio-error-main {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-html body .studio-error-main b {
-  overflow-wrap: anywhere;
-}
 html body .studio-error-main small,
 html body .studio-error-count small {
   color: var(--st-muted);
   font-size: 12px;
 }
-html body .studio-error-count {
-  display: grid;
-  justify-items: end;
-  white-space: nowrap;
-}
-html body .studio-error-detail {
-  display: grid;
-  gap: 8px;
-  justify-items: start;
-  padding: 0 14px 14px;
-}
-html body .studio-error-detail pre {
-  width: 100%;
-  max-height: 260px;
-  margin: 0;
-  padding: 10px;
-  overflow: auto;
-  border-radius: 8px;
-  background: var(--c-gray-95);
-  font-size: 12px;
-  white-space: pre-wrap;
-}
 @media (max-width: 700px) {
-  html body .studio-error-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
   html body .studio-error-kind {
     grid-column: 1 / -1;
   }
@@ -8518,82 +6431,12 @@ html body .app-spinner-detail {
   color: var(--st-muted);
   font-variant-numeric: tabular-nums;
 }
-
-/* Studio › Ειδοποιήσεις: a new notice with its window, then the list (showing, scheduled, ended). */
-html body .studio-notice-new {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px 200px auto;
-  gap: 12px;
-  align-items: start;
-  padding: 16px;
-  border: 1px solid var(--st-line);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .studio-notice-new label {
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--c-gray-15);
-}
-html body .studio-notice-new input {
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 10px;
-  background: var(--c-white);
-  font: inherit;
-  font-weight: 500;
-}
-html body .studio-notice-new label small {
-  font-weight: 500;
-  color: var(--st-muted);
-  font-size: 12px;
-}
-html body .studio-notice-new > .app-button {
-  align-self: start;
-  margin-top: 25px;
-  min-height: 40px;
-}
-html body .studio-notice-warning {
-  grid-column: 1/-1;
-  color: var(--st-red);
-  font-size: 13px;
-}
-html body .studio-notice-group {
-  display: grid;
-  gap: 8px;
-}
-html body .studio-notice-group h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 6px 0 0;
-  font-size: 14px;
-}
-html body .studio-notice-group h3 span {
-  min-width: 22px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--c-gray-95-4);
-  color: var(--st-muted);
-  font-size: 12px;
-  text-align: center;
-}
 html body .studio-notice-row {
   display: grid;
   grid-template-columns: 140px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   padding: 10px 14px;
-}
-html body .studio-notice-row.status-ended {
-  background: var(--c-gray-100-2);
-}
-html body .studio-notice-row.status-ended b {
-  color: var(--st-muted);
-  font-weight: 600;
 }
 html body .studio-notice-status {
   justify-self: start;
@@ -8602,30 +6445,7 @@ html body .studio-notice-status {
   font-size: 12px;
   font-weight: 700;
 }
-html body .studio-notice-status.status-active {
-  background: var(--st-green-soft);
-  color: var(--st-green);
-}
-html body .studio-notice-status.status-scheduled {
-  background: var(--st-amber-soft);
-  color: var(--st-amber);
-}
-html body .studio-notice-status.status-ended {
-  background: var(--c-gray-95-4);
-  color: var(--st-muted);
-}
-html body .studio-notice-actions {
-  display: flex;
-  gap: 8px;
-}
 @media (max-width: 900px) {
-  html body .studio-notice-new .studio-notice-message {
-    grid-column: 1/-1;
-  }
-  html body .studio-notice-new > .app-button {
-    grid-column: 1/-1;
-    margin-top: 0;
-  }
   html body .studio-notice-row {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -8656,43 +6476,7 @@ html body .sidebar .nav-group.first {
     display: none;
   }
 }
-
-/* Studio tabs in two titled rows for the platform owner: the platform's own work, then the set-up. */
-html body .studio-tab-rows {
-  display: grid;
-  gap: 6px;
-}
-html body .studio-tab-row {
-  display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-}
-html body .studio-tab-group {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--st-muted);
-}
-html body .studio-tab-row .studio-tabs {
-  justify-content: flex-start;
-}
-html body .studio-tab-row .studio-tabs button {
-  flex: 0 0 auto;
-  padding: 7px 14px !important;
-}
 /* Roles & permissions: one tab, two views. */
-html body .studio-roles-switch {
-  display: inline-flex;
-  justify-self: start;
-  gap: 2px;
-  margin-bottom: 10px;
-  padding: 3px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-}
 html body .studio-roles-switch button {
   padding: 6px 14px;
   border: 0;
@@ -8704,23 +6488,7 @@ html body .studio-roles-switch button {
   font-weight: 700;
   cursor: pointer;
 }
-html body .studio-roles-switch button.active {
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-45);
-  box-shadow: inset 0 0 0 1px var(--c-teal-90-2);
-}
-@media (max-width: 760px) {
-  html body .studio-tab-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
-  }
-}
 /* In the two rows there is room for the icons on a computer screen. */
-@media (min-width: 1280px) {
-  html body .studio-tab-row .studio-tabs button svg {
-    display: inline-block;
-  }
-}
 
 /* Evaluation Demo: the guided tour over the real screen (the place stands out, the rest dims). */
 html body .guided-tour {
@@ -8896,176 +6664,6 @@ html body .demo-rate-screen b {
 /* In an evaluation Demo the rating card (after a step or a tour) shows above an open dialog. */
 html body .step-rating-card {
   z-index: 1700;
-}
-
-/* Studio › Αξιολογήσεις: every Demo's ratings together. */
-html body .studio-ratings-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-html body .studio-ratings-kpis > * {
-  display: grid;
-  gap: 4px;
-  padding: 14px 16px;
-  border: 1px solid var(--st-line);
-  border-radius: 12px;
-  background: var(--c-white);
-  font: inherit;
-  text-align: left;
-}
-html body .studio-ratings-kpis > button {
-  cursor: pointer;
-}
-html body .studio-ratings-kpis > .attention {
-  border-color: var(--c-amber-70);
-  background: var(--st-amber-soft);
-}
-html body .studio-ratings-kpis span {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--st-muted);
-}
-html body .studio-ratings-kpis strong {
-  font-size: 24px;
-  color: var(--c-blue-15);
-}
-html body .studio-ratings-kpis strong.negative {
-  color: var(--st-red);
-}
-html body .studio-ratings-kpis small {
-  font-size: 12px;
-  color: var(--st-muted);
-}
-html body .studio-ratings-body {
-  display: grid;
-  gap: 14px;
-}
-html body .studio-ratings-group {
-  display: grid;
-  gap: 8px;
-}
-html body .studio-ratings-group h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  font-size: 14px;
-}
-html body .studio-ratings-group h3 span {
-  min-width: 22px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--c-gray-95-4);
-  color: var(--st-muted);
-  font-size: 12px;
-  text-align: center;
-}
-html body .studio-rating-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px 70px 110px;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 14px;
-}
-html body .studio-rating-title {
-  font-weight: 700;
-  color: var(--c-blue-15);
-}
-html body .studio-rating-bar {
-  height: 8px;
-  border-radius: 999px;
-  background: var(--c-gray-95-4);
-  overflow: hidden;
-}
-html body .studio-rating-bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--c-amber-70);
-}
-html body .studio-rating-bar i.low {
-  background: var(--st-red);
-}
-html body .studio-rating-row b {
-  color: var(--c-amber-50);
-}
-html body .studio-rating-row small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-html body .studio-rating-comments,
-html body .studio-rating-final {
-  display: grid;
-  gap: 6px;
-}
-html body .studio-rating-comments {
-  grid-column: 1/-1;
-}
-html body .studio-rating-comment,
-html body .studio-rating-final q {
-  padding: 6px 10px;
-  border-left: 3px solid var(--c-amber-70);
-  border-radius: 6px;
-  background: var(--c-gray-100-2);
-  font-size: 13px;
-  color: var(--c-gray-15);
-}
-html body .studio-rating-comment {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 12px;
-}
-html body .studio-rating-comment cite {
-  font-style: normal;
-  font-size: 12px;
-  color: var(--st-muted);
-}
-html body .studio-rating-final {
-  padding: 12px 14px;
-}
-html body .studio-rating-final > div:first-child {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-html body .studio-rating-final > div:first-child small {
-  color: var(--st-muted);
-}
-html body .studio-rating-final-scores {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 13px;
-}
-html body .studio-rating-final-scores > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: var(--c-gray-95-4);
-}
-html body .studio-ratings .studio-errors-actions select {
-  height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 10px;
-  background: var(--c-white);
-  font: inherit;
-}
-@media (max-width: 900px) {
-  html body .studio-ratings-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  html body .studio-rating-row {
-    grid-template-columns: minmax(0, 1fr) 70px;
-  }
-  html body .studio-rating-bar,
-  html body .studio-rating-row small {
-    display: none;
-  }
 }
 
 /* Sets list: the state on one line on a computer; on a tablet the barcode goes under the name, so the
@@ -9534,172 +7132,20 @@ html body .movement-detail-links {
 html body .movement-detail-links .app-button {
   text-decoration: none;
 }
-/* Users list: column names in sentence case, as on the other lists. */
-html body .people-head {
-  text-transform: none;
-}
 /* Page title on a phone stays on the left (a short title was pushed right, next to the buttons' edge). */
 @media (max-width: 700px) {
   html body .page-head > div:first-child {
     align-self: stretch;
   }
-  /* Users: a signup request is shorter, role and department side by side, so the list shows below it. */
-  html body .hospital-people .hospital-request {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 8px;
-    padding: 10px;
-  }
-  html body .hospital-people .hospital-request-note {
-    grid-column: 1 / -1;
-  }
-  html body .people-requests > header small {
-    display: none;
-  }
-  html body .hospital-admin .hospital-people > section.hospital-card {
-    overflow-y: auto;
-  }
-  html body .hospital-admin .hospital-people .people-rows {
-    flex: 0 0 auto;
-    overflow: visible;
-  }
-  /* Departments: the name on its own line, the code and «Προσθήκη» below it. */
-  html body .hospital-department-add {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  html body .hospital-department-add > input:first-child {
-    grid-column: 1 / -1;
-  }
-  /* User card: the three buttons on one row. */
-  html body .people-drawer footer {
-    flex-wrap: nowrap;
-    gap: 6px;
-  }
-  html body .people-drawer footer .app-button {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-}
-html body .hospital-tabs .hospital-count {
-  white-space: nowrap;
-}
-@media (max-width: 700px) {
-  /* The two tabs fit the phone width (the page slid sideways with «1 αίτημα»). */
-  html body .hospital-tabs {
-    overflow-x: auto;
-  }
-  html body .hospital-tabs button {
-    gap: 5px;
-    padding-left: 8px;
-    padding-right: 8px;
-    white-space: nowrap;
-  }
-  html body .hospital-tabs button > svg {
-    display: none;
-  }
-}
-/* Studio: column names in sentence case, as on the other lists. */
-html body .studio-list-head {
-  text-transform: none;
 }
 /* Studio > Settings on a tablet: the general settings on the left, the label and security cards
    stacked on the right (security fell below the long settings column). */
-@media (min-width: 701px) and (max-width: 1099px) {
-  html body .studio-system-grid > section:first-child {
-    grid-row: span 2;
-  }
-}
 /* Studio > Sterilization flow on a computer: one page scroll, instead of the policies and the stages
    each scrolling in their own box with the version history out of sight below. */
-@media (min-width: 1100px) {
-  html body .studio-body-workflow {
-    overflow-y: auto !important;
-  }
-  html body .studio-body-workflow .studio-workflow-page {
-    height: auto !important;
-    grid-template-rows: auto auto auto auto;
-    align-items: start;
-  }
-  html body .studio-body-workflow .studio-workflow-side,
-  html body .studio-body-workflow .studio-workflow-main {
-    overflow: visible;
-  }
-}
-/* Studio: «Πραγματικά δεδομένα» / «Demo» is a small label, not something to press. */
-html body .studio-health {
-  border: 0;
-  box-shadow: none;
-  background: var(--c-gray-95);
-  padding: 4px 10px;
-  font-size: 12px;
-  cursor: default;
-}
-html body .studio-health svg {
-  width: 15px;
-  height: 15px;
-}
 /* Overview: every stage row fits its card (the last one was cut in half). */
-@media (min-width: 1100px) and (min-height: 600px) {
-  html body .dash-card .dash-bars {
-    grid-auto-rows: minmax(18px, 1fr);
-    gap: 2px;
-  }
-  html body .dash-card .dash-bar {
-    min-height: 0;
-  }
-}
-/* «+N ακόμη» under the departments. */
-html body .dash-more {
-  justify-self: start;
-  padding: 2px 0;
-  border: 0;
-  background: none;
-  color: var(--c-cyan-35);
-  font: inherit;
-  font-size: 12.5px;
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-}
 /* Needs attention on a phone: whole names, on two lines when needed. */
-@media (max-width: 700px) {
-  html body .dash-list b,
-  html body .dash-list small {
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-}
-@media (min-width: 1100px) and (min-height: 600px) {
-  html body .dash-card .dash-depts-list {
-    gap: 2px;
-  }
-  html body .dash-card .dash-dept {
-    min-height: 24px;
-  }
-}
 /* Overview on a laptop-height screen: the page scrolls and every card keeps its full height (squeezed
    into one screen the stages and departments were cut and the department bars vanished). */
-@media (min-width: 1100px) and (max-height: 819px) {
-  html body .hospital-overview.dash {
-    overflow-y: auto;
-  }
-  html body .hospital-overview.dash > .dash-grid {
-    flex: 0 0 auto;
-    grid-template-rows: none;
-  }
-  html body .dash-grid > .dash-card {
-    overflow: visible;
-  }
-  html body .dash-card .dash-depts-list,
-  html body .dash-card .dash-list,
-  html body .dash-card .dash-bars,
-  html body .dash-card .dash-legend {
-    flex: 0 0 auto;
-    overflow: visible;
-  }
-  html body .dash-card .dash-bar {
-    min-height: 24px;
-  }
-}
 /* Issues and Expiry review. Short tab labels exist for the phone only. */
 html body .issues-tabs .tab-short {
   display: none;
@@ -9898,42 +7344,6 @@ html body .department-status-tabs button {
 }
 /* Hospitals and the Studio's hospital status on a phone: one card per hospital, every figure labelled and
    «Είσοδος» always in view (the table hid the requests, the link and the actions past the right edge). */
-@media (max-width: 700px) {
-  html body .owner-hospitals-scroll {
-    overflow-x: visible;
-  }
-  html body .owner-hospitals-table,
-  html body .owner-hospitals-table tbody {
-    display: block;
-    width: 100%;
-  }
-  html body .owner-hospitals-table thead {
-    display: none;
-  }
-  html body .owner-hospitals-table tbody tr {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--c-gray-95);
-  }
-  html body .owner-hospitals-table tbody td {
-    display: block;
-    padding: 0;
-    border: 0;
-  }
-  html body .owner-hospitals-table tbody td:first-child,
-  html body .owner-hospitals-table tbody td.owner-none {
-    grid-column: 1 / -1;
-  }
-  html body .owner-hospitals-table tbody td[data-label]::before {
-    content: attr(data-label);
-    display: block;
-    color: var(--st-muted);
-    font-size: 11px;
-    font-weight: 600;
-  }
-}
 /* Name check on a phone: card titles take two lines, the tabs keep their whole names, and each fix is a small
    card, today's name above the new one (the table ran 88px past the edge). */
 @media (max-width: 700px) {
@@ -9985,85 +7395,6 @@ html body .department-status-tabs button {
     grid-row: 1 / span 2;
   }
 }
-/* The owner's Studio sections: the page title names the section, so the panel's own eyebrow and heading
-   (which repeated it) are hidden; its description stays. */
-html
-  body
-  .studio-section-page
-  .studio-body
-  :is(.studio-panel-head, .asset-import-head, .studio-errors-head, .studio-workflow-hero)
-  > div:first-child
-  > :is(.eyebrow, h2) {
-  display: none;
-}
 /* Notices: the date fields keep to their column (the browser's date picker was wider than it and ran into
    the next field and the button). */
-@media (min-width: 1281px) {
-  html body .studio-notice-new {
-    grid-template-columns: minmax(0, 1fr) 230px 230px auto;
-  }
-}
 /* On a tablet the message takes the whole first row and the dates share the second. */
-@media (max-width: 1280px) {
-  html body .studio-notice-new {
-    grid-template-columns: 1fr 1fr auto;
-  }
-  html body .studio-notice-new .studio-notice-message {
-    grid-column: 1/-1;
-  }
-}
-@media (max-width: 900px) {
-  html body .studio-notice-new {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-html body .studio-notice-new label {
-  min-width: 0;
-}
-html body .studio-notice-new input {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-/* Evaluation Demos with none yet: a card that says what a Demo is for, with the button to open one. */
-html body .evaluation-demo-empty-card {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  padding: 32px 16px;
-  border: 1px dashed var(--c-gray-90);
-  border-radius: 12px;
-  color: var(--st-muted);
-  text-align: center;
-}
-html body .evaluation-demo-empty-card > svg {
-  color: var(--c-violet-45);
-}
-html body .evaluation-demo-empty-card strong {
-  color: var(--c-cyan-20);
-  font-size: 15px;
-}
-html body .evaluation-demo-empty-card span {
-  max-width: 460px;
-  font-size: 13px;
-}
-/* The owner's Sterilization Flow page: its title is the page's, so the box keeps its description (the compact
-   desktop layout hid it, which left the box empty but for the profile name). */
-html body .studio-section-page .studio-body-workflow .studio-workflow-hero p {
-  display: block;
-}
-/* The hospital the owner is working in: said in place of its «Είσοδος». */
-html body .platform-here {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  padding: 0 10px;
-  color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-/* Hospitals list: the code and counts under a name meet the contrast ratio (the lighter cyan did not). */
-html body .platform-hospital-name small {
-  color: var(--st-muted);
-}
