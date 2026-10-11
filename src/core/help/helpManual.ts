@@ -1227,7 +1227,7 @@ export const helpManual: ManualSection[] = [
         ],
         en: [
           'Who made the movement',
-          'Every entry keeps the account it was recorded under; the database itself writes it, not the device, and it never changes. When the account differs from the name on the entry, the movement details show it as "Account that recorded it" and the list shows it in orange. From the details, "Open card" opens the Set or instrument and "Tracing" opens its traceability.',
+          'Every entry keeps the account it was recorded under; the database itself writes it, not the device, and it never changes. When the account differs from the name on the entry, the movement details show it as "Account that recorded it" and the list shows it in orange. From the details, "Open card" opens the Set or instrument and "Traceability" opens its traceability.',
         ],
       },
       {
