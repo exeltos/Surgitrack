@@ -51,7 +51,11 @@ export default function SterilizerLoads({
               </span>
               <div>
                 <strong>
-                  {trData(load.equipment)} · {tr('Κύκλος')} {load.cycleNumber}
+                  <span>{trData(load.equipment)}</span>{' '}
+                  <span className="sterilizer-load-cycle">
+                    <span className="sterilizer-load-sep">· </span>
+                    {tr('Κύκλος')} {load.cycleNumber}
+                  </span>
                 </strong>
                 <small>
                   {load.program} · {tr('Φορτώθηκε {0} από {1}', load.createdAt, trData(load.createdByName))}

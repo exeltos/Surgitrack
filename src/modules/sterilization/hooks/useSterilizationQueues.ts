@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {tr} from '../../../i18n';
+import {tr, trc} from '../../../i18n';
 import {effectiveState} from '../../../core/workflow';
 import type {AssetState} from '../../../types/domain';
 import type {Kind, SterilizationRow, AssetDraft} from '../sterilizationTypes';
@@ -80,24 +80,25 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
     const asset = tools.find(item => item.id === id);
     return asset ? {kind: 'TOOL', asset} : undefined;
   };
+  // The list is titled like its stage card, so the two read as one.
   const queueTitle =
     queue === 'INCOMING'
-      ? tr('Αναμονή φυσικής παραλαβής')
+      ? tr('Παραλαβή')
       : queue === 'WASHING'
-        ? tr('Καθαρισμός & Απολύμανση')
+        ? trc('stage', 'Καθαρισμός')
         : queue === 'PREP'
-          ? tr('Έλεγχος & Σύνθεση')
+          ? tr('Σύνθεση')
           : queue === 'PACKAGING'
-            ? tr('Συσκευασία & Σήμανση')
+            ? tr('Συσκευασία')
             : queue === 'PROCESS'
-              ? tr('Φόρτωση κλιβάνου')
+              ? tr('Φόρτωση')
               : queue === 'IN_STERILIZER'
                 ? tr('Στον κλίβανο')
                 : queue === 'RELEASE'
-                  ? tr('Έλεγχος & Αποδέσμευση')
+                  ? tr('Αποδέσμευση')
                   : queue === 'STORAGE'
                     ? tr('Αποθήκευση')
-                    : tr('Έτοιμα για παραλαβή');
+                    : tr('Έτοιμα για παράδοση');
   const queueStageLabel =
     queue === 'INCOMING'
       ? tr('Αναμένει φυσική παράδοση')
