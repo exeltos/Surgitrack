@@ -3,7 +3,6 @@ import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
-import StatusBadge from '../../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {
   CheckCircle2,
@@ -305,13 +304,14 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       ) : (
                         <span className="ster-object-state">{tr('Μεμονωμένο εργαλείο')}</span>
                       )
-                    ) : (
-                      <StatusBadge value={x.state} />
-                    )}{' '}
+                    ) : assetIssues.length === 0 ? (
+                      // The stage is the tab itself: the column only speaks up for something to see.
+                      <span className="ster-meta-none">—</span>
+                    ) : null}
                     {assetIssues.length > 0 && (
                       <span className="issue-inline">
                         <TriangleAlert size={14} />
-                        {assetIssues.length} {tr('ανοικτή')}
+                        {assetIssues.length} {assetIssues.length === 1 ? tr('ανοικτή') : tr('ανοικτές')}
                       </span>
                     )}
                     {queue === 'INCOMING' &&
@@ -324,7 +324,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                           </span>
                         ) : null;
                       })()}
-                    <small className="ster-tablet-stage">{queueStageLabel}</small>
                   </div>
                   <div className="ster-status">
                     <small>{queueStageLabel}</small>
@@ -359,9 +358,13 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <Box size={15} /> {tr('Έλεγχος συσκευασίας')}
                       </button>
                     ) : queue === 'PROCESS' ? (
-                      <span className="ster-row-note">
-                        {pickedKeys.includes(keyOf(x)) ? tr('Μπαίνει στο φορτίο') : tr('Εκτός φορτίου')}
-                      </span>
+                      pickedKeys.includes(keyOf(x)) ? (
+                        <span className="ster-load-badge in">
+                          <CheckCircle2 size={13} /> {tr('Στο φορτίο')}
+                        </span>
+                      ) : (
+                        <span className="ster-load-badge">{tr('Εκτός φορτίου')}</span>
+                      )
                     ) : queue === 'RELEASE' ? (
                       inLoad.has(keyOf(x)) ? (
                         (() => {
@@ -370,8 +373,15 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                           );
                           // One release per load, from the header button: the row only says which load it is in.
                           return (
-                            <span className="ster-row-note" title={load?.id}>
-                              {load ? `${trData(load.equipment)} · ${tr('Κύκλος')} ${load.cycleNumber}` : ''}
+                            <span className="ster-row-note ster-row-load">
+                              {load && (
+                                <>
+                                  <b>{trData(load.equipment)}</b>
+                                  <small>
+                                    {tr('Κύκλος')} {load.cycleNumber}
+                                  </small>
+                                </>
+                              )}
                             </span>
                           );
                         })()

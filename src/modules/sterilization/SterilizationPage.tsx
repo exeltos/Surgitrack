@@ -47,7 +47,7 @@ export default function SterilizationPage() {
         <div>
           <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
           <h1>{tr('Αποστείρωση')}</h1>
-          <p>{tr('Η ροή του νοσοκομείου από το Studio, με πλήρη ιχνηλασιμότητα.')}</p>
+          <p>{tr('Η πορεία των εργαλείων από την παραλαβή έως την παράδοση στο τμήμα.')}</p>
         </div>
         <div className="ster-shift">
           <ShieldCheck size={18} />

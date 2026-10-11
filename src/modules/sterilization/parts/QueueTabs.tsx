@@ -9,6 +9,7 @@ import {
   PackageOpen,
   Hourglass,
 } from 'lucide-react';
+import {useEffect, useRef} from 'react';
 import {tr, trc} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -27,8 +28,16 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
     storage,
     washing,
   } = s;
+  const strip = useRef<HTMLDivElement>(null);
+  // On a phone the stages scroll sideways: the open one is kept in view.
+  useEffect(() => {
+    const active = strip.current?.querySelector<HTMLElement>('button.active');
+    const box = strip.current;
+    if (!active || !box || box.scrollWidth <= box.clientWidth) return;
+    box.scrollTo?.({left: active.offsetLeft - box.offsetLeft - 8, behavior: 'smooth'});
+  }, [queue]);
   return (
-    <div className="sterile-queues modern workflow-configured-queues">
+    <div className="sterile-queues modern workflow-configured-queues" ref={strip}>
       <button
         className={queue === 'INCOMING' ? 'active' : ''}
         data-tour="queue-INCOMING"
@@ -48,7 +57,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <PackageOpen />
           <span>{trc('stage', 'Καθαρισμός')}</span>
           <strong>{washing.length}</strong>
-          <small>{tr('Πλύση / απολύμανση')}</small>
+          <small>{tr('Πλύση')}</small>
         </button>
       )}
       {(stageEnabled('PREPARATION') || preparation.length > 0) && (
@@ -56,7 +65,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <Layers3 />
           <span title={tr('Έλεγχος & Σύνθεση')}>{tr('Σύνθεση')}</span>
           <strong>{preparation.length}</strong>
-          <small>{tr('Εργαλεία / αποκλίσεις')}</small>
+          <small>{tr('Έλεγχος εργαλείων')}</small>
         </button>
       )}
       {(stageEnabled('PACKAGING') || packaging.length > 0) && (
@@ -68,7 +77,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <Box />
           <span>{tr('Συσκευασία')}</span>
           <strong>{packaging.length}</strong>
-          <small>{tr('Συσκευασία / σήμανση')}</small>
+          <small>{tr('Σήμανση')}</small>
         </button>
       )}
       <button

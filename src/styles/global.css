@@ -439,13 +439,6 @@
   .sterilization-workspace .ster-work-panel .ster-meta {
     grid-column: 3;
   }
-  .sterilization-workspace .ster-work-panel .ster-tablet-stage {
-    display: block;
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--st-muted);
-    line-height: 1.3;
-  }
 }
 
 @media (max-width: 760px) {
@@ -468,9 +461,6 @@
   }
   .sterilization-workspace .ster-work-panel .ster-status {
     display: none;
-  }
-  .sterilization-workspace .ster-work-panel .ster-tablet-stage {
-    display: block;
   }
   .sterilization-workspace .ster-work-panel .ster-row-action {
     flex-wrap: wrap !important;
@@ -11347,5 +11337,89 @@ html body .dash-more {
   }
   html body .dash-card .dash-bar {
     min-height: 24px;
+  }
+}
+/* Sterilization review: the scan button reads like every other button. */
+html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan-clear) {
+  font-size: 13px;
+  font-weight: 700;
+}
+/* Stage cards: the short description stays on one line. */
+html body .sterilization-workspace .sterile-queues.modern button > small {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+/* The status column speaks only for an open issue; otherwise a quiet dash. */
+html body .sterilization-workspace .ster-meta-none {
+  color: var(--st-muted);
+}
+/* Loading: each row says whether it goes in the load. */
+html body .ster-load-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+html body .ster-load-badge.in {
+  background: var(--c-cyan-90);
+  color: var(--c-cyan-30-5);
+}
+/* Release: the sterilizer and the cycle on two whole lines. */
+html body .ster-row-action .ster-row-note.ster-row-load {
+  display: grid;
+  gap: 1px;
+  white-space: normal;
+  overflow: visible;
+  line-height: 1.3;
+}
+html body .ster-row-load b {
+  color: var(--c-cyan-20);
+  font-size: 12px;
+  font-weight: 650;
+}
+@media (max-width: 760px) {
+  /* Phone: the stages are one strip that scrolls sideways, so the list starts high on the screen. */
+  html body .sterilization-workspace .sterile-queues.modern {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  html body .sterilization-workspace .sterile-queues.modern button {
+    flex: 0 0 auto;
+    min-width: 128px;
+    scroll-snap-align: start;
+  }
+  /* The user's name is already in the menu. */
+  html body .sterilization-workspace .ster-shift {
+    display: none;
+  }
+  /* In the sterilizer: the cycle under the sterilizer, the badge under the title. */
+  html body .sterilizer-load-card > header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  html body .sterilizer-load-card > header .sterilizer-load-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  html body .sterilizer-load-card .sterilizer-load-sep,
+  html body .sterilization-workspace .ster-work-panel .ster-meta:has(> .ster-meta-none) {
+    display: none;
+  }
+  html body .sterilizer-load-card .sterilizer-load-cycle {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
   }
 }
