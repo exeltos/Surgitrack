@@ -537,8 +537,11 @@ async function main() {
   }
 }
 
-/** A few dialogs reachable with one click, captured where the role has them. */
-async function captureModals(page, {role, viewport, record, log, wanted}) {
+/**
+ * Dialogs and screen states a click or two away, captured where the role has them: each Sterilization queue
+ * and its stage dialog, a purchase order, an instrument's report, a grouped Set, sign-out.
+ */
+async function captureModals(page, {role, viewport, seed, record, log, wanted}) {
   const modals = [];
   const sterilization = ['STERILIZATION', 'SUPERVISOR', 'ADMIN'].includes(role);
   if (sterilization)
@@ -565,6 +568,34 @@ async function captureModals(page, {role, viewport, record, log, wanted}) {
             .click({timeout: 3000}),
       },
     );
+  if (sterilization) {
+    // Each stage's queue (a screen state, no dialog), and the dialog its first row (or the load button) opens.
+    const queue = q => page.locator(`[data-tour="queue-${q}"]`).click({timeout: 3000});
+    const firstRow = () => page.locator('.ster-row-action button').first().click({timeout: 3000});
+    const button = name => () => page.getByRole('button', {name}).first().click({timeout: 3000});
+    const stages = [
+      ['washing', 'WASHING', firstRow],
+      ['prep', 'PREP', firstRow],
+      ['packaging', 'PACKAGING', firstRow],
+      ['process', 'PROCESS', button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)],
+      ['in-sterilizer', 'IN_STERILIZER', undefined],
+      ['release', 'RELEASE', button(/^(Αποδέσμευση φορτίου|Release (the )?load)/)],
+      ['ready', 'READY', firstRow],
+    ];
+    for (const [name, q, opener] of stages) {
+      modals.push({name: `sterilization-queue-${name}`, route: '/sterilization', dialog: false, open: () => queue(q)});
+      if (opener)
+        modals.push({
+          name: `sterilization-${name}-dialog`,
+          route: '/sterilization',
+          open: async () => {
+            await queue(q);
+            await page.waitForTimeout(300);
+            await opener();
+          },
+        });
+    }
+  }
   if (sterilization)
     modals.push({
       name: 'issues-resolve-modal',
@@ -593,6 +624,46 @@ async function captureModals(page, {role, viewport, record, log, wanted}) {
           .click({timeout: 3000});
       },
     });
+  if (role === 'ADMIN' || role === 'SUPERVISOR')
+    modals.push({
+      // A new purchase order (Replacements).
+      name: 'replacements-order-dialog',
+      route: '/replacements',
+      open: () =>
+        page
+          .locator('button')
+          .filter({hasText: /Νέα παραγγελία|New order/})
+          .first()
+          .click({timeout: 3000}),
+    });
+  if (role !== 'VIEWER' && seed.firstToolId)
+    modals.push({
+      // An instrument's problem report.
+      name: 'tool-report-dialog',
+      route: `/tools/${seed.firstToolId}`,
+      open: async () => {
+        await page
+          .locator('button')
+          .filter({hasText: /^(Ενέργειες|Actions)/})
+          .first()
+          .click({timeout: 3000});
+        await page
+          .getByText(/^(Αναφορά προβλήματος|Report a problem)/)
+          .first()
+          .click({timeout: 3000});
+      },
+    });
+  if (role !== 'DEPARTMENT' && seed.firstSetId)
+    modals.push({
+      // A Set's contents grouped by instrument kind, the first group open.
+      name: 'sets-detail-grouped',
+      route: `/sets/${seed.firstSetId}`,
+      dialog: false,
+      open: async () => {
+        await page.locator('button[aria-label="Ομαδοποίηση ίδιων εργαλείων"]').first().click({timeout: 3000});
+        await page.locator('.set-tool-group-row').first().click({timeout: 3000});
+      },
+    });
   // Every signed-in role: the in-app sign-out question.
   modals.push({
     name: 'signout-modal',
@@ -612,12 +683,13 @@ async function captureModals(page, {role, viewport, record, log, wanted}) {
     log.console.length = log.failed.length = log.blocked.length = log.mock.length = 0;
     try {
       await modal.open();
-      await page.waitForSelector(
-        '.modal-backdrop, .studio-drawer, [role="dialog"], [aria-modal="true"], dialog[open]',
-        {
-          timeout: 3000,
-        },
-      );
+      if (modal.dialog !== false)
+        await page.waitForSelector(
+          '.modal-backdrop, .studio-drawer, [role="dialog"], [aria-modal="true"], dialog[open]',
+          {
+            timeout: 3000,
+          },
+        );
       await page.waitForTimeout(SETTLE_MS);
       const file = `${LANG}_${role.toLowerCase()}_${viewport}_${modal.name}.png`;
       await shoot(page, file, viewport);
