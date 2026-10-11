@@ -57,8 +57,8 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       id: 'WASHING',
       enabled: true,
       locked: false,
-      labelEl: 'Καθαρισμός & Απολύμανση',
-      labelEn: 'Cleaning & Disinfection',
+      labelEl: 'Καθαρισμός',
+      labelEn: 'Cleaning',
       descriptionEl: 'Τεκμηρίωση ολοκλήρωσης καθαρισμού / θερμικής ή άλλης απολύμανσης.',
       descriptionEn: 'Document completion of cleaning and thermal or other disinfection.',
       checksEl: [
@@ -72,8 +72,8 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       id: 'PREPARATION',
       enabled: true,
       locked: false,
-      labelEl: 'Έλεγχος & Σύνθεση',
-      labelEn: 'Inspection & Assembly',
+      labelEl: 'Σύνθεση',
+      labelEn: 'Assembly',
       descriptionEl: 'Έλεγχος εργαλείων, σύνθεση Σετ και διαχείριση αποκλίσεων.',
       descriptionEn: 'Instrument inspection, set assembly and deviation management.',
       checksEl: ['Έλεγχος λειτουργικότητας', 'Επιβεβαίωση σύνθεσης'],
@@ -83,8 +83,8 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       id: 'PACKAGING',
       enabled: true,
       locked: false,
-      labelEl: 'Συσκευασία & Σήμανση',
-      labelEn: 'Packaging & Labelling',
+      labelEl: 'Συσκευασία',
+      labelEn: 'Packaging',
       descriptionEl: 'Έλεγχος περιέκτη / αποστειρωμένης συσκευασίας, σήμανσης και δείκτη.',
       descriptionEn: 'Check container / sterile barrier, labelling and indicator.',
       checksEl: [
@@ -98,8 +98,8 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       id: 'STERILIZATION',
       enabled: true,
       locked: true,
-      labelEl: 'Φόρτωση κλιβάνου',
-      labelEn: 'Sterilizer load',
+      labelEl: 'Φόρτωση',
+      labelEn: 'Loading',
       descriptionEl: 'Επιλογή κλιβάνου, φορτίου και προγράμματος· όλα τα Σετ και εργαλεία μπαίνουν μαζί σε έναν κύκλο.',
       descriptionEn: 'Choose the sterilizer, load and program; all Sets and instruments go into one cycle together.',
       checksEl: ['Καταγραφή κύκλου'],
@@ -110,8 +110,8 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       enabled: true,
       // Every sterilizer load ends here: indicators and approval before anything goes back to a department.
       locked: true,
-      labelEl: 'Αποδέσμευση φορτίου',
-      labelEn: 'Load Release',
+      labelEl: 'Αποδέσμευση',
+      labelEn: 'Release',
       descriptionEl: 'Υποχρεωτικός έλεγχος δεικτών και έγκριση πριν την παράδοση.',
       descriptionEn: 'Required indicator check and approval before delivery.',
       checksEl: ['Παράμετροι κύκλου αποδεκτές', 'Χημικός δείκτης αποδεκτός', 'Συσκευασία στεγνή και ακέραιη'],
@@ -132,8 +132,8 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
       id: 'DELIVERY',
       enabled: true,
       locked: true,
-      labelEl: 'Παράδοση στο Τμήμα',
-      labelEn: 'Department Delivery',
+      labelEl: 'Παράδοση',
+      labelEn: 'Delivery',
       descriptionEl: 'Ταυτοποίηση παραλαμβάνοντα και ολοκλήρωση της αλυσίδας φύλαξης.',
       descriptionEn: 'Receiver identification and chain-of-custody completion.',
       checksEl: ['Ταυτοποίηση παραλαμβάνοντα'],
@@ -143,8 +143,19 @@ export const defaultSterilizationWorkflow: SterilizationWorkflowConfig = {
 };
 
 /**
- * A workflow saved before the stage was renamed keeps its old wording: «Αποστείρωση» becomes
- * «Φόρτωση κλιβάνου» (only when the hospital has not renamed it itself). Stage descriptions still in their
+ * Stage names a hospital never changed itself: each stage has one short name everywhere now, so a saved
+ * workflow still carrying an earlier default name takes the current one. A name the hospital gave itself stays.
+ */
+const OLD_DEFAULT_LABELS: Partial<Record<WorkflowStageId, string[]>> = {
+  WASHING: ['Καθαρισμός & Απολύμανση'],
+  PREPARATION: ['Έλεγχος & Σύνθεση'],
+  PACKAGING: ['Συσκευασία & Σήμανση'],
+  STERILIZATION: ['Αποστείρωση', 'Φόρτωση κλιβάνου'],
+  RELEASE: ['Αποδέσμευση φορτίου'],
+  DELIVERY: ['Παράδοση στο Τμήμα'],
+};
+/**
+ * A workflow saved before the stage was renamed keeps its old wording only where the hospital renamed it. Stage descriptions still in their
  * old default wording (English terms since put in Greek) take the current default, and only those.
  */
 const OLD_DESCRIPTIONS_EL = new Set([
@@ -152,25 +163,30 @@ const OLD_DESCRIPTIONS_EL = new Set([
   'Ταυτοποίηση παραλαμβάνοντα και ολοκλήρωση chain of custody.',
 ]);
 export const upgradeWorkflowLabels = (workflow: SterilizationWorkflowConfig): SterilizationWorkflowConfig => {
-  const fresh = defaultSterilizationWorkflow.stages.find(stage => stage.id === 'STERILIZATION');
-  const oldLabel = (stage: WorkflowStageConfig) => stage.id === 'STERILIZATION' && stage.labelEl === 'Αποστείρωση';
+  const defaultOf = (stage: WorkflowStageConfig) =>
+    defaultSterilizationWorkflow.stages.find(item => item.id === stage.id);
+  const oldLabel = (stage: WorkflowStageConfig) => !!OLD_DEFAULT_LABELS[stage.id]?.includes(stage.labelEl);
   // Load release is required: a saved workflow that left it off (or unlocked) gets it back on and locked.
   const releaseOff = (stage: WorkflowStageConfig) => stage.id === 'RELEASE' && (!stage.enabled || !stage.locked);
   const oldDescription = (stage: WorkflowStageConfig) => OLD_DESCRIPTIONS_EL.has(stage.descriptionEl);
-  if (!workflow.stages?.some(stage => (fresh && oldLabel(stage)) || releaseOff(stage) || oldDescription(stage)))
-    return workflow;
+  if (!workflow.stages?.some(stage => oldLabel(stage) || releaseOff(stage) || oldDescription(stage))) return workflow;
   return {
     ...workflow,
     stages: workflow.stages.map(stage => {
-      if (fresh && oldLabel(stage))
-        return {
-          ...stage,
-          labelEl: fresh.labelEl,
-          labelEn: fresh.labelEn,
-          descriptionEl: fresh.descriptionEl,
-          descriptionEn: fresh.descriptionEn,
-        };
-      const upgraded = releaseOff(stage) ? {...stage, enabled: true, locked: true} : stage;
+      const fresh = defaultOf(stage);
+      // «Αποστείρωση» was the sterilizer stage's first name: its description changed with it.
+      const renamed =
+        fresh && oldLabel(stage)
+          ? {
+              ...stage,
+              labelEl: fresh.labelEl,
+              labelEn: fresh.labelEn,
+              ...(stage.labelEl === 'Αποστείρωση'
+                ? {descriptionEl: fresh.descriptionEl, descriptionEn: fresh.descriptionEn}
+                : {}),
+            }
+          : stage;
+      const upgraded = releaseOff(renamed) ? {...renamed, enabled: true, locked: true} : renamed;
       const current = defaultSterilizationWorkflow.stages.find(item => item.id === stage.id);
       return oldDescription(stage) && current ? {...upgraded, descriptionEl: current.descriptionEl} : upgraded;
     }),

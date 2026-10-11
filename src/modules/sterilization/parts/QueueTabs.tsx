@@ -57,13 +57,13 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <PackageOpen />
           <span>{trc('stage', 'Καθαρισμός')}</span>
           <strong>{washing.length}</strong>
-          <small>{tr('Πλύση')}</small>
+          <small>{tr('Πλύση & απολύμανση')}</small>
         </button>
       )}
       {(stageEnabled('PREPARATION') || preparation.length > 0) && (
         <button className={queue === 'PREP' ? 'active' : ''} data-tour="queue-PREP" onClick={() => setQueue('PREP')}>
           <Layers3 />
-          <span title={tr('Έλεγχος & Σύνθεση')}>{tr('Σύνθεση')}</span>
+          <span>{tr('Σύνθεση')}</span>
           <strong>{preparation.length}</strong>
           <small>{tr('Έλεγχος εργαλείων')}</small>
         </button>
@@ -77,7 +77,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <Box />
           <span>{tr('Συσκευασία')}</span>
           <strong>{packaging.length}</strong>
-          <small>{tr('Σήμανση')}</small>
+          <small>{tr('Συσκευασία & σήμανση')}</small>
         </button>
       )}
       <button
@@ -86,9 +86,9 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
         onClick={() => setQueue('PROCESS')}
       >
         <Flame />
-        <span title={tr('Φόρτωση κλιβάνου')}>{tr('Φόρτωση')}</span>
+        <span>{tr('Φόρτωση')}</span>
         <strong>{processing.length}</strong>
-        <small>{tr('Κλίβανος / φορτίο')}</small>
+        <small>{tr('Κλίβανος & φορτίο')}</small>
       </button>
       <button
         className={queue === 'IN_STERILIZER' ? 'active' : ''}

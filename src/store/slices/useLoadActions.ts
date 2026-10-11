@@ -106,7 +106,7 @@ export function useLoadActions(
         addMovement({
           asset: `${asset.barcode} · ${asset.name}`,
           assetKind: ref.kind,
-          from: 'Καθαρισμός & Απολύμανση',
+          from: 'Καθαρισμός',
           to:
             sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === nextStateAfter('WASHING'))?.labelEl ||
             'Επόμενο στάδιο',
@@ -159,7 +159,7 @@ export function useLoadActions(
         addMovement({
           asset: `${asset.barcode} · ${asset.name}`,
           assetKind: ref.kind,
-          from: 'Φόρτωση κλιβάνου',
+          from: 'Φόρτωση',
           to: 'Στον κλίβανο',
           status: `Φορτίο ${loadId} · ${payload.equipment} · κύκλος ${payload.cycleNumber} · σε εξέλιξη`,
           by: currentUser.name,
@@ -219,7 +219,7 @@ export function useLoadActions(
         asset: `${asset.barcode} · ${asset.name}`,
         assetKind: ref.kind,
         from: 'Στον κλίβανο',
-        to: result === 'PASSED' ? 'Αποδέσμευση φορτίου' : 'Επανεπεξεργασία',
+        to: result === 'PASSED' ? 'Αποδέσμευση' : 'Επανεπεξεργασία',
         status: `Φορτίο ${load.id} · ${load.equipment} · ${load.cycleNumber} · ${result === 'PASSED' ? 'επιτυχές' : 'ΑΠΟΤΥΧΙΑ'}`,
         by: currentUser.name,
       });
@@ -301,7 +301,7 @@ export function useLoadActions(
       addMovement({
         asset: `${item.barcode} · ${item.assetName}`,
         assetKind: item.assetKind,
-        from: 'Αποδέσμευση φορτίου',
+        from: 'Αποδέσμευση',
         to:
           decision === 'RELEASED'
             ? sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === nextStateAfter('RELEASE'))?.labelEl ||
@@ -447,7 +447,7 @@ export function useLoadActions(
       addMovement({
         asset: `${item.barcode} · ${item.assetName}`,
         assetKind: item.assetKind,
-        from: 'Αποδέσμευση φορτίου',
+        from: 'Αποδέσμευση',
         to: result === 'PASS' ? 'Αποδεσμεύτηκε' : 'Ανάκληση / Επανεπεξεργασία',
         status: `Βιολογικός δείκτης ${result === 'PASS' ? 'επιτυχής' : 'ανεπιτυχής'} · φορτίο ${loadId} · κύκλος ${load.cycleNumber}`,
         by: currentUser.name,

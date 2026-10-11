@@ -7,7 +7,8 @@ import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wr
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
-import {tr, trc, trData} from '../../i18n';
+import {tr, trData} from '../../i18n';
+import {statusLabel} from '../../components/ui/statusLabel';
 import {presetPath, useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
@@ -32,16 +33,8 @@ const IN_STERILIZATION_STATES: string[] = [
   'AWAITING_RELEASE',
   'IN_STORAGE',
 ];
-const sterilizationStage = (state: string) =>
-  ({
-    PENDING_STERILIZATION: tr('Αναμονή παραλαβής'),
-    IN_WASHING: trc('stage', 'Καθαρισμός'),
-    IN_PREPARATION: tr('Σύνθεση'),
-    IN_PACKAGING: tr('Συσκευασία'),
-    IN_STERILIZATION: tr('Κλίβανος'),
-    AWAITING_RELEASE: tr('Αποδέσμευση'),
-    IN_STORAGE: tr('Αποθήκευση'),
-  })[state];
+// Where it is inside Sterilization, as every list says it («Σε καθαρισμό», «Στον κλίβανο»…).
+const sterilizationStage = (state: string) => statusLabel(state);
 
 export default function DepartmentPage() {
   const {sets, tools, issues, currentUser, role} = useSurgi();

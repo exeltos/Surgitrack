@@ -91,7 +91,7 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                         {receiptBatchDepartment ? ` · ${receiptBatchDepartment}` : ''}
                       </span>
                     </div>
-                    <small>{tr('Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα στο «Έλεγχος & Σύνθεση».')}</small>
+                    <small>{tr('Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα, στη «Σύνθεση».')}</small>
                   </div>
                   <div className="delivery-batch-list">
                     {incoming.map(item => {

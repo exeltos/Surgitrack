@@ -130,7 +130,8 @@ export function trData(text: string | null | undefined): string {
   if (!text) return text ?? '';
   // Records written before «Stock» was renamed «Απόθεμα» still say Stock.
   if (current !== 'en') return text.replace(/\bStock\b/g, 'Απόθεμα');
-  const whole = en[text.trim()];
+  // Stored places are stages, never buttons: «Καθαρισμός» there is the Cleaning stage, not «Clear».
+  const whole = en[`stage|${text.trim()}`] || en[text.trim()];
   if (whole) return whole;
   return text
     .split(/( · | → )/)
