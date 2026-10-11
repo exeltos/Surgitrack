@@ -7,6 +7,9 @@ const mocks = vi.hoisted(() => ({
   readCache: vi.fn(),
   setRestored: vi.fn(),
   loadAppRecords: vi.fn(),
+  seedDemoOrganization: vi.fn(),
+  org: {name: 'Test Hospital', is_demo: false, evaluation: false, plan: 'STANDARD', trial_ends_at: null},
+  dataMode: 'PRODUCTION',
 }));
 
 vi.mock('../../../lib/supabase', () => {
@@ -17,8 +20,7 @@ vi.mock('../../../lib/supabase', () => {
       from: (table: string) => ({
         select: () => ({
           eq: () => ({
-            single: () =>
-              result({name: 'Test Hospital', is_demo: false, evaluation: false, plan: 'STANDARD', trial_ends_at: null}),
+            single: () => result(mocks.org),
             order: () => result(table === 'departments' ? [] : null),
           }),
         }),
@@ -33,6 +35,12 @@ vi.mock('../identity', () => ({
 vi.mock('../appRecords', async importOriginal => ({
   ...(await importOriginal<typeof import('../appRecords')>()),
   loadAppRecords: mocks.loadAppRecords,
+  getCloudOrganizationId: () => 'org-1',
+}));
+vi.mock('../demoSeed', () => ({seedDemoOrganization: mocks.seedDemoOrganization}));
+vi.mock('../../../config/dataMode', async importOriginal => ({
+  ...(await importOriginal<typeof import('../../../config/dataMode')>()),
+  getRuntimeDataMode: () => mocks.dataMode,
 }));
 vi.mock('../localCache', async importOriginal => ({
   ...(await importOriginal<typeof import('../localCache')>()),
@@ -89,5 +97,40 @@ describe('opening the hospital', () => {
     expect(organizationId).toBe('org-1');
     expect(Object.keys(restored)).toEqual(['tools']);
     expect(restored.tools).toMatchObject({changed: ['t1'], items: [{id: 't1', name: 'Edited here'}]});
+  });
+
+  it('opens a reset Demo from the server and fills it, whatever this device kept from before the reset', async () => {
+    mocks.org = {name: 'SurgiTrack Demo', is_demo: true, evaluation: false, plan: 'STANDARD', trial_ends_at: null};
+    mocks.dataMode = 'DEMO';
+    mocks.setRestored.mockClear();
+    // A full copy from before the reset (settings and all), while the server is empty.
+    const fresh = {
+      changed: [],
+      removed: [],
+      since: '',
+      deletedSince: '',
+      savedAt: Date.now(),
+      version: 1,
+      expired: false,
+    };
+    mocks.readCache.mockResolvedValue(
+      Object.fromEntries([...STORE_COLLECTIONS, 'library'].map(c => [c, {...fresh, items: [{id: `old-${c}`}]}])),
+    );
+    const empty = Object.fromEntries([...STORE_COLLECTIONS, 'library'].map(c => [c, []]));
+    mocks.loadAppRecords.mockReset();
+    mocks.loadAppRecords.mockResolvedValueOnce(empty).mockResolvedValue(serverRecords());
+    let workspace: CloudWorkspace | null = null;
+    render(
+      <CloudWorkspaceGate>
+        {ws => {
+          workspace = ws;
+          return null;
+        }}
+      </CloudWorkspaceGate>,
+    );
+    await waitFor(() => expect(workspace).not.toBeNull());
+    expect(mocks.seedDemoOrganization).toHaveBeenCalledWith('org-1', expect.anything());
+    const records = workspace!.records as unknown as Record<string, Array<{id: string}>>;
+    expect(records.sets).toEqual([{id: 's1', name: 'Server set'}]);
   });
 });
