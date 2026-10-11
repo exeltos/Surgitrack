@@ -1,0 +1,957 @@
+/* Hospital. Moved together from overrides.css; cascade order is intentional. */
+.hospital-users-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 34px 16px;
+  color: var(--st-muted);
+  text-align: center;
+}
+.hospital-users-empty svg {
+  color: var(--c-cyan-70);
+}
+.hospital-users-empty strong {
+  color: var(--c-cyan-30);
+  font-size: 13px;
+}
+.hospital-users-empty small {
+  font-size: 12px;
+}
+.overview-links {
+  display: flex;
+  gap: 8px;
+}
+.overview-alert small {
+  color: var(--c-amber-40-3);
+}
+
+/* Hospital people: one users list (rows open a drawer), invitations, signups to approve, departments. */
+.hospital-people {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.hospital-count.attention {
+  background: var(--c-amber-95);
+  color: var(--c-orange-35);
+}
+.people-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.people-invite {
+  position: relative;
+}
+.people-invite-menu > button,
+.people-invite-menu > label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: var(--c-cyan-45);
+  cursor: pointer;
+}
+.people-invite-menu > button:hover,
+.people-invite-menu > label:hover {
+  background: var(--c-gray-100-2);
+}
+.people-invite-menu span {
+  display: grid;
+  gap: 2px;
+}
+.people-invite-menu b {
+  color: var(--c-blue-15);
+  font-size: 13px;
+}
+.people-invite-menu small {
+  color: var(--st-muted);
+  font-size: 11px;
+}
+.people-requests {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--c-amber-85);
+  border-radius: 12px;
+  background: var(--c-gray-100);
+}
+.people-requests > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  color: var(--c-orange-50);
+}
+.people-requests .hospital-request {
+  background: var(--c-white);
+}
+.people-head,
+.people-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
+  align-items: center;
+  gap: 10px;
+}
+.people-head {
+  padding: 0 12px;
+  color: var(--st-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.people-rows {
+  display: grid;
+  gap: 6px;
+}
+.people-row:hover {
+  border-color: var(--c-cyan-85);
+  background: var(--c-white);
+}
+.people-row code {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--c-cyan-45);
+}
+.people-who {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.people-who b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.people-who small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--st-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.people-you {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-3);
+  color: var(--c-cyan-45);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+.people-value {
+  min-width: 0;
+  color: var(--c-blue-25);
+  font-size: 12.5px;
+}
+.people-value.whole {
+  color: var(--st-muted);
+  font-style: italic;
+}
+.people-csv {
+  display: grid;
+  gap: 6px;
+}
+.people-csv > div {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 9px;
+}
+.people-csv > div.error {
+  border-color: var(--c-red-85);
+  background: var(--c-gray-100-4);
+}
+.people-csv small {
+  color: var(--st-muted);
+}
+.hospital-people .hospital-request select,
+.hospital-people .hospital-request input,
+.hospital-people .hospital-department-add input,
+.hospital-people .hospital-row input {
+  height: 36px;
+  min-width: 0;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 8px;
+  background: var(--c-white);
+  padding: 0 9px;
+  color: var(--c-blue-15);
+  font: inherit;
+  font-size: 13px;
+}
+.hospital-people .people-toolbar .studio-search input {
+  height: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.people-row.self {
+  cursor: default;
+  background: var(--c-white);
+}
+.people-row.self:hover {
+  border-color: var(--c-gray-95);
+}
+.hospital-member-status.invited {
+  color: var(--c-orange-50);
+}
+.hospital-member-status.invited > i {
+  background: var(--c-amber-70);
+}
+.people-invited {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--c-amber-85);
+  border-radius: 11px;
+  background: var(--c-gray-100);
+  color: var(--c-orange-50);
+}
+.people-invited span {
+  display: grid;
+  gap: 3px;
+}
+.people-invited b {
+  color: var(--c-orange-35);
+  font-size: 13px;
+}
+.people-invited small {
+  color: var(--c-amber-45);
+  font-size: 12px;
+  line-height: 1.4;
+}
+@media (max-width: 760px) {
+  .people-head {
+    display: none;
+  }
+  .people-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 4px;
+  }
+  .people-row > code,
+  .people-row > .people-value {
+    display: none;
+  }
+  .people-row > .hospital-member-status {
+    grid-column: 1;
+  }
+  .people-row > .people-open {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+  .hospital-people .hospital-request {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.people-invited > button,
+.people-invited > .app-button {
+  grid-column: 2;
+  justify-self: start;
+}
+.people-password {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  background: var(--c-white);
+  color: var(--c-cyan-45);
+}
+.people-password span {
+  display: grid;
+  gap: 3px;
+}
+.people-password b {
+  color: var(--c-cyan-20-2);
+  font-size: 13px;
+}
+.people-password small {
+  color: var(--c-cyan-45-2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.people-password > :last-child {
+  grid-column: 2;
+  justify-self: start;
+}
+.people-invited > .app-button,
+.people-password > .app-button {
+  grid-column: 2;
+  justify-self: start;
+}
+.people-invited > .app-button + .app-button,
+.people-password > .app-button + .app-button {
+  margin-top: -2px;
+}
+.people-link {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+.people-link input {
+  min-width: 0;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 8px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-2);
+  font: inherit;
+  font-size: 12px;
+}
+.people-link small {
+  grid-column: 1 / -1;
+  color: var(--c-cyan-45-2);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.hospital-notice > span {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.hospital-notice .people-link {
+  margin-top: 0;
+}
+.people-link.compact {
+  grid-column: auto;
+  margin-top: 0;
+  min-width: 0;
+}
+.people-link.compact input {
+  height: 30px;
+}
+/* Signup invitations waiting for the person's details. */
+.people-invitations {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 12px;
+  background: var(--c-gray-100-2);
+}
+.people-invitations > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-cyan-35-4);
+  font-size: 14px;
+}
+.people-invitation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+/* Hospital people: the page scrolls, the lists inside it do not (one scrollbar, not two). */
+.hospital-people .hospital-rows,
+.hospital-people .people-rows {
+  max-height: none;
+  overflow: visible;
+}
+
+/* Overview dashboard. One teal for magnitude bars; the categorical hues (blue, orange, aqua, yellow)
+   from the validated data-viz palette for «where it is»; red only for service / lost and issues. */
+.dash {
+  --dash-1: #2a78d6;
+  --dash-2: #eb6834;
+  --dash-3: #1baf7a;
+  --dash-4: #eda100;
+  --dash-bad: #e34948;
+  --dash-bar: #1f7a93;
+  --dash-track: var(--c-gray-95);
+  --dash-other: var(--c-gray-85-2);
+}
+.dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.dash-kpi {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+  color: inherit;
+  text-decoration: none;
+}
+.dash-kpi-label {
+  display: flex;
+  gap: 6px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+  align-items: flex-start;
+  min-height: 32px;
+  line-height: 1.25;
+}
+.dash-kpi strong {
+  color: var(--c-cyan-20);
+  font-size: 34px;
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.dash-kpi small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.dash-kpi.warn strong,
+.dash-kpi.warn .dash-kpi-label {
+  color: var(--c-orange-45);
+}
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px;
+}
+.dash-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+.dash-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--c-cyan-20);
+}
+.dash-flow {
+  grid-column: span 7;
+}
+.dash-where {
+  grid-column: span 5;
+}
+.dash-depts {
+  grid-column: span 7;
+}
+.dash-activity {
+  grid-column: span 5;
+}
+.dash-attention,
+.dash-latest {
+  grid-column: span 6;
+}
+.dash-bars {
+  display: grid;
+  gap: 6px;
+}
+.dash-bar {
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 12px;
+  min-height: 30px;
+  color: var(--c-cyan-30);
+  font-size: 13px;
+  text-decoration: none;
+}
+.dash-bar:hover .dash-bar-name {
+  text-decoration: underline;
+}
+.dash-bar-track i {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 7px 7px 0;
+  background: var(--dash-bar);
+}
+.dash-bar strong {
+  text-align: right;
+  font-size: 14px;
+}
+.dash-stack i {
+  min-width: 4px;
+  border-radius: 4px;
+}
+.dash-stack i.empty {
+  flex: 1;
+  background: var(--dash-track);
+}
+.dash-legend {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dash-legend li {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto 44px;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+}
+.dash-legend li:last-child {
+  border-bottom: 0;
+}
+.dash-legend strong {
+  font-size: 14px;
+}
+.dash-legend small {
+  color: var(--st-muted);
+  text-align: right;
+}
+.dash-legend-inline .dot {
+  margin-right: 6px;
+}
+.dash-depts-list {
+  display: grid;
+  gap: 4px;
+}
+.dash-dept {
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) minmax(0, 1fr) 34px 48px;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  color: var(--c-cyan-30);
+  font-size: 13px;
+  text-decoration: none;
+}
+.dash-dept:hover .dash-dept-name {
+  text-decoration: underline;
+}
+.dash-dept-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-dept-fill i {
+  min-width: 0;
+}
+.dash-dept-fill i:last-child {
+  border-radius: 0 7px 7px 0;
+}
+.dash-dept strong {
+  text-align: right;
+  font-size: 14px;
+}
+.dash-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 20px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.dash-pill.bad {
+  background: var(--c-gray-95-2);
+  color: var(--c-red-40-2);
+}
+.dash-col i {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: var(--dash-bar);
+}
+.dash-col i.zero {
+  background: var(--dash-track);
+}
+.dash-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--st-muted);
+  font-size: 11px;
+}
+.dash-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dash-list li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  color: var(--c-cyan-30);
+}
+.dash-list li:last-child {
+  border-bottom: 0;
+}
+.dash-list li > a:hover b {
+  text-decoration: underline;
+}
+.dash-list b {
+  display: block;
+  overflow: hidden;
+  color: var(--c-cyan-20);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-list small {
+  display: block;
+  overflow: hidden;
+  color: var(--st-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-list .bad {
+  color: var(--c-red-40-2);
+}
+.dash-list .warn {
+  color: var(--c-orange-45);
+}
+.dash-list li.ok {
+  grid-template-columns: minmax(0, 1fr);
+  color: var(--st-muted);
+  font-size: 13px;
+}
+.dash-kpi-label svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+.dash .dash-legend-inline {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* The Overview dashboard is taller than the screen: it scrolls instead of cutting off its lower cards. */
+.hospital-overview.dash {
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-gutter: stable;
+}
+html body .dash-grid {
+  gap: 10px;
+}
+html body .dash-card {
+  gap: 8px;
+  padding: 12px 16px;
+}
+html body .dash-legend li {
+  min-height: 26px;
+}
+html body .dash-list li {
+  padding: 5px 0;
+}
+html body .dash-activity .dash-columns {
+  height: 120px;
+  max-height: 120px;
+}
+html body .dash-dept-name {
+  font-weight: 500;
+  font-size: 13px;
+}
+html body .hospital-admin .hospital-people > .hospital-tabs,
+html body .hospital-admin .hospital-people > .hospital-notice {
+  flex: 0 0 auto;
+}
+html body .hospital-admin .hospital-people > section.hospital-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+html body .hospital-admin .hospital-people > section.hospital-card > * {
+  flex: 0 0 auto;
+}
+html body .hospital-admin .hospital-people .hospital-rows,
+html body .hospital-admin .hospital-people .people-rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* Overview: the activity card leads with three numbers; the chart below is shorter. */
+html body .dash-activity-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 6px 0 8px;
+}
+html body .dash-activity-stats span {
+  display: grid;
+  gap: 1px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+/* Overview, by department: with many departments only the list scrolls, inside its card. */
+html body .dash-card .dash-depts-list {
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/* Users list: header on one line; on phone the department and role stay visible */
+html body .people-head span {
+  white-space: nowrap;
+}
+/* Users list: column names in sentence case, as on the other lists. */
+html body .people-head {
+  text-transform: none;
+}
+html body .hospital-tabs .hospital-count {
+  white-space: nowrap;
+}
+/* «+N ακόμη» under the departments. */
+html body .dash-more {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--c-cyan-35);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  .people-invitation {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+  .people-invitation .people-link {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  html body .people-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0;
+  }
+  html body .people-row > .people-who,
+  html body .people-row > .hospital-member-status {
+    grid-column: 1 / span 2;
+  }
+  html body .people-row > .people-value {
+    display: block;
+    grid-row: 2;
+    font-size: 12px;
+    color: var(--c-blue-35);
+    white-space: normal;
+  }
+  html body .people-row > .people-value + .people-value::before {
+    content: '\00a0·\00a0';
+  }
+  html body .people-row > .people-open {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    margin-left: 8px;
+  }
+}
+@media (max-width: 1180px) {
+  .dash-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .dash-flow,
+  .dash-where,
+  .dash-depts,
+  .dash-activity,
+  .dash-attention,
+  .dash-latest {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 640px) {
+  .dash-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dash-bar {
+    grid-template-columns: minmax(110px, 140px) minmax(0, 1fr) 30px;
+  }
+}
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview.dash > .dash-grid {
+    flex: 1 1 auto;
+    min-height: 300px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  html body .hospital-overview.dash {
+    overflow: hidden;
+  }
+  html body .dash-flow > .dash-bars,
+  html body .dash-depts > .dash-depts-list,
+  html body .dash-where > .dash-legend,
+  html body .dash-attention > .dash-list,
+  html body .dash-latest > .dash-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    align-content: start;
+  }
+  html body .dash-activity > .dash-columns {
+    flex: 1 1 auto;
+    min-height: 40px;
+    height: auto;
+  }
+  html body .dash-flow .dash-bar-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html body .dash-card .dash-bars {
+    grid-auto-rows: minmax(18px, 1fr);
+    gap: 2px;
+  }
+  html body .dash-card .dash-bar {
+    min-height: 0;
+  }
+  html body .dash-card .dash-depts-list {
+    gap: 2px;
+  }
+  html body .dash-card .dash-dept {
+    min-height: 24px;
+  }
+}
+@media (min-width: 1100px) and (max-height: 599px) {
+  html body .hospital-overview.dash > .dash-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  html body .dash-grid > .dash-card {
+    grid-column: auto;
+  }
+}
+@media (max-width: 700px) {
+  html body .people-toolbar {
+    flex-wrap: wrap;
+  }
+  html body .people-toolbar .studio-search {
+    flex: 1 1 100%;
+  }
+  html body .people-toolbar .people-invite,
+  html body .people-toolbar .people-invite > .app-button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  /* Users: a signup request is shorter, role and department side by side, so the list shows below it. */
+  html body .hospital-people .hospital-request {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    padding: 10px;
+  }
+  html body .hospital-people .hospital-request-note {
+    grid-column: 1 / -1;
+  }
+  html body .people-requests > header small {
+    display: none;
+  }
+  html body .hospital-admin .hospital-people > section.hospital-card {
+    overflow-y: auto;
+  }
+  html body .hospital-admin .hospital-people .people-rows {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  /* Departments: the name on its own line, the code and «Προσθήκη» below it. */
+  html body .hospital-department-add {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .hospital-department-add > input:first-child {
+    grid-column: 1 / -1;
+  }
+  /* User card: the three buttons on one row. */
+  html body .people-drawer footer {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  html body .people-drawer footer .app-button {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  /* The two tabs fit the phone width (the page slid sideways with «1 αίτημα»). */
+  html body .hospital-tabs {
+    overflow-x: auto;
+  }
+  html body .hospital-tabs button {
+    gap: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+  html body .hospital-tabs button > svg {
+    display: none;
+  }
+  html body .dash-list b,
+  html body .dash-list small {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+@media (min-width: 1100px) and (min-height: 600px) and (max-height: 760px) {
+  html body .dash-kpi small {
+    display: none;
+  }
+  html body .hospital-overview .overview-alert {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  html body .dash-activity-stats {
+    margin: 2px 0 4px;
+  }
+  html body .dash-activity-stats span {
+    padding: 4px 8px;
+  }
+  html body .dash-activity > .dash-axis {
+    display: none;
+  }
+}
+@media (min-width: 1100px) and (max-height: 819px) {
+  html body .hospital-overview.dash {
+    overflow-y: auto;
+  }
+  html body .hospital-overview.dash > .dash-grid {
+    flex: 0 0 auto;
+    grid-template-rows: none;
+  }
+  html body .dash-grid > .dash-card {
+    overflow: visible;
+  }
+  html body .dash-card .dash-depts-list,
+  html body .dash-card .dash-list,
+  html body .dash-card .dash-bars,
+  html body .dash-card .dash-legend {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  html body .dash-card .dash-bar {
+    min-height: 24px;
+  }
+}

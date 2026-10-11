@@ -7,3 +7,5 @@
 @import './layers/04-reports-department-admin.css';
 @import './overrides.css';
 @import './sections/sterilization.css';
+@import './sections/studio.css';
+@import './sections/hospital.css';

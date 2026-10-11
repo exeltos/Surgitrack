@@ -1,0 +1,1708 @@
+/* Studio. Moved together from overrides.css; cascade order is intentional. */
+
+/* Studio v0.29.6 — Hospital access workspace */
+.studio-users-panel > .studio-panel-head {
+  align-items: flex-start;
+}
+.studio-users-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 100%;
+  overflow: visible !important;
+}
+.roles-guide {
+  padding: 4px 2px 24px;
+}
+.roles-guide-table {
+  border: 1px solid var(--line, var(--c-gray-90-2));
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--panel, var(--c-white));
+}
+.roles-guide-head,
+.roles-guide-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(130px, 1.2fr) minmax(150px, 1.4fr) minmax(170px, 1.8fr);
+  gap: 16px;
+  padding: 14px 18px;
+  align-items: start;
+}
+.roles-guide-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line, var(--c-gray-90-2));
+}
+.roles-guide-row + .roles-guide-row {
+  border-top: 1px solid var(--line, var(--c-gray-90-2));
+}
+.roles-guide-row b {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.platform-private-demo-actions .platform-demo-reset {
+  margin-left: auto;
+}
+.tape-library-groups article.hidden-tape {
+  opacity: 0.5;
+}
+
+/* Studio — bulk import of instruments and Sets */
+.studio-body-import {
+  overflow-y: auto !important;
+}
+.asset-import {
+  display: grid;
+  gap: 14px;
+  padding: 18px 22px 24px;
+  color: var(--st-ink, var(--c-blue-20));
+}
+.asset-import-hospital,
+.asset-import-header-row {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-muted, var(--c-cyan-55));
+}
+.asset-import-steps {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.asset-import-steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--st-muted, var(--c-cyan-55));
+  font-size: 13px;
+  font-weight: 700;
+}
+.asset-import-steps li.active {
+  border-color: var(--st-teal, var(--c-cyan-45));
+  color: var(--st-teal, var(--c-cyan-45));
+}
+.asset-import-alert,
+.asset-import-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+.asset-import-alert {
+  border: 1px solid var(--c-red-85);
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red, var(--c-red-45));
+}
+.asset-import-note {
+  justify-content: space-between;
+  border: 1px solid var(--c-amber-80);
+  background: var(--st-amber-soft, var(--c-amber-95-2));
+  color: var(--st-amber, var(--c-amber-50));
+}
+.asset-import-body,
+.asset-import-history {
+  padding: 18px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 14px;
+  background: var(--c-white);
+}
+.asset-import-file,
+.asset-import-map,
+.asset-import-check {
+  display: grid;
+  gap: 14px;
+}
+.asset-import-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.asset-import-fields label {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 11px;
+}
+.asset-import-fields label.missing {
+  border-color: var(--c-red-85);
+  background: var(--st-red-soft, var(--c-gray-95-2));
+}
+.asset-import-fields select {
+  min-width: 0;
+  width: 100%;
+}
+.asset-import-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.asset-import-summary > div {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 11px;
+}
+.asset-import-summary strong {
+  font-size: 22px;
+}
+.asset-import-summary .good strong {
+  color: var(--st-green, var(--c-green-50));
+}
+.asset-import-summary .bad {
+  border-color: var(--c-red-85);
+  background: var(--st-red-soft, var(--c-gray-95-2));
+}
+.asset-import-summary .bad strong {
+  color: var(--st-red, var(--c-red-45));
+}
+.asset-import-errors,
+.asset-import-preview {
+  display: grid;
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.asset-import-errors > div,
+.asset-import-preview > div {
+  display: flex;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: var(--st-canvas, var(--c-gray-95));
+  font-size: 13px;
+}
+.asset-import-preview > div {
+  justify-content: space-between;
+}
+/* Import check step: the name choices. */
+.asset-import-names {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-amber-85);
+  border-radius: 12px;
+  background: var(--c-gray-100);
+  font-size: 13px;
+}
+.asset-import-names label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--c-amber-25);
+}
+.asset-import-name-diffs {
+  display: grid;
+  gap: 4px;
+  padding-left: 24px;
+}
+.asset-import-name-diffs > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: var(--c-white);
+  font-size: 12.5px;
+}
+/* The instruments an import will create, shown at the check step. */
+.asset-import-tools {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.asset-import-tools > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.asset-import-tools-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: min(320px, 100%);
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--st-muted);
+}
+.asset-import-tools-search input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+}
+.asset-import-tools-table {
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+}
+.asset-import-tools-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.asset-import-tools-table td {
+  padding: 7px 10px;
+  border-top: 1px solid var(--c-gray-95);
+  color: var(--c-cyan-20-3);
+}
+.asset-import-tools-table td.mono {
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+}
+.asset-import-progress > div {
+  height: 100%;
+  background: var(--st-teal, var(--c-cyan-45));
+  transition: width 0.2s;
+}
+.asset-import-done {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 18px;
+  text-align: center;
+  color: var(--st-green, var(--c-green-50));
+}
+.asset-import-history {
+  display: grid;
+  gap: 8px;
+}
+.asset-import-history h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.asset-import-history > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 11px;
+}
+.asset-import-history > div.undone {
+  opacity: 0.65;
+}
+.import-page .asset-import {
+  padding-inline: 0;
+}
+.plan-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: var(--st-canvas, var(--c-gray-95));
+  color: var(--st-muted, var(--c-cyan-55));
+}
+.plan-badge.trial {
+  background: var(--st-teal-soft, var(--c-gray-95-3));
+  color: var(--st-teal, var(--c-cyan-45));
+}
+.plan-badge.trial.warn {
+  background: var(--st-amber-soft, var(--c-amber-95-2));
+  color: var(--st-amber, var(--c-amber-50));
+}
+.plan-badge.locked {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red, var(--c-red-45));
+}
+.studio-plan {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.studio-plan legend {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.studio-plan label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 10px;
+  cursor: pointer;
+}
+.studio-plan label.active {
+  border-color: var(--st-teal, var(--c-cyan-45));
+  background: var(--st-teal-soft, var(--c-gray-95-3));
+}
+.studio-plan input {
+  width: auto !important;
+  margin-top: 3px;
+}
+.studio-plan span {
+  display: grid;
+  gap: 2px;
+}
+.studio-trial-length {
+  display: grid;
+  gap: 8px;
+}
+.studio-trial-length > span {
+  font-size: 13px;
+  font-weight: 700;
+}
+@media (max-width: 900px) {
+  .studio-users-panel > .studio-panel-head {
+    flex-direction: column !important;
+  }
+  .studio-users-panel > .studio-panel-head select {
+    width: 100% !important;
+  }
+  .roles-guide-head {
+    display: none;
+  }
+  .roles-guide-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+@media (min-width: 1100px) {
+  .studio-tabs button {
+    padding: 8px 6px;
+    gap: 5px;
+  }
+  html body .studio-body-workflow .studio-workflow-page {
+    display: grid !important;
+    grid-template-columns: 400px minmax(0, 1fr);
+    gap: 10px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    grid-template-rows: auto auto auto auto;
+    align-items: start;
+  }
+  html body .studio-body-workflow .studio-workflow-hero,
+  html body .studio-body-workflow .released-loads,
+  html body .studio-body-workflow .studio-workflow-footer {
+    grid-column: 1 / -1;
+  }
+  html body .studio-body-workflow .studio-workflow-side,
+  html body .studio-body-workflow .studio-workflow-main {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    overflow: visible;
+  }
+  html body .studio-body-workflow .studio-workflow-list {
+    overflow: visible !important;
+  }
+  /* Policy options: the title is enough here; the explanation stays in the tooltip-sized second line. */
+  html body .studio-body-workflow .studio-release-policy-grid {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+  html body .studio-body-workflow .studio-release-policy-grid small {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-release-policy > header span {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-workflow-hero p {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-workflow-policy span {
+    display: none;
+  }
+  html body .studio-body-workflow .studio-release-policy-grid > label {
+    padding: 7px 10px !important;
+    min-height: 0 !important;
+    gap: 8px !important;
+  }
+  html body .studio-body-workflow .studio-release-policy {
+    padding: 8px 12px !important;
+    gap: 6px !important;
+  }
+  html body .studio-body-workflow .studio-workflow-policy {
+    padding: 7px 12px !important;
+  }
+  html body .studio-body-workflow .studio-release-policy-grid select {
+    min-width: 0;
+    max-width: 130px;
+    padding: 3px 6px;
+  }
+  html body .studio-body-workflow .studio-workflow-stage {
+    padding: 8px 12px !important;
+  }
+  html body .studio-system-grid,
+  html body .studio-system-grid:has(> .platform-contact) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  html body .studio-system-grid > section {
+    grid-column: auto;
+    padding: 12px 14px;
+  }
+  html body .studio-system-grid > .platform-contact {
+    grid-column: 1 / -1;
+  }
+  html body .studio-body-workflow {
+    overflow-y: auto !important;
+  }
+}
+@media (max-width: 640px) {
+  .asset-import {
+    padding: 14px 12px 20px;
+  }
+  .asset-import-history > div {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .asset-import select {
+    min-width: 0;
+    width: 100%;
+  }
+}
+.studio-trial-length > div {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.studio-trial-length button {
+  padding: 6px 12px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 999px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.studio-trial-length button.active {
+  border-color: var(--st-teal, var(--c-cyan-45));
+  background: var(--st-teal, var(--c-cyan-45));
+  color: var(--c-white);
+}
+.studio-admin-invite {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed var(--c-cyan-85);
+  border-radius: 12px;
+  background: var(--st-cyan-soft, var(--c-gray-100-2));
+}
+.studio-field-hint {
+  margin: -4px 0 2px;
+  color: var(--st-muted, var(--c-cyan-55));
+  font-size: 12px;
+}
+.studio-field-error {
+  color: var(--st-red, var(--c-red-45)) !important;
+}
+.platform-contact-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+}
+.studio-system-grid .platform-contact-fields label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.platform-contact-fields input {
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  font: inherit;
+  color: var(--c-blue-20);
+}
+.platform-contact-status {
+  display: block;
+  margin-top: 8px;
+  color: #3f7d56;
+  font-weight: 700;
+}
+.studio-users-panel .hospital-people {
+  padding: 0 16px 16px;
+}
+
+/* The platform owner's start page in Studio. */
+.owner-dashboard {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.owner-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+.owner-kpi span {
+  color: var(--c-cyan-45-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+.owner-kpi strong {
+  grid-column: 1 / -1;
+  color: var(--c-cyan-20-2);
+  font-size: 26px;
+  line-height: 1;
+}
+.owner-kpi.warn {
+  border-color: var(--c-amber-85);
+  background: var(--c-gray-100);
+  color: var(--c-orange-50);
+}
+.owner-kpi.stop {
+  border-color: var(--c-red-85);
+  background: var(--c-gray-100-4);
+  color: var(--c-red-40);
+}
+.owner-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 14px;
+}
+.owner-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 16px;
+  background: var(--c-white);
+}
+.owner-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.owner-card h2 {
+  margin: 2px 0 0;
+  color: var(--c-cyan-20-2);
+  font-size: 18px;
+}
+.owner-count {
+  min-width: 30px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-cyan-45);
+  font-weight: 800;
+  text-align: center;
+}
+.owner-count.warn {
+  background: var(--c-amber-95);
+  color: var(--c-orange-50);
+}
+.owner-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--c-cyan-45-2);
+  font-size: 13px;
+}
+.owner-attention {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.owner-attention li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  color: var(--c-cyan-45);
+  font-size: 13px;
+}
+.owner-attention li.warn {
+  border-color: var(--c-amber-85);
+  background: var(--c-gray-100);
+  color: var(--c-orange-50);
+}
+.owner-attention li.stop {
+  border-color: var(--c-red-85);
+  background: var(--c-gray-100-4);
+  color: var(--c-red-40);
+}
+.owner-actions {
+  display: grid;
+  gap: 8px;
+}
+.owner-actions button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  background: var(--c-white);
+  font: inherit;
+  text-align: left;
+  color: var(--c-cyan-45);
+  cursor: pointer;
+}
+.owner-actions button:hover {
+  border-color: var(--c-cyan-85);
+  background: var(--c-white);
+}
+.owner-actions span {
+  display: grid;
+  gap: 2px;
+}
+.owner-hospitals {
+  display: grid;
+  gap: 6px;
+}
+
+/* Bulk import, first step: the file on the left (drop or choose, template below), and a worked
+   example of how rows become Sets and instruments on the right. Steps read as one progress line. */
+.asset-import-hospital.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 999px;
+  background: var(--c-gray-100-2);
+  color: var(--st-teal, var(--c-cyan-45));
+}
+.asset-import-hospital.chip b {
+  color: var(--c-cyan-20-2);
+  font-size: 14px;
+}
+.asset-import-steps li {
+  flex: 1 1 0;
+  min-width: max-content;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 4px 10px 4px 0;
+  position: relative;
+}
+.asset-import-steps li:not(:last-child)::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  margin-left: 8px;
+  background: var(--st-line, var(--c-gray-90));
+  border-radius: 2px;
+}
+.asset-import-steps li.done::after {
+  background: var(--st-green, var(--c-green-50));
+}
+.asset-import-file {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.asset-import-start {
+  display: grid;
+  gap: 12px;
+}
+.asset-import-drop.disabled .asset-import-drop-icon {
+  color: var(--st-muted, var(--c-cyan-55));
+}
+.asset-import-template {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 12px;
+  background: var(--c-white);
+  color: var(--st-teal, var(--c-cyan-45));
+}
+.asset-import-template span {
+  display: grid;
+  gap: 2px;
+}
+.asset-import-template b {
+  color: var(--c-cyan-20-2);
+  font-size: 13.5px;
+}
+.asset-import-template small {
+  color: var(--st-muted, var(--c-cyan-55));
+  font-size: 12px;
+  line-height: 1.4;
+}
+.asset-import-guide {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 14px;
+  background: var(--c-white);
+}
+.asset-import-guide > b {
+  font-size: 14px;
+  color: var(--c-cyan-20-2);
+}
+.asset-import-guide > small {
+  margin-top: -6px;
+  color: var(--st-muted, var(--c-cyan-55));
+  font-size: 12px;
+}
+.asset-import-guide table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--c-white);
+  font-size: 12px;
+}
+.asset-import-guide td {
+  padding: 7px 9px;
+  border-top: 1px solid var(--c-gray-95);
+  color: var(--c-blue-15);
+}
+.asset-import-guide td:last-child,
+.asset-import-guide th:last-child {
+  text-align: right;
+  font-weight: 800;
+}
+.asset-import-guide td.blank {
+  color: #a3b1ba;
+}
+.asset-import-guide tr.set-a td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-cyan-60);
+  background: var(--c-gray-95);
+  font-weight: 700;
+}
+.asset-import-guide ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--c-blue-35);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+@media (max-width: 900px) {
+  .platform-contact-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Studio libraries: the library picker becomes a row of chips above the list. */
+  html body .studio-manager {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  html body .studio-manager-nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: auto;
+  }
+  html body .studio-list-head.with-count,
+  html body .studio-list-row.with-count {
+    grid-template-columns: minmax(0, 1fr) 70px 196px !important;
+    align-items: center;
+  }
+  html body .studio-list-head.with-count > span:nth-child(2),
+  html body .studio-list-row.with-count > span:nth-child(2) {
+    display: none !important;
+  }
+  html body .studio-notice-new .studio-notice-message {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 1100px) {
+  .owner-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .owner-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .studio-body-system {
+    overflow-y: auto !important;
+  }
+  .studio-system-grid > section {
+    overflow: visible;
+  }
+}
+@media (max-width: 760px) {
+  .owner-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .owner-attention li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .owner-attention li > :last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+@media (min-width: 761px) {
+  .studio-tabs button {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 4px !important;
+    gap: 5px;
+  }
+}
+@media (min-width: 761px) {
+  @container (max-width: 900px) {
+    .studio-tabs button {
+      flex: 0 0 auto;
+      padding: 8px 10px !important;
+    }
+  }
+}
+.asset-import-guide li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 9px;
+}
+.studio-system-grid > section {
+  overflow: visible;
+}
+
+/* The bulk-import page title looks like every other page title. */
+.asset-import-head h2 {
+  margin: 0 0 4px;
+  color: var(--c-cyan-20);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.asset-import-head p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.asset-import-head .eyebrow {
+  display: block;
+  margin: 0 0 2px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+/* Studio density: one-line header, slimmer tabs and library list. */
+html body .studio-head {
+  align-items: center;
+}
+html body .studio-head > div:first-child {
+  min-width: 0;
+  flex: 1;
+}
+html body .studio-head h1 {
+  margin: 0 0 2px;
+}
+html body .studio-health > div > span {
+  display: none;
+}
+html body .studio-manager-nav {
+  gap: 2px;
+  padding: 6px;
+}
+html body .studio-manager-nav button > span {
+  width: 28px;
+  height: 28px;
+}
+html body .studio-workspace {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+/* Studio: tighter vertical rhythm so a tab fits the screen (the tab bar and header stay fixed). */
+html body .roles-guide {
+  gap: 8px;
+}
+html body .roles-guide .eyebrow {
+  display: none;
+}
+html body .roles-guide-row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+html body .studio-workflow-page {
+  gap: 10px;
+}
+html body .studio-workflow-hero {
+  padding: 10px 16px;
+}
+html body .studio-workflow-policy,
+html body .studio-release-policy {
+  padding: 10px 14px;
+  gap: 8px;
+}
+html body .studio-workflow-stage {
+  padding: 10px 14px;
+}
+html body .studio-body-import .asset-import {
+  gap: 10px;
+}
+html body .studio-body-import .asset-import-head {
+  margin: 0;
+  padding-top: 0;
+}
+/* Owner dashboard: fills the screen. KPI row, attention + actions, and the hospitals table taking the rest. */
+html body .studio-body-overview .owner-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 10px;
+}
+html body .owner-dashboard > .owner-hospitals {
+  flex: 1 1 auto;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+html body .owner-hospitals > header {
+  flex: 0 0 auto;
+}
+.owner-hospitals table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.owner-hospitals th {
+  position: sticky;
+  top: 0;
+  background: var(--c-white);
+  padding: 7px 12px;
+  text-align: left;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.owner-hospitals td {
+  padding: 8px 12px;
+  border-top: 1px solid var(--c-gray-95);
+  vertical-align: middle;
+}
+.owner-hospitals td:last-child {
+  text-align: right;
+}
+.owner-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--c-gray-95-8);
+  color: var(--c-green-45);
+  font-size: 12px;
+  font-weight: 700;
+}
+.owner-status.warn {
+  background: var(--c-amber-95);
+  color: var(--c-orange-50);
+}
+.owner-status.stop {
+  background: var(--c-gray-95-5);
+  color: var(--c-red-40-2);
+}
+.owner-status.off {
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+}
+.owner-missing {
+  color: var(--c-orange-50);
+  font-weight: 700;
+}
+.owner-hospitals td.owner-none {
+  padding: 14px 12px;
+  color: var(--st-muted);
+}
+.sterilizer-batch-style {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-cyan-50);
+}
+.sterilizer-batch-style > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+html body .sterilizer-batch-style label.on {
+  border-color: var(--c-cyan-40);
+  background: var(--c-gray-95-3);
+}
+.sterilizer-batch-preview {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+  font-size: 12px;
+  color: var(--c-cyan-50);
+}
+.sterilizer-batch-preview > span {
+  font-weight: 700;
+}
+.sterilizer-batch-preview ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (max-width: 1000px) {
+  .asset-import-file {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .asset-import-template {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  /* Phones: four numbered dots on a line, the current step's name under them. */
+  .asset-import-steps li {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0;
+    gap: 0;
+  }
+  .asset-import-steps li.active {
+    font-size: 12.5px;
+    gap: 6px;
+  }
+  .asset-import-steps li:not(:last-child)::after {
+    margin-left: 6px;
+  }
+}
+.sterilizer-batch-preview li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--c-gray-95-3);
+  color: var(--c-cyan-35);
+  font-size: 13px;
+  font-weight: 700;
+}
+html body .studio-setting-input select {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 36px;
+  padding: 0 4px;
+  border: 0;
+  outline-offset: 2px;
+  background: transparent;
+  color: var(--c-cyan-20);
+  font-size: 14px;
+}
+html body .studio-list-row button.studio-count-toggle.on {
+  border-color: var(--c-green-40-2);
+  background: var(--c-gray-100-3);
+  color: var(--c-green-40-2);
+}
+html body .studio-list-head.with-count,
+html body .studio-list-row.with-count {
+  grid-template-columns: minmax(160px, 1.2fr) minmax(140px, 1fr) 90px 196px;
+}
+html body .roles-guide header h2 {
+  margin: 6px 0 14px;
+}
+
+/* Studio → Errors (platform owner) */
+html body .studio-errors {
+  display: grid;
+  gap: 14px;
+}
+html body .studio-errors-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+html body .studio-errors-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+html body .studio-errors-failed {
+  color: var(--st-red);
+}
+html body .studio-errors-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 40px 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: var(--st-muted);
+}
+html body .studio-errors-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-errors-list > li {
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-error-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+html body .studio-error-kind.kind-sync {
+  background: var(--st-amber-soft);
+  color: var(--st-amber);
+}
+html body .studio-error-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+html body .studio-error-main b {
+  overflow-wrap: anywhere;
+}
+html body .studio-error-count {
+  display: grid;
+  justify-items: end;
+  white-space: nowrap;
+}
+html body .studio-error-detail {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 0 14px 14px;
+}
+html body .studio-error-detail pre {
+  width: 100%;
+  max-height: 260px;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--c-gray-95);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+/* Studio › Ειδοποιήσεις: a new notice with its window, then the list (showing, scheduled, ended). */
+html body .studio-notice-new {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px 200px auto;
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-notice-new label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-gray-15);
+}
+html body .studio-notice-new input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-weight: 500;
+}
+html body .studio-notice-new label small {
+  font-weight: 500;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-notice-new > .app-button {
+  align-self: start;
+  margin-top: 25px;
+  min-height: 40px;
+}
+html body .studio-notice-warning {
+  grid-column: 1/-1;
+  color: var(--st-red);
+  font-size: 13px;
+}
+html body .studio-notice-group {
+  display: grid;
+  gap: 8px;
+}
+html body .studio-notice-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+html body .studio-notice-group h3 span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+  font-size: 12px;
+  text-align: center;
+}
+html body .studio-notice-row.status-ended {
+  background: var(--c-gray-100-2);
+}
+html body .studio-notice-row.status-ended b {
+  color: var(--st-muted);
+  font-weight: 600;
+}
+html body .studio-notice-status.status-active {
+  background: var(--st-green-soft);
+  color: var(--st-green);
+}
+html body .studio-notice-status.status-scheduled {
+  background: var(--st-amber-soft);
+  color: var(--st-amber);
+}
+html body .studio-notice-status.status-ended {
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+}
+html body .studio-notice-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Studio tabs in two titled rows for the platform owner: the platform's own work, then the set-up. */
+html body .studio-tab-rows {
+  display: grid;
+  gap: 6px;
+}
+html body .studio-tab-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+html body .studio-tab-group {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .studio-tab-row .studio-tabs {
+  justify-content: flex-start;
+}
+html body .studio-tab-row .studio-tabs button {
+  flex: 0 0 auto;
+  padding: 7px 14px !important;
+}
+/* Roles & permissions: one tab, two views. */
+html body .studio-roles-switch {
+  display: inline-flex;
+  justify-self: start;
+  gap: 2px;
+  margin-bottom: 10px;
+  padding: 3px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .studio-roles-switch button.active {
+  background: var(--c-gray-95-3);
+  color: var(--c-cyan-45);
+  box-shadow: inset 0 0 0 1px var(--c-teal-90-2);
+}
+
+/* Studio › Αξιολογήσεις: every Demo's ratings together. */
+html body .studio-ratings-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 1100px) {
+  html body .studio-list-head.with-count,
+  html body .studio-list-row.with-count {
+    grid-template-columns: minmax(140px, 1fr) 80px 196px;
+  }
+}
+@media (max-width: 700px) {
+  html body .studio-manager-nav {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  html body .studio-manager-nav button {
+    min-width: 0;
+  }
+  html body .asset-import-guide table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  html body .asset-import-guide th,
+  html body .asset-import-guide td {
+    padding-left: 6px;
+    padding-right: 6px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+  }
+  html body .asset-import-guide th:last-child,
+  html body .asset-import-guide td:last-child {
+    width: 44px;
+  }
+  html body .studio-error-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .owner-hospitals-scroll {
+    overflow-x: visible;
+  }
+}
+@media (max-width: 900px) {
+  html body .studio-notice-new > .app-button {
+    grid-column: 1/-1;
+    margin-top: 0;
+  }
+  html body .studio-ratings-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  html body .studio-tab-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+@media (min-width: 1280px) {
+  html body .studio-tab-row .studio-tabs button svg {
+    display: inline-block;
+  }
+}
+html body .studio-ratings-kpis > * {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+  font: inherit;
+  text-align: left;
+}
+html body .studio-ratings-kpis > button {
+  cursor: pointer;
+}
+html body .studio-ratings-kpis > .attention {
+  border-color: var(--c-amber-70);
+  background: var(--st-amber-soft);
+}
+html body .studio-ratings-kpis span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-muted);
+}
+html body .studio-ratings-kpis strong {
+  font-size: 24px;
+  color: var(--c-blue-15);
+}
+html body .studio-ratings-kpis strong.negative {
+  color: var(--st-red);
+}
+html body .studio-ratings-kpis small {
+  font-size: 12px;
+  color: var(--st-muted);
+}
+html body .studio-ratings-body {
+  display: grid;
+  gap: 14px;
+}
+html body .studio-ratings-group {
+  display: grid;
+  gap: 8px;
+}
+html body .studio-ratings-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+html body .studio-ratings-group h3 span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  color: var(--st-muted);
+  font-size: 12px;
+  text-align: center;
+}
+html body .studio-rating-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px 70px 110px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+}
+html body .studio-rating-title {
+  font-weight: 700;
+  color: var(--c-blue-15);
+}
+html body .studio-rating-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  overflow: hidden;
+}
+html body .studio-rating-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--c-amber-70);
+}
+html body .studio-rating-bar i.low {
+  background: var(--st-red);
+}
+html body .studio-rating-row b {
+  color: var(--c-amber-50);
+}
+html body .studio-rating-row small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-rating-comments,
+html body .studio-rating-final {
+  display: grid;
+  gap: 6px;
+}
+html body .studio-rating-comments {
+  grid-column: 1/-1;
+}
+html body .studio-rating-comment,
+html body .studio-rating-final q {
+  padding: 6px 10px;
+  border-left: 3px solid var(--c-amber-70);
+  border-radius: 6px;
+  background: var(--c-gray-100-2);
+  font-size: 13px;
+  color: var(--c-gray-15);
+}
+html body .studio-rating-comment {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+html body .studio-rating-comment cite {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--st-muted);
+}
+html body .studio-rating-final {
+  padding: 12px 14px;
+}
+html body .studio-rating-final > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+html body .studio-rating-final > div:first-child small {
+  color: var(--st-muted);
+}
+html body .studio-rating-final-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+}
+html body .studio-rating-final-scores > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+}
+html body .studio-ratings .studio-errors-actions select {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+}
+/* Studio: column names in sentence case, as on the other lists. */
+html body .studio-list-head {
+  text-transform: none;
+}
+/* Studio: «Πραγματικά δεδομένα» / «Demo» is a small label, not something to press. */
+html body .studio-health {
+  border: 0;
+  box-shadow: none;
+  background: var(--c-gray-95);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: default;
+}
+html body .studio-health svg {
+  width: 15px;
+  height: 15px;
+}
+/* The owner's Studio sections: the page title names the section, so the panel's own eyebrow and heading
+   (which repeated it) are hidden; its description stays. */
+html
+  body
+  .studio-section-page
+  .studio-body
+  :is(.studio-panel-head, .asset-import-head, .studio-errors-head, .studio-workflow-hero)
+  > div:first-child
+  > :is(.eyebrow, h2) {
+  display: none;
+}
+html body .studio-notice-new label {
+  min-width: 0;
+}
+html body .studio-notice-new input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+/* Evaluation Demos with none yet: a card that says what a Demo is for, with the button to open one. */
+html body .evaluation-demo-empty-card {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 1px dashed var(--c-gray-90);
+  border-radius: 12px;
+  color: var(--st-muted);
+  text-align: center;
+}
+html body .evaluation-demo-empty-card > svg {
+  color: var(--c-violet-45);
+}
+html body .evaluation-demo-empty-card strong {
+  color: var(--c-cyan-20);
+  font-size: 15px;
+}
+html body .evaluation-demo-empty-card span {
+  max-width: 460px;
+  font-size: 13px;
+}
+/* The owner's Sterilization Flow page: its title is the page's, so the box keeps its description (the compact
+   desktop layout hid it, which left the box empty but for the profile name). */
+html body .studio-section-page .studio-body-workflow .studio-workflow-hero p {
+  display: block;
+}
+/* The hospital the owner is working in: said in place of its «Είσοδος». */
+html body .platform-here {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* Hospitals list: the code and counts under a name meet the contrast ratio (the lighter cyan did not). */
+html body .platform-hospital-name small {
+  color: var(--st-muted);
+}
+@media (max-width: 900px) {
+  html body .studio-rating-row {
+    grid-template-columns: minmax(0, 1fr) 70px;
+  }
+  html body .studio-rating-bar,
+  html body .studio-rating-row small {
+    display: none;
+  }
+}
+@media (min-width: 701px) and (max-width: 1099px) {
+  html body .studio-system-grid > section:first-child {
+    grid-row: span 2;
+  }
+}
+@media (max-width: 700px) {
+  html body .owner-hospitals-table,
+  html body .owner-hospitals-table tbody {
+    display: block;
+    width: 100%;
+  }
+  html body .owner-hospitals-table thead {
+    display: none;
+  }
+  html body .owner-hospitals-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--c-gray-95);
+  }
+  html body .owner-hospitals-table tbody td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+  html body .owner-hospitals-table tbody td:first-child,
+  html body .owner-hospitals-table tbody td.owner-none {
+    grid-column: 1 / -1;
+  }
+  html body .owner-hospitals-table tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--st-muted);
+    font-size: 11px;
+    font-weight: 600;
+  }
+}
+@media (min-width: 1281px) {
+  html body .studio-notice-new {
+    grid-template-columns: minmax(0, 1fr) 230px 230px auto;
+  }
+}
+@media (max-width: 1280px) {
+  html body .studio-notice-new {
+    grid-template-columns: 1fr 1fr auto;
+  }
+  html body .studio-notice-new .studio-notice-message {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 900px) {
+  html body .studio-notice-new {
+    grid-template-columns: 1fr 1fr;
+  }
+}
