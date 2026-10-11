@@ -119,8 +119,8 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
       value: stock,
       onChange: setStock,
       options: [
-        {value: 'YES', label: tr('Υπάρχει στο απόθεμα')},
-        {value: 'NO', label: tr('Δεν υπάρχει στο απόθεμα')},
+        {value: 'YES', label: tr('Με απόθεμα')},
+        {value: 'NO', label: tr('Χωρίς απόθεμα')},
       ],
     },
     {
@@ -230,7 +230,7 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
           className={status === 'NEEDED' && !stock ? 'active warn' : 'warn'}
           onClick={() => (setStatus('NEEDED'), setStock(''))}
         >
-          <span>{tr('Χρειάζονται αντικατάσταση')}</span>
+          <span>{tr('Προς αντικατάσταση')}</span>
           <strong>{needed.length}</strong>
         </button>
         <button
@@ -238,7 +238,7 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
           className={status === 'NEEDED' && stock === 'YES' ? 'active good' : 'good'}
           onClick={() => (setStatus('NEEDED'), setStock('YES'))}
         >
-          <span>{tr('Υπάρχει στο απόθεμα')}</span>
+          <span>{tr('Με απόθεμα')}</span>
           <strong>{needed.filter(i => i.stock.length).length}</strong>
         </button>
         <button
@@ -246,7 +246,7 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
           className={status === 'NEEDED' && stock === 'NO' ? 'active bad' : 'bad'}
           onClick={() => (setStatus('NEEDED'), setStock('NO'))}
         >
-          <span>{tr('Δεν υπάρχει στο απόθεμα')}</span>
+          <span>{tr('Χωρίς απόθεμα')}</span>
           <strong>{needed.filter(i => !i.stock.length).length}</strong>
         </button>
         <button
@@ -402,8 +402,14 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
                       {editable && (
                         <td className="row-actions">
                           {canReplace && (
-                            <button type="button" className="primary" onClick={() => replace([item])}>
-                              <PackageCheck size={13} /> {tr('Αντικατάσταση')}
+                            <button
+                              type="button"
+                              className="primary"
+                              title={tr('Αντικατάσταση')}
+                              aria-label={tr('Αντικατάσταση')}
+                              onClick={() => replace([item])}
+                            >
+                              <PackageCheck size={13} /> <span className="btn-label">{tr('Αντικατάσταση')}</span>
                             </button>
                           )}
                           {item.status === 'NEEDED' && (

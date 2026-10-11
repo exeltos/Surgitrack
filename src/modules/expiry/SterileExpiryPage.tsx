@@ -114,7 +114,11 @@ export default function SterileExpiryPage() {
                           <Link className="row-title-link" to={to}>
                             {item.name}
                           </Link>
-                          <small className="row-sub">{item.kind === 'SET' ? tr('Σετ') : tr('Εργαλείο')}</small>
+                          <small className="row-sub">
+                            {item.kind === 'SET' ? tr('Σετ') : tr('Εργαλείο')}
+                            {/* On a tablet the barcode column gives its room to the name and shows here. */}
+                            <span className="expiry-sub-barcode mono"> · {item.barcode}</span>
+                          </small>
                         </span>
                       </div>
                     </td>

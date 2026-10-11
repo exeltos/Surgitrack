@@ -1520,7 +1520,7 @@ export const en: Record<string, string> = {
   'Απόθεμα: όλα': 'Stock: all',
   'Βλάβες & Αντικαταστάσεις': 'Repairs & replacements',
   'Βλάβη / φθορά': 'Damage / wear',
-  'Δεν υπάρχει στο απόθεμα': 'Not in Stock',
+  'Χωρίς απόθεμα': 'Not in Stock',
   'Δεν υπάρχουν εργαλεία σε Service, με βλάβη, χαμένα ή εκτός χρήσης.':
     'No instruments in Service, damaged, lost or out of use.',
   'Δεν υπάρχουν παραγγελίες ακόμη.': 'No orders yet.',
@@ -1598,7 +1598,8 @@ export const en: Record<string, string> = {
   'Το Σετ δεν έχει καταχωρημένα εργαλεία.': 'The Set has no instruments recorded.',
   'Υπάρχει στο απόθεμα': 'In Stock',
   'Χρειάζεται αντικατάσταση': 'Needs replacement',
-  'Χρειάζονται αντικατάσταση': 'Need replacement',
+  'Προς αντικατάσταση': 'Need replacement',
+  'Με απόθεμα': 'In Stock',
   'Παραλήφθηκε με {0}': 'Received with {0}',
   'Λείπει 1': '1 missing',
   'Λείπει 1 εργαλείο': '1 instrument missing',
@@ -1817,6 +1818,7 @@ export const en: Record<string, string> = {
   'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
   'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
   'Ανοικτές πάνω από {0} ημέρες': 'Open over {0} days',
+  'Πάνω από {0} ημέρες': 'Over {0} days',
   'Οποιαδήποτε ημερομηνία': 'Any date',
   // Studio → Platform: evaluation Demos
   'Demo αξιολόγησης': 'Evaluation Demo',
