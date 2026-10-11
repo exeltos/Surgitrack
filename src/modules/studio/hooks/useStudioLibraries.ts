@@ -1,4 +1,6 @@
 import {useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {isPlatformOnly} from '../../../core/platformOnly';
 import {roles, libraryMeta} from '../studioMeta';
 import {activeHospitalId} from '../../../data/cloud/hospitalSwitch';
 import type {Tab} from '../studioMeta';
@@ -26,7 +28,10 @@ export function useStudioLibraries(
     return roles.map(r => ({role: r.id, count: here.filter(u => u.role === r.id && u.active).length}));
   }, [displayedUsers]);
   const resetQuery = () => setQuery('');
+  const navigate = useNavigate();
   const selectTab = (next: Tab) => {
+    // With the owner's menu, a section is a page of its own: the address (and the lit menu entry) follows.
+    if (isPlatformOnly()) navigate(`/studio?tab=${next.toLowerCase()}`);
     setTab(next);
     resetQuery();
   };

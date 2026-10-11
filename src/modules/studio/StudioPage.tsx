@@ -9,6 +9,8 @@ import LibraryEditor from './LibraryEditor';
 import OrganizationEditor from './OrganizationEditor';
 import {useStudioPage} from './useStudioPage';
 import StudioTabs from './tabs/StudioTabs';
+import {isPlatformOnly} from '../../core/platformOnly';
+import {STUDIO_TABS, type Tab} from './studioMeta';
 import PlatformTab from './tabs/PlatformTab';
 import LibrariesTab from './tabs/LibrariesTab';
 import WorkflowTab from './tabs/WorkflowTab';
@@ -19,9 +21,32 @@ import ErrorsTab from './tabs/ErrorsTab';
 import NoticesTab from './tabs/NoticesTab';
 import RatingsTab from './tabs/RatingsTab';
 
+/** With the owner's menu each section is a page: its own one-line description under its title. */
+const SECTION_TEXT: Record<Tab, [string, string]> = {
+  OVERVIEW: ['Τι χρειάζεται προσοχή σήμερα σε όλα τα νοσοκομεία.', 'What needs attention today across hospitals.'],
+  PLATFORM: ['Τύπος χρήσης κάθε νοσοκομείου και τα Demo.', 'Each hospital’s plan and the Demos.'],
+  USERS: ['Οι χρήστες όλων των νοσοκομείων, ανά νοσοκομείο και ρόλο.', 'Every hospital’s users, by hospital and role.'],
+  IMPORT: [
+    'Μαζική εισαγωγή Σετ και εργαλείων σε ένα νοσοκομείο.',
+    'Bulk import of Sets and instruments into a hospital.',
+  ],
+  RATINGS: ['Τι λένε οι χρήστες για κάθε λειτουργία.', 'What users say about each feature.'],
+  NOTICES: ['Μηνύματα προς όλους τους χρήστες της εφαρμογής.', 'Messages to every user of the app.'],
+  ERRORS: ['Σφάλματα που συνάντησαν οι χρήστες στην εφαρμογή.', 'Errors users ran into in the app.'],
+  LIBRARIES: [
+    'Οι κοινές λίστες με τις οποίες ξεκινά κάθε νέο νοσοκομείο.',
+    'The shared lists every new hospital starts with.',
+  ],
+  WORKFLOW: ['Τα στάδια της Αποστείρωσης για τα νέα νοσοκομεία.', 'The sterilization stages for new hospitals.'],
+  ROLES: ['Τι μπορεί να κάνει κάθε ρόλος.', 'What each role can do.'],
+  SYSTEM: ['Επαφή υποστήριξης, ετικέτες και γενικές ρυθμίσεις.', 'Support contact, labels and general settings.'],
+};
+
 export default function StudioPage() {
   const s = useStudioPage();
   const [rolesView, setRolesView] = useState<'PERMISSIONS' | 'GUIDE'>('PERMISSIONS');
+  // The owner's menu holds the sections: the page shows one, titled, with no tab rows.
+  const section = isPlatformOnly() ? STUDIO_TABS.find(t => t.id === s.tab) : undefined;
   const {
     L,
     changePlan,
@@ -51,7 +76,9 @@ export default function StudioPage() {
     tab,
   } = s;
   return (
-    <div className="studio-workspace">
+    // A section's page title already names it: its panel heading would say the same thing again
+    // (Libraries keeps its own, which names the list being edited).
+    <div className={`studio-workspace${section && section.id !== 'LIBRARIES' ? ' studio-section-page' : ''}`}>
       <div className="studio-head">
         <div>
           <span className="eyebrow">
@@ -59,17 +86,19 @@ export default function StudioPage() {
               ? L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')
               : L('ΡΥΘΜΙΣΕΙΣ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL SETTINGS')}
           </span>
-          <h1>{L('SurgiTrack Studio', 'SurgiTrack Studio')}</h1>
+          <h1>{section ? L(section.el, section.en) : 'SurgiTrack Studio'}</h1>
           <p>
-            {platformAdmin
-              ? L(
-                  'Νοσοκομεία, χρήστες, demo πρόσβαση και βιβλιοθήκες της πλατφόρμας.',
-                  'Hospitals, users, demo access and libraries of the platform.',
-                )
-              : L(
-                  'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου.',
-                  'Libraries, sterilization flow, role permissions and hospital settings.',
-                )}
+            {section
+              ? L(...SECTION_TEXT[section.id])
+              : platformAdmin
+                ? L(
+                    'Νοσοκομεία, χρήστες, demo πρόσβαση και βιβλιοθήκες της πλατφόρμας.',
+                    'Hospitals, users, demo access and libraries of the platform.',
+                  )
+                : L(
+                    'Βιβλιοθήκες, ροή αποστείρωσης, δικαιώματα ρόλων και ρυθμίσεις του νοσοκομείου.',
+                    'Libraries, sterilization flow, role permissions and hospital settings.',
+                  )}
           </p>
         </div>
         <div
@@ -97,7 +126,7 @@ export default function StudioPage() {
           </div>
         </div>
       </div>
-      <StudioTabs s={s} />
+      {!section && <StudioTabs s={s} />}
       <div className={`studio-body studio-body-${tab.toLowerCase()}`}>
         {tab === 'OVERVIEW' && platformAdmin && (
           <OwnerDashboard

@@ -10240,9 +10240,6 @@ html body .studio-notice-actions {
   gap: 8px;
 }
 @media (max-width: 900px) {
-  html body .studio-notice-new {
-    grid-template-columns: 1fr 1fr;
-  }
   html body .studio-notice-new .studio-notice-message {
     grid-column: 1/-1;
   }
@@ -11718,4 +11715,44 @@ html body .department-status-tabs button {
     grid-column: 3;
     grid-row: 1 / span 2;
   }
+}
+/* The owner's Studio sections: the page title names the section, so the panel's own eyebrow and heading
+   (which repeated it) are hidden; its description stays. */
+html
+  body
+  .studio-section-page
+  .studio-body
+  :is(.studio-panel-head, .asset-import-head, .studio-errors-head, .studio-workflow-hero)
+  > div:first-child
+  > :is(.eyebrow, h2) {
+  display: none;
+}
+/* Notices: the date fields keep to their column (the browser's date picker was wider than it and ran into
+   the next field and the button). */
+@media (min-width: 1281px) {
+  html body .studio-notice-new {
+    grid-template-columns: minmax(0, 1fr) 230px 230px auto;
+  }
+}
+/* On a tablet the message takes the whole first row and the dates share the second. */
+@media (max-width: 1280px) {
+  html body .studio-notice-new {
+    grid-template-columns: 1fr 1fr auto;
+  }
+  html body .studio-notice-new .studio-notice-message {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 900px) {
+  html body .studio-notice-new {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+html body .studio-notice-new label {
+  min-width: 0;
+}
+html body .studio-notice-new input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }

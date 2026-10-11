@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import {useLocation} from 'react-router-dom';
 import {useAppPreferences} from '../../../core/AppPreferences';
 import {useLibraries, type LibraryKey, type AdminUser, type Organization} from '../../../core/LibraryStore';
 import type {LibraryItem} from '../../../core/libraries';
@@ -20,7 +21,13 @@ export function useStudioState() {
   const hospitalLibraryMeta = libraryMeta.filter(
     m => platformAdmin || libs.dataMode !== 'PRODUCTION' || m.key !== 'departments',
   );
-  const [tab, setTab] = useState<Tab>(platformAdmin ? 'OVERVIEW' : 'LIBRARIES');
+  // «?tab=users» opens that section (the platform owner's menu links straight to each one).
+  const {search} = useLocation();
+  const urlTab = new URLSearchParams(search).get('tab')?.toUpperCase() as Tab | undefined;
+  const [tab, setTab] = useState<Tab>(urlTab || (platformAdmin ? 'OVERVIEW' : 'LIBRARIES'));
+  useEffect(() => {
+    if (urlTab) setTab(urlTab);
+  }, [urlTab]);
   const [libraryKey, setLibraryKey] = useState<LibraryKey>(hospitalLibraryMeta[0].key);
   // The color tape palette has its own editor next to the plain libraries.
   const [tapesOpen, setTapesOpen] = useState(false);

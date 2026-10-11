@@ -23,7 +23,8 @@ import {
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, formatExpiry, sterileExpiryList, type ExpiryEntry} from '../../core/sterileExpiry';
-import {navSectionFor, navigationFor, navigationGroupLabel} from '../../config/navigation';
+import {navSectionFor, navigationFor, navigationGroupLabel, ownerNavigation} from '../../config/navigation';
+import {isPlatformOnly} from '../../core/platformOnly';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
@@ -75,7 +76,18 @@ const navEN: Record<string, string> = {
   Αναφορές: 'Reports',
   Ιστορικό: 'History',
   Κάδος: 'Recycle bin',
-  'SurgiTrack Studio': 'Management Center',
+  'SurgiTrack Studio': 'SurgiTrack Studio',
+  Ιχνηλάτηση: 'Traceability',
+  Χρήστες: 'Users',
+  'Demo & τύποι χρήσης': 'Demo & plans',
+  Εισαγωγή: 'Import',
+  Ειδοποιήσεις: 'Notices',
+  Αξιολογήσεις: 'Ratings',
+  Σφάλματα: 'Errors',
+  Βιβλιοθήκες: 'Libraries',
+  'Ροή Αποστείρωσης': 'Sterilization Flow',
+  'Ρόλοι & δικαιώματα': 'Roles & permissions',
+  Ρυθμίσεις: 'Settings',
   'Σετ & Εργαλεία': 'Sets & Instruments',
   'Χρήστες & Τμήματα': 'Users & departments',
   Νοσοκομεία: 'Hospitals',
@@ -164,8 +176,7 @@ export default function AppShell({
   useListMemory(contentRef);
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
-  const platformOnly =
-    !isDemo && !!getRealIdentity()?.platform && !sessionStorage.getItem('surgitrack-active-organization');
+  const platformOnly = isPlatformOnly();
   // Hospital administration: a real hospital's admin working as Admin, or the Admin of Demo.
   const hospitalId = role === 'ADMIN' ? managedHospitalId() : undefined;
   const hospitalAdmin = !!hospitalId || (isDemo && role === 'ADMIN');
@@ -183,17 +194,21 @@ export default function AppShell({
   }, [hospitalId, location.pathname]);
   const navigation = (
     platformOnly
-      ? // Studio first, the list of hospitals below it.
-        PLATFORM_ONLY_PAGES.flatMap(page => navigationFor(role, can).filter(item => item.to === page))
+      ? // The owner's own menu: each Studio section is an entry.
+        ownerNavigation.filter(item => can(item.permission))
       : navigationFor(role, can)
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
     // The list of all hospitals is the platform admin's, outside Demo.
     .filter(item => item.to !== '/hospitals' || actingAsPlatformOwner());
   useEffect(() => {
-    if (platformOnly && !PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
-      navigate('/studio', {replace: true});
-  }, [platformOnly, location.pathname, navigate]);
+    if (!platformOnly) return;
+    // The Studio opens on a section, so one menu entry is always lit.
+    if (location.pathname === '/studio' && !new URLSearchParams(location.search).get('tab'))
+      navigate('/studio?tab=overview', {replace: true});
+    else if (!PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
+      navigate('/studio?tab=overview', {replace: true});
+  }, [platformOnly, location.pathname, location.search, navigate]);
   const returnFromDemo = () => {
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
@@ -303,7 +318,8 @@ export default function AppShell({
                 to={item.to}
                 end
                 onClick={() => setMobileOpen(false)}
-                className={active ? 'nav-item active' : 'nav-item'}
+                // The link's own match ignores the query, which would light every Studio section at once.
+                className={() => (active ? 'nav-item active' : 'nav-item')}
               >
                 <item.icon size={18} />
                 <span>{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
