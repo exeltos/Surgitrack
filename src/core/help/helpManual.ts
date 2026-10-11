@@ -38,41 +38,41 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Λογαριασμός',
-          'Λογαριασμό ανοίγει μόνο ο διαχειριστής του νοσοκομείου σας. Αν σας έστειλε πρόσκληση ή σύνδεσμο εγγραφής, συμπληρώνετε ονοματεπώνυμο και τμήμα και περιμένετε την έγκρισή του· κωδικό δεν ορίζετε ακόμη.',
+          'Λογαριασμό ανοίγει μόνο ο διαχειριστής του νοσοκομείου σας. Αν σας έστειλε πρόσκληση ή σύνδεσμο εγγραφής, συμπληρώνετε όνομα, επώνυμο, τμήμα και κωδικό και βλέπετε αμέσως το όνομα χρήστη σας. Αν γραφτήκατε με τον κοινό σύνδεσμο του νοσοκομείου, πατήστε πρώτα «Επιβεβαίωση email» στο email που θα λάβετε. Συνδέεστε μόλις εγκρίνει ο διαχειριστής.',
         ],
         en: [
           'Account',
-          'Only your hospital administrator opens accounts. If you got an invitation or a signup link, you fill in your name and department and wait for approval; you do not set a password yet.',
+          'Only your hospital administrator opens accounts. If you got an invitation or a signup link, you fill in your first name, last name, department and password and see your username at once. If you signed up with the hospital’s shared link, first press "Confirm email" in the email you receive. You can sign in as soon as the administrator approves.',
         ],
       },
       {
         el: [
           'Πολλές συσκευές',
-          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει αμέσως ό,τι αποθήκευσαν ή διέγραψαν οι άλλες (ζωντανός συγχρονισμός)· αν η ζωντανή σύνδεση δεν είναι διαθέσιμη, ελέγχει κάθε 20 δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο. Ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα. Αν δύο συσκευές αλλάξουν ταυτόχρονα το ίδιο Σετ ή εργαλείο, κρατιούνται και οι δύο αλλαγές όταν αφορούν διαφορετικά πεδία· αν αφορούν το ίδιο πεδίο, κρατιέται αυτή που αποθηκεύτηκε πρώτη και εμφανίζεται μήνυμα «Ταυτόχρονη αλλαγή από άλλη συσκευή» με το πεδίο. Αν χαθεί το δίκτυο, εμφανίζεται κάτω στην οθόνη η ειδοποίηση «Χωρίς σύνδεση στο δίκτυο»: ό,τι καταχωρίσετε κρατιέται σε αυτή τη συσκευή και αποθηκεύεται μόλις επανέλθει η σύνδεση, ακόμη κι αν κλείσει η σελίδα (ανοίξτε την ξανά με τον ίδιο χρήστη). Η συσκευή κρατά αντίγραφο των δεδομένων του νοσοκομείου, ώστε η εφαρμογή να ανοίγει αμέσως και να φέρνει μόνο ό,τι άλλαξε· το αντίγραφο σβήνει με την αποσύνδεση και δεν χρησιμοποιείται αν είναι παλαιότερο από μία ημέρα. Η πάνω μπάρα δείχνει την κατάσταση: «Ζωντανά» (πράσινο) ή «Συγχρονισμός» (γκρι, έλεγχος ανά 20 δευτερόλεπτα), «Αποθήκευση · N αλλαγές» όσο αποθηκεύονται και «Δεν αποθηκεύτηκε · νέα προσπάθεια» αν κάτι απέτυχε· κρατώντας το δείκτη από πάνω φαίνεται η ώρα της τελευταίας επικοινωνίας με τον server. Σε tablet οι λίστες κρατούν τις βασικές στήλες: τα μεγάλα ονόματα πιάνουν δύο γραμμές, η σημείωση μιας εκκρεμότητας εμφανίζεται κάτω από το αντικείμενο και, σε κατακόρυφη θέση, κάθε κίνηση του Ιστορικού δείχνει σε δεύτερη γραμμή την ενέργεια και τον χρήστη.',
+          'Μπορείτε να δουλεύετε από πολλούς υπολογιστές και tablet μαζί. Κάθε οθόνη παίρνει αμέσως ό,τι αποθήκευσαν ή διέγραψαν οι άλλες (ζωντανός συγχρονισμός)· αν η ζωντανή σύνδεση δεν είναι διαθέσιμη, ελέγχει κάθε 20 δευτερόλεπτα και μόλις επιστρέψετε στο παράθυρο. Ό,τι έχετε αλλάξει εσείς αποθηκεύεται πρώτα. Αν δύο συσκευές αλλάξουν ταυτόχρονα το ίδιο Σετ ή εργαλείο, κρατιούνται και οι δύο αλλαγές όταν αφορούν διαφορετικά πεδία· αν αφορούν το ίδιο πεδίο, κρατιέται αυτή που αποθηκεύτηκε πρώτη και εμφανίζεται μήνυμα «Ταυτόχρονη αλλαγή από άλλη συσκευή» με το πεδίο. Αν χαθεί το δίκτυο, εμφανίζεται κάτω στην οθόνη η ειδοποίηση «Χωρίς σύνδεση στο δίκτυο»: ό,τι καταχωρίσετε κρατιέται σε αυτή τη συσκευή και αποθηκεύεται μόλις επανέλθει η σύνδεση, ακόμη κι αν κλείσει η σελίδα (ανοίξτε την ξανά με τον ίδιο χρήστη). Η συσκευή κρατά αντίγραφο των δεδομένων του νοσοκομείου, ώστε η εφαρμογή να ανοίγει αμέσως και να φέρνει μόνο ό,τι άλλαξε· το αντίγραφο σβήνει με την αποσύνδεση και δεν χρησιμοποιείται αν είναι παλαιότερο από μία ημέρα. Η πάνω μπάρα δείχνει την κατάσταση: «Ζωντανά» (πράσινο) ή «Συγχρονισμός» (γκρι, έλεγχος ανά 20 δευτερόλεπτα), «Αποθήκευση · N αλλαγές» όσο αποθηκεύονται και «Δεν αποθηκεύτηκε · νέα προσπάθεια» αν κάτι απέτυχε· κρατώντας το δείκτη από πάνω φαίνεται η ώρα της τελευταίας επικοινωνίας με τον server. Σε tablet οι λίστες κρατούν τις βασικές στήλες: τα μεγάλα ονόματα πιάνουν δύο γραμμές, η σημείωση μιας εκκρεμότητας εμφανίζεται κάτω από το αντικείμενο και κάθε κίνηση του Ιστορικού δείχνει σε δεύτερη γραμμή την ενέργεια και τον χρήστη· σε κινητό κάθε κίνηση είναι μια κάρτα.',
         ],
         en: [
           'Several devices',
-          'You can work from several computers and tablets at once. Each screen takes what the others saved or deleted at once (live sync); when the live connection is not available it checks every 20 seconds and as soon as you come back to the window. Your own changes are saved first. If two devices change the same Set or instrument at the same time, both changes are kept when they concern different fields; when they concern the same field, the one saved first is kept and a "Changed on another device at the same time" message names the field. If the network drops, a "No network connection" notice appears at the bottom of the screen: what you record is kept on this device and saved as soon as the connection is back, even if the page closes (open it again with the same user). The device keeps a copy of the hospital’s data, so the app opens at once and fetches only what changed; the copy is wiped at sign-out and not used when older than a day. The top bar shows the state: "Live" (green) or "Sync" (grey, checking every 20 seconds), "Saving · N changes" while saving and "Not saved · retrying" if something failed; hovering over it shows the time of the last contact with the server. On a tablet the lists keep their key columns: long names take two lines, an issue’s note shows under the item and, in portrait, each History entry shows the action and the user on a second line.',
+          'You can work from several computers and tablets at once. Each screen takes what the others saved or deleted at once (live sync); when the live connection is not available it checks every 20 seconds and as soon as you come back to the window. Your own changes are saved first. If two devices change the same Set or instrument at the same time, both changes are kept when they concern different fields; when they concern the same field, the one saved first is kept and a "Changed on another device at the same time" message names the field. If the network drops, a "No network connection" notice appears at the bottom of the screen: what you record is kept on this device and saved as soon as the connection is back, even if the page closes (open it again with the same user). The device keeps a copy of the hospital’s data, so the app opens at once and fetches only what changed; the copy is wiped at sign-out and not used when older than a day. The top bar shows the state: "Live" (green) or "Sync" (grey, checking every 20 seconds), "Saving · N changes" while saving and "Not saved · retrying" if something failed; hovering over it shows the time of the last contact with the server. On a tablet the lists keep their key columns: long names take two lines, an issue’s note shows under the item and each History entry shows the action and the user on a second line; on a phone each movement is a card.',
         ],
       },
       {
         el: [
           'Πρώτη σύνδεση',
-          'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234), τον ρόλο και το τμήμα σας. Πατήστε «Ορισμός κωδικού», ορίστε κωδικό τουλάχιστον 8 χαρακτήρων και συνδεθείτε με το όνομα χρήστη ή το email σας.',
+          'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας στο SurgiTrack εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234) και τον ρόλο σας. Συνδεθείτε με το όνομα χρήστη (ή το email σας) και τον κωδικό που ορίσατε στην εγγραφή: τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό. Αν τον λογαριασμό τον δημιούργησε ο διαχειριστής, πατήστε «Ορισμός κωδικού» στο email.',
         ],
         en: [
           'First sign-in',
-          'Once approved you get an "Access approved" email with your username (e.g. GN1234), your role and your department. Press "Set password", choose a password of at least 8 characters and sign in with your username or email.',
+          'Once approved you get an "Your access to SurgiTrack was approved" email with your username (e.g. GN1234) and your role. Sign in with your username (or email) and the password you set when signing up: at least 8 characters, with a letter and a number. If the administrator created the account, press "Set password" in the email.',
         ],
       },
       {
         el: [
           'Η οθόνη σας',
-          'Το μενού αριστερά δείχνει μόνο όσα επιτρέπει ο ρόλος σας. Μετά τη σύνδεση ανοίγει η Επισκόπηση, αν υπάρχει στο μενού σας· αλλιώς η πρώτη επιλογή του μενού. Στο πεδίο σάρωσης της πάνω μπάρας σαρώνετε ή γράφετε barcode και ανοίγει αμέσως το Σετ ή το εργαλείο. Πάνω δεξιά: γλώσσα (EL/EN), Βοήθεια, προσβασιμότητα (μέγεθος κειμένου, αντίθεση) και ειδοποιήσεις.',
+          'Το μενού αριστερά δείχνει μόνο όσα επιτρέπει ο ρόλος σας, σε ομάδες: Καθημερινή εργασία, Εξοπλισμός, Ανάλυση, Διαχείριση. Μετά τη σύνδεση ανοίγει η Επισκόπηση, αν υπάρχει στο μενού σας· αλλιώς η πρώτη επιλογή του μενού. Στο πεδίο σάρωσης της πάνω μπάρας σαρώνετε ή γράφετε barcode και ανοίγει αμέσως το Σετ ή το εργαλείο. Πάνω δεξιά: γλώσσα (EL/EN), Βοήθεια, προσβασιμότητα (μέγεθος κειμένου, αντίθεση) και ειδοποιήσεις.',
         ],
         en: [
           'Your screen',
-          'The menu on the left shows only what your role allows. After signing in the Overview opens if your menu has it; otherwise the first entry of your menu. In the scan field of the top bar, scan or type a barcode and the Set or instrument opens at once. Top right: language (EL/EN), Help, accessibility (text size, contrast) and notifications.',
+          'The menu on the left shows only what your role allows, in groups: Daily work, Equipment, Insight, Administration. After signing in the Overview opens if your menu has it; otherwise the first entry of your menu. In the scan field of the top bar, scan or type a barcode and the Set or instrument opens at once. Top right: language (EL/EN), Help, accessibility (text size, contrast) and notifications.',
         ],
       },
       {
@@ -98,14 +98,14 @@ export const helpManual: ManualSection[] = [
     ],
     steps: {
       el: [
-        'Ανοίξτε το email έγκρισης και κρατήστε το όνομα χρήστη.',
-        'Πατήστε «Ορισμός κωδικού» και ορίστε κωδικό.',
-        'Συνδεθείτε και ανοίξτε τη Βοήθεια (το βιβλίο πάνω δεξιά) σε κάθε οθόνη που δεν γνωρίζετε.',
+        'Κρατήστε το όνομα χρήστη που εμφανίζεται μετά την εγγραφή.',
+        'Μετά το email έγκρισης, συνδεθείτε με αυτό και τον κωδικό σας.',
+        'Ανοίξτε τη Βοήθεια (το βιβλίο πάνω δεξιά) σε κάθε οθόνη που δεν γνωρίζετε.',
       ],
       en: [
-        'Open the approval email and keep your username.',
-        'Press "Set password" and choose a password.',
-        'Sign in and open Help (the book icon, top right) on any screen you do not know.',
+        'Keep the username shown after you sign up.',
+        'After the approval email, sign in with it and your password.',
+        'Open Help (the book icon, top right) on any screen you do not know.',
       ],
     },
     checks: {
@@ -148,11 +148,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τμήματα και βιβλιοθήκες',
-          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους και χρωματικές ταινίες· στη Ροή Αποστείρωσης τα στάδια.',
+          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους, πλυντήρια και χρωματικούς μάρτυρες· στη Ροή Αποστείρωσης τα στάδια.',
         ],
         en: [
           'Departments and libraries',
-          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers and color tapes; in Sterilization Flow the stages.',
+          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers, washers and color markers; in Sterilization Flow the stages.',
         ],
       },
       {
@@ -182,7 +182,7 @@ export const helpManual: ManualSection[] = [
         ],
         en: [
           'Equipment',
-          'A barcode label printer in Sterilization, a barcode scanner (USB or Bluetooth, works as a keyboard) at every handover point, a computer or tablet with Chrome or Edge. If sterilizers will be connected, see "Connected devices". For the IT department: the app talks only to its own site and to Supabase (https and wss on *.supabase.co), loads nothing from third parties and does not open inside other sites; the site’s security headers enforce this.',
+          'A barcode label printer in Sterilization, a barcode scanner (USB or Bluetooth, works as a keyboard) at every handover point, a computer or tablet with Chrome or Edge. If sterilizers will be connected, see "Devices". For the IT department: the app talks only to its own site and to Supabase (https and wss on *.supabase.co), loads nothing from third parties and does not open inside other sites; the site’s security headers enforce this.',
         ],
       },
       {
@@ -253,11 +253,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Στοιχεία',
-          'Αριστερά φαίνονται barcode, κωδικός, τμήμα, ειδικότητα, κατασκευαστής, ιδιοκτησία και χρωματική σήμανση. Όσοι έχουν δικαίωμα τα αλλάζουν με «Επεξεργασία».',
+          'Αριστερά φαίνονται barcode, κωδικός, τμήμα, ειδικότητα, κατασκευαστής, ιδιοκτησία, χρωματικός μάρτυρας, ημερομηνία αποστείρωσης και λήξη. Όσοι έχουν δικαίωμα τα αλλάζουν με «Επεξεργασία».',
         ],
         en: [
           'Details',
-          'On the left: barcode, code, department, specialty, manufacturer, ownership and color marker. Users with the right can change them with "Edit".',
+          'On the left: barcode, code, department, specialty, manufacturer, ownership, color marker, sterilization date and expiry. Users with the right can change them with "Edit".',
         ],
       },
       {
@@ -273,18 +273,21 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ιστορικό και φωτογραφίες',
-          'Οι καρτέλες δείχνουν κάθε κίνηση, αναφορά προβλήματος και φωτογραφία του αντικειμένου.',
+          'Οι καρτέλες Ιστορικό, Εκκρεμότητες, Σύνοψη και Σημειώσεις (και Σύνθεση στα Σετ) δείχνουν κάθε κίνηση και αναφορά προβλήματος. Οι φωτογραφίες ανοίγουν από την κάρτα στοιχείων («Άνοιγμα φωτογραφιών»).',
         ],
-        en: ['History and photos', 'The tabs show every movement, problem report and photo of the item.'],
+        en: [
+          'History and photos',
+          'The History, Issues, Summary and Notes tabs (and Composition on Sets) show every movement and problem report. Photos open from the details card ("Open photos").',
+        ],
       },
       {
         el: [
           'Ενέργειες',
-          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, εκτύπωση barcode και, στο κουμπί «Ενέργειες», αναφορά προβλήματος και διαχείριση (τμήμα, Σετ, Απόθεμα, Service, απώλεια). Μια ενέργεια διαχείρισης αναιρείται από την ειδοποίηση για λίγα δευτερόλεπτα· το ιστορικό κρατά και την αναίρεση.',
+          'Ανάλογα με τον ρόλο: αποστολή προς Αποστείρωση, εκτύπωση barcode και, στο κουμπί «Ενέργειες», αναφορά προβλήματος, διαχείριση (τμήμα, Service, απώλεια· στα εργαλεία και Σετ ή Απόθεμα, στα Σετ και επιστροφή) και «Νέο barcode» όταν η ετικέτα χάθηκε ή φθάρηκε. Μια ενέργεια διαχείρισης αναιρείται από την ειδοποίηση για λίγα δευτερόλεπτα· το ιστορικό κρατά και την αναίρεση.',
         ],
         en: [
           'Actions',
-          'Depending on the role: send to Sterilization, print the barcode and, under "Actions", report a problem and manage (department, Set, Stock, Service, loss). A management action can be undone from its notice for a few seconds; the history keeps the undo too.',
+          'Depending on the role: send to Sterilization, print the barcode and, under "Actions", report a problem, manage (department, Service, loss; for instruments also Set or Stock, for Sets also return) and "New barcode" when the label is lost or worn. A management action can be undone from its notice for a few seconds; the history keeps the undo too.',
         ],
       },
       {
@@ -327,7 +330,7 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Δείκτες (KPIs)',
-          'Κάθε δείκτης στην κορυφή είναι σύνδεσμος. Πατώντας τον ανοίγει η αντίστοιχη λίστα με τα σωστά φίλτρα ήδη εφαρμοσμένα, π.χ. «Κοντά στο όριο χρήσεων» ανοίγει τα Εργαλεία με φίλτρο «Λίγες χρήσεις».',
+          'Κάθε δείκτης στην κορυφή είναι σύνδεσμος. Πατώντας τον ανοίγει η αντίστοιχη λίστα με τα σωστά φίλτρα ήδη εφαρμοσμένα, π.χ. «Κοντά στο όριο» ανοίγει τα Εργαλεία με φίλτρο «Λίγες χρήσεις».',
         ],
         en: [
           'Indicators (KPIs)',
@@ -337,11 +340,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ανά τμήμα',
-          'Ο πίνακας δείχνει τι έχει κάθε τμήμα: στο τμήμα, στην αποστείρωση, έτοιμα και εκκρεμότητες. Πατήστε το όνομα του τμήματος για να δείτε τα Σετ του.',
+          'Μια μπάρα ανά τμήμα δείχνει πού βρίσκεται ο εξοπλισμός του (στο τμήμα, σε αποστείρωση, έτοιμα, άλλα) και τις ανοικτές εκκρεμότητες. Φαίνονται τα πέντε πιο φορτωμένα τμήματα· το «+N ακόμη» δείχνει τα υπόλοιπα. Πατώντας ένα τμήμα βλέπετε τη σελίδα του όπως τη βλέπει το ίδιο το τμήμα.',
         ],
         en: [
           'By department',
-          'The table shows what each department holds: at the department, in sterilization, ready and issues. Click a department name to see its Sets.',
+          'One bar per department shows where its equipment is (at the department, in sterilization, ready, other) and its open issues. The five busiest departments show; "+N more" shows the rest. Clicking a department opens its page as the department itself sees it.',
         ],
       },
       {
@@ -352,6 +355,16 @@ export const helpManual: ManualSection[] = [
         en: [
           'Sterilization flow',
           'The bars show how many items are at each stage. Clicking a stage opens Sterilization on that tab.',
+        ],
+      },
+      {
+        el: [
+          'Οι υπόλοιπες κάρτες',
+          '«Πού βρίσκεται ο εξοπλισμός» μετρά Σετ, μεμονωμένα εργαλεία και Απόθεμα: στα τμήματα, στην Αποστείρωση, έτοιμα για παραλαβή, σε Απόθεμα, Service / απολεσθέντα. «Κινήσεις 14 ημερών» δείχνει τις κινήσεις ανά ημέρα, με σύνολα για σήμερα, 7 και 14 ημέρες. «Χρειάζεται προσοχή» συγκεντρώνει εκκρεμότητες, λήξεις αποστείρωσης και εργαλεία κοντά στο όριο χρήσεων· κάθε γραμμή ανοίγει την αντίστοιχη λίστα.',
+        ],
+        en: [
+          'The other cards',
+          '"Where the equipment is" counts Sets, standalone instruments and Stock: in departments, in sterilization, ready for pickup, in stock, service / lost. "Movements, last 14 days" shows movements per day, with totals for today, 7 and 14 days. "Needs attention" gathers issues, sterile expiry and instruments near their usage limit; each line opens the matching list.',
         ],
       },
     ],
@@ -386,11 +399,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τι βλέπω',
-          'Στις δύο καρτέλες βλέπετε τα Σετ και τα μεμονωμένα εργαλεία του τμήματός σας. Οι δείκτες πάνω φιλτράρουν τη λίστα: «Στο τμήμα», «Σε αποστείρωση» (καθ’ οδόν ή μέσα στην Αποστείρωση), «Έτοιμα για παραλαβή».',
+          'Στις δύο καρτέλες βλέπετε τα Σετ και τα μεμονωμένα εργαλεία του τμήματός σας. Οι δείκτες πάνω φιλτράρουν τη λίστα: «Στο τμήμα», «Σε αποστείρωση» (καθ’ οδόν ή μέσα στην Αποστείρωση), «Έτοιμα για παραλαβή», και η «Ανοικτές εκκρεμότητες» ανοίγει τις Εκκρεμότητες του τμήματος. Ό,τι βρίσκεται στην Αποστείρωση εμφανίζεται «Σε αποστείρωση» με το στάδιο από κάτω (π.χ. «Σύνθεση», «Κλίβανος»). Οι χρήσεις γράφονται «24 / 60 χρήσεις».',
         ],
         en: [
           'What I see',
-          'The two tabs list your Sets and standalone instruments. The indicators above filter the list: "At department", "In sterilization" (on the way to or inside Sterilization), "Ready for pickup".',
+          'The two tabs list your Sets and standalone instruments. The indicators above filter the list: "At department", "In sterilization" (on the way to or inside Sterilization), "Ready for pickup", and "Open issues" opens the department’s Issues. Whatever is in Sterilization shows "In sterilization" with the stage under it (e.g. "Composition", "Sterilizer"). Uses read "24 / 60 uses".',
         ],
       },
       {
@@ -474,11 +487,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καρτέλες σταδίων',
-          'Κάθε καρτέλα είναι ένα στάδιο. Ο αριθμός δείχνει πόσα περιμένουν. Τα στάδια που είναι απενεργοποιημένα στο Studio δεν εμφανίζονται. Η μπλε μπάρα «Αναζήτηση & σάρωση» φιλτράρει την καρτέλα καθώς γράφετε· με σάρωση barcode και Enter ανοίγει το αντικείμενο στο στάδιο όπου βρίσκεται. Δίπλα της είναι τα Φίλτρα (τμήμα, ειδικότητα, Σετ ή εργαλεία).',
+          'Κάθε καρτέλα είναι ένα στάδιο, με μια λέξη από κάτω για το τι γίνεται εκεί (π.χ. Καθαρισμός «Πλύση», Σύνθεση «Έλεγχος εργαλείων», Συσκευασία «Σήμανση», Αποδέσμευση «Πύλη ποιότητας»). Ο αριθμός δείχνει πόσα περιμένουν και η λίστα έχει τον ίδιο τίτλο με την καρτέλα (στην Παράδοση: «Έτοιμα για παράδοση»). Τα στάδια που είναι απενεργοποιημένα στο Studio δεν εμφανίζονται, εκτός αν έχουν ακόμη αντικείμενα. Η μπλε μπάρα «Αναζήτηση & σάρωση» φιλτράρει την καρτέλα καθώς γράφετε· με σάρωση barcode και Enter ανοίγει το αντικείμενο στο στάδιο όπου βρίσκεται. Δίπλα της είναι τα Φίλτρα (τμήμα, ειδικότητα, Σετ ή εργαλεία).',
         ],
         en: [
           'Stage tabs',
-          'Each tab is a stage and its number shows how many are waiting. Stages disabled in Studio are not shown. The blue "Search & scan" bar filters the tab as you type; scanning a barcode and pressing Enter opens the item in its stage. The Filters (department, specialty, Sets or instruments) sit next to it.',
+          'Each tab is a stage, with a word under it for what happens there (e.g. Composition "Instrument check", Packaging "Labelling", Release "Quality gate"). Its number shows how many are waiting and the list has the same title as the tab (at Delivery: "Ready for delivery"). Stages disabled in Studio are not shown, unless they still hold items. The blue "Search & scan" bar filters the tab as you type; scanning a barcode and pressing Enter opens the item in its stage. The Filters (department, specialty, Sets or instruments) sit next to it.',
         ],
       },
       {
@@ -489,6 +502,16 @@ export const helpManual: ManualSection[] = [
         en: [
           'Physical receipt',
           'In "Receipt" scan the Set and declare any visible deviation. You are recorded automatically as the receiver; the department person handing it over signs with their user code and password. Deviations (missing, damaged) create an issue.',
+        ],
+      },
+      {
+        el: [
+          'Καθαρισμός',
+          'Στον «Καθαρισμό» ο καθαρισμός καταγράφεται με φόρτωση πλυντηρίου: «Φόρτωση πλυντηρίου» πάνω από τη λίστα για πολλά μαζί ή στη γραμμή για ένα. Διαλέγετε πλυντήριο / απολυμαντή, αριθμό κύκλου και πρόγραμμα και πατάτε «Ολοκλήρωση φορτίου». Το «Χωρίς πλυντήριο» εμφανίζεται μόνο όταν το επιτρέπει η πολιτική καθαρισμού στο Studio → Ροή Αποστείρωσης.',
+        ],
+        en: [
+          'Washing',
+          'In "Washing" washing is recorded with a washer load: "Washer load" above the list for several at once, or on the row for one. Pick the washer / disinfector, the cycle number and the program and press "Complete load". "Without a washer" shows only when the washing policy in Studio → Sterilization Flow allows it.',
         ],
       },
       {
@@ -514,11 +537,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Διάρκεια αποστείρωσης',
-          'Στη «Συσκευασία & Σήμανση» διαλέγετε για κάθε Σετ ή εργαλείο διάρκεια 2, 3 ή 6 μηνών· προτείνεται η προεπιλογή του νοσοκομείου. Η διάρκεια μετρά από την αποδέσμευση και η ημερομηνία λήξης φαίνεται στην καρτέλα του. Αν το νοσοκομείο δεν έχει στάδιο συσκευασίας, η διάρκεια επιλέγεται στην προετοιμασία.',
+          'Στη «Συσκευασία» (έλεγχος συσκευασίας) διαλέγετε για κάθε Σετ ή εργαλείο διάρκεια 2, 3 ή 6 μηνών· προτείνεται η προεπιλογή του νοσοκομείου. Η διάρκεια μετρά από την αποδέσμευση και η ημερομηνία λήξης φαίνεται στην καρτέλα του. Αν το νοσοκομείο δεν έχει στάδιο συσκευασίας, η διάρκεια επιλέγεται στην προετοιμασία.',
         ],
         en: [
           'Sterile shelf life',
-          'At "Packaging & Labelling" you choose a shelf life of 2, 3 or 6 months for each Set or instrument; the hospital default is suggested. It counts from the release and the expiry date shows on its card. If the hospital has no packaging stage, the shelf life is chosen at preparation.',
+          'At "Packaging" (packaging check) you choose a shelf life of 2, 3 or 6 months for each Set or instrument; the hospital default is suggested. It counts from the release and the expiry date shows on its card. If the hospital has no packaging stage, the shelf life is chosen at preparation.',
         ],
       },
       {
@@ -603,6 +626,143 @@ export const helpManual: ManualSection[] = [
     related: ['/issues', '/sets', '/movements', '/expiry'],
   },
   {
+    to: '/issues',
+    permission: 'issue.view',
+    title: {el: 'Εκκρεμότητες', en: 'Issues'},
+    summary: {
+      el: 'Ελλείψεις, φθορές, βλάβες και απώλειες που χρειάζονται διαχείριση.',
+      en: 'Missing, damaged, faulty or lost items that need handling.',
+    },
+    audience: {el: 'Όλοι οι χρήστες', en: 'All users'},
+    chapters: [
+      {
+        el: [
+          'Δημιουργία',
+          'Εκκρεμότητα δημιουργείται από την καρτέλα Σετ ή εργαλείου («Ενέργειες» → «Αναφορά προβλήματος») ή αυτόματα από απόκλιση στην παραλαβή. Απώλεια και αποστολή σε Service η Αποστείρωση τις δηλώνει από «Ενέργειες» → «Διαχείριση», γιατί αλλάζουν την κατάσταση· ένα τμήμα δηλώνει την απώλεια ως αναφορά και η Αποστείρωση την επιβεβαιώνει.',
+        ],
+        en: [
+          'Creating',
+          'An issue is created from a Set or instrument card ("Actions" → "Report a problem") or automatically from a receipt deviation. Sterilization declares a loss or a Service send-off in "Actions" → "Manage", because they change the state; a department reports a loss and Sterilization confirms it.',
+        ],
+      },
+      {
+        el: [
+          'Κλείσιμο',
+          'Η Αποστείρωση επιλύει την εκκρεμότητα (αντικατάσταση, service, επιστροφή) και την κλείνει. Όλα καταγράφονται στο Ιστορικό.',
+        ],
+        en: [
+          'Closing',
+          'Sterilization resolves the issue (replacement, service, return) and closes it. Everything is recorded in History.',
+        ],
+      },
+      {
+        el: [
+          'Δύο καρτέλες',
+          'Η Αποστείρωση και ο Διαχειριστής βλέπουν δύο καρτέλες: «Αναφορές προβλημάτων» (ό,τι αναφέρθηκε) και «Αντικαταστάσεις & Παραγγελίες» (τα εργαλεία που πρέπει να αντικατασταθούν, από το Απόθεμα ή με παραγγελία αγοράς). Σε κινητό γράφονται «Αναφορές» και «Αντικαταστάσεις».',
+        ],
+        en: [
+          'Two tabs',
+          'Sterilization and the Administrator see two tabs: "Problem reports" (what was reported) and "Replacements & orders" (the instruments to replace, from Stock or with a purchase order). On a phone they read "Reports" and "Replacements".',
+        ],
+      },
+      {
+        el: [
+          'Αριθμοί',
+          'Πάνω από τη λίστα των αναφορών, τέσσερις κάρτες: Σύνολο, Ανοικτές, Πάνω από 7 ημέρες (ανοικτές που περιμένουν πολύ) και Επιλυμένες. Μετρούν μέσα στο τμήμα, τον τύπο και την αναζήτηση που έχετε επιλέξει· πατώντας μία, η λίστα δείχνει μόνο αυτές. Στα «Φίλτρα» το ίδιο φίλτρο λέγεται «Ανοικτές πάνω από 7 ημέρες».',
+        ],
+        en: [
+          'Numbers',
+          'Above the list of reports, four cards: Total, Open, Over 7 days (open ones waiting long) and Resolved. They count within the department, type and search you chose; pressing one shows only those in the list. In "Filters" the same filter is called "Open over 7 days".',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Πατήστε την κάρτα «Ανοικτές» (ή «Πάνω από 7 ημέρες» για όσες περιμένουν πολύ).',
+        'Ανοίξτε την εκκρεμότητα και δείτε σημείωση και φωτογραφίες.',
+        'Επιλύστε και κλείστε την.',
+      ],
+      en: [
+        'Press the "Open" card (or "Over 7 days" for those waiting long).',
+        'Open the issue and see its note and photos.',
+        'Resolve and close it.',
+      ],
+    },
+    related: ['/replacements', '/sterilization', '/movements'],
+  },
+  {
+    to: '/replacements',
+    permission: 'stock.manage',
+    openedFrom: ['/issues'],
+    title: {el: 'Αντικαταστάσεις & Παραγγελίες', en: 'Replacements & orders'},
+    summary: {
+      el: 'Τα εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης: αν υπάρχει ίδιο στο Απόθεμα, αντικατάσταση με ένα κλικ, αλλιώς παραγγελία αγοράς.',
+      en: 'Instruments in Service, damaged or worn, lost or out of use: replace from Stock in one click when it holds the same instrument, otherwise record a purchase order.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Τι εμφανίζεται',
+          'Εργαλεία σε Service, με ανοιχτή αναφορά βλάβης ή φθοράς, χαμένα και εκτός χρήσης. Για καθένα: το Σετ στο οποίο ανήκει (ή από το οποίο βγήκε), η αιτία, από πότε, και αν το Απόθεμα έχει ίδιο εργαλείο (ίδιος κωδικός ή, χωρίς κωδικό, ίδια ονομασία).',
+        ],
+        en: [
+          'What it lists',
+          'Instruments in Service, with an open damage or wear report, lost and out of use. For each: the Set it belongs to (or left), the reason, since when, and whether Stock holds the same instrument (same code or, with no code, the same name).',
+        ],
+      },
+      {
+        el: [
+          'Αριθμοί',
+          'Πάνω από τη λίστα, τέσσερις κάρτες: «Προς αντικατάσταση», «Με απόθεμα» (υπάρχει ίδιο στο Απόθεμα), «Χωρίς απόθεμα» (χρειάζεται παραγγελία) και «Σε παραγγελία». Πατώντας μία, η λίστα δείχνει μόνο αυτά.',
+        ],
+        en: [
+          'Numbers',
+          'Above the list, four cards: "Need replacement", "In Stock" (Stock holds the same one), "Not in Stock" (it needs ordering) and "On order". Pressing one shows only those in the list.',
+        ],
+      },
+      {
+        el: [
+          'Αντικατάσταση από Απόθεμα',
+          '«Αντικατάσταση» βάζει ένα ίδιο εργαλείο από το Απόθεμα στο Σετ. Αν το χαλασμένο ήταν ακόμα μέσα, βγαίνει για Service. Επιλέξτε πολλά και πατήστε «Αντικατάσταση από Απόθεμα» για όλα μαζί· το ίδιο εργαλείο Αποθέματος δεν δίνεται δύο φορές.',
+        ],
+        en: [
+          'Replace from Stock',
+          '"Replace" puts a matching Stock instrument into the Set. If the damaged one was still in it, it leaves for Service. Select several and press "Replace from Stock" for all at once; one Stock instrument is never used twice.',
+        ],
+      },
+      {
+        el: [
+          'Παραγγελία αγοράς',
+          'Για όσα δεν υπάρχουν στο Απόθεμα: επιλέξτε τα και «Παραγγελία αγοράς». Γίνεται μία γραμμή ανά είδος με την ποσότητα, συμπληρώνετε προμηθευτή και σημείωση. Στην καρτέλα «Παραγγελίες» η παραγγελία εκτυπώνεται, σημειώνεται ως παραγγελθείσα ή ακυρωμένη, και με «Παραλαβή στο Απόθεμα» τα νέα εργαλεία καταχωρούνται αυτόματα στο Απόθεμα.',
+        ],
+        en: [
+          'Purchase order',
+          'For what Stock lacks: select it and "Purchase order". One line per kind with its quantity; add supplier and note. In the "Orders" tab the order prints, is marked ordered or cancelled, and "Receive into Stock" registers the new instruments in Stock.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Πατήστε «Προς αντικατάσταση», «Με απόθεμα» ή «Χωρίς απόθεμα», ή φιλτράρετε με αιτία και τμήμα.',
+        'Αντικαταστήστε από το Απόθεμα όσα έχουν διαθέσιμο.',
+        'Για τα υπόλοιπα καταχωρήστε παραγγελία αγοράς και εκτυπώστε την.',
+        'Όταν έρθουν, «Παραλαβή στο Απόθεμα»: τα νέα εργαλεία μπαίνουν στο Απόθεμα με δικά τους barcodes.',
+      ],
+      en: [
+        'Press "Need replacement", "In Stock" or "Not in Stock", or filter by reason and department.',
+        'Replace from Stock what it holds.',
+        'Record a purchase order for the rest and print it.',
+        'When they arrive, "Receive into Stock": the new instruments enter Stock with their own barcodes.',
+      ],
+    },
+    tip: {
+      el: 'Το «Λήψη» (Excel, PDF / Εκτύπωση, CSV) παίρνει ό,τι έχετε επιλέξει, αλλιώς ό,τι δείχνουν τα φίλτρα.',
+      en: '"Download" (Excel, PDF / Print, CSV) takes your selection, otherwise what the filters show.',
+    },
+    related: ['/stock', '/issues', '/reports'],
+  },
+  {
     to: '/expiry',
     permission: 'asset.registry.view',
     title: {el: 'Λήξεις αποστείρωσης', en: 'Sterile expiry'},
@@ -650,167 +810,6 @@ export const helpManual: ManualSection[] = [
       en: 'The hospital’s default shelf life is set in Studio → Settings.',
     },
     related: ['/sterilization', '/sets', '/studio'],
-  },
-  {
-    to: '/bin',
-    permission: 'asset.delete',
-    title: {el: 'Κάδος', en: 'Recycle bin'},
-    summary: {
-      el: 'Ό,τι διαγράφεται μένει 30 ημέρες στον Κάδο και μπορεί να επανέλθει όπως ήταν.',
-      en: 'Whatever is deleted stays 30 days in the bin and can be put back as it was.',
-    },
-    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
-    chapters: [
-      {
-        el: [
-          'Πού βρίσκεται',
-          'Ο Κάδος είναι κάτω αριστερά στο μενού, όπως στον υπολογιστή. Όταν έχει κάτι μέσα δείχνει πόσα είναι.',
-        ],
-        en: [
-          'Where it is',
-          'The bin sits at the bottom left of the menu, like on a computer. When something is in it, it shows how many.',
-        ],
-      },
-      {
-        el: [
-          'Επαναφορά',
-          'Σετ, εργαλεία, εγγραφές βιβλιοθηκών, χρωματικές ταινίες και συσκευές επανέρχονται όπως ήταν· μετά από 30 ημέρες σβήνονται οριστικά. Τις βιβλιοθήκες τις επαναφέρει μόνο ο Διαχειριστής.',
-        ],
-        en: [
-          'Restore',
-          'Sets, instruments, library records, color tapes and devices come back as they were; after 30 days they are deleted for good. Only the Administrator restores library records.',
-        ],
-      },
-    ],
-    steps: {
-      el: ['Πατήστε τον Κάδο κάτω αριστερά.', 'Βρείτε την εγγραφή και πατήστε «Επαναφορά».'],
-      en: ['Press the bin at the bottom left.', 'Find the record and press "Restore".'],
-    },
-    related: ['/sets', '/tools', '/studio'],
-  },
-  {
-    to: '/devices',
-    permission: 'sterilization.workspace',
-    title: {el: 'Συνδεδεμένες συσκευές', en: 'Connected devices'},
-    summary: {
-      el: 'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν τα δεδομένα των κύκλων τους στο SurgiTrack.',
-      en: 'Sterilizers, washers and other devices that send their cycle data to SurgiTrack.',
-    },
-    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
-    chapters: [
-      {
-        el: [
-          'Τρεις τρόποι σύνδεσης',
-          'Δίκτυο: η συσκευή ή το λογισμικό του κατασκευαστή στέλνει κάθε κύκλο αυτόματα με ένα κλειδί συσκευής. Αρχείο: εξάγετε τους κύκλους σε USB (CSV ή Excel) και τους ανεβάζετε. Καλώδιο: η συσκευή συνδέεται σε υπολογιστή της Αποστείρωσης (Chrome ή Edge) και ό,τι τυπώνει διαβάζεται αυτόματα.',
-        ],
-        en: [
-          'Three ways to connect',
-          'Network: the device or the manufacturer software sends every cycle automatically with a device key. File: export the cycles to USB (CSV or Excel) and upload them. Cable: the device connects to a Sterilization computer (Chrome or Edge) and what it prints is read automatically.',
-        ],
-      },
-      {
-        el: [
-          'Αυτόματη συμπλήρωση κύκλου',
-          'Στην καταγραφή κύκλου ή φορτίου εμφανίζονται οι νέοι κύκλοι των συσκευών. Το «Χρήση» συμπληρώνει κλίβανο, αριθμό κύκλου και πρόγραμμα· εσείς ελέγχετε και επιβεβαιώνετε. Αποτυχημένος κύκλος της συσκευής σημειώνεται ως αποτυχία.',
-        ],
-        en: [
-          'Cycle auto-fill',
-          'When recording a cycle or a load, the devices’ new cycles are listed. “Use” fills in sterilizer, cycle number and program; you check and confirm. A cycle the device failed is marked as failed.',
-        ],
-      },
-      {
-        el: [
-          'Αρχείο',
-          'Κάθε συσκευή κρατά τους κύκλους της με θερμοκρασία, πίεση, διάρκεια και αποτέλεσμα. Το «Λήψη» τους κατεβάζει σε Excel ή CSV για έλεγχο ή επιθεώρηση.',
-        ],
-        en: [
-          'Record',
-          'Each device keeps its cycles with temperature, pressure, duration and result. “Download” saves them as Excel or CSV for review or audit.',
-        ],
-      },
-    ],
-    steps: {
-      el: [
-        'Ο διαχειριστής προσθέτει τη συσκευή και διαλέγει τρόπο σύνδεσης.',
-        'Για δίκτυο: «Κλειδί δικτύου» και το δίνετε στον τεχνικό του κατασκευαστή.',
-        'Για αρχείο ή καλώδιο: «Αρχείο» ή «Καλώδιο» στην κάρτα της συσκευής.',
-      ],
-      en: [
-        'The admin adds the device and picks how it connects.',
-        'For network: “Network key”, given to the manufacturer’s technician.',
-        'For file or cable: “File” or “Cable” on the device card.',
-      ],
-    },
-    related: ['/sterilization', '/reports'],
-  },
-  {
-    to: '/tools',
-    permission: 'asset.registry.view',
-    title: {el: 'Εργαλεία', en: 'Instruments'},
-    summary: {
-      el: 'Το γενικό μητρώο όλων των φυσικών εργαλείων, σε Σετ, μεμονωμένα ή στο Απόθεμα.',
-      en: 'The register of every physical instrument, in Sets, standalone or in Stock.',
-    },
-    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
-    chapters: [
-      {
-        el: [
-          'Φίλτρα',
-          'Όλα τα φίλτρα βρίσκονται στο κουμπί «Φίλτρα»: τμήμα, ειδικότητα, εταιρεία, θέση, κατάσταση και τύπος χρήσης. Οι δείκτες πάνω από τη λίστα φιλτράρουν με ένα κλικ.',
-        ],
-        en: [
-          'Filters',
-          'All filters are in the "Filters" button: department, specialty, manufacturer, location, state and usage type. The indicators above the list filter with one click.',
-        ],
-      },
-      {
-        el: [
-          'Τύπος χρήσης',
-          '«Με όριο χρήσεων» δείχνει εργαλεία με όριο χρήσεων, «Λίγες χρήσεις» όσα πλησιάζουν στο όριο και «Χωρίς όριο» τα υπόλοιπα.',
-        ],
-        en: [
-          'Usage type',
-          '"With a usage limit" shows instruments with a usage limit, "Few uses left" those near it and "No limit" the rest.',
-        ],
-      },
-      {
-        el: [
-          'Καρτέλα εργαλείου',
-          'Πατώντας ένα εργαλείο βλέπετε ιστορικό, φωτογραφίες, χρήσεις, χρωματική σήμανση και ιδιοκτησία. Το όριο και οι χρήσεις αλλάζουν μόνο από τον Διαχειριστή και τον Προϊστάμενο Αποστείρωσης.',
-        ],
-        en: [
-          'Instrument card',
-          'Opening an instrument shows history, photos, uses, color marker and ownership. The limit and uses can be changed only by the Administrator and the Sterilization supervisor.',
-        ],
-      },
-      {
-        el: [
-          'Εισαγωγή και ονομασίες',
-          'Το «Μαζική εισαγωγή» φέρνει εργαλεία και Σετ από Excel. Το «Έλεγχος ονομασιών» βρίσκει γραφές που διαφέρουν και κωδικούς με πολλές ονομασίες και τα ενοποιεί.',
-        ],
-        en: [
-          'Import and names',
-          '"Bulk import" brings instruments and Sets from Excel. "Name check" finds names written differently and codes with many names, and unifies them.',
-        ],
-      },
-    ],
-    steps: {
-      el: [
-        'Αναζητήστε με όνομα, κωδικό, barcode ή serial.',
-        'Περιορίστε με τα φίλτρα.',
-        'Ανοίξτε το εργαλείο για λεπτομέρειες και ενέργειες.',
-      ],
-      en: [
-        'Search by name, code, barcode or serial.',
-        'Narrow down with the filters.',
-        'Open the instrument for details and actions.',
-      ],
-    },
-    tip: {
-      el: 'Η λίστα φορτώνει σταδιακά καθώς κάνετε κύλιση· για να βρείτε κάτι γρήγορα χρησιμοποιήστε την αναζήτηση.',
-      en: 'The list loads progressively as you scroll; to find something quickly, use search.',
-    },
-    related: ['/sets', '/stock', '/standalone-tools', '/import', '/tools/names'],
   },
   {
     to: '/sets',
@@ -868,153 +867,78 @@ export const helpManual: ManualSection[] = [
     related: ['/tools', '/stock', '/reports', '/import'],
   },
   {
-    to: '/import',
-    permission: 'asset.create',
-    openedFrom: ['/tools', '/sets'],
-    title: {el: 'Μαζική εισαγωγή', en: 'Bulk import'},
+    to: '/tools',
+    permission: 'asset.registry.view',
+    title: {el: 'Εργαλεία', en: 'Instruments'},
     summary: {
-      el: 'Εισαγωγή εργαλείων και Σετ από Excel ή CSV, με προεπισκόπηση πριν γραφτεί οτιδήποτε.',
-      en: 'Import instruments and Sets from Excel or CSV, with a preview before anything is written.',
+      el: 'Το γενικό μητρώο όλων των φυσικών εργαλείων, σε Σετ, μεμονωμένα ή στο Απόθεμα.',
+      en: 'The register of every physical instrument, in Sets, standalone or in Stock.',
     },
-    audience: {el: 'Διαχειριστής και Προϊστάμενος Αποστείρωσης', en: 'Administrator and Sterilization supervisor'},
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
     chapters: [
       {
         el: [
-          'Το αρχείο',
-          'Κατεβάστε το «Πρότυπο Excel». Μία γραμμή ανά εργαλείο: Σετ, κωδικός, όνομα εργαλείου (υποχρεωτικό), ποσότητα, τμήμα, ειδικότητα, κατασκευαστής, μέγιστες χρήσεις, σειριακός αριθμός. Ίδιο όνομα Σετ = ίδιο Σετ· κενό Σετ = μεμονωμένο εργαλείο· κενό τμήμα = Απόθεμα.',
+          'Φίλτρα',
+          'Όλα τα φίλτρα βρίσκονται στο κουμπί «Φίλτρα»: τμήμα, ειδικότητα, εταιρεία, θέση, κατάσταση και τύπος χρήσης. Οι δείκτες πάνω από τη λίστα φιλτράρουν με ένα κλικ.',
         ],
         en: [
-          'The file',
-          'Download the "Excel template". One row per instrument: Set, code, instrument name (required), quantity, department, specialty, manufacturer, max uses, serial number. Same Set name = same Set; no Set = standalone instrument; no department = Stock.',
+          'Filters',
+          'All filters are in the "Filters" button: department, specialty, manufacturer, location, state and usage type. The indicators above the list filter with one click.',
         ],
       },
       {
         el: [
-          'Προεπισκόπηση',
-          'Πριν την εισαγωγή βλέπετε πόσα Σετ, μεμονωμένα και εργαλεία Αποθέματος θα δημιουργηθούν, τη λίστα εργαλείων με αναζήτηση και τις γραμμές με πρόβλημα. Οι στήλες αναγνωρίζονται αυτόματα· αν μια στήλη δεν βρέθηκε, την αντιστοιχίζετε με το χέρι.',
+          'Τύπος χρήσης',
+          '«Με όριο χρήσεων» δείχνει εργαλεία με όριο χρήσεων, «Λίγες χρήσεις» όσα πλησιάζουν στο όριο και «Χωρίς όριο» τα υπόλοιπα.',
         ],
         en: [
-          'Preview',
-          'Before importing you see how many Sets, standalone and Stock instruments will be created, the instrument list with search and the rows with problems. Columns are recognized automatically; if one is not found, you map it by hand.',
+          'Usage type',
+          '"With a usage limit" shows instruments with a usage limit, "Few uses left" those near it and "No limit" the rest.',
         ],
       },
       {
         el: [
-          'Ονομασίες',
-          'Η εισαγωγή μπορεί να γράψει τις ονομασίες ενιαία (κεφαλαία χωρίς τόνους, ίδια γραφή μονάδων) και να χρησιμοποιήσει την ονομασία που ήδη έχει το νοσοκομείο για τον ίδιο κωδικό, ώστε να μη δημιουργηθούν διπλές ονομασίες.',
+          'Καρτέλα εργαλείου',
+          'Πατώντας ένα εργαλείο βλέπετε ιστορικό, φωτογραφίες, χρήσεις, χρωματικό μάρτυρα και ιδιοκτησία. Το όριο και οι χρήσεις αλλάζουν μόνο από τον Διαχειριστή και τον Προϊστάμενο Αποστείρωσης.',
         ],
         en: [
-          'Names',
-          'The import can write names uniformly (capitals without accents, units written the same way) and use the name the hospital already has for the same code, so no duplicate names are created.',
+          'Instrument card',
+          'Opening an instrument shows history, photos, uses, color marker and ownership. The limit and uses can be changed only by the Administrator and the Sterilization supervisor.',
         ],
       },
       {
         el: [
-          'Αναίρεση',
-          'Κάθε εισαγωγή εμφανίζεται στις «Εισαγωγές σε αυτό το νοσοκομείο» και αναιρείται ολόκληρη με «Αναίρεση εισαγωγής», όσο κανένα αντικείμενό της δεν έχει χρησιμοποιηθεί.',
+          'Εισαγωγή και ονομασίες',
+          'Το «Μαζική εισαγωγή» φέρνει εργαλεία και Σετ από Excel. Το «Έλεγχος ονομασιών» βρίσκει γραφές που διαφέρουν και κωδικούς με πολλές ονομασίες και τα ενοποιεί.',
         ],
         en: [
-          'Undo',
-          'Every import appears under "Imports in this hospital" and can be undone in full with "Undo import", as long as none of its items has been used.',
+          'Import and names',
+          '"Bulk import" brings instruments and Sets from Excel. "Name check" finds names written differently and codes with many names, and unifies them.',
         ],
       },
     ],
     steps: {
       el: [
-        'Εργαλεία ή Σετ → «Μαζική εισαγωγή».',
-        'Κατεβάστε το πρότυπο και συμπληρώστε το.',
-        'Σύρετε το αρχείο στη σελίδα.',
-        'Ελέγξτε προεπισκόπηση, προβλήματα και ονομασίες.',
-        'Πατήστε «Εισαγωγή».',
+        'Αναζητήστε με όνομα, κωδικό, barcode ή serial.',
+        'Περιορίστε με τα φίλτρα.',
+        'Ανοίξτε το εργαλείο για λεπτομέρειες και ενέργειες.',
       ],
       en: [
-        'Instruments or Sets → "Bulk import".',
-        'Download the template and fill it in.',
-        'Drag the file onto the page.',
-        'Check the preview, problems and names.',
-        'Press "Import".',
-      ],
-    },
-    checks: {
-      el: [
-        'Τα ονόματα τμημάτων είναι ίδια με αυτά της Διαχείρισης νοσοκομείου.',
-        'Οι γραμμές με πρόβλημα διορθώθηκαν ή δεν χρειάζονται.',
-        'Μετά την εισαγωγή: «Έλεγχος ονομασιών».',
-      ],
-      en: [
-        'Department names match those in Users & departments.',
-        'Rows with problems were fixed or are not needed.',
-        'After importing: "Name check".',
-      ],
-    },
-    related: ['/tools/names', '/sets', '/tools'],
-  },
-  {
-    to: '/tools/names',
-    permission: 'asset.edit',
-    openedFrom: ['/tools'],
-    title: {el: 'Έλεγχος ονομασιών', en: 'Name check'},
-    summary: {
-      el: 'Ενιαίες ονομασίες εργαλείων: διορθώσεις γραφής και κωδικοί που έχουν περισσότερες από μία ονομασίες.',
-      en: 'Consistent instrument names: spelling fixes and codes that carry more than one name.',
-    },
-    audience: {el: 'Διαχειριστής και Προϊστάμενος Αποστείρωσης', en: 'Administrator and Sterilization supervisor'},
-    chapters: [
-      {
-        el: [
-          'Διορθώσεις γραφής',
-          'Διορθώσεις χωρίς ρίσκο: διπλά κενά, τόνοι, πεζά, λατινικά γράμματα μέσα σε ελληνική λέξη (και αντίστροφα), «12cm» → «12 CM». Αφήστε επιλεγμένες όσες θέλετε και πατήστε «Εφαρμογή σε … εργαλεία».',
-        ],
-        en: [
-          'Spelling fixes',
-          'Risk-free fixes: double spaces, accents, lower case, Latin letters inside a Greek word (and the reverse), "12cm" → "12 CM". Keep the ones you want ticked and press "Apply to … instruments".',
-        ],
-      },
-      {
-        el: [
-          'Ίδιος κωδικός',
-          'Για κάθε κωδικό με πολλές ονομασίες η εφαρμογή προτείνει την πιο συχνή. Επιλέξτε ποιες ονομασίες μπαίνουν στην ενοποίηση, την τελική ονομασία (ή γράψτε άλλη) και πατήστε «Ενοποίηση». Το «Πιθανό λάθος κωδικός» σημαίνει άλλο εργαλείο με λάθος κωδικό: διορθώστε το από την καρτέλα του.',
-        ],
-        en: [
-          'Same code',
-          'For each code with many names the app suggests the most used one. Choose which names join, the final name (or type another) and press "Unify". "Possibly wrong code" means another instrument with the wrong code: fix it from its card.',
-        ],
-      },
-      {
-        el: [
-          'Συνθέσεις Σετ',
-          'Η αλλαγή ονομασίας περνά και στις πρότυπες συνθέσεις των Σετ. Αν εμφανιστεί «Συνθέσεις Σετ με παλιές ονομασίες», πατήστε «Ενημέρωση συνθέσεων».',
-        ],
-        en: [
-          'Set compositions',
-          'A rename also reaches the Set template compositions. If "Set compositions with old names" appears, press "Update compositions".',
-        ],
-      },
-    ],
-    steps: {
-      el: [
-        'Εργαλεία → «Έλεγχος ονομασιών».',
-        'Εφαρμόστε τις διορθώσεις γραφής.',
-        'Περάστε τους κωδικούς με πολλές ονομασίες· ο αριθμός εργαλείων ανοίγει τη λίστα τους.',
-        'Ενημερώστε τις συνθέσεις αν το ζητήσει.',
-      ],
-      en: [
-        'Instruments → "Name check".',
-        'Apply the spelling fixes.',
-        'Go through the codes with many names; the instrument count opens their list.',
-        'Update the compositions if asked.',
+        'Search by name, code, barcode or serial.',
+        'Narrow down with the filters.',
+        'Open the instrument for details and actions.',
       ],
     },
     tip: {
-      el: 'Κάθε αλλαγή αναιρείται από την ειδοποίηση που εμφανίζεται αμέσως μετά.',
-      en: 'Every change can be undone from the notice that appears right after it.',
+      el: 'Η λίστα φορτώνει σταδιακά καθώς κάνετε κύλιση· για να βρείτε κάτι γρήγορα χρησιμοποιήστε την αναζήτηση.',
+      en: 'The list loads progressively as you scroll; to find something quickly, use search.',
     },
-    related: ['/tools', '/import', '/sets'],
+    related: ['/sets', '/stock', '/standalone-tools', '/import', '/tools/names'],
   },
   {
     to: '/standalone-tools',
     permission: 'asset.registry.view',
-    title: {el: 'Μεμονωμένα σε χρήση', en: 'Standalone in Use'},
+    title: {el: 'Μεμονωμένα εργαλεία σε χρήση', en: 'Standalone instruments in use'},
     summary: {
       el: 'Εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα, εκτός Σετ.',
       en: 'Instruments used on their own in departments, outside any Set.',
@@ -1034,11 +958,21 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Όριο χρήσεων',
-          'Οι δείκτες «Με όριο χρήσεων» και «Λίγες χρήσεις» φιλτράρουν τη λίστα. Το υπόλοιπο φαίνεται σε κάθε γραμμή.',
+          'Οι δείκτες «Με όριο χρήσεων» και «Λίγες χρήσεις» φιλτράρουν τη λίστα. Σε κάθε γραμμή φαίνονται οι χρήσεις που έγιναν και το όριο (π.χ. 11 / 50) και η λήξη αποστείρωσης.',
         ],
         en: [
           'Usage limits',
-          'The "With a usage limit" and "Few uses left" indicators filter the list. Remaining uses show on each row.',
+          'The "With a usage limit" and "Few uses left" indicators filter the list. Each row shows the uses made and the limit (e.g. 11 / 50) and the sterile expiry.',
+        ],
+      },
+      {
+        el: [
+          'Ομαδοποίηση',
+          'Το κουμπί «Ομαδοποίηση» ενώνει τα ίδια εργαλεία σε μία γραμμή, με το πλήθος των τεμαχίων, την κατάσταση, τα τμήματα και το εύρος χρήσεων. Πατώντας μια ομάδα ανοίγουν τα τεμάχιά της.',
+        ],
+        en: [
+          'Grouping',
+          'The "Group" button joins identical instruments into one row, with the number of pieces, the state, the departments and the range of uses. Clicking a group lists its pieces.',
         ],
       },
     ],
@@ -1061,32 +995,32 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Αριθμοί και καρτέλες',
-          'Πάνω βλέπετε τους αριθμούς του Αποθέματος (εργαλεία, είδη, με όριο χρήσεων, κάτω από το ελάχιστο)· πατώντας μια κάρτα φιλτράρεται η λίστα, και το «Κάτω από το ελάχιστο» ανοίγει τα Ελάχιστα αποθέματα. Από κάτω, οι καρτέλες «Εργαλεία Αποθέματος» και «Ελάχιστα αποθέματα» αλλάζουν τη λίστα.',
+          'Πάνω βλέπετε τους αριθμούς του Αποθέματος (εργαλεία, είδη, με όριο χρήσεων, κάτω από το ελάχιστο)· πατώντας μια κάρτα φιλτράρεται η λίστα, ενώ τα «Είδη εργαλείων» και «Κάτω από το ελάχιστο» ανοίγουν τα Ελάχιστα αποθέματα. Από κάτω, οι καρτέλες «Εργαλεία Αποθέματος» και «Ελάχιστα αποθέματα» αλλάζουν τη λίστα.',
         ],
         en: [
           'Numbers and tabs',
-          'At the top are the Stock numbers (instruments, kinds, with a usage limit, below the minimum); tapping a card filters the list, and "Below the minimum" opens Minimum stock. Below them, the "Stock instruments" and "Minimum stock" tabs switch the list.',
+          'At the top are the Stock numbers (instruments, kinds, with a usage limit, below the minimum); tapping a card filters the list, while "Instrument types" and "Below the minimum" open Minimum stock. Below them, the "Stock instruments" and "Minimum stock" tabs switch the list.',
         ],
       },
       {
         el: [
           'Προσθήκη σε Σετ',
-          'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Απόθεμα. Ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
+          'Η προσθήκη γίνεται μέσα από το Σετ: ανοίξτε το Σετ, πατήστε «Προσθήκη εργαλείων» και διαλέξτε από την καρτέλα Απόθεμα. Στα Σετ εργαλείων ο δείκτης «Σετ με έλλειψη» ανοίγει τα Σετ που χρειάζονται συμπλήρωση.',
         ],
         en: [
           'Add to a Set',
-          'Adding happens from the Set: open the Set, press "Add instruments" and pick from the Stock tab. The "Sets with missing items" indicator opens the Sets that need completing.',
+          'Adding happens from the Set: open the Set, press "Add instruments" and pick from the Stock tab. In Instrument Sets the "Sets with shortage" indicator opens the Sets that need completing.',
         ],
       },
     ],
     steps: {
       el: [
-        'Ανοίξτε «Σετ με έλλειψη» για να δείτε τι λείπει.',
+        'Στα Σετ εργαλείων πατήστε «Σετ με έλλειψη» για να δείτε τι λείπει.',
         'Ανοίξτε το Σετ και πατήστε «Προσθήκη εργαλείων».',
         'Διαλέξτε το εργαλείο από την καρτέλα Απόθεμα.',
       ],
       en: [
-        'Open "Sets with missing items" to see what is missing.',
+        'In Instrument Sets press "Sets with shortage" to see what is missing.',
         'Open the Set and press "Add instruments".',
         'Pick the instrument from the Stock tab.',
       ],
@@ -1094,178 +1028,59 @@ export const helpManual: ManualSection[] = [
     related: ['/sets', '/tools', '/replacements'],
   },
   {
-    to: '/replacements',
-    permission: 'stock.manage',
-    openedFrom: ['/issues'],
-    title: {el: 'Αντικαταστάσεις & Παραγγελίες', en: 'Replacements & orders'},
+    to: '/devices',
+    permission: 'sterilization.workspace',
+    title: {el: 'Συσκευές', en: 'Devices'},
     summary: {
-      el: 'Τα εργαλεία σε Service, με βλάβη ή φθορά, χαμένα ή εκτός χρήσης: αν υπάρχει ίδιο στο Απόθεμα, αντικατάσταση με ένα κλικ, αλλιώς παραγγελία αγοράς.',
-      en: 'Instruments in Service, damaged or worn, lost or out of use: replace from Stock in one click when it holds the same instrument, otherwise record a purchase order.',
+      el: 'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν τα δεδομένα των κύκλων τους στο SurgiTrack.',
+      en: 'Sterilizers, washers and other devices that send their cycle data to SurgiTrack.',
     },
     audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
     chapters: [
       {
         el: [
-          'Τι εμφανίζεται',
-          'Εργαλεία σε Service, με ανοιχτή αναφορά βλάβης ή φθοράς, χαμένα και εκτός χρήσης. Για καθένα: το Σετ στο οποίο ανήκει (ή από το οποίο βγήκε), η αιτία, από πότε, και αν το Απόθεμα έχει ίδιο εργαλείο (ίδιος κωδικός ή, χωρίς κωδικό, ίδια ονομασία).',
+          'Τρεις τρόποι σύνδεσης',
+          'Δίκτυο: η συσκευή ή το λογισμικό του κατασκευαστή στέλνει κάθε κύκλο αυτόματα με ένα κλειδί συσκευής. Αρχείο: εξάγετε τους κύκλους σε USB (CSV ή Excel) και τους ανεβάζετε. Καλώδιο: η συσκευή συνδέεται σε υπολογιστή της Αποστείρωσης (Chrome ή Edge) και ό,τι τυπώνει διαβάζεται αυτόματα.',
         ],
         en: [
-          'What it lists',
-          'Instruments in Service, with an open damage or wear report, lost and out of use. For each: the Set it belongs to (or left), the reason, since when, and whether Stock holds the same instrument (same code or, with no code, the same name).',
+          'Three ways to connect',
+          'Network: the device or the manufacturer software sends every cycle automatically with a device key. File: export the cycles to USB (CSV or Excel) and upload them. Cable: the device connects to a Sterilization computer (Chrome or Edge) and what it prints is read automatically.',
         ],
       },
       {
         el: [
-          'Αντικατάσταση από Απόθεμα',
-          '«Αντικατάσταση» βάζει ένα ίδιο εργαλείο από το Απόθεμα στο Σετ. Αν το χαλασμένο ήταν ακόμα μέσα, βγαίνει για Service. Επιλέξτε πολλά και πατήστε «Αντικατάσταση από Απόθεμα» για όλα μαζί· το ίδιο εργαλείο Αποθέματος δεν δίνεται δύο φορές.',
+          'Αυτόματη συμπλήρωση κύκλου',
+          'Στην καταγραφή κύκλου ή φορτίου εμφανίζονται οι νέοι κύκλοι των συσκευών. Το «Χρήση» συμπληρώνει κλίβανο, αριθμό κύκλου και πρόγραμμα· εσείς ελέγχετε και επιβεβαιώνετε. Αποτυχημένος κύκλος της συσκευής σημειώνεται ως αποτυχία.',
         ],
         en: [
-          'Replace from Stock',
-          '"Replace" puts a matching Stock instrument into the Set. If the damaged one was still in it, it leaves for Service. Select several and press "Replace from Stock" for all at once; one Stock instrument is never used twice.',
+          'Cycle auto-fill',
+          'When recording a cycle or a load, the devices’ new cycles are listed. “Use” fills in sterilizer, cycle number and program; you check and confirm. A cycle the device failed is marked as failed.',
         ],
       },
       {
         el: [
-          'Παραγγελία αγοράς',
-          'Για όσα δεν υπάρχουν στο Απόθεμα: επιλέξτε τα και «Παραγγελία αγοράς». Γίνεται μία γραμμή ανά είδος με την ποσότητα, συμπληρώνετε προμηθευτή και σημείωση. Στην καρτέλα «Παραγγελίες» η παραγγελία εκτυπώνεται, σημειώνεται ως παραγγελθείσα ή ακυρωμένη, και με «Παραλαβή στο Απόθεμα» τα νέα εργαλεία καταχωρούνται αυτόματα στο Απόθεμα.',
+          'Αρχείο',
+          'Κάθε συσκευή κρατά τους κύκλους της με θερμοκρασία, πίεση, διάρκεια και αποτέλεσμα. Το «Λήψη» τους κατεβάζει σε Excel, PDF ή CSV για έλεγχο ή επιθεώρηση. Η στήλη «Φόρτωση» δείχνει αν ο κύκλος είναι «Σε φόρτωση» ή «Διαθέσιμος» για νέο φορτίο.',
         ],
         en: [
-          'Purchase order',
-          'For what Stock lacks: select it and "Purchase order". One line per kind with its quantity; add supplier and note. In the "Orders" tab the order prints, is marked ordered or cancelled, and "Receive into Stock" registers the new instruments in Stock.',
+          'Record',
+          'Each device keeps its cycles with temperature, pressure, duration and result. “Download” saves them as Excel, PDF or CSV for review or audit. The “Load” column shows whether a cycle is “In a load” or “Available” for a new load.',
         ],
       },
     ],
     steps: {
       el: [
-        'Φιλτράρετε με αιτία, τμήμα ή διαθεσιμότητα στο Απόθεμα.',
-        'Αντικαταστήστε από το Απόθεμα όσα έχουν διαθέσιμο.',
-        'Για τα υπόλοιπα καταχωρήστε παραγγελία αγοράς και εκτυπώστε την.',
-        'Όταν έρθουν, «Παραλαβή στο Απόθεμα»: τα νέα εργαλεία μπαίνουν στο Απόθεμα με δικά τους barcodes.',
+        'Ο διαχειριστής προσθέτει τη συσκευή και διαλέγει τρόπο σύνδεσης.',
+        'Για δίκτυο: «Κλειδί δικτύου» και το δίνετε στον τεχνικό του κατασκευαστή.',
+        'Για αρχείο ή καλώδιο: «Αρχείο» ή «Καλώδιο» στην κάρτα της συσκευής.',
       ],
       en: [
-        'Filter by reason, department or Stock availability.',
-        'Replace from Stock what it holds.',
-        'Record a purchase order for the rest and print it.',
-        'When they arrive, "Receive into Stock": the new instruments enter Stock with their own barcodes.',
+        'The admin adds the device and picks how it connects.',
+        'For network: “Network key”, given to the manufacturer’s technician.',
+        'For file or cable: “File” or “Cable” on the device card.',
       ],
     },
-    tip: {
-      el: 'Το «Λήψη» (Excel, PDF / Εκτύπωση, CSV) παίρνει ό,τι έχετε επιλέξει, αλλιώς ό,τι δείχνουν τα φίλτρα.',
-      en: '"Download" (Excel, PDF / Print, CSV) takes your selection, otherwise what the filters show.',
-    },
-    related: ['/stock', '/issues', '/reports'],
-  },
-  {
-    to: '/issues',
-    permission: 'issue.view',
-    title: {el: 'Εκκρεμότητες', en: 'Issues'},
-    summary: {
-      el: 'Ελλείψεις, φθορές, βλάβες και απώλειες που χρειάζονται διαχείριση.',
-      en: 'Missing, damaged, faulty or lost items that need handling.',
-    },
-    audience: {el: 'Όλοι οι χρήστες', en: 'All users'},
-    chapters: [
-      {
-        el: [
-          'Δημιουργία',
-          'Εκκρεμότητα δημιουργείται από την καρτέλα Σετ ή εργαλείου («Ενέργειες» → «Αναφορά προβλήματος») ή αυτόματα από απόκλιση στην παραλαβή. Απώλεια και αποστολή σε Service η Αποστείρωση τις δηλώνει από «Ενέργειες» → «Διαχείριση», γιατί αλλάζουν την κατάσταση· ένα τμήμα δηλώνει την απώλεια ως αναφορά και η Αποστείρωση την επιβεβαιώνει.',
-        ],
-        en: [
-          'Creating',
-          'An issue is created from a Set or instrument card ("Actions" → "Report a problem") or automatically from a receipt deviation. Sterilization declares a loss or a Service send-off in "Actions" → "Manage", because they change the state; a department reports a loss and Sterilization confirms it.',
-        ],
-      },
-      {
-        el: [
-          'Κλείσιμο',
-          'Η Αποστείρωση επιλύει την εκκρεμότητα (αντικατάσταση, service, επιστροφή) και την κλείνει. Όλα καταγράφονται στο Ιστορικό.',
-        ],
-        en: [
-          'Closing',
-          'Sterilization resolves the issue (replacement, service, return) and closes it. Everything is recorded in History.',
-        ],
-      },
-      {
-        el: [
-          'Δύο καρτέλες',
-          'Η Αποστείρωση και ο Διαχειριστής βλέπουν δύο καρτέλες: «Αναφορές προβλημάτων» (ό,τι αναφέρθηκε) και «Αντικαταστάσεις & Παραγγελίες» (τα εργαλεία που πρέπει να αντικατασταθούν, από το Απόθεμα ή με παραγγελία αγοράς).',
-        ],
-        en: [
-          'Two tabs',
-          'Sterilization and the Administrator see two tabs: "Problem reports" (what was reported) and "Replacements & orders" (the instruments to replace, from Stock or with a purchase order).',
-        ],
-      },
-      {
-        el: [
-          'Αριθμοί',
-          'Πάνω από τη λίστα των αναφορών, τέσσερις κάρτες: Σύνολο, Ανοικτές, Ανοικτές πάνω από 7 ημέρες (αυτές που περιμένουν πολύ) και Επιλυμένες. Μετρούν μέσα στο τμήμα, τον τύπο και την αναζήτηση που έχετε επιλέξει· πατώντας μία, η λίστα δείχνει μόνο αυτές. Το ίδιο φίλτρο ημερομηνίας υπάρχει και στα «Φίλτρα».',
-        ],
-        en: [
-          'Numbers',
-          'Above the list of reports, four cards: Total, Open, Open over 7 days (those waiting long) and Resolved. They count within the department, type and search you chose; pressing one shows only those in the list. The same date filter is also in "Filters".',
-        ],
-      },
-    ],
-    steps: {
-      el: [
-        'Πατήστε την κάρτα «Ανοικτές» (ή «Ανοικτές πάνω από 7 ημέρες» για όσες περιμένουν πολύ).',
-        'Ανοίξτε την εκκρεμότητα και δείτε σημείωση και φωτογραφίες.',
-        'Επιλύστε και κλείστε την.',
-      ],
-      en: [
-        'Press the "Open" card (or "Open over 7 days" for those waiting long).',
-        'Open the issue and see its note and photos.',
-        'Resolve and close it.',
-      ],
-    },
-    related: ['/replacements', '/sterilization', '/movements'],
-  },
-  {
-    to: '/reports',
-    permission: 'reports.view',
-    title: {el: 'Αναφορές & Εκτυπώσεις', en: 'Reports & Printing'},
-    summary: {
-      el: 'Έτοιμες αναφορές με φίλτρα και λήψη σε Excel, PDF ή CSV.',
-      en: 'Ready-made reports with filters and download as Excel, PDF or CSV.',
-    },
-    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
-    chapters: [
-      {
-        el: [
-          'Διαθέσιμες αναφορές',
-          'Σύνθεση Σετ, Ανά Τμήμα, Ανά Ειδικότητα, Service & Βλάβες, Όρια Χρήσεων, Εργαλεία εκτός χρήσης και Ιχνηλασιμότητα Ασθενούς.',
-        ],
-        en: [
-          'Available reports',
-          'Set composition, By department, By specialty, Service & faults, Usage limits, Out-of-use instruments and Patient traceability.',
-        ],
-      },
-      {
-        el: [
-          'Λήψη: Excel, PDF, CSV',
-          'Το κουμπί «Λήψη» έχει τρεις επιλογές: «Excel» κατεβάζει τα αποτελέσματα ως πίνακα με φίλτρα, «PDF / Εκτύπωση» ανοίγει προεπισκόπηση A4 για εκτύπωση ή αποθήκευση ως PDF, και «CSV» τα δίνει ως απλό κείμενο για άλλα προγράμματα. Όλες παίρνουν τα αποτελέσματα με τα φίλτρα που έχετε ορίσει. Ο πίνακας χωράει στο πλάτος της οθόνης· τα μεγάλα κείμενα αλλάζουν γραμμή.',
-        ],
-        en: [
-          'Download: Excel, PDF, CSV',
-          'The "Download" button has three options: "Excel" downloads the results as a table with filters, "PDF / Print" opens an A4 preview to print or save as PDF, and "CSV" gives them as plain text for other programs. All take the results with the filters you set. The table fits the screen width; long texts wrap.',
-        ],
-      },
-      {
-        el: [
-          'Εκτός χρήσης',
-          'Εργαλεία που συμπλήρωσαν το όριο χρήσεών τους φεύγουν από τις λίστες και μένουν ως ιστορικό σε αυτή την αναφορά, με ημερομηνία και αιτία.',
-        ],
-        en: [
-          'Out of use',
-          'Instruments that reached their usage limit leave the lists and stay as history in this report, with date and reason.',
-        ],
-      },
-    ],
-    steps: {
-      el: ['Επιλέξτε αναφορά από αριστερά.', 'Ορίστε φίλτρα.', 'Πατήστε «Λήψη» και διαλέξτε Excel, PDF ή CSV.'],
-      en: ['Pick a report on the left.', 'Set the filters.', 'Press "Download" and choose Excel, PDF or CSV.'],
-    },
-    related: ['/overview', '/movements'],
+    related: ['/sterilization', '/reports'],
   },
   {
     to: '/traceability',
@@ -1302,6 +1117,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Κύκλοι και Σετ',
+          'Οι «Κύκλοι αποστείρωσης» δείχνουν τα φορτία κλιβάνου από τα οποία πέρασε το αντικείμενο (δικά του ή του Σετ του), με κλίβανο, αριθμό κύκλου, πρόγραμμα και αποτέλεσμα. Για κωδικό ασθενούς φαίνεται τι χρησιμοποιήθηκε, το καθένα με τον τελευταίο κύκλο αποστείρωσης πριν τη χρήση. Ένα εργαλείο μέσα σε Σετ δείχνει και τις «Κινήσεις του Σετ». Αν ένα όνομα ταιριάζει σε πολλά, εμφανίζεται «Βρέθηκαν N — διαλέξτε ένα».',
+        ],
+        en: [
+          'Cycles and Sets',
+          '"Sterilization cycles" lists the sterilizer loads the item went through (its own or its Set’s), with sterilizer, cycle number, program and outcome. For a patient code you see what was used, each with the last sterilization cycle before the use. An instrument in a Set also shows the "Moves of the Set". When a name matches several items, "N found — choose one" lists them.',
+        ],
+      },
+      {
+        el: [
           'Λήψη και εκτύπωση',
           'Το κουμπί «Λήψη» δίνει τα αποτελέσματα σε Excel, CSV ή PDF για εκτύπωση, π.χ. για έλεγχο ποιότητας ή για ανάκληση.',
         ],
@@ -1326,6 +1151,53 @@ export const helpManual: ManualSection[] = [
     related: ['/movements', '/reports'],
   },
   {
+    to: '/reports',
+    permission: 'reports.view',
+    title: {el: 'Αναφορές', en: 'Reports'},
+    summary: {
+      el: 'Έτοιμες αναφορές με φίλτρα και λήψη σε Excel, PDF ή CSV.',
+      en: 'Ready-made reports with filters and download as Excel, PDF or CSV.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Διαθέσιμες αναφορές',
+          'Σύνθεση Σετ, Ανά τμήμα, Ανά ειδικότητα, Service & βλάβες, Όρια χρήσεων, Εργαλεία εκτός χρήσης, Φορτία κλιβάνου, Λήξεις αποστείρωσης, Παραδόσεις & παραλαβές και Ιχνηλασιμότητα ασθενούς.',
+        ],
+        en: [
+          'Available reports',
+          'Set composition, By department, By specialty, Service & faults, Usage limits, Out-of-use instruments, Sterilizer loads, Sterile expiry, Deliveries & receipts and Patient traceability.',
+        ],
+      },
+      {
+        el: [
+          'Λήψη: Excel, PDF, CSV',
+          'Το κουμπί «Λήψη» έχει τρεις επιλογές: «Excel» κατεβάζει τα αποτελέσματα ως πίνακα με φίλτρα, «PDF / Εκτύπωση» ανοίγει προεπισκόπηση A4 για εκτύπωση ή αποθήκευση ως PDF, και «CSV» τα δίνει ως απλό κείμενο για άλλα προγράμματα. Όλες παίρνουν τα αποτελέσματα με τα φίλτρα που έχετε ορίσει. Τα κείμενα αλλάζουν γραμμή μόνο ανάμεσα σε λέξεις· όταν ο πίνακας δεν χωράει, κυλά οριζόντια. Στήλες χωρίς τιμή δεν εμφανίζονται στην οθόνη· η λήψη τις κρατά.',
+        ],
+        en: [
+          'Download: Excel, PDF, CSV',
+          'The "Download" button has three options: "Excel" downloads the results as a table with filters, "PDF / Print" opens an A4 preview to print or save as PDF, and "CSV" gives them as plain text for other programs. All take the results with the filters you set. Texts wrap only between words; when the table does not fit, it scrolls sideways. Columns with no value are not shown on screen; the download keeps them.',
+        ],
+      },
+      {
+        el: [
+          'Εκτός χρήσης',
+          'Εργαλεία που συμπλήρωσαν το όριο χρήσεών τους φεύγουν από τις λίστες και μένουν ως ιστορικό σε αυτή την αναφορά, με ημερομηνία και αιτία.',
+        ],
+        en: [
+          'Out of use',
+          'Instruments that reached their usage limit leave the lists and stay as history in this report, with date and reason.',
+        ],
+      },
+    ],
+    steps: {
+      el: ['Επιλέξτε αναφορά από αριστερά.', 'Ορίστε φίλτρα.', 'Πατήστε «Λήψη» και διαλέξτε Excel, PDF ή CSV.'],
+      en: ['Pick a report on the left.', 'Set the filters.', 'Press "Download" and choose Excel, PDF or CSV.'],
+    },
+    related: ['/overview', '/movements'],
+  },
+  {
     to: '/movements',
     permission: 'history.view',
     title: {el: 'Ιστορικό', en: 'History'},
@@ -1341,7 +1213,7 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Πρόσφατο και παλαιότερο ιστορικό',
-          'Για να ανοίγει γρήγορα, η εφαρμογή φορτώνει το ιστορικό των τελευταίων 90 ημερών (τις συνθέσεις και τις αποδεσμεύσεις για 7 μήνες, όσο κρατά η μεγαλύτερη διάρκεια αποστείρωσης). Στο Ιστορικό το «Φόρτωση παλαιότερων» φέρνει και τις υπόλοιπες εγγραφές· η Ιχνηλασιμότητα και οι Αναφορές τις φέρνουν μόνες τους. Τίποτα δεν σβήνεται: όλο το ιστορικό μένει στη βάση.',
+          'Για να ανοίγει γρήγορα, η εφαρμογή φορτώνει το ιστορικό των τελευταίων 90 ημερών (τις συνθέσεις και τις αποδεσμεύσεις για 7 μήνες, όσο κρατά η μεγαλύτερη διάρκεια αποστείρωσης). Στο Ιστορικό το «Φόρτωση παλαιότερων» φέρνει και τις υπόλοιπες εγγραφές· η Ιχνηλάτηση και οι Αναφορές τις φέρνουν μόνες τους. Τίποτα δεν σβήνεται: όλο το ιστορικό μένει στη βάση.',
         ],
         en: [
           'Recent and older history',
@@ -1351,11 +1223,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Ποιος έκανε την κίνηση',
-          'Κάθε εγγραφή κρατά τον λογαριασμό με τον οποίο καταχωρήθηκε· τον γράφει η ίδια η βάση δεδομένων, όχι η συσκευή, και δεν αλλάζει. Στις λεπτομέρειες της κίνησης φαίνεται ως «Λογαριασμός (από τη βάση)». Αν το όνομα της καταχώρησης δεν είναι του λογαριασμού, ο λογαριασμός εμφανίζεται και στη λίστα με πορτοκαλί χρώμα.',
+          'Κάθε εγγραφή κρατά τον λογαριασμό με τον οποίο καταχωρήθηκε· τον γράφει η ίδια η βάση δεδομένων, όχι η συσκευή, και δεν αλλάζει. Όταν ο λογαριασμός διαφέρει από το όνομα της καταχώρησης, εμφανίζεται στις λεπτομέρειες της κίνησης ως «Λογαριασμός που την καταχώρησε» και στη λίστα με πορτοκαλί χρώμα. Από τις λεπτομέρειες, το «Άνοιγμα καρτέλας» ανοίγει το Σετ ή το εργαλείο και το «Ιχνηλάτηση» την Ιχνηλάτησή του.',
         ],
         en: [
           'Who made the movement',
-          'Every entry keeps the account it was recorded under; the database itself writes it, not the device, and it never changes. The movement details show it as "Account (from the database)". When the recorded name is not the account’s, the account also shows in the list, in orange.',
+          'Every entry keeps the account it was recorded under; the database itself writes it, not the device, and it never changes. When the account differs from the name on the entry, the movement details show it as "Account that recorded it" and the list shows it in orange. From the details, "Open card" opens the Set or instrument and "Tracing" opens its traceability.',
         ],
       },
       {
@@ -1396,63 +1268,6 @@ export const helpManual: ManualSection[] = [
     related: ['/reports'],
   },
   {
-    to: '/studio',
-    permission: 'studio.manage',
-    title: {el: 'SurgiTrack Studio', en: 'Management Center'},
-    summary: {
-      el: 'Ρυθμίσεις του νοσοκομείου: βιβλιοθήκες, στάδια ροής, δικαιώματα ρόλων, χρωματικές ταινίες και όριο προειδοποίησης χρήσεων.',
-      en: 'Hospital settings: libraries, workflow stages, role permissions, color tapes and the usage warning threshold.',
-    },
-    audience: {el: 'Διαχειριστής', en: 'Administrator'},
-    chapters: [
-      {
-        el: [
-          'Βιβλιοθήκες',
-          'Τμήματα, ειδικότητες, κατασκευαστές, προμηθευτές, κατηγορίες εργαλείων, κλίβανοι και πλυντήρια. Ό,τι ορίζεται εδώ εμφανίζεται στις επιλογές όλης της εφαρμογής. Στους «Κλιβάνους», η «Προσθήκη κλιβάνων» προσθέτει πολλούς μαζί με τον τρόπο ονομασίας του νοσοκομείου (Κλίβανος A, B, C… ή 1, 2, 3…)· η επιλογή μένει για τις επόμενες φορές και οι κλίβανοι εμφανίζονται στη Φόρτωση κλιβάνου. Τα «Πλυντήρια» εμφανίζονται με τον ίδιο τρόπο στη Φόρτωση πλυντηρίου.',
-        ],
-        en: [
-          'Libraries',
-          'Departments, specialties, manufacturers, suppliers, instrument categories, sterilizers and washers. Whatever you define here appears in the choices across the app. In "Sterilizers", "Add sterilizers" adds several at once in the hospital’s naming (Sterilizer A, B, C… or 1, 2, 3…); the choice is kept for next time and the sterilizers appear in the Sterilizer load. "Washers" appear the same way in the Washer load.',
-        ],
-      },
-      {
-        el: [
-          'Δικαιώματα',
-          'Ορίστε τι κάνει κάθε ρόλος. Κάποια δικαιώματα (δημιουργία, σύνθεση, όρια χρήσεων) ανήκουν μόνο στον Προϊστάμενο Αποστείρωσης. Τον χρήστη τμήματος τον περιορίζει και η ίδια η βάση δεδομένων: σε Σετ και εργαλεία αλλάζει μόνο ό,τι αλλάζει η δική του ροή (αποστολή προς Αποστείρωση από το τμήμα, χρήσεις, εκτός χρήσης στο όριο, καταμέτρηση) και τις εκκρεμότητες μόνο τις δημιουργεί· οτιδήποτε άλλο στείλει μένει όπως ήταν.',
-        ],
-        en: [
-          'Permissions',
-          'Set what each role can do. Some permissions (creation, composition, usage limits) belong only to the Sterilization supervisor. The database itself also limits a department user: on Sets and instruments it changes only what its own workflow changes (dispatch to Sterilization from the department, uses, out of use at the limit, the count), and issues it can only report; anything else it sends stays as it was.',
-        ],
-      },
-      {
-        el: [
-          'Ροή Αποστείρωσης',
-          'Τα στάδια από την παραλαβή έως την αποδέσμευση. Ενεργοποιήστε μόνο τα στάδια και τους ελέγχους που κάνει η Κεντρική Αποστείρωση του νοσοκομείου σας. Στην πολιτική αποδέσμευσης ορίζετε αν απαιτείται συγκεκριμένος δείκτης· χωρίς απαίτηση αρκεί ένας επιτυχής (χημικός ή βιολογικός).',
-        ],
-        en: [
-          'Sterilization Flow',
-          'The stages from receipt to release. Turn on only the stages and checks your hospital’s Central Sterilization performs. In the release policy you set whether a specific indicator is required; without one, one passed indicator (chemical or biological) is enough.',
-        ],
-      },
-      {
-        el: [
-          'Ρόλοι και Ρυθμίσεις',
-          'Οι «Ρόλοι» εξηγούν τι κάνει κάθε ρόλος, για να διαλέγετε σωστά στις εγκρίσεις. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις», την προεπιλεγμένη διάρκεια αποστείρωσης (2, 3 ή 6 μήνες), την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο) και το «Κλείδωμα οθόνης μετά από αδράνεια» (προεπιλογή 15 λεπτά, ή Ποτέ): σε κοινόχρηστα tablet η οθόνη κλειδώνει όταν δεν χρησιμοποιείται, ξεκλειδώνει με το συνθηματικό του ίδιου χρήστη ή άλλος χρήστης συνδέεται ως ο εαυτός του· ο συγχρονισμός συνεχίζει από πίσω και τίποτα δεν χάνεται.',
-        ],
-        en: [
-          'Roles and Settings',
-          '"Roles" explains what each role does, so you choose correctly when approving. In "Settings" you set when an instrument shows as "Few uses left", the default sterile shelf life (2, 3 or 6 months) and the hospital’s barcode label (size, header, logo), and "Screen lock after inactivity" (default 15 minutes, or Never): on shared tablets the screen locks when not in use and unlocks with the same user’s password, or another user signs in as themselves; syncing goes on behind it and nothing is lost.',
-        ],
-      },
-    ],
-    steps: {
-      el: ['Επιλέξτε ενότητα.', 'Κάντε τις αλλαγές.', 'Αποθηκεύστε· οι αλλαγές ισχύουν αμέσως.'],
-      en: ['Pick a section.', 'Make your changes.', 'Save; changes apply at once.'],
-    },
-    related: ['/hospital', '/start-admin', '/overview'],
-  },
-  {
     to: '/hospital',
     permission: 'studio.manage',
     title: {el: 'Χρήστες & Τμήματα', en: 'Users & departments'},
@@ -1475,11 +1290,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Κοινός σύνδεσμος και CSV',
-          'Για πολλούς μαζί: ο «Κοινός σύνδεσμος νοσοκομείου» (10 ημέρες) μοιράζεται στο προσωπικό, κάνουν εγγραφή με τον ίδιο τρόπο και τους εγκρίνετε. «Από αρχείο CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς χωρίς έγκριση και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
+          'Για πολλούς μαζί: ο «Κοινός σύνδεσμος νοσοκομείου» (10 ημέρες) μοιράζεται στο προσωπικό, κάνουν εγγραφή με τον ίδιο τρόπο, επιβεβαιώνουν το email τους και τους εγκρίνετε. «Από αρχείο CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς χωρίς έγκριση και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
         ],
         en: [
           'Hospital link and CSV',
-          'For many at once: share the "Hospital signup link" (10 days) with staff; they sign up the same way and you approve them. "From a CSV file" (Name; Email; Department; Role) creates the accounts at once, without approval, and each person gets an email with a username and a password link.',
+          'For many at once: share the "Hospital signup link" (10 days) with staff; they sign up the same way, confirm their email and you approve them. "From a CSV file" (Name; Email; Department; Role) creates the accounts at once, without approval, and each person gets an email with a username and a password link.',
         ],
       },
       {
@@ -1495,21 +1310,21 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Χρήστες',
-          'Πατώντας έναν χρήστη αλλάζετε ρόλο, τμήμα, πρόσβαση Demo ή τον απενεργοποιείτε. «Αποστολή συνδέσμου αλλαγής κωδικού» βοηθά όποιον ξέχασε τον κωδικό. Η «Διαγραφή» αφαιρεί εντελώς τον λογαριασμό· το ιστορικό κινήσεών του μένει.',
+          'Η καρτέλα Χρήστες δείχνει «N αιτήματα» όταν περιμένουν εγκρίσεις· τα φίλτρα περιορίζουν τη λίστα ανά τμήμα, ρόλο και πρόσβαση (Ενεργοί, Ανενεργοί, Εκκρεμεί πρόσκληση). Πατώντας έναν χρήστη αλλάζετε ρόλο, τμήμα, πρόσβαση Demo ή τον απενεργοποιείτε. «Αποστολή συνδέσμου αλλαγής κωδικού» βοηθά όποιον ξέχασε τον κωδικό. Η «Διαγραφή» αφαιρεί εντελώς τον λογαριασμό· το ιστορικό κινήσεών του μένει.',
         ],
         en: [
           'Users',
-          'Open a user to change the role, department or Demo access, or to deactivate them. "Send password change link" helps someone who forgot their password. "Delete" removes the account completely; their movement history stays.',
+          'The Users tab shows "N requests" when approvals are waiting; the filters narrow the list by department, role and access (Active, Inactive, Invitation pending). Open a user to change the role, department or Demo access, or to deactivate them. "Send password change link" helps someone who forgot their password. "Delete" removes the account completely; their movement history stays.',
         ],
       },
       {
         el: [
           'Τμήματα',
-          'Προσθέστε, μετονομάστε ή απενεργοποιήστε τμήματα. Τα ονόματα εμφανίζονται στις εγγραφές, στις εισαγωγές και σε όλες τις λίστες· απενεργοποιημένο τμήμα δεν προσφέρεται σε νέους χρήστες.',
+          'Προσθέστε, μετονομάστε ή απενεργοποιήστε τμήματα. Κάθε τμήμα δείχνει τι έχει, π.χ. «4 χρήστες · 12 Σετ». Τα ονόματα εμφανίζονται στις εγγραφές, στις εισαγωγές και σε όλες τις λίστες· απενεργοποιημένο τμήμα δεν προσφέρεται σε νέους χρήστες.',
         ],
         en: [
           'Departments',
-          'Add, rename or deactivate departments. The names appear in signups, imports and every list; a deactivated department is not offered to new users.',
+          'Add, rename or deactivate departments. Each department shows what it holds, e.g. "4 users · 12 Sets". The names appear in signups, imports and every list; a deactivated department is not offered to new users.',
         ],
       },
     ],
@@ -1597,18 +1412,256 @@ export const helpManual: ManualSection[] = [
     },
     related: ['/studio'],
   },
+  {
+    to: '/studio',
+    permission: 'studio.manage',
+    title: {el: 'SurgiTrack Studio', en: 'SurgiTrack Studio'},
+    summary: {
+      el: 'Ρυθμίσεις του νοσοκομείου: βιβλιοθήκες, στάδια ροής, δικαιώματα ρόλων, χρωματικοί μάρτυρες και όριο προειδοποίησης χρήσεων.',
+      en: 'Hospital settings: libraries, workflow stages, role permissions, color markers and the usage warning threshold.',
+    },
+    audience: {el: 'Διαχειριστής', en: 'Administrator'},
+    chapters: [
+      {
+        el: [
+          'Βιβλιοθήκες',
+          'Τμήματα, ειδικότητες, κατασκευαστές, προμηθευτές, κατηγορίες εργαλείων, κλίβανοι, πλυντήρια και χρωματικοί μάρτυρες. Ό,τι ορίζεται εδώ εμφανίζεται στις επιλογές όλης της εφαρμογής. Στους «Κλιβάνους», η «Προσθήκη κλιβάνων» προσθέτει πολλούς μαζί με τον τρόπο ονομασίας του νοσοκομείου (Κλίβανος A, B, C… ή 1, 2, 3…)· η επιλογή μένει για τις επόμενες φορές και οι κλίβανοι εμφανίζονται στη Φόρτωση κλιβάνου. Τα «Πλυντήρια» εμφανίζονται με τον ίδιο τρόπο στη Φόρτωση πλυντηρίου.',
+        ],
+        en: [
+          'Libraries',
+          'Departments, specialties, manufacturers, suppliers, instrument categories, sterilizers, washers and color markers. Whatever you define here appears in the choices across the app. In "Sterilizers", "Add sterilizers" adds several at once in the hospital’s naming (Sterilizer A, B, C… or 1, 2, 3…); the choice is kept for next time and the sterilizers appear in the Sterilizer load. "Washers" appear the same way in the Washer load.',
+        ],
+      },
+      {
+        el: [
+          'Δικαιώματα',
+          'Ορίστε τι κάνει κάθε ρόλος. Κάποια δικαιώματα (δημιουργία, σύνθεση, όρια χρήσεων) ανήκουν μόνο στον Προϊστάμενο Αποστείρωσης. Τον χρήστη τμήματος τον περιορίζει και η ίδια η βάση δεδομένων: σε Σετ και εργαλεία αλλάζει μόνο ό,τι αλλάζει η δική του ροή (αποστολή προς Αποστείρωση από το τμήμα, χρήσεις, εκτός χρήσης στο όριο, καταμέτρηση) και τις εκκρεμότητες μόνο τις δημιουργεί· οτιδήποτε άλλο στείλει μένει όπως ήταν.',
+        ],
+        en: [
+          'Permissions',
+          'Set what each role can do. Some permissions (creation, composition, usage limits) belong only to the Sterilization supervisor. The database itself also limits a department user: on Sets and instruments it changes only what its own workflow changes (dispatch to Sterilization from the department, uses, out of use at the limit, the count), and issues it can only report; anything else it sends stays as it was.',
+        ],
+      },
+      {
+        el: [
+          'Ροή Αποστείρωσης',
+          'Τα στάδια από την παραλαβή έως την παράδοση στο τμήμα. Ενεργοποιήστε μόνο τα στάδια και τους ελέγχους που κάνει η Κεντρική Αποστείρωση του νοσοκομείου σας. Στην πολιτική αποδέσμευσης ορίζετε αν απαιτείται συγκεκριμένος δείκτης· χωρίς απαίτηση αρκεί ένας επιτυχής (χημικός ή βιολογικός).',
+        ],
+        en: [
+          'Sterilization Flow',
+          'The stages from receipt to delivery to the department. Turn on only the stages and checks your hospital’s Central Sterilization performs. In the release policy you set whether a specific indicator is required; without one, one passed indicator (chemical or biological) is enough.',
+        ],
+      },
+      {
+        el: [
+          'Ρόλοι & δικαιώματα και Ρυθμίσεις',
+          'Στους «Ρόλοι & δικαιώματα», το «Ποιος κάνει τι» εξηγεί κάθε ρόλο, για να διαλέγετε σωστά στις εγκρίσεις, και το «Δικαιώματα ανά ρόλο» τα αλλάζει. Στις «Ρυθμίσεις» ορίζετε πότε ένα εργαλείο εμφανίζεται με «Λίγες χρήσεις», την προεπιλεγμένη διάρκεια αποστείρωσης (2, 3 ή 6 μήνες), την ετικέτα barcode του νοσοκομείου (μέγεθος, κεφαλίδα, λογότυπο) και το «Κλείδωμα οθόνης μετά από αδράνεια» (προεπιλογή 15 λεπτά, ή Ποτέ): σε κοινόχρηστα tablet η οθόνη κλειδώνει όταν δεν χρησιμοποιείται, ξεκλειδώνει με το συνθηματικό του ίδιου χρήστη ή άλλος χρήστης συνδέεται ως ο εαυτός του· ο συγχρονισμός συνεχίζει από πίσω και τίποτα δεν χάνεται. Το «Email υπενθυμίσεων κάθε πρωί» στέλνει γύρω στις 8 σε διαχειριστές (και, αν θέλετε, στον Προϊστάμενο Αποστείρωσης) ό,τι περιμένει, μόνο όταν κάτι περιμένει. Οι «Οδηγοί οθόνης» ορίζουν αν οι χρήστες βλέπουν την πρώτη φορά σε κάθε οθόνη τι κάνει και τα πρώτα βήματα.',
+        ],
+        en: [
+          'Roles & permissions and Settings',
+          'In "Roles & permissions", "Who does what" explains each role, so you choose correctly when approving, and "Permissions by role" changes them. In "Settings" you set when an instrument shows as "Few uses left", the default sterile shelf life (2, 3 or 6 months), the hospital’s barcode label (size, header, logo) and "Screen lock after inactivity" (default 15 minutes, or Never): on shared tablets the screen locks when not in use and unlocks with the same user’s password, or another user signs in as themselves; syncing goes on behind it and nothing is lost. "Reminder email every morning" sends what is waiting to the administrators (and, if you like, the Sterilization supervisor) around 8, only when something is waiting. "Screen guides" sets whether users see, the first time on each screen, what it does and the first steps.',
+        ],
+      },
+    ],
+    steps: {
+      el: ['Επιλέξτε ενότητα.', 'Κάντε τις αλλαγές.', 'Αποθηκεύστε· οι αλλαγές ισχύουν αμέσως.'],
+      en: ['Pick a section.', 'Make your changes.', 'Save; changes apply at once.'],
+    },
+    related: ['/hospital', '/start-admin', '/overview'],
+  },
+  {
+    to: '/import',
+    permission: 'asset.create',
+    openedFrom: ['/tools', '/sets'],
+    title: {el: 'Μαζική εισαγωγή', en: 'Bulk import'},
+    summary: {
+      el: 'Εισαγωγή εργαλείων και Σετ από Excel ή CSV, με προεπισκόπηση πριν γραφτεί οτιδήποτε.',
+      en: 'Import instruments and Sets from Excel or CSV, with a preview before anything is written.',
+    },
+    audience: {el: 'Διαχειριστής και Προϊστάμενος Αποστείρωσης', en: 'Administrator and Sterilization supervisor'},
+    chapters: [
+      {
+        el: [
+          'Το αρχείο',
+          'Κατεβάστε το «Πρότυπο Excel». Μία γραμμή ανά εργαλείο: Σετ, κωδικός, όνομα εργαλείου (υποχρεωτικό), ποσότητα, τμήμα, ειδικότητα, κατασκευαστής, μέγιστες χρήσεις, σειριακός αριθμός. Ίδιο όνομα Σετ = ίδιο Σετ· κενό Σετ = μεμονωμένο εργαλείο· κενό τμήμα = Απόθεμα.',
+        ],
+        en: [
+          'The file',
+          'Download the "Excel template". One row per instrument: Set, code, instrument name (required), quantity, department, specialty, manufacturer, max uses, serial number. Same Set name = same Set; no Set = standalone instrument; no department = Stock.',
+        ],
+      },
+      {
+        el: [
+          'Προεπισκόπηση',
+          'Πριν την εισαγωγή βλέπετε πόσα Σετ, μεμονωμένα και εργαλεία Αποθέματος θα δημιουργηθούν, τη λίστα εργαλείων με αναζήτηση και τις γραμμές με πρόβλημα. Οι στήλες αναγνωρίζονται αυτόματα· αν μια στήλη δεν βρέθηκε, την αντιστοιχίζετε με το χέρι.',
+        ],
+        en: [
+          'Preview',
+          'Before importing you see how many Sets, standalone and Stock instruments will be created, the instrument list with search and the rows with problems. Columns are recognized automatically; if one is not found, you map it by hand.',
+        ],
+      },
+      {
+        el: [
+          'Ονομασίες',
+          'Η εισαγωγή μπορεί να γράψει τις ονομασίες ενιαία (κεφαλαία χωρίς τόνους, ίδια γραφή μονάδων) και να χρησιμοποιήσει την ονομασία που ήδη έχει το νοσοκομείο για τον ίδιο κωδικό, ώστε να μη δημιουργηθούν διπλές ονομασίες.',
+        ],
+        en: [
+          'Names',
+          'The import can write names uniformly (capitals without accents, units written the same way) and use the name the hospital already has for the same code, so no duplicate names are created.',
+        ],
+      },
+      {
+        el: [
+          'Αναίρεση',
+          'Κάθε εισαγωγή εμφανίζεται στις «Εισαγωγές σε αυτό το νοσοκομείο» και αναιρείται ολόκληρη με «Αναίρεση» (επιβεβαίωση «Αναίρεση εισαγωγής»), όσο κανένα αντικείμενό της δεν έχει χρησιμοποιηθεί.',
+        ],
+        en: [
+          'Undo',
+          'Every import appears under "Imports in this hospital" and can be undone in full with "Undo" (confirmed with "Undo import"), as long as none of its items has been used.',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Εργαλεία ή Σετ → «Μαζική εισαγωγή».',
+        'Κατεβάστε το πρότυπο και συμπληρώστε το.',
+        'Σύρετε το αρχείο στη σελίδα.',
+        'Ελέγξτε προεπισκόπηση, προβλήματα και ονομασίες.',
+        'Πατήστε «Εισαγωγή».',
+      ],
+      en: [
+        'Instruments or Sets → "Bulk import".',
+        'Download the template and fill it in.',
+        'Drag the file onto the page.',
+        'Check the preview, problems and names.',
+        'Press "Import".',
+      ],
+    },
+    checks: {
+      el: [
+        'Τα ονόματα τμημάτων είναι ίδια με αυτά της σελίδας Χρήστες & Τμήματα.',
+        'Οι γραμμές με πρόβλημα διορθώθηκαν ή δεν χρειάζονται.',
+        'Μετά την εισαγωγή: «Έλεγχος ονομασιών».',
+      ],
+      en: [
+        'Department names match those in Users & departments.',
+        'Rows with problems were fixed or are not needed.',
+        'After importing: "Name check".',
+      ],
+    },
+    related: ['/tools/names', '/sets', '/tools'],
+  },
+  {
+    to: '/tools/names',
+    permission: 'asset.edit',
+    openedFrom: ['/tools'],
+    title: {el: 'Έλεγχος ονομασιών', en: 'Name check'},
+    summary: {
+      el: 'Ενιαίες ονομασίες εργαλείων: διορθώσεις γραφής και κωδικοί που έχουν περισσότερες από μία ονομασίες.',
+      en: 'Consistent instrument names: spelling fixes and codes that carry more than one name.',
+    },
+    audience: {el: 'Διαχειριστής και Προϊστάμενος Αποστείρωσης', en: 'Administrator and Sterilization supervisor'},
+    chapters: [
+      {
+        el: [
+          'Διορθώσεις γραφής',
+          'Διορθώσεις χωρίς ρίσκο: διπλά κενά, τόνοι, πεζά, λατινικά γράμματα μέσα σε ελληνική λέξη (και αντίστροφα), «12cm» → «12 CM». Αφήστε επιλεγμένες όσες θέλετε και πατήστε «Εφαρμογή σε … εργαλεία».',
+        ],
+        en: [
+          'Spelling fixes',
+          'Risk-free fixes: double spaces, accents, lower case, Latin letters inside a Greek word (and the reverse), "12cm" → "12 CM". Keep the ones you want ticked and press "Apply to … instruments".',
+        ],
+      },
+      {
+        el: [
+          'Ίδιος κωδικός',
+          'Για κάθε κωδικό με πολλές ονομασίες η εφαρμογή προτείνει την πιο συχνή. Επιλέξτε ποιες ονομασίες μπαίνουν στην ενοποίηση, την τελική ονομασία (ή γράψτε άλλη) και πατήστε «Ενοποίηση». Το «Πιθανό λάθος κωδικός» σημαίνει άλλο εργαλείο με λάθος κωδικό: διορθώστε το από την καρτέλα του.',
+        ],
+        en: [
+          'Same code',
+          'For each code with many names the app suggests the most used one. Choose which names join, the final name (or type another) and press "Unify". "Possibly wrong code" means another instrument with the wrong code: fix it from its card.',
+        ],
+      },
+      {
+        el: [
+          'Συνθέσεις Σετ',
+          'Η αλλαγή ονομασίας περνά και στις πρότυπες συνθέσεις των Σετ. Αν εμφανιστεί «Συνθέσεις Σετ με παλιές ονομασίες», πατήστε «Ενημέρωση συνθέσεων».',
+        ],
+        en: [
+          'Set compositions',
+          'A rename also reaches the Set template compositions. If "Set compositions with old names" appears, press "Update compositions".',
+        ],
+      },
+    ],
+    steps: {
+      el: [
+        'Εργαλεία → «Έλεγχος ονομασιών».',
+        'Εφαρμόστε τις διορθώσεις γραφής.',
+        'Περάστε τους κωδικούς με πολλές ονομασίες· ο αριθμός εργαλείων ανοίγει τη λίστα τους.',
+        'Ενημερώστε τις συνθέσεις αν το ζητήσει.',
+      ],
+      en: [
+        'Instruments → "Name check".',
+        'Apply the spelling fixes.',
+        'Go through the codes with many names; the instrument count opens their list.',
+        'Update the compositions if asked.',
+      ],
+    },
+    tip: {
+      el: 'Κάθε αλλαγή αναιρείται από την ειδοποίηση που εμφανίζεται αμέσως μετά.',
+      en: 'Every change can be undone from the notice that appears right after it.',
+    },
+    related: ['/tools', '/import', '/sets'],
+  },
+  {
+    to: '/bin',
+    permission: 'asset.delete',
+    title: {el: 'Κάδος', en: 'Recycle bin'},
+    summary: {
+      el: 'Ό,τι διαγράφεται μένει 30 ημέρες στον Κάδο και μπορεί να επανέλθει όπως ήταν.',
+      en: 'Whatever is deleted stays 30 days in the bin and can be put back as it was.',
+    },
+    audience: {el: 'Αποστείρωση και Διαχειριστής', en: 'Sterilization and Administrator'},
+    chapters: [
+      {
+        el: [
+          'Πού βρίσκεται',
+          'Ο Κάδος είναι κάτω αριστερά στο μενού, όπως στον υπολογιστή. Όταν έχει κάτι μέσα δείχνει πόσα είναι.',
+        ],
+        en: [
+          'Where it is',
+          'The bin sits at the bottom left of the menu, like on a computer. When something is in it, it shows how many.',
+        ],
+      },
+      {
+        el: [
+          'Επαναφορά',
+          'Σετ, εργαλεία, εγγραφές βιβλιοθηκών, χρωματικοί μάρτυρες και συσκευές επανέρχονται όπως ήταν· μετά από 30 ημέρες σβήνονται οριστικά. Τις βιβλιοθήκες τις επαναφέρει μόνο ο Διαχειριστής.',
+        ],
+        en: [
+          'Restore',
+          'Sets, instruments, library records, color markers and devices come back as they were; after 30 days they are deleted for good. Only the Administrator restores library records.',
+        ],
+      },
+    ],
+    steps: {
+      el: ['Πατήστε τον Κάδο κάτω αριστερά.', 'Βρείτε την εγγραφή και πατήστε «Επαναφορά».'],
+      en: ['Press the bin at the bottom left.', 'Find the record and press "Restore".'],
+    },
+    related: ['/sets', '/tools', '/studio'],
+  },
 ];
 
 export const glossary: Array<{term: string; el: string; en: string}> = [
   {
     term: 'Όνομα χρήστη / Username',
-    el: 'Ο προσωπικός κωδικός σύνδεσης (π.χ. GN1234: τα αρχικά και τέσσερα ψηφία). Έρχεται με το email έγκρισης· συνδέεστε με αυτό ή με το email σας.',
-    en: 'Your personal sign-in code (e.g. GN1234: your initials and four digits). It comes with the approval email; you sign in with it or with your email.',
+    el: 'Ο προσωπικός κωδικός σύνδεσης (π.χ. GN1234: τα αρχικά και τέσσερα ψηφία). Εμφανίζεται αμέσως μετά την εγγραφή και στο email έγκρισης· συνδέεστε με αυτό ή με το email σας.',
+    en: 'Your personal sign-in code (e.g. GN1234: your initials and four digits). It shows right after you sign up and in the approval email; you sign in with it or with your email.',
   },
   {
     term: 'Αίτηση πρόσβασης',
-    el: 'Η εγγραφή ενός νέου χρήστη που περιμένει την έγκριση του διαχειριστή του νοσοκομείου. Μέχρι την έγκριση δεν υπάρχει λογαριασμός ούτε κωδικός.',
-    en: 'A new user signup waiting for the hospital administrator to approve it. Until approval there is no account and no password.',
+    el: 'Η εγγραφή ενός νέου χρήστη (με τον κωδικό που όρισε) που περιμένει την έγκριση του διαχειριστή του νοσοκομείου· μέχρι τότε δεν μπορεί να συνδεθεί.',
+    en: 'A new user’s signup (with the password they set) waiting for the hospital administrator to approve it; until then they cannot sign in.',
   },
   {
     term: 'Πρότυπη σύνθεση',
@@ -1686,7 +1739,7 @@ export const glossary: Array<{term: string; el: string; en: string}> = [
     en: 'A procedure that blocks items from a faulty cycle from circulating.',
   },
   {
-    term: 'Χρωματική σήμανση',
+    term: 'Χρωματικός μάρτυρας / Χρωματική σήμανση',
     el: 'Έγχρωμες ταινίες που αναγνωρίζουν το Σετ ή το εργαλείο με μια ματιά.',
     en: 'Colored tapes that identify a Set or instrument at a glance.',
   },
