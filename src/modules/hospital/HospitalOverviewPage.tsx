@@ -66,6 +66,8 @@ const movementStamp = (at: string) => {
  * The hospital admin's home: the whole hospital at a glance — where the sets and instruments
  * are, what each department holds, what is stuck, and the latest movements.
  */
+const DEPARTMENTS_SHOWN = 5;
+
 export default function HospitalOverviewPage() {
   const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();
   const {departments, systemSettings, sterilizationWorkflow} = useLibraries();
@@ -73,6 +75,8 @@ export default function HospitalOverviewPage() {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const hospitalId = managedHospitalId();
   const [pendingAccess, setPendingAccess] = useState(0);
+  // The busiest departments first; the rest behind «+N ακόμη», so the card shows whole rows.
+  const [allDepartments, setAllDepartments] = useState(false);
 
   useEffect(() => {
     if (!hospitalId) return;
@@ -109,6 +113,8 @@ export default function HospitalOverviewPage() {
             issues: openIssues.filter(i => i.department === d.el).length,
           };
         })
+        // A department with no equipment (supplies, biomedical) only takes a row.
+        .filter(d => d.total > 0)
         .sort((a, b) => b.total - a.total),
     [departments, tracked, openIssues, lang],
   );
@@ -306,7 +312,8 @@ export default function HospitalOverviewPage() {
                 to={`/sterilization?queue=${p.queue}`}
                 title={`${p.label}: ${p.count}`}
               >
-                <span className="dash-bar-name">{p.label}</span>
+                {/* The short form fits the card; the full name is in the tooltip. */}
+                <span className="dash-bar-name">{p.label.replace(/ από Αποστείρωση$/, '')}</span>
                 <span className="dash-bar-track">
                   <i style={{width: `${(p.count / pipelineMax) * 100}%`}} />
                 </span>
@@ -361,7 +368,7 @@ export default function HospitalOverviewPage() {
             </div>
           </header>
           <div className="dash-depts-list" tabIndex={0} aria-label={L('Ανά τμήμα', 'By department')}>
-            {byDepartment.map(d => {
+            {(allDepartments ? byDepartment : byDepartment.slice(0, DEPARTMENTS_SHOWN)).map(d => {
               const other = Math.max(0, d.total - d.atDepartment - d.inProcess - d.ready);
               return (
                 <Link
@@ -395,6 +402,16 @@ export default function HospitalOverviewPage() {
                 </Link>
               );
             })}
+            {byDepartment.length > DEPARTMENTS_SHOWN && (
+              <button type="button" className="dash-more" onClick={() => setAllDepartments(v => !v)}>
+                {allDepartments
+                  ? L('Λιγότερα', 'Fewer')
+                  : L(
+                      `+${byDepartment.length - DEPARTMENTS_SHOWN} ακόμη`,
+                      `+${byDepartment.length - DEPARTMENTS_SHOWN} more`,
+                    )}
+              </button>
+            )}
             {byDepartment.length === 0 && (
               <p className="hospital-empty">{L('Δεν υπάρχουν τμήματα ακόμα.', 'No departments yet.')}</p>
             )}
@@ -423,7 +440,6 @@ export default function HospitalOverviewPage() {
           <header>
             <div>
               <b>{L('Κινήσεις 14 ημερών', 'Movements, last 14 days')}</b>
-              <small>{L(`${perDayTotal} κινήσεις συνολικά`, `${perDayTotal} movements in total`)}</small>
             </div>
             <Link to="/movements">{L('Ιστορικό', 'History')}</Link>
           </header>
@@ -452,7 +468,7 @@ export default function HospitalOverviewPage() {
           </div>
           <div className="dash-axis">
             <span>{dayLabel(perDay[0].day)}</span>
-            <span>{L(`έως ${perDayMax} την ημέρα`, `up to ${perDayMax} a day`)}</span>
+            <span>{L(`Μέγιστο: ${perDayMax} κινήσεις σε μία ημέρα`, `Most: ${perDayMax} movements in a day`)}</span>
             <span>{dayLabel(perDay[perDay.length - 1].day)}</span>
           </div>
         </section>
