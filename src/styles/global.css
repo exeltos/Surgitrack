@@ -11719,3 +11719,14 @@ html body .department-status-tabs button {
     grid-row: 1 / span 2;
   }
 }
+/* The owner's Studio sections: the page title names the section, so the panel's own eyebrow and heading
+   (which repeated it) are hidden; its description stays. */
+html
+  body
+  .studio-section-page
+  .studio-body
+  :is(.studio-panel-head, .asset-import-head, .studio-errors-head, .studio-workflow-hero)
+  > div:first-child
+  > :is(.eyebrow, h2) {
+  display: none;
+}

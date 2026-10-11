@@ -76,7 +76,9 @@ export default function StudioPage() {
     tab,
   } = s;
   return (
-    <div className="studio-workspace">
+    // A section's page title already names it: its panel heading would say the same thing again
+    // (Libraries keeps its own, which names the list being edited).
+    <div className={`studio-workspace${section && section.id !== 'LIBRARIES' ? ' studio-section-page' : ''}`}>
       <div className="studio-head">
         <div>
           <span className="eyebrow">
