@@ -1,0 +1,125 @@
+/* Expiry. Moved together from overrides.css; cascade order is intentional. */
+@media (max-width: 1100px) {
+  html body .expiry-table th:nth-child(3) {
+    width: 13%;
+  }
+  html body .expiry-table th:nth-child(4) {
+    width: 120px;
+  }
+}
+/* Expiry page: narrower date / duration columns so the name gets the free width. */
+html body .expiry-table th:nth-child(1) {
+  width: auto;
+  min-width: 220px;
+}
+html body .expiry-table th:nth-child(2) {
+  width: 88px;
+}
+html body .expiry-table th:nth-child(6),
+html body .expiry-table th:nth-child(7) {
+  width: 112px;
+}
+html body .expiry-table th:nth-child(9) {
+  width: 40px;
+}
+html body .expiry-table th:nth-child(5) {
+  width: 84px;
+}
+html body .expiry-table th:nth-child(7) {
+  width: 104px;
+}
+html body .expiry-table th:nth-child(8) {
+  width: 132px;
+}
+html body .expiry-table th:nth-child(6) {
+  width: 140px;
+}
+/* Expiry on a tablet: narrower fixed columns, the name keeps its room. */
+html body .expiry-sub-barcode {
+  display: none;
+}
+@media (max-width: 1280px) {
+  /* Tools, stock, standalone tools: 1 name, 2 barcode, 3 specialty, 4 place, 5 uses, 6 state, 7 open. */
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(3) {
+    width: 128px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(4) {
+    width: 168px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(5) {
+    width: 92px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(6) {
+    width: 132px;
+  }
+  /* Expiry: name, barcode, department, sterilized, expires, remaining. */
+  html body .expiry-table th:nth-child(4),
+  html body .expiry-table td:nth-child(4),
+  html body .expiry-table th:nth-child(5),
+  html body .expiry-table td:nth-child(5) {
+    display: none;
+  }
+  html body .expiry-table th:nth-child(3),
+  html body .expiry-table td:nth-child(3),
+  html body .expiry-table th:nth-child(7),
+  html body .expiry-table td:nth-child(7) {
+    display: table-cell;
+  }
+  html body .expiry-table th:nth-child(6) {
+    width: 140px;
+  }
+  html body .expiry-table th:nth-child(2),
+  html body .expiry-table td:nth-child(2) {
+    display: none;
+  }
+  html body .expiry-sub-barcode {
+    display: inline;
+  }
+}
+@media (max-width: 900px) {
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(4) {
+    width: 150px;
+  }
+  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(6) {
+    width: 124px;
+  }
+  html body .expiry-table th:nth-child(3),
+  html body .expiry-table td:nth-child(3) {
+    display: none !important;
+  }
+}
+@media (max-width: 700px) {
+  /* Expiry: every field of the card is shown (the tablet layout hides some columns). */
+  html body .expiry-table tbody td:nth-child(n) {
+    display: block !important;
+  }
+  /* The phone card has its own barcode line. */
+  html body .expiry-sub-barcode {
+    display: none;
+  }
+}
+html body .expiry-table th:nth-child(4) {
+  width: 150px;
+}
+html body .expiry-table th:nth-child(3) {
+  width: 12%;
+}
+/* Expiry: the place badge stays on one line. */
+html body .expiry-table td:nth-child(4) > .badge {
+  white-space: nowrap;
+}
+@media (max-width: 1280px) {
+  html body .expiry-table th:nth-child(3) {
+    width: 130px;
+  }
+  html body .expiry-table th:nth-child(6),
+  html body .expiry-table th:nth-child(7) {
+    width: 108px;
+  }
+  html body .expiry-table th:nth-child(8) {
+    width: 132px;
+  }
+  html body .expiry-table th:nth-child(9) {
+    width: 32px;
+  }
+}

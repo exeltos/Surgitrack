@@ -1,0 +1,91 @@
+/* Issues. Moved together from overrides.css; cascade order is intentional. */
+html body .issues-fixed .issue-note {
+  max-width: 0;
+}
+html body .issues-fixed .row-sub {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .issues-fixed a.issue-asset {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+html body .issues-fixed a.issue-asset:hover {
+  text-decoration: underline;
+}
+/* Issues: columns sized by name (the photos column comes and goes); actions read as words. */
+html body .issues-fixed th.col-photos {
+  width: 100px;
+}
+html body .issues-fixed th.col-created {
+  width: 128px;
+}
+html body .issues-fixed .issue-note-inline {
+  display: none;
+}
+/* Issues and Expiry review. Short tab labels exist for the phone only. */
+html body .issues-tabs .tab-short {
+  display: none;
+}
+@media (max-width: 1280px) {
+  /* Issues: the note goes under the item instead of its own squeezed column. */
+  html body .issues-fixed th:nth-child(2),
+  html body .issues-fixed td.issue-note {
+    display: none;
+  }
+  html body .issues-fixed .issue-note-inline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 2px;
+    color: var(--c-blue-35);
+    font-size: 12px;
+    font-style: italic;
+  }
+}
+@media (max-width: 900px) {
+  html body .issues-fixed th.col-created {
+    width: 104px;
+  }
+  html body .kpis.issues-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  html body .kpis.issues-kpis > * small {
+    white-space: normal;
+  }
+}
+@media (min-width: 701px) {
+  html body .issues-fixed .issue-actions-row {
+    display: grid;
+    grid-auto-flow: dense;
+    grid-template-columns: auto auto 34px;
+    justify-content: end;
+    align-items: center;
+    gap: 6px;
+  }
+  html body .issues-fixed .issue-actions-row > a.issue-action {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  html body .issues-fixed .issue-actions-row > button.issue-action:last-child {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  html body .issues-fixed .issue-actions-row > button.issue-action:not(:last-child) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+@media (max-width: 700px) {
+  html body .issues-tabs .tab-long {
+    display: none;
+  }
+  html body .issues-tabs .tab-short {
+    display: inline;
+  }
+}
