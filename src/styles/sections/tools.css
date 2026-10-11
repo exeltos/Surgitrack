@@ -1,0 +1,345 @@
+/* Tools. Moved together from overrides.css; cascade order is intentional. */
+
+/* Έλεγχος ονομασιών: spelling fixes and codes with several names. */
+.name-check {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+.name-check-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.name-check-kpis > div {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.name-check-kpis span,
+.name-check-kpis small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.name-check-kpis strong {
+  color: var(--c-blue-15-2);
+  font-size: 24px;
+}
+.name-check-kpis .warn strong {
+  color: var(--c-orange-50-2);
+}
+.name-check-kpis .good strong {
+  color: var(--c-green-45);
+}
+.name-check-card,
+.name-check-group {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.name-check-card > header,
+.name-check-group > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.name-check-table {
+  max-height: 560px;
+  overflow: auto;
+  border: 1px solid var(--c-gray-95);
+  border-radius: 10px;
+}
+.name-check-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.name-check-table td {
+  padding: 7px 10px;
+  border-top: 1px solid var(--c-gray-95);
+}
+.name-check-table td.from {
+  color: var(--c-red-40-4);
+}
+.name-check-table td.to {
+  color: var(--c-green-40);
+  font-weight: 600;
+}
+.name-check-table td.arrow {
+  color: var(--st-muted);
+  width: 20px;
+}
+.name-check-table td.num,
+.name-check-table th:last-child {
+  text-align: right;
+}
+.name-check-table td.num {
+  font-weight: 700;
+}
+.name-check-table tr.skipped td {
+  opacity: 0.45;
+}
+.name-check-codes {
+  display: grid;
+  gap: 10px;
+}
+.name-check-filter small {
+  color: var(--st-muted);
+}
+.name-check-search input {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+}
+.name-check-only {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--c-cyan-40-2);
+}
+.name-check-group code {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--c-blue-15-2);
+}
+.name-check-odd {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--c-gray-95-2);
+  color: var(--c-red-40);
+  font-size: 12px;
+  font-weight: 700;
+}
+.name-check-group ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.name-check-group li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--c-gray-100-2);
+  font-size: 13px;
+}
+.name-check-group li.odd {
+  background: var(--c-gray-100-4);
+}
+.name-check-group footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.name-check-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px;
+  border: 1px dashed var(--c-gray-90-2);
+  border-radius: 12px;
+  color: var(--c-green-45);
+}
+
+/* Name check: a count opens its instruments. */
+.name-check-count {
+  min-width: 34px;
+  padding: 2px 8px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 999px;
+  background: var(--c-white);
+  color: var(--c-cyan-35);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.name-check-count:hover {
+  background: var(--c-gray-95-3);
+}
+.name-check-list > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.name-check-list-table {
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+}
+.name-check-list-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.name-check-list-table td {
+  padding: 8px 10px;
+  border-top: 1px solid var(--c-gray-95);
+}
+.name-check-list-table td.mono {
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+}
+.name-check-list-table td.go {
+  color: var(--st-muted);
+  width: 20px;
+}
+.name-check-list > small {
+  color: var(--st-muted);
+}
+.name-check-sets {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-amber-85);
+  border-radius: 12px;
+  background: var(--c-gray-100);
+  color: var(--c-orange-45-2);
+}
+.name-check-sets span {
+  display: grid;
+  gap: 3px;
+  color: var(--c-amber-25);
+}
+.name-check-sets small {
+  color: #7a6235;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+/* Name check KPIs: same slim look as the other pages. */
+html body .name-check-kpis > div {
+  padding: 8px 14px;
+}
+/* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
+html body .tools-registry .tools-place-set {
+  font-size: 12.5px;
+  white-space: normal;
+}
+/* Instrument card: the moves of the Set it travels in, under its own. */
+html body .asset-history-group {
+  margin: 14px 0 4px;
+  color: var(--c-blue-45);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
+html body .standalone-registry th:nth-child(5) {
+  width: 96px;
+}
+html body .standalone-registry button.row-title-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+html body .standalone-registry tr.standalone-group.open,
+html body .standalone-registry tr.standalone-group.open td {
+  background: var(--c-gray-95-3);
+}
+html body .standalone-registry tr.standalone-piece td:first-child {
+  padding-left: 28px;
+}
+html body .standalone-states {
+  color: var(--c-blue-45);
+  font-size: 12px;
+  font-weight: 600;
+}
+html body .standalone-registry button.icon-link {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  .name-check-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .name-check-sets {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .name-check-sets > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 700px) {
+  html body .tools-registry tbody td:nth-child(4) {
+    flex: 1 0 60%;
+    min-width: 0;
+  }
+  html body .tools-registry tbody td:nth-child(4) .row-title-link,
+  html body .tools-registry tbody td:nth-child(4) .row-sub {
+    display: inline;
+  }
+  html body .tools-registry tbody td:nth-child(4) .row-sub {
+    margin-left: 6px;
+  }
+  html body .name-check-kpis span {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+  }
+  html body .name-check-table thead {
+    display: none;
+  }
+  html body .name-check-table table,
+  html body .name-check-table tbody {
+    display: block;
+  }
+  html body .name-check-table tbody tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 10px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--c-gray-95);
+  }
+  html body .name-check-table tbody td {
+    padding: 0;
+    border: 0;
+  }
+  html body .name-check-table tbody td:first-child:not(.from) {
+    grid-row: span 2;
+  }
+  html body .name-check-table tbody td.arrow {
+    display: none;
+  }
+  html body .name-check-table tbody td.from,
+  html body .name-check-table tbody td.to {
+    grid-column: 2;
+  }
+  html body .name-check-table tbody td.to::before {
+    content: '→ ';
+    color: var(--st-muted);
+  }
+  html body .name-check-table tbody td.num {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
