@@ -512,9 +512,16 @@
     grid-template-rows: auto minmax(0, 1fr);
   }
   .manual-sidebar {
-    max-height: 30vh;
+    max-height: none;
+    padding: 10px 16px;
     border-right: 0;
     border-bottom: 1px solid var(--c-gray-90);
+  }
+  .manual-sidebar > :not(.manual-mobile-pick) {
+    display: none;
+  }
+  .manual-sidebar > .manual-mobile-pick {
+    display: block;
   }
   .manual-brand p,
   .manual-search kbd {
@@ -732,4 +739,19 @@
   margin-top: 14px;
   color: var(--st-muted);
   font-size: 13px;
+}
+
+/* The phone's section pick list (hidden on wider screens, where the sidebar lists the sections). */
+.manual-mobile-pick {
+  display: none;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
 }

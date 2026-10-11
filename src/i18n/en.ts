@@ -308,7 +308,6 @@ export const en: Record<string, string> = {
   'Αναφορά απόκλισης': 'Report deviation',
   'Αναφορά συστήματος': 'System report',
   Αναφορές: 'Reports',
-  'Αναφορές & Εκτυπώσεις': 'Reports & Prints',
   'Αναφορές και εκκρεμότητες του τμήματος {0}.': 'Reports and issues of department {0}.',
   Ανοικτές: 'Open',
   'Ανοικτές αναφορές': 'Open reports',
