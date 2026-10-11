@@ -609,7 +609,7 @@ export const en: Record<string, string> = {
   Ιστορικό: 'History',
   'Ιστορικό ιχνηλασιμότητας του τμήματος {0}.': 'Traceability history of department {0}.',
   'Ιστορικό κινήσεων': 'Movement history',
-  Ιχνηλάτηση: 'Tracing',
+  Ιχνηλάτηση: 'Traceability',
   'Ιχνηλασιμότητα ασθενούς': 'Patient traceability',
   ΚΑΜΕΡΑ: 'CAMERA',
   'ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ': 'INSTRUMENT CARD',
