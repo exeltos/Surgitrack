@@ -46,7 +46,10 @@ Deno.serve(async req => {
     await admin.from("user_invitations").update({invited_by: null}).eq("invited_by", userId);
 
     const {error} = await admin.auth.admin.deleteUser(userId);
-    if (error) return json({error: "delete_failed", message: error.message}, 500);
+    if (error) {
+      console.error("delete-staff", error.message);
+      return json({error: "delete_failed"}, 500);
+    }
     await admin.from("profiles").delete().eq("id", userId);
     const email = String(target.email || "").toLowerCase();
     if (email) {
@@ -55,6 +58,7 @@ Deno.serve(async req => {
     }
     return json({ok: true, name: target.name});
   } catch (e) {
-    return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);
+    console.error("delete-staff", e instanceof Error ? e.message : e);
+    return json({error: "failed"}, 500);
   }
 });

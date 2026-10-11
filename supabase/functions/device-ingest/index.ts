@@ -111,12 +111,16 @@ Deno.serve(async req => {
         .from("device_readings")
         .upsert(rows, {onConflict: "device_id,cycle_number", ignoreDuplicates: true})
         .select("id");
-      if (error) return json({error: "failed", message: error.message}, 500);
+      if (error) {
+      console.error("device-ingest", error.message);
+      return json({error: "failed"}, 500);
+    }
       stored = data?.length || 0;
     }
     await admin.from("devices").update({last_seen_at: new Date().toISOString()}).eq("id", device.id);
     return json({ok: true, received: list.length, stored, skipped: rows.length - stored, rejected});
   } catch (e) {
-    return json({error: "failed", message: e instanceof Error ? e.message : String(e)}, 500);
+    console.error("device-ingest", e instanceof Error ? e.message : e);
+    return json({error: "failed"}, 500);
   }
 });

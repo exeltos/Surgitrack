@@ -1,7 +1,7 @@
 // nodemailer encodes Greek subjects and bodies correctly (denomailer broke long Greek subjects
 // across header lines, so the whole message showed as raw source).
 import nodemailer from "npm:nodemailer@6.9.16";
-import {APP_ORIGIN, SITE} from "./http.ts";
+import {SITE} from "./http.ts";
 
 // The app's own emails (signup invitations, approvals, admin alerts). They go out through the same
 // SMTP server as the sign-in emails (secrets SMTP_HOST, SMTP_PORT, which is 465 since Edge Functions
@@ -76,9 +76,12 @@ export const usernameBox = (code: string) =>
 <div style="font-size:22px;font-weight:800;letter-spacing:2px;color:#152c41">${esc(code)}</div></td></tr></table>`;
 
 export {SITE};
-// Links may point only at the app itself (production, its deploy previews, or local development).
-const ALLOWED_ORIGIN = APP_ORIGIN;
+// Emailed links point only at the production app, or at an origin named in the ALLOWED_ORIGINS secret:
+// not at a deploy preview or localhost, which anyone able to open a branch could serve, so a real
+// SurgiTrack email never carries a token to someone else's page.
+const PRODUCTION_ORIGIN = /^https:\/\/((www\.)?surgitrack\.eu|surgitrack-med\.netlify\.app)$/;
 export const appSite = (origin: unknown) => {
   const o = String(origin || "").replace(/\/$/, "");
-  return ALLOWED_ORIGIN.test(o) ? o : SITE;
+  const extra = (Deno.env.get("ALLOWED_ORIGINS") || "").split(",").map(s => s.trim().replace(/\/$/, "")).filter(Boolean);
+  return PRODUCTION_ORIGIN.test(o) || extra.includes(o) ? o : SITE;
 };

@@ -1,5 +1,6 @@
 import {type SupabaseClient} from "jsr:@supabase/supabase-js@2";
 import {esc, layout, mailConfigured, sendEmail, usernameBox} from "./mail.ts";
+import {notifyAccountEvent, recordAccountEvent} from "./accountEvents.ts";
 
 // Making a staff account: shared by invite-staff (hospital staff) and demo-account (a prospect's Demo).
 // The role names the app shows (a Sterilization supervisor is a Sterilization user with a flag).
@@ -79,6 +80,19 @@ export async function grantAccess(admin: SupabaseClient, g: Grant) {
     if (link.error || !link.data?.user) throw link.error || new Error("Invite failed");
     userId = link.data.user.id;
     token = link.data.properties?.hashed_token;
+    if (existing && token) {
+      // A link for an account that already exists goes back to the caller too (as staff-link's does): it is
+      // kept in account_events, and a set-password link is told to the person, or no link is made.
+      const action = kind === "recovery" ? "password_link" : "invite_link";
+      const recorded = await recordAccountEvent(admin, {
+        organizationId: g.org,
+        targetId: existing.id,
+        actorId: g.invitedBy,
+        action,
+      });
+      if (!recorded) throw new Error("Audit failed");
+      if (action === "password_link") await notifyAccountEvent(g.email, action, "");
+    }
   } else if (!existing) {
     const {data: inv, error} = await admin.auth.admin.inviteUserByEmail(g.email, {redirectTo: g.site, data: meta});
     if (error || !inv.user) throw error || new Error("Invite failed");

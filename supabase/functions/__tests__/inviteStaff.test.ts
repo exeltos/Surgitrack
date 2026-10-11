@@ -168,7 +168,7 @@ describe('invite-staff: an account made at once (hospital admin role or direct l
     expect(upserts('profiles')[0].values).toMatchObject({role: 'ADMIN', active: false});
   });
 
-  it('asks the invited user to the app origin, and a foreign origin falls back to production', async () => {
+  it('asks the invited user to the production app; a preview, localhost or foreign origin falls back to it', async () => {
     mailOn();
     codeIs();
     const requested: string[] = [];
@@ -176,10 +176,16 @@ describe('invite-staff: an account made at once (hospital admin role or direct l
       requested.push((args as {options: {redirectTo: string}}).options.redirectTo);
       return {data: {user: {id: 'u'}, properties: {hashed_token: 't'}}, error: null};
     };
-    for (const redirect_to of ['http://localhost:5174', 'https://evil.example', undefined]) {
+    for (const redirect_to of [
+      'https://www.surgitrack.eu',
+      'https://deploy-preview-55--surgitrack-med.netlify.app',
+      'http://localhost:5174',
+      'https://evil.example',
+      undefined,
+    ]) {
       await invite(handle, {...body, email: `${requested.length}@b.gr`, redirect_to});
     }
-    expect(requested).toEqual(['http://localhost:5174', SITE, SITE]);
+    expect(requested).toEqual(['https://www.surgitrack.eu', SITE, SITE, SITE, SITE]);
   });
 
   it('puts only the allowed origin in the emailed link', async () => {
@@ -249,6 +255,24 @@ describe('invite-staff: an account made at once (hospital admin role or direct l
     expect(String(row.url)).toContain('st_link=recovery');
     expect(fake.calls.filter(c => c.what === 'rpc')).toHaveLength(0);
     expect(upserts('profiles')).toHaveLength(0);
+    // The link for an existing account is kept on record, and the person is told.
+    const event = fake.dbCalls('insert').find(c => c.table === 'account_events');
+    expect(event?.values).toMatchObject({target_id: 'u9', actor_id: 'admin-1', action: 'password_link'});
+    expect(mailState.outbox.filter(m => m.to === 'maria@hospital.gr').length).toBeGreaterThan(1);
+  });
+
+  it('gives no link for an existing account when it cannot be kept on record', async () => {
+    mailOn();
+    routes(withProfile({id: 'u9', organization_id: 'org-1', active: false, user_code: 'ZZ0000'}));
+    const db = fake.db;
+    fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+    fake.admin.generateLink = (args: unknown) =>
+      (args as {type: string}).type === 'invite'
+        ? {data: null, error: {message: 'already registered'}}
+        : {data: {user: {id: 'u9'}, properties: {hashed_token: 't2'}}, error: null};
+    const row = await result(await invite(handle, body));
+    expect(row).toMatchObject({ok: false});
+    expect(row.url).toBeUndefined();
   });
 
   it('fails when no username can be made, before any account exists', async () => {
