@@ -1,0 +1,109 @@
+/* Ui. Moved together from overrides.css; cascade order is intentional. */
+.action-menu {
+  position: relative;
+}
+.action-menu-caret {
+  transition: transform 0.15s;
+}
+.action-menu-toggle.open .action-menu-caret {
+  transform: rotate(180deg);
+}
+.action-menu-panel.align-left {
+  left: 0;
+}
+.action-menu-panel.align-right {
+  right: 0;
+}
+
+/* Screen-reader-only text stays inside its scrolling list: anchored at the list's corner, it can
+   never widen the page (it did on phones, where a list's spinner sat past the right edge). */
+.table-panel,
+.list-scroll-panel {
+  position: relative;
+}
+
+/* Empty lists: one look for «nothing here yet» and «nothing matches». */
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 56px 24px;
+  text-align: center;
+}
+.empty-state strong {
+  color: var(--c-cyan-20);
+  font-size: 16px;
+}
+.empty-state p {
+  max-width: 460px;
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.empty-state-actions a {
+  text-decoration: none;
+}
+/* KPI strips on the list pages: label and number on one row. */
+html body .tools-list-workspace .kpis {
+  margin-bottom: 8px;
+}
+html body .tools-list-workspace .kpis strong {
+  margin-top: 0;
+  font-size: 20px;
+}
+html body .kpis > * svg {
+  display: none;
+}
+.expiry-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.expiry-badge.ok {
+  background: var(--c-gray-95-8);
+  color: var(--c-green-40-3);
+}
+.expiry-badge.expiring {
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+}
+.expiry-badge.expired {
+  background: var(--c-gray-95-5);
+  color: var(--c-red-35);
+}
+.sterile-dates > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+/* Only recent history is loaded (T3): a note, and a button for the rest. */
+html body .history-window-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+  color: var(--c-blue-35);
+  font-size: 13px;
+}
+
+/* Loading screen: how far a large hospital's load has come, under the spinner. */
+html body .app-spinner-wrap.full {
+  align-content: center;
+  gap: 14px;
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+  html body .compact-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

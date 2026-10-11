@@ -37,8 +37,10 @@ if (!name || !pattern) {
   process.exit(2);
 }
 // The section: classes matching a regex, or (given a folder) the classes only the files in that folder use.
-const sectionDir = existsSync(join(ROOT, pattern)) ? join(ROOT, pattern) : undefined;
-const sectionRegex = sectionDir ? undefined : new RegExp(pattern);
+// Several folders: comma-separated (e.g. src/modules/department,src/components/department).
+const folders = pattern.split(',').map(dir => join(ROOT, dir.replace(/\/+$/, '')));
+const sectionDirs = folders.every(dir => existsSync(dir)) ? folders : undefined;
+const sectionRegex = sectionDirs ? undefined : new RegExp(pattern);
 const target = join(STYLES, 'sections', `${name}.css`);
 const importLine = `@import './sections/${name}.css';`;
 
@@ -415,7 +417,7 @@ const sectionClass = name => {
   const files = [...(usedIn.get(name) || [])];
   // A class built at run time counts by the prefix it is built from.
   for (const [key, where] of usedIn) if (key.endsWith('*') && name.startsWith(key.slice(0, -1))) files.push(...where);
-  return files.length > 0 && files.every(file => file.startsWith(sectionDir + '/'));
+  return files.length > 0 && files.every(file => sectionDirs.some(dir => file.startsWith(dir + '/')));
 };
 const inSection = item =>
   item.file === OVERRIDES &&

@@ -12,3 +12,15 @@
 @import './sections/tools.css';
 @import './sections/stock.css';
 @import './sections/assets.css';
+@import './sections/department.css';
+@import './sections/replacements.css';
+@import './sections/issues.css';
+@import './sections/expiry.css';
+@import './sections/devices.css';
+@import './sections/movements.css';
+@import './sections/traceability.css';
+@import './sections/reports.css';
+@import './sections/auth.css';
+@import './sections/demo.css';
+@import './sections/layout.css';
+@import './sections/ui.css';

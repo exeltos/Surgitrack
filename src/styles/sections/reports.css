@@ -1,0 +1,72 @@
+/* Reports. Moved together from overrides.css; cascade order is intentional. */
+/* A one-line page description must not widen a grid page. */
+html body .reports-catalog {
+  overflow-y: auto;
+}
+@media (min-width: 761px) {
+  .reports-result-body {
+    overflow-x: auto;
+  }
+  .reports-table th,
+  .reports-table td {
+    white-space: normal;
+    overflow-wrap: normal;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .reports-result-body.fit-tight .reports-table th,
+  .reports-result-body.fit-tight .reports-table td {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}
+@media (max-width: 700px) {
+  html body .reports-catalog-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+  html body .reports-catalog-item {
+    min-width: 0;
+  }
+  html body .reports-catalog-item strong {
+    white-space: normal;
+    line-height: 1.2;
+  }
+  html body .reports-table thead {
+    display: none;
+  }
+  html body .reports-table,
+  html body .reports-table tbody,
+  html body .reports-table tr,
+  html body .reports-table td {
+    display: block;
+    width: 100%;
+  }
+  html body .reports-table tr {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line, var(--c-gray-90-3));
+  }
+  html body .reports-table td {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 8px;
+    padding: 2px 0;
+    border: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  html body .reports-table td::before {
+    content: attr(data-label);
+    color: var(--c-blue-50);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: Inter, system-ui, sans-serif;
+  }
+  html body .reports-table td:not([data-label])::before {
+    content: none;
+  }
+  html body .reports-table td:not([data-label]) {
+    display: block;
+  }
+}

@@ -1,0 +1,167 @@
+/* Movements. Moved together from overrides.css; cascade order is intentional. */
+/* Movements: one-line rows (route and chip never wrap), header buttons like everywhere else. */
+html body .ledger-columns,
+html body .ledger-row {
+  gap: 10px;
+  /* Movements: the action column gets the room (up to two lines, full text on hover), the date stays on one
+   line, the route takes only what it needs. */
+  grid-template-columns: 150px minmax(140px, 0.9fr) minmax(190px, 1.1fr) minmax(230px, 1.6fr) minmax(150px, 1fr) 24px;
+}
+html body .ledger-route i {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+html body .ledger-row .movement-chip {
+  max-width: 100%;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  line-height: 1.3;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  overflow: hidden;
+  max-height: calc(2 * 1.3em + 6px);
+}
+html body .ledger-row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+html body .ledger-date b {
+  white-space: nowrap;
+}
+html body .movement-ledger.cleaning .ledger-row.picked {
+  background: var(--c-gray-95-2);
+}
+html body .movement-ledger.cleaning .ledger-date input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--c-red-40);
+}
+/* History: the account the database recorded, shown when it is not the name the device wrote. */
+html body .ledger-user small.ledger-account-differs {
+  color: var(--c-orange-45-2);
+  font-weight: 700;
+}
+html body .movement-detail-grid .movement-account.differs strong {
+  color: var(--c-orange-45-2);
+}
+@media (max-width: 1280px) {
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 128px minmax(120px, 0.9fr) minmax(150px, 1fr) minmax(190px, 1.5fr) minmax(130px, 0.9fr) 20px;
+  }
+  html body .ledger-date svg {
+    display: none;
+  }
+  html body .ledger-date {
+    gap: 0;
+  }
+}
+@media (max-width: 1600px) {
+  html body .ledger-route i {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: 100%;
+  }
+}
+@media (max-width: 900px) {
+  /* Movements: two lines per entry, so the action and the user stay visible. */
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1.1fr) 20px;
+  }
+  html body .ledger-row {
+    grid-template-areas: 'date asset route open' 'date user action open';
+    row-gap: 4px;
+  }
+  html body .ledger-row > .ledger-date {
+    grid-area: date;
+  }
+  html body .ledger-row > .ledger-asset {
+    grid-area: asset;
+  }
+  html body .ledger-row > .ledger-route {
+    grid-area: route;
+  }
+  html body .ledger-row > span:nth-child(4) {
+    grid-area: action;
+    display: block;
+  }
+  html body .ledger-row > .ledger-user {
+    grid-area: user;
+    display: flex;
+  }
+  html body .ledger-row > svg:last-child {
+    grid-area: open;
+  }
+  html body .ledger-columns span:nth-child(4),
+  html body .ledger-columns span:nth-child(5) {
+    display: none;
+  }
+}
+/* Movement details: the patient row has no icon; its label and value sit in the text column. */
+html body .movement-detail-grid .movement-patient > span,
+html body .movement-detail-grid .movement-patient > strong {
+  grid-column: 2;
+}
+/* Movement details: straight to the item's card or its trail. */
+html body .movement-detail-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 24px 0;
+}
+html body .movement-detail-links .app-button {
+  text-decoration: none;
+}
+@media (max-width: 1180px) and (min-width: 901px) {
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1.1fr) 20px;
+  }
+  html body .ledger-row {
+    grid-template-areas: 'date asset route open' 'date user action open';
+    row-gap: 4px;
+  }
+  html body .ledger-row > .ledger-date {
+    grid-area: date;
+  }
+  html body .ledger-row > .ledger-asset {
+    grid-area: asset;
+  }
+  html body .ledger-row > .ledger-route {
+    grid-area: route;
+  }
+  html body .ledger-row > span:nth-child(4) {
+    grid-area: action;
+    display: block;
+  }
+  html body .ledger-row > .ledger-user {
+    grid-area: user;
+  }
+  html body .ledger-row > svg:last-child {
+    grid-area: open;
+  }
+  html body .ledger-columns span:nth-child(4),
+  html body .ledger-columns span:nth-child(5) {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  html body .ledger-columns {
+    display: none;
+  }
+  html body .ledger-row {
+    grid-template-columns: minmax(0, 1fr) 20px;
+    grid-template-areas: 'date open' 'action open' 'asset open' 'route open' 'user open';
+    row-gap: 4px;
+  }
+  html body .ledger-row .movement-chip {
+    white-space: normal;
+  }
+}

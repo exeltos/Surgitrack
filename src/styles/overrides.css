@@ -1,4 +1,5 @@
-/* Rules not yet moved into a section file (src/styles/sections). Cascade order is intentional. */
+/* Shared rules, and section rules that could tie with a shared one if moved (see scripts/css-section.mjs).
+   Cascade order is intentional. */
 
 /* Tool ownership invariants */
 .asset-field-na {
@@ -127,20 +128,8 @@
 .auth-footer {
   flex-shrink: 0;
 }
-.auth-page > .auth-main {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-}
 /* On desktop the scroll area spans the window (scrollbar at the edge); narrower screens keep
    their own width and padding rules for .auth-main. */
-@media (min-width: 851px) {
-  .auth-page > .auth-main {
-    max-width: none;
-    margin: 0;
-    padding: 40px max(32px, calc((100% - 1076px) / 2));
-  }
-}
 
 /* Platform admin: all hospitals */
 
@@ -901,19 +890,10 @@
 .asset-workbench-actions {
   flex-wrap: nowrap;
 }
-.action-menu {
-  position: relative;
-}
 .action-menu-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-.action-menu-caret {
-  transition: transform 0.15s;
-}
-.action-menu-toggle.open .action-menu-caret {
-  transform: rotate(180deg);
 }
 .action-menu-panel {
   position: absolute;
@@ -927,12 +907,6 @@
   border-radius: 12px;
   background: var(--c-white);
   box-shadow: 0 16px 40px rgba(15, 40, 55, 0.18);
-}
-.action-menu-panel.align-left {
-  left: 0;
-}
-.action-menu-panel.align-right {
-  right: 0;
 }
 .action-menu-panel button {
   display: flex;
@@ -1019,15 +993,6 @@
 }
 
 /* A page that failed to open: the menu stays usable. */
-.route-error {
-  max-width: 560px;
-  margin: 48px auto;
-  padding: 24px;
-  border: 1px solid #e3d6c4;
-  border-radius: 14px;
-  background: var(--c-gray-100);
-  text-align: center;
-}
 .route-error h2 {
   margin: 0 0 8px;
   font-size: 18px;
@@ -1195,9 +1160,6 @@
 }
 
 /* Phones: every top-bar button stays on screen (language moves into the accessibility panel) */
-.a11y-lang {
-  display: none !important;
-}
 .a11y-row button.active {
   border-color: var(--st-teal, var(--c-cyan-45));
   background: var(--st-teal-soft, var(--c-gray-95-3));
@@ -1205,32 +1167,13 @@
   font-weight: 700;
 }
 @media (max-width: 650px) {
-  .a11y-lang {
-    display: flex !important;
-  }
   .top-actions > .lang,
   .top-actions > .avatar,
   .suite-switcher > span {
     display: none;
   }
-  .topbar {
-    gap: 6px;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-  .top-actions {
-    gap: 6px;
-  }
   .role-switch select {
     max-width: 112px;
-  }
-  .a11y-popover,
-  .notification-popover {
-    position: fixed !important;
-    top: 60px !important;
-    right: 12px !important;
-    left: auto !important;
-    max-width: calc(100vw - 24px);
   }
 }
 @media (max-width: 380px) {
@@ -1241,54 +1184,16 @@
 
 /* Screen-reader-only text stays inside its scrolling list: anchored at the list's corner, it can
    never widen the page (it did on phones, where a list's spinner sat past the right edge). */
-.table-panel,
-.list-scroll-panel {
-  position: relative;
-}
 .visually-hidden {
   top: 0;
   left: 0;
 }
 
 /* Connected devices */
-.devices-page {
-  display: grid;
-  gap: 16px;
-}
 .devices-head-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-}
-.devices-alert,
-.devices-notice {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 11px;
-  font-size: 13px;
-}
-.devices-alert {
-  border: 1px solid var(--c-red-85);
-  background: var(--st-red-soft, var(--c-gray-95-2));
-  color: var(--st-red, var(--c-red-45));
-}
-.devices-notice {
-  border: 1px solid var(--c-green-85);
-  background: var(--st-green-soft, var(--c-gray-95-4));
-  color: var(--st-green, var(--c-green-50));
-}
-.devices-alert span,
-.devices-notice span {
-  flex: 1;
-}
-.devices-alert button,
-.devices-notice button {
-  border: 0;
-  background: none;
-  color: inherit;
-  cursor: pointer;
 }
 .devices-empty {
   display: grid;
@@ -1307,12 +1212,6 @@
 .devices-empty b {
   color: var(--st-ink, var(--c-blue-20));
 }
-.devices-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
-  gap: 14px;
-  align-items: stretch;
-}
 .device-card {
   display: grid;
   grid-template-rows: 1fr auto;
@@ -1322,13 +1221,6 @@
   border: 1px solid var(--st-line, var(--c-gray-90));
   border-radius: 14px;
   background: var(--c-white);
-}
-.device-card.selected {
-  border-color: var(--st-teal, var(--c-cyan-45));
-  box-shadow: 0 0 0 1px var(--st-teal, var(--c-cyan-45));
-}
-.device-card.inactive {
-  opacity: 0.7;
 }
 .device-card-main {
   display: grid;
@@ -1367,12 +1259,6 @@
   font-size: 12.5px;
   color: var(--st-muted, var(--c-cyan-55));
 }
-.device-card-last.good {
-  color: var(--st-green, var(--c-green-50));
-}
-.device-card-last.bad {
-  color: var(--st-red, var(--c-red-45));
-}
 .device-card-off {
   justify-self: start;
   padding: 2px 8px;
@@ -1388,31 +1274,8 @@
   padding-top: 10px;
   border-top: 1px solid var(--st-line, var(--c-gray-90));
 }
-.devices-readings {
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-}
-.devices-readings > header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.devices-readings h2 {
-  margin: 0 0 2px;
-  font-size: 17px;
-}
 .devices-readings header small {
   color: var(--st-muted, var(--c-cyan-55));
-}
-.devices-table-wrap {
-  overflow-x: auto;
-  position: relative;
-}
-.devices-table-wrap.small {
-  margin-top: 10px;
 }
 .devices-table {
   width: 100%;
@@ -1439,14 +1302,6 @@
   background: var(--st-canvas, var(--c-gray-95));
   color: var(--st-muted, var(--c-cyan-55));
 }
-.device-result.pass {
-  background: var(--st-green-soft, var(--c-gray-95-4));
-  color: var(--st-green, var(--c-green-50));
-}
-.device-result.fail {
-  background: var(--st-red-soft, var(--c-gray-95-2));
-  color: var(--st-red, var(--c-red-45));
-}
 .devices-modal {
   width: min(640px, calc(100vw - 24px));
 }
@@ -1457,74 +1312,6 @@
   font-size: 12.5px;
   line-height: 1.5;
 }
-.devices-info {
-  color: var(--st-ink, var(--c-blue-20));
-}
-.devices-check {
-  display: flex !important;
-  align-items: center;
-  gap: 8px;
-}
-.devices-key {
-  display: grid;
-  gap: 12px;
-}
-.devices-key label {
-  display: grid;
-  gap: 6px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--st-muted, var(--c-cyan-55));
-}
-.devices-key-warning {
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--st-amber-soft, var(--c-amber-95-2));
-  color: var(--st-amber, var(--c-amber-50));
-  font-size: 13px;
-}
-.devices-copy {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.devices-copy code {
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--st-canvas, var(--c-gray-95));
-  color: var(--st-ink, var(--c-blue-20));
-  font-size: 12px;
-  white-space: nowrap;
-}
-.devices-copy button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
-  border: 1px solid var(--st-line, var(--c-gray-90));
-  border-radius: 8px;
-  background: var(--c-white);
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-}
-.devices-key pre,
-.devices-serial-log {
-  margin: 0;
-  max-height: 220px;
-  overflow: auto;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--st-canvas, var(--c-gray-95));
-  color: var(--st-ink, var(--c-blue-20));
-  font-size: 11.5px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
 .devices-serial-bar {
   display: flex;
   align-items: flex-end;
@@ -1532,26 +1319,10 @@
   flex-wrap: wrap;
   margin: 10px 0;
 }
-.devices-serial-bar label {
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--st-muted, var(--c-cyan-55));
-}
 .devices-serial-state.open {
   color: var(--st-green, var(--c-green-50));
   font-size: 12.5px;
   font-weight: 700;
-}
-.device-cycle-picker {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 12px;
-  border: 1px solid var(--c-cyan-85);
-  border-radius: 12px;
-  background: var(--st-cyan-soft, var(--c-gray-100-2));
 }
 .device-cycle-picker > b {
   display: inline-flex;
@@ -1563,21 +1334,6 @@
 .device-cycle-picker > small {
   color: var(--st-muted, var(--c-cyan-55));
   font-size: 12.5px;
-}
-.device-cycle-picker ul {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.device-cycle-picker li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: var(--c-white);
 }
 .device-cycle-picker li > span:first-child {
   display: grid;
@@ -1600,31 +1356,12 @@
   font-weight: 700;
   cursor: pointer;
 }
-/* Device dialogs: title left, close button in the corner; the "active" box sits beside its words. */
-.devices-modal > header {
-  grid-template-columns: minmax(0, 1fr) auto !important;
-}
-.form-grid label.devices-check {
-  flex-direction: row !important;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-}
 .form-grid label.devices-check input {
   width: 18px;
   height: 18px;
   margin: 0;
   padding: 0;
   flex: none;
-}
-/* Department view opened from the Overview: the corner card leads back. */
-a.department-back {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
-a.department-back:hover {
-  border-color: var(--st-teal, var(--c-cyan-45));
 }
 div.asset-import-hospital b {
   color: var(--st-ink, var(--c-blue-20));
@@ -1798,14 +1535,6 @@ div.asset-import-hospital b {
 }
 
 /* The page an emailed invitation or password-reset link opens: one button spends the link. */
-.email-link-page {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px 16px;
-  background: var(--c-gray-100-2);
-  font-family: inherit;
-}
 .email-link-card {
   width: min(440px, 100%);
   display: grid;
@@ -1818,32 +1547,6 @@ div.asset-import-hospital b {
   box-shadow: 0 18px 50px rgba(19, 44, 57, 0.08);
   text-align: center;
 }
-.email-link-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-  text-align: left;
-}
-.email-link-brand > span {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
-  background: var(--c-blue-25-2);
-  color: var(--c-white);
-  font-weight: 800;
-}
-.email-link-brand b {
-  display: block;
-  color: var(--c-blue-15-2);
-  font-size: 16px;
-}
-.email-link-brand small {
-  color: var(--c-blue-55);
-  font-size: 11px;
-}
 .email-link-icon {
   display: grid;
   place-items: center;
@@ -1852,38 +1555,6 @@ div.asset-import-hospital b {
   border-radius: 50%;
   background: var(--c-gray-95-3);
   color: var(--c-cyan-45);
-}
-.email-link-card h1 {
-  margin: 4px 0 0;
-  color: var(--c-blue-15-2);
-  font-size: 22px;
-}
-.email-link-card p {
-  margin: 0;
-  color: var(--c-blue-45);
-  font-size: 14px;
-  line-height: 1.6;
-}
-.email-link-card p.email-link-error {
-  color: var(--c-red-40);
-}
-.email-link-button {
-  margin-top: 8px;
-  min-width: 180px;
-  padding: 12px 22px;
-  border: 0;
-  border-radius: 10px;
-  background: var(--c-blue-25-2);
-  color: var(--c-white);
-  font: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-}
-.email-link-button:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 /* One column (tablets, phones): the Settings cards keep their full height and the tab scrolls. */
 @media (max-width: 1100px) {
@@ -1972,14 +1643,6 @@ div.asset-import-hospital b {
 
 /* The slide-in menu (tablets held upright, phones) sits above its dimmed backdrop: two older
    rules had put the backdrop on top, so a tap on a menu item only closed the menu. */
-@media (max-width: 900px) {
-  .sidebar.mobile-open {
-    z-index: 80;
-  }
-  .mobile-sidebar-backdrop {
-    z-index: 70;
-  }
-}
 /* Landscape tablets (short screens): a tighter menu, so every item fits without scrolling. */
 @media (min-width: 901px) and (max-height: 820px) {
   .sidebar .nav-item {
@@ -1995,23 +1658,11 @@ div.asset-import-hospital b {
   row-gap: 8px;
   column-gap: 8px;
 }
-.device-card-actions .app-button {
-  min-width: 0;
-  white-space: nowrap;
-}
 .device-card-tools {
   display: flex;
   gap: 6px;
   margin-left: auto;
   flex-shrink: 0;
-}
-.device-card-actions .icon-button:first-of-type {
-  margin-left: 0;
-}
-.device-card-main {
-  min-width: 0;
-  align-content: start;
-  overflow-wrap: anywhere;
 }
 .name-check-tabs {
   display: flex;
@@ -2155,77 +1806,8 @@ div.asset-import-hospital b {
   gap: 14px;
   padding-bottom: 24px;
 }
-.replacements-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-.replacements-kpis button {
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-.replacements-kpis button.active {
-  border-color: var(--c-cyan-35);
-  box-shadow: 0 0 0 2px rgba(21, 90, 110, 0.12);
-}
-.replacements-kpis span {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.replacements-kpis strong {
-  color: var(--c-blue-15-2);
-  font-size: 24px;
-}
-.replacements-kpis .warn strong {
-  color: var(--c-orange-50-2);
-}
-.replacements-kpis .good strong {
-  color: var(--c-green-45);
-}
-.replacements-kpis .bad strong {
-  color: var(--c-red-40-2);
-}
-.replacements-card {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-.replacements-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 .replacements-spacer {
   flex: 1;
-}
-.replacements-search {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  min-width: min(360px, 100%);
-  padding: 0 11px;
-  min-height: 38px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  color: var(--st-muted);
-}
-.replacements-search input {
-  flex: 1;
-  border: 0;
-  outline: 0;
-  font: inherit;
-  font-size: 13px;
-  background: transparent;
 }
 .replacements-bulk {
   display: flex;
@@ -2235,34 +1817,6 @@ div.asset-import-hospital b {
   padding: 8px 10px;
   border-radius: 10px;
   background: var(--c-gray-95);
-}
-.replacements-bulk b {
-  margin-right: 6px;
-  color: var(--c-cyan-35);
-}
-.replacements-clear {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 12px;
-  color: var(--c-cyan-40-2);
-  cursor: pointer;
-}
-.replacements-table {
-  max-height: 620px;
-  overflow: auto;
-  border: 1px solid var(--c-gray-95);
-  border-radius: 10px;
-}
-.replacements-table table,
-.replacements-order-lines table,
-.replacements-order-body table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12.5px;
 }
 .replacements-table th,
 .replacements-order-lines th {
@@ -2276,13 +1830,6 @@ div.asset-import-hospital b {
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
-}
-.replacements-table td,
-.replacements-order-lines td,
-.replacements-order-body td {
-  padding: 7px 10px;
-  border-top: 1px solid var(--c-gray-95);
-  vertical-align: top;
 }
 .replacements-table tr.selected td {
   background: var(--c-gray-100-2);
@@ -2298,33 +1845,14 @@ div.asset-import-hospital b {
   color: var(--c-cyan-35);
   text-decoration: none;
 }
-.replacements-table .pick {
-  width: 34px;
-}
 .replacements-table .since {
   color: var(--c-cyan-40-2);
   font-size: 12px;
-}
-.replacements-table .replacement-status {
-  white-space: normal;
 }
 .replacements-table .empty {
   padding: 26px;
   text-align: center;
   color: var(--st-muted);
-}
-.replacement-reason,
-.replacement-status,
-.replacement-stock,
-.replacement-order-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 700;
-  white-space: nowrap;
 }
 .r-SERVICE {
   background: var(--c-gray-95-7);
@@ -2341,14 +1869,6 @@ div.asset-import-hospital b {
 .r-RETIRED {
   background: var(--c-gray-95);
   color: var(--c-cyan-40-2);
-}
-.replacement-stock.yes {
-  background: var(--c-gray-95-8);
-  color: var(--c-green-45);
-}
-.replacement-stock.no {
-  background: var(--c-gray-95-2);
-  color: var(--c-red-40-2);
 }
 .replacement-status.s-NEEDED {
   background: var(--c-amber-95);
@@ -2373,95 +1893,16 @@ div.asset-import-hospital b {
   background: var(--c-gray-95);
   color: var(--st-muted);
 }
-.replacements-table .row-actions {
-  width: 132px;
-}
-.replacements-table td:nth-child(3) {
-  min-width: 190px;
-}
-.replacements-table .row-actions button {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  margin: 0 0 4px;
-  white-space: nowrap;
-  padding: 4px 9px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 8px;
-  background: var(--c-white);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--c-blue-20);
-  cursor: pointer;
-}
-.replacements-table .row-actions button.primary {
-  border-color: var(--c-cyan-35);
-  background: var(--c-cyan-35);
-  color: var(--c-white);
-}
-.replacements-orders {
-  display: grid;
-  gap: 10px;
-}
-.replacements-order {
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-.replacements-order > header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  cursor: pointer;
-}
 .replacements-order > header small {
   display: block;
   color: var(--st-muted);
   font-size: 12px;
-}
-.replacements-order-count {
-  color: var(--c-cyan-40-2);
-  font-size: 12.5px;
-}
-.replacements-order-body {
-  display: grid;
-  gap: 10px;
-  padding: 0 14px 14px;
-}
-.replacements-order-body .qty {
-  text-align: center;
-  font-weight: 800;
-}
-.replacements-order-note {
-  margin: 0;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--c-gray-100-2);
-  font-size: 12.5px;
 }
 .replacements-order-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-}
-.replacements-order-actions small {
-  color: var(--c-cyan-40-2);
-  font-size: 12px;
-}
-.replacements-empty {
-  justify-items: center;
-  padding: 34px;
-  text-align: center;
-  color: var(--st-muted);
-}
-.replacements-empty strong {
-  color: var(--c-blue-20);
 }
 .replacements-order-modal {
   position: relative;
@@ -2475,62 +1916,16 @@ div.asset-import-hospital b {
   background: var(--c-white);
   box-shadow: 0 24px 60px rgba(20, 40, 52, 0.25);
 }
-.replacements-order-modal > header {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-.replacements-order-modal h2 {
-  margin: 2px 0 4px;
-  font-size: 19px;
-}
 .replacements-order-modal header p {
   margin: 0;
   color: var(--st-muted);
   font-size: 12.5px;
-}
-.replacements-order-lines {
-  overflow: auto;
-  border: 1px solid var(--c-gray-95);
-  border-radius: 10px;
-}
-.replacements-order-lines input {
-  width: 64px;
-  padding: 5px 7px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 8px;
-  font: inherit;
 }
 .replacements .barcodes,
 .replacements-order-modal .barcodes {
   font-size: 11px;
   color: var(--c-cyan-40-2);
   word-break: break-word;
-}
-.replacements-orders-bar {
-  display: flex;
-  justify-content: flex-end;
-}
-.replacements-order-add {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 90px auto;
-  align-items: end;
-  gap: 10px;
-}
-.replacements-order-add label {
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--c-cyan-40-2);
-}
-.replacements-order-add input {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  font: inherit;
-  font-weight: 400;
 }
 .replacements-order-lines .icon-button {
   display: inline-grid;
@@ -2543,59 +1938,15 @@ div.asset-import-hospital b {
   color: var(--c-blue-40-2);
   cursor: pointer;
 }
-.replacements-order-lines .icon-button:hover {
-  color: var(--st-red, var(--c-red-40-2));
-  border-color: currentColor;
-}
-.replacements-order-fields {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: 10px;
-}
-.replacements-order-fields label {
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--c-cyan-40-2);
-}
-.replacements-order-fields input {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  font: inherit;
-  font-weight: 400;
-}
-.replacements-order-modal > footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-}
 .replacements-order-modal > footer span {
   margin: 0 auto 0 0 !important;
   padding: 0 !important;
   font-weight: 700;
   color: var(--c-cyan-35);
 }
-@media (max-width: 900px) {
-  .replacements-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .replacements-order-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .replacements-order > header {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 
 /* Desktop menu: one line per item and tighter rows, so the whole menu fits without scrolling. */
 @media (min-width: 901px) {
-  .sidebar nav {
-    gap: 2px;
-  }
   .sidebar .nav-item {
     min-height: 0;
     padding-top: 8px;
@@ -2613,9 +1964,6 @@ div.asset-import-hospital b {
     padding-top: 7px;
     padding-bottom: 7px;
   }
-  .sidebar .demo-exit-panel button {
-    text-align: left;
-  }
 }
 
 /* Studio → Settings on every screen: each card keeps its full height and the tab scrolls, rather
@@ -2625,39 +1973,6 @@ div.asset-import-hospital b {
   height: auto;
   grid-template-rows: none;
   align-items: start;
-}
-.replacements-cancelled {
-  display: grid;
-  gap: 10px;
-}
-.replacements-cancelled > summary {
-  padding: 6px 2px;
-  color: var(--st-muted);
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.replacements-order.o-CANCELLED {
-  opacity: 0.75;
-}
-/* Order dialog: rows centred on one line, the footer flush with the table (a general footer rule
-   added side padding), the quantity column at the right. */
-.replacements-order-modal > footer {
-  padding: 4px 0 0 !important;
-  border: 0 !important;
-  background: none !important;
-}
-.replacements-order-lines td,
-.replacements-order-body td {
-  vertical-align: middle;
-}
-.replacements-order-lines th:last-child,
-.replacements-order-lines td:last-child {
-  width: 90px;
-  text-align: right;
-}
-.replacements-order-lines td.mono {
-  white-space: nowrap;
 }
 /* Εκκρεμότητες: the problem reports and, for Sterilization and admins, the replacements tab. */
 .issues-tabs {
@@ -2747,15 +2062,6 @@ div.asset-import-hospital b {
 .replacements-toolbar > * {
   flex-shrink: 0;
 }
-.replacements-toolbar .replacements-search {
-  flex: 1 1 120px;
-  min-width: 0;
-}
-@media (max-width: 1180px) {
-  .replacements-toolbar .label-wide {
-    display: none;
-  }
-}
 
 /* A tablet keeps the page buttons beside the title; only a phone stacks them. */
 @media (min-width: 641px) and (max-width: 900px) {
@@ -2773,13 +2079,6 @@ div.asset-import-hospital b {
 }
 
 /* Empty lists: one look for «nothing here yet» and «nothing matches». */
-.empty-state {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-  padding: 56px 24px;
-  text-align: center;
-}
 .empty-state-icon {
   display: grid;
   place-items: center;
@@ -2790,26 +2089,12 @@ div.asset-import-hospital b {
   background: var(--c-gray-95-3);
   color: var(--c-cyan-35);
 }
-.empty-state strong {
-  color: var(--c-cyan-20);
-  font-size: 16px;
-}
-.empty-state p {
-  max-width: 460px;
-  margin: 0;
-  color: var(--st-muted);
-  font-size: 14px;
-  line-height: 1.45;
-}
 .empty-state-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
   margin-top: 10px;
-}
-.empty-state-actions a {
-  text-decoration: none;
 }
 
 /* Overview dashboard. One teal for magnitude bars; the categorical hues (blue, orange, aqua, yellow)
@@ -2914,19 +2199,6 @@ div.asset-import-hospital b {
   height: 190px;
 }
 
-/* View-only users are told so on every page. */
-.readonly-strip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 24px;
-  border-bottom: 1px solid var(--c-gray-90-4);
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-35);
-  font-size: 13px;
-  font-weight: 600;
-}
-
 /* One table header style on every list: small, bold, sentence case. */
 .reports-table th,
 .devices-table th,
@@ -2950,36 +2222,11 @@ html body .content .movements-actions > button {
   height: 38px;
   padding-block: 0;
 }
-.receive-modal .replacements-order-lines input {
-  width: 72px;
-  margin-right: 8px;
-}
-.receive-modal .link-button {
-  border: 0;
-  background: none;
-  color: var(--c-cyan-35);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.receive-modal .link-button:disabled {
-  color: var(--st-muted);
-  cursor: default;
-  text-decoration: none;
-}
-.receive-modal td:last-child {
-  white-space: nowrap;
-}
 
 /* Density: more of the page for the content. A slimmer top bar, header, KPI strips and filter bar, smaller
    page titles and sidebar, and tighter table rows (the list keeps its own scroll, so a row saved is a row shown). */
 :root {
   --st-topbar-h: 56px;
-}
-html body .topbar {
-  height: 56px;
 }
 html body .content {
   padding-top: 16px;
@@ -3004,13 +2251,7 @@ html body .nav-item {
   padding: 7px 11px;
   font-size: 13px;
 }
-html body .sidebar nav {
-  gap: 2px;
-}
 /* KPI strips on the list pages: label and number on one row. */
-html body .tools-list-workspace .kpis {
-  margin-bottom: 8px;
-}
 html body .tools-list-workspace .kpis > * {
   display: flex;
   align-items: baseline;
@@ -3018,10 +2259,6 @@ html body .tools-list-workspace .kpis > * {
   gap: 10px;
   min-height: 0;
   padding: 8px 14px;
-}
-html body .tools-list-workspace .kpis strong {
-  margin-top: 0;
-  font-size: 20px;
 }
 html body .tools-list-workspace > .asset-filter-bar,
 html body .tools-list-workspace > .asset-list-controls {
@@ -3075,17 +2312,6 @@ html body .replacements-kpis > * {
 html body .replacements-kpis strong {
   font-size: 20px;
 }
-html body .replacements-table td small {
-  display: block;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-html body .replacements-table tbody td {
-  padding-top: 6px;
-  padding-bottom: 6px;
-}
 html body .replacements-table .row-actions {
   display: flex;
   flex-wrap: nowrap;
@@ -3095,19 +2321,7 @@ html body .replacements-table .row-actions {
 html body .replacements-table .row-actions button {
   white-space: nowrap;
 }
-@media (max-width: 1700px) {
-  /* Only the main action keeps its words; the others are icons with a tooltip. */
-  html body .replacements-table .row-actions button:not(.primary) .btn-label {
-    display: none;
-  }
-}
 /* A one-line page description must not widen a grid page. */
-html body .devices-page {
-  grid-template-columns: minmax(0, 1fr);
-}
-html body .reports-catalog {
-  overflow-y: auto;
-}
 html body .asset-registry-table td:first-child {
   min-width: 260px;
 }
@@ -3210,26 +2424,8 @@ html body .ster-shift {
   gap: 8px;
   align-items: center;
 }
-/* Devices: compact cards and a section title that matches the other panels. */
-html body .devices-page {
-  gap: 10px;
-}
-html body .devices-grid {
-  gap: 10px;
-}
-html body .device-card {
-  padding: 12px 14px;
-  gap: 8px;
-}
 html body .device-card-main b {
   font-size: 15px;
-}
-html body .device-card-actions {
-  padding-top: 8px;
-}
-html body .devices-readings {
-  padding: 12px 16px;
-  gap: 8px;
 }
 html body .devices-readings h2 {
   font-size: 15px;
@@ -3347,15 +2543,6 @@ html body .issues-fixed th:nth-child(6) {
 html body .issues-fixed td {
   min-width: 0;
 }
-html body .issues-fixed .issue-note {
-  max-width: 0;
-}
-html body .issues-fixed .row-sub {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 /* The item and the note (what is wrong) read in up to two lines instead of ending in «…». */
 html body .issues-fixed .issue-asset,
 html body .issues-fixed td.issue-note > span {
@@ -3365,14 +2552,6 @@ html body .issues-fixed td.issue-note > span {
   overflow: hidden;
   white-space: normal;
   line-height: 1.3;
-}
-html body .issues-fixed a.issue-asset {
-  color: inherit;
-  font-weight: 700;
-  text-decoration: none;
-}
-html body .issues-fixed a.issue-asset:hover {
-  text-decoration: underline;
 }
 /* Replacements table: fixed layout, the tool name takes the free width, actions are always fully visible. */
 html body .replacements-fixed {
@@ -3391,22 +2570,6 @@ html body .replacements-fixed th.col-reason {
 }
 html body .replacements-fixed th.col-since {
   width: 100px;
-}
-html body .replacements-fixed th.col-stock {
-  width: 80px;
-}
-html body .replacements-fixed .row-actions {
-  white-space: nowrap;
-}
-html body .replacements-fixed td {
-  min-width: 0;
-}
-html body .replacements-fixed td strong,
-html body .replacements-fixed td small,
-html body .replacements-fixed td > a {
-  display: block;
-  white-space: normal;
-  overflow-wrap: anywhere;
 }
 /* One KPI look everywhere: one-line label (truncated with a tooltip-free ellipsis), number on the right. */
 html body .kpis > * small,
@@ -3461,27 +2624,9 @@ html body .name-check-kpis strong {
   font-size: 20px;
 }
 /* Movements: one-line rows (route and chip never wrap), header buttons like everywhere else. */
-html body .ledger-columns,
-html body .ledger-row {
-  gap: 10px;
-}
 html body .ledger-route i,
 html body .ledger-route {
   white-space: nowrap;
-}
-html body .ledger-route i {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-html body .ledger-row .movement-chip {
-  display: inline-block;
-  max-width: 100%;
-  text-overflow: ellipsis;
-}
-html body .ledger-row {
-  padding-top: 8px;
-  padding-bottom: 8px;
 }
 html body .movements-actions > button {
   min-height: 38px;
@@ -3536,9 +2681,6 @@ html body .replacements-kpis > *.active {
     0 0 0 1px var(--c-cyan-40),
     0 1px 3px rgba(16, 42, 67, 0.08);
 }
-html body .kpis > * svg {
-  display: none;
-}
 html body .replacements-kpis .warn strong,
 html body .name-check-kpis .warn strong,
 html body .dash-kpi.warn strong {
@@ -3548,13 +2690,7 @@ html body .replacements-kpis .good strong,
 html body .name-check-kpis .good strong {
   color: var(--c-green-45);
 }
-html body .replacements-kpis .bad strong {
-  color: #c0322f;
-}
 /* Replacement rows: same-size buttons, right-aligned, never stretched or cut off. */
-html body .replacements-fixed td.row-actions {
-  text-align: right;
-}
 html body .replacements-fixed .row-actions {
   display: flex;
   align-items: center;
@@ -3573,9 +2709,6 @@ html body .replacements-fixed .row-actions button {
 }
 html body .replacements-fixed th.col-actions {
   width: 250px;
-}
-html body .replacements-fixed td {
-  vertical-align: middle;
 }
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
@@ -3615,24 +2748,6 @@ html body .department-header .department-user-sign {
   gap: 8px;
   padding: 6px 12px;
   border-radius: 12px;
-}
-html body .department-header .department-user-sign span {
-  display: none;
-}
-html body .department-header {
-  align-items: center;
-}
-html body .department-header > div:first-child > p {
-  white-space: normal;
-}
-html body .department-asset-row {
-  min-height: 0;
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-html body .department-asset-state > small,
-html body .department-asset-uses > small {
-  display: none;
 }
 html body .department-asset-open,
 html body .department-asset-list article > a {
@@ -3683,11 +2798,6 @@ html body .replacements > section {
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-html body .replacements .replacements-table {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
 }
 html body .replacements-fixed th.col-status {
   width: 215px;
@@ -3899,42 +3009,6 @@ html body .shelf-life-options button.on {
   background: var(--c-cyan-40);
   color: var(--c-white);
 }
-.expiry-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 22px;
-  padding: 0 9px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.expiry-badge.ok {
-  background: var(--c-gray-95-8);
-  color: var(--c-green-40-3);
-}
-.expiry-badge.expiring {
-  background: var(--c-amber-95);
-  color: var(--c-orange-40);
-}
-.expiry-badge.expired {
-  background: var(--c-gray-95-5);
-  color: var(--c-red-35);
-}
-html body .notification-item.expiry.expired svg {
-  color: var(--c-red-40-2);
-}
-html body .notification-item.expiry.expiring svg {
-  color: var(--c-orange-50-2);
-}
-@media (max-width: 1100px) {
-  html body .expiry-table th:nth-child(3) {
-    width: 13%;
-  }
-  html body .expiry-table th:nth-child(4) {
-    width: 120px;
-  }
-}
 .sterilizer-load-icon {
   display: grid;
   place-items: center;
@@ -4015,25 +3089,6 @@ html body .sidebar-bin.active {
   width: 46px;
   height: 46px;
 }
-.recycle-bin-icon {
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
-}
-.sidebar-bin-icon em {
-  position: absolute;
-  top: -5px;
-  right: -7px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #d64545;
-  color: var(--c-white);
-  font-size: 10.5px;
-  font-style: normal;
-  font-weight: 800;
-  line-height: 18px;
-  text-align: center;
-}
 /* Phone: title and Filters on the first line, the search field on its own full-width line. */
 /* Composition & preparation: one compact line for who/when/how many, checks as tidy cards, the accepted
    shortage on the action bar, select-all next to the counter. */
@@ -4081,43 +3136,9 @@ html body .delivery-batch-modal .handover-signature-row > button {
   grid-column: 1 / -1;
   justify-content: center;
 }
-/* Movements: the action column gets the room (up to two lines, full text on hover), the date stays on one
-   line, the route takes only what it needs. */
-html body .ledger-columns,
-html body .ledger-row {
-  grid-template-columns: 150px minmax(140px, 0.9fr) minmax(190px, 1.1fr) minmax(230px, 1.6fr) minmax(150px, 1fr) 24px;
-}
-html body .ledger-date b {
-  white-space: nowrap;
-}
-html body .ledger-row .movement-chip {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  white-space: normal;
-  line-height: 1.3;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  overflow: hidden;
-}
 @media (max-width: 1280px) {
-  html body .ledger-columns,
-  html body .ledger-row {
-    grid-template-columns: 128px minmax(120px, 0.9fr) minmax(150px, 1fr) minmax(190px, 1.5fr) minmax(130px, 0.9fr) 20px;
-  }
   html body .ledger-date b {
     font-size: 12px;
-  }
-}
-html body .ledger-row .movement-chip {
-  max-height: calc(2 * 1.3em + 6px);
-}
-@media (max-width: 1280px) {
-  html body .ledger-date svg {
-    display: none;
-  }
-  html body .ledger-date {
-    gap: 0;
   }
 }
 /* The route is written in full (it was cut to «Καθαρισμός & Απολύμα…»), on two lines when needed. */
@@ -4127,20 +3148,6 @@ html body .ledger-row .movement-chip {
     white-space: normal;
     row-gap: 0;
   }
-  html body .ledger-route i {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    max-width: 100%;
-  }
-}
-.department-expiry {
-  display: block;
-  margin-top: 4px;
-}
-.department-expiry small {
-  color: var(--st-muted);
-  font-size: 11.5px;
 }
 /* Sterile dates with their symbols (ISO 15223-1: STERILE box, hourglass for use-by). */
 .sterile-dates {
@@ -4151,12 +3158,6 @@ html body .ledger-row .movement-chip {
   white-space: nowrap;
   align-items: center;
   font-variant-numeric: tabular-nums;
-}
-.sterile-dates > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
 }
 .sym {
   height: 1em;
@@ -4191,9 +3192,6 @@ html body .main:has(.offline-strip) {
   padding-bottom: 120px;
 }
 /* Toasts sit above the notice while it shows. */
-html body:has(.offline-strip) .toast {
-  bottom: 110px;
-}
 html body .offline-strip svg {
   flex: 0 0 auto;
   margin-top: 1px;
@@ -4226,83 +3224,13 @@ html body .studio-list-row button.studio-count-toggle {
   font-weight: 700;
 }
 /* Send to Sterilization: the count step (operating theatres), signed in its own window first. */
-html body .department-count-step {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-amber-85-2);
-  border-radius: 12px;
-  background: var(--c-gray-100);
-  color: var(--c-orange-40);
-}
 html body .department-count-step.signed {
   border-color: #b7dfc8;
   background: var(--c-gray-100-2);
   color: var(--c-green-40-2);
 }
-html body .department-count-step > div {
-  flex: 1 1 auto;
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
 html body .department-count-step small {
   color: var(--c-blue-35);
-}
-html body .department-count-step small.missing {
-  color: var(--c-red-40);
-  font-weight: 700;
-}
-/* The count window: laid out like the printed count form. */
-html body .count-form-backdrop {
-  z-index: 1450;
-}
-html body .count-form-modal {
-  width: min(980px, calc(100vw - 32px));
-  max-height: calc(100vh - 32px);
-  display: flex;
-  flex-direction: column;
-  border-radius: 16px;
-  background: var(--c-white);
-  box-shadow: 0 24px 60px rgba(16, 24, 40, 0.28);
-  overflow: hidden;
-}
-html body .count-form-modal > header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px 20px 12px;
-  border-bottom: 2px solid var(--c-cyan-40);
-}
-html body .count-form-modal > header h2 {
-  margin: 2px 0 0;
-  font-size: 20px;
-}
-html body .count-form-modal > header p {
-  margin: 2px 0 0;
-  color: var(--c-cyan-40);
-  font-weight: 700;
-}
-html body .count-form-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px 20px;
-  overflow: hidden;
-}
-html body .count-form-body h3 {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 0 0 6px;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--c-cyan-40-2);
 }
 html body .count-form-body h3 small {
   letter-spacing: 0;
@@ -4315,24 +3243,6 @@ html body .count-form-body .signed {
 html body .count-form-body .pending {
   color: var(--c-amber-50);
 }
-html body .count-form-meta {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 10px;
-  overflow: hidden;
-}
-html body .count-form-meta > div {
-  padding: 7px 12px;
-  border-right: 1px solid var(--c-gray-90);
-  border-bottom: 1px solid var(--c-gray-90);
-}
-html body .count-form-meta > div:nth-child(3n) {
-  border-right: 0;
-}
-html body .count-form-meta > div:nth-last-child(-n + 3) {
-  border-bottom: 0;
-}
 html body .count-form-meta b {
   display: flex;
   align-items: center;
@@ -4342,28 +3252,11 @@ html body .count-form-meta b {
   text-transform: uppercase;
   color: var(--c-cyan-50-2);
 }
-html body .count-form-meta span {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-}
 html body .count-form-meta small {
   display: block;
   font-size: 12px;
   font-weight: 500;
   color: var(--c-cyan-40-2);
-}
-html body .count-form-b {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-html body .count-form-tools {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  margin-bottom: 8px;
 }
 html body .count-form-tools label {
   display: grid;
@@ -4373,11 +3266,6 @@ html body .count-form-tools label {
   font-weight: 700;
   color: var(--c-blue-35);
 }
-html body .count-form-tools label span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
 html body .count-form-tools input {
   min-height: 38px;
   padding: 0 10px;
@@ -4386,114 +3274,10 @@ html body .count-form-tools input {
   font: inherit;
   font-weight: 500;
 }
-html body .count-form-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid var(--c-green-40-2);
-  border-radius: 8px;
-  background: var(--c-white);
-  color: var(--c-green-40-2);
-  font-weight: 700;
-  cursor: pointer;
-}
-html body .count-form-all:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-html body .count-form-scan-message {
-  margin: -4px 0 6px;
-  color: var(--c-cyan-40);
-  font-size: 12px;
-  font-weight: 600;
-}
-html body .count-form-table {
-  flex: 1 1 auto;
-  min-height: 120px;
-  overflow-y: auto;
-  border: 1px solid var(--c-gray-90-3);
-  border-radius: 10px;
-}
-html body .count-form-table table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 13px;
-}
-html body .count-form-table th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: 7px 8px;
-  background: var(--c-gray-95);
-  border-bottom: 1px solid var(--c-cyan-70);
-  color: var(--c-cyan-40-2);
-  font-size: 10.5px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-align: left;
-}
-html body .count-form-table td {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--c-gray-95);
-  cursor: pointer;
-}
-html body .count-form-table tr.on td {
-  background: var(--c-gray-100-3);
-}
-html body .count-form-table .num {
-  width: 44px;
-  color: var(--c-cyan-50-2);
-  text-align: right;
-}
-html body .count-form-table th:nth-child(2) {
-  width: 96px;
-}
-html body .count-form-table th:nth-child(4) {
-  width: 110px;
-}
-html body .count-form-table .chk {
-  width: 132px;
-  text-align: center;
-}
-html body .count-form-table td.name {
-  font-weight: 700;
-}
 html body .count-form-table input {
   width: 18px;
   height: 18px;
   margin: 0;
-}
-html body .count-form-sent {
-  color: var(--c-green-40-2);
-  font-weight: 800;
-}
-html body .count-form-sum {
-  margin: 8px 0 0;
-  font-weight: 700;
-}
-html body .count-form-sum.short {
-  color: var(--c-red-40);
-}
-html body .count-form-modal > footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 12px 20px;
-  border-top: 1px solid var(--c-gray-90-3);
-}
-html body .count-form-modal > footer .count-form-print {
-  margin-right: auto;
-}
-@media (max-width: 700px) {
-  html body .count-form-meta {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  html body .count-form-tools {
-    flex-wrap: wrap;
-  }
 }
 /* History: the platform owner's clean-up of chosen entries. */
 html body .movement-clean-bar {
@@ -4546,39 +3330,12 @@ html body .movement-clean-error {
   margin: 0;
   font-weight: 700;
 }
-html body .movement-ledger.cleaning .ledger-row.picked {
-  background: var(--c-gray-95-2);
-}
-html body .movement-ledger.cleaning .ledger-date input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: var(--c-red-40);
-}
 /* Issues: columns sized by name (the photos column comes and goes); actions read as words. */
-html body .issues-fixed th.col-photos {
-  width: 100px;
-}
 html body .issues-fixed th.col-status {
   width: 104px;
 }
 html body .issues-fixed .issue-actions-row {
   justify-content: flex-end;
-}
-/* Expiry page: narrower date / duration columns so the name gets the free width. */
-html body .expiry-table th:nth-child(1) {
-  width: auto;
-  min-width: 220px;
-}
-html body .expiry-table th:nth-child(2) {
-  width: 88px;
-}
-html body .expiry-table th:nth-child(6),
-html body .expiry-table th:nth-child(7) {
-  width: 112px;
-}
-html body .expiry-table th:nth-child(9) {
-  width: 40px;
 }
 /* Sets list: an expiry column after the state. */
 html body .sets-registry th:nth-child(8) {
@@ -4642,9 +3399,6 @@ html body .trace-recent button {
 html body .issues-fixed th.col-actions {
   width: 290px;
 }
-html body .issues-fixed th.col-created {
-  width: 128px;
-}
 /* Sets list: the name keeps its width next to the new expiry column. */
 html body .sets-registry th:nth-child(3) {
   width: 132px;
@@ -4669,26 +3423,8 @@ html body .expiry-table td:first-child .row-title-link {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-html body .expiry-table th:nth-child(5) {
-  width: 84px;
-}
-html body .expiry-table th:nth-child(7) {
-  width: 104px;
-}
-html body .expiry-table th:nth-child(8) {
-  width: 132px;
-}
-html body .expiry-table th:nth-child(6) {
-  width: 140px;
-}
-html body .issues-fixed .issue-note-inline {
-  display: none;
-}
 /* Tablet (landscape, laid out at 1280px, portrait ≤900px): every list keeps its key columns, names get two lines. */
 @media (max-width: 1280px) {
-  html body .sidebar:not(.mobile-open) {
-    box-shadow: none;
-  }
   html body .registry-fixed td:first-child .row-title-link,
   html body .registry-fixed td:first-child .registry-asset-name strong,
   html body .issues-fixed .issue-asset {
@@ -4699,54 +3435,10 @@ html body .issues-fixed .issue-note-inline {
     overflow: hidden;
     line-height: 1.25;
   }
-  /* Tools, stock, standalone tools: 1 name, 2 barcode, 3 specialty, 4 place, 5 uses, 6 state, 7 open. */
-  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(3) {
-    width: 128px;
-  }
-  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(4) {
-    width: 168px;
-  }
-  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(5) {
-    width: 92px;
-  }
-  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(6) {
-    width: 132px;
-  }
   /* Sets: the specialty is in the card; the name gets the room. */
   html body .sets-registry th:nth-child(3),
   html body .sets-registry td:nth-child(3) {
     display: none;
-  }
-  /* Expiry: name, barcode, department, sterilized, expires, remaining. */
-  html body .expiry-table th:nth-child(4),
-  html body .expiry-table td:nth-child(4),
-  html body .expiry-table th:nth-child(5),
-  html body .expiry-table td:nth-child(5) {
-    display: none;
-  }
-  html body .expiry-table th:nth-child(3),
-  html body .expiry-table td:nth-child(3),
-  html body .expiry-table th:nth-child(7),
-  html body .expiry-table td:nth-child(7) {
-    display: table-cell;
-  }
-  html body .expiry-table th:nth-child(6) {
-    width: 140px;
-  }
-  /* Issues: the note goes under the item instead of its own squeezed column. */
-  html body .issues-fixed th:nth-child(2),
-  html body .issues-fixed td.issue-note {
-    display: none;
-  }
-  html body .issues-fixed .issue-note-inline {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-top: 2px;
-    color: var(--c-blue-35);
-    font-size: 12px;
-    font-style: italic;
   }
   /* Set card: the open-report note wraps instead of being cut, and is never hidden. */
   html body .asset-detail-body .set-tool-state {
@@ -4793,21 +3485,11 @@ html body .issues-fixed .issue-note-inline {
   }
 }
 @media (max-width: 900px) {
-  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(4) {
-    width: 150px;
-  }
-  html body .registry-fixed:not(.sets-registry):not(.expiry-table) th:nth-child(6) {
-    width: 124px;
-  }
   html body .sets-registry th:nth-child(4) {
     width: 130px;
   }
   html body .sets-registry th:nth-child(6) {
     width: 132px;
-  }
-  html body .expiry-table th:nth-child(3),
-  html body .expiry-table td:nth-child(3) {
-    display: none !important;
   }
   html body .issues-fixed th.col-actions {
     width: 236px;
@@ -4815,42 +3497,6 @@ html body .issues-fixed .issue-note-inline {
   html body .issues-fixed .issue-actions-row {
     flex-wrap: wrap;
     gap: 6px;
-  }
-  html body .issues-fixed th.col-created {
-    width: 104px;
-  }
-  /* Movements: two lines per entry, so the action and the user stay visible. */
-  html body .ledger-columns,
-  html body .ledger-row {
-    grid-template-columns: 112px minmax(0, 1fr) minmax(0, 1.1fr) 20px;
-  }
-  html body .ledger-row {
-    grid-template-areas: 'date asset route open' 'date user action open';
-    row-gap: 4px;
-  }
-  html body .ledger-row > .ledger-date {
-    grid-area: date;
-  }
-  html body .ledger-row > .ledger-asset {
-    grid-area: asset;
-  }
-  html body .ledger-row > .ledger-route {
-    grid-area: route;
-  }
-  html body .ledger-row > span:nth-child(4) {
-    grid-area: action;
-    display: block;
-  }
-  html body .ledger-row > .ledger-user {
-    grid-area: user;
-    display: flex;
-  }
-  html body .ledger-row > svg:last-child {
-    grid-area: open;
-  }
-  html body .ledger-columns span:nth-child(4),
-  html body .ledger-columns span:nth-child(5) {
-    display: none;
   }
   html body .studio-manager-nav button {
     flex: 0 0 auto;
@@ -4883,19 +3529,6 @@ html body .handover-signature-row button {
   height: 40px;
   border-radius: 10px;
 }
-/* History: the account the database recorded, shown when it is not the name the device wrote. */
-html body .ledger-user small.ledger-account-differs {
-  color: var(--c-orange-45-2);
-  font-weight: 700;
-}
-html body .movement-detail-grid .movement-account.differs strong {
-  color: var(--c-orange-45-2);
-}
-/* Movement details: the patient row has no icon; its label and value sit in the text column. */
-html body .movement-detail-grid .movement-patient > span,
-html body .movement-detail-grid .movement-patient > strong {
-  grid-column: 2;
-}
 /* Top-bar sync chip: live (green), periodic (grey), saving (blue), failed (red). */
 html body .sync-chip {
   display: inline-flex;
@@ -4910,25 +3543,9 @@ html body .sync-chip i {
   border-radius: 50%;
   background: currentColor;
 }
-html body .sync-chip.live {
-  background: var(--c-gray-100-3);
-  color: var(--c-green-45-2);
-}
-html body .sync-chip.polling {
-  background: var(--c-gray-95);
-  color: var(--c-blue-35);
-}
-html body .sync-chip.saving i {
-  animation: sync-pulse 1s ease-in-out infinite;
-}
 @keyframes sync-pulse {
   50% {
     opacity: 0.3;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  html body .sync-chip.saving i {
-    animation: none;
   }
 }
 @media (max-width: 650px) {
@@ -5015,11 +3632,6 @@ html body .idle-lock-card input {
   font: inherit;
   font-size: 15px;
 }
-html body .idle-lock-card input:focus {
-  outline: none;
-  border-color: var(--c-cyan-40);
-  box-shadow: 0 0 0 3px rgba(29, 107, 122, 0.15);
-}
 html body .idle-lock-card button.primary {
   display: flex;
   align-items: center;
@@ -5035,10 +3647,6 @@ html body .idle-lock-card button.primary {
   font-size: 15px;
   cursor: pointer;
 }
-html body .idle-lock-card button.primary:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 html body .idle-lock-switch {
   display: inline-flex;
   align-items: center;
@@ -5051,29 +3659,11 @@ html body .idle-lock-switch {
   font-size: 13px;
   cursor: pointer;
 }
-html body .idle-lock-card .idle-lock-error {
-  margin: 0;
-  color: var(--c-red-40);
-  font-weight: 700;
-  font-size: 13px;
-}
 /* A record changed on two devices at once (S4). */
 html body .sync-conflict-toast {
   border-left: 4px solid var(--c-orange-50-2);
 }
 /* Only recent history is loaded (T3): a note, and a button for the rest. */
-html body .history-window-note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 10px;
-  padding: 8px 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-gray-100-2);
-  color: var(--c-blue-35);
-  font-size: 13px;
-}
 html body .history-window-note button {
   margin-left: auto;
   padding: 5px 12px;
@@ -5117,37 +3707,11 @@ html body .idle-lock-password button[aria-pressed='true'] {
 
 /* Reports: texts wrap between words only, never inside a word («Κύκλο-ς», «09/10/202-6»); when a
    table still does not fit (useFitWidth), cells get tighter and the results scroll sideways. */
-@media (min-width: 761px) {
-  .reports-result-body {
-    overflow-x: auto;
-  }
-  .reports-table th,
-  .reports-table td {
-    white-space: normal;
-    overflow-wrap: normal;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-  .reports-result-body.fit-tight .reports-table th,
-  .reports-result-body.fit-tight .reports-table td {
-    padding-left: 6px;
-    padding-right: 6px;
-  }
-}
 /* Menu icons keep their size next to a long hint. */
 .action-menu-panel button > svg {
   flex: 0 0 auto;
 }
 /* Issues cards: two per row on phones, like the Replacements cards next to them. */
-@media (max-width: 900px) {
-  html body .kpis.issues-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-  html body .kpis.issues-kpis > * small {
-    white-space: normal;
-  }
-}
 
 /* Sign-out questions show above the screen lock (z-index 10000), which can start them ("Sign in as someone
    else"). Important: the rule for every confirmation (02-assets-shared.css) puts them at 1600 with !important. */
@@ -5214,10 +3778,6 @@ html body .sets-registry .set-count-short .muted {
     color: var(--c-blue-45);
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
-  }
-  /* Expiry: every field of the card is shown (the tablet layout hides some columns). */
-  html body .expiry-table tbody td:nth-child(n) {
-    display: block !important;
   }
 }
 
@@ -5307,139 +3867,16 @@ html body .sets-registry .set-count-short .muted {
     flex-wrap: wrap;
   }
 }
-
-/* Replacements toolbar on a phone: the search on its own line, the buttons below it (one row
-   squeezed the search to a letter and cut off «Λήψη»). */
-@media (max-width: 700px) {
-  html body .replacements-toolbar .replacements-search {
-    flex: 1 0 100%;
-  }
-  html body .replacements-toolbar .replacements-spacer {
-    display: none;
-  }
-}
-
-/* Traceability trail: date and time in their own column, a line joining the steps, the step
-   itself as the headline; the item's card has «Άνοιγμα καρτέλας» on the right. */
-html body .trace-card .trace-open {
-  text-decoration: none;
-  margin-left: auto;
-  align-self: center;
-  white-space: nowrap;
-}
-html body .timeline-item.trace-step {
-  grid-template-columns: 132px 18px minmax(0, 1fr);
-  gap: 12px;
-  padding: 6px 0 16px;
-}
-html body .trace-step time {
-  padding-top: 1px;
-  color: var(--c-blue-15);
-  font-size: 13px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-html body .trace-step .dot {
-  position: relative;
-  justify-self: center;
-}
-html body .trace-step:not(:last-child) .dot::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 4px;
-  width: 2px;
-  height: calc(100% + 40px);
-  background: var(--c-gray-80);
-}
-html body .trace-step > div:last-child {
-  display: grid;
-  gap: 2px;
-}
 html body .trace-step strong {
   color: var(--c-blue-15-2);
   font-size: 14px;
-}
-html body .trace-step-asset {
-  color: var(--c-cyan-35);
-  font-size: 13px;
-  font-weight: 600;
 }
 html body .trace-step small {
   color: var(--c-blue-50);
   font-size: 12.5px;
 }
-@media (max-width: 700px) {
-  html body .timeline-item.trace-step {
-    grid-template-columns: 18px minmax(0, 1fr);
-  }
-  html body .trace-step time {
-    grid-column: 2;
-    order: -1;
-  }
-  html body .trace-step .dot {
-    grid-row: 1 / span 2;
-    grid-column: 1;
-  }
-  html body .trace-card {
-    flex-wrap: wrap;
-  }
-  html body .trace-card .trace-open {
-    margin-left: 0;
-  }
-}
 
 /* Reports on phone: every report type visible, result rows as cards */
-@media (max-width: 700px) {
-  html body .reports-catalog-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow: visible;
-  }
-  html body .reports-catalog-item {
-    min-width: 0;
-  }
-  html body .reports-catalog-item strong {
-    white-space: normal;
-    line-height: 1.2;
-  }
-  html body .reports-table thead {
-    display: none;
-  }
-  html body .reports-table,
-  html body .reports-table tbody,
-  html body .reports-table tr,
-  html body .reports-table td {
-    display: block;
-    width: 100%;
-  }
-  html body .reports-table tr {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--line, var(--c-gray-90-3));
-  }
-  html body .reports-table td {
-    display: grid;
-    grid-template-columns: 96px minmax(0, 1fr);
-    gap: 8px;
-    padding: 2px 0;
-    border: 0;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-  html body .reports-table td::before {
-    content: attr(data-label);
-    color: var(--c-blue-50);
-    font-size: 11px;
-    font-weight: 600;
-    font-family: Inter, system-ui, sans-serif;
-  }
-  html body .reports-table td:not([data-label])::before {
-    content: none;
-  }
-  html body .reports-table td:not([data-label]) {
-    display: block;
-  }
-}
 
 /* Overview on one screen: the card's last block (list, chart) takes the room left and scrolls inside. */
 @media (min-width: 1100px) and (min-height: 600px) {
@@ -5501,17 +3938,8 @@ html body .maintenance-strip {
   background: var(--st-cyan-soft, var(--c-teal-90-2));
   color: var(--st-ink, var(--c-blue-20-3));
 }
-html body .maintenance-strip > span {
-  flex: 1;
-}
-html body .maintenance-strip .icon-button {
-  flex: none;
-}
 
 /* What's new: after an update and in Help */
-html body .whats-new-dialog {
-  width: min(560px, calc(100vw - 32px));
-}
 html body .whats-new-icon {
   background: var(--st-cyan-soft, var(--c-teal-90-2));
   color: var(--st-teal, var(--c-cyan-30-2));
@@ -5527,10 +3955,6 @@ html body .whats-new-notes {
   line-height: 1.5;
   color: var(--st-ink, var(--c-blue-20-3));
 }
-html body .whats-new-help .whats-new-notes {
-  padding: 0 0 8px 20px;
-  max-height: none;
-}
 html body .whats-new-release h2 {
   margin: 18px 0 8px;
   font-size: 15px;
@@ -5542,9 +3966,6 @@ html body .whats-new-release h2 small {
 }
 
 /* The briefing after signing in: what waits today */
-html body .briefing-dialog {
-  width: min(520px, calc(100vw - 32px));
-}
 html body .briefing-icon {
   background: var(--st-amber-soft, var(--c-amber-95-2));
   color: var(--st-amber, var(--c-amber-50));
@@ -5641,14 +4062,6 @@ html body .screen-guide-body p {
   font-size: 13px;
   line-height: 1.5;
 }
-html body .screen-guide-body ol {
-  margin: 0 0 12px;
-  padding-left: 20px;
-  display: grid;
-  gap: 4px;
-  font-size: 13px;
-  line-height: 1.45;
-}
 html body .screen-guide-actions {
   display: flex;
   flex-wrap: wrap;
@@ -5734,10 +4147,6 @@ html body .modal-backdrop .modal-actions > button:not(.primary) {
 /* One column (tablet): the instruments first, then the checks and the note right above the complete button. */
 
 /* Loading screen: how far a large hospital's load has come, under the spinner. */
-html body .app-spinner-wrap.full {
-  align-content: center;
-  gap: 14px;
-}
 html body .app-spinner-detail {
   font-size: 14px;
   color: var(--st-muted);
@@ -5762,32 +4171,7 @@ html body .studio-notice-status {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-
-/* Menu sections (the day's work, equipment, insight, administration): a short title over each. */
-html body .sidebar .nav-group {
-  display: block;
-  margin: 10px 11px 2px;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 45%);
-}
-html body .sidebar .nav-group.first {
-  margin-top: 0;
-}
 /* Short screens: a little space between sections instead of a title, so the whole menu still fits. */
-@media (min-width: 901px) and (max-height: 820px) {
-  html body .sidebar .nav-group {
-    height: 0;
-    margin: 6px 11px 4px;
-    overflow: hidden;
-    border-top: 1px solid rgb(255 255 255 / 10%);
-  }
-  html body .sidebar .nav-group.first {
-    display: none;
-  }
-}
 /* Roles & permissions: one tab, two views. */
 html body .studio-roles-switch button {
   padding: 6px 14px;
@@ -5800,102 +4184,9 @@ html body .studio-roles-switch button {
   font-weight: 700;
   cursor: pointer;
 }
-/* In the two rows there is room for the icons on a computer screen. */
-
-/* Evaluation Demo: the guided tour over the real screen (the place stands out, the rest dims). */
-html body .guided-tour {
-  position: fixed;
-  inset: 0;
-  z-index: 2100;
-  pointer-events: none;
-}
-html body .guided-tour-spot {
-  position: fixed;
-  border-radius: 12px;
-  box-shadow:
-    0 0 0 3px var(--c-cyan-45),
-    0 0 0 9999px rgb(10 30 40 / 42%);
-  transition:
-    top 0.2s ease,
-    left 0.2s ease,
-    width 0.2s ease,
-    height 0.2s ease;
-}
-html body .guided-tour-dim {
-  position: fixed;
-  inset: 0;
-  background: rgb(10 30 40 / 32%);
-}
-html body .guided-tour-note {
-  position: fixed;
-  display: grid;
-  gap: 8px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--c-white);
-  box-shadow: 0 18px 50px rgb(10 30 40 / 28%);
-  pointer-events: auto;
-}
-html body .guided-tour-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-html body .guided-tour-head small {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--st-muted);
-}
-html body .guided-tour-head button {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--c-gray-95-4);
-  cursor: pointer;
-}
 html body .guided-tour-note strong {
   font-size: 15px;
   color: var(--c-blue-15);
-}
-html body .guided-tour-note p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--c-gray-15);
-}
-html body .guided-tour-wait {
-  color: var(--st-muted);
-  font-size: 12px;
-  font-style: italic;
-}
-html body .guided-tour-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-html body .guided-tour-actions button {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 9px;
-  background: var(--c-white);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-html body .guided-tour-actions button.primary {
-  border-color: var(--c-cyan-35);
-  background: var(--c-cyan-35);
-  color: var(--c-white);
 }
 /* The welcome of an evaluation Demo. */
 html body .demo-welcome-backdrop {
@@ -5973,10 +4264,6 @@ html body .demo-rate-screen svg {
 html body .demo-rate-screen b {
   color: var(--c-amber-50, #c98a00);
 }
-/* In an evaluation Demo the rating card (after a step or a tour) shows above an open dialog. */
-html body .step-rating-card {
-  z-index: 1700;
-}
 
 /* Sets list: the state on one line on a computer; on a tablet the barcode goes under the name, so the
    name is never cut in the middle of a word. */
@@ -6040,244 +4327,13 @@ html body .name-check-tabs button {
 }
 /* Stock minimums on a tablet: every column fits (on order and state were past the right edge). */
 /* On a phone each kind is a card: the name, then stock, minimum, on order and state, the order button last. */
-/* Devices: the chosen device stands out. */
-html body .device-card.selected {
-  background: var(--c-gray-95-3);
-}
 /* No cycles yet: ordinary text size, with what to do next. */
 html body .devices-empty.small {
   font-size: 13.5px;
 }
-html body .device-cycle-used {
-  color: var(--c-cyan-35);
-}
-html body .device-cycle-free {
-  color: var(--c-green-40-3);
-  font-weight: 600;
-}
-/* Cycles on a phone: each one a card (the table ran past the edge after «Αποτέλεσμα»). */
-@media (max-width: 700px) {
-  html body .devices-table thead {
-    display: none;
-  }
-  html body .devices-table,
-  html body .devices-table tbody {
-    display: block;
-  }
-  html body .devices-table tbody tr {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 12px;
-    padding: 10px 2px;
-    border-bottom: 1px solid var(--c-gray-95);
-  }
-  html body .devices-table tbody td {
-    display: block;
-    padding: 0;
-    border: 0;
-    white-space: normal;
-  }
-  html body .devices-table tbody td[data-label]::before {
-    content: attr(data-label) ' ';
-    color: var(--c-blue-45);
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-}
-/* Traceability: several items fit a name, so they are listed to choose from. */
-html body .trace-pick {
-  margin-bottom: 16px;
-  padding: 14px 16px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .trace-pick ul,
-html body .trace-patient ul,
-html body .trace-cycles ul {
-  display: grid;
-  gap: 6px;
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-}
-html body .trace-pick button {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 10px;
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--c-gray-95);
-  border-radius: 10px;
-  background: none;
-  color: var(--c-blue-15-2);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-html body .trace-pick button:hover {
-  background: var(--c-gray-95-3);
-}
-html body .trace-pick button .mono {
-  color: var(--c-cyan-35);
-}
-html body .trace-pick button small {
-  color: var(--c-blue-50);
-  font-size: 12px;
-}
-/* A patient: what was used, each with the last sterilization cycle before the use. */
-html body .trace-patient li {
-  display: grid;
-  gap: 2px;
-}
-html body .trace-patient li a {
-  color: var(--c-cyan-35);
-  font-weight: 700;
-  text-decoration: none;
-}
-html body .trace-patient li small {
-  color: var(--c-blue-50);
-  font-size: 12.5px;
-}
-/* The sterilization cycles an item went through. */
-html body .trace-cycles {
-  margin-bottom: 16px;
-  padding: 14px 16px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .trace-cycles h3,
-html body .trace-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: var(--c-blue-45);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-html body .trace-group {
-  margin: 10px 0 8px;
-}
-html body .trace-cycles li {
-  display: grid;
-  grid-template-columns: 132px minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: baseline;
-  font-size: 13px;
-}
-html body .trace-cycles time {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-html body .trace-cycles b.ok {
-  color: var(--c-green-40-3);
-}
-html body .trace-cycles b.bad {
-  color: var(--c-red-40-2);
-}
-@media (max-width: 700px) {
-  html body .trace-cycles li {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  html body .trace-cycles li span {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-  /* The item's card stays small, so its trail shows at once. */
-  html body .trace-card {
-    gap: 10px;
-    padding: 12px 14px;
-  }
-  html body .trace-card > svg {
-    display: none;
-  }
-  html body .trace-card h2 {
-    font-size: 19px;
-  }
-  html body .trace-card p {
-    font-size: 13.5px;
-  }
-  html body .trace-card .trace-open {
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 13px;
-  }
-}
-html body .trace-patient li a,
-html body .trace-patient li b {
-  font-size: 14px;
-}
-html body .trace-pick > small {
-  display: block;
-  margin-top: 8px;
-  color: var(--c-blue-50);
-  font-size: 12px;
-}
 
 /* Movements on a tablet: two lines per entry, so who did it stays in view (the user column was hidden). */
-@media (max-width: 1180px) and (min-width: 901px) {
-  html body .ledger-columns,
-  html body .ledger-row {
-    grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1.1fr) 20px;
-  }
-  html body .ledger-row {
-    grid-template-areas: 'date asset route open' 'date user action open';
-    row-gap: 4px;
-  }
-  html body .ledger-row > .ledger-date {
-    grid-area: date;
-  }
-  html body .ledger-row > .ledger-asset {
-    grid-area: asset;
-  }
-  html body .ledger-row > .ledger-route {
-    grid-area: route;
-  }
-  html body .ledger-row > span:nth-child(4) {
-    grid-area: action;
-    display: block;
-  }
-  html body .ledger-row > .ledger-user {
-    grid-area: user;
-  }
-  html body .ledger-row > svg:last-child {
-    grid-area: open;
-  }
-  html body .ledger-columns span:nth-child(4),
-  html body .ledger-columns span:nth-child(5) {
-    display: none;
-  }
-}
 /* Movements on a phone: each entry a card (when and what happened, the item, the route, who). */
-@media (max-width: 700px) {
-  html body .ledger-columns {
-    display: none;
-  }
-  html body .ledger-row {
-    grid-template-columns: minmax(0, 1fr) 20px;
-    grid-template-areas: 'date open' 'action open' 'asset open' 'route open' 'user open';
-    row-gap: 4px;
-  }
-  html body .ledger-row .movement-chip {
-    white-space: normal;
-  }
-}
-/* Movement details: straight to the item's card or its trail. */
-html body .movement-detail-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 24px 0;
-}
-html body .movement-detail-links .app-button {
-  text-decoration: none;
-}
 /* Page title on a phone stays on the left (a short title was pushed right, next to the buttons' edge). */
 @media (max-width: 700px) {
   html body .page-head > div:first-child {
@@ -6292,131 +4348,10 @@ html body .movement-detail-links .app-button {
 /* Needs attention on a phone: whole names, on two lines when needed. */
 /* Overview on a laptop-height screen: the page scrolls and every card keeps its full height (squeezed
    into one screen the stages and departments were cut and the department bars vanished). */
-/* Issues and Expiry review. Short tab labels exist for the phone only. */
-html body .issues-tabs .tab-short {
-  display: none;
-}
 /* Issue actions in fixed places: «open» at the far right, «Επίλυση» left of it, «Παραγγελία» before. */
-@media (min-width: 701px) {
-  html body .issues-fixed .issue-actions-row {
-    display: grid;
-    grid-auto-flow: dense;
-    grid-template-columns: auto auto 34px;
-    justify-content: end;
-    align-items: center;
-    gap: 6px;
-  }
-  html body .issues-fixed .issue-actions-row > a.issue-action {
-    grid-column: 3;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > button.issue-action:last-child {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > button.issue-action:not(:last-child) {
-    grid-column: 1;
-    grid-row: 1;
-  }
-}
-/* The search icon keeps its size next to the field. */
-html body .replacements-search > svg {
-  flex: 0 0 auto;
-}
-/* Replacements on a tablet: icon-only row buttons and tighter columns, so the name keeps its room. */
-@media (min-width: 701px) and (max-width: 1280px) {
-  html body .replacements-fixed th.col-set {
-    width: 16%;
-  }
-  html body .replacements-fixed th.col-reason {
-    width: 100px;
-  }
-  html body .replacements-fixed th.col-stock {
-    width: 72px;
-  }
-  html body .replacements-fixed th.col-status {
-    width: 124px;
-  }
-  html body .replacements-fixed .replacement-status {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.25;
-  }
-  html body .replacements-fixed th.col-actions {
-    width: 128px;
-  }
-  html body .replacements-table .row-actions button .btn-label {
-    display: none;
-  }
-  html body .replacements-fixed .row-actions button {
-    padding: 0 9px;
-  }
-}
-/* Expiry on a tablet: narrower fixed columns, the name keeps its room. */
-html body .expiry-sub-barcode {
-  display: none;
-}
-html body .expiry-table th:nth-child(4) {
-  width: 150px;
-}
-html body .expiry-table th:nth-child(3) {
-  width: 12%;
-}
-@media (max-width: 1280px) {
-  html body .expiry-table th:nth-child(2),
-  html body .expiry-table td:nth-child(2) {
-    display: none;
-  }
-  html body .expiry-sub-barcode {
-    display: inline;
-  }
-  html body .expiry-table th:nth-child(3) {
-    width: 130px;
-  }
-  html body .expiry-table th:nth-child(6),
-  html body .expiry-table th:nth-child(7) {
-    width: 108px;
-  }
-  html body .expiry-table th:nth-child(8) {
-    width: 132px;
-  }
-  html body .expiry-table th:nth-child(9) {
-    width: 32px;
-  }
-}
-/* Expiry: the place badge stays on one line. */
-html body .expiry-table td:nth-child(4) > .badge {
-  white-space: nowrap;
-}
 /* Compact KPI cards keep one row of four down to a portrait tablet. */
-@media (min-width: 901px) and (max-width: 1100px) {
-  html body .compact-kpis {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
 @media (max-width: 700px) {
-  html body .issues-tabs .tab-long {
-    display: none;
-  }
-  html body .issues-tabs .tab-short {
-    display: inline;
-  }
   /* The phone card has its own barcode line. */
-  html body .expiry-sub-barcode {
-    display: none;
-  }
-  /* Replacements toolbar: the search on one line, the three buttons side by side below it. */
-  html body .replacements-toolbar {
-    flex-wrap: wrap;
-  }
-  html body .replacements-toolbar > :not(.replacements-search):not(.replacements-spacer) {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  html body .replacements-toolbar button > svg {
-    flex: 0 0 auto;
-  }
   html body .replacements-toolbar > :not(.replacements-search) button,
   html body .replacements-toolbar > button {
     gap: 5px;
@@ -6425,67 +4360,6 @@ html body .expiry-table td:nth-child(4) > .badge {
     padding-right: 8px;
     font-size: 12px;
     white-space: nowrap;
-  }
-}
-/* Department review. The sterilization stage under the «Σε αποστείρωση» badge. */
-html body .department-asset-state > small.department-stage {
-  display: block;
-  margin-top: 2px;
-  color: var(--st-muted);
-  font-size: 11.5px;
-}
-/* Status filter: every choice whole, with room at the right edge. */
-html body .department-status-tabs {
-  flex: 0 0 auto;
-}
-html body .department-status-tabs button {
-  white-space: nowrap;
-}
-@media (max-width: 700px) {
-  /* Phone: the list starts higher. The user's name is already in the menu. */
-  html body .department-header .department-user-sign:not(.department-back) {
-    display: none;
-  }
-  html body .department-kpis {
-    gap: 6px;
-  }
-  html body .department-kpis > * {
-    gap: 0;
-    padding: 7px 12px;
-    border-radius: 12px;
-  }
-  html body .department-kpis > * span {
-    font-size: 12px;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  html body .department-kpis > * strong {
-    font-size: 20px;
-  }
-  /* Sets and standalone tools as two tabs side by side. */
-  html body .department-category-tabs {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 6px;
-  }
-  html body .department-category-tabs button {
-    grid-template-columns: minmax(0, 1fr) auto;
-    padding: 8px 10px;
-    gap: 6px;
-  }
-  html body .department-category-tabs button small,
-  html body .department-category-tabs button > svg {
-    display: none;
-  }
-  html body .department-category-tabs button strong {
-    font-size: 13px;
-    line-height: 1.2;
-  }
-  /* The name wraps in full so its color marking is never cut. */
-  html body .department-asset-identity strong {
-    white-space: normal;
-    overflow: visible;
   }
 }
 /* Hospitals and the Studio's hospital status on a phone: one card per hospital, every figure labelled and

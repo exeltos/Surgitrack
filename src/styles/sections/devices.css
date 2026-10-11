@@ -1,0 +1,268 @@
+/* Devices. Moved together from overrides.css; cascade order is intentional. */
+
+/* Connected devices */
+.devices-page {
+  display: grid;
+  gap: 16px;
+}
+.devices-alert,
+.devices-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+.devices-alert {
+  border: 1px solid var(--c-red-85);
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red, var(--c-red-45));
+}
+.devices-notice {
+  border: 1px solid var(--c-green-85);
+  background: var(--st-green-soft, var(--c-gray-95-4));
+  color: var(--st-green, var(--c-green-50));
+}
+.devices-alert span,
+.devices-notice span {
+  flex: 1;
+}
+.devices-alert button,
+.devices-notice button {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.devices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+.device-card.selected {
+  border-color: var(--st-teal, var(--c-cyan-45));
+  box-shadow: 0 0 0 1px var(--st-teal, var(--c-cyan-45));
+}
+.device-card.inactive {
+  opacity: 0.7;
+}
+.device-card-last.good {
+  color: var(--st-green, var(--c-green-50));
+}
+.device-card-last.bad {
+  color: var(--st-red, var(--c-red-45));
+}
+.devices-readings {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+.devices-readings > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.devices-readings h2 {
+  margin: 0 0 2px;
+  font-size: 17px;
+}
+.devices-table-wrap {
+  overflow-x: auto;
+  position: relative;
+}
+.devices-table-wrap.small {
+  margin-top: 10px;
+}
+.device-result.pass {
+  background: var(--st-green-soft, var(--c-gray-95-4));
+  color: var(--st-green, var(--c-green-50));
+}
+.device-result.fail {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red, var(--c-red-45));
+}
+.devices-info {
+  color: var(--st-ink, var(--c-blue-20));
+}
+.devices-check {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+.devices-key {
+  display: grid;
+  gap: 12px;
+}
+.devices-key label {
+  display: grid;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--st-muted, var(--c-cyan-55));
+}
+.devices-key-warning {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--st-amber-soft, var(--c-amber-95-2));
+  color: var(--st-amber, var(--c-amber-50));
+  font-size: 13px;
+}
+.devices-copy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.devices-copy code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--st-canvas, var(--c-gray-95));
+  color: var(--st-ink, var(--c-blue-20));
+  font-size: 12px;
+  white-space: nowrap;
+}
+.devices-copy button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--st-line, var(--c-gray-90));
+  border-radius: 8px;
+  background: var(--c-white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+.devices-key pre,
+.devices-serial-log {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--st-canvas, var(--c-gray-95));
+  color: var(--st-ink, var(--c-blue-20));
+  font-size: 11.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.devices-serial-bar label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-muted, var(--c-cyan-55));
+}
+.device-cycle-picker {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid var(--c-cyan-85);
+  border-radius: 12px;
+  background: var(--st-cyan-soft, var(--c-gray-100-2));
+}
+.device-cycle-picker ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.device-cycle-picker li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--c-white);
+}
+/* Device dialogs: title left, close button in the corner; the "active" box sits beside its words. */
+.devices-modal > header {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+.form-grid label.devices-check {
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.device-card-actions .app-button {
+  min-width: 0;
+  white-space: nowrap;
+}
+.device-card-actions .icon-button:first-of-type {
+  margin-left: 0;
+}
+.device-card-main {
+  min-width: 0;
+  align-content: start;
+  overflow-wrap: anywhere;
+}
+/* A one-line page description must not widen a grid page. */
+html body .devices-page {
+  grid-template-columns: minmax(0, 1fr);
+  /* Devices: compact cards and a section title that matches the other panels. */
+  gap: 10px;
+}
+html body .devices-grid {
+  gap: 10px;
+}
+html body .device-card {
+  padding: 12px 14px;
+  gap: 8px;
+}
+html body .device-card-actions {
+  padding-top: 8px;
+}
+html body .devices-readings {
+  padding: 12px 16px;
+  gap: 8px;
+}
+/* Devices: the chosen device stands out. */
+html body .device-card.selected {
+  background: var(--c-gray-95-3);
+}
+html body .device-cycle-used {
+  color: var(--c-cyan-35);
+}
+html body .device-cycle-free {
+  color: var(--c-green-40-3);
+  font-weight: 600;
+}
+@media (max-width: 700px) {
+  html body .devices-table thead {
+    display: none;
+  }
+  html body .devices-table,
+  html body .devices-table tbody {
+    display: block;
+  }
+  html body .devices-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--c-gray-95);
+  }
+  html body .devices-table tbody td {
+    display: block;
+    padding: 0;
+    border: 0;
+    white-space: normal;
+  }
+  html body .devices-table tbody td[data-label]::before {
+    content: attr(data-label) ' ';
+    color: var(--c-blue-45);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+}
