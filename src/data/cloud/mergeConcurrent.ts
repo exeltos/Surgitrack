@@ -3,12 +3,16 @@ import type {CloudRecord} from './appRecords';
 
 type Rec = CloudRecord & Record<string, unknown>;
 const same = (a: unknown, b: unknown) => recordKey(a ?? null) === recordKey(b ?? null);
+/** Counts that each device adds to: changed on both, both additions are kept (a usage limit must see every use). */
+const COUNTERS = new Set(['uses', 'sterilizations']);
+const isCount = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
 
 /**
  * Two devices changed the same record. `base` is what this device last had from the server, `local` its
  * unsaved version, `server` what the other device saved since. Every field changed only here goes on top
  * of the server's version, so both changes are kept; a field changed on both devices to different values
- * keeps the saved (server) value and is reported, so the user knows their change there did not stick.
+ * keeps the saved (server) value and is reported, so the user knows their change there did not stick. A count
+ * (uses, sterilizations) takes what this device added on top of the server's count, so no use is lost.
  */
 export function mergeConcurrent(base: CloudRecord | undefined, local: CloudRecord, server: CloudRecord) {
   const b = (base || {}) as Rec;
@@ -19,6 +23,10 @@ export function mergeConcurrent(base: CloudRecord | undefined, local: CloudRecor
   for (const key of new Set([...Object.keys(l), ...Object.keys(s), ...Object.keys(b)])) {
     if (key === 'id') continue;
     if (same(l[key], b[key])) continue; // not changed here
+    if (COUNTERS.has(key) && isCount(l[key]) && isCount(b[key]) && isCount(s[key])) {
+      merged[key] = Math.max(0, s[key] + l[key] - b[key]);
+      continue;
+    }
     const changedThere = !same(s[key], b[key]);
     if (changedThere && !same(s[key], l[key])) {
       conflicts.push(key);

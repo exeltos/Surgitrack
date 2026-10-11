@@ -214,7 +214,7 @@ UX rules the current product follows (keep them):
   batch is bisected; Sets and instruments are saved after the cycles and releases waiting on the same device,
   so a release reaches the server before the Set it makes ready; permanent refusals restore the server version
   and tell the user; concurrent edits merge
-  per field, same-field conflicts keep the first save and notify. Realtime pushes others' changes; without it,
+  per field, same-field conflicts keep the first save and notify, except usage counts (uses, sterilizations), which add up. Realtime pushes others' changes; without it,
   polling every 20 s. An IndexedDB copy opens the app instantly and survives reloads (unsaved changes kept and
   replayed; copy wiped at sign-out, ignored after a day).
 - **Security definer functions** are catalogued in `supabase/SECURITY_DEFINER.md` and pinned by a test.

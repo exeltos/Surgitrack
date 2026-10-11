@@ -28,7 +28,7 @@ vi.mock('../remoteChanges', async importOriginal => ({
 vi.mock('../realtime', () => ({isRealtimeLive: () => false, onRemoteChange: () => () => undefined}));
 vi.mock('../localCache', () => ({takeRestored: () => undefined, writeCollection: api.writeCollection}));
 
-const {useAppRecordSync, onSyncNotice, unsavedChanges} = await import('../useAppRecordSync');
+const {useAppRecordSync, onSyncNotice, onSyncConflict, unsavedChanges} = await import('../useAppRecordSync');
 const {syncNoticeMessage} = await import('../../../components/layout/syncNoticeMessage');
 
 type Tool = CloudRecord & {barcode: string; name: string};
@@ -129,6 +129,41 @@ describe('saving a collection to the cloud', () => {
     api.loadChangedRecords.mockClear();
     await act(async () => window.dispatchEvent(new Event('focus')));
     expect(api.loadChangedRecords).toHaveBeenCalled();
+    stop();
+  });
+
+  it('keeps both uses when another device added one to the same instrument meanwhile, and its other changes', async () => {
+    const conflicts: unknown[] = [];
+    const stop = onSyncConflict(conflict => conflicts.push(conflict));
+    const base = {...tool(1), uses: 3, sterilizations: 7};
+    render(<Harness initial={[base]} />);
+    // The other device saved first: one use and a note. This device's save is refused as stale.
+    api.writeAppRecords.mockResolvedValueOnce({...saved(), stale: ['t1']});
+    api.loadRecordsById.mockResolvedValue([{...base, uses: 4, sterilizations: 8, notes: 'από το Τμήμα'}]);
+    await change(list => list.map(item => ({...item, uses: 4, sterilizations: 9})));
+    await wait(2000);
+
+    const expected = {...base, uses: 5, sterilizations: 10, notes: 'από το Τμήμα'};
+    expect(store).toEqual([expected]);
+    expect(api.writeAppRecords.mock.calls[1][2]).toEqual([expected]);
+    expect(conflicts).toEqual([]);
+    expect(unsavedChanges()).toBe(0);
+    stop();
+  });
+
+  it('keeps the saved value of a field both devices changed, says so, and does not send it again', async () => {
+    const conflicts: unknown[] = [];
+    const stop = onSyncConflict(conflict => conflicts.push(conflict));
+    render(<Harness initial={[tool(1)]} />);
+    api.writeAppRecords.mockResolvedValueOnce({...saved(), stale: ['t1']});
+    api.loadRecordsById.mockResolvedValue([tool(1, 'Theirs')]);
+    await change(list => list.map(item => ({...item, name: 'Mine'})));
+    await wait(2000);
+
+    expect(store).toEqual([tool(1, 'Theirs')]);
+    expect(conflicts).toEqual([{collection: 'tools', label: 'T000001 · Theirs', fields: ['name']}]);
+    expect(sent()).toEqual([['t1']]);
+    expect(unsavedChanges()).toBe(0);
     stop();
   });
 
