@@ -3859,6 +3859,8 @@
 }
 .evaluation-demo-facts > div {
   display: grid;
+  /* A fact that wraps (the end date with its days left) does not push the others' values down. */
+  align-content: start;
   gap: 1px;
 }
 .evaluation-demo-facts dt {
@@ -4642,6 +4644,10 @@ a.auth-primary {
   align-items: center;
   gap: 6px;
   cursor: pointer;
+}
+/* The checkbox keeps to the line of text, so the date sits level with the other facts. */
+.evaluation-demo-keep input {
+  margin: 0;
 }
 .studio-convert-choice {
   display: grid;
