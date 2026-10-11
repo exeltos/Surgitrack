@@ -7,7 +7,7 @@ import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wr
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
-import {tr, trData} from '../../i18n';
+import {tr, trc, trData} from '../../i18n';
 import {presetPath, useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
@@ -17,17 +17,31 @@ type StatusFilter = 'ALL' | 'IN_DEPARTMENT' | 'STERILIZATION' | 'READY';
 type DepartmentItem = {kind: 'SET' | 'TOOL'; asset: SetAsset | Tool};
 const departmentStateLabel: Record<string, string> = {
   IN_DEPARTMENT: 'Στο τμήμα',
-  PENDING_STERILIZATION: 'Αναμονή παραλαβής',
-  IN_WASHING: 'Καθαρισμός & Απολύμανση',
-  IN_PREPARATION: 'Σε προετοιμασία',
-  IN_PACKAGING: 'Συσκευασία & Σήμανση',
-  IN_STERILIZATION: 'Σε αποστείρωση',
-  AWAITING_RELEASE: 'Αναμονή αποδέσμευσης',
-  IN_STORAGE: 'Αποθήκευση',
   READY_FOR_PICKUP: 'Έτοιμο για παραλαβή',
   SERVICE: 'Service',
   LOST: 'Απολεσθέν',
 };
+
+/** Every state the department counts as «Σε αποστείρωση»: the row shows that one badge, the stage under it. */
+const IN_STERILIZATION_STATES: string[] = [
+  'PENDING_STERILIZATION',
+  'IN_WASHING',
+  'IN_PREPARATION',
+  'IN_PACKAGING',
+  'IN_STERILIZATION',
+  'AWAITING_RELEASE',
+  'IN_STORAGE',
+];
+const sterilizationStage = (state: string) =>
+  ({
+    PENDING_STERILIZATION: tr('Αναμονή παραλαβής'),
+    IN_WASHING: trc('stage', 'Καθαρισμός'),
+    IN_PREPARATION: tr('Σύνθεση'),
+    IN_PACKAGING: tr('Συσκευασία'),
+    IN_STERILIZATION: tr('Κλίβανος'),
+    AWAITING_RELEASE: tr('Αποδέσμευση'),
+    IN_STORAGE: tr('Αποθήκευση'),
+  })[state];
 
 export default function DepartmentPage() {
   const {sets, tools, issues, currentUser, role} = useSurgi();
@@ -63,17 +77,7 @@ export default function DepartmentPage() {
     [departmentSets, departmentTools],
   );
   const ready = allDepartmentItems.filter(item => item.asset.state === 'READY_FOR_PICKUP').length;
-  const inSterilization = allDepartmentItems.filter(item =>
-    [
-      'PENDING_STERILIZATION',
-      'IN_WASHING',
-      'IN_PREPARATION',
-      'IN_PACKAGING',
-      'IN_STERILIZATION',
-      'AWAITING_RELEASE',
-      'IN_STORAGE',
-    ].includes(item.asset.state),
-  ).length;
+  const inSterilization = allDepartmentItems.filter(item => IN_STERILIZATION_STATES.includes(item.asset.state)).length;
   const atDepartment = allDepartmentItems.filter(item => item.asset.state === 'IN_DEPARTMENT').length;
   const openIssues = issues.filter(issue => issue.department === dept && issue.status === 'OPEN').length;
   const sourceItems: DepartmentItem[] =
@@ -84,16 +88,7 @@ export default function DepartmentPage() {
     const stateOk =
       statusFilter === 'ALL' ||
       (statusFilter === 'IN_DEPARTMENT' && item.asset.state === 'IN_DEPARTMENT') ||
-      (statusFilter === 'STERILIZATION' &&
-        [
-          'PENDING_STERILIZATION',
-          'IN_WASHING',
-          'IN_PREPARATION',
-          'IN_PACKAGING',
-          'IN_STERILIZATION',
-          'AWAITING_RELEASE',
-          'IN_STORAGE',
-        ].includes(item.asset.state)) ||
+      (statusFilter === 'STERILIZATION' && IN_STERILIZATION_STATES.includes(item.asset.state)) ||
       (statusFilter === 'READY' && item.asset.state === 'READY_FOR_PICKUP');
     const haystack =
       `${item.asset.name} ${item.asset.code} ${item.asset.barcode} ${item.asset.specialty} ${(item.asset as Tool).manufacturer || ''}`.toLowerCase();
@@ -194,7 +189,7 @@ export default function DepartmentPage() {
               className={statusFilter === 'STERILIZATION' ? 'active' : ''}
               onClick={() => setStatusFilter('STERILIZATION')}
             >
-              {tr('Αποστείρωση')}
+              {tr('Σε αποστείρωση')}
             </button>
             <button className={statusFilter === 'READY' ? 'active' : ''} onClick={() => setStatusFilter('READY')}>
               {tr('Έτοιμα')}
@@ -259,9 +254,16 @@ export default function DepartmentPage() {
                     </div>
                     <div className="department-asset-state">
                       <small>{tr('Κατάσταση')}</small>
-                      <span className={`badge badge-${asset.state.toLowerCase()}`}>
-                        {tr(departmentStateLabel[asset.state] || asset.state)}
-                      </span>
+                      {IN_STERILIZATION_STATES.includes(asset.state) ? (
+                        <>
+                          <span className="badge badge-in_sterilization">{tr('Σε αποστείρωση')}</span>
+                          <small className="department-stage">{sterilizationStage(asset.state)}</small>
+                        </>
+                      ) : (
+                        <span className={`badge badge-${asset.state.toLowerCase()}`}>
+                          {tr(departmentStateLabel[asset.state] || asset.state)}
+                        </span>
+                      )}
                       {asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state) && (
                         <span
                           className="department-expiry"
@@ -288,7 +290,7 @@ export default function DepartmentPage() {
                       <small>{tr('Χρήσεις')}</small>
                       <strong>
                         {asset.maxUses !== undefined
-                          ? `${asset.uses || 0}/${asset.maxUses}`
+                          ? tr('{0} / {1} χρήσεις', asset.uses || 0, asset.maxUses)
                           : tr('{0} χρήσεις', asset.uses || 0)}
                       </strong>
                     </div>

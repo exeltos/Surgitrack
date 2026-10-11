@@ -1,4 +1,5 @@
 import {useColorTapes} from './colorMarkerUtils';
+import {tr} from '../../i18n';
 import {useAppPreferences} from '../../core/AppPreferences';
 import type {ColorTape} from '../../core/colorTapes';
 
@@ -50,7 +51,11 @@ export default function ColorMarker({
     return tape ? (lang === 'el' ? tape.el : tape.en) : '?';
   });
   return (
-    <span className={`color-marker color-marker-${size}`} title={names.join(' + ')} aria-label={names.join(' + ')}>
+    <span
+      className={`color-marker color-marker-${size}`}
+      title={tr('Χρωματική σήμανση: {0}', names.join(' + '))}
+      aria-label={tr('Χρωματική σήμανση: {0}', names.join(' + '))}
+    >
       {tapes.map((id, i) => (
         <TapeSwatch key={`${id}-${i}`} tape={byId.get(id)} size={size} />
       ))}
