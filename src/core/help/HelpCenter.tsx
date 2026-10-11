@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../AppPreferences';
-import {APP_EDITION, APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
+import {APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import {loadPlatformContact, type PlatformContact} from '../../data/cloud/platformContact';
 import {glossary, helpManual, type ManualSection} from './helpManual';
@@ -340,8 +340,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                 <span>{tx.about}</span>
               </button>
               <div className="manual-version">
-                {tx.version} v{APP_VERSION}
-                <span>{APP_EDITION}</span>
+                {tx.version} {APP_VERSION}
               </div>
             </div>
           </aside>
@@ -557,8 +556,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
               <div className="manual-about-grid">
                 <section>
                   <small>{tx.version}</small>
-                  <strong>v{APP_VERSION}</strong>
-                  <span>{APP_EDITION}</span>
+                  <strong>{APP_VERSION}</strong>
                 </section>
               </div>
             </main>

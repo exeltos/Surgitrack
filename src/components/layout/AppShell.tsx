@@ -47,7 +47,7 @@ import MaintenanceStrip from './MaintenanceStrip';
 import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
 import Briefing, {briefingDue} from './Briefing';
 import ScreenGuide from './ScreenGuide';
-import {APP_VERSION, APP_EDITION} from '../../config/appMeta';
+import {APP_VERSION} from '../../config/appMeta';
 import {tr, trData} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
@@ -363,10 +363,7 @@ export default function AppShell({
         </NavLink>
       )}
       <div className="sidebar-foot">
-        <span>Healthcare Suite ready</span>
-        <small>
-          v{APP_VERSION} · {APP_EDITION}
-        </small>
+        <small>{lang === 'el' ? `Έκδοση ${APP_VERSION}` : `Version ${APP_VERSION}`}</small>
       </div>
     </aside>
   );
@@ -767,7 +764,7 @@ export default function AppShell({
           )}
           {children}
         </section>
-        <footer>© 2026 SurgiTrack · Healthcare Suite</footer>
+        <footer>© 2026 SurgiTrack</footer>
       </main>
       {helpOpen && (
         <Suspense fallback={null}>

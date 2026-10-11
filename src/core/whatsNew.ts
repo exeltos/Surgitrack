@@ -6,6 +6,44 @@ export type Release = {version: string; date: string; notes: ReleaseNote[]};
 /** What changed for users, newest first: shown once after an update and in Help → What's new. */
 export const releases: Release[] = [
   {
+    version: '1.0.0',
+    date: '2026-10-11',
+    notes: [
+      {
+        el: 'Κάθε στάδιο της Αποστείρωσης έχει ένα όνομα παντού (Παραλαβή, Καθαρισμός, Σύνθεση, Συσκευασία, Φόρτωση, Αποδέσμευση, Αποθήκευση, Παράδοση) και κάθε Σετ λέει πού βρίσκεται: «Σε καθαρισμό», «Στον κλίβανο»…',
+        en: 'Each sterilization stage has one name everywhere (Receipt, Cleaning, Assembly, Packaging, Loading, Release, Storage, Delivery) and every Set says where it is: "Being cleaned", "In the sterilizer"…',
+      },
+      {
+        el: 'Στο τμήμα, ό,τι είναι στην Αποστείρωση δείχνει «Σε αποστείρωση» και από κάτω το στάδιο, π.χ. «Σε σύνθεση».',
+        en: 'In a department, whatever is in Sterilization shows "In sterilization" with the stage under it, e.g. "Being assembled".',
+        permission: 'department.workspace',
+      },
+      {
+        el: 'Οι ρυθμίσεις του νοσοκομείου (Βιβλιοθήκες, Ροή Αποστείρωσης, Ρόλοι & δικαιώματα, Ρυθμίσεις) είναι στο αριστερό μενού.',
+        en: 'The hospital’s settings (Libraries, Sterilization Flow, Roles & permissions, Settings) are in the left menu.',
+        permission: 'studio.manage',
+      },
+      {
+        el: 'Ιχνηλάτηση: οι κύκλοι αποστείρωσης, ο ασθενής με ό,τι χρησιμοποιήθηκε και η πορεία του Σετ για κάθε εργαλείο του.',
+        en: 'Traceability: sterilization cycles, the patient with what was used, and the Set’s path for each of its instruments.',
+        permission: 'traceability.view',
+      },
+      {
+        el: 'Επισκόπηση: πού βρίσκεται ο εξοπλισμός, κινήσεις 14 ημερών και τι χρειάζεται προσοχή, σε μία ματιά.',
+        en: 'Overview: where the equipment is, 14 days of movements and what needs attention, at a glance.',
+        permission: 'overview.view',
+      },
+      {
+        el: 'Σε tablet και κινητό οι λίστες, οι κάρτες και οι φόρμες χωρούν χωρίς κομμένα κείμενα.',
+        en: 'On tablets and phones lists, cards and forms fit without cut-off text.',
+      },
+      {
+        el: 'Το Κέντρο βοήθειας ξαναγράφτηκε ώστε να περιγράφει ακριβώς τις οθόνες, με νέες εικόνες και εγχειρίδια PDF.',
+        en: 'The Help Center was rewritten to match the screens exactly, with new pictures and PDF manuals.',
+      },
+    ],
+  },
+  {
     version: '0.30.0',
     date: '2026-10-09',
     notes: [

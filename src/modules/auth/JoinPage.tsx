@@ -155,7 +155,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
           <div className="auth-brand-mark">S</div>
           <div>
             <strong>SurgiTrack</strong>
-            <span>Healthcare Suite</span>
+            <span>Trace Every Instrument</span>
           </div>
         </div>
         <button className="auth-lang" onClick={() => setLang(el ? 'en' : 'el')}>
