@@ -148,11 +148,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τμήματα και βιβλιοθήκες',
-          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Studio → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους, πλυντήρια και χρωματικούς μάρτυρες· στη Ροή Αποστείρωσης τα στάδια.',
+          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Ρυθμίσεις νοσοκομείου → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους, πλυντήρια και χρωματικούς μάρτυρες· στη Ροή Αποστείρωσης τα στάδια.',
         ],
         en: [
           'Departments and libraries',
-          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Studio → Libraries check specialties, manufacturers, sterilizers, washers and color markers; in Sterilization Flow the stages.',
+          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Hospital settings → Libraries check specialties, manufacturers, sterilizers, washers and color markers; in Sterilization Flow the stages.',
         ],
       },
       {
@@ -409,11 +409,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καταμέτρηση χειρουργείου',
-          'Στα χειρουργεία (Studio → Βιβλιοθήκες → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» ζητά πρώτα καταμέτρηση. Το κουμπί «Καταμέτρηση» ανοίγει το έντυπο: πάνω το μέρος της Αποστείρωσης (σύνθεση, αποδέσμευση, αποστείρωση και λήξη, κύκλος), κάτω τα εργαλεία με «Εστάλη» και «Καταμετρήθηκε». Γράφετε τον κωδικό ασθενούς, τσεκάρετε ή σαρώνετε κάθε εργαλείο ή πατάτε «Όλα παρόντα», και «Υπογραφή καταμέτρησης» (όνομα και ώρα). Μετά ενεργοποιείται η αποστολή. Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το έντυπο τυπώνεται κενό ή υπογεγραμμένο, και από την Εκτύπωση του Σετ.',
+          'Στα χειρουργεία (Ρυθμίσεις νοσοκομείου → Βιβλιοθήκες → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» ζητά πρώτα καταμέτρηση. Το κουμπί «Καταμέτρηση» ανοίγει το έντυπο: πάνω το μέρος της Αποστείρωσης (σύνθεση, αποδέσμευση, αποστείρωση και λήξη, κύκλος), κάτω τα εργαλεία με «Εστάλη» και «Καταμετρήθηκε». Γράφετε τον κωδικό ασθενούς, τσεκάρετε ή σαρώνετε κάθε εργαλείο ή πατάτε «Όλα παρόντα», και «Υπογραφή καταμέτρησης» (όνομα και ώρα). Μετά ενεργοποιείται η αποστολή. Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το έντυπο τυπώνεται κενό ή υπογεγραμμένο, και από την Εκτύπωση του Σετ.',
         ],
         en: [
           'Surgical count',
-          'In operating theatres (Studio → Libraries → Departments → "Count") "Send to Sterilization" asks for the count first. The "Count" button opens the form: Sterilization’s part on top (composition, release, sterilization and expiry, cycle), the instruments below with "Sent" and "Counted". Enter the patient code, tick or scan each instrument or press "All present", then "Sign the count" (name and time). Sending is then enabled. If instruments are missing, an issue opens and Sterilization sees it at Receipt. The form prints blank or signed, also from the Set’s Print menu.',
+          'In operating theatres (Hospital settings → Libraries → Departments → "Count") "Send to Sterilization" asks for the count first. The "Count" button opens the form: Sterilization’s part on top (composition, release, sterilization and expiry, cycle), the instruments below with "Sent" and "Counted". Enter the patient code, tick or scan each instrument or press "All present", then "Sign the count" (name and time). Sending is then enabled. If instruments are missing, an issue opens and Sterilization sees it at Receipt. The form prints blank or signed, also from the Set’s Print menu.',
         ],
       },
       {
@@ -507,11 +507,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Καθαρισμός',
-          'Στον «Καθαρισμό» ο καθαρισμός καταγράφεται με φόρτωση πλυντηρίου: «Φόρτωση πλυντηρίου» πάνω από τη λίστα για πολλά μαζί ή στη γραμμή για ένα. Διαλέγετε πλυντήριο / απολυμαντή, αριθμό κύκλου και πρόγραμμα και πατάτε «Ολοκλήρωση φορτίου». Το «Χωρίς πλυντήριο» εμφανίζεται μόνο όταν το επιτρέπει η πολιτική καθαρισμού στο Studio → Ροή Αποστείρωσης.',
+          'Στον «Καθαρισμό» ο καθαρισμός καταγράφεται με φόρτωση πλυντηρίου: «Φόρτωση πλυντηρίου» πάνω από τη λίστα για πολλά μαζί ή στη γραμμή για ένα. Διαλέγετε πλυντήριο / απολυμαντή, αριθμό κύκλου και πρόγραμμα και πατάτε «Ολοκλήρωση φορτίου». Το «Χωρίς πλυντήριο» εμφανίζεται μόνο όταν το επιτρέπει η πολιτική καθαρισμού στο Ρυθμίσεις νοσοκομείου → Ροή Αποστείρωσης.',
         ],
         en: [
           'Washing',
-          'In "Washing" washing is recorded with a washer load: "Washer load" above the list for several at once, or on the row for one. Pick the washer / disinfector, the cycle number and the program and press "Complete load". "Without a washer" shows only when the washing policy in Studio → Sterilization Flow allows it.',
+          'In "Washing" washing is recorded with a washer load: "Washer load" above the list for several at once, or on the row for one. Pick the washer / disinfector, the cycle number and the program and press "Complete load". "Without a washer" shows only when the washing policy in Hospital settings → Sterilization Flow allows it.',
         ],
       },
       {
@@ -806,8 +806,8 @@ export const helpManual: ManualSection[] = [
       ],
     },
     tip: {
-      el: 'Η προεπιλεγμένη διάρκεια του νοσοκομείου ορίζεται στο Studio → Ρυθμίσεις.',
-      en: 'The hospital’s default shelf life is set in Studio → Settings.',
+      el: 'Η προεπιλεγμένη διάρκεια του νοσοκομείου ορίζεται στο Ρυθμίσεις νοσοκομείου → Ρυθμίσεις.',
+      en: 'The hospital’s default shelf life is set in Hospital settings → Settings.',
     },
     related: ['/sterilization', '/sets', '/studio'],
   },
@@ -1378,11 +1378,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Διαχειριστής νοσοκομείου',
-          'Από το Studio → Χρήστες επιλέξτε το νοσοκομείο και στείλτε πρόσκληση στον διαχειριστή του. Λαμβάνει απευθείας όνομα χρήστη και σύνδεσμο κωδικού· από εκεί και πέρα προσκαλεί ο ίδιος το προσωπικό του.',
+          'Από τα «Χρήστες» του μενού της πλατφόρμας επιλέξτε το νοσοκομείο και στείλτε πρόσκληση στον διαχειριστή του. Λαμβάνει απευθείας όνομα χρήστη και σύνδεσμο κωδικού· από εκεί και πέρα προσκαλεί ο ίδιος το προσωπικό του.',
         ],
         en: [
           'Hospital administrator',
-          'In Studio → Users pick the hospital and invite its administrator. They get a username and a password link straight away; from then on they invite their own staff.',
+          'In the platform menu’s "Users" pick the hospital and invite its administrator. They get a username and a password link straight away; from then on they invite their own staff.',
         ],
       },
       {

@@ -1,5 +1,11 @@
 import {describe, expect, it} from 'vitest';
-import {defaultSterilizationWorkflow, nextStateAfter, reprocessState, workflowStageState} from '../workflow';
+import {
+  defaultSterilizationWorkflow,
+  nextStateAfter,
+  reprocessState,
+  upgradeWorkflowLabels,
+  workflowStageState,
+} from '../workflow';
 import type {WorkflowStageConfig} from '../workflow';
 
 const withStages = (overrides: Partial<Record<WorkflowStageConfig['id'], boolean>>): WorkflowStageConfig[] =>
@@ -92,5 +98,22 @@ describe('protected core stages', () => {
     defaultSterilizationWorkflow.stages.forEach(stage => {
       expect(workflowStageState[stage.id]).toBeDefined();
     });
+  });
+});
+
+describe('stage names', () => {
+  const withLabel = (id: string, labelEl: string) => ({
+    ...defaultSterilizationWorkflow,
+    stages: defaultSterilizationWorkflow.stages.map(stage => (stage.id === id ? {...stage, labelEl} : stage)),
+  });
+
+  it('gives a stage still carrying an earlier default name the current short one', () => {
+    const upgraded = upgradeWorkflowLabels(withLabel('WASHING', 'Καθαρισμός & Απολύμανση'));
+    expect(upgraded.stages.find(stage => stage.id === 'WASHING')?.labelEl).toBe('Καθαρισμός');
+  });
+
+  it('keeps a name the hospital gave the stage itself', () => {
+    const upgraded = upgradeWorkflowLabels(withLabel('WASHING', 'Πλυντήρια'));
+    expect(upgraded.stages.find(stage => stage.id === 'WASHING')?.labelEl).toBe('Πλυντήρια');
   });
 });

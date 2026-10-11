@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import {expiryAlerts, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import PageHeader from '../../components/ui/PageHeader';
-import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
 import {workflowStageState} from '../../core/workflow';
 import {useLibraries} from '../../core/LibraryStore';
@@ -143,12 +142,12 @@ export default function HospitalOverviewPage() {
       const here = tracked.filter(a => a.state === state);
       if (!stage.enabled && !here.length) return [];
       if (stage.id !== 'STERILIZATION')
-        return [{key: stage.id, label: statusLabel(state), queue: QUEUE_OF[state], count: here.length}];
+        return [{key: stage.id, label: L(stage.labelEl, stage.labelEn), queue: QUEUE_OF[state], count: here.length}];
       const running = here.filter(a => inSterilizer.has(a.id)).length;
       return [
         {
           key: 'PROCESS',
-          label: L('Αναμονή φόρτωσης', 'Waiting to load'),
+          label: L(stage.labelEl, stage.labelEn),
           queue: 'PROCESS',
           count: here.length - running,
         },
@@ -313,7 +312,7 @@ export default function HospitalOverviewPage() {
                 title={`${p.label}: ${p.count}`}
               >
                 {/* The short form fits the card; the full name is in the tooltip. */}
-                <span className="dash-bar-name">{p.label.replace(/ από Αποστείρωση$/, '')}</span>
+                <span className="dash-bar-name">{p.label}</span>
                 <span className="dash-bar-track">
                   <i style={{width: `${(p.count / pipelineMax) * 100}%`}} />
                 </span>

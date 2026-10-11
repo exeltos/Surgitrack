@@ -9,6 +9,7 @@ import LibraryEditor from './LibraryEditor';
 import OrganizationEditor from './OrganizationEditor';
 import {useStudioPage} from './useStudioPage';
 import StudioTabs from './tabs/StudioTabs';
+import {useLocation} from 'react-router-dom';
 import {isPlatformOnly} from '../../core/platformOnly';
 import {STUDIO_TABS, type Tab} from './studioMeta';
 import PlatformTab from './tabs/PlatformTab';
@@ -46,11 +47,30 @@ const SECTION_TEXT: Record<Tab, [string, string]> = {
   SYSTEM: ['Επαφή υποστήριξης, ετικέτες και γενικές ρυθμίσεις.', 'Support contact, labels and general settings.'],
 };
 
+/** Inside a hospital the same sections set up that hospital, not the ones to come. */
+const HOSPITAL_SECTION_TEXT: Partial<Record<Tab, [string, string]>> = {
+  LIBRARIES: [
+    'Οι λίστες του νοσοκομείου: ειδικότητες, κατασκευαστές, κλίβανοι και άλλες.',
+    'The hospital’s lists: specialties, makers, sterilizers and more.',
+  ],
+  WORKFLOW: [
+    'Τα στάδια της Αποστείρωσης του νοσοκομείου και οι κανόνες τους.',
+    'The hospital’s sterilization stages and their rules.',
+  ],
+  ROLES: ['Τι μπορεί να κάνει κάθε ρόλος στο νοσοκομείο.', 'What each role can do in the hospital.'],
+  SYSTEM: [
+    'Διάρκεια αποστείρωσης, ετικέτες, κλείδωμα οθόνης και υπενθυμίσεις.',
+    'Sterile shelf life, labels, screen lock and reminders.',
+  ],
+};
+
 export default function StudioPage() {
   const s = useStudioPage();
   const [rolesView, setRolesView] = useState<'PERMISSIONS' | 'GUIDE'>('PERMISSIONS');
-  // The owner's menu holds the sections: the page shows one, titled, with no tab rows.
-  const section = isPlatformOnly() ? STUDIO_TABS.find(t => t.id === s.tab) : undefined;
+  // A menu entry opens one section («?tab=…»): the page shows it, titled, with no tab rows.
+  const section = new URLSearchParams(useLocation().search).get('tab')
+    ? STUDIO_TABS.find(t => t.id === s.tab)
+    : undefined;
   const {
     L,
     changePlan,
@@ -93,7 +113,7 @@ export default function StudioPage() {
           <h1>{section ? L(section.el, section.en) : 'SurgiTrack Studio'}</h1>
           <p>
             {section
-              ? L(...SECTION_TEXT[section.id])
+              ? L(...((!isPlatformOnly() && HOSPITAL_SECTION_TEXT[section.id]) || SECTION_TEXT[section.id]))
               : platformAdmin
                 ? L(
                     'Νοσοκομεία, χρήστες, demo πρόσβαση και βιβλιοθήκες της πλατφόρμας.',

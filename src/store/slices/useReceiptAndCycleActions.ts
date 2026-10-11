@@ -262,7 +262,7 @@ export function useReceiptAndCycleActions(
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
-      from: 'Σύνθεση & Προετοιμασία',
+      from: 'Σύνθεση',
       to:
         sterilizationWorkflow.stages.find(stage => workflowStageState[stage.id] === nextStateAfter('PREPARATION'))
           ?.labelEl || 'Επόμενο στάδιο',

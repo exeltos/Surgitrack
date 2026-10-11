@@ -11184,12 +11184,13 @@ html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan
   font-size: 13px;
   font-weight: 700;
 }
-/* Stage cards: the short description stays on one line. */
+/* Stage cards: the short description shows whole, on two lines where it needs them; every card in a row keeps
+   the same height. */
 html body .sterilization-workspace .sterile-queues.modern button > small {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
   font-size: 11px;
+  line-height: 1.25;
 }
 /* The status column speaks only for an open issue; otherwise a quiet dash. */
 html body .sterilization-workspace .ster-meta-none {

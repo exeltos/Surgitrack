@@ -165,8 +165,8 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
   {
     key: 'sterilization.prepare',
     group: 'WORKFLOW',
-    el: 'Έλεγχος & Σύνθεση',
-    en: 'Inspection & Assembly',
+    el: 'Σύνθεση',
+    en: 'Assembly',
     hintEl: 'Έλεγχος, αποκλίσεις, αντικαταστάσεις και σύνθεση.',
     hintEn: 'Inspection, deviations, replacement and assembly.',
   },

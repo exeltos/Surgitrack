@@ -72,7 +72,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </div>
               <small>
                 {L(
-                  'Προτείνεται στη Συσκευασία & Σήμανση και αλλάζει ανά Σετ ή εργαλείο. Μετρά από την αποδέσμευση.',
+                  'Προτείνεται στη Συσκευασία και αλλάζει ανά Σετ ή εργαλείο. Μετρά από την αποδέσμευση.',
                   'Suggested at Packaging & Labelling and changeable per Set or instrument. Counted from the release.',
                 )}
               </small>
