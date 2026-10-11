@@ -109,7 +109,8 @@ export default function IssuesPage() {
         className={tab === 'REPORTS' ? 'active' : ''}
         onClick={() => setParams({}, {replace: true})}
       >
-        <ClipboardList size={16} /> {tr('Αναφορές προβλημάτων')}{' '}
+        <ClipboardList size={16} /> <span className="tab-long">{tr('Αναφορές προβλημάτων')}</span>
+        <span className="tab-short">{tr('Αναφορές')}</span>{' '}
         <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
       </button>
       <button
@@ -118,7 +119,8 @@ export default function IssuesPage() {
         className={tab === 'REPLACEMENTS' ? 'active' : ''}
         onClick={() => setParams({tab: 'replacements'}, {replace: true})}
       >
-        <PackageX size={16} /> {tr('Αντικαταστάσεις & Παραγγελίες')} <b>{neededReplacements}</b>
+        <PackageX size={16} /> <span className="tab-long">{tr('Αντικαταστάσεις & Παραγγελίες')}</span>
+        <span className="tab-short">{tr('Αντικαταστάσεις')}</span> <b>{neededReplacements}</b>
       </button>
     </div>
   ) : null;
@@ -146,7 +148,7 @@ export default function IssuesPage() {
               {label: tr('Σύνολο'), value: counted.length, ...card('')},
               {label: tr('Ανοικτές'), value: counted.filter(i => i.status === 'OPEN').length, ...card('OPEN')},
               {
-                label: tr('Ανοικτές πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
+                label: tr('Πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
                 value: counted.filter(isOld).length,
                 ...card('OPEN', 'OLD'),
               },

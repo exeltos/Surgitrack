@@ -11,15 +11,15 @@ const rows = () => within(table()).queryAllByRole('row').slice(1);
 describe('Replacements', () => {
   it('splits what needs replacing into what Stock has and what it lacks', () => {
     renderPage(<ReplacementsPage />, {path: '/replacements'});
-    const needed = kpiValue('Χρειάζονται αντικατάσταση');
+    const needed = kpiValue('Προς αντικατάσταση');
     expect(needed).toBeGreaterThan(0);
-    expect(kpiValue('Υπάρχει στο απόθεμα') + kpiValue('Δεν υπάρχει στο απόθεμα')).toBe(needed);
+    expect(kpiValue('Με απόθεμα') + kpiValue('Χωρίς απόθεμα')).toBe(needed);
   });
 
   it.each([
-    ['Χρειάζονται αντικατάσταση', null],
-    ['Υπάρχει στο απόθεμα', /^Ναι · \d+$/],
-    ['Δεν υπάρχει στο απόθεμα', /^Όχι$/],
+    ['Προς αντικατάσταση', null],
+    ['Με απόθεμα', /^Ναι · \d+$/],
+    ['Χωρίς απόθεμα', /^Όχι$/],
   ] as const)('lists exactly what «%s» counts', (label, stock) => {
     renderPage(<ReplacementsPage />, {path: '/replacements'});
     fireEvent.click(kpi(label));
@@ -30,15 +30,15 @@ describe('Replacements', () => {
 
   it('replaces an instrument from Stock once confirmed, and only then', () => {
     renderPage(<ReplacementsPage />, {path: '/replacements'});
-    fireEvent.click(kpi('Υπάρχει στο απόθεμα'));
-    const before = kpiValue('Χρειάζονται αντικατάσταση');
+    fireEvent.click(kpi('Με απόθεμα'));
+    const before = kpiValue('Προς αντικατάσταση');
     fireEvent.click(within(rows()[0]).getByRole('button', {name: /Αντικατάσταση/}));
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByText('Αντικατάσταση από το Απόθεμα;')).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole('button', {name: 'Ακύρωση'}));
-    expect(kpiValue('Χρειάζονται αντικατάσταση')).toBe(before);
+    expect(kpiValue('Προς αντικατάσταση')).toBe(before);
     fireEvent.click(within(rows()[0]).getByRole('button', {name: /Αντικατάσταση/}));
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', {name: 'Αντικατάσταση'}));
-    expect(kpiValue('Χρειάζονται αντικατάσταση')).toBe(before - 1);
+    expect(kpiValue('Προς αντικατάσταση')).toBe(before - 1);
   });
 });

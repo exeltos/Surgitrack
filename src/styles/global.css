@@ -8436,12 +8436,6 @@ html body .expiry-table th:nth-child(1) {
 html body .expiry-table th:nth-child(2) {
   width: 88px;
 }
-html body .expiry-table th:nth-child(3) {
-  width: 14%;
-}
-html body .expiry-table th:nth-child(4) {
-  width: 128px;
-}
 html body .expiry-table th:nth-child(6),
 html body .expiry-table th:nth-child(7) {
   width: 112px;
@@ -8637,14 +8631,8 @@ html body .issues-fixed .issue-note-inline {
   html body .expiry-table td:nth-child(7) {
     display: table-cell;
   }
-  html body .expiry-table th:nth-child(3) {
-    width: 150px;
-  }
   html body .expiry-table th:nth-child(6) {
     width: 140px;
-  }
-  html body .expiry-table th:nth-child(8) {
-    width: 156px;
   }
   /* Issues: the note goes under the item instead of its own squeezed column. */
   html body .issues-fixed th:nth-child(2),
@@ -9326,9 +9314,6 @@ html body .asset-create-hint {
 /* Replacements toolbar on a phone: the search on its own line, the buttons below it (one row
    squeezed the search to a letter and cut off «Λήψη»). */
 @media (max-width: 700px) {
-  html body .replacements-toolbar {
-    flex-wrap: wrap;
-  }
   html body .replacements-toolbar .replacements-search {
     flex: 1 0 100%;
   }
@@ -11421,5 +11406,140 @@ html body .ster-row-load b {
     display: block;
     font-size: 13px;
     font-weight: 600;
+  }
+}
+/* Issues and Expiry review. Short tab labels exist for the phone only. */
+html body .issues-tabs .tab-short {
+  display: none;
+}
+/* Issue actions in fixed places: «open» at the far right, «Επίλυση» left of it, «Παραγγελία» before. */
+@media (min-width: 701px) {
+  html body .issues-fixed .issue-actions-row {
+    display: grid;
+    grid-auto-flow: dense;
+    grid-template-columns: auto auto 34px;
+    justify-content: end;
+    align-items: center;
+    gap: 6px;
+  }
+  html body .issues-fixed .issue-actions-row > a.issue-action {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  html body .issues-fixed .issue-actions-row > button.issue-action:last-child {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  html body .issues-fixed .issue-actions-row > button.issue-action:not(:last-child) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+/* The search icon keeps its size next to the field. */
+html body .replacements-search > svg {
+  flex: 0 0 auto;
+}
+/* Replacements on a tablet: icon-only row buttons and tighter columns, so the name keeps its room. */
+@media (min-width: 701px) and (max-width: 1280px) {
+  html body .replacements-fixed th.col-set {
+    width: 16%;
+  }
+  html body .replacements-fixed th.col-reason {
+    width: 100px;
+  }
+  html body .replacements-fixed th.col-stock {
+    width: 72px;
+  }
+  html body .replacements-fixed th.col-status {
+    width: 124px;
+  }
+  html body .replacements-fixed .replacement-status {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+  }
+  html body .replacements-fixed th.col-actions {
+    width: 128px;
+  }
+  html body .replacements-table .row-actions button .btn-label {
+    display: none;
+  }
+  html body .replacements-fixed .row-actions button {
+    padding: 0 9px;
+  }
+}
+/* Expiry on a tablet: narrower fixed columns, the name keeps its room. */
+html body .expiry-sub-barcode {
+  display: none;
+}
+html body .expiry-table th:nth-child(4) {
+  width: 150px;
+}
+html body .expiry-table th:nth-child(3) {
+  width: 12%;
+}
+@media (max-width: 1280px) {
+  html body .expiry-table th:nth-child(2),
+  html body .expiry-table td:nth-child(2) {
+    display: none;
+  }
+  html body .expiry-sub-barcode {
+    display: inline;
+  }
+  html body .expiry-table th:nth-child(3) {
+    width: 130px;
+  }
+  html body .expiry-table th:nth-child(6),
+  html body .expiry-table th:nth-child(7) {
+    width: 108px;
+  }
+  html body .expiry-table th:nth-child(8) {
+    width: 132px;
+  }
+  html body .expiry-table th:nth-child(9) {
+    width: 32px;
+  }
+}
+/* Expiry: the place badge stays on one line. */
+html body .expiry-table td:nth-child(4) > .badge {
+  white-space: nowrap;
+}
+/* Compact KPI cards keep one row of four down to a portrait tablet. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  html body .compact-kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  html body .issues-tabs .tab-long {
+    display: none;
+  }
+  html body .issues-tabs .tab-short {
+    display: inline;
+  }
+  /* The phone card has its own barcode line. */
+  html body .expiry-sub-barcode {
+    display: none;
+  }
+  /* Replacements toolbar: the search on one line, the three buttons side by side below it. */
+  html body .replacements-toolbar {
+    flex-wrap: wrap;
+  }
+  html body .replacements-toolbar > :not(.replacements-search):not(.replacements-spacer) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  html body .replacements-toolbar button > svg {
+    flex: 0 0 auto;
+  }
+  html body .replacements-toolbar > :not(.replacements-search) button,
+  html body .replacements-toolbar > button {
+    gap: 5px;
+    width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 }
