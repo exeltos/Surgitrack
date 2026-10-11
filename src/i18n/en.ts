@@ -1828,7 +1828,9 @@ export const en: Record<string, string> = {
     'Each Demo is a separate hospital with sample data. The contact person gets an email with their account, and the Demo locks when it ends.',
   'Νέο Demo': 'New Demo',
   'Αντιγραφή συνδέσμου': 'Copy link',
-  'Δεν έχει ανοίξει κανένα Demo αξιολόγησης.': 'No evaluation Demo has been opened yet.',
+  'Κανένα Demo αξιολόγησης ακόμη': 'No evaluation Demo yet',
+  'Ένα Demo δίνει σε έναν υποψήφιο πελάτη δικό του νοσοκομείο με δοκιμαστικά δεδομένα, για όσες ημέρες ορίσετε.':
+    'A Demo gives a prospective customer a hospital of their own with sample data, for as many days as you set.',
   'Επαναφορά δεδομένων': 'Reset data',
   'Θα διαγραφούν όλα τα δεδομένα του «{0}» και θα φορτωθούν ξανά τα αρχικά δοκιμαστικά. Οι χρήστες και τα τμήματα μένουν.':
     'All data of «{0}» will be deleted and the original sample data loaded again. Users and departments stay.',

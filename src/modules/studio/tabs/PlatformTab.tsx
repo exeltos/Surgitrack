@@ -85,24 +85,27 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
           </AppButton>
         </div>
       </header>
-      <div className="platform-kpis">
-        <div>
-          <span>{L('Νοσοκομεία', 'Hospitals')}</span>
-          <strong>{displayedOrganizations.length}</strong>
+      {/* The hospital figures belong with the hospitals, not with the Demos. */}
+      {current === 'HOSPITALS' && (
+        <div className="platform-kpis">
+          <div>
+            <span>{L('Νοσοκομεία', 'Hospitals')}</span>
+            <strong>{displayedOrganizations.length}</strong>
+          </div>
+          <div>
+            <span>{L('Ενεργά', 'Active')}</span>
+            <strong>{displayedOrganizations.filter(org => org.active).length}</strong>
+          </div>
+          <div>
+            <span>{L('Σε δοκιμαστική περίοδο', 'On trial')}</span>
+            <strong>{trials.filter(org => !trialEnded(org.plan, org.trialEndsAt)).length}</strong>
+          </div>
+          <div>
+            <span>{L('Χρήστες νοσοκομείων', 'Hospital users')}</span>
+            <strong>{displayedUsers.length}</strong>
+          </div>
         </div>
-        <div>
-          <span>{L('Ενεργά', 'Active')}</span>
-          <strong>{displayedOrganizations.filter(org => org.active).length}</strong>
-        </div>
-        <div>
-          <span>{L('Σε δοκιμαστική περίοδο', 'On trial')}</span>
-          <strong>{trials.filter(org => !trialEnded(org.plan, org.trialEndsAt)).length}</strong>
-        </div>
-        <div>
-          <span>{L('Χρήστες νοσοκομείων', 'Hospital users')}</span>
-          <strong>{displayedUsers.length}</strong>
-        </div>
-      </div>
+      )}
       <nav className="platform-views" aria-label={L('Ενότητες', 'Sections')}>
         {views.map(v => (
           <button
