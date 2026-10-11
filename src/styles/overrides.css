@@ -88,12 +88,6 @@
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
-.camera-modal-backdrop {
-  z-index: 1400 !important;
-}
-.camera-modal {
-  z-index: 1401 !important;
-}
 
 /* Studio v0.29.6 — Hospital access workspace */
 .studio-users-panel > .studio-panel-head select {
@@ -313,10 +307,6 @@
   font-weight: 700;
   cursor: pointer;
 }
-.asset-filter-panel footer button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 .asset-filter-panel footer button.primary {
   border-color: var(--c-cyan-45);
   background: var(--c-cyan-45);
@@ -360,12 +350,6 @@
 }
 
 /* Date filters inside the Filters panel. */
-.asset-filter-date {
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--muted);
-}
 .asset-filter-date input {
   min-height: 36px;
   border: 1px solid var(--line, var(--c-gray-90-2));
@@ -380,35 +364,11 @@
 .movement-filter-bar {
   margin-bottom: 14px;
 }
-/* In the Reports filter strip the Filters button sits on the left: open its panel to the right. */
-.reports-filter-strip .asset-filter-panel {
-  left: 0;
-  right: auto;
-}
 
 /* Tool / Set card: when editing makes the fields taller than the screen, the card scrolls
    instead of squeezing the barcode, uses and photo tiles out of sight. */
-.asset-workbench-sidebar {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
 .asset-workbench-sidebar > * {
   flex-shrink: 0;
-}
-/* The photo count sits in the corner, clear of the "Photo" label. */
-.asset-tool-photo-card {
-  position: relative;
-}
-.asset-tool-photo-card .asset-cover-count {
-  top: 6px !important;
-  right: 6px !important;
-  bottom: auto !important;
-  left: auto !important;
-  transform: scale(0.85);
-  transform-origin: top right;
-}
-.asset-tool-photo-empty strong {
-  white-space: nowrap;
 }
 /* Short screens: the menu scrolls inside the sidebar, so every item stays reachable. */
 .sidebar nav {
@@ -459,11 +419,6 @@
   margin: 4px 0 0;
   font-size: 18px;
 }
-.asset-manage-choices {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
 .asset-manage-choices button {
   display: flex;
   gap: 10px;
@@ -496,11 +451,6 @@
 }
 .asset-manage-choices button.danger {
   color: var(--c-red-40);
-}
-.asset-manage-choices button.danger.active {
-  border-color: var(--c-red-40);
-  background: var(--c-gray-100-4);
-  box-shadow: inset 0 0 0 1px var(--c-red-40);
 }
 .asset-manage-target {
   flex: 1;
@@ -566,44 +516,11 @@
   font-size: 12.5px;
   color: var(--c-cyan-40-2);
 }
-.asset-manage-note textarea {
-  flex: 1;
-  min-height: 80px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  padding: 9px 11px;
-  font: inherit;
-  resize: none;
-}
 .asset-manage-modal > footer {
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-}
-.asset-manage-follows {
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--c-amber-95-2);
-  color: var(--c-amber-35);
-  font-size: 13px;
-  line-height: 1.45;
-}
-.asset-manage-choices[hidden] {
-  display: none;
-}
-.asset-manage-reports {
-  display: grid;
-  gap: 6px;
-  padding: 10px 12px;
-  border: 1px solid var(--c-amber-85);
-  border-radius: 12px;
-  background: var(--c-gray-100);
-  font-size: 13px;
-}
-.asset-manage-reports > b {
-  color: var(--c-amber-35);
 }
 .asset-manage-reports label {
   display: flex;
@@ -634,9 +551,6 @@
   line-height: 1;
   overflow: hidden;
 }
-.tape-swatch b.on-dark {
-  color: var(--c-white);
-}
 .tape-sm {
   width: 16px;
   height: 7px;
@@ -662,23 +576,9 @@
   gap: 2px;
   vertical-align: middle;
 }
-.color-marker-sm {
-  margin-left: 6px;
-}
 .color-marker-empty {
   color: var(--muted);
   font-size: 12px;
-}
-.asset-ownership-field dd {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.asset-marker-field dd {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 .asset-marker-field dd small {
   color: var(--muted);
@@ -748,11 +648,6 @@
   justify-content: flex-end;
   gap: 8px;
 }
-.color-mode-choices {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
 .color-mode-choices label {
   display: flex;
   gap: 8px;
@@ -771,10 +666,6 @@
   color: var(--st-muted);
   font-size: 12px;
 }
-.color-mode-choices label.active {
-  border-color: var(--c-cyan-40);
-  background: var(--c-gray-95);
-}
 .color-selection {
   display: flex;
   flex-wrap: wrap;
@@ -789,19 +680,6 @@
 .color-selection em {
   color: var(--st-muted);
 }
-.color-selection-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-}
-.color-selection-actions {
-  display: inline-flex;
-  gap: 2px;
-}
 .color-selection-actions button {
   display: inline-grid;
   place-items: center;
@@ -812,43 +690,11 @@
   background: var(--c-gray-95);
   cursor: pointer;
 }
-.color-selection-actions button:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-.color-duplicate {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: var(--c-amber-95-2);
-  color: var(--c-orange-40);
-  font-size: 13px;
-}
-.color-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  min-height: 38px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  color: var(--st-muted);
-}
 .color-search input {
   flex: 1;
   border: 0;
   outline: 0;
   font: inherit;
-}
-.color-palette {
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  gap: 12px;
-  padding-right: 4px;
 }
 .color-palette section > b,
 .tape-library-groups section > b {
@@ -879,24 +725,6 @@
   font-size: 11.5px;
   color: var(--c-cyan-30);
 }
-.color-palette button:hover:not(:disabled) {
-  border-color: var(--c-cyan-40);
-}
-.color-palette button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-/* The "keep own color or take the Set's" question sits above the dialog that asked it. */
-.nested-color-question {
-  z-index: 1300;
-}
-.color-question-rows {
-  display: grid;
-  gap: 6px;
-  max-height: 260px;
-  overflow-y: auto;
-}
 .color-question-rows > div {
   display: flex;
   justify-content: space-between;
@@ -906,10 +734,6 @@
   border-radius: 10px;
   background: var(--c-white);
   font-size: 13px;
-}
-.color-question-rows > .color-question-set {
-  background: var(--c-gray-95);
-  font-weight: 600;
 }
 .color-question-modal > p {
   margin: 0;
@@ -1170,11 +994,6 @@
   background: var(--c-white);
   box-shadow: 0 24px 60px rgba(15, 40, 55, 0.25);
 }
-.new-barcode-modal > header {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
 .new-barcode-modal h2 {
   margin: 4px 0 0;
   font-size: 18px;
@@ -1185,34 +1004,10 @@
   font-size: 13px;
   line-height: 1.45;
 }
-.new-barcode-swap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--c-gray-100-2);
-  color: var(--st-muted);
-}
 .new-barcode-swap span {
   display: grid;
   gap: 2px;
   text-align: center;
-}
-.new-barcode-swap small {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.new-barcode-swap b {
-  font-size: 18px;
-  color: var(--st-muted);
-  text-decoration: line-through;
-}
-.new-barcode-swap .new b {
-  color: var(--c-cyan-40);
-  text-decoration: none;
 }
 .new-barcode-reasons {
   display: flex;
@@ -1221,31 +1016,6 @@
   align-items: center;
   font-size: 13px;
   color: var(--c-cyan-40-2);
-}
-.new-barcode-reasons > span {
-  width: 100%;
-}
-.new-barcode-reasons label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 11px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 999px;
-  cursor: pointer;
-}
-.new-barcode-reasons label.active {
-  border-color: var(--c-cyan-40);
-  background: var(--c-gray-95);
-  color: var(--c-cyan-30-2);
-}
-.new-barcode-reasons input {
-  display: none;
-}
-.new-barcode-modal > footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
 }
 
 /* A page that failed to open: the menu stays usable. */
@@ -1422,29 +1192,6 @@
   .asset-import-hospital {
     width: 100%;
   }
-}
-
-/* Problem report: where Loss and Service are declared instead */
-.report-type-hint {
-  display: block;
-  margin-top: 6px;
-  color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.45;
-}
-.report-type-hint button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--st-teal, var(--c-cyan-45));
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 /* Phones: every top-bar button stays on screen (language moves into the accessibility panel) */
@@ -2266,41 +2013,6 @@ div.asset-import-hospital b {
   align-content: start;
   overflow-wrap: anywhere;
 }
-
-/* Έλεγχος ονομασιών: spelling fixes and codes with several names. */
-.name-check {
-  display: grid;
-  gap: 16px;
-  padding-bottom: 24px;
-}
-.name-check-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-.name-check-kpis > div {
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-.name-check-kpis span,
-.name-check-kpis small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.name-check-kpis strong {
-  color: var(--c-blue-15-2);
-  font-size: 24px;
-}
-.name-check-kpis .warn strong {
-  color: var(--c-orange-50-2);
-}
-.name-check-kpis .good strong {
-  color: var(--c-green-45);
-}
 .name-check-tabs {
   display: flex;
   flex: none;
@@ -2334,23 +2046,6 @@ div.asset-import-hospital b {
   color: var(--c-orange-45-2);
   font-size: 12px;
 }
-.name-check-card,
-.name-check-group {
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-.name-check-card > header,
-.name-check-group > header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
 .name-check-card > header > div {
   display: grid;
   gap: 3px;
@@ -2360,17 +2055,6 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 12.5px;
   line-height: 1.45;
-}
-.name-check-table {
-  max-height: 560px;
-  overflow: auto;
-  border: 1px solid var(--c-gray-95);
-  border-radius: 10px;
-}
-.name-check-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
 }
 .name-check-table th {
   position: sticky;
@@ -2382,43 +2066,11 @@ div.asset-import-hospital b {
   text-align: left;
   text-transform: uppercase;
 }
-.name-check-table td {
-  padding: 7px 10px;
-  border-top: 1px solid var(--c-gray-95);
-}
-.name-check-table td.from {
-  color: var(--c-red-40-4);
-}
-.name-check-table td.to {
-  color: var(--c-green-40);
-  font-weight: 600;
-}
-.name-check-table td.arrow {
-  color: var(--st-muted);
-  width: 20px;
-}
-.name-check-table td.num,
-.name-check-table th:last-child {
-  text-align: right;
-}
-.name-check-table td.num {
-  font-weight: 700;
-}
-.name-check-table tr.skipped td {
-  opacity: 0.45;
-}
-.name-check-codes {
-  display: grid;
-  gap: 10px;
-}
 .name-check-filter {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-}
-.name-check-filter small {
-  color: var(--st-muted);
 }
 .name-check-search,
 .name-check-group footer input {
@@ -2432,61 +2084,13 @@ div.asset-import-hospital b {
   background: var(--c-white);
   color: var(--st-muted);
 }
-.name-check-search input {
-  flex: 1;
-  height: 36px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font: inherit;
-}
-.name-check-only {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--c-cyan-40-2);
-}
 .name-check-group header > div {
   display: flex;
   align-items: baseline;
   gap: 10px;
 }
-.name-check-group code {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--c-blue-15-2);
-}
 .name-check-group header small {
   color: var(--st-muted);
-}
-.name-check-odd {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--c-gray-95-2);
-  color: var(--c-red-40);
-  font-size: 12px;
-  font-weight: 700;
-}
-.name-check-group ul {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.name-check-group li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: var(--c-gray-100-2);
-  font-size: 13px;
 }
 .name-check-group li label {
   display: flex;
@@ -2494,21 +2098,11 @@ div.asset-import-hospital b {
   gap: 8px;
   min-width: 0;
 }
-.name-check-group li.odd {
-  background: var(--c-gray-100-4);
-}
 .name-check-group li em {
   color: var(--c-red-40);
   font-size: 12px;
   font-style: normal;
   font-weight: 700;
-}
-.name-check-group footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  justify-content: flex-end;
 }
 .name-check-group footer input {
   flex: 1;
@@ -2516,36 +2110,6 @@ div.asset-import-hospital b {
   color: var(--c-blue-15-2);
   font: inherit;
   font-size: 13px;
-}
-.name-check-empty {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  padding: 36px;
-  border: 1px dashed var(--c-gray-90-2);
-  border-radius: 12px;
-  color: var(--c-green-45);
-}
-@media (max-width: 760px) {
-  .name-check-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* Name check: a count opens its instruments. */
-.name-check-count {
-  min-width: 34px;
-  padding: 2px 8px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 999px;
-  background: var(--c-white);
-  color: var(--c-cyan-35);
-  font: inherit;
-  font-weight: 800;
-  cursor: pointer;
-}
-.name-check-count:hover {
-  background: var(--c-gray-95-3);
 }
 .name-check-list {
   display: grid;
@@ -2558,12 +2122,6 @@ div.asset-import-hospital b {
   background: var(--c-white);
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
 }
-.name-check-list > header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
 .name-check-list > header span {
   color: var(--st-muted);
   font-size: 12px;
@@ -2573,17 +2131,6 @@ div.asset-import-hospital b {
   margin: 2px 0 0;
   color: var(--c-blue-15-2);
   font-size: 17px;
-}
-.name-check-list-table {
-  min-height: 0;
-  overflow: auto;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-}
-.name-check-list-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
 }
 .name-check-list-table th {
   position: sticky;
@@ -2595,55 +2142,11 @@ div.asset-import-hospital b {
   text-align: left;
   text-transform: uppercase;
 }
-.name-check-list-table td {
-  padding: 8px 10px;
-  border-top: 1px solid var(--c-gray-95);
-}
 .name-check-list-table tbody tr {
   cursor: pointer;
 }
 .name-check-list-table tbody tr:hover {
   background: var(--c-gray-100-2);
-}
-.name-check-list-table td.mono {
-  font-family: ui-monospace, monospace;
-  white-space: nowrap;
-}
-.name-check-list-table td.go {
-  color: var(--st-muted);
-  width: 20px;
-}
-.name-check-list > small {
-  color: var(--st-muted);
-}
-.name-check-sets {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-amber-85);
-  border-radius: 12px;
-  background: var(--c-gray-100);
-  color: var(--c-orange-45-2);
-}
-.name-check-sets span {
-  display: grid;
-  gap: 3px;
-  color: var(--c-amber-25);
-}
-.name-check-sets small {
-  color: #7a6235;
-  font-size: 12.5px;
-  line-height: 1.45;
-}
-@media (max-width: 760px) {
-  .name-check-sets {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .name-check-sets > :last-child {
-    grid-column: 1 / -1;
-  }
 }
 
 /* Βλάβες & Αντικαταστάσεις: instruments to replace, Stock availability and purchase orders. */
@@ -3267,9 +2770,6 @@ div.asset-import-hospital b {
     width: auto;
     flex-wrap: nowrap;
   }
-  .asset-page-actions button {
-    flex: 0 0 auto;
-  }
 }
 
 /* Empty lists: one look for «nothing here yet» and «nothing matches». */
@@ -3442,24 +2942,6 @@ div.asset-import-hospital b {
 }
 
 /* Two button heights everywhere: 38px for page-level buttons, 32px inside tables and rows. */
-html
-  body
-  .content
-  :is(
-    .app-button-md,
-    .asset-page-actions button,
-    .page-head > .primary,
-    .movements-actions > button,
-    .set-composition-actions .app-button,
-    .hospital-users-toolbar .app-button,
-    .hospital-user-actions .app-button,
-    .asset-filter-toggle,
-    .count-sign,
-    .device-actions .app-button
-  ) {
-  min-height: 38px !important;
-  height: auto;
-}
 html body .content .asset-list-controls .icon-toggle {
   align-self: center;
   height: 38px;
@@ -3957,12 +3439,6 @@ html body .asset-detail-workspace .eyebrow {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-html body .asset-workbench-fields dt {
-  white-space: nowrap;
-}
-html body .asset-workbench-fields > div {
-  grid-template-columns: 150px minmax(0, 1fr);
-}
 html body .asset-detail-body .set-tool-uses strong {
   white-space: nowrap;
   overflow: hidden;
@@ -3981,9 +3457,6 @@ html body .asset-create-field-list label > small {
   margin-top: -2px;
 }
 /* Name check KPIs: same slim look as the other pages. */
-html body .name-check-kpis > div {
-  padding: 8px 14px;
-}
 html body .name-check-kpis strong {
   font-size: 20px;
 }
@@ -4227,26 +3700,6 @@ html body .replacements-fixed .replacement-status {
   text-overflow: ellipsis;
   vertical-align: middle;
 }
-/* Asset card: compact enough to fit a laptop screen without its own scrollbar. */
-html body .asset-workbench-sidebar {
-  padding: 12px 14px;
-}
-html body .asset-workbench-title {
-  gap: 8px;
-}
-html body .asset-workbench-fields {
-  margin: 6px 0 8px;
-}
-html body .asset-workbench-fields > div {
-  min-height: 27px;
-}
-html body .asset-cover-empty small {
-  display: none;
-}
-html body .asset-cover-empty svg {
-  width: 20px;
-  height: 20px;
-}
 /* Set composition rows: the "Uses" label is repeated on every row, so only the value is shown. */
 html body .asset-detail-body .set-tool-uses > span {
   display: none;
@@ -4254,31 +3707,6 @@ html body .asset-detail-body .set-tool-uses > span {
 html body .asset-detail-body .set-tool-row {
   padding-top: 6px !important;
   padding-bottom: 6px !important;
-}
-html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
-  grid-template-columns: 150px minmax(0, 1fr);
-  min-height: 25px;
-}
-html body .asset-workbench-sidebar-tool .asset-workbench-fields dt {
-  white-space: nowrap;
-}
-html body .asset-workbench-sidebar-tool .asset-workbench-title-status small {
-  display: none;
-}
-html body .asset-workbench-fields > div,
-html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
-  min-height: 23px;
-}
-html body .asset-workbench-fields dd {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-html body .asset-workbench-title {
-  padding-bottom: 6px;
-}
-html body .asset-cover {
-  height: 60px;
 }
 /* "14/15 · Shortage 1": the count and its note each stay on one line. */
 html body .asset-count-state {
@@ -4291,10 +3719,6 @@ html body .asset-count-state {
 html body .asset-count-state span {
   white-space: nowrap;
   font-size: 12px;
-}
-html body .asset-workbench-sidebar .asset-cover {
-  min-height: 0;
-  height: 96px;
 }
 /* Overview as one screen: six cards in a 3x2 grid that fills the window's height; what a card cannot show
    scrolls inside the card, never the page. */
@@ -4366,24 +3790,6 @@ html body .owner-dashboard > * {
 .owner-hospitals td small {
   color: var(--st-muted);
   font-size: 12px;
-}
-/* Asset manage dialog: the buttons never sit on the note field. The dialog is as tall as its content (up to
-   the screen) and the Note field keeps its own room above the footer. */
-html body .asset-manage-modal {
-  height: auto;
-  max-height: calc(100dvh - 48px);
-  overflow-y: auto;
-}
-html body .asset-manage-modal > footer {
-  margin-top: 4px;
-  flex: 0 0 auto;
-  position: sticky;
-  bottom: -20px;
-  padding: 10px 0 2px;
-  background: var(--c-white);
-}
-html body .asset-manage-note {
-  flex: 0 0 auto;
 }
 /* Sterilizer load: tick the instruments to include, one button loads them all. */
 .ster-row-pick {
@@ -4798,15 +4204,6 @@ html body .offline-strip svg {
   }
 }
 /* Set / instrument card: the two dates on one line; the shelf life beside them, or below when it does not fit. */
-html body dd.sterile-dd {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px 10px;
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-}
 html body dd.sterile-dd small {
   color: var(--c-blue-45);
   font-size: 0.82em;
@@ -5097,13 +4494,6 @@ html body .count-form-modal > footer .count-form-print {
   html body .count-form-tools {
     flex-wrap: wrap;
   }
-}
-/* Filters: "Clear filters" takes the width its text needs; "Done" fills the rest. */
-html body .asset-filter-panel footer {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-html body .asset-filter-panel footer button {
-  padding: 0 10px;
 }
 /* History: the platform owner's clean-up of chosen entries. */
 html body .movement-clean-bar {
@@ -5859,13 +5249,6 @@ html body .sets-registry .set-count-short .muted {
   }
 }
 
-/* New Set / instrument: why «Αποθήκευση» is not available yet. */
-html body .asset-create-hint {
-  color: #8a5a00;
-  font-size: 12.5px;
-  font-weight: 600;
-}
-
 /* Page header buttons wrap on a phone instead of running off the left edge
    (Instruments: «Έλεγχος ονομασιών» was 120 px out of view). */
 @media (max-width: 700px) {
@@ -6056,77 +5439,6 @@ html body .trace-step small {
   html body .reports-table td:not([data-label]) {
     display: block;
   }
-}
-
-/* Users list: header on one line; on phone the department and role stay visible */
-
-/* Studio libraries on phone: all six libraries visible in two columns */
-
-/* Previous / next record of the list the card was opened from */
-html body .browse-arrows {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: 6px;
-  padding-left: 12px;
-  border-left: 1px solid var(--line, var(--c-gray-90-3));
-  color: var(--c-blue-35);
-  font-size: 13px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-html body .browse-arrows .icon-btn {
-  width: 34px;
-  height: 34px;
-}
-html body .browse-arrows .icon-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-/* Photos: the preview opens the full photo */
-html body .asset-photo-open {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: zoom-in;
-}
-html body .asset-photo-open img {
-  display: block;
-  width: 100%;
-}
-html body .photo-viewer {
-  display: grid;
-  place-items: center;
-  padding: 24px;
-}
-html body .photo-viewer figure {
-  position: relative;
-  display: grid;
-  gap: 8px;
-  max-width: min(1200px, 100%);
-  margin: 0;
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .photo-viewer img {
-  max-width: 100%;
-  max-height: calc(100vh - 140px);
-  object-fit: contain;
-}
-html body .photo-viewer figcaption {
-  color: var(--st-muted);
-  font-size: 13px;
-}
-html body .photo-viewer .icon-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: var(--c-white);
 }
 
 /* Overview on one screen: the card's last block (list, chart) takes the room left and scrolls inside. */
@@ -6703,111 +6015,11 @@ html body .sets-registry .sets-row-barcode {
     flex-wrap: wrap;
     row-gap: 8px;
   }
-  html body .asset-workbench-fields dd {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    overflow-wrap: anywhere;
-  }
 }
 /* New Set / instrument form on a tablet: the label above its field, so the field gets the full width
    and its placeholder is not cut; the hint below it, in full. */
-@media (max-width: 1279px) {
-  html body .asset-create-field-list label {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
-  }
-  html body .asset-create-field-list label > small {
-    grid-column: 1;
-    display: block;
-    margin-top: 0;
-  }
-}
-/* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
-html body .tools-registry .tools-place-set {
-  font-size: 12.5px;
-  white-space: normal;
-}
 /* Instruments list on a phone: name on top; barcode and place on one line; uses and state below. */
-@media (max-width: 700px) {
-  html body .tools-registry tbody td:nth-child(4) {
-    flex: 1 0 60%;
-    min-width: 0;
-  }
-  html body .tools-registry tbody td:nth-child(4) .row-title-link,
-  html body .tools-registry tbody td:nth-child(4) .row-sub {
-    display: inline;
-  }
-  html body .tools-registry tbody td:nth-child(4) .row-sub {
-    margin-left: 6px;
-  }
-}
-/* Instrument card: the moves of the Set it travels in, under its own. */
-html body .asset-history-group {
-  margin: 14px 0 4px;
-  color: var(--c-blue-45);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-/* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
-html body .standalone-registry th:nth-child(5) {
-  width: 96px;
-}
-html body .standalone-registry button.row-title-link {
-  padding: 0;
-  border: 0;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-}
-html body .standalone-registry tr.standalone-group.open,
-html body .standalone-registry tr.standalone-group.open td {
-  background: var(--c-gray-95-3);
-}
-html body .standalone-registry tr.standalone-piece td:first-child {
-  padding-left: 28px;
-}
-html body .standalone-states {
-  color: var(--c-blue-45);
-  font-size: 12px;
-  font-weight: 600;
-}
 /* On a phone the grouping button keeps only its icon, so search, filters and grouping share one row. */
-@media (max-width: 700px) {
-  html body .asset-filter-bar:has(.asset-filter-toggle[aria-pressed]) {
-    flex-wrap: nowrap;
-  }
-  html body .asset-filter-bar:has(.asset-filter-toggle[aria-pressed]) .asset-filter-search {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  html body .asset-filter-bar .asset-filter-toggle[aria-pressed] span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-}
-html body .standalone-registry button.icon-link {
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-/* Stock minimums: no minimum set yet reads as a neutral note, not as «all fine». */
-html body .stock-min-summary .none {
-  color: var(--c-blue-45);
-}
-html body .stock-min-add {
-  flex-wrap: wrap;
-}
-html body .stock-min-add > small {
-  flex: 1 1 100%;
-  color: var(--st-muted);
-  font-size: 12px;
-}
 /* Tab bars above lists (Stock, Issues, Name check): the size of the card tabs, and one row on a phone. */
 html body .name-check-tabs button {
   font-size: 14px;
@@ -6827,73 +6039,7 @@ html body .name-check-tabs button {
   }
 }
 /* Stock minimums on a tablet: every column fits (on order and state were past the right edge). */
-@media (max-width: 1279px) {
-  html body .stock-min-table {
-    table-layout: fixed;
-    width: 100%;
-    min-width: 0 !important;
-  }
-  html body .stock-min-table th:nth-child(2),
-  html body .stock-min-table th:nth-child(4) {
-    width: 84px;
-    white-space: normal;
-  }
-  html body .stock-min-table th:nth-child(3) {
-    width: 96px;
-  }
-  html body .stock-min-table th:nth-child(5) {
-    width: 140px;
-  }
-  html body .stock-min-status {
-    white-space: nowrap;
-  }
-  html body .stock-min-table th:nth-child(6) {
-    width: 128px;
-  }
-  html body .stock-min-table td {
-    white-space: normal;
-  }
-}
 /* On a phone each kind is a card: the name, then stock, minimum, on order and state, the order button last. */
-@media (max-width: 700px) {
-  html body .stock-min-table thead {
-    display: none;
-  }
-  html body .stock-min-table,
-  html body .stock-min-table tbody {
-    display: block;
-  }
-  html body .stock-min-table tbody tr {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 14px;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--c-gray-95);
-  }
-  html body .stock-min-table tbody td {
-    display: block;
-    padding: 0 !important;
-    border: 0;
-    text-align: left !important;
-  }
-  html body .stock-min-table tbody td:first-child {
-    flex: 1 0 100%;
-  }
-  html body .stock-min-table tbody td[data-label]::before {
-    content: attr(data-label) ' ';
-    color: var(--c-blue-45);
-    font-size: 12px;
-    font-weight: 600;
-  }
-  html body .stock-min-table input {
-    width: 64px;
-    min-height: 30px;
-  }
-  html body .stock-min-table tbody td:empty {
-    display: none;
-  }
-}
 /* Devices: the chosen device stands out. */
 html body .device-card.selected {
   background: var(--c-gray-95-3);
@@ -7347,52 +6493,9 @@ html body .department-status-tabs button {
 /* Name check on a phone: card titles take two lines, the tabs keep their whole names, and each fix is a small
    card, today's name above the new one (the table ran 88px past the edge). */
 @media (max-width: 700px) {
-  html body .name-check-kpis span {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.25;
-  }
   html body .name-check-tabs button {
     white-space: normal;
     text-align: left;
-  }
-  html body .name-check-table thead {
-    display: none;
-  }
-  html body .name-check-table table,
-  html body .name-check-table tbody {
-    display: block;
-  }
-  html body .name-check-table tbody tr {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 2px 10px;
-    padding: 8px 10px;
-    border-top: 1px solid var(--c-gray-95);
-  }
-  html body .name-check-table tbody td {
-    padding: 0;
-    border: 0;
-  }
-  html body .name-check-table tbody td:first-child:not(.from) {
-    grid-row: span 2;
-  }
-  html body .name-check-table tbody td.arrow {
-    display: none;
-  }
-  html body .name-check-table tbody td.from,
-  html body .name-check-table tbody td.to {
-    grid-column: 2;
-  }
-  html body .name-check-table tbody td.to::before {
-    content: '→ ';
-    color: var(--st-muted);
-  }
-  html body .name-check-table tbody td.num {
-    grid-column: 3;
-    grid-row: 1 / span 2;
   }
 }
 /* Notices: the date fields keep to their column (the browser's date picker was wider than it and ran into
