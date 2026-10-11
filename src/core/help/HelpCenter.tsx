@@ -140,7 +140,7 @@ const RECORD_LISTS = ['/department', '/tools', '/sets', '/standalone-tools', '/s
  * from a record rather than the menu, only need their permission.
  */
 export default function HelpCenter({onClose, screens}: {onClose: () => void; screens: string[]}) {
-  const {pathname} = useLocation();
+  const {pathname, search} = useLocation();
   const navigate = useNavigate();
   const {can} = useSurgi();
   const {lang} = useAppPreferences();
@@ -164,7 +164,11 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
     visible.find(s => s.detailOf?.some(prefix => path.startsWith(prefix))) ||
     visible.find(s => path === s.to || path.startsWith(`${s.to}/`)) ||
     (path.startsWith('/standalone') ? visible.find(s => s.to === '/standalone-tools') : undefined);
-  const screenSection = sectionFor(pathname);
+  // Replacements is a tab of Issues: its own section opens from that tab.
+  const screenSection =
+    (pathname === '/issues' && new URLSearchParams(search).get('tab') === 'replacements'
+      ? visible.find(s => s.to === '/replacements')
+      : undefined) || sectionFor(pathname);
   const [selected, setSelected] = useState(() => (screenSection || visible[0])?.to || '');
   const [chapter, setChapter] = useState(0);
   const [mode, setMode] = useState<Mode>('manual');
@@ -270,6 +274,30 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
 
         <div className="manual-body">
           <aside className="manual-sidebar">
+            {/* On a phone the sections are one pick list (the sidebar list had room for a single entry). */}
+            <select
+              className="manual-mobile-pick"
+              aria-label={tx.sections}
+              value={mode === 'manual' ? `section:${selected}` : `mode:${mode}`}
+              onChange={e => {
+                const [kind, value] = e.target.value.split(/:(.*)/);
+                if (kind === 'section') select(value);
+                else setMode(value as Mode);
+              }}
+            >
+              <optgroup label={tx.sections}>
+                {filtered.map(s => (
+                  <option key={s.to} value={`section:${s.to}`}>
+                    {s.title[L]}
+                  </option>
+                ))}
+              </optgroup>
+              <option value="mode:news">{tx.whatsNew}</option>
+              <option value="mode:glossary">{tx.glossary}</option>
+              <option value="mode:support">{tx.support}</option>
+              {owner && <option value="mode:pdf">{L === 'el' ? 'Εγχειρίδια PDF' : 'PDF manuals'}</option>}
+              <option value="mode:about">{tx.about}</option>
+            </select>
             <div className="manual-side-label">{tx.sections}</div>
             <nav className="manual-nav">
               {filtered.length ? (

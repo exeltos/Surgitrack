@@ -99,7 +99,8 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
           <div className="modal-body add-tools-body">
             <div className="source-tabs source-tabs-spacious" role="tablist" aria-label={tr('Πηγή εργαλείων')}>
               <button className={source === 'STOCK' ? 'active' : ''} onClick={() => chooseSource('STOCK')}>
-                <PackageOpen size={15} /> Stock <span>{sourceCount('STOCK')}</span>
+                <PackageOpen size={15} /> {tr('Απόθεμα') + ' '}
+                <span>{sourceCount('STOCK')}</span>
               </button>
               <button className={source === 'SET_MEMBER' ? 'active' : ''} onClick={() => chooseSource('SET_MEMBER')}>
                 <Layers3 size={15} /> {tr('Από άλλο Σετ') + ' '}
