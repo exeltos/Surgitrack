@@ -62,4 +62,11 @@ select tests.eq((select n from found where check_name = 'ready without a passed 
 update public.release_transitions set changed_at = changed_at - interval '3 days';
 select tests.eq((select count(*)::int from found), 0, 'a change already looked at by two nightly runs is not named again');
 
+-- Each foreign key of the log has an index.
+select tests.ok(exists (select 1 from pg_indexes where tablename = 'release_transitions'
+                          and indexdef like '%(organization_id)%')
+            and exists (select 1 from pg_indexes where tablename = 'release_transitions'
+                          and indexdef like '%(changed_by)%'),
+  'the log''s foreign keys are indexed');
+
 rollback;
