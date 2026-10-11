@@ -1,28 +1,10 @@
 import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
-import {
-  Accessibility,
-  Bell,
-  BookOpen,
-  Home,
-  LogOut,
-  Menu,
-  Minus,
-  Plus,
-  X,
-  PackageCheck,
-  TriangleAlert,
-  Gauge,
-  Eye,
-  UserPlus,
-  Undo2,
-  CalendarClock,
-  WifiOff,
-} from 'lucide-react';
+import {Accessibility, Bell, BookOpen, Home, LogOut, Menu, Minus, Plus, X, Eye, Undo2, WifiOff} from 'lucide-react';
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
-import {expiryAlerts, formatExpiry, sterileExpiryList, type ExpiryEntry} from '../../core/sterileExpiry';
+import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
 import {navSectionFor, navigationFor, navigationGroupLabel, ownerNavigation} from '../../config/navigation';
 import {isPlatformOnly} from '../../core/platformOnly';
 import {useSurgi} from '../../store/SurgiStore';
@@ -48,12 +30,13 @@ import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
 import Briefing, {briefingDue} from './Briefing';
 import ScreenGuide from './ScreenGuide';
 import {APP_VERSION} from '../../config/appMeta';
-import {tr, trData} from '../../i18n';
+import {tr} from '../../i18n';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 import {formatDate, formatTime} from '../../core/displayDate';
 
 // The user manual is loaded only when first opened.
+import NotificationPanel from './NotificationPanel';
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
 /** Initials of a name, e.g. "ΑΙΚΑΤΕΡΙΝΗ ΜΠΟΥΓΑ" → "ΑΜ". */
 const initialsOf = (name: string) => {
@@ -96,14 +79,6 @@ const navEN: Record<string, string> = {
 };
 /** Pages the platform admin can use without having entered a hospital. */
 const PLATFORM_ONLY_PAGES = ['/studio', '/hospitals'];
-const expiryText = (e: ExpiryEntry, lang: string) =>
-  e.state === 'EXPIRED'
-    ? lang === 'el'
-      ? `Η αποστείρωση έληξε στις ${formatExpiry(e.sterileUntil)}`
-      : `Sterility expired on ${formatExpiry(e.sterileUntil)}`
-    : lang === 'el'
-      ? `Η αποστείρωση λήγει στις ${formatExpiry(e.sterileUntil)} (${e.daysLeft} ημ.)`
-      : `Sterility expires on ${formatExpiry(e.sterileUntil)} (${e.daysLeft} d)`;
 export default function AppShell({
   children,
   onLogout,
@@ -459,243 +434,24 @@ export default function AppShell({
                 {openNotifications > 0 && <span>{openNotifications}</span>}
               </button>
               {notificationOpen && (
-                <div className="notification-popover">
-                  <header>
-                    <strong>{lang === 'el' ? 'Ειδοποιήσεις' : 'Notifications'}</strong>
-                    <button onClick={() => setNotificationOpen(false)}>
-                      <X size={15} />
-                    </button>
-                  </header>
-                  {role === 'DEPARTMENT' ? (
-                    <div className="notification-list">
-                      {departmentReady.map(a => (
-                        <button
-                          key={`ready-${a.id}`}
-                          className="notification-item ready"
-                          onClick={() => {
-                            setNotificationOpen(false);
-                            navigate(a.barcode.startsWith('S') ? `/sets/${a.id}` : `/tools/${a.id}`);
-                          }}
-                        >
-                          <PackageCheck size={17} />
-                          <span>
-                            <strong>
-                              {a.barcode} · {a.name}
-                            </strong>
-                            <small>
-                              {lang === 'el'
-                                ? 'Έτοιμο για παραλαβή από την Αποστείρωση'
-                                : 'Ready for pickup from Sterilization'}
-                            </small>
-                          </span>
-                        </button>
-                      ))}
-                      {departmentIssues.slice(0, 5).map(i => (
-                        <button
-                          key={i.id}
-                          className="notification-item"
-                          onClick={() => {
-                            setNotificationOpen(false);
-                            navigate('/issues');
-                          }}
-                        >
-                          <TriangleAlert size={17} />
-                          <span>
-                            <strong>{i.asset}</strong>
-                            <small>{trData(i.type)}</small>
-                          </span>
-                        </button>
-                      ))}
-                      {departmentExpiry.slice(0, 5).map(e => (
-                        <button
-                          key={`exp-${e.kind}-${e.id}`}
-                          className={`notification-item expiry ${e.state.toLowerCase()}`}
-                          onClick={() => {
-                            setNotificationOpen(false);
-                            navigate(e.kind === 'SET' ? `/sets/${e.id}` : `/tools/${e.id}`);
-                          }}
-                        >
-                          <CalendarClock size={17} />
-                          <span>
-                            <strong>
-                              {e.barcode} · {e.name}
-                            </strong>
-                            <small>{expiryText(e, lang)}</small>
-                          </span>
-                        </button>
-                      ))}
-                      {departmentUsage.slice(0, 5).map(a => (
-                        <button
-                          key={a.id}
-                          className="notification-item"
-                          onClick={() => {
-                            setNotificationOpen(false);
-                            navigate('/department');
-                          }}
-                        >
-                          <Gauge size={17} />
-                          <span>
-                            <strong>
-                              {a.barcode} · {a.name}
-                            </strong>
-                            <small>
-                              {lang === 'el' ? `${a.remaining} χρήσεις απομένουν` : `${a.remaining} uses remaining`}
-                            </small>
-                          </span>
-                        </button>
-                      ))}
-                      {openNotifications === 0 && (
-                        <div className="notification-empty">
-                          {lang === 'el' ? 'Δεν υπάρχουν νέες ειδοποιήσεις.' : 'No new notifications.'}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      {accessRequests > 0 && (
-                        <div className="notification-list">
-                          <button
-                            className="notification-item ready"
-                            onClick={() => {
-                              setNotificationOpen(false);
-                              navigate('/hospital');
-                            }}
-                          >
-                            <UserPlus size={17} />
-                            <span>
-                              <strong>
-                                {lang === 'el'
-                                  ? `${accessRequests} ${accessRequests === 1 ? 'αίτημα' : 'αιτήματα'} πρόσβασης`
-                                  : `${accessRequests} access ${accessRequests === 1 ? 'request' : 'requests'}`}
-                              </strong>
-                              <small>{lang === 'el' ? 'Αναμένουν την έγκρισή σας' : 'Waiting for your approval'}</small>
-                            </span>
-                          </button>
-                        </div>
-                      )}
-                      {expiryNotices.length > 0 && (
-                        <div className="notification-list">
-                          <span className="notification-group">
-                            {lang === 'el' ? 'Λήξη αποστείρωσης' : 'Sterile expiry'} · {expiryNotices.length}
-                          </span>
-                          {expiryNotices.slice(0, 6).map(e => (
-                            <button
-                              key={`exp-${e.kind}-${e.id}`}
-                              className={`notification-item expiry ${e.state.toLowerCase()}`}
-                              onClick={() => {
-                                setNotificationOpen(false);
-                                navigate('/expiry');
-                              }}
-                            >
-                              <CalendarClock size={17} />
-                              <span>
-                                <strong>
-                                  {e.barcode} · {e.name}
-                                </strong>
-                                <small>{expiryText(e, lang)}</small>
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {outOfUseNotices.length > 0 && (
-                        <div className="notification-list">
-                          {outOfUseNotices.slice(0, 8).map(t => (
-                            <div key={`out-${t.id}`} className="notification-item out-of-use">
-                              <Gauge size={17} />
-                              <span>
-                                <strong>
-                                  {t.barcode} · {t.name}
-                                </strong>
-                                <small>
-                                  {lang === 'el'
-                                    ? `Εκτός χρήσης · ${trData(t.retiredReason || '')} · ${t.retiredAt || ''}`
-                                    : `Out of use · ${trData(t.retiredReason || '')} · ${t.retiredAt || ''}`}
-                                </small>
-                              </span>
-                              <button type="button" onClick={() => acknowledgeOutOfUse(t.id)}>
-                                {lang === 'el' ? 'Ενημερώθηκα' : 'Got it'}
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {openIssues.length > 0 && (
-                        <div className="notification-list">
-                          <span className="notification-group">
-                            {lang === 'el' ? 'Ανοιχτές εκκρεμότητες' : 'Open issues'} · {openIssues.length}
-                          </span>
-                          {openIssues.slice(0, 6).map(i => (
-                            <button
-                              key={i.id}
-                              className="notification-item"
-                              onClick={() => {
-                                setNotificationOpen(false);
-                                navigate('/issues');
-                              }}
-                            >
-                              <TriangleAlert size={17} />
-                              <span>
-                                <strong>{i.asset}</strong>
-                                <small>
-                                  {trData(i.type)} · {trData(i.department)} · {i.created}
-                                </small>
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {lifecycleAlerts.length > 0 && (
-                        <div className="notification-list">
-                          <span className="notification-group">
-                            {lang === 'el' ? 'Λίγες χρήσεις απομένουν' : 'Few uses left'} · {lifecycleAlerts.length}
-                          </span>
-                          {lifecycleAlerts.slice(0, 6).map(a => (
-                            <button
-                              key={a.id}
-                              className="notification-item"
-                              onClick={() => {
-                                setNotificationOpen(false);
-                                navigate(a.assetKind === 'SET' ? `/sets/${a.assetId}` : `/tools/${a.assetId}`);
-                              }}
-                            >
-                              <Gauge size={17} />
-                              <span>
-                                <strong>
-                                  {a.barcode} · {a.name}
-                                </strong>
-                                <small>
-                                  {lang === 'el'
-                                    ? `${a.remaining} από ${a.maxUses} χρήσεις απομένουν`
-                                    : `${a.remaining} of ${a.maxUses} uses left`}
-                                </small>
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {openNotifications === 0 ? (
-                        <div className="notification-empty">
-                          {lang === 'el' ? 'Δεν υπάρχουν νέες ειδοποιήσεις.' : 'No new notifications.'}
-                        </div>
-                      ) : (
-                        openIssues.length > 6 && (
-                          <button
-                            className="notification-more"
-                            onClick={() => {
-                              setNotificationOpen(false);
-                              navigate('/issues');
-                            }}
-                          >
-                            {lang === 'el'
-                              ? `Όλες οι εκκρεμότητες (${openIssues.length})`
-                              : `All issues (${openIssues.length})`}
-                          </button>
-                        )
-                      )}
-                    </>
-                  )}
-                </div>
+                <NotificationPanel
+                  role={role}
+                  lang={lang}
+                  notices={{
+                    departmentReady,
+                    departmentIssues,
+                    departmentExpiry,
+                    departmentUsage,
+                    accessRequests,
+                    expiryNotices,
+                    outOfUseNotices,
+                    openIssues,
+                    lifecycleAlerts,
+                    openNotifications,
+                  }}
+                  onAcknowledgeOutOfUse={acknowledgeOutOfUse}
+                  onClose={() => setNotificationOpen(false)}
+                />
               )}
             </div>
             <div className="avatar" title={signedInName}>
