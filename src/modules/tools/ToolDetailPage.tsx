@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   ArrowRightLeft,
   Barcode,
-  Camera,
   Copy,
   Flag,
   History,
@@ -18,7 +17,6 @@ import {
   X,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
-import type {AssetPhoto} from '../../types/domain';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
@@ -33,13 +31,13 @@ import DepartmentDispatchModal from '../../components/department/DepartmentDispa
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
-import ReportTypeField from '../../components/assets/ReportTypeField';
 import AssetManageModal from '../../components/assets/AssetManageModal';
 import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
 import {effectiveToolMarker} from '../../core/colorTapes';
 import ActionMenu from '../../components/ui/ActionMenu';
 import {useConfirm} from '../../components/ui/useConfirm';
+import {ToolReportModal} from './ToolDialogs';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 
 export default function ToolDetailPage() {
@@ -78,9 +76,6 @@ export default function ToolDetailPage() {
   const [deleteBlockedOpen, setDeleteBlockedOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [dispatchOpen, setDispatchOpen] = useState(false);
-  const [reportType, setReportType] = useState('Βλάβη');
-  const [reportNote, setReportNote] = useState('');
-  const [reportPhotos, setReportPhotos] = useState<AssetPhoto[]>([]);
   if (!tool)
     return (
       <div className="empty">
@@ -507,98 +502,39 @@ export default function ToolDetailPage() {
         />
       )}
       {can('issue.create') && reportOpen && (
-        <div className="modal-backdrop">
-          <div className="asset-modal set-report-modal tool-report-modal">
-            <header>
-              <div>
-                <h2>{tr('Νέα αναφορά')}</h2>
-                <p>
-                  {tool.barcode} · {tool.name}
-                </p>
-              </div>
-              <button className="icon-button" onClick={() => setReportOpen(false)}>
-                <X size={18} />
-              </button>
-            </header>
-            <div className="modal-body">
-              <div className="form-grid">
-                <ReportTypeField
-                  kind="TOOL"
-                  value={reportType}
-                  onChange={setReportType}
-                  canManage={can('asset.composition.manage')}
-                  onManage={
-                    workflowLocked
-                      ? undefined
-                      : () => {
-                          setReportOpen(false);
-                          setManageOpen(true);
-                        }
-                  }
-                />
-                <label className="span-2">
-                  {tr('Παρατήρηση')}
-                  <textarea
-                    rows={3}
-                    value={reportNote}
-                    onChange={e => setReportNote(e.target.value)}
-                    placeholder={tr('Περιγραφή συμβάντος...')}
-                  />
-                </label>
-                <label className="span-2 report-photo-input">
-                  <Camera size={17} /> {tr('Φωτογραφίες')}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    multiple
-                    onChange={async e =>
-                      setReportPhotos(await filesToAssetPhotos(Array.from(e.target.files || []), 'issues'))
-                    }
-                  />
-                  <small>
-                    {reportPhotos.length
-                      ? tr('{0} φωτογραφίες έτοιμες', reportPhotos.length)
-                      : tr('Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών')}
-                  </small>
-                </label>
-              </div>
-            </div>
-            <footer>
-              <AppButton onClick={() => setReportOpen(false)}>{tr('Ακύρωση')}</AppButton>
-              <AppButton
-                variant="primary"
-                onClick={() => {
-                  const done = () => {
-                    setReportOpen(false);
-                    setReportNote('');
-                    setReportPhotos([]);
-                  };
-                  if (reportType === 'Απώλεια' && can('asset.composition.manage')) {
-                    ask({
-                      title: tr('Δήλωση απώλειας;'),
-                      message: tr(
-                        'Το {0} δηλώνεται ως χαμένο και αφαιρείται από το Σετ του. Μπορείς να το επαναφέρεις αν βρεθεί.',
-                        tool.barcode,
-                      ),
-                      confirmLabel: tr('Δήλωση απώλειας'),
-                      danger: true,
-                      onConfirm: () => {
-                        markLost('TOOL', tool.id, reportNote.trim());
-                        done();
-                      },
-                    });
-                    return;
-                  }
-                  reportIssue(tool.id, reportType, reportNote, 'Καρτέλα Εργαλείου', reportPhotos);
-                  done();
-                }}
-              >
-                {tr('Καταχώρηση αναφοράς')}
-              </AppButton>
-            </footer>
-          </div>
-        </div>
+        <ToolReportModal
+          tool={tool}
+          canManage={can('asset.composition.manage')}
+          onManage={
+            workflowLocked
+              ? undefined
+              : () => {
+                  setReportOpen(false);
+                  setManageOpen(true);
+                }
+          }
+          onClose={() => setReportOpen(false)}
+          onSubmit={(type, note, photos) => {
+            if (type === 'Απώλεια' && can('asset.composition.manage')) {
+              ask({
+                title: tr('Δήλωση απώλειας;'),
+                message: tr(
+                  'Το {0} δηλώνεται ως χαμένο και αφαιρείται από το Σετ του. Μπορείς να το επαναφέρεις αν βρεθεί.',
+                  tool.barcode,
+                ),
+                confirmLabel: tr('Δήλωση απώλειας'),
+                danger: true,
+                onConfirm: () => {
+                  markLost('TOOL', tool.id, note.trim());
+                  setReportOpen(false);
+                },
+              });
+              return;
+            }
+            reportIssue(tool.id, type, note, 'Καρτέλα Εργαλείου', photos);
+            setReportOpen(false);
+          }}
+        />
       )}
       {confirmNode}
       {manageOpen && <AssetManageModal kind="TOOL" asset={tool} onClose={() => setManageOpen(false)} />}
