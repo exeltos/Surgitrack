@@ -1806,6 +1806,8 @@ export const en: Record<string, string> = {
   'Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.':
     'Permanently delete {0} history entries? The clean-up will be recorded as a new entry.',
   '{0} χρήσεις': '{0} uses',
+  '{0} / {1} χρήσεις': '{0} / {1} uses',
+  'Χρωματική σήμανση: {0}': 'Colour marking: {0}',
   '{0}/{1} χρήσεις': '{0}/{1} uses',
   'Κάτω από το ελάχιστο': 'Below minimum',
   'Πρόσφατες αναζητήσεις': 'Recent searches',
