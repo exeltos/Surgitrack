@@ -14,7 +14,16 @@ import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import {formatDateTime} from '../../core/displayDate';
-import {LOAD_STATUS, cellText, genericReportHtml, reports, stateLabel, type ReportId, type Row} from './reportsMeta';
+import {
+  LOAD_STATUS,
+  REPORT_HISTORY,
+  cellText,
+  genericReportHtml,
+  reports,
+  stateLabel,
+  type ReportId,
+  type Row,
+} from './reportsMeta';
 import {buildReport} from './buildReport';
 
 export default function ReportsPage() {
@@ -353,7 +362,8 @@ export default function ReportsPage() {
           <p>{tr('Επιλέξτε αναφορά, ορίστε φίλτρα και δείτε τα αποτελέσματα πριν από εκτύπωση ή PDF.')}</p>
         </div>
       </div>
-      <HistoryWindowNote auto />
+      {/* Only the reports that read history load the rest of it, and only the kind they read. */}
+      {REPORT_HISTORY[active] && <HistoryWindowNote auto collections={REPORT_HISTORY[active]} />}
       <div className="reports-workbench">
         <aside className="reports-catalog" aria-label={tr('Τύποι αναφορών')}>
           <div className="reports-catalog-head">

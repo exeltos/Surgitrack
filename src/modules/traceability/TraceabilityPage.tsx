@@ -18,7 +18,7 @@ const readRecent = (): string[] => {
 };
 import {useSurgi} from '../../store/SurgiStore';
 import {getI18nLang, tr, trData} from '../../i18n';
-import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
+import {useTraceHistory} from './useTraceHistory';
 import {parseDisplayDate} from '../../core/displayDate';
 import type {Movement, ProcessLoadStatus, SetAsset, Tool} from '../../types/domain';
 
@@ -150,6 +150,18 @@ export default function TraceabilityPage() {
       });
     return [...seen.values()];
   })();
+  // Older history than the opening loaded: only this item's or this patient's, fetched as the search settles.
+  const traced = asset ? [asset, ...(carrierSet ? [carrierSet] : [])] : [];
+  const history = useTraceHistory(
+    needle && !choosing
+      ? {
+          assetIds: traced.map(item => item.id),
+          barcodes: traced.flatMap(item => [item.barcode, ...(item.legacyBarcodes || [])]),
+          text: asset ? undefined : q,
+          patientBarcodes: [...new Set(patientMoves.map(barcodeOf))].sort(),
+        }
+      : undefined,
+  );
   const traceTable = (): ExportTable => ({
     title: tr('Ιχνηλάτηση · {0}', q.trim()),
     subtitle: tr('{0} κινήσεις', related.length),
@@ -186,7 +198,16 @@ export default function TraceabilityPage() {
           </div>
         )}
       </div>
-      <HistoryWindowNote auto />
+      {(history.searching || history.failed) && (
+        <div className="history-window-note" role="status">
+          <History size={15} />
+          <span>
+            {history.searching
+              ? tr('Αναζήτηση και στο παλαιότερο ιστορικό…')
+              : tr('Το παλαιότερο ιστορικό δεν φορτώθηκε (σύνδεση): εμφανίζονται μόνο οι πρόσφατοι μήνες.')}
+          </span>
+        </div>
+      )}
       <form
         className="trace-search"
         onSubmit={e => {

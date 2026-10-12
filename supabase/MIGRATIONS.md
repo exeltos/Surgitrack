@@ -97,6 +97,16 @@ Checked afterwards: the check is validated, `release_transitions` has row level 
 or `authenticated`, the trigger function is not callable by them, and `supabase/integrity.sql` finds nothing. The
 security advisor notes `release_transitions` as "RLS enabled, no policy", on purpose, like `device_keys`.
 
+## Not applied yet
+
+| Version        | Name             | What it does                                                                                                                                                                        |
+| -------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261011200000 | release_required | Ready from a sterilization stage only with an unused release of a passed cycle (refused with 23514 otherwise); releases already saved are marked used, except a fresh one in flight |
+
+Apply it with `apply_migration` under this version (or record the version the tool gives and rename the file). Before
+applying, check that no open page runs a version older than #159 (it would save a Set before its release), and
+afterwards that `supabase/integrity.sql` finds nothing.
+
 ## Testing locally
 
 ```sh

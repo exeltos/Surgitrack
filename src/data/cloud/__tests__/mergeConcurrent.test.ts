@@ -36,6 +36,25 @@ describe('two devices changing the same record', () => {
     expect(merged).toEqual({...local, photos: [{id: 'p1'}]});
   });
 
+  it('adds up the uses both devices counted, so a usage limit sees every one', () => {
+    const counted = {...base, sterilizations: 10};
+    const local = {...counted, uses: 4, sterilizations: 11};
+    const server = {...counted, uses: 5, sterilizations: 11, state: 'PENDING_STERILIZATION'};
+    const {merged, conflicts, keepsLocal} = mergeConcurrent(counted, local, server);
+    expect(merged).toEqual({...server, uses: 6, sterilizations: 12});
+    expect(conflicts).toEqual([]);
+    expect(keepsLocal).toBe(true);
+  });
+
+  it('merges a count that is not a number like any other field', () => {
+    const local = {...base, uses: 4};
+    const unknownCount = {...base, uses: undefined};
+    const server = {...base, uses: 6};
+    const {merged, conflicts} = mergeConcurrent(unknownCount, local, server);
+    expect(merged).toEqual(server);
+    expect(conflicts).toEqual(['uses']);
+  });
+
   it('names records the way users see them', () => {
     expect(recordLabel(base)).toBe('S000321 · ΟΡΘΟΠΕΔΙΚΟ');
     expect(recordLabel({id: 'i1', asset: 'T001202 · ΨΑΛΙΔΙ'} as {id: string})).toBe('T001202 · ΨΑΛΙΔΙ');

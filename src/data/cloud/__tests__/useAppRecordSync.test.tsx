@@ -11,6 +11,7 @@ const api = vi.hoisted(() => ({
   loadBarcodes: vi.fn(),
   loadChangedRecords: vi.fn(),
   writeCollection: vi.fn(),
+  loadTable: vi.fn(),
 }));
 
 vi.mock('../appRecords', () => ({
@@ -18,7 +19,7 @@ vi.mock('../appRecords', () => ({
   deleteAppRecords: api.deleteAppRecords,
   loadRecordsById: api.loadRecordsById,
   loadBarcodes: api.loadBarcodes,
-  loadTable: vi.fn(),
+  loadTable: api.loadTable,
 }));
 vi.mock('../remoteChanges', async importOriginal => ({
   ...(await importOriginal<typeof import('../remoteChanges')>()),
@@ -28,8 +29,9 @@ vi.mock('../remoteChanges', async importOriginal => ({
 vi.mock('../realtime', () => ({isRealtimeLive: () => false, onRemoteChange: () => () => undefined}));
 vi.mock('../localCache', () => ({takeRestored: () => undefined, writeCollection: api.writeCollection}));
 
-const {useAppRecordSync, onSyncNotice, unsavedChanges} = await import('../useAppRecordSync');
+const {useAppRecordSync, onSyncNotice, onSyncConflict, unsavedChanges} = await import('../useAppRecordSync');
 const {syncNoticeMessage} = await import('../../../components/layout/syncNoticeMessage');
+const {cutoffOf, loadOlderMatching, setCutoff} = await import('../historyWindow');
 
 type Tool = CloudRecord & {barcode: string; name: string};
 const tool = (n: number, name = `Tool ${n}`): Tool => ({id: `t${n}`, barcode: `T${String(n).padStart(6, '0')}`, name});
@@ -130,6 +132,68 @@ describe('saving a collection to the cloud', () => {
     await act(async () => window.dispatchEvent(new Event('focus')));
     expect(api.loadChangedRecords).toHaveBeenCalled();
     stop();
+  });
+
+  it('keeps both uses when another device added one to the same instrument meanwhile, and its other changes', async () => {
+    const conflicts: unknown[] = [];
+    const stop = onSyncConflict(conflict => conflicts.push(conflict));
+    const base = {...tool(1), uses: 3, sterilizations: 7};
+    render(<Harness initial={[base]} />);
+    // The other device saved first: one use and a note. This device's save is refused as stale.
+    api.writeAppRecords.mockResolvedValueOnce({...saved(), stale: ['t1']});
+    api.loadRecordsById.mockResolvedValue([{...base, uses: 4, sterilizations: 8, notes: 'από το Τμήμα'}]);
+    await change(list => list.map(item => ({...item, uses: 4, sterilizations: 9})));
+    await wait(2000);
+
+    const expected = {...base, uses: 5, sterilizations: 10, notes: 'από το Τμήμα'};
+    expect(store).toEqual([expected]);
+    expect(api.writeAppRecords.mock.calls[1][2]).toEqual([expected]);
+    expect(conflicts).toEqual([]);
+    expect(unsavedChanges()).toBe(0);
+    stop();
+  });
+
+  it('keeps the saved value of a field both devices changed, says so, and does not send it again', async () => {
+    const conflicts: unknown[] = [];
+    const stop = onSyncConflict(conflict => conflicts.push(conflict));
+    render(<Harness initial={[tool(1)]} />);
+    api.writeAppRecords.mockResolvedValueOnce({...saved(), stale: ['t1']});
+    api.loadRecordsById.mockResolvedValue([tool(1, 'Theirs')]);
+    await change(list => list.map(item => ({...item, name: 'Mine'})));
+    await wait(2000);
+
+    expect(store).toEqual([tool(1, 'Theirs')]);
+    expect(conflicts).toEqual([{collection: 'tools', label: 'T000001 · Theirs', fields: ['name']}]);
+    expect(sent()).toEqual([['t1']]);
+    expect(unsavedChanges()).toBe(0);
+    stop();
+  });
+
+  it('adds the older records a search asks for, without saving them again or counting the history as loaded', async () => {
+    const cutoff = '2026-07-01T00:00:00.000Z';
+    let moves: CloudRecord[] = [];
+    function History() {
+      const [items, setItems] = useState<CloudRecord[]>([{id: 'm-new'}]);
+      moves = items;
+      useAppRecordSync('org-1', 'movements', items, (remote, removed, append) =>
+        setItems(list => mergeRemote(list, remote, removed, append)),
+      );
+      return null;
+    }
+    render(<History />);
+    setCutoff('movements', cutoff);
+    api.loadTable.mockResolvedValue([{id: 'm-old'}]);
+
+    await act(() => loadOlderMatching({movements: 'asset.ilike."S000321*"'}));
+    await wait(1000);
+    expect(api.loadTable).toHaveBeenCalledWith('org-1', 'movements', {
+      before: cutoff,
+      filter: 'asset.ilike."S000321*"',
+    });
+    expect(moves.map(item => item.id)).toEqual(['m-new', 'm-old']);
+    expect(cutoffOf('movements')).toBe(cutoff);
+    expect(api.writeAppRecords).not.toHaveBeenCalled();
+    setCutoff('movements', undefined);
   });
 
   it('tries again after a network error, further apart each time, and starts over after a success', async () => {

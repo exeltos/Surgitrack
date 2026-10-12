@@ -9,6 +9,7 @@ vi.mock('../../../data/cloud/identity', () => ({
 vi.mock('../../../config/dataMode', () => ({getRuntimeDataMode: () => 'PRODUCTION'}));
 
 import ScreenGuide, {screenSection} from '../ScreenGuide';
+import {helpManual} from '../../../core/help/helpManual';
 
 const all = () => true;
 
@@ -21,7 +22,8 @@ describe('screen guide on first visit', () => {
   it('shows the screen from the manual once, then not again for that person', async () => {
     const onHelp = vi.fn();
     const {unmount} = render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={onHelp} />);
-    expect(screen.getByRole('complementary', {name: 'Οδηγός οθόνης'})).toHaveTextContent('Αποστείρωση');
+    // The manual comes with the first guide, not with the app.
+    expect(await screen.findByRole('complementary', {name: 'Οδηγός οθόνης'})).toHaveTextContent('Αποστείρωση');
     await userEvent.click(screen.getByRole('button', {name: 'Το κατάλαβα'}));
     expect(screen.queryByRole('complementary')).toBeNull();
     unmount();
@@ -35,11 +37,11 @@ describe('screen guide on first visit', () => {
   it('opens Help on the screen and can be turned off for every screen', async () => {
     const onHelp = vi.fn();
     const {unmount} = render(<ScreenGuide pathname="/issues" lang="el" can={all} onHelp={onHelp} />);
-    await userEvent.click(screen.getByRole('button', {name: /Αναλυτικά στη Βοήθεια/}));
+    await userEvent.click(await screen.findByRole('button', {name: /Αναλυτικά στη Βοήθεια/}));
     expect(onHelp).toHaveBeenCalled();
     unmount();
     const {unmount: again} = render(<ScreenGuide pathname="/stock" lang="el" can={all} onHelp={onHelp} />);
-    await userEvent.click(screen.getByRole('button', {name: 'Να μην εμφανίζονται οδηγοί'}));
+    await userEvent.click(await screen.findByRole('button', {name: 'Να μην εμφανίζονται οδηγοί'}));
     again();
     render(<ScreenGuide pathname="/reports" lang="el" can={all} onHelp={onHelp} />);
     expect(screen.queryByRole('complementary')).toBeNull();
@@ -51,9 +53,9 @@ describe('screen guide on first visit', () => {
   });
 
   it('only for menu screens the person may open', () => {
-    expect(screenSection('/studio', () => false)).toBeUndefined();
-    expect(screenSection('/start', all)).toBeUndefined();
-    expect(screenSection('/tools/abc', all)).toBeUndefined();
-    expect(screenSection('/issues', all)?.to).toBe('/issues');
+    expect(screenSection(helpManual, '/studio', () => false)).toBeUndefined();
+    expect(screenSection(helpManual, '/start', all)).toBeUndefined();
+    expect(screenSection(helpManual, '/tools/abc', all)).toBeUndefined();
+    expect(screenSection(helpManual, '/issues', all)?.to).toBe('/issues');
   });
 });

@@ -23,8 +23,9 @@ with problems(organization_id, check_name, n) as (
                        where i.organization_id = s.organization_id and i.set_id = s.id and i.state <> 'RETIRED')
    group by 1
   union all
-  -- Ready straight from a sterilization stage (logged by the database) with no release of a passed cycle
-  -- within 12 hours either side. Each change is looked at by two nightly runs, once it is 12 hours old, so a
+  -- Ready straight from a sterilization stage (logged by the database) with no release of a passed cycle:
+  -- neither the one the database checked (release_id) nor one within 12 hours either side (changes logged
+  -- before the check). Each change is looked at by two nightly runs, once it is 12 hours old, so a
   -- device that syncs late is not blamed.
   select t.organization_id, 'ready without a passed release', count(*)
     from public.release_transitions t
@@ -37,7 +38,8 @@ with problems(organization_id, check_name, n) as (
           and r.decision = 'RELEASED' and r.physical_parameters_ok and r.packaging_integrity_ok
           and r.biological_indicator_result is distinct from 'FAIL'
           and c.result = 'PASSED'
-          and r.created_at between t.changed_at - interval '12 hours' and t.changed_at + interval '12 hours')
+          and (r.id = t.release_id
+               or r.created_at between t.changed_at - interval '12 hours' and t.changed_at + interval '12 hours'))
    group by 1
 )
 select coalesce(o.name, p.organization_id::text) as hospital, p.check_name, sum(p.n)::int as n

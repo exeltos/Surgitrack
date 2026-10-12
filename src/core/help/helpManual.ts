@@ -1213,11 +1213,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Πρόσφατο και παλαιότερο ιστορικό',
-          'Για να ανοίγει γρήγορα, η εφαρμογή φορτώνει το ιστορικό των τελευταίων 90 ημερών (τις συνθέσεις και τις αποδεσμεύσεις για 7 μήνες, όσο κρατά η μεγαλύτερη διάρκεια αποστείρωσης). Στο Ιστορικό το «Φόρτωση παλαιότερων» φέρνει και τις υπόλοιπες εγγραφές· η Ιχνηλάτηση και οι Αναφορές τις φέρνουν μόνες τους. Τίποτα δεν σβήνεται: όλο το ιστορικό μένει στη βάση.',
+          'Για να ανοίγει γρήγορα, η εφαρμογή φορτώνει το ιστορικό των τελευταίων 90 ημερών (τις συνθέσεις και τις αποδεσμεύσεις για 7 μήνες, όσο κρατά η μεγαλύτερη διάρκεια αποστείρωσης). Στο Ιστορικό το «Φόρτωση παλαιότερων» φέρνει και τις υπόλοιπες εγγραφές· η Ιχνηλάτηση φέρνει μόνη της το παλαιότερο ιστορικό του Σετ, του εργαλείου ή του ασθενούς που αναζητάτε, και οι Αναφορές που διαβάζουν ιστορικό (φορτία, παραδόσεις, ασθενής) φέρνουν ό,τι χρειάζονται όταν τις ανοίξετε. Τίποτα δεν σβήνεται: όλο το ιστορικό μένει στη βάση.',
         ],
         en: [
           'Recent and older history',
-          'To open quickly, the app loads the last 90 days of history (compositions and releases for 7 months, as long as the longest sterile shelf life). In History, "Load older" brings the rest; Traceability and Reports load it by themselves. Nothing is deleted: all history stays in the database.',
+          'To open quickly, the app loads the last 90 days of history (compositions and releases for 7 months, as long as the longest sterile shelf life). In History, "Load older" brings the rest; Traceability brings the older history of the Set, instrument or patient you search for by itself, and the Reports that read history (loads, handovers, patient) bring what they need when you open them. Nothing is deleted: all history stays in the database.',
         ],
       },
       {
