@@ -139,7 +139,8 @@ export default function AppShell({
   const [sinceSignIn, setSinceSignIn] = useState<'pending' | 'news' | 'briefing' | ''>('pending');
   useEffect(() => {
     const timer = window.setTimeout(
-      () => setSinceSignIn(whatsNewDue(can) ? 'news' : briefingDue() ? 'briefing' : ''),
+      // An evaluation Demo has its own welcome: no release notes or daily briefing over it.
+      () => setSinceSignIn(evaluationDemo ? '' : whatsNewDue(can) ? 'news' : briefingDue() ? 'briefing' : ''),
       1200,
     );
     return () => window.clearTimeout(timer);
@@ -570,7 +571,8 @@ export default function AppShell({
         )}
         <section className="content" ref={contentRef}>
           {/* Not over the sign-in dialogs: once they are closed. */}
-          {sinceSignIn === '' && (
+          {/* In an evaluation Demo the first steps' guided tours explain each screen instead. */}
+          {sinceSignIn === '' && !evaluationDemo && (
             <ScreenGuide
               pathname={location.pathname}
               lang={lang === 'en' ? 'en' : 'el'}

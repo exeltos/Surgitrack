@@ -110,11 +110,11 @@ describe('Demo bar', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('rates the screen the person is on', async () => {
+  it('rates the screen the person is on, from the star in the bar', async () => {
     localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
     const user = userEvent.setup();
     render(wrap('/sets', <DemoBar role="STERILIZATION" onShowMe={() => undefined} />));
-    await user.click(await screen.findByRole('button', {name: /Αξιολογήστε την οθόνη/}));
+    await user.click(await screen.findByRole('button', {name: 'Αξιολογήστε αυτή την οθόνη'}));
     const card = screen.getByRole('complementary', {name: 'Αξιολόγηση βήματος'});
     await user.click(within(card).getByRole('radio', {name: '5/5'}));
     await user.click(within(card).getByRole('button', {name: 'Αποστολή'}));
@@ -134,8 +134,9 @@ describe('Demo bar', () => {
     expect(within(stars).getByRole('radio', {name: '4/5'})).toBeChecked();
   });
 
-  it('asks how a step was as soon as it is done, with a comment, and «Later» leaves it', async () => {
+  it('asks once per part of the app, when its last step is done, with a comment, and «Later» leaves it', async () => {
     localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');
+    service.loadGuideDone.mockResolvedValue(new Set(['receive']));
     service.findDoneRecordSteps.mockResolvedValue([]);
     const user = userEvent.setup();
     const bar = (savedAt?: number) =>
@@ -145,18 +146,23 @@ describe('Demo bar', () => {
     // Steps already done on opening the app bring no card, and there is no «Evaluate» yet.
     expect(screen.queryByRole('complementary', {name: 'Αξιολόγηση βήματος'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Αξιολόγηση'})).not.toBeInTheDocument();
-    // The person records a preparation; once the app has saved it, the step is found done.
+    // One more step of the Sterilization workflow: the part is not finished, so no card.
     service.findDoneRecordSteps.mockResolvedValue(['prepare']);
     rerender(bar(Date.now()));
-    const card = await screen.findByRole('complementary', {name: 'Αξιολόγηση βήματος'}, {timeout: 3000});
-    expect(within(card).getByText('Ολοκληρώσατε: Σύνθεση και έλεγχος')).toBeInTheDocument();
+    await waitFor(() => expect(service.markGuideSteps).toHaveBeenCalledWith('org-demo', 'user-1', ['prepare']));
+    expect(screen.queryByRole('complementary', {name: 'Αξιολόγηση βήματος'})).not.toBeInTheDocument();
+    // Its last steps: one card for the whole part.
+    service.findDoneRecordSteps.mockResolvedValue(['cycle', 'release', 'deliver']);
+    rerender(bar(Date.now() + 10_000));
+    const card = await screen.findByRole('complementary', {name: 'Αξιολόγηση βήματος'}, {timeout: 8000});
+    expect(within(card).getByText('Ολοκληρώσατε: Ροή Αποστείρωσης')).toBeInTheDocument();
     expect(within(card).getByRole('button', {name: 'Αποστολή'})).toBeDisabled();
     await user.click(within(card).getByRole('radio', {name: '5/5'}));
     await user.type(within(card).getByRole('textbox', {name: 'Σχόλιο'}), 'Πολύ καθαρό');
     await user.click(within(card).getByRole('button', {name: 'Αποστολή'}));
-    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'step_prepare', 5, 'Πολύ καθαρό');
+    expect(feedback.rateModule).toHaveBeenCalledWith('org-demo', 'user-1', 'sterilization', 5, 'Πολύ καθαρό');
     expect(screen.queryByRole('complementary', {name: 'Αξιολόγηση βήματος'})).not.toBeInTheDocument();
-  });
+  }, 15_000);
 
   it('after the last step, asks for the final evaluation', async () => {
     localStorage.setItem('surgitrack-demo-guide-seen-user-1', '1');

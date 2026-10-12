@@ -20,7 +20,7 @@ import type {UserRole} from '../../store/types';
 import {useEvaluationDemo} from '../../data/cloud/demoContext';
 import {findDoneRecordSteps, loadGuideDone, markGuideSteps} from '../../data/cloud/demoGuide';
 import {getRealIdentity} from '../../data/cloud/identity';
-import {FINAL_TOPIC, stepTopic, suggestFinal} from '../../core/demoFeedback';
+import {FINAL_TOPIC, MODULES, moduleOfStep, stepTopic, suggestFinal} from '../../core/demoFeedback';
 import {loadMyFeedback, rateModule, type DemoRequestKind, type FeedbackRow} from '../../data/cloud/demoFeedback';
 import StarRating from '../demo/StarRating';
 import DemoRequestDialog from '../demo/DemoRequestDialog';
@@ -36,10 +36,13 @@ const CHECK_EVERY_MS = 5000;
 
 /**
  * The bar of a prospect's evaluation Demo: days left, the first-steps guide (steps complete
- * themselves; "Show me" opens the screen with its Help), and "I want the application" / "Ask for
- * more time". As soon as a step is done a card asks how it was (1–5 stars, a comment); after the last
- * step it asks for the final evaluation. `savedAt` is when the app last saved to the server: the
- * steps done by a record are checked then, so the card appears right after the action.
+ * themselves; "Show me" opens the screen with its Help), "Rate this screen" (a star in the bar), and
+ * "I want the application" / "Ask for more time". When the person has done every step of a part of
+ * the app (Sterilization, Departments…) one card asks how that part was (1–5 stars, a comment); a
+ * single step can still be rated from the guide. After the last step it asks for the final
+ * evaluation. One card at a time, never over the welcome or a tour. `savedAt` is when the app last
+ * saved to the server: the steps done by a record are checked then, so the card appears right after
+ * the action.
  */
 export default function DemoBar({
   role,
@@ -61,16 +64,15 @@ export default function DemoBar({
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState<Map<string, FeedbackRow>>(new Map());
   const [dialog, setDialog] = useState<'final' | DemoRequestKind | null>(null);
-  // Steps done since the app opened, waiting for their rating card; then, maybe, the final one.
+  // Parts of the app finished since the app opened, waiting for their rating card; then, maybe, the final one.
   const [toAsk, setToAsk] = useState<string[]>([]);
   const [askFinalNow, setAskFinalNow] = useState(false);
   // Steps found on opening the app were done earlier: only steps done from then on bring the card.
   const ready = useRef(false);
   const lastCheck = useRef(0);
-  // The guided tour on the screen, the step whose tour just ended (its rating card), the welcome on
-  // the first visit, and the person's own rating of the screen they are on.
+  // The guided tour on the screen, the welcome on the first visit, and the person's own rating of the
+  // screen they are on.
   const [tour, setTour] = useState<{step: GuideStep; tour: Tour} | null>(null);
-  const [toursDone, setToursDone] = useState<string[]>([]);
   const [welcome, setWelcome] = useState(false);
   const [rateScreen, setRateScreen] = useState<{topic: string; title: string} | null>(null);
 
@@ -102,7 +104,14 @@ export default function DemoBar({
         const fresh = keys.filter(k => !prev.has(k));
         const next = new Set([...prev, ...fresh]);
         if (ready.current && fresh.length) {
-          setToAsk(queue => [...queue, ...fresh.filter(k => !queue.includes(k))]);
+          // A part of the app whose steps (this person's) are now all done.
+          const finished = [...new Set(fresh.map(k => moduleOfStep(k)?.key).filter((k): k is string => !!k))].filter(
+            key => {
+              const part = MODULES.find(m => m.key === key)!;
+              return steps.filter(s => part.steps.includes(s.key)).every(s => next.has(s.key));
+            },
+          );
+          setToAsk(queue => [...queue, ...finished.filter(k => !queue.includes(k))]);
           if (steps.every(s => next.has(s.key))) setAskFinalNow(true);
         }
         return next;
@@ -180,7 +189,6 @@ export default function DemoBar({
   };
   const tourEnded = (step: GuideStep) => {
     setTour(null);
-    setToursDone(list => (list.includes(step.key) ? list : [...list, step.key]));
     if (userId) void markGuideSteps(demo.organizationId, userId, [tourTopic(step.key)]).catch(() => undefined);
   };
   const progress = guideProgress(steps, done);
@@ -188,13 +196,18 @@ export default function DemoBar({
   const ending = days <= 3;
   const finalDone = feedback.has(FINAL_TOPIC);
   const askFinal = !finalDone && suggestFinal(progress, days);
-  // The card: the oldest step done and not rated yet; after the last step, the final evaluation.
-  const asking = steps.find(s => s.key === toAsk.find(k => !feedback.get(stepTopic(k))?.rating));
+  // The card: the oldest part of the app finished and not rated yet; after the last step, the final evaluation.
+  const asking = MODULES.find(m => m.key === toAsk.find(k => !feedback.get(k)?.rating));
   const cardFinal = !asking && askFinalNow && !finalDone;
   const later = (key?: string) => (key ? setToAsk(queue => queue.filter(k => k !== key)) : setAskFinalNow(false));
-  // After a tour, how it was (once per tour and session), unless a step's own card is asking.
-  const tourToRate = !asking && !cardFinal ? steps.find(s => toursDone.includes(s.key)) : undefined;
-  const cardBusy = !!(asking || cardFinal || tourToRate || tour || welcome);
+  // Only one thing at a time: no card over the welcome or a tour.
+  const cardBusy = !!(asking || cardFinal || tour || welcome);
+  const rateThisScreen = () =>
+    setRateScreen({
+      topic: screenTopic(pathname),
+      title: document.querySelector('.content h1')?.textContent?.trim() || 'SurgiTrack',
+    });
+  const screenRating = feedback.get(screenTopic(pathname))?.rating;
   return (
     <>
       <div className={`demo-bar${ending ? ' ending' : ''}`} role="status">
@@ -209,6 +222,17 @@ export default function DemoBar({
               )
             : L('Δοκιμαστικά δεδομένα', 'Sample data')}
         </span>
+        <button
+          type="button"
+          className={`demo-bar-action demo-bar-rate${screenRating ? ' rated' : ''}`}
+          onClick={rateThisScreen}
+          disabled={cardBusy || !!dialog || !!rateScreen}
+          title={L('Αξιολογήστε αυτή την οθόνη', 'Rate this screen')}
+          aria-label={L('Αξιολογήστε αυτή την οθόνη', 'Rate this screen')}
+        >
+          <Star size={15} />
+          {screenRating ? <b>{screenRating}★</b> : null}
+        </button>
         <button type="button" className="demo-bar-guide" onClick={() => setOpen(v => !v)} aria-expanded={open}>
           <ListChecks size={15} />
           {L('Πρώτα βήματα', 'First steps')}
@@ -235,14 +259,14 @@ export default function DemoBar({
           {L('Θέλω την εφαρμογή', 'I want it')}
         </button>
       </div>
-      {(asking || cardFinal) && !dialog && (
+      {(asking || cardFinal) && !dialog && !welcome && !tour && (
         <StepRatingCard
           key={asking?.key || 'final'}
           L={L}
           step={asking && {title: L(asking.title.el, asking.title.en)}}
           onRate={(rating, comment) => {
             if (!asking) return;
-            rate(stepTopic(asking.key), rating, comment);
+            rate(asking.key, rating, comment);
             later(asking.key);
           }}
           onLater={() => later(asking?.key)}
@@ -250,20 +274,6 @@ export default function DemoBar({
             later();
             setDialog('final');
           }}
-        />
-      )}
-      {tourToRate && !dialog && (
-        <StepRatingCard
-          key={`tour-${tourToRate.key}`}
-          L={L}
-          heading={L(`Ξενάγηση: ${tourToRate.title.el}`, `Tour: ${tourToRate.title.en}`)}
-          step={{title: L(tourToRate.title.el, tourToRate.title.en)}}
-          onRate={(rating, comment) => {
-            rate(tourTopic(tourToRate.key), rating, comment);
-            setToursDone(list => list.filter(k => k !== tourToRate.key));
-          }}
-          onLater={() => setToursDone(list => list.filter(k => k !== tourToRate.key))}
-          onFinal={() => undefined}
         />
       )}
       {rateScreen && !cardBusy && !dialog && (
@@ -279,22 +289,6 @@ export default function DemoBar({
           onLater={() => setRateScreen(null)}
           onFinal={() => undefined}
         />
-      )}
-      {!rateScreen && !cardBusy && !dialog && (
-        <button
-          type="button"
-          className="demo-rate-screen"
-          onClick={() =>
-            setRateScreen({
-              topic: screenTopic(pathname),
-              title: document.querySelector('.content h1')?.textContent?.trim() || 'SurgiTrack',
-            })
-          }
-        >
-          <Star size={15} />
-          {L('Αξιολογήστε την οθόνη', 'Rate this screen')}
-          {feedback.get(screenTopic(pathname))?.rating ? <b>{feedback.get(screenTopic(pathname))!.rating}★</b> : null}
-        </button>
       )}
       {tour && (
         <GuidedTour
