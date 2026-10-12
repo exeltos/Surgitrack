@@ -1,7 +1,21 @@
 import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
-import {Accessibility, Bell, BookOpen, Home, LogOut, Menu, Minus, Plus, X, Eye, Undo2, WifiOff} from 'lucide-react';
+import {
+  Accessibility,
+  Bell,
+  BookOpen,
+  FlaskConical,
+  Home,
+  LogOut,
+  Menu,
+  Minus,
+  Plus,
+  X,
+  Eye,
+  Undo2,
+  WifiOff,
+} from 'lucide-react';
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
@@ -275,14 +289,6 @@ export default function AppShell({
           <X size={18} />
         </button>
       </div>
-      {isDemo && (
-        <div className="demo-exit-panel">
-          <span>DEMO</span>
-          <button onClick={returnFromDemo}>
-            {lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}
-          </button>
-        </div>
-      )}
       <nav>
         {navigation
           .filter(item => item.to !== '/bin')
@@ -366,7 +372,8 @@ export default function AppShell({
             <Home size={15} />
             <span>SurgiTrack</span>
           </button>
-          <RoleSwitcher />
+          {/* In the platform's Demo the role is picked in the DEMO line. */}
+          {!isDemo && <RoleSwitcher />}
           {!!getCloudOrganizationId() && <SyncChip info={syncInfo} live={realtimeLive} online={online} />}
           <div className="top-actions">
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>
@@ -476,6 +483,35 @@ export default function AppShell({
                     'Οι τελευταίες αλλαγές κρατιούνται σε αυτή τη συσκευή και θα αποθηκευτούν μόλις επανέλθει η σύνδεση, ακόμη κι αν κλείσει η σελίδα: ανοίξτε την ξανά με τον ίδιο χρήστη.',
                   )}
             </span>
+          </div>
+        )}
+        {/* The platform's own Demo: a slim line above the content (as the evaluators' Demo bar), not a box
+            in the menu. */}
+        {isDemo && !evaluationDemo && (
+          <div className="demo-bar owner-demo-bar" role="status">
+            <span className="demo-bar-chip">
+              <FlaskConical size={14} /> DEMO
+            </span>
+            <span className="demo-bar-text">
+              {lang === 'el'
+                ? 'Δοκιμαστικό νοσοκομείο · τα ίδια δεδομένα με τα Demo των αξιολογητών'
+                : 'Sample hospital · the same data as the evaluators’ Demos'}
+            </span>
+            <div className="owner-demo-role">
+              <Eye size={14} aria-hidden="true" />
+              <span>{lang === 'el' ? 'Ρόλος' : 'Role'}</span>
+              <RoleSwitcher />
+            </div>
+            <button
+              type="button"
+              className="demo-bar-action"
+              onClick={returnFromDemo}
+              aria-label={lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}
+              title={lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}
+            >
+              <LogOut size={15} />
+              <span>{lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}</span>
+            </button>
           </div>
         )}
         {evaluationDemo && (
