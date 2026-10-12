@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {CheckCircle2, Hourglass, Lock, PackageCheck, Printer, TriangleAlert} from 'lucide-react';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
@@ -8,22 +7,22 @@ import type {ProcessLoadRecord} from '../../../types/domain';
 
 /**
  * The loads in the sterilizer right now. Their Sets and instruments are locked (read-only) until the end
- * of the cycle: "End of cycle" sends the load to release, "Cycle failed" sends the whole load back.
+ * of the cycle. «Στον κλίβανο» only shows them; Release (with `onFinish`) records the end of the cycle:
+ * "End of cycle" makes the load ready to release, "Cycle failed" sends the whole load back.
  */
 export default function SterilizerLoads({
   loads,
-  canFinish,
+  canFinish = false,
   onFinish,
   onPrint,
 }: {
   loads: ProcessLoadRecord[];
-  canFinish: boolean;
-  onFinish: (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => void;
-  onPrint: (loadId: string) => void;
+  canFinish?: boolean;
+  onFinish?: (loadId: string, result: 'PASSED' | 'FAILED') => void;
+  onPrint?: (loadId: string) => void;
 }) {
   const [confirm, ask] = useConfirm();
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  if (!loads.length)
+  if (!loads.length && !onFinish)
     return (
       <div className="empty ster-empty">
         <PackageCheck size={32} />
@@ -81,43 +80,36 @@ export default function SterilizerLoads({
                 </li>
               ))}
             </ul>
-            <footer>
-              <input
-                value={notes[load.id] || ''}
-                onChange={e => setNotes(current => ({...current, [load.id]: e.target.value}))}
-                placeholder={tr('Παρατήρηση τέλους κύκλου (προαιρετικά)…')}
-                aria-label={tr('Παρατήρηση τέλους κύκλου')}
-                disabled={!canFinish}
-              />
-              <button className="sterilizer-load-print" onClick={() => onPrint(load.id)}>
-                <Printer size={15} /> {tr('Έντυπο')}
-              </button>
-              <button
-                className="release-reprocess"
-                disabled={!canFinish}
-                onClick={() =>
-                  ask({
-                    title: tr('Αποτυχία κύκλου;'),
-                    message: tr(
-                      'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.',
-                      load.items.length,
-                    ),
-                    confirmLabel: tr('Αποτυχία κύκλου'),
-                    danger: true,
-                    onConfirm: () => onFinish(load.id, 'FAILED', notes[load.id]),
-                  })
-                }
-              >
-                <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
-              </button>
-              <button
-                className="primary"
-                disabled={!canFinish}
-                onClick={() => onFinish(load.id, 'PASSED', notes[load.id])}
-              >
-                <CheckCircle2 size={15} /> {tr('Τέλος κύκλου · {0}', load.items.length)}
-              </button>
-            </footer>
+            {onFinish && (
+              <footer>
+                {onPrint && (
+                  <button className="sterilizer-load-print" onClick={() => onPrint(load.id)}>
+                    <Printer size={15} /> {tr('Έντυπο')}
+                  </button>
+                )}
+                <button
+                  className="release-reprocess"
+                  disabled={!canFinish}
+                  onClick={() =>
+                    ask({
+                      title: tr('Αποτυχία κύκλου;'),
+                      message: tr(
+                        'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.',
+                        load.items.length,
+                      ),
+                      confirmLabel: tr('Αποτυχία κύκλου'),
+                      danger: true,
+                      onConfirm: () => onFinish(load.id, 'FAILED'),
+                    })
+                  }
+                >
+                  <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
+                </button>
+                <button className="primary" disabled={!canFinish} onClick={() => onFinish(load.id, 'PASSED')}>
+                  <CheckCircle2 size={15} /> {tr('Τέλος κύκλου · {0}', load.items.length)}
+                </button>
+              </footer>
+            )}
           </section>
         );
       })}

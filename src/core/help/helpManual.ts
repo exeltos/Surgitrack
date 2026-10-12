@@ -557,11 +557,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Στον κλίβανο',
-          'Η καρτέλα «Στον κλίβανο» δείχνει τα φορτία που κλιβανίζονται τώρα: κλίβανο, κύκλο, πρόγραμμα, ποιος φόρτωσε και πότε, και τα αντικείμενα. Είναι κλειδωμένα· κανείς δεν μπορεί να τα αλλάξει. Όταν τελειώσει ο κύκλος πατήστε «Τέλος κύκλου»: το φορτίο περνά στην Αποδέσμευση και η οθόνη πηγαίνει εκεί (η Αποδέσμευση είναι πάντα υποχρεωτική)· με «Αποτυχία κύκλου» όλο το φορτίο επιστρέφει σε επανεπεξεργασία.',
+          'Η καρτέλα «Στον κλίβανο» δείχνει τα φορτία που κλιβανίζονται τώρα: κλίβανο, κύκλο, πρόγραμμα, ποιος φόρτωσε και πότε, και τα αντικείμενα. Είναι κλειδωμένα· κανείς δεν μπορεί να τα αλλάξει, και η καρτέλα είναι μόνο για προβολή. Τα φορτία σε εξέλιξη φαίνονται και στην αρχή της Αποδέσμευσης: εκεί, όταν τελειώσει ο κύκλος, πατήστε «Τέλος κύκλου» και το φορτίο είναι έτοιμο για αποδέσμευση (η Αποδέσμευση είναι πάντα υποχρεωτική)· με «Αποτυχία κύκλου» όλο το φορτίο επιστρέφει σε επανεπεξεργασία.',
         ],
         en: [
           'In the sterilizer',
-          'The "In the sterilizer" tab shows the loads being sterilized now: sterilizer, cycle, program, who loaded it and when, and the items. They are locked; nobody can change them. When the cycle ends press "End of cycle": the load moves to Release and the screen goes there (Release is always required); "Cycle failed" sends the whole load back to reprocessing.',
+          'The "In the sterilizer" tab shows the loads being sterilized now: sterilizer, cycle, program, who loaded it and when, and the items. They are locked; nobody can change them, and the tab is view only. Loads in progress also show at the top of Release: there, when the cycle ends, press "End of cycle" and the load is ready to release (Release is always required); "Cycle failed" sends the whole load back to reprocessing.',
         ],
       },
       {
@@ -577,11 +577,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Έντυπο αποδέσμευσης',
-          'Το κουμπί «Έντυπο» (στο «Στον κλίβανο», στην Αποδέσμευση και στα πρόσφατα αποδεσμευμένα φορτία) τυπώνει σε A4 το έντυπο του φορτίου: τύπο φορτίου, κλίβανο, κύκλο, πρόγραμμα, διάρκεια αποστείρωσης, τους δείκτες με χώρο για να κολλήσετε την ταινία τους, τους ελέγχους, τα αντικείμενα με τη λήξη τους, την απόφαση και την έγκριση με τα στοιχεία του χρήστη και υπογραφή. Από το «Στον κλίβανο» βγαίνει κενό για συμπλήρωση· από την Αποδέσμευση βγαίνει συμπληρωμένο με ό,τι έχετε επιλέξει εκεί (δείκτες, έλεγχοι) και τα στοιχεία του συνδεδεμένου χρήστη· μετά την αποδέσμευση βγαίνει με την καταχωρημένη απόφαση. Τα αντικείμενα δείχνουν την ημερομηνία αποστείρωσης (STERILE) και λήξης (κλεψύδρα)· αν δεν έχει οριστεί διάρκεια, εμφανίζεται η προεπιλογή του νοσοκομείου.',
+          'Το κουμπί «Έντυπο» (στα φορτία σε εξέλιξη και στο παράθυρο της Αποδέσμευσης και στα πρόσφατα αποδεσμευμένα φορτία) τυπώνει σε A4 το έντυπο του φορτίου: τύπο φορτίου, κλίβανο, κύκλο, πρόγραμμα, διάρκεια αποστείρωσης, τους δείκτες με χώρο για να κολλήσετε την ταινία τους, τους ελέγχους, τα αντικείμενα με τη λήξη τους, την απόφαση και την έγκριση με τα στοιχεία του χρήστη και υπογραφή. Για φορτίο σε εξέλιξη βγαίνει κενό για συμπλήρωση· από την Αποδέσμευση βγαίνει συμπληρωμένο με ό,τι έχετε επιλέξει εκεί (δείκτες, έλεγχοι) και τα στοιχεία του συνδεδεμένου χρήστη· μετά την αποδέσμευση βγαίνει με την καταχωρημένη απόφαση. Τα αντικείμενα δείχνουν την ημερομηνία αποστείρωσης (STERILE) και λήξης (κλεψύδρα)· αν δεν έχει οριστεί διάρκεια, εμφανίζεται η προεπιλογή του νοσοκομείου.',
         ],
         en: [
           'Release form',
-          'The "Form" button (in "In the sterilizer", in Release and in the recently released loads) prints the load’s A4 form: load type, sterilizer, cycle, program, shelf life, the indicators with a place to stick their strip, the checks, the items with their expiry, the decision and the approval with the user’s details and signature. From "In the sterilizer" it prints blank to fill in; from Release it prints filled in with what you have ticked there (indicators, checks) and the signed-in user’s details; after the release it prints with the recorded decision. Items show the sterilization date (STERILE) and the expiry date (hourglass); when no shelf life is set, the hospital default is shown.',
+          'The "Form" button (on loads in progress, in the Release window and in the recently released loads) prints the load’s A4 form: load type, sterilizer, cycle, program, shelf life, the indicators with a place to stick their strip, the checks, the items with their expiry, the decision and the approval with the user’s details and signature. For a load in progress it prints blank to fill in; from Release it prints filled in with what you have ticked there (indicators, checks) and the signed-in user’s details; after the release it prints with the recorded decision. Items show the sterilization date (STERILE) and the expiry date (hourglass); when no shelf life is set, the hospital default is shown.',
         ],
       },
       {

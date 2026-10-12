@@ -189,3 +189,127 @@ html body .trace-pick > small {
     font-size: 13.5px;
   }
 }
+
+/* Search | Uses with a patient code. */
+html body .trace-tabs {
+  flex: none;
+  margin-bottom: 12px;
+}
+/* Uses with a patient code: filters on one line, then the list. */
+html body .trace-patients {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+html body .trace-patients-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+html body .trace-patients-filters label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-blue-25);
+}
+html body .trace-patients-filters input {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 9px;
+  background: var(--c-white);
+  font: inherit;
+  font-weight: 500;
+}
+html body .trace-patients-code {
+  flex: 1 1 240px;
+}
+html body .trace-patients-code > div {
+  position: relative;
+}
+html body .trace-patients-code svg {
+  position: absolute;
+  top: 11px;
+  left: 10px;
+  color: var(--muted);
+}
+html body .trace-patients-code input {
+  width: 100%;
+  padding-left: 32px;
+}
+html body .trace-patients-count {
+  align-self: flex-end;
+  padding-bottom: 11px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+html body .trace-patients-table {
+  overflow: auto;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .trace-patients-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+html body .trace-patients-table th {
+  position: sticky;
+  top: 0;
+  padding: 10px 12px;
+  background: var(--c-gray-100-2);
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+html body .trace-patients-table td {
+  padding: 9px 12px;
+  border-top: 1px solid var(--c-gray-95);
+  vertical-align: middle;
+}
+html body .trace-patients-table td:first-child {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-patient-code {
+  padding: 3px 8px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 7px;
+  background: var(--c-white);
+  color: var(--c-cyan-35);
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+html body .trace-patient-code:hover {
+  border-color: var(--c-cyan-35);
+}
+@media (max-width: 700px) {
+  html body .trace-patients-count {
+    margin-left: 0;
+  }
+  html body .trace-patients-table td:nth-child(4),
+  html body .trace-patients-table th:nth-child(4),
+  html body .trace-patients-table td:nth-child(5),
+  html body .trace-patients-table th:nth-child(5),
+  html body .trace-patients-table td:nth-child(6),
+  html body .trace-patients-table th:nth-child(6) {
+    display: none;
+  }
+  html body .trace-patients-table td,
+  html body .trace-patients-table th {
+    padding: 8px;
+  }
+  html body .trace-patients-table td:first-child {
+    white-space: normal;
+  }
+  html body .trace-patients-table td:nth-child(3) {
+    overflow-wrap: anywhere;
+  }
+}

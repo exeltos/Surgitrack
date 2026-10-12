@@ -5,7 +5,6 @@ import {
   CalendarClock,
   Flame,
   FileText,
-  History,
   PenLine,
   Stethoscope,
   UsersRound,
@@ -36,16 +35,7 @@ export const INDICATOR: Record<string, string> = {
 export const indicatorText = (value?: string) => (value && INDICATOR[value] ? tr(INDICATOR[value]) : '—');
 
 export type ReportId =
-  | 'composition'
-  | 'department'
-  | 'specialty'
-  | 'issues'
-  | 'usage'
-  | 'retired'
-  | 'loads'
-  | 'expiry'
-  | 'handovers'
-  | 'traceability';
+  'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'loads' | 'expiry' | 'handovers';
 export type Row = Record<string, string | number>;
 
 export const stateLabel: Record<string, string> = {
@@ -93,12 +83,6 @@ export const reports: Array<{id: ReportId; title: string; description: string; i
     title: 'Παραδόσεις & παραλαβές',
     description: 'Ποιος παρέδωσε σε ποιον, και αν ο άλλος υπέγραψε με τον δικό του κωδικό.',
     icon: PenLine,
-  },
-  {
-    id: 'traceability',
-    title: 'Ιχνηλασιμότητα ασθενούς',
-    description: 'Κινήσεις Σετ/εργαλείων βάσει κωδικού ασθενούς.',
-    icon: History,
   },
 ];
 

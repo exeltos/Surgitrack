@@ -121,7 +121,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           )}
           {queue === 'IN_STERILIZER' && (
             <span className="ster-hint">
-              {tr('Τα αντικείμενα είναι κλειδωμένα μέχρι το τέλος του κύκλου· μετά περνούν στην Αποδέσμευση.')}
+              {tr('Μόνο προβολή: τα αντικείμενα είναι κλειδωμένα· το «Τέλος κύκλου» καταγράφεται στην Αποδέσμευση.')}
             </span>
           )}
           {queue === 'STORAGE' && (
@@ -224,22 +224,26 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
         </details>
       )}
-      {queue === 'IN_STERILIZER' ? (
-        <SterilizerLoads
-          loads={s.runningLoads}
-          canFinish={s.can('sterilization.cycle')}
-          onFinish={(id, result, note) => {
-            // A finished cycle goes straight on to Release, where the load is shown ready to release.
-            if (s.finishProcessLoad(id, result, note) && result === 'PASSED') s.setQueue('RELEASE');
-          }}
-          onPrint={s.printLoadForm}
-        />
-      ) : rows.length === 0 ? (
-        <div className="empty ster-empty">
-          <PackageCheck size={32} />
-          <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>
-          <span>{tr('Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.')}</span>
+      {queue === 'RELEASE' && s.runningLoads.length > 0 && (
+        <div className="release-running-loads">
+          <SterilizerLoads
+            loads={s.runningLoads}
+            canFinish={s.can('sterilization.cycle')}
+            onFinish={(id, result) => s.finishProcessLoad(id, result)}
+            onPrint={s.printLoadForm}
+          />
         </div>
+      )}
+      {queue === 'IN_STERILIZER' ? (
+        <SterilizerLoads loads={s.runningLoads} />
+      ) : rows.length === 0 ? (
+        queue === 'RELEASE' && s.runningLoads.length > 0 ? null : (
+          <div className="empty ster-empty">
+            <PackageCheck size={32} />
+            <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>
+            <span>{tr('Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.')}</span>
+          </div>
+        )
       ) : (
         <>
           <div className="ster-list-head">

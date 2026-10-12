@@ -827,6 +827,7 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
 .sterilizer-load-card > footer {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
@@ -1597,4 +1598,13 @@ html body .ster-row-load b {
 .prep-tools-scroll .prep-select-all-row:has(input:disabled) {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+/* Release: the loads still in the sterilizer come first, where their end of cycle is recorded. */
+.release-running-loads {
+  flex: 0 0 auto;
+}
+.release-running-loads .sterilizer-loads {
+  overflow: visible;
+  padding-bottom: 0;
 }

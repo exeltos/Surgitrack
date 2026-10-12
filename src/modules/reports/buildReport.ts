@@ -7,17 +7,9 @@ type Store = ReturnType<typeof useSurgi>;
 /** What the reports are built from. */
 export type ReportInput = Pick<
   Store,
-  | 'sets'
-  | 'tools'
-  | 'retiredTools'
-  | 'issues'
-  | 'movements'
-  | 'processLoads'
-  | 'sterilizationReleases'
-  | 'receipts'
-  | 'deliveries'
+  'sets' | 'tools' | 'retiredTools' | 'issues' | 'processLoads' | 'sterilizationReleases' | 'receipts' | 'deliveries'
 > & {warningThreshold: number};
-/** The chosen filters; 'ALL' (or an empty patient code) is no filter. */
+/** The chosen filters; 'ALL' is no filter. */
 export type ReportFilters = {
   setId: string;
   department: string;
@@ -27,7 +19,6 @@ export type ReportFilters = {
   issueStatus: string;
   issueType: string;
   usageFilter: string;
-  patientCode: string;
   loadStatus: string;
   sterilizerName: string;
   expiryState: string;
@@ -40,8 +31,7 @@ export function buildReport(
   input: ReportInput,
   filters: ReportFilters,
 ): {columns: Array<{key: string; label: string}>; rows: Row[]} {
-  const {sets, tools, retiredTools, issues, movements, processLoads, sterilizationReleases, receipts, deliveries} =
-    input;
+  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = input;
   const {warningThreshold} = input;
   const {
     setId,
@@ -52,7 +42,6 @@ export function buildReport(
     issueStatus,
     issueType,
     usageFilter,
-    patientCode,
     loadStatus,
     sterilizerName,
     expiryState,
@@ -353,30 +342,5 @@ export function buildReport(
       rows: rows as Row[],
     };
   }
-  const q = patientCode.trim().toLowerCase();
-  const rows = movements
-    .filter(m => m.patientCode && (!q || m.patientCode.toLowerCase().includes(q)))
-    .map(m => ({
-      patientCode: m.patientCode || '',
-      asset: m.asset,
-      kind: m.assetKind === 'SET' ? 'Σετ' : 'Εργαλείο',
-      from: m.from,
-      to: m.to,
-      status: m.status,
-      at: m.at,
-      by: m.by,
-    }));
-  return {
-    columns: [
-      {key: 'patientCode', label: tr('Κωδικός ασθενούς')},
-      {key: 'asset', label: tr('Σετ / Εργαλείο')},
-      {key: 'kind', label: tr('Τύπος')},
-      {key: 'from', label: tr('Από')},
-      {key: 'to', label: tr('Προς')},
-      {key: 'status', label: tr('Κίνηση')},
-      {key: 'at', label: tr('Ημερομηνία')},
-      {key: 'by', label: tr('Χρήστης')},
-    ],
-    rows: rows as Row[],
-  };
+  return {columns: [], rows: []};
 }

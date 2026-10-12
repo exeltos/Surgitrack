@@ -3028,14 +3028,6 @@ html body .shelf-life-options button.on {
   color: var(--st-muted);
   font-size: 12px;
 }
-.sterilizer-load-card > footer input {
-  flex: 1 1 220px;
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 10px;
-  font-size: 13px;
-}
 html body .sterilizer-load-card > footer .release-reprocess {
   border: 1px solid var(--c-orange-85);
   background: var(--c-gray-100-4);
