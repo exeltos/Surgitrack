@@ -240,18 +240,20 @@ export function useAppRecordSync(
     window.clearTimeout(cacheTimer.current);
     cacheTimer.current = window.setTimeout(() => writeCopy.current(), CACHE_DELAY_MS);
   };
-  // The rest of the history, older than what the opening loaded (T3): fetched on request, added after.
+  // The rest of the history, older than what the opening loaded (T3): fetched on request, added after. With
+  // a filter only the matching records come (a search), and the rest stays unloaded.
   useEffect(() => {
     if (!organizationId || !HISTORY_WINDOW_DAYS[collection]) return;
-    return registerOlderLoader(collection, async () => {
+    return registerOlderLoader(collection, async filter => {
       const cutoff = cutoffOf(collection);
       if (!cutoff) return;
-      const older = await loadTable(organizationId, collection as TableCollection, {before: cutoff});
+      const older = await loadTable(organizationId, collection as TableCollection, {before: cutoff, filter});
+      if (cutoffOf(collection) !== cutoff) return; // another hospital, or loaded in full meanwhile
       // Taken from the server: their appearance in the store is not a local change to save.
       const until = Date.now() + 60000;
       older.forEach(record => adopted.current.set(record.id, until));
       if (older.length) applyRef.current?.(older, [], true);
-      setCutoff(collection, undefined);
+      if (!filter) setCutoff(collection, undefined);
       scheduleCopy();
     });
   }, [organizationId, collection]);

@@ -1,6 +1,7 @@
-import {fireEvent, screen, within} from '@testing-library/react';
-import {describe, expect, it} from 'vitest';
+import {act, fireEvent, screen, within} from '@testing-library/react';
+import {describe, expect, it, vi} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
+import {registerOlderLoader, setCutoff} from '../../../data/cloud/historyWindow';
 import ReportsPage from '../ReportsPage';
 
 const REPORTS = [
@@ -96,5 +97,25 @@ describe('Reports', () => {
     expect(new Set(column('Υπογραφή άλλου μέρους'))).toEqual(new Set(['Μη επιβεβαιωμένη']));
     expect(new Set(column('Κίνηση'))).toEqual(new Set(['Παραλαβή', 'Παράδοση']));
     for (const cell of within(results()).getAllByText('Μη επιβεβαιωμένη')) expect(cell).toHaveClass('report-cell-warn');
+  });
+
+  it('loads older history only for a report that reads it, and only the kind it reads', async () => {
+    const loaded: string[] = [];
+    const collections = ['movements', 'receipts', 'deliveries', 'sterilizationReleases'] as const;
+    const stops = collections.map(collection => {
+      setCutoff(collection, '2026-07-01T00:00:00.000Z');
+      return registerOlderLoader(collection, async () => {
+        loaded.push(collection);
+        setCutoff(collection, undefined);
+      });
+    });
+    renderPage(<ReportsPage />);
+    expect(loaded).toEqual([]);
+    choose('Ανά τμήμα');
+    expect(loaded).toEqual([]);
+    await act(async () => choose('Παραδόσεις & παραλαβές'));
+    await vi.waitFor(() => expect([...loaded].sort()).toEqual(['deliveries', 'receipts']));
+    stops.forEach(stop => stop());
+    collections.forEach(collection => setCutoff(collection, undefined));
   });
 });

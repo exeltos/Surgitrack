@@ -11,6 +11,7 @@ import {
   UsersRound,
   Wrench,
 } from 'lucide-react';
+import type {CloudCollection} from '../../data/cloud/appRecords';
 import {escapeHtml} from '../../core/escapeHtml';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {formatDateTime, parseDisplayDate} from '../../core/displayDate';
@@ -101,6 +102,13 @@ export const reports: Array<{id: ReportId; title: string; description: string; i
     icon: History,
   },
 ];
+
+/** The history each report reads (the opening loads only recent history): loaded in full when it opens. */
+export const REPORT_HISTORY: Partial<Record<ReportId, CloudCollection[]>> = {
+  loads: ['sterilizationReleases'],
+  handovers: ['receipts', 'deliveries'],
+  traceability: ['movements'],
+};
 
 /** Report cells holding stored Greek values (type, department, state…) are shown in the UI language. */
 export const TRANSLATED_COLUMNS = new Set([

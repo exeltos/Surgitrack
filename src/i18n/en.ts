@@ -653,6 +653,9 @@ export const en: Record<string, string> = {
   'Απόκρυψη συνθηματικού': 'Hide password',
   'Εμφάνιση συνθηματικού': 'Show password',
   'Φόρτωση του παλαιότερου ιστορικού…': 'Loading the older history…',
+  'Αναζήτηση και στο παλαιότερο ιστορικό…': 'Searching the older history too…',
+  'Το παλαιότερο ιστορικό δεν φορτώθηκε (σύνδεση): εμφανίζονται μόνο οι πρόσφατοι μήνες.':
+    'The older history could not be loaded (connection): only the recent months are shown.',
   'Εμφανίζεται το ιστορικό των τελευταίων 90 ημερών.': 'Showing the history of the last 90 days.',
   'Φόρτωση παλαιότερων': 'Load older',
   'Ταυτόχρονη αλλαγή από άλλη συσκευή': 'Changed on another device at the same time',

@@ -65,7 +65,8 @@ const loadStripped = async <T>(load: (strip: boolean) => Promise<T>): Promise<T>
 export async function loadTable(
   organizationId: string,
   collection: TableCollection,
-  range: {since?: string; before?: string} = {},
+  /** `filter`: a PostgREST `or` filter, for only the matching records (see HistoryFilter). */
+  range: {since?: string; before?: string; filter?: string} = {},
   onProgress?: (loaded: number, total: number) => void,
 ) {
   const {mutable} = CLOUD_TABLES[collection];
@@ -78,6 +79,7 @@ export async function loadTable(
         .eq('organization_id', organizationId);
       if (range.since) query = query.gte('created_at', range.since);
       if (range.before) query = query.lt('created_at', range.before);
+      if (range.filter) query = query.or(range.filter);
       query = query.order('created_at', {ascending: false}).order('id').range(from, to);
       return (strip ? query.stripNulls() : query).then(result => ({
         ...result,
