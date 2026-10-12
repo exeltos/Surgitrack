@@ -230,3 +230,37 @@ html body .owner-demo-bar .role-switch select {
     display: none;
   }
 }
+/* Studio header: the owner's way into the platform's Demo, next to the hospital picker. */
+html body .header-demo-enter {
+  display: inline-flex;
+  margin-left: 8px;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--c-violet-80);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-blue-25);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+html body .header-demo-enter svg {
+  color: var(--c-violet-45);
+}
+html body .header-demo-enter:hover:not(:disabled) {
+  background: var(--c-gray-95-9);
+}
+html body .header-demo-enter:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+/* On a phone the header has no room: the Demo opens from Demo αξιολόγησης → «Δικό μου Demo». */
+@media (max-width: 700px) {
+  html body .header-demo-enter {
+    display: none;
+  }
+}

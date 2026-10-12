@@ -1,9 +1,7 @@
-import {setRuntimeDataMode} from '../../../config/dataMode';
 import {type Organization} from '../../../core/LibraryStore';
-import type {UserRole} from '../../../store/types';
 import {supabase} from '../../../lib/supabase';
-import {applyDemoSessionUser, demoSessionUser, type DemoView, type HospitalRoleKind} from '../../../config/demoRoles';
-import {departments as defaultDepartments} from '../../../core/libraries';
+import {type HospitalRoleKind} from '../../../config/demoRoles';
+import {enterPlatformDemo} from '../../../data/cloud/platformDemo';
 import {organizationCode} from '../../../core/organizationCode';
 import type {useStudioState} from './useStudioState';
 import type {useStudioCloud} from './useStudioCloud';
@@ -20,7 +18,6 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
     setCloudError,
     setOrganizationEditor,
     setQuery,
-    setRole,
     selectedOrganizationId,
     setSelectedOrganizationId,
     setTab,
@@ -168,23 +165,10 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
   // Every demo is its own demo hospital in Supabase, so demo data never mixes with real hospitals.
   // Without a source it is the built-in SurgiTrack Demo; with one, that hospital's private demo copy.
   const enterDemo = async (kind: HospitalRoleKind, sourceOrganizationId?: string) => {
-    const role: UserRole = kind === 'STERILIZATION_SUPERVISOR' ? 'STERILIZATION' : kind;
     setCloudError('');
-    const {data: demoOrganizationId, error} = await supabase.rpc('platform_ensure_demo_organization', {
-      p_source: sourceOrganizationId ?? null,
-    });
-    if (error || !demoOrganizationId) {
-      setCloudError(error?.message || L('Δεν ήταν δυνατή η είσοδος στο Demo.', 'Could not open the Demo.'));
-      return;
-    }
-    const view: DemoView = kind === 'DEPARTMENT' ? 'DEPARTMENT:' : kind;
-    applyDemoSessionUser(demoSessionUser(view, defaultDepartments));
-    sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
-    setRuntimeDataMode('DEMO');
-    setRole(role);
-    // Each role opens on its menu's home (the Overview when its menu has it), like after signing in.
-    window.location.hash = '#/';
-    window.location.reload();
+    const error = await enterPlatformDemo(kind, sourceOrganizationId);
+    if (error !== undefined)
+      setCloudError(error || L('Δεν ήταν δυνατή η είσοδος στο Demo.', 'Could not open the Demo.'));
   };
   const enterBuiltInDemo = (kind: HospitalRoleKind) => void enterDemo(kind);
   const enterOrganizationDemo = (organization: Organization, kind: HospitalRoleKind) => {
