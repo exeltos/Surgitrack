@@ -1957,13 +1957,6 @@ div.asset-import-hospital b {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .sidebar .demo-exit-panel {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-top: 7px;
-    padding-bottom: 7px;
-  }
 }
 
 /* Studio → Settings on every screen: each card keeps its full height and the tab scrolls, rather

@@ -1,7 +1,21 @@
 import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
-import {Accessibility, Bell, BookOpen, Home, LogOut, Menu, Minus, Plus, X, Eye, Undo2, WifiOff} from 'lucide-react';
+import {
+  Accessibility,
+  Bell,
+  BookOpen,
+  FlaskConical,
+  Home,
+  LogOut,
+  Menu,
+  Minus,
+  Plus,
+  X,
+  Eye,
+  Undo2,
+  WifiOff,
+} from 'lucide-react';
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
@@ -275,14 +289,6 @@ export default function AppShell({
           <X size={18} />
         </button>
       </div>
-      {isDemo && (
-        <div className="demo-exit-panel">
-          <span>DEMO</span>
-          <button onClick={returnFromDemo}>
-            {lang === 'el' ? '← Επιστροφή στη Διαχείριση' : '← Back to Platform Admin'}
-          </button>
-        </div>
-      )}
       <nav>
         {navigation
           .filter(item => item.to !== '/bin')
@@ -476,6 +482,24 @@ export default function AppShell({
                     'Οι τελευταίες αλλαγές κρατιούνται σε αυτή τη συσκευή και θα αποθηκευτούν μόλις επανέλθει η σύνδεση, ακόμη κι αν κλείσει η σελίδα: ανοίξτε την ξανά με τον ίδιο χρήστη.',
                   )}
             </span>
+          </div>
+        )}
+        {/* The platform's own Demo: a slim line above the content (as the evaluators' Demo bar), not a box
+            in the menu. */}
+        {isDemo && !evaluationDemo && (
+          <div className="demo-bar owner-demo-bar" role="status">
+            <span className="demo-bar-chip">
+              <FlaskConical size={14} /> DEMO
+            </span>
+            <span className="demo-bar-text">
+              {lang === 'el'
+                ? 'Δοκιμαστικό νοσοκομείο · τα ίδια δεδομένα με τα Demo των αξιολογητών'
+                : 'Sample hospital · the same data as the evaluators’ Demos'}
+            </span>
+            <button type="button" className="demo-bar-action" onClick={returnFromDemo}>
+              <LogOut size={15} />
+              {lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}
+            </button>
           </div>
         )}
         {evaluationDemo && (

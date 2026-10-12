@@ -164,9 +164,6 @@ html body .sidebar .nav-group.first {
   .sidebar nav {
     gap: 2px;
   }
-  .sidebar .demo-exit-panel button {
-    text-align: left;
-  }
 }
 @media (max-width: 1280px) {
   html body .sidebar:not(.mobile-open) {
@@ -187,5 +184,17 @@ html body .sidebar .nav-group.first {
   }
   html body .sidebar .nav-group.first {
     display: none;
+  }
+}
+/* The platform's own Demo on a phone: one line, the badge and the way out. */
+@media (max-width: 700px) {
+  html body .owner-demo-bar {
+    flex-wrap: nowrap;
+  }
+  html body .owner-demo-bar .demo-bar-text {
+    display: none;
+  }
+  html body .owner-demo-bar .demo-bar-action {
+    margin-left: auto;
   }
 }
