@@ -1994,4 +1994,8 @@ export const en: Record<string, string> = {
   'Ιχνηλάτηση ασθενούς {0}': 'Trace patient {0}',
   'Δεν βρέθηκαν χρήσεις σε ασθενείς': 'No uses with a patient code found',
   'Άλλαξε τον κωδικό ή τις ημερομηνίες.': 'Change the code or the dates.',
+  '{0} ολοκλήρωσε την εγγραφή στο «{1}».': '{0} finished signing up in «{1}».',
+  '{0} ολοκλήρωσε την αξιολόγηση στο «{1}».': '{0} sent the evaluation of «{1}».',
+  '+{0} ακόμη': '+{0} more',
+  'Άνοιγμα Demo': 'Open Demos',
 };

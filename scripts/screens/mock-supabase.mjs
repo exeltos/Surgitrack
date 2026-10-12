@@ -369,6 +369,7 @@ export function createDatabase(seed) {
               nps: null,
               answers: {},
               comment,
+              updated_at: iso(-2),
             }))
             .concat([
               {
@@ -379,6 +380,7 @@ export function createDatabase(seed) {
                 nps: 9,
                 answers: {ease: 4, fit: 5, missing: 'Σύνδεση με το πληροφοριακό σύστημα', sets: 420, theatres: 8},
                 comment: 'Μας καλύπτει, θέλουμε προσφορά.',
+                updated_at: iso(-1),
               },
             ])
         : [],
