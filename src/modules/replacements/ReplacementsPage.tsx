@@ -338,11 +338,7 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
                   <th className="col-reason">{tr('Αιτία')}</th>
                   <th className="col-stock">{tr('Απόθεμα')}</th>
                   <th className="col-status">{tr('Κατάσταση')}</th>
-                  {editable && (
-                    <th className="col-actions">
-                      <span className="visually-hidden">{tr('Ενέργειες')}</span>
-                    </th>
-                  )}
+                  {editable && <th className="col-actions">{tr('Ενέργειες')}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -401,47 +397,57 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
                       </td>
                       {editable && (
                         <td className="row-actions">
-                          {canReplace && (
-                            <button
-                              type="button"
-                              className="primary"
-                              title={tr('Αντικατάσταση')}
-                              aria-label={tr('Αντικατάσταση')}
-                              onClick={() => replace([item])}
-                            >
-                              <PackageCheck size={13} /> <span className="btn-label">{tr('Αντικατάσταση')}</span>
-                            </button>
-                          )}
-                          {item.status === 'NEEDED' && (
-                            <button
-                              type="button"
-                              title={tr('Παραγγελία')}
-                              aria-label={tr('Παραγγελία')}
-                              onClick={() => setOrdering(orderLines([item]))}
-                            >
-                              <ShoppingCart size={13} /> <span className="btn-label">{tr('Παραγγελία')}</span>
-                            </button>
-                          )}
-                          {item.reason === 'SERVICE' && item.status !== 'REPLACED' && (
-                            <button
-                              type="button"
-                              title={tr('Επέστρεψε επισκευασμένο: πάει στο Απόθεμα')}
-                              aria-label={tr('Επιστροφή')}
-                              onClick={() =>
-                                ask({
-                                  title: tr('Επιστροφή από Service;'),
-                                  message: tr(
-                                    'Το εργαλείο {0} επέστρεψε επισκευασμένο και μπαίνει στο Απόθεμα.',
-                                    item.tool.barcode,
-                                  ),
-                                  confirmLabel: tr('Επιστροφή στο Απόθεμα'),
-                                  onConfirm: () => store.returnToService('TOOL', item.tool.id),
-                                })
-                              }
-                            >
-                              <Undo2 size={13} /> <span className="btn-label">{tr('Επιστροφή')}</span>
-                            </button>
-                          )}
+                          <div className="replacement-actions">
+                            {canReplace ? (
+                              <button
+                                type="button"
+                                className="primary slot-replace"
+                                title={tr('Αντικατάσταση')}
+                                aria-label={tr('Αντικατάσταση')}
+                                onClick={() => replace([item])}
+                              >
+                                <PackageCheck size={13} /> <span className="btn-label">{tr('Αντικατάσταση')}</span>
+                              </button>
+                            ) : (
+                              <span className="slot-replace" aria-hidden="true" />
+                            )}
+                            {item.status === 'NEEDED' ? (
+                              <button
+                                type="button"
+                                className="slot-order"
+                                title={tr('Παραγγελία')}
+                                aria-label={tr('Παραγγελία')}
+                                onClick={() => setOrdering(orderLines([item]))}
+                              >
+                                <ShoppingCart size={13} /> <span className="btn-label">{tr('Παραγγελία')}</span>
+                              </button>
+                            ) : (
+                              <span className="slot-order" aria-hidden="true" />
+                            )}
+                            {item.reason === 'SERVICE' && item.status !== 'REPLACED' ? (
+                              <button
+                                type="button"
+                                className="slot-return"
+                                title={tr('Επέστρεψε επισκευασμένο: πάει στο Απόθεμα')}
+                                aria-label={tr('Επιστροφή')}
+                                onClick={() =>
+                                  ask({
+                                    title: tr('Επιστροφή από Service;'),
+                                    message: tr(
+                                      'Το εργαλείο {0} επέστρεψε επισκευασμένο και μπαίνει στο Απόθεμα.',
+                                      item.tool.barcode,
+                                    ),
+                                    confirmLabel: tr('Επιστροφή στο Απόθεμα'),
+                                    onConfirm: () => store.returnToService('TOOL', item.tool.id),
+                                  })
+                                }
+                              >
+                                <Undo2 size={13} /> <span className="btn-label">{tr('Επιστροφή')}</span>
+                              </button>
+                            ) : (
+                              <span className="slot-return" aria-hidden="true" />
+                            )}
+                          </div>
                         </td>
                       )}
                     </tr>

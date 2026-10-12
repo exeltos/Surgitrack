@@ -2707,9 +2707,6 @@ html body .replacements-fixed .row-actions button {
   padding: 0 10px;
   font-size: 12px;
 }
-html body .replacements-fixed th.col-actions {
-  width: 250px;
-}
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
 html body .department-kpis > * {

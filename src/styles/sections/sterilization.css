@@ -10,10 +10,8 @@
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
     grid-template-columns: minmax(410px, 35%) minmax(0, 65%);
-    overflow: hidden !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-left-panel {
-    overflow: hidden !important;
     padding-right: 0 !important;
     gap: 8px;
   }
@@ -1026,9 +1024,6 @@ html body .prep-workspace-modal .prep-tools-toolbar-actions {
   flex-wrap: nowrap;
   white-space: nowrap;
 }
-html body .prep-workspace-modal .prep-tools-toolbar-actions .prep-bulk-select {
-  margin: 0;
-}
 html body .prep-control-panel .shelf-life-picker {
   grid-template-columns: 1fr;
   gap: 8px;
@@ -1541,4 +1536,65 @@ html body .ster-row-load b {
     font-size: 13px;
     font-weight: 600;
   }
+}
+
+/* Instrument actions (Report, Replace, Service, Stock, Another Set): each one reads as a button card. */
+.prep-manage-card .prep-manage-grid > button {
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  min-height: 62px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 11px;
+  background: var(--c-white);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.prep-manage-card .prep-manage-grid > button > svg {
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 8px;
+  border-radius: 9px;
+  background: var(--c-gray-90-3);
+  color: var(--c-cyan-35);
+}
+.prep-manage-card .prep-manage-grid > button:first-child > svg {
+  background: var(--c-amber-95);
+  color: var(--c-amber-45-3);
+}
+.prep-manage-card .prep-manage-grid > button:hover {
+  border-color: var(--c-cyan-35);
+  box-shadow: 0 4px 12px rgba(18, 88, 107, 0.12);
+}
+.prep-manage-card .prep-manage-grid > button:focus-visible {
+  outline: 2px solid var(--c-cyan-35);
+  outline-offset: 2px;
+}
+
+/* "Select all" sits on the left, directly above the instruments' checkboxes. */
+.prep-tools-scroll .prep-select-all-row {
+  cursor: pointer;
+  min-height: 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background: var(--c-gray-100-2);
+}
+.prep-tools-scroll .prep-select-all-row > strong {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--c-blue-25);
+}
+.prep-tools-scroll .prep-select-all-row.checked .prep-tool-check > span {
+  background: var(--c-green-45-4);
+  border-color: var(--c-green-45-4);
+}
+.prep-tools-scroll .prep-select-all-row:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

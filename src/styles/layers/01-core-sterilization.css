@@ -2230,7 +2230,6 @@ td {
   font-size: 18px;
   color: var(--c-blue-25);
 }
-.prep-all-ok,
 .prep-print-actions button {
   display: inline-flex;
   align-items: center;
@@ -2245,13 +2244,8 @@ td {
   font-weight: 750;
   cursor: pointer;
 }
-.prep-all-ok:hover,
 .prep-print-actions button:hover {
   background: var(--c-gray-100-2);
-}
-.prep-all-ok:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 .prep-block-warning {
   margin: 0 12px 10px;
@@ -3667,11 +3661,6 @@ td {
   flex-direction: column;
   gap: 10px;
   min-width: 0;
-}
-.prep-bulk-select {
-  display: flex;
-  align-items: center;
-  padding-left: 0;
 }
 .tool-manage-btn {
   display: inline-flex;
@@ -5811,11 +5800,6 @@ td {
   scrollbar-gutter: stable !important;
 }
 .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column > .receipt-left-panel {
-  align-self: start !important;
-  height: max-content !important;
-  max-height: none !important;
-  min-height: max-content !important;
-  overflow: visible !important;
   padding-bottom: 18px !important;
 }
 .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column > .receipt-right-panel {
