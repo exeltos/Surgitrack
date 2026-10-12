@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {Building2, X} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import {
@@ -11,7 +12,7 @@ import {
 } from '../../config/demoRoles';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {useLibraries} from '../../core/LibraryStore';
-import {actingAsPlatformOwner, canViewAs, getRealIdentity, sessionUserFor} from '../../data/cloud/identity';
+import {canViewAs, getRealIdentity, sessionUserFor} from '../../data/cloud/identity';
 import {supabase} from '../../lib/supabase';
 import {switchHospital} from '../../data/cloud/hospitalSwitch';
 import {useSurgi} from '../../store/SurgiStore';
@@ -22,7 +23,8 @@ const ACTIVE_ORGANIZATION_KEY = 'surgitrack-active-organization';
  * Header pickers for seeing the app as someone else sees it.
  * - Demo: any role or library department of the demo hospital.
  * - Hospital admin: Admin, Sterilization or any department of their hospital (real data).
- * - Platform admin: first a hospital, then a role or department in it (real data).
+ * - Platform admin inside a hospital (entered from Studio → Νοσοκομεία): the hospital's name with the way back
+ *   to Studio, then a role or department in it (real data).
  */
 export default function RoleSwitcher() {
   const {role, currentUser, switchIdentity} = useSurgi();
@@ -32,23 +34,21 @@ export default function RoleSwitcher() {
   const isDemo = getRuntimeDataMode() === 'DEMO';
   const real = getRealIdentity();
   const activeOrganization = sessionStorage.getItem(ACTIVE_ORGANIZATION_KEY) || '';
-  // Viewing a hospital as one of its roles hides the other hospitals, as for that role; picking
-  // "Owner" brings the hospital picker back.
-  const pickHospital = !isDemo && !!real?.platform && (!activeOrganization || actingAsPlatformOwner());
+  // The owner inside a hospital: its name and the way back to Studio (hospitals are entered from Studio →
+  // Νοσοκομεία, so Studio itself needs no hospital picker).
+  const inHospital = !isDemo && !!real?.platform && !!activeOrganization;
   const pickRole = isDemo || (canViewAs(real) && (!real?.platform || !!activeOrganization));
-  const [hospitals, setHospitals] = useState<Array<{id: string; name: string}>>([]);
+  const [hospitalName, setHospitalName] = useState('');
 
   useEffect(() => {
-    if (!pickHospital) return;
+    if (!inHospital) return;
     void supabase
       .from('organizations')
-      .select('id,name')
-      // Real hospitals, and the prospects' evaluation Demos the owner may enter to help.
-      .or('is_demo.eq.false,evaluation.eq.true')
-      .eq('active', true)
-      .order('name')
-      .then(({data}) => setHospitals(data || []));
-  }, [pickHospital]);
+      .select('name')
+      .eq('id', activeOrganization)
+      .maybeSingle()
+      .then(({data}) => setHospitalName(data?.name || ''));
+  }, [inHospital, activeOrganization]);
 
   // The owner inside a hospital can work as themselves or see it exactly as its administrator does.
   const ownerInHospital = !isDemo && !!real?.platform;
@@ -63,27 +63,24 @@ export default function RoleSwitcher() {
       ? 'OWNER'
       : currentDemoView(role, currentUser, departments);
 
-  // A different hospital means different data: reload so its records are loaded.
-  const changeHospital = (id: string) => switchHospital(id, id ? '#/' : '#/studio');
-
-  if (!pickHospital && !pickRole) return null;
+  if (!inHospital && !pickRole) return null;
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   return (
     <div className="role-switch">
-      {pickHospital && (
-        <select
-          value={activeOrganization}
-          onChange={e => changeHospital(e.target.value)}
-          title={L('Νοσοκομείο εργασίας', 'Working hospital')}
-          aria-label={L('Νοσοκομείο', 'Hospital')}
-        >
-          <option value="">{L('— Μόνο Studio —', '— Studio only —')}</option>
-          {hospitals.map(h => (
-            <option key={h.id} value={h.id}>
-              {h.name}
-            </option>
-          ))}
-        </select>
+      {inHospital && (
+        <span className="role-switch-hospital">
+          <Building2 size={15} aria-hidden="true" />
+          <b title={hospitalName}>{hospitalName || L('Νοσοκομείο', 'Hospital')}</b>
+          <button
+            type="button"
+            onClick={() => switchHospital('')}
+            title={L('Επιστροφή στο Studio', 'Back to Studio')}
+            aria-label={L('Επιστροφή στο Studio', 'Back to Studio')}
+          >
+            <X size={14} />
+            <span>{L('Studio', 'Studio')}</span>
+          </button>
+        </span>
       )}
       {pickRole && (
         <select
