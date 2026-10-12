@@ -1,5 +1,18 @@
 import {useState} from 'react';
-import {BadgeCheck, Check, Copy, FlaskConical, LogIn, Mail, Plus, RotateCcw, Send, Trash2} from 'lucide-react';
+import {
+  BadgeCheck,
+  Check,
+  ChevronRight,
+  Copy,
+  FlaskConical,
+  LogIn,
+  Mail,
+  Plus,
+  RotateCcw,
+  Send,
+  Trash2,
+  X,
+} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr} from '../../../i18n';
@@ -54,9 +67,26 @@ export default function DemoAccountsPanel({
   const setCreating = (open: boolean) => (onCreatingChange ? onCreatingChange(open) : setCreatingOwn(open));
   const [confirmNode, ask] = useConfirm();
   const [converting, setConverting] = useState<DemoAccount | null>(null);
+  // The list only shows the Demos; one opens in a drawer with its details and every action.
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = d.demos.find(demo => demo.id === openId);
   const counts = d.demos.reduce(
     (acc, demo) => ({...acc, [demoStage(demo)]: (acc[demoStage(demo)] || 0) + 1}),
     {} as Partial<Record<DemoStage, number>>,
+  );
+  const notice = d.notice && (
+    <div className={`evaluation-demo-notice ${d.notice.kind}`} role={d.notice.kind === 'error' ? 'alert' : 'status'}>
+      <span>{d.notice.text}</span>
+      {d.notice.url && (
+        <button onClick={() => void navigator.clipboard?.writeText(d.notice!.url!)}>
+          <Copy size={14} />
+          {tr('Αντιγραφή συνδέσμου')}
+        </button>
+      )}
+      <button className="evaluation-demo-notice-close" onClick={() => d.setNotice(null)} aria-label={tr('Κλείσιμο')}>
+        ×
+      </button>
+    </div>
   );
   return (
     <section
@@ -87,27 +117,7 @@ export default function DemoAccountsPanel({
       )}
       {d.demos.length > 1 && <DemoFunnel demos={d.demos} />}
       {d.busy?.id === 'new' && <p className="evaluation-demo-busy">{d.busy.label}</p>}
-      {d.notice && (
-        <div
-          className={`evaluation-demo-notice ${d.notice.kind}`}
-          role={d.notice.kind === 'error' ? 'alert' : 'status'}
-        >
-          <span>{d.notice.text}</span>
-          {d.notice.url && (
-            <button onClick={() => void navigator.clipboard?.writeText(d.notice!.url!)}>
-              <Copy size={14} />
-              {tr('Αντιγραφή συνδέσμου')}
-            </button>
-          )}
-          <button
-            className="evaluation-demo-notice-close"
-            onClick={() => d.setNotice(null)}
-            aria-label={tr('Κλείσιμο')}
-          >
-            ×
-          </button>
-        </div>
-      )}
+      {!open && notice}
       {d.loading ? (
         <p className="evaluation-demo-empty">{tr('Φόρτωση…')}</p>
       ) : !d.demos.length ? (
@@ -128,46 +138,70 @@ export default function DemoAccountsPanel({
       ) : (
         <div className="evaluation-demo-list">
           {d.demos.map(demo => (
-            <DemoCard
+            <DemoRow
               key={demo.id}
               demo={demo}
-              busy={d.busy?.id === demo.id ? d.busy.label : d.busy ? 'other' : null}
-              onContinue={() => void d.continuePreparing(demo)}
-              onResend={() => void d.resend(demo)}
-              onExtend={() => void d.extend(demo)}
-              onChangeEnd={date => void d.changeEnd(demo, trialEndOn(date))}
-              onChangeLimit={limit => void d.changeLimit(demo, limit)}
-              onHandled={requestId => void d.handleRequest(demo, requestId)}
-              onAutoDelete={autoDelete => void d.changeAutoDelete(demo, autoDelete)}
-              onConvert={() => setConverting(demo)}
+              busy={d.busy?.id === demo.id ? d.busy.label : null}
+              onOpen={() => setOpenId(demo.id)}
+            />
+          ))}
+        </div>
+      )}
+      {open && (
+        <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && setOpenId(null)}>
+          <aside className="studio-drawer evaluation-demo-drawer" aria-label={open.hospitalName}>
+            <header>
+              <div>
+                <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
+                <h2>{open.hospitalName}</h2>
+              </div>
+              <button onClick={() => setOpenId(null)} aria-label={tr('Κλείσιμο')}>
+                <X />
+              </button>
+            </header>
+            {notice}
+            <DemoCard
+              demo={open}
+              busy={d.busy?.id === open.id ? d.busy.label : d.busy ? 'other' : null}
+              onContinue={() => void d.continuePreparing(open)}
+              onResend={() => void d.resend(open)}
+              onExtend={() => void d.extend(open)}
+              onChangeEnd={date => void d.changeEnd(open, trialEndOn(date))}
+              onChangeLimit={limit => void d.changeLimit(open, limit)}
+              onHandled={requestId => void d.handleRequest(open, requestId)}
+              onAutoDelete={autoDelete => void d.changeAutoDelete(open, autoDelete)}
+              onConvert={() => {
+                setOpenId(null);
+                setConverting(open);
+              }}
               onDelete={() =>
                 ask({
                   title: tr('Διαγραφή Demo'),
                   message: tr(
                     'Το «{0}» θα διαγραφεί οριστικά: όλες οι εγγραφές του, οι αξιολογήσεις, τα αιτήματα και οι λογαριασμοί των {1} χρηστών του. Δεν αναιρείται.',
-                    demo.organizationName,
-                    demo.extraUsers + (demo.evaluatorId ? 1 : 0),
+                    open.organizationName,
+                    open.extraUsers + (open.evaluatorId ? 1 : 0),
                   ),
                   confirmLabel: tr('Οριστική διαγραφή'),
                   danger: true,
-                  onConfirm: () => void d.remove(demo),
+                  onConfirm: () => void d.remove(open),
                 })
               }
-              onEnter={() => d.enter(demo)}
+              onEnter={() => d.enter(open)}
               onReset={() =>
                 ask({
                   title: tr('Επαναφορά δεδομένων'),
                   message: tr(
                     'Θα διαγραφούν όλα τα δεδομένα του «{0}» και θα φορτωθούν ξανά τα αρχικά δοκιμαστικά. Οι χρήστες και τα τμήματα μένουν.',
-                    demo.organizationName,
+                    open.organizationName,
                   ),
                   confirmLabel: tr('Επαναφορά'),
                   danger: true,
-                  onConfirm: () => void d.reset(demo),
+                  onConfirm: () => void d.reset(open),
                 })
               }
             />
-          ))}
+          </aside>
         </div>
       )}
       {creating && (
@@ -203,6 +237,53 @@ export default function DemoAccountsPanel({
       )}
       {confirmNode}
     </section>
+  );
+}
+
+/** One Demo in the list: what it is and where it stands, read only; a click opens it. */
+function DemoRow({demo, busy, onOpen}: {demo: DemoAccount; busy: string | null; onOpen: () => void}) {
+  const stage = demoStage(demo);
+  const days = demoDaysLeft(demo);
+  const newRequests = demo.requests.filter(r => r.status === 'NEW').length;
+  return (
+    <button type="button" className={`evaluation-demo-row ${stage.toLowerCase()}`} onClick={onOpen}>
+      <span className="evaluation-demo-row-name">
+        <strong>{demo.hospitalName}</strong>
+        <small>{[demo.code, demo.contactName, demo.contactEmail].filter(Boolean).join(' · ')}</small>
+      </span>
+      <span className="evaluation-demo-row-fact">
+        <small>{tr('Λήξη')}</small>
+        <b>{demo.endsAt ? formatDate(demo.endsAt) : '—'}</b>
+        {stage !== 'ENDED' && stage !== 'CONVERTED' && demo.endsAt && <em>{tr('{0} ημέρες', days)}</em>}
+      </span>
+      <span className="evaluation-demo-row-fact">
+        <small>{tr('Όνομα χρήστη')}</small>
+        <b>{demo.evaluatorCode || '—'}</b>
+      </span>
+      <span className="evaluation-demo-row-fact">
+        <small>{tr('Πρώτα βήματα')}</small>
+        <b>{demo.evaluatorGuide ? `${demo.evaluatorGuide.done} / ${demo.evaluatorGuide.total}` : '—'}</b>
+      </span>
+      <span className="evaluation-demo-row-fact">
+        <small>{tr('Συνάδελφοι')}</small>
+        <b>
+          {demo.extraUsers} / {demo.maxExtraUsers}
+        </b>
+      </span>
+      <span className="evaluation-demo-badges">
+        {busy ? (
+          <span className="evaluation-demo-stage preparing">{busy}</span>
+        ) : (
+          <>
+            {newRequests > 0 && (
+              <span className="evaluation-demo-stage request">{tr('Νέα αιτήματα: {0}', newRequests)}</span>
+            )}
+            <span className={`evaluation-demo-stage ${stage.toLowerCase()}`}>{tr(STAGE_LABEL[stage])}</span>
+          </>
+        )}
+      </span>
+      <ChevronRight size={18} className="evaluation-demo-row-open" aria-hidden="true" />
+    </button>
   );
 }
 
@@ -247,9 +328,9 @@ function DemoCard({
     <article className={`evaluation-demo-card ${stage.toLowerCase()}`}>
       <div className="evaluation-demo-main">
         <div>
-          <strong>{demo.hospitalName}</strong>
           <small>
-            {demo.code} · {demo.contactName} · <a href={`mailto:${demo.contactEmail}`}>{demo.contactEmail}</a>
+            {demo.code ? `${demo.code} · ` : ''}
+            {demo.contactName} · <a href={`mailto:${demo.contactEmail}`}>{demo.contactEmail}</a>
             {demo.contactPhone ? ` · ${demo.contactPhone}` : ''}
           </small>
           {demo.notes && <small className="evaluation-demo-notes">{demo.notes}</small>}

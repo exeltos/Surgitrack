@@ -22,6 +22,10 @@ vi.mock('../../../data/cloud/hospitalSwitch', () => ({switchHospital: vi.fn()}))
 
 import DemoAccountsPanel from '../demo/DemoAccountsPanel';
 
+/** Opens a Demo from the list: its details and actions are in a drawer. */
+const openDemo = async (user: ReturnType<typeof userEvent.setup>, name = 'Γ.Ν. Λάρισας') =>
+  user.click(await screen.findByRole('button', {name: new RegExp(`^${name}`)}));
+
 const inDays = (days: number) => new Date(Date.now() + days * 864e5).toISOString();
 const demo = (patch: Partial<DemoAccount> = {}): DemoAccount => ({
   id: 'demo-1',
@@ -123,6 +127,7 @@ describe('Studio: evaluation Demos', () => {
     ]);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: 'Συνέχεια προετοιμασίας'}));
     await waitFor(() => expect(calls).toEqual(['seed', 'invite']));
   });
@@ -137,6 +142,7 @@ describe('Studio: evaluation Demos', () => {
     });
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: 'Αποστολή email'}));
     expect(await screen.findByText(/το email δεν στάλθηκε/)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Αντιγραφή συνδέσμου'})).toBeInTheDocument();
@@ -149,11 +155,26 @@ describe('Studio: evaluation Demos', () => {
       demo({id: 'b', hospitalName: 'Β', endsAt: inDays(-2)}),
     ]);
     render(<DemoAccountsPanel />);
-    const first = (await screen.findByText('Α')).closest('article')!;
+    const first = (await screen.findByText('Α')).closest('button')!;
     expect(within(first as HTMLElement).getByText('Σε αξιολόγηση')).toBeInTheDocument();
     expect(within(first as HTMLElement).getByText('2 / 5')).toBeInTheDocument();
-    const second = screen.getByText('Β').closest('article')!;
+    const second = screen.getByText('Β').closest('button')!;
     expect(within(second as HTMLElement).getByText('Έληξε')).toBeInTheDocument();
+  });
+
+  it('lists each Demo without actions, and opens it in a drawer with all of them', async () => {
+    service.loadDemoAccounts.mockResolvedValue([demo()]);
+    const user = userEvent.setup();
+    render(<DemoAccountsPanel />);
+    await screen.findByRole('button', {name: /^Γ.Ν. Λάρισας/});
+    expect(screen.queryByRole('button', {name: 'Διαγραφή Demo'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: '+7 ημέρες'})).not.toBeInTheDocument();
+    await openDemo(user);
+    const drawer = screen.getByRole('complementary', {name: 'Γ.Ν. Λάρισας'});
+    expect(within(drawer).getByRole('button', {name: 'Διαγραφή Demo'})).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', {name: 'Μετατροπή σε πελάτη'})).toBeInTheDocument();
+    await user.click(within(drawer).getByRole('button', {name: 'Κλείσιμο'}));
+    expect(screen.queryByRole('complementary', {name: 'Γ.Ν. Λάρισας'})).not.toBeInTheDocument();
   });
 
   it('extends a Demo by a week from its current end', async () => {
@@ -161,6 +182,7 @@ describe('Studio: evaluation Demos', () => {
     service.loadDemoAccounts.mockResolvedValue([demo({endsAt})]);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: '+7 ημέρες'}));
     await waitFor(() => expect(service.setDemoEnd).toHaveBeenCalled());
     const [org, end] = service.setDemoEnd.mock.calls[0];
@@ -187,6 +209,7 @@ describe('Studio: evaluation Demos', () => {
     ]);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: '1 / 5'}));
     expect(screen.getByText('ΝΙΚΟΣ ΡΗΓΑΣ')).toBeInTheDocument();
     expect(screen.getByText('NR1111')).toBeInTheDocument();
@@ -219,7 +242,9 @@ describe('Studio: evaluation Demos', () => {
     ]);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    // The list says there is a new request; the Demo's drawer shows it.
     expect(await screen.findByText('Νέα αιτήματα: 1')).toBeInTheDocument();
+    await openDemo(user);
     expect(screen.getByText('Θέλει την εφαρμογή')).toBeInTheDocument();
     expect(screen.getByText('Καλέστε με')).toBeInTheDocument();
     expect(screen.getByText('Ροή Αποστείρωσης')).toBeInTheDocument();
@@ -238,6 +263,7 @@ describe('Studio: evaluation Demos', () => {
     service.loadDemoAccounts.mockResolvedValue([demo({endsAt: '2026-10-01T20:59:59.000Z'})]);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     const keep = await screen.findByRole('checkbox', {name: 'Αυτόματη διαγραφή 30 ημέρες μετά τη λήξη'});
     expect(keep).toBeChecked();
     expect(screen.getByText('31/10/2026')).toBeInTheDocument();
@@ -250,6 +276,7 @@ describe('Studio: evaluation Demos', () => {
     service.convertDemoAccount.mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: 'Μετατροπή σε πελάτη'}));
     const form = screen.getByRole('complementary', {name: 'Μετατροπή σε πελάτη'});
     expect(within(form).getByLabelText('Όνομα νοσοκομείου')).toHaveValue('Γ.Ν. Λάρισας');
@@ -279,6 +306,7 @@ describe('Studio: evaluation Demos', () => {
     });
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: 'Μετατροπή σε πελάτη'}));
     const form = screen.getByRole('complementary', {name: 'Μετατροπή σε πελάτη'});
     await user.click(within(form).getByRole('radio', {name: /Διατήρηση δεδομένων/}));
@@ -290,8 +318,10 @@ describe('Studio: evaluation Demos', () => {
 
   it('shows a converted Demo as a customer, with only "Enter"', async () => {
     service.loadDemoAccounts.mockResolvedValue([demo({status: 'CONVERTED', convertedAt: '2026-10-09T10:00:00Z'})]);
+    const user = userEvent.setup();
     render(<DemoAccountsPanel />);
     expect(await screen.findAllByText('Έγινε πελάτης')).not.toHaveLength(0);
+    await openDemo(user);
     expect(screen.getByText('Πελάτης από')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Μετατροπή σε πελάτη'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: /Επαναφορά δεδομένων/})).not.toBeInTheDocument();
@@ -314,6 +344,7 @@ describe('Studio: evaluation Demos', () => {
     service.deleteDemoAccount.mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(<DemoAccountsPanel />);
+    await openDemo(user);
     await user.click(await screen.findByRole('button', {name: 'Διαγραφή Demo'}));
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveTextContent('οι λογαριασμοί των 3 χρηστών');

@@ -37,6 +37,7 @@ import {formatDate, formatTime} from '../../core/displayDate';
 
 // The user manual is loaded only when first opened.
 import NotificationPanel from './NotificationPanel';
+import OwnerDemoAlerts from './OwnerDemoAlerts';
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
 /** Initials of a name, e.g. "ΑΙΚΑΤΕΡΙΝΗ ΜΠΟΥΓΑ" → "ΑΜ". */
 const initialsOf = (name: string) => {
@@ -563,6 +564,8 @@ export default function AppShell({
           </button>
         </div>
       )}
+      {/* The platform owner: a prospect finished signing up in a Demo, or sent its evaluation. */}
+      {platformOnly && !isDemo && can('studio.manage') && <OwnerDemoAlerts />}
       {!toast && departmentReadyToast && role === 'DEPARTMENT' && (
         <div className="toast department-ready-toast" role="status">
           <strong>{lang === 'el' ? 'Έτοιμο για παραλαβή' : 'Ready for pickup'}</strong>
