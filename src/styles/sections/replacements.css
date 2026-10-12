@@ -373,10 +373,6 @@ html body .replacements-fixed td > a {
 html body .replacements-kpis .bad strong {
   color: #c0322f;
 }
-/* Replacement rows: same-size buttons, right-aligned, never stretched or cut off. */
-html body .replacements-fixed td.row-actions {
-  text-align: right;
-}
 html body .replacements .replacements-table {
   flex: 1 1 auto;
   min-height: 0;
@@ -446,13 +442,80 @@ html body .replacements-search > svg {
     text-overflow: clip;
     line-height: 1.25;
   }
-  html body .replacements-fixed th.col-actions {
-    width: 128px;
-  }
   html body .replacements-table .row-actions button .btn-label {
     display: none;
   }
   html body .replacements-fixed .row-actions button {
     padding: 0 9px;
+  }
+}
+/* Replacement rows: the cell stays a table cell (so the row's line runs under it); inside, three fixed slots
+   (Replace, Order, Return) keep each kind of button in the same column on every row. */
+html body .replacements-fixed td.row-actions {
+  display: table-cell;
+  width: auto;
+  text-align: right;
+}
+html body .replacements-fixed th.col-actions {
+  width: 410px;
+  text-align: right;
+}
+html body .replacements-fixed .replacement-actions {
+  display: inline-grid;
+  grid-template-columns: 136px 120px 120px;
+  align-items: center;
+  justify-items: stretch;
+  gap: 6px;
+}
+html body .replacements-fixed .replacement-actions > button {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  margin: 0;
+  padding: 0 10px;
+}
+html body .replacements-fixed .replacement-actions > span[aria-hidden] {
+  height: 34px;
+}
+@media (max-width: 1700px) {
+  html body .replacements-fixed th.col-actions {
+    width: 240px;
+  }
+  html body .replacements-fixed .replacement-actions {
+    grid-template-columns: 136px 34px 34px;
+  }
+  html body .replacements-fixed .replacement-actions > button:not(.primary) {
+    padding: 0;
+  }
+}
+@media (min-width: 701px) and (max-width: 1280px) {
+  html body .replacements-fixed th.col-actions {
+    width: 140px;
+  }
+  html body .replacements-fixed .replacement-actions {
+    grid-template-columns: 34px 34px 34px;
+  }
+  html body .replacements-fixed .replacement-actions > button {
+    padding: 0;
+  }
+}
+@media (max-width: 700px) {
+  html body .replacements-fixed td.row-actions {
+    display: block;
+    text-align: left;
+  }
+  html body .replacements-fixed .replacement-actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  html body .replacements-fixed .replacement-actions > button {
+    width: auto;
+    min-width: 34px;
+    padding: 0 10px;
+  }
+  html body .replacements-fixed .replacement-actions > span[aria-hidden] {
+    display: none;
   }
 }

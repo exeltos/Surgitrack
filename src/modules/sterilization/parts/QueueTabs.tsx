@@ -100,7 +100,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
         <strong>{inSterilizer.length}</strong>
         <small>{tr('Κύκλος σε εξέλιξη')}</small>
       </button>
-      {(stageEnabled('RELEASE') || awaitingRelease.length > 0) && (
+      {(stageEnabled('RELEASE') || awaitingRelease.length > 0 || inSterilizer.length > 0) && (
         <button
           className={queue === 'RELEASE' ? 'active' : ''}
           data-tour="queue-RELEASE"

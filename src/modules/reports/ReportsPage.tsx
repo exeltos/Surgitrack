@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react';
 import {useFitWidth} from '../../components/ui/useFitWidth';
-import {AlertTriangle, FileText, Search} from 'lucide-react';
+import {AlertTriangle, ExternalLink, FileText, History} from 'lucide-react';
+import {Link} from 'react-router-dom';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import type {ExportTable} from '../../core/exportTable';
@@ -23,12 +24,12 @@ export default function ReportsPage() {
     tools,
     retiredTools,
     issues,
-    movements,
     currentUser,
     processLoads,
     sterilizationReleases,
     receipts,
     deliveries,
+    can,
   } = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   const compositionOptions = useCompositionOptions();
@@ -43,7 +44,6 @@ export default function ReportsPage() {
   const [issueStatus, setIssueStatus] = useState('ALL');
   const [issueType, setIssueType] = useState('ALL');
   const [usageFilter, setUsageFilter] = useState('ALL');
-  const [patientCode, setPatientCode] = useState('');
   const [loadStatus, setLoadStatus] = useState('ALL');
   const [sterilizerName, setSterilizerName] = useState('ALL');
   const [expiryState, setExpiryState] = useState('ALL');
@@ -90,7 +90,6 @@ export default function ReportsPage() {
           tools,
           retiredTools,
           issues,
-          movements,
           processLoads,
           sterilizationReleases,
           receipts,
@@ -106,7 +105,6 @@ export default function ReportsPage() {
           issueStatus,
           issueType,
           usageFilter,
-          patientCode,
           loadStatus,
           sterilizerName,
           expiryState,
@@ -125,7 +123,6 @@ export default function ReportsPage() {
       sterilizerName,
       expiryState,
       issues,
-      movements,
       department,
       specialty,
       assetKind,
@@ -133,7 +130,6 @@ export default function ReportsPage() {
       issueStatus,
       issueType,
       usageFilter,
-      patientCode,
       warningThreshold,
       receipts,
       deliveries,
@@ -329,7 +325,6 @@ export default function ReportsPage() {
       issueStatus,
       issueType,
       usageFilter,
-      patientCode,
       loadStatus,
       sterilizerName,
       expiryState,
@@ -381,6 +376,19 @@ export default function ReportsPage() {
                 </button>
               );
             })}
+            {can('traceability.view') && (
+              // Patient traceability lives with the rest of the tracing, in Traceability.
+              <Link className="reports-catalog-item reports-catalog-link" to="/traceability?tab=patients">
+                <span className="reports-catalog-icon">
+                  <History size={18} />
+                </span>
+                <span>
+                  <strong>{tr('Ιχνηλασιμότητα ασθενούς')}</strong>
+                  <small>{tr('Στην Ιχνηλάτηση: χρήσεις σε ασθενείς, με εξαγωγή.')}</small>
+                </span>
+                <ExternalLink size={15} className="reports-catalog-out" />
+              </Link>
+            )}
           </div>
         </aside>
         <section className="reports-stage">
@@ -408,19 +416,6 @@ export default function ReportsPage() {
               </label>
             )}
             <FilterMenu filters={reportFilters} />
-            {active === 'traceability' && (
-              <label className="reports-filter-search">
-                <span>{tr('Κωδικός ασθενούς')}</span>
-                <div>
-                  <Search size={16} />
-                  <input
-                    value={patientCode}
-                    onChange={e => setPatientCode(e.target.value)}
-                    placeholder={tr('π.χ. PT-2026-0041')}
-                  />
-                </div>
-              </label>
-            )}
           </div>
           <div className="reports-result-card">
             <div className="reports-result-head">
@@ -483,11 +478,7 @@ export default function ReportsPage() {
                 <div className="reports-empty">
                   <FileText size={30} />
                   <strong>{tr('Δεν υπάρχουν αποτελέσματα')}</strong>
-                  <span>
-                    {active === 'traceability' && !patientCode
-                      ? tr('Πληκτρολόγησε κωδικό ασθενούς για αναζήτηση ιχνηλασιμότητας.')
-                      : tr('Άλλαξε τα φίλτρα ή επίλεξε διαφορετική αναφορά.')}
-                  </span>
+                  <span>{tr('Άλλαξε τα φίλτρα ή επίλεξε διαφορετική αναφορά.')}</span>
                 </div>
               )}
             </div>

@@ -193,25 +193,6 @@
 .reports-filter-wide {
   grid-column: span 2;
 }
-.reports-filter-search {
-  grid-column: span 2;
-}
-.reports-filter-search > div {
-  height: 36px;
-  border: 1px solid var(--c-gray-90);
-  background: var(--c-white);
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  padding: 0 9px;
-  color: var(--st-muted);
-}
-.reports-filter-search input {
-  height: 32px;
-  border: 0;
-  padding-left: 7px;
-  box-shadow: none !important;
-}
 .reports-result-card {
   flex: 1;
   min-height: 0;
@@ -333,8 +314,7 @@
   .reports-filter-strip {
     grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
-  .reports-filter-wide,
-  .reports-filter-search {
+  .reports-filter-wide {
     grid-column: span 2;
   }
   .reports-stage-head {
@@ -411,8 +391,7 @@
   .reports-filter-strip {
     grid-template-columns: minmax(0, 1fr);
   }
-  .reports-filter-wide,
-  .reports-filter-search {
+  .reports-filter-wide {
     grid-column: auto;
   }
   .reports-catalog-item {

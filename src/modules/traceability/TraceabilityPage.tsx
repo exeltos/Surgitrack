@@ -1,10 +1,11 @@
 import {Fragment, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-import {Search, Route, History, ExternalLink, Flame, UserRound} from 'lucide-react';
+import {Search, Route, History, ExternalLink, Flame, UserRound, Users} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
+import PatientUses from './PatientUses';
 
 const RECENT_KEY = 'surgitrack.trace.recent';
 /** The last searches on this device (barcodes and patient codes), newest first. */
@@ -49,8 +50,11 @@ const barcodeOf = (m: Movement) => m.asset.split(' · ')[0].trim();
 export default function TraceabilityPage() {
   const {sets, tools, movements, counts, sterilizationCycles, processLoads} = useSurgi();
   // Opened from a movement: the item to look up comes in the address (?q=S000321).
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(() => params.get('q') || '');
+  // Two tabs: the search (a barcode or a patient code) and every use recorded with a patient code.
+  const tab = params.get('tab') === 'patients' ? 'PATIENTS' : 'SEARCH';
+  const patientUses = movements.filter(m => m.patientCode).length;
   const [recent, setRecent] = useState<string[]>(readRecent);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
@@ -180,183 +184,216 @@ export default function TraceabilityPage() {
           <h1>{tr('Ιχνηλάτηση')}</h1>
           <p>{tr('Αναζήτηση από barcode Σετ/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.')}</p>
         </div>
-        {related.length > 0 && (
+        {tab === 'SEARCH' && related.length > 0 && (
           <div className="page-head-actions">
             <DownloadMenu table={traceTable} onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))} />
           </div>
         )}
       </div>
       <HistoryWindowNote auto />
-      <form
-        className="trace-search"
-        onSubmit={e => {
-          e.preventDefault();
-          remember(q);
-        }}
-      >
-        <Search />
-        <input
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          onBlur={() => needle && remember(q)}
-          placeholder={tr('S..., T... ή κωδικός ασθενούς')}
-        />
-        <button className="primary" type="submit">
-          {tr('Αναζήτηση')}
+      <div className="name-check-tabs trace-tabs" role="tablist">
+        <button
+          role="tab"
+          aria-selected={tab === 'SEARCH'}
+          className={tab === 'SEARCH' ? 'active' : ''}
+          onClick={() => setParams({}, {replace: true})}
+        >
+          <Search size={16} /> {tr('Αναζήτηση')}
         </button>
-      </form>
-      {!needle && recent.length > 0 && (
-        <div className="trace-recent">
-          <History size={15} />
-          <span>{tr('Πρόσφατες αναζητήσεις')}</span>
-          {recent.map(term => (
-            <button key={term} type="button" onClick={() => setQ(term)}>
-              {term}
-            </button>
-          ))}
-        </div>
-      )}
-      {choosing && (
-        <div className="trace-pick">
-          <strong>{tr('Βρέθηκαν {0} — διαλέξτε ένα:', nameMatches.length)}</strong>
-          <ul>
-            {nameMatches.slice(0, 30).map(x => (
-              <li key={x.id}>
-                <button type="button" onClick={() => setQ(x.barcode)}>
-                  <b className="mono">{x.barcode}</b> {x.name}
-                  <small>
-                    {trData(x.department) || tr('Απόθεμα')} · {statusLabel(x.state)}
-                  </small>
-                </button>
-              </li>
-            ))}
-          </ul>
-          {nameMatches.length > 30 && <small>{tr('Εμφανίζονται τα πρώτα 30· γράψτε περισσότερα ή το barcode.')}</small>}
-        </div>
-      )}
-      {asset && (
-        <div className="trace-card">
-          <Route size={24} />
-          <div>
-            <small>{isSet ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
-            <h2>{asset.barcode}</h2>
-            <p>
-              {asset.name} · {trData(asset.department) || tr('Απόθεμα')} · {statusLabel(asset.state)}
-              {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
-            </p>
-          </div>
-          <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
-            <ExternalLink size={16} /> {tr('Άνοιγμα καρτέλας')}
-          </Link>
-        </div>
-      )}
-      {patientItems.length > 0 && (
-        <div className="trace-card trace-patient">
-          <UserRound size={24} />
-          <div>
-            <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
-            <h2>{patientMoves[0].patientCode}</h2>
-            <ul>
-              {patientItems.map(p => (
-                <li key={p.label}>
-                  {p.item ? (
-                    <Link to={sets.some(x => x.id === p.item!.id) ? `/sets/${p.item.id}` : `/tools/${p.item.id}`}>
-                      {p.label}
-                    </Link>
-                  ) : (
-                    <b>{p.label}</b>
-                  )}
-                  <small>
-                    {p.cycle
-                      ? tr(
-                          'Τελευταίος κύκλος πριν τη χρήση: {0} · κύκλος {1} · {2} · {3}',
-                          p.cycle.sterilizer,
-                          p.cycle.cycleNumber,
-                          p.cycle.at,
-                          p.cycle.label,
-                        )
-                      : tr('Δεν βρέθηκε κύκλος αποστείρωσης πριν τη χρήση.')}
-                  </small>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-      {cycles.length > 0 && (
-        <section className="trace-cycles">
-          <h3>
-            <Flame size={15} /> {tr('Κύκλοι αποστείρωσης')}
-          </h3>
-          <ul>
-            {cycles.map(c => (
-              <li key={c.id}>
-                <time>{c.at}</time>
-                <span>
-                  {c.sterilizer} · {tr('κύκλος {0}', c.cycleNumber)}
-                  {c.program ? ` · ${c.program}` : ''}
-                  {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
-                </span>
-                <b className={c.tone}>{c.label}</b>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-      {countHits.map(c => (
-        <div className="trace-card" key={c.id}>
-          <Route size={24} />
-          <div>
-            <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
-            <h2>{c.patientCode}</h2>
-            <p>
-              {tr('Υπογεγραμμένη καταμέτρηση Σετ') + ' '}
-              {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/{c.expected} {tr('εργαλεία ·') + ' '}
-              {c.at}.
-            </p>
-          </div>
-        </div>
-      ))}
-      <div className="timeline list-scroll-region">
-        {related.length ? (
-          related.map((m, i) => (
-            <Fragment key={m.id}>
-              {i === own.length && carrierSet && (
-                <h3 className="trace-group">
-                  {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
-                </h3>
-              )}
-              <div className="timeline-item trace-step">
-                <time>{m.at}</time>
-                <div className="dot" />
-                <div>
-                  <strong>{trData(m.status)}</strong>
-                  {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
-                  <small>
-                    {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
-                    {m.patientCode ? ` · ${tr('Ασθενής {0}', m.patientCode)}` : ''}
-                  </small>
-                </div>
-              </div>
-            </Fragment>
-          ))
-        ) : choosing ? null : (
-          <div className="empty">
-            <strong>
-              {!needle
-                ? tr('Αναζητήστε Σετ, εργαλείο ή ασθενή')
-                : asset
-                  ? tr('Δεν βρέθηκαν κινήσεις')
-                  : tr('Δεν βρέθηκε Σετ, εργαλείο ή ασθενής με «{0}»', q.trim())}
-            </strong>
-            <span>
-              {needle
-                ? tr('Δοκιμάστε άλλο barcode ή κωδικό ασθενούς.')
-                : tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή κωδικό ασθενούς.')}
-            </span>
-          </div>
-        )}
+        <button
+          role="tab"
+          aria-selected={tab === 'PATIENTS'}
+          className={tab === 'PATIENTS' ? 'active' : ''}
+          onClick={() => setParams({tab: 'patients'}, {replace: true})}
+        >
+          <Users size={16} /> {tr('Χρήσεις σε ασθενείς')} <b>{patientUses}</b>
+        </button>
       </div>
+      {tab === 'PATIENTS' ? (
+        <PatientUses
+          movements={movements}
+          onOpen={code => {
+            setQ(code);
+            remember(code);
+            setParams({}, {replace: true});
+          }}
+        />
+      ) : (
+        <>
+          <form
+            className="trace-search"
+            onSubmit={e => {
+              e.preventDefault();
+              remember(q);
+            }}
+          >
+            <Search />
+            <input
+              value={q}
+              onChange={e => setQ(e.target.value)}
+              onBlur={() => needle && remember(q)}
+              placeholder={tr('S..., T... ή κωδικός ασθενούς')}
+            />
+            <button className="primary" type="submit">
+              {tr('Αναζήτηση')}
+            </button>
+          </form>
+          {!needle && recent.length > 0 && (
+            <div className="trace-recent">
+              <History size={15} />
+              <span>{tr('Πρόσφατες αναζητήσεις')}</span>
+              {recent.map(term => (
+                <button key={term} type="button" onClick={() => setQ(term)}>
+                  {term}
+                </button>
+              ))}
+            </div>
+          )}
+          {choosing && (
+            <div className="trace-pick">
+              <strong>{tr('Βρέθηκαν {0} — διαλέξτε ένα:', nameMatches.length)}</strong>
+              <ul>
+                {nameMatches.slice(0, 30).map(x => (
+                  <li key={x.id}>
+                    <button type="button" onClick={() => setQ(x.barcode)}>
+                      <b className="mono">{x.barcode}</b> {x.name}
+                      <small>
+                        {trData(x.department) || tr('Απόθεμα')} · {statusLabel(x.state)}
+                      </small>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {nameMatches.length > 30 && (
+                <small>{tr('Εμφανίζονται τα πρώτα 30· γράψτε περισσότερα ή το barcode.')}</small>
+              )}
+            </div>
+          )}
+          {asset && (
+            <div className="trace-card">
+              <Route size={24} />
+              <div>
+                <small>{isSet ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
+                <h2>{asset.barcode}</h2>
+                <p>
+                  {asset.name} · {trData(asset.department) || tr('Απόθεμα')} · {statusLabel(asset.state)}
+                  {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
+                </p>
+              </div>
+              <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
+                <ExternalLink size={16} /> {tr('Άνοιγμα καρτέλας')}
+              </Link>
+            </div>
+          )}
+          {patientItems.length > 0 && (
+            <div className="trace-card trace-patient">
+              <UserRound size={24} />
+              <div>
+                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
+                <h2>{patientMoves[0].patientCode}</h2>
+                <ul>
+                  {patientItems.map(p => (
+                    <li key={p.label}>
+                      {p.item ? (
+                        <Link to={sets.some(x => x.id === p.item!.id) ? `/sets/${p.item.id}` : `/tools/${p.item.id}`}>
+                          {p.label}
+                        </Link>
+                      ) : (
+                        <b>{p.label}</b>
+                      )}
+                      <small>
+                        {p.cycle
+                          ? tr(
+                              'Τελευταίος κύκλος πριν τη χρήση: {0} · κύκλος {1} · {2} · {3}',
+                              p.cycle.sterilizer,
+                              p.cycle.cycleNumber,
+                              p.cycle.at,
+                              p.cycle.label,
+                            )
+                          : tr('Δεν βρέθηκε κύκλος αποστείρωσης πριν τη χρήση.')}
+                      </small>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+          {cycles.length > 0 && (
+            <section className="trace-cycles">
+              <h3>
+                <Flame size={15} /> {tr('Κύκλοι αποστείρωσης')}
+              </h3>
+              <ul>
+                {cycles.map(c => (
+                  <li key={c.id}>
+                    <time>{c.at}</time>
+                    <span>
+                      {c.sterilizer} · {tr('κύκλος {0}', c.cycleNumber)}
+                      {c.program ? ` · ${c.program}` : ''}
+                      {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
+                    </span>
+                    <b className={c.tone}>{c.label}</b>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {countHits.map(c => (
+            <div className="trace-card" key={c.id}>
+              <Route size={24} />
+              <div>
+                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
+                <h2>{c.patientCode}</h2>
+                <p>
+                  {tr('Υπογεγραμμένη καταμέτρηση Σετ') + ' '}
+                  {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/{c.expected} {tr('εργαλεία ·') + ' '}
+                  {c.at}.
+                </p>
+              </div>
+            </div>
+          ))}
+          <div className="timeline list-scroll-region">
+            {related.length ? (
+              related.map((m, i) => (
+                <Fragment key={m.id}>
+                  {i === own.length && carrierSet && (
+                    <h3 className="trace-group">
+                      {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
+                    </h3>
+                  )}
+                  <div className="timeline-item trace-step">
+                    <time>{m.at}</time>
+                    <div className="dot" />
+                    <div>
+                      <strong>{trData(m.status)}</strong>
+                      {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
+                      <small>
+                        {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
+                        {m.patientCode ? ` · ${tr('Ασθενής {0}', m.patientCode)}` : ''}
+                      </small>
+                    </div>
+                  </div>
+                </Fragment>
+              ))
+            ) : choosing ? null : (
+              <div className="empty">
+                <strong>
+                  {!needle
+                    ? tr('Αναζητήστε Σετ, εργαλείο ή ασθενή')
+                    : asset
+                      ? tr('Δεν βρέθηκαν κινήσεις')
+                      : tr('Δεν βρέθηκε Σετ, εργαλείο ή ασθενής με «{0}»', q.trim())}
+                </strong>
+                <span>
+                  {needle
+                    ? tr('Δοκιμάστε άλλο barcode ή κωδικό ασθενούς.')
+                    : tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή κωδικό ασθενούς.')}
+                </span>
+              </div>
+            )}
+          </div>
+        </>
+      )}
       {report && <PrintPreviewModal title={tr('Ιχνηλάτηση')} html={report} onClose={() => setReport(null)} />}
     </>
   );

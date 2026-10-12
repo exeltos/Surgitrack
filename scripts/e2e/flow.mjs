@@ -333,7 +333,7 @@ async function main() {
       await queue('Σύνθεση');
       await queueRow().getByRole('button', {name: 'Έλεγχος & Σύνθεση'}).click();
       const modal = page.locator('.modal-backdrop').last();
-      await modal.getByRole('button', {name: 'Επιλογή όλων'}).click();
+      await modal.locator('.prep-select-all-row').click();
       await modal.getByText('Ακεραιότητα & λειτουργικότητα').click();
       await modal.getByText('Σύνθεση & συναρμολόγηση').click();
       await modal.getByRole('button', {name: 'Ολοκλήρωση · Προς κλιβανισμό'}).click();
@@ -367,7 +367,7 @@ async function main() {
 
     await step('The cycle ends and passes', async () => {
       const {page} = sterilization;
-      await queue('Στον κλίβανο');
+      await queue('Αποδέσμευση');
       await page.getByRole('button', {name: 'Τέλος κύκλου · 1'}).click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'AWAITING_RELEASE', 'state saved');

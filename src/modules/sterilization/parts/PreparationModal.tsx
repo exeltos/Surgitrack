@@ -354,24 +354,6 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                     </div>
                   </div>
                   <div className="prep-tools-toolbar-actions">
-                    <div className="prep-bulk-select">
-                      <button
-                        type="button"
-                        className="prep-all-ok"
-                        onClick={toggleAllPrepChecks}
-                        disabled={prepEligibleIds.length === 0}
-                      >
-                        {prepAllEligibleSelected ? (
-                          <>
-                            <X size={14} /> {tr('Αποεπιλογή όλων')}
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 size={14} /> {tr('Επιλογή όλων')}
-                          </>
-                        )}
-                      </button>
-                    </div>
                     <span className="prep-tools-progress">
                       {prepCheckedIds.size}/{prepItemIds.length}
                     </span>
@@ -475,6 +457,22 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                             </div>
                           );
                         }),
+                      )}
+                      {prepTools.length > 0 && (
+                        <label
+                          className={`prep-tool-row prep-select-all-row ${prepAllEligibleSelected ? 'checked' : ''}`}
+                        >
+                          <span className="prep-tool-check">
+                            <input
+                              type="checkbox"
+                              checked={prepAllEligibleSelected}
+                              disabled={prepEligibleIds.length === 0}
+                              onChange={toggleAllPrepChecks}
+                            />
+                            <span>{prepAllEligibleSelected ? <Check size={14} /> : null}</span>
+                          </span>
+                          <strong>{tr('Επιλογή όλων')}</strong>
+                        </label>
                       )}
                       {prepTools.map(t => {
                         const toolIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode));

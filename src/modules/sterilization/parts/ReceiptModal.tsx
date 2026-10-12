@@ -279,6 +279,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                         </button>
                       </div>
                       <textarea
+                        autoFocus
                         value={note}
                         onChange={e => setNote(e.target.value)}
                         placeholder={tr('Κατάσταση μεταφοράς ή άλλη παρατήρηση…')}

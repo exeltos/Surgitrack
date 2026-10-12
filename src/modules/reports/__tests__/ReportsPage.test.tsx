@@ -13,7 +13,6 @@ const REPORTS = [
   'Φορτία κλιβάνου',
   'Λήξεις αποστείρωσης',
   'Παραδόσεις & παραλαβές',
-  'Ιχνηλασιμότητα ασθενούς',
 ];
 
 const results = () => screen.getByRole('region', {name: 'Αποτελέσματα'});
@@ -68,19 +67,12 @@ describe('Reports', () => {
     expect(new Set(column('Τμήμα'))).toEqual(new Set([department]));
   });
 
-  it('traces by patient code: every coded movement, then only that patient, then nothing for an unknown code', () => {
+  it('sends patient traceability to the Traceability page, where all tracing lives', () => {
     renderPage(<ReportsPage />);
-    choose('Ιχνηλασιμότητα ασθενούς');
-    const everyone = count();
-    expect(everyone).toBeGreaterThan(0);
-    const code = screen.getByPlaceholderText('π.χ. PT-2026-0041');
-    fireEvent.change(code, {target: {value: 'pt-2026-0041'}});
-    expect(count()).toBeGreaterThan(0);
-    expect(count()).toBeLessThan(everyone);
-    expect(new Set(column('Κωδικός ασθενούς'))).toEqual(new Set(['PT-2026-0041']));
-    fireEvent.change(code, {target: {value: 'NOBODY-0000'}});
-    expect(count()).toBe(0);
-    expect(screen.getByText('Άλλαξε τα φίλτρα ή επίλεξε διαφορετική αναφορά.')).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /Ιχνηλασιμότητα ασθενούς/})).toHaveAttribute(
+      'href',
+      '/traceability?tab=patients',
+    );
   });
 
   it('lists handovers with the other party signature, and filters to the unconfirmed ones', () => {

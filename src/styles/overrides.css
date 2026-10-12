@@ -2707,9 +2707,6 @@ html body .replacements-fixed .row-actions button {
   padding: 0 10px;
   font-size: 12px;
 }
-html body .replacements-fixed th.col-actions {
-  width: 250px;
-}
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
 html body .department-kpis > * {
@@ -3030,14 +3027,6 @@ html body .shelf-life-options button.on {
 .sterilizer-load-card > header small {
   color: var(--st-muted);
   font-size: 12px;
-}
-.sterilizer-load-card > footer input {
-  flex: 1 1 220px;
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 10px;
-  font-size: 13px;
 }
 html body .sterilizer-load-card > footer .release-reprocess {
   border: 1px solid var(--c-orange-85);
