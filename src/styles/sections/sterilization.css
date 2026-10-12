@@ -1608,3 +1608,26 @@ html body .ster-row-load b {
   overflow: visible;
   padding-bottom: 0;
 }
+
+/* Composition on a phone: the name on its own line, the state and the button under it, all inside the row. */
+@media (max-width: 700px) {
+  html body .prep-tools-scroll .prep-tool-row {
+    grid-template-columns: 34px minmax(0, 1fr) auto !important;
+    column-gap: 8px;
+  }
+  html body .prep-tools-scroll .prep-tool-row > .prep-tool-main {
+    grid-column: 2 / -1;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .prep-tools-scroll .prep-tool-row > .prep-tool-state {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+  }
+  html body .prep-tools-scroll .prep-tool-row > .tool-manage-btn {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: end;
+  }
+}
