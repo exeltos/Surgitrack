@@ -186,6 +186,27 @@ html body .sidebar .nav-group.first {
     display: none;
   }
 }
+/* The platform's own Demo: the role to see the app as, in the DEMO line. */
+html body .owner-demo-bar .owner-demo-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--c-violet-45);
+  font-size: 12px;
+  font-weight: 700;
+}
+html body .owner-demo-bar .role-switch {
+  display: flex;
+  min-width: 0;
+}
+html body .owner-demo-bar .role-switch select {
+  height: 30px;
+  max-width: 240px;
+  padding: 0 8px;
+  border-color: var(--c-violet-80);
+  font-size: 12px;
+}
 /* The platform's own Demo on a phone: one line, the badge and the way out. */
 @media (max-width: 700px) {
   html body .owner-demo-bar {
@@ -194,7 +215,18 @@ html body .sidebar .nav-group.first {
   html body .owner-demo-bar .demo-bar-text {
     display: none;
   }
-  html body .owner-demo-bar .demo-bar-action {
-    margin-left: auto;
+  html body .owner-demo-bar .owner-demo-role {
+    flex: 1 1 auto;
+  }
+  html body .owner-demo-bar .owner-demo-role > span {
+    display: none;
+  }
+  html body .owner-demo-bar .role-switch select {
+    width: 100%;
+    max-width: none;
+  }
+  /* The way out as an icon: the role picker takes the room. */
+  html body .owner-demo-bar .demo-bar-action > span {
+    display: none;
   }
 }

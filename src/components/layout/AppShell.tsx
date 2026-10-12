@@ -372,7 +372,8 @@ export default function AppShell({
             <Home size={15} />
             <span>SurgiTrack</span>
           </button>
-          <RoleSwitcher />
+          {/* In the platform's Demo the role is picked in the DEMO line. */}
+          {!isDemo && <RoleSwitcher />}
           {!!getCloudOrganizationId() && <SyncChip info={syncInfo} live={realtimeLive} online={online} />}
           <div className="top-actions">
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>
@@ -496,9 +497,20 @@ export default function AppShell({
                 ? 'Δοκιμαστικό νοσοκομείο · τα ίδια δεδομένα με τα Demo των αξιολογητών'
                 : 'Sample hospital · the same data as the evaluators’ Demos'}
             </span>
-            <button type="button" className="demo-bar-action" onClick={returnFromDemo}>
+            <div className="owner-demo-role">
+              <Eye size={14} aria-hidden="true" />
+              <span>{lang === 'el' ? 'Ρόλος' : 'Role'}</span>
+              <RoleSwitcher />
+            </div>
+            <button
+              type="button"
+              className="demo-bar-action"
+              onClick={returnFromDemo}
+              aria-label={lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}
+              title={lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}
+            >
               <LogOut size={15} />
-              {lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}
+              <span>{lang === 'el' ? 'Έξοδος από Demo' : 'Exit Demo'}</span>
             </button>
           </div>
         )}
