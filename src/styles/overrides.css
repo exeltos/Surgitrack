@@ -4219,34 +4219,6 @@ html body .demo-welcome-actions {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-/* «Αξιολογήστε την οθόνη»: always at hand in an evaluation Demo, bottom right. */
-html body .demo-rate-screen {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 900;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid var(--c-amber-70, #f2c36b);
-  border-radius: 999px;
-  background: var(--c-white);
-  box-shadow: 0 8px 24px rgb(10 30 40 / 16%);
-  color: var(--c-blue-15);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-html body .demo-rate-screen svg {
-  color: var(--c-amber-50, #c98a00);
-}
-html body .demo-rate-screen b {
-  color: var(--c-amber-50, #c98a00);
-}
-
 /* Sets list: the state on one line on a computer; on a tablet the barcode goes under the name, so the
    name is never cut in the middle of a word. */
 html body .sets-registry .sets-row-barcode {

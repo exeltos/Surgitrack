@@ -373,3 +373,35 @@ html body .topbar .role-switch select {
     display: none;
   }
 }
+/* Evaluation Demo: «Rate this screen» as a star in the DEMO line (with the person's rating once given). */
+html body .demo-bar .demo-bar-rate {
+  padding: 5px 8px;
+}
+html body .demo-bar .demo-bar-rate.rated svg {
+  fill: currentColor;
+}
+html body .demo-bar .demo-bar-rate b {
+  font-size: 12px;
+}
+html body .demo-bar .demo-bar-rate:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+/* The evaluation Demo line: its buttons never break in two; the days left give way instead. */
+html body .demo-bar > button {
+  flex: none;
+  white-space: nowrap;
+}
+html body .demo-bar > .demo-bar-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  html body .demo-bar:not(.owner-demo-bar) > .demo-bar-text {
+    display: none;
+  }
+  html body .demo-bar:not(.owner-demo-bar) {
+    gap: 6px;
+  }
+}
