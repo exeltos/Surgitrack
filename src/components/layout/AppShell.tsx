@@ -52,6 +52,8 @@ import {formatDate, formatTime} from '../../core/displayDate';
 // The user manual is loaded only when first opened.
 import NotificationPanel from './NotificationPanel';
 import OwnerDemoAlerts from './OwnerDemoAlerts';
+import {enterPlatformDemo} from '../../data/cloud/platformDemo';
+import {tellUser} from '../ui/confirmService';
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
 /** Initials of a name, e.g. "ΑΙΚΑΤΕΡΙΝΗ ΜΠΟΥΓΑ" → "ΑΜ". */
 const initialsOf = (name: string) => {
@@ -131,6 +133,7 @@ export default function AppShell({
   const [a11y, setA11y] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [enteringDemo, setEnteringDemo] = useState(false);
   // After signing in: first what changed in this version, then what waits today (one at a time).
   // A moment after the screen opens, so that counts loaded alongside (access requests) are in.
   const [sinceSignIn, setSinceSignIn] = useState<'pending' | 'news' | 'briefing' | ''>('pending');
@@ -374,6 +377,27 @@ export default function AppShell({
           </button>
           {/* In the platform's Demo the role is picked in the DEMO line. */}
           {!isDemo && <RoleSwitcher />}
+          {/* The owner in Studio opens the platform's own Demo from the header (as in Limoxis). */}
+          {platformOnly && !isDemo && can('studio.manage') && (
+            <button
+              type="button"
+              className="header-demo-enter"
+              title={tr('Είσοδος Demo')}
+              aria-label={tr('Είσοδος Demo')}
+              disabled={enteringDemo}
+              onClick={() => {
+                setEnteringDemo(true);
+                void enterPlatformDemo('ADMIN').then(error => {
+                  if (error === undefined) return;
+                  setEnteringDemo(false);
+                  void tellUser(tr('Είσοδος Demo'), error || tr('Δεν ήταν δυνατή η είσοδος στο Demo.'));
+                });
+              }}
+            >
+              <FlaskConical size={15} />
+              <span>{tr('Είσοδος Demo')}</span>
+            </button>
+          )}
           {!!getCloudOrganizationId() && <SyncChip info={syncInfo} live={realtimeLive} online={online} />}
           <div className="top-actions">
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>

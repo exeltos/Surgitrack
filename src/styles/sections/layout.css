@@ -230,3 +230,146 @@ html body .owner-demo-bar .role-switch select {
     display: none;
   }
 }
+/* Studio header: the owner's way into the platform's Demo, next to the hospital picker. */
+html body .header-demo-enter {
+  display: inline-flex;
+  margin-left: 8px;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--c-violet-80);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-blue-25);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+html body .header-demo-enter svg {
+  color: var(--c-violet-45);
+}
+html body .header-demo-enter:hover:not(:disabled) {
+  background: var(--c-gray-95-9);
+}
+html body .header-demo-enter:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+/* On a phone: the flask alone. */
+@media (max-width: 700px) {
+  html body .header-demo-enter {
+    padding: 0 9px;
+  }
+  html body .header-demo-enter > span {
+    display: none;
+  }
+}
+/* The owner inside a hospital: its name and the way back to Studio, where the hospital picker was. */
+html body .role-switch-hospital {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  min-width: 0;
+  max-width: 320px;
+  margin-right: 8px;
+  padding: 0 4px 0 10px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-blue-25);
+  font-size: 12.5px;
+}
+html body .role-switch-hospital > svg {
+  flex: none;
+  color: var(--c-cyan-35);
+}
+html body .role-switch-hospital > b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .role-switch-hospital > button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--c-gray-100-2);
+  color: var(--c-blue-25);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .role-switch-hospital > button:hover {
+  background: var(--c-gray-95-9);
+}
+@media (max-width: 700px) {
+  html body .role-switch-hospital {
+    max-width: 150px;
+  }
+  html body .role-switch-hospital > button > span {
+    display: none;
+  }
+}
+/* Header controls on one line and one height: the hospital, the role, «Είσοδος Demo». */
+html body .topbar {
+  align-items: center;
+}
+html body .topbar .role-switch {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+html body .topbar .role-switch select,
+html body .topbar .role-switch-hospital,
+html body .topbar .header-demo-enter {
+  box-sizing: border-box;
+  height: 34px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+html body .topbar .role-switch-hospital {
+  flex: none;
+  margin-right: 0;
+}
+html body .topbar .role-switch select {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  html body .topbar .role-switch {
+    gap: 6px;
+  }
+  /* The hospital as its icon and the way back; the role picker keeps the room. */
+  html body .topbar .role-switch-hospital {
+    max-width: none;
+    padding: 0 3px;
+  }
+  html body .topbar .role-switch-hospital > b {
+    display: none;
+  }
+  html body .topbar .role-switch-hospital > svg {
+    display: none;
+  }
+  html body .topbar .role-switch:has(.role-switch-hospital) select {
+    width: 96px;
+    min-width: 0;
+  }
+  html body .topbar .role-switch {
+    flex: none;
+  }
+  /* The owner in a hospital: the live dot gives way to the hospital and role pickers. */
+  html body .topbar:has(.role-switch-hospital) .sync-chip {
+    display: none;
+  }
+}

@@ -1998,4 +1998,6 @@ export const en: Record<string, string> = {
   '{0} ολοκλήρωσε την αξιολόγηση στο «{1}».': '{0} sent the evaluation of «{1}».',
   '+{0} ακόμη': '+{0} more',
   'Άνοιγμα Demo': 'Open Demos',
+  'Είσοδος Demo': 'Enter Demo',
+  'Δεν ήταν δυνατή η είσοδος στο Demo.': 'Could not open the Demo.',
 };

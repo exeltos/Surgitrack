@@ -536,6 +536,8 @@ const RPC = {
   my_access_request: () => null,
   demo_seats_left: () => null,
   platform_list_departments: db => db.departments,
+  // The owner's «Είσοδος Demo»: the test hospital stands in for the platform's Demo hospital.
+  platform_ensure_demo_organization: () => ORG_ID,
 };
 
 const FUNCTIONS = {
