@@ -46,6 +46,22 @@ describe('ScanApp', () => {
   });
 });
 
+describe('ScanApp lookup for a department', () => {
+  it('shows only the department’s own equipment', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {
+      path: '/scan/lookup',
+      signedIn: {id: 'u-or', name: 'Νοσηλεύτρια Χειρουργείου', role: 'DEPARTMENT', department: 'Χειρουργείο'},
+    });
+    typeBarcode('S000327');
+    expect(screen.queryByRole('article')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Ο χρήστης του τμήματος βλέπει μόνο τον εξοπλισμό του δικού του τμήματος.'),
+    ).toBeInTheDocument();
+    typeBarcode('S000322');
+    expect(within(screen.getByRole('article')).getByText('ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ')).toBeInTheDocument();
+  });
+});
+
 describe('ScanApp report', () => {
   const staff = {
     id: 'u-ster',

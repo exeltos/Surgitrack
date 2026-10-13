@@ -15,18 +15,33 @@ const RECENT = 5;
 
 /** Lookup: scan any Set or instrument to see where it is, its state, and what happened to it last. */
 export default function LookupStation({onStations}: {onStations: () => void}) {
-  const {sets, tools, movements} = useSurgi();
+  const {sets, tools, movements, role, currentUser} = useSurgi();
   const [found, setFound] = useState<{kind: 'SET' | 'TOOL'; id: string} | null>(null);
   const [feedback, setFeedback] = useState<BarcodeFeedback | null>(null);
   useScanAnswers(feedback);
   const matches = (barcode: string, item: {barcode: string; legacyBarcodes?: string[]}) =>
     item.barcode.toUpperCase() === barcode || !!item.legacyBarcodes?.some(code => code.toUpperCase() === barcode);
 
+  // A department user sees only their own department's equipment, as on the Set and instrument pages.
+  const ownDepartment = (department: string | undefined) =>
+    role !== 'DEPARTMENT' || department === currentUser.department;
+
   const scan = (barcode: string) => {
     const set = sets.find(item => matches(barcode, item));
     const tool = set ? undefined : tools.find(item => matches(barcode, item));
     if (!set && !tool) {
       setFeedback({type: 'ERROR', message: tr('{0} δεν βρέθηκε στο μητρώο.', barcode)});
+      return;
+    }
+    const department = set
+      ? set.department
+      : tool!.department || sets.find(item => item.id === tool!.setId)?.department;
+    if (!ownDepartment(department)) {
+      setFound(null);
+      setFeedback({
+        type: 'ERROR',
+        message: tr('Ο χρήστης του τμήματος βλέπει μόνο τον εξοπλισμό του δικού του τμήματος.'),
+      });
       return;
     }
     setFeedback({type: 'OK', message: `${barcode} · ${(set || tool)!.name}`});
@@ -37,9 +52,11 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
   const tool = found?.kind === 'TOOL' ? tools.find(item => item.id === found.id) : undefined;
   const asset = set || tool;
   const parentSet = tool?.setId ? sets.find(item => item.id === tool.setId) : undefined;
+  // Movements keep the barcode they were recorded with: a reissued barcode's old ones count too.
+  const codes = new Set([asset?.barcode, ...(asset?.legacyBarcodes || [])].map(code => code?.toUpperCase()));
   const recent = asset
     ? movements
-        .filter(m => m.asset.split(' · ')[0].toUpperCase() === asset.barcode.toUpperCase())
+        .filter(m => codes.has(m.asset.split(' · ')[0].toUpperCase()))
         .sort((a, b) => (parseDisplayDate(b.at)?.getTime() ?? 0) - (parseDisplayDate(a.at)?.getTime() ?? 0))
         .slice(0, RECENT)
     : [];

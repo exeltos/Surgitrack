@@ -35,7 +35,10 @@ export default function ReportStation({onStations}: {onStations: () => void}) {
   const periodReceipts = receipts.filter(r => when(r.at));
   const periodDeliveries = deliveries.filter(d => when(d.at));
   const loaded = sterilizerLoads.filter(load => when(load.createdAt));
-  const released = sterilizerLoads.filter(load => load.status === 'RELEASED' && when(load.releasedAt));
+  // A load recalled after its release was still released then (it keeps its release time).
+  const released = sterilizerLoads.filter(
+    load => (load.status === 'RELEASED' || load.status === 'RECALLED') && when(load.releasedAt),
+  );
   const notReleased = sterilizerLoads.filter(
     load => (load.status === 'REPROCESS' || load.status === 'FAILED') && when(load.completedAt || load.releasedAt),
   );
