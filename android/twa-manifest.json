@@ -1,0 +1,41 @@
+{
+  "packageId": "eu.surgitrack.scan",
+  "host": "www.surgitrack.eu",
+  "name": "SurgiTrack Σάρωση",
+  "launcherName": "SurgiTrack",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#17384A",
+  "themeColorDark": "#17384A",
+  "navigationColor": "#FFFFFF",
+  "navigationColorDark": "#17384A",
+  "navigationDividerColor": "#DBE3EA",
+  "navigationDividerColorDark": "#17384A",
+  "backgroundColor": "#F5F7FB",
+  "enableNotifications": false,
+  "startUrl": "/scan.html",
+  "iconUrl": "https://www.surgitrack.eu/scan-icon-512.png",
+  "maskableIconUrl": "https://www.surgitrack.eu/scan-icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./surgitrack-android.keystore",
+    "alias": "surgitrack"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://www.surgitrack.eu/scan.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://www.surgitrack.eu/",
+  "minSdkVersion": 21,
+  "protocolHandlers": [],
+  "fileHandlers": []
+}

@@ -1,0 +1,101 @@
+name: Android app
+
+# Builds the phone app (scan.html) as an Android APK and app bundle with Bubblewrap (a Trusted Web Activity:
+# the installed app opens www.surgitrack.eu/scan.html full screen and updates with the site).
+# Run it from Actions → Android app → Run workflow; the files are under the run's Artifacts.
+# Signed with the key in the ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD secrets. Without them (or on a
+# push that changes this build) it signs with a throwaway key: fine to check the build, not to hand out.
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version name shown on the phone (e.g. 1.0.1); the version code is the run number'
+        required: false
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Android build tools
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;36.1.0" "platforms;android-36" > /dev/null
+
+      - name: Install Bubblewrap
+        run: |
+          npm install --global @bubblewrap/cli@1.25.0
+          mkdir -p ~/.bubblewrap
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+
+      # The launcher icon and the web manifest come from this commit's public/ (served during the build), not
+      # from whatever the site has now.
+      - name: Version and icon
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+        run: |
+          name="${VERSION_NAME:-1.0.${{ github.run_number }}}"
+          jq --arg name "$name" --argjson code ${{ github.run_number }} \
+            '.appVersionName = $name | .appVersionCode = $code
+             | .iconUrl = "http://localhost:8765/scan-icon-512.png" | .maskableIconUrl = .iconUrl
+             | .webManifestUrl = "http://localhost:8765/scan.webmanifest"' \
+            twa-manifest.json > twa.tmp && mv twa.tmp twa-manifest.json
+          echo "Version $name (${{ github.run_number }})"
+
+      - name: Signing key
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "$KEYSTORE" ]; then
+            echo "$KEYSTORE" | base64 --decode > surgitrack-android.keystore
+            echo "SIGNED=release" >> "$GITHUB_ENV"
+          else
+            keytool -genkeypair -keystore surgitrack-android.keystore -alias surgitrack -keyalg RSA -keysize 2048 \
+              -validity 30 -storepass test-only -keypass test-only -dname "CN=SurgiTrack test" > /dev/null
+            echo "SIGNED=test-key" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build
+        env:
+          RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ "$SIGNED" = "release" ]; then password="$RELEASE_PASSWORD"; else password=test-only; fi
+          export BUBBLEWRAP_KEYSTORE_PASSWORD="$password" BUBBLEWRAP_KEY_PASSWORD="$password"
+          python3 -m http.server 8765 --directory ../public > /dev/null 2>&1 &
+          sleep 1
+          bubblewrap update --skipVersionUpgrade < /dev/null
+          bubblewrap build --skipPwaValidation < /dev/null
+          mkdir -p ../apk
+          mv app-release-signed.apk "../apk/surgitrack-scan-${SIGNED}.apk"
+          mv app-release-bundle.aab "../apk/surgitrack-scan-${SIGNED}.aab"
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: surgitrack-scan-${{ env.SIGNED }}-${{ github.run_number }}
+          path: apk/
+          retention-days: 30
