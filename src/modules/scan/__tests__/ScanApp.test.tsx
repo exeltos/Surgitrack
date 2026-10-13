@@ -14,7 +14,7 @@ const typeBarcode = (code: string) => {
 describe('ScanApp', () => {
   it('opens on the stations the signed-in person may use', () => {
     renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan'});
-    const stations = within(screen.getByRole('navigation', {name: 'Σταθμοί'}));
+    const stations = within(screen.getByRole('navigation', {name: 'Αρχική'}));
     for (const name of ['Παραλαβή', 'Φόρτωση κλιβάνου', 'Αποδέσμευση', 'Παράδοση', 'Αναζήτηση'])
       expect(stations.getByRole('button', {name: new RegExp(name)})).toBeInTheDocument();
   });
@@ -62,6 +62,28 @@ describe('ScanApp lookup for a department', () => {
   });
 });
 
+describe('ScanApp lists', () => {
+  it('lists the Sets and opens what a Set holds', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/lists'});
+    fireEvent.change(screen.getByRole('searchbox', {name: 'Αναζήτηση'}), {target: {value: 'S000322'}});
+    fireEvent.click(screen.getByRole('button', {name: /ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ/}));
+    const form = screen.getByRole('region', {name: 'Σύνθεση Σετ'});
+    expect(within(form).getAllByRole('listitem').length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', {name: /Λίστες/}));
+    fireEvent.click(screen.getByRole('button', {name: /Μεμονωμένα/}));
+    expect(screen.getByRole('button', {name: /Μεμονωμένα/})).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('shows a department user only their own department', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {
+      path: '/scan/lists',
+      signedIn: {id: 'u-or', name: 'Νοσηλεύτρια Χειρουργείου', role: 'DEPARTMENT', department: 'Χειρουργείο'},
+    });
+    expect(screen.getByRole('button', {name: /ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ/})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /SET ΕΠΙΣΙΟΤΟΜΗΣ/})).not.toBeInTheDocument();
+  });
+});
+
 describe('ScanApp report', () => {
   const staff = {
     id: 'u-ster',
@@ -90,7 +112,6 @@ describe('ScanApp report', () => {
 
 describe('ScanCamera', () => {
   it('takes a Bluetooth/USB scanner’s barcode typed anywhere on the screen', () => {
-    localStorage.setItem('surgitrack-scan-camera', 'off');
     const onBarcode = vi.fn();
     render(<ScanCamera onBarcode={onBarcode} />);
     act(() => {
@@ -98,6 +119,14 @@ describe('ScanCamera', () => {
         document.body.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles: true}));
     });
     expect(onBarcode).toHaveBeenCalledWith('S000327');
-    localStorage.clear();
+  });
+
+  it('opens the camera only when «Σάρωση» is pressed', () => {
+    const {container} = render(<ScanCamera onBarcode={vi.fn()} />);
+    expect(container.querySelector('video')).toBeNull();
+    fireEvent.click(screen.getByRole('button', {name: 'Σάρωση'}));
+    expect(container.querySelector('video')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', {name: /Κλείσιμο κάμερας/}));
+    expect(container.querySelector('video')).toBeNull();
   });
 });

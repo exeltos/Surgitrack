@@ -2001,14 +2001,12 @@ export const en: Record<string, string> = {
   'Αποστειρωμένα προς τμήμα / αίθουσα': 'Sterile items to a department / theatre',
   'Σκανάρετε ένα Σετ: πού είναι, τι έγινε': 'Scan a set: where it is, what happened',
   Εφαρμογή: 'App',
-  Σταθμοί: 'Stations',
   'Η κάμερα δεν είναι διαθέσιμη εδώ. Πληκτρολογήστε το barcode ή χρησιμοποιήστε scanner.':
     'The camera is not available here. Type the barcode or use a scanner.',
   'Δεν δόθηκε άδεια για την κάμερα. Επιτρέψτε την από τις ρυθμίσεις του browser.':
     'Camera permission was not given. Allow it in the browser settings.',
   Φακός: 'Torch',
   Πληκτρολόγηση: 'Type',
-  'Σκανάρετε με scanner ή πατήστε «Κάμερα» ή «Πληκτρολόγηση».': 'Scan with a scanner, or press “Camera” or “Type”.',
   'Αφαίρεση {0}': 'Remove {0}',
   'Δεν προστέθηκαν': 'Not added',
   'Η παράδοση καταγράφηκε': 'Delivery recorded',
@@ -2071,4 +2069,17 @@ export const en: Record<string, string> = {
   Έξοδος: 'Exit',
   'Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.':
     'The platform account belongs to no hospital. Try scanning in the Demo.',
+  Λίστες: 'Lists',
+  'Σετ και μεμονωμένα, με το περιεχόμενο κάθε Σετ': 'Sets and standalone instruments, with what each set holds',
+  'Το Σετ δεν έχει εργαλεία.': 'The set has no instruments.',
+  'Σετ και μεμονωμένα εργαλεία': 'Sets and standalone instruments',
+  Λίστα: 'List',
+  'Barcode, όνομα ή κωδικός': 'Barcode, name or code',
+  'Δεν βρέθηκε τίποτα.': 'Nothing found.',
+  'Περισσότερα · {0}': 'More · {0}',
+  Αρχική: 'Home',
+  'Παρόντα / αναμενόμενα': 'Present / expected',
+  'Δεν ήταν δυνατή η δημιουργία του PDF. Δοκιμάστε ξανά.': 'The PDF could not be made. Try again.',
+  'Δημιουργία PDF…': 'Making the PDF…',
+  'PDF σύνθεσης': 'Composition PDF',
 };

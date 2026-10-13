@@ -183,7 +183,7 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
     <ScanScreen
       title={tr('Αποδέσμευση')}
       subtitle={tr('Σκανάρετε ένα αντικείμενο του φορτίου ή επιλέξτε το φορτίο.')}
-      backLabel={tr('Σταθμοί')}
+      backLabel={tr('Αρχική')}
       onBack={onStations}
     >
       <ScanCamera onBarcode={scan} feedback={feedback} />

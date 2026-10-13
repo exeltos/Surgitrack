@@ -1,7 +1,15 @@
-import type {ReactNode} from 'react';
-import {ArrowLeft, CheckCircle2, X} from 'lucide-react';
+import {useState, type ReactNode} from 'react';
+import {ArrowLeft, CheckCircle2, FileDown, X} from 'lucide-react';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {tr, trData} from '../../i18n';
+import {useCompositionOptions} from '../../components/assets/usePrintLook';
+import {tellUser} from '../../components/ui/confirmService';
+import {compositionLines} from '../../core/compositionCheck';
+import {formatDateTime} from '../../core/displayDate';
+import {htmlToPdf, shareOrDownloadPdf} from '../../core/htmlToPdf';
+import {useSurgi} from '../../store/SurgiStore';
+import {compositionHtml} from '../sterilization/printUtils';
+import type {Issue, SetAsset, Tool} from '../../types/domain';
 import type {SterilizationRow} from '../sterilization/sterilizationTypes';
 
 /** One screen of the phone app: a dark header with the way back, the content, and its main button. */
@@ -112,8 +120,109 @@ export function ScanDone({
         {again}
       </button>
       <button type="button" className="scan-secondary" onClick={onStations}>
-        {tr('Σταθμοί')}
+        {tr('Αρχική')}
       </button>
     </div>
+  );
+}
+
+/**
+ * A Set's composition sheet, as printed from the Set's page: one row per kind of instrument with its code
+ * and how many there should be and are, what is missing, and open issues (Βλάβη, Φθορά…).
+ */
+export function SetContents({set, tools, issues}: {set: SetAsset; tools: Tool[]; issues: Issue[]}) {
+  const problems = new Map<string, string[]>();
+  for (const issue of issues) {
+    if (issue.status !== 'OPEN') continue;
+    const barcode = issue.asset.split(' · ')[0];
+    problems.set(barcode, [...(problems.get(barcode) || []), trData(issue.type)]);
+  }
+  const lines = compositionLines(set.compositionTemplate, tools, problems);
+  const templated = !!set.compositionTemplate?.length;
+  const expected = templated ? lines.reduce((sum, line) => sum + (line.expected || 0), 0) : set.expected;
+  const missing = lines.reduce((sum, line) => sum + line.missing, 0);
+  return (
+    <section className="scan-form" aria-label={tr('Σύνθεση Σετ')}>
+      <h2 className="scan-section">
+        {tr('Σύνθεση Σετ')}{' '}
+        <span>
+          {tools.length}
+          {expected ? ` / ${expected}` : ''}
+        </span>
+      </h2>
+      {missing > 0 && (
+        <p className="scan-form-alert">
+          {missing === 1 ? tr('Λείπει 1 εργαλείο') : tr('Λείπουν {0} εργαλεία', missing)}
+        </p>
+      )}
+      {lines.length ? (
+        <ol className="scan-form-lines">
+          {lines.map((line, index) => (
+            <li
+              key={`${line.code}:${line.name}:${index}`}
+              className={line.missing ? 'missing' : line.problems.length ? 'issue' : ''}
+            >
+              <span className="scan-form-num">{index + 1}</span>
+              <span className="scan-form-name">
+                <b>{line.name}</b>
+                <small>
+                  {line.code}
+                  {line.manufacturer !== '—' ? ` · ${line.manufacturer}` : ''}
+                </small>
+                {line.missing > 0 && (
+                  <em className="miss">{line.missing === 1 ? tr('Λείπει 1') : tr('Λείπουν {0}', line.missing)}</em>
+                )}
+                {line.problems.length > 0 && <em className="prob">{line.problems.join(' · ')}</em>}
+              </span>
+              <span className="scan-form-qty" aria-label={tr('Παρόντα / αναμενόμενα')}>
+                {line.present}
+                {line.expected !== undefined ? <small>/{line.expected}</small> : null}
+              </span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="scan-empty">{tr('Το Σετ δεν έχει εργαλεία.')}</p>
+      )}
+    </section>
+  );
+}
+
+/** The Set's composition sheet as a PDF file, the same sheet the Set's page prints: shared or downloaded. */
+export function SetPdfButton({set, tools}: {set: SetAsset; tools: Tool[]}) {
+  const {issues, currentUser} = useSurgi();
+  const compositionOptions = useCompositionOptions();
+  const [busy, setBusy] = useState(false);
+  const make = async () => {
+    setBusy(true);
+    try {
+      const problems = issues
+        .filter(
+          issue =>
+            issue.status === 'OPEN' &&
+            (issue.asset.startsWith(set.barcode) || tools.some(tool => issue.asset.startsWith(tool.barcode))),
+        )
+        .map(issue => ({barcode: issue.asset.split(' · ')[0], type: issue.type}));
+      const html = compositionHtml(
+        set,
+        tools,
+        currentUser.name,
+        formatDateTime(),
+        problems,
+        compositionOptions(set.colorTapes),
+      );
+      const blob = await htmlToPdf(html);
+      await shareOrDownloadPdf(blob, `${set.barcode}.pdf`, tr('Σύνθεση {0}', set.barcode));
+    } catch {
+      void tellUser(tr('PDF'), tr('Δεν ήταν δυνατή η δημιουργία του PDF. Δοκιμάστε ξανά.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button type="button" className="scan-secondary" disabled={busy} onClick={() => void make()}>
+      {busy ? <span className="app-spinner inline" aria-hidden="true" /> : <FileDown size={18} />}{' '}
+      {busy ? tr('Δημιουργία PDF…') : tr('PDF σύνθεσης')}
+    </button>
   );
 }

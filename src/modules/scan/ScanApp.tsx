@@ -7,6 +7,7 @@ import {
   Flame,
   FlaskConical,
   LayoutDashboard,
+  List,
   LogOut,
   Search,
   ShieldCheck,
@@ -28,6 +29,7 @@ import {tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import {SCAN_PATH, isScanStandalone} from './scanApp';
 import DeliverStation from './stations/DeliverStation';
+import ListsStation from './stations/ListsStation';
 import LoadStation from './stations/LoadStation';
 import LookupStation from './stations/LookupStation';
 import ReceiveStation from './stations/ReceiveStation';
@@ -91,6 +93,13 @@ const stations = (): Station[] => [
     tone: 'lookup',
   },
   {
+    path: 'lists',
+    title: tr('Λίστες'),
+    text: tr('Σετ και μεμονωμένα, με το περιεχόμενο κάθε Σετ'),
+    icon: <List size={26} />,
+    tone: 'lists',
+  },
+  {
     path: 'report',
     title: tr('Αναφορά'),
     text: tr('Η ημέρα: παραλαβές, φορτία, παραδόσεις, εκκρεμότητες'),
@@ -124,7 +133,7 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
   const ownerOutside = owner && isPlatformOnly();
   const enterDemo = () => {
     setEnteringDemo(true);
-    void enterPlatformDemo('ADMIN').then(error => {
+    void enterPlatformDemo('ADMIN', undefined, `#${SCAN_PATH}`).then(error => {
       if (error === undefined) return;
       setEnteringDemo(false);
       void tellUser(tr('Είσοδος Demo'), error || tr('Δεν ήταν δυνατή η είσοδος στο Demo.'));
@@ -168,15 +177,17 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         </div>
       )}
       <main className="scan-body">
-        {ownerOutside && (
+        {owner && !ownerDemo && (
           <section className="scan-demo-enter">
-            <p>{tr('Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.')}</p>
+            {ownerOutside && (
+              <p>{tr('Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.')}</p>
+            )}
             <button type="button" className="scan-primary" disabled={enteringDemo} onClick={enterDemo}>
               <FlaskConical size={18} /> {tr('Είσοδος Demo')}
             </button>
           </section>
         )}
-        <nav className="scan-stations" aria-label={tr('Σταθμοί')}>
+        <nav className="scan-stations" aria-label={tr('Αρχική')}>
           {(ownerOutside ? [] : allowed).map(station => (
             <button
               key={station.path}
@@ -211,6 +222,7 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         <Route path={`${SCAN_PATH}/release`} element={station('release', <ReleaseStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/deliver`} element={station('deliver', <DeliverStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/report`} element={station('report', <ReportStation onStations={toStations} />)} />
+        <Route path={`${SCAN_PATH}/lists`} element={station('lists', <ListsStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/lookup`} element={station('lookup', <LookupStation onStations={toStations} />)} />
         <Route path="*" element={<Navigate to={SCAN_PATH} replace />} />
       </Routes>
