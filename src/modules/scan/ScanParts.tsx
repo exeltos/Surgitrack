@@ -2,6 +2,7 @@ import type {ReactNode} from 'react';
 import {ArrowLeft, CheckCircle2, X} from 'lucide-react';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {tr, trData} from '../../i18n';
+import type {Tool} from '../../types/domain';
 import type {SterilizationRow} from '../sterilization/sterilizationTypes';
 
 /** One screen of the phone app: a dark header with the way back, the content, and its main button. */
@@ -115,5 +116,34 @@ export function ScanDone({
         {tr('Σταθμοί')}
       </button>
     </div>
+  );
+}
+
+/** What a Set holds: its instruments, by name, with barcode and code. */
+export function SetContents({tools}: {tools: Tool[]}) {
+  const sorted = [...tools].sort((a, b) => a.name.localeCompare(b.name, 'el'));
+  return (
+    <section aria-label={tr('Περιεχόμενο Σετ')}>
+      <h2 className="scan-section">
+        {tr('Περιεχόμενο Σετ')} <span>{tools.length}</span>
+      </h2>
+      {sorted.length ? (
+        <ul className="scan-items compact">
+          {sorted.map(tool => (
+            <li key={tool.id}>
+              <span>
+                <b>{tool.name}</b>
+                <small>
+                  <span className="mono">{tool.barcode}</span>
+                  {tool.code ? ` · ${tool.code}` : ''}
+                </small>
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="scan-empty">{tr('Το Σετ δεν έχει εργαλεία.')}</p>
+      )}
+    </section>
   );
 }

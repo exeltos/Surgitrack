@@ -26,6 +26,9 @@ html body .scan-head h1 {
   font-size: 22px;
   line-height: 1.2;
 }
+html body .scan-head .mono {
+  color: inherit;
+}
 html body .scan-head p {
   margin: 3px 0 0;
   font-size: 13.5px;
@@ -238,6 +241,9 @@ html body .scan-station.deliver .scan-station-icon {
 html body .scan-station.lookup .scan-station-icon {
   background: #627887;
 }
+html body .scan-station.lists .scan-station-icon {
+  background: #3e7cb1;
+}
 html body .scan-station.report .scan-station-icon {
   background: var(--c-cyan-20);
 }
@@ -413,6 +419,29 @@ html body .scan-camera-hint {
   margin: 0;
   color: #627887;
   font-size: 13.5px;
+}
+
+/* Lists: a search box above the list. */
+html body .scan-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #c9d5de;
+  border-radius: 12px;
+  background: #fff;
+  color: #627887;
+}
+html body .scan-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #16252f;
+  font: inherit;
+  font-size: 16px;
 }
 
 /* What was scanned. */
@@ -658,10 +687,14 @@ html body .scan-loads li > div {
   font: inherit;
   text-align: left;
 }
-html body .scan-loads li > button > span,
+html body .scan-loads li > button > span:not(.asset-type-icon-inline),
 html body .scan-loads li > div > span {
   flex: 1;
   min-width: 0;
+}
+html body .scan-loads .asset-type-icon-inline {
+  flex: none;
+  color: var(--c-cyan-40);
 }
 html body .scan-loads b {
   display: block;

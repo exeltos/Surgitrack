@@ -62,6 +62,28 @@ describe('ScanApp lookup for a department', () => {
   });
 });
 
+describe('ScanApp lists', () => {
+  it('lists the Sets and opens what a Set holds', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/lists'});
+    fireEvent.change(screen.getByRole('searchbox', {name: 'Αναζήτηση'}), {target: {value: 'S000322'}});
+    fireEvent.click(screen.getByRole('button', {name: /ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ/}));
+    const contents = screen.getByRole('region', {name: 'Περιεχόμενο Σετ'});
+    expect(within(contents).getAllByRole('listitem').length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', {name: /Λίστες/}));
+    fireEvent.click(screen.getByRole('button', {name: /Μεμονωμένα/}));
+    expect(screen.getByRole('button', {name: /Μεμονωμένα/})).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('shows a department user only their own department', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {
+      path: '/scan/lists',
+      signedIn: {id: 'u-or', name: 'Νοσηλεύτρια Χειρουργείου', role: 'DEPARTMENT', department: 'Χειρουργείο'},
+    });
+    expect(screen.getByRole('button', {name: /ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ/})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /SET ΕΠΙΣΙΟΤΟΜΗΣ/})).not.toBeInTheDocument();
+  });
+});
+
 describe('ScanApp report', () => {
   const staff = {
     id: 'u-ster',

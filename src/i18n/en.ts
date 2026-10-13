@@ -2070,4 +2070,13 @@ export const en: Record<string, string> = {
   Έξοδος: 'Exit',
   'Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.':
     'The platform account belongs to no hospital. Try scanning in the Demo.',
+  Λίστες: 'Lists',
+  'Σετ και μεμονωμένα, με το περιεχόμενο κάθε Σετ': 'Sets and standalone instruments, with what each set holds',
+  'Περιεχόμενο Σετ': 'Set contents',
+  'Το Σετ δεν έχει εργαλεία.': 'The set has no instruments.',
+  'Σετ και μεμονωμένα εργαλεία': 'Sets and standalone instruments',
+  Λίστα: 'List',
+  'Barcode, όνομα ή κωδικός': 'Barcode, name or code',
+  'Δεν βρέθηκε τίποτα.': 'Nothing found.',
+  'Περισσότερα · {0}': 'More · {0}',
 };

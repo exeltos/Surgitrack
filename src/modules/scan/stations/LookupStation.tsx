@@ -7,7 +7,7 @@ import {formatDate, parseDisplayDate} from '../../../core/displayDate';
 import {tr, trData} from '../../../i18n';
 import {useSurgi} from '../../../store/SurgiStore';
 import ScanCamera from '../ScanCamera';
-import {ScanScreen} from '../ScanParts';
+import {ScanScreen, SetContents} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /** How many of an item's latest movements are shown. */
@@ -102,6 +102,7 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
               </div>
             )}
           </dl>
+          {set && <SetContents tools={tools.filter(item => item.setId === set.id)} />}
           <h2 className="scan-section">{tr('Τελευταίες κινήσεις')}</h2>
           {recent.length ? (
             <ul className="scan-moves">
