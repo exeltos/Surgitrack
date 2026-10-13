@@ -48,6 +48,7 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
     nps: number | null;
     answers: Record<string, unknown> | null;
     comment: string | null;
+    updated_at?: string;
   };
   type RequestRow = {
     id: string;
@@ -67,7 +68,7 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
     const [fb, rq] = await Promise.all([
       supabase
         .from('demo_feedback')
-        .select('organization_id,user_id,topic,rating,nps,answers,comment')
+        .select('organization_id,user_id,topic,rating,nps,answers,comment,updated_at')
         .in('organization_id', orgIds),
       supabase
         .from('demo_requests')
@@ -133,10 +134,20 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
         count: list.length,
         comments: commentsOf.get(topic) || [],
       })),
+      feedback: mine
+        .filter(f => f.topic !== 'final' && f.rating)
+        .map(f => ({
+          topic: f.topic,
+          name: nameOf(members, f.user_id),
+          rating: f.rating as number,
+          comment: f.comment?.trim() || undefined,
+          at: f.updated_at,
+        })),
       evaluations: mine
         .filter(f => f.topic === 'final')
         .map(f => ({
           name: nameOf(members, f.user_id),
+          at: f.updated_at,
           nps: f.nps,
           ease: num(f.answers?.ease),
           fit: num(f.answers?.fit),

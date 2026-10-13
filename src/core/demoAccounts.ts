@@ -56,9 +56,13 @@ export type DemoAccount = {
   /** Average 1–5 rating of each part of the app, over everyone who rated it. */
   /** Per part of the app or per guide step (topic `step_<key>`), with the comments left with them. */
   ratings: Array<{topic: string; average: number; count: number; comments: string[]}>;
+  /** Every rating given (not the final evaluation), with who gave it and when: what the owner reads. */
+  feedback?: Array<{topic: string; name: string; rating: number; comment?: string; at?: string}>;
   /** Final evaluations, one per person who sent one. */
   evaluations: Array<{
     name: string;
+    /** When it was last sent. */
+    at?: string;
     nps: number | null;
     ease?: number;
     fit?: number;

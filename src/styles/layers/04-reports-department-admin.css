@@ -4544,12 +4544,6 @@ a.auth-primary {
   font: inherit;
   cursor: pointer;
 }
-.evaluation-demo-ratings li span {
-  min-width: 160px;
-}
-.evaluation-demo-ratings li b {
-  color: #b7791f;
-}
 .evaluation-demo-nps {
   padding: 1px 8px;
   border-radius: 999px;

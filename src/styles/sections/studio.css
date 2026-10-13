@@ -1445,41 +1445,6 @@ html body .studio-ratings-kpis small {
   font-size: 12px;
   color: var(--st-muted);
 }
-html body .studio-ratings-body {
-  display: grid;
-  gap: 14px;
-}
-html body .studio-ratings-group {
-  display: grid;
-  gap: 8px;
-}
-html body .studio-ratings-group h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  font-size: 14px;
-}
-html body .studio-ratings-group h3 span {
-  min-width: 22px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--c-gray-95-4);
-  color: var(--st-muted);
-  font-size: 12px;
-  text-align: center;
-}
-html body .studio-rating-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px 70px 110px;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 14px;
-}
-html body .studio-rating-title {
-  font-weight: 700;
-  color: var(--c-blue-15);
-}
 html body .studio-rating-bar {
   height: 8px;
   border-radius: 999px;
@@ -1494,66 +1459,6 @@ html body .studio-rating-bar i {
 }
 html body .studio-rating-bar i.low {
   background: var(--st-red);
-}
-html body .studio-rating-row b {
-  color: var(--c-amber-50);
-}
-html body .studio-rating-row small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-html body .studio-rating-comments,
-html body .studio-rating-final {
-  display: grid;
-  gap: 6px;
-}
-html body .studio-rating-comments {
-  grid-column: 1/-1;
-}
-html body .studio-rating-comment,
-html body .studio-rating-final q {
-  padding: 6px 10px;
-  border-left: 3px solid var(--c-amber-70);
-  border-radius: 6px;
-  background: var(--c-gray-100-2);
-  font-size: 13px;
-  color: var(--c-gray-15);
-}
-html body .studio-rating-comment {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 4px 12px;
-}
-html body .studio-rating-comment cite {
-  font-style: normal;
-  font-size: 12px;
-  color: var(--st-muted);
-}
-html body .studio-rating-final {
-  padding: 12px 14px;
-}
-html body .studio-rating-final > div:first-child {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-html body .studio-rating-final > div:first-child small {
-  color: var(--st-muted);
-}
-html body .studio-rating-final-scores {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 13px;
-}
-html body .studio-rating-final-scores > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: var(--c-gray-95-4);
 }
 html body .studio-ratings .studio-errors-actions select {
   height: 38px;
@@ -1642,11 +1547,7 @@ html body .platform-hospital-name small {
   color: var(--st-muted);
 }
 @media (max-width: 900px) {
-  html body .studio-rating-row {
-    grid-template-columns: minmax(0, 1fr) 70px;
-  }
-  html body .studio-rating-bar,
-  html body .studio-rating-row small {
+  html body .studio-rating-bar {
     display: none;
   }
 }
@@ -1841,4 +1742,170 @@ html body .owner-demo-toast li {
 html body .owner-demo-toast small {
   font-size: 11.5px;
   color: var(--c-gray-90-2);
+}
+
+/* What the Demos think (Studio → Αξιολογήσεις and each Demo's drawer): the final evaluations, then the
+   ratings by part of the app (open one for who said what) or by Demo and person. */
+html body .ratings-view {
+  display: grid;
+  gap: 16px;
+}
+html body .ratings-view-group {
+  display: grid;
+  gap: 8px;
+}
+html body .ratings-view-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+html body .ratings-view-group h3 span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  font-size: 11px;
+  text-align: center;
+}
+html body .ratings-view-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+html body .ratings-view-switch {
+  margin: 0;
+}
+html body .ratings-finals,
+html body .ratings-parts,
+html body .ratings-demos,
+html body .rating-entries {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .ratings-finals > li,
+html body .ratings-parts > li,
+html body .ratings-demos > li {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .ratings-parts > li.low {
+  border-color: var(--c-red-85-3);
+}
+html body .ratings-final-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+html body .ratings-final-head small,
+html body .rating-entry small {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+html body .ratings-final-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html body .ratings-final-scores > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95-4);
+  font-size: 12px;
+}
+html body .ratings-view q {
+  display: block;
+  padding: 5px 9px;
+  border-left: 3px solid var(--c-amber-70);
+  border-radius: 6px;
+  background: var(--c-gray-100-2);
+  font-size: 12.5px;
+}
+html body .ratings-part-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(80px, 160px) auto auto 16px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+html body .ratings-part-title {
+  font-weight: 700;
+}
+html body .ratings-part-row b {
+  color: var(--c-amber-50);
+}
+html body .ratings-part-row small {
+  color: var(--muted);
+  font-size: 12px;
+}
+html body .ratings-part-row[aria-expanded='true'] .ratings-part-open {
+  transform: rotate(180deg);
+}
+html body .rating-entries {
+  padding-top: 6px;
+  border-top: 1px solid var(--c-gray-95);
+}
+html body .rating-entry {
+  display: grid;
+  gap: 3px;
+}
+html body .rating-entry > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+html body .rating-entry-subject {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+html body .rating-entry b {
+  color: var(--c-amber-50);
+  letter-spacing: 1px;
+}
+html body .rating-entry b.low {
+  color: var(--st-red);
+}
+html body .ratings-demos h4 {
+  margin: 0;
+  font-size: 13.5px;
+}
+html body .ratings-person {
+  display: grid;
+  gap: 4px;
+  padding-left: 10px;
+  border-left: 2px solid var(--c-gray-90);
+}
+html body .ratings-person > strong {
+  font-size: 12.5px;
+}
+@media (max-width: 700px) {
+  html body .ratings-part-row {
+    grid-template-columns: minmax(0, 1fr) auto 16px;
+  }
+  html body .ratings-part-row .studio-rating-bar,
+  html body .ratings-part-row small {
+    display: none;
+  }
 }

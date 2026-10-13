@@ -1,24 +1,17 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {MessageSquareHeart, RefreshCw, Star} from 'lucide-react';
+import {MessageSquareHeart, RefreshCw} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import Spinner from '../../../components/ui/Spinner';
 import type {DemoAccount} from '../../../core/demoAccounts';
-import {npsGroup} from '../../../core/demoFeedback';
-import {summarizeRatings, type RatingKind} from '../../../core/demoRatings';
+import {summarizeRatings} from '../../../core/demoRatings';
 import {loadDemoAccounts} from '../../../data/cloud/demoAccounts';
-import {moduleTitle, stars} from '../demo/ratingTitles';
+import {stars} from '../demo/ratingTitles';
+import RatingsView from '../demo/RatingsView';
 import type {StudioPageState} from '../useStudioPage';
 
-const KINDS: Array<{kind: RatingKind; el: string; en: string}> = [
-  {kind: 'TOUR', el: 'Ξεναγήσεις', en: 'Guided tours'},
-  {kind: 'STEP', el: 'Πρώτα βήματα', en: 'First steps'},
-  {kind: 'SCREEN', el: 'Οθόνες', en: 'Screens'},
-  {kind: 'MODULE', el: 'Ενότητες', en: 'Parts of the app'},
-];
-
 /**
- * The platform owner's view of what the evaluation Demos think: every rating together (tours, first steps,
- * screens), with the comments and the hospital they came from, and the final evaluations with the NPS.
+ * The platform owner's view of what the evaluation Demos think: the final evaluations with the NPS first,
+ * then every rating by part of the app or by Demo, each with its comment, person, hospital and date.
  * One Demo or all of them.
  */
 export default function RatingsTab({s}: {s: StudioPageState}) {
@@ -121,91 +114,7 @@ export default function RatingsTab({s}: {s: StudioPageState}) {
               </span>
             </div>
           ) : (
-            <div className="studio-ratings-body">
-              {KINDS.map(({kind, el, en}) => {
-                const rows = summary.ratings
-                  .filter(r => r.kind === kind)
-                  .sort(
-                    (a, b) => a.average - b.average || moduleTitle(a.topic).localeCompare(moduleTitle(b.topic), 'el'),
-                  );
-                if (!rows.length) return null;
-                return (
-                  <div key={kind} className="studio-ratings-group">
-                    <h3>
-                      {L(el, en)} <span>{rows.length}</span>
-                    </h3>
-                    <ul className="studio-errors-list">
-                      {rows.map(r => (
-                        <li key={r.topic} className="studio-rating-row">
-                          <span className="studio-rating-title">{moduleTitle(r.topic)}</span>
-                          <span className="studio-rating-bar" aria-hidden="true">
-                            <i style={{width: `${(r.average / 5) * 100}%`}} className={r.average < 3 ? 'low' : ''} />
-                          </span>
-                          <b>{stars(r.average)}</b>
-                          <small>
-                            {r.count} {r.count === 1 ? L('βαθμολογία', 'rating') : L('βαθμολογίες', 'ratings')}
-                          </small>
-                          {r.comments.length > 0 && (
-                            <div className="studio-rating-comments">
-                              {r.comments.map((c, i) => (
-                                <span key={i} className="studio-rating-comment">
-                                  <q>{c.text}</q>
-                                  {!demoId && <cite>{c.hospital}</cite>}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-              {summary.evaluations.length > 0 && (
-                <div className="studio-ratings-group">
-                  <h3>
-                    {L('Τελικές αξιολογήσεις', 'Final evaluations')} <span>{summary.evaluations.length}</span>
-                  </h3>
-                  <ul className="studio-errors-list">
-                    {summary.evaluations.map((e, i) => (
-                      <li key={i} className="studio-rating-final">
-                        <div>
-                          <b>{e.name || '—'}</b>
-                          <small>{e.hospital}</small>
-                        </div>
-                        <div className="studio-rating-final-scores">
-                          {e.nps !== null && (
-                            <span className={`evaluation-demo-nps ${npsGroup(e.nps).toLowerCase()}`}>
-                              {L(`Σύσταση ${e.nps}/10`, `Recommend ${e.nps}/10`)}
-                            </span>
-                          )}
-                          {e.ease !== undefined && (
-                            <span>
-                              <Star size={13} /> {L(`Ευκολία ${e.ease}/5`, `Ease ${e.ease}/5`)}
-                            </span>
-                          )}
-                          {e.fit !== undefined && (
-                            <span>
-                              <Star size={13} /> {L(`Ταιριάζει ${e.fit}/5`, `Fit ${e.fit}/5`)}
-                            </span>
-                          )}
-                          {(e.sets !== undefined || e.theatres !== undefined) && (
-                            <span>
-                              {L(
-                                `Σετ ${e.sets ?? '—'} · Αίθουσες ${e.theatres ?? '—'}`,
-                                `Sets ${e.sets ?? '—'} · Theatres ${e.theatres ?? '—'}`,
-                              )}
-                            </span>
-                          )}
-                        </div>
-                        {e.missing && <q>{L(`Λείπει: ${e.missing}`, `Missing: ${e.missing}`)}</q>}
-                        {e.comment && <q>{e.comment}</q>}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            <RatingsView demos={shown} L={L} />
           )}
         </>
       )}

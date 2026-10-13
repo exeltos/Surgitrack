@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useConfirm} from '../../../components/ui/useConfirm';
-import {tr} from '../../../i18n';
+import {getI18nLang, tr} from '../../../i18n';
 import {formatDate} from '../../../core/displayDate';
 import {
   DEMO_DELETE_AFTER_DAYS,
@@ -28,8 +28,7 @@ import {
   type DemoStage,
 } from '../../../core/demoAccounts';
 import {trialEndDate, trialEndOn} from '../../../core/trial';
-import {npsGroup} from '../../../core/demoFeedback';
-import {moduleTitle, stars} from './ratingTitles';
+import RatingsView from './RatingsView';
 import NewDemoDialog from './NewDemoDialog';
 import ConvertDemoDialog from './ConvertDemoDialog';
 import {useDemoAccounts} from './useDemoAccounts';
@@ -522,7 +521,8 @@ function DemoFeedback({
   disabled: boolean;
   onHandled: (requestId: string) => void;
 }) {
-  if (!demo.ratings.length && !demo.evaluations.length && !demo.requests.length) return null;
+  const L = (el: string, en: string) => (getI18nLang() === 'en' ? en : el);
+  if (!demo.feedback?.length && !demo.ratings.length && !demo.evaluations.length && !demo.requests.length) return null;
   return (
     <div className="evaluation-demo-feedback">
       {demo.requests.length > 0 && (
@@ -550,50 +550,7 @@ function DemoFeedback({
           </ul>
         </section>
       )}
-      {demo.ratings.length > 0 && (
-        <section aria-label={tr('Βαθμολογίες')}>
-          <h4>{tr('Βαθμολογίες')}</h4>
-          <ul className="evaluation-demo-ratings">
-            {/* By part of the app, its steps together. */}
-            {[...demo.ratings]
-              .sort((a, b) => moduleTitle(a.topic).localeCompare(moduleTitle(b.topic), 'el'))
-              .map(r => (
-                <li key={r.topic}>
-                  <span>{moduleTitle(r.topic)}</span>
-                  <b>{stars(r.average)}</b>
-                  <small>({r.count})</small>
-                  {r.comments.map((c, i) => (
-                    <q key={i}>{c}</q>
-                  ))}
-                </li>
-              ))}
-          </ul>
-        </section>
-      )}
-      {demo.evaluations.length > 0 && (
-        <section aria-label={tr('Τελική αξιολόγηση')}>
-          <h4>{tr('Τελική αξιολόγηση')}</h4>
-          <ul>
-            {demo.evaluations.map((e, i) => (
-              <li key={i}>
-                <b>{e.name || '—'}</b>
-                {e.nps !== null && (
-                  <span className={`evaluation-demo-nps ${npsGroup(e.nps).toLowerCase()}`}>
-                    {tr('Σύσταση {0}/10', e.nps)}
-                  </span>
-                )}
-                {e.ease !== undefined && <span>{tr('Ευκολία {0}/5', e.ease)}</span>}
-                {e.fit !== undefined && <span>{tr('Ταιριάζει {0}/5', e.fit)}</span>}
-                {(e.sets !== undefined || e.theatres !== undefined) && (
-                  <span>{tr('Σετ {0} · Αίθουσες {1}', e.sets ?? '—', e.theatres ?? '—')}</span>
-                )}
-                {e.missing && <q>{tr('Λείπει: {0}', e.missing)}</q>}
-                {e.comment && <q>{e.comment}</q>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <RatingsView demos={[demo]} L={L} single />
     </div>
   );
 }

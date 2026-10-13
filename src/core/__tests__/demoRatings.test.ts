@@ -43,3 +43,26 @@ describe('the owner’s view of Demo ratings', () => {
     expect(summarizeRatings([]).nps).toBeUndefined();
   });
 });
+
+describe('ratings by part of the app', () => {
+  it('puts a part’s own, step, tour and screen ratings together, the low parts first, newest first', async () => {
+    const {ratingPart, ratingsByPart} = await import('../demoRatings');
+    expect(
+      ['sterilization', 'step_receive', 'tour_release', 'screen_sterilization', 'screen_sets'].map(ratingPart),
+    ).toEqual(['sterilization', 'sterilization', 'sterilization', 'sterilization', 'other']);
+    const parts = ratingsByPart([
+      demo('Λάρισα', {
+        feedback: [
+          {topic: 'step_receive', name: 'Α', rating: 5, at: '2026-10-01T00:00:00Z'},
+          {topic: 'tour_cycle', name: 'Β', rating: 3, at: '2026-10-03T00:00:00Z'},
+          {topic: 'screen_reports', name: 'Α', rating: 2, at: '2026-10-02T00:00:00Z'},
+        ],
+      }),
+    ]);
+    expect(parts.map(p => p.key)).toEqual(['reports', 'sterilization']);
+    const sterilization = parts.find(p => p.key === 'sterilization')!;
+    expect(sterilization.average).toBe(4);
+    expect(sterilization.entries.map(e => e.name)).toEqual(['Β', 'Α']);
+    expect(sterilization.entries[0].hospital).toBe('Λάρισα');
+  });
+});
