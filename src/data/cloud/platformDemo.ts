@@ -6,11 +6,13 @@ import {supabase} from '../../lib/supabase';
 /**
  * The platform owner enters a Demo as one of its roles: the built-in SurgiTrack Demo, or (with a source) that
  * hospital's private demo copy. Each is its own demo hospital in Supabase, so demo data never mixes with real
- * hospitals. Reloads on its Overview; returns the error when the Demo could not be opened.
+ * hospitals. Reloads on its Overview (or `home`, e.g. the phone app's stations); returns the error when the
+ * Demo could not be opened.
  */
 export async function enterPlatformDemo(
   kind: HospitalRoleKind = 'ADMIN',
   sourceOrganizationId?: string,
+  home = '#/',
 ): Promise<string | undefined> {
   const {data: demoOrganizationId, error} = await supabase.rpc('platform_ensure_demo_organization', {
     p_source: sourceOrganizationId ?? null,
@@ -21,7 +23,7 @@ export async function enterPlatformDemo(
   sessionStorage.setItem('surgitrack-active-organization', String(demoOrganizationId));
   setRuntimeDataMode('DEMO');
   // Each role opens on its menu's home (the Overview when its menu has it), like after signing in.
-  window.location.hash = '#/';
+  window.location.hash = home;
   window.location.reload();
   return undefined;
 }

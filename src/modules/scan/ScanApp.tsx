@@ -133,7 +133,7 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
   const ownerOutside = owner && isPlatformOnly();
   const enterDemo = () => {
     setEnteringDemo(true);
-    void enterPlatformDemo('ADMIN').then(error => {
+    void enterPlatformDemo('ADMIN', undefined, `#${SCAN_PATH}`).then(error => {
       if (error === undefined) return;
       setEnteringDemo(false);
       void tellUser(tr('Είσοδος Demo'), error || tr('Δεν ήταν δυνατή η είσοδος στο Demo.'));
