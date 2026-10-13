@@ -44,7 +44,11 @@ jobs:
           node-version: '20'
 
       - name: Android build tools
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;36.1.0" "platforms;android-36" > /dev/null
+        # Bubblewrap looks for the SDK tools in <sdk>/bin (or the old <sdk>/tools); the runner has them in
+        # cmdline-tools/latest/bin.
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;36.1.0" "platforms;android-36" > /dev/null
+          [ -e "$ANDROID_HOME/bin" ] || sudo ln -s "$ANDROID_HOME/cmdline-tools/latest/bin" "$ANDROID_HOME/bin"
 
       - name: Install Bubblewrap
         run: |
