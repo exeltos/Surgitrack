@@ -2079,4 +2079,7 @@ export const en: Record<string, string> = {
   'Περισσότερα · {0}': 'More · {0}',
   Αρχική: 'Home',
   'Παρόντα / αναμενόμενα': 'Present / expected',
+  'Δεν ήταν δυνατή η δημιουργία του PDF. Δοκιμάστε ξανά.': 'The PDF could not be made. Try again.',
+  'Δημιουργία PDF…': 'Making the PDF…',
+  'PDF σύνθεσης': 'Composition PDF',
 };

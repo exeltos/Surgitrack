@@ -1,8 +1,14 @@
-import type {ReactNode} from 'react';
-import {ArrowLeft, CheckCircle2, X} from 'lucide-react';
+import {useState, type ReactNode} from 'react';
+import {ArrowLeft, CheckCircle2, FileDown, X} from 'lucide-react';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {tr, trData} from '../../i18n';
+import {useCompositionOptions} from '../../components/assets/usePrintLook';
+import {tellUser} from '../../components/ui/confirmService';
 import {compositionLines} from '../../core/compositionCheck';
+import {formatDateTime} from '../../core/displayDate';
+import {htmlToPdf, shareOrDownloadPdf} from '../../core/htmlToPdf';
+import {useSurgi} from '../../store/SurgiStore';
+import {compositionHtml} from '../sterilization/printUtils';
 import type {Issue, SetAsset, Tool} from '../../types/domain';
 import type {SterilizationRow} from '../sterilization/sterilizationTypes';
 
@@ -179,5 +185,44 @@ export function SetContents({set, tools, issues}: {set: SetAsset; tools: Tool[];
         <p className="scan-empty">{tr('Το Σετ δεν έχει εργαλεία.')}</p>
       )}
     </section>
+  );
+}
+
+/** The Set's composition sheet as a PDF file, the same sheet the Set's page prints: shared or downloaded. */
+export function SetPdfButton({set, tools}: {set: SetAsset; tools: Tool[]}) {
+  const {issues, currentUser} = useSurgi();
+  const compositionOptions = useCompositionOptions();
+  const [busy, setBusy] = useState(false);
+  const make = async () => {
+    setBusy(true);
+    try {
+      const problems = issues
+        .filter(
+          issue =>
+            issue.status === 'OPEN' &&
+            (issue.asset.startsWith(set.barcode) || tools.some(tool => issue.asset.startsWith(tool.barcode))),
+        )
+        .map(issue => ({barcode: issue.asset.split(' · ')[0], type: issue.type}));
+      const html = compositionHtml(
+        set,
+        tools,
+        currentUser.name,
+        formatDateTime(),
+        problems,
+        compositionOptions(set.colorTapes),
+      );
+      const blob = await htmlToPdf(html);
+      await shareOrDownloadPdf(blob, `${set.barcode}.pdf`, tr('Σύνθεση {0}', set.barcode));
+    } catch {
+      void tellUser(tr('PDF'), tr('Δεν ήταν δυνατή η δημιουργία του PDF. Δοκιμάστε ξανά.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button type="button" className="scan-secondary" disabled={busy} onClick={() => void make()}>
+      {busy ? <span className="app-spinner inline" aria-hidden="true" /> : <FileDown size={18} />}{' '}
+      {busy ? tr('Δημιουργία PDF…') : tr('PDF σύνθεσης')}
+    </button>
   );
 }

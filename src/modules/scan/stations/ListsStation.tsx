@@ -5,7 +5,7 @@ import {statusLabel} from '../../../components/ui/statusLabel';
 import {formatDate} from '../../../core/displayDate';
 import {tr, trData} from '../../../i18n';
 import {useSurgi} from '../../../store/SurgiStore';
-import {ScanScreen, SetContents} from '../ScanParts';
+import {ScanScreen, SetContents, SetPdfButton} from '../ScanParts';
 
 type Tab = 'SETS' | 'TOOLS';
 /** Rows shown at first; «Περισσότερα» shows the next as many. */
@@ -66,6 +66,7 @@ export default function ListsStation({onStations}: {onStations: () => void}) {
           )}
         </dl>
         {set && <SetContents set={set} tools={members} issues={issues} />}
+        {set && <SetPdfButton set={set} tools={members} />}
       </ScanScreen>
     );
   }
