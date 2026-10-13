@@ -67,12 +67,9 @@ describe('Reports', () => {
     expect(new Set(column('Τμήμα'))).toEqual(new Set([department]));
   });
 
-  it('sends patient traceability to the Traceability page, where all tracing lives', () => {
+  it('has no patient traceability: it lives in Traceability', () => {
     renderPage(<ReportsPage />);
-    expect(screen.getByRole('link', {name: /Ιχνηλασιμότητα ασθενούς/})).toHaveAttribute(
-      'href',
-      '/traceability?tab=patients',
-    );
+    expect(screen.queryByText('Ιχνηλασιμότητα ασθενούς')).not.toBeInTheDocument();
   });
 
   it('lists handovers with the other party signature, and filters to the unconfirmed ones', () => {

@@ -1,7 +1,6 @@
 import {useMemo, useState} from 'react';
 import {useFitWidth} from '../../components/ui/useFitWidth';
-import {AlertTriangle, ExternalLink, FileText, History} from 'lucide-react';
-import {Link} from 'react-router-dom';
+import {AlertTriangle, FileText} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import type {ExportTable} from '../../core/exportTable';
@@ -19,18 +18,8 @@ import {LOAD_STATUS, cellText, genericReportHtml, reports, stateLabel, type Repo
 import {buildReport} from './buildReport';
 
 export default function ReportsPage() {
-  const {
-    sets,
-    tools,
-    retiredTools,
-    issues,
-    currentUser,
-    processLoads,
-    sterilizationReleases,
-    receipts,
-    deliveries,
-    can,
-  } = useSurgi();
+  const {sets, tools, retiredTools, issues, currentUser, processLoads, sterilizationReleases, receipts, deliveries} =
+    useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   const compositionOptions = useCompositionOptions();
   // Sets in the composition picker, by name.
@@ -376,19 +365,6 @@ export default function ReportsPage() {
                 </button>
               );
             })}
-            {can('traceability.view') && (
-              // Patient traceability lives with the rest of the tracing, in Traceability.
-              <Link className="reports-catalog-item reports-catalog-link" to="/traceability?tab=patients">
-                <span className="reports-catalog-icon">
-                  <History size={18} />
-                </span>
-                <span>
-                  <strong>{tr('Ιχνηλασιμότητα ασθενούς')}</strong>
-                  <small>{tr('Στην Ιχνηλάτηση: χρήσεις σε ασθενείς, με εξαγωγή.')}</small>
-                </span>
-                <ExternalLink size={15} className="reports-catalog-out" />
-              </Link>
-            )}
           </div>
         </aside>
         <section className="reports-stage">

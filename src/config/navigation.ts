@@ -129,6 +129,8 @@ export const navSectionFor = (
   pathname: string,
   toolMode: (id: string) => 'STANDALONE' | 'SET_MEMBER' | 'STOCK' | undefined,
 ): string | undefined => {
+  // Traceability's tabs and a looked-up item (?tab=…, ?q=…) are still Traceability.
+  if (pathname === '/traceability') return '/traceability';
   if (pathname === '/sets/new' || /^\/sets\/[^/]+$/.test(pathname)) return '/sets';
   if (pathname === '/tools/new' || pathname === '/tools/names') return '/tools';
   const tool = /^\/tools\/([^/]+)$/.exec(pathname);

@@ -1988,9 +1988,7 @@ export const en: Record<string, string> = {
     '{0} changes have not reached the server yet (e.g. because of the connection). If you sign out now, they will be lost.',
   Παραμονή: 'Stay',
   'Αποσύνδεση χωρίς αποθήκευση': 'Sign out without saving',
-  'Στην Ιχνηλάτηση: χρήσεις σε ασθενείς, με εξαγωγή.': 'In Traceability: uses with a patient code, with export.',
   'Χρήσεις σε ασθενείς': 'Uses with a patient code',
-  'Από → Προς': 'From → To',
   'Ιχνηλάτηση ασθενούς {0}': 'Trace patient {0}',
   'Δεν βρέθηκαν χρήσεις σε ασθενείς': 'No uses with a patient code found',
   'Άλλαξε τον κωδικό ή τις ημερομηνίες.': 'Change the code or the dates.',
@@ -2000,4 +1998,6 @@ export const en: Record<string, string> = {
   'Άνοιγμα Demo': 'Open Demos',
   'Είσοδος Demo': 'Enter Demo',
   'Δεν ήταν δυνατή η είσοδος στο Demo.': 'Could not open the Demo.',
+  'Κωδικός ασθενούς, π.χ. PT-2026-0041': 'Patient code, e.g. PT-2026-0041',
+  'Πατήστε μια γραμμή για την ιχνηλάτηση του ασθενούς': 'Click a row to trace the patient',
 };
