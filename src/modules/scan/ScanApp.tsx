@@ -1,10 +1,11 @@
-import type {ReactNode} from 'react';
+import {useState, type ReactNode} from 'react';
 import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {
   ArrowDownToLine,
   ChartColumn,
   ChevronRight,
   Flame,
+  FlaskConical,
   LayoutDashboard,
   LogOut,
   Search,
@@ -13,6 +14,12 @@ import {
   X,
 } from 'lucide-react';
 import IdleLock from '../../components/layout/IdleLock';
+import RoleSwitcher from '../../components/layout/RoleSwitcher';
+import {tellUser} from '../../components/ui/confirmService';
+import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
+import {isPlatformOnly} from '../../core/platformOnly';
+import {getRealIdentity} from '../../data/cloud/identity';
+import {enterPlatformDemo} from '../../data/cloud/platformDemo';
 import {useLibraries} from '../../core/LibraryStore';
 import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
 import type {Permission} from '../../core/permissions';
@@ -109,6 +116,28 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
     station => (!station.permission || can(station.permission)) && (!station.only || station.only(currentUser)),
   );
   const toStations = () => navigate(SCAN_PATH);
+  // The platform owner: outside a hospital there is nothing to scan, so the Demo opens from here; in the
+  // Demo, a bar to pick the role and to leave it (as in the full app).
+  const [enteringDemo, setEnteringDemo] = useState(false);
+  const owner = !!getRealIdentity()?.platform;
+  const ownerDemo = owner && getRuntimeDataMode() === 'DEMO';
+  const ownerOutside = owner && isPlatformOnly();
+  const enterDemo = () => {
+    setEnteringDemo(true);
+    void enterPlatformDemo('ADMIN').then(error => {
+      if (error === undefined) return;
+      setEnteringDemo(false);
+      void tellUser(tr('Είσοδος Demo'), error || tr('Δεν ήταν δυνατή η είσοδος στο Demo.'));
+    });
+  };
+  const leaveDemo = () => {
+    sessionStorage.removeItem('surgitrack-demo-role');
+    sessionStorage.removeItem('surgitrack-session-user');
+    sessionStorage.removeItem('surgitrack-active-organization');
+    setRuntimeDataMode('PRODUCTION');
+    window.location.hash = standalone ? `#${SCAN_PATH}` : '#/studio';
+    window.location.reload();
+  };
 
   const home = (
     <div className="scan-screen">
@@ -127,9 +156,28 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
           {currentUser.department ? ` · ${trData(currentUser.department)}` : ''}
         </p>
       </header>
+      {ownerDemo && (
+        <div className="scan-demo-bar" role="status">
+          <span className="scan-demo-chip">
+            <FlaskConical size={14} /> DEMO
+          </span>
+          <RoleSwitcher home={SCAN_PATH} />
+          <button type="button" onClick={leaveDemo}>
+            <LogOut size={15} /> {tr('Έξοδος')}
+          </button>
+        </div>
+      )}
       <main className="scan-body">
+        {ownerOutside && (
+          <section className="scan-demo-enter">
+            <p>{tr('Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.')}</p>
+            <button type="button" className="scan-primary" disabled={enteringDemo} onClick={enterDemo}>
+              <FlaskConical size={18} /> {tr('Είσοδος Demo')}
+            </button>
+          </section>
+        )}
         <nav className="scan-stations" aria-label={tr('Σταθμοί')}>
-          {allowed.map(station => (
+          {(ownerOutside ? [] : allowed).map(station => (
             <button
               key={station.path}
               type="button"

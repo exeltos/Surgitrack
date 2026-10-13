@@ -26,7 +26,8 @@ const ACTIVE_ORGANIZATION_KEY = 'surgitrack-active-organization';
  * - Platform admin inside a hospital (entered from Studio → Νοσοκομεία): the hospital's name with the way back
  *   to Studio, then a role or department in it (real data).
  */
-export default function RoleSwitcher() {
+/** `home`: where a new role opens (the full app's home, or the phone app's stations). */
+export default function RoleSwitcher({home = '/'}: {home?: string} = {}) {
   const {role, currentUser, switchIdentity} = useSurgi();
   const {departments} = useLibraries();
   const {lang} = useAppPreferences();
@@ -56,7 +57,7 @@ export default function RoleSwitcher() {
     if (isDemo) switchIdentity(demoSessionUser(view as DemoView, departments));
     else if (real && (view === 'OWNER' || (view === 'ADMIN' && !real.platform))) switchIdentity(sessionUserFor(real));
     else if (real) switchIdentity(viewAsSessionUser(view as DemoView, departments, real));
-    navigate('/');
+    navigate(home);
   };
   const currentView =
     ownerInHospital && role === 'ADMIN' && !currentUser.viewAs

@@ -115,6 +115,66 @@ html body .scan-danger {
   color: #b42318;
 }
 
+/* The platform owner: the Demo, entered from here and left from its bar. */
+html body .scan-demo-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #5b3fd1;
+  color: #fff;
+  font-size: 13px;
+}
+html body .scan-demo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+html body .scan-demo-bar .role-switch {
+  flex: 1;
+  min-width: 0;
+}
+html body .scan-demo-bar select {
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+}
+html body .scan-demo-bar > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+}
+html body .scan-demo-enter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d7ccff;
+  border-radius: 18px;
+  background: #f4f0ff;
+}
+html body .scan-demo-enter p {
+  margin: 0;
+  color: #3b2a8a;
+  font-size: 15px;
+}
+html body .scan-demo-enter .scan-primary {
+  background: #5b3fd1;
+}
+
 /* The stations. */
 html body .scan-stations {
   display: flex;

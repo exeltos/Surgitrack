@@ -2068,4 +2068,7 @@ export const en: Record<string, string> = {
   '{0} παραδόσεις': '{0} deliveries',
   'Καμία κίνηση στην περίοδο.': 'No activity in this period.',
   'Οι πλήρεις αναφορές είναι στην εφαρμογή, στον υπολογιστή.': 'The full reports are in the app, on a computer.',
+  Έξοδος: 'Exit',
+  'Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.':
+    'The platform account belongs to no hospital. Try scanning in the Demo.',
 };
