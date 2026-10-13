@@ -71,10 +71,3 @@ html body .reports-catalog {
   }
 }
 /* Patient traceability: a link to Traceability, with an arrow out. */
-html body .reports-catalog-link {
-  grid-template-columns: 38px minmax(0, 1fr) 16px;
-  text-decoration: none;
-}
-html body .reports-catalog-link .reports-catalog-out {
-  color: var(--muted);
-}
