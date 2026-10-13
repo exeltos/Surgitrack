@@ -8,3 +8,7 @@ Thumbs.db
 *.tsbuildinfo
 .claude/worktrees/
 
+
+# Android signing keys never go in the repository.
+*.keystore
+*.jks

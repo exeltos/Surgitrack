@@ -17,6 +17,8 @@ type Props = {
   goodbye?: string;
   passwordRecovery?: boolean;
   onPasswordRecoveryHandled?: () => void;
+  /** The phone app's sign-in: the same accounts, named for scanning. */
+  scan?: boolean;
 };
 
 const copy = {
@@ -123,6 +125,7 @@ export default function AuthIndex({
   goodbye,
   passwordRecovery = false,
   onPasswordRecoveryHandled,
+  scan = false,
 }: Props) {
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
   const [view, setView] = useState<View>('login');
@@ -148,6 +151,7 @@ export default function AuthIndex({
   }, [passwordRecovery]);
   const [infoView, setInfoView] = useState<InfoView>(null);
   const t = useMemo(() => copy[lang], [lang]);
+  const scanTitle = lang === 'el' ? 'Σάρωση εργαλείων' : 'Instrument scanning';
   const switchLang = () => {
     const next = lang === 'el' ? 'en' : 'el';
     setLang(next);
@@ -287,7 +291,7 @@ export default function AuthIndex({
           <div className="auth-brand-mark">S</div>
           <div>
             <strong>{t.product}</strong>
-            <span>{t.suite}</span>
+            <span>{scan ? scanTitle : t.suite}</span>
           </div>
         </div>
         <button className="auth-lang" onClick={switchLang}>
@@ -300,7 +304,7 @@ export default function AuthIndex({
           <div className="auth-logo">S</div>
           <span className="auth-eyebrow">{t.suite}</span>
           <h1>{t.product}</h1>
-          <p className="auth-product-subtitle">{t.subtitle}</p>
+          <p className="auth-product-subtitle">{scan ? scanTitle : t.subtitle}</p>
           <div className="auth-security">
             <ShieldCheck size={18} />
             <span>{t.secure}</span>

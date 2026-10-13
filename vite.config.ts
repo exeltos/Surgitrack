@@ -13,12 +13,16 @@ export default defineConfig(({command, mode}) => {
     base: './',
     build: {
       rollupOptions: {
+        // The full app, and the phone app (scanning only) that installs from scan.html.
+        input: {main: 'index.html', scan: 'scan.html'},
         output: {
           // Libraries change rarely; in their own files a release re-downloads only the app code.
           manualChunks(id) {
             if (!id.includes('node_modules')) return undefined;
             if (/node_modules\/(react|react-dom|scheduler|react-router|react-router-dom)\//.test(id)) return 'react';
             if (id.includes('node_modules/@supabase/')) return 'supabase';
+            // The barcode decoder for phones without one of their own: loaded only when the camera opens there.
+            if (id.includes('node_modules/@zxing/')) return 'barcode';
             return undefined;
           },
         },

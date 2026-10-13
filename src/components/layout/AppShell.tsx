@@ -11,6 +11,7 @@ import {
   Menu,
   Minus,
   Plus,
+  ScanBarcode,
   X,
   Eye,
   Undo2,
@@ -624,6 +625,12 @@ export default function AppShell({
             <X size={16} />
           </button>
         </div>
+      )}
+      {/* On a phone: the scanning stations (receipt, loading, release, delivery, lookup), full screen. */}
+      {!platformOnly && (
+        <button type="button" className="scan-fab" onClick={() => navigate('/scan')}>
+          <ScanBarcode size={22} /> {tr('Σάρωση')}
+        </button>
       )}
       {/* The platform owner: a prospect finished signing up in a Demo, or sent its evaluation. */}
       {platformOnly && !isDemo && can('studio.manage') && <OwnerDemoAlerts />}

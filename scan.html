@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#17384a" />
+    <link rel="manifest" href="./scan.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SurgiTrack" />
+    <link rel="apple-touch-icon" href="./scan-icon-180.png" />
+    <meta
+      name="description"
+      content="SurgiTrack Σάρωση: παραλαβή, φόρτωση κλιβάνου, αποδέσμευση και παράδοση με την κάμερα του κινητού."
+    />
+    <link rel="icon" type="image/svg+xml" href="./scan-icon.svg" />
+    <title>SurgiTrack Σάρωση</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .boot-loader {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f6f8fb;
+      }
+      .boot-spinner {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 3px solid #d8e3e8;
+        border-top-color: #1d6b7a;
+        animation: boot-spin 0.8s linear infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-spinner {
+          animation-duration: 2s;
+        }
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>Το SurgiTrack χρειάζεται JavaScript για να λειτουργήσει. / SurgiTrack needs JavaScript to run.</noscript>
+    <div id="root">
+      <div class="boot-loader" role="status">
+        <span class="boot-spinner" aria-label="Φόρτωση…"></span>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

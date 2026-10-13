@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "eu.surgitrack.scan",
+      "sha256_cert_fingerprints": [
+        "A0:BE:81:6B:9E:D4:EF:0B:83:26:D5:79:B1:85:7D:6C:11:9E:D6:EA:D9:88:46:89:D9:55:6C:56:42:85:9A:12"
+      ]
+    }
+  }
+]
