@@ -15,6 +15,7 @@ import {installErrorReporting} from './data/cloud/errorReporting';
 import {installTabletViewport} from './core/tabletViewport';
 import {getI18nLang, loadEnglish, setI18nLang} from './i18n';
 import {loadDemoRepository} from './data/repositories';
+import {SCAN_PATH, isScanStandalone} from './modules/scan/scanApp';
 
 installChunkRecovery();
 installErrorReporting();
@@ -25,6 +26,9 @@ const runtimeDataMode = getRuntimeDataMode();
 if (!root) throw new Error('SurgiTrack: root element was not found.');
 // An emailed invitation or password-reset link opens its own page first (see EmailLinkPage).
 const link = emailLink();
+// The phone app (scan.html) opens on its scanning screens.
+if (isScanStandalone() && !link && ['', '#', '#/'].includes(window.location.hash))
+  window.history.replaceState(null, '', `#${SCAN_PATH}`);
 const render = () =>
   ReactDOM.createRoot(root).render(
     link ? (

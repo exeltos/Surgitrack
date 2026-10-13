@@ -1,0 +1,736 @@
+/* The phone app (scan.html, or «Σάρωση» on a phone): the scanning stations, full screen, large for one hand. */
+html body .scan-app {
+  min-height: 100dvh;
+  background: #f5f7fb;
+  color: #16252f;
+}
+html body .scan-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 640px;
+  margin: 0 auto;
+}
+html body .scan-head {
+  padding: calc(12px + env(safe-area-inset-top)) 18px 16px;
+  background: linear-gradient(180deg, var(--c-cyan-20), var(--c-cyan-15-2));
+  color: #fff;
+}
+html body .scan-head h1 {
+  margin: 8px 0 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+html body .scan-head p {
+  margin: 3px 0 0;
+  font-size: 13.5px;
+  opacity: 0.82;
+}
+html body .scan-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+html body .scan-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px 4px 6px;
+  margin-left: -6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  opacity: 0.9;
+}
+html body .scan-head-row .scan-back {
+  margin-left: 0;
+  background: rgba(255, 255, 255, 0.12);
+}
+html body .scan-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 20px;
+}
+html body .scan-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid #dbe3ea;
+}
+html body .scan-foot-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+html body .scan-foot-pair button {
+  padding: 12px 8px;
+  white-space: nowrap;
+}
+
+/* Buttons: one main action per screen, as wide as the screen. */
+html body .scan-primary,
+html body .scan-secondary,
+html body .scan-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+}
+html body .scan-primary {
+  border: 0;
+  background: var(--c-cyan-40);
+  color: #fff;
+}
+html body .scan-primary:disabled {
+  background: #b9c7d0;
+  color: #f5f7fb;
+}
+html body .scan-secondary {
+  border: 1px solid #c9d5de;
+  background: #fff;
+  color: var(--c-cyan-20);
+}
+html body .scan-danger {
+  border: 1px solid #f3b8b3;
+  background: #fff4f3;
+  color: #b42318;
+}
+
+/* The stations. */
+html body .scan-stations {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+html body .scan-station {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 14px 14px 12px;
+  border: 1px solid #dbe3ea;
+  border-radius: 18px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+html body .scan-station > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+html body .scan-station b {
+  display: block;
+  font-size: 17px;
+}
+html body .scan-station small {
+  display: block;
+  margin-top: 2px;
+  color: #627887;
+  font-size: 13px;
+}
+html body .scan-station > svg {
+  color: #9aabb7;
+}
+html body .scan-station-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--c-cyan-60);
+  color: #fff;
+}
+html body .scan-station.load .scan-station-icon {
+  background: #7a5af5;
+}
+html body .scan-station.release .scan-station-icon {
+  background: #12a150;
+}
+html body .scan-station.deliver .scan-station-icon {
+  background: #d97f06;
+}
+html body .scan-station.lookup .scan-station-icon {
+  background: #627887;
+}
+html body .scan-signout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  color: #627887;
+  font: inherit;
+  font-size: 15px;
+}
+
+/* The camera, and typing / a scanner instead. */
+html body .scan-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html body .scan-camera-view {
+  position: relative;
+  overflow: hidden;
+  height: min(38vh, 300px);
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 45%, #3a4a55, #11181d);
+}
+html body .scan-camera-view video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+html body .scan-camera-target {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+html body .scan-camera-target span {
+  position: relative;
+  width: 72%;
+  height: 42%;
+  border: 3px solid var(--c-cyan-60);
+  border-radius: 14px;
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.3);
+}
+html body .scan-camera-target span::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  height: 2px;
+  background: #e34948;
+  box-shadow: 0 0 8px #e34948;
+}
+html body .scan-camera-error {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: rgba(17, 24, 29, 0.85);
+  color: #fff;
+  font-size: 13.5px;
+}
+html body .scan-camera-feedback {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #12a150;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+html body .scan-camera-feedback.inline {
+  position: static;
+}
+html body .scan-camera-feedback.warn {
+  background: #d97f06;
+}
+html body .scan-camera-feedback.error {
+  background: #d92d20;
+}
+html body .scan-camera-feedback svg {
+  flex: none;
+  margin-top: 1px;
+}
+html body .scan-camera-tools {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+html body .scan-camera-tools button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #dbe3ea;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--c-cyan-20);
+  font: inherit;
+  font-size: 14px;
+}
+html body .scan-camera-tools button[aria-pressed='true'] {
+  border-color: var(--c-cyan-40);
+  background: #e7f3f5;
+}
+html body .scan-camera-type {
+  display: flex;
+  gap: 8px;
+}
+html body .scan-camera-type input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #c9d5de;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+html body .scan-camera-type button {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--c-cyan-40);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+html body .scan-camera-type button:disabled {
+  background: #b9c7d0;
+}
+html body .scan-camera-hint {
+  margin: 0;
+  color: #627887;
+  font-size: 13.5px;
+}
+
+/* What was scanned. */
+html body .scan-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: #627887;
+  font-size: 14px;
+}
+html body .scan-count b {
+  color: #16252f;
+  font-size: 24px;
+}
+html body .scan-items,
+html body .scan-refused,
+html body .scan-loads,
+html body .scan-moves {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .scan-items li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 6px 10px 12px;
+  border: 1px solid #dbe3ea;
+  border-left: 4px solid #12a150;
+  border-radius: 12px;
+  background: #fff;
+}
+html body .scan-items.compact li {
+  border-left-width: 1px;
+  padding: 8px 12px;
+}
+html body .scan-items li > span:not(.asset-type-icon-inline) {
+  flex: 1;
+  min-width: 0;
+}
+html body .scan-items b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+html body .scan-items small {
+  display: block;
+  margin-top: 2px;
+  color: #627887;
+  font-size: 12.5px;
+}
+html body .scan-item-remove {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #9aabb7;
+}
+html body .scan-refused li {
+  padding: 9px 12px;
+  border: 1px solid #fda29b;
+  border-left: 4px solid #d92d20;
+  border-radius: 12px;
+  background: #fff4f3;
+  color: #912018;
+  font-size: 13.5px;
+}
+html body .scan-empty {
+  margin: 4px 0;
+  color: #627887;
+  font-size: 14px;
+  text-align: center;
+}
+html body .scan-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 15px;
+}
+html body .scan-section span {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #e3eaf0;
+  color: #475467;
+  font-size: 12.5px;
+}
+
+/* Confirming a round: what, from or to whom, the signature and the note. */
+html body .scan-summary {
+  margin: 0;
+  padding: 4px 14px;
+  border: 1px solid #dbe3ea;
+  border-radius: 16px;
+  background: #fff;
+}
+html body .scan-summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #eef2f5;
+  font-size: 14.5px;
+}
+html body .scan-summary div:last-child {
+  border-bottom: 0;
+}
+html body .scan-summary dt {
+  color: #627887;
+}
+html body .scan-summary dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+html body .scan-sign {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #dbe3ea;
+  border-radius: 16px;
+  background: #fff;
+}
+html body .scan-sign .handover-signature-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html body .scan-sign .handover-signature-row input,
+html body .scan-sign .handover-signature-row button {
+  width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+}
+html body .scan-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .scan-field input,
+html body .scan-field select,
+html body .scan-field textarea {
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #c9d5de;
+  border-radius: 12px;
+  background: #fff;
+  color: #16252f;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+html body .scan-field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+html body .scan-chips {
+  display: flex;
+  gap: 8px;
+}
+html body .scan-chips label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #c9d5de;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+html body .scan-chips label.on {
+  border-color: var(--c-cyan-40);
+  background: #e7f3f5;
+  color: var(--c-cyan-20);
+}
+html body .scan-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html body .scan-checks label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+html body .scan-checks input,
+html body .scan-chips input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--c-cyan-40);
+}
+html body .scan-verdict {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff6e7;
+  color: #8a5a10;
+  font-size: 13.5px;
+}
+html body .scan-verdict.ok {
+  background: #e8f6ee;
+  color: #0e7a3c;
+}
+
+/* Release: loads waiting, and loads in the sterilizer. */
+html body .scan-loads li {
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+}
+html body .scan-loads li > button,
+html body .scan-loads li > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+html body .scan-loads li > button > span,
+html body .scan-loads li > div > span {
+  flex: 1;
+  min-width: 0;
+}
+html body .scan-loads b {
+  display: block;
+  font-size: 15px;
+}
+html body .scan-loads small {
+  display: block;
+  color: #627887;
+  font-size: 12.5px;
+}
+html body .scan-loads li > button > svg:first-child {
+  color: #12a150;
+}
+html body .scan-loads li.running > div > svg {
+  color: #7a5af5;
+}
+html body .scan-load-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+html body .scan-load-actions .scan-primary,
+html body .scan-load-actions .scan-danger {
+  min-height: 44px;
+  padding: 8px 6px;
+  gap: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Lookup. */
+html body .scan-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+html body .scan-lookup > header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+html body .scan-lookup > header small {
+  display: block;
+  color: #627887;
+  font-size: 13px;
+}
+html body .scan-lookup > header b {
+  display: block;
+  font-size: 17px;
+}
+html body .scan-moves li {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+  background: #fff;
+}
+html body .scan-moves li > svg {
+  flex: none;
+  margin-top: 2px;
+  color: #627887;
+}
+html body .scan-moves b {
+  display: block;
+  font-size: 14px;
+}
+html body .scan-moves small {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #627887;
+  font-size: 12.5px;
+}
+
+/* The end of a round. */
+html body .scan-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 8px 8px;
+  text-align: center;
+}
+html body .scan-done > svg {
+  color: #12a150;
+}
+html body .scan-done h2 {
+  margin: 0;
+  font-size: 21px;
+}
+html body .scan-done p {
+  margin: 0 0 12px;
+  color: #475467;
+  font-size: 15px;
+}
+
+html body .scan-toast {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 8px 12px 14px;
+  border-radius: 14px;
+  background: var(--c-cyan-20);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 12px 30px rgba(16, 45, 60, 0.3);
+}
+html body .scan-toast.warning {
+  background: #8a4b05;
+}
+html body .scan-toast span {
+  flex: 1;
+}
+html body .scan-toast button {
+  border: 0;
+  background: transparent;
+  color: #fff;
+}
+
+/* «Σάρωση» in the full app: on a phone only, above the content of every page. */
+html body .scan-fab {
+  display: none;
+}
+@media (max-width: 900px) {
+  html body .scan-fab {
+    position: fixed;
+    right: 16px;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 56px;
+    padding: 0 20px 0 16px;
+    border: 0;
+    border-radius: 28px;
+    background: var(--c-cyan-40);
+    color: #fff;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow:
+      0 8px 22px rgba(16, 45, 60, 0.35),
+      0 2px 6px rgba(16, 45, 60, 0.25);
+  }
+  /* Room under the last row, so the button never covers it. */
+  html body .content {
+    padding-bottom: 88px;
+  }
+}

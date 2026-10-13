@@ -1,11 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {Barcode, Camera, CheckCircle2, TriangleAlert} from 'lucide-react';
 import {tr} from '../../i18n';
-
-// The browser's BarcodeDetector is not in the TypeScript DOM typings yet.
-type BarcodeDetectorConstructor = new (options: {formats: string[]}) => {
-  detect: (source: HTMLVideoElement) => Promise<{rawValue?: string}[]>;
-};
+import {createFrameReader} from '../../core/barcodeReader';
 
 export type BarcodeFeedback = {type: 'OK' | 'WARN' | 'ERROR'; message: string};
 
@@ -35,7 +31,7 @@ export default function BarcodeCapture({
 
   const stopCamera = () => {
     if (frameRef.current !== null) {
-      cancelAnimationFrame(frameRef.current);
+      window.clearTimeout(frameRef.current);
       frameRef.current = null;
     }
     streamRef.current?.getTracks().forEach(track => track.stop());
@@ -75,21 +71,11 @@ export default function BarcodeCapture({
       }
       video.srcObject = stream;
       await video.play();
-      const Detector = (window as unknown as {BarcodeDetector?: BarcodeDetectorConstructor}).BarcodeDetector;
-      if (!Detector) {
-        setCameraError(
-          tr(
-            'Δεν υπάρχει αυτόματη αναγνώριση barcode σε αυτόν τον browser. Η χειροκίνητη εισαγωγή και ο USB/Bluetooth scanner λειτουργούν κανονικά.',
-          ),
-        );
-        return;
-      }
-      const detector = new Detector({formats: ['code_128', 'code_39', 'ean_13', 'ean_8', 'qr_code', 'data_matrix']});
+      const read = await createFrameReader();
       const scan = async () => {
         if (!streamRef.current || !videoRef.current) return;
         try {
-          const results = await detector.detect(videoRef.current);
-          const value = results?.[0]?.rawValue?.trim();
+          const value = await read(videoRef.current);
           if (value) {
             const now = Date.now();
             if (value !== lastDetectedRef.current.value || now - lastDetectedRef.current.at > 1800) {
@@ -99,11 +85,11 @@ export default function BarcodeCapture({
           }
         } catch {
           // Best-effort per-frame detection: a single failed scan frame is expected/harmless,
-          // the loop below simply retries on the next animation frame.
+          // the loop below simply retries on the next frame.
         }
-        frameRef.current = requestAnimationFrame(scan);
+        if (streamRef.current) frameRef.current = window.setTimeout(() => void scan(), 120);
       };
-      frameRef.current = requestAnimationFrame(scan);
+      void scan();
     } catch (error) {
       setCameraError(error instanceof Error ? error.message : tr('Δεν ήταν δυνατή η πρόσβαση στην κάμερα.'));
     }

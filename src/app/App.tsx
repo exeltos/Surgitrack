@@ -22,6 +22,7 @@ import {lazyPage} from '../core/resilience';
 import NotFoundPage from '../modules/NotFoundPage';
 import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
 import {useSignOutGuard} from './useSignOutGuard';
+import {SCAN_PATH, isScanStandalone, onScanScreens} from '../modules/scan/scanApp';
 import {
   type AccessRequest,
   canViewAs,
@@ -54,6 +55,7 @@ const StudioPage = lazyPage(() => import('../modules/studio/StudioPage'));
 const HospitalAdminPage = lazyPage(() => import('../modules/hospital/HospitalAdminPage'));
 const HospitalOverviewPage = lazyPage(() => import('../modules/hospital/HospitalOverviewPage'));
 const JoinPage = lazyPage(() => import('../modules/auth/JoinPage'));
+const ScanApp = lazyPage(() => import('../modules/scan/ScanApp'));
 
 const readDemoSessionUser = (): SessionUser | undefined => {
   try {
@@ -170,7 +172,8 @@ export default function App() {
     sessionStorage.setItem('surgitrack-auth', '1');
     sessionStorage.removeItem('surgitrack-session-user');
     sessionStorage.removeItem('surgitrack-view-as');
-    window.location.hash = '#/';
+    // Signed in from the phone app (or its screens): back to scanning, not to the full app.
+    window.location.hash = onScanScreens() ? `#${SCAN_PATH}` : '#/';
     window.location.reload();
   };
   // Asked in the app, after what is still unsaved has had a chance to reach the server (see useSignOutGuard).
@@ -198,7 +201,7 @@ export default function App() {
     }
     setGoodbye(msg);
     setAuthenticated(false);
-    navigate('/', {replace: true});
+    navigate(onScanScreens() ? SCAN_PATH : '/', {replace: true});
   };
   // A hospital's signup link is public: it works signed in or not.
   const joinToken = /^\/join\/([0-9a-f]{16,})$/.exec(location.pathname)?.[1];
@@ -227,6 +230,7 @@ export default function App() {
   if (!authenticated)
     return (
       <AuthIndex
+        scan={onScanScreens()}
         onAuthenticated={login}
         goodbye={goodbye}
         passwordRecovery={passwordRecovery}
@@ -238,6 +242,25 @@ export default function App() {
     );
   // Never show (or act as) a stand-in person outside Demo: wait until the store has the signed-in user.
   if (!sessionReady) return <Spinner fullScreen />;
+  const signOutLayer = createPortal(
+    <div className="sign-out-guard">
+      {signOutGuard}
+      <ConfirmHost />
+    </div>,
+    document.body,
+  );
+  // The phone app: only the scanning stations, without the menu and pages of the full app.
+  if (isScanStandalone() || location.pathname === SCAN_PATH || location.pathname.startsWith(`${SCAN_PATH}/`))
+    return (
+      <UnsavedChangesProvider>
+        <RouteErrorBoundary>
+          <Suspense fallback={<Spinner fullScreen />}>
+            <ScanApp key={lang} onLogout={logout} />
+          </Suspense>
+        </RouteErrorBoundary>
+        {signOutLayer}
+      </UnsavedChangesProvider>
+    );
   return (
     <UnsavedChangesProvider>
       <AppShell onLogout={logout}>
@@ -435,13 +458,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         {/* On top of the screen lock too: "switch user" there signs out through it. */}
-        {createPortal(
-          <div className="sign-out-guard">
-            {signOutGuard}
-            <ConfirmHost />
-          </div>,
-          document.body,
-        )}
+        {signOutLayer}
       </AppShell>
     </UnsavedChangesProvider>
   );
