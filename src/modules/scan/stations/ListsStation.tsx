@@ -16,7 +16,7 @@ const PAGE = 60;
  * what it holds. A department user sees only their own department's, as everywhere in the app.
  */
 export default function ListsStation({onStations}: {onStations: () => void}) {
-  const {sets, tools, role, currentUser} = useSurgi();
+  const {sets, tools, issues, role, currentUser} = useSurgi();
   const [tab, setTab] = useState<Tab>('SETS');
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(PAGE);
@@ -58,12 +58,6 @@ export default function ListsStation({onStations}: {onStations: () => void}) {
               <dd>{trData(asset.specialty)}</dd>
             </div>
           )}
-          {set && (
-            <div>
-              <dt>{tr('Εργαλεία')}</dt>
-              <dd>{members.length}</dd>
-            </div>
-          )}
           {asset.sterileUntil && (
             <div>
               <dt>{tr('Αποστειρωμένο έως')}</dt>
@@ -71,7 +65,7 @@ export default function ListsStation({onStations}: {onStations: () => void}) {
             </div>
           )}
         </dl>
-        {set && <SetContents tools={members} />}
+        {set && <SetContents set={set} tools={members} issues={issues} />}
       </ScanScreen>
     );
   }
@@ -80,7 +74,7 @@ export default function ListsStation({onStations}: {onStations: () => void}) {
     <ScanScreen
       title={tr('Λίστες')}
       subtitle={tr('Σετ και μεμονωμένα εργαλεία')}
-      backLabel={tr('Σταθμοί')}
+      backLabel={tr('Αρχική')}
       onBack={onStations}
     >
       <div className="scan-camera-tools" role="group" aria-label={tr('Λίστα')}>

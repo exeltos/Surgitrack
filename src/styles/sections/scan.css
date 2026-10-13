@@ -444,6 +444,90 @@ html body .scan-search input {
   font-size: 16px;
 }
 
+/* A Set's composition sheet: one row per kind of instrument, present / expected on the right. */
+html body .scan-form-alert {
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid #fda29b;
+  border-left: 4px solid #d92d20;
+  border-radius: 12px;
+  background: #fff4f3;
+  color: #912018;
+  font-size: 14px;
+  font-weight: 700;
+}
+html body .scan-form-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+html body .scan-form-lines li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef2f5;
+}
+html body .scan-form-lines li:last-child {
+  border-bottom: 0;
+}
+html body .scan-form-lines li.missing {
+  background: #fdf3f2;
+}
+html body .scan-form-lines li.issue {
+  background: #fff9ef;
+}
+html body .scan-form-num {
+  color: #9aabb7;
+  font-size: 13px;
+  text-align: right;
+}
+html body .scan-form-name b {
+  display: block;
+  font-size: 14.5px;
+  overflow-wrap: anywhere;
+}
+html body .scan-form-name small {
+  display: block;
+  color: #627887;
+  font-size: 12.5px;
+}
+html body .scan-form-name em {
+  display: inline-block;
+  margin: 4px 6px 0 0;
+  padding: 1px 7px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+html body .scan-form-name em.miss {
+  background: #fde8e6;
+  color: #b3261e;
+}
+html body .scan-form-name em.prob {
+  background: #fff3df;
+  color: #8a4b00;
+}
+html body .scan-form-qty {
+  font-size: 17px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+html body .scan-form-qty small {
+  color: #627887;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .scan-form-lines li.missing .scan-form-qty {
+  color: #b3261e;
+}
+
 /* What was scanned. */
 html body .scan-count {
   display: flex;

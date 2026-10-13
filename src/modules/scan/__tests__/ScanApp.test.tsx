@@ -14,7 +14,7 @@ const typeBarcode = (code: string) => {
 describe('ScanApp', () => {
   it('opens on the stations the signed-in person may use', () => {
     renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan'});
-    const stations = within(screen.getByRole('navigation', {name: 'Σταθμοί'}));
+    const stations = within(screen.getByRole('navigation', {name: 'Αρχική'}));
     for (const name of ['Παραλαβή', 'Φόρτωση κλιβάνου', 'Αποδέσμευση', 'Παράδοση', 'Αναζήτηση'])
       expect(stations.getByRole('button', {name: new RegExp(name)})).toBeInTheDocument();
   });
@@ -67,8 +67,8 @@ describe('ScanApp lists', () => {
     renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/lists'});
     fireEvent.change(screen.getByRole('searchbox', {name: 'Αναζήτηση'}), {target: {value: 'S000322'}});
     fireEvent.click(screen.getByRole('button', {name: /ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ/}));
-    const contents = screen.getByRole('region', {name: 'Περιεχόμενο Σετ'});
-    expect(within(contents).getAllByRole('listitem').length).toBeGreaterThan(0);
+    const form = screen.getByRole('region', {name: 'Σύνθεση Σετ'});
+    expect(within(form).getAllByRole('listitem').length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole('button', {name: /Λίστες/}));
     fireEvent.click(screen.getByRole('button', {name: /Μεμονωμένα/}));
     expect(screen.getByRole('button', {name: /Μεμονωμένα/})).toHaveAttribute('aria-pressed', 'true');

@@ -31,7 +31,7 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
 
   if (step === 'DONE')
     return (
-      <ScanScreen title={tr('Παράδοση')} backLabel={tr('Σταθμοί')} onBack={onStations}>
+      <ScanScreen title={tr('Παράδοση')} backLabel={tr('Αρχική')} onBack={onStations}>
         <ScanDone
           title={tr('Η παράδοση καταγράφηκε')}
           text={tr('{0} αντικείμενα παραδόθηκαν στο {1}.', delivered.count, trData(delivered.department))}
@@ -121,7 +121,7 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
       subtitle={
         department ? tr('Παράδοση προς {0}', trData(department)) : tr('Το πρώτο barcode ορίζει το τμήμα της παράδοσης.')
       }
-      backLabel={tr('Σταθμοί')}
+      backLabel={tr('Αρχική')}
       onBack={onStations}
       footer={
         <button type="button" className="scan-primary" disabled={!items.length} onClick={() => setStep('CONFIRM')}>

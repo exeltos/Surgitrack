@@ -2,7 +2,8 @@ import type {ReactNode} from 'react';
 import {ArrowLeft, CheckCircle2, X} from 'lucide-react';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {tr, trData} from '../../i18n';
-import type {Tool} from '../../types/domain';
+import {compositionLines} from '../../core/compositionCheck';
+import type {Issue, SetAsset, Tool} from '../../types/domain';
 import type {SterilizationRow} from '../sterilization/sterilizationTypes';
 
 /** One screen of the phone app: a dark header with the way back, the content, and its main button. */
@@ -113,34 +114,67 @@ export function ScanDone({
         {again}
       </button>
       <button type="button" className="scan-secondary" onClick={onStations}>
-        {tr('Σταθμοί')}
+        {tr('Αρχική')}
       </button>
     </div>
   );
 }
 
-/** What a Set holds: its instruments, by name, with barcode and code. */
-export function SetContents({tools}: {tools: Tool[]}) {
-  const sorted = [...tools].sort((a, b) => a.name.localeCompare(b.name, 'el'));
+/**
+ * A Set's composition sheet, as printed from the Set's page: one row per kind of instrument with its code
+ * and how many there should be and are, what is missing, and open issues (Βλάβη, Φθορά…).
+ */
+export function SetContents({set, tools, issues}: {set: SetAsset; tools: Tool[]; issues: Issue[]}) {
+  const problems = new Map<string, string[]>();
+  for (const issue of issues) {
+    if (issue.status !== 'OPEN') continue;
+    const barcode = issue.asset.split(' · ')[0];
+    problems.set(barcode, [...(problems.get(barcode) || []), trData(issue.type)]);
+  }
+  const lines = compositionLines(set.compositionTemplate, tools, problems);
+  const templated = !!set.compositionTemplate?.length;
+  const expected = templated ? lines.reduce((sum, line) => sum + (line.expected || 0), 0) : set.expected;
+  const missing = lines.reduce((sum, line) => sum + line.missing, 0);
   return (
-    <section aria-label={tr('Περιεχόμενο Σετ')}>
+    <section className="scan-form" aria-label={tr('Σύνθεση Σετ')}>
       <h2 className="scan-section">
-        {tr('Περιεχόμενο Σετ')} <span>{tools.length}</span>
+        {tr('Σύνθεση Σετ')}{' '}
+        <span>
+          {tools.length}
+          {expected ? ` / ${expected}` : ''}
+        </span>
       </h2>
-      {sorted.length ? (
-        <ul className="scan-items compact">
-          {sorted.map(tool => (
-            <li key={tool.id}>
-              <span>
-                <b>{tool.name}</b>
+      {missing > 0 && (
+        <p className="scan-form-alert">
+          {missing === 1 ? tr('Λείπει 1 εργαλείο') : tr('Λείπουν {0} εργαλεία', missing)}
+        </p>
+      )}
+      {lines.length ? (
+        <ol className="scan-form-lines">
+          {lines.map((line, index) => (
+            <li
+              key={`${line.code}:${line.name}:${index}`}
+              className={line.missing ? 'missing' : line.problems.length ? 'issue' : ''}
+            >
+              <span className="scan-form-num">{index + 1}</span>
+              <span className="scan-form-name">
+                <b>{line.name}</b>
                 <small>
-                  <span className="mono">{tool.barcode}</span>
-                  {tool.code ? ` · ${tool.code}` : ''}
+                  {line.code}
+                  {line.manufacturer !== '—' ? ` · ${line.manufacturer}` : ''}
                 </small>
+                {line.missing > 0 && (
+                  <em className="miss">{line.missing === 1 ? tr('Λείπει 1') : tr('Λείπουν {0}', line.missing)}</em>
+                )}
+                {line.problems.length > 0 && <em className="prob">{line.problems.join(' · ')}</em>}
+              </span>
+              <span className="scan-form-qty" aria-label={tr('Παρόντα / αναμενόμενα')}>
+                {line.present}
+                {line.expected !== undefined ? <small>/{line.expected}</small> : null}
               </span>
             </li>
           ))}
-        </ul>
+        </ol>
       ) : (
         <p className="scan-empty">{tr('Το Σετ δεν έχει εργαλεία.')}</p>
       )}

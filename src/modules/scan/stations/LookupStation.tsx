@@ -15,7 +15,7 @@ const RECENT = 5;
 
 /** Lookup: scan any Set or instrument to see where it is, its state, and what happened to it last. */
 export default function LookupStation({onStations}: {onStations: () => void}) {
-  const {sets, tools, movements, role, currentUser} = useSurgi();
+  const {sets, tools, movements, issues, role, currentUser} = useSurgi();
   const [found, setFound] = useState<{kind: 'SET' | 'TOOL'; id: string} | null>(null);
   const [feedback, setFeedback] = useState<BarcodeFeedback | null>(null);
   useScanAnswers(feedback);
@@ -65,7 +65,7 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
     <ScanScreen
       title={tr('Αναζήτηση')}
       subtitle={tr('Σκανάρετε ένα Σετ ή εργαλείο: πού είναι, τι έγινε.')}
-      backLabel={tr('Σταθμοί')}
+      backLabel={tr('Αρχική')}
       onBack={onStations}
     >
       <ScanCamera onBarcode={scan} feedback={feedback} />
@@ -102,7 +102,7 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
               </div>
             )}
           </dl>
-          {set && <SetContents tools={tools.filter(item => item.setId === set.id)} />}
+          {set && <SetContents set={set} tools={tools.filter(item => item.setId === set.id)} issues={issues} />}
           <h2 className="scan-section">{tr('Τελευταίες κινήσεις')}</h2>
           {recent.length ? (
             <ul className="scan-moves">

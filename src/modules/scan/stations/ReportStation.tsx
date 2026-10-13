@@ -87,7 +87,7 @@ export default function ReportStation({onStations}: {onStations: () => void}) {
     <ScanScreen
       title={tr('Αναφορά')}
       subtitle={tr('Η Αποστείρωση με μια ματιά')}
-      backLabel={tr('Σταθμοί')}
+      backLabel={tr('Αρχική')}
       onBack={onStations}
     >
       <div className="scan-camera-tools" role="group" aria-label={tr('Περίοδος')}>

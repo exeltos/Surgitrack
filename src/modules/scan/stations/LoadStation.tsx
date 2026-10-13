@@ -36,7 +36,7 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
 
   if (step === 'DONE')
     return (
-      <ScanScreen title={tr('Φόρτωση κλιβάνου')} backLabel={tr('Σταθμοί')} onBack={onStations}>
+      <ScanScreen title={tr('Φόρτωση κλιβάνου')} backLabel={tr('Αρχική')} onBack={onStations}>
         <ScanDone
           title={tr('Ο κύκλος ξεκίνησε')}
           text={tr('{0} αντικείμενα στον κλίβανο {1}.', loaded, trData(s.loadEquipment))}
@@ -135,7 +135,7 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
     <ScanScreen
       title={tr('Φόρτωση κλιβάνου')}
       subtitle={tr('{0} έτοιμα για φόρτωση', s.loadCandidates.length)}
-      backLabel={tr('Σταθμοί')}
+      backLabel={tr('Αρχική')}
       onBack={onStations}
       footer={
         <button type="button" className="scan-primary" disabled={!items.length} onClick={() => setStep('CONFIRM')}>

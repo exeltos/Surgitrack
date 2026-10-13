@@ -187,7 +187,7 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
             </button>
           </section>
         )}
-        <nav className="scan-stations" aria-label={tr('Σταθμοί')}>
+        <nav className="scan-stations" aria-label={tr('Αρχική')}>
           {(ownerOutside ? [] : allowed).map(station => (
             <button
               key={station.path}
