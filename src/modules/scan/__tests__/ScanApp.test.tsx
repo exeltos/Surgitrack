@@ -46,6 +46,32 @@ describe('ScanApp', () => {
   });
 });
 
+describe('ScanApp report', () => {
+  const staff = {
+    id: 'u-ster',
+    name: 'Νοσηλεύτρια Αποστείρωσης',
+    role: 'STERILIZATION',
+    department: 'Κεντρική Αποστείρωση',
+  } as const;
+
+  it('is not among the stations of Sterilization staff', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan', signedIn: staff});
+    expect(screen.queryByRole('button', {name: /Αναφορά/})).not.toBeInTheDocument();
+  });
+
+  it('shows the day at Sterilization: activity, stages now, and who did what', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {
+      path: '/scan/report',
+      signedIn: {...staff, supervisor: true},
+    });
+    expect(screen.getByRole('heading', {name: 'Αναφορά'})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: 'Τώρα στην Αποστείρωση'})).toBeInTheDocument();
+    expect(screen.getByText('Αναμονή παραλαβής')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: '7 ημέρες'}));
+    expect(screen.getByRole('button', {name: '7 ημέρες'})).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
 describe('ScanCamera', () => {
   it('takes a Bluetooth/USB scanner’s barcode typed anywhere on the screen', () => {
     localStorage.setItem('surgitrack-scan-camera', 'off');

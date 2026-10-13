@@ -173,6 +173,9 @@ html body .scan-station.deliver .scan-station-icon {
 html body .scan-station.lookup .scan-station-icon {
   background: #627887;
 }
+html body .scan-station.report .scan-station-icon {
+  background: var(--c-cyan-20);
+}
 html body .scan-signout {
   display: inline-flex;
   align-items: center;
@@ -651,6 +654,73 @@ html body .scan-moves small {
   gap: 4px;
   color: #627887;
   font-size: 12.5px;
+}
+
+/* The day's report (admin and supervisor). */
+html body .scan-report-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+html body .scan-report-kpis div {
+  padding: 10px 12px;
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+}
+html body .scan-report-kpis dt {
+  color: #627887;
+  font-size: 12.5px;
+}
+html body .scan-report-kpis dd {
+  margin: 2px 0 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+html body .scan-refused li.scan-report-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-color: #f5c56b;
+  border-left-color: #d97f06;
+  background: #fff8ea;
+  color: #7a4b00;
+  font-size: 14px;
+}
+html body .scan-report-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 6px 14px;
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+  list-style: none;
+}
+html body .scan-report-stages li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) 1fr 28px;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+  font-size: 14px;
+}
+html body .scan-report-stages li > i {
+  height: 8px;
+  border-radius: 999px;
+  background: #e3eaf0;
+  overflow: hidden;
+}
+html body .scan-report-stages li > i > i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--c-cyan-40);
+}
+html body .scan-report-stages b {
+  text-align: right;
 }
 
 /* The end of a round. */

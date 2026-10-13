@@ -1,7 +1,8 @@
 import type {ReactNode} from 'react';
-import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
+import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {
   ArrowDownToLine,
+  ChartColumn,
   ChevronRight,
   Flame,
   LayoutDashboard,
@@ -15,6 +16,7 @@ import IdleLock from '../../components/layout/IdleLock';
 import {useLibraries} from '../../core/LibraryStore';
 import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
 import type {Permission} from '../../core/permissions';
+import type {SessionUser} from '../../store/types';
 import {tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import {SCAN_PATH, isScanStandalone} from './scanApp';
@@ -23,6 +25,8 @@ import LoadStation from './stations/LoadStation';
 import LookupStation from './stations/LookupStation';
 import ReceiveStation from './stations/ReceiveStation';
 import ReleaseStation from './stations/ReleaseStation';
+import ReportStation from './stations/ReportStation';
+import {useNewVersion} from './useNewVersion';
 
 type Station = {
   path: string;
@@ -31,7 +35,13 @@ type Station = {
   icon: ReactNode;
   tone: string;
   permission?: Permission;
+  /** Only for these people, whatever the permissions. */
+  only?: (user: SessionUser) => boolean;
 };
+
+/** The hospital admin and the Sterilization supervisor: the day's report. */
+const managesSterilization = (user: SessionUser) =>
+  user.role === 'ADMIN' || (user.role === 'STERILIZATION' && !!user.supervisor);
 
 const stations = (): Station[] => [
   {
@@ -73,6 +83,14 @@ const stations = (): Station[] => [
     icon: <Search size={26} />,
     tone: 'lookup',
   },
+  {
+    path: 'report',
+    title: tr('Αναφορά'),
+    text: tr('Η ημέρα: παραλαβές, φορτία, παραδόσεις, εκκρεμότητες'),
+    icon: <ChartColumn size={26} />,
+    tone: 'report',
+    only: managesSterilization,
+  },
 ];
 
 /**
@@ -84,8 +102,12 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
   const {currentUser, organizationName, can, toast, clearToast} = useSurgi();
   const {systemSettings} = useLibraries();
   const navigate = useNavigate();
+  // A newer version loads on the stations screen, never in the middle of a round.
+  useNewVersion(useLocation().pathname === SCAN_PATH);
   const standalone = isScanStandalone();
-  const allowed = stations().filter(station => !station.permission || can(station.permission));
+  const allowed = stations().filter(
+    station => (!station.permission || can(station.permission)) && (!station.only || station.only(currentUser)),
+  );
   const toStations = () => navigate(SCAN_PATH);
 
   const home = (
@@ -140,6 +162,7 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         <Route path={`${SCAN_PATH}/load`} element={station('load', <LoadStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/release`} element={station('release', <ReleaseStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/deliver`} element={station('deliver', <DeliverStation onStations={toStations} />)} />
+        <Route path={`${SCAN_PATH}/report`} element={station('report', <ReportStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/lookup`} element={station('lookup', <LookupStation onStations={toStations} />)} />
         <Route path="*" element={<Navigate to={SCAN_PATH} replace />} />
       </Routes>

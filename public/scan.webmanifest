@@ -1,6 +1,6 @@
 {
   "name": "SurgiTrack Σάρωση",
-  "short_name": "Σάρωση",
+  "short_name": "SurgiTrack",
   "description": "Σάρωση χειρουργικών εργαλείων και Σετ: παραλαβή, φόρτωση κλιβάνου, αποδέσμευση, παράδοση.",
   "lang": "el",
   "id": "./scan.html",
