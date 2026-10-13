@@ -165,23 +165,6 @@ html body .scan-demo-bar > button {
   font: inherit;
   font-weight: 700;
 }
-html body .scan-demo-enter {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid #d7ccff;
-  border-radius: 18px;
-  background: #f4f0ff;
-}
-html body .scan-demo-enter p {
-  margin: 0;
-  color: #3b2a8a;
-  font-size: 15px;
-}
-html body .scan-demo-enter .scan-primary {
-  background: #5b3fd1;
-}
 
 /* The stations. */
 html body .scan-stations {
@@ -240,6 +223,15 @@ html body .scan-station.deliver .scan-station-icon {
 }
 html body .scan-station.lookup .scan-station-icon {
   background: #627887;
+}
+html body .scan-station.demo .scan-station-icon {
+  background: #5b3fd1;
+}
+html body .scan-station.hospital .scan-station-icon {
+  background: var(--c-cyan-40);
+}
+html body .scan-station:disabled {
+  opacity: 0.55;
 }
 html body .scan-station.lists .scan-station-icon {
   background: #3e7cb1;

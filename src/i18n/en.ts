@@ -2067,8 +2067,6 @@ export const en: Record<string, string> = {
   'Καμία κίνηση στην περίοδο.': 'No activity in this period.',
   'Οι πλήρεις αναφορές είναι στην εφαρμογή, στον υπολογιστή.': 'The full reports are in the app, on a computer.',
   Έξοδος: 'Exit',
-  'Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.':
-    'The platform account belongs to no hospital. Try scanning in the Demo.',
   Λίστες: 'Lists',
   'Σετ και μεμονωμένα, με το περιεχόμενο κάθε Σετ': 'Sets and standalone instruments, with what each set holds',
   'Το Σετ δεν έχει εργαλεία.': 'The set has no instruments.',
@@ -2082,4 +2080,10 @@ export const en: Record<string, string> = {
   'Δεν ήταν δυνατή η δημιουργία του PDF. Δοκιμάστε ξανά.': 'The PDF could not be made. Try again.',
   'Δημιουργία PDF…': 'Making the PDF…',
   'PDF σύνθεσης': 'Composition PDF',
+  'Δεν ήταν δυνατή η φόρτωση των νοσοκομείων.': 'The hospitals could not be loaded.',
+  'Δοκιμαστικό νοσοκομείο, για δοκιμές': 'Sample hospital, for trying things out',
+  Νοσοκομεία: 'Hospitals',
+  'Είσοδος στο νοσοκομείο': 'Enter the hospital',
+  Ανενεργό: 'Inactive',
+  'Δεν υπάρχουν νοσοκομεία ακόμα.': 'No hospitals yet.',
 };
