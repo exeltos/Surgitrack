@@ -35,7 +35,7 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://www.surgitrack.eu/",
-  "minSdkVersion": 21,
+  "minSdkVersion": 24,
   "protocolHandlers": [],
   "fileHandlers": []
 }
