@@ -955,3 +955,63 @@ html body .dash-more {
     min-height: 24px;
   }
 }
+
+/* Overview, compact (a computer): smaller numbers and titles, tighter cards, so more fits on one screen;
+   the text people read keeps its size. */
+@media (min-width: 901px) {
+  html body .hospital-overview.dash {
+    gap: 10px;
+  }
+  html body .hospital-overview .page-head h1 {
+    font-size: 21px;
+  }
+  html body .hospital-overview .page-head p {
+    font-size: 12.5px;
+  }
+  html body .hospital-overview .overview-alert {
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+  html body .hospital-overview .dash-kpis {
+    gap: 10px;
+  }
+  html body .hospital-overview .dash-kpi {
+    gap: 2px !important;
+    padding: 8px 14px !important;
+    border-radius: 12px;
+  }
+  html body .hospital-overview .dash-kpi-label {
+    font-size: 12px !important;
+  }
+  html body .hospital-overview .dash-kpi strong {
+    font-size: 21px !important;
+  }
+  html body .hospital-overview .dash-kpi small {
+    font-size: 11.5px;
+  }
+  html body .hospital-overview .dash-grid {
+    gap: 10px;
+  }
+  html body .hospital-overview .dash-card {
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 12px;
+  }
+  html body .hospital-overview .dash-card > header b {
+    font-size: 14px;
+  }
+  html body .hospital-overview .dash-card > header small {
+    margin-top: 1px;
+    font-size: 11.5px;
+  }
+  html body .hospital-overview .dash-legend li {
+    min-height: 22px;
+  }
+  html body .hospital-overview .dash-list li {
+    padding: 4px 0;
+  }
+  html body .hospital-overview .dash-activity .dash-columns {
+    height: 96px;
+    max-height: 96px;
+  }
+}
