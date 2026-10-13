@@ -1,7 +1,8 @@
-import {useState, type ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {
   ArrowDownToLine,
+  Building2,
   ChartColumn,
   ChevronRight,
   Flame,
@@ -16,11 +17,10 @@ import {
 } from 'lucide-react';
 import IdleLock from '../../components/layout/IdleLock';
 import RoleSwitcher from '../../components/layout/RoleSwitcher';
-import {tellUser} from '../../components/ui/confirmService';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
 import {isPlatformOnly} from '../../core/platformOnly';
 import {getRealIdentity} from '../../data/cloud/identity';
-import {enterPlatformDemo} from '../../data/cloud/platformDemo';
+import {switchHospital} from '../../data/cloud/hospitalSwitch';
 import {useLibraries} from '../../core/LibraryStore';
 import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
 import type {Permission} from '../../core/permissions';
@@ -29,6 +29,7 @@ import {tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import {SCAN_PATH, isScanStandalone} from './scanApp';
 import DeliverStation from './stations/DeliverStation';
+import OwnerEntry from './OwnerEntry';
 import ListsStation from './stations/ListsStation';
 import LoadStation from './stations/LoadStation';
 import LookupStation from './stations/LookupStation';
@@ -125,20 +126,12 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
     station => (!station.permission || can(station.permission)) && (!station.only || station.only(currentUser)),
   );
   const toStations = () => navigate(SCAN_PATH);
-  // The platform owner: outside a hospital there is nothing to scan, so the Demo opens from here; in the
-  // Demo, a bar to pick the role and to leave it (as in the full app).
-  const [enteringDemo, setEnteringDemo] = useState(false);
+  // The platform owner: outside any hospital the home offers the Demo and the hospitals (OwnerEntry); inside
+  // one, «Αλλαγή» goes back to that choice; in the Demo, a bar picks the role and leaves it (as in the app).
   const owner = !!getRealIdentity()?.platform;
   const ownerDemo = owner && getRuntimeDataMode() === 'DEMO';
   const ownerOutside = owner && isPlatformOnly();
-  const enterDemo = () => {
-    setEnteringDemo(true);
-    void enterPlatformDemo('ADMIN', undefined, `#${SCAN_PATH}`).then(error => {
-      if (error === undefined) return;
-      setEnteringDemo(false);
-      void tellUser(tr('Είσοδος Demo'), error || tr('Δεν ήταν δυνατή η είσοδος στο Demo.'));
-    });
-  };
+  const ownerInside = owner && !ownerDemo && !ownerOutside;
   const leaveDemo = () => {
     sessionStorage.removeItem('surgitrack-demo-role');
     sessionStorage.removeItem('surgitrack-session-user');
@@ -153,6 +146,11 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
       <header className="scan-head">
         <div className="scan-head-row">
           <span>{organizationName ? trData(organizationName) : 'SurgiTrack'}</span>
+          {ownerInside && (
+            <button type="button" className="scan-back" onClick={() => switchHospital('', `#${SCAN_PATH}`)}>
+              <Building2 size={16} /> {tr('Αλλαγή')}
+            </button>
+          )}
           {!standalone && (
             <button type="button" className="scan-back" onClick={() => navigate('/')}>
               <LayoutDashboard size={16} /> {tr('Εφαρμογή')}
@@ -177,17 +175,8 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         </div>
       )}
       <main className="scan-body">
-        {owner && !ownerDemo && (
-          <section className="scan-demo-enter">
-            {ownerOutside && (
-              <p>{tr('Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.')}</p>
-            )}
-            <button type="button" className="scan-primary" disabled={enteringDemo} onClick={enterDemo}>
-              <FlaskConical size={18} /> {tr('Είσοδος Demo')}
-            </button>
-          </section>
-        )}
-        <nav className="scan-stations" aria-label={tr('Αρχική')}>
+        {ownerOutside && <OwnerEntry />}
+        <nav className="scan-stations" aria-label={tr('Αρχική')} hidden={ownerOutside}>
           {(ownerOutside ? [] : allowed).map(station => (
             <button
               key={station.path}
