@@ -1,24 +1,13 @@
 import {useEffect, useRef, useState} from 'react';
-import {Camera, CameraOff, CheckCircle2, Flashlight, Keyboard, TriangleAlert} from 'lucide-react';
+import {CameraOff, CheckCircle2, Flashlight, Keyboard, ScanBarcode, TriangleAlert} from 'lucide-react';
 import type {BarcodeFeedback} from '../../components/barcode/BarcodeCapture';
 import {createFrameReader} from '../../core/barcodeReader';
 import {tr} from '../../i18n';
 
-const CAMERA_KEY = 'surgitrack-scan-camera';
-/** The same barcode in view again within this time is the same scan, not a second one. */
-const REPEAT_MS = 2000;
-
-const cameraWanted = () => {
-  try {
-    return localStorage.getItem(CAMERA_KEY) !== 'off';
-  } catch {
-    return true;
-  }
-};
-
 /**
- * The phone app's scanner: the camera, always on while scanning, plus typing and a Bluetooth/USB scanner
- * (it types the barcode and Enter anywhere on the screen). `feedback` is the answer to the last scan.
+ * The phone app's scanner: «Σάρωση» opens the camera for one barcode (it closes once it has read it), plus
+ * typing and a Bluetooth/USB scanner (it types the barcode and Enter anywhere on the screen). `feedback` is
+ * the answer to the last scan.
  */
 export default function ScanCamera({
   onBarcode,
@@ -27,7 +16,7 @@ export default function ScanCamera({
   onBarcode: (barcode: string) => void;
   feedback?: BarcodeFeedback | null;
 }) {
-  const [on, setOn] = useState(cameraWanted);
+  const [on, setOn] = useState(false);
   const [error, setError] = useState('');
   const [torch, setTorch] = useState<boolean | null>(null);
   const [typing, setTyping] = useState(false);
@@ -35,7 +24,6 @@ export default function ScanCamera({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<number | null>(null);
-  const lastRef = useRef({value: '', at: 0});
   const submitRef = useRef(onBarcode);
   submitRef.current = onBarcode;
 
@@ -83,11 +71,13 @@ export default function ScanCamera({
           if (stopped || !videoRef.current) return;
           try {
             const value = await read(videoRef.current);
-            const now = Date.now();
-            if (value && (value !== lastRef.current.value || now - lastRef.current.at > REPEAT_MS)) {
-              lastRef.current = {value, at: now};
+            // One barcode per press: the camera closes as soon as it has read one.
+            if (value && !stopped) {
+              stopped = true;
               submit(value);
-            } else if (value) lastRef.current.at = now;
+              setOn(false);
+              return;
+            }
           } catch {
             // One unreadable frame is normal; the next one is read a moment later.
           }
@@ -124,15 +114,6 @@ export default function ScanCamera({
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const toggleCamera = () => {
-    const next = !on;
-    setOn(next);
-    try {
-      localStorage.setItem(CAMERA_KEY, next ? 'on' : 'off');
-    } catch {
-      // Only remembers the choice for next time.
-    }
-  };
   const toggleTorch = async () => {
     const track = streamRef.current?.getVideoTracks()[0];
     if (!track || torch === null) return;
@@ -172,20 +153,34 @@ export default function ScanCamera({
           </div>
         )
       )}
-      <div className="scan-camera-tools">
-        <button type="button" onClick={toggleCamera} aria-pressed={on}>
-          {on ? <CameraOff size={17} /> : <Camera size={17} />}
-          {on ? tr('Κλείσιμο κάμερας') : tr('Κάμερα')}
-        </button>
-        {torch !== null && (
-          <button type="button" onClick={() => void toggleTorch()} aria-pressed={torch}>
-            <Flashlight size={17} /> {tr('Φακός')}
+      {on ? (
+        <div className="scan-camera-tools">
+          <button type="button" onClick={() => setOn(false)}>
+            <CameraOff size={17} /> {tr('Κλείσιμο κάμερας')}
           </button>
-        )}
-        <button type="button" onClick={() => setTyping(v => !v)} aria-pressed={typing}>
-          <Keyboard size={17} /> {tr('Πληκτρολόγηση')}
-        </button>
-      </div>
+          {torch !== null && (
+            <button type="button" onClick={() => void toggleTorch()} aria-pressed={torch}>
+              <Flashlight size={17} /> {tr('Φακός')}
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="scan-camera-start">
+          <button type="button" className="scan-primary" onClick={() => setOn(true)}>
+            <ScanBarcode size={22} /> {tr('Σάρωση')}
+          </button>
+          <button
+            type="button"
+            className="scan-secondary"
+            onClick={() => setTyping(v => !v)}
+            aria-pressed={typing}
+            aria-label={tr('Πληκτρολόγηση')}
+            title={tr('Πληκτρολόγηση')}
+          >
+            <Keyboard size={20} />
+          </button>
+        </div>
+      )}
       {typing && (
         <form
           className="scan-camera-type"
@@ -209,9 +204,6 @@ export default function ScanCamera({
             {tr('Προσθήκη')}
           </button>
         </form>
-      )}
-      {!on && !typing && (
-        <p className="scan-camera-hint">{tr('Σκανάρετε με scanner ή πατήστε «Κάμερα» ή «Πληκτρολόγηση».')}</p>
       )}
     </section>
   );

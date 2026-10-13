@@ -168,9 +168,11 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         </div>
       )}
       <main className="scan-body">
-        {ownerOutside && (
+        {owner && !ownerDemo && (
           <section className="scan-demo-enter">
-            <p>{tr('Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.')}</p>
+            {ownerOutside && (
+              <p>{tr('Ο λογαριασμός της πλατφόρμας δεν ανήκει σε νοσοκομείο. Δοκιμάστε τη Σάρωση στο Demo.')}</p>
+            )}
             <button type="button" className="scan-primary" disabled={enteringDemo} onClick={enterDemo}>
               <FlaskConical size={18} /> {tr('Είσοδος Demo')}
             </button>

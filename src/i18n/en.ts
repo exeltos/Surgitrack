@@ -2008,7 +2008,6 @@ export const en: Record<string, string> = {
     'Camera permission was not given. Allow it in the browser settings.',
   Φακός: 'Torch',
   Πληκτρολόγηση: 'Type',
-  'Σκανάρετε με scanner ή πατήστε «Κάμερα» ή «Πληκτρολόγηση».': 'Scan with a scanner, or press “Camera” or “Type”.',
   'Αφαίρεση {0}': 'Remove {0}',
   'Δεν προστέθηκαν': 'Not added',
   'Η παράδοση καταγράφηκε': 'Delivery recorded',

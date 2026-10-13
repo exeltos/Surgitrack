@@ -90,7 +90,6 @@ describe('ScanApp report', () => {
 
 describe('ScanCamera', () => {
   it('takes a Bluetooth/USB scanner’s barcode typed anywhere on the screen', () => {
-    localStorage.setItem('surgitrack-scan-camera', 'off');
     const onBarcode = vi.fn();
     render(<ScanCamera onBarcode={onBarcode} />);
     act(() => {
@@ -98,6 +97,14 @@ describe('ScanCamera', () => {
         document.body.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles: true}));
     });
     expect(onBarcode).toHaveBeenCalledWith('S000327');
-    localStorage.clear();
+  });
+
+  it('opens the camera only when «Σάρωση» is pressed', () => {
+    const {container} = render(<ScanCamera onBarcode={vi.fn()} />);
+    expect(container.querySelector('video')).toBeNull();
+    fireEvent.click(screen.getByRole('button', {name: 'Σάρωση'}));
+    expect(container.querySelector('video')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', {name: /Κλείσιμο κάμερας/}));
+    expect(container.querySelector('video')).toBeNull();
   });
 });

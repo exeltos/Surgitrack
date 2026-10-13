@@ -1,6 +1,11 @@
 /* The phone app (scan.html, or «Σάρωση» on a phone): the scanning stations, full screen, large for one hand. */
+/* The full app locks the page (html, body, #root: overflow hidden; only its lists scroll): the phone app is
+   its own scrolling page. */
 html body .scan-app {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: #f5f7fb;
   color: #16252f;
 }
@@ -334,6 +339,23 @@ html body .scan-camera-feedback.error {
 html body .scan-camera-feedback svg {
   flex: none;
   margin-top: 1px;
+}
+html body .scan-camera-start {
+  display: grid;
+  grid-template-columns: 1fr 56px;
+  gap: 8px;
+}
+html body .scan-camera-start .scan-primary {
+  min-height: 60px;
+  font-size: 17px;
+}
+html body .scan-camera-start .scan-secondary {
+  min-height: 60px;
+  padding: 0;
+}
+html body .scan-camera-start .scan-secondary[aria-pressed='true'] {
+  border-color: var(--c-cyan-40);
+  background: #e7f3f5;
 }
 html body .scan-camera-tools {
   display: flex;
