@@ -3037,15 +3037,15 @@ html body .release-actions .release-print {
   font-weight: 700;
 }
 /* Sterilization stage tabs on narrower screens (tablet): less inner padding so every label fits whole. */
-/* Recycle bin at the bottom left of the menu, like a desktop bin (full when something was deleted). */
+/* Recycle bin at the bottom right of the menu, at its edge: the icon alone (full when something was deleted). */
 html body .sidebar-bin {
-  align-self: flex-start;
+  align-self: flex-end;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  margin: auto 0 6px 12px;
-  padding: 6px 10px 5px;
+  margin: auto 8px 6px 0;
+  padding: 4px;
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--c-gray-95);

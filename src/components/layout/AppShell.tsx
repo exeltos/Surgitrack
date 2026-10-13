@@ -332,7 +332,7 @@ export default function AppShell({
           })}
       </nav>
       {binItem && (
-        // The recycle bin sits at the bottom left, like a desktop bin: full when something was deleted.
+        // The recycle bin sits at the bottom right of the menu, as an icon: full when something was deleted.
         <NavLink
           to="/bin"
           end
@@ -345,7 +345,6 @@ export default function AppShell({
             <RecycleBinIcon full={binCount > 0} />
             {binCount > 0 && <em>{binCount}</em>}
           </span>
-          <span>{binLabel}</span>
         </NavLink>
       )}
       <div className="sidebar-foot">
