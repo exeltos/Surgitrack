@@ -224,3 +224,17 @@ describe('ScanApp tabs with a trailing slash', () => {
     expect(screen.getByRole('navigation', {name: 'Πλοήγηση'})).toBeInTheDocument();
   });
 });
+
+describe('ScanApp Demo waiting list', () => {
+  it('in the Demo, lists what waits and adds it with a tap, as a scan', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/receive', demo: true});
+    const waiting = within(screen.getByRole('region', {name: 'Demo · σε αναμονή'}));
+    fireEvent.click(waiting.getByRole('button', {name: /S000327/}));
+    expect(screen.getByRole('button', {name: 'Συνέχεια · 1'})).toBeEnabled();
+  });
+
+  it('is not shown in a real hospital', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/receive'});
+    expect(screen.queryByRole('region', {name: 'Demo · σε αναμονή'})).not.toBeInTheDocument();
+  });
+});

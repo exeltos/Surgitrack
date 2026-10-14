@@ -2126,4 +2126,6 @@ export const en: Record<string, string> = {
   'Πλήρης εφαρμογή': 'Full app',
   'Αλλαγή νοσοκομείου': 'Change hospital',
   Πλοήγηση: 'Navigation',
+  'Demo · σε αναμονή': 'Demo · waiting',
+  'Χωρίς ετικέτες: πατήστε ένα για να μπει σαν σκαναρισμένο.': 'No labels: tap one to add it as if scanned.',
 };

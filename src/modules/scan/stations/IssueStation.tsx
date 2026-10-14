@@ -7,7 +7,7 @@ import {useSurgi} from '../../../store/SurgiStore';
 import type {AssetPhoto} from '../../../types/domain';
 import {departmentOf, findScanned, type Scanned} from '../findScanned';
 import ScanCamera from '../ScanCamera';
-import {ScanDone, ScanRefused, ScanScreen} from '../ScanParts';
+import {DemoWaiting, ScanDone, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /** Where the report says it came from (as «Καρτέλα Εργαλείου» on the instrument's page). */
@@ -76,6 +76,12 @@ export default function IssueStation({onStations}: {onStations: () => void}) {
       >
         <ScanCamera onBarcode={scan} feedback={feedback} />
         <ScanRefused messages={answers.refused} />
+        <DemoWaiting
+          items={sets
+            .filter(set => role !== 'DEPARTMENT' || set.department === currentUser.department)
+            .map(asset => ({...asset, kind: 'SET' as const}))}
+          onPick={scan}
+        />
       </ScanScreen>
     );
 

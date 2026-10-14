@@ -1283,3 +1283,69 @@ html body .scan-menu-signout .scan-menu-icon {
   background: transparent;
   color: inherit;
 }
+
+/* Demo only: what waits at the station, tapped in as if scanned (a presentation has no labels). */
+html body .scan-demo-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px dashed #b9a6f5;
+  border-radius: 18px;
+  background: #f6f2ff;
+}
+html body .scan-demo-waiting .scan-section {
+  margin: 0;
+  color: #5b3fd1;
+}
+html body .scan-demo-waiting .scan-section span {
+  margin-left: auto;
+  background: #e6ddff;
+  color: #5b3fd1;
+}
+html body .scan-demo-waiting p {
+  margin: 0;
+  color: #6b5aa8;
+  font-size: 13px;
+}
+html body .scan-demo-waiting ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .scan-demo-waiting li button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1px solid #e0d6ff;
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+html body .scan-demo-waiting li button:active {
+  background: #efe9ff;
+}
+html body .scan-demo-waiting .scan-demo-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+html body .scan-demo-waiting b {
+  font-size: 14px;
+}
+html body .scan-demo-waiting small {
+  color: #627887;
+  font-size: 12.5px;
+}
+html body .scan-demo-waiting li button > svg:last-child {
+  color: #5b3fd1;
+}

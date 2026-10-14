@@ -3,7 +3,7 @@ import {useLibraries} from '../../../core/LibraryStore';
 import {tr, trData} from '../../../i18n';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
-import {ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
+import {DemoWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /**
@@ -149,6 +149,10 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
         <b>{items.length}</b>
       </div>
       <ScanRefused messages={answers.refused} />
+      <DemoWaiting
+        items={s.loadCandidates.filter(item => !s.loadSelected.has(`${item.kind}:${item.id}`))}
+        onPick={s.addBarcodeToLoad}
+      />
       <ScanItemList
         items={items}
         onRemove={item => s.toggleLoadAsset(`${item.kind}:${item.id}`)}

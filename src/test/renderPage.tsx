@@ -21,9 +21,20 @@ export const forgetPageMemory = () => {
  */
 export function renderPage(
   page: ReactElement,
-  {path = '/', route = '*', signedIn}: {path?: string; route?: string; signedIn?: SessionUser} = {},
+  {
+    path = '/',
+    route = '*',
+    signedIn,
+    demo,
+  }: {
+    path?: string;
+    route?: string;
+    signedIn?: SessionUser;
+    /** In the platform's Demo (as entered from Studio). */ demo?: boolean;
+  } = {},
 ) {
   forgetPageMemory();
+  if (demo) sessionStorage.setItem('surgitrack-data-mode', 'DEMO');
   // Someone other than the sample hospital's default user (the store reads them from the session).
   if (signedIn) {
     sessionStorage.setItem('surgitrack-demo-role', signedIn.role);
