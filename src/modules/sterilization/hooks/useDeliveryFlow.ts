@@ -130,6 +130,13 @@ export function useDeliveryFlow(
     });
     return true;
   };
+  /** Everything ready for one department, at once (a delivery goes to one department). */
+  const selectDeliveryDepartment = (department: string) => {
+    if (deliveryBatchDepartment && deliveryBatchDepartment !== department) return;
+    const keys = ready.filter(x => x.department === department).map(x => `${x.kind}:${x.id}`);
+    setDeliverySelected(current => new Set([...current, ...keys]));
+    setDeliveryBatchReceiver(null);
+  };
   const toggleDeliveryAsset = (item: SterilizationRow) => {
     const key = `${item.kind}:${item.id}`;
     if (deliverySelected.has(key)) {
@@ -187,6 +194,7 @@ export function useDeliveryFlow(
     if (completed === deliverySelectedAssets.length) closeDeliveryBatch();
   };
   return {
+    selectDeliveryDepartment,
     addBarcodeToDelivery,
     closeDelivery,
     closeDeliveryBatch,

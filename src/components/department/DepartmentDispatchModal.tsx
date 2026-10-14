@@ -49,11 +49,21 @@ export default function DepartmentDispatchModal({
   const limitedTools =
     kind === 'TOOL' ? tools.filter(t => t.id === id && t.maxUses) : tools.filter(t => t.setId === id && t.maxUses);
   const limitedSet = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
-  const consumesLives = limitedTools.length > 0 || limitedSet;
+  // Limited-use instruments not used this time (the Set was opened, the instrument was not): no use recorded.
+  const [unused, setUnused] = useState<Set<string>>(new Set());
+  const usedTools = limitedTools.filter(t => !unused.has(t.id));
+  const consumesLives = usedTools.length > 0 || limitedSet;
+  const toggleUnused = (toolId: string) =>
+    setUnused(current => {
+      const next = new Set(current);
+      if (next.has(toolId)) next.delete(toolId);
+      else next.add(toolId);
+      return next;
+    });
   const canSend = (!counting || !!count) && (!consumesLives || (patientCode.trim().length > 0 && livesConfirmed));
   const send = () => {
     if (!canSend) return;
-    sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined);
+    sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined, [...unused]);
     onClose();
   };
   return (
@@ -124,7 +134,7 @@ export default function DepartmentDispatchModal({
               )}
             </div>
           )}
-          {consumesLives && (
+          {(limitedTools.length > 0 || limitedSet) && (
             <div className="department-lives-card">
               <div className="department-lives-head">
                 <Gauge size={18} />
@@ -134,23 +144,35 @@ export default function DepartmentDispatchModal({
               <ul>
                 {limitedTools.map(t => {
                   const remaining = Math.max(0, (t.maxUses || 0) - t.uses);
+                  const used = !unused.has(t.id);
                   return (
-                    <li key={t.id} className={remaining <= 1 ? 'last-life' : ''}>
-                      <span>
-                        {t.barcode} · {t.name}
-                      </span>
-                      <b>
-                        {remaining} → {Math.max(0, remaining - 1)}
-                      </b>
-                      {remaining <= 1 && <small>{tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}</small>}
+                    <li key={t.id} className={`${used && remaining <= 1 ? 'last-life' : ''} ${used ? '' : 'not-used'}`}>
+                      <label className="department-lives-used" title={tr('Χρησιμοποιήθηκε')}>
+                        <input
+                          type="checkbox"
+                          checked={used}
+                          onChange={() => toggleUnused(t.id)}
+                          aria-label={tr('Χρησιμοποιήθηκε: {0}', t.barcode)}
+                        />
+                        <span>
+                          {t.barcode} · {t.name}
+                        </span>
+                      </label>
+                      <b>{used ? `${remaining} → ${Math.max(0, remaining - 1)}` : tr('χωρίς χρήση')}</b>
+                      {used && remaining <= 1 && <small>{tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}</small>}
                     </li>
                   );
                 })}
               </ul>
-              <label className="department-lives-confirm">
-                <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
-                {tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}
-              </label>
+              <small className="department-lives-hint">
+                {tr('Ξετσεκάρετε όσα δεν χρησιμοποιήθηκαν: στέλνονται χωρίς να αφαιρεθεί χρήση.')}
+              </small>
+              {consumesLives && (
+                <label className="department-lives-confirm">
+                  <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
+                  {tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}
+                </label>
+              )}
             </div>
           )}
           <div className="department-signature-card">

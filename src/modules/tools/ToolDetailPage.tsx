@@ -57,6 +57,7 @@ export default function ToolDetailPage() {
     currentUser,
     can,
     setColorMarker,
+    correctUses,
   } = useSurgi();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
@@ -270,6 +271,11 @@ export default function ToolDetailPage() {
           }
           onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
           canEditUsage={can('asset.usage.configure')}
+          onCorrectUses={
+            can('asset.usage.configure') && tool.state !== 'RETIRED'
+              ? delta => correctUses('TOOL', tool.id, delta)
+              : undefined
+          }
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />
@@ -352,6 +358,11 @@ export default function ToolDetailPage() {
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
+                    onCorrect={
+                      can('asset.usage.configure') && tool.state !== 'RETIRED'
+                        ? delta => correctUses('TOOL', tool.id, delta)
+                        : undefined
+                    }
                     description={tr('Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.')}
                   />
                   <dl className="asset-definition-list compact-status-list">

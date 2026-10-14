@@ -324,3 +324,33 @@ html body .department-asset-row:hover {
 html body .department-asset-row.last-opened:hover {
   background: var(--c-gray-95-3);
 }
+/* Send to Sterilization: a tick per limited-use instrument; the ones not used go without losing a use. */
+html body .department-lives-used {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  cursor: pointer;
+}
+html body .department-lives-used input {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--c-cyan-40);
+}
+html body .department-lives-card li.not-used span,
+html body .department-lives-card li.not-used b {
+  color: var(--st-muted);
+  text-decoration: line-through;
+}
+html body .department-lives-card li.not-used b {
+  text-decoration: none;
+  font-weight: 600;
+}
+html body .department-lives-hint {
+  display: block;
+  margin: 6px 0 2px;
+  color: var(--st-muted);
+  font-size: 11px;
+}

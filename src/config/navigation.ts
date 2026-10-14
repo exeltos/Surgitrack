@@ -89,6 +89,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
   if (role === 'DEPARTMENT') {
     const departmentNavigation: NavigationItem[] = [
       {to: '/department', label: 'Σετ & Εργαλεία', icon: PackageSearch, permission: 'department.workspace'},
+      {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'department.workspace'},
       {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
       {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},
     ];

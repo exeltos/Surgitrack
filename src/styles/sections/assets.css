@@ -450,3 +450,34 @@ html body .photo-viewer .icon-button {
     clip: rect(0 0 0 0);
   }
 }
+
+/* Usage card: −/+ to correct the recorded uses (usage-limit managers only). */
+html body .usage-correct {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+}
+/* The number stays in the value column, aligned with the rows above and below; the −/+ follow it. */
+html body .usage-correct > :first-child {
+  min-width: 2.5ch;
+}
+html body .usage-correct button:first-of-type {
+  margin-left: 6px;
+}
+html body .usage-correct button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 6px;
+  background: var(--c-white);
+  color: var(--c-cyan-30);
+  cursor: pointer;
+}
+html body .usage-correct button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

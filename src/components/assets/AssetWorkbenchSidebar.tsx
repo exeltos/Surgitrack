@@ -1,7 +1,7 @@
 import {useLibraries} from '../../core/LibraryStore';
 import {useEffect, useState} from 'react';
 import {useUnsavedChanges} from '../../app/UnsavedChanges';
-import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
+import {Barcode, Camera, Check, Images, Minus, Palette, Pencil, Plus, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
@@ -34,6 +34,8 @@ type Props = {
   onEditMarker?: () => void;
   /** Lives (usage limit) are editable only by the admin and the Sterilization supervisor. */
   canEditUsage?: boolean;
+  /** Usage-limit managers: corrects the recorded uses by one (a use counted by mistake, or missed). */
+  onCorrectUses?: (delta: 1 | -1) => void;
 };
 const states: Array<{value: AssetState; label: string}> = [
   {value: 'IN_DEPARTMENT', label: 'Στο τμήμα'},
@@ -75,6 +77,7 @@ export default function AssetWorkbenchSidebar({
   markerNote,
   onEditMarker,
   canEditUsage = false,
+  onCorrectUses,
 }: Props) {
   const {systemSettings} = useLibraries();
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
@@ -411,7 +414,33 @@ export default function AssetWorkbenchSidebar({
           <>
             <div>
               <dt>{tr('Χρήσεις')}</dt>
-              <dd>{asset.uses || 0}</dd>
+              <dd>
+                {onCorrectUses ? (
+                  <span className="usage-correct">
+                    <span>{asset.uses || 0}</span>
+                    <button
+                      type="button"
+                      onClick={() => onCorrectUses(-1)}
+                      disabled={(asset.uses || 0) <= 0}
+                      aria-label={tr('Μία χρήση λιγότερη')}
+                      title={tr('Μία χρήση λιγότερη')}
+                    >
+                      <Minus size={12} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onCorrectUses(1)}
+                      disabled={(asset.uses || 0) >= asset.maxUses}
+                      aria-label={tr('Μία χρήση περισσότερη')}
+                      title={tr('Μία χρήση περισσότερη')}
+                    >
+                      <Plus size={12} />
+                    </button>
+                  </span>
+                ) : (
+                  asset.uses || 0
+                )}
+              </dd>
             </div>
             <div>
               <dt>{tr('Υπόλοιπο χρήσεων')}</dt>

@@ -119,6 +119,16 @@ export function useReceiptFlow(
       return next;
     });
   };
+  /** Everything waiting from one department, at once (the receipt is one department at a time). */
+  const selectReceiptBatchDepartment = (department: string) => {
+    if (receiptBatchDepartment && receiptBatchDepartment !== department) return;
+    const keys = incoming.filter(x => x.department === department).map(x => `${x.kind}:${x.id}`);
+    setReceiptBatchSelected(current => new Set([...current, ...keys]));
+  };
+  const clearReceiptBatchSelection = () => {
+    setReceiptBatchSelected(new Set());
+    setReceiptBatchDeviations(new Set());
+  };
   const addBarcodeToReceiptBatch = (raw: string) => {
     const barcode = raw.trim().toUpperCase();
     if (!barcode) return false;
@@ -273,6 +283,8 @@ export function useReceiptFlow(
     setQueue('INCOMING');
   };
   return {
+    clearReceiptBatchSelection,
+    selectReceiptBatchDepartment,
     addBarcodeToReceiptBatch,
     closeReceipt,
     closeReceiptBatch,

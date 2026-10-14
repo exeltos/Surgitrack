@@ -69,6 +69,17 @@ const DEPARTMENTS_SHOWN = 5;
 
 export default function HospitalOverviewPage() {
   const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();
+  // An issue or a movement names its Set or instrument as «barcode · name»: its row opens that card.
+  const assetPath = (label: string) => {
+    const barcode = label.split(' · ')[0].trim().toUpperCase();
+    const known = (item: {barcode: string; legacyBarcodes?: string[]}) =>
+      item.barcode.toUpperCase() === barcode || !!item.legacyBarcodes?.some(code => code.toUpperCase() === barcode);
+    const set = sets.find(known);
+    if (set) return `/sets/${set.id}`;
+    // A retired instrument has no card to open: its row keeps the list it came from.
+    const tool = tools.find(known);
+    return tool ? `/tools/${tool.id}` : undefined;
+  };
   const {departments, systemSettings, sterilizationWorkflow} = useLibraries();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
@@ -448,10 +459,10 @@ export default function HospitalOverviewPage() {
               [L('7 ημέρες', '7 days'), perDay.slice(-7).reduce((sum, x) => sum + x.n, 0)],
               [L('14 ημέρες', '14 days'), perDayTotal],
             ].map(([label, n]) => (
-              <span key={String(label)}>
+              <Link key={String(label)} to="/movements">
                 <b>{n}</b>
                 <small>{label}</small>
-              </span>
+              </Link>
             ))}
           </div>
           <div
@@ -510,12 +521,12 @@ export default function HospitalOverviewPage() {
             {openIssues.slice(0, 5).map(i => (
               <li key={i.id}>
                 <TriangleAlert size={15} className="bad" />
-                <span>
+                <Link to={assetPath(i.asset) || presetPath('/issues', {status: 'OPEN'})}>
                   <b>{i.asset}</b>
                   <small>
                     {trData(i.type)} · {trData(i.department)} · {i.created}
                   </small>
-                </span>
+                </Link>
               </li>
             ))}
             {lowStock.length > 0 && (
@@ -574,12 +585,12 @@ export default function HospitalOverviewPage() {
             {latestMovements.slice(0, 6).map(m => (
               <li key={m.id}>
                 <History size={15} />
-                <span>
+                <Link to={assetPath(m.asset) || '/movements'}>
                   <b>{m.asset}</b>
                   <small>
                     {trData(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
                   </small>
-                </span>
+                </Link>
               </li>
             ))}
             {movements.length === 0 && (

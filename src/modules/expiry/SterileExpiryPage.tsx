@@ -19,13 +19,16 @@ type View = (typeof VIEWS)[number];
 
 /** Sterile Sets and instruments with their expiry: the ones to watch first. On expiry the app only warns. */
 export default function SterileExpiryPage() {
-  const {sets, tools} = useSurgi();
+  const {sets, tools, role, currentUser} = useSurgi();
+  // A department user sees only their own department's Sets and instruments (none, without a department).
+  const departmentUser = role === 'DEPARTMENT';
+  const own = departmentUser ? currentUser.department || '' : '';
   const [params] = useSearchParams();
   const initial = (VIEWS as readonly string[]).includes(params.get('view') || '') ? params.get('view')! : 'ALERT';
   const [view, setView] = useRememberedState<string>('expiry.view', initial);
   const [q, setQ] = useRememberedState('expiry.q', '');
   const [department, setDepartment] = useRememberedState('expiry.department', '');
-  const all = sterileExpiryList(sets, tools);
+  const all = sterileExpiryList(sets, tools).filter(item => !departmentUser || (!!own && item.department === own));
   const counts = {
     EXPIRING: all.filter(item => item.state === 'EXPIRING').length,
     EXPIRED: all.filter(item => item.state === 'EXPIRED').length,
@@ -34,7 +37,7 @@ export default function SterileExpiryPage() {
   const shown = all.filter(
     item =>
       (view === 'ALL' || (view === 'ALERT' ? item.state !== 'OK' : item.state === (view as View))) &&
-      (!department || item.department === department) &&
+      (departmentUser || !department || item.department === department) &&
       `${item.name} ${item.barcode} ${item.department || ''}`.toLowerCase().includes(q.toLowerCase()),
   );
   const departments = [...new Set(all.map(item => item.department || '').filter(Boolean))].sort();
@@ -58,15 +61,19 @@ export default function SterileExpiryPage() {
           query={q}
           onQueryChange={setQ}
           placeholder={tr('Ονομασία ή barcode...')}
-          filters={[
-            {
-              key: 'department',
-              value: department,
-              placeholder: tr('Όλα τα τμήματα'),
-              options: departments.map(value => ({value, label: trData(value)})),
-              onChange: setDepartment,
-            },
-          ]}
+          filters={
+            own
+              ? []
+              : [
+                  {
+                    key: 'department',
+                    value: department,
+                    placeholder: tr('Όλα τα τμήματα'),
+                    options: departments.map(value => ({value, label: trData(value)})),
+                    onChange: setDepartment,
+                  },
+                ]
+          }
         />
       </div>
       <ScrollableListPanel withKpis ariaLabel={tr('Λήξεις αποστείρωσης')}>

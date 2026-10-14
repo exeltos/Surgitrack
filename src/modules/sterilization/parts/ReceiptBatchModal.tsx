@@ -1,4 +1,6 @@
-import {Fragment} from 'react';
+import {Fragment, useEffect, useState} from 'react';
+import BatchDepartmentPicker from './BatchDepartmentPicker';
+import {departmentsOf} from '../batchDepartments';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import BatchSetTools from '../BatchSetTools';
@@ -19,7 +21,9 @@ import type {SterilizationPageState} from '../useSterilizationPage';
 export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
   const {
     addBarcodeToReceiptBatch,
+    clearReceiptBatchSelection,
     closeReceiptBatch,
+    selectReceiptBatchDepartment,
     completeReceiptBatch,
     currentUser,
     incoming,
@@ -43,6 +47,15 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
     toggleReceiptBatchAsset,
     tools,
   } = s;
+  const [picked, setPicked] = useState('');
+  // A new batch starts with no department picked.
+  useEffect(() => {
+    if (!receiptBatchOpen) setPicked('');
+  }, [receiptBatchOpen]);
+  // The batch's department once something is in it; until then the one picked from the list (or none).
+  const department = receiptBatchDepartment || picked;
+  const fromDepartment = incoming.filter(item => item.department === department);
+  const shown = department ? fromDepartment : incoming;
   return (
     <>
       {receiptBatchOpen && (
@@ -93,8 +106,23 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                     </div>
                     <small>{tr('Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα, στη «Σύνθεση».')}</small>
                   </div>
+                  <BatchDepartmentPicker
+                    departments={departmentsOf(incoming)}
+                    value={department}
+                    locked={!!receiptBatchDepartment}
+                    allSelected={
+                      !!fromDepartment.length &&
+                      fromDepartment.every(item => receiptBatchSelected.has(`${item.kind}:${item.id}`))
+                    }
+                    onPick={setPicked}
+                    onSelectAll={() => selectReceiptBatchDepartment(department)}
+                    onClear={() => {
+                      clearReceiptBatchSelection();
+                      setPicked('');
+                    }}
+                  />
                   <div className="delivery-batch-list">
-                    {incoming.map(item => {
+                    {shown.map(item => {
                       const key = `${item.kind}:${item.id}`;
                       const selected = receiptBatchSelected.has(key);
                       const incompatible =

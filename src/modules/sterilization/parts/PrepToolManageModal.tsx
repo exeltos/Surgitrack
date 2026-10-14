@@ -1,9 +1,21 @@
-import {TriangleAlert, ArrowRight, X, Layers3, Wrench, PackageOpen} from 'lucide-react';
+import {TriangleAlert, ArrowRight, X, Layers3, Wrench, PackageOpen, CheckCircle2} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
-  const {canCompose, closePrepManage, issues, openIssueReport, openPrepToolAction, prepDraft, prepManageTool} = s;
+  const {
+    canCompose,
+    closePrepManage,
+    issues,
+    openIssueReport,
+    openPrepToolAction,
+    prepDraft,
+    prepManageTool,
+    setPrepKeptIssueIds,
+  } = s;
+  const openIssues = prepManageTool
+    ? issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(prepManageTool.barcode))
+    : [];
   return (
     <>
       {prepManageTool && prepDraft && (
@@ -53,6 +65,22 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
               </div>
             )}
             <div className="prep-manage-grid">
+              {openIssues.length > 0 && (
+                <button
+                  type="button"
+                  className="prep-no-action-option"
+                  onClick={() => {
+                    setPrepKeptIssueIds(current => new Set([...current, ...openIssues.map(i => i.id)]));
+                    closePrepManage();
+                  }}
+                >
+                  <CheckCircle2 size={16} />
+                  <span>
+                    <b>{tr('Παραμονή ως έχει')}</b>
+                    <small>{tr('Η αναφορά μένει ανοικτή· το εργαλείο ελέγχεται και το Σετ συνεχίζει')}</small>
+                  </span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {

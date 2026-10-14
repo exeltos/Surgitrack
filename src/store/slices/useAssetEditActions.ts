@@ -260,9 +260,33 @@ export function useAssetEditActions(
     }
     notify(normalized ? tr('Ορίστηκε όριο {0} χρήσεων.', normalized) : tr('Το όριο χρήσεων αφαιρέθηκε.'));
   };
+  /**
+   * Corrects a limited-use Set's or instrument's recorded uses by one (a use counted by mistake, or one missed);
+   * only who may set the usage limit (hospital admin, Sterilization supervisor, platform owner). Recorded.
+   */
+  const correctUses = (kind: AssetKind, id: string, delta: 1 | -1) => {
+    if (!can('asset.usage.configure')) return;
+    const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
+    if (!asset?.maxUses || asset.state === 'RETIRED') return;
+    const before = asset.uses || 0;
+    const after = Math.min(asset.maxUses, Math.max(0, before + delta));
+    if (after === before) return;
+    if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
+    else setTools(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
+    addMovement({
+      asset: `${asset.barcode} · ${asset.name}`,
+      assetKind: kind,
+      from: asset.department || '—',
+      to: asset.department || '—',
+      status: `Διόρθωση χρήσεων · ${before} → ${after} · ${currentUser.name}`,
+      by: currentUser.name,
+    });
+    notify(tr('{0}: χρήσεις {1} → {2}.', asset.barcode, before, after));
+  };
   return {
     addToolsToSet,
     configureUsageLimit,
+    correctUses,
     lifecycleAlerts,
     renameTools,
     syncCompositionNames,

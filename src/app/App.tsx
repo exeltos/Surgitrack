@@ -75,7 +75,7 @@ function RoleHome() {
       : homePathFor(role, can) || roleHomePath(role);
   return <Navigate to={home} replace />;
 }
-const Guard = ({permission, children}: {permission: Permission; children: ReactNode}) => (
+const Guard = ({permission, children}: {permission: Permission | Permission[]; children: ReactNode}) => (
   <ProtectedRoute permission={permission}>
     <RouteErrorBoundary>
       <Suspense fallback={<Spinner />}>{children}</Suspense>
@@ -326,7 +326,8 @@ export default function App() {
           <Route
             path="/expiry"
             element={
-              <Guard permission="asset.registry.view">
+              // A department sees its own Sets and instruments here (to send them before they expire).
+              <Guard permission={['asset.registry.view', 'department.workspace']}>
                 <SterileExpiryPage />
               </Guard>
             }

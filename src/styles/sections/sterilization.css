@@ -1195,8 +1195,9 @@ html body .prep-workspace-modal .prep-tools-scroll {
 html body .prep-workspace-modal aside * {
   overflow-wrap: break-word;
 }
-/* Preparation list: the Handle button of a Missing or Set-issue row matches the other row buttons. */
-html body .prep-tools-scroll .prep-missing-row .tool-manage-btn {
+/* Preparation list: every Handle button looks the same (missing, Set issue, an instrument's open report). */
+html body .prep-tools-scroll .prep-missing-row .tool-manage-btn,
+html body .prep-tools-scroll .tool-manage-btn.warning {
   font-size: 11px;
   border: 1px solid var(--c-amber-80-2);
 }
@@ -1630,4 +1631,75 @@ html body .ster-row-load b {
     grid-row: 2;
     justify-self: end;
   }
+}
+
+/* Mass receipt / delivery: the right card scrolls inside its frame (its last box stayed outside it). */
+html body .delivery-batch-confirm {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Mass receipt / delivery: the department, picked from a list, and all of its items at once. */
+html body .batch-department {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .batch-department label {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  color: var(--c-cyan-30);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+html body .batch-department select {
+  min-height: 34px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 9px;
+  background: var(--c-white);
+  padding: 0 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .batch-department button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 150px;
+  height: 34px;
+  margin: 0;
+  border: 1px solid var(--c-cyan-80);
+  border-radius: 9px;
+  background: var(--c-cyan-95);
+  padding: 0 12px;
+  color: var(--c-cyan-30);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: none;
+  cursor: pointer;
+}
+html body .batch-department button:hover {
+  border-color: var(--c-cyan-65);
+}
+html body .batch-department button:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+html body .batch-department button.clear {
+  border-color: var(--c-gray-90);
+  background: var(--c-white);
+  color: var(--c-gray-30);
+}
+html body .batch-department button.clear:hover {
+  border-color: var(--c-gray-65);
+  background: var(--c-gray-95);
 }

@@ -336,7 +336,6 @@ export const en: Record<string, string> = {
   'Αποδεσμευμένο μεμονωμένα': 'Released individually',
   Αποδεσμεύτηκε: 'Released',
   'Αποδοχή καταγεγραμμένης έλλειψης': 'Accept recorded shortage',
-  'Αποεπιλογή τμήματος': 'Deselect department',
   'Αποεπιλογή όλων': 'Deselect all',
   Αποθήκευση: 'Storage',
   Απολεσθέν: 'Lost',
@@ -498,7 +497,6 @@ export const en: Record<string, string> = {
   'Επιλογή εργαλείου από Απόθεμα, άλλο Σετ ή μεμονωμένο': 'Pick an instrument from stock, another set or standalone',
   'Επιλογή εργαλείου…': 'Select instrument…',
   'Επιλογή όλων': 'Select all',
-  'Επιλογή όλων του τμήματος': 'Select all of the department',
   Επιλυμένες: 'Resolved',
   Επιλυμένη: 'Resolved',
   'Επιστρέψτε στη λίστα εργαλείων και επιλέξτε ξανά.': 'Go back to the instrument list and select again.',
@@ -2129,4 +2127,15 @@ export const en: Record<string, string> = {
   'Demo · σε αναμονή': 'Demo · waiting',
   'Χωρίς ετικέτες: πατήστε ένα για να μπει σαν σκαναρισμένο.': 'No labels: tap one to add it as if scanned.',
   'Όλα ({0})': 'All ({0})',
+  'Επιλογή όλων ({0})': 'Select all ({0})',
+  'Η αναφορά μένει ανοικτή· το εργαλείο ελέγχεται και το Σετ συνεχίζει':
+    'The report stays open; the instrument is checked and the Set goes on',
+  'Χρησιμοποιήθηκε: {0}': 'Used: {0}',
+  'χωρίς χρήση': 'no use',
+  'Ξετσεκάρετε όσα δεν χρησιμοποιήθηκαν: στέλνονται χωρίς να αφαιρεθεί χρήση.':
+    'Untick the ones not used: they are sent without losing a use.',
+  Χρησιμοποιήθηκε: 'Used',
+  'Μία χρήση λιγότερη': 'One use less',
+  'Μία χρήση περισσότερη': 'One use more',
+  '{0}: χρήσεις {1} → {2}.': '{0}: uses {1} → {2}.',
 };

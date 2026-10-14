@@ -1,4 +1,7 @@
+import {useEffect, useState} from 'react';
 import {loadLabel} from '../../../core/loadLabel';
+import BatchDepartmentPicker from './BatchDepartmentPicker';
+import {departmentsOf} from '../batchDepartments';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, ScanBarcode, UserRoundCheck, X, ShieldCheck, IdCard, UserCheck} from 'lucide-react';
@@ -23,10 +26,20 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
     processLoads,
     ready,
     setDeliveryBatchNote,
+    selectDeliveryDepartment,
     setDeliveryBatchReceiver,
     toggleAllDeliveryDepartment,
     toggleDeliveryAsset,
   } = s;
+  const [picked, setPicked] = useState('');
+  // A new batch starts with no department picked.
+  useEffect(() => {
+    if (!deliveryBatchOpen) setPicked('');
+  }, [deliveryBatchOpen]);
+  // The delivery's department once something is in it; until then the one picked from the list (or none).
+  const department = deliveryBatchDepartment || picked;
+  const forDepartment = ready.filter(item => item.department === department);
+  const shown = department ? forDepartment : ready;
   return (
     <>
       {deliveryBatchOpen && (
@@ -78,15 +91,6 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                       </span>
                     </div>
                     <div className="delivery-list-actions">
-                      {deliveryBatchDepartment && (
-                        <button type="button" className="secondary compact" onClick={toggleAllDeliveryDepartment}>
-                          {ready
-                            .filter(item => item.department === deliveryBatchDepartment)
-                            .every(item => deliverySelected.has(`${item.kind}:${item.id}`))
-                            ? tr('Αποεπιλογή τμήματος')
-                            : tr('Επιλογή όλων του τμήματος')}
-                        </button>
-                      )}
                       <small>
                         {deliveryBatchDepartment
                           ? tr('Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.')
@@ -94,8 +98,23 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                       </small>
                     </div>
                   </div>
+                  <BatchDepartmentPicker
+                    departments={departmentsOf(ready)}
+                    value={department}
+                    locked={!!deliveryBatchDepartment}
+                    allSelected={
+                      !!forDepartment.length &&
+                      forDepartment.every(item => deliverySelected.has(`${item.kind}:${item.id}`))
+                    }
+                    onPick={setPicked}
+                    onSelectAll={() => selectDeliveryDepartment(department)}
+                    onClear={() => {
+                      toggleAllDeliveryDepartment();
+                      setPicked('');
+                    }}
+                  />
                   <div className="delivery-batch-list">
-                    {ready.map(item => {
+                    {shown.map(item => {
                       const key = `${item.kind}:${item.id}`;
                       const selected = deliverySelected.has(key);
                       const incompatible =
