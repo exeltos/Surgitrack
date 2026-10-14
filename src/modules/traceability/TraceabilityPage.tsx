@@ -1,4 +1,4 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {Search, Route, History, ExternalLink, Flame, UserRound, Users} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -53,6 +53,11 @@ export default function TraceabilityPage() {
   // Opened from a movement: the item to look up comes in the address (?q=S000321).
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(() => params.get('q') || '');
+  // A movement opened from «Όλες οι κινήσεις» links here with its barcode while the page stays open.
+  const urlQuery = params.get('q');
+  useEffect(() => {
+    if (urlQuery) setQ(urlQuery);
+  }, [urlQuery]);
   // Three tabs: the search (a barcode or a patient code), every movement of the hospital, and every use
   // recorded with a patient code.
   const tab = params.get('tab') === 'patients' ? 'PATIENTS' : params.get('tab') === 'history' ? 'HISTORY' : 'SEARCH';
