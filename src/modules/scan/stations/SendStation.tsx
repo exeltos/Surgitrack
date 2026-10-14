@@ -10,7 +10,7 @@ import {tr, trData} from '../../../i18n';
 import {useSurgi} from '../../../store/SurgiStore';
 import {departmentOf, findScanned, type Scanned} from '../findScanned';
 import ScanCamera from '../ScanCamera';
-import {ScanDone, ScanRefused, ScanScreen} from '../ScanParts';
+import {DemoWaiting, ScanDone, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /**
@@ -80,6 +80,16 @@ export default function SendStation({onStations}: {onStations: () => void}) {
       >
         <ScanCamera onBarcode={scan} feedback={feedback} />
         <ScanRefused messages={answers.refused} />
+        <DemoWaiting
+          items={[
+            ...sets.map(asset => ({...asset, kind: 'SET' as const})),
+            ...tools.filter(tool => !tool.setId).map(asset => ({...asset, kind: 'TOOL' as const})),
+          ].filter(
+            item =>
+              item.state === 'IN_DEPARTMENT' && (role !== 'DEPARTMENT' || item.department === currentUser.department),
+          )}
+          onPick={scan}
+        />
       </ScanScreen>
     );
 

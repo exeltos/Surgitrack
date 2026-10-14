@@ -7,7 +7,7 @@ import {formatDate, parseDisplayDate} from '../../../core/displayDate';
 import {tr, trData} from '../../../i18n';
 import {useSurgi} from '../../../store/SurgiStore';
 import ScanCamera from '../ScanCamera';
-import {ScanScreen, SetContents, SetPdfButton} from '../ScanParts';
+import {DemoWaiting, ScanScreen, SetContents, SetPdfButton} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /** How many of an item's latest movements are shown. */
@@ -69,6 +69,12 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
       onBack={onStations}
     >
       <ScanCamera onBarcode={scan} feedback={feedback} />
+      {!asset && (
+        <DemoWaiting
+          items={sets.filter(set => ownDepartment(set.department)).map(item => ({...item, kind: 'SET' as const}))}
+          onPick={scan}
+        />
+      )}
       {asset && found && (
         <article className="scan-lookup">
           <header>

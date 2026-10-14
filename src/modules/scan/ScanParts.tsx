@@ -1,5 +1,6 @@
 import {createContext, useContext, useState, type ReactNode} from 'react';
-import {ArrowLeft, CheckCircle2, FileDown, X} from 'lucide-react';
+import {ArrowLeft, CheckCircle2, FileDown, FlaskConical, Plus, X} from 'lucide-react';
+import {getRuntimeDataMode} from '../../config/dataMode';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {tr, trData} from '../../i18n';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
@@ -237,5 +238,51 @@ export function SetPdfButton({set, tools}: {set: SetAsset; tools: Tool[]}) {
       {busy ? <span className="app-spinner inline" aria-hidden="true" /> : <FileDown size={18} />}{' '}
       {busy ? tr('Δημιουργία PDF…') : tr('PDF σύνθεσης')}
     </button>
+  );
+}
+
+/** A Set or instrument offered in the Demo's waiting list. */
+export type DemoItem = {
+  kind: 'SET' | 'TOOL';
+  id: string;
+  barcode: string;
+  name: string;
+  department?: string;
+  maxUses?: number;
+};
+
+/** How many waiting items the Demo lists. */
+const DEMO_SHOWN = 12;
+
+/**
+ * Demo only (a presentation has no labels to scan): what is waiting at this station, each one tapped in as if
+ * scanned, through the same scan handler and rules. Never shown in a real hospital, where a scan proves the
+ * instrument is in hand.
+ */
+export function DemoWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcode: string) => void}) {
+  if (getRuntimeDataMode() !== 'DEMO' || !items.length) return null;
+  return (
+    <section className="scan-demo-waiting" aria-label={tr('Demo · σε αναμονή')}>
+      <h2 className="scan-section">
+        <FlaskConical size={16} /> {tr('Demo · σε αναμονή')} <span>{items.length}</span>
+      </h2>
+      <p>{tr('Χωρίς ετικέτες: πατήστε ένα για να μπει σαν σκαναρισμένο.')}</p>
+      <ul>
+        {items.slice(0, DEMO_SHOWN).map(item => (
+          <li key={`${item.kind}:${item.id}`}>
+            <button type="button" onClick={() => onPick(item.barcode)}>
+              <AssetTypeIcon kind={item.kind} maxUses={item.kind === 'TOOL' ? item.maxUses : undefined} size={16} />
+              <span className="scan-demo-text">
+                <b>
+                  <span className="mono">{item.barcode}</span> · {item.name}
+                </b>
+                {item.department && <small>{trData(item.department)}</small>}
+              </span>
+              <Plus size={18} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

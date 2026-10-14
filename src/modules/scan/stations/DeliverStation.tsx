@@ -4,7 +4,7 @@ import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
-import {ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
+import {DemoWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /**
@@ -135,6 +135,12 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
         <b>{items.length}</b>
       </div>
       <ScanRefused messages={answers.refused} />
+      <DemoWaiting
+        items={s.ready.filter(
+          item => !items.some(row => row.id === item.id) && (!department || item.department === department),
+        )}
+        onPick={s.addBarcodeToDelivery}
+      />
       <ScanItemList
         items={items}
         onRemove={s.toggleDeliveryAsset}
