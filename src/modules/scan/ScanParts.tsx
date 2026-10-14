@@ -260,6 +260,7 @@ const DEMO_SHOWN = 12;
  * instrument is in hand.
  */
 export function DemoWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcode: string) => void}) {
+  const [all, setAll] = useState(false);
   if (getRuntimeDataMode() !== 'DEMO' || !items.length) return null;
   return (
     <section className="scan-demo-waiting" aria-label={tr('Demo · σε αναμονή')}>
@@ -268,7 +269,7 @@ export function DemoWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcod
       </h2>
       <p>{tr('Χωρίς ετικέτες: πατήστε ένα για να μπει σαν σκαναρισμένο.')}</p>
       <ul>
-        {items.slice(0, DEMO_SHOWN).map(item => (
+        {(all ? items : items.slice(0, DEMO_SHOWN)).map(item => (
           <li key={`${item.kind}:${item.id}`}>
             <button type="button" onClick={() => onPick(item.barcode)}>
               <AssetTypeIcon kind={item.kind} maxUses={item.kind === 'TOOL' ? item.maxUses : undefined} size={16} />
@@ -283,6 +284,11 @@ export function DemoWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcod
           </li>
         ))}
       </ul>
+      {!all && items.length > DEMO_SHOWN && (
+        <button type="button" className="scan-secondary" onClick={() => setAll(true)}>
+          {tr('Όλα ({0})', items.length)}
+        </button>
+      )}
     </section>
   );
 }

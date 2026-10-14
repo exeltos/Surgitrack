@@ -238,3 +238,13 @@ describe('ScanApp Demo waiting list', () => {
     expect(screen.queryByRole('region', {name: 'Demo · σε αναμονή'})).not.toBeInTheDocument();
   });
 });
+
+describe('ScanApp Demo waiting list, long', () => {
+  it('shows the first ones and all of them on request', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/lookup', demo: true});
+    const waiting = within(screen.getByRole('region', {name: 'Demo · σε αναμονή'}));
+    expect(waiting.getAllByRole('listitem')).toHaveLength(12);
+    fireEvent.click(waiting.getByRole('button', {name: /Όλα \(/}));
+    expect(waiting.getAllByRole('listitem').length).toBeGreaterThan(12);
+  });
+});
