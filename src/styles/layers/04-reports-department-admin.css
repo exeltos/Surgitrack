@@ -155,9 +155,10 @@
 }
 .reports-filter-strip {
   flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px 16px;
   padding: 10px 14px;
   background: var(--c-white);
   border-bottom: 1px solid var(--c-gray-95);
@@ -192,7 +193,6 @@
 }
 /* Equipment inventory: grouped by department or by specialty. */
 .reports-group-toggle {
-  grid-column: span 2;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -339,12 +339,6 @@
   .reports-workbench {
     grid-template-columns: 240px minmax(0, 1fr);
   }
-  .reports-filter-strip {
-    grid-template-columns: repeat(2, minmax(150px, 1fr));
-  }
-  .reports-group-toggle {
-    grid-column: span 2;
-  }
   .reports-stage-head {
     align-items: flex-start;
   }
@@ -415,9 +409,6 @@
   }
   .reports-stage-actions .app-button {
     flex: 1;
-  }
-  .reports-filter-strip {
-    grid-template-columns: minmax(0, 1fr);
   }
   .reports-catalog-item {
     min-width: 150px;
