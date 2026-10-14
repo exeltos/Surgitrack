@@ -82,6 +82,11 @@ const Guard = ({permission, children}: {permission: Permission | Permission[]; c
     </RouteErrorBoundary>
   </ProtectedRoute>
 );
+/** «Ιστορικό» is a tab of Traceability for whoever has Traceability; a department keeps its own page. */
+function MovementsRoute() {
+  const {can} = useSurgi();
+  return can('traceability.view') ? <Navigate to="/traceability?tab=history" replace /> : <MovementsPage />;
+}
 
 export default function App() {
   const {setSessionUser, sessionReady, currentUser} = useSurgi();
@@ -410,7 +415,7 @@ export default function App() {
             path="/movements"
             element={
               <Guard permission="history.view">
-                <MovementsPage />
+                <MovementsRoute />
               </Guard>
             }
           />

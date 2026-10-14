@@ -73,7 +73,6 @@ const assetNavigation: NavigationItem[] = [
   {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace', group: 'EQUIPMENT'},
   {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view', group: 'INSIGHT'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view', group: 'INSIGHT'},
-  {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view', group: 'INSIGHT'},
   {to: '/bin', label: 'Κάδος', icon: Trash2, permission: 'asset.delete'},
 ];
 export const navigationFor = (role: UserRole, can?: (permission: Permission) => boolean): NavigationItem[] => {
