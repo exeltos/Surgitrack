@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, type ReactNode} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode} from 'react';
 import {ChevronDown} from 'lucide-react';
 
 export type ActionMenuItem = {
@@ -33,7 +33,32 @@ export default function ActionMenu({
   title?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [place, setPlace] = useState<CSSProperties>();
   const wrap = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+
+  // The panel floats over the page at the button (fixed), so a list that scrolls or clips its rows cannot cut
+  // it off; it opens upwards when there is no room below, and stays inside the screen's width.
+  useLayoutEffect(() => {
+    if (!open) {
+      setPlace(undefined);
+      return;
+    }
+    const toggle = wrap.current?.querySelector('button');
+    const menu = panel.current;
+    if (!toggle || !menu) return;
+    const button = toggle.getBoundingClientRect();
+    const {width, height} = menu.getBoundingClientRect();
+    const gap = 6;
+    const below = button.bottom + gap + height <= window.innerHeight - 8 || button.top - gap - height < 8;
+    const wanted = align === 'right' ? button.right - width : button.left;
+    setPlace({
+      position: 'fixed',
+      top: below ? button.bottom + gap : button.top - gap - height,
+      left: Math.max(8, Math.min(wanted, window.innerWidth - width - 8)),
+      right: 'auto',
+    });
+  }, [open, align]);
 
   // Close on an outside click or Escape.
   useEffect(() => {
@@ -42,11 +67,19 @@ export default function ActionMenu({
       if (wrap.current && !wrap.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    // Fixed at the button: when the page or a list scrolls, or the window changes size, it closes.
+    const onMove = (e: Event) => {
+      if (!panel.current?.contains(e.target as Node)) setOpen(false);
+    };
     document.addEventListener('mousedown', onPointer);
     document.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', onMove, true);
+    window.addEventListener('resize', onMove);
     return () => {
       document.removeEventListener('mousedown', onPointer);
       document.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', onMove, true);
+      window.removeEventListener('resize', onMove);
     };
   }, [open]);
 
@@ -67,7 +100,12 @@ export default function ActionMenu({
         <ChevronDown size={15} className="action-menu-caret" />
       </button>
       {open && (
-        <div className={`action-menu-panel align-${align}`} role="menu">
+        <div
+          ref={panel}
+          className={`action-menu-panel align-${align}`}
+          role="menu"
+          style={place || {visibility: 'hidden'}}
+        >
           {items.map(item => (
             <button
               key={item.key}

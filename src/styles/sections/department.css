@@ -308,3 +308,19 @@ html body .department-status-tabs button {
     overflow: visible;
   }
 }
+/* The row is the target: the mouse lights the whole row (straight edges, under the last-opened bar too). */
+html body .department-asset-row {
+  transition: background-color 0.12s ease;
+}
+html body .department-asset-row .department-asset-open,
+html body .department-asset-row .department-asset-open:hover,
+html body .department-asset-row.last-opened .department-asset-open:hover {
+  background: transparent;
+  border-radius: 0;
+}
+html body .department-asset-row:hover {
+  background: color-mix(in srgb, var(--c-gray-95-3) 60%, transparent);
+}
+html body .department-asset-row.last-opened:hover {
+  background: var(--c-gray-95-3);
+}
