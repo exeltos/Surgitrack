@@ -1,15 +1,4 @@
-import {
-  Activity,
-  Archive,
-  Boxes,
-  CalendarClock,
-  Flame,
-  FileText,
-  PenLine,
-  Stethoscope,
-  UsersRound,
-  Wrench,
-} from 'lucide-react';
+import {Activity, Boxes, CalendarClock, Flame, FileText, PenLine, Wrench} from 'lucide-react';
 import {escapeHtml} from '../../core/escapeHtml';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {formatDateTime, parseDisplayDate} from '../../core/displayDate';
@@ -34,8 +23,9 @@ export const INDICATOR: Record<string, string> = {
 };
 export const indicatorText = (value?: string) => (value && INDICATOR[value] ? tr(INDICATOR[value]) : '—');
 
-export type ReportId =
-  'composition' | 'department' | 'specialty' | 'issues' | 'usage' | 'retired' | 'loads' | 'expiry' | 'handovers';
+export type ReportId = 'inventory' | 'issues' | 'usage' | 'loads' | 'expiry' | 'handovers';
+/** How the equipment inventory is grouped. */
+export type InventoryGroup = 'department' | 'specialty';
 export type Row = Record<string, string | number>;
 
 export const stateLabel: Record<string, string> = {
@@ -55,16 +45,18 @@ export const stateLabel: Record<string, string> = {
 };
 
 export const reports: Array<{id: ReportId; title: string; description: string; icon: typeof FileText}> = [
-  {id: 'composition', title: 'Σύνθεση Σετ', description: 'Αναλυτική σύνθεση συγκεκριμένου Σετ.', icon: Boxes},
-  {id: 'department', title: 'Ανά τμήμα', description: 'Σετ και εργαλεία οργανωμένα ανά τμήμα.', icon: UsersRound},
-  {id: 'specialty', title: 'Ανά ειδικότητα', description: 'Κατανομή εξοπλισμού ανά ειδικότητα.', icon: Stethoscope},
-  {id: 'issues', title: 'Service & βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
-  {id: 'usage', title: 'Όρια χρήσεων', description: 'Υπόλοιπο χρήσεων και κρίσιμα όρια.', icon: Activity},
   {
-    id: 'retired',
-    title: 'Εργαλεία εκτός χρήσης',
-    description: 'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. συμπλήρωση ορίου χρήσεων).',
-    icon: Archive,
+    id: 'inventory',
+    title: 'Απογραφή εξοπλισμού',
+    description: 'Σετ και εργαλεία ανά τμήμα ή ανά ειδικότητα.',
+    icon: Boxes,
+  },
+  {id: 'issues', title: 'Service & βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
+  {
+    id: 'usage',
+    title: 'Χρήσεις & αποσύρσεις',
+    description: 'Υπόλοιπο χρήσεων, κρίσιμα όρια και εργαλεία που τέθηκαν εκτός χρήσης.',
+    icon: Activity,
   },
   {
     id: 'loads',

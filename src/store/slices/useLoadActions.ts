@@ -12,6 +12,7 @@ import type {
   RecallCase,
 } from '../../types/domain';
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
+import {demoSigned} from '../../data/cloud/handover';
 import type {
   CreateProcessLoadPayload,
   DeliveryPayload,
@@ -547,6 +548,8 @@ export function useLoadActions(
       deliveredByName: deliverer.name,
       deliveredByDepartment: deliverer.department,
       handoverSignatureId: payload.handoverSignatureId,
+      // The Demo's sample people sign in the app (no server signature): their signature counts as confirmed.
+      counterpartyVerified: demoSigned(payload.receivedByUserId, payload.handoverSignatureId),
       receivedByUserId: payload.receivedByUserId,
       receivedByName: payload.receivedByName,
       receivedByDepartment: payload.receivedByDepartment,

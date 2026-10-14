@@ -190,8 +190,36 @@
   border-color: var(--c-cyan-65);
   box-shadow: 0 0 0 3px rgba(27, 119, 140, 0.07);
 }
-.reports-filter-wide {
+/* Equipment inventory: grouped by department or by specialty. */
+.reports-group-toggle {
   grid-column: span 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.reports-group-toggle > span {
+  margin-right: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--st-muted);
+}
+.reports-group-toggle button {
+  height: 36px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 9px;
+  background: var(--c-white);
+  padding: 0 12px;
+  color: var(--c-cyan-30);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.reports-group-toggle button.active {
+  border-color: var(--c-cyan-65);
+  background: var(--c-cyan-95);
 }
 .reports-result-card {
   flex: 1;
@@ -314,7 +342,7 @@
   .reports-filter-strip {
     grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
-  .reports-filter-wide {
+  .reports-group-toggle {
     grid-column: span 2;
   }
   .reports-stage-head {
@@ -390,9 +418,6 @@
   }
   .reports-filter-strip {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .reports-filter-wide {
-    grid-column: auto;
   }
   .reports-catalog-item {
     min-width: 150px;

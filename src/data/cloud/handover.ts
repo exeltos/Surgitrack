@@ -44,6 +44,18 @@ export const DEMO_HANDOVER_STERILIZATION: HandoverSigner = {
 
 export const isDemoHandover = () => getRuntimeDataMode() === 'DEMO' || !getRealIdentity();
 
+/**
+ * A handover signed by one of the Demo's sample people: confirmed (true), as the app checked their code.
+ * Undefined otherwise, for the database to stamp from the server signature (handover_counterparty_stamp).
+ */
+export const demoSigned = (otherPartyId?: string, signatureId?: string) =>
+  isDemoHandover() &&
+  !signatureId &&
+  !!otherPartyId &&
+  [...DEMO_HANDOVER_PEOPLE, DEMO_HANDOVER_STERILIZATION].some(p => p.userId === otherPartyId)
+    ? true
+    : undefined;
+
 export type HandoverVerifyResult =
   {ok: true; signer: HandoverSigner} | {ok: false; reason: 'invalid' | 'locked' | 'same_user' | 'unavailable'};
 

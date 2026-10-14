@@ -7,6 +7,7 @@ import type {
   SterilizationReleaseRecord,
 } from '../../types/domain';
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
+import {demoSigned} from '../../data/cloud/handover';
 import type {
   PreparationPayload,
   ReceivePayload,
@@ -165,6 +166,8 @@ export function useReceiptAndCycleActions(
       fromDepartment: a.department || 'Τμήμα',
       toDepartment: 'Κεντρική Αποστείρωση',
       handoverSignatureId: payload.handoverSignatureId,
+      // The Demo's sample people sign in the app (no server signature): their signature counts as confirmed.
+      counterpartyVerified: demoSigned(payload.deliveredByUserId, payload.handoverSignatureId),
       deliveredByUserId: payload.deliveredByUserId,
       deliveredByName: payload.deliveredByName,
       deliveredByDepartment: payload.deliveredByDepartment,

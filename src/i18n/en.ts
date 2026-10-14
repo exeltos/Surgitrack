@@ -254,7 +254,6 @@ export const en: Record<string, string> = {
   Έως: 'To',
   Όλα: 'All',
   'Όλα τα τμήματα': 'All departments',
-  'Όλα τα όρια': 'All limits',
   Όλες: 'All',
   'Όλες οι αναμενόμενες θέσεις της σύνθεσης είναι καλυμμένες.':
     'All expected positions of the composition are covered.',
@@ -270,7 +269,6 @@ export const en: Record<string, string> = {
   'Όνομα Σετ': 'Set name',
   'Όνομα Σετ, κωδικός ή barcode...': 'Set name, code or barcode...',
   'Όνομα εργαλείου': 'Instrument name',
-  'Όρια χρήσεων': 'Usage limits',
   Όριο: 'Limit',
   'Όριο χρήσεων': 'Usage limit',
   'ΑΝΑΛΥΣΗ ΔΕΔΟΜΕΝΩΝ': 'DATA ANALYSIS',
@@ -286,6 +284,12 @@ export const en: Record<string, string> = {
   'Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.':
     'Unalterable history of handovers, receipts, checks and transfers.',
   'Ανά ειδικότητα': 'By specialty',
+  'Απογραφή εξοπλισμού': 'Equipment inventory',
+  'Σετ και εργαλεία ανά τμήμα ή ανά ειδικότητα.': 'Sets and instruments by department or by specialty.',
+  'Χρήσεις & αποσύρσεις': 'Uses & retirements',
+  'Υπόλοιπο χρήσεων, κρίσιμα όρια και εργαλεία που τέθηκαν εκτός χρήσης.':
+    'Remaining uses, critical limits and instruments taken out of service.',
+  'Σε χρήση & εκτός χρήσης': 'In use & out of use',
   'Ανά τμήμα': 'By department',
   Ανάκληση: 'Recall',
   'Ανάκληση / Επανεπεξεργασία': 'Recall / Reprocessing',
@@ -295,7 +299,6 @@ export const en: Record<string, string> = {
   'Αναζήτηση από barcode Σετ/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.':
     'Search by set/instrument barcode or patient code — without patient names.',
   'Αναζητήστε Σετ, εργαλείο ή ασθενή': 'Search for a set, instrument or patient',
-  'Αναλυτική σύνθεση συγκεκριμένου Σετ.': 'Detailed composition of a specific set.',
   'Αναμένει αποδέσμευση': 'Awaiting release',
   'Αναμένει φυσική παράδοση': 'Awaiting physical handover',
   Αναμενόμενα: 'Expected',
@@ -640,7 +643,6 @@ export const en: Record<string, string> = {
   'Καταμέτρηση κατά την παραλαβή': 'Count at receipt',
   'Καταμέτρηση χειρουργείου': 'Surgical count',
   'Καταμέτρηση χειρουργείου υπογεγραμμένη': 'Surgical count signed',
-  'Κατανομή εξοπλισμού ανά ειδικότητα.': 'Equipment by specialty.',
   Κατασκευαστής: 'Manufacturer',
   'Καταχώρησε επανεπεξεργασία και ακολούθησε τη διαδικασία διερεύνησης της μονάδας.':
     "Record reprocessing and follow the unit's investigation procedure.",
@@ -760,7 +762,6 @@ export const en: Record<string, string> = {
   'Η εγγραφή είναι μόνο για ανάγνωση: οι κινήσεις δεν αλλάζουν ούτε σβήνονται.':
     'This record is read-only: movements are never changed or deleted.',
   'Λογαριασμός που την καταχώρησε': 'Account that recorded it',
-  '{0} · χωρίς όριο': '{0} · no limit',
   'Χημ.': 'Chem.',
   'Βιολ.': 'Biol.',
   'Βρέθηκαν {0} — διαλέξτε ένα:': '{0} found — choose one:',
@@ -1115,7 +1116,6 @@ export const en: Record<string, string> = {
   'Σετ εργαλείων': 'Instrument set',
   'Σετ και εργαλεία ανά ειδικότητα': 'Sets and instruments by specialty',
   'Σετ και εργαλεία ανά τμήμα': 'Sets and instruments by department',
-  'Σετ και εργαλεία οργανωμένα ανά τμήμα.': 'Sets and instruments organised by department.',
   'Σετ με έλλειψη': 'Sets with shortage',
   'Σύνολο Σετ': 'Total Sets',
   'Σετ σε χρήση': 'Set in use',
@@ -1217,7 +1217,6 @@ export const en: Record<string, string> = {
   'Υπογεγραμμένη καταμέτρηση Σετ': 'Signed set count',
   'Υποχρεωτική αιτιολόγηση…': 'Mandatory reason…',
   Υπόλοιπο: 'Remaining',
-  'Υπόλοιπο χρήσεων και κρίσιμα όρια.': 'Remaining uses and critical limits.',
   'Υπόλοιπο χρήσεων': 'Uses left',
   'ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ': 'STERILIZATION LOAD',
   'ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ': 'WASHER LOAD',
@@ -1460,9 +1459,6 @@ export const en: Record<string, string> = {
   'Σε ποιον ανήκει': 'Owned by',
   'Συμπλήρωση ορίου χρήσεων': 'Usage limit reached',
   'Εκτός χρήσης': 'Out of use',
-  'Εργαλεία εκτός χρήσης': 'Out-of-use instruments',
-  'Ιστορικό εργαλείων που τέθηκαν εκτός χρήσης (π.χ. συμπλήρωση ορίου χρήσεων).':
-    'History of instruments taken out of use (e.g. usage limit reached).',
   'Εκτός χρήσης από': 'Out of use since',
   'Καταγραφή χρήσης': 'Use recorded',
   'Τελευταία χρήση · θα τεθεί εκτός χρήσης': 'Last use · will be taken out of use',
