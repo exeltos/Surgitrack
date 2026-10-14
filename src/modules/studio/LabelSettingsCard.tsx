@@ -33,12 +33,14 @@ export default function LabelSettingsCard({L}: {L: (el: string, en: string) => s
   const paper = labelPaper(label);
   const mm = `${paper.w}×${paper.h} mm`;
   const [headerEl, headerEn] = HEADER_LABEL[label.header] || HEADER_LABEL.BRAND;
-  const sample = sets[0] || {
-    barcode: 'S000001',
-    name: L('ΔΕΙΓΜΑ ΣΕΤ', 'SAMPLE SET'),
-    department: L('Χειρουργείο', 'Operating theatre'),
-  };
-  const sampleTools = sets[0] ? tools.filter(t => t.setId === sets[0].id).length : 12;
+  // A Set with its sterilization and expiry dates when there is one, so the preview shows them as they print.
+  const sample = sets.find(set => set.sterileUntil) ||
+    sets[0] || {
+      barcode: 'S000001',
+      name: L('ΔΕΙΓΜΑ ΣΕΤ', 'SAMPLE SET'),
+      department: L('Χειρουργείο', 'Operating theatre'),
+    };
+  const sampleTools = 'id' in sample ? tools.filter(t => t.setId === sample.id).length : 12;
   return (
     <section className="label-settings-card">
       <header>
@@ -75,7 +77,13 @@ export default function LabelSettingsCard({L}: {L: (el: string, en: string) => s
       {/* Outside the Settings grid, whose form styles would otherwise reach the dialog. */}
       {open &&
         createPortal(
-          <BarcodeLabelPreview asset={sample} kind="SET" toolCount={sampleTools} onClose={() => setOpen(false)} />,
+          <BarcodeLabelPreview
+            asset={sample}
+            kind="SET"
+            toolCount={sampleTools}
+            saveOnClose
+            onClose={() => setOpen(false)}
+          />,
           document.body,
         )}
     </section>

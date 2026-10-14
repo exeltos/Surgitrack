@@ -797,6 +797,11 @@ demoSterile('LAP-GEN', 8, 2);
 demoSterile('GYN-LAP', -3, 3);
 demoSterile('DELIVERY-01', 24, 6);
 demoSterile('CSECTION-01', 168, 6);
+// Everything else that is sterile (in its department, or ready for pickup) also carries its sterilization and expiry
+// dates, so its label and the expiry lists show them as for a real released Set.
+sets
+  .filter(set => !set.sterileUntil && (set.state === 'IN_DEPARTMENT' || set.state === 'READY_FOR_PICKUP'))
+  .forEach((set, index) => demoSterile(set.code, 40 + ((index * 37) % 140), 6));
 const label = (set: SetAsset) => `${set.barcode} · ${set.name}`;
 const people = {
   ster: 'Demo Χρήστης Αποστείρωσης',

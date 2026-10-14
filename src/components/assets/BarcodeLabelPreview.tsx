@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {ImagePlus, Trash2} from 'lucide-react';
+import {Check, ImagePlus, Save, Trash2} from 'lucide-react';
 import PrintPreviewModal from './PrintPreviewModal';
 import AppButton from '../ui/AppButton';
 import {barcodeLabelHtml, labelPaper} from '../../modules/sterilization/printUtils';
@@ -52,11 +52,14 @@ export default function BarcodeLabelPreview({
   kind,
   toolCount,
   onClose,
+  saveOnClose,
 }: {
   asset: LabelAsset;
   kind: AssetKind;
   toolCount?: number;
   onClose: () => void;
+  /** Opened from the hospital's settings: closing keeps the changes as the hospital's default. */
+  saveOnClose?: boolean;
 }) {
   const libs = useLibraries();
   const {can, currentUser} = useSurgi();
@@ -68,6 +71,12 @@ export default function BarcodeLabelPreview({
   const changed = JSON.stringify(settings) !== JSON.stringify(saved);
   const set = (patch: Partial<LabelSettings>) => setSettings(current => ({...current, ...patch}));
   const paper = labelPaper(settings);
+  const saveDefault = () =>
+    libs.updateSystemSettings({label: settings}, currentUser.name, 'Προεπιλογές ετικέτας barcode');
+  const close = () => {
+    if (saveOnClose && canSaveDefault && changed) saveDefault();
+    onClose();
+  };
 
   const aside = (
     <>
@@ -226,14 +235,7 @@ export default function BarcodeLabelPreview({
         />
         <b>{Math.round(zoom * 100)}%</b>
       </label>
-      {canSaveDefault ? (
-        <AppButton
-          disabled={!changed}
-          onClick={() => libs.updateSystemSettings({label: settings}, currentUser.name, 'Προεπιλογές ετικέτας barcode')}
-        >
-          {changed ? tr('Ορισμός ως προεπιλογή νοσοκομείου') : tr('Είναι η προεπιλογή νοσοκομείου')}
-        </AppButton>
-      ) : (
+      {!canSaveDefault && (
         <p className="label-default-note">
           {tr(
             'Οι προεπιλογές της ετικέτας ορίζονται από τον διαχειριστή. Οι αλλαγές εδώ ισχύουν για αυτή την εκτύπωση.',
@@ -249,7 +251,19 @@ export default function BarcodeLabelPreview({
       title={`Barcode ${asset.barcode}`}
       html={barcodeLabelHtml(asset, kind, toolCount, settings, zoom)}
       aside={aside}
-      onClose={onClose}
+      onClose={close}
+      actions={
+        canSaveDefault &&
+        (changed ? (
+          <AppButton icon={<Save size={15} />} onClick={saveDefault}>
+            {tr('Ορισμός ως προεπιλογή νοσοκομείου')}
+          </AppButton>
+        ) : (
+          <span className="label-default-saved">
+            <Check size={15} /> {tr('Είναι η προεπιλογή νοσοκομείου')}
+          </span>
+        ))
+      }
     />
   );
 }

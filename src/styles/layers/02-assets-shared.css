@@ -617,6 +617,21 @@
   align-items: center;
   gap: 7px;
 }
+/* Left of the footer: e.g. keeping the label options as the hospital's default. */
+.print-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+.label-default-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-green-30);
+  font-size: 12.5px;
+  font-weight: 700;
+}
 .table-panel tbody tr {
   cursor: pointer;
 }
