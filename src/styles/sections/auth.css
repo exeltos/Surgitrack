@@ -79,3 +79,218 @@
     padding: 40px max(32px, calc((100% - 1076px) / 2));
   }
 }
+
+/* Sign-in: the brand panel on the left, the form on the right; on a phone the panel is the header. */
+html body .auth-split {
+  flex-direction: row;
+}
+html body .auth-hero {
+  position: relative;
+  display: flex;
+  flex: 0 0 52%;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 52px 64px;
+  background: radial-gradient(1200px 600px at -10% -10%, #2a8fa3 0%, #14536a 45%, #0c2e3d 100%);
+  color: #fff;
+}
+html body .auth-hero::before,
+html body .auth-hero::after {
+  content: '';
+  position: absolute;
+  border: 2px solid rgb(155 227 239 / 14%);
+  pointer-events: none;
+}
+html body .auth-hero::before {
+  right: 40px;
+  bottom: 60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 60px;
+  transform: rotate(-8deg);
+}
+html body .auth-hero::after {
+  right: -120px;
+  bottom: -120px;
+  width: 420px;
+  height: 420px;
+  border-radius: 90px;
+  transform: rotate(12deg);
+}
+html body .auth-hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+html body .auth-hero-mark {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 25%);
+}
+html body .auth-hero-brand strong {
+  display: block;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+html body .auth-hero-brand span {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.75;
+}
+html body .auth-hero h1 {
+  max-width: 540px;
+  margin: auto 0 14px;
+  font-size: 44px;
+  line-height: 1.08;
+  letter-spacing: -1.2px;
+}
+html body .auth-hero h1 em {
+  color: #9be3ef;
+  font-style: normal;
+}
+html body .auth-hero-lead {
+  max-width: 480px;
+  margin: 0 0 26px;
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+html body .auth-hero-points {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 auto;
+  padding: 0;
+  list-style: none;
+}
+html body .auth-hero-points li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+html body .auth-hero-points li > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 12%);
+}
+html body .auth-hero-chips {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+html body .auth-hero-chips span {
+  padding: 7px 12px;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 10%);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+html body .auth-side {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+html body .auth-split .auth-topbar {
+  justify-content: flex-end;
+  border-bottom: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+html body .auth-split .auth-mini-brand {
+  display: none;
+}
+html body .auth-split .auth-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: center;
+  grid-template-columns: minmax(0, 480px);
+  justify-content: center;
+  gap: 0;
+  max-width: none;
+  margin: 0;
+  padding: 24px 48px;
+}
+html body .auth-split .auth-footer {
+  border-top: 0;
+}
+html body .auth-brand-mark,
+html body .auth-logo {
+  background: transparent;
+}
+@media (max-width: 1100px) {
+  html body .auth-hero {
+    flex-basis: 46%;
+    padding: 44px 40px;
+  }
+  html body .auth-hero h1 {
+    font-size: 36px;
+  }
+}
+@media (max-width: 850px) {
+  html body .auth-split {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  html body .auth-hero {
+    flex: none;
+    padding: calc(22px + env(safe-area-inset-top)) 22px 64px;
+  }
+  html body .auth-hero::before,
+  html body .auth-hero-lead,
+  html body .auth-hero-points,
+  html body .auth-hero-chips {
+    display: none;
+  }
+  html body .auth-hero h1 {
+    margin: 26px 0 0;
+    font-size: 28px;
+    line-height: 1.12;
+    letter-spacing: -0.6px;
+  }
+  html body .auth-hero-mark {
+    width: 44px;
+    height: 44px;
+  }
+  html body .auth-side {
+    flex: none;
+  }
+  html body .auth-split .auth-topbar {
+    position: absolute;
+    top: env(safe-area-inset-top);
+    right: 0;
+    z-index: 2;
+    height: 64px;
+    padding: 0 16px;
+  }
+  html body .auth-split .auth-lang {
+    border-color: rgb(255 255 255 / 30%);
+    background: rgb(255 255 255 / 12%);
+    color: #fff;
+  }
+  html body .auth-split .auth-main {
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+    margin-top: -40px;
+    padding: 0 14px 20px;
+  }
+  html body .auth-split .auth-card {
+    border-radius: 22px;
+    box-shadow: 0 12px 30px rgb(16 37 47 / 12%);
+  }
+}

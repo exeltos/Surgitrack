@@ -17,6 +17,7 @@ import {
   Undo2,
   WifiOff,
 } from 'lucide-react';
+import BrandMark from './BrandMark';
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
@@ -281,7 +282,7 @@ export default function AppShell({
   const sidebar = (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="brand">
-        <div className="brand-mark">S</div>
+        <BrandMark className="brand-mark" />
         <div>
           <strong>SurgiTrack</strong>
           <span>Trace Every Instrument</span>
