@@ -69,12 +69,19 @@ export default function BarcodeLabelPreview({
   const [logoError, setLogoError] = useState('');
   const canSaveDefault = can('studio.manage');
   const changed = JSON.stringify(settings) !== JSON.stringify(saved);
-  const set = (patch: Partial<LabelSettings>) => setSettings(current => ({...current, ...patch}));
+  // Edited here (not just different from the default, which another device may change meanwhile).
+  const [edited, setEdited] = useState(false);
+  const set = (patch: Partial<LabelSettings>) => {
+    setEdited(true);
+    setSettings(current => ({...current, ...patch}));
+  };
   const paper = labelPaper(settings);
-  const saveDefault = () =>
+  const saveDefault = () => {
     libs.updateSystemSettings({label: settings}, currentUser.name, 'Προεπιλογές ετικέτας barcode');
+    setEdited(false);
+  };
   const close = () => {
-    if (saveOnClose && canSaveDefault && changed) saveDefault();
+    if (saveOnClose && canSaveDefault && edited && changed) saveDefault();
     onClose();
   };
 

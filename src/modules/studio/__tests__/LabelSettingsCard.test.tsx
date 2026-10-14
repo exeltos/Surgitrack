@@ -19,4 +19,16 @@ describe('Barcode label settings', () => {
     const summary = document.querySelector('.label-settings-summary') as HTMLElement;
     expect(within(summary).getByText(/Τριπλή/)).toBeTruthy();
   });
+
+  it('saves nothing on closing when nothing was changed here', () => {
+    renderPage(<LabelSettingsCard L={L} />, {
+      signedIn: {id: 'u-admin', name: 'Διαχειριστής', role: 'ADMIN', department: ''},
+    });
+    const summary = document.querySelector('.label-settings-summary') as HTMLElement;
+    const before = summary.textContent;
+    fireEvent.click(screen.getByRole('button', {name: /Ρύθμιση & προεπισκόπηση/}));
+    expect(screen.getByText('Είναι η προεπιλογή νοσοκομείου')).toBeTruthy();
+    fireEvent.click(screen.getAllByRole('button', {name: 'Κλείσιμο'}).at(-1)!);
+    expect(summary.textContent).toBe(before);
+  });
 });
