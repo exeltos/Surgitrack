@@ -2,7 +2,9 @@ name: Android app
 
 # Builds the phone app (scan.html) as an Android APK and app bundle with Bubblewrap (a Trusted Web Activity:
 # the installed app opens www.surgitrack.eu/scan.html full screen and updates with the site).
-# Run it from Actions → Android app → Run workflow; the files are under the run's Artifacts.
+# Run it from Actions → Android app → Run workflow; the files are under the run's Artifacts, and a run signed with
+# the release key also publishes the APK as a GitHub Release (the latest one is always at
+# https://github.com/exeltos/Surgitrack/releases/latest/download/SurgiTrack.apk).
 # Signed with the key in the ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD secrets. Without them (or on a
 # push that changes this build) it signs with a throwaway key: fine to check the build, not to hand out.
 on:
@@ -23,6 +25,9 @@ jobs:
   apk:
     name: Build APK
     runs-on: ubuntu-latest
+    # The Release step publishes the signed APK.
+    permissions:
+      contents: write
     timeout-minutes: 30
     defaults:
       run:
@@ -69,6 +74,7 @@ jobs:
              | .webManifestUrl = "http://localhost:8765/scan.webmanifest"' \
             twa-manifest.json > twa.tmp && mv twa.tmp twa-manifest.json
           echo "Version $name (${{ github.run_number }})"
+          echo "VERSION_NAME=$name" >> "$GITHUB_ENV"
 
       - name: Signing key
         env:
@@ -103,3 +109,16 @@ jobs:
           name: surgitrack-scan-${{ env.SIGNED }}-${{ github.run_number }}
           path: apk/
           retention-days: 30
+
+      # Only an APK signed with the release key is published: a permanent download, newest first.
+      - name: Release
+        if: env.SIGNED == 'release'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp apk/surgitrack-scan-release.apk apk/SurgiTrack.apk
+          gh release create "android-v${VERSION_NAME}" apk/SurgiTrack.apk \
+            --target "$GITHUB_SHA" --latest \
+            --title "SurgiTrack Android ${VERSION_NAME}" \
+            --notes "Η εφαρμογή σάρωσης SurgiTrack για Android (έκδοση ${VERSION_NAME}). Κατεβάστε το SurgiTrack.apk στο κινητό και εγκαταστήστε το. Το περιεχόμενο ενημερώνεται μόνο του από το www.surgitrack.eu· νέο APK χρειάζεται μόνο για αλλαγή εικονιδίου ή ονόματος."
