@@ -36,6 +36,6 @@ here and to that test's list. State checked against the live project on 09/10/20
 `accept_surgitrack_invitation`, `asset_manufacturers_to_library`, `assign_user_code`, `caller_department_name_internal`,
 `demo_cron_secret_ok`, `department_guard_instrument`, `department_guard_set`,
 `demo_user_limit`, `generate_user_code`, `handle_new_user`, `handover_counterparty_stamp`, `hospital_settings_keep_manufacturers`,
-`hospital_settings_to_audit`, `merge_used_manufacturers`, `purge_recycle_bin`, `record_deletion`,
+`hospital_settings_to_audit`, `merge_used_manufacturers`, `purge_recycle_bin`, `record_deletion`, `forget_deletion`,
 `rename_department_references`, `reserve_login_attempt`, `staff_request_email_confirmed`,
 `supervisor_guard_insert`, `supervisor_guard_instrument`, `supervisor_guard_set`.
