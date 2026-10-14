@@ -1034,8 +1034,11 @@
 .department-send-modal > header {
   flex: 0 0 auto;
 }
+/* The form scrolls between the fixed header and buttons, so its last field (the note) is always reachable. */
 .department-send-modal > .modal-body {
-  overflow: hidden;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   flex: 1;
 }
 .department-send-modal > footer {
