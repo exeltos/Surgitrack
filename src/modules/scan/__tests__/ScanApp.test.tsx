@@ -161,7 +161,7 @@ describe('ScanApp for a department', () => {
     const count = within(screen.getByRole('region', {name: 'Καταμέτρηση εργαλείων'}));
     for (const box of count.getAllByRole('checkbox')) fireEvent.click(box);
     const lives = screen.queryByRole('region', {name: 'Καταγραφή χρήσης'});
-    if (lives) fireEvent.click(within(lives).getByRole('checkbox'));
+    if (lives) fireEvent.click(within(lives).getByRole('checkbox', {name: /Επιβεβαιώνω ότι χρησιμοποιήθηκε/}));
     expect(send).toBeEnabled();
     fireEvent.click(send);
     return screen.findByRole('heading', {name: 'Εστάλη στην Αποστείρωση'});
@@ -246,5 +246,19 @@ describe('ScanApp Demo waiting list, long', () => {
     expect(waiting.getAllByRole('listitem')).toHaveLength(12);
     fireEvent.click(waiting.getByRole('button', {name: /Όλα \(/}));
     expect(waiting.getAllByRole('listitem').length).toBeGreaterThan(12);
+  });
+});
+
+describe('ScanApp sending, an instrument not used', () => {
+  it('sends without counting a use for an unticked limited-use instrument', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {
+      path: '/scan/send',
+      signedIn: {id: 'u-or', name: 'Νοσηλεύτρια Χειρουργείου', role: 'DEPARTMENT', department: 'Χειρουργείο'},
+    });
+    typeBarcode('S000321');
+    const lives = within(screen.getByRole('region', {name: 'Καταγραφή χρήσης'}));
+    const ticks = lives.getAllByRole('checkbox', {name: /Χρησιμοποιήθηκε:/});
+    for (const tick of ticks) fireEvent.click(tick);
+    expect(lives.getAllByText('χωρίς χρήση').length).toBe(ticks.length);
   });
 });

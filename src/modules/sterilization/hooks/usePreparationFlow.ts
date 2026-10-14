@@ -18,6 +18,7 @@ export function usePreparationFlow(
     applyColorPlan,
     colorQuestion,
     issues,
+    prepKeptIssueIds,
     moveTool,
     prepCheckedIds,
     prepDraft,
@@ -87,7 +88,11 @@ export function usePreparationFlow(
     });
   const prepEligibleIds = prepDraft
     ? prepDraft.kind === 'SET'
-      ? prepTools.filter(t => !issues.some(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode))).map(t => t.id)
+      ? prepTools
+          .filter(
+            t => !issues.some(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode) && !prepKeptIssueIds.has(i.id)),
+          )
+          .map(t => t.id)
       : prepOpenIssues.length
         ? []
         : [prepDraft.asset.id]

@@ -38,10 +38,39 @@ describe('instrument lives', () => {
     expect(result.current.retiredTools.find(t => t.id === tool.id)!.retiredNoticeSeenAt).toBeTruthy();
   });
 
+  it('sends an instrument marked not used without taking a life, and without asking for a patient code', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const tool = result.current.tools.find(
+      t => t.maxUses && t.mode !== 'SET_MEMBER' && t.uses < t.maxUses && t.state === 'IN_DEPARTMENT',
+    )!;
+    expect(tool).toBeTruthy();
+    let sent = false;
+    act(() => {
+      sent = result.current.sendToSterilization('TOOL', tool.id, undefined, undefined, [tool.id]);
+    });
+    expect(sent).toBe(true);
+    const after = result.current.tools.find(t => t.id === tool.id)!;
+    expect(after.uses).toBe(tool.uses);
+    expect(after.state).toBe('PENDING_STERILIZATION');
+  });
+
   it('keeps lives read-only for users without the usage permission', () => {
     const {result} = renderHook(() => useSurgi(), {wrapper});
     const tool = result.current.tools.find(t => t.maxUses)!;
     act(() => result.current.updateTool(tool.id, {maxUses: 999}));
     expect(result.current.tools.find(t => t.id === tool.id)!.maxUses).toBe(tool.maxUses);
+  });
+
+  it('lets a usage-limit manager correct the uses by one, recorded, and nobody else', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const tool = result.current.tools.find(t => t.maxUses && t.uses > 0 && t.state !== 'RETIRED')!;
+    act(() => result.current.correctUses('TOOL', tool.id, -1));
+    expect(result.current.tools.find(t => t.id === tool.id)!.uses).toBe(tool.uses);
+
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+    const admin = renderHook(() => useSurgi(), {wrapper}).result;
+    act(() => admin.current.correctUses('TOOL', tool.id, -1));
+    expect(admin.current.tools.find(t => t.id === tool.id)!.uses).toBe(tool.uses - 1);
+    expect(admin.current.movements[0].status).toContain(`Διόρθωση χρήσεων · ${tool.uses} → ${tool.uses - 1}`);
   });
 });

@@ -450,3 +450,26 @@ html body .photo-viewer .icon-button {
     clip: rect(0 0 0 0);
   }
 }
+
+/* Usage card: −/+ to correct the recorded uses (usage-limit managers only). */
+html body .usage-correct {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+html body .usage-correct button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: var(--c-white);
+  color: var(--c-cyan-30);
+  cursor: pointer;
+}
+html body .usage-correct button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

@@ -29,6 +29,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
   const {
     prepSetIssues,
     prepKeptIssueIds,
+    setPrepCheckedIds,
     setPrepKeptIssueIds,
     setPrepManageIssueId,
     setAcceptedMissingCodes,
@@ -476,21 +477,25 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                       )}
                       {prepTools.map(t => {
                         const toolIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(t.barcode));
+                        // Open reports not chosen to «continue without handling»: the instrument needs handling first.
+                        const pending = toolIssues.filter(i => !prepKeptIssueIds.has(i.id));
+                        const kept = toolIssues.length > 0 && pending.length === 0;
                         const checked = prepCheckedIds.has(t.id);
                         return (
                           <div
-                            className={`prep-tool-row ${checked ? 'checked' : ''} ${toolIssues.length ? 'has-issue' : ''}`}
+                            className={`prep-tool-row ${checked ? 'checked' : ''} ${pending.length ? 'has-issue' : ''} ${kept ? 'accepted' : ''}`}
                             key={t.id}
                           >
-                            <label className="prep-tool-check" onClick={e => e.stopPropagation()}>
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                disabled={toolIssues.length > 0}
-                                onChange={() => togglePrepItem(t.id)}
-                              />
-                              <span>{checked ? <Check size={14} /> : null}</span>
-                            </label>
+                            {pending.length ? (
+                              <div className="prep-missing-placeholder">
+                                <TriangleAlert size={15} />
+                              </div>
+                            ) : (
+                              <label className="prep-tool-check" onClick={e => e.stopPropagation()}>
+                                <input type="checkbox" checked={checked} onChange={() => togglePrepItem(t.id)} />
+                                <span>{checked ? <Check size={14} /> : null}</span>
+                              </label>
+                            )}
                             <div className="prep-tool-main">
                               <span className="mono">{t.barcode}</span>
                               <strong>{t.name}</strong>
@@ -500,7 +505,9 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                               </small>
                             </div>
                             <div className="prep-tool-state">
-                              {toolIssues.length ? (
+                              {kept ? (
+                                <span className="prep-missing-accepted">{tr('Παραμονή ως έχει')}</span>
+                              ) : toolIssues.length ? (
                                 <span className="prep-open-issue-state">
                                   <span className="prep-issue-chip">
                                     <TriangleAlert size={12} />
@@ -512,22 +519,43 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                                 <span className="prep-ok-chip">{tr('Έτοιμο για έλεγχο')}</span>
                               )}
                             </div>
-                            <button
-                              className={`tool-manage-btn prep-attention-action ${toolIssues.length ? 'warning' : 'subtle'}`}
-                              type="button"
-                              onClick={() => openPrepManage(t.id)}
-                            >
-                              {toolIssues.length ? (
-                                <>
-                                  <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
-                                </>
-                              ) : (
-                                <>
-                                  {tr('Λεπτομέρειες') + ' '}
-                                  <ArrowRight size={14} />
-                                </>
-                              )}
-                            </button>
+                            {kept ? (
+                              <button
+                                className="tool-manage-btn subtle"
+                                type="button"
+                                onClick={() => {
+                                  setPrepKeptIssueIds(current => {
+                                    const next = new Set(current);
+                                    toolIssues.forEach(i => next.delete(i.id));
+                                    return next;
+                                  });
+                                  setPrepCheckedIds(current => {
+                                    const next = new Set(current);
+                                    next.delete(t.id);
+                                    return next;
+                                  });
+                                }}
+                              >
+                                {tr('Αναίρεση')}
+                              </button>
+                            ) : (
+                              <button
+                                className={`tool-manage-btn prep-attention-action ${pending.length ? 'warning' : 'subtle'}`}
+                                type="button"
+                                onClick={() => openPrepManage(t.id)}
+                              >
+                                {pending.length ? (
+                                  <>
+                                    <TriangleAlert size={14} /> {tr('Αντιμετώπιση')}
+                                  </>
+                                ) : (
+                                  <>
+                                    {tr('Λεπτομέρειες') + ' '}
+                                    <ArrowRight size={14} />
+                                  </>
+                                )}
+                              </button>
+                            )}
                           </div>
                         );
                       })}

@@ -293,7 +293,14 @@ export type SurgiStoreValue = {
   /** Demo only: work as another identity (role and department). */
   switchIdentity: (user: SessionUser) => void;
   /** Sends to Sterilization; false when it was refused (the reason is shown as a toast). */
-  sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => boolean;
+  sendToSterilization: (
+    kind: AssetKind,
+    id: string,
+    patientCode?: string,
+    note?: string,
+    /** Limited-use instruments not used this time: sent without losing a use. */
+    unusedToolIds?: string[],
+  ) => boolean;
   /** Whether the item may circulate (not used up, not recalled); when not, the reason is shown as a toast. */
   circulationAllowed: (kind: AssetKind, id: string) => boolean;
   receiveAtSterilization: (kind: AssetKind, id: string, payload: ReceivePayload) => ReceiptRecord | undefined;
@@ -323,6 +330,8 @@ export type SurgiStoreValue = {
     payload: WorkflowCheckpointPayload,
   ) => WorkflowCheckpointRecord | undefined;
   completeDeliveryToDepartment: (kind: AssetKind, id: string, payload: DeliveryPayload) => DeliveryRecord | undefined;
+  /** Corrects recorded uses by one (usage-limit managers only). */
+  correctUses: (kind: AssetKind, id: string, delta: 1 | -1) => void;
   configureUsageLimit: (kind: AssetKind, id: string, maxUses?: number) => void;
   /** Platform owner: drops history entries already deleted on the server and records the clean-up. */
   forgetMovements: (ids: readonly string[]) => void;

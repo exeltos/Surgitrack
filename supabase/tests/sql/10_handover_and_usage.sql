@@ -14,9 +14,10 @@ select tests.eq((select uses from public.instrument_sets where id = 'set-a1'), 4
 select tests.rows($q$update public.instruments set uses = 0, sterilizations = 1 where id = 'tool-a1'$q$);
 select tests.eq((select uses from public.instruments where id = 'tool-a1'), 2, 'an instrument''s uses do not go down');
 select tests.eq((select sterilizations from public.instruments where id = 'tool-a1'), 5, 'nor its sterilizations');
+-- Who may set the usage limit corrects the count (15_usage_correction.sql); a Sterilization user cannot.
 select tests.login('admin_a');
-select tests.rows($q$update public.instruments set uses = 0 where id = 'tool-a1'$q$);
-select tests.eq((select uses from public.instruments where id = 'tool-a1'), 2, 'not even for a hospital admin');
+select tests.rows($q$update public.instruments set uses = 1 where id = 'tool-a1'$q$);
+select tests.eq((select uses from public.instruments where id = 'tool-a1'), 1, 'a hospital admin corrects them');
 reset role;
 update public.instruments set uses = 0 where id = 'tool-a1';
 select tests.eq((select uses from public.instruments where id = 'tool-a1'), 0, 'a restore or the service role still sets them');

@@ -49,10 +49,20 @@ export function useReceiptAndCycleActions(
     chooseShelfLife,
   } = p;
 
-  const sendToSterilization = (kind: AssetKind, id: string, patientCode?: string, note?: string) => {
+  const sendToSterilization = (
+    kind: AssetKind,
+    id: string,
+    patientCode?: string,
+    note?: string,
+    unusedToolIds: string[] = [],
+  ) => {
     const a = assetName(kind, id);
     if (!a || !assertCirculationAllowed(kind, id)) return false;
-    const limited = livesConsumedBy(kind, id);
+    // Limited-use instruments the department marked as not used (the Set was opened, the instrument was not):
+    // they go to Sterilization without losing a use.
+    const unused = new Set(unusedToolIds);
+    const notUsed = livesConsumedBy(kind, id).filter(t => unused.has(t.id));
+    const limited = livesConsumedBy(kind, id).filter(t => !unused.has(t.id));
     const setLimited = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
     if ((limited.length || setLimited) && !patientCode?.trim()) {
       notify(tr('{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.', a.barcode), true);
@@ -101,7 +111,7 @@ export function useReceiptAndCycleActions(
       to: 'Κεντρική Αποστείρωση',
       status: `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής${
         limited.length ? ` · −1 χρήση σε ${limited.length} εργαλεί${limited.length === 1 ? 'ο' : 'α'}` : ''
-      }`,
+      }${notUsed.length ? ` · χωρίς χρήση: ${notUsed.map(t => t.barcode).join(', ')}` : ''}`,
       by: currentUser.name,
       patientCode,
       note,

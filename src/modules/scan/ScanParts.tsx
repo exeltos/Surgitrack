@@ -1,4 +1,5 @@
-import {createContext, useContext, useState, type ReactNode} from 'react';
+import {useContext, useState, type ReactNode} from 'react';
+import {ScanStationLook} from './scanLook';
 import {ArrowLeft, CheckCircle2, FileDown, FlaskConical, Plus, X} from 'lucide-react';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -12,9 +13,6 @@ import {useSurgi} from '../../store/SurgiStore';
 import {compositionHtml} from '../sterilization/printUtils';
 import type {Issue, SetAsset, Tool} from '../../types/domain';
 import type {SterilizationRow} from '../sterilization/sterilizationTypes';
-
-/** The station a screen belongs to: its icon and colour, shown in the screen's header. */
-export const ScanStationLook = createContext<{icon?: ReactNode; tone?: string}>({});
 
 /** One screen of the phone app: a dark header with the way back, the content, and its main button. */
 export function ScanScreen({

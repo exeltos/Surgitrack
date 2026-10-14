@@ -6,11 +6,18 @@ import {roleHomePath} from '../../core/permissions';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 
-export default function ProtectedRoute({permission, children}: {permission: Permission; children: ReactNode}) {
+/** Opens the page when the role has the permission (or, given several, any one of them). */
+export default function ProtectedRoute({
+  permission,
+  children,
+}: {
+  permission: Permission | Permission[];
+  children: ReactNode;
+}) {
   const {can, role} = useSurgi();
   const {lang} = useAppPreferences();
   const {pathname} = useLocation();
-  if (can(permission)) return <>{children}</>;
+  if ((Array.isArray(permission) ? permission : [permission]).some(can)) return <>{children}</>;
   // A page the role may not open sends it to its own home; the notice stays only when the home itself is closed.
   const home = roleHomePath(role);
   if (pathname !== home) return <Navigate to={home} replace />;

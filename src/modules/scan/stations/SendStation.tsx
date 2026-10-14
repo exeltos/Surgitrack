@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import {CheckCheck, ClipboardCheck, Gauge, Send} from 'lucide-react';
-import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import type {BarcodeFeedback} from '../../../components/barcode/BarcodeCapture';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {useLibraries} from '../../../core/LibraryStore';
@@ -28,6 +27,8 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const [patientCode, setPatientCode] = useState('');
   const [note, setNote] = useState('');
   const [livesConfirmed, setLivesConfirmed] = useState(false);
+  // Limited-use instruments not used this time: sent without losing a use.
+  const [unused, setUnused] = useState<Set<string>>(new Set());
   const [ticked, setTicked] = useState<Set<string>>(new Set());
   const [bulk, setBulk] = useState(false);
   const answers = useScanAnswers(feedback);
@@ -49,6 +50,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
     setPatientCode('');
     setNote('');
     setLivesConfirmed(false);
+    setUnused(new Set());
     setTicked(new Set());
     setBulk(false);
     setFound(item);
@@ -100,7 +102,9 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const counted = members.length - missing.length;
   // Limited-use instruments lose one use on every dispatch after a procedure.
   const limited = kind === 'TOOL' ? (found.asset.maxUses ? [found.asset] : []) : members.filter(t => t.maxUses);
-  const consumesLives = limited.length > 0 || (kind === 'SET' && !!found.asset.maxUses);
+  const used = limited.filter(t => !unused.has(t.id));
+  const limitedSet = kind === 'SET' && !!found.asset.maxUses;
+  const consumesLives = used.length > 0 || limitedSet;
   const needsPatient = counting || consumesLives;
   const ready =
     (!needsPatient || patientCode.trim().length > 0) &&
@@ -164,7 +168,8 @@ export default function SendStation({onStations}: {onStations: () => void}) {
       });
       if (!count) return;
     }
-    if (!sendToSterilization(kind, asset.id, patientCode.trim() || undefined, note.trim() || undefined)) return;
+    if (!sendToSterilization(kind, asset.id, patientCode.trim() || undefined, note.trim() || undefined, [...unused]))
+      return;
     setSent(found);
     setFound(null);
   };
@@ -239,34 +244,55 @@ export default function SendStation({onStations}: {onStations: () => void}) {
           )}
         </section>
       )}
-      {consumesLives && (
+      {(limited.length > 0 || limitedSet) && (
         <section className="scan-sign" aria-label={tr('Καταγραφή χρήσης')}>
           <h2 className="scan-section">
             <Gauge size={17} /> {tr('Καταγραφή χρήσης')}
           </h2>
-          <ul className="scan-items">
+          <p className="scan-hint">
+            {tr('Ξετσεκάρετε όσα δεν χρησιμοποιήθηκαν: στέλνονται χωρίς να αφαιρεθεί χρήση.')}
+          </p>
+          <div className="scan-checks">
             {limited.map(tool => {
               const remaining = Math.max(0, (tool.maxUses || 0) - tool.uses);
+              const isUsed = !unused.has(tool.id);
               return (
-                <li key={tool.id}>
-                  <AssetTypeIcon kind="TOOL" maxUses={tool.maxUses} size={16} />
+                <label key={tool.id} className={isUsed ? 'on' : ''}>
+                  <input
+                    type="checkbox"
+                    checked={isUsed}
+                    onChange={() =>
+                      setUnused(current => {
+                        const next = new Set(current);
+                        if (next.has(tool.id)) next.delete(tool.id);
+                        else next.add(tool.id);
+                        return next;
+                      })
+                    }
+                    aria-label={tr('Χρησιμοποιήθηκε: {0}', tool.barcode)}
+                  />
                   <span>
                     <b>{tool.name}</b>
                     <small>
-                      {tr('Υπόλοιπο χρήσεων')}: {remaining} → {Math.max(0, remaining - 1)}
-                      {remaining <= 1 ? ` · ${tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}` : ''}
+                      {isUsed
+                        ? `${tr('Υπόλοιπο χρήσεων')}: ${remaining} → ${Math.max(0, remaining - 1)}${
+                            remaining <= 1 ? ` · ${tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}` : ''
+                          }`
+                        : tr('χωρίς χρήση')}
                     </small>
                   </span>
-                </li>
+                </label>
               );
             })}
-          </ul>
-          <div className="scan-checks">
-            <label className={livesConfirmed ? 'on' : ''}>
-              <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
-              <span>{tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}</span>
-            </label>
           </div>
+          {consumesLives && (
+            <div className="scan-checks">
+              <label className={livesConfirmed ? 'on' : ''}>
+                <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
+                <span>{tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}</span>
+              </label>
+            </div>
+          )}
         </section>
       )}
       <label className="scan-field">

@@ -43,7 +43,7 @@ import IssueStation from './stations/IssueStation';
 import PickupStation from './stations/PickupStation';
 import ReportStation from './stations/ReportStation';
 import SendStation from './stations/SendStation';
-import {ScanStationLook} from './ScanParts';
+import {ScanStationLook} from './scanLook';
 import {useNewVersion} from './useNewVersion';
 import {hospitalRoleNames} from '../../config/demoRoles';
 

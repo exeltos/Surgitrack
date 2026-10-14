@@ -1,14 +1,17 @@
-import {TriangleAlert} from 'lucide-react';
+import {Minus, Plus, TriangleAlert} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
 import {tr} from '../../i18n';
 export default function UsageLimitCard({
   uses,
   maxUses,
   description,
+  onCorrect,
 }: {
   uses: number;
   maxUses?: number;
   description: string;
+  /** Usage-limit managers only: corrects the recorded uses by one (a use counted by mistake, or missed). */
+  onCorrect?: (delta: 1 | -1) => void;
 }) {
   const {systemSettings} = useLibraries();
   const remaining = maxUses !== undefined ? Math.max(0, maxUses - uses) : undefined;
@@ -28,7 +31,31 @@ export default function UsageLimitCard({
           <div className="usage-config-limit usage-view-stats">
             <div>
               <span>{tr('Χρήσεις που έχουν γίνει')}</span>
-              <strong>{uses}</strong>
+              {onCorrect ? (
+                <span className="usage-correct">
+                  <button
+                    type="button"
+                    onClick={() => onCorrect(-1)}
+                    disabled={uses <= 0}
+                    aria-label={tr('Μία χρήση λιγότερη')}
+                    title={tr('Μία χρήση λιγότερη')}
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <strong>{uses}</strong>
+                  <button
+                    type="button"
+                    onClick={() => onCorrect(1)}
+                    disabled={uses >= maxUses}
+                    aria-label={tr('Μία χρήση περισσότερη')}
+                    title={tr('Μία χρήση περισσότερη')}
+                  >
+                    <Plus size={14} />
+                  </button>
+                </span>
+              ) : (
+                <strong>{uses}</strong>
+              )}
             </div>
             <div className={warning ? 'warning' : ''}>
               <span>{tr('Υπόλοιπο χρήσεων')}</span>

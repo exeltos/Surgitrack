@@ -1349,3 +1349,8 @@ html body .scan-demo-waiting small {
 html body .scan-demo-waiting li button > svg:last-child {
   color: #5b3fd1;
 }
+html body .scan-hint {
+  margin: 0;
+  color: #627887;
+  font-size: 13px;
+}
