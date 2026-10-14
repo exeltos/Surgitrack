@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Building2, Clock3, Languages, Mail, ShieldCheck, UserRound} from 'lucide-react';
+import BrandMark from '../../components/layout/BrandMark';
 import {FunctionsHttpError} from '@supabase/supabase-js';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -152,7 +153,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
     <div className="auth-page">
       <header className="auth-topbar">
         <div className="auth-mini-brand">
-          <div className="auth-brand-mark">S</div>
+          <BrandMark className="auth-brand-mark" />
           <div>
             <strong>SurgiTrack</strong>
             <span>Trace Every Instrument</span>
@@ -165,7 +166,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
       </header>
       <main className="auth-main">
         <section className="auth-intro">
-          <div className="auth-logo">S</div>
+          <BrandMark className="auth-logo" />
           <span className="auth-eyebrow">{L('ΕΓΓΡΑΦΗ ΠΡΟΣΩΠΙΚΟΥ', 'STAFF SIGNUP')}</span>
           <h1>{info?.organization_name || 'SurgiTrack'}</h1>
           <p className="auth-product-subtitle">

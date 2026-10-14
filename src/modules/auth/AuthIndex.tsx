@@ -1,5 +1,17 @@
 import {useEffect, useMemo, useState} from 'react';
-import {Eye, EyeOff, LockKeyhole, Mail, ArrowLeft, ShieldCheck, Languages, LogIn} from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  Mail,
+  ArrowLeft,
+  ShieldCheck,
+  Languages,
+  LogIn,
+  RefreshCcw,
+  ScanBarcode,
+} from 'lucide-react';
+import BrandMark from '../../components/layout/BrandMark';
 import {passwordOk} from '../../core/passwordRules';
 import {PasswordFields} from '../../components/auth/PasswordFields';
 import type {SessionUser, UserRole} from '../../store/types';
@@ -26,6 +38,16 @@ const copy = {
     product: 'SurgiTrack',
     subtitle: 'Ιχνηλασιμότητα χειρουργικών εργαλείων',
     suite: 'Trace Every Instrument',
+    heroTitle: 'Κάθε εργαλείο,',
+    heroTitleAccent: 'σε κάθε βήμα.',
+    heroLead:
+      'Ιχνηλασιμότητα χειρουργικών εργαλείων από το τμήμα στην Αποστείρωση και πίσω, με υπογραφές και πλήρες ιστορικό.',
+    heroPoints: [
+      'Παραλαβή, κλίβανος, αποδέσμευση, παράδοση',
+      'Σάρωση barcode από το κινητό',
+      'Δικαιώματα ανά ρόλο · ασφαλής πρόσβαση',
+    ],
+    heroChips: ['Υπογραφές παράδοσης', 'Ιστορικό ανά εργαλείο', 'Αναφορές ημέρας'],
     login: 'Σύνδεση',
     register: 'Εγγραφή',
     forgot: 'Ξέχασα τον κωδικό',
@@ -74,6 +96,16 @@ const copy = {
     product: 'SurgiTrack',
     subtitle: 'Surgical Instrument Traceability',
     suite: 'Trace Every Instrument',
+    heroTitle: 'Every instrument,',
+    heroTitleAccent: 'every step.',
+    heroLead:
+      'Surgical instrument traceability from the department to Sterilization and back, with signatures and a full history.',
+    heroPoints: [
+      'Receipt, sterilizer, release, delivery',
+      'Barcode scanning from the phone',
+      'Rights by role · secure access',
+    ],
+    heroChips: ['Handover signatures', 'History per instrument', 'Daily reports'],
     login: 'Sign in',
     register: 'Register',
     forgot: 'Forgot password',
@@ -285,180 +317,210 @@ export default function AuthIndex({
     setShowPassword(false);
   };
   return (
-    <div className="auth-page">
-      <header className="auth-topbar">
-        <div className="auth-mini-brand">
-          <div className="auth-brand-mark">S</div>
+    <div className="auth-page auth-split">
+      <aside className="auth-hero">
+        <div className="auth-hero-brand">
+          <BrandMark className="auth-hero-mark" />
           <div>
             <strong>{t.product}</strong>
             <span>{scan ? scanTitle : t.suite}</span>
           </div>
         </div>
-        <button className="auth-lang" onClick={switchLang}>
-          <Languages size={16} />
-          <span>{lang === 'el' ? 'EN' : 'EL'}</span>
-        </button>
-      </header>
-      <main className="auth-main">
-        <section className="auth-intro">
-          <div className="auth-logo">S</div>
-          <span className="auth-eyebrow">{t.suite}</span>
-          <h1>{t.product}</h1>
-          <p className="auth-product-subtitle">{scan ? scanTitle : t.subtitle}</p>
-          <div className="auth-security">
-            <ShieldCheck size={18} />
-            <span>{t.secure}</span>
+        <h1>
+          {t.heroTitle}
+          <br />
+          <em>{t.heroTitleAccent}</em>
+        </h1>
+        <p className="auth-hero-lead">{t.heroLead}</p>
+        <ul className="auth-hero-points">
+          {t.heroPoints.map((point, index) => (
+            <li key={point}>
+              <span aria-hidden="true">
+                {index === 0 ? (
+                  <RefreshCcw size={16} />
+                ) : index === 1 ? (
+                  <ScanBarcode size={16} />
+                ) : (
+                  <ShieldCheck size={16} />
+                )}
+              </span>
+              {point}
+            </li>
+          ))}
+        </ul>
+        <div className="auth-hero-chips">
+          {t.heroChips.map(chip => (
+            <span key={chip}>{chip}</span>
+          ))}
+        </div>
+      </aside>
+      <div className="auth-side">
+        <header className="auth-topbar">
+          <div className="auth-mini-brand">
+            <BrandMark className="auth-brand-mark" />
+            <div>
+              <strong>{t.product}</strong>
+              <span>{scan ? scanTitle : t.suite}</span>
+            </div>
           </div>
-        </section>
-        <section className="auth-card-wrap">
-          {goodbye && <div className="auth-goodbye">{goodbye}</div>}
-          <div className="auth-card">
-            {view === 'login' && (
-              <>
-                <div className="auth-card-title">
-                  <div>
-                    <span className="auth-eyebrow">{t.login}</span>
-                    <h2>{t.welcome}</h2>
-                    <p>{t.loginIntro}</p>
-                  </div>
-                  <LogIn size={22} />
-                </div>
-                <form className="auth-form" onSubmit={submitLogin}>
-                  <label>
-                    {t.loginId}
-                    <div className="auth-input">
-                      <Mail size={17} />
-                      <input
-                        name="loginId"
-                        type="text"
-                        required
-                        autoComplete="username"
-                        placeholder="AF2741 ή name@hospital.gr"
-                      />
+          <button className="auth-lang" onClick={switchLang}>
+            <Languages size={16} />
+            <span>{lang === 'el' ? 'EN' : 'EL'}</span>
+          </button>
+        </header>
+        <main className="auth-main">
+          <section className="auth-card-wrap">
+            {goodbye && <div className="auth-goodbye">{goodbye}</div>}
+            <div className="auth-card">
+              {view === 'login' && (
+                <>
+                  <div className="auth-card-title">
+                    <div>
+                      <span className="auth-eyebrow">{t.login}</span>
+                      <h2>{t.welcome}</h2>
+                      <p>{t.loginIntro}</p>
                     </div>
-                  </label>
-                  <label>
-                    {t.password}
-                    <div className="auth-input">
-                      <LockKeyhole size={17} />
-                      <input
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        autoComplete="current-password"
-                      />
-                      <button type="button" onClick={() => setShowPassword(v => !v)} aria-label="toggle password">
-                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    <LogIn size={22} />
+                  </div>
+                  <form className="auth-form" onSubmit={submitLogin}>
+                    <label>
+                      {t.loginId}
+                      <div className="auth-input">
+                        <Mail size={17} />
+                        <input
+                          name="loginId"
+                          type="text"
+                          required
+                          autoComplete="username"
+                          placeholder="AF2741 ή name@hospital.gr"
+                        />
+                      </div>
+                    </label>
+                    <label>
+                      {t.password}
+                      <div className="auth-input">
+                        <LockKeyhole size={17} />
+                        <input
+                          name="password"
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          autoComplete="current-password"
+                        />
+                        <button type="button" onClick={() => setShowPassword(v => !v)} aria-label="toggle password">
+                          {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                        </button>
+                      </div>
+                    </label>
+                    <div className="auth-form-row">
+                      <button type="button" className="auth-text-btn" onClick={() => changeView('forgot')}>
+                        {t.forgotLink}
                       </button>
                     </div>
-                  </label>
-                  <div className="auth-form-row">
-                    <button type="button" className="auth-text-btn" onClick={() => changeView('forgot')}>
-                      {t.forgotLink}
+                    {message && <div className="auth-message">{message}</div>}
+                    <button className="auth-primary" type="submit">
+                      {t.signIn}
                     </button>
-                  </div>
-                  {message && <div className="auth-message">{message}</div>}
-                  <button className="auth-primary" type="submit">
-                    {t.signIn}
+                  </form>
+                </>
+              )}
+              {view === 'forgot' && (
+                <>
+                  <button className="auth-back" onClick={() => changeView('login')}>
+                    <ArrowLeft size={15} />
+                    {t.backLogin}
                   </button>
-                </form>
-              </>
-            )}
-            {view === 'forgot' && (
-              <>
-                <button className="auth-back" onClick={() => changeView('login')}>
-                  <ArrowLeft size={15} />
-                  {t.backLogin}
-                </button>
-                <div className="auth-card-title">
-                  <div>
-                    <span className="auth-eyebrow">{t.forgot}</span>
-                    <h2>{t.forgotTitle}</h2>
-                    <p>{t.forgotIntro}</p>
-                  </div>
-                  <LockKeyhole size={22} />
-                </div>
-                <form className="auth-form" onSubmit={submitForgot}>
-                  <label>
-                    {t.email}
-                    <div className="auth-input">
-                      <Mail size={17} />
-                      <input name="email" type="email" required placeholder="name@hospital.gr" />
+                  <div className="auth-card-title">
+                    <div>
+                      <span className="auth-eyebrow">{t.forgot}</span>
+                      <h2>{t.forgotTitle}</h2>
+                      <p>{t.forgotIntro}</p>
                     </div>
-                  </label>
-                  {message && <div className="auth-message">{message}</div>}
-                  <button className="auth-primary" type="submit">
-                    {t.sendReset}
-                  </button>
-                </form>
-              </>
-            )}
-            {view === 'reset' && (
-              <>
-                <button className="auth-back" onClick={() => changeView('login')}>
-                  <ArrowLeft size={15} />
-                  {t.backLogin}
-                </button>
-                <div className="auth-card-title">
-                  <div>
-                    <span className="auth-eyebrow">{lang === 'el' ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ' : 'ACCOUNT SECURITY'}</span>
-                    <h2>{lang === 'el' ? 'Ορισμός νέου κωδικού' : 'Set a new password'}</h2>
-                    <p>
-                      {lang === 'el'
-                        ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.'
-                        : 'Create a new password for your account.'}
-                    </p>
+                    <LockKeyhole size={22} />
                   </div>
-                  <ShieldCheck size={22} />
-                </div>
-                <form className="auth-form" onSubmit={submitReset}>
-                  <PasswordFields
-                    el={lang === 'el'}
-                    label={lang === 'el' ? 'Νέος κωδικός' : 'New password'}
-                    password={newPassword}
-                    confirm={newPasswordAgain}
-                    onPassword={setNewPassword}
-                    onConfirm={setNewPasswordAgain}
-                  />
-                  {message && (
-                    <div className="auth-message is-error" role="alert">
-                      {message}
-                    </div>
-                  )}
-                  <button className="auth-primary" type="submit">
-                    {lang === 'el' ? 'Αποθήκευση νέου κωδικού' : 'Save new password'}
+                  <form className="auth-form" onSubmit={submitForgot}>
+                    <label>
+                      {t.email}
+                      <div className="auth-input">
+                        <Mail size={17} />
+                        <input name="email" type="email" required placeholder="name@hospital.gr" />
+                      </div>
+                    </label>
+                    {message && <div className="auth-message">{message}</div>}
+                    <button className="auth-primary" type="submit">
+                      {t.sendReset}
+                    </button>
+                  </form>
+                </>
+              )}
+              {view === 'reset' && (
+                <>
+                  <button className="auth-back" onClick={() => changeView('login')}>
+                    <ArrowLeft size={15} />
+                    {t.backLogin}
                   </button>
-                </form>
-              </>
-            )}
-            {view === 'sent' && (
-              <div className="auth-status-card">
-                <div className="auth-status-icon">
-                  <Mail size={24} />
+                  <div className="auth-card-title">
+                    <div>
+                      <span className="auth-eyebrow">
+                        {lang === 'el' ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ' : 'ACCOUNT SECURITY'}
+                      </span>
+                      <h2>{lang === 'el' ? 'Ορισμός νέου κωδικού' : 'Set a new password'}</h2>
+                      <p>
+                        {lang === 'el'
+                          ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.'
+                          : 'Create a new password for your account.'}
+                      </p>
+                    </div>
+                    <ShieldCheck size={22} />
+                  </div>
+                  <form className="auth-form" onSubmit={submitReset}>
+                    <PasswordFields
+                      el={lang === 'el'}
+                      label={lang === 'el' ? 'Νέος κωδικός' : 'New password'}
+                      password={newPassword}
+                      confirm={newPasswordAgain}
+                      onPassword={setNewPassword}
+                      onConfirm={setNewPasswordAgain}
+                    />
+                    {message && (
+                      <div className="auth-message is-error" role="alert">
+                        {message}
+                      </div>
+                    )}
+                    <button className="auth-primary" type="submit">
+                      {lang === 'el' ? 'Αποθήκευση νέου κωδικού' : 'Save new password'}
+                    </button>
+                  </form>
+                </>
+              )}
+              {view === 'sent' && (
+                <div className="auth-status-card">
+                  <div className="auth-status-icon">
+                    <Mail size={24} />
+                  </div>
+                  <span className="auth-eyebrow">{lang === 'el' ? 'ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ' : 'PASSWORD RESET'}</span>
+                  <h2>{lang === 'el' ? 'Ελέγξτε το email σας' : 'Check your email'}</h2>
+                  <p>
+                    {lang === 'el'
+                      ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό. Ο σύνδεσμος είναι προσωπικός και περιορισμένης διάρκειας.'
+                      : 'We sent a secure link to set a new password. The link is personal and time-limited.'}
+                  </p>
+                  <button className="auth-primary" type="button" onClick={() => setView('login')}>
+                    {lang === 'el' ? 'Επιστροφή στη σύνδεση' : 'Back to sign in'}
+                  </button>
                 </div>
-                <span className="auth-eyebrow">{lang === 'el' ? 'ΕΠΑΝΑΦΟΡΑ ΚΩΔΙΚΟΥ' : 'PASSWORD RESET'}</span>
-                <h2>{lang === 'el' ? 'Ελέγξτε το email σας' : 'Check your email'}</h2>
-                <p>
-                  {lang === 'el'
-                    ? 'Στείλαμε ασφαλή σύνδεσμο για να ορίσετε νέο κωδικό. Ο σύνδεσμος είναι προσωπικός και περιορισμένης διάρκειας.'
-                    : 'We sent a secure link to set a new password. The link is personal and time-limited.'}
-                </p>
-                <button className="auth-primary" type="button" onClick={() => setView('login')}>
-                  {lang === 'el' ? 'Επιστροφή στη σύνδεση' : 'Back to sign in'}
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-      </main>
-      <footer className="auth-footer">
-        <span>© 2026 SurgiTrack · v{APP_VERSION}</span>
-        <nav>
-          <button onClick={() => setInfoView('privacy')}>{t.privacy}</button>
-          <button onClick={() => setInfoView('terms')}>{t.termsLink}</button>
-          <button onClick={() => setInfoView('support')}>{t.support}</button>
-        </nav>
-      </footer>
+              )}
+            </div>
+          </section>
+        </main>
+        <footer className="auth-footer">
+          <span>© 2026 SurgiTrack · v{APP_VERSION}</span>
+          <nav>
+            <button onClick={() => setInfoView('privacy')}>{t.privacy}</button>
+            <button onClick={() => setInfoView('terms')}>{t.termsLink}</button>
+            <button onClick={() => setInfoView('support')}>{t.support}</button>
+          </nav>
+        </footer>
+      </div>
       {infoView && (
         <div className="auth-info-backdrop" role="presentation" onMouseDown={() => setInfoView(null)}>
           <section className="auth-info-modal" role="dialog" aria-modal="true" onMouseDown={e => e.stopPropagation()}>
