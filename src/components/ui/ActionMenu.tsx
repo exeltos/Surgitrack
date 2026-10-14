@@ -48,14 +48,17 @@ export default function ActionMenu({
     const menu = panel.current;
     if (!toggle || !menu) return;
     const button = toggle.getBoundingClientRect();
-    const {width, height} = menu.getBoundingClientRect();
+    // Where «fixed 0,0» lands: the screen's corner, unless an ancestor with a filter or transform (the high
+    // contrast setting, a dialog) holds the panel; the position is set relative to that.
+    Object.assign(menu.style, {position: 'fixed', top: '0px', left: '0px', right: 'auto'});
+    const {left: originX, top: originY, width, height} = menu.getBoundingClientRect();
     const gap = 6;
     const below = button.bottom + gap + height <= window.innerHeight - 8 || button.top - gap - height < 8;
     const wanted = align === 'right' ? button.right - width : button.left;
     setPlace({
       position: 'fixed',
-      top: below ? button.bottom + gap : button.top - gap - height,
-      left: Math.max(8, Math.min(wanted, window.innerWidth - width - 8)),
+      top: (below ? button.bottom + gap : button.top - gap - height) - originY,
+      left: Math.max(8, Math.min(wanted, window.innerWidth - width - 8)) - originX,
       right: 'auto',
     });
   }, [open, align]);
