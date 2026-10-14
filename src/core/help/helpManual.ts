@@ -1163,11 +1163,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Διαθέσιμες αναφορές',
-          'Σύνθεση Σετ, Ανά τμήμα, Ανά ειδικότητα, Service & βλάβες, Όρια χρήσεων, Εργαλεία εκτός χρήσης, Φορτία κλιβάνου, Λήξεις αποστείρωσης, Παραδόσεις & παραλαβές και Ιχνηλασιμότητα ασθενούς.',
+          'Απογραφή εξοπλισμού (ανά τμήμα ή ανά ειδικότητα), Service & βλάβες, Χρήσεις & αποσύρσεις, Φορτία κλιβάνου, Λήξεις αποστείρωσης και Παραδόσεις & παραλαβές. Η σύνθεση ενός Σετ τυπώνεται από την καρτέλα του Σετ και η ιχνηλασιμότητα ασθενούς βρίσκεται στην «Ιχνηλάτηση».',
         ],
         en: [
           'Available reports',
-          'Set composition, By department, By specialty, Service & faults, Usage limits, Out-of-use instruments, Sterilizer loads, Sterile expiry, Deliveries & receipts and Patient traceability.',
+          "Equipment inventory (by department or by specialty), Service & faults, Uses & retirements, Sterilizer loads, Sterile expiry and Deliveries & receipts. A Set's composition prints from the Set's card and patient traceability is in «Traceability».",
         ],
       },
       {

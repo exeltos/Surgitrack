@@ -9,23 +9,25 @@ import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
-import {compositionHtml} from '../sterilization/printUtils';
-import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import {tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
-import {formatDateTime} from '../../core/displayDate';
-import {LOAD_STATUS, cellText, genericReportHtml, reports, stateLabel, type ReportId, type Row} from './reportsMeta';
+import {
+  LOAD_STATUS,
+  cellText,
+  genericReportHtml,
+  reports,
+  stateLabel,
+  type InventoryGroup,
+  type ReportId,
+  type Row,
+} from './reportsMeta';
 import {buildReport} from './buildReport';
 
 export default function ReportsPage() {
-  const {sets, tools, retiredTools, issues, currentUser, processLoads, sterilizationReleases, receipts, deliveries} =
-    useSurgi();
+  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
-  const compositionOptions = useCompositionOptions();
-  // Sets in the composition picker, by name.
-  const setsByName = useMemo(() => [...sets].sort((a, b) => a.name.localeCompare(b.name, 'el')), [sets]);
-  const [active, setActive] = useState<ReportId>('composition');
-  const [setId, setSetId] = useState(sets[0]?.id || '');
+  const [active, setActive] = useState<ReportId>('inventory');
+  const [group, setGroup] = useState<InventoryGroup>('department');
   const [department, setDepartment] = useState('ALL');
   const [specialty, setSpecialty] = useState('ALL');
   const [assetKind, setAssetKind] = useState('ALL');
@@ -51,10 +53,10 @@ export default function ReportsPage() {
       Array.from(
         new Set([
           ...sets.map(x => x.department),
-          ...tools.map(x => x.department).filter((value): value is string => Boolean(value)),
+          ...[...tools, ...retiredTools].map(x => x.department).filter((value): value is string => Boolean(value)),
         ]),
       ).sort((a, b) => a.localeCompare(b, 'el')),
-    [sets, tools],
+    [sets, tools, retiredTools],
   );
   const specialties = useMemo(
     () =>
@@ -67,7 +69,6 @@ export default function ReportsPage() {
     () => Array.from(new Set(issues.map(x => x.type))).sort((a, b) => a.localeCompare(b, 'el')),
     [issues],
   );
-  const selectedSet = sets.find(s => s.id === setId) || sets[0];
   const activeMeta = reports.find(r => r.id === active)!;
 
   const reportData = useMemo(
@@ -86,7 +87,7 @@ export default function ReportsPage() {
           warningThreshold,
         },
         {
-          setId,
+          group,
           department,
           specialty,
           assetKind,
@@ -102,7 +103,7 @@ export default function ReportsPage() {
       ),
     [
       active,
-      setId,
+      group,
       sets,
       tools,
       retiredTools,
@@ -127,25 +128,12 @@ export default function ReportsPage() {
   );
 
   const buildPreview = () => {
-    if (active === 'composition' && selectedSet) {
-      return {
-        title: tr('Σύνθεση {0}', selectedSet.barcode),
-        html: compositionHtml(
-          selectedSet,
-          tools.filter(t => t.setId === selectedSet.id),
-          currentUser.name,
-          formatDateTime(),
-          issues.filter(i => i.status === 'OPEN').map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
-          compositionOptions(selectedSet.colorTapes),
-        ),
-      };
-    }
     const subtitle =
-      active === 'department'
-        ? tr('Σετ και εργαλεία ανά τμήμα')
-        : active === 'specialty'
-          ? tr('Σετ και εργαλεία ανά ειδικότητα')
-          : tr(activeMeta.description);
+      active === 'inventory'
+        ? group === 'department'
+          ? tr('Σετ και εργαλεία ανά τμήμα')
+          : tr('Σετ και εργαλεία ανά ειδικότητα')
+        : tr(activeMeta.description);
     return {
       title: tr(activeMeta.title),
       html: genericReportHtml(tr(activeMeta.title), subtitle, reportData.columns, reportData.rows),
@@ -157,7 +145,7 @@ export default function ReportsPage() {
     value: value === 'ALL' ? '' : value,
     onChange: (next: string) => set(next || 'ALL'),
   });
-  const byDepartment = active === 'department' || active === 'specialty';
+  const byDepartment = active === 'inventory';
   const reportFilters: SelectFilter[] = [
     ...(byDepartment || active === 'issues' || active === 'usage' || active === 'expiry' || active === 'handovers'
       ? [
@@ -169,7 +157,7 @@ export default function ReportsPage() {
           },
         ]
       : []),
-    ...(byDepartment || active === 'retired'
+    ...(byDepartment
       ? [
           {
             key: 'specialty',
@@ -270,10 +258,11 @@ export default function ReportsPage() {
       ? [
           {
             key: 'usage',
-            placeholder: tr('Όλα τα όρια'),
+            placeholder: tr('Σε χρήση & εκτός χρήσης'),
             options: [
               {value: 'CRITICAL', label: tr('Κρίσιμο · ≤ {0}', warningThreshold)},
               {value: 'EXHAUSTED', label: tr('Συμπληρωμένο όριο · 0')},
+              {value: 'RETIRED', label: tr('Εκτός χρήσης')},
             ],
             ...choice(usageFilter, setUsageFilter),
           },
@@ -306,7 +295,7 @@ export default function ReportsPage() {
     reportData.rows,
     [
       active,
-      setId,
+      group,
       department,
       specialty,
       assetKind,
@@ -322,7 +311,7 @@ export default function ReportsPage() {
   );
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
   const reportTable = (): ExportTable => ({
-    title: active === 'composition' && selectedSet ? tr('Σύνθεση {0}', selectedSet.barcode) : tr(activeMeta.title),
+    title: tr(activeMeta.title),
     subtitle: `${reportData.rows.length} ${tr('εγγραφές')}`,
     headers: reportData.columns.map(c => c.label),
     rows: reportData.rows.map(row => reportData.columns.map(c => cellText(c.key, row[c.key]))),
@@ -379,37 +368,40 @@ export default function ReportsPage() {
             </div>
           </header>
           <div className="reports-filter-strip">
-            {active === 'composition' && (
-              <label className="reports-filter-wide">
-                <span>{tr('Σετ')}</span>
-                <select value={selectedSet?.id || ''} onChange={e => setSetId(e.target.value)}>
-                  {setsByName.map(s => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} · {s.barcode}
-                    </option>
-                  ))}
-                </select>
-              </label>
+            {active === 'inventory' && (
+              <div className="reports-group-toggle" role="group" aria-label={tr('Ομαδοποίηση')}>
+                <span>{tr('Ομαδοποίηση')}</span>
+                {(['department', 'specialty'] as const).map(value => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={group === value ? 'active' : ''}
+                    aria-pressed={group === value}
+                    onClick={() => setGroup(value)}
+                  >
+                    {value === 'department' ? tr('Ανά τμήμα') : tr('Ανά ειδικότητα')}
+                  </button>
+                ))}
+              </div>
             )}
             <FilterMenu filters={reportFilters} />
           </div>
           <div className="reports-result-card">
             <div className="reports-result-head">
               <div>
-                <strong>
-                  {active === 'composition' && selectedSet
-                    ? `${selectedSet.barcode} · ${selectedSet.name}`
-                    : tr('Αποτελέσματα')}
-                </strong>
+                <strong>{tr('Αποτελέσματα')}</strong>
                 <span>
                   {reportData.rows.length} {tr('εγγραφές')}
                 </span>
               </div>
-              {active === 'usage' && reportData.rows.some((r: Row) => Number(r.remaining) <= warningThreshold) && (
-                <span className="reports-warning">
-                  <AlertTriangle size={14} /> {tr('Υπάρχουν κρίσιμα όρια')}
-                </span>
-              )}
+              {active === 'usage' &&
+                reportData.rows.some(
+                  (r: Row) => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold,
+                ) && (
+                  <span className="reports-warning">
+                    <AlertTriangle size={14} /> {tr('Υπάρχουν κρίσιμα όρια')}
+                  </span>
+                )}
             </div>
             <div
               ref={resultBody}

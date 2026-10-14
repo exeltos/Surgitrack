@@ -4,12 +4,9 @@ import {renderPage} from '../../../test/renderPage';
 import ReportsPage from '../ReportsPage';
 
 const REPORTS = [
-  'Σύνθεση Σετ',
-  'Ανά τμήμα',
-  'Ανά ειδικότητα',
+  'Απογραφή εξοπλισμού',
   'Service & βλάβες',
-  'Όρια χρήσεων',
-  'Εργαλεία εκτός χρήσης',
+  'Χρήσεις & αποσύρσεις',
   'Φορτία κλιβάνου',
   'Λήξεις αποστείρωσης',
   'Παραδόσεις & παραλαβές',
@@ -47,19 +44,36 @@ describe('Reports', () => {
     else expect(within(results()).getByText('Δεν υπάρχουν αποτελέσματα')).toBeInTheDocument();
   });
 
-  it('shows the composition of the Set picked', () => {
+  it('has six reports: Set composition prints from the Set card', () => {
     renderPage(<ReportsPage />);
-    const picker = screen.getByRole('combobox', {name: 'Σετ'}) as HTMLSelectElement;
-    const second = picker.options[1];
-    fireEvent.change(picker, {target: {value: second.value}});
-    const barcode = second.textContent!.split(' · ').pop()!;
-    expect(document.querySelector('.reports-result-head strong')!.textContent).toContain(barcode);
-    expect(count()).toBe(bodyRows().length);
+    expect(document.querySelectorAll('.reports-catalog-item')).toHaveLength(6);
+    expect(screen.queryByRole('button', {name: /^Σύνθεση Σετ/})).not.toBeInTheDocument();
+  });
+
+  it('groups the inventory by department or by specialty', () => {
+    renderPage(<ReportsPage />);
+    const headers = () =>
+      within(results())
+        .getAllByRole('columnheader')
+        .map(h => h.textContent);
+    expect(headers()[0]).toBe('Τμήμα');
+    fireEvent.click(screen.getByRole('button', {name: 'Ανά ειδικότητα'}));
+    expect(headers()[0]).toBe('Ειδικότητα');
+    expect(headers()).not.toContain('Τμήμα');
+  });
+
+  it('lists the instruments in service and those taken out of service together', () => {
+    renderPage(<ReportsPage />);
+    choose('Χρήσεις & αποσύρσεις');
+    const states = new Set(column('Κατάσταση'));
+    expect(states).toEqual(new Set(['Σε χρήση', 'Εκτός χρήσης']));
+    filter('Σε χρήση & εκτός χρήσης', 'RETIRED');
+    expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
   });
 
   it('lists only the department filtered on', () => {
     renderPage(<ReportsPage />);
-    choose('Ανά τμήμα');
+    choose('Απογραφή εξοπλισμού');
     const all = count();
     const department = column('Τμήμα')[0]!;
     filter('Όλα τα τμήματα', department);

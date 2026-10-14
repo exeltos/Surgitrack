@@ -1,7 +1,15 @@
 import type {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
-import {LOAD_STATUS, indicatorText, sortableTime, stateLabel, type ReportId, type Row} from './reportsMeta';
+import {
+  LOAD_STATUS,
+  indicatorText,
+  sortableTime,
+  stateLabel,
+  type InventoryGroup,
+  type ReportId,
+  type Row,
+} from './reportsMeta';
 
 type Store = ReturnType<typeof useSurgi>;
 /** What the reports are built from. */
@@ -11,7 +19,7 @@ export type ReportInput = Pick<
 > & {warningThreshold: number};
 /** The chosen filters; 'ALL' is no filter. */
 export type ReportFilters = {
-  setId: string;
+  group: InventoryGroup;
   department: string;
   specialty: string;
   assetKind: string;
@@ -34,7 +42,7 @@ export function buildReport(
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = input;
   const {warningThreshold} = input;
   const {
-    setId,
+    group,
     department,
     specialty,
     assetKind,
@@ -47,27 +55,7 @@ export function buildReport(
     expiryState,
     signature,
   } = filters;
-  if (active === 'composition') {
-    const set = sets.find(s => s.id === setId) || sets[0];
-    const members = set ? tools.filter(t => t.setId === set.id) : [];
-    return {
-      columns: [
-        {key: 'barcode', label: 'Barcode'},
-        {key: 'name', label: tr('Εργαλείο')},
-        {key: 'code', label: tr('Κωδικός')},
-        {key: 'manufacturer', label: tr('Κατασκευαστής')},
-        {key: 'uses', label: tr('Χρήσεις')},
-      ],
-      rows: members.map(t => ({
-        barcode: t.barcode,
-        name: t.name,
-        code: t.code,
-        manufacturer: t.manufacturer || '—',
-        uses: t.maxUses ? `${t.uses}/${t.maxUses}` : tr('{0} · χωρίς όριο', t.uses),
-      })) as Row[],
-    };
-  }
-  if (active === 'department' || active === 'specialty') {
+  if (active === 'inventory') {
     const assets = [
       ...sets.map(s => ({
         kind: 'Σετ',
@@ -95,7 +83,7 @@ export function buildReport(
     // Grouped by department (or specialty), Sets before instruments, then by name.
     const sorted = assets.sort(
       (a, b) =>
-        (active === 'department'
+        (group === 'department'
           ? a.department.localeCompare(b.department, 'el')
           : (a.specialty || '').localeCompare(b.specialty || '', 'el')) ||
         b.kind.localeCompare(a.kind, 'el') ||
@@ -104,8 +92,8 @@ export function buildReport(
     return {
       columns: [
         {
-          key: active === 'department' ? 'department' : 'specialty',
-          label: active === 'department' ? tr('Τμήμα') : tr('Ειδικότητα'),
+          key: group === 'department' ? 'department' : 'specialty',
+          label: group === 'department' ? tr('Τμήμα') : tr('Ειδικότητα'),
         },
         {key: 'kind', label: tr('Τύπος')},
         {key: 'barcode', label: 'Barcode'},
@@ -142,7 +130,8 @@ export function buildReport(
     };
   }
   if (active === 'usage') {
-    const assets = [
+    // Limited-use Sets and instruments in service, then the instruments taken out of service.
+    const inService = [
       ...sets
         .filter(s => s.maxUses)
         .map(s => ({
@@ -164,14 +153,34 @@ export function buildReport(
           maxUses: t.maxUses || 0,
         })),
     ]
-      .map(a => ({...a, remaining: Math.max(0, a.maxUses - a.uses)}))
-      .filter(a => department === 'ALL' || a.department === department)
-      .filter(a => assetKind === 'ALL' || (assetKind === 'SET' ? a.kind === 'Σετ' : a.kind === 'Εργαλείο'))
-      .filter(
-        a =>
-          usageFilter === 'ALL' || (usageFilter === 'CRITICAL' ? a.remaining <= warningThreshold : a.remaining === 0),
-      )
+      .map(a => ({...a, remaining: Math.max(0, a.maxUses - a.uses), stateLabel: 'Σε χρήση', retiredAt: '', reason: ''}))
       .sort((a, b) => a.remaining - b.remaining);
+    const retired = retiredTools
+      .map(t => ({
+        kind: 'Εργαλείο',
+        barcode: t.barcode,
+        name: t.name,
+        department: t.department || '—',
+        uses: t.uses,
+        maxUses: t.maxUses ?? '—',
+        remaining: t.maxUses !== undefined ? Math.max(0, t.maxUses - t.uses) : '—',
+        stateLabel: 'Εκτός χρήσης',
+        retiredAt: t.retiredAt || '—',
+        reason: t.retiredReason || '—',
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'el') || a.barcode.localeCompare(b.barcode));
+    const rows = [
+      ...(usageFilter === 'RETIRED'
+        ? []
+        : inService.filter(
+            a =>
+              usageFilter === 'ALL' ||
+              (usageFilter === 'CRITICAL' ? a.remaining <= warningThreshold : a.remaining === 0),
+          )),
+      ...(usageFilter === 'ALL' || usageFilter === 'RETIRED' ? retired : []),
+    ]
+      .filter(a => department === 'ALL' || a.department === department)
+      .filter(a => assetKind === 'ALL' || (assetKind === 'SET' ? a.kind === 'Σετ' : a.kind === 'Εργαλείο'));
     return {
       columns: [
         {key: 'kind', label: tr('Τύπος')},
@@ -181,36 +190,9 @@ export function buildReport(
         {key: 'uses', label: tr('Χρήσεις')},
         {key: 'maxUses', label: tr('Όριο')},
         {key: 'remaining', label: tr('Υπόλοιπο')},
-      ],
-      rows: assets as Row[],
-    };
-  }
-  if (active === 'retired') {
-    const rows = retiredTools
-      .filter(t => specialty === 'ALL' || t.specialty === specialty)
-      .map(t => ({
-        barcode: t.barcode,
-        name: t.name,
-        code: t.code,
-        manufacturer: t.manufacturer || '—',
-        specialty: t.specialty || '—',
-        uses: t.maxUses !== undefined ? `${t.uses}/${t.maxUses}` : String(t.uses),
-        retiredAt: t.retiredAt || '—',
-        reason: t.retiredReason || '—',
-        notes: t.notes || '',
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'el') || a.barcode.localeCompare(b.barcode));
-    return {
-      columns: [
-        {key: 'barcode', label: 'Barcode'},
-        {key: 'name', label: tr('Εργαλείο')},
-        {key: 'code', label: tr('Κωδικός')},
-        {key: 'manufacturer', label: tr('Κατασκευαστής')},
-        {key: 'specialty', label: tr('Ειδικότητα')},
-        {key: 'uses', label: tr('Χρήσεις')},
+        {key: 'stateLabel', label: tr('Κατάσταση')},
         {key: 'retiredAt', label: tr('Εκτός χρήσης από')},
         {key: 'reason', label: tr('Αιτία')},
-        {key: 'notes', label: tr('Σημειώσεις')},
       ],
       rows: rows as Row[],
     };
