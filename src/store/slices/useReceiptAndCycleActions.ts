@@ -51,12 +51,12 @@ export function useReceiptAndCycleActions(
 
   const sendToSterilization = (kind: AssetKind, id: string, patientCode?: string, note?: string) => {
     const a = assetName(kind, id);
-    if (!a || !assertCirculationAllowed(kind, id)) return;
+    if (!a || !assertCirculationAllowed(kind, id)) return false;
     const limited = livesConsumedBy(kind, id);
     const setLimited = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
     if ((limited.length || setLimited) && !patientCode?.trim()) {
       notify(tr('{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.', a.barcode), true);
-      return;
+      return false;
     }
     const at = formatStoreDateTime();
     const exhausted = limited.filter(t => t.uses + 1 >= (t.maxUses || 0));
@@ -126,6 +126,7 @@ export function useReceiptAndCycleActions(
           )
         : tr('{0} προωθήθηκε ηλεκτρονικά προς Αποστείρωση από {1}.', a.barcode, currentUser.name),
     );
+    return true;
   };
   /** Sterilization confirms it saw an out-of-use notice (the tool was physically set aside). */
   const acknowledgeOutOfUse = (id: string) =>

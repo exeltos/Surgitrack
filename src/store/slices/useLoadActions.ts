@@ -529,6 +529,11 @@ export function useLoadActions(
   const completeDeliveryToDepartment = (kind: AssetKind, id: string, payload: DeliveryPayload) => {
     const a = assetName(kind, id);
     if (!a || a.state !== 'READY_FOR_PICKUP' || !assertCirculationAllowed(kind, id)) return;
+    const deliverer = payload.deliveredBy || {
+      userId: currentUser.id,
+      name: currentUser.name,
+      department: currentUser.department,
+    };
     const record: DeliveryRecord = {
       id: `d${uniqueStamp()}-${Math.random().toString(36).slice(2, 6)}`,
       workflowVersion: sterilizationWorkflow.version,
@@ -538,9 +543,9 @@ export function useLoadActions(
       barcode: a.barcode,
       assetName: a.name,
       department: a.department || 'Τμήμα',
-      deliveredByUserId: currentUser.id,
-      deliveredByName: currentUser.name,
-      deliveredByDepartment: currentUser.department,
+      deliveredByUserId: deliverer.userId,
+      deliveredByName: deliverer.name,
+      deliveredByDepartment: deliverer.department,
       handoverSignatureId: payload.handoverSignatureId,
       receivedByUserId: payload.receivedByUserId,
       receivedByName: payload.receivedByName,
@@ -555,7 +560,7 @@ export function useLoadActions(
       assetKind: kind,
       from: 'Κεντρική Αποστείρωση',
       to: a.department || 'Τμήμα',
-      status: `Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ${currentUser.name} · παρέλαβε ${payload.receivedByName}`,
+      status: `Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ${deliverer.name} · παρέλαβε ${payload.receivedByName}`,
       by: currentUser.name,
     });
     notify(tr('Η παράδοση του {0} στο {1} ολοκληρώθηκε.', a.barcode, a.department || 'τμήμα'));

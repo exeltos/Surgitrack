@@ -15,7 +15,7 @@ select tests.eq((
   select string_agg(p.proname, ',' order by p.proname) from pg_proc p
    where p.pronamespace = 'public'::regnamespace and p.prosecdef
      and has_function_privilege('authenticated', p.oid, 'execute')),
-  'app_record_writable,can_import_assets,claim_platform_admin,current_org_id,current_org_locked,'
+  'app_record_writable,caller_department_name,can_import_assets,claim_platform_admin,current_org_id,current_org_locked,'
   'current_role,demo_seats_left,hospital_create_signup_link,hospital_decide_access_request,'
   'hospital_revoke_signup_links,is_asset_manager,is_cssd_operator,is_org_admin,is_platform_admin,'
   'is_viewer,my_access_request,platform_convert_demo,platform_create_demo_account,'

@@ -1,6 +1,12 @@
 import {useEffect, useRef, useState} from 'react';
 import {KeyRound, PenLine} from 'lucide-react';
-import {DEMO_HANDOVER_PEOPLE, isDemoHandover, verifyHandover, type HandoverSigner} from '../../data/cloud/handover';
+import {
+  DEMO_HANDOVER_PEOPLE,
+  DEMO_HANDOVER_STERILIZATION,
+  isDemoHandover,
+  verifyHandover,
+  type HandoverSigner,
+} from '../../data/cloud/handover';
 import {tr, trData} from '../../i18n';
 
 const REASON_TEXT = {
@@ -40,7 +46,10 @@ export default function HandoverSignature({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const demo = isDemoHandover();
-  const demoPerson = demo && department ? DEMO_HANDOVER_PEOPLE.find(p => p.department === department) : undefined;
+  const demoPerson =
+    demo && department
+      ? [...DEMO_HANDOVER_PEOPLE, DEMO_HANDOVER_STERILIZATION].find(p => p.department === department)
+      : undefined;
   const itemsKey = [...assetIds].sort().join('|');
   const signedFor = useRef<string | null>(null);
   useEffect(() => {

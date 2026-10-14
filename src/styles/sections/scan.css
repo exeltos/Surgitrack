@@ -995,3 +995,74 @@ html body .scan-fab {
     padding-bottom: 88px;
   }
 }
+
+/* Department stations: send to Sterilization (with the count), pickup, fault report. */
+html body .scan-station.send .scan-station-icon {
+  background: var(--c-cyan-40);
+}
+html body .scan-station.pickup .scan-station-icon {
+  background: #12a150;
+}
+html body .scan-station.issue .scan-station-icon {
+  background: #d14343;
+}
+html body .scan-count-form,
+html body .scan-photos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+html body .scan-count-form .scan-section span,
+html body .scan-photos .scan-section span {
+  margin-left: auto;
+}
+html body .scan-checks label.on {
+  border-color: var(--c-cyan-40);
+  background: #e7f3f5;
+}
+html body .scan-checks label > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+html body .scan-checks label small {
+  color: #627887;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+html body .scan-photos ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .scan-photos li {
+  position: relative;
+}
+html body .scan-photos img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 12px;
+}
+html body .scan-photos li button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+}
+html body .scan-photos label.scan-secondary {
+  position: relative;
+  cursor: pointer;
+}

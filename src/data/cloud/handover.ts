@@ -33,6 +33,15 @@ export const DEMO_HANDOVER_PEOPLE: HandoverSigner[] = [
   role: 'Χρήστης Τμήματος',
 }));
 
+/** Demo only: the Sterilization person who brings sterile Sets to a department and signs there. */
+export const DEMO_HANDOVER_STERILIZATION: HandoverSigner = {
+  code: 'ST1001',
+  userId: 'demo-st1001',
+  name: 'Demo Χρήστης Αποστείρωσης',
+  department: 'Κεντρική Αποστείρωση',
+  role: 'Αποστείρωση',
+};
+
 export const isDemoHandover = () => getRuntimeDataMode() === 'DEMO' || !getRealIdentity();
 
 export type HandoverVerifyResult =
@@ -47,7 +56,7 @@ export async function verifyHandover(
   const code = userCode.trim().toUpperCase();
   if (!code || !password) return {ok: false, reason: 'invalid'};
   if (isDemoHandover()) {
-    const signer = DEMO_HANDOVER_PEOPLE.find(person => person.code === code);
+    const signer = [...DEMO_HANDOVER_PEOPLE, DEMO_HANDOVER_STERILIZATION].find(person => person.code === code);
     return signer ? {ok: true, signer} : {ok: false, reason: 'invalid'};
   }
   const real = getRealIdentity();

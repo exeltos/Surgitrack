@@ -165,6 +165,11 @@ export type DeliveryPayload = {
   receivedByUserId: string;
   receivedByName: string;
   receivedByDepartment: string;
+  /**
+   * When the department records the pickup (the phone app), the Sterilization person who brought it and signed;
+   * otherwise the signed-in user delivers.
+   */
+  deliveredBy?: {userId: string; name: string; department: string};
   note?: string;
 };
 
@@ -287,7 +292,10 @@ export type SurgiStoreValue = {
   setSessionUser: (user: SessionUser) => void;
   /** Demo only: work as another identity (role and department). */
   switchIdentity: (user: SessionUser) => void;
-  sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => void;
+  /** Sends to Sterilization; false when it was refused (the reason is shown as a toast). */
+  sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => boolean;
+  /** Whether the item may circulate (not used up, not recalled); when not, the reason is shown as a toast. */
+  circulationAllowed: (kind: AssetKind, id: string) => boolean;
   receiveAtSterilization: (kind: AssetKind, id: string, payload: ReceivePayload) => ReceiptRecord | undefined;
   recordPreparation: (kind: AssetKind, id: string, payload: PreparationPayload) => PreparationRecord | undefined;
   completeSterilizationCycle: (

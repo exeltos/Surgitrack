@@ -10,8 +10,11 @@ import {
   LayoutDashboard,
   List,
   LogOut,
+  PackageCheck,
   Search,
+  Send,
   ShieldCheck,
+  TriangleAlert,
   Truck,
   X,
 } from 'lucide-react';
@@ -35,7 +38,10 @@ import LoadStation from './stations/LoadStation';
 import LookupStation from './stations/LookupStation';
 import ReceiveStation from './stations/ReceiveStation';
 import ReleaseStation from './stations/ReleaseStation';
+import IssueStation from './stations/IssueStation';
+import PickupStation from './stations/PickupStation';
 import ReportStation from './stations/ReportStation';
+import SendStation from './stations/SendStation';
 import {useNewVersion} from './useNewVersion';
 
 type Station = {
@@ -54,6 +60,23 @@ const managesSterilization = (user: SessionUser) =>
   user.role === 'ADMIN' || (user.role === 'STERILIZATION' && !!user.supervisor);
 
 const stations = (): Station[] => [
+  {
+    path: 'send',
+    title: tr('Αποστολή στην Αποστείρωση'),
+    text: tr('Μετά τη χρήση: κωδικός ασθενούς, καταμέτρηση, αποστολή'),
+    icon: <Send size={26} />,
+    tone: 'send',
+    permission: 'department.dispatch',
+    only: user => user.role !== 'STERILIZATION',
+  },
+  {
+    path: 'pickup',
+    title: tr('Παραλαβή από Αποστείρωση'),
+    text: tr('Τα αποστειρωμένα που φτάνουν στο τμήμα'),
+    icon: <PackageCheck size={26} />,
+    tone: 'pickup',
+    only: user => user.role === 'DEPARTMENT',
+  },
   {
     path: 'receive',
     title: tr('Παραλαβή'),
@@ -85,6 +108,14 @@ const stations = (): Station[] => [
     icon: <Truck size={26} />,
     tone: 'deliver',
     permission: 'sterilization.deliver',
+  },
+  {
+    path: 'issue',
+    title: tr('Αναφορά βλάβης'),
+    text: tr('Βλάβη, φθορά ή έλλειψη, με φωτογραφία'),
+    icon: <TriangleAlert size={26} />,
+    tone: 'issue',
+    permission: 'issue.create',
   },
   {
     path: 'lookup',
@@ -212,6 +243,9 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         <Route path={`${SCAN_PATH}/deliver`} element={station('deliver', <DeliverStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/report`} element={station('report', <ReportStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/lists`} element={station('lists', <ListsStation onStations={toStations} />)} />
+        <Route path={`${SCAN_PATH}/send`} element={station('send', <SendStation onStations={toStations} />)} />
+        <Route path={`${SCAN_PATH}/pickup`} element={station('pickup', <PickupStation onStations={toStations} />)} />
+        <Route path={`${SCAN_PATH}/issue`} element={station('issue', <IssueStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/lookup`} element={station('lookup', <LookupStation onStations={toStations} />)} />
         <Route path="*" element={<Navigate to={SCAN_PATH} replace />} />
       </Routes>

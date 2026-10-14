@@ -1165,11 +1165,6 @@ body {
   width: 100%;
   max-width: none;
 }
-.asset-focus-shell .topbar {
-  width: 100%;
-  padding-left: clamp(18px, 2.2vw, 34px);
-  padding-right: clamp(18px, 2.2vw, 34px);
-}
 .asset-focus-shell .content {
   max-width: none;
   width: 100%;
@@ -1191,10 +1186,6 @@ body {
   .asset-focus-shell .content {
     padding-left: 18px;
     padding-right: 18px;
-  }
-  .asset-focus-shell .topbar {
-    padding-left: 14px;
-    padding-right: 14px;
   }
 }
 
