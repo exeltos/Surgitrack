@@ -608,6 +608,7 @@
 .print-preview-modal > footer {
   padding: 12px 18px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
   border-top: 1px solid var(--c-gray-95);
@@ -616,6 +617,21 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+}
+/* Left of the footer: e.g. keeping the label options as the hospital's default. */
+.print-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+.label-default-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-green-30);
+  font-size: 12.5px;
+  font-weight: 700;
 }
 .table-panel tbody tr {
   cursor: pointer;
@@ -643,6 +659,10 @@
     border-left: 0;
     border-top: 1px solid var(--c-gray-95);
     max-height: 42vh;
+  }
+  /* The save action takes its own row; Close and Print stay visible below it. */
+  .print-preview-actions {
+    flex: 1 1 100%;
   }
 }
 

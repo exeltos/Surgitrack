@@ -9,6 +9,7 @@ export default function PrintPreviewModal({
   onClose,
   aside,
   compact,
+  actions,
 }: {
   title: string;
   html: string;
@@ -17,6 +18,8 @@ export default function PrintPreviewModal({
   aside?: ReactNode;
   /** A smaller dialog for small prints such as labels. */
   compact?: boolean;
+  /** Extra buttons on the left of the footer (e.g. saving the options as the default). */
+  actions?: ReactNode;
 }) {
   const frameId = 'surgitrack-print-preview';
   const doPrint = () => {
@@ -44,6 +47,7 @@ export default function PrintPreviewModal({
           {aside && <aside className="print-preview-aside">{aside}</aside>}
         </div>
         <footer>
+          {actions && <div className="print-preview-actions">{actions}</div>}
           <AppButton onClick={onClose}>{tr('Κλείσιμο')}</AppButton>
           <AppButton variant="primary" icon={<Printer size={16} />} onClick={doPrint}>
             {tr('Εκτύπωση / Αποθήκευση PDF')}
