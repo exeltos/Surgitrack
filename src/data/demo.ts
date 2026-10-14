@@ -639,6 +639,13 @@ const takenOutTools = takenOut.map(item => {
   expectOneMore(item.set, item.seed);
   return tools[tools.length - 1];
 });
+// An instrument in service is always below its limit: the use that reaches it takes it out of service. The generated
+// counts that reach or pass it are brought just below, so the Demo shows instruments near their limit instead.
+tools
+  .filter(tool => tool.maxUses && tool.state !== 'RETIRED' && tool.uses >= tool.maxUses)
+  .forEach((tool, index) => {
+    tool.uses = tool.maxUses! - 1 - (index % 3);
+  });
 export {tools};
 export const movements: Movement[] = [
   {

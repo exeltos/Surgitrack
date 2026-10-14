@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {navSectionFor} from '../navigation';
+import {navSectionFor, navigationFor} from '../navigation';
+import type {Permission} from '../../core/permissions';
 
 describe('navSectionFor', () => {
   const noTool = () => undefined;
@@ -12,5 +13,21 @@ describe('navSectionFor', () => {
     expect(navSectionFor('/sets/s1', noTool)).toBe('/sets');
     expect(navSectionFor('/tools/t1', () => 'SET_MEMBER')).toBe('/tools');
     expect(navSectionFor('/tools/t1', () => 'STANDALONE')).toBe('/standalone-tools');
+  });
+});
+
+describe('History in the menu', () => {
+  const paths = (can: (permission: Permission) => boolean) => navigationFor('ADMIN', can).map(item => item.to);
+
+  it('is a tab of Traceability for whoever has Traceability', () => {
+    const all = paths(() => true);
+    expect(all).toContain('/traceability');
+    expect(all).not.toContain('/movements');
+  });
+
+  it('stays in the menu when Traceability is taken away', () => {
+    const noTrace = paths(permission => permission !== 'traceability.view');
+    expect(noTrace).not.toContain('/traceability');
+    expect(noTrace).toContain('/movements');
   });
 });

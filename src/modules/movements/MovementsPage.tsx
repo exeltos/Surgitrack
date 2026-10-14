@@ -41,7 +41,8 @@ function assetParts(value: string) {
   return {barcode, name: rest.join(' · ') || value};
 }
 
-export default function MovementsPage() {
+/** The hospital's movements; `embedded` in Traceability («Όλες οι κινήσεις»), which gives the page its title. */
+export default function MovementsPage({embedded = false}: {embedded?: boolean}) {
   const {movements, sets, tools, role, currentUser, forgetMovements} = useSurgi();
   // Only the platform owner can clean chosen entries out of the history: in a hospital, or in Demo.
   const demo = getRuntimeDataMode() === 'DEMO';
@@ -191,10 +192,10 @@ export default function MovementsPage() {
     stopCleaning();
   };
   return (
-    <div className="movements-workspace">
+    <div className={embedded ? 'movements-workspace embedded' : 'movements-workspace'}>
       <div className="page-head movements-head">
         <div>
-          <h1>{tr('Ιστορικό')}</h1>
+          {!embedded && <h1>{tr('Ιστορικό')}</h1>}
           <p>
             {role === 'DEPARTMENT'
               ? tr('Ιστορικό ιχνηλασιμότητας του τμήματος {0}.', trData(currentUser.department))

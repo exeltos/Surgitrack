@@ -38,6 +38,16 @@ vi.mock('../../../store/SurgiStore', () => ({
   }),
 }));
 
+// The hospital's sterilizers and washers (Studio › Libraries): one has a device, one has not.
+vi.mock('../../../core/LibraryStore', () => ({
+  useLibraries: () => ({
+    sterilizers: [
+      {id: 'st1', el: 'ΚΛΙΒΑΝΟΣ 1', en: 'Sterilizer 1'},
+      {id: 'st2', el: 'ΚΛΙΒΑΝΟΣ 2', en: 'Sterilizer 2'},
+    ],
+    washers: [{id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'Washer 1'}],
+  }),
+}));
 const {default: DevicesPage} = await import('../DevicesPage');
 
 const autoclave: Device = {
@@ -103,7 +113,10 @@ describe('Connected devices', () => {
     fireEvent.click(within(dialog).getByRole('button', {name: /Διαγραφή/}));
     await waitFor(() => expect(db.deleted).toEqual(['d1']));
     expect(store.addToBin).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(screen.queryByText('ΚΛΙΒΑΝΟΣ 1')).not.toBeInTheDocument());
+    // Gone from the devices (it is offered again as a library sterilizer with no device).
+    await waitFor(() =>
+      expect(within(document.querySelector('.devices-grid') as HTMLElement).queryByText('ΚΛΙΒΑΝΟΣ 1')).toBeNull(),
+    );
   });
 
   it('lets only the hospital admin add, edit or delete devices', async () => {
@@ -119,5 +132,17 @@ describe('Connected devices', () => {
     db.fail = 'network down';
     open();
     expect(await screen.findByText(/network down/)).toBeInTheDocument();
+  });
+
+  it('offers the library sterilizers that have no device yet, named, to the admin', async () => {
+    open();
+    const strip = await screen.findByRole('region', {name: 'Χωρίς σύνδεση'});
+    expect(
+      within(strip)
+        .getAllByRole('button')
+        .map(b => b.textContent?.trim()),
+    ).toEqual(['ΚΛΙΒΑΝΟΣ 2']);
+    fireEvent.click(within(strip).getByRole('button', {name: /ΚΛΙΒΑΝΟΣ 2/}));
+    expect((screen.getByRole('combobox', {name: /Όνομα/}) as HTMLInputElement).value).toBe('ΚΛΙΒΑΝΟΣ 2');
   });
 });

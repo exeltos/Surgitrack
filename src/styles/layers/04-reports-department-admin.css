@@ -435,6 +435,18 @@
   flex-direction: column;
   overflow: hidden;
 }
+/* «Όλες οι κινήσεις» in Traceability: the movements fill the rest of the page. */
+.trace-with-history {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.movements-workspace.embedded {
+  flex: 1 1 auto;
+  height: auto;
+}
 .movements-head {
   flex: 0 0 auto;
   margin-bottom: 12px;
@@ -725,7 +737,8 @@
   .ledger-open {
     display: none;
   }
-  .movements-workspace {
+  .movements-workspace,
+  .trace-with-history {
     height: auto;
     overflow: visible;
   }

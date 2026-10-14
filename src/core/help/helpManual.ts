@@ -1117,6 +1117,16 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
+          'Όλες οι κινήσεις',
+          'Η καρτέλα «Όλες οι κινήσεις» είναι το πλήρες ιστορικό του νοσοκομείου (παλιά «Ιστορικό»): κάθε παράδοση, παραλαβή, έλεγχος και μετακίνηση, με φίλτρα και λήψη.',
+        ],
+        en: [
+          'All movements',
+          'The "All movements" tab is the hospital\'s full history (formerly "History"): every delivery, receipt, check and movement, with filters and download.',
+        ],
+      },
+      {
+        el: [
           'Κύκλοι και Σετ',
           'Οι «Κύκλοι αποστείρωσης» δείχνουν τα φορτία κλιβάνου από τα οποία πέρασε το αντικείμενο (δικά του ή του Σετ του), με κλίβανο, αριθμό κύκλου, πρόγραμμα και αποτέλεσμα. Για κωδικό ασθενούς φαίνεται τι χρησιμοποιήθηκε, το καθένα με τον τελευταίο κύκλο αποστείρωσης πριν τη χρήση. Ένα εργαλείο μέσα σε Σετ δείχνει και τις «Κινήσεις του Σετ». Αν ένα όνομα ταιριάζει σε πολλά, εμφανίζεται «Βρέθηκαν N — διαλέξτε ένα».',
         ],
@@ -1148,7 +1158,7 @@ export const helpManual: ManualSection[] = [
         'Download or print the results if needed.',
       ],
     },
-    related: ['/movements', '/reports'],
+    related: ['/reports'],
   },
   {
     to: '/reports',

@@ -52,6 +52,8 @@ export type NavigationItem = {
   icon: LucideIcon;
   exactSearch?: string;
   permission: Permission;
+  /** Shown only to whoever lacks this permission (History, when Traceability, which holds it, is not there). */
+  unless?: Permission;
   group?: NavigationGroup;
 };
 
@@ -73,11 +75,19 @@ const assetNavigation: NavigationItem[] = [
   {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace', group: 'EQUIPMENT'},
   {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view', group: 'INSIGHT'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view', group: 'INSIGHT'},
-  {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view', group: 'INSIGHT'},
+  {
+    to: '/movements',
+    label: 'Ιστορικό',
+    icon: History,
+    permission: 'history.view',
+    unless: 'traceability.view',
+    group: 'INSIGHT',
+  },
   {to: '/bin', label: 'Κάδος', icon: Trash2, permission: 'asset.delete'},
 ];
 export const navigationFor = (role: UserRole, can?: (permission: Permission) => boolean): NavigationItem[] => {
   const allowed = (permission: Permission) => (can ? can(permission) : hasPermission(role, permission));
+  const shows = (item: NavigationItem) => allowed(item.permission) && !(item.unless && allowed(item.unless));
   const overview: NavigationItem = {
     to: '/overview',
     label: 'Επισκόπηση',
@@ -85,7 +95,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     permission: 'overview.view',
     group: 'WORK',
   };
-  if (role === 'STERILIZATION') return [overview, ...assetNavigation].filter(item => allowed(item.permission));
+  if (role === 'STERILIZATION') return [overview, ...assetNavigation].filter(shows);
   if (role === 'DEPARTMENT') {
     const departmentNavigation: NavigationItem[] = [
       {to: '/department', label: 'Σετ & Εργαλεία', icon: PackageSearch, permission: 'department.workspace'},
@@ -93,7 +103,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
       {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view'},
       {to: '/movements', label: 'Ιστορικό', icon: History, permission: 'history.view'},
     ];
-    return departmentNavigation.filter(item => allowed(item.permission));
+    return departmentNavigation.filter(shows);
   }
   const adminNavigation: NavigationItem[] = [
     overview,
@@ -118,7 +128,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     },
     {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'SETTINGS'},
   ];
-  return adminNavigation.filter(item => allowed(item.permission));
+  return adminNavigation.filter(shows);
 };
 
 /**

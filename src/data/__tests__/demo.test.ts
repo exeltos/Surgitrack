@@ -44,3 +44,11 @@ describe('demo hospital', () => {
     for (const release of data.sterilizationReleases || []) expect(cycles.has(release.cycleRecordId)).toBe(true);
   });
 });
+
+describe('Demo usage counts', () => {
+  it('keeps every instrument in service below its use limit', async () => {
+    const {tools} = await import('../demo');
+    const over = tools.filter(t => t.maxUses && t.state !== 'RETIRED' && t.uses >= t.maxUses);
+    expect(over.map(t => t.barcode)).toEqual([]);
+  });
+});

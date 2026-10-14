@@ -5,6 +5,7 @@ import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
+import {useLibraries} from '../../core/LibraryStore';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {
@@ -53,6 +54,8 @@ export default function DevicesPage() {
   const [keyFor, setKeyFor] = useState<{device: Device; key?: string; busy?: boolean}>();
   const [fileFor, setFileFor] = useState<Device>();
   const [serialFor, setSerialFor] = useState<Device>();
+  // The hospital's sterilizers and washers (Studio › Libraries) that no device sends cycles for yet.
+  const {sterilizers, washers} = useLibraries();
 
   const load = useCallback(async () => {
     if (!organizationId) return;
@@ -174,6 +177,10 @@ export default function DevicesPage() {
       ]),
     };
   };
+  const unconnected = [
+    ...sterilizers.map(item => ({name: item.el, kind: 'STERILIZER' as const})),
+    ...washers.map(item => ({name: item.el, kind: 'WASHER' as const})),
+  ].filter(item => !devices.some(device => device.name.trim() === item.name));
   const resultLabel = (result: DeviceReading['result']) =>
     result === 'PASS' ? L('Επιτυχία', 'Pass') : result === 'FAIL' ? L('Αποτυχία', 'Fail') : L('Άγνωστο', 'Unknown');
 
@@ -233,6 +240,31 @@ export default function DevicesPage() {
         </div>
       )}
 
+      {isAdmin && !loading && unconnected.length > 0 && (
+        <section className="devices-unconnected" aria-label={L('Χωρίς σύνδεση', 'Not connected')}>
+          <div>
+            <b>{L('Χωρίς σύνδεση', 'Not connected')}</b>
+            <span>
+              {L(
+                'Κλίβανοι και πλυντήρια του νοσοκομείου (Βιβλιοθήκες) που δεν στέλνουν ακόμη δεδομένα κύκλων.',
+                'The hospital’s sterilizers and washers (Libraries) that do not send cycle data yet.',
+              )}
+            </span>
+          </div>
+          <ul>
+            {unconnected.map(item => (
+              <li key={`${item.kind}:${item.name}`}>
+                <button
+                  type="button"
+                  onClick={() => setEditor({value: {...emptyDevice, name: item.name, kind: item.kind}})}
+                >
+                  <Plus size={14} /> {item.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {!loading && devices.length === 0 ? (
         <div className="devices-empty">
           <Cable size={26} />

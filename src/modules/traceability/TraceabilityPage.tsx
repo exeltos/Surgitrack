@@ -1,4 +1,4 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {Search, Route, History, ExternalLink, Flame, UserRound, Users} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -6,6 +6,7 @@ import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import PatientUses from './PatientUses';
+import MovementsPage from '../movements/MovementsPage';
 
 const RECENT_KEY = 'surgitrack.trace.recent';
 /** The last searches on this device (barcodes and patient codes), newest first. */
@@ -52,8 +53,14 @@ export default function TraceabilityPage() {
   // Opened from a movement: the item to look up comes in the address (?q=S000321).
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(() => params.get('q') || '');
-  // Two tabs: the search (a barcode or a patient code) and every use recorded with a patient code.
-  const tab = params.get('tab') === 'patients' ? 'PATIENTS' : 'SEARCH';
+  // A movement opened from «Όλες οι κινήσεις» links here with its barcode while the page stays open.
+  const urlQuery = params.get('q');
+  useEffect(() => {
+    if (urlQuery) setQ(urlQuery);
+  }, [urlQuery]);
+  // Three tabs: the search (a barcode or a patient code), every movement of the hospital, and every use
+  // recorded with a patient code.
+  const tab = params.get('tab') === 'patients' ? 'PATIENTS' : params.get('tab') === 'history' ? 'HISTORY' : 'SEARCH';
   const patientUses = movements.filter(m => m.patientCode).length;
   const [recent, setRecent] = useState<string[]>(readRecent);
   const [report, setReport] = useState<string | null>(null);
@@ -177,7 +184,8 @@ export default function TraceabilityPage() {
     ]),
   });
   return (
-    <>
+    // The movements tab fills the page, as «Ιστορικό» did on its own.
+    <div className={tab === 'HISTORY' ? 'trace-with-history' : undefined}>
       <div className="page-head">
         <div>
           <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
@@ -190,7 +198,8 @@ export default function TraceabilityPage() {
           </div>
         )}
       </div>
-      <HistoryWindowNote auto />
+      {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
+      {tab !== 'HISTORY' && <HistoryWindowNote auto />}
       <div className="name-check-tabs trace-tabs" role="tablist">
         <button
           role="tab"
@@ -202,6 +211,14 @@ export default function TraceabilityPage() {
         </button>
         <button
           role="tab"
+          aria-selected={tab === 'HISTORY'}
+          className={tab === 'HISTORY' ? 'active' : ''}
+          onClick={() => setParams({tab: 'history'}, {replace: true})}
+        >
+          <History size={16} /> {tr('Όλες οι κινήσεις')}
+        </button>
+        <button
+          role="tab"
           aria-selected={tab === 'PATIENTS'}
           className={tab === 'PATIENTS' ? 'active' : ''}
           onClick={() => setParams({tab: 'patients'}, {replace: true})}
@@ -209,7 +226,9 @@ export default function TraceabilityPage() {
           <Users size={16} /> {tr('Χρήσεις σε ασθενείς')} <b>{patientUses}</b>
         </button>
       </div>
-      {tab === 'PATIENTS' ? (
+      {tab === 'HISTORY' ? (
+        <MovementsPage embedded />
+      ) : tab === 'PATIENTS' ? (
         <PatientUses
           movements={movements}
           onOpen={code => {
@@ -395,6 +414,6 @@ export default function TraceabilityPage() {
         </>
       )}
       {report && <PrintPreviewModal title={tr('Ιχνηλάτηση')} html={report} onClose={() => setReport(null)} />}
-    </>
+    </div>
   );
 }
