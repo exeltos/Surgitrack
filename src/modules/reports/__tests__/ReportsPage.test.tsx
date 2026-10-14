@@ -57,7 +57,7 @@ describe('Reports', () => {
         .getAllByRole('columnheader')
         .map(h => h.textContent);
     expect(headers()[0]).toBe('Τμήμα');
-    fireEvent.click(screen.getByRole('button', {name: 'Ανά ειδικότητα'}));
+    filter('Ομαδοποίηση ανά τμήμα', 'specialty');
     expect(headers()[0]).toBe('Ειδικότητα');
     expect(headers()).not.toContain('Τμήμα');
   });

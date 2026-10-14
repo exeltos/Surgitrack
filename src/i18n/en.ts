@@ -283,7 +283,8 @@ export const en: Record<string, string> = {
   'Αλλαγή κάμερας': 'Switch camera',
   'Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.':
     'Unalterable history of handovers, receipts, checks and transfers.',
-  'Ανά ειδικότητα': 'By specialty',
+  'Ομαδοποίηση ανά τμήμα': 'Grouped by department',
+  'Ομαδοποίηση ανά ειδικότητα': 'Grouped by specialty',
   'Απογραφή εξοπλισμού': 'Equipment inventory',
   'Σετ και εργαλεία ανά τμήμα ή ανά ειδικότητα.': 'Sets and instruments by department or by specialty.',
   'Χρήσεις & αποσύρσεις': 'Uses & retirements',
