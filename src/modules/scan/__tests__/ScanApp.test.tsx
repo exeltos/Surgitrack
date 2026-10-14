@@ -217,3 +217,10 @@ describe('ScanApp tabs', () => {
     expect(screen.queryByRole('navigation', {name: 'Πλοήγηση'})).not.toBeInTheDocument();
   });
 });
+
+describe('ScanApp tabs with a trailing slash', () => {
+  it('keeps the tab bar on #/scan/', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/'});
+    expect(screen.getByRole('navigation', {name: 'Πλοήγηση'})).toBeInTheDocument();
+  });
+});

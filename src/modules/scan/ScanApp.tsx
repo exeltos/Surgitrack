@@ -4,6 +4,7 @@ import {
   ArrowDownToLine,
   Building2,
   ChartColumn,
+  ChevronRight,
   Flame,
   FlaskConical,
   LayoutDashboard,
@@ -28,7 +29,7 @@ import {useLibraries} from '../../core/LibraryStore';
 import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
 import type {Permission} from '../../core/permissions';
 import type {SessionUser} from '../../store/types';
-import {tr, trData} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import {SCAN_PATH, isScanStandalone} from './scanApp';
 import DeliverStation from './stations/DeliverStation';
@@ -152,7 +153,8 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
   const {currentUser, organizationName, can, toast, clearToast} = useSurgi();
   const {systemSettings} = useLibraries();
   const navigate = useNavigate();
-  const {pathname} = useLocation();
+  // A link may end in «/» (#/scan/): the same screen.
+  const pathname = useLocation().pathname.replace(/\/+$/, '') || '/';
   // A newer version loads on the stations screen, never in the middle of a round.
   useNewVersion(pathname === SCAN_PATH);
   // The tab bar is on the screens one moves between (home, lookup, lists, account), not inside a round.
@@ -226,8 +228,9 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
   );
   const roleKind =
     currentUser.role === 'STERILIZATION' && currentUser.supervisor ? 'STERILIZATION_SUPERVISOR' : currentUser.role;
-  const roleName =
-    roleKind in hospitalRoleNames ? hospitalRoleNames[roleKind as keyof typeof hospitalRoleNames].el : '';
+  const roleNames =
+    roleKind in hospitalRoleNames ? hospitalRoleNames[roleKind as keyof typeof hospitalRoleNames] : null;
+  const roleName = roleNames ? roleNames[getI18nLang()] : '';
   const account = (
     <div className="scan-screen">
       <header className="scan-head">
@@ -242,22 +245,39 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
             <UserRound size={30} />
           </span>
           <b>{trData(currentUser.name)}</b>
-          {roleName && <small>{tr(roleName)}</small>}
+          {roleName && <small>{roleName}</small>}
           {currentUser.department && <small>{trData(currentUser.department)}</small>}
         </section>
-        {!standalone && (
-          <button type="button" className="scan-secondary" onClick={() => navigate('/')}>
-            <LayoutDashboard size={18} /> {tr('Πλήρης εφαρμογή')}
-          </button>
+        {(!standalone || ownerInside) && (
+          <div className="scan-menu">
+            {!standalone && (
+              <button type="button" onClick={() => navigate('/')}>
+                <span className="scan-menu-icon">
+                  <LayoutDashboard size={18} />
+                </span>
+                <span>{tr('Πλήρης εφαρμογή')}</span>
+                <ChevronRight size={18} />
+              </button>
+            )}
+            {ownerInside && (
+              <button type="button" onClick={() => switchHospital('', `#${SCAN_PATH}`)}>
+                <span className="scan-menu-icon">
+                  <Building2 size={18} />
+                </span>
+                <span>{tr('Αλλαγή νοσοκομείου')}</span>
+                <ChevronRight size={18} />
+              </button>
+            )}
+          </div>
         )}
-        {ownerInside && (
-          <button type="button" className="scan-secondary" onClick={() => switchHospital('', `#${SCAN_PATH}`)}>
-            <Building2 size={18} /> {tr('Αλλαγή νοσοκομείου')}
+        <div className="scan-menu">
+          <button type="button" className="scan-menu-signout" onClick={() => onLogout()}>
+            <span className="scan-menu-icon">
+              <LogOut size={18} />
+            </span>
+            <span>{tr('Αποσύνδεση')}</span>
           </button>
-        )}
-        <button type="button" className="scan-danger" onClick={() => onLogout()}>
-          <LogOut size={18} /> {tr('Αποσύνδεση')}
-        </button>
+        </div>
       </main>
     </div>
   );
