@@ -40,11 +40,11 @@ export default function BatchDepartmentPicker({
       </label>
       {value &&
         (allSelected ? (
-          <button type="button" className="secondary compact" onClick={onClear}>
+          <button type="button" className="clear" onClick={onClear}>
             <X size={14} /> {tr('Αποεπιλογή')}
           </button>
         ) : (
-          <button type="button" className="secondary compact" onClick={onSelectAll}>
+          <button type="button" onClick={onSelectAll}>
             <CheckCheck size={14} /> {tr('Επιλογή όλων ({0})', count)}
           </button>
         ))}

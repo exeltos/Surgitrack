@@ -86,10 +86,12 @@ export function useCycleFlow(
           ? 'Η έλλειψη έγινε αποδεκτή τεκμηριωμένα και το Set προωθήθηκε με απόκλιση.'
           : 'Η σύνθεση αποκαταστάθηκε πριν την προώθηση.',
       );
+    // Open reports kept as they are («Παραμονή ως έχει»): recorded as a deviation of this preparation.
+    const keptIssues = p.issues.filter(i => i.status === 'OPEN' && p.prepKeptIssueIds.has(i.id));
     recordPreparation(kind, id, {
       toolIds: prepItemIds,
       checkedToolIds: [...prepCheckedIds],
-      allOk: prepCompositionComplete,
+      allOk: prepCompositionComplete && keptIssues.length === 0,
       processChecks: prepProcessChecks,
       // Without a Packaging & Labelling stage the shelf life is chosen here.
       shelfLifeMonths: sterilizationWorkflow.stages.some(stage => stage.id === 'PACKAGING' && stage.enabled)
@@ -100,6 +102,7 @@ export function useCycleFlow(
         prepAcceptedDeviation
           ? `Αποδεκτή απόκλιση σύνθεσης: ${prepMissingRequirements.length ? prepMissingRequirements.map(req => `${req.missing}× ${req.name}`).join(', ') : `${prepMissingCount} εργαλείο/α`}`
           : '',
+        keptIssues.length ? `Παραμονή ως έχει: ${keptIssues.map(i => `${i.asset} (${i.type})`).join(', ')}` : '',
       ]
         .filter(Boolean)
         .join(' · '),

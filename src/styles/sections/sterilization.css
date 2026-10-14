@@ -1670,6 +1670,36 @@ html body .batch-department button {
   display: inline-flex;
   flex: none;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-width: 150px;
+  height: 34px;
+  margin: 0;
+  border: 1px solid var(--c-cyan-80);
+  border-radius: 9px;
+  background: var(--c-cyan-95);
+  padding: 0 12px;
+  color: var(--c-cyan-30);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
   white-space: nowrap;
+  box-shadow: none;
+  cursor: pointer;
+}
+html body .batch-department button:hover {
+  border-color: var(--c-cyan-65);
+}
+html body .batch-department button:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+html body .batch-department button.clear {
+  border-color: var(--c-gray-90);
+  background: var(--c-white);
+  color: var(--c-gray-30);
+}
+html body .batch-department button.clear:hover {
+  border-color: var(--c-gray-65);
+  background: var(--c-gray-95);
 }

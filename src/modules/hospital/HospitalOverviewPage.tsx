@@ -76,7 +76,8 @@ export default function HospitalOverviewPage() {
       item.barcode.toUpperCase() === barcode || !!item.legacyBarcodes?.some(code => code.toUpperCase() === barcode);
     const set = sets.find(known);
     if (set) return `/sets/${set.id}`;
-    const tool = tools.find(known) || retiredTools.find(known);
+    // A retired instrument has no card to open: its row keeps the list it came from.
+    const tool = tools.find(known);
     return tool ? `/tools/${tool.id}` : undefined;
   };
   const {departments, systemSettings, sterilizationWorkflow} = useLibraries();
