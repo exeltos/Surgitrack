@@ -2128,4 +2128,5 @@ export const en: Record<string, string> = {
   Πλοήγηση: 'Navigation',
   'Demo · σε αναμονή': 'Demo · waiting',
   'Χωρίς ετικέτες: πατήστε ένα για να μπει σαν σκαναρισμένο.': 'No labels: tap one to add it as if scanned.',
+  'Όλα ({0})': 'All ({0})',
 };
