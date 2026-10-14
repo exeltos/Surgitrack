@@ -94,7 +94,7 @@ describe('ScanApp report', () => {
 
   it('is not among the stations of Sterilization staff', () => {
     renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan', signedIn: staff});
-    expect(screen.queryByRole('button', {name: /Αναφορά/})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /Αναφορά(?! βλάβης)/})).not.toBeInTheDocument();
   });
 
   it('shows the day at Sterilization: activity, stages now, and who did what', () => {
@@ -128,5 +128,67 @@ describe('ScanCamera', () => {
     expect(container.querySelector('video')).not.toBeNull();
     fireEvent.click(screen.getByRole('button', {name: /Κλείσιμο κάμερας/}));
     expect(container.querySelector('video')).toBeNull();
+  });
+});
+
+describe('ScanApp for a department', () => {
+  const theatre = {
+    id: 'u-or',
+    name: 'Νοσηλεύτρια Χειρουργείου',
+    role: 'DEPARTMENT' as const,
+    department: 'Χειρουργείο',
+  };
+
+  it('offers sending, pickup and fault reports, not the Sterilization stations', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan', signedIn: theatre});
+    const stations = within(screen.getByRole('navigation', {name: 'Αρχική'}));
+    for (const name of ['Αποστολή στην Αποστείρωση', 'Παραλαβή από Αποστείρωση', 'Αναφορά βλάβης'])
+      expect(stations.getByRole('button', {name: new RegExp(name)})).toBeInTheDocument();
+    expect(stations.queryByRole('button', {name: /Φόρτωση κλιβάνου/})).not.toBeInTheDocument();
+  });
+
+  it('sends a Set after the patient code and the signed count', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/send', signedIn: theatre});
+    typeBarcode('S000322');
+    const refused = () => within(screen.getByRole('list', {name: 'Δεν προστέθηκαν'}));
+    expect(refused().getByText(/S000322 · ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ: δεν βρίσκεται στο τμήμα/)).toBeInTheDocument();
+    typeBarcode('S000327');
+    expect(refused().getByText(/ανήκει σε άλλο τμήμα/)).toBeInTheDocument();
+    typeBarcode('S000321');
+    const send = screen.getByRole('button', {name: /Υπογραφή & αποστολή/});
+    expect(send).toBeDisabled();
+    fireEvent.change(screen.getByLabelText(/Κωδικός ασθενούς/), {target: {value: 'PT-1'}});
+    const count = within(screen.getByRole('region', {name: 'Καταμέτρηση εργαλείων'}));
+    for (const box of count.getAllByRole('checkbox')) fireEvent.click(box);
+    const lives = screen.queryByRole('region', {name: 'Καταγραφή χρήσης'});
+    if (lives) fireEvent.click(within(lives).getByRole('checkbox'));
+    expect(send).toBeEnabled();
+    fireEvent.click(send);
+    return screen.findByRole('heading', {name: 'Εστάλη στην Αποστείρωση'});
+  });
+
+  it('records the pickup, signed by the Sterilization person who brought it', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/pickup', signedIn: theatre});
+    typeBarcode('S000321');
+    expect(
+      within(screen.getByRole('list', {name: 'Δεν προστέθηκαν'})).getByText(/δεν είναι έτοιμο για παραλαβή/),
+    ).toBeInTheDocument();
+    typeBarcode('S000322');
+    fireEvent.click(screen.getByRole('button', {name: 'Συνέχεια · 1'}));
+    const complete = screen.getByRole('button', {name: /Ολοκλήρωση παραλαβής · 1/});
+    expect(complete).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', {name: 'Υπογραφή demo'}));
+    await screen.findByText('ST1001');
+    fireEvent.click(complete);
+    expect(await screen.findByRole('heading', {name: 'Η παραλαβή καταγράφηκε'})).toBeInTheDocument();
+  });
+
+  it('reports a fault on an instrument of the Set', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/issue', signedIn: theatre});
+    typeBarcode('S000321');
+    fireEvent.change(screen.getByLabelText('Τύπος αναφοράς'), {target: {value: 'Φθορά'}});
+    fireEvent.click(within(screen.getByRole('region', {name: 'Εργαλεία με πρόβλημα'})).getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getByRole('button', {name: /Καταχώρηση αναφοράς/}));
+    expect(await screen.findByRole('heading', {name: 'Η αναφορά καταχωρήθηκε'})).toBeInTheDocument();
   });
 });

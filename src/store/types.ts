@@ -165,6 +165,11 @@ export type DeliveryPayload = {
   receivedByUserId: string;
   receivedByName: string;
   receivedByDepartment: string;
+  /**
+   * When the department records the pickup (the phone app), the Sterilization person who brought it and signed;
+   * otherwise the signed-in user delivers.
+   */
+  deliveredBy?: {userId: string; name: string; department: string};
   note?: string;
 };
 
