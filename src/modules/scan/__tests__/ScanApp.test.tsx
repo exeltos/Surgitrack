@@ -179,7 +179,13 @@ describe('ScanApp for a department', () => {
     expect(complete).toBeDisabled();
     fireEvent.click(screen.getByRole('button', {name: 'Υπογραφή demo'}));
     await screen.findByText('ST1001');
-    fireEvent.click(complete);
+    // Back to change what is handed over: the signature no longer holds.
+    fireEvent.click(screen.getByRole('button', {name: /Σάρωση/}));
+    fireEvent.click(screen.getByRole('button', {name: 'Συνέχεια · 1'}));
+    expect(screen.getByRole('button', {name: /Ολοκλήρωση παραλαβής · 1/})).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', {name: 'Υπογραφή demo'}));
+    await screen.findByText('ST1001');
+    fireEvent.click(screen.getByRole('button', {name: /Ολοκλήρωση παραλαβής · 1/}));
     expect(await screen.findByRole('heading', {name: 'Η παραλαβή καταγράφηκε'})).toBeInTheDocument();
   });
 

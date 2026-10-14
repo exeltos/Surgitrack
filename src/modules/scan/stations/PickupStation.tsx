@@ -90,7 +90,11 @@ export default function PickupStation({onStations}: {onStations: () => void}) {
         title={tr('Ολοκλήρωση παραλαβής')}
         subtitle={trData(currentUser.department)}
         backLabel={tr('Σάρωση')}
-        onBack={() => setStep('SCAN')}
+        onBack={() => {
+          // The signature covers the items on screen: going back to change them asks for it again.
+          setSigner(null);
+          setStep('SCAN');
+        }}
         footer={
           <button type="button" className="scan-primary" disabled={!items.length || !signerFits} onClick={complete}>
             {tr('Ολοκλήρωση παραλαβής · {0}', items.length)}

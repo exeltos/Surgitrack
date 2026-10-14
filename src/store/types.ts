@@ -292,7 +292,10 @@ export type SurgiStoreValue = {
   setSessionUser: (user: SessionUser) => void;
   /** Demo only: work as another identity (role and department). */
   switchIdentity: (user: SessionUser) => void;
-  sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => void;
+  /** Sends to Sterilization; false when it was refused (the reason is shown as a toast). */
+  sendToSterilization: (kind: AssetKind, id: string, patientCode?: string, note?: string) => boolean;
+  /** Whether the item may circulate (not used up, not recalled); when not, the reason is shown as a toast. */
+  circulationAllowed: (kind: AssetKind, id: string) => boolean;
   receiveAtSterilization: (kind: AssetKind, id: string, payload: ReceivePayload) => ReceiptRecord | undefined;
   recordPreparation: (kind: AssetKind, id: string, payload: PreparationPayload) => PreparationRecord | undefined;
   completeSterilizationCycle: (

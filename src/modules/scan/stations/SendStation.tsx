@@ -19,7 +19,7 @@ import {useScanAnswers} from '../useScanAnswers';
  * operating theatre), the instrument count, ticked one by one or scanned, signed with the sending.
  */
 export default function SendStation({onStations}: {onStations: () => void}) {
-  const {sets, tools, role, currentUser, sendToSterilization, recordCount} = useSurgi();
+  const {sets, tools, role, currentUser, sendToSterilization, recordCount, circulationAllowed} = useSurgi();
   const {systemSettings} = useLibraries();
   const [found, setFound] = useState<Scanned | null>(null);
   const [feedback, setFeedback] = useState<BarcodeFeedback | null>(null);
@@ -124,7 +124,8 @@ export default function SendStation({onStations}: {onStations: () => void}) {
     setBulk(true);
   };
   const send = async () => {
-    if (!ready) return;
+    // Refused before anything is recorded (used up, recalled): the count is not signed for nothing.
+    if (!ready || !circulationAllowed(kind, asset.id)) return;
     if (counting) {
       if (
         missing.length &&
@@ -153,7 +154,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
       });
       if (!count) return;
     }
-    sendToSterilization(kind, asset.id, patientCode.trim() || undefined, note.trim() || undefined);
+    if (!sendToSterilization(kind, asset.id, patientCode.trim() || undefined, note.trim() || undefined)) return;
     setSent(found);
     setFound(null);
   };
