@@ -33,6 +33,7 @@ export default function UsageLimitCard({
               <span>{tr('Χρήσεις που έχουν γίνει')}</span>
               {onCorrect ? (
                 <span className="usage-correct">
+                  <strong>{uses}</strong>
                   <button
                     type="button"
                     onClick={() => onCorrect(-1)}
@@ -42,7 +43,6 @@ export default function UsageLimitCard({
                   >
                     <Minus size={14} />
                   </button>
-                  <strong>{uses}</strong>
                   <button
                     type="button"
                     onClick={() => onCorrect(1)}

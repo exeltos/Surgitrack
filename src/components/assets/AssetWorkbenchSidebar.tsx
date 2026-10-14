@@ -417,6 +417,7 @@ export default function AssetWorkbenchSidebar({
               <dd>
                 {onCorrectUses ? (
                   <span className="usage-correct">
+                    <span>{asset.uses || 0}</span>
                     <button
                       type="button"
                       onClick={() => onCorrectUses(-1)}
@@ -424,9 +425,8 @@ export default function AssetWorkbenchSidebar({
                       aria-label={tr('Μία χρήση λιγότερη')}
                       title={tr('Μία χρήση λιγότερη')}
                     >
-                      <Minus size={13} />
+                      <Minus size={12} />
                     </button>
-                    {asset.uses || 0}
                     <button
                       type="button"
                       onClick={() => onCorrectUses(1)}
@@ -434,7 +434,7 @@ export default function AssetWorkbenchSidebar({
                       aria-label={tr('Μία χρήση περισσότερη')}
                       title={tr('Μία χρήση περισσότερη')}
                     >
-                      <Plus size={13} />
+                      <Plus size={12} />
                     </button>
                   </span>
                 ) : (
