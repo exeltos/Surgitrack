@@ -147,6 +147,18 @@ export default function ReportsPage() {
   });
   const byDepartment = active === 'inventory';
   const reportFilters: SelectFilter[] = [
+    // The inventory is grouped by department (the default) or by specialty.
+    ...(byDepartment
+      ? [
+          {
+            key: 'group',
+            placeholder: tr('Ομαδοποίηση ανά τμήμα'),
+            options: [{value: 'specialty', label: tr('Ομαδοποίηση ανά ειδικότητα')}],
+            value: group === 'specialty' ? 'specialty' : '',
+            onChange: (next: string) => setGroup(next === 'specialty' ? 'specialty' : 'department'),
+          },
+        ]
+      : []),
     ...(byDepartment || active === 'issues' || active === 'usage' || active === 'expiry' || active === 'handovers'
       ? [
           {
@@ -368,22 +380,6 @@ export default function ReportsPage() {
             </div>
           </header>
           <div className="reports-filter-strip">
-            {active === 'inventory' && (
-              <div className="reports-group-toggle" role="group" aria-label={tr('Ομαδοποίηση')}>
-                <span>{tr('Ομαδοποίηση')}</span>
-                {(['department', 'specialty'] as const).map(value => (
-                  <button
-                    key={value}
-                    type="button"
-                    className={group === value ? 'active' : ''}
-                    aria-pressed={group === value}
-                    onClick={() => setGroup(value)}
-                  >
-                    {value === 'department' ? tr('Ανά τμήμα') : tr('Ανά ειδικότητα')}
-                  </button>
-                ))}
-              </div>
-            )}
             <FilterMenu filters={reportFilters} />
           </div>
           <div className="reports-result-card">
