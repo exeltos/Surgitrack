@@ -53,10 +53,10 @@ export default function ReportsPage() {
       Array.from(
         new Set([
           ...sets.map(x => x.department),
-          ...tools.map(x => x.department).filter((value): value is string => Boolean(value)),
+          ...[...tools, ...retiredTools].map(x => x.department).filter((value): value is string => Boolean(value)),
         ]),
       ).sort((a, b) => a.localeCompare(b, 'el')),
-    [sets, tools],
+    [sets, tools, retiredTools],
   );
   const specialties = useMemo(
     () =>

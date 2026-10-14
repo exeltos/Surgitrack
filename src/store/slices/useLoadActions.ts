@@ -549,7 +549,11 @@ export function useLoadActions(
       deliveredByDepartment: deliverer.department,
       handoverSignatureId: payload.handoverSignatureId,
       // The Demo's sample people sign in the app (no server signature): their signature counts as confirmed.
-      counterpartyVerified: demoSigned(payload.receivedByUserId, payload.handoverSignatureId),
+      // The other party: the receiver, or the deliverer when the department records the pickup itself.
+      counterpartyVerified: demoSigned(
+        deliverer.userId !== currentUser.id ? deliverer.userId : payload.receivedByUserId,
+        payload.handoverSignatureId,
+      ),
       receivedByUserId: payload.receivedByUserId,
       receivedByName: payload.receivedByName,
       receivedByDepartment: payload.receivedByDepartment,
