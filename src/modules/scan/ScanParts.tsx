@@ -1,4 +1,4 @@
-import {useState, type ReactNode} from 'react';
+import {createContext, useContext, useState, type ReactNode} from 'react';
 import {ArrowLeft, CheckCircle2, FileDown, X} from 'lucide-react';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {tr, trData} from '../../i18n';
@@ -11,6 +11,9 @@ import {useSurgi} from '../../store/SurgiStore';
 import {compositionHtml} from '../sterilization/printUtils';
 import type {Issue, SetAsset, Tool} from '../../types/domain';
 import type {SterilizationRow} from '../sterilization/sterilizationTypes';
+
+/** The station a screen belongs to: its icon and colour, shown in the screen's header. */
+export const ScanStationLook = createContext<{icon?: ReactNode; tone?: string}>({});
 
 /** One screen of the phone app: a dark header with the way back, the content, and its main button. */
 export function ScanScreen({
@@ -28,14 +31,24 @@ export function ScanScreen({
   footer?: ReactNode;
   children: ReactNode;
 }) {
+  const look = useContext(ScanStationLook);
   return (
     <div className="scan-screen">
       <header className="scan-head">
         <button type="button" className="scan-back" onClick={onBack}>
           <ArrowLeft size={17} /> {backLabel}
         </button>
-        <h1>{title}</h1>
-        {subtitle && <p>{subtitle}</p>}
+        <div className="scan-head-title">
+          {look.icon && (
+            <span className={`scan-head-icon ${look.tone || ''}`} aria-hidden="true">
+              {look.icon}
+            </span>
+          )}
+          <div>
+            <h1>{title}</h1>
+            {subtitle && <p>{subtitle}</p>}
+          </div>
+        </div>
       </header>
       <main className="scan-body">{children}</main>
       {footer && <footer className="scan-foot">{footer}</footer>}

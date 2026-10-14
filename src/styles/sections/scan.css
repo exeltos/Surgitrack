@@ -239,19 +239,6 @@ html body .scan-station.lists .scan-station-icon {
 html body .scan-station.report .scan-station-icon {
   background: var(--c-cyan-20);
 }
-html body .scan-signout {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: auto;
-  min-height: 46px;
-  border: 0;
-  background: transparent;
-  color: #627887;
-  font: inherit;
-  font-size: 15px;
-}
 
 /* The camera, and typing / a scanner instead. */
 html body .scan-camera {
@@ -1065,4 +1052,234 @@ html body .scan-photos li button {
 html body .scan-photos label.scan-secondary {
   position: relative;
   cursor: pointer;
+}
+
+/* Mobile look: the home as tiles, a tab bar at the bottom, the station's icon in each screen's header. */
+html body .scan-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+html body .scan-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 150px;
+  padding: 16px 14px 14px;
+  border: 1px solid #dbe3ea;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(16 37 47 / 6%);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: transform 0.12s ease;
+}
+html body .scan-tile:active {
+  transform: scale(0.97);
+}
+html body .scan-tile .scan-station-icon {
+  margin-bottom: 6px;
+}
+html body .scan-tile b {
+  font-size: 16px;
+  line-height: 1.25;
+}
+html body .scan-tile small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #627887;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+html body .scan-tile.send .scan-station-icon {
+  background: var(--c-cyan-40);
+}
+html body .scan-tile.pickup .scan-station-icon,
+html body .scan-tile.release .scan-station-icon {
+  background: #12a150;
+}
+html body .scan-tile.issue .scan-station-icon {
+  background: #d14343;
+}
+html body .scan-tile.load .scan-station-icon {
+  background: #7a5af5;
+}
+html body .scan-tile.deliver .scan-station-icon {
+  background: #d97f06;
+}
+html body .scan-tile.lookup .scan-station-icon {
+  background: #627887;
+}
+html body .scan-tile.lists .scan-station-icon {
+  background: #3e7cb1;
+}
+html body .scan-tile.report .scan-station-icon {
+  background: var(--c-cyan-20);
+}
+
+html body .scan-head-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+html body .scan-head-title h1 {
+  margin: 0;
+}
+html body .scan-head-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 16%);
+}
+html body .scan-head-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+html body .scan-app.with-tabs .scan-screen {
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+html body .scan-tabs {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid #dbe3ea;
+  background: rgb(255 255 255 / 96%);
+  backdrop-filter: blur(10px);
+}
+html body .scan-tabs a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 4px 0;
+  border-radius: 14px;
+  color: #627887;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+html body .scan-tabs a svg {
+  padding: 3px 14px;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+}
+html body .scan-tabs a.active {
+  color: var(--c-cyan-20);
+}
+html body .scan-tabs a.active svg {
+  background: #dcedf0;
+}
+
+html body .scan-account {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 22px 16px;
+  border: 1px solid #dbe3ea;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+}
+html body .scan-account b {
+  font-size: 18px;
+}
+html body .scan-account small {
+  color: #627887;
+  font-size: 14px;
+}
+html body .scan-account-avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+  border-radius: 999px;
+  background: #e7f3f5;
+  color: var(--c-cyan-40);
+}
+
+/* The header stays at the top while the screen scrolls. */
+html body .scan-head {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+}
+
+/* Account: settings-style rows; signing out on its own, in red. */
+html body .scan-menu {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dbe3ea;
+  border-radius: 18px;
+  background: #fff;
+}
+html body .scan-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 1px solid #eef2f5;
+  background: transparent;
+  color: #16252f;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+}
+html body .scan-menu button:last-child {
+  border-bottom: 0;
+}
+html body .scan-menu button:active {
+  background: #f1f5f8;
+}
+html body .scan-menu button > span:nth-child(2) {
+  flex: 1;
+}
+html body .scan-menu button > svg {
+  color: #9aabb7;
+}
+html body .scan-menu-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #e7f3f5;
+  color: var(--c-cyan-40);
+}
+html body .scan-menu .scan-menu-signout {
+  justify-content: center;
+  color: #b42318;
+}
+html body .scan-menu .scan-menu-signout > span:nth-child(2) {
+  flex: none;
+}
+html body .scan-menu-signout .scan-menu-icon {
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: inherit;
 }

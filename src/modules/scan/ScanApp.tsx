@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
+import {NavLink, Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {
   ArrowDownToLine,
   Building2,
@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   TriangleAlert,
   Truck,
+  UserRound,
   X,
 } from 'lucide-react';
 import IdleLock from '../../components/layout/IdleLock';
@@ -28,7 +29,7 @@ import {useLibraries} from '../../core/LibraryStore';
 import {DEFAULT_IDLE_LOCK_MINUTES} from '../../core/libraryTypes';
 import type {Permission} from '../../core/permissions';
 import type {SessionUser} from '../../store/types';
-import {tr, trData} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import {SCAN_PATH, isScanStandalone} from './scanApp';
 import DeliverStation from './stations/DeliverStation';
@@ -42,7 +43,9 @@ import IssueStation from './stations/IssueStation';
 import PickupStation from './stations/PickupStation';
 import ReportStation from './stations/ReportStation';
 import SendStation from './stations/SendStation';
+import {ScanStationLook} from './ScanParts';
 import {useNewVersion} from './useNewVersion';
+import {hospitalRoleNames} from '../../config/demoRoles';
 
 type Station = {
   path: string;
@@ -150,8 +153,12 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
   const {currentUser, organizationName, can, toast, clearToast} = useSurgi();
   const {systemSettings} = useLibraries();
   const navigate = useNavigate();
+  // A link may end in «/» (#/scan/): the same screen.
+  const pathname = useLocation().pathname.replace(/\/+$/, '') || '/';
   // A newer version loads on the stations screen, never in the middle of a round.
-  useNewVersion(useLocation().pathname === SCAN_PATH);
+  useNewVersion(pathname === SCAN_PATH);
+  // The tab bar is on the screens one moves between (home, lookup, lists, account), not inside a round.
+  const tabbed = [SCAN_PATH, `${SCAN_PATH}/lookup`, `${SCAN_PATH}/lists`, `${SCAN_PATH}/account`].includes(pathname);
   const standalone = isScanStandalone();
   const allowed = stations().filter(
     station => (!station.permission || can(station.permission)) && (!station.only || station.only(currentUser)),
@@ -182,11 +189,6 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
               <Building2 size={16} /> {tr('Αλλαγή')}
             </button>
           )}
-          {!standalone && (
-            <button type="button" className="scan-back" onClick={() => navigate('/')}>
-              <LayoutDashboard size={16} /> {tr('Εφαρμογή')}
-            </button>
-          )}
         </div>
         <h1>{tr('Σάρωση')}</h1>
         <p>
@@ -207,36 +209,95 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
       )}
       <main className="scan-body">
         {ownerOutside && <OwnerEntry />}
-        <nav className="scan-stations" aria-label={tr('Αρχική')} hidden={ownerOutside}>
+        <nav className="scan-tiles" aria-label={tr('Αρχική')} hidden={ownerOutside}>
           {(ownerOutside ? [] : allowed).map(station => (
             <button
               key={station.path}
               type="button"
-              className={`scan-station ${station.tone}`}
+              className={`scan-tile ${station.tone}`}
               onClick={() => navigate(`${SCAN_PATH}/${station.path}`)}
             >
               <span className="scan-station-icon">{station.icon}</span>
-              <span>
-                <b>{station.title}</b>
-                <small>{station.text}</small>
-              </span>
-              <ChevronRight size={20} />
+              <b>{station.title}</b>
+              <small>{station.text}</small>
             </button>
           ))}
         </nav>
-        <button type="button" className="scan-signout" onClick={() => onLogout()}>
-          <LogOut size={17} /> {tr('Αποσύνδεση')}
-        </button>
       </main>
     </div>
   );
-  const station = (path: string, element: ReactNode) =>
-    allowed.some(item => item.path === path) ? element : <Navigate to={SCAN_PATH} replace />;
+  const roleKind =
+    currentUser.role === 'STERILIZATION' && currentUser.supervisor ? 'STERILIZATION_SUPERVISOR' : currentUser.role;
+  const roleNames =
+    roleKind in hospitalRoleNames ? hospitalRoleNames[roleKind as keyof typeof hospitalRoleNames] : null;
+  const roleName = roleNames ? roleNames[getI18nLang()] : '';
+  const account = (
+    <div className="scan-screen">
+      <header className="scan-head">
+        <div className="scan-head-row">
+          <span>{organizationName ? trData(organizationName) : 'SurgiTrack'}</span>
+        </div>
+        <h1>{tr('Λογαριασμός')}</h1>
+      </header>
+      <main className="scan-body">
+        <section className="scan-account">
+          <span className="scan-account-avatar" aria-hidden="true">
+            <UserRound size={30} />
+          </span>
+          <b>{trData(currentUser.name)}</b>
+          {roleName && <small>{roleName}</small>}
+          {currentUser.department && <small>{trData(currentUser.department)}</small>}
+        </section>
+        {(!standalone || ownerInside) && (
+          <div className="scan-menu">
+            {!standalone && (
+              <button type="button" onClick={() => navigate('/')}>
+                <span className="scan-menu-icon">
+                  <LayoutDashboard size={18} />
+                </span>
+                <span>{tr('Πλήρης εφαρμογή')}</span>
+                <ChevronRight size={18} />
+              </button>
+            )}
+            {ownerInside && (
+              <button type="button" onClick={() => switchHospital('', `#${SCAN_PATH}`)}>
+                <span className="scan-menu-icon">
+                  <Building2 size={18} />
+                </span>
+                <span>{tr('Αλλαγή νοσοκομείου')}</span>
+                <ChevronRight size={18} />
+              </button>
+            )}
+          </div>
+        )}
+        <div className="scan-menu">
+          <button type="button" className="scan-menu-signout" onClick={() => onLogout()}>
+            <span className="scan-menu-icon">
+              <LogOut size={18} />
+            </span>
+            <span>{tr('Αποσύνδεση')}</span>
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+  const tabs = [
+    {to: SCAN_PATH, label: tr('Αρχική'), icon: <LayoutDashboard size={22} />},
+    {to: `${SCAN_PATH}/lookup`, label: tr('Αναζήτηση'), icon: <Search size={22} />},
+    {to: `${SCAN_PATH}/lists`, label: tr('Λίστες'), icon: <List size={22} />},
+    {to: `${SCAN_PATH}/account`, label: tr('Λογαριασμός'), icon: <UserRound size={22} />},
+  ].filter(tab => !ownerOutside || tab.to === SCAN_PATH || tab.to.endsWith('/account'));
+  const station = (path: string, element: ReactNode) => {
+    const item = allowed.find(entry => entry.path === path);
+    if (!item) return <Navigate to={SCAN_PATH} replace />;
+    return <ScanStationLook.Provider value={{icon: item.icon, tone: item.tone}}>{element}</ScanStationLook.Provider>;
+  };
 
   return (
-    <div className="scan-app">
+    <div className={`scan-app${tabbed ? ' with-tabs' : ''}`}>
       <Routes>
         <Route path={SCAN_PATH} element={home} />
+        <Route path={`${SCAN_PATH}/account`} element={account} />
         <Route path={`${SCAN_PATH}/receive`} element={station('receive', <ReceiveStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/load`} element={station('load', <LoadStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/release`} element={station('release', <ReleaseStation onStations={toStations} />)} />
@@ -249,6 +310,16 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         <Route path={`${SCAN_PATH}/lookup`} element={station('lookup', <LookupStation onStations={toStations} />)} />
         <Route path="*" element={<Navigate to={SCAN_PATH} replace />} />
       </Routes>
+      {tabbed && (
+        <nav className="scan-tabs" aria-label={tr('Πλοήγηση')}>
+          {tabs.map(tab => (
+            <NavLink key={tab.to} to={tab.to} end className={({isActive}) => (isActive ? 'active' : '')}>
+              {tab.icon}
+              <span>{tab.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      )}
       {toast && (
         <div className={`scan-toast${toast.warning ? ' warning' : ''}`} role="status">
           <span>{toast.text}</span>
