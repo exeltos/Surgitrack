@@ -2122,4 +2122,8 @@ export const en: Record<string, string> = {
   'Υπογραφή & αποστολή': 'Sign & send',
   'Κωδικός ασθενούς · υποχρεωτικός': 'Patient code · required',
   'Κωδικός ασθενούς · προαιρετικός': 'Patient code · optional',
+  Λογαριασμός: 'Account',
+  'Πλήρης εφαρμογή': 'Full app',
+  'Αλλαγή νοσοκομείου': 'Change hospital',
+  Πλοήγηση: 'Navigation',
 };

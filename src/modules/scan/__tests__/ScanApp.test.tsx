@@ -198,3 +198,22 @@ describe('ScanApp for a department', () => {
     expect(await screen.findByRole('heading', {name: 'Η αναφορά καταχωρήθηκε'})).toBeInTheDocument();
   });
 });
+
+describe('ScanApp tabs', () => {
+  it('moves between home, lookup, lists and the account from the tab bar, and signs out there', () => {
+    const onLogout = vi.fn();
+    renderPage(<ScanApp onLogout={onLogout} />, {path: '/scan'});
+    const tabs = within(screen.getByRole('navigation', {name: 'Πλοήγηση'}));
+    fireEvent.click(tabs.getByRole('link', {name: /Λογαριασμός/}));
+    expect(screen.getByRole('heading', {name: 'Λογαριασμός'})).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: /Αποσύνδεση/}));
+    expect(onLogout).toHaveBeenCalled();
+    fireEvent.click(tabs.getByRole('link', {name: /Λίστες/}));
+    expect(screen.getByRole('searchbox', {name: 'Αναζήτηση'})).toBeInTheDocument();
+  });
+
+  it('is not shown inside a round', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/receive'});
+    expect(screen.queryByRole('navigation', {name: 'Πλοήγηση'})).not.toBeInTheDocument();
+  });
+});

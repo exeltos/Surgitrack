@@ -5,7 +5,8 @@ folder on an empty Postgres gives the same public schema as the live project. La
 local replay below: policies, triggers and table and function privileges are identical, and function bodies differ
 only in whitespace (`platform_delete_movements`).
 
-The folder has 88 files, all applied to the live project and recorded in its history (checked 10/10/2026).
+The folder has 93 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup` applied
+and recorded on 14/10/2026, the file named after the version the live project gave it).
 
 ## How the versions line up
 
