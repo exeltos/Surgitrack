@@ -216,6 +216,8 @@ export function useAppRecordSync(
   const superseded = useRef(new WeakSet<CloudRecord>());
   // How many times in a row each record came back as changed on another device.
   const staleStreak = useRef(new Map<string, number>());
+  // After a save refused as changed elsewhere, no flush runs before this time (the pause between tries).
+  const holdUntil = useRef(0);
   // Server time from which the next look fetches changes and deletions (kept in the device's copy).
   const since = useRef(new Date(Date.now() - 10 * 60000).toISOString());
   const deletedSince = useRef(since.current);
@@ -317,6 +319,7 @@ export function useAppRecordSync(
       const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
       const current = new Map(latest.current.map(item => [item.id, item]));
       const merged: CloudRecord[] = [];
+      const gone: string[] = [];
       const givenUp: Array<{label: string; reverted: boolean; reason: RefusalReason}> = [];
       for (const id of ids) {
         const server = saved.get(id);
@@ -331,6 +334,7 @@ export function useAppRecordSync(
             if (server) known.set(id, server);
             else known.delete(id);
             if (server) merged.push(server);
+            else if (local) gone.push(id);
             givenUp.push({label: recordLabel(server || local || {id}), reverted: !!server, reason: 'conflict'});
           }
           continue;
@@ -345,6 +349,8 @@ export function useAppRecordSync(
           continue;
         }
         const result = mergeConcurrent(known.get(id), local, server);
+        // Nothing of this device's is left to send: the conflict is over, and so is the streak.
+        if (!result.keepsLocal) staleStreak.current.delete(id);
         // The other device's save is now the base; what is kept from here is saved on top of it.
         known.set(id, server);
         superseded.current.add(local);
@@ -354,7 +360,7 @@ export function useAppRecordSync(
             listener({collection, label: recordLabel(server), fields: result.conflicts}),
           );
       }
-      if (merged.length) applyRef.current?.(merged, []);
+      if (merged.length || gone.length) applyRef.current?.(merged, gone);
       if (givenUp.length) notify({kind: 'refused', records: givenUp});
     };
     // Records the server will not take (permission, invalid data): sent again they would block the
@@ -456,6 +462,7 @@ export function useAppRecordSync(
           if (stale.size) {
             await resolveStale([...stale]);
             hadStale = true;
+            holdUntil.current = Date.now() + RETRY_DELAY_MS;
           }
           if (rejected.size) await renumber([...rejected]);
           // The store is taking the restored, merged or renumbered records: the next flush sends what is left.
@@ -493,9 +500,12 @@ export function useAppRecordSync(
         pullNow.current();
       }
     };
-    const timer = window.setTimeout(() => {
-      queue.current = queue.current.then(flush);
-    }, SYNC_DELAY_MS);
+    const timer = window.setTimeout(
+      () => {
+        queue.current = queue.current.then(flush);
+      },
+      Math.max(SYNC_DELAY_MS, holdUntil.current - Date.now()),
+    );
     return () => window.clearTimeout(timer);
   }, [organizationId, collection, items, retryTick]);
 
