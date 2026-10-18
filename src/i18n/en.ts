@@ -1933,6 +1933,7 @@ export const en: Record<string, string> = {
     '{0}: not saved ({1}) and removed from this device.',
   'δεν έχετε δικαίωμα για αυτή την αλλαγή': 'you are not allowed to make this change',
   'η βάση δεδομένων δεν δέχτηκε τα στοιχεία': 'the database did not accept the data',
+  'άλλαξε ταυτόχρονα σε άλλη συσκευή': 'it was changed at the same time on another device',
   'ο διακομιστής την απέρριψε': 'the server refused it',
   'Και {0} ακόμη.': 'And {0} more.',
   Αποσύνδεση: 'Sign out',

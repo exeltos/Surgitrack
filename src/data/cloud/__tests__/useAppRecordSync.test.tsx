@@ -91,6 +91,48 @@ describe('saving a collection to the cloud', () => {
     stop();
   });
 
+  it('stops sending a record the server keeps refusing as changed elsewhere, and keeps the saved version', async () => {
+    const notices: unknown[] = [];
+    const stop = onSyncNotice(notice => notices.push(notice));
+    // The saved version is the one this device started from, so each merge keeps the local edit and sends it again.
+    const server = tool(1);
+    render(<Harness initial={[tool(1)]} />);
+    // Every save of t1 comes back as changed on another device, whatever the device sends.
+    const times: number[] = [];
+    api.writeAppRecords.mockImplementation(async () => {
+      times.push(Date.now());
+      return {...saved(), stale: ['t1']};
+    });
+    api.loadRecordsById.mockResolvedValue([server]);
+    await change(list => list.map(item => ({...item, name: 'Edited'})));
+    await wait(60_000);
+
+    // A few tries, with a pause between them, and then it gives up: not a save every few milliseconds.
+    expect(api.writeAppRecords.mock.calls.length).toBeLessThanOrEqual(3);
+    // …each after the pause.
+    times.slice(1).forEach((at, index) => expect(at - times[index]).toBeGreaterThanOrEqual(5000));
+    expect(store[0]).toEqual(server);
+    expect(notices).toEqual([
+      {kind: 'refused', records: [{label: 'T000001 · Tool 1', reverted: true, reason: 'conflict'}]},
+    ]);
+    expect(syncNoticeMessage(notices[0] as never).text).toContain('άλλαξε ταυτόχρονα σε άλλη συσκευή');
+    expect(unsavedChanges()).toBe(0);
+    stop();
+  });
+
+  it('lets go of a record refused as changed elsewhere that is no longer on the server', async () => {
+    render(<Harness initial={[tool(1), tool(2)]} />);
+    api.writeAppRecords.mockResolvedValue({...saved(), stale: ['t1']});
+    // Another device deleted it: there is nothing to merge with.
+    api.loadRecordsById.mockResolvedValue([]);
+    await change(list => list.map(item => (item.id === 't1' ? {...item, name: 'Edited'} : item)));
+    await wait(60_000);
+
+    expect(store.map(item => item.id)).toEqual(['t2']);
+    expect(api.writeAppRecords.mock.calls.length).toBeLessThanOrEqual(3);
+    expect(unsavedChanges()).toBe(0);
+  });
+
   it('drops a record the server refuses for good and keeps saving (and reading) the rest', async () => {
     const notices: unknown[] = [];
     const stop = onSyncNotice(notice => notices.push(notice));
