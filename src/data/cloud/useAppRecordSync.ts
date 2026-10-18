@@ -31,6 +31,12 @@ const ADOPT_MS = 5000;
 // Rounds per flush; later changes are picked up by the next render's flush.
 const MAX_ROUNDS = 5;
 /**
+ * A record the database keeps refusing as changed on another device, even after merging with the saved
+ * version, is given up on after this many tries in a row: it goes back to the server's version (and the
+ * user hears so) instead of being sent again and again, which once flooded the database for days.
+ */
+const MAX_STALE_TRIES = 3;
+/**
  * Collections whose saves wait until these have nothing left to save on this device: a cycle and its
  * release reach the server before the Set or instrument they make ready, so the database can require a
  * release of a passed cycle when a Set becomes ready.
@@ -90,7 +96,7 @@ export const onSyncConflict = (listener: (conflict: SyncConflict) => void) => {
   };
 };
 
-export type RefusalReason = 'permission' | 'invalid' | 'other';
+export type RefusalReason = 'permission' | 'invalid' | 'conflict' | 'other';
 /** What the sync changed or gave up on by itself, and the user must hear about. */
 export type SyncNotice =
   | {kind: 'barcode'; collection: 'sets' | 'tools'; changes: Array<{from: string; to: string}>}
@@ -208,6 +214,8 @@ export function useAppRecordSync(
   const adopted = useRef(new Map<string, number>());
   // Local versions replaced by a merge with another device's save: never sent as they are.
   const superseded = useRef(new WeakSet<CloudRecord>());
+  // How many times in a row each record came back as changed on another device.
+  const staleStreak = useRef(new Map<string, number>());
   // Server time from which the next look fetches changes and deletions (kept in the device's copy).
   const since = useRef(new Date(Date.now() - 10 * 60000).toISOString());
   const deletedSince = useRef(since.current);
@@ -309,10 +317,33 @@ export function useAppRecordSync(
       const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
       const current = new Map(latest.current.map(item => [item.id, item]));
       const merged: CloudRecord[] = [];
+      const givenUp: Array<{label: string; reverted: boolean; reason: RefusalReason}> = [];
       for (const id of ids) {
         const server = saved.get(id);
         const local = current.get(id);
-        if (!server || !local) continue;
+        const tries = (staleStreak.current.get(id) || 0) + 1;
+        staleStreak.current.set(id, tries);
+        if (!server || !local) {
+          // Nothing to merge with: after a few tries the record is let go rather than sent for ever.
+          if (tries >= MAX_STALE_TRIES) {
+            staleStreak.current.delete(id);
+            if (local) superseded.current.add(local);
+            if (server) known.set(id, server);
+            else known.delete(id);
+            if (server) merged.push(server);
+            givenUp.push({label: recordLabel(server || local || {id}), reverted: !!server, reason: 'conflict'});
+          }
+          continue;
+        }
+        if (tries >= MAX_STALE_TRIES) {
+          // Still refused after merging: keep the saved version.
+          staleStreak.current.delete(id);
+          known.set(id, server);
+          superseded.current.add(local);
+          merged.push(server);
+          givenUp.push({label: recordLabel(server), reverted: true, reason: 'conflict'});
+          continue;
+        }
         const result = mergeConcurrent(known.get(id), local, server);
         // The other device's save is now the base; what is kept from here is saved on top of it.
         known.set(id, server);
@@ -324,6 +355,7 @@ export function useAppRecordSync(
           );
       }
       if (merged.length) applyRef.current?.(merged, []);
+      if (givenUp.length) notify({kind: 'refused', records: givenUp});
     };
     // Records the server will not take (permission, invalid data): sent again they would block the
     // collection for good, so they go back to the server's version, or away if never saved there.
@@ -392,6 +424,8 @@ export function useAppRecordSync(
     const before = (SAVED_AFTER[collection] || []).map(other => `${organizationId}:${other}`);
     const flush = async () => {
       busy.current = true;
+      // A save refused as changed elsewhere is tried again only after a pause, never straight away.
+      let hadStale = false;
       try {
         for (let round = 0; round < MAX_ROUNDS; round++) {
           if (before.length) await settled(before);
@@ -414,9 +448,15 @@ export function useAppRecordSync(
           // What the database took is saved even when one record in the batch was refused.
           sendable
             .filter(item => !rejected.has(item.id) && !stale.has(item.id) && !refused.has(item.id))
-            .forEach(item => known.set(item.id, item));
+            .forEach(item => {
+              known.set(item.id, item);
+              staleStreak.current.delete(item.id);
+            });
           if (refused.size) await dropRefused(outcome.refused);
-          if (stale.size) await resolveStale([...stale]);
+          if (stale.size) {
+            await resolveStale([...stale]);
+            hadStale = true;
+          }
           if (rejected.size) await renumber([...rejected]);
           // The store is taking the restored, merged or renumbered records: the next flush sends what is left.
           if (refused.size || stale.size || rejected.size) break;
@@ -435,7 +475,10 @@ export function useAppRecordSync(
         lastSyncAt = Date.now();
         // Still changing after the last round: run another flush rather than wait for a render.
         const rest = diff(known, latest.current);
-        if (rest.changed.length || rest.removed.length) setRetryTick(tick => tick + 1);
+        if (rest.changed.length || rest.removed.length) {
+          if (hadStale) window.setTimeout(() => setRetryTick(tick => tick + 1), RETRY_DELAY_MS);
+          else setRetryTick(tick => tick + 1);
+        }
       } catch (error) {
         console.error(`SurgiTrack: saving ${collection} failed`, error);
         failed.add(key);

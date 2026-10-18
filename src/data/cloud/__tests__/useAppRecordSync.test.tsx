@@ -91,6 +91,29 @@ describe('saving a collection to the cloud', () => {
     stop();
   });
 
+  it('stops sending a record the server keeps refusing as changed elsewhere, and keeps the saved version', async () => {
+    const notices: unknown[] = [];
+    const stop = onSyncNotice(notice => notices.push(notice));
+    // The saved version is the one this device started from, so each merge keeps the local edit and sends it again.
+    const server = tool(1);
+    render(<Harness initial={[tool(1)]} />);
+    // Every save of t1 comes back as changed on another device, whatever the device sends.
+    api.writeAppRecords.mockResolvedValue({...saved(), stale: ['t1']});
+    api.loadRecordsById.mockResolvedValue([server]);
+    await change(list => list.map(item => ({...item, name: 'Edited'})));
+    await wait(60_000);
+
+    // A few tries, with a pause between them, and then it gives up: not a save every few milliseconds.
+    expect(api.writeAppRecords.mock.calls.length).toBeLessThanOrEqual(3);
+    expect(store[0]).toEqual(server);
+    expect(notices).toEqual([
+      {kind: 'refused', records: [{label: 'T000001 · Tool 1', reverted: true, reason: 'conflict'}]},
+    ]);
+    expect(syncNoticeMessage(notices[0] as never).text).toContain('άλλαξε ταυτόχρονα σε άλλη συσκευή');
+    expect(unsavedChanges()).toBe(0);
+    stop();
+  });
+
   it('drops a record the server refuses for good and keeps saving (and reading) the rest', async () => {
     const notices: unknown[] = [];
     const stop = onSyncNotice(notice => notices.push(notice));

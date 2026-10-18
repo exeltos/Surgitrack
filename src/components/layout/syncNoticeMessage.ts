@@ -6,7 +6,9 @@ const refusalReason = (reason: RefusalReason) =>
     ? tr('δεν έχετε δικαίωμα για αυτή την αλλαγή')
     : reason === 'invalid'
       ? tr('η βάση δεδομένων δεν δέχτηκε τα στοιχεία')
-      : tr('ο διακομιστής την απέρριψε');
+      : reason === 'conflict'
+        ? tr('άλλαξε ταυτόχρονα σε άλλη συσκευή')
+        : tr('ο διακομιστής την απέρριψε');
 
 /** What the sync did by itself, in words (see onSyncNotice). */
 export function syncNoticeMessage(notice: SyncNotice): {title: string; text: string} {
