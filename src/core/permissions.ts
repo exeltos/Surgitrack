@@ -430,7 +430,7 @@ export const roleHomePath = (role: UserRole) =>
   role === 'STERILIZATION'
     ? '/sterilization'
     : role === 'DEPARTMENT'
-      ? '/department'
+      ? '/department/home'
       : role === 'VIEWER'
         ? '/overview'
         : '/studio';

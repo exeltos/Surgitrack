@@ -2138,4 +2138,18 @@ export const en: Record<string, string> = {
   'Μία χρήση λιγότερη': 'One use less',
   'Μία χρήση περισσότερη': 'One use more',
   '{0}: χρήσεις {1} → {2}.': '{0}: uses {1} → {2}.',
+  'ΑΡΧΙΚΗ ΤΜΗΜΑΤΟΣ': 'DEPARTMENT HOME',
+  'Για παραλαβή': 'Ready for pickup',
+  'Ο εξοπλισμός του τμήματος με μια ματιά: τι είναι πού και τι περιμένει.':
+    "The department's equipment at a glance: what is where and what is waiting.",
+  'Ό,τι περιμένει το τμήμα τώρα.': 'What the department has waiting now.',
+  '{0} έτοιμα για παραλαβή από την Αποστείρωση': '{0} ready for pickup from Sterilization',
+  '{0} έληξαν · {1} λήγουν σύντομα': '{0} expired · {1} expiring soon',
+  '{0} λήγουν σύντομα': '{0} expiring soon',
+  'απομένουν {0} χρήσεις': '{0} uses left',
+  'Όλα εντάξει: τίποτα δεν περιμένει.': 'All clear: nothing is waiting.',
+  'Οι πιο πρόσφατες κινήσεις των Σετ και εργαλείων του τμήματος.':
+    "The latest movements of the department's Sets and instruments.",
+  'Όλο το ιστορικό': 'Full history',
+  'Δεν υπάρχουν κινήσεις ακόμα.': 'No movements yet.',
 };

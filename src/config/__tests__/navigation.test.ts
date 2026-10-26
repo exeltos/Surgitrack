@@ -33,9 +33,10 @@ describe('History in the menu', () => {
 });
 
 describe('the department menu', () => {
-  it('lists the Sets and the standalone instruments as two entries', () => {
+  it('starts with its Home, then the Sets and the standalone instruments as two entries', () => {
     const items = navigationFor('DEPARTMENT').map(item => [item.to, item.label]);
-    expect(items.slice(0, 2)).toEqual([
+    expect(items.slice(0, 3)).toEqual([
+      ['/department/home', 'Αρχική'],
       ['/department', 'Σετ εργαλείων'],
       ['/department/tools', 'Μεμονωμένα εργαλεία'],
     ]);

@@ -155,7 +155,7 @@ describe('Sterilization supervisor', () => {
 describe('roleHomePath', () => {
   it('routes each role to its dedicated workspace', () => {
     expect(roleHomePath('STERILIZATION')).toBe('/sterilization');
-    expect(roleHomePath('DEPARTMENT')).toBe('/department');
+    expect(roleHomePath('DEPARTMENT')).toBe('/department/home');
     expect(roleHomePath('ADMIN')).toBe('/studio');
   });
 });

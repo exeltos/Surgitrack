@@ -1020,3 +1020,14 @@ html body .dash-more {
     max-height: 96px;
   }
 }
+
+/* The department's Home: the Overview's cards, two side by side (one column on a narrow screen). */
+html body .department-home .dash-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+@media (max-width: 900px) {
+  html body .department-home .dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
