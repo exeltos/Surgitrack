@@ -222,4 +222,23 @@ describe('undoing a movement made by mistake', () => {
     const last = s().undoInfo(b.kind, b.id)!;
     expect(!last.ok && last.reason).toBe('LAST_IN_LOAD');
   });
+
+  it('lets the admin undo an older delivery that kept nothing, worked out from its wording; not Sterilization', () => {
+    const admin = asRole('ADMIN');
+    const delivered = (s: typeof admin) =>
+      [...s().sets.map(x => ({kind: 'SET' as const, a: x})), ...s().tools.map(x => ({kind: 'TOOL' as const, a: x}))]
+        .filter(({a}) => a.state === 'IN_DEPARTMENT')
+        .map(({kind, a}) => ({kind, a, info: s().undoInfo(kind, a.id)}))
+        .find(x => x.info?.snapshot.legacy && x.info.snapshot.action === 'DELIVERY');
+    const found = delivered(admin)!;
+    expect(found).toBeTruthy();
+    expect(found.info!.ok).toBe(true);
+    act(() => void admin().undoMovement(found.kind, found.a.id, 'παλιά λάθος παράδοση'));
+    const list = found.kind === 'SET' ? admin().sets : admin().tools;
+    expect(list.find(x => x.id === found.a.id)!.state).toBe('READY_FOR_PICKUP');
+
+    // A Sterilization user does not undo an older movement.
+    const ster = asRole('STERILIZATION');
+    expect(delivered(ster)).toBeUndefined();
+  });
 });

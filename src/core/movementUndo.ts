@@ -54,6 +54,8 @@ export type UndoSnapshot = {
   stage?: string;
   /** The running sterilizer load it was put in. */
   loadId?: string;
+  /** Worked out for an older movement that kept nothing (core/legacyUndo): its uses stay as they are. */
+  legacy?: boolean;
   /** Recall items the receipt marked as returned, as they were (put back when it is undone). */
   recall?: Array<{caseId: string; status: RecallItemStatus; returnedAt?: string}>;
   assets: Array<{kind: AssetKind; id: string; before: Fields}>;
@@ -127,9 +129,9 @@ export function undoneIds(movements: readonly Movement[]): Set<string> {
 }
 
 /**
- * The movement that can be undone for this Set or instrument: its latest one, leaving out undo entries,
- * movements already undone and the ones recorded as another's consequence. Undefined when it has none or
- * the latest cannot be undone (no snapshot).
+ * The movement that could be undone for this Set or instrument: its latest one, leaving out undo entries,
+ * movements already undone and the ones recorded as another's consequence. Whether it can be (it kept what
+ * it changed, or it is an older one core/legacyUndo works out) is the caller's to decide.
  */
 export function latestUndoable(movements: readonly Movement[], barcode: string): Movement | undefined {
   const undone = undoneIds(movements);
@@ -137,8 +139,7 @@ export function latestUndoable(movements: readonly Movement[], barcode: string):
     .map((m, index) => ({m, index, stamp: movementStamp(m.at)}))
     .filter(({m}) => barcodeOf(m.asset) === barcode.toUpperCase() && !m.undoes && !m.causedBy && !undone.has(m.id))
     .sort((a, b) => b.stamp - a.stamp || a.index - b.index);
-  const latest = own[0]?.m;
-  return latest?.undo ? latest : undefined;
+  return own[0]?.m;
 }
 
 export type UndoActor = {
@@ -177,7 +178,11 @@ export function membersUnchanged(snapshot: UndoSnapshot, tools: readonly Tool[])
 export function cancelledRecordIds(movements: readonly Movement[]): Set<string> {
   const undone = new Set(movements.map(m => m.undoes).filter(Boolean));
   const ids = new Set<string>();
-  for (const m of movements) if (m.undo?.recordId && undone.has(m.id)) ids.add(m.undo.recordId);
+  for (const m of movements) {
+    if (m.undo?.recordId && undone.has(m.id)) ids.add(m.undo.recordId);
+    // An undo entry names the record itself when the movement kept nothing (an older one).
+    if (m.undoes && m.cancels) ids.add(m.cancels);
+  }
   return ids;
 }
 
@@ -208,11 +213,13 @@ export function undoPermission(
   asset: {state: string; department?: string} | undefined,
   actor: UndoActor,
   today: Date = new Date(),
+  undo: UndoSnapshot | undefined = movement.undo,
 ): {ok: true} | {ok: false; reason: UndoRefusal} {
-  const undo = movement.undo;
   if (!undo || !asset) return {ok: false, reason: 'NOT_UNDOABLE'};
   if (asset.state !== undo.after) return {ok: false, reason: 'MOVED_ON'};
   if (actor.manager) return {ok: true};
+  // An older movement, worked out rather than kept, only by the admin or the supervisor.
+  if (undo.legacy) return {ok: false, reason: 'NO_RIGHT'};
   if (actor.role === 'STERILIZATION') {
     if (undo.action === 'DISPATCH') return {ok: false, reason: 'NOT_OWN'};
     const own = movement.accountId

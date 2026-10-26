@@ -133,6 +133,8 @@ export interface Movement {
   undoes?: string;
   /** Recorded as a consequence of that movement (an instrument out of use at a dispatch): undone with it. */
   causedBy?: string;
+  /** On an undo entry: the record (receipt, delivery, preparation, stage check) it cancels. */
+  cancels?: string;
 }
 export interface Issue {
   id: string;

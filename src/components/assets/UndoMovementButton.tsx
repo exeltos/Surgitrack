@@ -24,12 +24,12 @@ export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: str
   const {undoInfo, undoMovement, role} = useSurgi();
   const [confirmNode, ask] = useConfirm();
   const info = undoInfo(kind, id);
-  const action = info?.movement.undo?.action;
+  const action = info?.snapshot.action;
   if (!info || !action) return null;
   // A refusal worth explaining is shown on a disabled button; the rest stay hidden.
   const refusal = info.ok ? '' : refusalText(info.reason);
   if (!info.ok && !refusal) return null;
-  const stage = info.movement.undo?.stage;
+  const stage = info.snapshot.stage;
   const label =
     action === 'DISPATCH'
       ? role === 'DEPARTMENT'
@@ -53,13 +53,20 @@ export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: str
         onClick={() =>
           ask({
             title: label,
-            message: tr(
-              'Αναιρείται η κίνηση «{0}» της {1} ({2}) και το {3} επιστρέφει όπως ήταν πριν. Η κίνηση μένει στο ιστορικό ως αναιρεμένη.',
-              trData(m.status),
-              m.at,
-              trData(m.by),
-              m.asset.split(' · ')[0],
-            ),
+            message:
+              tr(
+                'Αναιρείται η κίνηση «{0}» της {1} ({2}) και το {3} επιστρέφει όπως ήταν πριν. Η κίνηση μένει στο ιστορικό ως αναιρεμένη.',
+                trData(m.status),
+                m.at,
+                trData(m.by),
+                m.asset.split(' · ')[0],
+              ) +
+              (info.snapshot.legacy
+                ? ' ' +
+                  tr(
+                    'Παλαιότερη κίνηση: επανέρχεται μόνο η θέση του (και οι ημερομηνίες αποστείρωσης της τελευταίας αποδέσμευσης)· οι χρήσεις δεν αλλάζουν, διορθώστε τες με −/+ αν χρειάζεται.',
+                  )
+                : ''),
             confirmLabel: label,
             danger: true,
             note: {label: tr('Αιτιολογία'), placeholder: tr('π.χ. λάθος σάρωση'), required: true},

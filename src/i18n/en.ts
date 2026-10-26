@@ -2182,4 +2182,6 @@ export const en: Record<string, string> = {
     'It is the only item in the load: end the cycle as failed to take it out of the sterilizer.',
   'Αναίρεση: {0}': 'Undo: {0}',
   'Αναίρεση φόρτωσης': 'Undo loading',
+  'Παλαιότερη κίνηση: επανέρχεται μόνο η θέση του (και οι ημερομηνίες αποστείρωσης της τελευταίας αποδέσμευσης)· οι χρήσεις δεν αλλάζουν, διορθώστε τες με −/+ αν χρειάζεται.':
+    'An older movement: only where it is comes back (and the sterile dates of its latest release); uses do not change, correct them with −/+ if needed.',
 };
