@@ -2140,6 +2140,7 @@ export const en: Record<string, string> = {
   '{0}: χρήσεις {1} → {2}.': '{0}: uses {1} → {2}.',
   'ΑΡΧΙΚΗ ΤΜΗΜΑΤΟΣ': 'DEPARTMENT HOME',
   'Για παραλαβή': 'Ready for pickup',
+  '{0} Σετ · {1} μεμονωμένα': '{0} Sets · {1} standalone',
   'Ο εξοπλισμός του τμήματος με μια ματιά: τι είναι πού και τι περιμένει.':
     "The department's equipment at a glance: what is where and what is waiting.",
   'Ό,τι περιμένει το τμήμα τώρα.': 'What the department has waiting now.',
@@ -2152,4 +2153,15 @@ export const en: Record<string, string> = {
     "The latest movements of the department's Sets and instruments.",
   'Όλο το ιστορικό': 'Full history',
   'Δεν υπάρχουν κινήσεις ακόμα.': 'No movements yet.',
+  'Πού βρίσκεται ο εξοπλισμός': 'Where the equipment is',
+  'Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος τώρα.': "The department's Sets and standalone instruments now.",
+  'Service / απολεσθέντα': 'Service / lost',
+  'Κινήσεις 14 ημερών': 'Movements, last 14 days',
+  'Αποστολές στην Αποστείρωση και παραλαβές στο τμήμα, ανά ημέρα.':
+    'Sent to Sterilization and received at the department, per day.',
+  Αποστολές: 'Sent',
+  '{0}: {1} αποστολές, {2} παραλαβές': '{0}: {1} sent, {2} received',
+  'Πιο πολυχρησιμοποιημένα Σετ': 'Most used Sets',
+  'Τα Σετ του τμήματος με τις περισσότερες χρήσεις.': "The department's Sets with the most uses.",
+  'Καμία χρήση ακόμα.': 'No uses yet.',
 };

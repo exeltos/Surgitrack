@@ -16,7 +16,7 @@ describe('Department home', () => {
     expect(screen.getByText('ΑΡΧΙΚΗ ΤΜΗΜΑΤΟΣ')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Χειρουργείο'})).toBeInTheDocument();
     for (const label of ['Σετ', 'Μεμονωμένα', 'Στο τμήμα', 'Για παραλαβή'])
-      expect(screen.getByRole('link', {name: new RegExp(label)})).toBeInTheDocument();
+      expect(screen.getByRole('link', {name: new RegExp(`^${label}`)})).toBeInTheDocument();
     expect(screen.getByRole('link', {name: /Στο τμήμα/})).toHaveAttribute(
       'href',
       '/department?preset=1&statusFilter=IN_DEPARTMENT',

@@ -1024,7 +1024,36 @@ html body .dash-more {
 /* The department's Home: the Overview's cards, two side by side (one column on a narrow screen). */
 html body .department-home .dash-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
+  align-items: stretch;
+}
+html body .department-home .dash-grid > .dash-card {
+  grid-column: auto;
+}
+html body .department-home .dash-grid > .dash-most-used {
+  grid-column: 1 / -1;
+}
+.department-home .dash-bar-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Sent and received stacked in one column per day. */
+.dash-col.stacked {
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.dash-col.stacked i:not(:first-child) {
+  border-radius: 0;
+}
+html body .department-home .dash-activity .dash-columns {
+  flex: 0 0 auto;
+  height: 130px;
+  max-height: 130px;
+}
+.department-home .dash-axis .dash-legend-inline {
+  font-size: 11px;
 }
 @media (max-width: 900px) {
   html body .department-home .dash-grid {

@@ -1,6 +1,7 @@
 import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import {
+  Activity,
   CalendarClock,
   Gauge,
   History,
@@ -18,6 +19,8 @@ import {presetPath} from '../../core/listMemory';
 import PageHeader from '../../components/ui/PageHeader';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
+import {movementsPerDay, statusCard} from './departmentStatus';
+import {useAppPreferences} from '../../core/AppPreferences';
 
 /** Every state the department counts as «Σε αποστείρωση». */
 const IN_STERILIZATION_STATES: string[] = [
@@ -32,10 +35,12 @@ const IN_STERILIZATION_STATES: string[] = [
 
 /**
  * The department's home after signing in: its Sets and standalone instruments at a glance — where they
- * are, what is waiting to be picked up, what expires, its open issues and its latest movements.
+ * are, how busy the department has been, what is waiting (pickup, expiry, issues), its latest movements
+ * and its most used Sets.
  */
 export default function DepartmentHomePage() {
   const {sets, tools, issues, movements, lifecycleAlerts, currentUser} = useSurgi();
+  const {lang} = useAppPreferences();
   const dept = currentUser.department;
 
   const departmentSets = useMemo(() => sets.filter(item => item.department === dept), [sets, dept]);
@@ -43,9 +48,12 @@ export default function DepartmentHomePage() {
   const standalone = departmentTools.filter(item => item.mode === 'STANDALONE');
   // Sets and standalone instruments move on their own; a Set's instruments travel with it.
   const tracked = [...departmentSets, ...standalone];
-  const atDepartment = tracked.filter(a => a.state === 'IN_DEPARTMENT').length;
-  const inSterilization = tracked.filter(a => IN_STERILIZATION_STATES.includes(a.state)).length;
   const ready = tracked.filter(a => a.state === 'READY_FOR_PICKUP');
+  const byStatus = (statusFilter: string, match: (state: string) => boolean) =>
+    statusCard(departmentSets, standalone, statusFilter, match);
+  const atDepartment = byStatus('IN_DEPARTMENT', state => state === 'IN_DEPARTMENT');
+  const inSterilization = byStatus('STERILIZATION', state => IN_STERILIZATION_STATES.includes(state));
+  const readyStatus = byStatus('READY', state => state === 'READY_FOR_PICKUP');
   const openIssues = issues.filter(issue => issue.department === dept && issue.status === 'OPEN');
   const expiry = expiryAlerts(sterileExpiryList(departmentSets, departmentTools));
   const expired = expiry.filter(e => e.state === 'EXPIRED').length;
@@ -72,12 +80,37 @@ export default function DepartmentHomePage() {
     [movements, byBarcode, dept],
   );
 
+  // Where the department's Sets and standalone instruments are now.
+  const where = [
+    {key: 'dept', label: tr('Στο τμήμα'), n: atDepartment.value},
+    {key: 'process', label: tr('Σε αποστείρωση'), n: inSterilization.value},
+    {key: 'ready', label: tr('Για παραλαβή'), n: readyStatus.value},
+    {
+      key: 'lost',
+      label: tr('Service / απολεσθέντα'),
+      n: tracked.filter(a => a.state === 'SERVICE' || a.state === 'LOST').length,
+    },
+  ];
+  const whereTotal = where.reduce((sum, x) => sum + x.n, 0);
+  const perDay = useMemo(() => movementsPerDay(movements, dept, new Date()), [movements, dept]);
+  const perDayMax = Math.max(1, ...perDay.map(x => x.sent + x.received));
+  const sentTotal = perDay.reduce((sum, x) => sum + x.sent, 0);
+  const receivedTotal = perDay.reduce((sum, x) => sum + x.received, 0);
+  const dayLabel = (d: Date) =>
+    d.toLocaleDateString(lang === 'el' ? 'el-GR' : 'en-GB', {day: 'numeric', month: 'short'});
+  const mostUsed = [...departmentSets]
+    .filter(s => (s.uses || 0) > 0)
+    .sort((a, b) => (b.uses || 0) - (a.uses || 0))
+    .slice(0, 5);
+  const mostUsedMax = Math.max(1, ...mostUsed.map(s => s.uses || 0));
+
   const kpis = [
     {
       icon: Layers3,
       label: tr('Σετ'),
       value: departmentSets.length,
       to: presetPath('/department'),
+      note: undefined as string | undefined,
     },
     {
       icon: Wrench,
@@ -88,20 +121,17 @@ export default function DepartmentHomePage() {
     {
       icon: Home,
       label: tr('Στο τμήμα'),
-      value: atDepartment,
-      to: presetPath('/department', {statusFilter: 'IN_DEPARTMENT'}),
+      ...atDepartment,
     },
     {
       icon: Sparkles,
       label: tr('Σε αποστείρωση'),
-      value: inSterilization,
-      to: presetPath('/department', {statusFilter: 'STERILIZATION'}),
+      ...inSterilization,
     },
     {
       icon: PackageCheck,
       label: tr('Για παραλαβή'),
-      value: ready.length,
-      to: presetPath('/department', {statusFilter: 'READY'}),
+      ...readyStatus,
       warn: ready.length > 0,
     },
     {
@@ -137,11 +167,105 @@ export default function DepartmentHomePage() {
               {k.label}
             </span>
             <strong>{k.value}</strong>
+            {k.note && <small>{k.note}</small>}
           </Link>
         ))}
       </div>
 
       <div className="dash-grid">
+        <section className="dash-card dash-where">
+          <header>
+            <div>
+              <b>{tr('Πού βρίσκεται ο εξοπλισμός')}</b>
+              <small>{tr('Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος τώρα.')}</small>
+            </div>
+            <Layers3 size={18} />
+          </header>
+          <div className="dash-stack" role="img" aria-label={where.map(x => `${x.label}: ${x.n}`).join(', ')}>
+            {whereTotal === 0 ? (
+              <i className="empty" />
+            ) : (
+              where
+                .filter(x => x.n > 0)
+                .map(x => (
+                  <i key={x.key} className={`seg-${x.key}`} style={{flexGrow: x.n}} title={`${x.label}: ${x.n}`} />
+                ))
+            )}
+          </div>
+          <ul className="dash-legend" tabIndex={0} aria-label={tr('Πού βρίσκεται ο εξοπλισμός')}>
+            {where.map(x => (
+              <li key={x.key}>
+                <span className={`dot seg-${x.key}`} />
+                <span>{x.label}</span>
+                <strong>{x.n}</strong>
+                <small>{whereTotal ? `${Math.round((x.n / whereTotal) * 100)}%` : '—'}</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="dash-card dash-activity">
+          <header>
+            <div>
+              <b>{tr('Κινήσεις 14 ημερών')}</b>
+              <small>{tr('Αποστολές στην Αποστείρωση και παραλαβές στο τμήμα, ανά ημέρα.')}</small>
+            </div>
+            <Activity size={18} />
+          </header>
+          <div className="dash-activity-stats">
+            {[
+              [tr('Αποστολές'), sentTotal],
+              [tr('Παραλαβές'), receivedTotal],
+              [tr('Σήμερα'), perDay[perDay.length - 1].sent + perDay[perDay.length - 1].received],
+            ].map(([label, n]) => (
+              <Link key={String(label)} to="/movements">
+                <b>{n}</b>
+                <small>{label}</small>
+              </Link>
+            ))}
+          </div>
+          <div
+            className="dash-columns"
+            role="img"
+            aria-label={perDay
+              .map(x => tr('{0}: {1} αποστολές, {2} παραλαβές', dayLabel(x.day), x.sent, x.received))
+              .join(', ')}
+          >
+            {perDay.map(x => (
+              <span
+                key={x.day.getTime()}
+                className="dash-col stacked"
+                title={tr('{0}: {1} αποστολές, {2} παραλαβές', dayLabel(x.day), x.sent, x.received)}
+              >
+                {x.sent + x.received === 0 ? (
+                  <i className="zero" />
+                ) : (
+                  <>
+                    {x.received > 0 && (
+                      <i className="seg-ready" style={{height: `${(x.received / perDayMax) * 100}%`}} />
+                    )}
+                    {x.sent > 0 && <i className="seg-dept" style={{height: `${(x.sent / perDayMax) * 100}%`}} />}
+                  </>
+                )}
+              </span>
+            ))}
+          </div>
+          <div className="dash-axis">
+            <span>{dayLabel(perDay[0].day)}</span>
+            <span className="dash-legend-inline">
+              <span>
+                <span className="dot seg-dept" />
+                {tr('Αποστολές')}
+              </span>
+              <span>
+                <span className="dot seg-ready" />
+                {tr('Παραλαβές')}
+              </span>
+            </span>
+            <span>{dayLabel(perDay[perDay.length - 1].day)}</span>
+          </div>
+        </section>
+
         <section className="dash-card dash-attention">
           <header>
             <div>
@@ -154,7 +278,7 @@ export default function DepartmentHomePage() {
             {ready.length > 0 && (
               <li>
                 <PackageCheck size={15} className="warn" />
-                <Link to={presetPath('/department', {statusFilter: 'READY'})}>
+                <Link to={readyStatus.to}>
                   <b>{tr('{0} έτοιμα για παραλαβή από την Αποστείρωση', ready.length)}</b>
                   <small>
                     {ready
@@ -240,6 +364,27 @@ export default function DepartmentHomePage() {
               </li>
             )}
           </ul>
+        </section>
+        <section className="dash-card dash-most-used">
+          <header>
+            <div>
+              <b>{tr('Πιο πολυχρησιμοποιημένα Σετ')}</b>
+              <small>{tr('Τα Σετ του τμήματος με τις περισσότερες χρήσεις.')}</small>
+            </div>
+            <Gauge size={18} />
+          </header>
+          <div className="dash-bars" tabIndex={0} aria-label={tr('Πιο πολυχρησιμοποιημένα Σετ')}>
+            {mostUsed.map(s => (
+              <Link key={s.id} className="dash-bar" to={`/sets/${s.id}`} title={`${s.name}: ${s.uses || 0}`}>
+                <span className="dash-bar-name">{s.name}</span>
+                <span className="dash-bar-track">
+                  <i style={{width: `${((s.uses || 0) / mostUsedMax) * 100}%`}} />
+                </span>
+                <strong>{s.uses || 0}</strong>
+              </Link>
+            ))}
+            {mostUsed.length === 0 && <p className="hospital-empty">{tr('Καμία χρήση ακόμα.')}</p>}
+          </div>
         </section>
       </div>
     </div>
