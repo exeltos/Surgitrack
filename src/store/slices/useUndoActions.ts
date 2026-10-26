@@ -1,4 +1,10 @@
-import {latestUndoable, restoreFields, undoPermission, type UndoRefusal} from '../../core/movementUndo';
+import {
+  latestUndoable,
+  membersUnchanged,
+  restoreFields,
+  undoPermission,
+  type UndoRefusal,
+} from '../../core/movementUndo';
 import type {AssetKind, Movement} from '../../types/domain';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
@@ -11,7 +17,20 @@ export type UndoInfo = {movement: Movement} & ({ok: true} | {ok: false; reason: 
 export function useUndoActions(
   p: ReturnType<typeof useSurgiSession> & ReturnType<typeof useSurgiRecords> & ReturnType<typeof useSurgiHelpers>,
 ) {
-  const {addMovement, can, currentUser, movements, notify, role, setIssues, setSets, setTools, sets, tools} = p;
+  const {
+    addMovement,
+    can,
+    currentUser,
+    movements,
+    notify,
+    role,
+    setIssues,
+    setRecallCases,
+    setSets,
+    setTools,
+    sets,
+    tools,
+  } = p;
   const actor = () => ({
     role,
     manager: can('asset.usage.configure'),
@@ -28,7 +47,11 @@ export function useUndoActions(
     if (!asset) return undefined;
     const movement = latestUndoable(movements, asset.barcode);
     if (!movement) return undefined;
-    return {movement, ...undoPermission(movement, asset, actor())};
+    const allowed = undoPermission(movement, asset, actor());
+    // A Set whose instruments changed since (one replaced, moved or sent to Service) is not put back.
+    if (allowed.ok && movement.undo && !membersUnchanged(movement.undo, tools))
+      return {movement, ok: false, reason: 'MOVED_ON'};
+    return {movement, ...allowed};
   };
 
   /** Puts the Set or instrument back as it was before its latest movement, and records why. */
@@ -49,6 +72,24 @@ export function useUndoActions(
           opened.has(i.id) && i.status === 'OPEN'
             ? {...i, status: 'RESOLVED', note: `${i.note} · Αναιρέθηκε η κίνηση: ${reason.trim()}`}
             : i,
+        ),
+      );
+    }
+    // A recalled item the receipt counted as returned is awaited again.
+    if (snapshot.recall?.length) {
+      const recalled = new Map(snapshot.recall.map(r => [r.caseId, r]));
+      setRecallCases(cases =>
+        cases.map(c =>
+          recalled.has(c.id)
+            ? {
+                ...c,
+                items: c.items.map(item =>
+                  item.assetKind === snapshot.kind && item.assetId === snapshot.id
+                    ? {...item, status: recalled.get(c.id)!.status, returnedAt: recalled.get(c.id)!.returnedAt}
+                    : item,
+                ),
+              }
+            : c,
         ),
       );
     }

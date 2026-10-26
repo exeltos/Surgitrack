@@ -111,8 +111,12 @@ describe('undoing a movement made by mistake', () => {
     const info = s().undoInfo('TOOL', tool.id)!;
     expect(info.movement.undo?.action).toBe('RECEIPT');
     expect(info.ok).toBe(true);
+    const receiptId = info.movement.undo?.recordId;
+    expect(s().receipts.some(r => r.id === receiptId)).toBe(true);
     act(() => void s().undoMovement('TOOL', tool.id, 'λάθος παραλαβή'));
     expect(s().tools.find(t => t.id === tool.id)!.state).toBe('PENDING_STERILIZATION');
+    // The receipt stays recorded but no longer counts as done.
+    expect(s().receipts.some(r => r.id === receiptId)).toBe(false);
     // The dispatch before it was the department's.
     const dispatch = s().undoInfo('TOOL', tool.id)!;
     expect(dispatch.movement.undo?.action).toBe('DISPATCH');

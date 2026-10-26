@@ -1,4 +1,4 @@
-import type {AssetKind, AssetState, Movement, SetAsset, Tool} from '../types/domain';
+import type {AssetKind, AssetState, Movement, RecallItemStatus, SetAsset, Tool} from '../types/domain';
 import {movementStamp} from './movementTime';
 
 /**
@@ -22,6 +22,8 @@ const UNDO_FIELDS = [
   'retiredAt',
   'retiredReason',
   'setId',
+  'mode',
+  'department',
 ] as const;
 
 type Fields = Partial<Record<(typeof UNDO_FIELDS)[number], unknown>>;
@@ -36,6 +38,10 @@ export type UndoSnapshot = {
   usesCounted: boolean;
   /** Problem reports the movement opened (closed when it is undone). */
   issueIds?: string[];
+  /** The receipt or delivery record it wrote (left out of reports once undone). */
+  recordId?: string;
+  /** Recall items the receipt marked as returned, as they were (put back when it is undone). */
+  recall?: Array<{caseId: string; status: RecallItemStatus; returnedAt?: string}>;
   assets: Array<{kind: AssetKind; id: string; before: Fields}>;
 };
 
@@ -53,7 +59,13 @@ export function takeSnapshot(
   id: string,
   sets: readonly SetAsset[],
   tools: readonly Tool[],
-  extra: {after: AssetState; usesCounted?: boolean; issueIds?: string[]},
+  extra: {
+    after: AssetState;
+    usesCounted?: boolean;
+    issueIds?: string[];
+    recordId?: string;
+    recall?: UndoSnapshot['recall'];
+  },
 ): UndoSnapshot {
   const assets: UndoSnapshot['assets'] = [];
   if (kind === 'SET') {
@@ -71,6 +83,8 @@ export function takeSnapshot(
     after: extra.after,
     usesCounted: !!extra.usesCounted,
     ...(extra.issueIds?.length ? {issueIds: extra.issueIds} : {}),
+    ...(extra.recordId ? {recordId: extra.recordId} : {}),
+    ...(extra.recall?.length ? {recall: extra.recall} : {}),
     assets,
   };
 }
@@ -117,6 +131,37 @@ export type UndoActor = {
   name: string;
   department: string;
 };
+
+/**
+ * Whether the Set's instruments are still the ones the movement left: none added or taken out since (an
+ * instrument replaced, moved or sent to Service), each where the movement put it. Otherwise putting the
+ * snapshot back would undo those changes too.
+ */
+export function membersUnchanged(snapshot: UndoSnapshot, tools: readonly Tool[]): boolean {
+  if (snapshot.kind !== 'SET') return true;
+  const kept = new Map(snapshot.assets.filter(a => a.kind === 'TOOL').map(a => [a.id, a.before]));
+  // An instrument that joined the Set since.
+  if (tools.some(t => t.setId === snapshot.id && !kept.has(t.id))) return false;
+  for (const [id, before] of kept) {
+    const tool = tools.find(t => t.id === id);
+    if (!tool) return false;
+    if (tool.setId === snapshot.id) {
+      if (tool.mode !== before.mode || tool.state !== snapshot.after) return false;
+    } else if (!(snapshot.usesCounted && tool.state === 'RETIRED')) {
+      // Out of the Set: only the dispatch's own taking out of use at the limit.
+      return false;
+    }
+  }
+  return true;
+}
+
+/** The receipts and deliveries whose movement was undone: kept as records, left out of the counts. */
+export function cancelledRecordIds(movements: readonly Movement[]): Set<string> {
+  const undone = new Set(movements.map(m => m.undoes).filter(Boolean));
+  const ids = new Set<string>();
+  for (const m of movements) if (m.undo?.recordId && undone.has(m.id)) ids.add(m.undo.recordId);
+  return ids;
+}
 
 /** Why an undo is refused (the screen words it). */
 export type UndoRefusal = 'NOT_UNDOABLE' | 'MOVED_ON' | 'NOT_OWN' | 'NOT_TODAY' | 'USE_COUNTED' | 'NO_RIGHT';

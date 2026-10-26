@@ -563,7 +563,7 @@ export function useLoadActions(
       note: payload.note,
     };
     // As it is before the delivery, so that a delivery made by mistake can be undone.
-    const undo = takeSnapshot('DELIVERY', kind, id, sets, tools, {after: 'IN_DEPARTMENT'});
+    const undo = takeSnapshot('DELIVERY', kind, id, sets, tools, {after: 'IN_DEPARTMENT', recordId: record.id});
     setDeliveries(x => [record, ...x]);
     updateState(kind, id, 'IN_DEPARTMENT');
     addMovement({

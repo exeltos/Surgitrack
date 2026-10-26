@@ -4,6 +4,7 @@ import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
 import type {SurgiStoreValue} from './types';
 import {useSurgiStore} from './slices/useSurgiStore';
 import {useLibraries} from '../core/LibraryStore';
+import {cancelledRecordIds} from '../core/movementUndo';
 
 export type {
   DeliveryPayload,
@@ -126,6 +127,10 @@ export function SurgiProvider({
 
   const activeTools = useMemo(() => tools.filter(t => t.state !== 'RETIRED'), [tools]);
   const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
+  // A receipt or delivery whose movement was undone stays recorded but no longer counts as done.
+  const cancelled = useMemo(() => cancelledRecordIds(movements), [movements]);
+  const validReceipts = useMemo(() => receipts.filter(r => !cancelled.has(r.id)), [receipts, cancelled]);
+  const validDeliveries = useMemo(() => deliveries.filter(d => !cancelled.has(d.id)), [deliveries, cancelled]);
   const value = useMemo(
     () => ({
       sets,
@@ -134,14 +139,14 @@ export function SurgiProvider({
       movements,
       issues,
       counts,
-      receipts,
+      receipts: validReceipts,
       preparations,
       sterilizationCycles,
       processLoads,
       recallCases,
       sterilizationReleases,
       workflowCheckpoints,
-      deliveries,
+      deliveries: validDeliveries,
       purchaseOrders,
       recycleBin,
       restoreFromBin,
@@ -226,14 +231,14 @@ export function SurgiProvider({
       movements,
       issues,
       counts,
-      receipts,
+      validReceipts,
       preparations,
       sterilizationCycles,
       processLoads,
       recallCases,
       sterilizationReleases,
       workflowCheckpoints,
-      deliveries,
+      validDeliveries,
       purchaseOrders,
       recycleBin,
       lifecycleAlerts,

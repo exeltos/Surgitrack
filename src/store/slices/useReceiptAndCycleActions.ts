@@ -33,6 +33,7 @@ export function useReceiptAndCycleActions(
     livesConsumedBy,
     nextStateAfter,
     notify,
+    recallCases,
     reprocessState,
     setIssues,
     setPreparations,
@@ -168,12 +169,21 @@ export function useReceiptAndCycleActions(
     const issueId = `i${uniqueStamp()}`;
     const opensIssue = !!(payload.checkPerformed && payload.checkResult && payload.checkResult !== 'OK');
     // As it is before the receipt, so that a receipt made by mistake can be undone.
+    const recordId = `r${uniqueStamp()}-${Math.random().toString(36).slice(2, 7)}`;
     const undo = takeSnapshot('RECEIPT', kind, id, sets, tools, {
       after: nextStateAfter('RECEIPT'),
       issueIds: opensIssue ? [issueId] : undefined,
+      recordId,
+      recall: recallCases.flatMap(c =>
+        c.status !== 'OPEN'
+          ? []
+          : c.items
+              .filter(item => item.assetKind === kind && item.assetId === id)
+              .map(item => ({caseId: c.id, status: item.status, returnedAt: item.returnedAt})),
+      ),
     });
     const record: ReceiptRecord = {
-      id: `r${uniqueStamp()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: recordId,
       workflowVersion: sterilizationWorkflow.version,
       batchId: payload.batchId,
       assetId: id,

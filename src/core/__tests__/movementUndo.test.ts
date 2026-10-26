@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {latestUndoable, undoneIds, undoPermission, type UndoSnapshot} from '../movementUndo';
+import {latestUndoable, membersUnchanged, undoneIds, undoPermission, type UndoSnapshot} from '../movementUndo';
+import type {Tool} from '../../types/domain';
 import type {Movement} from '../../types/domain';
 
 const snapshot = (action: UndoSnapshot['action'], after: UndoSnapshot['after'], usesCounted = false): UndoSnapshot => ({
@@ -60,5 +61,27 @@ describe('undoing a movement', () => {
     expect(
       undoPermission(move({undo: snapshot('DISPATCH', 'PENDING_STERILIZATION')}), {...asset, department: 'ΤΕΠ'}, dept),
     ).toEqual({ok: false, reason: 'NOT_OWN'});
+  });
+
+  it('refuses a Set whose instruments changed since the movement', () => {
+    const set: UndoSnapshot = {
+      action: 'RECEIPT',
+      kind: 'SET',
+      id: 's1',
+      after: 'IN_WASHING',
+      usesCounted: false,
+      assets: [
+        {kind: 'SET', id: 's1', before: {state: 'PENDING_STERILIZATION'}},
+        {kind: 'TOOL', id: 'a', before: {state: 'PENDING_STERILIZATION', setId: 's1', mode: 'SET_MEMBER'}},
+      ],
+    };
+    const tool = (over: Partial<Tool>) =>
+      ({id: 'a', setId: 's1', mode: 'SET_MEMBER', state: 'IN_WASHING', ...over}) as Tool;
+    expect(membersUnchanged(set, [tool({})])).toBe(true);
+    // Replaced: the old one left for Service, a new one joined.
+    expect(
+      membersUnchanged(set, [tool({setId: undefined, mode: 'STANDALONE', state: 'SERVICE'}), tool({id: 'b'})]),
+    ).toBe(false);
+    expect(membersUnchanged(set, [tool({}), tool({id: 'b'})])).toBe(false);
   });
 });
