@@ -689,8 +689,11 @@ html body .hospital-admin .hospital-people > section.hospital-card {
 html body .hospital-admin .hospital-people > section.hospital-card > * {
   flex: 0 0 auto;
 }
+/* The list takes the card's remaining height and scrolls (also as the card's own child, e.g. Departments). */
 html body .hospital-admin .hospital-people .hospital-rows,
-html body .hospital-admin .hospital-people .people-rows {
+html body .hospital-admin .hospital-people .people-rows,
+html body .hospital-admin .hospital-people > section.hospital-card > .hospital-rows,
+html body .hospital-admin .hospital-people > section.hospital-card > .people-rows {
   flex: 1 1 auto;
   min-height: 0;
   max-height: none;
