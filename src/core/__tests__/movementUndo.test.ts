@@ -84,4 +84,31 @@ describe('undoing a movement', () => {
     ).toBe(false);
     expect(membersUnchanged(set, [tool({}), tool({id: 'b'})])).toBe(false);
   });
+
+  it('lets a department cancel its own older dispatch, but no other older movement', () => {
+    const dept = {role: 'DEPARTMENT', manager: false, userId: 'u-d', name: 'Ελένη', department: 'ΜΕΘ'};
+    const asset = {state: 'PENDING_STERILIZATION', department: 'ΜΕΘ'};
+    const legacy = (action: UndoSnapshot['action'], after: UndoSnapshot['after']) => ({
+      ...snapshot(action, after),
+      legacy: true,
+    });
+    const m = move({});
+    expect(undoPermission(m, asset, dept, new Date(), legacy('DISPATCH', 'PENDING_STERILIZATION')).ok).toBe(true);
+    expect(
+      undoPermission(
+        m,
+        {state: 'IN_DEPARTMENT', department: 'ΜΕΘ'},
+        dept,
+        new Date(),
+        legacy('DELIVERY', 'IN_DEPARTMENT'),
+      ),
+    ).toEqual({
+      ok: false,
+      reason: 'NO_RIGHT',
+    });
+    expect(undoPermission(m, {state: 'IN_WASHING'}, ster, new Date(), legacy('RECEIPT', 'IN_WASHING'))).toEqual({
+      ok: false,
+      reason: 'NO_RIGHT',
+    });
+  });
 });
