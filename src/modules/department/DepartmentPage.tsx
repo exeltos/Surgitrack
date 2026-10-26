@@ -2,7 +2,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import SterileDates from '../../components/ui/SterileDates';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
-import {Link, useSearchParams} from 'react-router-dom';
+import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wrench} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
@@ -44,8 +44,14 @@ export default function DepartmentPage() {
   const dept = viewing || currentUser.department;
   const lastOpenedKey =
     typeof window !== 'undefined' ? sessionStorage.getItem('surgitrack.department.lastAsset') : null;
-  const initialCategory: Category = lastOpenedKey?.startsWith('TOOL:') ? 'TOOLS' : 'SETS';
-  const [category, setCategory] = useState<Category>(initialCategory);
+  // Sets and standalone instruments are two entries of the department's menu (/department, /department/tools).
+  // Someone viewing a department from the Overview stays on the Overview's page and switches here.
+  const {pathname} = useLocation();
+  const navigate = useNavigate();
+  const [viewedCategory, setViewedCategory] = useState<Category>('SETS');
+  const category: Category = viewing ? viewedCategory : pathname === '/department/tools' ? 'TOOLS' : 'SETS';
+  const setCategory = (next: Category) =>
+    viewing ? setViewedCategory(next) : navigate(next === 'TOOLS' ? '/department/tools' : '/department');
   const [statusFilter, setStatusFilter] = useRememberedState<StatusFilter>('statusFilter', 'ALL');
   const [query, setQuery] = useRememberedState('query', '');
   const [lastOpened, setLastOpened] = useState(lastOpenedKey);
@@ -62,21 +68,15 @@ export default function DepartmentPage() {
     () => tools.filter(item => item.department === dept && item.mode === 'STANDALONE'),
     [tools, dept],
   );
-  const allDepartmentItems = useMemo<DepartmentItem[]>(
-    () => [
-      ...departmentSets.map(asset => ({kind: 'SET' as const, asset})),
-      ...departmentTools.map(asset => ({kind: 'TOOL' as const, asset})),
-    ],
-    [departmentSets, departmentTools],
-  );
-  const ready = allDepartmentItems.filter(item => item.asset.state === 'READY_FOR_PICKUP').length;
-  const inSterilization = allDepartmentItems.filter(item => IN_STERILIZATION_STATES.includes(item.asset.state)).length;
-  const atDepartment = allDepartmentItems.filter(item => item.asset.state === 'IN_DEPARTMENT').length;
-  const openIssues = issues.filter(issue => issue.department === dept && issue.status === 'OPEN').length;
   const sourceItems: DepartmentItem[] =
     category === 'SETS'
       ? departmentSets.map(asset => ({kind: 'SET', asset}))
       : departmentTools.map(asset => ({kind: 'TOOL', asset}));
+  // The counts are of what this page lists: the Sets, or the standalone instruments.
+  const ready = sourceItems.filter(item => item.asset.state === 'READY_FOR_PICKUP').length;
+  const inSterilization = sourceItems.filter(item => IN_STERILIZATION_STATES.includes(item.asset.state)).length;
+  const atDepartment = sourceItems.filter(item => item.asset.state === 'IN_DEPARTMENT').length;
+  const openIssues = issues.filter(issue => issue.department === dept && issue.status === 'OPEN').length;
   const visibleItems = sourceItems.filter(item => {
     const stateOk =
       statusFilter === 'ALL' ||
@@ -92,9 +92,13 @@ export default function DepartmentPage() {
     <div className="department-workspace">
       <header className="department-header">
         <div>
-          <span className="eyebrow">{tr('ΣΕΤ & ΕΡΓΑΛΕΙΑ ΤΜΗΜΑΤΟΣ')}</span>
+          <span className="eyebrow">{category === 'TOOLS' ? tr('ΜΕΜΟΝΩΜΕΝΑ ΕΡΓΑΛΕΙΑ') : tr('ΣΕΤ ΕΡΓΑΛΕΙΩΝ')}</span>
           <h1>{trData(dept)}</h1>
-          <p>{tr('Τα Σετ και τα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.')}</p>
+          <p>
+            {category === 'TOOLS'
+              ? tr('Τα μεμονωμένα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.')
+              : tr('Τα Σετ του τμήματος, και η αποστολή στην Αποστείρωση.')}
+          </p>
         </div>
         {viewing ? (
           <Link className="department-user-sign department-back" to="/overview">
@@ -137,28 +141,31 @@ export default function DepartmentPage() {
       </section>
 
       <section className="department-assets-panel">
-        <div className="department-category-tabs">
-          <button className={category === 'SETS' ? 'active' : ''} onClick={() => setCategory('SETS')}>
-            <Layers3 size={19} />
-            <span>
-              <strong>{tr('Σετ εργαλείων')}</strong>
-              <small>
-                {departmentSets.length} {tr('Σετ του τμήματος')}
-              </small>
-            </span>
-            <b>{departmentSets.length}</b>
-          </button>
-          <button className={category === 'TOOLS' ? 'active' : ''} onClick={() => setCategory('TOOLS')}>
-            <Wrench size={19} />
-            <span>
-              <strong>{tr('Μεμονωμένα εργαλεία')}</strong>
-              <small>
-                {departmentTools.length} {tr('εργαλεία σε αυτόνομη χρήση')}
-              </small>
-            </span>
-            <b>{departmentTools.length}</b>
-          </button>
-        </div>
+        {/* The department's own menu chooses Sets or instruments; the admin viewing a department switches here. */}
+        {viewing && (
+          <div className="department-category-tabs">
+            <button className={category === 'SETS' ? 'active' : ''} onClick={() => setCategory('SETS')}>
+              <Layers3 size={19} />
+              <span>
+                <strong>{tr('Σετ εργαλείων')}</strong>
+                <small>
+                  {departmentSets.length} {tr('Σετ του τμήματος')}
+                </small>
+              </span>
+              <b>{departmentSets.length}</b>
+            </button>
+            <button className={category === 'TOOLS' ? 'active' : ''} onClick={() => setCategory('TOOLS')}>
+              <Wrench size={19} />
+              <span>
+                <strong>{tr('Μεμονωμένα εργαλεία')}</strong>
+                <small>
+                  {departmentTools.length} {tr('εργαλεία σε αυτόνομη χρήση')}
+                </small>
+              </span>
+              <b>{departmentTools.length}</b>
+            </button>
+          </div>
+        )}
         <div className="department-list-toolbar">
           <label className="department-search">
             <Search size={17} />
