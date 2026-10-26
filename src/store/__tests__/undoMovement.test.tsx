@@ -142,4 +142,84 @@ describe('undoing a movement made by mistake', () => {
     expect(!info || (!info.ok && info.reason === 'MOVED_ON')).toBe(true);
     expect(s().undoMovement('TOOL', tool.id, 'λάθος')).toBe(false);
   });
+
+  it('lets Sterilization undo a stage of its own: washing, preparation, packaging', () => {
+    const s = asRole('STERILIZATION');
+    const tool = s().tools.find(t => t.mode === 'STANDALONE' && t.state === 'IN_DEPARTMENT' && !t.maxUses)!;
+    const state = () => s().tools.find(t => t.id === tool.id)!.state;
+    act(() => void s().sendToSterilization('TOOL', tool.id));
+    act(() => void s().receiveAtSterilization('TOOL', tool.id, deliverer));
+    const wash = () =>
+      act(
+        () =>
+          void s().createProcessLoad({
+            kind: 'WASHING',
+            assetRefs: [{kind: 'TOOL', id: tool.id}],
+            equipment: 'ΠΛΥΝΤΗΡΙΟ 1',
+            cycleNumber: 'W-1',
+            program: 'ΘΕΡΜΙΚΗ',
+          }),
+      );
+    wash();
+    const afterWash = state();
+    expect(afterWash).not.toBe('IN_WASHING');
+    const washed = s().undoInfo('TOOL', tool.id)!;
+    expect(washed.ok && washed.movement.undo?.action).toBe('STAGE');
+    const checkpointId = washed.movement.undo?.recordId;
+    expect(s().workflowCheckpoints.some(c => c.id === checkpointId)).toBe(true);
+    act(() => void s().undoMovement('TOOL', tool.id, 'λάθος φορτίο πλυντηρίου'));
+    expect(state()).toBe('IN_WASHING');
+    // The stage check stays recorded but no longer counts.
+    expect(s().workflowCheckpoints.some(c => c.id === checkpointId)).toBe(false);
+
+    wash();
+    expect(state()).toBe('IN_PREPARATION');
+    act(
+      () => void s().recordPreparation('TOOL', tool.id, {toolIds: [tool.id], checkedToolIds: [tool.id], allOk: true}),
+    );
+    const prepared = s().undoInfo('TOOL', tool.id)!;
+    expect(prepared.ok).toBe(true);
+    const preparationId = prepared.movement.undo?.recordId;
+    act(() => void s().undoMovement('TOOL', tool.id, 'λάθος Σετ'));
+    expect(state()).toBe('IN_PREPARATION');
+    expect(s().preparations.some(r => r.id === preparationId)).toBe(false);
+  });
+
+  it('takes an item loaded by mistake out of a running sterilizer load, but not its only item', () => {
+    const s = asRole('STERILIZATION');
+    // Two items waiting at the sterilizer: Sets or standalone instruments.
+    const waiting = [
+      ...s()
+        .sets.filter(x => x.state === 'IN_STERILIZATION')
+        .map(x => ({kind: 'SET' as const, id: x.id})),
+      ...s()
+        .tools.filter(t => t.mode === 'STANDALONE' && t.state === 'IN_STERILIZATION')
+        .map(t => ({kind: 'TOOL' as const, id: t.id})),
+    ];
+    expect(waiting.length).toBeGreaterThanOrEqual(2);
+    const [a, b] = waiting;
+    let loadId = '';
+    act(() => {
+      loadId =
+        s().createProcessLoad({
+          kind: 'STERILIZATION',
+          assetRefs: [a, b],
+          equipment: 'ΚΛΙΒΑΝΟΣ 1',
+          cycleNumber: 'S-9',
+          program: '134°C',
+          chemicalIndicatorResult: 'PASS',
+        })?.id || '';
+    });
+    expect(s().processLoads.find(l => l.id === loadId)?.status).toBe('OPEN');
+    expect(s().undoInfo(a.kind, a.id)?.movement.undo?.action).toBe('LOADING');
+    act(() => void s().undoMovement(a.kind, a.id, 'λάθος κλίβανος'));
+    expect(
+      s()
+        .processLoads.find(l => l.id === loadId)!
+        .items.map(i => i.assetId),
+    ).toEqual([b.id]);
+    // The last item stays: the cycle is ended as failed instead.
+    const last = s().undoInfo(b.kind, b.id)!;
+    expect(!last.ok && last.reason).toBe('LAST_IN_LOAD');
+  });
 });

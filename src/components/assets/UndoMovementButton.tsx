@@ -11,11 +11,14 @@ const refusalText = (reason: UndoRefusal) =>
     ? tr('Μετρήθηκε χρήση: την αποστολή την ακυρώνει ο προϊστάμενος Αποστείρωσης.')
     : reason === 'NOT_TODAY'
       ? tr('Αναιρείτε μόνο κινήσεις της ίδιας ημέρας· τις παλαιότερες ο προϊστάμενος.')
-      : '';
+      : reason === 'LAST_IN_LOAD'
+        ? tr('Είναι το μόνο στο φορτίο: τερματίστε τον κύκλο ως αποτυχημένο για να βγει από τον κλίβανο.')
+        : '';
 
 /**
- * «Αναίρεση …» on a Set's or instrument's page: undoes its latest dispatch, receipt or delivery when it was
- * made by mistake, with a reason. Shown only to who may undo it (see core/movementUndo).
+ * «Αναίρεση …» on a Set's or instrument's page: undoes its latest dispatch, receipt, stage of Sterilization,
+ * loading or delivery when it was made by mistake, with a reason. Shown only to who may undo it (see
+ * core/movementUndo).
  */
 export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: string}) {
   const {undoInfo, undoMovement, role} = useSurgi();
@@ -26,6 +29,7 @@ export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: str
   // A refusal worth explaining is shown on a disabled button; the rest stay hidden.
   const refusal = info.ok ? '' : refusalText(info.reason);
   if (!info.ok && !refusal) return null;
+  const stage = info.movement.undo?.stage;
   const label =
     action === 'DISPATCH'
       ? role === 'DEPARTMENT'
@@ -33,7 +37,11 @@ export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: str
         : tr('Αναίρεση αποστολής')
       : action === 'RECEIPT'
         ? tr('Αναίρεση παραλαβής')
-        : tr('Αναίρεση παράδοσης');
+        : action === 'STAGE'
+          ? tr('Αναίρεση: {0}', trData(stage || ''))
+          : action === 'LOADING'
+            ? tr('Αναίρεση φόρτωσης')
+            : tr('Αναίρεση παράδοσης');
   const m = info.movement;
   return (
     <>

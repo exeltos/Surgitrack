@@ -2178,4 +2178,8 @@ export const en: Record<string, string> = {
   Αναιρέθηκε: 'Undone',
   'Αναιρέθηκε η κίνηση του {0}.': 'The movement of {0} was undone.',
   Αιτιολογία: 'Reason',
+  'Είναι το μόνο στο φορτίο: τερματίστε τον κύκλο ως αποτυχημένο για να βγει από τον κλίβανο.':
+    'It is the only item in the load: end the cycle as failed to take it out of the sterilizer.',
+  'Αναίρεση: {0}': 'Undo: {0}',
+  'Αναίρεση φόρτωσης': 'Undo loading',
 };

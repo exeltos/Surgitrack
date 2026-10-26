@@ -104,6 +104,12 @@ export function useLoadActions(
           completedByDepartment: currentUser.department,
           completedAt: now,
         };
+        // As it is before, so that an item washed by mistake can be undone (the load itself stays recorded).
+        const undo = takeSnapshot('STAGE', ref.kind, ref.id, sets, tools, {
+          after: nextStateAfter('WASHING') as AssetState,
+          recordId: checkpoint.id,
+          stage: stage?.labelEl || 'Καθαρισμός',
+        });
         setWorkflowCheckpoints(list => [checkpoint, ...list]);
         updateState(ref.kind, ref.id, nextStateAfter('WASHING'));
         addMovement({
@@ -115,6 +121,7 @@ export function useLoadActions(
             'Επόμενο στάδιο',
           status: `Φορτίο πλυντηρίου ${loadId} · ${payload.equipment} · ${payload.cycleNumber} · ${payload.program}`,
           by: currentUser.name,
+          undo,
         });
       });
       const record: ProcessLoadRecord = {
@@ -166,6 +173,8 @@ export function useLoadActions(
           to: 'Στον κλίβανο',
           status: `Φορτίο ${loadId} · ${payload.equipment} · κύκλος ${payload.cycleNumber} · σε εξέλιξη`,
           by: currentUser.name,
+          // Taken out of the running load if it was loaded by mistake (its state does not change).
+          undo: takeSnapshot('LOADING', ref.kind, ref.id, sets, tools, {after: 'IN_STERILIZATION', loadId}),
         }),
       );
       notify(
@@ -514,9 +523,15 @@ export function useLoadActions(
       completedByDepartment: currentUser.department,
       completedAt: formatStoreDateTime(),
     };
+    const nextState = nextStateAfter(payload.stageId);
+    // As it is before, so that a stage completed by mistake can be undone.
+    const undo = takeSnapshot('STAGE', kind, id, sets, tools, {
+      after: nextState as AssetState,
+      recordId: record.id,
+      stage: stage.labelEl,
+    });
     setWorkflowCheckpoints(x => [record, ...x]);
     if (payload.stageId === 'PACKAGING') chooseShelfLife(kind, id, payload.shelfLifeMonths);
-    const nextState = nextStateAfter(payload.stageId);
     updateState(kind, id, nextState);
     addMovement({
       asset: `${a.barcode} · ${a.name}`,
@@ -525,6 +540,7 @@ export function useLoadActions(
       to: sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === nextState)?.labelEl || 'Επόμενο στάδιο',
       status: `Ολοκλήρωση ελέγχου · ${stage.labelEl}`,
       by: currentUser.name,
+      undo,
     });
     notify(tr('{0}: ολοκληρώθηκε το στάδιο «{1}».', a.barcode, stage.labelEl));
     return record;

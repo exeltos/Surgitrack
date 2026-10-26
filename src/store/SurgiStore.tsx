@@ -127,10 +127,15 @@ export function SurgiProvider({
 
   const activeTools = useMemo(() => tools.filter(t => t.state !== 'RETIRED'), [tools]);
   const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
-  // A receipt or delivery whose movement was undone stays recorded but no longer counts as done.
+  // A receipt, delivery, preparation or stage check whose movement was undone stays recorded but no longer counts.
   const cancelled = useMemo(() => cancelledRecordIds(movements), [movements]);
   const validReceipts = useMemo(() => receipts.filter(r => !cancelled.has(r.id)), [receipts, cancelled]);
   const validDeliveries = useMemo(() => deliveries.filter(d => !cancelled.has(d.id)), [deliveries, cancelled]);
+  const validPreparations = useMemo(() => preparations.filter(r => !cancelled.has(r.id)), [preparations, cancelled]);
+  const validCheckpoints = useMemo(
+    () => workflowCheckpoints.filter(r => !cancelled.has(r.id)),
+    [workflowCheckpoints, cancelled],
+  );
   const value = useMemo(
     () => ({
       sets,
@@ -140,12 +145,12 @@ export function SurgiProvider({
       issues,
       counts,
       receipts: validReceipts,
-      preparations,
+      preparations: validPreparations,
       sterilizationCycles,
       processLoads,
       recallCases,
       sterilizationReleases,
-      workflowCheckpoints,
+      workflowCheckpoints: validCheckpoints,
       deliveries: validDeliveries,
       purchaseOrders,
       recycleBin,
@@ -232,12 +237,12 @@ export function SurgiProvider({
       issues,
       counts,
       validReceipts,
-      preparations,
+      validPreparations,
       sterilizationCycles,
       processLoads,
       recallCases,
       sterilizationReleases,
-      workflowCheckpoints,
+      validCheckpoints,
       validDeliveries,
       purchaseOrders,
       recycleBin,
