@@ -1032,6 +1032,13 @@ html body .department-home .dash-grid > .dash-card {
 html body .department-home .dash-grid > .dash-most-used {
   grid-column: 1 / -1;
 }
+/* «Χρειάζεται προσοχή» and «Τελευταίες κινήσεις» keep a fixed height: a long list scrolls inside its card. */
+html body .department-home .dash-attention > .dash-list,
+html body .department-home .dash-latest > .dash-list {
+  max-height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .department-home .dash-bar-name {
   overflow: hidden;
   font-weight: 700;
