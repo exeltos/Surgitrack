@@ -299,6 +299,12 @@ export function useReceiptAndCycleActions(
       processChecks: payload.processChecks,
       note: payload.note,
     };
+    // As it is before, so that a preparation recorded by mistake can be undone.
+    const undo = takeSnapshot('STAGE', kind, id, sets, tools, {
+      after: nextStateAfter('PREPARATION'),
+      recordId: record.id,
+      stage: sterilizationWorkflow.stages.find(stage => stage.id === 'PREPARATION')?.labelEl || 'Σύνθεση',
+    });
     setPreparations(x => [record, ...x]);
     chooseShelfLife(kind, id, payload.shelfLifeMonths);
     updateState(kind, id, nextStateAfter('PREPARATION'));
@@ -311,6 +317,7 @@ export function useReceiptAndCycleActions(
           ?.labelEl || 'Επόμενο στάδιο',
       status: 'Σύνθεση / προετοιμασία ολοκληρώθηκε · προς κλιβανισμό',
       by: currentUser.name,
+      undo,
     });
     notify(tr('Η σύνθεση / προετοιμασία του {0} καταγράφηκε.', a.barcode));
     return record;

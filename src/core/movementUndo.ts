@@ -2,14 +2,23 @@ import type {AssetKind, AssetState, Movement, RecallItemStatus, SetAsset, Tool} 
 import {movementStamp} from './movementTime';
 
 /**
- * Undoing a wrong movement (a Set sent to Sterilization by mistake, received or delivered by mistake).
+ * Undoing a wrong movement: a Set sent to Sterilization, received, delivered, or moved through a stage of
+ * Sterilization (washing, preparation, packaging and the other checks, loading into a running sterilizer) by
+ * mistake. A sterilizer cycle and a release are not undone: a load is recalled instead.
  *
  * The movement keeps what it changed as it was before ("undo"): the Set's or instrument's state, uses and
  * sterile dates, and its instruments' (a use counted, one taken out of use at its limit). Undoing puts that
  * back and records a new movement that names the one it undoes; nothing is deleted from the history.
  */
 
-export type UndoAction = 'DISPATCH' | 'RECEIPT' | 'DELIVERY';
+export type UndoAction =
+  | 'DISPATCH'
+  | 'RECEIPT'
+  | 'DELIVERY'
+  /** A stage of Sterilization completed (a washer load, preparation, packaging or another check). */
+  | 'STAGE'
+  /** Loaded into a sterilizer whose cycle is still running. */
+  | 'LOADING';
 
 /** The fields an undoable movement may change, kept as they were before it (null: was empty). */
 const UNDO_FIELDS = [
@@ -24,6 +33,7 @@ const UNDO_FIELDS = [
   'setId',
   'mode',
   'department',
+  'shelfLifeMonths',
 ] as const;
 
 type Fields = Partial<Record<(typeof UNDO_FIELDS)[number], unknown>>;
@@ -38,8 +48,12 @@ export type UndoSnapshot = {
   usesCounted: boolean;
   /** Problem reports the movement opened (closed when it is undone). */
   issueIds?: string[];
-  /** The receipt or delivery record it wrote (left out of reports once undone). */
+  /** The record it wrote (receipt, delivery, preparation, stage check): left out of reports once undone. */
   recordId?: string;
+  /** The stage it completed, as the screens name it. */
+  stage?: string;
+  /** The running sterilizer load it was put in. */
+  loadId?: string;
   /** Recall items the receipt marked as returned, as they were (put back when it is undone). */
   recall?: Array<{caseId: string; status: RecallItemStatus; returnedAt?: string}>;
   assets: Array<{kind: AssetKind; id: string; before: Fields}>;
@@ -65,6 +79,8 @@ export function takeSnapshot(
     issueIds?: string[];
     recordId?: string;
     recall?: UndoSnapshot['recall'];
+    stage?: string;
+    loadId?: string;
   },
 ): UndoSnapshot {
   const assets: UndoSnapshot['assets'] = [];
@@ -85,6 +101,8 @@ export function takeSnapshot(
     ...(extra.issueIds?.length ? {issueIds: extra.issueIds} : {}),
     ...(extra.recordId ? {recordId: extra.recordId} : {}),
     ...(extra.recall?.length ? {recall: extra.recall} : {}),
+    ...(extra.stage ? {stage: extra.stage} : {}),
+    ...(extra.loadId ? {loadId: extra.loadId} : {}),
     assets,
   };
 }
@@ -155,7 +173,7 @@ export function membersUnchanged(snapshot: UndoSnapshot, tools: readonly Tool[])
   return true;
 }
 
-/** The receipts and deliveries whose movement was undone: kept as records, left out of the counts. */
+/** The records (receipts, deliveries, preparations, stage checks) whose movement was undone: kept, not counted. */
 export function cancelledRecordIds(movements: readonly Movement[]): Set<string> {
   const undone = new Set(movements.map(m => m.undoes).filter(Boolean));
   const ids = new Set<string>();
@@ -164,7 +182,15 @@ export function cancelledRecordIds(movements: readonly Movement[]): Set<string> 
 }
 
 /** Why an undo is refused (the screen words it). */
-export type UndoRefusal = 'NOT_UNDOABLE' | 'MOVED_ON' | 'NOT_OWN' | 'NOT_TODAY' | 'USE_COUNTED' | 'NO_RIGHT';
+export type UndoRefusal =
+  | 'NOT_UNDOABLE'
+  | 'MOVED_ON'
+  | 'NOT_OWN'
+  | 'NOT_TODAY'
+  | 'USE_COUNTED'
+  | 'NO_RIGHT'
+  /** The only item of its running load: the cycle is ended as failed instead. */
+  | 'LAST_IN_LOAD';
 
 const sameDay = (at: string, today: Date) => {
   const stamp = movementStamp(at);
@@ -174,8 +200,8 @@ const sameDay = (at: string, today: Date) => {
 
 /**
  * Whether this person may undo the movement, and why not. The admin and the supervisor undo any of them;
- * a Sterilization user their own receipts and deliveries of the same day; a department its own dispatch
- * while Sterilization has not received it, when no use was counted.
+ * a Sterilization user their own receipts, stages and deliveries of the same day; a department its own
+ * dispatch while Sterilization has not received it, when no use was counted.
  */
 export function undoPermission(
   movement: Movement,

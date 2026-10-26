@@ -13,7 +13,7 @@ import type {useSurgiHelpers} from './useSurgiHelpers';
 
 export type UndoInfo = {movement: Movement} & ({ok: true} | {ok: false; reason: UndoRefusal});
 
-/** Undoing a dispatch, receipt or delivery made by mistake (see core/movementUndo). */
+/** Undoing a dispatch, receipt, stage or delivery made by mistake (see core/movementUndo). */
 export function useUndoActions(
   p: ReturnType<typeof useSurgiSession> & ReturnType<typeof useSurgiRecords> & ReturnType<typeof useSurgiHelpers>,
 ) {
@@ -23,8 +23,10 @@ export function useUndoActions(
     currentUser,
     movements,
     notify,
+    processLoads,
     role,
     setIssues,
+    setProcessLoads,
     setRecallCases,
     setSets,
     setTools,
@@ -51,6 +53,13 @@ export function useUndoActions(
     // A Set whose instruments changed since (one replaced, moved or sent to Service) is not put back.
     if (allowed.ok && movement.undo && !membersUnchanged(movement.undo, tools))
       return {movement, ok: false, reason: 'MOVED_ON'};
+    // Loaded by mistake: only out of a load whose cycle is still running, and not its only item.
+    if (allowed.ok && movement.undo?.action === 'LOADING') {
+      const load = processLoads.find(l => l.id === movement.undo!.loadId);
+      if (!load || load.status !== 'OPEN' || !load.items.some(i => i.assetKind === kind && i.assetId === id))
+        return {movement, ok: false, reason: 'MOVED_ON'};
+      if (load.items.length === 1) return {movement, ok: false, reason: 'LAST_IN_LOAD'};
+    }
     return {movement, ...allowed};
   };
 
@@ -72,6 +81,16 @@ export function useUndoActions(
           opened.has(i.id) && i.status === 'OPEN'
             ? {...i, status: 'RESOLVED', note: `${i.note} · Αναιρέθηκε η κίνηση: ${reason.trim()}`}
             : i,
+        ),
+      );
+    }
+    // Taken out of the running sterilizer load it was put in by mistake.
+    if (snapshot.action === 'LOADING' && snapshot.loadId) {
+      setProcessLoads(list =>
+        list.map(l =>
+          l.id === snapshot.loadId
+            ? {...l, items: l.items.filter(i => !(i.assetKind === kind && i.assetId === id))}
+            : l,
         ),
       );
     }
