@@ -23,8 +23,8 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
     const timer = window.setTimeout(() => setToast(undefined), toast.undo ? UNDO_SECONDS * 1000 : 3200);
     return () => window.clearTimeout(timer);
   }, [toast]);
-  const addMovement = (m: Omit<Movement, 'id' | 'at'>) =>
-    setMovements(x => [{...m, id: `m${uniqueStamp()}`, at: formatStoreDateTime()}, ...x]);
+  const addMovement = (m: Omit<Movement, 'id' | 'at'> & {id?: string}) =>
+    setMovements(x => [{...m, id: m.id || `m${uniqueStamp()}`, at: formatStoreDateTime()}, ...x]);
   // The asset as the actions see it: one left in a stage since turned off is in the next enabled stage.
   const assetName = (kind: AssetKind, id: string) => {
     const asset = findAsset(kind, id, sets, tools);

@@ -9,6 +9,7 @@ import {useAssetStatusActions} from './useAssetStatusActions';
 import {useAssetEditActions} from './useAssetEditActions';
 import {usePurchaseActions} from './usePurchaseActions';
 import {useRecycleBinActions} from './useRecycleBinActions';
+import {useUndoActions} from './useUndoActions';
 import type {SurgiDataMode} from '../../data/repositories';
 import type {CloudWorkspace} from '../../data/cloud/CloudWorkspaceGate';
 
@@ -25,5 +26,6 @@ export function useSurgiStore(args: {dataMode: SurgiDataMode; cloud?: CloudWorks
   const s8 = {...s7, ...useAssetEditActions(s7)};
   const s9 = {...s8, ...usePurchaseActions(s8)};
   const s10 = {...s9, ...useRecycleBinActions(s9)};
-  return s10;
+  const s11 = {...s10, ...useUndoActions(s10)};
+  return s11;
 }

@@ -31,6 +31,7 @@ import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {askConfirm} from '../../components/ui/confirmService';
+import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -44,6 +45,7 @@ function assetParts(value: string) {
 /** The hospital's movements; `embedded` in Traceability («Όλες οι κινήσεις»), which gives the page its title. */
 export default function MovementsPage({embedded = false}: {embedded?: boolean}) {
   const {movements, sets, tools, role, currentUser, forgetMovements} = useSurgi();
+  const undone = useUndoneMovements();
   // Only the platform owner can clean chosen entries out of the history: in a hospital, or in Demo.
   const demo = getRuntimeDataMode() === 'DEMO';
   const owner = demo ? !!getRealIdentity()?.platform : actingAsPlatformOwner();
@@ -337,6 +339,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
                     <mark className="movement-chip" title={trData(m.status)}>
                       {trData(m.status)}
                     </mark>
+                    {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                   </span>
                   <span className="ledger-user">
                     <UserRound size={15} />

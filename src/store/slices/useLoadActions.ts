@@ -20,6 +20,7 @@ import type {
   WorkflowCheckpointPayload,
 } from '../types';
 import {workflowStageState} from '../../core/workflow';
+import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -49,6 +50,7 @@ export function useLoadActions(
     setSterilizationReleases,
     setTools,
     setWorkflowCheckpoints,
+    sets,
     sterilizationCycles,
     sterilizationWorkflow,
     tools,
@@ -560,6 +562,8 @@ export function useLoadActions(
       at: formatStoreDateTime(),
       note: payload.note,
     };
+    // As it is before the delivery, so that a delivery made by mistake can be undone.
+    const undo = takeSnapshot('DELIVERY', kind, id, sets, tools, {after: 'IN_DEPARTMENT', recordId: record.id});
     setDeliveries(x => [record, ...x]);
     updateState(kind, id, 'IN_DEPARTMENT');
     addMovement({
@@ -569,6 +573,7 @@ export function useLoadActions(
       to: a.department || 'Τμήμα',
       status: `Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ${deliverer.name} · παρέλαβε ${payload.receivedByName}`,
       by: currentUser.name,
+      undo,
     });
     notify(tr('Η παράδοση του {0} στο {1} ολοκληρώθηκε.', a.barcode, a.department || 'τμήμα'));
     return record;

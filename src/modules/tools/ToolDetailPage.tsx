@@ -24,6 +24,7 @@ import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import AppButton from '../../components/ui/AppButton';
+import UndoMovementButton from '../../components/assets/UndoMovementButton';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -39,6 +40,7 @@ import ActionMenu from '../../components/ui/ActionMenu';
 import {useConfirm} from '../../components/ui/useConfirm';
 import {ToolReportModal} from './ToolDialogs';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
+import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 
 export default function ToolDetailPage() {
   const {
@@ -59,6 +61,7 @@ export default function ToolDetailPage() {
     setColorMarker,
     correctUses,
   } = useSurgi();
+  const undone = useUndoneMovements();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
   const {id} = useParams();
@@ -120,12 +123,15 @@ export default function ToolDetailPage() {
     <div className="asset-history-row" key={item.id}>
       <span className="history-dot" />
       <div>
-        <strong>{trData(item.status)}</strong>
+        <strong>
+          {trData(item.status)} {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+        </strong>
         <p>
           {trData(item.from)} → {trData(item.to)}
         </p>
         <small>
           {item.at} · {trData(item.by)}
+          {item.undoes && item.note ? ` · ${tr('Αιτιολογία')}: ${item.note}` : ''}
         </small>
       </div>
     </div>
@@ -232,6 +238,7 @@ export default function ToolDetailPage() {
                 : []),
             ]}
           />
+          <UndoMovementButton kind="TOOL" id={tool.id} />
           {can('department.dispatch') && tool.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}
