@@ -283,6 +283,11 @@ export const en: Record<string, string> = {
   'Αλλαγή κάμερας': 'Switch camera',
   'Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.':
     'Unalterable history of handovers, receipts, checks and transfers.',
+  'ΣΕΤ ΕΡΓΑΛΕΙΩΝ': 'INSTRUMENT SETS',
+  'ΜΕΜΟΝΩΜΕΝΑ ΕΡΓΑΛΕΙΑ': 'STANDALONE INSTRUMENTS',
+  'Τα Σετ του τμήματος, και η αποστολή στην Αποστείρωση.': "The department's Sets, and sending them to Sterilization.",
+  'Τα μεμονωμένα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.':
+    "The department's standalone instruments, and sending them to Sterilization.",
   'Ομαδοποίηση ανά τμήμα': 'Grouped by department',
   'Ομαδοποίηση ανά ειδικότητα': 'Grouped by specialty',
   'Απογραφή εξοπλισμού': 'Equipment inventory',
@@ -1086,7 +1091,6 @@ export const en: Record<string, string> = {
   'Ρυθμίσεις νέου εργαλείου': 'New instrument settings',
   Ρόλος: 'Role',
   ΣΕΤ: 'SET',
-  'ΣΕΤ & ΕΡΓΑΛΕΙΑ ΤΜΗΜΑΤΟΣ': 'DEPARTMENT SETS & INSTRUMENTS',
   ΣΗΜΕΙΩΣΕΙΣ: 'NOTES',
   ΣΥΝΘΕΣΗ: 'COMPOSITION',
   'ΣΥΝΘΕΣΗ & ΠΡΟΕΤΟΙΜΑΣΙΑ': 'COMPOSITION & PREPARATION',
@@ -1155,8 +1159,6 @@ export const en: Record<string, string> = {
   'Σύνολο εργαλείων': 'Total instruments',
   Σύνοψη: 'Summary',
   ΤΕΚΜΗΡΙΩΣΗ: 'DOCUMENTATION',
-  'Τα Σετ και τα εργαλεία του τμήματος, και η αποστολή στην Αποστείρωση.':
-    "The department's Sets and instruments, and sending them to Sterilization.",
   'Τα βασικά στοιχεία εμφανίζονται σε μία καθαρή γραμμή · αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα':
     'Key details on one clear line · report only if a visible problem is found',
   'Τα εργαλεία αποδεσμεύονται και μεταφέρονται στο Απόθεμα.': 'The instruments are released and moved to stock.',

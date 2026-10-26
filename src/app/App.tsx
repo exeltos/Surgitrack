@@ -404,6 +404,14 @@ export default function App() {
             }
           />
           <Route
+            path="/department/tools"
+            element={
+              <Guard permission="department.workspace">
+                <DepartmentPage />
+              </Guard>
+            }
+          />
+          <Route
             path="/issues"
             element={
               <Guard permission="issue.view">

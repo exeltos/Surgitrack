@@ -72,6 +72,7 @@ const navEN: Record<string, string> = {
   Αντικαταστάσεις: 'Replacements',
   Εργαλεία: 'Instruments',
   'Σετ εργαλείων': 'Instrument Sets',
+  'Μεμονωμένα εργαλεία': 'Standalone instruments',
   Μεμονωμένα: 'Standalone',
   'Απόθεμα εργαλείων': 'Instrument Stock',
   Εκκρεμότητες: 'Issues',
@@ -90,7 +91,6 @@ const navEN: Record<string, string> = {
   'Ροή Αποστείρωσης': 'Sterilization Flow',
   'Ρόλοι & δικαιώματα': 'Roles & permissions',
   Ρυθμίσεις: 'Settings',
-  'Σετ & Εργαλεία': 'Sets & Instruments',
   'Χρήστες & Τμήματα': 'Users & departments',
   Νοσοκομεία: 'Hospitals',
   Επισκόπηση: 'Overview',
@@ -278,7 +278,7 @@ export default function AppShell({
   }, [role, currentUser.department, readyKey, lang]);
   const toolModeOf = (id: string) => tools.find(t => t.id === id)?.mode;
   const assetDetailMode = /^\/(tools|sets)\/[^/]+$/.test(location.pathname);
-  const departmentMode = location.pathname === '/department';
+  const departmentMode = location.pathname === '/department' || location.pathname === '/department/tools';
   const sidebar = (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="brand">

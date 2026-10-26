@@ -131,7 +131,7 @@ export default function ToolDetailPage() {
     </div>
   );
   const departmentView = role === 'DEPARTMENT';
-  const backTo = departmentView ? '/department' : '/tools';
+  const backTo = departmentView ? (tool.mode === 'STANDALONE' ? '/department/tools' : '/department') : '/tools';
   const workflowLocked = !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(tool.state);
 
   return (
