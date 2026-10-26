@@ -165,3 +165,18 @@ html body .movement-detail-links .app-button {
     white-space: normal;
   }
 }
+
+/* A movement that was undone later stays in the history, marked. */
+.undone-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-orange-45);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  vertical-align: middle;
+}

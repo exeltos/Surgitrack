@@ -25,6 +25,7 @@ import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import AppButton from '../../components/ui/AppButton';
+import UndoMovementButton from '../../components/assets/UndoMovementButton';
 import {compositionHtml} from '../sterilization/printUtils';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
@@ -43,6 +44,7 @@ import {useConfirm} from '../../components/ui/useConfirm';
 import {printCountForm} from '../../components/department/printCountForm';
 import {formatDateTime} from '../../core/displayDate';
 import SetContents from './SetContents';
+import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 
 export default function SetDetailPage() {
   const {
@@ -67,6 +69,7 @@ export default function SetDetailPage() {
     organizationName,
     correctUses,
   } = useSurgi();
+  const undone = useUndoneMovements();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
   const {id} = useParams();
@@ -257,6 +260,7 @@ export default function SetDetailPage() {
                 : []),
             ]}
           />
+          <UndoMovementButton kind="SET" id={set.id} />
           {can('department.dispatch') && set.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}
@@ -379,13 +383,17 @@ export default function SetDetailPage() {
                       <div className="asset-history-row" key={item.id}>
                         <span className="history-dot" />
                         <div>
-                          <strong>{trData(item.status)}</strong>
+                          <strong>
+                            {trData(item.status)}{' '}
+                            {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+                          </strong>
                           <p>
                             {trData(item.from)} → {trData(item.to)}
                           </p>
                           <small>
                             {item.at} · {trData(item.by)}
                             {item.patientCode ? ` · ${item.patientCode}` : ''}
+                            {item.undoes && item.note ? ` · ${tr('Αιτιολογία')}: ${item.note}` : ''}
                           </small>
                         </div>
                       </div>

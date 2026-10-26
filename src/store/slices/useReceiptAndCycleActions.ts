@@ -15,6 +15,7 @@ import type {
   SterilizationReleasePayload,
 } from '../types';
 import {workflowStageState} from '../../core/workflow';
+import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -74,6 +75,11 @@ export function useReceiptAndCycleActions(
     const exhaustedIds = new Set(exhausted.map(t => t.id));
     const limitedIds = new Set(limited.map(t => t.id));
     const dispatchedToolExhausted = kind === 'TOOL' && exhaustedIds.has(id);
+    // As it is before the dispatch, so that a dispatch made by mistake can be undone.
+    const undo = takeSnapshot('DISPATCH', kind, id, sets, tools, {
+      after: dispatchedToolExhausted ? 'RETIRED' : 'PENDING_STERILIZATION',
+      usesCounted: limited.length > 0 || setLimited,
+    });
     if (!dispatchedToolExhausted) updateState(kind, id, 'PENDING_STERILIZATION');
     if (limited.length) {
       setTools(list =>
@@ -105,7 +111,9 @@ export function useReceiptAndCycleActions(
         ),
       );
     }
+    const dispatchId = `m${uniqueStamp()}-${Math.random().toString(36).slice(2, 6)}`;
     addMovement({
+      id: dispatchId,
       asset: `${a.barcode} · ${a.name}`,
       assetKind: kind,
       from: a.department || currentUser.department || 'Τμήμα',
@@ -116,6 +124,7 @@ export function useReceiptAndCycleActions(
       by: currentUser.name,
       patientCode,
       note,
+      undo,
     });
     exhausted.forEach(t =>
       addMovement({
@@ -126,6 +135,7 @@ export function useReceiptAndCycleActions(
         status: `Συμπλήρωση ορίου χρήσεων (${t.maxUses}/${t.maxUses}) · αυτόματα εκτός χρήσης`,
         by: currentUser.name,
         patientCode,
+        causedBy: dispatchId,
       }),
     );
     notify(
@@ -155,6 +165,13 @@ export function useReceiptAndCycleActions(
     const physicalExpected = setAsset ? tools.filter(t => t.setId === id).length : undefined;
     const checkedCount =
       setAsset && payload.checkPerformed ? (payload.checkedCount ?? physicalExpected ?? setAsset.actual) : undefined;
+    const issueId = `i${uniqueStamp()}`;
+    const opensIssue = !!(payload.checkPerformed && payload.checkResult && payload.checkResult !== 'OK');
+    // As it is before the receipt, so that a receipt made by mistake can be undone.
+    const undo = takeSnapshot('RECEIPT', kind, id, sets, tools, {
+      after: nextStateAfter('RECEIPT'),
+      issueIds: opensIssue ? [issueId] : undefined,
+    });
     const record: ReceiptRecord = {
       id: `r${uniqueStamp()}-${Math.random().toString(36).slice(2, 7)}`,
       workflowVersion: sterilizationWorkflow.version,
@@ -205,7 +222,7 @@ export function useReceiptAndCycleActions(
     );
     if (kind === 'SET' && payload.checkPerformed && checkedCount !== undefined)
       setSets(x => x.map(s => (s.id === id ? {...s, actual: checkedCount} : s)));
-    if (payload.checkPerformed && payload.checkResult && payload.checkResult !== 'OK') {
+    if (opensIssue) {
       const issueType =
         payload.checkResult === 'MISSING'
           ? 'Έλλειψη'
@@ -214,7 +231,7 @@ export function useReceiptAndCycleActions(
             : 'Παρατήρηση παραλαβής';
       setIssues(x => [
         {
-          id: `i${uniqueStamp()}`,
+          id: issueId,
           asset: `${a.barcode} · ${a.name}`,
           type: issueType,
           status: 'OPEN',
@@ -242,6 +259,7 @@ export function useReceiptAndCycleActions(
           ? 'Φυσική παραλαβή + καταμέτρηση'
           : 'Φυσική παραλαβή · χωρίς εμφανή απόκλιση',
       by: `${currentUser.name} · παρέδωσε ${payload.deliveredByName}`,
+      undo,
     });
     notify(
       payload.checkPerformed

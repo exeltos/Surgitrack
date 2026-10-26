@@ -2164,4 +2164,18 @@ export const en: Record<string, string> = {
   'Πιο πολυχρησιμοποιημένα Σετ': 'Most used Sets',
   'Τα Σετ του τμήματος με τις περισσότερες χρήσεις.': "The department's Sets with the most uses.",
   'Καμία χρήση ακόμα.': 'No uses yet.',
+  'Μετρήθηκε χρήση: την αποστολή την ακυρώνει ο προϊστάμενος Αποστείρωσης.':
+    'A use was counted: the Sterilization supervisor cancels this dispatch.',
+  'Αναιρείτε μόνο κινήσεις της ίδιας ημέρας· τις παλαιότερες ο προϊστάμενος.':
+    "You undo only the same day's movements; older ones are undone by the supervisor.",
+  'Ακύρωση αποστολής': 'Cancel dispatch',
+  'Αναίρεση αποστολής': 'Undo dispatch',
+  'Αναίρεση παραλαβής': 'Undo receipt',
+  'Αναίρεση παράδοσης': 'Undo delivery',
+  'Αναιρείται η κίνηση «{0}» της {1} ({2}) και το {3} επιστρέφει όπως ήταν πριν. Η κίνηση μένει στο ιστορικό ως αναιρεμένη.':
+    'The movement “{0}” of {1} ({2}) is undone and {3} goes back to how it was before. The movement stays in the history, marked undone.',
+  'π.χ. λάθος σάρωση': 'e.g. wrong scan',
+  Αναιρέθηκε: 'Undone',
+  'Αναιρέθηκε η κίνηση του {0}.': 'The movement of {0} was undone.',
+  Αιτιολογία: 'Reason',
 };

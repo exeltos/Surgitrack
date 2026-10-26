@@ -1,3 +1,5 @@
+import type {UndoSnapshot} from '../core/movementUndo';
+
 export type AssetKind = 'SET' | 'TOOL';
 export type AssetState =
   | 'IN_DEPARTMENT'
@@ -125,6 +127,12 @@ export interface Movement {
   note?: string;
   /** The account the database recorded this entry under (set by the database, never by the device). */
   accountId?: string;
+  /** What the movement changed, as it was before: lets it be undone (core/movementUndo). */
+  undo?: UndoSnapshot;
+  /** The movement this entry undoes. */
+  undoes?: string;
+  /** Recorded as a consequence of that movement (an instrument out of use at a dispatch): undone with it. */
+  causedBy?: string;
 }
 export interface Issue {
   id: string;

@@ -23,6 +23,7 @@ import {getI18nLang, tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import {parseDisplayDate} from '../../core/displayDate';
 import type {Movement, ProcessLoadStatus, SetAsset, Tool} from '../../types/domain';
+import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 
 /** One sterilization cycle an item went through, from the load it was in (or an older per-item record). */
 type CycleEntry = {
@@ -50,6 +51,7 @@ const time = (value: string | undefined) => parseDisplayDate(value)?.getTime() ?
 const barcodeOf = (m: Movement) => m.asset.split(' · ')[0].trim();
 export default function TraceabilityPage() {
   const {sets, tools, movements, counts, sterilizationCycles, processLoads} = useSurgi();
+  const undone = useUndoneMovements();
   // Opened from a movement: the item to look up comes in the address (?q=S000321).
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(() => params.get('q') || '');
@@ -384,7 +386,10 @@ export default function TraceabilityPage() {
                     <time>{m.at}</time>
                     <div className="dot" />
                     <div>
-                      <strong>{trData(m.status)}</strong>
+                      <strong>
+                        {trData(m.status)}{' '}
+                        {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+                      </strong>
                       {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
                       <small>
                         {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
