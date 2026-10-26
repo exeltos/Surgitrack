@@ -45,13 +45,13 @@ export default function DepartmentPage() {
   const lastOpenedKey =
     typeof window !== 'undefined' ? sessionStorage.getItem('surgitrack.department.lastAsset') : null;
   // Sets and standalone instruments are two entries of the department's menu (/department, /department/tools).
+  // Someone viewing a department from the Overview stays on the Overview's page and switches here.
   const {pathname} = useLocation();
   const navigate = useNavigate();
-  const category: Category = pathname === '/department/tools' ? 'TOOLS' : 'SETS';
+  const [viewedCategory, setViewedCategory] = useState<Category>('SETS');
+  const category: Category = viewing ? viewedCategory : pathname === '/department/tools' ? 'TOOLS' : 'SETS';
   const setCategory = (next: Category) =>
-    navigate(
-      `${next === 'TOOLS' ? '/department/tools' : '/department'}${viewing ? `?d=${encodeURIComponent(viewing)}` : ''}`,
-    );
+    viewing ? setViewedCategory(next) : navigate(next === 'TOOLS' ? '/department/tools' : '/department');
   const [statusFilter, setStatusFilter] = useRememberedState<StatusFilter>('statusFilter', 'ALL');
   const [query, setQuery] = useRememberedState('query', '');
   const [lastOpened, setLastOpened] = useState(lastOpenedKey);
