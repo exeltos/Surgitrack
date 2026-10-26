@@ -695,6 +695,8 @@ html body .hospital-admin .hospital-people .people-rows,
 html body .hospital-admin .hospital-people > section.hospital-card > .hospital-rows,
 html body .hospital-admin .hospital-people > section.hospital-card > .people-rows {
   flex: 1 1 auto;
+  /* Rows keep their own height: a short list does not stretch them to fill the card. */
+  align-content: start;
   min-height: 0;
   max-height: none;
   overflow-y: auto;

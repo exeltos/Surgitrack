@@ -59,10 +59,11 @@ export function useUndoActions(
     const movement = latestUndoable(movements, asset.barcode);
     if (!movement) return undefined;
     const who = actor();
-    // An older movement kept nothing: the admin and the supervisor undo it as far as it can be worked out.
+    // An older movement kept nothing: the admin and the supervisor (and a department, its own dispatch) undo
+    // it as far as it can be worked out.
     const snapshot =
       movement.undo ??
-      (who.manager
+      (who.manager || who.role === 'DEPARTMENT'
         ? legacySnapshot(movement, kind, id, {
             sets,
             tools,

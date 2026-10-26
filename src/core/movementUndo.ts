@@ -218,8 +218,10 @@ export function undoPermission(
   if (!undo || !asset) return {ok: false, reason: 'NOT_UNDOABLE'};
   if (asset.state !== undo.after) return {ok: false, reason: 'MOVED_ON'};
   if (actor.manager) return {ok: true};
-  // An older movement, worked out rather than kept, only by the admin or the supervisor.
-  if (undo.legacy) return {ok: false, reason: 'NO_RIGHT'};
+  // An older movement, worked out rather than kept: the admin and the supervisor, and a department its own
+  // older dispatch (its uses stay as they are).
+  if (undo.legacy && !(actor.role === 'DEPARTMENT' && undo.action === 'DISPATCH'))
+    return {ok: false, reason: 'NO_RIGHT'};
   if (actor.role === 'STERILIZATION') {
     if (undo.action === 'DISPATCH') return {ok: false, reason: 'NOT_OWN'};
     const own = movement.accountId

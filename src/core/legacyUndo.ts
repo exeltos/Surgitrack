@@ -20,7 +20,8 @@ import type {UndoAction, UndoSnapshot} from './movementUndo';
  * a dispatch puts it back in the department, with the sterile dates of its latest release; a receipt back to
  * awaiting receipt; a delivery back to ready for pickup; a stage back to that stage. Uses, and instruments
  * taken out of use at their limit, are not known and stay as they are (the admin corrects them separately).
- * Only the hospital admin and the Sterilization supervisor undo an older movement.
+ * The hospital admin and the Sterilization supervisor undo an older movement; a department its own older
+ * dispatch, while Sterilization has not received it.
  */
 export type LegacyContext = {
   sets: readonly SetAsset[];
