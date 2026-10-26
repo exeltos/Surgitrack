@@ -97,6 +97,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
   if (role === 'STERILIZATION') return [overview, ...assetNavigation].filter(shows);
   if (role === 'DEPARTMENT') {
     const departmentNavigation: NavigationItem[] = [
+      {to: '/department/home', label: 'Αρχική', icon: LayoutDashboard, permission: 'department.workspace'},
       {to: '/department', label: 'Σετ εργαλείων', icon: Layers3, permission: 'department.workspace'},
       {to: '/department/tools', label: 'Μεμονωμένα εργαλεία', icon: Scissors, permission: 'department.workspace'},
       {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'department.workspace'},
@@ -152,7 +153,7 @@ export const navSectionFor = (
 
 /**
  * Where a user lands after signing in: the Overview when their menu has it, otherwise the first entry
- * of their menu (e.g. Sets & Instruments for a department).
+ * of their menu (e.g. a department's Home).
  */
 export const homePathFor = (role: UserRole, can?: (permission: Permission) => boolean): string | undefined => {
   const items = navigationFor(role, can);

@@ -47,6 +47,7 @@ const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
 const NameCheckPage = lazyPage(() => import('../modules/tools/NameCheckPage'));
 const DepartmentPage = lazyPage(() => import('../modules/department/DepartmentPage'));
+const DepartmentHomePage = lazyPage(() => import('../modules/department/DepartmentHomePage'));
 const IssuesPage = lazyPage(() => import('../modules/issues/IssuesPage'));
 const MovementsPage = lazyPage(() => import('../modules/movements/MovementsPage'));
 const TraceabilityPage = lazyPage(() => import('../modules/traceability/TraceabilityPage'));
@@ -400,6 +401,14 @@ export default function App() {
             element={
               <Guard permission="department.workspace">
                 <DepartmentPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/department/home"
+            element={
+              <Guard permission="department.workspace">
+                <DepartmentHomePage />
               </Guard>
             }
           />

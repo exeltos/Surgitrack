@@ -22,7 +22,7 @@ const setup = (role: string, path: string) => {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/department" element={<p>department home</p>} />
+              <Route path="/department/home" element={<p>department home</p>} />
             </Routes>
           </SurgiProvider>
         </LibraryStoreProvider>
