@@ -4,10 +4,10 @@ import {managedHospitalId} from './accessRequests';
 const ACTIVE_ORGANIZATION_KEY = 'surgitrack-active-organization';
 
 /**
- * The platform admin enters a hospital (or leaves to Studio only, with no id). A different
+ * The platform admin enters a hospital (or leaves to Studio only, with no id): into the Overview, the home of its menu. A different
  * hospital means different data, so the page reloads and the workspace gate loads that hospital.
  */
-export const switchHospital = (organizationId: string, hash = organizationId ? '#/hospital' : '#/studio') => {
+export const switchHospital = (organizationId: string, hash = organizationId ? '#/' : '#/studio') => {
   if (organizationId) sessionStorage.setItem(ACTIVE_ORGANIZATION_KEY, organizationId);
   else sessionStorage.removeItem(ACTIVE_ORGANIZATION_KEY);
   sessionStorage.removeItem('surgitrack-session-user');
