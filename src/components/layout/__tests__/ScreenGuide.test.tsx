@@ -1,70 +1,40 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-const identity = vi.hoisted(() => ({id: 'user-1' as string | undefined, mode: 'PRODUCTION'}));
-vi.mock('../../../data/cloud/identity', () => ({
-  getRealIdentity: () => (identity.id ? {id: identity.id} : undefined),
-}));
-vi.mock('../../../config/dataMode', () => ({getRuntimeDataMode: () => identity.mode}));
-
 import ScreenGuide, {screenSection} from '../ScreenGuide';
 
 const all = () => true;
+const show = (pathname: string, extra: {onHelp?: () => void; onClose?: () => void} = {}) =>
+  render(
+    <ScreenGuide
+      pathname={pathname}
+      lang="el"
+      can={all}
+      onHelp={extra.onHelp ?? vi.fn()}
+      onClose={extra.onClose ?? vi.fn()}
+    />,
+  );
 
-describe('screen guide on first visit', () => {
-  beforeEach(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-    identity.id = 'user-1';
-    identity.mode = 'PRODUCTION';
-  });
-
-  it('shows the screen from the manual once, then not again for that person', async () => {
-    const onHelp = vi.fn();
-    const {unmount} = render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={onHelp} />);
+describe('screen guide, opened on request', () => {
+  it('shows the screen from the manual with its first steps', () => {
+    show('/sterilization');
     expect(screen.getByRole('complementary', {name: 'Οδηγός οθόνης'})).toHaveTextContent('Αποστείρωση');
-    await userEvent.click(screen.getByRole('button', {name: 'Το κατάλαβα'}));
-    expect(screen.queryByRole('complementary')).toBeNull();
-    unmount();
-    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={onHelp} />);
-    expect(screen.queryByRole('complementary')).toBeNull();
-    identity.id = 'user-2';
-    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={onHelp} />);
-    expect(screen.getByRole('complementary')).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem').length).toBeGreaterThan(0);
   });
 
-  it('opens Help on the screen and can be turned off for every screen', async () => {
+  it('closes, and opens Help on the screen', async () => {
+    const onClose = vi.fn();
     const onHelp = vi.fn();
-    const {unmount} = render(<ScreenGuide pathname="/issues" lang="el" can={all} onHelp={onHelp} />);
+    show('/issues', {onClose, onHelp});
+    await userEvent.click(screen.getByRole('button', {name: 'Το κατάλαβα'}));
+    expect(onClose).toHaveBeenCalledTimes(1);
     await userEvent.click(screen.getByRole('button', {name: /Αναλυτικά στη Βοήθεια/}));
     expect(onHelp).toHaveBeenCalled();
-    unmount();
-    const {unmount: again} = render(<ScreenGuide pathname="/stock" lang="el" can={all} onHelp={onHelp} />);
-    await userEvent.click(screen.getByRole('button', {name: 'Να μην εμφανίζονται οδηγοί'}));
-    again();
-    render(<ScreenGuide pathname="/reports" lang="el" can={all} onHelp={onHelp} />);
-    expect(screen.queryByRole('complementary')).toBeNull();
+    expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('shows in Demo too, per role and for the Demo session only', async () => {
-    identity.mode = 'DEMO';
-    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
-    const {unmount} = render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} />);
-    await userEvent.click(screen.getByRole('button', {name: 'Το κατάλαβα'}));
-    unmount();
-    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} />);
-    expect(screen.queryByRole('complementary')).toBeNull();
-    // Another Demo session starts afresh; nothing was kept in the browser's long-term storage.
-    sessionStorage.clear();
-    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
-    expect(localStorage.length).toBe(0);
-    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} />);
-    expect(screen.getByRole('complementary')).toBeInTheDocument();
-  });
-
-  it('stays hidden when the hospital turned the guides off', () => {
-    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} enabled={false} />);
+  it('shows nothing for a screen the manual does not describe', () => {
+    show('/start');
     expect(screen.queryByRole('complementary')).toBeNull();
   });
 

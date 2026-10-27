@@ -137,8 +137,8 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </div>
               <small>
                 {L(
-                  'Η πρώτη φορά σε κάθε οθόνη: τι κάνει και τα πρώτα βήματα, πάνω από την οθόνη. Για όλους τους χρήστες του νοσοκομείου· όταν εμφανίζονται, ο καθένας μπορεί να τους κλείσει για τον εαυτό του.',
-                  'The first time on each screen: what it does and the first steps, above the screen. For everyone in the hospital; when shown, each person can still turn them off for themselves.',
+                  'Το κουμπί «Οδηγός οθόνης» στην πάνω μπάρα: τι κάνει η οθόνη και τα πρώτα βήματα, όποτε τον ζητήσει ο χρήστης. Για τα τμήματα, την Αποστείρωση και τον διαχειριστή του νοσοκομείου.',
+                  'The «Screen guide» button in the top bar: what the screen does and the first steps, whenever the user asks. For departments, Sterilization and the hospital admin.',
                 )}
               </small>
             </label>

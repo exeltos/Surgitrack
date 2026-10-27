@@ -5,6 +5,7 @@ import {
   Accessibility,
   Bell,
   BookOpen,
+  Compass,
   FlaskConical,
   Home,
   LogOut,
@@ -45,7 +46,7 @@ import DemoBar from './DemoBar';
 import MaintenanceStrip from './MaintenanceStrip';
 import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
 import Briefing, {briefingDue} from './Briefing';
-import ScreenGuide from './ScreenGuide';
+import ScreenGuide, {screenSection} from './ScreenGuide';
 import {APP_VERSION} from '../../config/appMeta';
 import {tr} from '../../i18n';
 import {useHasModule} from '../../data/cloud/modulesContext';
@@ -138,6 +139,8 @@ export default function AppShell({
   const [a11y, setA11y] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  // «Οδηγός οθόνης»: opened from the top bar on the screen the person is on.
+  const [guideOpen, setGuideOpen] = useState(false);
   const [enteringDemo, setEnteringDemo] = useState(false);
   // After signing in: first what changed in this version, then what waits today (one at a time).
   // A moment after the screen opens, so that counts loaded alongside (access requests) are in.
@@ -177,6 +180,16 @@ export default function AppShell({
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly = isPlatformOnly();
+  // The guide is for departments, Sterilization and the hospital admin (not the platform owner), on a screen the
+  // manual describes, unless the hospital turned the guides off.
+  // A new screen starts with its guide closed.
+  useEffect(() => setGuideOpen(false), [location.pathname]);
+  const guideAvailable =
+    systemSettings.screenGuides !== false &&
+    !platformOnly &&
+    !actingAsPlatformOwner() &&
+    (role === 'DEPARTMENT' || role === 'STERILIZATION' || role === 'ADMIN') &&
+    !!screenSection(location.pathname, can);
   // Hospital administration: a real hospital's admin working as Admin, or the Admin of Demo.
   const hospitalId = role === 'ADMIN' ? managedHospitalId() : undefined;
   const hospitalAdmin = !!hospitalId || (isDemo && role === 'ADMIN');
@@ -416,6 +429,17 @@ export default function AppShell({
             <button className="lang" onClick={() => setLang(lang === 'el' ? 'en' : 'el')}>
               {lang === 'el' ? 'EN' : 'EL'}
             </button>
+            {guideAvailable && (
+              <button
+                className={`icon-btn guide-btn ${guideOpen ? 'active' : ''}`}
+                onClick={() => setGuideOpen(open => !open)}
+                aria-pressed={guideOpen}
+                title={lang === 'el' ? 'Οδηγός οθόνης' : 'Screen guide'}
+                aria-label={lang === 'el' ? 'Οδηγός οθόνης' : 'Screen guide'}
+              >
+                <Compass size={18} />
+              </button>
+            )}
             <button
               className="icon-btn help-btn"
               onClick={() => setHelpOpen(true)}
@@ -582,15 +606,13 @@ export default function AppShell({
           </div>
         )}
         <section className="content" ref={contentRef}>
-          {/* Not over the sign-in dialogs: once they are closed. */}
-          {/* In an evaluation Demo the first steps' guided tours explain each screen instead. */}
-          {sinceSignIn === '' && !evaluationDemo && (
+          {guideAvailable && guideOpen && (
             <ScreenGuide
               pathname={location.pathname}
               lang={lang === 'en' ? 'en' : 'el'}
               can={can}
               onHelp={() => setHelpOpen(true)}
-              enabled={systemSettings.screenGuides !== false}
+              onClose={() => setGuideOpen(false)}
             />
           )}
           {children}

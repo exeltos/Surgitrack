@@ -4099,16 +4099,6 @@ html body .screen-guide-actions {
   align-items: center;
   gap: 8px;
 }
-html body .screen-guide-off {
-  border: 0;
-  background: none;
-  padding: 6px 4px;
-  font: inherit;
-  font-size: 12px;
-  color: var(--st-muted);
-  text-decoration: underline;
-  cursor: pointer;
-}
 @media (max-width: 650px) {
   html body .screen-guide {
     position: static;

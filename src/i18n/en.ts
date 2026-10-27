@@ -565,8 +565,6 @@ export const en: Record<string, string> = {
   'Οδηγοί οθόνης': 'Screen guides',
   Εμφανίζονται: 'Shown',
   'Δεν εμφανίζονται': 'Not shown',
-  'Οι σύντομες οδηγίες την πρώτη φορά σε κάθε οθόνη. Αλλάζουν αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
-    "The short guides the first time on each screen. They can be changed later in the hospital's settings.",
   'Η παραλαβή ολοκληρώθηκε': 'Receipt completed',
   'Η παραλαβή ολοκληρώνεται μόνο μετά την ταυτοποίηση.': 'The receipt completes only after identification.',
   'Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.': 'Unit policy does not allow this exception.',
@@ -1944,10 +1942,8 @@ export const en: Record<string, string> = {
   'Τι σας περιμένει σήμερα, {0}': 'What is waiting for you today, {0}',
   Ξεκινάμε: "Let's start",
   'Οδηγός οθόνης': 'Screen guide',
-  'Πρώτη φορά εδώ': 'First time here',
   'Το κατάλαβα': 'Got it',
   'Αναλυτικά στη Βοήθεια': 'More in Help',
-  'Να μην εμφανίζονται οδηγοί': 'Do not show guides',
   'Άνοιγμα φωτογραφίας {0}': 'Open photo {0}',
   'Σετ και εργαλεία του τμήματος': 'Sets and instruments of the department',
   'Όλα τα Σετ και εργαλεία του φορτίου ανακαλούνται για επανεπεξεργασία.':
@@ -2213,4 +2209,6 @@ export const en: Record<string, string> = {
   'Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα': 'Press a card or a group to see the list',
   'Εμφάνιση όλων': 'Show all',
   'Κλείσιμο λίστας': 'Close the list',
+  'Το κουμπί «Οδηγός οθόνης» με σύντομες οδηγίες για κάθε οθόνη. Αλλάζει αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
+    'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',
 };
