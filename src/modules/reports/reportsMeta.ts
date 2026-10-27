@@ -44,34 +44,67 @@ export const stateLabel: Record<string, string> = {
   RETIRED: 'Εκτός χρήσης',
 };
 
-export const reports: Array<{id: ReportId; title: string; description: string; icon: typeof FileText}> = [
+/** The reports in three groups, as the list shows them. */
+export type ReportGroup = 'EQUIPMENT' | 'STERILIZATION' | 'HANDOVER';
+export const reportGroups: Array<{id: ReportGroup; title: string}> = [
+  {id: 'EQUIPMENT', title: 'Εξοπλισμός'},
+  {id: 'STERILIZATION', title: 'Αποστείρωση'},
+  {id: 'HANDOVER', title: 'Παραδόσεις'},
+];
+
+export const reports: Array<{
+  id: ReportId;
+  group: ReportGroup;
+  title: string;
+  description: string;
+  /** What it is used for, in one line. */
+  purpose: string;
+  icon: typeof FileText;
+}> = [
   {
     id: 'inventory',
+    group: 'EQUIPMENT',
+    purpose: 'Για απογραφή και έλεγχο: τι υπάρχει και πού βρίσκεται.',
     title: 'Απογραφή εξοπλισμού',
     description: 'Σετ και εργαλεία ανά τμήμα ή ανά ειδικότητα.',
     icon: Boxes,
   },
-  {id: 'issues', title: 'Service & βλάβες', description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.', icon: Wrench},
+  {
+    id: 'issues',
+    group: 'EQUIPMENT',
+    purpose: 'Για να δεις ποιες βλάβες και απώλειες εκκρεμούν.',
+    title: 'Service & βλάβες',
+    description: 'Βλάβες, φθορές, απώλειες και εκκρεμότητες.',
+    icon: Wrench,
+  },
   {
     id: 'usage',
+    group: 'EQUIPMENT',
+    purpose: 'Για να προλάβεις εργαλεία που φτάνουν στο όριο χρήσεων.',
     title: 'Χρήσεις & αποσύρσεις',
     description: 'Υπόλοιπο χρήσεων, κρίσιμα όρια και εργαλεία που τέθηκαν εκτός χρήσης.',
     icon: Activity,
   },
   {
     id: 'loads',
+    group: 'STERILIZATION',
+    purpose: 'Για τεκμηρίωση κύκλων και αποδεσμεύσεων σε έλεγχο.',
     title: 'Φορτία κλιβάνου',
     description: 'Φορτία, κύκλοι, δείκτες και αποδεσμεύσεις ανά κλίβανο.',
     icon: Flame,
   },
   {
     id: 'expiry',
+    group: 'STERILIZATION',
+    purpose: 'Για να ξανα-αποστειρώσεις πριν λήξει ό,τι είναι στα ράφια.',
     title: 'Λήξεις αποστείρωσης',
     description: 'Αποστειρωμένα Σετ και εργαλεία με διάρκεια και ημερομηνία λήξης.',
     icon: CalendarClock,
   },
   {
     id: 'handovers',
+    group: 'HANDOVER',
+    purpose: 'Για να δεις ποιος παρέδωσε σε ποιον και ποιες υπογραφές λείπουν.',
     title: 'Παραδόσεις & παραλαβές',
     description: 'Ποιος παρέδωσε σε ποιον, και αν ο άλλος υπέγραψε με τον δικό του κωδικό.',
     icon: PenLine,

@@ -17,6 +17,8 @@ import Spinner from '../../components/ui/Spinner';
 import {trialState, type HospitalPlan, type TrialState} from '../../core/trial';
 import {loadPlatformContact, type PlatformContact} from './platformContact';
 import {TrialContext} from './trialContext';
+import {ModulesContext} from './modulesContext';
+import {modulesOf, type HospitalModule} from '../../core/hospitalModules';
 import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
 import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
@@ -55,6 +57,8 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
   const [status, setStatus] = useState<'loading' | 'ready' | 'local' | 'error' | 'locked'>('loading');
   const [trial, setTrial] = useState<TrialState | null>(null);
   const [evaluationDemo, setEvaluationDemo] = useState<EvaluationDemo | null>(null);
+  // The modules the platform owner switched on for this hospital (null: the hospital says nothing, all are on).
+  const [modules, setModules] = useState<HospitalModule[] | null>(null);
   const [lock, setLock] = useState<{
     hospital: string;
     endsAt?: string;
@@ -85,12 +89,20 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         setStatus('local');
         return;
       }
-      const {data: org, error: orgError} = await supabase
+      const orgColumns = 'name,is_demo,evaluation,plan,trial_ends_at';
+      let {data: org, error: orgError} = await supabase
         .from('organizations')
-        .select('name,is_demo,evaluation,plan,trial_ends_at')
+        .select(`${orgColumns},modules`)
         .eq('id', organizationId)
         .single();
-      if (orgError) throw orgError;
+      // A database without the modules column yet (42703): the hospital opens with every module on.
+      if (orgError?.code === '42703')
+        ({data: org, error: orgError} = await supabase
+          .from('organizations')
+          .select(orgColumns)
+          .eq('id', organizationId)
+          .single());
+      if (orgError || !org) throw orgError || new Error('hospital not found');
       // Demo work only ever lands in demo hospitals and real work only in real ones, so a stale
       // tab or a mode switch can never write sample data into a real hospital (or the reverse).
       // A prospect's evaluation Demo is the exception: real accounts work in it, outside Demo mode.
@@ -121,6 +133,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         return;
       }
       setSampleDataMark(demo || evaluation);
+      setModules(modulesOf((org as {modules?: unknown}).modules) ?? null);
       setTrial(plan.plan === 'TRIAL' ? plan : null);
       setEvaluationDemo(
         evaluation ? {organizationId, hospitalName: org.name, endsAt: org.trial_ends_at || undefined} : null,
@@ -212,7 +225,9 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
   if (status === 'ready' && workspace)
     return (
       <TrialContext.Provider value={trial}>
-        <EvaluationDemoContext.Provider value={evaluationDemo}>{children(workspace)}</EvaluationDemoContext.Provider>
+        <ModulesContext.Provider value={modules}>
+          <EvaluationDemoContext.Provider value={evaluationDemo}>{children(workspace)}</EvaluationDemoContext.Provider>
+        </ModulesContext.Provider>
       </TrialContext.Provider>
     );
   if (status === 'locked' && lock) return <TrialLocked lang={lang} {...lock} />;

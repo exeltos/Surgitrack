@@ -1,5 +1,6 @@
 import {STUDIO_TABS as TABS, type StudioTabDef as TabDef, type Tab} from '../studioMeta';
 import type {StudioPageState} from '../useStudioPage';
+import {isOwnerOnlyTab} from '../../../core/ownerOnlySections';
 
 const GROUPS = [
   {id: 'PLATFORM', el: 'Πλατφόρμα', en: 'Platform'},
@@ -10,8 +11,12 @@ const PRODUCTION_ONLY: Tab[] = ['IMPORT', 'RATINGS', 'NOTICES', 'ERRORS'];
 
 export default function StudioTabs({s}: {s: StudioPageState}) {
   const {L, libs, platformAdmin, selectTab, tab} = s;
+  // The Sterilization flow, the roles and the settings are the platform owner's.
   const shown = TABS.filter(
-    t => (t.group === 'SETUP' || platformAdmin) && (!PRODUCTION_ONLY.includes(t.id) || libs.dataMode === 'PRODUCTION'),
+    t =>
+      (t.group === 'SETUP' || platformAdmin) &&
+      (platformAdmin || !isOwnerOnlyTab(t.id)) &&
+      (!PRODUCTION_ONLY.includes(t.id) || libs.dataMode === 'PRODUCTION'),
   );
   const groups = GROUPS.map(g => ({...g, tabs: shown.filter(t => t.group === g.id)})).filter(g => g.tabs.length);
   const row = (tabs: TabDef[]) =>

@@ -208,3 +208,15 @@ html body .trace-patients-ledger .movement-chip {
   width: fit-content;
   max-width: 100%;
 }
+
+html body .trace-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 10px;
+  border: 0;
+  background: none;
+  color: var(--primary, #0f6bb8);
+  font-weight: 700;
+  cursor: pointer;
+}

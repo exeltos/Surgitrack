@@ -1,3 +1,4 @@
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {useEffect, useMemo} from 'react';
 import {ChevronRight, Sun, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
@@ -54,6 +55,8 @@ export default function Briefing({
 }) {
   const {role, currentUser, sets, tools, retiredTools, issues, processLoads, purchaseOrders} = useSurgi();
   const {systemSettings} = useLibraries();
+  // The minimum stock alert is a module the platform owner gives a hospital.
+  const withMinimums = useHasModule('STOCK_MINIMUMS');
   const items: BriefingItem[] = useMemo(
     () =>
       briefingFor({
@@ -66,9 +69,9 @@ export default function Briefing({
         expiry: expiryAlerts(sterileExpiryList(sets, tools)),
         outOfUse: retiredTools.filter(t => !t.retiredNoticeSeenAt).length,
         accessRequests,
-        belowMinimum: belowMinimum(
-          minimumRows([...tools, ...retiredTools], purchaseOrders, systemSettings.stockMinimums),
-        ).length,
+        belowMinimum: withMinimums
+          ? belowMinimum(minimumRows([...tools, ...retiredTools], purchaseOrders, systemSettings.stockMinimums)).length
+          : 0,
         screens,
       }),
     [
@@ -81,6 +84,7 @@ export default function Briefing({
       processLoads,
       purchaseOrders,
       systemSettings,
+      withMinimums,
       accessRequests,
       screens,
     ],

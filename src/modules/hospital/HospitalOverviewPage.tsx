@@ -26,7 +26,9 @@ import type {AssetState} from '../../types/domain';
 import {trData} from '../../i18n';
 import {presetPath} from '../../core/listMemory';
 import {belowMinimum, minimumRows} from '../../core/stockMinimums';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {movementStamp} from '../../core/movementTime';
+import {movementText} from '../../core/movementText';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -91,9 +93,14 @@ export default function HospitalOverviewPage() {
   const inProcess = tracked.filter(a => PROCESS_STATES.includes(a.state));
   const ready = tracked.filter(a => a.state === 'READY_FOR_PICKUP');
   const openIssues = issues.filter(i => i.status === 'OPEN');
+  // Kinds below their minimum stock (a module the platform owner gives a hospital).
+  const withMinimums = useHasModule('STOCK_MINIMUMS');
   const lowStock = useMemo(
-    () => belowMinimum(minimumRows([...tools, ...retiredTools], purchaseOrders, systemSettings.stockMinimums)),
-    [tools, retiredTools, purchaseOrders, systemSettings.stockMinimums],
+    () =>
+      withMinimums
+        ? belowMinimum(minimumRows([...tools, ...retiredTools], purchaseOrders, systemSettings.stockMinimums))
+        : [],
+    [withMinimums, tools, retiredTools, purchaseOrders, systemSettings.stockMinimums],
   );
   const lost = tracked.filter(a => a.state === 'LOST' || a.state === 'SERVICE');
 
@@ -578,7 +585,7 @@ export default function HospitalOverviewPage() {
                 <Link to={assetPath(m.asset) || '/movements'}>
                   <b>{m.asset}</b>
                   <small>
-                    {trData(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
+                    {movementText(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
                   </small>
                 </Link>
               </li>

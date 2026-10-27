@@ -5,6 +5,7 @@ import type {UndoRefusal} from '../../core/movementUndo';
 import AppButton from '../ui/AppButton';
 import {useConfirm} from '../ui/useConfirm';
 import {tr, trData} from '../../i18n';
+import {movementText} from '../../core/movementText';
 
 const refusalText = (reason: UndoRefusal) =>
   reason === 'USE_COUNTED'
@@ -56,7 +57,7 @@ export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: str
             message:
               tr(
                 'Αναιρείται η κίνηση «{0}» της {1} ({2}) και το {3} επιστρέφει όπως ήταν πριν. Η κίνηση μένει στο ιστορικό ως αναιρεμένη.',
-                trData(m.status),
+                movementText(m.status),
                 m.at,
                 trData(m.by),
                 m.asset.split(' · ')[0],

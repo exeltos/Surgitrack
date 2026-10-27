@@ -23,6 +23,7 @@ import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
 import {navSectionFor, navigationFor, navigationGroupLabel, ownerNavigation} from '../../config/navigation';
 import {isPlatformOnly} from '../../core/platformOnly';
+import {isOwnerOnlyPath, isOwnerOnlyTab} from '../../core/ownerOnlySections';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
@@ -47,6 +48,7 @@ import Briefing, {briefingDue} from './Briefing';
 import ScreenGuide from './ScreenGuide';
 import {APP_VERSION} from '../../config/appMeta';
 import {tr} from '../../i18n';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 import {formatDate, formatTime} from '../../core/displayDate';
@@ -171,6 +173,7 @@ export default function AppShell({
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
   useListMemory(contentRef);
+  const withDevices = useHasModule('DEVICES');
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly = isPlatformOnly();
@@ -196,8 +199,12 @@ export default function AppShell({
       : navigationFor(role, can)
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
+    // Devices is a module the platform owner gives a hospital.
+    .filter(item => item.to !== '/devices' || withDevices)
     // The list of all hospitals is the platform admin's, outside Demo.
-    .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner());
+    .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner())
+    // So are the Sterilization flow, the roles & permissions and the settings: a hospital admin works within them.
+    .filter(item => !isOwnerOnlyPath(item.to) || actingAsPlatformOwner());
   // The pages the menu reaches, for Help: a Studio section is the Studio page, and its hospitals list is
   // what the Hospitals help describes.
   const helpScreens = [
@@ -210,8 +217,11 @@ export default function AppShell({
   useEffect(() => {
     // The Studio opens on a section, so one menu entry is always lit: the platform's overview outside a
     // hospital, the hospital's libraries inside one.
-    if (location.pathname === '/studio' && !new URLSearchParams(location.search).get('tab'))
+    const studioTab = new URLSearchParams(location.search).get('tab');
+    if (location.pathname === '/studio' && !studioTab)
       navigate(platformOnly ? '/studio?tab=overview' : '/studio?tab=libraries', {replace: true});
+    else if (location.pathname === '/studio' && isOwnerOnlyTab(studioTab) && !actingAsPlatformOwner())
+      navigate('/studio?tab=libraries', {replace: true});
     else if (platformOnly && !PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
       navigate('/studio?tab=overview', {replace: true});
   }, [platformOnly, location.pathname, location.search, navigate]);

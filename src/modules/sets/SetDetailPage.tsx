@@ -45,6 +45,7 @@ import {printCountForm} from '../../components/department/printCountForm';
 import {formatDateTime} from '../../core/displayDate';
 import SetContents from './SetContents';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import {movementText} from '../../core/movementText';
 
 export default function SetDetailPage() {
   const {
@@ -384,7 +385,7 @@ export default function SetDetailPage() {
                         <span className="history-dot" />
                         <div>
                           <strong>
-                            {trData(item.status)}{' '}
+                            {movementText(item.status)}{' '}
                             {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                           </strong>
                           <p>

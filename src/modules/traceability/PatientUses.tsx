@@ -9,6 +9,7 @@ import {useProgressiveList} from '../../core/useProgressiveList';
 import {parseDisplayDate} from '../../core/displayDate';
 import {getI18nLang, tr, trData} from '../../i18n';
 import type {Movement} from '../../types/domain';
+import {movementText} from '../../core/movementText';
 
 /** dd/mm/yyyy… → yyyy-mm-dd, to compare with the date fields. */
 const dateKey = (value: string) => {
@@ -36,9 +37,9 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
     .sort((a, b) => time(b.at) - time(a.at));
   const rows = useProgressiveList(filtered, [needle, dateFrom, dateTo].join('|'));
   const table = (): ExportTable => ({
-    title: tr('Χρήσεις σε ασθενείς'),
+    title: tr('Καταγραφές με κωδικό ασθενούς'),
     subtitle: [
-      tr('{0} κινήσεις', filtered.length),
+      tr('{0} καταγραφές', filtered.length),
       needle && `${tr('Κωδικός ασθενούς')} ${code.trim()}`,
       dateFrom && `${tr('Από')} ${dateFrom}`,
       dateTo && `${tr('Έως')} ${dateTo}`,
@@ -58,14 +59,14 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
       m.at,
       m.patientCode || '',
       m.asset,
-      trData(m.status),
+      movementText(m.status),
       trData(m.from),
       trData(m.to),
       trData(m.by),
     ]),
   });
   return (
-    <section className="trace-patients" aria-label={tr('Χρήσεις σε ασθενείς')}>
+    <section className="trace-patients" aria-label={tr('Καταγραφές με κωδικό ασθενούς')}>
       <AssetFilterBar
         className="movement-filter-bar"
         query={code}
@@ -94,14 +95,18 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
       <div className="movement-ledger trace-patients-ledger">
         <div className="ledger-head">
           <div>
-            <span>{tr('{0} κινήσεις', filtered.length)}</span>
+            <span>{tr('{0} καταγραφές', filtered.length)}</span>
           </div>
-          <small>{tr('Πατήστε μια γραμμή για την ιχνηλάτηση του ασθενούς')}</small>
+          <small>
+            {tr(
+              'Κάθε φορά που ένα Σετ ή εργαλείο στάλθηκε προς Αποστείρωση με κωδικό ασθενούς. Πατήστε μια γραμμή για τον ασθενή.',
+            )}
+          </small>
         </div>
         <div className="ledger-columns">
           <span>{tr('Ημερομηνία / ώρα')}</span>
           <span>{tr('Σετ / Εργαλείο')}</span>
-          <span>{tr('Διαδρομή')}</span>
+          <span>{tr('Τμήμα')}</span>
           <span>{tr('Κωδικός ασθενούς')}</span>
           <span>{tr('Χρήστης')}</span>
           <span></span>
@@ -129,8 +134,6 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
                   </span>
                   <span className="ledger-route">
                     <i>{trData(m.from)}</i>
-                    <ChevronRight size={15} />
-                    <i>{trData(m.to)}</i>
                   </span>
                   <span>
                     <mark className="movement-chip">{m.patientCode}</mark>
@@ -139,7 +142,7 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
                     <UserRound size={15} />
                     <span>
                       <b>{trData(m.by)}</b>
-                      <small>{trData(m.status)}</small>
+                      <small>{movementText(m.status)}</small>
                     </span>
                   </span>
                   <ChevronRight className="ledger-open" size={18} />
@@ -149,14 +152,16 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
           ) : (
             <div className="ledger-empty">
               <Route size={28} />
-              <strong>{tr('Δεν βρέθηκαν χρήσεις σε ασθενείς')}</strong>
+              <strong>{tr('Δεν βρέθηκαν καταγραφές με κωδικό ασθενούς')}</strong>
               <span>{tr('Άλλαξε τον κωδικό ή τις ημερομηνίες.')}</span>
             </div>
           )}
           {rows.hasMore && <MoreRows onVisible={rows.showMore} />}
         </div>
       </div>
-      {report && <PrintPreviewModal title={tr('Χρήσεις σε ασθενείς')} html={report} onClose={() => setReport(null)} />}
+      {report && (
+        <PrintPreviewModal title={tr('Καταγραφές με κωδικό ασθενούς')} html={report} onClose={() => setReport(null)} />
+      )}
     </section>
   );
 }
