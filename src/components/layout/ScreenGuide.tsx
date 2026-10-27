@@ -1,79 +1,41 @@
-import {useState} from 'react';
 import {BookOpen, Compass, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
-import {getRuntimeDataMode} from '../../config/dataMode';
 import {helpManual} from '../../core/help/helpManual';
 import type {Permission} from '../../core/permissions';
-import {getRealIdentity} from '../../data/cloud/identity';
 import {tr} from '../../i18n';
-
-const key = (userId: string) => `surgitrack-screen-guides:${userId}`;
-type Seen = {off?: boolean; screens: string[]};
-
-// In Demo each role starts afresh with every Demo session (nothing is kept on the device).
-const storeOf = (userId: string) => (userId.startsWith('demo:') ? sessionStorage : localStorage);
-
-const read = (userId: string): Seen => {
-  try {
-    const value = JSON.parse(storeOf(userId).getItem(key(userId)) || 'null') as Seen | null;
-    return value && Array.isArray(value.screens) ? value : {screens: []};
-  } catch {
-    return {screens: []};
-  }
-};
-const write = (userId: string, seen: Seen) => {
-  try {
-    storeOf(userId).setItem(key(userId), JSON.stringify(seen));
-  } catch {
-    // Private mode: shown again next time.
-  }
-};
 
 /** The manual section of a menu screen, if this person may open it. */
 export const screenSection = (pathname: string, can: (p: Permission) => boolean) =>
   helpManual.find(s => !s.guide && !s.detailOf && s.to === pathname && (!s.permission || can(s.permission)));
 
 /**
- * The first time a person opens a screen: what it is for and its first steps, from the manual, above the
- * screen (it does not block it). Once closed it does not come back for that screen; it can be turned off
- * for every screen. Remembered per person, as ward devices are shared (in Demo, per role and Demo session). A hospital can turn the guides off for
- * everyone (Studio → Ρυθμίσεις → Οδηγοί οθόνης): `enabled` false.
+ * What the screen is for and its first steps, from the manual, above the screen (it does not block it). It opens
+ * from «Οδηγός οθόνης» in the top bar, when the person asks for it, and closes again; nothing is remembered. For
+ * departments, Sterilization and the hospital admin; a hospital can turn it off for everyone (Studio → Ρυθμίσεις →
+ * Οδηγοί οθόνης).
  */
 export default function ScreenGuide({
   pathname,
   lang,
   can,
   onHelp,
-  enabled = true,
+  onClose,
 }: {
   pathname: string;
   lang: 'el' | 'en';
   can: (p: Permission) => boolean;
   onHelp: () => void;
-  enabled?: boolean;
+  onClose: () => void;
 }) {
-  const mode = getRuntimeDataMode();
-  const userId =
-    mode === 'PRODUCTION'
-      ? getRealIdentity()?.id
-      : mode === 'DEMO'
-        ? `demo:${sessionStorage.getItem('surgitrack-demo-role') || 'ADMIN'}`
-        : undefined;
-  const [seen, setSeen] = useState<Seen>(() => (userId ? read(userId) : {off: true, screens: []}));
   const section = screenSection(pathname, can);
-  if (!enabled || !userId || !section || seen.off || seen.screens.includes(section.to)) return null;
-  const save = (next: Seen) => {
-    setSeen(next);
-    write(userId, next);
-  };
-  const done = () => save({...seen, screens: [...seen.screens, section.to]});
+  if (!section) return null;
   return (
     <aside className="screen-guide" aria-label={tr('Οδηγός οθόνης')}>
       <div className="screen-guide-icon">
         <Compass size={20} aria-hidden="true" />
       </div>
       <div className="screen-guide-body">
-        <small>{tr('Πρώτη φορά εδώ')}</small>
+        <small>{tr('Οδηγός οθόνης')}</small>
         <h2>{section.title[lang]}</h2>
         <p>{section.summary[lang]}</p>
         <ol>
@@ -82,25 +44,22 @@ export default function ScreenGuide({
           ))}
         </ol>
         <div className="screen-guide-actions">
-          <AppButton size="sm" variant="primary" onClick={done}>
+          <AppButton size="sm" variant="primary" onClick={onClose}>
             {tr('Το κατάλαβα')}
           </AppButton>
           <AppButton
             size="sm"
             icon={<BookOpen size={14} />}
             onClick={() => {
-              done();
+              onClose();
               onHelp();
             }}
           >
             {tr('Αναλυτικά στη Βοήθεια')}
           </AppButton>
-          <button type="button" className="screen-guide-off" onClick={() => save({...seen, off: true})}>
-            {tr('Να μην εμφανίζονται οδηγοί')}
-          </button>
         </div>
       </div>
-      <button type="button" className="icon-button" onClick={done} aria-label={tr('Κλείσιμο')}>
+      <button type="button" className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
         <X size={16} />
       </button>
     </aside>

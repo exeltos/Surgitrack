@@ -405,3 +405,7 @@ html body .demo-bar > .demo-bar-text {
     gap: 6px;
   }
 }
+
+html body .icon-btn.guide-btn.active {
+  background: var(--st-accent-soft, rgba(15, 107, 184, 0.12));
+}
