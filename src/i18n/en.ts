@@ -2208,4 +2208,9 @@ export const en: Record<string, string> = {
     'To re-sterilize what is on the shelves before it expires.',
   'Για να δεις ποιος παρέδωσε σε ποιον και ποιες υπογραφές λείπουν.':
     'To see who handed over to whom and which signatures are missing.',
+  'Ανά είδος': 'By kind',
+  'Ανά κλίβανο': 'By sterilizer',
+  'Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα': 'Press a card or a group to see the list',
+  'Εμφάνιση όλων': 'Show all',
+  'Κλείσιμο λίστας': 'Close the list',
 };

@@ -16,8 +16,17 @@ const results = () => screen.getByRole('region', {name: 'Αποτελέσματ�
 /** The "N εγγραφές" next to the results. */
 const count = () =>
   Number(/(\d+) εγγραφές/.exec(document.querySelector('.reports-result-head span')!.textContent!)![1]);
-const bodyRows = () => within(results()).queryAllByRole('row').slice(1);
+/** A report starts with its totals; the list opens from «Εμφάνιση όλων» (or a card). */
+const showAll = () => {
+  const button = screen.queryByRole('button', {name: 'Εμφάνιση όλων'});
+  if (button) fireEvent.click(button);
+};
+const bodyRows = () => {
+  showAll();
+  return within(results()).queryAllByRole('row').slice(1);
+};
 const column = (label: string) => {
+  showAll();
   const headers = within(results())
     .getAllByRole('columnheader')
     .map(h => h.textContent);
@@ -52,21 +61,26 @@ describe('Reports', () => {
 
   it('groups the inventory by department or by specialty', () => {
     renderPage(<ReportsPage />);
-    const headers = () =>
-      within(results())
+    const headers = () => {
+      showAll();
+      return within(results())
         .getAllByRole('columnheader')
         .map(h => h.textContent);
+    };
     expect(headers()[0]).toBe('Τμήμα');
     filter('Ομαδοποίηση ανά τμήμα', 'specialty');
     expect(headers()[0]).toBe('Ειδικότητα');
     expect(headers()).not.toContain('Τμήμα');
   });
 
-  it('lists the instruments in service and those taken out of service together', () => {
+  it('lists the instruments in service and those taken out of service, each from its card', () => {
     renderPage(<ReportsPage />);
     choose('Χρήσεις & αποσύρσεις');
-    const states = new Set(column('Κατάσταση'));
-    expect(states).toEqual(new Set(['Σε χρήση', 'Εκτός χρήσης']));
+    const card = (name: RegExp) => within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name});
+    fireEvent.click(card(/Σε χρήση/));
+    expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Σε χρήση']));
+    fireEvent.click(card(/Εκτός χρήσης/));
+    expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
     filter('Σε χρήση & εκτός χρήσης', 'RETIRED');
     expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
   });
@@ -99,5 +113,19 @@ describe('Reports', () => {
     expect(new Set(column('Υπογραφή άλλου μέρους'))).toEqual(new Set(['Μη επιβεβαιωμένη']));
     expect(new Set(column('Κίνηση'))).toEqual(new Set(['Παραλαβή', 'Παράδοση']));
     for (const cell of within(results()).getAllByText('Μη επιβεβαιωμένη')) expect(cell).toHaveClass('report-cell-warn');
+  });
+
+  it('starts with its totals and opens the list from a card or a group', () => {
+    renderPage(<ReportsPage />);
+    expect(within(screen.getByRole('list', {name: 'Σύνολα'})).getAllByRole('button').length).toBeGreaterThan(1);
+    expect(within(results()).queryAllByRole('row')).toHaveLength(0);
+    fireEvent.click(within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name: /Σετ/}));
+    const kinds = new Set(column('Τύπος'));
+    expect(kinds).toEqual(new Set(['Σετ']));
+    fireEvent.click(screen.getByRole('button', {name: 'Κλείσιμο λίστας'}));
+    expect(within(results()).queryAllByRole('row')).toHaveLength(0);
+    const group = screen.getByRole('group', {name: 'Ανά τμήμα'});
+    fireEvent.click(within(group).getAllByRole('button')[0]);
+    expect(bodyRows().length).toBeGreaterThan(0);
   });
 });

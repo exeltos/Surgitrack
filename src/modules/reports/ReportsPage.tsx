@@ -23,12 +23,14 @@ import {
   type Row,
 } from './reportsMeta';
 import {buildReport} from './buildReport';
-import {reportSummary} from './reportSummary';
+import {reportGroups as splitRows, reportSummary} from './reportSummary';
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   const [active, setActive] = useState<ReportId>('inventory');
+  // The list opens when a card or a group is pressed: the report starts with its totals.
+  const [view, setView] = useState<{label: string; test: (row: Row) => boolean} | null>(null);
   const [group, setGroup] = useState<InventoryGroup>('department');
   const [department, setDepartment] = useState('ALL');
   const [specialty, setSpecialty] = useState('ALL');
@@ -130,6 +132,8 @@ export default function ReportsPage() {
   );
 
   const summary = reportSummary(active, reportData.rows, warningThreshold);
+  const split = splitRows(active, reportData.rows);
+  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : []), [view, reportData.rows]);
   const buildPreview = () => {
     const subtitle =
       active === 'inventory'
@@ -307,8 +311,9 @@ export default function ReportsPage() {
     );
   }, [active, reportData]);
   const shownRows = useProgressiveList(
-    reportData.rows,
+    viewRows,
     [
+      view?.label,
       active,
       group,
       department,
@@ -362,7 +367,10 @@ export default function ReportsPage() {
                       <button
                         key={report.id}
                         className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                        onClick={() => setActive(report.id)}
+                        onClick={() => {
+                          setActive(report.id);
+                          setView(null);
+                        }}
                       >
                         <span className="reports-catalog-icon">
                           <Icon size={18} />
@@ -394,21 +402,59 @@ export default function ReportsPage() {
           <div className="reports-filter-strip">
             <FilterMenu filters={reportFilters} />
           </div>
-          <ul className="reports-summary" aria-label={tr('Σύνολα')}>
-            {summary.map(chip => (
-              <li key={chip.label} className={chip.tone && chip.value > 0 ? chip.tone : ''}>
-                <b>{chip.value}</b> {chip.label}
-              </li>
-            ))}
-          </ul>
+          <div className="reports-overview">
+            <ul className="reports-summary" aria-label={tr('Σύνολα')}>
+              {summary.map(chip => (
+                <li key={chip.label}>
+                  <button
+                    type="button"
+                    className={`${chip.tone && chip.value > 0 ? chip.tone : ''} ${view?.label === chip.label ? 'active' : ''}`}
+                    aria-pressed={view?.label === chip.label}
+                    disabled={chip.value === 0}
+                    onClick={() => setView({label: chip.label, test: chip.test})}
+                  >
+                    <b>{chip.value}</b>
+                    <span>{chip.label}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {split.items.length > 1 && (
+              <div className="reports-split" role="group" aria-label={split.title}>
+                <strong>{split.title}</strong>
+                {split.items.map(item => (
+                  <button
+                    type="button"
+                    key={item.label}
+                    className={view?.label === `${split.title}: ${item.label}` ? 'active' : ''}
+                    onClick={() =>
+                      setView({
+                        label: `${split.title}: ${item.label}`,
+                        test: row => String(row[split.key] ?? '—') === item.label,
+                      })
+                    }
+                  >
+                    <span>{cellText(split.key, item.label)}</span>
+                    <i style={{width: `${Math.max(4, (item.value / split.items[0].value) * 100)}%`}} />
+                    <b>{item.value}</b>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="reports-result-card">
             <div className="reports-result-head">
               <div>
-                <strong>{tr('Αποτελέσματα')}</strong>
+                <strong>{view ? view.label : tr('Αποτελέσματα')}</strong>
                 <span>
-                  {reportData.rows.length} {tr('εγγραφές')}
+                  {view ? viewRows.length : reportData.rows.length} {tr('εγγραφές')}
                 </span>
               </div>
+              {view && (
+                <button type="button" className="reports-close-list" onClick={() => setView(null)}>
+                  {tr('Κλείσιμο λίστας')}
+                </button>
+              )}
               {active === 'usage' &&
                 reportData.rows.some(
                   (r: Row) => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold,
@@ -425,7 +471,19 @@ export default function ReportsPage() {
               tabIndex={0}
               aria-label={tr('Αποτελέσματα')}
             >
-              {reportData.rows.length ? (
+              {!view ? (
+                <div className="reports-empty">
+                  <FileText size={30} />
+                  <strong>{tr('Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα')}</strong>
+                  <button
+                    type="button"
+                    className="app-button"
+                    onClick={() => setView({label: tr('Σύνολο'), test: () => true})}
+                  >
+                    {tr('Εμφάνιση όλων')}
+                  </button>
+                </div>
+              ) : viewRows.length ? (
                 <table className="reports-table">
                   <thead>
                     <tr>
