@@ -17,11 +17,12 @@ describe('Studio sections of the platform owner', () => {
     who.owner = false;
   });
 
-  it('are not in the hospital admin’s tabs, only the libraries are', () => {
+  it('are not in the hospital admin’s tabs, the libraries and the settings are', () => {
     renderPage(<StudioPage />, {path: '/studio', signedIn: admin});
     const names = tabNames().join('|');
     expect(names).toContain('Βιβλιοθήκες');
-    for (const hidden of ['Ροή Αποστείρωσης', 'Ρόλοι & δικαιώματα', 'Ρυθμίσεις']) expect(names).not.toContain(hidden);
+    for (const hidden of ['Ροή Αποστείρωσης', 'Ρόλοι & δικαιώματα']) expect(names).not.toContain(hidden);
+    expect(names).toContain('Ρυθμίσεις');
   });
 
   it('are not reached by their address: the hospital admin lands on the libraries', () => {
