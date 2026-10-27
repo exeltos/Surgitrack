@@ -7,6 +7,7 @@ import type {UserRole} from '../../../store/types';
 import {useSurgi} from '../../../store/SurgiStore';
 import {defaultRolePermissions, type Permission} from '../../../core/permissions';
 import {actingAsPlatformOwner} from '../../../data/cloud/identity';
+import {isOwnerOnlyTab} from '../../../core/ownerOnlySections';
 import {libraryMeta} from '../studioMeta';
 import type {Tab} from '../studioMeta';
 
@@ -24,10 +25,13 @@ export function useStudioState() {
   // «?tab=users» opens that section (the platform owner's menu links straight to each one).
   const {search} = useLocation();
   const urlTab = new URLSearchParams(search).get('tab')?.toUpperCase() as Tab | undefined;
-  const [tab, setTab] = useState<Tab>(urlTab || (platformAdmin ? 'OVERVIEW' : 'LIBRARIES'));
+  // The Sterilization flow, the roles and the settings are the platform owner's: a hospital admin who opens one
+  // by its address lands on the libraries.
+  const urlSection = urlTab && !platformAdmin && isOwnerOnlyTab(urlTab) ? 'LIBRARIES' : urlTab;
+  const [tab, setTab] = useState<Tab>(urlSection || (platformAdmin ? 'OVERVIEW' : 'LIBRARIES'));
   useEffect(() => {
-    if (urlTab) setTab(urlTab);
-  }, [urlTab]);
+    if (urlSection) setTab(urlSection);
+  }, [urlSection]);
   const [libraryKey, setLibraryKey] = useState<LibraryKey>(hospitalLibraryMeta[0].key);
   // The color tape palette has its own editor next to the plain libraries.
   const [tapesOpen, setTapesOpen] = useState(false);

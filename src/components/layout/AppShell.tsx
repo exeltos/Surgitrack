@@ -23,6 +23,7 @@ import {isExpired} from '../../core/recycleBin';
 import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
 import {navSectionFor, navigationFor, navigationGroupLabel, ownerNavigation} from '../../config/navigation';
 import {isPlatformOnly} from '../../core/platformOnly';
+import {isOwnerOnlyPath, isOwnerOnlyTab} from '../../core/ownerOnlySections';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../../config/dataMode';
@@ -197,7 +198,9 @@ export default function AppShell({
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
     // The list of all hospitals is the platform admin's, outside Demo.
-    .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner());
+    .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner())
+    // So are the Sterilization flow, the roles & permissions and the settings: a hospital admin works within them.
+    .filter(item => !isOwnerOnlyPath(item.to) || actingAsPlatformOwner());
   // The pages the menu reaches, for Help: a Studio section is the Studio page, and its hospitals list is
   // what the Hospitals help describes.
   const helpScreens = [
@@ -210,8 +213,11 @@ export default function AppShell({
   useEffect(() => {
     // The Studio opens on a section, so one menu entry is always lit: the platform's overview outside a
     // hospital, the hospital's libraries inside one.
-    if (location.pathname === '/studio' && !new URLSearchParams(location.search).get('tab'))
+    const studioTab = new URLSearchParams(location.search).get('tab');
+    if (location.pathname === '/studio' && !studioTab)
       navigate(platformOnly ? '/studio?tab=overview' : '/studio?tab=libraries', {replace: true});
+    else if (location.pathname === '/studio' && isOwnerOnlyTab(studioTab) && !actingAsPlatformOwner())
+      navigate('/studio?tab=libraries', {replace: true});
     else if (platformOnly && !PLATFORM_ONLY_PAGES.some(page => location.pathname.startsWith(page)))
       navigate('/studio?tab=overview', {replace: true});
   }, [platformOnly, location.pathname, location.search, navigate]);
