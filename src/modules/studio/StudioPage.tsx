@@ -177,6 +177,7 @@ export default function StudioPage() {
             organizations={displayedOrganizations.filter(o => o.active)}
             departments={cloudDepartments}
             byName={currentUser.name}
+            choose
           />
         )}
         {tab === 'ROLES' && (

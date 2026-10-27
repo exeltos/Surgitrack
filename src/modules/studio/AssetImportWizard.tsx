@@ -13,6 +13,8 @@ type Props = {
   organizations: Array<{id: string; name: string}>;
   departments: Array<{organizationId: string; name: string; code: string; active: boolean}>;
   byName: string;
+  /** The platform owner, outside any hospital: the hospital is chosen from the list, never preselected. */
+  choose?: boolean;
   /** Standing alone on its own page (not inside Studio): its title is then the page's main heading. */
   asPage?: boolean;
 };
@@ -53,7 +55,7 @@ export default function AssetImportWizard({asPage = false, ...props}: Props) {
             )}
           </p>
         </div>
-        {organizations.length === 1 ? (
+        {organizations.length === 1 && !props.choose ? (
           <div className="asset-import-hospital chip">
             <Building2 size={16} />
             <b>{organizations[0].name}</b>

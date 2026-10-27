@@ -30,13 +30,17 @@ export type ImportProps = {
   organizations: Array<{id: string; name: string}>;
   departments: Array<{organizationId: string; name: string; code: string; active: boolean}>;
   byName: string;
+  /** The platform owner works outside any hospital: the hospital is chosen, never preselected. */
+  choose?: boolean;
 };
 
 /** The wizard's state and actions; the step components below read what they need from it. */
-export function useAssetImport({lang, organizations, departments, byName}: ImportProps) {
+export function useAssetImport({lang, organizations, departments, byName, choose}: ImportProps) {
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
-  // Inside a hospital there is one choice, already made.
-  const [organizationId, setOrganizationId] = useState(organizations.length === 1 ? organizations[0].id : '');
+  // Inside a hospital there is one choice, already made; the platform owner chooses every time.
+  const [organizationId, setOrganizationId] = useState(
+    !choose && organizations.length === 1 ? organizations[0].id : '',
+  );
   const [step, setStep] = useState<Step>('FILE');
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<SheetRows>([]);
