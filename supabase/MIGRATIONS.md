@@ -5,10 +5,10 @@ folder on an empty Postgres gives the same public schema as the live project. La
 local replay below: policies, triggers and table and function privileges are identical, and function bodies differ
 only in whitespace (`platform_delete_movements`).
 
-The folder has 98 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
+The folder has 99 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
 `20261014102205_usage_correction`, `20261014124438_demo_handover_stamp` and `20261014134551_recreated_records_forget_deletion`
 applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` on 26/10/2026 and
-`20261027082127_hospital_modules` on 27/10/2026, each file named after the version the live project gave it).
+`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, each file named after the version the live project gave it).
 
 ## How the versions line up
 
