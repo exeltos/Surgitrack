@@ -48,6 +48,7 @@ import Briefing, {briefingDue} from './Briefing';
 import ScreenGuide from './ScreenGuide';
 import {APP_VERSION} from '../../config/appMeta';
 import {tr} from '../../i18n';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 import {formatDate, formatTime} from '../../core/displayDate';
@@ -172,6 +173,7 @@ export default function AppShell({
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
   useListMemory(contentRef);
+  const withDevices = useHasModule('DEVICES');
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly = isPlatformOnly();
@@ -197,6 +199,8 @@ export default function AppShell({
       : navigationFor(role, can)
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
+    // Devices is a module the platform owner gives a hospital.
+    .filter(item => item.to !== '/devices' || withDevices)
     // The list of all hospitals is the platform admin's, outside Demo.
     .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner())
     // So are the Sterilization flow, the roles & permissions and the settings: a hospital admin works within them.

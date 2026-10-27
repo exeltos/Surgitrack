@@ -22,6 +22,7 @@ import {lazyPage} from '../core/resilience';
 import NotFoundPage from '../modules/NotFoundPage';
 import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
 import {useSignOutGuard} from './useSignOutGuard';
+import ModuleGate from '../components/layout/ModuleGate';
 import {SCAN_PATH, isScanStandalone, onScanScreens} from '../modules/scan/scanApp';
 import {
   type AccessRequest,
@@ -384,7 +385,9 @@ export default function App() {
             path="/devices"
             element={
               <Guard permission="sterilization.workspace">
-                <DevicesPage />
+                <ModuleGate module="DEVICES">
+                  <DevicesPage />
+                </ModuleGate>
               </Guard>
             }
           />

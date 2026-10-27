@@ -4,11 +4,13 @@ import {CheckCircle2, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import {useLibraries} from '../../../core/LibraryStore';
 import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
+import {useHasModule} from '../../../data/cloud/modulesContext';
 import {deviceNote} from '../sterilizationTypes';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function LoadModal({s}: {s: SterilizationPageState}) {
   const {sterilizers, washers} = useLibraries();
+  const withDevices = useHasModule('DEVICES');
   const {
     addBarcodeToLoad,
     closeLoad,
@@ -61,18 +63,20 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               </div>
             </div>
             <div className="load-modal-body">
-              <DeviceCyclePicker
-                kind={loadModal === 'WASHING' ? 'WASHER' : 'STERILIZER'}
-                equipment={loadEquipment}
-                onPick={(reading, device) => {
-                  setLoadEquipment(device.name);
-                  setLoadCycleNumber(reading.cycleNumber);
-                  if (reading.program) setLoadProgram(reading.program);
-                  if (reading.result === 'FAIL') setLoadChemical('FAIL');
-                  setLoadNote(note => note || deviceNote(reading));
-                  s.setLoadFromDevice(true);
-                }}
-              />
+              {withDevices && (
+                <DeviceCyclePicker
+                  kind={loadModal === 'WASHING' ? 'WASHER' : 'STERILIZER'}
+                  equipment={loadEquipment}
+                  onPick={(reading, device) => {
+                    setLoadEquipment(device.name);
+                    setLoadCycleNumber(reading.cycleNumber);
+                    if (reading.program) setLoadProgram(reading.program);
+                    if (reading.result === 'FAIL') setLoadChemical('FAIL');
+                    setLoadNote(note => note || deviceNote(reading));
+                    s.setLoadFromDevice(true);
+                  }}
+                />
+              )}
               <div className="cycle-clean-fields">
                 <label>
                   {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}

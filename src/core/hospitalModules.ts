@@ -2,7 +2,7 @@
  * Modules the platform owner switches on for a hospital (Studio → Hospitals). A hospital that has not been
  * given a module does not see its screens, counts or alerts.
  */
-export type HospitalModule = 'REPLACEMENTS' | 'STOCK_MINIMUMS';
+export type HospitalModule = 'REPLACEMENTS' | 'STOCK_MINIMUMS' | 'DEVICES';
 
 export const HOSPITAL_MODULES: Array<{
   id: HospitalModule;
@@ -24,6 +24,13 @@ export const HOSPITAL_MODULES: Array<{
     en: 'Minimum stock',
     descriptionEl: 'Ελάχιστη ποσότητα ανά είδος εργαλείου στο Απόθεμα και ειδοποίηση όταν πέσει κάτω από αυτή.',
     descriptionEn: 'A minimum quantity per kind of instrument in Stock, and an alert when it falls below.',
+  },
+  {
+    id: 'DEVICES',
+    el: 'Συσκευές',
+    en: 'Devices',
+    descriptionEl: 'Σύνδεση κλιβάνων και πλυντηρίων και κύκλοι που έρχονται από τις συσκευές.',
+    descriptionEn: 'Connecting sterilizers and washers, and the cycles that come from the devices.',
   },
 ];
 

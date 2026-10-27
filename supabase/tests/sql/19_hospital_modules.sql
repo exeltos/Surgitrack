@@ -1,15 +1,19 @@
--- The modules of a hospital: both on by default, read by its users, changed only by the platform owner.
+-- The modules of a hospital: all three on by default, read by its users, changed only by the platform owner.
 begin;
 \ir ../local/fixtures.sql
 
 select tests.login('platform');
 select tests.eq(
   (select modules from public.organizations where id = tests.org('A')),
-  array['REPLACEMENTS', 'STOCK_MINIMUMS']::text[], 'a hospital starts with both modules on (nothing disappears)');
+  array['REPLACEMENTS', 'STOCK_MINIMUMS', 'DEVICES']::text[], 'a hospital starts with every module on (nothing disappears)');
 select tests.eq(tests.rows($q$update public.organizations set modules = '{}' where id = tests.org('A')$q$), 1,
   'the platform owner switches the modules off for a hospital');
 select tests.eq(tests.rows($q$update public.organizations set modules = array['STOCK_MINIMUMS'] where id = tests.org('A')$q$),
   1, '... or on one by one');
+select tests.eq(tests.rows($q$update public.organizations set modules = array['DEVICES'] where id = tests.org('A')$q$), 1,
+  'Devices is a module like the others');
+select tests.eq(tests.rows($q$update public.organizations set modules = array['STOCK_MINIMUMS'] where id = tests.org('A')$q$),
+  1, '... and off again');
 select tests.throws($q$update public.organizations set modules = array['SOMETHING'] where id = tests.org('A')$q$, '23514',
   'a module that does not exist is refused');
 

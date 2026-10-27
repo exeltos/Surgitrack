@@ -8,7 +8,7 @@ describe('the hospital editor’s modules', () => {
     const onSave = vi.fn();
     render(<OrganizationEditor onClose={() => undefined} onSave={onSave} />);
     const boxes = screen.getAllByRole('checkbox');
-    expect(boxes).toHaveLength(2);
+    expect(boxes).toHaveLength(3);
     expect(boxes.every(box => !(box as HTMLInputElement).checked)).toBe(true);
     fireEvent.change(screen.getAllByRole('textbox')[0], {target: {value: 'Νέο Νοσοκομείο'}});
     fireEvent.change(screen.getByRole('textbox', {name: 'Ονοματεπώνυμο'}), {target: {value: 'Άννα Διαχειρίστρια'}});
