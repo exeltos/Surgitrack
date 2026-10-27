@@ -10,9 +10,12 @@ import {tr} from '../../i18n';
 const key = (userId: string) => `surgitrack-screen-guides:${userId}`;
 type Seen = {off?: boolean; screens: string[]};
 
+// In Demo each role starts afresh with every Demo session (nothing is kept on the device).
+const storeOf = (userId: string) => (userId.startsWith('demo:') ? sessionStorage : localStorage);
+
 const read = (userId: string): Seen => {
   try {
-    const value = JSON.parse(localStorage.getItem(key(userId)) || 'null') as Seen | null;
+    const value = JSON.parse(storeOf(userId).getItem(key(userId)) || 'null') as Seen | null;
     return value && Array.isArray(value.screens) ? value : {screens: []};
   } catch {
     return {screens: []};
@@ -20,7 +23,7 @@ const read = (userId: string): Seen => {
 };
 const write = (userId: string, seen: Seen) => {
   try {
-    localStorage.setItem(key(userId), JSON.stringify(seen));
+    storeOf(userId).setItem(key(userId), JSON.stringify(seen));
   } catch {
     // Private mode: shown again next time.
   }
@@ -33,7 +36,7 @@ export const screenSection = (pathname: string, can: (p: Permission) => boolean)
 /**
  * The first time a person opens a screen: what it is for and its first steps, from the manual, above the
  * screen (it does not block it). Once closed it does not come back for that screen; it can be turned off
- * for every screen. Remembered per person, as ward devices are shared. A hospital can turn the guides off for
+ * for every screen. Remembered per person, as ward devices are shared (in Demo, per role and Demo session). A hospital can turn the guides off for
  * everyone (Studio → Ρυθμίσεις → Οδηγοί οθόνης): `enabled` false.
  */
 export default function ScreenGuide({
@@ -49,7 +52,13 @@ export default function ScreenGuide({
   onHelp: () => void;
   enabled?: boolean;
 }) {
-  const userId = getRuntimeDataMode() === 'PRODUCTION' ? getRealIdentity()?.id : undefined;
+  const mode = getRuntimeDataMode();
+  const userId =
+    mode === 'PRODUCTION'
+      ? getRealIdentity()?.id
+      : mode === 'DEMO'
+        ? `demo:${sessionStorage.getItem('surgitrack-demo-role') || 'ADMIN'}`
+        : undefined;
   const [seen, setSeen] = useState<Seen>(() => (userId ? read(userId) : {off: true, screens: []}));
   const section = screenSection(pathname, can);
   if (!enabled || !userId || !section || seen.off || seen.screens.includes(section.to)) return null;

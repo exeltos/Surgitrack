@@ -2,11 +2,11 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-const identity = vi.hoisted(() => ({id: 'user-1' as string | undefined}));
+const identity = vi.hoisted(() => ({id: 'user-1' as string | undefined, mode: 'PRODUCTION'}));
 vi.mock('../../../data/cloud/identity', () => ({
   getRealIdentity: () => (identity.id ? {id: identity.id} : undefined),
 }));
-vi.mock('../../../config/dataMode', () => ({getRuntimeDataMode: () => 'PRODUCTION'}));
+vi.mock('../../../config/dataMode', () => ({getRuntimeDataMode: () => identity.mode}));
 
 import ScreenGuide, {screenSection} from '../ScreenGuide';
 
@@ -15,7 +15,9 @@ const all = () => true;
 describe('screen guide on first visit', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     identity.id = 'user-1';
+    identity.mode = 'PRODUCTION';
   });
 
   it('shows the screen from the manual once, then not again for that person', async () => {
@@ -43,6 +45,22 @@ describe('screen guide on first visit', () => {
     again();
     render(<ScreenGuide pathname="/reports" lang="el" can={all} onHelp={onHelp} />);
     expect(screen.queryByRole('complementary')).toBeNull();
+  });
+
+  it('shows in Demo too, per role and for the Demo session only', async () => {
+    identity.mode = 'DEMO';
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+    const {unmount} = render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} />);
+    await userEvent.click(screen.getByRole('button', {name: 'Το κατάλαβα'}));
+    unmount();
+    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} />);
+    expect(screen.queryByRole('complementary')).toBeNull();
+    // Another Demo session starts afresh; nothing was kept in the browser's long-term storage.
+    sessionStorage.clear();
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+    expect(localStorage.length).toBe(0);
+    render(<ScreenGuide pathname="/sterilization" lang="el" can={all} onHelp={vi.fn()} />);
+    expect(screen.getByRole('complementary')).toBeInTheDocument();
   });
 
   it('stays hidden when the hospital turned the guides off', () => {
