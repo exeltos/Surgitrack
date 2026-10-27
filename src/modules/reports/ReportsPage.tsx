@@ -15,6 +15,7 @@ import {
   LOAD_STATUS,
   cellText,
   genericReportHtml,
+  reportGroups,
   reports,
   stateLabel,
   type InventoryGroup,
@@ -22,6 +23,7 @@ import {
   type Row,
 } from './reportsMeta';
 import {buildReport} from './buildReport';
+import {reportSummary} from './reportSummary';
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
@@ -127,6 +129,7 @@ export default function ReportsPage() {
     ],
   );
 
+  const summary = reportSummary(active, reportData.rows, warningThreshold);
   const buildPreview = () => {
     const subtitle =
       active === 'inventory'
@@ -348,24 +351,31 @@ export default function ReportsPage() {
             </span>
           </div>
           <div className="reports-catalog-list">
-            {reports.map(report => {
-              const Icon = report.icon;
-              return (
-                <button
-                  key={report.id}
-                  className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                  onClick={() => setActive(report.id)}
-                >
-                  <span className="reports-catalog-icon">
-                    <Icon size={18} />
-                  </span>
-                  <span>
-                    <strong>{tr(report.title)}</strong>
-                    <small>{tr(report.description)}</small>
-                  </span>
-                </button>
-              );
-            })}
+            {reportGroups.map(group => (
+              <div className="reports-catalog-group" key={group.id} role="group" aria-label={tr(group.title)}>
+                <h3>{tr(group.title)}</h3>
+                {reports
+                  .filter(report => report.group === group.id)
+                  .map(report => {
+                    const Icon = report.icon;
+                    return (
+                      <button
+                        key={report.id}
+                        className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
+                        onClick={() => setActive(report.id)}
+                      >
+                        <span className="reports-catalog-icon">
+                          <Icon size={18} />
+                        </span>
+                        <span>
+                          <strong>{tr(report.title)}</strong>
+                          <small>{tr(report.purpose)}</small>
+                        </span>
+                      </button>
+                    );
+                  })}
+              </div>
+            ))}
           </div>
         </aside>
         <section className="reports-stage">
@@ -373,7 +383,9 @@ export default function ReportsPage() {
             <div>
               <span className="eyebrow">{tr('ΕΠΙΛΕΓΜΕΝΗ ΑΝΑΦΟΡΑ')}</span>
               <h2>{tr(activeMeta.title)}</h2>
-              <p>{tr(activeMeta.description)}</p>
+              <p>
+                {tr(activeMeta.description)} {tr(activeMeta.purpose)}
+              </p>
             </div>
             <div className="reports-stage-actions" data-tour="report-download">
               <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
@@ -382,6 +394,13 @@ export default function ReportsPage() {
           <div className="reports-filter-strip">
             <FilterMenu filters={reportFilters} />
           </div>
+          <ul className="reports-summary" aria-label={tr('Σύνολα')}>
+            {summary.map(chip => (
+              <li key={chip.label} className={chip.tone && chip.value > 0 ? chip.tone : ''}>
+                <b>{chip.value}</b> {chip.label}
+              </li>
+            ))}
+          </ul>
           <div className="reports-result-card">
             <div className="reports-result-head">
               <div>

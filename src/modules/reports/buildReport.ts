@@ -245,6 +245,7 @@ export function buildReport(
       .filter(e => expiryState === 'ALL' || e.state === expiryState)
       .map(e => ({
         kind: e.kind === 'SET' ? 'Σετ' : 'Εργαλείο',
+        expiryState: e.state,
         barcode: e.barcode,
         name: e.name,
         department: e.department || '—',

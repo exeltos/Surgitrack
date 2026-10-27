@@ -2193,4 +2193,19 @@ export const en: Record<string, string> = {
   'Δεν βρέθηκε Σετ ή εργαλείο με «{0}»': 'No Set or instrument found with «{0}»',
   'Δοκιμάστε άλλο barcode ή όνομα.': 'Try another barcode or name.',
   'Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.': 'Scan or type a barcode (S..., T...) or a name.',
+  Σύνολα: 'Totals',
+  'Κρίσιμο όριο': 'Critical limit',
+  Αποδεσμεύτηκαν: 'Released',
+  Αποτυχίες: 'Failures',
+  'Μη επιβεβαιωμένες': 'Unconfirmed',
+  Εξοπλισμός: 'Equipment',
+  'Για απογραφή και έλεγχο: τι υπάρχει και πού βρίσκεται.':
+    'For stocktaking and checks: what there is and where it is.',
+  'Για να δεις ποιες βλάβες και απώλειες εκκρεμούν.': 'To see which faults and losses are pending.',
+  'Για να προλάβεις εργαλεία που φτάνουν στο όριο χρήσεων.': 'To catch instruments approaching their use limit.',
+  'Για τεκμηρίωση κύκλων και αποδεσμεύσεων σε έλεγχο.': 'To document cycles and releases for an audit.',
+  'Για να ξανα-αποστειρώσεις πριν λήξει ό,τι είναι στα ράφια.':
+    'To re-sterilize what is on the shelves before it expires.',
+  'Για να δεις ποιος παρέδωσε σε ποιον και ποιες υπογραφές λείπουν.':
+    'To see who handed over to whom and which signatures are missing.',
 };
