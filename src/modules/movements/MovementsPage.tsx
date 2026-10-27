@@ -32,6 +32,7 @@ import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import {movementText} from '../../core/movementText';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -146,7 +147,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
           m.assetKind === 'SET' ? tr('Σετ') : tr('Εργαλείο'),
           trData(m.from),
           trData(m.to),
-          trData(m.status),
+          movementText(m.status),
           trData(m.by),
           m.patientCode || '',
         ];
@@ -336,8 +337,8 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
                     <i>{trData(m.to)}</i>
                   </span>
                   <span>
-                    <mark className="movement-chip" title={trData(m.status)}>
-                      {trData(m.status)}
+                    <mark className="movement-chip" title={movementText(m.status)}>
+                      {movementText(m.status)}
                     </mark>
                     {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                   </span>
@@ -392,7 +393,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
               <div>
                 <Route />
                 <span>{tr('Ενέργεια')}</span>
-                <strong>{trData(selected.status)}</strong>
+                <strong>{movementText(selected.status)}</strong>
               </div>
               <div>
                 <MapPin />

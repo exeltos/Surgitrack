@@ -3,7 +3,7 @@ import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import TraceabilityPage from '../TraceabilityPage';
 
-const uses = () => screen.getByRole('region', {name: 'Χρήσεις σε ασθενείς'});
+const uses = () => screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'});
 /** The patient code of each listed use. */
 const codes = () => [...uses().querySelectorAll('.ledger-row mark')].map(mark => mark.textContent);
 
@@ -19,8 +19,10 @@ describe('TraceabilityPage', () => {
     expect(codes().length).toBeLessThan(everyone.length);
     expect(new Set(codes())).toEqual(new Set(['PT-2026-0041']));
     fireEvent.click(uses().querySelector('.ledger-row')!);
-    expect(screen.getByRole('tab', {name: /Αναζήτηση/})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: /Όλοι οι ασθενείς/}));
+    expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
   });
 
   it('shows nothing for an unknown patient code', () => {
@@ -29,6 +31,6 @@ describe('TraceabilityPage', () => {
       target: {value: 'NOBODY-0000'},
     });
     expect(codes()).toEqual([]);
-    expect(screen.getByText('Δεν βρέθηκαν χρήσεις σε ασθενείς')).toBeInTheDocument();
+    expect(screen.getByText('Δεν βρέθηκαν καταγραφές με κωδικό ασθενούς')).toBeInTheDocument();
   });
 });

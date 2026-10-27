@@ -21,6 +21,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
 import {movementsPerDay, statusCard} from './departmentStatus';
 import {useAppPreferences} from '../../core/AppPreferences';
+import {movementText} from '../../core/movementText';
 
 /** Every state the department counts as «Σε αποστείρωση». */
 const IN_STERILIZATION_STATES: string[] = [
@@ -353,7 +354,7 @@ export default function DepartmentHomePage() {
                 <Link to={assetPath(m.asset) || '/movements'}>
                   <b>{m.asset}</b>
                   <small>
-                    {trData(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
+                    {movementText(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
                   </small>
                 </Link>
               </li>

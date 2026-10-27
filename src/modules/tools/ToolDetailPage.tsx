@@ -41,6 +41,7 @@ import {useConfirm} from '../../components/ui/useConfirm';
 import {ToolReportModal} from './ToolDialogs';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import {movementText} from '../../core/movementText';
 
 export default function ToolDetailPage() {
   const {
@@ -124,7 +125,7 @@ export default function ToolDetailPage() {
       <span className="history-dot" />
       <div>
         <strong>
-          {trData(item.status)} {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+          {movementText(item.status)} {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
         </strong>
         <p>
           {trData(item.from)} → {trData(item.to)}

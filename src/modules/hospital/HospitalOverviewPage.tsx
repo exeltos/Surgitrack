@@ -28,6 +28,7 @@ import {presetPath} from '../../core/listMemory';
 import {belowMinimum, minimumRows} from '../../core/stockMinimums';
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {movementStamp} from '../../core/movementTime';
+import {movementText} from '../../core/movementText';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -584,7 +585,7 @@ export default function HospitalOverviewPage() {
                 <Link to={assetPath(m.asset) || '/movements'}>
                   <b>{m.asset}</b>
                   <small>
-                    {trData(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
+                    {movementText(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
                   </small>
                 </Link>
               </li>

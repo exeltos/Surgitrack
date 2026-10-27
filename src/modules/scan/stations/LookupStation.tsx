@@ -9,6 +9,7 @@ import {useSurgi} from '../../../store/SurgiStore';
 import ScanCamera from '../ScanCamera';
 import {DemoWaiting, ScanScreen, SetContents, SetPdfButton} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
+import {movementText} from '../../../core/movementText';
 
 /** How many of an item's latest movements are shown. */
 const RECENT = 5;
@@ -117,7 +118,7 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
                 <li key={m.id}>
                   <Clock3 size={15} />
                   <span>
-                    <b>{trData(m.status)}</b>
+                    <b>{movementText(m.status)}</b>
                     <small>
                       {trData(m.from)} <ChevronRight size={12} /> {trData(m.to)}
                     </small>

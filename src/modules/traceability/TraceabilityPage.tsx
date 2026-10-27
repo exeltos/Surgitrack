@@ -1,6 +1,6 @@
 import {Fragment, useEffect, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-import {Search, Route, History, ExternalLink, Flame, UserRound, Users} from 'lucide-react';
+import {Search, Route, History, ExternalLink, Flame, UserRound, Users, ArrowLeft} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -24,6 +24,7 @@ import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import {parseDisplayDate} from '../../core/displayDate';
 import type {Movement, ProcessLoadStatus, SetAsset, Tool} from '../../types/domain';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import {movementText} from '../../core/movementText';
 
 /** One sterilization cycle an item went through, from the load it was in (or an older per-item record). */
 type CycleEntry = {
@@ -63,7 +64,9 @@ export default function TraceabilityPage() {
   // Three tabs: the search (a barcode or a patient code), every movement of the hospital, and every use
   // recorded with a patient code.
   const tab = params.get('tab') === 'patients' ? 'PATIENTS' : params.get('tab') === 'history' ? 'HISTORY' : 'SEARCH';
-  const patientUses = movements.filter(m => m.patientCode).length;
+  const patientCodes = new Set(movements.map(m => m.patientCode).filter(Boolean)).size;
+  // «Ασθενής»: the list of codes, or (?patient=PT-…) one patient's trace.
+  const patient = params.get('patient') || '';
   const [recent, setRecent] = useState<string[]>(readRecent);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
@@ -97,13 +100,13 @@ export default function TraceabilityPage() {
     : choosing
       ? []
       : needle
-        ? movements.filter(m => [m.asset, m.patientCode, m.status].some(x => x?.toLowerCase().includes(needle)))
+        ? movements.filter(m => [m.asset, m.status].some(x => x?.toLowerCase().includes(needle)))
         : [];
   const setMoves = carrierSet
     ? movements.filter(m => barcodeOf(m).toLowerCase() === carrierSet.barcode.toLowerCase())
     : [];
   const related = [...own, ...setMoves];
-  const countHits = needle && !asset ? counts.filter(c => c.patientCode.toLowerCase().includes(needle)) : [];
+  const countHits = patient ? counts.filter(c => c.patientCode.toLowerCase() === patient.toLowerCase()) : [];
   // One item's trail: its name is in the card above, so each step shows only what happened.
   const singleAsset = !!asset;
   // The sterilization cycles an item went through: its own, or (an instrument in a Set) its Set's.
@@ -147,8 +150,12 @@ export default function TraceabilityPage() {
   };
   const cycles = asset ? cyclesOf(asset).slice(0, 20) : [];
   // A patient code: what was used for that patient, with the last cycle before the use.
-  const patientMoves =
-    needle && !asset && !choosing ? movements.filter(m => m.patientCode?.toLowerCase() === needle) : [];
+  const patientMoves = patient ? movements.filter(m => m.patientCode?.toLowerCase() === patient.toLowerCase()) : [];
+  // A code typed in the item search: offered to open as a patient.
+  const typedPatient =
+    needle && !asset && !choosing
+      ? movements.find(m => m.patientCode?.toLowerCase() === needle)?.patientCode
+      : undefined;
   const patientItems = (() => {
     const seen = new Map<string, {item?: SetAsset | Tool; label: string; at: string; cycle?: CycleEntry}>();
     [...patientMoves]
@@ -178,7 +185,7 @@ export default function TraceabilityPage() {
     rows: related.map(m => [
       m.at,
       m.asset,
-      trData(m.status),
+      movementText(m.status),
       trData(m.from),
       trData(m.to),
       trData(m.by),
@@ -192,7 +199,11 @@ export default function TraceabilityPage() {
         <div>
           <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
           <h1>{tr('Ιχνηλάτηση')}</h1>
-          <p>{tr('Αναζήτηση από barcode Σετ/εργαλείου ή από κωδικό ασθενούς — χωρίς ονοματεπώνυμο ασθενούς.')}</p>
+          <p>
+            {tr(
+              'Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός, χωρίς ονοματεπώνυμο).',
+            )}
+          </p>
         </div>
         {tab === 'SEARCH' && related.length > 0 && (
           <div className="page-head-actions">
@@ -209,7 +220,15 @@ export default function TraceabilityPage() {
           className={tab === 'SEARCH' ? 'active' : ''}
           onClick={() => setParams({}, {replace: true})}
         >
-          <Search size={16} /> {tr('Αναζήτηση')}
+          <Search size={16} /> {tr('Σετ / εργαλείο')}
+        </button>
+        <button
+          role="tab"
+          aria-selected={tab === 'PATIENTS'}
+          className={tab === 'PATIENTS' ? 'active' : ''}
+          onClick={() => setParams({tab: 'patients'}, {replace: true})}
+        >
+          <Users size={16} /> {tr('Ασθενής')} <b>{patientCodes}</b>
         </button>
         <button
           role="tab"
@@ -219,26 +238,92 @@ export default function TraceabilityPage() {
         >
           <History size={16} /> {tr('Όλες οι κινήσεις')}
         </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'PATIENTS'}
-          className={tab === 'PATIENTS' ? 'active' : ''}
-          onClick={() => setParams({tab: 'patients'}, {replace: true})}
-        >
-          <Users size={16} /> {tr('Χρήσεις σε ασθενείς')} <b>{patientUses}</b>
-        </button>
       </div>
       {tab === 'HISTORY' ? (
         <MovementsPage embedded />
-      ) : tab === 'PATIENTS' ? (
+      ) : tab === 'PATIENTS' && !patient ? (
         <PatientUses
           movements={movements}
-          onOpen={code => {
-            setQ(code);
-            remember(code);
-            setParams({}, {replace: true});
-          }}
+          onOpen={code => setParams({tab: 'patients', patient: code}, {replace: true})}
         />
+      ) : tab === 'PATIENTS' ? (
+        <>
+          <button type="button" className="trace-back" onClick={() => setParams({tab: 'patients'}, {replace: true})}>
+            <ArrowLeft size={16} /> {tr('Όλοι οι ασθενείς')}
+          </button>
+          {patientItems.length > 0 ? (
+            <div className="trace-card trace-patient">
+              <UserRound size={24} />
+              <div>
+                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
+                <h2>{patientMoves[0].patientCode}</h2>
+                <ul>
+                  {patientItems.map(p => (
+                    <li key={p.label}>
+                      {p.item ? (
+                        <Link to={sets.some(x => x.id === p.item!.id) ? `/sets/${p.item.id}` : `/tools/${p.item.id}`}>
+                          {p.label}
+                        </Link>
+                      ) : (
+                        <b>{p.label}</b>
+                      )}
+                      <small>
+                        {tr('Καταγράφηκε στις {0}', p.at)} ·{' '}
+                        {p.cycle
+                          ? tr(
+                              'Τελευταίος κύκλος πριν: {0} · κύκλος {1} · {2} · {3}',
+                              p.cycle.sterilizer,
+                              p.cycle.cycleNumber,
+                              p.cycle.at,
+                              p.cycle.label,
+                            )
+                          : tr('Δεν βρέθηκε κύκλος αποστείρωσης πριν.')}
+                      </small>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <div className="empty">
+              <strong>{tr('Δεν βρέθηκε ασθενής με κωδικό «{0}»', patient)}</strong>
+            </div>
+          )}
+          {countHits.map(c => (
+            <div className="trace-card" key={c.id}>
+              <Route size={24} />
+              <div>
+                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
+                <h2>{c.patientCode}</h2>
+                <p>
+                  {tr('Υπογεγραμμένη καταμέτρηση Σετ') + ' '}
+                  {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/{c.expected} {tr('εργαλεία ·') + ' '}
+                  {c.at}.
+                </p>
+              </div>
+            </div>
+          ))}
+          <div className="timeline list-scroll-region">
+            {[...patientMoves]
+              .sort((a, b) => time(b.at) - time(a.at))
+              .map(m => (
+                <div className="timeline-item trace-step" key={m.id}>
+                  <time>{m.at}</time>
+                  <div className="dot" />
+                  <div>
+                    <strong>
+                      {movementText(m.status)}{' '}
+                      {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+                    </strong>
+                    <span className="trace-step-asset">{m.asset}</span>
+                    <small>
+                      {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
+                    </small>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </>
       ) : (
         <>
           <form
@@ -253,7 +338,7 @@ export default function TraceabilityPage() {
               value={q}
               onChange={e => setQ(e.target.value)}
               onBlur={() => needle && remember(q)}
-              placeholder={tr('S..., T... ή κωδικός ασθενούς')}
+              placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
             />
             <button className="primary" type="submit">
               {tr('Αναζήτηση')}
@@ -306,37 +391,16 @@ export default function TraceabilityPage() {
               </Link>
             </div>
           )}
-          {patientItems.length > 0 && (
-            <div className="trace-card trace-patient">
-              <UserRound size={24} />
-              <div>
-                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
-                <h2>{patientMoves[0].patientCode}</h2>
-                <ul>
-                  {patientItems.map(p => (
-                    <li key={p.label}>
-                      {p.item ? (
-                        <Link to={sets.some(x => x.id === p.item!.id) ? `/sets/${p.item.id}` : `/tools/${p.item.id}`}>
-                          {p.label}
-                        </Link>
-                      ) : (
-                        <b>{p.label}</b>
-                      )}
-                      <small>
-                        {p.cycle
-                          ? tr(
-                              'Τελευταίος κύκλος πριν τη χρήση: {0} · κύκλος {1} · {2} · {3}',
-                              p.cycle.sterilizer,
-                              p.cycle.cycleNumber,
-                              p.cycle.at,
-                              p.cycle.label,
-                            )
-                          : tr('Δεν βρέθηκε κύκλος αποστείρωσης πριν τη χρήση.')}
-                      </small>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          {typedPatient && (
+            <div className="trace-pick">
+              <strong>{tr('Το «{0}» είναι κωδικός ασθενούς.', typedPatient)}</strong>
+              <button
+                type="button"
+                className="app-button"
+                onClick={() => setParams({tab: 'patients', patient: typedPatient}, {replace: true})}
+              >
+                {tr('Άνοιγμα ασθενούς')}
+              </button>
             </div>
           )}
           {cycles.length > 0 && (
@@ -359,20 +423,6 @@ export default function TraceabilityPage() {
               </ul>
             </section>
           )}
-          {countHits.map(c => (
-            <div className="trace-card" key={c.id}>
-              <Route size={24} />
-              <div>
-                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
-                <h2>{c.patientCode}</h2>
-                <p>
-                  {tr('Υπογεγραμμένη καταμέτρηση Σετ') + ' '}
-                  {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/{c.expected} {tr('εργαλεία ·') + ' '}
-                  {c.at}.
-                </p>
-              </div>
-            </div>
-          ))}
           <div className="timeline list-scroll-region">
             {related.length ? (
               related.map((m, i) => (
@@ -387,7 +437,7 @@ export default function TraceabilityPage() {
                     <div className="dot" />
                     <div>
                       <strong>
-                        {trData(m.status)}{' '}
+                        {movementText(m.status)}{' '}
                         {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                       </strong>
                       {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
@@ -403,15 +453,15 @@ export default function TraceabilityPage() {
               <div className="empty">
                 <strong>
                   {!needle
-                    ? tr('Αναζητήστε Σετ, εργαλείο ή ασθενή')
+                    ? tr('Αναζητήστε Σετ ή εργαλείο')
                     : asset
                       ? tr('Δεν βρέθηκαν κινήσεις')
-                      : tr('Δεν βρέθηκε Σετ, εργαλείο ή ασθενής με «{0}»', q.trim())}
+                      : tr('Δεν βρέθηκε Σετ ή εργαλείο με «{0}»', q.trim())}
                 </strong>
                 <span>
                   {needle
-                    ? tr('Δοκιμάστε άλλο barcode ή κωδικό ασθενούς.')
-                    : tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή κωδικό ασθενούς.')}
+                    ? tr('Δοκιμάστε άλλο barcode ή όνομα.')
+                    : tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}
                 </span>
               </div>
             )}
