@@ -3,6 +3,7 @@ import type {LibraryItem} from './libraries';
 import type {SterilizationWorkflowConfig, SterilizationWorkflowVersion} from './workflow';
 import type {Permission} from './permissions';
 import type {ColorTape} from './colorTapes';
+import type {HospitalModule} from './hospitalModules';
 
 export type Organization = {
   id: string;
@@ -13,6 +14,8 @@ export type Organization = {
   /** Standard use, or a trial that locks the hospital after trialEndsAt. */
   plan?: 'STANDARD' | 'TRIAL';
   trialEndsAt?: string;
+  /** The modules the platform owner switched on for this hospital (none named: all are on). */
+  modules?: HospitalModule[];
 };
 export type AdminUser = {
   id: string;

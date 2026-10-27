@@ -18,6 +18,7 @@ import KpiStrip from '../../components/ui/KpiStrip';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
 import {daysSince} from '../../core/displayDate';
+import {useHasModule} from '../../data/cloud/modulesContext';
 
 /** An open issue older than this many days is "waiting long" (its own card and filter). */
 const OLD_ISSUE_DAYS = 7;
@@ -40,8 +41,10 @@ export default function IssuesPage() {
   } = useSurgi();
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
   const [confirm, ask] = useConfirm();
-  // Sterilization and admins also see the instruments to replace, as a second tab.
-  const withReplacements = can('stock.manage');
+  // Sterilization and admins also see the instruments to replace, as a second tab (in a hospital the platform
+  // owner gave the Replacements & Orders module).
+  const hasReplacements = useHasModule('REPLACEMENTS');
+  const withReplacements = can('stock.manage') && hasReplacements;
   const [params, setParams] = useSearchParams();
   const tab = withReplacements && params.get('tab') === 'replacements' ? 'REPLACEMENTS' : 'REPORTS';
   const neededReplacements = useMemo(

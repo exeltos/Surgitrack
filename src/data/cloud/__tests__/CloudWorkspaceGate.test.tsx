@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {render, waitFor} from '@testing-library/react';
+import {cleanup, render, screen, waitFor} from '@testing-library/react';
 import type {CloudRecords} from '../appRecords';
 import type {CloudWorkspace} from '../CloudWorkspaceGate';
 
@@ -51,6 +51,7 @@ vi.mock('../localCache', async importOriginal => ({
 
 const {default: CloudWorkspaceGate} = await import('../CloudWorkspaceGate');
 const {STORE_COLLECTIONS} = await import('../appRecords');
+const {useHasModule} = await import('../modulesContext');
 
 const serverRecords = () => {
   const records = Object.fromEntries([...STORE_COLLECTIONS, 'library'].map(c => [c, []])) as unknown as CloudRecords;
@@ -132,5 +133,39 @@ describe('opening the hospital', () => {
     expect(mocks.seedDemoOrganization).toHaveBeenCalledWith('org-1', expect.anything());
     const records = workspace!.records as unknown as Record<string, Array<{id: string}>>;
     expect(records.sets).toEqual([{id: 's1', name: 'Server set'}]);
+  });
+
+  describe('the modules the platform owner gave the hospital', () => {
+    const Probe = () => {
+      const replacements = useHasModule('REPLACEMENTS');
+      const minimums = useHasModule('STOCK_MINIMUMS');
+      return <p data-testid="modules">{`${replacements}|${minimums}`}</p>;
+    };
+    const open = async (org: Record<string, unknown>) => {
+      mocks.org = {
+        name: 'Test Hospital',
+        is_demo: false,
+        evaluation: false,
+        plan: 'STANDARD',
+        trial_ends_at: null,
+        ...org,
+      };
+      mocks.dataMode = 'PRODUCTION';
+      mocks.readCache.mockResolvedValue({});
+      mocks.loadAppRecords.mockReset();
+      mocks.loadAppRecords.mockResolvedValue(serverRecords());
+      render(<CloudWorkspaceGate>{() => <Probe />}</CloudWorkspaceGate>);
+      return (await screen.findByTestId('modules')).textContent;
+    };
+
+    it('shows only the ones it was given', async () => {
+      expect(await open({modules: ['STOCK_MINIMUMS']})).toBe('false|true');
+    });
+
+    it('shows none when none were given, and every one when the hospital does not say', async () => {
+      expect(await open({modules: []})).toBe('false|false');
+      cleanup();
+      expect(await open({})).toBe('true|true');
+    });
   });
 });

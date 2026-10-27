@@ -8,6 +8,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import {useConfirm} from '../../components/ui/useConfirm';
 import OrderDialog from '../replacements/OrderDialog';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {pieces} from '../replacements/pieces';
 import {kindKey, toolKinds} from '../../core/replacements';
 import {belowMinimum, minimumRows, orderLinesForMinimums, type MinimumRow} from '../../core/stockMinimums';
@@ -27,6 +28,9 @@ const STATUS: Record<MinimumRow['status'], {label: string; className: string}> =
  */
 export default function StockMinimums() {
   const {tools, retiredTools, purchaseOrders, createPurchaseOrder, can, role, currentUser} = useSurgi();
+  // Ordering what is missing needs the Replacements & Orders module (where the orders are kept).
+  const hasOrders = useHasModule('REPLACEMENTS');
+  const canOrder = can('stock.manage') && hasOrders;
   const {systemSettings, updateSystemSettings} = useLibraries();
   const navigate = useNavigate();
   const [confirm, ask] = useConfirm();
@@ -83,7 +87,7 @@ export default function StockMinimums() {
             {missingTotal > 0 && ` ${tr('Για να φτάσουν στο ελάχιστο λείπουν {0}.', pieces(missingTotal))}`}
           </span>
         </div>
-        {can('stock.manage') && toOrder.length > 0 && (
+        {canOrder && toOrder.length > 0 && (
           <AppButton variant="primary" icon={<ShoppingCart size={15} />} onClick={() => orderFor(toOrder)}>
             {tr('Παραγγελία για όσα λείπουν')}
           </AppButton>
@@ -177,7 +181,7 @@ export default function StockMinimums() {
                     </span>
                   </td>
                   <td>
-                    {can('stock.manage') && r.missing > 0 && (
+                    {canOrder && r.missing > 0 && (
                       <button type="button" className="issue-action wide" onClick={() => orderFor([r])}>
                         <ShoppingCart size={14} /> {tr('Παραγγελία {0}', r.missing)}
                       </button>

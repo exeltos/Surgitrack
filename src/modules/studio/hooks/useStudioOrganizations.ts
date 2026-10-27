@@ -59,6 +59,11 @@ export function useStudioOrganizations(p: ReturnType<typeof useStudioState> & Re
     }
     const plan = await setOrganizationPlan(id!, data.plan || 'STANDARD', data.trialEndsAt);
     if (!plan) return;
+    // The modules this hospital is given (only the platform owner changes them: the database enforces it).
+    if (data.modules) {
+      const {error: modulesError} = await supabase.from('organizations').update({modules: data.modules}).eq('id', id!);
+      if (modulesError) return setCloudError(modulesError.message);
+    }
     // The hospital's admin gets one email with their username and a button to accept and set a password.
     if (hospitalAdmin?.email) {
       const {data: result, error} = await supabase.functions.invoke('invite-staff', {

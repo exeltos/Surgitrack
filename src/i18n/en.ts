@@ -2184,4 +2184,5 @@ export const en: Record<string, string> = {
   'Αναίρεση φόρτωσης': 'Undo loading',
   'Παλαιότερη κίνηση: επανέρχεται μόνο η θέση του (και οι ημερομηνίες αποστείρωσης της τελευταίας αποδέσμευσης)· οι χρήσεις δεν αλλάζουν, διορθώστε τες με −/+ αν χρειάζεται.':
     'An older movement: only where it is comes back (and the sterile dates of its latest release); uses do not change, correct them with −/+ if needed.',
+  Ενότητες: 'Modules',
 };

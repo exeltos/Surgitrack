@@ -1,4 +1,5 @@
 import {ListEmpty} from '../../components/ui/EmptyState';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {useBrowseList} from '../../core/browseList';
 import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
@@ -27,7 +28,9 @@ import {effectiveToolMarker} from '../../core/colorTapes';
 export default function StockPage() {
   const {tools, retiredTools, can, purchaseOrders} = useSurgi();
   const [params, setParams] = useSearchParams();
-  const view = params.get('view') === 'minimums' ? 'MIN' : 'LIST';
+  // Minimum stock is a module the platform owner gives a hospital: without it there is only the list.
+  const withMinimums = useHasModule('STOCK_MINIMUMS');
+  const view = withMinimums && params.get('view') === 'minimums' ? 'MIN' : 'LIST';
   const navigate = useNavigate();
   const stock = tools.filter(t => t.mode === 'STOCK');
   const [q, setQ] = useRememberedState('q', '');
@@ -98,39 +101,45 @@ export default function StockPage() {
           {
             label: tr('Είδη εργαλείων'),
             value: stockKinds,
-            onClick: () => setParams({view: 'minimums'}, {replace: true}),
+            ...(withMinimums ? {onClick: () => setParams({view: 'minimums'}, {replace: true})} : {}),
           },
           {
             label: tr('Με όριο χρήσεων'),
             value: stock.filter(t => !!t.maxUses).length,
             ...listKpi({usage: 'LIMITED'}),
           },
-          {
-            label: tr('Κάτω από το ελάχιστο'),
-            value: lowCount,
-            onClick: () => setParams({view: 'minimums'}, {replace: true}),
-            active: view === 'MIN',
-          },
+          ...(withMinimums
+            ? [
+                {
+                  label: tr('Κάτω από το ελάχιστο'),
+                  value: lowCount,
+                  onClick: () => setParams({view: 'minimums'}, {replace: true}),
+                  active: view === 'MIN',
+                },
+              ]
+            : []),
         ]}
       />
-      <div className="name-check-tabs stock-tabs" role="tablist">
-        <button
-          role="tab"
-          aria-selected={view === 'LIST'}
-          className={view === 'LIST' ? 'active' : ''}
-          onClick={() => setParams({}, {replace: true})}
-        >
-          <Boxes size={16} /> {tr('Εργαλεία Αποθέματος')} <b>{stock.length}</b>
-        </button>
-        <button
-          role="tab"
-          aria-selected={view === 'MIN'}
-          className={view === 'MIN' ? 'active' : ''}
-          onClick={() => setParams({view: 'minimums'}, {replace: true})}
-        >
-          <Gauge size={16} /> {tr('Ελάχιστα αποθέματα')} {lowCount > 0 && <b className="warn">{lowCount}</b>}
-        </button>
-      </div>
+      {withMinimums && (
+        <div className="name-check-tabs stock-tabs" role="tablist">
+          <button
+            role="tab"
+            aria-selected={view === 'LIST'}
+            className={view === 'LIST' ? 'active' : ''}
+            onClick={() => setParams({}, {replace: true})}
+          >
+            <Boxes size={16} /> {tr('Εργαλεία Αποθέματος')} <b>{stock.length}</b>
+          </button>
+          <button
+            role="tab"
+            aria-selected={view === 'MIN'}
+            className={view === 'MIN' ? 'active' : ''}
+            onClick={() => setParams({view: 'minimums'}, {replace: true})}
+          >
+            <Gauge size={16} /> {tr('Ελάχιστα αποθέματα')} {lowCount > 0 && <b className="warn">{lowCount}</b>}
+          </button>
+        </div>
+      )}
       {view === 'MIN' ? (
         <StockMinimums />
       ) : (

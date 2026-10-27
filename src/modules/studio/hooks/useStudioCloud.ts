@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+import {modulesOf} from '../../../core/hospitalModules';
 import type {LibraryItem} from '../../../core/libraries';
 import type {UserRole} from '../../../store/types';
 import {supabase} from '../../../lib/supabase';
@@ -24,7 +25,7 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
     // Demo hospitals are sandboxes, not customers: they are managed through the Demo buttons only.
     const {data, error} = await supabase
       .from('organizations')
-      .select('id,name,code,active,demo_enabled,plan,trial_ends_at')
+      .select('id,name,code,active,demo_enabled,plan,trial_ends_at,modules')
       .eq('is_demo', false)
       .order('name');
     if (error) setCloudError(error.message);
@@ -39,6 +40,7 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
           demoEnabled: row.demo_enabled,
           plan: row.plan === 'TRIAL' ? 'TRIAL' : 'STANDARD',
           trialEndsAt: row.trial_ends_at || undefined,
+          modules: modulesOf(row.modules),
         })),
       );
     }
