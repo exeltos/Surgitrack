@@ -202,3 +202,40 @@ html body .settings-aside > small {
   font-size: 12px;
   color: var(--st-muted);
 }
+
+/* Libraries: a count pill instead of a second line in the list of libraries, quieter row buttons. */
+html body .studio-manager-nav > button {
+  align-items: center;
+}
+html body .studio-manager-nav > button > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+html body .studio-nav-count {
+  flex: none;
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-100-2);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  text-align: center;
+}
+html body .studio-manager-nav > button.active .studio-nav-count {
+  background: var(--c-white);
+  color: var(--c-cyan-35);
+}
+html body .studio-list-row button {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+html body .studio-list-row button.danger-icon {
+  color: var(--st-muted);
+}
+html body .studio-list-row button.danger-icon:hover {
+  background: #fdecec;
+  color: #a54545;
+}

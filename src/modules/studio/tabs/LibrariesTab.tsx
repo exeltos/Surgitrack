@@ -68,10 +68,10 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                   </span>
                   <div>
                     <b>{L(m.el, m.en)}</b>
-                    <small>
-                      {libs[m.key].length} {L('εγγραφές', 'records')}
-                    </small>
                   </div>
+                  <em className="studio-nav-count" title={`${libs[m.key].length} ${L('εγγραφές', 'records')}`}>
+                    {libs[m.key].length}
+                  </em>
                 </button>
               );
             })}
@@ -81,10 +81,13 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
               </span>
               <div>
                 <b>{L('Χρωματικοί μάρτυρες', 'Color markers')}</b>
-                <small>
-                  {(libs.colorTapes || []).filter(t => t.active !== false).length} {L('σε χρήση', 'in use')}
-                </small>
               </div>
+              <em
+                className="studio-nav-count"
+                title={`${(libs.colorTapes || []).filter(t => t.active !== false).length} ${L('σε χρήση', 'in use')}`}
+              >
+                {(libs.colorTapes || []).filter(t => t.active !== false).length}
+              </em>
             </button>
           </aside>
           {tapesOpen ? (
@@ -95,7 +98,6 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
             <section className="studio-manager-panel">
               <header className="studio-panel-head">
                 <div>
-                  <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΗ', 'LIBRARY')}</span>
                   <h2>{L(currentMeta.el, currentMeta.en)}</h2>
                   <p>{L(currentMeta.hintEl, currentMeta.hintEn)}</p>
                 </div>
