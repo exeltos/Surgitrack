@@ -220,3 +220,57 @@ html body .trace-back {
   font-weight: 700;
   cursor: pointer;
 }
+
+html body .trace-recent-items {
+  padding: 16px 18px;
+}
+html body .trace-recent-items h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .trace-recent-items ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .trace-recent-items button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+  text-align: left;
+  cursor: pointer;
+}
+html body .trace-recent-items button:hover {
+  border-color: var(--c-cyan-75);
+  background: var(--c-gray-100-2);
+}
+html body .trace-recent-items button span {
+  overflow: hidden;
+  font-weight: 700;
+  color: var(--c-cyan-20);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .trace-recent-items button small {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--st-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 800px) {
+  html body .trace-recent-items ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

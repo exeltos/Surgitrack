@@ -2214,4 +2214,5 @@ export const en: Record<string, string> = {
   Καινούργιο: 'New',
   Καινούργια: 'New',
   'Έχει όριο χρήσεων και καμία χρήση ακόμα.': 'Has a use limit and no use yet.',
+  'Πρόσφατη δραστηριότητα': 'Recent activity',
 };

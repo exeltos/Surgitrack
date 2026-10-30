@@ -106,6 +106,18 @@ export default function TraceabilityPage() {
     ? movements.filter(m => barcodeOf(m).toLowerCase() === carrierSet.barcode.toLowerCase())
     : [];
   const related = [...own, ...setMoves];
+  // With nothing searched yet: the items that moved most recently, one tap away.
+  const recentItems = (() => {
+    if (needle) return [];
+    const seen = new Map<string, Movement>();
+    [...movements]
+      .sort((a, b) => time(b.at) - time(a.at))
+      .forEach(m => {
+        const code = barcodeOf(m);
+        if (!m.undoes && !seen.has(code)) seen.set(code, m);
+      });
+    return [...seen.entries()].slice(0, 8);
+  })();
   const countHits = patient ? counts.filter(c => c.patientCode.toLowerCase() === patient.toLowerCase()) : [];
   // One item's trail: its name is in the card above, so each step shows only what happened.
   const singleAsset = !!asset;
@@ -449,7 +461,24 @@ export default function TraceabilityPage() {
                   </div>
                 </Fragment>
               ))
-            ) : choosing ? null : (
+            ) : choosing ? null : recentItems.length ? (
+              <section className="trace-recent-items" aria-label={tr('Πρόσφατη δραστηριότητα')}>
+                <h3>{tr('Πρόσφατη δραστηριότητα')}</h3>
+                <ul>
+                  {recentItems.map(([code, m]) => (
+                    <li key={code}>
+                      <button type="button" onClick={() => setQ(code)}>
+                        <b className="mono">{code}</b>
+                        <span>{m.asset.split(' · ').slice(1).join(' · ')}</span>
+                        <small>
+                          {movementText(m.status)} · {m.at}
+                        </small>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : (
               <div className="empty">
                 <strong>
                   {!needle
