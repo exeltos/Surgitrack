@@ -25,7 +25,7 @@
   border-bottom: 1px solid var(--c-gray-90-4);
   background: var(--c-gray-95-3);
   color: var(--c-cyan-35);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 html body .topbar {
@@ -53,7 +53,7 @@ html body .notification-item.expiry.expiring svg {
   border-radius: 999px;
   background: #d64545;
   color: var(--c-white);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-style: normal;
   font-weight: 800;
   line-height: 18px;
@@ -87,7 +87,7 @@ html body .idle-lock-card .idle-lock-error {
   margin: 0;
   color: var(--c-red-40);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .maintenance-strip > span {
   flex: 1;
@@ -114,7 +114,7 @@ html body .screen-guide-body ol {
   padding-left: 20px;
   display: grid;
   gap: 4px;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
 }
 
@@ -122,7 +122,7 @@ html body .screen-guide-body ol {
 html body .sidebar .nav-group {
   display: block;
   margin: 10px 11px 2px;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -193,7 +193,7 @@ html body .owner-demo-bar .owner-demo-role {
   gap: 6px;
   min-width: 0;
   color: var(--c-violet-45);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 html body .owner-demo-bar .role-switch {
@@ -205,7 +205,7 @@ html body .owner-demo-bar .role-switch select {
   max-width: 240px;
   padding: 0 8px;
   border-color: var(--c-violet-80);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* The platform's own Demo on a phone: one line, the badge and the way out. */
 @media (max-width: 700px) {
@@ -243,7 +243,7 @@ html body .header-demo-enter {
   background: var(--c-white);
   color: var(--c-blue-25);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -281,7 +281,7 @@ html body .role-switch-hospital {
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-blue-25);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .role-switch-hospital > svg {
   flex: none;
@@ -304,7 +304,7 @@ html body .role-switch-hospital > button {
   background: var(--c-gray-100-2);
   color: var(--c-blue-25);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -381,7 +381,7 @@ html body .demo-bar .demo-bar-rate.rated svg {
   fill: currentColor;
 }
 html body .demo-bar .demo-bar-rate b {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 html body .demo-bar .demo-bar-rate:disabled {
   opacity: 0.5;

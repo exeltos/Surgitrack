@@ -29,7 +29,7 @@
   box-shadow: 0 1px 2px rgba(25, 57, 72, 0.025);
 }
 .tools-list-workspace .kpis small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .tools-list-workspace .kpis strong {
@@ -77,7 +77,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .asset-registry-table thead th {
   height: 46px;
@@ -85,7 +85,7 @@
   vertical-align: middle;
   background: var(--c-white);
   color: var(--c-cyan-45-2);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -128,7 +128,7 @@
 .asset-registry-table .row-title-link {
   display: inline-block;
   max-width: 100%;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1.3;
   color: var(--c-blue-25-4);
@@ -140,12 +140,12 @@
 }
 .asset-registry-table .row-sub {
   margin-top: 3px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.3;
   color: var(--st-muted);
 }
 .asset-registry-table .mono {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 750;
   white-space: nowrap;
 }
@@ -153,7 +153,7 @@
   color: var(--st-muted);
 }
 .asset-registry-table .badge {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-registry-table .icon-link {
   width: 32px;
@@ -318,7 +318,7 @@
   min-width: 0;
 }
 .asset-photo-tile figcaption span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 750;
   white-space: nowrap;
   overflow: hidden;
@@ -326,7 +326,7 @@
   color: var(--c-cyan-30-6);
 }
 .asset-photo-tile figcaption small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .photo-remove {
@@ -363,11 +363,11 @@
   gap: 2px;
 }
 .asset-photo-empty strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-40-9);
 }
 .asset-photo-empty span {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .issue-photo-field {
@@ -390,10 +390,10 @@
   gap: 2px;
 }
 .issue-photo-head strong {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .issue-photo-head span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .issue-photo-actions {
@@ -453,7 +453,7 @@
   border: 1px solid var(--c-gray-90);
 }
 .issue-table-photos span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--c-cyan-50-4);
   background: var(--c-gray-95);
@@ -487,7 +487,7 @@
   background: var(--c-white);
   color: var(--c-cyan-35);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
@@ -710,7 +710,7 @@ body {
   gap: 8px;
 }
 .camera-error span {
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--c-gray-85-2);
 }
@@ -775,7 +775,7 @@ body {
   .nav-item {
     padding: 10px 9px;
     gap: 9px;
-    font-size: 12px;
+    font-size: 12.5px;
   }
   .topbar {
     padding: 0 18px;
@@ -924,12 +924,12 @@ body {
   margin: 3px 0 5px;
 }
 .asset-detail-workspace .asset-profile-title p {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-detail-workspace .asset-action-link {
   min-height: 42px;
   padding: 0 14px;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 .asset-detail-tabs {
@@ -952,7 +952,7 @@ body {
   border-radius: 10px 10px 0 0;
   background: transparent;
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -984,7 +984,7 @@ body {
   border-radius: 999px;
   background: #fff1e7;
   color: #9a5127;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .asset-detail-body {
@@ -1009,22 +1009,22 @@ body {
   margin: 3px 0 2px;
 }
 .asset-detail-workspace .asset-section-head p {
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.45;
   max-width: 760px;
 }
 .asset-detail-workspace .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.11em;
 }
 .asset-detail-workspace .asset-definition-list {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-detail-workspace .asset-definition-list dt {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-detail-workspace .asset-definition-list dd {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-detail-full-panel {
   display: flex;
@@ -1057,10 +1057,10 @@ body {
   gap: 14px;
 }
 .asset-detail-full-panel .asset-photo-tile figcaption span {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-detail-full-panel .asset-photo-tile figcaption small {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* Set composition now owns the full working canvas. Only the instruments list scrolls. */
@@ -1091,24 +1091,24 @@ body {
 .asset-detail-body .set-tool-index {
   width: 30px;
   height: 30px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-detail-body .set-tool-code strong,
 .asset-detail-body .set-tool-name strong {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-detail-body .set-tool-code small,
 .asset-detail-body .set-tool-name small {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-detail-body .set-tool-uses span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-detail-body .set-tool-uses strong {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-detail-body .set-tool-state small {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-detail-body .set-composition-actions .app-button {
   min-height: 42px;
@@ -1129,7 +1129,7 @@ body {
   .asset-detail-tabs button {
     min-height: 48px;
     padding: 0 15px;
-    font-size: 12.5px;
+    font-size: 13px;
   }
   .asset-detail-body {
     overflow: hidden;
@@ -1249,7 +1249,7 @@ body {
 .asset-workbench-title p {
   margin: 0;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 750;
 }
 .asset-workbench-fields {
@@ -1298,11 +1298,11 @@ body {
   color: var(--st-muted);
 }
 .asset-cover-empty strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-45-4);
 }
 .asset-cover-empty span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-cover-count {
   position: absolute;
@@ -1315,7 +1315,7 @@ body {
   border-radius: 999px;
   background: rgba(15, 53, 70, 0.88);
   color: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
 }
 .asset-barcode-card {
@@ -1335,7 +1335,7 @@ body {
   align-items: center;
   gap: 7px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 750;
 }
 .asset-barcode-card strong {
@@ -1360,10 +1360,10 @@ body {
   gap: 2px;
 }
 .asset-workbench-mini span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-workbench-mini strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-25-2);
 }
 .asset-workbench-main {
@@ -1478,7 +1478,7 @@ body {
   padding: 8px 0 3px;
 }
 .asset-fields-heading > strong {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--st-muted);
@@ -1490,7 +1490,7 @@ body {
   border: 0;
   background: transparent;
   color: var(--c-cyan-45);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   padding: 5px 7px;
   border-radius: 7px;
@@ -1507,10 +1507,10 @@ body {
   grid-template-columns: 104px minmax(0, 1fr);
 }
 .asset-workbench-fields dt {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-workbench-fields dd {
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .asset-sidebar-quickfacts {
   display: grid;
@@ -1535,10 +1535,10 @@ body {
   align-items: center;
 }
 .asset-sidebar-quickfacts .asset-workbench-mini span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-sidebar-quickfacts .asset-workbench-mini strong {
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-workbench-sidebar .asset-cover {
   height: min(170px, 22vh);
@@ -1557,7 +1557,7 @@ body {
 .asset-workbench-actions .asset-action-link {
   min-height: 40px !important;
   padding: 0 13px !important;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-workbench-main > .asset-detail-tabs {
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1588,11 +1588,11 @@ body {
   background: var(--c-gray-100-2);
 }
 .choice-dialog-body strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-25-2);
 }
 .choice-dialog-body span {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.45;
   color: var(--st-muted);
 }
@@ -1660,10 +1660,10 @@ body {
   gap: 2px;
 }
 .report-tool-picker strong {
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .report-tool-picker small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .report-photo-input {
@@ -1715,7 +1715,7 @@ body {
   border-radius: 7px;
   background: var(--c-white);
   color: var(--c-cyan-45);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -1739,7 +1739,7 @@ body {
   background: var(--c-white);
   color: var(--c-cyan-25-2);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   outline: none;
 }
@@ -1850,7 +1850,7 @@ body {
   min-width: 0;
 }
 .asset-workbench-title-status small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-amber-45);
   font-weight: 700;
 }
@@ -2040,11 +2040,11 @@ body {
   gap: 2px;
 }
 .asset-tool-photo-empty strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-45-4);
 }
 .asset-tool-photo-empty span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .asset-workbench-sidebar-tool .asset-cover-count {
@@ -2154,7 +2154,7 @@ body {
   }
   .asset-workbench-main > .asset-detail-tabs button {
     padding: 0 7px !important;
-    font-size: 12px;
+    font-size: 12.5px;
   }
   .asset-workbench-main > .asset-detail-tabs button b {
     margin-left: 4px;
@@ -2172,7 +2172,7 @@ body {
 .bin-by {
   display: block;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .bin-actions {
   display: flex;
@@ -2184,7 +2184,7 @@ body {
   width: auto;
   gap: 6px;
   padding: 0 12px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .issue-action.danger {
@@ -2230,7 +2230,7 @@ body {
   flex: 1 1 auto;
   gap: 4px;
   max-width: 460px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-cyan-40-2);
 }
@@ -2260,13 +2260,13 @@ body {
 .stock-min-sub {
   display: block;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .stock-min-status {
   display: inline-block;
   padding: 3px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .stock-min-status.ok {
@@ -2296,7 +2296,7 @@ body {
   margin-bottom: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 .bin-notice.ok {

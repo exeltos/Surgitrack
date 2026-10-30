@@ -12,10 +12,10 @@
 }
 .hospital-users-empty strong {
   color: var(--c-cyan-30);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .hospital-users-empty small {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .overview-links {
   display: flex;
@@ -67,11 +67,11 @@
 }
 .people-invite-menu b {
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .people-invite-menu small {
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .people-requests {
   display: grid;
@@ -100,7 +100,7 @@
 .people-head {
   padding: 0 12px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -126,13 +126,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .people-who small {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .people-you {
@@ -140,14 +140,14 @@
   border-radius: 999px;
   background: var(--c-gray-95-3);
   color: var(--c-cyan-45);
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 800;
 }
 .people-value {
   min-width: 0;
   color: var(--c-blue-25);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .people-value.whole {
   color: var(--st-muted);
@@ -183,7 +183,7 @@
   padding: 0 9px;
   color: var(--c-blue-15);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .hospital-people .people-toolbar .studio-search input {
   height: auto;
@@ -221,11 +221,11 @@
 }
 .people-invited b {
   color: var(--c-orange-35);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .people-invited small {
   color: var(--c-amber-45);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.4;
 }
 @media (max-width: 760px) {
@@ -272,11 +272,11 @@
 }
 .people-password b {
   color: var(--c-cyan-20-2);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .people-password small {
   color: var(--c-cyan-45-2);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.4;
 }
 .people-password > :last-child {
@@ -309,12 +309,12 @@
   background: var(--c-white);
   color: var(--c-cyan-20-2);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .people-link small {
   grid-column: 1 / -1;
   color: var(--c-cyan-45-2);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.4;
 }
 .hospital-notice > span {
@@ -400,7 +400,7 @@
   display: flex;
   gap: 6px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   align-items: flex-start;
   min-height: 32px;
@@ -415,7 +415,7 @@
 }
 .dash-kpi small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .dash-kpi.warn strong,
 .dash-kpi.warn .dash-kpi-label {
@@ -470,7 +470,7 @@
   gap: 12px;
   min-height: 30px;
   color: var(--c-cyan-30);
-  font-size: 13px;
+  font-size: 13.5px;
   text-decoration: none;
 }
 .dash-bar:hover .dash-bar-name {
@@ -509,7 +509,7 @@
   gap: 8px;
   min-height: 30px;
   border-bottom: 1px solid var(--c-gray-95);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .dash-legend li:last-child {
   border-bottom: 0;
@@ -535,7 +535,7 @@
   gap: 12px;
   min-height: 32px;
   color: var(--c-cyan-30);
-  font-size: 13px;
+  font-size: 13.5px;
   text-decoration: none;
 }
 .dash-dept:hover .dash-dept-name {
@@ -564,7 +564,7 @@
   gap: 3px;
   min-height: 20px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .dash-pill.bad {
@@ -586,7 +586,7 @@
   justify-content: space-between;
   gap: 8px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .dash-list {
   display: grid;
@@ -614,7 +614,7 @@
   display: block;
   overflow: hidden;
   color: var(--c-cyan-20);
-  font-size: 13px;
+  font-size: 13.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -622,7 +622,7 @@
   display: block;
   overflow: hidden;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -635,7 +635,7 @@
 .dash-list li.ok {
   grid-template-columns: minmax(0, 1fr);
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .dash-kpi-label svg {
   flex: 0 0 auto;
@@ -673,7 +673,7 @@ html body .dash-activity .dash-columns {
 }
 html body .dash-dept-name {
   font-weight: 500;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .hospital-admin .hospital-people > .hospital-tabs,
 html body .hospital-admin .hospital-people > .hospital-notice {
@@ -749,7 +749,7 @@ html body .dash-more {
   background: none;
   color: var(--c-cyan-35);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
@@ -773,7 +773,7 @@ html body .dash-more {
   html body .people-row > .people-value {
     display: block;
     grid-row: 2;
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--c-blue-35);
     white-space: normal;
   }
@@ -976,7 +976,7 @@ html body .dash-more {
     font-size: 21px;
   }
   html body .hospital-overview .page-head p {
-    font-size: 12.5px;
+    font-size: 13px;
   }
   html body .hospital-overview .overview-alert {
     padding-top: 7px;
@@ -991,13 +991,13 @@ html body .dash-more {
     border-radius: 12px;
   }
   html body .hospital-overview .dash-kpi-label {
-    font-size: 12px !important;
+    font-size: 12.5px !important;
   }
   html body .hospital-overview .dash-kpi strong {
     font-size: 21px !important;
   }
   html body .hospital-overview .dash-kpi small {
-    font-size: 11.5px;
+    font-size: 12px;
   }
   html body .hospital-overview .dash-grid {
     gap: 10px;
@@ -1012,7 +1012,7 @@ html body .dash-more {
   }
   html body .hospital-overview .dash-card > header small {
     margin-top: 1px;
-    font-size: 11.5px;
+    font-size: 12px;
   }
   html body .hospital-overview .dash-legend li {
     min-height: 22px;
@@ -1065,7 +1065,7 @@ html body .department-home .dash-activity .dash-columns {
   max-height: 130px;
 }
 .department-home .dash-axis .dash-legend-inline {
-  font-size: 11px;
+  font-size: 12px;
 }
 @media (max-width: 900px) {
   html body .department-home .dash-grid {

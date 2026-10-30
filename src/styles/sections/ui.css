@@ -61,7 +61,7 @@ html body .kpis > * svg {
   min-height: 22px;
   padding: 0 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -94,7 +94,7 @@ html body .history-window-note {
   border-radius: 10px;
   background: var(--c-gray-100-2);
   color: var(--c-blue-35);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
 /* Loading screen: how far a large hospital's load has come, under the spinner. */

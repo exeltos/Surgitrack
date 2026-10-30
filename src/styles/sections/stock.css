@@ -34,7 +34,7 @@ html body .stock-min-add {
 html body .stock-min-add > small {
   flex: 1 1 100%;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 @media (max-width: 1279px) {
   html body .stock-min-table {
@@ -91,7 +91,7 @@ html body .stock-min-add > small {
   html body .stock-min-table tbody td[data-label]::before {
     content: attr(data-label) ' ';
     color: var(--c-blue-45);
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 600;
   }
   html body .stock-min-table input {

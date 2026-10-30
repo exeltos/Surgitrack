@@ -43,7 +43,7 @@ html body .issues-tabs .tab-short {
     overflow: hidden;
     margin-top: 2px;
     color: var(--c-blue-35);
-    font-size: 12px;
+    font-size: 12.5px;
     font-style: italic;
   }
 }

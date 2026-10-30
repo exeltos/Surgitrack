@@ -38,7 +38,7 @@
 }
 .email-link-brand small {
   color: var(--c-blue-55);
-  font-size: 11px;
+  font-size: 12px;
 }
 .email-link-card h1 {
   margin: 4px 0 0;
@@ -137,7 +137,7 @@ html body .auth-hero-brand strong {
 }
 html body .auth-hero-brand span {
   display: block;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
   opacity: 0.75;
 }
@@ -194,7 +194,7 @@ html body .auth-hero-chips span {
   border: 1px solid rgb(255 255 255 / 15%);
   border-radius: 999px;
   background: rgb(255 255 255 / 10%);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
 }
 html body .auth-side {

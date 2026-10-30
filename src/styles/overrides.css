@@ -46,7 +46,7 @@
   border-top: 1px solid var(--c-gray-95);
   border-bottom: 1px solid var(--c-gray-90-3);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.055em;
   text-transform: uppercase;
@@ -100,7 +100,7 @@
   background: var(--c-white);
   color: var(--c-cyan-25-2);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .studio-users-panel > .studio-search {
   margin: 0 22px 12px !important;
@@ -162,7 +162,7 @@
 }
 .hospital-card > header > a {
   color: var(--c-cyan-45);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -187,7 +187,7 @@
   border: 1px dashed var(--c-gray-90-2);
   border-radius: 8px;
   color: var(--c-cyan-50-2);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -214,7 +214,7 @@
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-35-2);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -235,7 +235,7 @@
   border-radius: 999px;
   background: var(--c-cyan-45);
   color: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   line-height: 18px;
   text-align: center;
@@ -262,7 +262,7 @@
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-35-2);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 650;
   outline: none;
 }
@@ -292,7 +292,7 @@
   border-radius: 8px;
   background: var(--c-white);
   color: var(--c-cyan-35-2);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -310,7 +310,7 @@
   margin: 4px 0 16px;
 }
 .roles-guide-row span {
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.5;
 }
 /* Narrow screens: each role becomes a stacked card instead of four columns. */
@@ -426,11 +426,11 @@
 }
 .asset-manage-choices button b {
   color: var(--c-cyan-15);
-  font-size: 13.5px;
+  font-size: 14px;
 }
 .asset-manage-choices button small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.35;
 }
 .asset-manage-choices button.active {
@@ -487,7 +487,7 @@
   border-radius: 9px;
   background: var(--c-white);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-manage-sets button small {
   color: var(--st-muted);
@@ -502,7 +502,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--c-cyan-40-2);
 }
 .asset-manage-modal > footer {
@@ -524,7 +524,7 @@
 .asset-manage-reports label small,
 .asset-manage-reports > small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 
 /* ---------- Color markers (identification tape) ---------- */
@@ -553,7 +553,7 @@
 .tape-lg {
   width: 40px;
   height: 16px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .tape-swatch.missing {
   background: repeating-linear-gradient(45deg, #ddd 0 4px, var(--c-gray-100-2) 4px 8px);
@@ -567,11 +567,11 @@
 }
 .color-marker-empty {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-marker-field dd small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-marker-edit {
   display: inline-grid;
@@ -592,7 +592,7 @@
   margin-right: 6px;
 }
 .member-marker small {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--c-orange-45-2);
 }
@@ -649,11 +649,11 @@
 .color-mode-choices label span {
   display: grid;
   gap: 4px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .color-mode-choices label small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .color-selection {
   display: flex;
@@ -663,7 +663,7 @@
   padding: 10px 12px;
   border-radius: 12px;
   background: var(--c-gray-100-2);
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--c-cyan-40-2);
 }
 .color-selection em {
@@ -689,7 +689,7 @@
 .tape-library-groups section > b {
   display: block;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-40-2);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -711,7 +711,7 @@
   text-align: left;
 }
 .color-palette button small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--c-cyan-30);
 }
 .color-question-rows > div {
@@ -722,12 +722,12 @@
   padding: 8px 10px;
   border-radius: 10px;
   background: var(--c-white);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .color-question-modal > p {
   margin: 0;
   color: var(--c-cyan-40-2);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
 }
 
@@ -752,13 +752,13 @@
 }
 .tape-library > header small {
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .tape-library-actions {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 13px;
+  font-size: 13.5px;
   white-space: nowrap;
 }
 .tape-library-actions label {
@@ -786,7 +786,7 @@
   border: 1px solid var(--c-gray-90);
   border-radius: 10px;
   background: var(--c-white);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .tape-library-groups article span:not(.tape-swatch) {
   flex: 1;
@@ -818,7 +818,7 @@
 .tape-new label {
   display: grid;
   gap: 4px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-40-2);
 }
 .tape-new input:not([type='color']) {
@@ -833,7 +833,7 @@
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-40-2);
 }
 .tape-new-colors > span:first-child {
@@ -933,11 +933,11 @@
 }
 .action-menu-panel button b {
   color: var(--c-cyan-15);
-  font-size: 13.5px;
+  font-size: 14px;
 }
 .action-menu-panel button small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .action-menu-panel button.danger,
 .action-menu-panel button.danger b {
@@ -953,7 +953,7 @@
   border-radius: 12px;
   background: var(--c-gray-100);
   color: var(--c-amber-35);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -975,7 +975,7 @@
 .new-barcode-modal > p {
   margin: 0;
   color: var(--c-cyan-40-2);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
 }
 .new-barcode-swap span {
@@ -988,7 +988,7 @@
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-40-2);
 }
 
@@ -1019,7 +1019,7 @@
   margin: 0;
   max-width: 70ch;
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import select {
   min-height: 38px;
@@ -1031,7 +1031,7 @@
   background: var(--c-white);
   color: var(--st-ink, var(--c-blue-20));
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import-steps li span {
   display: grid;
@@ -1066,12 +1066,12 @@
 .asset-import-fields label > span {
   display: grid;
   gap: 1px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import-fields small,
 .asset-import-fields em {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 11.5px;
+  font-size: 12px;
   font-style: normal;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1086,7 +1086,7 @@
 .asset-import-summary span,
 .asset-import-summary small {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-import-errors b {
   flex: 0 0 90px;
@@ -1109,7 +1109,7 @@
   padding: 8px 10px;
   background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-align: left;
   text-transform: uppercase;
@@ -1117,7 +1117,7 @@
 }
 .asset-import-tools > small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-import-progress {
   position: relative;
@@ -1131,7 +1131,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--st-ink, var(--c-blue-20));
 }
@@ -1151,7 +1151,7 @@
 }
 .asset-import-history > div small {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 @media (max-width: 640px) {
   .asset-import-hospital {
@@ -1215,11 +1215,11 @@
 }
 .devices-unconnected b {
   color: var(--c-cyan-30);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .devices-unconnected span {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .devices-unconnected ul {
   display: flex;
@@ -1240,7 +1240,7 @@
   background: var(--c-cyan-95);
   color: var(--c-cyan-30);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -1287,13 +1287,13 @@
 .device-card-main small,
 .device-card-kind {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .device-card-kind {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 12px;
 }
 .device-card-connection {
   display: inline-flex;
@@ -1301,11 +1301,11 @@
   gap: 6px;
   margin-top: 6px;
   color: var(--st-teal, var(--c-cyan-45));
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
 }
 .device-card-last {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--st-muted, var(--c-cyan-55));
 }
 .device-card-off {
@@ -1313,7 +1313,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   background: var(--st-canvas, var(--c-gray-95));
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .device-card-actions {
@@ -1329,7 +1329,7 @@
 .devices-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .devices-table th,
 .devices-table td {
@@ -1340,13 +1340,13 @@
 }
 .devices-table th {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .device-result {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   background: var(--st-canvas, var(--c-gray-95));
   color: var(--st-muted, var(--c-cyan-55));
@@ -1358,7 +1358,7 @@
 .devices-hint,
 .devices-info {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.5;
 }
 .devices-serial-bar {
@@ -1370,7 +1370,7 @@
 }
 .devices-serial-state.open {
   color: var(--st-green, var(--c-green-50));
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
 }
 .device-cycle-picker > b {
@@ -1378,21 +1378,21 @@
   align-items: center;
   gap: 6px;
   color: var(--st-teal, var(--c-cyan-45));
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .device-cycle-picker > small {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .device-cycle-picker li > span:first-child {
   display: grid;
   flex: 1;
   min-width: 0;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .device-cycle-picker li small {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .device-cycle-picker li button {
   padding: 6px 12px;
@@ -1401,7 +1401,7 @@
   background: var(--st-teal, var(--c-cyan-45));
   color: var(--c-white);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -1431,7 +1431,7 @@ div.asset-import-hospital b {
   border-bottom: 1px solid var(--c-amber-80);
   background: var(--st-amber-soft, var(--c-amber-95-2));
   color: var(--st-amber, var(--c-amber-50));
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 .trial-strip.ended {
@@ -1466,7 +1466,7 @@ div.asset-import-hospital b {
 }
 .trial-contact dt {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .trial-contact dd {
   margin: 0;
@@ -1519,7 +1519,7 @@ div.asset-import-hospital b {
 .people-requests > header small {
   grid-column: 2;
   color: var(--c-amber-45);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .people-row {
   width: 100%;
@@ -1537,7 +1537,7 @@ div.asset-import-hospital b {
 }
 .people-csv em {
   color: var(--c-red-40);
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 700;
 }
@@ -1561,11 +1561,11 @@ div.asset-import-hospital b {
 }
 .owner-actions b {
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .owner-actions small {
   color: var(--st-muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 /* All ten Studio tabs on one row from tablet width up: tighter spacing, and the icons go first
    when the row is short of room. Phones keep the wrapped grid. */
@@ -1649,7 +1649,7 @@ div.asset-import-hospital b {
 }
 .asset-import-drop small {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .asset-import-drop-icon {
   display: grid;
@@ -1665,7 +1665,7 @@ div.asset-import-hospital b {
   padding: 7px 9px;
   background: var(--c-gray-100-2);
   color: var(--c-cyan-45-2);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   text-align: left;
   text-transform: uppercase;
@@ -1686,7 +1686,7 @@ div.asset-import-hospital b {
     justify-self: start;
   }
   .asset-import-steps li span {
-    font-size: 12px;
+    font-size: 12.5px;
   }
 }
 
@@ -1744,7 +1744,7 @@ div.asset-import-hospital b {
   border-radius: 999px;
   background: var(--c-amber-95);
   color: var(--c-orange-45-2);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .name-check-card > header > div {
   display: grid;
@@ -1753,7 +1753,7 @@ div.asset-import-hospital b {
 }
 .name-check-card > header small {
   color: var(--st-muted);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
 }
 .name-check-table th {
@@ -1762,7 +1762,7 @@ div.asset-import-hospital b {
   padding: 8px 10px;
   background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   text-align: left;
   text-transform: uppercase;
 }
@@ -1800,7 +1800,7 @@ div.asset-import-hospital b {
 }
 .name-check-group li em {
   color: var(--c-red-40);
-  font-size: 12px;
+  font-size: 12.5px;
   font-style: normal;
   font-weight: 700;
 }
@@ -1809,7 +1809,7 @@ div.asset-import-hospital b {
   height: 34px;
   color: var(--c-blue-15-2);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .name-check-list {
   display: grid;
@@ -1824,7 +1824,7 @@ div.asset-import-hospital b {
 }
 .name-check-list > header span {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .name-check-list > header h3 {
@@ -1838,7 +1838,7 @@ div.asset-import-hospital b {
   padding: 8px 10px;
   background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   text-align: left;
   text-transform: uppercase;
 }
@@ -1875,7 +1875,7 @@ div.asset-import-hospital b {
   padding: 8px 10px;
   background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1888,7 +1888,7 @@ div.asset-import-hospital b {
 .replacements-order-body td small {
   display: block;
   color: var(--st-muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .replacements-table td a {
   color: var(--c-cyan-35);
@@ -1896,7 +1896,7 @@ div.asset-import-hospital b {
 }
 .replacements-table .since {
   color: var(--c-cyan-40-2);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .replacements-table .empty {
   padding: 26px;
@@ -1945,7 +1945,7 @@ div.asset-import-hospital b {
 .replacements-order > header small {
   display: block;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .replacements-order-actions {
   display: flex;
@@ -1968,11 +1968,11 @@ div.asset-import-hospital b {
 .replacements-order-modal header p {
   margin: 0;
   color: var(--st-muted);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .replacements .barcodes,
 .replacements-order-modal .barcodes {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-40-2);
   word-break: break-word;
 }
@@ -2081,7 +2081,7 @@ div.asset-import-hospital b {
 .department-header .eyebrow,
 .studio-head .eyebrow {
   margin: 0 0 2px;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.12em !important;
 }
 
@@ -2174,11 +2174,11 @@ div.asset-import-hospital b {
   display: block;
   margin-top: 2px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .dash-card > header > a {
   color: var(--c-cyan-35);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .dash-bar-track {
@@ -2204,7 +2204,7 @@ div.asset-import-hospital b {
   flex-wrap: wrap;
   gap: 4px 14px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .dash-dept-track {
   height: 14px;
@@ -2249,7 +2249,7 @@ div.asset-import-hospital b {
 .ledger-columns span,
 .sterilization-workspace .ster-list-head span {
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -2278,7 +2278,7 @@ html body .page-head p,
 html body .ster-work-head p,
 html body .department-header p,
 html body .studio-head p {
-  font-size: 13px !important;
+  font-size: 13.5px !important;
 }
 html body .page-head,
 html body .ster-work-head,
@@ -2291,7 +2291,7 @@ html body .sidebar {
 }
 html body .nav-item {
   padding: 7px 11px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 /* KPI strips on the list pages: label and number on one row. */
 html body .tools-list-workspace .kpis > * {
@@ -2473,7 +2473,7 @@ html body .devices-readings h2 {
   font-size: 15px;
 }
 html body .devices-readings header small {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
 html body .registry-fixed td:nth-child(4) .row-sub {
@@ -2673,7 +2673,7 @@ html body .ledger-route {
 html body .movements-actions > button {
   min-height: 38px;
   padding: 0 14px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 /* One KPI card everywhere: label on top, big number below, a soft shadow so the strip stands out. */
 html body .kpis > *,
@@ -2698,7 +2698,7 @@ html body .replacements-kpis > * span,
 html body .name-check-kpis span,
 html body .dash-kpi-label {
   color: var(--st-muted);
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   font-weight: 500;
   line-height: 1.3;
   white-space: nowrap;
@@ -2747,7 +2747,7 @@ html body .replacements-fixed .row-actions button {
   height: 34px;
   margin: 0;
   padding: 0 10px;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
@@ -2766,7 +2766,7 @@ html body .department-kpis > * {
 html body .department-kpis > * span,
 html body .department-kpis > * small {
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
 }
 html body .department-kpis > * strong {
@@ -2867,7 +2867,7 @@ html body .asset-count-state {
 }
 html body .asset-count-state span {
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* Overview as one screen: six cards in a 3x2 grid that fills the window's height; what a card cannot show
    scrolls inside the card, never the page. */
@@ -2934,11 +2934,11 @@ html body .owner-dashboard > * {
 }
 .owner-hospitals td b {
   display: block;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .owner-hospitals td small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* Sterilizer load: tick the instruments to include, one button loads them all. */
 .ster-row-pick {
@@ -2950,7 +2950,7 @@ html body .owner-dashboard > * {
 }
 html body .load-modal .cycle-clean-fields label,
 html body .load-indicator-pick legend {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 html body .load-indicator-pick {
@@ -2974,7 +2974,7 @@ html body .load-modal .load-indicator-pick label {
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-20);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .load-indicator-pick input {
   width: 16px;
@@ -2987,11 +2987,11 @@ html body .load-modal .load-assets-list small,
 html body .load-modal .load-assets-head strong,
 html body .load-modal .load-assets-head span,
 html body .load-modal .load-assets-head button {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .load-release-modal .load-manifest b,
 html body .load-release-modal .load-manifest small {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .load-indicator-chips {
   display: flex;
@@ -3038,7 +3038,7 @@ html body .shelf-life-options button {
   border-radius: 10px;
   background: var(--c-white);
   color: var(--c-cyan-20);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -3068,7 +3068,7 @@ html body .shelf-life-options button.on {
 }
 .sterilizer-load-card > header small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 html body .sterilizer-load-card > footer .release-reprocess {
   border: 1px solid var(--c-orange-85);
@@ -3098,7 +3098,7 @@ html body .sidebar-bin {
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--c-gray-95);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
   text-decoration: none;
@@ -3133,11 +3133,11 @@ html body .sidebar-bin.active {
   border-radius: 12px;
   background: var(--c-white);
   color: var(--c-cyan-30);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .prep-process-checks > strong {
   margin: 4px 0 2px;
-  font-size: 12px;
+  font-size: 12.5px;
   letter-spacing: 0.02em;
   color: var(--c-cyan-30-4);
 }
@@ -3154,7 +3154,7 @@ html body .prep-process-checks > label {
   cursor: pointer;
 }
 html body .prep-process-checks > label small {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.3;
   color: var(--st-muted);
 }
@@ -3169,7 +3169,7 @@ html body .delivery-batch-modal .handover-signature-row > button {
 }
 @media (max-width: 1280px) {
   html body .ledger-date b {
-    font-size: 12px;
+    font-size: 12.5px;
   }
 }
 /* The route is written in full (it was cut to «Καθαρισμός & Απολύμα…»), on two lines when needed. */
@@ -3251,7 +3251,7 @@ html body .studio-list-row button.studio-count-toggle {
   border-radius: 999px;
   background: var(--c-white);
   color: var(--c-blue-45);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 /* Send to Sterilization: the count step (operating theatres), signed in its own window first. */
@@ -3278,14 +3278,14 @@ html body .count-form-meta b {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 10.5px;
+  font-size: 11.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--c-cyan-50-2);
 }
 html body .count-form-meta small {
   display: block;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
   color: var(--c-cyan-40-2);
 }
@@ -3293,7 +3293,7 @@ html body .count-form-tools label {
   display: grid;
   gap: 3px;
   flex: 1 1 0;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-blue-35);
 }
@@ -3324,7 +3324,7 @@ html body .movement-clean-bar {
   color: var(--c-red-30);
 }
 html body .movement-clean-bar > span {
-  font-size: 13px;
+  font-size: 13.5px;
   display: grid;
   flex: 1 1 260px;
   min-width: 0;
@@ -3333,7 +3333,7 @@ html body .movement-clean-bar small {
   color: #7a271a;
 }
 html body .movement-clean-bar button {
-  font-size: 13px;
+  font-size: 13.5px;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
@@ -3401,7 +3401,7 @@ html body .dash-activity-stats b {
 }
 html body .dash-activity-stats small {
   color: var(--c-blue-45);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
 }
 /* Traceability: the last searches on this device, one tap to repeat. */
@@ -3412,7 +3412,7 @@ html body .trace-recent {
   gap: 6px 8px;
   margin: -4px 0 12px;
   color: var(--c-blue-35);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 html body .trace-recent button {
@@ -3423,7 +3423,7 @@ html body .trace-recent button {
   color: var(--c-cyan-35);
   font: inherit;
   font-family: ui-monospace, monospace;
-  font-size: 12.5px;
+  font-size: 13px;
   cursor: pointer;
 }
 /* Issues: room for the three worded actions. */
@@ -3629,7 +3629,7 @@ html body .idle-lock-card h2 {
 html body .idle-lock-card > p {
   margin: 0;
   color: var(--c-blue-35);
-  font-size: 13.5px;
+  font-size: 14px;
 }
 html body .idle-lock-user {
   display: grid;
@@ -3651,7 +3651,7 @@ html body .idle-lock-card label {
   gap: 4px;
   width: 100%;
   text-align: left;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-blue-35);
 }
@@ -3687,7 +3687,7 @@ html body .idle-lock-switch {
   color: var(--c-cyan-35);
   font: inherit;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 13.5px;
   cursor: pointer;
 }
 /* A record changed on two devices at once (S4). */
@@ -3788,7 +3788,7 @@ html body .sets-registry .set-count-short .muted {
     max-width: none;
     padding: 0 !important;
     border: 0;
-    font-size: 12.5px;
+    font-size: 13px;
   }
   html body .registry-fixed tbody td:first-child {
     flex: 1 0 100%;
@@ -3880,7 +3880,7 @@ html body .sets-registry .set-count-short .muted {
     max-width: none !important;
     padding: 0 !important;
     border: 0;
-    font-size: 12.5px;
+    font-size: 13px;
   }
   html body .issues-fixed tbody td:first-child {
     flex: 1 0 100%;
@@ -3904,7 +3904,7 @@ html body .trace-step strong {
 }
 html body .trace-step small {
   color: var(--c-blue-50);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 /* Reports on phone: every report type visible, result rows as cards */
@@ -3938,7 +3938,7 @@ html body .studio-errors-head p {
   max-width: 720px;
   margin: 0;
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .studio-error-kind {
   justify-self: start;
@@ -3946,13 +3946,13 @@ html body .studio-error-kind {
   border-radius: 999px;
   background: var(--st-red-soft);
   color: var(--st-red);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 html body .studio-error-main small,
 html body .studio-error-count small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 @media (max-width: 700px) {
   html body .studio-error-kind {
@@ -3982,7 +3982,7 @@ html body .whats-new-notes {
   gap: 8px;
   max-height: min(52vh, 420px);
   overflow-y: auto;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
   color: var(--st-ink, var(--c-blue-20-3));
 }
@@ -4020,7 +4020,7 @@ html body .briefing-row {
   border-radius: 12px;
   background: var(--c-white);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   text-align: left;
   color: var(--st-ink, var(--c-blue-20-3));
   cursor: pointer;
@@ -4078,7 +4078,7 @@ html body .screen-guide-icon {
   color: var(--st-teal, var(--c-cyan-30-2));
 }
 html body .screen-guide-body small {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -4090,7 +4090,7 @@ html body .screen-guide-body h2 {
 }
 html body .screen-guide-body p {
   margin: 0 0 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.5;
 }
 html body .screen-guide-actions {
@@ -4153,7 +4153,7 @@ html body .screen-guide-actions {
 /* Dialog action bars: one type size and height for every button. Plain ones (Cancel, Print, Do not release)
    fell back to the browser's 16px next to 12px primary ones. */
 html body .modal-backdrop .modal-actions > button {
-  font-size: 13px;
+  font-size: 13.5px;
   min-height: 40px;
 }
 html body .modal-backdrop .modal-actions > button:not(.primary) {
@@ -4184,7 +4184,7 @@ html body .studio-notice-status {
   justify-self: start;
   padding: 2px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 @media (max-width: 900px) {
@@ -4201,7 +4201,7 @@ html body .studio-roles-switch button {
   background: none;
   color: var(--c-cyan-50);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -4240,7 +4240,7 @@ html body .demo-welcome-card {
   border-radius: 12px;
   background: var(--c-gray-100-2);
   color: var(--c-gray-15);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
 }
 html body .demo-welcome-card svg {
@@ -4312,7 +4312,7 @@ html body .name-check-tabs button {
   }
   html body .name-check-tabs button {
     padding: 9px 8px;
-    font-size: 13px;
+    font-size: 13.5px;
   }
   html body .name-check-tabs button > svg {
     display: none;
@@ -4322,7 +4322,7 @@ html body .name-check-tabs button {
 /* On a phone each kind is a card: the name, then stock, minimum, on order and state, the order button last. */
 /* No cycles yet: ordinary text size, with what to do next. */
 html body .devices-empty.small {
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 /* Movements on a tablet: two lines per entry, so who did it stays in view (the user column was hidden). */
@@ -4351,7 +4351,7 @@ html body .devices-empty.small {
     width: 100%;
     padding-left: 8px;
     padding-right: 8px;
-    font-size: 12px;
+    font-size: 12.5px;
     white-space: nowrap;
   }
 }

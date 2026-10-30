@@ -51,7 +51,7 @@
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-visible-deviation button {
     padding: 8px 9px;
     min-height: 42px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-check-section > .handover-warning {
     margin: 0 10px 9px !important;
@@ -80,7 +80,7 @@
   border-bottom: 1px solid var(--c-gray-95);
   background: var(--c-white);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.055em;
   text-transform: uppercase;
@@ -101,7 +101,7 @@
 }
 .ster-cell-text strong,
 .ster-cell-text span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-blue-40);
   white-space: nowrap;
   overflow: hidden;
@@ -146,27 +146,27 @@
   background: var(--c-gray-100);
 }
 .receipt-tool-barcode {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--c-cyan-40-6);
 }
 .receipt-tool-code,
 .receipt-tool-manufacturer {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-blue-50-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .receipt-tool-name strong {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-blue-25-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .receipt-tool-name small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -293,7 +293,7 @@
 }
 .sterilization-workspace .receipt-queue-panel .ster-tablet-specialty {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   font-weight: 500;
   line-height: 1.3;
@@ -335,7 +335,7 @@
   border-radius: 10px;
   border: 1px dashed var(--line, var(--c-gray-90-2));
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -408,21 +408,21 @@ html body .sterile-queues.modern button > span {
   border: 0;
   background: transparent;
   color: var(--c-cyan-35);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   text-decoration: underline;
 }
 .ster-row-note {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .release-load-picker {
   display: grid;
   gap: 4px;
   margin-bottom: 10px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .release-load-picker select {
@@ -432,7 +432,7 @@ html body .sterile-queues.modern button > span {
   border-radius: 10px;
   background: var(--c-white);
   color: var(--c-cyan-20);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .sterilization-workspace .ster-asset-cell.with-pick {
   grid-template-columns: 22px 44px minmax(0, 1fr);
@@ -459,7 +459,7 @@ html body .ster-row-action .ster-row-note {
   display: grid;
   gap: 4px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .release-indicators select {
@@ -469,12 +469,12 @@ html body .ster-row-action .ster-row-note {
   border-radius: 10px;
   background: var(--c-white);
   color: var(--c-cyan-20);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .release-indicator-hint {
   margin: 6px 0 0;
   color: var(--c-orange-45);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
 }
 .release-indicator-hint.ok {
@@ -489,7 +489,7 @@ html body .ster-row-action .ster-row-note {
   border-radius: 10px;
   background: var(--c-gray-95-5);
   color: var(--c-red-40-2);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 /* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
@@ -673,7 +673,7 @@ html body .load-modal .load-indicator-pick {
   gap: 5px;
 }
 html body .load-indicator-pick > span {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-cyan-50);
 }
@@ -740,11 +740,11 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
 }
 .shelf-life-title strong {
   color: var(--c-cyan-20);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .shelf-life-title span {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .shelf-life-options {
   display: flex;
@@ -781,7 +781,7 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
   border-radius: 999px;
   background: var(--c-amber-95);
   color: var(--c-orange-40);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -797,7 +797,7 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
   gap: 10px;
   padding: 9px 14px;
   border-bottom: 1px solid var(--c-gray-95);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .sterilizer-load-items li:last-child {
   border-bottom: 0;
@@ -805,7 +805,7 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
 /* The barcode reads like every other queue's (no underline until pointed at; it opens the record). */
 .sterilizer-load-items a {
   color: var(--c-cyan-45-3);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 800;
   text-decoration: none;
 }
@@ -959,7 +959,7 @@ html body .prep-process-checks > label span {
   gap: 1px;
 }
 html body .prep-process-checks > label b {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--c-cyan-20);
 }
 html body .prep-note-field textarea {
@@ -997,10 +997,10 @@ html body .prep-actions .prep-accept-missing span {
   align-items: baseline;
 }
 html body .prep-actions .prep-accept-missing strong {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .prep-actions .prep-accept-missing small {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-amber-40);
 }
 html body .prep-tools-toolbar-actions {
@@ -1123,7 +1123,7 @@ html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
   border-radius: 999px;
   background: var(--c-amber-95);
   color: var(--c-orange-40);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 html body .released-load-actions .bi-pass {
@@ -1164,10 +1164,10 @@ html body .prep-composition-status .prep-accept-missing span {
   align-items: baseline;
 }
 html body .prep-composition-status .prep-accept-missing strong {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .prep-composition-status .prep-accept-missing small {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-amber-40);
 }
 html body .prep-block-warning {
@@ -1184,7 +1184,7 @@ html body .prep-block-warning .prep-block-hint {
 }
 .prep-block-hint {
   color: var(--c-amber-35);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.35;
 }
 /* Preparation: the side column and the list move only up and down (see keepLeft); long texts wrap. */
@@ -1198,7 +1198,7 @@ html body .prep-workspace-modal aside * {
 /* Preparation list: every Handle button looks the same (missing, Set issue, an instrument's open report). */
 html body .prep-tools-scroll .prep-missing-row .tool-manage-btn,
 html body .prep-tools-scroll .tool-manage-btn.warning {
-  font-size: 11px;
+  font-size: 12px;
   border: 1px solid var(--c-amber-80-2);
 }
 html body .ster-count-shortage {
@@ -1210,7 +1210,7 @@ html body .ster-count-shortage {
   color: var(--c-red-40);
   font-weight: 700;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 12px;
 }
 html body .ster-meta .ster-count-shortage {
   margin-left: 0;
@@ -1241,7 +1241,7 @@ html body .handover-signature .demo-code .demo-fill-btn {
 }
 /* The preparation note reads like every other note field. */
 html body .prep-note-field textarea {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
 /* Hand-over signature where it has little room (the receipt card's left column, bulk receipt and delivery):
@@ -1251,7 +1251,7 @@ html body .handover-signature {
 }
 /* Visible deviation at receipt: two choices in the type of the rest of the card. */
 html body .receipt-visible-deviation button {
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.3;
   white-space: normal;
 }
@@ -1262,7 +1262,7 @@ html body .delivery-batch-assets .load-assets-head > small {
   max-width: 340px;
   overflow: visible;
   color: var(--st-muted);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.35;
   text-align: right;
   text-overflow: clip;
@@ -1282,7 +1282,7 @@ html body .ster-row-action .ster-row-alt {
   background: none;
   box-shadow: none;
   color: var(--st-teal);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -1312,7 +1312,7 @@ html body .prep-workspace-modal .prep-head-prints button {
 }
 /* Sterilization review: the scan button reads like every other button. */
 html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan-clear) {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 /* Stage cards: the short description shows whole, on two lines where it needs them; every card in a row keeps
@@ -1320,7 +1320,7 @@ html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan
 html body .sterilization-workspace .sterile-queues.modern button > small {
   white-space: normal;
   overflow: visible;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.25;
 }
 /* The status column speaks only for an open issue; otherwise a quiet dash. */
@@ -1336,7 +1336,7 @@ html body .ster-load-badge {
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 650;
   white-space: nowrap;
 }
@@ -1354,7 +1354,7 @@ html body .ster-row-action .ster-row-note.ster-row-load {
 }
 html body .ster-row-load b {
   color: var(--c-cyan-20);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 650;
 }
 @media (max-width: 760px) {
@@ -1535,7 +1535,7 @@ html body .ster-row-load b {
   }
   html body .sterilizer-load-card .sterilizer-load-cycle {
     display: block;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
   }
 }
@@ -1589,7 +1589,7 @@ html body .ster-row-load b {
 }
 .prep-tools-scroll .prep-select-all-row > strong {
   grid-column: 2 / -1;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-blue-25);
 }
 .prep-tools-scroll .prep-select-all-row.checked .prep-tool-check > span {
@@ -1653,7 +1653,7 @@ html body .batch-department label {
   gap: 4px;
   min-width: 0;
   color: var(--c-cyan-30);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
 }
 html body .batch-department select {
@@ -1663,7 +1663,7 @@ html body .batch-department select {
   background: var(--c-white);
   padding: 0 10px;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 html body .batch-department button {
@@ -1681,7 +1681,7 @@ html body .batch-department button {
   padding: 0 12px;
   color: var(--c-cyan-30);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
   box-shadow: none;

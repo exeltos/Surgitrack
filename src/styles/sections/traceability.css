@@ -16,7 +16,7 @@ html body .timeline-item.trace-step {
 html body .trace-step time {
   padding-top: 1px;
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -39,7 +39,7 @@ html body .trace-step > div:last-child {
 }
 html body .trace-step-asset {
   color: var(--c-cyan-35);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 /* Traceability: several items fit a name, so they are listed to choose from. */
@@ -82,7 +82,7 @@ html body .trace-pick button .mono {
 }
 html body .trace-pick button small {
   color: var(--c-blue-50);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* A patient: what was used, each with the last sterilization cycle before the use. */
 html body .trace-patient li {
@@ -96,7 +96,7 @@ html body .trace-patient li a {
 }
 html body .trace-patient li small {
   color: var(--c-blue-50);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 /* The sterilization cycles an item went through. */
 html body .trace-cycles {
@@ -113,7 +113,7 @@ html body .trace-group {
   gap: 6px;
   margin: 0;
   color: var(--c-blue-45);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -126,7 +126,7 @@ html body .trace-cycles li {
   grid-template-columns: 132px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: baseline;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .trace-cycles time {
   font-weight: 700;
@@ -146,7 +146,7 @@ html body .trace-pick > small {
   display: block;
   margin-top: 8px;
   color: var(--c-blue-50);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 @media (max-width: 700px) {
   html body .timeline-item.trace-step {
@@ -170,7 +170,7 @@ html body .trace-pick > small {
     margin-left: 0;
     min-height: 34px;
     padding: 0 12px;
-    font-size: 13px;
+    font-size: 13.5px;
   }
   html body .trace-cycles li {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -186,7 +186,7 @@ html body .trace-pick > small {
     font-size: 19px;
   }
   html body .trace-card p {
-    font-size: 13.5px;
+    font-size: 14px;
   }
 }
 

@@ -12,7 +12,7 @@
 }
 .reports-page-head .eyebrow {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   font-weight: 850;
   color: var(--st-muted);
@@ -24,7 +24,7 @@
   margin-bottom: 4px;
 }
 .reports-page-head p {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .reports-workbench {
   flex: 1;
@@ -55,11 +55,11 @@
   border-bottom: 1px solid var(--c-gray-95);
 }
 .reports-catalog-head strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-30-4);
 }
 .reports-catalog-head span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .reports-catalog-list {
@@ -108,12 +108,12 @@
   display: block;
 }
 .reports-catalog-item strong {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.2;
   margin-bottom: 3px;
 }
 .reports-catalog-item small {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.35;
   color: var(--st-muted);
 }
@@ -133,7 +133,7 @@
 }
 .reports-stage-head .eyebrow {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   font-weight: 850;
   color: var(--st-muted);
@@ -146,7 +146,7 @@
 .reports-stage-head p {
   margin: 0;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .reports-stage-actions {
   display: flex;
@@ -169,7 +169,7 @@
   min-width: 0;
 }
 .reports-filter-strip label > span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--st-muted);
 }
@@ -183,7 +183,7 @@
   padding: 0 10px;
   color: var(--c-cyan-30);
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   outline: none;
 }
 .reports-filter-strip select:focus,
@@ -218,14 +218,14 @@
 }
 .reports-result-head strong {
   display: block;
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--c-cyan-30-6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .reports-result-head span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .reports-warning {
@@ -248,7 +248,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 .reports-table thead {
   position: sticky;
@@ -258,7 +258,7 @@
 .reports-table th {
   background: var(--c-gray-100-2);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   padding: 9px 10px;
   border-bottom: 1px solid var(--c-gray-90);
@@ -291,11 +291,11 @@
   color: var(--st-muted);
 }
 .reports-empty strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-35-7);
 }
 .reports-empty span {
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 4px;
   max-width: 380px;
 }
@@ -384,7 +384,7 @@
     min-width: 150px;
   }
   .reports-table {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 
@@ -454,7 +454,7 @@
 .ledger-head span,
 .ledger-head small {
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .ledger-head small {
   display: flex;
@@ -476,7 +476,7 @@
   background: var(--c-white);
   border-bottom: 1px solid var(--c-gray-90);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.035em;
@@ -509,7 +509,7 @@
 }
 .ledger-date b,
 .ledger-user b {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .ledger-asset {
   display: flex;
@@ -517,20 +517,20 @@
   min-width: 0;
 }
 .ledger-asset small {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--c-cyan-45);
   letter-spacing: 0.05em;
 }
 .ledger-asset b {
-  font-size: 12px;
+  font-size: 12.5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .ledger-asset em {
   font-style: normal;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   /* The name reads in full (two lines at most) instead of ending in «…». */
   display: -webkit-box;
@@ -548,7 +548,7 @@
 .ledger-route i {
   /* Department names are the point of this column: wrap them instead of cutting them off. */
   font-style: normal;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
@@ -559,7 +559,7 @@
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--c-cyan-40-9);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.15;
   text-decoration: none;
   white-space: normal;
@@ -574,7 +574,7 @@
   line-height: 1.25;
 }
 .ledger-user small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .ledger-open {
@@ -594,7 +594,7 @@
   color: var(--c-cyan-30-4);
 }
 .ledger-empty span {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .movement-modal-backdrop {
   position: fixed;
@@ -659,11 +659,11 @@
   color: var(--st-muted);
 }
 .movement-detail-grid span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .movement-detail-grid strong {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .movement-detail-grid .movement-patient {
   grid-column: 1/-1;
@@ -676,7 +676,7 @@
   border-top: 1px solid var(--c-gray-90);
   padding: 12px 24px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 @media (max-width: 900px) {
   .ledger-columns,
@@ -768,7 +768,7 @@
 .department-header p {
   margin: 0;
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .department-user-sign {
   display: grid;
@@ -787,11 +787,11 @@
   color: var(--c-cyan-45-10);
 }
 .department-user-sign span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .department-user-sign strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-25-4);
 }
 .department-kpis {
@@ -808,7 +808,7 @@
 }
 .department-kpis span {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .department-kpis strong {
@@ -857,11 +857,11 @@
   gap: 1px;
 }
 .department-category-tabs button strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-30-5);
 }
 .department-category-tabs button small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .department-category-tabs button b {
@@ -871,7 +871,7 @@
   place-items: center;
   border-radius: 999px;
   background: var(--c-gray-95);
-  font-size: 11px;
+  font-size: 12px;
 }
 .department-category-tabs button.active {
   border-color: var(--c-cyan-55-5);
@@ -911,7 +911,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-30-5);
 }
 .department-status-tabs {
@@ -926,7 +926,7 @@
   background: transparent;
   border-radius: 7px;
   padding: 7px 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--st-muted);
   cursor: pointer;
@@ -979,10 +979,10 @@
   min-width: 0;
 }
 .department-asset-identity .mono {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .department-asset-identity strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-25-2);
   white-space: nowrap;
   overflow: hidden;
@@ -991,7 +991,7 @@
 .department-asset-identity small,
 .department-asset-state small,
 .department-asset-uses small {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--st-muted);
 }
 .department-asset-state,
@@ -1016,11 +1016,11 @@
   margin: 0 auto 8px;
 }
 .department-empty strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-40-5);
 }
 .department-empty span {
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 3px;
 }
 .department-send-modal {
@@ -1063,11 +1063,11 @@
   gap: 2px;
 }
 .department-send-route span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .department-send-route strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-30-5);
 }
 .department-send-route svg {
@@ -1077,7 +1077,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 750;
   color: var(--c-cyan-45-4);
 }
@@ -1106,15 +1106,15 @@
   flex-direction: column;
 }
 .department-signature-card span {
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .department-signature-card strong {
-  font-size: 11px;
+  font-size: 12px;
 }
 .department-signature-card small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 @media (max-width: 1180px) {
@@ -1214,7 +1214,7 @@
 }
 .department-asset-state .badge {
   max-width: 100%;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.2;
   white-space: normal;
   text-align: left;
@@ -1226,7 +1226,7 @@
   gap: 5px;
 }
 .department-asset-uses strong {
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .department-asset-row.last-opened {
@@ -1268,7 +1268,7 @@
   border-bottom: 1px solid var(--c-gray-95);
 }
 .notification-popover > header strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-25-2);
 }
 .notification-popover > header button {
@@ -1313,20 +1313,20 @@
   min-width: 0;
 }
 .notification-item strong {
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--c-cyan-25-2);
 }
 .notification-item small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .notification-empty {
   padding: 18px 14px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
 }
 @media (max-width: 1180px) {
@@ -1537,7 +1537,7 @@
 .studio-panel-head p {
   margin: 0;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   max-width: 700px;
 }
 .studio-search {
@@ -1617,7 +1617,7 @@
   color: var(--st-muted);
   cursor: pointer;
   font-weight: 700;
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-access-toggle > span {
   width: 28px;
@@ -1699,7 +1699,7 @@
 .studio-system-grid label {
   display: grid;
   gap: 5px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   margin: 12px 0;
 }
@@ -1878,7 +1878,7 @@
   margin: 0;
   max-width: 760px;
   color: var(--c-cyan-55-3);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.45;
 }
 .studio-workflow-profile {
@@ -1891,7 +1891,7 @@
 .studio-workflow-profile small {
   grid-column: 1/3;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-workflow-profile input {
   min-width: 0;
@@ -1899,7 +1899,7 @@
   border-radius: 9px;
   padding: 9px 10px;
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-30-5);
 }
 .studio-workflow-profile span {
@@ -1907,7 +1907,7 @@
   color: var(--c-cyan-45);
   border-radius: 999px;
   padding: 5px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
 }
 .studio-workflow-policy {
@@ -1925,10 +1925,10 @@
   gap: 2px;
 }
 .studio-workflow-policy strong {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .studio-workflow-policy span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   line-height: 1.4;
 }
@@ -1963,7 +1963,7 @@
   color: var(--c-cyan-45-3);
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 850;
 }
 .studio-workflow-stage.disabled .workflow-stage-index {
@@ -1986,7 +1986,7 @@
   color: var(--st-muted);
 }
 .workflow-core-chip {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   background: var(--c-gray-95-4);
   color: var(--c-green-50-3);
@@ -2017,7 +2017,7 @@
   align-items: center;
   gap: 7px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-45-2);
 }
 .workflow-stage-toggle input {
@@ -2070,13 +2070,13 @@
   min-width: 0;
 }
 .studio-workflow-footer strong {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .studio-workflow-footer span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-30-5);
   white-space: nowrap;
   overflow: hidden;
@@ -2126,11 +2126,11 @@
   gap: 2px;
 }
 .studio-release-policy > header strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-30-4);
 }
 .studio-release-policy > header span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .studio-release-policy-grid {
@@ -2160,11 +2160,11 @@
   flex: 1;
 }
 .studio-release-policy-grid b {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-30-4);
 }
 .studio-release-policy-grid small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   line-height: 1.35;
 }
@@ -2173,7 +2173,7 @@
   background: var(--c-white);
   border-radius: 8px;
   padding: 7px 8px;
-  font-size: 11px;
+  font-size: 12px;
   max-width: 150px;
 }
 @media (max-width: 1000px) {
@@ -2261,7 +2261,7 @@
 .department-send-note {
   display: grid;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-45-4);
 }
 .department-send-note > span {
@@ -2273,11 +2273,11 @@
   color: var(--c-cyan-50-3);
 }
 .department-send-note strong {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-30);
 }
 .department-send-note small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   font-weight: 500;
 }
@@ -2315,7 +2315,7 @@
   --studio-accent: var(--c-cyan-45);
 }
 .studio-workspace .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.2;
   font-weight: 750;
   letter-spacing: 0.09em;
@@ -2329,16 +2329,16 @@
   color: var(--studio-ink);
 }
 .studio-head p {
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
   font-weight: 400;
 }
 .studio-health strong {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 680;
 }
 .studio-health span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-tabs {
   gap: 4px;
@@ -2353,7 +2353,7 @@
   min-height: 38px;
   gap: 6px;
   padding: 8px 9px !important;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1;
   font-weight: 620;
 }
@@ -2372,7 +2372,7 @@
 }
 .studio-panel-head p,
 .studio-workflow-hero p {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.45;
 }
 .studio-manager {
@@ -2385,7 +2385,7 @@
   padding: 9px !important;
 }
 .studio-manager-nav button b {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 640;
   color: var(--studio-text);
 }
@@ -2393,7 +2393,7 @@
   color: var(--studio-accent);
 }
 .studio-manager-nav button small {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-panel-head {
   padding: 14px 16px 11px;
@@ -2404,7 +2404,7 @@
   padding: 8px 10px;
 }
 .studio-search input {
-  font-size: 12px !important;
+  font-size: 12.5px !important;
   color: var(--studio-text);
 }
 .studio-search input::placeholder {
@@ -2412,7 +2412,7 @@
 }
 .studio-list-head {
   padding: 7px 16px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 680;
   letter-spacing: 0.055em;
 }
@@ -2422,17 +2422,17 @@
 .studio-list-row {
   min-height: 48px;
   padding: 9px 3px;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .studio-list-row strong {
   font-weight: 620;
   color: var(--studio-ink);
 }
 .studio-list-row > span {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-list-row code {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-list-row button {
   width: 30px;
@@ -2441,7 +2441,7 @@
 }
 .studio-access-toggle,
 .role-chip {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 620;
 }
 .studio-system-grid h3 {
@@ -2450,35 +2450,35 @@
   color: var(--studio-ink) !important;
 }
 .studio-system-grid p {
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 .studio-check-row {
-  font-size: 11.5px !important;
+  font-size: 12px !important;
 }
 .workflow-stage-main strong {
-  font-size: 12px !important;
+  font-size: 12.5px !important;
   font-weight: 650 !important;
 }
 .workflow-stage-main p {
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 .workflow-check-preview span {
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 .studio-drawer h2 {
   font-size: 19px;
   font-weight: 680;
 }
 .studio-drawer-form label {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 620;
 }
 .studio-drawer-form input,
 .studio-drawer-form select {
-  font-size: 11.5px !important;
+  font-size: 12px !important;
 }
 .studio-form-note {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-workspace .app-button,
 .studio-workspace button.primary,
@@ -2523,12 +2523,12 @@
   margin-bottom: 2px;
 }
 .studio-role-selector-head > strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-30-5);
   font-weight: 680;
 }
 .studio-role-selector-head > small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   line-height: 1.4;
 }
@@ -2566,11 +2566,11 @@
   min-width: 0;
 }
 .studio-role-selector > button b {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 660;
 }
 .studio-role-selector > button small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 
@@ -2602,7 +2602,7 @@
   font-weight: 680;
 }
 .studio-role-permission-head p {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   margin: 0;
   max-width: 720px;
@@ -2624,13 +2624,13 @@
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-50);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 650;
 }
 .studio-role-head-actions .app-button {
   min-height: 36px !important;
   padding: 0 10px !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 
 .studio-role-security-banner {
@@ -2654,10 +2654,10 @@
   gap: 2px;
 }
 .studio-role-security-banner strong {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-role-security-banner span {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--c-cyan-55-3);
 }
@@ -2682,7 +2682,7 @@
   gap: 10px;
 }
 .studio-permission-group > header strong {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-35-2);
   font-weight: 680;
 }
@@ -2694,7 +2694,7 @@
   background: var(--c-gray-95-3);
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 12px;
   color: #47717f;
   font-weight: 700;
 }
@@ -2757,12 +2757,12 @@
   min-width: 0;
 }
 .studio-permission-copy b {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-30-4);
   font-weight: 650;
 }
 .studio-permission-copy small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   line-height: 1.35;
 }
@@ -2775,7 +2775,7 @@
   border-radius: 7px;
   background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 650;
   white-space: nowrap;
 }
@@ -2797,11 +2797,11 @@
   gap: 7px;
 }
 .studio-role-audit > header strong {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-35-2);
 }
 .studio-role-audit > header small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .studio-role-audit-row {
@@ -2810,22 +2810,22 @@
   gap: 10px;
   align-items: center;
   min-height: 25px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   border-top: 1px solid var(--c-gray-95);
 }
 .studio-role-audit-row strong {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-35-2);
   font-weight: 620;
 }
 .studio-role-audit-row small {
-  font-size: 11px;
+  font-size: 12px;
 }
 .studio-role-audit-empty {
   padding: 8px 0 2px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 @media (max-width: 1050px) {
@@ -2893,7 +2893,7 @@
   color: var(--c-cyan-45-10);
 }
 .studio-admin-access-summary > div span {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--muted);
 }
 .studio-admin-access-summary > section {
@@ -2910,7 +2910,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: #267356;
 }
 .studio-setting-input {
@@ -2933,14 +2933,14 @@
 .studio-setting-input span {
   padding: 0 12px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 12.5px;
   white-space: nowrap;
 }
 .studio-system-grid label > small {
   display: block;
   margin-top: 5px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 @media (max-width: 900px) {
   .studio-admin-access-summary {
@@ -2973,7 +2973,7 @@
   gap: 10px;
 }
 .platform-kpis span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .platform-kpis strong {
@@ -3034,11 +3034,11 @@
 }
 .platform-private-demo strong {
   color: var(--c-cyan-30-5);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .platform-private-demo small {
   color: var(--c-cyan-60-2);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
 }
 .platform-private-demo-actions {
@@ -3053,7 +3053,7 @@
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-40-4);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3102,7 +3102,7 @@
   background: transparent;
   color: var(--c-blue-45-3);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3119,7 +3119,7 @@
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--c-cyan-35-9);
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
 }
 .platform-hospitals {
@@ -3172,7 +3172,7 @@
 }
 .platform-hospital-name small {
   color: var(--c-cyan-55);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .platform-hospital-badges {
   display: flex;
@@ -3189,7 +3189,7 @@
   gap: 5px;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
 }
 .platform-status::before {
@@ -3228,7 +3228,7 @@
   background: var(--c-gray-100-2);
   color: var(--c-cyan-35);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -3241,7 +3241,7 @@
   align-items: center;
   gap: 7px;
   color: var(--c-cyan-45-4);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .platform-private-demo-actions select {
@@ -3252,7 +3252,7 @@
   background: var(--c-white);
   color: var(--c-cyan-30-5);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .platform-private-demo-actions button.platform-demo-reset {
   display: inline-flex;
@@ -3291,7 +3291,7 @@
   background: var(--c-gray-95-9);
   border-bottom: 1px solid var(--c-violet-85-2);
   color: var(--c-violet-25);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .demo-bar.ending {
   background: var(--c-amber-95-2);
@@ -3306,7 +3306,7 @@
   border-radius: 999px;
   background: var(--c-violet-30);
   color: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -3334,7 +3334,7 @@
   padding: 0 6px;
   border-radius: 999px;
   background: var(--c-violet-95);
-  font-size: 11px;
+  font-size: 12px;
 }
 .demo-guide {
   position: fixed;
@@ -3366,7 +3366,7 @@
 }
 .demo-guide header small {
   color: var(--c-violet-45);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .demo-guide header button {
   border: 0;
@@ -3408,11 +3408,11 @@
 }
 .demo-guide li b {
   color: var(--c-violet-20);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .demo-guide li small {
   color: var(--c-violet-45);
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.4;
 }
 .demo-guide li.done {
@@ -3432,7 +3432,7 @@
   background: var(--c-white);
   color: var(--c-violet-25);
   font: inherit;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -3547,7 +3547,7 @@
   display: grid;
   gap: 5px;
   color: var(--c-violet-30-2);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
 }
 .demo-dialog input,
@@ -3561,7 +3561,7 @@
 .demo-dialog-intro {
   margin: 0;
   color: var(--c-violet-45);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .demo-dialog-row {
   display: flex;
@@ -3569,14 +3569,14 @@
   justify-content: space-between;
   gap: 10px;
   color: var(--c-violet-30-2);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 .demo-dialog-nps {
   display: grid;
   gap: 6px;
   color: var(--c-violet-30-2);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 .demo-dialog-nps > div {
@@ -3644,7 +3644,7 @@
 .demo-dialog-error {
   margin: 0;
   color: var(--c-red-40);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .cloud-gate.trial-locked button.primary {
   border-color: var(--c-violet-30);
@@ -3669,11 +3669,11 @@
   gap: 2px;
 }
 .people-demo-seats b {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .people-demo-seats small {
   color: var(--c-violet-45);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .people-demo-seats.full {
   border-color: var(--c-red-85-3);
@@ -3709,7 +3709,7 @@
 }
 .platform-evaluation-demos small {
   color: var(--c-violet-45);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
 }
 .evaluation-demo-counts {
@@ -3723,7 +3723,7 @@
   gap: 4px;
   padding: 3px 9px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   background: var(--c-gray-95);
@@ -3752,7 +3752,7 @@
   gap: 8px;
   padding: 8px 11px;
   border-radius: 9px;
-  font-size: 12px;
+  font-size: 12.5px;
   background: var(--c-gray-100-3);
   color: var(--c-green-40);
 }
@@ -3777,7 +3777,7 @@
   border-radius: 8px;
   background: var(--c-white);
   color: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3790,7 +3790,7 @@
 .evaluation-demo-busy {
   margin: 0;
   color: var(--c-violet-45);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .evaluation-demo-busy {
   font-weight: 700;
@@ -3824,7 +3824,7 @@
 }
 .evaluation-demo-main strong {
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .evaluation-demo-main small {
   overflow-wrap: anywhere;
@@ -3844,7 +3844,7 @@
 }
 .evaluation-demo-facts dt {
   color: var(--c-violet-45);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -3852,7 +3852,7 @@
 .evaluation-demo-facts dd {
   margin: 0;
   color: var(--c-blue-15);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .evaluation-demo-facts em {
@@ -3877,7 +3877,7 @@
   border-radius: 8px;
   background: var(--c-white);
   color: var(--c-violet-25);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3914,7 +3914,7 @@
   border-radius: 8px;
   background: var(--c-gray-95-6);
   list-style: none;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .evaluation-demo-colleagues li {
   display: grid;
@@ -3951,7 +3951,7 @@
   grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   color: var(--c-blue-40);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .auth-name-row .auth-input input {
@@ -3968,7 +3968,7 @@
 }
 .join-username span {
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3981,7 +3981,7 @@
 .auth-hint {
   margin-top: -6px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.4;
 }
 .auth-input select {
@@ -3993,7 +3993,7 @@
   background: transparent;
   padding: 0 9px;
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 a.auth-primary {
   display: inline-flex;
@@ -4022,7 +4022,7 @@ a.auth-primary {
   gap: 6px 14px;
   margin: 4px 0 16px;
   text-align: left;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .pending-access-details dt {
   color: var(--st-muted);
@@ -4039,7 +4039,7 @@ a.auth-primary {
   border-radius: 999px;
   background: #d92d20;
   color: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 800;
   text-align: center;
@@ -4055,7 +4055,7 @@ a.auth-primary {
   gap: 12px;
   padding: 10px 14px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 .hospital-notice.ok {
@@ -4105,7 +4105,7 @@ a.auth-primary {
   display: block;
   margin-top: 3px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.4;
 }
 .hospital-count {
@@ -4120,7 +4120,7 @@ a.auth-primary {
 .hospital-empty {
   margin: 0;
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .hospital-request {
   display: grid;
@@ -4142,7 +4142,7 @@ a.auth-primary {
 .hospital-request label,
 .hospital-department-add,
 .hospital-row {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--c-blue-40);
 }
@@ -4159,7 +4159,7 @@ a.auth-primary {
   background: var(--c-white);
   padding: 0 9px;
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .hospital-request-actions {
   grid-column: 1 / -1;
@@ -4185,7 +4185,7 @@ a.auth-primary {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .hospital-link-expiry {
   color: var(--c-cyan-50-2);
@@ -4226,11 +4226,11 @@ a.auth-primary {
 }
 .hospital-row b {
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .hospital-row small {
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .hospital-row > button:not(.studio-access-toggle) {
@@ -4260,7 +4260,7 @@ a.auth-primary {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .department-lives-card ul {
   list-style: none;
@@ -4276,14 +4276,14 @@ a.auth-primary {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 2px 10px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .department-lives-card li b {
   font-variant-numeric: tabular-nums;
 }
 .department-lives-card li small {
   grid-column: 1 / -1;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--c-red-40-2);
 }
@@ -4295,7 +4295,7 @@ a.auth-primary {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #5b3d0c;
 }
@@ -4314,7 +4314,7 @@ a.auth-primary {
   color: var(--c-red-30);
   border-radius: 7px;
   padding: 5px 9px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -4351,7 +4351,7 @@ a.auth-primary {
   border-bottom: 2px solid transparent;
   background: transparent;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--c-cyan-45-2);
   cursor: pointer;
@@ -4366,7 +4366,7 @@ a.auth-primary {
   align-items: center;
   gap: 6px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .hospital-member-status > i {
@@ -4394,12 +4394,12 @@ a.auth-primary {
   border-radius: 10px;
 }
 .label-settings-summary dt {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .label-settings-summary dd {
   margin: 3px 0 0;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--c-blue-20);
 }
@@ -4426,7 +4426,7 @@ a.auth-primary {
   padding: 8px 13px 6px;
   background: var(--c-gray-100-2);
   border-bottom: 1px solid var(--c-gray-95);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -4438,7 +4438,7 @@ a.auth-primary {
   border: 0;
   background: var(--c-white);
   font: inherit;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--c-cyan-40);
   cursor: pointer;
@@ -4494,12 +4494,12 @@ a.auth-primary {
   padding: 10px 12px;
   border-radius: 8px;
   background: var(--c-gray-95-6);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-violet-30-2);
 }
 .evaluation-demo-feedback h4 {
   margin: 0 0 4px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-blue-15);
 }
@@ -4593,7 +4593,7 @@ a.auth-primary {
   border-radius: 8px;
   background: var(--c-gray-95-6);
   overflow: hidden;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-violet-30-2);
 }
 .evaluation-demo-funnel li b {
@@ -4609,7 +4609,7 @@ a.auth-primary {
 }
 .evaluation-demo-funnel p {
   margin: 0;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-violet-30-2);
 }
 .evaluation-demo-keep {
@@ -4648,7 +4648,7 @@ a.auth-primary {
   padding: 0;
   list-style: none;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .auth-password-rules li {
   display: inline-flex;
@@ -4706,7 +4706,7 @@ html body .report-cell-warn {
 .step-rating-card p {
   margin: 0;
   color: var(--c-violet-30-2);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .step-rating-card textarea {
   width: 100%;
@@ -4715,7 +4715,7 @@ html body .report-cell-warn {
   border: 1px solid var(--c-violet-85-2);
   border-radius: 9px;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .step-rating-card footer {
   display: flex;
@@ -4732,7 +4732,7 @@ html body .report-cell-warn {
   background: var(--c-white);
   color: var(--c-violet-20);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
 }

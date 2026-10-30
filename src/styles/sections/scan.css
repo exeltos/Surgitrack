@@ -31,7 +31,7 @@ html body .scan-head .mono {
 }
 html body .scan-head p {
   margin: 3px 0 0;
-  font-size: 13.5px;
+  font-size: 14px;
   opacity: 0.82;
 }
 html body .scan-head-row {
@@ -40,7 +40,7 @@ html body .scan-head-row {
   align-items: center;
   gap: 10px;
   min-height: 32px;
-  font-size: 13px;
+  font-size: 13.5px;
   opacity: 0.9;
 }
 html body .scan-back {
@@ -131,7 +131,7 @@ html body .scan-demo-bar {
   padding: 8px 16px;
   background: #5b3fd1;
   color: #fff;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .scan-demo-chip {
   display: inline-flex;
@@ -197,7 +197,7 @@ html body .scan-station small {
   display: block;
   margin-top: 2px;
   color: #627887;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .scan-station > svg {
   color: #9aabb7;
@@ -295,7 +295,7 @@ html body .scan-camera-error {
   border-radius: 12px;
   background: rgba(17, 24, 29, 0.85);
   color: #fff;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 html body .scan-camera-feedback {
   position: absolute;
@@ -397,7 +397,7 @@ html body .scan-camera-type button:disabled {
 html body .scan-camera-hint {
   margin: 0;
   color: #627887;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 /* Lists: a search box above the list. */
@@ -463,7 +463,7 @@ html body .scan-form-lines li.issue {
 }
 html body .scan-form-num {
   color: #9aabb7;
-  font-size: 13px;
+  font-size: 13.5px;
   text-align: right;
 }
 html body .scan-form-name b {
@@ -474,14 +474,14 @@ html body .scan-form-name b {
 html body .scan-form-name small {
   display: block;
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .scan-form-name em {
   display: inline-block;
   margin: 4px 6px 0 0;
   padding: 1px 7px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-style: normal;
   font-weight: 800;
 }
@@ -500,7 +500,7 @@ html body .scan-form-qty {
 }
 html body .scan-form-qty small {
   color: #627887;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 html body .scan-form-lines li.missing .scan-form-qty {
@@ -558,7 +558,7 @@ html body .scan-items small {
   display: block;
   margin-top: 2px;
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .scan-item-remove {
   display: grid;
@@ -578,7 +578,7 @@ html body .scan-refused li {
   border-radius: 12px;
   background: #fff4f3;
   color: #912018;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 html body .scan-empty {
   margin: 4px 0;
@@ -598,7 +598,7 @@ html body .scan-section span {
   border-radius: 999px;
   background: #e3eaf0;
   color: #475467;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 /* Confirming a round: what, from or to whom, the signature and the note. */
@@ -654,7 +654,7 @@ html body .scan-field {
   flex-direction: column;
   gap: 6px;
   color: #475467;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 html body .scan-field input,
@@ -724,7 +724,7 @@ html body .scan-verdict {
   border-radius: 12px;
   background: #fff6e7;
   color: #8a5a10;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 html body .scan-verdict.ok {
   background: #e8f6ee;
@@ -766,7 +766,7 @@ html body .scan-loads b {
 html body .scan-loads small {
   display: block;
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .scan-loads li > button > svg:first-child {
   color: #12a150;
@@ -803,7 +803,7 @@ html body .scan-lookup > header {
 html body .scan-lookup > header small {
   display: block;
   color: #627887;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .scan-lookup > header b {
   display: block;
@@ -831,7 +831,7 @@ html body .scan-moves small {
   align-items: center;
   gap: 4px;
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 /* The day's report (admin and supervisor). */
@@ -849,7 +849,7 @@ html body .scan-report-kpis div {
 }
 html body .scan-report-kpis dt {
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .scan-report-kpis dd {
   margin: 2px 0 0;
@@ -1015,7 +1015,7 @@ html body .scan-checks label > span {
 }
 html body .scan-checks label small {
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
 }
 html body .scan-photos ul {
@@ -1092,7 +1092,7 @@ html body .scan-tile small {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.35;
 }
 html body .scan-tile.send .scan-station-icon {
@@ -1172,7 +1172,7 @@ html body .scan-tabs a {
   padding: 4px 0;
   border-radius: 14px;
   color: #627887;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
 }
@@ -1306,7 +1306,7 @@ html body .scan-demo-waiting .scan-section span {
 html body .scan-demo-waiting p {
   margin: 0;
   color: #6b5aa8;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .scan-demo-waiting ul {
   display: flex;
@@ -1344,7 +1344,7 @@ html body .scan-demo-waiting b {
 }
 html body .scan-demo-waiting small {
   color: #627887;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .scan-demo-waiting li button > svg:last-child {
   color: #5b3fd1;
@@ -1352,5 +1352,5 @@ html body .scan-demo-waiting li button > svg:last-child {
 html body .scan-hint {
   margin: 0;
   color: #627887;
-  font-size: 13px;
+  font-size: 13.5px;
 }
