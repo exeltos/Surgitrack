@@ -293,7 +293,6 @@ export default function SetDetailPage() {
           markerTapes={set.colorTapes}
           onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
           canEditUsage={can('asset.usage.configure')}
-          onCorrectUses={can('asset.usage.configure') ? delta => correctUses('SET', set.id, delta) : undefined}
         />
         <section className="asset-workbench-main">
           <AssetTabs
@@ -317,6 +316,7 @@ export default function SetDetailPage() {
                   <UsageLimitCard
                     uses={uses}
                     maxUses={set.maxUses}
+                    fresh={!uses && history.length === 0}
                     onCorrect={can('asset.usage.configure') ? delta => correctUses('SET', set.id, delta) : undefined}
                     description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />

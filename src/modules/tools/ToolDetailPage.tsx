@@ -279,11 +279,6 @@ export default function ToolDetailPage() {
           }
           onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
           canEditUsage={can('asset.usage.configure')}
-          onCorrectUses={
-            can('asset.usage.configure') && tool.state !== 'RETIRED'
-              ? delta => correctUses('TOOL', tool.id, delta)
-              : undefined
-          }
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />
@@ -366,6 +361,7 @@ export default function ToolDetailPage() {
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
+                    fresh={!tool.uses && history.length === 0 && setHistory.length === 0}
                     onCorrect={
                       can('asset.usage.configure') && tool.state !== 'RETIRED'
                         ? delta => correctUses('TOOL', tool.id, delta)
