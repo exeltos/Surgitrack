@@ -42,6 +42,7 @@ import {ToolReportModal} from './ToolDialogs';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {movementText} from '../../core/movementText';
+import {isFreshOnPage} from '../../core/freshAsset';
 
 export default function ToolDetailPage() {
   const {
@@ -361,7 +362,7 @@ export default function ToolDetailPage() {
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
-                    fresh={!tool.uses && history.length === 0 && setHistory.length === 0}
+                    fresh={isFreshOnPage(tool, movements, tool.mode === 'SET_MEMBER' ? set : undefined)}
                     onCorrect={
                       can('asset.usage.configure') && tool.state !== 'RETIRED'
                         ? delta => correctUses('TOOL', tool.id, delta)

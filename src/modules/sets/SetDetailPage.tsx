@@ -46,6 +46,7 @@ import {formatDateTime} from '../../core/displayDate';
 import SetContents from './SetContents';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {movementText} from '../../core/movementText';
+import {isFreshOnPage} from '../../core/freshAsset';
 
 export default function SetDetailPage() {
   const {
@@ -316,7 +317,7 @@ export default function SetDetailPage() {
                   <UsageLimitCard
                     uses={uses}
                     maxUses={set.maxUses}
-                    fresh={!uses && history.length === 0}
+                    fresh={isFreshOnPage({...set, uses}, movements)}
                     onCorrect={can('asset.usage.configure') ? delta => correctUses('SET', set.id, delta) : undefined}
                     description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />

@@ -152,7 +152,8 @@ export function buildReport(
           department: s.department,
           uses: s.uses || 0,
           maxUses: s.maxUses || 0,
-          carrier: undefined as string | undefined,
+          carrier: undefined as {barcode: string; legacyBarcodes?: string[]} | undefined,
+          legacyBarcodes: s.legacyBarcodes,
         })),
       ...tools
         .filter(t => t.maxUses)
@@ -164,14 +165,15 @@ export function buildReport(
           uses: t.uses,
           maxUses: t.maxUses || 0,
           // A member instrument travels inside its Set: the Set's moves are its history too.
-          carrier: t.mode === 'SET_MEMBER' ? sets.find(s => s.id === t.setId)?.barcode : undefined,
+          carrier: t.mode === 'SET_MEMBER' ? sets.find(s => s.id === t.setId) : undefined,
+          legacyBarcodes: t.legacyBarcodes,
         })),
     ]
       .map(a => ({
         ...a,
         remaining: Math.max(0, a.maxUses - a.uses),
         stateLabel: 'Σε χρήση',
-        fresh: isFresh(a, history) && !(a.carrier && history.has(a.carrier.toUpperCase())) ? 'Ναι' : '—',
+        fresh: isFresh(a, history, a.carrier) ? 'Ναι' : '—',
         retiredAt: '',
         reason: '',
       }))
