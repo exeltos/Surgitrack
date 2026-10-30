@@ -1,3 +1,4 @@
+import {printLogoHtml} from '../../core/printBranding';
 import type {ProcessLoadRecord} from '../../types/domain';
 import {tr, trData} from '../../i18n';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
@@ -72,7 +73,7 @@ export function releaseFormBody({
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : printLogoHtml() || '<div class="brand">SurgiTrack</div>';
   const meta = [
     [tr('Τύπος φορτίου'), loadType || '—'],
     [tr('Κλίβανος'), trData(load.equipment)],

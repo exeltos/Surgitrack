@@ -1,3 +1,4 @@
+import {printLogoHtml} from '../../core/printBranding';
 import type {AssetKind, SetAsset, Tool} from '../../types/domain';
 import {escapeHtml} from '../../core/escapeHtml';
 import {getI18nLang, tr, trData} from '../../i18n';
@@ -365,7 +366,7 @@ function compositionBody(
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : printLogoHtml() || '<div class="brand">SurgiTrack</div>';
   const marker = markerChips(options.marker);
   const meta =
     [

@@ -3,6 +3,7 @@ import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
+import HospitalLogoCard from '../HospitalLogoCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
@@ -157,6 +158,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </div>
             </label>
           </section>
+          <HospitalLogoCard L={L} />
           <LabelSettingsCard L={L} />
           <section>
             <header>
