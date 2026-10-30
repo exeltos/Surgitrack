@@ -5,11 +5,14 @@ export default function UsageLimitCard({
   uses,
   maxUses,
   description,
+  fresh,
   onCorrect,
 }: {
   uses: number;
   maxUses?: number;
   description: string;
+  /** No use counted and no movement in the history: new, or never used since registered. */
+  fresh?: boolean;
   /** Usage-limit managers only: corrects the recorded uses by one (a use counted by mistake, or missed). */
   onCorrect?: (delta: 1 | -1) => void;
 }) {
@@ -25,6 +28,11 @@ export default function UsageLimitCard({
           <span>{description}</span>
         </div>
         <span className="usage-type-badge">{maxUses ? tr('Περιορισμένων χρήσεων') : tr('Χωρίς όριο')}</span>
+        {maxUses !== undefined && fresh && (
+          <span className="usage-fresh-badge" title={tr('Καμία χρήση και καμία κίνηση στο ιστορικό ακόμα.')}>
+            {tr('Καινούργιο')}
+          </span>
+        )}
       </div>
       {maxUses !== undefined && (
         <>

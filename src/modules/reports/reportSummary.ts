@@ -46,6 +46,7 @@ export function reportSummary(active: ReportId, rows: Row[], warningThreshold: n
         tone: 'warn',
         test: r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold,
       },
+      {label: tr('Καινούργια'), value: count(rows, r => r.fresh === 'Ναι'), test: r => r.fresh === 'Ναι'},
       {
         label: tr('Εκτός χρήσης'),
         value: count(rows, r => r.stateLabel === 'Εκτός χρήσης'),

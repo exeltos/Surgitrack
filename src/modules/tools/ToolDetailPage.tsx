@@ -42,6 +42,7 @@ import {ToolReportModal} from './ToolDialogs';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {movementText} from '../../core/movementText';
+import {isFreshOnPage} from '../../core/freshAsset';
 
 export default function ToolDetailPage() {
   const {
@@ -279,11 +280,6 @@ export default function ToolDetailPage() {
           }
           onEditMarker={can('asset.edit') && !workflowLocked ? () => setMarkerOpen(true) : undefined}
           canEditUsage={can('asset.usage.configure')}
-          onCorrectUses={
-            can('asset.usage.configure') && tool.state !== 'RETIRED'
-              ? delta => correctUses('TOOL', tool.id, delta)
-              : undefined
-          }
         />
         <section className="asset-workbench-main">
           <AssetTabs value={tab} onChange={setTab} issueCount={toolIssues.length} className="asset-detail-tabs" />
@@ -366,6 +362,7 @@ export default function ToolDetailPage() {
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
+                    fresh={isFreshOnPage(tool, movements, tool.mode === 'SET_MEMBER' ? set : undefined)}
                     onCorrect={
                       can('asset.usage.configure') && tool.state !== 'RETIRED'
                         ? delta => correctUses('TOOL', tool.id, delta)

@@ -2211,4 +2211,7 @@ export const en: Record<string, string> = {
   'Κλείσιμο λίστας': 'Close the list',
   'Το κουμπί «Οδηγός οθόνης» με σύντομες οδηγίες για κάθε οθόνη. Αλλάζει αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
     'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',
+  Καινούργιο: 'New',
+  Καινούργια: 'New',
+  'Καμία χρήση και καμία κίνηση στο ιστορικό ακόμα.': 'No use and no movement in the history yet.',
 };
