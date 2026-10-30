@@ -3426,21 +3426,6 @@ html body .issues-fixed th.col-actions {
   width: 290px;
 }
 /* Sets list: the name keeps its width next to the new expiry column. */
-html body .sets-registry th:nth-child(3) {
-  width: 132px;
-}
-html body .sets-registry th:nth-child(4) {
-  width: 158px;
-}
-html body .sets-registry th:nth-child(5) {
-  width: 78px;
-}
-html body .sets-registry th:nth-child(6) {
-  width: 158px;
-}
-html body .sets-registry th:nth-child(7) {
-  width: 104px;
-}
 /* Expiry page: names wrap to two lines instead of being cut; headers fit. */
 html body .expiry-table td:first-child .row-title-link {
   white-space: normal;
