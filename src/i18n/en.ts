@@ -2213,5 +2213,5 @@ export const en: Record<string, string> = {
     'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',
   Καινούργιο: 'New',
   Καινούργια: 'New',
-  'Καμία χρήση και καμία κίνηση στο ιστορικό ακόμα.': 'No use and no movement in the history yet.',
+  'Έχει όριο χρήσεων και καμία χρήση ακόμα.': 'Has a use limit and no use yet.',
 };

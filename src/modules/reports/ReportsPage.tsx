@@ -26,8 +26,7 @@ import {buildReport} from './buildReport';
 import {reportGroups as splitRows, reportSummary} from './reportSummary';
 
 export default function ReportsPage() {
-  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries, movements} =
-    useSurgi();
+  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   const [active, setActive] = useState<ReportId>('inventory');
   // The list opens when a card or a group is pressed: the report starts with its totals.
@@ -89,7 +88,6 @@ export default function ReportsPage() {
           sterilizationReleases,
           receipts,
           deliveries,
-          movements,
           warningThreshold,
         },
         {
@@ -129,7 +127,6 @@ export default function ReportsPage() {
       warningThreshold,
       receipts,
       deliveries,
-      movements,
       signature,
     ],
   );
