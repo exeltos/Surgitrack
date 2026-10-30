@@ -64,8 +64,11 @@ html body .settings-layout {
   gap: 16px;
   align-items: start;
 }
-html body .settings-main {
+html body .settings-main,
+html body .settings-main.studio-system-grid,
+html body .settings-main.studio-system-grid:has(> .platform-contact) {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   min-width: 0;
 }

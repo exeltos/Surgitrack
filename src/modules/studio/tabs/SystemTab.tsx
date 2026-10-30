@@ -15,7 +15,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
     <>
       {tab === 'SYSTEM' && (
         <div className="settings-layout">
-          <div className="settings-main">
+          <div className="settings-main studio-system-grid">
             {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
             <section>
               <header>
