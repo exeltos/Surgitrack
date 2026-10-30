@@ -260,3 +260,51 @@ html body .studio-list-row button.danger-icon:hover {
     margin: 0;
   }
 }
+
+/* Lists with number tiles on top (Sets, Tools, Issues, Expiry, Stock): the tiles take less height, so the list
+   starts higher. */
+html body .kpis {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+html body .kpis > *,
+html body .kpi-item,
+html body .tools-list-workspace .kpis > * {
+  padding: 8px 14px;
+}
+html body .kpis strong,
+html body .kpi-item strong,
+html body .tools-list-workspace .kpis strong {
+  margin-top: 0;
+  font-size: 21px;
+  line-height: 1.15;
+}
+/* Sets list: room for the specialty (long names no longer break inside a word). */
+html body .sets-registry th:nth-child(2) {
+  width: 104px;
+}
+html body .sets-registry th:nth-child(3) {
+  width: 17%;
+}
+html body .sets-registry th:nth-child(4) {
+  width: 15%;
+}
+html body .sets-registry th:nth-child(5) {
+  width: 84px;
+}
+html body .sets-registry th:nth-child(6) {
+  width: 150px;
+}
+html body .sets-registry th:nth-child(7) {
+  width: 104px;
+}
+
+/* The tiles of the list pages: label on the left, number on the right, in one low row. */
+html body .tools-list-workspace .kpis > .kpi-item {
+  display: flex !important;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0 !important;
+  padding: 10px 16px !important;
+}
