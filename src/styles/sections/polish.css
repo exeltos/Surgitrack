@@ -239,3 +239,24 @@ html body .studio-list-row button.danger-icon:hover {
   background: #fdecec;
   color: #a54545;
 }
+
+/* Users: a signup request fits on one line on a wide screen (who, role, department, note, then the buttons). */
+@media (min-width: 1200px) {
+  html body .hospital-people .hospital-request {
+    grid-template-columns: minmax(200px, 1.3fr) 190px 160px minmax(110px, 1fr) auto;
+    gap: 10px 12px;
+    align-items: end;
+    padding: 10px 14px;
+  }
+  html body .hospital-people .hospital-request .hospital-request-who {
+    grid-column: auto;
+    align-self: center;
+  }
+  html body .hospital-people .hospital-request .hospital-request-actions {
+    grid-column: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 0;
+  }
+}
