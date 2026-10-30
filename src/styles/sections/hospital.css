@@ -17,10 +17,6 @@
 .hospital-users-empty small {
   font-size: 12.5px;
 }
-.overview-links {
-  display: flex;
-  gap: 8px;
-}
 .overview-alert small {
   color: var(--c-amber-40-3);
 }
@@ -619,12 +615,12 @@
   white-space: nowrap;
 }
 .dash-list small {
-  display: block;
+  display: -webkit-box;
   overflow: hidden;
   color: var(--st-muted);
   font-size: 12.5px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 .dash-list .bad {
   color: var(--c-red-40-2);

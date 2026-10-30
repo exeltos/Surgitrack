@@ -138,12 +138,6 @@
   display: grid;
   gap: 16px;
 }
-.overview-links .app-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-}
 .overview-alert {
   display: flex;
   align-items: center;
@@ -2180,6 +2174,7 @@ div.asset-import-hospital b {
   color: var(--c-cyan-35);
   font-size: 12.5px;
   font-weight: 700;
+  white-space: nowrap;
 }
 .dash-bar-track {
   height: 14px;
