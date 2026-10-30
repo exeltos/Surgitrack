@@ -55,3 +55,147 @@ html body .hospital-request,
 html body .people-row {
   border-radius: 10px;
 }
+
+/* Settings: cards of fields in two columns on the left, a fixed note on the right (the layout of Limoxis Observer's
+   settings pages, in this app's colors). */
+html body .settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+html body .settings-main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+html body .settings-main > section {
+  padding: 18px 20px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+}
+html body .settings-main > section > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+html body .settings-main > section > header > svg {
+  flex: none;
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 7px;
+  border-radius: 9px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-35);
+}
+html body .settings-main > section > header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--c-cyan-20);
+}
+html body .settings-main > section > header p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--st-muted);
+}
+html body .settings-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+}
+html body .settings-fields > label {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--c-cyan-25);
+}
+html body .settings-fields > label > small {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--st-muted);
+}
+html body .settings-aside {
+  position: sticky;
+  top: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+}
+html body .settings-aside h3 {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .settings-aside h3:not(:first-child) {
+  margin-top: 18px;
+}
+html body .settings-aside ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .settings-aside li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--c-cyan-30);
+}
+html body .settings-aside li svg {
+  margin-top: 2px;
+  color: var(--c-cyan-35);
+}
+html body .settings-codes {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+html body .settings-codes > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+}
+html body .settings-codes dt {
+  color: var(--st-muted);
+}
+html body .settings-codes dd {
+  margin: 0;
+  color: var(--c-cyan-20);
+}
+html body .settings-codes dd span {
+  margin-left: 6px;
+  color: var(--st-muted);
+}
+@media (max-width: 1100px) {
+  html body .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .settings-aside {
+    position: static;
+  }
+}
+@media (max-width: 720px) {
+  html body .settings-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+html body .settings-aside > small {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--st-muted);
+}
