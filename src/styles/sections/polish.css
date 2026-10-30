@@ -1,0 +1,57 @@
+/* The look the screens share: one corner radius for cards and tiles, one light shadow, one weight for buttons.
+   Comes last of the sections so that each screen's own layout is kept and only the shared look changes. */
+:root {
+  --radius-card: 12px;
+  --shadow-card: 0 1px 2px rgba(23, 56, 74, 0.05);
+  --shadow-button: 0 1px 2px rgba(18, 88, 107, 0.2);
+}
+
+/* Cards and panels. */
+html body .panel,
+html body .table-panel,
+html body .trace-card,
+html body .dash-card,
+html body .reports-result-card,
+html body .label-settings-card,
+html body .reports-catalog,
+html body .reports-stage {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Tiles with a number (Overview, Sets, Tools, Issues, Expiry, Stock): the same size and corner everywhere. */
+html body .kpis > *,
+html body .kpi-item,
+html body .dash-kpi {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 12px 16px;
+}
+html body .kpis strong,
+html body .dash-kpi strong,
+html body .dash-kpi b {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+html body .kpis > .kpi-link:hover,
+html body .kpi-item:hover {
+  box-shadow: 0 2px 6px rgba(25, 57, 72, 0.08);
+}
+
+/* Primary buttons: the same teal, lighter shadow and weight; one corner radius. */
+html body .primary,
+html body .app-button-primary {
+  box-shadow: var(--shadow-button);
+  font-weight: 650;
+}
+html body .app-button,
+html body .primary {
+  border-radius: 9px;
+}
+
+/* Rows that open something: the same corner as the cards they sit in. */
+html body .reports-catalog-item,
+html body .hospital-request,
+html body .people-row {
+  border-radius: 10px;
+}
