@@ -66,7 +66,8 @@ jobs:
     name: Accessibility
     # Every route for the hospital admin and a department user, desktop and phone, checked with axe-core
     # (WCAG 2 A/AA) against a mocked Supabase; fails on any serious or critical finding.
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.56 cannot install its browser on what ubuntu-latest now is (Ubuntu 26.04).
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
@@ -99,8 +100,8 @@ jobs:
   e2e:
     name: End-to-end flow
     # The main flow through the real screens, two people in their own browsers (scripts/e2e/flow.mjs), against
-    # the mocked Supabase the Accessibility job uses.
-    runs-on: ubuntu-latest
+    # the mocked Supabase the Accessibility job uses. Pinned for the same reason.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
