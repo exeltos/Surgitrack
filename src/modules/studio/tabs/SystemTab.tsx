@@ -18,7 +18,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
     <>
       {tab === 'SYSTEM' && (
         <>
-          <div className="studio-roles-switch" role="group" aria-label={L('Ενότητα ρυθμίσεων', 'Settings section')}>
+          <div className="studio-part-tabs" role="tablist" aria-label={L('Ενότητα ρυθμίσεων', 'Settings section')}>
             {(
               [
                 ['GENERAL', L('Γενικά', 'General')],
@@ -29,7 +29,8 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               <button
                 key={id}
                 type="button"
-                aria-pressed={part === id}
+                role="tab"
+                aria-selected={part === id}
                 className={part === id ? 'active' : ''}
                 onClick={() => setPart(id)}
               >

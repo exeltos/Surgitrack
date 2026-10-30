@@ -56,20 +56,58 @@ html body .people-row {
   border-radius: 10px;
 }
 
-/* Settings: cards with a tinted icon, roomier fields and softer helper text. */
+/* Settings: tabs across the whole width, then one panel per theme with a row per setting
+   (name and explanation on the left, the control on the right). */
+html body .studio-part-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin: 0 0 18px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .studio-part-tabs button {
+  padding: 13px 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .studio-part-tabs button:hover {
+  background: #f3f8f9;
+  color: var(--c-cyan-30-2);
+}
+html body .studio-part-tabs button.active {
+  border-bottom-color: var(--c-cyan-35);
+  color: var(--c-cyan-30-2);
+  background: #eef6f7;
+}
+
+html body .studio-system-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-count: auto;
+  gap: 16px;
+}
 html body .studio-system-grid > section {
-  padding: 18px 20px 20px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   border: 1px solid var(--c-gray-90);
   border-radius: var(--radius-card);
   background: var(--c-white);
 }
 html body .studio-system-grid > section > header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--c-gray-95);
+  margin: 0;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--c-gray-90);
+  background: #f6fafb;
 }
 html body .studio-system-grid > section > header > svg {
   flex: none;
@@ -78,31 +116,52 @@ html body .studio-system-grid > section > header > svg {
   height: 18px;
   padding: 9px;
   border-radius: 10px;
-  background: #e6f2f4;
+  background: #e0eff2;
   color: var(--c-cyan-35);
 }
 html body .studio-system-grid > section > header h3 {
-  margin: 0 0 2px;
+  margin: 0;
   font-size: 15px;
   font-weight: 700;
   color: var(--c-cyan-20);
 }
 html body .studio-system-grid > section > header p {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 12.5px;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--st-muted);
 }
+/* A setting: name, then its explanation under it; the control on the right. */
 html body .studio-system-grid > section > label {
   display: grid;
-  gap: 6px;
-  margin-top: 16px;
-  font-size: 13px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 340px);
+  column-gap: 32px;
+  row-gap: 3px;
+  align-items: center;
+  margin: 0;
+  padding: 16px 20px;
+  border-top: 1px solid var(--c-gray-95);
+  font-size: 14px;
   font-weight: 700;
   color: var(--c-cyan-20);
 }
-html body .studio-system-grid > section > label:first-of-type {
-  margin-top: 0;
+html body .studio-system-grid > section > header + label {
+  border-top: 0;
+}
+html body .studio-system-grid > section > label > select,
+html body .studio-system-grid > section > label > .studio-setting-input,
+html body .studio-system-grid > section > label > .studio-static-field {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+html body .studio-system-grid > section > label > small {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--st-muted);
 }
 html body .studio-system-grid > section > label select,
 html body .studio-system-grid > section > label input:not([type='checkbox']) {
@@ -117,10 +176,29 @@ html body .studio-system-grid > section > label input:focus {
   outline: 2px solid rgba(29, 107, 122, 0.35);
   outline-offset: 1px;
 }
-html body .studio-system-grid > section > label > small {
-  margin-top: -2px;
-  font-size: 12.5px;
-  font-weight: 400;
-  line-height: 1.45;
-  color: var(--st-muted);
+/* The other cards (logo, label, security): their content sits inside the panel with the same margins. */
+html body .studio-system-grid > section > :not(header):not(label) {
+  margin: 16px 20px 0;
+}
+html body .studio-system-grid > section > :last-child:not(label) {
+  margin-bottom: 20px;
+}
+@media (max-width: 760px) {
+  html body .studio-system-grid > section > label {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .studio-system-grid > section > label > select,
+  html body .studio-system-grid > section > label > .studio-setting-input,
+  html body .studio-system-grid > section > label > .studio-static-field {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  html body .studio-system-grid > section > label > small {
+    grid-row: auto;
+  }
+}
+html body .studio-system-grid > section > label:not(:has(> small)) > select,
+html body .studio-system-grid > section > label:not(:has(> small)) > .studio-setting-input,
+html body .studio-system-grid > section > label:not(:has(> small)) > .studio-static-field {
+  grid-row: 1;
 }
