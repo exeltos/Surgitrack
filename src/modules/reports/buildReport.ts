@@ -1,7 +1,6 @@
 import type {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
-import {barcodesWithHistory, isFresh} from '../../core/freshAsset';
 import {
   LOAD_STATUS,
   indicatorText,
@@ -16,15 +15,7 @@ type Store = ReturnType<typeof useSurgi>;
 /** What the reports are built from. */
 export type ReportInput = Pick<
   Store,
-  | 'sets'
-  | 'tools'
-  | 'retiredTools'
-  | 'issues'
-  | 'processLoads'
-  | 'sterilizationReleases'
-  | 'receipts'
-  | 'deliveries'
-  | 'movements'
+  'sets' | 'tools' | 'retiredTools' | 'issues' | 'processLoads' | 'sterilizationReleases' | 'receipts' | 'deliveries'
 > & {warningThreshold: number};
 /** The chosen filters; 'ALL' is no filter. */
 export type ReportFilters = {
@@ -48,8 +39,7 @@ export function buildReport(
   input: ReportInput,
   filters: ReportFilters,
 ): {columns: Array<{key: string; label: string}>; rows: Row[]} {
-  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries, movements} =
-    input;
+  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = input;
   const {warningThreshold} = input;
   const {
     group,
@@ -141,7 +131,6 @@ export function buildReport(
   }
   if (active === 'usage') {
     // Limited-use Sets and instruments in service, then the instruments taken out of service.
-    const history = barcodesWithHistory(movements);
     const inService = [
       ...sets
         .filter(s => s.maxUses)
@@ -152,8 +141,6 @@ export function buildReport(
           department: s.department,
           uses: s.uses || 0,
           maxUses: s.maxUses || 0,
-          carrier: undefined as {barcode: string; legacyBarcodes?: string[]} | undefined,
-          legacyBarcodes: s.legacyBarcodes,
         })),
       ...tools
         .filter(t => t.maxUses)
@@ -164,16 +151,14 @@ export function buildReport(
           department: t.department || 'Απόθεμα',
           uses: t.uses,
           maxUses: t.maxUses || 0,
-          // A member instrument travels inside its Set: the Set's moves are its history too.
-          carrier: t.mode === 'SET_MEMBER' ? sets.find(s => s.id === t.setId) : undefined,
-          legacyBarcodes: t.legacyBarcodes,
         })),
     ]
       .map(a => ({
         ...a,
         remaining: Math.max(0, a.maxUses - a.uses),
         stateLabel: 'Σε χρήση',
-        fresh: isFresh(a, history, a.carrier) ? 'Ναι' : '—',
+        // A limited-use Set or instrument with no use counted: new.
+        fresh: a.uses ? '—' : 'Ναι',
         retiredAt: '',
         reason: '',
       }))
