@@ -327,3 +327,29 @@ html body .issues-fixed .issue-actions-row > a.issue-action:hover {
   background: var(--c-gray-100-2);
   color: var(--c-cyan-35);
 }
+
+/* Replacements: the same low tiles as the other lists, and room for the Set so its name does not break in three. */
+html body .replacements-kpis {
+  gap: 10px;
+}
+html body .replacements-kpis > * {
+  display: flex !important;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px !important;
+  padding: 10px 16px !important;
+}
+html body .replacements-kpis > * strong {
+  font-size: 21px !important;
+}
+@media (min-width: 1281px) {
+  html body .replacements-fixed th.col-set {
+    width: 18%;
+  }
+  html body .replacements-fixed th.col-reason {
+    width: 104px;
+  }
+  html body .replacements-fixed th.col-status {
+    width: 200px;
+  }
+}
