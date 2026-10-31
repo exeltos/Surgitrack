@@ -190,11 +190,6 @@ html body .trace-pick > small {
   }
 }
 
-/* Search | Uses with a patient code. */
-html body .trace-tabs {
-  flex: none;
-  margin-bottom: 12px;
-}
 /* Uses with a patient code: filters on one line, then the list. */
 html body .trace-patients {
   display: flex;

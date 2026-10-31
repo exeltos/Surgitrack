@@ -90,6 +90,7 @@ export const en: Record<string, string> = {
   'Barcode / Κωδικός': 'Barcode / Code',
   'Σαρώστε barcode': 'Scan a barcode',
   'Ιχνηλάτηση · {0}': 'Trace · {0}',
+  'Ασθενής · {0}': 'Patient · {0}',
   '{0} κινήσεις': '{0} movements',
   'Άνοιγμα καρτέλας': 'Open card',
   'Πώς επιλύθηκε (προαιρετικό)': 'How it was resolved (optional)',
@@ -2206,6 +2207,9 @@ export const en: Record<string, string> = {
   'Ανά είδος': 'By kind',
   'Ανά κλίβανο': 'By sterilizer',
   'Εμφάνιση όλων': 'Show all',
+  'Η πορεία ενός Σετ ή εργαλείου, βήμα βήμα': 'The journey of a Set or instrument, step by step',
+  'Υλικό ανά κωδικό ασθενούς': 'Material by patient code',
+  'Το αμετάβλητο ιστορικό όλου του νοσοκομείου': 'The unchangeable history of the whole hospital',
   'Το κουμπί «Οδηγός οθόνης» με σύντομες οδηγίες για κάθε οθόνη. Αλλάζει αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
     'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',
   Καινούργιο: 'New',

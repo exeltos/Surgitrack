@@ -516,7 +516,6 @@ html
   }
 }
 /* Traceability: the description under the title is not squeezed into two lines. */
-html body .trace-tabs ~ *,
 html body .page-head > div:first-child > p {
   max-width: none;
 }
@@ -615,4 +614,99 @@ html body .page-head > div:first-child > p {
   html body .reports-summary button {
     padding: 8px 14px;
   }
+}
+
+/* Traceability: the three ways to look are cards (like the reports), and every one ends in a list with its export
+   at the end of the search bar. */
+html body .trace-modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+html body .trace-mode {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+  box-shadow: var(--shadow-card);
+  color: var(--c-cyan-35-2);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+html body .trace-mode:hover {
+  border-color: var(--c-cyan-70);
+  box-shadow: 0 2px 8px rgba(25, 57, 72, 0.1);
+}
+html body .trace-mode strong,
+html body .trace-mode small {
+  display: block;
+}
+html body .trace-mode strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+html body .trace-mode strong b {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-orange-95, #fdf1d9);
+  color: var(--c-orange-45);
+  font-size: 12px;
+}
+html body .trace-mode small {
+  margin-top: 2px;
+  color: var(--st-muted);
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+html body .trace-mode-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-45-8);
+}
+html body .trace-mode.active {
+  border-color: var(--c-cyan-40);
+  background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
+  box-shadow:
+    0 0 0 1px var(--c-cyan-40),
+    var(--shadow-card);
+}
+html body .trace-mode.active .trace-mode-icon {
+  background: var(--c-cyan-40);
+  color: var(--c-white);
+}
+@media (max-width: 800px) {
+  html body .trace-modes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* A Set's own trail is a list like the others; its rows are not buttons. */
+html body .trace-ledger {
+  margin-top: 12px;
+}
+html body .ledger-row.static {
+  cursor: default;
+}
+html body .trace-search-bar > .primary {
+  white-space: nowrap;
+}
+/* One patient's page: back to the list on the left, the export on the right. */
+html body .trace-patient-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }

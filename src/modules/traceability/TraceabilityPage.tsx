@@ -1,8 +1,20 @@
 import {Fragment, useEffect, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-import {Search, Route, History, ExternalLink, Flame, UserRound, Users, ArrowLeft} from 'lucide-react';
+import {
+  Search,
+  Route,
+  History,
+  ExternalLink,
+  Flame,
+  UserRound,
+  Users,
+  ArrowLeft,
+  ChevronRight,
+  Clock3,
+} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import PatientUses from './PatientUses';
@@ -119,8 +131,6 @@ export default function TraceabilityPage() {
     return [...seen.entries()].slice(0, 8);
   })();
   const countHits = patient ? counts.filter(c => c.patientCode.toLowerCase() === patient.toLowerCase()) : [];
-  // One item's trail: its name is in the card above, so each step shows only what happened.
-  const singleAsset = !!asset;
   // The sterilization cycles an item went through: its own, or (an instrument in a Set) its Set's.
   const cyclesOf = (item: SetAsset | Tool): CycleEntry[] => {
     const inSet = 'mode' in item && item.mode === 'SET_MEMBER' ? sets.find(x => x.id === item.setId) : undefined;
@@ -182,9 +192,10 @@ export default function TraceabilityPage() {
       });
     return [...seen.values()];
   })();
-  const traceTable = (): ExportTable => ({
-    title: tr('Ιχνηλάτηση · {0}', q.trim()),
-    subtitle: tr('{0} κινήσεις', related.length),
+  // The list a person downloads or prints: the moves in front of them, with the patient code when there is one.
+  const movesTable = (title: string, list: Movement[]): ExportTable => ({
+    title,
+    subtitle: tr('{0} κινήσεις', list.length),
     headers: [
       tr('Ημερομηνία / ώρα'),
       tr('Σετ / Εργαλείο'),
@@ -194,7 +205,7 @@ export default function TraceabilityPage() {
       tr('Χρήστης'),
       tr('Κωδικός ασθενούς'),
     ],
-    rows: related.map(m => [
+    rows: list.map(m => [
       m.at,
       m.asset,
       movementText(m.status),
@@ -204,6 +215,12 @@ export default function TraceabilityPage() {
       m.patientCode || '',
     ]),
   });
+  const traceTable = () => movesTable(tr('Ιχνηλάτηση · {0}', q.trim()), related);
+  const patientTable = () =>
+    movesTable(
+      tr('Ασθενής · {0}', patientMoves[0]?.patientCode || patient),
+      [...patientMoves].sort((a, b) => time(b.at) - time(a.at)),
+    );
   return (
     // The movements tab fills the page, as «Ιστορικό» did on its own.
     <div className={tab === 'HISTORY' ? 'trace-with-history' : undefined}>
@@ -217,38 +234,53 @@ export default function TraceabilityPage() {
             )}
           </p>
         </div>
-        {tab === 'SEARCH' && related.length > 0 && (
-          <div className="page-head-actions">
-            <DownloadMenu table={traceTable} onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))} />
-          </div>
-        )}
       </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
-      <div className="name-check-tabs trace-tabs" role="tablist">
+      <div className="trace-modes" role="tablist">
         <button
           role="tab"
           aria-selected={tab === 'SEARCH'}
-          className={tab === 'SEARCH' ? 'active' : ''}
+          className={`trace-mode ${tab === 'SEARCH' ? 'active' : ''}`}
           onClick={() => setParams({}, {replace: true})}
         >
-          <Search size={16} /> {tr('Σετ / εργαλείο')}
+          <span className="trace-mode-icon">
+            <Search size={18} />
+          </span>
+          <span>
+            <strong>{tr('Σετ / εργαλείο')}</strong>
+            <small>{tr('Η πορεία ενός Σετ ή εργαλείου, βήμα βήμα')}</small>
+          </span>
         </button>
         <button
           role="tab"
           aria-selected={tab === 'PATIENTS'}
-          className={tab === 'PATIENTS' ? 'active' : ''}
+          className={`trace-mode ${tab === 'PATIENTS' ? 'active' : ''}`}
           onClick={() => setParams({tab: 'patients'}, {replace: true})}
         >
-          <Users size={16} /> {tr('Ασθενής')} <b>{patientCodes}</b>
+          <span className="trace-mode-icon">
+            <Users size={18} />
+          </span>
+          <span>
+            <strong>
+              {tr('Ασθενής')} <b>{patientCodes}</b>
+            </strong>
+            <small>{tr('Υλικό ανά κωδικό ασθενούς')}</small>
+          </span>
         </button>
         <button
           role="tab"
           aria-selected={tab === 'HISTORY'}
-          className={tab === 'HISTORY' ? 'active' : ''}
+          className={`trace-mode ${tab === 'HISTORY' ? 'active' : ''}`}
           onClick={() => setParams({tab: 'history'}, {replace: true})}
         >
-          <History size={16} /> {tr('Όλες οι κινήσεις')}
+          <span className="trace-mode-icon">
+            <History size={18} />
+          </span>
+          <span>
+            <strong>{tr('Όλες οι κινήσεις')}</strong>
+            <small>{tr('Το αμετάβλητο ιστορικό όλου του νοσοκομείου')}</small>
+          </span>
         </button>
       </div>
       {tab === 'HISTORY' ? (
@@ -260,9 +292,17 @@ export default function TraceabilityPage() {
         />
       ) : tab === 'PATIENTS' ? (
         <>
-          <button type="button" className="trace-back" onClick={() => setParams({tab: 'patients'}, {replace: true})}>
-            <ArrowLeft size={16} /> {tr('Όλοι οι ασθενείς')}
-          </button>
+          <div className="trace-patient-bar">
+            <button type="button" className="trace-back" onClick={() => setParams({tab: 'patients'}, {replace: true})}>
+              <ArrowLeft size={16} /> {tr('Όλοι οι ασθενείς')}
+            </button>
+            {patientMoves.length > 0 && (
+              <DownloadMenu
+                table={patientTable}
+                onPrint={() => setReport(tableReportHtml(patientTable(), getI18nLang()))}
+              />
+            )}
+          </div>
           {patientItems.length > 0 ? (
             <div className="trace-card trace-patient">
               <UserRound size={24} />
@@ -338,24 +378,26 @@ export default function TraceabilityPage() {
         </>
       ) : (
         <>
-          <form
-            className="trace-search"
-            onSubmit={e => {
-              e.preventDefault();
-              remember(q);
-            }}
-          >
-            <Search />
-            <input
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              onBlur={() => needle && remember(q)}
-              placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
-            />
-            <button className="primary" type="submit">
-              {tr('Αναζήτηση')}
-            </button>
-          </form>
+          <AssetFilterBar
+            className="movement-filter-bar trace-search-bar"
+            query={q}
+            onQueryChange={setQ}
+            onSubmitQuery={remember}
+            placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+            extra={
+              <>
+                <button className="primary" type="button" onClick={() => remember(q)}>
+                  {tr('Αναζήτηση')}
+                </button>
+                {related.length > 0 && (
+                  <DownloadMenu
+                    table={traceTable}
+                    onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))}
+                  />
+                )}
+              </>
+            }
+          />
           {!needle && recent.length > 0 && (
             <div className="trace-recent">
               <History size={15} />
@@ -435,33 +477,71 @@ export default function TraceabilityPage() {
               </ul>
             </section>
           )}
+          {related.length > 0 && (
+            <div className="movement-ledger trace-ledger">
+              <div className="ledger-head">
+                <div>
+                  <span>
+                    {related.length} {related.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
+                  </span>
+                </div>
+              </div>
+              <div className="ledger-columns">
+                <span>{tr('Ημερομηνία / ώρα')}</span>
+                <span>{tr('Σετ / Εργαλείο')}</span>
+                <span>{tr('Διαδρομή')}</span>
+                <span>{tr('Ενέργεια')}</span>
+                <span>{tr('Χρήστης')}</span>
+                <span></span>
+              </div>
+              <div className="ledger-scroll">
+                {related.map((m, i) => {
+                  const [code, ...rest] = m.asset.split(' · ');
+                  return (
+                    <Fragment key={m.id}>
+                      {i === own.length && carrierSet && (
+                        <h3 className="trace-group">
+                          {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
+                        </h3>
+                      )}
+                      <div className="ledger-row static">
+                        <span className="ledger-date">
+                          <Clock3 size={15} />
+                          <b>{m.at}</b>
+                        </span>
+                        <span className="ledger-asset">
+                          <small>{m.assetKind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
+                          <b>{code}</b>
+                          {rest.length > 0 && <em>{rest.join(' · ')}</em>}
+                        </span>
+                        <span className="ledger-route">
+                          <i>{trData(m.from)}</i>
+                          <ChevronRight size={15} />
+                          <i>{trData(m.to)}</i>
+                        </span>
+                        <span>
+                          <mark className="movement-chip" title={movementText(m.status)}>
+                            {movementText(m.status)}
+                          </mark>
+                          {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+                        </span>
+                        <span className="ledger-user">
+                          <UserRound size={15} />
+                          <span>
+                            <b>{trData(m.by)}</b>
+                            {m.patientCode && <small>{tr('Ασθενής {0}', m.patientCode)}</small>}
+                          </span>
+                        </span>
+                        <span />
+                      </div>
+                    </Fragment>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className="timeline list-scroll-region">
-            {related.length ? (
-              related.map((m, i) => (
-                <Fragment key={m.id}>
-                  {i === own.length && carrierSet && (
-                    <h3 className="trace-group">
-                      {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
-                    </h3>
-                  )}
-                  <div className="timeline-item trace-step">
-                    <time>{m.at}</time>
-                    <div className="dot" />
-                    <div>
-                      <strong>
-                        {movementText(m.status)}{' '}
-                        {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                      </strong>
-                      {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
-                      <small>
-                        {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
-                        {m.patientCode ? ` · ${tr('Ασθενής {0}', m.patientCode)}` : ''}
-                      </small>
-                    </div>
-                  </div>
-                </Fragment>
-              ))
-            ) : choosing ? null : recentItems.length ? (
+            {related.length ? null : choosing ? null : recentItems.length ? (
               <section className="trace-recent-items" aria-label={tr('Πρόσφατη δραστηριότητα')}>
                 <h3>{tr('Πρόσφατη δραστηριότητα')}</h3>
                 <ul>
