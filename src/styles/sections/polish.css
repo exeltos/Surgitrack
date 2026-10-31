@@ -759,7 +759,6 @@ html body .mode-card .hospital-count {
   }
   html body .studio-manager-nav > button {
     display: grid;
-    grid-template-columns: 34px minmax(0, 1fr);
     grid-template-areas:
       'icon name'
       'icon count';
