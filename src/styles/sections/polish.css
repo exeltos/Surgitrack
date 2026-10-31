@@ -507,3 +507,16 @@ html
   small.row-sub {
   max-width: 300px;
 }
+
+/* Movements and patient uses: the user column gets the room it needs, the action and the patient code take less. */
+@media (min-width: 1281px) {
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 150px minmax(140px, 1fr) minmax(190px, 1.1fr) minmax(190px, 1.1fr) minmax(200px, 1.35fr) 24px;
+  }
+}
+/* Traceability: the description under the title is not squeezed into two lines. */
+html body .trace-tabs ~ *,
+html body .page-head > div:first-child > p {
+  max-width: none;
+}
