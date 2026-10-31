@@ -368,3 +368,19 @@ html body .replacements-kpis > * strong {
     width: 200px;
   }
 }
+
+/* An empty tab of a Set or instrument says so in the middle of its panel, not as a small line in a corner. */
+html body .asset-empty {
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 13.5px;
+}
+html body .asset-empty > svg {
+  width: 30px;
+  height: 30px;
+  opacity: 0.55;
+}
