@@ -2339,13 +2339,6 @@ html body .page-head > div:first-child > p {
   white-space: nowrap;
 }
 /* Replacements: KPI tiles in one row, tighter rows. */
-html body .replacements-kpis > * {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 14px;
-}
 html body .replacements-kpis strong {
   font-size: 20px;
 }
