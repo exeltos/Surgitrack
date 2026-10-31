@@ -237,14 +237,14 @@ export default function TraceabilityPage() {
       </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
-      <div className="trace-modes" role="tablist">
+      <div className="mode-cards" role="tablist">
         <button
           role="tab"
           aria-selected={tab === 'SEARCH'}
-          className={`trace-mode ${tab === 'SEARCH' ? 'active' : ''}`}
+          className={`mode-card ${tab === 'SEARCH' ? 'active' : ''}`}
           onClick={() => setParams({}, {replace: true})}
         >
-          <span className="trace-mode-icon">
+          <span className="mode-card-icon">
             <Search size={18} />
           </span>
           <span>
@@ -255,10 +255,10 @@ export default function TraceabilityPage() {
         <button
           role="tab"
           aria-selected={tab === 'PATIENTS'}
-          className={`trace-mode ${tab === 'PATIENTS' ? 'active' : ''}`}
+          className={`mode-card ${tab === 'PATIENTS' ? 'active' : ''}`}
           onClick={() => setParams({tab: 'patients'}, {replace: true})}
         >
-          <span className="trace-mode-icon">
+          <span className="mode-card-icon">
             <Users size={18} />
           </span>
           <span>
@@ -271,10 +271,10 @@ export default function TraceabilityPage() {
         <button
           role="tab"
           aria-selected={tab === 'HISTORY'}
-          className={`trace-mode ${tab === 'HISTORY' ? 'active' : ''}`}
+          className={`mode-card ${tab === 'HISTORY' ? 'active' : ''}`}
           onClick={() => setParams({tab: 'history'}, {replace: true})}
         >
-          <span className="trace-mode-icon">
+          <span className="mode-card-icon">
             <History size={18} />
           </span>
           <span>

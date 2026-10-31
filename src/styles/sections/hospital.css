@@ -671,7 +671,6 @@ html body .dash-dept-name {
   font-weight: 500;
   font-size: 13.5px;
 }
-html body .hospital-admin .hospital-people > .hospital-tabs,
 html body .hospital-admin .hospital-people > .hospital-notice {
   flex: 0 0 auto;
 }
@@ -733,9 +732,6 @@ html body .people-head span {
 /* Users list: column names in sentence case, as on the other lists. */
 html body .people-head {
   text-transform: none;
-}
-html body .hospital-tabs .hospital-count {
-  white-space: nowrap;
 }
 /* «+N ακόμη» under the departments. */
 html body .dash-more {
@@ -903,18 +899,6 @@ html body .dash-more {
     padding-right: 10px;
   }
   /* The two tabs fit the phone width (the page slid sideways with «1 αίτημα»). */
-  html body .hospital-tabs {
-    overflow-x: auto;
-  }
-  html body .hospital-tabs button {
-    gap: 5px;
-    padding-left: 8px;
-    padding-right: 8px;
-    white-space: nowrap;
-  }
-  html body .hospital-tabs button > svg {
-    display: none;
-  }
   html body .dash-list b,
   html body .dash-list small {
     white-space: normal;

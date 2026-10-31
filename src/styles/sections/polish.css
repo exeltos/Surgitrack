@@ -618,13 +618,13 @@ html body .page-head > div:first-child > p {
 
 /* Traceability: the three ways to look are cards (like the reports), and every one ends in a list with its export
    at the end of the search bar. */
-html body .trace-modes {
+html body .mode-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 12px;
 }
-html body .trace-mode {
+html body .mode-card {
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
   align-items: center;
@@ -642,19 +642,19 @@ html body .trace-mode {
     border-color 0.15s,
     box-shadow 0.15s;
 }
-html body .trace-mode:hover {
+html body .mode-card:hover {
   border-color: var(--c-cyan-70);
   box-shadow: 0 2px 8px rgba(25, 57, 72, 0.1);
 }
-html body .trace-mode strong,
-html body .trace-mode small {
+html body .mode-card strong,
+html body .mode-card small {
   display: block;
 }
-html body .trace-mode strong {
+html body .mode-card strong {
   font-size: 14px;
   line-height: 1.25;
 }
-html body .trace-mode strong b {
+html body .mode-card strong b {
   margin-left: 6px;
   padding: 1px 8px;
   border-radius: 999px;
@@ -662,13 +662,13 @@ html body .trace-mode strong b {
   color: var(--c-orange-45);
   font-size: 12px;
 }
-html body .trace-mode small {
+html body .mode-card small {
   margin-top: 2px;
   color: var(--st-muted);
   font-size: 12.5px;
   line-height: 1.3;
 }
-html body .trace-mode-icon {
+html body .mode-card-icon {
   display: grid;
   place-items: center;
   width: 38px;
@@ -677,19 +677,19 @@ html body .trace-mode-icon {
   background: var(--c-gray-100-2);
   color: var(--c-cyan-45-8);
 }
-html body .trace-mode.active {
+html body .mode-card.active {
   border-color: var(--c-cyan-40);
   background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
   box-shadow:
     0 0 0 1px var(--c-cyan-40),
     var(--shadow-card);
 }
-html body .trace-mode.active .trace-mode-icon {
+html body .mode-card.active .mode-card-icon {
   background: var(--c-cyan-40);
   color: var(--c-white);
 }
 @media (max-width: 800px) {
-  html body .trace-modes {
+  html body .mode-cards {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -709,4 +709,32 @@ html body .trace-patient-bar {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+/* Two cards (Users & Departments) take half the width each; the section below fills the page. */
+html body .mode-cards.modes-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+html body .hospital-admin .hospital-people > .mode-cards {
+  flex: 0 0 auto;
+}
+html body .mode-card .hospital-count {
+  display: inline-block;
+  min-width: 0;
+  margin-left: 6px;
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  html body .mode-cards.modes-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Departments: two columns of cards, so all of them show without scrolling. */
+@media (min-width: 1101px) {
+  html body .hospital-departments-card .hospital-rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-content: start;
+  }
 }

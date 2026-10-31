@@ -4324,30 +4324,6 @@ a.auth-primary {
 }
 
 /* Hospital admin: requests & departments / users in separate tabs. */
-.hospital-tabs {
-  display: flex;
-  gap: 6px;
-  margin: 4px 0 12px;
-  border-bottom: 1px solid var(--c-gray-90);
-}
-.hospital-tabs button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 14px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--c-cyan-45-2);
-  cursor: pointer;
-}
-.hospital-tabs button.active {
-  color: var(--c-cyan-40);
-  border-bottom-color: var(--c-cyan-40);
-}
 /* Locked (read-only) values of a user row; they turn into fields with the row's edit button. */
 .hospital-member-status {
   display: inline-flex;
