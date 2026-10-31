@@ -231,9 +231,6 @@
   line-height: 1.45;
 }
 /* Name check KPIs: same slim look as the other pages. */
-html body .name-check-kpis > div {
-  padding: 8px 14px;
-}
 /* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
 html body .tools-registry .tools-place-set {
   font-size: 13px;

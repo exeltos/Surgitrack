@@ -211,8 +211,11 @@ export default function ToolsPage() {
                             {t.name}
                           </Link>
                           <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
-                          <small className="row-sub">{[t.manufacturer, t.code].filter(Boolean).join(' · ')}</small>
-                          {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
+                          <small className="row-sub">
+                            {[t.manufacturer, t.code, t.serialNumber && `S/N ${t.serialNumber}`]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </small>
                         </span>
                       </div>
                     </td>

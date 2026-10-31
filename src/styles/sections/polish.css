@@ -417,3 +417,31 @@ html body .asset-related-set-link strong {
   font-size: 13px;
   overflow-wrap: anywhere;
 }
+
+/* Name check: the same low tiles (label left, number right, the note under them) and the page edges of the lists. */
+html body .name-check {
+  padding-inline: 8px;
+}
+html body .name-check-kpis > div {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 10px !important;
+  padding: 9px 16px !important;
+}
+html body .name-check-kpis > div > small {
+  grid-column: 1 / -1;
+}
+html body .name-check-kpis > div > strong {
+  font-size: 21px !important;
+}
+
+/* Instruments list: less room for the specialty and the status, so the name line with the serial number fits. */
+html body .tools-registry th:nth-child(3) {
+  width: 148px;
+}
+html body .tools-registry th:nth-child(6) {
+  width: 124px;
+}
+html body .tools-registry td small.row-sub {
+  max-width: 300px;
+}
