@@ -521,16 +521,92 @@ html body .page-head > div:first-child > p {
   max-width: none;
 }
 
-/* Reports: the totals and the split by department take less height (two columns of bars next to the tiles), so the list below starts higher. */
+/* Reports, on a computer: the six reports are a row of cards on top and the chosen one takes the whole width below,
+   so the table has room for its columns and shows more rows. */
 @media (min-width: 1101px) {
+  html body .reports-workbench {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+  }
+  html body .reports-catalog {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  html body .reports-catalog-head,
+  html body .reports-catalog-group > h3,
+  html body .reports-catalog-item small,
+  html body .reports-stage-head .eyebrow {
+    display: none;
+  }
+  html body .reports-catalog-list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0;
+    overflow: visible;
+  }
+  html body .reports-catalog-group {
+    display: contents;
+  }
+  html body .reports-catalog-item {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 58px;
+    padding: 10px 12px;
+    border: 1px solid var(--c-gray-90);
+    border-radius: var(--radius-card);
+    background: var(--c-white);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .reports-catalog-item:hover {
+    border-color: var(--c-cyan-70);
+    box-shadow: 0 2px 8px rgba(25, 57, 72, 0.1);
+  }
+  html body .reports-catalog-item strong {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+  html body .reports-catalog-icon {
+    width: 34px;
+    height: 34px;
+  }
+  html body .reports-catalog-item.active {
+    border-color: var(--c-cyan-40);
+    background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
+    box-shadow:
+      0 0 0 1px var(--c-cyan-40),
+      var(--shadow-card);
+  }
+  html body .reports-catalog-item.active .reports-catalog-icon {
+    background: var(--c-cyan-40);
+    color: var(--c-white);
+  }
+  html body .reports-stage-head {
+    min-height: 0;
+    padding: 12px 17px;
+  }
+  html body .reports-stage-head h2 {
+    margin-top: 0;
+    font-size: 19px;
+  }
+  html body .reports-filter-strip {
+    padding: 8px 14px;
+  }
   html body .reports-overview {
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 20px;
+    gap: 24px;
     padding-bottom: 10px;
   }
   html body .reports-split {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 14px;
     row-gap: 2px;
   }
   html body .reports-split > strong {
