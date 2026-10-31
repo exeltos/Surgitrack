@@ -285,8 +285,6 @@ export default function SetDetailPage() {
         <AssetWorkbenchSidebar
           kind="SET"
           asset={set}
-          memberCount={members.length}
-          expectedCount={set.expected}
           onPhotos={() => setPhotosOpen(true)}
           workflowLocked={workflowLocked}
           onSave={can('asset.edit') ? patch => updateSet(set.id, patch) : undefined}

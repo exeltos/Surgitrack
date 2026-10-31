@@ -32,7 +32,7 @@ html body .department-asset-uses > small {
 }
 .department-expiry small {
   color: var(--st-muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 /* Send to Sterilization: the count step (operating theatres), signed in its own window first. */
 html body .department-count-step {
@@ -100,7 +100,7 @@ html body .count-form-body h3 {
   justify-content: space-between;
   align-items: baseline;
   margin: 0 0 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--c-cyan-40-2);
@@ -165,7 +165,7 @@ html body .count-form-all:disabled {
 html body .count-form-scan-message {
   margin: -4px 0 6px;
   color: var(--c-cyan-40);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
 }
 html body .count-form-table {
@@ -179,7 +179,7 @@ html body .count-form-table table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .count-form-table th {
   position: sticky;
@@ -189,7 +189,7 @@ html body .count-form-table th {
   background: var(--c-gray-95);
   border-bottom: 1px solid var(--c-cyan-70);
   color: var(--c-cyan-40-2);
-  font-size: 10.5px;
+  font-size: 11.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   text-align: left;
@@ -246,7 +246,7 @@ html body .department-asset-state > small.department-stage {
   display: block;
   margin-top: 2px;
   color: var(--st-muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 /* Status filter: every choice whole, with room at the right edge. */
 html body .department-status-tabs {
@@ -275,7 +275,7 @@ html body .department-status-tabs button {
     border-radius: 12px;
   }
   html body .department-kpis > * span {
-    font-size: 12px;
+    font-size: 12.5px;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -299,7 +299,7 @@ html body .department-status-tabs button {
     display: none;
   }
   html body .department-category-tabs button strong {
-    font-size: 13px;
+    font-size: 13.5px;
     line-height: 1.2;
   }
   /* The name wraps in full so its color marking is never cut. */
@@ -352,5 +352,5 @@ html body .department-lives-hint {
   display: block;
   margin: 6px 0 2px;
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
 }

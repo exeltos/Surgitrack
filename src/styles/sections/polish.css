@@ -1,0 +1,823 @@
+/* The look the screens share: one corner radius for cards and tiles, one light shadow, one weight for buttons.
+   Comes last of the sections so that each screen's own layout is kept and only the shared look changes. */
+:root {
+  --radius-card: 12px;
+  --shadow-card: 0 1px 2px rgba(23, 56, 74, 0.05);
+  --shadow-button: 0 1px 2px rgba(18, 88, 107, 0.2);
+}
+
+/* Cards and panels. */
+html body .panel,
+html body .table-panel,
+html body .trace-card,
+html body .dash-card,
+html body .reports-result-card,
+html body .label-settings-card,
+html body .reports-catalog,
+html body .reports-stage {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Tiles with a number (Overview, Sets, Tools, Issues, Expiry, Stock): the same size and corner everywhere. */
+html body .kpis > *,
+html body .kpi-item,
+html body .dash-kpi {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 12px 16px;
+}
+html body .kpis strong,
+html body .dash-kpi strong,
+html body .dash-kpi b {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+html body .kpis > .kpi-link:hover,
+html body .kpi-item:hover {
+  box-shadow: 0 2px 6px rgba(25, 57, 72, 0.08);
+}
+
+/* Primary buttons: the same teal, lighter shadow and weight; one corner radius. */
+html body .primary,
+html body .app-button-primary {
+  box-shadow: var(--shadow-button);
+  font-weight: 650;
+}
+html body .app-button,
+html body .primary {
+  border-radius: 9px;
+}
+
+/* Rows that open something: the same corner as the cards they sit in. */
+html body .reports-catalog-item,
+html body .hospital-request,
+html body .people-row {
+  border-radius: 10px;
+}
+
+/* Settings: cards of fields in two columns on the left, a fixed note on the right (the layout of Limoxis Observer's
+   settings pages, in this app's colors). */
+html body .settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+html body .settings-main,
+html body .settings-main.studio-system-grid,
+html body .settings-main.studio-system-grid:has(> .platform-contact) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+html body .settings-main > section {
+  padding: 18px 20px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+}
+html body .settings-main > section > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+html body .settings-main > section > header > svg {
+  flex: none;
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 7px;
+  border-radius: 9px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-35);
+}
+html body .settings-main > section > header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--c-cyan-20);
+}
+html body .settings-main > section > header p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--st-muted);
+}
+html body .settings-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+}
+html body .settings-fields > label {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--c-cyan-25);
+}
+html body .settings-fields > label > small {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--st-muted);
+}
+html body .settings-aside {
+  position: sticky;
+  top: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+}
+html body .settings-aside h3 {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .settings-aside h3:not(:first-child) {
+  margin-top: 18px;
+}
+html body .settings-aside ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .settings-aside li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--c-cyan-30);
+}
+html body .settings-aside li svg {
+  margin-top: 2px;
+  color: var(--c-cyan-35);
+}
+html body .settings-codes {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+html body .settings-codes > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+}
+html body .settings-codes dt {
+  color: var(--st-muted);
+}
+html body .settings-codes dd {
+  margin: 0;
+  color: var(--c-cyan-20);
+}
+html body .settings-codes dd span {
+  margin-left: 6px;
+  color: var(--st-muted);
+}
+@media (max-width: 1100px) {
+  html body .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .settings-aside {
+    position: static;
+  }
+}
+@media (max-width: 720px) {
+  html body .settings-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+html body .settings-aside > small {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--st-muted);
+}
+
+/* Libraries: a count pill instead of a second line in the list of libraries, quieter row buttons. */
+html body .studio-manager-nav > button {
+  align-items: center;
+}
+html body .studio-manager-nav > button > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+html body .studio-nav-count {
+  flex: none;
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-100-2);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  text-align: center;
+}
+html body .studio-manager-nav > button.active .studio-nav-count {
+  background: var(--c-white);
+  color: var(--c-cyan-35);
+}
+html body .studio-list-row button {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+html body .studio-list-row button.danger-icon {
+  color: var(--st-muted);
+}
+html body .studio-list-row button.danger-icon:hover {
+  background: #fdecec;
+  color: #a54545;
+}
+
+/* Users: a signup request fits on one line on a wide screen (who, role, department, note, then the buttons). */
+@media (min-width: 1200px) {
+  html body .hospital-people .hospital-request {
+    grid-template-columns: minmax(200px, 1.3fr) 190px 160px minmax(110px, 1fr) auto;
+    gap: 10px 12px;
+    align-items: end;
+    padding: 10px 14px;
+  }
+  html body .hospital-people .hospital-request .hospital-request-who {
+    grid-column: auto;
+    align-self: center;
+  }
+  html body .hospital-people .hospital-request .hospital-request-actions {
+    grid-column: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin: 0;
+  }
+}
+
+/* Lists with number tiles on top (Sets, Tools, Issues, Expiry, Stock): the tiles take less height, so the list
+   starts higher. */
+html body .kpis {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+html body .kpis > *,
+html body .kpi-item,
+html body .tools-list-workspace .kpis > * {
+  padding: 8px 14px;
+}
+html body .kpis strong,
+html body .kpi-item strong,
+html body .tools-list-workspace .kpis strong {
+  margin-top: 0;
+  font-size: 21px;
+  line-height: 1.15;
+}
+/* One size for the tiles of every list page: an older rule with !important kept some at 26px. */
+html body .kpis > *:not(.kpi-item) {
+  gap: 2px !important;
+  padding: 9px 16px !important;
+}
+html body .kpis > * strong {
+  font-size: 21px !important;
+}
+/* Sets list: room for the specialty (long names no longer break inside a word). */
+html body .sets-registry th:nth-child(2) {
+  width: 104px;
+}
+html body .sets-registry th:nth-child(3) {
+  width: 14%;
+}
+html body .sets-registry th:nth-child(4) {
+  width: 14%;
+}
+html body .sets-registry th:nth-child(5) {
+  width: 84px;
+}
+html body .sets-registry th:nth-child(6) {
+  width: 172px;
+}
+/* The colour marks sit on the line of the maker and code, so every row keeps the same height. */
+html body .sets-registry .row-sub-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+html body .sets-registry th:nth-child(7) {
+  width: 104px;
+}
+
+/* The tiles of the list pages: label on the left, number on the right, in one low row. */
+html body .tools-list-workspace .kpis > .kpi-item {
+  display: flex !important;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0 !important;
+  padding: 10px 16px !important;
+}
+
+/* New order: the empty list says so across the whole width, not inside the first column. */
+html body .order-empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--st-muted);
+}
+/* Issues: the card link is an icon until hovered, so each row has fewer boxes. */
+html body .issues-fixed .issue-actions-row > a.issue-action {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--st-muted);
+}
+html body .issues-fixed .issue-actions-row > a.issue-action:hover {
+  border-color: var(--c-gray-90);
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-35);
+}
+
+/* Replacements: the same low tiles as the other lists, and room for the Set so its name does not break in three. */
+html body .replacements-kpis {
+  gap: 10px;
+}
+html body .replacements-kpis > * {
+  display: flex !important;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px !important;
+  padding: 10px 16px !important;
+}
+html body .replacements-kpis > * strong {
+  font-size: 21px !important;
+}
+@media (min-width: 1281px) {
+  html body .replacements-fixed th.col-set {
+    width: 18%;
+  }
+  html body .replacements-fixed th.col-reason {
+    width: 104px;
+  }
+  html body .replacements-fixed th.col-status {
+    width: 200px;
+  }
+}
+
+/* An empty tab of a Set or instrument says so in the middle of its panel, not as a small line in a corner. */
+html body .asset-empty {
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 13.5px;
+}
+html body .asset-empty > svg {
+  width: 30px;
+  height: 30px;
+  opacity: 0.55;
+}
+
+/* A lone card in the quick facts (the barcode of a Set) takes the whole width. */
+html body .asset-sidebar-quickfacts > :only-child {
+  grid-column: 1 / -1;
+}
+
+/* «Belongs to the Set» on an instrument's Summary: a card like the ones above it. */
+html body .asset-related-set-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: inherit;
+  text-decoration: none;
+}
+html body .asset-related-set-link:hover {
+  border-color: var(--c-cyan-40);
+}
+html body .asset-related-set-link > span {
+  display: grid;
+  min-width: 0;
+}
+html body .asset-related-set-link small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .asset-related-set-link strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* Name check: the same low tiles (label left, number right, the note under them) and the page edges of the lists. */
+html body .name-check {
+  padding-inline: 8px;
+}
+html body .name-check-kpis > div {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 10px !important;
+  padding: 9px 16px !important;
+}
+html body .name-check-kpis > div > small {
+  grid-column: 1 / -1;
+}
+html body .name-check-kpis > div > strong {
+  font-size: 21px !important;
+}
+
+/* Instruments list: less room for the specialty and the status, so the name line with the serial number fits. */
+html body .tools-registry th:nth-child(3) {
+  width: 148px;
+}
+html body .tools-registry th:nth-child(6) {
+  width: 124px;
+}
+html body .tools-registry td small.row-sub {
+  max-width: 300px;
+}
+
+/* New Set / instrument form: the hint under a field is shown whole; the panel has the room. */
+html body .asset-create-field-list label > small {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-height: 1.35;
+}
+/* New Set / instrument, right panel: the info card and the quantity share one top edge. */
+html body .asset-section-body .form-grid-comfortable {
+  align-items: start;
+}
+
+/* New Set, picking instruments: a narrower barcode and origin leave the name its line; rows are lower, so more show. */
+@media (min-width: 1101px) {
+  html body .create-set-list-head,
+  html body .create-set-tool-row {
+    grid-template-columns: 34px 124px minmax(0, 1fr) 140px;
+  }
+  html body .create-set-tool-row {
+    min-height: 52px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+/* Standalone instruments: the status and expiry columns are short, so the name, the department and «Χωρίς όριο» get the room. */
+html body .standalone-registry th:nth-child(3) {
+  width: 148px;
+}
+html body .standalone-registry th:nth-child(4) {
+  width: 164px;
+}
+html body .standalone-registry th:nth-child(5) {
+  width: 100px;
+}
+html body .standalone-registry th:nth-child(6) {
+  width: 124px;
+}
+html body .standalone-registry th:nth-child(7) {
+  width: 96px;
+}
+
+/* Stock: two lines per instrument (the serial number joins the code line, as in the instruments list); the minimums status stays on one line. */
+html body .stock-min-status {
+  white-space: nowrap;
+}
+html body .stock-min-table th:nth-child(5) {
+  width: 150px;
+}
+@media (min-width: 1281px) {
+  html body .stock-min-table th:nth-child(5) {
+    width: 168px;
+  }
+}
+html
+  body
+  .asset-registry-table.registry-fixed:not(.sets-registry):not(.tools-registry):not(.expiry-table)
+  td
+  small.row-sub {
+  max-width: 300px;
+}
+
+/* Movements and patient uses: the user column gets the room it needs, the action and the patient code take less. */
+@media (min-width: 1281px) {
+  html body .ledger-columns,
+  html body .ledger-row {
+    grid-template-columns: 150px minmax(140px, 1fr) minmax(190px, 1.1fr) minmax(190px, 1.1fr) minmax(200px, 1.35fr) 24px;
+  }
+}
+/* Traceability: the description under the title is not squeezed into two lines. */
+html body .page-head > div:first-child > p {
+  max-width: none;
+}
+
+/* Reports, on a computer: the six reports are a row of cards on top and the chosen one takes the whole width below,
+   so the table has room for its columns and shows more rows. */
+@media (min-width: 1101px) {
+  html body .reports-workbench {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+  }
+  html body .reports-catalog {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  html body .reports-catalog-head,
+  html body .reports-catalog-group > h3,
+  html body .reports-catalog-item small,
+  html body .reports-stage-head .eyebrow {
+    display: none;
+  }
+  html body .reports-catalog-list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0;
+    overflow: visible;
+  }
+  html body .reports-catalog-group {
+    display: contents;
+  }
+  html body .reports-catalog-item {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 58px;
+    padding: 10px 12px;
+    border: 1px solid var(--c-gray-90);
+    border-radius: var(--radius-card);
+    background: var(--c-white);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .reports-catalog-item:hover {
+    border-color: var(--c-cyan-70);
+    box-shadow: 0 2px 8px rgba(25, 57, 72, 0.1);
+  }
+  html body .reports-catalog-item strong {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+  html body .reports-catalog-icon {
+    width: 34px;
+    height: 34px;
+  }
+  html body .reports-catalog-item.active {
+    border-color: var(--c-cyan-40);
+    background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
+    box-shadow:
+      0 0 0 1px var(--c-cyan-40),
+      var(--shadow-card);
+  }
+  html body .reports-catalog-item.active .reports-catalog-icon {
+    background: var(--c-cyan-40);
+    color: var(--c-white);
+  }
+  html body .reports-stage-head {
+    min-height: 0;
+    padding: 12px 17px;
+  }
+  html body .reports-stage-head h2 {
+    margin-top: 0;
+    font-size: 19px;
+  }
+  html body .reports-filter-strip {
+    padding: 8px 14px;
+  }
+  html body .reports-overview {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 24px;
+    padding-bottom: 10px;
+  }
+  html body .reports-split {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 14px;
+    row-gap: 2px;
+  }
+  html body .reports-split > strong {
+    grid-column: 1 / -1;
+  }
+  html body .reports-summary button {
+    padding: 8px 14px;
+  }
+}
+
+/* Traceability: the three ways to look are cards (like the reports), and every one ends in a list with its export
+   at the end of the search bar. */
+html body .mode-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+html body .mode-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+  box-shadow: var(--shadow-card);
+  color: var(--c-cyan-35-2);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+html body .mode-card:hover {
+  border-color: var(--c-cyan-70);
+  box-shadow: 0 2px 8px rgba(25, 57, 72, 0.1);
+}
+html body .mode-card strong,
+html body .mode-card small {
+  display: block;
+}
+html body .mode-card strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+html body .mode-card strong b {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-orange-95, #fdf1d9);
+  color: var(--c-orange-45);
+  font-size: 12px;
+}
+html body .mode-card small {
+  margin-top: 2px;
+  color: var(--st-muted);
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+html body .mode-card-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-45-8);
+}
+html body .mode-card.active {
+  border-color: var(--c-cyan-40);
+  background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
+  box-shadow:
+    0 0 0 1px var(--c-cyan-40),
+    var(--shadow-card);
+}
+html body .mode-card.active .mode-card-icon {
+  background: var(--c-cyan-40);
+  color: var(--c-white);
+}
+@media (max-width: 800px) {
+  html body .mode-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* A Set's own trail is a list like the others; its rows are not buttons. */
+html body .trace-ledger {
+  margin-top: 12px;
+}
+html body .ledger-row.static {
+  cursor: default;
+}
+html body .trace-search-bar > .primary {
+  white-space: nowrap;
+}
+/* One patient's page: back to the list on the left, the export on the right. */
+html body .trace-patient-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Two cards (Users & Departments) take half the width each; the section below fills the page. */
+html body .mode-cards.modes-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+html body .hospital-admin .hospital-people > .mode-cards {
+  flex: 0 0 auto;
+}
+html body .mode-card .hospital-count {
+  display: inline-block;
+  min-width: 0;
+  margin-left: 6px;
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  html body .mode-cards.modes-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Departments: two columns of cards, so all of them show without scrolling. */
+@media (min-width: 1101px) {
+  html body .hospital-departments-card .hospital-rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-content: start;
+  }
+}
+
+/* Libraries, on a computer: the seven libraries are a row of cards (like Reports and Traceability) and the chosen one
+   takes the whole width, so every record shows without a narrow column. */
+@media (min-width: 1101px) {
+  html body .studio-manager {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: auto;
+    gap: 12px;
+  }
+  html body .studio-manager-nav {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    padding: 0 !important;
+  }
+  html body .studio-manager-nav > button {
+    display: grid;
+    grid-template-areas:
+      'icon name'
+      'icon count';
+    row-gap: 0;
+    align-items: center;
+    min-height: 58px;
+    padding: 9px 12px;
+    border: 1px solid var(--c-gray-90);
+    border-radius: var(--radius-card);
+    background: var(--c-white);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .studio-manager-nav > button:hover {
+    border-color: var(--c-cyan-70);
+  }
+  html body .studio-manager-nav > button > span {
+    grid-area: icon;
+  }
+  html body .studio-manager-nav > button > div {
+    grid-area: name;
+  }
+  html body .studio-manager-nav > button b {
+    font-size: 12.5px;
+    line-height: 1.2;
+  }
+  html body .studio-manager-nav > button {
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 8px;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 6px;
+  }
+  html body .studio-manager-nav > button > span {
+    width: 28px;
+    height: 28px;
+  }
+  html body .studio-manager-nav > button .studio-nav-count {
+    grid-area: count;
+    justify-self: start;
+    min-width: 0;
+    padding: 0;
+    background: none;
+    font-size: 12.5px;
+  }
+  html body .studio-manager-nav > button.active {
+    border-color: var(--c-cyan-40);
+    background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
+    box-shadow:
+      0 0 0 1px var(--c-cyan-40),
+      var(--shadow-card);
+  }
+  html body .studio-manager-nav > button.active > span {
+    background: var(--c-cyan-40);
+    color: var(--c-white);
+  }
+  html body .studio-manager-nav > button.active .studio-nav-count {
+    background: none;
+  }
+}

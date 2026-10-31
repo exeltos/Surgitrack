@@ -17,7 +17,6 @@ import {
   X,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
-import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
@@ -377,12 +376,6 @@ export default function ToolDetailPage() {
                     <div>
                       <dt>{tr('Τρέχουσα θέση')}</dt>
                       <dd>{location}</dd>
-                    </div>
-                    <div>
-                      <dt>{tr('Κατάσταση')}</dt>
-                      <dd>
-                        <StatusBadge value={tool.state} />
-                      </dd>
                     </div>
                     <div>
                       <dt>{tr('Ανοικτές εκκρεμότητες')}</dt>

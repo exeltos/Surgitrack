@@ -125,30 +125,27 @@ export default function StudioPage() {
                   )}
           </p>
         </div>
-        <div
-          className="studio-health"
-          title={
-            libs.dataMode === 'DEMO'
-              ? L(
+        {/* Only Demo is marked: real data is the normal case and needs no label on every screen. */}
+        {libs.dataMode === 'DEMO' && (
+          <div
+            className="studio-health"
+            title={L(
+              'Ξεχωριστό Demo νοσοκομείο· οι αλλαγές αποθηκεύονται μόνο εδώ.',
+              'Separate Demo hospital; changes are saved only here.',
+            )}
+          >
+            <ShieldCheck size={20} />
+            <div>
+              <strong>{L('Demo', 'Demo')}</strong>
+              <span>
+                {L(
                   'Ξεχωριστό Demo νοσοκομείο· οι αλλαγές αποθηκεύονται μόνο εδώ.',
                   'Separate Demo hospital; changes are saved only here.',
-                )
-              : L('Πραγματικά νοσοκομεία, χρήστες και δεδομένα.', 'Real hospitals, users and data.')
-          }
-        >
-          <ShieldCheck size={20} />
-          <div>
-            <strong>{libs.dataMode === 'DEMO' ? L('Demo', 'Demo') : L('Πραγματικά δεδομένα', 'Real data')}</strong>
-            <span>
-              {libs.dataMode === 'DEMO'
-                ? L(
-                    'Ξεχωριστό Demo νοσοκομείο· οι αλλαγές αποθηκεύονται μόνο εδώ.',
-                    'Separate Demo hospital; changes are saved only here.',
-                  )
-                : L('Πραγματικά νοσοκομεία, χρήστες και δεδομένα.', 'Real hospitals, users and data.')}
-            </span>
+                )}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
       {!section && <StudioTabs s={s} />}
       <div className={`studio-body studio-body-${tab.toLowerCase()}`}>

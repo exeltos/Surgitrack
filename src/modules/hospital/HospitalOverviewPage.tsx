@@ -57,7 +57,7 @@ const QUEUE_OF: Partial<Record<AssetState, string>> = {
  * The hospital admin's home: the whole hospital at a glance — where the sets and instruments
  * are, what each department holds, what is stuck, and the latest movements.
  */
-const DEPARTMENTS_SHOWN = 5;
+const DEPARTMENTS_SHOWN = 7;
 
 export default function HospitalOverviewPage() {
   const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();
@@ -258,17 +258,6 @@ export default function HospitalOverviewPage() {
           'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',
           'Where the equipment is, what is moving and what needs attention.',
         )}
-        actions={
-          <div className="overview-links">
-            <Link className="app-button app-button-secondary app-button-md" to="/reports">
-              {L('Αναφορές', 'Reports')}
-            </Link>
-            <Link className="app-button app-button-secondary app-button-md" to="/movements">
-              <History size={15} />
-              {L('Ιστορικό', 'History')}
-            </Link>
-          </div>
-        }
       />
 
       {pendingAccess > 0 && (
@@ -448,7 +437,6 @@ export default function HospitalOverviewPage() {
             <div>
               <b>{L('Κινήσεις 14 ημερών', 'Movements, last 14 days')}</b>
             </div>
-            <Link to="/movements">{L('Ιστορικό', 'History')}</Link>
           </header>
           <div className="dash-activity-stats">
             {[
@@ -491,7 +479,7 @@ export default function HospitalOverviewPage() {
                 )}
               </small>
             </div>
-            <Link to={presetPath('/issues', {status: 'OPEN'})}>{L('Όλες', 'All')}</Link>
+            <Link to={presetPath('/issues', {status: 'OPEN'})}>{L('Δες όλες', 'See all')}</Link>
           </header>
           <ul className="dash-list" tabIndex={0} aria-label={L('Χρειάζεται προσοχή', 'Needs attention')}>
             {expiry.length > 0 && (
@@ -576,10 +564,10 @@ export default function HospitalOverviewPage() {
                 )}
               </small>
             </div>
-            <Link to="/movements">{L('Όλο το ιστορικό', 'Full history')}</Link>
+            <Link to="/movements">{L('Δες όλες', 'See all')}</Link>
           </header>
           <ul className="dash-list" tabIndex={0} aria-label={L('Τελευταίες κινήσεις', 'Latest movements')}>
-            {latestMovements.slice(0, 6).map(m => (
+            {latestMovements.slice(0, 5).map(m => (
               <li key={m.id}>
                 <History size={15} />
                 <Link to={assetPath(m.asset) || '/movements'}>

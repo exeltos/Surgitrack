@@ -229,8 +229,10 @@ export default function SetsPage() {
                           <Link className="row-title-link" to={`/sets/${s.id}`}>
                             {s.name}
                           </Link>
-                          <ColorMarker tapes={s.colorTapes} size="sm" />
-                          <small className="row-sub">{[s.manufacturer, s.code].filter(Boolean).join(' · ')}</small>
+                          <span className="row-sub-line">
+                            <small className="row-sub">{[s.manufacturer, s.code].filter(Boolean).join(' · ')}</small>
+                            <ColorMarker tapes={s.colorTapes} size="sm" />
+                          </span>
                           {/* On a tablet the barcode sits here, so the name keeps the room of its column. */}
                           <small className="row-sub mono sets-row-barcode">{s.barcode}</small>
                         </span>

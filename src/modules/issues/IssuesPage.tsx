@@ -258,7 +258,7 @@ export default function IssuesPage() {
                       <td className="issue-note" title={i.note}>
                         <span>{i.note}</span>
                       </td>
-                      <td>{i.created}</td>
+                      <td className="issue-created">{i.created}</td>
                       {withPhotos && (
                         <td>
                           {i.photos?.length ? (

@@ -75,7 +75,7 @@
   gap: 16px;
 }
 .form-grid label {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--c-cyan-30-3);
   display: flex;
@@ -100,7 +100,7 @@
 .selection-count {
   border-radius: 999px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 800;
 }
 .composer-search {
@@ -157,7 +157,7 @@
   flex-direction: row !important;
   border-radius: 999px;
   padding: 6px 9px;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-modal > footer {
   padding: 15px 24px;
@@ -317,7 +317,7 @@
   min-height: 40px;
   border-radius: 9px;
   padding: 0 14px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 750;
 }
 .asset-page-actions .primary,
@@ -378,19 +378,19 @@
   gap: 12px;
 }
 .a11y-popover > strong {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .a11y-popover label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .a11y-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .a11y-row div {
   display: flex;
@@ -406,14 +406,14 @@
   place-items: center;
 }
 .role-chip {
-  font-size: 11px;
+  font-size: 12px;
   padding: 5px 8px;
   border-radius: 999px;
 }
 .secondary.compact {
   align-self: flex-start;
   padding: 8px 10px;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .user-library {
   margin-top: 4px;
@@ -442,7 +442,7 @@
   color: #17624c;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .demo-role-grid {
   display: grid;
@@ -457,13 +457,13 @@
 .form-grid-comfortable input,
 .form-grid-comfortable select {
   min-height: 44px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .empty-inline {
   padding: 28px;
   text-align: center;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .source-tabs {
   display: flex;
@@ -482,7 +482,7 @@
   background: var(--c-white);
   color: var(--c-cyan-45-4);
   font-weight: 750;
-  font-size: 12px;
+  font-size: 12.5px;
   padding: 8px 11px;
 }
 .source-tabs button span {
@@ -493,7 +493,7 @@
   padding: 0 6px;
   border-radius: 999px;
   background: var(--c-gray-95);
-  font-size: 11px;
+  font-size: 12px;
 }
 .source-tabs button.active span {
   background: var(--c-white);
@@ -520,7 +520,7 @@
 }
 .confirm-dialog p {
   margin: 0;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--st-muted);
 }
@@ -630,7 +630,7 @@
   align-items: center;
   gap: 6px;
   color: var(--c-green-30);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
 }
 .table-panel tbody tr {
@@ -678,7 +678,7 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--c-gray-100-2);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--muted);
 }
@@ -696,7 +696,7 @@
   border-radius: 10px;
 }
 .usage-view-stats span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
 }
 .usage-view-stats strong {
@@ -731,7 +731,7 @@
   background: var(--c-white);
   color: var(--c-cyan-30);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 750;
   line-height: 1;
   cursor: pointer;
@@ -769,7 +769,7 @@
 .app-button-sm {
   min-height: 36px;
   padding: 0 11px;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .app-button-md {
   min-height: 38px;
@@ -801,7 +801,7 @@
   color: var(--c-blue-20);
 }
 .asset-modal-add-tools .asset-profile-title p {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .add-tools-summary {
   display: flex;
@@ -826,11 +826,11 @@
   color: var(--st-muted);
 }
 .add-tools-summary span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .add-tools-summary strong {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-blue-25-4);
 }
 .add-tools-body {
@@ -1250,7 +1250,7 @@ td {
   outline: 0;
   background: transparent;
   color: var(--c-cyan-20-3);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-filter-search input::placeholder {
   color: var(--st-muted);
@@ -1265,7 +1265,7 @@ td {
   border-radius: 8px;
   background: var(--c-gray-100-2);
   color: var(--c-cyan-50-4);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -1456,7 +1456,7 @@ td {
   background: var(--c-white);
 }
 .create-set-search input {
-  font-size: 13px;
+  font-size: 13.5px;
 }
 /* Head and rows share one fixed grid (an auto last column sized to the title in one, the pill in the other),
    and the head keeps the scrollbar room the list keeps. */
@@ -1472,7 +1472,7 @@ td {
   border-bottom: 1px solid var(--c-gray-90);
   background: var(--c-white);
   color: var(--st-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1498,10 +1498,10 @@ td {
   justify-self: start;
 }
 .create-set-tool-row b {
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .create-set-tool-row small {
-  font-size: 11px;
+  font-size: 12px;
 }
 @media (max-width: 1100px) {
   .asset-modal-backdrop-workspace {
@@ -1688,7 +1688,7 @@ td {
   align-items: flex-start;
 }
 .asset-create-required {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .asset-create-field-list {
@@ -1701,7 +1701,7 @@ td {
   grid-template-columns: 112px minmax(0, 1fr);
   gap: 10px;
   align-items: center;
-  font-size: 12px;
+  font-size: 12.5px;
   color: #627174;
 }
 .asset-create-field-list label > span {
@@ -1721,7 +1721,7 @@ td {
   justify-content: center;
   border-radius: 999px;
   background: var(--c-gray-95);
-  font-size: 11px;
+  font-size: 12px;
 }
 .asset-create-tabs button.active span {
   background: var(--c-gray-95-10);
@@ -1774,11 +1774,11 @@ td {
   min-height: 44px;
 }
 .asset-inline-info strong {
-  font-size: 13px;
+  font-size: 13.5px;
   color: #20343c;
 }
 .asset-inline-info small {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--st-muted);
 }
@@ -1831,7 +1831,7 @@ td {
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--c-cyan-35-9);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -1841,7 +1841,7 @@ td {
   gap: 6px;
 }
 .label-option-group > span {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;
   color: var(--st-muted);
@@ -1857,7 +1857,7 @@ td {
   border-radius: 7px;
   background: var(--c-white);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-35-2);
   cursor: pointer;
   display: grid;
@@ -1865,7 +1865,7 @@ td {
   text-align: center;
 }
 .label-segments button small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
 }
 .label-segments button.active {
@@ -1905,7 +1905,7 @@ td {
 }
 .label-logo-row label {
   cursor: pointer;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-cyan-40);
 }
@@ -1913,14 +1913,14 @@ td {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-35-2);
 }
 .label-zoom {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-35-2);
 }
 .label-zoom input {
@@ -1937,7 +1937,7 @@ td {
   text-align: center;
 }
 .label-default-note {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--st-muted);
   line-height: 1.4;
 }
@@ -1949,7 +1949,7 @@ td {
 .label-numbers label {
   display: grid;
   gap: 3px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-35-2);
 }
 .label-numbers input {
@@ -1975,7 +1975,7 @@ td {
   display: grid;
   gap: 6px;
   padding: 0 20px 16px 68px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--st-muted);
 }
 .confirm-dialog-type input,
@@ -1984,6 +1984,6 @@ td {
   border: 1px solid var(--c-gray-90-2);
   border-radius: 8px;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-20-3);
 }

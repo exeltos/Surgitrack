@@ -1,3 +1,4 @@
+import {printLogoHtml} from '../../core/printBranding';
 import type {PreparationRecord, SterilizationReleaseRecord} from '../../types/domain';
 import type {SurgicalCount} from '../../store/types';
 import {tr, trData} from '../../i18n';
@@ -99,7 +100,7 @@ export function countFormBody({asset, items, hospital, preparation, release, cou
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}}
   @media print{tr{break-inside:avoid}}
   </style></head><body>
-  <div class="top"><div><div class="brand">${escapeHtml(hospital || 'SurgiTrack')}</div><div class="doc">${escapeHtml(tr('Έντυπο καταμέτρησης εργαλείων'))}</div><h1>${escapeHtml(asset.name)}</h1></div><div class="barcode">${code128Svg(asset.barcode, 48)}<div class="barcode-code">${escapeHtml(asset.barcode)}</div></div></div>
+  <div class="top"><div>${printLogoHtml()}<div class="brand">${escapeHtml(hospital || 'SurgiTrack')}</div><div class="doc">${escapeHtml(tr('Έντυπο καταμέτρησης εργαλείων'))}</div><h1>${escapeHtml(asset.name)}</h1></div><div class="barcode">${code128Svg(asset.barcode, 48)}<div class="barcode-code">${escapeHtml(asset.barcode)}</div></div></div>
   <h2>${escapeHtml(tr('Α. Αποστείρωση · ελεγμένο και αποστειρωμένο'))}<small class="${release ? 'signed' : 'pending'}">${escapeHtml(release ? tr('Υπογεγραμμένο ηλεκτρονικά') : tr('Χωρίς αποδέσμευση'))}</small></h2>
   <div class="meta">${partA}</div>
   <h2>${escapeHtml(tr('Β. Χειρουργείο · καταμέτρηση μετά την επέμβαση'))}<small class="${signed ? 'signed' : 'pending'}">${escapeHtml(signed ? tr('Υπογεγραμμένη {0}', count?.at || '') : tr('Εκκρεμεί υπογραφή'))}</small></h2>

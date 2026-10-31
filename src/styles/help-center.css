@@ -65,12 +65,12 @@
   margin: 0;
 }
 .manual-brand strong {
-  font-size: 12px;
+  font-size: 12.5px;
   letter-spacing: 0.05em;
   color: #1f4f5a;
 }
 .manual-brand small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-50-2);
 }
 .manual-search {
@@ -92,21 +92,21 @@
   outline: 0;
   background: transparent;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .manual-search kbd {
   padding: 2px 5px;
   border: 1px solid var(--c-gray-90-2);
   border-radius: 5px;
   background: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-50-2);
 }
 .manual-actions {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-cyan-50-2);
 }
 .manual-close {
@@ -138,7 +138,7 @@
 }
 .manual-side-label {
   padding: 14px 14px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.11em;
   color: var(--c-gray-45);
@@ -161,7 +161,7 @@
   background: transparent;
   text-align: left;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-45-4);
   cursor: pointer;
 }
@@ -177,7 +177,7 @@
 }
 .manual-nav-empty {
   padding: 12px 8px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-55-4);
 }
 .manual-side-bottom {
@@ -193,7 +193,7 @@
   margin: 8px 4px 2px;
   padding-top: 8px;
   border-top: 1px solid var(--c-gray-95);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-gray-45);
 }
 .manual-article,
@@ -207,7 +207,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;
   color: var(--c-cyan-50-2);
@@ -244,7 +244,7 @@
   padding: 7px 10px;
   border-radius: 7px;
   background: var(--c-gray-95);
-  font-size: 12px;
+  font-size: 12.5px;
   color: #33666e;
 }
 .manual-chapter-tabs {
@@ -264,7 +264,7 @@
   border-radius: 7px;
   background: var(--c-gray-100-2);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-cyan-45-2);
   cursor: pointer;
@@ -276,7 +276,7 @@
   place-items: center;
   border-radius: 5px;
   background: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
 }
 .manual-chapter-tabs button.active {
   background: var(--c-gray-95-10);
@@ -287,7 +287,7 @@
   padding-top: 18px;
 }
 .manual-step-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.1em;
   color: var(--st-muted);
@@ -309,7 +309,7 @@
   align-items: center;
   gap: 6px;
   margin: 18px 0 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-blue-20);
 }
 .manual-detail-section ol,
@@ -325,7 +325,7 @@
   grid-template-columns: 24px minmax(0, 1fr);
   gap: 8px;
   align-items: start;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-30-3);
 }
 .manual-detail-section li b {
@@ -336,12 +336,12 @@
   border-radius: 6px;
   background: var(--c-gray-95-3);
   color: var(--c-cyan-40);
-  font-size: 11px;
+  font-size: 12px;
 }
 .manual-check-section li {
   display: flex;
   gap: 7px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: #2d6a4f;
 }
 .manual-good-practice,
@@ -365,7 +365,7 @@
   display: grid;
   gap: 3px;
   margin: 0;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
 }
 .manual-chapter-footer {
@@ -375,7 +375,7 @@
   margin-top: 22px;
   padding-top: 12px;
   border-top: 1px solid var(--c-gray-95);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--st-muted);
 }
 .manual-chapter-footer button {
@@ -387,7 +387,7 @@
   border-radius: 7px;
   background: var(--c-white);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-35-2);
   cursor: pointer;
 }
@@ -407,7 +407,7 @@
   background: var(--c-cyan-40);
   color: var(--c-white);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -423,7 +423,7 @@
   padding: 11px 13px;
   border: 1px solid var(--c-gray-90);
   border-radius: 9px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-30-3);
 }
 .manual-glossary b {
@@ -443,7 +443,7 @@
   border-radius: 9px;
 }
 .manual-about-grid small {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--st-muted);
@@ -465,11 +465,11 @@
   padding: 14px;
   border: 1px solid var(--c-gray-90);
   border-radius: 9px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-30-3);
 }
 .manual-support-grid small {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -565,7 +565,7 @@
   border-radius: 999px;
   background: rgba(16, 45, 56, 0.82);
   color: var(--c-white);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 .manual-screen-thumb:hover span,
@@ -603,7 +603,7 @@
 .manual-lightbox-tools span {
   min-width: 78px;
   text-align: center;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .manual-lightbox-tools button {
@@ -619,7 +619,7 @@
   background: rgba(255, 255, 255, 0.08);
   color: var(--c-white);
   font: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   cursor: pointer;
 }
 .manual-lightbox-tools button.active,
@@ -655,7 +655,7 @@
 .manual-lightbox > footer {
   padding: 8px 14px 12px;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--c-gray-80);
 }
 @media (max-width: 700px) {
@@ -671,7 +671,7 @@
   margin-top: 18px;
 }
 .manual-see-also > b {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-blue-20);
 }
 .manual-see-also > div {
@@ -688,7 +688,7 @@
   border-radius: 999px;
   background: var(--c-white);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--c-cyan-40);
   cursor: pointer;
@@ -738,7 +738,7 @@
 .manual-special .owner-manuals-note {
   margin-top: 14px;
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
 /* The phone's section pick list (hidden on wider screens, where the sidebar lists the sections). */

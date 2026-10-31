@@ -1,3 +1,4 @@
+import {printLogoHtml} from '../../core/printBranding';
 import type {PurchaseOrder} from '../../types/domain';
 import type {ReplacementItem} from '../../core/replacements';
 import {REASON_LABEL} from '../../core/replacements';
@@ -62,7 +63,7 @@ export function replacementListHtml(items: readonly ReplacementItem[], subtitle:
     .join('');
   return page(
     tr('Βλάβες & Αντικαταστάσεις'),
-    `<div class="top"><div><div class="brand">SurgiTrack${hospital ? ` · ${esc(hospital)}` : ''}</div><div class="doc">${esc(tr('Λίστα εργαλείων προς αντικατάσταση'))}</div><h1>${esc(tr('Βλάβες & Αντικαταστάσεις'))}</h1><p>${esc(subtitle)}</p></div><div class="when">${esc(now())}</div></div>
+    `<div class="top"><div>${printLogoHtml()}<div class="brand">SurgiTrack${hospital ? ` · ${esc(hospital)}` : ''}</div><div class="doc">${esc(tr('Λίστα εργαλείων προς αντικατάσταση'))}</div><h1>${esc(tr('Βλάβες & Αντικαταστάσεις'))}</h1><p>${esc(subtitle)}</p></div><div class="when">${esc(now())}</div></div>
 <div class="sum">
 <div><b>${esc(tr('Σύνολο'))}</b><span>${items.length}</span></div>
 <div><b>Service</b><span>${count('SERVICE')}</span></div>
@@ -104,7 +105,7 @@ export function purchaseOrderHtml(order: PurchaseOrder, hospital?: string) {
     .join('');
   return page(
     tr('Παραγγελία {0}', order.number),
-    `<div class="top"><div><div class="brand">SurgiTrack${hospital ? ` · ${esc(hospital)}` : ''}</div><div class="doc">${esc(tr('Παραγγελία αγοράς εργαλείων'))}</div><h1>${esc(order.number)}</h1></div><div class="when">${esc(now())}</div></div>
+    `<div class="top"><div>${printLogoHtml()}<div class="brand">SurgiTrack${hospital ? ` · ${esc(hospital)}` : ''}</div><div class="doc">${esc(tr('Παραγγελία αγοράς εργαλείων'))}</div><h1>${esc(order.number)}</h1></div><div class="when">${esc(now())}</div></div>
 <div class="meta">
 <div><b>${esc(tr('Ημερομηνία'))}</b><span>${esc(order.createdAt)}</span></div>
 <div><b>${esc(tr('Καταχώρησε'))}</b><span>${esc(order.createdByName)}</span></div>

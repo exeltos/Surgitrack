@@ -29,7 +29,7 @@
   align-items: start;
 }
 .roles-guide-head {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -65,7 +65,7 @@
 .asset-import-header-row {
   display: grid;
   gap: 5px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--st-muted, var(--c-cyan-55));
 }
@@ -80,7 +80,7 @@
   align-items: center;
   gap: 8px;
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 .asset-import-steps li.active {
@@ -94,7 +94,7 @@
   gap: 10px;
   padding: 10px 14px;
   border-radius: 11px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import-alert {
   border: 1px solid var(--c-red-85);
@@ -179,7 +179,7 @@
   padding: 8px 10px;
   border-radius: 9px;
   background: var(--st-canvas, var(--c-gray-95));
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import-preview > div {
   justify-content: space-between;
@@ -193,7 +193,7 @@
   border: 1px solid var(--c-amber-85);
   border-radius: 12px;
   background: var(--c-gray-100);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import-names label {
   display: flex;
@@ -214,7 +214,7 @@
   padding: 5px 8px;
   border-radius: 8px;
   background: var(--c-white);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 /* The instruments an import will create, shown at the check step. */
 .asset-import-tools {
@@ -248,7 +248,7 @@
   outline: 0;
   background: transparent;
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-import-tools-table {
   max-height: 420px;
@@ -259,7 +259,7 @@
 .asset-import-tools-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .asset-import-tools-table td {
   padding: 7px 10px;
@@ -311,7 +311,7 @@
   margin-top: 4px;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   background: var(--st-canvas, var(--c-gray-95));
   color: var(--st-muted, var(--c-cyan-55));
@@ -337,7 +337,7 @@
 }
 .studio-plan legend {
   margin-bottom: 6px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 .studio-plan label {
@@ -367,7 +367,7 @@
   gap: 8px;
 }
 .studio-trial-length > span {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 @media (max-width: 900px) {
@@ -491,7 +491,7 @@
   border-radius: 999px;
   background: var(--c-white);
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   cursor: pointer;
 }
 .studio-trial-length button.active {
@@ -510,7 +510,7 @@
 .studio-field-hint {
   margin: -4px 0 2px;
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .studio-field-error {
   color: var(--st-red, var(--c-red-45)) !important;
@@ -523,7 +523,7 @@
 }
 .studio-system-grid .platform-contact-fields label {
   margin: 0;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .platform-contact-fields input {
@@ -557,7 +557,7 @@
 }
 .owner-kpi span {
   color: var(--c-cyan-45-2);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .owner-kpi strong {
@@ -621,7 +621,7 @@
   gap: 8px;
   margin: 0;
   color: var(--c-cyan-45-2);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .owner-attention {
   display: grid;
@@ -639,7 +639,7 @@
   border: 1px solid var(--c-gray-90);
   border-radius: 11px;
   color: var(--c-cyan-45);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .owner-attention li.warn {
   border-color: var(--c-amber-85);
@@ -747,11 +747,11 @@
 }
 .asset-import-template b {
   color: var(--c-cyan-20-2);
-  font-size: 13.5px;
+  font-size: 14px;
 }
 .asset-import-template small {
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.4;
 }
 .asset-import-guide {
@@ -769,7 +769,7 @@
 .asset-import-guide > small {
   margin-top: -6px;
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-import-guide table {
   width: 100%;
@@ -779,7 +779,7 @@
   border-radius: 10px;
   overflow: hidden;
   background: var(--c-white);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .asset-import-guide td {
   padding: 7px 9px;
@@ -806,7 +806,7 @@
   padding: 0;
   list-style: none;
   color: var(--c-blue-35);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
 }
 @media (max-width: 900px) {
@@ -908,7 +908,7 @@
 .asset-import-head .eyebrow {
   display: block;
   margin: 0 0 2px;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.12em;
 }
 /* Studio density: one-line header, slimmer tabs and library list. */
@@ -998,7 +998,7 @@ html body .owner-hospitals > header {
   padding: 7px 12px;
   text-align: left;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .owner-hospitals td {
@@ -1015,7 +1015,7 @@ html body .owner-hospitals > header {
   border-radius: 999px;
   background: var(--c-gray-95-8);
   color: var(--c-green-45);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .owner-status.warn {
@@ -1041,7 +1041,7 @@ html body .owner-hospitals > header {
 .sterilizer-batch-style {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--c-cyan-50);
 }
@@ -1061,7 +1061,7 @@ html body .sterilizer-batch-style label.on {
   border: 1px solid var(--c-gray-90);
   border-radius: 10px;
   background: var(--c-white);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--c-cyan-50);
 }
 .sterilizer-batch-preview > span {
@@ -1092,7 +1092,7 @@ html body .sterilizer-batch-style label.on {
     gap: 0;
   }
   .asset-import-steps li.active {
-    font-size: 12.5px;
+    font-size: 13px;
     gap: 6px;
   }
   .asset-import-steps li:not(:last-child)::after {
@@ -1104,7 +1104,7 @@ html body .sterilizer-batch-style label.on {
   border-radius: 999px;
   background: var(--c-gray-95-3);
   color: var(--c-cyan-35);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 html body .studio-setting-input select {
@@ -1216,7 +1216,7 @@ html body .studio-error-detail pre {
   overflow: auto;
   border-radius: 8px;
   background: var(--c-gray-95);
-  font-size: 12px;
+  font-size: 12.5px;
   white-space: pre-wrap;
 }
 
@@ -1234,7 +1234,7 @@ html body .studio-notice-new {
 html body .studio-notice-new label {
   display: grid;
   gap: 6px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--c-gray-15);
 }
@@ -1250,7 +1250,7 @@ html body .studio-notice-new input {
 html body .studio-notice-new label small {
   font-weight: 500;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 html body .studio-notice-new > .app-button {
   align-self: start;
@@ -1260,7 +1260,7 @@ html body .studio-notice-new > .app-button {
 html body .studio-notice-warning {
   grid-column: 1/-1;
   color: var(--st-red);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .studio-notice-group {
   display: grid;
@@ -1279,7 +1279,7 @@ html body .studio-notice-group h3 span {
   border-radius: 999px;
   background: var(--c-gray-95-4);
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   text-align: center;
 }
 html body .studio-notice-row.status-ended {
@@ -1318,7 +1318,7 @@ html body .studio-tab-row {
   gap: 10px;
 }
 html body .studio-tab-group {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1379,7 +1379,7 @@ html body .studio-ratings-kpis {
     padding-right: 6px;
     white-space: normal;
     overflow-wrap: anywhere;
-    font-size: 12px;
+    font-size: 12.5px;
   }
   html body .asset-import-guide th:last-child,
   html body .asset-import-guide td:last-child {
@@ -1430,7 +1430,7 @@ html body .studio-ratings-kpis > .attention {
   background: var(--st-amber-soft);
 }
 html body .studio-ratings-kpis span {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: var(--st-muted);
 }
@@ -1442,7 +1442,7 @@ html body .studio-ratings-kpis strong.negative {
   color: var(--st-red);
 }
 html body .studio-ratings-kpis small {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--st-muted);
 }
 html body .studio-rating-bar {
@@ -1478,7 +1478,7 @@ html body .studio-health {
   box-shadow: none;
   background: var(--c-gray-95);
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: 12.5px;
   cursor: default;
 }
 html body .studio-health svg {
@@ -1524,7 +1524,7 @@ html body .evaluation-demo-empty-card strong {
 }
 html body .evaluation-demo-empty-card span {
   max-width: 460px;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 /* The owner's Sterilization Flow page: its title is the page's, so the box keeps its description (the compact
    desktop layout hid it, which left the box empty but for the profile name). */
@@ -1538,7 +1538,7 @@ html body .platform-here {
   min-height: 36px;
   padding: 0 10px;
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1585,7 +1585,7 @@ html body .platform-hospital-name small {
     content: attr(data-label);
     display: block;
     color: var(--st-muted);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
   }
 }
@@ -1645,12 +1645,12 @@ html body .evaluation-demo-row-name {
 }
 html body .evaluation-demo-row-name strong {
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .evaluation-demo-row-name small {
   overflow: hidden;
   color: var(--c-violet-45);
-  font-size: 11.5px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1661,18 +1661,18 @@ html body .evaluation-demo-row-fact {
 }
 html body .evaluation-demo-row-fact small {
   color: var(--c-violet-45);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 html body .evaluation-demo-row-fact b {
   color: var(--c-blue-15);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 html body .evaluation-demo-row-fact em {
   color: var(--c-violet-45);
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
 }
 html body .evaluation-demo-row-open {
@@ -1736,11 +1736,11 @@ html body .owner-demo-toast ul {
 html body .owner-demo-toast li {
   display: grid;
   gap: 1px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--c-white);
 }
 html body .owner-demo-toast small {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--c-gray-90-2);
 }
 
@@ -1766,7 +1766,7 @@ html body .ratings-view-group h3 span {
   padding: 1px 7px;
   border-radius: 999px;
   background: var(--c-gray-95-4);
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
 }
 html body .ratings-view-head {
@@ -1811,7 +1811,7 @@ html body .ratings-final-head {
 html body .ratings-final-head small,
 html body .rating-entry small {
   color: var(--muted);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 html body .ratings-final-scores {
   display: flex;
@@ -1825,7 +1825,7 @@ html body .ratings-final-scores > span {
   padding: 2px 8px;
   border-radius: 999px;
   background: var(--c-gray-95-4);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 html body .ratings-view q {
   display: block;
@@ -1833,7 +1833,7 @@ html body .ratings-view q {
   border-left: 3px solid var(--c-amber-70);
   border-radius: 6px;
   background: var(--c-gray-100-2);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 html body .ratings-part-row {
   display: grid;
@@ -1857,7 +1857,7 @@ html body .ratings-part-row b {
 }
 html body .ratings-part-row small {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 html body .ratings-part-row[aria-expanded='true'] .ratings-part-open {
   transform: rotate(180deg);
@@ -1877,7 +1877,7 @@ html body .rating-entry > div {
   gap: 4px 10px;
 }
 html body .rating-entry-subject {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
 }
 html body .rating-entry b {
@@ -1889,7 +1889,7 @@ html body .rating-entry b.low {
 }
 html body .ratings-demos h4 {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 html body .ratings-person {
   display: grid;
@@ -1898,7 +1898,7 @@ html body .ratings-person {
   border-left: 2px solid var(--c-gray-90);
 }
 html body .ratings-person > strong {
-  font-size: 12.5px;
+  font-size: 13px;
 }
 @media (max-width: 700px) {
   html body .ratings-part-row {
@@ -1908,4 +1908,25 @@ html body .ratings-person > strong {
   html body .ratings-part-row small {
     display: none;
   }
+}
+
+html body .hospital-logo-body {
+  display: grid;
+  place-items: center;
+  min-height: 84px;
+  padding: 12px;
+  border: 1px dashed var(--st-line, #d8e1e5);
+  border-radius: 10px;
+  background: #fff;
+}
+html body .hospital-logo-body img {
+  max-width: 100%;
+  max-height: 72px;
+  object-fit: contain;
+}
+html body .hospital-logo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }

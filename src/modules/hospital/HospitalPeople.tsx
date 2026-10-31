@@ -65,31 +65,50 @@ export default function HospitalPeople({
           </button>
         </div>
       )}
-      <div className="hospital-tabs" role="tablist" aria-label={L('Ενότητες', 'Sections')}>
+      <div className="mode-cards modes-2" role="tablist" aria-label={L('Ενότητες', 'Sections')}>
         <button
           role="tab"
           aria-selected={tab === 'USERS'}
-          className={tab === 'USERS' ? 'active' : ''}
+          className={`mode-card ${tab === 'USERS' ? 'active' : ''}`}
           onClick={() => setTab('USERS')}
         >
-          <Users size={16} /> {L('Χρήστες', 'Users')}
-          <span className="hospital-count">{members.length}</span>
-          {pending.length > 0 && (
-            <span className="hospital-count attention">
-              {pending.length === 1
-                ? L('1 αίτημα', '1 request')
-                : L(`${pending.length} αιτήματα`, `${pending.length} requests`)}
-            </span>
-          )}
+          <span className="mode-card-icon">
+            <Users size={18} />
+          </span>
+          <span>
+            <strong>
+              {L('Χρήστες', 'Users')} <b className="hospital-count">{members.length}</b>
+              {pending.length > 0 && (
+                <b className="hospital-count attention">
+                  {pending.length === 1
+                    ? L('1 αίτημα', '1 request')
+                    : L(`${pending.length} αιτήματα`, `${pending.length} requests`)}
+                </b>
+              )}
+            </strong>
+            <small>{L('Λογαριασμοί, ρόλοι και αιτήματα πρόσβασης', 'Accounts, roles and access requests')}</small>
+          </span>
         </button>
         <button
           role="tab"
           aria-selected={tab === 'DEPARTMENTS'}
-          className={tab === 'DEPARTMENTS' ? 'active' : ''}
+          className={`mode-card ${tab === 'DEPARTMENTS' ? 'active' : ''}`}
           onClick={() => setTab('DEPARTMENTS')}
         >
-          <Building2 size={16} /> {L('Τμήματα', 'Departments')}
-          <span className="hospital-count">{activeDepartments.length}</span>
+          <span className="mode-card-icon">
+            <Building2 size={18} />
+          </span>
+          <span>
+            <strong>
+              {L('Τμήματα', 'Departments')} <b className="hospital-count">{activeDepartments.length}</b>
+            </strong>
+            <small>
+              {L(
+                'Τα τμήματα του νοσοκομείου και πόσα Σετ έχει το καθένα',
+                'The hospital’s departments and how many Sets each holds',
+              )}
+            </small>
+          </span>
         </button>
       </div>
       <UsersSection s={s} />

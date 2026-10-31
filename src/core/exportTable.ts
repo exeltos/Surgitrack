@@ -3,6 +3,7 @@
  * formatted report page for printing or saving as PDF. Both are built from the rows, never from
  * a picture of the screen.
  */
+import {printLogoHtml} from './printBranding';
 import {escapeHtml as html} from './escapeHtml';
 import {formatDateTime} from './displayDate';
 import {markPrintHtml, markTable} from './sampleDataMark';
@@ -278,7 +279,7 @@ tr:nth-child(even) td { background: #f5f8fa; }
 tr { page-break-inside: avoid; }
 footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
 </style></head><body>
-<header><div><h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
+<header><div>${printLogoHtml()}<h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
 <small>SurgiTrack<br>${html(printed)}</small></header>
 <table><thead><tr>${table.headers.map(h => `<th>${html(h)}</th>`).join('')}</tr></thead>
 <tbody>${table.rows.map(row => `<tr>${row.map(v => `<td>${html(v ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>

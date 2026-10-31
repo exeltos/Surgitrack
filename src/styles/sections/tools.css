@@ -22,7 +22,7 @@
 .name-check-kpis span,
 .name-check-kpis small {
   color: var(--st-muted);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .name-check-kpis strong {
   color: var(--c-blue-15-2);
@@ -60,7 +60,7 @@
 .name-check-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .name-check-table td {
   padding: 7px 10px;
@@ -106,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--c-cyan-40-2);
 }
 .name-check-group code {
@@ -122,7 +122,7 @@
   border-radius: 999px;
   background: var(--c-gray-95-2);
   color: var(--c-red-40);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 .name-check-group ul {
@@ -140,7 +140,7 @@
   padding: 6px 10px;
   border-radius: 8px;
   background: var(--c-gray-100-2);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .name-check-group li.odd {
   background: var(--c-gray-100-4);
@@ -192,7 +192,7 @@
 .name-check-list-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .name-check-list-table td {
   padding: 8px 10px;
@@ -227,31 +227,25 @@
 }
 .name-check-sets small {
   color: #7a6235;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
 }
 /* Name check KPIs: same slim look as the other pages. */
-html body .name-check-kpis > div {
-  padding: 8px 14px;
-}
 /* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
 html body .tools-registry .tools-place-set {
-  font-size: 12.5px;
+  font-size: 13px;
   white-space: normal;
 }
 /* Instrument card: the moves of the Set it travels in, under its own. */
 html body .asset-history-group {
   margin: 14px 0 4px;
   color: var(--c-blue-45);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 /* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
-html body .standalone-registry th:nth-child(5) {
-  width: 96px;
-}
 html body .standalone-registry button.row-title-link {
   padding: 0;
   border: 0;
@@ -268,7 +262,7 @@ html body .standalone-registry tr.standalone-piece td:first-child {
 }
 html body .standalone-states {
   color: var(--c-blue-45);
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
 }
 html body .standalone-registry button.icon-link {

@@ -16,7 +16,7 @@ html body .timeline-item.trace-step {
 html body .trace-step time {
   padding-top: 1px;
   color: var(--c-blue-15);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -39,7 +39,7 @@ html body .trace-step > div:last-child {
 }
 html body .trace-step-asset {
   color: var(--c-cyan-35);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
 }
 /* Traceability: several items fit a name, so they are listed to choose from. */
@@ -82,7 +82,7 @@ html body .trace-pick button .mono {
 }
 html body .trace-pick button small {
   color: var(--c-blue-50);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 /* A patient: what was used, each with the last sterilization cycle before the use. */
 html body .trace-patient li {
@@ -96,7 +96,7 @@ html body .trace-patient li a {
 }
 html body .trace-patient li small {
   color: var(--c-blue-50);
-  font-size: 12.5px;
+  font-size: 13px;
 }
 /* The sterilization cycles an item went through. */
 html body .trace-cycles {
@@ -113,7 +113,7 @@ html body .trace-group {
   gap: 6px;
   margin: 0;
   color: var(--c-blue-45);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -126,7 +126,7 @@ html body .trace-cycles li {
   grid-template-columns: 132px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: baseline;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .trace-cycles time {
   font-weight: 700;
@@ -146,7 +146,7 @@ html body .trace-pick > small {
   display: block;
   margin-top: 8px;
   color: var(--c-blue-50);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 @media (max-width: 700px) {
   html body .timeline-item.trace-step {
@@ -170,7 +170,7 @@ html body .trace-pick > small {
     margin-left: 0;
     min-height: 34px;
     padding: 0 12px;
-    font-size: 13px;
+    font-size: 13.5px;
   }
   html body .trace-cycles li {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -186,15 +186,10 @@ html body .trace-pick > small {
     font-size: 19px;
   }
   html body .trace-card p {
-    font-size: 13.5px;
+    font-size: 14px;
   }
 }
 
-/* Search | Uses with a patient code. */
-html body .trace-tabs {
-  flex: none;
-  margin-bottom: 12px;
-}
 /* Uses with a patient code: filters on one line, then the list. */
 html body .trace-patients {
   display: flex;
@@ -219,4 +214,58 @@ html body .trace-back {
   color: var(--primary, #0f6bb8);
   font-weight: 700;
   cursor: pointer;
+}
+
+html body .trace-recent-items {
+  padding: 16px 18px;
+}
+html body .trace-recent-items h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .trace-recent-items ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .trace-recent-items button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+  text-align: left;
+  cursor: pointer;
+}
+html body .trace-recent-items button:hover {
+  border-color: var(--c-cyan-75);
+  background: var(--c-gray-100-2);
+}
+html body .trace-recent-items button span {
+  overflow: hidden;
+  font-weight: 700;
+  color: var(--c-cyan-20);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .trace-recent-items button small {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  color: var(--st-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 800px) {
+  html body .trace-recent-items ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

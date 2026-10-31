@@ -59,7 +59,7 @@ html body .reports-catalog {
   html body .reports-table td::before {
     content: attr(data-label);
     color: var(--c-blue-50);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     font-family: Inter, system-ui, sans-serif;
   }

@@ -25,6 +25,18 @@ describe('TraceabilityPage', () => {
     expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
   });
 
+  it('offers the download on one patient’s page and on a Set’s trail, next to its list', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients&patient=PT-2026-0041'});
+    expect(screen.getByText('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /Λήψη/})).toBeInTheDocument();
+  });
+
+  it('lists a Set’s moves as a table with the download beside the search', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?q=S000329'});
+    expect(document.querySelectorAll('.trace-ledger .ledger-row').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', {name: /Λήψη/})).toBeInTheDocument();
+  });
+
   it('shows nothing for an unknown patient code', () => {
     renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients'});
     fireEvent.change(within(uses()).getByPlaceholderText('Κωδικός ασθενούς, π.χ. PT-2026-0041'), {

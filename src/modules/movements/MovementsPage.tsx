@@ -194,12 +194,17 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
     forgetMovements(ids);
     stopCleaning();
   };
+  // On its own the export sits in the page head; inside Traceability it sits with the search, as in its other tabs.
+  const downloadMenu = (
+    <DownloadMenu table={exportTable} onPrint={() => setReport(tableReportHtml(exportTable(), getI18nLang()))} />
+  );
   return (
     <div className={embedded ? 'movements-workspace embedded' : 'movements-workspace'}>
       <div className="page-head movements-head">
         <div>
           {!embedded && <h1>{tr('Ιστορικό')}</h1>}
-          <p>
+          {/* Inside Traceability the card above already says it. */}
+          <p className={embedded ? 'visually-hidden' : undefined}>
             {role === 'DEPARTMENT'
               ? tr('Ιστορικό ιχνηλασιμότητας του τμήματος {0}.', trData(currentUser.department))
               : tr('Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.')}
@@ -211,11 +216,12 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
               <Eraser size={16} /> {tr('Καθαρισμός ιστορικού')}
             </button>
           )}
-          <DownloadMenu table={exportTable} onPrint={() => setReport(tableReportHtml(exportTable(), getI18nLang()))} />
+          {!embedded && downloadMenu}
         </div>
       </div>
       <AssetFilterBar
         className="movement-filter-bar"
+        extra={embedded ? downloadMenu : undefined}
         query={q}
         onQueryChange={setQ}
         placeholder={tr('Barcode, Σετ/εργαλείο, χρήστης ή κωδικός ασθενούς...')}

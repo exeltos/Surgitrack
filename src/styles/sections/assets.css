@@ -14,7 +14,7 @@
 .asset-filter-date {
   display: grid;
   gap: 4px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--muted);
 }
 /* In the Reports filter strip the Filters button sits on the left: open its panel to the right. */
@@ -69,7 +69,7 @@
   border-radius: 10px;
   background: var(--c-amber-95-2);
   color: var(--c-amber-35);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.45;
 }
 .asset-manage-choices[hidden] {
@@ -82,7 +82,7 @@
   border: 1px solid var(--c-amber-85);
   border-radius: 12px;
   background: var(--c-gray-100);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .asset-manage-reports > b {
   color: var(--c-amber-35);
@@ -139,7 +139,7 @@
   border-radius: 10px;
   background: var(--c-amber-95-2);
   color: var(--c-orange-40);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .color-search {
   display: flex;
@@ -196,7 +196,7 @@
   color: var(--st-muted);
 }
 .new-barcode-swap small {
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -240,7 +240,7 @@
   display: block;
   margin-top: 6px;
   color: var(--st-muted, var(--c-cyan-55));
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 500;
   line-height: 1.45;
 }
@@ -347,7 +347,7 @@ html body .asset-filter-panel footer button {
 /* New Set / instrument: why «Αποθήκευση» is not available yet. */
 html body .asset-create-hint {
   color: #8a5a00;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -360,7 +360,7 @@ html body .browse-arrows {
   padding-left: 12px;
   border-left: 1px solid var(--line, var(--c-gray-90-3));
   color: var(--c-blue-35);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -409,7 +409,7 @@ html body .photo-viewer img {
 }
 html body .photo-viewer figcaption {
   color: var(--st-muted);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 html body .photo-viewer .icon-button {
   position: absolute;

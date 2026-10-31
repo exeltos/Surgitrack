@@ -1,5 +1,6 @@
 import {emitBinDraft} from './binBridge';
-import {createContext, useContext, useMemo, useState, type ReactNode} from 'react';
+import {setPrintLogo} from './printBranding';
+import {createContext, useContext, useEffect, useMemo, useState, type ReactNode} from 'react';
 import {getAdminRepository} from '../data/adminRepositories';
 import {DEMO_ORGANIZATION, LEGACY_DEMO_ORGANIZATION_IDS} from '../data/adminRepositories/demoRepository';
 import type {SurgiDataMode} from '../data/repositories';
@@ -125,6 +126,9 @@ export function LibraryStoreProvider({
       if (localStorageKey) localStorage.setItem(localStorageKey, JSON.stringify(next));
       return next;
     });
+  // What the hospital prints carries its logo, when it has one.
+  const hospitalLogo = state.systemSettings.label?.logo;
+  useEffect(() => setPrintLogo(hospitalLogo), [hospitalLogo]);
   const libraryRecord = useMemo(() => [{...state, id: 'state'}], [state]);
   // Settings another device saved (another admin, another screen) replace this screen's copy.
   useAppRecordSync(cloud?.organizationId, 'library', libraryRecord, remote => {

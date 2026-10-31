@@ -1,7 +1,6 @@
-import {useLibraries} from '../../core/LibraryStore';
 import {useEffect, useState} from 'react';
 import {useUnsavedChanges} from '../../app/UnsavedChanges';
-import {Barcode, Camera, Check, Images, Minus, Palette, Pencil, Plus, X} from 'lucide-react';
+import {Barcode, Camera, Check, Images, Palette, Pencil, X} from 'lucide-react';
 import ColorMarker from './ColorMarker';
 import type {AssetKind, AssetState, Ownership, SetAsset, Tool} from '../../types/domain';
 import StatusBadge from '../ui/StatusBadge';
@@ -19,8 +18,6 @@ type EditablePatch = Partial<
 type Props = {
   kind: AssetKind;
   asset: SetAsset | Tool;
-  memberCount?: number;
-  expectedCount?: number;
   setName?: string;
   setDepartment?: string;
   /** The Set a member instrument travels in: its state and sterile dates are the instrument's. */
@@ -35,7 +32,6 @@ type Props = {
   /** Lives (usage limit) are editable only by the admin and the Sterilization supervisor. */
   canEditUsage?: boolean;
   /** Usage-limit managers: corrects the recorded uses by one (a use counted by mistake, or missed). */
-  onCorrectUses?: (delta: 1 | -1) => void;
 };
 const states: Array<{value: AssetState; label: string}> = [
   {value: 'IN_DEPARTMENT', label: 'Στο τμήμα'},
@@ -65,8 +61,6 @@ const ownershipLabel = (asset: {ownership?: Ownership; ownerName?: string}) => {
 export default function AssetWorkbenchSidebar({
   kind,
   asset,
-  memberCount,
-  expectedCount,
   setName,
   setDepartment,
   memberOf,
@@ -77,9 +71,7 @@ export default function AssetWorkbenchSidebar({
   markerNote,
   onEditMarker,
   canEditUsage = false,
-  onCorrectUses,
 }: Props) {
-  const {systemSettings} = useLibraries();
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
@@ -176,6 +168,7 @@ export default function AssetWorkbenchSidebar({
           ) : (
             <StatusBadge value={carrier.state} />
           )}{' '}
+          {fromSet && !displayStateLabel && <small className="muted">{tr('με το Σετ')}</small>}{' '}
           {sterile && sterile.state !== 'OK' && <ExpiryBadge entry={sterile} />}
           {workflowLocked && <small>{tr('Ενεργή διαδικασία · αλλαγές στοιχείων κλειδωμένες')}</small>}
         </div>
@@ -206,31 +199,25 @@ export default function AssetWorkbenchSidebar({
         )}
       </div>
       <dl className="asset-workbench-fields">
-        <div>
-          <dt>{tr('Κατάσταση')}</dt>
-          <dd>
-            {!editing && displayStateLabel ? (
-              <span className="status-badge asset-member-status">{displayStateLabel}</span>
-            ) : editing ? (
+        {/* The status shows once, in the title; the row is only the field to change it. */}
+        {editing && (
+          <div>
+            <dt>{tr('Κατάσταση')}</dt>
+            <dd>
               <select
                 className="asset-inline-input"
                 value={draft.state}
                 onChange={e => setDraft(c => ({...c, state: e.target.value as AssetState}))}
               >
-                {states.map(s => (
-                  <option key={s.value} value={s.value}>
-                    {tr(s.label)}
+                {states.map(st => (
+                  <option key={st.value} value={st.value}>
+                    {tr(st.label)}
                   </option>
                 ))}
               </select>
-            ) : (
-              <>
-                <StatusBadge value={carrier.state} />
-                {fromSet && <small className="muted"> {tr('με το Σετ')}</small>}
-              </>
-            )}
-          </dd>
-        </div>
+            </dd>
+          </div>
+        )}
         {/* Always shown: the dates once released, a dash while the item is not sterile. */}
         <div>
           <dt>{tr('Αποστείρωση')}</dt>
@@ -394,10 +381,11 @@ export default function AssetWorkbenchSidebar({
             )}
           </dd>
         </div>
-        <div className="asset-usage-field">
-          <dt>{tr('Αρχικό όριο χρήσεων')}</dt>
-          <dd>
-            {editing && canEditUsage && draft.usageType === 'LIMITED' ? (
+        {/* The limit, the uses and the remainder are on the Summary tab; here only while editing the limit. */}
+        {editing && canEditUsage && draft.usageType === 'LIMITED' && (
+          <div className="asset-usage-field">
+            <dt>{tr('Αρχικό όριο χρήσεων')}</dt>
+            <dd>
               <input
                 className="asset-inline-input"
                 type="number"
@@ -405,52 +393,8 @@ export default function AssetWorkbenchSidebar({
                 value={draft.maxUses}
                 onChange={e => setDraft(c => ({...c, maxUses: e.target.value}))}
               />
-            ) : (
-              (asset.maxUses ?? '—')
-            )}
-          </dd>
-        </div>
-        {asset.maxUses !== undefined && (
-          <>
-            <div>
-              <dt>{tr('Χρήσεις')}</dt>
-              <dd>
-                {onCorrectUses ? (
-                  <span className="usage-correct">
-                    <span>{asset.uses || 0}</span>
-                    <button
-                      type="button"
-                      onClick={() => onCorrectUses(-1)}
-                      disabled={(asset.uses || 0) <= 0}
-                      aria-label={tr('Μία χρήση λιγότερη')}
-                      title={tr('Μία χρήση λιγότερη')}
-                    >
-                      <Minus size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onCorrectUses(1)}
-                      disabled={(asset.uses || 0) >= asset.maxUses}
-                      aria-label={tr('Μία χρήση περισσότερη')}
-                      title={tr('Μία χρήση περισσότερη')}
-                    >
-                      <Plus size={12} />
-                    </button>
-                  </span>
-                ) : (
-                  asset.uses || 0
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>{tr('Υπόλοιπο χρήσεων')}</dt>
-              <dd
-                className={asset.maxUses - (asset.uses || 0) <= systemSettings.usageWarningThreshold ? 'warn-text' : ''}
-              >
-                {Math.max(0, asset.maxUses - (asset.uses || 0))}
-              </dd>
-            </div>
-          </>
+            </dd>
+          </div>
         )}
       </dl>
       <div className="asset-sidebar-quickfacts">
@@ -461,25 +405,18 @@ export default function AssetWorkbenchSidebar({
           </div>
           <strong className="mono">{asset.barcode}</strong>
         </div>
-        {kind === 'SET' ? (
-          <div className="asset-workbench-mini">
-            <AssetTypeIcon kind="SET" size={17} />
-            <div>
-              <span>{tr('Περιεχόμενα Σετ')}</span>
-              <strong>
-                {memberCount}/{expectedCount} {tr('εργαλεία')}
-              </strong>
-            </div>
-          </div>
-        ) : (
+        {kind === 'SET' ? null : (
           <>
-            <div className="asset-workbench-mini">
-              <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} size={17} />
-              <div>
-                <span>{tr('Χρήσεις')}</span>
-                <strong>{tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool?.uses || 0)}</strong>
+            {/* The uses of a limited instrument are on the Summary tab; here only a count with no limit. */}
+            {!tool?.maxUses && (
+              <div className="asset-workbench-mini">
+                <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} size={17} />
+                <div>
+                  <span>{tr('Χρήσεις')}</span>
+                  <strong>{tr('{0} χρήσεις', tool?.uses || 0)}</strong>
+                </div>
               </div>
-            </div>
+            )}
             <button
               className="asset-tool-photo-card"
               type="button"
