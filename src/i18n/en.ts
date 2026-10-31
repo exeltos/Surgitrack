@@ -2205,9 +2205,7 @@ export const en: Record<string, string> = {
     'To see who handed over to whom and which signatures are missing.',
   'Ανά είδος': 'By kind',
   'Ανά κλίβανο': 'By sterilizer',
-  'Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα': 'Press a card or a group to see the list',
   'Εμφάνιση όλων': 'Show all',
-  'Κλείσιμο λίστας': 'Close the list',
   'Το κουμπί «Οδηγός οθόνης» με σύντομες οδηγίες για κάθε οθόνη. Αλλάζει αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
     'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',
   Καινούργιο: 'New',

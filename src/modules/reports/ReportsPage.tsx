@@ -133,7 +133,7 @@ export default function ReportsPage() {
 
   const summary = reportSummary(active, reportData.rows, warningThreshold);
   const split = splitRows(active, reportData.rows);
-  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : []), [view, reportData.rows]);
+  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : reportData.rows), [view, reportData.rows]);
   const buildPreview = () => {
     const subtitle =
       active === 'inventory'
@@ -447,12 +447,12 @@ export default function ReportsPage() {
               <div>
                 <strong>{view ? view.label : tr('Αποτελέσματα')}</strong>
                 <span>
-                  {view ? viewRows.length : reportData.rows.length} {tr('εγγραφές')}
+                  {viewRows.length} {tr('εγγραφές')}
                 </span>
               </div>
               {view && (
                 <button type="button" className="reports-close-list" onClick={() => setView(null)}>
-                  {tr('Κλείσιμο λίστας')}
+                  {tr('Εμφάνιση όλων')}
                 </button>
               )}
               {active === 'usage' &&
@@ -471,19 +471,7 @@ export default function ReportsPage() {
               tabIndex={0}
               aria-label={tr('Αποτελέσματα')}
             >
-              {!view ? (
-                <div className="reports-empty">
-                  <FileText size={30} />
-                  <strong>{tr('Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα')}</strong>
-                  <button
-                    type="button"
-                    className="app-button"
-                    onClick={() => setView({label: tr('Σύνολο'), test: () => true})}
-                  >
-                    {tr('Εμφάνιση όλων')}
-                  </button>
-                </div>
-              ) : viewRows.length ? (
+              {viewRows.length ? (
                 <table className="reports-table">
                   <thead>
                     <tr>
