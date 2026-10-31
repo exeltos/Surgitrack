@@ -408,8 +408,6 @@ export const en: Record<string, string> = {
   'Δεν υπάρχει πρόσβαση σε αυτό το Σετ.': 'No access to this set.',
   'Δεν υπάρχει πρόσβαση σε αυτό το εργαλείο.': 'No access to this instrument.',
   'Δεν υπάρχουν ανοικτές εκκρεμότητες.': 'No open issues.',
-  'Τελευταία κίνηση': 'Latest movement',
-  'Δες όλες ({0})': 'See all ({0})',
   'Δεν υπάρχουν αποτελέσματα': 'No results',
   'Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την κατηγορία.': 'No instruments available in this category.',
   'Δεν υπάρχουν διαθέσιμα εργαλεία σε αυτή την πηγή.': 'No instruments available at this source.',
