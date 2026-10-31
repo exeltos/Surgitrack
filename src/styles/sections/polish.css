@@ -500,6 +500,10 @@ html body .stock-min-table th:nth-child(5) {
     width: 168px;
   }
 }
-html body .asset-registry-table.registry-fixed:not(.sets-registry):not(.tools-registry):not(.expiry-table) td small.row-sub {
+html
+  body
+  .asset-registry-table.registry-fixed:not(.sets-registry):not(.tools-registry):not(.expiry-table)
+  td
+  small.row-sub {
   max-width: 300px;
 }
