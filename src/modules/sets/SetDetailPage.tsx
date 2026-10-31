@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
+import AssetSummaryExtras from '../../components/assets/AssetSummaryExtras';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import AddToolsToSetModal from '../../components/assets/AddToolsToSetModal';
@@ -285,8 +286,6 @@ export default function SetDetailPage() {
         <AssetWorkbenchSidebar
           kind="SET"
           asset={set}
-          memberCount={members.length}
-          expectedCount={set.expected}
           onPhotos={() => setPhotosOpen(true)}
           workflowLocked={workflowLocked}
           onSave={can('asset.edit') ? patch => updateSet(set.id, patch) : undefined}
@@ -336,6 +335,13 @@ export default function SetDetailPage() {
                       <dd className={memberIssues.length ? 'warn-text' : ''}>{memberIssues.length}</dd>
                     </div>
                   </dl>
+                  <AssetSummaryExtras
+                    lastMovement={history[0]}
+                    undone={undone}
+                    issues={memberIssues}
+                    onOpenHistory={() => setTab('HISTORY')}
+                    onOpenIssues={() => setTab('ISSUES')}
+                  />
                   {!complete && (
                     <div className="asset-alert warning asset-side-alert">
                       <TriangleAlert size={18} />

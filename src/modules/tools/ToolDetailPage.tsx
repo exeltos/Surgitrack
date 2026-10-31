@@ -17,8 +17,8 @@ import {
   X,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
-import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
+import AssetSummaryExtras from '../../components/assets/AssetSummaryExtras';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -379,16 +379,17 @@ export default function ToolDetailPage() {
                       <dd>{location}</dd>
                     </div>
                     <div>
-                      <dt>{tr('Κατάσταση')}</dt>
-                      <dd>
-                        <StatusBadge value={tool.state} />
-                      </dd>
-                    </div>
-                    <div>
                       <dt>{tr('Ανοικτές εκκρεμότητες')}</dt>
                       <dd className={toolIssues.length ? 'warn-text' : ''}>{toolIssues.length}</dd>
                     </div>
                   </dl>
+                  <AssetSummaryExtras
+                    lastMovement={history[0]}
+                    undone={undone}
+                    issues={toolIssues}
+                    onOpenHistory={() => setTab('HISTORY')}
+                    onOpenIssues={() => setTab('ISSUES')}
+                  />
                   {set && (
                     <Link className="asset-related-set-link" to={`/sets/${set.id}`}>
                       <Layers3 size={17} />

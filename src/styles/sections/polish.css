@@ -384,3 +384,114 @@ html body .asset-empty > svg {
   height: 30px;
   opacity: 0.55;
 }
+
+/* A lone card in the quick facts (the barcode of a Set) takes the whole width. */
+html body .asset-sidebar-quickfacts > :only-child {
+  grid-column: 1 / -1;
+}
+
+/* Summary tab of a Set or instrument: the latest movement and the open reports under the numbers. */
+html body .asset-summary-extras {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+html body .asset-summary-extras > section {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .asset-summary-extras header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+html body .asset-summary-extras header > strong {
+  font-size: 13px;
+}
+html body .asset-summary-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-cyan-35);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+html body .asset-summary-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding-top: 8px;
+  border-top: 1px solid var(--c-gray-90-4);
+}
+html body .asset-summary-row > svg {
+  margin-top: 2px;
+  color: var(--st-muted);
+}
+html body .asset-summary-row > svg.warn {
+  color: var(--c-orange-45);
+}
+html body .asset-summary-row strong {
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+html body .asset-summary-row small {
+  display: block;
+  color: var(--st-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+html body .asset-summary-none {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--c-gray-90-4);
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
+@media (max-width: 900px) {
+  html body .asset-summary-extras {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+html body .asset-summary-extras {
+  margin-bottom: 12px;
+}
+/* «Belongs to the Set» on an instrument's Summary: a card like the ones above it. */
+html body .asset-related-set-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: inherit;
+  text-decoration: none;
+}
+html body .asset-related-set-link:hover {
+  border-color: var(--c-cyan-40);
+}
+html body .asset-related-set-link > span {
+  display: grid;
+  min-width: 0;
+}
+html body .asset-related-set-link small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .asset-related-set-link strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
