@@ -125,8 +125,10 @@ async function loadSeed() {
 function appRoutes() {
   const source = readFileSync(join(ROOT, 'src/app/App.tsx'), 'utf8');
   const routes = [];
-  const re = /<Route\s+path="([^"]+)"\s+element=\{\s*<Guard permission="([^"]+)"/g;
-  for (let m; (m = re.exec(source));) routes.push({path: m[1], permission: m[2]});
+  // A Guard may follow a comment and may take a list of permissions (any one opens the page): the first is used.
+  const re =
+    /<Route\s+path="([^"]+)"\s+element=\{\s*(?:\/\/[^\n]*\n\s*)*<Guard permission=(?:"([^"]+)"|\{\[\s*'([^']+)')/g;
+  for (let m; (m = re.exec(source));) routes.push({path: m[1], permission: m[2] ?? m[3]});
   return routes;
 }
 

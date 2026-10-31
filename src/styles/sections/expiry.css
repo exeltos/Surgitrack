@@ -32,7 +32,16 @@ html body .expiry-table th:nth-child(8) {
   width: 132px;
 }
 html body .expiry-table th:nth-child(6) {
-  width: 140px;
+  width: 112px;
+}
+/* Department and position take a fixed share, so the name keeps the rest and the position pill has room. */
+@media (min-width: 1101px) {
+  html body .expiry-table th:nth-child(3) {
+    width: 150px;
+  }
+  html body .expiry-table th:nth-child(4) {
+    width: 168px;
+  }
 }
 /* Expiry on a tablet: narrower fixed columns, the name keeps its room. */
 html body .expiry-sub-barcode {

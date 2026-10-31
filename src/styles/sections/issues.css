@@ -21,7 +21,10 @@ html body .issues-fixed th.col-photos {
   width: 100px;
 }
 html body .issues-fixed th.col-created {
-  width: 128px;
+  width: 148px;
+}
+html body .issues-fixed td.issue-created {
+  white-space: nowrap;
 }
 html body .issues-fixed .issue-note-inline {
   display: none;
