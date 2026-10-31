@@ -308,3 +308,22 @@ html body .tools-list-workspace .kpis > .kpi-item {
   min-height: 0 !important;
   padding: 10px 16px !important;
 }
+
+/* New order: the empty list says so across the whole width, not inside the first column. */
+html body .order-empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--st-muted);
+}
+/* Issues: the card link is an icon until hovered, so each row has fewer boxes. */
+html body .issues-fixed .issue-actions-row > a.issue-action {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--st-muted);
+}
+html body .issues-fixed .issue-actions-row > a.issue-action:hover {
+  border-color: var(--c-gray-90);
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-35);
+}

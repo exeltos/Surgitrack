@@ -116,15 +116,11 @@ export default function OrderDialog({
                   </td>
                 </tr>
               ))}
-              {!lines.length && (
-                <tr>
-                  <td colSpan={6} className="empty">
-                    {tr('Προσθέστε το πρώτο εργαλείο από τη φόρμα παρακάτω.')}
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
+          {!lines.length && (
+            <div className="order-empty">{tr('Προσθέστε το πρώτο εργαλείο από τη φόρμα παρακάτω.')}</div>
+          )}
         </div>
         <div className="replacements-order-add">
           <label>
