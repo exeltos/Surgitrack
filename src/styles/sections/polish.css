@@ -738,3 +738,87 @@ html body .mode-card .hospital-count {
     align-content: start;
   }
 }
+
+/* Libraries, on a computer: the seven libraries are a row of cards (like Reports and Traceability) and the chosen one
+   takes the whole width, so every record shows without a narrow column. */
+@media (min-width: 1101px) {
+  html body .studio-manager {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: auto;
+    gap: 12px;
+  }
+  html body .studio-manager-nav {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    padding: 0 !important;
+  }
+  html body .studio-manager-nav > button {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-areas:
+      'icon name'
+      'icon count';
+    row-gap: 0;
+    align-items: center;
+    min-height: 58px;
+    padding: 9px 12px;
+    border: 1px solid var(--c-gray-90);
+    border-radius: var(--radius-card);
+    background: var(--c-white);
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .studio-manager-nav > button:hover {
+    border-color: var(--c-cyan-70);
+  }
+  html body .studio-manager-nav > button > span {
+    grid-area: icon;
+  }
+  html body .studio-manager-nav > button > div {
+    grid-area: name;
+  }
+  html body .studio-manager-nav > button b {
+    font-size: 12.5px;
+    line-height: 1.2;
+  }
+  html body .studio-manager-nav > button {
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 8px;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 6px;
+  }
+  html body .studio-manager-nav > button > span {
+    width: 28px;
+    height: 28px;
+  }
+  html body .studio-manager-nav > button .studio-nav-count {
+    grid-area: count;
+    justify-self: start;
+    min-width: 0;
+    padding: 0;
+    background: none;
+    font-size: 12.5px;
+  }
+  html body .studio-manager-nav > button.active {
+    border-color: var(--c-cyan-40);
+    background: linear-gradient(180deg, var(--c-gray-95) 0%, var(--c-white) 100%);
+    box-shadow:
+      0 0 0 1px var(--c-cyan-40),
+      var(--shadow-card);
+  }
+  html body .studio-manager-nav > button.active > span {
+    background: var(--c-cyan-40);
+    color: var(--c-white);
+  }
+  html body .studio-manager-nav > button.active .studio-nav-count {
+    background: none;
+  }
+}
