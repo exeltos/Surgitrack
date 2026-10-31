@@ -246,9 +246,6 @@ html body .asset-history-group {
   text-transform: uppercase;
 }
 /* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
-html body .standalone-registry th:nth-child(5) {
-  width: 96px;
-}
 html body .standalone-registry button.row-title-link {
   padding: 0;
   border: 0;

@@ -470,3 +470,20 @@ html body .asset-section-body .form-grid-comfortable {
     padding-bottom: 8px;
   }
 }
+
+/* Standalone instruments: the status and expiry columns are short, so the name, the department and «Χωρίς όριο» get the room. */
+html body .standalone-registry th:nth-child(3) {
+  width: 148px;
+}
+html body .standalone-registry th:nth-child(4) {
+  width: 164px;
+}
+html body .standalone-registry th:nth-child(5) {
+  width: 100px;
+}
+html body .standalone-registry th:nth-child(6) {
+  width: 124px;
+}
+html body .standalone-registry th:nth-child(7) {
+  width: 96px;
+}
