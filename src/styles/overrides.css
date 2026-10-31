@@ -2643,10 +2643,7 @@ html body .asset-detail-body .set-tool-row {
 /* New Set / instrument form: the hint sits under the field, in the field's column, and stays short. */
 html body .asset-create-field-list label > small {
   grid-column: 2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden;
   margin-top: -2px;
 }
 /* Name check KPIs: same slim look as the other pages. */

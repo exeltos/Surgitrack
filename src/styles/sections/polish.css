@@ -445,3 +445,28 @@ html body .tools-registry th:nth-child(6) {
 html body .tools-registry td small.row-sub {
   max-width: 300px;
 }
+
+/* New Set / instrument form: the hint under a field is shown whole; the panel has the room. */
+html body .asset-create-field-list label > small {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-height: 1.35;
+}
+/* New Set / instrument, right panel: the info card and the quantity share one top edge. */
+html body .asset-section-body .form-grid-comfortable {
+  align-items: start;
+}
+
+/* New Set, picking instruments: a narrower barcode and origin leave the name its line; rows are lower, so more show. */
+@media (min-width: 1101px) {
+  html body .create-set-list-head,
+  html body .create-set-tool-row {
+    grid-template-columns: 34px 124px minmax(0, 1fr) 140px;
+  }
+  html body .create-set-tool-row {
+    min-height: 52px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
