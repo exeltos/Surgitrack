@@ -57,7 +57,7 @@ const QUEUE_OF: Partial<Record<AssetState, string>> = {
  * The hospital admin's home: the whole hospital at a glance — where the sets and instruments
  * are, what each department holds, what is stuck, and the latest movements.
  */
-const DEPARTMENTS_SHOWN = 6;
+const DEPARTMENTS_SHOWN = 7;
 
 export default function HospitalOverviewPage() {
   const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();

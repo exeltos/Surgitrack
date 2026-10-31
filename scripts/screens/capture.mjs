@@ -60,6 +60,8 @@ const REBUILD = !!arg('rebuild', false);
 const EXTRAS = !arg('no-extras', false);
 const SETTLE_MS = Number(arg('settle', 600));
 const A11Y = !!arg('a11y', false);
+// --exact: the window's own size, panels left scrolling (what a person sees), instead of growing the window.
+const EXACT = !!arg('exact', false);
 const AXE = join(ROOT, 'node_modules/axe-core/axe.min.js');
 
 /** axe-core findings for the page as it is now: rule, impact, how many elements and a few of them. */
@@ -349,7 +351,7 @@ async function shoot(page, file, viewport) {
   if (BEFORE) await page.evaluate(BEFORE).catch(() => undefined);
   const size = VIEWPORTS[viewport];
   let height = size.height;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < (EXACT ? 0 : 5); i++) {
     const extra = await page.evaluate(() => {
       let most = 0;
       for (const el of document.querySelectorAll('body *')) {
@@ -365,7 +367,7 @@ async function shoot(page, file, viewport) {
     await page.setViewportSize({width: size.width, height});
     await page.waitForTimeout(250);
   }
-  await page.screenshot({path: join(OUT, file), fullPage: true, animations: 'disabled'});
+  await page.screenshot({path: join(OUT, file), fullPage: !EXACT, animations: 'disabled'});
   if (height !== size.height) await page.setViewportSize(size);
 }
 
