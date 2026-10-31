@@ -226,8 +226,9 @@ export default function StockPage() {
                               {t.name}
                             </Link>
                             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
-                            <small className="row-sub">{t.code}</small>
-                            {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
+                            <small className="row-sub">
+                              {[t.code, t.serialNumber && `S/N ${t.serialNumber}`].filter(Boolean).join(' · ')}
+                            </small>
                           </span>
                         </div>
                       </td>

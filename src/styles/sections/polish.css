@@ -487,3 +487,19 @@ html body .standalone-registry th:nth-child(6) {
 html body .standalone-registry th:nth-child(7) {
   width: 96px;
 }
+
+/* Stock: two lines per instrument (the serial number joins the code line, as in the instruments list); the minimums status stays on one line. */
+html body .stock-min-status {
+  white-space: nowrap;
+}
+html body .stock-min-table th:nth-child(5) {
+  width: 150px;
+}
+@media (min-width: 1281px) {
+  html body .stock-min-table th:nth-child(5) {
+    width: 168px;
+  }
+}
+html body .asset-registry-table.registry-fixed:not(.sets-registry):not(.tools-registry):not(.expiry-table) td small.row-sub {
+  max-width: 300px;
+}
