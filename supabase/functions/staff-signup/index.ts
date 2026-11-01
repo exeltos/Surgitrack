@@ -3,6 +3,7 @@ import {createClient} from "jsr:@supabase/supabase-js@2";
 import {clientIp, corsFor, jsonWith} from "../_shared/http.ts";
 import {appSite, esc, layout, mailConfigured, sendEmail} from "../_shared/mail.ts";
 import {releaseUnconfirmedSignup} from "../_shared/unconfirmedSignup.ts";
+import {confirmEmailChange} from "../_shared/emailChange.ts";
 
 // Public signup form (#/join/<token>): through a hospital's signup link, or a personal invitation
 // (emailed, or its link passed on by hand). The person fills in their name, department (and email
@@ -52,6 +53,14 @@ Deno.serve(async req => {
         .eq("status", "PENDING_EMAIL")
         .maybeSingle();
       if (waitingError) return json({error: "unavailable"}, 503);
+      if (!waiting) {
+        // Not a signup: the link of a sign-in email change, made by a hospital admin and confirmed by the new address.
+        const change = await confirmEmailChange(admin, token);
+        if (change.status === "ok") return json({ok: true, kind: "email_change", email: change.email, organization_name: change.organization});
+        if (change.status === "unavailable") return json({error: "unavailable"}, 503);
+        if (change.status === "taken") return json({error: "email_taken"}, 409);
+        return json({error: "link_invalid"}, 410);
+      }
       if (!waiting?.user_id || Date.parse(waiting.requested_at) + CONFIRM_DAYS * 864e5 < Date.now())
         return json({error: "link_invalid"}, 410);
       const {error: confirmError} = await admin.auth.admin.updateUserById(waiting.user_id, {email_confirm: true});
