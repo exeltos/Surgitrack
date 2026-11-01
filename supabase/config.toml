@@ -23,3 +23,11 @@ verify_jwt = false
 # Called by the database scheduler with the cron secret; it checks that (or the platform owner) itself.
 [functions.reminders]
 verify_jwt = false
+
+# Editing a staff account (name, email, role, access). The live project runs this function with the gateway
+# check off (found on 01/11/2026). The function checks the caller itself: no valid session is refused with 401,
+# anyone who is not an active admin with 403, and a hospital admin cannot change another admin (only the platform
+# owner). It is recorded here so that a deploy from this repository does not change the setting quietly. Turning
+# the gateway check on would be a separate decision, tried first with a real admin session.
+[functions.update-staff]
+verify_jwt = false

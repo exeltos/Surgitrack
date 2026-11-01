@@ -25,7 +25,7 @@ Applied with the Supabase MCP `apply_migration` after a fresh platform backup (0
 checks of the live schema; each file is named after the version the project recorded. After each one the checks of
 `docs/RUNBOOK-database-rollout.md` gave the expected result. The same day the three staff functions that enforce the same
 rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `verify_jwt = false` as it had) were deployed;
-`update-staff` is not listed in `config.toml` for that setting, so the repository and the live project differ there.
+`update-staff` was not listed in `config.toml` for that setting; it is now (`verify_jwt = false`, as live), so the repository and the live project agree.
 
 `20261101210816_hide_profile_contacts` had already been run by hand in the Dashboard at 15:29 UTC, before the app that
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
