@@ -82,7 +82,7 @@ for (const {file, tree} of trees)
   });
 
 // The longhands each property sets, as the browser expands it.
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.CHROMIUM_PATH ? {executablePath: process.env.CHROMIUM_PATH} : {});
 const page = await browser.newPage();
 // Every declaration of the rules concerned: a later one in the same rule matters too (below).
 const ruleDecls = [...new Set(decls.map(({decl}) => decl.parent))].flatMap(rule =>
