@@ -37,6 +37,8 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
 
+Edge functions deployed on 02/11/2026 without a migration: `staff-signup` v25 (every signup counts against the limits: 30 an hour per address, 200 an hour per hospital link, 5 a day per email address).
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and
