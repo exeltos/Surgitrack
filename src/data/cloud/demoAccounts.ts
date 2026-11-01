@@ -1,5 +1,6 @@
 import {supabase} from '../../lib/supabase';
 import type {DemoAccount} from '../../core/demoAccounts';
+import {loadProfileContacts} from './profileContacts';
 import {DEMO_PACK_VERSION, seedDemoOrganization} from './demoSeed';
 import {guideSteps} from '../../core/demoGuide';
 import type {UserRole} from '../../store/types';
@@ -103,13 +104,17 @@ export const loadDemoAccounts = async (): Promise<DemoAccount[]> => {
       if (!lastRun.has(run.organization_id)) lastRun.set(run.organization_id, run);
     const {data: profiles, error: profilesError} = await supabase
       .from('profiles')
-      .select('id,name,email,role,active,user_code,organization_id')
+      .select('id,name,role,active,organization_id')
       .in(
         'organization_id',
         rows.map(row => row.organization_id),
       );
     if (profilesError) throw profilesError;
-    for (const p of (profiles || []) as Array<Person & {organization_id: string}>) {
+    // Sign-in emails and usernames come through profile_contacts() (the platform owner gets everyone's).
+    const {contacts, error: contactsError} = await loadProfileContacts();
+    if (contactsError) throw contactsError;
+    for (const row of (profiles || []) as Array<Omit<Person, 'email' | 'user_code'> & {organization_id: string}>) {
+      const p = {...row, email: contacts.get(row.id)?.email ?? '', user_code: contacts.get(row.id)?.user_code ?? null};
       const list = people.get(p.organization_id) || [];
       list.push(p);
       people.set(p.organization_id, list);

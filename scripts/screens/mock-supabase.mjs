@@ -540,6 +540,8 @@ const RPC = {
   claim_platform_admin: () => null,
   my_access_request: () => null,
   demo_seats_left: () => null,
+  // Sign-in email and username of the hospital's people (admins; the Demo hospital has one).
+  profile_contacts: db => db.profiles.map(p => ({id: p.id, email: p.email, user_code: p.user_code})),
   platform_list_departments: db => db.departments,
   // The owner's «Είσοδος Demo»: the test hospital stands in for the platform's Demo hospital.
   platform_ensure_demo_organization: () => ORG_ID,

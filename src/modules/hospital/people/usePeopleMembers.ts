@@ -1,4 +1,5 @@
 import {supabase} from '../../../lib/supabase';
+import {findProfileIdByEmail} from '../../../data/cloud/profileContacts';
 import {SUPERVISOR, wholeHospital, accountRole, functionError} from '../hospitalPeopleMeta';
 import type {Member, Draft, InviteResult} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
@@ -67,16 +68,11 @@ export function usePeopleMembers(
     const sent = !error && !!r?.ok;
     if (sent && r?.mode === 'account' && (supervisor || (platform && draft.demoEnabled))) {
       // The invitation knows only the role; the supervisor flag and Demo access follow on the account.
-      const {data: profile} = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('organization_id', organizationId)
-        .ilike('email', draft.email.trim().replace(/[\\%_]/g, '\\$&'))
-        .maybeSingle();
-      if (profile)
+      const profileId = await findProfileIdByEmail(organizationId, draft.email);
+      if (profileId)
         await supabase.functions.invoke('update-staff', {
           body: {
-            user_id: (profile as {id: string}).id,
+            user_id: profileId,
             name: draft.name,
             email: draft.email,
             supervisor,

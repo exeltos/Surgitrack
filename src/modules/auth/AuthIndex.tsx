@@ -244,7 +244,7 @@ export default function AuthIndex({
     }
     const {data: profile, error: profileError} = await supabase
       .from('profiles')
-      .select('id,name,email,role,active,organization_id,department_id')
+      .select('id,name,role,active,organization_id,department_id')
       .eq('id', authData.user.id)
       .maybeSingle();
     // Joined through a hospital signup link and not approved yet: the app shows the request status.
