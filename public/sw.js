@@ -9,6 +9,7 @@
  *    invitation and password links carry one-time tokens in theirs.
  *  - /assets/* (named by content, so a file never changes), the help pictures and the icons: from the device
  *    first, fetched once.
+ *  - The first visit: the page tells the worker what it loaded (message 'warm') and those files are kept too.
  *  - Anything else (the PDF manuals, ...) is left to the browser.
  * Changing CACHE_VERSION drops what earlier versions of this file stored.
  */
@@ -70,6 +71,41 @@ async function fromDevice(request) {
   }
   return response;
 }
+
+/**
+ * The page that registered this worker was loaded before the worker controlled it, so its own request never
+ * passed through here. It sends the addresses it loaded (its page and the files it used), and they are kept now:
+ * one visit is enough to open the app offline. Only this site's own pages and static files are taken.
+ */
+self.addEventListener('message', event => {
+  if (event.data?.type !== 'warm' || !Array.isArray(event.data.urls)) return;
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE);
+      for (const address of event.data.urls.slice(0, 200)) {
+        let url;
+        try {
+          url = new URL(String(address));
+        } catch {
+          continue;
+        }
+        if (url.origin !== self.location.origin) continue;
+        try {
+          if (isPage(url.pathname)) {
+            const response = await fetch(url.origin + url.pathname);
+            if (response.ok && response.status === 200) await cache.put(pageKey(url.pathname), response);
+          } else if (isStatic(url.pathname) && !(await cache.match(url.origin + url.pathname))) {
+            const response = await fetch(url.origin + url.pathname);
+            if (response.ok && response.status === 200) await cache.put(url.origin + url.pathname, response);
+          }
+        } catch {
+          // Offline or a file gone: the next visit tries again.
+        }
+      }
+      await trim(cache);
+    })(),
+  );
+});
 
 self.addEventListener('fetch', event => {
   const {request} = event;

@@ -26,7 +26,7 @@ The build needs those two variables (in `.env.local`; the GitHub workflow uses p
 that exists only in Demo organizations) is chosen at sign-in. `npm run ci` runs what GitHub Actions runs: format check
 (`npm run format` fixes it), typecheck (`tsc -b`), lint, tests, build.
 
-Built versions register `public/sw.js` (a service worker, not used by `npm run dev`): after one visit the app and the
+Built versions register `public/sw.js` (a service worker, not used by `npm run dev`): after one visit (the page tells the worker what it loaded) the app and the
 phone scanning app open without a network, pages are fetched from the network first so a new release is never
 hidden, and nothing from Supabase is ever stored by it (`src/core/__tests__/serviceWorker.test.ts` pins these rules).
 Bump `CACHE_VERSION` in `public/sw.js` to drop what earlier versions stored.

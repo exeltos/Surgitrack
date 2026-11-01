@@ -38,10 +38,12 @@ const setup = () => {
       keys: async () => [...stores.keys()],
       delete: async (name: string) => stores.delete(name),
     },
-    fetch: async (request: {url: string}) => {
-      network.calls.push(request.url);
+    // Like the real fetch: an address or a request.
+    fetch: async (request: {url: string} | string) => {
+      const url = typeof request === 'string' ? request : request.url;
+      network.calls.push(url);
       if (!network.online) throw new TypeError('Failed to fetch');
-      return new Response(`body of ${request.url}`, {status: network.status});
+      return new Response(`body of ${url}`, {status: network.status});
     },
   };
   // The worker's own code, with the browser's globals handed in by name.
@@ -112,6 +114,39 @@ describe('service worker', () => {
     expect(await sw.send(`${ORIGIN}/manuals/SurgiTrack-manual-el.pdf`, {mode: 'navigate'})).toBeUndefined();
     expect(await sw.send(`${ORIGIN}/manuals/SurgiTrack-manual-el.pdf`)).toBeUndefined();
     expect(await sw.send(`${ORIGIN}/api/anything`)).toBeUndefined();
+    expect(sw.network.calls).toEqual([]);
+  });
+
+  /** The page that registered the worker tells it what it loaded; resolves when the worker has finished. */
+  const warm = (urls: string[]) =>
+    new Promise<void>(resolve => {
+      sw.listeners.message({
+        data: {type: 'warm', urls},
+        waitUntil: (p: Promise<unknown>) => void p.then(() => resolve()),
+      });
+    });
+
+  it('on the first visit, keeps the page and the files it loaded, so one visit is enough to open offline', async () => {
+    await warm([`${ORIGIN}/index.html`, `${ORIGIN}/assets/main-abc123.js`, `${ORIGIN}/assets/react-def456.js`]);
+    sw.network.online = false;
+    expect(await (await sw.send(`${ORIGIN}/`, {mode: 'navigate'}))?.text()).toContain('index.html');
+    expect(await (await sw.send(`${ORIGIN}/assets/main-abc123.js`))?.text()).toContain('main-abc123.js');
+  });
+
+  it('on the first visit never takes a one-time link, another site, or a file it does not handle', async () => {
+    await warm([
+      `${ORIGIN}/index.html?st_token=secret&st_link=invite`,
+      'https://project.supabase.co/rest/v1/sets',
+      `${ORIGIN}/manuals/SurgiTrack-manual-el.pdf`,
+      'not an address',
+    ]);
+    expect(sw.network.calls).toEqual([`${ORIGIN}/index.html`]);
+    expect([...sw.stores.get('surgitrack-v1')!.keys()]).toEqual([`${ORIGIN}/index.html`]);
+  });
+
+  it('ignores any other message', async () => {
+    sw.listeners.message({data: {type: 'something else'}, waitUntil: () => undefined});
+    sw.listeners.message({data: null, waitUntil: () => undefined});
     expect(sw.network.calls).toEqual([]);
   });
 
