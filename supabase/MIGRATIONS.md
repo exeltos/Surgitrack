@@ -8,7 +8,7 @@ only in whitespace (`platform_delete_movements`).
 The folder has 105 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
 `20261014102205_usage_correction`, `20261014124438_demo_handover_stamp` and `20261014134551_recreated_records_forget_deletion`
 applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` on 26/10/2026 and
-`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the ten of 01/11/2026 listed below, each file named after the version the live project gave it).
+`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the eleven of 01/11/2026 listed below, each file named after the version the live project gave it).
 
 ## Applied on 01/11/2026 (from the review of that day)
 
@@ -24,6 +24,7 @@ applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` 
 | 20261102080000 | admin_role_owner_only                        | A trigger on `profiles`: a signed-in hospital admin cannot give anyone the Admin role (direct write, or approving a signup as Admin); `update-staff` v21 and `invite-staff` v24 refuse it too (`owner_only`) |
 | 20261102100000 | email_change_requests                        | A hospital admin's change of another person's sign-in email waits for the new address to confirm it (`email_change_requests`, service role only); `update-staff` v22 and `staff-signup` v24                  |
 | 20261102120000 | platform_owner_setting                       | The platform owner's address moves from the code into the private row `platform_owner`; `caller_is_platform_owner()` lets the app ask about it (applied before the app that asks it)                         |
+| 20261102140000 | login_attempts_purge                         | The nightly job also clears `login_attempts` (the rate limiter's table, never purged until now) of rows older than a day; `device-ingest` v16 limits a device key and unknown keys per address               |
 
 Applied with the Supabase MCP `apply_migration` after a fresh platform backup (01/11/2026 01:40 UTC) and read-only
 checks of the live schema; each file is named after the version the project recorded. After each one the checks of
@@ -34,14 +35,6 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 `20261101210816_hide_profile_contacts` had already been run by hand in the Dashboard at 15:29 UTC, before the app that
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
-
-## Not yet applied to the live project
-
-| Version        | Name                 | What it does                                                                                                             |
-| -------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 20261102140000 | login_attempts_purge | The nightly job also clears `login_attempts` (the rate limiter's table, never purged until now) of rows older than a day |
-
-Deploy `device-ingest` with it (it now limits a device key to 30 requests and an address sending unknown keys to 30, per 10 minutes, using that table).
 
 ## How the versions line up
 
