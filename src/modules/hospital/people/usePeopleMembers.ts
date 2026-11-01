@@ -189,16 +189,29 @@ export function usePeopleMembers(
       setNotice({
         kind: 'error',
         text:
-          status === 409
-            ? L('Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.', 'That email is already used by another account.')
-            : status === 400
-              ? L('Ελέγξτε το ονοματεπώνυμο και το email.', 'Check the name and the email.')
-              : status === 412
+          status === 401
+            ? L(
+                'Η σύνδεσή σας έληξε. Αποσυνδεθείτε και συνδεθείτε ξανά.',
+                'Your session expired. Sign out and sign in again.',
+              )
+            : status === 403
+              ? L(
+                  'Δεν έχετε δικαίωμα να αλλάξετε αυτόν τον λογαριασμό (οι λογαριασμοί διαχειριστή αλλάζουν μόνο από τον ιδιοκτήτη).',
+                  'You are not allowed to change this account (admin accounts are changed only by the owner).',
+                )
+              : status === 409
                 ? L(
-                    'Ο χρήστης δεν έχει επιβεβαιώσει ακόμα το email του. Μόλις το επιβεβαιώσει, η αίτηση θα εμφανιστεί εδώ για έγκριση.',
-                    'This user has not confirmed their email yet. Once they do, the request will appear here for approval.',
+                    'Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.',
+                    'That email is already used by another account.',
                   )
-                : L('Οι αλλαγές δεν αποθηκεύτηκαν.', 'The changes were not saved.'),
+                : status === 400
+                  ? L('Ελέγξτε το ονοματεπώνυμο και το email.', 'Check the name and the email.')
+                  : status === 412
+                    ? L(
+                        'Ο χρήστης δεν έχει επιβεβαιώσει ακόμα το email του. Μόλις το επιβεβαιώσει, η αίτηση θα εμφανιστεί εδώ για έγκριση.',
+                        'This user has not confirmed their email yet. Once they do, the request will appear here for approval.',
+                      )
+                    : L('Οι αλλαγές δεν αποθηκεύτηκαν.', 'The changes were not saved.'),
       });
       return;
     }
