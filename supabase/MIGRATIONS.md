@@ -5,18 +5,28 @@ folder on an empty Postgres gives the same public schema as the live project. La
 local replay below: policies, triggers and table and function privileges are identical, and function bodies differ
 only in whitespace (`platform_delete_movements`).
 
-The folder has 99 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
+The folder has 104 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
 `20261014102205_usage_correction`, `20261014124438_demo_handover_stamp` and `20261014134551_recreated_records_forget_deletion`
 applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` on 26/10/2026 and
-`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, each file named after the version the live project gave it).
+`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the five of 01/11/2026 listed below, each file named after the version the live project gave it).
 
-## Not applied yet (written 01/11/2026, from the review)
+## Applied on 01/11/2026 (from the review of that day)
 
-These five files are **not** in the live project yet: `20261101090000_client_errors_rate_cap`,
-`20261101091000_access_request_token_and_pending_email_guard`, `20261101092000_trial_lock_storage`,
-`20261101093000_profile_contacts_function` and `20261101094000_admin_accounts_owner_only`. They were replayed and tested locally only (`tests/sql/20_review_hardening.sql`).
-When they are applied, the live version will be the one the project gives them; rename the files to match (see below).
-`supabase/staged/` holds one more change that must wait for an app update (see its README).
+| Version        | Name                                         | What it does                                                                                                                                              |
+| -------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261101203245 | client_errors_rate_cap                       | At most 60 error reports an hour per signed-in account                                                                                                    |
+| 20261101203313 | access_request_token_and_pending_email_guard | `confirm_token` of staff_access_requests unreadable by signed-in users; a direct write cannot activate an account whose signup email is unconfirmed       |
+| 20261101203341 | trial_lock_storage                           | The trial lock also covers the `surgitrack-assets` Storage bucket                                                                                         |
+| 20261101203352 | profile_contacts_function                    | `profile_contacts()`: sign-in email and username for a hospital's admins, the platform owner, or the caller's own row                                     |
+| 20261101203835 | admin_accounts_owner_only                    | A hospital admin no longer changes or removes another admin's account by a direct write (the staff functions refuse it too); only the platform owner does |
+
+Applied with the Supabase MCP `apply_migration` after a fresh platform backup (01/11/2026 01:40 UTC) and read-only
+checks of the live schema; each file is named after the version the project recorded. After each one the checks of
+`docs/RUNBOOK-database-rollout.md` gave the expected result. The same day the three staff functions that enforce the same
+rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `verify_jwt = false` as it had) were deployed;
+`update-staff` is not listed in `config.toml` for that setting, so the repository and the live project differ there.
+
+`supabase/staged/` holds one more change that waits for an app update and a day of use (step 5 of the runbook).
 
 ## How the versions line up
 
