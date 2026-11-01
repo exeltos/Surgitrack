@@ -35,6 +35,14 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
 
+## Not yet applied to the live project
+
+| Version        | Name                 | What it does                                                                                                             |
+| -------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 20261102140000 | login_attempts_purge | The nightly job also clears `login_attempts` (the rate limiter's table, never purged until now) of rows older than a day |
+
+Deploy `device-ingest` with it (it now limits a device key to 30 requests and an address sending unknown keys to 30, per 10 minutes, using that table).
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and

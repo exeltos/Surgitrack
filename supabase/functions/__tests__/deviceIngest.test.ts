@@ -14,6 +14,8 @@ const DAY = 86_400_000;
 type World = {found?: Row; device?: Row; org?: Row; stored?: number};
 /** A known key, an active device, a paying hospital; every cycle sent is new unless `stored` says fewer were. */
 const world = (w: World = {}) => {
+  // The rate limiter lets every request through unless a test says otherwise.
+  fake.rpc = () => ({data: 'attempt-1', error: null});
   answerTables({
     'device_keys:select': 'found' in w ? w.found : {device_id: 'device-1'},
     'devices:select': 'device' in w ? w.device : DEVICE,
@@ -286,5 +288,79 @@ describe('device-ingest: reading what devices send', () => {
   it('leaves out what was not sent', async () => {
     const row = await one({cycle_number: '1'});
     expect(row).toMatchObject({program: null, started_at: null, ended_at: null, max_temperature: null, max_pressure: null, duration_minutes: null});
+  });
+});
+
+describe('device-ingest: rate limits', () => {
+  const reservations = () => fake.calls.filter(c => c.what === 'rpc' && c.args[0] === 'reserve_login_attempt');
+  const args = (call: {args: unknown[]}) => call.args[1] as Record<string, unknown>;
+
+  it('counts every request of a known key against that device, 30 in 10 minutes', async () => {
+    await ingest({cycle_number: '1'});
+    expect(reservations()).toHaveLength(1);
+    expect(args(reservations()[0])).toEqual({
+      p_user_code: 'device:device-1',
+      p_ip: 'device:device-1',
+      p_window_minutes: 10,
+      p_max_code_fails: 30,
+      p_max_ip_fails: 30,
+    });
+  });
+
+  it('answers 429 with Retry-After once a device is over its limit, storing nothing', async () => {
+    fake.rpc = () => ({data: null, error: null});
+    const response = await ingest({cycle_number: '1'});
+    expect(response.status).toBe(429);
+    expect(response.headers.get('Retry-After')).toBe('600');
+    expect(await response.json()).toEqual({error: 'too_many_requests', retry_after_minutes: 10});
+    nothingWritten();
+    expect(fake.dbCalls().some(c => c.table === 'devices')).toBe(false);
+  });
+
+  it('fails closed when the limiter is unavailable: the device retries later', async () => {
+    fake.rpc = () => ({data: null, error: {message: 'down'}});
+    const response = await ingest({cycle_number: '1'});
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({error: 'unavailable'});
+    nothingWritten();
+  });
+
+  it('does not count a request whose key shape is wrong, or whose body is refused, against anything', async () => {
+    await ingest({cycle_number: '1'}, {});
+    await ingest('x'.repeat(512 * 1024 + 1));
+    await ingest('{not json');
+    expect(reservations()).toHaveLength(0);
+  });
+
+  it('counts a key no device has against the address it came from, 30 in 10 minutes', async () => {
+    world({found: null});
+    const response = await ingest({cycle_number: '1'}, {'x-device-key': KEY, 'cf-connecting-ip': '203.0.113.9'});
+    expect(response.status).toBe(401);
+    expect(args(reservations()[0])).toEqual({
+      p_user_code: 'devicekey:203.0.113.9',
+      p_ip: 'devicekey:203.0.113.9',
+      p_window_minutes: 10,
+      p_max_code_fails: 30,
+      p_max_ip_fails: 30,
+    });
+  });
+
+  it('answers 429 instead of 401 to an address that keeps sending keys no device has', async () => {
+    world({found: null});
+    fake.rpc = () => ({data: null, error: null});
+    const response = await ingest({cycle_number: '1'}, {'x-device-key': KEY, 'cf-connecting-ip': '203.0.113.9'});
+    expect(response.status).toBe(429);
+    expect(response.headers.get('Retry-After')).toBe('600');
+  });
+
+  it('never trusts the first x-forwarded-for entry, which the client writes', async () => {
+    world({found: null});
+    await ingest({cycle_number: '1'}, {'x-device-key': KEY, 'x-forwarded-for': '1.1.1.1, 198.51.100.7'});
+    expect(args(reservations()[0]).p_ip).toBe('devicekey:198.51.100.7');
+  });
+
+  it('does not count valid-key requests against the address', async () => {
+    await ingest({cycle_number: '1'}, {'x-device-key': KEY, 'cf-connecting-ip': '203.0.113.9'});
+    expect(reservations().map(c => args(c).p_ip)).toEqual(['device:device-1']);
   });
 });
