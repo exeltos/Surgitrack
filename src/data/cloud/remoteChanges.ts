@@ -2,7 +2,6 @@ import {supabase} from '../../lib/supabase';
 import {CLOUD_TABLES, tableColumns, tableFromRow} from './cloudTables';
 import type {CloudCollection, CloudRecord} from './appRecords';
 import {loadAllPages, PAGE_SIZE} from './pages';
-import {rememberVersions} from './versions';
 
 /** A record's content in a fixed form (keys sorted, empty values dropped), to tell real changes apart. */
 export const recordKey = (value: unknown): string => {
@@ -22,15 +21,19 @@ export const recordKey = (value: unknown): string => {
 
 /**
  * Records of a collection saved by anyone since `since` (server time: the database stamps every update).
- * Returns them with the latest stamp seen, which moves the next look forward. History tables are
+ * Returns them with the latest stamp seen, which moves the next look forward, and the version (updated_at)
+ * of each. The versions are NOT remembered here: only the caller knows which of the records it adopts, and a
+ * record edited meanwhile on this device must keep the version it started from, or its save would pass the
+ * database's stale check and silently overwrite what the other device saved. History tables are
  * append-only and have no updated_at: only their created_at counts.
  */
 export async function loadChangedRecords(
   organizationId: string,
   collection: CloudCollection,
   since: string,
-): Promise<{records: CloudRecord[]; latest?: string}> {
+): Promise<{records: CloudRecord[]; latest?: string; versions: Record<string, string>}> {
   const records: CloudRecord[] = [];
+  const versions: Record<string, string> = {};
   let latest: string | undefined;
   const {mutable} = CLOUD_TABLES[collection];
   for (let from = 0; ; from += PAGE_SIZE) {
@@ -46,13 +49,13 @@ export async function loadChangedRecords(
       .range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     const page = data as unknown as Array<Record<string, unknown>>;
-    if (mutable) rememberVersions(collection, page);
     for (const row of page) {
+      if (mutable && typeof row.updated_at === 'string') versions[String(row.id)] = row.updated_at;
       for (const stamp of [row.updated_at, row.created_at])
         if (typeof stamp === 'string' && (!latest || stamp > latest)) latest = stamp;
       records.push(tableFromRow(collection, row));
     }
-    if (page.length < PAGE_SIZE) return {records, latest};
+    if (page.length < PAGE_SIZE) return {records, latest, versions};
   }
 }
 

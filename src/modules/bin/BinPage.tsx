@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Cable, Layers3, Palette, RotateCcw, Tags, Trash2, Wrench} from 'lucide-react';
+import {deviceClockTrusted} from '../../data/cloud/clockCheck';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import PageHeader from '../../components/ui/PageHeader';
@@ -50,9 +51,16 @@ export default function BinPage() {
   const libs = useLibraries();
   const [confirm, ask] = useConfirm();
   const [notice, setNotice] = useState<{ok: boolean; text: string} | null>(null);
-  // What stayed past its 30 days goes when the bin is opened.
+  // What stayed past its 30 days goes when the bin is opened, if the device's clock agrees with the server's
+  // (a wrong clock would otherwise delete what is still recoverable).
   useEffect(() => {
-    purgeExpiredBin();
+    let active = true;
+    void deviceClockTrusted().then(trusted => {
+      if (active && trusted) purgeExpiredBin();
+    });
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const entries = recycleBin.filter(entry => !isExpired(entry));

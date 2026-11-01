@@ -143,9 +143,53 @@ export async function clearCache() {
   });
 }
 
+/**
+ * Wipes what this device holds of the hospital but keeps the changes that exist nowhere else (not yet
+ * saved): a sign-out the person did not ask for (expired session, signed out in another tab) must not
+ * lose recorded work. Each copy shrinks to its unsaved records and is marked old (savedAt 0), so it is
+ * never used as data, only for those changes (see readCache and pendingOnto). They stay under the
+ * user's and hospital's own key and go with the next normal sign-out (clearCache).
+ */
+export async function clearSyncedCache() {
+  owner = undefined;
+  const db = await openDb();
+  if (!db) return;
+  await new Promise<void>(resolve => {
+    try {
+      const tx = db.transaction(STORE, 'readwrite');
+      const store = tx.objectStore(STORE);
+      const request = store.openCursor();
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) return;
+        const entry = cursor.value as CachedCollection;
+        if (!entry?.changed?.length && !entry?.removed?.length) {
+          cursor.delete();
+        } else {
+          const keep = new Set(entry.changed);
+          cursor.update({
+            ...entry,
+            items: entry.items.filter(item => keep.has(item.id)),
+            versions: Object.fromEntries(Object.entries(entry.versions || {}).filter(([id]) => keep.has(id))),
+            savedAt: 0,
+          });
+        }
+        cursor.continue();
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+      tx.onabort = () => resolve();
+    } catch {
+      resolve();
+    }
+  });
+}
+
 if (typeof window !== 'undefined')
   supabase.auth.onAuthStateChange(event => {
-    if (event === 'SIGNED_OUT') void clearCache();
+    // A sign-out through the app's own button clears everything first (clearCache); this one also covers
+    // the session ending on its own, where unsaved work has to survive.
+    if (event === 'SIGNED_OUT') void clearSyncedCache();
   });
 
 /**

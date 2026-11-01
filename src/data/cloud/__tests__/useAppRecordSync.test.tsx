@@ -30,6 +30,7 @@ vi.mock('../localCache', () => ({takeRestored: () => undefined, writeCollection:
 
 const {useAppRecordSync, onSyncNotice, unsavedChanges} = await import('../useAppRecordSync');
 const {syncNoticeMessage} = await import('../../../components/layout/syncNoticeMessage');
+const {versionOf} = await import('../versions');
 
 type Tool = CloudRecord & {barcode: string; name: string};
 const tool = (n: number, name = `Tool ${n}`): Tool => ({id: `t${n}`, barcode: `T${String(n).padStart(6, '0')}`, name});
@@ -172,6 +173,27 @@ describe('saving a collection to the cloud', () => {
     await act(async () => window.dispatchEvent(new Event('focus')));
     expect(api.loadChangedRecords).toHaveBeenCalled();
     stop();
+  });
+
+  it('does not take the server version of a record edited while the look for changes was running', async () => {
+    render(<Harness initial={[tool(1), tool(2)]} />);
+    let answer: (value: unknown) => void = () => undefined;
+    api.loadChangedRecords.mockReturnValue(new Promise(resolve => (answer = resolve)));
+    await act(async () => window.dispatchEvent(new Event('focus')));
+    // The person edits t1 while the answer is on its way; another device changed t1 and t2.
+    await change(list => list.map(item => (item.id === 't1' ? {...item, name: 'Mine'} : item)));
+    await act(async () => {
+      answer({
+        records: [tool(1, 'Theirs'), tool(2, 'Theirs')],
+        latest: new Date().toISOString(),
+        versions: {t1: 'server-v2', t2: 'server-v2'},
+      });
+    });
+    // t2 was taken in, so its version is the server's; t1 keeps the version it was edited from, so that
+    // saving it is refused as stale (and merged) instead of overwriting the other device's change.
+    expect(versionOf('tools', 't2')).toBe('server-v2');
+    expect(versionOf('tools', 't1')).not.toBe('server-v2');
+    expect(store.find(item => item.id === 't1')?.name).toBe('Mine');
   });
 
   it('tries again after a network error, further apart each time, and starts over after a success', async () => {

@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+  # Every pull request, whichever branch it targets.
   pull_request:
-    branches: [main]
 
 jobs:
   verify:
@@ -30,6 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: Dependencies with known vulnerabilities (production)
+        run: npm audit --omit=dev --audit-level=high
       - name: Format
         run: npm run format:check
       - name: Typecheck
@@ -38,6 +40,8 @@ jobs:
         run: npm run lint
       - name: Unused CSS
         run: npm run css:unused
+      - name: Dead CSS declarations
+        run: npm run css:dead
       - name: English translations
         run: npm run i18n:check
       - name: Test

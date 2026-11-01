@@ -13,6 +13,7 @@ import {roleHomePath, type Permission} from '../core/permissions';
 import type {SessionUser} from '../store/types';
 import {getRuntimeDataMode, setRuntimeDataMode} from '../config/dataMode';
 import {clearPasswordRecovery, passwordRecoveryPending, supabase} from '../lib/supabase';
+import {clearRecentSearches} from '../core/recentSearches';
 import {clearCache} from '../data/cloud/localCache';
 import {clearIdleLock} from '../components/layout/idleLockState';
 import {hospitalOverviewAvailable} from '../data/cloud/hospitalSwitch';
@@ -163,6 +164,7 @@ export default function App() {
         return;
       }
       if (event === 'SIGNED_OUT') {
+        clearRecentSearches();
         setAuthenticated(false);
         setAuthReady(true);
       }
@@ -194,6 +196,7 @@ export default function App() {
     // This device's copy of the hospital (patient codes included) goes with the session.
     await clearCache();
     clearIdleLock();
+    clearRecentSearches();
     if (!wasDemo) await supabase.auth.signOut();
     sessionStorage.removeItem('surgitrack-auth');
     sessionStorage.removeItem('surgitrack-demo-role');
