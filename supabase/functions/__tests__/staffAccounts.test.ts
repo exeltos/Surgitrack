@@ -229,3 +229,40 @@ describe('update-staff: an unconfirmed signup', () => {
     expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).toMatchObject({active: true});
   });
 });
+
+describe('another admin\'s account: only the platform owner', () => {
+  const PEER = {...TARGET, id: 'user-2', role: 'ADMIN', name: 'Peer Admin', email: 'peer@hospital.gr'};
+  const OWNER = {...ADMIN, id: 'admin-1', organization_id: null};
+  /** The caller is a hospital admin, or the platform owner (no hospital); the target is another admin. */
+  const asCaller = (caller: Profile) => {
+    fake.db = (call: DbCall) => {
+      if (call.table === 'profiles' && call.op === 'select') {
+        const id = call.filters.find(([op, column]) => op === 'eq' && column === 'id')?.[2];
+        return {data: id === 'admin-1' ? caller : id === 'user-2' ? PEER : null, error: null};
+      }
+      return {data: null, error: null};
+    };
+  };
+  const requests: Record<string, (handle: Handler) => Promise<Response>> = {
+    'staff-link': handle => handle(post({user_id: 'user-2'})),
+    'update-staff': handle => handle(post({user_id: 'user-2', name: 'Peer Admin', email: 'peer@hospital.gr'})),
+    'delete-staff': handle => handle(post({user_id: 'user-2'})),
+  };
+
+  for (const name of Object.keys(requests)) {
+    it(`${name}: a hospital admin is refused, and nothing is changed`, async () => {
+      asCaller(ADMIN);
+      const response = await requests[name](await loadFunction(name));
+      expect(response.status).toBe(403);
+      expect(await response.json()).toEqual({error: 'owner_only'});
+      expect(fake.calls.some(c => ['deleteUser', 'generateLink', 'updateUserById'].includes(c.what))).toBe(false);
+      expect(fake.dbCalls('update').length + fake.dbCalls('delete').length).toBe(0);
+    });
+
+    it(`${name}: the platform owner may`, async () => {
+      asCaller(OWNER);
+      const response = await requests[name](await loadFunction(name));
+      expect(await response.json()).not.toEqual({error: 'owner_only'});
+    });
+  }
+});

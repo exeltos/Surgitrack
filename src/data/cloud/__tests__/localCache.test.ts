@@ -3,7 +3,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('../../../lib/supabase', () => ({supabase: {auth: {onAuthStateChange: () => undefined}}}));
 
-const {CACHE_MAX_AGE_MS, clearCache, pendingOnto, readCache, setCacheOwner, writeCollection} =
+const {CACHE_MAX_AGE_MS, clearCache, clearSyncedCache, pendingOnto, readCache, setCacheOwner, writeCollection} =
   await import('../localCache');
 
 const owner = {userId: 'u1', organizationId: 'org-1'};
@@ -39,6 +39,27 @@ describe("this device's copy", () => {
   it('uses a fresh copy as it is', async () => {
     await writeAged('sets', entry([{id: 's1'}]), 1000);
     expect((await readCache(owner, ['sets'])).sets).toMatchObject({expired: false, items: [{id: 's1'}]});
+  });
+
+  it('keeps only the unsaved changes when the session ends on its own, and never uses them as data', async () => {
+    await writeAged('sets', entry([{id: 's1'}]), 1000);
+    await writeAged('tools', entry([{id: 't1'}, {id: 't2', name: 'Edited'}], ['t2'], ['t9']), 1000);
+    await clearSyncedCache();
+    const copy = await readCache(owner, ['sets', 'tools']);
+    expect(copy.sets).toBeUndefined();
+    expect(copy.tools).toMatchObject({
+      expired: true,
+      changed: ['t2'],
+      removed: ['t9'],
+      items: [{id: 't2', name: 'Edited'}],
+      versions: {t2: 'v-t2'},
+    });
+  });
+
+  it('wipes everything on the explicit sign-out, unsaved changes included', async () => {
+    await writeAged('tools', entry([{id: 't1'}], ['t1']), 1000);
+    await clearCache();
+    expect(await readCache(owner, ['tools'])).toEqual({});
   });
 
   it("never hands one user's copy to another", async () => {

@@ -2,37 +2,14 @@ import {useHasModule} from '../../data/cloud/modulesContext';
 import {useEffect, useMemo} from 'react';
 import {ChevronRight, Sun, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
-import {getRuntimeDataMode} from '../../config/dataMode';
 import {briefingFor, greekVocative, type BriefingItem} from '../../core/briefing';
 import {formatDate} from '../../core/displayDate';
-import {isoDate, sterileExpiryList, expiryAlerts} from '../../core/sterileExpiry';
+import {sterileExpiryList, expiryAlerts} from '../../core/sterileExpiry';
 import {belowMinimum, minimumRows} from '../../core/stockMinimums';
-import {getRealIdentity} from '../../data/cloud/identity';
 import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
-
-const seenKey = (userId: string) => `surgitrack-briefing-seen:${userId}`;
-
-/** Whether today's briefing is still to be shown to the signed-in person (once a day, per person). */
-export function briefingDue() {
-  const userId = getRuntimeDataMode() === 'PRODUCTION' ? getRealIdentity()?.id : undefined;
-  if (!userId) return false;
-  try {
-    return localStorage.getItem(seenKey(userId)) !== isoDate(new Date());
-  } catch {
-    return false;
-  }
-}
-
-const markSeen = () => {
-  const userId = getRealIdentity()?.id;
-  try {
-    if (userId) localStorage.setItem(seenKey(userId), isoDate(new Date()));
-  } catch {
-    // Private mode: shown again next time.
-  }
-};
+import {markBriefingSeen as markSeen} from './briefingDue';
 
 /**
  * The first thing after signing in each day: what waits for this person, by role, each line opening the

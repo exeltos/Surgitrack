@@ -1,5 +1,6 @@
 import {useCallback, useEffect} from 'react';
 import {supabase} from '../../../lib/supabase';
+import {loadProfileContacts} from '../../../data/cloud/profileContacts';
 import type {Request, Member} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
 
@@ -40,7 +41,7 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
       return;
     }
     if (!organizationId) return;
-    const [deps, reqs, profiles, invites, demoAccount, seats] = await Promise.all([
+    const [deps, reqs, profiles, contacts, invites, demoAccount, seats] = await Promise.all([
       supabase.from('departments').select('id,name,code,active').eq('organization_id', organizationId).order('name'),
       supabase
         .from('staff_access_requests')
@@ -52,9 +53,11 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
         .order('requested_at'),
       supabase
         .from('profiles')
-        .select('id,name,email,user_code,role,supervisor,active,department_id,demo_enabled')
+        .select('id,name,role,supervisor,active,department_id,demo_enabled')
         .eq('organization_id', organizationId)
         .order('name'),
+      // The sign-in email and username come apart from the rest of the profile (only admins read them).
+      loadProfileContacts(organizationId),
       supabase
         .from('user_invitations')
         .select('email,last_sent_at,invited_at')
@@ -72,10 +75,17 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
     // department picker come from them), so without those they are not shown.
     if (deps.data) setDepartments(deps.data);
     setRequests(deps.data && reqs.data ? (reqs.data as Request[]) : []);
-    if (profiles.data) setMembers(profiles.data as Member[]);
+    if (profiles.data)
+      setMembers(
+        (profiles.data as Array<Omit<Member, 'email' | 'user_code'>>).map(row => ({
+          ...row,
+          email: contacts.contacts.get(row.id)?.email ?? '',
+          user_code: contacts.contacts.get(row.id)?.user_code ?? null,
+        })),
+      );
     const sent = (invites.data || []) as Array<{email: string; last_sent_at: string | null; invited_at: string | null}>;
     setInvitations(Object.fromEntries(sent.map(i => [i.email.toLowerCase(), i.last_sent_at || i.invited_at || ''])));
-    const error = deps.error || reqs.error || profiles.error;
+    const error = deps.error || reqs.error || profiles.error || contacts.error;
     if (error) setNotice({kind: 'error', text: error.message});
   }, [
     organizationId,

@@ -239,7 +239,10 @@ async function main() {
   const db = createDatabase(seed);
   const server = await serve();
   const base = `http://127.0.0.1:${server.address().port}/`;
-  const browser = await chromium.launch({headless: !flag('headed')});
+  const browser = await chromium.launch({
+    headless: !flag('headed'),
+    ...(process.env.CHROMIUM_PATH ? {executablePath: process.env.CHROMIUM_PATH} : {}),
+  });
   const row = (table, id) => db[table].find(r => r.id === id);
   let failed = false;
   try {

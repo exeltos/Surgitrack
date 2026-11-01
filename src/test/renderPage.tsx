@@ -4,7 +4,7 @@ import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {AppPreferencesProvider} from '../core/AppPreferences';
 import {LibraryStoreProvider} from '../core/LibraryStore';
 import {SurgiProvider} from '../store/SurgiStore';
-import {UnsavedChangesProvider} from '../app/UnsavedChanges';
+import {UnsavedChangesProvider} from '../app/UnsavedChangesProvider';
 import type {SessionUser} from '../store/types';
 
 /**

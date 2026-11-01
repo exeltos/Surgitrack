@@ -1,14 +1,12 @@
 import {Sparkles, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {APP_VERSION} from '../../config/appMeta';
-import {getRuntimeDataMode} from '../../config/dataMode';
 import {formatDate} from '../../core/displayDate';
 import type {Permission} from '../../core/permissions';
-import {notesFor, olderVersion, releases, type Release} from '../../core/whatsNew';
+import {notesFor, releases, type Release} from '../../core/whatsNew';
 import {getRealIdentity} from '../../data/cloud/identity';
 import {tr} from '../../i18n';
-
-const seenKey = (userId: string) => `surgitrack-seen-version:${userId}`;
+import {whatsNewSeenKey as seenKey} from './whatsNewDue';
 
 /** The notes of one release this user can use, as a list. */
 export function ReleaseNotes({
@@ -45,23 +43,6 @@ export function ReleaseHistory({lang, can}: {lang: 'el' | 'en'; can: (p: Permiss
         ))}
     </>
   );
-}
-
-/**
- * Whether this person should see "What's new": once after an update, per person (devices are shared on the
- * wards). Someone who never saw a version before (a new account or device) is told nothing and starts from this one.
- */
-export function whatsNewDue(can: (p: Permission) => boolean) {
-  const userId = getRuntimeDataMode() === 'PRODUCTION' ? getRealIdentity()?.id : undefined;
-  const release = releases.find(r => r.version === APP_VERSION);
-  if (!userId || !release || !notesFor(release, can).length) return false;
-  try {
-    const seen = localStorage.getItem(seenKey(userId));
-    if (!seen) localStorage.setItem(seenKey(userId), APP_VERSION);
-    return !!seen && olderVersion(seen, APP_VERSION);
-  } catch {
-    return false;
-  }
 }
 
 /** What changed in this version that the person can use; closing marks it seen. */

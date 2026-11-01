@@ -3,6 +3,7 @@ import {modulesOf} from '../../../core/hospitalModules';
 import type {LibraryItem} from '../../../core/libraries';
 import type {UserRole} from '../../../store/types';
 import {supabase} from '../../../lib/supabase';
+import {loadProfileContacts} from '../../../data/cloud/profileContacts';
 import type {useStudioState} from './useStudioState';
 
 export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
@@ -55,9 +56,11 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
     if (libs.dataMode !== 'PRODUCTION') return;
     const {data, error} = await supabase
       .from('profiles')
-      .select('id,name,email,role,active,demo_enabled,organization_id,department_id')
+      .select('id,name,role,active,demo_enabled,organization_id,department_id')
       .not('organization_id', 'is', null)
       .order('name');
+    // Sign-in emails are read through profile_contacts(): the platform owner gets everyone's.
+    const {contacts} = await loadProfileContacts();
     if (error) {
       setCloudError(error.message);
       return;
@@ -66,7 +69,7 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
       (data || []).map(row => ({
         id: row.id,
         name: row.name,
-        email: row.email,
+        email: contacts.get(row.id)?.email ?? '',
         role: row.role as UserRole,
         active: row.active,
         demoEnabled: row.demo_enabled,

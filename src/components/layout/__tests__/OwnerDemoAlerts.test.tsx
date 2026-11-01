@@ -8,7 +8,7 @@ vi.mock('../../../data/cloud/demoEvents', () => events);
 vi.mock('../../../data/cloud/identity', () => ({getRealIdentity: () => ({id: 'owner-1'})}));
 
 import OwnerDemoAlerts from '../OwnerDemoAlerts';
-import {UnsavedChangesProvider} from '../../../app/UnsavedChanges';
+import {UnsavedChangesProvider} from '../../../app/UnsavedChangesProvider';
 
 const KEY = 'surgitrack-owner-demo-seen:owner-1';
 const renderAlerts = () =>

@@ -8,16 +8,7 @@ import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import PatientUses from './PatientUses';
 import MovementsPage from '../movements/MovementsPage';
 
-const RECENT_KEY = 'surgitrack.trace.recent';
-/** The last searches on this device (barcodes and patient codes), newest first. */
-const readRecent = (): string[] => {
-  try {
-    const list = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
-    return Array.isArray(list) ? list.filter((x): x is string => typeof x === 'string').slice(0, 6) : [];
-  } catch {
-    return [];
-  }
-};
+import {readRecentSearches, rememberRecentSearch} from '../../core/recentSearches';
 import {useSurgi} from '../../store/SurgiStore';
 import {getI18nLang, tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
@@ -67,18 +58,12 @@ export default function TraceabilityPage() {
   const patientCodes = new Set(movements.map(m => m.patientCode).filter(Boolean)).size;
   // «Ασθενής»: the list of codes, or (?patient=PT-…) one patient's trace.
   const patient = params.get('patient') || '';
-  const [recent, setRecent] = useState<string[]>(readRecent);
+  const [recent, setRecent] = useState<string[]>(readRecentSearches);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
     const term = value.trim();
     if (!term) return;
-    const next = [term, ...recent.filter(x => x.toLowerCase() !== term.toLowerCase())].slice(0, 6);
-    setRecent(next);
-    try {
-      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-    } catch {
-      // Private mode: the list just is not kept.
-    }
+    setRecent(rememberRecentSearch(recent, term));
   };
   const needle = q.trim().toLowerCase();
   const all: Array<SetAsset | Tool> = [...sets, ...tools];

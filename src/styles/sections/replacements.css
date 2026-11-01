@@ -286,9 +286,9 @@
   gap: 8px;
   /* Order dialog: rows centred on one line, the footer flush with the table (a general footer rule
    added side padding), the quantity column at the right. */
-  padding: 4px 0 0 !important;
-  border: 0 !important;
-  background: none !important;
+  padding: 4px 0 0;
+  border: 0;
+  background: none;
 }
 .replacements-cancelled {
   display: grid;

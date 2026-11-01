@@ -815,7 +815,7 @@
   }
   /* Studio libraries: the library picker becomes a row of chips above the list. */
   html body .studio-manager {
-    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
   }
   html body .studio-manager-nav {
@@ -1362,7 +1362,7 @@ html body .studio-ratings-kpis {
 }
 @media (max-width: 700px) {
   html body .studio-manager-nav {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     overflow: visible;
   }

@@ -1,10 +1,15 @@
-import {useEffect} from 'react';
-import {useConfirm} from './useConfirm';
+import type {useConfirm} from './useConfirm';
 
 type Ask = Parameters<ReturnType<typeof useConfirm>[1]>[0];
 type Question = Omit<Ask, 'onConfirm' | 'onCancel'>;
 
 let open: ((ask: Ask) => void) | null = null;
+
+/** Where ConfirmHost shows the questions; null when it unmounts (only the one that set it clears it). */
+export const setConfirmOpener = (next: ((ask: Ask) => void) | null) => {
+  open = next;
+};
+export const confirmOpener = () => open;
 
 /**
  * The app's own confirmation, from anywhere (hooks, event handlers, async flows): resolves to the note text
@@ -23,15 +28,3 @@ export function askConfirm(question: Question): Promise<string | false> {
 /** A message to acknowledge, with one button. */
 export const tellUser = (title: string, message: string) =>
   askConfirm({title, message, notice: true, confirmLabel: 'OK'}).then(() => undefined);
-
-/** Renders the dialogs {@link askConfirm} opens. Mount once. */
-export function ConfirmHost() {
-  const [node, ask] = useConfirm();
-  useEffect(() => {
-    open = ask;
-    return () => {
-      if (open === ask) open = null;
-    };
-  }, [ask]);
-  return node;
-}

@@ -13,7 +13,7 @@ import {takeRestored, writeCollection} from './localCache';
 import {loadRecordsById, loadTable} from './appRecords';
 import {cutoffOf, HISTORY_WINDOW_DAYS, registerOlderLoader, setCutoff} from './historyWindow';
 import type {TableCollection} from './cloudTables';
-import {exportVersions, importVersions} from './versions';
+import {exportVersions, importVersions, rememberVersions} from './versions';
 import {mergeConcurrent, recordLabel} from './mergeConcurrent';
 
 const SYNC_DELAY_MS = 400;
@@ -523,7 +523,7 @@ export function useAppRecordSync(
       if (local.changed.length || local.removed.length) return;
       running = true;
       try {
-        const {records, latest: stamp} = await loadChangedRecords(organizationId, collection, since.current);
+        const {records, latest: stamp, versions} = await loadChangedRecords(organizationId, collection, since.current);
         if (stamp) since.current = new Date(Date.parse(stamp) - 60000).toISOString();
         let removed: string[] = [];
         if (collection !== 'library') {
@@ -534,10 +534,22 @@ export function useAppRecordSync(
         }
         markSynced();
         const current = new Map(latest.current.map(item => [item.id, item]));
+        // A record changed here and not saved yet stays as it is here, with the version it started from.
+        const editedHere = (id: string) => {
+          const mine = current.get(id);
+          return !!mine && known.get(id) !== mine;
+        };
+        // The versions seen are remembered only for the records taken in (or already equal): for one edited
+        // meanwhile, a newer version would let its save overwrite the other device's change unnoticed.
+        rememberVersions(
+          collection,
+          records
+            .filter(record => !editedHere(record.id))
+            .map(record => ({id: record.id, updated_at: versions?.[record.id]})),
+        );
         const fresh = records.filter(record => {
+          if (editedHere(record.id)) return false;
           const mine = current.get(record.id);
-          // A record changed here and not saved yet stays as it is here.
-          if (mine && known.get(record.id) !== mine) return false;
           return !mine || recordKey(mine) !== recordKey(record);
         });
         if (!fresh.length && !removed.length) return;

@@ -1,36 +1,9 @@
 import {createPortal} from 'react-dom';
-import {createContext, useCallback, useContext, useEffect, useMemo, useRef, type ReactNode} from 'react';
-import {useNavigate, type NavigateOptions} from 'react-router-dom';
+import {useCallback, useEffect, useMemo, useRef, type ReactNode} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useConfirm} from '../components/ui/useConfirm';
 import {tr} from '../i18n';
-
-/** The screens that hold a draft right now (a form being filled, an edit not yet saved). */
-const drafts = new Set<symbol>();
-
-/** Marks the calling screen as holding unsaved changes while `dirty` is true. */
-export function useUnsavedChanges(dirty: boolean) {
-  useEffect(() => {
-    if (!dirty) return;
-    const key = Symbol('draft');
-    drafts.add(key);
-    return () => {
-      drafts.delete(key);
-    };
-  }, [dirty]);
-}
-
-type Leave = (go: () => void) => void;
-const LeaveContext = createContext<Leave>(go => go());
-
-/** Runs `go` at once, or after the user agrees to leave a screen with unsaved changes. */
-export const useLeave = () => useContext(LeaveContext);
-
-/** `navigate`, asking first when the current screen holds unsaved changes. */
-export function useGuardedNavigate() {
-  const leave = useLeave();
-  const navigate = useNavigate();
-  return useCallback((to: string, options?: NavigateOptions) => leave(() => navigate(to, options)), [leave, navigate]);
-}
+import {drafts, LeaveContext, type Leave} from './UnsavedChanges';
 
 /**
  * Leaving a screen with unsaved changes asks first, with staying as the default: in-app links and

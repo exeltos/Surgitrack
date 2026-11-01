@@ -36,11 +36,13 @@ Deno.serve(async req => {
     if (!userId) return json({error: "user_required"}, 400);
     if (userId === auth.user.id) return json({error: "self"}, 409);
 
-    const {data: target} = await admin.from("profiles").select("id, organization_id, name, email").eq("id", userId).maybeSingle();
+    const {data: target} = await admin.from("profiles").select("id, organization_id, name, email, role").eq("id", userId).maybeSingle();
     if (!target) return json({error: "not_found"}, 404);
     // A hospital admin only manages their own hospital; the platform admin (no hospital) any.
     if (me.organization_id && target.organization_id !== me.organization_id) return json({error: "forbidden"}, 403);
     if (!target.organization_id) return json({error: "forbidden"}, 403);
+    // An admin account is removed only by the platform owner (no hospital), never by another hospital admin.
+    if (me.organization_id && target.role === "ADMIN") return json({error: "owner_only"}, 403);
 
     // An invitation the user sent keeps its record but loses the link.
     await admin.from("user_invitations").update({invited_by: null}).eq("invited_by", userId);
