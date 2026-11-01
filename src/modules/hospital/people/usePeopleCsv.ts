@@ -16,7 +16,7 @@ export function usePeopleCsv(
     ReturnType<typeof usePeopleDepartments> &
     ReturnType<typeof usePeopleMembers>,
 ) {
-  const {L, changed, csvRows, departments, organizationId, setBusy, setCsvRows, setNotice} = p;
+  const {L, changed, csvRows, departments, organizationId, platform, setBusy, setCsvRows, setNotice} = p;
 
   // ---- Invitations from a CSV file: Ονοματεπώνυμο; Email; Τμήμα; Ρόλος ----
   const readCsv = async (file: File) => {
@@ -40,9 +40,14 @@ export function usePeopleCsv(
       const error =
         name.length < 2 || !EMAIL_FORMAT.test(email)
           ? L('Μη έγκυρο όνομα ή email', 'Invalid name or email')
-          : !wholeHospital(role) && !dep
-            ? L('Άγνωστο τμήμα', 'Unknown department')
-            : undefined;
+          : role === 'ADMIN' && !platform
+            ? L(
+                'Διαχειριστές ορίζει μόνο ο διαχειριστής της πλατφόρμας',
+                'Only the platform owner makes an administrator',
+              )
+            : !wholeHospital(role) && !dep
+              ? L('Άγνωστο τμήμα', 'Unknown department')
+              : undefined;
       return {name, email, role, departmentId: dep?.id || '', department, error};
     });
     setCsvRows(rows);

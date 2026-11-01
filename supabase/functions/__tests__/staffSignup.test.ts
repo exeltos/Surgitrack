@@ -203,14 +203,45 @@ describe('staff-signup: throttling', () => {
     expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
   });
 
-  it('allows 10 signups an hour per address, counted by the address Cloudflare reports', async () => {
+  const reservations = () =>
+    fake.calls.filter(c => c.what === 'rpc' && c.args[0] === 'reserve_login_attempt').map(c => c.args[1] as Record<string, unknown>);
+
+  it('counts every signup: 30 an hour per address (the one Cloudflare reports), 200 an hour per hospital link, 5 a day per email', async () => {
     await handle(post(form, {'cf-connecting-ip': '203.0.113.9', 'x-forwarded-for': '6.6.6.6'}));
-    expect(fake.calls.find(c => c.what === 'rpc')?.args[1]).toMatchObject({
-      p_user_code: 'SIGNUP',
-      p_ip: 'signup:203.0.113.9',
-      p_window_minutes: 60,
-      p_max_ip_fails: 10,
+    const limit = (who: string, max: number, minutes: number) => ({
+      p_user_code: who,
+      p_ip: who,
+      p_window_minutes: minutes,
+      p_max_code_fails: max,
+      p_max_ip_fails: max,
     });
+    expect(reservations()).toEqual([
+      limit('signup:203.0.113.9', 30, 60),
+      limit('signup-org:org-1', 200, 60),
+      limit('signup-email:giorgos@hospital.gr', 5, 1440),
+    ]);
+  });
+
+  it.each([
+    ['address', 0],
+    ['hospital link', 1],
+    ['email', 2],
+  ])('answers 429 when the limit per %s is reached, creating nothing', async (_what, which) => {
+    let n = 0;
+    fake.rpc = name => ({data: name === 'reserve_login_attempt' && n++ === which ? null : 'attempt-1', error: null});
+    const response = await handle(post(form));
+    expect(response.status).toBe(429);
+    expect(await response.json()).toEqual({error: 'too_many_attempts'});
+    expect(fake.calls.some(c => c.what === 'createUser')).toBe(false);
+    expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
+  });
+
+  it('does not email an address again once its day is used up', async () => {
+    mailOn();
+    fake.rpc = name => ({data: name === 'reserve_login_attempt' && fake.calls.filter(c => c.what === 'rpc').length >= 3 ? null : 'attempt-1', error: null});
+    const response = await handle(post(form));
+    expect(response.status).toBe(429);
+    expect(mailState.outbox).toHaveLength(0);
   });
 });
 
@@ -236,11 +267,9 @@ describe('staff-signup: signing up through the hospital link', () => {
     expect(requests('insert')[0].values).toMatchObject({organization_id: 'org-1'});
   });
 
-  it('marks the throttle attempt as succeeded', async () => {
+  it('leaves the throttle attempt counted: a successful signup is not forgiven', async () => {
     await handle(post(form));
-    const update = fake.dbCalls('update').find(c => c.table === 'login_attempts');
-    expect(update?.values).toEqual({succeeded: true});
-    expect(eqValue(update!, 'id')).toBe('attempt-1');
+    expect(fake.dbCalls('update').filter(c => c.table === 'login_attempts')).toHaveLength(0);
   });
 
   it('only accepts an active department of the same hospital', async () => {
@@ -500,5 +529,117 @@ describe('staff-signup: confirming the email (hospital link)', () => {
     world({account: {id: 'someone', active: false}, unconfirmed: null});
     expect((await handle(post(form))).status).toBe(409);
     expect(fake.calls.some(c => c.what === 'deleteUser')).toBe(false);
+  });
+});
+
+describe('staff-signup: confirming a sign-in email change (made by a hospital admin)', () => {
+  const REQUEST = {
+    id: 'chg-1',
+    organization_id: 'org-1',
+    user_id: 'user-9',
+    new_email: 'new@hospital.gr',
+    requested_at: AN_HOUR_AGO(),
+  };
+  const PROFILE = {id: 'user-9', organization_id: 'org-1', email: 'old@hospital.gr', role: 'DEPARTMENT'};
+  const open = (w: {request?: Row; profile?: Row; taken?: unknown} = {}) => {
+    const has = (key: 'request' | 'profile' | 'taken') => key in w;
+    answerTables({
+      'staff_access_requests:select': null,
+      'email_change_requests:select': has('request') ? w.request : REQUEST,
+      'profiles:select': (call: {filters: Array<[string, string, unknown]>}) =>
+        call.filters.some(([op]) => op === 'neq') ? (has('taken') ? w.taken : null) : has('profile') ? w.profile : PROFILE,
+      'organizations:select': {name: 'ΙΑΣΩ Θεσσαλίας'},
+    });
+  };
+  const confirm = () => handle(post({action: 'confirm', token: 'a'.repeat(48)}));
+
+  it('makes the change once the new address has opened its link, and tells the old address', async () => {
+    mailOn();
+    open();
+    const response = await confirm();
+    expect(await response.json()).toEqual({
+      ok: true,
+      kind: 'email_change',
+      email: 'new@hospital.gr',
+      organization_name: 'ΙΑΣΩ Θεσσαλίας',
+    });
+    expect(fake.calls.find(c => c.what === 'updateUserById')?.args).toEqual([
+      'user-9',
+      {email: 'new@hospital.gr', email_confirm: true},
+    ]);
+    expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).toEqual({email: 'new@hospital.gr'});
+    expect(fake.dbCalls('delete').some(c => c.table === 'email_change_requests')).toBe(true);
+    expect(fake.dbCalls('insert').find(c => c.table === 'account_events')?.values).toMatchObject({
+      action: 'email_changed',
+      detail: {from: 'old@hospital.gr', to: 'new@hospital.gr', confirmed: true},
+    });
+    expect(mailState.outbox.map(m => m.to)).toEqual(['old@hospital.gr']);
+  });
+
+  it('keeps the completion first: when it cannot be recorded nothing changes and the request stays', async () => {
+    open();
+    const db = fake.db;
+    fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+    const response = await confirm();
+    expect(response.status).toBe(503);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+    expect(fake.dbCalls('delete')).toHaveLength(0);
+  });
+
+  it('records the change before making it', async () => {
+    open();
+    let recordedBefore: boolean | undefined;
+    const original = fake.admin.updateUserById;
+    fake.admin.updateUserById = (...args: Parameters<typeof original>) => {
+      recordedBefore ??= fake.dbCalls('insert').some(c => c.table === 'account_events');
+      return original(...args);
+    };
+    await confirm();
+    expect(recordedBefore).toBe(true);
+  });
+
+  it('looks the request up by the hash of the token, never by the token', async () => {
+    open();
+    await confirm();
+    const lookup = fake.dbCalls('select').find(c => c.table === 'email_change_requests');
+    const hash = lookup?.filters.find(([op, column]) => op === 'eq' && column === 'token_hash')?.[2] as string;
+    expect(hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(hash).not.toContain('aaaa');
+  });
+
+  it.each([
+    ['an unknown link', {request: null}],
+    ['a link older than 3 days', {request: {...REQUEST, requested_at: new Date(Date.now() - 4 * 864e5).toISOString()}}],
+    ['a person who moved to another hospital', {profile: {...PROFILE, organization_id: 'org-2'}}],
+    ['a person who no longer exists', {profile: null}],
+    ['a person the platform owner has made an administrator since', {profile: {...PROFILE, role: 'ADMIN'}}],
+  ])('refuses %s, changing nothing', async (_label, world) => {
+    open(world);
+    const response = await confirm();
+    expect(response.status).toBe(410);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  it('refuses an address somebody else has taken in the meantime', async () => {
+    open({taken: [{id: 'someone-else'}]});
+    const response = await confirm();
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({error: 'email_taken'});
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+  });
+
+  it('puts the sign-in email back when the profile could not be updated', async () => {
+    open();
+    const db = fake.db;
+    fake.db = call => (call.table === 'profiles' && call.op === 'update' ? {data: null, error: {message: 'down'}} : db(call));
+    const response = await confirm();
+    expect(response.status).toBe(503);
+    const calls = fake.calls.filter(c => c.what === 'updateUserById').map(c => c.args);
+    expect(calls).toEqual([
+      ['user-9', {email: 'new@hospital.gr', email_confirm: true}],
+      ['user-9', {email: 'old@hospital.gr', email_confirm: true}],
+    ]);
   });
 });

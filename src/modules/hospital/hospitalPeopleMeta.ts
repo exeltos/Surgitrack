@@ -65,6 +65,10 @@ export const roles: Array<{id: string; el: string; en: string}> = [
   {id: 'VIEWER', ...hospitalRoleNames.VIEWER},
 ];
 
+/** The roles a person may give: only the platform owner makes an administrator. `keep` is a role already held. */
+export const assignableRoles = (platform: boolean | undefined, keep?: string) =>
+  platform ? roles : roles.filter(r => r.id !== 'ADMIN' || r.id === keep);
+
 export const wholeHospital = (role: string) => role === 'ADMIN' || role === 'VIEWER';
 
 export const roleValue = (m: Pick<Member, 'role' | 'supervisor'>) =>

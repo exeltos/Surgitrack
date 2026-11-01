@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Copy, KeyRound, Mail, Save, Send, Trash2, UserCheck, X} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {localizedName} from '../../core/glossary';
-import {roles, wholeHospital, roleValue, EMAIL_FORMAT} from './hospitalPeopleMeta';
+import {assignableRoles, wholeHospital, roleValue, EMAIL_FORMAT} from './hospitalPeopleMeta';
 import type {Department, Member, Draft} from './hospitalPeopleMeta';
 import LinkCopy from './LinkCopy';
 import {formatDateTime} from '../../core/displayDate';
@@ -12,6 +12,7 @@ export default function MemberDrawer({
   self,
   departments,
   showDemo,
+  platform,
   demo,
   invitedAt,
   busy,
@@ -29,6 +30,8 @@ export default function MemberDrawer({
   self: boolean;
   departments: Department[];
   showDemo: boolean;
+  /** The platform owner: the only one who makes an administrator. */
+  platform?: boolean;
   /** The local Demo: no emails, a new user is added at once. */
   demo: boolean;
   /** When the invitation was last sent, for an invited user who has not accepted yet. */
@@ -68,7 +71,7 @@ export default function MemberDrawer({
     <label>
       {L('Ρόλος', 'Role')}
       <select value={draft.role} disabled={self} onChange={e => set({role: e.target.value})}>
-        {roles.map(role => (
+        {assignableRoles(platform, member?.role).map(role => (
           <option key={role.id} value={role.id}>
             {lang === 'el' ? role.el : role.en}
           </option>

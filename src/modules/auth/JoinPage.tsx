@@ -82,16 +82,25 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
   const [password2, setPassword2] = useState('');
   const [done, setDone] = useState<{email: string; userCode: string; confirm: boolean} | null>(null);
   // The emailed confirmation link: undefined while it is checked.
-  const [confirmed, setConfirmed] = useState<{organization: string} | 'invalid' | 'failed'>();
+  const [confirmed, setConfirmed] = useState<
+    {organization: string; emailChange?: string} | 'invalid' | 'taken' | 'failed'
+  >();
 
   useEffect(() => {
     if (confirm) {
       void supabase.functions
-        .invoke<{ok: boolean; organization_name: string}>('staff-signup', {body: {action: 'confirm', token}})
+        .invoke<{ok: boolean; organization_name: string; kind?: string; email?: string}>('staff-signup', {
+          body: {action: 'confirm', token},
+        })
         .then(async ({data, error}) => {
-          if (data?.ok) return setConfirmed({organization: data.organization_name});
+          // The same link works for a signup's email and for a sign-in email change made by a hospital admin.
+          if (data?.ok)
+            return setConfirmed({
+              organization: data.organization_name,
+              emailChange: data.kind === 'email_change' ? data.email || '' : undefined,
+            });
           const status = error instanceof FunctionsHttpError ? (error.context as Response).status : 0;
-          setConfirmed(status === 410 ? 'invalid' : 'failed');
+          setConfirmed(status === 410 ? 'invalid' : status === 409 ? 'taken' : 'failed');
         });
       return;
     }
@@ -189,6 +198,17 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                 </div>
                 {confirmed === undefined ? (
                   <p>{L('Επιβεβαίωση email…', 'Confirming your email…')}</p>
+                ) : typeof confirmed === 'object' && confirmed.emailChange !== undefined ? (
+                  <>
+                    <span className="auth-eyebrow">{L('ΤΟ EMAIL ΕΠΙΒΕΒΑΙΩΘΗΚΕ', 'EMAIL CONFIRMED')}</span>
+                    <h2>{L('Το email σύνδεσης άλλαξε', 'Your sign-in email was changed')}</h2>
+                    <p>
+                      {L(
+                        `Από εδώ και πέρα συνδέεστε στο SurgiTrack με το ${confirmed.emailChange}. Το όνομα χρήστη και ο κωδικός σας μένουν ίδια.`,
+                        `From now on you sign in to SurgiTrack with ${confirmed.emailChange}. Your username and password stay the same.`,
+                      )}
+                    </p>
+                  </>
                 ) : typeof confirmed === 'object' ? (
                   <>
                     <span className="auth-eyebrow">{L('ΤΟ EMAIL ΕΠΙΒΕΒΑΙΩΘΗΚΕ', 'EMAIL CONFIRMED')}</span>
@@ -205,15 +225,22 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                     <h2>
                       {confirmed === 'invalid'
                         ? L('Ο σύνδεσμος δεν είναι έγκυρος', 'This link is not valid')
-                        : L('Η επιβεβαίωση δεν ολοκληρώθηκε', 'Confirmation failed')}
+                        : confirmed === 'taken'
+                          ? L('Το email χρησιμοποιείται ήδη', 'This email is already in use')
+                          : L('Η επιβεβαίωση δεν ολοκληρώθηκε', 'Confirmation failed')}
                     </h2>
                     <p>
                       {confirmed === 'invalid'
                         ? L(
-                            'Ο σύνδεσμος επιβεβαίωσης έληξε ή έχει ήδη χρησιμοποιηθεί. Αν δεν έχετε επιβεβαιώσει, κάντε ξανά την εγγραφή από τον σύνδεσμο του νοσοκομείου.',
-                            'The confirmation link has expired or was already used. If you have not confirmed yet, sign up again through the hospital link.',
+                            'Ο σύνδεσμος επιβεβαίωσης έληξε ή έχει ήδη χρησιμοποιηθεί. Αν δεν έχετε επιβεβαιώσει, κάντε ξανά την εγγραφή από τον σύνδεσμο του νοσοκομείου ή ζητήστε από τον διαχειριστή να στείλει νέο.',
+                            'The confirmation link has expired or was already used. If you have not confirmed yet, sign up again through the hospital link, or ask the administrator to send a new one.',
                           )
-                        : L('Δοκιμάστε ξανά σε λίγο.', 'Please try again shortly.')}
+                        : confirmed === 'taken'
+                          ? L(
+                              'Άλλος λογαριασμός χρησιμοποιεί αυτό το email. Η αλλαγή δεν έγινε· απευθυνθείτε στον διαχειριστή.',
+                              'Another account uses this email. The change was not made; contact the administrator.',
+                            )
+                          : L('Δοκιμάστε ξανά σε λίγο.', 'Please try again shortly.')}
                     </p>
                   </>
                 )}

@@ -167,10 +167,20 @@ describe('update-staff: the sign-in email', () => {
     handle = await loadFunction('update-staff');
     Object.assign(env, {SMTP_HOST: 'smtp.test', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'app@test'});
   });
-  const update = (email: string) => handle(post({user_id: 'user-2', name: 'Nurse', email}));
+  const update = (email: string, extra: Record<string, unknown> = {}) =>
+    handle(post({user_id: 'user-2', name: 'Nurse', email, ...extra}));
+  /** The platform owner (no hospital) is the caller: the one who changes an email at once. */
+  const asOwner = (target: Profile) => {
+    answer(target);
+    const db = fake.db;
+    fake.db = call =>
+      call.table === 'profiles' && call.op === 'select' && call.filters.some(([op, c, v]) => op === 'eq' && c === 'id' && v === 'admin-1')
+        ? {data: {...ADMIN, organization_id: null}, error: null}
+        : db(call);
+  };
 
-  it('records the change and tells the old address and the new one', async () => {
-    answer({...TARGET, role: 'DEPARTMENT'});
+  it('the platform owner changes it at once, records it and tells the old address and the new one', async () => {
+    asOwner({...TARGET, role: 'DEPARTMENT'});
     const response = await update('new@hospital.gr');
     expect(response.status).toBe(200);
     const event = fake.dbCalls('insert').find(c => c.table === 'account_events');
@@ -180,19 +190,107 @@ describe('update-staff: the sign-in email', () => {
       action: 'email_changed',
       detail: {from: 'Nurse@Hospital.gr', to: 'new@hospital.gr'},
     });
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(true);
     expect(mailState.outbox.map(m => m.to)).toEqual(['Nurse@Hospital.gr', 'new@hospital.gr']);
     expect(mailState.outbox[0].html).toContain('άλλαξε από');
     expect(mailState.outbox[1].html).toContain('ορίστηκε σε αυτή τη διεύθυνση');
   });
 
   it('changes nothing when the change could not be recorded', async () => {
-    answer({...TARGET, role: 'DEPARTMENT'});
+    asOwner({...TARGET, role: 'DEPARTMENT'});
     const db = fake.db;
     fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
     const response = await update('new@hospital.gr');
     expect(response.status).toBe(500);
     expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
     expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  describe('a hospital admin: the new address confirms it first', () => {
+    const pending = (extra: Record<string, unknown> = {}) => update('new@hospital.gr', {redirect_to: 'https://www.surgitrack.eu', ...extra});
+
+    it('keeps the old email, asks the new address to confirm, and tells the old one', async () => {
+      answer({...TARGET, role: 'DEPARTMENT'});
+      const response = await pending();
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ok: true, name: 'Nurse', email: 'Nurse@Hospital.gr', pending_email: 'new@hospital.gr'});
+      // The sign-in is not touched, and the profile keeps its email.
+      expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+      expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).toMatchObject({email: 'Nurse@Hospital.gr'});
+      const request = fake.dbCalls('insert').find(c => c.table === 'email_change_requests')?.values as Record<string, unknown>;
+      expect(request).toMatchObject({organization_id: 'org-1', user_id: 'user-2', new_email: 'new@hospital.gr', requested_by: 'admin-1'});
+      // Only the hash of the token is kept; the token itself travels in the email to the NEW address.
+      expect(request.token_hash).toMatch(/^[0-9a-f]{64}$/);
+      expect(fake.dbCalls('insert').find(c => c.table === 'account_events')?.values).toMatchObject({action: 'email_change_requested'});
+      expect(mailState.outbox.map(m => m.to)).toEqual([['new@hospital.gr'].join(), 'Nurse@Hospital.gr']);
+      const link = /https:\/\/www\.surgitrack\.eu\/#\/join\/confirm\/([0-9a-f]{48})/.exec(mailState.outbox[0].html);
+      expect(link).not.toBeNull();
+      expect(JSON.stringify(request)).not.toContain(link![1]);
+      expect(mailState.outbox[1].html).toContain('μόνο όταν επιβεβαιωθεί');
+    });
+
+    it('replaces an earlier waiting request of the same person', async () => {
+      answer({...TARGET, role: 'DEPARTMENT'});
+      await pending();
+      const deletes = fake.dbCalls('delete').filter(c => c.table === 'email_change_requests');
+      expect(deletes[0].filters).toContainEqual(['eq', 'user_id', 'user-2']);
+    });
+
+    it('changes nothing when no email can be sent', async () => {
+      answer({...TARGET, role: 'DEPARTMENT'});
+      for (const key of ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM']) delete env[key];
+      const response = await pending();
+      expect(response.status).toBe(503);
+      expect(await response.json()).toEqual({error: 'email_unavailable'});
+      expect(fake.dbCalls('insert')).toHaveLength(0);
+      expect(fake.dbCalls('update')).toHaveLength(0);
+    });
+
+    it('withdraws the request when the email to the new address fails', async () => {
+      answer({...TARGET, role: 'DEPARTMENT'});
+      mailState.fail = true;
+      const response = await pending();
+      expect(response.status).toBe(502);
+      expect(await response.json()).toEqual({error: 'email_failed'});
+      expect(fake.dbCalls('delete').filter(c => c.table === 'email_change_requests')).toHaveLength(2);
+      expect(fake.dbCalls('update')).toHaveLength(0);
+    });
+
+    it('changes nothing when the request could not be recorded', async () => {
+      answer({...TARGET, role: 'DEPARTMENT'});
+      const db = fake.db;
+      fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+      expect((await pending()).status).toBe(500);
+      expect(mailState.outbox).toHaveLength(0);
+      expect(fake.dbCalls('update')).toHaveLength(0);
+    });
+
+    it('the platform owner changing the email or the role voids a request made before', async () => {
+      asOwner({...TARGET, role: 'DEPARTMENT'});
+      await update('other@hospital.gr');
+      const voided = fake.dbCalls('delete').filter(c => c.table === 'email_change_requests');
+      expect(voided).toHaveLength(1);
+      expect(voided[0].filters).toContainEqual(['eq', 'user_id', 'user-2']);
+      resetFake();
+      fake.user = {id: 'admin-1'};
+      asOwner({...TARGET, role: 'DEPARTMENT'});
+      await update('nurse@hospital.gr', {role: 'ADMIN'});
+      expect(fake.dbCalls('delete').filter(c => c.table === 'email_change_requests')).toHaveLength(1);
+    });
+
+    it('but an owner change of something else leaves it', async () => {
+      asOwner({...TARGET, role: 'DEPARTMENT'});
+      await update('nurse@hospital.gr', {role: 'DEPARTMENT'});
+      expect(fake.dbCalls('delete').filter(c => c.table === 'email_change_requests')).toHaveLength(0);
+    });
+
+    it('still saves the other fields at once', async () => {
+      answer({...TARGET, role: 'DEPARTMENT'});
+      const response = await update('nurse@hospital.gr', {role: 'VIEWER'});
+      expect(response.status).toBe(200);
+      expect(mailState.outbox).toHaveLength(0);
+      expect(fake.dbCalls('insert').filter(c => c.table === 'email_change_requests')).toHaveLength(0);
+    });
   });
 
   it('records nothing and sends nothing when the email stays the same', async () => {
@@ -265,4 +363,41 @@ describe('another admin\'s account: only the platform owner', () => {
       expect(await response.json()).not.toEqual({error: 'owner_only'});
     });
   }
+});
+
+describe('giving the Admin role: only the platform owner', () => {
+  const asCaller = (caller: Profile) => {
+    fake.db = (call: DbCall) => {
+      if (call.table === 'profiles' && call.op === 'select') {
+        const id = call.filters.find(([op, column]) => op === 'eq' && column === 'id')?.[2];
+        return {data: id === 'admin-1' ? caller : id === 'user-2' ? TARGET : null, error: null};
+      }
+      return {data: null, error: null};
+    };
+  };
+  const promote = (handle: Handler) =>
+    handle(post({user_id: 'user-2', name: TARGET.name, email: TARGET.email, role: 'ADMIN'}));
+
+  it('update-staff: a hospital admin cannot make someone an admin, and nothing is changed', async () => {
+    asCaller(ADMIN);
+    const response = await promote(await loadFunction('update-staff'));
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({error: 'owner_only'});
+    expect(fake.dbCalls('update').length).toBe(0);
+  });
+
+  it('update-staff: the platform owner may', async () => {
+    asCaller({...ADMIN, organization_id: null});
+    const response = await promote(await loadFunction('update-staff'));
+    expect(response.status).toBe(200);
+    expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).toMatchObject({role: 'ADMIN'});
+  });
+
+  it('update-staff: a hospital admin still sets the other roles', async () => {
+    asCaller(ADMIN);
+    const response = await (await loadFunction('update-staff'))(
+      post({user_id: 'user-2', name: TARGET.name, email: TARGET.email, role: 'VIEWER'}),
+    );
+    expect(response.status).toBe(200);
+  });
 });

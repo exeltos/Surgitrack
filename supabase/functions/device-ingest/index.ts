@@ -20,6 +20,30 @@ const hex = (bytes: ArrayBuffer) => Array.from(new Uint8Array(bytes), b => b.toS
 const MAX_CYCLES = 200;
 const MAX_BODY = 512 * 1024;
 
+// Rate limits (the same atomic limiter as sign-in, reserve_login_attempt; every request waits on it, so parallel
+// requests cannot slip past). A real device or gateway sends a cycle when one ends, or a backlog of at most
+// 200 cycles a request when it reconnects, so these are far above normal use.
+//  - a device key: at most 30 requests in 10 minutes, whatever the address (a leaked key cannot flood the table);
+//  - an address sending keys no device has: at most 30 of them in 10 minutes (then 429, whatever it sends).
+//    Requests with a valid key never count against the address, so a hospital whose gateway shares its address
+//    with something misbehaving is not locked out.
+const WINDOW_MINUTES = 10;
+const MAX_REQUESTS_PER_DEVICE = 30;
+const MAX_UNKNOWN_KEYS_PER_IP = 30;
+const clientIp = (req: Request) => {
+  // Edge Functions sit behind Cloudflare, which sets cf-connecting-ip itself; x-forwarded-for's first entry is
+  // whatever the client sent, so only its last (proxy-added) entry is used as a fallback.
+  const cf = (req.headers.get("cf-connecting-ip") || "").trim();
+  if (cf) return cf;
+  const forwarded = (req.headers.get("x-forwarded-for") || "").split(",").map(s => s.trim()).filter(Boolean);
+  return forwarded[forwarded.length - 1] || "unknown";
+};
+const tooMany = () =>
+  new Response(JSON.stringify({error: "too_many_requests", retry_after_minutes: WINDOW_MINUTES}), {
+    status: 429,
+    headers: {...cors, "Content-Type": "application/json", "Retry-After": String(WINDOW_MINUTES * 60)},
+  });
+
 type Raw = Record<string, unknown>;
 const pick = (row: Raw, ...names: string[]) => {
   for (const name of names) {
@@ -75,7 +99,32 @@ Deno.serve(async req => {
     const admin = createClient(url, service, {auth: {persistSession: false}});
     const hash = hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key)));
     const {data: found} = await admin.from("device_keys").select("device_id").eq("key_hash", hash).maybeSingle();
-    if (!found) return json({error: "unknown_device_key"}, 401);
+    if (!found) {
+      // Keys no device has: counted per address (a real device never sends one).
+      const who = `devicekey:${clientIp(req)}`;
+      const {data: attempt, error: limitError} = await admin.rpc("reserve_login_attempt", {
+        p_user_code: who,
+        p_ip: who,
+        p_window_minutes: WINDOW_MINUTES,
+        p_max_code_fails: MAX_UNKNOWN_KEYS_PER_IP,
+        p_max_ip_fails: MAX_UNKNOWN_KEYS_PER_IP,
+      });
+      if (limitError) return json({error: "unavailable"}, 503);
+      if (attempt === null) return tooMany();
+      return json({error: "unknown_device_key"}, 401);
+    }
+    // A known key: at most MAX_REQUESTS_PER_DEVICE requests per window. Every request is recorded and none is
+    // marked as succeeded, so each one counts. Fail closed: a device retries later.
+    const device_ = `device:${found.device_id}`;
+    const {data: slot, error: slotError} = await admin.rpc("reserve_login_attempt", {
+      p_user_code: device_,
+      p_ip: device_,
+      p_window_minutes: WINDOW_MINUTES,
+      p_max_code_fails: MAX_REQUESTS_PER_DEVICE,
+      p_max_ip_fails: MAX_REQUESTS_PER_DEVICE,
+    });
+    if (slotError) return json({error: "unavailable"}, 503);
+    if (slot === null) return tooMany();
     const {data: device} = await admin.from("devices").select("id, organization_id, active").eq("id", found.device_id).maybeSingle();
     if (!device?.active) return json({error: "device_inactive"}, 403);
     // A trial hospital whose trial has ended takes no data until it is renewed.

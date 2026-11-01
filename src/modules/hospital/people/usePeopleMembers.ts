@@ -171,7 +171,7 @@ export function usePeopleMembers(
     }
     setBusy(true);
     setNotice(null);
-    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('update-staff', {
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean; pending_email?: string}>('update-staff', {
       body: {
         user_id: member.id,
         name: draft.name,
@@ -181,6 +181,8 @@ export function usePeopleMembers(
         department_id: wholeHospital(role) ? null : draft.departmentId || null,
         active: draft.active,
         ...(platform ? {demo_enabled: draft.demoEnabled} : {}),
+        // Where the link that confirms a changed email points.
+        redirect_to: window.location.origin,
       },
     });
     setBusy(false);
@@ -206,26 +208,36 @@ export function usePeopleMembers(
                   'Δεν έχετε δικαίωμα να αλλάξετε αυτόν τον λογαριασμό (οι λογαριασμοί διαχειριστή αλλάζουν μόνο από τον ιδιοκτήτη).',
                   'You are not allowed to change this account (admin accounts are changed only by the owner).',
                 )
-              : status === 409
+              : code === 'email_unavailable' || code === 'email_failed'
                 ? L(
-                    'Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.',
-                    'That email is already used by another account.',
+                    'Η αλλαγή email χρειάζεται επιβεβαίωση από τη νέα διεύθυνση, αλλά το email δεν στάλθηκε. Δεν αποθηκεύτηκε τίποτα· δοκιμάστε ξανά σε λίγο.',
+                    'Changing the email needs the new address to confirm it, but the email could not be sent. Nothing was saved; try again shortly.',
                   )
-                : status === 400
-                  ? L('Ελέγξτε το ονοματεπώνυμο και το email.', 'Check the name and the email.')
-                  : status === 412
-                    ? L(
-                        'Ο χρήστης δεν έχει επιβεβαιώσει ακόμα το email του. Μόλις το επιβεβαιώσει, η αίτηση θα εμφανιστεί εδώ για έγκριση.',
-                        'This user has not confirmed their email yet. Once they do, the request will appear here for approval.',
-                      )
-                    : L(`Οι αλλαγές δεν αποθηκεύτηκαν.${detail}`, `The changes were not saved.${detail}`),
+                : status === 409
+                  ? L(
+                      'Το email χρησιμοποιείται ήδη από άλλον λογαριασμό.',
+                      'That email is already used by another account.',
+                    )
+                  : status === 400
+                    ? L('Ελέγξτε το ονοματεπώνυμο και το email.', 'Check the name and the email.')
+                    : status === 412
+                      ? L(
+                          'Ο χρήστης δεν έχει επιβεβαιώσει ακόμα το email του. Μόλις το επιβεβαιώσει, η αίτηση θα εμφανιστεί εδώ για έγκριση.',
+                          'This user has not confirmed their email yet. Once they do, the request will appear here for approval.',
+                        )
+                      : L(`Οι αλλαγές δεν αποθηκεύτηκαν.${detail}`, `The changes were not saved.${detail}`),
       });
       return;
     }
     setDrawer(null);
     setNotice({
       kind: 'ok',
-      text: L(`Τα στοιχεία του ${draft.name} αποθηκεύτηκαν.`, `${draft.name}'s details were saved.`),
+      text: data.pending_email
+        ? L(
+            `Τα στοιχεία του ${draft.name} αποθηκεύτηκαν, εκτός από το email. Στάλθηκε email επιβεβαίωσης στο ${data.pending_email}· το email σύνδεσης θα αλλάξει όταν το επιβεβαιώσει. Μέχρι τότε ο χρήστης συνδέεται με το τωρινό του.`,
+            `${draft.name}'s details were saved, except the email. A confirmation email was sent to ${data.pending_email}; the sign-in email changes once they confirm it. Until then the user signs in with the current one.`,
+          )
+        : L(`Τα στοιχεία του ${draft.name} αποθηκεύτηκαν.`, `${draft.name}'s details were saved.`),
     });
     await changed();
   };

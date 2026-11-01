@@ -39,6 +39,23 @@ describe('Signup email confirmation', () => {
     expect(invoke).toHaveBeenCalledWith('staff-signup', {body: {action: 'confirm', token: 'c0ffee00c0ffee00'}});
   });
 
+  it('confirms the link of a sign-in email change made by an administrator', async () => {
+    invoke.mockResolvedValue({
+      data: {ok: true, kind: 'email_change', email: 'new@hospital.gr', organization_name: 'ΙΑΣΩ Θεσσαλίας'},
+      error: null,
+    });
+    open({token: 'c0ffee00c0ffee00', confirm: true});
+    expect(await screen.findByText('Το email σύνδεσης άλλαξε')).toBeInTheDocument();
+    expect(screen.getByText(/new@hospital\.gr/)).toBeInTheDocument();
+    expect(screen.queryByText('Αναμονή έγκρισης')).not.toBeInTheDocument();
+  });
+
+  it('says when the new email was taken in the meantime', async () => {
+    invoke.mockResolvedValue({data: null, error: httpError(409)});
+    open({token: 'c0ffee00c0ffee00', confirm: true});
+    expect(await screen.findByText('Το email χρησιμοποιείται ήδη')).toBeInTheDocument();
+  });
+
   it('says when the link expired or was used', async () => {
     invoke.mockResolvedValue({data: null, error: httpError(410)});
     open({token: 'c0ffee00c0ffee00', confirm: true});

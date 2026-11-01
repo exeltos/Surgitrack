@@ -126,6 +126,7 @@ Deno.serve(async req => {
       if (r.status !== "PENDING") return json({error: "Request is not awaiting approval"}, 409);
       const role = String(body.role || "");
       if (!ROLES.includes(role)) return json({error: "Role required"}, 400);
+      if (cp.organization_id && role === "ADMIN") return json({error: "owner_only"}, 403);
       const orgName = await hospital(r.organization_id);
       const dept = await department(r.organization_id, role, body.department_id ?? r.department_id);
       const supervisor = role === "STERILIZATION" && (body.supervisor ?? r.supervisor) === true;
@@ -212,6 +213,8 @@ Deno.serve(async req => {
         // A new hospital's admin (Studio) or a list the admin has already checked: straight to an account.
         const direct = row.direct === true || body.direct === true;
         if (!email.includes("@") || !org || !ROLES.includes(role) || (direct && name.length < 2)) throw new Error("Invalid user data");
+        // Only the platform owner makes an administrator.
+        if (cp.organization_id && role === "ADMIN") throw new Error("owner_only");
         const orgName = await hospital(org);
         const dept = await department(org, role, row.department_id);
         if (direct) {

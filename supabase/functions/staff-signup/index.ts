@@ -3,6 +3,7 @@ import {createClient} from "jsr:@supabase/supabase-js@2";
 import {clientIp, corsFor, jsonWith} from "../_shared/http.ts";
 import {appSite, esc, layout, mailConfigured, sendEmail} from "../_shared/mail.ts";
 import {releaseUnconfirmedSignup} from "../_shared/unconfirmedSignup.ts";
+import {confirmEmailChange} from "../_shared/emailChange.ts";
 
 // Public signup form (#/join/<token>): through a hospital's signup link, or a personal invitation
 // (emailed, or its link passed on by hand). The person fills in their name, department (and email
@@ -52,6 +53,14 @@ Deno.serve(async req => {
         .eq("status", "PENDING_EMAIL")
         .maybeSingle();
       if (waitingError) return json({error: "unavailable"}, 503);
+      if (!waiting) {
+        // Not a signup: the link of a sign-in email change, made by a hospital admin and confirmed by the new address.
+        const change = await confirmEmailChange(admin, token);
+        if (change.status === "ok") return json({ok: true, kind: "email_change", email: change.email, organization_name: change.organization});
+        if (change.status === "unavailable") return json({error: "unavailable"}, 503);
+        if (change.status === "taken") return json({error: "email_taken"}, 409);
+        return json({error: "link_invalid"}, 410);
+      }
       if (!waiting?.user_id || Date.parse(waiting.requested_at) + CONFIRM_DAYS * 864e5 < Date.now())
         return json({error: "link_invalid"}, 410);
       const {error: confirmError} = await admin.auth.admin.updateUserById(waiting.user_id, {email_confirm: true});
@@ -136,17 +145,28 @@ Deno.serve(async req => {
     if (password.length < PASSWORD_MIN || password.length > 72 || !/\p{L}/u.test(password) || !/\d/.test(password))
       return json({error: "password_invalid"}, 400);
 
-    // Throttle signups per IP (the same atomic limiter as sign-in).
+    // Throttle signups (the same atomic limiter as sign-in). EVERY signup counts, the ones that succeed too: a
+    // successful one creates an account and, through the hospital link, emails the address it names, so counting only
+    // the failures would let anyone create accounts and send our email to anybody without limit.
+    //  - per address: 30 an hour (a ward signing up together shares one);
+    //  - per hospital link: 200 an hour (a leaked link cannot fill a hospital with accounts);
+    //  - per email address: 5 a day (nobody's inbox is flooded with our confirmation emails).
     const ip = clientIp(req);
-    const {data: attemptId, error: limitError} = await admin.rpc("reserve_login_attempt", {
-      p_user_code: "SIGNUP",
-      p_ip: `signup:${ip}`,
-      p_window_minutes: 60,
-      p_max_code_fails: 100000,
-      p_max_ip_fails: 10,
-    });
-    if (limitError) return json({error: "unavailable"}, 503);
-    if (attemptId === null) return json({error: "too_many_attempts"}, 429);
+    for (const [who, max, minutes] of [
+      [`signup:${ip}`, 30, 60],
+      [`signup-org:${organizationId}`, 200, 60],
+      [`signup-email:${email}`, 5, 1440],
+    ] as const) {
+      const {data: attemptId, error: limitError} = await admin.rpc("reserve_login_attempt", {
+        p_user_code: who,
+        p_ip: who,
+        p_window_minutes: minutes,
+        p_max_code_fails: max,
+        p_max_ip_fails: max,
+      });
+      if (limitError) return json({error: "unavailable"}, 503);
+      if (attemptId === null) return json({error: "too_many_attempts"}, 429);
+    }
 
     let department: {id: string; name: string} | null = null;
     if (needsDepartment) {
@@ -245,7 +265,6 @@ Deno.serve(async req => {
       await undo();
       return json({error: "signup_failed"}, 500);
     }
-    await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
     if (confirmByEmail) {
       const url = `${appSite(body?.origin)}/#/join/confirm/${confirmToken}`;
       const emailed = await sendEmail(

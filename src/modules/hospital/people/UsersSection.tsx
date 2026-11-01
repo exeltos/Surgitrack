@@ -15,7 +15,7 @@ import {
 import AppButton from '../../../components/ui/AppButton';
 import FilterMenu from '../../../components/assets/FilterMenu';
 import {localizedName} from '../../../core/glossary';
-import {SUPERVISOR, roles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
+import {SUPERVISOR, roles, assignableRoles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
 import type {PeopleState} from './usePeople';
 
@@ -252,7 +252,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     <label>
                       {L('Ρόλος', 'Role')}
                       <select value={d.role} onChange={e => setDecision(r, {role: e.target.value})}>
-                        {roles.map(role => (
+                        {assignableRoles(platform, d.role).map(role => (
                           <option key={role.id} value={role.id}>
                             {el ? role.el : role.en}
                           </option>

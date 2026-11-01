@@ -223,8 +223,13 @@ export default function AuthIndex({
       authData = restored;
     }
     if (!authData.user) return;
-    const email = authData.user.email?.toLowerCase() || '';
-    if (email === 'info@exeltos.com') {
+    // The database knows who the platform owner is; the app does not.
+    const {data: isOwner, error: ownerError} = await supabase.rpc('caller_is_platform_owner');
+    if (ownerError) {
+      setMessage(lang === 'el' ? 'Δεν ήταν δυνατή η φόρτωση του λογαριασμού.' : 'Could not load the account.');
+      return;
+    }
+    if (isOwner === true) {
       const {error: claimError} = await supabase.rpc('claim_platform_admin');
       if (claimError) {
         setMessage(

@@ -51,6 +51,13 @@ beforeEach(async () => {
 });
 
 describe('invite-staff: who may invite', () => {
+  it('a hospital admin cannot invite an admin: only the platform owner makes one', async () => {
+    const row = await result(await invite(handle, {email: 'a@b.gr', organization_id: 'org-1', role: 'ADMIN', direct: true, full_name: 'Μαρία'}));
+    expect(row).toMatchObject({ok: false, error: 'owner_only'});
+    expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
+    expect(fake.calls.filter(c => ['generateLink', 'inviteUserByEmail'].includes(c.what))).toHaveLength(0);
+  });
+
   it('refuses a caller who is not signed in', async () => {
     fake.user = null;
     expect((await invite(handle, {})).status).toBe(401);
@@ -164,6 +171,7 @@ describe('invite-staff: an account made at once (hospital admin role or direct l
     mailOn();
     codeIs();
     linkFor();
+    routes({'profiles:select': call => (filter(call, 'id') === 'admin-1' ? {...ADMIN, organization_id: null} : null)});
     await invite(handle, {...body, role: 'ADMIN'});
     expect(upserts('profiles')[0].values).toMatchObject({role: 'ADMIN', active: false});
   });
@@ -381,6 +389,7 @@ describe('invite-staff: a signup invitation (anyone but an admin, not from a lis
 
   it('invites an admin to the signup form too, unless told to make the account at once', async () => {
     mailOn();
+    routes({'profiles:select': call => (filter(call, 'id') === 'admin-1' ? {...ADMIN, organization_id: null} : null)});
     const row = await result(await invite(handle, {...body, role: 'ADMIN', full_name: 'Μαρία'}));
     expect(row).toMatchObject({ok: true, mode: 'signup'});
     expect(fake.calls.filter(c => c.what === 'generateLink')).toHaveLength(0);
