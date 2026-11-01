@@ -28,7 +28,7 @@ for (const file of files)
   postcss.parse(readFileSync(file, 'utf8'), {from: file}).walkDecls(d => d.important && count++);
 
 if (process.argv.includes('--update')) {
-  writeFileSync(baselineFile, JSON.stringify({important: count}) + '\n');
+  writeFileSync(baselineFile, JSON.stringify({important: count}, null, 2) + '\n');
   console.log(`Baseline is now ${count}.`);
 } else {
   const {important: allowed} = JSON.parse(readFileSync(baselineFile, 'utf8'));
