@@ -139,6 +139,9 @@ $$;
 create or replace function cron.unschedule(job_name text) returns boolean language sql as $$
   with d as (delete from cron.job where jobname = job_name returning 1) select exists (select 1 from d)
 $$;
+create or replace function cron.unschedule(job_id bigint) returns boolean language sql as $$
+  with d as (delete from cron.job where jobid = job_id returning 1) select exists (select 1 from d)
+$$;
 grant all on all tables in schema cron to postgres;
 grant all on all sequences in schema cron to postgres;
 grant execute on all functions in schema cron to postgres;
