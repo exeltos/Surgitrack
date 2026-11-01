@@ -185,7 +185,14 @@ export function usePeopleMembers(
     });
     setBusy(false);
     if (error || !data?.ok) {
-      const status = (error as {context?: {status?: number}} | null)?.context?.status;
+      const context = (error as {context?: {status?: number; json?: () => Promise<{error?: string}>}} | null)?.context;
+      const status = context?.status;
+      // For support: the server's error code (or the kind of failure when no answer came back).
+      const code = await context?.json?.().then(
+        b => b?.error,
+        () => undefined,
+      );
+      const detail = ` (${[status, code, error && !status ? (error as Error).name : ''].filter(Boolean).join(' ')})`;
       setNotice({
         kind: 'error',
         text:
@@ -211,7 +218,7 @@ export function usePeopleMembers(
                         'Ο χρήστης δεν έχει επιβεβαιώσει ακόμα το email του. Μόλις το επιβεβαιώσει, η αίτηση θα εμφανιστεί εδώ για έγκριση.',
                         'This user has not confirmed their email yet. Once they do, the request will appear here for approval.',
                       )
-                    : L('Οι αλλαγές δεν αποθηκεύτηκαν.', 'The changes were not saved.'),
+                    : L(`Οι αλλαγές δεν αποθηκεύτηκαν.${detail}`, `The changes were not saved.${detail}`),
       });
       return;
     }
