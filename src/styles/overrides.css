@@ -4140,6 +4140,7 @@ html body .screen-guide-actions {
 .department-search:focus-within,
 .studio-search:focus-within,
 .manual-search:focus-within,
+html body .scan-search:focus-within,
 .studio-setting-input:focus-within,
 .asset-manage-target:focus-within,
 .asset-filter-panel select:focus-visible,

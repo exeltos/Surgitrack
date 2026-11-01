@@ -1,7 +1,8 @@
 import {describe, expect, it} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {askConfirm, ConfirmHost, tellUser} from '../confirmService';
+import {askConfirm, tellUser} from '../confirmService';
+import {ConfirmHost} from '../ConfirmHost';
 
 describe('the app confirmation from anywhere', () => {
   it('resolves to an empty string on confirm and false on cancel', async () => {

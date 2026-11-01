@@ -1,7 +1,8 @@
 import {describe, expect, it, vi} from 'vitest';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ScreenGuide, {screenSection} from '../ScreenGuide';
+import ScreenGuide from '../ScreenGuide';
+import {screenSection} from '../screenSection';
 
 const all = () => true;
 const show = (pathname: string, extra: {onHelp?: () => void; onClose?: () => void} = {}) =>

@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {GUIDED_SCREENS, hasScreenGuide} from '../guidedScreens';
-import {screenSection} from '../ScreenGuide';
+import {screenSection} from '../screenSection';
 import {helpManual} from '../../../core/help/helpManual';
 
 describe('which screens have a guide', () => {
