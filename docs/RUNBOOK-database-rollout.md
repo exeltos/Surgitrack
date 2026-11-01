@@ -4,6 +4,10 @@
 
 Κάθε βήμα έχει: τι κάνει, πώς το εφαρμόζεις, **πώς ελέγχεις ότι πέτυχε**, και **πώς γυρίζεις πίσω**. Αν ένας έλεγχος δεν βγει όπως γράφει, **σταμάτα** και μην πας στο επόμενο βήμα.
 
+## Κατάσταση (01/11/2026)
+
+Τα **βήματα 0 έως 4 έγιναν** στις 01/11/2026 και ο κάθε έλεγχος βγήκε όπως έπρεπε. Για το backup του βήματος 0 χρησιμοποιήθηκε το καθημερινό backup του ίδιου του Supabase (01/11 01:40 UTC), γιατί το νυχτερινό backup του GitHub **αποτυγχάνει** (λείπει το secret `SUPABASE_DB_URL`). **Μένει το βήμα 5** (απόκρυψη emails και usernames), όχι πριν περάσει μία μέρα χρήσης.
+
 ## Τι θα αλλάξει για τους χρήστες
 
 | Αλλαγή                                          | Τι θα δουν                                                                                          |
@@ -29,10 +33,10 @@
 
 Εφάρμοσέ τα με αυτή τη σειρά, από τον φάκελο `supabase/migrations/`:
 
-1. `20261101090000_client_errors_rate_cap.sql`
-2. `20261101091000_access_request_token_and_pending_email_guard.sql`
-3. `20261101092000_trial_lock_storage.sql`
-4. `20261101093000_profile_contacts_function.sql`
+1. `20261101203245_client_errors_rate_cap.sql`
+2. `20261101203313_access_request_token_and_pending_email_guard.sql`
+3. `20261101203341_trial_lock_storage.sql`
+4. `20261101203352_profile_contacts_function.sql`
 
 **Έλεγχος** (τρέξε στο SQL Editor, δεν αλλάζει τίποτα):
 
@@ -84,7 +88,7 @@ drop function if exists public.profile_contacts(uuid);
 
 Αυτό έχει δύο μέρη που πρέπει να γίνουν μαζί:
 
-**α) Το migration:** `20261101094000_admin_accounts_owner_only.sql`
+**α) Το migration:** `20261101203835_admin_accounts_owner_only.sql`
 
 **β) Οι τρεις edge functions** `update-staff`, `staff-link`, `delete-staff` (με CLI: `supabase functions deploy update-staff staff-link delete-staff --project-ref oklyqnoqzbhjudqbkulq`).
 
