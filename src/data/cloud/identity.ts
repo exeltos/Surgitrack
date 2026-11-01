@@ -2,8 +2,6 @@ import {supabase} from '../../lib/supabase';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import type {SessionUser, UserRole} from '../../store/types';
 
-const PLATFORM_ADMIN_EMAIL = 'info@exeltos.com';
-
 /** Who is actually signed in, independent of any role they are currently viewing the app as. */
 export type RealIdentity = {
   id: string;
@@ -52,7 +50,7 @@ let pending: Promise<IdentityResult> | null = null;
 
 /**
  * Resolves the signed-in user once per page load (the workspace gate and the app both need it).
- * The platform admin is recognised by email and claimed server-side; everyone else by profile.
+ * The platform owner is recognised by the database and claimed server-side; everyone else by profile.
  */
 export const resolveIdentity = (): Promise<IdentityResult> => {
   pending ??= (async (): Promise<IdentityResult> => {
@@ -60,7 +58,10 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
     const authUser = data.session?.user;
     if (!authUser) return {status: 'signed-out'};
     let identity: RealIdentity;
-    if (authUser.email?.toLowerCase() === PLATFORM_ADMIN_EMAIL) {
+    // The database knows who the platform owner is (their confirmed sign-in email); the app does not.
+    const {data: isOwner, error: ownerError} = await supabase.rpc('caller_is_platform_owner');
+    if (ownerError) return {status: 'error', message: ownerError.message};
+    if (isOwner === true) {
       const {error} = await supabase.rpc('claim_platform_admin');
       if (error) return {status: 'error', message: error.message};
       identity = {

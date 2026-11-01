@@ -34,6 +34,14 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
 
+## Not yet applied to the live project
+
+| Version        | Name                   | What it does                                                                                                                                   |
+| -------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261102120000 | platform_owner_setting | The platform owner's address moves from the code into the private row `platform_owner`; `caller_is_platform_owner()` lets the app ask about it |
+
+Apply it **before** the new app is published: the app asks `caller_is_platform_owner()` at sign-in instead of comparing the address itself, so an app published first would fail the owner's sign-in until the migration is there.
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and

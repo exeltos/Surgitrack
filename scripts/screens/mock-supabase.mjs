@@ -538,6 +538,8 @@ const json = (status, body, headers = {}) => ({
 
 const RPC = {
   claim_platform_admin: () => null,
+  // The signed-in account is the platform owner when it is the PLATFORM one.
+  caller_is_platform_owner: (_db, _payload, account) => account?.email === ACCOUNTS.PLATFORM.email,
   my_access_request: () => null,
   demo_seats_left: () => null,
   // Sign-in email and username of the hospital's people (admins; the Demo hospital has one).
@@ -644,7 +646,7 @@ export function handleSupabase(db, account, {method, url, headers, body}) {
     const name = path.slice('/rest/v1/'.length);
     if (name.startsWith('rpc/')) {
       const fn = RPC[name.slice(4)];
-      return json(200, fn ? fn(db, payload) : null);
+      return json(200, fn ? fn(db, payload, account) : null);
     }
     const table = (db[name] ??= []);
     const params = u.searchParams;
