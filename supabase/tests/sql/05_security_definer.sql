@@ -22,7 +22,7 @@ select tests.eq((
   'platform_create_department,platform_create_organization,platform_delete_movements,'
   'platform_ensure_demo_organization,platform_list_departments,platform_reset_demo_organization,'
   'platform_undo_asset_import,platform_update_department,platform_update_organization,'
-  'role_has_permission,signup_link_info',
+  'profile_contacts,role_has_permission,signup_link_info',
   'signed-in users call only the reviewed security definer functions');
 
 select tests.eq((

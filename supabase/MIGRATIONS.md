@@ -10,6 +10,14 @@ The folder has 99 files, all applied to the live project (checked 10/10/2026; `2
 applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` on 26/10/2026 and
 `20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, each file named after the version the live project gave it).
 
+## Not applied yet (written 01/11/2026, from the review)
+
+These four files are **not** in the live project yet: `20261101090000_client_errors_rate_cap`,
+`20261101091000_access_request_token_and_pending_email_guard`, `20261101092000_trial_lock_storage` and
+`20261101093000_profile_contacts_function`. They were replayed and tested locally only (`tests/sql/20_review_hardening.sql`).
+When they are applied, the live version will be the one the project gives them; rename the files to match (see below).
+`supabase/staged/` holds one more change that must wait for an app update (see its README).
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and
