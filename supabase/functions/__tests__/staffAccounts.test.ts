@@ -266,3 +266,40 @@ describe('another admin\'s account: only the platform owner', () => {
     });
   }
 });
+
+describe('giving the Admin role: only the platform owner', () => {
+  const asCaller = (caller: Profile) => {
+    fake.db = (call: DbCall) => {
+      if (call.table === 'profiles' && call.op === 'select') {
+        const id = call.filters.find(([op, column]) => op === 'eq' && column === 'id')?.[2];
+        return {data: id === 'admin-1' ? caller : id === 'user-2' ? TARGET : null, error: null};
+      }
+      return {data: null, error: null};
+    };
+  };
+  const promote = (handle: Handler) =>
+    handle(post({user_id: 'user-2', name: TARGET.name, email: TARGET.email, role: 'ADMIN'}));
+
+  it('update-staff: a hospital admin cannot make someone an admin, and nothing is changed', async () => {
+    asCaller(ADMIN);
+    const response = await promote(await loadFunction('update-staff'));
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({error: 'owner_only'});
+    expect(fake.dbCalls('update').length).toBe(0);
+  });
+
+  it('update-staff: the platform owner may', async () => {
+    asCaller({...ADMIN, organization_id: null});
+    const response = await promote(await loadFunction('update-staff'));
+    expect(response.status).toBe(200);
+    expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).toMatchObject({role: 'ADMIN'});
+  });
+
+  it('update-staff: a hospital admin still sets the other roles', async () => {
+    asCaller(ADMIN);
+    const response = await (await loadFunction('update-staff'))(
+      post({user_id: 'user-2', name: TARGET.name, email: TARGET.email, role: 'VIEWER'}),
+    );
+    expect(response.status).toBe(200);
+  });
+});

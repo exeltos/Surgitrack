@@ -100,6 +100,7 @@ export default function HospitalPeople({
           self={!!drawer.member && drawer.member.id === me?.id}
           departments={activeDepartments}
           showDemo={platform && hospitalDemo}
+          platform={platform}
           demo={demo}
           invitedAt={drawer.member ? invitedAt(drawer.member) : undefined}
           onResend={draft => void invite(draft, true)}
