@@ -5,10 +5,10 @@ folder on an empty Postgres gives the same public schema as the live project. La
 local replay below: policies, triggers and table and function privileges are identical, and function bodies differ
 only in whitespace (`platform_delete_movements`).
 
-The folder has 104 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
+The folder has 105 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
 `20261014102205_usage_correction`, `20261014124438_demo_handover_stamp` and `20261014134551_recreated_records_forget_deletion`
 applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` on 26/10/2026 and
-`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the five of 01/11/2026 listed below, each file named after the version the live project gave it).
+`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the six of 01/11/2026 listed below, each file named after the version the live project gave it).
 
 ## Applied on 01/11/2026 (from the review of that day)
 
@@ -19,6 +19,7 @@ applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` 
 | 20261101203341 | trial_lock_storage                           | The trial lock also covers the `surgitrack-assets` Storage bucket                                                                                         |
 | 20261101203352 | profile_contacts_function                    | `profile_contacts()`: sign-in email and username for a hospital's admins, the platform owner, or the caller's own row                                     |
 | 20261101203835 | admin_accounts_owner_only                    | A hospital admin no longer changes or removes another admin's account by a direct write (the staff functions refuse it too); only the platform owner does |
+| 20261101210816 | hide_profile_contacts                        | Signed-in users cannot read `profiles.email` and `profiles.user_code` from the table; the app reads them through `profile_contacts()`                     |
 
 Applied with the Supabase MCP `apply_migration` after a fresh platform backup (01/11/2026 01:40 UTC) and read-only
 checks of the live schema; each file is named after the version the project recorded. After each one the checks of
@@ -26,7 +27,9 @@ checks of the live schema; each file is named after the version the project reco
 rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `verify_jwt = false` as it had) were deployed;
 `update-staff` is not listed in `config.toml` for that setting, so the repository and the live project differ there.
 
-`supabase/staged/` holds one more change that waits for an app update and a day of use (step 5 of the runbook).
+`20261101210816_hide_profile_contacts` had already been run by hand in the Dashboard at 15:29 UTC, before the app that
+reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
+version (see the comment in the file).
 
 ## How the versions line up
 

@@ -1,7 +1,7 @@
--- Run after the staged migration is replayed (see README.md): colleagues' emails and usernames are no longer
--- readable from the table, the rest of the profile is, and profile_contacts() gives each role what it needs.
+-- Colleagues' emails and usernames are not readable from the profiles table, the rest of the profile is, and
+-- profile_contacts() gives each role what it needs.
 begin;
-\ir ../tests/local/fixtures.sql
+\ir ../local/fixtures.sql
 
 select tests.login('dept_a');
 select tests.throws($q$select email from public.profiles$q$, '42501', 'a department user cannot read emails');
