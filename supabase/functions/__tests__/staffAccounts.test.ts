@@ -265,6 +265,25 @@ describe('update-staff: the sign-in email', () => {
       expect(fake.dbCalls('update')).toHaveLength(0);
     });
 
+    it('the platform owner changing the email or the role voids a request made before', async () => {
+      asOwner({...TARGET, role: 'DEPARTMENT'});
+      await update('other@hospital.gr');
+      const voided = fake.dbCalls('delete').filter(c => c.table === 'email_change_requests');
+      expect(voided).toHaveLength(1);
+      expect(voided[0].filters).toContainEqual(['eq', 'user_id', 'user-2']);
+      resetFake();
+      fake.user = {id: 'admin-1'};
+      asOwner({...TARGET, role: 'DEPARTMENT'});
+      await update('nurse@hospital.gr', {role: 'ADMIN'});
+      expect(fake.dbCalls('delete').filter(c => c.table === 'email_change_requests')).toHaveLength(1);
+    });
+
+    it('but an owner change of something else leaves it', async () => {
+      asOwner({...TARGET, role: 'DEPARTMENT'});
+      await update('nurse@hospital.gr', {role: 'DEPARTMENT'});
+      expect(fake.dbCalls('delete').filter(c => c.table === 'email_change_requests')).toHaveLength(0);
+    });
+
     it('still saves the other fields at once', async () => {
       answer({...TARGET, role: 'DEPARTMENT'});
       const response = await update('nurse@hospital.gr', {role: 'VIEWER'});

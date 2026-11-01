@@ -540,7 +540,7 @@ describe('staff-signup: confirming a sign-in email change (made by a hospital ad
     new_email: 'new@hospital.gr',
     requested_at: AN_HOUR_AGO(),
   };
-  const PROFILE = {id: 'user-9', organization_id: 'org-1', email: 'old@hospital.gr'};
+  const PROFILE = {id: 'user-9', organization_id: 'org-1', email: 'old@hospital.gr', role: 'DEPARTMENT'};
   const open = (w: {request?: Row; profile?: Row; taken?: unknown} = {}) => {
     const has = (key: 'request' | 'profile' | 'taken') => key in w;
     answerTables({
@@ -576,6 +576,29 @@ describe('staff-signup: confirming a sign-in email change (made by a hospital ad
     expect(mailState.outbox.map(m => m.to)).toEqual(['old@hospital.gr']);
   });
 
+  it('keeps the completion first: when it cannot be recorded nothing changes and the request stays', async () => {
+    open();
+    const db = fake.db;
+    fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+    const response = await confirm();
+    expect(response.status).toBe(503);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+    expect(fake.dbCalls('delete')).toHaveLength(0);
+  });
+
+  it('records the change before making it', async () => {
+    open();
+    let recordedBefore: boolean | undefined;
+    const original = fake.admin.updateUserById;
+    fake.admin.updateUserById = (...args: Parameters<typeof original>) => {
+      recordedBefore ??= fake.dbCalls('insert').some(c => c.table === 'account_events');
+      return original(...args);
+    };
+    await confirm();
+    expect(recordedBefore).toBe(true);
+  });
+
   it('looks the request up by the hash of the token, never by the token', async () => {
     open();
     await confirm();
@@ -590,6 +613,7 @@ describe('staff-signup: confirming a sign-in email change (made by a hospital ad
     ['a link older than 3 days', {request: {...REQUEST, requested_at: new Date(Date.now() - 4 * 864e5).toISOString()}}],
     ['a person who moved to another hospital', {profile: {...PROFILE, organization_id: 'org-2'}}],
     ['a person who no longer exists', {profile: null}],
+    ['a person the platform owner has made an administrator since', {profile: {...PROFILE, role: 'ADMIN'}}],
   ])('refuses %s, changing nothing', async (_label, world) => {
     open(world);
     const response = await confirm();

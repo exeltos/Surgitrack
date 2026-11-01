@@ -37,16 +37,29 @@ export async function confirmEmailChange(admin: SupabaseClient, token: string): 
   }
   const {data: profile} = await admin
     .from("profiles")
-    .select("id, organization_id, email")
+    .select("id, organization_id, email, role")
     .eq("id", request.user_id)
     .maybeSingle();
-  if (!profile || profile.organization_id !== request.organization_id) {
+  // The request was made by a hospital admin, who may not touch an admin's account (only the platform owner does):
+  // if the person has been made an administrator since, the request is void. (update-staff also withdraws a request
+  // when the owner changes the person's email or role; this is the second lock.)
+  if (!profile || profile.organization_id !== request.organization_id || profile.role === "ADMIN") {
     await admin.from("email_change_requests").delete().eq("id", request.id);
     return {status: "invalid"};
   }
   const pattern = String(request.new_email).replace(/[\\%_]/g, "\\$&");
   const {data: taken} = await admin.from("profiles").select("id").ilike("email", pattern).neq("id", request.user_id).limit(1);
   if (taken?.length) return {status: "taken"};
+  // No record, no change (as update-staff does): the completion is kept first, and when it cannot be kept nothing
+  // is changed and the request stays, so the link can be opened again.
+  const recorded = await recordAccountEvent(admin, {
+    organizationId: request.organization_id,
+    targetId: request.user_id,
+    actorId: request.user_id,
+    action: "email_changed",
+    detail: {from: profile.email ?? null, to: request.new_email, confirmed: true},
+  });
+  if (!recorded) return {status: "unavailable"};
   const {error: authError} = await admin.auth.admin.updateUserById(request.user_id, {
     email: request.new_email,
     email_confirm: true,
@@ -59,13 +72,6 @@ export async function confirmEmailChange(admin: SupabaseClient, token: string): 
     return {status: "unavailable"};
   }
   await admin.from("email_change_requests").delete().eq("id", request.id);
-  await recordAccountEvent(admin, {
-    organizationId: request.organization_id,
-    targetId: request.user_id,
-    actorId: request.user_id,
-    action: "email_changed",
-    detail: {from: profile.email ?? null, to: request.new_email, confirmed: true},
-  });
   if (profile.email) await notifyAccountEvent(profile.email, "email_changed", "");
   const {data: org} = await admin.from("organizations").select("name").eq("id", request.organization_id).maybeSingle();
   return {status: "ok", email: request.new_email, organization: org?.name || ""};

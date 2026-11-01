@@ -176,6 +176,11 @@ Deno.serve(async req => {
       if (emailChanged && !needsConfirmation && target.email) await admin.auth.admin.updateUserById(userId, {email: target.email, email_confirm: true});
       return json({error: "update_failed"}, 500);
     }
+    // A change made by the platform owner to the person's email or role voids a request a hospital admin made before
+    // it: the link must not overwrite what the owner has just decided.
+    if (!needsConfirmation && (emailChanged || role !== target.role)) {
+      await admin.from("email_change_requests").delete().eq("user_id", userId);
+    }
     if (needsConfirmation) {
       if (target.email) await notifyAccountEvent(target.email, "email_change_requested", me.name);
       return json({ok: true, name, email: target.email, pending_email: email});
