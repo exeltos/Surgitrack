@@ -278,7 +278,8 @@ describe('Studio: evaluation Demos', () => {
     await openDemo(user);
     const keep = await screen.findByRole('checkbox', {name: 'Αυτόματη διαγραφή 30 ημέρες μετά τη λήξη'});
     expect(keep).toBeChecked();
-    expect(screen.getByText('31/10/2026')).toBeInTheDocument();
+    // Scoped to the checkbox's label: other dates in the drawer (created, invited) can fall on the same day.
+    expect(keep.closest('label')).toHaveTextContent('31/10/2026');
     await user.click(keep);
     await waitFor(() => expect(service.setDemoAutoDelete).toHaveBeenCalledWith('demo-1', false));
   });
