@@ -41,6 +41,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
     lang,
     me,
     pending,
+    platform,
     q,
     query,
     readCsv,
@@ -390,19 +391,28 @@ export default function UsersSection({s}: {s: PeopleState}) {
             {shown.map(m => {
               // Your own account is changed by another admin (or the platform owner), never by you.
               const self = m.id === me?.id;
+              // Another admin's account is changed only by the platform owner (the staff functions and the database
+              // refuse a hospital admin too).
+              const ownerOnly = !self && !platform && m.role === 'ADMIN';
+              const locked = self || ownerOnly;
               return (
                 <button
                   key={m.id}
                   type="button"
                   className={`people-row${self ? ' self' : ''}`}
-                  disabled={self}
+                  disabled={locked}
                   title={
                     self
                       ? L(
                           'Τον δικό σας λογαριασμό τον αλλάζει άλλος διαχειριστής.',
                           'Another admin changes your own account.',
                         )
-                      : undefined
+                      : ownerOnly
+                        ? L(
+                            'Τους λογαριασμούς διαχειριστών τους αλλάζει μόνο ο διαχειριστής της πλατφόρμας.',
+                            'Only the platform owner changes an admin account.',
+                          )
+                        : undefined
                   }
                   onClick={() => setDrawer({member: m})}
                 >
@@ -429,7 +439,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
                     </span>
                   )}
-                  {self ? (
+                  {locked ? (
                     <Lock size={15} className="people-open" />
                   ) : (
                     <ChevronRight size={16} className="people-open" />

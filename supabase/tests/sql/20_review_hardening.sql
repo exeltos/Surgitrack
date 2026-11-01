@@ -78,4 +78,21 @@ select tests.eq(tests.count('select * from public.profile_contacts()'), 8, 'the 
 select tests.anon();
 select tests.throws('select * from public.profile_contacts()', '42501', 'signed-out visitors get nothing');
 
+-- Another admin's account: the platform owner only ------------------------------------------------------
+reset role;
+update public.profiles set role = 'ADMIN' where id = tests.uid('ster_a');   -- a second admin in hospital A
+select tests.login('admin_a');
+select tests.eq(tests.rows(format($q$update public.profiles set name = 'Changed' where id = %L$q$, tests.uid('ster_a'))), 0,
+  'a hospital admin changes no other admin''s account directly');
+select tests.eq(tests.rows(format($q$delete from public.profiles where id = %L$q$, tests.uid('ster_a'))), 0,
+  'nor removes it');
+select tests.eq(tests.rows(format($q$update public.profiles set name = 'Changed' where id = %L$q$, tests.uid('sup_a'))), 1,
+  'but still manages everyone else');
+select tests.login('platform');
+select tests.eq(tests.rows(format($q$update public.profiles set name = 'By owner' where id = %L$q$, tests.uid('ster_a'))), 1,
+  'the platform owner changes it');
+select tests.service();
+select tests.eq(tests.rows(format($q$update public.profiles set name = 'By function' where id = %L$q$, tests.uid('ster_a'))), 1,
+  'and the staff functions (service role) are not limited by the policy');
+
 rollback;

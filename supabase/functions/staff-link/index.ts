@@ -6,7 +6,8 @@ import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.t
 // Makes a one-time link for a staff member, to pass on by hand (message, phone) when email does
 // not reach them: an invitation link for someone who has not accepted yet, or a set-new-password
 // link for an active user. The link itself is never emailed. Only a hospital admin for users of
-// their own hospital, or the platform admin; never for one's own account. The link opens the app's «Συνέχεια» page,
+// their own hospital (not for another admin: only the platform admin makes a link for an admin), or the platform admin;
+// never for one's own account. The link opens the app's «Συνέχεια» page,
 // which spends it only when the person presses the button. Every link is recorded in account_events
 // (no record, no link) and the person is told by email, so a link cannot be used in their name unseen.
 const corsBase = {
@@ -42,11 +43,13 @@ Deno.serve(async req => {
     // The link may point only at the app itself.
     const site = APP_ORIGIN.test(origin) ? origin : SITE;
 
-    const {data: target} = await admin.from("profiles").select("id, organization_id, email, active").eq("id", userId).maybeSingle();
+    const {data: target} = await admin.from("profiles").select("id, organization_id, email, active, role").eq("id", userId).maybeSingle();
     if (!target?.email) return json({error: "not_found"}, 404);
     // A hospital admin only manages their own hospital; the platform admin (no hospital) any.
     if (me.organization_id && target.organization_id !== me.organization_id) return json({error: "forbidden"}, 403);
     if (!target.organization_id) return json({error: "forbidden"}, 403);
+    // An admin account is changed only by the platform owner (no hospital), never by another hospital admin.
+    if (me.organization_id && target.role === "ADMIN") return json({error: "owner_only"}, 403);
 
     // Someone who has not accepted their invitation gets an invitation link; everyone else a
     // set-new-password link. An invitation that turns out to be accepted already falls back.

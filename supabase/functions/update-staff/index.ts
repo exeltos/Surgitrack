@@ -4,8 +4,8 @@ import {corsFor, jsonWith} from "../_shared/http.ts";
 import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.ts";
 
 // Edits a staff account: full name, sign-in email, department, role and access (and Demo access,
-// for the platform admin only). Only a hospital admin for users of their own hospital, or the
-// platform admin. The email changes on the sign-in account too, so the person signs in with the
+// for the platform admin only). Only a hospital admin for users of their own hospital (never another admin's
+// account), or the platform admin. The email changes on the sign-in account too, so the person signs in with the
 // new one; the username (user code) stays the same. Nobody changes their own account. An email change
 // is recorded in account_events (no record, no change) and both the old and the new address are told.
 const corsBase = {
@@ -55,6 +55,8 @@ Deno.serve(async req => {
     // A hospital admin only manages their own hospital; the platform admin (no hospital) any.
     if (me.organization_id && target.organization_id !== me.organization_id) return json({error: "forbidden"}, 403);
     if (!target.organization_id) return json({error: "forbidden"}, 403);
+    // An admin account is changed only by the platform owner (no hospital), never by another hospital admin.
+    if (me.organization_id && target.role === "ADMIN") return json({error: "owner_only"}, 403);
 
     // Fields left out keep their value.
     const role = body?.role === undefined ? target.role : String(body.role);
