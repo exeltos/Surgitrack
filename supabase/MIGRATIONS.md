@@ -8,7 +8,7 @@ only in whitespace (`platform_delete_movements`).
 The folder has 105 files, all applied to the live project (checked 10/10/2026; `20261014063143_department_pickup`,
 `20261014102205_usage_correction`, `20261014124438_demo_handover_stamp` and `20261014134551_recreated_records_forget_deletion`
 applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` on 26/10/2026 and
-`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the eight of 01/11/2026 listed below, each file named after the version the live project gave it).
+`20261027082127_hospital_modules` and `20261027094320_hospital_module_devices` on 27/10/2026, and the nine of 01/11/2026 listed below, each file named after the version the live project gave it).
 
 ## Applied on 01/11/2026 (from the review of that day)
 
@@ -22,6 +22,7 @@ applied and recorded on 14/10/2026, `20261026113029_department_cancel_dispatch` 
 | 20261101210816 | hide_profile_contacts                        | Signed-in users cannot read `profiles.email` and `profiles.user_code` from the table; the app reads them through `profile_contacts()`                                                                        |
 | 20261101230000 | demo_seats_left_caller_check                 | `demo_seats_left(org)` answers only for the caller's own hospital, the platform owner and the service role                                                                                                   |
 | 20261102080000 | admin_role_owner_only                        | A trigger on `profiles`: a signed-in hospital admin cannot give anyone the Admin role (direct write, or approving a signup as Admin); `update-staff` v21 and `invite-staff` v24 refuse it too (`owner_only`) |
+| 20261102100000 | email_change_requests                        | A hospital admin's change of another person's sign-in email waits for the new address to confirm it (`email_change_requests`, service role only); `update-staff` v22 and `staff-signup` v24                  |
 
 Applied with the Supabase MCP `apply_migration` after a fresh platform backup (01/11/2026 01:40 UTC) and read-only
 checks of the live schema; each file is named after the version the project recorded. After each one the checks of
@@ -32,14 +33,6 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 `20261101210816_hide_profile_contacts` had already been run by hand in the Dashboard at 15:29 UTC, before the app that
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
-
-## Not yet applied to the live project
-
-| Version        | Name                  | What it does                                                                                                                                     |
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 20261102100000 | email_change_requests | A hospital admin's change of another person's sign-in email waits for the new address to confirm it (`email_change_requests`, service role only) |
-
-Deploy `update-staff` and `staff-signup` with it (and the app, whose `#/join/confirm/<token>` page now also confirms an email change), then move the row to the table above.
 
 ## How the versions line up
 
