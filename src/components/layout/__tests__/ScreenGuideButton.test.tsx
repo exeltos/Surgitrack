@@ -36,7 +36,7 @@ describe('«Οδηγός οθόνης» in the top bar', () => {
     expect(screen.queryByRole('complementary', {name: 'Οδηγός οθόνης'})).toBeNull();
     const button = await screen.findByRole('button', {name: 'Οδηγός οθόνης'});
     fireEvent.click(button);
-    expect(screen.getByRole('complementary', {name: 'Οδηγός οθόνης'})).toBeInTheDocument();
+    expect(await screen.findByRole('complementary', {name: 'Οδηγός οθόνης'})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: 'Το κατάλαβα'}));
     expect(screen.queryByRole('complementary', {name: 'Οδηγός οθόνης'})).toBeNull();
   });

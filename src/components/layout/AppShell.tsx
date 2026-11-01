@@ -46,7 +46,7 @@ import DemoBar from './DemoBar';
 import MaintenanceStrip from './MaintenanceStrip';
 import WhatsNewDialog, {whatsNewDue} from './WhatsNew';
 import Briefing, {briefingDue} from './Briefing';
-import ScreenGuide, {screenSection} from './ScreenGuide';
+import {hasScreenGuide} from './guidedScreens';
 import {APP_VERSION} from '../../config/appMeta';
 import {tr} from '../../i18n';
 import {useHasModule} from '../../data/cloud/modulesContext';
@@ -60,6 +60,8 @@ import OwnerDemoAlerts from './OwnerDemoAlerts';
 import {enterPlatformDemo} from '../../data/cloud/platformDemo';
 import {tellUser} from '../ui/confirmService';
 const HelpCenter = lazyPage(() => import('../../core/help/HelpCenter'));
+// The guide reads the manual (a large file): both load when someone opens it.
+const ScreenGuide = lazyPage(() => import('./ScreenGuide'));
 /** Initials of a name, e.g. "ΑΙΚΑΤΕΡΙΝΗ ΜΠΟΥΓΑ" → "ΑΜ". */
 const initialsOf = (name: string) => {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -189,7 +191,7 @@ export default function AppShell({
     !platformOnly &&
     !actingAsPlatformOwner() &&
     (role === 'DEPARTMENT' || role === 'STERILIZATION' || role === 'ADMIN') &&
-    !!screenSection(location.pathname, can);
+    hasScreenGuide(location.pathname, can);
   // Hospital administration: a real hospital's admin working as Admin, or the Admin of Demo.
   const hospitalId = role === 'ADMIN' ? managedHospitalId() : undefined;
   const hospitalAdmin = !!hospitalId || (isDemo && role === 'ADMIN');
@@ -607,13 +609,15 @@ export default function AppShell({
         )}
         <section className="content" ref={contentRef}>
           {guideAvailable && guideOpen && (
-            <ScreenGuide
-              pathname={location.pathname}
-              lang={lang === 'en' ? 'en' : 'el'}
-              can={can}
-              onHelp={() => setHelpOpen(true)}
-              onClose={() => setGuideOpen(false)}
-            />
+            <Suspense fallback={null}>
+              <ScreenGuide
+                pathname={location.pathname}
+                lang={lang === 'en' ? 'en' : 'el'}
+                can={can}
+                onHelp={() => setHelpOpen(true)}
+                onClose={() => setGuideOpen(false)}
+              />
+            </Suspense>
           )}
           {children}
         </section>
