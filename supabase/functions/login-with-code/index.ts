@@ -11,7 +11,11 @@ const corsBase = {
 };
 
 const WINDOW_MINUTES = 15;
-const MAX_FAILS_PER_CODE = 5;
+// Wrong passwords stop the ADDRESS first: 5 per username and address, so someone who only knows a username cannot keep
+// its owner out from their own address. A guess spread over many addresses meets the ceilings per username (30) and
+// per address (20), all within 15 minutes.
+const MAX_FAILS_PER_CODE_AND_IP = 5;
+const MAX_FAILS_PER_CODE = 30;
 const MAX_FAILS_PER_IP = 20;
 const CODE_FORMAT = /^[A-Z]{2}[0-9]{4}$/;
 
@@ -49,6 +53,7 @@ Deno.serve(async req => {
       p_window_minutes: WINDOW_MINUTES,
       p_max_code_fails: MAX_FAILS_PER_CODE,
       p_max_ip_fails: MAX_FAILS_PER_IP,
+      p_max_pair_fails: MAX_FAILS_PER_CODE_AND_IP,
     });
     if (reserveError) {
       await settle();

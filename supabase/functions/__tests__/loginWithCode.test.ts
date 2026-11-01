@@ -111,6 +111,18 @@ describe('login-with-code', () => {
     expect(request?.filters).toContainEqual(['eq', 'status', 'PENDING']);
   });
 
+  it('limits wrong passwords per username and address first, then per username and per address', async () => {
+    await handle(post({user_code: 'AM8704', password: 'secret'}, {'cf-connecting-ip': '203.0.113.9'}));
+    expect(fake.calls.find(c => c.what === 'rpc')?.args[1]).toEqual({
+      p_user_code: 'AM8704',
+      p_ip: '203.0.113.9',
+      p_window_minutes: 15,
+      p_max_code_fails: 30,
+      p_max_ip_fails: 20,
+      p_max_pair_fails: 5,
+    });
+  });
+
   it('stops with 429 when a limit is reached, before checking the password', async () => {
     fake.rpc = () => ({data: null, error: null});
     const response = await handle(post({user_code: 'AM8704', password: 'secret'}));

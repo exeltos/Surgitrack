@@ -36,6 +36,14 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
 
+## Not yet applied to the live project
+
+| Version        | Name                    | What it does                                                                                                                                      |
+| -------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261102160000 | login_limit_per_address | `reserve_login_attempt` can also count per username AND address; sign-in locks the address first (5), then the username (30) and the address (20) |
+
+Apply it first, then deploy `login-with-code` (it passes the new limit; before the migration that call would fail and sign-in would answer 503).
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and
