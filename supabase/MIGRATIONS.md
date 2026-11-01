@@ -31,6 +31,14 @@ rule (`delete-staff` v14, `staff-link` v12, `update-staff` v16, which keeps `ver
 reads contacts through `profile_contacts()` was published; the migration of 21:08 UTC changed nothing and recorded the
 version (see the comment in the file).
 
+## Not yet applied to the live project
+
+| Version        | Name                         | What it does                                                                                               |
+| -------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 20261101230000 | demo_seats_left_caller_check | `demo_seats_left(org)` answers only for the caller's own hospital, the platform owner and the service role |
+
+Apply it with `apply_migration` under this version and name, then move it to the table above.
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and

@@ -95,4 +95,21 @@ select tests.service();
 select tests.eq(tests.rows(format($q$update public.profiles set name = 'By function' where id = %L$q$, tests.uid('ster_a'))), 1,
   'and the staff functions (service role) are not limited by the policy');
 
+-- Seats left in a Demo: only for the caller's own hospital -------------------------------------------------------
+reset role;
+insert into public.demo_accounts (organization_id, hospital_name, contact_name, contact_email, max_extra_users)
+values (tests.org('A'), 'Demo A', 'Contact', 'contact@test.local', 10);
+select tests.login('admin_a');
+select tests.ok(public.demo_seats_left(tests.org('A')) is not null, 'a person reads the seats left of their own Demo');
+select tests.ok(public.demo_seats_left(tests.org('B')) is null, 'but not of another hospital, even a real one');
+select tests.ok(public.demo_seats_left(md5('no such hospital')::uuid) is null, 'the answer for an unknown id is the same (null)');
+select tests.login('admin_b');
+select tests.ok(public.demo_seats_left(tests.org('A')) is null, 'another hospital''s admin cannot read hospital A''s seats');
+select tests.login('platform');
+select tests.ok(public.demo_seats_left(tests.org('A')) is not null, 'the platform owner reads any Demo');
+select tests.service();
+select tests.ok(public.demo_seats_left(tests.org('A')) is not null, 'the service role (invite-staff) reads any Demo');
+select tests.eq(public.demo_seats_left(tests.org('A')), (select max_extra_users from public.demo_accounts where organization_id = tests.org('A'))
+  - (select count(*)::int from public.profiles where organization_id = tests.org('A')), 'and the number is the limit less the accounts');
+
 rollback;
