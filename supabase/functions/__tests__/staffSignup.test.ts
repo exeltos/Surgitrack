@@ -203,14 +203,45 @@ describe('staff-signup: throttling', () => {
     expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
   });
 
-  it('allows 10 signups an hour per address, counted by the address Cloudflare reports', async () => {
+  const reservations = () =>
+    fake.calls.filter(c => c.what === 'rpc' && c.args[0] === 'reserve_login_attempt').map(c => c.args[1] as Record<string, unknown>);
+
+  it('counts every signup: 30 an hour per address (the one Cloudflare reports), 200 an hour per hospital link, 5 a day per email', async () => {
     await handle(post(form, {'cf-connecting-ip': '203.0.113.9', 'x-forwarded-for': '6.6.6.6'}));
-    expect(fake.calls.find(c => c.what === 'rpc')?.args[1]).toMatchObject({
-      p_user_code: 'SIGNUP',
-      p_ip: 'signup:203.0.113.9',
-      p_window_minutes: 60,
-      p_max_ip_fails: 10,
+    const limit = (who: string, max: number, minutes: number) => ({
+      p_user_code: who,
+      p_ip: who,
+      p_window_minutes: minutes,
+      p_max_code_fails: max,
+      p_max_ip_fails: max,
     });
+    expect(reservations()).toEqual([
+      limit('signup:203.0.113.9', 30, 60),
+      limit('signup-org:org-1', 200, 60),
+      limit('signup-email:giorgos@hospital.gr', 5, 1440),
+    ]);
+  });
+
+  it.each([
+    ['address', 0],
+    ['hospital link', 1],
+    ['email', 2],
+  ])('answers 429 when the limit per %s is reached, creating nothing', async (_what, which) => {
+    let n = 0;
+    fake.rpc = name => ({data: name === 'reserve_login_attempt' && n++ === which ? null : 'attempt-1', error: null});
+    const response = await handle(post(form));
+    expect(response.status).toBe(429);
+    expect(await response.json()).toEqual({error: 'too_many_attempts'});
+    expect(fake.calls.some(c => c.what === 'createUser')).toBe(false);
+    expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
+  });
+
+  it('does not email an address again once its day is used up', async () => {
+    mailOn();
+    fake.rpc = name => ({data: name === 'reserve_login_attempt' && fake.calls.filter(c => c.what === 'rpc').length >= 3 ? null : 'attempt-1', error: null});
+    const response = await handle(post(form));
+    expect(response.status).toBe(429);
+    expect(mailState.outbox).toHaveLength(0);
   });
 });
 
@@ -236,11 +267,9 @@ describe('staff-signup: signing up through the hospital link', () => {
     expect(requests('insert')[0].values).toMatchObject({organization_id: 'org-1'});
   });
 
-  it('marks the throttle attempt as succeeded', async () => {
+  it('leaves the throttle attempt counted: a successful signup is not forgiven', async () => {
     await handle(post(form));
-    const update = fake.dbCalls('update').find(c => c.table === 'login_attempts');
-    expect(update?.values).toEqual({succeeded: true});
-    expect(eqValue(update!, 'id')).toBe('attempt-1');
+    expect(fake.dbCalls('update').filter(c => c.table === 'login_attempts')).toHaveLength(0);
   });
 
   it('only accepts an active department of the same hospital', async () => {
