@@ -10,6 +10,7 @@ import {
   LogIn,
   RefreshCcw,
   ScanBarcode,
+  UserRound,
 } from 'lucide-react';
 import BrandMark from '../../components/layout/BrandMark';
 import {passwordOk} from '../../core/passwordRules';
@@ -54,7 +55,9 @@ const copy = {
     welcome: 'Καλώς ήρθατε',
     loginIntro: 'Συνδεθείτε για να συνεχίσετε στο SurgiTrack.',
     email: 'Email',
-    loginId: 'Κωδικός χρήστη ή Email',
+    loginId: 'Κωδικός χρήστη',
+    loginPlaceholder: 'π.χ. AF2741',
+    loginHint: 'Ο κωδικός χρήστη σας: 2 γράμματα και 4 ψηφία. Δεν είναι το email σας.',
     password: 'Κωδικός πρόσβασης',
     forgotLink: 'Ξέχασα τον κωδικό μου',
     signIn: 'Σύνδεση',
@@ -112,7 +115,9 @@ const copy = {
     welcome: 'Welcome',
     loginIntro: 'Sign in to continue to SurgiTrack.',
     email: 'Email',
-    loginId: 'User ID or Email',
+    loginId: 'User ID',
+    loginPlaceholder: 'e.g. AF2741',
+    loginHint: 'Your user ID: 2 letters and 4 digits. It is not your email.',
     password: 'Password',
     forgotLink: 'Forgot my password',
     signIn: 'Sign in',
@@ -391,15 +396,18 @@ export default function AuthIndex({
                     <label>
                       {t.loginId}
                       <div className="auth-input">
-                        <Mail size={17} />
+                        <UserRound size={17} />
                         <input
                           name="loginId"
                           type="text"
                           required
                           autoComplete="username"
-                          placeholder="AF2741 ή name@hospital.gr"
+                          autoCapitalize="characters"
+                          spellCheck={false}
+                          placeholder={t.loginPlaceholder}
                         />
                       </div>
+                      <small className="auth-field-hint">{t.loginHint}</small>
                     </label>
                     <label>
                       {t.password}
