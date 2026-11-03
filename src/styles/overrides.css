@@ -4384,6 +4384,10 @@ html body .devices-empty.small {
 .staff-import-drop b {
   color: var(--c-blue-15);
 }
+.staff-import-drop.dragging {
+  border-color: var(--c-blue-15);
+  background: var(--c-blue-96, #eef5fb);
+}
 .staff-import-note {
   margin: 0;
   color: var(--st-muted);

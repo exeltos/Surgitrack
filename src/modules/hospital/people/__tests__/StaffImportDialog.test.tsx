@@ -56,9 +56,20 @@ beforeEach(() => {
 describe("the owner's staff import", () => {
   it('starts with the file, saying what it is and that it is not stored', () => {
     render(<StaffImportDialog s={state} onClose={() => undefined} />);
-    expect(screen.getByText('Επιλέξτε το αρχείο με τους εργαζόμενους')).toBeInTheDocument();
+    expect(screen.getByText(/Σύρετε εδώ το αρχείο/)).toBeInTheDocument();
     expect(screen.getByText(/Το αρχείο δεν αποθηκεύεται/)).toBeInTheDocument();
     expect(screen.getByText(/ως αρχικό κωδικό το κινητό του/)).toBeInTheDocument();
+  });
+
+  it('reads a file dropped on the drop area', async () => {
+    sheet.rows = [HEADER, ['Μαρία Ιωάννου', 'Χειρουργείο', '6912345678', '']];
+    const view = render(<StaffImportDialog s={state} onClose={() => undefined} />);
+    const zone = view.container.querySelector('.staff-import-drop')!;
+    fireEvent.dragOver(zone, {dataTransfer: {files: [], dropEffect: 'none'}});
+    expect(zone.className).toContain('dragging');
+    fireEvent.drop(zone, {dataTransfer: {files: [new File(['x'], 'staff.xlsx')]}});
+    await screen.findByText(/Επιλογή όλων των ορατών/);
+    expect(screen.getByText('ΜΑΡΙΑ ΙΩΑΝΝΟΥ')).toBeInTheDocument();
   });
 
   it('lists everybody with the department it found and the number masked, nothing chosen yet', async () => {
