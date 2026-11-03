@@ -78,8 +78,13 @@ export function countFormBody({asset, items, hospital, preparation, release, cou
   const by = count?.by || '';
   const mode = count?.mode === 'BULK' ? tr('μαζική («Όλα παρόντα»)') : count ? tr('ανά εργαλείο') : '';
   return `<style>
-  @page{size:A4 portrait;margin:11mm 11mm 13mm}
-  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#15232b;font-size:9pt}
+  /* No page margin: the browser prints its own header (date, title) and footer (address) in the margin of a page, so the
+     margins are made by the sheet itself. A table whose header and footer rows are blank spacers repeats them on every
+     page, which keeps the same margin on a second page. */
+  @page{size:A4 portrait;margin:0}
+  .pg{width:100%;border-collapse:collapse;table-layout:auto}.pg>thead>tr>td{height:11mm}.pg>tfoot>tr>td{height:13mm}
+  .pg>thead>tr>td,.pg>tfoot>tr>td,.pg>tbody>tr>td{padding:0;border:0;background:none}.pg>tbody>tr{break-inside:auto}
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;padding:0 11mm;font-family:Arial,Helvetica,sans-serif;color:#15232b;font-size:9pt}
   .top{display:grid;grid-template-columns:1fr auto;gap:6mm;align-items:start;padding-bottom:3mm;border-bottom:.6mm solid #1d6b7a}
   .brand{font-size:13pt;font-weight:800;letter-spacing:.03em;color:#1d6b7a}
   .doc{font-size:7pt;font-weight:700;letter-spacing:.12em;color:#5f707b;text-transform:uppercase;margin-top:2.5mm}
@@ -96,9 +101,9 @@ export function countFormBody({asset, items, hospital, preparation, release, cou
   .sum{margin-top:2mm;font-weight:700}
   .signs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;margin-top:8mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:.6mm}.signs strong{display:block;font-size:9pt;color:#15232b}
   .footer{margin-top:5mm;padding-top:2mm;border-top:.2mm solid #d7e0e5;display:flex;justify-content:space-between;font-size:7pt;color:#6a7a84}
-  @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}}
-  @media print{tr{break-inside:avoid}}
-  </style></head><body>
+  @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}.pg>thead,.pg>tfoot{display:none}}
+  @media print{tr{break-inside:avoid}.pg>tbody>tr{break-inside:auto}}
+  </style></head><body><table class="pg"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>
   <div class="top"><div><div class="brand">${escapeHtml(hospital || 'SurgiTrack')}</div><div class="doc">${escapeHtml(tr('Έντυπο καταμέτρησης εργαλείων'))}</div><h1>${escapeHtml(asset.name)}</h1></div><div class="barcode">${code128Svg(asset.barcode, 48)}<div class="barcode-code">${escapeHtml(asset.barcode)}</div></div></div>
   <h2>${escapeHtml(tr('Α. Αποστείρωση · ελεγμένο και αποστειρωμένο'))}<small class="${release ? 'signed' : 'pending'}">${escapeHtml(release ? tr('Υπογεγραμμένο ηλεκτρονικά') : tr('Χωρίς αποδέσμευση'))}</small></h2>
   <div class="meta">${partA}</div>
@@ -106,7 +111,7 @@ export function countFormBody({asset, items, hospital, preparation, release, cou
   <table><thead><tr><th class="num">#</th><th>Barcode</th><th>${escapeHtml(tr('Εργαλείο'))}</th><th>${escapeHtml(tr('Κωδικός'))}</th><th class="chk">${escapeHtml(tr('Εστάλη'))}</th><th class="chk">${escapeHtml(tr('Καταμετρήθηκε'))}</th></tr></thead><tbody>${rows}</tbody></table>
   <div class="sum">${escapeHtml(tr('Καταμετρήθηκαν {0} από {1}', signed || draft ? counted : '___', items.length))}${count?.missing?.length ? ` · ${escapeHtml(tr('Λείπουν: {0}', count.missing.join(', ')))}` : ''}</div>
   <div class="signs"><div><b>${escapeHtml(tr('Κωδικός ασθενούς'))}</b><strong>${escapeHtml(patient) || '&nbsp;'}</strong></div><div><b>${escapeHtml(tr('Καταμέτρηση από'))}</b><strong>${escapeHtml(by) || '&nbsp;'}</strong>${escapeHtml(mode)}</div><div><b>${escapeHtml(tr('Ημερομηνία / ώρα · υπογραφή'))}</b><strong>${escapeHtml(count?.at || '') || '&nbsp;'}</strong></div></div>
-  <div class="footer"><span>SurgiTrack · ${escapeHtml(asset.barcode)}</span><span>${escapeHtml(tr('{0} εργαλεία', items.length))}</span></div>`;
+  <div class="footer"><span>SurgiTrack · ${escapeHtml(asset.barcode)}</span><span>${escapeHtml(tr('{0} εργαλεία', items.length))}</span></div></td></tr></tbody></table>`;
 }
 
 export function printCountForm(data: CountFormData) {
