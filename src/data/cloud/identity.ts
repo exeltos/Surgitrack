@@ -39,6 +39,8 @@ export const loadMyAccessRequest = async (): Promise<AccessRequest | null> => {
 export type IdentityResult =
   | {status: 'signed-out'}
   | {status: 'inactive'}
+  /** Made by the owner's staff import: the initial password must be replaced before anything else (by `deadline`). */
+  | {status: 'password-change'; deadline: string | null}
   | {status: 'pending'; request: AccessRequest}
   | {status: 'error'; message: string}
   | {status: 'ok'; identity: RealIdentity};
@@ -75,7 +77,9 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
     } else {
       const {data: profile, error} = await supabase
         .from('profiles')
-        .select('id,name,role,active,supervisor,organization_id,department:departments(name)')
+        .select(
+          'id,name,role,active,supervisor,organization_id,password_change_required,password_change_deadline,department:departments(name)',
+        )
         .eq('id', authUser.id)
         .maybeSingle();
       if (error) return {status: 'error', message: error.message};
@@ -98,6 +102,10 @@ export const resolveIdentity = (): Promise<IdentityResult> => {
           // Without the request it is simply an inactive account.
         }
         return {status: 'inactive'};
+      }
+      // The database already shows this person nothing of the hospital; the screen asks for the new password.
+      if (profile.password_change_required) {
+        return {status: 'password-change', deadline: (profile.password_change_deadline as string | null) ?? null};
       }
       const department = profile.department as {name?: string} | {name?: string}[] | null;
       identity = {

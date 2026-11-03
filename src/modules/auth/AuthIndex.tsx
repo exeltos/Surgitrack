@@ -15,6 +15,7 @@ import {
 import BrandMark from '../../components/layout/BrandMark';
 import {passwordOk} from '../../core/passwordRules';
 import {PasswordFields} from '../../components/auth/PasswordFields';
+import {formatDate} from '../../core/displayDate';
 import type {SessionUser, UserRole} from '../../store/types';
 import {APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
 import {FunctionsHttpError, type User} from '@supabase/supabase-js';
@@ -30,6 +31,9 @@ type Props = {
   goodbye?: string;
   passwordRecovery?: boolean;
   onPasswordRecoveryHandled?: () => void;
+  /** Made by the owner's staff import: the first password is replaced here, before anything else. */
+  firstPasswordChange?: {deadline: string | null} | null;
+  onFirstPasswordChanged?: () => void;
   /** The phone app's sign-in: the same accounts, named for scanning. */
   scan?: boolean;
 };
@@ -162,10 +166,12 @@ export default function AuthIndex({
   goodbye,
   passwordRecovery = false,
   onPasswordRecoveryHandled,
+  firstPasswordChange = null,
+  onFirstPasswordChanged,
   scan = false,
 }: Props) {
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('surgitrack-lang') as Lang) || 'el');
-  const [view, setView] = useState<View>('login');
+  const [view, setView] = useState<View>(firstPasswordChange ? 'reset' : 'login');
   const [showPassword, setShowPassword] = useState(false);
   // The new password (set from a reset or invitation link), and its repetition.
   const [newPassword, setNewPassword] = useState('');
@@ -180,6 +186,12 @@ export default function AuthIndex({
     });
     return () => listener.subscription.unsubscribe();
   }, []);
+  useEffect(() => {
+    if (firstPasswordChange) {
+      setMessage('');
+      setView('reset');
+    }
+  }, [firstPasswordChange]);
   useEffect(() => {
     if (passwordRecovery) {
       setMessage('');
@@ -303,6 +315,22 @@ export default function AuthIndex({
     }
     if (password !== confirmPassword) {
       setMessage(t.mismatch);
+      return;
+    }
+    if (firstPasswordChange) {
+      // The first password of someone the owner's import made: changed on the server, which then lifts the requirement.
+      const {error: firstError} = await supabase.functions.invoke('change-initial-password', {body: {password}});
+      if (firstError) {
+        setMessage(
+          lang === 'el'
+            ? 'Ο κωδικός δεν άλλαξε. Δοκιμάστε ξανά σε λίγο.'
+            : 'The password was not changed. Try again shortly.',
+        );
+        return;
+      }
+      setNewPassword('');
+      setNewPasswordAgain('');
+      onFirstPasswordChanged?.();
       return;
     }
     const {error} = await supabase.auth.updateUser({password});
@@ -467,21 +495,57 @@ export default function AuthIndex({
               )}
               {view === 'reset' && (
                 <>
-                  <button className="auth-back" onClick={() => changeView('login')}>
-                    <ArrowLeft size={15} />
-                    {t.backLogin}
-                  </button>
+                  {firstPasswordChange ? (
+                    <button
+                      className="auth-back"
+                      type="button"
+                      onClick={() => void supabase.auth.signOut().then(() => window.location.reload())}
+                    >
+                      <ArrowLeft size={15} />
+                      {lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}
+                    </button>
+                  ) : (
+                    <button className="auth-back" onClick={() => changeView('login')}>
+                      <ArrowLeft size={15} />
+                      {t.backLogin}
+                    </button>
+                  )}
                   <div className="auth-card-title">
                     <div>
                       <span className="auth-eyebrow">
-                        {lang === 'el' ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ' : 'ACCOUNT SECURITY'}
+                        {firstPasswordChange
+                          ? lang === 'el'
+                            ? 'ΠΡΩΤΗ ΣΥΝΔΕΣΗ'
+                            : 'FIRST SIGN-IN'
+                          : lang === 'el'
+                            ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ'
+                            : 'ACCOUNT SECURITY'}
                       </span>
-                      <h2>{lang === 'el' ? 'Ορισμός νέου κωδικού' : 'Set a new password'}</h2>
+                      <h2>
+                        {firstPasswordChange
+                          ? lang === 'el'
+                            ? 'Ορίστε τον δικό σας κωδικό'
+                            : 'Choose your own password'
+                          : lang === 'el'
+                            ? 'Ορισμός νέου κωδικού'
+                            : 'Set a new password'}
+                      </h2>
                       <p>
-                        {lang === 'el'
-                          ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.'
-                          : 'Create a new password for your account.'}
+                        {firstPasswordChange
+                          ? lang === 'el'
+                            ? 'Για λόγους ασφαλείας, αντικαταστήστε τον αρχικό κωδικό πριν συνεχίσετε.'
+                            : 'For your security, replace the initial password before you continue.'
+                          : lang === 'el'
+                            ? 'Δημιουργήστε έναν νέο κωδικό πρόσβασης για τον λογαριασμό σας.'
+                            : 'Create a new password for your account.'}
                       </p>
+                      {firstPasswordChange?.deadline && (
+                        <p>
+                          {lang === 'el'
+                            ? `Προθεσμία: ${formatDate(firstPasswordChange.deadline)}. Μετά από αυτή ο λογαριασμός κλειδώνει.`
+                            : `Deadline: ${formatDate(firstPasswordChange.deadline)}. After it the account is locked.`}
+                        </p>
+                      )}
                     </div>
                     <ShieldCheck size={22} />
                   </div>

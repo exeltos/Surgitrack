@@ -100,6 +100,8 @@ export default function App() {
   const [accessRequest, setAccessRequest] = useState<AccessRequest>();
   const [authReady, setAuthReady] = useState(false);
   const [goodbye, setGoodbye] = useState('');
+  // Someone the owner's staff import made: the first password must be replaced before anything else.
+  const [firstPassword, setFirstPassword] = useState<{deadline: string | null} | null>(null);
   const [passwordRecovery, setPasswordRecovery] = useState(
     () => passwordRecoveryPending() || /type=(recovery|invite)/.test(window.location.hash),
   );
@@ -123,6 +125,12 @@ export default function App() {
       if (!mounted) return;
       if (result.status === 'pending') {
         setAccessRequest(result.request);
+        setAuthenticated(false);
+        setAuthReady(true);
+        return;
+      }
+      if (result.status === 'password-change') {
+        setFirstPassword({deadline: result.deadline});
         setAuthenticated(false);
         setAuthReady(true);
         return;
@@ -243,6 +251,8 @@ export default function App() {
         scan={onScanScreens()}
         onAuthenticated={login}
         goodbye={goodbye}
+        firstPasswordChange={firstPassword}
+        onFirstPasswordChanged={() => window.location.reload()}
         passwordRecovery={passwordRecovery}
         onPasswordRecoveryHandled={() => {
           clearPasswordRecovery();

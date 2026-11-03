@@ -46,10 +46,13 @@ Deno.serve(async req => {
 
     const {data: me} = await admin
       .from("profiles")
-      .select("id, organization_id, role, active")
+      .select("id, organization_id, role, active, password_change_required")
       .eq("id", auth.user.id)
       .maybeSingle();
     if (!me?.active) return json({error: "unauthorized"}, 401);
+    // Someone the staff import made, who still has the initial password (their mobile number), takes no part in a
+    // handover until they have chosen their own: the database already shows them nothing of the hospital.
+    if (me.password_change_required) return json({error: "password_change_required"}, 403);
     const body = await req.json().catch(() => ({}));
     // Hospital staff sign within their own hospital; the platform admin within the one it works in.
     const organizationId = me.organization_id || (me.role === "ADMIN" ? String(body?.organization_id || "") : "");
@@ -84,6 +87,9 @@ Deno.serve(async req => {
       .eq("user_code", code)
       .eq("organization_id", organizationId)
       .eq("active", true)
+      // ... and nobody can sign as a person who still has the initial password: a colleague who knows their username
+      // and their mobile number could otherwise obtain a verified signature in their name.
+      .eq("password_change_required", false)
       .maybeSingle();
 
     let verified = false;

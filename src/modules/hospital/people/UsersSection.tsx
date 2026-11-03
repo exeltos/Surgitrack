@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {
   ChevronRight,
   FileSpreadsheet,
@@ -17,6 +18,7 @@ import FilterMenu from '../../../components/assets/FilterMenu';
 import {localizedName} from '../../../core/glossary';
 import {SUPERVISOR, roles, assignableRoles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
+import StaffImportDialog from './StaffImportDialog';
 import type {PeopleState} from './usePeople';
 
 export default function UsersSection({s}: {s: PeopleState}) {
@@ -55,8 +57,11 @@ export default function UsersSection({s}: {s: PeopleState}) {
     signupFormUrl,
     tab,
   } = s;
+  // The owner's staff import (never shown to a hospital admin).
+  const [importing, setImporting] = useState(false);
   return (
     <>
+      {importing && <StaffImportDialog s={s} onClose={() => setImporting(false)} />}
       {tab === 'USERS' && (
         <section className="hospital-card hospital-members">
           <div className="people-toolbar">
@@ -157,7 +162,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       </span>
                     </button>
                   )}
-                  {!demo && !demoSeats && (
+                  {/* The hospital admin's list by email; the owner has the staff import instead (below). */}
+                  {!demo && !demoSeats && !platform && (
                     <label role="menuitem" className="people-invite-file">
                       <FileSpreadsheet size={16} />
                       <span>
@@ -180,6 +186,26 @@ export default function UsersSection({s}: {s: PeopleState}) {
                         }}
                       />
                     </label>
+                  )}
+                  {platform && !demo && !demoSeats && s.organizationId && (
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setInviteMenu(false);
+                        setImporting(true);
+                      }}
+                    >
+                      <FileSpreadsheet size={16} />
+                      <span>
+                        <b>{L('Εισαγωγή εργαζομένων', 'Import employees')}</b>
+                        <small>
+                          {L(
+                            'Μόνο για τον ιδιοκτήτη: ανεβάστε τη λίστα, επιλέξτε ποιους και ενεργοποιήστε τους. Αρχικός κωδικός το κινητό.',
+                            'Owner only: upload the list, choose who, and activate them. The initial password is the mobile number.',
+                          )}
+                        </small>
+                      </span>
+                    </button>
                   )}
                 </div>
               )}
