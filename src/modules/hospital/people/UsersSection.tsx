@@ -59,6 +59,39 @@ export default function UsersSection({s}: {s: PeopleState}) {
   } = s;
   // The owner's staff import (never shown to a hospital admin).
   const [importing, setImporting] = useState(false);
+  // Whether the person has set their own password yet (accounts made by a staff import start on the mobile number).
+  const passwordBadge = (m: (typeof shown)[number]) => {
+    const until = m.password_change_deadline
+      ? new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'el-GR', {day: '2-digit', month: '2-digit'}).format(
+          new Date(m.password_change_deadline),
+        )
+      : '';
+    if (!m.password_change_required)
+      return {
+        kind: 'changed',
+        text: L('Δικός του κωδικός', 'Own password'),
+        title: L('Έχει ορίσει δικό του κωδικό.', 'Has set a password of their own.'),
+      };
+    return m.active
+      ? {
+          kind: 'default',
+          text: until
+            ? L(`Αρχικός κωδικός · έως ${until}`, `Initial password · by ${until}`)
+            : L('Αρχικός κωδικός', 'Initial password'),
+          title: L(
+            'Δεν έχει αλλάξει ακόμη τον αρχικό κωδικό (το κινητό του). Μετά την προθεσμία ο λογαριασμός κλειδώνει.',
+            'Has not changed the initial password (their mobile number) yet. The account locks after the deadline.',
+          ),
+        }
+      : {
+          kind: 'locked',
+          text: L('Δεν άλλαξε κωδικό · κλειδώθηκε', 'Password not changed · locked'),
+          title: L(
+            'Δεν άλλαξε τον αρχικό κωδικό μέσα στην προθεσμία και ο λογαριασμός κλειδώθηκε. Ενεργοποιήστε τον ξανά για νέα προθεσμία.',
+            'Did not change the initial password in time and the account was locked. Activate it again for a new deadline.',
+          ),
+        };
+  };
   return (
     <>
       {importing && <StaffImportDialog s={s} onClose={() => setImporting(false)} />}
@@ -454,17 +487,24 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     {wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id)}
                   </span>
                   <span className="people-value">{roleLabel(roleValue(m))}</span>
-                  {invitedAt(m) !== undefined ? (
-                    <span className="hospital-member-status invited">
-                      <i></i>
-                      {L('Εκκρεμεί πρόσκληση', 'Invitation pending')}
-                    </span>
-                  ) : (
-                    <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
-                      <i></i>
-                      {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                    </span>
-                  )}
+                  <span className="people-state">
+                    {invitedAt(m) !== undefined ? (
+                      <span className="hospital-member-status invited">
+                        <i></i>
+                        {L('Εκκρεμεί πρόσκληση', 'Invitation pending')}
+                      </span>
+                    ) : (
+                      <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
+                        <i></i>
+                        {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                      </span>
+                    )}
+                    {invitedAt(m) === undefined && passwordBadge(m) && (
+                      <small className={`people-password ${passwordBadge(m)!.kind}`} title={passwordBadge(m)!.title}>
+                        {passwordBadge(m)!.text}
+                      </small>
+                    )}
+                  </span>
                   {locked ? (
                     <Lock size={15} className="people-open" />
                   ) : (

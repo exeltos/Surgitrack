@@ -60,3 +60,46 @@ describe('the entry to the staff import', () => {
     expect(screen.queryByRole('menuitem', {name: /Εισαγωγή εργαζομένων/})).not.toBeInTheDocument();
   });
 });
+
+describe('the password mark on each person', () => {
+  const member = (id: string, name: string, extra: Record<string, unknown>) => ({
+    id,
+    name,
+    email: `${id}@x.gr`,
+    user_code: id.toUpperCase(),
+    role: 'DEPARTMENT',
+    supervisor: false,
+    active: true,
+    department_id: null,
+    demo_enabled: false,
+    ...extra,
+  });
+  it('says who still has the initial password (and until when), who set their own, and who was locked', () => {
+    const shown = [
+      member('a1', 'ΕΛΕΝΗ', {password_change_required: true, password_change_deadline: '2026-11-10T09:00:00Z'}),
+      member('b2', 'ΝΙΚΟΣ', {password_change_required: false}),
+      member('c3', 'ΜΑΡΙΑ', {
+        password_change_required: true,
+        password_change_deadline: '2026-10-30T09:00:00Z',
+        active: false,
+      }),
+    ];
+    render(
+      inApp(
+        <UsersSection
+          s={people({
+            inviteMenu: false,
+            shown,
+            members: shown,
+            me: {id: 'me'},
+            invitedAt: () => undefined,
+            departmentName: () => '—',
+          })}
+        />,
+      ),
+    );
+    expect(screen.getByText(/Αρχικός κωδικός · έως 10\/11/)).toBeInTheDocument();
+    expect(screen.getByText('Δικός του κωδικός')).toBeInTheDocument();
+    expect(screen.getByText(/Δεν άλλαξε κωδικό · κλειδώθηκε/)).toBeInTheDocument();
+  });
+});

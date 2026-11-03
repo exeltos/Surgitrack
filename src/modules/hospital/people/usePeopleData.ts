@@ -53,7 +53,9 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
         .order('requested_at'),
       supabase
         .from('profiles')
-        .select('id,name,role,supervisor,active,department_id,demo_enabled')
+        .select(
+          'id,name,role,supervisor,active,department_id,demo_enabled,password_change_required,password_change_deadline',
+        )
         .eq('organization_id', organizationId)
         .order('name'),
       // The sign-in email and username come apart from the rest of the profile (only admins read them).

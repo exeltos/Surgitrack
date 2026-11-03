@@ -31,6 +31,9 @@ export type Member = {
   active: boolean;
   department_id: string | null;
   demo_enabled: boolean;
+  /** Still on the initial password (the mobile number of a staff import) until the person sets their own. */
+  password_change_required?: boolean;
+  password_change_deadline?: string | null;
 };
 
 export type Decision = {role: string; departmentId: string; note: string};
