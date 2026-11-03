@@ -15,7 +15,8 @@ const withoutTrailingBlanks = (rows: SheetRows) => {
 /** CSV with comma, semicolon or tab (Greek Excel saves with semicolons), quoted cells allowed. */
 export function parseCsv(text: string): SheetRows {
   const source = text.replace(/^\uFEFF/, '');
-  const firstLine = source.split(/\r?\n/, 1)[0] || '';
+  // The delimiter is read from the first line that has something in it (a file may start with blank lines).
+  const firstLine = source.split(/\r?\n/).find(line => line.trim()) || '';
   const delimiter = [';', '\t', ','].reduce((best, candidate) =>
     firstLine.split(candidate).length > firstLine.split(best).length ? candidate : best,
   );
