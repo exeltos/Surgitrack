@@ -12,6 +12,9 @@ import {
   UserX,
   Users,
   X,
+  KeyRound,
+  LockKeyhole,
+  ShieldCheck,
 } from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import FilterMenu from '../../../components/assets/FilterMenu';
@@ -500,9 +503,20 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       </span>
                     )}
                     {invitedAt(m) === undefined && passwordBadge(m) && (
-                      <small className={`people-password ${passwordBadge(m)!.kind}`} title={passwordBadge(m)!.title}>
-                        {passwordBadge(m)!.text}
-                      </small>
+                      <span
+                        className={`people-password ${passwordBadge(m)!.kind}`}
+                        title={`${passwordBadge(m)!.text}. ${passwordBadge(m)!.title}`}
+                        role="img"
+                        aria-label={passwordBadge(m)!.text}
+                      >
+                        {passwordBadge(m)!.kind === 'changed' ? (
+                          <ShieldCheck size={13} />
+                        ) : passwordBadge(m)!.kind === 'locked' ? (
+                          <LockKeyhole size={13} />
+                        ) : (
+                          <KeyRound size={13} />
+                        )}
+                      </span>
                     )}
                   </span>
                   {locked ? (

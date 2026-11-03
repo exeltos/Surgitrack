@@ -98,8 +98,8 @@ describe('the password mark on each person', () => {
         />,
       ),
     );
-    expect(screen.getByText(/Αρχικός κωδικός · έως 10\/11/)).toBeInTheDocument();
-    expect(screen.getByText('Δικός του κωδικός')).toBeInTheDocument();
-    expect(screen.getByText(/Δεν άλλαξε κωδικό · κλειδώθηκε/)).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: /Αρχικός κωδικός · έως 10\/11/})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: 'Δικός του κωδικός'})).toBeInTheDocument();
+    expect(screen.getByRole('img', {name: /Δεν άλλαξε κωδικό · κλειδώθηκε/})).toBeInTheDocument();
   });
 });
