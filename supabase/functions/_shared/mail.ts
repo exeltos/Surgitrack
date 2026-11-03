@@ -22,22 +22,43 @@ const smtpSettings = () => {
 export const mailConfigured = () =>
   !!smtpSettings() || !!(Deno.env.get("RESEND_API_KEY") && Deno.env.get("MAIL_FROM"));
 
-const sendSmtp = async (to: string[], subject: string, html: string) => {
-  const s = smtpSettings();
-  if (!s) return undefined;
-  try {
-    const transport = nodemailer.createTransport({
+// One connection, one sign-in, for all the messages of a request: a bulk import used to sign in to the SMTP
+// server again for every message, and Google refuses that after a few dozen ("454 4.7.0 Too many login attempts").
+let pooled: ReturnType<typeof nodemailer.createTransport> | undefined;
+let pooledFor = "";
+const smtpTransport = (s: NonNullable<ReturnType<typeof smtpSettings>>) => {
+  const key = `${s.host}:${s.port}:${s.user}`;
+  if (!pooled || pooledFor !== key) {
+    pooled?.close();
+    pooled = nodemailer.createTransport({
       host: s.host,
       port: s.port,
       secure: s.port === 465,
       auth: {user: s.user, pass: s.pass},
+      pool: true,
+      maxConnections: 1,
+      maxMessages: 100,
     });
-    await transport.sendMail({from: s.from, to: to.join(", "), subject, html});
-    return true;
-  } catch (e) {
-    console.error("smtp", e instanceof Error ? e.message : e);
-    return false;
+    pooledFor = key;
   }
+  return pooled;
+};
+
+const sendSmtp = async (to: string[], subject: string, html: string) => {
+  const s = smtpSettings();
+  if (!s) return undefined;
+  const transport = smtpTransport(s);
+  // A refused sign-in or a busy server is tried once more after a pause before the message counts as unsent.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      await transport.sendMail({from: s.from, to: to.join(", "), subject, html});
+      return true;
+    } catch (e) {
+      console.error("smtp", e instanceof Error ? e.message : e);
+      if (attempt === 0) await new Promise(resolve => setTimeout(resolve, 2500));
+    }
+  }
+  return false;
 };
 
 const sendResend = async (to: string[], subject: string, html: string) => {

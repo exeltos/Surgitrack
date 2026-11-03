@@ -170,6 +170,32 @@ export function openPrintWindow(title: string, html: string) {
   return true;
 }
 
+/**
+ * Prints a whole HTML document from its own window. A label printed from the preview's iframe gets the
+ * browser's default margins, headers and scale (the page's own @page size is not honoured there), which
+ * spoils a 100×58 mm sticker; a window of its own prints exactly the @page the label declares.
+ */
+export function printDocumentInWindow(title: string, documentHtml: string) {
+  const win = window.open('', '_blank', 'width=900,height=700');
+  if (!win) return false;
+  try {
+    win.opener = null;
+  } catch {
+    // Best-effort hardening only.
+  }
+  win.document.open();
+  win.document.write(markPrintHtml(documentHtml));
+  win.document.title = title;
+  win.document.close();
+  const doPrint = () => {
+    win.focus();
+    window.setTimeout(() => win.print(), 200);
+  };
+  if (win.document.readyState === 'complete') doPrint();
+  else win.addEventListener('load', doPrint, {once: true});
+  return true;
+}
+
 type PrintAsset = (
   | Pick<SetAsset, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
   | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
@@ -265,7 +291,7 @@ function barcodeLabelBody(
   .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{display:flex;flex-wrap:wrap;row-gap:.2mm;justify-content:center}.foot.dated .code{flex:1 1 100%;text-align:center}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{}
   .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}
-  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:7pt}.sheet-grid .main .brand{font-size:7pt}.sheet-grid .main .code{font-size:6.4pt}.sheet-grid .main .detail{font-size:5.6pt}.sheet-grid .main .logo{height:4mm}.sheet-grid .main .bc{padding:1.4mm 0 1mm}.sheet-grid .main .bc svg{width:68%}.pair .mini .name{font-size:5.4pt}.pair .mini .code{font-size:5.6pt}.pair .mini .detail{font-size:4.8pt}.pair .mini .bc svg{width:78%}
+  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:7pt}.sheet-grid .main .brand{font-size:7pt}.sheet-grid .main .code{font-size:6.4pt}.sheet-grid .main .detail{font-size:5.6pt}.sheet-grid .main .logo{height:4mm}.sheet-grid .main{padding-bottom:2.8mm}.pair .mini{padding-top:2.4mm;padding-bottom:1.4mm}.sheet-grid .main .head{display:block}.sheet-grid .main .brand,.sheet-grid .main .logo{position:absolute;top:9.5mm;right:${(right + 1).toFixed(1)}mm;margin:0}.sheet-grid .main .bc{padding:1.4mm 0 1mm}.sheet-grid .main .bc svg{width:58%}.pair .mini .name{font-size:5.4pt}.pair .mini .code{font-size:5.6pt}.pair .mini .detail{font-size:4.8pt}.pair .mini .bc svg{width:78%}
   @media screen{html{background:#eef2f5;zoom:${screenZoom}}body{margin:4mm;background:#fff;box-shadow:0 0 0 .2mm #c8d2d9,0 1mm 3mm rgba(0,0,0,.08)}}
   </style></head><body>${cells}`;
 }

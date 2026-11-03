@@ -43,6 +43,8 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
   // The username and the instructions go to the personal email of each person who has one, in the same step.
   const [sendEmail, setSendEmail] = useState(true);
   const [fileError, setFileError] = useState('');
+  // A file being dragged over the drop area.
+  const [dragging, setDragging] = useState(false);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<Map<number, Result> | null>(null);
   const [deadline, setDeadline] = useState<string | null>(null);
@@ -210,9 +212,27 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
         <div className="studio-drawer-form">
           {!rows && (
             <>
-              <label className="staff-import-drop">
+              <label
+                className={`staff-import-drop${dragging ? ' dragging' : ''}`}
+                onDragOver={e => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'copy';
+                  setDragging(true);
+                }}
+                onDragLeave={e => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragging(false);
+                }}
+                onDrop={e => {
+                  e.preventDefault();
+                  setDragging(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) void openFile(file);
+                }}
+              >
                 <FileSpreadsheet size={22} />
-                <b>{L('Επιλέξτε το αρχείο με τους εργαζόμενους', 'Choose the file of employees')}</b>
+                <b>
+                  {L('Σύρετε εδώ το αρχείο ή πατήστε για να το επιλέξετε', 'Drag the file here or click to choose it')}
+                </b>
                 <small>
                   {L(
                     'Excel (.xlsx) ή CSV, με στήλες: Ονοματεπώνυμο, Τμήμα, Κινητό (προαιρετικά Email, Ρόλος). Το αρχείο δεν αποθηκεύεται.',
