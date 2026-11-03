@@ -126,7 +126,8 @@ export async function labelToPdf(html: string, widthMm: number, heightMm: number
       const first = raw.search(/\S/);
       if (!element || first < 0 || element.closest('svg') || !element.getClientRects().length) continue;
       const last = raw.search(/\s*$/);
-      let text = raw.slice(first, last);
+      // Composed (a letter and its accent mark as one character), as the font has them.
+      let text = raw.slice(first, last).normalize('NFC');
       const range = doc.createRange();
       range.setStart(node, first);
       range.setEnd(node, last);
