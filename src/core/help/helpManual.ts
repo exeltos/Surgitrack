@@ -168,11 +168,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσωπικό',
-          'Στη Χρήστες & Τμήματα → Χρήστες → «Προσθήκη χρήστη»: «Πρόσκληση ατόμου» για έναν έναν (email ή σύνδεσμος), «Κοινός σύνδεσμος νοσοκομείου» για πολλούς ή «Από αρχείο CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τα αιτήματα (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
+          'Στη Χρήστες & Τμήματα → Χρήστες → «Προσθήκη χρήστη»: «Πρόσκληση ατόμου» για έναν έναν (email ή σύνδεσμος), «Κοινός σύνδεσμος νοσοκομείου» για πολλούς ή «Από αρχείο Excel ή CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τα αιτήματα (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
         ],
         en: [
           'Staff',
-          'In Users & departments → Users → "Add user": "Invite a person" one by one (email or link), "Hospital signup link" for many, or "From a CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
+          'In Users & departments → Users → "Add user": "Invite a person" one by one (email or link), "Hospital signup link" for many, or "From an Excel or CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
         ],
       },
       {
@@ -1300,11 +1300,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Κοινός σύνδεσμος και CSV',
-          'Για πολλούς μαζί: ο «Κοινός σύνδεσμος νοσοκομείου» (10 ημέρες) μοιράζεται στο προσωπικό, κάνουν εγγραφή με τον ίδιο τρόπο, επιβεβαιώνουν το email τους και τους εγκρίνετε. «Από αρχείο CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς χωρίς έγκριση και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
+          'Για πολλούς μαζί: ο «Κοινός σύνδεσμος νοσοκομείου» (10 ημέρες) μοιράζεται στο προσωπικό, κάνουν εγγραφή με τον ίδιο τρόπο, επιβεβαιώνουν το email τους και τους εγκρίνετε. «Από αρχείο Excel ή CSV» (Ονοματεπώνυμο; Email; Τμήμα; Ρόλος) δημιουργεί αμέσως τους λογαριασμούς χωρίς έγκριση και ο καθένας λαμβάνει email με όνομα χρήστη και σύνδεσμο κωδικού.',
         ],
         en: [
           'Hospital link and CSV',
-          'For many at once: share the "Hospital signup link" (10 days) with staff; they sign up the same way, confirm their email and you approve them. "From a CSV file" (Name; Email; Department; Role) creates the accounts at once, without approval, and each person gets an email with a username and a password link.',
+          'For many at once: share the "Hospital signup link" (10 days) with staff; they sign up the same way, confirm their email and you approve them. "From an Excel or CSV file" (Name; Email; Department; Role) creates the accounts at once, without approval, and each person gets an email with a username and a password link.',
         ],
       },
       {

@@ -1,4 +1,5 @@
 import {supabase} from '../../../lib/supabase';
+import {readSheetFile} from '../../../core/sheetImport';
 import {SUPERVISOR, roles, wholeHospital, accountRole, EMAIL_FORMAT} from '../hospitalPeopleMeta';
 import type {InviteResult} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
@@ -20,14 +21,23 @@ export function usePeopleCsv(
 
   // ---- Invitations from a CSV file: Ονοματεπώνυμο; Email; Τμήμα; Ρόλος ----
   const readCsv = async (file: File) => {
-    const lines = (await file.text())
-      .split(/\r?\n/)
-      .map(x => x.trim())
-      .filter(Boolean);
-    const rows = lines.slice(1).map(line => {
-      const [name = '', email = '', department = '', roleRaw = ''] = line
-        .split(/[;,]/)
-        .map(x => x.trim().replace(/^"|"$/g, ''));
+    // An Excel workbook (.xlsx) is read as one, a CSV as text: reading a workbook as text gives garbage.
+    let sheet: string[][];
+    try {
+      sheet = await readSheetFile(file);
+    } catch (e) {
+      setNotice({
+        kind: 'error',
+        text:
+          (e as Error).message === 'xls'
+            ? L('Αποθηκεύστε το αρχείο ως .xlsx ή CSV.', 'Save the file as .xlsx or CSV.')
+            : L('Το αρχείο δεν διαβάστηκε.', 'The file could not be read.'),
+      });
+      return;
+    }
+    const lines = sheet.filter(cells => cells.some(cell => cell.trim()));
+    const rows = lines.slice(1).map(cells => {
+      const [name = '', email = '', department = '', roleRaw = ''] = cells.map(x => (x || '').trim());
       const raw = roleRaw.trim().toUpperCase();
       const role =
         roles.find(r => r.id === raw || r.el.toUpperCase() === raw || r.en.toUpperCase() === raw)?.id || 'DEPARTMENT';

@@ -167,7 +167,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     <label role="menuitem" className="people-invite-file">
                       <FileSpreadsheet size={16} />
                       <span>
-                        <b>{L('Από αρχείο CSV', 'From a CSV file')}</b>
+                        <b>{L('Από αρχείο Excel ή CSV', 'From an Excel or CSV file')}</b>
                         <small>
                           {L(
                             'Μαζική εισαγωγή: λογαριασμοί αμέσως, χωρίς έγκριση. Ονοματεπώνυμο; Email; Τμήμα; Ρόλος',
@@ -177,7 +177,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       </span>
                       <input
                         type="file"
-                        accept=".csv,text/csv"
+                        accept=".xlsx,.csv,text/csv"
                         hidden
                         onChange={e => {
                           setInviteMenu(false);

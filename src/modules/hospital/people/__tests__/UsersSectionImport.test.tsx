@@ -42,14 +42,14 @@ const people = (extra: Record<string, unknown>) =>
 describe('the entry to the staff import', () => {
   it('is offered to the platform owner, in place of the invitations from a CSV file, and opens the import', () => {
     render(inApp(<UsersSection s={people({platform: true})} />));
-    expect(screen.queryByRole('menuitem', {name: /Από αρχείο CSV/})).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', {name: /Από αρχείο Excel ή CSV/})).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('menuitem', {name: /Εισαγωγή εργαζομένων/}));
     expect(screen.getByRole('dialog', {name: 'Εισαγωγή εργαζομένων'})).toBeInTheDocument();
   });
 
   it('is not offered to a hospital admin', () => {
     render(inApp(<UsersSection s={people({platform: false})} />));
-    expect(screen.getByRole('menuitem', {name: /Από αρχείο CSV/})).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', {name: /Από αρχείο Excel ή CSV/})).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', {name: /Εισαγωγή εργαζομένων/})).not.toBeInTheDocument();
   });
 
