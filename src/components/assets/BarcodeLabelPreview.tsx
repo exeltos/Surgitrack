@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Check, ImagePlus, Save, Trash2} from 'lucide-react';
 import PrintPreviewModal from './PrintPreviewModal';
 import AppButton from '../ui/AppButton';
-import {barcodeLabelHtml, DEFAULT_MAIN_SHARE, labelPaper} from '../../modules/sterilization/printUtils';
+import {barcodeLabelHtml, labelPaper, mainShareOf, reserveRightOf} from '../../modules/sterilization/printUtils';
 import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import {DEFAULT_LABEL_SETTINGS, type LabelHeader, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
@@ -145,7 +145,7 @@ export default function BarcodeLabelPreview({
                   min={0}
                   max={15}
                   step={0.5}
-                  value={settings.reserveRight || 0}
+                  value={reserveRightOf(settings)}
                   onChange={e => set({reserveRight: Number(e.target.value) || undefined})}
                 />
               </label>
@@ -158,11 +158,11 @@ export default function BarcodeLabelPreview({
                   min={35}
                   max={70}
                   step={5}
-                  value={settings.mainShare || DEFAULT_MAIN_SHARE}
+                  value={mainShareOf(settings)}
                   onChange={e => set({mainShare: Number(e.target.value)})}
                   aria-label={tr('Ύψος μεγάλης ετικέτας')}
                 />
-                <b>{settings.mainShare || DEFAULT_MAIN_SHARE}%</b>
+                <b>{mainShareOf(settings)}%</b>
               </label>
             )}
           </div>

@@ -69,6 +69,12 @@ const deflatedWorkbook = async () => {
 };
 
 describe('parseCsv', () => {
+  it('finds the delimiter on the first non-blank line', () => {
+    expect(parseCsv('\n\nΟνομα,Email\nΑ Β,a@b.gr').filter(r => r.some(Boolean))).toEqual([
+      ['Ονομα', 'Email'],
+      ['Α Β', 'a@b.gr'],
+    ]);
+  });
   it('reads semicolons, quotes, doubled quotes and line breaks inside quotes', () => {
     const rows = parseCsv('\uFEFFΌνομα;Σημειώσεις\r\n"Λαβίδα; 14cm";"Είπε ""ναι""\nκαι μετά"\r\n\r\nΨαλίδι;\n');
     expect(rows).toEqual([['Όνομα', 'Σημειώσεις'], ['Λαβίδα; 14cm', 'Είπε "ναι"\nκαι μετά'], [''], ['Ψαλίδι', '']]);
