@@ -4390,64 +4390,201 @@ html body .devices-empty.small {
   font-size: 12px;
   line-height: 1.5;
 }
+/* A large centred window, not the narrow side drawer: a whole hospital's list needs a table that fits. */
+.studio-drawer-backdrop.staff-import-backdrop {
+  justify-content: center;
+  align-items: center;
+  padding: 3vh 2vw;
+}
+.studio-drawer.staff-import {
+  width: min(1180px, 100%);
+  height: min(900px, 100%);
+  border-radius: 16px;
+  overflow: hidden;
+}
 .staff-import-tools {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 190px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 260px);
   gap: 8px;
 }
-.staff-import-all {
+/* The drawer's own form styles (label as a grid, padded inputs) come first; these are written to win over them. */
+.studio-drawer-form .staff-import-all {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 9px;
   font-size: 12px;
   font-weight: 700;
+  line-height: 1.4;
 }
-.staff-import-list {
-  display: grid;
-  gap: 6px;
+.studio-drawer-form .staff-import-all input[type='checkbox'],
+.studio-drawer-form .staff-import-table input[type='checkbox'] {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--c-blue-15);
 }
-.staff-import-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, 150px) minmax(0, 130px);
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid var(--c-gray-95);
-  border-radius: 10px;
+.staff-import-table-wrap {
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  overflow: clip;
 }
-.staff-import-row > div {
-  display: grid;
-  min-width: 0;
+.staff-import-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
 }
-.staff-import-row small {
+.staff-import-table th {
+  position: sticky;
+  top: -18px;
+  z-index: 1;
+  padding: 9px 10px;
+  background: var(--c-gray-95);
   color: var(--st-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--c-gray-90);
 }
-.staff-import-row em {
+.staff-import-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+.staff-import-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.staff-import-table th:nth-child(1),
+.staff-import-table td:nth-child(1) {
+  width: 44px;
+  text-align: center;
+}
+.staff-import-table:not(.result) th:nth-child(2) {
+  width: 20%;
+}
+.staff-import-table:not(.result) th:nth-child(3) {
+  width: 17%;
+}
+.staff-import-table:not(.result) th:nth-child(4) {
+  width: 18%;
+}
+.staff-import-table:not(.result) th:nth-child(5) {
+  width: 11%;
+}
+.staff-import-table:not(.result) th:nth-child(7) {
+  width: 15%;
+}
+.staff-import-table.result th:nth-child(1),
+.staff-import-table.result td:nth-child(1) {
+  width: auto;
+  text-align: left;
+}
+.staff-import-table.result th:nth-child(3) {
+  width: 15%;
+}
+.staff-import-table select {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 8px;
+}
+.staff-import-table b {
+  color: var(--c-blue-15);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.staff-import-table em {
   color: var(--c-red-40);
   font-size: 11px;
   font-style: normal;
   font-weight: 700;
 }
+.staff-import-table .ready {
+  color: var(--c-green-35, #1a7f4b);
+  font-weight: 700;
+}
+.staff-import-table td.email {
+  color: var(--st-muted);
+  overflow: hidden;
+  overflow-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.staff-import-row.error {
+  background: rgba(214, 69, 65, 0.05);
+}
 .staff-import-row.existing {
   opacity: 0.6;
 }
-.staff-import-row:has(.staff-import-code) {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
 .staff-import-code {
   letter-spacing: 1px;
+  font-size: 13px;
 }
 .staff-import-days {
   display: grid;
   gap: 4px;
+  max-width: 260px;
   font-size: 12px;
   font-weight: 700;
 }
-@media (max-width: 640px) {
-  .staff-import-row {
-    grid-template-columns: auto minmax(0, 1fr);
+/* On a phone the table becomes one card per person. */
+@media (max-width: 820px) {
+  .studio-drawer-backdrop.staff-import-backdrop {
+    padding: 0;
   }
-  .staff-import-row select {
-    grid-column: 2;
+  .studio-drawer.staff-import {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+  .staff-import-tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .staff-import-table thead {
+    display: none;
+  }
+  .staff-import-table,
+  .staff-import-table tbody,
+  .staff-import-table tr,
+  .staff-import-table td {
+    display: block;
+    width: auto;
+  }
+  .staff-import-table-wrap {
+    border: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .staff-import-table tr {
+    position: relative;
+    padding: 8px 10px;
+    border: 1px solid var(--c-gray-90);
+    border-radius: 10px;
+  }
+  .staff-import-table td,
+  .staff-import-table td:nth-child(1) {
+    padding: 3px 0;
+    border: 0;
+    text-align: left;
+    width: auto;
+  }
+  .staff-import-table td.email {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .staff-import-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--st-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+  .staff-import-table:not(.result) td.check {
+    position: absolute;
+    top: 8px;
+    right: 10px;
   }
 }

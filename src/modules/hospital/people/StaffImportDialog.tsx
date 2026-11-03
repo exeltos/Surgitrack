@@ -189,7 +189,10 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
   const skipped = results ? results.size - made : 0;
 
   return (
-    <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && !running && onClose()}>
+    <div
+      className="studio-drawer-backdrop staff-import-backdrop"
+      onMouseDown={e => e.currentTarget === e.target && !running && onClose()}
+    >
       <aside
         className="studio-drawer staff-import"
         role="dialog"
@@ -272,62 +275,96 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
                   )}
                 </span>
               </label>
-              <div className="staff-import-list">
-                {shown.map(r => (
-                  <div
-                    key={r.id}
-                    className={`staff-import-row${r.problems.length ? ' error' : ''}${r.existing ? ' existing' : ''}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selected.has(r.id)}
-                      disabled={!selectable(r)}
-                      onChange={() => toggle(r.id)}
-                      aria-label={r.name}
-                    />
-                    <div>
-                      <b>{r.name || '—'}</b>
-                      <small>
-                        {maskPhone(r.phone) || '—'}
-                        {r.email && ` · ${r.email}`}
-                      </small>
-                      {r.existing && <em>{L('Υπάρχει ήδη στο νοσοκομείο', 'Already in the hospital')}</em>}
-                      {!r.existing && r.problems.length > 0 && (
-                        <em>
-                          {L('Λείπει ή δεν ταιριάζει:', 'Missing or invalid:')}{' '}
-                          {r.problems.map(p => problemText(p, el)).join(', ')}
-                        </em>
-                      )}
-                    </div>
-                    <select
-                      value={r.departmentId}
-                      disabled={r.existing || r.role === 'VIEWER'}
-                      onChange={e => edit(r.id, {departmentId: e.target.value})}
-                      aria-label={L(`Τμήμα του ${r.name}`, `Department of ${r.name}`)}
-                    >
-                      <option value="">
-                        {r.departmentGiven ? `? ${r.departmentGiven}` : L('— τμήμα —', '— department —')}
-                      </option>
-                      {activeDepartments.map(d => (
-                        <option key={d.id} value={d.id}>
-                          {d.name}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      value={r.role}
-                      disabled={r.existing}
-                      onChange={e => edit(r.id, {role: e.target.value as StaffRole})}
-                      aria-label={L(`Ρόλος του ${r.name}`, `Role of ${r.name}`)}
-                    >
-                      {ROLES.map(role => (
-                        <option key={role} value={role}>
-                          {roleLabel(role)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+              <p className="staff-import-note">
+                {L(
+                  `${chosen.length} επιλεγμένοι από ${rows?.length ?? 0} στο αρχείο`,
+                  `${chosen.length} chosen of ${rows?.length ?? 0} in the file`,
+                )}
+              </p>
+              <div className="staff-import-table-wrap">
+                <table className="staff-import-table">
+                  <thead>
+                    <tr>
+                      <th className="check" aria-label={L('Επιλογή', 'Choose')} />
+                      <th>{L('Ονοματεπώνυμο', 'Name')}</th>
+                      <th>{L('Τμήμα', 'Department')}</th>
+                      <th>{L('Ρόλος', 'Role')}</th>
+                      <th>{L('Κινητό', 'Mobile')}</th>
+                      <th>Email</th>
+                      <th>{L('Κατάσταση', 'Status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {shown.map(r => (
+                      <tr
+                        key={r.id}
+                        className={`staff-import-row${r.problems.length ? ' error' : ''}${r.existing ? ' existing' : ''}`}
+                      >
+                        <td className="check">
+                          <input
+                            type="checkbox"
+                            checked={selected.has(r.id)}
+                            disabled={!selectable(r)}
+                            onChange={() => toggle(r.id)}
+                            aria-label={r.name}
+                          />
+                        </td>
+                        <td data-label={L('Ονοματεπώνυμο', 'Name')}>
+                          <b>{r.name || '—'}</b>
+                        </td>
+                        <td data-label={L('Τμήμα', 'Department')}>
+                          <select
+                            value={r.departmentId}
+                            disabled={r.existing || r.role === 'VIEWER'}
+                            onChange={e => edit(r.id, {departmentId: e.target.value})}
+                            aria-label={L(`Τμήμα του ${r.name}`, `Department of ${r.name}`)}
+                          >
+                            <option value="">
+                              {r.departmentGiven
+                                ? L(`— ${r.departmentGiven} (δεν ταιριάζει) —`, `— ${r.departmentGiven} (no match) —`)
+                                : L('— τμήμα —', '— department —')}
+                            </option>
+                            {activeDepartments.map(d => (
+                              <option key={d.id} value={d.id}>
+                                {d.name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td data-label={L('Ρόλος', 'Role')}>
+                          <select
+                            value={r.role}
+                            disabled={r.existing}
+                            onChange={e => edit(r.id, {role: e.target.value as StaffRole})}
+                            aria-label={L(`Ρόλος του ${r.name}`, `Role of ${r.name}`)}
+                          >
+                            {ROLES.map(role => (
+                              <option key={role} value={role}>
+                                {roleLabel(role)}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td data-label={L('Κινητό', 'Mobile')}>{maskPhone(r.phone) || '—'}</td>
+                        <td data-label="Email" className="email" title={r.email || undefined}>
+                          {r.email || '—'}
+                        </td>
+                        <td data-label={L('Κατάσταση', 'Status')}>
+                          {r.existing ? (
+                            <em>{L('Υπάρχει ήδη στο νοσοκομείο', 'Already in the hospital')}</em>
+                          ) : r.problems.length > 0 ? (
+                            <em>
+                              {L('Λείπει ή δεν ταιριάζει:', 'Missing or invalid:')}{' '}
+                              {r.problems.map(p => problemText(p, el)).join(', ')}
+                            </em>
+                          ) : (
+                            <span className="ready">{L('Έτοιμο', 'Ready')}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 {!shown.length && <p className="hospital-empty">{L('Κανένα αποτέλεσμα.', 'No results.')}</p>}
               </div>
               <label className="staff-import-all">
@@ -360,31 +397,48 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
                   `${made} accounts made${skipped ? `, ${skipped} not made` : ''}. ${deadline ? `First sign-in deadline: ${formatDate(deadline)}. ` : ''}Initial password: each person's mobile number. ${mailed} emails sent.`,
                 )}
               </p>
-              <div className="staff-import-list">
-                {rows
-                  .filter(r => results.has(r.id))
-                  .map(r => {
-                    const result = results.get(r.id)!;
-                    return (
-                      <div key={r.id} className={`staff-import-row${result.ok ? '' : ' error'}`}>
-                        <div>
-                          <b>{r.name}</b>
-                          <small>{departmentLabel(r.departmentId)}</small>
-                          {!result.ok && <em>{importErrorText(result.error || '', el)}</em>}
-                          {result.ok && (
-                            <small>
-                              {!withEmail(r)
-                                ? L('Χωρίς email: δώστε του το όνομα χρήστη', 'No email: give them the username')
-                                : result.emailed
-                                  ? L('Στάλθηκε email', 'Email sent')
-                                  : L('Το email δεν στάλθηκε', 'The email was not sent')}
-                            </small>
-                          )}
-                        </div>
-                        <strong className="staff-import-code">{result.userCode || ''}</strong>
-                      </div>
-                    );
-                  })}
+              <div className="staff-import-table-wrap">
+                <table className="staff-import-table result">
+                  <thead>
+                    <tr>
+                      <th>{L('Ονοματεπώνυμο', 'Name')}</th>
+                      <th>{L('Τμήμα', 'Department')}</th>
+                      <th>{L('Όνομα χρήστη', 'Username')}</th>
+                      <th>{L('Αποτέλεσμα', 'Result')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows
+                      .filter(r => results.has(r.id))
+                      .map(r => {
+                        const result = results.get(r.id)!;
+                        return (
+                          <tr key={r.id} className={`staff-import-row${result.ok ? '' : ' error'}`}>
+                            <td data-label={L('Ονοματεπώνυμο', 'Name')}>
+                              <b>{r.name}</b>
+                            </td>
+                            <td data-label={L('Τμήμα', 'Department')}>{departmentLabel(r.departmentId)}</td>
+                            <td data-label={L('Όνομα χρήστη', 'Username')}>
+                              <strong className="staff-import-code">{result.userCode || '—'}</strong>
+                            </td>
+                            <td data-label={L('Αποτέλεσμα', 'Result')}>
+                              {!result.ok ? (
+                                <em>{importErrorText(result.error || '', el)}</em>
+                              ) : !withEmail(r) ? (
+                                <span>
+                                  {L('Χωρίς email: δώστε του το όνομα χρήστη', 'No email: give them the username')}
+                                </span>
+                              ) : result.emailed ? (
+                                <span className="ready">{L('Στάλθηκε email', 'Email sent')}</span>
+                              ) : (
+                                <em>{L('Το email δεν στάλθηκε', 'The email was not sent')}</em>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
               </div>
             </>
           )}
