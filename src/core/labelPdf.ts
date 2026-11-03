@@ -145,7 +145,13 @@ export async function labelToPdf(html: string, widthMm: number, heightMm: number
         while (text.length > 1 && widthOf(`${text}…`) > mm(element.clientWidth)) text = text.slice(0, -1);
         text += '…';
       }
-      pdf.text(text, mm(box.left), mm(box.top + ASCENT * sizePx), spacing ? {charSpace: spacing} : undefined);
+      const options: {charSpace?: number; renderingMode?: 'fillThenStroke'} = spacing ? {charSpace: spacing} : {};
+      // The brand name is drawn a little heavier: thin strokes come out pale on a thermal printer.
+      if (element.classList.contains('brand')) {
+        pdf.setLineWidth(0.12);
+        options.renderingMode = 'fillThenStroke';
+      }
+      pdf.text(text, mm(box.left), mm(box.top + ASCENT * sizePx), options);
     }
     // Opens the print dialog when the viewer shows it.
     pdf.autoPrint();
