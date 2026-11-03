@@ -151,13 +151,15 @@ describe('verify-handover: someone the staff import made who still has the initi
     await sign();
     expect(personLookup()!.filters).toContainEqual(['eq', 'password_change_required', false]);
     // Left out, they are answered like an unknown code: wrong credentials, no password tried, nothing signed.
+    const tried = calls('signIn').length;
+    const signed = fake.dbCalls('insert').filter(c => c.table === 'handover_signatures').length;
     world({person: null});
     passwordOk();
     const response = await sign();
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({error: 'invalid_credentials'});
-    expect(calls('signIn')).toHaveLength(0);
-    expect(fake.dbCalls('insert').filter(c => c.table === 'handover_signatures')).toHaveLength(0);
+    expect(calls('signIn')).toHaveLength(tried);
+    expect(fake.dbCalls('insert').filter(c => c.table === 'handover_signatures')).toHaveLength(signed);
   });
 
   it('cannot witness a handover either, until they have chosen their own password', async () => {
