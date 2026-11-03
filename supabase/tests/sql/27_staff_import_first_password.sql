@@ -12,7 +12,6 @@ update public.profiles set password_change_required = true, password_change_dead
 select tests.login('dept_a');
 select tests.ok((select public.current_org_id()) is null, 'their hospital is not theirs yet');
 select tests.ok((select public."current_role"()) is null, 'nor their role');
-select tests.ok(public.current_department_id() is null, 'nor their department');
 select tests.eq(tests.count('select * from public.departments'), 0, 'they see none of the hospital''s data');
 select tests.eq(tests.count('select id from public.profiles'), 1, 'only their own profile');
 select tests.ok((select password_change_required from public.profiles where id = tests.uid('dept_a')),

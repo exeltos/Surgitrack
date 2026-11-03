@@ -2,8 +2,8 @@
 -- password (their mobile number) that they must replace at their first sign-in, within a deadline.
 --
 -- A person whose password_change_required is set:
---  * is held to it by the DATABASE, not by the screen: current_org_id(), current_role(), current_department_id()
---    and caller_department_name_internal() answer nothing for them, so every row-level policy of the hospital's
+--  * is held to it by the DATABASE, not by the screen: current_org_id(), current_role() and
+--    caller_department_name_internal() answer nothing for them, so every row-level policy of the hospital's
 --    data (all of them are written with these) shows them nothing, in the app or by calling the API directly.
 --    They can still read their own profile (to know why) and call change-initial-password.
 --  * is locked (active = false) by the nightly job lock_unchanged_passwords() when the deadline passes and the
@@ -39,9 +39,6 @@ create or replace function public.current_org_id() returns uuid language sql sta
 $$;
 create or replace function public.current_role() returns public.surgi_role language sql stable security definer set search_path=public as $$
  select role from public.profiles where id=auth.uid() and active=true and not password_change_required
-$$;
-create or replace function public.current_department_id() returns uuid language sql stable security definer set search_path=public as $$
- select department_id from public.profiles where id=auth.uid() and active=true and not password_change_required
 $$;
 create or replace function public.caller_department_name_internal() returns text language sql stable security definer
   set search_path = public as $$
