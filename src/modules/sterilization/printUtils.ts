@@ -183,8 +183,17 @@ export const labelPaper = (settings: LabelSettings) => {
   return {w: fit(settings.width, preset.w), h: fit(settings.height, preset.h)};
 };
 
-/** The large label's share of the triple label's height (%), unless the hospital set another. */
-export const DEFAULT_MAIN_SHARE = 60;
+/** The triple label's large sticker is 35 mm tall (100×35); the two small ones share the rest of the roll's height. */
+const MAIN_STICKER_MM = 35;
+/** The pink sterilizer-indicator tape printed along the right edge of each sticker: nothing is printed over it. */
+const INDICATOR_TAPE_MM = 7;
+
+/** The large label's share of the triple label's height (%): the hospital's own, or a 35 mm sticker. */
+export const mainShareOf = (settings: LabelSettings) =>
+  settings.mainShare || Math.round((MAIN_STICKER_MM / labelPaper(settings).h) * 100);
+/** The empty strip at the right edge of each sticker (mm): the hospital's own, or the indicator tape's width on a triple label. */
+export const reserveRightOf = (settings: LabelSettings) =>
+  Math.min(15, Math.max(0, settings.reserveRight || (settings.size === 'SHEET' ? INDICATOR_TAPE_MM : 0)));
 
 const LABEL_MM: Record<LabelSize, {w: number; h: number}> = {
   SMALL: {w: 50, h: 25},
@@ -231,12 +240,12 @@ function barcodeLabelBody(
       : `${tr('Χρήσεις')}: ${'uses' in asset ? asset.uses : 0}${'maxUses' in asset && asset.maxUses ? ` / ${asset.maxUses}` : ''}`;
   const {w, h} = labelPaper(settings);
   // 1 + 2: the large label on top, two small ones side by side below.
-  const share = Math.min(70, Math.max(35, settings.mainShare || DEFAULT_MAIN_SHARE)) / 100;
-  const mainH = +(h * share).toFixed(2);
+  const share = Math.min(70, Math.max(35, mainShareOf(settings))) / 100;
+  const mainH = settings.mainShare ? +(h * share).toFixed(2) : Math.min(MAIN_STICKER_MM, +(h * 0.7).toFixed(2));
   const miniH = +(h - mainH).toFixed(2);
   // Type scales with the label height so every size keeps the same proportions.
   const k = settings.size === 'SHEET' ? Math.min(1.25, Math.max(0.8, miniH / 25)) : h / 25;
-  const right = Math.min(15, Math.max(0, settings.reserveRight || 0));
+  const right = reserveRightOf(settings);
   const cell = (className: string) =>
     datesHtml ? labelCellHtml(asset, datesHtml, settings, className) : labelCell(asset, details, settings, className);
   const cells =
@@ -254,9 +263,9 @@ function barcodeLabelBody(
   .head,.foot{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:1.5mm}.foot .code{grid-column:2;text-align:center}.foot .detail{grid-column:3;justify-self:end}
   .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{display:flex;flex-wrap:wrap;row-gap:.2mm;justify-content:center}.foot.dated .code{flex:1 1 100%;text-align:center}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
-  .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
-  .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
-  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}
+  .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{}
+  .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}
+  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:7pt}.sheet-grid .main .brand{font-size:7pt}.sheet-grid .main .code{font-size:6.4pt}.sheet-grid .main .detail{font-size:5.6pt}.sheet-grid .main .logo{height:4mm}.sheet-grid .main .bc{padding:1.4mm 0 1mm}.sheet-grid .main .bc svg{width:68%}.pair .mini .name{font-size:5.4pt}.pair .mini .code{font-size:5.6pt}.pair .mini .detail{font-size:4.8pt}.pair .mini .bc svg{width:78%}
   @media screen{html{background:#eef2f5;zoom:${screenZoom}}body{margin:4mm;background:#fff;box-shadow:0 0 0 .2mm #c8d2d9,0 1mm 3mm rgba(0,0,0,.08)}}
   </style></head><body>${cells}`;
 }
