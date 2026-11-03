@@ -4,6 +4,7 @@ import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
 import {markPrintHtml} from '../../core/sampleDataMark';
 import {printDocumentInWindow} from '../../modules/sterilization/printUtils';
+import {labelToPdf} from '../../core/labelPdf';
 export default function PrintPreviewModal({
   title,
   html,
@@ -12,6 +13,7 @@ export default function PrintPreviewModal({
   compact,
   actions,
   printInWindow,
+  labelPdf,
 }: {
   title: string;
   html: string;
@@ -24,9 +26,26 @@ export default function PrintPreviewModal({
   actions?: ReactNode;
   /** Print from a window of its own, so the page's own @page size and margins apply (labels). */
   printInWindow?: boolean;
+  /** A sticker label: printed as a PDF whose page is the sticker (size in mm), so no browser margins or headers apply. */
+  labelPdf?: {html: string; widthMm: number; heightMm: number};
 }) {
   const frameId = 'surgitrack-print-preview';
   const doPrint = () => {
+    if (labelPdf) {
+      // The window opens now (a popup opened after the wait would be blocked) and shows the PDF when it is made.
+      const win = window.open('', '_blank');
+      if (win) {
+        void labelToPdf(labelPdf.html, labelPdf.widthMm, labelPdf.heightMm)
+          .then(blob => {
+            win.location.href = URL.createObjectURL(blob);
+          })
+          .catch(() => {
+            win.close();
+            printDocumentInWindow(title, html);
+          });
+        return;
+      }
+    }
     if (printInWindow && printDocumentInWindow(title, html)) return;
     const frame = document.getElementById(frameId) as HTMLIFrameElement | null;
     frame?.contentWindow?.focus();
