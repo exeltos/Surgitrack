@@ -4369,3 +4369,85 @@ html body .devices-empty.small {
 /* Notices: the date fields keep to their column (the browser's date picker was wider than it and ran into
    the next field and the button). */
 /* On a tablet the message takes the whole first row and the dates share the second. */
+
+.staff-import-drop {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 26px 16px;
+  border: 2px dashed var(--c-gray-90);
+  border-radius: 14px;
+  text-align: center;
+  color: var(--st-muted);
+  cursor: pointer;
+}
+.staff-import-drop b {
+  color: var(--c-blue-15);
+}
+.staff-import-note {
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.staff-import-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 190px);
+  gap: 8px;
+}
+.staff-import-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.staff-import-list {
+  display: grid;
+  gap: 6px;
+}
+.staff-import-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 150px) minmax(0, 130px);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-gray-95);
+  border-radius: 10px;
+}
+.staff-import-row > div {
+  display: grid;
+  min-width: 0;
+}
+.staff-import-row small {
+  color: var(--st-muted);
+}
+.staff-import-row em {
+  color: var(--c-red-40);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+.staff-import-row.existing {
+  opacity: 0.6;
+}
+.staff-import-row:has(.staff-import-code) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.staff-import-code {
+  letter-spacing: 1px;
+}
+.staff-import-days {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .staff-import-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .staff-import-row select {
+    grid-column: 2;
+  }
+}

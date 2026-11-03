@@ -52,7 +52,7 @@ Deno.serve(async req => {
 
     const {data: target} = await admin
       .from("profiles")
-      .select("id, organization_id, email, role, supervisor, active, department_id, demo_enabled")
+      .select("id, organization_id, email, role, supervisor, active, department_id, demo_enabled, password_change_required")
       .eq("id", userId)
       .maybeSingle();
     if (!target) return json({error: "not_found"}, 404);
@@ -168,6 +168,11 @@ Deno.serve(async req => {
         active,
         department_id: departmentId,
         demo_enabled: demoEnabled,
+        // Someone the staff import made who never changed their first password was locked at the deadline: an admin
+        // who activates the account again gives them another week.
+        ...(active && !target.active && target.password_change_required
+          ? {password_change_deadline: new Date(Date.now() + 7 * 864e5).toISOString()}
+          : {}),
       })
       .eq("id", userId);
     if (error) {

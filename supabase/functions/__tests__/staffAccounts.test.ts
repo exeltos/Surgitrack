@@ -365,6 +365,32 @@ describe('another admin\'s account: only the platform owner', () => {
   }
 });
 
+describe('update-staff: someone the staff import made, locked for never changing their first password', () => {
+  const FIRST = {...TARGET, role: 'DEPARTMENT', active: false, password_change_required: true};
+  const activate = async () => {
+    answer(FIRST);
+    return (await loadFunction('update-staff'))(post({user_id: 'user-2', name: 'Nurse', email: 'nurse@hospital.gr', active: true}));
+  };
+
+  it('gives them another week when an admin activates them again', async () => {
+    expect((await activate()).status).toBe(200);
+    const values = fake.dbCalls('update').find(c => c.table === 'profiles')?.values as Record<string, unknown>;
+    const days = Math.round((Date.parse(values.password_change_deadline as string) - Date.now()) / 864e5);
+    expect(days).toBe(7);
+  });
+
+  it('leaves the deadline alone for anyone else, or when nothing is activated', async () => {
+    answer({...FIRST, password_change_required: false});
+    await (await loadFunction('update-staff'))(post({user_id: 'user-2', name: 'Nurse', email: 'nurse@hospital.gr', active: true}));
+    expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).not.toHaveProperty('password_change_deadline');
+    resetFake();
+    fake.user = {id: 'admin-1'};
+    answer({...FIRST, active: true});
+    await (await loadFunction('update-staff'))(post({user_id: 'user-2', name: 'Nurse', email: 'nurse@hospital.gr'}));
+    expect(fake.dbCalls('update').find(c => c.table === 'profiles')?.values).not.toHaveProperty('password_change_deadline');
+  });
+});
+
 describe('giving the Admin role: only the platform owner', () => {
   const asCaller = (caller: Profile) => {
     fake.db = (call: DbCall) => {

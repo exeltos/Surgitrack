@@ -39,6 +39,14 @@ version (see the comment in the file).
 
 Edge functions deployed on 02/11/2026 without a migration: `staff-signup` v25 (every signup counts against the limits: 30 an hour per address, 200 an hour per hospital link, 5 a day per email address).
 
+## Not yet applied to the live project
+
+| Version        | Name                        | What it does                                                                                                                                                                                      |
+| -------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 20261103090000 | staff_import_first_password | `profiles.password_change_required` / `_deadline`: until the first password is replaced the database shows the person none of the hospital's data; a nightly job locks the ones past the deadline |
+
+Apply it **first**, then deploy `import-staff` (owner only: makes the accounts from the uploaded list), `change-initial-password` (the first-password change) and `update-staff` (a new deadline when an admin activates a locked person again), then publish the app (the People page of the owner gets «Εισαγωγή εργαζομένων», and the first sign-in asks for the new password). The app asks for `password_change_required` at sign-in, so published before the migration it would fail to read the profile.
+
 ## How the versions line up
 
 - A file's version is the version the live project recorded for it, so `supabase migration list` shows local and
