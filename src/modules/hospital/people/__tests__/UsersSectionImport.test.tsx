@@ -40,8 +40,9 @@ const people = (extra: Record<string, unknown>) =>
   }) as unknown as Props;
 
 describe('the entry to the staff import', () => {
-  it('is offered to the platform owner, and opens the import', () => {
+  it('is offered to the platform owner, in place of the invitations from a CSV file, and opens the import', () => {
     render(inApp(<UsersSection s={people({platform: true})} />));
+    expect(screen.queryByRole('menuitem', {name: /Από αρχείο CSV/})).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('menuitem', {name: /Εισαγωγή εργαζομένων/}));
     expect(screen.getByRole('dialog', {name: 'Εισαγωγή εργαζομένων'})).toBeInTheDocument();
   });

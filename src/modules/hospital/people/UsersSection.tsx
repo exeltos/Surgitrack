@@ -162,7 +162,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       </span>
                     </button>
                   )}
-                  {!demo && !demoSeats && (
+                  {/* The hospital admin's list by email; the owner has the staff import instead (below). */}
+                  {!demo && !demoSeats && !platform && (
                     <label role="menuitem" className="people-invite-file">
                       <FileSpreadsheet size={16} />
                       <span>
