@@ -1,6 +1,6 @@
 // @vitest-environment node
 import {beforeEach, describe, expect, it} from 'vitest';
-import {eqValue, loadFunction, post, resetFake} from './harness';
+import {env, eqValue, loadFunction, mailState, post, resetFake} from './harness';
 import {fake, type DbCall} from './fakes/supabase';
 import {phonePassword, placeholderEmail} from '../_shared/staffImport';
 
@@ -18,7 +18,7 @@ const world = (w: World = {}) => {
       if (eqValue(call, 'id')) return {data: 'caller' in w ? w.caller : OWNER, error: null};
       return call.filters.some(([, column]) => column === 'name') ? {data: w.sameName ?? [], error: null} : {data: w.sameEmail ?? [], error: null};
     }
-    if (call.table === 'organizations') return {data: 'org' in w ? w.org : {id: 'org-1', active: true, is_demo: false}, error: null};
+    if (call.table === 'organizations') return {data: 'org' in w ? w.org : {id: 'org-1', name: 'ΙΑΣΩ Θεσσαλίας', active: true, is_demo: false}, error: null};
     if (call.table === 'departments') return {data: DEPARTMENTS, error: null};
     return {data: null, error: null};
   };
@@ -80,7 +80,7 @@ describe('import-staff: making the people', () => {
   it('makes an active account with the mobile number as password, to be changed at the first sign-in', async () => {
     const response = await importing([person()]);
     const body = await answer(response);
-    expect(body.results).toEqual([{index: 0, ok: true, user_code: 'AB1000'}]);
+    expect(body.results).toEqual([{index: 0, ok: true, user_code: 'AB1000', emailed: false}]);
     const created = fake.calls.find(c => c.what === 'createUser')?.args[0] as Record<string, unknown>;
     expect(created).toMatchObject({password: '6912345678', email_confirm: true, email: 'ab1000@staff.surgitrack.invalid'});
     expect(profileInserts()[0]).toMatchObject({
@@ -170,6 +170,119 @@ describe('import-staff: making the people', () => {
   it('reports an email the sign-in service already has', async () => {
     fake.admin.createUser = () => ({data: null, error: {message: 'User already registered'}});
     expect((await answer(await importing([person()]))).results[0]).toEqual({index: 0, ok: false, error: 'email_taken'});
+  });
+});
+
+const mailOn = () => Object.assign(env, {SMTP_HOST: 'smtp.test', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'app@test'});
+
+describe('import-staff: the welcome email', () => {
+  const welcomed = (extra: Record<string, unknown> = {}) => importing([person({email: 'maria@gmail.com', ...extra})], {deadline_days: 7});
+
+  it('goes to the address of their own, with the username and what to do at the first sign-in', async () => {
+    mailOn();
+    const body = await answer(await welcomed());
+    expect(body.results[0]).toEqual({index: 0, ok: true, user_code: 'AB1000', emailed: true});
+    expect(mailState.outbox).toHaveLength(1);
+    const mail = mailState.outbox[0];
+    expect(mail.to).toBe('maria@gmail.com');
+    expect(mail.subject).toContain('Ο λογαριασμός σας στο SurgiTrack');
+    expect(mail.html).toContain('AB1000');
+    expect(mail.html).toContain('όνομα χρήστη');
+    expect(mail.html).toContain('αριθμό του κινητού σας τηλεφώνου');
+    expect(mail.html).toContain('τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό');
+    expect(mail.html).toMatch(/μέχρι \d{2}\/\d{2}\/\d{4}/);
+    expect(mail.html).toContain('κλειδώνει');
+  });
+
+  it('has no link at all, not even a button, and never the password or the number', async () => {
+    mailOn();
+    await welcomed();
+    const html = mailState.outbox[0].html;
+    expect(html).not.toMatch(/<a[\s>]/i);
+    expect(html).not.toMatch(/https?:\/\//i);
+    expect(html).not.toContain('6912345678');
+    expect(html).not.toMatch(/\d{10}/);
+  });
+
+  it('is not sent to a person with no email of their own, nor when the request says not to', async () => {
+    mailOn();
+    const none = await answer(await importing([person()]));
+    expect(none.results[0]).toMatchObject({ok: true, emailed: false});
+    const off = await answer(await importing([person({full_name: 'Γιώργος Νικολάου', email: 'g@gmail.com'})], {send_email: false}));
+    expect(off.results[0]).toMatchObject({ok: true, emailed: false});
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('leaves the account made when the email could not be sent, saying so, so it can be sent again', async () => {
+    mailOn();
+    mailState.fail = true;
+    const body = await answer(await welcomed());
+    expect(body.results[0]).toEqual({index: 0, ok: true, user_code: 'AB1000', emailed: false});
+    expect(profileInserts()).toHaveLength(1);
+  });
+
+  it('sends nothing without mail settings, and the accounts are still made', async () => {
+    const body = await answer(await welcomed());
+    expect(body.results[0]).toMatchObject({ok: true, emailed: false});
+    expect(profileInserts()).toHaveLength(1);
+  });
+
+  it('is sent only for the people made, not for a row that failed', async () => {
+    mailOn();
+    await importing([person({email: 'a@gmail.com', phone: 'abc'}), person({full_name: 'Γιώργος Νικολάου', email: 'g@gmail.com'})]);
+    expect(mailState.outbox.map(m => m.to)).toEqual(['g@gmail.com']);
+  });
+});
+
+describe('import-staff: sending the welcome email again', () => {
+  const resend = (codes: unknown[]) => handle(post({organization_id: 'org-1', resend: codes}));
+  const FIRST = {email: 'maria@gmail.com', active: true, password_change_required: true, password_change_deadline: '2026-11-10T09:00:00Z'};
+  const person_ = (row: Row) => {
+    const db = fake.db;
+    fake.db = call => (call.table === 'profiles' && call.op === 'select' && !eqValue(call, 'id') ? {data: row, error: null} : db(call));
+  };
+
+  it('goes to those who still have their first password to change, with the deadline they have', async () => {
+    mailOn();
+    person_(FIRST);
+    const response = await resend(['ab1000']);
+    expect(await response.json()).toEqual({sent: [{user_code: 'AB1000', emailed: true}]});
+    expect(mailState.outbox[0].to).toBe('maria@gmail.com');
+    expect(mailState.outbox[0].html).toContain('10/11/2026');
+    expect(fake.dbCalls().filter(c => c.op !== 'select')).toHaveLength(0);
+    expect(fake.calls.some(c => c.what === 'createUser')).toBe(false);
+  });
+
+  it('looks the person up in that hospital only', async () => {
+    mailOn();
+    person_(FIRST);
+    await resend(['AB1000']);
+    const lookup = fake.dbCalls('select').find(c => c.table === 'profiles' && c.filters.some(([, column]) => column === 'user_code'))!;
+    expect(lookup.filters).toContainEqual(['eq', 'organization_id', 'org-1']);
+  });
+
+  it.each([
+    ['one who already changed it', {...FIRST, password_change_required: false}],
+    ['a locked account', {...FIRST, active: false}],
+    ['one with the address that can never receive mail', {...FIRST, email: 'ab1000@staff.surgitrack.invalid'}],
+    ['a person who does not exist', null],
+  ])('sends nothing to %s', async (_who, row) => {
+    mailOn();
+    person_(row);
+    const body = (await (await resend(['AB1000'])).json()) as {sent: Array<{emailed: boolean}>};
+    expect(body.sent[0].emailed).toBe(false);
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('is for the owner only, like the import', async () => {
+    world({caller: HOSPITAL_ADMIN});
+    expect((await resend(['AB1000'])).status).toBe(403);
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('takes at most 50 at a time', async () => {
+    const response = await resend(Array.from({length: 51}, (_, i) => `AB${1000 + i}`));
+    expect(response.status).toBe(413);
   });
 });
 

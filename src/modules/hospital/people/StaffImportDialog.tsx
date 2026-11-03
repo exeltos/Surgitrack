@@ -11,8 +11,12 @@ import type {PeopleState} from './usePeople';
 const ROLES: StaffRole[] = ['DEPARTMENT', 'STERILIZATION', 'VIEWER'];
 const BATCH = 25;
 
-type Result = {ok: boolean; userCode?: string; error?: string};
-type Answer = {results?: Array<{index: number; ok: boolean; user_code?: string; error?: string}>; deadline?: string};
+type Result = {ok: boolean; userCode?: string; emailed?: boolean; error?: string};
+type Answer = {
+  results?: Array<{index: number; ok: boolean; user_code?: string; emailed?: boolean; error?: string}>;
+  deadline?: string;
+};
+type Resent = {sent?: Array<{user_code: string; emailed: boolean}>};
 
 const problemText = (code: string, el: boolean) =>
   ({
@@ -36,6 +40,8 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
   const [query, setQuery] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('');
   const [days, setDays] = useState(7);
+  // The username and the instructions go to the personal email of each person who has one, in the same step.
+  const [sendEmail, setSendEmail] = useState(true);
   const [fileError, setFileError] = useState('');
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<Map<number, Result> | null>(null);
@@ -115,6 +121,7 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
         body: {
           organization_id: organizationId,
           deadline_days: days,
+          send_email: sendEmail,
           rows: batch.map(r => ({
             full_name: r.name,
             department_id: r.role === 'VIEWER' ? null : r.departmentId,
@@ -129,7 +136,7 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
         done.set(
           r.id,
           answer
-            ? {ok: answer.ok, userCode: answer.user_code, error: answer.error}
+            ? {ok: answer.ok, userCode: answer.user_code, emailed: answer.emailed, error: answer.error}
             : {ok: false, error: 'request_failed'},
         );
       });
@@ -139,6 +146,30 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
     setDeadline(lastDeadline);
     setRunning(false);
     await changed();
+  };
+
+  const withEmail = (r: StaffRow) => !!r.email;
+  /** Made, with an email of their own, and the message did not go. */
+  const unsent = (rows || []).filter(
+    r => withEmail(r) && results?.get(r.id)?.ok && results.get(r.id)?.emailed === false,
+  );
+  const resend = async () => {
+    if (!organizationId || !results || !unsent.length || running) return;
+    setRunning(true);
+    const next = new Map(results);
+    for (let from = 0; from < unsent.length; from += BATCH) {
+      const batch = unsent.slice(from, from + BATCH);
+      const {data, error} = await supabase.functions.invoke<Resent>('import-staff', {
+        body: {organization_id: organizationId, resend: batch.map(r => results.get(r.id)?.userCode)},
+      });
+      for (const r of batch) {
+        const code = results.get(r.id)?.userCode;
+        const sent = !error && !!data?.sent?.find(x => x.user_code === code)?.emailed;
+        next.set(r.id, {...results.get(r.id)!, emailed: sent});
+      }
+      setResults(new Map(next));
+    }
+    setRunning(false);
   };
 
   const download = () => {
@@ -153,6 +184,8 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
   };
 
   const made = results ? [...results.values()].filter(r => r.ok).length : 0;
+  const mailed = results ? [...results.values()].filter(r => r.ok && r.emailed).length : 0;
+  const chosenWithEmail = chosen.filter(withEmail).length;
   const skipped = results ? results.size - made : 0;
 
   return (
@@ -196,8 +229,8 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
               {fileError && <p className="hospital-empty">{fileError}</p>}
               <p className="staff-import-note">
                 {L(
-                  'Κάθε εργαζόμενος παίρνει όνομα χρήστη και ως αρχικό κωδικό το κινητό του. Στην πρώτη σύνδεση πρέπει να ορίσει δικό του κωδικό, αλλιώς ο λογαριασμός κλειδώνει μετά την προθεσμία.',
-                  'Each employee gets a username and their mobile number as the initial password. At the first sign-in they must choose their own, or the account is locked after the deadline.',
+                  'Κάθε εργαζόμενος παίρνει όνομα χρήστη και ως αρχικό κωδικό το κινητό του. Στην πρώτη σύνδεση πρέπει να ορίσει δικό του κωδικό, αλλιώς ο λογαριασμός κλειδώνει μετά την προθεσμία. Όσοι έχουν προσωπικό email στο αρχείο παίρνουν μήνυμα με το όνομα χρήστη και τις οδηγίες (χωρίς σύνδεσμο).',
+                  'Each employee gets a username and their mobile number as the initial password. At the first sign-in they must choose their own, or the account is locked after the deadline. Those with a personal email in the file get a message with the username and the instructions (no link).',
                 )}
               </p>
             </>
@@ -297,6 +330,15 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
                 ))}
                 {!shown.length && <p className="hospital-empty">{L('Κανένα αποτέλεσμα.', 'No results.')}</p>}
               </div>
+              <label className="staff-import-all">
+                <input type="checkbox" checked={sendEmail} onChange={e => setSendEmail(e.target.checked)} />
+                <span>
+                  {L(
+                    `Αποστολή email με το όνομα χρήστη και τις οδηγίες (${chosenWithEmail} από τους ${chosen.length} επιλεγμένους έχουν email)`,
+                    `Email the username and the instructions (${chosenWithEmail} of the ${chosen.length} chosen have an email)`,
+                  )}
+                </span>
+              </label>
               <label className="staff-import-days">
                 {L('Προθεσμία πρώτης σύνδεσης (ημέρες)', 'Deadline for the first sign-in (days)')}
                 <input
@@ -314,8 +356,8 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
             <>
               <p className="staff-import-note">
                 {L(
-                  `Δημιουργήθηκαν ${made} λογαριασμοί${skipped ? `, δεν δημιουργήθηκαν ${skipped}` : ''}. ${deadline ? `Προθεσμία πρώτης σύνδεσης: ${formatDate(deadline)}. ` : ''}Αρχικός κωδικός: το κινητό του καθενός.`,
-                  `${made} accounts made${skipped ? `, ${skipped} not made` : ''}. ${deadline ? `First sign-in deadline: ${formatDate(deadline)}. ` : ''}Initial password: each person's mobile number.`,
+                  `Δημιουργήθηκαν ${made} λογαριασμοί${skipped ? `, δεν δημιουργήθηκαν ${skipped}` : ''}. ${deadline ? `Προθεσμία πρώτης σύνδεσης: ${formatDate(deadline)}. ` : ''}Αρχικός κωδικός: το κινητό του καθενός. Στάλθηκαν ${mailed} email.`,
+                  `${made} accounts made${skipped ? `, ${skipped} not made` : ''}. ${deadline ? `First sign-in deadline: ${formatDate(deadline)}. ` : ''}Initial password: each person's mobile number. ${mailed} emails sent.`,
                 )}
               </p>
               <div className="staff-import-list">
@@ -329,6 +371,15 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
                           <b>{r.name}</b>
                           <small>{departmentLabel(r.departmentId)}</small>
                           {!result.ok && <em>{importErrorText(result.error || '', el)}</em>}
+                          {result.ok && (
+                            <small>
+                              {!withEmail(r)
+                                ? L('Χωρίς email: δώστε του το όνομα χρήστη', 'No email: give them the username')
+                                : result.emailed
+                                  ? L('Στάλθηκε email', 'Email sent')
+                                  : L('Το email δεν στάλθηκε', 'The email was not sent')}
+                            </small>
+                          )}
                         </div>
                         <strong className="staff-import-code">{result.userCode || ''}</strong>
                       </div>
@@ -342,6 +393,13 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
           {!results && rows && (
             <AppButton onClick={() => setRows(null)} disabled={running}>
               {L('Άλλο αρχείο', 'Another file')}
+            </AppButton>
+          )}
+          {results && unsent.length > 0 && (
+            <AppButton disabled={running} onClick={() => void resend()}>
+              {running
+                ? L('Αποστολή…', 'Sending…')
+                : L(`Επαναποστολή email (${unsent.length})`, `Send the email again (${unsent.length})`)}
             </AppButton>
           )}
           {results && (

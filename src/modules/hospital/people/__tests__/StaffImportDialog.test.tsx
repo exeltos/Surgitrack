@@ -108,6 +108,7 @@ describe("the owner's staff import", () => {
       body: {
         organization_id: 'org-1',
         deadline_days: 7,
+        send_email: true,
         rows: [
           {
             full_name: 'ΜΑΡΙΑ ΙΩΑΝΝΟΥ',
@@ -131,6 +132,76 @@ describe("the owner's staff import", () => {
     expect(screen.queryByText('ΆΝΝΑ ΛΆΜΠΡΟΥ')).not.toBeInTheDocument();
     expect(screen.getByText(/Προθεσμία πρώτης σύνδεσης: 10\/11\/2026/)).toBeInTheDocument();
     expect(changed).toHaveBeenCalled();
+  });
+
+  it('emails the username and the instructions to those who have an email, unless asked not to', async () => {
+    await open([
+      ['Μαρία Ιωάννου', 'Χειρουργείο', '6912345678', ''],
+      ['Γιώργος Νικολάου', 'Αποστείρωση', '6987654321', 'g@gmail.com'],
+    ]);
+    fireEvent.click(
+      screen
+        .getByLabelText(/Επιλογή όλων των ορατών/)
+        .closest('label')!
+        .querySelector('input')!,
+    );
+    const box = screen.getByLabelText(/Αποστολή email με το όνομα χρήστη/);
+    expect(box).toBeChecked();
+    expect(screen.getByText(/1 από τους 2 επιλεγμένους έχουν email/)).toBeInTheDocument();
+    fireEvent.click(box);
+    fireEvent.click(screen.getByRole('button', {name: 'Ενεργοποίηση επιλεγμένων (2)'}));
+    await waitFor(() => expect(invoke).toHaveBeenCalled());
+    expect(invoke.mock.calls[0][1].body.send_email).toBe(false);
+  });
+
+  it('says for each person whether the email went, and sends again the ones it did not', async () => {
+    invoke.mockResolvedValueOnce({
+      data: {
+        results: [
+          {index: 0, ok: true, user_code: 'MI1111', emailed: true},
+          {index: 1, ok: true, user_code: 'GN2222', emailed: false},
+          {index: 2, ok: true, user_code: 'AL3333', emailed: false},
+        ],
+      },
+      error: null,
+    });
+    await open([
+      ['Μαρία Ιωάννου', 'Χειρουργείο', '6912345678', 'm@gmail.com'],
+      ['Γιώργος Νικολάου', 'Αποστείρωση', '6987654321', 'g@gmail.com'],
+      ['Άννα Λάμπρου', 'Χειρουργείο', '6933333333', ''],
+    ]);
+    fireEvent.click(
+      screen
+        .getByLabelText(/Επιλογή όλων των ορατών/)
+        .closest('label')!
+        .querySelector('input')!,
+    );
+    fireEvent.click(screen.getByRole('button', {name: 'Ενεργοποίηση επιλεγμένων (3)'}));
+    await screen.findByText(/Στάλθηκαν 1 email/);
+    expect(screen.getByText('Στάλθηκε email')).toBeInTheDocument();
+    expect(screen.getByText('Το email δεν στάλθηκε')).toBeInTheDocument();
+    expect(screen.getByText('Χωρίς email: δώστε του το όνομα χρήστη')).toBeInTheDocument();
+    // Only the one with an email whose message did not go is offered again; nobody's number is sent.
+    invoke.mockResolvedValueOnce({data: {sent: [{user_code: 'GN2222', emailed: true}]}, error: null});
+    fireEvent.click(screen.getByRole('button', {name: 'Επαναποστολή email (1)'}));
+    await waitFor(() => expect(screen.queryByRole('button', {name: /Επαναποστολή email/})).not.toBeInTheDocument());
+    expect(invoke).toHaveBeenLastCalledWith('import-staff', {body: {organization_id: 'org-1', resend: ['GN2222']}});
+    expect(screen.getAllByText('Στάλθηκε email')).toHaveLength(2);
+  });
+
+  it('keeps offering the email again when it still could not be sent', async () => {
+    invoke.mockResolvedValueOnce({
+      data: {results: [{index: 0, ok: true, user_code: 'MI1111', emailed: false}]},
+      error: null,
+    });
+    await open([['Μαρία Ιωάννου', 'Χειρουργείο', '6912345678', 'm@gmail.com']]);
+    fireEvent.click(within(rowOf('ΜΑΡΙΑ ΙΩΑΝΝΟΥ')).getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', {name: /Ενεργοποίηση επιλεγμένων/}));
+    const again = await screen.findByRole('button', {name: 'Επαναποστολή email (1)'});
+    invoke.mockResolvedValueOnce({data: null, error: {message: 'down'}});
+    fireEvent.click(again);
+    await waitFor(() => expect(invoke).toHaveBeenCalledTimes(2));
+    expect(await screen.findByRole('button', {name: 'Επαναποστολή email (1)'})).toBeInTheDocument();
   });
 
   it('sends the deadline chosen', async () => {

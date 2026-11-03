@@ -68,7 +68,15 @@ const HEADERS: Record<'name' | 'surname' | 'first' | 'department' | 'phone' | 'e
   first: ['ΟΝΟΜΑ', 'FIRST NAME'],
   department: ['ΤΜΗΜΑ', 'ΥΠΗΡΕΣΙΑ', 'ΚΛΙΝΙΚΗ', 'ΜΟΝΑΔΑ', 'DEPARTMENT', 'WARD', 'UNIT'],
   phone: ['ΚΙΝΗΤΟ', 'ΚΙΝΗΤΟ ΤΗΛΕΦΩΝΟ', 'ΤΗΛΕΦΩΝΟ', 'ΤΗΛ', 'MOBILE', 'PHONE', 'CELL'],
-  email: ['EMAIL', 'E MAIL', 'ΗΛΕΚΤΡΟΝΙΚΟ ΤΑΧΥΔΡΟΜΕΙΟ'],
+  email: [
+    'EMAIL',
+    'E MAIL',
+    'PERSONAL EMAIL',
+    'ΠΡΟΣΩΠΙΚΟ EMAIL',
+    'ΠΡΟΣΩΠΙΚΟ E MAIL',
+    'ΗΛΕΚΤΡΟΝΙΚΟ ΤΑΧΥΔΡΟΜΕΙΟ',
+    'ΠΡΟΣΩΠΙΚΟ ΗΛΕΚΤΡΟΝΙΚΟ ΤΑΧΥΔΡΟΜΕΙΟ',
+  ],
   role: ['ΡΟΛΟΣ', 'ΙΔΙΟΤΗΤΑ', 'ROLE'],
 };
 

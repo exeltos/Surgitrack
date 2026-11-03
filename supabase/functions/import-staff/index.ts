@@ -2,6 +2,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
 import {recordAccountEvent} from "../_shared/accountEvents.ts";
+import {mailConfigured, sendEmail} from "../_shared/mail.ts";
+import {welcomeEmail} from "../_shared/staffWelcome.ts";
 import {
   cleanName,
   DEFAULT_DEADLINE_DAYS,
@@ -20,8 +22,11 @@ import {
 // first sign-in (password_change_required), within the deadline, or the account is locked (lock_unchanged_passwords).
 // Only the platform owner (an active admin of no hospital). Nobody else, whatever their role. The numbers are used
 // to make the passwords and are never kept or returned; the answer holds the usernames and the reasons only.
-//   body: {organization_id, deadline_days?, rows: [{full_name, department_id, role?, phone, email?}]}
-//   answer: {results: [{index, ok, user_code?, error?}]}
+// A person with an email of their own is also sent one (their username and what to do at the first sign-in, no link,
+// never the password), unless the request says send_email: false; one who could not be sent can be sent again with
+// {organization_id, resend: [user_code, …]}.
+//   body: {organization_id, deadline_days?, send_email?, rows: [{full_name, department_id, role?, phone, email?}]}
+//   answer: {results: [{index, ok, user_code?, emailed?, error?}], deadline}
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -48,18 +53,44 @@ Deno.serve(async req => {
 
     const body = await req.json().catch(() => ({}));
     const organizationId = String(body?.organization_id || "");
+    const resend: unknown[] = Array.isArray(body?.resend) ? body.resend : [];
     const rows: unknown[] = Array.isArray(body?.rows) ? body.rows : [];
-    if (!organizationId || !rows.length) return json({error: "invalid_input"}, 400);
-    if (rows.length > MAX_IMPORT_ROWS) return json({error: "too_many_rows", max: MAX_IMPORT_ROWS}, 413);
+    if (!organizationId || (!rows.length && !resend.length)) return json({error: "invalid_input"}, 400);
+    if (Math.max(rows.length, resend.length) > MAX_IMPORT_ROWS) return json({error: "too_many_rows", max: MAX_IMPORT_ROWS}, 413);
     const days = Math.min(MAX_DEADLINE_DAYS, Math.max(1, Math.round(Number(body?.deadline_days) || DEFAULT_DEADLINE_DAYS)));
 
-    const {data: org} = await admin.from("organizations").select("id, active, is_demo").eq("id", organizationId).maybeSingle();
+    const {data: org} = await admin.from("organizations").select("id, name, active, is_demo").eq("id", organizationId).maybeSingle();
     if (!org?.active || org.is_demo) return json({error: "hospital_invalid"}, 400);
+
+    // The welcome email: only to an address of the person's own (never the placeholder), only while mail is set up.
+    const sendWelcome = async (to: string, userCode: string, deadline: string | null) => {
+      if (!mailConfigured() || to.endsWith(".invalid")) return false;
+      const {subject, html} = welcomeEmail({hospital: String(org.name || ""), userCode, deadline});
+      return !!(await sendEmail([to], subject, html));
+    };
+
+    // Sending again, to the people of this hospital who still have to change their first password.
+    if (resend.length) {
+      const sent: Array<{user_code: string; emailed: boolean}> = [];
+      for (const code of resend) {
+        const userCode = String(code || "").trim().toUpperCase();
+        const {data: person} = await admin
+          .from("profiles")
+          .select("email, active, password_change_required, password_change_deadline")
+          .eq("organization_id", organizationId)
+          .eq("user_code", userCode)
+          .maybeSingle();
+        const eligible = !!person?.active && !!person.password_change_required && !!person.email;
+        sent.push({user_code: userCode, emailed: eligible ? await sendWelcome(person!.email as string, userCode, person!.password_change_deadline as string | null) : false});
+      }
+      return json({sent});
+    }
+    const welcome = body?.send_email !== false;
     const {data: departments} = await admin.from("departments").select("id").eq("organization_id", organizationId).eq("active", true);
     const departmentIds = new Set((departments || []).map(d => d.id as string));
     const deadline = new Date(Date.now() + days * 864e5).toISOString();
 
-    const results: Array<{index: number; ok: boolean; user_code?: string; error?: string}> = [];
+    const results: Array<{index: number; ok: boolean; user_code?: string; emailed?: boolean; error?: string}> = [];
     for (let index = 0; index < rows.length; index++) {
       const row = (rows[index] && typeof rows[index] === "object" ? rows[index] : {}) as Record<string, unknown>;
       const fail = (error: string) => results.push({index, ok: false, error});
@@ -162,7 +193,9 @@ Deno.serve(async req => {
         fail("create_failed");
         continue;
       }
-      results.push({index, ok: true, user_code: userCode});
+      // Best effort: the account is made either way; the answer says whether the email went (it can be sent again).
+      const emailed = welcome && !!given ? await sendWelcome(given, userCode, deadline) : false;
+      results.push({index, ok: true, user_code: userCode, emailed});
     }
     return json({results, deadline});
   } catch (e) {
