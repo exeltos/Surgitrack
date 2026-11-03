@@ -32,7 +32,7 @@ export type AdminUser = {
 export type RolePermissionAudit = {id: string; role: UserRole; at: string; by: string; permissions: Permission[]};
 /** What the top of a barcode label shows. */
 export type LabelHeader = 'BRAND' | 'LOGO' | 'TEXT' | 'NONE';
-/** SMALL 50×25 mm, MEDIUM 70×35 mm, SHEET 100×50 mm (one large + two small labels). */
+/** SMALL 50×25 mm, MEDIUM 70×35 mm, SHEET 100×58 mm (one large + two small labels). */
 export type LabelSize = 'SMALL' | 'MEDIUM' | 'SHEET';
 export type LabelSettings = {
   size: LabelSize;
@@ -43,8 +43,6 @@ export type LabelSettings = {
   logo?: string;
   /** Uses / tool count line. */
   showDetails: boolean;
-  /** The Set's or instrument's code above its name ("cod. 041993"). */
-  showCode?: boolean;
   /** Paper size in mm when it differs from the size's own (e.g. the printer's label roll). */
   width?: number;
   height?: number;

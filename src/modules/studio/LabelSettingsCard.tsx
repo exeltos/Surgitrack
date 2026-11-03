@@ -11,7 +11,7 @@ import {labelPaper} from '../sterilization/printUtils';
 const SIZE_LABEL = {
   SMALL: ['Μικρή', 'Small', '50×25 mm'],
   MEDIUM: ['Μεσαία', 'Medium', '70×35 mm'],
-  SHEET: ['Τριπλή (1 μεγάλη + 2 μικρές)', 'Triple (1 large + 2 small)', '100×50 mm'],
+  SHEET: ['Τριπλή (1 μεγάλη + 2 μικρές)', 'Triple (1 large + 2 small)', '100×58 mm'],
 };
 const HEADER_LABEL = {
   BRAND: ['SurgiTrack', 'SurgiTrack'],

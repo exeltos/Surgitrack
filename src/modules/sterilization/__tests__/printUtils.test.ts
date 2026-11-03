@@ -16,7 +16,7 @@ describe('barcode label', () => {
     expect(small).toContain('ΙΑΣΩ');
     expect(small).toContain('3 / 30');
     const sheet = barcodeLabelHtml(tool, 'TOOL', undefined, {size: 'SHEET', header: 'NONE', showDetails: false});
-    expect(sheet).toContain('@page{size:100mm 50mm');
+    expect(sheet).toContain('@page{size:100mm 58mm');
     expect(sheet).not.toContain('SurgiTrack');
     expect(sheet).not.toContain('3 / 30');
   });
@@ -88,7 +88,6 @@ describe('label paper', () => {
         size: 'SHEET',
         header: 'BRAND',
         showDetails: false,
-        showCode: true,
         width: 105,
         height: 55,
         reserveRight: 6,
@@ -98,9 +97,7 @@ describe('label paper', () => {
     expect(html).toContain('size:105mm 55mm');
     expect(html).toContain('grid-template-rows:33mm 22mm');
     expect(html).toContain('8.0mm 1.1mm 2mm');
-    expect(html).toContain('cod. 041993');
-    // The code line is on the large label only.
-    expect(html.match(/cod\. 041993/g)).toHaveLength(1);
+    expect(html).not.toContain('cod. 041993');
   });
 });
 

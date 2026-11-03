@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Check, ImagePlus, Save, Trash2} from 'lucide-react';
 import PrintPreviewModal from './PrintPreviewModal';
 import AppButton from '../ui/AppButton';
-import {barcodeLabelHtml, labelPaper} from '../../modules/sterilization/printUtils';
+import {barcodeLabelHtml, DEFAULT_MAIN_SHARE, labelPaper} from '../../modules/sterilization/printUtils';
 import {useLibraries} from '../../core/LibraryStore';
 import {useSurgi} from '../../store/SurgiStore';
 import {DEFAULT_LABEL_SETTINGS, type LabelHeader, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
@@ -12,7 +12,7 @@ import {tr} from '../../i18n';
 const SIZES: Array<{id: LabelSize; label: string; mm: string}> = [
   {id: 'SMALL', label: 'Μικρή', mm: '50×25 mm'},
   {id: 'MEDIUM', label: 'Μεσαία', mm: '70×35 mm'},
-  {id: 'SHEET', label: 'Τριπλή', mm: '1 μεγάλη + 2 μικρές'},
+  {id: 'SHEET', label: 'Τριπλή', mm: '100×58 · 1 μεγάλη + 2 μικρές'},
 ];
 /** Preview zoom that fits each size in the dialog. */
 const ZOOM_FOR: Record<LabelSize, number> = {SMALL: 3, MEDIUM: 2.2, SHEET: 1.4};
@@ -67,7 +67,9 @@ export default function BarcodeLabelPreview({
   const [settings, setSettings] = useState<LabelSettings>(saved);
   const [zoom, setZoom] = useState(() => ZOOM_FOR[saved.size] || 2.4);
   const [logoError, setLogoError] = useState('');
-  const canSaveDefault = can('studio.manage');
+  // Only the hospital's settings screen changes the label; every print uses what the administrator set there.
+  const configure = !!saveOnClose;
+  const canSaveDefault = configure && can('studio.manage');
   const changed = JSON.stringify(settings) !== JSON.stringify(saved);
   // Edited here (not just different from the default, which another device may change meanwhile).
   const [edited, setEdited] = useState(false);
@@ -87,148 +89,154 @@ export default function BarcodeLabelPreview({
 
   const aside = (
     <>
-      <div className="label-option-group">
-        <span>{tr('ΜΕΓΕΘΟΣ')}</span>
-        <div className="label-segments sizes">
-          {SIZES.map(size => (
-            <button
-              key={size.id}
-              type="button"
-              className={settings.size === size.id ? 'active' : ''}
-              aria-pressed={settings.size === size.id}
-              onClick={() => {
-                set({size: size.id, width: undefined, height: undefined});
-                setZoom(ZOOM_FOR[size.id]);
-              }}
-            >
-              {tr(size.label)}
-              <small>{tr(size.mm)}</small>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="label-option-group">
-        <span>{tr('ΧΑΡΤΙ ΕΚΤΥΠΩΤΗ (mm)')}</span>
-        <div className="label-numbers">
-          <label>
-            {tr('Πλάτος')}
-            <input
-              type="number"
-              min={20}
-              max={150}
-              value={paper.w}
-              onChange={e => set({width: Number(e.target.value) || undefined})}
-            />
-          </label>
-          <label>
-            {tr('Ύψος')}
-            <input
-              type="number"
-              min={20}
-              max={150}
-              value={paper.h}
-              onChange={e => set({height: Number(e.target.value) || undefined})}
-            />
-          </label>
-          <label
-            title={tr('Κενό στη δεξιά άκρη κάθε ετικέτας, π.χ. για τη λωρίδα δείκτη που είναι ήδη τυπωμένη στο χαρτί.')}
-          >
-            {tr('Κενό δεξιά')}
-            <input
-              type="number"
-              min={0}
-              max={15}
-              step={0.5}
-              value={settings.reserveRight || 0}
-              onChange={e => set({reserveRight: Number(e.target.value) || undefined})}
-            />
-          </label>
-        </div>
-        {settings.size === 'SHEET' && (
-          <label className="label-zoom">
-            {tr('Μεγάλη ετικέτα')}
-            <input
-              type="range"
-              min={35}
-              max={70}
-              step={5}
-              value={settings.mainShare || 50}
-              onChange={e => set({mainShare: Number(e.target.value)})}
-              aria-label={tr('Ύψος μεγάλης ετικέτας')}
-            />
-            <b>{settings.mainShare || 50}%</b>
-          </label>
-        )}
-      </div>
-      <div className="label-option-group">
-        <span>{tr('ΚΕΦΑΛΙΔΑ')}</span>
-        <div className="label-segments">
-          {HEADERS.map(header => (
-            <button
-              key={header.id}
-              type="button"
-              className={settings.header === header.id ? 'active' : ''}
-              aria-pressed={settings.header === header.id}
-              onClick={() => set({header: header.id})}
-            >
-              {tr(header.label)}
-            </button>
-          ))}
-        </div>
-        {settings.header === 'TEXT' && (
-          <input
-            type="text"
-            maxLength={40}
-            value={settings.text || ''}
-            onChange={e => set({text: e.target.value})}
-            placeholder={tr('Π.χ. όνομα νοσοκομείου')}
-            aria-label={tr('Κείμενο κεφαλίδας')}
-          />
-        )}
-        {settings.header === 'LOGO' && (
-          <div className="label-logo-row">
-            {settings.logo && <img src={settings.logo} alt={tr('Λογότυπο')} />}
-            <label>
-              <ImagePlus size={14} /> {settings.logo ? tr('Αλλαγή') : tr('Ανέβασμα λογότυπου')}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                hidden
-                onChange={async e => {
-                  const file = e.target.files?.[0];
-                  e.target.value = '';
-                  if (!file) return;
-                  try {
-                    setLogoError('');
-                    set({logo: await logoDataUrl(file)});
-                  } catch {
-                    setLogoError(tr('Η εικόνα δεν μπόρεσε να διαβαστεί.'));
-                  }
-                }}
-              />
-            </label>
-            {settings.logo && (
-              <button
-                type="button"
-                className="icon-button"
-                aria-label={tr('Αφαίρεση λογότυπου')}
-                onClick={() => set({logo: undefined})}
+      {configure && (
+        <>
+          <div className="label-option-group">
+            <span>{tr('ΜΕΓΕΘΟΣ')}</span>
+            <div className="label-segments sizes">
+              {SIZES.map(size => (
+                <button
+                  key={size.id}
+                  type="button"
+                  className={settings.size === size.id ? 'active' : ''}
+                  aria-pressed={settings.size === size.id}
+                  onClick={() => {
+                    set({size: size.id, width: undefined, height: undefined});
+                    setZoom(ZOOM_FOR[size.id]);
+                  }}
+                >
+                  {tr(size.label)}
+                  <small>{tr(size.mm)}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="label-option-group">
+            <span>{tr('ΧΑΡΤΙ ΕΚΤΥΠΩΤΗ (mm)')}</span>
+            <div className="label-numbers">
+              <label>
+                {tr('Πλάτος')}
+                <input
+                  type="number"
+                  min={20}
+                  max={150}
+                  value={paper.w}
+                  onChange={e => set({width: Number(e.target.value) || undefined})}
+                />
+              </label>
+              <label>
+                {tr('Ύψος')}
+                <input
+                  type="number"
+                  min={20}
+                  max={150}
+                  value={paper.h}
+                  onChange={e => set({height: Number(e.target.value) || undefined})}
+                />
+              </label>
+              <label
+                title={tr(
+                  'Κενό στη δεξιά άκρη κάθε ετικέτας, π.χ. για τη λωρίδα δείκτη που είναι ήδη τυπωμένη στο χαρτί.',
+                )}
               >
-                <Trash2 size={14} />
-              </button>
+                {tr('Κενό δεξιά')}
+                <input
+                  type="number"
+                  min={0}
+                  max={15}
+                  step={0.5}
+                  value={settings.reserveRight || 0}
+                  onChange={e => set({reserveRight: Number(e.target.value) || undefined})}
+                />
+              </label>
+            </div>
+            {settings.size === 'SHEET' && (
+              <label className="label-zoom">
+                {tr('Μεγάλη ετικέτα')}
+                <input
+                  type="range"
+                  min={35}
+                  max={70}
+                  step={5}
+                  value={settings.mainShare || DEFAULT_MAIN_SHARE}
+                  onChange={e => set({mainShare: Number(e.target.value)})}
+                  aria-label={tr('Ύψος μεγάλης ετικέτας')}
+                />
+                <b>{settings.mainShare || DEFAULT_MAIN_SHARE}%</b>
+              </label>
             )}
           </div>
-        )}
-        {logoError && <small className="identity-error">{logoError}</small>}
-      </div>
-      <label className="label-check">
-        <input type="checkbox" checked={!!settings.showCode} onChange={e => set({showCode: e.target.checked})} />
-        {tr('Κωδικός (cod.) πάνω από το όνομα')}
-      </label>
-      <label className="label-check">
-        <input type="checkbox" checked={settings.showDetails} onChange={e => set({showDetails: e.target.checked})} />
-        {kind === 'SET' ? tr('Πλήθος εργαλείων') : tr('Χρήσεις')}
-      </label>
+          <div className="label-option-group">
+            <span>{tr('ΚΕΦΑΛΙΔΑ')}</span>
+            <div className="label-segments">
+              {HEADERS.map(header => (
+                <button
+                  key={header.id}
+                  type="button"
+                  className={settings.header === header.id ? 'active' : ''}
+                  aria-pressed={settings.header === header.id}
+                  onClick={() => set({header: header.id})}
+                >
+                  {tr(header.label)}
+                </button>
+              ))}
+            </div>
+            {settings.header === 'TEXT' && (
+              <input
+                type="text"
+                maxLength={40}
+                value={settings.text || ''}
+                onChange={e => set({text: e.target.value})}
+                placeholder={tr('Π.χ. όνομα νοσοκομείου')}
+                aria-label={tr('Κείμενο κεφαλίδας')}
+              />
+            )}
+            {settings.header === 'LOGO' && (
+              <div className="label-logo-row">
+                {settings.logo && <img src={settings.logo} alt={tr('Λογότυπο')} />}
+                <label>
+                  <ImagePlus size={14} /> {settings.logo ? tr('Αλλαγή') : tr('Ανέβασμα λογότυπου')}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    hidden
+                    onChange={async e => {
+                      const file = e.target.files?.[0];
+                      e.target.value = '';
+                      if (!file) return;
+                      try {
+                        setLogoError('');
+                        set({logo: await logoDataUrl(file)});
+                      } catch {
+                        setLogoError(tr('Η εικόνα δεν μπόρεσε να διαβαστεί.'));
+                      }
+                    }}
+                  />
+                </label>
+                {settings.logo && (
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={tr('Αφαίρεση λογότυπου')}
+                    onClick={() => set({logo: undefined})}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            )}
+            {logoError && <small className="identity-error">{logoError}</small>}
+          </div>
+          <label className="label-check">
+            <input
+              type="checkbox"
+              checked={settings.showDetails}
+              onChange={e => set({showDetails: e.target.checked})}
+            />
+            {kind === 'SET' ? tr('Πλήθος εργαλείων') : tr('Χρήσεις')}
+          </label>
+        </>
+      )}
       <label className="label-zoom">
         {tr('Μεγέθυνση')}
         <input
@@ -242,11 +250,9 @@ export default function BarcodeLabelPreview({
         />
         <b>{Math.round(zoom * 100)}%</b>
       </label>
-      {!canSaveDefault && (
+      {!configure && (
         <p className="label-default-note">
-          {tr(
-            'Οι προεπιλογές της ετικέτας ορίζονται από τον διαχειριστή. Οι αλλαγές εδώ ισχύουν για αυτή την εκτύπωση.',
-          )}
+          {tr('Η ετικέτα (μέγεθος, κεφαλίδα, γραμμή στοιχείων) ορίζεται από τον διαχειριστή στο Studio → Ρυθμίσεις.')}
         </p>
       )}
     </>
