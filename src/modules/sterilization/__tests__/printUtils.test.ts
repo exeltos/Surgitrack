@@ -102,7 +102,7 @@ describe('label paper', () => {
 });
 
 describe('triple label on the 100×58 roll', () => {
-  it('has a 35 mm large sticker and stops 7 mm before the right edge (the indicator tape)', () => {
+  it('has a 35 mm large sticker and stops 5 mm before the right edge (the indicator tape)', () => {
     const html = barcodeLabelHtml({barcode: 'S000001', name: 'ΒΑΣΙΚΟ', department: 'Χειρουργείο'}, 'SET', 12, {
       size: 'SHEET',
       header: 'BRAND',
@@ -110,7 +110,7 @@ describe('triple label on the 100×58 roll', () => {
     });
     expect(html).toContain('size:100mm 58mm');
     expect(html).toContain('grid-template-rows:35mm 23mm');
-    expect(html).toContain('9.0mm 1.1mm 2mm');
+    expect(html).toContain('7.0mm 1.1mm 2mm');
     expect(html).not.toContain('border-bottom:.2mm');
   });
 });

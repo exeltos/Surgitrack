@@ -4592,3 +4592,36 @@ html body .devices-empty.small {
     right: 10px;
   }
 }
+
+/* Whether a person still has the initial password: one small round icon beside the status, so the row keeps its height
+   (the key: still the initial password; the shield: has set their own; the padlock: locked for not changing it). */
+.people-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+html body .people-row .people-password {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: help;
+}
+html body .people-row .people-password.changed {
+  color: #5f8f78;
+  background: #eaf4ee;
+}
+html body .people-row .people-password.default {
+  color: #9a5a00;
+  background: #fff1d6;
+}
+html body .people-row .people-password.locked {
+  color: #b3261e;
+  background: #fde8e6;
+}

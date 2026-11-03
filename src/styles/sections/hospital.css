@@ -240,6 +240,7 @@
   .people-row > .people-value {
     display: none;
   }
+  .people-row > .people-state,
   .people-row > .hospital-member-status {
     grid-column: 1;
   }
