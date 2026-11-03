@@ -587,11 +587,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εκτυπώσεις',
-          'Από τη σύνθεση εκτυπώνεται το φύλλο σύνθεσης (A4, με στήλη ελέγχου και υπογραφές) και η ετικέτα barcode. Η ετικέτα έχει τρία μεγέθη (50×25, 70×35, 100×50 mm) και κεφαλίδα SurgiTrack, λογότυπο, δικό σας κείμενο ή καμία· ο διαχειριστής ορίζει την προεπιλογή του νοσοκομείου.',
+          'Από τη σύνθεση εκτυπώνεται το φύλλο σύνθεσης (A4, με στήλη ελέγχου και υπογραφές) και η ετικέτα barcode. Η ετικέτα έχει τρία μεγέθη (50×25, 70×35, 100×58 mm) και κεφαλίδα SurgiTrack, λογότυπο, δικό σας κείμενο ή καμία· ο διαχειριστής ορίζει την προεπιλογή του νοσοκομείου.',
         ],
         en: [
           'Printing',
-          'The composition sheet (A4, with a check column and signatures) and the barcode label print from the preparation step. The label comes in three sizes (50×25, 70×35, 100×50 mm) with a SurgiTrack, logo, custom text or no header; the administrator sets the hospital default.',
+          'The composition sheet (A4, with a check column and signatures) and the barcode label print from the preparation step. The label comes in three sizes (50×25, 70×35, 100×58 mm) with a SurgiTrack, logo, custom text or no header; the administrator sets the hospital default.',
         ],
       },
     ],

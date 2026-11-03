@@ -50,8 +50,8 @@ export const en: Record<string, string> = {
   Μεγέθυνση: 'Zoom',
   'Ορισμός ως προεπιλογή νοσοκομείου': 'Set as hospital default',
   'Είναι η προεπιλογή νοσοκομείου': 'This is the hospital default',
-  'Οι προεπιλογές της ετικέτας ορίζονται από τον διαχειριστή. Οι αλλαγές εδώ ισχύουν για αυτή την εκτύπωση.':
-    'Label defaults are set by the administrator. Changes here apply to this print only.',
+  'Η ετικέτα (μέγεθος, κεφαλίδα, γραμμή στοιχείων) ορίζεται από τον διαχειριστή στο Studio → Ρυθμίσεις.':
+    'The label (size, header, details line) is set by the administrator in Studio → Settings.',
   Μικρή: 'Small',
   Μεσαία: 'Medium',
   Τριπλή: 'Triple',
@@ -1589,7 +1589,7 @@ export const en: Record<string, string> = {
   'Λείπει 1 εργαλείο': '1 instrument missing',
   'ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ': 'DAMAGE · SERVICE · LOSS',
   Αντικαταστάσεις: 'Replacements',
-  '1 μεγάλη + 2 μικρές': '1 large + 2 small',
+  '100×58 · 1 μεγάλη + 2 μικρές': '1 large + 2 small',
   'ΧΑΡΤΙ ΕΚΤΥΠΩΤΗ (mm)': 'PRINTER PAPER (mm)',
   Πλάτος: 'Width',
   Ύψος: 'Height',
@@ -1598,7 +1598,6 @@ export const en: Record<string, string> = {
     'Empty space at the right edge of each label, e.g. for an indicator strip already printed on the paper.',
   'Μεγάλη ετικέτα': 'Large label',
   'Ύψος μεγάλης ετικέτας': 'Large label height',
-  'Κωδικός (cod.) πάνω από το όνομα': 'Code (cod.) above the name',
   '1 τεμάχιο': '1 piece',
   '1 είδος': '1 kind',
   'Επιλέξτε ή γράψτε (προαιρετικό)': 'Choose or type (optional)',

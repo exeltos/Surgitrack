@@ -183,10 +183,13 @@ export const labelPaper = (settings: LabelSettings) => {
   return {w: fit(settings.width, preset.w), h: fit(settings.height, preset.h)};
 };
 
+/** The large label's share of the triple label's height (%), unless the hospital set another. */
+export const DEFAULT_MAIN_SHARE = 60;
+
 const LABEL_MM: Record<LabelSize, {w: number; h: number}> = {
   SMALL: {w: 50, h: 25},
   MEDIUM: {w: 70, h: 35},
-  SHEET: {w: 100, h: 50},
+  SHEET: {w: 100, h: 58},
 };
 
 const labelHeaderHtml = (settings: LabelSettings) => {
@@ -202,7 +205,7 @@ const labelHeaderHtml = (settings: LabelSettings) => {
 const labelCell = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
   labelCellHtml(asset, escapeHtml(details), settings, className);
 const labelCellHtml = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
-  `<section class="label ${className}">${settings.showCode && asset.code && className !== 'mini' ? `<div class="cod">cod. ${escapeHtml(asset.code)}</div>` : ''}<div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot${details.includes('sym-date') ? ' dated' : ''}"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${details}</span>` : ''}</div></section>`;
+  `<section class="label ${className}"><div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot${details.includes('sym-date') ? ' dated' : ''}"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails ? `<span class="detail">${details}</span>` : ''}</div></section>`;
 
 /**
  * The barcode label's print CSS and body (the part after <title>). `screenZoom` enlarges it on
@@ -228,7 +231,7 @@ function barcodeLabelBody(
       : `${tr('Χρήσεις')}: ${'uses' in asset ? asset.uses : 0}${'maxUses' in asset && asset.maxUses ? ` / ${asset.maxUses}` : ''}`;
   const {w, h} = labelPaper(settings);
   // 1 + 2: the large label on top, two small ones side by side below.
-  const share = Math.min(70, Math.max(35, settings.mainShare || 50)) / 100;
+  const share = Math.min(70, Math.max(35, settings.mainShare || DEFAULT_MAIN_SHARE)) / 100;
   const mainH = +(h * share).toFixed(2);
   const miniH = +(h - mainH).toFixed(2);
   // Type scales with the label height so every size keeps the same proportions.
@@ -244,17 +247,16 @@ function barcodeLabelBody(
   return `<style>
   @page{size:${w}mm ${h}mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111}body{width:${w}mm;height:${h}mm;overflow:hidden}
   .label{position:relative;width:100%;height:100%;display:flex;flex-direction:column;padding:1.4mm ${(2 + right).toFixed(1)}mm 1.1mm 2mm;overflow:hidden}
-  .cod{font-size:${pt(5)};color:#444;line-height:1.1}
-  .head{display:flex;justify-content:space-between;align-items:center;gap:1.5mm;min-height:0}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5mm;min-height:0}
   .name{font-size:${pt(6.6)};font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .brand{font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
+  .brand{margin-top:${(1.1 * k).toFixed(2)}mm;margin-right:-${Math.min(right, 1.5).toFixed(1)}mm;font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
-  .head,.foot,.cod{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
+  .head,.foot{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:1.5mm}.foot .code{grid-column:2;text-align:center}.foot .detail{grid-column:3;justify-self:end}
   .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{display:flex;flex-wrap:wrap;row-gap:.2mm;justify-content:center}.foot.dated .code{flex:1 1 100%;text-align:center}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{border-bottom:.2mm solid #bbb}
   .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}.pair .mini:first-child{border-right:.2mm solid #bbb}
-  .sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}
+  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:8.4pt}.sheet-grid .main .brand{font-size:8.6pt}.sheet-grid .main .code{font-size:7.6pt}.sheet-grid .main .detail{font-size:6.4pt}.sheet-grid .main .logo{height:4.6mm}
   @media screen{html{background:#eef2f5;zoom:${screenZoom}}body{margin:4mm;background:#fff;box-shadow:0 0 0 .2mm #c8d2d9,0 1mm 3mm rgba(0,0,0,.08)}}
   </style></head><body>${cells}`;
 }
