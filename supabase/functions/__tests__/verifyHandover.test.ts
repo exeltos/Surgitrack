@@ -146,6 +146,37 @@ describe('verify-handover: the other party', () => {
   });
 });
 
+describe('verify-handover: someone the staff import made who still has the initial password', () => {
+  it('cannot be the other party: the search leaves them out, so a colleague who knows their username and mobile number gets no signature', async () => {
+    await sign();
+    expect(personLookup()!.filters).toContainEqual(['eq', 'password_change_required', false]);
+    // Left out, they are answered like an unknown code: wrong credentials, no password tried, nothing signed.
+    world({person: null});
+    passwordOk();
+    const response = await sign();
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({error: 'invalid_credentials'});
+    expect(calls('signIn')).toHaveLength(0);
+    expect(fake.dbCalls('insert').filter(c => c.table === 'handover_signatures')).toHaveLength(0);
+  });
+
+  it('cannot witness a handover either, until they have chosen their own password', async () => {
+    world({me: {...NURSE, password_change_required: true}});
+    passwordOk();
+    const response = await sign();
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({error: 'password_change_required'});
+    expect(calls('signIn')).toHaveLength(0);
+    expect(fake.dbCalls('insert').filter(c => c.table === 'handover_signatures')).toHaveLength(0);
+  });
+
+  it('is no obstacle to anyone else', async () => {
+    world({me: {...NURSE, password_change_required: false}});
+    passwordOk();
+    expect((await sign()).status).toBe(200);
+  });
+});
+
 describe('verify-handover: a confirmed handover', () => {
   beforeEach(passwordOk);
 
