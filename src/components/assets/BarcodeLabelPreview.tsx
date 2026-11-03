@@ -261,6 +261,7 @@ export default function BarcodeLabelPreview({
   return (
     <PrintPreviewModal
       compact
+      printInWindow
       title={`Barcode ${asset.barcode}`}
       html={barcodeLabelHtml(asset, kind, toolCount, settings, zoom)}
       aside={aside}

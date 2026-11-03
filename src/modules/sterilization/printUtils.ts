@@ -170,6 +170,32 @@ export function openPrintWindow(title: string, html: string) {
   return true;
 }
 
+/**
+ * Prints a whole HTML document from its own window. A label printed from the preview's iframe gets the
+ * browser's default margins, headers and scale (the page's own @page size is not honoured there), which
+ * spoils a 100×58 mm sticker; a window of its own prints exactly the @page the label declares.
+ */
+export function printDocumentInWindow(title: string, documentHtml: string) {
+  const win = window.open('', '_blank', 'width=900,height=700');
+  if (!win) return false;
+  try {
+    win.opener = null;
+  } catch {
+    // Best-effort hardening only.
+  }
+  win.document.open();
+  win.document.write(markPrintHtml(documentHtml));
+  win.document.title = title;
+  win.document.close();
+  const doPrint = () => {
+    win.focus();
+    window.setTimeout(() => win.print(), 200);
+  };
+  if (win.document.readyState === 'complete') doPrint();
+  else win.addEventListener('load', doPrint, {once: true});
+  return true;
+}
+
 type PrintAsset = (
   | Pick<SetAsset, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
   | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>

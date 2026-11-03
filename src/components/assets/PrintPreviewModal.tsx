@@ -3,6 +3,7 @@ import {Printer, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
 import {markPrintHtml} from '../../core/sampleDataMark';
+import {printDocumentInWindow} from '../../modules/sterilization/printUtils';
 export default function PrintPreviewModal({
   title,
   html,
@@ -10,6 +11,7 @@ export default function PrintPreviewModal({
   aside,
   compact,
   actions,
+  printInWindow,
 }: {
   title: string;
   html: string;
@@ -20,9 +22,12 @@ export default function PrintPreviewModal({
   compact?: boolean;
   /** Extra buttons on the left of the footer (e.g. saving the options as the default). */
   actions?: ReactNode;
+  /** Print from a window of its own, so the page's own @page size and margins apply (labels). */
+  printInWindow?: boolean;
 }) {
   const frameId = 'surgitrack-print-preview';
   const doPrint = () => {
+    if (printInWindow && printDocumentInWindow(title, html)) return;
     const frame = document.getElementById(frameId) as HTMLIFrameElement | null;
     frame?.contentWindow?.focus();
     frame?.contentWindow?.print();
