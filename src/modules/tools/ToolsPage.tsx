@@ -4,6 +4,7 @@ import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {usesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -26,7 +27,8 @@ import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function ToolsPage() {
-  const {tools, sets, can, organizationId} = useSurgi();
+  const {tools, sets, can, organizationId, movements} = useSurgi();
+  const onDay = (day?: string) => (day ? usesOnDay(tools, movements, day) : undefined);
   const navigate = useNavigate();
   const [q, setQ] = useRememberedState('q', '');
   const [department, setDepartment] = useRememberedState('department', '');
@@ -166,8 +168,11 @@ export default function ToolsPage() {
           ]}
           extra={
             <ListExport
-              table={() => toolsExportTable(filtered, tr('Εργαλεία'))}
-              grouped={() => toolsGroupedExportTable(filtered, tr('Εργαλεία'), systemSettings.usageWarningThreshold)}
+              table={day => toolsExportTable(filtered, tr('Εργαλεία'), onDay(day))}
+              pickDay
+              grouped={day =>
+                toolsGroupedExportTable(filtered, tr('Εργαλεία'), systemSettings.usageWarningThreshold, onDay(day))
+              }
               disabled={filtered.length === 0}
             />
           }

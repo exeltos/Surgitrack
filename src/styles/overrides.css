@@ -4693,3 +4693,17 @@ html body .compact-kpis.kpis-wide {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* The day to compare a list download with, beside the Download button. */
+html body .export-day {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--muted, #667085);
+}
+html body .export-day input {
+  width: auto;
+  min-height: 36px;
+  padding: 4px 8px;
+}

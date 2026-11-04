@@ -4,6 +4,7 @@ import {Fragment, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {usesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -29,7 +30,8 @@ import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpi
 import type {Tool} from '../../types/domain';
 
 export default function StandaloneToolsPage() {
-  const {tools, can} = useSurgi();
+  const {tools, can, movements} = useSurgi();
+  const onDay = (day?: string) => (day ? usesOnDay(tools, movements, day) : undefined);
   const navigate = useNavigate();
   const standalone = tools.filter(t => t.mode === 'STANDALONE');
   const [q, setQ] = useRememberedState('q', '');
@@ -256,12 +258,14 @@ export default function StandaloneToolsPage() {
               <span>{tr('Ομαδοποίηση')}</span>
             </button>
             <ListExport
-              table={() => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
-              grouped={() =>
+              table={day => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'), onDay(day))}
+              pickDay
+              grouped={day =>
                 toolsGroupedExportTable(
                   filtered,
                   tr('Μεμονωμένα εργαλεία σε χρήση'),
                   systemSettings.usageWarningThreshold,
+                  onDay(day),
                 )
               }
               disabled={filtered.length === 0}

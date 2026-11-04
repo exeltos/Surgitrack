@@ -4,6 +4,7 @@ import {STERILE_STATES, formatExpiry} from './sterileExpiry';
 import {isExhausted, isLow, isNew} from './usageStatus';
 import {distinctValues, groupTools} from './toolGroups';
 import type {ExportTable} from './exportTable';
+import {dayLabel, type UsesOnDay} from './usageHistory';
 import type {SetAsset, Tool} from '../types/domain';
 
 const remainingUses = (x: {maxUses?: number; uses?: number}) =>
@@ -15,7 +16,7 @@ const expiry = (x: {state: string; sterileUntil?: string}) =>
 /** The instruments of a list as a table: name, barcode, where, uses (used, limit, remaining) and expiry. */
 const sum = (values: Array<number | undefined>) => values.reduce<number>((total, v) => total + (v || 0), 0);
 
-export const toolsExportTable = (tools: Tool[], title: string): ExportTable => ({
+const baseToolsTable = (tools: Tool[], title: string): ExportTable => ({
   title,
   totals: [
     tr('Σύνολο εργαλείων: {0}', tools.length),
@@ -57,6 +58,33 @@ export const toolsExportTable = (tools: Tool[], title: string): ExportTable => (
     expiry(t),
   ]),
 });
+
+/**
+ * The instruments as a table; with a past day, the instruments that existed then, and next to the uses now the uses
+ * on that day, what was left and the difference (the uses made since).
+ */
+export const toolsExportTable = (tools: Tool[], title: string, onDay?: UsesOnDay): ExportTable => {
+  if (!onDay) return baseToolsTable(tools, title);
+  const then = (t: Tool) => onDay.byId.get(t.id)?.uses ?? t.uses ?? 0;
+  const existing = tools.filter(t => onDay.byId.get(t.id)?.existed !== false);
+  const base = baseToolsTable(existing, `${title} · ${tr('κατάσταση την {0}', dayLabel(onDay.day))}`);
+  const at = base.headers.indexOf(tr('Υπόλοιπο')) + 1;
+  const day = dayLabel(onDay.day);
+  const extra = (t: Tool) => [
+    then(t),
+    t.maxUses ? Math.max(0, t.maxUses - then(t)) : tr('Χωρίς όριο'),
+    t.maxUses ? (t.uses || 0) - then(t) : '',
+  ];
+  const limited = existing.filter(t => t.maxUses);
+  const insert = <T>(row: T[], values: T[]) => [...row.slice(0, at), ...values, ...row.slice(at)];
+  return {
+    ...base,
+    headers: insert(base.headers, [tr('Χρήσεις την {0}', day), tr('Υπόλοιπο την {0}', day), tr('Διαφορά χρήσεων')]),
+    rows: base.rows.map((row, i) => insert(row, extra(existing[i]))),
+    totals:
+      base.totals && insert(base.totals, [sum(limited.map(then)), '', sum(limited.map(t => (t.uses || 0) - then(t)))]),
+  };
+};
 
 /** The Sets of a list as a table: name, barcode, where, instruments, uses and expiry. */
 export const setsExportTable = (sets: SetAsset[], memberCount: Map<string, number>, title: string): ExportTable => ({
@@ -115,7 +143,14 @@ const range = (values: number[]) => {
  * uses made in all, the uses left per piece (least to most, never added up: the uses left by nine instruments are not
  * a number of anything), and how many are exhausted, low on uses or new. The totals under it count the same things.
  */
-export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThreshold: number): ExportTable => {
+export const toolsGroupedExportTable = (
+  allTools: Tool[],
+  title: string,
+  warningThreshold: number,
+  onDay?: UsesOnDay,
+): ExportTable => {
+  const tools = onDay ? allTools.filter(t => onDay.byId.get(t.id)?.existed !== false) : allTools;
+  const then = (t: Tool) => onDay?.byId.get(t.id)?.uses ?? t.uses ?? 0;
   const rows = groupTools(tools)
     .sort((a, b) => a[0].name.localeCompare(b[0].name, 'el'))
     .map(g => {
@@ -134,6 +169,7 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThr
         limited.length,
         range(limited.map(t => t.maxUses as number)),
         sum(limited.map(t => t.uses)),
+        ...(onDay ? [sum(limited.map(then)), sum(limited.map(t => (t.uses || 0) - then(t)))] : []),
         range(limited.map(t => remainingUses(t) as number)),
         limited.filter(isExhausted).length,
         limited.filter(t => isLow(t, warningThreshold)).length,
@@ -141,8 +177,9 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThr
       ];
     });
   const column = (index: number) => sum(rows.map(row => row[index] as number));
+  const day = onDay ? dayLabel(onDay.day) : '';
   return {
-    title,
+    title: onDay ? `${title} · ${tr('κατάσταση την {0}', day)}` : title,
     headers: [
       tr('Ονομασία'),
       tr('Κωδικός'),
@@ -153,6 +190,7 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThr
       tr('Με όριο χρήσεων'),
       tr('Όριο χρήσεων'),
       tr('Χρήσεις που έγιναν'),
+      ...(onDay ? [tr('Χρήσεις την {0}', day), tr('Διαφορά χρήσεων')] : []),
       tr('Υπόλοιπο ανά τεμάχιο'),
       tr('Εξαντλημένα'),
       tr('Λίγες χρήσεις'),
@@ -169,10 +207,11 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThr
       column(6),
       '',
       column(8),
+      ...(onDay ? [column(9), column(10)] : []),
       '',
-      column(10),
-      column(11),
-      column(12),
+      column(onDay ? 12 : 10),
+      column(onDay ? 13 : 11),
+      column(onDay ? 14 : 12),
     ],
   };
 };

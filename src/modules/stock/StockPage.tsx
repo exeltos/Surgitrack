@@ -5,6 +5,7 @@ import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {usesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -29,7 +30,8 @@ import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
 export default function StockPage() {
-  const {tools, retiredTools, can, purchaseOrders} = useSurgi();
+  const {tools, retiredTools, can, purchaseOrders, movements} = useSurgi();
+  const onDay = (day?: string) => (day ? usesOnDay(tools, movements, day) : undefined);
   const [params, setParams] = useSearchParams();
   // Minimum stock is a module the platform owner gives a hospital: without it there is only the list.
   const withMinimums = useHasModule('STOCK_MINIMUMS');
@@ -193,9 +195,15 @@ export default function StockPage() {
             ]}
             extra={
               <ListExport
-                table={() => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'))}
-                grouped={() =>
-                  toolsGroupedExportTable(filtered, tr('Απόθεμα εργαλείων'), systemSettings.usageWarningThreshold)
+                table={day => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'), onDay(day))}
+                pickDay
+                grouped={day =>
+                  toolsGroupedExportTable(
+                    filtered,
+                    tr('Απόθεμα εργαλείων'),
+                    systemSettings.usageWarningThreshold,
+                    onDay(day),
+                  )
                 }
                 disabled={filtered.length === 0}
               />
