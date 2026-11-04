@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 import {CalendarDays, X} from 'lucide-react';
 import DownloadMenu from './DownloadMenu';
 import PrintPreviewModal from '../assets/PrintPreviewModal';
@@ -24,7 +24,6 @@ export default function ListExport({
   pickDay?: boolean;
 }) {
   const [day, setDay] = useState('');
-  const picker = useRef<HTMLInputElement>(null);
   const today = new Date().toLocaleDateString('sv-SE');
   const [report, setReport] = useState<{title: string; html: string} | null>(null);
   const preview = (make: (day?: string) => ExportTable) => () => {
@@ -36,25 +35,17 @@ export default function ListExport({
       <div className="export-group">
         {pickDay && (
           <span className="export-day">
-            <button
-              type="button"
+            <span
               className="app-button app-button-secondary app-button-md export-day-toggle"
               title={tr(
                 'Η λήψη δείχνει την κατάσταση των εργαλείων όπως ήταν την ημερομηνία που επιλέγετε· κενό = σήμερα.',
               )}
-              onClick={() => {
-                try {
-                  picker.current?.showPicker();
-                } catch {
-                  picker.current?.focus();
-                }
-              }}
             >
               <CalendarDays size={16} />
               <span>
                 {tr('Κατάσταση')}: <b>{day ? dayLabel(day) : tr('Σήμερα')}</b>
               </span>
-            </button>
+            </span>
             {day && (
               <button
                 type="button"
@@ -67,12 +58,10 @@ export default function ListExport({
               </button>
             )}
             <input
-              ref={picker}
               type="date"
               className="export-day-input"
               value={day}
               max={today}
-              tabIndex={-1}
               aria-label={tr('Ημερομηνία για την κατάσταση της λήψης')}
               onChange={event => setDay(event.target.value)}
             />

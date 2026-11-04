@@ -4710,6 +4710,8 @@ html body .export-day-toggle {
   border-right-width: 0;
 }
 html body .export-day-clear {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4725,16 +4727,22 @@ html body .export-day-clear:hover {
   background: var(--c-gray-95);
   color: var(--c-cyan-35);
 }
+/* The real date input lies, invisible, over the whole button: a tap or click opens its own picker on every browser
+   (iOS has no showPicker), and the keyboard reaches it. */
 html body .export-day-input {
   position: absolute;
-  left: 0;
-  bottom: 0;
+  inset: 0;
   width: 100%;
-  height: 1px;
+  height: 100%;
+  margin: 0;
   padding: 0;
   border: 0;
   opacity: 0;
-  pointer-events: none;
+  cursor: pointer;
+}
+html body .export-day:focus-within .export-day-toggle {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 1px;
 }
 html body .export-group .action-menu-toggle {
   border-top-left-radius: 0;
