@@ -4,6 +4,7 @@ import {STERILE_STATES, formatExpiry} from './sterileExpiry';
 import {isExhausted, isLow, isNew} from './usageStatus';
 import {distinctValues, groupTools} from './toolGroups';
 import type {ExportTable} from './exportTable';
+import {dayLabel, type UsesOnDay} from './usageHistory';
 import type {SetAsset, Tool} from '../types/domain';
 
 const remainingUses = (x: {maxUses?: number; uses?: number}) =>
@@ -15,7 +16,7 @@ const expiry = (x: {state: string; sterileUntil?: string}) =>
 /** The instruments of a list as a table: name, barcode, where, uses (used, limit, remaining) and expiry. */
 const sum = (values: Array<number | undefined>) => values.reduce<number>((total, v) => total + (v || 0), 0);
 
-export const toolsExportTable = (tools: Tool[], title: string): ExportTable => ({
+const baseToolsTable = (tools: Tool[], title: string): ExportTable => ({
   title,
   totals: [
     tr('Σύνολο εργαλείων: {0}', tools.length),
@@ -57,6 +58,21 @@ export const toolsExportTable = (tools: Tool[], title: string): ExportTable => (
     expiry(t),
   ]),
 });
+
+/**
+ * The instruments as they were on a past day: those that existed then, with the uses of that day (the limit is the
+ * present one). The expiry is today's, so it is left out.
+ */
+const asOfDay = (tools: Tool[], onDay: UsesOnDay): Tool[] =>
+  tools
+    .filter(t => onDay.byId.get(t.id)?.existed !== false)
+    .map(t => ({...t, uses: onDay.byId.get(t.id)?.uses ?? t.uses ?? 0, sterileUntil: undefined}));
+
+const onDayTitle = (title: string, onDay: UsesOnDay) => `${title} · ${tr('κατάσταση την {0}', dayLabel(onDay.day))}`;
+
+/** The instruments as a table; with a past day, the list as it was on that day. */
+export const toolsExportTable = (tools: Tool[], title: string, onDay?: UsesOnDay): ExportTable =>
+  onDay ? baseToolsTable(asOfDay(tools, onDay), onDayTitle(title, onDay)) : baseToolsTable(tools, title);
 
 /** The Sets of a list as a table: name, barcode, where, instruments, uses and expiry. */
 export const setsExportTable = (sets: SetAsset[], memberCount: Map<string, number>, title: string): ExportTable => ({
@@ -115,7 +131,13 @@ const range = (values: number[]) => {
  * uses made in all, the uses left per piece (least to most, never added up: the uses left by nine instruments are not
  * a number of anything), and how many are exhausted, low on uses or new. The totals under it count the same things.
  */
-export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThreshold: number): ExportTable => {
+export const toolsGroupedExportTable = (
+  allTools: Tool[],
+  title: string,
+  warningThreshold: number,
+  onDay?: UsesOnDay,
+): ExportTable => {
+  const tools = onDay ? asOfDay(allTools, onDay) : allTools;
   const rows = groupTools(tools)
     .sort((a, b) => a[0].name.localeCompare(b[0].name, 'el'))
     .map(g => {
@@ -142,7 +164,7 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThr
     });
   const column = (index: number) => sum(rows.map(row => row[index] as number));
   return {
-    title,
+    title: onDay ? onDayTitle(title, onDay) : title,
     headers: [
       tr('Ονομασία'),
       tr('Κωδικός'),
