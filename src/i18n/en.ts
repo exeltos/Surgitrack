@@ -724,6 +724,13 @@ export const en: Record<string, string> = {
     'Completing records a shared delivery ID, the sterilization user, the receiver, department, date/time and links each barcode to its cycle history.',
   'Με την ολοκλήρωση καταγράφονται κοινός κωδικός, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.':
     'Completing records a shared batch ID, sender, receiver, department, time and the visible-deviation declaration per barcode.',
+  'Καινούργια (0 χρήσεις)': 'New (0 uses)',
+  'Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.':
+    'Instruments with a set maximum number of sterilizations; the rest have no limit.',
+  'Εργαλεία με όριο που δεν έχουν αποστειρωθεί ακόμη: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.':
+    'Instruments with a limit that have not been sterilized yet: the remaining uses are the original number.',
+  'Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.':
+    'Instruments with few uses left, according to the warning threshold.',
   'Με όριο χρήσεων': 'With usage limit',
   Μεμονωμένα: 'Standalone',
   'Μεμονωμένα εργαλεία': 'Standalone instruments',

@@ -4,6 +4,8 @@ import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {toolsExportTable} from '../../core/assetExport';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -151,6 +153,9 @@ export default function ToolsPage() {
               onChange: setUsage,
             },
           ]}
+          extra={
+            <ListExport table={() => toolsExportTable(filtered, tr('Εργαλεία'))} disabled={filtered.length === 0} />
+          }
         />
       </div>
       <ScrollableListPanel withKpis ariaLabel={tr('Λίστα εργαλείων')}>

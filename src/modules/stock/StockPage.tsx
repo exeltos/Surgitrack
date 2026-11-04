@@ -5,6 +5,8 @@ import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {toolsExportTable} from '../../core/assetExport';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
@@ -178,6 +180,12 @@ export default function StockPage() {
                 onChange: setUsage,
               },
             ]}
+            extra={
+              <ListExport
+                table={() => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'))}
+                disabled={filtered.length === 0}
+              />
+            }
           />
           <ScrollableListPanel withKpis ariaLabel={tr('Απόθεμα εργαλείων')}>
             {filtered.length === 0 ? (

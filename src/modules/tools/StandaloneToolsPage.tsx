@@ -4,6 +4,8 @@ import {Fragment, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {toolsExportTable} from '../../core/assetExport';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -52,6 +54,18 @@ export default function StandaloneToolsPage() {
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
       matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
+      (!state || t.state === state) &&
+      `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
+        .toLowerCase()
+        .includes(q.toLowerCase()),
+  );
+  // The cards above the list count what the department, specialty, company, status and search leave, whichever usage
+  // type is chosen (the usage cards are the shortcuts to that choice).
+  const scope = standalone.filter(
+    t =>
+      (!department || t.department === department) &&
+      (!specialty || t.specialty === specialty) &&
+      (!manufacturer || t.manufacturer === manufacturer) &&
       (!state || t.state === state) &&
       `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
         .toLowerCase()
@@ -157,16 +171,23 @@ export default function StandaloneToolsPage() {
       <KpiStrip
         compact
         items={[
-          {label: tr('Σε χρήση'), value: standalone.length, ...kpi()},
-          {label: tr('Τμήματα'), value: new Set(standalone.map(t => t.department).filter(Boolean)).size},
+          {label: tr('Σε χρήση'), value: scope.length, ...kpi()},
           {
             label: tr('Με όριο χρήσεων'),
-            value: standalone.filter(t => t.maxUses).length,
+            value: scope.filter(t => t.maxUses).length,
+            hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
             ...kpi({usage: 'LIMITED'}),
           },
           {
+            label: tr('Καινούργια'),
+            value: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία με όριο που δεν έχουν αποστειρωθεί ακόμη: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
+            ...kpi({usage: 'NEW'}),
+          },
+          {
             label: tr('Λίγες χρήσεις'),
-            value: standalone.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+            value: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
             ...kpi({usage: 'LOW'}),
           },
         ]}
@@ -213,16 +234,22 @@ export default function StandaloneToolsPage() {
           },
         ]}
         extra={
-          <button
-            type="button"
-            className={`asset-filter-toggle ${grouped ? 'has-active' : ''}`}
-            onClick={() => setGrouped(v => !v)}
-            aria-pressed={grouped}
-            title={tr('Ομαδοποίηση ίδιων εργαλείων')}
-          >
-            <Layers3 size={15} />
-            <span>{tr('Ομαδοποίηση')}</span>
-          </button>
+          <>
+            <button
+              type="button"
+              className={`asset-filter-toggle ${grouped ? 'has-active' : ''}`}
+              onClick={() => setGrouped(v => !v)}
+              aria-pressed={grouped}
+              title={tr('Ομαδοποίηση ίδιων εργαλείων')}
+            >
+              <Layers3 size={15} />
+              <span>{tr('Ομαδοποίηση')}</span>
+            </button>
+            <ListExport
+              table={() => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
+              disabled={filtered.length === 0}
+            />
+          </>
         }
       />
       <ScrollableListPanel withKpis ariaLabel={tr('Μεμονωμένα εργαλεία σε χρήση')}>

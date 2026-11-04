@@ -11,6 +11,8 @@ type KpiItem = {
   onClick?: () => void;
   /** The KPI's filters are the ones in effect now. */
   active?: boolean;
+  /** What the number counts, shown on hover. */
+  hint?: string;
 };
 
 type Props = {
@@ -33,18 +35,25 @@ export default function KpiStrip({items, compact = false, className = ''}: Props
         const cls = `kpi-item${item.to || item.onClick ? ' kpi-link' : ''}${item.active ? ' active' : ''}`;
         if (item.to)
           return (
-            <Link key={index} to={item.to} className={cls}>
+            <Link key={index} to={item.to} className={cls} title={item.hint}>
               {body}
             </Link>
           );
         if (item.onClick)
           return (
-            <button key={index} type="button" className={cls} onClick={item.onClick} aria-pressed={!!item.active}>
+            <button
+              key={index}
+              type="button"
+              className={cls}
+              onClick={item.onClick}
+              aria-pressed={!!item.active}
+              title={item.hint}
+            >
               {body}
             </button>
           );
         return (
-          <div key={index} className={cls}>
+          <div key={index} className={cls} title={item.hint}>
             {body}
           </div>
         );

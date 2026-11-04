@@ -5,6 +5,8 @@ import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {setsExportTable} from '../../core/assetExport';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
@@ -170,6 +172,12 @@ export default function SetsPage() {
             onChange: setCompleteness,
           },
         ]}
+        extra={
+          <ListExport
+            table={() => setsExportTable(filtered, memberCount, tr('Σετ εργαλείων'))}
+            disabled={filtered.length === 0}
+          />
+        }
       />
       <ScrollableListPanel ariaLabel={tr('Λίστα Σετ εργαλείων')}>
         {filtered.length === 0 ? (

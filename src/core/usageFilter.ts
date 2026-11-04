@@ -1,10 +1,11 @@
 import {tr} from '../i18n';
 
-export type UsageFilter = '' | 'LIMITED' | 'LOW' | 'UNLIMITED';
+export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'LOW' | 'UNLIMITED';
 
-/** Options of the "usage type" list filter: instruments with lives, few lives left, or no limit. */
+/** Options of the "usage type" list filter: instruments with lives, new (none used), few lives left, or no limit. */
 export const usageFilterOptions = () => [
   {value: 'LIMITED', label: tr('Με όριο χρήσεων')},
+  {value: 'NEW', label: tr('Καινούργια (0 χρήσεις)')},
   {value: 'LOW', label: tr('Λίγες χρήσεις')},
   {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
 ];
@@ -18,6 +19,8 @@ export const matchesUsage = (filter: string, items: Lives[], warningThreshold: n
   if (!filter) return true;
   const limited = items.filter(x => !!x.maxUses);
   if (filter === 'LIMITED') return limited.length > 0;
+  // New: has a limit and none of it is used yet, so the remaining uses are the original number.
+  if (filter === 'NEW') return limited.length > 0 && limited.every(x => !(x.uses || 0));
   if (filter === 'LOW') return limited.some(x => remaining(x) <= warningThreshold);
   return limited.length === 0;
 };
