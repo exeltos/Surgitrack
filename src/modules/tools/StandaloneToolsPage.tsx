@@ -3,7 +3,7 @@ import {useBrowseList} from '../../core/browseList';
 import {Fragment, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
-import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -38,6 +38,7 @@ export default function StandaloneToolsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
   const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
@@ -48,6 +49,7 @@ export default function StandaloneToolsPage() {
     specialty: [specialty, setSpecialty],
     manufacturer: [manufacturer, setManufacturer],
     state: [state, setState],
+    limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
   const filtered = standalone.filter(
@@ -55,6 +57,7 @@ export default function StandaloneToolsPage() {
       (!department || t.department === department) &&
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
       matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
@@ -73,7 +76,7 @@ export default function StandaloneToolsPage() {
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
-  const filterKey = [q, department, specialty, manufacturer, state, usage, grouped].join('|');
+  const filterKey = [q, department, specialty, manufacturer, state, limit, usage, grouped].join('|');
   const groupKey = (t: Tool) => toolKind(t);
   const groups = useMemo(() => groupTools(filtered), [filtered]);
   // Groups opened in place to show their pieces.
@@ -170,7 +173,7 @@ export default function StandaloneToolsPage() {
             label: tr('Με όριο χρήσεων'),
             value: scope.filter(t => t.maxUses).length,
             hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
-            ...kpi({usage: 'LIMITED'}),
+            ...kpi({limit: 'LIMITED'}),
           },
           {
             label: tr('Αχρησιμοποίητα'),
@@ -226,6 +229,13 @@ export default function StandaloneToolsPage() {
             onChange: setState,
           },
           {
+            key: 'limit',
+            value: limit,
+            placeholder: tr('Με ή χωρίς όριο'),
+            options: limitFilterOptions(),
+            onChange: setLimit,
+          },
+          {
             key: 'usage',
             value: usage,
             placeholder: tr('Όλοι οι τύποι χρήσης'),
@@ -273,6 +283,7 @@ export default function StandaloneToolsPage() {
               setSpecialty('');
               setManufacturer('');
               setState('');
+              setLimit('');
               setUsage('');
             }}
           />

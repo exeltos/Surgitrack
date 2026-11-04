@@ -3,17 +3,17 @@ import {isExhausted, isLimited, isLow, isNew, isUsed, type Lives} from './usageS
 
 export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'USED' | 'LOW' | 'EXHAUSTED' | 'UNLIMITED';
 
-/**
- * Options of the "usage type" list filter: instruments with lives, then new (no use made), used (some made, some
- * left), few left, none left (finished), and no limit.
- */
-export const usageFilterOptions = () => [
+/** The "limit" list filter (with or without a limit of uses) and the "usage" one (new, used, few left, finished) combine. */
+export const limitFilterOptions = () => [
   {value: 'LIMITED', label: tr('Με όριο χρήσεων')},
+  {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
+];
+
+export const usageFilterOptions = () => [
   {value: 'NEW', label: tr('Αχρησιμοποίητα (0 χρήσεις)')},
   {value: 'USED', label: tr('Χρησιμοποιημένα')},
   {value: 'LOW', label: tr('Λίγες χρήσεις')},
   {value: 'EXHAUSTED', label: tr('Εξαντλημένα (0 υπόλοιπο)')},
-  {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
 ];
 
 /** Whether an instrument (or any of the given instruments, e.g. a Set's) matches the usage filter. */

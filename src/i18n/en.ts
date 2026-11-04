@@ -1490,6 +1490,7 @@ export const en: Record<string, string> = {
     '{0} was sent to Sterilization. Usage limit reached: {1} — taken out of use.',
   'Λίγες χρήσεις': 'Few uses left',
   'Όλοι οι τύποι χρήσης': 'All usage types',
+  'Με ή χωρίς όριο': 'With or without a limit',
   'Φόρτωση…': 'Loading…',
   'Όλα τα Σετ': 'All Sets',
   Πλήρη: 'Complete',

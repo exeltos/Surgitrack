@@ -3,7 +3,7 @@ import {useBrowseList} from '../../core/browseList';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
-import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -33,6 +33,7 @@ export default function ToolsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
   const {systemSettings} = useLibraries();
   const [mode, setMode] = useRememberedState('mode', '');
@@ -43,6 +44,7 @@ export default function ToolsPage() {
     manufacturer: [manufacturer, setManufacturer],
     state: [state, setState],
     mode: [mode, setMode],
+    limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
   const filtered = tools.filter(
@@ -50,6 +52,7 @@ export default function ToolsPage() {
       (!department || t.department === department) &&
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
       matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       (!mode || t.mode === mode) &&
@@ -60,7 +63,7 @@ export default function ToolsPage() {
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state' | 'mode') =>
     [...new Set(tools.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
-  const filterKey = [q, department, specialty, manufacturer, state, mode, usage].join('|');
+  const filterKey = [q, department, specialty, manufacturer, state, mode, limit, usage].join('|');
   useBrowseList('/tools', filtered);
   const rows = useProgressiveList(filtered, filterKey);
   return (
@@ -147,6 +150,13 @@ export default function ToolsPage() {
               onChange: setState,
             },
             {
+              key: 'limit',
+              value: limit,
+              placeholder: tr('Με ή χωρίς όριο'),
+              options: limitFilterOptions(),
+              onChange: setLimit,
+            },
+            {
               key: 'usage',
               value: usage,
               placeholder: tr('Όλοι οι τύποι χρήσης'),
@@ -190,6 +200,7 @@ export default function ToolsPage() {
               setManufacturer('');
               setState('');
               setMode('');
+              setLimit('');
               setUsage('');
             }}
           />
