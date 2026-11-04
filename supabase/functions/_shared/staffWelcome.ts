@@ -10,12 +10,12 @@ const athensDate = (iso: string) =>
     new Date(iso),
   );
 
-export const welcomeEmail = (d: {hospital: string; userCode: string; deadline: string | null}) => ({
-  subject: `Ο λογαριασμός σας στο SurgiTrack · ${d.hospital}`,
+export const welcomeEmail = (d: {hospital: string; userCode: string; deadline: string | null; reminder?: boolean}) => ({
+  subject: `${d.reminder ? "Υπενθύμιση: " : ""}Ο λογαριασμός σας στο SurgiTrack · ${d.hospital}`,
   html: layout(
     "ΝΕΟΣ ΛΟΓΑΡΙΑΣΜΟΣ",
     "Ο λογαριασμός σας στο SurgiTrack",
-    `<p>Το <b>${esc(d.hospital)}</b> δημιούργησε λογαριασμό για εσάς στο SurgiTrack. Αυτό είναι το όνομα χρήστη σας:</p>
+    `${d.reminder ? `<p><b>Υπενθύμιση:</b> δεν έχετε ακόμη κάνει την πρώτη σας σύνδεση ούτε ορίσει δικό σας κωδικό.</p>` : ""}<p>Το <b>${esc(d.hospital)}</b> δημιούργησε λογαριασμό για εσάς στο SurgiTrack. Αυτό είναι το όνομα χρήστη σας:</p>
      ${usernameBox(d.userCode)}
      <p><b>Στην πρώτη σας σύνδεση:</b></p>
      <ol style="padding-left:20px;margin:0 0 14px">

@@ -24,7 +24,7 @@ import {
 // to make the passwords and are never kept or returned; the answer holds the usernames and the reasons only.
 // A person with an email of their own is also sent one (their username and what to do at the first sign-in, no link,
 // never the password), unless the request says send_email: false; one who could not be sent can be sent again with
-// {organization_id, resend: [user_code, …]}.
+// {organization_id, resend: [user_code, …], reminder?: true} (a reminder says they have not signed in yet).
 //   body: {organization_id, deadline_days?, send_email?, rows: [{full_name, department_id, role?, phone, email?}]}
 //   answer: {results: [{index, ok, user_code?, emailed?, error?}], deadline}
 const corsBase = {
@@ -63,9 +63,9 @@ Deno.serve(async req => {
     if (!org?.active || org.is_demo) return json({error: "hospital_invalid"}, 400);
 
     // The welcome email: only to an address of the person's own (never the placeholder), only while mail is set up.
-    const sendWelcome = async (to: string, userCode: string, deadline: string | null) => {
+    const sendWelcome = async (to: string, userCode: string, deadline: string | null, reminder = false) => {
       if (!mailConfigured() || to.endsWith(".invalid")) return false;
-      const {subject, html} = welcomeEmail({hospital: String(org.name || ""), userCode, deadline});
+      const {subject, html} = welcomeEmail({hospital: String(org.name || ""), userCode, deadline, reminder});
       return !!(await sendEmail([to], subject, html));
     };
 
@@ -81,7 +81,7 @@ Deno.serve(async req => {
           .eq("user_code", userCode)
           .maybeSingle();
         const eligible = !!person?.active && !!person.password_change_required && !!person.email;
-        sent.push({user_code: userCode, emailed: eligible ? await sendWelcome(person!.email as string, userCode, person!.password_change_deadline as string | null) : false});
+        sent.push({user_code: userCode, emailed: eligible ? await sendWelcome(person!.email as string, userCode, person!.password_change_deadline as string | null, body?.reminder === true) : false});
       }
       return json({sent});
     }

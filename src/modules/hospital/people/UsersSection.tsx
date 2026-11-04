@@ -22,6 +22,7 @@ import {localizedName} from '../../../core/glossary';
 import {SUPERVISOR, roles, assignableRoles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
 import StaffImportDialog from './StaffImportDialog';
+import PasswordReminder from './PasswordReminder';
 import type {PeopleState} from './usePeople';
 
 export default function UsersSection({s}: {s: PeopleState}) {
@@ -420,6 +421,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
             </div>
           )}
 
+          {platform && !demo && !demoSeats && <PasswordReminder s={s} />}
           <div className="people-head">
             <span>{L('Χρήστης', 'User')}</span>
             <span>{L('Όνομα χρήστη', 'Username')}</span>
