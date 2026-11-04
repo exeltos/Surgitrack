@@ -3,7 +3,11 @@ import {useBrowseList} from '../../core/browseList';
 import {Fragment, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
-import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
+import {isExhausted} from '../../core/usageStatus';
+import {distinctValues, groupTools, toolKind} from '../../core/toolGroups';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -34,6 +38,7 @@ export default function StandaloneToolsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
   const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
@@ -44,6 +49,7 @@ export default function StandaloneToolsPage() {
     specialty: [specialty, setSpecialty],
     manufacturer: [manufacturer, setManufacturer],
     state: [state, setState],
+    limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
   const filtered = standalone.filter(
@@ -51,24 +57,28 @@ export default function StandaloneToolsPage() {
       (!department || t.department === department) &&
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
       matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
-  const filterKey = [q, department, specialty, manufacturer, state, usage, grouped].join('|');
-  const groupKey = (t: Tool) => `${t.code}|${t.name}|${t.manufacturer}`;
-  const groups = useMemo(() => {
-    const m = new Map<string, Tool[]>();
-    filtered.forEach(t => {
-      const k = groupKey(t);
-      const list = m.get(k);
-      if (list) list.push(t);
-      else m.set(k, [t]);
-    });
-    return [...m.values()];
-  }, [filtered]);
+  // The cards above the list count what the department, specialty, company, status and search leave, whichever usage
+  // type is chosen (the usage cards are the shortcuts to that choice).
+  const scope = standalone.filter(
+    t =>
+      (!department || t.department === department) &&
+      (!specialty || t.specialty === specialty) &&
+      (!manufacturer || t.manufacturer === manufacturer) &&
+      (!state || t.state === state) &&
+      `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
+        .toLowerCase()
+        .includes(q.toLowerCase()),
+  );
+  const filterKey = [q, department, specialty, manufacturer, state, limit, usage, grouped].join('|');
+  const groupKey = (t: Tool) => toolKind(t);
+  const groups = useMemo(() => groupTools(filtered), [filtered]);
   // Groups opened in place to show their pieces.
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
   const toggleGroup = (key: string) =>
@@ -120,6 +130,7 @@ export default function StandaloneToolsPage() {
           <>
             <b>{t.uses}</b>
             <span className="muted"> / {t.maxUses}</span>
+            {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
           </>
         ) : (
           <span className="muted">{tr('Χωρίς όριο')}</span>
@@ -157,17 +168,30 @@ export default function StandaloneToolsPage() {
       <KpiStrip
         compact
         items={[
-          {label: tr('Σε χρήση'), value: standalone.length, ...kpi()},
-          {label: tr('Τμήματα'), value: new Set(standalone.map(t => t.department).filter(Boolean)).size},
+          {label: tr('Σε χρήση'), value: scope.length, ...kpi()},
           {
             label: tr('Με όριο χρήσεων'),
-            value: standalone.filter(t => t.maxUses).length,
-            ...kpi({usage: 'LIMITED'}),
+            value: scope.filter(t => t.maxUses).length,
+            hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
+            ...kpi({limit: 'LIMITED'}),
+          },
+          {
+            label: tr('Αχρησιμοποίητα'),
+            value: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
+            ...kpi({usage: 'NEW'}),
           },
           {
             label: tr('Λίγες χρήσεις'),
-            value: standalone.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+            value: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
             ...kpi({usage: 'LOW'}),
+          },
+          {
+            label: tr('Εξαντλημένα'),
+            value: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.'),
+            ...kpi({usage: 'EXHAUSTED'}),
           },
         ]}
       />
@@ -205,6 +229,13 @@ export default function StandaloneToolsPage() {
             onChange: setState,
           },
           {
+            key: 'limit',
+            value: limit,
+            placeholder: tr('Με ή χωρίς όριο'),
+            options: limitFilterOptions(),
+            onChange: setLimit,
+          },
+          {
             key: 'usage',
             value: usage,
             placeholder: tr('Όλοι οι τύποι χρήσης'),
@@ -213,16 +244,29 @@ export default function StandaloneToolsPage() {
           },
         ]}
         extra={
-          <button
-            type="button"
-            className={`asset-filter-toggle ${grouped ? 'has-active' : ''}`}
-            onClick={() => setGrouped(v => !v)}
-            aria-pressed={grouped}
-            title={tr('Ομαδοποίηση ίδιων εργαλείων')}
-          >
-            <Layers3 size={15} />
-            <span>{tr('Ομαδοποίηση')}</span>
-          </button>
+          <>
+            <button
+              type="button"
+              className={`asset-filter-toggle ${grouped ? 'has-active' : ''}`}
+              onClick={() => setGrouped(v => !v)}
+              aria-pressed={grouped}
+              title={tr('Ομαδοποίηση ίδιων εργαλείων')}
+            >
+              <Layers3 size={15} />
+              <span>{tr('Ομαδοποίηση')}</span>
+            </button>
+            <ListExport
+              table={() => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
+              grouped={() =>
+                toolsGroupedExportTable(
+                  filtered,
+                  tr('Μεμονωμένα εργαλεία σε χρήση'),
+                  systemSettings.usageWarningThreshold,
+                )
+              }
+              disabled={filtered.length === 0}
+            />
+          </>
         }
       />
       <ScrollableListPanel withKpis ariaLabel={tr('Μεμονωμένα εργαλεία σε χρήση')}>
@@ -239,6 +283,7 @@ export default function StandaloneToolsPage() {
               setSpecialty('');
               setManufacturer('');
               setState('');
+              setLimit('');
               setUsage('');
             }}
           />
@@ -283,7 +328,14 @@ export default function StandaloneToolsPage() {
                                   {t.name}
                                 </button>
                                 <small className="row-sub">
-                                  {[t.manufacturer, t.code].filter(Boolean).join(' · ')}
+                                  {[
+                                    distinctValues(g, x => x.manufacturer).join(', '),
+                                    distinctValues(g, x => x.code).length > 1
+                                      ? tr('{0} κωδικοί', distinctValues(g, x => x.code).length)
+                                      : t.code,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' · ')}
                                 </small>
                               </span>
                             </div>

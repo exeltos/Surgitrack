@@ -22,6 +22,10 @@ import {localizedName} from '../../../core/glossary';
 import {SUPERVISOR, roles, assignableRoles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
 import StaffImportDialog from './StaffImportDialog';
+import PasswordReminder from './PasswordReminder';
+import DownloadMenu from '../../../components/ui/DownloadMenu';
+import PrintPreviewModal from '../../../components/assets/PrintPreviewModal';
+import {usernameSheetsHtml, usernameTable, type UsernameRow} from './usernameLists';
 import type {PeopleState} from './usePeople';
 
 export default function UsersSection({s}: {s: PeopleState}) {
@@ -62,6 +66,16 @@ export default function UsersSection({s}: {s: PeopleState}) {
   } = s;
   // The owner's staff import (never shown to a hospital admin).
   const [importing, setImporting] = useState(false);
+  const [sheets, setSheets] = useState(false);
+  // The people on screen (the filters apply: choose a department to take just that one): department, name, username.
+  const usernameRows = (): UsernameRow[] =>
+    shown
+      .filter(m => m.user_code)
+      .map(m => ({
+        department: wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id),
+        name: m.name,
+        userCode: m.user_code!,
+      }));
   // Whether the person has set their own password yet (accounts made by a staff import start on the mobile number).
   const passwordBadge = (m: (typeof shown)[number]) => {
     const until = m.password_change_deadline
@@ -98,6 +112,13 @@ export default function UsersSection({s}: {s: PeopleState}) {
   return (
     <>
       {importing && <StaffImportDialog s={s} onClose={() => setImporting(false)} />}
+      {sheets && (
+        <PrintPreviewModal
+          title={L('Ονόματα χρήστη ανά τμήμα', 'Usernames by department')}
+          html={usernameSheetsHtml(usernameRows(), el, lang)}
+          onClose={() => setSheets(false)}
+        />
+      )}
       {tab === 'USERS' && (
         <section className="hospital-card hospital-members">
           <div className="people-toolbar">
@@ -140,6 +161,12 @@ export default function UsersSection({s}: {s: PeopleState}) {
                   onChange: access => setFilters(f => ({...f, access})),
                 },
               ]}
+            />
+            <DownloadMenu
+              table={() => usernameTable(usernameRows(), el)}
+              onPrint={() => setSheets(true)}
+              printLabel={L('Λίστες ανά τμήμα (PDF / εκτύπωση)', 'Lists by department (PDF / print)')}
+              disabled={shown.every(m => !m.user_code)}
             />
             <div className="people-invite">
               <AppButton
@@ -420,6 +447,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
             </div>
           )}
 
+          {platform && !demo && !demoSeats && <PasswordReminder s={s} />}
           <div className="people-head">
             <span>{L('Χρήστης', 'User')}</span>
             <span>{L('Όνομα χρήστη', 'Username')}</span>

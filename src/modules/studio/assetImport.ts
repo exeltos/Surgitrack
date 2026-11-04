@@ -19,6 +19,8 @@ export type ImportField =
   | 'specialty'
   | 'manufacturer'
   | 'maxUses'
+  | 'usesDone'
+  | 'usesLeft'
   | 'serialNumber'
   | 'notes';
 
@@ -110,8 +112,34 @@ export const IMPORT_FIELDS: ReadonlyArray<{
     en: 'Max uses',
     hintEl: 'Όριο χρήσεων του εργαλείου',
     hintEn: "The instrument's use limit",
-    aliases: ['μεγιστεσχρησεισ', 'οριοχρησεων', 'χρησεισ', 'ζωεσ', 'maxuses', 'lifes', 'lives'],
+    aliases: ['μεγιστεσχρησεισ', 'οριοχρησεων', 'ζωεσ', 'maxuses', 'lifes', 'lives'],
   },
+  {
+    key: 'usesDone',
+    el: 'Χρήσεις που έγιναν',
+    en: 'Uses made',
+    hintEl: 'Πόσες χρήσεις έχουν ήδη γίνει (εργαλείο που χρησιμοποιούσατε πριν)· κενό: καμία',
+    hintEn: 'How many uses were already made (an instrument in use before); empty: none',
+    aliases: [
+      'χρησειστουεγιναν',
+      'χρησειστουεχουνγινει',
+      'χρησειστουεχουνγινει',
+      'εγιναν',
+      'usesmade',
+      'usesdone',
+      'used',
+      'uses',
+    ],
+  },
+  {
+    key: 'usesLeft',
+    el: 'Υπόλοιπο χρήσεων',
+    en: 'Uses left',
+    hintEl: 'Αντί για τις χρήσεις που έγιναν: πόσες απομένουν',
+    hintEn: 'Instead of uses made: how many are left',
+    aliases: ['υπολοιποχρησεων', 'υπολοιπο', 'απομενουν', 'usesleft', 'remaining', 'remaininguses'],
+  },
+
   {
     key: 'serialNumber',
     el: 'Σειριακός αριθμός',
@@ -258,6 +286,7 @@ export function buildImportPlan(
     specialty: string;
     manufacturer: string;
     maxUses?: number;
+    usesDone: number;
     serialNumber: string;
     notes: string;
   };
@@ -300,6 +329,51 @@ export function buildImportPlan(
           `Max uses “${maxUsesText}” is not a positive whole number.`,
         ),
       });
+    // The uses already made: given directly, or as the uses left; and whether it is declared new.
+    const usesDoneText = value(row, 'usesDone');
+    const usesLeftText = value(row, 'usesLeft');
+    const whole = (text: string) => (text ? Number(text.replace(',', '.')) : undefined);
+    let usesDone = whole(usesDoneText);
+    const usesLeft = whole(usesLeftText);
+    if (usesDone !== undefined && (!Number.isInteger(usesDone) || usesDone < 0)) {
+      errors.push({
+        row: rowNumber,
+        message: L(
+          `Οι χρήσεις που έγιναν «${usesDoneText}» δεν είναι μη αρνητικός ακέραιος.`,
+          `Uses made “${usesDoneText}” is not a whole number from 0.`,
+        ),
+      });
+      usesDone = undefined;
+    }
+    if (usesDone === undefined && usesLeft !== undefined) {
+      if (!Number.isInteger(usesLeft) || usesLeft < 0)
+        errors.push({
+          row: rowNumber,
+          message: L(
+            `Το υπόλοιπο χρήσεων «${usesLeftText}» δεν είναι μη αρνητικός ακέραιος.`,
+            `Uses left “${usesLeftText}” is not a whole number from 0.`,
+          ),
+        });
+      else if (maxUses !== undefined && Number.isInteger(maxUses) && maxUses >= 1) usesDone = maxUses - usesLeft;
+    }
+    if (usesDone !== undefined && usesDone > 0) {
+      if (maxUses === undefined)
+        errors.push({
+          row: rowNumber,
+          message: L(
+            'Χρήσεις που έγιναν χωρίς όριο χρήσεων: συμπληρώστε και τις «Μέγιστες χρήσεις».',
+            'Uses made without a use limit: fill in “Max uses” too.',
+          ),
+        });
+      else if (usesDone > maxUses)
+        errors.push({
+          row: rowNumber,
+          message: L(
+            `Οι χρήσεις που έγιναν (${usesDone}) ξεπερνούν το όριο (${maxUses}).`,
+            `Uses made (${usesDone}) are more than the limit (${maxUses}).`,
+          ),
+        });
+    }
     const departmentText = value(row, 'department');
     const department = departmentText ? departmentByKey.get(normalize(departmentText)) : undefined;
     if (departmentText && !department)
@@ -333,6 +407,7 @@ export function buildImportPlan(
       specialty: value(row, 'specialty'),
       manufacturer: value(row, 'manufacturer'),
       maxUses: maxUses !== undefined && Number.isInteger(maxUses) && maxUses > 0 ? maxUses : undefined,
+      usesDone: usesDone !== undefined && Number.isInteger(usesDone) && usesDone > 0 ? usesDone : 0,
       serialNumber,
       notes: value(row, 'notes'),
     };
@@ -387,7 +462,7 @@ export function buildImportPlan(
     name: line.name,
     specialty: line.specialty,
     manufacturer: line.manufacturer || undefined,
-    uses: 0,
+    uses: line.maxUses ? line.usesDone : 0,
     sterilizations: 0,
     maxUses: line.maxUses,
     serialNumber: line.serialNumber || undefined,
@@ -479,6 +554,9 @@ export const templateTable = (lang: 'el' | 'en') => ({
       '',
       '',
       '',
+      '',
+      '',
+      '',
     ],
     [
       'Βασικό Λαπαροτομίας 1',
@@ -493,7 +571,10 @@ export const templateTable = (lang: 'el' | 'en') => ({
       '',
       '',
       '',
+      '',
+      '',
+      '',
     ],
-    ['', '', 'GN100', 'Λαβίδα βιοψίας', 1, '', '', 'Γαστρεντερολογία', 'Olympus', 50, 'SN12345', ''],
+    ['', '', 'GN100', 'Λαβίδα βιοψίας', 1, '', '', 'Γαστρεντερολογία', 'Olympus', 50, '', '', 'SN12345', ''],
   ],
 });

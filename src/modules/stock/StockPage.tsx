@@ -4,7 +4,10 @@ import {useBrowseList} from '../../core/browseList';
 import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
-import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
+import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
@@ -37,6 +40,7 @@ export default function StockPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
   const {systemSettings} = useLibraries();
   const lowCount = useMemo(
@@ -49,6 +53,7 @@ export default function StockPage() {
     t =>
       (!specialty || t.specialty === specialty) &&
       (!manufacturer || t.manufacturer === manufacturer) &&
+      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
       matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
       (!state || t.state === state) &&
       `${t.name} ${t.code} ${t.barcode} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty}`
@@ -56,13 +61,14 @@ export default function StockPage() {
         .includes(q.toLowerCase()),
   );
   useBrowseList('/tools', filtered);
-  const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, usage].join('|'));
+  const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, limit, usage].join('|'));
   // The same number cards as the other lists: each one filters the list, the last opens the minimums.
   const kpi = kpiFilters({
     q: [q, setQ],
     specialty: [specialty, setSpecialty],
     manufacturer: [manufacturer, setManufacturer],
     state: [state, setState],
+    limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
   // A filter card shows the list (from the minimums view too); the minimums view lights its own card.
@@ -106,7 +112,7 @@ export default function StockPage() {
           {
             label: tr('Με όριο χρήσεων'),
             value: stock.filter(t => !!t.maxUses).length,
-            ...listKpi({usage: 'LIMITED'}),
+            ...listKpi({limit: 'LIMITED'}),
           },
           ...(withMinimums
             ? [
@@ -171,6 +177,13 @@ export default function StockPage() {
                 onChange: setState,
               },
               {
+                key: 'limit',
+                value: limit,
+                placeholder: tr('Με ή χωρίς όριο'),
+                options: limitFilterOptions(),
+                onChange: setLimit,
+              },
+              {
                 key: 'usage',
                 value: usage,
                 placeholder: tr('Όλοι οι τύποι χρήσης'),
@@ -178,6 +191,15 @@ export default function StockPage() {
                 onChange: setUsage,
               },
             ]}
+            extra={
+              <ListExport
+                table={() => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'))}
+                grouped={() =>
+                  toolsGroupedExportTable(filtered, tr('Απόθεμα εργαλείων'), systemSettings.usageWarningThreshold)
+                }
+                disabled={filtered.length === 0}
+              />
+            }
           />
           <ScrollableListPanel withKpis ariaLabel={tr('Απόθεμα εργαλείων')}>
             {filtered.length === 0 ? (
@@ -197,6 +219,7 @@ export default function StockPage() {
                   setSpecialty('');
                   setManufacturer('');
                   setState('');
+                  setLimit('');
                   setUsage('');
                 }}
               />
@@ -243,6 +266,7 @@ export default function StockPage() {
                           <>
                             <b>{t.uses}</b>
                             <span className="muted"> / {t.maxUses}</span>
+                            {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
                           </>
                         ) : (
                           <span className="muted">{tr('Χωρίς όριο')}</span>

@@ -1,6 +1,7 @@
 import type {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
+import {isNew} from '../../core/usageStatus';
 import {
   LOAD_STATUS,
   indicatorText,
@@ -141,6 +142,7 @@ export function buildReport(
           department: s.department,
           uses: s.uses || 0,
           maxUses: s.maxUses || 0,
+          fresh: isNew(s),
         })),
       ...tools
         .filter(t => t.maxUses)
@@ -151,14 +153,15 @@ export function buildReport(
           department: t.department || 'Απόθεμα',
           uses: t.uses,
           maxUses: t.maxUses || 0,
+          fresh: isNew(t),
         })),
     ]
       .map(a => ({
         ...a,
         remaining: Math.max(0, a.maxUses - a.uses),
         stateLabel: 'Σε χρήση',
-        // A limited-use Set or instrument with no use counted: new.
-        fresh: a.uses ? '—' : 'Ναι',
+        // New: a limit and no use made (see core/usageStatus).
+        fresh: a.fresh ? 'Ναι' : '—',
         retiredAt: '',
         reason: '',
       }))
@@ -184,7 +187,13 @@ export function buildReport(
         : inService.filter(
             a =>
               usageFilter === 'ALL' ||
-              (usageFilter === 'CRITICAL' ? a.remaining <= warningThreshold : a.remaining === 0),
+              (usageFilter === 'CRITICAL'
+                ? a.remaining > 0 && a.remaining <= warningThreshold
+                : usageFilter === 'NEW'
+                  ? a.fresh === 'Ναι'
+                  : usageFilter === 'USED'
+                    ? a.uses > 0 && a.remaining > 0
+                    : a.remaining === 0),
           )),
       ...(usageFilter === 'ALL' || usageFilter === 'RETIRED' ? retired : []),
     ]
@@ -200,7 +209,7 @@ export function buildReport(
         {key: 'maxUses', label: tr('Όριο')},
         {key: 'remaining', label: tr('Υπόλοιπο')},
         {key: 'stateLabel', label: tr('Κατάσταση')},
-        {key: 'fresh', label: tr('Καινούργιο')},
+        {key: 'fresh', label: tr('Αχρησιμοποίητο')},
         {key: 'retiredAt', label: tr('Εκτός χρήσης από')},
         {key: 'reason', label: tr('Αιτία')},
       ],

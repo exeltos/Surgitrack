@@ -4625,3 +4625,71 @@ html body .people-row .people-password.locked {
   color: #b3261e;
   background: #fde8e6;
 }
+
+/* The owner's reminder to those who have not set their own password: one line above the list. */
+.people-reminder {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff7e6;
+  color: #7a4a00;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.people-reminder > span:not(.people-reminder-ask) {
+  flex: 1 1 220px;
+}
+.people-reminder-ask {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Use limit: the number of uses made typed in, and the exhausted notice. */
+html body .usage-correct input {
+  width: 6ch;
+  padding: 3px 6px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 800;
+  text-align: right;
+}
+html body .usage-exhausted-warning {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 7px 9px;
+  border: 1px solid #e8a59e;
+  border-radius: 8px;
+  background: #fde8e6;
+  color: #8f1f17;
+  font-size: 11px;
+  font-weight: 700;
+}
+/* In the lists: an instrument with no use left that is still in service. */
+html body .usage-exhausted-badge {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #fde8e6;
+  color: #b3261e;
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* A strip of five cards (the individual instruments: the usage types) keeps them on one row on a wide screen. */
+html body .compact-kpis.kpis-wide {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+@media (max-width: 1100px) {
+  html body .compact-kpis.kpis-wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

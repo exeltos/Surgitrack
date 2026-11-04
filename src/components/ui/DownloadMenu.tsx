@@ -9,7 +9,9 @@ import {getI18nLang, tr} from '../../i18n';
  */
 export default function DownloadMenu({
   table,
+  grouped,
   onPrint,
+  onPrintGrouped,
   printLabel,
   variant = 'secondary',
   disabled,
@@ -17,39 +19,69 @@ export default function DownloadMenu({
 }: {
   /** The rows to download; built only when an option is chosen. */
   table: () => ExportTable;
+  /** The same list grouped by kind: when given, Excel, CSV and PDF are each offered both ways. */
+  grouped?: () => ExportTable;
   /** Opens the print preview (from which the user prints or saves as PDF); none: no PDF option. */
   onPrint?: () => void;
+  /** The print preview of the grouped list. */
+  onPrintGrouped?: () => void;
   printLabel?: string;
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
   align?: 'left' | 'right';
 }) {
+  const both = (label: string) =>
+    grouped ? [tr('{0} · αναλυτικά', label), tr('{0} · ομαδοποιημένα', label)] : [label];
+  const [xlsx, xlsxGrouped] = both(tr('Excel (.xlsx)'));
+  const [pdf, pdfGrouped] = both(printLabel || tr('PDF / Εκτύπωση'));
+  const [csv, csvGrouped] = both(tr('CSV (.csv)'));
+  const xlsxHint = tr('Πίνακας με φίλτρα, για επεξεργασία.');
+  const pdfHint = tr('Προεπισκόπηση, μετά εκτύπωση ή αποθήκευση ως PDF.');
+  const csvHint = tr('Απλό κείμενο, για άλλα προγράμματα.');
+  const groupedHint = tr('Ένα είδος ανά γραμμή, με σύνολα τεμαχίων και χρήσεων.');
   const items: ActionMenuItem[] = [
     {
       key: 'xlsx',
       icon: <FileSpreadsheet size={16} />,
-      label: tr('Excel (.xlsx)'),
-      hint: tr('Πίνακας με φίλτρα, για επεξεργασία.'),
+      label: xlsx,
+      hint: xlsxHint,
       onSelect: () => downloadXlsx(table()),
     },
-    ...(onPrint
+    ...(grouped
       ? [
           {
-            key: 'pdf',
-            icon: <Printer size={16} />,
-            label: printLabel || tr('PDF / Εκτύπωση'),
-            hint: tr('Προεπισκόπηση, μετά εκτύπωση ή αποθήκευση ως PDF.'),
-            onSelect: onPrint,
+            key: 'xlsx-grouped',
+            icon: <FileSpreadsheet size={16} />,
+            label: xlsxGrouped,
+            hint: groupedHint,
+            onSelect: () => downloadXlsx(grouped()),
           },
         ]
       : []),
-    {
-      key: 'csv',
-      icon: <FileText size={16} />,
-      label: tr('CSV (.csv)'),
-      hint: tr('Απλό κείμενο, για άλλα προγράμματα.'),
-      onSelect: () => downloadCsv(table()),
-    },
+    ...(onPrint ? [{key: 'pdf', icon: <Printer size={16} />, label: pdf, hint: pdfHint, onSelect: onPrint}] : []),
+    ...(grouped && onPrintGrouped
+      ? [
+          {
+            key: 'pdf-grouped',
+            icon: <Printer size={16} />,
+            label: pdfGrouped,
+            hint: groupedHint,
+            onSelect: onPrintGrouped,
+          },
+        ]
+      : []),
+    {key: 'csv', icon: <FileText size={16} />, label: csv, hint: csvHint, onSelect: () => downloadCsv(table())},
+    ...(grouped
+      ? [
+          {
+            key: 'csv-grouped',
+            icon: <FileText size={16} />,
+            label: csvGrouped,
+            hint: groupedHint,
+            onSelect: () => downloadCsv(grouped()),
+          },
+        ]
+      : []),
   ];
   return (
     <ActionMenu

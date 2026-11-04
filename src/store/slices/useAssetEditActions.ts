@@ -283,10 +283,35 @@ export function useAssetEditActions(
     });
     notify(tr('{0}: χρήσεις {1} → {2}.', asset.barcode, before, after));
   };
+  /**
+   * Sets how many uses were made (an instrument that was in use before the system, brought in with its uses, or one
+   * counted wrongly); same people as the correction, recorded. What is left follows: the limit less the uses.
+   */
+  const recordUsage = (kind: AssetKind, id: string, change: {uses?: number}) => {
+    if (!can('asset.usage.configure')) return;
+    const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
+    if (!asset?.maxUses || asset.state === 'RETIRED') return;
+    const before = asset.uses || 0;
+    const after =
+      change.uses === undefined ? before : Math.min(asset.maxUses, Math.max(0, Math.round(Number(change.uses) || 0)));
+    if (after === before) return;
+    if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
+    else setTools(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
+    addMovement({
+      asset: `${asset.barcode} · ${asset.name}`,
+      assetKind: kind,
+      from: asset.department || '—',
+      to: asset.department || '—',
+      status: `${tr('Διόρθωση χρήσεων')} · ${before} → ${after} · ${currentUser.name}`,
+      by: currentUser.name,
+    });
+    notify(tr('{0}: χρήσεις {1} → {2}.', asset.barcode, before, after));
+  };
   return {
     addToolsToSet,
     configureUsageLimit,
     correctUses,
+    recordUsage,
     lifecycleAlerts,
     renameTools,
     syncCompositionNames,

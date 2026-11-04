@@ -7,14 +7,17 @@ export default function UsageLimitCard({
   description,
   fresh,
   onCorrect,
+  onSetUses,
 }: {
   uses: number;
   maxUses?: number;
   description: string;
-  /** A use limit and no use counted yet: new. */
+  /** A use limit and no use counted: new (see core/usageStatus). */
   fresh?: boolean;
   /** Usage-limit managers only: corrects the recorded uses by one (a use counted by mistake, or missed). */
   onCorrect?: (delta: 1 | -1) => void;
+  /** Usage-limit managers only: sets how many uses were made (an instrument that was in use before the system). */
+  onSetUses?: (uses: number) => void;
 }) {
   const {systemSettings} = useLibraries();
   const remaining = maxUses !== undefined ? Math.max(0, maxUses - uses) : undefined;
@@ -30,7 +33,7 @@ export default function UsageLimitCard({
         <span className="usage-type-badge">{maxUses ? tr('Περιορισμένων χρήσεων') : tr('Χωρίς όριο')}</span>
         {maxUses !== undefined && fresh && (
           <span className="usage-fresh-badge" title={tr('Έχει όριο χρήσεων και καμία χρήση ακόμα.')}>
-            {tr('Καινούργιο')}
+            {tr('Αχρησιμοποίητο')}
           </span>
         )}
       </div>
@@ -39,7 +42,23 @@ export default function UsageLimitCard({
           <div className="usage-config-limit usage-view-stats">
             <div>
               <span>{tr('Χρήσεις που έχουν γίνει')}</span>
-              {onCorrect ? (
+              {onSetUses ? (
+                <span className="usage-correct">
+                  <input
+                    type="number"
+                    min={0}
+                    max={maxUses}
+                    defaultValue={uses}
+                    key={uses}
+                    aria-label={tr('Χρήσεις που έχουν γίνει')}
+                    onBlur={e => {
+                      const next = Math.min(maxUses, Math.max(0, Math.round(Number(e.target.value) || 0)));
+                      if (next !== uses) onSetUses(next);
+                      else e.target.value = String(uses);
+                    }}
+                  />
+                </span>
+              ) : onCorrect ? (
                 <span className="usage-correct">
                   <strong>{uses}</strong>
                   <button
@@ -77,7 +96,13 @@ export default function UsageLimitCard({
           <div className="usage-limit-bar" aria-label={tr('Χρησιμοποιήθηκε {0}% του ορίου', Math.round(percent))}>
             <span style={{width: `${percent}%`}} />
           </div>
-          {warning && (
+          {remaining === 0 && (
+            <div className="usage-exhausted-warning">
+              <TriangleAlert size={15} />
+              <span>{tr('Εξαντλημένο: δεν απομένει καμία χρήση. Αποσύρετε το από τη χρήση.')}</span>
+            </div>
+          )}
+          {warning && remaining !== 0 && (
             <div className="usage-threshold-warning">
               <TriangleAlert size={15} />
               <span>

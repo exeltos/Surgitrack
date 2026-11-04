@@ -253,6 +253,18 @@ describe('import-staff: sending the welcome email again', () => {
     expect(fake.calls.some(c => c.what === 'createUser')).toBe(false);
   });
 
+  it('can be a reminder: the subject and the first line say so, and nothing else changes', async () => {
+    mailOn();
+    person_(FIRST);
+    await handle(post({organization_id: 'org-1', resend: ['AB1000'], reminder: true}));
+    expect(mailState.outbox[0].subject).toMatch(/^Υπενθύμιση: /);
+    expect(mailState.outbox[0].html).toContain('δεν έχετε ακόμη κάνει την πρώτη σας σύνδεση');
+    expect(mailState.outbox[0].html).not.toContain('http');
+    mailState.outbox.length = 0;
+    await resend(['AB1000']);
+    expect(mailState.outbox[0].subject).not.toMatch(/Υπενθύμιση/);
+  });
+
   it('looks the person up in that hospital only', async () => {
     mailOn();
     person_(FIRST);

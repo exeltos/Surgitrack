@@ -20,6 +20,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
+import {isNew} from '../../core/usageStatus';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
@@ -60,7 +61,7 @@ export default function ToolDetailPage() {
     currentUser,
     can,
     setColorMarker,
-    correctUses,
+    recordUsage,
   } = useSurgi();
   const undone = useUndoneMovements();
   const navigate = useNavigate();
@@ -361,10 +362,10 @@ export default function ToolDetailPage() {
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
-                    fresh={!tool.uses}
-                    onCorrect={
+                    fresh={isNew(tool)}
+                    onSetUses={
                       can('asset.usage.configure') && tool.state !== 'RETIRED'
-                        ? delta => correctUses('TOOL', tool.id, delta)
+                        ? uses => recordUsage('TOOL', tool.id, {uses})
                         : undefined
                     }
                     description={tr('Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.')}

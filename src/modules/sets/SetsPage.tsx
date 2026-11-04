@@ -4,7 +4,9 @@ import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet} from 'lucide-react';
-import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
+import ListExport from '../../components/ui/ListExport';
+import {setsExportTable} from '../../core/assetExport';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
@@ -29,6 +31,7 @@ export default function SetsPage() {
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
   const [state, setState] = useRememberedState('state', '');
+  const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
   const [completeness, setCompleteness] = useRememberedState('completeness', '');
   // Limited-use instruments per Set, for the usage filter.
@@ -51,6 +54,7 @@ export default function SetsPage() {
     specialty: [specialty, setSpecialty],
     manufacturer: [manufacturer, setManufacturer],
     state: [state, setState],
+    limit: [limit, setLimit],
     usage: [usage, setUsage],
     completeness: [completeness, setCompleteness],
   });
@@ -59,6 +63,7 @@ export default function SetsPage() {
       (!department || s.department === department) &&
       (!specialty || s.specialty === specialty) &&
       (!manufacturer || s.manufacturer === manufacturer) &&
+      matchesUsage(limit, [s, ...(limitedBySet.get(s.id) || [])], systemSettings.usageWarningThreshold) &&
       matchesUsage(usage, [s, ...(limitedBySet.get(s.id) || [])], systemSettings.usageWarningThreshold) &&
       (!state || s.state === state) &&
       (!completeness || (completeness === 'SHORT' ? s.actual < s.expected : s.actual >= s.expected)) &&
@@ -75,7 +80,7 @@ export default function SetsPage() {
   useBrowseList('/sets', filtered);
   const rows = useProgressiveList(
     filtered,
-    [q, department, specialty, manufacturer, state, usage, completeness].join('|'),
+    [q, department, specialty, manufacturer, state, limit, usage, completeness].join('|'),
   );
   return (
     <div className="tools-list-workspace">
@@ -153,6 +158,13 @@ export default function SetsPage() {
             onChange: setState,
           },
           {
+            key: 'limit',
+            value: limit,
+            placeholder: tr('Με ή χωρίς όριο'),
+            options: limitFilterOptions(),
+            onChange: setLimit,
+          },
+          {
             key: 'usage',
             value: usage,
             placeholder: tr('Όλοι οι τύποι χρήσης'),
@@ -170,6 +182,12 @@ export default function SetsPage() {
             onChange: setCompleteness,
           },
         ]}
+        extra={
+          <ListExport
+            table={() => setsExportTable(filtered, memberCount, tr('Σετ εργαλείων'))}
+            disabled={filtered.length === 0}
+          />
+        }
       />
       <ScrollableListPanel ariaLabel={tr('Λίστα Σετ εργαλείων')}>
         {filtered.length === 0 ? (
@@ -197,6 +215,7 @@ export default function SetsPage() {
               setSpecialty('');
               setManufacturer('');
               setState('');
+              setLimit('');
               setUsage('');
               setCompleteness('');
             }}
