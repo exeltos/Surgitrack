@@ -4,6 +4,7 @@ import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
 import {getI18nLang} from '../../i18n';
 import {checkIpAccess} from '../../data/cloud/ipAccess';
+import {plainAddress} from '../../core/ipAddress';
 import type {Organization} from '../../core/LibraryStore';
 
 type Mode = 'OFF' | 'LOG' | 'ENFORCE';
@@ -31,6 +32,8 @@ export default function NetworkAccessDialog({
   const [myIp, setMyIp] = useState<string>();
   const [find, setFind] = useState('');
   const [state, setState] = useState<'loading' | 'ready' | 'saving'>('loading');
+  const [editing, setEditing] = useState(false);
+  const [reload, setReload] = useState(0);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -53,11 +56,9 @@ export default function NetworkAccessDialog({
       ]);
       if (!alive) return;
       const row = rule.data as {mode?: Mode; addresses?: Address[]; exempt_users?: string[]} | null;
-      if (row) {
-        setMode(row.mode || 'OFF');
-        setAddresses((row.addresses || []).map(a => ({ip: a.ip, label: a.label || ''})));
-        setExempt(row.exempt_users || []);
-      }
+      setMode(row?.mode || 'OFF');
+      setAddresses((row?.addresses || []).map(a => ({ip: plainAddress(a.ip), label: a.label || ''})));
+      setExempt(row?.exempt_users || []);
       setMembers((people.data as Member[] | null) || []);
       setLog((rows.data as LogRow[] | null) || []);
       setMyIp(mine?.ip);
@@ -66,7 +67,7 @@ export default function NetworkAccessDialog({
     return () => {
       alive = false;
     };
-  }, [organization.id]);
+  }, [organization.id, reload]);
 
   const nameOf = (id: string) => members.find(m => m.id === id)?.name || '—';
   const shown = members.filter(m => m.name.toLowerCase().includes(find.trim().toLowerCase()));
@@ -101,7 +102,9 @@ export default function NetworkAccessDialog({
       setState('ready');
       return;
     }
-    onClose();
+    setEditing(false);
+    setState('loading');
+    setReload(n => n + 1);
   };
 
   const modes: {value: Mode; label: string; hint: string}[] = [
@@ -121,7 +124,7 @@ export default function NetworkAccessDialog({
     {
       value: 'ENFORCE',
       label: L('Ενεργός', 'On'),
-      hint: L('Από άλλη διεύθυνση δεν φαίνονται δεδομένα.', 'From any other address no data is shown.'),
+      hint: L('Μπαίνουν μόνο από τις διευθύνσεις παρακάτω.', 'Only the addresses below get in.'),
     },
   ];
 
@@ -139,16 +142,19 @@ export default function NetworkAccessDialog({
         </header>
         <div className="studio-drawer-form">
           <small className="studio-field-hint">
-            {L(
-              'Ο owner μπαίνει πάντα από παντού. Όσους προσθέσετε στις εξαιρέσεις επίσης.',
-              'The owner always gets in from anywhere. So does anyone you add to the exceptions.',
-            )}
+            {L('Ο owner μπαίνει πάντα από παντού.', 'The owner always gets in from anywhere.')}
           </small>
           <fieldset className="studio-plan">
             <legend>{L('Λειτουργία', 'Mode')}</legend>
             {modes.map(m => (
               <label key={m.value} className="network-mode">
-                <input type="radio" name="ip-mode" checked={mode === m.value} onChange={() => setMode(m.value)} />
+                <input
+                  type="radio"
+                  name="ip-mode"
+                  disabled={!editing}
+                  checked={mode === m.value}
+                  onChange={() => setMode(m.value)}
+                />
                 <span>
                   <b>{m.label}</b>
                   <small>{m.hint}</small>
@@ -160,61 +166,67 @@ export default function NetworkAccessDialog({
           <fieldset className="studio-plan">
             <legend>{L('Επιτρεπτές διευθύνσεις', 'Allowed addresses')}</legend>
             {addresses.map((a, i) => (
-              <div className="network-address" key={i}>
+              <div className={`network-address ${editing ? 'editing' : ''}`} key={i}>
                 <input
                   value={a.ip}
+                  disabled={!editing}
                   placeholder="203.0.113.5"
                   aria-label={L('Διεύθυνση IP', 'IP address')}
                   onChange={e => setAddress(i, {ip: e.target.value})}
                 />
                 <input
                   value={a.label}
+                  disabled={!editing}
                   placeholder={L('Περιγραφή (π.χ. Wi-Fi)', 'Label (e.g. Wi-Fi)')}
                   aria-label={L('Περιγραφή', 'Label')}
                   onChange={e => setAddress(i, {label: e.target.value})}
                 />
-                <button
-                  type="button"
-                  className="network-remove"
-                  aria-label={L('Αφαίρεση', 'Remove')}
-                  onClick={() => setAddresses(list => list.filter((_, j) => j !== i))}
-                >
-                  <X size={14} />
-                </button>
+                {editing && (
+                  <button
+                    type="button"
+                    className="network-remove"
+                    aria-label={L('Αφαίρεση', 'Remove')}
+                    onClick={() => setAddresses(list => list.filter((_, j) => j !== i))}
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
             ))}
-            <div className="network-add">
-              <AppButton onClick={() => setAddresses(list => [...list, {ip: '', label: ''}])}>
-                {L('Προσθήκη διεύθυνσης', 'Add an address')}
-              </AppButton>
-              {myIp && !addresses.some(a => a.ip.trim() === myIp) && (
-                <AppButton
-                  onClick={() => setAddresses(list => [...list, {ip: myIp, label: L('Η διεύθυνσή μου', 'My address')}])}
-                >
-                  {L(`Προσθήκη της τωρινής μου (${myIp})`, `Add my current one (${myIp})`)}
+            {!addresses.length && !editing && <small>{L('Καμία διεύθυνση.', 'No address.')}</small>}
+            {editing && (
+              <div className="network-add">
+                <AppButton onClick={() => setAddresses(list => [...list, {ip: '', label: ''}])}>
+                  {L('Προσθήκη διεύθυνσης', 'Add an address')}
                 </AppButton>
-              )}
-            </div>
-            <small className="studio-field-hint">
-              {L(
-                'Μία διεύθυνση ή περιοχή, π.χ. 203.0.113.0/28.',
-                'A single address or a range such as 203.0.113.0/28.',
-              )}
-            </small>
+                {myIp && !addresses.some(a => a.ip.trim() === myIp) && (
+                  <AppButton onClick={() => setAddresses(list => [...list, {ip: myIp, label: L('Η IP μου', 'My IP')}])}>
+                    {L(`Προσθήκη της IP μου (${myIp})`, `Add my IP (${myIp})`)}
+                  </AppButton>
+                )}
+              </div>
+            )}
           </fieldset>
 
           <fieldset className="studio-plan">
-            <legend>{L('Εξαιρέσεις (μπαίνουν από παντού)', 'Exceptions (get in from anywhere)')}</legend>
-            <input
-              value={find}
-              placeholder={L('Αναζήτηση χρήστη…', 'Search a user…')}
-              aria-label={L('Αναζήτηση χρήστη', 'Search a user')}
-              onChange={e => setFind(e.target.value)}
-            />
+            <legend>{L('Εξαιρέσεις', 'Exceptions')}</legend>
+            {editing && (
+              <input
+                value={find}
+                placeholder={L('Αναζήτηση χρήστη…', 'Search a user…')}
+                aria-label={L('Αναζήτηση χρήστη', 'Search a user')}
+                onChange={e => setFind(e.target.value)}
+              />
+            )}
             <div className="network-people">
-              {shown.map(m => (
+              {(editing ? shown : members.filter(m => exempt.includes(m.id))).map(m => (
                 <label key={m.id}>
-                  <input type="checkbox" checked={exempt.includes(m.id)} onChange={() => toggle(m.id)} />
+                  <input
+                    type="checkbox"
+                    disabled={!editing}
+                    checked={exempt.includes(m.id)}
+                    onChange={() => toggle(m.id)}
+                  />
                   <span>
                     {m.name}
                     <small>
@@ -224,12 +236,19 @@ export default function NetworkAccessDialog({
                   </span>
                 </label>
               ))}
-              {state === 'ready' && !shown.length && <small>{L('Κανένας χρήστης.', 'No user.')}</small>}
+              {state === 'ready' && !editing && !exempt.length && (
+                <small>
+                  {L(
+                    'Καμία εξαίρεση. Μπαίνει μόνο ο owner από παντού.',
+                    'No exceptions. Only the owner gets in from anywhere.',
+                  )}
+                </small>
+              )}
             </div>
           </fieldset>
 
           <fieldset className="studio-plan">
-            <legend>{L('Πρόσφατες διευθύνσεις εκτός λίστας', 'Recent addresses outside the list')}</legend>
+            <legend>{L('Προσπάθειες από άλλη διεύθυνση', 'Attempts from another address')}</legend>
             {log.length ? (
               <table className="network-log">
                 <tbody>
@@ -250,10 +269,30 @@ export default function NetworkAccessDialog({
           {error && <small className="studio-field-error">{error}</small>}
         </div>
         <footer>
-          <AppButton onClick={onClose}>{L('Ακύρωση', 'Cancel')}</AppButton>
-          <AppButton variant="primary" disabled={state !== 'ready'} onClick={() => void save()}>
-            {L('Αποθήκευση', 'Save')}
-          </AppButton>
+          {editing ? (
+            <>
+              <AppButton
+                onClick={() => {
+                  setEditing(false);
+                  setError('');
+                  setState('loading');
+                  setReload(n => n + 1);
+                }}
+              >
+                {L('Ακύρωση', 'Cancel')}
+              </AppButton>
+              <AppButton variant="primary" disabled={state !== 'ready'} onClick={() => void save()}>
+                {L('Αποθήκευση', 'Save')}
+              </AppButton>
+            </>
+          ) : (
+            <>
+              <AppButton onClick={onClose}>{L('Κλείσιμο', 'Close')}</AppButton>
+              <AppButton variant="primary" disabled={state !== 'ready'} onClick={() => setEditing(true)}>
+                {L('Επεξεργασία', 'Edit')}
+              </AppButton>
+            </>
+          )}
         </footer>
       </aside>
     </div>
