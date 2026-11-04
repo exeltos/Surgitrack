@@ -33,14 +33,16 @@ export default function ListExport({
       {pickDay && (
         <label
           className="export-day"
-          title={tr('Η λήψη δείχνει και την κατάσταση της ημερομηνίας που επιλέγετε, σε σύγκριση με σήμερα.')}
+          title={tr(
+            'Η λήψη δείχνει την κατάσταση των εργαλείων όπως ήταν την ημερομηνία που επιλέγετε· κενό = σήμερα.',
+          )}
         >
-          <span>{tr('Σύγκριση με')}</span>
+          <span>{tr('Κατάσταση την')}</span>
           <input
             type="date"
             value={day}
             max={today}
-            aria-label={tr('Ημερομηνία σύγκρισης για τη λήψη')}
+            aria-label={tr('Ημερομηνία για την κατάσταση της λήψης')}
             onChange={event => setDay(event.target.value)}
           />
         </label>

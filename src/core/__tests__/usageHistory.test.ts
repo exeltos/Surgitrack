@@ -42,7 +42,7 @@ describe('the uses of an instrument on a past day', () => {
   });
 });
 
-describe('the exports compared with a day', () => {
+describe('the exports on a day', () => {
   const onDay = {
     day: '2026-11-01',
     byId: new Map([
@@ -51,23 +51,19 @@ describe('the exports compared with a day', () => {
     ]),
   };
   const tools = [tool({}), tool({id: 't2', barcode: 'T000002'})];
-  it('adds the uses then, what was left and the difference, and leaves out what did not exist', () => {
+  it('shows the uses and what was left on that day, and leaves out what did not exist', () => {
     const table = toolsExportTable(tools, 'Εργαλεία', onDay);
     expect(table.rows).toHaveLength(1);
-    const at = (h: string) => table.headers.indexOf(h);
-    expect(table.rows[0][at('Χρήσεις την 1/11/2026')]).toBe(1);
-    expect(table.rows[0][at('Υπόλοιπο την 1/11/2026')]).toBe(14);
-    expect(table.rows[0][at('Διαφορά χρήσεων')]).toBe(4);
-    expect(table.totals).toHaveLength(table.headers.length);
+    expect(table.rows[0][table.headers.indexOf('Χρήσεις')]).toBe(1);
+    expect(table.rows[0][table.headers.indexOf('Υπόλοιπο')]).toBe(14);
     expect(table.title).toContain('1/11/2026');
-  });
-  it('does the same for the grouped list, with totals under the right columns', () => {
-    const table = toolsGroupedExportTable(tools, 'Εργαλεία', 3, onDay);
-    const at = (h: string) => table.headers.indexOf(h);
-    expect(table.rows[0][at('Χρήσεις την 1/11/2026')]).toBe(1);
-    expect(table.rows[0][at('Διαφορά χρήσεων')]).toBe(4);
     expect(table.totals).toHaveLength(table.headers.length);
-    expect(table.totals?.[at('Διαφορά χρήσεων')]).toBe(4);
-    expect(table.totals?.[at('Εξαντλημένα')]).toBe(0);
+  });
+  it('does the same for the grouped list', () => {
+    const table = toolsGroupedExportTable(tools, 'Εργαλεία', 3, onDay);
+    expect(table.rows).toHaveLength(1);
+    expect(table.rows[0][table.headers.indexOf('Χρήσεις που έγιναν')]).toBe(1);
+    expect(table.rows[0][table.headers.indexOf('Υπόλοιπο ανά τεμάχιο')]).toBe('14');
+    expect(table.title).toContain('1/11/2026');
   });
 });
