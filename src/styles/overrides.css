@@ -4762,9 +4762,12 @@ html body .network-mode span {
 }
 html body .network-address {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-bottom: 8px;
+}
+html body .network-address.editing {
+  grid-template-columns: 1fr 1fr auto;
 }
 html body .network-remove {
   display: inline-flex;
