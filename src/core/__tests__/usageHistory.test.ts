@@ -63,6 +63,27 @@ describe('ties and earlier barcodes', () => {
   });
 });
 
+describe('a batch of corrections saved in any order', () => {
+  it('finds where a run of the same minute ended from its numbers', () => {
+    const jumbled = [
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 10 → 11 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 11 → 12 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 0 → 1 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 5 → 6 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 1 → 2 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 2 → 3 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 3 → 4 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 4 → 5 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 6 → 7 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 7 → 8 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 8 → 9 · Α'),
+      move('15/10/2026 11:56', 'Διόρθωση χρήσεων · 9 → 10 · Α'),
+    ];
+    expect(usesOnDay([tool({uses: 12})], jumbled, '2026-10-30', now).byId.get('t1')!.uses).toBe(12);
+    expect(usesOnDay([tool({uses: 12})], jumbled, '2026-10-14', now).byId.get('t1')!.uses).toBe(0);
+  });
+});
+
 describe('the exports on a day', () => {
   const onDay = {
     day: '2026-11-01',

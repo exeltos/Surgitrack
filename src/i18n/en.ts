@@ -1492,7 +1492,7 @@ export const en: Record<string, string> = {
   'Όλοι οι τύποι χρήσης': 'All usage types',
   'Με ή χωρίς όριο': 'With or without a limit',
   'κατάσταση την {0}': 'status on {0}',
-  'Κατάσταση την': 'Status on',
+  'Καθαρισμός ημερομηνίας': 'Clear the date',
   'Ημερομηνία για την κατάσταση της λήψης': 'Date for the status of the download',
   'Η λήψη δείχνει την κατάσταση των εργαλείων όπως ήταν την ημερομηνία που επιλέγετε· κενό = σήμερα.':
     'The download shows the tools as they were on the date you pick; empty = today.',

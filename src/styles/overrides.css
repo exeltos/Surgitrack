@@ -4694,16 +4694,57 @@ html body .compact-kpis.kpis-wide {
   }
 }
 
-/* The day to compare a list download with, beside the Download button. */
+/* The day of a list download and the Download button side by side as one control. */
+html body .export-group {
+  display: inline-flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+}
 html body .export-day {
+  position: relative;
+  display: inline-flex;
+}
+html body .export-day-toggle {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right-width: 0;
+}
+html body .export-day-clear {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: var(--muted, #667085);
+  justify-content: center;
+  width: 28px;
+  border: 1px solid var(--c-gray-90);
+  border-left: 0;
+  border-right: 0;
+  background: var(--c-white);
+  color: var(--c-cyan-35-2);
+  cursor: pointer;
 }
-html body .export-day input {
-  width: auto;
-  min-height: 36px;
-  padding: 4px 8px;
+html body .export-day-clear:hover {
+  background: var(--c-gray-95);
+  color: var(--c-cyan-35);
+}
+/* The real date input lies, invisible, over the whole button: a tap or click opens its own picker on every browser
+   (iOS has no showPicker), and the keyboard reaches it. */
+html body .export-day-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+html body .export-day:focus-within .export-day-toggle {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 1px;
+}
+html body .export-group .action-menu-toggle {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }

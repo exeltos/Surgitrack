@@ -33,8 +33,8 @@ export function usePeopleState(props: {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<'USERS' | 'DEPARTMENTS'>('USERS');
   const [query, setQuery] = useState('');
-  /** List filters: department id, role, and access (ACTIVE, INACTIVE, INVITED). */
-  const [filters, setFilters] = useState({department: '', role: '', access: ''});
+  /** List filters: department id, role, access (ACTIVE, INACTIVE, INVITED) and password (INITIAL, OWN, LOCKED). */
+  const [filters, setFilters] = useState({department: '', role: '', access: '', password: ''});
   const [inviteMenu, setInviteMenu] = useState(false);
   const [drawer, setDrawer] = useState<{member: Member | null} | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);

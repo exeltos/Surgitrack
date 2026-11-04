@@ -5,7 +5,8 @@ import {Plus, ChevronRight, Boxes, Gauge} from 'lucide-react';
 import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
-import {usesOnDay} from '../../core/usageHistory';
+import type {Tool} from '../../types/domain';
+import {usesOnDay, type UsesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -51,17 +52,19 @@ export default function StockPage() {
   );
   const values = (key: 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(stock.map(t => String(t[key] || '')).filter(Boolean))].sort();
-  const filtered = stock.filter(
-    t =>
-      (!specialty || t.specialty === specialty) &&
-      (!manufacturer || t.manufacturer === manufacturer) &&
-      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
-      matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
-      (!state || t.state === state) &&
-      `${t.name} ${t.code} ${t.barcode} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty}`
-        .toLowerCase()
-        .includes(q.toLowerCase()),
-  );
+  // The usage filters judge the instrument as it is, or as it was on the day chosen for a download.
+  const matchesList = (t: Tool, view: Tool = t) =>
+    (!specialty || t.specialty === specialty) &&
+    (!manufacturer || t.manufacturer === manufacturer) &&
+    matchesUsage(limit, [view], systemSettings.usageWarningThreshold) &&
+    matchesUsage(usage, [view], systemSettings.usageWarningThreshold) &&
+    (!state || t.state === state) &&
+    `${t.name} ${t.code} ${t.barcode} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty}`
+      .toLowerCase()
+      .includes(q.toLowerCase());
+  const filtered = stock.filter(t => matchesList(t));
+  const listOn = (history?: UsesOnDay) =>
+    history ? stock.filter(t => matchesList(t, {...t, uses: history.byId.get(t.id)?.uses ?? t.uses})) : filtered;
   useBrowseList('/tools', filtered);
   const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, limit, usage].join('|'));
   // The same number cards as the other lists: each one filters the list, the last opens the minimums.
@@ -195,16 +198,20 @@ export default function StockPage() {
             ]}
             extra={
               <ListExport
-                table={day => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'), onDay(day))}
+                table={day => {
+                  const history = onDay(day);
+                  return toolsExportTable(listOn(history), tr('Απόθεμα εργαλείων'), history);
+                }}
                 pickDay
-                grouped={day =>
-                  toolsGroupedExportTable(
-                    filtered,
+                grouped={day => {
+                  const history = onDay(day);
+                  return toolsGroupedExportTable(
+                    listOn(history),
                     tr('Απόθεμα εργαλείων'),
                     systemSettings.usageWarningThreshold,
-                    onDay(day),
-                  )
-                }
+                    history,
+                  );
+                }}
                 disabled={filtered.length === 0}
               />
             }

@@ -60,6 +60,11 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
           : filters.access === 'ACTIVE'
             ? m.active
             : !m.active && invitedAt(m) === undefined)) &&
+      (!filters.password ||
+        (invitedAt(m) === undefined &&
+          (filters.password === 'OWN'
+            ? !m.password_change_required
+            : m.password_change_required && (filters.password === 'INITIAL' ? m.active : !m.active)))) &&
       (!q ||
         `${m.name} ${m.email} ${m.user_code || ''} ${roleLabel(roleValue(m))} ${departmentName(m.department_id)}`
           .toLowerCase()
