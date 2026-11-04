@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   seedDemoOrganization: vi.fn(),
   org: {name: 'Test Hospital', is_demo: false, evaluation: false, plan: 'STANDARD', trial_ends_at: null},
   dataMode: 'PRODUCTION',
+  ip: null as unknown,
 }));
 
 vi.mock('../../../lib/supabase', () => {
@@ -17,6 +18,7 @@ vi.mock('../../../lib/supabase', () => {
   return {
     supabase: {
       auth: {onAuthStateChange: () => undefined},
+      rpc: () => result(mocks.ip),
       from: (table: string) => ({
         select: () => ({
           eq: () => ({
@@ -167,5 +169,33 @@ describe('opening the hospital', () => {
       cleanup();
       expect(await open({})).toBe('true|true');
     });
+  });
+});
+
+describe('a hospital that lets people in only from its own network', () => {
+  const open = () =>
+    render(<CloudWorkspaceGate>{ws => <div data-testid="app">{ws ? 'in' : 'local'}</div>}</CloudWorkspaceGate>);
+  it('turns away an address that is not allowed, and says which address it saw', async () => {
+    mocks.ip = {mode: 'ENFORCE', allowed: false, ip: '192.0.2.44'};
+    mocks.loadAppRecords.mockClear();
+    mocks.loadAppRecords.mockResolvedValue(serverRecords());
+    mocks.readCache.mockResolvedValue({});
+    open();
+    expect(await screen.findByText(/μόνο από το δίκτυο του νοσοκομείου/)).toBeInTheDocument();
+    expect(screen.getByText('192.0.2.44')).toBeInTheDocument();
+    expect(screen.queryByTestId('app')).not.toBeInTheDocument();
+    expect(mocks.loadAppRecords).not.toHaveBeenCalled();
+    mocks.ip = null;
+  });
+  it('lets everyone in when it only records, and when the answer cannot be had', async () => {
+    mocks.loadAppRecords.mockResolvedValue(serverRecords());
+    mocks.readCache.mockResolvedValue({});
+    mocks.ip = {mode: 'LOG', allowed: false, ip: '192.0.2.44'};
+    open();
+    expect(await screen.findByTestId('app')).toHaveTextContent('in');
+    cleanup();
+    mocks.ip = null;
+    open();
+    expect(await screen.findByTestId('app')).toHaveTextContent('in');
   });
 });

@@ -4748,3 +4748,61 @@ html body .export-group .action-menu-toggle {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
+/* The platform owner's network rule for a hospital. */
+html body .network-mode {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+}
+html body .network-mode span {
+  display: grid;
+  gap: 2px;
+}
+html body .network-address {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+html body .network-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: var(--c-white);
+  cursor: pointer;
+}
+html body .network-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+html body .network-people {
+  display: grid;
+  gap: 4px;
+  max-height: 220px;
+  margin-top: 8px;
+  overflow: auto;
+}
+html body .network-people label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+html body .network-people small {
+  display: block;
+  color: var(--muted, #667085);
+}
+html body .network-log {
+  width: 100%;
+  font-size: 0.78rem;
+  border-collapse: collapse;
+}
+html body .network-log td {
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
