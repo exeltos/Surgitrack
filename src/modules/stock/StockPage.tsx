@@ -6,7 +6,7 @@ import {useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
-import {toolsExportTable} from '../../core/assetExport';
+import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -184,6 +184,7 @@ export default function StockPage() {
             extra={
               <ListExport
                 table={() => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'))}
+                grouped={() => toolsGroupedExportTable(filtered, tr('Απόθεμα εργαλείων'))}
                 disabled={filtered.length === 0}
               />
             }

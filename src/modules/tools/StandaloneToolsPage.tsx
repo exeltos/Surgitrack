@@ -5,7 +5,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
-import {toolsExportTable} from '../../core/assetExport';
+import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
@@ -257,6 +257,7 @@ export default function StandaloneToolsPage() {
             </button>
             <ListExport
               table={() => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
+              grouped={() => toolsGroupedExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
               disabled={filtered.length === 0}
             />
           </>

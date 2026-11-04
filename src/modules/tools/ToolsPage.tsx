@@ -5,7 +5,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
-import {toolsExportTable} from '../../core/assetExport';
+import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
@@ -155,7 +155,11 @@ export default function ToolsPage() {
             },
           ]}
           extra={
-            <ListExport table={() => toolsExportTable(filtered, tr('Εργαλεία'))} disabled={filtered.length === 0} />
+            <ListExport
+              table={() => toolsExportTable(filtered, tr('Εργαλεία'))}
+              grouped={() => toolsGroupedExportTable(filtered, tr('Εργαλεία'))}
+              disabled={filtered.length === 0}
+            />
           }
         />
       </div>

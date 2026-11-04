@@ -14,6 +14,8 @@ export type ExportTable = {
   subtitle?: string;
   headers: string[];
   rows: Array<Array<string | number>>;
+  /** A totals line under the rows (bold, outside the filter in Excel); same columns as the rows. */
+  totals?: Array<string | number>;
 };
 
 const xml = (value: string | number) =>
@@ -94,7 +96,14 @@ const zip = (files: Array<{name: string; content: string}>) => {
 const sheetXml = (table: ExportTable) => {
   const width = table.headers.length;
   const lengths = table.headers.map((header, i) =>
-    Math.min(60, Math.max(header.length, ...table.rows.map(row => String(row[i] ?? '').length)) + 2),
+    Math.min(
+      60,
+      Math.max(
+        header.length,
+        String(table.totals?.[i] ?? '').length,
+        ...table.rows.map(row => String(row[i] ?? '').length),
+      ) + 2,
+    ),
   );
   // Text goes in as an inline string: Excel shows it as text and never evaluates it, even when it starts
   // with = + - or @, so exported records cannot carry formulas. Never write text cells as <f>.
@@ -108,13 +117,18 @@ const sheetXml = (table: ExportTable) => {
   const bodyRows = table.rows
     .map((row, r) => `<row r="${r + 5}">${row.map((v, i) => cell(v ?? '', `${column(i)}${r + 5}`, 0)).join('')}</row>`)
     .join('');
+  // The totals sit two rows under the data, so a filter on the data never hides or moves them.
+  const totalsRowNumber = table.rows.length + 6;
+  const totalsRow = table.totals
+    ? `<row r="${totalsRowNumber}">${table.totals.map((v, i) => cell(v ?? '', `${column(i)}${totalsRowNumber}`, 4)).join('')}</row>`
+    : '';
   const last = `${column(width - 1)}${Math.max(4, table.rows.length + 4)}`;
   return (
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
     '<sheetViews><sheetView workbookViewId="0"><pane ySplit="4" topLeftCell="A5" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
     `<cols>${lengths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols>` +
-    `<sheetData>${titleRow}${subtitleRow}${headerRow}${bodyRows}</sheetData>` +
+    `<sheetData>${titleRow}${subtitleRow}${headerRow}${bodyRows}${totalsRow}</sheetData>` +
     `<autoFilter ref="A4:${last}"/>` +
     '</worksheet>'
   );
@@ -123,16 +137,18 @@ const sheetXml = (table: ExportTable) => {
 const STYLES =
   '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
   '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
-  '<fonts count="4"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="15"/><name val="Calibri"/></font>' +
-  '<font><i/><sz val="10"/><color rgb="FF5B6B75"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts>' +
-  '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
-  '<fill><patternFill patternType="solid"><fgColor rgb="FF1D6B7A"/><bgColor indexed="64"/></patternFill></fill></fills>' +
-  '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+  '<fonts count="5"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="15"/><name val="Calibri"/></font>' +
+  '<font><i/><sz val="10"/><color rgb="FF5B6B75"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>' +
+  '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
+  '<fill><patternFill patternType="solid"><fgColor rgb="FF1D6B7A"/><bgColor indexed="64"/></patternFill></fill>' +
+  '<fill><patternFill patternType="solid"><fgColor rgb="FFEEF4F6"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+  '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left/><right/><top style="thin"><color rgb="FF1D6B7A"/></top><bottom/><diagonal/></border></borders>' +
   '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-  '<cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+  '<cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
   '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
   '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
-  '<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs>' +
+  '<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>' +
+  '<xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/></cellXfs>' +
   '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
   '</styleSheet>';
 
@@ -249,7 +265,8 @@ const csvCell = (value: string | number) => {
  * Greek and most European settings expects), with a byte-order mark so Greek opens correctly.
  */
 export function tableCsv(table: ExportTable) {
-  return '\ufeff' + [table.headers, ...table.rows].map(row => row.map(csvCell).join(';')).join('\r\n') + '\r\n';
+  const lines = [table.headers, ...table.rows, ...(table.totals ? [table.totals] : [])];
+  return '\ufeff' + lines.map(row => row.map(csvCell).join(';')).join('\r\n') + '\r\n';
 }
 /** Downloads the table as CSV. */
 export function downloadCsv(table: ExportTable) {
@@ -276,12 +293,13 @@ th { background: #1d6b7a; color: #fff; text-align: left; padding: 6px 7px; font-
 td { padding: 5px 7px; border-bottom: 1px solid #dde5ea; vertical-align: top; }
 tr:nth-child(even) td { background: #f5f8fa; }
 tr { page-break-inside: avoid; }
+tfoot th.total { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; }
 footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
 </style></head><body>
 <header><div><h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
 <small>SurgiTrack<br>${html(printed)}</small></header>
 <table><thead><tr>${table.headers.map(h => `<th>${html(h)}</th>`).join('')}</tr></thead>
-<tbody>${table.rows.map(row => `<tr>${row.map(v => `<td>${html(v ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>
+<tbody>${table.rows.map(row => `<tr>${row.map(v => `<td>${html(v ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>${table.totals ? `<tfoot><tr>${table.totals.map(v => `<th class="total">${html(v ?? '')}</th>`).join('')}</tr></tfoot>` : ''}</table>
 <footer>${table.rows.length} ${lang === 'el' ? (table.rows.length === 1 ? 'εγγραφή' : 'εγγραφές') : table.rows.length === 1 ? 'record' : 'records'}</footer>
 </body></html>`);
 }
