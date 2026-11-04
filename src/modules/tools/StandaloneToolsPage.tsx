@@ -7,6 +7,7 @@ import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
+import {distinctValues, groupTools, toolKind} from '../../core/toolGroups';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -73,17 +74,8 @@ export default function StandaloneToolsPage() {
         .includes(q.toLowerCase()),
   );
   const filterKey = [q, department, specialty, manufacturer, state, usage, grouped].join('|');
-  const groupKey = (t: Tool) => `${t.code}|${t.name}|${t.manufacturer}`;
-  const groups = useMemo(() => {
-    const m = new Map<string, Tool[]>();
-    filtered.forEach(t => {
-      const k = groupKey(t);
-      const list = m.get(k);
-      if (list) list.push(t);
-      else m.set(k, [t]);
-    });
-    return [...m.values()];
-  }, [filtered]);
+  const groupKey = (t: Tool) => toolKind(t);
+  const groups = useMemo(() => groupTools(filtered), [filtered]);
   // Groups opened in place to show their pieces.
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
   const toggleGroup = (key: string) =>
@@ -321,7 +313,14 @@ export default function StandaloneToolsPage() {
                                   {t.name}
                                 </button>
                                 <small className="row-sub">
-                                  {[t.manufacturer, t.code].filter(Boolean).join(' · ')}
+                                  {[
+                                    distinctValues(g, x => x.manufacturer).join(', '),
+                                    distinctValues(g, x => x.code).length > 1
+                                      ? tr('{0} κωδικοί', distinctValues(g, x => x.code).length)
+                                      : t.code,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' · ')}
                                 </small>
                               </span>
                             </div>

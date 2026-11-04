@@ -2,6 +2,7 @@ import {statusLabel} from '../components/ui/statusLabel';
 import {tr, trData} from '../i18n';
 import {STERILE_STATES, formatExpiry} from './sterileExpiry';
 import {isExhausted, isNew} from './usageStatus';
+import {distinctValues, groupTools} from './toolGroups';
 import type {ExportTable} from './exportTable';
 import type {SetAsset, Tool} from '../types/domain';
 
@@ -102,27 +103,23 @@ export const setsExportTable = (sets: SetAsset[], memberCount: Map<string, numbe
 });
 
 /**
- * The same instruments grouped by code, name and company (as the list's «Ομαδοποίηση»): one row per kind with its
+ * The same instruments grouped by kind, i.e. by name (as the list's «Ομαδοποίηση», see core/toolGroups): one row per kind with its
  * pieces, the departments they are in, how many have a limit, the uses made and left, and how many are new or
  * exhausted; and the totals under them.
  */
 export const toolsGroupedExportTable = (tools: Tool[], title: string): ExportTable => {
-  const groups = new Map<string, Tool[]>();
-  for (const t of tools) {
-    const key = `${t.code}|${t.name}|${t.manufacturer || ''}`;
-    groups.set(key, [...(groups.get(key) || []), t]);
-  }
-  const rows = [...groups.values()]
-    .sort((a, b) => a[0].name.localeCompare(b[0].name, 'el') || a[0].code.localeCompare(b[0].code))
+  const rows = groupTools(tools)
+    .sort((a, b) => a[0].name.localeCompare(b[0].name, 'el'))
     .map(g => {
       const limited = g.filter(t => t.maxUses);
-      const departments = [...new Set(g.map(t => trData(t.department) || tr('Απόθεμα')))].sort((a, b) =>
+      const departments = distinctValues(g, t => trData(t.department) || tr('Απόθεμα')).sort((a, b) =>
         a.localeCompare(b, 'el'),
       );
+      const codes = distinctValues(g, t => t.code);
       return [
         g[0].name,
-        g[0].code || '',
-        g[0].manufacturer || '',
+        codes.length > 1 ? tr('{0} κωδικοί', codes.length) : codes[0] || '',
+        distinctValues(g, t => t.manufacturer).join(', '),
         trData(g.find(t => t.specialty)?.specialty) || '',
         departments.join(' · '),
         g.length,

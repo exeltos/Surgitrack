@@ -29,4 +29,16 @@ describe('the individual instruments in use', () => {
     expect(card('Καινούργια').getAttribute('title')).toMatch(/αρχικός αριθμός χρήσεων/);
     expect(screen.getByRole('button', {name: /Λήψη/})).toBeInTheDocument();
   });
+
+  it('groups the pieces by kind with the button, and takes the list both itemised and grouped', () => {
+    renderPage(<StandaloneToolsPage />);
+    const rowsBefore = document.querySelectorAll('tbody tr').length;
+    const toggle = screen.getByRole('button', {name: /Ομαδοποίηση/});
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(document.querySelectorAll('tbody tr').length).toBeLessThanOrEqual(rowsBefore);
+    fireEvent.click(screen.getByRole('button', {name: /Λήψη/}));
+    expect(screen.getByRole('menuitem', {name: /Excel \(\.xlsx\) · ομαδοποιημένα/})).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', {name: /Excel \(\.xlsx\) · αναλυτικά/})).toBeInTheDocument();
+  });
 });

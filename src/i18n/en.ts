@@ -726,9 +726,9 @@ export const en: Record<string, string> = {
     'Completing records a shared batch ID, sender, receiver, department, time and the visible-deviation declaration per barcode.',
   'Καινούργια (0 χρήσεις)': 'New (0 uses)',
   'Εξαντλημένα (0 υπόλοιπο)': 'Exhausted (0 left)',
-  'Στο αρχείο, ένα είδος ανά γραμμή με σύνολα τεμαχίων και χρήσεων.':
-    'In the file, one kind per row with totals of pieces and uses.',
-  Ομαδοποιημένα: 'Grouped',
+  'Ένα είδος ανά γραμμή, με σύνολα τεμαχίων και χρήσεων.': 'One kind per row, with totals of pieces and uses.',
+  '{0} · αναλυτικά': '{0} · itemised',
+  '{0} · ομαδοποιημένα': '{0} · grouped',
   'Σύνολο εργαλείων: {0}': 'Instruments in total: {0}',
   'Σύνολο Σετ: {0}': 'Sets in total: {0}',
   'Σύνολο ειδών: {0}': 'Kinds in total: {0}',
