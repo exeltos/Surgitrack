@@ -7,6 +7,7 @@ import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable} from '../../core/assetExport';
+import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
@@ -251,6 +252,7 @@ export default function StockPage() {
                           <>
                             <b>{t.uses}</b>
                             <span className="muted"> / {t.maxUses}</span>
+                            {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
                           </>
                         ) : (
                           <span className="muted">{tr('Χωρίς όριο')}</span>

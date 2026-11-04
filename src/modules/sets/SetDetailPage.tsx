@@ -19,6 +19,7 @@ import {
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
+import {isNew} from '../../core/usageStatus';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import AddToolsToSetModal from '../../components/assets/AddToolsToSetModal';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -68,7 +69,7 @@ export default function SetDetailPage() {
     preparations,
     sterilizationReleases,
     organizationName,
-    correctUses,
+    recordUsage,
   } = useSurgi();
   const undone = useUndoneMovements();
   const navigate = useNavigate();
@@ -316,8 +317,12 @@ export default function SetDetailPage() {
                   <UsageLimitCard
                     uses={uses}
                     maxUses={set.maxUses}
-                    fresh={!uses}
-                    onCorrect={can('asset.usage.configure') ? delta => correctUses('SET', set.id, delta) : undefined}
+                    fresh={isNew(set)}
+                    declaredNew={!!set.fresh}
+                    onSetUses={can('asset.usage.configure') ? uses => recordUsage('SET', set.id, {uses}) : undefined}
+                    onToggleNew={
+                      can('asset.usage.configure') ? () => recordUsage('SET', set.id, {fresh: !set.fresh}) : undefined
+                    }
                     description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />
                   <dl className="asset-definition-list compact-status-list">

@@ -42,6 +42,8 @@ export interface Tool {
   state: AssetState;
   maxUses?: number;
   uses: number;
+  /** Declared new (the hospital knows no use was made before it came to the system): see core/usageStatus. */
+  fresh?: boolean;
   sterilizations: number;
   serialNumber?: string;
   purchaseDate?: string;
@@ -97,6 +99,8 @@ export interface SetAsset {
   notes?: string;
   uses?: number;
   maxUses?: number;
+  /** Declared new, as for an instrument. */
+  fresh?: boolean;
   photos?: AssetPhoto[];
   /** Color marker: 1-3 tape ids in order. */
   colorTapes?: string[];

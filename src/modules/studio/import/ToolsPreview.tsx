@@ -46,7 +46,7 @@ export default function ToolsPreview({plan, L}: {plan: ImportPlan; L: (el: strin
               <th>{L('Κωδικός', 'Code')}</th>
               <th>{L('Κατασκευαστής', 'Manufacturer')}</th>
               <th>{L('Θέση', 'Place')}</th>
-              <th>{L('Όριο χρήσεων', 'Use limit')}</th>
+              <th>{L('Χρήσεις / όριο', 'Uses / limit')}</th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +57,10 @@ export default function ToolsPreview({plan, L}: {plan: ImportPlan; L: (el: strin
                 <td>{t.code || '—'}</td>
                 <td>{t.manufacturer || '—'}</td>
                 <td>{t.setId ? setNames.get(t.setId) || L('Σετ', 'Set') : t.department || L('Απόθεμα', 'Stock')}</td>
-                <td>{t.maxUses || '—'}</td>
+                <td>
+                  {t.maxUses ? `${t.uses} / ${t.maxUses}` : '—'}
+                  {t.fresh && <span className="usage-fresh-badge">{L('Καινούργιο', 'New')}</span>}
+                </td>
               </tr>
             ))}
           </tbody>

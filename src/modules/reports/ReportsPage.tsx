@@ -279,8 +279,9 @@ export default function ReportsPage() {
             key: 'usage',
             placeholder: tr('Σε χρήση & εκτός χρήσης'),
             options: [
-              {value: 'CRITICAL', label: tr('Κρίσιμο · ≤ {0}', warningThreshold)},
-              {value: 'EXHAUSTED', label: tr('Συμπληρωμένο όριο · 0')},
+              {value: 'CRITICAL', label: tr('Κρίσιμο · 1 έως {0}', warningThreshold)},
+              {value: 'EXHAUSTED', label: tr('Εξαντλημένα · 0 υπόλοιπο')},
+              {value: 'NEW', label: tr('Καινούργια')},
               {value: 'RETIRED', label: tr('Εκτός χρήσης')},
             ],
             ...choice(usageFilter, setUsageFilter),

@@ -192,6 +192,10 @@ export type CreateToolPayload = {
   manufacturer?: string;
   quantity: number;
   maxUses?: number;
+  /** Uses already made (an instrument in use before it came to the system); with a limit only. */
+  uses?: number;
+  /** Declared new: a limit, no use made. */
+  fresh?: boolean;
   notes?: string;
   serialNumber?: string;
 };
@@ -333,6 +337,7 @@ export type SurgiStoreValue = {
   completeDeliveryToDepartment: (kind: AssetKind, id: string, payload: DeliveryPayload) => DeliveryRecord | undefined;
   /** Corrects recorded uses by one (usage-limit managers only). */
   correctUses: (kind: AssetKind, id: string, delta: 1 | -1) => void;
+  recordUsage: (kind: AssetKind, id: string, change: {uses?: number; fresh?: boolean}) => void;
   /** The latest movement of a Set or instrument that could be undone, and whether this person may. */
   undoInfo: (kind: AssetKind, id: string) => UndoInfo | undefined;
   /** Undoes a dispatch, receipt or delivery made by mistake (a reason is required). */

@@ -6,6 +6,7 @@ import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable} from '../../core/assetExport';
+import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -249,6 +250,7 @@ export default function ToolsPage() {
                         <>
                           <b>{t.uses}</b>
                           <span className="muted"> / {t.maxUses}</span>
+                          {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
                         </>
                       ) : (
                         <span className="muted">{tr('Χωρίς όριο')}</span>

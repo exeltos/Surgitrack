@@ -14,23 +14,32 @@ describe('usage filter', () => {
     expect(matchesUsage('LOW', [low], 3)).toBe(true);
     expect(matchesUsage('LOW', [limited], 3)).toBe(false);
   });
-  it('finds new instruments: a limit, none of it used yet (the remaining uses are the original number)', () => {
-    expect(matchesUsage('NEW', [{maxUses: 18, uses: 0}], 3)).toBe(true);
-    expect(matchesUsage('NEW', [{maxUses: 18}], 3)).toBe(true);
-    expect(matchesUsage('NEW', [limited], 3)).toBe(false);
+  it('finds new instruments: a limit, no use made, and declared new', () => {
+    expect(matchesUsage('NEW', [{maxUses: 18, uses: 0, fresh: true}], 3)).toBe(true);
+    // Zero uses alone is not new: everything imported starts at zero, used before or not.
+    expect(matchesUsage('NEW', [{maxUses: 18, uses: 0}], 3)).toBe(false);
+    expect(matchesUsage('NEW', [{maxUses: 18, uses: 1, fresh: true}], 3)).toBe(false);
     expect(matchesUsage('NEW', [free], 3)).toBe(false);
     // A Set is new when every instrument with a limit is.
     expect(
       matchesUsage(
         'NEW',
         [
-          {maxUses: 18, uses: 0},
+          {maxUses: 18, fresh: true},
           {maxUses: 10, uses: 1},
         ],
         3,
       ),
     ).toBe(false);
-    expect(matchesUsage('NEW', [{maxUses: 18, uses: 0}, free], 3)).toBe(true);
+    expect(matchesUsage('NEW', [{maxUses: 18, fresh: true}, free], 3)).toBe(true);
+  });
+  it('keeps few lives left and none left apart', () => {
+    const none = {maxUses: 3, uses: 3};
+    expect(matchesUsage('LOW', [low], 3)).toBe(true);
+    expect(matchesUsage('LOW', [none], 3)).toBe(false);
+    expect(matchesUsage('EXHAUSTED', [none], 3)).toBe(true);
+    expect(matchesUsage('EXHAUSTED', [low], 3)).toBe(false);
+    expect(matchesUsage('EXHAUSTED', [free], 3)).toBe(false);
   });
   it('finds unlimited, and a Set counts its members', () => {
     expect(matchesUsage('UNLIMITED', [free], 3)).toBe(true);

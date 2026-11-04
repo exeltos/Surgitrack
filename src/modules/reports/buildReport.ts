@@ -1,6 +1,7 @@
 import type {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
+import {isNew} from '../../core/usageStatus';
 import {
   LOAD_STATUS,
   indicatorText,
@@ -141,6 +142,7 @@ export function buildReport(
           department: s.department,
           uses: s.uses || 0,
           maxUses: s.maxUses || 0,
+          fresh: isNew(s),
         })),
       ...tools
         .filter(t => t.maxUses)
@@ -151,14 +153,15 @@ export function buildReport(
           department: t.department || 'Απόθεμα',
           uses: t.uses,
           maxUses: t.maxUses || 0,
+          fresh: isNew(t),
         })),
     ]
       .map(a => ({
         ...a,
         remaining: Math.max(0, a.maxUses - a.uses),
         stateLabel: 'Σε χρήση',
-        // A limited-use Set or instrument with no use counted: new.
-        fresh: a.uses ? '—' : 'Ναι',
+        // New: a limit, no use made, and declared new (see core/usageStatus), not just zero uses.
+        fresh: a.fresh ? 'Ναι' : '—',
         retiredAt: '',
         reason: '',
       }))
@@ -184,7 +187,11 @@ export function buildReport(
         : inService.filter(
             a =>
               usageFilter === 'ALL' ||
-              (usageFilter === 'CRITICAL' ? a.remaining <= warningThreshold : a.remaining === 0),
+              (usageFilter === 'CRITICAL'
+                ? a.remaining > 0 && a.remaining <= warningThreshold
+                : usageFilter === 'NEW'
+                  ? a.fresh === 'Ναι'
+                  : a.remaining === 0),
           )),
       ...(usageFilter === 'ALL' || usageFilter === 'RETIRED' ? retired : []),
     ]

@@ -42,9 +42,18 @@ export function reportSummary(active: ReportId, rows: Row[], warningThreshold: n
       },
       {
         label: tr('Κρίσιμο όριο'),
-        value: count(rows, r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold),
+        value: count(
+          rows,
+          r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) > 0 && Number(r.remaining) <= warningThreshold,
+        ),
         tone: 'warn',
-        test: r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold,
+        test: r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) > 0 && Number(r.remaining) <= warningThreshold,
+      },
+      {
+        label: tr('Εξαντλημένα'),
+        value: count(rows, r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) === 0),
+        tone: 'bad',
+        test: r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) === 0,
       },
       {label: tr('Καινούργια'), value: count(rows, r => r.fresh === 'Ναι'), test: r => r.fresh === 'Ναι'},
       {

@@ -1,26 +1,28 @@
 import {tr} from '../i18n';
+import {isExhausted, isLimited, isLow, isNew, type Lives} from './usageStatus';
 
-export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'LOW' | 'UNLIMITED';
+export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'LOW' | 'EXHAUSTED' | 'UNLIMITED';
 
-/** Options of the "usage type" list filter: instruments with lives, new (none used), few lives left, or no limit. */
+/**
+ * Options of the "usage type" list filter: instruments with lives, new (declared new, none used), few lives left,
+ * none left, or no limit.
+ */
 export const usageFilterOptions = () => [
   {value: 'LIMITED', label: tr('Με όριο χρήσεων')},
   {value: 'NEW', label: tr('Καινούργια (0 χρήσεις)')},
   {value: 'LOW', label: tr('Λίγες χρήσεις')},
+  {value: 'EXHAUSTED', label: tr('Εξαντλημένα (0 υπόλοιπο)')},
   {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
 ];
-
-type Lives = {maxUses?: number; uses?: number};
-
-const remaining = (x: Lives) => (x.maxUses ? Math.max(0, x.maxUses - (x.uses || 0)) : Infinity);
 
 /** Whether an instrument (or any of the given instruments, e.g. a Set's) matches the usage filter. */
 export const matchesUsage = (filter: string, items: Lives[], warningThreshold: number) => {
   if (!filter) return true;
-  const limited = items.filter(x => !!x.maxUses);
+  const limited = items.filter(isLimited);
   if (filter === 'LIMITED') return limited.length > 0;
-  // New: has a limit and none of it is used yet, so the remaining uses are the original number.
-  if (filter === 'NEW') return limited.length > 0 && limited.every(x => !(x.uses || 0));
-  if (filter === 'LOW') return limited.some(x => remaining(x) <= warningThreshold);
+  // New: a limit, no use made and declared new (see core/usageStatus). A Set is new when all its limited items are.
+  if (filter === 'NEW') return limited.length > 0 && limited.every(isNew);
+  if (filter === 'LOW') return limited.some(x => isLow(x, warningThreshold));
+  if (filter === 'EXHAUSTED') return limited.some(isExhausted);
   return limited.length === 0;
 };

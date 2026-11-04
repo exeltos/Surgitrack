@@ -6,6 +6,7 @@ import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
 import {matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable} from '../../core/assetExport';
+import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
@@ -134,6 +135,7 @@ export default function StandaloneToolsPage() {
           <>
             <b>{t.uses}</b>
             <span className="muted"> / {t.maxUses}</span>
+            {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
           </>
         ) : (
           <span className="muted">{tr('Χωρίς όριο')}</span>
@@ -181,7 +183,9 @@ export default function StandaloneToolsPage() {
           {
             label: tr('Καινούργια'),
             value: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
-            hint: tr('Εργαλεία με όριο που δεν έχουν αποστειρωθεί ακόμη: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
+            hint: tr(
+              'Εργαλεία με όριο, χωρίς καμία χρήση, που έχουν δηλωθεί ως καινούργια: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.',
+            ),
             ...kpi({usage: 'NEW'}),
           },
           {
@@ -189,6 +193,12 @@ export default function StandaloneToolsPage() {
             value: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
             hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
             ...kpi({usage: 'LOW'}),
+          },
+          {
+            label: tr('Εξαντλημένα'),
+            value: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία που δεν έχουν καμία χρήση πια αλλά είναι ακόμη στο τμήμα: πρέπει να αποσυρθούν.'),
+            ...kpi({usage: 'EXHAUSTED'}),
           },
         ]}
       />

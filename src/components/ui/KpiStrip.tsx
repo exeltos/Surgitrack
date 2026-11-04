@@ -23,7 +23,9 @@ type Props = {
 
 export default function KpiStrip({items, compact = false, className = ''}: Props) {
   return (
-    <div className={`kpis${compact ? ' compact-kpis' : ''}${className ? ` ${className}` : ''}`}>
+    <div
+      className={`kpis${compact ? ' compact-kpis' : ''}${items.length > 4 ? ' kpis-wide' : ''}${className ? ` ${className}` : ''}`}
+    >
       {items.map((item, index) => {
         const body = (
           <>
