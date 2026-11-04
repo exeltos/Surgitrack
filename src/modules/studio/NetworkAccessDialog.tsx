@@ -4,11 +4,10 @@ import AppButton from '../../components/ui/AppButton';
 import {supabase} from '../../lib/supabase';
 import {getI18nLang} from '../../i18n';
 import {checkIpAccess} from '../../data/cloud/ipAccess';
+import {plainAddress} from '../../core/ipAddress';
 import type {Organization} from '../../core/LibraryStore';
 
 type Mode = 'OFF' | 'LOG' | 'ENFORCE';
-/** A single address is kept as «address/32» (or /128); it is shown as the address alone. */
-const plain = (ip: string) => ip.replace(/\/(32|128)$/, '');
 type Address = {ip: string; label: string};
 type Member = {id: string; name: string; role: string; active: boolean};
 type LogRow = {id: number; user_id: string; ip: string | null; blocked: boolean; at: string};
@@ -58,7 +57,7 @@ export default function NetworkAccessDialog({
       if (!alive) return;
       const row = rule.data as {mode?: Mode; addresses?: Address[]; exempt_users?: string[]} | null;
       setMode(row?.mode || 'OFF');
-      setAddresses((row?.addresses || []).map(a => ({ip: plain(a.ip), label: a.label || ''})));
+      setAddresses((row?.addresses || []).map(a => ({ip: plainAddress(a.ip), label: a.label || ''})));
       setExempt(row?.exempt_users || []);
       setMembers((people.data as Member[] | null) || []);
       setLog((rows.data as LogRow[] | null) || []);

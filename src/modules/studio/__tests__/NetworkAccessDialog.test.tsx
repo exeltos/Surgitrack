@@ -30,6 +30,7 @@ vi.mock('../../../lib/supabase', () => {
 });
 
 const {default: NetworkAccessDialog} = await import('../NetworkAccessDialog');
+const {plainAddress: plain} = await import('../../../core/ipAddress');
 
 const org = {id: 'org-1', name: 'ΙΑΣΩ'} as Organization;
 
@@ -49,5 +50,14 @@ describe('the network rule of a hospital', () => {
     expect(screen.getByText('ΑΝΝΑ')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Αποθήκευση'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /Προσθήκη της IP μου \(109\.242\.139\.232\)/})).toBeInTheDocument();
+  });
+});
+
+describe('how an address is shown', () => {
+  it('drops the prefix of a single address only, never the one of a range', () => {
+    expect(plain('94.64.59.134/32')).toBe('94.64.59.134');
+    expect(plain('2001:db8::1/128')).toBe('2001:db8::1');
+    expect(plain('2001:db8::/32')).toBe('2001:db8::/32');
+    expect(plain('203.0.113.0/28')).toBe('203.0.113.0/28');
   });
 });
