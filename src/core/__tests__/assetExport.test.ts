@@ -68,7 +68,8 @@ describe('the exports of the tool and Set lists', () => {
       'Εργαλεία',
     );
     expect(table.totals?.[0]).toBe('Σύνολο εργαλείων: 3');
-    expect(table.totals?.[table.headers.indexOf('Χρήσεις')]).toBe(47);
+    // Uses made are counted for the instruments with a limit (7 and 5 here); the one without a limit adds none.
+    expect(table.totals?.[table.headers.indexOf('Χρήσεις')]).toBe(7);
     // Only the ones with a limit have uses left: 13 and 5.
     expect(table.totals?.[table.headers.indexOf('Υπόλοιπο')]).toBe(18);
   });
