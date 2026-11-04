@@ -29,7 +29,7 @@ const request = (id: string, status: string, user_id: string | null) => ({
   invited_at: null,
 });
 
-const useView = (members: unknown[], requests: unknown[]) =>
+const useView = (members: unknown[], requests: unknown[], password = '') =>
   usePeopleView({
     decisions: {},
     departments: [],
@@ -38,7 +38,7 @@ const useView = (members: unknown[], requests: unknown[]) =>
     lang: 'el',
     members,
     query: '',
-    filters: {department: '', role: '', access: ''},
+    filters: {department: '', role: '', access: '', password},
     requests,
     setDecisions: () => undefined,
   } as unknown as Input);
@@ -61,5 +61,19 @@ describe('usePeopleView: the users list', () => {
     // Only the approval request is the admin's to decide; the invitation waits for its person.
     expect(v.pending.map(r => r.id)).toEqual(['r1']);
     expect(v.invitedToSignup.map(r => r.id)).toEqual(['r3']);
+  });
+});
+
+describe('usePeopleView: the password filter', () => {
+  const people = [
+    {...member('initial', 'INITIAL', true), password_change_required: true},
+    {...member('own', 'OWN', true), password_change_required: false},
+    {...member('locked', 'LOCKED', false), password_change_required: true},
+  ];
+  it('finds those who have not changed the initial password, those who have, and those locked', () => {
+    expect(useView(people, [], 'INITIAL').shown.map(m => m.id)).toEqual(['initial']);
+    expect(useView(people, [], 'OWN').shown.map(m => m.id)).toEqual(['own']);
+    expect(useView(people, [], 'LOCKED').shown.map(m => m.id)).toEqual(['locked']);
+    expect(useView(people, [], '').shown).toHaveLength(3);
   });
 });

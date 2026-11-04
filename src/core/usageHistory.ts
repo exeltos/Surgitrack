@@ -23,6 +23,33 @@ export const endOfDay = (day: string) => {
   return new Date(y, m - 1, d, 23, 59, 59, 999).getTime();
 };
 
+type Step = {stamp: number; from: number; to: number};
+
+/**
+ * Corrections made in the same minute become one step, from where the first started to where the last ended. Their
+ * order is not kept (the minute is the only time stored, and a batch of them is saved in any order), so it is found
+ * from the numbers: along a chain 0 → 1 → 2 → 3 only the start is left without an arrival and the end without a
+ * departure. A run that goes back to where it began (up and down) has no end to find and keeps the order given.
+ */
+const perMinute = (steps: Step[]): Step[] => {
+  const byMinute = new Map<number, Step[]>();
+  for (const step of steps) byMinute.set(step.stamp, [...(byMinute.get(step.stamp) || []), step]);
+  return [...byMinute.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([stamp, group]) => {
+      const net = new Map<number, number>();
+      for (const {from, to} of group) {
+        net.set(from, (net.get(from) ?? 0) - 1);
+        net.set(to, (net.get(to) ?? 0) + 1);
+      }
+      const starts = [...net].filter(([, n]) => n < 0).map(([v]) => v);
+      const ends = [...net].filter(([, n]) => n > 0).map(([v]) => v);
+      return starts.length === 1 && ends.length === 1
+        ? {stamp, from: starts[0], to: ends[0]}
+        : {stamp, from: group[0].from, to: group[group.length - 1].to};
+    });
+};
+
 export const usesOnDay = (tools: Tool[], movements: Movement[], day: string, now = Date.now()): UsesOnDay => {
   const cutoff = endOfDay(day);
   const corrections = new Map<string, Array<{stamp: number; from: number; to: number}>>();
@@ -46,7 +73,7 @@ export const usesOnDay = (tools: Tool[], movements: Movement[], day: string, now
   for (const t of tools) {
     // The history under its earlier barcodes (edited or reissued) is its own too.
     const barcodes = [t.barcode, ...(t.legacyBarcodes || [])].map(b => b.toUpperCase());
-    const list = barcodes.flatMap(b => corrections.get(b) || []).sort((a, b) => a.stamp - b.stamp);
+    const list = perMinute(barcodes.flatMap(b => corrections.get(b) || []));
     const madeAt = Math.min(...barcodes.map(b => created.get(b) ?? Infinity));
     const upTo = list.filter(c => c.stamp <= cutoff);
     const uses =

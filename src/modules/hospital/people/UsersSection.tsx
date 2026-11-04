@@ -86,8 +86,8 @@ export default function UsersSection({s}: {s: PeopleState}) {
     if (!m.password_change_required)
       return {
         kind: 'changed',
-        text: L('Δικός του κωδικός', 'Own password'),
-        title: L('Έχει ορίσει δικό του κωδικό.', 'Has set a password of their own.'),
+        text: L('Προσωπικός κωδικός', 'Personal password'),
+        title: L('Έχει ορίσει προσωπικό κωδικό.', 'Has set a personal password.'),
       };
     return m.active
       ? {
@@ -159,6 +159,20 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     {value: 'INVITED', label: L('Εκκρεμεί πρόσκληση', 'Invitation pending')},
                   ],
                   onChange: access => setFilters(f => ({...f, access})),
+                },
+                {
+                  key: 'password',
+                  value: filters.password,
+                  placeholder: L('Κάθε κωδικός', 'Any password'),
+                  options: [
+                    {
+                      value: 'INITIAL',
+                      label: L('Αρχικός κωδικός (δεν έχει μπει ακόμη)', 'Initial password (not changed yet)'),
+                    },
+                    {value: 'OWN', label: L('Προσωπικός κωδικός', 'Personal password')},
+                    {value: 'LOCKED', label: L('Κλειδωμένοι (έληξε η προθεσμία)', 'Locked (deadline passed)')},
+                  ],
+                  onChange: password => setFilters(f => ({...f, password})),
                 },
               ]}
             />
@@ -461,7 +475,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
               <div className="hospital-users-empty">
                 <Users size={22} />
                 <strong>
-                  {q || filters.department || filters.role || filters.access
+                  {q || filters.department || filters.role || filters.access || filters.password
                     ? L(
                         'Κανένας χρήστης δεν ταιριάζει στην αναζήτηση ή στα φίλτρα.',
                         'No user matches the search or filters.',

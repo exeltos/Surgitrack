@@ -4,7 +4,7 @@ import {Fragment, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {ChevronDown, ChevronRight, Layers3, Plus} from 'lucide-react';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
-import {usesOnDay} from '../../core/usageHistory';
+import {usesOnDay, type UsesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -54,18 +54,20 @@ export default function StandaloneToolsPage() {
     limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
-  const filtered = standalone.filter(
-    t =>
-      (!department || t.department === department) &&
-      (!specialty || t.specialty === specialty) &&
-      (!manufacturer || t.manufacturer === manufacturer) &&
-      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
-      matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
-      (!state || t.state === state) &&
-      `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
-        .toLowerCase()
-        .includes(q.toLowerCase()),
-  );
+  // The usage filters judge the instrument as it is, or as it was on the day chosen for a download.
+  const matchesList = (t: Tool, view: Tool = t) =>
+    (!department || t.department === department) &&
+    (!specialty || t.specialty === specialty) &&
+    (!manufacturer || t.manufacturer === manufacturer) &&
+    matchesUsage(limit, [view], systemSettings.usageWarningThreshold) &&
+    matchesUsage(usage, [view], systemSettings.usageWarningThreshold) &&
+    (!state || t.state === state) &&
+    `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
+      .toLowerCase()
+      .includes(q.toLowerCase());
+  const filtered = standalone.filter(t => matchesList(t));
+  const listOn = (history?: UsesOnDay) =>
+    history ? standalone.filter(t => matchesList(t, {...t, uses: history.byId.get(t.id)?.uses ?? t.uses})) : filtered;
   // The cards above the list count what the department, specialty, company, status and search leave, whichever usage
   // type is chosen (the usage cards are the shortcuts to that choice).
   const scope = standalone.filter(
@@ -258,16 +260,20 @@ export default function StandaloneToolsPage() {
               <span>{tr('Ομαδοποίηση')}</span>
             </button>
             <ListExport
-              table={day => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'), onDay(day))}
+              table={day => {
+                const history = onDay(day);
+                return toolsExportTable(listOn(history), tr('Μεμονωμένα εργαλεία σε χρήση'), history);
+              }}
               pickDay
-              grouped={day =>
-                toolsGroupedExportTable(
-                  filtered,
+              grouped={day => {
+                const history = onDay(day);
+                return toolsGroupedExportTable(
+                  listOn(history),
                   tr('Μεμονωμένα εργαλεία σε χρήση'),
                   systemSettings.usageWarningThreshold,
-                  onDay(day),
-                )
-              }
+                  history,
+                );
+              }}
               disabled={filtered.length === 0}
             />
           </>

@@ -4,7 +4,8 @@ import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
-import {usesOnDay} from '../../core/usageHistory';
+import type {Tool} from '../../types/domain';
+import {usesOnDay, type UsesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
 import {isExhausted} from '../../core/usageStatus';
@@ -49,19 +50,21 @@ export default function ToolsPage() {
     limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
-  const filtered = tools.filter(
-    t =>
-      (!department || t.department === department) &&
-      (!specialty || t.specialty === specialty) &&
-      (!manufacturer || t.manufacturer === manufacturer) &&
-      matchesUsage(limit, [t], systemSettings.usageWarningThreshold) &&
-      matchesUsage(usage, [t], systemSettings.usageWarningThreshold) &&
-      (!state || t.state === state) &&
-      (!mode || t.mode === mode) &&
-      `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''} ${t.ownerName || ''}`
-        .toLowerCase()
-        .includes(q.toLowerCase()),
-  );
+  // The usage filters judge the instrument as it is, or as it was on the day chosen for a download.
+  const matchesList = (t: Tool, view: Tool = t) =>
+    (!department || t.department === department) &&
+    (!specialty || t.specialty === specialty) &&
+    (!manufacturer || t.manufacturer === manufacturer) &&
+    matchesUsage(limit, [view], systemSettings.usageWarningThreshold) &&
+    matchesUsage(usage, [view], systemSettings.usageWarningThreshold) &&
+    (!state || t.state === state) &&
+    (!mode || t.mode === mode) &&
+    `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''} ${t.ownerName || ''}`
+      .toLowerCase()
+      .includes(q.toLowerCase());
+  const filtered = tools.filter(t => matchesList(t));
+  const listOn = (history?: UsesOnDay) =>
+    history ? tools.filter(t => matchesList(t, {...t, uses: history.byId.get(t.id)?.uses ?? t.uses})) : filtered;
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state' | 'mode') =>
     [...new Set(tools.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
@@ -168,11 +171,20 @@ export default function ToolsPage() {
           ]}
           extra={
             <ListExport
-              table={day => toolsExportTable(filtered, tr('Εργαλεία'), onDay(day))}
+              table={day => {
+                const history = onDay(day);
+                return toolsExportTable(listOn(history), tr('Εργαλεία'), history);
+              }}
               pickDay
-              grouped={day =>
-                toolsGroupedExportTable(filtered, tr('Εργαλεία'), systemSettings.usageWarningThreshold, onDay(day))
-              }
+              grouped={day => {
+                const history = onDay(day);
+                return toolsGroupedExportTable(
+                  listOn(history),
+                  tr('Εργαλεία'),
+                  systemSettings.usageWarningThreshold,
+                  history,
+                );
+              }}
               disabled={filtered.length === 0}
             />
           }
