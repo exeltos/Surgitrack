@@ -4683,14 +4683,6 @@ html body .usage-exhausted-badge {
   font-weight: 800;
   white-space: nowrap;
 }
-html body .asset-check-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-html body .asset-check-row input {
-  width: auto;
-}
 
 /* A strip of five cards (the individual instruments: the usage types) keeps them on one row on a wide screen. */
 html body .compact-kpis.kpis-wide {
