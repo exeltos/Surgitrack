@@ -91,6 +91,17 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         setStatus('local');
         return;
       }
+      // A hospital that lets people in only from its own networks turns the others away (the database refuses
+      // their data too, the hospital's own record included, so this is asked first). The platform owner is never
+      // held to it; in LOG mode the call only records the address.
+      if (!result.identity.platform && !demo) {
+        const access = await checkIpAccess();
+        if (turnedAway(access)) {
+          setBlockedIp(access?.ip);
+          setStatus('network');
+          return;
+        }
+      }
       const orgColumns = 'name,is_demo,evaluation,plan,trial_ends_at';
       let {data: org, error: orgError} = await supabase
         .from('organizations')
@@ -133,16 +144,6 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
         });
         setStatus('locked');
         return;
-      }
-      // A hospital that lets people in only from its own networks turns the others away (the database refuses
-      // their data too). The platform owner is never held to it; in LOG mode the call only records the address.
-      if (!result.identity.platform && !demo) {
-        const access = await checkIpAccess();
-        if (turnedAway(access)) {
-          setBlockedIp(access?.ip);
-          setStatus('network');
-          return;
-        }
       }
       setSampleDataMark(demo || evaluation);
       setModules(modulesOf((org as {modules?: unknown}).modules) ?? null);
