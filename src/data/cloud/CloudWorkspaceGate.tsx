@@ -25,6 +25,7 @@ import DemoRequestDialog from '../../components/demo/DemoRequestDialog';
 import {setSampleDataMark} from '../../core/sampleDataMark';
 import {setPhotoStorageOrganization} from './photoStorage';
 import {setErrorReportingOrganization} from './errorReporting';
+import {checkIpAccess, turnedAway} from './ipAccess';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -54,7 +55,8 @@ const LARGE_LOAD = 2000;
 
 export default function CloudWorkspaceGate({children}: {children: (workspace: CloudWorkspace | null) => ReactNode}) {
   const [workspace, setWorkspace] = useState<CloudWorkspace | null>(null);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'local' | 'error' | 'locked'>('loading');
+  const [status, setStatus] = useState<'loading' | 'ready' | 'local' | 'error' | 'locked' | 'network'>('loading');
+  const [blockedIp, setBlockedIp] = useState<string>();
   const [trial, setTrial] = useState<TrialState | null>(null);
   const [evaluationDemo, setEvaluationDemo] = useState<EvaluationDemo | null>(null);
   // The modules the platform owner switched on for this hospital (null: the hospital says nothing, all are on).
@@ -88,6 +90,17 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       if (!organizationId) {
         setStatus('local');
         return;
+      }
+      // A hospital that lets people in only from its own networks turns the others away (the database refuses
+      // their data too, the hospital's own record included, so this is asked first). The platform owner is never
+      // held to it; in LOG mode the call only records the address.
+      if (!result.identity.platform && !demo) {
+        const access = await checkIpAccess();
+        if (turnedAway(access)) {
+          setBlockedIp(access?.ip);
+          setStatus('network');
+          return;
+        }
       }
       const orgColumns = 'name,is_demo,evaluation,plan,trial_ends_at';
       let {data: org, error: orgError} = await supabase
@@ -231,6 +244,7 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
       </TrialContext.Provider>
     );
   if (status === 'locked' && lock) return <TrialLocked lang={lang} {...lock} />;
+  if (status === 'network') return <NetworkBlocked lang={lang} ip={blockedIp} onRetry={() => void load()} />;
   if (status === 'loading') {
     const loading = lang === 'el' ? 'Φόρτωση δεδομένων…' : 'Loading data…';
     // A large hospital takes a while on a slow line: how far it has come, so it does not look stuck.
@@ -348,6 +362,44 @@ function TrialLocked({
           onClose={() => setRequest(null)}
         />
       )}
+    </div>
+  );
+}
+
+/** What a person sees from an address the hospital does not allow. */
+function NetworkBlocked({lang, ip, onRetry}: {lang: 'el' | 'en'; ip?: string; onRetry: () => void}) {
+  const L = (el: string, en: string) => (lang === 'el' ? el : en);
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    sessionStorage.removeItem('surgitrack-active-organization');
+    window.location.hash = '#/';
+    window.location.reload();
+  };
+  return (
+    <div className="cloud-gate trial-locked" role="alert">
+      <strong>
+        {L(
+          'Η πρόσβαση επιτρέπεται μόνο από το δίκτυο του νοσοκομείου',
+          'Access is allowed only from the hospital network',
+        )}
+      </strong>
+      <p>
+        {L(
+          'Συνδεθείτε από το δίκτυο ή το Wi-Fi του νοσοκομείου. Αν βρίσκεστε ήδη εκεί και βλέπετε αυτό το μήνυμα, ενημερώστε τον διαχειριστή του SurgiTrack.',
+          'Connect from the hospital network or Wi-Fi. If you are already there and still see this message, tell the SurgiTrack administrator.',
+        )}
+      </p>
+      {ip && (
+        <p>
+          {L('Η διεύθυνση από την οποία συνδέεστε:', 'The address you are connecting from:')} <b>{ip}</b>
+        </p>
+      )}
+      <div>
+        <button className="primary" onClick={onRetry}>
+          {L('Δοκιμή ξανά', 'Try again')}
+        </button>
+        <button onClick={() => void signOut()}>{L('Αποσύνδεση', 'Sign out')}</button>
+      </div>
     </div>
   );
 }

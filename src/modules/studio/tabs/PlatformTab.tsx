@@ -6,6 +6,7 @@ import {
   FlaskConical,
   LogIn,
   MoreHorizontal,
+  Network,
   Pencil,
   Plus,
   Power,
@@ -19,6 +20,7 @@ import {hospitalRoleKinds, hospitalRoleNames, type HospitalRoleKind} from '../..
 import type {Organization} from '../../../core/LibraryStore';
 import {trialEndAfter, trialEnded} from '../../../core/trial';
 import PlanBadge from '../PlanBadge';
+import NetworkAccessDialog from '../NetworkAccessDialog';
 import {activeHospitalId, switchHospital} from '../../../data/cloud/hospitalSwitch';
 import DemoAccountsPanel from '../demo/DemoAccountsPanel';
 import type {StudioPageState} from '../useStudioPage';
@@ -148,6 +150,7 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
 }
 
 function HospitalList({s}: {s: StudioPageState}) {
+  const [network, setNetwork] = useState<Organization | null>(null);
   const {L, changePlan, cloudDepartments, displayedOrganizations, displayedUsers, openOrganization} = s;
   if (!displayedOrganizations.length)
     return <div className="studio-empty">{L('Δεν υπάρχουν νοσοκομεία.', 'No hospitals yet.')}</div>;
@@ -211,18 +214,23 @@ function HospitalList({s}: {s: StudioPageState}) {
                 icon={<MoreHorizontal size={15} />}
                 label={L('Ενέργειες', 'Actions')}
                 align="right"
-                items={hospitalActions(s, org)}
+                items={hospitalActions(s, org, setNetwork)}
               />
             </div>
           </article>
         );
       })}
+      {network && <NetworkAccessDialog organization={network} onClose={() => setNetwork(null)} />}
     </div>
   );
 }
 
 /** Everything else a hospital's row can do, behind one menu instead of a row of buttons. */
-function hospitalActions(s: StudioPageState, org: Organization): ActionMenuItem[] {
+function hospitalActions(
+  s: StudioPageState,
+  org: Organization,
+  openNetwork: (org: Organization) => void,
+): ActionMenuItem[] {
   const {
     L,
     changePlan,
@@ -240,6 +248,16 @@ function hospitalActions(s: StudioPageState, org: Organization): ActionMenuItem[
       label: L('Επεξεργασία', 'Edit'),
       hint: L('Όνομα, κωδικός, χρήση και λήξη', 'Name, code, use and end date'),
       onSelect: () => setOrganizationEditor(org),
+    },
+    {
+      key: 'network',
+      icon: <Network size={15} />,
+      label: L('Πρόσβαση ανά δίκτυο', 'Access by network'),
+      hint: L(
+        'Μόνο από τις διευθύνσεις του νοσοκομείου, με εξαιρέσεις',
+        'Only from the hospital addresses, with exceptions',
+      ),
+      onSelect: () => openNetwork(org),
     },
   ];
   if (org.plan === 'TRIAL')
