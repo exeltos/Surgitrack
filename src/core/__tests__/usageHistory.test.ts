@@ -42,6 +42,27 @@ describe('the uses of an instrument on a past day', () => {
   });
 });
 
+describe('ties and earlier barcodes', () => {
+  it('keeps corrections of the same minute in order (movements are kept newest first)', () => {
+    const newestFirst = [
+      move('02/11/2026 10:00', 'Διόρθωση χρήσεων · 1 → 2 · Α'),
+      move('02/11/2026 10:00', 'Διόρθωση χρήσεων · 0 → 1 · Α'),
+    ];
+    const t = [tool({uses: 2})];
+    expect(usesOnDay(t, newestFirst, '2026-11-02', now).byId.get('t1')!.uses).toBe(2);
+    expect(usesOnDay(t, newestFirst, '2026-11-01', now).byId.get('t1')!.uses).toBe(0);
+  });
+  it('counts the history under an earlier barcode', () => {
+    const old = [
+      move('30/10/2026 10:00', 'Διόρθωση χρήσεων · 0 → 1 · Α', 'T000009 · NEEDLE'),
+      move('01/10/2026 09:00', 'Δημιουργία φυσικού εργαλείου', 'T000009 · NEEDLE'),
+    ];
+    const t = [tool({uses: 2, legacyBarcodes: ['T000009']})];
+    expect(usesOnDay(t, old, '2026-11-01', now).byId.get('t1')!.uses).toBe(1);
+    expect(usesOnDay(t, old, '2026-09-01', now).byId.get('t1')!.existed).toBe(false);
+  });
+});
+
 describe('the exports on a day', () => {
   const onDay = {
     day: '2026-11-01',

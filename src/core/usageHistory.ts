@@ -27,7 +27,8 @@ export const usesOnDay = (tools: Tool[], movements: Movement[], day: string, now
   const cutoff = endOfDay(day);
   const corrections = new Map<string, Array<{stamp: number; from: number; to: number}>>();
   const created = new Map<string, number>();
-  for (const m of movements) {
+  // The movements are kept newest first: walking them oldest first keeps corrections of the same minute in order.
+  for (const m of [...movements].reverse()) {
     if (m.assetKind !== 'TOOL' || m.undoes) continue;
     const barcode = barcodeOf(m.asset);
     const stamp = movementStamp(m.at);
@@ -43,12 +44,14 @@ export const usesOnDay = (tools: Tool[], movements: Movement[], day: string, now
   }
   const byId = new Map<string, {uses: number; existed: boolean}>();
   for (const t of tools) {
-    const barcode = t.barcode.toUpperCase();
-    const list = (corrections.get(barcode) || []).sort((a, b) => a.stamp - b.stamp);
+    // The history under its earlier barcodes (edited or reissued) is its own too.
+    const barcodes = [t.barcode, ...(t.legacyBarcodes || [])].map(b => b.toUpperCase());
+    const list = barcodes.flatMap(b => corrections.get(b) || []).sort((a, b) => a.stamp - b.stamp);
+    const madeAt = Math.min(...barcodes.map(b => created.get(b) ?? Infinity));
     const upTo = list.filter(c => c.stamp <= cutoff);
     const uses =
       cutoff >= now ? t.uses || 0 : upTo.length ? upTo[upTo.length - 1].to : list.length ? list[0].from : t.uses || 0;
-    byId.set(t.id, {uses, existed: (created.get(barcode) ?? 0) <= cutoff});
+    byId.set(t.id, {uses, existed: (madeAt === Infinity ? 0 : madeAt) <= cutoff});
   }
   return {day, byId};
 };
