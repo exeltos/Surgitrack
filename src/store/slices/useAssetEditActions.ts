@@ -271,14 +271,8 @@ export function useAssetEditActions(
     const before = asset.uses || 0;
     const after = Math.min(asset.maxUses, Math.max(0, before + delta));
     if (after === before) return;
-    // Once a use is counted it is no longer new.
-    const keep = <T extends {uses?: number}>(item: T): T => ({
-      ...item,
-      uses: after,
-      ...(after > 0 ? {fresh: undefined} : {}),
-    });
-    if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? keep(item) : item)));
-    else setTools(list => list.map(item => (item.id === id ? keep(item) : item)));
+    if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
+    else setTools(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
     addMovement({
       asset: `${asset.barcode} · ${asset.name}`,
       assetKind: kind,
@@ -290,37 +284,28 @@ export function useAssetEditActions(
     notify(tr('{0}: χρήσεις {1} → {2}.', asset.barcode, before, after));
   };
   /**
-   * Sets how many uses were made (instruments that were in use before the system, brought in with their uses) and/or
-   * whether it is declared new (a limit, no use made, and known to be new); same people as the correction, recorded.
-   * A use counted clears the new mark.
+   * Sets how many uses were made (an instrument that was in use before the system, brought in with its uses, or one
+   * counted wrongly); same people as the correction, recorded. What is left follows: the limit less the uses.
    */
-  const recordUsage = (kind: AssetKind, id: string, change: {uses?: number; fresh?: boolean}) => {
+  const recordUsage = (kind: AssetKind, id: string, change: {uses?: number}) => {
     if (!can('asset.usage.configure')) return;
     const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
     if (!asset?.maxUses || asset.state === 'RETIRED') return;
     const before = asset.uses || 0;
     const after =
       change.uses === undefined ? before : Math.min(asset.maxUses, Math.max(0, Math.round(Number(change.uses) || 0)));
-    const fresh = after > 0 ? undefined : change.fresh === undefined ? asset.fresh : change.fresh || undefined;
-    if (after === before && fresh === asset.fresh) return;
-    const apply = <T extends {uses?: number; fresh?: boolean}>(item: T): T => ({...item, uses: after, fresh});
-    if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? apply(item) : item)));
-    else setTools(list => list.map(item => (item.id === id ? apply(item) : item)));
-    const what = [
-      after !== before ? `${tr('Διόρθωση χρήσεων')} · ${before} → ${after}` : '',
-      fresh !== asset.fresh ? (fresh ? tr('Σήμανση ως καινούργιο') : tr('Αφαίρεση σήμανσης καινούργιο')) : '',
-    ]
-      .filter(Boolean)
-      .join(' · ');
+    if (after === before) return;
+    if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
+    else setTools(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
     addMovement({
       asset: `${asset.barcode} · ${asset.name}`,
       assetKind: kind,
       from: asset.department || '—',
       to: asset.department || '—',
-      status: `${what} · ${currentUser.name}`,
+      status: `${tr('Διόρθωση χρήσεων')} · ${before} → ${after} · ${currentUser.name}`,
       by: currentUser.name,
     });
-    notify(`${asset.barcode}: ${what}`);
+    notify(tr('{0}: χρήσεις {1} → {2}.', asset.barcode, before, after));
   };
   return {
     addToolsToSet,

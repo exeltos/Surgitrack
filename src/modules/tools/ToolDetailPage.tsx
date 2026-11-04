@@ -363,15 +363,9 @@ export default function ToolDetailPage() {
                     uses={tool.uses}
                     maxUses={tool.maxUses}
                     fresh={isNew(tool)}
-                    declaredNew={!!tool.fresh}
                     onSetUses={
                       can('asset.usage.configure') && tool.state !== 'RETIRED'
                         ? uses => recordUsage('TOOL', tool.id, {uses})
-                        : undefined
-                    }
-                    onToggleNew={
-                      can('asset.usage.configure') && tool.state !== 'RETIRED'
-                        ? () => recordUsage('TOOL', tool.id, {fresh: !tool.fresh})
                         : undefined
                     }
                     description={tr('Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.')}

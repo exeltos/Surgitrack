@@ -173,11 +173,9 @@ export default function StandaloneToolsPage() {
             ...kpi({usage: 'LIMITED'}),
           },
           {
-            label: tr('Καινούργια'),
+            label: tr('Αχρησιμοποίητα'),
             value: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
-            hint: tr(
-              'Εργαλεία με όριο, χωρίς καμία χρήση, που έχουν δηλωθεί ως καινούργια: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.',
-            ),
+            hint: tr('Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
             ...kpi({usage: 'NEW'}),
           },
           {
@@ -189,7 +187,7 @@ export default function StandaloneToolsPage() {
           {
             label: tr('Εξαντλημένα'),
             value: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
-            hint: tr('Εργαλεία που δεν έχουν καμία χρήση πια αλλά είναι ακόμη στο τμήμα: πρέπει να αποσυρθούν.'),
+            hint: tr('Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.'),
             ...kpi({usage: 'EXHAUSTED'}),
           },
         ]}

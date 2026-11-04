@@ -4649,7 +4649,7 @@ html body .people-row .people-password.locked {
   gap: 8px;
 }
 
-/* Use limit: the number of uses made typed in, the new mark, and the exhausted notice. */
+/* Use limit: the number of uses made typed in, and the exhausted notice. */
 html body .usage-correct input {
   width: 6ch;
   padding: 3px 6px;
@@ -4658,21 +4658,6 @@ html body .usage-correct input {
   font: inherit;
   font-weight: 800;
   text-align: right;
-}
-html body .usage-new-toggle {
-  margin-top: 8px;
-  padding: 5px 10px;
-  border: 1px solid #b9dcc8;
-  border-radius: 8px;
-  background: #f1faf5;
-  color: #1c6b3f;
-  font: inherit;
-  font-size: 11.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-html body .usage-new-toggle[aria-pressed='true'] {
-  background: #e3f4ea;
 }
 html body .usage-exhausted-warning {
   display: flex;

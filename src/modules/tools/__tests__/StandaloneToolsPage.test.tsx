@@ -25,8 +25,8 @@ describe('the individual instruments in use', () => {
 
   it('has a new-instruments card and a way to download the list', () => {
     renderPage(<StandaloneToolsPage />);
-    expect(card('Καινούργια')).toBeInTheDocument();
-    expect(card('Καινούργια').getAttribute('title')).toMatch(/αρχικός αριθμός χρήσεων/);
+    expect(card('Αχρησιμοποίητα')).toBeInTheDocument();
+    expect(card('Αχρησιμοποίητα').getAttribute('title')).toMatch(/αρχικός αριθμός χρήσεων/);
     expect(screen.getByRole('button', {name: /Λήψη/})).toBeInTheDocument();
   });
 

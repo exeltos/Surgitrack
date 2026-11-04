@@ -32,9 +32,8 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [quantity, setQuantity] = useState(1);
   const [limited, setLimited] = useState(false);
   const [maxUses, setMaxUses] = useState('50');
-  // Uses already made, and whether it is declared new (a limit and no use made).
+  // Uses already made (an instrument in use before it came to the system).
   const [usesMade, setUsesMade] = useState('0');
-  const [declaredNew, setDeclaredNew] = useState(false);
   const [notes, setNotes] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
   const [photos, setPhotos] = useState<AssetPhoto[]>([]);
@@ -82,7 +81,6 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
         quantity,
         maxUses: limit,
         uses: limit ? Math.min(limit, Math.max(0, Math.round(Number(usesMade) || 0))) : undefined,
-        fresh: limit ? declaredNew : undefined,
         notes: notes.trim() || undefined,
         // One serial number cannot belong to several pieces.
         serialNumber: (quantity === 1 && serialNumber.trim()) || undefined,
@@ -259,31 +257,17 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               </label>
             )}
             {limited && kind === 'TOOL' && (
-              <>
-                <label>
-                  <span>{tr('Χρήσεις που έχουν γίνει ήδη')}</span>
-                  <input
-                    className="asset-inline-input"
-                    type="number"
-                    min="0"
-                    max={Number(maxUses) || undefined}
-                    value={usesMade}
-                    onChange={e => {
-                      setUsesMade(e.target.value);
-                      if (Number(e.target.value) > 0) setDeclaredNew(false);
-                    }}
-                  />
-                </label>
-                <label className="asset-check-row">
-                  <input
-                    type="checkbox"
-                    checked={declaredNew && !(Number(usesMade) > 0)}
-                    disabled={Number(usesMade) > 0}
-                    onChange={e => setDeclaredNew(e.target.checked)}
-                  />
-                  <span>{tr('Καινούργιο (καμία χρήση ως τώρα)')}</span>
-                </label>
-              </>
+              <label>
+                <span>{tr('Χρήσεις που έχουν γίνει ήδη')}</span>
+                <input
+                  className="asset-inline-input"
+                  type="number"
+                  min="0"
+                  max={Number(maxUses) || undefined}
+                  value={usesMade}
+                  onChange={e => setUsesMade(e.target.value)}
+                />
+              </label>
             )}
           </div>
 

@@ -1,15 +1,16 @@
 import {tr} from '../i18n';
-import {isExhausted, isLimited, isLow, isNew, type Lives} from './usageStatus';
+import {isExhausted, isLimited, isLow, isNew, isUsed, type Lives} from './usageStatus';
 
-export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'LOW' | 'EXHAUSTED' | 'UNLIMITED';
+export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'USED' | 'LOW' | 'EXHAUSTED' | 'UNLIMITED';
 
 /**
- * Options of the "usage type" list filter: instruments with lives, new (declared new, none used), few lives left,
- * none left, or no limit.
+ * Options of the "usage type" list filter: instruments with lives, then new (no use made), used (some made, some
+ * left), few left, none left (finished), and no limit.
  */
 export const usageFilterOptions = () => [
   {value: 'LIMITED', label: tr('Με όριο χρήσεων')},
-  {value: 'NEW', label: tr('Καινούργια (0 χρήσεις)')},
+  {value: 'NEW', label: tr('Αχρησιμοποίητα (0 χρήσεις)')},
+  {value: 'USED', label: tr('Χρησιμοποιημένα')},
   {value: 'LOW', label: tr('Λίγες χρήσεις')},
   {value: 'EXHAUSTED', label: tr('Εξαντλημένα (0 υπόλοιπο)')},
   {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
@@ -20,8 +21,9 @@ export const matchesUsage = (filter: string, items: Lives[], warningThreshold: n
   if (!filter) return true;
   const limited = items.filter(isLimited);
   if (filter === 'LIMITED') return limited.length > 0;
-  // New: a limit, no use made and declared new (see core/usageStatus). A Set is new when all its limited items are.
+  // A Set is new when all its instruments with a limit are; used when any is.
   if (filter === 'NEW') return limited.length > 0 && limited.every(isNew);
+  if (filter === 'USED') return limited.some(isUsed);
   if (filter === 'LOW') return limited.some(x => isLow(x, warningThreshold));
   if (filter === 'EXHAUSTED') return limited.some(isExhausted);
   return limited.length === 0;

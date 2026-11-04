@@ -724,7 +724,13 @@ export const en: Record<string, string> = {
     'Completing records a shared delivery ID, the sterilization user, the receiver, department, date/time and links each barcode to its cycle history.',
   'Με την ολοκλήρωση καταγράφονται κοινός κωδικός, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.':
     'Completing records a shared batch ID, sender, receiver, department, time and the visible-deviation declaration per barcode.',
-  'Καινούργια (0 χρήσεις)': 'New (0 uses)',
+  'Αχρησιμοποίητα (0 χρήσεις)': 'Unused (0 uses)',
+  Χρησιμοποιημένα: 'Used',
+  'Έχει όριο χρήσεων και καμία χρήση ακόμα.': 'Has a use limit and no use yet.',
+  'Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.':
+    'Instruments with a limit and no use yet: the remaining uses are the original number.',
+  'Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.':
+    'Instruments with no use left: they have finished and must be taken out of use.',
   'Εξαντλημένα (0 υπόλοιπο)': 'Exhausted (0 left)',
   'Ένα είδος ανά γραμμή, με σύνολα τεμαχίων και χρήσεων.': 'One kind per row, with totals of pieces and uses.',
   '{0} · αναλυτικά': '{0} · itemised',
@@ -740,18 +746,8 @@ export const en: Record<string, string> = {
   'Εξαντλημένα · 0 υπόλοιπο': 'Exhausted · 0 left',
   'Κρίσιμο · 1 έως {0}': 'Critical · 1 to {0}',
   'Χρήσεις που έχουν γίνει ήδη': 'Uses already made',
-  'Καινούργιο (καμία χρήση ως τώρα)': 'New (no use so far)',
-  'Έχει όριο χρήσεων, καμία χρήση ακόμα και έχει δηλωθεί ως καινούργιο.':
-    'Has a use limit, no use yet and is declared new.',
-  'Σήμανση ως καινούργιο': 'Mark as new',
-  'Αφαίρεση σήμανσης «Καινούργιο»': 'Remove the «New» mark',
   'Εξαντλημένο: δεν απομένει καμία χρήση. Αποσύρετε το από τη χρήση.': 'Exhausted: no use is left. Take it out of use.',
   'Διόρθωση χρήσεων': 'Uses corrected',
-  'Αφαίρεση σήμανσης καινούργιο': 'New mark removed',
-  'Εργαλεία με όριο, χωρίς καμία χρήση, που έχουν δηλωθεί ως καινούργια: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.':
-    'Instruments with a limit, no use made and declared new: the remaining uses are the original number.',
-  'Εργαλεία που δεν έχουν καμία χρήση πια αλλά είναι ακόμη στο τμήμα: πρέπει να αποσυρθούν.':
-    'Instruments with no use left that are still in the department: they must be taken out of use.',
   'Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.':
     'Instruments with a set maximum number of sterilizations; the rest have no limit.',
   'Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.':
@@ -2240,6 +2236,6 @@ export const en: Record<string, string> = {
   'Κλείσιμο λίστας': 'Close the list',
   'Το κουμπί «Οδηγός οθόνης» με σύντομες οδηγίες για κάθε οθόνη. Αλλάζει αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
     'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',
-  Καινούργιο: 'New',
-  Καινούργια: 'New',
+  Αχρησιμοποίητο: 'Unused',
+  Αχρησιμοποίητα: 'Unused',
 };

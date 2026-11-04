@@ -21,7 +21,6 @@ export type ImportField =
   | 'maxUses'
   | 'usesDone'
   | 'usesLeft'
-  | 'fresh'
   | 'serialNumber'
   | 'notes';
 
@@ -140,14 +139,7 @@ export const IMPORT_FIELDS: ReadonlyArray<{
     hintEn: 'Instead of uses made: how many are left',
     aliases: ['υπολοιποχρησεων', 'υπολοιπο', 'απομενουν', 'usesleft', 'remaining', 'remaininguses'],
   },
-  {
-    key: 'fresh',
-    el: 'Καινούργιο',
-    en: 'New',
-    hintEl: 'Ναι: δεν έχει γίνει καμία χρήση πριν· αλλιώς δεν θεωρείται καινούργιο',
-    hintEn: 'Yes: no use was made before; otherwise it is not counted as new',
-    aliases: ['καινουργιο', 'καινουργια', 'καινουργιοσ', 'new', 'fresh', 'αχρησιμοποιητο'],
-  },
+
   {
     key: 'serialNumber',
     el: 'Σειριακός αριθμός',
@@ -295,7 +287,6 @@ export function buildImportPlan(
     manufacturer: string;
     maxUses?: number;
     usesDone: number;
-    fresh: boolean;
     serialNumber: string;
     notes: string;
   };
@@ -383,16 +374,6 @@ export function buildImportPlan(
           ),
         });
     }
-    const freshText = normalize(value(row, 'fresh'));
-    const fresh = ['ναι', 'ν', 'nai', 'yes', 'y', 'true', '1', 'x'].includes(freshText);
-    if (fresh && usesDone && usesDone > 0)
-      errors.push({
-        row: rowNumber,
-        message: L(
-          'Καινούργιο με χρήσεις που έγιναν: ένα εργαλείο δεν μπορεί να είναι και τα δύο.',
-          'New with uses made: an instrument cannot be both.',
-        ),
-      });
     const departmentText = value(row, 'department');
     const department = departmentText ? departmentByKey.get(normalize(departmentText)) : undefined;
     if (departmentText && !department)
@@ -427,7 +408,6 @@ export function buildImportPlan(
       manufacturer: value(row, 'manufacturer'),
       maxUses: maxUses !== undefined && Number.isInteger(maxUses) && maxUses > 0 ? maxUses : undefined,
       usesDone: usesDone !== undefined && Number.isInteger(usesDone) && usesDone > 0 ? usesDone : 0,
-      fresh,
       serialNumber,
       notes: value(row, 'notes'),
     };
@@ -483,8 +463,6 @@ export function buildImportPlan(
     specialty: line.specialty,
     manufacturer: line.manufacturer || undefined,
     uses: line.maxUses ? line.usesDone : 0,
-    // New only with a limit, no use made, and said to be new.
-    fresh: line.maxUses && !line.usesDone && line.fresh ? true : undefined,
     sterilizations: 0,
     maxUses: line.maxUses,
     serialNumber: line.serialNumber || undefined,
@@ -597,6 +575,6 @@ export const templateTable = (lang: 'el' | 'en') => ({
       '',
       '',
     ],
-    ['', '', 'GN100', 'Λαβίδα βιοψίας', 1, '', '', 'Γαστρεντερολογία', 'Olympus', 50, '', '', 'Ναι', 'SN12345', ''],
+    ['', '', 'GN100', 'Λαβίδα βιοψίας', 1, '', '', 'Γαστρεντερολογία', 'Olympus', 50, '', '', 'SN12345', ''],
   ],
 });

@@ -134,13 +134,12 @@ describe('uses already made and new instruments in the import', () => {
     'Μέγιστες χρήσεις',
     'Χρήσεις που έγιναν',
     'Υπόλοιπο χρήσεων',
-    'Καινούργιο',
   ];
   const run = (rows: Array<Array<string | number>>) => {
     const all = [COLS, ...rows.map(r => r.map(String))];
     return buildImportPlan(all.slice(1), 2, autoMapping(COLS), context());
   };
-  const line = (max: string, done: string, left: string, fresh: string) => [
+  const line = (max: string, done: string, left: string) => [
     '',
     '',
     'K1',
@@ -153,31 +152,21 @@ describe('uses already made and new instruments in the import', () => {
     max,
     done,
     left,
-    fresh,
   ];
 
-  it('brings an instrument in with the uses it already made, so it does not pass for new', () => {
-    const result = run([line('18', '5', '', '')]);
+  it('brings an instrument in with the uses it already made, so it does not pass for new (zero uses)', () => {
+    const result = run([line('18', '5', '')]);
     expect(result.errors).toEqual([]);
     expect(result.tools[0]).toMatchObject({uses: 5, maxUses: 18});
-    expect(result.tools[0].fresh).toBeUndefined();
   });
 
   it('takes the uses left instead, as the limit less them', () => {
-    expect(run([line('18', '', '3', '')]).tools[0]).toMatchObject({uses: 15, maxUses: 18});
+    expect(run([line('18', '', '3')]).tools[0]).toMatchObject({uses: 15, maxUses: 18});
   });
 
-  it('marks an instrument new only when it has a limit, no use made and is said to be new', () => {
-    expect(run([line('18', '', '', 'Ναι')]).tools[0]).toMatchObject({uses: 0, maxUses: 18, fresh: true});
-    // Zero uses and nothing said: not declared new.
-    expect(run([line('18', '0', '', '')]).tools[0].fresh).toBeUndefined();
-    expect(run([line('', '', '', 'Ναι')]).tools[0].fresh).toBeUndefined();
-  });
-
-  it('refuses uses made without a limit, over the limit, or new with uses made', () => {
-    expect(run([line('', '3', '', '')]).errors).toHaveLength(1);
-    expect(run([line('5', '9', '', '')]).errors).toHaveLength(1);
-    expect(run([line('18', '2', '', 'Ναι')]).errors).toHaveLength(1);
+  it('refuses uses made without a limit or over the limit', () => {
+    expect(run([line('', '3', '')]).errors).toHaveLength(1);
+    expect(run([line('5', '9', '')]).errors).toHaveLength(1);
   });
 
   it('no longer reads a column named just «Χρήσεις» as the limit', () => {

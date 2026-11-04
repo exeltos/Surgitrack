@@ -55,7 +55,12 @@ export function reportSummary(active: ReportId, rows: Row[], warningThreshold: n
         tone: 'bad',
         test: r => r.stateLabel === 'Σε χρήση' && Number(r.remaining) === 0,
       },
-      {label: tr('Καινούργια'), value: count(rows, r => r.fresh === 'Ναι'), test: r => r.fresh === 'Ναι'},
+      {label: tr('Αχρησιμοποίητα'), value: count(rows, r => r.fresh === 'Ναι'), test: r => r.fresh === 'Ναι'},
+      {
+        label: tr('Χρησιμοποιημένα'),
+        value: count(rows, r => r.stateLabel === 'Σε χρήση' && Number(r.uses) > 0 && Number(r.remaining) > 0),
+        test: r => r.stateLabel === 'Σε χρήση' && Number(r.uses) > 0 && Number(r.remaining) > 0,
+      },
       {
         label: tr('Εκτός χρήσης'),
         value: count(rows, r => r.stateLabel === 'Εκτός χρήσης'),

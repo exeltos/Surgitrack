@@ -8,21 +8,16 @@ export default function UsageLimitCard({
   fresh,
   onCorrect,
   onSetUses,
-  declaredNew,
-  onToggleNew,
 }: {
   uses: number;
   maxUses?: number;
   description: string;
-  /** A use limit, no use counted and declared new: new (see core/usageStatus). */
+  /** A use limit and no use counted: new (see core/usageStatus). */
   fresh?: boolean;
   /** Usage-limit managers only: corrects the recorded uses by one (a use counted by mistake, or missed). */
   onCorrect?: (delta: 1 | -1) => void;
   /** Usage-limit managers only: sets how many uses were made (an instrument that was in use before the system). */
   onSetUses?: (uses: number) => void;
-  /** Marked new (and no use made yet): for those who manage the limit, a button to mark or unmark it. */
-  declaredNew?: boolean;
-  onToggleNew?: () => void;
 }) {
   const {systemSettings} = useLibraries();
   const remaining = maxUses !== undefined ? Math.max(0, maxUses - uses) : undefined;
@@ -37,11 +32,8 @@ export default function UsageLimitCard({
         </div>
         <span className="usage-type-badge">{maxUses ? tr('Περιορισμένων χρήσεων') : tr('Χωρίς όριο')}</span>
         {maxUses !== undefined && fresh && (
-          <span
-            className="usage-fresh-badge"
-            title={tr('Έχει όριο χρήσεων, καμία χρήση ακόμα και έχει δηλωθεί ως καινούργιο.')}
-          >
-            {tr('Καινούργιο')}
+          <span className="usage-fresh-badge" title={tr('Έχει όριο χρήσεων και καμία χρήση ακόμα.')}>
+            {tr('Αχρησιμοποίητο')}
           </span>
         )}
       </div>
@@ -104,11 +96,6 @@ export default function UsageLimitCard({
           <div className="usage-limit-bar" aria-label={tr('Χρησιμοποιήθηκε {0}% του ορίου', Math.round(percent))}>
             <span style={{width: `${percent}%`}} />
           </div>
-          {onToggleNew && uses === 0 && (
-            <button type="button" className="usage-new-toggle" onClick={onToggleNew} aria-pressed={!!declaredNew}>
-              {declaredNew ? tr('Αφαίρεση σήμανσης «Καινούργιο»') : tr('Σήμανση ως καινούργιο')}
-            </button>
-          )}
           {remaining === 0 && (
             <div className="usage-exhausted-warning">
               <TriangleAlert size={15} />

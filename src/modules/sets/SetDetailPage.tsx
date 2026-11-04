@@ -318,11 +318,7 @@ export default function SetDetailPage() {
                     uses={uses}
                     maxUses={set.maxUses}
                     fresh={isNew(set)}
-                    declaredNew={!!set.fresh}
                     onSetUses={can('asset.usage.configure') ? uses => recordUsage('SET', set.id, {uses}) : undefined}
-                    onToggleNew={
-                      can('asset.usage.configure') ? () => recordUsage('SET', set.id, {fresh: !set.fresh}) : undefined
-                    }
                     description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />
                   <dl className="asset-definition-list compact-status-list">

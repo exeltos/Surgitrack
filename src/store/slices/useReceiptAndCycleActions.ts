@@ -86,7 +86,7 @@ export function useReceiptAndCycleActions(
       setTools(list =>
         list.map(t => {
           if (!limitedIds.has(t.id)) return t;
-          const used = {...t, uses: t.uses + 1, fresh: undefined};
+          const used = {...t, uses: t.uses + 1};
           return exhaustedIds.has(t.id)
             ? {
                 ...used,
@@ -106,7 +106,6 @@ export function useReceiptAndCycleActions(
             ? {
                 ...s,
                 uses: setLimited ? (s.uses || 0) + 1 : s.uses,
-                fresh: setLimited ? undefined : s.fresh,
                 actual: Math.max(0, s.actual - exhausted.length),
               }
             : s,

@@ -156,7 +156,7 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThr
       tr('Υπόλοιπο ανά τεμάχιο'),
       tr('Εξαντλημένα'),
       tr('Λίγες χρήσεις'),
-      tr('Καινούργια'),
+      tr('Αχρησιμοποίητα'),
     ],
     rows,
     totals: [

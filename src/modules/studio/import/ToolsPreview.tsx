@@ -57,10 +57,7 @@ export default function ToolsPreview({plan, L}: {plan: ImportPlan; L: (el: strin
                 <td>{t.code || '—'}</td>
                 <td>{t.manufacturer || '—'}</td>
                 <td>{t.setId ? setNames.get(t.setId) || L('Σετ', 'Set') : t.department || L('Απόθεμα', 'Stock')}</td>
-                <td>
-                  {t.maxUses ? `${t.uses} / ${t.maxUses}` : '—'}
-                  {t.fresh && <span className="usage-fresh-badge">{L('Καινούργιο', 'New')}</span>}
-                </td>
+                <td>{t.maxUses ? `${t.uses} / ${t.maxUses}` : '—'}</td>
               </tr>
             ))}
           </tbody>

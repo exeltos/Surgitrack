@@ -382,7 +382,6 @@ export function useAssetCatalogActions(
       mode,
       state: mode === 'STOCK' ? 'IN_STOCK' : 'IN_DEPARTMENT',
       uses: p.maxUses ? Math.min(p.maxUses, Math.max(0, Math.round(p.uses || 0))) : 0,
-      fresh: p.maxUses && !p.uses && p.fresh ? true : undefined,
       maxUses: p.maxUses,
       sterilizations: 0,
       notes: p.notes,

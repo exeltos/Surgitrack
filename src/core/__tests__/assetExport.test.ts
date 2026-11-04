@@ -77,7 +77,7 @@ describe('the exports of the tool and Set lists', () => {
   it('takes the instruments grouped by kind: the limit, the uses made, and the uses left per piece, not added up', () => {
     const table = toolsGroupedExportTable(
       [
-        tool({id: 'a', uses: 0, maxUses: 10, fresh: true}),
+        tool({id: 'a', uses: 0, maxUses: 10}),
         tool({id: 'b', uses: 10, maxUses: 10}),
         tool({id: 'c', uses: 8, maxUses: 10, department: 'ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ'}),
         tool({id: 'd', name: 'ΑΛΛΟ', code: 'K9', uses: 0, maxUses: undefined}),
@@ -95,7 +95,7 @@ describe('the exports of the tool and Set lists', () => {
     expect(kind[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–10');
     expect(kind[at('Εξαντλημένα')]).toBe(1);
     expect(kind[at('Λίγες χρήσεις')]).toBe(1);
-    expect(kind[at('Καινούργια')]).toBe(1);
+    expect(kind[at('Αχρησιμοποίητα')]).toBe(1);
     expect(String(kind[at('Τμήμα')])).toContain('ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ');
     expect(table.totals?.[at('Τεμάχια')]).toBe(4);
     expect(table.totals?.[at('Υπόλοιπο ανά τεμάχιο')]).toBe('');

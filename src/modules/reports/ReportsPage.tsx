@@ -281,7 +281,8 @@ export default function ReportsPage() {
             options: [
               {value: 'CRITICAL', label: tr('Κρίσιμο · 1 έως {0}', warningThreshold)},
               {value: 'EXHAUSTED', label: tr('Εξαντλημένα · 0 υπόλοιπο')},
-              {value: 'NEW', label: tr('Καινούργια')},
+              {value: 'NEW', label: tr('Αχρησιμοποίητα')},
+              {value: 'USED', label: tr('Χρησιμοποιημένα')},
               {value: 'RETIRED', label: tr('Εκτός χρήσης')},
             ],
             ...choice(usageFilter, setUsageFilter),

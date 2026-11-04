@@ -160,7 +160,7 @@ export function buildReport(
         ...a,
         remaining: Math.max(0, a.maxUses - a.uses),
         stateLabel: 'Σε χρήση',
-        // New: a limit, no use made, and declared new (see core/usageStatus), not just zero uses.
+        // New: a limit and no use made (see core/usageStatus).
         fresh: a.fresh ? 'Ναι' : '—',
         retiredAt: '',
         reason: '',
@@ -191,7 +191,9 @@ export function buildReport(
                 ? a.remaining > 0 && a.remaining <= warningThreshold
                 : usageFilter === 'NEW'
                   ? a.fresh === 'Ναι'
-                  : a.remaining === 0),
+                  : usageFilter === 'USED'
+                    ? a.uses > 0 && a.remaining > 0
+                    : a.remaining === 0),
           )),
       ...(usageFilter === 'ALL' || usageFilter === 'RETIRED' ? retired : []),
     ]
@@ -207,7 +209,7 @@ export function buildReport(
         {key: 'maxUses', label: tr('Όριο')},
         {key: 'remaining', label: tr('Υπόλοιπο')},
         {key: 'stateLabel', label: tr('Κατάσταση')},
-        {key: 'fresh', label: tr('Καινούργιο')},
+        {key: 'fresh', label: tr('Αχρησιμοποίητο')},
         {key: 'retiredAt', label: tr('Εκτός χρήσης από')},
         {key: 'reason', label: tr('Αιτία')},
       ],
