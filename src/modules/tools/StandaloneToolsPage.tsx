@@ -249,7 +249,13 @@ export default function StandaloneToolsPage() {
             </button>
             <ListExport
               table={() => toolsExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
-              grouped={() => toolsGroupedExportTable(filtered, tr('Μεμονωμένα εργαλεία σε χρήση'))}
+              grouped={() =>
+                toolsGroupedExportTable(
+                  filtered,
+                  tr('Μεμονωμένα εργαλεία σε χρήση'),
+                  systemSettings.usageWarningThreshold,
+                )
+              }
               disabled={filtered.length === 0}
             />
           </>

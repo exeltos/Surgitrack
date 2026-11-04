@@ -70,31 +70,35 @@ describe('the exports of the tool and Set lists', () => {
     expect(table.totals?.[0]).toBe('Σύνολο εργαλείων: 3');
     // Uses made are counted for the instruments with a limit (7 and 5 here); the one without a limit adds none.
     expect(table.totals?.[table.headers.indexOf('Χρήσεις')]).toBe(7);
-    // Only the ones with a limit have uses left: 13 and 5.
-    expect(table.totals?.[table.headers.indexOf('Υπόλοιπο')]).toBe(18);
+    // The uses left are not added up: they are a number of nothing.
+    expect(table.totals?.[table.headers.indexOf('Υπόλοιπο')]).toBe('');
   });
 
-  it('takes the instruments grouped by code, name and company, with their totals', () => {
+  it('takes the instruments grouped by kind: the limit, the uses made, and the uses left per piece, not added up', () => {
     const table = toolsGroupedExportTable(
       [
         tool({id: 'a', uses: 0, maxUses: 10, fresh: true}),
         tool({id: 'b', uses: 10, maxUses: 10}),
-        tool({id: 'c', uses: 3, maxUses: 10, department: 'ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ'}),
+        tool({id: 'c', uses: 8, maxUses: 10, department: 'ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ'}),
         tool({id: 'd', name: 'ΑΛΛΟ', code: 'K9', uses: 0, maxUses: undefined}),
       ],
       'Εργαλεία',
+      3,
     );
     expect(table.rows).toHaveLength(2);
     const at = (name: string) => table.headers.indexOf(name);
     const kind = table.rows.find(r => r[0] === 'LARGE NEEDLE DRIVER')!;
     expect(kind[at('Τεμάχια')]).toBe(3);
     expect(kind[at('Με όριο χρήσεων')]).toBe(3);
-    expect(kind[at('Χρήσεις που έγιναν')]).toBe(13);
-    expect(kind[at('Υπόλοιπο χρήσεων')]).toBe(17);
+    expect(kind[at('Όριο χρήσεων')]).toBe('10');
+    expect(kind[at('Χρήσεις που έγιναν')]).toBe(18);
+    expect(kind[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–10');
     expect(kind[at('Εξαντλημένα')]).toBe(1);
+    expect(kind[at('Λίγες χρήσεις')]).toBe(1);
     expect(kind[at('Καινούργια')]).toBe(1);
     expect(String(kind[at('Τμήμα')])).toContain('ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ');
     expect(table.totals?.[at('Τεμάχια')]).toBe(4);
+    expect(table.totals?.[at('Υπόλοιπο ανά τεμάχιο')]).toBe('');
     expect(table.totals?.[0]).toBe('Σύνολο ειδών: 2');
   });
 });

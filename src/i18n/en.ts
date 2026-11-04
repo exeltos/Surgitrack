@@ -734,6 +734,7 @@ export const en: Record<string, string> = {
   'Σύνολο ειδών: {0}': 'Kinds in total: {0}',
   Τεμάχια: 'Pieces',
   'Χρήσεις που έγιναν': 'Uses made',
+  'Υπόλοιπο ανά τεμάχιο': 'Uses left per piece',
   Εξαντλημένα: 'Exhausted',
   Εξαντλημένο: 'Exhausted',
   'Εξαντλημένα · 0 υπόλοιπο': 'Exhausted · 0 left',

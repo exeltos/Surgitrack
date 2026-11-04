@@ -184,7 +184,9 @@ export default function StockPage() {
             extra={
               <ListExport
                 table={() => toolsExportTable(filtered, tr('Απόθεμα εργαλείων'))}
-                grouped={() => toolsGroupedExportTable(filtered, tr('Απόθεμα εργαλείων'))}
+                grouped={() =>
+                  toolsGroupedExportTable(filtered, tr('Απόθεμα εργαλείων'), systemSettings.usageWarningThreshold)
+                }
                 disabled={filtered.length === 0}
               />
             }

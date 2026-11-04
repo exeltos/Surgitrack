@@ -1,7 +1,7 @@
 import {statusLabel} from '../components/ui/statusLabel';
 import {tr, trData} from '../i18n';
 import {STERILE_STATES, formatExpiry} from './sterileExpiry';
-import {isExhausted, isNew} from './usageStatus';
+import {isExhausted, isLow, isNew} from './usageStatus';
 import {distinctValues, groupTools} from './toolGroups';
 import type {ExportTable} from './exportTable';
 import type {SetAsset, Tool} from '../types/domain';
@@ -27,7 +27,7 @@ export const toolsExportTable = (tools: Tool[], title: string): ExportTable => (
     '',
     sum(tools.filter(t => t.maxUses).map(t => t.uses)),
     '',
-    sum(tools.filter(t => t.maxUses).map(t => remainingUses(t) as number)),
+    '',
     '',
   ],
   headers: [
@@ -71,7 +71,7 @@ export const setsExportTable = (sets: SetAsset[], memberCount: Map<string, numbe
     sum(sets.map(s => memberCount.get(s.id) ?? s.actual)),
     sum(sets.filter(s => s.maxUses).map(s => s.uses)),
     '',
-    sum(sets.filter(s => s.maxUses).map(s => remainingUses(s) as number)),
+    '',
     '',
   ],
   headers: [
@@ -102,12 +102,20 @@ export const setsExportTable = (sets: SetAsset[], memberCount: Map<string, numbe
   ]),
 });
 
+const range = (values: number[]) => {
+  if (!values.length) return '';
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  return low === high ? String(low) : `${low}–${high}`;
+};
+
 /**
- * The same instruments grouped by kind, i.e. by name (as the list's «Ομαδοποίηση», see core/toolGroups): one row per kind with its
- * pieces, the departments they are in, how many have a limit, the uses made and left, and how many are new or
- * exhausted; and the totals under them.
+ * The same instruments grouped by kind, i.e. by name (as the list's «Ομαδοποίηση», see core/toolGroups): one row per
+ * kind with its pieces and the departments they are in; for the pieces with a limit, the limit (or its range), the
+ * uses made in all, the uses left per piece (least to most, never added up: the uses left by nine instruments are not
+ * a number of anything), and how many are exhausted, low on uses or new. The totals under it count the same things.
  */
-export const toolsGroupedExportTable = (tools: Tool[], title: string): ExportTable => {
+export const toolsGroupedExportTable = (tools: Tool[], title: string, warningThreshold: number): ExportTable => {
   const rows = groupTools(tools)
     .sort((a, b) => a[0].name.localeCompare(b[0].name, 'el'))
     .map(g => {
@@ -124,9 +132,11 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string): ExportTab
         departments.join(' · '),
         g.length,
         limited.length,
+        range(limited.map(t => t.maxUses as number)),
         sum(limited.map(t => t.uses)),
-        sum(limited.map(t => remainingUses(t) as number)),
+        range(limited.map(t => remainingUses(t) as number)),
         limited.filter(isExhausted).length,
+        limited.filter(t => isLow(t, warningThreshold)).length,
         limited.filter(isNew).length,
       ];
     });
@@ -141,9 +151,11 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string): ExportTab
       tr('Τμήμα'),
       tr('Τεμάχια'),
       tr('Με όριο χρήσεων'),
+      tr('Όριο χρήσεων'),
       tr('Χρήσεις που έγιναν'),
-      tr('Υπόλοιπο χρήσεων'),
+      tr('Υπόλοιπο ανά τεμάχιο'),
       tr('Εξαντλημένα'),
+      tr('Λίγες χρήσεις'),
       tr('Καινούργια'),
     ],
     rows,
@@ -155,10 +167,12 @@ export const toolsGroupedExportTable = (tools: Tool[], title: string): ExportTab
       '',
       column(5),
       column(6),
-      column(7),
+      '',
       column(8),
-      column(9),
+      '',
       column(10),
+      column(11),
+      column(12),
     ],
   };
 };

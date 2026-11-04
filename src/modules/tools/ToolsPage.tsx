@@ -157,7 +157,7 @@ export default function ToolsPage() {
           extra={
             <ListExport
               table={() => toolsExportTable(filtered, tr('Εργαλεία'))}
-              grouped={() => toolsGroupedExportTable(filtered, tr('Εργαλεία'))}
+              grouped={() => toolsGroupedExportTable(filtered, tr('Εργαλεία'), systemSettings.usageWarningThreshold)}
               disabled={filtered.length === 0}
             />
           }
