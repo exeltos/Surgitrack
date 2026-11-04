@@ -1,6 +1,6 @@
 import {supabase} from '../../lib/supabase';
 
-/** What the database says about the caller's network (see migration 20261104200000_ip_access). */
+/** What the database says about the caller's network (see migration 20261104184718_ip_access). */
 export type IpAccess = {mode: 'OFF' | 'LOG' | 'ENFORCE'; allowed: boolean; ip?: string};
 
 /**
