@@ -1,5 +1,4 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
-import Sheet from './Sheet';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
@@ -42,8 +41,8 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {loadModal && (
-        <Sheet onClose={closeLoad}>
-          <div className="receipt-card-modal workflow-modal load-modal">
+        <div className="modal-backdrop" onMouseDown={closeLoad}>
+          <div className="receipt-card-modal workflow-modal load-modal" onMouseDown={e => e.stopPropagation()}>
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoad}>
               <X size={18} />
             </button>
@@ -223,7 +222,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </Sheet>
+        </div>
       )}
     </>
   );

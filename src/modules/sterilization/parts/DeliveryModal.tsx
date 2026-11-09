@@ -1,5 +1,4 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
-import Sheet from './Sheet';
 import {CheckCircle2, Box, Stethoscope, UserRoundCheck, X, IdCard, UserCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
@@ -20,8 +19,11 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {deliveryDraft && (
-        <Sheet onClose={closeDelivery}>
-          <div className="receipt-card-modal workflow-modal workflow-modal-delivery">
+        <div className="modal-backdrop" onMouseDown={closeDelivery}>
+          <div
+            className="receipt-card-modal workflow-modal workflow-modal-delivery"
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeDelivery}>
               <X size={18} />
             </button>
@@ -104,7 +106,7 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </Sheet>
+        </div>
       )}
     </>
   );

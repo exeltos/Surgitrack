@@ -685,7 +685,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
       await modal.open();
       if (modal.dialog !== false)
         await page.waitForSelector(
-          '.modal-backdrop, .ster-sheet, .studio-drawer, [role="dialog"], [aria-modal="true"], dialog[open]',
+          '.modal-backdrop, .studio-drawer, [role="dialog"], [aria-modal="true"], dialog[open]',
           {
             timeout: 3000,
           },

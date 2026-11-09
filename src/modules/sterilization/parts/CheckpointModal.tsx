@@ -1,5 +1,4 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
-import Sheet from './Sheet';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {CheckCircle2, X, ShieldCheck, UserCheck} from 'lucide-react';
 import {getI18nLang, tr, trData} from '../../../i18n';
@@ -24,8 +23,11 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {checkpointDraft && checkpointStage && (
-        <Sheet onClose={closeCheckpoint}>
-          <div className="receipt-card-modal workflow-modal workflow-checkpoint-modal">
+        <div className="modal-backdrop" onMouseDown={closeCheckpoint}>
+          <div
+            className="receipt-card-modal workflow-modal workflow-checkpoint-modal"
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeCheckpoint}>
               <X size={18} />
             </button>
@@ -101,7 +103,7 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </Sheet>
+        </div>
       )}
     </>
   );

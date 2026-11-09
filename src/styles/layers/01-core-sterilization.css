@@ -1380,6 +1380,8 @@ td {
   margin-top: 2px;
 }
 .receipt-card-modal {
+  position: relative;
+  width: min(780px, 100%);
   background: var(--c-white);
   border-radius: 15px;
   box-shadow: 0 26px 90px rgba(15, 23, 42, 0.25);
@@ -1572,6 +1574,9 @@ td {
   font-size: 11px;
   color: var(--c-blue-40);
 }
+.receipt-card-modal.completed {
+  width: min(700px, 100%);
+}
 @media (max-width: 700px) {
   .receipt-summary-grid,
   .receipt-facts {
@@ -1616,6 +1621,9 @@ td {
   margin-top: 5px;
   color: var(--c-blue-50-2);
 }
+.prep-modal {
+  width: min(860px, 100%);
+}
 .compact-empty {
   min-height: 100px !important;
   font-size: 11px !important;
@@ -1623,6 +1631,8 @@ td {
 
 /* v0.10 Receipt detail workspace */
 .receipt-card-modal {
+  width: min(1180px, 68vw);
+  height: min(88vh, 900px);
   padding: 24px 26px 0;
 }
 .receipt-card-modal > .receipt-card-head {
@@ -1731,6 +1741,12 @@ td {
 .receipt-card-modal,
 .receipt-card-modal.completed,
 .prep-modal {
+  width: min(1320px, 72vw) !important;
+  max-width: calc(100vw - 44px) !important;
+  height: calc(100vh - 36px) !important;
+  max-height: calc(100vh - 36px) !important;
+  min-height: 680px;
+  overflow: hidden !important;
   display: flex;
   flex-direction: column;
   padding: 0 !important;
@@ -1759,6 +1775,7 @@ td {
 }
 /* The receipt body scrolls as one workspace while header/actions remain fixed. */
 .receipt-card-modal {
+  overflow-y: auto !important;
   scrollbar-gutter: stable;
 }
 .receipt-card-modal > .receipt-summary-grid,
@@ -1775,6 +1792,22 @@ td {
 .receipt-card-modal > .receipt-complete-banner {
   margin-top: 18px;
 }
+@media (max-width: 1400px) {
+  .receipt-card-modal,
+  .receipt-card-modal.completed,
+  .prep-modal {
+    width: 78vw !important;
+  }
+}
+@media (max-width: 1100px) {
+  .receipt-card-modal,
+  .receipt-card-modal.completed,
+  .prep-modal {
+    width: 94vw !important;
+    max-width: 94vw !important;
+    min-height: 0;
+  }
+}
 @media (max-width: 700px) {
   .modal-backdrop {
     padding: 0;
@@ -1783,6 +1816,10 @@ td {
   .receipt-card-modal,
   .receipt-card-modal.completed,
   .prep-modal {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
     border-radius: 0;
   }
   .receipt-card-modal > .receipt-card-head,
@@ -1805,6 +1842,9 @@ td {
 }
 
 /* v0.12 Receipt refinement: fixed header/footer + scrollable body */
+.receipt-card-modal {
+  overflow: hidden !important;
+}
 .receipt-card-modal > .receipt-card-head {
   position: relative;
   top: auto;
@@ -1907,6 +1947,10 @@ td {
 }
 
 /* v0.15 Receipt workspace: large split card inspired by Limoxis detail drawers */
+.receipt-card-modal {
+  width: min(1500px, 94vw) !important;
+  height: 92vh !important;
+}
 .receipt-two-column {
   display: grid;
   grid-template-columns: minmax(360px, 38%) minmax(0, 62%);
@@ -1944,6 +1988,11 @@ td {
   margin-bottom: 0;
 }
 @media (max-width: 1100px) {
+  .receipt-card-modal {
+    width: 96vw !important;
+    height: 94vh !important;
+    max-height: 94vh !important;
+  }
   .receipt-two-column {
     grid-template-columns: minmax(0, 1fr);
     overflow-y: auto !important;
@@ -1951,6 +2000,9 @@ td {
 }
 @media (max-width: 700px) {
   .receipt-card-modal {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
     border-radius: 0 !important;
   }
   .receipt-two-column {
@@ -1960,6 +2012,10 @@ td {
 }
 
 /* v0.16 Receipt fit: keep receipt controls visible; only the Set tools card scrolls */
+.receipt-card-modal {
+  width: min(1580px, 97vw) !important;
+  height: min(94vh, 980px) !important;
+}
 .receipt-card-body.receipt-two-column {
   min-height: 0;
   overflow: hidden !important;
@@ -2018,6 +2074,10 @@ td {
   overflow: hidden;
 }
 @media (max-height: 820px) and (min-width: 1101px) {
+  .receipt-card-modal {
+    height: 96vh !important;
+    max-height: 96vh !important;
+  }
   .receipt-card-body.receipt-two-column {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
@@ -2053,6 +2113,9 @@ td {
    Keep the receipt modal/header/actions and left-side controls fixed.
    The Set tool rows are the only vertically scrolling area on desktop. */
 @media (min-width: 1101px) {
+  .receipt-card-modal {
+    overflow: hidden !important;
+  }
   .receipt-card-body.receipt-two-column {
     flex: 1 1 auto !important;
     height: 0;
@@ -2084,6 +2147,11 @@ td {
     scrollbar-gutter: stable;
     overscroll-behavior: contain;
   }
+}
+
+.prep-workspace-modal {
+  width: min(1580px, 97vw);
+  overflow: hidden;
 }
 .prep-workspace-modal > .receipt-card-head {
   flex: 0 0 auto;
@@ -2370,6 +2438,9 @@ td {
   .prep-tools-panel {
     min-height: 460px;
   }
+  .prep-workspace-modal {
+    width: 94vw;
+  }
 }
 @media (max-width: 700px) {
   .prep-workspace-body {
@@ -2395,6 +2466,10 @@ td {
 }
 
 /* v0.16.6 Preparation full-height + bulk checking */
+.prep-workspace-modal {
+  height: calc(100dvh - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
+}
 .prep-workspace-body {
   height: 100%;
   align-items: stretch;
@@ -2410,6 +2485,10 @@ td {
   align-items: flex-end;
 }
 @media (max-width: 1100px) {
+  .prep-workspace-modal {
+    height: calc(100dvh - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
   .prep-tools-panel {
     height: auto;
   }
@@ -2743,7 +2822,10 @@ td {
 
 /* v0.17.7 — unified professional workflow modal system */
 .workflow-modal {
+  width: min(920px, calc(100vw - 40px));
+  max-height: calc(100vh - 40px);
   padding: 0;
+  overflow: hidden;
   border-radius: 18px;
   background: var(--c-white);
   display: flex;
@@ -2842,11 +2924,20 @@ td {
 }
 
 /* No giant empty vertical canvas */
+.workflow-modal-cycle,
+.workflow-modal-delivery {
+  height: auto;
+  min-height: 0;
+}
 .workflow-modal .modal-x {
   top: 14px;
   right: 14px;
 }
 @media (max-width: 760px) {
+  .workflow-modal {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
   .workflow-modal-head > .badge {
     grid-column: 2;
   }
@@ -4021,6 +4112,9 @@ td {
 .workflow-configured-queues button {
   min-width: 0;
 }
+.workflow-checkpoint-modal {
+  width: min(820px, 94vw);
+}
 .workflow-checkpoint-body {
   padding: 18px;
   display: grid;
@@ -4104,6 +4198,10 @@ td {
   border-radius: 8px;
   padding: 6px 8px;
   cursor: pointer;
+}
+.load-modal {
+  width: min(980px, 94vw);
+  max-height: 88vh;
 }
 .load-modal-body {
   padding: 14px 16px;
@@ -4215,6 +4313,10 @@ td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.load-release-modal {
+  width: min(940px, 94vw);
+  max-height: 90vh;
 }
 .load-manifest {
   border: 1px solid var(--c-gray-90);
@@ -4400,6 +4502,10 @@ td {
 }
 @media (max-width: 760px) {
   .load-modal {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
   }
   .load-modal-body {
@@ -4431,8 +4537,11 @@ td {
 
 /* v0.23.7 · tablet-first delivery batch */
 .delivery-batch-modal {
+  width: min(1180px, calc(100vw - 34px));
+  max-height: min(900px, calc(100dvh - 28px));
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .delivery-batch-modal .workflow-modal-head {
   flex: 0 0 auto;
@@ -4573,6 +4682,10 @@ td {
 }
 @media (max-width: 860px) {
   .delivery-batch-modal {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
   }
   .delivery-batch-grid {
@@ -4675,11 +4788,33 @@ td {
    This prevents status badges / counters from ever sitting underneath X
    and keeps simple tasks compact while preserving large workspaces where needed.
 */
+.receipt-card-modal.workflow-modal {
+  min-height: 0;
+  height: auto;
+  max-height: calc(100dvh - 40px);
+  overflow: hidden;
+}
 .receipt-card-modal.workflow-modal:not(.load-modal):not(.load-release-modal):not(.delivery-batch-modal):not(
     .prep-workspace-modal
   ) {
   width: min(920px, calc(100vw - 40px)) !important;
   max-width: calc(100vw - 40px) !important;
+}
+.receipt-card-modal.workflow-modal.workflow-checkpoint-modal {
+  width: min(820px, calc(100vw - 40px));
+}
+.receipt-card-modal.workflow-modal.load-modal {
+  width: min(980px, calc(100vw - 40px)) !important;
+  max-width: calc(100vw - 40px) !important;
+}
+.receipt-card-modal.workflow-modal.load-release-modal {
+  width: min(940px, calc(100vw - 40px)) !important;
+  max-width: calc(100vw - 40px) !important;
+}
+.receipt-card-modal.workflow-modal.delivery-batch-modal {
+  width: min(1180px, calc(100vw - 40px)) !important;
+  max-width: calc(100vw - 40px) !important;
+  height: min(860px, calc(100dvh - 40px));
 }
 .workflow-modal-head {
   position: relative;
@@ -5097,6 +5232,11 @@ td {
 
 /* Receipt modal: normal use fits without scrolling the page/left control area. */
 @media (min-width: 1101px) {
+  .receipt-card-modal:not(.prep-workspace-modal) {
+    height: min(94dvh, 920px) !important;
+    max-height: 94dvh !important;
+    overflow: hidden !important;
+  }
   .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-head {
     flex: 0 0 auto;
     padding: 14px 70px 12px 22px;
@@ -5529,11 +5669,15 @@ td {
 }
 
 /* Receipt modal: fixed shell, scrollable content, persistent footer */
+.receipt-card-modal {
+  max-height: calc(100vh - 24px) !important;
+}
 .receipt-card-modal.workflow-modal,
 .receipt-card-modal.prep-modal,
 .receipt-card-modal {
   display: flex !important;
   flex-direction: column !important;
+  overflow: hidden !important;
 }
 .receipt-card-modal > .receipt-card-head,
 .receipt-card-modal > .workflow-modal-head {
@@ -5563,6 +5707,19 @@ td {
 }
 
 /* Prevent the receipt panel itself from pushing below the viewport */
+@media (min-width: 901px) {
+  .receipt-card-modal {
+    height: min(900px, calc(100vh - 24px)) !important;
+  }
+}
+@media (max-width: 900px) {
+  .receipt-card-modal {
+    width: calc(100vw - 12px) !important;
+    max-height: calc(100vh - 12px) !important;
+    height: calc(100vh - 12px) !important;
+  }
+}
+
 /* v0.27.4 — high-specificity visible fixes */
 
 /* Sterilization lists: intentionally smaller and denser than registry cards */
@@ -5616,6 +5773,7 @@ td {
 
 /* Physical receipt modal: the actual scroll container is receipt-card-body.receipt-two-column */
 .receipt-card-modal:not(.prep-workspace-modal) {
+  height: min(92dvh, 860px) !important;
   display: flex !important;
   flex-direction: column !important;
 }
@@ -5684,6 +5842,10 @@ td {
 }
 
 /* v0.27.6 — final receipt layout: note + actions are always visible */
+.receipt-card-modal:not(.prep-workspace-modal) {
+  height: min(94dvh, 900px) !important;
+  overflow: hidden !important;
+}
 .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column {
   padding-bottom: 10px !important;
 }
@@ -5849,6 +6011,10 @@ td {
 }
 
 /* Receipt modal: use the height for content instead of empty canvas. */
+.receipt-card-modal:not(.prep-workspace-modal) {
+  height: min(88dvh, 820px) !important;
+  max-height: 88dvh !important;
+}
 .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column {
   display: grid !important;
   grid-template-columns: minmax(390px, 34%) minmax(0, 66%) !important;
@@ -6387,6 +6553,9 @@ td {
    full-screen column instead, receipt details then the instrument list, scrolling together. */
 @media (max-width: 700px) {
   .receipt-card-modal:not(.prep-workspace-modal) {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
     border-radius: 0 !important;
   }
   .receipt-card-modal:not(.prep-workspace-modal) > .receipt-card-body.receipt-two-column {

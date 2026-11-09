@@ -1,5 +1,4 @@
 import {Fragment, useEffect, useState} from 'react';
-import Sheet from './Sheet';
 import BatchDepartmentPicker from './BatchDepartmentPicker';
 import {departmentsOf} from '../batchDepartments';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
@@ -60,8 +59,11 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {receiptBatchOpen && (
-        <Sheet onClose={closeReceiptBatch}>
-          <div className="receipt-card-modal workflow-modal delivery-batch-modal">
+        <div className="modal-backdrop" onMouseDown={closeReceiptBatch}>
+          <div
+            className="receipt-card-modal workflow-modal delivery-batch-modal"
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeReceiptBatch}>
               <X size={18} />
             </button>
@@ -288,7 +290,7 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </Sheet>
+        </div>
       )}
     </>
   );

@@ -1,5 +1,4 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
-import Sheet from './Sheet';
 import {CheckCircle2, TriangleAlert, Box, Stethoscope, X, ShieldCheck, Clock3} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -21,8 +20,11 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {releaseDraft && (
-        <Sheet onClose={closeRelease}>
-          <div className="receipt-card-modal workflow-modal workflow-modal-cycle">
+        <div className="modal-backdrop" onMouseDown={closeRelease}>
+          <div
+            className="receipt-card-modal workflow-modal workflow-modal-cycle"
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeRelease}>
               <X size={18} />
             </button>
@@ -179,7 +181,7 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </Sheet>
+        </div>
       )}
     </>
   );

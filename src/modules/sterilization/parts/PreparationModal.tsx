@@ -1,5 +1,4 @@
 import type {UIEvent} from 'react';
-import Sheet from './Sheet';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {
   CheckCircle2,
@@ -111,8 +110,8 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {prepDraft && (
-        <Sheet onClose={() => setPrepDraft(null)}>
-          <div className="receipt-card-modal prep-modal prep-workspace-modal">
+        <div className="modal-backdrop" onMouseDown={() => setPrepDraft(null)}>
+          <div className="receipt-card-modal prep-modal prep-workspace-modal" onMouseDown={e => e.stopPropagation()}>
             <button
               className="modal-x"
               aria-label={tr('Κλείσιμο')}
@@ -605,7 +604,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </Sheet>
+        </div>
       )}
     </>
   );
