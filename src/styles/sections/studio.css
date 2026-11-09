@@ -1872,11 +1872,12 @@ html body .notice-block {
   border-radius: 12px;
   background: var(--c-white);
 }
-html body .notice-block legend {
-  padding: 0 8px;
-  font-size: 13px;
+html body .notice-block-title {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-gray-90-3);
+  font-size: 14px;
   font-weight: 800;
-  letter-spacing: 0.02em;
   color: var(--st-teal);
 }
 html body .notice-block label {

@@ -191,7 +191,10 @@ export default function NoticeComposer({
     >
       <div className="notice-form">
         <fieldset className="notice-block">
-          <legend>{L('1 · Τι θα δείξετε', '1 · What to show')}</legend>
+          <legend className="sr-only">{L('1 · Τι θα δείξετε', '1 · What to show')}</legend>
+          <h3 className="notice-block-title" aria-hidden="true">
+            {L('1 · Τι θα δείξετε', '1 · What to show')}
+          </h3>
           <Choice
             label={L('Είδος', 'Kind')}
             value={kind}
@@ -303,7 +306,10 @@ export default function NoticeComposer({
         </fieldset>
 
         <fieldset className="notice-block">
-          <legend>{L('2 · Σε ποιους', '2 · To whom')}</legend>
+          <legend className="sr-only">{L('2 · Σε ποιους', '2 · To whom')}</legend>
+          <h3 className="notice-block-title" aria-hidden="true">
+            {L('2 · Σε ποιους', '2 · To whom')}
+          </h3>
           <Choice
             label={L('Χρήστες', 'Users')}
             value={to}
@@ -366,7 +372,10 @@ export default function NoticeComposer({
         </fieldset>
 
         <fieldset className="notice-block">
-          <legend>{L('3 · Πότε', '3 · When')}</legend>
+          <legend className="sr-only">{L('3 · Πότε', '3 · When')}</legend>
+          <h3 className="notice-block-title" aria-hidden="true">
+            {L('3 · Πότε', '3 · When')}
+          </h3>
           <div className="notice-row">
             <label>
               {L('Από', 'From')}
