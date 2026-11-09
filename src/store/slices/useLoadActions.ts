@@ -30,6 +30,8 @@ import {
   type SimScenario,
 } from '../../core/cycleSimulator';
 import {formatDateTime} from '../../core/displayDate';
+import {useHasModule} from '../../data/cloud/modulesContext';
+import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
@@ -43,6 +45,8 @@ export function useLoadActions(
     ReturnType<typeof useSurgiHelpers> &
     ReturnType<typeof useReceiptAndCycleActions>,
 ) {
+  // A simulated cycle is also reported to the connected devices (device-ingest) where the hospital has them.
+  const withDevices = useHasModule('DEVICES');
   const {
     addMovement,
     assertCirculationAllowed,
@@ -289,6 +293,33 @@ export function useLoadActions(
     };
     recordCycleResult(finished, refs, result, now);
     setProcessLoads(list => list.map(item => (item.id === loadId ? finished : item)));
+    const organizationId = p.cloud?.organizationId;
+    if (run && finished.cycleData && organizationId && withDevices) {
+      const data = finished.cycleData;
+      void sendSimulatedCycle(organizationId, load.equipment, {
+        cycleNumber: load.cycleNumber,
+        program: load.program,
+        startedAt: new Date(run.startedAt).toISOString(),
+        endedAt: new Date().toISOString(),
+        result: data.result,
+        maxTemperature: data.maxTemperature,
+        maxPressure: data.maxPressure,
+        durationMinutes: Math.round(elapsedMinutes(run, Date.now())),
+      })
+        .then(sent =>
+          notify(
+            sent.stored
+              ? tr('Ο κύκλος στάλθηκε στη σελίδα Συσκευές ως «{0}».', simulatedDeviceName(load.equipment))
+              : tr('Ο κύκλος υπήρχε ήδη στη σελίδα Συσκευές.'),
+          ),
+        )
+        .catch(() =>
+          notify(
+            tr('Ο κύκλος δεν στάλθηκε στη σελίδα Συσκευές: μόνο ο διαχειριστής του νοσοκομείου μπορεί να το κάνει.'),
+            true,
+          ),
+        );
+    }
     notify(
       result === 'PASSED'
         ? tr('Ο κύκλος του φορτίου {0} τελείωσε: αναμένει αποδέσμευση.', named(loadId))

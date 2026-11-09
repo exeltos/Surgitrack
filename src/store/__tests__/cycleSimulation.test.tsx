@@ -4,6 +4,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {LibraryStoreProvider} from '../../core/LibraryStore';
 import {SurgiProvider, useSurgi} from '../SurgiStore';
 
+const sent = vi.hoisted(() => vi.fn(async () => ({stored: 1})));
+vi.mock('../../data/cloud/simulatedDevice', () => ({
+  sendSimulatedCycle: sent,
+  simulatedDeviceName: (name: string) => `${name} (προσομοίωση)`,
+}));
+
 const wrapper = ({children}: {children: ReactNode}) => (
   <LibraryStoreProvider>
     <SurgiProvider dataMode="DEMO">{children}</SurgiProvider>
@@ -94,6 +100,17 @@ describe('a simulated sterilizer cycle', () => {
     expect(f.current().status).toBe('FAILED');
     expect(f.current().cycleData?.result).toBe('FAIL');
     expect(f.s().tools.find(t => t.id === f.asset.id)!.state).not.toBe('AWAITING_RELEASE');
+  });
+
+  it('does not report to the connected devices where there is no hospital in the cloud', () => {
+    vi.useFakeTimers({toFake: ['Date']});
+    vi.setSystemTime(new Date('2026-11-09T10:00:00'));
+    const f = setup();
+    f.run(() => f.s().startCycleSimulation(f.load.id, 'PASS'));
+    vi.setSystemTime(new Date('2026-11-09T10:01:05'));
+    f.run(() => f.s().finishProcessLoad(f.load.id, 'PASSED'));
+    expect(f.current().status).toBe('AWAITING_RELEASE');
+    expect(sent).not.toHaveBeenCalled();
   });
 
   it('does not start twice', () => {

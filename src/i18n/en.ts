@@ -2208,6 +2208,10 @@ export const en: Record<string, string> = {
   Θερμοκρασία: 'Temperature',
   Πίεση: 'Pressure',
   'Ελάχιστη πίεση {0} bar': 'Minimum pressure {0} bar',
+  'Ο κύκλος στάλθηκε στη σελίδα Συσκευές ως «{0}».': 'The cycle was sent to the Devices page as “{0}”.',
+  'Ο κύκλος υπήρχε ήδη στη σελίδα Συσκευές.': 'The cycle was already on the Devices page.',
+  'Ο κύκλος δεν στάλθηκε στη σελίδα Συσκευές: μόνο ο διαχειριστής του νοσοκομείου μπορεί να το κάνει.':
+    'The cycle was not sent to the Devices page: only the hospital admin can do that.',
   '{0} σε λειτουργία · {1} ελεύθεροι': '{0} running · {1} free',
   'Όλοι ελεύθεροι': 'All free',
   Ελεύθερος: 'Free',

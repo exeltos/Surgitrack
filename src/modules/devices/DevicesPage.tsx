@@ -28,6 +28,7 @@ import {
 import {DeviceEditor, FileDialog, KeyDialog, SerialDialog} from './DeviceDialogs';
 import {binEntryForDevice} from '../../core/recycleBin';
 import {messageOf} from './deviceUi';
+import {isSimulatedDevice} from '../../data/cloud/simulatedDevice';
 import {formatDateTime} from '../../core/displayDate';
 
 const emptyDevice: DeviceInput = {name: '', kind: 'STERILIZER', connection: 'FILE', active: true};
@@ -292,7 +293,12 @@ export default function DevicesPage() {
                   <span className="device-card-kind">
                     {L(deviceKindLabel[device.kind].el, deviceKindLabel[device.kind].en)}
                   </span>
-                  <b>{device.name}</b>
+                  <b>
+                    {device.name}
+                    {isSimulatedDevice(device) && (
+                      <span className="device-sim-badge">{L('Προσομοίωση', 'Simulation')}</span>
+                    )}
+                  </b>
                   <small>
                     {[device.manufacturer, device.model, device.serialNumber && `S/N ${device.serialNumber}`]
                       .filter(Boolean)

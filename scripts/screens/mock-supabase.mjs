@@ -164,7 +164,8 @@ export function createDatabase(seed) {
         code: 'GN-TEST',
         active: true,
         // SCREENS_EVALUATION=1: the hospital is an evaluation Demo (Demo bar, first steps, ratings).
-        is_demo: process.env.SCREENS_EVALUATION === '1',
+        // SCREENS_DEMO_HOSPITAL=1: it is the platform's Demo hospital (a demo hospital in Supabase, opened in Demo mode).
+        is_demo: process.env.SCREENS_EVALUATION === '1' || process.env.SCREENS_DEMO_HOSPITAL === '1',
         evaluation: process.env.SCREENS_EVALUATION === '1',
         demo_enabled: false,
         plan: 'STANDARD',
@@ -550,6 +551,42 @@ const RPC = {
 };
 
 const FUNCTIONS = {
+  // A new device key (kept per device to know who sends) and a device sending cycles with it (device-ingest).
+  'device-key': (db, body) => {
+    const device = db.devices.find(d => d.id === body?.device_id);
+    if (!device) return {status: 404, body: {error: 'not_found'}};
+    db.__deviceKeys ??= {};
+    const key = `stk_${Array.from({length: 48}, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('')}`;
+    db.__deviceKeys[key] = device.id;
+    device.key_hint = key.slice(-4);
+    return {ok: true, key};
+  },
+  'device-ingest': (db, body, _account, headers) => {
+    const deviceId = db.__deviceKeys?.[String(headers?.['x-device-key'] || '')];
+    if (!deviceId) return {status: 401, body: {error: 'unknown_device_key'}};
+    const list = Array.isArray(body?.cycles) ? body.cycles : [body];
+    let stored = 0;
+    for (const row of list) {
+      if (db.device_readings.some(r => r.device_id === deviceId && r.cycle_number === row.cycle_number)) continue;
+      db.device_readings.unshift({
+        id: crypto.randomUUID(),
+        organization_id: ORG_ID,
+        device_id: deviceId,
+        cycle_number: row.cycle_number,
+        program: row.program ?? null,
+        started_at: row.started_at ?? null,
+        ended_at: row.ended_at ?? null,
+        result: row.result,
+        max_temperature: row.max_temperature ?? null,
+        max_pressure: row.max_pressure ?? null,
+        duration_minutes: row.duration_minutes ?? null,
+        source: 'API',
+        created_at: new Date().toISOString(),
+      });
+      stored++;
+    }
+    return {ok: true, received: list.length, stored, skipped: list.length - stored, rejected: []};
+  },
   'staff-signup': (db, body) =>
     body?.action === 'info'
       ? {
@@ -624,7 +661,7 @@ export function handleSupabase(db, account, {method, url, headers, body}) {
   if (path.startsWith('/functions/v1/')) {
     const name = path.slice('/functions/v1/'.length);
     const fn = FUNCTIONS[name];
-    const out = fn ? fn(db, payload, account) : {ok: true};
+    const out = fn ? fn(db, payload, account, headers) : {ok: true};
     // A function answers {status, body} to refuse, else the body itself.
     return out && typeof out.status === 'number' && 'body' in out ? json(out.status, out.body) : json(200, out);
   }

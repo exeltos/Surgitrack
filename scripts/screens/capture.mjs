@@ -174,7 +174,7 @@ async function newContext(browser, {viewport, account, db, log}) {
   });
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
-    ({lang, key, session, whatsNew, briefing, guides, demo}) => {
+    ({lang, key, session, whatsNew, briefing, guides, demo, demoHospital}) => {
       // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
       window.__longTasks = [];
       try {
@@ -189,6 +189,7 @@ async function newContext(browser, {viewport, account, db, log}) {
       sessionStorage.setItem('__harness_init', '1');
       // SCREENS_DEMO=1: the app in its Demo mode (the simulated sterilizer is offered there).
       if (demo) sessionStorage.setItem('surgitrack-data-mode', 'DEMO');
+      if (demoHospital) sessionStorage.setItem('surgitrack-active-organization', demoHospital);
       localStorage.setItem('surgitrack-lang', lang);
       localStorage.setItem('surgitrack-motion', '1');
       if (session) localStorage.setItem(key, JSON.stringify(session));
@@ -213,7 +214,8 @@ async function newContext(browser, {viewport, account, db, log}) {
       whatsNew: process.env.SCREENS_WHATS_NEW === '1',
       briefing: process.env.SCREENS_BRIEFING === '1',
       guides: process.env.SCREENS_GUIDES === '1',
-      demo: process.env.SCREENS_DEMO === '1',
+      demo: process.env.SCREENS_DEMO === '1' || process.env.SCREENS_DEMO_HOSPITAL === '1',
+      demoHospital: process.env.SCREENS_DEMO_HOSPITAL === '1' ? ORG_ID : '',
     },
   );
   // Every Supabase call is answered here; anything else off this machine is refused (and logged).
@@ -600,7 +602,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
     }
   }
   // The simulated sterilizer (Demo only): started on the first load in the sterilizer, then seen later in its cycle.
-  if (sterilization && process.env.SCREENS_DEMO === '1') {
+  if (sterilization && (process.env.SCREENS_DEMO === '1' || process.env.SCREENS_DEMO_HOSPITAL === '1')) {
     const toRelease = () => page.locator('[data-tour="queue-RELEASE"]').click({timeout: 3000});
     modals.push({
       name: 'sterilization-simulation-3-done',
@@ -628,6 +630,19 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByRole('button', {name: /^(Τέλος κύκλου|End of cycle)/})
           .first()
           .click({timeout: 3000});
+        // The ended cycle was sent to device-ingest as the simulated device: it is on the Devices page.
+        await page.waitForTimeout(1500);
+        await page
+          .getByRole('link', {name: /^(Συσκευές|Devices)$/})
+          .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(1200);
+        await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-5-devices.png`, viewport);
+        await page
+          .getByRole('link', {name: /^(Αποστείρωση|Sterilization)$/})
+          .first()
+          .click({timeout: 3000});
+        await toRelease();
         await page.waitForTimeout(500);
         await page
           .getByRole('button', {name: /^(Αποδέσμευση φορτίου|Release (the )?load)/})
