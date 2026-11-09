@@ -1941,10 +1941,6 @@ html body .notice-choice {
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
 }
-html body .notice-choice button {
-  position: relative;
-  padding-left: 40px;
-}
 html body .notice-choice .notice-dot {
   position: absolute;
   left: 14px;
@@ -1964,7 +1960,8 @@ html body .notice-choice button {
   display: grid;
   gap: 3px;
   align-content: start;
-  padding: 11px 14px;
+  position: relative;
+  padding: 11px 14px 11px 40px;
   border: 1px solid var(--c-gray-90-4);
   border-radius: 10px;
   background: var(--c-white);
