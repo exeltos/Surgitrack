@@ -6,25 +6,35 @@ import {effectiveState, workflowStageState, type WorkflowStageConfig, type Workf
  * Sterilization supervisor) does it, with a reason, and the move is recorded in the history.
  */
 
-export type ReturnTarget = {id: WorkflowStageId; state: string; label: string};
+export type ReturnTargetId = WorkflowStageId | 'DEPARTMENT';
+export type ReturnTarget = {id: ReturnTargetId; state: string; label: string};
 
 /** The stage the release waits in: it belongs to a whole load, so an item is never put back into it. */
 const NOT_A_TARGET: readonly WorkflowStageId[] = ['RELEASE'];
 
 /**
- * The stages an item in `state` may go back to: every enabled stage before the one it is in, nearest first,
- * leaving out the release. Nothing for an item that is not in a stage of Sterilization (at a department, in
- * Service).
+ * Where an item in `state` may be put back to: every enabled earlier stage, nearest first, and its department
+ * (sent to Sterilization or released by mistake). A delivered item (at its department) may go back to any stage,
+ * the delivery included. The release is never a target. Nothing for an item elsewhere (in Service, retired).
  */
-export function returnTargets(stages: readonly WorkflowStageConfig[], state: string): ReturnTarget[] {
+export function returnTargets(
+  stages: readonly WorkflowStageConfig[],
+  state: string,
+  department = 'Τμήμα',
+): ReturnTarget[] {
+  const stageTargets = (list: readonly WorkflowStageConfig[]): ReturnTarget[] =>
+    list
+      .filter(stage => stage.enabled && !NOT_A_TARGET.includes(stage.id))
+      .map(stage => ({id: stage.id, state: workflowStageState[stage.id], label: stage.labelEl}))
+      .reverse();
+  if (state === 'IN_DEPARTMENT') return stageTargets(stages);
   const current = effectiveState(stages, state);
   const index = stages.findIndex(stage => workflowStageState[stage.id] === current);
-  if (index <= 0) return [];
-  return stages
-    .slice(0, index)
-    .filter(stage => stage.enabled && !NOT_A_TARGET.includes(stage.id))
-    .map(stage => ({id: stage.id, state: workflowStageState[stage.id], label: stage.labelEl}))
-    .reverse();
+  if (index < 0) return [];
+  return [
+    ...stageTargets(stages.slice(0, index)),
+    {id: 'DEPARTMENT', state: 'IN_DEPARTMENT', label: `Επιστροφή στο τμήμα · ${department}`},
+  ];
 }
 
 export type ReturnRefusal =

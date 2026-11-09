@@ -27,6 +27,7 @@ import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import AppButton from '../../components/ui/AppButton';
 import UndoMovementButton from '../../components/assets/UndoMovementButton';
+import StageReturnButton from '../../components/assets/StageReturnButton';
 import {compositionHtml} from '../sterilization/printUtils';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
@@ -263,6 +264,7 @@ export default function SetDetailPage() {
             ]}
           />
           <UndoMovementButton kind="SET" id={set.id} />
+          <StageReturnButton kind="SET" id={set.id} />
           {can('department.dispatch') && set.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}

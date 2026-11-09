@@ -26,6 +26,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import AppButton from '../../components/ui/AppButton';
 import UndoMovementButton from '../../components/assets/UndoMovementButton';
+import StageReturnButton from '../../components/assets/StageReturnButton';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -241,6 +242,7 @@ export default function ToolDetailPage() {
             ]}
           />
           <UndoMovementButton kind="TOOL" id={tool.id} />
+          <StageReturnButton kind="TOOL" id={tool.id} />
           {can('department.dispatch') && tool.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}

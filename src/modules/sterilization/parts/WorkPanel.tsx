@@ -416,8 +416,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                     {stageReturnInfo(x.kind, x.id) && (
                       <button
                         className="ster-row-alt"
-                        title={tr('Επιστροφή σε προηγούμενο στάδιο')}
-                        aria-label={tr('Επιστροφή σε προηγούμενο στάδιο')}
+                        title={tr('Επιστροφή σε στάδιο ή στο τμήμα')}
+                        aria-label={tr('Επιστροφή σε στάδιο ή στο τμήμα')}
                         onClick={() => setReturning({kind: x.kind, id: x.id, barcode: x.barcode, name: x.name})}
                       >
                         <Undo2 size={14} /> {tr('Επιστροφή')}

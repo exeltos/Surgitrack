@@ -8,8 +8,8 @@ import {
   type UndoSnapshot,
 } from '../../core/movementUndo';
 import {legacySnapshot} from '../../core/legacyUndo';
-import {returnTargets, type ReturnRefusal, type ReturnTarget} from '../../core/stageReturn';
-import {workflowStageState, type WorkflowStageId} from '../../core/workflow';
+import {returnTargets, type ReturnRefusal, type ReturnTarget, type ReturnTargetId} from '../../core/stageReturn';
+import {workflowStageState} from '../../core/workflow';
 import type {AssetKind, AssetState, Movement} from '../../types/domain';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
@@ -171,7 +171,7 @@ export function useUndoActions(
     if (!can('asset.usage.configure')) return undefined;
     const asset = assetName(kind, id);
     if (!asset || (kind === 'TOOL' && (asset as {mode?: string}).mode !== 'STANDALONE')) return undefined;
-    const targets = returnTargets(sterilizationWorkflow.stages, asset.state);
+    const targets = returnTargets(sterilizationWorkflow.stages, asset.state, asset.department);
     if (!targets.length) return undefined;
     const holds = (status: string) =>
       processLoads.find(
@@ -186,12 +186,16 @@ export function useUndoActions(
   };
 
   /** Puts the item back to an earlier stage, with a reason; the move is in the history and can be undone. */
-  const returnToStage = (kind: AssetKind, id: string, stage: WorkflowStageId, reason: string) => {
+  const returnToStage = (kind: AssetKind, id: string, stage: ReturnTargetId, reason: string) => {
     const info = stageReturnInfo(kind, id);
     const asset = assetName(kind, id);
     const target = info?.targets.find(t => t.id === stage);
     if (!info || info.refusal || !asset || !target || !reason.trim()) return false;
-    const from = sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === asset.state)?.labelEl;
+    const from =
+      asset.state === 'IN_DEPARTMENT'
+        ? asset.department
+        : sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === asset.state)?.labelEl;
+    const to = target.id === 'DEPARTMENT' ? asset.department || 'Τμήμα' : target.label;
     const undo = takeSnapshot('RETURN', kind, id, sets, tools, {after: target.state as AssetState});
     // Taken out of the load that waited for release: the rest of the load is released without it.
     setProcessLoads(list =>
@@ -208,13 +212,13 @@ export function useUndoActions(
       asset: `${asset.barcode} · ${asset.name}`,
       assetKind: kind,
       from: from || asset.state,
-      to: target.label,
-      status: 'Επιστροφή σε προηγούμενο στάδιο',
+      to,
+      status: target.id === 'DEPARTMENT' ? 'Επιστροφή στο τμήμα' : 'Επιστροφή σε προηγούμενο στάδιο',
       by: currentUser.name,
       note: reason.trim(),
       undo,
     });
-    notify(tr('{0}: επέστρεψε στο στάδιο «{1}».', asset.barcode, target.label));
+    notify(tr('{0}: επέστρεψε στο στάδιο «{1}».', asset.barcode, to));
     return true;
   };
 

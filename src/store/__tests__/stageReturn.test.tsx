@@ -22,13 +22,22 @@ describe('returnTargets', () => {
       'PREPARATION',
       'WASHING',
       'RECEIPT',
+      'DEPARTMENT',
     ]);
-    expect(returnTargets(stages, 'IN_WASHING').map(t => t.id)).toEqual(['RECEIPT']);
+    expect(returnTargets(stages, 'IN_WASHING').map(t => t.id)).toEqual(['RECEIPT', 'DEPARTMENT']);
   });
 
-  it('offers nothing at the first stage or outside Sterilization', () => {
-    expect(returnTargets(stages, 'PENDING_STERILIZATION')).toEqual([]);
-    expect(returnTargets(stages, 'IN_DEPARTMENT')).toEqual([]);
+  it('offers only the department at the first stage, and every stage but the release once delivered', () => {
+    expect(returnTargets(stages, 'PENDING_STERILIZATION').map(t => t.id)).toEqual(['DEPARTMENT']);
+    expect(returnTargets(stages, 'IN_DEPARTMENT').map(t => t.id)).toEqual([
+      'DELIVERY',
+      'STERILIZATION',
+      'PACKAGING',
+      'PREPARATION',
+      'WASHING',
+      'RECEIPT',
+    ]);
+    expect(returnTargets(stages, 'RETIRED')).toEqual([]);
   });
 });
 
@@ -82,7 +91,7 @@ describe('returning an item to an earlier stage', () => {
         .s()
         .stageReturnInfo('TOOL', f.asset.id)
         ?.targets.map(t => t.id),
-    ).toEqual(['WASHING', 'RECEIPT']);
+    ).toEqual(['WASHING', 'RECEIPT', 'DEPARTMENT']);
 
     // A reason is required.
     expect(f.run(() => f.s().returnToStage('TOOL', f.asset.id, 'WASHING', '  '))).toBe(false);
@@ -135,6 +144,17 @@ describe('returning an item to an earlier stage', () => {
     expect(f.run(() => f.s().returnToStage('TOOL', f.asset.id, 'PACKAGING', 'λάθος αποδέσμευση'))).toBe(true);
     expect(f.tool().state).toBe('IN_PACKAGING');
     expect(f.tool().sterileUntil).toBeUndefined();
+  });
+
+  it('sends an instrument back to its department, and a delivered one back to the sterilization stages', () => {
+    const f = setup();
+    f.through();
+    expect(f.run(() => f.s().returnToStage('TOOL', f.asset.id, 'DEPARTMENT', 'στάλθηκε κατά λάθος'))).toBe(true);
+    expect(f.tool().state).toBe('IN_DEPARTMENT');
+    expect(f.s().movements[0]).toMatchObject({status: 'Επιστροφή στο τμήμα', to: f.asset.department});
+    // At its department it may be put back into any stage (here the receipt).
+    expect(f.run(() => f.s().returnToStage('TOOL', f.asset.id, 'RECEIPT', 'επανάληψη'))).toBe(true);
+    expect(f.tool().state).toBe('PENDING_STERILIZATION');
   });
 
   it('refuses a stage that is not an earlier one', () => {

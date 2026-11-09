@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Undo2, X} from 'lucide-react';
 import {useSurgi} from '../../../store/SurgiStore';
 import {returnRefusalText} from '../../../core/stageReturn';
-import type {WorkflowStageId} from '../../../core/workflow';
+import type {ReturnTargetId} from '../../../core/stageReturn';
 import type {AssetKind} from '../../../types/domain';
 import AppButton from '../../../components/ui/AppButton';
 import {tr, trData} from '../../../i18n';
@@ -20,7 +20,7 @@ export default function StageReturnModal({
 }) {
   const {stageReturnInfo, returnToStage} = useSurgi();
   const info = stageReturnInfo(asset.kind, asset.id);
-  const [stage, setStage] = useState<WorkflowStageId | ''>(info?.targets[0]?.id ?? '');
+  const [stage, setStage] = useState<ReturnTargetId | ''>(info?.targets[0]?.id ?? '');
   const [reason, setReason] = useState('');
   const refusal = info?.refusal ? tr(returnRefusalText(info.refusal)) : '';
   const ready = !!info && !info.refusal && !!stage && !!reason.trim();
@@ -35,7 +35,7 @@ export default function StageReturnModal({
             <Undo2 size={20} />
           </div>
           <div>
-            <h3>{tr('Επιστροφή σε προηγούμενο στάδιο')}</h3>
+            <h3>{tr('Επιστροφή σε στάδιο ή στο τμήμα')}</h3>
             <p>
               {asset.barcode} · {trData(asset.name)}.{' '}
               {tr('Η κίνηση καταγράφεται στο ιστορικό με την αιτιολογία και μπορεί να αναιρεθεί.')}
@@ -47,8 +47,8 @@ export default function StageReturnModal({
         </header>
         {refusal && <div className="identity-error">{refusal}</div>}
         <label className="stage-return-field">
-          {tr('Επιστροφή στο στάδιο')}
-          <select value={stage} onChange={e => setStage(e.target.value as WorkflowStageId)} disabled={!!refusal}>
+          {tr('Επιστροφή σε')}
+          <select value={stage} onChange={e => setStage(e.target.value as ReturnTargetId)} disabled={!!refusal}>
             {info?.targets.map(t => (
               <option key={t.id} value={t.id}>
                 {trData(t.label)}
