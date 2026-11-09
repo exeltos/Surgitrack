@@ -1,5 +1,6 @@
 import {
   latestUndoable,
+  takeSnapshot,
   membersUnchanged,
   restoreFields,
   undoPermission,
@@ -7,7 +8,9 @@ import {
   type UndoSnapshot,
 } from '../../core/movementUndo';
 import {legacySnapshot} from '../../core/legacyUndo';
-import type {AssetKind, Movement} from '../../types/domain';
+import {returnTargets, type ReturnRefusal, type ReturnTarget} from '../../core/stageReturn';
+import {workflowStageState, type WorkflowStageId} from '../../core/workflow';
+import type {AssetKind, AssetState, Movement} from '../../types/domain';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -16,12 +19,16 @@ import type {useSurgiHelpers} from './useSurgiHelpers';
 /** The movement to undo and what it changed (kept, or worked out for an older one), and whether this person may. */
 export type UndoInfo = {movement: Movement; snapshot: UndoSnapshot} & ({ok: true} | {ok: false; reason: UndoRefusal});
 
+/** Where an item may be put back to by hand, or why it may not (nothing: not for this person or this item). */
+export type StageReturnInfo = {targets: ReturnTarget[]; refusal?: ReturnRefusal};
+
 /** Undoing a dispatch, receipt, stage or delivery made by mistake (see core/movementUndo). */
 export function useUndoActions(
   p: ReturnType<typeof useSurgiSession> & ReturnType<typeof useSurgiRecords> & ReturnType<typeof useSurgiHelpers>,
 ) {
   const {
     addMovement,
+    assetName,
     can,
     currentUser,
     deliveries,
@@ -40,6 +47,7 @@ export function useUndoActions(
     sterilizationReleases,
     sterilizationWorkflow,
     tools,
+    updateState,
     workflowCheckpoints,
   } = p;
   const actor = () => ({
@@ -154,5 +162,61 @@ export function useUndoActions(
     return true;
   };
 
-  return {undoInfo, undoMovement};
+  /**
+   * The stages a Sterilization item may be put back to by hand. Only who may correct uses (owner, hospital
+   * admin, Sterilization supervisor) is offered it; an item in a running sterilizer load, or the last of a load
+   * waiting for release, is refused.
+   */
+  const stageReturnInfo = (kind: AssetKind, id: string): StageReturnInfo | undefined => {
+    if (!can('asset.usage.configure')) return undefined;
+    const asset = assetName(kind, id);
+    if (!asset || (kind === 'TOOL' && (asset as {mode?: string}).mode !== 'STANDALONE')) return undefined;
+    const targets = returnTargets(sterilizationWorkflow.stages, asset.state);
+    if (!targets.length) return undefined;
+    const holds = (status: string) =>
+      processLoads.find(
+        l =>
+          l.kind === 'STERILIZATION' &&
+          l.status === status &&
+          l.items.some(i => i.assetKind === kind && i.assetId === id),
+      );
+    if (holds('OPEN')) return {targets, refusal: 'IN_RUNNING_LOAD'};
+    if (holds('AWAITING_RELEASE')?.items.length === 1) return {targets, refusal: 'LAST_IN_LOAD'};
+    return {targets};
+  };
+
+  /** Puts the item back to an earlier stage, with a reason; the move is in the history and can be undone. */
+  const returnToStage = (kind: AssetKind, id: string, stage: WorkflowStageId, reason: string) => {
+    const info = stageReturnInfo(kind, id);
+    const asset = assetName(kind, id);
+    const target = info?.targets.find(t => t.id === stage);
+    if (!info || info.refusal || !asset || !target || !reason.trim()) return false;
+    const from = sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === asset.state)?.labelEl;
+    const undo = takeSnapshot('RETURN', kind, id, sets, tools, {after: target.state as AssetState});
+    // Taken out of the load that waited for release: the rest of the load is released without it.
+    setProcessLoads(list =>
+      list.map(l =>
+        l.kind === 'STERILIZATION' &&
+        l.status === 'AWAITING_RELEASE' &&
+        l.items.some(i => i.assetKind === kind && i.assetId === id)
+          ? {...l, items: l.items.filter(i => !(i.assetKind === kind && i.assetId === id))}
+          : l,
+      ),
+    );
+    updateState(kind, id, target.state as AssetState);
+    addMovement({
+      asset: `${asset.barcode} · ${asset.name}`,
+      assetKind: kind,
+      from: from || asset.state,
+      to: target.label,
+      status: 'Επιστροφή σε προηγούμενο στάδιο',
+      by: currentUser.name,
+      note: reason.trim(),
+      undo,
+    });
+    notify(tr('{0}: επέστρεψε στο στάδιο «{1}».', asset.barcode, target.label));
+    return true;
+  };
+
+  return {undoInfo, undoMovement, stageReturnInfo, returnToStage};
 }

@@ -1,0 +1,42 @@
+import {effectiveState, workflowStageState, type WorkflowStageConfig, type WorkflowStageId} from './workflow';
+
+/**
+ * Returning a Set or instrument to an earlier stage of Sterilization by hand (put through a stage by mistake,
+ * or received on the wrong tablet). Only who may correct uses (the owner, the hospital admin and the
+ * Sterilization supervisor) does it, with a reason, and the move is recorded in the history.
+ */
+
+export type ReturnTarget = {id: WorkflowStageId; state: string; label: string};
+
+/** The stage the release waits in: it belongs to a whole load, so an item is never put back into it. */
+const NOT_A_TARGET: readonly WorkflowStageId[] = ['RELEASE'];
+
+/**
+ * The stages an item in `state` may go back to: every enabled stage before the one it is in, nearest first,
+ * leaving out the release. Nothing for an item that is not in a stage of Sterilization (at a department, in
+ * Service).
+ */
+export function returnTargets(stages: readonly WorkflowStageConfig[], state: string): ReturnTarget[] {
+  const current = effectiveState(stages, state);
+  const index = stages.findIndex(stage => workflowStageState[stage.id] === current);
+  if (index <= 0) return [];
+  return stages
+    .slice(0, index)
+    .filter(stage => stage.enabled && !NOT_A_TARGET.includes(stage.id))
+    .map(stage => ({id: stage.id, state: workflowStageState[stage.id], label: stage.labelEl}))
+    .reverse();
+}
+
+export type ReturnRefusal =
+  /** Loaded in a sterilizer whose cycle is still running: take it out of the load or end the cycle first. */
+  | 'IN_RUNNING_LOAD'
+  /** The only item left of a load waiting for release: that load is released as «Μη αποδέσμευση». */
+  | 'LAST_IN_LOAD'
+  | 'NO_TARGET';
+
+export const returnRefusalText = (reason: ReturnRefusal) =>
+  reason === 'IN_RUNNING_LOAD'
+    ? 'Είναι σε κλίβανο με κύκλο σε εξέλιξη: χρησιμοποιήστε «Αναίρεση φόρτωσης» ή τερματίστε τον κύκλο.'
+    : reason === 'LAST_IN_LOAD'
+      ? 'Είναι το μόνο που απομένει στο φορτίο: αποδεσμεύστε το φορτίο ως «Μη αποδέσμευση» για να γυρίσει σε επανεπεξεργασία.'
+      : 'Δεν υπάρχει προηγούμενο στάδιο.';

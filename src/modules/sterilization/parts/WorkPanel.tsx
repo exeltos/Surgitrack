@@ -16,14 +16,23 @@ import {
   ShieldCheck,
   Layers3,
   Printer,
+  Undo2,
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import type {SterilizationRow} from '../sterilizationTypes';
 import SterilizerLoads from './SterilizerLoads';
+import StageReturnModal from './StageReturnModal';
 import {askConfirm} from '../../../components/ui/confirmService';
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
-  const {counts} = useSurgi();
+  const {counts, stageReturnInfo} = useSurgi();
+  const [returning, setReturning] = useState<{
+    kind: SterilizationRow['kind'];
+    id: string;
+    barcode: string;
+    name: string;
+  }>();
   const washWithoutWasher = !!useLibraries().sterilizationWorkflow.washingPolicy?.allowWithoutWasher;
   const {
     awaitingLoads,
@@ -403,6 +412,17 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <UserRoundCheck size={15} /> {tr('Παράδοση στο τμήμα')}
                       </button>
                     )}
+                    {/* Owner, hospital admin and supervisor: put it back to an earlier stage after a mistake. */}
+                    {stageReturnInfo(x.kind, x.id) && (
+                      <button
+                        className="ster-row-alt"
+                        title={tr('Επιστροφή σε προηγούμενο στάδιο')}
+                        aria-label={tr('Επιστροφή σε προηγούμενο στάδιο')}
+                        onClick={() => setReturning({kind: x.kind, id: x.id, barcode: x.barcode, name: x.name})}
+                      >
+                        <Undo2 size={14} /> {tr('Επιστροφή')}
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -410,6 +430,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
         </>
       )}
+      {returning && <StageReturnModal asset={returning} onClose={() => setReturning(undefined)} />}
     </div>
   );
 }

@@ -1,5 +1,6 @@
-import type {UndoInfo} from './slices/useUndoActions';
+import type {StageReturnInfo, UndoInfo} from './slices/useUndoActions';
 import type {Permission} from '../core/permissions';
+import type {WorkflowStageId} from '../core/workflow';
 import type {
   AssetKind,
   AssetState,
@@ -340,6 +341,10 @@ export type SurgiStoreValue = {
   undoInfo: (kind: AssetKind, id: string) => UndoInfo | undefined;
   /** Undoes a dispatch, receipt or delivery made by mistake (a reason is required). */
   undoMovement: (kind: AssetKind, id: string, reason: string) => boolean;
+  /** Where a Sterilization item may be put back to by hand (owner, hospital admin, supervisor only). */
+  stageReturnInfo: (kind: AssetKind, id: string) => StageReturnInfo | undefined;
+  /** Puts the item back to an earlier stage, with a required reason. */
+  returnToStage: (kind: AssetKind, id: string, stage: WorkflowStageId, reason: string) => boolean;
   configureUsageLimit: (kind: AssetKind, id: string, maxUses?: number) => void;
   /** Platform owner: drops history entries already deleted on the server and records the clean-up. */
   forgetMovements: (ids: readonly string[]) => void;
