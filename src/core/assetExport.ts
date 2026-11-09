@@ -128,8 +128,9 @@ const range = (values: number[]) => {
 /**
  * The same instruments grouped by kind, i.e. by name (as the list's «Ομαδοποίηση», see core/toolGroups): one row per
  * kind with its pieces and the departments they are in; for the pieces with a limit, the limit (or its range), the
- * uses made in all, the uses left per piece (least to most, never added up: the uses left by nine instruments are not
- * a number of anything), and how many are exhausted, low on uses or new. The totals under it count the same things.
+ * uses made in all, the uses left per piece (least to most) and the total of the uses left by all the pieces of the
+ * kind, and how many are exhausted, low on uses or new. The totals under it count the same things, the uses left
+ * included.
  */
 export const toolsGroupedExportTable = (
   allTools: Tool[],
@@ -157,6 +158,7 @@ export const toolsGroupedExportTable = (
         range(limited.map(t => t.maxUses as number)),
         sum(limited.map(t => t.uses)),
         range(limited.map(t => remainingUses(t) as number)),
+        sum(limited.map(t => remainingUses(t) as number)),
         limited.filter(isExhausted).length,
         limited.filter(t => isLow(t, warningThreshold)).length,
         limited.filter(isNew).length,
@@ -176,6 +178,7 @@ export const toolsGroupedExportTable = (
       tr('Όριο χρήσεων'),
       tr('Χρήσεις που έγιναν'),
       tr('Υπόλοιπο ανά τεμάχιο'),
+      tr('Σύνολο υπολοίπων χρήσεων'),
       tr('Εξαντλημένα'),
       tr('Λίγες χρήσεις'),
       tr('Αχρησιμοποίητα'),
@@ -195,6 +198,7 @@ export const toolsGroupedExportTable = (
       column(10),
       column(11),
       column(12),
+      column(13),
     ],
   };
 };

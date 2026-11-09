@@ -23,7 +23,6 @@ import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import type {SterilizationRow} from '../sterilizationTypes';
 import SterilizerLoads from './SterilizerLoads';
-import SterilizerBoard from './SterilizerBoard';
 import StageReturnModal from './StageReturnModal';
 import {askConfirm} from '../../../components/ui/confirmService';
 
@@ -247,14 +246,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             canFinish={s.can('sterilization.cycle')}
             onFinish={(id, result) => s.finishProcessLoad(id, result)}
             onPrint={s.printLoadForm}
+            onReport={s.printCycle}
           />
         </div>
       )}
       {queue === 'IN_STERILIZER' ? (
-        <>
-          <SterilizerBoard names={s.sterilizerNames} loads={s.runningLoads} />
-          <SterilizerLoads loads={s.runningLoads} />
-        </>
+        <SterilizerLoads loads={s.runningLoads} onPrint={s.printLoadForm} onReport={s.printCycle} />
       ) : rows.length === 0 ? (
         queue === 'RELEASE' && s.runningLoads.length > 0 ? null : (
           <div className="empty ster-empty">

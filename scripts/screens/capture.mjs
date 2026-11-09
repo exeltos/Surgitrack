@@ -610,9 +610,19 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
       dialog: false,
       open: async () => {
         await toRelease();
+        // The row's «Προσομοίωση» opens the load's card, where the scenario is chosen and the simulation started.
+        await page
+          .getByRole('button', {name: /^(Προσομοίωση|Simulation)$/})
+          .first()
+          .click({timeout: 3000});
         await page
           .getByRole('button', {name: /Έναρξη προσομοίωσης|Start simulation/})
           .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(500);
+        await page
+          .getByRole('button', {name: /^(Κλείσιμο|Close)$/})
+          .last()
           .click({timeout: 3000});
         // The cycle runs on the clock: shots early in the heating, in the hold, and (the harness's own) at the end.
         await page.waitForTimeout(3000);
@@ -639,6 +649,21 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await page.locator('[data-tour="queue-IN_STERILIZER"]').click({timeout: 3000});
         await page.waitForTimeout(500);
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2b-board.png`, viewport);
+        // «Λεπτομέρειες» of the row: the load's card with its Sets and instruments.
+        await page
+          .getByRole('button', {name: /Λεπτομέρειες|Details/})
+          .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(500);
+        await shoot(
+          page,
+          `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2c-details.png`,
+          viewport,
+        );
+        await page
+          .getByRole('button', {name: /^(Κλείσιμο|Close)$/})
+          .last()
+          .click({timeout: 3000});
         await toRelease();
         await page.waitForTimeout(42000);
         // The cycle ended by itself (as a connected sterilizer's does): nobody pressed «Τέλος κύκλου».

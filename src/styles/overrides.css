@@ -3048,34 +3048,6 @@ html body .shelf-life-options button.on {
   background: var(--c-cyan-40);
   color: var(--c-white);
 }
-.sterilizer-load-icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: var(--c-amber-95);
-  color: var(--c-orange-45-5);
-}
-.sterilizer-load-card > header > div {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.sterilizer-load-card > header strong {
-  color: var(--c-cyan-20);
-  font-size: 15px;
-}
-.sterilizer-load-card > header small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-html body .sterilizer-load-card > footer .release-reprocess {
-  border: 1px solid var(--c-orange-85);
-  background: var(--c-gray-100-4);
-  color: var(--c-orange-40-2);
-}
-html body .sterilizer-load-card > footer .sterilizer-load-print,
 html body .release-actions .release-print {
   display: inline-flex;
   align-items: center;

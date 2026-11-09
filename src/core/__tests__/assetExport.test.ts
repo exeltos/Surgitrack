@@ -74,7 +74,7 @@ describe('the exports of the tool and Set lists', () => {
     expect(table.totals?.[table.headers.indexOf('Υπόλοιπο')]).toBe('');
   });
 
-  it('takes the instruments grouped by kind: the limit, the uses made, and the uses left per piece, not added up', () => {
+  it('takes the instruments grouped by kind: the limit, the uses made, the uses left per piece and in all', () => {
     const table = toolsGroupedExportTable(
       [
         tool({id: 'a', uses: 0, maxUses: 10}),
@@ -93,12 +93,16 @@ describe('the exports of the tool and Set lists', () => {
     expect(kind[at('Όριο χρήσεων')]).toBe('10');
     expect(kind[at('Χρήσεις που έγιναν')]).toBe(18);
     expect(kind[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–10');
+    // 10 + 0 + 2 uses left by the three pieces.
+    expect(kind[at('Σύνολο υπολοίπων χρήσεων')]).toBe(12);
     expect(kind[at('Εξαντλημένα')]).toBe(1);
     expect(kind[at('Λίγες χρήσεις')]).toBe(1);
     expect(kind[at('Αχρησιμοποίητα')]).toBe(1);
     expect(String(kind[at('Τμήμα')])).toContain('ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ');
     expect(table.totals?.[at('Τεμάχια')]).toBe(4);
     expect(table.totals?.[at('Υπόλοιπο ανά τεμάχιο')]).toBe('');
+    // The total of the uses left is added up under the column too (the piece with no limit adds none).
+    expect(table.totals?.[at('Σύνολο υπολοίπων χρήσεων')]).toBe(12);
     expect(table.totals?.[0]).toBe('Σύνολο ειδών: 2');
   });
 });
