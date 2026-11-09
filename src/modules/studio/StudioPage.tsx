@@ -36,7 +36,10 @@ const SECTION_TEXT: Record<Tab, [string, string]> = {
     'Bulk import of Sets and instruments into a hospital.',
   ],
   RATINGS: ['Τι λένε οι χρήστες για κάθε λειτουργία.', 'What users say about each feature.'],
-  NOTICES: ['Μηνύματα προς όλους τους χρήστες της εφαρμογής.', 'Messages to every user of the app.'],
+  NOTICES: [
+    'Ανακοινώσεις και προωθήσεις προς τους χρήστες και τους διαχειριστές των νοσοκομείων.',
+    'Announcements and promotions to the users and the administrators of the hospitals.',
+  ],
   ERRORS: ['Σφάλματα που συνάντησαν οι χρήστες στην εφαρμογή.', 'Errors users ran into in the app.'],
   LIBRARIES: [
     'Οι κοινές λίστες με τις οποίες ξεκινά κάθε νέο νοσοκομείο.',
