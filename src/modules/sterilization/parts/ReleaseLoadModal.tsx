@@ -1,5 +1,5 @@
 import {loadLabel} from '../../../core/loadLabel';
-import {Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
+import {Activity, Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -153,6 +153,11 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
               <button className="release-print" onClick={() => s.printLoadForm(selectedReleaseLoad.id, true)}>
                 <Printer size={16} /> {tr('Έντυπο')}
               </button>
+              {selectedReleaseLoad.cycleData && (
+                <button className="release-print" onClick={() => s.printCycle(selectedReleaseLoad.id)}>
+                  <Activity size={16} /> {tr('Report κύκλου')}
+                </button>
+              )}
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>
                 <TriangleAlert size={16} /> {tr('Μη αποδέσμευση · όλο το φορτίο')}
               </button>

@@ -266,3 +266,14 @@ html body .device-cycle-free {
     font-weight: 600;
   }
 }
+
+.device-sim-badge {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: middle;
+}

@@ -42,7 +42,9 @@ export default function UndoMovementButton({kind, id}: {kind: AssetKind; id: str
           ? tr('Αναίρεση: {0}', trData(stage || ''))
           : action === 'LOADING'
             ? tr('Αναίρεση φόρτωσης')
-            : tr('Αναίρεση παράδοσης');
+            : action === 'RETURN'
+              ? tr('Αναίρεση επιστροφής')
+              : tr('Αναίρεση παράδοσης');
   const m = info.movement;
   return (
     <>

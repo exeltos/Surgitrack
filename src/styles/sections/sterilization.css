@@ -1703,3 +1703,315 @@ html body .batch-department button.clear:hover {
   border-color: var(--c-gray-65);
   background: var(--c-gray-95);
 }
+
+/* «Επιστροφή σε προηγούμενο στάδιο»: roomy, clearly labelled fields. */
+.stage-return-field {
+  display: grid;
+  gap: 6px;
+  padding: 0 20px 14px 68px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-blue-40);
+}
+.stage-return-field select,
+.stage-return-field textarea {
+  width: 100%;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-3);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+}
+.stage-return-field select {
+  height: 42px;
+  padding: 0 11px;
+  cursor: pointer;
+}
+.stage-return-field textarea {
+  min-height: 84px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.stage-return-field select:focus-visible,
+.stage-return-field textarea:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+.confirm-dialog > .identity-error {
+  margin: 0 20px 12px 68px;
+}
+
+/* Row «Επιστροφή»: a quiet icon button beside the main action, instead of a link repeated under every one. */
+.sterilization-workspace .ster-row-action .ster-row-return {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  box-shadow: none;
+  color: var(--st-muted);
+  cursor: pointer;
+}
+.sterilization-workspace .ster-row-action .ster-row-return:hover {
+  border-color: var(--c-cyan-65);
+  color: var(--st-teal);
+}
+.sterilization-workspace .ster-row-action .ster-row-return:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+
+/* A load in the sterilizer: the simulated cycle's live readings (parts/CycleMonitor.tsx). */
+.cycle-monitor {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--c-gray-95);
+  background: var(--c-gray-100-2);
+}
+.cycle-monitor-start {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  color: var(--st-muted);
+  font-size: 13px;
+}
+.cycle-monitor-start select {
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  font: inherit;
+}
+.cycle-monitor-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cycle-monitor-head small {
+  margin-left: auto;
+  color: var(--st-muted);
+}
+.cycle-monitor-sim {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 11px;
+  font-weight: 700;
+}
+.cycle-monitor-body {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+.cycle-readings {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.cycle-readings > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 9px;
+  background: var(--c-white);
+}
+.cycle-readings dt {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.cycle-readings dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cycle-readings dd.bad {
+  color: var(--c-red-45);
+}
+.cycle-chart {
+  width: 100%;
+  height: 96px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 9px;
+  background: var(--c-white);
+}
+.cycle-chart path {
+  fill: none;
+  stroke-linejoin: round;
+}
+.cycle-chart-plan {
+  stroke: var(--c-gray-90-2);
+  stroke-width: 1.5;
+}
+.cycle-chart-temp {
+  stroke: var(--c-orange-60);
+  stroke-width: 2.2;
+}
+.cycle-chart-pressure {
+  stroke: var(--c-cyan-45);
+  stroke-width: 2.2;
+}
+.cycle-chart-hold {
+  fill: var(--c-gray-95);
+}
+.cycle-chart-limit {
+  stroke: var(--c-red-45);
+  stroke-dasharray: 3 3;
+  stroke-width: 1;
+}
+.cycle-verdict {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.cycle-verdict.ok {
+  background: var(--c-green-90);
+  color: var(--c-green-45);
+}
+.cycle-verdict.bad {
+  background: var(--c-red-85-5);
+  color: var(--c-red-45);
+}
+@media (max-width: 700px) {
+  .cycle-monitor-body,
+  .cycle-monitor-start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.cycle-chart-wrap {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.cycle-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 11px;
+}
+.cycle-chart-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 0;
+  margin-right: 5px;
+  vertical-align: middle;
+  border-top: 2px solid currentColor;
+}
+.cycle-chart-legend .temp::before {
+  border-color: var(--c-orange-60);
+}
+.cycle-chart-legend .pressure::before {
+  border-color: var(--c-cyan-45);
+}
+.cycle-chart-legend .limit::before {
+  border-top-style: dashed;
+  border-color: var(--c-red-45);
+}
+
+/* All sterilizers on one screen (parts/SterilizerBoard.tsx). */
+.sterilizer-board {
+  display: grid;
+  gap: 10px;
+  padding: 12px 12px 0;
+}
+.sterilizer-board > header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.sterilizer-board > header small {
+  color: var(--st-muted);
+}
+.sterilizer-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+.sterilizer-tile {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.sterilizer-tile.free {
+  background: var(--c-gray-100-2);
+  color: var(--st-muted);
+}
+.sterilizer-tile.busy {
+  border-color: var(--c-orange-60);
+}
+.sterilizer-tile.busy.done {
+  border-color: var(--c-green-45);
+}
+.sterilizer-tile .tile-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sterilizer-tile .tile-sim {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 10px;
+  font-weight: 700;
+}
+.sterilizer-tile .tile-state {
+  font-size: 13px;
+  font-weight: 600;
+}
+.sterilizer-tile .tile-readings {
+  display: flex;
+  gap: 16px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.sterilizer-tile .tile-readings .bad {
+  color: var(--c-red-45);
+}
+.sterilizer-tile .tile-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  overflow: hidden;
+}
+.sterilizer-tile .tile-progress i {
+  display: block;
+  height: 100%;
+  background: var(--c-orange-60);
+}
+.sterilizer-tile.done .tile-progress i {
+  background: var(--c-green-45);
+}
+.sterilizer-tile small {
+  color: var(--st-muted);
+}

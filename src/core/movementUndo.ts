@@ -18,7 +18,9 @@ export type UndoAction =
   /** A stage of Sterilization completed (a washer load, preparation, packaging or another check). */
   | 'STAGE'
   /** Loaded into a sterilizer whose cycle is still running. */
-  | 'LOADING';
+  | 'LOADING'
+  /** Put back to an earlier stage by hand (owner, hospital admin, Sterilization supervisor): core/stageReturn. */
+  | 'RETURN';
 
 /** The fields an undoable movement may change, kept as they were before it (null: was empty). */
 const UNDO_FIELDS = [

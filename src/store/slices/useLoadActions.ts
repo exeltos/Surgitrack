@@ -20,6 +20,18 @@ import type {
   WorkflowCheckpointPayload,
 } from '../types';
 import {workflowStageState} from '../../core/workflow';
+import {
+  buildCycleData,
+  DEFAULT_SPEED,
+  elapsedMinutes,
+  isFinished,
+  planFor,
+  type SimRun,
+  type SimScenario,
+} from '../../core/cycleSimulator';
+import {formatDateTime} from '../../core/displayDate';
+import {useHasModule} from '../../data/cloud/modulesContext';
+import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
@@ -33,6 +45,8 @@ export function useLoadActions(
     ReturnType<typeof useSurgiHelpers> &
     ReturnType<typeof useReceiptAndCycleActions>,
 ) {
+  // A simulated cycle is also reported to the connected devices (device-ingest) where the hospital has them.
+  const withDevices = useHasModule('DEVICES');
   const {
     addMovement,
     assertCirculationAllowed,
@@ -237,10 +251,25 @@ export function useLoadActions(
       });
     });
   };
+  /** Starts a simulated cycle in a load that is in the sterilizer (Demo): its readings follow the clock. */
+  const startCycleSimulation = (loadId: string, scenario: SimScenario) => {
+    const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
+    if (!load || load.status !== 'OPEN' || load.simulation) return;
+    const run: SimRun = {scenario, startedAt: Date.now(), speed: DEFAULT_SPEED};
+    setProcessLoads(list => list.map(item => (item.id === loadId ? {...item, simulation: run} : item)));
+    notify(tr('Ξεκίνησε η προσομοίωση του κύκλου {0}.', named(loadId)));
+  };
   /** "End of cycle" for a load in the sterilizer: it goes to release, or back to reprocessing if it failed. */
   const finishProcessLoad = (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => {
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
     if (!load || load.status !== 'OPEN') return;
+    // A simulated cycle that is still running cannot be ended as passed (stopping it is a failure).
+    const run = load.simulation;
+    const plan = planFor(load.program);
+    if (run && result === 'PASSED' && !isFinished(run, plan, Date.now())) {
+      notify(tr('Ο κύκλος του φορτίου {0} τρέχει ακόμα.', named(loadId)), true);
+      return;
+    }
     const refs = load.items
       .map(item => ({ref: {kind: item.assetKind, id: item.assetId}, asset: assetName(item.assetKind, item.assetId)}))
       .filter((entry): entry is LoadRef => !!entry.asset && entry.asset.state === 'IN_STERILIZATION');
@@ -250,9 +279,47 @@ export function useLoadActions(
       status: result === 'PASSED' ? 'AWAITING_RELEASE' : 'FAILED',
       note: [load.note, note?.trim()].filter(Boolean).join(' · ') || undefined,
       completedAt: now,
+      ...(run
+        ? {
+            cycleData: buildCycleData(
+              load.program,
+              run.scenario,
+              formatDateTime(run.startedAt),
+              now,
+              elapsedMinutes(run, Date.now()),
+            ),
+          }
+        : {}),
     };
     recordCycleResult(finished, refs, result, now);
     setProcessLoads(list => list.map(item => (item.id === loadId ? finished : item)));
+    const organizationId = p.cloud?.organizationId;
+    if (run && finished.cycleData && organizationId && withDevices) {
+      const data = finished.cycleData;
+      void sendSimulatedCycle(organizationId, load.equipment, {
+        cycleNumber: load.cycleNumber,
+        program: load.program,
+        startedAt: new Date(run.startedAt).toISOString(),
+        endedAt: new Date().toISOString(),
+        result: data.result,
+        maxTemperature: data.maxTemperature,
+        maxPressure: data.maxPressure,
+        durationMinutes: Math.round(elapsedMinutes(run, Date.now())),
+      })
+        .then(sent =>
+          notify(
+            sent.stored
+              ? tr('Ο κύκλος στάλθηκε στη σελίδα Συσκευές ως «{0}».', simulatedDeviceName(load.equipment))
+              : tr('Ο κύκλος υπήρχε ήδη στη σελίδα Συσκευές.'),
+          ),
+        )
+        .catch(() =>
+          notify(
+            tr('Ο κύκλος δεν στάλθηκε στη σελίδα Συσκευές: μόνο ο διαχειριστής του νοσοκομείου μπορεί να το κάνει.'),
+            true,
+          ),
+        );
+    }
     notify(
       result === 'PASSED'
         ? tr('Ο κύκλος του φορτίου {0} τελείωσε: αναμένει αποδέσμευση.', named(loadId))
@@ -598,6 +665,7 @@ export function useLoadActions(
     advanceStageItems,
     recordBiologicalResult,
     finishProcessLoad,
+    startCycleSimulation,
     completeDeliveryToDepartment,
     completeWorkflowCheckpoint,
     createProcessLoad,

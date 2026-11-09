@@ -16,14 +16,25 @@ import {
   ShieldCheck,
   Layers3,
   Printer,
+  Undo2,
+  Activity,
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import type {SterilizationRow} from '../sterilizationTypes';
 import SterilizerLoads from './SterilizerLoads';
+import SterilizerBoard from './SterilizerBoard';
+import StageReturnModal from './StageReturnModal';
 import {askConfirm} from '../../../components/ui/confirmService';
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
-  const {counts} = useSurgi();
+  const {counts, stageReturnInfo} = useSurgi();
+  const [returning, setReturning] = useState<{
+    kind: SterilizationRow['kind'];
+    id: string;
+    barcode: string;
+    name: string;
+  }>();
   const washWithoutWasher = !!useLibraries().sterilizationWorkflow.washingPolicy?.allowWithoutWasher;
   const {
     awaitingLoads,
@@ -215,6 +226,11 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   <button onClick={() => s.printLoadForm(load.id)}>
                     <Printer size={14} /> {tr('Έντυπο')}
                   </button>
+                  {load.cycleData && (
+                    <button onClick={() => s.printCycle(load.id)}>
+                      <Activity size={14} /> {tr('Report κύκλου')}
+                    </button>
+                  )}
                   <button onClick={() => recallLoad(load.id)}>
                     <TriangleAlert size={14} /> {tr('Ανάκληση')}
                   </button>
@@ -235,7 +251,10 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
         </div>
       )}
       {queue === 'IN_STERILIZER' ? (
-        <SterilizerLoads loads={s.runningLoads} />
+        <>
+          <SterilizerBoard names={s.sterilizerNames} loads={s.runningLoads} />
+          <SterilizerLoads loads={s.runningLoads} />
+        </>
       ) : rows.length === 0 ? (
         queue === 'RELEASE' && s.runningLoads.length > 0 ? null : (
           <div className="empty ster-empty">
@@ -403,6 +422,17 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <UserRoundCheck size={15} /> {tr('Παράδοση στο τμήμα')}
                       </button>
                     )}
+                    {/* Owner, hospital admin and supervisor: put it back to an earlier stage after a mistake. */}
+                    {stageReturnInfo(x.kind, x.id) && (
+                      <button
+                        className="ster-row-return"
+                        title={tr('Επιστροφή σε στάδιο ή στο τμήμα')}
+                        aria-label={tr('Επιστροφή σε στάδιο ή στο τμήμα')}
+                        onClick={() => setReturning({kind: x.kind, id: x.id, barcode: x.barcode, name: x.name})}
+                      >
+                        <Undo2 size={16} />
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -410,6 +440,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
         </>
       )}
+      {returning && <StageReturnModal asset={returning} onClose={() => setReturning(undefined)} />}
     </div>
   );
 }

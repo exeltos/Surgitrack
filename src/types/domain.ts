@@ -1,4 +1,5 @@
 import type {UndoSnapshot} from '../core/movementUndo';
+import type {CycleData, SimRun} from '../core/cycleSimulator';
 
 export type AssetKind = 'SET' | 'TOOL';
 export type AssetState =
@@ -268,6 +269,10 @@ export interface ProcessLoadRecord {
   releasedAt?: string;
   recalledAt?: string;
   recallReason?: string;
+  /** A simulated cycle running in this load (Demo): the cycle's values come from the clock (core/cycleSimulator). */
+  simulation?: SimRun;
+  /** What the cycle measured, kept for the cycle report (a device's readings or the simulation's). */
+  cycleData?: CycleData;
 }
 export interface ReceiptRecord {
   id: string;
