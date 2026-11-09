@@ -4,6 +4,8 @@ import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {useConfirm} from '../../../components/ui/useConfirm';
 import {tr, trData} from '../../../i18n';
 import type {ProcessLoadRecord} from '../../../types/domain';
+import CycleMonitor from './CycleMonitor';
+import {simulationRunning, useNow} from './simulationClock';
 
 /**
  * The loads in the sterilizer right now. Their Sets and instruments are locked (read-only) until the end
@@ -22,6 +24,8 @@ export default function SterilizerLoads({
   onPrint?: (loadId: string) => void;
 }) {
   const [confirm, ask] = useConfirm();
+  // A simulated cycle still running: the clock re-renders the buttons when it ends.
+  const now = useNow(loads.some(load => !!load.simulation));
   if (!loads.length && !onFinish)
     return (
       <div className="empty ster-empty">
@@ -65,6 +69,7 @@ export default function SterilizerLoads({
                 <Lock size={13} /> {tr('Σε εξέλιξη')}
               </span>
             </header>
+            <CycleMonitor load={load} />
             <ul className="sterilizer-load-items">
               {load.items.map(item => (
                 <li key={`${item.assetKind}:${item.assetId}`}>
@@ -105,7 +110,12 @@ export default function SterilizerLoads({
                 >
                   <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
                 </button>
-                <button className="primary" disabled={!canFinish} onClick={() => onFinish(load.id, 'PASSED')}>
+                <button
+                  className="primary"
+                  disabled={!canFinish || simulationRunning(load, now)}
+                  title={simulationRunning(load, now) ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
+                  onClick={() => onFinish(load.id, 'PASSED')}
+                >
                   <CheckCircle2 size={15} /> {tr('Τέλος κύκλου · {0}', load.items.length)}
                 </button>
               </footer>

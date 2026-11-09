@@ -1,6 +1,7 @@
 import type {StageReturnInfo, UndoInfo} from './slices/useUndoActions';
 import type {Permission} from '../core/permissions';
 import type {ReturnTargetId} from '../core/stageReturn';
+import type {SimScenario} from '../core/cycleSimulator';
 import type {
   AssetKind,
   AssetState,
@@ -318,6 +319,8 @@ export type SurgiStoreValue = {
   releaseProcessLoad: (loadId: string, payload: ReleaseProcessLoadPayload) => ProcessLoadRecord | undefined;
   /** End of cycle for a load in the sterilizer: on to release, or the whole load back to reprocessing. */
   finishProcessLoad: (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => ProcessLoadRecord | undefined;
+  /** Starts a simulated cycle in a load that is in the sterilizer (Demo only). */
+  startCycleSimulation: (loadId: string, scenario: SimScenario) => void;
   recallProcessLoad: (loadId: string, reason: string) => void;
   /** The biological indicator of a load released while pending: a failure recalls the whole load. */
   recordBiologicalResult: (loadId: string, result: 'PASS' | 'FAIL') => void;

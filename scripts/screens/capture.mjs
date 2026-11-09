@@ -174,7 +174,7 @@ async function newContext(browser, {viewport, account, db, log}) {
   });
   const session = account ? fakeSession(account) : null;
   await context.addInitScript(
-    ({lang, key, session, whatsNew, briefing, guides}) => {
+    ({lang, key, session, whatsNew, briefing, guides, demo}) => {
       // Main-thread time blocked by long tasks (> 50 ms), read per route as `state.blockedMs`.
       window.__longTasks = [];
       try {
@@ -187,6 +187,8 @@ async function newContext(browser, {viewport, account, db, log}) {
       }
       if (sessionStorage.getItem('__harness_init')) return;
       sessionStorage.setItem('__harness_init', '1');
+      // SCREENS_DEMO=1: the app in its Demo mode (the simulated sterilizer is offered there).
+      if (demo) sessionStorage.setItem('surgitrack-data-mode', 'DEMO');
       localStorage.setItem('surgitrack-lang', lang);
       localStorage.setItem('surgitrack-motion', '1');
       if (session) localStorage.setItem(key, JSON.stringify(session));
@@ -211,6 +213,7 @@ async function newContext(browser, {viewport, account, db, log}) {
       whatsNew: process.env.SCREENS_WHATS_NEW === '1',
       briefing: process.env.SCREENS_BRIEFING === '1',
       guides: process.env.SCREENS_GUIDES === '1',
+      demo: process.env.SCREENS_DEMO === '1',
     },
   );
   // Every Supabase call is answered here; anything else off this machine is refused (and logged).
@@ -595,6 +598,28 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           },
         });
     }
+  }
+  // The simulated sterilizer (Demo only): started on the first load in the sterilizer, then seen later in its cycle.
+  if (sterilization && process.env.SCREENS_DEMO === '1') {
+    const toRelease = () => page.locator('[data-tour="queue-RELEASE"]').click({timeout: 3000});
+    modals.push({
+      name: 'sterilization-simulation-3-done',
+      route: '/sterilization',
+      dialog: false,
+      open: async () => {
+        await toRelease();
+        await page
+          .getByRole('button', {name: /Έναρξη προσομοίωσης|Start simulation/})
+          .first()
+          .click({timeout: 3000});
+        // The cycle runs on the clock: shots early in the heating, in the hold, and (the harness's own) at the end.
+        await page.waitForTimeout(3000);
+        await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-1-heating.png`, viewport);
+        await page.waitForTimeout(19000);
+        await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2-hold.png`, viewport);
+        await page.waitForTimeout(42000);
+      },
+    });
   }
   if (sterilization)
     modals.push({
