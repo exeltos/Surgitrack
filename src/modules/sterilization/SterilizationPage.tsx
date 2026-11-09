@@ -41,98 +41,113 @@ export default function SterilizationPage() {
     setSpecialtyFilter,
     specialtyFilter,
   } = s;
+  // A work card open: it takes the place of the queue (the queue stays mounted, so its picks are kept).
+  const sheetOpen = !!(
+    s.receiptDraft ||
+    s.receiptBatchOpen ||
+    s.prepDraft ||
+    (s.checkpointDraft && s.checkpointStage) ||
+    s.loadModal ||
+    s.releaseDraft ||
+    s.selectedReleaseLoad ||
+    s.deliveryDraft ||
+    s.deliveryBatchOpen ||
+    s.receiptView
+  );
   return (
     <div className="sterilization-workspace">
-      <div className="ster-work-head">
-        <div>
-          <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
-          <h1>{tr('Αποστείρωση')}</h1>
-          <p>{tr('Η πορεία των εργαλείων από την παραλαβή έως την παράδοση στο τμήμα.')}</p>
-        </div>
-        <div className="ster-shift">
-          <ShieldCheck size={18} />
+      <div style={{display: sheetOpen ? 'none' : 'contents'}}>
+        <div className="ster-work-head">
           <div>
-            <small>{tr('Συνδεδεμένος χρήστης')}</small>
-            <strong>{trData(currentUser.name)}</strong>
-            <span>{trData(currentUser.department)}</span>
+            <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
+            <h1>{tr('Αποστείρωση')}</h1>
+            <p>{tr('Η πορεία των εργαλείων από την παραλαβή έως την παράδοση στο τμήμα.')}</p>
+          </div>
+          <div className="ster-shift">
+            <ShieldCheck size={18} />
+            <div>
+              <small>{tr('Συνδεδεμένος χρήστης')}</small>
+              <strong>{trData(currentUser.name)}</strong>
+              <span>{trData(currentUser.department)}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="ster-scan ster-scan-restored">
-        <div className="ster-scan-icon">
-          <ScanBarcode size={23} />
-        </div>
-        <div className="ster-scan-copy">
-          <strong>{tr('Αναζήτηση & σάρωση')}</strong>
-          <span>{tr('Σάρωση barcode ή πληκτρολόγηση · φιλτράρει την καρτέλα · Enter ανοίγει το barcode')}</span>
-        </div>
-        <div className="ster-scan-input" data-tour="ster-scan">
-          <Barcode size={17} />
-          <input
-            autoComplete="off"
-            value={query}
-            onChange={e => {
-              setQuery(e.target.value);
-              setQuickScanFeedback('');
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                s.scanQuery();
-              }
-              if (e.key === 'Escape') setQuery('');
-            }}
-            placeholder={tr('Barcode, ονομασία, κωδικός ή τμήμα…')}
-            aria-label={tr('Αναζήτηση & σάρωση')}
-          />
-          {query && (
-            <button
-              type="button"
-              className="ster-scan-clear"
-              aria-label={tr('Καθαρισμός')}
-              onClick={() => setQuery('')}
-            >
-              <X size={15} />
+        <div className="ster-scan ster-scan-restored">
+          <div className="ster-scan-icon">
+            <ScanBarcode size={23} />
+          </div>
+          <div className="ster-scan-copy">
+            <strong>{tr('Αναζήτηση & σάρωση')}</strong>
+            <span>{tr('Σάρωση barcode ή πληκτρολόγηση · φιλτράρει την καρτέλα · Enter ανοίγει το barcode')}</span>
+          </div>
+          <div className="ster-scan-input" data-tour="ster-scan">
+            <Barcode size={17} />
+            <input
+              autoComplete="off"
+              value={query}
+              onChange={e => {
+                setQuery(e.target.value);
+                setQuickScanFeedback('');
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  s.scanQuery();
+                }
+                if (e.key === 'Escape') setQuery('');
+              }}
+              placeholder={tr('Barcode, ονομασία, κωδικός ή τμήμα…')}
+              aria-label={tr('Αναζήτηση & σάρωση')}
+            />
+            {query && (
+              <button
+                type="button"
+                className="ster-scan-clear"
+                aria-label={tr('Καθαρισμός')}
+                onClick={() => setQuery('')}
+              >
+                <X size={15} />
+              </button>
+            )}
+            <button type="button" onClick={s.scanQuery}>
+              {tr('Άνοιγμα')}
             </button>
-          )}
-          <button type="button" onClick={s.scanQuery}>
-            {tr('Άνοιγμα')}
-          </button>
+          </div>
+          <div className="ster-scan-filters">
+            <FilterMenu
+              filters={[
+                {
+                  key: 'department',
+                  value: departmentFilter,
+                  placeholder: tr('Όλα τα τμήματα'),
+                  options: queueValues('department').map(value => ({value, label: value})),
+                  onChange: setDepartmentFilter,
+                },
+                {
+                  key: 'specialty',
+                  value: specialtyFilter,
+                  placeholder: tr('Όλες οι ειδικότητες'),
+                  options: queueValues('specialty').map(value => ({value, label: value})),
+                  onChange: setSpecialtyFilter,
+                },
+                {
+                  key: 'kind',
+                  value: kindFilter,
+                  placeholder: tr('Σετ & εργαλεία'),
+                  options: [
+                    {value: 'SET', label: tr('Μόνο Σετ')},
+                    {value: 'TOOL', label: tr('Μόνο εργαλεία')},
+                  ],
+                  onChange: setKindFilter,
+                },
+              ]}
+            />
+          </div>
+          {quickScanFeedback && <div className="ster-scan-feedback-inline">{quickScanFeedback}</div>}
         </div>
-        <div className="ster-scan-filters">
-          <FilterMenu
-            filters={[
-              {
-                key: 'department',
-                value: departmentFilter,
-                placeholder: tr('Όλα τα τμήματα'),
-                options: queueValues('department').map(value => ({value, label: value})),
-                onChange: setDepartmentFilter,
-              },
-              {
-                key: 'specialty',
-                value: specialtyFilter,
-                placeholder: tr('Όλες οι ειδικότητες'),
-                options: queueValues('specialty').map(value => ({value, label: value})),
-                onChange: setSpecialtyFilter,
-              },
-              {
-                key: 'kind',
-                value: kindFilter,
-                placeholder: tr('Σετ & εργαλεία'),
-                options: [
-                  {value: 'SET', label: tr('Μόνο Σετ')},
-                  {value: 'TOOL', label: tr('Μόνο εργαλεία')},
-                ],
-                onChange: setKindFilter,
-              },
-            ]}
-          />
-        </div>
-        {quickScanFeedback && <div className="ster-scan-feedback-inline">{quickScanFeedback}</div>}
+        <QueueTabs s={s} />
+        <WorkPanel s={s} />
       </div>
-      <QueueTabs s={s} />
-      <WorkPanel s={s} />
       <LoadModal s={s} />
       <ReleaseLoadModal s={s} />
       <CheckpointModal s={s} />

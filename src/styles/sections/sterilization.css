@@ -5,9 +5,6 @@
   .sterilization-workspace > .ster-work-panel > .ster-list-head {
     flex: 0 0 auto;
   }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) {
-    height: min(94vh, 940px) !important;
-  }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
     grid-template-columns: minmax(410px, 35%) minmax(0, 65%);
   }
@@ -493,11 +490,6 @@ html body .ster-row-action .ster-row-note {
   font-weight: 600;
 }
 /* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
-html body .load-modal {
-  width: min(1180px, calc(100vw - 32px));
-  height: min(900px, calc(100dvh - 32px));
-  max-height: calc(100dvh - 32px);
-}
 html body .load-modal .load-modal-body {
   flex: 1 1 auto;
   display: flex;
@@ -528,11 +520,6 @@ html body .load-modal .load-assets-list > label {
 }
 html body .load-modal .cycle-note {
   flex: 0 0 auto;
-}
-html body .load-release-modal {
-  width: min(1100px, calc(100vw - 32px));
-  height: min(760px, calc(100dvh - 32px));
-  max-height: calc(100dvh - 32px);
 }
 @media (max-width: 1180px) and (min-width: 761px) {
   .sterilization-workspace .ster-work-panel .ster-list-head,
@@ -1032,11 +1019,6 @@ html body .prep-control-panel .shelf-life-picker {
   padding: 10px 12px;
 }
 /* Stage dialogs (washing, packaging, storage) and delivery: as tall as their content, footer right after. */
-html body .workflow-checkpoint-modal,
-html body .workflow-modal-delivery {
-  height: auto;
-  max-height: calc(100dvh - 32px);
-}
 html body .workflow-checkpoint-modal .release-check-card .receipt-section-title,
 html body .workflow-modal .release-check-card .receipt-section-title {
   display: flex;
@@ -1110,12 +1092,6 @@ html body .delivery-batch-modal .handover-signature-row {
 html body .delivery-batch-modal .handover-signature-row input {
   min-width: 0;
   width: 100%;
-}
-html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
-html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
-  height: auto !important;
-  min-height: 0;
-  max-height: calc(100dvh - 32px) !important;
 }
 .released-load-bi {
   align-self: center;
@@ -1441,14 +1417,6 @@ html body .ster-row-load b {
   }
 }
 @media (max-width: 1100px) {
-  html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
-  html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
-    height: auto;
-  }
-  html body .prep-workspace-modal {
-    height: calc(100dvh - 48px) !important;
-    max-height: calc(100dvh - 48px) !important;
-  }
   html body .receipt-card-modal > .prep-workspace-body {
     height: auto;
     align-content: start;
@@ -1765,4 +1733,48 @@ html body .batch-department button.clear:hover {
 .sterilization-workspace .ster-row-action .ster-row-return:focus-visible {
   outline: 2px solid var(--c-cyan-65);
   outline-offset: 1px;
+}
+
+/* A work card opened in the page (parts/Sheet.tsx): full width, scrolling with the page like any other screen. */
+.ster-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+.ster-sheet-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 8px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--st-teal);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ster-sheet-back:hover {
+  border-color: var(--c-cyan-65);
+}
+.ster-sheet-back:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+/* The card fills the page like any screen: the page scrolls, the back button replaces the dialog's close. */
+.ster-sheet > .receipt-card-modal {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  max-height: none;
+  min-height: calc(100vh - 150px);
+  box-shadow: none;
+  border: 1px solid var(--c-gray-90-2);
+}
+.ster-sheet > .receipt-card-modal > .modal-x {
+  display: none;
 }

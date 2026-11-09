@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import Sheet from './Sheet';
 import {loadLabel} from '../../../core/loadLabel';
 import BatchDepartmentPicker from './BatchDepartmentPicker';
 import {departmentsOf} from '../batchDepartments';
@@ -43,11 +44,8 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {deliveryBatchOpen && (
-        <div className="modal-backdrop" onMouseDown={closeDeliveryBatch}>
-          <div
-            className="receipt-card-modal workflow-modal delivery-batch-modal"
-            onMouseDown={e => e.stopPropagation()}
-          >
+        <Sheet onClose={closeDeliveryBatch}>
+          <div className="receipt-card-modal workflow-modal delivery-batch-modal">
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeDeliveryBatch}>
               <X size={18} />
             </button>
@@ -241,7 +239,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </div>
+        </Sheet>
       )}
     </>
   );

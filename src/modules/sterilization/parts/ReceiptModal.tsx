@@ -1,4 +1,5 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
+import Sheet from './Sheet';
 import {
   CheckCircle2,
   ClipboardCheck,
@@ -49,8 +50,8 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {receiptDraft && (
-        <div className="modal-backdrop" onMouseDown={closeReceipt}>
-          <div className="receipt-card-modal" onMouseDown={e => e.stopPropagation()}>
+        <Sheet onClose={closeReceipt}>
+          <div className="receipt-card-modal">
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeReceipt}>
               <X size={18} />
             </button>
@@ -457,7 +458,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </div>
+        </Sheet>
       )}
     </>
   );

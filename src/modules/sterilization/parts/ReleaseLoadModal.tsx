@@ -1,4 +1,5 @@
 import {loadLabel} from '../../../core/loadLabel';
+import Sheet from './Sheet';
 import {Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -28,8 +29,8 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
   return (
     <>
       {selectedReleaseLoad && (
-        <div className="modal-backdrop" onMouseDown={closeLoadRelease}>
-          <div className="receipt-card-modal workflow-modal load-release-modal" onMouseDown={e => e.stopPropagation()}>
+        <Sheet onClose={closeLoadRelease}>
+          <div className="receipt-card-modal workflow-modal load-release-modal">
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoadRelease}>
               <X size={18} />
             </button>
@@ -162,7 +163,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
               </button>
             </div>
           </div>
-        </div>
+        </Sheet>
       )}
     </>
   );
