@@ -239,6 +239,27 @@ export function buildReport(
           cycleProgram: [load.cycleNumber, load.program].filter(Boolean).join(' · '),
           indicators: `${tr('Χημ.')} ${indicatorText(load.chemicalIndicatorResult)} · ${tr('Βιολ.')} ${indicatorText(load.biologicalIndicatorResult)}`,
           releasedInfo: load.releasedAt ? [load.releasedAt, release?.releasedByName].filter(Boolean).join(' · ') : '—',
+          maxTemperature: load.cycleData ? `${load.cycleData.maxTemperature.toFixed(1)} °C` : '—',
+          maxPressure: load.cycleData ? `${load.cycleData.maxPressure.toFixed(2)} bar` : '—',
+          holdMinutes: load.cycleData ? `${load.cycleData.holdMinutes} ${tr('λεπτά')}` : '—',
+          parameters: load.cycleData ? (load.cycleData.result === 'PASS' ? tr('Τηρήθηκαν') : tr('Δεν τηρήθηκαν')) : '—',
+          dataSource: load.cycleData
+            ? load.cycleData.source === 'SIMULATION'
+              ? tr('Προσομοίωση')
+              : tr('Συσκευή')
+            : '—',
+          // On screen: the cycle's readings in one column.
+          cycleReadings: load.cycleData
+            ? [
+                `${load.cycleData.maxTemperature.toFixed(1)} °C`,
+                `${load.cycleData.maxPressure.toFixed(2)} bar`,
+                `${load.cycleData.holdMinutes}′`,
+                load.cycleData.result === 'PASS' ? tr('Τηρήθηκαν') : tr('Δεν τηρήθηκαν'),
+                load.cycleData.source === 'SIMULATION' ? tr('Προσομοίωση') : '',
+              ]
+                .filter(Boolean)
+                .join(' · ')
+            : '—',
         };
       });
     return {
@@ -250,6 +271,11 @@ export function buildReport(
         {key: 'items', label: tr('Αντικείμενα')},
         {key: 'chemical', label: tr('Χημικός δείκτης')},
         {key: 'biological', label: tr('Βιολογικός δείκτης')},
+        {key: 'maxTemperature', label: tr('Μέγ. θερμοκρασία')},
+        {key: 'maxPressure', label: tr('Μέγ. πίεση')},
+        {key: 'holdMinutes', label: tr('Χρόνος αποστείρωσης')},
+        {key: 'parameters', label: tr('Παράμετροι κύκλου')},
+        {key: 'dataSource', label: tr('Πηγή δεδομένων')},
         {key: 'loadStatus', label: tr('Κατάσταση')},
         {key: 'released', label: tr('Αποδέσμευση')},
         {key: 'releasedBy', label: tr('Αποδέσμευσε')},

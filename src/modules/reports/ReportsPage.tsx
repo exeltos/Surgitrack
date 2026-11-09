@@ -300,6 +300,7 @@ export default function ReportsPage() {
             {key: 'cycleProgram', label: tr('Κύκλος')},
             {key: 'items', label: tr('Αντικείμενα')},
             {key: 'indicators', label: tr('Δείκτες')},
+            {key: 'cycleReadings', label: tr('Παράμετροι κύκλου')},
             {key: 'loadStatus', label: tr('Κατάσταση')},
             {key: 'releasedInfo', label: tr('Αποδέσμευση')},
             {key: 'barcodes', label: 'Barcodes'},

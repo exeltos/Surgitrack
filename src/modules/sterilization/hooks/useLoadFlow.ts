@@ -1,6 +1,8 @@
 import {sterilizedOnOf} from '../../../core/sterileExpiry';
 import {tr} from '../../../i18n';
 import {printReleaseForm} from '../printRelease';
+import {printCycleReport} from '../printCycleReport';
+import type {CycleData} from '../../../core/cycleSimulator';
 import type {useSterilizationState} from './useSterilizationState';
 import type {useSterilizationQueues} from './useSterilizationQueues';
 import type {usePreparationChecks} from './usePreparationChecks';
@@ -237,7 +239,27 @@ export function useLoadFlow(
         : undefined,
     });
   };
+  /** Prints the cycle report of a load whose cycle ended with readings (a device's or the simulation's). */
+  const printCycle = (loadId: string) => {
+    const load = p.processLoads.find(item => item.id === loadId);
+    if (!load?.cycleData) return;
+    const release = p.sterilizationReleases.find(r => r.loadId === loadId);
+    printCycleReport({
+      load: {...load, cycleData: load.cycleData as CycleData},
+      hospital: p.organizationName,
+      release:
+        release && load.releasedAt
+          ? {
+              at: load.releasedAt,
+              by: release.releasedByName,
+              decision: load.status === 'REPROCESS' ? 'REPROCESS' : 'RELEASED',
+            }
+          : undefined,
+      label: p.systemSettings.label,
+    });
+  };
   return {
+    printCycle,
     printLoadForm,
     addBarcodeToLoad,
     awaitingLoads,

@@ -113,6 +113,8 @@ export type CycleEvaluation = {
   maxPressure: number;
   /** Minutes the temperature and pressure were both in range. */
   holdMinutes: number;
+  /** The lowest pressure during the hold (what the pressure rule is judged by). */
+  minHoldPressure: number;
   problems: CycleProblem[];
 };
 
@@ -133,6 +135,7 @@ export function evaluate(plan: CyclePlan, samples: readonly CycleSample[], step 
     maxTemperature: Math.max(0, ...samples.map(s => s.temperature)),
     maxPressure: Math.max(0, ...samples.map(s => s.pressure)),
     holdMinutes: round(held),
+    minHoldPressure: duringHold.length ? Math.min(...duringHold.map(s => s.pressure)) : 0,
     problems,
   };
 }
@@ -150,6 +153,8 @@ export type CycleData = {
   maxTemperature: number;
   maxPressure: number;
   holdMinutes: number;
+  /** The lowest pressure during the hold (absent in data kept before it was recorded). */
+  minHoldPressure?: number;
   /** [minute, °C, bar] once a minute. */
   curve: Array<[number, number, number]>;
 };
@@ -177,6 +182,7 @@ export function buildCycleData(
     maxTemperature: evaluation.maxTemperature,
     maxPressure: evaluation.maxPressure,
     holdMinutes: evaluation.holdMinutes,
+    minHoldPressure: evaluation.minHoldPressure,
     curve: samples.filter(s => Number.isInteger(s.minute)).map(s => [s.minute, s.temperature, s.pressure]),
   };
 }

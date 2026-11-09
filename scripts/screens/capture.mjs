@@ -618,6 +618,44 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await page.waitForTimeout(19000);
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2-hold.png`, viewport);
         await page.waitForTimeout(42000);
+        // The cycle ends: the readings stay with the load, in the cycle report and in the loads report.
+        await page
+          .getByRole('button', {name: /^(Τέλος κύκλου|End of cycle)/})
+          .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(500);
+        await page
+          .getByRole('button', {name: /^(Αποδέσμευση φορτίου|Release (the )?load)/})
+          .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(600);
+        await shoot(
+          page,
+          `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-3b-release.png`,
+          viewport,
+        );
+        await page
+          .getByRole('button', {name: /^(Ακύρωση|Cancel)$/})
+          .first()
+          .click({timeout: 3000});
+        await page
+          .getByRole('link', {name: /^(Αναφορές|Reports)$/})
+          .first()
+          .click({timeout: 3000});
+        await page
+          .getByText(/Φορτία κλιβάνου|Sterilizer loads/)
+          .first()
+          .click({timeout: 3000});
+        await page
+          .getByRole('button', {name: /^(Εμφάνιση όλων|Show all)$/})
+          .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(800);
+        await shoot(
+          page,
+          `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-4-report-list.png`,
+          viewport,
+        );
       },
     });
   }

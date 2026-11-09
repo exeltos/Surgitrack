@@ -17,6 +17,7 @@ import {
   Layers3,
   Printer,
   Undo2,
+  Activity,
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -224,6 +225,11 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   <button onClick={() => s.printLoadForm(load.id)}>
                     <Printer size={14} /> {tr('Έντυπο')}
                   </button>
+                  {load.cycleData && (
+                    <button onClick={() => s.printCycle(load.id)}>
+                      <Activity size={14} /> {tr('Report κύκλου')}
+                    </button>
+                  )}
                   <button onClick={() => recallLoad(load.id)}>
                     <TriangleAlert size={14} /> {tr('Ανάκληση')}
                   </button>
