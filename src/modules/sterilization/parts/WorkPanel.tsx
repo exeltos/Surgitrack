@@ -415,12 +415,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                     {/* Owner, hospital admin and supervisor: put it back to an earlier stage after a mistake. */}
                     {stageReturnInfo(x.kind, x.id) && (
                       <button
-                        className="ster-row-alt"
+                        className="ster-row-return"
                         title={tr('Επιστροφή σε στάδιο ή στο τμήμα')}
                         aria-label={tr('Επιστροφή σε στάδιο ή στο τμήμα')}
                         onClick={() => setReturning({kind: x.kind, id: x.id, barcode: x.barcode, name: x.name})}
                       >
-                        <Undo2 size={14} /> {tr('Επιστροφή')}
+                        <Undo2 size={16} />
                       </button>
                     )}
                   </div>

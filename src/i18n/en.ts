@@ -2186,6 +2186,21 @@ export const en: Record<string, string> = {
   'Αναίρεση αποστολής': 'Undo dispatch',
   'Αναίρεση παραλαβής': 'Undo receipt',
   'Αναίρεση παράδοσης': 'Undo delivery',
+  'Αναίρεση επιστροφής': 'Undo return',
+  'Επιστροφή…': 'Return…',
+  'Επιστροφή σε στάδιο ή στο τμήμα': 'Return to a stage or to the department',
+  'Επιστροφή σε': 'Return to',
+  'Επιστροφή σε προηγούμενο στάδιο': 'Return to an earlier stage',
+  'Επιστροφή στο τμήμα': 'Return to the department',
+  'Η κίνηση καταγράφεται στο ιστορικό με την αιτιολογία και μπορεί να αναιρεθεί.':
+    'The movement is recorded in the history with the reason and can be undone.',
+  'π.χ. λάθος σάρωση, άλλο tablet': 'e.g. wrong scan, another tablet',
+  '{0}: επέστρεψε στο στάδιο «{1}».': '{0}: returned to the stage “{1}”.',
+  'Είναι σε κλίβανο με κύκλο σε εξέλιξη: χρησιμοποιήστε «Αναίρεση φόρτωσης» ή τερματίστε τον κύκλο.':
+    'It is in a sterilizer with a running cycle: use “Undo loading” or end the cycle.',
+  'Είναι το μόνο που απομένει στο φορτίο: αποδεσμεύστε το φορτίο ως «Μη αποδέσμευση» για να γυρίσει σε επανεπεξεργασία.':
+    'It is the only one left in the load: release the load as “Not released” to send it back to reprocessing.',
+  'Δεν υπάρχει προηγούμενο στάδιο.': 'There is no earlier stage.',
   'Αναιρείται η κίνηση «{0}» της {1} ({2}) και το {3} επιστρέφει όπως ήταν πριν. Η κίνηση μένει στο ιστορικό ως αναιρεμένη.':
     'The movement “{0}” of {1} ({2}) is undone and {3} goes back to how it was before. The movement stays in the history, marked undone.',
   'π.χ. λάθος σάρωση': 'e.g. wrong scan',

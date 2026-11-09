@@ -1742,3 +1742,27 @@ html body .batch-department button.clear:hover {
 .confirm-dialog > .identity-error {
   margin: 0 20px 12px 68px;
 }
+
+/* Row «Επιστροφή»: a quiet icon button beside the main action, instead of a link repeated under every one. */
+.sterilization-workspace .ster-row-action .ster-row-return {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  box-shadow: none;
+  color: var(--st-muted);
+  cursor: pointer;
+}
+.sterilization-workspace .ster-row-action .ster-row-return:hover {
+  border-color: var(--c-cyan-65);
+  color: var(--st-teal);
+}
+.sterilization-workspace .ster-row-action .ster-row-return:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}

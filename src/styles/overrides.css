@@ -1173,7 +1173,7 @@
     display: none;
   }
   .role-switch select {
-    max-width: 112px;
+    max-width: 100px;
   }
 }
 @media (max-width: 380px) {
