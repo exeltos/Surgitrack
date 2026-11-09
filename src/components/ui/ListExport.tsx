@@ -64,6 +64,15 @@ export default function ListExport({
               max={today}
               aria-label={tr('Ημερομηνία για την κατάσταση της λήψης')}
               onChange={event => setDay(event.target.value)}
+              // A desktop browser opens the picker only from the little icon inside a date field; a click anywhere
+              // on the (invisible) field over the button has to ask for it. iOS has no showPicker and opens its own.
+              onClick={event => {
+                try {
+                  event.currentTarget.showPicker?.();
+                } catch {
+                  // Refused (no user gesture, or already open): the browser's own behaviour stays.
+                }
+              }}
             />
           </span>
         )}
