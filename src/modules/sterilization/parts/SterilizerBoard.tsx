@@ -6,22 +6,11 @@ import {
   endMinute,
   isFinished,
   planFor,
-  type CyclePhase,
 } from '../../../core/cycleSimulator';
 import type {ProcessLoadRecord} from '../../../types/domain';
 import {tr, trData} from '../../../i18n';
 import {useNow} from './simulationClock';
-
-const phaseText = (phase: CyclePhase) =>
-  phase === 'HEATING'
-    ? tr('Προθέρμανση')
-    : phase === 'HOLDING'
-      ? tr('Αποστείρωση')
-      : phase === 'DRYING'
-        ? tr('Στέγνωμα')
-        : phase === 'ABORTED'
-          ? tr('Διακοπή κύκλου')
-          : tr('Ολοκληρώθηκε');
+import {phaseText} from './cycleLabels';
 
 /**
  * All the hospital's sterilizers on one screen: each is free, or runs a load with its phase, readings and

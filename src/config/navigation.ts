@@ -15,6 +15,7 @@ import {
   ScanSearch,
   Scissors,
   Gauge,
+  Flame,
   Users,
   FlaskConical,
   FileSpreadsheet,
@@ -58,6 +59,7 @@ export type NavigationItem = {
 
 const assetNavigation: NavigationItem[] = [
   {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace', group: 'WORK'},
+  {to: '/sterilizers', label: 'Κλίβανοι', icon: Flame, permission: 'sterilization.workspace', group: 'WORK'},
   {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view', group: 'WORK'},
   {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'asset.registry.view', group: 'WORK'},
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view', group: 'EQUIPMENT'},

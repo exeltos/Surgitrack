@@ -617,6 +617,22 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         // The cycle runs on the clock: shots early in the heating, in the hold, and (the harness's own) at the end.
         await page.waitForTimeout(3000);
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-1-heating.png`, viewport);
+        // The «Κλίβανοι» screen: every sterilizer and its cycle.
+        await page
+          .getByRole('link', {name: /^(Κλίβανοι|Sterilizers)$/})
+          .first()
+          .click({timeout: 3000});
+        await page.waitForTimeout(800);
+        await shoot(
+          page,
+          `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-1b-sterilizers.png`,
+          viewport,
+        );
+        await page
+          .getByRole('link', {name: /^(Αποστείρωση|Sterilization)$/})
+          .first()
+          .click({timeout: 3000});
+        await toRelease();
         await page.waitForTimeout(19000);
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2-hold.png`, viewport);
         // All sterilizers on one board (the «Στον κλίβανο» tab) while the cycle runs.
@@ -625,11 +641,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2b-board.png`, viewport);
         await toRelease();
         await page.waitForTimeout(42000);
-        // The cycle ends: the readings stay with the load, in the cycle report and in the loads report.
-        await page
-          .getByRole('button', {name: /^(Τέλος κύκλου|End of cycle)/})
-          .first()
-          .click({timeout: 3000});
+        // The cycle ended by itself (as a connected sterilizer's does): nobody pressed «Τέλος κύκλου».
         // The ended cycle was sent to device-ingest as the simulated device: it is on the Devices page.
         await page.waitForTimeout(1500);
         await page

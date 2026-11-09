@@ -45,6 +45,7 @@ const StockPage = lazyPage(() => import('../modules/stock/StockPage'));
 const BinPage = lazyPage(() => import('../modules/bin/BinPage'));
 const SterileExpiryPage = lazyPage(() => import('../modules/expiry/SterileExpiryPage'));
 const SterilizationPage = lazyPage(() => import('../modules/sterilization/SterilizationPage'));
+const SterilizersPage = lazyPage(() => import('../modules/sterilization/SterilizersPage'));
 const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
 const NameCheckPage = lazyPage(() => import('../modules/tools/NameCheckPage'));
@@ -391,6 +392,14 @@ export default function App() {
             element={
               <Guard permission="asset.create">
                 <ImportPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/sterilizers"
+            element={
+              <Guard permission="sterilization.workspace">
+                <SterilizersPage />
               </Guard>
             }
           />

@@ -11,24 +11,14 @@ import {
   evaluate,
   isFinished,
   planFor,
-  type CyclePhase,
   type CycleProblem,
   type SimScenario,
 } from '../../../core/cycleSimulator';
 import type {ProcessLoadRecord} from '../../../types/domain';
 import {tr} from '../../../i18n';
 import {useNow} from './simulationClock';
-
-const phaseLabel = (phase: CyclePhase) =>
-  phase === 'HEATING'
-    ? tr('Προθέρμανση')
-    : phase === 'HOLDING'
-      ? tr('Αποστείρωση')
-      : phase === 'DRYING'
-        ? tr('Στέγνωμα')
-        : phase === 'ABORTED'
-          ? tr('Διακοπή κύκλου')
-          : tr('Ολοκληρώθηκε');
+import CycleChart from './CycleChart';
+import {phaseText} from './cycleLabels';
 
 const problemText = (problem: CycleProblem) =>
   problem === 'ABORTED'
@@ -42,41 +32,6 @@ const scenarios = (): Array<{id: SimScenario; label: string}> => [
   {id: 'LOW_PRESSURE', label: tr('Πτώση πίεσης')},
   {id: 'ABORTED', label: tr('Διακοπή από συναγερμό')},
 ];
-
-const W = 320;
-const H = 96;
-
-/** The planned curve (faint) and what has happened so far (solid): temperature, and pressure under it. */
-function CycleChart({load, now}: {load: ProcessLoadRecord; now: number}) {
-  const run = load.simulation!;
-  const plan = planFor(load.program);
-  const end = endMinute(plan, run.scenario);
-  const done = Math.min(elapsedMinutes(run, now), end);
-  const x = (minute: number) => (minute / end) * W;
-  const tY = (temperature: number) => H - 6 - ((temperature - 20) / (plan.setpoint + 6 - 20)) * (H - 14);
-  const pY = (pressure: number) => H - 6 - (pressure / 2.6) * (H - 14);
-  const line = (points: Array<[number, number]>) =>
-    points.map(([px, py], index) => `${index ? 'L' : 'M'}${px.toFixed(1)},${py.toFixed(1)}`).join(' ');
-  const planned = curve(plan, run.scenario);
-  const made = curve(plan, run.scenario, done);
-  const holdFrom = x(plan.heatMinutes);
-  const holdTo = x(Math.min(plan.heatMinutes + plan.holdMinutes, end));
-  return (
-    <svg
-      className="cycle-chart"
-      viewBox={`0 0 ${W} ${H}`}
-      role="img"
-      aria-label={tr('Καμπύλη θερμοκρασίας και πίεσης του κύκλου')}
-    >
-      <rect className="cycle-chart-hold" x={holdFrom} y={0} width={Math.max(holdTo - holdFrom, 0)} height={H} />
-      <line className="cycle-chart-limit" x1={0} x2={W} y1={pY(MIN_HOLD_PRESSURE)} y2={pY(MIN_HOLD_PRESSURE)} />
-      <path className="cycle-chart-plan" d={line(planned.map(s => [x(s.minute), tY(s.temperature)]))} />
-      <path className="cycle-chart-plan" d={line(planned.map(s => [x(s.minute), pY(s.pressure)]))} />
-      <path className="cycle-chart-temp" d={line(made.map(s => [x(s.minute), tY(s.temperature)]))} />
-      <path className="cycle-chart-pressure" d={line(made.map(s => [x(s.minute), pY(s.pressure)]))} />
-    </svg>
-  );
-}
 
 /**
  * A load in the sterilizer: in the Demo a simulated cycle can be started here; its temperature, pressure and
@@ -121,7 +76,7 @@ export default function CycleMonitor({load}: {load: ProcessLoadRecord}) {
     <div className={`cycle-monitor${finished ? ' done' : ''}`}>
       <div className="cycle-monitor-head">
         <Activity size={16} aria-hidden="true" />
-        <strong>{phaseLabel(sample.phase)}</strong>
+        <strong>{phaseText(sample.phase)}</strong>
         <span className="cycle-monitor-sim">
           <FlaskConical size={12} /> {tr('Προσομοίωση')}
         </span>

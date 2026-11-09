@@ -1,3 +1,4 @@
+import {useEffect, useRef} from 'react';
 import {loadLabel} from '../../core/loadLabel';
 import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
 import {STERILE_STATES} from '../../core/sterileExpiry';
@@ -22,8 +23,10 @@ import type {
 import {workflowStageState} from '../../core/workflow';
 import {
   buildCycleData,
+  curve,
   DEFAULT_SPEED,
   elapsedMinutes,
+  evaluate,
   isFinished,
   planFor,
   type SimRun,
@@ -661,6 +664,31 @@ export function useLoadActions(
     notify(tr('Η παράδοση του {0} στο {1} ολοκληρώθηκε.', a.barcode, a.department || 'τμήμα'));
     return record;
   };
+  // A simulated cycle ends by itself, as a connected sterilizer's does: a passed one goes on to release, one
+  // that failed (pressure, an alarm) sends the load back to reprocessing. It runs wherever the person is in the
+  // app, so the cycle is not left waiting for someone to open the right tab. Stopping it by hand stays possible.
+  const finishRef = useRef(finishProcessLoad);
+  const loadsRef = useRef(processLoads);
+  useEffect(() => {
+    finishRef.current = finishProcessLoad;
+    loadsRef.current = processLoads;
+  });
+  const handled = useRef(new Set<string>());
+  const simulating = processLoads.some(l => l.kind === 'STERILIZATION' && l.status === 'OPEN' && !!l.simulation);
+  useEffect(() => {
+    if (!simulating) return;
+    const timer = window.setInterval(() => {
+      for (const load of loadsRef.current) {
+        const run = load.simulation;
+        if (load.kind !== 'STERILIZATION' || load.status !== 'OPEN' || !run || handled.current.has(load.id)) continue;
+        const plan = planFor(load.program);
+        if (!isFinished(run, plan, Date.now())) continue;
+        handled.current.add(load.id);
+        finishRef.current(load.id, evaluate(plan, curve(plan, run.scenario)).result === 'PASS' ? 'PASSED' : 'FAILED');
+      }
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [simulating]);
   return {
     advanceStageItems,
     recordBiologicalResult,
