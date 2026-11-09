@@ -96,7 +96,7 @@ describe("the owner's promotions on the administrator's Overview", () => {
     const dialog = await screen.findByRole('dialog', {name: 'Προϊόν Χ'});
     expect(dialog.querySelector('img')).toHaveAttribute('src', 'https://example.com/p.png');
     expect(within(dialog).getByRole('link', {name: /Δείτε/})).toHaveAttribute('href', 'https://example.com/x');
-    fireEvent.click(within(dialog).getAllByRole('button', {name: 'Κλείσιμο'})[1]);
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Κλείσιμο'}));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     // Still a card on the Overview, and not in front of the screen again.
     expect(screen.getByRole('heading', {name: 'Προϊόν Χ'})).toBeInTheDocument();

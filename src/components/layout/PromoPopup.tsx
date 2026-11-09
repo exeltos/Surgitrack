@@ -40,16 +40,13 @@ export default function PromoPopup({promo, onClose}: {promo: PromoContent; onClo
           <small>{tr('Πρόταση')}</small>
           <h2>{promo.title}</h2>
           <p>{promo.message}</p>
-          <div className="promo-popup-actions">
-            {link && (
+          {link && (
+            <div className="promo-popup-actions">
               <a className="promo-cta" href={link} target="_blank" rel="noopener noreferrer">
                 {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={15} aria-hidden="true" />
               </a>
-            )}
-            <button type="button" className="promo-popup-close" onClick={onClose}>
-              {tr('Κλείσιμο')}
-            </button>
-          </div>
+            </div>
+          )}
         </div>
       </article>
     </div>

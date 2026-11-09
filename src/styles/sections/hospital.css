@@ -1204,12 +1204,3 @@ html body .department-home .dash-activity .dash-columns {
   font-weight: 700;
   text-decoration: none;
 }
-.promo-popup-close {
-  margin-left: auto;
-  padding: 10px 16px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 10px;
-  background: var(--c-white);
-  font-weight: 700;
-  cursor: pointer;
-}
