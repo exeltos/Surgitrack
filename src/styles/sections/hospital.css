@@ -1091,6 +1091,13 @@ html body .department-home .dash-activity .dash-columns {
   background: var(--c-gray-100-2);
   color: var(--c-cyan-35);
 }
+.promo-card .promo-image {
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--c-white);
+}
 .promo-card small {
   color: var(--st-muted);
   font-size: 11px;

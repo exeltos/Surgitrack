@@ -51,6 +51,16 @@ describe("the owner's promotions on the administrator's Overview", () => {
     expect(state.asked).toEqual(['PROMO']);
   });
 
+  it('shows the picture of the product, and the icon if it cannot be loaded', async () => {
+    state.promos = [promo({imageUrl: 'https://example.com/p.png'})];
+    const {container} = render(<PromoCards />);
+    await screen.findByRole('heading', {name: 'Προϊόν Χ'});
+    const image = container.querySelector('img.promo-image') as HTMLImageElement;
+    expect(image).toHaveAttribute('src', 'https://example.com/p.png');
+    fireEvent.error(image);
+    expect(container.querySelector('img.promo-image')).toBeNull();
+  });
+
   it('shows no link that is not https', async () => {
     state.promos = [promo({linkUrl: 'javascript:alert(1)'})];
     render(<PromoCards />);

@@ -23,6 +23,7 @@ const readHidden = (): string[] => {
 export default function PromoCards() {
   const [promos, setPromos] = useState<PlatformNotice[]>([]);
   const [hidden, setHidden] = useState<string[]>(readHidden);
+  const [broken, setBroken] = useState<string[]>([]);
   useEffect(() => {
     if (getRuntimeDataMode() !== 'PRODUCTION') return;
     let live = true;
@@ -49,9 +50,14 @@ export default function PromoCards() {
     <div className="promo-cards">
       {shown.map(promo => {
         const link = safeLink(promo.linkUrl);
+        const image = broken.includes(promo.id) ? undefined : safeLink(promo.imageUrl);
         return (
           <article key={promo.id} className="promo-card" aria-label={promo.title}>
-            <Megaphone size={20} aria-hidden="true" />
+            {image ? (
+              <img className="promo-image" src={image} alt="" onError={() => setBroken(ids => [...ids, promo.id])} />
+            ) : (
+              <Megaphone size={20} aria-hidden="true" />
+            )}
             <div>
               <small>{tr('Πρόταση')}</small>
               <h3>{promo.title}</h3>

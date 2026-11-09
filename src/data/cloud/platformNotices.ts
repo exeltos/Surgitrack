@@ -15,6 +15,8 @@ export type PlatformNotice = {
   title?: string;
   linkUrl?: string;
   linkLabel?: string;
+  /** A picture for a promotion (https). */
+  imageUrl?: string;
   /** The hospitals it is for; none named: every hospital. */
   organizationIds?: string[];
   startsAt: string;
@@ -32,6 +34,7 @@ type Row = {
   title?: string | null;
   link_url?: string | null;
   link_label?: string | null;
+  image_url?: string | null;
   organization_ids?: string[] | null;
   starts_at: string;
   ends_at: string | null;
@@ -46,6 +49,7 @@ const fromRow = (row: Row): PlatformNotice => ({
   title: row.title || undefined,
   linkUrl: row.link_url || undefined,
   linkLabel: row.link_label || undefined,
+  imageUrl: row.image_url || undefined,
   organizationIds: row.organization_ids?.length ? row.organization_ids : undefined,
   startsAt: row.starts_at,
   endsAt: row.ends_at || undefined,
@@ -53,8 +57,10 @@ const fromRow = (row: Row): PlatformNotice => ({
   createdByName: row.created_by_name || undefined,
 });
 
-const COLUMNS =
+const MID_COLUMNS =
   'id,message,kind,audience,title,link_url,link_label,organization_ids,starts_at,ends_at,created_at,created_by_name';
+// Newest: with the picture of a promotion (migration notice_image).
+const COLUMNS = MID_COLUMNS.replace('link_label,', 'link_label,image_url,');
 // Before the database has the new columns (migration notice_audience_and_promotions) only the old ones exist.
 const OLD_COLUMNS = 'id,message,starts_at,ends_at,created_at,created_by_name';
 const MISSING_COLUMN = '42703';
@@ -75,6 +81,7 @@ export async function loadNotices(): Promise<PlatformNotice[]> {
   const read = (columns: string) =>
     supabase.from('platform_notices').select(columns).order('starts_at', {ascending: false}).limit(200);
   let {data, error} = await read(COLUMNS);
+  if (error?.code === MISSING_COLUMN) ({data, error} = await read(MID_COLUMNS));
   if (error?.code === MISSING_COLUMN) ({data, error} = await read(OLD_COLUMNS));
   if (error) throw error;
   return (data as unknown as Row[]).map(fromRow);
@@ -94,6 +101,7 @@ export async function loadActiveNotices(kind: NoticeKind = 'NOTICE'): Promise<Pl
       .or(`ends_at.is.null,ends_at.gt.${now}`)
       .order('starts_at', {ascending: false});
   let {data, error} = await read(COLUMNS);
+  if (error?.code === MISSING_COLUMN) ({data, error} = await read(MID_COLUMNS));
   // An old database has only notices, for everyone.
   if (error?.code === MISSING_COLUMN) {
     ({data, error} = await read(OLD_COLUMNS));
@@ -110,6 +118,7 @@ export type NewNotice = {
   title?: string;
   linkUrl?: string;
   linkLabel?: string;
+  imageUrl?: string;
   organizationIds?: string[];
   startsAt?: string;
   endsAt?: string;
@@ -121,7 +130,12 @@ export async function addNotice(notice: NewNotice) {
   const {error} = await supabase.from('platform_notices').insert({
     message: notice.message.trim(),
     // The old columns only, when it is a plain notice for everyone: it works before and after the migration.
-    ...(promo || notice.audience === 'ADMINS' || notice.organizationIds?.length || notice.title || notice.linkUrl
+    ...(promo ||
+    notice.audience === 'ADMINS' ||
+    notice.organizationIds?.length ||
+    notice.title ||
+    notice.linkUrl ||
+    notice.imageUrl
       ? {
           kind: notice.kind || 'NOTICE',
           // A promotion is for the administrators.
@@ -129,6 +143,7 @@ export async function addNotice(notice: NewNotice) {
           title: notice.title?.trim() || null,
           link_url: safeLink(notice.linkUrl?.trim()) || null,
           link_label: notice.linkUrl?.trim() ? notice.linkLabel?.trim() || null : null,
+          ...(notice.imageUrl ? {image_url: safeLink(notice.imageUrl.trim()) || null} : {}),
           organization_ids: notice.organizationIds?.length ? notice.organizationIds : null,
         }
       : {}),

@@ -13,6 +13,7 @@ export type NoticeFields = {
   title?: string;
   linkUrl?: string;
   linkLabel?: string;
+  imageUrl?: string;
   organizationIds?: string[];
   startsAt?: string;
   endsAt?: string;
@@ -83,6 +84,8 @@ export default function NoticeComposer({
   const [message, setMessage] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [linkLabel, setLinkLabel] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [brokenImage, setBrokenImage] = useState('');
   const [onlyChosen, setOnlyChosen] = useState(false);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
@@ -92,22 +95,25 @@ export default function NoticeComposer({
   const promo = kind === 'PROMO';
   const to: NoticeAudience = promo ? 'ADMINS' : audience;
   const link = linkUrl.trim();
+  const image = promo ? imageUrl.trim() : '';
   const problem = !message.trim()
     ? ''
     : promo && !title.trim()
       ? L('Η προώθηση χρειάζεται τίτλο.', 'A promotion needs a title.')
-      : link && !safeLink(link)
-        ? L(
-            'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
-            'The link must start with https:// and have no spaces.',
-          )
-        : onlyChosen && chosen.size === 0
-          ? L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')
-          : from && until && new Date(until) <= new Date(from)
-            ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
-            : until && new Date(until).getTime() <= Date.now()
-              ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
-              : '';
+      : image && !safeLink(image)
+        ? L('Η διεύθυνση της εικόνας πρέπει να αρχίζει με https://.', 'The picture address must start with https://.')
+        : link && !safeLink(link)
+          ? L(
+              'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
+              'The link must start with https:// and have no spaces.',
+            )
+          : onlyChosen && chosen.size === 0
+            ? L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')
+            : from && until && new Date(until) <= new Date(from)
+              ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
+              : until && new Date(until).getTime() <= Date.now()
+                ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
+                : '';
   const ready = !!message.trim() && !problem && !busy;
   const shown = useMemo(() => {
     const q = search.trim().toLocaleLowerCase('el-GR');
@@ -139,6 +145,7 @@ export default function NoticeComposer({
       title: promo || title.trim() ? title : undefined,
       linkUrl: link || undefined,
       linkLabel: linkLabel.trim() || undefined,
+      imageUrl: image || undefined,
       organizationIds: onlyChosen ? [...chosen] : undefined,
       startsAt: toIso(from),
       endsAt: toIso(until),
@@ -148,6 +155,7 @@ export default function NoticeComposer({
       setMessage('');
       setLinkUrl('');
       setLinkLabel('');
+      setImageUrl('');
       setFrom('');
       setUntil('');
     }
@@ -210,6 +218,18 @@ export default function NoticeComposer({
               {message.length} / {MESSAGE_MAX}
             </small>
           </label>
+          {promo && (
+            <label>
+              {L('Εικόνα προϊόντος (διεύθυνση https, προαιρετική)', 'Product picture (https address, optional)')}
+              <input
+                value={imageUrl}
+                maxLength={500}
+                inputMode="url"
+                placeholder="https://"
+                onChange={e => setImageUrl(e.target.value)}
+              />
+            </label>
+          )}
           <div className="notice-button-box">
             <span className="notice-choice-label">
               {L('Κουμπί με σύνδεσμο (προαιρετικό)', 'Button with a link (optional)')}
@@ -336,6 +356,9 @@ export default function NoticeComposer({
         {promo ? (
           <article className="promo-card">
             <Megaphone size={20} aria-hidden="true" />
+            {safeLink(image) && brokenImage !== image && (
+              <img className="promo-image" src={image} alt="" onError={() => setBrokenImage(image)} />
+            )}
             <div>
               <small>{L('Πρόταση', 'Suggestion')}</small>
               <h3>{title.trim() || L('Τίτλος προώθησης', 'Promotion title')}</h3>

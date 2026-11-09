@@ -98,4 +98,18 @@ describe('the owner’s form for an announcement or a promotion', () => {
     write(/^Μήνυμα/, 'Κείμενο');
     expect(publishButton()).toBeDisabled();
   });
+
+  it('takes a picture for a promotion, shows it, and refuses one that is not https', () => {
+    const onPublish = open();
+    fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
+    write(/^Κείμενο\d/, 'Ένα προϊόν');
+    write('Τίτλος', 'Προϊόν Χ');
+    write(/^Εικόνα προϊόντος/, 'http://example.com/a.png');
+    expect(screen.getByRole('alert')).toHaveTextContent('https://');
+    expect(publishButton()).toBeDisabled();
+    write(/^Εικόνα προϊόντος/, 'https://example.com/a.png');
+    expect(document.querySelector('.notice-preview img')).toHaveAttribute('src', 'https://example.com/a.png');
+    fireEvent.click(publishButton());
+    expect(onPublish.mock.calls[0][0]).toMatchObject({imageUrl: 'https://example.com/a.png'});
+  });
 });
