@@ -47,10 +47,17 @@ describe('the entry to the staff import', () => {
     expect(screen.getByRole('dialog', {name: 'Εισαγωγή εργαζομένων'})).toBeInTheDocument();
   });
 
+  it('also offers the owner a new active user, one at a time', () => {
+    render(inApp(<UsersSection s={people({platform: true})} />));
+    fireEvent.click(screen.getByRole('menuitem', {name: /Νέος ενεργός χρήστης/}));
+    expect(screen.getByRole('dialog', {name: 'Νέος ενεργός χρήστης'})).toBeInTheDocument();
+  });
+
   it('is not offered to a hospital admin', () => {
     render(inApp(<UsersSection s={people({platform: false})} />));
     expect(screen.getByRole('menuitem', {name: /Από αρχείο Excel ή CSV/})).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', {name: /Εισαγωγή εργαζομένων/})).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', {name: /Νέος ενεργός χρήστης/})).not.toBeInTheDocument();
   });
 
   it('is not offered without a hospital picked, or in a Demo', () => {

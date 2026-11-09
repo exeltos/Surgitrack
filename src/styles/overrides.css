@@ -4809,3 +4809,26 @@ html body .network-log td {
   padding: 3px 6px;
   border-bottom: 1px solid var(--c-gray-90);
 }
+
+/* The owner's «Νέος ενεργός χρήστης» (people/StaffAddDialog.tsx): a small form in the side drawer. */
+.staff-add .staff-add-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+.staff-add .staff-add-problems {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--c-orange-40);
+  font-size: 12.5px;
+}
+.staff-add .staff-add-done {
+  display: grid;
+  gap: 8px;
+  color: var(--c-green-45);
+}
+.staff-add .staff-add-done p {
+  margin: 0;
+  color: var(--st-ink, inherit);
+}
