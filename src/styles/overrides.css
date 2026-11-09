@@ -4579,6 +4579,16 @@ html body .export-day-input {
   opacity: 0;
   cursor: pointer;
 }
+/* In Chrome and Edge the picker opens from the field's own icon: that icon fills the whole button. */
+html body .export-day-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
 html body .export-day:focus-within .export-day-toggle {
   outline: 2px solid var(--c-cyan-45);
   outline-offset: 1px;
@@ -4647,4 +4657,27 @@ html body .network-log {
 html body .network-log td {
   padding: 3px 6px;
   border-bottom: 1px solid var(--c-gray-90);
+}
+
+/* The owner's «Νέος ενεργός χρήστης» (people/StaffAddDialog.tsx): a small form in the side drawer. */
+.staff-add .staff-add-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+.staff-add .staff-add-problems {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--c-orange-40);
+  font-size: 12.5px;
+}
+.staff-add .staff-add-done {
+  display: grid;
+  gap: 8px;
+  color: var(--c-green-45);
+}
+.staff-add .staff-add-done p {
+  margin: 0;
+  color: var(--st-ink, inherit);
 }

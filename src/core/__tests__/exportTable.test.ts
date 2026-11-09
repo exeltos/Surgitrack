@@ -52,6 +52,41 @@ describe('xlsxBlob', () => {
   });
 });
 
+describe('a table with a band before some of its rows', () => {
+  const banded: ExportTable = {
+    title: 'T',
+    headers: ['A', 'B'],
+    rows: [
+      ['one', 1],
+      ['two', 2],
+      ['new', 3],
+    ],
+    sections: [{before: 2, title: 'Αχρησιμοποίητα'}],
+    totals: ['sum', 6],
+  };
+  const sheet = async () => {
+    const bytes = new Uint8Array(await xlsxBlob(banded).arrayBuffer());
+    const text = new TextDecoder().decode(bytes);
+    return text.slice(text.indexOf('<worksheet'), text.indexOf('</worksheet>'));
+  };
+
+  it('writes the band as a row of its own in Excel, and the rows after it one row lower, totals and filter included', async () => {
+    const xml = await sheet();
+    expect(xml).toContain('<c r="A5" s="0" t="inlineStr"><is><t xml:space="preserve">one</t></is></c>');
+    expect(xml).toContain('<c r="A7" s="4" t="inlineStr"><is><t xml:space="preserve">Αχρησιμοποίητα</t></is></c>');
+    expect(xml).toContain('<c r="A8" s="0" t="inlineStr"><is><t xml:space="preserve">new</t></is></c>');
+    // Two rows under the last one (8), so a filter never hides them.
+    expect(xml).toContain('<c r="A10" s="4" t="inlineStr"><is><t xml:space="preserve">sum</t></is></c>');
+    expect(xml).toContain('<autoFilter ref="A4:B8"/>');
+  });
+
+  it('shows it on the printed page, and leaves it out of the CSV', () => {
+    expect(tableReportHtml(banded, 'el')).toContain('<tr class="band"><th colspan="2">Αχρησιμοποίητα</th></tr>');
+    expect(tableCsv(banded)).not.toContain('Αχρησιμοποίητα');
+    expect(tableCsv(banded).trim().split('\r\n')).toHaveLength(5);
+  });
+});
+
 describe('tableCsv', () => {
   it('writes headers and rows separated by ";", quoting cells that need it', () => {
     const csv = tableCsv({

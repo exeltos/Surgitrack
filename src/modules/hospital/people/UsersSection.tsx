@@ -22,6 +22,7 @@ import {localizedName} from '../../../core/glossary';
 import {SUPERVISOR, roles, assignableRoles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
 import CopyField from '../CopyField';
 import StaffImportDialog from './StaffImportDialog';
+import StaffAddDialog from './StaffAddDialog';
 import PasswordReminder from './PasswordReminder';
 import DownloadMenu from '../../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../../components/assets/PrintPreviewModal';
@@ -66,6 +67,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
   } = s;
   // The owner's staff import (never shown to a hospital admin).
   const [importing, setImporting] = useState(false);
+  const [addingActive, setAddingActive] = useState(false);
   const [sheets, setSheets] = useState(false);
   // The people on screen (the filters apply: choose a department to take just that one): department, name, username.
   const usernameRows = (): UsernameRow[] =>
@@ -112,6 +114,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
   return (
     <>
       {importing && <StaffImportDialog s={s} onClose={() => setImporting(false)} />}
+      {addingActive && <StaffAddDialog s={s} onClose={() => setAddingActive(false)} />}
       {sheets && (
         <PrintPreviewModal
           title={L('Ονόματα χρήστη ανά τμήμα', 'Usernames by department')}
@@ -263,6 +266,26 @@ export default function UsersSection({s}: {s: PeopleState}) {
                         }}
                       />
                     </label>
+                  )}
+                  {platform && !demo && !demoSeats && s.organizationId && (
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setInviteMenu(false);
+                        setAddingActive(true);
+                      }}
+                    >
+                      <UserPlus size={16} />
+                      <span>
+                        <b>{L('Νέος ενεργός χρήστης', 'New active user')}</b>
+                        <small>
+                          {L(
+                            'Μόνο για τον ιδιοκτήτη: ένας χρήστης κατευθείαν ενεργός, χωρίς πρόσκληση. Αρχικός κωδικός το κινητό.',
+                            'Owner only: one user made active at once, with no invitation. The initial password is the mobile number.',
+                          )}
+                        </small>
+                      </span>
+                    </button>
                   )}
                   {platform && !demo && !demoSeats && s.organizationId && (
                     <button

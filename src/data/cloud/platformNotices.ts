@@ -1,9 +1,22 @@
 import {supabase} from '../../lib/supabase';
 
-/** A notice the platform owner shows to every signed-in user, from a time until a time (Studio → Ειδοποιήσεις). */
+/**
+ * A notice the platform owner shows from a time until a time (Studio → Ειδοποιήσεις). A notice is a line at the
+ * top of the app; a promotion is a card on the hospital administrator's Overview, with a title and a link. Each is for
+ * everyone or only the hospital administrators, in every hospital or in the ones named.
+ */
+export type NoticeKind = 'NOTICE' | 'PROMO';
+export type NoticeAudience = 'ALL' | 'ADMINS';
 export type PlatformNotice = {
   id: string;
   message: string;
+  kind: NoticeKind;
+  audience: NoticeAudience;
+  title?: string;
+  linkUrl?: string;
+  linkLabel?: string;
+  /** The hospitals it is for; none named: every hospital. */
+  organizationIds?: string[];
   startsAt: string;
   endsAt?: string;
   createdAt: string;
@@ -14,6 +27,12 @@ export type NoticeStatus = 'ACTIVE' | 'SCHEDULED' | 'ENDED';
 type Row = {
   id: string;
   message: string;
+  kind?: NoticeKind;
+  audience?: NoticeAudience;
+  title?: string | null;
+  link_url?: string | null;
+  link_label?: string | null;
+  organization_ids?: string[] | null;
   starts_at: string;
   ends_at: string | null;
   created_at: string;
@@ -22,11 +41,23 @@ type Row = {
 const fromRow = (row: Row): PlatformNotice => ({
   id: row.id,
   message: row.message,
+  kind: row.kind || 'NOTICE',
+  audience: row.audience || 'ALL',
+  title: row.title || undefined,
+  linkUrl: row.link_url || undefined,
+  linkLabel: row.link_label || undefined,
+  organizationIds: row.organization_ids?.length ? row.organization_ids : undefined,
   startsAt: row.starts_at,
   endsAt: row.ends_at || undefined,
   createdAt: row.created_at,
   createdByName: row.created_by_name || undefined,
 });
+
+const COLUMNS =
+  'id,message,kind,audience,title,link_url,link_label,organization_ids,starts_at,ends_at,created_at,created_by_name';
+// Before the database has the new columns (migration notice_audience_and_promotions) only the old ones exist.
+const OLD_COLUMNS = 'id,message,starts_at,ends_at,created_at,created_by_name';
+const MISSING_COLUMN = '42703';
 
 /** Whether a notice shows now, is still to come, or is over. */
 export const noticeStatus = (notice: PlatformNotice, now = Date.now()): NoticeStatus =>
@@ -36,33 +67,71 @@ export const noticeStatus = (notice: PlatformNotice, now = Date.now()): NoticeSt
       ? 'ENDED'
       : 'ACTIVE';
 
+/** A link the app opens: https only (the database refuses any other). */
+export const safeLink = (url?: string) => (url && /^https:\/\/\S+$/i.test(url) ? url : undefined);
+
 /** Every notice, newest first (the list in Studio). */
 export async function loadNotices(): Promise<PlatformNotice[]> {
-  const {data, error} = await supabase
-    .from('platform_notices')
-    .select('id,message,starts_at,ends_at,created_at,created_by_name')
-    .order('starts_at', {ascending: false})
-    .limit(200);
+  const read = (columns: string) =>
+    supabase.from('platform_notices').select(columns).order('starts_at', {ascending: false}).limit(200);
+  let {data, error} = await read(COLUMNS);
+  if (error?.code === MISSING_COLUMN) ({data, error} = await read(OLD_COLUMNS));
   if (error) throw error;
-  return (data as Row[]).map(fromRow);
+  return (data as unknown as Row[]).map(fromRow);
 }
 
-/** The notices showing now, for the strip at the top of the app; none when they cannot be read. */
-export async function loadActiveNotices(): Promise<PlatformNotice[]> {
+/**
+ * The notices showing now that this person may read (the database narrows them to their hospital and role), of one
+ * kind: the notices of the strip at the top of the app, or the promotions of the Overview. None when they cannot be read.
+ */
+export async function loadActiveNotices(kind: NoticeKind = 'NOTICE'): Promise<PlatformNotice[]> {
   const now = new Date().toISOString();
-  const {data, error} = await supabase
-    .from('platform_notices')
-    .select('id,message,starts_at,ends_at,created_at,created_by_name')
-    .lte('starts_at', now)
-    .or(`ends_at.is.null,ends_at.gt.${now}`)
-    .order('starts_at', {ascending: false});
+  const read = (columns: string) =>
+    supabase
+      .from('platform_notices')
+      .select(columns)
+      .lte('starts_at', now)
+      .or(`ends_at.is.null,ends_at.gt.${now}`)
+      .order('starts_at', {ascending: false});
+  let {data, error} = await read(COLUMNS);
+  // An old database has only notices, for everyone.
+  if (error?.code === MISSING_COLUMN) {
+    ({data, error} = await read(OLD_COLUMNS));
+    if (kind === 'PROMO') return [];
+  }
   if (error) return [];
-  return (data as Row[]).map(fromRow);
+  return (data as unknown as Row[]).map(fromRow).filter(notice => notice.kind === kind);
 }
 
-export async function addNotice(notice: {message: string; startsAt?: string; endsAt?: string; byName: string}) {
+export type NewNotice = {
+  message: string;
+  kind?: NoticeKind;
+  audience?: NoticeAudience;
+  title?: string;
+  linkUrl?: string;
+  linkLabel?: string;
+  organizationIds?: string[];
+  startsAt?: string;
+  endsAt?: string;
+  byName: string;
+};
+
+export async function addNotice(notice: NewNotice) {
+  const promo = notice.kind === 'PROMO';
   const {error} = await supabase.from('platform_notices').insert({
     message: notice.message.trim(),
+    // The old columns only, when it is a plain notice for everyone: it works before and after the migration.
+    ...(promo || notice.audience === 'ADMINS' || notice.organizationIds?.length || notice.title || notice.linkUrl
+      ? {
+          kind: notice.kind || 'NOTICE',
+          // A promotion is for the administrators.
+          audience: promo ? 'ADMINS' : notice.audience || 'ALL',
+          title: notice.title?.trim() || null,
+          link_url: safeLink(notice.linkUrl?.trim()) || null,
+          link_label: notice.linkUrl?.trim() ? notice.linkLabel?.trim() || null : null,
+          organization_ids: notice.organizationIds?.length ? notice.organizationIds : null,
+        }
+      : {}),
     ...(notice.startsAt ? {starts_at: notice.startsAt} : {}),
     ends_at: notice.endsAt || null,
     created_by_name: notice.byName,

@@ -16,6 +16,11 @@ export type ExportTable = {
   rows: Array<Array<string | number>>;
   /** A totals line under the rows (bold, outside the filter in Excel); same columns as the rows. */
   totals?: Array<string | number>;
+  /**
+   * A bold band across the table before row `before` (an index into `rows`), to tell one part of the list from the
+   * next. Excel and the printed page show it; the CSV, which is data for other programs, leaves it out.
+   */
+  sections?: Array<{before: number; title: string}>;
 };
 
 const xml = (value: string | number) =>
@@ -114,15 +119,30 @@ const sheetXml = (table: ExportTable) => {
   const titleRow = `<row r="1">${cell(table.title, 'A1', 1)}</row>`;
   const subtitleRow = `<row r="2">${cell(table.subtitle || '', 'A2', 2)}</row>`;
   const headerRow = `<row r="4">${table.headers.map((h, i) => cell(h, `${column(i)}4`, 3)).join('')}</row>`;
+  // A section band is a row of its own before the data row it names, so the rows after it move down by one.
+  const bands = new Map((table.sections || []).map(section => [section.before, section.title]));
+  let rowNumber = 4;
   const bodyRows = table.rows
-    .map((row, r) => `<row r="${r + 5}">${row.map((v, i) => cell(v ?? '', `${column(i)}${r + 5}`, 0)).join('')}</row>`)
+    .map((row, r) => {
+      let out = '';
+      const band = bands.get(r);
+      if (band !== undefined) {
+        rowNumber += 1;
+        out += `<row r="${rowNumber}">${table.headers
+          .map((_, i) => cell(i === 0 ? band : '', `${column(i)}${rowNumber}`, 4))
+          .join('')}</row>`;
+      }
+      rowNumber += 1;
+      const n = rowNumber;
+      return out + `<row r="${n}">${row.map((v, i) => cell(v ?? '', `${column(i)}${n}`, 0)).join('')}</row>`;
+    })
     .join('');
   // The totals sit two rows under the data, so a filter on the data never hides or moves them.
-  const totalsRowNumber = table.rows.length + 6;
+  const totalsRowNumber = rowNumber + 2;
   const totalsRow = table.totals
     ? `<row r="${totalsRowNumber}">${table.totals.map((v, i) => cell(v ?? '', `${column(i)}${totalsRowNumber}`, 4)).join('')}</row>`
     : '';
-  const last = `${column(width - 1)}${Math.max(4, table.rows.length + 4)}`;
+  const last = `${column(width - 1)}${Math.max(4, rowNumber)}`;
   return (
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
@@ -223,7 +243,7 @@ export function xlsxBlob(source: ExportTable) {
       content:
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
         `<sheets><sheet name="${sheetName}" sheetId="1" r:id="rId1"/></sheets>` +
-        `<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">'${sheetName.replace(/'/g, "''")}'!$A$4:$${column(table.headers.length - 1)}$${Math.max(4, table.rows.length + 4)}</definedName></definedNames></workbook>`,
+        `<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">'${sheetName.replace(/'/g, "''")}'!$A$4:$${column(table.headers.length - 1)}$${Math.max(4, 4 + table.rows.length + (table.sections?.length || 0))}</definedName></definedNames></workbook>`,
     },
     {
       name: 'xl/_rels/workbook.xml.rels',
@@ -293,13 +313,24 @@ th { background: #1d6b7a; color: #fff; text-align: left; padding: 6px 7px; font-
 td { padding: 5px 7px; border-bottom: 1px solid #dde5ea; vertical-align: top; }
 tr:nth-child(even) td { background: #f5f8fa; }
 tr { page-break-inside: avoid; }
+tr.band th { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; font-size: 11px; }
 tfoot th.total { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; }
 footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
 </style></head><body>
 <header><div><h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
 <small>SurgiTrack<br>${html(printed)}</small></header>
 <table><thead><tr>${table.headers.map(h => `<th>${html(h)}</th>`).join('')}</tr></thead>
-<tbody>${table.rows.map(row => `<tr>${row.map(v => `<td>${html(v ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>${table.totals ? `<tfoot><tr>${table.totals.map(v => `<th class="total">${html(v ?? '')}</th>`).join('')}</tr></tfoot>` : ''}</table>
+<tbody>${table.rows
+    .map((row, r) => {
+      const band = table.sections?.find(section => section.before === r);
+      return (
+        (band ? `<tr class="band"><th colspan="${table.headers.length}">${html(band.title)}</th></tr>` : '') +
+        `<tr>${row.map(v => `<td>${html(v ?? '')}</td>`).join('')}</tr>`
+      );
+    })
+    .join(
+      '',
+    )}</tbody>${table.totals ? `<tfoot><tr>${table.totals.map(v => `<th class="total">${html(v ?? '')}</th>`).join('')}</tr></tfoot>` : ''}</table>
 <footer>${table.rows.length} ${lang === 'el' ? (table.rows.length === 1 ? 'εγγραφή' : 'εγγραφές') : table.rows.length === 1 ? 'record' : 'records'}</footer>
 </body></html>`);
 }
