@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {ExternalLink, Megaphone, X} from 'lucide-react';
+import {ExternalLink, FileText, Maximize2, Megaphone, X} from 'lucide-react';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import {loadActiveNotices, safeLink, type PlatformNotice} from '../../data/cloud/platformNotices';
 import {tr} from '../../i18n';
@@ -34,6 +34,7 @@ export default function PromoCards() {
   const [promos, setPromos] = useState<PlatformNotice[]>([]);
   const [hidden, setHidden] = useState<string[]>(() => readList(HIDDEN));
   const [seen, setSeen] = useState<string[]>(() => readList(SEEN));
+  const [opened, setOpened] = useState('');
   const [broken, setBroken] = useState<string[]>([]);
   useEffect(() => {
     if (getRuntimeDataMode() !== 'PRODUCTION') return;
@@ -54,9 +55,10 @@ export default function PromoCards() {
     writeList(HIDDEN, next);
   };
   // A new promotion opens once in front of the screen; closed, it stays as a card on the Overview.
-  const front = shown.find(promo => !seen.includes(promo.id));
+  const front = shown.find(promo => promo.id === opened) || shown.find(promo => !seen.includes(promo.id));
   const closeFront = () => {
-    if (!front) return;
+    setOpened('');
+    if (!front || seen.includes(front.id)) return;
     const next = [...seen, front.id];
     setSeen(next);
     writeList(SEEN, next);
@@ -83,6 +85,19 @@ export default function PromoCards() {
                   {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={14} aria-hidden="true" />
                 </a>
               )}
+              {safeLink(promo.attachmentUrl) && (
+                <a
+                  className="promo-file"
+                  href={safeLink(promo.attachmentUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FileText size={15} aria-hidden="true" /> {promo.attachmentName || 'PDF'}
+                </a>
+              )}
+              <button type="button" className="promo-open" onClick={() => setOpened(promo.id)}>
+                <Maximize2 size={14} aria-hidden="true" /> {tr('Προβολή')}
+              </button>
             </div>
             <button
               type="button"

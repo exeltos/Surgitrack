@@ -105,4 +105,23 @@ describe("the owner's promotions on the administrator's Overview", () => {
     await screen.findByRole('heading', {name: 'Προϊόν Χ'});
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('opens a promotion again from its card, with the picture on the side and the PDF', async () => {
+    state.promos = [
+      promo({
+        imageUrl: 'https://example.com/p.png',
+        imageLayout: 'RIGHT',
+        attachmentUrl: 'https://example.com/f.pdf',
+        attachmentName: 'Τιμοκατάλογος.pdf',
+      }),
+    ];
+    render(<PromoCards />);
+    await screen.findByRole('heading', {name: 'Προϊόν Χ'});
+    expect(screen.getByRole('link', {name: /Τιμοκατάλογος/})).toHaveAttribute('href', 'https://example.com/f.pdf');
+    fireEvent.click(screen.getByRole('button', {name: /Προβολή/}));
+    const dialog = screen.getByRole('dialog', {name: 'Προϊόν Χ'});
+    expect(dialog).toHaveClass('layout-right');
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Κλείσιμο'}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });

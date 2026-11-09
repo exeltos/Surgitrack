@@ -1,12 +1,15 @@
 import {useEffect} from 'react';
-import {ExternalLink, Megaphone, X} from 'lucide-react';
-import {safeLink} from '../../data/cloud/platformNotices';
+import {ExternalLink, FileText, Megaphone, X} from 'lucide-react';
+import {safeLink, type ImageLayout} from '../../data/cloud/platformNotices';
 import {tr} from '../../i18n';
 
 export type PromoContent = {
   title?: string;
   message: string;
   imageUrl?: string;
+  imageLayout?: ImageLayout;
+  attachmentUrl?: string;
+  attachmentName?: string;
   linkUrl?: string;
   linkLabel?: string;
 };
@@ -23,9 +26,16 @@ export default function PromoPopup({promo, onClose}: {promo: PromoContent; onClo
   }, [onClose]);
   const image = safeLink(promo.imageUrl);
   const link = safeLink(promo.linkUrl);
+  const file = safeLink(promo.attachmentUrl);
+  const layout = image ? promo.imageLayout || 'TOP' : 'TOP';
   return (
     <div className="modal-backdrop promo-popup-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
-      <article className="promo-popup" role="dialog" aria-modal="true" aria-label={promo.title || tr('Πρόταση')}>
+      <article
+        className={`promo-popup layout-${layout.toLowerCase()}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={promo.title || tr('Πρόταση')}
+      >
         <button type="button" className="icon-button promo-popup-x" onClick={onClose} aria-label={tr('Κλείσιμο')}>
           <X size={18} />
         </button>
@@ -40,11 +50,18 @@ export default function PromoPopup({promo, onClose}: {promo: PromoContent; onClo
           <small>{tr('Πρόταση')}</small>
           <h2>{promo.title}</h2>
           <p>{promo.message}</p>
-          {link && (
+          {(link || file) && (
             <div className="promo-popup-actions">
-              <a className="promo-cta" href={link} target="_blank" rel="noopener noreferrer">
-                {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={15} aria-hidden="true" />
-              </a>
+              {link && (
+                <a className="promo-cta" href={link} target="_blank" rel="noopener noreferrer">
+                  {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={15} aria-hidden="true" />
+                </a>
+              )}
+              {file && (
+                <a className="promo-file" href={file} target="_blank" rel="noopener noreferrer">
+                  <FileText size={16} aria-hidden="true" /> {promo.attachmentName || 'PDF'}
+                </a>
+              )}
             </div>
           )}
         </div>

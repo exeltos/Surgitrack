@@ -7,6 +7,8 @@ import {supabase} from '../../lib/supabase';
  */
 export type NoticeKind = 'NOTICE' | 'PROMO';
 export type NoticeAudience = 'ALL' | 'ADMINS';
+/** Where the picture of a promotion goes on its card. */
+export type ImageLayout = 'TOP' | 'LEFT' | 'RIGHT';
 export type PlatformNotice = {
   id: string;
   message: string;
@@ -17,6 +19,10 @@ export type PlatformNotice = {
   linkLabel?: string;
   /** A picture for a promotion (https). */
   imageUrl?: string;
+  imageLayout?: ImageLayout;
+  /** A file that goes with a promotion (a PDF), and its name. */
+  attachmentUrl?: string;
+  attachmentName?: string;
   /** The hospitals it is for; none named: every hospital. */
   organizationIds?: string[];
   startsAt: string;
@@ -35,6 +41,9 @@ type Row = {
   link_url?: string | null;
   link_label?: string | null;
   image_url?: string | null;
+  image_layout?: ImageLayout | null;
+  attachment_url?: string | null;
+  attachment_name?: string | null;
   organization_ids?: string[] | null;
   starts_at: string;
   ends_at: string | null;
@@ -50,6 +59,9 @@ const fromRow = (row: Row): PlatformNotice => ({
   linkUrl: row.link_url || undefined,
   linkLabel: row.link_label || undefined,
   imageUrl: row.image_url || undefined,
+  imageLayout: row.image_layout || undefined,
+  attachmentUrl: row.attachment_url || undefined,
+  attachmentName: row.attachment_name || undefined,
   organizationIds: row.organization_ids?.length ? row.organization_ids : undefined,
   startsAt: row.starts_at,
   endsAt: row.ends_at || undefined,
@@ -59,8 +71,10 @@ const fromRow = (row: Row): PlatformNotice => ({
 
 const MID_COLUMNS =
   'id,message,kind,audience,title,link_url,link_label,organization_ids,starts_at,ends_at,created_at,created_by_name';
-// Newest: with the picture of a promotion (migration notice_image).
-const COLUMNS = MID_COLUMNS.replace('link_label,', 'link_label,image_url,');
+// With the picture of a promotion (migration notice_image).
+const IMAGE_COLUMNS = MID_COLUMNS.replace('link_label,', 'link_label,image_url,');
+// Newest: where the picture goes and a file with it (migration promo_layout_and_attachment).
+const COLUMNS = IMAGE_COLUMNS.replace('image_url,', 'image_url,image_layout,attachment_url,attachment_name,');
 // Before the database has the new columns (migration notice_audience_and_promotions) only the old ones exist.
 const OLD_COLUMNS = 'id,message,starts_at,ends_at,created_at,created_by_name';
 const MISSING_COLUMN = '42703';
@@ -81,6 +95,7 @@ export async function loadNotices(): Promise<PlatformNotice[]> {
   const read = (columns: string) =>
     supabase.from('platform_notices').select(columns).order('starts_at', {ascending: false}).limit(200);
   let {data, error} = await read(COLUMNS);
+  if (error?.code === MISSING_COLUMN) ({data, error} = await read(IMAGE_COLUMNS));
   if (error?.code === MISSING_COLUMN) ({data, error} = await read(MID_COLUMNS));
   if (error?.code === MISSING_COLUMN) ({data, error} = await read(OLD_COLUMNS));
   if (error) throw error;
@@ -101,6 +116,7 @@ export async function loadActiveNotices(kind: NoticeKind = 'NOTICE'): Promise<Pl
       .or(`ends_at.is.null,ends_at.gt.${now}`)
       .order('starts_at', {ascending: false});
   let {data, error} = await read(COLUMNS);
+  if (error?.code === MISSING_COLUMN) ({data, error} = await read(IMAGE_COLUMNS));
   if (error?.code === MISSING_COLUMN) ({data, error} = await read(MID_COLUMNS));
   // An old database has only notices, for everyone.
   if (error?.code === MISSING_COLUMN) {
@@ -119,6 +135,9 @@ export type NewNotice = {
   linkUrl?: string;
   linkLabel?: string;
   imageUrl?: string;
+  imageLayout?: ImageLayout;
+  attachmentUrl?: string;
+  attachmentName?: string;
   organizationIds?: string[];
   startsAt?: string;
   endsAt?: string;
@@ -135,7 +154,8 @@ export async function addNotice(notice: NewNotice) {
     notice.organizationIds?.length ||
     notice.title ||
     notice.linkUrl ||
-    notice.imageUrl
+    notice.imageUrl ||
+    notice.attachmentUrl
       ? {
           kind: notice.kind || 'NOTICE',
           // A promotion is for the administrators.
@@ -144,6 +164,15 @@ export async function addNotice(notice: NewNotice) {
           link_url: safeLink(notice.linkUrl?.trim()) || null,
           link_label: notice.linkUrl?.trim() ? notice.linkLabel?.trim() || null : null,
           ...(notice.imageUrl ? {image_url: safeLink(notice.imageUrl.trim()) || null} : {}),
+          ...(notice.imageUrl && notice.imageLayout && notice.imageLayout !== 'TOP'
+            ? {image_layout: notice.imageLayout}
+            : {}),
+          ...(notice.attachmentUrl
+            ? {
+                attachment_url: safeLink(notice.attachmentUrl.trim()) || null,
+                attachment_name: notice.attachmentName?.trim().slice(0, 200) || null,
+              }
+            : {}),
           organization_ids: notice.organizationIds?.length ? notice.organizationIds : null,
         }
       : {}),

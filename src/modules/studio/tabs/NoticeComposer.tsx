@@ -1,8 +1,8 @@
 import {useMemo, useState} from 'react';
-import {ExternalLink, Maximize2, Megaphone, Plus} from 'lucide-react';
+import {ExternalLink, FileText, Maximize2, Megaphone, Plus} from 'lucide-react';
 import PromoPopup from '../../../components/layout/PromoPopup';
 import AppButton from '../../../components/ui/AppButton';
-import {safeLink, type NoticeAudience, type NoticeKind} from '../../../data/cloud/platformNotices';
+import {safeLink, type ImageLayout, type NoticeAudience, type NoticeKind} from '../../../data/cloud/platformNotices';
 
 type Lang = (el: string, en: string) => string;
 
@@ -15,6 +15,9 @@ export type NoticeFields = {
   linkUrl?: string;
   linkLabel?: string;
   imageUrl?: string;
+  imageLayout?: ImageLayout;
+  attachmentUrl?: string;
+  attachmentName?: string;
   organizationIds?: string[];
   startsAt?: string;
   endsAt?: string;
@@ -76,6 +79,7 @@ export default function NoticeComposer({
   busy,
   onPublish,
   onUploadImage,
+  onUploadFile,
 }: {
   L: Lang;
   organizations: Array<{id: string; name: string}>;
@@ -83,6 +87,8 @@ export default function NoticeComposer({
   onPublish: (fields: NoticeFields) => Promise<boolean>;
   /** Uploads a picture chosen on the device and gives back its https address. */
   onUploadImage: (file: File) => Promise<string>;
+  /** Uploads a PDF that goes with a promotion and gives back its https address. */
+  onUploadFile: (file: File) => Promise<string>;
 }) {
   const [kind, setKind] = useState<NoticeKind>('NOTICE');
   const [audience, setAudience] = useState<NoticeAudience>('ALL');
@@ -91,6 +97,8 @@ export default function NoticeComposer({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkLabel, setLinkLabel] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [imageLayout, setImageLayout] = useState<ImageLayout>('TOP');
+  const [attachment, setAttachment] = useState<{url: string; name: string} | null>(null);
   const [brokenImage, setBrokenImage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [enlarged, setEnlarged] = useState(false);
@@ -125,6 +133,23 @@ export default function NoticeComposer({
                 ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
                 : '';
   const ready = !!message.trim() && !problem && !busy && !uploading;
+  const chooseFile = async (file?: File) => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError('');
+    try {
+      setAttachment({url: await onUploadFile(file), name: file.name});
+    } catch {
+      setUploadError(
+        L(
+          'Το αρχείο δεν ανέβηκε. Επιτρέπεται PDF έως 10 MB.',
+          'The file did not upload. A PDF up to 10 MB is allowed.',
+        ),
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
   const choosePicture = async (file?: File) => {
     if (!file) return;
     setUploading(true);
@@ -173,6 +198,9 @@ export default function NoticeComposer({
       linkUrl: link || undefined,
       linkLabel: linkLabel.trim() || undefined,
       imageUrl: image || undefined,
+      imageLayout: image ? imageLayout : undefined,
+      attachmentUrl: promo ? attachment?.url : undefined,
+      attachmentName: promo ? attachment?.name : undefined,
       organizationIds: onlyChosen ? [...chosen] : undefined,
       startsAt: toIso(from),
       endsAt: toIso(until),
@@ -183,6 +211,7 @@ export default function NoticeComposer({
       setLinkUrl('');
       setLinkLabel('');
       setImageUrl('');
+      setAttachment(null);
       setFrom('');
       setUntil('');
     }
@@ -278,6 +307,50 @@ export default function NoticeComposer({
                           'Διαλέξτε αρχείο από τον υπολογιστή (JPEG, PNG ή WebP).',
                           'Choose a file from your computer (JPEG, PNG or WebP).',
                         )}
+                  </small>
+                </label>
+              )}
+              {image && (
+                <Choice
+                  label={L('Θέση εικόνας στην κάρτα', 'Picture position on the card')}
+                  value={imageLayout}
+                  onChange={setImageLayout}
+                  options={[
+                    {id: 'TOP', title: L('Πάνω', 'Top')},
+                    {id: 'LEFT', title: L('Αριστερά', 'Left')},
+                    {id: 'RIGHT', title: L('Δεξιά', 'Right')},
+                  ]}
+                />
+              )}
+            </div>
+          )}
+          {promo && (
+            <div className="notice-picture">
+              <span className="notice-choice-label">
+                {L('Συνημμένο αρχείο PDF (προαιρετικό)', 'Attached PDF (optional)')}
+              </span>
+              {attachment ? (
+                <div className="notice-picture-row">
+                  <FileText size={20} aria-hidden="true" />
+                  <span>{attachment.name}</span>
+                  <button type="button" onClick={() => setAttachment(null)}>
+                    {L('Αφαίρεση αρχείου', 'Remove file')}
+                  </button>
+                </div>
+              ) : (
+                <label className="notice-picture-pick">
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    disabled={uploading}
+                    aria-label={L('Επιλογή αρχείου PDF', 'Choose a PDF')}
+                    onChange={e => {
+                      void chooseFile(e.target.files?.[0]);
+                      e.target.value = '';
+                    }}
+                  />
+                  <small>
+                    {L('Π.χ. φυλλάδιο ή τιμοκατάλογος, έως 10 MB.', 'E.g. a brochure or a price list, up to 10 MB.')}
                   </small>
                 </label>
               )}
@@ -440,6 +513,9 @@ export default function NoticeComposer({
               title: title.trim() || L('Τίτλος προώθησης', 'Promotion title'),
               message: message.trim() || L('Το κείμενο θα εμφανιστεί εδώ.', 'The text will show here.'),
               imageUrl: image,
+              imageLayout,
+              attachmentUrl: attachment?.url,
+              attachmentName: attachment?.name,
               linkUrl: link,
               linkLabel: linkLabel.trim(),
             }}

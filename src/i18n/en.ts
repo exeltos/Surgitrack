@@ -744,6 +744,7 @@ export const en: Record<string, string> = {
   'Σύνολο υπολοίπων χρήσεων': 'Total uses left',
   '{0} (αχρησιμοποίητα)': '{0} (unused)',
   Πρόταση: 'Suggestion',
+  Προβολή: 'View',
   Περισσότερα: 'Learn more',
   'Απόκρυψη πρότασης': 'Hide the suggestion',
   'Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα': 'Unused: new pieces, no use made yet',

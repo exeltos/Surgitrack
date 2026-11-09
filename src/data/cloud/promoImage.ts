@@ -15,3 +15,15 @@ export async function uploadPromoImage(file: File): Promise<string> {
   if (error) throw error;
   return supabase.storage.from(PROMO_BUCKET).getPublicUrl(path).data.publicUrl;
 }
+
+/** The largest file that goes with a promotion (the bucket refuses more). */
+export const PROMO_FILE_MAX = 10 * 1024 * 1024;
+
+/** Uploads a PDF that goes with a promotion and returns the https address it opens from. */
+export async function uploadPromoFile(file: File): Promise<string> {
+  if (file.type !== 'application/pdf' || file.size > PROMO_FILE_MAX) throw new Error('not a PDF up to 10 MB');
+  const path = `files/${crypto.randomUUID()}.pdf`;
+  const {error} = await supabase.storage.from(PROMO_BUCKET).upload(path, file, {contentType: 'application/pdf'});
+  if (error) throw error;
+  return supabase.storage.from(PROMO_BUCKET).getPublicUrl(path).data.publicUrl;
+}

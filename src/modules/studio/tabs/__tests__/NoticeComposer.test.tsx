@@ -8,8 +8,20 @@ const orgs = [
   {id: 'o2', name: 'Κλινική Βορρά'},
 ];
 const upload = vi.fn(async (_file: File) => 'https://x.supabase.co/storage/v1/object/public/promo-images/a.jpg');
+const uploadFile = vi.fn(
+  async (_file: File) => 'https://x.supabase.co/storage/v1/object/public/promo-images/files/b.pdf',
+);
 const open = (onPublish = vi.fn(async (_fields: NoticeFields) => true), busy = false) => {
-  render(<NoticeComposer L={L} organizations={orgs} busy={busy} onPublish={onPublish} onUploadImage={upload} />);
+  render(
+    <NoticeComposer
+      L={L}
+      organizations={orgs}
+      busy={busy}
+      onPublish={onPublish}
+      onUploadImage={upload}
+      onUploadFile={uploadFile}
+    />,
+  );
   return onPublish;
 };
 const write = (label: RegExp | string, value: string) =>
@@ -151,5 +163,38 @@ describe('the owner’s form for an announcement or a promotion', () => {
     fireEvent.click(screen.getByRole('radio', {name: /Ανακοίνωση/}));
     expect(screen.getByRole('alert')).toHaveTextContent('έως 300');
     expect(publishButton()).toBeDisabled();
+  });
+
+  it('places the picture where the owner chooses and attaches a PDF', async () => {
+    const onPublish = open();
+    fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
+    write('Τίτλος', 'EXELTOS');
+    write(/^Κείμενο\d/, 'Κείμενο');
+    // The position appears once there is a picture.
+    expect(screen.queryByRole('radiogroup', {name: 'Θέση εικόνας στην κάρτα'})).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Επιλογή εικόνας'), {
+      target: {files: [new File(['x'], 'p.png', {type: 'image/png'})]},
+    });
+    fireEvent.click(await screen.findByRole('radio', {name: 'Αριστερά'}));
+    fireEvent.change(screen.getByLabelText('Επιλογή αρχείου PDF'), {
+      target: {files: [new File(['%PDF'], 'Φυλλάδιο.pdf', {type: 'application/pdf'})]},
+    });
+    expect(await screen.findByText('Φυλλάδιο.pdf')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: /Μεγέθυνση/}));
+    const dialog = screen.getByRole('dialog', {name: 'EXELTOS'});
+    expect(dialog).toHaveClass('layout-left');
+    expect(within(dialog).getByRole('link', {name: /Φυλλάδιο\.pdf/})).toHaveAttribute(
+      'href',
+      expect.stringContaining('b.pdf'),
+    );
+    fireEvent.keyDown(window, {key: 'Escape'});
+    fireEvent.click(publishButton());
+    await waitFor(() =>
+      expect(onPublish.mock.calls[0][0]).toMatchObject({
+        imageLayout: 'LEFT',
+        attachmentName: 'Φυλλάδιο.pdf',
+        attachmentUrl: expect.stringContaining('b.pdf'),
+      }),
+    );
   });
 });
