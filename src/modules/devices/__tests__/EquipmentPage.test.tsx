@@ -1,4 +1,5 @@
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AppPreferencesProvider} from '../../../core/AppPreferences';
 import type {Device, DeviceReading} from '../../../core/deviceData';
@@ -25,14 +26,15 @@ vi.mock('../../../data/cloud/devices', () => ({
     db.devices = db.devices.filter(d => d.id !== id);
   },
 }));
-const store = vi.hoisted(() => ({role: 'ADMIN', addToBin: vi.fn()}));
+const store = vi.hoisted(() => ({role: 'ADMIN', addToBin: vi.fn(), loads: [] as unknown[]}));
 vi.mock('../../../store/SurgiStore', () => ({
   useSurgi: () => ({
     organizationId: 'org-1',
     role: store.role,
     can: () => true,
     sterilizationCycles: [],
-    processLoads: [],
+    processLoads: store.loads,
+    tools: [],
     addToBin: store.addToBin,
     currentUser: {name: 'ΔΙΑΧΕΙΡΙΣΤΗΣ'},
   }),
@@ -48,7 +50,7 @@ vi.mock('../../../core/LibraryStore', () => ({
     washers: [{id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'Washer 1'}],
   }),
 }));
-const {default: DevicesPage} = await import('../DevicesPage');
+const {default: EquipmentPage} = await import('../EquipmentPage');
 
 const autoclave: Device = {
   id: 'd1',
@@ -71,10 +73,18 @@ const reading = (n: string, deviceId = 'd1'): DeviceReading => ({
 
 const open = () =>
   render(
-    <AppPreferencesProvider>
-      <DevicesPage />
-    </AppPreferencesProvider>,
+    <MemoryRouter>
+      <AppPreferencesProvider>
+        <EquipmentPage />
+      </AppPreferencesProvider>
+    </MemoryRouter>,
   );
+/** The row of a piece of equipment. */
+const rowOf = async (name: string) => (await screen.findByText(name)).closest('tr') as HTMLElement;
+const details = async (name: string) => {
+  fireEvent.click(within(await rowOf(name)).getByRole('button', {name: /Λεπτομέρειες/}));
+  return screen.findByRole('dialog', {name});
+};
 
 beforeEach(() => {
   db.devices = [autoclave, washer];
@@ -82,50 +92,70 @@ beforeEach(() => {
   db.fail = '';
   db.deleted = [];
   store.role = 'ADMIN';
+  store.loads = [];
   store.addToBin.mockClear();
 });
 
-describe('Connected devices', () => {
-  it('lists the hospital devices, inactive ones marked', async () => {
+describe('Sterilizers & Devices, one screen', () => {
+  it('lists every piece of equipment in a row: the library sterilizers and washers and the connected devices', async () => {
     open();
-    expect(await screen.findByText('ΚΛΙΒΑΝΟΣ 1')).toBeInTheDocument();
-    const card = screen.getByText('ΠΛΥΝΤΗΡΙΟ 1').closest('.device-card') as HTMLElement;
-    expect(within(card).getByText('Ανενεργή')).toBeInTheDocument();
+    expect((await rowOf('ΚΛΙΒΑΝΟΣ 1')).textContent).toContain('Δίκτυο');
+    expect((await rowOf('ΚΛΙΒΑΝΟΣ 2')).textContent).toContain('Χωρίς σύνδεση');
+    const washerRow = await rowOf('ΠΛΥΝΤΗΡΙΟ 1');
+    expect(within(washerRow).getByText('Ανενεργή')).toBeInTheDocument();
   });
 
-  it('shows the cycles of the device picked, and only those', async () => {
+  it('shows the running load of a sterilizer in its row and the Sets and instruments in its card', async () => {
+    store.loads = [
+      {
+        id: 'L1',
+        kind: 'STERILIZATION',
+        status: 'OPEN',
+        equipment: 'ΚΛΙΒΑΝΟΣ 1',
+        cycleNumber: '2026-1',
+        program: '134°C · 5 min',
+        createdAt: '09/11/2026 10:00',
+        createdByName: 'Χ',
+        items: [{assetId: 's1', assetKind: 'SET', barcode: 'S000334', assetName: 'ΥΣΤΕΡΟΣΚΟΠΗΣΗΣ', department: 'Χ'}],
+      },
+    ];
     open();
-    const cycles = await screen.findByRole('region', {name: 'Τελευταίοι κύκλοι'});
+    const row = await rowOf('ΚΛΙΒΑΝΟΣ 1');
+    expect(row.textContent).toContain('2026-1');
+    expect(within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('Ελεύθερος')).toBeInTheDocument();
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
+    expect(within(card).getByText('S000334')).toBeInTheDocument();
+    expect(within(card).getByText('ΥΣΤΕΡΟΣΚΟΠΗΣΗΣ')).toBeInTheDocument();
+  });
+
+  it('shows the cycles of the device whose card is open, and only those', async () => {
+    open();
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
+    const cycles = within(card).getByRole('region', {name: 'Τελευταίοι κύκλοι'});
     expect(within(cycles).getByText('1042')).toBeInTheDocument();
     expect(within(cycles).queryByText('W-7')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText('ΠΛΥΝΤΗΡΙΟ 1'));
-    const washerCycles = await screen.findByRole('region', {name: 'Τελευταίοι κύκλοι'});
-    expect(within(washerCycles).getByText('W-7')).toBeInTheDocument();
-    expect(within(washerCycles).queryByText('1042')).not.toBeInTheDocument();
   });
 
   it('deletes a device only after confirmation, keeping it in the recycle bin first', async () => {
     open();
-    const card = (await screen.findByText('ΚΛΙΒΑΝΟΣ 1')).closest('.device-card') as HTMLElement;
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
     fireEvent.click(within(card).getByRole('button', {name: 'Διαγραφή'}));
     expect(db.deleted).toEqual([]);
-    const dialog = screen.getByRole('dialog');
-    fireEvent.click(within(dialog).getByRole('button', {name: /Διαγραφή/}));
+    const confirm = screen.getAllByRole('dialog').find(d => /Θα διαγραφεί/.test(d.textContent || '')) as HTMLElement;
+    fireEvent.click(within(confirm).getByRole('button', {name: /Διαγραφή/}));
     await waitFor(() => expect(db.deleted).toEqual(['d1']));
     expect(store.addToBin).toHaveBeenCalledTimes(1);
-    // Gone from the devices (it is offered again as a library sterilizer with no device).
-    await waitFor(() =>
-      expect(within(document.querySelector('.devices-grid') as HTMLElement).queryByText('ΚΛΙΒΑΝΟΣ 1')).toBeNull(),
-    );
+    // Gone from the devices: it is a library sterilizer with no device again.
+    await waitFor(async () => expect((await rowOf('ΚΛΙΒΑΝΟΣ 1')).textContent).toContain('Χωρίς σύνδεση'));
   });
 
   it('lets only the hospital admin add, edit or delete devices', async () => {
     store.role = 'STERILIZATION';
     open();
-    await screen.findByText('ΚΛΙΒΑΝΟΣ 1');
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
     expect(screen.queryByRole('button', {name: /Νέα συσκευή/})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Διαγραφή'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Επεξεργασία'})).not.toBeInTheDocument();
+    expect(within(card).queryByRole('button', {name: 'Διαγραφή'})).not.toBeInTheDocument();
+    expect(within(card).queryByRole('button', {name: 'Επεξεργασία'})).not.toBeInTheDocument();
   });
 
   it('says what went wrong when the devices cannot be read', async () => {
@@ -134,15 +164,10 @@ describe('Connected devices', () => {
     expect(await screen.findByText(/network down/)).toBeInTheDocument();
   });
 
-  it('offers the library sterilizers that have no device yet, named, to the admin', async () => {
+  it('offers the admin to connect a library sterilizer that has no device, named', async () => {
     open();
-    const strip = await screen.findByRole('region', {name: 'Χωρίς σύνδεση'});
-    expect(
-      within(strip)
-        .getAllByRole('button')
-        .map(b => b.textContent?.trim()),
-    ).toEqual(['ΚΛΙΒΑΝΟΣ 2']);
-    fireEvent.click(within(strip).getByRole('button', {name: /ΚΛΙΒΑΝΟΣ 2/}));
+    const card = await details('ΚΛΙΒΑΝΟΣ 2');
+    fireEvent.click(within(card).getByRole('button', {name: /Σύνδεση συσκευής/}));
     expect((screen.getByRole('combobox', {name: /Όνομα/}) as HTMLInputElement).value).toBe('ΚΛΙΒΑΝΟΣ 2');
   });
 });

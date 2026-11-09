@@ -16,7 +16,7 @@ export const GUIDED_SCREENS: ReadonlyArray<readonly [path: string, permission: P
   ['/tools', 'asset.registry.view'],
   ['/standalone-tools', 'asset.registry.view'],
   ['/stock', 'stock.manage'],
-  ['/devices', 'sterilization.workspace'],
+  ['/sterilizers', 'sterilization.workspace'],
   ['/traceability', 'traceability.view'],
   ['/reports', 'reports.view'],
   ['/movements', 'history.view'],

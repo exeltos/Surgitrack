@@ -1819,133 +1819,6 @@ html body .batch-department button.clear:hover {
 /* All sterilizers on one screen (parts/SterilizerBoard.tsx). */
 
 /* The «Κλίβανοι» screen: every sterilizer and its cycle, large (SterilizersPage.tsx). */
-.sterilizers-page {
-  display: grid;
-  gap: 14px;
-  align-content: start;
-}
-.sterilizer-wall {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-  gap: 14px;
-}
-.sterilizer-wall-card {
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  padding: 16px 18px;
-  border: 1px solid var(--c-gray-90-3);
-  border-radius: 14px;
-  background: var(--c-white);
-}
-.sterilizer-wall-card.free {
-  background: var(--c-gray-100-2);
-  color: var(--st-muted);
-}
-.sterilizer-wall-card.busy {
-  border-color: var(--c-orange-60);
-  border-width: 2px;
-}
-.sterilizer-wall-card.busy.done {
-  border-color: var(--c-green-45);
-}
-.sterilizer-wall-card > header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.sterilizer-wall-card > header h2 {
-  margin: 0;
-  font-size: 18px;
-}
-.sterilizer-wall-card .wall-phase {
-  margin-left: auto;
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: var(--c-gray-95);
-  font-size: 13px;
-  font-weight: 700;
-}
-.sterilizer-wall-card.busy .wall-phase {
-  background: var(--c-amber-95);
-  color: var(--c-orange-40);
-}
-.sterilizer-wall-card.done .wall-phase {
-  background: var(--c-green-90);
-  color: var(--c-green-45);
-}
-.sterilizer-wall-card .wall-sim {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--c-amber-95);
-  color: var(--c-orange-40);
-  font-size: 11px;
-  font-weight: 700;
-}
-.wall-readings {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-.wall-readings > div {
-  display: grid;
-  gap: 2px;
-}
-.wall-readings small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.wall-readings b {
-  font-size: 30px;
-  line-height: 1.1;
-  font-variant-numeric: tabular-nums;
-}
-.wall-readings b.bad {
-  color: var(--c-red-45);
-}
-.sterilizer-wall-card .cycle-chart {
-  height: 150px;
-}
-.sterilizer-wall-card .tile-progress {
-  height: 10px;
-  border-radius: 999px;
-  background: var(--c-gray-95);
-  overflow: hidden;
-}
-.sterilizer-wall-card .tile-progress i {
-  display: block;
-  height: 100%;
-  background: var(--c-orange-60);
-}
-.sterilizer-wall-card.done .tile-progress i {
-  background: var(--c-green-45);
-}
-.sterilizer-wall-card > footer {
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-}
-.sterilizer-wall-card .wall-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.sterilizer-wall-card .wall-items code {
-  padding: 1px 6px;
-  border-radius: 6px;
-  background: var(--c-gray-95);
-  font-size: 12px;
-}
-.sterilizer-wall-card .wall-items em {
-  color: var(--st-muted);
-}
-.sterilizer-wall-card .wall-nodata,
-.sterilizer-wall-card .wall-last {
-  margin: 0;
-}
 
 /* Loads in the sterilizer as horizontal rows (parts/SterilizerLoads.tsx) and the card of a load's details. */
 .sterilizer-rows-wrap {
@@ -1957,7 +1830,7 @@ html body .batch-department button.clear:hover {
   border-collapse: collapse;
 }
 .sterilizer-rows th {
-  padding: 8px 10px;
+  padding: 8px;
   border-bottom: 1px solid var(--c-gray-90-3);
   color: var(--st-muted);
   font-size: 11px;
@@ -1966,7 +1839,7 @@ html body .batch-department button.clear:hover {
   text-transform: uppercase;
 }
 .sterilizer-rows td {
-  padding: 10px;
+  padding: 9px 8px;
   border-bottom: 1px solid var(--c-gray-95);
   vertical-align: middle;
   font-size: 13px;
@@ -2027,10 +1900,12 @@ html body .batch-department button.clear:hover {
   background: var(--c-green-45);
 }
 .sterilizer-rows .row-actions {
-  display: flex;
+  text-align: right;
+}
+.sterilizer-rows .row-actions-inner {
+  display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
   gap: 6px;
 }
 .sterilizer-rows .row-details,
@@ -2166,4 +2041,75 @@ html body .batch-department button.clear:hover {
   gap: 8px;
   padding: 12px 18px;
   border-top: 1px solid var(--c-gray-95);
+}
+
+/* Sterilizers & Devices on one screen (modules/devices/EquipmentPage.tsx): what the rows add to the load rows. */
+.equipment-rows .row-phase.idle {
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+}
+.equipment-rows tr.free > td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-gray-90-2);
+}
+.equipment-rows .row-connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--c-green-45);
+  font-weight: 600;
+}
+.equipment-rows td .device-sim-badge {
+  margin-left: 6px;
+}
+.equipment-details .equipment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.equipment-details .equipment-cycles-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.equipment-details .devices-table-wrap {
+  max-height: 260px;
+}
+
+.equipment-rows td.num span {
+  display: block;
+  font-weight: 600;
+}
+.sterilizer-rows .row-actions-inner {
+  flex-wrap: nowrap;
+}
+.sterilizer-rows .release-reprocess {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-red-85);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-red-45);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.sterilizer-rows .release-reprocess:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sterilizer-rows .row-actions .primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .sterilizer-rows .row-actions-inner {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }

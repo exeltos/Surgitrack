@@ -138,54 +138,56 @@ export default function SterilizerLoads({
                   {load.items.length}
                 </td>
                 <td className="row-actions">
-                  {canSimulate && !load.simulation && (
+                  <div className="row-actions-inner">
+                    {canSimulate && !load.simulation && (
+                      <button className="row-details" onClick={() => setOpenId(load.id)}>
+                        <FlaskConical size={15} /> {tr('Προσομοίωση')}
+                      </button>
+                    )}
                     <button className="row-details" onClick={() => setOpenId(load.id)}>
-                      <FlaskConical size={15} /> {tr('Προσομοίωση')}
+                      <ListTree size={15} /> {tr('Λεπτομέρειες')}
                     </button>
-                  )}
-                  <button className="row-details" onClick={() => setOpenId(load.id)}>
-                    <ListTree size={15} /> {tr('Λεπτομέρειες')}
-                  </button>
-                  {onFinish && (
-                    <>
-                      {onPrint && (
+                    {onFinish && (
+                      <>
+                        {onPrint && (
+                          <button
+                            className="row-icon"
+                            title={tr('Έντυπο')}
+                            aria-label={tr('Έντυπο')}
+                            onClick={() => onPrint(load.id)}
+                          >
+                            <Printer size={15} />
+                          </button>
+                        )}
                         <button
-                          className="row-icon"
-                          title={tr('Έντυπο')}
-                          aria-label={tr('Έντυπο')}
-                          onClick={() => onPrint(load.id)}
+                          className="release-reprocess"
+                          disabled={!canFinish}
+                          onClick={() =>
+                            ask({
+                              title: tr('Αποτυχία κύκλου;'),
+                              message: tr(
+                                'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.',
+                                load.items.length,
+                              ),
+                              confirmLabel: tr('Αποτυχία κύκλου'),
+                              danger: true,
+                              onConfirm: () => onFinish(load.id, 'FAILED'),
+                            })
+                          }
                         >
-                          <Printer size={15} />
+                          <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
                         </button>
-                      )}
-                      <button
-                        className="release-reprocess"
-                        disabled={!canFinish}
-                        onClick={() =>
-                          ask({
-                            title: tr('Αποτυχία κύκλου;'),
-                            message: tr(
-                              'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.',
-                              load.items.length,
-                            ),
-                            confirmLabel: tr('Αποτυχία κύκλου'),
-                            danger: true,
-                            onConfirm: () => onFinish(load.id, 'FAILED'),
-                          })
-                        }
-                      >
-                        <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
-                      </button>
-                      <button
-                        className="primary"
-                        disabled={!canFinish || running}
-                        title={running ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
-                        onClick={() => onFinish(load.id, 'PASSED')}
-                      >
-                        <CheckCircle2 size={15} /> {tr('Τέλος κύκλου')}
-                      </button>
-                    </>
-                  )}
+                        <button
+                          className="primary"
+                          disabled={!canFinish || running}
+                          title={running ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
+                          onClick={() => onFinish(load.id, 'PASSED')}
+                        >
+                          <CheckCircle2 size={15} /> {tr('Τέλος κύκλου')}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             );

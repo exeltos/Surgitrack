@@ -629,7 +629,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-1-heating.png`, viewport);
         // The «Κλίβανοι» screen: every sterilizer and its cycle.
         await page
-          .getByRole('link', {name: /^(Κλίβανοι|Sterilizers)$/})
+          .getByRole('link', {name: /^(Κλίβανοι & Συσκευές|Sterilizers & Devices)$/})
           .first()
           .click({timeout: 3000});
         await page.waitForTimeout(800);
@@ -670,7 +670,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         // The ended cycle was sent to device-ingest as the simulated device: it is on the Devices page.
         await page.waitForTimeout(1500);
         await page
-          .getByRole('link', {name: /^(Συσκευές|Devices)$/})
+          .getByRole('link', {name: /^(Κλίβανοι & Συσκευές|Sterilizers & Devices)$/})
           .first()
           .click({timeout: 3000});
         await page.waitForTimeout(1200);
