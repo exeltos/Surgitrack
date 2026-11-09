@@ -4740,6 +4740,16 @@ html body .export-day-input {
   opacity: 0;
   cursor: pointer;
 }
+/* In Chrome and Edge the picker opens from the field's own icon: that icon fills the whole button. */
+html body .export-day-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
 html body .export-day:focus-within .export-day-toggle {
   outline: 2px solid var(--c-cyan-45);
   outline-offset: 1px;
