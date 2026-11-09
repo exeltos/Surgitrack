@@ -1703,3 +1703,42 @@ html body .batch-department button.clear:hover {
   border-color: var(--c-gray-65);
   background: var(--c-gray-95);
 }
+
+/* «Επιστροφή σε προηγούμενο στάδιο»: roomy, clearly labelled fields. */
+.stage-return-field {
+  display: grid;
+  gap: 6px;
+  padding: 0 20px 14px 68px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-blue-40);
+}
+.stage-return-field select,
+.stage-return-field textarea {
+  width: 100%;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-3);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+}
+.stage-return-field select {
+  height: 42px;
+  padding: 0 11px;
+  cursor: pointer;
+}
+.stage-return-field textarea {
+  min-height: 84px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.stage-return-field select:focus-visible,
+.stage-return-field textarea:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+.confirm-dialog > .identity-error {
+  margin: 0 20px 12px 68px;
+}

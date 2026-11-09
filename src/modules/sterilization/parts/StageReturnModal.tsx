@@ -4,6 +4,7 @@ import {useSurgi} from '../../../store/SurgiStore';
 import {returnRefusalText} from '../../../core/stageReturn';
 import type {WorkflowStageId} from '../../../core/workflow';
 import type {AssetKind} from '../../../types/domain';
+import AppButton from '../../../components/ui/AppButton';
 import {tr, trData} from '../../../i18n';
 
 /**
@@ -45,7 +46,7 @@ export default function StageReturnModal({
           </button>
         </header>
         {refusal && <div className="identity-error">{refusal}</div>}
-        <label className="confirm-dialog-type">
+        <label className="stage-return-field">
           {tr('Επιστροφή στο στάδιο')}
           <select value={stage} onChange={e => setStage(e.target.value as WorkflowStageId)} disabled={!!refusal}>
             {info?.targets.map(t => (
@@ -55,27 +56,28 @@ export default function StageReturnModal({
             ))}
           </select>
         </label>
-        <label className="confirm-dialog-type">
+        <label className="stage-return-field">
           {tr('Αιτιολογία')}
           <textarea
             autoFocus
-            rows={2}
+            rows={3}
             value={reason}
             placeholder={tr('π.χ. λάθος σάρωση, άλλο tablet')}
             onChange={e => setReason(e.target.value)}
           />
         </label>
         <footer>
-          <button onClick={onClose}>{tr('Ακύρωση')}</button>
-          <button
-            className="primary"
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
+          <AppButton
+            variant="primary"
+            icon={<Undo2 size={16} />}
             disabled={!ready}
             onClick={() => {
               if (stage && returnToStage(asset.kind, asset.id, stage, reason)) onClose();
             }}
           >
             {tr('Επιστροφή')}
-          </button>
+          </AppButton>
         </footer>
       </div>
     </div>
