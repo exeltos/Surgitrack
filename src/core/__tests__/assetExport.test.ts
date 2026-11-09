@@ -90,7 +90,8 @@ describe('the exports of the tool and Set lists', () => {
     expect(table.rows.map(r => r[0])).toEqual(['ΑΛΛΟ', 'LARGE NEEDLE DRIVER', 'LARGE NEEDLE DRIVER (αχρησιμοποίητα)']);
     const inUse = table.rows[1];
     expect(inUse[at('Τεμάχια')]).toBe(2);
-    expect(inUse[at('Με όριο χρήσεων')]).toBe(2);
+    // «Με όριο χρήσεων» is not a column (it repeated «Τεμάχια»).
+    expect(table.headers).not.toContain('Με όριο χρήσεων');
     expect(inUse[at('Όριο χρήσεων')]).toBe('10');
     expect(inUse[at('Χρήσεις που έγιναν')]).toBe(18);
     expect(inUse[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–2');
