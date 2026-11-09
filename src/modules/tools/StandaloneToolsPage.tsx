@@ -7,7 +7,7 @@ import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/u
 import {usesOnDay, type UsesOnDay} from '../../core/usageHistory';
 import ListExport from '../../components/ui/ListExport';
 import {toolsExportTable, toolsGroupedExportTable} from '../../core/assetExport';
-import {isExhausted} from '../../core/usageStatus';
+import {isExhausted, remainingUses} from '../../core/usageStatus';
 import {distinctValues, groupTools, toolKind} from '../../core/toolGroups';
 import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
@@ -366,6 +366,12 @@ export default function StandaloneToolsPage() {
                                     : `${Math.min(...used)}–${Math.max(...used)}`}
                                 </b>
                                 <span className="muted"> / {t.maxUses}</span>
+                                <small className="row-sub">
+                                  {tr(
+                                    'Υπόλοιπο σύνολο: {0}',
+                                    g.reduce((total, x) => total + remainingUses(x), 0),
+                                  )}
+                                </small>
                               </>
                             ) : t.maxUses ? (
                               '—'

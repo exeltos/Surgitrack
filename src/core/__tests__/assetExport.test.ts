@@ -74,7 +74,7 @@ describe('the exports of the tool and Set lists', () => {
     expect(table.totals?.[table.headers.indexOf('Υπόλοιπο')]).toBe('');
   });
 
-  it('takes the instruments grouped by kind: the limit, the uses made, and the uses left per piece, not added up', () => {
+  it('takes the instruments grouped by kind: the limit, the uses made, the uses left per piece and in all', () => {
     const table = toolsGroupedExportTable(
       [
         tool({id: 'a', uses: 0, maxUses: 10}),
@@ -85,20 +85,30 @@ describe('the exports of the tool and Set lists', () => {
       'Εργαλεία',
       3,
     );
-    expect(table.rows).toHaveLength(2);
     const at = (name: string) => table.headers.indexOf(name);
-    const kind = table.rows.find(r => r[0] === 'LARGE NEEDLE DRIVER')!;
-    expect(kind[at('Τεμάχια')]).toBe(3);
-    expect(kind[at('Με όριο χρήσεων')]).toBe(3);
-    expect(kind[at('Όριο χρήσεων')]).toBe('10');
-    expect(kind[at('Χρήσεις που έγιναν')]).toBe(18);
-    expect(kind[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–10');
-    expect(kind[at('Εξαντλημένα')]).toBe(1);
-    expect(kind[at('Λίγες χρήσεις')]).toBe(1);
-    expect(kind[at('Αχρησιμοποίητα')]).toBe(1);
-    expect(String(kind[at('Τμήμα')])).toContain('ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ');
+    // The kind's pieces in use (b: exhausted, c: low), the one without a limit, and the new piece on its own row last.
+    expect(table.rows.map(r => r[0])).toEqual(['ΑΛΛΟ', 'LARGE NEEDLE DRIVER', 'LARGE NEEDLE DRIVER (αχρησιμοποίητα)']);
+    const inUse = table.rows[1];
+    expect(inUse[at('Τεμάχια')]).toBe(2);
+    // «Με όριο χρήσεων» is not a column (it repeated «Τεμάχια»).
+    expect(table.headers).not.toContain('Με όριο χρήσεων');
+    expect(inUse[at('Όριο χρήσεων')]).toBe('10');
+    expect(inUse[at('Χρήσεις που έγιναν')]).toBe(18);
+    expect(inUse[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–2');
+    // 0 + 2 uses left by the two pieces in use.
+    expect(inUse[at('Σύνολο υπολοίπων χρήσεων')]).toBe(2);
+    expect(inUse[at('Εξαντλημένα')]).toBe(1);
+    expect(inUse[at('Λίγες χρήσεις')]).toBe(1);
+    expect(inUse[at('Αχρησιμοποίητα')]).toBe(0);
+    expect(String(inUse[at('Τμήμα')])).toContain('ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ');
+    const fresh = table.rows[2];
+    expect(fresh[at('Τεμάχια')]).toBe(1);
+    expect(fresh[at('Σύνολο υπολοίπων χρήσεων')]).toBe(10);
+    expect(fresh[at('Αχρησιμοποίητα')]).toBe(1);
+    // The totals count every piece; the kinds are counted once each (not once per row).
     expect(table.totals?.[at('Τεμάχια')]).toBe(4);
     expect(table.totals?.[at('Υπόλοιπο ανά τεμάχιο')]).toBe('');
+    expect(table.totals?.[at('Σύνολο υπολοίπων χρήσεων')]).toBe(12);
     expect(table.totals?.[0]).toBe('Σύνολο ειδών: 2');
   });
 });

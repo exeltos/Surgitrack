@@ -128,8 +128,9 @@ const range = (values: number[]) => {
 /**
  * The same instruments grouped by kind, i.e. by name (as the list's «Ομαδοποίηση», see core/toolGroups): one row per
  * kind with its pieces and the departments they are in; for the pieces with a limit, the limit (or its range), the
- * uses made in all, the uses left per piece (least to most, never added up: the uses left by nine instruments are not
- * a number of anything), and how many are exhausted, low on uses or new. The totals under it count the same things.
+ * uses made in all, the uses left per piece (least to most) and the total of the uses left by all the pieces of the
+ * kind, and how many are exhausted, low on uses or new. The new pieces (a limit, no use made) of a kind are a row of
+ * their own at the end of the list. The totals under it count the same things, the uses left included.
  */
 export const toolsGroupedExportTable = (
   allTools: Tool[],
@@ -138,30 +139,40 @@ export const toolsGroupedExportTable = (
   onDay?: UsesOnDay,
 ): ExportTable => {
   const tools = onDay ? asOfDay(allTools, onDay) : allTools;
-  const rows = groupTools(tools)
-    .sort((a, b) => a[0].name.localeCompare(b[0].name, 'el'))
-    .map(g => {
-      const limited = g.filter(t => t.maxUses);
-      const departments = distinctValues(g, t => trData(t.department) || tr('Απόθεμα')).sort((a, b) =>
-        a.localeCompare(b, 'el'),
-      );
-      const codes = distinctValues(g, t => t.code);
-      return [
-        g[0].name,
-        codes.length > 1 ? tr('{0} κωδικοί', codes.length) : codes[0] || '',
-        distinctValues(g, t => t.manufacturer).join(', '),
-        trData(g.find(t => t.specialty)?.specialty) || '',
-        departments.join(' · '),
-        g.length,
-        limited.length,
-        range(limited.map(t => t.maxUses as number)),
-        sum(limited.map(t => t.uses)),
-        range(limited.map(t => remainingUses(t) as number)),
-        limited.filter(isExhausted).length,
-        limited.filter(t => isLow(t, warningThreshold)).length,
-        limited.filter(isNew).length,
-      ];
-    });
+  const kinds = groupTools(tools).sort((a, b) => a[0].name.localeCompare(b[0].name, 'el'));
+  const rowOf = (g: Tool[], name: string) => {
+    const limited = g.filter(t => t.maxUses);
+    const departments = distinctValues(g, t => trData(t.department) || tr('Απόθεμα')).sort((a, b) =>
+      a.localeCompare(b, 'el'),
+    );
+    const codes = distinctValues(g, t => t.code);
+    return [
+      name,
+      codes.length > 1 ? tr('{0} κωδικοί', codes.length) : codes[0] || '',
+      distinctValues(g, t => t.manufacturer).join(', '),
+      trData(g.find(t => t.specialty)?.specialty) || '',
+      departments.join(' · '),
+      g.length,
+      range(limited.map(t => t.maxUses as number)),
+      sum(limited.map(t => t.uses)),
+      range(limited.map(t => remainingUses(t) as number)),
+      sum(limited.map(t => remainingUses(t) as number)),
+      limited.filter(isExhausted).length,
+      limited.filter(t => isLow(t, warningThreshold)).length,
+      limited.filter(isNew).length,
+    ];
+  };
+  // The pieces of each kind that are in use (or have no limit) first; the new ones, with no use made, on their own
+  // rows at the end of the list, so their uses left (all of them) are not mixed with those of the used pieces.
+  const inUse = kinds
+    .map(g => ({g: g.filter(t => !isNew(t)), name: g[0].name}))
+    .filter(part => part.g.length)
+    .map(part => rowOf(part.g, part.name));
+  const unused = kinds
+    .map(g => ({g: g.filter(isNew), name: g[0].name}))
+    .filter(part => part.g.length)
+    .map(part => rowOf(part.g, tr('{0} (αχρησιμοποίητα)', part.name)));
+  const rows = [...inUse, ...unused];
   const column = (index: number) => sum(rows.map(row => row[index] as number));
   return {
     title: onDay ? onDayTitle(title, onDay) : title,
@@ -172,26 +183,26 @@ export const toolsGroupedExportTable = (
       tr('Ειδικότητα'),
       tr('Τμήμα'),
       tr('Τεμάχια'),
-      tr('Με όριο χρήσεων'),
       tr('Όριο χρήσεων'),
       tr('Χρήσεις που έγιναν'),
       tr('Υπόλοιπο ανά τεμάχιο'),
+      tr('Σύνολο υπολοίπων χρήσεων'),
       tr('Εξαντλημένα'),
       tr('Λίγες χρήσεις'),
       tr('Αχρησιμοποίητα'),
     ],
     rows,
     totals: [
-      tr('Σύνολο ειδών: {0}', rows.length),
+      tr('Σύνολο ειδών: {0}', kinds.length),
       '',
       '',
       '',
       '',
       column(5),
-      column(6),
       '',
-      column(8),
+      column(7),
       '',
+      column(9),
       column(10),
       column(11),
       column(12),
