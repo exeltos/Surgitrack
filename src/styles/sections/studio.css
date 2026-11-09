@@ -2098,7 +2098,13 @@ html body .notice-preview .notice-preview-who {
   font-weight: 600;
 }
 html body .notice-preview .promo-card {
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+}
+html body .notice-preview .promo-card .promo-image {
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
 }
 html body .notice-preview .maintenance-strip {
   border: 1px solid var(--c-amber-80);

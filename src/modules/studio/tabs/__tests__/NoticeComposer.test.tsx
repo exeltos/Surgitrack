@@ -126,4 +126,30 @@ describe('the owner’s form for an announcement or a promotion', () => {
     });
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('δεν ανέβηκε'));
   });
+
+  it('enlarges the promotion into the card the hospital sees in front of its screen', () => {
+    open();
+    fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
+    write('Τίτλος', 'EXELTOS');
+    write(/^Κείμενο\d/, 'Εφαρμογές cloud');
+    write(/Σύνδεσμος/, 'https://exeltos.com/');
+    write('Κείμενο κουμπιού', 'Πατήστε εδώ');
+    fireEvent.click(screen.getByRole('button', {name: /Μεγέθυνση/}));
+    const dialog = screen.getByRole('dialog', {name: 'EXELTOS'});
+    expect(within(dialog).getByText('Εφαρμογές cloud')).toBeInTheDocument();
+    expect(within(dialog).getByRole('link', {name: /Πατήστε εδώ/})).toHaveAttribute('href', 'https://exeltos.com/');
+    fireEvent.keyDown(window, {key: 'Escape'});
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('lets a promotion be longer than an announcement', () => {
+    open();
+    fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
+    write('Τίτλος', 'Χ');
+    write(/^Κείμενο\d/, 'α'.repeat(500));
+    expect(publishButton()).toBeEnabled();
+    fireEvent.click(screen.getByRole('radio', {name: /Ανακοίνωση/}));
+    expect(screen.getByRole('alert')).toHaveTextContent('έως 300');
+    expect(publishButton()).toBeDisabled();
+  });
 });

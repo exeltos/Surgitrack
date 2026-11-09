@@ -1,5 +1,6 @@
 import {useMemo, useState} from 'react';
-import {ExternalLink, Megaphone, Plus} from 'lucide-react';
+import {ExternalLink, Maximize2, Megaphone, Plus} from 'lucide-react';
+import PromoPopup from '../../../components/layout/PromoPopup';
 import AppButton from '../../../components/ui/AppButton';
 import {safeLink, type NoticeAudience, type NoticeKind} from '../../../data/cloud/platformNotices';
 
@@ -19,7 +20,9 @@ export type NoticeFields = {
   endsAt?: string;
 };
 
+/** The database's limits: a notice is one line, a promotion has room for a paragraph. */
 const MESSAGE_MAX = 300;
+const PROMO_MAX = 1000;
 const toIso = (value: string) => (value ? new Date(value).toISOString() : undefined);
 /** A datetime-local value for a moment, in the browser's time zone. */
 const localInput = (date: Date) => {
@@ -90,6 +93,7 @@ export default function NoticeComposer({
   const [imageUrl, setImageUrl] = useState('');
   const [brokenImage, setBrokenImage] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [enlarged, setEnlarged] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [onlyChosen, setOnlyChosen] = useState(false);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
@@ -98,25 +102,28 @@ export default function NoticeComposer({
   const [until, setUntil] = useState('');
 
   const promo = kind === 'PROMO';
+  const max = promo ? PROMO_MAX : MESSAGE_MAX;
   const to: NoticeAudience = promo ? 'ADMINS' : audience;
   const link = linkUrl.trim();
   const image = promo ? imageUrl.trim() : '';
   const problem = !message.trim()
     ? ''
-    : promo && !title.trim()
-      ? L('Η προώθηση χρειάζεται τίτλο.', 'A promotion needs a title.')
-      : link && !safeLink(link)
-        ? L(
-            'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
-            'The link must start with https:// and have no spaces.',
-          )
-        : onlyChosen && chosen.size === 0
-          ? L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')
-          : from && until && new Date(until) <= new Date(from)
-            ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
-            : until && new Date(until).getTime() <= Date.now()
-              ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
-              : '';
+    : message.length > max
+      ? L('Το μήνυμα της ανακοίνωσης έχει έως 300 χαρακτήρες.', 'An announcement message has up to 300 characters.')
+      : promo && !title.trim()
+        ? L('Η προώθηση χρειάζεται τίτλο.', 'A promotion needs a title.')
+        : link && !safeLink(link)
+          ? L(
+              'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
+              'The link must start with https:// and have no spaces.',
+            )
+          : onlyChosen && chosen.size === 0
+            ? L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')
+            : from && until && new Date(until) <= new Date(from)
+              ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
+              : until && new Date(until).getTime() <= Date.now()
+                ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
+                : '';
   const ready = !!message.trim() && !problem && !busy && !uploading;
   const choosePicture = async (file?: File) => {
     if (!file) return;
@@ -225,7 +232,7 @@ export default function NoticeComposer({
             <textarea
               rows={3}
               value={message}
-              maxLength={MESSAGE_MAX}
+              maxLength={max}
               onChange={e => setMessage(e.target.value)}
               placeholder={
                 promo
@@ -237,7 +244,7 @@ export default function NoticeComposer({
               }
             />
             <small>
-              {message.length} / {MESSAGE_MAX}
+              {message.length} / {max}
             </small>
           </label>
           {promo && (
@@ -403,11 +410,12 @@ export default function NoticeComposer({
       <aside className="notice-preview" aria-label={L('Προεπισκόπηση', 'Preview')}>
         <h3>{L('Προεπισκόπηση', 'Preview')}</h3>
         <p className="notice-preview-who">{who}</p>
-        {promo ? (
+        {promo && (
           <article className="promo-card">
-            <Megaphone size={20} aria-hidden="true" />
-            {safeLink(image) && brokenImage !== image && (
+            {safeLink(image) && brokenImage !== image ? (
               <img className="promo-image" src={image} alt="" onError={() => setBrokenImage(image)} />
+            ) : (
+              <Megaphone size={20} aria-hidden="true" />
             )}
             <div>
               <small>{L('Πρόταση', 'Suggestion')}</small>
@@ -420,7 +428,25 @@ export default function NoticeComposer({
               )}
             </div>
           </article>
-        ) : (
+        )}
+        {promo && (
+          <AppButton type="button" icon={<Maximize2 size={16} />} onClick={() => setEnlarged(true)}>
+            {L('Μεγέθυνση: όπως το βλέπει το νοσοκομείο', 'Enlarge: as the hospital sees it')}
+          </AppButton>
+        )}
+        {enlarged && promo && (
+          <PromoPopup
+            promo={{
+              title: title.trim() || L('Τίτλος προώθησης', 'Promotion title'),
+              message: message.trim() || L('Το κείμενο θα εμφανιστεί εδώ.', 'The text will show here.'),
+              imageUrl: image,
+              linkUrl: link,
+              linkLabel: linkLabel.trim(),
+            }}
+            onClose={() => setEnlarged(false)}
+          />
+        )}
+        {!promo && (
           <div className="trial-strip maintenance-strip" role="presentation">
             <Megaphone size={16} aria-hidden="true" />
             <span>{message.trim() || L('Το μήνυμα θα εμφανιστεί εδώ.', 'The message will show here.')}</span>

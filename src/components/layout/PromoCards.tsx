@@ -3,15 +3,25 @@ import {ExternalLink, Megaphone, X} from 'lucide-react';
 import {getRuntimeDataMode} from '../../config/dataMode';
 import {loadActiveNotices, safeLink, type PlatformNotice} from '../../data/cloud/platformNotices';
 import {tr} from '../../i18n';
+import PromoPopup from './PromoPopup';
 
 const HIDDEN = 'surgitrack-promos-hidden';
+/** The promotions already shown in front of the screen on this device. */
+const SEEN = 'surgitrack-promos-seen';
 const REFRESH_MS = 10 * 60_000;
 
-const readHidden = (): string[] => {
+const readList = (key: string): string[] => {
   try {
-    return JSON.parse(localStorage.getItem(HIDDEN) || '[]') as string[];
+    return JSON.parse(localStorage.getItem(key) || '[]') as string[];
   } catch {
     return [];
+  }
+};
+const writeList = (key: string, list: string[]) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch {
+    // Private mode: remembered until the page reloads.
   }
 };
 
@@ -22,7 +32,8 @@ const readHidden = (): string[] => {
  */
 export default function PromoCards() {
   const [promos, setPromos] = useState<PlatformNotice[]>([]);
-  const [hidden, setHidden] = useState<string[]>(readHidden);
+  const [hidden, setHidden] = useState<string[]>(() => readList(HIDDEN));
+  const [seen, setSeen] = useState<string[]>(() => readList(SEEN));
   const [broken, setBroken] = useState<string[]>([]);
   useEffect(() => {
     if (getRuntimeDataMode() !== 'PRODUCTION') return;
@@ -40,14 +51,19 @@ export default function PromoCards() {
   const hide = (id: string) => {
     const next = [...hidden, id];
     setHidden(next);
-    try {
-      localStorage.setItem(HIDDEN, JSON.stringify(next));
-    } catch {
-      // Private mode: hidden until the page reloads.
-    }
+    writeList(HIDDEN, next);
+  };
+  // A new promotion opens once in front of the screen; closed, it stays as a card on the Overview.
+  const front = shown.find(promo => !seen.includes(promo.id));
+  const closeFront = () => {
+    if (!front) return;
+    const next = [...seen, front.id];
+    setSeen(next);
+    writeList(SEEN, next);
   };
   return (
     <div className="promo-cards">
+      {front && <PromoPopup promo={front} onClose={closeFront} />}
       {shown.map(promo => {
         const link = safeLink(promo.linkUrl);
         const image = broken.includes(promo.id) ? undefined : safeLink(promo.imageUrl);
