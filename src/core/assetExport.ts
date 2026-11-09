@@ -148,7 +148,8 @@ export const toolsGroupedExportTable = (
     const codes = distinctValues(g, t => t.code);
     return [
       name,
-      codes.length > 1 ? tr('{0} κωδικοί', codes.length) : codes[0] || '',
+      // The codes themselves, not how many there are.
+      [...codes].sort((a, b) => a.localeCompare(b, 'el')).join(', '),
       distinctValues(g, t => t.manufacturer).join(', '),
       trData(g.find(t => t.specialty)?.specialty) || '',
       departments.join(' · '),
@@ -173,6 +174,10 @@ export const toolsGroupedExportTable = (
     .filter(part => part.g.length)
     .map(part => rowOf(part.g, tr('{0} (αχρησιμοποίητα)', part.name)));
   const rows = [...inUse, ...unused];
+  // The new pieces are set apart under a band of their own.
+  const sections = unused.length
+    ? [{before: inUse.length, title: tr('Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα')}]
+    : undefined;
   const column = (index: number) => sum(rows.map(row => row[index] as number));
   return {
     title: onDay ? onDayTitle(title, onDay) : title,
@@ -192,6 +197,7 @@ export const toolsGroupedExportTable = (
       tr('Αχρησιμοποίητα'),
     ],
     rows,
+    ...(sections ? {sections} : {}),
     totals: [
       tr('Σύνολο ειδών: {0}', kinds.length),
       '',

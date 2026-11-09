@@ -110,5 +110,25 @@ describe('the exports of the tool and Set lists', () => {
     expect(table.totals?.[at('Υπόλοιπο ανά τεμάχιο')]).toBe('');
     expect(table.totals?.[at('Σύνολο υπολοίπων χρήσεων')]).toBe(12);
     expect(table.totals?.[0]).toBe('Σύνολο ειδών: 2');
+    // The new pieces are set apart under a band of their own, before their first row.
+    expect(table.sections).toEqual([{before: 2, title: expect.stringContaining('Αχρησιμοποίητα')}]);
+  });
+
+  it('lists the codes of a kind in the code column, not how many there are', () => {
+    const table = toolsGroupedExportTable(
+      [
+        tool({id: 'a', code: 'K300', uses: 3, maxUses: 10}),
+        tool({id: 'b', code: 'K100', uses: 4, maxUses: 10}),
+        tool({id: 'c', code: 'K100', uses: 5, maxUses: 10}),
+      ],
+      'Εργαλεία',
+      3,
+    );
+    expect(table.rows[0][table.headers.indexOf('Κωδικός')]).toBe('K100, K300');
+  });
+
+  it('has no band when no piece is new', () => {
+    const table = toolsGroupedExportTable([tool({id: 'a', uses: 3, maxUses: 10})], 'Εργαλεία', 3);
+    expect(table.sections).toBeUndefined();
   });
 });

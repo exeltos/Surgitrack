@@ -743,6 +743,7 @@ export const en: Record<string, string> = {
   'Υπόλοιπο ανά τεμάχιο': 'Uses left per piece',
   'Σύνολο υπολοίπων χρήσεων': 'Total uses left',
   '{0} (αχρησιμοποίητα)': '{0} (unused)',
+  'Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα': 'Unused: new pieces, no use made yet',
   'Υπόλοιπο σύνολο: {0}': 'Total left: {0}',
   Εξαντλημένα: 'Exhausted',
   Εξαντλημένο: 'Exhausted',
