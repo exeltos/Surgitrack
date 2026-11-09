@@ -7,8 +7,9 @@ const orgs = [
   {id: 'o1', name: 'ΙΑΣΩ Θεσσαλίας'},
   {id: 'o2', name: 'Κλινική Βορρά'},
 ];
+const upload = vi.fn(async (_file: File) => 'https://x.supabase.co/storage/v1/object/public/promo-images/a.jpg');
 const open = (onPublish = vi.fn(async (_fields: NoticeFields) => true), busy = false) => {
-  render(<NoticeComposer L={L} organizations={orgs} busy={busy} onPublish={onPublish} />);
+  render(<NoticeComposer L={L} organizations={orgs} busy={busy} onPublish={onPublish} onUploadImage={upload} />);
   return onPublish;
 };
 const write = (label: RegExp | string, value: string) =>
@@ -99,17 +100,30 @@ describe('the owner’s form for an announcement or a promotion', () => {
     expect(publishButton()).toBeDisabled();
   });
 
-  it('takes a picture for a promotion, shows it, and refuses one that is not https', () => {
+  it('uploads a picture chosen on the device, shows it, and publishes its address', async () => {
     const onPublish = open();
     fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
     write(/^Κείμενο\d/, 'Ένα προϊόν');
     write('Τίτλος', 'Προϊόν Χ');
-    write(/^Εικόνα προϊόντος/, 'http://example.com/a.png');
-    expect(screen.getByRole('alert')).toHaveTextContent('https://');
-    expect(publishButton()).toBeDisabled();
-    write(/^Εικόνα προϊόντος/, 'https://example.com/a.png');
-    expect(document.querySelector('.notice-preview img')).toHaveAttribute('src', 'https://example.com/a.png');
+    const file = new File(['x'], 'p.png', {type: 'image/png'});
+    fireEvent.change(screen.getByLabelText('Επιλογή εικόνας'), {target: {files: [file]}});
+    await waitFor(() => expect(document.querySelector('.notice-preview img')).toBeTruthy());
+    expect(upload).toHaveBeenCalledWith(file);
     fireEvent.click(publishButton());
-    expect(onPublish.mock.calls[0][0]).toMatchObject({imageUrl: 'https://example.com/a.png'});
+    await waitFor(() =>
+      expect(onPublish.mock.calls[0][0]).toMatchObject({imageUrl: expect.stringContaining('promo-images')}),
+    );
+  });
+
+  it('says so when the picture does not upload', async () => {
+    upload.mockRejectedValueOnce(new Error('no'));
+    open();
+    fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
+    write(/^Κείμενο\d/, 'Ένα προϊόν');
+    write('Τίτλος', 'Προϊόν Χ');
+    fireEvent.change(screen.getByLabelText('Επιλογή εικόνας'), {
+      target: {files: [new File(['x'], 'p.png', {type: 'image/png'})]},
+    });
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('δεν ανέβηκε'));
   });
 });

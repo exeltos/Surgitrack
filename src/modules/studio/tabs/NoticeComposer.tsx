@@ -72,11 +72,14 @@ export default function NoticeComposer({
   organizations,
   busy,
   onPublish,
+  onUploadImage,
 }: {
   L: Lang;
   organizations: Array<{id: string; name: string}>;
   busy: boolean;
   onPublish: (fields: NoticeFields) => Promise<boolean>;
+  /** Uploads a picture chosen on the device and gives back its https address. */
+  onUploadImage: (file: File) => Promise<string>;
 }) {
   const [kind, setKind] = useState<NoticeKind>('NOTICE');
   const [audience, setAudience] = useState<NoticeAudience>('ALL');
@@ -86,6 +89,8 @@ export default function NoticeComposer({
   const [linkLabel, setLinkLabel] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [brokenImage, setBrokenImage] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const [onlyChosen, setOnlyChosen] = useState(false);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
@@ -100,21 +105,36 @@ export default function NoticeComposer({
     ? ''
     : promo && !title.trim()
       ? L('Η προώθηση χρειάζεται τίτλο.', 'A promotion needs a title.')
-      : image && !safeLink(image)
-        ? L('Η διεύθυνση της εικόνας πρέπει να αρχίζει με https://.', 'The picture address must start with https://.')
-        : link && !safeLink(link)
-          ? L(
-              'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
-              'The link must start with https:// and have no spaces.',
-            )
-          : onlyChosen && chosen.size === 0
-            ? L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')
-            : from && until && new Date(until) <= new Date(from)
-              ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
-              : until && new Date(until).getTime() <= Date.now()
-                ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
-                : '';
-  const ready = !!message.trim() && !problem && !busy;
+      : link && !safeLink(link)
+        ? L(
+            'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
+            'The link must start with https:// and have no spaces.',
+          )
+        : onlyChosen && chosen.size === 0
+          ? L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')
+          : from && until && new Date(until) <= new Date(from)
+            ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
+            : until && new Date(until).getTime() <= Date.now()
+              ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
+              : '';
+  const ready = !!message.trim() && !problem && !busy && !uploading;
+  const choosePicture = async (file?: File) => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError('');
+    try {
+      setImageUrl(await onUploadImage(file));
+    } catch {
+      setUploadError(
+        L(
+          'Η εικόνα δεν ανέβηκε. Δοκιμάστε άλλο αρχείο (JPEG, PNG ή WebP).',
+          'The picture did not upload. Try another file (JPEG, PNG or WebP).',
+        ),
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
   const shown = useMemo(() => {
     const q = search.trim().toLocaleLowerCase('el-GR');
     return organizations.filter(o => !q || o.name.toLocaleLowerCase('el-GR').includes(q));
@@ -219,16 +239,40 @@ export default function NoticeComposer({
             </small>
           </label>
           {promo && (
-            <label>
-              {L('Εικόνα προϊόντος (διεύθυνση https, προαιρετική)', 'Product picture (https address, optional)')}
-              <input
-                value={imageUrl}
-                maxLength={500}
-                inputMode="url"
-                placeholder="https://"
-                onChange={e => setImageUrl(e.target.value)}
-              />
-            </label>
+            <div className="notice-picture">
+              <span className="notice-choice-label">
+                {L('Εικόνα προϊόντος (προαιρετική)', 'Product picture (optional)')}
+              </span>
+              {image ? (
+                <div className="notice-picture-row">
+                  <img src={image} alt="" />
+                  <button type="button" onClick={() => setImageUrl('')}>
+                    {L('Αφαίρεση εικόνας', 'Remove picture')}
+                  </button>
+                </div>
+              ) : (
+                <label className="notice-picture-pick">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    disabled={uploading}
+                    aria-label={L('Επιλογή εικόνας', 'Choose a picture')}
+                    onChange={e => {
+                      void choosePicture(e.target.files?.[0]);
+                      e.target.value = '';
+                    }}
+                  />
+                  <small>
+                    {uploading
+                      ? L('Ανέβασμα…', 'Uploading…')
+                      : L(
+                          'Διαλέξτε αρχείο από τον υπολογιστή (JPEG, PNG ή WebP).',
+                          'Choose a file from your computer (JPEG, PNG or WebP).',
+                        )}
+                  </small>
+                </label>
+              )}
+            </div>
           )}
           <div className="notice-button-box">
             <span className="notice-choice-label">
@@ -343,7 +387,7 @@ export default function NoticeComposer({
         </fieldset>
 
         <div className="notice-footer">
-          <p role="alert">{problem}</p>
+          <p role="alert">{problem || uploadError}</p>
           <AppButton type="submit" variant="primary" icon={<Plus size={16} />} disabled={!ready}>
             {L('Δημοσίευση', 'Publish')}
           </AppButton>

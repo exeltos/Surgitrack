@@ -1929,6 +1929,35 @@ html body .notice-choice-label {
   text-transform: uppercase;
   color: var(--st-muted);
 }
+html body .notice-picture {
+  display: grid;
+  gap: 8px;
+}
+html body .notice-picture-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+html body .notice-picture-row img {
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--c-gray-90-4);
+}
+html body .notice-picture-row button {
+  padding: 8px 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .notice-picture-pick {
+  padding: 12px 14px;
+  border: 1px dashed var(--c-gray-90-4);
+  border-radius: 10px;
+}
 html body .notice-button-box {
   display: grid;
   gap: 8px;
@@ -2081,4 +2110,10 @@ html body .notice-preview .maintenance-strip {
   html body .notice-preview {
     position: static;
   }
+}
+
+/* Ειδοποιήσεις: the form is taller than the screen, so the tab scrolls inside the page. */
+html body .studio-body-notices {
+  min-height: 0;
+  overflow-y: auto;
 }

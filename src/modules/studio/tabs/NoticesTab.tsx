@@ -14,6 +14,7 @@ import {
   type PlatformNotice,
 } from '../../../data/cloud/platformNotices';
 import type {StudioPageState} from '../useStudioPage';
+import {uploadPromoImage} from '../../../data/cloud/promoImage';
 import NoticeComposer, {type NoticeFields} from './NoticeComposer';
 
 const STATUS: Record<NoticeStatus, [string, string]> = {
@@ -104,6 +105,7 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
         organizations={displayedOrganizations.map(o => ({id: o.id, name: o.name}))}
         busy={busy}
         onPublish={publish}
+        onUploadImage={uploadPromoImage}
       />
 
       {failed && <p className="studio-errors-failed">{failed}</p>}
