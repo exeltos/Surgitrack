@@ -39,21 +39,25 @@ function Choice<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <div className="notice-choice" role="radiogroup" aria-label={label}>
-      {options.map(option => (
-        <button
-          key={option.id}
-          type="button"
-          role="radio"
-          aria-checked={value === option.id}
-          disabled={option.disabled}
-          className={value === option.id ? 'on' : ''}
-          onClick={() => onChange(option.id)}
-        >
-          <b>{option.title}</b>
-          {option.hint && <small>{option.hint}</small>}
-        </button>
-      ))}
+    <div className="notice-choice-group">
+      <span className="notice-choice-label">{label}</span>
+      <div className="notice-choice" role="radiogroup" aria-label={label}>
+        {options.map(option => (
+          <button
+            key={option.id}
+            type="button"
+            role="radio"
+            aria-checked={value === option.id}
+            disabled={option.disabled}
+            className={value === option.id ? 'on' : ''}
+            onClick={() => onChange(option.id)}
+          >
+            <i className="notice-dot" aria-hidden="true" />
+            <b>{option.title}</b>
+            {option.hint && <small>{option.hint}</small>}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -206,28 +210,31 @@ export default function NoticeComposer({
               {message.length} / {MESSAGE_MAX}
             </small>
           </label>
-          <div className="notice-row">
-            <label>
-              {L('Σύνδεσμος (προαιρετικός)', 'Link (optional)')}
-              <input
-                value={linkUrl}
-                maxLength={500}
-                inputMode="url"
-                placeholder="https://"
-                onChange={e => setLinkUrl(e.target.value)}
-              />
-            </label>
-            {link && (
+          <div className="notice-button-box">
+            <span className="notice-choice-label">
+              {L('Κουμπί με σύνδεσμο (προαιρετικό)', 'Button with a link (optional)')}
+            </span>
+            <div className="notice-row">
+              <label>
+                {L('Σύνδεσμος', 'Link')}
+                <input
+                  value={linkUrl}
+                  maxLength={500}
+                  inputMode="url"
+                  placeholder="https://"
+                  onChange={e => setLinkUrl(e.target.value)}
+                />
+              </label>
               <label>
                 {L('Κείμενο κουμπιού', 'Button text')}
                 <input
                   value={linkLabel}
                   maxLength={40}
-                  placeholder={L('Περισσότερα', 'Learn more')}
+                  placeholder={L('Π.χ. Πατήστε εδώ', 'E.g. Click here')}
                   onChange={e => setLinkLabel(e.target.value)}
                 />
               </label>
-            )}
+            </div>
           </div>
         </fieldset>
 

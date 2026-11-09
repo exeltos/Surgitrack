@@ -43,7 +43,7 @@ describe('the owner’s form for an announcement or a promotion', () => {
   it('makes a promotion for the administrators only, which needs a title', () => {
     const onPublish = open();
     fireEvent.click(screen.getByRole('radio', {name: /Προώθηση/}));
-    write(/^Κείμενο/, 'Ένα προϊόν');
+    write(/^Κείμενο\d/, 'Ένα προϊόν');
     expect(screen.getByRole('alert')).toHaveTextContent('Η προώθηση χρειάζεται τίτλο.');
     expect(publishButton()).toBeDisabled();
     // The audience cannot be everyone.
