@@ -29,6 +29,7 @@ import {belowMinimum, minimumRows} from '../../core/stockMinimums';
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {movementStamp} from '../../core/movementTime';
 import {movementText} from '../../core/movementText';
+import PromoCards from '../../components/layout/PromoCards';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -270,6 +271,8 @@ export default function HospitalOverviewPage() {
           </div>
         }
       />
+
+      <PromoCards />
 
       {pendingAccess > 0 && (
         <Link className="overview-alert" to="/hospital">

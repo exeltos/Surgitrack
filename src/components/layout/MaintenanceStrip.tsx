@@ -15,14 +15,14 @@ const readDismissed = (): string[] => {
   }
 };
 
-/** The platform owner's notices to every user (Studio → Ειδοποιήσεις), while they run; each user can hide one. */
+/** The platform owner's notices (Studio → Ειδοποιήσεις) for this person, while they run; each user can hide one. */
 export default function MaintenanceStrip() {
   const [notices, setNotices] = useState<PlatformNotice[]>([]);
   const [dismissed, setDismissed] = useState<string[]>(readDismissed);
   useEffect(() => {
     if (getRuntimeDataMode() !== 'PRODUCTION') return;
     let live = true;
-    const load = () => void loadActiveNotices().then(list => live && setNotices(list));
+    const load = () => void loadActiveNotices('NOTICE').then(list => live && setNotices(list));
     load();
     const timer = window.setInterval(load, REFRESH_MS);
     return () => {

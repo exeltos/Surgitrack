@@ -1073,3 +1073,52 @@ html body .department-home .dash-activity .dash-columns {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* The platform owner's promotions on the hospital administrator's Overview (components/layout/PromoCards.tsx). */
+.promo-cards {
+  display: grid;
+  gap: 10px;
+}
+.promo-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-cyan-65);
+  border-radius: 12px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-35);
+}
+.promo-card small {
+  color: var(--st-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.promo-card h3 {
+  margin: 2px 0 4px;
+  font-size: 16px;
+  color: var(--c-cyan-20-3);
+}
+.promo-card p {
+  margin: 0 0 8px;
+  color: var(--c-cyan-20-3);
+  font-size: 13.5px;
+}
+.promo-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  background: var(--st-teal);
+  color: var(--c-white);
+  font-weight: 700;
+  text-decoration: none;
+}
+.promo-card a:focus-visible {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 2px;
+}

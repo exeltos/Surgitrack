@@ -1909,3 +1909,74 @@ html body .ratings-person > strong {
     display: none;
   }
 }
+
+/* Studio › Ειδοποιήσεις: the kind, who it is for, the link, and the hospitals it goes to. */
+html body .studio-notice-new .studio-notice-extra,
+html body .studio-notice-new .studio-notice-hospitals {
+  grid-column: 1 / -1;
+}
+html body .studio-notice-new .studio-notice-extra {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+html body .studio-notice-new select {
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-weight: 500;
+}
+html body .studio-notice-new .studio-notice-hospitals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+}
+html body .studio-notice-new .studio-notice-hospitals legend {
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+html body .studio-notice-new .studio-notice-radio {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+html body .studio-notice-new .studio-notice-radio {
+  white-space: nowrap;
+}
+html body .studio-notice-new .studio-notice-radio input {
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+html body .studio-notice-new .studio-notice-orgs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px 12px;
+  flex-basis: 100%;
+  max-height: 180px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+html body .studio-notice-kind {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
