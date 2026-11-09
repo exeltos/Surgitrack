@@ -617,6 +617,11 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-1-heating.png`, viewport);
         await page.waitForTimeout(19000);
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2-hold.png`, viewport);
+        // All sterilizers on one board (the «Στον κλίβανο» tab) while the cycle runs.
+        await page.locator('[data-tour="queue-IN_STERILIZER"]').click({timeout: 3000});
+        await page.waitForTimeout(500);
+        await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2b-board.png`, viewport);
+        await toRelease();
         await page.waitForTimeout(42000);
         // The cycle ends: the readings stay with the load, in the cycle report and in the loads report.
         await page

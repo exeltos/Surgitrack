@@ -1929,3 +1929,89 @@ html body .batch-department button.clear:hover {
   border-top-style: dashed;
   border-color: var(--c-red-45);
 }
+
+/* All sterilizers on one screen (parts/SterilizerBoard.tsx). */
+.sterilizer-board {
+  display: grid;
+  gap: 10px;
+  padding: 12px 12px 0;
+}
+.sterilizer-board > header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.sterilizer-board > header small {
+  color: var(--st-muted);
+}
+.sterilizer-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+.sterilizer-tile {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.sterilizer-tile.free {
+  background: var(--c-gray-100-2);
+  color: var(--st-muted);
+}
+.sterilizer-tile.busy {
+  border-color: var(--c-orange-60);
+}
+.sterilizer-tile.busy.done {
+  border-color: var(--c-green-45);
+}
+.sterilizer-tile .tile-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sterilizer-tile .tile-sim {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+  font-size: 10px;
+  font-weight: 700;
+}
+.sterilizer-tile .tile-state {
+  font-size: 13px;
+  font-weight: 600;
+}
+.sterilizer-tile .tile-readings {
+  display: flex;
+  gap: 16px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.sterilizer-tile .tile-readings .bad {
+  color: var(--c-red-45);
+}
+.sterilizer-tile .tile-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  overflow: hidden;
+}
+.sterilizer-tile .tile-progress i {
+  display: block;
+  height: 100%;
+  background: var(--c-orange-60);
+}
+.sterilizer-tile.done .tile-progress i {
+  background: var(--c-green-45);
+}
+.sterilizer-tile small {
+  color: var(--st-muted);
+}
