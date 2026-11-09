@@ -57,7 +57,7 @@ export default function PromoCards() {
               <h3>{promo.title}</h3>
               <p>{promo.message}</p>
               {link && (
-                <a href={link} target="_blank" rel="noopener noreferrer">
+                <a className="promo-cta" href={link} target="_blank" rel="noopener noreferrer">
                   {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={14} aria-hidden="true" />
                 </a>
               )}

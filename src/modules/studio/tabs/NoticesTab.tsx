@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {Megaphone, Plus, RefreshCw, Square, Trash2} from 'lucide-react';
+import {Megaphone, RefreshCw, Square, Trash2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import Spinner from '../../../components/ui/Spinner';
 import {askConfirm} from '../../../components/ui/confirmService';
@@ -10,20 +10,11 @@ import {
   endNotice,
   loadNotices,
   noticeStatus,
-  safeLink,
-  type NoticeAudience,
-  type NoticeKind,
   type NoticeStatus,
   type PlatformNotice,
 } from '../../../data/cloud/platformNotices';
 import type {StudioPageState} from '../useStudioPage';
-
-/** A datetime-local value for a moment, in the browser's time zone. */
-const localInput = (date: Date) => {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
-const toIso = (value: string) => (value ? new Date(value).toISOString() : undefined);
+import NoticeComposer, {type NoticeFields} from './NoticeComposer';
 
 const STATUS: Record<NoticeStatus, [string, string]> = {
   ACTIVE: ['Εμφανίζεται', 'Showing'],
@@ -40,16 +31,6 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
   const {L, currentUser, displayedOrganizations, platformAdmin, tab} = s;
   const [notices, setNotices] = useState<PlatformNotice[] | null>(null);
   const [failed, setFailed] = useState('');
-  const [message, setMessage] = useState('');
-  const [from, setFrom] = useState('');
-  const [until, setUntil] = useState('');
-  const [kind, setKind] = useState<NoticeKind>('NOTICE');
-  const [audience, setAudience] = useState<NoticeAudience>('ALL');
-  const [title, setTitle] = useState('');
-  const [linkUrl, setLinkUrl] = useState('');
-  const [linkLabel, setLinkLabel] = useState('');
-  const [onlyChosen, setOnlyChosen] = useState(false);
-  const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
     setFailed('');
@@ -74,46 +55,21 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
   }, [notices]);
   if (!active) return null;
 
-  const wrongWindow = !!from && !!until && new Date(until) <= new Date(from);
-  const pastUntil = !!until && new Date(until).getTime() <= Date.now();
-  const promo = kind === 'PROMO';
-  // A promotion is for the administrators and has a title; a link opens over https only.
-  const badLink = !!linkUrl.trim() && !safeLink(linkUrl.trim());
-  const noTitle = promo && !title.trim();
-  const noHospital = onlyChosen && chosen.size === 0;
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
     setFailed('');
     try {
       await action();
       await load();
+      return true;
     } catch (e) {
       setFailed(e instanceof Error ? e.message : String((e as {message?: string})?.message || e));
+      return false;
     } finally {
       setBusy(false);
     }
   };
-  const publish = () =>
-    run(async () => {
-      await addNotice({
-        message,
-        kind,
-        audience: promo ? 'ADMINS' : audience,
-        title: promo || title.trim() ? title : undefined,
-        linkUrl: linkUrl.trim() || undefined,
-        linkLabel: linkLabel.trim() || undefined,
-        organizationIds: onlyChosen ? [...chosen] : undefined,
-        startsAt: toIso(from),
-        endsAt: toIso(until),
-        byName: currentUser.name,
-      });
-      setMessage('');
-      setTitle('');
-      setLinkUrl('');
-      setLinkLabel('');
-      setFrom('');
-      setUntil('');
-    });
+  const publish = (fields: NoticeFields) => run(() => addNotice({...fields, byName: currentUser.name}));
   const remove = async (notice: PlatformNotice) => {
     const sure = await askConfirm({
       title: L('Διαγραφή ειδοποίησης', 'Delete notice'),
@@ -143,146 +99,12 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
         </div>
       </header>
 
-      <form
-        className="studio-notice-new"
-        onSubmit={e => {
-          e.preventDefault();
-          void publish();
-        }}
-      >
-        <div className="studio-notice-extra">
-          <label>
-            {L('Είδος', 'Kind')}
-            <select value={kind} onChange={e => setKind(e.target.value as NoticeKind)}>
-              <option value="NOTICE">{L('Ανακοίνωση (γραμμή στην κορυφή)', 'Announcement (line at the top)')}</option>
-              <option value="PROMO">{L('Προώθηση (κάρτα στην Επισκόπηση)', 'Promotion (card on the Overview)')}</option>
-            </select>
-          </label>
-          <label>
-            {L('Προς', 'To')}
-            <select
-              value={promo ? 'ADMINS' : audience}
-              disabled={promo}
-              onChange={e => setAudience(e.target.value as NoticeAudience)}
-            >
-              <option value="ALL">{L('Όλους τους χρήστες', 'Every user')}</option>
-              <option value="ADMINS">{L('Μόνο τους διαχειριστές νοσοκομείων', 'Hospital administrators only')}</option>
-            </select>
-            {promo && (
-              <small>{L('Οι προωθήσεις πάνε μόνο στους διαχειριστές.', 'Promotions go to administrators only.')}</small>
-            )}
-          </label>
-          {(promo || title) && (
-            <label>
-              {L('Τίτλος', 'Title')}
-              <input value={title} maxLength={120} onChange={e => setTitle(e.target.value)} />
-            </label>
-          )}
-          <label className="studio-notice-link">
-            {L('Σύνδεσμος (προαιρετικός, https)', 'Link (optional, https)')}
-            <input
-              value={linkUrl}
-              maxLength={500}
-              inputMode="url"
-              onChange={e => setLinkUrl(e.target.value)}
-              placeholder="https://"
-            />
-          </label>
-          {linkUrl.trim() && (
-            <label>
-              {L('Κείμενο κουμπιού', 'Button text')}
-              <input
-                value={linkLabel}
-                maxLength={40}
-                onChange={e => setLinkLabel(e.target.value)}
-                placeholder={L('Περισσότερα', 'Learn more')}
-              />
-            </label>
-          )}
-        </div>
-        <fieldset className="studio-notice-hospitals">
-          <legend>{L('Νοσοκομεία', 'Hospitals')}</legend>
-          <label className="studio-notice-radio">
-            <input type="radio" name="notice-hospitals" checked={!onlyChosen} onChange={() => setOnlyChosen(false)} />
-            {L('Όλα τα νοσοκομεία', 'Every hospital')}
-          </label>
-          <label className="studio-notice-radio">
-            <input type="radio" name="notice-hospitals" checked={onlyChosen} onChange={() => setOnlyChosen(true)} />
-            {L('Μόνο τα επιλεγμένα', 'Only the chosen ones')}
-          </label>
-          {onlyChosen && (
-            <ul className="studio-notice-orgs">
-              {displayedOrganizations.map(org => (
-                <li key={org.id}>
-                  <label className="studio-notice-radio">
-                    <input
-                      type="checkbox"
-                      checked={chosen.has(org.id)}
-                      onChange={() =>
-                        setChosen(current => {
-                          const next = new Set(current);
-                          if (next.has(org.id)) next.delete(org.id);
-                          else next.add(org.id);
-                          return next;
-                        })
-                      }
-                    />
-                    {org.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-        </fieldset>
-        <label className="studio-notice-message">
-          {promo ? L('Κείμενο προώθησης', 'Promotion text') : L('Νέα ανακοίνωση', 'New announcement')}
-          <input
-            value={message}
-            maxLength={300}
-            onChange={e => setMessage(e.target.value)}
-            placeholder={L('Π.χ. Συντήρηση την Κυριακή 22:00–23:00', 'E.g. Maintenance on Sunday 22:00–23:00')}
-          />
-        </label>
-        <label>
-          {L('Από', 'From')}
-          <input type="datetime-local" value={from} onChange={e => setFrom(e.target.value)} />
-          <small>{L('Κενό: από τώρα', 'Empty: from now')}</small>
-        </label>
-        <label>
-          {L('Μέχρι', 'Until')}
-          <input
-            type="datetime-local"
-            value={until}
-            min={from || localInput(new Date())}
-            onChange={e => setUntil(e.target.value)}
-          />
-          <small>{L('Κενό: μέχρι να τη λήξετε', 'Empty: until you end it')}</small>
-        </label>
-        <AppButton
-          type="submit"
-          variant="primary"
-          icon={<Plus size={16} />}
-          disabled={busy || !message.trim() || wrongWindow || pastUntil || badLink || noTitle || noHospital}
-        >
-          {L('Δημοσίευση', 'Publish')}
-        </AppButton>
-        {(wrongWindow || pastUntil || badLink || noTitle || noHospital) && (
-          <small className="studio-notice-warning" role="alert">
-            {wrongWindow
-              ? L('Το «Μέχρι» πρέπει να είναι μετά το «Από».', '"Until" must be after "From".')
-              : pastUntil
-                ? L('Το «Μέχρι» έχει ήδη περάσει.', '"Until" has already passed.')
-                : badLink
-                  ? L(
-                      'Ο σύνδεσμος πρέπει να αρχίζει με https:// και να μην έχει κενά.',
-                      'The link must start with https:// and have no spaces.',
-                    )
-                  : noTitle
-                    ? L('Η προώθηση χρειάζεται τίτλο.', 'A promotion needs a title.')
-                    : L('Διαλέξτε τουλάχιστον ένα νοσοκομείο.', 'Choose at least one hospital.')}
-          </small>
-        )}
-      </form>
+      <NoticeComposer
+        L={L}
+        organizations={displayedOrganizations.map(o => ({id: o.id, name: o.name}))}
+        busy={busy}
+        onPublish={publish}
+      />
 
       {failed && <p className="studio-errors-failed">{failed}</p>}
       {notices === null ? (

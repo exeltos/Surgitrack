@@ -1107,7 +1107,7 @@ html body .department-home .dash-activity .dash-columns {
   color: var(--c-cyan-20-3);
   font-size: 13.5px;
 }
-.promo-card a {
+.promo-card .promo-cta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1118,7 +1118,7 @@ html body .department-home .dash-activity .dash-columns {
   font-weight: 700;
   text-decoration: none;
 }
-.promo-card a:focus-visible {
+.promo-card .promo-cta:focus-visible {
   outline: 2px solid var(--c-cyan-45);
   outline-offset: 2px;
 }
