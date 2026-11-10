@@ -2103,28 +2103,54 @@ html body .batch-department button.clear:hover {
   padding-right: 6px;
 }
 .equipment-detail-workspace .equipment-detail-page {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  align-items: start;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
 }
 .equipment-detail-workspace .equipment-facts-card,
 .equipment-detail-workspace .equipment-wide {
   grid-column: 1 / -1;
 }
+/* The load and the history stay short (they scroll inside); the device's cycles take the rest of the height. */
+.equipment-detail-workspace .equipment-top {
+  min-height: 0;
+}
+.equipment-detail-workspace .equipment-top .asset-section-body {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.equipment-detail-workspace .equipment-cycles {
+  display: flex;
+  flex-direction: column;
+  min-height: 240px;
+}
+.equipment-detail-workspace .equipment-cycles .asset-section-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.equipment-detail-workspace .equipment-cycles .devices-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
 .equipment-detail-workspace .asset-section-head {
-  padding-top: 12px;
-  padding-bottom: 8px;
+  padding-top: 10px;
+  padding-bottom: 6px;
 }
 .equipment-detail-workspace .asset-section-body {
-  padding-top: 8px;
-  padding-bottom: 12px;
+  padding-top: 6px;
+  padding-bottom: 10px;
 }
 .equipment-detail-workspace .equipment-facts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px 18px;
+  gap: 8px 18px;
   margin: 0;
 }
 .equipment-detail-workspace .equipment-facts div {
@@ -2225,9 +2251,6 @@ html body .batch-department button.clear:hover {
 }
 .equipment-rows td .device-sim-badge {
   margin-left: 6px;
-}
-.equipment-detail-workspace .devices-table-wrap {
-  max-height: 320px;
 }
 
 .equipment-rows td.num span {

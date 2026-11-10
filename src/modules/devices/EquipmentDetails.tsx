@@ -228,7 +228,7 @@ export default function EquipmentDetails({
           </div>
         </section>
 
-        <section className={`asset-section${row.trouble?.items.length ? '' : ' equipment-wide'}`}>
+        <section className={`asset-section equipment-top${row.trouble?.items.length ? '' : ' equipment-wide'}`}>
           <div className="asset-section-head">
             <div>
               <span className="eyebrow">{L('ΦΟΡΤΙΟ', 'LOAD')}</span>
@@ -254,7 +254,7 @@ export default function EquipmentDetails({
         </section>
 
         {row.trouble && row.trouble.items.length > 0 && (
-          <section className="asset-section">
+          <section className="asset-section equipment-top">
             <div className="asset-section-head">
               <div>
                 <span className="eyebrow">{L('ΙΣΤΟΡΙΚΟ', 'HISTORY')}</span>
@@ -295,7 +295,7 @@ export default function EquipmentDetails({
         )}
 
         {device && (
-          <section className="asset-section equipment-wide">
+          <section className="asset-section equipment-wide equipment-cycles">
             <div className="asset-section-head">
               <div>
                 <span className="eyebrow">{L('ΣΥΣΚΕΥΗ', 'DEVICE')}</span>
