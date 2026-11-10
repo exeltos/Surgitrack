@@ -188,7 +188,7 @@ export default function EquipmentDetails({
       </div>
 
       <div className="equipment-detail-page">
-        <section className="asset-section">
+        <section className="asset-section equipment-facts-card">
           <div className="asset-section-head">
             <div>
               <span className="eyebrow">
@@ -215,7 +215,7 @@ export default function EquipmentDetails({
                 </div>
               </div>
             )}
-            <dl className="asset-definition-list">
+            <dl className="equipment-facts">
               {facts
                 .filter(([, value]) => value)
                 .map(([label, value]) => (
@@ -228,7 +228,7 @@ export default function EquipmentDetails({
           </div>
         </section>
 
-        <section className="asset-section">
+        <section className={`asset-section${row.trouble?.items.length ? '' : ' equipment-wide'}`}>
           <div className="asset-section-head">
             <div>
               <span className="eyebrow">{L('ΦΟΡΤΙΟ', 'LOAD')}</span>
@@ -295,7 +295,7 @@ export default function EquipmentDetails({
         )}
 
         {device && (
-          <section className="asset-section">
+          <section className="asset-section equipment-wide">
             <div className="asset-section-head">
               <div>
                 <span className="eyebrow">{L('ΣΥΣΚΕΥΗ', 'DEVICE')}</span>
