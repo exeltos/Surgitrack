@@ -66,9 +66,15 @@ export function testsState(tests: readonly EquipmentTest[] | undefined, now = Da
   return standings.some(item => item.due) ? 'DUE' : 'OK';
 }
 
-/** The tests with a new one first, the oldest dropped beyond `TESTS_KEPT`. */
-export const withTest = (tests: readonly EquipmentTest[] = [], test: EquipmentTest) =>
-  [test, ...tests].slice(0, TESTS_KEPT);
+/**
+ * The tests with a new one first, the oldest dropped beyond `TESTS_KEPT`. The latest of every kind always stays,
+ * however many of the others come after it: dropping a failure would clear the sterilizer's lockout.
+ */
+export function withTest(tests: readonly EquipmentTest[] = [], test: EquipmentTest): EquipmentTest[] {
+  const all = [test, ...tests];
+  const latest = new Set(TEST_KINDS.map(kind => all.find(item => item.kind === kind.id)?.id));
+  return all.filter((item, index) => index < TESTS_KEPT || latest.has(item.id));
+}
 
 /** Whether the hospital records tests at all (any sterilizer has one): only then are missing tests pointed out. */
 export const testsInUse = (list: ReadonlyArray<{tests?: readonly EquipmentTest[]}>) =>

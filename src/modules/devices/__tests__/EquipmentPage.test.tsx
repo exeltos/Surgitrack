@@ -44,7 +44,7 @@ vi.mock('../../../store/SurgiStore', () => ({
 const lib = vi.hoisted(() => ({
   sterilizers: [] as Array<{id: string; el: string; en: string; outOfService?: unknown}>,
   washers: [] as Array<{id: string; el: string; en: string; outOfService?: unknown}>,
-  updateItem: vi.fn(),
+  updateEquipment: vi.fn(),
 }));
 vi.mock('../../../core/LibraryStore', () => ({useLibraries: () => lib}));
 const {default: EquipmentPage} = await import('../EquipmentPage');
@@ -90,8 +90,16 @@ beforeEach(() => {
     {id: 'st2', el: 'ΚΛΙΒΑΝΟΣ 2', en: 'Sterilizer 2'},
   ];
   lib.washers = [{id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'Washer 1'}];
-  lib.updateItem = vi.fn((key: 'sterilizers' | 'washers', id: string, patch: Record<string, unknown>) => {
-    lib[key] = lib[key].map(item => (item.id === id ? {...item, ...patch} : item));
+  lib.updateEquipment = vi.fn(async (key: 'sterilizers' | 'washers', id: string, patch: Record<string, unknown>) => {
+    lib[key] = lib[key].map(item =>
+      item.id === id
+        ? {
+            ...item,
+            ...(patch.outOfService !== undefined ? {outOfService: patch.outOfService ?? undefined} : {}),
+            ...(patch.tests ? {tests: patch.tests} : {}),
+          }
+        : item,
+    );
   });
   db.devices = [autoclave, washer];
   db.readings = [reading('1042'), reading('1043'), reading('W-7', 'd2')];
@@ -185,7 +193,7 @@ describe('Sterilizers & Devices, one screen', () => {
     fireEvent.click(within(dialog).getByRole('radio', {name: 'Συντήρηση'}));
     fireEvent.change(within(dialog).getByLabelText(/Σημείωση/), {target: {value: 'Καλέστηκε ο τεχνικός'}});
     fireEvent.click(within(dialog).getByRole('button', {name: 'Εκτός λειτουργίας'}));
-    expect(lib.updateItem).toHaveBeenCalledWith(
+    expect(lib.updateEquipment).toHaveBeenCalledWith(
       'sterilizers',
       'st2',
       expect.objectContaining({
@@ -200,7 +208,7 @@ describe('Sterilizers & Devices, one screen', () => {
     const again = await screen.findByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 2'});
     expect(within(again).getByText(/Καλέστηκε ο τεχνικός/)).toBeInTheDocument();
     fireEvent.click(within(again).getByRole('button', {name: 'Επαναφορά σε λειτουργία'}));
-    expect(lib.updateItem).toHaveBeenLastCalledWith('sterilizers', 'st2', {outOfService: undefined});
+    expect(lib.updateEquipment).toHaveBeenLastCalledWith('sterilizers', 'st2', {outOfService: null});
     expect(within(await screen.findByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 2'})).queryByText(/Καλέστηκε/)).toBeNull();
   });
 
@@ -269,7 +277,7 @@ describe('Sterilizers & Devices, one screen', () => {
     fireEvent.click(within(dialog).getByRole('radio', {name: 'Αποτυχία'}));
     fireEvent.change(within(dialog).getByLabelText(/Σημείωση/), {target: {value: 'Δείκτης ανοιχτός'}});
     fireEvent.click(within(dialog).getByRole('button', {name: 'Καταγραφή'}));
-    expect(lib.updateItem).toHaveBeenCalledWith(
+    expect(lib.updateEquipment).toHaveBeenCalledWith(
       'sterilizers',
       'st2',
       expect.objectContaining({

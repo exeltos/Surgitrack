@@ -43,6 +43,16 @@ describe('the tests of a sterilizer', () => {
     expect(list).toHaveLength(TESTS_KEPT);
   });
 
+  it('never drops the latest result of a kind when the history is trimmed', () => {
+    // A failed leak test, then many other tests: the failure still holds the sterilizer back.
+    let list: EquipmentTest[] = withTest([], test('LEAK', '01/11/2026 08:00', 'FAIL'));
+    for (let i = 0; i < TESTS_KEPT + 10; i++)
+      list = withTest(list, {...test('BOWIE_DICK', '02/11/2026 07:00'), id: `b${i}`});
+    expect(list.length).toBeLessThanOrEqual(TESTS_KEPT + 1);
+    expect(list.some(item => item.kind === 'LEAK' && item.result === 'FAIL')).toBe(true);
+    expect(testsState(list, new Date(2026, 10, 2, 12).getTime())).toBe('FAILED');
+  });
+
   it('points out missing tests only where the hospital records tests at all', () => {
     expect(testsInUse([{}, {tests: []}])).toBe(false);
     expect(testsInUse([{}, {tests: allToday}])).toBe(true);

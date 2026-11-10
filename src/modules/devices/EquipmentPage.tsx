@@ -81,7 +81,7 @@ export default function EquipmentPage() {
   const canRecord = can('sterilization.workspace');
   // In the Demo, a load with no simulation can be given one (in its card, with the scenarios).
   const canSimulate = getRuntimeDataMode() === 'DEMO' && can('sterilization.cycle');
-  const {sterilizers, washers, updateItem} = useLibraries();
+  const {sterilizers, washers, updateEquipment} = useLibraries();
   // Taking a sterilizer out of use and back is the supervisor's (the same permission as the hospital's set-up).
   const canConfigure = can('asset.usage.configure');
   const [outFor, setOutFor] = useState<EquipmentRow>();
@@ -194,14 +194,19 @@ export default function EquipmentPage() {
   const attention = rows.filter(
     r => !r.outOfService && (r.trouble?.attention || (testStateOf(r) && testStateOf(r) !== 'OK')),
   ).length;
-  const recordTest = (
+  const recordTest = async (
     row: EquipmentRow,
     kind: EquipmentTest['kind'],
     value: {result: EquipmentTest['result']; note?: string},
   ) => {
     if (!row.libraryKey || !row.libraryId) return;
     const test: EquipmentTest = {id: `t${Date.now()}`, kind, ...value, at: formatDateTime(), by: currentUser.name};
-    updateItem(row.libraryKey, row.libraryId, {tests: withTest(row.tests, test)});
+    try {
+      await updateEquipment(row.libraryKey, row.libraryId, {tests: withTest(row.tests, test)});
+    } catch (e) {
+      setError(L('Η δοκιμή δεν αποθηκεύτηκε: ', 'The test was not saved: ') + messageOf(e));
+      return;
+    }
     const label = TEST_KINDS.find(item => item.id === kind);
     setNotice(
       value.result === 'FAIL'
@@ -212,18 +217,20 @@ export default function EquipmentPage() {
         : L(`${row.name}: καταγράφηκε η δοκιμή ${label?.el}.`, `${row.name}: ${label?.en} recorded.`),
     );
   };
-  const setOutOfService = (row: EquipmentRow, value?: {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string}) => {
+  const setOutOfService = async (row: EquipmentRow, value?: {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string}) => {
     if (!row.libraryKey || !row.libraryId) return;
-    updateItem(
-      row.libraryKey,
-      row.libraryId,
-      value ? {outOfService: {...value, since: formatDateTime(), by: currentUser.name}} : {outOfService: undefined},
-    );
-    setNotice(
-      value
-        ? L(`${row.name}: εκτός λειτουργίας.`, `${row.name}: out of service.`)
-        : L(`${row.name}: ξανά σε λειτουργία.`, `${row.name}: back in service.`),
-    );
+    try {
+      await updateEquipment(row.libraryKey, row.libraryId, {
+        outOfService: value ? {...value, since: formatDateTime(), by: currentUser.name} : null,
+      });
+      setNotice(
+        value
+          ? L(`${row.name}: εκτός λειτουργίας.`, `${row.name}: out of service.`)
+          : L(`${row.name}: ξανά σε λειτουργία.`, `${row.name}: back in service.`),
+      );
+    } catch (e) {
+      setError(L('Η αλλαγή δεν αποθηκεύτηκε: ', 'The change was not saved: ') + messageOf(e));
+    }
   };
 
   const save = async () => {

@@ -1,9 +1,9 @@
 import {emitBinDraft} from './binBridge';
-import {createContext, useContext, useMemo, useState, type ReactNode} from 'react';
+import {createContext, useContext, useEffect, useMemo, useState, type ReactNode} from 'react';
 import {getAdminRepository} from '../data/adminRepositories';
 import {DEMO_ORGANIZATION, LEGACY_DEMO_ORGANIZATION_IDS} from '../data/adminRepositories/demoRepository';
 import type {SurgiDataMode} from '../data/repositories';
-import type {LibraryItem} from './libraries';
+import type {EquipmentTest, LibraryItem, OutOfService} from './libraries';
 import type {ColorTape} from './colorTapes';
 import type {AdminUser, ConfigurationAuditEvent, LibraryKey, LibraryState, Organization} from './libraryTypes';
 import type {Permission} from './permissions';
@@ -13,6 +13,7 @@ import {upgradeWorkflowLabels, type SterilizationWorkflowConfig, type WorkflowSt
 import {libraryFromRecords} from '../data/cloud/appRecords';
 import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
 import {useAppRecordSync} from '../data/cloud/useAppRecordSync';
+import {loadEquipmentStatus, saveEquipmentStatus} from '../data/cloud/equipmentStatus';
 
 export type {AdminUser, LibraryKey, LibraryState, Organization} from './libraryTypes';
 
@@ -22,6 +23,16 @@ type LibraryStore = LibraryState & {
   /** Adds several records at once (one audit entry each). */
   addItems: (key: LibraryKey, items: Array<Omit<LibraryItem, 'id'>>) => void;
   updateItem: (key: LibraryKey, id: string, item: Partial<LibraryItem>) => void;
+  /**
+   * Puts a sterilizer or washer out of service (or back) and records its tests. In a hospital this is saved to the
+   * equipment's own table, which Sterilization staff may write (the library is the administrators'); elsewhere it
+   * is the library item. Rejects when it could not be saved.
+   */
+  updateEquipment: (
+    key: 'sterilizers' | 'washers',
+    id: string,
+    patch: {outOfService?: OutOfService | null; tests?: EquipmentTest[]},
+  ) => Promise<void>;
   removeItem: (key: LibraryKey, id: string) => void;
   /** Puts back a library record from the recycle bin (nothing happens if its id is taken). */
   restoreItem: (key: LibraryKey, item: LibraryItem) => void;
@@ -124,6 +135,39 @@ export function LibraryStoreProvider({
       const next = fn(s);
       if (localStorageKey) localStorage.setItem(localStorageKey, JSON.stringify(next));
       return next;
+    });
+  // Out of service and the tests of the equipment, kept by name in the hospital's equipment table.
+  const [equipment, setEquipment] = useState<
+    Record<string, {outOfService?: OutOfService | null; tests?: EquipmentTest[]}>
+  >({});
+  const equipmentOrganizationId = cloud?.organizationId;
+  useEffect(() => {
+    if (!equipmentOrganizationId) return;
+    let live = true;
+    const refresh = () =>
+      void loadEquipmentStatus(equipmentOrganizationId)
+        .then(rows => {
+          if (!live) return;
+          setEquipment(
+            Object.fromEntries(rows.map(row => [row.name, {outOfService: row.outOfService, tests: row.tests}])),
+          );
+        })
+        // Without the table (an older database) the library's own copy stays in force.
+        .catch(() => undefined);
+    refresh();
+    const timer = window.setInterval(refresh, 60_000);
+    const onVisible = () => document.visibilityState === 'visible' && refresh();
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [equipmentOrganizationId]);
+  const withEquipment = (items: LibraryItem[]) =>
+    items.map(item => {
+      const own = equipment[item.el];
+      return own ? {...item, outOfService: own.outOfService ?? undefined, tests: own.tests ?? item.tests} : item;
     });
   const libraryRecord = useMemo(() => [{...state, id: 'state'}], [state]);
   // Settings another device saved (another admin, another screen) replace this screen's copy.
@@ -430,6 +474,19 @@ export function LibraryStoreProvider({
         },
       );
     });
+  const updateEquipment: LibraryStore['updateEquipment'] = async (key, id, patch) => {
+    const item = state[key].find(x => x.id === id);
+    if (!item) return;
+    if (!equipmentOrganizationId) {
+      updateItem(key, id, {
+        ...(patch.outOfService !== undefined ? {outOfService: patch.outOfService ?? undefined} : {}),
+        ...(patch.tests ? {tests: patch.tests} : {}),
+      });
+      return;
+    }
+    await saveEquipmentStatus(equipmentOrganizationId, item.el, patch);
+    setEquipment(current => ({...current, [item.el]: {...current[item.el], ...patch}}));
+  };
   const resetData = () => {
     if (localStorageKey) localStorage.removeItem(localStorageKey);
     setState(repository.getInitialData());
@@ -437,6 +494,8 @@ export function LibraryStoreProvider({
   const value = useMemo(
     () => ({
       ...state,
+      sterilizers: withEquipment(state.sterilizers),
+      washers: withEquipment(state.washers),
       dataMode,
       addItem,
       addItems,
@@ -445,6 +504,7 @@ export function LibraryStoreProvider({
       removeColorTape,
       restoreColorTape,
       updateItem,
+      updateEquipment,
       addOrganization,
       updateOrganization,
       removeOrganization,
@@ -463,7 +523,7 @@ export function LibraryStoreProvider({
     }),
     // The actions are recreated every render and close over `state`, so this list is the state they read.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, dataMode, localStorageKey],
+    [state, equipment, dataMode, localStorageKey],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
