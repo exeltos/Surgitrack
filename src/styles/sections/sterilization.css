@@ -2109,21 +2109,43 @@ html body .batch-department button.clear:hover {
   line-height: 1.45;
 }
 .ster-tests {
-  display: grid;
-  gap: 8px;
-  margin: 12px 14px;
-  padding: 12px 14px;
+  margin: 8px 14px;
   border: 1px solid var(--c-gray-90-3);
   border-radius: 12px;
   background: var(--c-white);
 }
-.ster-tests > header {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
+.ster-tests.bad {
+  border-color: var(--c-red-45);
 }
-.ster-tests > header small {
-  display: block;
+.ster-tests.due {
+  border-color: var(--c-orange-40);
+}
+.ster-tests > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  cursor: pointer;
+  list-style: none;
+}
+.ster-tests > summary::-webkit-details-marker {
+  display: none;
+}
+.ster-tests-summary {
+  color: var(--st-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.ster-tests.bad .ster-tests-summary {
+  color: var(--c-red-40);
+}
+.ster-tests.due .ster-tests-summary {
+  color: var(--c-orange-40);
+}
+.ster-tests-help {
+  margin: 0;
+  padding: 0 12px 6px;
   color: var(--st-muted);
   font-size: 12.5px;
 }
@@ -2131,7 +2153,7 @@ html body .batch-department button.clear:hover {
   display: grid;
   gap: 6px;
   margin: 0;
-  padding: 0;
+  padding: 0 12px 10px;
   list-style: none;
 }
 .ster-tests li {
@@ -2140,13 +2162,17 @@ html body .batch-department button.clear:hover {
   align-items: center;
   gap: 8px 12px;
 }
+.ster-tests-message {
+  margin: 0;
+  padding: 0 12px 10px;
+  color: var(--c-green-45);
+  font-size: 13px;
+  font-weight: 600;
+}
 .ster-tests-name {
   min-width: 150px;
   font-size: 14px;
   font-weight: 700;
-}
-.ster-tests > header b {
-  font-size: 14px;
 }
 .ster-tests li em {
   color: var(--c-red-40);
@@ -2204,12 +2230,6 @@ html body .batch-department button.clear:hover {
 }
 .release-tests .release-indicator-hint.bad {
   color: var(--c-red-40);
-}
-.ster-tests-message {
-  margin: 0;
-  color: var(--c-green-45);
-  font-size: 13px;
-  font-weight: 600;
 }
 .ster-tests-message.warning {
   color: var(--c-red-40);
@@ -2287,7 +2307,7 @@ html body .batch-department button.clear:hover {
 /* The page of a piece of equipment: the content area does not scroll, so this page does, and it is compact:
    the facts in a strip, the load and the history side by side, the device's cycles across the width. */
 /* The page scrolls in the content area (the workspace is as tall as its content), like the Sterilization screen. */
-html body .content:has(> .equipment-detail-workspace) {
+html body .content:has(> .equipment-page) {
   overflow-y: auto;
 }
 .asset-detail-workspace.equipment-detail-workspace {

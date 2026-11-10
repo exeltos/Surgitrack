@@ -553,6 +553,33 @@ async function main() {
       if (!line || !line.toolIds?.includes(lost.id)) throw new Error('the order does not name the lost instrument');
     });
 
+    await step('The page of a sterilizer scrolls with the mouse wheel in a laptop window', async () => {
+      // A window of 1366×768 minus the browser's bars: what a hospital PC shows. Setting scrollTop would pass even
+      // for a panel the wheel cannot scroll, so the wheel is used.
+      const {page} = admin;
+      await page.setViewportSize({width: 1366, height: 650});
+      await open(admin, '/sterilizers');
+      await page
+        .getByRole('button', {name: /Λεπτομέρειες/})
+        .first()
+        .click();
+      const tests = page.getByRole('heading', {name: 'Δοκιμές κλιβάνου'});
+      await tests.waitFor();
+      const below = async () => (await tests.boundingBox())?.y ?? 0;
+      const content = (await page.locator('.content').boundingBox())?.height ?? 0;
+      if ((await below()) < content)
+        throw new Error('the tests are on screen without scrolling: the window is too tall for this check');
+      await page.mouse.move(700, 400);
+      await page.mouse.wheel(0, 3000);
+      await page.waitForTimeout(400);
+      // The wheel moved the page, and the heading came into view (not only a panel inside it).
+      const scrolled = await page.evaluate(() => document.querySelector('.content')?.scrollTop ?? 0);
+      const after = await tests.boundingBox();
+      if (scrolled < 50 || !after || after.y > 650)
+        throw new Error(`the page of the sterilizer did not scroll with the mouse wheel (scrolled ${scrolled}px)`);
+      await page.setViewportSize({width: 1440, height: 900});
+    });
+
     if (process.env.E2E_LOOK) {
       // Exploring: open a screen for one person and keep its picture and buttons (E2E_LOOK=role:/route).
       const [role, hash] = process.env.E2E_LOOK.split(':');

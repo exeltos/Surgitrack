@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {FlaskConical} from 'lucide-react';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useAppPreferences} from '../../../core/AppPreferences';
-import {testsInUse} from '../../../core/equipmentTests';
+import {testsInUse, testsState} from '../../../core/equipmentTests';
 import {trData} from '../../../i18n';
 import {useTestDeviceSync} from '../../devices/useTestDeviceSync';
 import SterilizerTestRow from './SterilizerTestRow';
@@ -22,20 +22,35 @@ export default function SterilizerTests() {
   if (!sterilizers.length) return null;
   const inUse = testsInUse(sterilizers);
 
+  // One line when closed: where the tests stand. It opens by itself when something needs attention.
+  const states = sterilizers.map(item => testsState(item.tests));
+  const failed = states.filter(state => state === 'FAILED').length;
+  const due = inUse ? states.filter(state => state === 'DUE').length : 0;
+  const summary = failed
+    ? L(`${failed} με αποτυχημένη δοκιμή`, `${failed} with a failed test`)
+    : due
+      ? L(`${due} με εκκρεμή δοκιμή`, `${due} with a test due`)
+      : inUse
+        ? L('όλες εντάξει', 'all up to date')
+        : L('δεν έχουν καταγραφεί', 'none recorded yet');
+
   return (
-    <section className="ster-tests" aria-label={L('Δοκιμές κλιβάνων', 'Sterilizer tests')}>
-      <header>
+    <details
+      className={`ster-tests${failed ? ' bad' : due ? ' due' : ''}`}
+      aria-label={L('Δοκιμές κλιβάνων', 'Sterilizer tests')}
+      open={!!failed || !!due || undefined}
+    >
+      <summary>
         <FlaskConical size={16} aria-hidden="true" />
-        <div>
-          <b>{L('Δοκιμές κλιβάνων', 'Sterilizer tests')}</b>
-          <small>
-            {L(
-              'Πριν το πρώτο φορτίο της ημέρας γίνεται η δοκιμή Bowie-Dick. Πατήστε μια δοκιμή για να καταγράψετε το αποτέλεσμα· αν αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να περάσει. Ελέγχονται ξανά στην Αποδέσμευση.',
-              'The Bowie-Dick test is done before the first load of the day. Press a test to record its result; if it fails, the sterilizer is not loaded until one passes. They are checked again at Release.',
-            )}
-          </small>
-        </div>
-      </header>
+        <b>{L('Δοκιμές κλιβάνων', 'Sterilizer tests')}</b>
+        <span className="ster-tests-summary">{summary}</span>
+      </summary>
+      <p className="ster-tests-help">
+        {L(
+          'Πριν το πρώτο φορτίο της ημέρας γίνεται η δοκιμή Bowie-Dick. Πατήστε μια δοκιμή για να καταγράψετε το αποτέλεσμα· αν αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να περάσει. Ελέγχονται ξανά στην Αποδέσμευση.',
+          'The Bowie-Dick test is done before the first load of the day. Press a test to record its result; if it fails, the sterilizer is not loaded until one passes. They are checked again at Release.',
+        )}
+      </p>
       <ul>
         {sterilizers.map(item => (
           <li key={item.id}>
@@ -50,6 +65,6 @@ export default function SterilizerTests() {
           {message.text}
         </p>
       )}
-    </section>
+    </details>
   );
 }
