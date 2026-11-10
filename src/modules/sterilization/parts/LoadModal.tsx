@@ -75,8 +75,11 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     if (reading.program) setLoadProgram(reading.program);
                     if (reading.result === 'FAIL') setLoadChemical('FAIL');
                     else if (loadModal === 'WASHING' && reading.result === 'PASS') setLoadChemical('PASS');
-                    if (loadModal === 'WASHING' && reading.maxTemperature !== undefined)
-                      s.setLoadWashTemp(String(reading.maxTemperature));
+                    // Each cycle has its own values: nothing of the previously picked cycle stays.
+                    if (loadModal === 'WASHING') {
+                      s.setLoadWashTemp(reading.maxTemperature !== undefined ? String(reading.maxTemperature) : '');
+                      s.setLoadWashA0('');
+                    }
                     setLoadNote(note => note || deviceNote(reading));
                     s.setLoadFromDevice(true);
                   }}
