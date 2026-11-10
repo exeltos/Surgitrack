@@ -41,15 +41,12 @@ vi.mock('../../../store/SurgiStore', () => ({
 }));
 
 // The hospital's sterilizers and washers (Studio › Libraries): one has a device, one has not.
-vi.mock('../../../core/LibraryStore', () => ({
-  useLibraries: () => ({
-    sterilizers: [
-      {id: 'st1', el: 'ΚΛΙΒΑΝΟΣ 1', en: 'Sterilizer 1'},
-      {id: 'st2', el: 'ΚΛΙΒΑΝΟΣ 2', en: 'Sterilizer 2'},
-    ],
-    washers: [{id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'Washer 1'}],
-  }),
+const lib = vi.hoisted(() => ({
+  sterilizers: [] as Array<{id: string; el: string; en: string; outOfService?: unknown}>,
+  washers: [] as Array<{id: string; el: string; en: string; outOfService?: unknown}>,
+  updateItem: vi.fn(),
 }));
+vi.mock('../../../core/LibraryStore', () => ({useLibraries: () => lib}));
 const {default: EquipmentPage} = await import('../EquipmentPage');
 
 const autoclave: Device = {
@@ -87,6 +84,14 @@ const details = async (name: string) => {
 };
 
 beforeEach(() => {
+  lib.sterilizers = [
+    {id: 'st1', el: 'ΚΛΙΒΑΝΟΣ 1', en: 'Sterilizer 1'},
+    {id: 'st2', el: 'ΚΛΙΒΑΝΟΣ 2', en: 'Sterilizer 2'},
+  ];
+  lib.washers = [{id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'Washer 1'}];
+  lib.updateItem = vi.fn((key: 'sterilizers' | 'washers', id: string, patch: Record<string, unknown>) => {
+    lib[key] = lib[key].map(item => (item.id === id ? {...item, ...patch} : item));
+  });
   db.devices = [autoclave, washer];
   db.readings = [reading('1042'), reading('1043'), reading('W-7', 'd2')];
   db.fail = '';
@@ -169,5 +174,77 @@ describe('Sterilizers & Devices, one screen', () => {
     const card = await details('ΚΛΙΒΑΝΟΣ 2');
     fireEvent.click(within(card).getByRole('button', {name: /Σύνδεση συσκευής/}));
     expect((screen.getByRole('combobox', {name: /Όνομα/}) as HTMLInputElement).value).toBe('ΚΛΙΒΑΝΟΣ 2');
+  });
+
+  it('takes a sterilizer out of service with a reason, and puts it back', async () => {
+    open();
+    const card = await details('ΚΛΙΒΑΝΟΣ 2');
+    fireEvent.click(within(card).getByRole('button', {name: 'Εκτός λειτουργίας'}));
+    const dialog = await screen.findByRole('dialog', {name: 'Εκτός λειτουργίας'});
+    fireEvent.click(within(dialog).getByRole('radio', {name: 'Συντήρηση'}));
+    fireEvent.change(within(dialog).getByLabelText(/Σημείωση/), {target: {value: 'Καλέστηκε ο τεχνικός'}});
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Εκτός λειτουργίας'}));
+    expect(lib.updateItem).toHaveBeenCalledWith(
+      'sterilizers',
+      'st2',
+      expect.objectContaining({
+        outOfService: expect.objectContaining({
+          reason: 'MAINTENANCE',
+          note: 'Καλέστηκε ο τεχνικός',
+          by: 'ΔΙΑΧΕΙΡΙΣΤΗΣ',
+        }),
+      }),
+    );
+    // The card stays open and now says it, with the note.
+    const again = await screen.findByRole('dialog', {name: 'ΚΛΙΒΑΝΟΣ 2'});
+    expect(within(again).getByText(/Καλέστηκε ο τεχνικός/)).toBeInTheDocument();
+    fireEvent.click(within(again).getByRole('button', {name: 'Επαναφορά σε λειτουργία'}));
+    expect(lib.updateItem).toHaveBeenLastCalledWith('sterilizers', 'st2', {outOfService: undefined});
+    expect(within(await screen.findByRole('dialog', {name: 'ΚΛΙΒΑΝΟΣ 2'})).queryByText(/Καλέστηκε/)).toBeNull();
+  });
+
+  it('cannot take out of service a sterilizer that is running a cycle', async () => {
+    store.loads = [
+      {
+        id: 'L1',
+        kind: 'STERILIZATION',
+        status: 'OPEN',
+        equipment: 'ΚΛΙΒΑΝΟΣ 1',
+        cycleNumber: '1',
+        program: '134°C',
+        createdAt: '09/11/2026 10:00',
+        createdByName: 'Χ',
+        items: [],
+      },
+    ];
+    open();
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
+    expect(within(card).getByRole('button', {name: 'Εκτός λειτουργίας'})).toBeDisabled();
+  });
+
+  it('counts the failures of the last 30 days and asks for a check at three', async () => {
+    const failed = (id: string, at: string) => ({
+      id,
+      kind: 'STERILIZATION',
+      status: 'FAILED',
+      equipment: 'ΚΛΙΒΑΝΟΣ 2',
+      cycleNumber: id,
+      program: '134°C',
+      createdAt: at,
+      completedAt: at,
+      createdByName: 'Χ',
+      items: [],
+    });
+    const today = new Date();
+    const stamp = (daysAgo: number) => {
+      const d = new Date(today.getTime() - daysAgo * 86400000);
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} 10:00`;
+    };
+    store.loads = [failed('F1', stamp(1)), failed('F2', stamp(5)), failed('F3', stamp(9))];
+    open();
+    expect(within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('3')).toBeInTheDocument();
+    const card = await details('ΚΛΙΒΑΝΟΣ 2');
+    expect(within(card).getByText(/ελέγξτε τον κλίβανο/)).toBeInTheDocument();
+    expect(within(card).getAllByText('Αποτυχία κύκλου')).toHaveLength(3);
   });
 });

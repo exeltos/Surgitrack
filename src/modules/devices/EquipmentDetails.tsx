@@ -1,4 +1,4 @@
-import {Cable, KeyRound, Pencil, Plus, Trash2, Upload, X} from 'lucide-react';
+import {Cable, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench, X} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import AppButton from '../../components/ui/AppButton';
 import DownloadMenu from '../../components/ui/DownloadMenu';
@@ -11,6 +11,8 @@ import {
 } from '../../core/deviceData';
 import type {ExportTable} from '../../core/exportTable';
 import {formatDateTime} from '../../core/displayDate';
+import type {OutOfService} from '../../core/libraries';
+import type {EquipmentTrouble} from '../../core/equipmentHealth';
 import type {ProcessLoadRecord} from '../../types/domain';
 import LoadContents from '../sterilization/parts/LoadContents';
 import {isSimulatedDevice} from '../../data/cloud/simulatedDevice';
@@ -25,6 +27,12 @@ export type EquipmentRow = {
   /** The load running in it now (sterilizers) and the last one that ran. */
   load?: ProcessLoadRecord;
   lastLoad?: ProcessLoadRecord;
+  /** The hospital's list (Studio › Libraries) this row comes from, and whether it is out of service. */
+  libraryKey?: 'sterilizers' | 'washers';
+  libraryId?: string;
+  outOfService?: OutOfService;
+  /** The failures of a sterilizer (newest first), the ones in the last 30 days, and whether they call for attention. */
+  trouble?: {items: EquipmentTrouble[]; recent: number; attention: boolean};
 };
 
 const resultLabel = (L: Lang, result: DeviceReading['result']) =>
@@ -42,7 +50,10 @@ export default function EquipmentDetails({
   devicesEnabled,
   isAdmin,
   canRecord,
+  canConfigure,
   onClose,
+  onOutOfService,
+  onBackInService,
   onConnect,
   onEdit,
   onRemove,
@@ -57,7 +68,11 @@ export default function EquipmentDetails({
   devicesEnabled: boolean;
   isAdmin: boolean;
   canRecord: boolean;
+  /** The supervisor's: take it out of service, put it back. */
+  canConfigure: boolean;
   onClose: () => void;
+  onOutOfService: () => void;
+  onBackInService: () => void;
   onConnect: () => void;
   onEdit: () => void;
   onRemove: () => void;
@@ -124,6 +139,41 @@ export default function EquipmentDetails({
           </button>
         </header>
         <div className="load-details-body">
+          {row.outOfService && (
+            <div className="equipment-out" role="status">
+              <Wrench size={16} aria-hidden="true" />
+              <div>
+                <b>
+                  {row.outOfService.reason === 'BREAKDOWN'
+                    ? L('Εκτός λειτουργίας · βλάβη', 'Out of service · breakdown')
+                    : L('Εκτός λειτουργίας · συντήρηση', 'Out of service · maintenance')}
+                </b>
+                <small>
+                  {L('Από', 'Since')} {row.outOfService.since} · {row.outOfService.by}
+                  {row.outOfService.note ? ` · ${row.outOfService.note}` : ''}
+                </small>
+              </div>
+            </div>
+          )}
+          {row.libraryId && canConfigure && (
+            <div className="equipment-actions">
+              {row.outOfService ? (
+                <AppButton size="sm" variant="primary" onClick={onBackInService}>
+                  {L('Επαναφορά σε λειτουργία', 'Put back in service')}
+                </AppButton>
+              ) : (
+                <AppButton size="sm" onClick={onOutOfService} disabled={!!row.load}>
+                  <Wrench size={14} />
+                  {L('Εκτός λειτουργίας', 'Out of service')}
+                </AppButton>
+              )}
+              {!row.outOfService && row.load && (
+                <small className="muted">
+                  {L('Τρέχει κύκλος: περιμένετε να τελειώσει.', 'A cycle is running: wait for it to end.')}
+                </small>
+              )}
+            </div>
+          )}
           {devicesEnabled && (
             <div className="equipment-actions">
               {device ? (
@@ -183,6 +233,39 @@ export default function EquipmentDetails({
             </>
           ) : (
             <p className="muted">{L('Δεν έχει τρέξει φορτίο ακόμα.', 'No load has run yet.')}</p>
+          )}
+          {row.trouble && row.trouble.items.length > 0 && (
+            <>
+              <h4>
+                {L('Αποτυχίες και μη αποδεσμεύσεις', 'Failures and loads not released')}
+                {row.trouble.attention && (
+                  <span className="equipment-attention">
+                    <TriangleAlert size={13} aria-hidden="true" />
+                    {L(
+                      `${row.trouble.recent} τις τελευταίες 30 ημέρες: ελέγξτε τον κλίβανο`,
+                      `${row.trouble.recent} in the last 30 days: have the sterilizer checked`,
+                    )}
+                  </span>
+                )}
+              </h4>
+              <ul className="equipment-trouble">
+                {row.trouble.items.slice(0, 10).map(item => (
+                  <li key={item.loadId}>
+                    <b>{item.cycleNumber}</b>
+                    <span>{item.program}</span>
+                    <span className={`device-result ${item.kind === 'CYCLE_FAILED' ? 'fail' : 'unknown'}`}>
+                      {item.kind === 'CYCLE_FAILED'
+                        ? L('Αποτυχία κύκλου', 'Cycle failed')
+                        : L('Δεν αποδεσμεύτηκε', 'Not released')}
+                    </span>
+                    <small>
+                      {item.at}
+                      {item.note ? ` · ${item.note}` : ''}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
           {device && (
             <>

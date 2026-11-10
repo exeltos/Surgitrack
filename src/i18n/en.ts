@@ -745,6 +745,9 @@ export const en: Record<string, string> = {
   '{0} (αχρησιμοποίητα)': '{0} (unused)',
   Πρόταση: 'Suggestion',
   Προβολή: 'View',
+  'Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.': 'The equipment “{0}” is out of service.',
+  'σε βλάβη': 'broken down',
+  'σε συντήρηση': 'in maintenance',
   'Ο κύκλος απέτυχε: το αντικείμενο περνά ξανά από πλύση, έλεγχο και συσκευασία.':
     'The cycle failed: the item goes through washing, checking and packing again.',
   'Δεν αποδεσμεύτηκε ({0}): περνά ξανά από πλύση, έλεγχο και συσκευασία.':

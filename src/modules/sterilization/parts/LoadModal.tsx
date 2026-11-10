@@ -83,8 +83,11 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   {equipmentList.length ? (
                     <select value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)}>
                       {equipmentList.map(item => (
-                        <option key={item.id} value={item.el}>
+                        <option key={item.id} value={item.el} disabled={!!item.outOfService}>
                           {trData(item.el)}
+                          {item.outOfService
+                            ? ` · ${item.outOfService.reason === 'BREAKDOWN' ? tr('σε βλάβη') : tr('σε συντήρηση')}`
+                            : ''}
                         </option>
                       ))}
                       {!equipmentList.some(item => item.el === loadEquipment) && (

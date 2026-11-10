@@ -10,6 +10,8 @@ import {
   Minimize2,
   Plus,
   Power,
+  TriangleAlert,
+  Wrench,
   RefreshCcw,
   Upload,
   Wifi,
@@ -17,6 +19,9 @@ import {
   XCircle,
 } from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
+import KpiStrip from '../../components/ui/KpiStrip';
+import {equipmentTrouble} from '../../core/equipmentHealth';
+import OutOfServiceDialog from './OutOfServiceDialog';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {useSurgi} from '../../store/SurgiStore';
@@ -74,7 +79,10 @@ export default function EquipmentPage() {
   const canRecord = can('sterilization.workspace');
   // In the Demo, a load with no simulation can be given one (in its card, with the scenarios).
   const canSimulate = getRuntimeDataMode() === 'DEMO' && can('sterilization.cycle');
-  const {sterilizers, washers} = useLibraries();
+  const {sterilizers, washers, updateItem} = useLibraries();
+  // Taking a sterilizer out of use and back is the supervisor's (the same permission as the hospital's set-up).
+  const canConfigure = can('asset.usage.configure');
+  const [outFor, setOutFor] = useState<EquipmentRow>();
   const [devices, setDevices] = useState<Device[]>([]);
   const [readings, setReadings] = useState<DeviceReading[]>([]);
   const [loading, setLoading] = useState(devicesEnabled);
@@ -136,8 +144,20 @@ export default function EquipmentPage() {
   // The hospital's equipment first (as Libraries lists it), then the devices that match none of it.
   const rows = useMemo<EquipmentRow[]>(() => {
     const library = [
-      ...sterilizers.map(item => ({name: item.el, kind: 'STERILIZER' as DeviceKind})),
-      ...washers.map(item => ({name: item.el, kind: 'WASHER' as DeviceKind})),
+      ...sterilizers.map(item => ({
+        name: item.el,
+        kind: 'STERILIZER' as DeviceKind,
+        libraryKey: 'sterilizers' as const,
+        libraryId: item.id,
+        outOfService: item.outOfService,
+      })),
+      ...washers.map(item => ({
+        name: item.el,
+        kind: 'WASHER' as DeviceKind,
+        libraryKey: 'washers' as const,
+        libraryId: item.id,
+        outOfService: item.outOfService,
+      })),
     ];
     const matched = new Set<string>();
     const list: EquipmentRow[] = library.map(item => {
@@ -146,7 +166,7 @@ export default function EquipmentPage() {
         devices.find(d => d.name.trim() === item.name && !matched.has(d.id)) ??
         devices.find(d => isSimulatedDevice(d) && d.name === simulatedDeviceName(item.name) && !matched.has(d.id));
       if (device) matched.add(device.id);
-      return {key: `lib:${item.kind}:${item.name}`, name: item.name, kind: item.kind, device};
+      return {key: `lib:${item.kind}:${item.name}`, device, ...item};
     });
     for (const device of devices)
       if (!matched.has(device.id)) list.push({key: `dev:${device.id}`, name: device.name, kind: device.kind, device});
@@ -160,6 +180,7 @@ export default function EquipmentPage() {
             ...row,
             load: running.find(l => l.equipment === row.name),
             lastLoad: sterilizerLoads.find(l => l.equipment === row.name && l.status !== 'OPEN'),
+            trouble: equipmentTrouble(row.name, sterilizerLoads),
           }
         : row,
     );
@@ -168,6 +189,21 @@ export default function EquipmentPage() {
   const when = (iso?: string) => (iso ? formatDateTime(iso) : '—');
   const opened = rows.find(r => r.key === openKey);
   const busy = rows.filter(r => r.load).length;
+  const outCount = rows.filter(r => r.outOfService).length;
+  const attention = rows.filter(r => r.trouble?.attention && !r.outOfService).length;
+  const setOutOfService = (row: EquipmentRow, value?: {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string}) => {
+    if (!row.libraryKey || !row.libraryId) return;
+    updateItem(
+      row.libraryKey,
+      row.libraryId,
+      value ? {outOfService: {...value, since: formatDateTime(), by: currentUser.name}} : {outOfService: undefined},
+    );
+    setNotice(
+      value
+        ? L(`${row.name}: εκτός λειτουργίας.`, `${row.name}: out of service.`)
+        : L(`${row.name}: ξανά σε λειτουργία.`, `${row.name}: back in service.`),
+    );
+  };
 
   const save = async () => {
     if (!organizationId || !editor || !editor.value.name.trim()) return;
@@ -276,6 +312,38 @@ export default function EquipmentPage() {
           </button>
         </div>
       )}
+      {rows.length > 0 && (
+        <KpiStrip
+          className="equipment-kpis"
+          compact
+          items={[
+            {label: L('Σε λειτουργία', 'Running'), value: busy, icon: <Flame size={16} aria-hidden="true" />},
+            {
+              label: L('Ελεύθεροι', 'Free'),
+              value: rows.length - busy - outCount,
+              icon: <Power size={16} aria-hidden="true" />,
+            },
+            {
+              label: L('Εκτός λειτουργίας', 'Out of service'),
+              value: outCount,
+              icon: <Wrench size={16} aria-hidden="true" />,
+              hint: L(
+                'Βλάβη ή συντήρηση: δεν επιλέγονται για φορτία.',
+                'Breakdown or maintenance: not chosen for loads.',
+              ),
+            },
+            {
+              label: L('Θέλουν έλεγχο', 'Need a check'),
+              value: attention,
+              icon: <TriangleAlert size={16} aria-hidden="true" />,
+              hint: L(
+                '3 ή περισσότερες αποτυχίες τις τελευταίες 30 ημέρες.',
+                '3 or more failures in the last 30 days.',
+              ),
+            },
+          ]}
+        />
+      )}
       {rows.length === 0 ? (
         <div className="devices-empty">
           <Cable size={26} />
@@ -299,6 +367,7 @@ export default function EquipmentPage() {
                 <th>{L('Πρόοδος', 'Progress')}</th>
                 <th>{L('Αντικείμενα', 'Items')}</th>
                 {devicesEnabled && <th>{L('Σύνδεση', 'Connection')}</th>}
+                <th>{L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}</th>
                 <th>{L('Τελευταίος κύκλος', 'Last cycle')}</th>
                 <th>
                   <span className="sr-only">{L('Ενέργειες', 'Actions')}</span>
@@ -316,11 +385,18 @@ export default function EquipmentPage() {
                   ? live
                     ? phaseText(live.sample.phase)
                     : L('Σε εξέλιξη', 'Running')
-                  : device && !device.active
-                    ? L('Ανενεργή', 'Inactive')
-                    : L('Ελεύθερος', 'Free');
+                  : row.outOfService
+                    ? row.outOfService.reason === 'BREAKDOWN'
+                      ? L('Βλάβη', 'Breakdown')
+                      : L('Συντήρηση', 'Maintenance')
+                    : device && !device.active
+                      ? L('Ανενεργή', 'Inactive')
+                      : L('Ελεύθερος', 'Free');
                 return (
-                  <tr key={row.key} className={row.load ? (live?.done ? 'done' : 'busy') : 'free'}>
+                  <tr
+                    key={row.key}
+                    className={row.load ? (live?.done ? 'done' : 'busy') : row.outOfService ? 'out' : 'free'}
+                  >
                     <td data-label={L('Εξοπλισμός', 'Equipment')}>
                       <span className="row-name">
                         {row.load ? (
@@ -345,7 +421,9 @@ export default function EquipmentPage() {
                       </small>
                     </td>
                     <td data-label={L('Κατάσταση', 'State')}>
-                      <span className={`row-phase${row.load ? (live?.done ? ' done' : '') : ' idle'}`}>
+                      <span
+                        className={`row-phase${row.load ? (live?.done ? ' done' : '') : row.outOfService ? ' out' : ' idle'}`}
+                      >
                         {stateText}
                       </span>
                       {row.load?.simulation && <small>{L('Προσομοίωση', 'Simulation')}</small>}
@@ -415,6 +493,18 @@ export default function EquipmentPage() {
                         )}
                       </td>
                     )}
+                    <td data-label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')} className="num">
+                      {row.kind !== 'STERILIZER' ? (
+                        '—'
+                      ) : row.trouble?.recent ? (
+                        <span className={`row-trouble${row.trouble.attention ? ' attention' : ''}`}>
+                          {row.trouble.attention && <TriangleAlert size={13} aria-hidden="true" />}
+                          {row.trouble.recent}
+                        </span>
+                      ) : (
+                        <span className="muted">0</span>
+                      )}
+                    </td>
                     <td data-label={L('Τελευταίος κύκλος', 'Last cycle')}>
                       {last ? (
                         <>
@@ -453,6 +543,17 @@ export default function EquipmentPage() {
         </div>
       )}
 
+      {outFor && (
+        <OutOfServiceDialog
+          L={L}
+          name={outFor.name}
+          onClose={() => setOutFor(undefined)}
+          onSave={value => {
+            setOutOfService(outFor, value);
+            setOutFor(undefined);
+          }}
+        />
+      )}
       {opened && (
         <EquipmentDetails
           L={L}
@@ -462,6 +563,9 @@ export default function EquipmentPage() {
           devicesEnabled={devicesEnabled}
           isAdmin={isAdmin}
           canRecord={canRecord}
+          canConfigure={canConfigure}
+          onOutOfService={() => setOutFor(opened)}
+          onBackInService={() => setOutOfService(opened)}
           onClose={() => setOpenKey('')}
           onConnect={() => setEditor({value: {...emptyDevice, name: opened.name, kind: opened.kind}})}
           onEdit={() => opened.device && setEditor({id: opened.device.id, value: {...opened.device}})}

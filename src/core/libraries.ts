@@ -1,4 +1,13 @@
-export type LibraryItem = {id: string; el: string; en: string; active?: boolean; code?: string};
+/** A sterilizer or washer taken out of use (a breakdown or maintenance): it cannot be chosen for a load until put back. */
+export type OutOfService = {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string; since: string; by: string};
+export type LibraryItem = {
+  id: string;
+  el: string;
+  en: string;
+  active?: boolean;
+  code?: string;
+  outOfService?: OutOfService;
+};
 export const departments: LibraryItem[] = [
   {id: 'ster', code: 'STER', el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},
   {id: 'or', code: 'OR', el: 'Χειρουργείο', en: 'Operating Theatre'},

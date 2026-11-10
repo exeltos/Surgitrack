@@ -1,5 +1,7 @@
 import {sterilizedOnOf} from '../../../core/sterileExpiry';
 import {tr} from '../../../i18n';
+import {useLibraries} from '../../../core/LibraryStore';
+import {useSurgi} from '../../../store/SurgiStore';
 import {printReleaseForm} from '../printRelease';
 import {printCycleReport} from '../printCycleReport';
 import type {CycleData} from '../../../core/cycleSimulator';
@@ -22,6 +24,8 @@ export function useLoadFlow(
     ReturnType<typeof usePreparationFlow> &
     ReturnType<typeof useCycleFlow>,
 ) {
+  const {notify} = useSurgi();
+  const {sterilizers, washers} = useLibraries();
   const {
     all,
     createProcessLoad,
@@ -130,6 +134,14 @@ export function useLoadFlow(
   const completeLoad = () => {
     if (!loadModal || !loadEquipment.trim() || !loadCycleNumber.trim() || !loadProgram.trim() || !loadSelected.size)
       return;
+    // Equipment taken out of service (a breakdown, maintenance) is not loaded, whatever was typed or left chosen.
+    const out = (loadModal === 'WASHING' ? washers : sterilizers).find(
+      item => item.el === loadEquipment.trim() && item.outOfService,
+    );
+    if (out) {
+      notify(tr('Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.', out.el), true);
+      return;
+    }
     const candidates = loadModal === 'WASHING' ? washing : processing;
     const assetRefs = candidates
       .filter(item => loadSelected.has(`${item.kind}:${item.id}`))

@@ -44,9 +44,11 @@ export function useSterilizationState() {
   const {sterilizationWorkflow, systemSettings, sterilizers: sterilizerLibrary, washers} = useLibraries();
   /** The hospital's sterilizers by name (Studio › Libraries › Sterilizers). */
   const sterilizerNames = sterilizerLibrary.map(item => item.el);
-  const defaultSterilizer = sterilizerNames[0] || 'Κλίβανος 1';
+  // The first one that is in service: a load is not offered an out-of-service sterilizer.
+  const defaultSterilizer =
+    sterilizerLibrary.find(item => !item.outOfService)?.el || sterilizerNames[0] || 'Κλίβανος 1';
   /** The first washer of Studio › Libraries › Washers, or the usual name when the hospital lists none. */
-  const defaultWasher = washers[0]?.el || 'Πλυντήριο 1';
+  const defaultWasher = washers.find(item => !item.outOfService)?.el || washers[0]?.el || 'Πλυντήριο 1';
   const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
