@@ -78,9 +78,10 @@ const open = () =>
   );
 /** The row of a piece of equipment. */
 const rowOf = async (name: string) => (await screen.findByText(name)).closest('tr') as HTMLElement;
+/** Opens the page of a piece of equipment (inside the app, in place of the list). */
 const details = async (name: string) => {
   fireEvent.click(within(await rowOf(name)).getByRole('button', {name: /Λεπτομέρειες/}));
-  return screen.findByRole('dialog', {name});
+  return screen.findByRole('region', {name});
 };
 
 beforeEach(() => {
@@ -196,11 +197,11 @@ describe('Sterilizers & Devices, one screen', () => {
       }),
     );
     // The card stays open and now says it, with the note.
-    const again = await screen.findByRole('dialog', {name: 'ΚΛΙΒΑΝΟΣ 2'});
+    const again = await screen.findByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 2'});
     expect(within(again).getByText(/Καλέστηκε ο τεχνικός/)).toBeInTheDocument();
     fireEvent.click(within(again).getByRole('button', {name: 'Επαναφορά σε λειτουργία'}));
     expect(lib.updateItem).toHaveBeenLastCalledWith('sterilizers', 'st2', {outOfService: undefined});
-    expect(within(await screen.findByRole('dialog', {name: 'ΚΛΙΒΑΝΟΣ 2'})).queryByText(/Καλέστηκε/)).toBeNull();
+    expect(within(await screen.findByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 2'})).queryByText(/Καλέστηκε/)).toBeNull();
   });
 
   it('cannot take out of service a sterilizer that is running a cycle', async () => {
@@ -246,5 +247,16 @@ describe('Sterilizers & Devices, one screen', () => {
     const card = await details('ΚΛΙΒΑΝΟΣ 2');
     expect(within(card).getByText(/ελέγξτε τον κλίβανο/)).toBeInTheDocument();
     expect(within(card).getAllByText('Αποτυχία κύκλου')).toHaveLength(3);
+  });
+
+  it('opens a piece of equipment inside the page, in place of the list, and goes back to the list', async () => {
+    open();
+    await details('ΚΛΙΒΑΝΟΣ 1');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // The list is not shown beside it.
+    expect(screen.queryByText('ΚΛΙΒΑΝΟΣ 2')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
+    expect(await screen.findByText('ΚΛΙΒΑΝΟΣ 2')).toBeInTheDocument();
+    expect(screen.queryByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 1'})).not.toBeInTheDocument();
   });
 });

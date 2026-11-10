@@ -8,6 +8,7 @@ import {
   evaluate,
   isFinished,
   planFor,
+  ranMinutes,
   type SimRun,
 } from '../cycleSimulator';
 
@@ -56,6 +57,12 @@ describe('a run over time', () => {
     expect(isFinished(run, plan, 1_000_000 + 10_000)).toBe(false);
     expect(isFinished(run, plan, 1_000_000 + 61_000)).toBe(true);
     expect(currentSample(run, plan, 1_000_000 + 90_000).phase).toBe('DONE');
+  });
+  it('counts the minutes it really ran, never more than its length, even when the end is recorded a day later', () => {
+    expect(ranMinutes(run, plan, 1_000_000 + 30_000)).toBe(10);
+    expect(ranMinutes(run, plan, 1_000_000 + 24 * 3_600_000)).toBe(endMinute(plan, 'PASS'));
+    const aborted: SimRun = {...run, scenario: 'ABORTED'};
+    expect(ranMinutes(aborted, plan, 1_000_000 + 24 * 3_600_000)).toBe(endMinute(plan, 'ABORTED'));
   });
   it('marks a stopped cycle as aborted', () => {
     const aborted: SimRun = {...run, scenario: 'ABORTED'};

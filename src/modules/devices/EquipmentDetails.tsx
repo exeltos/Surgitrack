@@ -1,6 +1,7 @@
-import {Cable, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench, X} from 'lucide-react';
+import {ArrowLeft, Cable, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import AppButton from '../../components/ui/AppButton';
+import BackLink from '../../components/ui/BackLink';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {
   connectionLabel,
@@ -51,7 +52,6 @@ export default function EquipmentDetails({
   isAdmin,
   canRecord,
   canConfigure,
-  onClose,
   onOutOfService,
   onBackInService,
   onConnect,
@@ -70,7 +70,6 @@ export default function EquipmentDetails({
   canRecord: boolean;
   /** The supervisor's: take it out of service, put it back. */
   canConfigure: boolean;
-  onClose: () => void;
   onOutOfService: () => void;
   onBackInService: () => void;
   onConnect: () => void;
@@ -109,145 +108,171 @@ export default function EquipmentDetails({
     ]),
   });
   const shownLoad = row.load ?? row.lastLoad;
+  const stateOf = row.load
+    ? L('Σε λειτουργία', 'Running')
+    : row.outOfService
+      ? row.outOfService.reason === 'BREAKDOWN'
+        ? L('Εκτός λειτουργίας · βλάβη', 'Out of service · breakdown')
+        : L('Εκτός λειτουργίας · συντήρηση', 'Out of service · maintenance')
+      : device && !device.active
+        ? L('Ανενεργή', 'Inactive')
+        : L('Ελεύθερος', 'Free');
+  const facts: Array<[string, string | undefined]> = [
+    [L('Είδος', 'Kind'), L(deviceKindLabel[row.kind].el, deviceKindLabel[row.kind].en)],
+    [L('Κατάσταση', 'State'), stateOf],
+    [L('Κατασκευαστής', 'Manufacturer'), device?.manufacturer],
+    [L('Μοντέλο', 'Model'), device?.model],
+    [L('Σειριακός αριθμός', 'Serial number'), device?.serialNumber],
+    [L('Θέση', 'Location'), device && device.location !== row.name ? device.location : undefined],
+    [
+      L('Σύνδεση', 'Connection'),
+      device ? L(connectionLabel[device.connection].el, connectionLabel[device.connection].en) : undefined,
+    ],
+  ];
   return (
-    <div className="modal-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
-      <div className="load-details equipment-details" role="dialog" aria-modal="true" aria-label={row.name}>
-        <header>
-          <div>
-            <h3>
-              {row.name}
-              {device && isSimulatedDevice(device) && (
-                <span className="device-sim-badge">{L('Προσομοίωση', 'Simulation')}</span>
-              )}
-            </h3>
-            <p>
-              {L(deviceKindLabel[row.kind].el, deviceKindLabel[row.kind].en)}
-              {device
-                ? ` · ${[
-                    device.manufacturer,
-                    device.model,
-                    device.serialNumber && `S/N ${device.serialNumber}`,
-                    device.location,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}`
-                : ''}
-            </p>
+    <section className="asset-detail-workspace equipment-detail-workspace" aria-label={row.name}>
+      <div className="asset-workbench-actions">
+        <div className="asset-action-group">
+          <BackLink fallback="/sterilizers" className="asset-action-link">
+            <ArrowLeft size={18} /> {L('Πίσω στη λίστα', 'Back to the list')}
+          </BackLink>
+        </div>
+        <div className="asset-action-group">
+          {row.libraryId && canConfigure && (
+            <AppButton
+              icon={<Wrench size={16} />}
+              onClick={row.outOfService ? onBackInService : onOutOfService}
+              disabled={!row.outOfService && !!row.load}
+              title={
+                !row.outOfService && row.load
+                  ? L('Τρέχει κύκλος: περιμένετε να τελειώσει.', 'A cycle is running: wait for it to end.')
+                  : undefined
+              }
+            >
+              {row.outOfService
+                ? L('Επαναφορά σε λειτουργία', 'Put back in service')
+                : L('Εκτός λειτουργίας', 'Out of service')}
+            </AppButton>
+          )}
+          {devicesEnabled && device && canRecord && device.active && (
+            <AppButton icon={<Upload size={16} />} onClick={onFile}>
+              {L('Αρχείο', 'File')}
+            </AppButton>
+          )}
+          {devicesEnabled && device && canRecord && device.active && device.connection === 'SERIAL' && (
+            <AppButton icon={<Cable size={16} />} onClick={onSerial}>
+              {L('Καλώδιο', 'Cable')}
+            </AppButton>
+          )}
+          {devicesEnabled && device && isAdmin && device.connection === 'API' && (
+            <AppButton icon={<KeyRound size={16} />} onClick={onKey}>
+              {L('Κλειδί δικτύου', 'Network key')}
+            </AppButton>
+          )}
+          {devicesEnabled && device && isAdmin && (
+            <>
+              <AppButton icon={<Pencil size={16} />} onClick={onEdit}>
+                {L('Επεξεργασία', 'Edit')}
+              </AppButton>
+              <AppButton variant="danger" icon={<Trash2 size={16} />} onClick={onRemove}>
+                {L('Διαγραφή', 'Delete')}
+              </AppButton>
+            </>
+          )}
+          {devicesEnabled && !device && isAdmin && (
+            <AppButton variant="primary" icon={<Plus size={16} />} onClick={onConnect}>
+              {L('Σύνδεση συσκευής', 'Connect a device')}
+            </AppButton>
+          )}
+        </div>
+      </div>
+
+      <div className="equipment-detail-page">
+        <section className="asset-section">
+          <div className="asset-section-head">
+            <div>
+              <span className="eyebrow">
+                {L(deviceKindLabel[row.kind].el, deviceKindLabel[row.kind].en).toUpperCase()}
+              </span>
+              <h2>
+                {row.name}
+                {device && isSimulatedDevice(device) && (
+                  <span className="device-sim-badge">{L('Προσομοίωση', 'Simulation')}</span>
+                )}
+              </h2>
+            </div>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X size={18} />
-          </button>
-        </header>
-        <div className="load-details-body">
-          {row.outOfService && (
-            <div className="equipment-out" role="status">
-              <Wrench size={16} aria-hidden="true" />
+          <div className="asset-section-body">
+            {row.outOfService && (
+              <div className="equipment-out" role="status">
+                <Wrench size={16} aria-hidden="true" />
+                <div>
+                  <b>{stateOf}</b>
+                  <small>
+                    {L('Από', 'Since')} {row.outOfService.since} · {row.outOfService.by}
+                    {row.outOfService.note ? ` · ${row.outOfService.note}` : ''}
+                  </small>
+                </div>
+              </div>
+            )}
+            <dl className="asset-definition-list">
+              {facts
+                .filter(([, value]) => value)
+                .map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+            </dl>
+          </div>
+        </section>
+
+        <section className="asset-section">
+          <div className="asset-section-head">
+            <div>
+              <span className="eyebrow">{L('ΦΟΡΤΙΟ', 'LOAD')}</span>
+              <h2>
+                {row.load ? L('Φορτίο στον κλίβανο', 'Load in the sterilizer') : L('Τελευταίο φορτίο', 'Last load')}
+              </h2>
+            </div>
+          </div>
+          <div className="asset-section-body">
+            {shownLoad ? (
+              <>
+                <LoadContents load={shownLoad} />
+                <p>
+                  <Link className="equipment-open-link" to="/sterilization?queue=IN_STERILIZER">
+                    {L('Άνοιγμα στην Αποστείρωση', 'Open in Sterilization')}
+                  </Link>
+                </p>
+              </>
+            ) : (
+              <p className="muted">{L('Δεν έχει τρέξει φορτίο ακόμα.', 'No load has run yet.')}</p>
+            )}
+          </div>
+        </section>
+
+        {row.trouble && row.trouble.items.length > 0 && (
+          <section className="asset-section">
+            <div className="asset-section-head">
               <div>
-                <b>
-                  {row.outOfService.reason === 'BREAKDOWN'
-                    ? L('Εκτός λειτουργίας · βλάβη', 'Out of service · breakdown')
-                    : L('Εκτός λειτουργίας · συντήρηση', 'Out of service · maintenance')}
-                </b>
-                <small>
-                  {L('Από', 'Since')} {row.outOfService.since} · {row.outOfService.by}
-                  {row.outOfService.note ? ` · ${row.outOfService.note}` : ''}
-                </small>
+                <span className="eyebrow">{L('ΙΣΤΟΡΙΚΟ', 'HISTORY')}</span>
+                <h2>
+                  {L('Αποτυχίες και μη αποδεσμεύσεις', 'Failures and loads not released')}
+                  {row.trouble.attention && (
+                    <span className="equipment-attention">
+                      <TriangleAlert size={13} aria-hidden="true" />
+                      {L(
+                        `${row.trouble.recent} τις τελευταίες 30 ημέρες: ελέγξτε τον κλίβανο`,
+                        `${row.trouble.recent} in the last 30 days: have the sterilizer checked`,
+                      )}
+                    </span>
+                  )}
+                </h2>
               </div>
             </div>
-          )}
-          {row.libraryId && canConfigure && (
-            <div className="equipment-actions">
-              {row.outOfService ? (
-                <AppButton size="sm" variant="primary" onClick={onBackInService}>
-                  {L('Επαναφορά σε λειτουργία', 'Put back in service')}
-                </AppButton>
-              ) : (
-                <AppButton size="sm" onClick={onOutOfService} disabled={!!row.load}>
-                  <Wrench size={14} />
-                  {L('Εκτός λειτουργίας', 'Out of service')}
-                </AppButton>
-              )}
-              {!row.outOfService && row.load && (
-                <small className="muted">
-                  {L('Τρέχει κύκλος: περιμένετε να τελειώσει.', 'A cycle is running: wait for it to end.')}
-                </small>
-              )}
-            </div>
-          )}
-          {devicesEnabled && (
-            <div className="equipment-actions">
-              {device ? (
-                <>
-                  {canRecord && device.active && (
-                    <AppButton size="sm" onClick={onFile}>
-                      <Upload size={14} />
-                      {L('Αρχείο', 'File')}
-                    </AppButton>
-                  )}
-                  {canRecord && device.active && device.connection === 'SERIAL' && (
-                    <AppButton size="sm" onClick={onSerial}>
-                      <Cable size={14} />
-                      {L('Καλώδιο', 'Cable')}
-                    </AppButton>
-                  )}
-                  {isAdmin && device.connection === 'API' && (
-                    <AppButton size="sm" onClick={onKey}>
-                      <KeyRound size={14} />
-                      {L('Κλειδί δικτύου', 'Network key')}
-                    </AppButton>
-                  )}
-                  {isAdmin && (
-                    <>
-                      <AppButton size="sm" onClick={onEdit}>
-                        <Pencil size={14} />
-                        {L('Επεξεργασία', 'Edit')}
-                      </AppButton>
-                      <AppButton size="sm" variant="danger" onClick={onRemove}>
-                        <Trash2 size={14} />
-                        {L('Διαγραφή', 'Delete')}
-                      </AppButton>
-                    </>
-                  )}
-                </>
-              ) : (
-                isAdmin && (
-                  <AppButton size="sm" variant="primary" onClick={onConnect}>
-                    <Plus size={14} />
-                    {L('Σύνδεση συσκευής', 'Connect a device')}
-                  </AppButton>
-                )
-              )}
-            </div>
-          )}
-          {shownLoad ? (
-            <>
-              <h4>
-                {row.load ? L('Φορτίο στον κλίβανο', 'Load in the sterilizer') : L('Τελευταίο φορτίο', 'Last load')}
-              </h4>
-              <LoadContents load={shownLoad} />
-              <p>
-                <Link to="/sterilization?queue=IN_STERILIZER">
-                  {L('Άνοιγμα στην Αποστείρωση', 'Open in Sterilization')}
-                </Link>
-              </p>
-            </>
-          ) : (
-            <p className="muted">{L('Δεν έχει τρέξει φορτίο ακόμα.', 'No load has run yet.')}</p>
-          )}
-          {row.trouble && row.trouble.items.length > 0 && (
-            <>
-              <h4>
-                {L('Αποτυχίες και μη αποδεσμεύσεις', 'Failures and loads not released')}
-                {row.trouble.attention && (
-                  <span className="equipment-attention">
-                    <TriangleAlert size={13} aria-hidden="true" />
-                    {L(
-                      `${row.trouble.recent} τις τελευταίες 30 ημέρες: ελέγξτε τον κλίβανο`,
-                      `${row.trouble.recent} in the last 30 days: have the sterilizer checked`,
-                    )}
-                  </span>
-                )}
-              </h4>
+            <div className="asset-section-body">
               <ul className="equipment-trouble">
                 {row.trouble.items.slice(0, 10).map(item => (
                   <li key={item.loadId}>
@@ -265,14 +290,20 @@ export default function EquipmentDetails({
                   </li>
                 ))}
               </ul>
-            </>
-          )}
-          {device && (
-            <>
-              <div className="equipment-cycles-head">
-                <h4>{L('Κύκλοι που έστειλε η συσκευή', 'Cycles the device sent')}</h4>
-                <DownloadMenu table={table} disabled={!readings.length} />
+            </div>
+          </section>
+        )}
+
+        {device && (
+          <section className="asset-section">
+            <div className="asset-section-head">
+              <div>
+                <span className="eyebrow">{L('ΣΥΣΚΕΥΗ', 'DEVICE')}</span>
+                <h2>{L('Κύκλοι που έστειλε η συσκευή', 'Cycles the device sent')}</h2>
               </div>
+              <DownloadMenu table={table} disabled={!readings.length} />
+            </div>
+            <div className="asset-section-body">
               {readings.length === 0 ? (
                 <p className="muted">
                   {L('Δεν υπάρχουν κύκλοι για αυτή τη συσκευή.', 'No cycles for this device.')}
@@ -331,15 +362,10 @@ export default function EquipmentDetails({
                   </table>
                 </div>
               )}
-            </>
-          )}
-        </div>
-        <footer>
-          <AppButton variant="primary" onClick={onClose}>
-            {L('Κλείσιμο', 'Close')}
-          </AppButton>
-        </footer>
+            </div>
+          </section>
+        )}
       </div>
-    </div>
+    </section>
   );
 }

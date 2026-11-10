@@ -29,6 +29,7 @@ import {
   evaluate,
   isFinished,
   planFor,
+  ranMinutes,
   type SimRun,
   type SimScenario,
 } from '../../core/cycleSimulator';
@@ -299,15 +300,18 @@ export function useLoadActions(
     const organizationId = p.cloud?.organizationId;
     if (run && finished.cycleData && organizationId && withDevices) {
       const data = finished.cycleData;
+      // The cycle's own length: the clock keeps running after it ends, so «Τέλος κύκλου» pressed later (even the
+      // next day) must not make the cycle longer.
+      const minutes = ranMinutes(run, plan, Date.now());
       void sendSimulatedCycle(organizationId, load.equipment, {
         cycleNumber: load.cycleNumber,
         program: load.program,
         startedAt: new Date(run.startedAt).toISOString(),
-        endedAt: new Date().toISOString(),
+        endedAt: new Date(run.startedAt + (minutes * 60_000) / (run.speed || 1)).toISOString(),
         result: data.result,
         maxTemperature: data.maxTemperature,
         maxPressure: data.maxPressure,
-        durationMinutes: Math.round(elapsedMinutes(run, Date.now())),
+        durationMinutes: Math.round(minutes),
       })
         .then(sent =>
           notify(

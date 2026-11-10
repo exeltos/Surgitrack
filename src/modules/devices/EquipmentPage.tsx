@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import {
   Cable,
   CheckCircle2,
@@ -86,7 +87,10 @@ export default function EquipmentPage() {
   const [loading, setLoading] = useState(devicesEnabled);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  const [openKey, setOpenKey] = useState('');
+  // The piece of equipment whose page is open is in the address, so «Πίσω» of the browser returns to the list.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openKey = searchParams.get('equipment') || '';
+  const setOpenKey = (key: string) => setSearchParams(key ? {equipment: key} : {});
   const [editor, setEditor] = useState<{id?: string; value: DeviceInput}>();
   const [removing, setRemoving] = useState<Device>();
   const [keyFor, setKeyFor] = useState<{device: Device; key?: string; busy?: boolean}>();
@@ -249,36 +253,38 @@ export default function EquipmentPage() {
 
   return (
     <div className="devices-page equipment-page">
-      <PageHeader
-        eyebrow={L('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ', 'CENTRAL STERILE SERVICES')}
-        title={L('Κλίβανοι & Συσκευές', 'Sterilizers & Devices')}
-        description={
-          rows.length === 0
-            ? L('Δεν έχουν οριστεί κλίβανοι ή συσκευές.', 'No sterilizers or devices are set.')
-            : busy
-              ? L(
-                  `${busy} σε λειτουργία · ${rows.length - busy} ελεύθεροι`,
-                  `${busy} running · ${rows.length - busy} free`,
-                )
-              : L('Όλος ο εξοπλισμός είναι ελεύθερος.', 'All the equipment is free.')
-        }
-        actions={
-          <div className="devices-head-actions">
-            {devicesEnabled && (
-              <AppButton onClick={() => void load()} disabled={loading}>
-                <RefreshCcw size={15} />
-                {L('Ανανέωση', 'Refresh')}
-              </AppButton>
-            )}
-            {devicesEnabled && isAdmin && (
-              <AppButton variant="primary" onClick={() => setEditor({value: {...emptyDevice}})}>
-                <Plus size={16} />
-                {L('Νέα συσκευή', 'New device')}
-              </AppButton>
-            )}
-          </div>
-        }
-      />
+      {!opened && (
+        <PageHeader
+          eyebrow={L('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ', 'CENTRAL STERILE SERVICES')}
+          title={L('Κλίβανοι & Συσκευές', 'Sterilizers & Devices')}
+          description={
+            rows.length === 0
+              ? L('Δεν έχουν οριστεί κλίβανοι ή συσκευές.', 'No sterilizers or devices are set.')
+              : busy
+                ? L(
+                    `${busy} σε λειτουργία · ${rows.length - busy} ελεύθεροι`,
+                    `${busy} running · ${rows.length - busy} free`,
+                  )
+                : L('Όλος ο εξοπλισμός είναι ελεύθερος.', 'All the equipment is free.')
+          }
+          actions={
+            <div className="devices-head-actions">
+              {devicesEnabled && (
+                <AppButton onClick={() => void load()} disabled={loading}>
+                  <RefreshCcw size={15} />
+                  {L('Ανανέωση', 'Refresh')}
+                </AppButton>
+              )}
+              {devicesEnabled && isAdmin && (
+                <AppButton variant="primary" onClick={() => setEditor({value: {...emptyDevice}})}>
+                  <Plus size={16} />
+                  {L('Νέα συσκευή', 'New device')}
+                </AppButton>
+              )}
+            </div>
+          }
+        />
+      )}
       {error && (
         <div className="devices-alert" role="alert">
           <XCircle size={16} />
@@ -297,7 +303,7 @@ export default function EquipmentPage() {
           </button>
         </div>
       )}
-      {rows.length > 0 && (
+      {!opened && rows.length > 0 && (
         <KpiStrip
           className="equipment-kpis"
           compact
@@ -329,7 +335,7 @@ export default function EquipmentPage() {
           ]}
         />
       )}
-      {rows.length === 0 ? (
+      {opened ? null : rows.length === 0 ? (
         <div className="devices-empty">
           <Cable size={26} />
           <b>{L('Δεν υπάρχει εξοπλισμός ακόμη.', 'No equipment yet.')}</b>
@@ -551,7 +557,6 @@ export default function EquipmentPage() {
           canConfigure={canConfigure}
           onOutOfService={() => setOutFor(opened)}
           onBackInService={() => setOutOfService(opened)}
-          onClose={() => setOpenKey('')}
           onConnect={() => setEditor({value: {...emptyDevice, name: opened.name, kind: opened.kind}})}
           onEdit={() => opened.device && setEditor({id: opened.device.id, value: {...opened.device}})}
           onRemove={() => setRemoving(opened.device)}
