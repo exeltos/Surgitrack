@@ -35,6 +35,7 @@ import {
 } from '../../core/cycleSimulator';
 import {formatDateTime} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
+import {useLibraries} from '../../core/LibraryStore';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
@@ -51,6 +52,8 @@ export function useLoadActions(
 ) {
   // A simulated cycle is also reported to the connected devices (device-ingest) where the hospital has them.
   const withDevices = useHasModule('DEVICES');
+  // Equipment taken out of service (a breakdown, maintenance) is not loaded.
+  const {sterilizers: sterilizerList, washers: washerList} = useLibraries();
   const {
     addMovement,
     assertCirculationAllowed,
@@ -84,6 +87,13 @@ export function useLoadActions(
 
   const createProcessLoad = (payload: CreateProcessLoadPayload) => {
     const expectedState: AssetState = payload.kind === 'WASHING' ? 'IN_WASHING' : 'IN_STERILIZATION';
+    const outOfService = (payload.kind === 'WASHING' ? washerList : sterilizerList).find(
+      item => item.el === payload.equipment.trim() && item.outOfService,
+    );
+    if (outOfService) {
+      notify(tr('Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.', outOfService.el), true);
+      return;
+    }
     const refs = payload.assetRefs
       .map(ref => ({ref, asset: assetName(ref.kind, ref.id)}))
       .filter(

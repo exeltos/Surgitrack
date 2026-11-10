@@ -127,7 +127,7 @@ export function SurgiProvider({
     workflowCheckpoints,
   } = useSurgiStore({dataMode, cloud});
   // Studio settings the actions read (workflow stages and policies, permissions): a change must reach them.
-  const {sterilizationWorkflow, rolePermissions, systemSettings} = useLibraries();
+  const {sterilizationWorkflow, rolePermissions, systemSettings, sterilizers, washers} = useLibraries();
 
   const activeTools = useMemo(() => tools.filter(t => t.state !== 'RETIRED'), [tools]);
   const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
@@ -262,6 +262,9 @@ export function SurgiProvider({
       sterilizationWorkflow,
       rolePermissions,
       systemSettings,
+      // A sterilizer or washer taken out of service is refused when a load is made.
+      sterilizers,
+      washers,
     ],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

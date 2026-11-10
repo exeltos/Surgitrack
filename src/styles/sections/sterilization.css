@@ -2093,65 +2093,6 @@ html body .batch-department button.clear:hover {
 .equipment-page .equipment-kpis {
   margin-bottom: 12px;
 }
-.equipment-detail-workspace .equipment-out {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  border: 1px solid var(--c-red-45);
-  border-radius: 10px;
-  color: var(--c-red-40);
-}
-.equipment-detail-workspace .equipment-out small {
-  display: block;
-  color: var(--st-muted);
-}
-.equipment-detail-workspace .equipment-attention {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-left: 10px;
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: var(--c-amber-95);
-  color: var(--c-red-40);
-  font-size: 12px;
-  font-weight: 700;
-}
-.equipment-detail-workspace .equipment-trouble {
-  display: grid;
-  gap: 4px;
-  margin: 6px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.equipment-detail-workspace .equipment-trouble li {
-  display: grid;
-  grid-template-columns: 90px minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-  font-size: 13px;
-}
-.equipment-detail-workspace .equipment-trouble small {
-  color: var(--st-muted);
-}
-.out-of-service-dialog .notice-choice {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 10px 0;
-}
-.equipment-rows .row-connection {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--c-green-45);
-  font-weight: 600;
-}
-.equipment-rows td .device-sim-badge {
-  margin-left: 6px;
-}
 .equipment-detail-workspace .equipment-detail-page {
   display: grid;
   gap: 14px;
