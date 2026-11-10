@@ -47,6 +47,11 @@ const readAsDataUrl = (blob: Blob) =>
     reader.readAsDataURL(blob);
   });
 
+/** A picture from the device as a JPEG whose longest side is at most `longest` pixels. */
+export async function downscaleToJpeg(file: File, longest = FULL, quality = 0.85): Promise<Blob> {
+  return toBlob(draw(await decode(file), longest), quality);
+}
+
 /**
  * Photos from the camera or the device, downscaled. In a hospital the photo goes to Storage and the record
  * keeps a small preview and the file's path; otherwise (local Demo, offline) the downscaled photo itself.

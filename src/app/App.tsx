@@ -23,7 +23,6 @@ import {lazyPage} from '../core/resilience';
 import NotFoundPage from '../modules/NotFoundPage';
 import RouteErrorBoundary from '../components/layout/RouteErrorBoundary';
 import {useSignOutGuard} from './useSignOutGuard';
-import ModuleGate from '../components/layout/ModuleGate';
 import {SCAN_PATH, isScanStandalone, onScanScreens} from '../modules/scan/scanApp';
 import {
   type AccessRequest,
@@ -45,7 +44,7 @@ const StockPage = lazyPage(() => import('../modules/stock/StockPage'));
 const BinPage = lazyPage(() => import('../modules/bin/BinPage'));
 const SterileExpiryPage = lazyPage(() => import('../modules/expiry/SterileExpiryPage'));
 const SterilizationPage = lazyPage(() => import('../modules/sterilization/SterilizationPage'));
-const DevicesPage = lazyPage(() => import('../modules/devices/DevicesPage'));
+const EquipmentPage = lazyPage(() => import('../modules/devices/EquipmentPage'));
 const ImportPage = lazyPage(() => import('../modules/import/ImportPage'));
 const NameCheckPage = lazyPage(() => import('../modules/tools/NameCheckPage'));
 const DepartmentPage = lazyPage(() => import('../modules/department/DepartmentPage'));
@@ -395,15 +394,14 @@ export default function App() {
             }
           />
           <Route
-            path="/devices"
+            path="/sterilizers"
             element={
               <Guard permission="sterilization.workspace">
-                <ModuleGate module="DEVICES">
-                  <DevicesPage />
-                </ModuleGate>
+                <EquipmentPage />
               </Guard>
             }
           />
+          <Route path="/devices" element={<Navigate to="/sterilizers" replace />} />
           <Route
             path="/overview/department"
             element={

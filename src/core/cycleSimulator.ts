@@ -86,6 +86,13 @@ export function sampleAt(plan: CyclePlan, scenario: SimScenario, minute: number)
 export const elapsedMinutes = (run: SimRun, now: number) =>
   Math.max(0, ((now - run.startedAt) / 1000) * (run.speed / 60));
 
+/**
+ * Simulated minutes the cycle really ran at `now`: never more than its own length, because the clock keeps
+ * running after it ends (the end of a cycle recorded the next day is still a 20-minute cycle).
+ */
+export const ranMinutes = (run: SimRun, plan: CyclePlan, now: number) =>
+  Math.min(elapsedMinutes(run, now), endMinute(plan, run.scenario));
+
 export const isFinished = (run: SimRun, plan: CyclePlan, now: number) =>
   elapsedMinutes(run, now) >= endMinute(plan, run.scenario);
 

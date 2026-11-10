@@ -1028,9 +1028,9 @@ export const helpManual: ManualSection[] = [
     related: ['/sets', '/tools', '/replacements'],
   },
   {
-    to: '/devices',
+    to: '/sterilizers',
     permission: 'sterilization.workspace',
-    title: {el: 'Συσκευές', en: 'Devices'},
+    title: {el: 'Κλίβανοι & Συσκευές', en: 'Sterilizers & Devices'},
     summary: {
       el: 'Κλίβανοι, πλυντήρια και άλλες συσκευές που στέλνουν τα δεδομένα των κύκλων τους στο SurgiTrack.',
       en: 'Sterilizers, washers and other devices that send their cycle data to SurgiTrack.',

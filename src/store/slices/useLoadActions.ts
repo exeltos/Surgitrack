@@ -1,3 +1,4 @@
+import {useEffect, useRef} from 'react';
 import {loadLabel} from '../../core/loadLabel';
 import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
 import {STERILE_STATES} from '../../core/sterileExpiry';
@@ -22,15 +23,19 @@ import type {
 import {workflowStageState} from '../../core/workflow';
 import {
   buildCycleData,
+  curve,
   DEFAULT_SPEED,
   elapsedMinutes,
+  evaluate,
   isFinished,
   planFor,
+  ranMinutes,
   type SimRun,
   type SimScenario,
 } from '../../core/cycleSimulator';
 import {formatDateTime} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
+import {useLibraries} from '../../core/LibraryStore';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
@@ -47,6 +52,8 @@ export function useLoadActions(
 ) {
   // A simulated cycle is also reported to the connected devices (device-ingest) where the hospital has them.
   const withDevices = useHasModule('DEVICES');
+  // Equipment taken out of service (a breakdown, maintenance) is not loaded.
+  const {sterilizers: sterilizerList, washers: washerList} = useLibraries();
   const {
     addMovement,
     assertCirculationAllowed,
@@ -80,6 +87,13 @@ export function useLoadActions(
 
   const createProcessLoad = (payload: CreateProcessLoadPayload) => {
     const expectedState: AssetState = payload.kind === 'WASHING' ? 'IN_WASHING' : 'IN_STERILIZATION';
+    const outOfService = (payload.kind === 'WASHING' ? washerList : sterilizerList).find(
+      item => item.el === payload.equipment.trim() && item.outOfService,
+    );
+    if (outOfService) {
+      notify(tr('Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.', outOfService.el), true);
+      return;
+    }
     const refs = payload.assetRefs
       .map(ref => ({ref, asset: assetName(ref.kind, ref.id)}))
       .filter(
@@ -296,15 +310,18 @@ export function useLoadActions(
     const organizationId = p.cloud?.organizationId;
     if (run && finished.cycleData && organizationId && withDevices) {
       const data = finished.cycleData;
+      // The cycle's own length: the clock keeps running after it ends, so «Τέλος κύκλου» pressed later (even the
+      // next day) must not make the cycle longer.
+      const minutes = ranMinutes(run, plan, Date.now());
       void sendSimulatedCycle(organizationId, load.equipment, {
         cycleNumber: load.cycleNumber,
         program: load.program,
         startedAt: new Date(run.startedAt).toISOString(),
-        endedAt: new Date().toISOString(),
+        endedAt: new Date(run.startedAt + (minutes * 60_000) / (run.speed || 1)).toISOString(),
         result: data.result,
         maxTemperature: data.maxTemperature,
         maxPressure: data.maxPressure,
-        durationMinutes: Math.round(elapsedMinutes(run, Date.now())),
+        durationMinutes: Math.round(minutes),
       })
         .then(sent =>
           notify(
@@ -661,6 +678,31 @@ export function useLoadActions(
     notify(tr('Η παράδοση του {0} στο {1} ολοκληρώθηκε.', a.barcode, a.department || 'τμήμα'));
     return record;
   };
+  // A simulated cycle ends by itself, as a connected sterilizer's does: a passed one goes on to release, one
+  // that failed (pressure, an alarm) sends the load back to reprocessing. It runs wherever the person is in the
+  // app, so the cycle is not left waiting for someone to open the right tab. Stopping it by hand stays possible.
+  const finishRef = useRef(finishProcessLoad);
+  const loadsRef = useRef(processLoads);
+  useEffect(() => {
+    finishRef.current = finishProcessLoad;
+    loadsRef.current = processLoads;
+  });
+  const handled = useRef(new Set<string>());
+  const simulating = processLoads.some(l => l.kind === 'STERILIZATION' && l.status === 'OPEN' && !!l.simulation);
+  useEffect(() => {
+    if (!simulating) return;
+    const timer = window.setInterval(() => {
+      for (const load of loadsRef.current) {
+        const run = load.simulation;
+        if (load.kind !== 'STERILIZATION' || load.status !== 'OPEN' || !run || handled.current.has(load.id)) continue;
+        const plan = planFor(load.program);
+        if (!isFinished(run, plan, Date.now())) continue;
+        handled.current.add(load.id);
+        finishRef.current(load.id, evaluate(plan, curve(plan, run.scenario)).result === 'PASS' ? 'PASSED' : 'FAILED');
+      }
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [simulating]);
   return {
     advanceStageItems,
     recordBiologicalResult,

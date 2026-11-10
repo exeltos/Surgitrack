@@ -834,9 +834,6 @@
   html body .studio-list-row.with-count > span:nth-child(2) {
     display: none !important;
   }
-  html body .studio-notice-new .studio-notice-message {
-    grid-column: 1/-1;
-  }
 }
 @media (max-width: 1100px) {
   .owner-kpis {
@@ -1220,48 +1217,6 @@ html body .studio-error-detail pre {
   white-space: pre-wrap;
 }
 
-/* Studio › Ειδοποιήσεις: a new notice with its window, then the list (showing, scheduled, ended). */
-html body .studio-notice-new {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px 200px auto;
-  gap: 12px;
-  align-items: start;
-  padding: 16px;
-  border: 1px solid var(--st-line);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .studio-notice-new label {
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--c-gray-15);
-}
-html body .studio-notice-new input {
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 10px;
-  background: var(--c-white);
-  font: inherit;
-  font-weight: 500;
-}
-html body .studio-notice-new label small {
-  font-weight: 500;
-  color: var(--st-muted);
-  font-size: 12px;
-}
-html body .studio-notice-new > .app-button {
-  align-self: start;
-  margin-top: 25px;
-  min-height: 40px;
-}
-html body .studio-notice-warning {
-  grid-column: 1/-1;
-  color: var(--st-red);
-  font-size: 13px;
-}
 html body .studio-notice-group {
   display: grid;
   gap: 8px;
@@ -1393,10 +1348,6 @@ html body .studio-ratings-kpis {
   }
 }
 @media (max-width: 900px) {
-  html body .studio-notice-new > .app-button {
-    grid-column: 1/-1;
-    margin-top: 0;
-  }
   html body .studio-ratings-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1496,14 +1447,6 @@ html
   > :is(.eyebrow, h2) {
   display: none;
 }
-html body .studio-notice-new label {
-  min-width: 0;
-}
-html body .studio-notice-new input {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
 /* Evaluation Demos with none yet: a card that says what a Demo is for, with the button to open one. */
 html body .evaluation-demo-empty-card {
   display: grid;
@@ -1587,24 +1530,6 @@ html body .platform-hospital-name small {
     color: var(--st-muted);
     font-size: 11px;
     font-weight: 600;
-  }
-}
-@media (min-width: 1281px) {
-  html body .studio-notice-new {
-    grid-template-columns: minmax(0, 1fr) 230px 230px auto;
-  }
-}
-@media (max-width: 1280px) {
-  html body .studio-notice-new {
-    grid-template-columns: 1fr 1fr auto;
-  }
-  html body .studio-notice-new .studio-notice-message {
-    grid-column: 1/-1;
-  }
-}
-@media (max-width: 900px) {
-  html body .studio-notice-new {
-    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -1910,65 +1835,6 @@ html body .ratings-person > strong {
   }
 }
 
-/* Studio › Ειδοποιήσεις: the kind, who it is for, the link, and the hospitals it goes to. */
-html body .studio-notice-new .studio-notice-extra,
-html body .studio-notice-new .studio-notice-hospitals {
-  grid-column: 1 / -1;
-}
-html body .studio-notice-new .studio-notice-extra {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-}
-html body .studio-notice-new select {
-  height: 40px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 10px;
-  background: var(--c-white);
-  font: inherit;
-  font-weight: 500;
-}
-html body .studio-notice-new .studio-notice-hospitals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  padding: 10px 12px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 10px;
-}
-html body .studio-notice-new .studio-notice-hospitals legend {
-  padding: 0 6px;
-  font-size: 13px;
-  font-weight: 700;
-}
-html body .studio-notice-new .studio-notice-radio {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-}
-html body .studio-notice-new .studio-notice-radio {
-  white-space: nowrap;
-}
-html body .studio-notice-new .studio-notice-radio input {
-  width: auto;
-  height: auto;
-  margin: 0;
-  padding: 0;
-}
-html body .studio-notice-new .studio-notice-orgs {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 4px 12px;
-  flex-basis: 100%;
-  max-height: 180px;
-  margin: 0;
-  padding: 0;
-  overflow: auto;
-  list-style: none;
-}
 html body .studio-notice-kind {
   display: inline-block;
   margin-right: 8px;
@@ -1979,4 +1845,282 @@ html body .studio-notice-kind {
   font-size: 11px;
   font-style: normal;
   font-weight: 700;
+}
+
+/* Studio › Ειδοποιήσεις: the form in three parts with a preview beside it (tabs/NoticeComposer.tsx). */
+html body .notice-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+}
+html body .notice-composer > * {
+  min-width: 0;
+}
+html body .notice-form {
+  display: grid;
+  gap: 14px;
+}
+html body .notice-block {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .notice-block-title {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-gray-90-3);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--st-teal);
+}
+html body .notice-block label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-gray-15);
+}
+html body .notice-block label small,
+html body .notice-note {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--st-muted);
+}
+html body .notice-block input:not([type='checkbox']),
+html body .notice-block textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-weight: 500;
+}
+html body .notice-block textarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+html body .notice-block input:focus-visible,
+html body .notice-block textarea:focus-visible {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 1px;
+}
+html body .notice-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+html body .notice-choice-group {
+  display: grid;
+  gap: 6px;
+}
+html body .notice-choice-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .notice-picture {
+  display: grid;
+  gap: 8px;
+}
+html body .notice-picture-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+html body .notice-picture-row img {
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--c-gray-90-4);
+}
+html body .notice-picture-row button {
+  padding: 8px 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .notice-picture-pick {
+  padding: 12px 14px;
+  border: 1px dashed var(--c-gray-90-4);
+  border-radius: 10px;
+}
+html body .notice-button-box {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px dashed var(--c-gray-90-4);
+  border-radius: 10px;
+}
+html body .notice-choice {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+html body .notice-choice .notice-dot {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--c-gray-90-4);
+  border-radius: 50%;
+}
+html body .notice-choice button.on .notice-dot {
+  border-color: var(--st-teal);
+  background: radial-gradient(circle, var(--st-teal) 45%, transparent 50%);
+}
+html body .notice-choice button {
+  font: inherit;
+  font-size: 14px;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+  position: relative;
+  padding: 11px 14px 11px 40px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-gray-15);
+  text-align: left;
+  cursor: pointer;
+}
+html body .notice-choice button small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .notice-choice button.on {
+  border-color: var(--st-teal);
+  background: var(--c-gray-100-2);
+  box-shadow: inset 0 0 0 1px var(--st-teal);
+}
+html body .notice-choice button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+html body .notice-choice button:focus-visible {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 1px;
+}
+html body .notice-orgs {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+}
+html body .notice-orgs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+html body .notice-orgs-bar input {
+  flex: 1 1 200px;
+}
+html body .notice-orgs-bar button {
+  padding: 8px 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .notice-orgs-bar span {
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
+html body .notice-orgs ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 2px 14px;
+  max-height: 190px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+html body .notice-orgs li label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  font-weight: 500;
+}
+html body .notice-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+html body .notice-footer p {
+  margin: 0;
+  min-height: 1.2em;
+  color: var(--st-red);
+  font-size: 13px;
+}
+html body .notice-preview {
+  position: sticky;
+  top: 12px;
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px dashed var(--c-gray-90-4);
+  border-radius: 12px;
+  background: var(--c-gray-100-2);
+}
+html body .notice-preview h3 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+html body .notice-preview .notice-preview-who {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .notice-preview .promo-card {
+  grid-template-columns: minmax(0, 1fr);
+}
+html body .notice-preview .promo-card .promo-image {
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
+}
+html body .notice-preview .maintenance-strip {
+  border: 1px solid var(--c-amber-80);
+  border-radius: 10px;
+}
+@media (max-width: 1280px) {
+  html body .notice-composer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .notice-preview {
+    position: static;
+  }
+}
+
+/* Ειδοποιήσεις: the form is taller than the screen, so the tab scrolls inside the page. */
+html body .studio-body-notices {
+  min-height: 0;
+  overflow-y: auto;
 }

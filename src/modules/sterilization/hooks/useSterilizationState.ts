@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
@@ -44,9 +44,11 @@ export function useSterilizationState() {
   const {sterilizationWorkflow, systemSettings, sterilizers: sterilizerLibrary, washers} = useLibraries();
   /** The hospital's sterilizers by name (Studio › Libraries › Sterilizers). */
   const sterilizerNames = sterilizerLibrary.map(item => item.el);
-  const defaultSterilizer = sterilizerNames[0] || 'Κλίβανος 1';
+  // The first one that is in service: a load is not offered an out-of-service sterilizer.
+  const defaultSterilizer =
+    sterilizerLibrary.find(item => !item.outOfService)?.el || sterilizerNames[0] || 'Κλίβανος 1';
   /** The first washer of Studio › Libraries › Washers, or the usual name when the hospital lists none. */
-  const defaultWasher = washers[0]?.el || 'Πλυντήριο 1';
+  const defaultWasher = washers.find(item => !item.outOfService)?.el || washers[0]?.el || 'Πλυντήριο 1';
   const compositionOptions = useCompositionOptions();
   const activeStages = sterilizationWorkflow.stages.filter(stage => stage.enabled);
   const stageEnabled = (id: WorkflowStageId) => activeStages.some(stage => stage.id === id);
@@ -61,11 +63,28 @@ export function useSterilizationState() {
     'STORAGE',
     'READY',
   ];
-  const [searchParams] = useSearchParams();
-  // A link can open a given stage, e.g. /sterilization?queue=READY from the overview.
+  const [searchParams, setSearchParams] = useSearchParams();
+  // A link can open a given stage, e.g. /sterilization?queue=READY from the overview. The stage open stays in the
+  // address too, so «Πίσω» from a Set or an instrument comes back to it and not to the first stage.
   const requestedQueue = searchParams.get('queue') as Queue | null;
-  const [queue, setQueue] = useState<Queue>(
-    requestedQueue && QUEUES.includes(requestedQueue) ? requestedQueue : 'INCOMING',
+  const validRequest = requestedQueue && QUEUES.includes(requestedQueue) ? requestedQueue : null;
+  const [queue, setQueueState] = useState<Queue>(validRequest || 'INCOMING');
+  useEffect(() => {
+    if (validRequest) setQueueState(validRequest);
+  }, [validRequest]);
+  const setQueue = useCallback(
+    (next: Queue) => {
+      setQueueState(next);
+      setSearchParams(
+        current => {
+          const params = new URLSearchParams(current);
+          params.set('queue', next);
+          return params;
+        },
+        {replace: true},
+      );
+    },
+    [setSearchParams],
   );
   const [query, setQuery] = useState('');
   const [quickBarcode, setQuickBarcode] = useState('');

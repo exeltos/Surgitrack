@@ -751,98 +751,7 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
   gap: 6px;
 }
 /* Sterilization › In the sterilizer: running loads, locked until the end of the cycle. */
-.sterilizer-loads {
-  display: grid;
-  gap: 12px;
-  padding: 12px;
-  overflow: auto;
-  min-height: 0;
-}
-.sterilizer-load-card {
-  border: 1px solid var(--c-gray-90);
-  border-radius: 14px;
-  background: var(--c-white);
-  overflow: hidden;
-}
-.sterilizer-load-card > header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--c-gray-100-2);
-  border-bottom: 1px solid var(--c-gray-95);
-}
-.sterilizer-load-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--c-amber-95);
-  color: var(--c-orange-40);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.sterilizer-load-items {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.sterilizer-load-items li {
-  display: grid;
-  grid-template-columns: 20px 96px minmax(0, 1fr) 200px;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--c-gray-95);
-  font-size: 13px;
-}
-.sterilizer-load-items li:last-child {
-  border-bottom: 0;
-}
 /* The barcode reads like every other queue's (no underline until pointed at; it opens the record). */
-.sterilizer-load-items a {
-  color: var(--c-cyan-45-3);
-  font-size: 12px;
-  font-weight: 800;
-  text-decoration: none;
-}
-.sterilizer-load-items a:hover {
-  text-decoration: underline;
-}
-.sterilizer-load-items b {
-  color: var(--c-cyan-25-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sterilizer-load-items small {
-  color: var(--st-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sterilizer-load-card > footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-top: 1px solid var(--c-gray-95);
-  background: var(--c-white);
-}
-html body .sterilizer-load-card > footer button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 10px;
-  font-weight: 700;
-}
 html body .release-actions .release-print {
   margin-right: auto;
 }
@@ -1212,6 +1121,24 @@ html body .ster-count-shortage {
   white-space: nowrap;
   font-size: 11px;
 }
+/* An item back before the sterilizer after a failed cycle or a load not released (parts/WorkPanel.tsx). */
+html body .ster-reprocess {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--c-amber-80-2);
+  border-radius: 8px;
+  background: var(--c-gray-100-2);
+  color: var(--c-red-40);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+html body .ster-reprocess small {
+  color: var(--st-muted);
+  font-weight: 600;
+}
 html body .ster-meta .ster-count-shortage {
   margin-left: 0;
 }
@@ -1360,12 +1287,6 @@ html body .ster-row-load b {
 @media (max-width: 760px) {
   .shelf-life-picker {
     grid-template-columns: 1fr;
-  }
-  .sterilizer-load-items li {
-    grid-template-columns: 20px 90px minmax(0, 1fr);
-  }
-  .sterilizer-load-items small {
-    display: none;
   }
 }
 @media (max-width: 1366px) {
@@ -1522,21 +1443,8 @@ html body .ster-row-load b {
     display: none;
   }
   /* In the sterilizer: the cycle under the sterilizer, the badge under the title. */
-  html body .sterilizer-load-card > header {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  html body .sterilizer-load-card > header .sterilizer-load-badge {
-    grid-column: 2;
-    justify-self: start;
-  }
-  html body .sterilizer-load-card .sterilizer-load-sep,
   html body .sterilization-workspace .ster-work-panel .ster-meta:has(> .ster-meta-none) {
     display: none;
-  }
-  html body .sterilizer-load-card .sterilizer-load-cycle {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
   }
 }
 
@@ -1604,10 +1512,6 @@ html body .ster-row-load b {
 /* Release: the loads still in the sterilizer come first, where their end of cycle is recorded. */
 .release-running-loads {
   flex: 0 0 auto;
-}
-.release-running-loads .sterilizer-loads {
-  overflow: visible;
-  padding-bottom: 0;
 }
 
 /* Composition on a phone: the name on its own line, the state and the button under it, all inside the row. */
@@ -1931,87 +1835,457 @@ html body .batch-department button.clear:hover {
 }
 
 /* All sterilizers on one screen (parts/SterilizerBoard.tsx). */
-.sterilizer-board {
-  display: grid;
-  gap: 10px;
-  padding: 12px 12px 0;
+
+/* The «Κλίβανοι» screen: every sterilizer and its cycle, large (SterilizersPage.tsx). */
+
+/* Loads in the sterilizer as horizontal rows (parts/SterilizerLoads.tsx) and the card of a load's details. */
+.sterilizer-rows-wrap {
+  padding: 12px;
+  overflow-x: auto;
 }
-.sterilizer-board > header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+.sterilizer-rows {
+  width: 100%;
+  border-collapse: collapse;
 }
-.sterilizer-board > header small {
+.sterilizer-rows th {
+  padding: 8px;
+  border-bottom: 1px solid var(--c-gray-90-3);
   color: var(--st-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
 }
-.sterilizer-board-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 10px;
+.sterilizer-rows td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--c-gray-95);
+  vertical-align: middle;
+  font-size: 13px;
 }
-.sterilizer-tile {
-  display: grid;
-  gap: 6px;
-  align-content: start;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90-3);
-  border-radius: 12px;
-  background: var(--c-white);
+.sterilizer-rows td:nth-child(2) {
+  max-width: 230px;
 }
-.sterilizer-tile.free {
-  background: var(--c-gray-100-2);
+.sterilizer-rows td small {
+  display: block;
   color: var(--st-muted);
+  font-size: 11.5px;
 }
-.sterilizer-tile.busy {
-  border-color: var(--c-orange-60);
+.sterilizer-rows tr.busy > td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-orange-60);
 }
-.sterilizer-tile.busy.done {
-  border-color: var(--c-green-45);
+.sterilizer-rows tr.done > td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-green-45);
 }
-.sterilizer-tile .tile-head {
+.sterilizer-rows .row-name {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.sterilizer-tile .tile-sim {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 1px 7px;
+.sterilizer-rows .num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sterilizer-rows .num .bad {
+  color: var(--c-red-45);
+}
+.sterilizer-rows .row-phase {
+  display: inline-block;
+  padding: 2px 10px;
   border-radius: 999px;
   background: var(--c-amber-95);
   color: var(--c-orange-40);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
-.sterilizer-tile .tile-state {
-  font-size: 13px;
-  font-weight: 600;
+.sterilizer-rows .row-phase.done {
+  background: var(--c-green-90);
+  color: var(--c-green-45);
 }
-.sterilizer-tile .tile-readings {
-  display: flex;
-  gap: 16px;
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-}
-.sterilizer-tile .tile-readings .bad {
-  color: var(--c-red-45);
-}
-.sterilizer-tile .tile-progress {
+.sterilizer-rows .tile-progress {
+  min-width: 90px;
   height: 8px;
   border-radius: 999px;
   background: var(--c-gray-95);
   overflow: hidden;
 }
-.sterilizer-tile .tile-progress i {
+.sterilizer-rows .tile-progress i {
   display: block;
   height: 100%;
   background: var(--c-orange-60);
 }
-.sterilizer-tile.done .tile-progress i {
+.sterilizer-rows tr.done .tile-progress i {
   background: var(--c-green-45);
 }
-.sterilizer-tile small {
+.sterilizer-rows .row-actions {
+  text-align: right;
+}
+.sterilizer-rows .row-actions-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.sterilizer-rows .row-details,
+.sterilizer-rows .row-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--st-teal);
+  font-weight: 700;
+  cursor: pointer;
+}
+.sterilizer-rows .row-icon {
+  padding: 6px 8px;
+}
+.sterilizer-rows .row-details:hover,
+.sterilizer-rows .row-icon:hover {
+  border-color: var(--c-cyan-65);
+}
+@media (max-width: 900px) {
+  .sterilizer-rows thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .sterilizer-rows tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--c-gray-90-3);
+  }
+  .sterilizer-rows td {
+    display: block;
+    padding: 2px 6px;
+    border: 0;
+  }
+  .sterilizer-rows td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--st-muted);
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+  .sterilizer-rows td.row-actions {
+    display: flex;
+    grid-column: 1 / -1;
+  }
+  .sterilizer-rows td.row-actions::before {
+    content: none;
+  }
+}
+
+.load-details {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  border-radius: 14px;
+  background: var(--c-white);
+  box-shadow: 0 18px 50px rgb(15 35 43 / 25%);
+}
+.load-details > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.load-details > header h3 {
+  margin: 0;
+  font-size: 17px;
+}
+.load-details > header p {
+  margin: 4px 0 0;
   color: var(--st-muted);
+  font-size: 13px;
+}
+.load-details-body {
+  overflow-y: auto;
+  padding: 12px 18px;
+}
+.load-details-body h4 {
+  margin: 14px 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+}
+.load-details-items,
+.load-details-items ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.load-details-items > li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.load-details-item {
+  display: grid;
+  grid-template-columns: 20px 100px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.load-details-item small {
+  color: var(--st-muted);
+}
+.load-details-items details {
+  margin: 6px 0 0 30px;
+  font-size: 12.5px;
+}
+.load-details-items details summary {
+  cursor: pointer;
+  color: var(--st-teal);
+  font-weight: 600;
+}
+.load-details-items details ul {
+  display: grid;
+  gap: 2px;
+  padding: 6px 0 0 4px;
+  color: var(--st-muted);
+}
+.load-details > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--c-gray-95);
+}
+
+/* Sterilizers & Devices on one screen (modules/devices/EquipmentPage.tsx): what the rows add to the load rows. */
+.equipment-rows .row-phase.idle {
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+}
+.equipment-rows tr.free > td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-gray-90-2);
+}
+.equipment-rows tr.out > td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-red-45);
+}
+.equipment-rows tr.out .row-name b {
+  color: var(--st-muted);
+}
+.equipment-rows .row-phase.out {
+  background: var(--c-red-95, var(--c-amber-95));
+  color: var(--c-red-40);
+}
+.equipment-rows .row-trouble {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.equipment-rows .row-trouble.attention {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-red-40);
+}
+.equipment-page .equipment-kpis {
+  margin-bottom: 12px;
+}
+/* The page of a piece of equipment: the content area does not scroll, so this page does, and it is compact:
+   the facts in a strip, the load and the history side by side, the device's cycles across the width. */
+.asset-detail-workspace.equipment-detail-workspace {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+}
+.equipment-detail-workspace .equipment-detail-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+.equipment-detail-workspace .equipment-facts-card,
+.equipment-detail-workspace .equipment-wide {
+  grid-column: 1 / -1;
+}
+/* The load and the history stay short (they scroll inside); the device's cycles take the rest of the height. */
+.equipment-detail-workspace .equipment-top {
+  min-height: 0;
+}
+.equipment-detail-workspace .equipment-top .asset-section-body {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.equipment-detail-workspace .equipment-cycles {
+  display: flex;
+  flex-direction: column;
+  min-height: 240px;
+}
+.equipment-detail-workspace .equipment-cycles .asset-section-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.equipment-detail-workspace .equipment-cycles .devices-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+.equipment-detail-workspace .asset-section-head {
+  padding-top: 10px;
+  padding-bottom: 6px;
+}
+.equipment-detail-workspace .asset-section-body {
+  padding-top: 6px;
+  padding-bottom: 10px;
+}
+.equipment-detail-workspace .equipment-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 18px;
+  margin: 0;
+}
+.equipment-detail-workspace .equipment-facts div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.equipment-detail-workspace .equipment-facts dt {
+  color: var(--st-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.equipment-detail-workspace .equipment-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+@media (max-width: 1100px) {
+  .equipment-detail-workspace .equipment-detail-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.equipment-detail-workspace .asset-section-head h2 .device-sim-badge {
+  margin-left: 10px;
+  vertical-align: middle;
+}
+.equipment-detail-workspace .equipment-open-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  color: var(--st-teal);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.equipment-detail-workspace .equipment-open-link:hover {
+  background: var(--c-gray-100-2);
+}
+.equipment-detail-workspace .equipment-out {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-red-45);
+  border-radius: 10px;
+  color: var(--c-red-40);
+}
+.equipment-detail-workspace .equipment-out small {
+  display: block;
+  color: var(--st-muted);
+}
+.equipment-detail-workspace .equipment-attention {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--c-amber-95);
+  color: var(--c-red-40);
+  font-size: 12px;
+  font-weight: 700;
+}
+.equipment-detail-workspace .equipment-trouble {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.equipment-detail-workspace .equipment-trouble li {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+}
+.equipment-detail-workspace .equipment-trouble small {
+  color: var(--st-muted);
+}
+.out-of-service-dialog .notice-choice {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 10px 0;
+}
+.equipment-rows .row-connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--c-green-45);
+  font-weight: 600;
+}
+.equipment-rows td .device-sim-badge {
+  margin-left: 6px;
+}
+
+.equipment-rows td.num span {
+  display: block;
+  font-weight: 600;
+}
+.sterilizer-rows .row-actions-inner {
+  flex-wrap: nowrap;
+}
+.sterilizer-rows .release-reprocess {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-red-85);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-red-45);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.sterilizer-rows .release-reprocess:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sterilizer-rows .row-actions .primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .sterilizer-rows .row-actions-inner {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }

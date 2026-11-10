@@ -371,7 +371,11 @@ async function main() {
     await step('The cycle ends and passes', async () => {
       const {page} = sterilization;
       await queue('Αποδέσμευση');
-      await page.getByRole('button', {name: 'Τέλος κύκλου · 1'}).click();
+      // The row of this load (the sample hospital has another load in the sterilizer).
+      await page
+        .locator('.sterilizer-rows tbody tr', {hasText: 'E2E-0001'})
+        .getByRole('button', {name: 'Τέλος κύκλου', exact: true})
+        .click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'AWAITING_RELEASE', 'state saved');
       const cycle = db.sterilization_cycles.find(c => c.asset_id === setId && c.cycle_number === 'E2E-0001');

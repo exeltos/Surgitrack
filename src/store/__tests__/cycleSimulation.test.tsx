@@ -113,6 +113,32 @@ describe('a simulated sterilizer cycle', () => {
     expect(sent).not.toHaveBeenCalled();
   });
 
+  it('ends by itself when the simulated cycle ends: a passed one goes to release', () => {
+    vi.useFakeTimers({toFake: ['Date', 'setInterval', 'clearInterval']});
+    vi.setSystemTime(new Date('2026-11-09T10:00:00'));
+    const f = setup();
+    f.run(() => f.s().startCycleSimulation(f.load.id, 'PASS'));
+    // Half a minute in: still running, nothing happens.
+    f.run(() => vi.advanceTimersByTime(30_000));
+    expect(f.current().status).toBe('OPEN');
+    // Past its end (a minute): it has ended without anyone pressing «Τέλος κύκλου».
+    f.run(() => vi.advanceTimersByTime(40_000));
+    expect(f.current().status).toBe('AWAITING_RELEASE');
+    expect(f.current().cycleData?.result).toBe('PASS');
+    expect(f.s().tools.find(t => t.id === f.asset.id)!.state).toBe('AWAITING_RELEASE');
+  });
+
+  it('a simulated cycle that fails sends the load back to reprocessing by itself', () => {
+    vi.useFakeTimers({toFake: ['Date', 'setInterval', 'clearInterval']});
+    vi.setSystemTime(new Date('2026-11-09T10:00:00'));
+    const f = setup();
+    f.run(() => f.s().startCycleSimulation(f.load.id, 'LOW_PRESSURE'));
+    f.run(() => vi.advanceTimersByTime(70_000));
+    expect(f.current().status).toBe('FAILED');
+    expect(f.current().cycleData?.result).toBe('FAIL');
+    expect(f.s().tools.find(t => t.id === f.asset.id)!.state).not.toBe('AWAITING_RELEASE');
+  });
+
   it('does not start twice', () => {
     const f = setup();
     f.run(() => f.s().startCycleSimulation(f.load.id, 'PASS'));

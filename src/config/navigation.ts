@@ -9,12 +9,12 @@ import {
   Building2,
   Hospital,
   LayoutDashboard,
-  Cable,
   Trash2,
   CalendarClock,
   ScanSearch,
   Scissors,
   Gauge,
+  Flame,
   Users,
   FlaskConical,
   FileSpreadsheet,
@@ -58,6 +58,7 @@ export type NavigationItem = {
 
 const assetNavigation: NavigationItem[] = [
   {to: '/sterilization', label: 'Αποστείρωση', icon: Sparkles, permission: 'sterilization.workspace', group: 'WORK'},
+  {to: '/sterilizers', label: 'Κλίβανοι & Συσκευές', icon: Flame, permission: 'sterilization.workspace', group: 'WORK'},
   {to: '/issues', label: 'Εκκρεμότητες', icon: TriangleAlert, permission: 'issue.view', group: 'WORK'},
   {to: '/expiry', label: 'Λήξεις', icon: CalendarClock, permission: 'asset.registry.view', group: 'WORK'},
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view', group: 'EQUIPMENT'},
@@ -71,7 +72,6 @@ const assetNavigation: NavigationItem[] = [
   },
   {to: '/standalone-tools', label: 'Μεμονωμένα', icon: Scissors, permission: 'asset.registry.view', group: 'EQUIPMENT'},
   {to: '/stock', label: 'Απόθεμα εργαλείων', icon: Warehouse, permission: 'stock.manage', group: 'EQUIPMENT'},
-  {to: '/devices', label: 'Συσκευές', icon: Cable, permission: 'sterilization.workspace', group: 'EQUIPMENT'},
   {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view', group: 'INSIGHT'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view', group: 'INSIGHT'},
   {

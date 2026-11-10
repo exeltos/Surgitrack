@@ -1,4 +1,4 @@
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {PlatformNotice} from '../../../data/cloud/platformNotices';
 
@@ -33,6 +33,8 @@ const promo = (over: Partial<PlatformNotice>): PlatformNotice => ({
 
 beforeEach(() => {
   localStorage.clear();
+  // The cards, with the promotion already shown once in front of the screen.
+  localStorage.setItem('surgitrack-promos-seen', JSON.stringify(['p1']));
   state.mode = 'PRODUCTION';
   state.promos = [];
   state.asked = [];
@@ -49,6 +51,16 @@ describe("the owner's promotions on the administrator's Overview", () => {
     expect(link).toHaveAttribute('target', '_blank');
     expect(link.getAttribute('rel')).toContain('noopener');
     expect(state.asked).toEqual(['PROMO']);
+  });
+
+  it('shows the picture of the product, and the icon if it cannot be loaded', async () => {
+    state.promos = [promo({imageUrl: 'https://example.com/p.png'})];
+    const {container} = render(<PromoCards />);
+    await screen.findByRole('heading', {name: 'Προϊόν Χ'});
+    const image = container.querySelector('img.promo-image') as HTMLImageElement;
+    expect(image).toHaveAttribute('src', 'https://example.com/p.png');
+    fireEvent.error(image);
+    expect(container.querySelector('img.promo-image')).toBeNull();
   });
 
   it('shows no link that is not https', async () => {
@@ -75,5 +87,41 @@ describe("the owner's promotions on the administrator's Overview", () => {
     render(<PromoCards />);
     expect(state.asked).toEqual([]);
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
+
+  it('opens a new promotion once in front of the screen, with its picture and button', async () => {
+    localStorage.removeItem('surgitrack-promos-seen');
+    state.promos = [promo({imageUrl: 'https://example.com/p.png'})];
+    const {unmount} = render(<PromoCards />);
+    const dialog = await screen.findByRole('dialog', {name: 'Προϊόν Χ'});
+    expect(dialog.querySelector('img')).toHaveAttribute('src', 'https://example.com/p.png');
+    expect(within(dialog).getByRole('link', {name: /Δείτε/})).toHaveAttribute('href', 'https://example.com/x');
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Κλείσιμο'}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // Still a card on the Overview, and not in front of the screen again.
+    expect(screen.getByRole('heading', {name: 'Προϊόν Χ'})).toBeInTheDocument();
+    unmount();
+    render(<PromoCards />);
+    await screen.findByRole('heading', {name: 'Προϊόν Χ'});
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('opens a promotion again from its card, with the picture on the side and the PDF', async () => {
+    state.promos = [
+      promo({
+        imageUrl: 'https://example.com/p.png',
+        imageLayout: 'RIGHT',
+        attachmentUrl: 'https://example.com/f.pdf',
+        attachmentName: 'Τιμοκατάλογος.pdf',
+      }),
+    ];
+    render(<PromoCards />);
+    await screen.findByRole('heading', {name: 'Προϊόν Χ'});
+    expect(screen.getByRole('link', {name: /Τιμοκατάλογος/})).toHaveAttribute('href', 'https://example.com/f.pdf');
+    fireEvent.click(screen.getByRole('button', {name: /Προβολή/}));
+    const dialog = screen.getByRole('dialog', {name: 'Προϊόν Χ'});
+    expect(dialog).toHaveClass('layout-right');
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Κλείσιμο'}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

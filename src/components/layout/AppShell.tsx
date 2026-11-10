@@ -10,6 +10,8 @@ import {
   Home,
   LogOut,
   Menu,
+  Pin,
+  PinOff,
   Minus,
   Plus,
   ScanBarcode,
@@ -51,7 +53,6 @@ import {briefingDue} from './briefingDue';
 import {hasScreenGuide} from './guidedScreens';
 import {APP_VERSION} from '../../config/appMeta';
 import {tr} from '../../i18n';
-import {useHasModule} from '../../data/cloud/modulesContext';
 import {useListMemory} from '../../core/listMemory';
 import {lazyPage} from '../../core/resilience';
 import {formatDate, formatTime} from '../../core/displayDate';
@@ -140,6 +141,23 @@ export default function AppShell({
   const {lang, setLang, fontScale, setFontScale, highContrast, setHighContrast, reducedMotion, setReducedMotion} =
     useAppPreferences();
   const [mobileOpen, setMobileOpen] = useState(false);
+  // The menu is open (pinned) or a thin rail of icons; the choice stays on this device.
+  const [pinned, setPinned] = useState(() => {
+    try {
+      return window.localStorage.getItem('surgitrack-menu-pinned') !== 'no';
+    } catch {
+      return true;
+    }
+  });
+  const togglePinned = () => {
+    const next = !pinned;
+    setPinned(next);
+    try {
+      window.localStorage.setItem('surgitrack-menu-pinned', next ? 'yes' : 'no');
+    } catch {
+      // Private mode: the choice lasts until the page reloads.
+    }
+  };
   const [a11y, setA11y] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -180,7 +198,6 @@ export default function AppShell({
   const location = useLocation();
   const contentRef = useRef<HTMLElement>(null);
   useListMemory(contentRef);
-  const withDevices = useHasModule('DEVICES');
   const isDemo = getRuntimeDataMode() === 'DEMO';
   // The platform admin belongs to no hospital, so outside Demo only Studio has anything to show.
   const platformOnly = isPlatformOnly();
@@ -216,8 +233,6 @@ export default function AppShell({
       : navigationFor(role, can)
   )
     .filter(item => item.to !== '/hospital' || hospitalAdmin)
-    // Devices is a module the platform owner gives a hospital.
-    .filter(item => item.to !== '/devices' || withDevices)
     // The list of all hospitals is the platform admin's, outside Demo.
     .filter(item => item.to !== '/studio?tab=platform' || actingAsPlatformOwner())
     // So are the Sterilization flow, the roles & permissions and the settings: a hospital admin works within them.
@@ -316,6 +331,32 @@ export default function AppShell({
           <span>Trace Every Instrument</span>
         </div>
         <button
+          type="button"
+          className="icon-btn sidebar-pin"
+          onClick={togglePinned}
+          aria-pressed={pinned}
+          aria-label={
+            pinned
+              ? lang === 'el'
+                ? 'Μάζεμα του μενού'
+                : 'Collapse the menu'
+              : lang === 'el'
+                ? 'Καρφίτσωμα του μενού'
+                : 'Pin the menu open'
+          }
+          title={
+            pinned
+              ? lang === 'el'
+                ? 'Μάζεμα του μενού'
+                : 'Collapse the menu'
+              : lang === 'el'
+                ? 'Καρφίτσωμα του μενού'
+                : 'Pin the menu open'
+          }
+        >
+          {pinned ? <PinOff size={16} /> : <Pin size={16} />}
+        </button>
+        <button
           className="icon-btn mobile-sidebar-close"
           onClick={() => setMobileOpen(false)}
           aria-label={lang === 'el' ? 'Κλείσιμο μενού' : 'Close menu'}
@@ -343,11 +384,13 @@ export default function AppShell({
                 to={item.to}
                 end
                 onClick={() => setMobileOpen(false)}
+                // In the thin rail only the icon shows: the name is the tooltip.
+                title={lang === 'en' ? navEN[item.label] || item.label : item.label}
                 // The link's own match ignores the query, which would light every Studio section at once.
                 className={() => (active ? 'nav-item active' : 'nav-item')}
               >
                 <item.icon size={18} />
-                <span>{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
+                <span className="nav-label">{lang === 'en' ? navEN[item.label] || item.label : item.label}</span>
                 {item.to === '/hospital' && accessRequests > 0 && <em className="nav-badge">{accessRequests}</em>}
               </NavLink>
             );
@@ -384,7 +427,7 @@ export default function AppShell({
   );
   return (
     <div
-      className={`app-shell ${assetDetailMode ? 'asset-focus-shell' : ''} ${departmentMode ? 'department-shell' : ''}`}
+      className={`app-shell ${assetDetailMode ? 'asset-focus-shell' : ''} ${departmentMode ? 'department-shell' : ''}${pinned ? '' : ' menu-rail'}`}
     >
       {sidebar}
       {mobileOpen && <button className="mobile-sidebar-backdrop" onClick={() => setMobileOpen(false)} />}
