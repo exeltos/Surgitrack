@@ -36,6 +36,7 @@ import {
 import {formatDateTime} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {useLibraries} from '../../core/LibraryStore';
+import {testsState} from '../../core/equipmentTests';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
@@ -92,6 +93,17 @@ export function useLoadActions(
     );
     if (outOfService) {
       notify(tr('Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.', outOfService.el), true);
+      return;
+    }
+    // A sterilizer whose latest test failed is not loaded until a passing one is recorded.
+    const failedTest =
+      payload.kind === 'STERILIZATION' &&
+      sterilizerList.find(item => item.el === payload.equipment.trim() && testsState(item.tests) === 'FAILED');
+    if (failedTest) {
+      notify(
+        tr('Ο κλίβανος «{0}» έχει αποτυχημένη δοκιμή: καταγράψτε επιτυχή δοκιμή για να φορτωθεί.', failedTest.el),
+        true,
+      );
       return;
     }
     const refs = payload.assetRefs

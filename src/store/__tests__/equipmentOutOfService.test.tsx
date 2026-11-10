@@ -74,4 +74,29 @@ describe('a sterilizer taken out of service', () => {
     f.run(() => f.s().libs.updateItem('sterilizers', sterilizer.id, {outOfService: undefined}));
     expect(f.run(load)).toBeDefined();
   });
+
+  it('is not loaded while its latest test failed, and is loaded again after a passing one', () => {
+    const f = setup();
+    const sterilizer = f.s().libs.sterilizers[0];
+    const test = (result: 'PASS' | 'FAIL', id: string) => ({
+      id,
+      kind: 'BOWIE_DICK' as const,
+      result,
+      at: '10/11/2026 07:30',
+      by: 'Τ',
+    });
+    const load = () =>
+      f.s().createProcessLoad({
+        kind: 'STERILIZATION',
+        assetRefs: f.ref,
+        equipment: sterilizer.el,
+        cycleNumber: 'S-2',
+        program: '134°C · 5 min',
+        chemicalIndicatorResult: 'PASS',
+      });
+    f.run(() => f.s().libs.updateItem('sterilizers', sterilizer.id, {tests: [test('FAIL', 't1')]}));
+    expect(f.run(load)).toBeUndefined();
+    f.run(() => f.s().libs.updateItem('sterilizers', sterilizer.id, {tests: [test('PASS', 't2'), test('FAIL', 't1')]}));
+    expect(f.run(load)).toBeDefined();
+  });
 });

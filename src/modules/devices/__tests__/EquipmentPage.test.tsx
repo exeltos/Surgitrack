@@ -259,4 +259,26 @@ describe('Sterilizers & Devices, one screen', () => {
     expect(await screen.findByText('ΚΛΙΒΑΝΟΣ 2')).toBeInTheDocument();
     expect(screen.queryByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 1'})).not.toBeInTheDocument();
   });
+
+  it('records a failed test of a sterilizer, which shows in its row', async () => {
+    open();
+    const card = await details('ΚΛΙΒΑΝΟΣ 2');
+    const bowie = within(card).getByText('Bowie-Dick').closest('tr') as HTMLElement;
+    fireEvent.click(within(bowie).getByRole('button', {name: 'Καταγραφή'}));
+    const dialog = await screen.findByRole('dialog', {name: 'Καταγραφή δοκιμής'});
+    fireEvent.click(within(dialog).getByRole('radio', {name: 'Αποτυχία'}));
+    fireEvent.change(within(dialog).getByLabelText(/Σημείωση/), {target: {value: 'Δείκτης ανοιχτός'}});
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Καταγραφή'}));
+    expect(lib.updateItem).toHaveBeenCalledWith(
+      'sterilizers',
+      'st2',
+      expect.objectContaining({
+        tests: [
+          expect.objectContaining({kind: 'BOWIE_DICK', result: 'FAIL', note: 'Δείκτης ανοιχτός', by: 'ΔΙΑΧΕΙΡΙΣΤΗΣ'}),
+        ],
+      }),
+    );
+    fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
+    expect(within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('Απέτυχε')).toBeInTheDocument();
+  });
 });

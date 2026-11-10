@@ -2079,6 +2079,59 @@ html body .batch-department button.clear:hover {
   background: var(--c-red-95, var(--c-amber-95));
   color: var(--c-red-40);
 }
+.equipment-rows .row-test {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.equipment-rows .row-test.ok {
+  background: var(--c-green-90);
+  color: var(--c-green-45);
+}
+.equipment-rows .row-test.due {
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+}
+.equipment-rows .row-test.bad {
+  background: var(--c-amber-95);
+  color: var(--c-red-40);
+}
+.equipment-detail-workspace .equipment-tests {
+  width: 100%;
+  border-collapse: collapse;
+}
+.equipment-detail-workspace .equipment-tests th {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--c-gray-90-3);
+  color: var(--st-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.equipment-detail-workspace .equipment-tests td {
+  padding: 8px;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.equipment-detail-workspace .equipment-tests td small {
+  display: block;
+  color: var(--st-muted);
+  font-size: 11.5px;
+}
+.equipment-detail-workspace .equipment-test-bad {
+  color: var(--c-red-40);
+}
+.equipment-detail-workspace .equipment-test-due {
+  color: var(--c-orange-40);
+}
+.load-test-due {
+  color: var(--c-orange-40);
+  font-weight: 600;
+}
 .equipment-rows .row-trouble {
   display: inline-flex;
   align-items: center;
@@ -2092,6 +2145,10 @@ html body .batch-department button.clear:hover {
 }
 .equipment-page .equipment-kpis {
   margin-bottom: 12px;
+}
+/* One line under the actions is enough: the card below has its own border. */
+.equipment-detail-workspace .asset-workbench-actions {
+  border-bottom: 0;
 }
 /* The page of a piece of equipment: the content area does not scroll, so this page does, and it is compact:
    the facts in a strip, the load and the history side by side, the device's cycles across the width. */

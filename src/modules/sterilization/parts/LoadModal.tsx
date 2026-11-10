@@ -3,6 +3,7 @@ import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import {useLibraries} from '../../../core/LibraryStore';
+import {testsInUse, testsState} from '../../../core/equipmentTests';
 import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {deviceNote} from '../sterilizationTypes';
@@ -83,11 +84,20 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   {equipmentList.length ? (
                     <select value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)}>
                       {equipmentList.map(item => (
-                        <option key={item.id} value={item.el} disabled={!!item.outOfService}>
+                        <option
+                          key={item.id}
+                          value={item.el}
+                          disabled={
+                            !!item.outOfService ||
+                            (loadModal === 'STERILIZATION' && testsState(item.tests) === 'FAILED')
+                          }
+                        >
                           {trData(item.el)}
                           {item.outOfService
                             ? ` · ${item.outOfService.reason === 'BREAKDOWN' ? tr('σε βλάβη') : tr('σε συντήρηση')}`
-                            : ''}
+                            : loadModal === 'STERILIZATION' && testsState(item.tests) === 'FAILED'
+                              ? ` · ${tr('αποτυχημένη δοκιμή')}`
+                              : ''}
                         </option>
                       ))}
                       {!equipmentList.some(item => item.el === loadEquipment) && (
@@ -97,6 +107,14 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   ) : (
                     <input value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)} />
                   )}
+                  {loadModal === 'STERILIZATION' &&
+                    testsInUse(equipmentList) &&
+                    testsState(equipmentList.find(item => item.el === loadEquipment)?.tests) === 'DUE' && (
+                      <small className="load-test-due">
+                        <TriangleAlert size={13} aria-hidden="true" />{' '}
+                        {tr('Εκκρεμεί δοκιμή του κλιβάνου (Κλίβανοι & Συσκευές).')}
+                      </small>
+                    )}
                 </label>
                 <label>
                   {tr('Αριθμός κύκλου / φορτίου')}
