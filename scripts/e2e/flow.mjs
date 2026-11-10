@@ -416,6 +416,13 @@ async function main() {
           }
       }
       await page.setViewportSize({width: 1440, height: 900});
+      // The «Report κύκλου» button (there when the cycle has readings) sits next to «Έντυπο», not in the middle.
+      const prints = modal.locator('.release-actions .release-print');
+      await prints.first().evaluate(el => el.after(el.cloneNode(true)));
+      const [first, copy] = await Promise.all([prints.nth(0).boundingBox(), prints.nth(1).boundingBox()]);
+      await prints.nth(1).evaluate(el => el.remove());
+      if (!first || !copy || copy.x - (first.x + first.width) > 30)
+        throw new Error('the Report button is not next to the Print button in the release dialog');
       // A long load: its content list scrolls inside its own box with the wheel, and does not stretch the dialog.
       const manifest = modal.locator('.load-manifest');
       const dialogBefore = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
