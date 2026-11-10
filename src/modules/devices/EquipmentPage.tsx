@@ -6,8 +6,6 @@ import {
   FlaskConical,
   Hourglass,
   ListTree,
-  Maximize2,
-  Minimize2,
   Plus,
   Power,
   TriangleAlert,
@@ -94,7 +92,6 @@ export default function EquipmentPage() {
   const [keyFor, setKeyFor] = useState<{device: Device; key?: string; busy?: boolean}>();
   const [fileFor, setFileFor] = useState<Device>();
   const [serialFor, setSerialFor] = useState<Device>();
-  const [full, setFull] = useState(false);
 
   const load = useCallback(async () => {
     if (!organizationId || !withDevices) return;
@@ -116,15 +113,6 @@ export default function EquipmentPage() {
   useEffect(() => {
     void load();
   }, [load]);
-  useEffect(() => {
-    const sync = () => setFull(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', sync);
-    return () => document.removeEventListener('fullscreenchange', sync);
-  }, []);
-  const toggleFull = () => {
-    if (document.fullscreenElement) void document.exitFullscreen();
-    else void document.documentElement.requestFullscreen?.();
-  };
 
   const sterilizerLoads = processLoads.filter(l => l.kind === 'STERILIZATION');
   const running = sterilizerLoads.filter(l => l.status === 'OPEN');
@@ -276,9 +264,6 @@ export default function EquipmentPage() {
         }
         actions={
           <div className="devices-head-actions">
-            <AppButton onClick={toggleFull} icon={full ? <Minimize2 size={16} /> : <Maximize2 size={16} />}>
-              {full ? L('Έξοδος από πλήρη οθόνη', 'Exit full screen') : L('Πλήρης οθόνη', 'Full screen')}
-            </AppButton>
             {devicesEnabled && (
               <AppButton onClick={() => void load()} disabled={loading}>
                 <RefreshCcw size={15} />

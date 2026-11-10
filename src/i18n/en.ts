@@ -2236,8 +2236,6 @@ export const en: Record<string, string> = {
   'Ελάχιστη πίεση {0} bar': 'Minimum pressure {0} bar',
   Πρόοδος: 'Progress',
   '{0} εργαλεία μέσα στο σετ': '{0} instruments in the Set',
-  'Πλήρης οθόνη': 'Full screen',
-  'Έξοδος από πλήρη οθόνη': 'Exit full screen',
   Απομένουν: 'Remaining',
   'Τελευταίος κύκλος': 'Last cycle',
   'Δεν έχουν οριστεί κλίβανοι': 'No sterilizers are set',
