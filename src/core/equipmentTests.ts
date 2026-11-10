@@ -1,4 +1,5 @@
-import {parseDisplayDate} from './displayDate';
+import {formatDateTime, parseDisplayDate} from './displayDate';
+import type {Device, DeviceReading} from './deviceData';
 import type {EquipmentTest, EquipmentTestKind} from './libraries';
 
 /** Each test, how often it is due, and what it is called. A day is the calendar day; a week is seven days. */
@@ -99,3 +100,38 @@ export function withTest(tests: readonly EquipmentTest[] = [], test: EquipmentTe
 /** Whether the hospital records tests at all (any sterilizer has one): only then are missing tests pointed out. */
 export const testsInUse = (list: ReadonlyArray<{tests?: readonly EquipmentTest[]}>) =>
   list.some(item => !!item.tests?.length);
+
+/**
+ * The results the test devices linked to a sterilizer (a 3M or other Bowie-Dick tester, a spore reader) sent that are
+ * not among its tests yet, as tests, with the tests it would have then. Nothing when there is nothing new. `skip` are
+ * the results already being saved.
+ */
+export function testsFromDevices(
+  sterilizer: {el: string; tests?: EquipmentTest[]},
+  devices: readonly Device[],
+  readings: readonly DeviceReading[],
+  skip: ReadonlySet<string> = new Set(),
+): {tests: EquipmentTest[]; ids: string[]} | undefined {
+  const linked = devices.filter(device => device.kind === 'TEST' && device.testsEquipment === sterilizer.el);
+  if (!linked.length) return undefined;
+  const known = new Set((sterilizer.tests || []).map(test => test.id));
+  const fresh = readings
+    .filter(reading => linked.some(device => device.id === reading.deviceId) && reading.result !== 'UNKNOWN')
+    .map(reading => ({reading, kind: testKindOfProgram(reading.program), id: `dev-${reading.id}`}))
+    .filter(item => item.kind && !known.has(item.id) && !skip.has(item.id))
+    .sort((a, b) =>
+      (a.reading.startedAt || a.reading.createdAt).localeCompare(b.reading.startedAt || b.reading.createdAt),
+    );
+  if (!fresh.length) return undefined;
+  let tests = sterilizer.tests || [];
+  for (const item of fresh)
+    tests = withTest(tests, {
+      id: item.id,
+      kind: item.kind!,
+      result: item.reading.result === 'PASS' ? 'PASS' : 'FAIL',
+      at: formatDateTime(item.reading.startedAt || item.reading.endedAt || item.reading.createdAt),
+      by: linked.find(device => device.id === item.reading.deviceId)?.name || '',
+      note: item.reading.program,
+    });
+  return {tests, ids: fresh.map(item => item.id)};
+}

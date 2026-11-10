@@ -365,6 +365,21 @@ export function useLoadActions(
       biologicalIndicator: 'OPTIONAL' as const,
       allowReleaseWhileBiPending: false,
     };
+    // A load is not released while the latest test of its sterilizer failed.
+    const failedSterilizer = sterilizerList.find(
+      item => item.el === load.equipment && testsState(item.tests) === 'FAILED',
+    );
+    if (payload.decision === 'RELEASED' && failedSterilizer) {
+      notify(
+        tr(
+          'Το φορτίο {0} δεν αποδεσμεύτηκε: ο κλίβανος «{1}» έχει αποτυχημένη δοκιμή.',
+          named(loadId),
+          failedSterilizer.el,
+        ),
+        true,
+      );
+      return undefined;
+    }
     const chemical = payload.chemicalIndicatorResult ?? (payload.chemicalIndicatorOk ? 'PASS' : 'NOT_RECORDED');
     const canRelease =
       payload.physicalParametersOk &&

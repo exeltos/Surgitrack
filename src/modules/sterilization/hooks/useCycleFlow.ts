@@ -1,5 +1,7 @@
 import type {Asset} from '../../../types/domain';
 import {releaseIndicatorVerdict} from '../../../core/releaseIndicators';
+import {useLibraries} from '../../../core/LibraryStore';
+import {testsState} from '../../../core/equipmentTests';
 import type {Kind} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
 import type {useSterilizationQueues} from './useSterilizationQueues';
@@ -73,8 +75,16 @@ export function useCycleFlow(
     allowReleaseWhileBiPending: false,
   };
   const releaseVerdict = releaseIndicatorVerdict(releasePolicy, releaseLoadChem, releaseLoadBi);
+  // A sterilizer whose latest test failed does not release (the load goes back to reprocessing).
+  const {sterilizers} = useLibraries();
+  const testsFailed =
+    !!selectedReleaseLoad &&
+    testsState(sterilizers.find(item => item.el === selectedReleaseLoad.equipment)?.tests) === 'FAILED';
   const releaseLoadReady =
-    releaseLoadChecks.physicalParametersOk && releaseLoadChecks.packagingIntegrityOk && releaseVerdict.ok;
+    releaseLoadChecks.physicalParametersOk &&
+    releaseLoadChecks.packagingIntegrityOk &&
+    releaseVerdict.ok &&
+    !testsFailed;
   const latestPassedCycle = (assetId: string) =>
     sterilizationCycles.find(c => c.assetId === assetId && c.result === 'PASSED');
   const moveToProcess = (kind: Kind, id: string) => {

@@ -22,7 +22,7 @@ import KpiStrip from '../../components/ui/KpiStrip';
 import {equipmentTrouble} from '../../core/equipmentHealth';
 import OutOfServiceDialog from './OutOfServiceDialog';
 import TestDialog from './TestDialog';
-import {TEST_KINDS, testKindOfProgram, testsInUse, testsState, withTest} from '../../core/equipmentTests';
+import {TEST_KINDS, testsFromDevices, testsInUse, testsState, withTest} from '../../core/equipmentTests';
 import type {EquipmentTest} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -188,32 +188,12 @@ export default function EquipmentPage() {
     if (!canRecord || loading) return;
     for (const row of rows) {
       if (row.kind !== 'STERILIZER' || !row.libraryKey || !row.libraryId) continue;
-      const linked = devices.filter(d => d.kind === 'TEST' && d.testsEquipment === row.name);
-      if (!linked.length) continue;
-      const known = new Set((row.tests || []).map(test => test.id));
-      const fresh = readings
-        .filter(r => linked.some(d => d.id === r.deviceId) && r.result !== 'UNKNOWN')
-        .map(r => ({reading: r, kind: testKindOfProgram(r.program), id: `dev-${r.id}`}))
-        .filter(item => item.kind && !known.has(item.id) && !importedTests.current.has(item.id))
-        .sort((a, b) =>
-          (a.reading.startedAt || a.reading.createdAt).localeCompare(b.reading.startedAt || b.reading.createdAt),
-        );
-      if (!fresh.length) continue;
-      fresh.forEach(item => importedTests.current.add(item.id));
-      let next = row.tests;
-      for (const item of fresh) {
-        next = withTest(next, {
-          id: item.id,
-          kind: item.kind!,
-          result: item.reading.result === 'PASS' ? 'PASS' : 'FAIL',
-          at: formatDateTime(item.reading.startedAt || item.reading.endedAt || item.reading.createdAt),
-          by: linked.find(d => d.id === item.reading.deviceId)?.name || '',
-          note: item.reading.program,
-        });
-      }
-      void updateEquipment(row.libraryKey, row.libraryId, {tests: next}).catch(() => {
+      const found = testsFromDevices({el: row.name, tests: row.tests}, devices, readings, importedTests.current);
+      if (!found) continue;
+      found.ids.forEach(id => importedTests.current.add(id));
+      void updateEquipment(row.libraryKey, row.libraryId, {tests: found.tests}).catch(() => {
         // Tried again the next time the page is opened.
-        fresh.forEach(item => importedTests.current.delete(item.id));
+        found.ids.forEach(id => importedTests.current.delete(id));
       });
     }
   }, [rows, devices, readings, canRecord, loading, updateEquipment]);

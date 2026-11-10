@@ -2189,6 +2189,22 @@ html body .batch-department button.clear:hover {
   background: var(--c-amber-95);
   color: var(--c-red-40);
 }
+.release-tests {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+}
+.release-tests .receipt-section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.release-tests .release-indicator-hint.bad {
+  color: var(--c-red-40);
+}
 .ster-tests-message {
   margin: 0;
   color: var(--c-green-45);
