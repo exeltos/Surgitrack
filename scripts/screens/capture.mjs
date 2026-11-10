@@ -439,7 +439,7 @@ async function main() {
       let list;
       if (role === 'PLATFORM') {
         // The platform owner outside any hospital: Studio and the hospital list.
-        list = ['/studio', '/studio?tab=NOTICES', '/hospitals', '/hospital'];
+        list = ['/studio', '/studio?tab=NOTICES', '/studio?tab=SECURITY', '/hospitals', '/hospital'];
       } else {
         const allowed = new Set(seed.permissions[role]);
         list = routes.filter(r => allowed.has(r.permission)).map(r => r.path);

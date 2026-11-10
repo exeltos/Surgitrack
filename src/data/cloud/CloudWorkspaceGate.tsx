@@ -26,6 +26,7 @@ import {setSampleDataMark} from '../../core/sampleDataMark';
 import {setPhotoStorageOrganization} from './photoStorage';
 import {setErrorReportingOrganization} from './errorReporting';
 import {checkIpAccess, turnedAway} from './ipAccess';
+import {PRESENCE_MINUTE, touchPresence} from './presence';
 
 export type CloudWorkspace = {
   organizationId: string;
@@ -234,6 +235,27 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
     return () => window.clearTimeout(timer);
   }, [trial, load, rearm]);
 
+  // Every minute the app says it is there (the owner sees who is connected); an address the owner blocked is turned away.
+  useEffect(() => {
+    if (status !== 'ready' || !workspace || getRuntimeDataMode() === 'DEMO') return;
+    let alive = true;
+    const beat = async () => {
+      const answer = await touchPresence();
+      if (alive && answer && !answer.allowed) {
+        setBlockedIp(answer.ip);
+        setStatus('network');
+      }
+    };
+    void beat();
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') void beat();
+    }, PRESENCE_MINUTE);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [status, workspace]);
+
   if (status === 'local') return <>{children(null)}</>;
   if (status === 'ready' && workspace)
     return (
@@ -385,8 +407,8 @@ function NetworkBlocked({lang, ip, onRetry}: {lang: 'el' | 'en'; ip?: string; on
       </strong>
       <p>
         {L(
-          'Συνδεθείτε από το δίκτυο ή το Wi-Fi του νοσοκομείου. Αν βρίσκεστε ήδη εκεί και βλέπετε αυτό το μήνυμα, ενημερώστε τον διαχειριστή του SurgiTrack.',
-          'Connect from the hospital network or Wi-Fi. If you are already there and still see this message, tell the SurgiTrack administrator.',
+          'Συνδεθείτε από το δίκτυο ή το Wi-Fi του νοσοκομείου. Αν βρίσκεστε ήδη εκεί και βλέπετε αυτό το μήνυμα (ή η διεύθυνσή σας έχει αποκλειστεί), ενημερώστε τον διαχειριστή του SurgiTrack.',
+          'Connect from the hospital network or Wi-Fi. If you are already there and still see this message (or your address has been blocked), tell the SurgiTrack administrator.',
         )}
       </p>
       {ip && (

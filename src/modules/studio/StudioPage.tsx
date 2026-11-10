@@ -19,6 +19,7 @@ import UsersTab from './tabs/UsersTab';
 import RolesTab from './tabs/RolesTab';
 import SystemTab from './tabs/SystemTab';
 import ErrorsTab from './tabs/ErrorsTab';
+import SecurityTab from './tabs/SecurityTab';
 import NoticesTab from './tabs/NoticesTab';
 import RatingsTab from './tabs/RatingsTab';
 
@@ -41,6 +42,10 @@ const SECTION_TEXT: Record<Tab, [string, string]> = {
     'Announcements and promotions to the users and the administrators of the hospitals.',
   ],
   ERRORS: ['Σφάλματα που συνάντησαν οι χρήστες στην εφαρμογή.', 'Errors users ran into in the app.'],
+  SECURITY: [
+    'Συνδεδεμένοι αυτή τη στιγμή με τη διεύθυνσή τους, και μπλοκάρισμα διευθύνσεων ή χρηστών.',
+    'Who is connected right now with their address, and blocking addresses or users.',
+  ],
   LIBRARIES: [
     'Οι κοινές λίστες με τις οποίες ξεκινά κάθε νέο νοσοκομείο.',
     'The shared lists every new hospital starts with.',
@@ -207,6 +212,7 @@ export default function StudioPage() {
         {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide /> : <RolesTab s={s} />}
         <SystemTab s={s} />
         <ErrorsTab s={s} />
+        <SecurityTab s={s} />
         <RatingsTab s={s} />
         <NoticesTab s={s} />
       </div>

@@ -1157,6 +1157,76 @@ html body .studio-errors-empty {
   background: var(--c-white);
   color: var(--st-muted);
 }
+/* Studio → Security (platform owner): who is connected, and the blocked addresses */
+html body .studio-security h3 {
+  margin: 8px 0 0;
+}
+html body .studio-security-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-security-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+html body .studio-security-table :is(th, td) {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--st-line);
+  text-align: left;
+  vertical-align: top;
+}
+html body .studio-security-table td small {
+  display: block;
+  color: var(--st-muted);
+}
+html body .studio-security-table tr.blocked {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+}
+html body .studio-security-flag {
+  color: var(--st-red);
+}
+html body .studio-security-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html body .studio-security-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+}
+html body .studio-security-add label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--st-muted);
+}
+html body .studio-security-add input {
+  height: 38px;
+  min-width: 220px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+}
+html body .studio-security-blocked > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+html body .studio-security-blocked small {
+  display: block;
+  color: var(--st-muted);
+}
 html body .studio-errors-list {
   display: grid;
   gap: 8px;

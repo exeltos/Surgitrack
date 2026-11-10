@@ -269,6 +269,7 @@ export function createDatabase(seed) {
         created_at: iso(-0.06),
       },
     ],
+    blocked_ips: [{ip: '198.51.100.44/32', note: 'Πολλές αποτυχημένες προσπάθειες', blocked_at: iso(-0.02)}],
     platform_settings: [
       {
         id: true,
@@ -561,6 +562,7 @@ const json = (status, body, headers = {}) => ({
   body: body === undefined ? '' : JSON.stringify(body),
 });
 
+const isoIn = days => new Date(Date.now() + days * 864e5).toISOString();
 const RPC = {
   claim_platform_admin: () => null,
   // The signed-in account is the platform owner when it is the PLATFORM one.
@@ -570,6 +572,52 @@ const RPC = {
   // Sign-in email and username of the hospital's people (admins; the Demo hospital has one).
   profile_contacts: db => db.profiles.map(p => ({id: p.id, email: p.email, user_code: p.user_code})),
   platform_list_departments: db => db.departments,
+  touch_presence: () => ({allowed: true}),
+  // The owner's security view: three people connected, two of them from the same address.
+  platform_active_sessions: () => [
+    {
+      user_id: 'u-sec-1',
+      name: 'Μαρία Παπαδοπούλου',
+      email: 'm.papadopoulou@example.test',
+      role: 'STERILIZATION',
+      organization_id: ORG_ID,
+      organization_name: 'Γενικό Νοσοκομείο Δοκιμής',
+      active: true,
+      ip: '203.0.113.5',
+      ip_blocked: false,
+      user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36',
+      first_seen: isoIn(-0.2),
+      last_seen: isoIn(-0.0002),
+    },
+    {
+      user_id: 'u-sec-2',
+      name: 'Νίκος Γεωργίου',
+      email: 'n.georgiou@example.test',
+      role: 'DEPARTMENT',
+      organization_id: ORG_ID,
+      organization_name: 'Γενικό Νοσοκομείο Δοκιμής',
+      active: true,
+      ip: '203.0.113.5',
+      ip_blocked: false,
+      user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 Firefox/132.0',
+      first_seen: isoIn(-0.1),
+      last_seen: isoIn(-0.001),
+    },
+    {
+      user_id: 'u-sec-3',
+      name: 'Ελένη Δημητρίου',
+      email: 'e.dimitriou@example.test',
+      role: 'ADMIN',
+      organization_id: ORG_ID,
+      organization_name: 'Γενικό Νοσοκομείο Δοκιμής',
+      active: true,
+      ip: '198.51.100.44',
+      ip_blocked: true,
+      user_agent: 'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1',
+      first_seen: isoIn(-0.05),
+      last_seen: isoIn(-0.003),
+    },
+  ],
   // The owner's «Είσοδος Demo»: the test hospital stands in for the platform's Demo hospital.
   platform_ensure_demo_organization: () => ORG_ID,
 };
