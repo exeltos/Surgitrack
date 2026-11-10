@@ -10,7 +10,6 @@ import {
   LogIn,
   RefreshCcw,
   ScanBarcode,
-  UserRound,
 } from 'lucide-react';
 import BrandMark from '../../components/layout/BrandMark';
 import {passwordOk} from '../../core/passwordRules';
@@ -424,7 +423,6 @@ export default function AuthIndex({
                     <label>
                       {t.loginId}
                       <div className="auth-input">
-                        <UserRound size={17} />
                         <input
                           name="loginId"
                           type="text"
@@ -440,7 +438,6 @@ export default function AuthIndex({
                     <label>
                       {t.password}
                       <div className="auth-input">
-                        <LockKeyhole size={17} />
                         <input
                           name="password"
                           type={showPassword ? 'text' : 'password'}
@@ -482,7 +479,6 @@ export default function AuthIndex({
                     <label>
                       {t.email}
                       <div className="auth-input">
-                        <Mail size={17} />
                         <input name="email" type="email" required placeholder="name@hospital.gr" />
                       </div>
                     </label>

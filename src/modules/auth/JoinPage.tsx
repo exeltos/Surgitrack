@@ -369,7 +369,6 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                   <label>
                     Email
                     <div className="auth-input">
-                      <Mail size={17} />
                       {info.email ? (
                         <input name="email" type="email" value={info.email} readOnly />
                       ) : (
