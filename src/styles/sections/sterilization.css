@@ -2102,6 +2102,106 @@ html body .batch-department button.clear:hover {
   background: var(--c-amber-95);
   color: var(--c-red-40);
 }
+.equipment-detail-workspace .equipment-tests-intro {
+  margin: 0 0 10px;
+  color: var(--st-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.ster-tests {
+  display: grid;
+  gap: 8px;
+  margin: 12px 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.ster-tests > header {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ster-tests > header small {
+  display: block;
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
+.ster-tests ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ster-tests li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.ster-tests-name {
+  min-width: 150px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ster-tests > header b {
+  font-size: 14px;
+}
+.ster-tests li em {
+  color: var(--c-red-40);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+.ster-tests-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ster-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 999px;
+  background: var(--c-white);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ster-test small {
+  color: var(--st-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.ster-test.ok {
+  border-color: var(--c-green-45);
+  color: var(--c-green-45);
+}
+.ster-test.due {
+  border-color: var(--c-orange-40);
+  color: var(--c-orange-40);
+}
+.ster-test.bad {
+  border-color: var(--c-red-45);
+  background: var(--c-amber-95);
+  color: var(--c-red-40);
+}
+.ster-tests-message {
+  margin: 0;
+  color: var(--c-green-45);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ster-tests-message.warning {
+  color: var(--c-red-40);
+}
+.ster-test:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 .equipment-detail-workspace .equipment-test-devices {
   display: flex;
   flex-wrap: wrap;
@@ -2170,21 +2270,22 @@ html body .batch-department button.clear:hover {
 }
 /* The page of a piece of equipment: the content area does not scroll, so this page does, and it is compact:
    the facts in a strip, the load and the history side by side, the device's cycles across the width. */
-.asset-detail-workspace.equipment-detail-workspace {
-  height: 100%;
-  min-height: 0;
+/* The page scrolls in the content area (the workspace is as tall as its content), like the Sterilization screen. */
+html body .content:has(> .equipment-detail-workspace) {
   overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 6px;
+}
+.asset-detail-workspace.equipment-detail-workspace {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
 }
 .equipment-detail-workspace .equipment-detail-page {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 10px;
   align-items: stretch;
+  padding-bottom: 8px;
 }
 .equipment-detail-workspace .equipment-facts-card,
 .equipment-detail-workspace .equipment-wide {
@@ -2206,9 +2307,7 @@ html body .batch-department button.clear:hover {
   flex-direction: column;
 }
 .equipment-detail-workspace .equipment-cycles .devices-table-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: none;
+  max-height: 380px;
 }
 .equipment-detail-workspace .asset-section-head {
   padding-top: 10px;

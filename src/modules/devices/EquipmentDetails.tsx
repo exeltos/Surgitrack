@@ -284,6 +284,12 @@ export default function EquipmentDetails({
               </div>
             </div>
             <div className="asset-section-body">
+              <p className="equipment-tests-intro">
+                {L(
+                  'Οι δοκιμές δείχνουν ότι ο κλίβανος δουλεύει σωστά πριν φορτωθεί. Το Bowie-Dick γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Φόρτωση».',
+                  'The tests show that the sterilizer works properly before it is loaded. The Bowie-Dick is done every day before the first load, the other two every week. If a test fails, the sterilizer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Loading” stage.',
+                )}
+              </p>
               <div className="equipment-test-devices">
                 {testDevices.length ? (
                   <>
