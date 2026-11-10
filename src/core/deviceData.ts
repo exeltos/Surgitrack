@@ -6,7 +6,7 @@ import type {SheetRows} from './sheetImport';
  * device-ingest function applies the same names and values to what devices send over the network.
  */
 
-export type DeviceKind = 'STERILIZER' | 'WASHER' | 'SEALER' | 'OTHER';
+export type DeviceKind = 'STERILIZER' | 'WASHER' | 'SEALER' | 'TEST' | 'OTHER';
 export type DeviceConnection = 'API' | 'FILE' | 'SERIAL';
 export type ReadingResult = 'PASS' | 'FAIL' | 'UNKNOWN';
 
@@ -20,6 +20,8 @@ export type Device = {
   location?: string;
   connection: DeviceConnection;
   active: boolean;
+  /** A test device: the sterilizer it tests (by its name in the hospital's list). */
+  testsEquipment?: string;
   keyHint?: string;
   lastSeenAt?: string;
 };
@@ -206,6 +208,7 @@ export const deviceKindLabel: Record<DeviceKind, {el: string; en: string}> = {
   STERILIZER: {el: 'Κλίβανος', en: 'Sterilizer'},
   WASHER: {el: 'Πλυντήριο-απολυμαντής', en: 'Washer-disinfector'},
   SEALER: {el: 'Θερμοσυγκολλητικό', en: 'Heat sealer'},
+  TEST: {el: 'Συσκευή δοκιμών κλιβάνου', en: 'Sterilizer test device'},
   OTHER: {el: 'Άλλη συσκευή', en: 'Other device'},
 };
 

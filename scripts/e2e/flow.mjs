@@ -389,6 +389,52 @@ async function main() {
       const modal = page.locator('.modal-backdrop').last();
       const load = db.process_loads.find(l => l.cycle_number === 'E2E-0001');
       await modal.locator('select').first().selectOption(load.id);
+      // The parts of the dialog (checks, the sterilizer's tests, the note, the load's content) never sit on top of
+      // each other, in a tall window and in a laptop one: a picture can look fine while the boxes overlap.
+      for (const size of [
+        {width: 1440, height: 900},
+        {width: 1366, height: 650},
+      ]) {
+        await page.setViewportSize(size);
+        await page.waitForTimeout(200);
+        const boxes = await modal
+          .locator('.release-check-card, .release-tests, .cycle-note, .load-manifest')
+          .evaluateAll(els => els.map(el => ({name: el.className, ...el.getBoundingClientRect().toJSON()})));
+        if (boxes.length < 4) throw new Error(`the release dialog has ${boxes.length} of its 4 parts`);
+        if (size.height >= 900) {
+          // In a window of this size nothing in the dialog needs scrolling.
+          const hidden = await modal.locator('.workflow-modal-body').evaluate(el => el.scrollHeight - el.clientHeight);
+          if (hidden > 2) throw new Error(`the release dialog hides ${hidden}px of its content in a 1440×900 window`);
+        }
+        for (const [i, a] of boxes.entries())
+          for (const b of boxes.slice(i + 1)) {
+            const overlap =
+              Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 &&
+              Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2;
+            if (overlap)
+              throw new Error(`in the release dialog (${size.width}×${size.height}) ${a.name} and ${b.name} overlap`);
+          }
+      }
+      await page.setViewportSize({width: 1440, height: 900});
+      // A long load: its content list scrolls inside its own box with the wheel, and does not stretch the dialog.
+      const manifest = modal.locator('.load-manifest');
+      const dialogBefore = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
+      await manifest.evaluate(el => {
+        const row = el.querySelector(':scope > div');
+        for (let i = 0; i < 30; i++) el.appendChild(row.cloneNode(true));
+      });
+      const dialogAfter = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
+      if (Math.abs(dialogAfter - dialogBefore) > 2) throw new Error('a long load stretches the release dialog');
+      await manifest.hover();
+      await page.mouse.wheel(0, 600);
+      await page.waitForTimeout(300);
+      const listScrolled = await manifest.evaluate(el => el.scrollTop);
+      if (listScrolled < 50)
+        throw new Error(`the content list of a long load did not scroll with the wheel (${listScrolled}px)`);
+      await manifest.evaluate(el => {
+        while (el.querySelectorAll(':scope > div').length > 2) el.lastElementChild?.remove();
+        el.scrollTop = 0;
+      });
       await modal.getByText('Φυσικές παράμετροι κύκλου αποδεκτές').click();
       await modal.getByText('Συσκευασίες στεγνές και ακέραιες').click();
       await modal.getByLabel('Χημικός δείκτης').selectOption('PASS');
@@ -551,6 +597,33 @@ async function main() {
       expectEqual(added.length, 1, 'new purchase orders');
       const line = added[0].lines.find(l => l.code === lost.code);
       if (!line || !line.toolIds?.includes(lost.id)) throw new Error('the order does not name the lost instrument');
+    });
+
+    await step('The page of a sterilizer scrolls with the mouse wheel in a laptop window', async () => {
+      // A window of 1366×768 minus the browser's bars: what a hospital PC shows. Setting scrollTop would pass even
+      // for a panel the wheel cannot scroll, so the wheel is used.
+      const {page} = admin;
+      await page.setViewportSize({width: 1366, height: 650});
+      await open(admin, '/sterilizers');
+      await page
+        .getByRole('button', {name: /Λεπτομέρειες/})
+        .first()
+        .click();
+      const tests = page.getByRole('heading', {name: 'Δοκιμές κλιβάνου'});
+      await tests.waitFor();
+      const below = async () => (await tests.boundingBox())?.y ?? 0;
+      const content = (await page.locator('.content').boundingBox())?.height ?? 0;
+      if ((await below()) < content)
+        throw new Error('the tests are on screen without scrolling: the window is too tall for this check');
+      await page.mouse.move(700, 400);
+      await page.mouse.wheel(0, 3000);
+      await page.waitForTimeout(400);
+      // The wheel moved the page, and the heading came into view (not only a panel inside it).
+      const scrolled = await page.evaluate(() => document.querySelector('.content')?.scrollTop ?? 0);
+      const after = await tests.boundingBox();
+      if (scrolled < 50 || !after || after.y > 650)
+        throw new Error(`the page of the sterilizer did not scroll with the mouse wheel (scrolled ${scrolled}px)`);
+      await page.setViewportSize({width: 1440, height: 900});
     });
 
     if (process.env.E2E_LOOK) {

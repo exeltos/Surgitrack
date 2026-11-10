@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {
   Cable,
@@ -21,6 +21,9 @@ import PageHeader from '../../components/ui/PageHeader';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {equipmentTrouble} from '../../core/equipmentHealth';
 import OutOfServiceDialog from './OutOfServiceDialog';
+import TestDialog from './TestDialog';
+import {TEST_KINDS, testsFromDevices, testsInUse, testsState, withTest} from '../../core/equipmentTests';
+import type {EquipmentTest} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import {useSurgi} from '../../store/SurgiStore';
@@ -78,10 +81,11 @@ export default function EquipmentPage() {
   const canRecord = can('sterilization.workspace');
   // In the Demo, a load with no simulation can be given one (in its card, with the scenarios).
   const canSimulate = getRuntimeDataMode() === 'DEMO' && can('sterilization.cycle');
-  const {sterilizers, washers, updateItem} = useLibraries();
+  const {sterilizers, washers, updateEquipment} = useLibraries();
   // Taking a sterilizer out of use and back is the supervisor's (the same permission as the hospital's set-up).
   const canConfigure = can('asset.usage.configure');
   const [outFor, setOutFor] = useState<EquipmentRow>();
+  const [testFor, setTestFor] = useState<{row: EquipmentRow; kind: EquipmentTest['kind']}>();
   const [devices, setDevices] = useState<Device[]>([]);
   const [readings, setReadings] = useState<DeviceReading[]>([]);
   const [loading, setLoading] = useState(devicesEnabled);
@@ -142,6 +146,7 @@ export default function EquipmentPage() {
         libraryKey: 'sterilizers' as const,
         libraryId: item.id,
         outOfService: item.outOfService,
+        tests: item.tests,
       })),
       ...washers.map(item => ({
         name: item.el,
@@ -177,24 +182,71 @@ export default function EquipmentPage() {
         : row,
     );
   }, [sterilizers, washers, devices, running, sterilizerLoads]);
+  // The results a sterilizer's test devices sent become its tests (once each, as a person's own record would).
+  const importedTests = useRef(new Set<string>());
+  useEffect(() => {
+    if (!canRecord || loading) return;
+    for (const row of rows) {
+      if (row.kind !== 'STERILIZER' || !row.libraryKey || !row.libraryId) continue;
+      const found = testsFromDevices({el: row.name, tests: row.tests}, devices, readings, importedTests.current);
+      if (!found) continue;
+      found.ids.forEach(id => importedTests.current.add(id));
+      void updateEquipment(row.libraryKey, row.libraryId, {tests: found.tests}).catch(() => {
+        // Tried again the next time the page is opened.
+        found.ids.forEach(id => importedTests.current.delete(id));
+      });
+    }
+  }, [rows, devices, readings, canRecord, loading, updateEquipment]);
+
   const lastReading = (id: string) => readings.find(r => r.deviceId === id);
   const when = (iso?: string) => (iso ? formatDateTime(iso) : '—');
   const opened = rows.find(r => r.key === openKey);
   const busy = rows.filter(r => r.load).length;
   const outCount = rows.filter(r => r.outOfService).length;
-  const attention = rows.filter(r => r.trouble?.attention && !r.outOfService).length;
-  const setOutOfService = (row: EquipmentRow, value?: {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string}) => {
+  // Missing tests are pointed out only where the hospital records tests at all; a failed one always is.
+  const withTests = testsInUse(sterilizers);
+  const testStateOf = (row: EquipmentRow) =>
+    row.kind === 'STERILIZER' && row.libraryId && (withTests || row.tests?.length) ? testsState(row.tests) : undefined;
+  const attention = rows.filter(
+    r => !r.outOfService && (r.trouble?.attention || (testStateOf(r) && testStateOf(r) !== 'OK')),
+  ).length;
+  const recordTest = async (
+    row: EquipmentRow,
+    kind: EquipmentTest['kind'],
+    value: {result: EquipmentTest['result']; note?: string},
+  ) => {
     if (!row.libraryKey || !row.libraryId) return;
-    updateItem(
-      row.libraryKey,
-      row.libraryId,
-      value ? {outOfService: {...value, since: formatDateTime(), by: currentUser.name}} : {outOfService: undefined},
-    );
+    const test: EquipmentTest = {id: `t${Date.now()}`, kind, ...value, at: formatDateTime(), by: currentUser.name};
+    try {
+      await updateEquipment(row.libraryKey, row.libraryId, {tests: withTest(row.tests, test)});
+    } catch (e) {
+      setError(L('Η δοκιμή δεν αποθηκεύτηκε: ', 'The test was not saved: ') + messageOf(e));
+      return;
+    }
+    const label = TEST_KINDS.find(item => item.id === kind);
     setNotice(
-      value
-        ? L(`${row.name}: εκτός λειτουργίας.`, `${row.name}: out of service.`)
-        : L(`${row.name}: ξανά σε λειτουργία.`, `${row.name}: back in service.`),
+      value.result === 'FAIL'
+        ? L(
+            `${row.name}: αποτυχημένη δοκιμή (${label?.el}). Ο κλίβανος δεν φορτώνεται μέχρι επιτυχή δοκιμή.`,
+            `${row.name}: test failed (${label?.en}). It is not loaded until a test passes.`,
+          )
+        : L(`${row.name}: καταγράφηκε η δοκιμή ${label?.el}.`, `${row.name}: ${label?.en} recorded.`),
     );
+  };
+  const setOutOfService = async (row: EquipmentRow, value?: {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string}) => {
+    if (!row.libraryKey || !row.libraryId) return;
+    try {
+      await updateEquipment(row.libraryKey, row.libraryId, {
+        outOfService: value ? {...value, since: formatDateTime(), by: currentUser.name} : null,
+      });
+      setNotice(
+        value
+          ? L(`${row.name}: εκτός λειτουργίας.`, `${row.name}: out of service.`)
+          : L(`${row.name}: ξανά σε λειτουργία.`, `${row.name}: back in service.`),
+      );
+    } catch (e) {
+      setError(L('Η αλλαγή δεν αποθηκεύτηκε: ', 'The change was not saved: ') + messageOf(e));
+    }
   };
 
   const save = async () => {
@@ -328,8 +380,8 @@ export default function EquipmentPage() {
               value: attention,
               icon: <TriangleAlert size={16} aria-hidden="true" />,
               hint: L(
-                '3 ή περισσότερες αποτυχίες τις τελευταίες 30 ημέρες.',
-                '3 or more failures in the last 30 days.',
+                '3 ή περισσότερες αποτυχίες σε 30 ημέρες, ή δοκιμή που απέτυχε ή εκκρεμεί.',
+                '3 or more failures in 30 days, or a test that failed or is due.',
               ),
             },
           ]}
@@ -358,6 +410,7 @@ export default function EquipmentPage() {
                 <th>{L('Πρόοδος', 'Progress')}</th>
                 <th>{L('Αντικείμενα', 'Items')}</th>
                 {devicesEnabled && <th>{L('Σύνδεση', 'Connection')}</th>}
+                <th>{L('Δοκιμές', 'Tests')}</th>
                 <th>{L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}</th>
                 <th>{L('Τελευταίος κύκλος', 'Last cycle')}</th>
                 <th>
@@ -484,6 +537,17 @@ export default function EquipmentPage() {
                         )}
                       </td>
                     )}
+                    <td data-label={L('Δοκιμές', 'Tests')}>
+                      {testStateOf(row) === 'FAILED' ? (
+                        <span className="row-test bad">{L('Απέτυχε', 'Failed')}</span>
+                      ) : testStateOf(row) === 'DUE' ? (
+                        <span className="row-test due">{L('Εκκρεμεί', 'Due')}</span>
+                      ) : testStateOf(row) === 'OK' ? (
+                        <span className="row-test ok">{L('Εντάξει', 'Up to date')}</span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
                     <td data-label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')} className="num">
                       {row.kind !== 'STERILIZER' ? (
                         '—'
@@ -534,6 +598,21 @@ export default function EquipmentPage() {
         </div>
       )}
 
+      {testFor && (
+        <TestDialog
+          L={L}
+          sterilizer={testFor.row.name}
+          test={L(
+            TEST_KINDS.find(item => item.id === testFor.kind)?.el || '',
+            TEST_KINDS.find(item => item.id === testFor.kind)?.en || '',
+          )}
+          onClose={() => setTestFor(undefined)}
+          onSave={value => {
+            recordTest(testFor.row, testFor.kind, value);
+            setTestFor(undefined);
+          }}
+        />
+      )}
       {outFor && (
         <OutOfServiceDialog
           L={L}
@@ -557,6 +636,11 @@ export default function EquipmentPage() {
           canConfigure={canConfigure}
           onOutOfService={() => setOutFor(opened)}
           onBackInService={() => setOutOfService(opened)}
+          onRecordTest={kind => setTestFor({row: opened, kind})}
+          testDevices={devices.filter(d => d.kind === 'TEST' && d.testsEquipment === opened.name)}
+          onConnectTestDevice={() =>
+            setEditor({value: {...emptyDevice, kind: 'TEST', connection: 'API', testsEquipment: opened.name}})
+          }
           onConnect={() => setEditor({value: {...emptyDevice, name: opened.name, kind: opened.kind}})}
           onEdit={() => opened.device && setEditor({id: opened.device.id, value: {...opened.device}})}
           onRemove={() => setRemoving(opened.device)}

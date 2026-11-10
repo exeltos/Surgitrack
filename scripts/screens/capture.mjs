@@ -347,9 +347,19 @@ async function layoutState(page) {
  */
 // SCREENS_BEFORE: a JavaScript expression run just before each screenshot (e.g. scroll a panel).
 const BEFORE = process.env.SCREENS_BEFORE;
+// SCREENS_WHEEL: pixels to scroll with the real mouse wheel over the middle of the page, as a person would (some
+// panels look fine in a screenshot and still do not scroll). Use it with --max-height equal to the window height,
+// or the window is made taller until nothing needs to scroll.
+const WHEEL = Number(process.env.SCREENS_WHEEL || 0);
 
 async function shoot(page, file, viewport) {
   if (BEFORE) await page.evaluate(BEFORE).catch(() => undefined);
+  if (WHEEL) {
+    const at = VIEWPORTS[viewport];
+    await page.mouse.move(at.width / 2 + 100, at.height / 2);
+    await page.mouse.wheel(0, WHEEL);
+    await page.waitForTimeout(400);
+  }
   const size = VIEWPORTS[viewport];
   let height = size.height;
   for (let i = 0; i < 5; i++) {

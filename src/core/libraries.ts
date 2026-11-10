@@ -1,5 +1,16 @@
 /** A sterilizer or washer taken out of use (a breakdown or maintenance): it cannot be chosen for a load until put back. */
 export type OutOfService = {reason: 'BREAKDOWN' | 'MAINTENANCE'; note?: string; since: string; by: string};
+/** The tests a steam sterilizer is checked with: the Bowie-Dick every day, the leak test and a spore test every week. */
+export type EquipmentTestKind = 'BOWIE_DICK' | 'LEAK' | 'BIOLOGICAL';
+export type EquipmentTest = {
+  id: string;
+  kind: EquipmentTestKind;
+  result: 'PASS' | 'FAIL';
+  /** When it was done, as records store it (08/10/2026 13:05). */
+  at: string;
+  by: string;
+  note?: string;
+};
 export type LibraryItem = {
   id: string;
   el: string;
@@ -7,6 +18,8 @@ export type LibraryItem = {
   active?: boolean;
   code?: string;
   outOfService?: OutOfService;
+  /** A sterilizer's tests, newest first (the last ones only). */
+  tests?: EquipmentTest[];
 };
 export const departments: LibraryItem[] = [
   {id: 'ster', code: 'STER', el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},

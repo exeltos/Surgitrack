@@ -372,10 +372,13 @@ export default function AppShell({
             const sections = new Set(shown.map(entry => entry.group).filter(Boolean)).size;
             const startsSection = sections > 1 && item.group && item.group !== shown[index - 1]?.group;
             const [path, query = ''] = item.to.split('?');
+            // A page that keeps its own state in the address (?queue=…, ?equipment=…) is still its menu entry, unless
+            // another entry shares its path and tells itself apart by the address (the Studio's sections).
+            const sharesPath = navigation.some(other => other !== item && other.to.split('?')[0] === path);
             const active =
               (location.pathname === path &&
                 ((item.exactSearch ?? query) === ''
-                  ? location.search === ''
+                  ? location.search === '' || (item.exactSearch === undefined && !sharesPath)
                   : location.search.slice(1) === (item.exactSearch ?? query))) ||
               (query === '' && navSectionFor(location.pathname, toolModeOf) === path);
             const link = (

@@ -24,6 +24,7 @@ import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import type {SterilizationRow} from '../sterilizationTypes';
 import SterilizerLoads from './SterilizerLoads';
+import SterilizerTests from './SterilizerTests';
 import {reprocessReason, type ReprocessReason} from '../../../core/reprocessReason';
 import StageReturnModal from './StageReturnModal';
 import {askConfirm} from '../../../components/ui/confirmService';
@@ -273,6 +274,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           />
         </div>
       )}
+      {queue === 'PROCESS' && <SterilizerTests />}
       {queue === 'IN_STERILIZER' ? (
         <SterilizerLoads loads={s.runningLoads} onPrint={s.printLoadForm} onReport={s.printCycle} />
       ) : rows.length === 0 ? (

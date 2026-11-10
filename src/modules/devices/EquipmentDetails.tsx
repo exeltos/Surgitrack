@@ -1,4 +1,15 @@
-import {ArrowLeft, Cable, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench} from 'lucide-react';
+import {
+  ArrowLeft,
+  Cable,
+  FlaskConical,
+  KeyRound,
+  Pencil,
+  Plus,
+  Trash2,
+  TriangleAlert,
+  Upload,
+  Wrench,
+} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import AppButton from '../../components/ui/AppButton';
 import BackLink from '../../components/ui/BackLink';
@@ -12,7 +23,8 @@ import {
 } from '../../core/deviceData';
 import type {ExportTable} from '../../core/exportTable';
 import {formatDateTime} from '../../core/displayDate';
-import type {OutOfService} from '../../core/libraries';
+import type {EquipmentTest, OutOfService} from '../../core/libraries';
+import {TEST_KINDS, testStandings} from '../../core/equipmentTests';
 import type {EquipmentTrouble} from '../../core/equipmentHealth';
 import type {ProcessLoadRecord} from '../../types/domain';
 import LoadContents from '../sterilization/parts/LoadContents';
@@ -32,6 +44,8 @@ export type EquipmentRow = {
   libraryKey?: 'sterilizers' | 'washers';
   libraryId?: string;
   outOfService?: OutOfService;
+  /** A sterilizer's tests (newest first). */
+  tests?: EquipmentTest[];
   /** The failures of a sterilizer (newest first), the ones in the last 30 days, and whether they call for attention. */
   trouble?: {items: EquipmentTrouble[]; recent: number; attention: boolean};
 };
@@ -54,6 +68,9 @@ export default function EquipmentDetails({
   canConfigure,
   onOutOfService,
   onBackInService,
+  onRecordTest,
+  testDevices,
+  onConnectTestDevice,
   onConnect,
   onEdit,
   onRemove,
@@ -72,6 +89,11 @@ export default function EquipmentDetails({
   canConfigure: boolean;
   onOutOfService: () => void;
   onBackInService: () => void;
+  /** Records a test of the sterilizer (the page asks for the result). */
+  onRecordTest: (kind: EquipmentTest['kind']) => void;
+  /** The test devices (Bowie-Dick tester, spore reader…) connected to this sterilizer. */
+  testDevices: Device[];
+  onConnectTestDevice: () => void;
   onConnect: () => void;
   onEdit: () => void;
   onRemove: () => void;
@@ -252,6 +274,108 @@ export default function EquipmentDetails({
             )}
           </div>
         </section>
+
+        {row.kind === 'STERILIZER' && row.libraryId && (
+          <section className="asset-section equipment-wide">
+            <div className="asset-section-head">
+              <div>
+                <span className="eyebrow">{L('ΔΟΚΙΜΕΣ', 'TESTS')}</span>
+                <h2>{L('Δοκιμές κλιβάνου', 'Sterilizer tests')}</h2>
+              </div>
+            </div>
+            <div className="asset-section-body">
+              <p className="equipment-tests-intro">
+                {L(
+                  'Οι δοκιμές δείχνουν ότι ο κλίβανος δουλεύει σωστά πριν φορτωθεί. Το Bowie-Dick γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Φόρτωση».',
+                  'The tests show that the sterilizer works properly before it is loaded. The Bowie-Dick is done every day before the first load, the other two every week. If a test fails, the sterilizer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Loading” stage.',
+                )}
+              </p>
+              <div className="equipment-test-devices">
+                {testDevices.length ? (
+                  <>
+                    <FlaskConical size={15} aria-hidden="true" />
+                    <span>
+                      {L('Συσκευή δοκιμών', 'Test device')}: <b>{testDevices.map(device => device.name).join(', ')}</b>{' '}
+                      —{' '}
+                      {L('τα αποτελέσματά της μπαίνουν εδώ αυτόματα.', 'its results are recorded here automatically.')}
+                    </span>
+                  </>
+                ) : (
+                  <span className="muted">
+                    {L(
+                      'Αν έχετε συσκευή δοκιμών (Bowie-Dick, βιολογική), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
+                      'If you have a test device (Bowie-Dick, biological), connect it so its results come here by themselves.',
+                    )}
+                  </span>
+                )}
+                {devicesEnabled && isAdmin && (
+                  <AppButton size="sm" icon={<Plus size={14} />} onClick={onConnectTestDevice}>
+                    {L('Σύνδεση συσκευής δοκιμών', 'Connect a test device')}
+                  </AppButton>
+                )}
+              </div>
+              <table className="equipment-tests">
+                <thead>
+                  <tr>
+                    <th>{L('Δοκιμή', 'Test')}</th>
+                    <th>{L('Τελευταία', 'Last')}</th>
+                    <th>{L('Αποτέλεσμα', 'Result')}</th>
+                    <th>{L('Από', 'By')}</th>
+                    <th>{L('Επόμενη', 'Next')}</th>
+                    <th>
+                      <span className="sr-only">{L('Ενέργειες', 'Actions')}</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {testStandings(row.tests).map(standing => {
+                    const kind = TEST_KINDS.find(item => item.id === standing.kind)!;
+                    return (
+                      <tr key={standing.kind}>
+                        <td>
+                          <b>{L(kind.el, kind.en)}</b>
+                          <small>{L(kind.hint.el, kind.hint.en)}</small>
+                        </td>
+                        <td>{standing.last?.at || '—'}</td>
+                        <td>
+                          {standing.last ? (
+                            <span className={`device-result ${standing.last.result === 'PASS' ? 'pass' : 'fail'}`}>
+                              {standing.last.result === 'PASS' ? L('Επιτυχία', 'Pass') : L('Αποτυχία', 'Fail')}
+                            </span>
+                          ) : (
+                            '—'
+                          )}
+                          {standing.last?.note && <small>{standing.last.note}</small>}
+                        </td>
+                        <td>
+                          {standing.last?.id.startsWith('dev-')
+                            ? L('Συσκευή: ', 'Device: ') + standing.last.by
+                            : standing.last?.by || '—'}
+                        </td>
+                        <td>
+                          {standing.failed ? (
+                            <b className="equipment-test-bad">{L('Επανάληψη', 'Repeat')}</b>
+                          ) : standing.due ? (
+                            <b className="equipment-test-due">{L('Εκκρεμεί', 'Due')}</b>
+                          ) : (
+                            <span className="muted">{L('Εντάξει', 'Up to date')}</span>
+                          )}
+                        </td>
+                        <td className="row-actions">
+                          {canRecord && (
+                            <AppButton size="sm" onClick={() => onRecordTest(standing.kind)}>
+                              {L('Καταγραφή', 'Record')}
+                            </AppButton>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
         {row.trouble && row.trouble.items.length > 0 && (
           <section className="asset-section equipment-top">

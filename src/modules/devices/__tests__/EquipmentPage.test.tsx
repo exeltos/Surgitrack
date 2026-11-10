@@ -44,7 +44,7 @@ vi.mock('../../../store/SurgiStore', () => ({
 const lib = vi.hoisted(() => ({
   sterilizers: [] as Array<{id: string; el: string; en: string; outOfService?: unknown}>,
   washers: [] as Array<{id: string; el: string; en: string; outOfService?: unknown}>,
-  updateItem: vi.fn(),
+  updateEquipment: vi.fn(),
 }));
 vi.mock('../../../core/LibraryStore', () => ({useLibraries: () => lib}));
 const {default: EquipmentPage} = await import('../EquipmentPage');
@@ -90,8 +90,16 @@ beforeEach(() => {
     {id: 'st2', el: 'ΚΛΙΒΑΝΟΣ 2', en: 'Sterilizer 2'},
   ];
   lib.washers = [{id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'Washer 1'}];
-  lib.updateItem = vi.fn((key: 'sterilizers' | 'washers', id: string, patch: Record<string, unknown>) => {
-    lib[key] = lib[key].map(item => (item.id === id ? {...item, ...patch} : item));
+  lib.updateEquipment = vi.fn(async (key: 'sterilizers' | 'washers', id: string, patch: Record<string, unknown>) => {
+    lib[key] = lib[key].map(item =>
+      item.id === id
+        ? {
+            ...item,
+            ...(patch.outOfService !== undefined ? {outOfService: patch.outOfService ?? undefined} : {}),
+            ...(patch.tests ? {tests: patch.tests} : {}),
+          }
+        : item,
+    );
   });
   db.devices = [autoclave, washer];
   db.readings = [reading('1042'), reading('1043'), reading('W-7', 'd2')];
@@ -173,7 +181,7 @@ describe('Sterilizers & Devices, one screen', () => {
   it('offers the admin to connect a library sterilizer that has no device, named', async () => {
     open();
     const card = await details('ΚΛΙΒΑΝΟΣ 2');
-    fireEvent.click(within(card).getByRole('button', {name: /Σύνδεση συσκευής/}));
+    fireEvent.click(within(card).getByRole('button', {name: 'Σύνδεση συσκευής'}));
     expect((screen.getByRole('combobox', {name: /Όνομα/}) as HTMLInputElement).value).toBe('ΚΛΙΒΑΝΟΣ 2');
   });
 
@@ -185,7 +193,7 @@ describe('Sterilizers & Devices, one screen', () => {
     fireEvent.click(within(dialog).getByRole('radio', {name: 'Συντήρηση'}));
     fireEvent.change(within(dialog).getByLabelText(/Σημείωση/), {target: {value: 'Καλέστηκε ο τεχνικός'}});
     fireEvent.click(within(dialog).getByRole('button', {name: 'Εκτός λειτουργίας'}));
-    expect(lib.updateItem).toHaveBeenCalledWith(
+    expect(lib.updateEquipment).toHaveBeenCalledWith(
       'sterilizers',
       'st2',
       expect.objectContaining({
@@ -200,7 +208,7 @@ describe('Sterilizers & Devices, one screen', () => {
     const again = await screen.findByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 2'});
     expect(within(again).getByText(/Καλέστηκε ο τεχνικός/)).toBeInTheDocument();
     fireEvent.click(within(again).getByRole('button', {name: 'Επαναφορά σε λειτουργία'}));
-    expect(lib.updateItem).toHaveBeenLastCalledWith('sterilizers', 'st2', {outOfService: undefined});
+    expect(lib.updateEquipment).toHaveBeenLastCalledWith('sterilizers', 'st2', {outOfService: null});
     expect(within(await screen.findByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 2'})).queryByText(/Καλέστηκε/)).toBeNull();
   });
 
@@ -258,5 +266,68 @@ describe('Sterilizers & Devices, one screen', () => {
     fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
     expect(await screen.findByText('ΚΛΙΒΑΝΟΣ 2')).toBeInTheDocument();
     expect(screen.queryByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 1'})).not.toBeInTheDocument();
+  });
+
+  it('records a failed test of a sterilizer, which shows in its row', async () => {
+    open();
+    const card = await details('ΚΛΙΒΑΝΟΣ 2');
+    const bowie = within(card).getByText('Bowie-Dick').closest('tr') as HTMLElement;
+    fireEvent.click(within(bowie).getByRole('button', {name: 'Καταγραφή'}));
+    const dialog = await screen.findByRole('dialog', {name: 'Καταγραφή δοκιμής'});
+    fireEvent.click(within(dialog).getByRole('radio', {name: 'Αποτυχία'}));
+    fireEvent.change(within(dialog).getByLabelText(/Σημείωση/), {target: {value: 'Δείκτης ανοιχτός'}});
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Καταγραφή'}));
+    expect(lib.updateEquipment).toHaveBeenCalledWith(
+      'sterilizers',
+      'st2',
+      expect.objectContaining({
+        tests: [
+          expect.objectContaining({kind: 'BOWIE_DICK', result: 'FAIL', note: 'Δείκτης ανοιχτός', by: 'ΔΙΑΧΕΙΡΙΣΤΗΣ'}),
+        ],
+      }),
+    );
+    fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
+    expect(within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('Απέτυχε')).toBeInTheDocument();
+  });
+
+  it("records the results a connected test device sent among its sterilizer's tests, once each", async () => {
+    db.devices = [
+      autoclave,
+      {
+        id: 'd3',
+        name: 'Δοκιμαστής Bowie-Dick',
+        kind: 'TEST',
+        connection: 'API',
+        active: true,
+        testsEquipment: 'ΚΛΙΒΑΝΟΣ 1',
+      },
+    ];
+    const sent = (id: string, program: string, result: DeviceReading['result']): DeviceReading => ({
+      ...reading(id, 'd3'),
+      program,
+      result,
+      startedAt: '2026-11-10T06:30:00Z',
+    });
+    db.readings = [
+      sent('b1', 'Bowie-Dick', 'PASS'),
+      sent('x1', '134°C · 5 min', 'PASS'),
+      sent('u1', 'Leak test', 'UNKNOWN'),
+    ];
+    open();
+    await waitFor(() => expect(lib.updateEquipment).toHaveBeenCalledTimes(1));
+    expect(lib.updateEquipment).toHaveBeenCalledWith(
+      'sterilizers',
+      'st1',
+      expect.objectContaining({
+        tests: [
+          expect.objectContaining({id: 'dev-rb1', kind: 'BOWIE_DICK', result: 'PASS', by: 'Δοκιμαστής Bowie-Dick'}),
+        ],
+      }),
+    );
+    // The card says which device it comes from.
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
+    expect(within(card).getByText(/Δοκιμαστής Bowie-Dick/, {selector: 'b'})).toBeInTheDocument();
+    expect(within(card).getByText(/Συσκευή: Δοκιμαστής Bowie-Dick/)).toBeInTheDocument();
+    expect(lib.updateEquipment).toHaveBeenCalledTimes(1);
   });
 });

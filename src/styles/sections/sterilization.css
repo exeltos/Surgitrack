@@ -5,7 +5,7 @@
   .sterilization-workspace > .ster-work-panel > .ster-list-head {
     flex: 0 0 auto;
   }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) {
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal):not(.load-release-modal) {
     height: min(94vh, 940px) !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
@@ -530,9 +530,10 @@ html body .load-modal .cycle-note {
   flex: 0 0 auto;
 }
 html body .load-release-modal {
-  width: min(1100px, calc(100vw - 32px));
-  height: min(760px, calc(100dvh - 32px));
-  max-height: calc(100dvh - 32px);
+  /* As large as the window allows: the checks, the sterilizer's tests, the note and the load's content together. */
+  width: min(1500px, calc(100vw - 24px));
+  height: min(1000px, calc(100dvh - 16px));
+  max-height: calc(100dvh - 16px);
 }
 @media (max-width: 1180px) and (min-width: 761px) {
   .sterilization-workspace .ster-work-panel .ster-list-head,
@@ -599,10 +600,11 @@ html body .load-release-modal {
 html body .load-release-modal .workflow-modal-body {
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: 14px 20px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 12px 20px;
   align-items: start;
-  overflow: hidden;
+  /* The left column (checks, tests, note) scrolls on a short window instead of being cut. */
+  overflow-y: auto;
 }
 html body .load-release-modal .release-load-picker {
   grid-column: 1 / -1;
@@ -615,7 +617,7 @@ html body .load-release-modal .release-check-card {
 }
 html body .load-release-modal .load-manifest {
   grid-column: 2;
-  grid-row: 2 / span 2;
+  grid-row: 3 / span 2;
   align-self: stretch;
   display: flex;
   flex-direction: column;
@@ -629,6 +631,12 @@ html body .load-release-modal .load-manifest > strong {
 }
 html body .load-release-modal .load-manifest > div {
   padding: 10px 12px;
+}
+html body .load-release-modal .release-tests {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: stretch;
+  margin: 0;
 }
 html body .load-release-modal .cycle-note {
   grid-column: 1;
@@ -684,7 +692,9 @@ html body .load-modal .load-assets-list span {
   grid-template-columns: 110px minmax(0, 1fr) 200px;
 }
 html body .load-release-modal .workflow-modal-body {
-  grid-template-rows: auto auto minmax(0, 1fr);
+  /* The picker, then the checks and the sterilizer's tests side by side, then the note and the load's content; the
+     last row takes what is left. */
+  grid-template-rows: auto auto auto minmax(0, 1fr);
 }
 html body .load-release-modal .cycle-note {
   align-self: start;
@@ -696,7 +706,11 @@ html body .load-release-modal .release-check-card .receipt-section-title {
   gap: 10px;
 }
 html body .load-release-modal .load-manifest > div {
-  grid-template-columns: 96px minmax(0, 1fr) 160px;
+  grid-template-columns: 84px minmax(0, 1fr) minmax(70px, 120px);
+}
+html body .load-release-modal .load-manifest > div b {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 html body .load-modal .load-modal-body > .cycle-clean-fields {
   margin: 0;
@@ -2050,6 +2064,10 @@ html body .batch-department button.clear:hover {
 .load-details-items details ul {
   display: grid;
   gap: 2px;
+  /* Only the list of a Set's instruments scrolls, not the card around it. */
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 6px 0 0 4px;
   color: var(--st-muted);
 }
@@ -2079,6 +2097,210 @@ html body .batch-department button.clear:hover {
   background: var(--c-red-95, var(--c-amber-95));
   color: var(--c-red-40);
 }
+.equipment-rows .row-test {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.equipment-rows .row-test.ok {
+  background: var(--c-green-90);
+  color: var(--c-green-45);
+}
+.equipment-rows .row-test.due {
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+}
+.equipment-rows .row-test.bad {
+  background: var(--c-amber-95);
+  color: var(--c-red-40);
+}
+.equipment-detail-workspace .equipment-tests-intro {
+  margin: 0 0 10px;
+  color: var(--st-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.ster-tests {
+  margin: 8px 14px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+.ster-tests.bad {
+  border-color: var(--c-red-45);
+}
+.ster-tests.due {
+  border-color: var(--c-orange-40);
+}
+.ster-tests > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  cursor: pointer;
+  list-style: none;
+}
+.ster-tests > summary::-webkit-details-marker {
+  display: none;
+}
+.ster-tests-summary {
+  color: var(--st-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.ster-tests.bad .ster-tests-summary {
+  color: var(--c-red-40);
+}
+.ster-tests.due .ster-tests-summary {
+  color: var(--c-orange-40);
+}
+.ster-tests-help {
+  margin: 0;
+  padding: 0 12px 6px;
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
+.ster-tests ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0 12px 10px;
+  list-style: none;
+}
+.ster-tests li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.ster-tests-message {
+  margin: 0;
+  padding: 0 12px 10px;
+  color: var(--c-green-45);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ster-tests-name {
+  min-width: 150px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ster-tests li em {
+  color: var(--c-red-40);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+.ster-tests-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ster-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 999px;
+  background: var(--c-white);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ster-test small {
+  color: var(--st-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.ster-test.ok {
+  border-color: var(--c-green-45);
+  color: var(--c-green-45);
+}
+.ster-test.due {
+  border-color: var(--c-orange-40);
+  color: var(--c-orange-40);
+}
+.ster-test.bad {
+  border-color: var(--c-red-45);
+  background: var(--c-amber-95);
+  color: var(--c-red-40);
+}
+.release-tests {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+}
+.release-tests .receipt-section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.release-tests .release-indicator-hint.bad {
+  color: var(--c-red-40);
+}
+.ster-tests-message.warning {
+  color: var(--c-red-40);
+}
+.ster-test:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.equipment-detail-workspace .equipment-test-devices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px dashed var(--c-gray-90-4);
+  border-radius: 10px;
+  font-size: 13px;
+}
+.equipment-detail-workspace .equipment-test-devices .app-button {
+  margin-left: auto;
+}
+.equipment-detail-workspace .equipment-tests {
+  width: 100%;
+  border-collapse: collapse;
+}
+.equipment-detail-workspace .equipment-tests th {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--c-gray-90-3);
+  color: var(--st-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.equipment-detail-workspace .equipment-tests td {
+  padding: 8px;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.equipment-detail-workspace .equipment-tests td small {
+  display: block;
+  color: var(--st-muted);
+  font-size: 11.5px;
+}
+.equipment-detail-workspace .equipment-test-bad {
+  color: var(--c-red-40);
+}
+.equipment-detail-workspace .equipment-test-due {
+  color: var(--c-orange-40);
+}
+.load-test-due {
+  color: var(--c-orange-40);
+  font-weight: 600;
+}
 .equipment-rows .row-trouble {
   display: inline-flex;
   align-items: center;
@@ -2093,23 +2315,28 @@ html body .batch-department button.clear:hover {
 .equipment-page .equipment-kpis {
   margin-bottom: 12px;
 }
+/* One line under the actions is enough: the card below has its own border. */
+.equipment-detail-workspace .asset-workbench-actions {
+  border-bottom: 0;
+}
 /* The page of a piece of equipment: the content area does not scroll, so this page does, and it is compact:
    the facts in a strip, the load and the history side by side, the device's cycles across the width. */
-.asset-detail-workspace.equipment-detail-workspace {
-  height: 100%;
-  min-height: 0;
+/* The page scrolls in the content area (the workspace is as tall as its content), like the Sterilization screen. */
+html body .content:has(> .equipment-page) {
   overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 6px;
+}
+.asset-detail-workspace.equipment-detail-workspace {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
 }
 .equipment-detail-workspace .equipment-detail-page {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 10px;
   align-items: stretch;
+  padding-bottom: 8px;
 }
 .equipment-detail-workspace .equipment-facts-card,
 .equipment-detail-workspace .equipment-wide {
@@ -2118,10 +2345,6 @@ html body .batch-department button.clear:hover {
 /* The load and the history stay short (they scroll inside); the device's cycles take the rest of the height. */
 .equipment-detail-workspace .equipment-top {
   min-height: 0;
-}
-.equipment-detail-workspace .equipment-top .asset-section-body {
-  max-height: 340px;
-  overflow-y: auto;
 }
 .equipment-detail-workspace .equipment-cycles {
   display: flex;
@@ -2135,9 +2358,7 @@ html body .batch-department button.clear:hover {
   flex-direction: column;
 }
 .equipment-detail-workspace .equipment-cycles .devices-table-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: none;
+  max-height: 380px;
 }
 .equipment-detail-workspace .asset-section-head {
   padding-top: 10px;
@@ -2240,7 +2461,9 @@ html body .batch-department button.clear:hover {
 }
 .out-of-service-dialog .notice-choice {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 10px 0;
+  gap: 10px;
+  margin: 0;
+  padding: 0 20px 14px 68px;
 }
 .equipment-rows .row-connection {
   display: inline-flex;
