@@ -142,4 +142,47 @@ describe('a sterilizer taken out of service', () => {
     release();
     expect(status()).toBe('RELEASED');
   });
+
+  it('does not load a washer while its latest test failed, and loads it after a passing one', () => {
+    const {result} = renderHook(() => ({...useSurgi(), libs: useLibraries()}), {wrapper});
+    const s = () => result.current;
+    const run = <T,>(fn: () => T) => {
+      let out!: T;
+      act(() => {
+        out = fn();
+      });
+      return out;
+    };
+    const asset = s().tools.find(t => t.mode === 'STANDALONE' && t.state === 'IN_DEPARTMENT' && !t.maxUses)!;
+    run(() => s().sendToSterilization('TOOL', asset.id));
+    run(() =>
+      s().receiveAtSterilization('TOOL', asset.id, {
+        deliveredByUserId: 'u',
+        deliveredByName: 'Τ',
+        deliveredByDepartment: 'Τμήμα',
+      }),
+    );
+    const washer = s().libs.washers[0];
+    const test = (kindResult: 'PASS' | 'FAIL', id: string) => ({
+      id,
+      kind: 'CLEANING' as const,
+      result: kindResult,
+      at: '10/11/2026 07:30',
+      by: 'Τ',
+    });
+    const load = () =>
+      s().createProcessLoad({
+        kind: 'WASHING',
+        assetRefs: [{kind: 'TOOL' as const, id: asset.id}],
+        equipment: washer.el,
+        cycleNumber: 'W-9',
+        program: 'Θ',
+      });
+    run(() => s().libs.updateItem('washers', washer.id, {tests: [test('FAIL', 'w1')]}));
+    expect(run(load)).toBeUndefined();
+    expect(s().processLoads.some(l => l.cycleNumber === 'W-9')).toBe(false);
+    run(() => s().libs.updateItem('washers', washer.id, {tests: [test('PASS', 'w2'), test('FAIL', 'w1')]}));
+    expect(run(load)).toBeDefined();
+    expect(s().processLoads.some(l => l.cycleNumber === 'W-9')).toBe(true);
+  });
 });

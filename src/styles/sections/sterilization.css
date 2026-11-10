@@ -766,7 +766,8 @@ html body .load-modal .load-indicator-pick input[type='checkbox'] {
 }
 /* Sterilization › In the sterilizer: running loads, locked until the end of the cycle. */
 /* The barcode reads like every other queue's (no underline until pointed at; it opens the record). */
-html body .release-actions .release-print {
+/* The print buttons sit together on the left; the space is after the last of them, before the release buttons. */
+html body .release-actions .release-print:has(+ .release-reprocess) {
   margin-right: auto;
 }
 .released-load-actions {

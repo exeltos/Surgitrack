@@ -95,13 +95,18 @@ export function useLoadActions(
       notify(tr('Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.', outOfService.el), true);
       return;
     }
-    // A sterilizer whose latest test failed is not loaded until a passing one is recorded.
-    const failedTest =
-      payload.kind === 'STERILIZATION' &&
-      sterilizerList.find(item => item.el === payload.equipment.trim() && testsState(item.tests) === 'FAILED');
+    // A sterilizer or washer whose latest test failed is not loaded until a passing one is recorded.
+    const washing = payload.kind === 'WASHING';
+    const failedTest = (washing ? washerList : sterilizerList).find(
+      item =>
+        item.el === payload.equipment.trim() &&
+        testsState(item.tests, Date.now(), washing ? 'WASHER' : 'STERILIZER') === 'FAILED',
+    );
     if (failedTest) {
       notify(
-        tr('Ο κλίβανος «{0}» έχει αποτυχημένη δοκιμή: καταγράψτε επιτυχή δοκιμή για να φορτωθεί.', failedTest.el),
+        washing
+          ? tr('Το πλυντήριο «{0}» έχει αποτυχημένη δοκιμή: καταγράψτε επιτυχή δοκιμή για να φορτωθεί.', failedTest.el)
+          : tr('Ο κλίβανος «{0}» έχει αποτυχημένη δοκιμή: καταγράψτε επιτυχή δοκιμή για να φορτωθεί.', failedTest.el),
         true,
       );
       return;

@@ -748,6 +748,9 @@ export const en: Record<string, string> = {
   'Ο εξοπλισμός «{0}» είναι εκτός λειτουργίας.': 'The equipment “{0}” is out of service.',
   'σε βλάβη': 'broken down',
   'αποτυχημένη δοκιμή': 'test failed',
+  'Εκκρεμεί δοκιμή του πλυντηρίου (Κλίβανοι & Συσκευές).': 'A test of the washer is due (Sterilizers & Devices).',
+  'Το πλυντήριο «{0}» έχει αποτυχημένη δοκιμή: καταγράψτε επιτυχή δοκιμή για να φορτωθεί.':
+    'The washer “{0}” has a failed test: record a passing test to load it.',
   'Το φορτίο {0} δεν αποδεσμεύτηκε: ο κλίβανος «{1}» έχει αποτυχημένη δοκιμή.':
     'The load {0} was not released: the sterilizer “{1}” has a failed test.',
   'Εκκρεμεί δοκιμή του κλιβάνου (Κλίβανοι & Συσκευές).': 'A test of the sterilizer is due (Sterilizers & Devices).',

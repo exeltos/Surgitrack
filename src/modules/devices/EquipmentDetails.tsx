@@ -275,20 +275,29 @@ export default function EquipmentDetails({
           </div>
         </section>
 
-        {row.kind === 'STERILIZER' && row.libraryId && (
+        {(row.kind === 'STERILIZER' || row.kind === 'WASHER') && row.libraryId && (
           <section className="asset-section equipment-wide">
             <div className="asset-section-head">
               <div>
                 <span className="eyebrow">{L('ΔΟΚΙΜΕΣ', 'TESTS')}</span>
-                <h2>{L('Δοκιμές κλιβάνου', 'Sterilizer tests')}</h2>
+                <h2>
+                  {row.kind === 'WASHER'
+                    ? L('Δοκιμές πλυντηρίου', 'Washer tests')
+                    : L('Δοκιμές κλιβάνου', 'Sterilizer tests')}
+                </h2>
               </div>
             </div>
             <div className="asset-section-body">
               <p className="equipment-tests-intro">
-                {L(
-                  'Οι δοκιμές δείχνουν ότι ο κλίβανος δουλεύει σωστά πριν φορτωθεί. Το Bowie-Dick γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Φόρτωση».',
-                  'The tests show that the sterilizer works properly before it is loaded. The Bowie-Dick is done every day before the first load, the other two every week. If a test fails, the sterilizer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Loading” stage.',
-                )}
+                {row.kind === 'WASHER'
+                  ? L(
+                      'Οι δοκιμές δείχνουν ότι το πλυντήριο καθαρίζει σωστά πριν φορτωθεί. Ο έλεγχος καθαρισμού με δείκτη λερώματος γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, το πλυντήριο δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Καθαρισμός».',
+                      'The tests show that the washer cleans properly before it is loaded. The cleaning test with a soil indicator is done every day before the first load, the other two every week. If a test fails, the washer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Cleaning” stage.',
+                    )
+                  : L(
+                      'Οι δοκιμές δείχνουν ότι ο κλίβανος δουλεύει σωστά πριν φορτωθεί. Το Bowie-Dick γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Φόρτωση».',
+                      'The tests show that the sterilizer works properly before it is loaded. The Bowie-Dick is done every day before the first load, the other two every week. If a test fails, the sterilizer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Loading” stage.',
+                    )}
               </p>
               <div className="equipment-test-devices">
                 {testDevices.length ? (
@@ -302,10 +311,15 @@ export default function EquipmentDetails({
                   </>
                 ) : (
                   <span className="muted">
-                    {L(
-                      'Αν έχετε συσκευή δοκιμών (Bowie-Dick, βιολογική), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
-                      'If you have a test device (Bowie-Dick, biological), connect it so its results come here by themselves.',
-                    )}
+                    {row.kind === 'WASHER'
+                      ? L(
+                          'Αν έχετε συσκευή δοκιμών (δείκτης λερώματος, πρωτεΐνη), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
+                          'If you have a test device (soil indicator, protein), connect it so its results come here by themselves.',
+                        )
+                      : L(
+                          'Αν έχετε συσκευή δοκιμών (Bowie-Dick, βιολογική), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
+                          'If you have a test device (Bowie-Dick, biological), connect it so its results come here by themselves.',
+                        )}
                   </span>
                 )}
                 {devicesEnabled && isAdmin && (
@@ -328,49 +342,51 @@ export default function EquipmentDetails({
                   </tr>
                 </thead>
                 <tbody>
-                  {testStandings(row.tests).map(standing => {
-                    const kind = TEST_KINDS.find(item => item.id === standing.kind)!;
-                    return (
-                      <tr key={standing.kind}>
-                        <td>
-                          <b>{L(kind.el, kind.en)}</b>
-                          <small>{L(kind.hint.el, kind.hint.en)}</small>
-                        </td>
-                        <td>{standing.last?.at || '—'}</td>
-                        <td>
-                          {standing.last ? (
-                            <span className={`device-result ${standing.last.result === 'PASS' ? 'pass' : 'fail'}`}>
-                              {standing.last.result === 'PASS' ? L('Επιτυχία', 'Pass') : L('Αποτυχία', 'Fail')}
-                            </span>
-                          ) : (
-                            '—'
-                          )}
-                          {standing.last?.note && <small>{standing.last.note}</small>}
-                        </td>
-                        <td>
-                          {standing.last?.id.startsWith('dev-')
-                            ? L('Συσκευή: ', 'Device: ') + standing.last.by
-                            : standing.last?.by || '—'}
-                        </td>
-                        <td>
-                          {standing.failed ? (
-                            <b className="equipment-test-bad">{L('Επανάληψη', 'Repeat')}</b>
-                          ) : standing.due ? (
-                            <b className="equipment-test-due">{L('Εκκρεμεί', 'Due')}</b>
-                          ) : (
-                            <span className="muted">{L('Εντάξει', 'Up to date')}</span>
-                          )}
-                        </td>
-                        <td className="row-actions">
-                          {canRecord && (
-                            <AppButton size="sm" onClick={() => onRecordTest(standing.kind)}>
-                              {L('Καταγραφή', 'Record')}
-                            </AppButton>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {testStandings(row.tests, Date.now(), row.kind === 'WASHER' ? 'WASHER' : 'STERILIZER').map(
+                    standing => {
+                      const kind = TEST_KINDS.find(item => item.id === standing.kind)!;
+                      return (
+                        <tr key={standing.kind}>
+                          <td>
+                            <b>{L(kind.el, kind.en)}</b>
+                            <small>{L(kind.hint.el, kind.hint.en)}</small>
+                          </td>
+                          <td>{standing.last?.at || '—'}</td>
+                          <td>
+                            {standing.last ? (
+                              <span className={`device-result ${standing.last.result === 'PASS' ? 'pass' : 'fail'}`}>
+                                {standing.last.result === 'PASS' ? L('Επιτυχία', 'Pass') : L('Αποτυχία', 'Fail')}
+                              </span>
+                            ) : (
+                              '—'
+                            )}
+                            {standing.last?.note && <small>{standing.last.note}</small>}
+                          </td>
+                          <td>
+                            {standing.last?.id.startsWith('dev-')
+                              ? L('Συσκευή: ', 'Device: ') + standing.last.by
+                              : standing.last?.by || '—'}
+                          </td>
+                          <td>
+                            {standing.failed ? (
+                              <b className="equipment-test-bad">{L('Επανάληψη', 'Repeat')}</b>
+                            ) : standing.due ? (
+                              <b className="equipment-test-due">{L('Εκκρεμεί', 'Due')}</b>
+                            ) : (
+                              <span className="muted">{L('Εντάξει', 'Up to date')}</span>
+                            )}
+                          </td>
+                          <td className="row-actions">
+                            {canRecord && (
+                              <AppButton size="sm" onClick={() => onRecordTest(standing.kind)}>
+                                {L('Καταγραφή', 'Record')}
+                              </AppButton>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
                 </tbody>
               </table>
             </div>

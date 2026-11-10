@@ -39,6 +39,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
   } = s;
   // The equipment comes from the hospital's list (Studio › Libraries), typed only when the list is empty.
   const equipmentList = loadModal === 'WASHING' ? washers : sterilizers;
+  const tested = loadModal === 'WASHING' ? 'WASHER' : 'STERILIZER';
   return (
     <>
       {loadModal && (
@@ -87,15 +88,12 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                         <option
                           key={item.id}
                           value={item.el}
-                          disabled={
-                            !!item.outOfService ||
-                            (loadModal === 'STERILIZATION' && testsState(item.tests) === 'FAILED')
-                          }
+                          disabled={!!item.outOfService || testsState(item.tests, Date.now(), tested) === 'FAILED'}
                         >
                           {trData(item.el)}
                           {item.outOfService
                             ? ` · ${item.outOfService.reason === 'BREAKDOWN' ? tr('σε βλάβη') : tr('σε συντήρηση')}`
-                            : loadModal === 'STERILIZATION' && testsState(item.tests) === 'FAILED'
+                            : testsState(item.tests, Date.now(), tested) === 'FAILED'
                               ? ` · ${tr('αποτυχημένη δοκιμή')}`
                               : ''}
                         </option>
@@ -107,12 +105,14 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   ) : (
                     <input value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)} />
                   )}
-                  {loadModal === 'STERILIZATION' &&
-                    testsInUse(equipmentList) &&
-                    testsState(equipmentList.find(item => item.el === loadEquipment)?.tests) === 'DUE' && (
+                  {testsInUse(equipmentList) &&
+                    testsState(equipmentList.find(item => item.el === loadEquipment)?.tests, Date.now(), tested) ===
+                      'DUE' && (
                       <small className="load-test-due">
                         <TriangleAlert size={13} aria-hidden="true" />{' '}
-                        {tr('Εκκρεμεί δοκιμή του κλιβάνου (Κλίβανοι & Συσκευές).')}
+                        {loadModal === 'WASHING'
+                          ? tr('Εκκρεμεί δοκιμή του πλυντηρίου (Κλίβανοι & Συσκευές).')
+                          : tr('Εκκρεμεί δοκιμή του κλιβάνου (Κλίβανοι & Συσκευές).')}
                       </small>
                     )}
                 </label>

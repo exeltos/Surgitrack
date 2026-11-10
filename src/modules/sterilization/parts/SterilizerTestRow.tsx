@@ -18,8 +18,11 @@ export default function SterilizerTestRow({
   sterilizer,
   inUse,
   onMessage,
+  equipment = 'sterilizers',
 }: {
   sterilizer: LibraryItem;
+  /** Sterilizers (the default) or washers: the tests differ. */
+  equipment?: 'sterilizers' | 'washers';
   inUse: boolean;
   onMessage?: (message: {text: string; warning: boolean}) => void;
 }) {
@@ -28,6 +31,7 @@ export default function SterilizerTestRow({
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const allowed = can('sterilization.workspace');
+  const washer = equipment === 'washers';
   const [recording, setRecording] = useState<EquipmentTest['kind']>();
 
   const record = async (value: {result: EquipmentTest['result']; note?: string}) => {
@@ -36,19 +40,29 @@ export default function SterilizerTestRow({
     if (!kind) return;
     const test: EquipmentTest = {id: `t${Date.now()}`, kind, ...value, at: formatDateTime(), by: currentUser.name};
     try {
-      await updateEquipment('sterilizers', sterilizer.id, {tests: withTest(sterilizer.tests, test)});
+      await updateEquipment(equipment, sterilizer.id, {tests: withTest(sterilizer.tests, test)});
       onMessage?.({
         warning: value.result === 'FAIL',
         text:
           value.result === 'FAIL'
-            ? L(
-                `Αποτυχημένη δοκιμή: ο κλίβανος «${sterilizer.el}» δεν φορτώνεται ούτε αποδεσμεύει μέχρι επιτυχή δοκιμή.`,
-                `Failed test: the sterilizer “${sterilizer.el}” is not loaded or released until a test passes.`,
-              )
-            : L(
-                `Καταγράφηκε η δοκιμή του κλιβάνου «${sterilizer.el}».`,
-                `Test of the sterilizer “${sterilizer.el}” recorded.`,
-              ),
+            ? washer
+              ? L(
+                  `Αποτυχημένη δοκιμή: το πλυντήριο «${sterilizer.el}» δεν φορτώνεται μέχρι επιτυχή δοκιμή.`,
+                  `Failed test: the washer “${sterilizer.el}” is not loaded until a test passes.`,
+                )
+              : L(
+                  `Αποτυχημένη δοκιμή: ο κλίβανος «${sterilizer.el}» δεν φορτώνεται ούτε αποδεσμεύει μέχρι επιτυχή δοκιμή.`,
+                  `Failed test: the sterilizer “${sterilizer.el}” is not loaded or released until a test passes.`,
+                )
+            : washer
+              ? L(
+                  `Καταγράφηκε η δοκιμή του πλυντηρίου «${sterilizer.el}».`,
+                  `Test of the washer “${sterilizer.el}” recorded.`,
+                )
+              : L(
+                  `Καταγράφηκε η δοκιμή του κλιβάνου «${sterilizer.el}».`,
+                  `Test of the sterilizer “${sterilizer.el}” recorded.`,
+                ),
       });
     } catch (e) {
       onMessage?.({
@@ -61,7 +75,7 @@ export default function SterilizerTestRow({
   return (
     <>
       <span className="ster-tests-buttons">
-        {testStandings(sterilizer.tests).map(standing => {
+        {testStandings(sterilizer.tests, Date.now(), washer ? 'WASHER' : 'STERILIZER').map(standing => {
           const kind = TEST_KINDS.find(entry => entry.id === standing.kind)!;
           const state = standing.failed ? 'bad' : standing.due ? (inUse ? 'due' : 'none') : 'ok';
           return (

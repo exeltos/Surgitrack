@@ -1,5 +1,14 @@
 import {describe, expect, it} from 'vitest';
-import {TESTS_KEPT, testKindOfProgram, testStandings, testsInUse, testsState, withTest} from '../equipmentTests';
+import {
+  TESTS_KEPT,
+  testKindOfProgram,
+  testKindsFor,
+  testStandings,
+  testsFromDevices,
+  testsInUse,
+  testsState,
+  withTest,
+} from '../equipmentTests';
 import type {EquipmentTest} from '../libraries';
 
 const test = (kind: EquipmentTest['kind'], at: string, result: EquipmentTest['result'] = 'PASS'): EquipmentTest => ({
@@ -77,5 +86,54 @@ describe('the tests of a sterilizer', () => {
     expect(list[0]).toBe(mine);
     expect(testStandings([older, mine], now)[0].last).toBe(mine);
     expect(testsState([older, mine, ...allToday.slice(1)], now)).toBe('OK');
+  });
+
+  it('has its own tests for a washer, with the soil test every day and the others every week', () => {
+    expect(testKindsFor('WASHER').map(kind => [kind.id, kind.days])).toEqual([
+      ['CLEANING', 1],
+      ['PROTEIN', 7],
+      ['SPRAY', 7],
+    ]);
+    const washerTests = [
+      test('CLEANING', '10/11/2026 07:30'),
+      test('PROTEIN', '08/11/2026 07:40'),
+      test('SPRAY', '05/11/2026 08:00'),
+    ];
+    expect(testsState(washerTests, now, 'WASHER')).toBe('OK');
+    // A sterilizer's tests are not a washer's: with none of its own, the sterilizer is only «due».
+    expect(testsState(washerTests, now, 'STERILIZER')).toBe('DUE');
+    const failed = [test('PROTEIN', '10/11/2026 09:00', 'FAIL'), ...washerTests];
+    expect(testsState(failed, now, 'WASHER')).toBe('FAILED');
+    expect(testsState(failed, now, 'STERILIZER')).toBe('DUE');
+  });
+
+  it('knows the washer tests by the program name a test device sends', () => {
+    expect(testKindOfProgram('Soil test Browne')).toBe('CLEANING');
+    expect(testKindOfProgram('TOSI')).toBe('CLEANING');
+    expect(testKindOfProgram('Έλεγχος καθαρισμού')).toBe('CLEANING');
+    expect(testKindOfProgram('Protein residue')).toBe('PROTEIN');
+    expect(testKindOfProgram('Υπολείμματα πρωτεΐνης')).toBe('PROTEIN');
+    expect(testKindOfProgram('Spray arms')).toBe('SPRAY');
+    expect(testKindOfProgram('Δοσολογία απορρυπαντικού')).toBe('SPRAY');
+  });
+
+  it("brings in a test device's results only as tests of the kind of equipment it is linked to", () => {
+    const devices = [
+      {id: 'd1', name: 'Tester', kind: 'TEST', connection: 'API', active: true, testsEquipment: 'Πλυντήριο 1'},
+    ] as never;
+    const reading = (id: string, program: string) =>
+      ({
+        id,
+        deviceId: 'd1',
+        program,
+        result: 'PASS',
+        cycleNumber: id,
+        source: 'API',
+        createdAt: '2026-11-10T06:00:00Z',
+      }) as never;
+    const readings = [reading('a', 'Soil test'), reading('b', 'Bowie-Dick')];
+    const found = testsFromDevices({el: 'Πλυντήριο 1'}, devices, readings, new Set(), 'WASHER');
+    expect(found?.ids).toEqual(['dev-a']);
+    expect(found?.tests[0]).toMatchObject({kind: 'CLEANING', result: 'PASS', by: 'Tester'});
   });
 });

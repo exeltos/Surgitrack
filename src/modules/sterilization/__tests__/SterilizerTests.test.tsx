@@ -41,4 +41,20 @@ describe('the tests of the sterilizers in the Loading stage', () => {
     expect(await within(second).findByRole('button', {name: /Βιολογική/})).toHaveClass('due');
     expect(within(await row('Κλίβανος Ατμού 01')).getByRole('button', {name: /Bowie-Dick/})).toHaveClass('ok');
   });
+
+  it("has the washers' own tests in the Cleaning stage, and a failed one is shown red", async () => {
+    renderPage(<SterilizerTests equipment="washers" />, {signedIn: staff, demo: true});
+    const region = await screen.findByRole('group', {name: 'Δοκιμές πλυντηρίων'});
+    const first = within(region).getAllByRole('listitem')[0];
+    expect(within(first).getByRole('button', {name: /Έλεγχος καθαρισμού/})).toBeInTheDocument();
+    expect(within(first).getByRole('button', {name: /πρωτεΐνης/})).toBeInTheDocument();
+    expect(within(first).getByRole('button', {name: /Ψεκαστήρες/})).toBeInTheDocument();
+    expect(within(first).queryByRole('button', {name: /Bowie-Dick/})).toBeNull();
+    fireEvent.click(within(first).getByRole('button', {name: /Έλεγχος καθαρισμού/}));
+    const dialog = await screen.findByRole('dialog', {name: 'Καταγραφή δοκιμής'});
+    fireEvent.click(within(dialog).getByRole('radio', {name: 'Αποτυχία'}));
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Καταγραφή'}));
+    expect(await screen.findByRole('status')).toHaveTextContent('το πλυντήριο');
+    expect(within(first).getByRole('button', {name: /Έλεγχος καθαρισμού/})).toHaveClass('bad');
+  });
 });
