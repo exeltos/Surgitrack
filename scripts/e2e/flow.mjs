@@ -416,6 +416,25 @@ async function main() {
           }
       }
       await page.setViewportSize({width: 1440, height: 900});
+      // A long load: its content list scrolls inside its own box with the wheel, and does not stretch the dialog.
+      const manifest = modal.locator('.load-manifest');
+      const dialogBefore = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
+      await manifest.evaluate(el => {
+        const row = el.querySelector(':scope > div');
+        for (let i = 0; i < 30; i++) el.appendChild(row.cloneNode(true));
+      });
+      const dialogAfter = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
+      if (Math.abs(dialogAfter - dialogBefore) > 2) throw new Error('a long load stretches the release dialog');
+      await manifest.hover();
+      await page.mouse.wheel(0, 600);
+      await page.waitForTimeout(300);
+      const listScrolled = await manifest.evaluate(el => el.scrollTop);
+      if (listScrolled < 50)
+        throw new Error(`the content list of a long load did not scroll with the wheel (${listScrolled}px)`);
+      await manifest.evaluate(el => {
+        while (el.querySelectorAll(':scope > div').length > 2) el.lastElementChild?.remove();
+        el.scrollTop = 0;
+      });
       await modal.getByText('Φυσικές παράμετροι κύκλου αποδεκτές').click();
       await modal.getByText('Συσκευασίες στεγνές και ακέραιες').click();
       await modal.getByLabel('Χημικός δείκτης').selectOption('PASS');
