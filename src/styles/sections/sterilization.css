@@ -5,7 +5,7 @@
   .sterilization-workspace > .ster-work-panel > .ster-list-head {
     flex: 0 0 auto;
   }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) {
+  .receipt-card-modal:not(.completed):not(.prep-workspace-modal):not(.load-release-modal) {
     height: min(94vh, 940px) !important;
   }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-card-body.receipt-two-column {
@@ -530,10 +530,10 @@ html body .load-modal .cycle-note {
   flex: 0 0 auto;
 }
 html body .load-release-modal {
-  /* Large enough for the checks, the sterilizer's tests and the note without scrolling on a 1440×900 window. */
-  width: min(1280px, calc(100vw - 32px));
-  height: min(900px, calc(100dvh - 24px));
-  max-height: calc(100dvh - 24px);
+  /* As large as the window allows: the checks, the sterilizer's tests, the note and the load's content together. */
+  width: min(1500px, calc(100vw - 24px));
+  height: min(1000px, calc(100dvh - 16px));
+  max-height: calc(100dvh - 16px);
 }
 @media (max-width: 1180px) and (min-width: 761px) {
   .sterilization-workspace .ster-work-panel .ster-list-head,

@@ -4808,8 +4808,8 @@ td {
   max-width: calc(100vw - 40px) !important;
 }
 .receipt-card-modal.workflow-modal.load-release-modal {
-  width: min(940px, calc(100vw - 40px)) !important;
-  max-width: calc(100vw - 40px) !important;
+  width: min(1500px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
 }
 .receipt-card-modal.workflow-modal.delivery-batch-modal {
   width: min(1180px, calc(100vw - 40px)) !important;
