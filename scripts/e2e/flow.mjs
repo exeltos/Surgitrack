@@ -389,6 +389,28 @@ async function main() {
       const modal = page.locator('.modal-backdrop').last();
       const load = db.process_loads.find(l => l.cycle_number === 'E2E-0001');
       await modal.locator('select').first().selectOption(load.id);
+      // The parts of the dialog (checks, the sterilizer's tests, the note, the load's content) never sit on top of
+      // each other, in a tall window and in a laptop one: a picture can look fine while the boxes overlap.
+      for (const size of [
+        {width: 1440, height: 900},
+        {width: 1366, height: 650},
+      ]) {
+        await page.setViewportSize(size);
+        await page.waitForTimeout(200);
+        const boxes = await modal
+          .locator('.release-check-card, .release-tests, .cycle-note, .load-manifest')
+          .evaluateAll(els => els.map(el => ({name: el.className, ...el.getBoundingClientRect().toJSON()})));
+        if (boxes.length < 4) throw new Error(`the release dialog has ${boxes.length} of its 4 parts`);
+        for (const [i, a] of boxes.entries())
+          for (const b of boxes.slice(i + 1)) {
+            const overlap =
+              Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 &&
+              Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2;
+            if (overlap)
+              throw new Error(`in the release dialog (${size.width}×${size.height}) ${a.name} and ${b.name} overlap`);
+          }
+      }
+      await page.setViewportSize({width: 1440, height: 900});
       await modal.getByText('Φυσικές παράμετροι κύκλου αποδεκτές').click();
       await modal.getByText('Συσκευασίες στεγνές και ακέραιες').click();
       await modal.getByLabel('Χημικός δείκτης').selectOption('PASS');

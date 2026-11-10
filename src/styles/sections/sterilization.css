@@ -602,7 +602,8 @@ html body .load-release-modal .workflow-modal-body {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 14px 20px;
   align-items: start;
-  overflow: hidden;
+  /* The left column (checks, tests, note) scrolls on a short window instead of being cut. */
+  overflow-y: auto;
 }
 html body .load-release-modal .release-load-picker {
   grid-column: 1 / -1;
@@ -615,7 +616,7 @@ html body .load-release-modal .release-check-card {
 }
 html body .load-release-modal .load-manifest {
   grid-column: 2;
-  grid-row: 2 / span 2;
+  grid-row: 2 / span 4;
   align-self: stretch;
   display: flex;
   flex-direction: column;
@@ -630,9 +631,14 @@ html body .load-release-modal .load-manifest > strong {
 html body .load-release-modal .load-manifest > div {
   padding: 10px 12px;
 }
-html body .load-release-modal .cycle-note {
+html body .load-release-modal .release-tests {
   grid-column: 1;
   grid-row: 3;
+  margin: 0;
+}
+html body .load-release-modal .cycle-note {
+  grid-column: 1;
+  grid-row: 4;
   margin: 0;
 }
 html body .load-release-modal .cycle-note textarea {
@@ -684,7 +690,9 @@ html body .load-modal .load-assets-list span {
   grid-template-columns: 110px minmax(0, 1fr) 200px;
 }
 html body .load-release-modal .workflow-modal-body {
-  grid-template-rows: auto auto minmax(0, 1fr);
+  /* The picker, the checks, the sterilizer's tests and the note take their own height; the last row (empty) takes
+     what is left, beside the load's content. */
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
 }
 html body .load-release-modal .cycle-note {
   align-self: start;
