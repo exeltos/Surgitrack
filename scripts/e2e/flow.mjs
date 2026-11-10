@@ -401,6 +401,11 @@ async function main() {
           .locator('.release-check-card, .release-tests, .cycle-note, .load-manifest')
           .evaluateAll(els => els.map(el => ({name: el.className, ...el.getBoundingClientRect().toJSON()})));
         if (boxes.length < 4) throw new Error(`the release dialog has ${boxes.length} of its 4 parts`);
+        if (size.height >= 900) {
+          // In a window of this size nothing in the dialog needs scrolling.
+          const hidden = await modal.locator('.workflow-modal-body').evaluate(el => el.scrollHeight - el.clientHeight);
+          if (hidden > 2) throw new Error(`the release dialog hides ${hidden}px of its content in a 1440×900 window`);
+        }
         for (const [i, a] of boxes.entries())
           for (const b of boxes.slice(i + 1)) {
             const overlap =
