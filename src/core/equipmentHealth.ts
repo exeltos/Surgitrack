@@ -1,4 +1,5 @@
 import {parseDisplayDate} from './displayDate';
+import {testsInUse, testsState} from './equipmentTests';
 import type {LibraryItem} from './libraries';
 import type {ProcessLoadRecord} from '../types/domain';
 
@@ -47,4 +48,43 @@ export function equipmentTrouble(
     return !!date && now - date.getTime() <= TROUBLE_DAYS * DAY_MS;
   });
   return {items, recent: recent.length, attention: recent.length >= TROUBLE_LIMIT};
+}
+
+/** What the day's briefing says about the sterilizers and washers: how many of them need someone's attention. */
+export type EquipmentBriefing = {
+  /** Latest test failed: not loaded until a passing one is recorded. */
+  failedTests: number;
+  outOfService: number;
+  /** Failed three times or more in the last 30 days: have it checked. */
+  troubled: number;
+  /** A test missing or overdue, in a hospital that records tests. */
+  testsDue: number;
+};
+
+export function equipmentBriefing(
+  sterilizers: readonly LibraryItem[],
+  washers: readonly LibraryItem[],
+  loads: readonly ProcessLoadRecord[],
+  now = Date.now(),
+): EquipmentBriefing {
+  const groups = [
+    {list: sterilizers, tested: 'STERILIZER' as const, loadKind: 'STERILIZATION' as const},
+    {list: washers, tested: 'WASHER' as const, loadKind: 'WASHING' as const},
+  ];
+  const out: EquipmentBriefing = {failedTests: 0, outOfService: 0, troubled: 0, testsDue: 0};
+  for (const {list, tested, loadKind} of groups) {
+    const inUse = testsInUse(list);
+    for (const item of list) {
+      if (item.outOfService) {
+        // Out of service is its own line: not also "overdue tests" of a machine nobody loads.
+        out.outOfService += 1;
+        continue;
+      }
+      const state = testsState(item.tests, now, tested);
+      if (state === 'FAILED') out.failedTests += 1;
+      else if (state === 'DUE' && inUse) out.testsDue += 1;
+      if (equipmentTrouble(item.el, loads, now, loadKind).attention) out.troubled += 1;
+    }
+  }
+  return out;
 }

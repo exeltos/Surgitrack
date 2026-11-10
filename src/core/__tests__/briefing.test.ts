@@ -26,7 +26,7 @@ const base: BriefingInput = {
   outOfUse: 2,
   accessRequests: 1,
   belowMinimum: 3,
-  screens: ['/department', '/issues', '/sterilization', '/tools', '/expiry', '/stock', '/hospital'],
+  screens: ['/department', '/issues', '/sterilization', '/tools', '/expiry', '/stock', '/hospital', '/sterilizers'],
 };
 const counts = (input: BriefingInput) => Object.fromEntries(briefingFor(input).map(i => [i.key, i.count]));
 
@@ -47,6 +47,14 @@ describe('briefing at sign-in', () => {
       stock: 3,
       issues: 2,
     });
+  });
+
+  it('tells Sterilization which sterilizers and washers need attention, and leaves the rest out', () => {
+    const equipment = {failedTests: 1, outOfService: 2, troubled: 1, testsDue: 0};
+    const result = counts({...base, role: 'STERILIZATION', equipment});
+    expect(result).toMatchObject({equipFailed: 1, equipTrouble: 1, equipOut: 2});
+    expect(result).not.toHaveProperty('equipDue');
+    expect(counts({...base, role: 'DEPARTMENT', equipment})).not.toHaveProperty('equipFailed');
   });
 
   it('gives the admin what needs a decision, not the sterilization queue', () => {

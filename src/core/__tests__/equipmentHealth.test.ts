@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {equipmentTrouble, outOfServiceOf} from '../equipmentHealth';
+import {equipmentBriefing, equipmentTrouble, outOfServiceOf} from '../equipmentHealth';
+import type {EquipmentTest, LibraryItem} from '../libraries';
 import type {ProcessLoadRecord} from '../../types/domain';
 
 const load = (over: Partial<ProcessLoadRecord>): ProcessLoadRecord =>
@@ -61,5 +62,33 @@ describe('what the equipment screen says about trouble', () => {
     ];
     expect(outOfServiceOf(list, 'Κλίβανος Α')).toBeUndefined();
     expect(outOfServiceOf(list, 'Κλίβανος Β')?.reason).toBe('BREAKDOWN');
+  });
+});
+
+describe('what the briefing of the day says about the equipment', () => {
+  const item = (el: string, over: Partial<LibraryItem> = {}) => ({id: el, el, en: el, ...over}) as LibraryItem;
+  const test = (kind: EquipmentTest['kind'], result: EquipmentTest['result']) =>
+    ({id: `${kind}${result}`, kind, result, at: '10/11/2026 07:00', by: 'Τ'}) as EquipmentTest;
+  const washer = (id: number) => load({id: `w${id}`, kind: 'WASHING', equipment: 'Πλυντήριο 1', status: 'FAILED'});
+
+  it('counts failed tests, out of service, repeated failures and due tests once each', () => {
+    const sterilizers = [
+      item('Α', {tests: [test('BOWIE_DICK', 'FAIL')]}),
+      item('Β', {outOfService: {reason: 'BREAKDOWN', since: '10/11/2026 08:00', by: 'Τ'}}),
+      item('Γ', {tests: [test('BOWIE_DICK', 'PASS')]}),
+      item('Δ'),
+    ];
+    const washers = [item('Πλυντήριο 1')];
+    const loads = [washer(1), washer(2), washer(3)].map(l => ({...l, completedAt: '09/11/2026 09:00'}));
+    expect(equipmentBriefing(sterilizers, washers, loads, now)).toEqual({
+      failedTests: 1,
+      outOfService: 1,
+      troubled: 1,
+      testsDue: 2,
+    });
+  });
+
+  it('does not point out missing tests in a hospital that records none', () => {
+    expect(equipmentBriefing([item('Α'), item('Β')], [item('Π')], [], now).testsDue).toBe(0);
   });
 });

@@ -1,6 +1,7 @@
 import type {UserRole} from '../store/types';
 import type {Issue, ProcessLoadRecord, SetAsset, Tool} from '../types/domain';
 import type {ExpiryEntry} from './sterileExpiry';
+import type {EquipmentBriefing} from './equipmentHealth';
 
 /** One line of the briefing at sign-in: how many, what, and the screen where it is dealt with. */
 export type BriefingItem = {
@@ -25,6 +26,8 @@ export type BriefingInput = {
   outOfUse: number;
   accessRequests: number;
   belowMinimum: number;
+  /** The sterilizers and washers that need attention (equipmentBriefing). */
+  equipment?: EquipmentBriefing;
   /** The screens this person can open; an item whose screen is not among them is left out. */
   screens: readonly string[];
 };
@@ -114,6 +117,38 @@ export function briefingFor(input: BriefingInput): BriefingItem[] {
               'Φορτία που περιμένουν αποτέλεσμα βιολογικού δείκτη',
               'Loads awaiting a biological indicator result',
               '/sterilization',
+              'warn',
+            ),
+            item(
+              'equipFailed',
+              input.equipment?.failedTests ?? 0,
+              'Κλίβανοι/πλυντήρια με αποτυχημένη δοκιμή: δεν φορτώνουν ως την επόμενη επιτυχή',
+              'Sterilizers/washers with a failed test: not loaded until a test passes',
+              '/sterilizers',
+              'act',
+            ),
+            item(
+              'equipTrouble',
+              input.equipment?.troubled ?? 0,
+              'Κλίβανοι/πλυντήρια με 3+ αποτυχίες σε 30 ημέρες, να ελεγχθούν',
+              'Sterilizers/washers with 3+ failures in 30 days, to be checked',
+              '/sterilizers',
+              'act',
+            ),
+            item(
+              'equipOut',
+              input.equipment?.outOfService ?? 0,
+              'Κλίβανοι/πλυντήρια εκτός λειτουργίας',
+              'Sterilizers/washers out of service',
+              '/sterilizers',
+              'warn',
+            ),
+            item(
+              'equipDue',
+              input.equipment?.testsDue ?? 0,
+              'Κλίβανοι/πλυντήρια με δοκιμή που εκκρεμεί',
+              'Sterilizers/washers with a test due',
+              '/sterilizers',
               'warn',
             ),
             item(
