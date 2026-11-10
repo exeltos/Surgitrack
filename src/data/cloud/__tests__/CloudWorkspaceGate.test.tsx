@@ -34,6 +34,7 @@ vi.mock('../../../lib/supabase', () => {
 vi.mock('../identity', () => ({
   resolveIdentity: async () => ({status: 'ok', identity: {id: 'u1', platform: false}}),
   productionOrganizationFor: () => 'org-1',
+  getRealIdentity: () => ({id: 'u1'}),
 }));
 vi.mock('../appRecords', async importOriginal => ({
   ...(await importOriginal<typeof import('../appRecords')>()),

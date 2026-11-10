@@ -11,7 +11,7 @@ import {
 } from './appRecords';
 import {pendingOnto, readCache, setCacheOwner, setRestored, type CachedCollection} from './localCache';
 import {setCutoff} from './historyWindow';
-import {productionOrganizationFor, resolveIdentity} from './identity';
+import {getRealIdentity, productionOrganizationFor, resolveIdentity} from './identity';
 import {translateToEnglish} from '../../core/glossary';
 import Spinner from '../../components/ui/Spinner';
 import {trialState, type HospitalPlan, type TrialState} from '../../core/trial';
@@ -237,9 +237,12 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
 
   // Every minute the app says it is there (the owner sees who is connected); an address the owner blocked is turned away.
   useEffect(() => {
-    if (status !== 'ready' || !workspace || getRuntimeDataMode() === 'DEMO') return;
+    // The people of a hospital, and the platform owner outside one; nobody not signed in.
+    const inside = status === 'ready' && !!workspace;
+    if (!(inside || status === 'local') || getRuntimeDataMode() === 'DEMO') return;
     let alive = true;
     const beat = async () => {
+      if (!getRealIdentity()?.id) return;
       const answer = await touchPresence();
       if (alive && answer && !answer.allowed) {
         setBlockedIp(answer.ip);

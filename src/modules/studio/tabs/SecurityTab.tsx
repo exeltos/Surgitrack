@@ -105,35 +105,27 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
 
   return (
     <section className="studio-errors studio-security">
-      <header className="studio-errors-head">
-        <div>
-          <h2>{L('Ασφάλεια', 'Security')}</h2>
-          <p>
-            {L(
-              'Ανανεώνεται κάθε 15 δευτερόλεπτα. Όσοι είναι σε μπλοκαρισμένη διεύθυνση αποκλείονται μέσα σε ένα λεπτό· εσείς δεν μπλοκάρεστε ποτέ.',
-              'Renews every 15 seconds. Whoever is on a blocked address is cut off within a minute; you are never blocked.',
-            )}
-          </p>
-        </div>
-        <div className="studio-errors-actions">
-          <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
-            {L('Ανανέωση', 'Refresh')}
-          </AppButton>
-        </div>
-      </header>
       {failed && <p className="studio-errors-failed">{failed}</p>}
-      <h3>
-        {L('Συνδεδεμένοι τώρα', 'Connected now')}
-        {sessions ? ` · ${sessions.length}` : ''}
-      </h3>
+      <div className="studio-security-title">
+        <h3>
+          {L('Συνδεδεμένοι τώρα', 'Connected now')}
+          {sessions ? ` · ${sessions.length}` : ''}
+        </h3>
+        <small>{L('Ανανεώνεται κάθε 15 δευτερόλεπτα', 'Renews every 15 seconds')}</small>
+        <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
+          {L('Ανανέωση', 'Refresh')}
+        </AppButton>
+      </div>
       {sessions === null ? (
         <Spinner />
       ) : !sessions.length ? (
-        <div className="studio-errors-empty">
-          <ShieldCheck size={22} />
-          <strong>{L('Κανείς δεν είναι συνδεδεμένος', 'Nobody is connected')}</strong>
-          <span>{L('Δεν έχει φανεί κανείς τα τελευταία 5 λεπτά.', 'Nobody was seen in the last 5 minutes.')}</span>
-        </div>
+        <p className="studio-security-empty">
+          <ShieldCheck size={18} aria-hidden="true" />
+          {L(
+            'Κανείς δεν έχει ανοιχτή την εφαρμογή αυτή τη στιγμή (τελευταία 5 λεπτά).',
+            'Nobody has the app open right now (last 5 minutes).',
+          )}
+        </p>
       ) : (
         <div className="studio-security-scroll">
           <table className="studio-security-table">
@@ -189,18 +181,25 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
           </table>
         </div>
       )}
-      <h3>
-        {L('Μπλοκαρισμένες διευθύνσεις', 'Blocked addresses')} · {blocked.length}
-      </h3>
+      <div className="studio-security-title">
+        <h3>
+          {L('Μπλοκαρισμένες διευθύνσεις', 'Blocked addresses')} · {blocked.length}
+        </h3>
+      </div>
       <div className="studio-security-add">
-        <label>
-          {L('Διεύθυνση (ή μικρό εύρος, π.χ. 203.0.113.0/28)', 'Address (or a small range, e.g. 203.0.113.0/28)')}
-          <input value={adding} onChange={e => setAdding(e.target.value)} placeholder="203.0.113.5" />
-        </label>
-        <label>
-          {L('Σημείωση', 'Note')}
-          <input value={note} maxLength={200} onChange={e => setNote(e.target.value)} />
-        </label>
+        <input
+          aria-label={L('Διεύθυνση ή μικρό εύρος', 'Address or small range')}
+          value={adding}
+          onChange={e => setAdding(e.target.value)}
+          placeholder={L('Διεύθυνση, π.χ. 203.0.113.5 ή 203.0.113.0/28', 'Address, e.g. 203.0.113.5 or 203.0.113.0/28')}
+        />
+        <input
+          aria-label={L('Σημείωση', 'Note')}
+          value={note}
+          maxLength={200}
+          onChange={e => setNote(e.target.value)}
+          placeholder={L('Σημείωση (προαιρετικά)', 'Note (optional)')}
+        />
         <AppButton variant="danger" icon={<Ban size={15} />} disabled={!adding.trim()} onClick={() => void addIp()}>
           {L('Μπλοκάρισμα', 'Block')}
         </AppButton>
