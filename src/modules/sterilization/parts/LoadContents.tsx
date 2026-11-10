@@ -22,6 +22,17 @@ export default function LoadContents({load}: {load: ProcessLoadRecord}) {
           {data.source === 'SIMULATION' ? ` · ${tr('Προσομοίωση')}` : ''}
         </p>
       )}
+      {load.kind === 'WASHING' && (
+        <p className={`cycle-verdict ${load.status === 'FAILED' ? 'bad' : 'ok'}`}>
+          {[
+            load.washTemperature !== undefined && `${load.washTemperature} °C`,
+            load.washA0 !== undefined && `A0 ${load.washA0}`,
+          ]
+            .filter(Boolean)
+            .concat(load.status === 'FAILED' ? tr('Αποτυχία πλύσης') : tr('Επιτυχής πλύση'))
+            .join(' · ')}
+        </p>
+      )}
       <h4>
         {tr('Περιεχόμενο φορτίου')} · {load.items.length}
       </h4>

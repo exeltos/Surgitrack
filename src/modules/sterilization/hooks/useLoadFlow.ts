@@ -13,6 +13,11 @@ import type {useCycleFlow} from './useCycleFlow';
 import {formatDateTime} from '../../../core/displayDate';
 import {askConfirm} from '../../../components/ui/confirmService';
 
+const numberOf = (text: string) => {
+  const value = Number(text.trim().replace(',', '.'));
+  return text.trim() && Number.isFinite(value) && value >= 0 ? value : undefined;
+};
+
 export function useLoadFlow(
   p: ReturnType<typeof useSterilizationState> &
     ReturnType<typeof useSterilizationQueues> &
@@ -81,7 +86,10 @@ export function useLoadFlow(
     setLoadEquipment(kind === 'WASHING' ? p.defaultWasher : p.defaultSterilizer);
     setLoadCycleNumber('');
     setLoadProgram(kind === 'WASHING' ? 'Θερμική απολύμανση' : '134°C · 5 min');
-    setLoadChemical('NOT_RECORDED');
+    // A washing cycle is passed unless the person (or the washer) says otherwise.
+    setLoadChemical(kind === 'WASHING' ? 'PASS' : 'NOT_RECORDED');
+    p.setLoadWashTemp('');
+    p.setLoadWashA0('');
     setLoadChemicalOn(true);
     setLoadBiologicalOn(releasePolicy.biologicalIndicator === 'REQUIRED');
     p.setLoadFromDevice(false);
@@ -144,6 +152,9 @@ export function useLoadFlow(
         loadModal === 'STERILIZATION' && (loadChemicalOn || loadChemical === 'FAIL') ? loadChemical : undefined,
       biologicalIndicatorResult: loadModal === 'STERILIZATION' && loadBiologicalOn ? 'PENDING' : undefined,
       cycleCompleted: loadModal === 'STERILIZATION' && p.loadFromDevice,
+      washResult: loadModal === 'WASHING' ? (loadChemical === 'FAIL' ? 'FAIL' : 'PASS') : undefined,
+      washTemperature: loadModal === 'WASHING' ? numberOf(p.loadWashTemp) : undefined,
+      washA0: loadModal === 'WASHING' ? numberOf(p.loadWashA0) : undefined,
       note: loadNote.trim() || undefined,
     });
     if (created) closeLoad();

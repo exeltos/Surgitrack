@@ -22,12 +22,17 @@ export type EquipmentTrouble = {
 };
 
 /**
- * The loads of a sterilizer that failed or were not released, newest first, with how many fall in the last
+ * The loads of a sterilizer (or, with `kind`, a washer) that failed or were not released, newest first, with how many fall in the last
  * `TROUBLE_DAYS` days (a sterilizer that keeps failing needs a technician, not another try).
  */
-export function equipmentTrouble(equipment: string, loads: readonly ProcessLoadRecord[], now = Date.now()) {
+export function equipmentTrouble(
+  equipment: string,
+  loads: readonly ProcessLoadRecord[],
+  now = Date.now(),
+  kind: ProcessLoadRecord['kind'] = 'STERILIZATION',
+) {
   const items: EquipmentTrouble[] = loads
-    .filter(load => load.kind === 'STERILIZATION' && load.equipment === equipment)
+    .filter(load => load.kind === kind && load.equipment === equipment)
     .filter(load => load.status === 'FAILED' || load.status === 'REPROCESS')
     .map(load => ({
       loadId: load.id,

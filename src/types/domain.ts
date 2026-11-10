@@ -261,6 +261,9 @@ export interface ProcessLoadRecord {
   biologicalIndicatorResult?: BiologicalIndicatorResult;
   physicalParametersOk?: boolean;
   packagingIntegrityOk?: boolean;
+  /** A washing load: the highest temperature (°C) and the A0 value of the cycle, when they were recorded. */
+  washTemperature?: number;
+  washA0?: number;
   note?: string;
   createdByUserId: string;
   createdByName: string;

@@ -123,6 +123,7 @@ export default function EquipmentPage() {
   }, [load]);
 
   const sterilizerLoads = processLoads.filter(l => l.kind === 'STERILIZATION');
+  const washerLoads = processLoads.filter(l => l.kind === 'WASHING');
   const running = sterilizerLoads.filter(l => l.status === 'OPEN');
   const now = useNow(running.some(l => !!l.simulation));
   const usedNumbers = useMemo(
@@ -180,9 +181,15 @@ export default function EquipmentPage() {
             lastLoad: sterilizerLoads.find(l => l.equipment === row.name && l.status !== 'OPEN'),
             trouble: equipmentTrouble(row.name, sterilizerLoads),
           }
-        : row,
+        : row.kind === 'WASHER'
+          ? {
+              ...row,
+              lastLoad: washerLoads.find(l => l.equipment === row.name),
+              trouble: equipmentTrouble(row.name, washerLoads, Date.now(), 'WASHING'),
+            }
+          : row,
     );
-  }, [sterilizers, washers, devices, running, sterilizerLoads]);
+  }, [sterilizers, washers, devices, running, sterilizerLoads, washerLoads]);
   // The results a sterilizer's test devices sent become its tests (once each, as a person's own record would).
   const importedTests = useRef(new Set<string>());
   useEffect(() => {
@@ -581,7 +588,10 @@ export default function EquipmentPage() {
                       ) : row.lastLoad ? (
                         <>
                           <b>{row.lastLoad.cycleNumber}</b>
-                          <small>{row.lastLoad.completedAt || row.lastLoad.createdAt}</small>
+                          <small>
+                            {row.lastLoad.completedAt || row.lastLoad.createdAt}
+                            {row.lastLoad.status === 'FAILED' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}
+                          </small>
                         </>
                       ) : (
                         '—'

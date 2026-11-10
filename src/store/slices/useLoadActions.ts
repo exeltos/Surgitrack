@@ -131,6 +131,46 @@ export function useLoadActions(
     }));
     const now = formatStoreDateTime();
     if (payload.kind === 'WASHING') {
+      const washFailed = payload.washResult === 'FAIL';
+      const washValues = {
+        ...(payload.washTemperature !== undefined ? {washTemperature: payload.washTemperature} : {}),
+        ...(payload.washA0 !== undefined ? {washA0: payload.washA0} : {}),
+      };
+      if (washFailed) {
+        // A failed wash moves nothing on: the items stay in the washing stage to go through the washer again.
+        refs.forEach(({ref, asset}) =>
+          addMovement({
+            asset: `${asset.barcode} · ${asset.name}`,
+            assetKind: ref.kind,
+            from: 'Καθαρισμός',
+            to: 'Καθαρισμός',
+            status: `Φορτίο πλυντηρίου ${loadId} · ${payload.equipment} · ${payload.cycleNumber} · ΑΠΟΤΥΧΙΑ`,
+            by: currentUser.name,
+          }),
+        );
+        const failed: ProcessLoadRecord = {
+          id: loadId,
+          workflowVersion: sterilizationWorkflow.version,
+          kind: 'WASHING',
+          equipment: payload.equipment,
+          cycleNumber: payload.cycleNumber,
+          program: payload.program,
+          status: 'FAILED',
+          items,
+          ...washValues,
+          note: payload.note,
+          createdByUserId: currentUser.id,
+          createdByName: currentUser.name,
+          createdAt: now,
+          completedAt: now,
+        };
+        setProcessLoads(list => [failed, ...list]);
+        notify(
+          tr('Το φορτίο {0} απέτυχε: τα αντικείμενα μένουν στον καθαρισμό για νέα πλύση.', `«${loadLabel(payload)}»`),
+          true,
+        );
+        return failed;
+      }
       const stage = sterilizationWorkflow.stages.find(stage => stage.id === 'WASHING');
       refs.forEach(({ref, asset}) => {
         const checkpoint: WorkflowCheckpointRecord = {
@@ -178,6 +218,7 @@ export function useLoadActions(
         program: payload.program,
         status: 'PASSED',
         items,
+        ...washValues,
         note: payload.note,
         createdByUserId: currentUser.id,
         createdByName: currentUser.name,
