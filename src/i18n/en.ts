@@ -745,6 +745,21 @@ export const en: Record<string, string> = {
   '{0} (αχρησιμοποίητα)': '{0} (unused)',
   Πρόταση: 'Suggestion',
   Προβολή: 'View',
+  'Ο κύκλος απέτυχε: το αντικείμενο περνά ξανά από πλύση, έλεγχο και συσκευασία.':
+    'The cycle failed: the item goes through washing, checking and packing again.',
+  'Δεν αποδεσμεύτηκε ({0}): περνά ξανά από πλύση, έλεγχο και συσκευασία.':
+    'Not released ({0}): it goes through washing, checking and packing again.',
+  'Δεν αποδεσμεύτηκε: περνά ξανά από πλύση, έλεγχο και συσκευασία.':
+    'Not released: it goes through washing, checking and packing again.',
+  'Ξανά: αποτυχία κύκλου': 'Again: cycle failed',
+  'Ξανά: ανάκληση φορτίου': 'Again: load recalled',
+  'Το φορτίο ανακλήθηκε: το αντικείμενο περνά ξανά από πλύση, έλεγχο και συσκευασία.':
+    'The load was recalled: the item goes through washing, checking and packing again.',
+  'Ξανά: δεν αποδεσμεύτηκε': 'Again: not released',
+  'φυσικές παράμετροι': 'physical parameters',
+  'χημικός δείκτης': 'chemical indicator',
+  'ακεραιότητα συσκευασίας': 'packaging integrity',
+  'βιολογικός δείκτης': 'biological indicator',
   Περισσότερα: 'Learn more',
   'Απόκρυψη πρότασης': 'Hide the suggestion',
   'Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα': 'Unused: new pieces, no use made yet',

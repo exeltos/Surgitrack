@@ -18,16 +18,37 @@ import {
   Printer,
   Undo2,
   Activity,
+  RotateCcw,
 } from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import type {SterilizationRow} from '../sterilizationTypes';
 import SterilizerLoads from './SterilizerLoads';
+import {reprocessReason, type ReprocessReason} from '../../../core/reprocessReason';
 import StageReturnModal from './StageReturnModal';
 import {askConfirm} from '../../../components/ui/confirmService';
 
+const CHECK_LABEL: Record<NonNullable<ReprocessReason['failedChecks']>[number], string> = {
+  PHYSICAL: 'φυσικές παράμετροι',
+  CHEMICAL: 'χημικός δείκτης',
+  PACKAGING: 'ακεραιότητα συσκευασίας',
+  BIOLOGICAL: 'βιολογικός δείκτης',
+};
+/** What the tooltip says about why the item must be processed again. */
+const reprocessText = (again: ReprocessReason) =>
+  again.kind === 'CYCLE_FAILED'
+    ? tr('Ο κύκλος απέτυχε: το αντικείμενο περνά ξανά από πλύση, έλεγχο και συσκευασία.')
+    : again.kind === 'RECALLED'
+      ? tr('Το φορτίο ανακλήθηκε: το αντικείμενο περνά ξανά από πλύση, έλεγχο και συσκευασία.')
+      : again.failedChecks?.length
+        ? tr(
+            'Δεν αποδεσμεύτηκε ({0}): περνά ξανά από πλύση, έλεγχο και συσκευασία.',
+            again.failedChecks.map(c => tr(CHECK_LABEL[c])).join(', '),
+          )
+        : tr('Δεν αποδεσμεύτηκε: περνά ξανά από πλύση, έλεγχο και συσκευασία.');
+
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
-  const {counts, stageReturnInfo} = useSurgi();
+  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads} = useSurgi();
   const [returning, setReturning] = useState<{
     kind: SterilizationRow['kind'];
     id: string;
@@ -59,6 +80,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     rows,
     washing,
   } = s;
+  // Before the sterilizer, an item that came back from a failed cycle or a load not released says so.
+  const showsReprocess = ['WASHING', 'PREP', 'PACKAGING', 'PROCESS'].includes(queue);
   // The instruments of «Φόρτωση κλιβάνου» are all picked by default; unticking leaves one out of the load.
   const [left, setLeft] = useState<Set<string>>(new Set());
   const keyOf = (x: {kind: string; id: string}) => `${x.kind}:${x.id}`;
@@ -274,6 +297,9 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             {rows.map(x => {
               const assetIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(x.barcode));
               const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
+              const again = showsReprocess
+                ? reprocessReason(x.id, sterilizationCycles, sterilizationReleases, processLoads, recallCases)
+                : undefined;
               return (
                 <div className="ster-work-row" key={`${x.kind}-${x.id}`}>
                   <div className={`ster-asset-cell${queue === 'PROCESS' ? ' with-pick' : ''}`}>
@@ -324,10 +350,26 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       ) : (
                         <span className="ster-object-state">{tr('Μεμονωμένο εργαλείο')}</span>
                       )
-                    ) : assetIssues.length === 0 ? (
+                    ) : assetIssues.length === 0 && !again ? (
                       // The stage is the tab itself: the column only speaks up for something to see.
                       <span className="ster-meta-none">—</span>
                     ) : null}
+                    {again && (
+                      <span
+                        className="ster-reprocess"
+                        title={[reprocessText(again), again.note].filter(Boolean).join(' · ')}
+                      >
+                        <RotateCcw size={13} aria-hidden="true" />
+                        {again.kind === 'CYCLE_FAILED'
+                          ? tr('Ξανά: αποτυχία κύκλου')
+                          : again.kind === 'RECALLED'
+                            ? tr('Ξανά: ανάκληση φορτίου')
+                            : tr('Ξανά: δεν αποδεσμεύτηκε')}
+                        <small>
+                          {trData(again.sterilizer)} · {again.cycleNumber}
+                        </small>
+                      </span>
+                    )}
                     {assetIssues.length > 0 && (
                       <span className="issue-inline">
                         <TriangleAlert size={14} />

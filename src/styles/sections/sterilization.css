@@ -1121,6 +1121,24 @@ html body .ster-count-shortage {
   white-space: nowrap;
   font-size: 11px;
 }
+/* An item back before the sterilizer after a failed cycle or a load not released (parts/WorkPanel.tsx). */
+html body .ster-reprocess {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--c-amber-80-2);
+  border-radius: 8px;
+  background: var(--c-gray-100-2);
+  color: var(--c-red-40);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+html body .ster-reprocess small {
+  color: var(--st-muted);
+  font-weight: 600;
+}
 html body .ster-meta .ster-count-shortage {
   margin-left: 0;
 }

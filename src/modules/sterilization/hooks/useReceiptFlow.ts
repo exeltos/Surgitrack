@@ -39,7 +39,6 @@ export function useReceiptFlow(
     setIssueTarget,
     setNote,
     setPrepDraft,
-    setQueue,
     setReceiptBatchDeliverer,
     setReceiptBatchDeviations,
     setReceiptBatchMismatchReason,
@@ -280,7 +279,6 @@ export function useReceiptFlow(
     setReceiptSetChecks({containerOk: false, compositionOk: false, visualOk: false});
     setIssueTarget(null);
     setIssueNote('');
-    setQueue('INCOMING');
   };
   return {
     clearReceiptBatchSelection,
