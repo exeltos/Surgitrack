@@ -76,7 +76,11 @@ export function DeviceEditor({
       footer={
         <>
           <AppButton onClick={onClose}>{L('Ακύρωση', 'Cancel')}</AppButton>
-          <AppButton variant="primary" disabled={!value.name.trim()} onClick={onSave}>
+          <AppButton
+            variant="primary"
+            disabled={!value.name.trim() || (value.kind === 'TEST' && !value.testsEquipment)}
+            onClick={onSave}
+          >
             {L('Αποθήκευση', 'Save')}
           </AppButton>
         </>
@@ -136,6 +140,25 @@ export function DeviceEditor({
             ))}
           </select>
         </label>
+        {value.kind === 'TEST' && (
+          <label className="span-2">
+            {L('Δοκιμάζει τον κλίβανο', 'Tests the sterilizer')} *
+            <select value={value.testsEquipment || ''} onChange={e => set('testsEquipment', e.target.value)}>
+              <option value="">{L('— διαλέξτε —', '— choose —')}</option>
+              {sterilizers.map(item => (
+                <option key={item.id} value={item.el}>
+                  {item.el}
+                </option>
+              ))}
+            </select>
+            <small>
+              {L(
+                'Τα αποτελέσματα της συσκευής (Bowie-Dick, διαρροή κενού, βιολογική) καταγράφονται στις δοκιμές αυτού του κλιβάνου. Το πρόγραμμα που στέλνει η συσκευή πρέπει να περιέχει το όνομα της δοκιμής, π.χ. «Bowie-Dick», «Leak test» ή «Bio».',
+                'The device’s results (Bowie-Dick, vacuum leak, biological) are recorded in this sterilizer’s tests. The program the device sends must contain the test’s name, e.g. “Bowie-Dick”, “Leak test” or “Bio”.',
+              )}
+            </small>
+          </label>
+        )}
         <label>
           {L('Κατασκευαστής', 'Manufacturer')}
           <input value={value.manufacturer || ''} onChange={e => set('manufacturer', e.target.value)} />

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {TESTS_KEPT, testStandings, testsInUse, testsState, withTest} from '../equipmentTests';
+import {TESTS_KEPT, testKindOfProgram, testStandings, testsInUse, testsState, withTest} from '../equipmentTests';
 import type {EquipmentTest} from '../libraries';
 
 const test = (kind: EquipmentTest['kind'], at: string, result: EquipmentTest['result'] = 'PASS'): EquipmentTest => ({
@@ -56,5 +56,26 @@ describe('the tests of a sterilizer', () => {
   it('points out missing tests only where the hospital records tests at all', () => {
     expect(testsInUse([{}, {tests: []}])).toBe(false);
     expect(testsInUse([{}, {tests: allToday}])).toBe(true);
+  });
+
+  it("knows which test a test device's program is", () => {
+    expect(testKindOfProgram('Bowie-Dick 134°C')).toBe('BOWIE_DICK');
+    expect(testKindOfProgram('Helix PCD')).toBe('BOWIE_DICK');
+    expect(testKindOfProgram('Leak test')).toBe('LEAK');
+    expect(testKindOfProgram('Δοκιμή διαρροής κενού')).toBe('LEAK');
+    expect(testKindOfProgram('Bio 3h')).toBe('BIOLOGICAL');
+    expect(testKindOfProgram('Βιολογική δοκιμή')).toBe('BIOLOGICAL');
+    expect(testKindOfProgram('134°C · 5 min')).toBeUndefined();
+    expect(testKindOfProgram(undefined)).toBeUndefined();
+  });
+
+  it('judges a kind by its newest date, not by the order it was recorded in', () => {
+    // A device result that comes in later but is older than the person\'s own record does not replace it.
+    const mine = test('BOWIE_DICK', '10/11/2026 09:00');
+    const older = test('BOWIE_DICK', '09/11/2026 09:00', 'FAIL');
+    const list = withTest([mine], older);
+    expect(list[0]).toBe(mine);
+    expect(testStandings([older, mine], now)[0].last).toBe(mine);
+    expect(testsState([older, mine, ...allToday.slice(1)], now)).toBe('OK');
   });
 });

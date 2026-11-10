@@ -45,4 +45,18 @@ select tests.throws(
   $q$insert into public.equipment_status (organization_id, name, tests) values (tests.org('A'), 'Κλίβανος 3', '{}')$q$,
   '23514', 'the tests are a list');
 
+-- A test device is a device that says which sterilizer it tests.
+select tests.login('admin_a');
+insert into public.devices (organization_id, name, kind, connection, tests_equipment)
+values (tests.org('A'), 'Δοκιμαστής Bowie-Dick', 'TEST', 'API', 'Κλίβανος 1');
+select tests.eq(
+  tests.count($q$select 1 from public.devices where kind = 'TEST' and tests_equipment = 'Κλίβανος 1'$q$), 1,
+  'a test device names the sterilizer it tests');
+select tests.throws(
+  $q$insert into public.devices (organization_id, name, kind, tests_equipment) values (tests.org('A'), 'Χ', 'TEST', '  ')$q$,
+  '23514', 'and the name is not blank');
+select tests.throws(
+  $q$insert into public.devices (organization_id, name, kind) values (tests.org('A'), 'Χ', 'MICROWAVE')$q$,
+  '23514', 'while other kinds stay refused');
+
 rollback;

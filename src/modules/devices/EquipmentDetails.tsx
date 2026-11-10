@@ -1,4 +1,15 @@
-import {ArrowLeft, Cable, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench} from 'lucide-react';
+import {
+  ArrowLeft,
+  Cable,
+  FlaskConical,
+  KeyRound,
+  Pencil,
+  Plus,
+  Trash2,
+  TriangleAlert,
+  Upload,
+  Wrench,
+} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import AppButton from '../../components/ui/AppButton';
 import BackLink from '../../components/ui/BackLink';
@@ -58,6 +69,8 @@ export default function EquipmentDetails({
   onOutOfService,
   onBackInService,
   onRecordTest,
+  testDevices,
+  onConnectTestDevice,
   onConnect,
   onEdit,
   onRemove,
@@ -78,6 +91,9 @@ export default function EquipmentDetails({
   onBackInService: () => void;
   /** Records a test of the sterilizer (the page asks for the result). */
   onRecordTest: (kind: EquipmentTest['kind']) => void;
+  /** The test devices (Bowie-Dick tester, spore reader…) connected to this sterilizer. */
+  testDevices: Device[];
+  onConnectTestDevice: () => void;
   onConnect: () => void;
   onEdit: () => void;
   onRemove: () => void;
@@ -268,6 +284,30 @@ export default function EquipmentDetails({
               </div>
             </div>
             <div className="asset-section-body">
+              <div className="equipment-test-devices">
+                {testDevices.length ? (
+                  <>
+                    <FlaskConical size={15} aria-hidden="true" />
+                    <span>
+                      {L('Συσκευή δοκιμών', 'Test device')}: <b>{testDevices.map(device => device.name).join(', ')}</b>{' '}
+                      —{' '}
+                      {L('τα αποτελέσματά της μπαίνουν εδώ αυτόματα.', 'its results are recorded here automatically.')}
+                    </span>
+                  </>
+                ) : (
+                  <span className="muted">
+                    {L(
+                      'Αν έχετε συσκευή δοκιμών (Bowie-Dick, βιολογική), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
+                      'If you have a test device (Bowie-Dick, biological), connect it so its results come here by themselves.',
+                    )}
+                  </span>
+                )}
+                {devicesEnabled && isAdmin && (
+                  <AppButton size="sm" icon={<Plus size={14} />} onClick={onConnectTestDevice}>
+                    {L('Σύνδεση συσκευής δοκιμών', 'Connect a test device')}
+                  </AppButton>
+                )}
+              </div>
               <table className="equipment-tests">
                 <thead>
                   <tr>
@@ -301,7 +341,11 @@ export default function EquipmentDetails({
                           )}
                           {standing.last?.note && <small>{standing.last.note}</small>}
                         </td>
-                        <td>{standing.last?.by || '—'}</td>
+                        <td>
+                          {standing.last?.id.startsWith('dev-')
+                            ? L('Συσκευή: ', 'Device: ') + standing.last.by
+                            : standing.last?.by || '—'}
+                        </td>
                         <td>
                           {standing.failed ? (
                             <b className="equipment-test-bad">{L('Επανάληψη', 'Repeat')}</b>

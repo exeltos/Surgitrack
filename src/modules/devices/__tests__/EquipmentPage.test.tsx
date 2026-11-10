@@ -181,7 +181,7 @@ describe('Sterilizers & Devices, one screen', () => {
   it('offers the admin to connect a library sterilizer that has no device, named', async () => {
     open();
     const card = await details('ΚΛΙΒΑΝΟΣ 2');
-    fireEvent.click(within(card).getByRole('button', {name: /Σύνδεση συσκευής/}));
+    fireEvent.click(within(card).getByRole('button', {name: 'Σύνδεση συσκευής'}));
     expect((screen.getByRole('combobox', {name: /Όνομα/}) as HTMLInputElement).value).toBe('ΚΛΙΒΑΝΟΣ 2');
   });
 
@@ -288,5 +288,46 @@ describe('Sterilizers & Devices, one screen', () => {
     );
     fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
     expect(within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('Απέτυχε')).toBeInTheDocument();
+  });
+
+  it("records the results a connected test device sent among its sterilizer's tests, once each", async () => {
+    db.devices = [
+      autoclave,
+      {
+        id: 'd3',
+        name: 'Δοκιμαστής Bowie-Dick',
+        kind: 'TEST',
+        connection: 'API',
+        active: true,
+        testsEquipment: 'ΚΛΙΒΑΝΟΣ 1',
+      },
+    ];
+    const sent = (id: string, program: string, result: DeviceReading['result']): DeviceReading => ({
+      ...reading(id, 'd3'),
+      program,
+      result,
+      startedAt: '2026-11-10T06:30:00Z',
+    });
+    db.readings = [
+      sent('b1', 'Bowie-Dick', 'PASS'),
+      sent('x1', '134°C · 5 min', 'PASS'),
+      sent('u1', 'Leak test', 'UNKNOWN'),
+    ];
+    open();
+    await waitFor(() => expect(lib.updateEquipment).toHaveBeenCalledTimes(1));
+    expect(lib.updateEquipment).toHaveBeenCalledWith(
+      'sterilizers',
+      'st1',
+      expect.objectContaining({
+        tests: [
+          expect.objectContaining({id: 'dev-rb1', kind: 'BOWIE_DICK', result: 'PASS', by: 'Δοκιμαστής Bowie-Dick'}),
+        ],
+      }),
+    );
+    // The card says which device it comes from.
+    const card = await details('ΚΛΙΒΑΝΟΣ 1');
+    expect(within(card).getByText(/Δοκιμαστής Bowie-Dick/, {selector: 'b'})).toBeInTheDocument();
+    expect(within(card).getByText(/Συσκευή: Δοκιμαστής Bowie-Dick/)).toBeInTheDocument();
+    expect(lib.updateEquipment).toHaveBeenCalledTimes(1);
   });
 });

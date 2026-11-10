@@ -43,13 +43,31 @@ export type TestStanding = {
   due: boolean;
 };
 
+/**
+ * Which test a test device's reading is, from its program name (how Bowie-Dick testers, leak tests and spore
+ * readers name them, in Greek or English); nothing when it is none of them.
+ */
+export function testKindOfProgram(program?: string): EquipmentTestKind | undefined {
+  const text = (program || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  if (/bowie|dick|helix|pcd/.test(text)) return 'BOWIE_DICK';
+  if (/leak|vacuum|διαρρο|κενο/.test(text)) return 'LEAK';
+  if (/bio|spore|σπορ|βιολογ/.test(text)) return 'BIOLOGICAL';
+  return undefined;
+}
+
 const sameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 /** Where each test stands: its latest result, and whether it is due again. */
 export function testStandings(tests: readonly EquipmentTest[] = [], now = Date.now()): TestStanding[] {
   return TEST_KINDS.map(({id, days}) => {
-    const last = tests.find(test => test.kind === id);
+    // The newest by its date (a test from a device may be recorded after a later one done by hand).
+    const last = tests
+      .filter(test => test.kind === id)
+      .reduce<EquipmentTest | undefined>((newest, test) => {
+        const at = parseDisplayDate(test.at)?.getTime() ?? 0;
+        return !newest || at > (parseDisplayDate(newest.at)?.getTime() ?? 0) ? test : newest;
+      }, undefined);
     const at = last ? parseDisplayDate(last.at) : undefined;
     const due = !at || (days === 1 ? !sameDay(at, new Date(now)) : now - at.getTime() > days * 24 * 60 * 60 * 1000);
     return {kind: id, last, failed: last?.result === 'FAIL', due};
@@ -71,7 +89,9 @@ export function testsState(tests: readonly EquipmentTest[] | undefined, now = Da
  * however many of the others come after it: dropping a failure would clear the sterilizer's lockout.
  */
 export function withTest(tests: readonly EquipmentTest[] = [], test: EquipmentTest): EquipmentTest[] {
-  const all = [test, ...tests];
+  const time = (item: EquipmentTest) => parseDisplayDate(item.at)?.getTime() ?? 0;
+  // Newest first by date; one recorded now goes ahead of an equal date.
+  const all = [test, ...tests].sort((a, b) => time(b) - time(a));
   const latest = new Set(TEST_KINDS.map(kind => all.find(item => item.kind === kind.id)?.id));
   return all.filter((item, index) => index < TESTS_KEPT || latest.has(item.id));
 }

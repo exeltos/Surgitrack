@@ -1,6 +1,6 @@
 import type {DeviceConnection, DeviceKind} from '../../core/deviceData';
 
-export const KINDS: DeviceKind[] = ['STERILIZER', 'WASHER', 'SEALER', 'OTHER'];
+export const KINDS: DeviceKind[] = ['STERILIZER', 'WASHER', 'SEALER', 'TEST', 'OTHER'];
 export const CONNECTIONS: DeviceConnection[] = ['API', 'FILE', 'SERIAL'];
 export const BAUD_RATES = [9600, 19200, 38400, 57600, 115200];
 export const messageOf = (e: unknown) =>

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {
   Cable,
@@ -22,7 +22,7 @@ import KpiStrip from '../../components/ui/KpiStrip';
 import {equipmentTrouble} from '../../core/equipmentHealth';
 import OutOfServiceDialog from './OutOfServiceDialog';
 import TestDialog from './TestDialog';
-import {TEST_KINDS, testsInUse, testsState, withTest} from '../../core/equipmentTests';
+import {TEST_KINDS, testKindOfProgram, testsInUse, testsState, withTest} from '../../core/equipmentTests';
 import type {EquipmentTest} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -182,6 +182,42 @@ export default function EquipmentPage() {
         : row,
     );
   }, [sterilizers, washers, devices, running, sterilizerLoads]);
+  // The results a sterilizer's test devices sent become its tests (once each, as a person's own record would).
+  const importedTests = useRef(new Set<string>());
+  useEffect(() => {
+    if (!canRecord || loading) return;
+    for (const row of rows) {
+      if (row.kind !== 'STERILIZER' || !row.libraryKey || !row.libraryId) continue;
+      const linked = devices.filter(d => d.kind === 'TEST' && d.testsEquipment === row.name);
+      if (!linked.length) continue;
+      const known = new Set((row.tests || []).map(test => test.id));
+      const fresh = readings
+        .filter(r => linked.some(d => d.id === r.deviceId) && r.result !== 'UNKNOWN')
+        .map(r => ({reading: r, kind: testKindOfProgram(r.program), id: `dev-${r.id}`}))
+        .filter(item => item.kind && !known.has(item.id) && !importedTests.current.has(item.id))
+        .sort((a, b) =>
+          (a.reading.startedAt || a.reading.createdAt).localeCompare(b.reading.startedAt || b.reading.createdAt),
+        );
+      if (!fresh.length) continue;
+      fresh.forEach(item => importedTests.current.add(item.id));
+      let next = row.tests;
+      for (const item of fresh) {
+        next = withTest(next, {
+          id: item.id,
+          kind: item.kind!,
+          result: item.reading.result === 'PASS' ? 'PASS' : 'FAIL',
+          at: formatDateTime(item.reading.startedAt || item.reading.endedAt || item.reading.createdAt),
+          by: linked.find(d => d.id === item.reading.deviceId)?.name || '',
+          note: item.reading.program,
+        });
+      }
+      void updateEquipment(row.libraryKey, row.libraryId, {tests: next}).catch(() => {
+        // Tried again the next time the page is opened.
+        fresh.forEach(item => importedTests.current.delete(item.id));
+      });
+    }
+  }, [rows, devices, readings, canRecord, loading, updateEquipment]);
+
   const lastReading = (id: string) => readings.find(r => r.deviceId === id);
   const when = (iso?: string) => (iso ? formatDateTime(iso) : '—');
   const opened = rows.find(r => r.key === openKey);
@@ -621,6 +657,10 @@ export default function EquipmentPage() {
           onOutOfService={() => setOutFor(opened)}
           onBackInService={() => setOutOfService(opened)}
           onRecordTest={kind => setTestFor({row: opened, kind})}
+          testDevices={devices.filter(d => d.kind === 'TEST' && d.testsEquipment === opened.name)}
+          onConnectTestDevice={() =>
+            setEditor({value: {...emptyDevice, kind: 'TEST', connection: 'API', testsEquipment: opened.name}})
+          }
           onConnect={() => setEditor({value: {...emptyDevice, name: opened.name, kind: opened.kind}})}
           onEdit={() => opened.device && setEditor({id: opened.device.id, value: {...opened.device}})}
           onRemove={() => setRemoving(opened.device)}

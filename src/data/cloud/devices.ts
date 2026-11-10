@@ -13,6 +13,7 @@ type DeviceRow = {
   location: string | null;
   connection: DeviceConnection;
   active: boolean;
+  tests_equipment: string | null;
   key_hint: string | null;
   last_seen_at: string | null;
 };
@@ -31,7 +32,8 @@ type ReadingRow = {
   created_at: string;
 };
 
-const DEVICE_COLUMNS = 'id,name,kind,manufacturer,model,serial_number,location,connection,active,key_hint,last_seen_at';
+const DEVICE_COLUMNS =
+  'id,name,kind,manufacturer,model,serial_number,location,connection,active,tests_equipment,key_hint,last_seen_at';
 const READING_COLUMNS =
   'id,device_id,cycle_number,program,started_at,ended_at,result,max_temperature,max_pressure,duration_minutes,source,created_at';
 
@@ -48,6 +50,7 @@ const deviceFromRow = (row: DeviceRow): Device => ({
   location: opt(row.location),
   connection: row.connection,
   active: row.active,
+  testsEquipment: opt(row.tests_equipment),
   keyHint: opt(row.key_hint),
   lastSeenAt: opt(row.last_seen_at),
 });
@@ -89,6 +92,7 @@ export async function saveDevice(organizationId: string, input: DeviceInput, id?
     location: input.location?.trim() || null,
     connection: input.connection,
     active: input.active,
+    tests_equipment: input.kind === 'TEST' ? input.testsEquipment?.trim() || null : null,
   };
   const {error} = id
     ? await supabase.from('devices').update(row).eq('organization_id', organizationId).eq('id', id)
