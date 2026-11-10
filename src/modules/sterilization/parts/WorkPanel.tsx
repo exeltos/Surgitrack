@@ -275,6 +275,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
         </div>
       )}
       {queue === 'PROCESS' && <SterilizerTests />}
+      {queue === 'WASHING' && <SterilizerTests equipment="washers" />}
       {queue === 'IN_STERILIZER' ? (
         <SterilizerLoads loads={s.runningLoads} onPrint={s.printLoadForm} onReport={s.printCycle} />
       ) : rows.length === 0 ? (

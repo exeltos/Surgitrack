@@ -142,19 +142,28 @@ export function DeviceEditor({
         </label>
         {value.kind === 'TEST' && (
           <label className="span-2">
-            {L('Δοκιμάζει τον κλίβανο', 'Tests the sterilizer')} *
+            {L('Δοκιμάζει τον κλίβανο ή το πλυντήριο', 'Tests the sterilizer or washer')} *
             <select value={value.testsEquipment || ''} onChange={e => set('testsEquipment', e.target.value)}>
               <option value="">{L('— διαλέξτε —', '— choose —')}</option>
-              {sterilizers.map(item => (
-                <option key={item.id} value={item.el}>
-                  {item.el}
-                </option>
-              ))}
+              <optgroup label={L('Κλίβανοι', 'Sterilizers')}>
+                {sterilizers.map(item => (
+                  <option key={item.id} value={item.el}>
+                    {item.el}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label={L('Πλυντήρια', 'Washers')}>
+                {washers.map(item => (
+                  <option key={item.id} value={item.el}>
+                    {item.el}
+                  </option>
+                ))}
+              </optgroup>
             </select>
             <small>
               {L(
-                'Τα αποτελέσματα της συσκευής (Bowie-Dick, διαρροή κενού, βιολογική) καταγράφονται στις δοκιμές αυτού του κλιβάνου. Το πρόγραμμα που στέλνει η συσκευή πρέπει να περιέχει το όνομα της δοκιμής, π.χ. «Bowie-Dick», «Leak test» ή «Bio».',
-                'The device’s results (Bowie-Dick, vacuum leak, biological) are recorded in this sterilizer’s tests. The program the device sends must contain the test’s name, e.g. “Bowie-Dick”, “Leak test” or “Bio”.',
+                'Τα αποτελέσματα της συσκευής καταγράφονται στις δοκιμές του εξοπλισμού που διαλέγετε. Το πρόγραμμα που στέλνει η συσκευή πρέπει να περιέχει το όνομα της δοκιμής: για κλίβανο «Bowie-Dick», «Leak test» ή «Bio», για πλυντήριο «Soil test», «Protein» ή «Spray».',
+                'The device’s results are recorded in the tests of the equipment you choose. The program the device sends must contain the test’s name: for a sterilizer “Bowie-Dick”, “Leak test” or “Bio”, for a washer “Soil test”, “Protein” or “Spray”.',
               )}
             </small>
           </label>

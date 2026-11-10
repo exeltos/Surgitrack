@@ -13,8 +13,11 @@ import SterilizerTestRow from './SterilizerTestRow';
  * press records the test; a connected test device records its own. The same tests are on the sterilizer's page in
  * «Κλίβανοι & Συσκευές» and are checked again at Release.
  */
-export default function SterilizerTests() {
-  const {sterilizers} = useLibraries();
+export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?: 'sterilizers' | 'washers'}) {
+  const library = useLibraries();
+  const sterilizers = library[equipment];
+  const washer = equipment === 'washers';
+  const type = washer ? 'WASHER' : 'STERILIZER';
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const [message, setMessage] = useState<{text: string; warning: boolean}>();
@@ -23,7 +26,7 @@ export default function SterilizerTests() {
   const inUse = testsInUse(sterilizers);
 
   // One line when closed: where the tests stand. It opens by itself when something needs attention.
-  const states = sterilizers.map(item => testsState(item.tests));
+  const states = sterilizers.map(item => testsState(item.tests, Date.now(), type));
   const failed = states.filter(state => state === 'FAILED').length;
   const due = inUse ? states.filter(state => state === 'DUE').length : 0;
   const summary = failed
@@ -37,26 +40,31 @@ export default function SterilizerTests() {
   return (
     <details
       className={`ster-tests${failed ? ' bad' : due ? ' due' : ''}`}
-      aria-label={L('Δοκιμές κλιβάνων', 'Sterilizer tests')}
+      aria-label={washer ? L('Δοκιμές πλυντηρίων', 'Washer tests') : L('Δοκιμές κλιβάνων', 'Sterilizer tests')}
       open={!!failed || !!due || undefined}
     >
       <summary>
         <FlaskConical size={16} aria-hidden="true" />
-        <b>{L('Δοκιμές κλιβάνων', 'Sterilizer tests')}</b>
+        <b>{washer ? L('Δοκιμές πλυντηρίων', 'Washer tests') : L('Δοκιμές κλιβάνων', 'Sterilizer tests')}</b>
         <span className="ster-tests-summary">{summary}</span>
       </summary>
       <p className="ster-tests-help">
-        {L(
-          'Πριν το πρώτο φορτίο της ημέρας γίνεται η δοκιμή Bowie-Dick. Πατήστε μια δοκιμή για να καταγράψετε το αποτέλεσμα· αν αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να περάσει. Ελέγχονται ξανά στην Αποδέσμευση.',
-          'The Bowie-Dick test is done before the first load of the day. Press a test to record its result; if it fails, the sterilizer is not loaded until one passes. They are checked again at Release.',
-        )}
+        {washer
+          ? L(
+              'Πριν το πρώτο φορτίο της ημέρας γίνεται ο έλεγχος καθαρισμού με δείκτη λερώματος. Πατήστε μια δοκιμή για να καταγράψετε το αποτέλεσμα· αν αποτύχει, το πλυντήριο δεν φορτώνεται μέχρι να περάσει.',
+              'The cleaning test with a soil indicator is done before the first load of the day. Press a test to record its result; if it fails, the washer is not loaded until one passes.',
+            )
+          : L(
+              'Πριν το πρώτο φορτίο της ημέρας γίνεται η δοκιμή Bowie-Dick. Πατήστε μια δοκιμή για να καταγράψετε το αποτέλεσμα· αν αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να περάσει. Ελέγχονται ξανά στην Αποδέσμευση.',
+              'The Bowie-Dick test is done before the first load of the day. Press a test to record its result; if it fails, the sterilizer is not loaded until one passes. They are checked again at Release.',
+            )}
       </p>
       <ul>
         {sterilizers.map(item => (
           <li key={item.id}>
             <span className="ster-tests-name">{trData(item.el)}</span>
             {item.outOfService && <em>{L('εκτός λειτουργίας', 'out of service')}</em>}
-            <SterilizerTestRow sterilizer={item} inUse={inUse} onMessage={setMessage} />
+            <SterilizerTestRow sterilizer={item} inUse={inUse} onMessage={setMessage} equipment={equipment} />
           </li>
         ))}
       </ul>

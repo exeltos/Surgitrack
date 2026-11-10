@@ -154,6 +154,7 @@ export default function EquipmentPage() {
         libraryKey: 'washers' as const,
         libraryId: item.id,
         outOfService: item.outOfService,
+        tests: item.tests,
       })),
     ];
     const matched = new Set<string>();
@@ -187,8 +188,14 @@ export default function EquipmentPage() {
   useEffect(() => {
     if (!canRecord || loading) return;
     for (const row of rows) {
-      if (row.kind !== 'STERILIZER' || !row.libraryKey || !row.libraryId) continue;
-      const found = testsFromDevices({el: row.name, tests: row.tests}, devices, readings, importedTests.current);
+      if ((row.kind !== 'STERILIZER' && row.kind !== 'WASHER') || !row.libraryKey || !row.libraryId) continue;
+      const found = testsFromDevices(
+        {el: row.name, tests: row.tests},
+        devices,
+        readings,
+        importedTests.current,
+        row.kind,
+      );
       if (!found) continue;
       found.ids.forEach(id => importedTests.current.add(id));
       void updateEquipment(row.libraryKey, row.libraryId, {tests: found.tests}).catch(() => {
@@ -204,9 +211,11 @@ export default function EquipmentPage() {
   const busy = rows.filter(r => r.load).length;
   const outCount = rows.filter(r => r.outOfService).length;
   // Missing tests are pointed out only where the hospital records tests at all; a failed one always is.
-  const withTests = testsInUse(sterilizers);
+  const testsUsed = {STERILIZER: testsInUse(sterilizers), WASHER: testsInUse(washers)};
   const testStateOf = (row: EquipmentRow) =>
-    row.kind === 'STERILIZER' && row.libraryId && (withTests || row.tests?.length) ? testsState(row.tests) : undefined;
+    (row.kind === 'STERILIZER' || row.kind === 'WASHER') && row.libraryId && (testsUsed[row.kind] || row.tests?.length)
+      ? testsState(row.tests, Date.now(), row.kind)
+      : undefined;
   const attention = rows.filter(
     r => !r.outOfService && (r.trouble?.attention || (testStateOf(r) && testStateOf(r) !== 'OK')),
   ).length;

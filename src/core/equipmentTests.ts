@@ -1,10 +1,12 @@
 import {formatDateTime, parseDisplayDate} from './displayDate';
 import type {Device, DeviceReading} from './deviceData';
-import type {EquipmentTest, EquipmentTestKind} from './libraries';
+import type {EquipmentTest, EquipmentTestKind, TestedEquipment} from './libraries';
 
 /** Each test, how often it is due, and what it is called. A day is the calendar day; a week is seven days. */
 export const TEST_KINDS: Array<{
   id: EquipmentTestKind;
+  /** The equipment it is for. */
+  equipment: TestedEquipment;
   days: number;
   el: string;
   en: string;
@@ -12,6 +14,7 @@ export const TEST_KINDS: Array<{
 }> = [
   {
     id: 'BOWIE_DICK',
+    equipment: 'STERILIZER',
     days: 1,
     el: 'Bowie-Dick',
     en: 'Bowie-Dick',
@@ -19,6 +22,7 @@ export const TEST_KINDS: Array<{
   },
   {
     id: 'LEAK',
+    equipment: 'STERILIZER',
     days: 7,
     el: 'Δοκιμή διαρροής κενού',
     en: 'Vacuum leak test',
@@ -26,13 +30,40 @@ export const TEST_KINDS: Array<{
   },
   {
     id: 'BIOLOGICAL',
+    equipment: 'STERILIZER',
     days: 7,
     el: 'Βιολογική δοκιμή (σπόροι)',
     en: 'Biological test (spores)',
     hint: {el: 'Κάθε εβδομάδα', en: 'Every week'},
   },
+  {
+    id: 'CLEANING',
+    equipment: 'WASHER',
+    days: 1,
+    el: 'Έλεγχος καθαρισμού (δείκτης λερώματος)',
+    en: 'Cleaning test (soil indicator)',
+    hint: {el: 'Κάθε μέρα, πριν το πρώτο φορτίο', en: 'Every day, before the first load'},
+  },
+  {
+    id: 'PROTEIN',
+    equipment: 'WASHER',
+    days: 7,
+    el: 'Υπολείμματα πρωτεΐνης',
+    en: 'Protein residue',
+    hint: {el: 'Κάθε εβδομάδα', en: 'Every week'},
+  },
+  {
+    id: 'SPRAY',
+    equipment: 'WASHER',
+    days: 7,
+    el: 'Ψεκαστήρες και δοσολογία',
+    en: 'Spray arms and dosing',
+    hint: {el: 'Κάθε εβδομάδα', en: 'Every week'},
+  },
 ];
-/** The newest tests kept per sterilizer. */
+/** The tests of one kind of equipment. */
+export const testKindsFor = (equipment: TestedEquipment) => TEST_KINDS.filter(kind => kind.equipment === equipment);
+/** The newest tests kept per piece of equipment. */
 export const TESTS_KEPT = 40;
 
 export type TestStanding = {
@@ -53,6 +84,10 @@ export function testKindOfProgram(program?: string): EquipmentTestKind | undefin
   if (/bowie|dick|helix|pcd/.test(text)) return 'BOWIE_DICK';
   if (/leak|vacuum|διαρρο|κενο/.test(text)) return 'LEAK';
   if (/bio|spore|σπορ|βιολογ/.test(text)) return 'BIOLOGICAL';
+  // A washer-disinfector's: the soil indicator, the protein residue, the spray arms and the dosing.
+  if (/protein|ninhydrin|πρωτεϊν|πρωτειν/.test(text)) return 'PROTEIN';
+  if (/browne|tosi|soil|clean|λερω|καθαρ/.test(text)) return 'CLEANING';
+  if (/spray|arm|dos|ψεκαστ|δοσολ|περιστρ/.test(text)) return 'SPRAY';
   return undefined;
 }
 
@@ -60,8 +95,12 @@ const sameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 /** Where each test stands: its latest result, and whether it is due again. */
-export function testStandings(tests: readonly EquipmentTest[] = [], now = Date.now()): TestStanding[] {
-  return TEST_KINDS.map(({id, days}) => {
+export function testStandings(
+  tests: readonly EquipmentTest[] = [],
+  now = Date.now(),
+  equipment: TestedEquipment = 'STERILIZER',
+): TestStanding[] {
+  return testKindsFor(equipment).map(({id, days}) => {
     // The newest by its date (a test from a device may be recorded after a later one done by hand).
     const last = tests
       .filter(test => test.kind === id)
@@ -79,8 +118,12 @@ export function testStandings(tests: readonly EquipmentTest[] = [], now = Date.n
  * The sterilizer's standing: «FAILED» when the latest of any test failed (it is not loaded until a pass is
  * recorded), «DUE» when a test is missing or overdue (a warning only), otherwise «OK».
  */
-export function testsState(tests: readonly EquipmentTest[] | undefined, now = Date.now()): 'OK' | 'DUE' | 'FAILED' {
-  const standings = testStandings(tests, now);
+export function testsState(
+  tests: readonly EquipmentTest[] | undefined,
+  now = Date.now(),
+  equipment: TestedEquipment = 'STERILIZER',
+): 'OK' | 'DUE' | 'FAILED' {
+  const standings = testStandings(tests, now, equipment);
   if (standings.some(item => item.failed)) return 'FAILED';
   return standings.some(item => item.due) ? 'DUE' : 'OK';
 }
@@ -97,7 +140,7 @@ export function withTest(tests: readonly EquipmentTest[] = [], test: EquipmentTe
   return all.filter((item, index) => index < TESTS_KEPT || latest.has(item.id));
 }
 
-/** Whether the hospital records tests at all (any sterilizer has one): only then are missing tests pointed out. */
+/** Whether the hospital records tests at all (any piece of this equipment has one): only then are missing tests pointed out. */
 export const testsInUse = (list: ReadonlyArray<{tests?: readonly EquipmentTest[]}>) =>
   list.some(item => !!item.tests?.length);
 
@@ -111,6 +154,7 @@ export function testsFromDevices(
   devices: readonly Device[],
   readings: readonly DeviceReading[],
   skip: ReadonlySet<string> = new Set(),
+  equipment: TestedEquipment = 'STERILIZER',
 ): {tests: EquipmentTest[]; ids: string[]} | undefined {
   const linked = devices.filter(device => device.kind === 'TEST' && device.testsEquipment === sterilizer.el);
   if (!linked.length) return undefined;
@@ -118,7 +162,9 @@ export function testsFromDevices(
   const fresh = readings
     .filter(reading => linked.some(device => device.id === reading.deviceId) && reading.result !== 'UNKNOWN')
     .map(reading => ({reading, kind: testKindOfProgram(reading.program), id: `dev-${reading.id}`}))
-    .filter(item => item.kind && !known.has(item.id) && !skip.has(item.id))
+    // Only the tests of this kind of equipment (a washer's soil test is not a sterilizer's).
+    .filter(item => item.kind && testKindsFor(equipment).some(k => k.id === item.kind))
+    .filter(item => !known.has(item.id) && !skip.has(item.id))
     .sort((a, b) =>
       (a.reading.startedAt || a.reading.createdAt).localeCompare(b.reading.startedAt || b.reading.createdAt),
     );
