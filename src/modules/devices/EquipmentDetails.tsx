@@ -264,7 +264,10 @@ export default function EquipmentDetails({
               <>
                 <LoadContents load={shownLoad} />
                 <p>
-                  <Link className="equipment-open-link" to="/sterilization?queue=IN_STERILIZER">
+                  <Link
+                    className="equipment-open-link"
+                    to={row.kind === 'WASHER' ? '/sterilization?queue=WASHING' : '/sterilization?queue=IN_STERILIZER'}
+                  >
                     {L('Άνοιγμα στην Αποστείρωση', 'Open in Sterilization')}
                   </Link>
                 </p>
@@ -399,13 +402,19 @@ export default function EquipmentDetails({
               <div>
                 <span className="eyebrow">{L('ΙΣΤΟΡΙΚΟ', 'HISTORY')}</span>
                 <h2>
-                  {L('Αποτυχίες και μη αποδεσμεύσεις', 'Failures and loads not released')}
+                  {row.kind === 'WASHER'
+                    ? L('Αποτυχημένες πλύσεις', 'Failed washes')
+                    : L('Αποτυχίες και μη αποδεσμεύσεις', 'Failures and loads not released')}
                   {row.trouble.attention && (
                     <span className="equipment-attention">
                       <TriangleAlert size={13} aria-hidden="true" />
                       {L(
-                        `${row.trouble.recent} τις τελευταίες 30 ημέρες: ελέγξτε τον κλίβανο`,
-                        `${row.trouble.recent} in the last 30 days: have the sterilizer checked`,
+                        row.kind === 'WASHER'
+                          ? `${row.trouble.recent} τις τελευταίες 30 ημέρες: ελέγξτε το πλυντήριο`
+                          : `${row.trouble.recent} τις τελευταίες 30 ημέρες: ελέγξτε τον κλίβανο`,
+                        row.kind === 'WASHER'
+                          ? `${row.trouble.recent} in the last 30 days: have the washer checked`
+                          : `${row.trouble.recent} in the last 30 days: have the sterilizer checked`,
                       )}
                     </span>
                   )}
@@ -420,7 +429,9 @@ export default function EquipmentDetails({
                     <span>{item.program}</span>
                     <span className={`device-result ${item.kind === 'CYCLE_FAILED' ? 'fail' : 'unknown'}`}>
                       {item.kind === 'CYCLE_FAILED'
-                        ? L('Αποτυχία κύκλου', 'Cycle failed')
+                        ? row.kind === 'WASHER'
+                          ? L('Αποτυχία πλύσης', 'Wash failed')
+                          : L('Αποτυχία κύκλου', 'Cycle failed')
                         : L('Δεν αποδεσμεύτηκε', 'Not released')}
                     </span>
                     <small>

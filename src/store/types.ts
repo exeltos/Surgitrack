@@ -136,6 +136,10 @@ export type CreateProcessLoadPayload = {
   program: string;
   /** Set when the chemical indicator is part of the load; its result is recorded at release. */
   chemicalIndicatorResult?: SterilizationIndicatorResult;
+  /** A washing load: how the cycle ended. A failed one keeps its items in the washer stage to be washed again. */
+  washResult?: 'PASS' | 'FAIL';
+  washTemperature?: number;
+  washA0?: number;
   /** The cycle already ended (taken from a connected device): the load goes straight to release. */
   cycleCompleted?: boolean;
   /** 'PENDING' when a biological indicator is part of the load; its result is recorded at release. */

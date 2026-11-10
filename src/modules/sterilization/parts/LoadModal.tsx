@@ -74,6 +74,9 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     setLoadCycleNumber(reading.cycleNumber);
                     if (reading.program) setLoadProgram(reading.program);
                     if (reading.result === 'FAIL') setLoadChemical('FAIL');
+                    else if (loadModal === 'WASHING' && reading.result === 'PASS') setLoadChemical('PASS');
+                    if (loadModal === 'WASHING' && reading.maxTemperature !== undefined)
+                      s.setLoadWashTemp(String(reading.maxTemperature));
                     setLoadNote(note => note || deviceNote(reading));
                     s.setLoadFromDevice(true);
                   }}
@@ -128,6 +131,51 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   {tr('Πρόγραμμα')}
                   <input value={loadProgram} onChange={e => setLoadProgram(e.target.value)} />
                 </label>
+                {loadModal === 'WASHING' && (
+                  <>
+                    <div className="load-indicator-pick" role="group" aria-labelledby="load-wash-result">
+                      <span id="load-wash-result">{tr('Αποτέλεσμα πλύσης')}</span>
+                      <div className="load-indicator-chips">
+                        <label>
+                          <input
+                            type="radio"
+                            name="load-wash-result"
+                            checked={loadChemical !== 'FAIL'}
+                            onChange={() => setLoadChemical('PASS')}
+                          />
+                          {tr('Επιτυχές')}
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="load-wash-result"
+                            checked={loadChemical === 'FAIL'}
+                            onChange={() => setLoadChemical('FAIL')}
+                          />
+                          {tr('Αποτυχία')}
+                        </label>
+                      </div>
+                    </div>
+                    <label>
+                      {tr('Θερμοκρασία (°C)')}
+                      <input
+                        inputMode="decimal"
+                        value={s.loadWashTemp}
+                        onChange={e => s.setLoadWashTemp(e.target.value)}
+                        placeholder={tr('προαιρετικό')}
+                      />
+                    </label>
+                    <label>
+                      {tr('Τιμή A0')}
+                      <input
+                        inputMode="decimal"
+                        value={s.loadWashA0}
+                        onChange={e => s.setLoadWashA0(e.target.value)}
+                        placeholder={tr('προαιρετικό')}
+                      />
+                    </label>
+                  </>
+                )}
                 {loadModal === 'STERILIZATION' && (
                   <div className="load-indicator-pick" role="group" aria-labelledby="load-indicator-title">
                     <span id="load-indicator-title">{tr('Δείκτες στο φορτίο')}</span>
@@ -156,6 +204,12 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 <div className="load-device-fail" role="alert">
                   <TriangleAlert size={16} />
                   {tr('Η συσκευή δήλωσε αποτυχία κύκλου: το φορτίο θα επιστρέψει σε επανεπεξεργασία.')}
+                </div>
+              )}
+              {loadModal === 'WASHING' && loadChemical === 'FAIL' && (
+                <div className="load-device-fail" role="alert">
+                  <TriangleAlert size={16} />
+                  {tr('Αποτυχία πλύσης: τα αντικείμενα μένουν στον καθαρισμό για νέα πλύση.')}
                 </div>
               )}
               {loadModal === 'STERILIZATION' && (
@@ -225,17 +279,11 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
             <div className="modal-actions workflow-modal-actions">
               <button onClick={closeLoad}>{tr('Ακύρωση')}</button>
               <button
-                className={
-                  loadModal === 'STERILIZATION' && loadChemical === 'FAIL' ? 'danger-action primary' : 'primary'
-                }
+                className={loadChemical === 'FAIL' ? 'danger-action primary' : 'primary'}
                 disabled={!loadSelected.size || !loadEquipment.trim() || !loadCycleNumber.trim() || !loadProgram.trim()}
                 onClick={completeLoad}
               >
-                {loadModal === 'STERILIZATION' && loadChemical === 'FAIL' ? (
-                  <TriangleAlert size={16} />
-                ) : (
-                  <CheckCircle2 size={16} />
-                )}{' '}
+                {loadChemical === 'FAIL' ? <TriangleAlert size={16} /> : <CheckCircle2 size={16} />}{' '}
                 {loadModal === 'STERILIZATION' && !s.loadFromDevice && loadChemical !== 'FAIL'
                   ? tr('Έναρξη κύκλου ·') + ' '
                   : tr('Ολοκλήρωση φορτίου ·') + ' '}

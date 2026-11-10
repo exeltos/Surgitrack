@@ -1247,6 +1247,17 @@ export const en: Record<string, string> = {
   'Το εργαλείο και τα απαιτούμενα μέρη του έχουν ελεγχθεί.': 'The instrument and its required parts have been checked.',
   'Το πρώτο barcode ορίζει το τμήμα της παράδοσης.': "The first barcode sets the delivery's department.",
   'Το πρώτο barcode ορίζει το τμήμα της παραλαβής.': "The first barcode sets the receipt's department.",
+  'Το φορτίο {0} απέτυχε: τα αντικείμενα μένουν στον καθαρισμό για νέα πλύση.':
+    'Load {0} failed: the items stay in cleaning to be washed again.',
+  'Αποτυχία πλύσης': 'Wash failed',
+  'Επιτυχής πλύση': 'Wash passed',
+  'Αποτέλεσμα πλύσης': 'Wash result',
+  Επιτυχές: 'Passed',
+  'Θερμοκρασία (°C)': 'Temperature (°C)',
+  'Τιμή A0': 'A0 value',
+  προαιρετικό: 'optional',
+  'Αποτυχία πλύσης: τα αντικείμενα μένουν στον καθαρισμό για νέα πλύση.':
+    'Wash failed: the items stay in cleaning to be washed again.',
   'Το φορτίο {0} απέτυχε και επέστρεψε σε επανεπεξεργασία.': 'Load {0} failed and returned to reprocessing.',
   'Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).': 'Load {0} released ({1} items).',
   'Το φορτίο {0} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.':

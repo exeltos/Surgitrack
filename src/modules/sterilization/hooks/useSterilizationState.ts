@@ -193,6 +193,9 @@ export function useSterilizationState() {
   const [loadBiologicalOn, setLoadBiologicalOn] = useState(false);
   /** The cycle was taken from a connected device, so it has already ended. */
   const [loadFromDevice, setLoadFromDevice] = useState(false);
+  /** A washing load: the temperature and A0 value of the cycle, typed (or taken from the device). */
+  const [loadWashTemp, setLoadWashTemp] = useState('');
+  const [loadWashA0, setLoadWashA0] = useState('');
   const [loadNote, setLoadNote] = useState('');
   const [loadScanFeedback, setLoadScanFeedback] = useState<{type: 'OK' | 'WARN' | 'ERROR'; message: string} | null>(
     null,
@@ -255,6 +258,10 @@ export function useSterilizationState() {
     loadBiologicalOn,
     loadFromDevice,
     setLoadFromDevice,
+    loadWashTemp,
+    setLoadWashTemp,
+    loadWashA0,
+    setLoadWashA0,
     loadCycleNumber,
     loadEquipment,
     loadModal,
