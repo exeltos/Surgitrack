@@ -320,7 +320,13 @@ export default function ReportsPage() {
   // Every column of the report sorts by its own title.
   const order = useTableSort(
     viewRows,
-    Object.fromEntries(screenColumns.map(c => [c.key, (row: Row) => displaySortValue(row[c.key])])),
+    Object.fromEntries(
+      screenColumns.map(c => [
+        c.key,
+        // A column that shows a date with a name after it (the release of a load) sorts by the date underneath.
+        (row: Row) => displaySortValue(c.key === 'releasedInfo' ? row.released : row[c.key]),
+      ]),
+    ),
   );
   const shownRows = useProgressiveList(
     order.rows,

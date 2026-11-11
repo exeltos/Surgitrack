@@ -215,6 +215,10 @@ Deno.serve(async req => {
         return json({error: "update_failed"}, 500);
       }
     }
+    // The person is told (best effort, and only at an address that can receive mail) so a reset cannot happen unnoticed.
+    if (resetInitial && target.email && !String(target.email).endsWith(".invalid")) {
+      await notifyAccountEvent(String(target.email), "initial_password_reset", me.name);
+    }
     // A change made by the platform owner to the person's email or role voids a request a hospital admin made before
     // it: the link must not overwrite what the owner has just decided.
     if (!needsConfirmation && (emailChanged || role !== target.role)) {

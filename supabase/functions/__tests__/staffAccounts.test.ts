@@ -355,6 +355,18 @@ describe('update-staff: a reset to a first password by hand', () => {
     expect(JSON.stringify(profile)).not.toContain('6912345678');
   });
 
+  it('tells the person by email that their password was reset, but not at an address that cannot receive mail', async () => {
+    Object.assign(env, {SMTP_HOST: 'smtp.test', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'app@test'});
+    answer(person);
+    await reset('6912345678');
+    expect(mailState.outbox.map(m => m.to)).toEqual(['Nurse@Hospital.gr']);
+    expect(mailState.outbox[0].html).toContain('επανήλθε σε αρχικό');
+    mailState.outbox.length = 0;
+    answer({...person, email: 'ab1000@staff.surgitrack.invalid'});
+    await handle(post({user_id: 'user-2', name: 'Nurse', email: 'ab1000@staff.surgitrack.invalid', reset_initial_password: true, phone: '6912345678'}));
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
   it('refuses a number that is not one, and changes nothing', async () => {
     answer(person);
     expect((await reset('12')).status).toBe(400);
