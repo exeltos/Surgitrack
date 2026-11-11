@@ -198,7 +198,11 @@ export async function writeCollection(
       void _items;
       changes = {
         ...rest,
-        versions: Object.fromEntries(Object.entries(versions).filter(([id, version]) => last.versions[id] !== version)),
+        // The versions that changed, and always those of the unsaved records: read without the whole copy
+        // (another tab wrote its own over it), these still need the version their change started from.
+        versions: Object.fromEntries(
+          Object.entries(versions).filter(([id, version]) => last.versions[id] !== version || unsaved.has(id)),
+        ),
         base: last.token,
         upserts,
         gone,

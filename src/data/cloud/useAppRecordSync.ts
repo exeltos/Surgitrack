@@ -159,10 +159,16 @@ type GroupMember = {
   settle: (outcome: GroupOutcome, items: CloudRecord[]) => void;
 };
 type GroupOutcome = {kind: 'saved'} | {kind: 'refused'; code: string; message: string} | {kind: 'not-sent'};
-type Group = {members: Map<string, GroupMember>};
+type Group = {
+  members: Map<string, GroupMember>;
+  /** Each collection's records as they were before the action: only what it changed joins the group. */
+  before: Map<string, Set<CloudRecord>>;
+};
 /** How long a group takes in the collections an action changed (their sync runs once the store has them). */
 const GROUP_COLLECT_MS = 300;
 let collecting: Group | undefined;
+// Each synced collection's current records, by hospital and collection, for the picture before an action.
+const liveCollections = new Map<string, () => readonly CloudRecord[]>();
 // Records in a group on its way to the database: not sent by their collection's flush meanwhile.
 const held = new WeakSet<CloudRecord>();
 
@@ -205,7 +211,10 @@ const sendGroup = async (group: Group) => {
  */
 export function saveTogether<T>(action: () => T): T {
   if (collecting) return action();
-  const group: Group = {members: new Map()};
+  const group: Group = {
+    members: new Map(),
+    before: new Map([...liveCollections].map(([key, items]) => [key, new Set(items())])),
+  };
   collecting = group;
   try {
     return action();
@@ -357,13 +366,17 @@ export function useAppRecordSync(
     if (!organizationId) return;
     const write = () => writeCopy.current();
     const flushNow = () => setRetryTick(tick => tick + 1);
+    const live = `${organizationId}:${collection}`;
+    const items = () => latest.current;
     cacheWriters.add(write);
     flushers.add(flushNow);
+    liveCollections.set(live, items);
     return () => {
       cacheWriters.delete(write);
       flushers.delete(flushNow);
+      if (liveCollections.get(live) === items) liveCollections.delete(live);
     };
-  }, [organizationId]);
+  }, [organizationId, collection]);
 
   useEffect(() => {
     latest.current = items;
@@ -516,8 +529,13 @@ export function useAppRecordSync(
     };
     // An action saving its records together is under way: this collection's changes join its group.
     if (collecting && !collecting.members.has(key)) {
+      // Changes already waiting before the action are not its own: they stay with the flush, so a refused
+      // group never takes them back with it.
+      const before = collecting.before.get(key);
       const take = () => {
-        const items = diff(known, latest.current).changed.filter(item => !superseded.current.has(item));
+        const items = diff(known, latest.current).changed.filter(
+          item => !superseded.current.has(item) && !before?.has(item),
+        );
         items.forEach(item => held.add(item));
         return items;
       };

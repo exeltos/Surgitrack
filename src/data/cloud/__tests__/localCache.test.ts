@@ -143,7 +143,7 @@ describe("this device's copy of a large collection", () => {
     expect((await readCache(owner, ['tools'])).tools!.items).toEqual(items);
   });
 
-  it('changes written over a whole copy that never reached the disk keep only the unsaved records', async () => {
+  it('changes written over a whole copy that is no longer there (another tab, a failed write) keep the unsaved records and their versions', async () => {
     let items = many(1000);
     await writeCollection('tools', {...entry(items), items});
     items = items.map(item => (item.id === 't3' ? {...item, name: 'Unsaved'} : item));
@@ -155,6 +155,8 @@ describe("this device's copy of a large collection", () => {
     expect(copy.expired).toBe(true);
     expect(copy.changed).toEqual(['t3']);
     expect(copy.items.find(item => item.id === 't3')).toEqual({id: 't3', name: 'Unsaved'});
+    // With the version its change started from, so its save is still checked against the server's (S4).
+    expect(copy.versions).toEqual({t3: 'v-t3'});
   });
 
   it('keeps the unsaved changes written on top when the session ends on its own', async () => {
