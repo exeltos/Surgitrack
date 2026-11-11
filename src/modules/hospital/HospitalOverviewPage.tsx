@@ -274,18 +274,38 @@ export default function HospitalOverviewPage() {
         .join(' · '),
       to: '/stock?view=minimums',
     });
-  if (lifecycleAlerts.length > 0)
+  // Usage alerts hold Sets and instruments, with a few uses left or none: each kind opens the list that holds exactly
+  // those (an instrument with none left is not in «few left», and a Set is not in the instrument list).
+  const usageRows = [
+    {kind: 'TOOL', none: true, to: presetPath('/tools', {usage: 'EXHAUSTED'})},
+    {kind: 'SET', none: true, to: presetPath('/sets', {usage: 'EXHAUSTED'})},
+    {kind: 'TOOL', none: false, to: presetPath('/tools', {usage: 'LOW'})},
+    {kind: 'SET', none: false, to: presetPath('/sets', {usage: 'LOW'})},
+  ] as const;
+  for (const row of usageRows) {
+    const group = lifecycleAlerts.filter(a => a.assetKind === row.kind && (a.remaining === 0) === row.none);
+    if (group.length === 0) continue;
+    const tool = row.kind === 'TOOL';
     triage.push({
-      key: 'limit',
-      tone: 'warn',
-      count: lifecycleAlerts.length,
-      title: L(`${lifecycleAlerts.length} κοντά στο όριο χρήσεων`, `${lifecycleAlerts.length} near their usage limit`),
-      note: lifecycleAlerts
+      key: `limit-${row.kind}-${row.none}`,
+      tone: row.none ? 'bad' : 'warn',
+      count: group.length,
+      title: row.none
+        ? L(
+            `${group.length} ${tool ? plural(group.length, 'εργαλείο', 'εργαλεία') : plural(group.length, 'Σετ', 'Σετ')} με εξαντλημένες χρήσεις`,
+            `${group.length} ${tool ? plural(group.length, 'instrument', 'instruments') : plural(group.length, 'Set', 'Sets')} out of uses`,
+          )
+        : L(
+            `${group.length} ${tool ? plural(group.length, 'εργαλείο', 'εργαλεία') : 'Σετ'} κοντά στο όριο χρήσεων`,
+            `${group.length} ${tool ? plural(group.length, 'instrument', 'instruments') : plural(group.length, 'Set', 'Sets')} near the usage limit`,
+          ),
+      note: group
         .slice(0, 2)
-        .map(a => `${a.barcode} · ${L(`απομένουν ${a.remaining}`, `${a.remaining} left`)}`)
+        .map(a => (row.none ? a.barcode : `${a.barcode} · ${L(`απομένουν ${a.remaining}`, `${a.remaining} left`)}`))
         .join(' · '),
-      to: presetPath('/tools', {usage: 'LOW'}),
+      to: row.to,
     });
+  }
   triage.sort((a, b) => Number(b.tone === 'bad') - Number(a.tone === 'bad'));
 
   // Where every unit of equipment is: Sets and standalone instruments by state, plus the instruments in Stock.
