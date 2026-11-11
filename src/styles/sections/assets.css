@@ -492,6 +492,9 @@ html body .usage-correct button:disabled {
   border-radius: 14px;
   background: var(--c-white);
 }
+.asset-lifecycle-scroll {
+  overflow-x: auto;
+}
 .asset-lifecycle-steps {
   display: flex;
   flex-wrap: nowrap;
@@ -499,7 +502,6 @@ html body .usage-correct button:disabled {
   margin: 0;
   padding: 0 0 2px;
   list-style: none;
-  overflow-x: auto;
 }
 .asset-lifecycle-steps li {
   position: relative;

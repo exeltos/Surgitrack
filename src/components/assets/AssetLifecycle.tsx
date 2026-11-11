@@ -78,18 +78,21 @@ export default function AssetLifecycle({
       </Link>
     ) : null;
   return (
-    <section className="asset-lifecycle" aria-label={tr('Πορεία στην Αποστείρωση')}>
-      <ol className="asset-lifecycle-steps">
-        {life.steps.map((id, index) => {
-          const status = index < life.current ? 'done' : index === life.current ? 'current' : 'todo';
-          return (
-            <li key={id} className={status} aria-current={status === 'current' ? 'step' : undefined}>
-              <i aria-hidden="true">{status === 'done' ? <Check size={13} /> : index + 1}</i>
-              <span>{label(id)}</span>
-            </li>
-          );
-        })}
-      </ol>
+    <section className="asset-lifecycle">
+      {/* On a narrow screen the steps scroll sideways: the region takes the keyboard focus so they can be reached. */}
+      <div className="asset-lifecycle-scroll" role="region" tabIndex={0} aria-label={tr('Πορεία στην Αποστείρωση')}>
+        <ol className="asset-lifecycle-steps">
+          {life.steps.map((id, index) => {
+            const status = index < life.current ? 'done' : index === life.current ? 'current' : 'todo';
+            return (
+              <li key={id} className={status} aria-current={status === 'current' ? 'step' : undefined}>
+                <i aria-hidden="true">{status === 'done' ? <Check size={13} /> : index + 1}</i>
+                <span>{label(id)}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
       <div className="asset-lifecycle-next">
         <div>
           <small>{tr('ΕΠΟΜΕΝΟ ΒΗΜΑ')}</small>
