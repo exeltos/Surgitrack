@@ -2513,3 +2513,8 @@ html body .content:has(> .equipment-page) {
     justify-content: flex-start;
   }
 }
+.stage-return-last {
+  margin: 0 0 4px;
+  color: var(--st-muted);
+  font-size: 12.5px;
+}

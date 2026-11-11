@@ -144,6 +144,15 @@ export function latestUndoable(movements: readonly Movement[], barcode: string):
   return own[0]?.m;
 }
 
+/** The newest entry of an item's history, whatever it was (a release, an undo…): what the item has just been through. */
+export function latestMovement(movements: readonly Movement[], barcode: string): Movement | undefined {
+  const own = movements
+    .map((m, index) => ({m, index, stamp: movementStamp(m.at)}))
+    .filter(({m}) => barcodeOf(m.asset) === barcode.toUpperCase())
+    .sort((a, b) => b.stamp - a.stamp || a.index - b.index);
+  return own[0]?.m;
+}
+
 export type UndoActor = {
   role: string;
   /** May correct uses (hospital admin, Sterilization supervisor, platform owner). */

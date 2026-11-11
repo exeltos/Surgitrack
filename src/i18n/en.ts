@@ -2307,6 +2307,8 @@ export const en: Record<string, string> = {
   'Επιστροφή…': 'Return…',
   'Επιστροφή σε στάδιο ή στο τμήμα': 'Return to a stage or to the department',
   'Επιστροφή σε': 'Return to',
+  'Επιστροφή σε: {0}': 'Return to: {0}',
+  'Τελευταία κίνηση: «{0}» της {1} ({2}).': 'Latest movement: «{0}» of {1} ({2}).',
   'Επιστροφή σε προηγούμενο στάδιο': 'Return to an earlier stage',
   'Επιστροφή στο τμήμα': 'Return to the department',
   'Η κίνηση καταγράφεται στο ιστορικό με την αιτιολογία και μπορεί να αναιρεθεί.':

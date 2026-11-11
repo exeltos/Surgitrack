@@ -6,6 +6,8 @@ import type {ReturnTargetId} from '../../../core/stageReturn';
 import type {AssetKind} from '../../../types/domain';
 import AppButton from '../../../components/ui/AppButton';
 import {tr, trData} from '../../../i18n';
+import {latestMovement} from '../../../core/movementUndo';
+import {movementText} from '../../../core/movementText';
 
 /**
  * «Επιστροφή σε προηγούμενο στάδιο»: the owner, the hospital admin and the Sterilization supervisor put an
@@ -18,7 +20,8 @@ export default function StageReturnModal({
   asset: {kind: AssetKind; id: string; barcode: string; name: string};
   onClose: () => void;
 }) {
-  const {stageReturnInfo, returnToStage} = useSurgi();
+  const {stageReturnInfo, returnToStage, movements} = useSurgi();
+  const last = latestMovement(movements, asset.barcode);
   const info = stageReturnInfo(asset.kind, asset.id);
   const [stage, setStage] = useState<ReturnTargetId | ''>(info?.targets[0]?.id ?? '');
   const [reason, setReason] = useState('');
@@ -46,6 +49,11 @@ export default function StageReturnModal({
           </button>
         </header>
         {refusal && <div className="identity-error">{refusal}</div>}
+        {last && (
+          <p className="stage-return-last">
+            {tr('Τελευταία κίνηση: «{0}» της {1} ({2}).', movementText(last.status), last.at, trData(last.by))}
+          </p>
+        )}
         <label className="stage-return-field">
           {tr('Επιστροφή σε')}
           <select value={stage} onChange={e => setStage(e.target.value as ReturnTargetId)} disabled={!!refusal}>
@@ -76,7 +84,9 @@ export default function StageReturnModal({
               if (stage && returnToStage(asset.kind, asset.id, stage, reason)) onClose();
             }}
           >
-            {tr('Επιστροφή')}
+            {stage
+              ? tr('Επιστροφή σε: {0}', trData(info?.targets.find(t => t.id === stage)?.label || ''))
+              : tr('Επιστροφή')}
           </AppButton>
         </footer>
       </div>

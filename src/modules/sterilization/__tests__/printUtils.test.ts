@@ -20,6 +20,18 @@ describe('barcode label', () => {
     expect(sheet).not.toContain('SurgiTrack');
     expect(sheet).not.toContain('3 / 30');
   });
+  it('names the department on the large label only, and the expected expiry once given', () => {
+    const sheet = barcodeLabelHtml(tool, 'TOOL', undefined, {size: 'SHEET', header: 'NONE', showDetails: true});
+    expect(sheet.match(/<div class="dept">Χειρουργείο<\/div>/g)).toHaveLength(1);
+    const single = barcodeLabelHtml(tool, 'TOOL', undefined, {size: 'SMALL', header: 'NONE', showDetails: true});
+    expect(single).not.toContain('<div class="dept">');
+    const dated = barcodeLabelHtml({...tool, sterileUntil: '2027-05-11'}, 'TOOL', undefined, {
+      size: 'SMALL',
+      header: 'NONE',
+      showDetails: true,
+    });
+    expect(dated).toContain('11/05');
+  });
   it('shows only image data URLs as the logo', () => {
     const logo = 'data:image/png;base64,AAAA';
     expect(
