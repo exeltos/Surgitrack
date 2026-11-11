@@ -2380,3 +2380,34 @@ html body .platform-contact-line .app-button {
   flex: 0 0 auto;
   min-height: 36px;
 }
+
+/* Sterilization flow by category: the stages, the rules around them, the hospital's features — one at a time. */
+html body .studio-body-workflow .studio-workflow-page[data-group] {
+  grid-template-columns: minmax(0, 1fr);
+}
+html body .studio-body-workflow .studio-workflow-page[data-group] > .settings-categories {
+  grid-column: 1 / -1;
+  max-width: none;
+  margin-bottom: 0;
+}
+/* The rules and the features use the whole width: cards side by side. */
+html body .studio-body-workflow .studio-workflow-page[data-group='POLICIES'] .studio-workflow-side {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+  gap: 12px;
+}
+html body .studio-body-workflow .studio-workflow-page[data-group='FEATURES'] .studio-flow-modules-list {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+html body .studio-flow-modules-list > li b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-cyan-20-3);
+}
+html body .studio-flow-modules-list small {
+  font-size: 12px;
+}
+html body .studio-flow-modules-list em {
+  font-size: 12.5px;
+}

@@ -444,6 +444,7 @@ async function main() {
           '/studio?tab=NOTICES',
           '/studio?tab=SECURITY',
           '/studio?tab=SYSTEM',
+          '/studio?tab=WORKFLOW',
           '/studio?tab=USERS',
           '/hospitals',
           '/hospital',
@@ -500,6 +501,11 @@ async function main() {
         const started = Date.now();
         await page.evaluate(h => (location.hash = h), `#${target}`);
         await settle(page);
+        // SCREENS_CLICK="Κανόνες" presses that button first (a tab of the page), for a shot of what it shows.
+        if (process.env.SCREENS_CLICK) {
+          await page.getByRole('button', {name: process.env.SCREENS_CLICK}).first().click({timeout: 3000});
+          await page.waitForTimeout(300);
+        }
         await page.evaluate(() => window.scrollTo(0, 0));
         const state = await pageState(page);
         state.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
