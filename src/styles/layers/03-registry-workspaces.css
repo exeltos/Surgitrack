@@ -1789,6 +1789,7 @@ body {
   flex-direction: column;
 }
 .set-report-modal .report-tool-picker {
+  margin: 14px 0 0;
   flex: 0 1 220px;
   min-height: 100px;
   overflow: auto;

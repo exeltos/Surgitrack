@@ -117,27 +117,6 @@ export function SetReportModal({
               {tr('Εργαλεία του Σετ')}
             </button>
           </div>
-          {target === 'TOOLS' && (
-            <div className="report-tool-picker">
-              {members.map(tool => (
-                <label key={tool.id}>
-                  <input
-                    type="checkbox"
-                    checked={toolIds.includes(tool.id)}
-                    onChange={e =>
-                      setToolIds(ids => (e.target.checked ? [...ids, tool.id] : ids.filter(id => id !== tool.id)))
-                    }
-                  />
-                  <span>
-                    <strong>{tool.name}</strong>
-                    <small>
-                      {tool.barcode} · {tool.code}
-                    </small>
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
           <div className="form-grid">
             <ReportTypeField
               kind="SET"
@@ -171,6 +150,27 @@ export function SetReportModal({
               </small>
             </label>
           </div>
+          {target === 'TOOLS' && (
+            <div className="report-tool-picker">
+              {members.map(tool => (
+                <label key={tool.id}>
+                  <input
+                    type="checkbox"
+                    checked={toolIds.includes(tool.id)}
+                    onChange={e =>
+                      setToolIds(ids => (e.target.checked ? [...ids, tool.id] : ids.filter(id => id !== tool.id)))
+                    }
+                  />
+                  <span>
+                    <strong>{tool.name}</strong>
+                    <small>
+                      {tool.barcode} · {tool.code}
+                    </small>
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
