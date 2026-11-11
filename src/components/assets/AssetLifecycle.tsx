@@ -1,5 +1,5 @@
 import {Link} from 'react-router-dom';
-import {ArrowRight, Check, Send} from 'lucide-react';
+import {ArrowRight, Check} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {useSurgi} from '../../store/SurgiStore';
@@ -7,7 +7,6 @@ import {assetLifecycle, queueOfStage, type LifecycleStepId} from '../../core/ass
 import {latestMovement} from '../../core/movementUndo';
 import {tr} from '../../i18n';
 import type {AssetKind} from '../../types/domain';
-import AppButton from '../ui/AppButton';
 
 const NEXT_TEXT: Record<LifecycleStepId, string> = {
   DEPARTMENT: 'Μετά τη χρήση, στείλτε το προς Αποστείρωση.',
@@ -30,14 +29,11 @@ export default function AssetLifecycle({
   id,
   state,
   barcode,
-  onDispatch,
 }: {
   kind: AssetKind;
   id: string;
   state: string;
   barcode: string;
-  /** Sends it to Sterilization (when it is in the department and the user may). */
-  onDispatch?: () => void;
 }) {
   const {sterilizationWorkflow} = useLibraries();
   const {lang} = useAppPreferences();
@@ -64,17 +60,12 @@ export default function AssetLifecycle({
       : currentId === 'DEPARTMENT'
         ? ''
         : queueOfStage[currentId];
+  // The dispatch button is the page's own («Προς Αποστείρωση», top right): here only the way into the stage it is at.
   const action =
-    currentId === 'DEPARTMENT' ? (
-      onDispatch ? (
-        <AppButton variant="primary" icon={<Send size={16} />} onClick={onDispatch}>
-          {tr('Προς Αποστείρωση')}
-        </AppButton>
-      ) : null
-    ) : can('sterilization.workspace') ? (
-      <Link className="app-button app-button-secondary app-button-md" to={`/sterilization?queue=${queue}`}>
+    currentId !== 'DEPARTMENT' && can('sterilization.workspace') ? (
+      <Link className="asset-lifecycle-link" to={`/sterilization?queue=${queue}`}>
         {tr('Άνοιγμα στην Αποστείρωση')}
-        <ArrowRight size={15} />
+        <ArrowRight size={14} />
       </Link>
     ) : null;
   return (
@@ -93,17 +84,15 @@ export default function AssetLifecycle({
           })}
         </ol>
       </div>
-      <div className="asset-lifecycle-next">
-        <div>
-          <small>{tr('ΕΠΟΜΕΝΟ ΒΗΜΑ')}</small>
-          <strong>{tr(NEXT_TEXT[currentId])}</strong>
-          <em>
-            {tr('Τώρα: {0}', label(currentId))}
-            {since ? ` · ${tr('από {0}', since)}` : ''}
-          </em>
-        </div>
+      <p className="asset-lifecycle-next">
+        <b>{tr('ΕΠΟΜΕΝΟ ΒΗΜΑ')}</b>
+        <span>{tr(NEXT_TEXT[currentId])}</span>
+        <em>
+          {tr('Τώρα: {0}', label(currentId))}
+          {since ? ` · ${tr('από {0}', since)}` : ''}
+        </em>
         {action}
-      </div>
+      </p>
     </section>
   );
 }
