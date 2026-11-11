@@ -444,6 +444,7 @@ async function main() {
           '/studio?tab=NOTICES',
           '/studio?tab=SECURITY',
           '/studio?tab=SYSTEM',
+          '/studio?tab=USERS',
           '/hospitals',
           '/hospital',
         ];
