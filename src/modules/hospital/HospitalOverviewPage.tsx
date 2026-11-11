@@ -3,7 +3,6 @@ import {Link} from 'react-router-dom';
 import {
   Activity,
   ArrowRight,
-  Boxes,
   Gauge,
   History,
   Layers3,
@@ -12,7 +11,6 @@ import {
   TriangleAlert,
   UserPlus,
   Wrench,
-  CalendarClock,
 } from 'lucide-react';
 import {expiryAlerts, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import PageHeader from '../../components/ui/PageHeader';
@@ -211,6 +209,85 @@ export default function HospitalOverviewPage() {
     },
   ];
 
+  // What waits for action, most urgent first (the red ones, then the amber): one row per kind, with the count and a
+  // few examples, opening the list that holds them.
+  const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+  const triage: Array<{key: string; tone: 'bad' | 'warn'; count: number; title: string; note?: string; to: string}> =
+    [];
+  if (expiry.length > 0)
+    triage.push({
+      key: 'expiry',
+      tone: expired ? 'bad' : 'warn',
+      count: expiry.length,
+      title: expired
+        ? L(
+            `${expired} έληξαν · ${expiry.length - expired} λήγουν σύντομα`,
+            `${expired} expired · ${expiry.length - expired} expiring soon`,
+          )
+        : L(`${expiry.length} λήγουν σύντομα`, `${expiry.length} expiring soon`),
+      note: expiry
+        .slice(0, 3)
+        .map(e => `${e.barcode} · ${formatExpiry(e.sterileUntil)}`)
+        .join(' · '),
+      to: '/expiry',
+    });
+  if (openIssues.length > 0)
+    triage.push({
+      key: 'issues',
+      tone: 'bad',
+      count: openIssues.length,
+      title: L(
+        `${openIssues.length} ${plural(openIssues.length, 'ανοιχτή εκκρεμότητα', 'ανοιχτές εκκρεμότητες')}`,
+        `${openIssues.length} open ${plural(openIssues.length, 'issue', 'issues')}`,
+      ),
+      note: openIssues
+        .slice(0, 2)
+        .map(i => `${i.asset.split(' · ')[0]} · ${trData(i.type)}`)
+        .join(' · '),
+      to: presetPath('/issues', {status: 'OPEN'}),
+    });
+  if (shortSets > 0)
+    triage.push({
+      key: 'short',
+      tone: 'warn',
+      count: shortSets,
+      title: L(`${shortSets} Σετ με έλλειψη`, `${shortSets} ${plural(shortSets, 'Set', 'Sets')} incomplete`),
+      note: sets
+        .filter(x => x.actual < x.expected)
+        .slice(0, 3)
+        .map(x => x.barcode)
+        .join(' · '),
+      to: presetPath('/sets', {completeness: 'SHORT'}),
+    });
+  if (lowStock.length > 0)
+    triage.push({
+      key: 'stock',
+      tone: 'warn',
+      count: lowStock.length,
+      title: L(
+        `${lowStock.length} είδη κάτω από το ελάχιστο απόθεμα`,
+        `${lowStock.length} kinds below their minimum stock`,
+      ),
+      note: lowStock
+        .slice(0, 3)
+        .map(r => r.name)
+        .join(' · '),
+      to: '/stock?view=minimums',
+    });
+  if (lifecycleAlerts.length > 0)
+    triage.push({
+      key: 'limit',
+      tone: 'warn',
+      count: lifecycleAlerts.length,
+      title: L(`${lifecycleAlerts.length} κοντά στο όριο χρήσεων`, `${lifecycleAlerts.length} near their usage limit`),
+      note: lifecycleAlerts
+        .slice(0, 2)
+        .map(a => `${a.barcode} · ${L(`απομένουν ${a.remaining}`, `${a.remaining} left`)}`)
+        .join(' · '),
+      to: presetPath('/tools', {usage: 'LOW'}),
+    });
+  triage.sort((a, b) => Number(b.tone === 'bad') - Number(a.tone === 'bad'));
+
   // Where every unit of equipment is: Sets and standalone instruments by state, plus the instruments in Stock.
   const stockTools = tools.filter(t => t.mode === 'STOCK');
   const location = [
@@ -295,6 +372,38 @@ export default function HospitalOverviewPage() {
       </div>
 
       <div className="dash-grid">
+        <section className="dash-card dash-attention">
+          <header>
+            <div>
+              <b>{L('Χρειάζεται προσοχή', 'Needs attention')}</b>
+              <small>
+                {L('Ό,τι περιμένει δράση, με σειρά σημασίας.', 'What is waiting for action, most urgent first.')}
+              </small>
+            </div>
+          </header>
+          <ul className="dash-list dash-triage" tabIndex={0} aria-label={L('Χρειάζεται προσοχή', 'Needs attention')}>
+            {triage.map(item => (
+              <li key={item.key} className={item.tone}>
+                <Link to={item.to}>
+                  <i aria-hidden="true" />
+                  <span>
+                    <b>{item.title}</b>
+                    {item.note && <small>{item.note}</small>}
+                  </span>
+                  <em>{item.count}</em>
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+            {triage.length === 0 && (
+              <li className="ok">
+                <PackageCheck size={15} />
+                <span>{L('Όλα εντάξει: τίποτα δεν περιμένει.', 'All clear: nothing is waiting.')}</span>
+              </li>
+            )}
+          </ul>
+        </section>
+
         <section className="dash-card dash-flow">
           <header>
             <div>
@@ -470,91 +579,6 @@ export default function HospitalOverviewPage() {
             <span>{L(`Μέγιστο: ${perDayMax} κινήσεις σε μία ημέρα`, `Most: ${perDayMax} movements in a day`)}</span>
             <span>{dayLabel(perDay[perDay.length - 1].day)}</span>
           </div>
-        </section>
-
-        <section className="dash-card dash-attention">
-          <header>
-            <div>
-              <b>{L('Χρειάζεται προσοχή', 'Needs attention')}</b>
-              <small>
-                {L(
-                  'Εκκρεμότητες, λήξεις αποστείρωσης και εργαλεία κοντά στο όριο χρήσεων.',
-                  'Issues, sterile expiry and instruments near their usage limit.',
-                )}
-              </small>
-            </div>
-            <Link to={presetPath('/issues', {status: 'OPEN'})}>{L('Όλες', 'All')}</Link>
-          </header>
-          <ul className="dash-list" tabIndex={0} aria-label={L('Χρειάζεται προσοχή', 'Needs attention')}>
-            {expiry.length > 0 && (
-              <li>
-                <CalendarClock size={15} className={expired ? 'bad' : 'warn'} />
-                <Link to="/expiry">
-                  <b>
-                    {expired
-                      ? L(
-                          `${expired} έληξαν · ${expiry.length - expired} λήγουν σύντομα`,
-                          `${expired} expired · ${expiry.length - expired} expiring soon`,
-                        )
-                      : L(`${expiry.length} λήγουν σύντομα`, `${expiry.length} expiring soon`)}
-                  </b>
-                  <small>
-                    {expiry
-                      .slice(0, 3)
-                      .map(e => `${e.barcode} · ${formatExpiry(e.sterileUntil)}`)
-                      .join(' · ')}
-                  </small>
-                </Link>
-              </li>
-            )}
-            {openIssues.slice(0, 5).map(i => (
-              <li key={i.id}>
-                <TriangleAlert size={15} className="bad" />
-                <Link to={assetPath(i.asset) || presetPath('/issues', {status: 'OPEN'})}>
-                  <b>{i.asset}</b>
-                  <small>
-                    {trData(i.type)} · {trData(i.department)} · {i.created}
-                  </small>
-                </Link>
-              </li>
-            ))}
-            {lowStock.length > 0 && (
-              <li>
-                <Boxes size={15} className="warn" />
-                <Link to="/stock?view=minimums">
-                  <b>
-                    {L(
-                      `${lowStock.length} είδη κάτω από το ελάχιστο απόθεμα`,
-                      `${lowStock.length} kinds below their minimum stock`,
-                    )}
-                  </b>
-                  <small>
-                    {lowStock
-                      .slice(0, 3)
-                      .map(r => r.name)
-                      .join(' · ')}
-                  </small>
-                </Link>
-              </li>
-            )}
-            {lifecycleAlerts.slice(0, 3).map(a => (
-              <li key={a.id}>
-                <Gauge size={15} className="warn" />
-                <Link to={a.assetKind === 'SET' ? `/sets/${a.assetId}` : `/tools/${a.assetId}`}>
-                  <b>
-                    {a.barcode} · {a.name}
-                  </b>
-                  <small>{L(`απομένουν ${a.remaining} χρήσεις`, `${a.remaining} uses left`)}</small>
-                </Link>
-              </li>
-            ))}
-            {openIssues.length === 0 && lifecycleAlerts.length === 0 && lowStock.length === 0 && !expiry.length && (
-              <li className="ok">
-                <PackageCheck size={15} />
-                <span>{L('Όλα εντάξει: τίποτα δεν περιμένει.', 'All clear: nothing is waiting.')}</span>
-              </li>
-            )}
-          </ul>
         </section>
 
         <section className="dash-card dash-latest">
