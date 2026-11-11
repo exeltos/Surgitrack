@@ -69,7 +69,10 @@ export type SystemSettings = {
   reminderEmails?: ReminderEmails;
   /** The first-visit guide above each screen (ScreenGuide); unset: shown. Each person can still turn it off. */
   screenGuides?: boolean;
+  /** The usage type a new instrument starts with; unset: no limit. */
+  defaultUsageType?: DefaultUsageType;
 };
+export type DefaultUsageType = 'UNLIMITED' | 'LIMITED' | 'WEAR';
 export type ReminderEmails = 'OFF' | 'ADMINS' | 'ADMINS_SUPERVISORS';
 export const DEFAULT_IDLE_LOCK_MINUTES = 15;
 export const IDLE_LOCK_OPTIONS = [0, 5, 10, 15, 30, 60] as const;

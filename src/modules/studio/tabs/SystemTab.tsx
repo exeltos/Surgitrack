@@ -5,7 +5,12 @@ import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
-import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
+import {
+  DEFAULT_IDLE_LOCK_MINUTES,
+  IDLE_LOCK_OPTIONS,
+  type DefaultUsageType,
+  type ReminderEmails,
+} from '../../../core/libraryTypes';
 import {formatDateTime} from '../../../core/displayDate';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 
@@ -16,7 +21,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
     <>
       {tab === 'SYSTEM' && (
         <div className="studio-system-grid">
-          {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
           <section>
             <header>
               <Gauge />
@@ -50,6 +54,27 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 {L(
                   'Εφαρμόζεται στις ειδοποιήσεις και στις καρτέλες περιορισμένων χρήσεων.',
                   'Applied to alerts and limited-use asset cards.',
+                )}
+              </small>
+            </label>
+            <label>
+              {L('Τύπος χρήσης νέων εργαλείων (προεπιλογή)', 'Usage type of new instruments (default)')}
+              <div className="studio-setting-input">
+                <select
+                  value={libs.systemSettings.defaultUsageType || 'UNLIMITED'}
+                  onChange={e =>
+                    libs.updateSystemSettings({defaultUsageType: e.target.value as DefaultUsageType}, currentUser.name)
+                  }
+                >
+                  <option value="UNLIMITED">{L('Χωρίς όριο', 'No limit')}</option>
+                  <option value="LIMITED">{L('Περιορισμένων χρήσεων', 'Limited uses')}</option>
+                  <option value="WEAR">{L('Χρήσεις με έλεγχο φθοράς', 'Uses with a wear check')}</option>
+                </select>
+              </div>
+              <small>
+                {L(
+                  'Προτείνεται όταν φτιάχνεται νέο εργαλείο· αλλάζει ανά εργαλείο στη δημιουργία ή στην κάρτα του.',
+                  'Suggested when a new instrument is created; changeable per instrument at creation or on its card.',
                 )}
               </small>
             </label>
@@ -264,6 +289,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </AppButton>
             )}
           </section>
+          {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
         </div>
       )}
     </>

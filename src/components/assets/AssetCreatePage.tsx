@@ -19,7 +19,7 @@ type CreateTab = 'DETAILS' | 'COMPOSITION' | 'PHOTOS' | 'NOTES';
 
 export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const navigate = useNavigate();
-  const {departments, manufacturers, specialties} = useLibraries();
+  const {departments, manufacturers, specialties, systemSettings} = useLibraries();
   const {sets, tools, createTool, createSet, nextBarcode, addAssetPhotos, can} = useSurgi();
   // Uses already made are written by hand only by who may set the usage limits, and while the owner leaves it on.
   const manualUses = useHasModule('MANUAL_USES') && can('asset.usage.configure');
@@ -33,9 +33,11 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [specialty, setSpecialty] = useState('');
   const [manufacturer, setManufacturer] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [limited, setLimited] = useState(false);
+  // The usage type a new instrument starts with is the hospital's default (Studio → Settings).
+  const defaultUsage = kind === 'TOOL' ? systemSettings.defaultUsageType : undefined;
+  const [limited, setLimited] = useState(defaultUsage === 'LIMITED');
   // Used with a wear check: no limit, the uses are counted.
-  const [wear, setWear] = useState(false);
+  const [wear, setWear] = useState(defaultUsage === 'WEAR');
   const [maxUses, setMaxUses] = useState('50');
   // Uses already made (an instrument in use before it came to the system).
   const [usesMade, setUsesMade] = useState('0');
