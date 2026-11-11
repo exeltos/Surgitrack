@@ -1,3 +1,6 @@
+import {statusLabel} from '../../components/ui/statusLabel';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {Link, useSearchParams} from 'react-router-dom';
 import {ChevronRight} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -40,6 +43,16 @@ export default function SterileExpiryPage() {
       (departmentUser || !department || item.department === department) &&
       `${item.name} ${item.barcode} ${item.department || ''}`.toLowerCase().includes(q.toLowerCase()),
   );
+  const order = useTableSort(shown, {
+    name: item => item.name,
+    barcode: item => item.barcode,
+    department: item => trData(item.department),
+    place: item => statusLabel(item.assetState),
+    duration: item => item.shelfLifeMonths,
+    sterilized: item => item.sterilizedOn,
+    until: item => item.sterileUntil,
+    left: item => item.daysLeft,
+  });
   const departments = [...new Set(all.map(item => item.department || '').filter(Boolean))].sort();
   return (
     <div className="tools-list-workspace sterile-expiry-page">
@@ -96,21 +109,21 @@ export default function SterileExpiryPage() {
           <table className="asset-registry-table registry-fixed expiry-table">
             <thead>
               <tr>
-                <th>{tr('Ονομασία')}</th>
-                <th>Barcode</th>
-                <th>{tr('Τμήμα')}</th>
-                <th>{tr('Θέση')}</th>
-                <th>{tr('Διάρκεια')}</th>
-                <th>{tr('Αποστείρωση')}</th>
-                <th>{tr('Λήξη')}</th>
-                <th>{tr('Υπόλοιπο')}</th>
+                <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label="Barcode" sortKey="barcode" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Θέση')} sortKey="place" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Διάρκεια')} sortKey="duration" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Αποστείρωση')} sortKey="sterilized" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Λήξη')} sortKey="until" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Υπόλοιπο')} sortKey="left" sort={order.sort} onSort={order.toggle} />
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {shown.map(item => {
+              {order.rows.map(item => {
                 const to = item.kind === 'SET' ? `/sets/${item.id}` : `/tools/${item.id}`;
                 return (
                   <tr key={`${item.kind}:${item.id}`} className={`expiry-row ${item.state.toLowerCase()}`}>

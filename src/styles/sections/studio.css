@@ -1181,6 +1181,10 @@ html body .studio-security-table td small {
 html body .studio-security-table tr.blocked {
   background: var(--st-red-soft, var(--c-gray-95-2));
 }
+html body .studio-security-me {
+  align-self: center;
+  color: var(--st-muted);
+}
 html body .studio-security-flag {
   color: var(--st-red);
 }

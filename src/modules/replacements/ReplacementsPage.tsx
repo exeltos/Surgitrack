@@ -21,6 +21,8 @@ import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {
   REASON_LABEL,
   allocateStock,
@@ -88,7 +90,18 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
           .includes(q)),
   );
   // The table renders the first rows at once and the rest as it scrolls; selection and exports use them all.
-  const rows = useProgressiveList(shown, [reason, department, stock, status, q].join('|'), 'replacements');
+  const order = useTableSort(shown, {
+    tool: item => item.tool.name,
+    set: item => item.set?.name,
+    reason: item => tr(REASON_LABEL[item.reason]),
+    stock: item => item.stock.length,
+    status: item => statusText(item),
+  });
+  const rows = useProgressiveList(
+    order.rows,
+    [reason, department, stock, status, q, order.sort?.key, order.sort?.dir].join('|'),
+    'replacements',
+  );
   const picked = shown.filter(item => selected.has(item.tool.id));
   const target = picked.length ? picked : shown;
   const fromStock = allocateStock(picked.filter(item => item.status !== 'REPLACED'));
@@ -333,11 +346,35 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
                       <input type="checkbox" checked={allShown} onChange={toggleAll} aria-label={tr('Επιλογή όλων')} />
                     </th>
                   )}
-                  <th>{tr('Εργαλείο')}</th>
-                  <th className="col-set">{tr('Σετ / τμήμα')}</th>
-                  <th className="col-reason">{tr('Αιτία')}</th>
-                  <th className="col-stock">{tr('Απόθεμα')}</th>
-                  <th className="col-status">{tr('Κατάσταση')}</th>
+                  <SortTh label={tr('Εργαλείο')} sortKey="tool" sort={order.sort} onSort={order.toggle} />
+                  <SortTh
+                    className="col-set"
+                    label={tr('Σετ / τμήμα')}
+                    sortKey="set"
+                    sort={order.sort}
+                    onSort={order.toggle}
+                  />
+                  <SortTh
+                    className="col-reason"
+                    label={tr('Αιτία')}
+                    sortKey="reason"
+                    sort={order.sort}
+                    onSort={order.toggle}
+                  />
+                  <SortTh
+                    className="col-stock"
+                    label={tr('Απόθεμα')}
+                    sortKey="stock"
+                    sort={order.sort}
+                    onSort={order.toggle}
+                  />
+                  <SortTh
+                    className="col-status"
+                    label={tr('Κατάσταση')}
+                    sortKey="status"
+                    sort={order.sort}
+                    onSort={order.toggle}
+                  />
                   {editable && <th className="col-actions">{tr('Ενέργειες')}</th>}
                 </tr>
               </thead>

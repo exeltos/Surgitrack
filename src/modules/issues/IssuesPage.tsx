@@ -17,7 +17,9 @@ import {useConfirm} from '../../components/ui/useConfirm';
 import KpiStrip from '../../components/ui/KpiStrip';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
-import {daysSince} from '../../core/displayDate';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
+import {daysSince, parseDisplayDate} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
 
 /** An open issue older than this many days is "waiting long" (its own card and filter). */
@@ -75,7 +77,16 @@ export default function IssuesPage() {
       `${i.asset} ${i.type} ${i.department} ${i.note}`.toLowerCase().includes(q.toLowerCase()),
   );
   // Long lists render in steps as they scroll into view (a large hospital has hundreds of issues).
-  const rows = useProgressiveList(filtered, [q, department, type, status, age].join('|'));
+  const order = useTableSort(filtered, {
+    asset: i => i.asset,
+    note: i => i.note,
+    created: i => parseDisplayDate(i.created)?.getTime(),
+    status: i => i.status,
+  });
+  const rows = useProgressiveList(
+    order.rows,
+    [q, department, type, status, age, order.sort?.key, order.sort?.dir].join('|'),
+  );
   // The photos column shows only when some listed issue has photos.
   const withPhotos = filtered.some(i => i.photos?.length);
   /** What an issue is about: the instrument or Set named by its barcode, to open it or order it. */
@@ -227,11 +238,23 @@ export default function IssuesPage() {
               <table className="asset-registry-table issues-registry-table issues-fixed">
                 <thead>
                   <tr>
-                    <th>{tr('Αντικείμενο')}</th>
-                    <th>{tr('Σημείωση')}</th>
-                    <th className="col-created">{tr('Δημιουργήθηκε')}</th>
+                    <SortTh label={tr('Αντικείμενο')} sortKey="asset" sort={order.sort} onSort={order.toggle} />
+                    <SortTh label={tr('Σημείωση')} sortKey="note" sort={order.sort} onSort={order.toggle} />
+                    <SortTh
+                      className="col-created"
+                      label={tr('Δημιουργήθηκε')}
+                      sortKey="created"
+                      sort={order.sort}
+                      onSort={order.toggle}
+                    />
                     {withPhotos && <th className="col-photos">{tr('Φωτογραφίες')}</th>}
-                    <th className="col-status">{tr('Κατάσταση')}</th>
+                    <SortTh
+                      className="col-status"
+                      label={tr('Κατάσταση')}
+                      sortKey="status"
+                      sort={order.sort}
+                      onSort={order.toggle}
+                    />
                     {withReplacements && (
                       <th className="col-actions">
                         <span className="visually-hidden">{tr('Ενέργειες')}</span>

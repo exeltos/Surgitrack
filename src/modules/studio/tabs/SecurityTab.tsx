@@ -1,6 +1,8 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Ban, RefreshCw, ShieldCheck, UserX} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
+import {SortTh} from '../../../components/ui/SortHeader';
+import {useTableSort} from '../../../components/ui/useTableSort';
 import Spinner from '../../../components/ui/Spinner';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {formatDateTime} from '../../../core/displayDate';
@@ -25,6 +27,12 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
   const [adding, setAdding] = useState('');
   const [note, setNote] = useState('');
   const open = tab === 'SECURITY' && platformAdmin;
+  // Who is looking: the owner's own row is not one to block.
+  const [me, setMe] = useState('');
+  useEffect(() => {
+    if (!open) return;
+    void supabase.auth.getSession().then(({data}) => setMe(data.session?.user.id || ''));
+  }, [open]);
 
   const load = useCallback(async () => {
     const [list, ips] = await Promise.all([
@@ -44,6 +52,14 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
     return () => window.clearInterval(timer);
   }, [open, load]);
 
+  const list = useTableSort(sessions || [], {
+    name: row => row.name,
+    hospital: row => row.organization_name || '',
+    ip: row => row.ip,
+    browser: row => browserOf(row.user_agent),
+    since: row => Date.parse(row.first_seen),
+    last: row => Date.parse(row.last_seen),
+  });
   // Everyone from one address (a hospital's network is often a single address).
   const perIp = useMemo(() => {
     const counts = new Map<string, number>();
@@ -131,17 +147,23 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
           <table className="studio-security-table">
             <thead>
               <tr>
-                <th>{L('Χρήστης', 'User')}</th>
-                <th>{L('Νοσοκομείο', 'Hospital')}</th>
-                <th>{L('Διεύθυνση', 'Address')}</th>
-                <th>{L('Πρόγραμμα περιήγησης', 'Browser')}</th>
-                <th>{L('Από', 'Since')}</th>
-                <th>{L('Τελευταία δραστηριότητα', 'Last seen')}</th>
+                {(
+                  [
+                    ['name', L('Χρήστης', 'User')],
+                    ['hospital', L('Νοσοκομείο', 'Hospital')],
+                    ['ip', L('Διεύθυνση', 'Address')],
+                    ['browser', L('Πρόγραμμα περιήγησης', 'Browser')],
+                    ['since', L('Από', 'Since')],
+                    ['last', L('Τελευταία δραστηριότητα', 'Last seen')],
+                  ] as const
+                ).map(([key, label]) => (
+                  <SortTh key={key} label={label} sortKey={key} sort={list.sort} onSort={list.toggle} />
+                ))}
                 <th aria-label={L('Ενέργειες', 'Actions')} />
               </tr>
             </thead>
             <tbody>
-              {sessions.map(row => (
+              {list.rows.map(row => (
                 <tr key={row.user_id} className={row.ip_blocked ? 'blocked' : ''}>
                   <td>
                     <b>{row.name}</b>
@@ -160,7 +182,8 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
                   <td>{sinceLabel(row.last_seen, Date.now(), L)}</td>
                   <td>
                     <div className="studio-security-actions">
-                      {row.ip && !row.ip_blocked && (
+                      {row.user_id === me && <small className="studio-security-me">{L('Εσείς', 'You')}</small>}
+                      {row.user_id !== me && row.organization_id && row.ip && !row.ip_blocked && (
                         <AppButton variant="danger" icon={<Ban size={15} />} onClick={() => void blockIp(row.ip!)}>
                           {L('Μπλοκάρισμα IP', 'Block IP')}
                         </AppButton>

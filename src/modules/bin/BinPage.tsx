@@ -1,3 +1,5 @@
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useEffect, useState} from 'react';
 import {Cable, Layers3, Palette, RotateCcw, Tags, Trash2, Wrench} from 'lucide-react';
 import {deviceClockTrusted} from '../../data/cloud/clockCheck';
@@ -64,6 +66,13 @@ export default function BinPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const entries = recycleBin.filter(entry => !isExpired(entry));
+  const order = useTableSort(entries, {
+    kind: entry => tr(KIND[entry.kind].label),
+    label: entry => entry.label,
+    detail: entry => detailOf(entry),
+    deletedAt: entry => Date.parse(entry.deletedAt),
+    left: entry => daysLeft(entry),
+  });
 
   // Studio libraries are saved by the hospital admin only, so only an admin can put one back.
   const canRestore = (entry: BinEntry) =>
@@ -119,18 +128,18 @@ export default function BinPage() {
           <table className="asset-registry-table bin-table">
             <thead>
               <tr>
-                <th>{tr('Τύπος')}</th>
-                <th>{tr('Αντικείμενο')}</th>
-                <th>{tr('Λεπτομέρεια')}</th>
-                <th>{tr('Διαγράφηκε')}</th>
-                <th>{tr('Λήγει σε')}</th>
+                <SortTh label={tr('Τύπος')} sortKey="kind" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Αντικείμενο')} sortKey="label" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Λεπτομέρεια')} sortKey="detail" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Διαγράφηκε')} sortKey="deletedAt" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Λήγει σε')} sortKey="left" sort={order.sort} onSort={order.toggle} />
                 <th>
                   <span className="visually-hidden">{tr('Ενέργειες')}</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {entries.map(entry => {
+              {order.rows.map(entry => {
                 const Icon = KIND[entry.kind].icon;
                 return (
                   <tr key={entry.id}>

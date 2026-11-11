@@ -1,3 +1,5 @@
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useEffect, useMemo, useState} from 'react';
 import {Building2, CalendarClock, Clock, Lock, Mail, Plus, UserCheck, UserX, Users} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
@@ -82,6 +84,13 @@ export default function OwnerDashboard({
     [organizations, users, pending, invitations],
   );
 
+  const order = useTableSort(rows, {
+    name: r => r.org.name,
+    status: r => (r.trial.ended ? 0 : !r.org.active ? 1 : r.trial.warn ? 2 : r.trial.plan === 'TRIAL' ? 3 : 4),
+    users: r => r.active,
+    admins: r => r.admins,
+    requests: r => r.requests,
+  });
   const activeHospitals = rows.filter(r => r.org.active && !r.trial.ended);
   const trials = rows.filter(r => r.trial.plan === 'TRIAL' && !r.trial.ended);
   const ending = trials.filter(r => r.trial.warn);
@@ -258,16 +267,16 @@ export default function OwnerDashboard({
           <table className="owner-hospitals-table">
             <thead>
               <tr>
-                <th>{L('Νοσοκομείο', 'Hospital')}</th>
-                <th>{L('Κατάσταση', 'Status')}</th>
-                <th>{L('Χρήστες', 'Users')}</th>
-                <th>{L('Διαχειριστής', 'Admin')}</th>
-                <th>{L('Αιτήματα', 'Requests')}</th>
+                <SortTh label={L('Νοσοκομείο', 'Hospital')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={L('Κατάσταση', 'Status')} sortKey="status" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={L('Χρήστες', 'Users')} sortKey="users" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={L('Διαχειριστής', 'Admin')} sortKey="admins" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={L('Αιτήματα', 'Requests')} sortKey="requests" sort={order.sort} onSort={order.toggle} />
                 <th />
               </tr>
             </thead>
             <tbody>
-              {rows.map(r => (
+              {order.rows.map(r => (
                 <tr key={r.org.id}>
                   <td>
                     <b>{r.org.name}</b>

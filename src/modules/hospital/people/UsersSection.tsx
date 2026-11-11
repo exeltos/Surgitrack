@@ -17,6 +17,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
+import SortHeader from '../../../components/ui/SortHeader';
+import {useTableSort} from '../../../components/ui/useTableSort';
 import FilterMenu from '../../../components/assets/FilterMenu';
 import {localizedName} from '../../../core/glossary';
 import {SUPERVISOR, roles, assignableRoles, wholeHospital, roleValue} from '../hospitalPeopleMeta';
@@ -65,6 +67,14 @@ export default function UsersSection({s}: {s: PeopleState}) {
     signupFormUrl,
     tab,
   } = s;
+  // The list sorts by its column titles; access goes active, invited, switched off.
+  const people = useTableSort(shown, {
+    name: m => m.name,
+    username: m => m.user_code,
+    department: m => departmentName(m.department_id),
+    role: m => roleLabel(roleValue(m)),
+    access: m => (m.active ? 0 : invitedAt(m) !== undefined ? 1 : 2),
+  });
   // The owner's staff import (never shown to a hospital admin).
   const [importing, setImporting] = useState(false);
   const [addingActive, setAddingActive] = useState(false);
@@ -486,11 +496,31 @@ export default function UsersSection({s}: {s: PeopleState}) {
 
           {platform && !demo && !demoSeats && <PasswordReminder s={s} />}
           <div className="people-head">
-            <span>{L('Χρήστης', 'User')}</span>
-            <span>{L('Όνομα χρήστη', 'Username')}</span>
-            <span>{L('Τμήμα', 'Department')}</span>
-            <span>{L('Ρόλος', 'Role')}</span>
-            <span>{L('Πρόσβαση', 'Access')}</span>
+            <span>
+              <SortHeader label={L('Χρήστης', 'User')} sortKey="name" sort={people.sort} onSort={people.toggle} />
+            </span>
+            <span>
+              <SortHeader
+                label={L('Όνομα χρήστη', 'Username')}
+                sortKey="username"
+                sort={people.sort}
+                onSort={people.toggle}
+              />
+            </span>
+            <span>
+              <SortHeader
+                label={L('Τμήμα', 'Department')}
+                sortKey="department"
+                sort={people.sort}
+                onSort={people.toggle}
+              />
+            </span>
+            <span>
+              <SortHeader label={L('Ρόλος', 'Role')} sortKey="role" sort={people.sort} onSort={people.toggle} />
+            </span>
+            <span>
+              <SortHeader label={L('Πρόσβαση', 'Access')} sortKey="access" sort={people.sort} onSort={people.toggle} />
+            </span>
             <span></span>
           </div>
           <div className="people-rows">
@@ -515,7 +545,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
                 )}
               </div>
             )}
-            {shown.map(m => {
+            {people.rows.map(m => {
               // Your own account is changed by another admin (or the platform owner), never by you.
               const self = m.id === me?.id;
               // Another admin's account is changed only by the platform owner (the staff functions and the database

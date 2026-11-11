@@ -901,6 +901,11 @@ td {
   min-width: 0;
   padding: 0 9px !important;
 }
+/* The field's own frame lights up (:focus-within above); the input inside never gets one of its own. */
+.auth-form .auth-input input:focus {
+  border-color: transparent;
+  box-shadow: none;
+}
 .auth-input button {
   border: 0;
   background: transparent;

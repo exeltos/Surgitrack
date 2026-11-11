@@ -13,6 +13,8 @@ import {isExhausted} from '../../core/usageStatus';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
 import StockMinimums from './StockMinimums';
@@ -65,8 +67,19 @@ export default function StockPage() {
   const filtered = stock.filter(t => matchesList(t));
   const listOn = (history?: UsesOnDay) =>
     history ? stock.filter(t => matchesList(t, {...t, uses: history.byId.get(t.id)?.uses ?? t.uses})) : filtered;
-  useBrowseList('/tools', filtered);
-  const rows = useProgressiveList(filtered, [q, specialty, manufacturer, state, limit, usage].join('|'));
+  const order = useTableSort(filtered, {
+    name: t => t.name,
+    barcode: t => t.barcode,
+    specialty: t => trData(t.specialty),
+    manufacturer: t => t.manufacturer,
+    uses: t => (t.maxUses ? t.uses : undefined),
+    state: t => statusLabel(t.state),
+  });
+  useBrowseList('/tools', order.rows);
+  const rows = useProgressiveList(
+    order.rows,
+    [q, specialty, manufacturer, state, limit, usage, order.sort?.key, order.sort?.dir].join('|'),
+  );
   // The same number cards as the other lists: each one filters the list, the last opens the minimums.
   const kpi = kpiFilters({
     q: [q, setQ],
@@ -242,12 +255,17 @@ export default function StockPage() {
               <table className="asset-registry-table registry-fixed">
                 <thead>
                   <tr>
-                    <th>{tr('Ονομασία')}</th>
-                    <th>Barcode</th>
-                    <th>{tr('Ειδικότητα')}</th>
-                    <th>{tr('Κατασκευαστής')}</th>
-                    <th>{tr('Χρήσεις')}</th>
-                    <th>{tr('Κατάσταση')}</th>
+                    <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                    <SortTh label="Barcode" sortKey="barcode" sort={order.sort} onSort={order.toggle} />
+                    <SortTh label={tr('Ειδικότητα')} sortKey="specialty" sort={order.sort} onSort={order.toggle} />
+                    <SortTh
+                      label={tr('Κατασκευαστής')}
+                      sortKey="manufacturer"
+                      sort={order.sort}
+                      onSort={order.toggle}
+                    />
+                    <SortTh label={tr('Χρήσεις')} sortKey="uses" sort={order.sort} onSort={order.toggle} />
+                    <SortTh label={tr('Κατάσταση')} sortKey="state" sort={order.sort} onSort={order.toggle} />
                     <th>
                       <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                     </th>

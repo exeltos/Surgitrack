@@ -1,3 +1,5 @@
+import SortHeader from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useMemo, useState} from 'react';
 import {
   BadgeCheck,
@@ -32,6 +34,7 @@ import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import {parseDisplayDate} from '../../core/displayDate';
 import {movementText} from '../../core/movementText';
 
 function dateKey(value: string) {
@@ -154,7 +157,17 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
       }),
     };
   };
-  const rows = useProgressiveList(filtered, [q, from, to, status, kind, dateFrom, dateTo].join('|'));
+  const order = useTableSort(filtered, {
+    at: m => parseDisplayDate(m.at)?.getTime(),
+    asset: m => assetParts(m.asset).barcode,
+    route: m => trData(m.from),
+    action: m => movementText(m.status),
+    by: m => trData(m.by),
+  });
+  const rows = useProgressiveList(
+    order.rows,
+    [q, from, to, status, kind, dateFrom, dateTo, order.sort?.key, order.sort?.dir].join('|'),
+  );
   const togglePick = (id: string) =>
     setPicked(current => {
       const next = new Set(current);
@@ -300,11 +313,21 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
           </small>
         </div>
         <div className="ledger-columns">
-          <span>{tr('Ημερομηνία / ώρα')}</span>
-          <span>{tr('Σετ / Εργαλείο')}</span>
-          <span>{tr('Διαδρομή')}</span>
-          <span>{tr('Ενέργεια')}</span>
-          <span>{tr('Χρήστης')}</span>
+          <span>
+            <SortHeader label={tr('Ημερομηνία / ώρα')} sortKey="at" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Σετ / Εργαλείο')} sortKey="asset" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Διαδρομή')} sortKey="route" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Ενέργεια')} sortKey="action" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Χρήστης')} sortKey="by" sort={order.sort} onSort={order.toggle} />
+          </span>
           <span></span>
         </div>
         <div className="ledger-scroll">

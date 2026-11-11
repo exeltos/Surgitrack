@@ -107,3 +107,41 @@ html body .app-spinner-wrap.full {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* A column title that sorts its list (SortHeader): the title with an up-down arrow, as plain as the title itself. */
+html body .sort-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+html body .sort-head > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html body .sort-head > svg {
+  flex: none;
+  opacity: 0.45;
+}
+html body .sort-head:hover > svg,
+html body .sort-head.active > svg {
+  opacity: 1;
+}
+html body .sort-head.active {
+  color: var(--c-cyan-55-2);
+}
+html body .sort-head:focus-visible {
+  outline: 2px solid var(--c-cyan-55-2);
+  outline-offset: 2px;
+}

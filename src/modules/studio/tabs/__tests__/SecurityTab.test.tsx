@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../../../lib/supabase', () => ({
   supabase: {
+    auth: {getSession: () => Promise.resolve({data: {session: {user: {id: 'owner'}}}})},
     rpc: (name: string, args?: unknown) => {
       mocks.rpc(name, args);
       return Promise.resolve({data: name === 'platform_active_sessions' ? mocks.sessions : null, error: null});
@@ -73,6 +74,17 @@ describe('the owner’s security section', () => {
     expect(mocks.rpc).not.toHaveBeenCalledWith('platform_block_ip', expect.anything());
     await userEvent.click(screen.getByRole('button', {name: 'Ξεμπλοκάρισμα'}));
     await waitFor(() => expect(mocks.rpc).toHaveBeenCalledWith('platform_unblock_ip', {p_ip: '198.51.100.7/32'}));
+  });
+
+  it('offers no block on the owner’s own row, nor on a row of the platform', async () => {
+    mocks.sessions = [
+      session({user_id: 'owner', name: 'Platform Admin', organization_id: null, organization_name: null}),
+    ];
+    render(<SecurityTab s={state} />);
+    expect(await screen.findByText('Platform Admin')).toBeInTheDocument();
+    expect(await screen.findByText('Εσείς')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /Μπλοκάρισμα IP/})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: /Αναστολή χρήστη/})).not.toBeInTheDocument();
   });
 
   it('shows nothing to anyone but the platform owner', () => {
