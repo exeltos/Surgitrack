@@ -2236,3 +2236,39 @@ html body .studio-body-notices {
   min-height: 0;
   overflow-y: auto;
 }
+
+/* Studio → Sterilization flow: which features the hospital has (its modules). */
+html body .studio-flow-modules-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-flow-modules-list > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--st-line);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .studio-flow-modules-list small {
+  grid-column: 1;
+  color: var(--st-muted);
+}
+html body .studio-flow-modules-list em {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--st-green, #2f7d57);
+}
+html body .studio-flow-modules-list > li.off {
+  opacity: 0.65;
+}
+html body .studio-flow-modules-list > li.off em {
+  color: var(--st-muted);
+}

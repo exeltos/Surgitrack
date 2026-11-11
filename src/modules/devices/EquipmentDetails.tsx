@@ -1,3 +1,4 @@
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {
   ArrowLeft,
   Cable,
@@ -101,6 +102,7 @@ export default function EquipmentDetails({
   onFile: () => void;
   onSerial: () => void;
 }) {
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const {device} = row;
   const when = (iso?: string) => (iso ? formatDateTime(iso) : '—');
   const table = (): ExportTable => ({
@@ -278,7 +280,7 @@ export default function EquipmentDetails({
           </div>
         </section>
 
-        {(row.kind === 'STERILIZER' || row.kind === 'WASHER') && row.libraryId && (
+        {withTests && (row.kind === 'STERILIZER' || row.kind === 'WASHER') && row.libraryId && (
           <section className="asset-section equipment-wide">
             <div className="asset-section-head">
               <div>

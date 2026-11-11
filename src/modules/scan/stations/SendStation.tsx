@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useHasModule} from '../../../data/cloud/modulesContext';
 import {CheckCheck, ClipboardCheck, Gauge, Send} from 'lucide-react';
 import type {BarcodeFeedback} from '../../../components/barcode/BarcodeCapture';
 import {askConfirm} from '../../../components/ui/confirmService';
@@ -20,6 +21,7 @@ import {useScanAnswers} from '../useScanAnswers';
 export default function SendStation({onStations}: {onStations: () => void}) {
   const {sets, tools, role, currentUser, sendToSterilization, recordCount, circulationAllowed} = useSurgi();
   const {systemSettings} = useLibraries();
+  const withCount = useHasModule('SURGICAL_COUNT');
   const [found, setFound] = useState<Scanned | null>(null);
   const [feedback, setFeedback] = useState<BarcodeFeedback | null>(null);
   const [countFeedback, setCountFeedback] = useState<BarcodeFeedback | null>(null);
@@ -96,7 +98,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
     );
 
   const {kind, asset} = found;
-  const counting = countsAtDepartment(departmentOf(found, sets), systemSettings.surgicalCountDepartments);
+  const counting = withCount && countsAtDepartment(departmentOf(found, sets), systemSettings.surgicalCountDepartments);
   const members = kind === 'SET' ? tools.filter(t => t.setId === asset.id && t.state !== 'RETIRED') : [found.asset];
   const missing = members.filter(t => !ticked.has(t.id));
   const counted = members.length - missing.length;

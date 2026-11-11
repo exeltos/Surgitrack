@@ -4,6 +4,7 @@ import {useLibraries} from '../../core/LibraryStore';
 import {countsAtDepartment} from '../../core/surgicalCount';
 import type {SurgicalCount} from '../../store/types';
 import CountModal from './CountModal';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {printCountForm} from './printCountForm';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
@@ -31,7 +32,8 @@ export default function DepartmentDispatchModal({
   const [livesConfirmed, setLivesConfirmed] = useState(false);
   // Operating theatres sign the instrument count (its own window) before the Set can be sent.
   const asset = kind === 'SET' ? sets.find(x => x.id === id) : tools.find(x => x.id === id);
-  const counting = countsAtDepartment(asset?.department, systemSettings.surgicalCountDepartments);
+  const withCount = useHasModule('SURGICAL_COUNT');
+  const counting = withCount && countsAtDepartment(asset?.department, systemSettings.surgicalCountDepartments);
   const [countOpen, setCountOpen] = useState(false);
   const [count, setCount] = useState<SurgicalCount | null>(null);
   const printSigned = () =>

@@ -1,3 +1,4 @@
+import {useHasModule} from '../../../data/cloud/modulesContext';
 import {statusLabel} from '../../../components/ui/statusLabel';
 import SortHeader from '../../../components/ui/SortHeader';
 import {useTableSort} from '../../../components/ui/useTableSort';
@@ -90,6 +91,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const [left, setLeft] = useState<Set<string>>(new Set());
   const keyOf = (x: {kind: string; id: string}) => `${x.kind}:${x.id}`;
   const pickedKeys = rows.map(keyOf).filter(key => !left.has(key));
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const order = useTableSort(rows, {
     name: x => x.name,
     department: x => trData(x.department),
@@ -283,8 +285,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           />
         </div>
       )}
-      {queue === 'PROCESS' && <SterilizerTests />}
-      {queue === 'WASHING' && <SterilizerTests equipment="washers" />}
+      {withTests && queue === 'PROCESS' && <SterilizerTests />}
+      {withTests && queue === 'WASHING' && <SterilizerTests equipment="washers" />}
       {queue === 'IN_STERILIZER' ? (
         <SterilizerLoads loads={s.runningLoads} onPrint={s.printLoadForm} onReport={s.printCycle} />
       ) : rows.length === 0 ? (

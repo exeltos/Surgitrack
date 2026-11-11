@@ -78,6 +78,7 @@ export default function EquipmentPage() {
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const withDevices = useHasModule('DEVICES');
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const devicesEnabled = withDevices && !!organizationId;
   const isAdmin = role === 'ADMIN';
   const canRecord = can('sterilization.workspace');
@@ -222,7 +223,10 @@ export default function EquipmentPage() {
   // Missing tests are pointed out only where the hospital records tests at all; a failed one always is.
   const testsUsed = {STERILIZER: testsInUse(sterilizers), WASHER: testsInUse(washers)};
   const testStateOf = (row: EquipmentRow) =>
-    (row.kind === 'STERILIZER' || row.kind === 'WASHER') && row.libraryId && (testsUsed[row.kind] || row.tests?.length)
+    withTests &&
+    (row.kind === 'STERILIZER' || row.kind === 'WASHER') &&
+    row.libraryId &&
+    (testsUsed[row.kind] || row.tests?.length)
       ? testsState(row.tests, Date.now(), row.kind)
       : undefined;
   const attention = rows.filter(
@@ -452,7 +456,9 @@ export default function EquipmentPage() {
                     onSort={order.toggle}
                   />
                 )}
-                <SortTh label={L('Δοκιμές', 'Tests')} sortKey="tests" sort={order.sort} onSort={order.toggle} />
+                {withTests && (
+                  <SortTh label={L('Δοκιμές', 'Tests')} sortKey="tests" sort={order.sort} onSort={order.toggle} />
+                )}
                 <SortTh
                   label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}
                   sortKey="failures"
@@ -589,19 +595,21 @@ export default function EquipmentPage() {
                         )}
                       </td>
                     )}
-                    <td data-label={L('Δοκιμές', 'Tests')}>
-                      {testStateOf(row) === 'FAILED' ? (
-                        <span className="row-test bad">{L('Απέτυχε', 'Failed')}</span>
-                      ) : testStateOf(row) === 'DUE' ? (
-                        <span className="row-test due">{L('Εκκρεμεί', 'Due')}</span>
-                      ) : testStateOf(row) === 'OK' ? (
-                        <span className="row-test ok">{L('Εντάξει', 'Up to date')}</span>
-                      ) : (
-                        '—'
-                      )}
-                    </td>
+                    {withTests && (
+                      <td data-label={L('Δοκιμές', 'Tests')}>
+                        {testStateOf(row) === 'FAILED' ? (
+                          <span className="row-test bad">{L('Απέτυχε', 'Failed')}</span>
+                        ) : testStateOf(row) === 'DUE' ? (
+                          <span className="row-test due">{L('Εκκρεμεί', 'Due')}</span>
+                        ) : testStateOf(row) === 'OK' ? (
+                          <span className="row-test ok">{L('Εντάξει', 'Up to date')}</span>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    )}
                     <td data-label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')} className="num">
-                      {row.kind !== 'STERILIZER' ? (
+                      {row.kind !== 'STERILIZER' && row.kind !== 'WASHER' ? (
                         '—'
                       ) : row.trouble?.recent ? (
                         <span className={`row-trouble${row.trouble.attention ? ' attention' : ''}`}>
