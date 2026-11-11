@@ -1367,15 +1367,6 @@ div.asset-import-hospital b {
   grid-column: 1 / -1;
   overflow: visible;
 }
-.platform-contact-fields .app-button,
-.platform-contact-fields > button {
-  min-height: 40px;
-}
-@media (max-width: 900px) {
-  .platform-contact-fields > :last-child {
-    justify-self: end;
-  }
-}
 .people-toolbar .studio-search {
   flex: 1;
   margin: 0;

@@ -515,25 +515,6 @@
 .studio-field-error {
   color: var(--st-red, var(--c-red-45)) !important;
 }
-.platform-contact-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
-  align-items: end;
-  gap: 12px;
-}
-.studio-system-grid .platform-contact-fields label {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-}
-.platform-contact-fields input {
-  min-height: 40px;
-  padding: 0 11px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  font: inherit;
-  color: var(--c-blue-20);
-}
 .platform-contact-status {
   display: block;
   margin-top: 8px;
@@ -810,9 +791,6 @@
   line-height: 1.45;
 }
 @media (max-width: 900px) {
-  .platform-contact-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
   /* Studio libraries: the library picker becomes a row of chips above the list. */
   html body .studio-manager {
     grid-template-columns: minmax(0, 1fr);
@@ -2364,4 +2342,41 @@ html body .settings-category:focus-visible {
   outline: 2px solid var(--c-cyan-65);
   outline-offset: -2px;
   border-radius: 6px;
+}
+
+/* The contact for trial hospitals on one line: the title, three fields and Save. The explanation is the tooltip. */
+html body .studio-system-grid > .platform-contact {
+  padding: 8px 14px;
+}
+html body .platform-contact-line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+html body .platform-contact-line h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 6px 0 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+html body .platform-contact-line input {
+  flex: 1 1 110px;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 13px;
+}
+html body .platform-contact-line input.wide {
+  flex-grow: 1.8;
+}
+html body .platform-contact-line .app-button {
+  flex: 0 0 auto;
+  min-height: 36px;
 }

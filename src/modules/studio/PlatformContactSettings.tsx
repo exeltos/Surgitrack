@@ -23,32 +23,38 @@ export default function PlatformContactSettings({L}: {L: (el: string, en: string
     }
   };
   return (
-    <section className="platform-contact">
-      <header>
-        <Phone />
-        <div>
-          <h3>{L('Επικοινωνία για δοκιμαστικά νοσοκομεία', 'Contact for trial hospitals')}</h3>
-          <p>
-            {L(
-              'Όταν λήξει η δοκιμαστική περίοδος ενός νοσοκομείου, οι χρήστες του βλέπουν αυτά τα στοιχεία για να επικοινωνήσουν μαζί σας.',
-              'When a hospital’s trial ends, its users see these details to contact you.',
-            )}
-          </p>
-        </div>
-      </header>
-      <div className="platform-contact-fields">
-        <label>
-          {L('Όνομα ή εταιρεία', 'Name or company')}
-          <input value={contact.name || ''} onChange={e => set('name', e.target.value)} />
-        </label>
-        <label>
-          Email
-          <input type="email" value={contact.email || ''} onChange={e => set('email', e.target.value)} />
-        </label>
-        <label>
-          {L('Τηλέφωνο', 'Phone')}
-          <input value={contact.phone || ''} onChange={e => set('phone', e.target.value)} />
-        </label>
+    <section
+      className="platform-contact"
+      title={L(
+        'Όταν λήξει η δοκιμαστική περίοδος ενός νοσοκομείου, οι χρήστες του βλέπουν αυτά τα στοιχεία για να επικοινωνήσουν μαζί σας.',
+        'When a hospital’s trial ends, its users see these details to contact you.',
+      )}
+    >
+      <div className="platform-contact-line">
+        <h3>
+          <Phone size={18} />
+          {L('Επικοινωνία δοκιμών', 'Trial contact')}
+        </h3>
+        <input
+          aria-label={L('Όνομα ή εταιρεία', 'Name or company')}
+          placeholder={L('Όνομα ή εταιρεία', 'Name or company')}
+          value={contact.name || ''}
+          onChange={e => set('name', e.target.value)}
+        />
+        <input
+          className="wide"
+          type="email"
+          aria-label="Email"
+          placeholder="Email"
+          value={contact.email || ''}
+          onChange={e => set('email', e.target.value)}
+        />
+        <input
+          aria-label={L('Τηλέφωνο', 'Phone')}
+          placeholder={L('Τηλέφωνο', 'Phone')}
+          value={contact.phone || ''}
+          onChange={e => set('phone', e.target.value)}
+        />
         <AppButton variant="primary" icon={<Save size={15} />} onClick={() => void save()}>
           {L('Αποθήκευση', 'Save')}
         </AppButton>
