@@ -138,7 +138,15 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                 <h2>
                   {prepDraft.asset.barcode} · {prepDraft.asset.name}
                 </h2>
-                <p>{tr('Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.')}</p>
+                <p>
+                  {prepDraft.asset.department && (
+                    <>
+                      <strong>{tr('Τμήμα: {0}', trData(prepDraft.asset.department))}</strong>
+                      {' · '}
+                    </>
+                  )}
+                  {tr('Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.')}
+                </p>
               </div>
               <div className="prep-print-actions prep-head-prints">{printButtons}</div>
             </div>
