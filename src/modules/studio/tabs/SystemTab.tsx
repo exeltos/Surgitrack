@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Barcode, RefreshCcw, Settings2, ShieldCheck, CheckCircle2} from 'lucide-react';
+import {Barcode, RefreshCcw, Settings2, ShieldCheck} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
@@ -39,6 +39,12 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </button>
             ))}
           </div>
+          <p className="settings-hint">
+            {L(
+              'Ό,τι έχει πεδίο, λίστα ή κουμπί αλλάζει από εδώ. Οι ενδείξεις «Σταθερό» και «Πάντα ενεργό» δεν αλλάζουν.',
+              'Anything with a field, a list or a button can be changed here. «Fixed» and «Always on» do not change.',
+            )}
+          </p>
           <div className="studio-system-grid">
             {group === 'GENERAL' && platformAdmin && libs.dataMode === 'PRODUCTION' && (
               <PlatformContactSettings L={L} />
@@ -191,20 +197,34 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     )}
                   </small>
                 </label>
-                <label>
-                  {L('Barcode Σετ', 'Set barcode')}
-                  <div className="studio-static-field">
-                    <b>{tr('S + 6 ψηφία')}</b>
-                    <span>S000321</span>
+                <div className="studio-fact">
+                  <div>
+                    <strong>{L('Barcode Σετ', 'Set barcode')}</strong>
+                    <small>
+                      {L(
+                        'Δίνεται αυτόματα σε κάθε νέο Σετ. Η μορφή είναι σταθερή και δεν αλλάζει.',
+                        'Given automatically to every new Set. The format is fixed and does not change.',
+                      )}
+                    </small>
                   </div>
-                </label>
-                <label>
-                  {L('Barcode Εργαλείου', 'Instrument barcode')}
-                  <div className="studio-static-field">
-                    <b>{tr('T + 6 ψηφία')}</b>
-                    <span>T001250</span>
+                  <em>
+                    {tr('S + 6 ψηφία')} · S000321 <i>{L('Σταθερό', 'Fixed')}</i>
+                  </em>
+                </div>
+                <div className="studio-fact">
+                  <div>
+                    <strong>{L('Barcode Εργαλείου', 'Instrument barcode')}</strong>
+                    <small>
+                      {L(
+                        'Δίνεται αυτόματα σε κάθε νέο εργαλείο. Η μορφή είναι σταθερή και δεν αλλάζει.',
+                        'Given automatically to every new instrument. The format is fixed and does not change.',
+                      )}
+                    </small>
                   </div>
-                </label>
+                  <em>
+                    {tr('T + 6 ψηφία')} · T001250 <i>{L('Σταθερό', 'Fixed')}</i>
+                  </em>
+                </div>
               </section>
             )}
             {group === 'STERILIZATION' && <LabelSettingsCard L={L} />}
@@ -222,17 +242,40 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     </p>
                   </div>
                 </header>
-                <div className="studio-check-row">
-                  <CheckCircle2 />
-                  <span>{L('Ηλεκτρονική υπογραφή χρήστη σε μεταφορά', 'User electronic signature on transfer')}</span>
+                <div className="studio-fact">
+                  <div>
+                    <strong>{L('Ηλεκτρονική υπογραφή σε μεταφορά', 'Electronic signature on transfer')}</strong>
+                    <small>
+                      {L(
+                        'Κάθε παράδοση και παραλαβή υπογράφεται από τον χρήστη που την κάνει, με τον κωδικό του.',
+                        'Every handover is signed by the user doing it, with their own password.',
+                      )}
+                    </small>
+                  </div>
+                  <em>
+                    <i>{L('Πάντα ενεργό', 'Always on')}</i>
+                  </em>
                 </div>
-                <div className="studio-check-row">
-                  <CheckCircle2 />
-                  <span>{L('Καταγραφή αλυσίδας παράδοσης', 'Chain-of-custody logging')}</span>
+
+                <div className="studio-fact">
+                  <div>
+                    <strong>{L('Καταγραφή αλυσίδας παράδοσης', 'Chain-of-custody logging')}</strong>
+                    <small>
+                      {L(
+                        'Κάθε κίνηση Σετ και εργαλείου καταγράφεται με ποιος, πότε, από πού και προς τα πού.',
+                        'Every movement of a Set or instrument is logged: who, when, from where and to where.',
+                      )}
+                    </small>
+                  </div>
+                  <em>
+                    <i>{L('Πάντα ενεργό', 'Always on')}</i>
+                  </em>
                 </div>
+
                 <details className="released-loads">
                   <summary>
-                    {L('Ιστορικό παραμετροποίησης', 'Configuration audit')} · {libs.configurationAudit.length}
+                    {L('Ιστορικό αλλαγών ρυθμίσεων', 'Settings change history')} · {libs.configurationAudit.length} —{' '}
+                    {L('ποιος άλλαξε τι και πότε (πάτησε για να ανοίξει)', 'who changed what and when (press to open)')}
                   </summary>
                   <div>
                     {libs.configurationAudit.slice(0, 10).map(event => (
@@ -250,12 +293,21 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     )}
                   </div>
                 </details>
-                <div className="studio-check-row">
-                  <CheckCircle2 />
-                  <span>
-                    {L('Δεν αποθηκεύονται κωδικοί πρόσβασης στο Studio', 'Passwords are not stored in Studio')}
-                  </span>
+                <div className="studio-fact">
+                  <div>
+                    <strong>{L('Κωδικοί πρόσβασης', 'Passwords')}</strong>
+                    <small>
+                      {L(
+                        'Το Studio δεν αποθηκεύει ούτε εμφανίζει κωδικούς πρόσβασης.',
+                        'Studio does not store or show passwords.',
+                      )}
+                    </small>
+                  </div>
+                  <em>
+                    <i>{L('Πάντα ενεργό', 'Always on')}</i>
+                  </em>
                 </div>
+
                 {/* Only in Demo: in a real hospital the libraries are the hospital's, saved for everyone, and a
                 reset here would empty them for every user. */}
                 {libs.dataMode === 'DEMO' && (

@@ -1703,30 +1703,6 @@
   color: var(--st-muted);
   margin: 12px 0;
 }
-.studio-static-field {
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  padding: 10px 11px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--c-cyan-30-5);
-}
-.studio-static-field span {
-  color: var(--st-muted);
-}
-.studio-check-row {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-  color: var(--c-cyan-40-8);
-}
-.studio-check-row svg {
-  color: var(--c-green-50);
-  width: 16px;
-}
 .studio-system-grid .secondary {
   margin-top: 16px;
 }
@@ -2451,9 +2427,6 @@
 }
 .studio-system-grid p {
   font-size: 11px !important;
-}
-.studio-check-row {
-  font-size: 11.5px !important;
 }
 .workflow-stage-main strong {
   font-size: 12px !important;

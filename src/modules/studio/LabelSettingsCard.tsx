@@ -72,7 +72,7 @@ export default function LabelSettingsCard({L}: {L: (el: string, en: string) => s
         </div>
       </dl>
       <AppButton variant="primary" icon={<SlidersHorizontal size={15} />} onClick={() => setOpen(true)}>
-        {L('Ρύθμιση & προεπισκόπηση', 'Set up & preview')}
+        {L('Επεξεργασία ετικέτας', 'Edit the label')}
       </AppButton>
       {/* Outside the Settings grid, whose form styles would otherwise reach the dialog. */}
       {open &&

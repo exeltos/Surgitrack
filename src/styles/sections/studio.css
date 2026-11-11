@@ -2411,3 +2411,55 @@ html body .studio-flow-modules-list small {
 html body .studio-flow-modules-list em {
   font-size: 12.5px;
 }
+
+/* A setting nobody changes (fixed or always on): the name, what it does, and a quiet note — not a field. */
+html body .studio-system-grid > section > .studio-fact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 28px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .studio-fact strong {
+  display: block;
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+html body .studio-fact small {
+  display: block;
+  margin-top: 2px;
+  color: var(--st-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+html body .studio-fact em {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--st-muted);
+  font-size: 13px;
+  font-style: normal;
+}
+html body .studio-fact em i {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-cyan-20-3);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+@media (max-width: 760px) {
+  html body .studio-system-grid > section > .studio-fact {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 6px;
+  }
+}
+html body .settings-hint {
+  max-width: 900px;
+  margin: 0 0 10px;
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
