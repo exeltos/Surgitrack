@@ -2526,3 +2526,8 @@ html body .studio-permission-lock {
   padding: 4px 6px;
   gap: 0;
 }
+
+/* The label card is a header and its edit button: a little air between them. */
+html body .studio-system-grid > .label-settings-card > .app-button {
+  margin: 14px 0 6px;
+}
