@@ -29,16 +29,6 @@ export default function RolesTab({s}: {s: StudioPageState}) {
       {tab === 'ROLES' && (
         <div className="studio-role-manager">
           <aside className="studio-role-selector">
-            <div className="studio-role-selector-head">
-              <span className="eyebrow">{L('ΡΟΛΟΙ', 'ROLES')}</span>
-              <strong>{L('Βασικοί ρόλοι πρόσβασης', 'Core access roles')}</strong>
-              <small>
-                {L(
-                  'Οι ρόλοι παραμένουν σταθεροί. Παραμετροποιούνται μόνο τα επιτρεπόμενα δικαιώματα.',
-                  'Roles remain fixed. Only allowed permissions can be configured.',
-                )}
-              </small>
-            </div>
             {roles.map(r => {
               const count = roleCount.find(x => x.role === r.id)?.count || 0;
               return (
@@ -59,7 +49,6 @@ export default function RolesTab({s}: {s: StudioPageState}) {
           <section className="studio-role-permission-panel">
             <header className="studio-role-permission-head">
               <div>
-                <span className="eyebrow">{L('ΔΙΚΑΙΩΜΑΤΑ ΡΟΛΟΥ', 'ROLE PERMISSIONS')}</span>
                 <h2>{L(roles.find(r => r.id === selectedRole)!.el, roles.find(r => r.id === selectedRole)!.en)}</h2>
                 <p>
                   {L(
@@ -118,6 +107,14 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                             'Critical chain-of-custody permissions remain locked. Other permissions can follow facility policy.',
                           )}
                 </span>
+                {selectedRole !== 'ADMIN' && (
+                  <span>
+                    {L(
+                      '🔒 Το λουκέτο σημαίνει ότι δεν αλλάζει (προστατευμένο ή μόνο ο Προϊστάμενος). Τα υπόλοιπα τα αλλάζεις και πατάς Αποθήκευση.',
+                      '🔒 A padlock means it cannot be changed (protected, or Supervisor only). Change the others, then press Save.',
+                    )}
+                  </span>
+                )}
               </div>
             </div>
             {selectedRole === 'ADMIN' ? (
@@ -179,11 +176,21 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                               <small>{L(item.hintEl, item.hintEn)}</small>
                             </span>
                             {locked && (
-                              <span className="studio-permission-lock">
+                              <span
+                                className="studio-permission-lock"
+                                title={
+                                  supervisorOnly
+                                    ? L('Μόνο ο Προϊστάμενος', 'Supervisor only')
+                                    : L('Προστατευμένο', 'Protected')
+                                }
+                                role="img"
+                                aria-label={
+                                  supervisorOnly
+                                    ? L('Μόνο ο Προϊστάμενος', 'Supervisor only')
+                                    : L('Προστατευμένο', 'Protected')
+                                }
+                              >
                                 <Lock size={13} />
-                                {supervisorOnly
-                                  ? L('Μόνο Προϊστάμενος', 'Supervisor only')
-                                  : L('Προστατευμένο', 'Protected')}
                               </span>
                             )}
                           </label>

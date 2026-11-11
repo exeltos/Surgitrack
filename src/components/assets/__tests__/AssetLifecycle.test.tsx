@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it} from 'vitest';
 import {AppPreferencesProvider} from '../../../core/AppPreferences';
 import {LibraryStoreProvider} from '../../../core/LibraryStore';
 import {SurgiProvider, useSurgi} from '../../../store/SurgiStore';
@@ -34,15 +34,11 @@ describe('the way round of a Set or instrument', () => {
     sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
   });
 
-  it('shows the department as the step it is at, and offers the dispatch', () => {
-    const send = vi.fn();
-    render(<AssetLifecycle kind="SET" id="x" state="IN_DEPARTMENT" barcode="S000321" onDispatch={send} />, {
-      wrapper: Wrapper,
-    });
+  it('shows the department as the step it is at, with no button of its own (the page has one)', () => {
+    render(<AssetLifecycle kind="SET" id="x" state="IN_DEPARTMENT" barcode="S000321" />, {wrapper: Wrapper});
     expect(screen.getByText('Μετά τη χρήση, στείλτε το προς Αποστείρωση.')).toBeInTheDocument();
     expect(screen.getByRole('listitem', {current: 'step'})).toHaveTextContent('Στο τμήμα');
-    fireEvent.click(screen.getByRole('button', {name: 'Προς Αποστείρωση'}));
-    expect(send).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('button', {name: 'Προς Αποστείρωση'})).not.toBeInTheDocument();
   });
 
   it('shows the stage it waits in, with a link to that stage of Sterilization', () => {

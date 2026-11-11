@@ -15,7 +15,7 @@ const corsBase = {
 const WINDOW_MINUTES = 15;
 const MAX_FAILS_PER_CODE = 5;
 const MAX_FAILS_PER_CALLER = 20;
-const CODE_FORMAT = /^[A-Z]{2}[0-9]{4}$/;
+const CODE_FORMAT = /^([A-Z]{2}[0-9]{4}|DEMO)$/;
 const ROLE_LABEL: Record<string, string> = {
   ADMIN: "Διαχειριστής",
   STERILIZATION: "Αποστείρωση",

@@ -399,9 +399,7 @@
     grid-template-rows: auto auto auto auto;
     align-items: start;
   }
-  html body .studio-body-workflow .studio-workflow-hero,
-  html body .studio-body-workflow .released-loads,
-  html body .studio-body-workflow .studio-workflow-footer {
+  html body .studio-body-workflow .released-loads {
     grid-column: 1 / -1;
   }
   html body .studio-body-workflow .studio-workflow-side,
@@ -423,9 +421,6 @@
     display: none;
   }
   html body .studio-body-workflow .studio-release-policy > header span {
-    display: none;
-  }
-  html body .studio-body-workflow .studio-workflow-hero p {
     display: none;
   }
   html body .studio-body-workflow .studio-workflow-policy span {
@@ -514,25 +509,6 @@
 }
 .studio-field-error {
   color: var(--st-red, var(--c-red-45)) !important;
-}
-.platform-contact-fields {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
-  align-items: end;
-  gap: 12px;
-}
-.studio-system-grid .platform-contact-fields label {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-}
-.platform-contact-fields input {
-  min-height: 40px;
-  padding: 0 11px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  font: inherit;
-  color: var(--c-blue-20);
 }
 .platform-contact-status {
   display: block;
@@ -810,9 +786,6 @@
   line-height: 1.45;
 }
 @media (max-width: 900px) {
-  .platform-contact-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
   /* Studio libraries: the library picker becomes a row of chips above the list. */
   html body .studio-manager {
     grid-template-columns: minmax(0, 1fr);
@@ -947,9 +920,6 @@ html body .roles-guide-row {
 }
 html body .studio-workflow-page {
   gap: 10px;
-}
-html body .studio-workflow-hero {
-  padding: 10px 16px;
 }
 html body .studio-workflow-policy,
 html body .studio-release-policy {
@@ -1392,21 +1362,6 @@ html body .studio-tab-row .studio-tabs button {
   padding: 7px 14px !important;
 }
 /* Roles & permissions: one tab, two views. */
-html body .studio-roles-switch {
-  display: inline-flex;
-  justify-self: start;
-  gap: 2px;
-  margin-bottom: 10px;
-  padding: 3px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-}
-html body .studio-roles-switch button.active {
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-45);
-  box-shadow: inset 0 0 0 1px var(--c-teal-90-2);
-}
 
 /* Studio › Αξιολογήσεις: every Demo's ratings together. */
 html body .studio-ratings-kpis {
@@ -1576,9 +1531,6 @@ html body .evaluation-demo-empty-card span {
 }
 /* The owner's Sterilization Flow page: its title is the page's, so the box keeps its description (the compact
    desktop layout hid it, which left the box empty but for the profile name). */
-html body .studio-section-page .studio-body-workflow .studio-workflow-hero p {
-  display: block;
-}
 /* The hospital the owner is working in: said in place of its «Είσοδος». */
 html body .platform-here {
   display: inline-flex;
@@ -2277,7 +2229,7 @@ html body .studio-flow-modules-list > li.off em {
 html body .studio-system-grid,
 html body .studio-system-grid:has(> .platform-contact) {
   height: auto;
-  grid-template-columns: minmax(0, 900px);
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
   gap: 16px;
 }
@@ -2330,4 +2282,247 @@ html body .studio-system-grid > section > label > :is(.studio-setting-input, .st
 }
 html body .studio-system-grid > section > label:not(:has(> small)) > :is(.studio-setting-input, .studio-static-field) {
   grid-row: 1;
+}
+
+/* Settings by category: tabs over the rows, one category on screen at a time (as in Reports). */
+html body .settings-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 12px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .settings-category {
+  margin-bottom: -1px;
+  padding: 8px 16px 9px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+html body .settings-category:hover {
+  color: var(--c-cyan-20-3);
+}
+html body .settings-category.active {
+  border-bottom-color: var(--c-cyan-45);
+  color: var(--c-cyan-20-3);
+}
+html body .settings-category:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+/* The contact for trial hospitals on one line: the title, three fields and Save. The explanation is the tooltip. */
+html body .studio-system-grid > .platform-contact {
+  padding: 8px 14px;
+}
+html body .platform-contact-line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+html body .platform-contact-line h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 6px 0 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+html body .platform-contact-line input {
+  flex: 1 1 110px;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 13px;
+}
+html body .platform-contact-line input.wide {
+  flex-grow: 1.8;
+}
+html body .platform-contact-line .app-button {
+  flex: 0 0 auto;
+  min-height: 36px;
+}
+
+/* Sterilization flow by category: the stages, the rules around them, the hospital's features — one at a time. */
+html body .studio-body-workflow .studio-workflow-page[data-group] {
+  grid-template-columns: minmax(0, 1fr);
+}
+html body .studio-body-workflow .studio-workflow-page[data-group] > .settings-categories {
+  grid-column: 1 / -1;
+  max-width: none;
+  margin-bottom: 0;
+}
+/* The rules and the features use the whole width: cards side by side. */
+html body .studio-body-workflow .studio-workflow-page[data-group='POLICIES'] .studio-workflow-side {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+  gap: 12px;
+}
+html body .studio-body-workflow .studio-workflow-page[data-group='FEATURES'] .studio-flow-modules-list {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+html body .studio-flow-modules-list > li b {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-cyan-20-3);
+}
+html body .studio-flow-modules-list small {
+  font-size: 12px;
+}
+html body .studio-flow-modules-list em {
+  font-size: 12.5px;
+}
+
+/* A setting nobody changes (fixed or always on): the name, what it does, and a quiet note — not a field. */
+html body .studio-system-grid > section > .studio-fact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 28px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .studio-fact strong {
+  display: block;
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+html body .studio-fact small {
+  display: block;
+  margin-top: 2px;
+  color: var(--st-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+html body .studio-fact em {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--st-muted);
+  font-size: 13px;
+  font-style: normal;
+}
+html body .studio-fact em i {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-cyan-20-3);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+@media (max-width: 760px) {
+  html body .studio-system-grid > section > .studio-fact {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 6px;
+  }
+}
+html body .settings-hint {
+  margin: 0 0 10px;
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
+
+/* The flow's history tab: rename, restore, and the list of versions (what changed, who, when). */
+html body .studio-history {
+  display: grid;
+  gap: 4px;
+  padding: 4px 20px 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 15px;
+  background: var(--c-white);
+}
+html body .studio-history .studio-fact-edit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  column-gap: 28px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .studio-history .studio-fact-edit input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+}
+html body .studio-history-title {
+  margin: 14px 0 0;
+  font-size: 15px;
+  color: var(--c-cyan-20);
+}
+html body .studio-history-help {
+  margin: 0 0 6px;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-history-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-history-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+}
+html body .studio-history-list small {
+  color: var(--st-muted);
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  html body .studio-history .studio-fact-edit {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+  }
+  html body .studio-history-list li {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+/* The category tabs stay at the top while the page scrolls. */
+html body .settings-categories {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: rgba(247, 250, 252, 0.96);
+  backdrop-filter: blur(4px);
+}
+
+/* Settings use the whole width: on a wide screen the rows of a card sit in two columns. */
+@media (min-width: 1100px) {
+  html body .studio-system-grid > section:not(.label-settings-card):not(.platform-contact) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 56px;
+    align-content: start;
+  }
+  html body .studio-system-grid > section:not(.label-settings-card):not(.platform-contact) > :is(header, details) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Roles: a padlock instead of a long badge on every locked row, and a line that says what it means. */
+html body .studio-permission-lock {
+  padding: 4px 6px;
+  gap: 0;
 }

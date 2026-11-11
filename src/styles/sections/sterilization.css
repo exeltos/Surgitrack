@@ -2513,8 +2513,13 @@ html body .content:has(> .equipment-page) {
     justify-content: flex-start;
   }
 }
-.stage-return-last {
-  margin: 0 0 4px;
+/* Aligned with the fields below it (the icon column is 48px wide), as a quiet note. */
+.confirm-dialog > .stage-return-last {
+  margin: 0 20px 14px 68px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--c-gray-95);
   color: var(--st-muted);
   font-size: 12.5px;
+  line-height: 1.5;
 }

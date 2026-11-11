@@ -375,36 +375,53 @@ export default function ReportsPage() {
               {reports.length} {tr('διαθέσιμες')}
             </span>
           </div>
-          <div className="reports-catalog-list">
-            {reportGroups.map(group => (
-              <div className="reports-catalog-group" key={group.id} role="group" aria-label={tr(group.title)}>
-                <h3>{tr(group.title)}</h3>
-                {reports
-                  .filter(report => report.group === group.id)
-                  .map(report => {
-                    const Icon = report.icon;
-                    return (
-                      <button
-                        key={report.id}
-                        title={tr(report.purpose)}
-                        className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                        onClick={() => {
-                          setActive(report.id);
-                          setView(null);
-                        }}
-                      >
-                        <span className="reports-catalog-icon">
-                          <Icon size={18} />
-                        </span>
-                        <span>
-                          <strong>{tr(report.title)}</strong>
-                          <small>{tr(report.purpose)}</small>
-                        </span>
-                      </button>
-                    );
-                  })}
-              </div>
+          <div className="reports-categories" role="group" aria-label={tr('Κατηγορίες αναφορών')}>
+            {reportGroups.map(g => (
+              <button
+                key={g.id}
+                type="button"
+                className={`reports-category ${activeMeta.group === g.id ? 'active' : ''}`}
+                aria-pressed={activeMeta.group === g.id}
+                onClick={() => {
+                  if (activeMeta.group === g.id) return;
+                  setActive(reports.find(r => r.group === g.id)!.id);
+                  setView(null);
+                }}
+              >
+                {tr(g.title)}
+                <b>{reports.filter(r => r.group === g.id).length}</b>
+              </button>
             ))}
+          </div>
+          <div
+            className="reports-catalog-list"
+            role="group"
+            aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
+          >
+            {reports
+              .filter(report => report.group === activeMeta.group)
+              .map(report => {
+                const Icon = report.icon;
+                return (
+                  <button
+                    key={report.id}
+                    title={tr(report.purpose)}
+                    className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setActive(report.id);
+                      setView(null);
+                    }}
+                  >
+                    <span className="reports-catalog-icon">
+                      <Icon size={18} />
+                    </span>
+                    <span>
+                      <strong>{tr(report.title)}</strong>
+                      <small>{tr(report.purpose)}</small>
+                    </span>
+                  </button>
+                );
+              })}
           </div>
         </aside>
         <section className="reports-stage">
@@ -420,10 +437,10 @@ export default function ReportsPage() {
               <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
             </div>
           </header>
-          <div className="reports-filter-strip">
-            <FilterMenu filters={reportFilters} align="left" />
-          </div>
           <div className="reports-overview">
+            <div className="reports-filter-strip">
+              <FilterMenu filters={reportFilters} align="left" />
+            </div>
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
               {summary.map(chip => (
                 <li key={chip.label}>

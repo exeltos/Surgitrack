@@ -1367,15 +1367,6 @@ div.asset-import-hospital b {
   grid-column: 1 / -1;
   overflow: visible;
 }
-.platform-contact-fields .app-button,
-.platform-contact-fields > button {
-  min-height: 40px;
-}
-@media (max-width: 900px) {
-  .platform-contact-fields > :last-child {
-    justify-self: end;
-  }
-}
 .people-toolbar .studio-search {
   flex: 1;
   margin: 0;
@@ -2679,9 +2670,6 @@ html body .roles-guide h2 {
 html body .roles-guide-row p,
 html body .roles-guide-row span {
   line-height: 1.4;
-}
-html body .studio-workflow-hero p {
-  margin-top: 2px;
 }
 /* Replacements: the page holds still; only the table scrolls. */
 html body .replacements {
@@ -4028,17 +4016,6 @@ html body .studio-notice-status {
 }
 /* Short screens: a little space between sections instead of a title, so the whole menu still fits. */
 /* Roles & permissions: one tab, two views. */
-html body .studio-roles-switch button {
-  padding: 6px 14px;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-  color: var(--c-cyan-50);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
 html body .guided-tour-note strong {
   font-size: 15px;
   color: var(--c-blue-15);

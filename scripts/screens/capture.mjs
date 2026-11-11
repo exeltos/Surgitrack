@@ -444,6 +444,8 @@ async function main() {
           '/studio?tab=NOTICES',
           '/studio?tab=SECURITY',
           '/studio?tab=SYSTEM',
+          '/studio?tab=WORKFLOW',
+          '/studio?tab=ROLES',
           '/studio?tab=USERS',
           '/hospitals',
           '/hospital',
@@ -500,7 +502,36 @@ async function main() {
         const started = Date.now();
         await page.evaluate(h => (location.hash = h), `#${target}`);
         await settle(page);
-        await page.evaluate(() => window.scrollTo(0, 0));
+        // SCREENS_CLICK="Κανόνες" presses that button first (a tab of the page), for a shot of what it shows.
+        if (process.env.SCREENS_CLICK) {
+          await page.getByRole('button', {name: process.env.SCREENS_CLICK}).first().click({timeout: 3000});
+          await page.waitForTimeout(300);
+        }
+        // SCREENS_SCROLL=400 scrolls what scrolls (the page or its panel) before the shot, to see what stays put.
+        if (process.env.SCREENS_SCROLL)
+          await page.evaluate(
+            by =>
+              document.querySelectorAll('*').forEach(el => {
+                if (el.scrollHeight > el.clientHeight + 40 && getComputedStyle(el).overflowY !== 'visible')
+                  el.scrollTop = by;
+              }),
+            Number(process.env.SCREENS_SCROLL),
+          );
+        if (process.env.SCREENS_SCROLL)
+          await page.evaluate(by => window.scrollTo(0, by), Number(process.env.SCREENS_SCROLL));
+        if (process.env.SCREENS_SCROLL)
+          console.log(
+            '  tabs top after scroll:',
+            await page.evaluate(() => {
+              const chain = [];
+              for (let el = document.querySelector('.settings-categories'); el; el = el.parentElement)
+                chain.push(
+                  `${el.tagName}.${el.className.toString().split(' ')[0]} oy=${getComputedStyle(el).overflowY} sh=${el.scrollHeight} ch=${el.clientHeight} st=${el.scrollTop}`,
+                );
+              return `${document.querySelector('.settings-categories')?.getBoundingClientRect().top} | ${chain.join(' > ')}`;
+            }),
+          );
+        if (!process.env.SCREENS_SCROLL) await page.evaluate(() => window.scrollTo(0, 0));
         const state = await pageState(page);
         state.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
         state.settledMs = Date.now() - started - SETTLE_MS;
@@ -788,6 +819,24 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByText(/^(Αναφορά προβλήματος|Report a problem)/)
           .first()
           .click({timeout: 3000});
+      },
+    });
+  if (role !== 'VIEWER' && seed.firstSetId)
+    modals.push({
+      // A Set's problem report, the instrument list open (it takes the height the fields leave).
+      name: 'set-report-dialog',
+      route: `/sets/${seed.firstSetId}`,
+      open: async () => {
+        await page
+          .locator('button')
+          .filter({hasText: /^(Ενέργειες|Actions)/})
+          .first()
+          .click({timeout: 3000});
+        await page
+          .getByText(/^(Αναφορά προβλήματος|Report a problem)/)
+          .first()
+          .click({timeout: 3000});
+        await page.locator('.report-target-switch button').nth(1).click({timeout: 3000});
       },
     });
   if (role !== 'DEPARTMENT' && seed.firstSetId)

@@ -190,11 +190,11 @@ export default function StudioPage() {
         )}
         {tab === 'ROLES' && (
           // Roles and permissions in one tab: who does what, or each role's permissions to change.
-          <div className="studio-roles-switch" role="group" aria-label={L('Προβολή', 'View')}>
+          <div className="settings-categories" role="group" aria-label={L('Προβολή', 'View')}>
             <button
               type="button"
               aria-pressed={rolesView === 'PERMISSIONS'}
-              className={rolesView === 'PERMISSIONS' ? 'active' : ''}
+              className={`settings-category ${rolesView === 'PERMISSIONS' ? 'active' : ''}`}
               onClick={() => setRolesView('PERMISSIONS')}
             >
               {L('Δικαιώματα ανά ρόλο', 'Permissions by role')}
@@ -202,7 +202,7 @@ export default function StudioPage() {
             <button
               type="button"
               aria-pressed={rolesView === 'GUIDE'}
-              className={rolesView === 'GUIDE' ? 'active' : ''}
+              className={`settings-category ${rolesView === 'GUIDE' ? 'active' : ''}`}
               onClick={() => setRolesView('GUIDE')}
             >
               {L('Ποιος κάνει τι', 'Who does what')}

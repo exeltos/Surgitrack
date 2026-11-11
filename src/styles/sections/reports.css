@@ -71,16 +71,6 @@ html body .reports-catalog {
   }
 }
 /* Patient traceability: a link to Traceability, with an arrow out. */
-
-html body .reports-catalog-group h3 {
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted, #6b7f8a);
-}
-html body .reports-overview {
-  display: grid;
-  align-items: start;
-}
 @media (max-width: 900px) {
   html body .reports-overview {
     grid-template-columns: 1fr;
@@ -183,19 +173,9 @@ html body .reports-catalog-list {
   flex-wrap: wrap;
   overflow: visible;
 }
-html body .reports-catalog-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-html body .reports-catalog-group h3 {
-  margin: 0 6px 0 0;
-}
 html body .reports-catalog-item {
   width: auto;
   min-width: 0;
-  gap: 8px;
   border-color: var(--c-gray-90);
   border-radius: 999px;
 }
@@ -210,12 +190,9 @@ html body .reports-catalog-item small {
 }
 html body .reports-stage-head {
   min-height: 0;
-  padding: 12px 16px 6px;
 }
 html body .reports-overview {
   grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-  padding: 6px 16px 6px;
 }
 html body .reports-summary {
   gap: 8px;
@@ -225,11 +202,7 @@ html body .reports-summary button {
   align-items: baseline;
   gap: 8px;
   min-width: 0;
-  padding: 6px 12px;
   border-radius: 999px;
-}
-html body .reports-summary button b {
-  font-size: 1.05rem;
 }
 html body .reports-split {
   display: flex;
@@ -258,31 +231,14 @@ html body .reports-catalog {
   background: transparent;
   border-radius: 0;
 }
-html body .reports-catalog-list {
-  padding: 2px 0 6px;
-  gap: 10px 26px;
-}
-html body .reports-catalog-group h3 {
-  margin-right: 8px;
-  font-size: 0.7rem;
-  font-weight: 800;
-}
 html body .reports-catalog-item {
-  grid-template-columns: 28px auto;
-  padding: 6px 16px 6px 7px;
   border: 1px solid var(--c-gray-90-4);
   background: var(--c-white);
-  box-shadow: 0 1px 2px rgba(16, 42, 54, 0.06);
 }
 html body .reports-catalog-item:hover {
   border-color: var(--c-cyan-45);
 }
-html body .reports-catalog-icon {
-  width: 28px;
-  height: 28px;
-}
 html body .reports-catalog-item strong {
-  font-size: 13px;
   font-weight: 700;
 }
 html body .reports-catalog-item.active {
@@ -310,4 +266,122 @@ html body .reports-result-body {
 }
 html body .reports-filter-strip {
   border-bottom: 0;
+}
+
+/* Reports, a lower top: the page title alone, the report choices on one compact line, the report's title and the
+   download on one line, the filters beside the totals. The list gets the height this frees. */
+html body .reports-page-head p,
+html body .reports-page-head .eyebrow {
+  display: none;
+}
+html body .reports-page-head {
+  margin-bottom: 2px;
+}
+html body .reports-page-head h1 {
+  font-size: 22px;
+}
+html body .reports-catalog-list {
+  gap: 6px 12px;
+}
+html body .reports-catalog-item {
+  grid-template-columns: 22px auto;
+  gap: 6px;
+  padding: 3px 9px 3px 4px;
+  box-shadow: none;
+}
+html body .reports-catalog-icon {
+  width: 22px;
+  height: 22px;
+}
+html body .reports-catalog-icon svg {
+  width: 13px;
+  height: 13px;
+}
+html body .reports-catalog-item strong {
+  font-size: 12px;
+}
+html body .reports-stage-head {
+  padding: 8px 16px 4px;
+  gap: 12px;
+}
+html body .reports-stage-head .eyebrow {
+  display: none;
+}
+html body .reports-stage-head h2 {
+  display: inline;
+  margin: 0 10px 0 0;
+  font-size: 17px;
+}
+html body .reports-stage-head p {
+  display: inline;
+  margin: 0;
+  font-size: 12px;
+}
+html body .reports-overview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 4px 16px 6px;
+}
+html body .reports-overview .reports-filter-strip {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+}
+html body .reports-overview .reports-summary {
+  flex: 1 1 auto;
+  margin: 0;
+}
+html body .reports-overview .reports-split {
+  flex: 1 0 100%;
+}
+html body .reports-summary button {
+  padding: 3px 10px;
+}
+html body .reports-summary button b {
+  font-size: 0.95rem;
+}
+
+/* Reports in two levels: the category (Εξοπλισμός · Αποστείρωση · Παραδόσεις) as tabs, and under them only the
+   reports of that category. Nothing from different categories sits side by side. */
+html body .reports-categories {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .reports-category {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: -1px;
+  padding: 7px 16px 8px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+html body .reports-category b {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-gray-65);
+}
+html body .reports-category:hover {
+  color: var(--c-cyan-20-3);
+}
+html body .reports-category.active {
+  border-bottom-color: var(--c-cyan-45);
+  color: var(--c-cyan-20-3);
+}
+html body .reports-category:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+html body .reports-catalog-list {
+  padding: 8px 0 4px;
 }

@@ -270,13 +270,7 @@ export default function ToolDetailPage() {
           </span>
         </div>
       )}
-      <AssetLifecycle
-        kind="TOOL"
-        id={tool.id}
-        state={tool.state}
-        barcode={tool.barcode}
-        onDispatch={can('department.dispatch') ? () => setDispatchOpen(true) : undefined}
-      />
+      <AssetLifecycle kind="TOOL" id={tool.id} state={tool.state} barcode={tool.barcode} />
       <div className="asset-workbench-grid">
         <AssetWorkbenchSidebar
           kind="TOOL"

@@ -1531,13 +1531,11 @@
   align-items: flex-start;
 }
 .studio-panel-head h2 {
-  font-size: 20px;
   margin: 2px 0 3px;
 }
 .studio-panel-head p {
   margin: 0;
   color: var(--st-muted);
-  font-size: 12px;
   max-width: 700px;
 }
 .studio-search {
@@ -1703,30 +1701,6 @@
   color: var(--st-muted);
   margin: 12px 0;
 }
-.studio-static-field {
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  padding: 10px 11px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--c-cyan-30-5);
-}
-.studio-static-field span {
-  color: var(--st-muted);
-}
-.studio-check-row {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-  color: var(--c-cyan-40-8);
-}
-.studio-check-row svg {
-  color: var(--c-green-50);
-  width: 16px;
-}
 .studio-system-grid .secondary {
   margin-top: 16px;
 }
@@ -1858,57 +1832,6 @@
   grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 12px;
   overflow: hidden;
-}
-.studio-workflow-hero {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: flex-start;
-  background: var(--c-white);
-  border: 1px solid var(--c-gray-90);
-  border-radius: 16px;
-  padding: 16px 18px;
-}
-.studio-workflow-hero h2 {
-  margin: 3px 0 5px;
-  font-size: 20px;
-  color: var(--c-cyan-20);
-}
-.studio-workflow-hero p {
-  margin: 0;
-  max-width: 760px;
-  color: var(--c-cyan-55-3);
-  font-size: 12px;
-  line-height: 1.45;
-}
-.studio-workflow-profile {
-  min-width: 270px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 5px 8px;
-  align-items: center;
-}
-.studio-workflow-profile small {
-  grid-column: 1/3;
-  color: var(--st-muted);
-  font-size: 11px;
-}
-.studio-workflow-profile input {
-  min-width: 0;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 9px;
-  padding: 9px 10px;
-  font: inherit;
-  font-size: 12px;
-  color: var(--c-cyan-30-5);
-}
-.studio-workflow-profile span {
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-45);
-  border-radius: 999px;
-  padding: 5px 8px;
-  font-size: 11px;
-  font-weight: 800;
 }
 .studio-workflow-policy {
   display: flex;
@@ -2055,51 +1978,13 @@
 .workflow-stage-toggle.locked > span {
   background: var(--c-cyan-65);
 }
-.studio-workflow-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  background: var(--c-white);
-  border: 1px solid var(--c-gray-90);
-  border-radius: 14px;
-  padding: 11px 14px;
-}
-.studio-workflow-footer > div {
-  display: grid;
-  min-width: 0;
-}
-.studio-workflow-footer strong {
-  font-size: 11px;
-  color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.studio-workflow-footer span {
-  font-size: 11px;
-  color: var(--c-cyan-30-5);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 @media (max-width: 900px) {
-  .studio-workflow-hero {
-    flex-direction: column;
-  }
-  .studio-workflow-profile {
-    width: 100%;
-    min-width: 0;
-  }
   .studio-workflow-stage {
     grid-template-columns: 36px minmax(0, 1fr);
   }
   .workflow-stage-toggle {
     grid-column: 2;
     justify-self: start;
-  }
-  .studio-workflow-footer {
-    align-items: flex-start;
-    flex-direction: column;
   }
 }
 
@@ -2210,10 +2095,8 @@
 }
 
 /* Policies and stages stay in normal document flow. */
-.studio-body-workflow .studio-workflow-hero,
 .studio-body-workflow .studio-workflow-policy,
-.studio-body-workflow .studio-release-policy,
-.studio-body-workflow .studio-workflow-footer {
+.studio-body-workflow .studio-release-policy {
   flex: 0 0 auto !important;
 }
 .studio-body-workflow .studio-workflow-list {
@@ -2227,17 +2110,8 @@
 }
 
 /* Keep the route/reset area visible as a clean final section, not a floating inner footer. */
-.studio-body-workflow .studio-workflow-footer {
-  position: relative !important;
-  bottom: auto !important;
-  z-index: auto !important;
-  margin-bottom: 2px !important;
-}
 
 /* Slightly compact policy cards so more settings fit before scrolling. */
-.studio-body-workflow .studio-workflow-hero {
-  padding: 14px 17px !important;
-}
 .studio-body-workflow .studio-workflow-policy {
   padding: 9px 12px !important;
 }
@@ -2360,18 +2234,15 @@
 .studio-tabs button.active {
   font-weight: 680 !important;
 }
-.studio-panel-head h2,
-.studio-workflow-hero h2 {
+.studio-panel-head h2 {
   color: var(--studio-ink);
   font-weight: 680;
   letter-spacing: -0.012em;
 }
-.studio-panel-head h2,
-.studio-workflow-hero h2 {
+.studio-panel-head h2 {
   font-size: 19px;
 }
-.studio-panel-head p,
-.studio-workflow-hero p {
+.studio-panel-head p {
   font-size: 11.5px;
   line-height: 1.45;
 }
@@ -2452,9 +2323,6 @@
 .studio-system-grid p {
   font-size: 11px !important;
 }
-.studio-check-row {
-  font-size: 11.5px !important;
-}
 .workflow-stage-main strong {
   font-size: 12px !important;
   font-weight: 650 !important;
@@ -2485,12 +2353,8 @@
 .studio-workspace button.secondary {
   font-weight: 620;
 }
-.studio-panel-head .app-button,
-.studio-workflow-footer .app-button {
+.studio-panel-head .app-button {
   min-height: 38px;
-}
-.studio-workflow-hero .eyebrow {
-  opacity: 0.78;
 }
 
 /* v0.28.4 — Roles & Permissions manager */
@@ -2514,23 +2378,6 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-}
-.studio-role-selector-head {
-  display: grid;
-  gap: 3px;
-  padding: 10px 10px 12px;
-  border-bottom: 1px solid var(--c-gray-95);
-  margin-bottom: 2px;
-}
-.studio-role-selector-head > strong {
-  font-size: 13px;
-  color: var(--c-cyan-30-5);
-  font-weight: 680;
-}
-.studio-role-selector-head > small {
-  font-size: 11px;
-  color: var(--st-muted);
-  line-height: 1.4;
 }
 .studio-role-selector > button {
   border: 0;

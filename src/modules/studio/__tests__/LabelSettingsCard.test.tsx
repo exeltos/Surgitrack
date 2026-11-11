@@ -10,7 +10,7 @@ describe('Barcode label settings', () => {
     renderPage(<LabelSettingsCard L={L} />, {
       signedIn: {id: 'u-admin', name: 'Διαχειριστής', role: 'ADMIN', department: ''},
     });
-    fireEvent.click(screen.getByRole('button', {name: /Ρύθμιση & προεπισκόπηση/}));
+    fireEvent.click(screen.getByRole('button', {name: /Επεξεργασία ετικέτας/}));
     const frame = document.querySelector('iframe') as HTMLIFrameElement;
     expect(frame.getAttribute('srcdoc')).toContain('class="dates"');
     fireEvent.click(screen.getByRole('button', {name: /Τριπλή/}));
@@ -26,7 +26,7 @@ describe('Barcode label settings', () => {
     });
     const summary = document.querySelector('.label-settings-summary') as HTMLElement;
     const before = summary.textContent;
-    fireEvent.click(screen.getByRole('button', {name: /Ρύθμιση & προεπισκόπηση/}));
+    fireEvent.click(screen.getByRole('button', {name: /Επεξεργασία ετικέτας/}));
     expect(screen.getByText('Είναι η προεπιλογή νοσοκομείου')).toBeTruthy();
     fireEvent.click(screen.getAllByRole('button', {name: 'Κλείσιμο'}).at(-1)!);
     expect(summary.textContent).toBe(before);

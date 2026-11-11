@@ -292,13 +292,7 @@ export default function SetDetailPage() {
           </span>
         </div>
       )}
-      <AssetLifecycle
-        kind="SET"
-        id={set.id}
-        state={set.state}
-        barcode={set.barcode}
-        onDispatch={can('department.dispatch') ? () => setDispatchOpen(true) : undefined}
-      />
+      <AssetLifecycle kind="SET" id={set.id} state={set.state} barcode={set.barcode} />
       <div className="asset-workbench-grid">
         <AssetWorkbenchSidebar
           kind="SET"

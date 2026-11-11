@@ -1777,8 +1777,38 @@ body {
   grid-column: 2;
   margin-left: auto;
 }
+/* A compact header and body: the room goes to the instrument list. */
+.set-report-modal > header {
+  padding: 12px 20px;
+  min-height: 0;
+}
+.set-report-modal > header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.set-report-modal > header p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+}
+.set-report-modal > header > .icon-button {
+  width: 34px;
+  height: 34px;
+}
+.set-report-modal .modal-body {
+  padding: 12px 20px 8px;
+}
+.set-report-modal .report-target-switch {
+  margin-bottom: 0;
+}
+.set-report-modal .report-target-switch button {
+  min-height: 36px;
+}
+.set-report-modal > footer {
+  padding: 10px 20px;
+  min-height: 0;
+}
 .set-report-modal {
-  height: min(760px, 88dvh);
+  height: min(860px, 92dvh);
   max-height: none;
 }
 .set-report-modal .modal-body {
@@ -1788,13 +1818,48 @@ body {
   display: flex;
   flex-direction: column;
 }
+/* The tool list takes all the height the fields leave and scrolls by itself; the card never does.
+   Type and photos share a row, the note goes under them, so the list starts higher. */
 .set-report-modal .report-tool-picker {
-  flex: 0 1 220px;
-  min-height: 100px;
+  margin: 14px 0 0;
+  flex: 1 1 0;
+  min-height: 120px;
+  max-height: none;
   overflow: auto;
 }
 .set-report-modal .form-grid {
   flex: 0 0 auto;
+  margin: 14px 0 0;
+  gap: 12px;
+}
+.set-report-modal .form-grid > :first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+.set-report-modal .form-grid > .report-photo-input {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  padding: 7px 10px;
+}
+.set-report-modal .form-grid > .report-photo-input input {
+  font-size: 12px;
+}
+.set-report-modal .form-grid > label.span-2:not(.report-photo-input) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+.set-report-modal .form-grid textarea {
+  min-height: 56px;
+}
+@media (max-width: 640px) {
+  .set-report-modal .form-grid > .report-photo-input {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .set-report-modal .form-grid > label.span-2:not(.report-photo-input) {
+    grid-row: auto;
+  }
 }
 .set-report-modal > footer {
   flex: 0 0 auto;
