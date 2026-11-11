@@ -1250,6 +1250,7 @@ export const en: Record<string, string> = {
   'Το φορτίο {0} απέτυχε: τα αντικείμενα μένουν στον καθαρισμό για νέα πλύση.':
     'Load {0} failed: the items stay in cleaning to be washed again.',
   'Αποτυχία πλύσης': 'Wash failed',
+  'Πίσω σε προηγούμενο στάδιο ή στο τμήμα': 'Back to an earlier stage or to the department',
   'αύξουσα σειρά · πατήστε για φθίνουσα': 'ascending · press for descending',
   'φθίνουσα σειρά · πατήστε για να φύγει η ταξινόμηση': 'descending · press to clear',
   'πατήστε για αύξουσα σειρά': 'press to sort ascending',

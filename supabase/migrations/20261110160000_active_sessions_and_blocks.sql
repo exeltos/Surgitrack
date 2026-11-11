@@ -19,6 +19,7 @@ create index if not exists user_presence_org on public.user_presence (organizati
 alter table public.user_presence enable row level security;
 revoke all on public.user_presence from anon, authenticated;
 grant select on public.user_presence to authenticated;
+drop policy if exists user_presence_owner_read on public.user_presence;
 create policy user_presence_owner_read on public.user_presence for select to authenticated
   using ((select public.is_platform_admin()));
 
@@ -31,6 +32,7 @@ create table if not exists public.blocked_ips (
 alter table public.blocked_ips enable row level security;
 revoke all on public.blocked_ips from anon, authenticated;
 grant select on public.blocked_ips to authenticated;
+drop policy if exists blocked_ips_owner_read on public.blocked_ips;
 create policy blocked_ips_owner_read on public.blocked_ips for select to authenticated
   using ((select public.is_platform_admin()));
 

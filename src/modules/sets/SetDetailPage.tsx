@@ -26,8 +26,8 @@ import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import {useCompositionOptions} from '../../components/assets/usePrintLook';
 import AppButton from '../../components/ui/AppButton';
-import UndoMovementButton from '../../components/assets/UndoMovementButton';
-import StageReturnButton from '../../components/assets/StageReturnButton';
+import {useUndoMovement} from '../../components/assets/UndoMovementButton';
+import {useStageReturn} from '../../components/assets/StageReturnButton';
 import {compositionHtml} from '../sterilization/printUtils';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
@@ -79,6 +79,9 @@ export default function SetDetailPage() {
   const [searchParams] = useSearchParams();
   const scannedOldBarcode = searchParams.get('replaced');
   const set = sets.find(item => item.id === id);
+  // «Αναίρεση» and «Επιστροφή…» are items of the «Ενέργειες» menu, for who may use them.
+  const undo = useUndoMovement('SET', id ?? '');
+  const stageBack = useStageReturn('SET', id ?? '');
   const [tab, setTab] = useRememberedState<AssetTab>('tab', 'CONTENTS');
   const [photosOpen, setPhotosOpen] = useState(false);
   const [duplicateOpen, setDuplicateOpen] = useState(false);
@@ -261,10 +264,12 @@ export default function SetDetailPage() {
                     },
                   ]
                 : []),
+              ...(undo.item ? [undo.item] : []),
+              ...(stageBack.item ? [stageBack.item] : []),
             ]}
           />
-          <UndoMovementButton kind="SET" id={set.id} />
-          <StageReturnButton kind="SET" id={set.id} />
+          {undo.node}
+          {stageBack.node}
           {can('department.dispatch') && set.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}
