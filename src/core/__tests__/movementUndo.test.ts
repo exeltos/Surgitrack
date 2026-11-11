@@ -1,5 +1,12 @@
 import {describe, expect, it} from 'vitest';
-import {latestUndoable, membersUnchanged, undoneIds, undoPermission, type UndoSnapshot} from '../movementUndo';
+import {
+  latestMovement,
+  latestUndoable,
+  membersUnchanged,
+  undoneIds,
+  undoPermission,
+  type UndoSnapshot,
+} from '../movementUndo';
 import type {Tool} from '../../types/domain';
 import type {Movement} from '../../types/domain';
 
@@ -32,6 +39,15 @@ describe('undoing a movement', () => {
     const undo = move({id: 'm3', at: '26/10/2026 09:05', undoes: 'm1'});
     expect(latestUndoable([undo, outOfUse, dispatch], 'T001')).toBeUndefined();
     expect([...undoneIds([undo, outOfUse, dispatch])].sort()).toEqual(['m1', 'm2']);
+  });
+
+  it('names the newest history entry of an item whatever it was: a release has no undo, an undo is an entry', () => {
+    const dispatch = move({id: 'm1', at: '26/10/2026 09:00', undo: snapshot('DISPATCH', 'PENDING_STERILIZATION')});
+    const release = move({id: 'm2', at: '26/10/2026 11:00', status: 'Αποδέσμευση'});
+    expect(latestMovement([dispatch, release], 'T001')?.id).toBe('m2');
+    const undo = move({id: 'm3', at: '26/10/2026 11:05', undoes: 'm2'});
+    expect(latestMovement([dispatch, release, undo], 't001')?.id).toBe('m3');
+    expect(latestMovement([dispatch], 'T999')).toBeUndefined();
   });
 
   it('lets a Sterilization user undo only their own receipt of the same day', () => {

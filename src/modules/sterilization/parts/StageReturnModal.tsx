@@ -6,6 +6,7 @@ import type {ReturnTargetId} from '../../../core/stageReturn';
 import type {AssetKind} from '../../../types/domain';
 import AppButton from '../../../components/ui/AppButton';
 import {tr, trData} from '../../../i18n';
+import {latestMovement} from '../../../core/movementUndo';
 import {movementText} from '../../../core/movementText';
 
 /**
@@ -19,8 +20,8 @@ export default function StageReturnModal({
   asset: {kind: AssetKind; id: string; barcode: string; name: string};
   onClose: () => void;
 }) {
-  const {stageReturnInfo, returnToStage, undoInfo} = useSurgi();
-  const last = undoInfo(asset.kind, asset.id)?.movement;
+  const {stageReturnInfo, returnToStage, movements} = useSurgi();
+  const last = latestMovement(movements, asset.barcode);
   const info = stageReturnInfo(asset.kind, asset.id);
   const [stage, setStage] = useState<ReturnTargetId | ''>(info?.targets[0]?.id ?? '');
   const [reason, setReason] = useState('');
