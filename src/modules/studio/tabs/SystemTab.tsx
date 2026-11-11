@@ -7,6 +7,40 @@ import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
 import {formatDateTime} from '../../../core/displayDate';
+import {libraryMeta} from '../studioMeta';
+import type {ConfigurationAuditEvent} from '../../../core/libraryTypes';
+
+const AUDIT_ACTION = {
+  CREATE: ['Προσθήκη', 'Added'],
+  UPDATE: ['Αλλαγή', 'Changed'],
+  DELETE: ['Διαγραφή', 'Deleted'],
+  RESET: ['Επαναφορά', 'Reset'],
+} as const;
+
+/** One change to the settings, in words: what part of the settings, and what was done (not the internal names). */
+const describeAudit = (event: ConfigurationAuditEvent, L: (el: string, en: string) => string) => {
+  const [actionEl, actionEn] = AUDIT_ACTION[event.action] || AUDIT_ACTION.UPDATE;
+  const action = L(actionEl, actionEn);
+  const libraryKey = event.entityId.split(':')[0];
+  const library = libraryMeta.find(item => item.key === libraryKey);
+  const area =
+    event.entityType === 'WORKFLOW'
+      ? L('Ροή αποστείρωσης', 'Sterilization flow')
+      : event.entityType === 'SYSTEM_SETTING'
+        ? L('Γενικές ρυθμίσεις', 'General settings')
+        : event.entityType === 'LIBRARY'
+          ? libraryKey === 'colorTapes'
+            ? L('Βιβλιοθήκη · Χρωματικές ταινίες', 'Library · Color tapes')
+            : library
+              ? `${L('Βιβλιοθήκη', 'Library')} · ${L(library.el, library.en)}`
+              : L('Βιβλιοθήκη', 'Library')
+          : event.entityType === 'USER'
+            ? L('Χρήστης', 'User')
+            : event.entityType === 'ORGANIZATION'
+              ? L('Νοσοκομείο', 'Hospital')
+              : L('Δικαιώματα ρόλου', 'Role permissions');
+  return {area, action, reason: event.reason};
+};
 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
@@ -249,16 +283,20 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     {L('ποιος άλλαξε τι και πότε (πάτησε για να ανοίξει)', 'who changed what and when (press to open)')}
                   </summary>
                   <div>
-                    {libs.configurationAudit.slice(0, 10).map(event => (
-                      <div key={event.id}>
-                        <span>
-                          <b>{event.entityType}</b> · {event.entityId}
-                        </span>
-                        <span>
-                          {event.by} · {formatDateTime(event.at)}
-                        </span>
-                      </div>
-                    ))}
+                    {libs.configurationAudit.slice(0, 10).map(event => {
+                      const what = describeAudit(event, L);
+                      return (
+                        <div key={event.id}>
+                          <span>
+                            <b>{what.area}</b> · {what.action}
+                            {what.reason ? ` · ${what.reason}` : ''}
+                          </span>
+                          <span>
+                            {event.by} · {formatDateTime(event.at)}
+                          </span>
+                        </div>
+                      );
+                    })}
                     {!libs.configurationAudit.length && (
                       <small>{L('Δεν υπάρχουν ακόμη αλλαγές.', 'No changes recorded yet.')}</small>
                     )}
