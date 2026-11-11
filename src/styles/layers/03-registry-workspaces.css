@@ -1778,20 +1778,20 @@ body {
   margin-left: auto;
 }
 .set-report-modal {
-  height: min(760px, 88dvh);
+  height: min(860px, 92dvh);
   max-height: none;
 }
 .set-report-modal .modal-body {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 .set-report-modal .report-tool-picker {
   margin: 14px 0 0;
-  flex: 0 1 220px;
-  min-height: 100px;
+  flex: 1 0 200px;
+  min-height: 200px;
   overflow: auto;
 }
 .set-report-modal .form-grid {
