@@ -36,9 +36,6 @@ const filter = (placeholder: string, value: string) => {
   fireEvent.change(screen.getByRole('combobox', {name: placeholder}), {target: {value}});
 };
 
-// Every report lists all its rows at once (the whole sample inventory): slow on a loaded runner.
-const SLOW = 20_000;
-
 describe('Reports', () => {
   it.each(REPORTS)('opens the report «%s», and its count matches what it lists', report => {
     renderPage(<ReportsPage />);
@@ -54,95 +51,74 @@ describe('Reports', () => {
     expect(screen.queryByRole('button', {name: /^Σύνθεση Σετ/})).not.toBeInTheDocument();
   });
 
-  it(
-    'groups the inventory by department or by specialty',
-    () => {
-      renderPage(<ReportsPage />);
-      const headers = () => {
-        return within(results())
-          .getAllByRole('columnheader')
-          .map(h => h.textContent);
-      };
-      expect(headers()[0]).toBe('Τμήμα');
-      filter('Ομαδοποίηση ανά τμήμα', 'specialty');
-      expect(headers()[0]).toBe('Ειδικότητα');
-      expect(headers()).not.toContain('Τμήμα');
-    },
-    SLOW,
-  );
+  it('groups the inventory by department or by specialty', () => {
+    renderPage(<ReportsPage />);
+    const headers = () => {
+      return within(results())
+        .getAllByRole('columnheader')
+        .map(h => h.textContent);
+    };
+    expect(headers()[0]).toBe('Τμήμα');
+    filter('Ομαδοποίηση ανά τμήμα', 'specialty');
+    expect(headers()[0]).toBe('Ειδικότητα');
+    expect(headers()).not.toContain('Τμήμα');
+  });
 
-  it(
-    'lists the instruments in service and those taken out of service, each from its card',
-    () => {
-      renderPage(<ReportsPage />);
-      choose('Χρήσεις & αποσύρσεις');
-      const card = (name: RegExp) => within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name});
-      fireEvent.click(card(/Σε χρήση/));
-      expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Σε χρήση']));
-      fireEvent.click(card(/Εκτός χρήσης/));
-      expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
-      filter('Σε χρήση & εκτός χρήσης', 'RETIRED');
-      expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
-    },
-    SLOW,
-  );
+  it('lists the instruments in service and those taken out of service, each from its card', () => {
+    renderPage(<ReportsPage />);
+    choose('Χρήσεις & αποσύρσεις');
+    const card = (name: RegExp) => within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name});
+    fireEvent.click(card(/Σε χρήση/));
+    expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Σε χρήση']));
+    fireEvent.click(card(/Εκτός χρήσης/));
+    expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
+    filter('Σε χρήση & εκτός χρήσης', 'RETIRED');
+    expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Εκτός χρήσης']));
+  });
 
-  it(
-    'lists only the department filtered on',
-    () => {
-      renderPage(<ReportsPage />);
-      choose('Απογραφή εξοπλισμού');
-      const all = count();
-      const department = column('Τμήμα')[0]!;
-      filter('Όλα τα τμήματα', department);
-      expect(count()).toBeLessThanOrEqual(all);
-      expect(new Set(column('Τμήμα'))).toEqual(new Set([department]));
-    },
-    SLOW,
-  );
+  it('lists only the department filtered on', () => {
+    renderPage(<ReportsPage />);
+    choose('Απογραφή εξοπλισμού');
+    const all = count();
+    const department = column('Τμήμα')[0]!;
+    filter('Όλα τα τμήματα', department);
+    expect(count()).toBeLessThanOrEqual(all);
+    expect(new Set(column('Τμήμα'))).toEqual(new Set([department]));
+  });
 
   it('has no patient traceability: it lives in Traceability', () => {
     renderPage(<ReportsPage />);
     expect(screen.queryByText('Ιχνηλασιμότητα ασθενούς')).not.toBeInTheDocument();
   });
 
-  it(
-    'lists handovers with the other party signature, and filters to the unconfirmed ones',
-    () => {
-      renderPage(<ReportsPage />);
-      choose('Παραδόσεις & παραλαβές');
-      const all = count();
-      expect(all).toBeGreaterThan(2);
-      const signatures = column('Υπογραφή άλλου μέρους');
-      expect(signatures).toContain('Επιβεβαιωμένη');
-      expect(signatures).toContain('Μη επιβεβαιωμένη');
-      filter('Όλες οι υπογραφές', 'UNVERIFIED');
-      expect(count()).toBe(2);
-      expect(new Set(column('Υπογραφή άλλου μέρους'))).toEqual(new Set(['Μη επιβεβαιωμένη']));
-      expect(new Set(column('Κίνηση'))).toEqual(new Set(['Παραλαβή', 'Παράδοση']));
-      for (const cell of within(results()).getAllByText('Μη επιβεβαιωμένη'))
-        expect(cell).toHaveClass('report-cell-warn');
-    },
-    SLOW,
-  );
+  it('lists handovers with the other party signature, and filters to the unconfirmed ones', () => {
+    renderPage(<ReportsPage />);
+    choose('Παραδόσεις & παραλαβές');
+    const all = count();
+    expect(all).toBeGreaterThan(2);
+    const signatures = column('Υπογραφή άλλου μέρους');
+    expect(signatures).toContain('Επιβεβαιωμένη');
+    expect(signatures).toContain('Μη επιβεβαιωμένη');
+    filter('Όλες οι υπογραφές', 'UNVERIFIED');
+    expect(count()).toBe(2);
+    expect(new Set(column('Υπογραφή άλλου μέρους'))).toEqual(new Set(['Μη επιβεβαιωμένη']));
+    expect(new Set(column('Κίνηση'))).toEqual(new Set(['Παραλαβή', 'Παράδοση']));
+    for (const cell of within(results()).getAllByText('Μη επιβεβαιωμένη')) expect(cell).toHaveClass('report-cell-warn');
+  });
 
-  it(
-    'lists everything at once, and a card or a group narrows the list',
-    () => {
-      renderPage(<ReportsPage />);
-      expect(within(screen.getByRole('list', {name: 'Σύνολα'})).getAllByRole('button').length).toBeGreaterThan(1);
-      const everything = bodyRows().length;
-      expect(everything).toBeGreaterThan(0);
-      fireEvent.click(within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name: /Σετ/}));
-      expect(new Set(column('Τύπος'))).toEqual(new Set(['Σετ']));
-      expect(bodyRows().length).toBeLessThan(everything);
-      fireEvent.click(screen.getByRole('button', {name: 'Εμφάνιση όλων'}));
-      expect(new Set(column('Τύπος')).size).toBeGreaterThan(1);
-      const group = screen.getByRole('group', {name: 'Ανά τμήμα'});
-      fireEvent.click(within(group).getAllByRole('button')[0]);
-      expect(bodyRows().length).toBeGreaterThan(0);
-      expect(bodyRows().length).toBeLessThan(everything);
-    },
-    SLOW,
-  );
+  it('lists everything at once, and a card or a group narrows the list', () => {
+    renderPage(<ReportsPage />);
+    expect(within(screen.getByRole('list', {name: 'Σύνολα'})).getAllByRole('button').length).toBeGreaterThan(1);
+    const everything = bodyRows().length;
+    expect(everything).toBeGreaterThan(0);
+    fireEvent.click(within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name: /Σετ/}));
+    expect(new Set(column('Τύπος'))).toEqual(new Set(['Σετ']));
+    expect(bodyRows().length).toBeLessThan(everything);
+    fireEvent.click(screen.getByRole('button', {name: 'Εμφάνιση όλων'}));
+    expect(new Set(column('Τύπος')).size).toBeGreaterThan(1);
+    const group = screen.getByRole('group', {name: 'Ανά τμήμα'});
+    fireEvent.click(within(group).getAllByRole('button')[0]);
+    expect(bodyRows().length).toBeGreaterThan(0);
+    expect(bodyRows().length).toBeLessThan(everything);
+  });
 });

@@ -1,33 +1,30 @@
-import {RefreshCcw, ShieldCheck, CheckCircle2, Gauge, CalendarClock, Monitor} from 'lucide-react';
+import {RefreshCcw, Settings2, ShieldCheck, CheckCircle2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
-import {
-  DEFAULT_IDLE_LOCK_MINUTES,
-  IDLE_LOCK_OPTIONS,
-  type DefaultUsageType,
-  type ReminderEmails,
-} from '../../../core/libraryTypes';
+import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
 import {formatDateTime} from '../../../core/displayDate';
-import {useHasModule} from '../../../data/cloud/modulesContext';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
-  const manualUses = useHasModule('MANUAL_USES');
   return (
     <>
       {tab === 'SYSTEM' && (
         <div className="studio-system-grid">
+          {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
           <section>
             <header>
-              <Gauge />
+              <Settings2 />
               <div>
-                <h3>{L('Χρήσεις εργαλείων', 'Instrument uses')}</h3>
+                <h3>{L('Γενικές ρυθμίσεις', 'General settings')}</h3>
                 <p>
-                  {L('Όρια, προειδοποιήσεις και καταγραφή των χρήσεων.', 'Limits, warnings and the record of uses.')}
+                  {L(
+                    'Κεντρικές παράμετροι που πρέπει να είναι κοινές σε όλη την εφαρμογή.',
+                    'Central parameters shared across the application.',
+                  )}
                 </p>
               </div>
             </header>
@@ -58,60 +55,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </small>
             </label>
             <label>
-              {L('Τύπος χρήσης νέων εργαλείων (προεπιλογή)', 'Usage type of new instruments (default)')}
-              <div className="studio-setting-input">
-                <select
-                  value={libs.systemSettings.defaultUsageType || 'UNLIMITED'}
-                  onChange={e =>
-                    libs.updateSystemSettings({defaultUsageType: e.target.value as DefaultUsageType}, currentUser.name)
-                  }
-                >
-                  <option value="UNLIMITED">{L('Χωρίς όριο', 'No limit')}</option>
-                  <option value="LIMITED">{L('Περιορισμένων χρήσεων', 'Limited uses')}</option>
-                  <option value="WEAR">{L('Χρήσεις με έλεγχο φθοράς', 'Uses with a wear check')}</option>
-                </select>
-              </div>
-              <small>
-                {L(
-                  'Προτείνεται όταν φτιάχνεται νέο εργαλείο· αλλάζει ανά εργαλείο στη δημιουργία ή στην κάρτα του.',
-                  'Suggested when a new instrument is created; changeable per instrument at creation or on its card.',
-                )}
-              </small>
-            </label>
-            <label>
-              {L('Χειροκίνητη καταγραφή χρήσεων', 'Manual use records')}
-              <div className="studio-static-field">
-                <b>{manualUses ? L('Ενεργή', 'On') : L('Κλειστή', 'Off')}</b>
-              </div>
-              <small>
-                {L(
-                  'Όποιος ορίζει όρια χρήσεων προσθέτει ή διορθώνει με το χέρι τις χρήσεις που έχουν γίνει. Την ενεργοποιεί ή την κλείνει ο διαχειριστής της πλατφόρμας για το νοσοκομείο.',
-                  'Whoever sets usage limits adds or corrects the uses already made by hand. The platform owner turns it on or off for the hospital.',
-                )}
-              </small>
-            </label>
-            <label>
-              {L('Τύποι χρήσης εργαλείου', 'Instrument usage types')}
-              <div className="studio-static-field">
-                <b>{L('Ορίζονται στην κάρτα του εργαλείου', 'Set on the instrument’s card')}</b>
-              </div>
-              <small>
-                {L(
-                  'Χωρίς όριο: δεν μετριέται. Περιορισμένων χρήσεων: μετριέται και αποσύρεται στο όριο. Με έλεγχο φθοράς: μετριέται χωρίς όριο και δεν αποσύρεται ποτέ αυτόματα.',
-                  'No limit: not counted. Limited uses: counted and withdrawn at the limit. With a wear check: counted with no limit and never withdrawn automatically.',
-                )}
-              </small>
-            </label>
-          </section>
-          <section>
-            <header>
-              <CalendarClock />
-              <div>
-                <h3>{L('Αποστείρωση & barcode', 'Sterilization & barcode')}</h3>
-                <p>{L('Διάρκεια αποστείρωσης και μορφή των barcode.', 'Sterile shelf life and the barcode format.')}</p>
-              </div>
-            </header>
-            <label>
               {L('Διάρκεια αποστείρωσης (προεπιλογή)', 'Sterile shelf life (default)')}
               <div className="studio-setting-input">
                 <select
@@ -134,30 +77,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 )}
               </small>
             </label>
-            <label>
-              {L('Barcode Σετ', 'Set barcode')}
-              <div className="studio-static-field">
-                <b>{tr('S + 6 ψηφία')}</b>
-                <span>S000321</span>
-              </div>
-            </label>
-            <label>
-              {L('Barcode Εργαλείου', 'Instrument barcode')}
-              <div className="studio-static-field">
-                <b>{tr('T + 6 ψηφία')}</b>
-                <span>T001250</span>
-              </div>
-            </label>
-          </section>
-          <LabelSettingsCard L={L} />
-          <section>
-            <header>
-              <Monitor />
-              <div>
-                <h3>{L('Οθόνη & ειδοποιήσεις', 'Screen & notifications')}</h3>
-                <p>{L('Κλείδωμα οθόνης, οδηγοί και υπενθυμίσεις.', 'Screen lock, guides and reminders.')}</p>
-              </div>
-            </header>
             <label>
               {L('Κλείδωμα οθόνης μετά από αδράνεια', 'Screen lock after inactivity')}
               <div className="studio-setting-input">
@@ -223,7 +142,22 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 )}
               </small>
             </label>
+            <label>
+              {L('Barcode Σετ', 'Set barcode')}
+              <div className="studio-static-field">
+                <b>{tr('S + 6 ψηφία')}</b>
+                <span>S000321</span>
+              </div>
+            </label>
+            <label>
+              {L('Barcode Εργαλείου', 'Instrument barcode')}
+              <div className="studio-static-field">
+                <b>{tr('T + 6 ψηφία')}</b>
+                <span>T001250</span>
+              </div>
+            </label>
           </section>
+          <LabelSettingsCard L={L} />
           <section>
             <header>
               <ShieldCheck />
@@ -289,7 +223,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </AppButton>
             )}
           </section>
-          {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
         </div>
       )}
     </>
