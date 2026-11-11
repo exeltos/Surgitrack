@@ -31,6 +31,7 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
@@ -64,6 +65,7 @@ export default function ToolDetailPage() {
     setColorMarker,
     recordUsage,
   } = useSurgi();
+  const manualUses = useHasModule('MANUAL_USES');
   const undone = useUndoneMovements();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
@@ -372,7 +374,7 @@ export default function ToolDetailPage() {
                     wearCheck={tool.wearCheck}
                     fresh={isNew(tool)}
                     onSetUses={
-                      can('asset.usage.configure') && tool.state !== 'RETIRED'
+                      can('asset.usage.configure') && manualUses && tool.state !== 'RETIRED'
                         ? uses => recordUsage('TOOL', tool.id, {uses})
                         : undefined
                     }

@@ -172,7 +172,7 @@ export function createDatabase(seed) {
         // SCREENS_MODULES=STOCK_MINIMUMS (comma list, or empty for none): the modules the owner gave the hospital.
         modules:
           process.env.SCREENS_MODULES === undefined
-            ? ['REPLACEMENTS', 'STOCK_MINIMUMS', 'SURGICAL_COUNT', 'EQUIPMENT_TESTS']
+            ? ['REPLACEMENTS', 'STOCK_MINIMUMS', 'SURGICAL_COUNT', 'EQUIPMENT_TESTS', 'MANUAL_USES']
             : process.env.SCREENS_MODULES.split(',').filter(Boolean),
         trial_ends_at: process.env.SCREENS_EVALUATION === '1' ? iso(12) : null,
         created_at: iso(-200),

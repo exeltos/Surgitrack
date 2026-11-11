@@ -3,7 +3,14 @@ import {ALL_MODULES, HOSPITAL_MODULES, modulesOf} from '../hospitalModules';
 
 describe('the modules of a hospital', () => {
   it('are the ones the platform owner switches on', () => {
-    expect(ALL_MODULES).toEqual(['REPLACEMENTS', 'STOCK_MINIMUMS', 'DEVICES', 'SURGICAL_COUNT', 'EQUIPMENT_TESTS']);
+    expect(ALL_MODULES).toEqual([
+      'REPLACEMENTS',
+      'STOCK_MINIMUMS',
+      'DEVICES',
+      'SURGICAL_COUNT',
+      'EQUIPMENT_TESTS',
+      'MANUAL_USES',
+    ]);
     expect(HOSPITAL_MODULES.every(m => m.el && m.en && m.descriptionEl && m.descriptionEn)).toBe(true);
   });
 
