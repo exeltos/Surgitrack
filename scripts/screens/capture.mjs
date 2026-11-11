@@ -439,7 +439,15 @@ async function main() {
       let list;
       if (role === 'PLATFORM') {
         // The platform owner outside any hospital: Studio and the hospital list.
-        list = ['/studio', '/studio?tab=NOTICES', '/studio?tab=SECURITY', '/hospitals', '/hospital'];
+        list = [
+          '/studio',
+          '/studio?tab=NOTICES',
+          '/studio?tab=SECURITY',
+          '/studio?tab=SYSTEM',
+          '/studio?tab=USERS',
+          '/hospitals',
+          '/hospital',
+        ];
       } else {
         const allowed = new Set(seed.permissions[role]);
         list = routes.filter(r => allowed.has(r.permission)).map(r => r.path);
@@ -713,10 +721,9 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByText(/Φορτία κλιβάνου|Sterilizer loads/)
           .first()
           .click({timeout: 3000});
-        await page
-          .getByRole('button', {name: /^(Εμφάνιση όλων|Show all)$/})
-          .first()
-          .click({timeout: 3000});
+        // The whole report is listed at once; a button only appears after a card has narrowed it.
+        const showAll = page.getByRole('button', {name: /^(Εμφάνιση όλων|Show all)$/}).first();
+        if (await showAll.count()) await showAll.click({timeout: 3000});
         await page.waitForTimeout(800);
         await shoot(
           page,

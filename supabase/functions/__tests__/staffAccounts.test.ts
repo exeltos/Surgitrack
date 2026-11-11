@@ -328,6 +328,78 @@ describe('update-staff: an unconfirmed signup', () => {
   });
 });
 
+describe('update-staff: a reset to a first password by hand', () => {
+  let handle: Handler;
+  beforeEach(async () => {
+    handle = await loadFunction('update-staff');
+  });
+  const reset = (phone: unknown, extra: Record<string, unknown> = {}) =>
+    handle(post({user_id: 'user-2', name: 'Nurse', email: 'nurse@hospital.gr', reset_initial_password: true, phone, ...extra}));
+  const person = {...TARGET, role: 'DEPARTMENT', password_change_required: false, password_change_deadline: null};
+
+  it('sets the sign-in to the number (digits only, +30 dropped), asks for a new password within a week and records it', async () => {
+    answer(person);
+    const response = await reset('+30 691 234 5678');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ok: true, initial_password_reset: true});
+    expect(fake.calls.filter(c => c.what === 'updateUserById').map(c => c.args)).toEqual([['user-2', {password: '6912345678'}]]);
+    const profile = fake.dbCalls('update').find(c => c.table === 'profiles')?.values as Record<string, unknown>;
+    expect(profile.password_change_required).toBe(true);
+    const days = (Date.parse(String(profile.password_change_deadline)) - Date.now()) / 864e5;
+    expect(days).toBeGreaterThan(6.9);
+    expect(days).toBeLessThan(7.1);
+    const event = fake.dbCalls('insert').find(c => c.table === 'account_events')?.values as Record<string, unknown>;
+    expect(event).toMatchObject({target_id: 'user-2', actor_id: 'admin-1', action: 'initial_password_reset'});
+    // Neither the number nor the password is kept: not in the record, not in the profile.
+    expect(JSON.stringify(event)).not.toContain('6912345678');
+    expect(JSON.stringify(profile)).not.toContain('6912345678');
+  });
+
+  it('tells the person by email that their password was reset, but not at an address that cannot receive mail', async () => {
+    Object.assign(env, {SMTP_HOST: 'smtp.test', SMTP_USER: 'u', SMTP_PASS: 'p', MAIL_FROM: 'app@test'});
+    answer(person);
+    await reset('6912345678');
+    expect(mailState.outbox.map(m => m.to)).toEqual(['Nurse@Hospital.gr']);
+    expect(mailState.outbox[0].html).toContain('επανήλθε σε αρχικό');
+    mailState.outbox.length = 0;
+    answer({...person, email: 'ab1000@staff.surgitrack.invalid'});
+    await handle(post({user_id: 'user-2', name: 'Nurse', email: 'ab1000@staff.surgitrack.invalid', reset_initial_password: true, phone: '6912345678'}));
+    expect(mailState.outbox).toHaveLength(0);
+  });
+
+  it('refuses a number that is not one, and changes nothing', async () => {
+    answer(person);
+    expect((await reset('12')).status).toBe(400);
+    expect((await reset('')).status).toBe(400);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  it('changes nothing when the reset could not be recorded', async () => {
+    answer(person);
+    const db = fake.db;
+    fake.db = call => (call.table === 'account_events' ? {data: null, error: {message: 'down'}} : db(call));
+    expect((await reset('6912345678')).status).toBe(500);
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  it('puts the profile back as it was when the sign-in could not take the number', async () => {
+    answer({...person, password_change_required: false});
+    fake.admin.updateUserById = () => ({error: {message: 'down'}});
+    expect((await reset('6912345678')).status).toBe(500);
+    const updates = fake.dbCalls('update').filter(c => c.table === 'profiles');
+    expect(updates.at(-1)?.values).toMatchObject({password_change_required: false, password_change_deadline: null});
+  });
+
+  it('is not done without «reset_initial_password», and not to oneself', async () => {
+    answer(person);
+    await handle(post({user_id: 'user-2', name: 'Nurse', email: 'nurse@hospital.gr', phone: '6912345678'}));
+    expect(fake.calls.some(c => c.what === 'updateUserById')).toBe(false);
+    expect((await handle(post({user_id: 'admin-1', name: 'A', email: 'a@hospital.gr', reset_initial_password: true, phone: '6912345678'}))).status).toBe(403);
+  });
+});
+
 describe('another admin\'s account: only the platform owner', () => {
   const PEER = {...TARGET, id: 'user-2', role: 'ADMIN', name: 'Peer Admin', email: 'peer@hospital.gr'};
   const OWNER = {...ADMIN, id: 'admin-1', organization_id: null};

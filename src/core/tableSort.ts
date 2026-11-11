@@ -1,9 +1,23 @@
+import {parseDisplayDate} from './displayDate';
+
 /** Sorting a list by one of its columns: one click ascending, a second descending, a third back to the list's own order. */
 export type SortDir = 'asc' | 'desc';
 export type Sort<K extends string = string> = {key: K; dir: SortDir} | null;
 
 export const nextSort = <K extends string>(current: Sort<K>, key: K): Sort<K> =>
   !current || current.key !== key ? {key, dir: 'asc'} : current.dir === 'asc' ? {key, dir: 'desc'} : null;
+
+/**
+ * A value as shown in a report cell, ready to sort: a date written «ηη/μμ/εεεε ώρα:λεπτά» by its time (not its text,
+ * which would put 10/01 before 09/12), a number by its size, anything else as text.
+ */
+export function displaySortValue(value: unknown): SortValue {
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return value == null ? undefined : String(value);
+  const text = value.trim();
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}(\s+\d{1,2}:\d{2})?$/.test(text)) return parseDisplayDate(text)?.getTime() ?? text;
+  return text === '—' ? undefined : text;
+}
 
 /** The `aria-sort` of a column header. */
 export const ariaSortOf = (sort: Sort, key: string): 'ascending' | 'descending' | 'none' =>

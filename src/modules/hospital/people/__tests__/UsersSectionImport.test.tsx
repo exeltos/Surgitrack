@@ -19,6 +19,8 @@ const people = (extra: Record<string, unknown>) =>
     departments: [],
     members: [],
     shown: [],
+    listed: [],
+    online: null,
     pending: [],
     invitedToSignup: [],
     filters: {department: '', role: '', access: ''},
@@ -98,6 +100,7 @@ describe('the password mark on each person', () => {
             inviteMenu: false,
             shown,
             members: shown,
+            listed: shown,
             me: {id: 'me'},
             invitedAt: () => undefined,
             departmentName: () => '—',
@@ -105,8 +108,8 @@ describe('the password mark on each person', () => {
         />,
       ),
     );
-    expect(screen.getByRole('img', {name: /Αρχικός κωδικός · έως 10\/11/})).toBeInTheDocument();
-    expect(screen.getByRole('img', {name: 'Προσωπικός κωδικός'})).toBeInTheDocument();
-    expect(screen.getByRole('img', {name: /Δεν άλλαξε κωδικό · κλειδώθηκε/})).toBeInTheDocument();
+    expect(screen.getByTitle(/Αρχικός κωδικός · έως 10\/11/)).toBeInTheDocument();
+    expect(screen.getByTitle(/^Προσωπικός κωδικός\./)).toBeInTheDocument();
+    expect(screen.getByTitle(/Δεν άλλαξε κωδικό · κλειδώθηκε/)).toBeInTheDocument();
   });
 });

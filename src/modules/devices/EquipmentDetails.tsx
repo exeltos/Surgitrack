@@ -1,3 +1,5 @@
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {
   ArrowLeft,
@@ -103,6 +105,17 @@ export default function EquipmentDetails({
   onSerial: () => void;
 }) {
   const withTests = useHasModule('EQUIPMENT_TESTS');
+  const cycles = useTableSort(readings, {
+    start: r => Date.parse(r.startedAt || r.createdAt),
+    cycle: r => r.cycleNumber,
+    program: r => r.program,
+    result: r => resultLabel(L, r.result),
+    temperature: r => r.maxTemperature,
+    pressure: r => r.maxPressure,
+    duration: r => r.durationMinutes,
+    source: r => L(connectionLabel[r.source].el, connectionLabel[r.source].en),
+    load: r => usedNumbers.has(r.cycleNumber.trim().toUpperCase()),
+  });
   const {device} = row;
   const when = (iso?: string) => (iso ? formatDateTime(iso) : '—');
   const table = (): ExportTable => ({
@@ -474,19 +487,59 @@ export default function EquipmentDetails({
                   <table className="devices-table">
                     <thead>
                       <tr>
-                        <th>{L('Έναρξη', 'Start')}</th>
-                        <th>{L('Κύκλος', 'Cycle')}</th>
-                        <th>{L('Πρόγραμμα', 'Program')}</th>
-                        <th>{L('Αποτέλεσμα', 'Result')}</th>
-                        <th>{L('Θερμ. (°C)', 'Temp. (°C)')}</th>
-                        <th>{L('Πίεση (bar)', 'Pressure (bar)')}</th>
-                        <th>{L('Διάρκεια (λεπτά)', 'Duration (min)')}</th>
-                        <th>{L('Πηγή', 'Source')}</th>
-                        <th>{L('Φόρτωση', 'Load')}</th>
+                        <SortTh
+                          label={L('Έναρξη', 'Start')}
+                          sortKey="start"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Κύκλος', 'Cycle')}
+                          sortKey="cycle"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Πρόγραμμα', 'Program')}
+                          sortKey="program"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Αποτέλεσμα', 'Result')}
+                          sortKey="result"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Θερμ. (°C)', 'Temp. (°C)')}
+                          sortKey="temperature"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Πίεση (bar)', 'Pressure (bar)')}
+                          sortKey="pressure"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Διάρκεια (λεπτά)', 'Duration (min)')}
+                          sortKey="duration"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh
+                          label={L('Πηγή', 'Source')}
+                          sortKey="source"
+                          sort={cycles.sort}
+                          onSort={cycles.toggle}
+                        />
+                        <SortTh label={L('Φόρτωση', 'Load')} sortKey="load" sort={cycles.sort} onSort={cycles.toggle} />
                       </tr>
                     </thead>
                     <tbody>
-                      {readings.map(r => (
+                      {cycles.rows.map(r => (
                         <tr key={r.id}>
                           <td>{when(r.startedAt || r.createdAt)}</td>
                           <td className="mono">{r.cycleNumber}</td>

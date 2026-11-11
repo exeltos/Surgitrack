@@ -93,7 +93,7 @@
 .people-head,
 .people-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
+  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 190px 18px;
   align-items: center;
   gap: 10px;
 }
@@ -292,6 +292,17 @@
 .people-invited > .app-button + .app-button,
 .people-password > .app-button + .app-button {
   margin-top: -2px;
+}
+.people-password > input {
+  grid-column: 2;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-2);
+  font: inherit;
 }
 .people-link {
   grid-column: 1 / -1;

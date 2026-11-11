@@ -1,4 +1,5 @@
-import {useEffect, useRef, useState} from 'react';
+import {useState} from 'react';
+import {useFloatingPanel} from '../ui/useFloatingPanel';
 import {SlidersHorizontal} from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {trData} from '../../i18n';
@@ -15,27 +16,13 @@ export type SelectFilter = {
 };
 
 /** One "Filters" button that opens every filter choice, with a count of the active ones. */
-export default function FilterMenu({filters}: {filters: SelectFilter[]}) {
+export default function FilterMenu({filters, align = 'right'}: {filters: SelectFilter[]; align?: 'left' | 'right'}) {
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const [open, setOpen] = useState(false);
-  const wrap = useRef<HTMLDivElement>(null);
   const activeFilters = filters.filter(filter => filter.value !== '').length;
-
-  // Close the filter panel on an outside click or Escape.
-  useEffect(() => {
-    if (!open) return;
-    const onPointer = (e: MouseEvent) => {
-      if (wrap.current && !wrap.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('mousedown', onPointer);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onPointer);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
+  // The panel floats over the page at the button, so the card or list around it cannot cut it off.
+  const {wrap, panel, place} = useFloatingPanel(open, () => setOpen(false), align);
 
   if (!filters.length) return null;
   return (
@@ -51,7 +38,13 @@ export default function FilterMenu({filters}: {filters: SelectFilter[]}) {
         {activeFilters > 0 && <em>{activeFilters}</em>}
       </button>
       {open && (
-        <div className="asset-filter-panel" role="dialog" aria-label={L('Φίλτρα', 'Filters')}>
+        <div
+          ref={panel}
+          className="asset-filter-panel"
+          role="dialog"
+          aria-label={L('Φίλτρα', 'Filters')}
+          style={place || {visibility: 'hidden'}}
+        >
           {filters.map(filter =>
             filter.type === 'date' ? (
               <label key={filter.key} className={`asset-filter-date ${filter.value ? 'selected' : ''}`}>

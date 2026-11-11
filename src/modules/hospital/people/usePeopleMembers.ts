@@ -8,6 +8,7 @@ import type {usePeopleView} from './usePeopleView';
 import type {usePeopleDecisions} from './usePeopleDecisions';
 import type {usePeopleDepartments} from './usePeopleDepartments';
 import {askConfirm} from '../../../components/ui/confirmService';
+import {phonePassword} from '../staffImportFile';
 
 export function usePeopleMembers(
   p: ReturnType<typeof usePeopleState> &
@@ -282,6 +283,71 @@ export function usePeopleMembers(
     });
   };
 
+  /**
+   * Sets the account back to a first password by hand: the mobile number typed (it is only the password, it is kept
+   * nowhere) and the person chooses their own at the next sign-in, within a week.
+   */
+  const resetInitialPassword = async (m: Member, phone: string) => {
+    const digits = phonePassword(phone);
+    if (!digits) {
+      setNotice({
+        kind: 'error',
+        text: L('Το κινητό δεν είναι έγκυρο (8–15 ψηφία).', 'The mobile number is not valid (8–15 digits).'),
+      });
+      return;
+    }
+    const sure = await askConfirm({
+      title: L(`Επαναφορά αρχικού κωδικού: ${m.name}`, `Reset first password: ${m.name}`),
+      message: L(
+        'Ο κωδικός του γίνεται το κινητό που γράψατε. Στην επόμενη σύνδεση πρέπει να ορίσει δικό του (μέσα σε 7 ημέρες). Ο αριθμός δεν αποθηκεύεται και η ενέργεια καταγράφεται.',
+        'Their password becomes the mobile number you typed. At the next sign-in they must choose their own (within 7 days). The number is not stored and the action is recorded.',
+      ),
+      confirmLabel: L('Επαναφορά', 'Reset'),
+      danger: true,
+    });
+    if (sure === false) return;
+    if (demo) {
+      setDrawer(null);
+      setNotice({
+        kind: 'ok',
+        text: L(
+          `Demo: σε κανονική χρήση ο κωδικός του ${m.name} θα γινόταν το κινητό που γράψατε.`,
+          `Demo: in real use ${m.name}'s password would become the mobile number you typed.`,
+        ),
+      });
+      return;
+    }
+    setBusy(true);
+    setNotice(null);
+    const {data, error} = await supabase.functions.invoke<{ok?: boolean}>('update-staff', {
+      body: {user_id: m.id, name: m.name, email: m.email, reset_initial_password: true, phone: digits},
+    });
+    setBusy(false);
+    if (error || !data?.ok) {
+      const status = (error as {context?: {status?: number}} | null)?.context?.status;
+      setNotice({
+        kind: 'error',
+        text:
+          status === 403
+            ? L(
+                'Δεν έχετε δικαίωμα να αλλάξετε αυτόν τον λογαριασμό (οι λογαριασμοί διαχειριστή αλλάζουν μόνο από τον ιδιοκτήτη).',
+                'You are not allowed to change this account (admin accounts are changed only by the owner).',
+              )
+            : L('Ο κωδικός δεν άλλαξε. Δοκιμάστε ξανά.', 'The password was not changed. Try again.'),
+      });
+      return;
+    }
+    setDrawer(null);
+    setNotice({
+      kind: 'ok',
+      text: L(
+        `Ο κωδικός του ${m.name} είναι πλέον το κινητό που γράψατε. Στην επόμενη σύνδεση θα ορίσει δικό του.`,
+        `${m.name}'s password is now the mobile number you typed. At the next sign-in they will choose their own.`,
+      ),
+    });
+    await changed();
+  };
+
   /** A one-time invitation or set-new-password link, made without sending any email. */
   const makeLink = async (m: Member) => {
     // Demo: a sample link of the same shape, which opens nothing.
@@ -333,5 +399,5 @@ export function usePeopleMembers(
     setNotice({kind: 'ok', text: L(`Ο λογαριασμός ${m.name} διαγράφηκε.`, `${m.name}'s account was deleted.`)});
     await changed();
   };
-  return {invite, makeLink, passwordReset, remove, save};
+  return {invite, makeLink, passwordReset, resetInitialPassword, remove, save};
 }

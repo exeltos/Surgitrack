@@ -4,6 +4,7 @@ import {corsFor, jsonWith} from "../_shared/http.ts";
 import {notifyAccountEvent, recordAccountEvent} from "../_shared/accountEvents.ts";
 import {EMAIL_CHANGE_DAYS, hashToken, newChangeToken} from "../_shared/emailChange.ts";
 import {appSite, esc, layout, mailConfigured, sendEmail} from "../_shared/mail.ts";
+import {phonePassword} from "../_shared/staffImport.ts";
 
 // Edits a staff account: full name, sign-in email, department, role and access (and Demo access,
 // for the platform admin only). Only a hospital admin for users of their own hospital (never another admin's
@@ -52,7 +53,7 @@ Deno.serve(async req => {
 
     const {data: target} = await admin
       .from("profiles")
-      .select("id, organization_id, email, role, supervisor, active, department_id, demo_enabled, password_change_required")
+      .select("id, organization_id, email, role, supervisor, active, department_id, demo_enabled, password_change_required, password_change_deadline")
       .eq("id", userId)
       .maybeSingle();
     if (!target) return json({error: "not_found"}, 404);
@@ -92,6 +93,11 @@ Deno.serve(async req => {
         .limit(1);
       if (unconfirmed?.length) return json({error: "email_unconfirmed"}, 412);
     }
+    // «reset_initial_password» sets the account back to a first password by hand: the person's mobile number (digits only,
+    // +30 dropped), which is not kept anywhere, and the person has to choose their own again at the next sign-in.
+    const resetInitial = body?.reset_initial_password === true;
+    const initialPassword = resetInitial ? phonePassword(body?.phone) : null;
+    if (resetInitial && !initialPassword) return json({error: "invalid_phone"}, 400);
     // Demo access is the platform admin's to give.
     const demoEnabled =
       !me.organization_id && body?.demo_enabled !== undefined ? !!body.demo_enabled : target.demo_enabled;
@@ -158,9 +164,22 @@ Deno.serve(async req => {
         }
       }
     }
+    // What was done to the account by someone else is recorded first: no record, no change.
+    const resetDeadline = new Date(Date.now() + 7 * 864e5).toISOString();
+    if (resetInitial) {
+      const recorded = await recordAccountEvent(admin, {
+        organizationId: target.organization_id,
+        targetId: userId,
+        actorId: auth.user.id,
+        action: "initial_password_reset",
+      });
+      if (!recorded) return json({error: "audit_failed"}, 500);
+    }
     const {error} = await admin
       .from("profiles")
       .update({
+        // After a reset the number is only a first password: the person must choose their own within a week.
+        ...(resetInitial ? {password_change_required: true, password_change_deadline: resetDeadline} : {}),
         name,
         email: needsConfirmation ? target.email : email,
         role,
@@ -170,7 +189,7 @@ Deno.serve(async req => {
         demo_enabled: demoEnabled,
         // Someone the staff import made who never changed their first password was locked at the deadline: an admin
         // who activates the account again gives them another week.
-        ...(active && !target.active && target.password_change_required
+        ...(!resetInitial && active && !target.active && target.password_change_required
           ? {password_change_deadline: new Date(Date.now() + 7 * 864e5).toISOString()}
           : {}),
       })
@@ -180,6 +199,25 @@ Deno.serve(async req => {
       if (needsConfirmation) await admin.from("email_change_requests").delete().eq("user_id", userId);
       if (emailChanged && !needsConfirmation && target.email) await admin.auth.admin.updateUserById(userId, {email: target.email, email_confirm: true});
       return json({error: "update_failed"}, 500);
+    }
+    // The reset itself: the sign-in account takes the number as its password. The profile already says the person must
+    // change it, so a failure here leaves the account as it was (and the flag is put back).
+    if (resetInitial && initialPassword) {
+      const {error: passwordError} = await admin.auth.admin.updateUserById(userId, {password: initialPassword});
+      if (passwordError) {
+        await admin
+          .from("profiles")
+          .update({
+            password_change_required: target.password_change_required ?? false,
+            password_change_deadline: target.password_change_deadline ?? null,
+          })
+          .eq("id", userId);
+        return json({error: "update_failed"}, 500);
+      }
+    }
+    // The person is told (best effort, and only at an address that can receive mail) so a reset cannot happen unnoticed.
+    if (resetInitial && target.email && !String(target.email).endsWith(".invalid")) {
+      await notifyAccountEvent(String(target.email), "initial_password_reset", me.name);
     }
     // A change made by the platform owner to the person's email or role voids a request a hospital admin made before
     // it: the link must not overwrite what the owner has just decided.
@@ -194,7 +232,7 @@ Deno.serve(async req => {
       if (target.email) await notifyAccountEvent(target.email, "email_changed", me.name);
       await notifyAccountEvent(email, "email_changed_to", me.name);
     }
-    return json({ok: true, name, email});
+    return json({ok: true, name, email, ...(resetInitial ? {initial_password_reset: true} : {})});
   } catch (e) {
     console.error("update-staff", e instanceof Error ? e.message : e);
     return json({error: "failed"}, 500);

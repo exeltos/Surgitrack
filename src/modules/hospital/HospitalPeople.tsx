@@ -42,6 +42,7 @@ export default function HospitalPeople({
     members,
     notice,
     passwordReset,
+    resetInitialPassword,
     pending,
     remove,
     save,
@@ -106,6 +107,7 @@ export default function HospitalPeople({
           onResend={draft => void invite(draft, true)}
           onInviteLink={demo ? undefined : draft => void invite(draft, false, false)}
           onPasswordReset={m => void passwordReset(m)}
+          onResetInitial={(m, phone) => void resetInitialPassword(m, phone)}
           onMakeLink={makeLink}
           busy={busy}
           L={L}

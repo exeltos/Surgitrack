@@ -4432,29 +4432,30 @@ html body .devices-empty.small {
   }
 }
 
-/* Whether a person still has the initial password: one small round icon beside the status, so the row keeps its height
-   (the key: still the initial password; the shield: has set their own; the padlock: locked for not changing it). */
+/* Whether a person still has a temporary (initial) password or chose their own: a small labelled pill under the status. */
 .people-state {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   min-width: 0;
 }
 html body .people-row .people-password {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   flex: none;
-  width: 22px;
-  height: 22px;
   margin: 0;
-  padding: 0;
+  padding: 2px 8px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
   cursor: help;
 }
 html body .people-row .people-password.changed {
-  color: #5f8f78;
-  background: #eaf4ee;
+  color: #276044;
+  background: #e3f1e8;
 }
 html body .people-row .people-password.default {
   color: #9a5a00;
@@ -4463,6 +4464,61 @@ html body .people-row .people-password.default {
 html body .people-row .people-password.locked {
   color: #b3261e;
   background: #fde8e6;
+}
+.people-online {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+.people-online i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2e9e5b;
+  box-shadow: 0 0 0 3px #d9f0e3;
+}
+/* The counts above the list: each also filters it. */
+.people-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.people-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 999px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.people-count i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8a97a3;
+}
+.people-count.online i {
+  background: #2e9e5b;
+}
+.people-count.default i {
+  background: #d98a00;
+}
+.people-count.changed i {
+  background: #5f8f78;
+}
+.people-count.locked i {
+  background: #b3261e;
+}
+.people-count.on {
+  border-color: var(--c-cyan-45);
+  background: var(--c-gray-95-3);
 }
 
 /* The owner's reminder to those who have not set their own password: one line above the list. */

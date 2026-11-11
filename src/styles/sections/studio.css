@@ -2272,3 +2272,62 @@ html body .studio-flow-modules-list > li.off {
 html body .studio-flow-modules-list > li.off em {
   color: var(--st-muted);
 }
+
+/* Settings: one column of rows: the name and a line of help on the left, the control on the right, no boxes within boxes. */
+html body .studio-system-grid,
+html body .studio-system-grid:has(> .platform-contact) {
+  height: auto;
+  grid-template-columns: minmax(0, 900px);
+  align-content: start;
+  gap: 16px;
+}
+html body .studio-system-grid > section {
+  padding: 4px 20px 8px;
+}
+html body .studio-system-grid > section > header {
+  padding: 14px 0 12px;
+  margin-bottom: 0;
+}
+html body .studio-system-grid > section > label {
+  grid-template-columns: minmax(0, 1fr) 260px;
+  column-gap: 28px;
+  row-gap: 2px;
+  align-items: center;
+  margin: 0;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+html body .studio-system-grid > section > label:last-of-type {
+  border-bottom: 0;
+}
+html body .studio-system-grid > section > label > small {
+  grid-column: 1;
+  grid-row: 2;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+html body .studio-system-grid > section > label > :is(.studio-setting-input, .studio-static-field) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  font-weight: 400;
+}
+@media (max-width: 760px) {
+  html body .studio-system-grid > section > label {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .studio-system-grid > section > label > :is(.studio-setting-input, .studio-static-field) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  html body .studio-system-grid > section > label > small {
+    grid-row: auto;
+  }
+}
+html body .studio-system-grid > section > label:not(:has(> small)) > :is(.studio-setting-input, .studio-static-field) {
+  grid-row: 1;
+}

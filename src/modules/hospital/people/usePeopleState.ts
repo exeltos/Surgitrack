@@ -34,7 +34,9 @@ export function usePeopleState(props: {
   const [tab, setTab] = useState<'USERS' | 'DEPARTMENTS'>('USERS');
   const [query, setQuery] = useState('');
   /** List filters: department id, role, access (ACTIVE, INACTIVE, INVITED) and password (INITIAL, OWN, LOCKED). */
-  const [filters, setFilters] = useState({department: '', role: '', access: '', password: ''});
+  const [filters, setFilters] = useState({department: '', role: '', access: '', password: '', online: ''});
+  /** Who is connected now; null while unknown (or when the database cannot say). */
+  const [online, setOnline] = useState<Set<string> | null>(null);
   const [inviteMenu, setInviteMenu] = useState(false);
   const [drawer, setDrawer] = useState<{member: Member | null} | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -71,6 +73,8 @@ export function usePeopleState(props: {
     members,
     newDepartment,
     notice,
+    online,
+    setOnline,
     onChanged,
     organizationId,
     platform,

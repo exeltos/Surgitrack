@@ -5,7 +5,13 @@ import {esc, layout, sendEmail} from "./mail.ts";
 // changed) is kept in account_events, which the hospital's admins and the platform owner read and nobody
 // signed in can change; and the person is told by email, so nobody can quietly act in their name.
 
-export type AccountAction = "password_link" | "invite_link" | "email_changed" | "email_change_requested" | "staff_imported";
+export type AccountAction =
+  | "password_link"
+  | "invite_link"
+  | "email_changed"
+  | "email_change_requested"
+  | "staff_imported"
+  | "initial_password_reset";
 
 /** Records the event; false when it could not be kept (the caller then does not act). */
 export const recordAccountEvent = async (
@@ -53,6 +59,8 @@ export const notifyAccountEvent = async (
       ? `Ζητήθηκε από ${who} (${when}) αλλαγή του email σύνδεσης του λογαριασμού σας στο SurgiTrack. Η αλλαγή θα γίνει μόνο όταν επιβεβαιωθεί από τη νέα διεύθυνση· μέχρι τότε συνδέεστε κανονικά με το τωρινό σας email.`
       : action === "email_changed"
       ? `Το email σύνδεσης του λογαριασμού σας στο SurgiTrack άλλαξε από ${who} (${when}). Από εδώ και πέρα συνδέεστε με το νέο email.`
+      : action === "initial_password_reset"
+        ? `Ο κωδικός του λογαριασμού σας στο SurgiTrack επανήλθε σε αρχικό από ${who} (${when}). Στην επόμενη σύνδεση θα σας ζητηθεί να ορίσετε δικό σας κωδικό.`
       : action === "password_link"
         ? `Δημιουργήθηκε σύνδεσμος ορισμού νέου κωδικού για τον λογαριασμό σας στο SurgiTrack από ${who} (${when}).`
         : `Δημιουργήθηκε σύνδεσμος πρόσκλησης για τον λογαριασμό σας στο SurgiTrack από ${who} (${when}).`;

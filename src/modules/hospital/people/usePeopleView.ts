@@ -7,7 +7,7 @@ import type {usePeopleData} from './usePeopleData';
 import {formatDateTime} from '../../../core/displayDate';
 
 export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<typeof usePeopleData>) {
-  const {decisions, departments, el, filters, invitations, lang, members, query, requests, setDecisions} = p;
+  const {decisions, departments, el, filters, invitations, lang, members, online, query, requests, setDecisions} = p;
 
   const departmentName = (id: string | null) => localizedName(departments.find(d => d.id === id)?.name || '—', lang);
   /** An invited user who has not accepted yet: the account stays inactive until they do. */
@@ -54,6 +54,7 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
       !waitingAccounts.has(m.id) &&
       (!filters.department || m.department_id === filters.department) &&
       (!filters.role || roleValue(m) === filters.role) &&
+      (!filters.online || online?.has(m.id)) &&
       (!filters.access ||
         (filters.access === 'INVITED'
           ? invitedAt(m) !== undefined
@@ -70,6 +71,8 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
           .toLowerCase()
           .includes(q)),
   );
+  /** Everyone on the list before any filter: the counts above it. */
+  const listed = members.filter(m => !waitingAccounts.has(m.id));
   return {
     activeDepartments,
     date,
@@ -77,6 +80,7 @@ export function usePeopleView(p: ReturnType<typeof usePeopleState> & ReturnType<
     departmentName,
     invitedAt,
     invitedToSignup,
+    listed,
     pending,
     q,
     roleLabel,

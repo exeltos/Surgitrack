@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ariaSortOf, nextSort, sortRows} from '../tableSort';
+import {ariaSortOf, displaySortValue, nextSort, sortRows} from '../tableSort';
 
 type Row = {name: string; n?: number; at?: Date};
 const rows: Row[] = [{name: 'Ωμέγα', n: 10}, {name: 'Άλφα', n: 2}, {name: 'βήτα'}, {name: 'Γάμμα', n: 2}];
@@ -43,5 +43,14 @@ describe('sorting a list by a column', () => {
     expect(ariaSortOf({key: 'name', dir: 'desc'}, 'name')).toBe('descending');
     expect(ariaSortOf({key: 'name', dir: 'asc'}, 'n')).toBe('none');
     expect(ariaSortOf(null, 'n')).toBe('none');
+  });
+
+  it('sorts a report’s dates by their time, not their text', () => {
+    const list = [{at: '10/01/2026 08:00'}, {at: '09/12/2025 23:10'}, {at: '—'}, {at: '09/12/2025 08:00'}];
+    const sorted = sortRows(list, {key: 'at', dir: 'asc'}, {at: r => displaySortValue(r.at)});
+    expect(sorted.map(r => r.at)).toEqual(['09/12/2025 08:00', '09/12/2025 23:10', '10/01/2026 08:00', '—']);
+    expect(displaySortValue(12)).toBe(12);
+    expect(displaySortValue(undefined)).toBeUndefined();
+    expect(displaySortValue(' Κλίβανος 2 ')).toBe('Κλίβανος 2');
   });
 });

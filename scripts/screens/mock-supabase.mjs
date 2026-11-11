@@ -573,6 +573,7 @@ const RPC = {
   profile_contacts: db => db.profiles.map(p => ({id: p.id, email: p.email, user_code: p.user_code})),
   platform_list_departments: db => db.departments,
   touch_presence: () => ({allowed: true}),
+  hospital_presence: () => [],
   // The owner's security view: three people connected, two of them from the same address.
   platform_active_sessions: () => [
     {

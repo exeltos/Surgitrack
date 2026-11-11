@@ -9,6 +9,9 @@ import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
+import {displaySortValue} from '../../core/tableSort';
 import {tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import {
@@ -133,7 +136,8 @@ export default function ReportsPage() {
 
   const summary = reportSummary(active, reportData.rows, warningThreshold);
   const split = splitRows(active, reportData.rows);
-  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : []), [view, reportData.rows]);
+  // The whole report is listed until a card or a group narrows it.
+  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : reportData.rows), [view, reportData.rows]);
   const buildPreview = () => {
     const subtitle =
       active === 'inventory'
@@ -313,9 +317,22 @@ export default function ReportsPage() {
       }),
     );
   }, [active, reportData]);
-  const shownRows = useProgressiveList(
+  // Every column of the report sorts by its own title.
+  const order = useTableSort(
     viewRows,
+    Object.fromEntries(
+      screenColumns.map(c => [
+        c.key,
+        // A column that shows a date with a name after it (the release of a load) sorts by the date underneath.
+        (row: Row) => displaySortValue(c.key === 'releasedInfo' ? row.released : row[c.key]),
+      ]),
+    ),
+  );
+  const shownRows = useProgressiveList(
+    order.rows,
     [
+      order.sort?.key,
+      order.sort?.dir,
       view?.label,
       active,
       group,
@@ -369,6 +386,7 @@ export default function ReportsPage() {
                     return (
                       <button
                         key={report.id}
+                        title={tr(report.purpose)}
                         className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
                         onClick={() => {
                           setActive(report.id);
@@ -403,7 +421,7 @@ export default function ReportsPage() {
             </div>
           </header>
           <div className="reports-filter-strip">
-            <FilterMenu filters={reportFilters} />
+            <FilterMenu filters={reportFilters} align="left" />
           </div>
           <div className="reports-overview">
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
@@ -455,7 +473,7 @@ export default function ReportsPage() {
               </div>
               {view && (
                 <button type="button" className="reports-close-list" onClick={() => setView(null)}>
-                  {tr('Κλείσιμο λίστας')}
+                  {tr('Εμφάνιση όλων')}
                 </button>
               )}
               {active === 'usage' &&
@@ -474,24 +492,12 @@ export default function ReportsPage() {
               tabIndex={0}
               aria-label={tr('Αποτελέσματα')}
             >
-              {!view ? (
-                <div className="reports-empty">
-                  <FileText size={30} />
-                  <strong>{tr('Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα')}</strong>
-                  <button
-                    type="button"
-                    className="app-button"
-                    onClick={() => setView({label: tr('Σύνολο'), test: () => true})}
-                  >
-                    {tr('Εμφάνιση όλων')}
-                  </button>
-                </div>
-              ) : viewRows.length ? (
+              {viewRows.length ? (
                 <table className="reports-table">
                   <thead>
                     <tr>
                       {screenColumns.map(c => (
-                        <th key={c.key}>{c.label}</th>
+                        <SortTh key={c.key} label={c.label} sortKey={c.key} sort={order.sort} onSort={order.toggle} />
                       ))}
                     </tr>
                   </thead>

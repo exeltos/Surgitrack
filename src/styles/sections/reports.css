@@ -73,17 +73,12 @@ html body .reports-catalog {
 /* Patient traceability: a link to Traceability, with an arrow out. */
 
 html body .reports-catalog-group h3 {
-  margin: 10px 4px 4px;
-  font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted, #6b7f8a);
 }
 html body .reports-overview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 340px);
-  gap: 16px;
-  padding: 12px 16px 4px;
   align-items: start;
 }
 @media (max-width: 900px) {
@@ -94,24 +89,17 @@ html body .reports-overview {
 html body .reports-summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 html body .reports-summary button {
-  display: grid;
-  gap: 2px;
-  min-width: 120px;
-  padding: 10px 14px;
   text-align: left;
   border: 1px solid var(--line, #d8e1e5);
-  border-radius: 12px;
   background: var(--panel, #fff);
   cursor: pointer;
 }
 html body .reports-summary button b {
-  font-size: 1.5rem;
   line-height: 1.1;
 }
 html body .reports-summary button span {
@@ -132,10 +120,6 @@ html body .reports-summary button:disabled {
   opacity: 0.5;
   cursor: default;
 }
-html body .reports-split {
-  display: grid;
-  gap: 6px;
-}
 html body .reports-split strong {
   font-size: 0.8rem;
   color: var(--muted, #6b7f8a);
@@ -145,9 +129,6 @@ html body .reports-split button {
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 8px;
   background: transparent;
   overflow: hidden;
   cursor: pointer;
@@ -183,4 +164,150 @@ html body .usage-fresh-badge {
   color: #1c6b3f;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+/* Reports: the catalog is a strip across the top, the filters and totals sit on one line and the list opens at once. */
+html body .reports-workbench {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+html body .reports-catalog {
+  min-height: auto;
+  overflow: visible;
+}
+html body .reports-catalog-head {
+  display: none;
+}
+html body .reports-catalog-list {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: visible;
+}
+html body .reports-catalog-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+html body .reports-catalog-group h3 {
+  margin: 0 6px 0 0;
+}
+html body .reports-catalog-item {
+  width: auto;
+  min-width: 0;
+  gap: 8px;
+  border-color: var(--c-gray-90);
+  border-radius: 999px;
+}
+html body .reports-catalog-icon {
+  border-radius: 999px;
+}
+html body .reports-catalog-item strong {
+  margin: 0;
+}
+html body .reports-catalog-item small {
+  display: none;
+}
+html body .reports-stage-head {
+  min-height: 0;
+  padding: 12px 16px 6px;
+}
+html body .reports-overview {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 6px 16px 6px;
+}
+html body .reports-summary {
+  gap: 8px;
+}
+html body .reports-summary button {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+html body .reports-summary button b {
+  font-size: 1.05rem;
+}
+html body .reports-split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+html body .reports-split strong {
+  margin-right: 4px;
+}
+html body .reports-split button {
+  padding: 4px 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 999px;
+}
+html body .reports-split button i {
+  display: none;
+}
+html body .reports-split button.active {
+  background: var(--c-gray-95);
+}
+
+/* Fewer frames: the report choices sit on the page itself, and inside the report there is one card, not cards in cards. */
+html body .reports-catalog {
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+html body .reports-catalog-list {
+  padding: 2px 0 6px;
+  gap: 10px 26px;
+}
+html body .reports-catalog-group h3 {
+  margin-right: 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+html body .reports-catalog-item {
+  grid-template-columns: 28px auto;
+  padding: 6px 16px 6px 7px;
+  border: 1px solid var(--c-gray-90-4);
+  background: var(--c-white);
+  box-shadow: 0 1px 2px rgba(16, 42, 54, 0.06);
+}
+html body .reports-catalog-item:hover {
+  border-color: var(--c-cyan-45);
+}
+html body .reports-catalog-icon {
+  width: 28px;
+  height: 28px;
+}
+html body .reports-catalog-item strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+html body .reports-catalog-item.active {
+  border-color: var(--c-cyan-45);
+  background: var(--c-cyan-45);
+  color: var(--c-white);
+  box-shadow: 0 2px 6px rgba(16, 42, 54, 0.18);
+}
+html body .reports-catalog-item.active .reports-catalog-icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--c-white);
+}
+html body .reports-result-card {
+  margin: 8px 0 0;
+  border: 0;
+  border-top: 1px solid var(--c-gray-95);
+  border-radius: 0;
+}
+html body .reports-result-head {
+  padding: 0 16px;
+  border-bottom: 0;
+}
+html body .reports-result-body {
+  padding: 0 16px 12px;
+}
+html body .reports-filter-strip {
+  border-bottom: 0;
 }
