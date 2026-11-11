@@ -395,3 +395,46 @@ html body .reports-summary button {
 html body .reports-summary button b {
   font-size: 0.95rem;
 }
+
+/* Reports in two levels: the category (Εξοπλισμός · Αποστείρωση · Παραδόσεις) as tabs, and under them only the
+   reports of that category. Nothing from different categories sits side by side. */
+html body .reports-categories {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .reports-category {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: -1px;
+  padding: 7px 16px 8px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+html body .reports-category b {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-gray-65);
+}
+html body .reports-category:hover {
+  color: var(--c-cyan-20-3);
+}
+html body .reports-category.active {
+  border-bottom-color: var(--c-cyan-45);
+  color: var(--c-cyan-20-3);
+}
+html body .reports-category:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+html body .reports-catalog-list {
+  padding: 8px 0 4px;
+}

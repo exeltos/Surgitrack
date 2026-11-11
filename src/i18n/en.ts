@@ -1278,6 +1278,7 @@ export const en: Record<string, string> = {
   'Τρέχουσα θέση': 'Current location',
   'Τρέχουσα σύνθεση': 'Current composition',
   'Τύποι αναφορών': 'Report types',
+  'Κατηγορίες αναφορών': 'Report categories',
   Τύπος: 'Type',
   'Τύπος αναφοράς': 'Report type',
   'Τύπος αντικειμένου': 'Item type',
