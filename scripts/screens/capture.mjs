@@ -445,6 +445,7 @@ async function main() {
           '/studio?tab=SECURITY',
           '/studio?tab=SYSTEM',
           '/studio?tab=WORKFLOW',
+          '/studio?tab=ROLES',
           '/studio?tab=USERS',
           '/hospitals',
           '/hospital',

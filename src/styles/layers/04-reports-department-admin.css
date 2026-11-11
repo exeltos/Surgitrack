@@ -2379,23 +2379,6 @@
   flex-direction: column;
   gap: 5px;
 }
-.studio-role-selector-head {
-  display: grid;
-  gap: 3px;
-  padding: 10px 10px 12px;
-  border-bottom: 1px solid var(--c-gray-95);
-  margin-bottom: 2px;
-}
-.studio-role-selector-head > strong {
-  font-size: 13px;
-  color: var(--c-cyan-30-5);
-  font-weight: 680;
-}
-.studio-role-selector-head > small {
-  font-size: 11px;
-  color: var(--st-muted);
-  line-height: 1.4;
-}
 .studio-role-selector > button {
   border: 0;
   background: transparent;

@@ -4016,17 +4016,6 @@ html body .studio-notice-status {
 }
 /* Short screens: a little space between sections instead of a title, so the whole menu still fits. */
 /* Roles & permissions: one tab, two views. */
-html body .studio-roles-switch button {
-  padding: 6px 14px;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-  color: var(--c-cyan-50);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
 html body .guided-tour-note strong {
   font-size: 15px;
   color: var(--c-blue-15);
