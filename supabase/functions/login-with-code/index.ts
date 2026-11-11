@@ -17,7 +17,8 @@ const WINDOW_MINUTES = 15;
 const MAX_FAILS_PER_CODE_AND_IP = 5;
 const MAX_FAILS_PER_CODE = 30;
 const MAX_FAILS_PER_IP = 20;
-const CODE_FORMAT = /^[A-Z]{2}[0-9]{4}$/;
+// Two letters and four digits, and «DEMO»: the one username the owner has given by hand to the Demo hospital's account.
+const CODE_FORMAT = /^([A-Z]{2}[0-9]{4}|DEMO)$/;
 
 Deno.serve(async req => {
   const cors = corsFor(req, corsBase);
