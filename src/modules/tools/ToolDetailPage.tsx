@@ -369,13 +369,14 @@ export default function ToolDetailPage() {
                   <UsageLimitCard
                     uses={tool.uses}
                     maxUses={tool.maxUses}
+                    wearCheck={tool.wearCheck}
                     fresh={isNew(tool)}
                     onSetUses={
                       can('asset.usage.configure') && tool.state !== 'RETIRED'
                         ? uses => recordUsage('TOOL', tool.id, {uses})
                         : undefined
                     }
-                    description={tr('Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.')}
+                    description={tr('Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο ή έλεγχος φθοράς.')}
                   />
                   <dl className="asset-definition-list compact-status-list">
                     <div>

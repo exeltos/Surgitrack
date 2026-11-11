@@ -72,7 +72,8 @@ export function useReceiptAndCycleActions(
       return false;
     }
     const at = formatStoreDateTime();
-    const exhausted = limited.filter(t => t.uses + 1 >= (t.maxUses || 0));
+    // Only an instrument with a limit runs out; one used with a wear check is just counted.
+    const exhausted = limited.filter(t => !!t.maxUses && t.uses + 1 >= t.maxUses);
     const exhaustedIds = new Set(exhausted.map(t => t.id));
     const limitedIds = new Set(limited.map(t => t.id));
     const dispatchedToolExhausted = kind === 'TOOL' && exhaustedIds.has(id);

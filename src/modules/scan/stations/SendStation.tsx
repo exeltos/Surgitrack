@@ -1,3 +1,4 @@
+import {usesAreCounted} from '../../../store/helpers';
 import {useState} from 'react';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {CheckCheck, ClipboardCheck, Gauge, Send} from 'lucide-react';
@@ -103,7 +104,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const missing = members.filter(t => !ticked.has(t.id));
   const counted = members.length - missing.length;
   // Limited-use instruments lose one use on every dispatch after a procedure.
-  const limited = kind === 'TOOL' ? (found.asset.maxUses ? [found.asset] : []) : members.filter(t => t.maxUses);
+  const limited = kind === 'TOOL' ? (usesAreCounted(found.asset) ? [found.asset] : []) : members.filter(usesAreCounted);
   const used = limited.filter(t => !unused.has(t.id));
   const limitedSet = kind === 'SET' && !!found.asset.maxUses;
   const consumesLives = used.length > 0 || limitedSet;
@@ -258,6 +259,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
             {limited.map(tool => {
               const remaining = Math.max(0, (tool.maxUses || 0) - tool.uses);
               const isUsed = !unused.has(tool.id);
+              const noLimit = !tool.maxUses;
               return (
                 <label key={tool.id} className={isUsed ? 'on' : ''}>
                   <input
@@ -276,11 +278,13 @@ export default function SendStation({onStations}: {onStations: () => void}) {
                   <span>
                     <b>{tool.name}</b>
                     <small>
-                      {isUsed
-                        ? `${tr('Υπόλοιπο χρήσεων')}: ${remaining} → ${Math.max(0, remaining - 1)}${
-                            remaining <= 1 ? ` · ${tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}` : ''
-                          }`
-                        : tr('χωρίς χρήση')}
+                      {isUsed && noLimit
+                        ? `${tr('Χρήσεις')}: ${tool.uses} → ${tool.uses + 1} · ${tr('έλεγχος φθοράς')}`
+                        : isUsed
+                          ? `${tr('Υπόλοιπο χρήσεων')}: ${remaining} → ${Math.max(0, remaining - 1)}${
+                              remaining <= 1 ? ` · ${tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}` : ''
+                            }`
+                          : tr('χωρίς χρήση')}
                     </small>
                   </span>
                 </label>

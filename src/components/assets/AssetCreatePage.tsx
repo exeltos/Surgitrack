@@ -31,6 +31,8 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [manufacturer, setManufacturer] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [limited, setLimited] = useState(false);
+  // Used with a wear check: no limit, the uses are counted.
+  const [wear, setWear] = useState(false);
   const [maxUses, setMaxUses] = useState('50');
   // Uses already made (an instrument in use before it came to the system).
   const [usesMade, setUsesMade] = useState('0');
@@ -80,7 +82,12 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
         manufacturer: manufacturer.trim() || undefined,
         quantity,
         maxUses: limit,
-        uses: limit ? Math.min(limit, Math.max(0, Math.round(Number(usesMade) || 0))) : undefined,
+        wearCheck: wear || undefined,
+        uses: limit
+          ? Math.min(limit, Math.max(0, Math.round(Number(usesMade) || 0)))
+          : wear
+            ? Math.max(0, Math.round(Number(usesMade) || 0))
+            : undefined,
         notes: notes.trim() || undefined,
         // One serial number cannot belong to several pieces.
         serialNumber: (quantity === 1 && serialNumber.trim()) || undefined,
@@ -237,11 +244,15 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <span>{tr('Τύπος χρήσης')}</span>
               <select
                 className="asset-inline-input"
-                value={limited ? 'LIMITED' : 'UNLIMITED'}
-                onChange={e => setLimited(e.target.value === 'LIMITED')}
+                value={limited ? 'LIMITED' : wear ? 'WEAR' : 'UNLIMITED'}
+                onChange={e => {
+                  setLimited(e.target.value === 'LIMITED');
+                  setWear(e.target.value === 'WEAR');
+                }}
               >
                 <option value="UNLIMITED">{tr('Χωρίς όριο')}</option>
                 <option value="LIMITED">{tr('Περιορισμένων χρήσεων')}</option>
+                {kind === 'TOOL' && <option value="WEAR">{tr('Χρήσεις με έλεγχο φθοράς')}</option>}
               </select>
             </label>
             {limited && (
@@ -256,14 +267,14 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 />
               </label>
             )}
-            {limited && kind === 'TOOL' && (
+            {(limited || wear) && kind === 'TOOL' && (
               <label>
                 <span>{tr('Χρήσεις που έχουν γίνει ήδη')}</span>
                 <input
                   className="asset-inline-input"
                   type="number"
                   min="0"
-                  max={Number(maxUses) || undefined}
+                  max={limited ? Number(maxUses) || undefined : undefined}
                   value={usesMade}
                   onChange={e => setUsesMade(e.target.value)}
                 />

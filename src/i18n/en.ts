@@ -698,8 +698,12 @@ export const en: Record<string, string> = {
   Κύκλος: 'Cycle',
   'Κύκλος / φορτίο': 'Cycle / load',
   'Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.': "The set's life cycle, when a usage limit is set.",
-  'Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.':
-    "The instrument's life cycle, when a usage limit is set.",
+  'Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο ή έλεγχος φθοράς.':
+    "The instrument's life cycle, when a usage limit or a wear check is set.",
+  'Χρήσεις με έλεγχο φθοράς': 'Uses with a wear check',
+  'Με έλεγχο φθοράς': 'With a wear check',
+  'έλεγχος φθοράς': 'wear check',
+  'Οι χρήσεις μετρούν χωρίς όριο, με έλεγχο φθοράς.': 'Uses are counted with no limit, with a wear check.',
   'Κύκλος ολοκληρώθηκε': 'Cycle completed',
   Λήψη: 'Capture',
   'Λήψη ή upload': 'Capture or upload',
