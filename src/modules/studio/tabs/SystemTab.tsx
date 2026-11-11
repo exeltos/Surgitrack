@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Barcode, RefreshCcw, Settings2, ShieldCheck} from 'lucide-react';
+import {Barcode, RefreshCcw, Settings2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
@@ -10,11 +10,10 @@ import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
   // Settings by category: only one category is on screen at a time.
-  const [group, setGroup] = useState<'GENERAL' | 'STERILIZATION' | 'SECURITY'>('GENERAL');
+  const [group, setGroup] = useState<'GENERAL' | 'STERILIZATION'>('GENERAL');
   const groups = [
     {id: 'GENERAL' as const, label: L('Γενικά', 'General')},
     {id: 'STERILIZATION' as const, label: L('Αποστείρωση & ετικέτες', 'Sterilization & labels')},
-    {id: 'SECURITY' as const, label: L('Ασφάλεια & ιχνηλασιμότητα', 'Security & traceability')},
   ];
   return (
     <>
@@ -39,8 +38,8 @@ export default function SystemTab({s}: {s: StudioPageState}) {
           </div>
           <p className="settings-hint">
             {L(
-              'Ό,τι έχει πεδίο, λίστα ή κουμπί αλλάζει από εδώ. Οι ενδείξεις «Σταθερό» και «Πάντα ενεργό» δεν αλλάζουν.',
-              'Anything with a field, a list or a button can be changed here. «Fixed» and «Always on» do not change.',
+              'Ό,τι έχει πεδίο, λίστα, μολυβάκι ή κουμπί αλλάζει από εδώ.',
+              'Anything with a field, a list, a pencil or a button can be changed here.',
             )}
           </p>
           <div className="studio-system-grid">
@@ -156,6 +155,25 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     )}
                   </small>
                 </label>
+                {/* Only in Demo: in a real hospital the libraries are the hospital's, saved for everyone, and a
+                reset here would empty them for every user. */}
+                {libs.dataMode === 'DEMO' && (
+                  <AppButton
+                    onClick={() =>
+                      setConfirm({
+                        title: L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?'),
+                        message: L(
+                          'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
+                          'Initial libraries and demo users will be restored.',
+                        ),
+                        action: libs.resetData,
+                      })
+                    }
+                  >
+                    <RefreshCcw size={16} />
+                    {L('Επαναφορά demo δεδομένων', 'Reset demo data')}
+                  </AppButton>
+                )}
               </section>
             )}
             {group === 'STERILIZATION' && (
@@ -198,86 +216,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </section>
             )}
             {group === 'STERILIZATION' && <LabelSettingsCard L={L} />}
-            {group === 'SECURITY' && (
-              <section>
-                <header>
-                  <ShieldCheck />
-                  <div>
-                    <h3>{L('Ασφάλεια & ιχνηλασιμότητα', 'Security & traceability')}</h3>
-                    <p>
-                      {L(
-                        'Οι μεταφορές και οι κρίσιμες ενέργειες διατηρούν ταυτότητα χρήστη και χρονική σήμανση.',
-                        'Transfers and critical actions retain user identity and timestamps.',
-                      )}
-                    </p>
-                  </div>
-                </header>
-                <div className="studio-fact">
-                  <div>
-                    <strong>{L('Ηλεκτρονική υπογραφή σε μεταφορά', 'Electronic signature on transfer')}</strong>
-                    <small>
-                      {L(
-                        'Κάθε παράδοση και παραλαβή υπογράφεται από τον χρήστη που την κάνει, με τον κωδικό του.',
-                        'Every handover is signed by the user doing it, with their own password.',
-                      )}
-                    </small>
-                  </div>
-                  <em>
-                    <i>{L('Πάντα ενεργό', 'Always on')}</i>
-                  </em>
-                </div>
-
-                <div className="studio-fact">
-                  <div>
-                    <strong>{L('Καταγραφή αλυσίδας παράδοσης', 'Chain-of-custody logging')}</strong>
-                    <small>
-                      {L(
-                        'Κάθε κίνηση Σετ και εργαλείου καταγράφεται με ποιος, πότε, από πού και προς τα πού.',
-                        'Every movement of a Set or instrument is logged: who, when, from where and to where.',
-                      )}
-                    </small>
-                  </div>
-                  <em>
-                    <i>{L('Πάντα ενεργό', 'Always on')}</i>
-                  </em>
-                </div>
-
-                <div className="studio-fact">
-                  <div>
-                    <strong>{L('Κωδικοί πρόσβασης', 'Passwords')}</strong>
-                    <small>
-                      {L(
-                        'Το Studio δεν αποθηκεύει ούτε εμφανίζει κωδικούς πρόσβασης.',
-                        'Studio does not store or show passwords.',
-                      )}
-                    </small>
-                  </div>
-                  <em>
-                    <i>{L('Πάντα ενεργό', 'Always on')}</i>
-                  </em>
-                </div>
-
-                {/* Only in Demo: in a real hospital the libraries are the hospital's, saved for everyone, and a
-                reset here would empty them for every user. */}
-                {libs.dataMode === 'DEMO' && (
-                  <AppButton
-                    onClick={() =>
-                      setConfirm({
-                        title: L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?'),
-                        message: L(
-                          'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
-                          'Initial libraries and demo users will be restored.',
-                        ),
-                        action: libs.resetData,
-                      })
-                    }
-                  >
-                    <RefreshCcw size={16} />
-                    {L('Επαναφορά demo δεδομένων', 'Reset demo data')}
-                  </AppButton>
-                )}
-              </section>
-            )}
           </div>
         </>
       )}

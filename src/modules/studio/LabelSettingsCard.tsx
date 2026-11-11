@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {createPortal} from 'react-dom';
-import {Barcode, SlidersHorizontal} from 'lucide-react';
+import {Barcode, Pencil, SlidersHorizontal} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import {useLibraries} from '../../core/LibraryStore';
@@ -55,22 +55,25 @@ export default function LabelSettingsCard({L}: {L: (el: string, en: string) => s
           </p>
         </div>
       </header>
-      <dl className="label-settings-summary">
-        <div>
-          <dt>{L('Μέγεθος', 'Size')}</dt>
-          <dd>
+      <div className="label-settings-summary" role="group" aria-label={L('Ρυθμίσεις ετικέτας', 'Label settings')}>
+        <button type="button" onClick={() => setOpen(true)}>
+          <span>{L('Μέγεθος', 'Size')}</span>
+          <b>
             {L(sizeEl, sizeEn)} <small>{mm}</small>
-          </dd>
-        </div>
-        <div>
-          <dt>{L('Κεφαλίδα', 'Header')}</dt>
-          <dd>{label.header === 'TEXT' && label.text ? label.text : L(headerEl, headerEn)}</dd>
-        </div>
-        <div>
-          <dt>{L('Γραμμή στοιχείων', 'Details line')}</dt>
-          <dd>{label.showDetails ? L('Εμφανίζεται', 'Shown') : L('Κρυφή', 'Hidden')}</dd>
-        </div>
-      </dl>
+          </b>
+          <Pencil size={13} aria-hidden="true" />
+        </button>
+        <button type="button" onClick={() => setOpen(true)}>
+          <span>{L('Κεφαλίδα', 'Header')}</span>
+          <b>{label.header === 'TEXT' && label.text ? label.text : L(headerEl, headerEn)}</b>
+          <Pencil size={13} aria-hidden="true" />
+        </button>
+        <button type="button" onClick={() => setOpen(true)}>
+          <span>{L('Γραμμή στοιχείων', 'Details line')}</span>
+          <b>{label.showDetails ? L('Εμφανίζεται', 'Shown') : L('Κρυφή', 'Hidden')}</b>
+          <Pencil size={13} aria-hidden="true" />
+        </button>
+      </div>
       <AppButton variant="primary" icon={<SlidersHorizontal size={15} />} onClick={() => setOpen(true)}>
         {L('Επεξεργασία ετικέτας', 'Edit the label')}
       </AppButton>
