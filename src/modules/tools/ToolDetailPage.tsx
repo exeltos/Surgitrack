@@ -20,6 +20,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
+import AssetLifecycle from '../../components/assets/AssetLifecycle';
 import {isNew} from '../../core/usageStatus';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -269,6 +270,11 @@ export default function ToolDetailPage() {
           </span>
         </div>
       )}
+      <AssetLifecycle
+        state={tool.state}
+        barcode={tool.barcode}
+        onDispatch={can('department.dispatch') ? () => setDispatchOpen(true) : undefined}
+      />
       <div className="asset-workbench-grid">
         <AssetWorkbenchSidebar
           kind="TOOL"

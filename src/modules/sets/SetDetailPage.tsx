@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTabs, {type AssetTab} from '../../components/assets/AssetTabs';
+import AssetLifecycle from '../../components/assets/AssetLifecycle';
 import UsageLimitCard from '../../components/assets/UsageLimitCard';
 import {isNew} from '../../core/usageStatus';
 import AssetEmptyState from '../../components/assets/AssetEmptyState';
@@ -291,6 +292,11 @@ export default function SetDetailPage() {
           </span>
         </div>
       )}
+      <AssetLifecycle
+        state={set.state}
+        barcode={set.barcode}
+        onDispatch={can('department.dispatch') ? () => setDispatchOpen(true) : undefined}
+      />
       <div className="asset-workbench-grid">
         <AssetWorkbenchSidebar
           kind="SET"
