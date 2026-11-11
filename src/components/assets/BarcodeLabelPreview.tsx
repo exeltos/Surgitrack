@@ -237,19 +237,21 @@ export default function BarcodeLabelPreview({
           </label>
         </>
       )}
-      <label className="label-zoom">
-        {tr('Μεγέθυνση')}
-        <input
-          type="range"
-          min={1}
-          max={4}
-          step={0.2}
-          value={zoom}
-          onChange={e => setZoom(Number(e.target.value))}
-          aria-label={tr('Μεγέθυνση')}
-        />
-        <b>{Math.round(zoom * 100)}%</b>
-      </label>
+      {configure && (
+        <label className="label-zoom">
+          {tr('Μεγέθυνση')}
+          <input
+            type="range"
+            min={1}
+            max={4}
+            step={0.2}
+            value={zoom}
+            onChange={e => setZoom(Number(e.target.value))}
+            aria-label={tr('Μεγέθυνση')}
+          />
+          <b>{Math.round(zoom * 100)}%</b>
+        </label>
+      )}
       {!configure && (
         <p className="label-default-note">
           {tr('Η ετικέτα (μέγεθος, κεφαλίδα, γραμμή στοιχείων) ορίζεται από τον διαχειριστή στο Studio → Ρυθμίσεις.')}
