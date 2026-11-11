@@ -240,7 +240,7 @@ const labelHeaderHtml = (settings: LabelSettings) => {
 const labelCell = (asset: PrintAsset, details: string, settings: LabelSettings, className: string) =>
   labelCellHtml(asset, escapeHtml(details), settings, className);
 const labelCellHtml = (asset: PrintAsset, details: string, settings: LabelSettings, className: string, count = '') =>
-  `<section class="label ${className}"><div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div><div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot${details.includes('sym-date') ? ' dated' : ''}"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails && count ? `<span class="count">${escapeHtml(count)}</span>` : ''}${settings.showDetails ? `<span class="detail">${details}</span>` : ''}</div></section>`;
+  `<section class="label ${className}"><div class="head"><div class="name">${escapeHtml(asset.name)}</div>${labelHeaderHtml(settings)}</div>${className === 'main' && asset.department ? `<div class="dept">${escapeHtml(trData(asset.department))}</div>` : ''}<div class="bc">${code128Svg(asset.barcode, 48)}</div><div class="foot${details.includes('sym-date') ? ' dated' : ''}"><span class="code">${escapeHtml(asset.barcode)}</span>${settings.showDetails && count ? `<span class="count">${escapeHtml(count)}</span>` : ''}${settings.showDetails ? `<span class="detail">${details}</span>` : ''}</div></section>`;
 
 /**
  * The barcode label's print CSS and body (the part after <title>). `screenZoom` enlarges it on
@@ -286,6 +286,7 @@ function barcodeLabelBody(
   @page{size:${w}mm ${h}mm;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:#111}body{width:${w}mm;height:${h}mm;overflow:hidden}
   .label{position:relative;width:100%;height:100%;display:flex;flex-direction:column;padding:1.4mm ${(2 + right).toFixed(1)}mm 1.1mm 2mm;overflow:hidden}
   .head{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5mm;min-height:0}
+  .dept{flex:none;font-size:${pt(5.4)};line-height:1.15;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .name{font-size:${pt(6.6)};font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .brand{margin-top:${(1.1 * k).toFixed(2)}mm;margin-right:-${Math.min(right, 1.5).toFixed(1)}mm;font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
