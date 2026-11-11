@@ -136,7 +136,8 @@ export default function ReportsPage() {
 
   const summary = reportSummary(active, reportData.rows, warningThreshold);
   const split = splitRows(active, reportData.rows);
-  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : []), [view, reportData.rows]);
+  // The whole report is listed until a card or a group narrows it.
+  const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : reportData.rows), [view, reportData.rows]);
   const buildPreview = () => {
     const subtitle =
       active === 'inventory'
@@ -379,6 +380,7 @@ export default function ReportsPage() {
                     return (
                       <button
                         key={report.id}
+                        title={tr(report.purpose)}
                         className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
                         onClick={() => {
                           setActive(report.id);
@@ -465,7 +467,7 @@ export default function ReportsPage() {
               </div>
               {view && (
                 <button type="button" className="reports-close-list" onClick={() => setView(null)}>
-                  {tr('Κλείσιμο λίστας')}
+                  {tr('Εμφάνιση όλων')}
                 </button>
               )}
               {active === 'usage' &&
@@ -484,19 +486,7 @@ export default function ReportsPage() {
               tabIndex={0}
               aria-label={tr('Αποτελέσματα')}
             >
-              {!view ? (
-                <div className="reports-empty">
-                  <FileText size={30} />
-                  <strong>{tr('Πατήστε μια κάρτα ή μια ομάδα για να δείτε τη λίστα')}</strong>
-                  <button
-                    type="button"
-                    className="app-button"
-                    onClick={() => setView({label: tr('Σύνολο'), test: () => true})}
-                  >
-                    {tr('Εμφάνιση όλων')}
-                  </button>
-                </div>
-              ) : viewRows.length ? (
+              {viewRows.length ? (
                 <table className="reports-table">
                   <thead>
                     <tr>
