@@ -212,7 +212,9 @@ UX rules the current product follows (keep them):
   (`useAppRecordSync`): writes are queued, sent in batches, retried with back-off (5 s to 2 min), a refused
   batch is bisected; Sets and instruments are saved after the cycles and releases waiting on the same device,
   so a release reaches the server before the Set it makes ready; permanent refusals restore the server version
-  and tell the user; concurrent edits merge
+  and tell the user; the records of a release (load or single), a delivery and a receipt are sent together in
+  one transaction (`save_records_together`, all or none; refused for good, all of them go back to the server's
+  version; not reachable or changed elsewhere, they are saved record by record as before); concurrent edits merge
   per field, same-field conflicts keep the first save and notify. Realtime pushes others' changes; without it,
   polling every 20 s. An IndexedDB copy opens the app instantly and survives reloads (unsaved changes kept and
   replayed; copy wiped at sign-out, ignored after a day). A change writes only what changed since the whole

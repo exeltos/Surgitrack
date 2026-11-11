@@ -563,8 +563,39 @@ const json = (status, body, headers = {}) => ({
 });
 
 const isoIn = days => new Date(Date.now() + days * 864e5).toISOString();
+/** The tables whose rows change after they are created (they have updated_at). */
+const VERSIONED = new Set([
+  'instrument_sets',
+  'instruments',
+  'issues',
+  'process_loads',
+  'recall_cases',
+  'purchase_orders',
+]);
+
 const RPC = {
   claim_platform_admin: () => null,
+  // Records saved together in one transaction (a release, a delivery): each row in order, the changed ones
+  // merged into what is there, history rows added once. The groups are kept in db._groups for the checks.
+  save_records_together: (db, payload) => {
+    const stamp = new Date().toISOString();
+    const saved = [];
+    const rows = payload?.p_rows || [];
+    (db._groups ??= []).push(rows.map(({table, row}) => `${table}:${row.id}`));
+    for (const {table: name, row: incoming} of rows) {
+      const table = (db[name] ??= []);
+      const row = {...incoming};
+      delete row.expected_updated_at;
+      const index = table.findIndex(r => r.organization_id === row.organization_id && r.id === row.id);
+      if (VERSIONED.has(name)) {
+        row.updated_at = stamp;
+        if (index >= 0) table[index] = {...table[index], ...row};
+        else table.unshift({...row, created_at: stamp});
+        saved.push({table: name, id: row.id, updated_at: stamp});
+      } else if (index < 0) table.unshift({...row, created_at: row.created_at ?? stamp});
+    }
+    return saved;
+  },
   // The signed-in account is the platform owner when it is the PLATFORM one.
   caller_is_platform_owner: (_db, _payload, account) => account?.email === ACCOUNTS.PLATFORM.email,
   my_access_request: () => null,

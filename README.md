@@ -73,6 +73,8 @@ Data flow: the store holds records in memory; in a cloud workspace each collecti
   (a trigger refuses a direct write), and every set-password or invitation link an admin makes and every email
   change is kept in `account_events` (read by the hospital's admins, changed by nobody) and emailed to the person.
 - The platform owner's account is made or claimed only with a confirmed email and only while no other exists.
+- A release, a delivery and a receipt reach the database in one transaction (`save_records_together`, which runs
+  with the caller's rights, so row security and every guard still apply): all of their records or none.
 - Usage counts (uses, sterilizations) never go down through the API. Each receipt and delivery is stamped by the
   database with `counterparty_verified`: whether the other party confirmed with their own password (verify-handover,
   recorded in `handover_signatures`) to the signed-in user in the last 24 hours.

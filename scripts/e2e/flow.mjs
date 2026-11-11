@@ -237,6 +237,16 @@ async function main() {
   build();
   const seed = await loadSeed();
   const db = createDatabase(seed);
+  /** One group saved together held these tables' rows, among them the Set and the record named. */
+  const savedTogether = (tables, setId, recordId) => {
+    const group = (db._groups || []).find(
+      keys => keys.includes(`instrument_sets:${setId}`) && keys.some(key => key.endsWith(`:${recordId}`)),
+    );
+    if (!group) throw new Error(`${recordId} and the Set were not saved together`);
+    for (const table of tables)
+      if (!group.some(key => key.startsWith(`${table}:`)))
+        throw new Error(`the group of ${recordId} has no ${table} row`);
+  };
   const server = await serve();
   const base = `http://127.0.0.1:${server.address().port}/`;
   const browser = await chromium.launch({
@@ -450,6 +460,8 @@ async function main() {
       expectEqual(row('instrument_sets', setId).state, 'READY_FOR_PICKUP', 'state saved');
       const release = db.sterilization_releases.find(r => r.asset_id === setId && r.load_id === load.id);
       expectEqual(release?.decision, 'RELEASED', 'release decision');
+      // The release, its movement and the Set's new state went in one transaction (save_records_together).
+      savedTogether(['sterilization_releases', 'movements', 'instrument_sets'], setId, release.id);
     });
 
     await step('The department sees it ready for pickup', async () => {
@@ -470,6 +482,7 @@ async function main() {
       expectEqual(row('instrument_sets', setId).state, 'IN_DEPARTMENT', 'state saved');
       const delivery = db.deliveries.find(d => d.asset_id === setId);
       if (!delivery) throw new Error('no delivery saved');
+      savedTogether(['deliveries', 'movements', 'instrument_sets'], setId, delivery.id);
     });
 
     await step('The department has it back, with its whole history', async () => {

@@ -35,6 +35,7 @@ import {
 } from '../../core/cycleSimulator';
 import {formatDateTime} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
+import {savedTogether} from '../../data/cloud/useAppRecordSync';
 import {useLibraries} from '../../core/LibraryStore';
 import {testsState} from '../../core/equipmentTests';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
@@ -781,10 +782,12 @@ export function useLoadActions(
     recordBiologicalResult,
     finishProcessLoad,
     startCycleSimulation,
-    completeDeliveryToDepartment,
+    // All its records reach the server together, or none of them (S5).
+    completeDeliveryToDepartment: savedTogether(completeDeliveryToDepartment),
     completeWorkflowCheckpoint,
     createProcessLoad,
     recallProcessLoad,
-    releaseProcessLoad,
+    // All its records reach the server together, or none of them (S5).
+    releaseProcessLoad: savedTogether(releaseProcessLoad),
   };
 }

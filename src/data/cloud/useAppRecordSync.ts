@@ -1,7 +1,10 @@
 import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import {
   deleteAppRecords,
+  isPermanentRefusal,
   loadBarcodes,
+  MAX_GROUP_ROWS,
+  saveRecordsTogether,
   writeAppRecords,
   type CloudCollection,
   type CloudRecord,
@@ -135,6 +138,90 @@ export const flushPendingWrites = (timeoutMs: number) =>
     });
     flushers.forEach(flush => flush());
   });
+
+/**
+ * Records saved together (S5). An action whose records must reach the server all or none (a load's release,
+ * a delivery) runs inside saveTogether: every collection it changes joins one group, and the group goes to the
+ * database in one transaction (save_records_together). Meanwhile each collection's own flush leaves those
+ * records alone. If the group cannot be saved that way (the database does not have the function yet, refuses
+ * it, or cannot be reached), its records are handed back to each collection's flush, which saves them as it
+ * always has, with its retries, merges and refusals.
+ */
+type GroupMember = {
+  organizationId: string;
+  collection: CloudCollection;
+  /** The collection's unsaved records now, held from its own flush. */
+  take: () => CloudRecord[];
+  /**
+   * The group is over: saved (the records count as saved), refused for good (every record of the group goes
+   * back to the server's version, and the user hears so), or not sent (the flush takes the records back).
+   */
+  settle: (outcome: GroupOutcome, items: CloudRecord[]) => void;
+};
+type GroupOutcome = {kind: 'saved'} | {kind: 'refused'; code: string; message: string} | {kind: 'not-sent'};
+type Group = {members: Map<string, GroupMember>};
+/** How long a group takes in the collections an action changed (their sync runs once the store has them). */
+const GROUP_COLLECT_MS = 300;
+let collecting: Group | undefined;
+// Records in a group on its way to the database: not sent by their collection's flush meanwhile.
+const held = new WeakSet<CloudRecord>();
+
+const sendGroup = async (group: Group) => {
+  const members = [...group.members.values()];
+  if (!members.length) return;
+  const organizationId = members[0].organizationId;
+  const taken = members.map(member => ({
+    member,
+    items: member.organizationId === organizationId ? member.take() : [],
+  }));
+  const total = taken.reduce((sum, {items}) => sum + items.length, 0);
+  let outcome: GroupOutcome = {kind: 'not-sent'};
+  // One record needs no group; a very large one is saved as before, collection by collection.
+  if (total > 1 && total <= MAX_GROUP_ROWS) {
+    try {
+      const result = await saveRecordsTogether(
+        organizationId,
+        taken.filter(({items}) => items.length).map(({member, items}) => ({collection: member.collection, items})),
+      );
+      if (result === 'saved') {
+        outcome = {kind: 'saved'};
+        markSynced();
+      }
+    } catch (error) {
+      const refusal = error as {code?: string; message?: string};
+      // Refused for good (permission, invalid data, a rule of the database): none of it is kept, here either.
+      // Anything else (no connection, changed on another device) is saved as before, record by record.
+      if (isPermanentRefusal(refusal))
+        outcome = {kind: 'refused', code: refusal.code || '', message: refusal.message || ''};
+      else console.warn('SurgiTrack: saving records together failed; each is saved on its own', error);
+    }
+  }
+  taken.forEach(({member, items}) => member.settle(outcome, items));
+};
+
+/**
+ * Runs an action whose records are saved together, all or none (see GroupMember). Outside a cloud
+ * workspace (Demo) the action just runs.
+ */
+export function saveTogether<T>(action: () => T): T {
+  if (collecting) return action();
+  const group: Group = {members: new Map()};
+  collecting = group;
+  try {
+    return action();
+  } finally {
+    window.setTimeout(() => {
+      if (collecting === group) collecting = undefined;
+      void sendGroup(group);
+    }, GROUP_COLLECT_MS);
+  }
+}
+
+/** The action, with its records saved together whenever it runs. */
+export const savedTogether =
+  <A extends unknown[], R>(action: (...args: A) => R) =>
+  (...args: A): R =>
+    saveTogether(() => action(...args));
 
 /** Save state, records waiting and the last time the server was reached, for the top bar. */
 export const useSyncInfo = () => useSyncExternalStore(subscribe, () => info);
@@ -427,6 +514,36 @@ export function useAppRecordSync(
       applyRef.current?.(renumbered, []);
       notify({kind: 'barcode', collection, changes});
     };
+    // An action saving its records together is under way: this collection's changes join its group.
+    if (collecting && !collecting.members.has(key)) {
+      const take = () => {
+        const items = diff(known, latest.current).changed.filter(item => !superseded.current.has(item));
+        items.forEach(item => held.add(item));
+        return items;
+      };
+      collecting.members.set(key, {
+        organizationId,
+        collection,
+        take,
+        settle: (outcome, items) => {
+          items.forEach(item => held.delete(item));
+          if (outcome.kind === 'saved')
+            items.forEach(item => {
+              known.set(item.id, item);
+              staleStreak.current.delete(item.id);
+            });
+          const done =
+            outcome.kind === 'refused' && items.length
+              ? dropRefused(items.map(item => ({id: item.id, code: outcome.code, message: outcome.message})))
+              : Promise.resolve();
+          void done
+            .catch(error => console.error(`SurgiTrack: putting back ${collection} failed`, error))
+            .finally(() => setRetryTick(tick => tick + 1));
+        },
+      });
+      // Held at once, so that a save already under way does not send them on their own.
+      take();
+    }
     const before = (SAVED_AFTER[collection] || []).map(other => `${organizationId}:${other}`);
     const flush = async () => {
       busy.current = true;
@@ -435,10 +552,14 @@ export function useAppRecordSync(
       try {
         for (let round = 0; round < MAX_ROUNDS; round++) {
           if (before.length) await settled(before);
-          const next = diff(known, latest.current);
+          const all = diff(known, latest.current);
+          // Records in a group on its way are saved by it (or handed back when it cannot be).
+          const next = {...all, changed: all.changed.filter(item => !held.has(item))};
           if (!next.changed.length && !next.removed.length) {
-            pending.delete(key);
-            pendingRecords.delete(key);
+            if (next.changed.length === all.changed.length) {
+              pending.delete(key);
+              pendingRecords.delete(key);
+            }
             break;
           }
           pendingRecords.set(key, next.changed.length + next.removed.length);
@@ -482,7 +603,7 @@ export function useAppRecordSync(
         lastSyncAt = Date.now();
         // Still changing after the last round: run another flush rather than wait for a render.
         const rest = diff(known, latest.current);
-        if (rest.changed.length || rest.removed.length) {
+        if (rest.changed.some(item => !held.has(item)) || rest.removed.length) {
           if (hadStale) window.setTimeout(() => setRetryTick(tick => tick + 1), RETRY_DELAY_MS);
           else setRetryTick(tick => tick + 1);
         }

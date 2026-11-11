@@ -8,6 +8,7 @@ import type {
 } from '../../types/domain';
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
 import {demoSigned} from '../../data/cloud/handover';
+import {savedTogether} from '../../data/cloud/useAppRecordSync';
 import type {
   PreparationPayload,
   ReceivePayload,
@@ -463,9 +464,11 @@ export function useReceiptAndCycleActions(
   return {
     acknowledgeOutOfUse,
     completeSterilizationCycle,
-    receiveAtSterilization,
+    // All its records reach the server together, or none of them (S5).
+    receiveAtSterilization: savedTogether(receiveAtSterilization),
     recordPreparation,
-    releaseSterilization,
+    // All its records reach the server together, or none of them (S5).
+    releaseSterilization: savedTogether(releaseSterilization),
     sendToSterilization,
   };
 }
