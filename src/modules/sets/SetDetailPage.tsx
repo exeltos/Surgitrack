@@ -293,6 +293,8 @@ export default function SetDetailPage() {
         </div>
       )}
       <AssetLifecycle
+        kind="SET"
+        id={set.id}
         state={set.state}
         barcode={set.barcode}
         onDispatch={can('department.dispatch') ? () => setDispatchOpen(true) : undefined}

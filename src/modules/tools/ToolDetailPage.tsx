@@ -271,6 +271,8 @@ export default function ToolDetailPage() {
         </div>
       )}
       <AssetLifecycle
+        kind="TOOL"
+        id={tool.id}
         state={tool.state}
         barcode={tool.barcode}
         onDispatch={can('department.dispatch') ? () => setDispatchOpen(true) : undefined}

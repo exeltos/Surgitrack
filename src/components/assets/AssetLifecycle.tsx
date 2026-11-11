@@ -6,6 +6,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {assetLifecycle, queueOfStage, type LifecycleStepId} from '../../core/assetLifecycle';
 import {latestMovement} from '../../core/movementUndo';
 import {tr} from '../../i18n';
+import type {AssetKind} from '../../types/domain';
 import AppButton from '../ui/AppButton';
 
 const NEXT_TEXT: Record<LifecycleStepId, string> = {
@@ -25,10 +26,14 @@ const NEXT_TEXT: Record<LifecycleStepId, string> = {
  * how long it has been at this step, and what comes next, with the button when the signed-in user is the one who acts.
  */
 export default function AssetLifecycle({
+  kind,
+  id,
   state,
   barcode,
   onDispatch,
 }: {
+  kind: AssetKind;
+  id: string;
   state: string;
   barcode: string;
   /** Sends it to Sterilization (when it is in the department and the user may). */
@@ -36,7 +41,7 @@ export default function AssetLifecycle({
 }) {
   const {sterilizationWorkflow} = useLibraries();
   const {lang} = useAppPreferences();
-  const {movements, can} = useSurgi();
+  const {movements, can, processLoads} = useSurgi();
   const life = assetLifecycle(sterilizationWorkflow.stages, state);
   if (!life) return null;
   const label = (id: LifecycleStepId) => {
@@ -46,6 +51,19 @@ export default function AssetLifecycle({
   };
   const currentId = life.steps[life.current];
   const since = latestMovement(movements, barcode)?.at;
+  // In a sterilizer load that has not ended: the Sterilization screen lists it under the running cycles, not under Loading.
+  const inRunningLoad = processLoads.some(
+    load =>
+      load.kind === 'STERILIZATION' &&
+      load.status === 'OPEN' &&
+      load.items.some(item => item.assetKind === kind && item.assetId === id),
+  );
+  const queue =
+    currentId === 'STERILIZATION' && inRunningLoad
+      ? 'IN_STERILIZER'
+      : currentId === 'DEPARTMENT'
+        ? ''
+        : queueOfStage[currentId];
   const action =
     currentId === 'DEPARTMENT' ? (
       onDispatch ? (
@@ -54,10 +72,7 @@ export default function AssetLifecycle({
         </AppButton>
       ) : null
     ) : can('sterilization.workspace') ? (
-      <Link
-        className="app-button app-button-secondary app-button-md"
-        to={`/sterilization?queue=${queueOfStage[currentId]}`}
-      >
+      <Link className="app-button app-button-secondary app-button-md" to={`/sterilization?queue=${queue}`}>
         {tr('Άνοιγμα στην Αποστείρωση')}
         <ArrowRight size={15} />
       </Link>
