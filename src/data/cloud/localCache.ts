@@ -10,6 +10,11 @@ import {mergeRemote} from './remoteChanges';
  *    opening with a connection (S3).
  * It holds patient codes, so it is wiped on sign-out. A copy older than a day is not used as data,
  * but the changes it kept unsaved are, whatever their age (they exist nowhere else).
+ *
+ * A collection is kept in two parts: the whole collection (a large hospital's instruments are megabytes,
+ * and writing them blocks the screen for a moment) and, beside it, what changed since it was written. A
+ * change writes only that second part; the whole collection is written again only once that part has grown
+ * (see writeCollection).
  */
 const DB_NAME = 'surgitrack-cache';
 const STORE = 'collections';
@@ -37,6 +42,18 @@ export type CachedCollection = {
   version: number;
   /** Older than a day: only its unsaved changes count (see pendingOnto). */
   expired?: boolean;
+  /** Names this written collection, so that only the changes written on top of it are read with it. */
+  token?: string;
+};
+
+/** What changed since the whole collection was written, saved beside it under its own key. */
+type CachedChanges = Omit<CachedCollection, 'items' | 'token' | 'expired'> & {
+  /** The token of the whole collection these changes go on top of. */
+  base: string;
+  /** Records new or different since then, and every unsaved one. */
+  upserts: CloudRecord[];
+  /** Records gone since then. */
+  gone: string[];
 };
 
 let dbPromise: Promise<IDBDatabase | undefined> | undefined;
@@ -59,6 +76,49 @@ const openDb = () => {
 
 const keyFor = (owner: CacheOwner, collection: CloudCollection) =>
   `${owner.userId}:${owner.organizationId}:${collection}`;
+const CHANGES = '#changes';
+const changesKey = (key: string) => `${key}${CHANGES}`;
+
+/**
+ * The whole collection on top of which changes are written, as written: its records (by identity, as the
+ * store hands them over) and versions. Only in this page's memory: after a reload the first write is whole.
+ */
+type Written = {token: string; records: Map<string, CloudRecord>; versions: Record<string, string>};
+const written = new Map<string, Written>();
+/**
+ * The changes are written alone while they hold at most this many records (a quarter of a small collection);
+ * past that the whole collection is written again, and the changes start over.
+ */
+const MAX_CHANGES = 500;
+const changesLimit = (size: number) => Math.min(MAX_CHANGES, Math.max(50, Math.ceil(size / 4)));
+let tokens = 0;
+const newToken = () =>
+  `${Date.now().toString(36)}-${(tokens++).toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+/**
+ * A collection read back: the changes go on top of the whole collection they were written over. Changes
+ * written over another one (a whole write that never reached the disk) only bring their unsaved records,
+ * so the copy counts as old: it is not used as data, its unsaved changes are (see pendingOnto).
+ */
+const combine = (whole: CachedCollection | undefined, changes: CachedChanges | undefined) => {
+  if (!changes || changes.version !== CACHE_VERSION) return whole;
+  const {base, upserts, gone, ...rest} = changes;
+  const matches = !!whole && !!whole.token && whole.token === base;
+  const unsaved = new Set(changes.changed);
+  const combined: CachedCollection = {
+    ...rest,
+    items: matches
+      ? mergeRemote(whole!.items, upserts, gone)
+      : mergeRemote(
+          whole?.items || [],
+          upserts.filter(item => unsaved.has(item.id)),
+          changes.removed,
+        ),
+    versions: {...(matches ? whole!.versions : {}), ...changes.versions},
+    savedAt: matches ? changes.savedAt : 0,
+  };
+  return combined;
+};
 
 export type CacheOwner = {userId: string; organizationId: string};
 let owner: CacheOwner | undefined;
@@ -80,9 +140,15 @@ export async function readCache(
       const tx = db.transaction(STORE, 'readonly');
       const store = tx.objectStore(STORE);
       for (const collection of collections) {
-        const request = store.get(keyFor(forOwner, collection));
-        request.onsuccess = () => {
-          const entry = request.result as CachedCollection | undefined;
+        const key = keyFor(forOwner, collection);
+        const request = store.get(key);
+        const changesRequest = store.get(changesKey(key));
+        changesRequest.onsuccess = () => {
+          const whole = request.result as CachedCollection | undefined;
+          const entry = combine(
+            whole?.version === CACHE_VERSION ? whole : undefined,
+            changesRequest.result as CachedChanges | undefined,
+          );
           if (!entry || entry.version !== CACHE_VERSION) return;
           const expired = Date.now() - entry.savedAt >= CACHE_MAX_AGE_MS;
           if (expired && !entry.changed.length && !entry.removed.length) return;
@@ -104,24 +170,66 @@ export async function readCache(
   });
 }
 
-/** Saves one collection's copy for the current owner (best effort: a full disk only loses the copy). */
+/**
+ * Saves one collection's copy for the current owner (best effort: a full disk only loses the copy). Only
+ * what changed since the whole collection was last written goes to the disk, unless that has grown past
+ * changesLimit: then the whole collection is written again. `items` must be the store's own records (a
+ * record is taken as unchanged while it is the same object).
+ */
 export async function writeCollection(
   collection: CloudCollection,
   entry: Omit<CachedCollection, 'savedAt' | 'version'>,
 ) {
   const current = owner;
   if (!current) return;
+  const key = keyFor(current, collection);
+  const savedAt = Date.now();
+  const versions = entry.versions || {};
+  // Decided now, in the order of the calls: each write goes on top of the whole one decided before it.
+  const last = written.get(key);
+  let changes: CachedChanges | undefined;
+  if (last) {
+    const unsaved = new Set(entry.changed);
+    const upserts = entry.items.filter(item => last.records.get(item.id) !== item || unsaved.has(item.id));
+    const present = new Set(entry.items.map(item => item.id));
+    const gone = [...last.records.keys()].filter(id => !present.has(id));
+    if (upserts.length + gone.length <= changesLimit(entry.items.length)) {
+      const {items: _items, ...rest} = entry;
+      void _items;
+      changes = {
+        ...rest,
+        versions: Object.fromEntries(Object.entries(versions).filter(([id, version]) => last.versions[id] !== version)),
+        base: last.token,
+        upserts,
+        gone,
+        savedAt,
+        version: CACHE_VERSION,
+      };
+    }
+  }
+  const token = changes ? undefined : newToken();
+  if (token) written.set(key, {token, records: new Map(entry.items.map(item => [item.id, item])), versions});
   const db = await openDb();
   if (!db) return;
   await new Promise<void>(resolve => {
+    // A whole write that did not reach the disk: the next write is whole again.
+    const failed = () => {
+      if (token && written.get(key)?.token === token) written.delete(key);
+      resolve();
+    };
     try {
       const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).put({...entry, savedAt: Date.now(), version: CACHE_VERSION}, keyFor(current, collection));
+      const store = tx.objectStore(STORE);
+      if (changes) store.put(changes, changesKey(key));
+      else {
+        store.put({...entry, savedAt, version: CACHE_VERSION, token}, key);
+        store.delete(changesKey(key));
+      }
       tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
-      tx.onabort = () => resolve();
+      tx.onerror = failed;
+      tx.onabort = failed;
     } catch {
-      resolve();
+      failed();
     }
   });
 }
@@ -129,6 +237,7 @@ export async function writeCollection(
 /** Wipes every copy on this device (sign-out, or a copy that must not be trusted). */
 export async function clearCache() {
   owner = undefined;
+  written.clear();
   const db = await openDb();
   if (!db) return;
   await new Promise<void>(resolve => {
@@ -152,29 +261,38 @@ export async function clearCache() {
  */
 export async function clearSyncedCache() {
   owner = undefined;
+  written.clear();
   const db = await openDb();
   if (!db) return;
   await new Promise<void>(resolve => {
     try {
       const tx = db.transaction(STORE, 'readwrite');
       const store = tx.objectStore(STORE);
-      const request = store.openCursor();
-      request.onsuccess = () => {
-        const cursor = request.result;
-        if (!cursor) return;
-        const entry = cursor.value as CachedCollection;
-        if (!entry?.changed?.length && !entry?.removed?.length) {
-          cursor.delete();
-        } else {
+      const keysRequest = store.getAllKeys();
+      const valuesRequest = store.getAll();
+      valuesRequest.onsuccess = () => {
+        const values = new Map(keysRequest.result.map((key, index) => [String(key), valuesRequest.result[index]]));
+        store.clear();
+        for (const [key, value] of values) {
+          if (key.endsWith(CHANGES)) continue;
+          const whole = value as CachedCollection;
+          const changes = values.get(changesKey(key)) as CachedChanges | undefined;
+          const entry = whole?.version === CACHE_VERSION ? combine(whole, changes) : whole;
+          if (!entry?.changed?.length && !entry?.removed?.length) continue;
           const keep = new Set(entry.changed);
-          cursor.update({
-            ...entry,
-            items: entry.items.filter(item => keep.has(item.id)),
-            versions: Object.fromEntries(Object.entries(entry.versions || {}).filter(([id]) => keep.has(id))),
-            savedAt: 0,
-          });
+          const {token: _token, expired: _expired, ...rest} = entry;
+          void _token;
+          void _expired;
+          store.put(
+            {
+              ...rest,
+              items: entry.items.filter(item => keep.has(item.id)),
+              versions: Object.fromEntries(Object.entries(entry.versions || {}).filter(([id]) => keep.has(id))),
+              savedAt: 0,
+            },
+            key,
+          );
         }
-        cursor.continue();
       };
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();

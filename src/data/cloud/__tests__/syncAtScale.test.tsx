@@ -7,8 +7,9 @@
  * It checks what a large hospital needs from the sync: an idle screen sends nothing, one change is one small
  * request, a whole load released at once goes in a few requests, and stations that change the same
  * instruments at the same time end up with the same data as the database, without a flood of requests and
- * without losing a change unannounced.
+ * without losing a change unannounced; and each change writes only what changed to the device's copy.
  */
+import 'fake-indexeddb/auto';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {act, cleanup, render} from '@testing-library/react';
 import {useState} from 'react';
@@ -24,6 +25,7 @@ const db = vi.hoisted(() => ({
   tables: new Map<string, Map<string, Record<string, unknown>>>(),
   requests: [] as Array<{op: string; table: string; rows: number}>,
   lastStamp: 0,
+  // Records each write of a device's copy put on its disk (IndexedDB).
   copies: [] as number[],
   // Saves refused because the record changed since the station saw it.
   stale: 0,
@@ -146,16 +148,9 @@ vi.mock('../../../lib/supabase', () => {
     };
     return builder;
   };
-  return {supabase: {from}};
+  return {supabase: {from, auth: {onAuthStateChange: () => undefined}}};
 });
 vi.mock('../realtime', () => ({isRealtimeLive: () => false, onRemoteChange: () => () => undefined}));
-vi.mock('../localCache', () => ({
-  takeRestored: () => undefined,
-  // The device's copy: how many records each write puts into IndexedDB.
-  writeCollection: async (_collection: string, entry: {items: unknown[]}) => {
-    db.copies.push(entry.items.length);
-  },
-}));
 
 const ORG = 'org-1';
 type Tool = CloudRecord & Record<string, unknown>;
@@ -207,6 +202,7 @@ type SyncModules = {
   sync: typeof import('../useAppRecordSync');
   versions: typeof import('../versions');
   remote: typeof import('../remoteChanges');
+  cache: typeof import('../localCache');
 };
 type Notice = import('../useAppRecordSync').SyncNotice;
 type Conflict = import('../useAppRecordSync').SyncConflict;
@@ -220,13 +216,20 @@ type Station = {
   conflicts: Conflict[];
 };
 
+let stationCount = 0;
+/** The user of the n-th station opened in the current test. */
+let firstStation = 0;
+const stationIndex = (n: number) => firstStation + n;
 const openStation = async (): Promise<Station> => {
   vi.resetModules();
   const modules: SyncModules = {
     sync: await import('../useAppRecordSync'),
     versions: await import('../versions'),
     remote: await import('../remoteChanges'),
+    cache: await import('../localCache'),
   };
+  // Each station keeps its copy under its own user, as on its own device.
+  modules.cache.setCacheOwner({userId: `station-${stationCount++}`, organizationId: ORG});
   // What the app's first load does: every instrument, with the version of each.
   const rows = [...tableOf('instruments').values()];
   modules.versions.rememberVersions('tools', rows);
@@ -267,6 +270,8 @@ const reads = () => db.requests.filter(r => r.op === 'select');
 const edit = (id: string, fields: Record<string, unknown>) => (list: Tool[]) =>
   list.map(item => (item.id === id ? {...item, ...fields} : item));
 const realNow = performance.now.bind(performance);
+const put = IDBObjectStore.prototype.put;
+const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 /** The measured numbers, printed with the test run. */
 // Written straight to the terminal: jsdom keeps console output of a passing test to itself.
 const report = (line: string) =>
@@ -279,10 +284,20 @@ describe('sync at a large hospital’s size', () => {
     db.lastStamp = 0;
     db.stale = 0;
     vi.useFakeTimers({toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date']});
+    vi.spyOn(IDBObjectStore.prototype, 'put').mockImplementation(function (
+      this: IDBObjectStore,
+      value: unknown,
+      key?: IDBValidKey,
+    ) {
+      const copy = value as {items?: unknown[]; upserts?: unknown[]};
+      db.copies.push((copy.items || copy.upserts || []).length);
+      return put.call(this, value, key);
+    });
     vi.setSystemTime(new Date('2026-11-11T09:00:00.000Z'));
   });
   afterEach(() => {
     cleanup();
+    vi.restoreAllMocks();
     vi.useRealTimers();
   });
 
@@ -295,8 +310,9 @@ describe('sync at a large hospital’s size', () => {
     // A look every 20 s (changed records + deletions), each returning nothing.
     expect(reads().length).toBeLessThanOrEqual(2 * 32);
     expect(reads().every(read => read.rows === 0)).toBe(true);
-    // The device's copy (megabytes at this size) is written when the screen opens and refreshed once.
-    expect(db.copies.length).toBeLessThanOrEqual(2);
+    // The device's copy (megabytes at this size) is written whole once, when the screen opens.
+    expect(db.copies.filter(records => records === 20_000)).toHaveLength(1);
+    expect(sum(db.copies)).toBeLessThanOrEqual(20_000);
   }, 60_000);
 
   it('a busy station: each change is one request with one record, and stays fast with 20,000 instruments', async () => {
@@ -322,11 +338,12 @@ describe('sync at a large hospital’s size', () => {
     const median = [...times].sort((a, b) => a - b)[15];
     report(
       `sync at scale: one change among 20,000 instruments: median ${median.toFixed(1)} ms; ` +
-        `device copy written ${db.copies.length} times for 30 changes`,
+        `device copy: ${sum(db.copies)} records written for 30 changes`,
     );
     expect(median).toBeLessThan(250);
-    // The copy is rewritten after the changes, not once per render: at most twice per change.
-    expect(db.copies.length).toBeLessThanOrEqual(60);
+    // Only what changed goes to the disk: all 30 changes together write less than one whole copy.
+    expect(Math.max(...db.copies)).toBeLessThanOrEqual(30);
+    expect(sum(db.copies)).toBeLessThan(20_000);
   }, 60_000);
 
   it('a whole release of 500 instruments goes in three requests', async () => {
@@ -348,6 +365,7 @@ describe('sync at a large hospital’s size', () => {
     // Each station changes its own field, on a small set of instruments all four keep touching.
     const FIELDS = ['state', 'department', 'notes', 'specialty'];
     const stations: Station[] = [];
+    firstStation = stationCount;
     for (let s = 0; s < 4; s++) stations.push(await openStation());
     await wait(5000);
     db.requests.length = 0;
@@ -397,6 +415,16 @@ describe('sync at a large hospital’s size', () => {
     }
     // The contention is real: saves were refused as changed elsewhere and merged.
     expect(db.stale).toBeGreaterThan(0);
+    // What each station would open with next time: its copy, read back, is what it holds now.
+    for (const [index, station] of stations.entries()) {
+      await act(() => vi.advanceTimersByTimeAsync(1000));
+      const copy = await station.modules.cache.readCache(
+        {userId: `station-${stationIndex(index)}`, organizationId: ORG},
+        ['tools'],
+      );
+      expect(copy.tools?.expired).toBe(false);
+      expect(copy.tools?.items).toEqual(station.items());
+    }
     // Each station changes its own field: merging keeps them all, nothing is reported as a same-field clash.
     expect(conflicts).toEqual([]);
     // A change that did not stick was announced to the station that made it.

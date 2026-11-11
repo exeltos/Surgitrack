@@ -215,7 +215,8 @@ UX rules the current product follows (keep them):
   and tell the user; concurrent edits merge
   per field, same-field conflicts keep the first save and notify. Realtime pushes others' changes; without it,
   polling every 20 s. An IndexedDB copy opens the app instantly and survives reloads (unsaved changes kept and
-  replayed; copy wiped at sign-out, ignored after a day).
+  replayed; copy wiped at sign-out, ignored after a day). A change writes only what changed since the whole
+  collection was last written; the whole collection is written again past 500 changed records.
 - **Security definer functions** are catalogued in `supabase/SECURITY_DEFINER.md` and pinned by a test.
 - **i18n:** Greek text is the key; `tr('Ελληνικό κείμενο')` looks up English in a lazily loaded dictionary;
   data labels go through a glossary.
