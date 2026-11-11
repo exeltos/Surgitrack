@@ -138,12 +138,6 @@
   display: grid;
   gap: 16px;
 }
-.overview-links .app-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-}
 .overview-alert {
   display: flex;
   align-items: center;
