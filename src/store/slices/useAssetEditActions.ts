@@ -26,10 +26,11 @@ export function useAssetEditActions(
   const {addMovement, can, currentUser, notify, setSets, setTools, sets, systemSettings, tools, undoable} = p;
 
   /** Lives (usage limits) change only by the admin or the Sterilization supervisor. */
-  const withoutUsageUnlessAllowed = <T extends {maxUses?: number}>(patch: T): T => {
-    if (!('maxUses' in patch) || can('asset.usage.configure')) return patch;
+  const withoutUsageUnlessAllowed = <T extends {maxUses?: number; wearCheck?: boolean}>(patch: T): T => {
+    if (!('maxUses' in patch || 'wearCheck' in patch) || can('asset.usage.configure')) return patch;
     const rest = {...patch};
     delete rest.maxUses;
+    delete rest.wearCheck;
     return rest;
   };
   const updateSet = (id: string, rawPatch: SetUpdatePatch) => {
@@ -250,15 +251,25 @@ export function useAssetEditActions(
     [sets, tools, systemSettings.usageWarningThreshold],
   );
 
-  const configureUsageLimit = (kind: AssetKind, id: string, maxUses?: number) => {
+  const configureUsageLimit = (kind: AssetKind, id: string, maxUses?: number, wearCheck?: boolean) => {
     if (!can('asset.usage.configure')) return;
     const normalized = normalizeUsageLimit(maxUses);
+    // A wear check is for instruments with no limit.
+    const wear = kind === 'TOOL' && !normalized && !!wearCheck;
     if (kind === 'SET') {
       setSets(list => list.map(item => (item.id === id ? {...item, maxUses: normalized, uses: item.uses || 0} : item)));
     } else {
-      setTools(list => list.map(item => (item.id === id ? {...item, maxUses: normalized} : item)));
+      setTools(list =>
+        list.map(item => (item.id === id ? {...item, maxUses: normalized, wearCheck: wear || undefined} : item)),
+      );
     }
-    notify(normalized ? tr('Ορίστηκε όριο {0} χρήσεων.', normalized) : tr('Το όριο χρήσεων αφαιρέθηκε.'));
+    notify(
+      normalized
+        ? tr('Ορίστηκε όριο {0} χρήσεων.', normalized)
+        : wear
+          ? tr('Οι χρήσεις μετρούν χωρίς όριο, με έλεγχο φθοράς.')
+          : tr('Το όριο χρήσεων αφαιρέθηκε.'),
+    );
   };
   /**
    * Corrects a limited-use Set's or instrument's recorded uses by one (a use counted by mistake, or one missed);
@@ -267,9 +278,9 @@ export function useAssetEditActions(
   const correctUses = (kind: AssetKind, id: string, delta: 1 | -1) => {
     if (!can('asset.usage.configure')) return;
     const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
-    if (!asset?.maxUses || asset.state === 'RETIRED') return;
+    if (!asset || !(asset.maxUses || ('wearCheck' in asset && asset.wearCheck)) || asset.state === 'RETIRED') return;
     const before = asset.uses || 0;
-    const after = Math.min(asset.maxUses, Math.max(0, before + delta));
+    const after = Math.min(asset.maxUses ?? Infinity, Math.max(0, before + delta));
     if (after === before) return;
     if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
     else setTools(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
@@ -290,10 +301,12 @@ export function useAssetEditActions(
   const recordUsage = (kind: AssetKind, id: string, change: {uses?: number}) => {
     if (!can('asset.usage.configure')) return;
     const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
-    if (!asset?.maxUses || asset.state === 'RETIRED') return;
+    if (!asset || !(asset.maxUses || ('wearCheck' in asset && asset.wearCheck)) || asset.state === 'RETIRED') return;
     const before = asset.uses || 0;
     const after =
-      change.uses === undefined ? before : Math.min(asset.maxUses, Math.max(0, Math.round(Number(change.uses) || 0)));
+      change.uses === undefined
+        ? before
+        : Math.min(asset.maxUses ?? Infinity, Math.max(0, Math.round(Number(change.uses) || 0)));
     if (after === before) return;
     if (kind === 'SET') setSets(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));
     else setTools(list => list.map(item => (item.id === id ? {...item, uses: after} : item)));

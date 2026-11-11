@@ -698,8 +698,12 @@ export const en: Record<string, string> = {
   Κύκλος: 'Cycle',
   'Κύκλος / φορτίο': 'Cycle / load',
   'Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.': "The set's life cycle, when a usage limit is set.",
-  'Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο χρήσεων.':
-    "The instrument's life cycle, when a usage limit is set.",
+  'Κύκλος ζωής του εργαλείου, όταν έχει οριστεί όριο ή έλεγχος φθοράς.':
+    "The instrument's life cycle, when a usage limit or a wear check is set.",
+  'Χρήσεις με έλεγχο φθοράς': 'Uses with a wear check',
+  'Με έλεγχο φθοράς': 'With a wear check',
+  'έλεγχος φθοράς': 'wear check',
+  'Οι χρήσεις μετρούν χωρίς όριο, με έλεγχο φθοράς.': 'Uses are counted with no limit, with a wear check.',
   'Κύκλος ολοκληρώθηκε': 'Cycle completed',
   Λήψη: 'Capture',
   'Λήψη ή upload': 'Capture or upload',
@@ -2307,6 +2311,7 @@ export const en: Record<string, string> = {
   'Επιστροφή…': 'Return…',
   'Επιστροφή σε στάδιο ή στο τμήμα': 'Return to a stage or to the department',
   'Επιστροφή σε': 'Return to',
+  'Τμήμα: {0}': 'Department: {0}',
   'Επιστροφή σε: {0}': 'Return to: {0}',
   'Τελευταία κίνηση: «{0}» της {1} ({2}).': 'Latest movement: «{0}» of {1} ({2}).',
   'Επιστροφή σε προηγούμενο στάδιο': 'Return to an earlier stage',

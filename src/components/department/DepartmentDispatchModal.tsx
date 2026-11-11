@@ -1,3 +1,4 @@
+import {usesAreCounted} from '../../store/helpers';
 import {useState} from 'react';
 import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
@@ -49,7 +50,9 @@ export default function DepartmentDispatchModal({
     });
   // Limited-use (multi-use with lives) instruments lose one life on every dispatch after a procedure.
   const limitedTools =
-    kind === 'TOOL' ? tools.filter(t => t.id === id && t.maxUses) : tools.filter(t => t.setId === id && t.maxUses);
+    kind === 'TOOL'
+      ? tools.filter(t => t.id === id && usesAreCounted(t))
+      : tools.filter(t => t.setId === id && usesAreCounted(t));
   const limitedSet = kind === 'SET' && !!sets.find(s => s.id === id)?.maxUses;
   // Limited-use instruments not used this time (the Set was opened, the instrument was not): no use recorded.
   const [unused, setUnused] = useState<Set<string>>(new Set());
@@ -146,9 +149,13 @@ export default function DepartmentDispatchModal({
               <ul>
                 {limitedTools.map(t => {
                   const remaining = Math.max(0, (t.maxUses || 0) - t.uses);
+                  const noLimit = !t.maxUses;
                   const used = !unused.has(t.id);
                   return (
-                    <li key={t.id} className={`${used && remaining <= 1 ? 'last-life' : ''} ${used ? '' : 'not-used'}`}>
+                    <li
+                      key={t.id}
+                      className={`${used && !noLimit && remaining <= 1 ? 'last-life' : ''} ${used ? '' : 'not-used'}`}
+                    >
                       <label className="department-lives-used" title={tr('Χρησιμοποιήθηκε')}>
                         <input
                           type="checkbox"
@@ -160,8 +167,16 @@ export default function DepartmentDispatchModal({
                           {t.barcode} · {t.name}
                         </span>
                       </label>
-                      <b>{used ? `${remaining} → ${Math.max(0, remaining - 1)}` : tr('χωρίς χρήση')}</b>
-                      {used && remaining <= 1 && <small>{tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}</small>}
+                      <b>
+                        {!used
+                          ? tr('χωρίς χρήση')
+                          : noLimit
+                            ? `${t.uses} → ${t.uses + 1}`
+                            : `${remaining} → ${Math.max(0, remaining - 1)}`}
+                      </b>
+                      {used && !noLimit && remaining <= 1 && (
+                        <small>{tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}</small>
+                      )}
                     </li>
                   );
                 })}

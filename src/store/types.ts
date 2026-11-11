@@ -198,7 +198,9 @@ export type CreateToolPayload = {
   manufacturer?: string;
   quantity: number;
   maxUses?: number;
-  /** Uses already made (an instrument in use before it came to the system); with a limit only. */
+  /** No limit, but the uses are counted (used with a wear check). */
+  wearCheck?: boolean;
+  /** Uses already made (an instrument in use before it came to the system); with a limit or a wear check. */
   uses?: number;
   notes?: string;
   serialNumber?: string;
@@ -249,6 +251,7 @@ export type ToolUpdatePatch = Partial<
     | 'warrantyUntil'
     | 'cost'
     | 'maxUses'
+    | 'wearCheck'
     | 'ownership'
     | 'ownerName'
   >
@@ -352,7 +355,7 @@ export type SurgiStoreValue = {
   stageReturnInfo: (kind: AssetKind, id: string) => StageReturnInfo | undefined;
   /** Puts the item back to an earlier stage, with a required reason. */
   returnToStage: (kind: AssetKind, id: string, stage: ReturnTargetId, reason: string) => boolean;
-  configureUsageLimit: (kind: AssetKind, id: string, maxUses?: number) => void;
+  configureUsageLimit: (kind: AssetKind, id: string, maxUses?: number, wearCheck?: boolean) => void;
   /** Platform owner: drops history entries already deleted on the server and records the clean-up. */
   forgetMovements: (ids: readonly string[]) => void;
   recordCount: (payload: Omit<SurgicalCount, 'id' | 'at' | 'by' | 'signed'>) => SurgicalCount | undefined;

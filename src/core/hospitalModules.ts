@@ -2,7 +2,8 @@
  * Modules the platform owner switches on for a hospital (Studio → Hospitals). A hospital that has not been
  * given a module does not see its screens, counts or alerts.
  */
-export type HospitalModule = 'REPLACEMENTS' | 'STOCK_MINIMUMS' | 'DEVICES' | 'SURGICAL_COUNT' | 'EQUIPMENT_TESTS';
+export type HospitalModule =
+  'REPLACEMENTS' | 'STOCK_MINIMUMS' | 'DEVICES' | 'SURGICAL_COUNT' | 'EQUIPMENT_TESTS' | 'MANUAL_USES';
 
 export const HOSPITAL_MODULES: Array<{
   id: HospitalModule;
@@ -49,6 +50,15 @@ export const HOSPITAL_MODULES: Array<{
       'Καθημερινές και εβδομαδιαίες δοκιμές κλιβάνων και πλυντηρίων (Bowie-Dick, διαρροή, βιολογική, καθαρισμός) που φράσσουν τη φόρτωση σε αποτυχία.',
     descriptionEn:
       'Daily and weekly tests of sterilizers and washers (Bowie-Dick, leak, biological, cleaning) that block loading when one fails.',
+  },
+  {
+    id: 'MANUAL_USES',
+    el: 'Χειροκίνητη καταγραφή χρήσεων',
+    en: 'Manual use records',
+    descriptionEl:
+      'Όποιος ορίζει τα όρια χρήσεων (διαχειριστής νοσοκομείου, προϊστάμενος Αποστείρωσης) προσθέτει ή διορθώνει με το χέρι τις χρήσεις που έχουν γίνει, και στη δημιουργία εργαλείου.',
+    descriptionEn:
+      'Whoever sets the usage limits (hospital admin, Sterilization supervisor) adds or corrects the uses already made by hand, also when creating an instrument.',
   },
 ];
 

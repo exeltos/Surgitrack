@@ -54,6 +54,8 @@ export const getDemoSessionUser = (role: UserRole): SessionUser => {
 export const findAsset = (kind: AssetKind, id: string, sets: SetAsset[], tools: Tool[]): Asset | undefined =>
   kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
 
+/** An instrument whose uses are counted: it has a usage limit, or it is used with a wear check (no limit). */
+export const usesAreCounted = (tool: {maxUses?: number; wearCheck?: boolean}) => !!tool.maxUses || !!tool.wearCheck;
 export const normalizeUsageLimit = (maxUses?: number) =>
   maxUses !== undefined && Number.isFinite(maxUses) && maxUses > 0 ? Math.floor(maxUses) : undefined;
 

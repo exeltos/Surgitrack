@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import type {AssetKind, AssetState, Movement} from '../../types/domain';
-import {findAsset, formatStoreDateTime, uniqueStamp} from '../helpers';
+import {findAsset, formatStoreDateTime, uniqueStamp, usesAreCounted} from '../helpers';
 import type {Toast} from '../types';
 import {tr} from '../../i18n';
 import {DEFAULT_SHELF_LIFE, STERILE_STATES, isShelfLife, isoDate, sterileUntil} from '../../core/sterileExpiry';
@@ -83,8 +83,8 @@ export function useSurgiHelpers(p: ReturnType<typeof useSurgiSession> & ReturnTy
   /** Tools whose lives (limited uses) are consumed when this asset is dispatched after a procedure. */
   const livesConsumedBy = (kind: AssetKind, id: string) =>
     kind === 'TOOL'
-      ? tools.filter(t => t.id === id && !!t.maxUses)
-      : tools.filter(t => t.setId === id && !!t.maxUses && t.state !== 'RETIRED');
+      ? tools.filter(t => t.id === id && usesAreCounted(t))
+      : tools.filter(t => t.setId === id && usesAreCounted(t) && t.state !== 'RETIRED');
   /** Keeps the shelf life chosen at Packaging & Labelling until the release. */
   const chooseShelfLife = (kind: AssetKind, id: string, months?: number) => {
     if (!isShelfLife(months)) return;

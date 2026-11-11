@@ -39,6 +39,7 @@ const FIELD_NAMES: Record<string, [string, string]> = {
   note: ['σημείωση', 'note'],
   uses: ['χρήσεις', 'uses'],
   maxUses: ['όριο χρήσεων', 'usage limit'],
+  wearCheck: ['έλεγχος φθοράς', 'wear check'],
   actual: ['εργαλεία', 'instruments'],
   setId: ['Σετ', 'Set'],
   patientCode: ['κωδικός ασθενούς', 'patient code'],

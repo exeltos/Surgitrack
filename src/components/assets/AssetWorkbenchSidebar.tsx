@@ -100,7 +100,7 @@ export default function AssetWorkbenchSidebar({
     manufacturer: asset.manufacturer || '',
     state: asset.state,
     serialNumber: tool?.serialNumber || '',
-    usageType: asset.maxUses !== undefined ? 'LIMITED' : 'UNLIMITED',
+    usageType: asset.maxUses !== undefined ? 'LIMITED' : tool?.wearCheck ? 'WEAR' : 'UNLIMITED',
     maxUses: asset.maxUses?.toString() || '',
     ownership: (asset.ownership || '') as Ownership | '',
     ownerName: asset.ownerName || '',
@@ -121,6 +121,7 @@ export default function AssetWorkbenchSidebar({
     asset.state,
     tool?.serialNumber,
     asset.maxUses,
+    tool?.wearCheck,
     asset.ownership,
     asset.ownerName,
     editing,
@@ -147,6 +148,7 @@ export default function AssetWorkbenchSidebar({
       manufacturer: draft.manufacturer.trim(),
       state: draft.state,
       ...(canEditUsage ? {maxUses} : {}),
+      ...(canEditUsage && kind === 'TOOL' ? {wearCheck: draft.usageType === 'WEAR' || undefined} : {}),
       ownership: draft.ownership || undefined,
       ownerName: ((draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && draft.ownerName.trim()) || undefined,
       ...(kind === 'TOOL' ? {serialNumber: draft.serialNumber.trim() || undefined} : {}),
@@ -386,9 +388,12 @@ export default function AssetWorkbenchSidebar({
               >
                 <option value="UNLIMITED">{tr('Χωρίς όριο')}</option>
                 <option value="LIMITED">{tr('Περιορισμένων χρήσεων')}</option>
+                {kind === 'TOOL' && <option value="WEAR">{tr('Χρήσεις με έλεγχο φθοράς')}</option>}
               </select>
             ) : asset.maxUses !== undefined ? (
               tr('Περιορισμένων χρήσεων')
+            ) : tool?.wearCheck ? (
+              tr('Χρήσεις με έλεγχο φθοράς')
             ) : (
               tr('Χωρίς όριο')
             )}
@@ -410,7 +415,7 @@ export default function AssetWorkbenchSidebar({
             )}
           </dd>
         </div>
-        {asset.maxUses !== undefined && (
+        {(asset.maxUses !== undefined || tool?.wearCheck) && (
           <>
             <div>
               <dt>{tr('Χρήσεις')}</dt>
@@ -430,7 +435,7 @@ export default function AssetWorkbenchSidebar({
                     <button
                       type="button"
                       onClick={() => onCorrectUses(1)}
-                      disabled={(asset.uses || 0) >= asset.maxUses}
+                      disabled={asset.maxUses !== undefined && (asset.uses || 0) >= asset.maxUses}
                       aria-label={tr('Μία χρήση περισσότερη')}
                       title={tr('Μία χρήση περισσότερη')}
                     >
@@ -442,14 +447,18 @@ export default function AssetWorkbenchSidebar({
                 )}
               </dd>
             </div>
-            <div>
-              <dt>{tr('Υπόλοιπο χρήσεων')}</dt>
-              <dd
-                className={asset.maxUses - (asset.uses || 0) <= systemSettings.usageWarningThreshold ? 'warn-text' : ''}
-              >
-                {Math.max(0, asset.maxUses - (asset.uses || 0))}
-              </dd>
-            </div>
+            {asset.maxUses !== undefined && (
+              <div>
+                <dt>{tr('Υπόλοιπο χρήσεων')}</dt>
+                <dd
+                  className={
+                    asset.maxUses - (asset.uses || 0) <= systemSettings.usageWarningThreshold ? 'warn-text' : ''
+                  }
+                >
+                  {Math.max(0, asset.maxUses - (asset.uses || 0))}
+                </dd>
+              </div>
+            )}
           </>
         )}
       </dl>

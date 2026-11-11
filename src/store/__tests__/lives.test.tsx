@@ -73,4 +73,32 @@ describe('instrument lives', () => {
     expect(admin.current.tools.find(t => t.id === tool.id)!.uses).toBe(tool.uses - 1);
     expect(admin.current.movements[0].status).toContain(`Διόρθωση χρήσεων · ${tool.uses} → ${tool.uses - 1}`);
   });
+
+  it('counts the uses of an instrument with a wear check without a limit, never takes it out of use, and lets the admin add uses', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const tool = result.current.tools.find(t => !t.maxUses && t.mode !== 'SET_MEMBER' && t.state === 'IN_DEPARTMENT')!;
+    expect(tool).toBeTruthy();
+    // Set to a wear check (no limit): the uses may now be added by hand, with no upper limit.
+    act(() => result.current.configureUsageLimit('TOOL', tool.id, undefined, true));
+    expect(result.current.tools.find(t => t.id === tool.id)!.wearCheck).toBe(true);
+    act(() => result.current.recordUsage('TOOL', tool.id, {uses: 120}));
+    expect(result.current.tools.find(t => t.id === tool.id)!.uses).toBe(120);
+
+    // A use is counted on dispatch (with a patient code), and the instrument stays in use however high it goes.
+    expect(result.current.sendToSterilization('TOOL', tool.id)).toBe(false);
+    act(() => {
+      result.current.sendToSterilization('TOOL', tool.id, 'PT-9');
+    });
+    const after = result.current.tools.find(t => t.id === tool.id)!;
+    expect(after.uses).toBe(121);
+    expect(after.state).toBe('PENDING_STERILIZATION');
+    expect(result.current.retiredTools.some(t => t.id === tool.id)).toBe(false);
+
+    // A limit replaces the wear check.
+    act(() => result.current.configureUsageLimit('TOOL', tool.id, 200, true));
+    const limited = result.current.tools.find(t => t.id === tool.id)!;
+    expect(limited.maxUses).toBe(200);
+    expect(limited.wearCheck).toBeUndefined();
+  });
 });

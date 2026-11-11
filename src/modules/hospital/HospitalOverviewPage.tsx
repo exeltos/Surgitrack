@@ -259,17 +259,6 @@ export default function HospitalOverviewPage() {
           'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',
           'Where the equipment is, what is moving and what needs attention.',
         )}
-        actions={
-          <div className="overview-links">
-            <Link className="app-button app-button-secondary app-button-md" to="/reports">
-              {L('Αναφορές', 'Reports')}
-            </Link>
-            <Link className="app-button app-button-secondary app-button-md" to="/movements">
-              <History size={15} />
-              {L('Ιστορικό', 'History')}
-            </Link>
-          </div>
-        }
       />
 
       <PromoCards />

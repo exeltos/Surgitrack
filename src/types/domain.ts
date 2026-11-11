@@ -42,6 +42,8 @@ export interface Tool {
   setId?: string;
   state: AssetState;
   maxUses?: number;
+  /** Used with a wear check: no usage limit, but the uses are counted (and may be added by hand). */
+  wearCheck?: boolean;
   uses: number;
   sterilizations: number;
   serialNumber?: string;

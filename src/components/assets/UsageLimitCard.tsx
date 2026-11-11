@@ -6,6 +6,7 @@ export default function UsageLimitCard({
   maxUses,
   description,
   fresh,
+  wearCheck,
   onCorrect,
   onSetUses,
 }: {
@@ -14,6 +15,8 @@ export default function UsageLimitCard({
   description: string;
   /** A use limit and no use counted: new (see core/usageStatus). */
   fresh?: boolean;
+  /** Used with a wear check: no limit, the uses are only counted (and may be added by hand). */
+  wearCheck?: boolean;
   /** Usage-limit managers only: corrects the recorded uses by one (a use counted by mistake, or missed). */
   onCorrect?: (delta: 1 | -1) => void;
   /** Usage-limit managers only: sets how many uses were made (an instrument that was in use before the system). */
@@ -30,13 +33,44 @@ export default function UsageLimitCard({
           <strong>{tr('Όριο χρήσεων')}</strong>
           <span>{description}</span>
         </div>
-        <span className="usage-type-badge">{maxUses ? tr('Περιορισμένων χρήσεων') : tr('Χωρίς όριο')}</span>
+        <span className="usage-type-badge">
+          {maxUses ? tr('Περιορισμένων χρήσεων') : wearCheck ? tr('Με έλεγχο φθοράς') : tr('Χωρίς όριο')}
+        </span>
         {maxUses !== undefined && fresh && (
           <span className="usage-fresh-badge" title={tr('Έχει όριο χρήσεων και καμία χρήση ακόμα.')}>
             {tr('Αχρησιμοποίητο')}
           </span>
         )}
       </div>
+      {maxUses === undefined && wearCheck && (
+        <div className="usage-config-limit usage-view-stats">
+          <div>
+            <span>{tr('Χρήσεις που έχουν γίνει')}</span>
+            {onSetUses ? (
+              <span className="usage-correct">
+                <input
+                  type="number"
+                  min={0}
+                  defaultValue={uses}
+                  key={uses}
+                  aria-label={tr('Χρήσεις που έχουν γίνει')}
+                  onBlur={e => {
+                    const next = Math.max(0, Math.round(Number(e.target.value) || 0));
+                    if (next !== uses) onSetUses(next);
+                    else e.target.value = String(uses);
+                  }}
+                />
+              </span>
+            ) : (
+              <strong>{uses}</strong>
+            )}
+          </div>
+          <div>
+            <span>{tr('Όριο')}</span>
+            <strong>{tr('Χωρίς όριο')}</strong>
+          </div>
+        </div>
+      )}
       {maxUses !== undefined && (
         <>
           <div className="usage-config-limit usage-view-stats">
