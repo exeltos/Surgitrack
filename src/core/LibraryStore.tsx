@@ -1,3 +1,4 @@
+import {useHasModule} from '../data/cloud/modulesContext';
 import {emitBinDraft} from './binBridge';
 import {createContext, useContext, useEffect, useMemo, useState, type ReactNode} from 'react';
 import {getAdminRepository} from '../data/adminRepositories';
@@ -111,6 +112,7 @@ export function LibraryStoreProvider({
   cloud?: CloudWorkspace | null;
 }) {
   const repository = useMemo(() => getAdminRepository(dataMode), [dataMode]);
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const [state, setState] = useState<LibraryState>(() => {
     const initial = repository.getInitialData();
     const saved = cloud && libraryFromRecords(cloud.records);
@@ -167,7 +169,11 @@ export function LibraryStoreProvider({
   const withEquipment = (items: LibraryItem[]) =>
     items.map(item => {
       const own = equipment[item.el];
-      return own ? {...item, outOfService: own.outOfService ?? undefined, tests: own.tests ?? item.tests} : item;
+      const merged = own
+        ? {...item, outOfService: own.outOfService ?? undefined, tests: own.tests ?? item.tests}
+        : item;
+      // A hospital without the tests module has none: nothing blocks loading, nothing is pointed out.
+      return withTests ? merged : {...merged, tests: undefined};
     });
   const libraryRecord = useMemo(() => [{...state, id: 'state'}], [state]);
   // Settings another device saved (another admin, another screen) replace this screen's copy.

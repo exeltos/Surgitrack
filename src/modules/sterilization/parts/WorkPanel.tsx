@@ -1,3 +1,7 @@
+import {useHasModule} from '../../../data/cloud/modulesContext';
+import {statusLabel} from '../../../components/ui/statusLabel';
+import SortHeader from '../../../components/ui/SortHeader';
+import {useTableSort} from '../../../components/ui/useTableSort';
 import {loadLabel} from '../../../core/loadLabel';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
@@ -87,6 +91,13 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const [left, setLeft] = useState<Set<string>>(new Set());
   const keyOf = (x: {kind: string; id: string}) => `${x.kind}:${x.id}`;
   const pickedKeys = rows.map(keyOf).filter(key => !left.has(key));
+  const withTests = useHasModule('EQUIPMENT_TESTS');
+  const order = useTableSort(rows, {
+    name: x => x.name,
+    department: x => trData(x.department),
+    specialty: x => trData(x.specialty),
+    state: x => statusLabel(x.state),
+  });
   const toggleLeft = (key: string) =>
     setLeft(current => {
       const next = new Set(current);
@@ -274,8 +285,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           />
         </div>
       )}
-      {queue === 'PROCESS' && <SterilizerTests />}
-      {queue === 'WASHING' && <SterilizerTests equipment="washers" />}
+      {withTests && queue === 'PROCESS' && <SterilizerTests />}
+      {withTests && queue === 'WASHING' && <SterilizerTests equipment="washers" />}
       {queue === 'IN_STERILIZER' ? (
         <SterilizerLoads loads={s.runningLoads} onPrint={s.printLoadForm} onReport={s.printCycle} />
       ) : rows.length === 0 ? (
@@ -289,15 +300,28 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
       ) : (
         <>
           <div className="ster-list-head">
-            <span>{tr('Αντικείμενο')}</span>
-            <span>{tr('Τμήμα')}</span>
-            <span>{tr('Ειδικότητα')}</span>
-            <span>{queue === 'INCOMING' ? tr('Σύνθεση / κατάσταση') : tr('Κατάσταση')}</span>
+            <span>
+              <SortHeader label={tr('Αντικείμενο')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+            </span>
+            <span>
+              <SortHeader label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
+            </span>
+            <span>
+              <SortHeader label={tr('Ειδικότητα')} sortKey="specialty" sort={order.sort} onSort={order.toggle} />
+            </span>
+            <span>
+              <SortHeader
+                label={queue === 'INCOMING' ? tr('Σύνθεση / κατάσταση') : tr('Κατάσταση')}
+                sortKey="state"
+                sort={order.sort}
+                onSort={order.toggle}
+              />
+            </span>
             <span>{tr('Στάδιο')}</span>
             <span>{tr('Ενέργειες')}</span>
           </div>
           <div className="ster-list-scroll">
-            {rows.map(x => {
+            {order.rows.map(x => {
               const assetIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(x.barcode));
               const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
               const again = showsReprocess

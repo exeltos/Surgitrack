@@ -1,3 +1,5 @@
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {
@@ -54,7 +56,7 @@ import {DeviceEditor, FileDialog, KeyDialog, SerialDialog} from './DeviceDialogs
 import EquipmentDetails, {type EquipmentRow} from './EquipmentDetails';
 import {binEntryForDevice} from '../../core/recycleBin';
 import {messageOf} from './deviceUi';
-import {formatDateTime} from '../../core/displayDate';
+import {formatDateTime, parseDisplayDate} from '../../core/displayDate';
 import {phaseText} from '../sterilization/parts/cycleLabels';
 import {liveOf, useNow} from '../sterilization/parts/simulationClock';
 
@@ -76,6 +78,7 @@ export default function EquipmentPage() {
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const withDevices = useHasModule('DEVICES');
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const devicesEnabled = withDevices && !!organizationId;
   const isAdmin = role === 'ADMIN';
   const canRecord = can('sterilization.workspace');
@@ -220,12 +223,32 @@ export default function EquipmentPage() {
   // Missing tests are pointed out only where the hospital records tests at all; a failed one always is.
   const testsUsed = {STERILIZER: testsInUse(sterilizers), WASHER: testsInUse(washers)};
   const testStateOf = (row: EquipmentRow) =>
-    (row.kind === 'STERILIZER' || row.kind === 'WASHER') && row.libraryId && (testsUsed[row.kind] || row.tests?.length)
+    withTests &&
+    (row.kind === 'STERILIZER' || row.kind === 'WASHER') &&
+    row.libraryId &&
+    (testsUsed[row.kind] || row.tests?.length)
       ? testsState(row.tests, Date.now(), row.kind)
       : undefined;
   const attention = rows.filter(
     r => !r.outOfService && (r.trouble?.attention || (testStateOf(r) && testStateOf(r) !== 'OK')),
   ).length;
+  // The table sorts by its column titles (the live readings and progress change by the second: not sorted).
+  const order = useTableSort(rows, {
+    name: r => r.name,
+    state: r => (r.load ? 1 : r.outOfService ? 2 : r.device && !r.device.active ? 3 : 0),
+    cycle: r => r.load?.cycleNumber,
+    items: r => r.load?.items.length,
+    connection: r => (r.device ? connectionShort[r.device.connection].el : undefined),
+    tests: r => ({FAILED: 0, DUE: 1, OK: 2})[testStateOf(r) ?? 'OK'],
+    failures: r => r.trouble?.recent,
+    last: r => {
+      const reading = r.device ? lastReading(r.device.id) : undefined;
+      return (
+        Date.parse(reading?.startedAt || reading?.createdAt || '') ||
+        parseDisplayDate(r.lastLoad?.completedAt || r.lastLoad?.createdAt)?.getTime()
+      );
+    },
+  });
   const recordTest = async (
     row: EquipmentRow,
     kind: EquipmentTest['kind'],
@@ -419,23 +442,42 @@ export default function EquipmentPage() {
           <table className="sterilizer-rows equipment-rows">
             <thead>
               <tr>
-                <th>{L('Εξοπλισμός', 'Equipment')}</th>
-                <th>{L('Κατάσταση', 'State')}</th>
-                <th>{L('Κύκλος', 'Cycle')}</th>
+                <SortTh label={L('Εξοπλισμός', 'Equipment')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={L('Κατάσταση', 'State')} sortKey="state" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={L('Κύκλος', 'Cycle')} sortKey="cycle" sort={order.sort} onSort={order.toggle} />
                 <th>{L('Ενδείξεις', 'Readings')}</th>
                 <th>{L('Πρόοδος', 'Progress')}</th>
-                <th>{L('Αντικείμενα', 'Items')}</th>
-                {devicesEnabled && <th>{L('Σύνδεση', 'Connection')}</th>}
-                <th>{L('Δοκιμές', 'Tests')}</th>
-                <th>{L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}</th>
-                <th>{L('Τελευταίος κύκλος', 'Last cycle')}</th>
+                <SortTh label={L('Αντικείμενα', 'Items')} sortKey="items" sort={order.sort} onSort={order.toggle} />
+                {devicesEnabled && (
+                  <SortTh
+                    label={L('Σύνδεση', 'Connection')}
+                    sortKey="connection"
+                    sort={order.sort}
+                    onSort={order.toggle}
+                  />
+                )}
+                {withTests && (
+                  <SortTh label={L('Δοκιμές', 'Tests')} sortKey="tests" sort={order.sort} onSort={order.toggle} />
+                )}
+                <SortTh
+                  label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}
+                  sortKey="failures"
+                  sort={order.sort}
+                  onSort={order.toggle}
+                />
+                <SortTh
+                  label={L('Τελευταίος κύκλος', 'Last cycle')}
+                  sortKey="last"
+                  sort={order.sort}
+                  onSort={order.toggle}
+                />
                 <th>
                   <span className="sr-only">{L('Ενέργειες', 'Actions')}</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {rows.map(row => {
+              {order.rows.map(row => {
                 const {device} = row;
                 const live = row.load ? liveOf(row.load, now) : undefined;
                 const last = device ? lastReading(device.id) : undefined;
@@ -553,19 +595,21 @@ export default function EquipmentPage() {
                         )}
                       </td>
                     )}
-                    <td data-label={L('Δοκιμές', 'Tests')}>
-                      {testStateOf(row) === 'FAILED' ? (
-                        <span className="row-test bad">{L('Απέτυχε', 'Failed')}</span>
-                      ) : testStateOf(row) === 'DUE' ? (
-                        <span className="row-test due">{L('Εκκρεμεί', 'Due')}</span>
-                      ) : testStateOf(row) === 'OK' ? (
-                        <span className="row-test ok">{L('Εντάξει', 'Up to date')}</span>
-                      ) : (
-                        '—'
-                      )}
-                    </td>
+                    {withTests && (
+                      <td data-label={L('Δοκιμές', 'Tests')}>
+                        {testStateOf(row) === 'FAILED' ? (
+                          <span className="row-test bad">{L('Απέτυχε', 'Failed')}</span>
+                        ) : testStateOf(row) === 'DUE' ? (
+                          <span className="row-test due">{L('Εκκρεμεί', 'Due')}</span>
+                        ) : testStateOf(row) === 'OK' ? (
+                          <span className="row-test ok">{L('Εντάξει', 'Up to date')}</span>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    )}
                     <td data-label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')} className="num">
-                      {row.kind !== 'STERILIZER' ? (
+                      {row.kind !== 'STERILIZER' && row.kind !== 'WASHER' ? (
                         '—'
                       ) : row.trouble?.recent ? (
                         <span className={`row-trouble${row.trouble.attention ? ' attention' : ''}`}>

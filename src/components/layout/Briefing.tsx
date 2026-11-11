@@ -7,6 +7,7 @@ import {formatDate} from '../../core/displayDate';
 import {sterileExpiryList, expiryAlerts} from '../../core/sterileExpiry';
 import {belowMinimum, minimumRows} from '../../core/stockMinimums';
 import {useLibraries} from '../../core/LibraryStore';
+import {equipmentBriefing} from '../../core/equipmentHealth';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {markBriefingSeen as markSeen} from './briefingDue';
@@ -31,7 +32,7 @@ export default function Briefing({
   onClose: () => void;
 }) {
   const {role, currentUser, sets, tools, retiredTools, issues, processLoads, purchaseOrders} = useSurgi();
-  const {systemSettings} = useLibraries();
+  const {systemSettings, sterilizers, washers} = useLibraries();
   // The minimum stock alert is a module the platform owner gives a hospital.
   const withMinimums = useHasModule('STOCK_MINIMUMS');
   const items: BriefingItem[] = useMemo(
@@ -46,6 +47,7 @@ export default function Briefing({
         expiry: expiryAlerts(sterileExpiryList(sets, tools)),
         outOfUse: retiredTools.filter(t => !t.retiredNoticeSeenAt).length,
         accessRequests,
+        equipment: equipmentBriefing(sterilizers, washers, processLoads),
         belowMinimum: withMinimums
           ? belowMinimum(minimumRows([...tools, ...retiredTools], purchaseOrders, systemSettings.stockMinimums)).length
           : 0,
@@ -61,6 +63,8 @@ export default function Briefing({
       processLoads,
       purchaseOrders,
       systemSettings,
+      sterilizers,
+      washers,
       withMinimums,
       accessRequests,
       screens,

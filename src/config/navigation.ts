@@ -21,6 +21,7 @@ import {
   Megaphone,
   MessageSquareHeart,
   Bug,
+  ShieldAlert,
   BookOpen,
   UserCog,
   Settings2,
@@ -185,6 +186,7 @@ export const ownerNavigation: NavigationItem[] = [
     group: 'CONTACT',
   },
   {to: '/studio?tab=errors', label: 'Σφάλματα', icon: Bug, permission: 'studio.manage', group: 'CONTACT'},
+  {to: '/studio?tab=security', label: 'Ασφάλεια', icon: ShieldAlert, permission: 'studio.manage', group: 'CONTACT'},
   {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'TEMPLATE'},
   {
     to: '/studio?tab=workflow',

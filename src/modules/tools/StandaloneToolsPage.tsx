@@ -13,6 +13,8 @@ import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
@@ -82,7 +84,17 @@ export default function StandaloneToolsPage() {
   );
   const filterKey = [q, department, specialty, manufacturer, state, limit, usage, grouped].join('|');
   const groupKey = (t: Tool) => toolKind(t);
-  const groups = useMemo(() => groupTools(filtered), [filtered]);
+  const order = useTableSort(filtered, {
+    name: t => t.name,
+    barcode: t => t.barcode,
+    specialty: t => trData(t.specialty),
+    department: t => trData(t.department),
+    uses: t => (t.maxUses ? t.uses : undefined),
+    state: t => statusLabel(t.state),
+    expiry: t =>
+      t.sterileUntil && (STERILE_STATES as readonly string[]).includes(t.state) ? t.sterileUntil : undefined,
+  });
+  const groups = useMemo(() => groupTools(order.rows), [order.rows]);
   // Groups opened in place to show their pieces.
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
   const toggleGroup = (key: string) =>
@@ -92,9 +104,10 @@ export default function StandaloneToolsPage() {
       else next.add(key);
       return next;
     });
-  useBrowseList('/tools', filtered);
-  const rows = useProgressiveList(filtered, filterKey);
-  const groupRows = useProgressiveList(groups, filterKey, 'shownGroups');
+  useBrowseList('/tools', order.rows);
+  const sortKey = `${filterKey}|${order.sort?.key}:${order.sort?.dir}`;
+  const rows = useProgressiveList(order.rows, sortKey);
+  const groupRows = useProgressiveList(groups, sortKey, 'shownGroups');
   // The expiry date while the instrument is sterile, coloured when it is near or past.
   const expiryOf = (t: Tool) =>
     t.sterileUntil && (STERILE_STATES as readonly string[]).includes(t.state)
@@ -301,13 +314,13 @@ export default function StandaloneToolsPage() {
           <table className="asset-registry-table registry-fixed sets-registry standalone-registry">
             <thead>
               <tr>
-                <th>{tr('Ονομασία')}</th>
-                <th>Barcode</th>
-                <th>{tr('Ειδικότητα')}</th>
-                <th>{tr('Τμήμα')}</th>
-                <th>{tr('Χρήσεις')}</th>
-                <th>{tr('Κατάσταση')}</th>
-                <th>{tr('Λήξη')}</th>
+                <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label="Barcode" sortKey="barcode" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Ειδικότητα')} sortKey="specialty" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Χρήσεις')} sortKey="uses" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Κατάσταση')} sortKey="state" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Λήξη')} sortKey="expiry" sort={order.sort} onSort={order.toggle} />
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                 </th>

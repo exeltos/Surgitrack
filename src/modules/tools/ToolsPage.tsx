@@ -13,6 +13,8 @@ import {useLibraries} from '../../core/LibraryStore';
 import {kpiFilters} from '../../core/kpiFilters';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
@@ -69,8 +71,21 @@ export default function ToolsPage() {
     [...new Set(tools.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
   const filterKey = [q, department, specialty, manufacturer, state, mode, limit, usage].join('|');
-  useBrowseList('/tools', filtered);
-  const rows = useProgressiveList(filtered, filterKey);
+  const order = useTableSort(filtered, {
+    name: t => t.name,
+    barcode: t => t.barcode,
+    specialty: t => trData(t.specialty),
+    place: t =>
+      t.mode === 'SET_MEMBER' && t.setId
+        ? setsById.get(t.setId)?.name
+        : t.mode === 'STOCK'
+          ? tr('Απόθεμα')
+          : tr('Μεμονωμένο'),
+    uses: t => (t.maxUses ? t.uses : undefined),
+    state: t => statusLabel(t.state),
+  });
+  useBrowseList('/tools', order.rows);
+  const rows = useProgressiveList(order.rows, `${filterKey}|${order.sort?.key}:${order.sort?.dir}`);
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -225,12 +240,12 @@ export default function ToolsPage() {
           <table className="asset-registry-table registry-fixed tools-registry">
             <thead>
               <tr>
-                <th>{tr('Ονομασία')}</th>
-                <th>Barcode</th>
-                <th>{tr('Ειδικότητα')}</th>
-                <th>{tr('Θέση')}</th>
-                <th>{tr('Χρήσεις')}</th>
-                <th>{tr('Κατάσταση')}</th>
+                <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label="Barcode" sortKey="barcode" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Ειδικότητα')} sortKey="specialty" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Θέση')} sortKey="place" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Χρήσεις')} sortKey="uses" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Κατάσταση')} sortKey="state" sort={order.sort} onSort={order.toggle} />
                 <th>
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                 </th>

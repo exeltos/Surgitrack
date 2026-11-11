@@ -1,3 +1,5 @@
+import {SortTh} from '../../../components/ui/SortHeader';
+import {useTableSort} from '../../../components/ui/useTableSort';
 import {useState} from 'react';
 import {
   CheckCircle2,
@@ -46,6 +48,12 @@ export default function SterilizerLoads({
   const [openId, setOpenId] = useState('');
   // A simulated cycle still running: the clock re-renders the rows (and the buttons when it ends).
   const now = useNow(loads.some(load => !!load.simulation));
+  const order = useTableSort(loads, {
+    equipment: load => load.equipment,
+    program: load => load.program,
+    status: load => load.status,
+    items: load => load.items.length,
+  });
   if (!loads.length && !onFinish)
     return (
       <div className="empty ster-empty">
@@ -62,20 +70,20 @@ export default function SterilizerLoads({
       <table className="sterilizer-rows">
         <thead>
           <tr>
-            <th>{tr('Κλίβανος')}</th>
-            <th>{tr('Πρόγραμμα')}</th>
-            <th>{tr('Κατάσταση')}</th>
+            <SortTh label={tr('Κλίβανος')} sortKey="equipment" sort={order.sort} onSort={order.toggle} />
+            <SortTh label={tr('Πρόγραμμα')} sortKey="program" sort={order.sort} onSort={order.toggle} />
+            <SortTh label={tr('Κατάσταση')} sortKey="status" sort={order.sort} onSort={order.toggle} />
             <th>{tr('Θερμοκρασία')}</th>
             <th>{tr('Πίεση')}</th>
             <th>{tr('Πρόοδος')}</th>
-            <th>{tr('Αντικείμενα')}</th>
+            <SortTh label={tr('Αντικείμενα')} sortKey="items" sort={order.sort} onSort={order.toggle} />
             <th>
               <span className="sr-only">{tr('Ενέργειες')}</span>
             </th>
           </tr>
         </thead>
         <tbody>
-          {loads.map(load => {
+          {order.rows.map(load => {
             const live = liveOf(load, now);
             const running = simulationRunning(load, now);
             return (

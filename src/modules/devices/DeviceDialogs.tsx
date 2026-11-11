@@ -1,3 +1,4 @@
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {Cable, Copy, KeyRound, Upload, X} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
@@ -69,6 +70,7 @@ export function DeviceEditor({
   const {sterilizers, washers} = useLibraries();
   const named = value.kind === 'STERILIZER' ? sterilizers : value.kind === 'WASHER' ? washers : null;
   const washer = value.kind === 'WASHER';
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   return (
     <Modal
       title={isNew ? L('Νέα συσκευή', 'New device') : L('Επεξεργασία συσκευής', 'Edit device')}
@@ -123,7 +125,7 @@ export function DeviceEditor({
         <label>
           {L('Τύπος', 'Type')}
           <select value={value.kind} onChange={e => set('kind', e.target.value as DeviceKind)}>
-            {KINDS.map(k => (
+            {KINDS.filter(k => k !== 'TEST' || withTests || value.kind === 'TEST').map(k => (
               <option key={k} value={k}>
                 {L(deviceKindLabel[k].el, deviceKindLabel[k].en)}
               </option>

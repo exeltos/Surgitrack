@@ -14,6 +14,7 @@ import {
   Megaphone,
   MessageSquareHeart,
   Settings2,
+  ShieldAlert,
   UserCog,
   Users,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ export type Tab =
   | 'ROLES'
   | 'SYSTEM'
   | 'ERRORS'
+  | 'SECURITY'
   | 'NOTICES'
   | 'RATINGS';
 
@@ -158,6 +160,7 @@ export const STUDIO_TABS: StudioTabDef[] = [
   {id: 'RATINGS', el: 'Αξιολογήσεις', en: 'Ratings', icon: MessageSquareHeart, group: 'PLATFORM'},
   {id: 'NOTICES', el: 'Ειδοποιήσεις', en: 'Notices', icon: Megaphone, group: 'PLATFORM'},
   {id: 'ERRORS', el: 'Σφάλματα', en: 'Errors', icon: Bug, group: 'PLATFORM'},
+  {id: 'SECURITY', el: 'Ασφάλεια', en: 'Security', icon: ShieldAlert, group: 'PLATFORM'},
   {id: 'LIBRARIES', el: 'Βιβλιοθήκες', en: 'Libraries', icon: BookOpen, group: 'SETUP'},
   {id: 'WORKFLOW', el: 'Ροή Αποστείρωσης', en: 'Sterilization Flow', icon: Layers3, group: 'SETUP'},
   {id: 'ROLES', el: 'Ρόλοι & δικαιώματα', en: 'Roles & permissions', icon: UserCog, group: 'SETUP'},

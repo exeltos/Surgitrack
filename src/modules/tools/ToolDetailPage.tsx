@@ -25,8 +25,8 @@ import AssetEmptyState from '../../components/assets/AssetEmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import BarcodeLabelPreview from '../../components/assets/BarcodeLabelPreview';
 import AppButton from '../../components/ui/AppButton';
-import UndoMovementButton from '../../components/assets/UndoMovementButton';
-import StageReturnButton from '../../components/assets/StageReturnButton';
+import {useUndoMovement} from '../../components/assets/UndoMovementButton';
+import {useStageReturn} from '../../components/assets/StageReturnButton';
 import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -71,6 +71,9 @@ export default function ToolDetailPage() {
   const [searchParams] = useSearchParams();
   const scannedOldBarcode = searchParams.get('replaced');
   const tool = tools.find(item => item.id === id);
+  // «Αναίρεση» and «Επιστροφή…» are items of the «Ενέργειες» menu, for who may use them.
+  const undo = useUndoMovement('TOOL', id ?? '');
+  const stageBack = useStageReturn('TOOL', id ?? '');
   const [tab, setTab] = useRememberedState<AssetTab>('tab', 'HISTORY');
   const [photosOpen, setPhotosOpen] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -239,10 +242,12 @@ export default function ToolDetailPage() {
                     },
                   ]
                 : []),
+              ...(undo.item ? [undo.item] : []),
+              ...(stageBack.item ? [stageBack.item] : []),
             ]}
           />
-          <UndoMovementButton kind="TOOL" id={tool.id} />
-          <StageReturnButton kind="TOOL" id={tool.id} />
+          {undo.node}
+          {stageBack.node}
           {can('department.dispatch') && tool.state === 'IN_DEPARTMENT' && (
             <AppButton variant="primary" icon={<Send size={18} />} onClick={() => setDispatchOpen(true)}>
               {tr('Προς Αποστείρωση')}

@@ -1,3 +1,5 @@
+import SortHeader from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useState} from 'react';
 import {ChevronRight, Clock3, Route, UserRound} from 'lucide-react';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
@@ -35,7 +37,14 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
       return (!dateFrom || !d || d >= dateFrom) && (!dateTo || !d || d <= dateTo);
     })
     .sort((a, b) => time(b.at) - time(a.at));
-  const rows = useProgressiveList(filtered, [needle, dateFrom, dateTo].join('|'));
+  const order = useTableSort(filtered, {
+    at: m => parseDisplayDate(m.at)?.getTime(),
+    asset: m => m.asset,
+    department: m => trData(m.from),
+    code: m => m.patientCode,
+    by: m => trData(m.by),
+  });
+  const rows = useProgressiveList(order.rows, [needle, dateFrom, dateTo, order.sort?.key, order.sort?.dir].join('|'));
   const table = (): ExportTable => ({
     title: tr('Καταγραφές με κωδικό ασθενούς'),
     subtitle: [
@@ -104,11 +113,21 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
           </small>
         </div>
         <div className="ledger-columns">
-          <span>{tr('Ημερομηνία / ώρα')}</span>
-          <span>{tr('Σετ / Εργαλείο')}</span>
-          <span>{tr('Τμήμα')}</span>
-          <span>{tr('Κωδικός ασθενούς')}</span>
-          <span>{tr('Χρήστης')}</span>
+          <span>
+            <SortHeader label={tr('Ημερομηνία / ώρα')} sortKey="at" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Σετ / Εργαλείο')} sortKey="asset" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Κωδικός ασθενούς')} sortKey="code" sort={order.sort} onSort={order.toggle} />
+          </span>
+          <span>
+            <SortHeader label={tr('Χρήστης')} sortKey="by" sort={order.sort} onSort={order.toggle} />
+          </span>
           <span></span>
         </div>
         <div className="ledger-scroll">

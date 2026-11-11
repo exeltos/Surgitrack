@@ -96,6 +96,7 @@ const navEN: Record<string, string> = {
   Ειδοποιήσεις: 'Notices',
   Αξιολογήσεις: 'Ratings',
   Σφάλματα: 'Errors',
+  Ασφάλεια: 'Security',
   Βιβλιοθήκες: 'Libraries',
   'Ροή Αποστείρωσης': 'Sterilization Flow',
   'Ρόλοι & δικαιώματα': 'Roles & permissions',

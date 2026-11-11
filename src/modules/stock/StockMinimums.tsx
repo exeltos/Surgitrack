@@ -1,3 +1,5 @@
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {CheckCircle2, Info, Plus, ShoppingCart, TriangleAlert} from 'lucide-react';
@@ -48,6 +50,13 @@ export default function StockMinimums() {
     const listed = new Set(rows.map(r => r.key));
     return toolKinds([...tools, ...retiredTools]).filter(k => !listed.has(kindKey(k)));
   }, [tools, retiredTools, rows]);
+  const order = useTableSort(rows, {
+    name: r => r.name,
+    stock: r => r.stock,
+    min: r => r.min,
+    onOrder: r => r.onOrder,
+    status: r => tr(STATUS[r.status].label),
+  });
   const anyMinimum = rows.some(r => r.min > 0);
   const low = belowMinimum(rows);
   const toOrder = rows.filter(r => r.missing > 0);
@@ -130,18 +139,18 @@ export default function StockMinimums() {
           <table className="asset-registry-table stock-min-table">
             <thead>
               <tr>
-                <th>{tr('Είδος')}</th>
-                <th>{tr('Στο Απόθεμα')}</th>
-                <th>{tr('Ελάχιστο')}</th>
-                <th>{tr('Σε παραγγελία')}</th>
-                <th>{tr('Κατάσταση')}</th>
+                <SortTh label={tr('Είδος')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Στο Απόθεμα')} sortKey="stock" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Ελάχιστο')} sortKey="min" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Σε παραγγελία')} sortKey="onOrder" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Κατάσταση')} sortKey="status" sort={order.sort} onSort={order.toggle} />
                 <th>
                   <span className="visually-hidden">{tr('Ενέργειες')}</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {rows.map(r => (
+              {order.rows.map(r => (
                 <tr key={r.key}>
                   <td>
                     <strong>{r.name}</strong>

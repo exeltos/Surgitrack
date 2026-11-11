@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   org: {name: 'Test Hospital', is_demo: false, evaluation: false, plan: 'STANDARD', trial_ends_at: null},
   dataMode: 'PRODUCTION',
   ip: null as unknown,
+  presence: {allowed: true} as unknown,
 }));
 
 vi.mock('../../../lib/supabase', () => {
@@ -18,7 +19,7 @@ vi.mock('../../../lib/supabase', () => {
   return {
     supabase: {
       auth: {onAuthStateChange: () => undefined},
-      rpc: () => result(mocks.ip),
+      rpc: (name: string) => result(name === 'touch_presence' ? mocks.presence : mocks.ip),
       from: (table: string) => ({
         select: () => ({
           eq: () => ({
@@ -33,6 +34,7 @@ vi.mock('../../../lib/supabase', () => {
 vi.mock('../identity', () => ({
   resolveIdentity: async () => ({status: 'ok', identity: {id: 'u1', platform: false}}),
   productionOrganizationFor: () => 'org-1',
+  getRealIdentity: () => ({id: 'u1'}),
 }));
 vi.mock('../appRecords', async importOriginal => ({
   ...(await importOriginal<typeof import('../appRecords')>()),
@@ -186,6 +188,15 @@ describe('a hospital that lets people in only from its own network', () => {
     expect(screen.queryByTestId('app')).not.toBeInTheDocument();
     expect(mocks.loadAppRecords).not.toHaveBeenCalled();
     mocks.ip = null;
+  });
+  it('turns away an address the platform owner blocked, from the app’s next minute', async () => {
+    mocks.loadAppRecords.mockResolvedValue(serverRecords());
+    mocks.readCache.mockResolvedValue({});
+    mocks.presence = {allowed: false, ip: '203.0.113.5'};
+    open();
+    expect(await screen.findByText('203.0.113.5')).toBeInTheDocument();
+    expect(screen.queryByTestId('app')).not.toBeInTheDocument();
+    mocks.presence = {allowed: true};
   });
   it('lets everyone in when it only records, and when the answer cannot be had', async () => {
     mocks.loadAppRecords.mockResolvedValue(serverRecords());

@@ -1,3 +1,4 @@
+import {useHasModule} from '../../../data/cloud/modulesContext';
 import {loadLabel} from '../../../core/loadLabel';
 import {Activity, Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
@@ -5,6 +6,7 @@ import type {SterilizationPageState} from '../useSterilizationPage';
 import ReleaseTests from './ReleaseTests';
 
 export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const {
     closeLoadRelease,
     awaitingLoads,
@@ -130,7 +132,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                           : tr('Αρκεί ένας από τους δύο δείκτες: συμπλήρωσε τουλάχιστον έναν ως επιτυχή.')}
                 </p>
               </section>
-              <ReleaseTests equipment={selectedReleaseLoad.equipment} />
+              {withTests && <ReleaseTests equipment={selectedReleaseLoad.equipment} />}
               <div className="load-manifest">
                 <strong>{tr('Περιεχόμενο φορτίου')}</strong>
                 {selectedReleaseLoad.items.map(item => (

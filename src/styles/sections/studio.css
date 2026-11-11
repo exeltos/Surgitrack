@@ -1157,6 +1157,111 @@ html body .studio-errors-empty {
   background: var(--c-white);
   color: var(--st-muted);
 }
+/* Studio → Security (platform owner): who is connected, and the blocked addresses */
+html body .studio-security-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-security-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+html body .studio-security-table :is(th, td) {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--st-line);
+  text-align: left;
+  vertical-align: top;
+}
+html body .studio-security-table td small {
+  display: block;
+  color: var(--st-muted);
+}
+html body .studio-security-table tr.blocked {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+}
+html body .studio-security-me {
+  align-self: center;
+  color: var(--st-muted);
+}
+html body .studio-security-flag {
+  color: var(--st-red);
+}
+html body .studio-security-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+html body .studio-security-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+}
+html body .studio-security-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+html body .studio-security-title h3 {
+  margin: 0;
+  margin-right: auto;
+}
+html body .studio-security-title small {
+  color: var(--st-muted);
+}
+html body .studio-security-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--st-line);
+  border-radius: 12px;
+  color: var(--st-muted);
+}
+html body .studio-security-field {
+  display: flex;
+  flex: 1 1 220px;
+  align-items: center;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .studio-security-field:focus-within {
+  border-color: var(--c-cyan-55-2);
+  box-shadow: 0 0 0 3px rgba(24, 59, 86, 0.07);
+}
+/* One frame only, the field's: the input inside has none (as on the sign-in page). */
+html body .studio-security-field > input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+html body .studio-security-blocked > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+html body .studio-security-blocked small {
+  display: block;
+  color: var(--st-muted);
+}
 html body .studio-errors-list {
   display: grid;
   gap: 8px;
@@ -2130,4 +2235,40 @@ html body .notice-preview .maintenance-strip {
 html body .studio-body-notices {
   min-height: 0;
   overflow-y: auto;
+}
+
+/* Studio → Sterilization flow: which features the hospital has (its modules). */
+html body .studio-flow-modules-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-flow-modules-list > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--st-line);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body .studio-flow-modules-list small {
+  grid-column: 1;
+  color: var(--st-muted);
+}
+html body .studio-flow-modules-list em {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--st-green, #2f7d57);
+}
+html body .studio-flow-modules-list > li.off {
+  opacity: 0.65;
+}
+html body .studio-flow-modules-list > li.off em {
+  color: var(--st-muted);
 }

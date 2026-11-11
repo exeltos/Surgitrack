@@ -7,7 +7,7 @@ const GROUPS = [
   {id: 'SETUP', el: 'Διαμόρφωση', en: 'Set-up'},
 ] as const;
 /** The platform tabs that exist only with the real hospitals (not in Demo). */
-const PRODUCTION_ONLY: Tab[] = ['IMPORT', 'RATINGS', 'NOTICES', 'ERRORS'];
+const PRODUCTION_ONLY: Tab[] = ['IMPORT', 'RATINGS', 'NOTICES', 'ERRORS', 'SECURITY'];
 
 export default function StudioTabs({s}: {s: StudioPageState}) {
   const {L, libs, platformAdmin, selectTab, tab} = s;

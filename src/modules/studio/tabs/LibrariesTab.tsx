@@ -1,3 +1,4 @@
+import {useHasModule} from '../../../data/cloud/modulesContext';
 import {useState} from 'react';
 import {Plus, Search, Trash2, Pencil, Palette, ListPlus, ClipboardCheck} from 'lucide-react';
 import {countDepartments} from '../../../core/surgicalCount';
@@ -29,6 +30,8 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
     tapesOpen,
   } = s;
   const withCodes = filteredItems.some(item => item.code);
+  // The count at the operating theatre is a module of the hospital.
+  const withCount = useHasModule('SURGICAL_COUNT');
   const [batchOpen, setBatchOpen] = useState(false);
   // Departments that count the instruments when sending to Sterilization (operating theatres).
   const counting = countDepartments(
@@ -135,7 +138,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                     <span>{item.en}</span>
                     <code>{withCodes ? item.code || '—' : ''}</code>
                     <div>
-                      {libraryKey === 'departments' && (
+                      {libraryKey === 'departments' && withCount && (
                         <button
                           type="button"
                           className={`studio-count-toggle ${counting.includes(item.el) ? 'on' : ''}`}
