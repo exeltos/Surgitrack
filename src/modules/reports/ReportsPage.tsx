@@ -415,7 +415,7 @@ export default function ReportsPage() {
             </div>
           </header>
           <div className="reports-filter-strip">
-            <FilterMenu filters={reportFilters} />
+            <FilterMenu filters={reportFilters} align="left" />
           </div>
           <div className="reports-overview">
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
