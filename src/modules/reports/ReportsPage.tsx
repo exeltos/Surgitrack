@@ -420,10 +420,10 @@ export default function ReportsPage() {
               <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
             </div>
           </header>
-          <div className="reports-filter-strip">
-            <FilterMenu filters={reportFilters} align="left" />
-          </div>
           <div className="reports-overview">
+            <div className="reports-filter-strip">
+              <FilterMenu filters={reportFilters} align="left" />
+            </div>
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
               {summary.map(chip => (
                 <li key={chip.label}>

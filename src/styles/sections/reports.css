@@ -311,3 +311,87 @@ html body .reports-result-body {
 html body .reports-filter-strip {
   border-bottom: 0;
 }
+
+/* Reports, a lower top: the page title alone, the report choices on one compact line, the report's title and the
+   download on one line, the filters beside the totals. The list gets the height this frees. */
+html body .reports-page-head p,
+html body .reports-page-head .eyebrow {
+  display: none;
+}
+html body .reports-page-head {
+  margin-bottom: 2px;
+}
+html body .reports-page-head h1 {
+  font-size: 22px;
+}
+html body .reports-catalog-list {
+  gap: 6px 12px;
+  padding: 0 0 4px;
+}
+html body .reports-catalog-group {
+  gap: 4px;
+}
+html body .reports-catalog-group h3 {
+  margin-right: 2px;
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+}
+html body .reports-catalog-item {
+  grid-template-columns: 22px auto;
+  gap: 6px;
+  padding: 3px 9px 3px 4px;
+  box-shadow: none;
+}
+html body .reports-catalog-icon {
+  width: 22px;
+  height: 22px;
+}
+html body .reports-catalog-icon svg {
+  width: 13px;
+  height: 13px;
+}
+html body .reports-catalog-item strong {
+  font-size: 12px;
+}
+html body .reports-stage-head {
+  padding: 8px 16px 4px;
+  gap: 12px;
+}
+html body .reports-stage-head .eyebrow {
+  display: none;
+}
+html body .reports-stage-head h2 {
+  display: inline;
+  margin: 0 10px 0 0;
+  font-size: 17px;
+}
+html body .reports-stage-head p {
+  display: inline;
+  margin: 0;
+  font-size: 12px;
+}
+html body .reports-overview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 4px 16px 6px;
+}
+html body .reports-overview .reports-filter-strip {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+}
+html body .reports-overview .reports-summary {
+  flex: 1 1 auto;
+  margin: 0;
+}
+html body .reports-overview .reports-split {
+  flex: 1 0 100%;
+}
+html body .reports-summary button {
+  padding: 3px 10px;
+}
+html body .reports-summary button b {
+  font-size: 0.95rem;
+}
