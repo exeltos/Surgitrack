@@ -2331,3 +2331,37 @@ html body .studio-system-grid > section > label > :is(.studio-setting-input, .st
 html body .studio-system-grid > section > label:not(:has(> small)) > :is(.studio-setting-input, .studio-static-field) {
   grid-row: 1;
 }
+
+/* Settings by category: tabs over the rows, one category on screen at a time (as in Reports). */
+html body .settings-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 900px;
+  margin: 0 0 12px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .settings-category {
+  margin-bottom: -1px;
+  padding: 8px 16px 9px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+html body .settings-category:hover {
+  color: var(--c-cyan-20-3);
+}
+html body .settings-category.active {
+  border-bottom-color: var(--c-cyan-45);
+  color: var(--c-cyan-20-3);
+}
+html body .settings-category:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
