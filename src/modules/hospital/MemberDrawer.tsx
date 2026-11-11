@@ -1,10 +1,11 @@
 import {useState} from 'react';
-import {Copy, KeyRound, Mail, Save, Send, Trash2, UserCheck, X} from 'lucide-react';
+import {Copy, KeyRound, Mail, Phone, Save, Send, Trash2, UserCheck, X} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {localizedName} from '../../core/glossary';
 import {assignableRoles, wholeHospital, roleValue, EMAIL_FORMAT} from './hospitalPeopleMeta';
 import type {Department, Member, Draft} from './hospitalPeopleMeta';
 import LinkCopy from './LinkCopy';
+import {phonePassword} from './staffImportFile';
 import {formatDateTime} from '../../core/displayDate';
 
 export default function MemberDrawer({
@@ -23,6 +24,7 @@ export default function MemberDrawer({
   onResend,
   onInviteLink,
   onPasswordReset,
+  onResetInitial,
   onMakeLink,
   onDelete,
 }: {
@@ -46,6 +48,8 @@ export default function MemberDrawer({
   onInviteLink?: (draft: Draft) => void;
   /** Emails the user a link to set a new password; left out in Demo. */
   onPasswordReset?: (member: Member) => void;
+  /** Sets the account back to a first password: the mobile number typed (kept nowhere). */
+  onResetInitial?: (member: Member, phone: string) => void;
   /** Makes the same kind of link without sending it, to pass on by hand; left out in Demo. */
   onMakeLink?: (member: Member) => Promise<string | undefined>;
   onDelete: () => void;
@@ -60,6 +64,8 @@ export default function MemberDrawer({
     demoEnabled: member?.demo_enabled ?? false,
   }));
   const set = (patch: Partial<Draft>) => setDraft(d => ({...d, ...patch}));
+  // The mobile number typed for a reset to a first password; it is never stored.
+  const [phone, setPhone] = useState('');
   // A new user is invited to the signup form and fills in their own name (the department is offered).
   const signupInvite = !member && !demo;
   const valid =
@@ -200,6 +206,38 @@ export default function MemberDrawer({
                 {L('Αποστολή συνδέσμου αλλαγής κωδικού', 'Send password reset link')}
               </AppButton>
               {onMakeLink && <LinkCopy member={member} make={onMakeLink} busy={busy || !member.active} L={L} />}
+            </div>
+          )}
+          {member && !invited && !self && onResetInitial && (
+            <div className="people-password">
+              <Phone size={17} />
+              <span>
+                <b>{L('Αρχικός κωδικός από κινητό', 'First password from a mobile number')}</b>
+                <small>
+                  {L(
+                    'Για όποιον δεν μπορεί να συνδεθεί με τον αρχικό του κωδικό (λάθος ή άλλο κινητό): γράψτε το σωστό κινητό και ο κωδικός του γίνεται αυτό. Στην επόμενη σύνδεση ορίζει δικό του (μέσα σε 7 ημέρες). Ο αριθμός δεν αποθηκεύεται.',
+                    'For someone who cannot sign in with their first password (a wrong or a different mobile number): type the right one and their password becomes that. At the next sign-in they choose their own (within 7 days). The number is not stored.',
+                  )}
+                </small>
+              </span>
+              <input
+                type="tel"
+                inputMode="tel"
+                autoComplete="off"
+                aria-label={L('Κινητό (νέος αρχικός κωδικός)', 'Mobile (new first password)')}
+                placeholder={L('Κινητό, π.χ. 6912345678', 'Mobile, e.g. 6912345678')}
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+              />
+              <AppButton
+                size="sm"
+                variant="danger"
+                disabled={busy || !phonePassword(phone)}
+                icon={<KeyRound size={14} />}
+                onClick={() => onResetInitial(member, phone)}
+              >
+                {L('Επαναφορά αρχικού κωδικού', 'Reset first password')}
+              </AppButton>
             </div>
           )}
           {!member && !demo && (

@@ -293,6 +293,17 @@
 .people-password > .app-button + .app-button {
   margin-top: -2px;
 }
+.people-password > input {
+  grid-column: 2;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-2);
+  font: inherit;
+}
 .people-link {
   grid-column: 1 / -1;
   display: grid;

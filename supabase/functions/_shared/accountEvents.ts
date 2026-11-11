@@ -5,7 +5,13 @@ import {esc, layout, sendEmail} from "./mail.ts";
 // changed) is kept in account_events, which the hospital's admins and the platform owner read and nobody
 // signed in can change; and the person is told by email, so nobody can quietly act in their name.
 
-export type AccountAction = "password_link" | "invite_link" | "email_changed" | "email_change_requested" | "staff_imported";
+export type AccountAction =
+  | "password_link"
+  | "invite_link"
+  | "email_changed"
+  | "email_change_requested"
+  | "staff_imported"
+  | "initial_password_reset";
 
 /** Records the event; false when it could not be kept (the caller then does not act). */
 export const recordAccountEvent = async (
