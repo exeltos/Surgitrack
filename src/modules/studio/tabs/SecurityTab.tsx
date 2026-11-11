@@ -187,19 +187,26 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
         </h3>
       </div>
       <div className="studio-security-add">
-        <input
-          aria-label={L('Διεύθυνση ή μικρό εύρος', 'Address or small range')}
-          value={adding}
-          onChange={e => setAdding(e.target.value)}
-          placeholder={L('Διεύθυνση, π.χ. 203.0.113.5 ή 203.0.113.0/28', 'Address, e.g. 203.0.113.5 or 203.0.113.0/28')}
-        />
-        <input
-          aria-label={L('Σημείωση', 'Note')}
-          value={note}
-          maxLength={200}
-          onChange={e => setNote(e.target.value)}
-          placeholder={L('Σημείωση (προαιρετικά)', 'Note (optional)')}
-        />
+        <div className="studio-security-field">
+          <input
+            aria-label={L('Διεύθυνση ή μικρό εύρος', 'Address or small range')}
+            value={adding}
+            onChange={e => setAdding(e.target.value)}
+            placeholder={L(
+              'Διεύθυνση, π.χ. 203.0.113.5 ή 203.0.113.0/28',
+              'Address, e.g. 203.0.113.5 or 203.0.113.0/28',
+            )}
+          />
+        </div>
+        <div className="studio-security-field">
+          <input
+            aria-label={L('Σημείωση', 'Note')}
+            value={note}
+            maxLength={200}
+            onChange={e => setNote(e.target.value)}
+            placeholder={L('Σημείωση (προαιρετικά)', 'Note (optional)')}
+          />
+        </div>
         <AppButton variant="danger" icon={<Ban size={15} />} disabled={!adding.trim()} onClick={() => void addIp()}>
           {L('Μπλοκάρισμα', 'Block')}
         </AppButton>

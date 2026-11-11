@@ -1219,13 +1219,31 @@ html body .studio-security-empty {
   border-radius: 12px;
   color: var(--st-muted);
 }
-html body .studio-security-add input {
+html body .studio-security-field {
+  display: flex;
   flex: 1 1 220px;
+  align-items: center;
   height: 38px;
-  padding: 0 10px;
+  padding: 0 12px;
   border: 1px solid var(--c-gray-90-4);
   border-radius: 10px;
   background: var(--c-white);
+}
+html body .studio-security-field:focus-within {
+  border-color: var(--c-cyan-55-2);
+  box-shadow: 0 0 0 3px rgba(24, 59, 86, 0.07);
+}
+/* One frame only, the field's: the input inside has none (as on the sign-in page). */
+html body .studio-security-field > input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
   color: inherit;
   font: inherit;
 }
