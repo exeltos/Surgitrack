@@ -51,8 +51,10 @@ export default function UsersSection({s}: {s: PeopleState}) {
     invitedAt,
     invitedToSignup,
     lang,
+    listed,
     me,
     pending,
+    online,
     platform,
     q,
     query,
@@ -98,12 +100,14 @@ export default function UsersSection({s}: {s: PeopleState}) {
     if (!m.password_change_required)
       return {
         kind: 'changed',
+        short: L('Δικός του κωδικός', 'Own password'),
         text: L('Προσωπικός κωδικός', 'Personal password'),
         title: L('Έχει ορίσει προσωπικό κωδικό.', 'Has set a personal password.'),
       };
     return m.active
       ? {
           kind: 'default',
+          short: L('Προσωρινός κωδικός', 'Temporary password'),
           text: until
             ? L(`Αρχικός κωδικός · έως ${until}`, `Initial password · by ${until}`)
             : L('Αρχικός κωδικός', 'Initial password'),
@@ -114,6 +118,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
         }
       : {
           kind: 'locked',
+          short: L('Κλειδωμένος', 'Locked'),
           text: L('Δεν άλλαξε κωδικό · κλειδώθηκε', 'Password not changed · locked'),
           title: L(
             'Δεν άλλαξε τον αρχικό κωδικό μέσα στην προθεσμία και ο λογαριασμός κλειδώθηκε. Ενεργοποιήστε τον ξανά για νέα προθεσμία.',
@@ -495,6 +500,52 @@ export default function UsersSection({s}: {s: PeopleState}) {
           )}
 
           {platform && !demo && !demoSeats && <PasswordReminder s={s} />}
+          <div className="people-counts" role="group" aria-label={L('Σύνοψη χρηστών', 'Users at a glance')}>
+            {online && (
+              <button
+                type="button"
+                className={`people-count online${filters.online ? ' on' : ''}`}
+                aria-pressed={!!filters.online}
+                onClick={() => setFilters(f => ({...f, online: f.online ? '' : 'ONLINE'}))}
+              >
+                <i></i>
+                {L('Συνδεδεμένοι τώρα', 'Connected now')} <b>{listed.filter(m => online.has(m.id)).length}</b>
+              </button>
+            )}
+            {(
+              [
+                [
+                  'INITIAL',
+                  'default',
+                  L('Προσωρινός κωδικός', 'Temporary password'),
+                  (m: (typeof listed)[number]) => m.password_change_required && m.active,
+                ],
+                [
+                  'OWN',
+                  'changed',
+                  L('Δικός τους κωδικός', 'Own password'),
+                  (m: (typeof listed)[number]) => !m.password_change_required,
+                ],
+                [
+                  'LOCKED',
+                  'locked',
+                  L('Κλειδωμένοι', 'Locked'),
+                  (m: (typeof listed)[number]) => m.password_change_required && !m.active,
+                ],
+              ] as const
+            ).map(([value, kind, label, test]) => (
+              <button
+                type="button"
+                key={value}
+                className={`people-count ${kind}${filters.password === value ? ' on' : ''}`}
+                aria-pressed={filters.password === value}
+                onClick={() => setFilters(f => ({...f, password: f.password === value ? '' : value}))}
+              >
+                <i></i>
+                {label} <b>{listed.filter(m => invitedAt(m) === undefined && test(m)).length}</b>
+              </button>
+            ))}
+          </div>
           <div className="people-head">
             <span>
               <SortHeader label={L('Χρήστης', 'User')} sortKey="name" sort={people.sort} onSort={people.toggle} />
@@ -528,7 +579,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
               <div className="hospital-users-empty">
                 <Users size={22} />
                 <strong>
-                  {q || filters.department || filters.role || filters.access || filters.password
+                  {q || filters.department || filters.role || filters.access || filters.password || filters.online
                     ? L(
                         'Κανένας χρήστης δεν ταιριάζει στην αναζήτηση ή στα φίλτρα.',
                         'No user matches the search or filters.',
@@ -575,6 +626,16 @@ export default function UsersSection({s}: {s: PeopleState}) {
                 >
                   <span className="people-who">
                     <b>
+                      {online?.has(m.id) && (
+                        <span
+                          className="people-online"
+                          role="img"
+                          aria-label={L('Συνδεδεμένος τώρα', 'Connected now')}
+                          title={L('Συνδεδεμένος τώρα', 'Connected now')}
+                        >
+                          <i></i>
+                        </span>
+                      )}
                       {m.name}
                       {self && <em className="people-you">{L('Εσείς', 'You')}</em>}
                     </b>
@@ -601,16 +662,15 @@ export default function UsersSection({s}: {s: PeopleState}) {
                       <span
                         className={`people-password ${passwordBadge(m)!.kind}`}
                         title={`${passwordBadge(m)!.text}. ${passwordBadge(m)!.title}`}
-                        role="img"
-                        aria-label={passwordBadge(m)!.text}
                       >
                         {passwordBadge(m)!.kind === 'changed' ? (
-                          <ShieldCheck size={13} />
+                          <ShieldCheck size={12} />
                         ) : passwordBadge(m)!.kind === 'locked' ? (
-                          <LockKeyhole size={13} />
+                          <LockKeyhole size={12} />
                         ) : (
-                          <KeyRound size={13} />
+                          <KeyRound size={12} />
                         )}
+                        {passwordBadge(m)!.short}
                       </span>
                     )}
                   </span>

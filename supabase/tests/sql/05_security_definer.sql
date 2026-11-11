@@ -17,7 +17,7 @@ select tests.eq((
      and has_function_privilege('authenticated', p.oid, 'execute')),
   'app_record_writable,caller_department_name,caller_is_platform_owner,can_import_assets,claim_platform_admin,current_org_id,current_org_locked,'
   'current_role,demo_seats_left,hospital_create_signup_link,hospital_decide_access_request,'
-  'hospital_revoke_signup_links,is_asset_manager,is_cssd_operator,is_org_admin,is_platform_admin,'
+  'hospital_presence,hospital_revoke_signup_links,is_asset_manager,is_cssd_operator,is_org_admin,is_platform_admin,'
   'is_viewer,my_access_request,my_ip_access,platform_active_sessions,platform_block_ip,platform_convert_demo,platform_create_demo_account,'
   'platform_create_department,platform_create_organization,platform_delete_movements,'
   'platform_ensure_demo_organization,platform_list_departments,platform_reset_demo_organization,'

@@ -29,7 +29,7 @@ const request = (id: string, status: string, user_id: string | null) => ({
   invited_at: null,
 });
 
-const useView = (members: unknown[], requests: unknown[], password = '') =>
+const useView = (members: unknown[], requests: unknown[], password = '', online: Set<string> | null = null, on = '') =>
   usePeopleView({
     decisions: {},
     departments: [],
@@ -37,8 +37,9 @@ const useView = (members: unknown[], requests: unknown[], password = '') =>
     invitations: {},
     lang: 'el',
     members,
+    online,
     query: '',
-    filters: {department: '', role: '', access: '', password},
+    filters: {department: '', role: '', access: '', password, online: on},
     requests,
     setDecisions: () => undefined,
   } as unknown as Input);
@@ -75,5 +76,20 @@ describe('usePeopleView: the password filter', () => {
     expect(useView(people, [], 'OWN').shown.map(m => m.id)).toEqual(['own']);
     expect(useView(people, [], 'LOCKED').shown.map(m => m.id)).toEqual(['locked']);
     expect(useView(people, [], '').shown).toHaveLength(3);
+  });
+});
+
+describe('usePeopleView: who is connected', () => {
+  const people = [member('on', 'ON', true), member('off', 'OFF', true)];
+  it('keeps only the connected when asked', () => {
+    expect(useView(people, [], '', new Set(['on']), 'ONLINE').shown.map(m => m.id)).toEqual(['on']);
+  });
+  it('shows everyone when not asked, and counts everyone as listed', () => {
+    const v = useView(people, [], '', new Set(['on']));
+    expect(v.shown).toHaveLength(2);
+    expect(v.listed).toHaveLength(2);
+  });
+  it('shows nobody as connected when the database cannot say, once asked', () => {
+    expect(useView(people, [], '', null, 'ONLINE').shown).toHaveLength(0);
   });
 });

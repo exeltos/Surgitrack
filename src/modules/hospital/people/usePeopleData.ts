@@ -1,6 +1,7 @@
 import {useCallback, useEffect} from 'react';
 import {supabase} from '../../../lib/supabase';
 import {loadProfileContacts} from '../../../data/cloud/profileContacts';
+import {loadHospitalPresence, PRESENCE_MINUTE} from '../../../data/cloud/presence';
 import type {Request, Member} from '../hospitalPeopleMeta';
 import type {usePeopleState} from './usePeopleState';
 
@@ -16,6 +17,7 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
     setInvitations,
     setMembers,
     setNotice,
+    setOnline,
     setRequests,
   } = p;
 
@@ -105,6 +107,23 @@ export function usePeopleData(p: ReturnType<typeof usePeopleState>) {
   useEffect(() => {
     void load();
   }, [load, refreshKey]);
+
+  // Who is connected: asked again every half minute while the tab is in view.
+  useEffect(() => {
+    if (demo || !organizationId) return;
+    let alive = true;
+    const ask = async () => {
+      if (document.visibilityState === 'hidden') return;
+      const ids = await loadHospitalPresence(organizationId);
+      if (alive) setOnline(ids);
+    };
+    void ask();
+    const timer = window.setInterval(() => void ask(), PRESENCE_MINUTE / 2);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [demo, organizationId, setOnline]);
 
   /** After a change: this list reloads, and so does whatever shows counts around it. */
   const changed = async () => {

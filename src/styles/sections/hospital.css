@@ -93,7 +93,7 @@
 .people-head,
 .people-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 150px 18px;
+  grid-template-columns: minmax(0, 1.6fr) 120px minmax(0, 1fr) minmax(0, 1fr) 190px 18px;
   align-items: center;
   gap: 10px;
 }

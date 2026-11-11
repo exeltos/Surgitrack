@@ -19,3 +19,18 @@ export async function touchPresence(): Promise<{allowed: boolean; ip?: string} |
     return null;
   }
 }
+
+/**
+ * Who of a hospital is connected now (seen in the last minutes), for its administrators and the platform owner.
+ * `null` when it cannot be had (no connection, or the function is not there yet): the screen then shows no
+ * "connected" mark at all rather than saying nobody is.
+ */
+export async function loadHospitalPresence(organizationId: string): Promise<Set<string> | null> {
+  try {
+    const {data, error} = await supabase.rpc('hospital_presence', {p_org: organizationId});
+    if (error || !Array.isArray(data)) return null;
+    return new Set((data as Array<{user_id: string}>).map(r => r.user_id));
+  } catch {
+    return null;
+  }
+}
