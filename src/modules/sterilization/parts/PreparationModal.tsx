@@ -17,7 +17,7 @@ import {printBarcodeLabel, printCompositionA4} from '../printUtils';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
-import {sterileUntil} from '../../../core/sterileExpiry';
+import {isoDate, sterileUntil} from '../../../core/sterileExpiry';
 import {SET_SHORTAGE_CODE} from '../hooks/usePreparationChecks';
 import {formatDateTime} from '../../../core/displayDate';
 
@@ -97,10 +97,15 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
         type="button"
         onClick={() =>
           printBarcodeLabel(
-            // Once the checks are done and a shelf life is chosen, the label already carries the expiry it would have
-            // if released today (the date it counts from is the release's, so this is the expected one).
+            // Once the checks are done (the button to the sterilizer is on) the label carries the sterilization date
+            // and the expiry it would have if released today (the release's own dates are the final ones).
             prepReadyForProcess && !stageEnabled('PACKAGING')
-              ? {...prepDraft.asset, sterileUntil: sterileUntil(new Date(), s.shelfLife)}
+              ? {
+                  ...prepDraft.asset,
+                  sterilizedOn: isoDate(new Date()),
+                  sterileUntil: sterileUntil(new Date(), s.shelfLife),
+                  shelfLifeMonths: s.shelfLife,
+                }
               : prepDraft.asset,
             prepDraft.kind,
             prepDraft.kind === 'SET' ? prepTools.length : undefined,
