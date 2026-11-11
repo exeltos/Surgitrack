@@ -9,6 +9,9 @@ import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
+import {displaySortValue} from '../../core/tableSort';
 import {tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import {
@@ -313,9 +316,16 @@ export default function ReportsPage() {
       }),
     );
   }, [active, reportData]);
-  const shownRows = useProgressiveList(
+  // Every column of the report sorts by its own title.
+  const order = useTableSort(
     viewRows,
+    Object.fromEntries(screenColumns.map(c => [c.key, (row: Row) => displaySortValue(row[c.key])])),
+  );
+  const shownRows = useProgressiveList(
+    order.rows,
     [
+      order.sort?.key,
+      order.sort?.dir,
       view?.label,
       active,
       group,
@@ -491,7 +501,7 @@ export default function ReportsPage() {
                   <thead>
                     <tr>
                       {screenColumns.map(c => (
-                        <th key={c.key}>{c.label}</th>
+                        <SortTh key={c.key} label={c.label} sortKey={c.key} sort={order.sort} onSort={order.toggle} />
                       ))}
                     </tr>
                   </thead>

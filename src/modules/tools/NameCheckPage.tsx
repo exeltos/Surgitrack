@@ -1,3 +1,5 @@
+import {SortTh} from '../../components/ui/SortHeader';
+import {useTableSort} from '../../components/ui/useTableSort';
 import {createContext, useContext, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -156,9 +158,19 @@ export default function NameCheckPage() {
 
 type Apply = (changes: Array<{id: string; name: string}>, label: string) => void;
 
-function CleanUps({fixes, editable, onApply}: {fixes: ReturnType<typeof cleanUps>; editable: boolean; onApply: Apply}) {
+function CleanUps({
+  fixes: all,
+  editable,
+  onApply,
+}: {
+  fixes: ReturnType<typeof cleanUps>;
+  editable: boolean;
+  onApply: Apply;
+}) {
   const [skipped, setSkipped] = useState<Set<string>>(new Set());
   const [shown, setShown] = useState(PAGE * 5);
+  const order = useTableSort(all, {from: f => f.from, to: f => f.to, count: f => f.items.length});
+  const fixes = order.rows;
   const chosen = fixes.filter(f => !skipped.has(f.from));
   const count = chosen.reduce((sum, f) => sum + f.items.length, 0);
   const toggle = (from: string) =>
@@ -211,10 +223,10 @@ function CleanUps({fixes, editable, onApply}: {fixes: ReturnType<typeof cleanUps
                   <span className="visually-hidden">{tr('Ενέργειες')}</span>
                 </th>
               )}
-              <th>{tr('Σήμερα')}</th>
+              <SortTh label={tr('Σήμερα')} sortKey="from" sort={order.sort} onSort={order.toggle} />
               <th aria-hidden="true" />
-              <th>{tr('Θα γίνει')}</th>
-              <th>{tr('Εργαλεία')}</th>
+              <SortTh label={tr('Θα γίνει')} sortKey="to" sort={order.sort} onSort={order.toggle} />
+              <SortTh label={tr('Εργαλεία')} sortKey="count" sort={order.sort} onSort={order.toggle} />
             </tr>
           </thead>
           <tbody>
@@ -439,6 +451,13 @@ function ToolsList({
   const setName = new Map(sets.map(x => [x.id, `${x.barcode} · ${x.name}`]));
   const place = (t: (typeof rows)[number]) =>
     t.setId ? setName.get(t.setId) || tr('Σετ') : t.mode === 'STOCK' ? tr('Απόθεμα') : trData(t.department) || '—';
+  const order = useTableSort(rows, {
+    barcode: t => t.barcode,
+    name: t => t.name,
+    code: t => t.code,
+    place: t => place(t),
+    state: t => statusLabel(t.state),
+  });
   return (
     <div className="modal-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
       <div className="name-check-list" role="dialog" aria-modal="true">
@@ -455,18 +474,18 @@ function ToolsList({
           <table>
             <thead>
               <tr>
-                <th>Barcode</th>
-                <th>{tr('Ονομασία')}</th>
-                <th>{tr('Κωδικός')}</th>
-                <th>{tr('Θέση')}</th>
-                <th>{tr('Κατάσταση')}</th>
+                <SortTh label="Barcode" sortKey="barcode" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Κωδικός')} sortKey="code" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Θέση')} sortKey="place" sort={order.sort} onSort={order.toggle} />
+                <SortTh label={tr('Κατάσταση')} sortKey="state" sort={order.sort} onSort={order.toggle} />
                 <th>
                   <span className="visually-hidden">{tr('Ενέργειες')}</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {rows.slice(0, LIST_ROWS).map(t => (
+              {order.rows.slice(0, LIST_ROWS).map(t => (
                 <tr key={t.id} onClick={() => navigate(`/tools/${t.id}`)}>
                   <td className="mono">{t.barcode}</td>
                   <td>{t.name}</td>
