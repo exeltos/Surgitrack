@@ -399,9 +399,7 @@
     grid-template-rows: auto auto auto auto;
     align-items: start;
   }
-  html body .studio-body-workflow .studio-workflow-hero,
-  html body .studio-body-workflow .released-loads,
-  html body .studio-body-workflow .studio-workflow-footer {
+  html body .studio-body-workflow .released-loads {
     grid-column: 1 / -1;
   }
   html body .studio-body-workflow .studio-workflow-side,
@@ -423,9 +421,6 @@
     display: none;
   }
   html body .studio-body-workflow .studio-release-policy > header span {
-    display: none;
-  }
-  html body .studio-body-workflow .studio-workflow-hero p {
     display: none;
   }
   html body .studio-body-workflow .studio-workflow-policy span {
@@ -925,9 +920,6 @@ html body .roles-guide-row {
 }
 html body .studio-workflow-page {
   gap: 10px;
-}
-html body .studio-workflow-hero {
-  padding: 10px 16px;
 }
 html body .studio-workflow-policy,
 html body .studio-release-policy {
@@ -1554,9 +1546,6 @@ html body .evaluation-demo-empty-card span {
 }
 /* The owner's Sterilization Flow page: its title is the page's, so the box keeps its description (the compact
    desktop layout hid it, which left the box empty but for the profile name). */
-html body .studio-section-page .studio-body-workflow .studio-workflow-hero p {
-  display: block;
-}
 /* The hospital the owner is working in: said in place of its «Είσοδος». */
 html body .platform-here {
   display: inline-flex;
@@ -2462,4 +2451,76 @@ html body .settings-hint {
   margin: 0 0 10px;
   color: var(--st-muted);
   font-size: 12.5px;
+}
+
+/* The flow's history tab: rename, restore, and the list of versions (what changed, who, when). */
+html body .studio-history {
+  display: grid;
+  gap: 4px;
+  padding: 4px 20px 16px;
+  border: 1px solid var(--st-line);
+  border-radius: 15px;
+  background: var(--c-white);
+}
+html body .studio-history .studio-fact-edit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  column-gap: 28px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .studio-history .studio-fact-edit input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+}
+html body .studio-history-title {
+  margin: 14px 0 0;
+  font-size: 15px;
+  color: var(--c-cyan-20);
+}
+html body .studio-history-help {
+  margin: 0 0 6px;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-history-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-history-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-size: 13px;
+}
+html body .studio-history-list small {
+  color: var(--st-muted);
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  html body .studio-history .studio-fact-edit {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+  }
+  html body .studio-history-list li {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+/* The category tabs stay at the top while the page scrolls. */
+html body .settings-categories {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: rgba(247, 250, 252, 0.96);
+  backdrop-filter: blur(4px);
 }

@@ -506,7 +506,31 @@ async function main() {
           await page.getByRole('button', {name: process.env.SCREENS_CLICK}).first().click({timeout: 3000});
           await page.waitForTimeout(300);
         }
-        await page.evaluate(() => window.scrollTo(0, 0));
+        // SCREENS_SCROLL=400 scrolls what scrolls (the page or its panel) before the shot, to see what stays put.
+        if (process.env.SCREENS_SCROLL)
+          await page.evaluate(
+            by =>
+              document.querySelectorAll('*').forEach(el => {
+                if (el.scrollHeight > el.clientHeight + 40 && getComputedStyle(el).overflowY !== 'visible')
+                  el.scrollTop = by;
+              }),
+            Number(process.env.SCREENS_SCROLL),
+          );
+        if (process.env.SCREENS_SCROLL)
+          await page.evaluate(by => window.scrollTo(0, by), Number(process.env.SCREENS_SCROLL));
+        if (process.env.SCREENS_SCROLL)
+          console.log(
+            '  tabs top after scroll:',
+            await page.evaluate(() => {
+              const chain = [];
+              for (let el = document.querySelector('.settings-categories'); el; el = el.parentElement)
+                chain.push(
+                  `${el.tagName}.${el.className.toString().split(' ')[0]} oy=${getComputedStyle(el).overflowY} sh=${el.scrollHeight} ch=${el.clientHeight} st=${el.scrollTop}`,
+                );
+              return `${document.querySelector('.settings-categories')?.getBoundingClientRect().top} | ${chain.join(' > ')}`;
+            }),
+          );
+        if (!process.env.SCREENS_SCROLL) await page.evaluate(() => window.scrollTo(0, 0));
         const state = await pageState(page);
         state.blockedMs = Math.round(await page.evaluate(() => (window.__longTasks || []).reduce((a, b) => a + b, 0)));
         state.settledMs = Date.now() - started - SETTLE_MS;

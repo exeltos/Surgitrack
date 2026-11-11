@@ -14,11 +14,12 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   const {sets, tools, advanceStageItems} = useSurgi();
   const modules = useContext(ModulesContext);
   // The page by category: the stages, the rules around them, or the hospital's features.
-  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'FEATURES'>('STAGES');
+  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'FEATURES' | 'HISTORY'>('STAGES');
   const groups = [
     {id: 'STAGES' as const, label: L('Στάδια', 'Stages')},
     {id: 'POLICIES' as const, label: L('Κανόνες', 'Rules')},
     {id: 'FEATURES' as const, label: L('Λειτουργίες νοσοκομείου', 'Hospital features')},
+    {id: 'HISTORY' as const, label: L('Ιστορικό & επαναφορά', 'History & reset')},
   ];
   /**
    * Turning a stage off: what is in it moves on to the next stage the hospital runs (after a confirmation),
@@ -52,30 +53,6 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
     <>
       {tab === 'WORKFLOW' && (
         <div className="studio-workflow-page" data-group={group}>
-          <section className="studio-workflow-hero">
-            <div>
-              <h2>{L('Ροή Αποστείρωσης', 'Sterilization flow')}</h2>
-              <p>
-                {L(
-                  'Το κάθε νοσοκομείο επιλέγει ποια στάδια θα αποτελούν υποχρεωτικό σημείο ελέγχου. Τα απενεργοποιημένα στάδια παρακάμπτονται αυτόματα χωρίς να χάνεται η ιχνηλασιμότητα.',
-                  'Each hospital chooses which stages are explicit control gates. Disabled stages are skipped automatically without losing traceability.',
-                )}
-              </p>
-            </div>
-            <div className="studio-workflow-profile">
-              <small>{L('Προφίλ μονάδας', 'Facility profile')}</small>
-              <input
-                // Older hospitals keep the first default name («… CSSD»); it reads without the acronym.
-                defaultValue={libs.sterilizationWorkflow.profileName.replace(/\s*CSSD$/, '')}
-                onBlur={e => {
-                  const name = e.target.value.trim();
-                  if (name && name !== libs.sterilizationWorkflow.profileName)
-                    libs.updateSterilizationWorkflow({profileName: name}, currentUser.name, 'Μετονομασία προφίλ ροής');
-                }}
-              />
-              <span>v{libs.sterilizationWorkflow.version}</span>
-            </div>
-          </section>
           <div className="settings-categories" role="group" aria-label={L('Κατηγορίες ροής', 'Flow categories')}>
             {groups.map(g => (
               <button
@@ -394,42 +371,74 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
               </div>
             </div>
           )}
-          <details className="released-loads">
-            <summary>
-              {L('Ιστορικό εκδόσεων ροής', 'Workflow version history')} · {libs.workflowVersions.length}
-            </summary>
-            <div>
-              {libs.workflowVersions.slice(0, 8).map(version => (
-                <div key={version.id}>
-                  <span>
-                    <b>v{version.version}</b> · {version.profileName}
-                    <small style={{display: 'block'}}>
-                      {version.changeReason || L('Αλλαγή παραμετροποίησης', 'Configuration change')}
-                    </small>
-                  </span>
-                  <span>
-                    {version.changedBy} ·{' '}
-                    {version.effectiveFrom ? formatDateTime(version.effectiveFrom) : L('Αρχική', 'Initial')}
-                  </span>
+          {group === 'HISTORY' && (
+            <section className="studio-history">
+              <div className="studio-fact studio-fact-edit">
+                <div>
+                  <strong>{L('Όνομα της ροής', 'Name of the flow')}</strong>
+                  <small>
+                    {L(
+                      'Το όνομα που φαίνεται στο ιστορικό. Τρέχουσα έκδοση: v',
+                      'The name shown in the history. Current version: v',
+                    )}
+                    {libs.sterilizationWorkflow.version}
+                  </small>
                 </div>
-              ))}
-            </div>
-          </details>
-          <footer className="studio-workflow-footer">
-            <div>
-              <strong>{L('Ενεργή διαδρομή', 'Active route')}</strong>
-              <span>
-                {libs.sterilizationWorkflow.stages
-                  .filter(stage => stage.enabled)
-                  .map(stage => L(stage.labelEl, stage.labelEn))
-                  .join(' → ')}
-              </span>
-            </div>
-            <AppButton onClick={handleResetSterilizationWorkflow}>
-              <RefreshCcw size={16} />
-              {L('Επαναφορά προτύπου', 'Reset template')}
-            </AppButton>
-          </footer>
+                <input
+                  aria-label={L('Όνομα της ροής', 'Name of the flow')}
+                  // Older hospitals keep the first default name («… CSSD»); it reads without the acronym.
+                  defaultValue={libs.sterilizationWorkflow.profileName.replace(/\s*CSSD$/, '')}
+                  onBlur={e => {
+                    const name = e.target.value.trim();
+                    if (name && name !== libs.sterilizationWorkflow.profileName)
+                      libs.updateSterilizationWorkflow(
+                        {profileName: name},
+                        currentUser.name,
+                        'Μετονομασία προφίλ ροής',
+                      );
+                  }}
+                />
+              </div>
+              <div className="studio-fact studio-fact-edit">
+                <div>
+                  <strong>{L('Επαναφορά αρχικής ροής', 'Restore the original flow')}</strong>
+                  <small>
+                    {L(
+                      'Επαναφέρει όλα τα στάδια και τους κανόνες στην αρχική ροή. Οι αλλαγές καταγράφονται στο ιστορικό.',
+                      'Restores all stages and rules to the original flow. The change is recorded in the history.',
+                    )}
+                  </small>
+                </div>
+                <AppButton onClick={handleResetSterilizationWorkflow}>
+                  <RefreshCcw size={16} />
+                  {L('Επαναφορά προτύπου', 'Reset template')}
+                </AppButton>
+              </div>
+              <h3 className="studio-history-title">
+                {L('Ιστορικό αλλαγών της ροής', 'History of changes to the flow')} · {libs.workflowVersions.length}
+              </h3>
+              <p className="studio-history-help">
+                {L(
+                  'Κάθε αλλαγή στα στάδια ή στους κανόνες γίνεται νέα έκδοση: τι άλλαξε, ποιος το έκανε και πότε.',
+                  'Every change to the stages or rules becomes a new version: what changed, who did it and when.',
+                )}
+              </p>
+              <ul className="studio-history-list">
+                {libs.workflowVersions.slice(0, 20).map(version => (
+                  <li key={version.id}>
+                    <span>
+                      <b>v{version.version}</b>{' '}
+                      {version.changeReason || L('Αλλαγή παραμετροποίησης', 'Configuration change')}
+                    </span>
+                    <small>
+                      {version.changedBy} ·{' '}
+                      {version.effectiveFrom ? formatDateTime(version.effectiveFrom) : L('Αρχική', 'Initial')}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       )}
     </>

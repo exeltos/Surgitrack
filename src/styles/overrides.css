@@ -2671,9 +2671,6 @@ html body .roles-guide-row p,
 html body .roles-guide-row span {
   line-height: 1.4;
 }
-html body .studio-workflow-hero p {
-  margin-top: 2px;
-}
 /* Replacements: the page holds still; only the table scrolls. */
 html body .replacements {
   display: flex;
