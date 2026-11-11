@@ -128,7 +128,7 @@ export function SetReportModal({
             <label className="span-2">
               {tr('Παρατήρηση')}
               <textarea
-                rows={3}
+                rows={2}
                 value={note}
                 onChange={e => setNote(e.target.value)}
                 placeholder={tr('Περιγραφή συμβάντος...')}

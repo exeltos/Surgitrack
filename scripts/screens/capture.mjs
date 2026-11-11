@@ -790,6 +790,24 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .click({timeout: 3000});
       },
     });
+  if (role !== 'VIEWER' && seed.firstSetId)
+    modals.push({
+      // A Set's problem report, the instrument list open (it takes the height the fields leave).
+      name: 'set-report-dialog',
+      route: `/sets/${seed.firstSetId}`,
+      open: async () => {
+        await page
+          .locator('button')
+          .filter({hasText: /^(Ενέργειες|Actions)/})
+          .first()
+          .click({timeout: 3000});
+        await page
+          .getByText(/^(Αναφορά προβλήματος|Report a problem)/)
+          .first()
+          .click({timeout: 3000});
+        await page.locator('.report-target-switch button').nth(1).click({timeout: 3000});
+      },
+    });
   if (role !== 'DEPARTMENT' && seed.firstSetId)
     modals.push({
       // A Set's contents grouped by instrument kind, the first group open.

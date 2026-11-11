@@ -1784,18 +1784,52 @@ body {
 .set-report-modal .modal-body {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
+/* The tool list takes all the height the fields leave and scrolls by itself; the card never does.
+   Type and photos share a row, the note goes under them, so the list starts higher. */
 .set-report-modal .report-tool-picker {
   margin: 14px 0 0;
-  flex: 1 0 200px;
-  min-height: 200px;
+  flex: 1 1 0;
+  min-height: 120px;
+  max-height: none;
   overflow: auto;
 }
 .set-report-modal .form-grid {
   flex: 0 0 auto;
+  margin: 14px 0 0;
+  gap: 12px;
+}
+.set-report-modal .form-grid > :first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+.set-report-modal .form-grid > .report-photo-input {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  padding: 7px 10px;
+}
+.set-report-modal .form-grid > .report-photo-input input {
+  font-size: 12px;
+}
+.set-report-modal .form-grid > label.span-2:not(.report-photo-input) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+.set-report-modal .form-grid textarea {
+  min-height: 56px;
+}
+@media (max-width: 640px) {
+  .set-report-modal .form-grid > .report-photo-input {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .set-report-modal .form-grid > label.span-2:not(.report-photo-input) {
+    grid-row: auto;
+  }
 }
 .set-report-modal > footer {
   flex: 0 0 auto;
