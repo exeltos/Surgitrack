@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {Barcode, RefreshCcw, Settings2, ShieldCheck} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
-import {tr} from '../../../i18n';
 import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
@@ -165,11 +164,11 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 <header>
                   <Barcode />
                   <div>
-                    <h3>{L('Αποστείρωση & barcode', 'Sterilization & barcode')}</h3>
+                    <h3>{L('Διάρκεια αποστείρωσης', 'Sterile shelf life')}</h3>
                     <p>
                       {L(
-                        'Η διάρκεια αποστείρωσης και η μορφή των barcode.',
-                        'The sterile shelf life and the barcode formats.',
+                        'Πόσο διαρκεί η αποστείρωση ενός Σετ ή εργαλείου από την αποδέσμευση.',
+                        'How long a Set or instrument stays sterile, counted from the release.',
                       )}
                     </p>
                   </div>
@@ -197,34 +196,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     )}
                   </small>
                 </label>
-                <div className="studio-fact">
-                  <div>
-                    <strong>{L('Barcode Σετ', 'Set barcode')}</strong>
-                    <small>
-                      {L(
-                        'Δίνεται αυτόματα σε κάθε νέο Σετ. Η μορφή είναι σταθερή και δεν αλλάζει.',
-                        'Given automatically to every new Set. The format is fixed and does not change.',
-                      )}
-                    </small>
-                  </div>
-                  <em>
-                    {tr('S + 6 ψηφία')} · S000321 <i>{L('Σταθερό', 'Fixed')}</i>
-                  </em>
-                </div>
-                <div className="studio-fact">
-                  <div>
-                    <strong>{L('Barcode Εργαλείου', 'Instrument barcode')}</strong>
-                    <small>
-                      {L(
-                        'Δίνεται αυτόματα σε κάθε νέο εργαλείο. Η μορφή είναι σταθερή και δεν αλλάζει.',
-                        'Given automatically to every new instrument. The format is fixed and does not change.',
-                      )}
-                    </small>
-                  </div>
-                  <em>
-                    {tr('T + 6 ψηφία')} · T001250 <i>{L('Σταθερό', 'Fixed')}</i>
-                  </em>
-                </div>
               </section>
             )}
             {group === 'STERILIZATION' && <LabelSettingsCard L={L} />}
