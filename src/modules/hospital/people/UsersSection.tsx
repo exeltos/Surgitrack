@@ -353,7 +353,12 @@ export default function UsersSection({s}: {s: PeopleState}) {
 
           {pending.length > 0 && (
             <div className="people-requests">
-              <header>
+              <header
+                title={L(
+                  'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης έχει ήδη όνομα χρήστη και κωδικό· με την έγκριση λαμβάνει ένα email και συνδέεται.',
+                  'Check the details, pick a role and department, then approve. The user already has a username and password; on approval they get one email and can sign in.',
+                )}
+              >
                 <UserCheck size={17} />
                 <b>
                   {L(
@@ -361,12 +366,6 @@ export default function UsersSection({s}: {s: PeopleState}) {
                     `${pending.length} ${pending.length === 1 ? 'request awaits' : 'requests await'} approval`,
                   )}
                 </b>
-                <small>
-                  {L(
-                    'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης έχει ήδη όνομα χρήστη και κωδικό· με την έγκριση λαμβάνει ένα email και συνδέεται.',
-                    'Check the details, pick a role and department, then approve. The user already has a username and password; on approval they get one email and can sign in.',
-                  )}
-                </small>
               </header>
               {pending.map(r => {
                 const d = decisionFor(r);

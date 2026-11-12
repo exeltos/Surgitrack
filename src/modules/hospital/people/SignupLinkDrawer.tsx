@@ -1,4 +1,4 @@
-import {UserCheck, X} from 'lucide-react';
+import {UserCheck} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import SignupLinkCard from '../SignupLinkCard';
 import type {PeopleState} from './usePeople';
@@ -15,9 +15,6 @@ export default function SignupLinkDrawer({s}: {s: PeopleState}) {
                 <span className="eyebrow">{L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
                 <h2>{L('Σύνδεσμος εγγραφής', 'Signup link')}</h2>
               </div>
-              <button onClick={() => setLinkOpen(false)} aria-label={L('Κλείσιμο', 'Close')}>
-                <X />
-              </button>
             </header>
             <div className="studio-drawer-form">
               <SignupLinkCard organizationId={organizationId} onError={showError} refreshKey={refreshKey} />

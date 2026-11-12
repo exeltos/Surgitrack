@@ -1358,3 +1358,25 @@ html body .department-home .dash-activity .dash-columns {
     gap: 8px;
   }
 }
+
+/* A signup request on one row on a computer (who · role · department · note · the two buttons), so the list of
+   users shows under it; the explanation is the tooltip of its title. */
+@media (min-width: 901px) {
+  html body .hospital-people .people-requests .hospital-request {
+    grid-template-columns: minmax(200px, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  html body .hospital-people .people-requests .hospital-request-who {
+    grid-column: auto;
+    align-self: center;
+  }
+  html body .hospital-people .people-requests .hospital-request-actions {
+    grid-column: auto;
+  }
+}
+html body .hospital-people .people-requests {
+  gap: 8px;
+  padding: 10px 12px;
+}

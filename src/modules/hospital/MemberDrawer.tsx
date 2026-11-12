@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Copy, KeyRound, Mail, Phone, Save, Send, Trash2, UserCheck, X} from 'lucide-react';
+import {Copy, KeyRound, Mail, Phone, Save, Send, Trash2, UserCheck} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {localizedName} from '../../core/glossary';
 import {assignableRoles, wholeHospital, roleValue, EMAIL_FORMAT} from './hospitalPeopleMeta';
@@ -93,9 +93,6 @@ export default function MemberDrawer({
             <span className="eyebrow">{member ? L('ΧΡΗΣΤΗΣ', 'USER') : L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
             <h2>{member ? member.name : L('Προσθήκη χρήστη', 'Add user')}</h2>
           </div>
-          <button onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           {!member && roleField}
