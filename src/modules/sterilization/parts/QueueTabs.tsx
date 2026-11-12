@@ -40,7 +40,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
   }, [queue]);
   return (
     <div className="sterile-queues modern workflow-configured-queues ster-steps" ref={strip}>
-      {/* One stage after the other, a chevron between each two for the flow. */}
+      {/* One stage after the other, each an arrow pointing to the next (the flow). */}
       {[
         <button
           key="INCOMING"
@@ -142,18 +142,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <span>{tr('Παράδοση')}</span>
           <strong>{ready.length}</strong>
         </button>,
-      ]
-        .filter(Boolean)
-        .flatMap((stage, i) =>
-          i
-            ? [
-                <span key={`arrow-${i}`} className="ster-step-arrow" aria-hidden="true">
-                  ›
-                </span>,
-                stage,
-              ]
-            : [stage],
-        )}
+      ].filter(Boolean)}
     </div>
   );
 }
