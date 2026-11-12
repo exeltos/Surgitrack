@@ -144,6 +144,12 @@ export default function SterilizerLoads({
                         {load.simulation ? ` · ${tr('Προσομοίωση')}` : ''}
                       </small>
                     </>
+                  ) : canSimulate && !load.simulation ? (
+                    // Demo: the cycle can be simulated, in the load's card (where the scenario is chosen); its data then
+                    // shows here.
+                    <button className="row-simulate" onClick={() => setOpenId(load.id)}>
+                      <FlaskConical size={14} /> {tr('Προσομοίωση')}
+                    </button>
                   ) : (
                     <small>{tr('Χωρίς ζωντανά δεδομένα')}</small>
                   )}
@@ -152,11 +158,6 @@ export default function SterilizerLoads({
                 {/* The buttons act on their own: a click on them does not open the card too. */}
                 <td className="row-actions" onClick={e => e.stopPropagation()}>
                   <div className="row-actions-inner">
-                    {canSimulate && !load.simulation && (
-                      <button className="row-details" onClick={() => setOpenId(load.id)}>
-                        <FlaskConical size={15} /> {tr('Προσομοίωση')}
-                      </button>
-                    )}
                     <button
                       className="row-icon"
                       title={tr('Λεπτομέρειες')}

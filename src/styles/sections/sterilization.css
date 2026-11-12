@@ -2702,3 +2702,17 @@ html body .sterilizer-rows td:first-child .row-name,
 html body .sterilizer-rows td:first-child small {
   white-space: nowrap;
 }
+html body .sterilizer-rows .row-simulate {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 0;
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  color: var(--c-cyan-60);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: underline;
+  cursor: pointer;
+}
