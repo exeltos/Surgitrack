@@ -671,6 +671,18 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         });
     }
   }
+  // A sterilizer's details, from «Κλίβανοι & Συσκευές».
+  if (sterilization)
+    modals.push({
+      name: 'sterilizers-details',
+      route: '/sterilizers',
+      dialog: false,
+      open: () =>
+        page
+          .getByRole('button', {name: /^(Λεπτομέρειες|Details)$/})
+          .first()
+          .click({timeout: 3000}),
+    });
   // The simulated sterilizer (Demo only): started on the first load in the sterilizer, then seen later in its cycle.
   if (sterilization && (process.env.SCREENS_DEMO === '1' || process.env.SCREENS_DEMO_HOSPITAL === '1')) {
     const toSterilizer = () => page.locator('[data-tour="queue-IN_STERILIZER"]').click({timeout: 3000});
