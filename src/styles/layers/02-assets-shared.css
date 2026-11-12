@@ -13,17 +13,6 @@
   border-color: var(--c-cyan-80-2);
   color: var(--c-cyan-30-2);
 }
-.qty-badge {
-  display: inline-flex;
-  min-width: 34px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9px;
-  background: var(--c-gray-95);
-  font-weight: 800;
-  color: #244c59;
-}
 .modal-backdrop {
   position: fixed;
   inset: 0;

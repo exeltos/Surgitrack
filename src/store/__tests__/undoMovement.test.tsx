@@ -58,7 +58,7 @@ describe('undoing a movement made by mistake', () => {
     const set = s().sets.find(x => x.state === 'IN_DEPARTMENT' && !x.maxUses)!;
     expect(set).toBeTruthy();
     const limited = s()
-      .tools.filter(t => t.setId === set.id && t.maxUses)
+      .tools.filter(t => t.setId === set.id && (t.maxUses || t.wearCheck))
       .map(t => t.id);
     act(() => void s().sendToSterilization('SET', set.id, undefined, undefined, limited));
     expect(s().undoInfo('SET', set.id)?.movement.undo?.usesCounted).toBe(false);

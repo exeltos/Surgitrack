@@ -44,6 +44,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
               <AssetTypeIcon
                 kind={receiptDraft.kind}
                 maxUses={receiptDraft.kind === 'TOOL' ? receiptDraft.asset.maxUses : undefined}
+                wearCheck={receiptDraft.kind === 'TOOL' ? receiptDraft.asset.wearCheck : undefined}
                 framed
                 className="ster-kind"
                 size={19}

@@ -145,7 +145,13 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
         <aside className="asset-workbench-sidebar asset-create-sidebar">
           <div className="asset-workbench-title">
             <div className="asset-workbench-title-main">
-              <AssetTypeIcon kind={kind} maxUses={limited ? Number(maxUses) || 1 : undefined} framed size={19} />
+              <AssetTypeIcon
+                kind={kind}
+                maxUses={limited ? Number(maxUses) || 1 : undefined}
+                wearCheck={wear}
+                framed
+                size={19}
+              />
               <div>
                 <span className="eyebrow">{kind === 'SET' ? tr('ΝΕΑ ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΝΕΑ ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
                 <h1>{name || tr('Χωρίς ονομασία')}</h1>
@@ -304,7 +310,12 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               </div>
             ) : (
               <div className="asset-workbench-mini">
-                <AssetTypeIcon kind="TOOL" maxUses={limited ? Number(maxUses) || 1 : undefined} size={17} />
+                <AssetTypeIcon
+                  kind="TOOL"
+                  maxUses={limited ? Number(maxUses) || 1 : undefined}
+                  wearCheck={wear}
+                  size={17}
+                />
                 <div>
                   <span>{tr('Καταχώριση')}</span>
                   <strong>

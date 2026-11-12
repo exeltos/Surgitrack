@@ -227,6 +227,7 @@ export default function DepartmentPage() {
                     <AssetTypeIcon
                       kind={kind}
                       maxUses={kind === 'TOOL' ? asset.maxUses : undefined}
+                      wearCheck={kind === 'TOOL' ? (asset as Tool).wearCheck : undefined}
                       framed
                       className="department-asset-icon"
                       size={19}

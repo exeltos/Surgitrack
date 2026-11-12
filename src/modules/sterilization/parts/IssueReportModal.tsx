@@ -35,6 +35,9 @@ export default function IssueReportModal({s}: {s: SterilizationPageState}) {
               <AssetTypeIcon
                 kind={issueTarget.kind}
                 maxUses={issueTarget.kind === 'TOOL' ? tools.find(t => t.id === issueTarget.id)?.maxUses : undefined}
+                wearCheck={
+                  issueTarget.kind === 'TOOL' ? tools.find(t => t.id === issueTarget.id)?.wearCheck : undefined
+                }
                 framed
                 size={18}
               />

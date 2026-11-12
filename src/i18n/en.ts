@@ -516,6 +516,8 @@ export const en: Record<string, string> = {
   Εργαλείο: 'Instrument',
   'Εργαλείο αντικατάστασης': 'Replacement instrument',
   'Εργαλείο περιορισμένων χρήσεων': 'Limited-use instrument',
+  χρήσεις: 'uses',
+  'Εργαλείο με έλεγχο φθοράς': 'Instrument with a wear check',
   'Εργαλείο που αφαιρείται': 'Instrument being removed',
   'Εργαλείο, κωδικός ή barcode σε {0}...': 'Instrument, code or barcode in {0}...',
   'Εργαλείο, κωδικός, barcode ή serial...': 'Instrument, code, barcode or serial...',
@@ -785,6 +787,7 @@ export const en: Record<string, string> = {
   'Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.':
     'Instruments with few uses left, according to the warning threshold.',
   'Με όριο χρήσεων': 'With usage limit',
+  'Με όριο': 'Limited',
   Μεμονωμένα: 'Standalone',
   'Μεμονωμένα εργαλεία': 'Standalone instruments',
   'Μεμονωμένα εργαλεία σε χρήση': 'Standalone instruments in use',
@@ -1847,9 +1850,8 @@ export const en: Record<string, string> = {
   'CSV (.csv)': 'CSV (.csv)',
   'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
   'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
-  'Ανοικτές πάνω από {0} ημέρες': 'Open over {0} days',
+  'Γρήγορα φίλτρα': 'Quick filters',
   'Πάνω από {0} ημέρες': 'Over {0} days',
-  'Οποιαδήποτε ημερομηνία': 'Any date',
   // Studio → Platform: evaluation Demos
   'Demo αξιολόγησης': 'Evaluation Demo',
   'DEMO ΑΞΙΟΛΟΓΗΣΗΣ': 'EVALUATION DEMO',

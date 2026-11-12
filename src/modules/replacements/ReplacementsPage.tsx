@@ -1,17 +1,7 @@
 import type {ReactNode} from 'react';
 import {useMemo, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-import {
-  CheckCircle2,
-  ClipboardList,
-  PackageCheck,
-  Plus,
-  RefreshCcw,
-  Search,
-  ShoppingCart,
-  Undo2,
-  X,
-} from 'lucide-react';
+import {CheckCircle2, ClipboardList, PackageCheck, RefreshCcw, Search, ShoppingCart, Undo2, X} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
@@ -40,6 +30,7 @@ import {useConfirm} from '../../components/ui/useConfirm';
 import {pieces} from './pieces';
 import {purchaseOrderHtml, replacementListHtml} from './replacementPrint';
 import {tr, trData} from '../../i18n';
+import QuickFilters from '../../components/ui/QuickFilters';
 
 type Tab = 'ITEMS' | 'ORDERS';
 type StatusFilter = '' | 'NEEDED' | 'IN_ORDER' | 'REPLACED';
@@ -48,8 +39,21 @@ type StatusFilter = '' | 'NEEDED' | 'IN_ORDER' | 'REPLACED';
  * Instruments in Service, damaged, lost or out of use: whether the same instrument waits in Stock,
  * replacing them from Stock in one step, and recording purchase orders for the rest.
  */
-/** `tabs`: the Issues page's tabs when embedded there, shown under these figures like on Issues. */
-export default function ReplacementsPage({embedded = false, tabs}: {embedded?: boolean; tabs?: ReactNode}) {
+/**
+ * `tabs`: the Issues page's tabs when embedded there. `view`/`onView`: which of the two lists shows, when the
+ * page around it holds that choice in its own tabs (then this page draws no tab row of its own).
+ */
+export default function ReplacementsPage({
+  embedded = false,
+  tabs,
+  view,
+  onView,
+}: {
+  embedded?: boolean;
+  tabs?: ReactNode;
+  view?: Tab;
+  onView?: (view: Tab) => void;
+}) {
   const store = useSurgi();
   const {tools, retiredTools, sets, issues, movements, purchaseOrders, can, organizationName} = store;
   const editable = can('stock.manage');
@@ -59,7 +63,9 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
   );
   const [confirm, ask] = useConfirm();
   const [params] = useSearchParams();
-  const [tab, setTab] = useState<Tab>(params.get('view') === 'orders' ? 'ORDERS' : 'ITEMS');
+  const [ownTab, setOwnTab] = useState<Tab>(params.get('view') === 'orders' ? 'ORDERS' : 'ITEMS');
+  const tab = view ?? ownTab;
+  const setTab = onView ?? setOwnTab;
   const [query, setQuery] = useState('');
   const [reason, setReason] = useState('');
   const [department, setDepartment] = useState('');
@@ -237,59 +243,27 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
           description={tr('Εργαλεία σε Service, με βλάβη ή χαμένα: αντικατάσταση από το Απόθεμα ή παραγγελία.')}
         />
       )}
-      <div className="replacements-kpis">
-        <button
-          type="button"
-          className={status === 'NEEDED' && !stock ? 'active warn' : 'warn'}
-          onClick={() => (setStatus('NEEDED'), setStock(''))}
-        >
-          <span>{tr('Προς αντικατάσταση')}</span>
-          <strong>{needed.length}</strong>
-        </button>
-        <button
-          type="button"
-          className={status === 'NEEDED' && stock === 'YES' ? 'active good' : 'good'}
-          onClick={() => (setStatus('NEEDED'), setStock('YES'))}
-        >
-          <span>{tr('Με απόθεμα')}</span>
-          <strong>{needed.filter(i => i.stock.length).length}</strong>
-        </button>
-        <button
-          type="button"
-          className={status === 'NEEDED' && stock === 'NO' ? 'active bad' : 'bad'}
-          onClick={() => (setStatus('NEEDED'), setStock('NO'))}
-        >
-          <span>{tr('Χωρίς απόθεμα')}</span>
-          <strong>{needed.filter(i => !i.stock.length).length}</strong>
-        </button>
-        <button
-          type="button"
-          className={status === 'IN_ORDER' ? 'active' : ''}
-          onClick={() => (setStatus('IN_ORDER'), setStock(''))}
-        >
-          <span>{tr('Σε παραγγελία')}</span>
-          <strong>{items.filter(i => i.status === 'IN_ORDER').length}</strong>
-        </button>
-      </div>
       {tabs}
-      <div className="name-check-tabs" role="tablist">
-        <button
-          role="tab"
-          aria-selected={tab === 'ITEMS'}
-          className={tab === 'ITEMS' ? 'active' : ''}
-          onClick={() => setTab('ITEMS')}
-        >
-          <RefreshCcw size={16} /> {tr('Εργαλεία')} <b>{shown.length}</b>
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'ORDERS'}
-          className={tab === 'ORDERS' ? 'active' : ''}
-          onClick={() => setTab('ORDERS')}
-        >
-          <ClipboardList size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
-        </button>
-      </div>
+      {view === undefined && (
+        <div className="name-check-tabs" role="tablist">
+          <button
+            role="tab"
+            aria-selected={tab === 'ITEMS'}
+            className={tab === 'ITEMS' ? 'active' : ''}
+            onClick={() => setTab('ITEMS')}
+          >
+            <RefreshCcw size={16} /> {tr('Εργαλεία')} <b>{shown.length}</b>
+          </button>
+          <button
+            role="tab"
+            aria-selected={tab === 'ORDERS'}
+            className={tab === 'ORDERS' ? 'active' : ''}
+            onClick={() => setTab('ORDERS')}
+          >
+            <ClipboardList size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
+          </button>
+        </div>
+      )}
 
       {tab === 'ITEMS' ? (
         <section className="replacements-card">
@@ -303,12 +277,42 @@ export default function ReplacementsPage({embedded = false, tabs}: {embedded?: b
               />
             </label>
             <FilterMenu filters={filters} />
+            <QuickFilters
+              items={[
+                {
+                  key: 'needed',
+                  label: tr('Προς αντικατάσταση'),
+                  count: needed.length,
+                  tone: 'warn',
+                  active: status === 'NEEDED' && !stock,
+                  onClick: () => (setStatus('NEEDED'), setStock('')),
+                },
+                {
+                  key: 'stock',
+                  label: tr('Με απόθεμα'),
+                  count: needed.filter(i => i.stock.length).length,
+                  tone: 'good',
+                  active: status === 'NEEDED' && stock === 'YES',
+                  onClick: () => (setStatus('NEEDED'), setStock('YES')),
+                },
+                {
+                  key: 'no-stock',
+                  label: tr('Χωρίς απόθεμα'),
+                  count: needed.filter(i => !i.stock.length).length,
+                  tone: 'bad',
+                  active: status === 'NEEDED' && stock === 'NO',
+                  onClick: () => (setStatus('NEEDED'), setStock('NO')),
+                },
+                {
+                  key: 'ordered',
+                  label: tr('Σε παραγγελία'),
+                  count: items.filter(i => i.status === 'IN_ORDER').length,
+                  active: status === 'IN_ORDER',
+                  onClick: () => (setStatus('IN_ORDER'), setStock('')),
+                },
+              ]}
+            />
             <span className="replacements-spacer" />
-            {editable && (
-              <AppButton icon={<Plus size={15} />} onClick={() => setOrdering([])}>
-                {tr('Νέα παραγγελία')}
-              </AppButton>
-            )}
             <DownloadMenu
               table={listTable}
               onPrint={printList}

@@ -2154,6 +2154,23 @@ html body .tools-list-workspace > .asset-list-controls {
 html body .asset-filter-bar {
   padding: 5px 8px;
 }
+/* With quick filters everything stays on one row: the search gives its room, and the grouping button keeps only
+   its icon (its words are the tooltip). */
+html body .asset-filter-bar.with-quick-filters {
+  flex-wrap: nowrap;
+}
+html body .asset-filter-bar.with-quick-filters > .asset-filter-search {
+  flex: 1 1 120px;
+  min-width: 120px;
+}
+html body .asset-filter-bar.with-quick-filters .export-day-word,
+html body .asset-filter-bar.with-quick-filters .asset-filter-toggle[aria-pressed] span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
 html body .asset-list-controls > .icon-toggle {
   min-height: 46px;
 }
@@ -2188,17 +2205,7 @@ html body .page-head > div:first-child > p {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* Replacements: KPI tiles in one row, tighter rows. */
-html body .replacements-kpis > * {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 14px;
-}
-html body .replacements-kpis strong {
-  font-size: 20px;
-}
+/* Replacements: tighter rows. */
 html body .replacements-table .row-actions {
   display: flex;
   flex-wrap: nowrap;
@@ -2317,10 +2324,10 @@ html body .registry-fixed th:last-child {
   padding-right: 8px;
 }
 @media (max-width: 1279px) {
-  html body .registry-fixed th:nth-child(3),
-  html body .registry-fixed td:nth-child(3),
-  html body .registry-fixed th:nth-child(7),
-  html body .registry-fixed td:nth-child(7) {
+  html body .registry-fixed:not(.expiry-table) th:nth-child(3),
+  html body .registry-fixed:not(.expiry-table) td:nth-child(3),
+  html body .registry-fixed:not(.expiry-table) th:nth-child(7),
+  html body .registry-fixed:not(.expiry-table) td:nth-child(7) {
     display: none;
   }
 }
@@ -2444,15 +2451,13 @@ html body .replacements-fixed th.col-since {
   width: 100px;
 }
 /* One KPI look everywhere: one-line label (truncated with a tooltip-free ellipsis), number on the right. */
-html body .kpis > * small,
-html body .replacements-kpis > * span {
+html body .kpis > * small {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-html body .kpis > *,
-html body .replacements-kpis > * {
+html body .kpis > * {
   min-width: 0;
 }
 /* Detail pages: labels on one line with a fixed column, tighter rows, eyebrow never wraps. */
@@ -2507,7 +2512,6 @@ html body .movements-actions > button {
 }
 /* One KPI card everywhere: label on top, big number below, a soft shadow so the strip stands out. */
 html body .kpis > *,
-html body .replacements-kpis > *,
 html body .name-check-kpis > div,
 html body .dash-kpi {
   display: grid !important;
@@ -2524,7 +2528,6 @@ html body .dash-kpi {
   text-align: left;
 }
 html body .kpis > * small,
-html body .replacements-kpis > * span,
 html body .name-check-kpis span,
 html body .dash-kpi-label {
   color: var(--st-muted);
@@ -2536,7 +2539,6 @@ html body .dash-kpi-label {
   text-overflow: ellipsis;
 }
 html body .kpis > * strong,
-html body .replacements-kpis > * strong,
 html body .name-check-kpis strong,
 html body .dash-kpi strong {
   margin: 0;
@@ -2546,19 +2548,16 @@ html body .dash-kpi strong {
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
-html body .kpis > *.active,
-html body .replacements-kpis > *.active {
+html body .kpis > *.active {
   border-color: var(--c-cyan-40);
   box-shadow:
     0 0 0 1px var(--c-cyan-40),
     0 1px 3px rgba(16, 42, 67, 0.08);
 }
-html body .replacements-kpis .warn strong,
 html body .name-check-kpis .warn strong,
 html body .dash-kpi.warn strong {
   color: var(--c-orange-45);
 }
-html body .replacements-kpis .good strong,
 html body .name-check-kpis .good strong {
   color: var(--c-green-45);
 }
@@ -4047,10 +4046,19 @@ html body .demo-welcome-actions {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-/* Sets list: the state on one line on a computer; on a tablet the barcode goes under the name, so the
-   name is never cut in the middle of a word. */
-html body .sets-registry .sets-row-barcode {
+/* Registries (Sets, instruments, standalone, Stock): the barcode sits under the name, not in a column of its
+   own, so the name keeps its width and is not cut. The state stays on one line on a computer. */
+html body .registry-fixed:not(.expiry-table) th:nth-child(2),
+html body .registry-fixed:not(.expiry-table) td:nth-child(2) {
   display: none;
+}
+html body .registry-row-barcode {
+  color: var(--c-cyan-45);
+  font-weight: 700;
+}
+/* Sets: «Εργαλεία» fits next to its sort arrow. */
+html body .sets-registry:not(.standalone-registry) th:nth-child(5) {
+  width: 104px;
 }
 @media (min-width: 1280px) {
   html body .sets-registry th:nth-child(6) {
@@ -4061,15 +4069,6 @@ html body .sets-registry .sets-row-barcode {
   }
 }
 @media (max-width: 1279px) {
-  html body .sets-registry th:nth-child(2),
-  html body .sets-registry td:nth-child(2) {
-    display: none;
-  }
-  html body .sets-registry .sets-row-barcode {
-    display: block;
-    color: var(--c-cyan-45);
-    font-weight: 700;
-  }
   html body .sets-registry td:first-child .row-title-link {
     overflow-wrap: normal;
     word-break: normal;

@@ -43,7 +43,8 @@ export default function ListExport({
             >
               <CalendarDays size={16} />
               <span>
-                {tr('Κατάσταση')}: <b>{day ? dayLabel(day) : tr('Σήμερα')}</b>
+                <span className="export-day-word">{tr('Κατάσταση')}: </span>
+                <b>{day ? dayLabel(day) : tr('Σήμερα')}</b>
               </span>
             </span>
             {day && (

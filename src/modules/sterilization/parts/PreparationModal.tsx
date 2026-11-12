@@ -125,6 +125,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
               <AssetTypeIcon
                 kind={prepDraft.kind}
                 maxUses={prepDraft.kind === 'TOOL' ? prepDraft.asset.maxUses : undefined}
+                wearCheck={prepDraft.kind === 'TOOL' ? prepDraft.asset.wearCheck : undefined}
                 framed
                 className="ster-kind"
                 size={19}

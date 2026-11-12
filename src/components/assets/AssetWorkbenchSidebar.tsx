@@ -165,7 +165,7 @@ export default function AssetWorkbenchSidebar({
     >
       <div className="asset-workbench-title">
         <div className="asset-workbench-title-main">
-          <AssetTypeIcon kind={kind} maxUses={asset.maxUses} framed size={19} />
+          <AssetTypeIcon kind={kind} maxUses={asset.maxUses} wearCheck={tool?.wearCheck} framed size={19} />
           <div>
             <span className="eyebrow">{kind === 'SET' ? tr('ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h1>{asset.name}</h1>
@@ -483,7 +483,7 @@ export default function AssetWorkbenchSidebar({
         ) : (
           <>
             <div className="asset-workbench-mini">
-              <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} size={17} />
+              <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} wearCheck={tool?.wearCheck} size={17} />
               <div>
                 <span>{tr('Χρήσεις')}</span>
                 <strong>{tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool?.uses || 0)}</strong>

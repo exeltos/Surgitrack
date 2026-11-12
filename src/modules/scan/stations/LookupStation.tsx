@@ -79,7 +79,7 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
       {asset && found && (
         <article className="scan-lookup">
           <header>
-            <AssetTypeIcon kind={found.kind} maxUses={tool?.maxUses} size={20} framed />
+            <AssetTypeIcon kind={found.kind} maxUses={tool?.maxUses} wearCheck={tool?.wearCheck} size={20} framed />
             <span>
               <small className="mono">{asset.barcode}</small>
               <b>{asset.name}</b>
