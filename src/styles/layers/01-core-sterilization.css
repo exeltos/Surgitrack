@@ -2831,9 +2831,6 @@ td {
     width: calc(100vw - 20px);
     max-height: calc(100vh - 20px);
   }
-  .workflow-modal-head > .badge {
-    grid-column: 2;
-  }
   .workflow-modal-cycle .cycle-clean-summary {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
@@ -4436,27 +4433,6 @@ td {
 .delivery-batch-modal .workflow-modal-head {
   flex: 0 0 auto;
 }
-.delivery-batch-count {
-  display: grid;
-  place-items: center;
-  min-width: 78px;
-  padding: 8px 12px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 11px;
-  background: var(--c-gray-100-2);
-}
-.delivery-batch-count strong {
-  font-size: 22px;
-  line-height: 1;
-  color: var(--c-cyan-35-6);
-}
-.delivery-batch-count span {
-  font-size: 11px;
-  color: var(--st-muted);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
 .delivery-batch-body {
   min-height: 0;
   overflow: auto;
@@ -4551,22 +4527,6 @@ td {
 .delivery-batch-confirm .cycle-note {
   margin: 0;
 }
-.delivery-trace-note {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  padding: 10px;
-  border-radius: 10px;
-  background: var(--c-gray-100-2);
-  border: 1px solid var(--c-gray-90);
-  color: var(--c-cyan-45-5);
-  font-size: 11px;
-  line-height: 1.45;
-}
-.delivery-trace-note svg {
-  flex: 0 0 auto;
-  color: var(--c-cyan-45-6);
-}
 .delivery-batch-modal .workflow-modal-actions {
   flex: 0 0 auto;
 }
@@ -4586,9 +4546,6 @@ td {
   }
   .delivery-batch-list {
     max-height: 290px;
-  }
-  .delivery-batch-count {
-    min-width: 62px;
   }
   .delivery-batch-modal .load-camera-view {
     height: 250px;
@@ -4711,8 +4668,7 @@ td {
   padding: 16px 82px 14px 20px;
   min-height: 72px;
 }
-.workflow-modal-head > .badge,
-.workflow-modal-head > .delivery-batch-count {
+.workflow-modal-head > .badge {
   justify-self: end;
   margin-left: 8px;
   max-width: 190px;
@@ -4766,9 +4722,6 @@ td {
 .delivery-batch-modal .workflow-modal-head {
   padding-right: 82px;
 }
-.delivery-batch-count {
-  margin-left: 0;
-}
 @media (max-width: 760px) {
   .receipt-card-modal.workflow-modal,
   .receipt-card-modal.workflow-modal:not(.load-modal):not(.load-release-modal):not(.delivery-batch-modal):not(
@@ -4789,8 +4742,7 @@ td {
     padding: 14px 66px 12px 14px;
     min-height: 66px;
   }
-  .workflow-modal-head > .badge,
-  .workflow-modal-head > .delivery-batch-count {
+  .workflow-modal-head > .badge {
     grid-column: 2;
     justify-self: start;
     margin: 6px 0 0;
@@ -4817,19 +4769,6 @@ td {
   justify-content: space-between;
   gap: 12px;
 }
-.delivery-list-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 9px;
-  min-width: 0;
-}
-.delivery-list-actions small {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
-}
 .delivery-batch-confirm .delivery-auth > label {
   display: grid;
   gap: 6px;
@@ -4847,19 +4786,6 @@ td {
   .delivery-batch-assets .load-assets-head {
     align-items: flex-start;
     flex-direction: column;
-  }
-  .delivery-list-actions {
-    width: 100%;
-    align-items: stretch;
-    flex-direction: column;
-  }
-  .delivery-list-actions .secondary {
-    width: 100%;
-    justify-content: center;
-  }
-  .delivery-list-actions small {
-    max-width: none;
-    white-space: normal;
   }
 }
 

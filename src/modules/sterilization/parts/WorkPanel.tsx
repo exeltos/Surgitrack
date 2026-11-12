@@ -116,23 +116,42 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const loadIdOf = new Map<string, string>(
     awaitingLoads.flatMap(load => load.items.map(item => [`${item.assetKind}:${item.assetId}`, load.id] as const)),
   );
-  const listed: Array<{load: (typeof awaitingLoads)[number]} | {x: (typeof order.rows)[number]}> =
-    queue === 'RELEASE'
-      ? [
-          ...awaitingLoads.flatMap(load => {
-            const its = order.rows.filter(x => loadIdOf.get(keyOf(x)) === load.id);
-            return its.length ? [{load}, ...its.map(x => ({x}))] : [];
-          }),
-          ...order.rows.filter(x => !loadIdOf.has(keyOf(x))).map(x => ({x})),
-        ]
-      : order.rows.map(x => ({x}));
-  const loadContent = (load: (typeof awaitingLoads)[number]) => {
-    const sets = load.items.filter(item => item.assetKind === 'SET').length;
-    const tools = load.items.length - sets;
+  type Row = (typeof order.rows)[number];
+  const listed: Array<{load: (typeof awaitingLoads)[number]} | {department: string; items: Row[]} | {x: Row}> =
+    queue === 'READY'
+      ? // Delivery: the rows under their department (a delivery goes to one), in the order the list is sorted.
+        [...new Set(order.rows.map(x => x.department || ''))].flatMap(department => {
+          const its = order.rows.filter(x => (x.department || '') === department);
+          return [{department, items: its}, ...its.map(x => ({x}))];
+        })
+      : queue === 'RELEASE'
+        ? [
+            ...awaitingLoads.flatMap(load => {
+              const its = order.rows.filter(x => loadIdOf.get(keyOf(x)) === load.id);
+              return its.length ? [{load}, ...its.map(x => ({x}))] : [];
+            }),
+            ...order.rows.filter(x => !loadIdOf.has(keyOf(x))).map(x => ({x})),
+          ]
+        : order.rows.map(x => ({x}));
+  const contentOf = (kinds: string[]) => {
+    const sets = kinds.filter(kind => kind === 'SET').length;
+    const tools = kinds.length - sets;
     return [sets ? tr('{0} Σετ', sets) : '', tools ? tr('{0} εργαλεία', tools) : ''].filter(Boolean).join(' · ');
   };
+  // The status column speaks only when a row has something to say (an open report, a reprocess): otherwise it is
+  // left out and the specialty takes its room.
+  const noStatus =
+    queue !== 'INCOMING' &&
+    !order.rows.some(
+      x =>
+        openIssuesOf(x.barcode).length > 0 ||
+        (showsReprocess &&
+          !!reprocessReason(x.id, sterilizationCycles, sterilizationReleases, processLoads, recallCases)),
+    );
   return (
-    <div className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}`}>
+    <div
+      className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}${noStatus ? ' no-status' : ''}`}
+    >
       {/* The stage and its count are in the step bar above: this row only holds the stage's actions. */}
       <div className="ster-panel-head">
         <div className="ster-panel-head-actions" data-tour="ster-panel-actions">
@@ -194,7 +213,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
           )}
           {queue === 'READY' && ready.length > 0 && (
-            <button className="primary compact" onClick={openDeliveryBatch}>
+            <button className="primary compact" onClick={() => openDeliveryBatch()}>
               <ScanBarcode size={15} /> {tr('Μαζική παράδοση')}
             </button>
           )}
@@ -280,7 +299,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   <div className="ster-load-group" key={`load-${load.id}`}>
                     <span>
                       <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', load.cycleNumber)}
-                      <small>{loadContent(load)}</small>
+                      <small>{contentOf(load.items.map(item => item.assetKind))}</small>
                     </span>
                     <button
                       className="primary compact"
@@ -292,6 +311,18 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   </div>
                 );
               }
+              if ('department' in item)
+                return (
+                  <div className="ster-load-group" key={`department-${item.department}`}>
+                    <span>
+                      <b>{trData(item.department) || tr('Χωρίς τμήμα')}</b>
+                      <small>{contentOf(item.items.map(x => x.kind))}</small>
+                    </span>
+                    <button className="primary compact" onClick={() => openDeliveryBatch(item.department)}>
+                      <UserRoundCheck size={15} /> {tr('Παράδοση όλων')}
+                    </button>
+                  </div>
+                );
               const x = item.x;
               const assetIssues = openIssuesOf(x.barcode);
               const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
@@ -434,8 +465,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <PackageCheck size={15} /> {tr('Έλεγχος αποθήκευσης')}
                       </button>
                     ) : (
-                      <button className="primary compact" onClick={() => openDelivery(x.kind, x)}>
-                        <UserRoundCheck size={15} /> {tr('Παράδοση στο τμήμα')}
+                      <button className="compact ster-row-deliver" onClick={() => openDelivery(x.kind, x)}>
+                        <UserRoundCheck size={15} /> {tr('Παράδοση')}
                       </button>
                     )}
                     {/* Owner, hospital admin and supervisor: put it back to an earlier stage after a mistake. */}

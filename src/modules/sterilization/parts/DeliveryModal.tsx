@@ -1,4 +1,3 @@
-import StatusBadge from '../../../components/ui/StatusBadge';
 import {CheckCircle2, Box, Stethoscope, UserRoundCheck, IdCard, UserCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
@@ -29,7 +28,6 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
                 {deliveryDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ')}</span>
                 <h2>
                   {deliveryDraft.asset.barcode} · {deliveryDraft.asset.name}
                 </h2>
@@ -38,7 +36,6 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
                   {trData(deliveryDraft.asset.department)}
                 </p>
               </div>
-              <StatusBadge value={deliveryDraft.asset.state} />
             </div>
             <div className="workflow-modal-body">
               <div className="delivery-pair">
@@ -62,7 +59,7 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
               <section className="delivery-auth">
                 <HandoverSignature
                   autoFocus
-                  label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
+                  label={tr('Υπογραφή παραλαμβάνοντα')}
                   department={deliveryDraft.asset.department}
                   signer={receiver}
                   assetIds={[deliveryDraft.asset.id]}
@@ -99,7 +96,7 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
             <div className="modal-actions workflow-modal-actions">
               <button onClick={closeDelivery}>{tr('Ακύρωση')}</button>
               <button className="primary" disabled={!receiver || !receiverMatches} onClick={completeDelivery}>
-                <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης / παραλαβής')}
+                <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης')}
               </button>
             </div>
           </div>

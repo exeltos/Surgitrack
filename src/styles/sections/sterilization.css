@@ -966,8 +966,8 @@ html body .delivery-batch-modal .handover-signature-row input {
   min-width: 0;
   width: 100%;
 }
-html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
-html body .receipt-card-modal.workflow-modal.workflow-modal-delivery,
+html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal.workflow-checkpoint-modal,
+html body .receipt-card-modal.workflow-modal.workflow-modal-delivery.workflow-modal-delivery,
 html body .receipt-card-modal.workflow-modal.load-modal.washer-load,
 html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load,
 html body .receipt-card-modal.workflow-modal.load-release-modal {
@@ -1133,7 +1133,6 @@ html body .receipt-visible-deviation button {
 }
 /* Bulk receipt and delivery: the hint beside the list title wraps in the type of the title's own hint
    instead of running out of room in a larger one. */
-html body .delivery-list-actions small,
 html body .delivery-batch-assets .load-assets-head > small {
   max-width: 340px;
   overflow: visible;
@@ -2727,4 +2726,43 @@ html body .sterilization-workspace .ster-load-group > span {
 html body .sterilization-workspace .ster-load-group small {
   color: var(--st-muted);
   font-size: 12px;
+}
+/* A queue whose rows have no status to show: the status column is left out and the specialty takes its room. */
+@media (min-width: 1101px) {
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-list-head > span:nth-child(4),
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-work-row > .ster-meta {
+    display: none;
+  }
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-list-head > span:nth-child(3),
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-work-row > .ster-cell-specialty {
+    grid-column: span 2;
+  }
+}
+/* Delivery: one light button per row; the department's block above carries the strong «Παράδοση όλων». */
+html body .sterilization-workspace .ster-row-deliver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--c-gray-90);
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+}
+html body .sterilization-workspace .ster-row-deliver:hover {
+  border-color: var(--c-cyan-60);
+}
+/* Dialogs as tall as their content: on a short window the content scrolls and the buttons stay in view. */
+html body .workflow-checkpoint-modal > .workflow-checkpoint-body,
+html body .workflow-modal-delivery > .workflow-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+html body .workflow-checkpoint-modal > .workflow-modal-actions,
+html body .workflow-modal-delivery > .workflow-modal-actions {
+  flex: 0 0 auto;
 }

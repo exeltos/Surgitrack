@@ -4,7 +4,7 @@ import BatchDepartmentPicker from './BatchDepartmentPicker';
 import {departmentsOf} from '../batchDepartments';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
-import {CheckCircle2, ScanBarcode, UserRoundCheck, ShieldCheck, IdCard, UserCheck} from 'lucide-react';
+import {CheckCircle2, ScanBarcode, UserRoundCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -14,7 +14,6 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
     addBarcodeToDelivery,
     closeDeliveryBatch,
     completeDeliveryBatch,
-    currentUser,
     deliveryBatchDepartment,
     deliveryBatchNote,
     deliveryBatchOpen,
@@ -53,31 +52,11 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                 <ScanBarcode size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ')}</span>
                 <h2>{tr('Μαζική παράδοση')}</h2>
-                <p>
-                  {tr(
-                    'Πρόσθεσε τα αντικείμενα με barcode, scanner υπολογιστή ή χειροκίνητα από τη λίστα. Κάθε παράδοση αφορά ένα τμήμα.',
-                  )}
-                </p>
-              </div>
-              <div className="delivery-batch-count">
-                <strong>{deliverySelectedAssets.length}</strong>
-                <span>{tr('επιλεγμένα')}</span>
               </div>
             </div>
             <div className="delivery-batch-body">
-              <BarcodeCapture
-                title={tr('Προσθήκη στην παράδοση')}
-                subtitle={
-                  deliveryBatchDepartment
-                    ? tr('Παράδοση προς {0}', deliveryBatchDepartment)
-                    : tr('Το πρώτο barcode ορίζει το τμήμα της παράδοσης.')
-                }
-                feedback={deliveryScanFeedback}
-                onBarcode={addBarcodeToDelivery}
-                suggest={ready}
-              />
+              <BarcodeCapture feedback={deliveryScanFeedback} onBarcode={addBarcodeToDelivery} suggest={ready} />
               <div className="delivery-batch-grid">
                 <section className="delivery-batch-assets">
                   <div className="load-assets-head">
@@ -87,13 +66,6 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                         {deliverySelectedAssets.length} {tr('επιλεγμένα')}
                         {deliveryBatchDepartment ? ` · ${deliveryBatchDepartment}` : ''}
                       </span>
-                    </div>
-                    <div className="delivery-list-actions">
-                      <small>
-                        {deliveryBatchDepartment
-                          ? tr('Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.')
-                          : tr('Επιλέξτε το πρώτο αντικείμενο για να οριστεί το τμήμα.')}
-                      </small>
                     </div>
                   </div>
                   <BatchDepartmentPicker
@@ -153,36 +125,15 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                               {incompatible ? tr(' · Άλλο τμήμα') : ''}
                             </small>
                           </div>
-                          {selected && <CheckCircle2 size={17} />}
                         </label>
                       );
                     })}
                   </div>
                 </section>
                 <section className="delivery-batch-confirm">
-                  <div className="delivery-pair">
-                    <div className="delivery-person confirmed">
-                      <UserCheck size={19} />
-                      <div>
-                        <span>{tr('Παραδίδει')}</span>
-                        <strong>{trData(currentUser.name)}</strong>
-                        <small>{trData(currentUser.department)}</small>
-                      </div>
-                    </div>
-                    <div className={`delivery-person ${deliveryBatchReceiverMatches ? 'confirmed' : ''}`}>
-                      <IdCard size={19} />
-                      <div>
-                        <span>{tr('Παραλαμβάνει')}</span>
-                        <strong>
-                          {deliveryBatchReceiverMatches ? deliveryBatchReceiver?.name : tr('Αναμονή ταυτοποίησης')}
-                        </strong>
-                        <small>{deliveryBatchDepartment || tr('Σκανάρετε πρώτα αντικείμενο')}</small>
-                      </div>
-                    </div>
-                  </div>
                   <section className="delivery-auth">
                     <HandoverSignature
-                      label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
+                      label={tr('Υπογραφή παραλαμβάνοντα')}
                       department={deliveryBatchDepartment}
                       disabled={!deliveryBatchDepartment}
                       signer={deliveryBatchReceiver}
@@ -216,14 +167,6 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                       placeholder={tr('Προαιρετική παρατήρηση για ολόκληρη την παράδοση…')}
                     />
                   </label>
-                  <div className="delivery-trace-note">
-                    <ShieldCheck size={17} />
-                    <span>
-                      {tr(
-                        'Με την ολοκλήρωση καταγράφονται κοινό ID παράδοσης, χρήστης αποστείρωσης, παραλαμβάνων, τμήμα, ημερομηνία/ώρα και σύνδεση κάθε barcode με το ιστορικό κύκλου του.',
-                      )}
-                    </span>
-                  </div>
                 </section>
               </div>
             </div>

@@ -479,10 +479,10 @@ async function main() {
     await step('Sterilization delivers it to the department', async () => {
       const {page} = sterilization;
       await queue('Παράδοση');
-      await queueRow().getByRole('button', {name: 'Παράδοση στο τμήμα'}).click();
+      await queueRow().getByRole('button', {name: 'Παράδοση', exact: true}).click();
       // The department's nurse receives it and signs with their own code and password.
       await signHandover(page, ACCOUNTS.DEPARTMENT);
-      await page.getByRole('button', {name: 'Ολοκλήρωση παράδοσης / παραλαβής'}).click();
+      await page.getByRole('button', {name: 'Ολοκλήρωση παράδοσης'}).click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'IN_DEPARTMENT', 'state saved');
       const delivery = db.deliveries.find(d => d.asset_id === setId);

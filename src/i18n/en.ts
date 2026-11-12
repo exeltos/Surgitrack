@@ -371,6 +371,8 @@ export const en: Record<string, string> = {
     'Scanner, typing or search by name: Enter or pick from the list.',
   'Αποδέσμευση · {0}': 'Release · {0}',
   'Απόρριψη φορτίου': 'Reject the load',
+  'Υπογραφή παραλαμβάνοντα': 'Receiver’s signature',
+  'Παράδοση όλων': 'Deliver all',
   'Αριθμός κύκλου': 'Cycle number',
   'Αρνητικός / επιτυχής': 'Negative / pass',
   'Αρχική σύνθεση': 'Initial composition',
@@ -478,7 +480,6 @@ export const en: Record<string, string> = {
   'Επιλέξτε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.':
     'Select the physical instruments that will belong to the set from the first save.',
   'Επιλέξτε τι θα γίνει με τα': 'Choose what happens to the',
-  'Επιλέξτε το πρώτο αντικείμενο για να οριστεί το τμήμα.': 'Select the first item to set the department.',
   'Επίλεξε το φυσικό εργαλείο που θα καλύψει την έλλειψη. Με την επιβεβαίωση θα προστεθεί στο Set.':
     'Select the physical instrument that will cover the shortage. On confirmation it will be added to the set.',
   'Επανέκδοση ετικέτας': 'Label reissue',
@@ -720,8 +721,6 @@ export const en: Record<string, string> = {
     'On confirmation, the current instrument leaves and the new one enters the set at the same time.',
   'Με την επιβεβαίωση το επιλεγμένο φυσικό εργαλείο προστίθεται στο Set και καλύπτει την έλλειψη.':
     'On confirmation, the selected physical instrument is added to the set and covers the shortage.',
-  'Με την ολοκλήρωση καταγράφονται κοινό ID παράδοσης, χρήστης αποστείρωσης, παραλαμβάνων, τμήμα, ημερομηνία/ώρα και σύνδεση κάθε barcode με το ιστορικό κύκλου του.':
-    'Completing records a shared delivery ID, the sterilization user, the receiver, department, date/time and links each barcode to its cycle history.',
   'Αχρησιμοποίητα (0 χρήσεις)': 'Unused (0 uses)',
   Χρησιμοποιημένα: 'Used',
   'Έχει όριο χρήσεων και καμία χρήση ακόμα.': 'Has a use limit and no use yet.',
@@ -810,7 +809,6 @@ export const en: Record<string, string> = {
   'Μη πλήρης σύνθεση': 'Incomplete composition',
   'Όλα τα Σετ του νοσοκομείου: πού βρίσκονται, τι τους λείπει, πότε λήγουν.':
     'Every Set of the hospital: where it is, what it is missing, when it expires.',
-  'Μπορείς να επιλέξεις πολλά αντικείμενα του ίδιου τμήματος.': 'You can select many items of the same department.',
   'Μπορείς να κάνεις λήψη με την κάμερα ή upload πολλών φωτογραφιών πριν από την πρώτη αποθήκευση.':
     'You can capture with the camera or upload several photos before the first save.',
   'Μόνιμες παρατηρήσεις': 'Permanent notes',
@@ -886,7 +884,6 @@ export const en: Record<string, string> = {
   'Ολοκλήρωση · Προς κλιβανισμό': 'Complete · To sterilization',
   'Ολοκλήρωση κύκλου': 'Complete cycle',
   'Ολοκλήρωση κύκλου αποστείρωσης': 'Sterilization cycle completed',
-  'Ολοκλήρωση παράδοσης / παραλαβής': 'Complete delivery / receipt',
   'Ολοκλήρωση παράδοσης ·': 'Complete delivery ·',
   'Ολοκλήρωση παραλαβής ·': 'Complete receipt ·',
   'Ολοκλήρωση φορτίου ·': 'Complete load ·',
@@ -907,7 +904,6 @@ export const en: Record<string, string> = {
   'Οριστική διαγραφή φυσικού εργαλείου': 'Physical instrument permanently deleted',
   'Π.χ. ειδική παρατήρηση μεταφοράς ή κατάστασης…': 'E.g. special transport or condition note…',
   'Π.χ. εξουσιοδοτημένη μεταφορά από άλλο τμήμα…': 'E.g. authorized transport from another department…',
-  'ΠΑΡΑΔΟΣΗ ΣΤΟ ΤΜΗΜΑ': 'DELIVERY TO DEPARTMENT',
   ΠΑΡΑΚΟΛΟΥΘΗΣΗ: 'MONITORING',
   ΠΡΟΕΠΙΣΚΟΠΗΣΗ: 'PREVIEW',
   'Πίσω στα Σετ & Εργαλεία': 'Back to Sets & Instruments',
@@ -1124,14 +1120,11 @@ export const en: Record<string, string> = {
   'Προσθήκη εργαλείων στο Σετ;': 'Add instruments to the set?',
   'Προσθήκη παρατήρησης': 'Add note',
   'Προσθήκη σε Σετ': 'Add to set',
-  'Προσθήκη στην παράδοση': 'Add to delivery',
   'Προσθήκη στην παραλαβή': 'Add to receipt',
   'Προσθήκη στο Σετ': 'Add to set',
   'Προσθήκη φωτογραφιών': 'Add photos',
   'Πρόβλημα κατά την παραλαβή': 'Problem at receipt',
   Πρόγραμμα: 'Program',
-  'Πρόσθεσε τα αντικείμενα με barcode, scanner υπολογιστή ή χειροκίνητα από τη λίστα. Κάθε παράδοση αφορά ένα τμήμα.':
-    'Add items by barcode, computer scanner or manually from the list. Each delivery is for one department.',
   'Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης': 'Recently released loads · recall available',
   Πρότυπο: 'Template',
   'Ρυθμίσεις νέου Σετ': 'New set settings',
@@ -1169,7 +1162,6 @@ export const en: Record<string, string> = {
   'Σετ του τμήματος': 'Department sets',
   Σημείωση: 'Note',
   Σημειώσεις: 'Notes',
-  'Σκανάρετε πρώτα αντικείμενο': 'Scan an item first',
   Στάδιο: 'Stage',
   'Στα αγγλικά θα εμφανίζεται ως': 'In English it will show as',
   'Στα αγγλικά θα εμφανίζεται όπως το γράψατε.': 'In English it will show as you wrote it.',
