@@ -44,7 +44,10 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
     <>
       {loadModal && (
         <div className="modal-backdrop" onMouseDown={closeLoad}>
-          <div className="receipt-card-modal workflow-modal load-modal" onMouseDown={e => e.stopPropagation()}>
+          <div
+            className={`receipt-card-modal workflow-modal load-modal ${loadModal === 'WASHING' ? 'washer-load' : 'sterilizer-load'}`}
+            onMouseDown={e => e.stopPropagation()}
+          >
             <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoad}>
               <X size={18} />
             </button>
@@ -53,15 +56,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 {loadModal === 'WASHING' ? <PackageOpen size={20} /> : <Flame size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">
-                  {loadModal === 'WASHING' ? tr('ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ') : tr('ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ')}
-                </span>
                 <h2>{loadModal === 'WASHING' ? tr('Φόρτωση πλυντηρίου') : tr('Φόρτωση κλιβάνου')}</h2>
-                <p>
-                  {tr(
-                    'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.',
-                  )}
-                </p>
               </div>
             </div>
             <div className="load-modal-body">
@@ -136,29 +131,6 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 </label>
                 {loadModal === 'WASHING' && (
                   <>
-                    <div className="load-indicator-pick" role="group" aria-labelledby="load-wash-result">
-                      <span id="load-wash-result">{tr('Αποτέλεσμα πλύσης')}</span>
-                      <div className="load-indicator-chips">
-                        <label>
-                          <input
-                            type="radio"
-                            name="load-wash-result"
-                            checked={loadChemical !== 'FAIL'}
-                            onChange={() => setLoadChemical('PASS')}
-                          />
-                          {tr('Επιτυχές')}
-                        </label>
-                        <label>
-                          <input
-                            type="radio"
-                            name="load-wash-result"
-                            checked={loadChemical === 'FAIL'}
-                            onChange={() => setLoadChemical('FAIL')}
-                          />
-                          {tr('Αποτυχία')}
-                        </label>
-                      </div>
-                    </div>
                     <label>
                       {tr('Θερμοκρασία (°C)')}
                       <input
@@ -270,14 +242,42 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   })}
                 </div>
               </section>
-              <label className="cycle-note">
-                {tr('Παρατήρηση φορτίου')}
-                <textarea
-                  value={loadNote}
-                  onChange={e => setLoadNote(e.target.value)}
-                  placeholder={tr('Προαιρετική παρατήρηση / απόκλιση…')}
-                />
-              </label>
+              {/* The last things said before completing: the washing result (a washer) and the note, side by side. */}
+              <div className="load-finish-row">
+                {loadModal === 'WASHING' && (
+                  <div className="load-indicator-pick" role="group" aria-labelledby="load-wash-result">
+                    <span id="load-wash-result">{tr('Αποτέλεσμα πλύσης')}</span>
+                    <div className="load-indicator-chips">
+                      <label>
+                        <input
+                          type="radio"
+                          name="load-wash-result"
+                          checked={loadChemical !== 'FAIL'}
+                          onChange={() => setLoadChemical('PASS')}
+                        />
+                        {tr('Επιτυχές')}
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="load-wash-result"
+                          checked={loadChemical === 'FAIL'}
+                          onChange={() => setLoadChemical('FAIL')}
+                        />
+                        {tr('Αποτυχία')}
+                      </label>
+                    </div>
+                  </div>
+                )}
+                <label className="cycle-note">
+                  {tr('Παρατήρηση φορτίου')}
+                  <textarea
+                    value={loadNote}
+                    onChange={e => setLoadNote(e.target.value)}
+                    placeholder={tr('Προαιρετική παρατήρηση / απόκλιση…')}
+                  />
+                </label>
+              </div>
             </div>
             <div className="modal-actions workflow-modal-actions">
               <button onClick={closeLoad}>{tr('Ακύρωση')}</button>

@@ -5,7 +5,7 @@ import {useTableSort} from '../../../components/ui/useTableSort';
 import {loadLabel} from '../../../core/loadLabel';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {
@@ -89,8 +89,11 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const openIssuesOf = useMemo(() => openIssuesByBarcode(issues), [issues]);
   // Before the sterilizer, an item that came back from a failed cycle or a load not released says so.
   const showsReprocess = ['WASHING', 'PREP', 'PACKAGING', 'PROCESS'].includes(queue);
-  // The instruments of «Φόρτωση κλιβάνου» are all picked by default; unticking leaves one out of the load.
+  // A loading queue (washer or sterilizer): every item is picked by default; unticking leaves one out of the load.
+  const picking = queue === 'WASHING' || queue === 'PROCESS';
   const [left, setLeft] = useState<Set<string>>(new Set());
+  // Another queue starts with everything picked again.
+  useEffect(() => setLeft(new Set()), [queue]);
   const keyOf = (x: {kind: string; id: string}) => `${x.kind}:${x.id}`;
   const pickedKeys = rows.map(keyOf).filter(key => !left.has(key));
   const withTests = useHasModule('EQUIPMENT_TESTS');
@@ -126,14 +129,21 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
               )}
             </>
           )}
-          {queue === 'WASHING' && (
+          {queue === 'WASHING' && washing.length > 0 && (
             <>
-              <span className="ster-hint">{tr('Τεκμηριωμένος έλεγχος καθαρισμού / απολύμανσης.')}</span>
-              {washing.length > 0 && (
-                <button className="primary compact" onClick={() => openLoad('WASHING')}>
-                  <Layers3 size={15} /> {tr('Φόρτωση πλυντηρίου')}
-                </button>
-              )}
+              <button
+                className="ster-pick-all"
+                onClick={() => setLeft(pickedKeys.length === rows.length ? new Set(rows.map(keyOf)) : new Set())}
+              >
+                {pickedKeys.length === rows.length ? tr('Αποεπιλογή όλων') : tr('Επιλογή όλων')}
+              </button>
+              <button
+                className="primary compact"
+                disabled={!pickedKeys.length}
+                onClick={() => openLoad('WASHING', pickedKeys)}
+              >
+                <Layers3 size={15} /> {tr('Φόρτωση πλυντηρίου')} · {pickedKeys.length}
+              </button>
             </>
           )}
           {queue === 'PREP' && (
@@ -326,8 +336,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                 : undefined;
               return (
                 <div className="ster-work-row" key={`${x.kind}-${x.id}`}>
-                  <div className={`ster-asset-cell${queue === 'PROCESS' ? ' with-pick' : ''}`}>
-                    {queue === 'PROCESS' && (
+                  <div className={`ster-asset-cell${picking ? ' with-pick' : ''}`}>
+                    {picking && (
                       <input
                         type="checkbox"
                         className="ster-row-pick"
@@ -415,17 +425,19 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <CheckCircle2 size={15} /> {tr('Παραλαβή')}
                       </button>
                     ) : queue === 'WASHING' ? (
-                      <>
-                        {/* A washer load with this item in it; washing without a washer only where Studio allows. */}
-                        <button className="primary compact" onClick={() => openLoad('WASHING', [`${x.kind}:${x.id}`])}>
-                          <Layers3 size={15} /> {tr('Φόρτωση πλυντηρίου')}
+                      // Loaded from the header button with the ticked items; washing without a washer only where
+                      // Studio allows it, one item at a time.
+                      washWithoutWasher ? (
+                        <button className="ster-row-alt" onClick={() => openCheckpoint(x.kind, x, 'WASHING')}>
+                          {tr('Χωρίς πλυντήριο')}
                         </button>
-                        {washWithoutWasher && (
-                          <button className="ster-row-alt" onClick={() => openCheckpoint(x.kind, x, 'WASHING')}>
-                            {tr('Χωρίς πλυντήριο')}
-                          </button>
-                        )}
-                      </>
+                      ) : pickedKeys.includes(keyOf(x)) ? (
+                        <span className="ster-load-badge in">
+                          <CheckCircle2 size={13} /> {tr('Στο φορτίο')}
+                        </span>
+                      ) : (
+                        <span className="ster-load-badge">{tr('Εκτός φορτίου')}</span>
+                      )
                     ) : queue === 'PREP' ? (
                       <button
                         className="primary compact ster-primary-action"

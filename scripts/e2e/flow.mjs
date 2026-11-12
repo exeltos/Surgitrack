@@ -332,8 +332,10 @@ async function main() {
 
     await step('Sterilization washes it', async () => {
       await queue('Καθαρισμός');
-      // Washing goes through a washer load, with the row's item already picked.
-      await queueRow().getByRole('button', {name: 'Φόρτωση πλυντηρίου'}).click();
+      // Washing goes through a washer load: the rows are picked like the sterilizer's, only this item goes in.
+      await sterilization.page.getByRole('button', {name: 'Αποεπιλογή όλων'}).click();
+      await queueRow().locator('input[type=checkbox]').check();
+      await sterilization.page.getByRole('button', {name: /^Φόρτωση πλυντηρίου · 1/}).click();
       const modal = sterilization.page.locator('.load-modal');
       await modal.getByPlaceholder('π.χ. 2026-0815-07').fill('W-E2E-1');
       await modal.getByRole('button', {name: /^Ολοκλήρωση φορτίου/}).click();

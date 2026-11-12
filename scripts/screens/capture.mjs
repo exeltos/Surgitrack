@@ -628,7 +628,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
     const firstRow = () => page.locator('.ster-row-action button').first().click({timeout: 3000});
     const button = name => () => page.getByRole('button', {name}).first().click({timeout: 3000});
     const stages = [
-      ['washing', 'WASHING', firstRow],
+      ['washing', 'WASHING', button(/^(Φόρτωση πλυντηρίου|Load the washer) · \d/)],
       ['prep', 'PREP', firstRow],
       ['packaging', 'PACKAGING', firstRow],
       ['process', 'PROCESS', button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)],

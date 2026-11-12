@@ -471,8 +471,6 @@ export const en: Record<string, string> = {
   'Επιλέξτε αναφορά, ορίστε φίλτρα και δείτε τα αποτελέσματα πριν από εκτύπωση ή PDF.':
     'Pick a report, set filters and review the results before printing or PDF.',
   'Επιλέξτε πηγή και φυσικό εργαλείο.': 'Choose a source and a physical instrument.',
-  'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.':
-    'Select the sets/instruments going into the same cycle. The cycle record will be linked to all selected barcodes.',
   'Επιλέξτε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.':
     'Select the physical instruments that will belong to the set from the first save.',
   'Επιλέξτε τι θα γίνει με τα': 'Choose what happens to the',
@@ -1207,7 +1205,6 @@ export const en: Record<string, string> = {
     'Identify the sender once and scan the items of the same department one after another.',
   'Ταυτοποίηση παραδίδοντα': 'Sender identification',
   'Τεκμηρίωση πριν από συσκευασία και κλιβανισμό.': 'Documentation before packaging and sterilization.',
-  'Τεκμηριωμένος έλεγχος καθαρισμού / απολύμανσης.': 'Documented cleaning / disinfection quality gate.',
   'Τεκμηριωμένος τελικός έλεγχος πριν χαρακτηριστεί έτοιμο για παράδοση.':
     'Documented final check before marking ready for delivery.',
   'Τεχνικές ή μόνιμες παρατηρήσεις...': 'Technical or permanent notes...',
@@ -1276,8 +1273,6 @@ export const en: Record<string, string> = {
   'Υποχρεωτική αιτιολόγηση…': 'Mandatory reason…',
   Υπόλοιπο: 'Remaining',
   'Υπόλοιπο χρήσεων': 'Uses left',
-  'ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ': 'STERILIZATION LOAD',
-  'ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ': 'WASHER LOAD',
   Φθορά: 'Wear',
   'Φυσικά εργαλεία': 'Physical instruments',
   'Φυσικές παράμετροι κύκλου αποδεκτές': 'Cycle physical parameters acceptable',
