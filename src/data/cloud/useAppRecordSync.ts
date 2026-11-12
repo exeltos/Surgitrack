@@ -13,8 +13,12 @@ import {takeRestored, writeCollection} from './localCache';
 import {loadRecordsById, loadTable} from './appRecords';
 import {cutoffOf, HISTORY_WINDOW_DAYS, registerOlderLoader, setCutoff} from './historyWindow';
 import type {TableCollection} from './cloudTables';
-import {exportVersions, importVersions, rememberVersions} from './versions';
+import {exportVersions, importVersions, rememberVersions, versionOf} from './versions';
 import {mergeConcurrent, recordLabel} from './mergeConcurrent';
+import {currentGroup, held, liveCollections, onGroupSaved} from './saveTogether';
+
+// Saving an action's records together (S5) lives in saveTogether.ts; the store's slices import it from here.
+export {saveTogether, savedTogether} from './saveTogether';
 
 const SYNC_DELAY_MS = 400;
 /** A failed save is tried again after 5 s, then 10 s, 20 s … up to 2 minutes, until one succeeds. */
@@ -69,6 +73,8 @@ const markSynced = () => {
   lastSyncAt = Date.now();
   publish();
 };
+// A group saved in one transaction counts as reaching the server, like any save.
+onGroupSaved(() => markSynced());
 const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -164,11 +170,42 @@ const CACHE_DELAY_MS = 800;
  */
 const COPY_REFRESH_MS = 10 * 60000;
 
+/**
+ * The records the server has confirmed, counting every change to them, so that a comparison already made
+ * with the same records is not made again (at a large hospital's size each one goes through every record).
+ */
+class KnownRecords extends Map<string, CloudRecord> {
+  changes = 0;
+  set(id: string, record: CloudRecord) {
+    this.changes += 1;
+    return super.set(id, record);
+  }
+  delete(id: string) {
+    this.changes += 1;
+    return super.delete(id);
+  }
+}
+const lastDiff = new WeakMap<
+  Map<string, CloudRecord>,
+  {items: readonly CloudRecord[]; changes: number; result: {changed: CloudRecord[]; removed: string[]}}
+>();
 const diff = (known: Map<string, CloudRecord>, items: readonly CloudRecord[]) => {
+  const changes = known instanceof KnownRecords ? known.changes : -1;
+  const last = lastDiff.get(known);
+  if (last && changes >= 0 && last.items === items && last.changes === changes) return last.result;
   const changed = items.filter(item => known.get(item.id) !== item);
   const currentIds = new Set(items.map(item => item.id));
   const removed = [...known.keys()].filter(id => !currentIds.has(id));
-  return {changed, removed};
+  const result = {changed, removed};
+  if (changes >= 0) lastDiff.set(known, {items, changes, result});
+  return result;
+};
+// Each list of records by id, made once per list (the store replaces the list when it changes).
+const indexes = new WeakMap<readonly CloudRecord[], Map<string, CloudRecord>>();
+const byId = (items: readonly CloudRecord[]) => {
+  let index = indexes.get(items);
+  if (!index) indexes.set(items, (index = new Map(items.map(item => [item.id, item]))));
+  return index;
 };
 
 /** Records taken from another device count as saved when they show up in the store. */
@@ -241,7 +278,8 @@ export function useAppRecordSync(
       removed,
       bases: changed.map(item => known.get(item.id)).filter((base): base is CloudRecord => !!base),
       cutoff: cutoffOf(collection),
-      versions: exportVersions(collection),
+      // Asked for one by one when only the changes are written (a large hospital has 100,000 of them).
+      versions: {all: () => exportVersions(collection), of: id => versionOf(collection, id)},
       since: since.current,
       deletedSince: deletedSince.current,
     });
@@ -270,20 +308,25 @@ export function useAppRecordSync(
     if (!organizationId) return;
     const write = () => writeCopy.current();
     const flushNow = () => setRetryTick(tick => tick + 1);
+    const live = `${organizationId}:${collection}`;
+    const items = () => latest.current;
     cacheWriters.add(write);
     flushers.add(flushNow);
+    liveCollections.set(live, items);
     return () => {
       cacheWriters.delete(write);
       flushers.delete(flushNow);
+      if (liveCollections.get(live) === items) liveCollections.delete(live);
     };
-  }, [organizationId]);
+  }, [organizationId, collection]);
 
   useEffect(() => {
     latest.current = items;
     if (!organizationId) return;
     // The first snapshot is what was just loaded from the server, or this device's copy of it.
     if (!confirmed.current) {
-      const known = new Map(items.map(item => [item.id, item]));
+      const known = new KnownRecords();
+      for (const item of items) known.set(item.id, item);
       const copy = takeRestored(organizationId, collection);
       if (copy) {
         since.current = copy.since;
@@ -317,7 +360,7 @@ export function useAppRecordSync(
     // Records another device saved since this device saw them: merge field by field (S4).
     const resolveStale = async (ids: string[]) => {
       const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
-      const current = new Map(latest.current.map(item => [item.id, item]));
+      const current = byId(latest.current);
       const merged: CloudRecord[] = [];
       const gone: string[] = [];
       const givenUp: Array<{label: string; reverted: boolean; reason: RefusalReason}> = [];
@@ -368,7 +411,7 @@ export function useAppRecordSync(
     const dropRefused = async (refusals: RefusedRecord[]) => {
       const ids = refusals.map(refusal => refusal.id);
       const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
-      const current = new Map(latest.current.map(item => [item.id, item]));
+      const current = byId(latest.current);
       const back: CloudRecord[] = [];
       const gone: string[] = [];
       const records = refusals.map(({id, code}) => {
@@ -391,7 +434,7 @@ export function useAppRecordSync(
     // free one, counting this device's records and the server's, and is saved again.
     const renumber = async (ids: string[]) => {
       type Coded = CloudRecord & {barcode?: unknown; legacyBarcodes?: string[]};
-      const current = new Map(latest.current.map(item => [item.id, item as Coded]));
+      const current = byId(latest.current) as Map<string, Coded>;
       const clashing: Array<Coded & {barcode: string}> = [];
       const others: RefusedRecord[] = [];
       for (const id of ids) {
@@ -427,6 +470,42 @@ export function useAppRecordSync(
       applyRef.current?.(renumbered, []);
       notify({kind: 'barcode', collection, changes});
     };
+    // An action saving its records together is under way: this collection's changes join its group.
+    const collecting = currentGroup();
+    if (collecting && !collecting.members.has(key)) {
+      // Changes already waiting before the action are not its own: they stay with the flush, so a refused
+      // group never takes them back with it.
+      const before = collecting.before.get(key);
+      const take = () => {
+        const items = diff(known, latest.current).changed.filter(
+          item => !superseded.current.has(item) && !before?.has(item),
+        );
+        items.forEach(item => held.add(item));
+        return items;
+      };
+      collecting.members.set(key, {
+        organizationId,
+        collection,
+        take,
+        settle: (outcome, items) => {
+          items.forEach(item => held.delete(item));
+          if (outcome.kind === 'saved')
+            items.forEach(item => {
+              known.set(item.id, item);
+              staleStreak.current.delete(item.id);
+            });
+          const done =
+            outcome.kind === 'refused' && items.length
+              ? dropRefused(items.map(item => ({id: item.id, code: outcome.code, message: outcome.message})))
+              : Promise.resolve();
+          void done
+            .catch(error => console.error(`SurgiTrack: putting back ${collection} failed`, error))
+            .finally(() => setRetryTick(tick => tick + 1));
+        },
+      });
+      // Held at once, so that a save already under way does not send them on their own.
+      take();
+    }
     const before = (SAVED_AFTER[collection] || []).map(other => `${organizationId}:${other}`);
     const flush = async () => {
       busy.current = true;
@@ -435,10 +514,14 @@ export function useAppRecordSync(
       try {
         for (let round = 0; round < MAX_ROUNDS; round++) {
           if (before.length) await settled(before);
-          const next = diff(known, latest.current);
+          const all = diff(known, latest.current);
+          // Records in a group on its way are saved by it (or handed back when it cannot be).
+          const next = {...all, changed: all.changed.filter(item => !held.has(item))};
           if (!next.changed.length && !next.removed.length) {
-            pending.delete(key);
-            pendingRecords.delete(key);
+            if (next.changed.length === all.changed.length) {
+              pending.delete(key);
+              pendingRecords.delete(key);
+            }
             break;
           }
           pendingRecords.set(key, next.changed.length + next.removed.length);
@@ -482,7 +565,7 @@ export function useAppRecordSync(
         lastSyncAt = Date.now();
         // Still changing after the last round: run another flush rather than wait for a render.
         const rest = diff(known, latest.current);
-        if (rest.changed.length || rest.removed.length) {
+        if (rest.changed.some(item => !held.has(item)) || rest.removed.length) {
           if (hadStale) window.setTimeout(() => setRetryTick(tick => tick + 1), RETRY_DELAY_MS);
           else setRetryTick(tick => tick + 1);
         }
@@ -533,7 +616,7 @@ export function useAppRecordSync(
           removed = latest.current.filter(item => known.get(item.id) === item && gone.has(item.id)).map(i => i.id);
         }
         markSynced();
-        const current = new Map(latest.current.map(item => [item.id, item]));
+        const current = byId(latest.current);
         // A record changed here and not saved yet stays as it is here, with the version it started from.
         const editedHere = (id: string) => {
           const mine = current.get(id);

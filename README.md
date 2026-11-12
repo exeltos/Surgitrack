@@ -37,6 +37,10 @@ Other checks:
   (grants, tenants, viewers, supervisor rights, configuration history). See `supabase/MIGRATIONS.md`.
 - `npm run screens` captures every screen for every role, desktop and mobile, against a mocked Supabase
   (see `scripts/screens/README.md`).
+- `npm run scale` opens the real app in a browser with the sample hospital many times over (20,000, 50,000 and
+  100,000 instruments by default; `-- --tools 30000` for another size) and reports the opening, the memory and how
+  long a change from another device or typing a search blocks the screen (`-- --profile` also says where the time
+  went). See `scripts/scale/bench.mjs`.
 - `npm run e2e` runs the main flow through the real screens: a department sends a Set, Sterilization receives,
   washes, prepares, packs, loads, ends the cycle, releases and delivers it, each person in their own browser,
   checking what was saved after every step (`scripts/e2e/flow.mjs`, same mocked Supabase).
@@ -73,6 +77,8 @@ Data flow: the store holds records in memory; in a cloud workspace each collecti
   (a trigger refuses a direct write), and every set-password or invitation link an admin makes and every email
   change is kept in `account_events` (read by the hospital's admins, changed by nobody) and emailed to the person.
 - The platform owner's account is made or claimed only with a confirmed email and only while no other exists.
+- A release, a delivery and a receipt reach the database in one transaction (`save_records_together`, which runs
+  with the caller's rights, so row security and every guard still apply): all of their records or none.
 - Usage counts (uses, sterilizations) never go down through the API. Each receipt and delivery is stamped by the
   database with `counterparty_verified`: whether the other party confirmed with their own password (verify-handover,
   recorded in `handover_signatures`) to the signed-in user in the last 24 hours.

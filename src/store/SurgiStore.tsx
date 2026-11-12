@@ -1,10 +1,11 @@
-import {createContext, useContext, useMemo, type ReactNode} from 'react';
+import {createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode} from 'react';
 import {type SurgiDataMode} from '../data/repositories';
 import type {CloudWorkspace} from '../data/cloud/CloudWorkspaceGate';
 import type {SurgiStoreValue} from './types';
 import {useSurgiStore} from './slices/useSurgiStore';
 import {useLibraries} from '../core/LibraryStore';
 import {cancelledRecordIds} from '../core/movementUndo';
+import {createHolder, publish, useTrackedValue, type StoreHolder} from './trackedStore';
 
 export type {
   DeliveryPayload,
@@ -17,13 +18,27 @@ export type {
   UserRole,
   WorkflowCheckpointPayload,
 } from './types';
-const Ctx = createContext<SurgiStoreValue | null>(null);
+// The context carries a holder that never changes: a component is redrawn only when a value it read changes
+// (see trackedStore), not on every change of the store.
+const Ctx = createContext<StoreHolder<SurgiStoreValue> | null>(null);
 // eslint-disable-next-line react-refresh/only-export-components
 export const useSurgi = () => {
-  const x = useContext(Ctx);
-  if (!x) throw new Error('useSurgi outside provider');
-  return x;
+  const holder = useContext(Ctx);
+  if (!holder) throw new Error('useSurgi outside provider');
+  return useTrackedValue(holder);
 };
+/**
+ * The list as `list`, but the same array as last time when it holds the same records: a list filtered again
+ * after an unrelated change keeps its identity, so the screens that read it are not redrawn (see trackedStore).
+ */
+function useSameList<T>(list: T[]): T[] {
+  const last = useRef(list);
+  const previous = last.current;
+  if (previous !== list && (previous.length !== list.length || list.some((item, i) => item !== previous[i])))
+    last.current = list;
+  return last.current;
+}
+
 export function SurgiProvider({
   children,
   dataMode = 'DEMO',
@@ -133,12 +148,15 @@ export function SurgiProvider({
   const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
   // A receipt, delivery, preparation or stage check whose movement was undone stays recorded but no longer counts.
   const cancelled = useMemo(() => cancelledRecordIds(movements), [movements]);
-  const validReceipts = useMemo(() => receipts.filter(r => !cancelled.has(r.id)), [receipts, cancelled]);
-  const validDeliveries = useMemo(() => deliveries.filter(d => !cancelled.has(d.id)), [deliveries, cancelled]);
-  const validPreparations = useMemo(() => preparations.filter(r => !cancelled.has(r.id)), [preparations, cancelled]);
-  const validCheckpoints = useMemo(
-    () => workflowCheckpoints.filter(r => !cancelled.has(r.id)),
-    [workflowCheckpoints, cancelled],
+  const validReceipts = useSameList(useMemo(() => receipts.filter(r => !cancelled.has(r.id)), [receipts, cancelled]));
+  const validDeliveries = useSameList(
+    useMemo(() => deliveries.filter(d => !cancelled.has(d.id)), [deliveries, cancelled]),
+  );
+  const validPreparations = useSameList(
+    useMemo(() => preparations.filter(r => !cancelled.has(r.id)), [preparations, cancelled]),
+  );
+  const validCheckpoints = useSameList(
+    useMemo(() => workflowCheckpoints.filter(r => !cancelled.has(r.id)), [workflowCheckpoints, cancelled]),
   );
   const value = useMemo(
     () => ({
@@ -267,5 +285,10 @@ export function SurgiProvider({
       washers,
     ],
   );
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  const [holder] = useState(() => createHolder<SurgiStoreValue>(value));
+  // Set while drawing, so the components drawn after it in the same pass already see it; they and the others
+  // that read a changed value are told once it is on the screen.
+  holder.value = value;
+  useLayoutEffect(() => publish(holder), [holder, value]);
+  return <Ctx.Provider value={holder}>{children}</Ctx.Provider>;
 }

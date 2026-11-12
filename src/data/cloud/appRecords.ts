@@ -143,7 +143,7 @@ const isStale = (error: DbError | null) =>
  * rule raised by a trigger. Anything else (network, timeouts, server errors, a schema the client does
  * not know yet) is worth another try.
  */
-const isPermanentRefusal = (error: DbError | null) =>
+export const isPermanentRefusal = (error: DbError | null) =>
   !!error && (error.code === RLS_VIOLATION || error.code === 'P0001' || /^2[23]/.test(error.code || ''));
 /** A unique clash is the barcode's unless the database names the primary key (the id). */
 const isBarcodeClash = (error: DbError) =>
@@ -248,6 +248,66 @@ export async function writeAppRecords(
     if (error) await settle(chunk, error);
   }
   return outcome;
+}
+
+/**
+ * The order a group is saved in: what the others are checked against first (cycles, then their releases),
+ * the Sets and instruments last, as the sync does collection by collection (SAVED_AFTER).
+ */
+const GROUP_ORDER: CloudCollection[] = [
+  'sterilizationCycles',
+  'sterilizationReleases',
+  ...STORE_COLLECTIONS.filter(
+    c => c !== 'sterilizationCycles' && c !== 'sterilizationReleases' && c !== 'sets' && c !== 'tools',
+  ),
+  'sets',
+  'tools',
+];
+/** The most rows the database takes in one group (save_records_together); a larger one is saved as before. */
+export const MAX_GROUP_ROWS = 2000;
+/** Whether the database has save_records_together; asked once, until a reload, when it does not. */
+let togetherAvailable = true;
+const isMissingFunction = (error: DbError & {status?: number}) =>
+  error.code === 'PGRST202' || error.code === '42883' || error.status === 404;
+
+/**
+ * Saves records of several collections in one transaction (save_records_together): all of them or none.
+ * 'unavailable' when the database does not have the function yet (the caller saves them as before);
+ * a refusal or a network failure is thrown, and nothing of the group is saved.
+ */
+export async function saveRecordsTogether(
+  organizationId: string,
+  groups: Array<{collection: CloudCollection; items: CloudRecord[]}>,
+): Promise<'saved' | 'unavailable'> {
+  if (!togetherAvailable) return 'unavailable';
+  const ordered = [...groups].sort((a, b) => GROUP_ORDER.indexOf(a.collection) - GROUP_ORDER.indexOf(b.collection));
+  const rows = ordered.flatMap(({collection, items}) => {
+    const {table, mutable} = CLOUD_TABLES[collection];
+    return items.map(item => {
+      const row = tableToRow(
+        organizationId,
+        collection as TableCollection,
+        item as CloudRecord & Record<string, unknown>,
+      );
+      // The version this device saw: the database refuses the group if the record changed since (S4).
+      if (mutable) row.expected_updated_at = versionOf(collection, item.id) ?? null;
+      return {table, row};
+    });
+  });
+  const {data, error} = await supabase.rpc('save_records_together', {p_rows: rows});
+  if (error) {
+    if (isMissingFunction(error as DbError & {status?: number})) {
+      togetherAvailable = false;
+      return 'unavailable';
+    }
+    throw error;
+  }
+  const byTable = new Map(ordered.map(({collection}) => [CLOUD_TABLES[collection].table as string, collection]));
+  for (const saved of (data || []) as Array<{table: string; id: string; updated_at: string}>) {
+    const collection = byTable.get(saved.table);
+    if (collection) rememberVersions(collection, [saved]);
+  }
+  return 'saved';
 }
 
 /** Every barcode of the hospital's Sets or instruments, retired ones included (never handed out again). */

@@ -1,6 +1,6 @@
 import {ListEmpty} from '../../components/ui/EmptyState';
 import {useBrowseList} from '../../core/browseList';
-import {useMemo} from 'react';
+import {useDeferredValue, useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
@@ -29,11 +29,34 @@ import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
+/** What the search looks in, kept per record (a record is a new object whenever it changes). */
+const haystacks = new WeakMap<object, string>();
+const haystack = (t: {
+  barcode: string;
+  name: string;
+  code: string;
+  serialNumber?: string;
+  manufacturer?: string;
+  specialty?: string;
+  department?: string;
+  ownerName?: string;
+}) => {
+  let text = haystacks.get(t);
+  if (text === undefined) {
+    text =
+      `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''} ${t.ownerName || ''}`.toLowerCase();
+    haystacks.set(t, text);
+  }
+  return text;
+};
+
 export default function ToolsPage() {
   const {tools, sets, can, organizationId, movements} = useSurgi();
   const onDay = (day?: string) => (day ? usesOnDay(tools, movements, day) : undefined);
   const navigate = useNavigate();
   const [q, setQ] = useRememberedState('q', '');
+  // The list follows the search a moment later, so typing stays quick in a large hospital's list.
+  const searched = useDeferredValue(q);
   const [department, setDepartment] = useRememberedState('department', '');
   const [specialty, setSpecialty] = useRememberedState('specialty', '');
   const [manufacturer, setManufacturer] = useRememberedState('manufacturer', '');
@@ -61,16 +84,14 @@ export default function ToolsPage() {
     matchesUsage(usage, [view], systemSettings.usageWarningThreshold) &&
     (!state || t.state === state) &&
     (!mode || t.mode === mode) &&
-    `${t.barcode} ${t.name} ${t.code} ${t.serialNumber || ''} ${t.manufacturer} ${t.specialty} ${t.department || ''} ${t.ownerName || ''}`
-      .toLowerCase()
-      .includes(q.toLowerCase());
+    haystack(t).includes(searched.toLowerCase());
   const filtered = tools.filter(t => matchesList(t));
   const listOn = (history?: UsesOnDay) =>
     history ? tools.filter(t => matchesList(t, {...t, uses: history.byId.get(t.id)?.uses ?? t.uses})) : filtered;
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state' | 'mode') =>
     [...new Set(tools.map(t => String(t[key] || '')).filter(Boolean))].sort();
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
-  const filterKey = [q, department, specialty, manufacturer, state, mode, limit, usage].join('|');
+  const filterKey = [searched, department, specialty, manufacturer, state, mode, limit, usage].join('|');
   const order = useTableSort(filtered, {
     name: t => t.name,
     barcode: t => t.barcode,

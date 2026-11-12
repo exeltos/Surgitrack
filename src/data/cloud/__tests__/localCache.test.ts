@@ -68,6 +68,136 @@ describe("this device's copy", () => {
   });
 });
 
+describe("this device's copy of a large collection", () => {
+  beforeEach(() => setCacheOwner(owner));
+  afterEach(() => {
+    vi.restoreAllMocks();
+    return clearCache();
+  });
+
+  type Item = {id: string; name: string};
+  const many = (count: number): Item[] => Array.from({length: count}, (_, n) => ({id: `t${n}`, name: `Tool ${n}`}));
+  /** Records each write to the disk carries (the whole collection, or only what changed). */
+  const recordsPut = () => {
+    const put = vi.spyOn(IDBObjectStore.prototype, 'put');
+    return () =>
+      put.mock.calls.map(([value]) => {
+        const written = value as {items?: unknown[]; upserts?: unknown[]};
+        return (written.items || written.upserts || []).length;
+      });
+  };
+  /** Changes the copy on disk under the key, as a write that went wrong would leave it. */
+  const tamper = (key: string, update: (value: Record<string, unknown>) => Record<string, unknown>) =>
+    new Promise<void>((resolve, reject) => {
+      const open = indexedDB.open('surgitrack-cache');
+      open.onsuccess = () => {
+        const tx = open.result.transaction('collections', 'readwrite');
+        const store = tx.objectStore('collections');
+        const read = store.get(key);
+        read.onsuccess = () => store.put(update(read.result), key);
+        tx.oncomplete = () => {
+          open.result.close();
+          resolve();
+        };
+        tx.onerror = () => reject(tx.error);
+      };
+    });
+
+  it('writes only the changed record, and reads back the whole collection with it', async () => {
+    let items = many(20_000);
+    await writeCollection('tools', {...entry(items), items});
+    const puts = recordsPut();
+    items = items.map(item => (item.id === 't5' ? {...item, name: 'Edited'} : item));
+    items = [{id: 'new', name: 'New'}, ...items.filter(item => item.id !== 't9')];
+    await writeCollection('tools', {
+      ...entry(items, ['t5', 'new'], ['t9']),
+      items,
+      versions: {...entry(many(20_000)).versions, t5: 'v-t5-2'},
+    });
+
+    expect(puts()).toEqual([2]);
+    const copy = (await readCache(owner, ['tools'])).tools!;
+    expect(copy.expired).toBe(false);
+    expect(copy.items).toEqual(items);
+    expect(copy.changed).toEqual(['t5', 'new']);
+    expect(copy.removed).toEqual(['t9']);
+    expect(copy.versions?.t5).toBe('v-t5-2');
+    expect(copy.versions?.t1).toBe('v-t1');
+  });
+
+  it('writes the whole collection again once the changes have grown, and the changes start over', async () => {
+    let items = many(4000);
+    await writeCollection('tools', {...entry(items), items});
+    const puts = recordsPut();
+    for (let round = 0; round < 6; round++) {
+      items = items.map((item, n) => (n >= round * 100 && n < (round + 1) * 100 ? {...item, name: 'Edited'} : item));
+      await writeCollection('tools', {...entry(items), items});
+    }
+
+    // 100, 200 … 500 changed records, then 600: past the limit, the whole collection.
+    expect(puts()).toEqual([100, 200, 300, 400, 500, 4000]);
+    expect((await readCache(owner, ['tools'])).tools!.items).toEqual(items);
+    items = items.map(item => (item.id === 't0' ? {...item, name: 'Again'} : item));
+    await writeCollection('tools', {...entry(items), items});
+    expect(puts().at(-1)).toBe(1);
+    expect((await readCache(owner, ['tools'])).tools!.items).toEqual(items);
+  });
+
+  it('changes written over a whole copy that is no longer there (another tab, a failed write) keep the unsaved records and their versions', async () => {
+    let items = many(1000);
+    await writeCollection('tools', {...entry(items), items});
+    items = items.map(item => (item.id === 't3' ? {...item, name: 'Unsaved'} : item));
+    await writeCollection('tools', {...entry(items, ['t3']), items});
+    // The whole copy on disk is another one than these changes were written over.
+    await tamper('u1:org-1:tools', value => ({...value, token: 'another'}));
+
+    const copy = (await readCache(owner, ['tools'])).tools!;
+    expect(copy.expired).toBe(true);
+    expect(copy.changed).toEqual(['t3']);
+    expect(copy.items.find(item => item.id === 't3')).toEqual({id: 't3', name: 'Unsaved'});
+    // With the version its change started from, so its save is still checked against the server's (S4).
+    expect(copy.versions).toEqual({t3: 'v-t3'});
+  });
+
+  it('keeps the new version of a record saved after the whole copy, though the record itself did not change', async () => {
+    const items = many(1000);
+    // t4 was not saved yet when the whole copy was written.
+    await writeCollection('tools', {...entry(items, ['t4']), items});
+    const puts = recordsPut();
+    // Saved since: the same record, a new version; asked for one by one, as the sync does.
+    const versions: Record<string, string> = {...entry(items).versions, t4: 'v-t4-saved'};
+    const asked: string[] = [];
+    await writeCollection('tools', {
+      ...entry(items),
+      items,
+      versions: {
+        all: () => versions,
+        of: id => (asked.push(id), versions[id]),
+      },
+    });
+
+    expect(puts()).toEqual([0]);
+    expect(asked).toEqual(['t4']);
+    expect((await readCache(owner, ['tools'])).tools!.versions?.t4).toBe('v-t4-saved');
+  });
+
+  it('keeps the unsaved changes written on top when the session ends on its own', async () => {
+    let items = many(1000);
+    await writeCollection('tools', {...entry(items), items});
+    items = items.map(item => (item.id === 't7' ? {...item, name: 'Unsaved'} : item));
+    await writeCollection('tools', {...entry(items, ['t7'], ['t99x']), items});
+    await clearSyncedCache();
+
+    expect((await readCache(owner, ['tools'])).tools).toMatchObject({
+      expired: true,
+      changed: ['t7'],
+      removed: ['t99x'],
+      items: [{id: 't7', name: 'Unsaved'}],
+      versions: {t7: 'v-t7'},
+    });
+  });
+});
+
 describe('unsaved changes put onto fresh server records', () => {
   it('keeps changed and new records, leaves deleted ones out, and only the changed versions', () => {
     const server = [

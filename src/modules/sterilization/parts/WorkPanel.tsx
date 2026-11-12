@@ -5,7 +5,7 @@ import {useTableSort} from '../../../components/ui/useTableSort';
 import {loadLabel} from '../../../core/loadLabel';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {
@@ -32,6 +32,7 @@ import SterilizerTests from './SterilizerTests';
 import {reprocessReason, type ReprocessReason} from '../../../core/reprocessReason';
 import StageReturnModal from './StageReturnModal';
 import {askConfirm} from '../../../components/ui/confirmService';
+import {openIssuesByBarcode} from '../../../core/openIssuesByBarcode';
 
 const CHECK_LABEL: Record<NonNullable<ReprocessReason['failedChecks']>[number], string> = {
   PHYSICAL: 'φυσικές παράμετροι',
@@ -85,6 +86,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     rows,
     washing,
   } = s;
+  // Each row's open issues, from one pass over them (not the whole list once per row).
+  const openIssuesOf = useMemo(() => openIssuesByBarcode(issues), [issues]);
   // Before the sterilizer, an item that came back from a failed cycle or a load not released says so.
   const showsReprocess = ['WASHING', 'PREP', 'PACKAGING', 'PROCESS'].includes(queue);
   // The instruments of «Φόρτωση κλιβάνου» are all picked by default; unticking leaves one out of the load.
@@ -322,7 +325,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
           <div className="ster-list-scroll">
             {order.rows.map(x => {
-              const assetIssues = issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(x.barcode));
+              const assetIssues = openIssuesOf(x.barcode);
               const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
               const again = showsReprocess
                 ? reprocessReason(x.id, sterilizationCycles, sterilizationReleases, processLoads, recallCases)

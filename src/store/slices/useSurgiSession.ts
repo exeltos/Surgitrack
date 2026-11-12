@@ -40,7 +40,12 @@ export function useSurgiSession(args: {dataMode: SurgiDataMode; cloud?: CloudWor
   const realUser = sessionUser?.role === role ? sessionUser : undefined;
   // Only Demo has stand-in people; outside it nobody is signed in until App has set the real user.
   const sessionReady = !!realUser || dataMode === 'DEMO';
-  const currentUser = realUser ?? (dataMode === 'DEMO' ? getDemoSessionUser(role) : unknownSessionUser(role));
+  // The same object while the person and role stay the same: the screens that show who is signed in are
+  // redrawn only when that changes (see trackedStore).
+  const currentUser = useMemo(
+    () => realUser ?? (dataMode === 'DEMO' ? getDemoSessionUser(role) : unknownSessionUser(role)),
+    [realUser, dataMode, role],
+  );
   const switchIdentity = (user: SessionUser) => {
     applyDemoSessionUser(user);
     setSessionUser(user);
@@ -48,9 +53,15 @@ export function useSurgiSession(args: {dataMode: SurgiDataMode; cloud?: CloudWor
   const activeDepartment = getActiveDepartment(role, currentUser);
   const supervisor = !!currentUser.supervisor;
   // Without a known user nothing may be done (and so nothing stamped with an empty name).
-  const permissions = sessionReady ? permissionsForRole(role, rolePermissions, supervisor) : [];
-  const can = (permission: import('../../core/permissions').Permission) =>
-    sessionReady && hasPermission(role, permission, rolePermissions, supervisor);
+  const permissions = useMemo(
+    () => (sessionReady ? permissionsForRole(role, rolePermissions, supervisor) : []),
+    [sessionReady, role, rolePermissions, supervisor],
+  );
+  const can = useCallback(
+    (permission: import('../../core/permissions').Permission) =>
+      sessionReady && hasPermission(role, permission, rolePermissions, supervisor),
+    [sessionReady, role, rolePermissions, supervisor],
+  );
   return {
     activeDepartment,
     can,

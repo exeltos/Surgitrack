@@ -21,7 +21,8 @@
     "css:dead": "node scripts/css-dedupe.mjs",
     "e2e": "node scripts/e2e/flow.mjs --rebuild",
     "css:focus": "node scripts/css-focus.mjs",
-    "css:important": "node scripts/css-important-count.mjs"
+    "css:important": "node scripts/css-important-count.mjs",
+    "scale": "node scripts/scale/bench.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
