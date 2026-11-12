@@ -13,7 +13,6 @@ import {
   Settings2,
   Trash2,
   TriangleAlert,
-  X,
   ClipboardCheck,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -502,9 +501,6 @@ export default function SetDetailPage() {
                   {set.barcode} · {set.name}
                 </p>
               </div>
-              <button className="icon-button" onClick={() => setPhotosOpen(false)}>
-                <X size={18} />
-              </button>
             </header>
             <div className="modal-body">
               <AssetPhotosCard
@@ -519,6 +515,9 @@ export default function SetDetailPage() {
                 }
               />
             </div>
+            <footer>
+              <AppButton onClick={() => setPhotosOpen(false)}>{tr('Κλείσιμο')}</AppButton>
+            </footer>
           </div>
         </div>
       )}

@@ -1178,12 +1178,6 @@ html body .department-home .dash-activity .dash-columns {
   background: var(--c-white);
   box-shadow: 0 24px 60px rgb(0 0 0 / 25%);
 }
-.promo-popup-x {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--c-white);
-}
 .promo-popup-image {
   display: block;
   width: 100%;
@@ -1252,10 +1246,6 @@ html body .department-home .dash-activity .dash-columns {
 }
 .promo-popup.layout-right .promo-popup-image {
   order: 2;
-}
-.promo-popup.layout-right .promo-popup-x {
-  right: auto;
-  left: 10px;
 }
 .promo-popup-actions {
   flex-wrap: wrap;

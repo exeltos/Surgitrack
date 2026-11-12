@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {X} from 'lucide-react';
 import {type Organization} from '../../core/LibraryStore';
 import AppButton from '../../components/ui/AppButton';
 import {tr} from '../../i18n';
@@ -40,9 +39,6 @@ export default function OrganizationEditor({
             <span className="eyebrow">{tr('ΝΟΣΟΚΟΜΕΙΟ')}</span>
             <h2>{organization ? tr('Επεξεργασία νοσοκομείου') : tr('Νέο νοσοκομείο')}</h2>
           </div>
-          <button onClick={onClose}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           <label>

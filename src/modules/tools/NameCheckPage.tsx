@@ -2,17 +2,7 @@ import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {createContext, useContext, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  ArrowRight,
-  CheckCheck,
-  ChevronRight,
-  Search,
-  SpellCheck2,
-  Wand2,
-  X,
-} from 'lucide-react';
+import {AlertTriangle, ArrowLeft, ArrowRight, CheckCheck, ChevronRight, Search, SpellCheck2, Wand2} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
@@ -466,9 +456,6 @@ function ToolsList({
             <span>{tr('{0} εργαλεία', rows.length)}</span>
             <h3>{title}</h3>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="name-check-list-table">
           <table>
@@ -501,6 +488,9 @@ function ToolsList({
           </table>
         </div>
         {rows.length > LIST_ROWS && <small>{tr('Εμφανίζονται {0} από {1}.', LIST_ROWS, rows.length)}</small>}
+        <footer>
+          <AppButton onClick={onClose}>{tr('Κλείσιμο')}</AppButton>
+        </footer>
       </div>
     </div>
   );

@@ -14,7 +14,6 @@ import {
   Settings2,
   Trash2,
   TriangleAlert,
-  X,
 } from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
@@ -447,9 +446,6 @@ export default function ToolDetailPage() {
                   {tool.barcode} · {tool.name}
                 </p>
               </div>
-              <button className="icon-button modal-close-right" onClick={() => setPhotosOpen(false)}>
-                <X size={18} />
-              </button>
             </header>
             <div className="modal-body">
               <AssetPhotosCard
@@ -464,6 +460,9 @@ export default function ToolDetailPage() {
                 }
               />
             </div>
+            <footer>
+              <AppButton onClick={() => setPhotosOpen(false)}>{tr('Κλείσιμο')}</AppButton>
+            </footer>
           </div>
         </div>
       )}

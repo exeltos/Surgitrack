@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import type {DemoAccount} from '../../../core/demoAccounts';
@@ -35,9 +34,6 @@ export default function ConvertDemoDialog({
             <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
             <h2>{tr('Μετατροπή σε πελάτη')}</h2>
           </div>
-          <button onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           <small>

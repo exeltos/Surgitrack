@@ -1,4 +1,4 @@
-import {BookOpen, Compass, X} from 'lucide-react';
+import {BookOpen, Compass} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import type {Permission} from '../../core/permissions';
 import {screenSection} from './screenSection';
@@ -55,9 +55,6 @@ export default function ScreenGuide({
           </AppButton>
         </div>
       </div>
-      <button type="button" className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-        <X size={16} />
-      </button>
     </aside>
   );
 }

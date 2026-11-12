@@ -1,6 +1,6 @@
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {loadLabel} from '../../../core/loadLabel';
-import {Activity, Printer, TriangleAlert, X, ShieldCheck} from 'lucide-react';
+import {Activity, Printer, TriangleAlert, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ReleaseTests from './ReleaseTests';
@@ -33,9 +33,6 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
       {selectedReleaseLoad && (
         <div className="modal-backdrop" onMouseDown={closeLoadRelease}>
           <div className="receipt-card-modal workflow-modal load-release-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoadRelease}>
-              <X size={18} />
-            </button>
             <div className="workflow-modal-head">
               <div className="ster-kind set">
                 <ShieldCheck size={20} />

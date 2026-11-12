@@ -5,7 +5,6 @@ import {
   Flame,
   TriangleAlert,
   ArrowRight,
-  X,
   Clock3,
   UserCheck,
   Layers3,
@@ -122,14 +121,6 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
       {prepDraft && (
         <div className="modal-backdrop" onMouseDown={() => setPrepDraft(null)}>
           <div className="receipt-card-modal prep-modal prep-workspace-modal" onMouseDown={e => e.stopPropagation()}>
-            <button
-              className="modal-x"
-              aria-label={tr('Κλείσιμο')}
-              title={tr('Κλείσιμο')}
-              onClick={() => setPrepDraft(null)}
-            >
-              <X size={18} />
-            </button>
             <div className="receipt-card-head">
               <AssetTypeIcon
                 kind={prepDraft.kind}

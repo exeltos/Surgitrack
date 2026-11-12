@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Camera, CameraOff, RefreshCw, X} from 'lucide-react';
+import {Camera, CameraOff, RefreshCw} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
 
@@ -71,9 +71,6 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
             <span className="eyebrow">{tr('ΚΑΜΕΡΑ')}</span>
             <h2>{tr('Λήψη φωτογραφίας')}</h2>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="camera-preview">
           {error ? (
@@ -93,6 +90,7 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
           >
             {tr('Αλλαγή κάμερας')}
           </AppButton>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton variant="primary" icon={<Camera size={16} />} onClick={capture} disabled={!!error}>
             {tr('Λήψη')}
           </AppButton>

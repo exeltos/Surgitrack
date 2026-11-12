@@ -1,6 +1,6 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
-import {CheckCircle2, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
+import {CheckCircle2, Flame, TriangleAlert, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import {useLibraries} from '../../../core/LibraryStore';
 import {testsInUse, testsState} from '../../../core/equipmentTests';
@@ -48,9 +48,6 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
             className={`receipt-card-modal workflow-modal load-modal ${loadModal === 'WASHING' ? 'washer-load' : 'sterilizer-load'}`}
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoad}>
-              <X size={18} />
-            </button>
             <div className="workflow-modal-head">
               <div className="ster-kind set">
                 {loadModal === 'WASHING' ? <PackageOpen size={20} /> : <Flame size={20} />}
@@ -118,7 +115,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     )}
                 </label>
                 <label>
-                  {tr('Αριθμός κύκλου / φορτίου')}
+                  {tr('Αριθμός κύκλου')}
                   <input
                     value={loadCycleNumber}
                     onChange={e => setLoadCycleNumber(e.target.value)}
@@ -191,9 +188,9 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 <BarcodeCapture
                   title={tr('Προσθήκη στο φορτίο')}
                   subtitle={tr('Σκανάρετε, πληκτρολογήστε ή χρησιμοποιήστε scanner υπολογιστή.')}
-                  placeholder={tr('Barcode · π.χ. S000324')}
                   feedback={loadScanFeedback}
                   onBarcode={addBarcodeToLoad}
+                  suggest={loadCandidates}
                 />
               )}
               <section className="load-assets">

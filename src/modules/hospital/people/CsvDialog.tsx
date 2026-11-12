@@ -1,4 +1,3 @@
-import {X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {wholeHospital} from '../hospitalPeopleMeta';
 import type {PeopleState} from './usePeople';
@@ -15,9 +14,6 @@ export default function CsvDialog({s}: {s: PeopleState}) {
                 <span className="eyebrow">{L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
                 <h2>{L('Προσκλήσεις από αρχείο', 'Invitations from a file')}</h2>
               </div>
-              <button onClick={() => setCsvRows(null)} aria-label={L('Κλείσιμο', 'Close')}>
-                <X />
-              </button>
             </header>
             <div className="studio-drawer-form">
               {csvRows.length === 0 && (

@@ -1,6 +1,6 @@
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {useEffect, useMemo} from 'react';
-import {ChevronRight, Sun, X} from 'lucide-react';
+import {ChevronRight, Sun} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {briefingFor, greekVocative, type BriefingItem} from '../../core/briefing';
 import {formatDate} from '../../core/displayDate';
@@ -100,9 +100,6 @@ export default function Briefing({
             <h3 id="briefing-title">{greeting}</h3>
             <p>{tr('Τι σας περιμένει σήμερα, {0}', formatDate(new Date()))}</p>
           </div>
-          <button className="icon-button" onClick={close} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <ul className="briefing-list">
           {items.map(i => (

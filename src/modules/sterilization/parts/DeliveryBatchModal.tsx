@@ -4,7 +4,7 @@ import BatchDepartmentPicker from './BatchDepartmentPicker';
 import {departmentsOf} from '../batchDepartments';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
-import {CheckCircle2, ScanBarcode, UserRoundCheck, X, ShieldCheck, IdCard, UserCheck} from 'lucide-react';
+import {CheckCircle2, ScanBarcode, UserRoundCheck, ShieldCheck, IdCard, UserCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -48,9 +48,6 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
             className="receipt-card-modal workflow-modal delivery-batch-modal"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeDeliveryBatch}>
-              <X size={18} />
-            </button>
             <div className="workflow-modal-head">
               <div className="ster-kind set">
                 <ScanBarcode size={20} />
@@ -79,6 +76,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                 }
                 feedback={deliveryScanFeedback}
                 onBarcode={addBarcodeToDelivery}
+                suggest={ready}
               />
               <div className="delivery-batch-grid">
                 <section className="delivery-batch-assets">

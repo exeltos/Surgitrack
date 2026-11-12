@@ -636,6 +636,17 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
       ['release', 'RELEASE', button(/^(Αποδέσμευση φορτίου|Release (the )?load)/)],
       ['ready', 'READY', firstRow],
     ];
+    // The load's barcode field searching by name: the suggestions under it.
+    modals.push({
+      name: 'sterilization-process-suggest',
+      route: '/sterilization',
+      open: async () => {
+        await queue('PROCESS');
+        await page.waitForTimeout(300);
+        await button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)();
+        await page.locator('.load-barcode-entry input').fill('λα', {timeout: 3000});
+      },
+    });
     for (const [name, q, opener] of stages) {
       modals.push({name: `sterilization-queue-${name}`, route: '/sterilization', dialog: false, open: () => queue(q)});
       if (opener)

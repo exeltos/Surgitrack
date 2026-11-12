@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {AlertTriangle, X} from 'lucide-react';
+import {AlertTriangle} from 'lucide-react';
 import AppButton from './AppButton';
 import {tr} from '../../i18n';
 export default function ConfirmDialog({
@@ -45,9 +45,6 @@ export default function ConfirmDialog({
             <h3>{title}</h3>
             <p>{message}</p>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         {confirmText && (
           <label className="confirm-dialog-type">

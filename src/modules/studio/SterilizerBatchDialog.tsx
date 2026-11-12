@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {X} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {translateToEnglish} from '../../core/glossary';
 import {nextSterilizerNames, type SterilizerNaming} from '../../core/sterilizerNaming';
@@ -31,9 +30,6 @@ export default function SterilizerBatchDialog({
             <span className="eyebrow">{tr('Κλίβανοι')}</span>
             <h2>{tr('Προσθήκη κλιβάνων')}</h2>
           </div>
-          <button aria-label={tr('Κλείσιμο')} onClick={onClose}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           <label>

@@ -1,4 +1,4 @@
-import {Activity, Printer, X} from 'lucide-react';
+import {Activity, Printer} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {loadLabel} from '../../../core/loadLabel';
 import {LOAD_STATUS} from '../../reports/reportsMeta';
@@ -35,9 +35,6 @@ export default function LoadDetailsDialog({
               <b>{tr(LOAD_STATUS[load.status] || load.status)}</b>
             </p>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="load-details-body">
           <LoadContents load={load} />

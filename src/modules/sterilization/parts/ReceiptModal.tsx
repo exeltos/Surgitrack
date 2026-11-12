@@ -40,9 +40,6 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
       {receiptDraft && (
         <div className="modal-backdrop" onMouseDown={closeReceipt}>
           <div className="receipt-card-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeReceipt}>
-              <X size={18} />
-            </button>
             <div className="receipt-card-head">
               <AssetTypeIcon
                 kind={receiptDraft.kind}
@@ -380,7 +377,9 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
             </div>
 
             <div className="modal-actions receipt-final-bar receipt-final-actions-only">
-              <button onClick={closeReceipt}>{tr('Ακύρωση')}</button>
+              <button data-modal-close onClick={closeReceipt}>
+                {tr('Ακύρωση')}
+              </button>
               <button
                 className="primary"
                 disabled={!receiptIdentityValid || (visibleDeviation && !receiptDeviationRecorded)}

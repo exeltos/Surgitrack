@@ -1,4 +1,4 @@
-import {TriangleAlert, ArrowRight, X, Layers3, Wrench, PackageOpen, CheckCircle2} from 'lucide-react';
+import {TriangleAlert, ArrowRight, Layers3, Wrench, PackageOpen, CheckCircle2} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -21,9 +21,6 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
       {prepManageTool && prepDraft && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepManage}>
           <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closePrepManage}>
-              <X size={17} />
-            </button>
             <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h3>
               {prepManageTool.barcode} · {prepManageTool.name}
@@ -157,6 +154,11 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
                 {tr('Αλλαγές στη σύνθεση του Σετ (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
               </p>
             )}
+            <div className="modal-actions">
+              <button type="button" onClick={closePrepManage}>
+                {tr('Ακύρωση')}
+              </button>
+            </div>
           </div>
         </div>
       )}

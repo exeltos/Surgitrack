@@ -1,4 +1,4 @@
-import {CheckCircle2, ClipboardCheck, TriangleAlert, Box, Stethoscope, X} from 'lucide-react';
+import {CheckCircle2, ClipboardCheck, TriangleAlert, Box, Stethoscope} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -9,14 +9,6 @@ export default function ReceiptViewModal({s}: {s: SterilizationPageState}) {
       {receiptView && !receiptDraft && !prepDraft && (
         <div className="modal-backdrop" onMouseDown={() => setReceiptView(null)}>
           <div className="receipt-card-modal completed" onMouseDown={e => e.stopPropagation()}>
-            <button
-              className="modal-x"
-              aria-label={tr('Κλείσιμο')}
-              title={tr('Κλείσιμο')}
-              onClick={() => setReceiptView(null)}
-            >
-              <X size={18} />
-            </button>
             <div className="receipt-complete-banner">
               <CheckCircle2 size={20} />
               <div>

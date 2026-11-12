@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Barcode, X} from 'lucide-react';
+import {Barcode} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
@@ -42,9 +42,6 @@ export default function NewBarcodeModal({
             <span className="eyebrow">{tr('ΝΕΟ BARCODE')}</span>
             <h2>{asset.name}</h2>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="new-barcode-swap">
           <span>

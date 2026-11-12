@@ -209,6 +209,10 @@
 .name-check-list > small {
   color: var(--st-muted);
 }
+.name-check-list > footer {
+  display: flex;
+  justify-content: flex-end;
+}
 .name-check-sets {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

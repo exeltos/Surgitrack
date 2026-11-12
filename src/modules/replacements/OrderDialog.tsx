@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {Plus, ShoppingCart, Trash2, X} from 'lucide-react';
+import {Plus, ShoppingCart, Trash2} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
@@ -60,9 +60,6 @@ export default function OrderDialog({
             <h2>{tr('Νέα παραγγελία αγοράς')}</h2>
             <p>{tr('Μία γραμμή ανά είδος εργαλείου. Αλλάξτε την ποσότητα ή προσθέστε οποιοδήποτε άλλο εργαλείο.')}</p>
           </div>
-          <button type="button" className="modal-x" aria-label={tr('Κλείσιμο')} onClick={onClose}>
-            <X size={18} />
-          </button>
         </header>
         <div className="replacements-order-lines">
           <table>

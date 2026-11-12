@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {CheckCircle2, X} from 'lucide-react';
+import {CheckCircle2} from 'lucide-react';
 import StarRating from './StarRating';
 import type {FinalAnswers} from '../../core/demoFeedback';
 import {saveFinalEvaluation, type FeedbackRow} from '../../data/cloud/demoFeedback';
@@ -44,9 +44,6 @@ export default function FinalEvaluationDialog({
       <div className="demo-dialog wide" role="dialog" aria-modal="true" aria-label={L('Αξιολόγηση', 'Evaluation')}>
         <header>
           <h3>{L('Η αξιολόγησή σας', 'Your evaluation')}</h3>
-          <button type="button" onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X size={18} />
-          </button>
         </header>
         {state === 'saved' ? (
           <div className="demo-dialog-done">

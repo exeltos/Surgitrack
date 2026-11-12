@@ -1184,12 +1184,6 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
 }
-.department-send-modal > header > .department-modal-close {
-  grid-column: 2;
-  margin-left: auto;
-  justify-self: end;
-  align-self: start;
-}
 
 /* v0.22.6 department list readability, return highlight and department notifications */
 .department-asset-row {

@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {Download, FileSpreadsheet, X} from 'lucide-react';
+import {Download, FileSpreadsheet} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {supabase} from '../../../lib/supabase';
 import {readSheetFile} from '../../../core/sheetImport';
@@ -205,9 +205,6 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
             <span className="eyebrow">{L('ΙΔΙΟΚΤΗΤΗΣ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM OWNER')}</span>
             <h2>{L('Εισαγωγή εργαζομένων', 'Import employees')}</h2>
           </div>
-          <button onClick={onClose} disabled={running} aria-label={L('Κλείσιμο', 'Close')}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           {!rows && (

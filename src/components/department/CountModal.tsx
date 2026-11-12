@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {CheckCheck, ClipboardCheck, Printer, ScanBarcode, X} from 'lucide-react';
+import {CheckCheck, ClipboardCheck, Printer, ScanBarcode} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import type {SurgicalCount} from '../../store/types';
@@ -8,6 +8,7 @@ import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {printCountForm} from './printCountForm';
 import {tr, trData} from '../../i18n';
 import {askConfirm} from '../../components/ui/confirmService';
+import {scanPlaceholder, useAssetSuggest} from '../barcode/AssetSuggest';
 
 /**
  * The operating theatre's instrument count, laid out like the printed count form: part A is what
@@ -37,6 +38,8 @@ export default function CountModal({
   const [bulk, setBulk] = useState(false);
   const [scan, setScan] = useState('');
   const [scanMessage, setScanMessage] = useState('');
+  // The Set's own instruments are offered while a name, code or barcode is typed.
+  const suggestions = useAssetSuggest(scan, barcode => scanTool(barcode), members);
   if (!asset) return null;
   const counted = members.filter(t => ticked.has(t.id)).length;
   const missing = members.filter(t => !ticked.has(t.id));
@@ -57,8 +60,8 @@ export default function CountModal({
     setTicked(new Set(members.map(t => t.id)));
     setBulk(true);
   };
-  const scanTool = () => {
-    const code = scan.trim().toUpperCase();
+  const scanTool = (raw = scan) => {
+    const code = raw.trim().toUpperCase();
     if (!code) return;
     const tool = members.find(t => t.barcode.toUpperCase() === code);
     if (!tool) setScanMessage(tr('Το {0} δεν ανήκει σε αυτό το Σετ.', code));
@@ -147,9 +150,6 @@ export default function CountModal({
             <h2>{asset.name}</h2>
             <p className="mono">{asset.barcode}</p>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="count-form-body">
           <section>
@@ -191,13 +191,16 @@ export default function CountModal({
                     value={scan}
                     onChange={e => setScan(e.target.value)}
                     onKeyDown={e => {
+                      if (suggestions.onKeyDown(e)) return;
                       if (e.key === 'Enter') {
                         e.preventDefault();
                         scanTool();
                       }
                     }}
-                    placeholder={tr('Σάρωση barcode εργαλείου + Enter')}
+                    placeholder={scanPlaceholder()}
+                    autoComplete="off"
                   />
+                  {suggestions.listbox}
                 </label>
               )}
               {members.length > 1 && (

@@ -136,9 +136,6 @@ export default function NetworkAccessDialog({
             <span className="eyebrow">{organization.name}</span>
             <h2>{L('Πρόσβαση ανά δίκτυο', 'Access by network')}</h2>
           </div>
-          <button onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           <small className="studio-field-hint">

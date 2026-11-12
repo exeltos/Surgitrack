@@ -1,5 +1,5 @@
 import {useMemo, useState, type ReactNode} from 'react';
-import {ArrowRightLeft, Building2, CircleCheck, Layers3, PackageOpen, SearchX, Unlink, Wrench, X} from 'lucide-react';
+import {ArrowRightLeft, Building2, CircleCheck, Layers3, PackageOpen, SearchX, Unlink, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
@@ -223,9 +223,6 @@ export default function AssetManageModal({
               <span className="mono">{asset.barcode}</span> · {asset.name}
             </h2>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         {openReports.length > 0 && !followsSet && (
           <section className="asset-manage-reports">

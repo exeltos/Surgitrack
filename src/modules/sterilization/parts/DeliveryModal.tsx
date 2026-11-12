@@ -1,5 +1,5 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
-import {CheckCircle2, Box, Stethoscope, UserRoundCheck, X, IdCard, UserCheck} from 'lucide-react';
+import {CheckCircle2, Box, Stethoscope, UserRoundCheck, IdCard, UserCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -24,9 +24,6 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
             className="receipt-card-modal workflow-modal workflow-modal-delivery"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeDelivery}>
-              <X size={18} />
-            </button>
             <div className="workflow-modal-head">
               <div className={`ster-kind ${deliveryDraft.kind.toLowerCase()}`}>
                 {deliveryDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}

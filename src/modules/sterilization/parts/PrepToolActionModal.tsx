@@ -1,4 +1,4 @@
-import {CheckCircle2, TriangleAlert, X} from 'lucide-react';
+import {CheckCircle2, TriangleAlert} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -34,14 +34,6 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
       {prepToolAction && prepDraft?.kind === 'SET' && (prepSelectedTool || prepReplacementRequirement) && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepToolAction}>
           <div className="tool-issue-card prep-tool-action-card" onMouseDown={e => e.stopPropagation()}>
-            <button
-              className="modal-x"
-              aria-label={tr('Κλείσιμο')}
-              title={tr('Κλείσιμο')}
-              onClick={closePrepToolAction}
-            >
-              <X size={17} />
-            </button>
             <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΣΥΝΘΕΣΗΣ')}</span>
             <h3>
               {prepSelectedTool
