@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Undo2, X} from 'lucide-react';
+import {Undo2} from 'lucide-react';
 import {useSurgi} from '../../../store/SurgiStore';
 import {returnRefusalText} from '../../../core/stageReturn';
 import type {ReturnTargetId} from '../../../core/stageReturn';
@@ -8,6 +8,11 @@ import AppButton from '../../../components/ui/AppButton';
 import {tr, trData} from '../../../i18n';
 import {latestMovement} from '../../../core/movementUndo';
 import {movementText} from '../../../core/movementText';
+import type {ReturnTarget} from '../../../core/stageReturn';
+
+/** A return target as the list shows it, under «Επιστροφή σε»: a stage, or «Τμήμα · <department>». */
+const targetLabel = (target: ReturnTarget) =>
+  target.id === 'DEPARTMENT' && target.department ? tr('Τμήμα · {0}', trData(target.department)) : trData(target.label);
 
 /**
  * «Επιστροφή σε προηγούμενο στάδιο»: the owner, the hospital admin and the Sterilization supervisor put an
@@ -44,9 +49,6 @@ export default function StageReturnModal({
               {tr('Η κίνηση καταγράφεται στο ιστορικό με την αιτιολογία και μπορεί να αναιρεθεί.')}
             </p>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         {refusal && <div className="identity-error">{refusal}</div>}
         {last && (
@@ -59,7 +61,7 @@ export default function StageReturnModal({
           <select value={stage} onChange={e => setStage(e.target.value as ReturnTargetId)} disabled={!!refusal}>
             {info?.targets.map(t => (
               <option key={t.id} value={t.id}>
-                {trData(t.label)}
+                {targetLabel(t)}
               </option>
             ))}
           </select>
@@ -84,9 +86,8 @@ export default function StageReturnModal({
               if (stage && returnToStage(asset.kind, asset.id, stage, reason)) onClose();
             }}
           >
-            {stage
-              ? tr('Επιστροφή σε: {0}', trData(info?.targets.find(t => t.id === stage)?.label || ''))
-              : tr('Επιστροφή')}
+            {/* Where to is in the list just above: the button stays short so the two buttons fit side by side. */}
+            {tr('Επιστροφή')}
           </AppButton>
         </footer>
       </div>
