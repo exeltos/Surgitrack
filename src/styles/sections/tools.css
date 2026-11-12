@@ -6,34 +6,6 @@
   gap: 16px;
   padding-bottom: 24px;
 }
-.name-check-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-.name-check-kpis > div {
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-.name-check-kpis span,
-.name-check-kpis small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.name-check-kpis strong {
-  color: var(--c-blue-15-2);
-  font-size: 24px;
-}
-.name-check-kpis .warn strong {
-  color: var(--c-orange-50-2);
-}
-.name-check-kpis .good strong {
-  color: var(--c-green-45);
-}
 .name-check-card,
 .name-check-group {
   display: grid;
@@ -235,9 +207,6 @@
   line-height: 1.45;
 }
 /* Name check KPIs: same slim look as the other pages. */
-html body .name-check-kpis > div {
-  padding: 8px 14px;
-}
 /* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
 html body .tools-registry .tools-place-set {
   font-size: 12.5px;
@@ -281,9 +250,6 @@ html body .standalone-registry button.icon-link {
   cursor: pointer;
 }
 @media (max-width: 760px) {
-  .name-check-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .name-check-sets {
     grid-template-columns: auto minmax(0, 1fr);
   }
@@ -302,12 +268,6 @@ html body .standalone-registry button.icon-link {
   }
   html body .tools-registry tbody td:nth-child(4) .row-sub {
     margin-left: 6px;
-  }
-  html body .name-check-kpis span {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.25;
   }
   html body .name-check-table thead {
     display: none;

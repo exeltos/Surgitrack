@@ -19,8 +19,6 @@ type EditablePatch = Partial<
 type Props = {
   kind: AssetKind;
   asset: SetAsset | Tool;
-  memberCount?: number;
-  expectedCount?: number;
   setName?: string;
   setDepartment?: string;
   /** The Set a member instrument travels in: its state and sterile dates are the instrument's. */
@@ -65,8 +63,6 @@ const ownershipLabel = (asset: {ownership?: Ownership; ownerName?: string}) => {
 export default function AssetWorkbenchSidebar({
   kind,
   asset,
-  memberCount,
-  expectedCount,
   setName,
   setDepartment,
   memberOf,
@@ -169,7 +165,8 @@ export default function AssetWorkbenchSidebar({
           <div>
             <span className="eyebrow">{kind === 'SET' ? tr('ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h1>{asset.name}</h1>
-            <p>{asset.code}</p>
+            {/* The code is shown under the name only when it says something else. */}
+            {asset.code && asset.code.trim().toLowerCase() !== asset.name.trim().toLowerCase() && <p>{asset.code}</p>}
           </div>
         </div>
         <div className="asset-workbench-title-status">
@@ -235,25 +232,12 @@ export default function AssetWorkbenchSidebar({
         </div>
         {/* Always shown: the dates once released, a dash while the item is not sterile. */}
         <div>
-          <dt>{tr('Αποστείρωση')}</dt>
-          <dd className="sterile-dd">
-            {sterile && carrier.sterileUntil && sterilizedOnOf(carrier) ? (
-              <>
-                {formatExpiry(sterilizedOnOf(carrier)!)}
-                {fromSet && <small className="muted">{tr('από το Σετ')}</small>}
-              </>
-            ) : (
-              <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
-                —
-              </span>
-            )}
-          </dd>
-        </div>
-        <div>
-          <dt>{tr('Λήξη')}</dt>
+          <dt>{tr('Αποστείρωση – Λήξη')}</dt>
           <dd className="sterile-dd">
             {sterile && carrier.sterileUntil ? (
               <>
+                {/* The expiry is shown whenever it is known, with a dash for a sterilization date that is not. */}
+                {sterilizedOnOf(carrier) ? formatExpiry(sterilizedOnOf(carrier)!) : '—'} →{' '}
                 {formatExpiry(carrier.sterileUntil)}
                 {fromSet && <small className="muted">{tr('από το Σετ')}</small>}
               </>
@@ -264,14 +248,19 @@ export default function AssetWorkbenchSidebar({
             )}
           </dd>
         </div>
-        <div>
-          <dt>{tr('Κωδικός')}</dt>
-          <dd>{editing ? textField('code', draft.code) : asset.code}</dd>
-        </div>
-        <div>
-          <dt>{tr('Ονομασία')}</dt>
-          <dd>{editing ? textField('name', draft.name) : asset.name}</dd>
-        </div>
+        {/* The title above already shows the name and the code: they are listed only to be edited. */}
+        {editing && (
+          <>
+            <div>
+              <dt>{tr('Κωδικός')}</dt>
+              <dd>{textField('code', draft.code)}</dd>
+            </div>
+            <div>
+              <dt>{tr('Ονομασία')}</dt>
+              <dd>{textField('name', draft.name)}</dd>
+            </div>
+          </>
+        )}
         <div>
           <dt>{tr('Ειδικότητα')}</dt>
           <dd>{editing ? textField('specialty', draft.specialty) : trData(asset.specialty) || '—'}</dd>
@@ -300,37 +289,39 @@ export default function AssetWorkbenchSidebar({
               : (asset as Tool).manufacturer || (asset as SetAsset).manufacturer || '—'}
           </dd>
         </div>
-        <div className="asset-ownership-field">
-          <dt>{tr('Ιδιοκτησία')}</dt>
-          <dd>
-            {editing ? (
-              <>
-                <select
-                  className="asset-inline-input"
-                  value={draft.ownership}
-                  onChange={e => setDraft(c => ({...c, ownership: e.target.value as Ownership | ''}))}
-                >
-                  <option value="">—</option>
-                  {ownerships.map(o => (
-                    <option key={o.value} value={o.value}>
-                      {tr(o.label)}
-                    </option>
-                  ))}
-                </select>
-                {(draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && (
-                  <input
+        {(editing || asset.ownership) && (
+          <div className="asset-ownership-field">
+            <dt>{tr('Ιδιοκτησία')}</dt>
+            <dd>
+              {editing ? (
+                <>
+                  <select
                     className="asset-inline-input"
-                    value={draft.ownerName}
-                    placeholder={draft.ownership === 'DOCTOR' ? tr('Όνομα ιατρού') : tr('Σε ποιον ανήκει')}
-                    onChange={e => setDraft(c => ({...c, ownerName: e.target.value}))}
-                  />
-                )}
-              </>
-            ) : (
-              ownershipLabel(asset)
-            )}
-          </dd>
-        </div>
+                    value={draft.ownership}
+                    onChange={e => setDraft(c => ({...c, ownership: e.target.value as Ownership | ''}))}
+                  >
+                    <option value="">—</option>
+                    {ownerships.map(o => (
+                      <option key={o.value} value={o.value}>
+                        {tr(o.label)}
+                      </option>
+                    ))}
+                  </select>
+                  {(draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && (
+                    <input
+                      className="asset-inline-input"
+                      value={draft.ownerName}
+                      placeholder={draft.ownership === 'DOCTOR' ? tr('Όνομα ιατρού') : tr('Σε ποιον ανήκει')}
+                      onChange={e => setDraft(c => ({...c, ownerName: e.target.value}))}
+                    />
+                  )}
+                </>
+              ) : (
+                ownershipLabel(asset)
+              )}
+            </dd>
+          </div>
+        )}
         <div className="asset-marker-field">
           <dt>{tr('Χρωματικός μάρτυρας')}</dt>
           <dd>
@@ -353,12 +344,12 @@ export default function AssetWorkbenchSidebar({
         </div>
         {kind === 'TOOL' && (
           <>
-            <div>
-              <dt>{tr('Τύπος')}</dt>
-              <dd>
-                {tool?.mode === 'SET_MEMBER' ? tr('Μέλος Σετ') : tool?.mode === 'STOCK' ? 'Απόθεμα' : tr('Μεμονωμένο')}
-              </dd>
-            </div>
+            {!setName && (
+              <div>
+                <dt>{tr('Τύπος')}</dt>
+                <dd>{tool?.mode === 'STOCK' ? tr('Απόθεμα') : tr('Μεμονωμένο')}</dd>
+              </div>
+            )}
             {setName && (
               <div>
                 <dt>{tr('Σετ εργαλείων')}</dt>
@@ -399,22 +390,24 @@ export default function AssetWorkbenchSidebar({
             )}
           </dd>
         </div>
-        <div className="asset-usage-field">
-          <dt>{tr('Αρχικό όριο χρήσεων')}</dt>
-          <dd>
-            {editing && canEditUsage && draft.usageType === 'LIMITED' ? (
-              <input
-                className="asset-inline-input"
-                type="number"
-                min="1"
-                value={draft.maxUses}
-                onChange={e => setDraft(c => ({...c, maxUses: e.target.value}))}
-              />
-            ) : (
-              (asset.maxUses ?? '—')
-            )}
-          </dd>
-        </div>
+        {editing && (
+          <div className="asset-usage-field">
+            <dt>{tr('Αρχικό όριο χρήσεων')}</dt>
+            <dd>
+              {editing && canEditUsage && draft.usageType === 'LIMITED' ? (
+                <input
+                  className="asset-inline-input"
+                  type="number"
+                  min="1"
+                  value={draft.maxUses}
+                  onChange={e => setDraft(c => ({...c, maxUses: e.target.value}))}
+                />
+              ) : (
+                (asset.maxUses ?? '—')
+              )}
+            </dd>
+          </div>
+        )}
         {(asset.maxUses !== undefined || tool?.wearCheck) && (
           <>
             <div>
@@ -445,20 +438,22 @@ export default function AssetWorkbenchSidebar({
                 ) : (
                   asset.uses || 0
                 )}
+                {asset.maxUses !== undefined && (
+                  <>
+                    <span className="muted"> / {asset.maxUses}</span>
+                    <span
+                      className={
+                        asset.maxUses - (asset.uses || 0) <= systemSettings.usageWarningThreshold
+                          ? 'warn-text usage-left'
+                          : 'usage-left'
+                      }
+                    >
+                      {tr('υπόλοιπο {0}', Math.max(0, asset.maxUses - (asset.uses || 0)))}
+                    </span>
+                  </>
+                )}
               </dd>
             </div>
-            {asset.maxUses !== undefined && (
-              <div>
-                <dt>{tr('Υπόλοιπο χρήσεων')}</dt>
-                <dd
-                  className={
-                    asset.maxUses - (asset.uses || 0) <= systemSettings.usageWarningThreshold ? 'warn-text' : ''
-                  }
-                >
-                  {Math.max(0, asset.maxUses - (asset.uses || 0))}
-                </dd>
-              </div>
-            )}
           </>
         )}
       </dl>
@@ -470,72 +465,28 @@ export default function AssetWorkbenchSidebar({
           </div>
           <strong className="mono">{asset.barcode}</strong>
         </div>
-        {kind === 'SET' ? (
-          <div className="asset-workbench-mini">
-            <AssetTypeIcon kind="SET" size={17} />
-            <div>
-              <span>{tr('Περιεχόμενα Σετ')}</span>
-              <strong>
-                {memberCount}/{expectedCount} {tr('εργαλεία')}
-              </strong>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="asset-workbench-mini">
-              <AssetTypeIcon kind="TOOL" maxUses={tool?.maxUses} wearCheck={tool?.wearCheck} size={17} />
-              <div>
-                <span>{tr('Χρήσεις')}</span>
-                <strong>{tool?.maxUses ? `${tool.uses}/${tool.maxUses}` : tr('{0} χρήσεις', tool?.uses || 0)}</strong>
-              </div>
-            </div>
-            <button
-              className="asset-tool-photo-card"
-              type="button"
-              onClick={onPhotos}
-              aria-label={cover ? `${tr('Άνοιγμα φωτογραφιών')} ${photos.length}` : undefined}
-            >
-              {cover ? (
-                <img src={cover} alt={asset.name} />
-              ) : (
-                <div className="asset-tool-photo-empty">
-                  <Camera size={22} />
-                  <div>
-                    <strong>{tr('Φωτογραφία')}</strong>
-                    <span>{tr('Λήψη ή upload')}</span>
-                  </div>
-                </div>
-              )}
-              <span className="asset-cover-count">
-                <Images size={14} />
-                {photos.length}
-              </span>
-            </button>
-          </>
-        )}
-      </div>
-      {kind === 'SET' && (
         <button
-          className="asset-cover"
+          className="asset-tool-photo-card"
           type="button"
           onClick={onPhotos}
-          aria-label={cover ? `${tr('Άνοιγμα φωτογραφιών')} ${photos.length}` : undefined}
+          aria-label={cover ? `${tr('Άνοιγμα φωτογραφιών')} ${photos.length}` : tr('Φωτογραφίες')}
         >
           {cover ? (
             <img src={cover} alt={asset.name} />
           ) : (
-            <div className="asset-cover-empty">
-              <Camera size={30} />
-              <strong>{tr('Χωρίς φωτογραφία')}</strong>
-              <span>{tr('Λήψη ή upload')}</span>
+            <div className="asset-tool-photo-empty">
+              <Camera size={20} />
+              <strong>{tr('Φωτογραφία')}</strong>
             </div>
           )}
-          <span className="asset-cover-count">
-            <Images size={14} />
-            {photos.length}
-          </span>
+          {photos.length > 0 && (
+            <span className="asset-cover-count">
+              <Images size={14} />
+              {photos.length}
+            </span>
+          )}
         </button>
-      )}
+      </div>
     </aside>
   );
 }

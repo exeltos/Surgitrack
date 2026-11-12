@@ -15,7 +15,7 @@ import {tr, trData} from '../../i18n';
 import {useHasModule} from '../../data/cloud/modulesContext';
 
 type Source = 'STOCK' | 'SET_MEMBER' | 'STANDALONE';
-type CreateTab = 'DETAILS' | 'COMPOSITION' | 'PHOTOS' | 'NOTES';
+type CreateTab = 'COMPOSITION' | 'PHOTOS' | 'NOTES';
 
 export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState('');
   const [source, setSource] = useState<Source>('STOCK');
-  const [tab, setTab] = useState<CreateTab>(kind === 'SET' ? 'COMPOSITION' : 'DETAILS');
+  const [tab, setTab] = useState<CreateTab>(kind === 'SET' ? 'COMPOSITION' : 'PHOTOS');
   const barcode = nextBarcode(kind);
   const valid = !!name.trim() && !!code.trim() && (!standaloneOnly || !!department.trim());
   const leave = useLeave();
@@ -236,6 +236,20 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
             </label>
             {kind === 'TOOL' && (
               <label>
+                <span>{tr('Ποσότητα')}</span>
+                <input
+                  className="asset-inline-input"
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={quantity}
+                  onChange={e => setQuantity(Math.max(1, Number(e.target.value) || 1))}
+                />
+                <small>{tr('Κάθε φυσικό τεμάχιο παίρνει δικό του barcode.')}</small>
+              </label>
+            )}
+            {kind === 'TOOL' && (
+              <label>
                 <span>{tr('Σειριακός αριθμός')}</span>
                 <input
                   className="asset-inline-input"
@@ -298,61 +312,32 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               </div>
               <strong className="mono">{barcode}</strong>
             </div>
-            {kind === 'SET' ? (
-              <div className="asset-workbench-mini">
-                <AssetTypeIcon kind="SET" size={17} />
-                <div>
-                  <span>{tr('Αρχική σύνθεση')}</span>
-                  <strong>
-                    {selected.length} {tr('εργαλεία')}
-                  </strong>
+            <button
+              className="asset-tool-photo-card"
+              type="button"
+              onClick={() => setTab('PHOTOS')}
+              aria-label={`${tr('Προσθήκη φωτογραφιών')} ${photos.length}`}
+            >
+              {cover ? (
+                <img src={cover} alt={name || tr('Νέο αντικείμενο')} />
+              ) : (
+                <div className="asset-tool-photo-empty">
+                  <Images size={20} />
+                  <strong>{tr('Φωτογραφία')}</strong>
                 </div>
-              </div>
-            ) : (
-              <div className="asset-workbench-mini">
-                <AssetTypeIcon
-                  kind="TOOL"
-                  maxUses={limited ? Number(maxUses) || 1 : undefined}
-                  wearCheck={wear}
-                  size={17}
-                />
-                <div>
-                  <span>{tr('Καταχώριση')}</span>
-                  <strong>
-                    {department.trim() || standaloneOnly ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}
-                  </strong>
-                </div>
-              </div>
-            )}
+              )}
+              {photos.length > 0 && (
+                <span className="asset-cover-count">
+                  <Images size={14} />
+                  {photos.length}
+                </span>
+              )}
+            </button>
           </div>
-
-          <button
-            className="asset-cover"
-            type="button"
-            onClick={() => setTab('PHOTOS')}
-            aria-label={cover ? `${tr('Προσθήκη φωτογραφιών')} ${photos.length}` : undefined}
-          >
-            {cover ? (
-              <img src={cover} alt={name || tr('Νέο αντικείμενο')} />
-            ) : (
-              <div className="asset-cover-empty">
-                <Images size={30} />
-                <strong>{tr('Χωρίς φωτογραφία')}</strong>
-                <span>{tr('Λήψη ή upload πριν την αποθήκευση')}</span>
-              </div>
-            )}
-            <span className="asset-cover-count">
-              <Images size={14} />
-              {photos.length}
-            </span>
-          </button>
         </aside>
 
         <section className="asset-workbench-main">
           <div className="asset-tabs asset-detail-tabs asset-create-tabs">
-            <button className={tab === 'DETAILS' ? 'active' : ''} onClick={() => setTab('DETAILS')}>
-              {tr('Βασικά')}
-            </button>
             {kind === 'SET' && (
               <button className={tab === 'COMPOSITION' ? 'active' : ''} onClick={() => setTab('COMPOSITION')}>
                 {tr('Σύνθεση') + ' '}
@@ -369,72 +354,6 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
           </div>
 
           <div className="asset-detail-body">
-            {tab === 'DETAILS' && (
-              <section className="asset-section asset-detail-full-panel">
-                <div className="asset-section-head">
-                  <div>
-                    <span className="eyebrow">{tr('ΝΕΑ ΚΑΤΑΧΩΡΙΣΗ')}</span>
-                    <h2>{kind === 'SET' ? tr('Ρυθμίσεις νέου Σετ') : tr('Ρυθμίσεις νέου εργαλείου')}</h2>
-                    <p>
-                      {tr(
-                        'Η καρτέλα δημιουργείται με τα ίδια στοιχεία που θα χρησιμοποιείτε αργότερα στην προβολή και επεξεργασία.',
-                      )}
-                    </p>
-                  </div>
-                </div>
-                <div className="asset-section-body">
-                  <div className="form-grid form-grid-comfortable">
-                    {kind === 'SET' && (
-                      <div className="asset-inline-info">
-                        <strong>{department.trim() ? tr('Σετ σε χρήση') : tr('Απόθεμα Σετ')}</strong>
-                        <small>
-                          {department.trim()
-                            ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
-                            : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα ως ενιαίο Απόθεμα Σετ.')}
-                        </small>
-                      </div>
-                    )}
-                    {kind === 'TOOL' && (
-                      <>
-                        <div className="asset-inline-info">
-                          <strong>
-                            {department.trim() || standaloneOnly ? tr('Μεμονωμένο σε χρήση') : tr('Απόθεμα εργαλείων')}
-                          </strong>
-                          <small>
-                            {department.trim()
-                              ? tr('Θα καταχωρηθεί στο τμήμα {0}.', department)
-                              : standaloneOnly
-                                ? tr('Επιλέξτε το τμήμα στο οποίο δίνεται.')
-                                : tr('Χωρίς Τμήμα, θα καταχωρηθεί αυτόματα στο Απόθεμα εργαλείων.')}
-                          </small>
-                        </div>
-                        <label>
-                          {tr('Ποσότητα')}
-                          <input
-                            type="number"
-                            min="1"
-                            max="100"
-                            value={quantity}
-                            onChange={e => setQuantity(Math.max(1, Number(e.target.value) || 1))}
-                          />
-                          <small>{tr('Κάθε φυσικό τεμάχιο παίρνει δικό του barcode.')}</small>
-                        </label>
-                      </>
-                    )}
-                    <label className="span-2">
-                      Barcode
-                      <input className="mono" value={barcode} readOnly />
-                      <small>
-                        {tr(
-                          'Αποδίδεται αυτόματα κατά την αποθήκευση. Ο κωδικός και το barcode παραμένουν διαφορετικά στοιχεία.',
-                        )}
-                      </small>
-                    </label>
-                  </div>
-                </div>
-              </section>
-            )}
-
             {kind === 'SET' && tab === 'COMPOSITION' && (
               <section className="asset-section asset-detail-full-panel create-card-composition">
                 <div className="asset-section-head">

@@ -73,9 +73,7 @@ export default function SetContents({
     <section className="asset-section set-composition-fixed asset-detail-full-panel">
       <div className="asset-section-head set-composition-head">
         <div>
-          <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ ΣΕΤ')}</span>
-          <h2>{tr('Φυσικά εργαλεία')}</h2>
-          <p>{tr('Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο.')}</p>
+          <h2 title={tr('Κάθε barcode είναι ξεχωριστό φυσικό εργαλείο.')}>{tr('Φυσικά εργαλεία')}</h2>
         </div>
         <div className="set-composition-actions">
           {can('asset.composition.manage') && (
@@ -175,7 +173,7 @@ export default function SetContents({
                       <span className="group-disclosure">
                         {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                       </span>
-                      {groupHasIssue && <small>{tr('Υπάρχει αναφορά')}</small>}
+                      {groupHasIssue && <IssueDot label={tr('Υπάρχει αναφορά')} />}
                     </div>
                   </button>
                   {open && (
@@ -199,16 +197,12 @@ export default function SetContents({
                             </div>
                             <div className="set-tool-uses">
                               <span>{tr('Χρήσεις')}</span>
-                              <strong>
-                                {tool.maxUses
-                                  ? tr('{0}/{1} χρήσεις', tool.uses, tool.maxUses)
-                                  : tr('{0} χρήσεις', tool.uses)}
-                              </strong>
+                              <UsesCell tool={tool} />
                             </div>
                             <div className="set-tool-state">
                               <MemberMarker tool={tool} set={set} />
                               {tool.state !== set.state && <StatusBadge value={tool.state} />}
-                              {hasIssue && <small>{tr('Ανοικτή αναφορά')}</small>}
+                              {hasIssue && <IssueDot label={tr('Ανοικτή αναφορά')} />}
                             </div>
                           </Link>
                         );
@@ -236,14 +230,12 @@ export default function SetContents({
                   </div>
                   <div className="set-tool-uses">
                     <span>{tr('Χρήσεις')}</span>
-                    <strong>
-                      {tool.maxUses ? tr('{0}/{1} χρήσεις', tool.uses, tool.maxUses) : tr('{0} χρήσεις', tool.uses)}
-                    </strong>
+                    <UsesCell tool={tool} />
                   </div>
                   <div className="set-tool-state">
                     <MemberMarker tool={tool} set={set} />
                     {tool.state !== set.state && <StatusBadge value={tool.state} />}
-                    {hasIssue && <small>{tr('Ανοικτή αναφορά')}</small>}
+                    {hasIssue && <IssueDot label={tr('Ανοικτή αναφορά')} />}
                   </div>
                 </Link>
               );
@@ -251,6 +243,27 @@ export default function SetContents({
       </div>
     </section>
   );
+}
+
+/** The uses of an instrument: «10 / 50» with a limit, «15 χρήσεις» without (counted for a wear check). */
+function UsesCell({tool}: {tool: Tool}) {
+  return (
+    <strong>
+      {tool.maxUses ? (
+        <>
+          {tool.uses}
+          <span className="muted"> / {tool.maxUses}</span>
+        </>
+      ) : (
+        tr('{0} χρήσεις', tool.uses)
+      )}
+    </strong>
+  );
+}
+
+/** A small red dot for an instrument with an open issue (the words are its tooltip). */
+function IssueDot({label}: {label: string}) {
+  return <i className="issue-dot" role="img" title={label} aria-label={label} />;
 }
 
 /** In the Set's composition: an instrument whose color differs from the Set's, or that has none. */

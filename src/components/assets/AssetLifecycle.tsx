@@ -77,7 +77,7 @@ export default function AssetLifecycle({
             const status = index < life.current ? 'done' : index === life.current ? 'current' : 'todo';
             return (
               <li key={id} className={status} aria-current={status === 'current' ? 'step' : undefined}>
-                <i aria-hidden="true">{status === 'done' ? <Check size={13} /> : index + 1}</i>
+                {status === 'done' && <Check size={13} aria-hidden="true" />}
                 <span>{label(id)}</span>
               </li>
             );
@@ -87,10 +87,7 @@ export default function AssetLifecycle({
       <p className="asset-lifecycle-next">
         <b>{tr('ΕΠΟΜΕΝΟ ΒΗΜΑ')}</b>
         <span>{tr(NEXT_TEXT[currentId])}</span>
-        <em>
-          {tr('Τώρα: {0}', label(currentId))}
-          {since ? ` · ${tr('από {0}', since)}` : ''}
-        </em>
+        {since && <em>{tr('Στο στάδιο από {0}', since)}</em>}
         {action}
       </p>
     </section>

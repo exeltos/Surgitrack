@@ -275,13 +275,6 @@ html body .asset-workbench-title {
 html body .asset-workbench-fields {
   margin: 6px 0 8px;
 }
-html body .asset-cover-empty small {
-  display: none;
-}
-html body .asset-cover-empty svg {
-  width: 20px;
-  height: 20px;
-}
 html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
   grid-template-columns: 150px minmax(0, 1fr);
   min-height: 25px;
@@ -300,13 +293,6 @@ html body .asset-workbench-fields dd {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-html body .asset-cover {
-  height: 60px;
-}
-html body .asset-workbench-sidebar .asset-cover {
-  min-height: 0;
-  height: 96px;
 }
 /* Asset manage dialog: the buttons never sit on the note field. The dialog is as tall as its content (up to
    the screen) and the Note field keeps its own room above the footer. */
@@ -482,18 +468,21 @@ html body .usage-correct button:disabled {
   cursor: default;
 }
 
-/* Where a Set or instrument is on its way round, and what comes next (AssetLifecycle): one thin strip. */
+/* Where a Set or instrument is on its way round, and what comes next (AssetLifecycle): the stages as a row of
+   arrows like the Sterilization queues, and one line under them. */
 .asset-lifecycle {
+  --life-arrow: 12px;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0 0 12px;
-  padding: 10px 16px 10px;
+  padding: 10px 14px;
   border: 1px solid var(--c-gray-90);
   border-radius: 14px;
   background: var(--c-white);
 }
 .asset-lifecycle-scroll {
   overflow-x: auto;
+  scrollbar-width: none;
 }
 .asset-lifecycle-steps {
   display: flex;
@@ -504,61 +493,46 @@ html body .usage-correct button:disabled {
 }
 .asset-lifecycle-steps li {
   position: relative;
-  display: grid;
-  flex: 1 0 84px;
-  justify-items: center;
-  gap: 3px;
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: max-content;
+  min-height: 34px;
+  margin-right: calc(var(--life-arrow) * -0.7);
+  padding: 4px calc(var(--life-arrow) + 6px);
+  background: var(--c-gray-95);
   color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 650;
   white-space: nowrap;
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--life-arrow)) 0,
+    100% 50%,
+    calc(100% - var(--life-arrow)) 100%,
+    0 100%,
+    var(--life-arrow) 50%
+  );
 }
-.asset-lifecycle-steps li::before {
-  content: '';
-  position: absolute;
-  top: 10px;
-  right: 50%;
-  left: -50%;
-  height: 2px;
-  background: var(--c-gray-90-4);
+.asset-lifecycle-steps li:first-child {
+  border-radius: 8px 0 0 8px;
+  clip-path: polygon(0 0, calc(100% - var(--life-arrow)) 0, 100% 50%, calc(100% - var(--life-arrow)) 100%, 0 100%);
 }
-.asset-lifecycle-steps li:first-child::before {
-  display: none;
+.asset-lifecycle-steps li:last-child {
+  margin-right: 0;
+  border-radius: 0 8px 8px 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--life-arrow) 50%);
 }
-.asset-lifecycle-steps li i {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--c-gray-90-4);
-  border-radius: 50%;
-  background: var(--c-white);
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 800;
-}
-.asset-lifecycle-steps li.done::before {
-  background: #276044;
-}
-.asset-lifecycle-steps li.done i {
-  border-color: #276044;
-  background: #276044;
-  color: var(--c-white);
+.asset-lifecycle-steps li.done {
+  background: #e6f2ec;
+  color: #276044;
 }
 .asset-lifecycle-steps li.current {
-  color: var(--c-cyan-45);
-  font-weight: 800;
-}
-.asset-lifecycle-steps li.current::before {
-  background: var(--c-cyan-45);
-}
-.asset-lifecycle-steps li.current i {
-  border-color: var(--c-cyan-45);
-  background: var(--c-cyan-45);
+  background: var(--c-cyan-20);
   color: var(--c-white);
-  box-shadow: 0 0 0 4px rgba(15, 94, 114, 0.15);
+  font-weight: 800;
 }
 .asset-lifecycle-next {
   display: flex;
@@ -596,4 +570,93 @@ html body .usage-correct button:disabled {
 }
 .asset-lifecycle-link:hover {
   text-decoration: underline;
+}
+
+/* Set and instrument card: the barcode and a small photo tile share one row; the stats that the right side
+   already shows are not repeated here. */
+html body .asset-workbench-sidebar .asset-sidebar-quickfacts {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-tool-photo-card {
+  min-height: 58px;
+  margin: 0;
+  border-radius: 10px;
+}
+html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-tool-photo-card img {
+  height: 58px;
+}
+html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-tool-photo-empty {
+  min-height: 58px;
+  gap: 7px;
+}
+html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-barcode-card {
+  min-height: 58px;
+}
+html body .asset-workbench-sidebar .usage-left {
+  margin-left: 8px;
+  color: var(--st-muted);
+  font-size: 11px;
+}
+html body .asset-workbench-sidebar .usage-left.warn-text {
+  color: var(--c-orange-45-3);
+}
+
+/* An instrument of a Set with an open issue: a small red dot, not a line of words. */
+html body .set-tool-state .issue-dot {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-red-40-2);
+  box-shadow: 0 0 0 3px rgba(192, 50, 47, 0.15);
+}
+html body .set-composition-head h2 {
+  margin: 0;
+}
+
+/* The photo field of a report: the same height as the select next to it, a dashed button with our own words. */
+html body .report-photo-field .report-photo-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px dashed var(--c-gray-80);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-40-3);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .report-photo-field:hover .report-photo-button {
+  border-color: var(--c-cyan-55-5);
+  background: var(--c-gray-95-3);
+}
+html body .report-photo-field:focus-within .report-photo-button {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 1px;
+}
+
+/* The empty photo tile: its label sits left, clear of the photo counter in the corner. */
+html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-tool-photo-empty {
+  justify-content: flex-start;
+  padding-left: 12px;
+}
+
+/* The report of an instrument has no list to fill the card: it is as tall as its fields. */
+html body .asset-modal.set-report-modal.tool-report-modal {
+  height: auto;
+}
+
+/* The name on the card of a Set or instrument: a title, not a banner. */
+html body .asset-workbench-sidebar .asset-workbench-title h1 {
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+html body .asset-workbench-sidebar .asset-workbench-title .eyebrow {
+  font-size: 10px;
 }

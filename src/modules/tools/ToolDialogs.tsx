@@ -1,8 +1,7 @@
 import {useState} from 'react';
-import {Camera} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import ReportTypeField from '../../components/assets/ReportTypeField';
-import {filesToAssetPhotos} from '../../components/assets/photoUtils';
+import ReportPhotoField from '../../components/assets/ReportPhotoField';
 import type {AssetPhoto, Tool} from '../../types/domain';
 import {tr} from '../../i18n';
 
@@ -53,23 +52,7 @@ export function ToolReportModal({
                 placeholder={tr('Περιγραφή συμβάντος...')}
               />
             </label>
-            <label className="span-2 report-photo-input">
-              <Camera size={17} /> {tr('Φωτογραφίες')}
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                multiple
-                onChange={async e =>
-                  setReportPhotos(await filesToAssetPhotos(Array.from(e.target.files || []), 'issues'))
-                }
-              />
-              <small>
-                {reportPhotos.length
-                  ? tr('{0} φωτογραφίες έτοιμες', reportPhotos.length)
-                  : tr('Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών')}
-              </small>
-            </label>
+            <ReportPhotoField photos={reportPhotos} onChange={setReportPhotos} />
           </div>
         </div>
         <footer>

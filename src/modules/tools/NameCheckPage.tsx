@@ -72,31 +72,20 @@ export default function NameCheckPage() {
             </AppButton>
           }
         />
-        <div className="name-check-kpis">
-          <div>
-            <span>{tr('Εργαλεία')}</span>
-            <strong>{tools.length}</strong>
-          </div>
-          <div>
-            <span>{tr('Διαφορετικές ονομασίες')}</span>
-            <strong>{distinct}</strong>
-          </div>
-          <div className={fixes.length ? 'warn' : 'good'}>
-            <span>{tr('Διορθώσεις γραφής')}</span>
-            <strong>{fixes.length}</strong>
-            <small>
-              {tr(
-                '{0} εργαλεία',
-                fixes.reduce((sum, f) => sum + f.items.length, 0),
-              )}
-            </small>
-          </div>
-          <div className={groups.length ? 'warn' : 'good'}>
-            <span>{tr('Κωδικοί με πολλές ονομασίες')}</span>
-            <strong>{groups.length}</strong>
-            <small>{tr('{0} με πιθανό λάθος κωδικό', odd)}</small>
-          </div>
-        </div>
+        <p className="name-check-summary">
+          <span>
+            <b>{tools.length}</b> {tr('εργαλεία')}
+          </span>
+          <span>
+            <b>{distinct}</b> {tr('διαφορετικές ονομασίες')}
+          </span>
+          <span className={fixes.length ? 'warn' : 'good'}>
+            <b>{fixes.reduce((sum, f) => sum + f.items.length, 0)}</b> {tr('εργαλεία με διόρθωση γραφής')}
+          </span>
+          <span className={odd ? 'warn' : 'good'}>
+            <b>{odd}</b> {tr('κωδικοί με πιθανό λάθος')}
+          </span>
+        </p>
         {staleSets > 0 && (
           <div className="name-check-sets">
             <AlertTriangle size={18} />

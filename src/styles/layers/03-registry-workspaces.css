@@ -1271,39 +1271,6 @@ body {
   font-weight: 800;
   overflow-wrap: anywhere;
 }
-.asset-cover {
-  position: relative;
-  width: 100%;
-  height: 210px;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-  cursor: pointer;
-}
-.asset-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: var(--c-white);
-}
-.asset-cover-empty {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: var(--st-muted);
-}
-.asset-cover-empty strong {
-  font-size: 13px;
-  color: var(--c-cyan-45-4);
-}
-.asset-cover-empty span {
-  font-size: 11px;
-}
 .asset-cover-count {
   position: absolute;
   right: 9px;
@@ -1342,29 +1309,6 @@ body {
   font-size: 18px;
   color: var(--c-cyan-40-3);
   letter-spacing: 0.04em;
-}
-.asset-workbench-mini {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 11px;
-  background: var(--c-white);
-  color: var(--c-cyan-45-5);
-}
-.asset-workbench-mini div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.asset-workbench-mini span {
-  font-size: 11px;
-}
-.asset-workbench-mini strong {
-  font-size: 12px;
-  color: var(--c-cyan-25-2);
 }
 .asset-workbench-main {
   min-width: 0;
@@ -1409,9 +1353,6 @@ body {
   .asset-workbench-sidebar {
     padding: 12px;
   }
-  .asset-cover {
-    height: 180px;
-  }
   .asset-workbench-fields > div {
     grid-template-columns: 96px minmax(0, 1fr);
   }
@@ -1451,9 +1392,6 @@ body {
   .asset-workbench-main {
     flex: 0 0 72dvh;
     min-width: 0;
-  }
-  .asset-cover {
-    height: 220px;
   }
 }
 
@@ -1518,8 +1456,7 @@ body {
   gap: 8px;
   margin: 3px 0 8px;
 }
-.asset-sidebar-quickfacts .asset-barcode-card,
-.asset-sidebar-quickfacts .asset-workbench-mini {
+.asset-sidebar-quickfacts .asset-barcode-card {
   margin: 0;
   min-height: 58px;
   padding: 8px 10px;
@@ -1530,20 +1467,6 @@ body {
 }
 .asset-sidebar-quickfacts .asset-barcode-card strong {
   font-size: 14px;
-}
-.asset-sidebar-quickfacts .asset-workbench-mini {
-  align-items: center;
-}
-.asset-sidebar-quickfacts .asset-workbench-mini span {
-  font-size: 11px;
-}
-.asset-sidebar-quickfacts .asset-workbench-mini strong {
-  font-size: 11px;
-}
-.asset-workbench-sidebar .asset-cover {
-  height: min(170px, 22vh);
-  min-height: 118px;
-  margin-top: 0;
 }
 .asset-workbench-actions {
   min-height: 50px;
@@ -1666,31 +1589,9 @@ body {
   font-size: 11px;
   color: var(--st-muted);
 }
-.report-photo-input {
-  position: relative;
-  display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 4px 7px;
-  padding: 11px 12px;
-  border: 1px dashed var(--c-gray-80);
-  border-radius: 10px;
-  background: var(--c-white);
-  cursor: pointer;
-}
-.report-photo-input input {
-  grid-column: 1/-1;
-}
-.report-photo-input small {
-  grid-column: 2;
-  color: var(--st-muted);
-}
 @media (max-width: 1180px) {
   .asset-sidebar-quickfacts {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .asset-workbench-sidebar .asset-cover {
-    height: 140px;
   }
   .asset-workbench-fields > div {
     min-height: 29px;
@@ -1832,16 +1733,11 @@ body {
   grid-column: 1;
   grid-row: 1;
 }
-.set-report-modal .form-grid > .report-photo-input {
+.set-report-modal .form-grid > .report-photo-field {
   grid-column: 2;
   grid-row: 1;
-  align-self: end;
-  padding: 7px 10px;
 }
-.set-report-modal .form-grid > .report-photo-input input {
-  font-size: 12px;
-}
-.set-report-modal .form-grid > label.span-2:not(.report-photo-input) {
+.set-report-modal .form-grid > label.span-2 {
   grid-column: 1 / -1;
   grid-row: 2;
 }
@@ -1849,11 +1745,11 @@ body {
   min-height: 56px;
 }
 @media (max-width: 640px) {
-  .set-report-modal .form-grid > .report-photo-input {
+  .set-report-modal .form-grid > .report-photo-field {
     grid-column: 1 / -1;
     grid-row: auto;
   }
-  .set-report-modal .form-grid > label.span-2:not(.report-photo-input) {
+  .set-report-modal .form-grid > label.span-2 {
     grid-row: auto;
   }
 }
@@ -2063,8 +1959,7 @@ body {
 .asset-workbench-sidebar-tool {
   overflow: hidden;
 }
-.asset-workbench-sidebar-tool .asset-sidebar-quickfacts .asset-barcode-card,
-.asset-workbench-sidebar-tool .asset-sidebar-quickfacts .asset-workbench-mini {
+.asset-workbench-sidebar-tool .asset-sidebar-quickfacts .asset-barcode-card {
   margin-top: 0;
   min-height: 78px;
 }
