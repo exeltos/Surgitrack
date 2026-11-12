@@ -3,13 +3,14 @@ import SterileDates from '../../components/ui/SterileDates';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, ShieldCheck, Wrench} from 'lucide-react';
+import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, Wrench} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {presetPath, useRememberedState} from '../../core/listMemory';
+import QuickFilters from '../../components/ui/QuickFilters';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
 
@@ -106,39 +107,48 @@ export default function DepartmentPage() {
             <span>{tr('Προβολή τμήματος')}</span>
             <strong>{tr('Πίσω στην Επισκόπηση')}</strong>
           </Link>
-        ) : (
-          <div className="department-user-sign">
-            <ShieldCheck size={18} />
-            <span>{tr('Συνδεδεμένος χρήστης')}</span>
-            <strong>{trData(currentUser.name)}</strong>
-          </div>
-        )}
+        ) : null}
       </header>
 
-      <section className="department-kpis">
-        {(
-          [
-            {filter: 'IN_DEPARTMENT', label: tr('Στο τμήμα'), value: atDepartment},
-            {filter: 'STERILIZATION', label: tr('Σε αποστείρωση'), value: inSterilization},
-            {filter: 'READY', label: tr('Έτοιμα για παραλαβή'), value: ready},
-          ] as const
-        ).map(k => (
-          <button
-            key={k.filter}
-            type="button"
-            className={statusFilter === k.filter ? 'active' : ''}
-            aria-pressed={statusFilter === k.filter}
-            onClick={() => setStatusFilter(statusFilter === k.filter ? 'ALL' : k.filter)}
-          >
-            <span>{k.label}</span>
-            <strong>{k.value}</strong>
-          </button>
-        ))}
-        <Link to={presetPath('/issues', {status: 'OPEN', department: dept})}>
-          <span>{tr('Ανοικτές εκκρεμότητες')}</span>
-          <strong>{openIssues}</strong>
-        </Link>
-      </section>
+      <QuickFilters
+        items={[
+          {
+            key: 'ALL',
+            label: tr('Όλα'),
+            count: sourceItems.length,
+            active: statusFilter === 'ALL',
+            onClick: () => setStatusFilter('ALL'),
+          },
+          ...(
+            [
+              {filter: 'IN_DEPARTMENT', label: tr('Στο τμήμα'), count: atDepartment},
+              {filter: 'STERILIZATION', label: tr('Σε αποστείρωση'), count: inSterilization},
+              {
+                filter: 'READY',
+                label: tr('Έτοιμα για παραλαβή'),
+                count: ready,
+                tone: ready ? ('good' as const) : undefined,
+              },
+            ] as const
+          ).map(k => ({
+            key: k.filter,
+            label: k.label,
+            count: k.count,
+            tone: 'tone' in k ? k.tone : undefined,
+            active: statusFilter === k.filter,
+            onClick: () => setStatusFilter(statusFilter === k.filter ? 'ALL' : k.filter),
+          })),
+          {
+            key: 'ISSUES',
+            label: tr('Ανοικτές εκκρεμότητες'),
+            hint: tr('Ανοίγει τις Εκκρεμότητες του τμήματος'),
+            count: openIssues,
+            tone: openIssues ? 'warn' : undefined,
+            active: false,
+            onClick: () => navigate(presetPath('/issues', {status: 'OPEN', department: dept})),
+          },
+        ]}
+      />
 
       <section className="department-assets-panel">
         {/* The department's own menu chooses Sets or instruments; the admin viewing a department switches here. */}
@@ -175,26 +185,6 @@ export default function DepartmentPage() {
               placeholder={tr('Ονομασία, κωδικός ή barcode...')}
             />
           </label>
-          <div className="department-status-tabs">
-            <button className={statusFilter === 'ALL' ? 'active' : ''} onClick={() => setStatusFilter('ALL')}>
-              {tr('Όλα')}
-            </button>
-            <button
-              className={statusFilter === 'IN_DEPARTMENT' ? 'active' : ''}
-              onClick={() => setStatusFilter('IN_DEPARTMENT')}
-            >
-              {tr('Στο τμήμα')}
-            </button>
-            <button
-              className={statusFilter === 'STERILIZATION' ? 'active' : ''}
-              onClick={() => setStatusFilter('STERILIZATION')}
-            >
-              {tr('Σε αποστείρωση')}
-            </button>
-            <button className={statusFilter === 'READY' ? 'active' : ''} onClick={() => setStatusFilter('READY')}>
-              {tr('Έτοιμα')}
-            </button>
-          </div>
         </div>
         <div
           className="department-asset-list"
@@ -233,7 +223,6 @@ export default function DepartmentPage() {
                       size={19}
                     />
                     <div className="department-asset-identity">
-                      <span className="mono">{asset.barcode}</span>
                       <strong>
                         {asset.name}{' '}
                         <ColorMarker
@@ -249,7 +238,8 @@ export default function DepartmentPage() {
                         />
                       </strong>
                       <small>
-                        {asset.code} · {trData(asset.specialty)}
+                        <span className="mono">{asset.barcode}</span>
+                        {asset.code && asset.code !== asset.name ? ` · ${asset.code}` : ''} · {trData(asset.specialty)}
                         {kind === 'SET' ? tr(' · {0}/{1} εργαλεία', memberCount, (asset as SetAsset).expected) : ''}
                       </small>
                     </div>

@@ -168,19 +168,37 @@ export default function OwnerDashboard({
   ];
 
   const kpis = [
-    {icon: Building2, label: L('Ενεργά νοσοκομεία', 'Active hospitals'), value: activeHospitals.length},
-    {icon: Clock, label: L('Σε δοκιμαστική περίοδο', 'On trial'), value: trials.length},
+    {
+      icon: Building2,
+      label: L('Ενεργά νοσοκομεία', 'Active hospitals'),
+      short: L('Νοσοκομεία', 'Hospitals'),
+      value: activeHospitals.length,
+    },
+    {
+      icon: Clock,
+      label: L('Σε δοκιμαστική περίοδο', 'On trial'),
+      short: L('Δοκιμαστικά', 'On trial'),
+      value: trials.length,
+    },
     {
       icon: CalendarClock,
       label: L('Λήγουν σε 7 ημέρες', 'Ending within 7 days'),
+      short: L('Λήγουν σε 7 ημ.', 'Ending in 7 d'),
       value: ending.length,
       tone: ending.length ? 'warn' : '',
     },
-    {icon: Lock, label: L('Κλειδωμένα', 'Locked'), value: locked.length, tone: locked.length ? 'stop' : ''},
-    {icon: Users, label: L('Ενεργοί χρήστες', 'Active users'), value: activeUsers},
+    {
+      icon: Lock,
+      label: L('Κλειδωμένα', 'Locked'),
+      short: L('Κλειδωμένα', 'Locked'),
+      value: locked.length,
+      tone: locked.length ? 'stop' : '',
+    },
+    {icon: Users, label: L('Ενεργοί χρήστες', 'Active users'), short: L('Χρήστες', 'Users'), value: activeUsers},
     {
       icon: UserCheck,
       label: L('Αιτήματα σε αναμονή', 'Requests waiting'),
+      short: L('Αιτήματα', 'Requests'),
       value: requests,
       tone: requests ? 'warn' : '',
     },
@@ -190,9 +208,9 @@ export default function OwnerDashboard({
     <div className="owner-dashboard">
       <div className="owner-kpis">
         {kpis.map(k => (
-          <div key={k.label} className={`owner-kpi ${k.tone || ''}`}>
+          <div key={k.label} className={`owner-kpi ${k.tone || ''}`} title={k.label}>
             <k.icon size={18} />
-            <span>{k.label}</span>
+            <span>{k.short}</span>
             <strong>{k.value}</strong>
           </div>
         ))}
@@ -202,7 +220,6 @@ export default function OwnerDashboard({
         <section className="owner-card">
           <header>
             <div>
-              <span className="eyebrow">{L('ΣΗΜΕΡΑ', 'TODAY')}</span>
               <h2>{L('Χρειάζονται προσοχή', 'Needs attention')}</h2>
             </div>
             <span className={`owner-count ${attention.length ? 'warn' : ''}`}>{attention.length}</span>
@@ -230,8 +247,7 @@ export default function OwnerDashboard({
         <section className="owner-card">
           <header>
             <div>
-              <span className="eyebrow">{L('ΓΡΗΓΟΡΑ', 'QUICK')}</span>
-              <h2>{L('Ενέργειες', 'Actions')}</h2>
+              <h2>{L('Γρήγορες ενέργειες', 'Quick actions')}</h2>
             </div>
           </header>
           <div className="owner-actions">
@@ -256,7 +272,6 @@ export default function OwnerDashboard({
       <section className="owner-card owner-hospitals">
         <header>
           <div>
-            <span className="eyebrow">{L('ΝΟΣΟΚΟΜΕΙΑ', 'HOSPITALS')}</span>
             <h2>{L('Κατάσταση ανά νοσοκομείο', 'Status by hospital')}</h2>
           </div>
           <AppButton size="sm" onClick={onOpenHospitals}>

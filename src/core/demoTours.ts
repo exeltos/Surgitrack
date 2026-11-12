@@ -264,7 +264,7 @@ const TOURS: Tour[] = [
     to: '/department',
     stops: [
       {
-        target: '.department-kpis',
+        target: '.department-workspace .quick-filters',
         title: t('Με μια ματιά', 'At a glance'),
         text: t(
           'Πόσα Σετ είναι στο τμήμα, στην Αποστείρωση ή έτοιμα για παραλαβή.',

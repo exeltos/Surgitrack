@@ -1155,7 +1155,7 @@ export const en: Record<string, string> = {
   'Στοιχεία Εργαλείου': 'Instrument details',
   'Στοιχεία Σετ': 'Set details',
   'Συμπληρώστε κωδικό': 'Enter a code',
-  'Συνδεδεμένος χρήστης': 'Signed-in user',
+  'Ανοίγει τις Εκκρεμότητες του τμήματος': 'Opens the department’s issues',
   Συσκευασία: 'Packaging',
   'Συσκευασία & Σήμανση': 'Packaging & Labelling',
   'Συσκευασία / περιέκτης': 'Packaging / container',

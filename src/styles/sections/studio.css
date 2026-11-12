@@ -2542,3 +2542,28 @@ html body .studio-system-grid > section > .studio-setting-row > .studio-setting-
   width: 100%;
   justify-content: center;
 }
+
+/* Owner overview: each figure's name on one line (the full name on hover). */
+html body .owner-kpi > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Hospitals: the figures that filter the list and «Νέο νοσοκομείο» on one row over it. */
+html body .platform-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 4px;
+}
+html body .platform-toolbar > .quick-filters {
+  flex: 1 1 auto;
+  margin: 0;
+}
+html body .platform-toolbar > .app-button {
+  flex: 0 0 auto;
+}
+html body .plan-badge {
+  white-space: nowrap;
+}
