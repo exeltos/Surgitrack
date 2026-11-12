@@ -213,3 +213,20 @@ html body .device-cycle-free {
   font-weight: 700;
   vertical-align: middle;
 }
+
+/* Equipment by kind: a small heading over the sterilizers, the washers and any other device. */
+/* A sterilizer's page: what it is and its state on one line under its name; «Καταγραφή» of a test is a real button. */
+html body .equipment-facts-line {
+  margin: 4px 0 0;
+  color: var(--st-muted);
+  font-size: 13px;
+}
+html body .equipment-tests .row-actions button {
+  border: 1px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: var(--c-white);
+  padding: 5px 12px;
+}
+html body .equipment-tests .row-actions button:hover {
+  border-color: var(--c-cyan-60);
+}

@@ -635,7 +635,8 @@ async function main() {
         .getByRole('button', {name: /Λεπτομέρειες/})
         .first()
         .click();
-      const tests = page.getByRole('heading', {name: 'Δοκιμές κλιβάνου'});
+      // The last test of the sterilizer, at the bottom of its page.
+      const tests = page.locator('.equipment-tests tbody tr').last();
       await tests.waitFor();
       const below = async () => (await tests.boundingBox())?.y ?? 0;
       const content = (await page.locator('.content').boundingBox())?.height ?? 0;
