@@ -632,7 +632,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
       ['prep', 'PREP', firstRow],
       ['packaging', 'PACKAGING', firstRow],
       ['process', 'PROCESS', button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)],
-      ['in-sterilizer', 'IN_STERILIZER', undefined],
+      ['in-sterilizer', 'IN_STERILIZER', button(/^(Λεπτομέρειες|Details)/)],
       ['release', 'RELEASE', button(/^(Αποδέσμευση φορτίου|Release (the )?load)/)],
       ['ready', 'READY', firstRow],
     ];
