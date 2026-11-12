@@ -663,13 +663,13 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
   }
   // The simulated sterilizer (Demo only): started on the first load in the sterilizer, then seen later in its cycle.
   if (sterilization && (process.env.SCREENS_DEMO === '1' || process.env.SCREENS_DEMO_HOSPITAL === '1')) {
-    const toRelease = () => page.locator('[data-tour="queue-RELEASE"]').click({timeout: 3000});
+    const toSterilizer = () => page.locator('[data-tour="queue-IN_STERILIZER"]').click({timeout: 3000});
     modals.push({
       name: 'sterilization-simulation-3-done',
       route: '/sterilization',
       dialog: false,
       open: async () => {
-        await toRelease();
+        await toSterilizer();
         // The row's «Προσομοίωση» opens the load's card, where the scenario is chosen and the simulation started.
         await page
           .getByRole('button', {name: /^(Προσομοίωση|Simulation)$/})
@@ -702,7 +702,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByRole('link', {name: /^(Αποστείρωση|Sterilization)$/})
           .first()
           .click({timeout: 3000});
-        await toRelease();
+        await toSterilizer();
         await page.waitForTimeout(19000);
         await shoot(page, `${LANG}_${role.toLowerCase()}_${viewport}_sterilization-simulation-2-hold.png`, viewport);
         // All sterilizers on one board (the «Στον κλίβανο» tab) while the cycle runs.
@@ -724,7 +724,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByRole('button', {name: /^(Κλείσιμο|Close)$/})
           .last()
           .click({timeout: 3000});
-        await toRelease();
+        await toSterilizer();
         await page.waitForTimeout(42000);
         // The cycle ended by itself (as a connected sterilizer's does): nobody pressed «Τέλος κύκλου».
         // The ended cycle was sent to device-ingest as the simulated device: it is on the Devices page.
@@ -739,7 +739,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByRole('link', {name: /^(Αποστείρωση|Sterilization)$/})
           .first()
           .click({timeout: 3000});
-        await toRelease();
+        await toSterilizer();
         await page.waitForTimeout(500);
         await page
           .getByRole('button', {name: /^(Αποδέσμευση φορτίου|Release (the )?load)/})

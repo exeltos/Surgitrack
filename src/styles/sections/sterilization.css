@@ -1503,9 +1503,6 @@ html body .ster-row-load b {
 }
 
 /* Release: the loads still in the sterilizer come first, where their end of cycle is recorded. */
-.release-running-loads {
-  flex: 0 0 auto;
-}
 
 /* Composition on a phone: the name on its own line, the state and the button under it, all inside the row. */
 @media (max-width: 700px) {
@@ -2677,4 +2674,31 @@ html body .load-modal .load-finish-row > .cycle-note {
 }
 html body .load-modal .load-finish-row textarea {
   min-height: 64px;
+}
+
+/* In the sterilizer: a row opens the load's card; the cycle in one column (phase, temperature and pressure on one
+   line, the progress bar and the minutes below). */
+html body .sterilizer-rows tbody tr.row-opens {
+  cursor: pointer;
+}
+html body .sterilizer-rows tbody tr.row-opens:hover > td {
+  background: var(--c-gray-100-2);
+}
+html body .sterilizer-rows .row-cycle {
+  min-width: 220px;
+}
+html body .sterilizer-rows .row-cycle-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-bottom: 5px;
+}
+html body .sterilizer-rows .row-cycle-line .bad {
+  color: var(--c-red-40-2);
+  font-weight: 700;
+}
+html body .sterilizer-rows td:first-child .row-name,
+html body .sterilizer-rows td:first-child small {
+  white-space: nowrap;
 }

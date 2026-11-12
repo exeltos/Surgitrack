@@ -145,11 +145,29 @@ const TOURS: Tour[] = [
     to: '/sterilization',
     stops: [
       {
+        target: '[data-tour="queue-IN_STERILIZER"]',
+        title: t('Στον κλίβανο', 'In the sterilizer'),
+        text: t(
+          'Εδώ φαίνεται κάθε φορτίο όσο τρέχει ο κύκλος του. Πατήστε την καρτέλα «Στον κλίβανο».',
+          'Every load shows here while its cycle runs. Press the «In the sterilizer» tab.',
+        ),
+        advance: 'click',
+      },
+      {
+        target: '[data-tour="cycle-end"]',
+        title: t('Τέλος κύκλου', 'End of cycle'),
+        text: t(
+          'Όταν τελειώσει ο κύκλος, πατήστε «Τέλος κύκλου»: το φορτίο περνά στην Αποδέσμευση.',
+          'When the cycle is over, press «End of cycle»: the load moves on to Release.',
+        ),
+        advance: 'click',
+      },
+      {
         target: '[data-tour="queue-RELEASE"]',
         title: t('Αποδέσμευση', 'Release'),
         text: t(
-          'Όταν τελειώσει ο κύκλος, το φορτίο περιμένει εδώ. Πατήστε την καρτέλα «Αποδέσμευση».',
-          'When the cycle ends, the load waits here. Press the «Release» tab.',
+          'Το φορτίο περιμένει τώρα εδώ. Πατήστε την καρτέλα «Αποδέσμευση».',
+          'The load now waits here. Press the «Release» tab.',
         ),
         advance: 'click',
       },

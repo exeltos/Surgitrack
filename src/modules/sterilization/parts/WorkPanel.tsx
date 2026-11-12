@@ -171,11 +171,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
               </button>
             </>
           )}
-          {queue === 'IN_STERILIZER' && (
-            <span className="ster-hint">
-              {tr('Μόνο προβολή: τα αντικείμενα είναι κλειδωμένα· το «Τέλος κύκλου» καταγράφεται στην Αποδέσμευση.')}
-            </span>
-          )}
           {queue === 'STORAGE' && (
             <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
           )}
@@ -281,29 +276,23 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
         </details>
       )}
-      {queue === 'RELEASE' && s.runningLoads.length > 0 && (
-        <div className="release-running-loads">
-          <SterilizerLoads
-            loads={s.runningLoads}
-            canFinish={s.can('sterilization.cycle')}
-            onFinish={(id, result) => s.finishProcessLoad(id, result)}
-            onPrint={s.printLoadForm}
-            onReport={s.printCycle}
-          />
-        </div>
-      )}
       {withTests && queue === 'PROCESS' && <SterilizerTests />}
       {withTests && queue === 'WASHING' && <SterilizerTests equipment="washers" />}
       {queue === 'IN_STERILIZER' ? (
-        <SterilizerLoads loads={s.runningLoads} onPrint={s.printLoadForm} onReport={s.printCycle} />
+        // The cycle ends where the load is: «Τέλος κύκλου» or «Αποτυχία κύκλου» on its row.
+        <SterilizerLoads
+          loads={s.runningLoads}
+          canFinish={s.can('sterilization.cycle')}
+          onFinish={(id, result) => s.finishProcessLoad(id, result)}
+          onPrint={s.printLoadForm}
+          onReport={s.printCycle}
+        />
       ) : rows.length === 0 ? (
-        queue === 'RELEASE' && s.runningLoads.length > 0 ? null : (
-          <div className="empty ster-empty">
-            <PackageCheck size={32} />
-            <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>
-            <span>{tr('Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.')}</span>
-          </div>
-        )
+        <div className="empty ster-empty">
+          <PackageCheck size={32} />
+          <strong>{tr('Δεν υπάρχουν εγγραφές σε αυτό το στάδιο')}</strong>
+          <span>{tr('Η ουρά θα ενημερωθεί όταν πραγματοποιηθεί νέα κίνηση.')}</span>
+        </div>
       ) : (
         <>
           <div className="ster-list-head">

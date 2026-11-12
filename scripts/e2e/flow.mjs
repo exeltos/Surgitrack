@@ -382,7 +382,7 @@ async function main() {
 
     await step('The cycle ends and passes', async () => {
       const {page} = sterilization;
-      await queue('Αποδέσμευση');
+      await queue('Στον κλίβανο');
       // The row of this load (the sample hospital has another load in the sterilizer).
       await page
         .locator('.sterilizer-rows tbody tr', {hasText: 'E2E-0001'})
