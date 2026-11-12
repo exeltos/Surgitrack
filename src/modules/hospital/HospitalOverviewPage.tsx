@@ -1,17 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
-import {
-  Activity,
-  ArrowRight,
-  Gauge,
-  History,
-  Layers3,
-  PackageCheck,
-  Sparkles,
-  TriangleAlert,
-  UserPlus,
-  Wrench,
-} from 'lucide-react';
+import {Activity, ArrowRight, History, Layers3, PackageCheck, TriangleAlert} from 'lucide-react';
 import {expiryAlerts, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import PageHeader from '../../components/ui/PageHeader';
 import {useSurgi} from '../../store/SurgiStore';
@@ -56,7 +45,7 @@ const QUEUE_OF: Partial<Record<AssetState, string>> = {
  * The hospital admin's home: the whole hospital at a glance — where the sets and instruments
  * are, what each department holds, what is stuck, and the latest movements.
  */
-const DEPARTMENTS_SHOWN = 5;
+const DEPARTMENTS_SHOWN = 8;
 
 export default function HospitalOverviewPage() {
   const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();
@@ -166,49 +155,6 @@ export default function HospitalOverviewPage() {
   const shortSets = sets.filter(x => x.actual < x.expected).length;
   const expiry = expiryAlerts(sterileExpiryList(sets, tools));
   const expired = expiry.filter(e => e.state === 'EXPIRED').length;
-  const kpis = [
-    {
-      icon: Layers3,
-      label: L('Σετ', 'Sets'),
-      value: sets.length,
-      to: presetPath('/sets'),
-      note: shortSets ? L(`${shortSets} με έλλειψη`, `${shortSets} incomplete`) : undefined,
-      warn: false,
-    },
-    {
-      icon: Wrench,
-      label: L('Εργαλεία', 'Instruments'),
-      value: tools.length,
-      to: presetPath('/tools'),
-      note: L(
-        `${tools.filter(t => t.mode === 'STOCK').length} στο Απόθεμα`,
-        `${tools.filter(t => t.mode === 'STOCK').length} in Stock`,
-      ),
-      warn: false,
-    },
-    {icon: Sparkles, label: L('Σε αποστείρωση', 'In sterilization'), value: inProcess.length, to: '/sterilization'},
-    {
-      icon: PackageCheck,
-      label: L('Για παραλαβή', 'Ready for pickup'),
-      value: ready.length,
-      to: '/sterilization?queue=READY',
-    },
-    {
-      icon: TriangleAlert,
-      label: L('Εκκρεμότητες', 'Open issues'),
-      value: openIssues.length,
-      to: presetPath('/issues', {status: 'OPEN'}),
-      warn: openIssues.length > 0,
-    },
-    {
-      icon: Gauge,
-      label: L('Κοντά στο όριο', 'Near usage limit'),
-      value: lifecycleAlerts.length,
-      to: presetPath('/tools', {usage: 'LOW'}),
-      warn: lifecycleAlerts.length > 0,
-    },
-  ];
-
   // What waits for action, most urgent first (the red ones, then the amber): one row per kind, with the count and a
   // few examples, opening the list that holds them.
   const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
@@ -226,8 +172,8 @@ export default function HospitalOverviewPage() {
           )
         : L(`${expiry.length} λήγουν σύντομα`, `${expiry.length} expiring soon`),
       note: expiry
-        .slice(0, 3)
-        .map(e => `${e.barcode} · ${formatExpiry(e.sterileUntil)}`)
+        .slice(0, 2)
+        .map(e => `${e.barcode} (${formatExpiry(e.sterileUntil).slice(0, 5)})`)
         .join(' · '),
       to: '/expiry',
     });
@@ -307,6 +253,19 @@ export default function HospitalOverviewPage() {
     });
   }
   triage.sort((a, b) => Number(b.tone === 'bad') - Number(a.tone === 'bad'));
+  // People waiting to be let in come first: nobody else can do it for them.
+  if (pendingAccess > 0)
+    triage.unshift({
+      key: 'access',
+      tone: 'warn',
+      count: pendingAccess,
+      title: L(
+        `${pendingAccess} ${pendingAccess === 1 ? 'αίτημα πρόσβασης περιμένει' : 'αιτήματα πρόσβασης περιμένουν'} έγκριση`,
+        `${pendingAccess} access ${pendingAccess === 1 ? 'request is' : 'requests are'} awaiting approval`,
+      ),
+      note: L('Χρήστες & Τμήματα', 'Users & departments'),
+      to: '/hospital',
+    });
 
   // Where every unit of equipment is: Sets and standalone instruments by state, plus the instruments in Stock.
   const stockTools = tools.filter(t => t.mode === 'STOCK');
@@ -359,37 +318,6 @@ export default function HospitalOverviewPage() {
       />
 
       <PromoCards />
-
-      {pendingAccess > 0 && (
-        <Link className="overview-alert" to="/hospital">
-          <UserPlus size={18} />
-          <span>
-            <b>
-              {L(
-                `${pendingAccess} ${pendingAccess === 1 ? 'αίτημα πρόσβασης περιμένει' : 'αιτήματα πρόσβασης περιμένουν'} έγκριση`,
-                `${pendingAccess} access ${pendingAccess === 1 ? 'request is' : 'requests are'} awaiting approval`,
-              )}
-            </b>
-            <small>
-              {L('Εγκρίνετε ή απορρίψτε από «Χρήστες & Τμήματα».', 'Approve or reject in “Users & departments”.')}
-            </small>
-          </span>
-          <ArrowRight size={16} />
-        </Link>
-      )}
-
-      <div className="dash-kpis">
-        {kpis.map(k => (
-          <Link key={k.label} to={k.to} className={`dash-kpi${k.warn ? ' warn' : ''}`}>
-            <span className="dash-kpi-label">
-              <k.icon size={15} />
-              {k.label}
-            </span>
-            <strong>{k.value}</strong>
-            {k.note && <small>{k.note}</small>}
-          </Link>
-        ))}
-      </div>
 
       <div className="dash-grid">
         <section className="dash-card dash-attention">
@@ -451,11 +379,16 @@ export default function HospitalOverviewPage() {
           </div>
         </section>
 
-        <section className="dash-card dash-where">
+        <section className="dash-card dash-equipment">
           <header>
             <div>
-              <b>{L('Πού βρίσκεται ο εξοπλισμός', 'Where the equipment is')}</b>
-              <small>{L('Σετ, μεμονωμένα εργαλεία και Απόθεμα.', 'Sets, standalone instruments and Stock.')}</small>
+              <b>{L('Εξοπλισμός', 'Equipment')}</b>
+              <small>
+                {L(
+                  `${sets.length} Σετ · ${tools.length} εργαλεία (${stockTools.length} στο Απόθεμα)`,
+                  `${sets.length} Sets · ${tools.length} instruments (${stockTools.length} in Stock)`,
+                )}
+              </small>
             </div>
             <Layers3 size={18} />
           </header>
@@ -470,31 +403,15 @@ export default function HospitalOverviewPage() {
                 ))
             )}
           </div>
-          <ul
-            className="dash-legend"
-            tabIndex={0}
-            aria-label={L('Πού βρίσκεται ο εξοπλισμός', 'Where the equipment is')}
-          >
+          {/* The legend of the bar is also the legend of the departments below: the same colours. */}
+          <ul className="dash-legend-row" aria-label={L('Πού βρίσκεται ο εξοπλισμός', 'Where the equipment is')}>
             {location.map(x => (
               <li key={x.key}>
                 <span className={`dot seg-${x.key}`} />
-                <span>{x.label}</span>
-                <strong>{x.n}</strong>
-                <small>{locationTotal ? `${Math.round((x.n / locationTotal) * 100)}%` : '—'}</small>
+                {x.label} <strong>{x.n}</strong>
               </li>
             ))}
           </ul>
-        </section>
-
-        <section className="dash-card dash-depts">
-          <header>
-            <div>
-              <b>{L('Ανά τμήμα', 'By department')}</b>
-              <small>
-                {L('Σετ και μεμονωμένα εργαλεία κάθε τμήματος.', "Each department's Sets and standalone instruments.")}
-              </small>
-            </div>
-          </header>
           <div className="dash-depts-list" tabIndex={0} aria-label={L('Ανά τμήμα', 'By department')}>
             {(allDepartments ? byDepartment : byDepartment.slice(0, DEPARTMENTS_SHOWN)).map(d => {
               const other = Math.max(0, d.total - d.atDepartment - d.inProcess - d.ready);
@@ -511,7 +428,7 @@ export default function HospitalOverviewPage() {
                       <i className="seg-dept" style={{flexGrow: d.atDepartment}} />
                       <i className="seg-process" style={{flexGrow: d.inProcess}} />
                       <i className="seg-ready" style={{flexGrow: d.ready}} />
-                      <i className="seg-other" style={{flexGrow: other}} />
+                      <i className="seg-lost" style={{flexGrow: other}} />
                     </span>
                   </span>
                   <strong>{d.total}</strong>
@@ -544,32 +461,15 @@ export default function HospitalOverviewPage() {
               <p className="hospital-empty">{L('Δεν υπάρχουν τμήματα ακόμα.', 'No departments yet.')}</p>
             )}
           </div>
-          <footer className="dash-legend-inline">
-            <span>
-              <span className="dot seg-dept" />
-              {L('Στο τμήμα', 'At department')}
-            </span>
-            <span>
-              <span className="dot seg-process" />
-              {L('Αποστείρωση', 'Sterilization')}
-            </span>
-            <span>
-              <span className="dot seg-ready" />
-              {L('Έτοιμα', 'Ready')}
-            </span>
-            <span>
-              <span className="dot seg-other" />
-              {L('Άλλα', 'Other')}
-            </span>
-          </footer>
         </section>
 
         <section className="dash-card dash-activity">
           <header>
             <div>
-              <b>{L('Κινήσεις 14 ημερών', 'Movements, last 14 days')}</b>
+              <b>{L('Δραστηριότητα', 'Activity')}</b>
+              <small>{L('Κινήσεις των τελευταίων 14 ημερών.', 'Movements of the last 14 days.')}</small>
             </div>
-            <Link to="/movements">{L('Ιστορικό', 'History')}</Link>
+            <Link to="/movements">{L('Όλο το ιστορικό', 'Full history')}</Link>
           </header>
           <div className="dash-activity-stats">
             {[
@@ -596,26 +496,10 @@ export default function HospitalOverviewPage() {
           </div>
           <div className="dash-axis">
             <span>{dayLabel(perDay[0].day)}</span>
-            <span>{L(`Μέγιστο: ${perDayMax} κινήσεις σε μία ημέρα`, `Most: ${perDayMax} movements in a day`)}</span>
             <span>{dayLabel(perDay[perDay.length - 1].day)}</span>
           </div>
-        </section>
-
-        <section className="dash-card dash-latest">
-          <header>
-            <div>
-              <b>{L('Τελευταίες κινήσεις', 'Latest movements')}</b>
-              <small>
-                {L(
-                  'Οι πιο πρόσφατες ενέργειες σε Σετ και εργαλεία.',
-                  'The most recent actions on Sets and instruments.',
-                )}
-              </small>
-            </div>
-            <Link to="/movements">{L('Όλο το ιστορικό', 'Full history')}</Link>
-          </header>
           <ul className="dash-list" tabIndex={0} aria-label={L('Τελευταίες κινήσεις', 'Latest movements')}>
-            {latestMovements.slice(0, 6).map(m => (
+            {latestMovements.slice(0, 4).map(m => (
               <li key={m.id}>
                 <History size={15} />
                 <Link to={assetPath(m.asset) || '/movements'}>
