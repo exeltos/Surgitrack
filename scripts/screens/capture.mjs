@@ -445,15 +445,19 @@ async function main() {
       if (role === 'PLATFORM') {
         // The platform owner outside any hospital: Studio and the hospital list.
         list = [
-          '/studio',
-          '/studio?tab=NOTICES',
-          '/studio?tab=SECURITY',
-          '/studio?tab=SYSTEM',
-          '/studio?tab=WORKFLOW',
-          '/studio?tab=ROLES',
-          '/studio?tab=USERS',
-          '/hospitals',
-          '/hospital',
+          '/studio?tab=overview',
+          '/studio?tab=platform',
+          '/studio?tab=users',
+          '/studio?tab=demos',
+          '/studio?tab=import',
+          '/studio?tab=notices',
+          '/studio?tab=ratings',
+          '/studio?tab=errors',
+          '/studio?tab=security',
+          '/studio?tab=libraries',
+          '/studio?tab=workflow',
+          '/studio?tab=roles',
+          '/studio?tab=system',
         ];
       } else {
         const allowed = new Set(seed.permissions[role]);
