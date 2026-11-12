@@ -1,4 +1,4 @@
-import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
+import {Fragment, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
 import {
@@ -277,10 +277,13 @@ export default function AppShell({
   // The person actually signed in, even while an admin views the app as another role.
   const signedInName = getRealIdentity()?.name || currentUser.name;
   const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
-  const departmentUsage = lifecycleAlerts.filter(a => departmentAssets.some(asset => asset.id === a.assetId));
-  // Sterile Sets and instruments in their last month (10 days for 2 months) or expired.
-  const expiryNotices = expiryAlerts(sterileExpiryList(sets, tools));
-  const departmentExpiry = expiryNotices.filter(e => departmentAssets.some(asset => asset.id === e.id));
+  const departmentAssetIds = new Set(departmentAssets.map(asset => asset.id));
+  const departmentUsage = lifecycleAlerts.filter(a => departmentAssetIds.has(a.assetId));
+  // Sterile Sets and instruments in their last month (10 days for 2 months) or expired: worked out again only
+  // when the Sets or instruments change (or the day does), not on every update of the screen.
+  const day = new Date().toDateString();
+  const expiryNotices = useMemo(() => expiryAlerts(sterileExpiryList(sets, tools, new Date(day))), [sets, tools, day]);
+  const departmentExpiry = expiryNotices.filter(e => departmentAssetIds.has(e.id));
   const accessRequests = hospitalId ? pendingAccess : 0;
   const openIssues = issues.filter(i => i.status === 'OPEN');
   // Instruments that just ran out of lives: Sterilization must set them aside and confirm.

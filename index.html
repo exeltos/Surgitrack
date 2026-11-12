@@ -2,6 +2,13 @@
 <html lang="el">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      React Router's HashRouter looks for a <base> element (document.querySelector) on every Link it renders:
+      without one, each look scans the whole page, which at a large hospital's size (thousands of rows with links)
+      blocked the screen for over a second on every update. Found first here, it is found at once. No href, so
+      it changes no address; target _self is what links do anyway.
+    -->
+    <base target="_self" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f5f7fb" />
     <meta
