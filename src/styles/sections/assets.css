@@ -650,3 +650,13 @@ html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-tool-photo-e
 html body .asset-modal.set-report-modal.tool-report-modal {
   height: auto;
 }
+
+/* The name on the card of a Set or instrument: a title, not a banner. */
+html body .asset-workbench-sidebar .asset-workbench-title h1 {
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+html body .asset-workbench-sidebar .asset-workbench-title .eyebrow {
+  font-size: 10px;
+}

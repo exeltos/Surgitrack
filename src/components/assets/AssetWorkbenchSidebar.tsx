@@ -165,7 +165,8 @@ export default function AssetWorkbenchSidebar({
           <div>
             <span className="eyebrow">{kind === 'SET' ? tr('ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h1>{asset.name}</h1>
-            <p>{asset.code}</p>
+            {/* The code is shown under the name only when it says something else. */}
+            {asset.code && asset.code.trim().toLowerCase() !== asset.name.trim().toLowerCase() && <p>{asset.code}</p>}
           </div>
         </div>
         <div className="asset-workbench-title-status">
