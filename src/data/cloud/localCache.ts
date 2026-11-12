@@ -83,7 +83,20 @@ const changesKey = (key: string) => `${key}${CHANGES}`;
  * The whole collection on top of which changes are written, as written: its records (by identity, as the
  * store hands them over) and versions. Only in this page's memory: after a reload the first write is whole.
  */
-type Written = {token: string; records: Map<string, CloudRecord>; versions: Record<string, string>};
+type Written = {
+  token: string;
+  records: Map<string, CloudRecord>;
+  versions: Record<string, string>;
+  /** Records not yet saved when it was written: their version may change later without the record itself. */
+  unsaved: Set<string>;
+};
+
+/**
+ * The versions of a collection's records: all of them, or (from the sync, at a large hospital's size) a way to
+ * list them all and to ask for one, so that a write of the changes alone asks only for the ones it needs.
+ */
+export type CopyVersions =
+  Record<string, string> | {all: () => Record<string, string>; of: (id: string) => string | undefined};
 const written = new Map<string, Written>();
 /**
  * The changes are written alone while they hold at most this many records (a quarter of a small collection);
@@ -178,13 +191,22 @@ export async function readCache(
  */
 export async function writeCollection(
   collection: CloudCollection,
-  entry: Omit<CachedCollection, 'savedAt' | 'version'>,
+  given: Omit<CachedCollection, 'savedAt' | 'version' | 'versions'> & {versions?: CopyVersions},
 ) {
   const current = owner;
   if (!current) return;
   const key = keyFor(current, collection);
   const savedAt = Date.now();
-  const versions = entry.versions || {};
+  const source = given.versions || {};
+  const lazy = typeof source.all === 'function' && typeof source.of === 'function';
+  const versionOf = lazy
+    ? (source as {of: (id: string) => string | undefined}).of
+    : (id: string) => (source as Record<string, string>)[id];
+  const allVersions = () =>
+    lazy ? (source as {all: () => Record<string, string>}).all() : (source as Record<string, string>);
+  const {versions: _versions, ...rest0} = given;
+  void _versions;
+  const entry: Omit<CachedCollection, 'savedAt' | 'version'> = rest0;
   // Decided now, in the order of the calls: each write goes on top of the whole one decided before it.
   const last = written.get(key);
   let changes: CachedChanges | undefined;
@@ -199,9 +221,14 @@ export async function writeCollection(
       changes = {
         ...rest,
         // The versions that changed, and always those of the unsaved records: read without the whole copy
-        // (another tab wrote its own over it), these still need the version their change started from.
+        // (another tab wrote its own over it), these still need the version their change started from. A version
+        // changes only when its record is saved or taken from the server: a record changed since the whole write
+        // (new or taken in: among the upserts) or one not saved then.
         versions: Object.fromEntries(
-          Object.entries(versions).filter(([id, version]) => last.versions[id] !== version || unsaved.has(id)),
+          [...new Set([...upserts.map(item => item.id), ...entry.changed, ...last.unsaved])].flatMap(id => {
+            const version = versionOf(id);
+            return version !== undefined && (last.versions[id] !== version || unsaved.has(id)) ? [[id, version]] : [];
+          }),
         ),
         base: last.token,
         upserts,
@@ -212,7 +239,14 @@ export async function writeCollection(
     }
   }
   const token = changes ? undefined : newToken();
-  if (token) written.set(key, {token, records: new Map(entry.items.map(item => [item.id, item])), versions});
+  const versions = token ? allVersions() : undefined;
+  if (token && versions)
+    written.set(key, {
+      token,
+      records: new Map(entry.items.map(item => [item.id, item])),
+      versions,
+      unsaved: new Set(entry.changed),
+    });
   const db = await openDb();
   if (!db) return;
   await new Promise<void>(resolve => {
@@ -226,7 +260,7 @@ export async function writeCollection(
       const store = tx.objectStore(STORE);
       if (changes) store.put(changes, changesKey(key));
       else {
-        store.put({...entry, savedAt, version: CACHE_VERSION, token}, key);
+        store.put({...entry, versions, savedAt, version: CACHE_VERSION, token}, key);
         store.delete(changesKey(key));
       }
       tx.oncomplete = () => resolve();

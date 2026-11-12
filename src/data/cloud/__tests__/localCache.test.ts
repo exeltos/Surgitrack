@@ -159,6 +159,28 @@ describe("this device's copy of a large collection", () => {
     expect(copy.versions).toEqual({t3: 'v-t3'});
   });
 
+  it('keeps the new version of a record saved after the whole copy, though the record itself did not change', async () => {
+    const items = many(1000);
+    // t4 was not saved yet when the whole copy was written.
+    await writeCollection('tools', {...entry(items, ['t4']), items});
+    const puts = recordsPut();
+    // Saved since: the same record, a new version; asked for one by one, as the sync does.
+    const versions: Record<string, string> = {...entry(items).versions, t4: 'v-t4-saved'};
+    const asked: string[] = [];
+    await writeCollection('tools', {
+      ...entry(items),
+      items,
+      versions: {
+        all: () => versions,
+        of: id => (asked.push(id), versions[id]),
+      },
+    });
+
+    expect(puts()).toEqual([0]);
+    expect(asked).toEqual(['t4']);
+    expect((await readCache(owner, ['tools'])).tools!.versions?.t4).toBe('v-t4-saved');
+  });
+
   it('keeps the unsaved changes written on top when the session ends on its own', async () => {
     let items = many(1000);
     await writeCollection('tools', {...entry(items), items});

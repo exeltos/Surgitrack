@@ -16,7 +16,7 @@ import {takeRestored, writeCollection} from './localCache';
 import {loadRecordsById, loadTable} from './appRecords';
 import {cutoffOf, HISTORY_WINDOW_DAYS, registerOlderLoader, setCutoff} from './historyWindow';
 import type {TableCollection} from './cloudTables';
-import {exportVersions, importVersions, rememberVersions} from './versions';
+import {exportVersions, importVersions, rememberVersions, versionOf} from './versions';
 import {mergeConcurrent, recordLabel} from './mergeConcurrent';
 
 const SYNC_DELAY_MS = 400;
@@ -260,11 +260,42 @@ const CACHE_DELAY_MS = 800;
  */
 const COPY_REFRESH_MS = 10 * 60000;
 
+/**
+ * The records the server has confirmed, counting every change to them, so that a comparison already made
+ * with the same records is not made again (at a large hospital's size each one goes through every record).
+ */
+class KnownRecords extends Map<string, CloudRecord> {
+  changes = 0;
+  set(id: string, record: CloudRecord) {
+    this.changes += 1;
+    return super.set(id, record);
+  }
+  delete(id: string) {
+    this.changes += 1;
+    return super.delete(id);
+  }
+}
+const lastDiff = new WeakMap<
+  Map<string, CloudRecord>,
+  {items: readonly CloudRecord[]; changes: number; result: {changed: CloudRecord[]; removed: string[]}}
+>();
 const diff = (known: Map<string, CloudRecord>, items: readonly CloudRecord[]) => {
+  const changes = known instanceof KnownRecords ? known.changes : -1;
+  const last = lastDiff.get(known);
+  if (last && changes >= 0 && last.items === items && last.changes === changes) return last.result;
   const changed = items.filter(item => known.get(item.id) !== item);
   const currentIds = new Set(items.map(item => item.id));
   const removed = [...known.keys()].filter(id => !currentIds.has(id));
-  return {changed, removed};
+  const result = {changed, removed};
+  if (changes >= 0) lastDiff.set(known, {items, changes, result});
+  return result;
+};
+// Each list of records by id, made once per list (the store replaces the list when it changes).
+const indexes = new WeakMap<readonly CloudRecord[], Map<string, CloudRecord>>();
+const byId = (items: readonly CloudRecord[]) => {
+  let index = indexes.get(items);
+  if (!index) indexes.set(items, (index = new Map(items.map(item => [item.id, item]))));
+  return index;
 };
 
 /** Records taken from another device count as saved when they show up in the store. */
@@ -337,7 +368,8 @@ export function useAppRecordSync(
       removed,
       bases: changed.map(item => known.get(item.id)).filter((base): base is CloudRecord => !!base),
       cutoff: cutoffOf(collection),
-      versions: exportVersions(collection),
+      // Asked for one by one when only the changes are written (a large hospital has 100,000 of them).
+      versions: {all: () => exportVersions(collection), of: id => versionOf(collection, id)},
       since: since.current,
       deletedSince: deletedSince.current,
     });
@@ -383,7 +415,8 @@ export function useAppRecordSync(
     if (!organizationId) return;
     // The first snapshot is what was just loaded from the server, or this device's copy of it.
     if (!confirmed.current) {
-      const known = new Map(items.map(item => [item.id, item]));
+      const known = new KnownRecords();
+      for (const item of items) known.set(item.id, item);
       const copy = takeRestored(organizationId, collection);
       if (copy) {
         since.current = copy.since;
@@ -417,7 +450,7 @@ export function useAppRecordSync(
     // Records another device saved since this device saw them: merge field by field (S4).
     const resolveStale = async (ids: string[]) => {
       const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
-      const current = new Map(latest.current.map(item => [item.id, item]));
+      const current = byId(latest.current);
       const merged: CloudRecord[] = [];
       const gone: string[] = [];
       const givenUp: Array<{label: string; reverted: boolean; reason: RefusalReason}> = [];
@@ -468,7 +501,7 @@ export function useAppRecordSync(
     const dropRefused = async (refusals: RefusedRecord[]) => {
       const ids = refusals.map(refusal => refusal.id);
       const saved = new Map((await loadRecordsById(organizationId, collection, ids)).map(r => [r.id, r]));
-      const current = new Map(latest.current.map(item => [item.id, item]));
+      const current = byId(latest.current);
       const back: CloudRecord[] = [];
       const gone: string[] = [];
       const records = refusals.map(({id, code}) => {
@@ -491,7 +524,7 @@ export function useAppRecordSync(
     // free one, counting this device's records and the server's, and is saved again.
     const renumber = async (ids: string[]) => {
       type Coded = CloudRecord & {barcode?: unknown; legacyBarcodes?: string[]};
-      const current = new Map(latest.current.map(item => [item.id, item as Coded]));
+      const current = byId(latest.current) as Map<string, Coded>;
       const clashing: Array<Coded & {barcode: string}> = [];
       const others: RefusedRecord[] = [];
       for (const id of ids) {
@@ -672,7 +705,7 @@ export function useAppRecordSync(
           removed = latest.current.filter(item => known.get(item.id) === item && gone.has(item.id)).map(i => i.id);
         }
         markSynced();
-        const current = new Map(latest.current.map(item => [item.id, item]));
+        const current = byId(latest.current);
         // A record changed here and not saved yet stays as it is here, with the version it started from.
         const editedHere = (id: string) => {
           const mine = current.get(id);
