@@ -23,6 +23,7 @@ export default function ReportPhotoField({
       </span>
       <input
         className="visually-hidden-file"
+        aria-label={tr('Προσθήκη φωτογραφιών')}
         type="file"
         accept="image/*"
         capture="environment"

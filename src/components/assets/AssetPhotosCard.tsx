@@ -64,6 +64,7 @@ export default function AssetPhotosCard({
       <input
         ref={cameraRef}
         className="visually-hidden-file"
+        aria-label={tr('Λήψη φωτογραφίας')}
         type="file"
         accept="image/*"
         capture="environment"
@@ -75,6 +76,7 @@ export default function AssetPhotosCard({
       <input
         ref={uploadRef}
         className="visually-hidden-file"
+        aria-label={tr('Upload φωτογραφιών')}
         type="file"
         accept="image/*"
         multiple
