@@ -1,4 +1,4 @@
-import {fireEvent, screen} from '@testing-library/react';
+import {fireEvent, screen, within} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import TraceabilityPage from '../TraceabilityPage';
@@ -12,7 +12,9 @@ describe('Traceability › All movements', () => {
       'title',
       'Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.',
     );
-    expect(screen.getByRole('button', {name: /Λήψη/})).toBeInTheDocument();
+    // Looked for in the search line only: every row of the list is a button too, and a search over all of them is slow.
+    const searchLine = document.querySelector('.movement-filter-bar') as HTMLElement;
+    expect(within(searchLine).getByRole('button', {name: /Λήψη/})).toBeInTheDocument();
     expect(screen.getByRole('heading', {level: 1, name: 'Ιχνηλάτηση'})).toBeInTheDocument();
     expect(screen.queryByRole('heading', {level: 1, name: 'Ιστορικό'})).not.toBeInTheDocument();
   });
