@@ -131,12 +131,14 @@ export default function HospitalOverviewPage() {
       .filter(load => load.kind === 'STERILIZATION' && load.status === 'OPEN')
       .flatMap(load => load.items.map(item => item.assetId)),
   );
-  const pipeline = sterilizationWorkflow.stages
-    .filter(stage => stage.id !== 'DELIVERY')
-    .flatMap((stage): Array<{key: string; label: string; queue?: string; count: number}> => {
+  // Every stage the hospital uses, up to the delivery (ready for pickup), in the order of the flow.
+  const pipeline = sterilizationWorkflow.stages.flatMap(
+    (stage): Array<{key: string; label: string; queue?: string; count: number}> => {
       const state = workflowStageState[stage.id] as AssetState;
       const here = tracked.filter(a => a.state === state);
       if (!stage.enabled && !here.length) return [];
+      if (stage.id === 'DELIVERY')
+        return [{key: stage.id, label: L('Παράδοση', 'Delivery'), queue: QUEUE_OF[state], count: here.length}];
       if (stage.id !== 'STERILIZATION')
         return [{key: stage.id, label: L(stage.labelEl, stage.labelEn), queue: QUEUE_OF[state], count: here.length}];
       const running = here.filter(a => inSterilizer.has(a.id)).length;
@@ -149,7 +151,8 @@ export default function HospitalOverviewPage() {
         },
         {key: 'IN_STERILIZER', label: L('Στον κλίβανο', 'In the sterilizer'), queue: 'IN_STERILIZER', count: running},
       ];
-    });
+    },
+  );
   const pipelineMax = Math.max(1, ...pipeline.map(p => p.count));
 
   const shortSets = sets.filter(x => x.actual < x.expected).length;
@@ -371,7 +374,7 @@ export default function HospitalOverviewPage() {
                 {/* The short form fits the card; the full name is in the tooltip. */}
                 <span className="dash-bar-name">{p.label}</span>
                 <span className="dash-bar-track">
-                  <i style={{width: `${(p.count / pipelineMax) * 100}%`}} />
+                  {p.count > 0 && <i style={{width: `${(p.count / pipelineMax) * 100}%`}} />}
                 </span>
                 <strong>{p.count}</strong>
               </Link>
