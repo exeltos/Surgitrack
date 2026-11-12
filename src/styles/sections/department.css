@@ -360,8 +360,13 @@ html body .department-lives-hint {
 html body .department-asset-row .department-asset-open {
   min-height: 0;
   padding: 7px 14px;
-  grid-template-columns: 36px minmax(300px, 1.5fr) minmax(280px, 1fr) minmax(120px, 0.4fr) 24px;
-  gap: 14px;
+}
+/* The wide columns only where they fit: narrower windows keep their own layouts. */
+@media (min-width: 1181px) {
+  html body .department-asset-row .department-asset-open {
+    grid-template-columns: 36px minmax(300px, 1.5fr) minmax(280px, 1fr) minmax(120px, 0.4fr) 24px;
+    gap: 14px;
+  }
 }
 html body .department-asset-row .department-asset-icon {
   width: 32px;
