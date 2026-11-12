@@ -19,9 +19,7 @@ export function useStudioState() {
   // here (libraries, workflow, permissions, settings) — no other hospitals, hospital record or Demo.
   const platformAdmin = actingAsPlatformOwner();
   // A real hospital's departments are managed on its own administration page.
-  const hospitalLibraryMeta = libraryMeta.filter(
-    m => platformAdmin || libs.dataMode !== 'PRODUCTION' || m.key !== 'departments',
-  );
+  const hospitalLibraryMeta = libraryMeta.filter(m => libs.dataMode !== 'PRODUCTION' || m.key !== 'departments');
   // «?tab=users» opens that section (the platform owner's menu links straight to each one).
   const {search} = useLocation();
   const urlTab = new URLSearchParams(search).get('tab')?.toUpperCase() as Tab | undefined;

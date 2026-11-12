@@ -1,6 +1,5 @@
 import {useEffect} from 'react';
 import {modulesOf} from '../../../core/hospitalModules';
-import type {LibraryItem} from '../../../core/libraries';
 import type {UserRole} from '../../../store/types';
 import {supabase} from '../../../lib/supabase';
 import {loadProfileContacts} from '../../../data/cloud/profileContacts';
@@ -8,7 +7,6 @@ import type {useStudioState} from './useStudioState';
 
 export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
   const {
-    L,
     cloudOrganizations,
     cloudUsers,
     libs,
@@ -18,7 +16,6 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
     setCloudError,
     setCloudOrganizations,
     setCloudUsers,
-    setNewItem,
   } = p;
 
   const loadCloudOrganizations = async () => {
@@ -108,31 +105,12 @@ export function useStudioCloud(p: ReturnType<typeof useStudioState>) {
     if (platformAdmin) void loadCloudDepartments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libs.dataMode]);
-  const saveCloudDepartment = async (item: Omit<LibraryItem, 'id'>) => {
-    const org = selectedOrganization || displayedOrganizations[0];
-    if (!org) {
-      setCloudError(L('Δημιουργήστε πρώτα νοσοκομείο.', 'Create a hospital first.'));
-      return;
-    }
-    const {error} = await supabase.rpc('platform_create_department', {
-      p_organization_id: org.id,
-      p_name: item.el,
-      p_code: item.code || item.el.slice(0, 8),
-    });
-    if (error) {
-      setCloudError(error.message);
-      return;
-    }
-    setNewItem(false);
-    await loadCloudDepartments();
-  };
   return {
     displayedOrganizations,
     displayedUsers,
     loadCloudDepartments,
     loadCloudOrganizations,
     loadCloudUsers,
-    saveCloudDepartment,
     selectedOrganization,
   };
 }

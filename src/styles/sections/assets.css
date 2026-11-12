@@ -660,3 +660,25 @@ html body .asset-workbench-sidebar .asset-workbench-title h1 {
 html body .asset-workbench-sidebar .asset-workbench-title .eyebrow {
   font-size: 10px;
 }
+
+/* The photos of a Set or instrument: a dialog as tall as what it holds (no empty half under «Κλείσιμο»), the
+   buttons on one line with a short explanation, the dialog's title naming it once. */
+html body .asset-photo-manager-modal {
+  width: min(880px, calc(100vw - 44px));
+  height: auto;
+  max-height: 88dvh;
+}
+html body .asset-photo-manager-modal .modal-body {
+  padding-top: 12px;
+  padding-bottom: 16px;
+}
+html body .photo-section-head.bare {
+  align-items: center;
+  padding: 0 0 12px;
+  border-bottom: 0;
+}
+html body .photo-section-head.bare > p {
+  margin: 0;
+  color: var(--st-muted);
+  font-size: 13px;
+}

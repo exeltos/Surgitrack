@@ -10,13 +10,10 @@ import type {useStudioOrganizations} from './useStudioOrganizations';
 export function useStudioLibraries(
   p: ReturnType<typeof useStudioState> & ReturnType<typeof useStudioCloud> & ReturnType<typeof useStudioOrganizations>,
 ) {
-  const {cloudDepartments, displayedUsers, libraryKey, libs, query, setQuery, setTab} = p;
+  const {displayedUsers, libraryKey, libs, query, setQuery, setTab} = p;
 
   const currentMeta = libraryMeta.find(x => x.key === libraryKey)!;
-  const currentItems =
-    libs.dataMode === 'PRODUCTION' && libraryKey === 'departments'
-      ? cloudDepartments.map(d => ({id: d.id, el: d.name, en: d.name, code: d.code}))
-      : libs[libraryKey];
+  const currentItems = libs[libraryKey];
   const filteredItems = currentItems.filter(x =>
     `${x.el} ${x.en} ${x.code || ''}`.toLowerCase().includes(query.toLowerCase()),
   );

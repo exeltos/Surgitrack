@@ -506,10 +506,11 @@ export default function SetDetailPage() {
                 onAdd={async files => addAssetPhotos('SET', set.id, await filesToAssetPhotos(files))}
                 onRemove={photoId => removeAssetPhoto('SET', set.id, photoId)}
                 readOnly={!can('asset.photos.manage')}
+                bare
                 description={
                   !can('asset.photos.manage')
                     ? tr('Φωτογραφική τεκμηρίωση του Σετ. Προβολή μόνο για τον ενεργό ρόλο.')
-                    : tr('Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.')
+                    : tr('Μία ή περισσότερες φωτογραφίες, από την κάμερα ή από αρχεία.')
                 }
               />
             </div>

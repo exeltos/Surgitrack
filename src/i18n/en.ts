@@ -155,7 +155,7 @@ export const en: Record<string, string> = {
   'Ενημερώθηκαν οι συνθέσεις {0} Σετ.': 'Updated the compositions of {0} Sets.',
   'Απόθεμα Σετ': 'Stock set',
   'Απόθεμα εργαλείων': 'Instrument stock',
-  'Upload φωτογραφιών': 'Upload photos',
+  'Ανέβασμα φωτογραφιών': 'Upload photos',
   'stage|Καθαρισμός': 'Cleaning',
   '{0} · {1}': '{0} · {1}',
   '{0} · {1} προστέθηκε στην παράδοση προς {2}.': '{0} · {1} added to the delivery to {2}.',
@@ -1071,8 +1071,7 @@ export const en: Record<string, string> = {
   'Ό,τι διαγράφεται μένει εδώ {0} ημέρες και μπορεί να επανέλθει.':
     'Deleted items stay here for {0} days and can be restored.',
   'Πύλη ποιότητας': 'Quality gate',
-  'Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.':
-    'Multiple photos. Capture turns on the device camera.',
+  'Μία ή περισσότερες φωτογραφίες, από την κάμερα ή από αρχεία.': 'One or more photos, from the camera or from files.',
   Ποσότητα: 'Quantity',
   'Πού θα μεταφερθεί το υπάρχον εργαλείο;': 'Where will the current instrument go?',
   Προέλευση: 'Origin',

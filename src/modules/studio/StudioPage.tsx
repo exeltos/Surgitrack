@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {ShieldCheck} from 'lucide-react';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
-import {supabase} from '../../lib/supabase';
 import OwnerDashboard from './OwnerDashboard';
 import RolesGuide from './RolesGuide';
 import AssetImportWizard from './AssetImportWizard';
@@ -92,14 +91,11 @@ export default function StudioPage() {
     lang,
     libraryKey,
     libs,
-    loadCloudDepartments,
     newItem,
     organizationEditor,
     platformAdmin,
-    saveCloudDepartment,
     saveOrganization,
     selectTab,
-    setCloudError,
     setConfirm,
     setEditItem,
     setNewItem,
@@ -225,28 +221,10 @@ export default function StudioPage() {
             setNewItem(false);
           }}
           onSave={data => {
-            if (libs.dataMode === 'PRODUCTION' && libraryKey === 'departments') {
-              if (editItem) {
-                void supabase
-                  .rpc('platform_update_department', {
-                    p_id: editItem.id,
-                    p_name: data.el,
-                    p_code: data.code || '',
-                    p_active: true,
-                  })
-                  .then(({error}) => {
-                    if (error) setCloudError(error.message);
-                    else void loadCloudDepartments();
-                  });
-                setEditItem(null);
-                setNewItem(false);
-              } else void saveCloudDepartment(data);
-            } else {
-              if (editItem) libs.updateItem(libraryKey, editItem.id, data);
-              else libs.addItem(libraryKey, data);
-              setEditItem(null);
-              setNewItem(false);
-            }
+            if (editItem) libs.updateItem(libraryKey, editItem.id, data);
+            else libs.addItem(libraryKey, data);
+            setEditItem(null);
+            setNewItem(false);
           }}
         />
       )}
