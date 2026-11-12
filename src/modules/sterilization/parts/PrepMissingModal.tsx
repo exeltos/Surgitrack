@@ -1,4 +1,4 @@
-import {CheckCircle2, TriangleAlert, ArrowRight, X} from 'lucide-react';
+import {CheckCircle2, TriangleAlert, ArrowRight} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import {SET_SHORTAGE_CODE} from '../hooks/usePreparationChecks';
@@ -27,9 +27,6 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
       {prepManageMissing && prepDraft?.kind === 'SET' && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepManage}>
           <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closePrepManage}>
-              <X size={17} />
-            </button>
             <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΕΛΛΕΙΨΗΣ')}</span>
             <h3>{prepManageMissing.name}</h3>
             <div className="prep-manage-summary">
@@ -93,6 +90,11 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
                 {tr('Αλλαγές στη σύνθεση του Σετ (αντικατάσταση, Service, Απόθεμα) κάνει ο Προϊστάμενος Αποστείρωσης.')}
               </p>
             )}
+            <div className="modal-actions">
+              <button type="button" onClick={closePrepManage}>
+                {tr('Ακύρωση')}
+              </button>
+            </div>
           </div>
         </div>
       )}

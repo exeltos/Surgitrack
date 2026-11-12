@@ -21,18 +21,6 @@
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .receipt-section-title {
     padding: 9px 12px;
   }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary {
-    padding: 9px;
-    gap: 7px;
-  }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary > div {
-    min-height: 48px !important;
-    padding: 7px 8px 7px 35px !important;
-  }
-  .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .compact-summary svg {
-    left: 10px;
-    top: 10px;
-  }
   .receipt-card-modal:not(.completed):not(.prep-workspace-modal) .identity-section {
     padding: 9px 11px;
   }
@@ -389,15 +377,6 @@ html body .sterilization-workspace .sterile-queues.modern button {
   padding-top: 7px;
   padding-bottom: 7px;
 }
-html body .ster-shift > div {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-html body .ster-shift small {
-  display: none;
-}
 html body .sterile-queues.modern button > span {
   white-space: nowrap;
   overflow: hidden;
@@ -528,6 +507,7 @@ html body .load-modal .load-assets-list > label {
 }
 html body .load-modal .cycle-note {
   flex: 0 0 auto;
+  padding: 0;
 }
 html body .load-release-modal {
   /* As large as the window allows: the checks, the sterilizer's tests, the note and the load's content together. */
@@ -558,38 +538,39 @@ html body .load-release-modal {
     grid-column: 3;
   }
 }
+/* On a phone a row is three lines: the item across the whole width, then department · specialty, then what there is
+   to see (a Set's composition, an issue, a shortage) with the buttons on the right (the action, and the return for
+   who may use it). */
 @media (max-width: 760px) {
   .sterilization-workspace .ster-work-panel .ster-list-head {
     display: none;
   }
   .sterilization-workspace .ster-work-panel .ster-work-row {
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) !important;
-    gap: 8px 10px;
-    padding: 13px 14px;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center;
+    gap: 4px 10px;
+    padding: 10px 12px;
   }
   .sterilization-workspace .ster-work-panel .ster-asset-cell {
-    grid-column: 1/-1;
+    grid-column: 1 / -1;
+    grid-row: 1;
   }
-  .sterilization-workspace .ster-work-panel .ster-cell-department,
-  .sterilization-workspace .ster-work-panel .ster-meta,
+  .sterilization-workspace .ster-work-panel .ster-cell-department {
+    grid-column: 1/-1 !important;
+    grid-row: 2;
+  }
+  html body .sterilization-workspace .ster-work-panel .ster-work-row > .ster-meta {
+    grid-column: 1;
+    grid-row: 3;
+  }
   .sterilization-workspace .ster-work-panel .ster-row-action {
-    grid-column: 2/-1 !important;
+    grid-column: 2 !important;
+    grid-row: 3;
+    flex-wrap: nowrap;
   }
   .sterilization-workspace .ster-work-panel .ster-status {
     display: none;
-  }
-  .sterilization-workspace .ster-work-panel .ster-row-action {
-    flex-wrap: wrap;
-  }
-}
-@media (max-width: 1700px) {
-  /* Seven cards in a row leave no room for the icon: titles keep their whole word. */
-  .sterile-queues.modern button {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  .sterile-queues.modern button > small {
-    grid-column: 1 / -1;
   }
 }
 @media (max-width: 1699px) {
@@ -1036,7 +1017,8 @@ html body .delivery-batch-modal .handover-signature-row input {
   width: 100%;
 }
 html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
-html body .receipt-card-modal.workflow-modal.workflow-modal-delivery {
+html body .receipt-card-modal.workflow-modal.workflow-modal-delivery,
+html body .receipt-card-modal.workflow-modal.load-modal.washer-load {
   height: auto !important;
   min-height: 0;
   max-height: calc(100dvh - 32px) !important;
@@ -1454,9 +1436,6 @@ html body .ster-row-load b {
     scroll-snap-align: start;
   }
   /* The user's name is already in the menu. */
-  html body .sterilization-workspace .ster-shift {
-    display: none;
-  }
   /* In the sterilizer: the cycle under the sterilizer, the badge under the title. */
   html body .sterilization-workspace .ster-work-panel .ster-meta:has(> .ster-meta-none) {
     display: none;
@@ -2522,4 +2501,165 @@ html body .content:has(> .equipment-page) {
   color: var(--st-muted);
   font-size: 12.5px;
   line-height: 1.5;
+}
+
+/* The stages as one thin step bar: icon, name and count on one line, a chevron between stages for the flow;
+   the open stage stands out, an empty one fades. On a phone it scrolls sideways. */
+html body .sterilization-workspace .sterile-queues.ster-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+  background: var(--c-white);
+  scrollbar-width: none;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: max-content;
+  min-height: 38px;
+  padding: 6px 10px;
+  overflow: visible;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--c-cyan-30);
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: none;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button:hover {
+  background: var(--c-gray-100-2);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button > svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button > span {
+  overflow: visible;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button > strong {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-cyan-20);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps > .ster-step-arrow {
+  align-self: center;
+  color: var(--c-gray-70);
+  font-size: 16px;
+  pointer-events: none;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.empty {
+  color: var(--st-muted);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.empty > strong {
+  background: transparent;
+  color: var(--st-muted);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.active {
+  background: var(--c-cyan-20);
+  color: var(--c-white);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.active > strong {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--c-white);
+}
+@media (max-width: 760px) {
+  html body .sterilization-workspace .sterile-queues.ster-steps button {
+    flex: 0 0 auto;
+  }
+}
+/* The row above the list holds only the stage's actions: with none, it takes no room. */
+html body .sterilization-workspace .ster-panel-head:not(:has(button)) {
+  display: none;
+}
+/* On a phone: department and specialty on one line. */
+@media (max-width: 760px) {
+  html body .sterilization-workspace .ster-work-panel .ster-cell-department {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 6px;
+  }
+  html body .sterilization-workspace .ster-work-panel .ster-cell-department > span::before {
+    content: '· ';
+  }
+  html body .sterilization-workspace .ster-work-panel .ster-meta:not(:has(> :not(.ster-meta-none))) {
+    display: none;
+  }
+}
+/* The stage's actions sit on the right, above the actions column of the list. */
+html body .sterilization-workspace .ster-work-panel > .ster-panel-head {
+  justify-content: flex-end;
+}
+html body .sterilization-workspace .ster-work-panel > .ster-panel-head > .ster-panel-head-actions {
+  margin-left: auto;
+}
+/* Receipt: «Αναφορά» is an icon button. */
+html body .receipt-card-modal .tool-report-btn.icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 32px;
+  padding: 0;
+}
+/* Batch receipt and delivery: the scanner on top, the two cards fill the rest of the dialog down to its buttons
+   (the list scrolls inside its card). */
+html body .delivery-batch-modal > .delivery-batch-body {
+  flex: 1 1 auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  /* Room between the header's line and the scanner box. */
+  padding-top: 14px;
+}
+/* The note of a batch has room to write (it grows with the card). */
+html body .delivery-batch-modal .delivery-batch-confirm .cycle-note textarea {
+  min-height: 150px;
+}
+
+/* Washer load: one row of cycle fields, the result and the note side by side under the content; the dialog is only
+   as tall as it needs, the content list scrolls when long. */
+html body .load-modal.washer-load {
+  height: auto;
+  width: min(1100px, calc(100vw - 32px));
+}
+html body .load-modal.washer-load .cycle-clean-fields {
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.7fr) minmax(0, 0.7fr);
+}
+html body .load-modal.washer-load .load-assets {
+  flex: 0 1 auto;
+}
+html body .load-modal.washer-load .load-assets-list {
+  max-height: 420px;
+}
+html body .load-modal .load-finish-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+html body .load-modal .load-finish-row > .load-indicator-pick {
+  flex: 0 0 auto;
+  align-content: start;
+}
+html body .load-modal .load-finish-row > .cycle-note {
+  flex: 1 1 auto;
+}
+html body .load-modal .load-finish-row textarea {
+  min-height: 64px;
 }

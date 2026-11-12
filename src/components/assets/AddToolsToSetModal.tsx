@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {Box, Check, Layers3, PackageOpen, Stethoscope, X} from 'lucide-react';
+import {Box, Check, Layers3, PackageOpen, Stethoscope} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import AppButton from '../ui/AppButton';
@@ -73,9 +73,6 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
                 {target?.code || '—'} · Barcode: <span className="mono">{target?.barcode || '—'}</span>
               </p>
             </div>
-            <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-              <X size={18} />
-            </button>
           </header>
           <div className="add-tools-summary">
             <div>

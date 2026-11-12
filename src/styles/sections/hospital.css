@@ -17,9 +17,6 @@
 .hospital-users-empty small {
   font-size: 12px;
 }
-.overview-alert small {
-  color: var(--c-amber-40-3);
-}
 
 /* Hospital people: one users list (rows open a drawer), invitations, signups to approve, departments. */
 .hospital-people {
@@ -457,9 +454,6 @@
 .dash-where {
   grid-column: span 5;
 }
-.dash-depts {
-  grid-column: span 7;
-}
 .dash-activity {
   grid-column: span 5;
 }
@@ -851,7 +845,6 @@ html body .dash-more {
   }
   .dash-flow,
   .dash-where,
-  .dash-depts,
   .dash-activity,
   .dash-attention,
   .dash-latest {
@@ -870,14 +863,12 @@ html body .dash-more {
   html body .hospital-overview.dash > .dash-grid {
     flex: 1 1 auto;
     min-height: 300px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
   }
   html body .hospital-overview.dash {
     overflow: hidden;
   }
   html body .dash-flow > .dash-bars,
-  html body .dash-depts > .dash-depts-list,
   html body .dash-where > .dash-legend,
   html body .dash-attention > .dash-list,
   html body .dash-latest > .dash-list {
@@ -988,10 +979,6 @@ html body .dash-more {
   html body .dash-kpi small {
     display: none;
   }
-  html body .hospital-overview .overview-alert {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
   html body .dash-activity-stats {
     margin: 2px 0 4px;
   }
@@ -1003,13 +990,6 @@ html body .dash-more {
   }
 }
 @media (min-width: 1100px) and (max-height: 819px) {
-  html body .hospital-overview.dash {
-    overflow-y: auto;
-  }
-  html body .hospital-overview.dash > .dash-grid {
-    flex: 0 0 auto;
-    grid-template-rows: none;
-  }
   html body .dash-grid > .dash-card {
     overflow: visible;
   }
@@ -1036,10 +1016,6 @@ html body .dash-more {
   }
   html body .hospital-overview .page-head p {
     font-size: 12.5px;
-  }
-  html body .hospital-overview .overview-alert {
-    padding-top: 7px;
-    padding-bottom: 7px;
   }
   html body .hospital-overview .dash-kpis {
     gap: 10px;
@@ -1202,12 +1178,6 @@ html body .department-home .dash-activity .dash-columns {
   background: var(--c-white);
   box-shadow: 0 24px 60px rgb(0 0 0 / 25%);
 }
-.promo-popup-x {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--c-white);
-}
 .promo-popup-image {
   display: block;
   width: 100%;
@@ -1277,10 +1247,6 @@ html body .department-home .dash-activity .dash-columns {
 .promo-popup.layout-right .promo-popup-image {
   order: 2;
 }
-.promo-popup.layout-right .promo-popup-x {
-  right: auto;
-  left: 10px;
-}
 .promo-popup-actions {
   flex-wrap: wrap;
 }
@@ -1311,4 +1277,73 @@ html body .department-home .dash-activity .dash-columns {
   background: var(--c-white);
   font-weight: 700;
   cursor: pointer;
+}
+
+/* Overview (admin and supervisor): four cards in two rows. What needs attention and the Sterilization flow, then
+   the equipment (where it is, the whole and by department, one legend for both) and the activity (14 days, latest
+   movements). */
+.hospital-overview .dash-attention,
+.hospital-overview .dash-equipment {
+  grid-column: span 7;
+}
+.hospital-overview .dash-flow,
+.hospital-overview .dash-activity {
+  grid-column: span 5;
+}
+.dash-legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.dash-legend-row li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dash-legend-row strong {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}
+@media (max-width: 1180px) {
+  .hospital-overview .dash-grid > .dash-card {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview.dash > .dash-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+  html body .hospital-overview .dash-grid > .dash-card {
+    grid-column: auto;
+  }
+  /* The page fills the window and never scrolls: what a card cannot show scrolls inside that card. */
+  html body .hospital-overview .dash-grid > .dash-card {
+    overflow: hidden;
+  }
+  html body .hospital-overview .dash-attention > .dash-list,
+  html body .hospital-overview .dash-flow > .dash-bars,
+  html body .hospital-overview .dash-equipment > .dash-depts-list,
+  html body .hospital-overview .dash-activity > .dash-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    align-content: start;
+  }
+  html body .hospital-overview .dash-activity > .dash-columns {
+    flex: 0 1 120px;
+    min-height: 40px;
+  }
+}
+/* Overview on a phone: the department bars get the room (the name wraps less than a bar shrinks). */
+@media (max-width: 640px) {
+  .hospital-overview .dash-dept {
+    grid-template-columns: minmax(0, 1fr) 96px 28px 40px;
+    gap: 8px;
+  }
 }

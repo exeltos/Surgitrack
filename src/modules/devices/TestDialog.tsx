@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {FlaskConical, X} from 'lucide-react';
+import {FlaskConical} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import type {EquipmentTest} from '../../core/libraries';
 import type {Lang} from './deviceUi';
@@ -48,9 +48,6 @@ export default function TestDialog({
                 : ''}
             </p>
           </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="notice-choice" role="radiogroup" aria-label={L('Αποτέλεσμα', 'Result')}>
           {(

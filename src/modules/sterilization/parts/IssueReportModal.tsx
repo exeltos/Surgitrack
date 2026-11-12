@@ -1,5 +1,5 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
-import {TriangleAlert, X, Camera, ImagePlus, Trash2} from 'lucide-react';
+import {TriangleAlert, Camera, ImagePlus, Trash2} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -25,9 +25,6 @@ export default function IssueReportModal({s}: {s: SterilizationPageState}) {
       {issueTarget && (
         <div className="nested-modal-backdrop" onMouseDown={closeIssueReport}>
           <div className="tool-issue-card" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeIssueReport}>
-              <X size={17} />
-            </button>
             <span className="eyebrow">{issueTarget.kind === 'SET' ? tr('ΑΝΑΦΟΡΑ ΣΕΤ') : tr('ΑΝΑΦΟΡΑ ΕΡΓΑΛΕΙΟΥ')}</span>
             <h3>
               {issueTarget.kind === 'SET'

@@ -3,6 +3,8 @@ import {describe, expect, it, vi} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import ScanApp from '../ScanApp';
 import ScanCamera from '../ScanCamera';
+import {SurgiProvider} from '../../../store/SurgiStore';
+import {LibraryStoreProvider} from '../../../core/LibraryStore';
 
 /** Types a barcode the way a person does: «Πληκτρολόγηση», the code, «Προσθήκη». */
 const typeBarcode = (code: string) => {
@@ -113,7 +115,13 @@ describe('ScanApp report', () => {
 describe('ScanCamera', () => {
   it('takes a Bluetooth/USB scanner’s barcode typed anywhere on the screen', () => {
     const onBarcode = vi.fn();
-    render(<ScanCamera onBarcode={onBarcode} />);
+    render(
+      <LibraryStoreProvider>
+        <SurgiProvider>
+          <ScanCamera onBarcode={onBarcode} />
+        </SurgiProvider>
+      </LibraryStoreProvider>,
+    );
     act(() => {
       for (const key of [...'s000327', 'Enter'])
         document.body.dispatchEvent(new KeyboardEvent('keydown', {key, bubbles: true}));
@@ -122,7 +130,13 @@ describe('ScanCamera', () => {
   });
 
   it('opens the camera only when «Σάρωση» is pressed', () => {
-    const {container} = render(<ScanCamera onBarcode={vi.fn()} />);
+    const {container} = render(
+      <LibraryStoreProvider>
+        <SurgiProvider>
+          <ScanCamera onBarcode={vi.fn()} />
+        </SurgiProvider>
+      </LibraryStoreProvider>,
+    );
     expect(container.querySelector('video')).toBeNull();
     fireEvent.click(screen.getByRole('button', {name: 'Σάρωση'}));
     expect(container.querySelector('video')).not.toBeNull();

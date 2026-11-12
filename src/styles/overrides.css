@@ -138,22 +138,6 @@
   display: grid;
   gap: 16px;
 }
-.overview-alert {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: 1px solid var(--c-amber-80);
-  border-radius: 12px;
-  background: var(--c-gray-100);
-  color: var(--c-orange-45-4);
-  text-decoration: none;
-}
-.overview-alert span {
-  flex: 1;
-  display: grid;
-  gap: 2px;
-}
 .hospital-card > header > a {
   color: var(--c-cyan-45);
   font-size: 12px;
@@ -2321,12 +2305,6 @@ html body .dash-kpi strong {
   font-size: 26px;
 }
 /* Sterilization header: logged-in user as a slim pill, one-line stage labels. */
-html body .ster-shift {
-  padding: 6px 12px;
-  border-radius: 12px;
-  gap: 8px;
-  align-items: center;
-}
 /* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
 html body .registry-fixed td:nth-child(4) .row-sub {
   max-width: none;

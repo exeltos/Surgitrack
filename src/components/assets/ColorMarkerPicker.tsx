@@ -69,9 +69,6 @@ export default function ColorMarkerPicker({
             <span className="eyebrow">{tr('ΧΡΩΜΑΤΙΚΟΣ ΜΑΡΤΥΡΑΣ')}</span>
             <h2>{title}</h2>
           </div>
-          <button className="icon-button" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
 
         {kind === 'TOOL' && (

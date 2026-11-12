@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react';
-import {CheckCircle2, X} from 'lucide-react';
+import {CheckCircle2} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {supabase} from '../../../lib/supabase';
 import {cleanStaffName, importErrorText, phonePassword, type StaffRole} from '../staffImportFile';
@@ -97,9 +97,6 @@ export default function StaffAddDialog({s, onClose}: {s: PeopleState; onClose: (
             <span className="eyebrow">{L('ΙΔΙΟΚΤΗΤΗΣ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM OWNER')}</span>
             <h2>{L('Νέος ενεργός χρήστης', 'New active user')}</h2>
           </div>
-          <button onClick={onClose} disabled={running} aria-label={L('Κλείσιμο', 'Close')}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           {made ? (

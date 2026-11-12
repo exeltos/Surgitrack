@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Camera, X} from 'lucide-react';
+import {Camera} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import ReportTypeField from '../../components/assets/ReportTypeField';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -34,9 +34,6 @@ export function ToolReportModal({
               {tool.barcode} · {tool.name}
             </p>
           </div>
-          <button className="icon-button" onClick={onClose}>
-            <X size={18} />
-          </button>
         </header>
         <div className="modal-body">
           <div className="form-grid">

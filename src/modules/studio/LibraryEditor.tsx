@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {X, Languages} from 'lucide-react';
+import {Languages} from 'lucide-react';
 import type {LibraryItem} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import {translateToEnglish} from '../../core/glossary';
@@ -28,9 +28,6 @@ export default function LibraryEditor({
             <span className="eyebrow">{title}</span>
             <h2>{item ? tr('Επεξεργασία εγγραφής') : tr('Νέα εγγραφή')}</h2>
           </div>
-          <button onClick={onClose}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           <label>

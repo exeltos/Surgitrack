@@ -1,6 +1,6 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
-import {CheckCircle2, X, ShieldCheck, UserCheck} from 'lucide-react';
+import {CheckCircle2, ShieldCheck, UserCheck} from 'lucide-react';
 import {getI18nLang, tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import ShelfLifePicker from './ShelfLifePicker';
@@ -28,9 +28,6 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
             className="receipt-card-modal workflow-modal workflow-checkpoint-modal"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeCheckpoint}>
-              <X size={18} />
-            </button>
             <div className="workflow-modal-head">
               <AssetTypeIcon
                 kind={checkpointDraft.draft.kind}

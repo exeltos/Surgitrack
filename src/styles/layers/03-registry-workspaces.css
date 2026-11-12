@@ -1761,10 +1761,6 @@ body {
 .asset-photo-manager-modal > header {
   grid-template-columns: minmax(0, 1fr) auto;
 }
-.asset-photo-manager-modal > header > .modal-close-right {
-  grid-column: 2;
-  margin-left: auto;
-}
 .asset-photo-manager-modal .modal-body {
   min-height: 0;
   overflow: auto;

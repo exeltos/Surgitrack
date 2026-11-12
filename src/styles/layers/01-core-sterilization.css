@@ -1088,28 +1088,6 @@ td {
   letter-spacing: 0.12em;
   color: #60778b;
 }
-.ster-shift {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid var(--c-gray-90-3);
-  background: var(--c-white);
-  border-radius: 11px;
-  padding: 10px 13px;
-  color: var(--c-cyan-40-5);
-}
-.ster-shift div {
-  display: flex;
-  flex-direction: column;
-}
-.ster-shift small {
-  font-size: 11px;
-  color: var(--st-muted);
-}
-.ster-shift strong {
-  font-size: 12px;
-  color: var(--c-blue-25);
-}
 .ster-scan {
   display: grid;
   grid-template-columns: auto auto minmax(360px, 1fr);
@@ -1246,14 +1224,6 @@ td {
   font-size: 12px;
   font-weight: 800;
 }
-.ster-type {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  background: var(--c-gray-95);
-  color: var(--st-muted);
-  border-radius: 4px;
-  padding: 2px 5px;
-}
 .ster-asset strong {
   font-size: 13px;
   white-space: nowrap;
@@ -1351,9 +1321,6 @@ td {
   .ster-work-head {
     flex-direction: column;
   }
-  .ster-shift {
-    width: 100%;
-  }
   .ster-scan {
     grid-template-columns: auto minmax(0, 1fr);
   }
@@ -1379,11 +1346,6 @@ td {
 }
 
 /* v0.8 Sterilization entry + receipt identity */
-.ster-shift span {
-  font-size: 11px;
-  color: var(--st-muted);
-  margin-top: 2px;
-}
 .receipt-card-modal {
   position: relative;
   width: min(780px, 100%);
@@ -1414,44 +1376,12 @@ td {
   color: var(--st-muted);
   font-size: 11px;
 }
-.receipt-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.receipt-summary-grid > div {
-  position: relative;
-  border: 1px solid var(--c-gray-90-3);
-  background: var(--c-gray-100-2);
-  border-radius: 10px;
-  padding: 12px 12px 12px 42px;
-  min-height: 70px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.receipt-summary-grid svg {
-  position: absolute;
-  left: 13px;
-  top: 15px;
-  color: var(--st-muted);
-}
-.receipt-summary-grid span,
 .receipt-facts span,
 .receipt-note-read > span {
   font-size: 11px;
   color: var(--st-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-.receipt-summary-grid strong {
-  font-size: 12px;
-  color: var(--c-blue-25);
-}
-.receipt-summary-grid small {
-  font-size: 11px;
-  color: var(--st-muted);
 }
 .identity-section {
   border: 1px solid var(--c-gray-90-3);
@@ -1583,7 +1513,6 @@ td {
   width: min(700px, 100%);
 }
 @media (max-width: 700px) {
-  .receipt-summary-grid,
   .receipt-facts {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1783,7 +1712,6 @@ td {
   overflow-y: auto !important;
   scrollbar-gutter: stable;
 }
-.receipt-card-modal > .receipt-summary-grid,
 .receipt-card-modal > .identity-section,
 .receipt-card-modal > .receipt-set-tools,
 .receipt-card-modal > .receipt-check-section,
@@ -1793,7 +1721,6 @@ td {
   margin-left: 28px;
   margin-right: 28px;
 }
-.receipt-card-modal > .receipt-summary-grid,
 .receipt-card-modal > .receipt-complete-banner {
   margin-top: 18px;
 }
@@ -1831,7 +1758,6 @@ td {
   .prep-modal > .receipt-card-head {
     padding: 18px 16px 14px;
   }
-  .receipt-card-modal > .receipt-summary-grid,
   .receipt-card-modal > .identity-section,
   .receipt-card-modal > .receipt-set-tools,
   .receipt-card-modal > .receipt-check-section,
@@ -1893,11 +1819,6 @@ td {
   color: var(--st-muted);
   font-weight: 500;
 }
-.receipt-card-body .receipt-summary-grid {
-  margin: 0;
-  padding: 14px;
-  gap: 10px;
-}
 .receipt-card-body .identity-section {
   margin: 0;
   border: 0;
@@ -1933,7 +1854,6 @@ td {
   box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.05);
 }
 /* v0.11 margin rules should not apply inside the new scrollable body */
-.receipt-card-modal > .receipt-summary-grid,
 .receipt-card-modal > .identity-section,
 .receipt-card-modal > .receipt-set-tools,
 .receipt-card-modal > .receipt-check-section {
@@ -1977,14 +1897,6 @@ td {
   margin: 0;
   display: flex;
   flex-direction: column;
-}
-.compact-summary {
-  grid-template-columns: minmax(0, 1fr);
-}
-.compact-summary > div {
-  min-height: 60px;
-  padding-top: 10px;
-  padding-bottom: 10px;
 }
 .compact-warning {
   margin-top: 0;
@@ -2047,19 +1959,6 @@ td {
   padding-bottom: 9px;
   margin-bottom: 0;
 }
-.receipt-left-panel .compact-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.receipt-left-panel .compact-summary > div {
-  min-height: 54px;
-  padding: 9px 10px 9px 38px;
-}
-.receipt-left-panel .compact-summary svg {
-  left: 11px;
-  top: 12px;
-}
 .receipt-left-panel .identity-section {
   padding: 11px 12px;
 }
@@ -2090,9 +1989,6 @@ td {
   .receipt-left-panel {
     gap: 7px;
   }
-  .receipt-left-panel .compact-summary > div {
-    min-height: 48px;
-  }
 }
 @media (max-width: 1100px) {
   .receipt-card-body.receipt-two-column {
@@ -2101,16 +1997,8 @@ td {
   .receipt-left-panel {
     overflow: visible !important;
   }
-  .receipt-left-panel .compact-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .receipt-right-panel {
     min-height: 420px;
-  }
-}
-@media (max-width: 700px) {
-  .receipt-left-panel .compact-summary {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 
@@ -5269,20 +5157,6 @@ td {
   .receipt-card-modal:not(.prep-workspace-modal) .receipt-section-title span {
     font-size: 11px;
   }
-  .receipt-card-modal:not(.prep-workspace-modal) .receipt-summary-grid.compact-summary {
-    gap: 6px;
-    padding: 8px 10px;
-  }
-  .receipt-card-modal:not(.prep-workspace-modal) .receipt-summary-grid.compact-summary > div {
-    min-height: 46px;
-    padding: 7px 7px 7px 34px;
-  }
-  .receipt-card-modal:not(.prep-workspace-modal) .receipt-summary-grid.compact-summary svg {
-    left: 9px;
-    top: 10px;
-    width: 17px;
-    height: 17px;
-  }
   .receipt-card-modal:not(.prep-workspace-modal) .identity-section {
     padding: 8px 10px;
   }
@@ -5312,13 +5186,14 @@ td {
   }
 }
 
-/* Set and single-tool receipt lists share one predictable six-column table. */
+/* Set and single-tool receipt lists share one predictable six-column table. The state column speaks only of a
+   problem and «Αναφορά» is an icon button: the name gets the room. */
 .receipt-tool-columns,
 .receipt-verification-row {
   display: grid;
   grid-template-columns:
-    minmax(92px, 0.72fr) minmax(90px, 0.7fr) minmax(210px, 1.8fr) minmax(135px, 1fr) minmax(155px, 1.15fr)
-    minmax(96px, 0.72fr) !important;
+    minmax(92px, 0.7fr) minmax(90px, 0.7fr) minmax(240px, 2.2fr) minmax(110px, 0.85fr) minmax(80px, 0.6fr)
+    36px !important;
   gap: 12px;
   align-items: center;
 }
@@ -5482,11 +5357,6 @@ td {
   line-height: 1.2;
   justify-content: center;
 }
-.sterilization-workspace .ster-object-state {
-  font-weight: 700;
-  color: var(--c-cyan-50);
-  line-height: 1.3;
-}
 .sterilization-workspace .ster-tablet-specialty {
   display: none;
 }
@@ -5636,9 +5506,6 @@ td {
 .ster-asset .ster-code {
   font-size: 11.5px;
 }
-.ster-asset .ster-type {
-  font-size: 11px;
-}
 .ster-asset-name {
   font-size: 15px;
   line-height: 1.18;
@@ -5655,9 +5522,6 @@ td {
 }
 .ster-meta strong {
   font-size: 15px;
-}
-.ster-object-state {
-  font-size: 11.5px;
 }
 .issue-inline {
   font-size: 11px;
@@ -5738,9 +5602,6 @@ td {
 .sterilization-workspace .ster-asset .ster-code {
   font-size: 11px !important;
 }
-.sterilization-workspace .ster-asset .ster-type {
-  font-size: 11px !important;
-}
 .sterilization-workspace .ster-asset-name {
   font-size: 13px;
   line-height: 1.15;
@@ -5757,9 +5618,6 @@ td {
 }
 .sterilization-workspace .ster-meta strong {
   font-size: 13px;
-}
-.sterilization-workspace .ster-object-state {
-  font-size: 11px !important;
 }
 .sterilization-workspace .issue-inline {
   font-size: 11px !important;
@@ -6057,9 +5915,6 @@ td {
 }
 
 /* Compact receipt sections so the left column does not create a large empty tail. */
-.receipt-card-modal:not(.prep-workspace-modal) .receipt-summary-grid.compact-summary > div {
-  min-height: 44px;
-}
 .receipt-card-modal:not(.prep-workspace-modal) .receipt-work-section {
   margin-bottom: 7px !important;
 }

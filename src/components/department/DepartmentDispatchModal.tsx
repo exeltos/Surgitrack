@@ -1,6 +1,6 @@
 import {usesAreCounted} from '../../store/helpers';
 import {useState} from 'react';
-import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, X, MessageSquarePlus} from 'lucide-react';
+import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, MessageSquarePlus} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
 import {countsAtDepartment} from '../../core/surgicalCount';
 import type {SurgicalCount} from '../../store/types';
@@ -85,9 +85,6 @@ export default function DepartmentDispatchModal({
               {barcode} · {name}
             </p>
           </div>
-          <button className="icon-button department-modal-close" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="modal-body department-send-body">
           <div className="department-send-route">

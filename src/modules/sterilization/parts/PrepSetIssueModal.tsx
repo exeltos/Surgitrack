@@ -1,4 +1,4 @@
-import {CheckCircle2, ArrowRight, X} from 'lucide-react';
+import {CheckCircle2, ArrowRight} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import {askConfirm} from '../../../components/ui/confirmService';
@@ -26,9 +26,6 @@ export default function PrepSetIssueModal({s}: {s: SterilizationPageState}) {
   return (
     <div className="nested-modal-backdrop" onMouseDown={close}>
       <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-        <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={close}>
-          <X size={17} />
-        </button>
         <span className="eyebrow">{tr('ΕΚΚΡΕΜΟΤΗΤΑ ΣΕΤ')}</span>
         <h3>{trData(prepManageIssue.type)}</h3>
         <div className="prep-manage-summary">
@@ -51,6 +48,11 @@ export default function PrepSetIssueModal({s}: {s: SterilizationPageState}) {
               <b>{tr('Παραμονή ως έχει')}</b>
               <small>{tr('Η εκκρεμότητα μένει ανοιχτή και η διαδικασία συνεχίζει')}</small>
             </span>
+          </button>
+        </div>
+        <div className="modal-actions">
+          <button type="button" onClick={close}>
+            {tr('Ακύρωση')}
           </button>
         </div>
       </div>

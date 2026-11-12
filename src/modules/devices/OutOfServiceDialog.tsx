@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Wrench, X} from 'lucide-react';
+import {Wrench} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import type {OutOfService} from '../../core/libraries';
 import type {Lang} from './deviceUi';
@@ -43,9 +43,6 @@ export default function OutOfServiceDialog({
               )}
             </p>
           </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X size={18} />
-          </button>
         </header>
         <div className="notice-choice" role="radiogroup" aria-label={L('Αιτία', 'Reason')}>
           {(

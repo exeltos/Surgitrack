@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Camera, Copy, Trash2, X} from 'lucide-react';
+import {Camera, Copy, Trash2} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import ReportTypeField from '../../components/assets/ReportTypeField';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
@@ -31,9 +31,6 @@ export function SetDeleteDialog({
               {memberCount} {tr('φυσικά εργαλεία του Σετ.')}
             </p>
           </div>
-          <button className="icon-button" onClick={onClose}>
-            <X size={18} />
-          </button>
         </header>
         <div className="choice-dialog-body">
           <button
@@ -66,6 +63,9 @@ export function SetDeleteDialog({
             <span>{tr('Διαγράφονται και τα φυσικά εργαλεία (επαναφορά από τον Κάδο).')}</span>
           </button>
         </div>
+        <footer>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
+        </footer>
       </div>
     </div>
   );
@@ -104,9 +104,6 @@ export function SetReportModal({
               {set.barcode} {tr('· επίλεξε αν αφορά το Σετ ή εργαλεία της σύνθεσης.')}
             </p>
           </div>
-          <button className="icon-button" onClick={onClose}>
-            <X size={18} />
-          </button>
         </header>
         <div className="modal-body">
           <div className="report-target-switch">
@@ -211,9 +208,6 @@ export function SetDuplicateDialog({
               {barcode};
             </p>
           </div>
-          <button className="icon-button" onClick={onClose}>
-            <X size={18} />
-          </button>
         </header>
         <div className="choice-dialog-body">
           <button onClick={() => onDuplicate(false)}>
@@ -225,6 +219,9 @@ export function SetDuplicateDialog({
             <span>{tr('Δημιουργεί νέα φυσικά εργαλεία με νέα μοναδικά barcodes.')}</span>
           </button>
         </div>
+        <footer>
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
+        </footer>
       </div>
     </div>
   );

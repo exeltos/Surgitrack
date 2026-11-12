@@ -1,6 +1,6 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
-import {CheckCircle2, Flame, TriangleAlert, X, PackageOpen} from 'lucide-react';
+import {CheckCircle2, Flame, TriangleAlert, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import {useLibraries} from '../../../core/LibraryStore';
 import {testsInUse, testsState} from '../../../core/equipmentTests';
@@ -44,24 +44,16 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
     <>
       {loadModal && (
         <div className="modal-backdrop" onMouseDown={closeLoad}>
-          <div className="receipt-card-modal workflow-modal load-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeLoad}>
-              <X size={18} />
-            </button>
+          <div
+            className={`receipt-card-modal workflow-modal load-modal ${loadModal === 'WASHING' ? 'washer-load' : 'sterilizer-load'}`}
+            onMouseDown={e => e.stopPropagation()}
+          >
             <div className="workflow-modal-head">
               <div className="ster-kind set">
                 {loadModal === 'WASHING' ? <PackageOpen size={20} /> : <Flame size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">
-                  {loadModal === 'WASHING' ? tr('ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ') : tr('ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ')}
-                </span>
                 <h2>{loadModal === 'WASHING' ? tr('Φόρτωση πλυντηρίου') : tr('Φόρτωση κλιβάνου')}</h2>
-                <p>
-                  {tr(
-                    'Επίλεξε τα Set/εργαλεία που μπαίνουν στον ίδιο κύκλο. Η εγγραφή του κύκλου θα συνδεθεί με όλα τα επιλεγμένα barcodes.',
-                  )}
-                </p>
               </div>
             </div>
             <div className="load-modal-body">
@@ -123,7 +115,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     )}
                 </label>
                 <label>
-                  {tr('Αριθμός κύκλου / φορτίου')}
+                  {tr('Αριθμός κύκλου')}
                   <input
                     value={loadCycleNumber}
                     onChange={e => setLoadCycleNumber(e.target.value)}
@@ -136,29 +128,6 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 </label>
                 {loadModal === 'WASHING' && (
                   <>
-                    <div className="load-indicator-pick" role="group" aria-labelledby="load-wash-result">
-                      <span id="load-wash-result">{tr('Αποτέλεσμα πλύσης')}</span>
-                      <div className="load-indicator-chips">
-                        <label>
-                          <input
-                            type="radio"
-                            name="load-wash-result"
-                            checked={loadChemical !== 'FAIL'}
-                            onChange={() => setLoadChemical('PASS')}
-                          />
-                          {tr('Επιτυχές')}
-                        </label>
-                        <label>
-                          <input
-                            type="radio"
-                            name="load-wash-result"
-                            checked={loadChemical === 'FAIL'}
-                            onChange={() => setLoadChemical('FAIL')}
-                          />
-                          {tr('Αποτυχία')}
-                        </label>
-                      </div>
-                    </div>
                     <label>
                       {tr('Θερμοκρασία (°C)')}
                       <input
@@ -219,9 +188,9 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 <BarcodeCapture
                   title={tr('Προσθήκη στο φορτίο')}
                   subtitle={tr('Σκανάρετε, πληκτρολογήστε ή χρησιμοποιήστε scanner υπολογιστή.')}
-                  placeholder={tr('Barcode · π.χ. S000324')}
                   feedback={loadScanFeedback}
                   onBarcode={addBarcodeToLoad}
+                  suggest={loadCandidates}
                 />
               )}
               <section className="load-assets">
@@ -270,14 +239,42 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   })}
                 </div>
               </section>
-              <label className="cycle-note">
-                {tr('Παρατήρηση φορτίου')}
-                <textarea
-                  value={loadNote}
-                  onChange={e => setLoadNote(e.target.value)}
-                  placeholder={tr('Προαιρετική παρατήρηση / απόκλιση…')}
-                />
-              </label>
+              {/* The last things said before completing: the washing result (a washer) and the note, side by side. */}
+              <div className="load-finish-row">
+                {loadModal === 'WASHING' && (
+                  <div className="load-indicator-pick" role="group" aria-labelledby="load-wash-result">
+                    <span id="load-wash-result">{tr('Αποτέλεσμα πλύσης')}</span>
+                    <div className="load-indicator-chips">
+                      <label>
+                        <input
+                          type="radio"
+                          name="load-wash-result"
+                          checked={loadChemical !== 'FAIL'}
+                          onChange={() => setLoadChemical('PASS')}
+                        />
+                        {tr('Επιτυχές')}
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="load-wash-result"
+                          checked={loadChemical === 'FAIL'}
+                          onChange={() => setLoadChemical('FAIL')}
+                        />
+                        {tr('Αποτυχία')}
+                      </label>
+                    </div>
+                  </div>
+                )}
+                <label className="cycle-note">
+                  {tr('Παρατήρηση φορτίου')}
+                  <textarea
+                    value={loadNote}
+                    onChange={e => setLoadNote(e.target.value)}
+                    placeholder={tr('Προαιρετική παρατήρηση / απόκλιση…')}
+                  />
+                </label>
+              </div>
             </div>
             <div className="modal-actions workflow-modal-actions">
               <button onClick={closeLoad}>{tr('Ακύρωση')}</button>

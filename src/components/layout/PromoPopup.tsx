@@ -1,6 +1,7 @@
 import {useEffect} from 'react';
-import {ExternalLink, FileText, Megaphone, X} from 'lucide-react';
+import {ExternalLink, FileText, Megaphone} from 'lucide-react';
 import {safeLink, type ImageLayout} from '../../data/cloud/platformNotices';
+import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
 
 export type PromoContent = {
@@ -36,9 +37,6 @@ export default function PromoPopup({promo, onClose}: {promo: PromoContent; onClo
         aria-modal="true"
         aria-label={promo.title || tr('Πρόταση')}
       >
-        <button type="button" className="icon-button promo-popup-x" onClick={onClose} aria-label={tr('Κλείσιμο')}>
-          <X size={18} />
-        </button>
         {image ? (
           <img className="promo-popup-image" src={image} alt="" />
         ) : (
@@ -50,20 +48,19 @@ export default function PromoPopup({promo, onClose}: {promo: PromoContent; onClo
           <small>{tr('Πρόταση')}</small>
           <h2>{promo.title}</h2>
           <p>{promo.message}</p>
-          {(link || file) && (
-            <div className="promo-popup-actions">
-              {link && (
-                <a className="promo-cta" href={link} target="_blank" rel="noopener noreferrer">
-                  {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={15} aria-hidden="true" />
-                </a>
-              )}
-              {file && (
-                <a className="promo-file" href={file} target="_blank" rel="noopener noreferrer">
-                  <FileText size={16} aria-hidden="true" /> {promo.attachmentName || 'PDF'}
-                </a>
-              )}
-            </div>
-          )}
+          <div className="promo-popup-actions">
+            {link && (
+              <a className="promo-cta" href={link} target="_blank" rel="noopener noreferrer">
+                {promo.linkLabel || tr('Περισσότερα')} <ExternalLink size={15} aria-hidden="true" />
+              </a>
+            )}
+            {file && (
+              <a className="promo-file" href={file} target="_blank" rel="noopener noreferrer">
+                <FileText size={16} aria-hidden="true" /> {promo.attachmentName || 'PDF'}
+              </a>
+            )}
+            <AppButton onClick={onClose}>{tr('Κλείσιμο')}</AppButton>
+          </div>
         </div>
       </article>
     </div>

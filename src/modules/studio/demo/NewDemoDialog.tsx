@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {tr} from '../../../i18n';
 import {DEFAULT_DEMO_DAYS, DEMO_LENGTHS, isValidEmail} from '../../../core/demoAccounts';
@@ -27,9 +26,6 @@ export default function NewDemoDialog({onClose, onCreate}: {onClose: () => void;
             <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
             <h2>{tr('Νέο Demo αξιολόγησης')}</h2>
           </div>
-          <button onClick={onClose} aria-label={tr('Κλείσιμο')}>
-            <X />
-          </button>
         </header>
         <div className="studio-drawer-form">
           <label>

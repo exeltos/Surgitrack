@@ -1,6 +1,6 @@
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {Cable, Copy, KeyRound, Upload, X} from 'lucide-react';
+import {Cable, Copy, KeyRound, Upload} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
 import AppButton from '../../components/ui/AppButton';
 import {readSheetFile} from '../../core/sheetImport';
@@ -39,9 +39,6 @@ function Modal({
             <h2>{title}</h2>
             {subtitle && <p>{subtitle}</p>}
           </div>
-          <button className="icon-button" onClick={onClose} aria-label="×">
-            <X size={18} />
-          </button>
         </header>
         <div className="modal-body">{children}</div>
         {footer && <footer>{footer}</footer>}

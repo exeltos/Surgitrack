@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {Barcode, Camera, CheckCircle2, TriangleAlert} from 'lucide-react';
 import {tr} from '../../i18n';
 import {createFrameReader} from '../../core/barcodeReader';
+import {scanPlaceholder, useAssetSuggest, type AssetSuggestion} from './AssetSuggest';
 
 export type BarcodeFeedback = {type: 'OK' | 'WARN' | 'ERROR'; message: string};
 
@@ -11,14 +12,17 @@ type Props = {
   placeholder?: string;
   feedback?: BarcodeFeedback | null;
   onBarcode: (barcode: string) => boolean | void;
+  /** The items this field takes, offered while a name, code or barcode is typed (default: every Set and instrument). */
+  suggest?: AssetSuggestion[];
 };
 
 export default function BarcodeCapture({
   title,
   subtitle,
-  placeholder = tr('Σαρώστε barcode'),
+  placeholder = scanPlaceholder(),
   feedback,
   onBarcode,
+  suggest,
 }: Props) {
   const [input, setInput] = useState('');
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -50,6 +54,7 @@ export default function BarcodeCapture({
     setInput('');
     inputRef.current?.focus();
   };
+  const suggestions = useAssetSuggest(input, barcode => submit(barcode), suggest);
   const startCamera = async () => {
     setCameraError('');
     setCameraOpen(true);
@@ -144,6 +149,7 @@ export default function BarcodeCapture({
           placeholder={placeholder}
           onChange={e => setInput(e.target.value.toUpperCase())}
           onKeyDown={e => {
+            if (suggestions.onKeyDown(e)) return;
             if (e.key === 'Enter') {
               e.preventDefault();
               submit();
@@ -153,9 +159,10 @@ export default function BarcodeCapture({
         <button type="button" onClick={() => submit()}>
           {tr('Προσθήκη')}
         </button>
+        {suggestions.listbox}
       </div>
       <div className="barcode-capture-help">
-        {tr('Χειροκίνητα ή με USB/Bluetooth scanner: σάρωση στο πεδίο και Enter.')}
+        {tr('Scanner, πληκτρολόγηση ή αναζήτηση με όνομα: Enter ή επιλογή από τη λίστα.')}
       </div>
       {feedback && (
         <div className={`load-scan-feedback ${feedback.type.toLowerCase()}`}>

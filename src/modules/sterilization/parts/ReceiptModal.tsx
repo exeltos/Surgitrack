@@ -1,16 +1,5 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
-import {
-  CheckCircle2,
-  ClipboardCheck,
-  TriangleAlert,
-  Stethoscope,
-  UserRoundCheck,
-  X,
-  IdCard,
-  Clock3,
-  Building2,
-  UserCheck,
-} from 'lucide-react';
+import {CheckCircle2, TriangleAlert, UserRoundCheck, X, IdCard} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -51,9 +40,6 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
       {receiptDraft && (
         <div className="modal-backdrop" onMouseDown={closeReceipt}>
           <div className="receipt-card-modal" onMouseDown={e => e.stopPropagation()}>
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeReceipt}>
-              <X size={18} />
-            </button>
             <div className="receipt-card-head">
               <AssetTypeIcon
                 kind={receiptDraft.kind}
@@ -63,77 +49,29 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                 size={19}
               />
               <div>
-                <span>{tr('ΚΑΡΤΕΛΑ ΠΑΡΑΛΑΒΗΣ')}</span>
                 <h2>
                   {receiptDraft.asset.barcode} · {receiptDraft.asset.name}
                 </h2>
+                {/* Where it comes from, when and who receives it: one line instead of a card of four boxes. */}
                 <p>
-                  {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')}
+                  {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')} · {formatDateTime()} ·{' '}
+                  {tr('Παραλαμβάνει: {0}', trData(currentUser.name))}
                 </p>
               </div>
             </div>
 
             <div className="receipt-card-body receipt-two-column">
               <div className="receipt-left-panel">
-                <section className="receipt-work-section">
-                  <div className="receipt-section-title">
-                    <div>
-                      <strong>{tr('Στοιχεία παραλαβής')}</strong>
-                      <span>{tr('Φυσική παράδοση και στοιχεία παραλαμβάνοντα.')}</span>
-                    </div>
-                  </div>
-                  <div className="receipt-summary-grid compact-summary">
-                    <div>
-                      <Building2 />
-                      <span>{tr('Τμήμα αποστολής')}</span>
-                      <strong>{trData(receiptDraft.asset.department)}</strong>
-                    </div>
-                    <div>
-                      <Clock3 />
-                      <span>{tr('Ημερομηνία / ώρα')}</span>
-                      <strong>{formatDateTime()}</strong>
-                    </div>
-                    <div>
-                      <UserCheck />
-                      <span>{tr('Παραλαμβάνει')}</span>
-                      <strong>{trData(currentUser.name)}</strong>
-                      <small>{trData(currentUser.department)}</small>
-                    </div>
-                    {receiptDraft.kind === 'SET' ? (
-                      <div>
-                        <ClipboardCheck />
-                        <span>{tr('Δηλωμένη σύνθεση')}</span>
-                        <strong
-                          className={receiptDraft.asset.actual !== receiptDraft.asset.expected ? 'warn-text' : ''}
-                        >
-                          {receiptExpectedCount} {tr('τεμάχια')}
-                        </strong>
-                        <small>
-                          {receiptExpectedCount} {tr('φυσικές εγγραφές')}
-                        </small>
-                      </div>
-                    ) : (
-                      <div>
-                        <Stethoscope />
-                        <span>{tr('Τύπος')}</span>
-                        <strong>{tr('Μεμονωμένο εργαλείο')}</strong>
-                      </div>
-                    )}
-                  </div>
-                </section>
-
                 <section className="receipt-work-section identity-work-section">
                   <div className="receipt-section-title">
                     <div>
-                      <strong>{tr('Ταυτοποίηση παραδίδοντα')}</strong>
-                      <span>{tr('Επιβεβαίωση με προσωπικό κωδικό.')}</span>
+                      <strong>{tr('Υπογραφή παραδίδοντα')}</strong>
                     </div>
                     <IdCard size={18} />
                   </div>
                   <div className="identity-section">
                     <HandoverSignature
                       autoFocus
-                      label={tr('Υπογραφή παραδίδοντα (κωδικός χρήστη + συνθηματικό)')}
                       department={receiptDraft.asset.department}
                       signer={deliverer}
                       assetIds={[receiptDraft.asset.id]}
@@ -177,17 +115,12 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                         </div>
                       ))}
                   </div>
-                  <div className="handover-warning compact-warning">
-                    <TriangleAlert size={16} />
-                    <span>{tr('Η παραλαβή ολοκληρώνεται μόνο μετά την ταυτοποίηση.')}</span>
-                  </div>
                 </section>
 
                 <section className="receipt-work-section receipt-check-section">
                   <div className="receipt-section-title">
                     <div>
                       <strong>{tr('Εμφανής κατάσταση κατά την παραλαβή')}</strong>
-                      <span>{tr('Δεν υποκαθιστά τον αναλυτικό Έλεγχο & Σύνθεση.')}</span>
                     </div>
                     <TriangleAlert size={18} />
                   </div>
@@ -295,10 +228,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                     <div className="prep-tools-head prep-tools-toolbar receipt-tools-toolbar">
                       <div className="receipt-tools-title-block">
                         <div>
-                          <strong>{tr('Φυσική σύνθεση Σετ')}</strong>{' '}
-                          <span>
-                            {receiptTools.length} {tr('εργαλεία — αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα')}
-                          </span>
+                          <strong>{tr('{0} εργαλεία', receiptTools.length)}</strong>
                         </div>
                       </div>
                       <div className="prep-tools-toolbar-actions">
@@ -319,7 +249,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                       <span>{tr('Όνομα εργαλείου')}</span>
                       <span>{tr('Εταιρεία')}</span>
                       <span>{tr('Κατάσταση')}</span>
-                      <span>{tr('Ενέργεια')}</span>
+                      <span />
                     </div>
                     <div className="prep-tools-scroll receipt-tools-scroll">
                       {receiptTools.length === 0 ? (
@@ -349,23 +279,23 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                               </div>
                               <span className="receipt-tool-manufacturer">{t.manufacturer || '—'}</span>
                               <div className="receipt-tool-state">
-                                {problem ? (
-                                  toolIssues.map(i => (
-                                    <span className="prep-issue-chip" key={i.id}>
-                                      <TriangleAlert size={12} />
-                                      {trData(i.type)}
-                                    </span>
-                                  ))
-                                ) : (
-                                  <span className="prep-ok-chip">{tr('Χωρίς απόκλιση')}</span>
-                                )}
+                                {problem
+                                  ? toolIssues.map(i => (
+                                      <span className="prep-issue-chip" key={i.id}>
+                                        <TriangleAlert size={12} />
+                                        {trData(i.type)}
+                                      </span>
+                                    ))
+                                  : null}
                               </div>
                               <button
-                                className="tool-report-btn"
+                                className="tool-report-btn icon-only"
+                                title={tr('Αναφορά')}
+                                aria-label={tr('Αναφορά')}
                                 type="button"
                                 onClick={() => openIssueReport('TOOL', t.id, 'Αποστείρωση · κατά την παραλαβή')}
                               >
-                                <TriangleAlert size={14} /> {tr('Αναφορά')}
+                                <TriangleAlert size={14} />
                               </button>
                             </div>
                           );
@@ -392,7 +322,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                       <span>{tr('Όνομα εργαλείου')}</span>
                       <span>{tr('Εταιρεία')}</span>
                       <span>{tr('Κατάσταση')}</span>
-                      <span>{tr('Ενέργεια')}</span>
+                      <span />
                     </div>
                     <div className="prep-tools-scroll receipt-tools-scroll single-receipt-scroll">
                       {(() => {
@@ -419,23 +349,23 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                             </div>
                             <span className="receipt-tool-manufacturer">{t.manufacturer || '—'}</span>
                             <div className="receipt-tool-state">
-                              {problem ? (
-                                toolIssues.map(i => (
-                                  <span className="prep-issue-chip" key={i.id}>
-                                    <TriangleAlert size={12} />
-                                    {trData(i.type)}
-                                  </span>
-                                ))
-                              ) : (
-                                <span className="prep-ok-chip">{tr('Χωρίς απόκλιση')}</span>
-                              )}
+                              {problem
+                                ? toolIssues.map(i => (
+                                    <span className="prep-issue-chip" key={i.id}>
+                                      <TriangleAlert size={12} />
+                                      {trData(i.type)}
+                                    </span>
+                                  ))
+                                : null}
                             </div>
                             <button
-                              className="tool-report-btn"
+                              className="tool-report-btn icon-only"
+                              title={tr('Αναφορά')}
+                              aria-label={tr('Αναφορά')}
                               type="button"
                               onClick={() => openIssueReport('TOOL', t.id, 'Αποστείρωση · κατά την παραλαβή')}
                             >
-                              <TriangleAlert size={14} /> {tr('Αναφορά')}
+                              <TriangleAlert size={14} />
                             </button>
                           </div>
                         );
@@ -447,7 +377,9 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
             </div>
 
             <div className="modal-actions receipt-final-bar receipt-final-actions-only">
-              <button onClick={closeReceipt}>{tr('Ακύρωση')}</button>
+              <button data-modal-close onClick={closeReceipt}>
+                {tr('Ακύρωση')}
+              </button>
               <button
                 className="primary"
                 disabled={!receiptIdentityValid || (visibleDeviation && !receiptDeviationRecorded)}

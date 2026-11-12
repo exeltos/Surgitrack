@@ -628,7 +628,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
     const firstRow = () => page.locator('.ster-row-action button').first().click({timeout: 3000});
     const button = name => () => page.getByRole('button', {name}).first().click({timeout: 3000});
     const stages = [
-      ['washing', 'WASHING', firstRow],
+      ['washing', 'WASHING', button(/^(Φόρτωση πλυντηρίου|Load the washer) · \d/)],
       ['prep', 'PREP', firstRow],
       ['packaging', 'PACKAGING', firstRow],
       ['process', 'PROCESS', button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)],
@@ -636,6 +636,17 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
       ['release', 'RELEASE', button(/^(Αποδέσμευση φορτίου|Release (the )?load)/)],
       ['ready', 'READY', firstRow],
     ];
+    // The load's barcode field searching by name: the suggestions under it.
+    modals.push({
+      name: 'sterilization-process-suggest',
+      route: '/sterilization',
+      open: async () => {
+        await queue('PROCESS');
+        await page.waitForTimeout(300);
+        await button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)();
+        await page.locator('.load-barcode-entry input').fill('λα', {timeout: 3000});
+      },
+    });
     for (const [name, q, opener] of stages) {
       modals.push({name: `sterilization-queue-${name}`, route: '/sterilization', dialog: false, open: () => queue(q)});
       if (opener)
@@ -839,6 +850,22 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await page.locator('.report-target-switch button').nth(1).click({timeout: 3000});
       },
     });
+  // The barcode label of a Set and of a standalone instrument: the same preview, opened from the print menu.
+  const printLabel = async () => {
+    await page
+      .locator('button')
+      .filter({hasText: /^(Εκτύπωση|Print)/})
+      .first()
+      .click({timeout: 3000});
+    await page
+      .getByText(/^(Ετικέτα barcode|Barcode label)/)
+      .first()
+      .click({timeout: 3000});
+  };
+  if (['SUPERVISOR', 'ADMIN', 'STERILIZATION'].includes(role) && seed.firstSetId)
+    modals.push({name: 'set-barcode-label', route: `/sets/${seed.firstSetId}`, open: printLabel});
+  if (['SUPERVISOR', 'ADMIN', 'STERILIZATION'].includes(role) && seed.firstStandaloneToolId)
+    modals.push({name: 'tool-barcode-label', route: `/tools/${seed.firstStandaloneToolId}`, open: printLabel});
   if (role !== 'DEPARTMENT' && seed.firstSetId)
     modals.push({
       // A Set's contents grouped by instrument kind, the first group open.

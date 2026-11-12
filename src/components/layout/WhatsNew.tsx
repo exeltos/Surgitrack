@@ -1,4 +1,4 @@
-import {Sparkles, X} from 'lucide-react';
+import {Sparkles} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {APP_VERSION} from '../../config/appMeta';
 import {formatDate} from '../../core/displayDate';
@@ -82,9 +82,6 @@ export default function WhatsNewDialog({
             <h3 id="whats-new-title">{tr('Τι νέο υπάρχει')}</h3>
             <p>{tr('Η εφαρμογή ενημερώθηκε στην έκδοση {0}.', `v${APP_VERSION}`)}</p>
           </div>
-          <button className="icon-button" onClick={close} aria-label={tr('Κλείσιμο')}>
-            <X size={18} />
-          </button>
         </header>
         <ReleaseNotes release={release} lang={lang} can={can} />
         <footer>

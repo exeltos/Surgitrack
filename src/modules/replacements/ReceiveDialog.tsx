@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {PackageCheck, X} from 'lucide-react';
+import {PackageCheck} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {lineRemaining} from '../../core/purchaseReceipt';
 import type {PurchaseOrder} from '../../types/domain';
@@ -28,9 +28,6 @@ export default function ReceiveDialog({
             <h2>{tr('Παραλαβή παραγγελίας')}</h2>
             <p>{tr('Γράψτε πόσα τεμάχια ήρθαν από κάθε είδος. Όσα λείπουν μένουν σε αναμονή.')}</p>
           </div>
-          <button type="button" className="modal-x" aria-label={tr('Κλείσιμο')} onClick={onClose}>
-            <X size={18} />
-          </button>
         </header>
         <div className="replacements-order-lines">
           <table>

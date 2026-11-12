@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {CheckCircle2, X} from 'lucide-react';
+import {CheckCircle2} from 'lucide-react';
 import {sendDemoRequest, type DemoRequestKind} from '../../data/cloud/demoFeedback';
 
 /**
@@ -52,9 +52,6 @@ export default function DemoRequestDialog({
           <h3>
             {purchase ? L('Θέλω την εφαρμογή', 'I want the application') : L('Ζητώ παράταση', 'Ask for more time')}
           </h3>
-          <button type="button" onClick={onClose} aria-label={L('Κλείσιμο', 'Close')}>
-            <X size={18} />
-          </button>
         </header>
         {state === 'sent' ? (
           <div className="demo-dialog-done">

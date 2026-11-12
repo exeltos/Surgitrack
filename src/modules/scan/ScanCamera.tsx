@@ -3,6 +3,7 @@ import {CameraOff, CheckCircle2, Flashlight, Keyboard, ScanBarcode, TriangleAler
 import type {BarcodeFeedback} from '../../components/barcode/BarcodeCapture';
 import {createFrameReader} from '../../core/barcodeReader';
 import {tr} from '../../i18n';
+import {scanPlaceholder, useAssetSuggest, type AssetSuggestion} from '../../components/barcode/AssetSuggest';
 
 /**
  * The phone app's scanner: «Σάρωση» opens the camera for one barcode (it closes once it has read it), plus
@@ -12,9 +13,12 @@ import {tr} from '../../i18n';
 export default function ScanCamera({
   onBarcode,
   feedback,
+  suggest,
 }: {
   onBarcode: (barcode: string) => void;
   feedback?: BarcodeFeedback | null;
+  /** The items this field takes, offered while a name, code or barcode is typed (default: every Set and instrument). */
+  suggest?: AssetSuggestion[];
 }) {
   const [on, setOn] = useState(false);
   const [error, setError] = useState('');
@@ -31,6 +35,14 @@ export default function ScanCamera({
     const value = raw.trim().toUpperCase();
     if (value) submitRef.current(value);
   };
+  const suggestions = useAssetSuggest(
+    typed,
+    barcode => {
+      submit(barcode);
+      setTyped('');
+    },
+    suggest,
+  );
 
   useEffect(() => {
     if (!on) return;
@@ -194,7 +206,8 @@ export default function ScanCamera({
             autoFocus
             value={typed}
             onChange={e => setTyped(e.target.value.toUpperCase())}
-            placeholder={tr('Barcode · π.χ. S000324')}
+            onKeyDown={e => suggestions.onKeyDown(e)}
+            placeholder={scanPlaceholder()}
             aria-label={tr('Barcode')}
             autoComplete="off"
             autoCapitalize="characters"
@@ -203,6 +216,7 @@ export default function ScanCamera({
           <button type="submit" className="primary" disabled={!typed.trim()}>
             {tr('Προσθήκη')}
           </button>
+          {suggestions.listbox}
         </form>
       )}
     </section>

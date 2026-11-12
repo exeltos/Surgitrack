@@ -1,5 +1,5 @@
 import StatusBadge from '../../../components/ui/StatusBadge';
-import {CheckCircle2, TriangleAlert, Box, Stethoscope, X, ShieldCheck, Clock3} from 'lucide-react';
+import {CheckCircle2, TriangleAlert, Box, Stethoscope, ShieldCheck, Clock3} from 'lucide-react';
 import {tr} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
@@ -25,9 +25,6 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
             className="receipt-card-modal workflow-modal workflow-modal-cycle"
             onMouseDown={e => e.stopPropagation()}
           >
-            <button className="modal-x" aria-label={tr('Κλείσιμο')} title={tr('Κλείσιμο')} onClick={closeRelease}>
-              <X size={18} />
-            </button>
             <div className="workflow-modal-head">
               <div className={`ster-kind ${releaseDraft.kind.toLowerCase()}`}>
                 {releaseDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
