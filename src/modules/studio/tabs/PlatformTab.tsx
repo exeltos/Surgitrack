@@ -102,8 +102,8 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
           <h2>{L('Demo αξιολόγησης', 'Evaluation Demos')}</h2>
           <p>
             {L(
-              'Δεν είναι πραγματικό νοσοκομείο: για πελάτη που ξεκινά, ανοίξτε «Νέο νοσοκομείο» με δοκιμαστική περίοδο.',
-              'Not a real hospital: for a customer who is starting, open a «New hospital» on trial.',
+              'Ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα, που κλειδώνει στη λήξη του. Για πελάτη που ξεκινά: «Νέο νοσοκομείο» με δοκιμαστική περίοδο.',
+              'A separate hospital with sample data that locks when it ends. For a customer who is starting: a «New hospital» on trial.',
             )}
           </p>
         </div>

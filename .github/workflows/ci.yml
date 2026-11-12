@@ -95,7 +95,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Check every screen
-        run: npm run screens -- --role ADMIN,DEPARTMENT --no-extras --max-height 900 --a11y --out screens-a11y
+        run: npm run screens -- --role ADMIN,DEPARTMENT,PLATFORM --no-extras --max-height 900 --a11y --out screens-a11y
 
       - name: Keep the screenshots
         if: always()

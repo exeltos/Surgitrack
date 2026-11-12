@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import HospitalPeople from '../../hospital/HospitalPeople';
 import type {StudioPageState} from '../useStudioPage';
 
@@ -13,6 +14,11 @@ export default function UsersTab({s}: {s: StudioPageState}) {
     setSelectedOrganizationId,
     tab,
   } = s;
+  // Opens on the first hospital: an empty page with a single list to choose from says nothing.
+  const firstId = displayedOrganizations[0]?.id;
+  useEffect(() => {
+    if (tab === 'USERS' && !selectedOrganizationId && firstId) setSelectedOrganizationId(firstId);
+  }, [tab, selectedOrganizationId, firstId, setSelectedOrganizationId]);
   return (
     <>
       {tab === 'USERS' && platformAdmin && (
@@ -30,7 +36,11 @@ export default function UsersTab({s}: {s: StudioPageState}) {
                   : L('Επιλέξτε νοσοκομείο.', 'Select a hospital.')}
               </p>
             </div>
-            <select value={selectedOrganizationId} onChange={e => setSelectedOrganizationId(e.target.value)}>
+            <select
+              aria-label={L('Νοσοκομείο', 'Hospital')}
+              value={selectedOrganizationId}
+              onChange={e => setSelectedOrganizationId(e.target.value)}
+            >
               <option value="">{L('Επιλογή νοσοκομείου', 'Select hospital')}</option>
               {displayedOrganizations.map(o => (
                 <option key={o.id} value={o.id}>

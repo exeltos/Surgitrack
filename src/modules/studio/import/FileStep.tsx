@@ -30,7 +30,7 @@ export default function FileStep({s}: {s: ImportState}) {
           <b>
             {organizationId
               ? L('Σύρετε εδώ το αρχείο ή πατήστε για επιλογή', 'Drop the file here or click to choose')
-              : L('Επιλέξτε πρώτα νοσοκομείο (πάνω δεξιά)', 'Choose a hospital first (top right)')}
+              : L('Επιλέξτε πρώτα νοσοκομείο', 'Choose a hospital first')}
           </b>
           <small>
             {organizationId
