@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Barcode, RefreshCcw, Settings2} from 'lucide-react';
+import {RefreshCcw} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import PlatformContactSettings from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
@@ -36,30 +36,12 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </button>
             ))}
           </div>
-          <p className="settings-hint">
-            {L(
-              'Ό,τι έχει πεδίο, λίστα, μολυβάκι ή κουμπί αλλάζει από εδώ.',
-              'Anything with a field, a list, a pencil or a button can be changed here.',
-            )}
-          </p>
           <div className="studio-system-grid">
             {group === 'GENERAL' && platformAdmin && libs.dataMode === 'PRODUCTION' && (
               <PlatformContactSettings L={L} />
             )}
             {group === 'GENERAL' && (
               <section>
-                <header>
-                  <Settings2 />
-                  <div>
-                    <h3>{L('Γενικές ρυθμίσεις', 'General settings')}</h3>
-                    <p>
-                      {L(
-                        'Κεντρικές παράμετροι που πρέπει να είναι κοινές σε όλη την εφαρμογή.',
-                        'Central parameters shared across the application.',
-                      )}
-                    </p>
-                  </div>
-                </header>
                 <label>
                   {L('Προειδοποίηση υπολοίπου χρήσεων', 'Remaining-use warning')}
                   <div className="studio-setting-input">
@@ -178,18 +160,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             )}
             {group === 'STERILIZATION' && (
               <section>
-                <header>
-                  <Barcode />
-                  <div>
-                    <h3>{L('Διάρκεια αποστείρωσης', 'Sterile shelf life')}</h3>
-                    <p>
-                      {L(
-                        'Πόσο διαρκεί η αποστείρωση ενός Σετ ή εργαλείου από την αποδέσμευση.',
-                        'How long a Set or instrument stays sterile, counted from the release.',
-                      )}
-                    </p>
-                  </div>
-                </header>
                 <label>
                   {L('Διάρκεια αποστείρωσης (προεπιλογή)', 'Sterile shelf life (default)')}
                   <div className="studio-setting-input">
@@ -213,9 +183,9 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                     )}
                   </small>
                 </label>
+                <LabelSettingsCard L={L} />
               </section>
             )}
-            {group === 'STERILIZATION' && <LabelSettingsCard L={L} />}
           </div>
         </>
       )}
