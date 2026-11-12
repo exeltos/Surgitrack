@@ -750,7 +750,9 @@ export const preparations: PreparationRecord[] = [];
 export const sterilizationReleases: SterilizationReleaseRecord[] = [];
 const demoSterile = (code: string, daysFromToday: number, months: number) => {
   const set = sets.find(item => item.code === code);
-  if (!set) return;
+  if (set) demoSterileAsset(set, 'SET', daysFromToday, months);
+};
+function demoSterileAsset(set: SetAsset | Tool, kind: 'SET' | 'TOOL', daysFromToday: number, months: number) {
   const until = new Date(DEMO_ANCHOR);
   until.setDate(until.getDate() + daysFromToday);
   set.sterileUntil = isoDate(until);
@@ -761,13 +763,13 @@ const demoSterile = (code: string, daysFromToday: number, months: number) => {
   set.sterilizedTime = '10:30';
   // Who composed and who released it: part A of the count form, already signed by Sterilization.
   const day = formatDate(on);
-  const base = {workflowVersion: 1, assetId: set.id, assetKind: 'SET' as const, barcode: set.barcode};
-  const members = tools.filter(tool => tool.setId === set.id);
+  const base = {workflowVersion: 1, assetId: set.id, assetKind: kind, barcode: set.barcode};
+  const members = kind === 'SET' ? tools.filter(tool => tool.setId === set.id) : [set as Tool];
   preparations.push({
     ...base,
     id: `prep-demo-${set.id}`,
     assetName: set.name,
-    department: set.department,
+    department: set.department || '',
     preparedByUserId: 'demo-sterilization',
     preparedByName: 'Demo Χρήστης Αποστείρωσης',
     preparedByDepartment: 'Κεντρική Αποστείρωση',
@@ -780,7 +782,7 @@ const demoSterile = (code: string, daysFromToday: number, months: number) => {
     ...base,
     id: `rel-demo-${set.id}`,
     assetName: set.name,
-    department: set.department,
+    department: set.department || '',
     cycleRecordId: `cyc-demo-${set.id}`,
     cycleNumber: `2026-${set.barcode.slice(-3)}`,
     sterilizer: 'Κλίβανος Ατμού 01',
@@ -798,7 +800,7 @@ const demoSterile = (code: string, daysFromToday: number, months: number) => {
     sterilizedOn: set.sterilizedOn,
     sterilizedTime: '10:30',
   });
-};
+}
 demoSterile('ORTHO-BASIC', 120, 6);
 demoSterile('LAP-GEN', 8, 2);
 demoSterile('GYN-LAP', -3, 3);
@@ -809,6 +811,15 @@ demoSterile('CSECTION-01', 168, 6);
 sets
   .filter(set => !set.sterileUntil && (set.state === 'IN_DEPARTMENT' || set.state === 'READY_FOR_PICKUP'))
   .forEach((set, index) => demoSterile(set.code, 40 + ((index * 37) % 140), 6));
+// The same for the standalone instruments: their label shows the dates as a Set's does.
+tools
+  .filter(
+    tool =>
+      tool.mode === 'STANDALONE' &&
+      !tool.sterileUntil &&
+      (tool.state === 'IN_DEPARTMENT' || tool.state === 'READY_FOR_PICKUP'),
+  )
+  .forEach((tool, index) => demoSterileAsset(tool, 'TOOL', 30 + ((index * 41) % 150), 6));
 const label = (set: SetAsset) => `${set.barcode} · ${set.name}`;
 const people = {
   ster: 'Demo Χρήστης Αποστείρωσης',
@@ -1274,8 +1285,9 @@ export const processLoads: ProcessLoadRecord[] = [
  */
 const demoCycle = (
   id: string,
-  set: SetAsset | undefined,
+  set: SetAsset | Tool | undefined,
   load: {loadId?: string; sterilizer: string; cycleNumber: string; program: string; completedAt: string},
+  kind: 'SET' | 'TOOL' = 'SET',
 ): SterilizationCycleRecord[] =>
   set
     ? [
@@ -1284,10 +1296,10 @@ const demoCycle = (
           workflowVersion: 1,
           loadId: load.loadId,
           assetId: set.id,
-          assetKind: 'SET',
+          assetKind: kind,
           barcode: set.barcode,
           assetName: set.name,
-          department: set.department,
+          department: set.department || '',
           sterilizer: load.sterilizer,
           cycleNumber: load.cycleNumber,
           program: load.program,
@@ -1297,7 +1309,7 @@ const demoCycle = (
           completedByName: people.ster,
           completedByDepartment: 'Κεντρική Αποστείρωση',
           completedAt: load.completedAt,
-          toolIds: tools.filter(tool => tool.setId === set.id).map(tool => tool.id),
+          toolIds: kind === 'SET' ? tools.filter(tool => tool.setId === set.id).map(tool => tool.id) : [set.id],
         },
       ]
     : [];
@@ -1324,13 +1336,16 @@ export const sterilizationCycles: SterilizationCycleRecord[] = [
     .flatMap(release =>
       demoCycle(
         release.cycleRecordId,
-        sets.find(set => set.id === release.assetId),
+        release.assetKind === 'TOOL'
+          ? tools.find(tool => tool.id === release.assetId)
+          : sets.find(set => set.id === release.assetId),
         {
           sterilizer: release.sterilizer,
           cycleNumber: release.cycleNumber,
           program: '134°C · 5′',
           completedAt: release.releasedAt,
         },
+        release.assetKind,
       ),
     ),
 ];

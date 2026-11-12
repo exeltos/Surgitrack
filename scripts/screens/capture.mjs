@@ -839,6 +839,22 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await page.locator('.report-target-switch button').nth(1).click({timeout: 3000});
       },
     });
+  // The barcode label of a Set and of a standalone instrument: the same preview, opened from the print menu.
+  const printLabel = async () => {
+    await page
+      .locator('button')
+      .filter({hasText: /^(Εκτύπωση|Print)/})
+      .first()
+      .click({timeout: 3000});
+    await page
+      .getByText(/^(Ετικέτα barcode|Barcode label)/)
+      .first()
+      .click({timeout: 3000});
+  };
+  if (['SUPERVISOR', 'ADMIN', 'STERILIZATION'].includes(role) && seed.firstSetId)
+    modals.push({name: 'set-barcode-label', route: `/sets/${seed.firstSetId}`, open: printLabel});
+  if (['SUPERVISOR', 'ADMIN', 'STERILIZATION'].includes(role) && seed.firstStandaloneToolId)
+    modals.push({name: 'tool-barcode-label', route: `/tools/${seed.firstStandaloneToolId}`, open: printLabel});
   if (role !== 'DEPARTMENT' && seed.firstSetId)
     modals.push({
       // A Set's contents grouped by instrument kind, the first group open.

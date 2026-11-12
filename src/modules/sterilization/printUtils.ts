@@ -6,6 +6,7 @@ import {markPrintHtml} from '../../core/sampleDataMark';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
 import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
+import {labelToPdf} from '../../core/labelPdf';
 
 // Code 128 B: same symbology used by the legacy FileMaker Barcode_Code128 webview.
 const CODE128_PATTERNS = [
@@ -310,8 +311,30 @@ export function barcodeLabelHtml(
   return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barcode ${escapeHtml(asset.barcode)}</title>${barcodeLabelBody(asset, kind, toolCount, settings, screenZoom)}</body></html>`;
 }
 
+/**
+ * Prints a sticker label as a PDF whose page is the sticker (no browser margins, headers or scaling), falling back
+ * to a window of its own when the PDF cannot be made. The one way every barcode label is printed.
+ */
+export function printLabelPdf(title: string, html: string, widthMm: number, heightMm: number) {
+  // The window opens now (a popup opened after the wait would be blocked) and shows the PDF when it is made.
+  const win = window.open('', '_blank');
+  if (!win) return printDocumentInWindow(title, html);
+  void labelToPdf(html, widthMm, heightMm)
+    .then(blob => {
+      win.location.href = URL.createObjectURL(blob);
+    })
+    .catch(() => {
+      win.close();
+      printDocumentInWindow(title, html);
+    });
+  return true;
+}
+
+/** A Set's or an instrument's barcode label, with the hospital's label settings: the same print from every screen. */
 export function printBarcodeLabel(asset: PrintAsset, kind: AssetKind, toolCount?: number, settings?: LabelSettings) {
-  return openPrintWindow(`Barcode ${asset.barcode}`, barcodeLabelBody(asset, kind, toolCount, settings));
+  const look = {...DEFAULT_LABEL_SETTINGS, ...(settings || {})};
+  const {w, h} = labelPaper(look);
+  return printLabelPdf(`Barcode ${asset.barcode}`, barcodeLabelHtml(asset, kind, toolCount, look, 1), w, h);
 }
 
 /** Extra look for the composition sheet: the label header (logo / text) and the Set's color marker. */

@@ -3,8 +3,7 @@ import {Printer, X} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {tr} from '../../i18n';
 import {markPrintHtml} from '../../core/sampleDataMark';
-import {printDocumentInWindow} from '../../modules/sterilization/printUtils';
-import {labelToPdf} from '../../core/labelPdf';
+import {printDocumentInWindow, printLabelPdf} from '../../modules/sterilization/printUtils';
 export default function PrintPreviewModal({
   title,
   html,
@@ -32,19 +31,8 @@ export default function PrintPreviewModal({
   const frameId = 'surgitrack-print-preview';
   const doPrint = () => {
     if (labelPdf) {
-      // The window opens now (a popup opened after the wait would be blocked) and shows the PDF when it is made.
-      const win = window.open('', '_blank');
-      if (win) {
-        void labelToPdf(labelPdf.html, labelPdf.widthMm, labelPdf.heightMm)
-          .then(blob => {
-            win.location.href = URL.createObjectURL(blob);
-          })
-          .catch(() => {
-            win.close();
-            printDocumentInWindow(title, html);
-          });
-        return;
-      }
+      printLabelPdf(title, labelPdf.html, labelPdf.widthMm, labelPdf.heightMm);
+      return;
     }
     if (printInWindow && printDocumentInWindow(title, html)) return;
     const frame = document.getElementById(frameId) as HTMLIFrameElement | null;

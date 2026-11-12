@@ -135,5 +135,9 @@ export function buildSeed(organizationId: string, scale = 1) {
     navigation,
     firstSetId: store.sets[0]?.id,
     firstToolId: store.tools[0]?.id,
+    // A standalone instrument (in no Set): its own barcode label.
+    firstStandaloneToolId: (
+      store.tools.find(tool => !tool.setId && tool.sterileUntil) || store.tools.find(tool => !tool.setId)
+    )?.id,
   };
 }
