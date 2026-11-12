@@ -1,6 +1,6 @@
 -- Handovers in the platform's Demo hospital count as signed when one of its sample people signed.
 --
--- handover_counterparty_stamp (20261011190000_handover_signature_per_handover.sql) confirms the other party of a
+-- handover_counterparty_stamp (20261011180045_handover_signature_per_handover.sql) confirms the other party of a
 -- receipt or delivery only from a server signature (verify-handover). In the platform's Demo the sample people
 -- (user ids «demo-…», codes such as ST1001) sign in the app instead, so every Demo handover read «unconfirmed».
 -- In a Demo hospital that is not a prospect's evaluation, such a record now keeps the stamp the app gave it.

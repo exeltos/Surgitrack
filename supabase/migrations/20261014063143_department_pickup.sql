@@ -9,7 +9,7 @@
 --    when the person named as delivering signed for these items, for this user.
 -- 2. The department guards let a department user move their own Set or instrument from «Έτοιμο για παραλαβή»
 --    (READY_FOR_PICKUP) to «Στο τμήμα» (IN_DEPARTMENT), keeping its sterile dates. Every other change stays as
---    before (20261011170000_department_own_equipment.sql).
+--    before (20261011172652_department_own_equipment.sql).
 
 -- 1 -----------------------------------------------------------------------------------------------
 -- The signed-in user's own department name, for the policy below (only their own, so callable by them).

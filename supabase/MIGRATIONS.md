@@ -57,14 +57,22 @@ version (see the comment in the file).
 
 Edge functions deployed on 02/11/2026 without a migration: `staff-signup` v25 (every signup counts against the limits: 30 an hour per address, 200 an hour per hospital link, 5 a day per email address).
 
-## Applied by hand, not in the migration history (checked 12/11/2026)
+## Migration history brought in line (12/11/2026)
 
-Every migration of the table above after `20261104184718_ip_access` is in the live schema (the six marked
-**Applied by hand** each checked by its tables, columns, functions and constraints on 12/11/2026), but the project's
-migration history (`supabase_migrations.schema_migrations`) has none of them except `20261112062004`: they were run
-in the SQL Editor, which records nothing. `supabase db push` would therefore try to run them again. Before using it, record them
-without running them (`supabase migration repair --status applied <version>` for each), or keep applying with the
-Supabase MCP `apply_migration`, which records the version (as `20261112062004` was).
+Every file in this folder now has its version in the live project's history (`supabase_migrations.schema_migrations`),
+and every version there has its file here (checked both ways on 12/11/2026):
+
+- The fifteen migrations after `20261104184718_ip_access` that were run in the SQL Editor (which records nothing) were
+  recorded with their name and an empty `statements` list, as the nine of 2026-10-05 below, after checking each one's
+  tables, columns, functions, constraints and Storage bucket in the live schema: `20261109150000` to `20261111180000`,
+  `20261112090000` and `20261112100000`. `20261112062004` was applied with `apply_migration`, which records it.
+- Four files carried another version than the one the live project recorded for them and were renamed to it (same name,
+  same order): `20261010190000` → `20261010194136_platform_notices`, `20261011120000` →
+  `20261011123945_release_transitions_fk_indexes`, `20261011170000` → `20261011172652_department_own_equipment`,
+  `20261011190000` → `20261011180045_handover_signature_per_handover`.
+
+So `supabase db push` has nothing to run again. Keep it that way: apply with `apply_migration` (or `db push`), which
+records the version, and name the file after the version the project gives it.
 
 ## How the versions line up
 
