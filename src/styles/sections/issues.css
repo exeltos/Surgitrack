@@ -73,7 +73,8 @@ html body .issues-fixed .issue-note-inline {
 /* One-click filters with counts, beside a list's search (Issues, Replacements). */
 .quick-filters {
   display: flex;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 4px;
   padding: 3px;
@@ -86,7 +87,7 @@ html body .issues-fixed .issue-note-inline {
   align-items: center;
   gap: 6px;
   min-height: 30px;
-  padding: 0 10px;
+  padding: 0 9px;
   border: 0;
   border-radius: 7px;
   background: transparent;
@@ -118,4 +119,16 @@ html body .issues-fixed .issue-note-inline {
 }
 .quick-filters button.active b {
   color: inherit;
+}
+/* On a laptop the quick filters sit closer, so the search keeps its room on the same row. */
+@media (max-width: 1500px) {
+  .quick-filters {
+    gap: 2px;
+    padding: 2px;
+  }
+  .quick-filters button {
+    gap: 4px;
+    padding: 0 6px;
+    font-size: 12px;
+  }
 }

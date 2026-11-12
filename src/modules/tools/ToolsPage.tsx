@@ -348,7 +348,7 @@ export default function ToolsPage() {
                   </tr>
                 );
               })}
-              {rows.hasMore && <MoreRows colSpan={5} onVisible={rows.showMore} />}
+              {rows.hasMore && <MoreRows colSpan={1} onVisible={rows.showMore} />}
             </tbody>
           </table>
         )}

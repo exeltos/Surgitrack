@@ -313,7 +313,7 @@ export default function SetsPage() {
                   </tr>
                 );
               })}
-              {rows.hasMore && <MoreRows colSpan={8} onVisible={rows.showMore} />}
+              {rows.hasMore && <MoreRows colSpan={1} onVisible={rows.showMore} />}
             </tbody>
           </table>
         )}

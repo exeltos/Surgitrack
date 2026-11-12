@@ -242,7 +242,7 @@ export default function StandaloneToolsPage() {
               items={[
                 {label: tr('Όλα'), count: scope.length, ...kpi()},
                 {
-                  label: tr('Με όριο χρήσεων'),
+                  label: tr('Με όριο'),
                   count: scope.filter(t => t.maxUses).length,
                   hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
                   ...kpi({limit: 'LIMITED'}),
@@ -428,7 +428,7 @@ export default function StandaloneToolsPage() {
                   })
                 : rows.visible.map(t => pieceRow(t))}
               {(grouped ? groupRows.hasMore : rows.hasMore) && (
-                <MoreRows colSpan={8} onVisible={grouped ? groupRows.showMore : rows.showMore} />
+                <MoreRows colSpan={1} onVisible={grouped ? groupRows.showMore : rows.showMore} />
               )}
             </tbody>
           </table>

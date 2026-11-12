@@ -301,7 +301,7 @@ export default function StockPage() {
                       </td>
                     </tr>
                   ))}
-                  {rows.hasMore && <MoreRows colSpan={7} onVisible={rows.showMore} />}
+                  {rows.hasMore && <MoreRows colSpan={1} onVisible={rows.showMore} />}
                 </tbody>
               </table>
             )}

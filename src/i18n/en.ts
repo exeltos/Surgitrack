@@ -787,6 +787,7 @@ export const en: Record<string, string> = {
   'Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.':
     'Instruments with few uses left, according to the warning threshold.',
   'Με όριο χρήσεων': 'With usage limit',
+  'Με όριο': 'Limited',
   Μεμονωμένα: 'Standalone',
   'Μεμονωμένα εργαλεία': 'Standalone instruments',
   'Μεμονωμένα εργαλεία σε χρήση': 'Standalone instruments in use',
