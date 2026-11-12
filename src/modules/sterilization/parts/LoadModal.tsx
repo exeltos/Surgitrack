@@ -148,29 +148,6 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     </label>
                   </>
                 )}
-                {loadModal === 'STERILIZATION' && (
-                  <div className="load-indicator-pick" role="group" aria-labelledby="load-indicator-title">
-                    <span id="load-indicator-title">{tr('Δείκτες στο φορτίο')}</span>
-                    <div className="load-indicator-chips">
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={loadChemicalOn}
-                          onChange={e => setLoadChemicalOn(e.target.checked)}
-                        />
-                        {tr('Χημικός')}
-                      </label>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={loadBiologicalOn}
-                          onChange={e => setLoadBiologicalOn(e.target.checked)}
-                        />
-                        {tr('Βιολογικός')}
-                      </label>
-                    </div>
-                  </div>
-                )}
               </div>
               {loadModal === 'STERILIZATION' && loadChemical === 'FAIL' && (
                 <div className="load-device-fail" role="alert">
@@ -185,13 +162,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 </div>
               )}
               {loadModal === 'STERILIZATION' && (
-                <BarcodeCapture
-                  title={tr('Προσθήκη στο φορτίο')}
-                  subtitle={tr('Σκανάρετε, πληκτρολογήστε ή χρησιμοποιήστε scanner υπολογιστή.')}
-                  feedback={loadScanFeedback}
-                  onBarcode={addBarcodeToLoad}
-                  suggest={loadCandidates}
-                />
+                <BarcodeCapture feedback={loadScanFeedback} onBarcode={addBarcodeToLoad} suggest={loadCandidates} />
               )}
               <section className="load-assets">
                 <div className="load-assets-head">
@@ -231,16 +202,37 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                           <strong>{item.name}</strong>
                           <small>{trData(item.department) || tr('Χωρίς τμήμα')}</small>
                         </span>
-                        {loadModal === 'STERILIZATION' && selected && (
-                          <CheckCircle2 className="load-scanned-mark" size={17} />
-                        )}
                       </label>
                     );
                   })}
                 </div>
               </section>
-              {/* The last things said before completing: the washing result (a washer) and the note, side by side. */}
+              {/* The last things said before completing: the indicators (a sterilizer) or the washing result (a washer), and
+                  the note, side by side. */}
               <div className="load-finish-row">
+                {loadModal === 'STERILIZATION' && (
+                  <div className="load-indicator-pick" role="group" aria-labelledby="load-indicator-title">
+                    <span id="load-indicator-title">{tr('Δείκτες στο φορτίο')}</span>
+                    <div className="load-indicator-chips">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={loadChemicalOn}
+                          onChange={e => setLoadChemicalOn(e.target.checked)}
+                        />
+                        {tr('Χημικός')}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={loadBiologicalOn}
+                          onChange={e => setLoadBiologicalOn(e.target.checked)}
+                        />
+                        {tr('Βιολογικός')}
+                      </label>
+                    </div>
+                  </div>
+                )}
                 {loadModal === 'WASHING' && (
                   <div className="load-indicator-pick" role="group" aria-labelledby="load-wash-result">
                     <span id="load-wash-result">{tr('Αποτέλεσμα πλύσης')}</span>

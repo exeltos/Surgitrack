@@ -4386,9 +4386,6 @@ td {
 .load-assets-list > label.selected {
   background: var(--c-gray-95-4);
 }
-.load-scanned-mark {
-  color: var(--c-green-50-2);
-}
 .load-modal-body:has(.load-scan-console) .load-assets {
   min-height: 180px;
   max-height: 290px;

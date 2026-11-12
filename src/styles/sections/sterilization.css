@@ -474,7 +474,6 @@ html body .ster-row-action .ster-row-note {
 /* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
 html body .load-modal {
   width: min(1180px, calc(100vw - 32px));
-  height: min(900px, calc(100dvh - 32px));
   max-height: calc(100dvh - 32px);
 }
 html body .load-modal .load-modal-body {
@@ -499,7 +498,6 @@ html body .load-indicator-pick legend {
   color: var(--c-cyan-50);
 }
 html body .load-modal .load-assets {
-  flex: 1 1 auto;
   max-height: none;
 }
 html body .load-modal .load-assets-list > label {
@@ -1018,7 +1016,8 @@ html body .delivery-batch-modal .handover-signature-row input {
 }
 html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
 html body .receipt-card-modal.workflow-modal.workflow-modal-delivery,
-html body .receipt-card-modal.workflow-modal.load-modal.washer-load {
+html body .receipt-card-modal.workflow-modal.load-modal.washer-load,
+html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load {
   height: auto !important;
   min-height: 0;
   max-height: calc(100dvh - 32px) !important;
@@ -2646,19 +2645,22 @@ html body .delivery-batch-modal .delivery-batch-confirm .cycle-note textarea {
   min-height: 150px;
 }
 
-/* Washer load: one row of cycle fields, the result and the note side by side under the content; the dialog is only
-   as tall as it needs, the content list scrolls when long. */
-html body .load-modal.washer-load {
+/* Washer and sterilizer load: one row of cycle fields, the result (or the indicators) and the note side by side under
+   the content; the dialog is only as tall as it needs, the content list scrolls when long. */
+html body .load-modal {
   height: auto;
   width: min(1100px, calc(100vw - 32px));
+}
+html body .load-modal.sterilizer-load .cycle-clean-fields {
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr);
 }
 html body .load-modal.washer-load .cycle-clean-fields {
   grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.7fr) minmax(0, 0.7fr);
 }
-html body .load-modal.washer-load .load-assets {
+html body .load-modal .load-assets {
   flex: 0 1 auto;
 }
-html body .load-modal.washer-load .load-assets-list {
+html body .load-modal .load-assets-list {
   max-height: 420px;
 }
 html body .load-modal .load-finish-row {

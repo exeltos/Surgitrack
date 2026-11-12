@@ -7,7 +7,8 @@ import {scanPlaceholder, useAssetSuggest, type AssetSuggestion} from './AssetSug
 export type BarcodeFeedback = {type: 'OK' | 'WARN' | 'ERROR'; message: string};
 
 type Props = {
-  title: string;
+  /** Shown above the field; without it the field says what it takes by its placeholder alone. */
+  title?: string;
   subtitle?: string;
   placeholder?: string;
   feedback?: BarcodeFeedback | null;
@@ -104,13 +105,15 @@ export default function BarcodeCapture({
   return (
     <section className="barcode-capture">
       <div className="barcode-capture-head">
-        <div>
-          <Barcode size={18} />
-          <span>
-            <strong>{title}</strong>
-            {subtitle && <small>{subtitle}</small>}
-          </span>
-        </div>
+        {title && (
+          <div>
+            <Barcode size={18} />
+            <span>
+              <strong>{title}</strong>
+              {subtitle && <small>{subtitle}</small>}
+            </span>
+          </div>
+        )}
         <button
           className={`barcode-camera-btn${cameraOpen ? ' active' : ''}`}
           type="button"
@@ -147,6 +150,7 @@ export default function BarcodeCapture({
           autoComplete="off"
           inputMode="text"
           placeholder={placeholder}
+          aria-label={title || placeholder}
           onChange={e => setInput(e.target.value.toUpperCase())}
           onKeyDown={e => {
             if (suggestions.onKeyDown(e)) return;
