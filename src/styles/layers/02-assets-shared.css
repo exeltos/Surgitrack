@@ -440,14 +440,6 @@
 }
 
 /* v0.20.1 — focused asset actions, larger creation flows, confirmation + preview */
-.form-grid-comfortable {
-  gap: 18px 20px;
-}
-.form-grid-comfortable input,
-.form-grid-comfortable select {
-  min-height: 44px;
-  font-size: 13px;
-}
 .empty-inline {
   padding: 28px;
   text-align: center;
@@ -1354,9 +1346,6 @@ td {
 .composer-list-workspace {
   padding-bottom: 10px;
 }
-.form-grid-comfortable {
-  row-gap: 18px;
-}
 .form-grid textarea {
   width: 100%;
   padding: 11px 12px;
@@ -1752,25 +1741,6 @@ td {
 }
 
 /* v0.25.0 — inferred initial placement from Department */
-.asset-inline-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-  min-height: 44px;
-}
-.asset-inline-info strong {
-  font-size: 13px;
-  color: #20343c;
-}
-.asset-inline-info small {
-  font-size: 11.5px;
-  line-height: 1.4;
-  color: var(--st-muted);
-}
 
 /* v0.26.7 — confirmations must always render above the asset workspace/topbar. */
 .confirm-dialog-backdrop {

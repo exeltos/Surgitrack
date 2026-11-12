@@ -132,8 +132,9 @@ export function SetReportModal({
               />
             </label>
             <label className="span-2 report-photo-input">
-              <Camera size={17} /> {tr('Φωτογραφίες')}
+              <Camera size={17} /> <b>{tr('Προσθήκη φωτογραφιών')}</b>
               <input
+                className="visually-hidden-file"
                 type="file"
                 accept="image/*"
                 capture="environment"
