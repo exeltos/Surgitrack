@@ -647,6 +647,16 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await page.locator('.load-barcode-entry input').fill('λα', {timeout: 3000});
       },
     });
+    // The batch delivery from the «Παράδοση» queue.
+    modals.push({
+      name: 'sterilization-batch-deliver-modal',
+      route: '/sterilization',
+      open: async () => {
+        await queue('READY');
+        await page.waitForTimeout(300);
+        await button(/^(Μαζική παράδοση|Batch delivery)/)();
+      },
+    });
     for (const [name, q, opener] of stages) {
       modals.push({name: `sterilization-queue-${name}`, route: '/sterilization', dialog: false, open: () => queue(q)});
       if (opener)
