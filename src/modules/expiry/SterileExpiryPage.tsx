@@ -5,13 +5,12 @@ import {Link, useSearchParams} from 'react-router-dom';
 import {ChevronRight} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import PageHeader from '../../components/ui/PageHeader';
-import KpiStrip from '../../components/ui/KpiStrip';
+import QuickFilters from '../../components/ui/QuickFilters';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import {ListEmpty} from '../../components/ui/EmptyState';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
-import {kpiFilters} from '../../core/kpiFilters';
 import {useRememberedState} from '../../core/listMemory';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
@@ -36,7 +35,8 @@ export default function SterileExpiryPage() {
     EXPIRING: all.filter(item => item.state === 'EXPIRING').length,
     EXPIRED: all.filter(item => item.state === 'EXPIRED').length,
   };
-  const kpi = kpiFilters({view: [view, setView], q: [q, setQ], department: [department, setDepartment]});
+  // One click picks what to see; the search and the department chosen stay.
+  const quick = (next: View) => ({active: view === next, onClick: () => setView(next)});
   const shown = all.filter(
     item =>
       (view === 'ALL' || (view === 'ALERT' ? item.state !== 'OK' : item.state === (view as View))) &&
@@ -45,10 +45,8 @@ export default function SterileExpiryPage() {
   );
   const order = useTableSort(shown, {
     name: item => item.name,
-    barcode: item => item.barcode,
     department: item => trData(item.department),
     place: item => statusLabel(item.assetState),
-    duration: item => item.shelfLifeMonths,
     sterilized: item => item.sterilizedOn,
     until: item => item.sterileUntil,
     left: item => item.daysLeft,
@@ -60,20 +58,32 @@ export default function SterileExpiryPage() {
         title={tr('Λήξεις αποστείρωσης')}
         description={tr('Σετ και εργαλεία που λήγουν ή έληξαν· όταν λήξουν χρειάζονται νέα επεξεργασία.')}
       />
-      <KpiStrip
-        compact
-        items={[
-          {label: tr('Χρειάζονται προσοχή'), value: counts.EXPIRING + counts.EXPIRED, ...kpi({view: 'ALERT'})},
-          {label: tr('Λήγουν σύντομα'), value: counts.EXPIRING, ...kpi({view: 'EXPIRING'})},
-          {label: tr('Έληξαν'), value: counts.EXPIRED, ...kpi({view: 'EXPIRED'})},
-          {label: tr('Αποστειρωμένα'), value: all.length, ...kpi({view: 'ALL'})},
-        ]}
-      />
       <div className="asset-list-controls">
         <AssetFilterBar
           query={q}
           onQueryChange={setQ}
           placeholder={tr('Ονομασία ή barcode...')}
+          extra={
+            <QuickFilters
+              items={[
+                {
+                  key: 'alert',
+                  label: tr('Χρειάζονται προσοχή'),
+                  count: counts.EXPIRING + counts.EXPIRED,
+                  ...quick('ALERT'),
+                },
+                {
+                  key: 'expiring',
+                  label: tr('Λήγουν σύντομα'),
+                  count: counts.EXPIRING,
+                  tone: 'warn',
+                  ...quick('EXPIRING'),
+                },
+                {key: 'expired', label: tr('Έληξαν'), count: counts.EXPIRED, tone: 'bad', ...quick('EXPIRED')},
+                {key: 'all', label: tr('Όλα'), count: all.length, ...quick('ALL')},
+              ]}
+            />
+          }
           filters={
             own
               ? []
@@ -89,7 +99,7 @@ export default function SterileExpiryPage() {
           }
         />
       </div>
-      <ScrollableListPanel withKpis ariaLabel={tr('Λήξεις αποστείρωσης')}>
+      <ScrollableListPanel ariaLabel={tr('Λήξεις αποστείρωσης')}>
         {shown.length === 0 ? (
           <ListEmpty
             total={view === 'ALL' ? all.length : 0}
@@ -110,14 +120,44 @@ export default function SterileExpiryPage() {
             <thead>
               <tr>
                 <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
-                <SortTh label="Barcode" sortKey="barcode" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Θέση')} sortKey="place" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Διάρκεια')} sortKey="duration" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Αποστείρωση')} sortKey="sterilized" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Λήξη')} sortKey="until" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Υπόλοιπο')} sortKey="left" sort={order.sort} onSort={order.toggle} />
-                <th>
+                {!departmentUser && (
+                  <SortTh
+                    className="col-dept"
+                    label={tr('Τμήμα')}
+                    sortKey="department"
+                    sort={order.sort}
+                    onSort={order.toggle}
+                  />
+                )}
+                <SortTh
+                  className="col-place"
+                  label={tr('Θέση')}
+                  sortKey="place"
+                  sort={order.sort}
+                  onSort={order.toggle}
+                />
+                <SortTh
+                  className="col-sterilized"
+                  label={tr('Αποστείρωση')}
+                  sortKey="sterilized"
+                  sort={order.sort}
+                  onSort={order.toggle}
+                />
+                <SortTh
+                  className="col-until"
+                  label={tr('Λήξη')}
+                  sortKey="until"
+                  sort={order.sort}
+                  onSort={order.toggle}
+                />
+                <SortTh
+                  className="col-left"
+                  label={tr('Υπόλοιπο')}
+                  sortKey="left"
+                  sort={order.sort}
+                  onSort={order.toggle}
+                />
+                <th className="col-open">
                   <span className="visually-hidden">{tr('Άνοιγμα')}</span>
                 </th>
               </tr>
@@ -134,28 +174,21 @@ export default function SterileExpiryPage() {
                           <Link className="row-title-link" to={to}>
                             {item.name}
                           </Link>
-                          <small className="row-sub">
-                            {item.kind === 'SET' ? tr('Σετ') : tr('Εργαλείο')}
-                            {/* On a tablet the barcode column gives its room to the name and shows here. */}
-                            <span className="expiry-sub-barcode mono"> · {item.barcode}</span>
-                          </small>
+                          <small className="row-sub mono">{item.barcode}</small>
                         </span>
                       </div>
                     </td>
-                    <td className="mono">{item.barcode}</td>
-                    <td>{trData(item.department) || '—'}</td>
-                    <td>
+                    {!departmentUser && <td className="col-dept">{trData(item.department) || '—'}</td>}
+                    <td className="col-place">
                       <StatusBadge value={item.assetState} />
                     </td>
-                    <td data-label={tr('Διάρκεια')}>
-                      {item.shelfLifeMonths ? tr('{0} μήνες', item.shelfLifeMonths) : '—'}
-                    </td>
-                    <td className="mono" data-label={tr('Αποστείρωση')}>
+                    <td className="col-sterilized" data-label={tr('Αποστείρωση')}>
                       {item.sterilizedOn ? formatExpiry(item.sterilizedOn) : '—'}
+                      {item.shelfLifeMonths ? (
+                        <small className="row-sub">{tr('{0} μήνες', item.shelfLifeMonths)}</small>
+                      ) : null}
                     </td>
-                    <td className="mono" data-label={tr('Λήξη')}>
-                      {formatExpiry(item.sterileUntil)}
-                    </td>
+                    <td data-label={tr('Λήξη')}>{formatExpiry(item.sterileUntil)}</td>
                     <td>
                       <ExpiryBadge entry={item} />
                     </td>
