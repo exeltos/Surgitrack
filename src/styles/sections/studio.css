@@ -2690,3 +2690,17 @@ html body .studio-security-card .studio-security-blocked > li:last-child {
 html body .studio-security-card .studio-security-blocked b.mono {
   font-size: 13px;
 }
+
+/* Roles: the role list and the permissions take the height left under the tabs, so their bottom edge is never
+   cut off. */
+@media (min-width: 901px) {
+  html body .studio-body-roles {
+    display: flex;
+    flex-direction: column;
+  }
+  html body .studio-body-roles > .studio-role-manager {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+}
