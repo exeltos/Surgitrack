@@ -428,6 +428,32 @@ html body .photo-viewer .icon-button {
     flex: 1 1 0;
     min-width: 0;
   }
+  /* Search, Filters and Download on one line on a phone: the two buttons show their icon only (the label stays for
+     screen readers), so Download no longer drops to a line of its own under the search. */
+  html body .asset-filter-bar:has(.action-menu):not(:has(.export-day)) {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  html body .asset-filter-bar:has(.action-menu):not(:has(.export-day)) .asset-filter-search {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  /* With the «Κατάσταση» day picker too, the search takes its own line and the buttons sit below it. */
+  html body .asset-filter-bar:has(.export-day) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  html body .asset-filter-bar:has(.export-day) .asset-filter-search {
+    flex: 1 1 100%;
+  }
+  html body .asset-filter-bar .action-menu-toggle {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  html body .asset-filter-bar .action-menu-toggle .action-menu-caret {
+    display: none;
+  }
+  html body .asset-filter-bar .action-menu-toggle > span,
   html body .asset-filter-bar .asset-filter-toggle[aria-pressed] span {
     position: absolute;
     width: 1px;

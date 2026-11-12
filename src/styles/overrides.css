@@ -3619,6 +3619,14 @@ html body .sets-registry .set-count-short .muted {
     justify-content: flex-end;
     max-width: 100%;
   }
+  /* The buttons share the width evenly, and the main action takes a whole line, instead of a ragged second row. */
+  html body .page-head-actions > * {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+  html body .page-head-actions > .app-button-primary {
+    flex-basis: 100%;
+  }
 }
 
 /* Issues and Replacements on a phone: each row is a card (the tables ran 100-370 px past the edge). */

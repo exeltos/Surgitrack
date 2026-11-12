@@ -1385,3 +1385,27 @@ html body .hospital-people .people-requests {
 html body .dash-list li.dash-movement {
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* Overview, Sterilization flow: rows of a steady height with a divider and a hover, instead of eight rows stretched
+   to fill the card with wide gaps between them. */
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview .dash-card .dash-bars {
+    grid-auto-rows: minmax(30px, 42px);
+    gap: 0;
+  }
+}
+html body .hospital-overview .dash-flow .dash-bar {
+  padding: 0 8px;
+  margin: 0 -8px;
+  border-radius: 8px;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .hospital-overview .dash-flow .dash-bar:last-child {
+  border-bottom: 0;
+}
+html body .hospital-overview .dash-flow .dash-bar:hover {
+  background: var(--c-gray-95);
+}
+html body .hospital-overview .dash-flow .dash-bar-track {
+  height: 10px;
+}
