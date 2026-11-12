@@ -7,7 +7,13 @@ import {effectiveState, workflowStageState, type WorkflowStageConfig, type Workf
  */
 
 export type ReturnTargetId = WorkflowStageId | 'DEPARTMENT';
-export type ReturnTarget = {id: ReturnTargetId; state: string; label: string};
+export type ReturnTarget = {
+  id: ReturnTargetId;
+  state: string;
+  label: string;
+  /** For the return to the department: which one (shown on its own, after «Τμήμα»). */
+  department?: string;
+};
 
 /** The stage the release waits in: it belongs to a whole load, so an item is never put back into it. */
 const NOT_A_TARGET: readonly WorkflowStageId[] = ['RELEASE'];
@@ -33,7 +39,7 @@ export function returnTargets(
   if (index < 0) return [];
   return [
     ...stageTargets(stages.slice(0, index)),
-    {id: 'DEPARTMENT', state: 'IN_DEPARTMENT', label: `Επιστροφή στο τμήμα · ${department}`},
+    {id: 'DEPARTMENT', state: 'IN_DEPARTMENT', label: `Τμήμα · ${department}`, department},
   ];
 }
 

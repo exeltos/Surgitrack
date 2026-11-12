@@ -2311,7 +2311,7 @@ export const en: Record<string, string> = {
   'Επιστροφή σε στάδιο ή στο τμήμα': 'Return to a stage or to the department',
   'Επιστροφή σε': 'Return to',
   'Τμήμα: {0}': 'Department: {0}',
-  'Επιστροφή σε: {0}': 'Return to: {0}',
+  'Τμήμα · {0}': 'Department · {0}',
   'Άνοιγμα στην Αποστείρωση': 'Open in Sterilization',
   'Πορεία στην Αποστείρωση': 'Progress through Sterilization',
   'ΕΠΟΜΕΝΟ ΒΗΜΑ': 'NEXT STEP',
