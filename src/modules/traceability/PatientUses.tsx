@@ -1,7 +1,8 @@
 import SortHeader from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
+import LedgerAsset from '../movements/LedgerAsset';
 import {useState} from 'react';
-import {ChevronRight, Clock3, Route, UserRound} from 'lucide-react';
+import {ChevronRight, Route, UserRound} from 'lucide-react';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -102,15 +103,15 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
         extra={<DownloadMenu table={table} onPrint={() => setReport(tableReportHtml(table(), getI18nLang()))} />}
       />
       <div className="movement-ledger trace-patients-ledger">
-        <div className="ledger-head">
+        <div
+          className="ledger-head"
+          title={tr(
+            'Κάθε φορά που ένα Σετ ή εργαλείο στάλθηκε προς Αποστείρωση με κωδικό ασθενούς. Πατήστε μια γραμμή για τον ασθενή.',
+          )}
+        >
           <div>
             <span>{tr('{0} καταγραφές', filtered.length)}</span>
           </div>
-          <small>
-            {tr(
-              'Κάθε φορά που ένα Σετ ή εργαλείο στάλθηκε προς Αποστείρωση με κωδικό ασθενούς. Πατήστε μια γραμμή για τον ασθενή.',
-            )}
-          </small>
         </div>
         <div className="ledger-columns">
           <span>
@@ -143,14 +144,9 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
                   title={tr('Ιχνηλάτηση ασθενούς {0}', m.patientCode || '')}
                 >
                   <span className="ledger-date">
-                    <Clock3 size={15} />
                     <b>{m.at}</b>
                   </span>
-                  <span className="ledger-asset">
-                    <small>{m.assetKind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
-                    <b>{barcode}</b>
-                    {rest.length > 0 && <em>{rest.join(' · ')}</em>}
-                  </span>
+                  <LedgerAsset kind={m.assetKind} barcode={barcode} name={rest.join(' · ') || undefined} />
                   <span className="ledger-route">
                     <i>{trData(m.from)}</i>
                   </span>
@@ -161,7 +157,6 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
                     <UserRound size={15} />
                     <span>
                       <b>{trData(m.by)}</b>
-                      <small>{movementText(m.status)}</small>
                     </span>
                   </span>
                   <ChevronRight className="ledger-open" size={18} />

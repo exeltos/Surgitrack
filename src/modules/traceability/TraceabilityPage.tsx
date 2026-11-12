@@ -17,6 +17,8 @@ import type {Movement, ProcessLoadStatus, SetAsset, Tool} from '../../types/doma
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {movementText} from '../../core/movementText';
 import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
+import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
+import StatusBadge from '../../components/ui/StatusBadge';
 
 /** One sterilization cycle an item went through, from the load it was in (or an older per-item record). */
 type CycleEntry = {
@@ -371,16 +373,24 @@ export default function TraceabilityPage() {
             </div>
           )}
           {asset && (
-            <div className="trace-card">
-              <Route size={24} />
+            <div className="trace-card trace-item">
+              <AssetTypeIcon
+                kind={isSet ? 'SET' : 'TOOL'}
+                maxUses={tool?.maxUses}
+                wearCheck={tool?.wearCheck}
+                framed
+                size={16}
+              />
               <div>
-                <small>{isSet ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
-                <h2>{asset.barcode}</h2>
+                <h2>
+                  <span className="mono">{asset.barcode}</span> · {asset.name}
+                </h2>
                 <p>
-                  {asset.name} · {trData(asset.department) || tr('Απόθεμα')} · {statusLabel(asset.state)}
+                  {trData(asset.department) || tr('Απόθεμα')}
                   {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
                 </p>
               </div>
+              <StatusBadge value={asset.state} />
               <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
                 <ExternalLink size={16} /> {tr('Άνοιγμα καρτέλας')}
               </Link>
@@ -439,7 +449,19 @@ export default function TraceabilityPage() {
                         {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
                         <small>
                           {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
-                          {m.patientCode ? ` · ${tr('Ασθενής {0}', m.patientCode)}` : ''}
+                          {m.patientCode && (
+                            <>
+                              {' · '}
+                              <button
+                                type="button"
+                                className="trace-patient-link"
+                                title={tr('Ιχνηλάτηση ασθενούς {0}', m.patientCode)}
+                                onClick={() => setParams({tab: 'patients', patient: m.patientCode!}, {replace: true})}
+                              >
+                                {tr('Ασθενής {0}', m.patientCode)}
+                              </button>
+                            </>
+                          )}
                         </small>
                       </div>
                     </div>
