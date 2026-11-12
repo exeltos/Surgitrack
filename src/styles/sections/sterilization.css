@@ -2507,8 +2507,7 @@ html body .content:has(> .equipment-page) {
    the open stage stands out, an empty one fades. On a phone it scrolls sideways. */
 html body .sterilization-workspace .sterile-queues.ster-steps {
   display: flex;
-  justify-content: space-between;
-  gap: 6px;
+  gap: 2px;
   padding: 4px;
   overflow-x: auto;
   border: 1px solid var(--c-gray-90-3);
@@ -2519,7 +2518,8 @@ html body .sterilization-workspace .sterile-queues.ster-steps {
 html body .sterilization-workspace .sterile-queues.ster-steps button {
   position: relative;
   display: inline-flex;
-  flex: 0 0 auto;
+  /* Every stage takes an equal share of the bar, however many the hospital uses: no empty gaps between them. */
+  flex: 1 1 0;
   align-items: center;
   justify-content: center;
   gap: 7px;
@@ -2558,6 +2558,7 @@ html body .sterilization-workspace .sterile-queues.ster-steps button > strong {
   text-align: center;
 }
 html body .sterilization-workspace .sterile-queues.ster-steps > .ster-step-arrow {
+  flex: 0 0 auto;
   align-self: center;
   color: var(--c-gray-70);
   font-size: 16px;
