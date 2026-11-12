@@ -119,7 +119,7 @@ describe('Reports', () => {
     for (const cell of within(results()).getAllByText('Μη επιβεβαιωμένη')) expect(cell).toHaveClass('report-cell-warn');
   });
 
-  it('lists everything at once, and a card or a group narrows the list', () => {
+  it('lists everything at once, and a total narrows the list', () => {
     renderPage(<ReportsPage />);
     expect(within(screen.getByRole('list', {name: 'Σύνολα'})).getAllByRole('button').length).toBeGreaterThan(1);
     const everything = bodyRows().length;
@@ -129,9 +129,7 @@ describe('Reports', () => {
     expect(bodyRows().length).toBeLessThan(everything);
     fireEvent.click(screen.getByRole('button', {name: 'Εμφάνιση όλων'}));
     expect(new Set(column('Τύπος')).size).toBeGreaterThan(1);
-    const group = screen.getByRole('group', {name: 'Ανά τμήμα'});
-    fireEvent.click(within(group).getAllByRole('button')[0]);
-    expect(bodyRows().length).toBeGreaterThan(0);
-    expect(bodyRows().length).toBeLessThan(everything);
+    // The split by department is gone: the Filters cover it.
+    expect(screen.queryByRole('group', {name: 'Ανά τμήμα'})).not.toBeInTheDocument();
   });
 });

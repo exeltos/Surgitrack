@@ -2241,8 +2241,8 @@ html body .studio-system-grid > section > header {
   margin-bottom: 0;
 }
 html body .studio-system-grid > section > label {
-  grid-template-columns: minmax(0, 1fr) 260px;
-  column-gap: 28px;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  column-gap: 48px;
   row-gap: 2px;
   align-items: center;
   margin: 0;
@@ -2430,11 +2430,6 @@ html body .studio-fact em i {
     row-gap: 6px;
   }
 }
-html body .settings-hint {
-  margin: 0 0 10px;
-  color: var(--st-muted);
-  font-size: 12.5px;
-}
 
 /* The flow's history tab: rename, restore, and the list of versions (what changed, who, when). */
 html body .studio-history {
@@ -2508,26 +2503,42 @@ html body .settings-categories {
   backdrop-filter: blur(4px);
 }
 
-/* Settings use the whole width: on a wide screen the rows of a card sit in two columns. */
-@media (min-width: 1100px) {
-  html body .studio-system-grid > section:not(.label-settings-card):not(.platform-contact) {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 56px;
-    align-content: start;
-  }
-  html body .studio-system-grid > section:not(.label-settings-card):not(.platform-contact) > :is(header, details) {
-    grid-column: 1 / -1;
-  }
-}
-
 /* Roles: a padlock instead of a long badge on every locked row, and a line that says what it means. */
 html body .studio-permission-lock {
   padding: 4px 6px;
   gap: 0;
 }
 
-/* The label card is a header and its edit button: a little air between them. */
-html body .studio-system-grid > .label-settings-card > .app-button {
-  margin: 14px 0 6px;
+/* A setting whose control is a button (the barcode label): laid out as the other rows, below a line. */
+html body .studio-system-grid > section > .studio-setting-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  column-gap: 48px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--c-gray-95);
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+html body .studio-system-grid > section > .studio-setting-row > small {
+  grid-column: 1;
+  grid-row: 2;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+html body .studio-system-grid > section > .studio-setting-row > .studio-setting-input {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+html body .studio-system-grid > section > .studio-setting-row > .studio-setting-input > .app-button {
+  width: 100%;
+  justify-content: center;
 }

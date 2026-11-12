@@ -70,42 +70,55 @@ html body .issues-fixed .issue-note-inline {
     grid-row: 1;
   }
 }
-/* One-click filters with counts, beside a list's search (Issues, Replacements). */
+/* Small figures above a list that filter it (QuickFilters): one slim row of equal tiles, label and count on one
+   line, the active one a light frosted glass. */
 .quick-filters {
   display: flex;
-  flex: 0 0 auto;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 4px;
-  padding: 3px;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.quick-filters button {
+  display: flex;
+  flex: 1 1 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 14px;
   border: 1px solid var(--c-gray-90);
   border-radius: 10px;
   background: var(--c-white);
-}
-.quick-filters button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 30px;
-  padding: 0 9px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
   color: var(--c-blue-35);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  white-space: nowrap;
+  text-align: left;
   cursor: pointer;
 }
+.quick-filters button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .quick-filters button:hover {
-  background: var(--c-gray-100-2);
+  border-color: var(--c-cyan-45);
 }
 .quick-filters button.active {
-  background: var(--c-cyan-35);
-  color: var(--c-white);
+  border-color: rgba(21, 90, 110, 0.6);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(21, 90, 110, 0.2));
+  color: var(--c-cyan-20);
+  font-weight: 750;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px rgba(21, 90, 110, 0.15),
+    0 3px 12px rgba(21, 90, 110, 0.2);
+  backdrop-filter: blur(6px);
 }
 .quick-filters b {
+  flex: 0 0 auto;
+  color: var(--c-blue-15-2);
+  font-size: 17px;
   font-weight: 800;
 }
 .quick-filters b.warn {
@@ -116,19 +129,4 @@ html body .issues-fixed .issue-note-inline {
 }
 .quick-filters b.good {
   color: var(--c-green-40-3);
-}
-.quick-filters button.active b {
-  color: inherit;
-}
-/* On a laptop the quick filters sit closer, so the search keeps its room on the same row. */
-@media (max-width: 1500px) {
-  .quick-filters {
-    gap: 2px;
-    padding: 2px;
-  }
-  .quick-filters button {
-    gap: 4px;
-    padding: 0 6px;
-    font-size: 12px;
-  }
 }

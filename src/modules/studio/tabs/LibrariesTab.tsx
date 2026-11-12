@@ -98,7 +98,6 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
             <section className="studio-manager-panel">
               <header className="studio-panel-head">
                 <div>
-                  <span className="eyebrow">{L('ΒΙΒΛΙΟΘΗΚΗ', 'LIBRARY')}</span>
                   <h2>{L(currentMeta.el, currentMeta.en)}</h2>
                   <p>{L(currentMeta.hintEl, currentMeta.hintEn)}</p>
                 </div>

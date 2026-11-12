@@ -32,6 +32,7 @@ import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
+import LedgerAsset from './LedgerAsset';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {parseDisplayDate} from '../../core/displayDate';
@@ -209,24 +210,29 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
   };
   return (
     <div className={embedded ? 'movements-workspace embedded' : 'movements-workspace'}>
-      <div className="page-head movements-head">
-        <div>
-          {!embedded && <h1>{tr('Ιστορικό')}</h1>}
-          <p>
-            {role === 'DEPARTMENT'
-              ? tr('Ιστορικό ιχνηλασιμότητας του τμήματος {0}.', trData(currentUser.department))
-              : tr('Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.')}
-          </p>
+      {!embedded && (
+        <div className="page-head movements-head">
+          <div>
+            {!embedded && <h1>{tr('Ιστορικό')}</h1>}
+            <p>
+              {role === 'DEPARTMENT'
+                ? tr('Ιστορικό ιχνηλασιμότητας του τμήματος {0}.', trData(currentUser.department))
+                : tr('Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.')}
+            </p>
+          </div>
+          <div className="movements-actions">
+            {canClean && !cleaning && (
+              <button onClick={() => setCleaning(true)} title={tr('Μόνο για τον owner της πλατφόρμας')}>
+                <Eraser size={16} /> {tr('Καθαρισμός ιστορικού')}
+              </button>
+            )}
+            <DownloadMenu
+              table={exportTable}
+              onPrint={() => setReport(tableReportHtml(exportTable(), getI18nLang()))}
+            />
+          </div>
         </div>
-        <div className="movements-actions">
-          {canClean && !cleaning && (
-            <button onClick={() => setCleaning(true)} title={tr('Μόνο για τον owner της πλατφόρμας')}>
-              <Eraser size={16} /> {tr('Καθαρισμός ιστορικού')}
-            </button>
-          )}
-          <DownloadMenu table={exportTable} onPrint={() => setReport(tableReportHtml(exportTable(), getI18nLang()))} />
-        </div>
-      </div>
+      )}
       <AssetFilterBar
         className="movement-filter-bar"
         query={q}
@@ -275,6 +281,27 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
             onChange: setDateTo,
           },
         ]}
+        // Inside Traceability the page has no header row of its own: its actions sit on the search line.
+        extra={
+          embedded ? (
+            <>
+              {canClean && !cleaning && (
+                <button
+                  type="button"
+                  className="asset-filter-toggle"
+                  onClick={() => setCleaning(true)}
+                  title={tr('Μόνο για τον owner της πλατφόρμας')}
+                >
+                  <Eraser size={15} /> <span>{tr('Καθαρισμός ιστορικού')}</span>
+                </button>
+              )}
+              <DownloadMenu
+                table={exportTable}
+                onPrint={() => setReport(tableReportHtml(exportTable(), getI18nLang()))}
+              />
+            </>
+          ) : undefined
+        }
       />
       {cleaning && (
         <div className="movement-clean-bar" role="region" aria-label={tr('Καθαρισμός ιστορικού')}>
@@ -308,7 +335,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
               {filtered.length} {filtered.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
             </span>
           </div>
-          <small>
+          <small title={tr('Αμετάβλητο ιστορικό παραδόσεων, παραλαβών, ελέγχων και μετακινήσεων.')}>
             <ShieldCheck size={14} /> {tr('Οι εγγραφές δεν αλλάζουν')}
           </small>
         </div>
@@ -342,19 +369,13 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
                   aria-pressed={cleaning ? picked.has(m.id) : undefined}
                 >
                   <span className="ledger-date">
-                    {cleaning ? (
+                    {cleaning && (
                       <input type="checkbox" checked={picked.has(m.id)} readOnly tabIndex={-1} aria-hidden="true" />
-                    ) : (
-                      <Clock3 size={15} />
                     )}
                     <b>{m.at}</b>
                   </span>
-                  <span className="ledger-asset">
-                    <small>{m.assetKind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
-                    <b>{asset.barcode}</b>
-                    {asset.name !== asset.barcode && <em>{asset.name}</em>}
-                  </span>
-                  <span className="ledger-route">
+                  <LedgerAsset kind={m.assetKind} barcode={asset.barcode} name={asset.name} />
+                  <span className="ledger-route" title={`${trData(m.from)} → ${trData(m.to)}`}>
                     <i>{trData(m.from)}</i>
                     <ChevronRight size={15} />
                     <i>{trData(m.to)}</i>

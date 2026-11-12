@@ -16,6 +16,9 @@ import {parseDisplayDate} from '../../core/displayDate';
 import type {Movement, ProcessLoadStatus, SetAsset, Tool} from '../../types/domain';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {movementText} from '../../core/movementText';
+import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
+import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
+import StatusBadge from '../../components/ui/StatusBadge';
 
 /** One sterilization cycle an item went through, from the load it was in (or an older per-item record). */
 type CycleEntry = {
@@ -73,6 +76,15 @@ export default function TraceabilityPage() {
     : undefined;
   const nameMatches =
     needle && !exact ? all.filter(x => x.name.toLowerCase().includes(needle) || x.code?.toLowerCase() === needle) : [];
+  // Typing a name or code offers the Sets and instruments (members of Sets too) to pick from.
+  const suggest = useAssetSuggest(
+    q,
+    picked => {
+      setQ(picked);
+      remember(picked);
+    },
+    all,
+  );
   const asset = exact || (nameMatches.length === 1 ? nameMatches[0] : undefined);
   const choosing = !asset && nameMatches.length > 1;
   const isSet = !!asset && sets.some(s => s.id === asset.id);
@@ -184,11 +196,7 @@ export default function TraceabilityPage() {
         <div>
           <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
           <h1>{tr('Ιχνηλάτηση')}</h1>
-          <p>
-            {tr(
-              'Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός, χωρίς ονοματεπώνυμο).',
-            )}
-          </p>
+          <p>{tr('Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός).')}</p>
         </div>
         {tab === 'SEARCH' && related.length > 0 && (
           <div className="page-head-actions">
@@ -288,7 +296,7 @@ export default function TraceabilityPage() {
               </div>
             </div>
           ))}
-          <div className="timeline list-scroll-region">
+          <div className="timeline list-scroll-region" role="region" tabIndex={0} aria-label={tr('Κινήσεις')}>
             {[...patientMoves]
               .sort((a, b) => time(b.at) - time(a.at))
               .map(m => (
@@ -322,12 +330,15 @@ export default function TraceabilityPage() {
             <input
               value={q}
               onChange={e => setQ(e.target.value)}
+              onKeyDown={suggest.onKeyDown}
               onBlur={() => needle && remember(q)}
               placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+              aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
             />
             <button className="primary" type="submit">
               {tr('Αναζήτηση')}
             </button>
+            {suggest.listbox}
           </form>
           {!needle && recent.length > 0 && (
             <div className="trace-recent">
@@ -340,7 +351,8 @@ export default function TraceabilityPage() {
               ))}
             </div>
           )}
-          {choosing && (
+          {/* The list above offers them while typing; this one is for when it was closed (Esc). */}
+          {choosing && !suggest.suggestions.length && (
             <div className="trace-pick">
               <strong>{tr('Βρέθηκαν {0} — διαλέξτε ένα:', nameMatches.length)}</strong>
               <ul>
@@ -361,16 +373,24 @@ export default function TraceabilityPage() {
             </div>
           )}
           {asset && (
-            <div className="trace-card">
-              <Route size={24} />
+            <div className="trace-card trace-item">
+              <AssetTypeIcon
+                kind={isSet ? 'SET' : 'TOOL'}
+                maxUses={tool?.maxUses}
+                wearCheck={tool?.wearCheck}
+                framed
+                size={16}
+              />
               <div>
-                <small>{isSet ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</small>
-                <h2>{asset.barcode}</h2>
+                <h2>
+                  <span className="mono">{asset.barcode}</span> · {asset.name}
+                </h2>
                 <p>
-                  {asset.name} · {trData(asset.department) || tr('Απόθεμα')} · {statusLabel(asset.state)}
+                  {trData(asset.department) || tr('Απόθεμα')}
                   {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
                 </p>
               </div>
+              <StatusBadge value={asset.state} />
               <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
                 <ExternalLink size={16} /> {tr('Άνοιγμα καρτέλας')}
               </Link>
@@ -408,49 +428,57 @@ export default function TraceabilityPage() {
               </ul>
             </section>
           )}
-          <div className="timeline list-scroll-region">
-            {related.length ? (
-              related.map((m, i) => (
-                <Fragment key={m.id}>
-                  {i === own.length && carrierSet && (
-                    <h3 className="trace-group">
-                      {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
-                    </h3>
-                  )}
-                  <div className="timeline-item trace-step">
-                    <time>{m.at}</time>
-                    <div className="dot" />
-                    <div>
-                      <strong>
-                        {movementText(m.status)}{' '}
-                        {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                      </strong>
-                      {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
-                      <small>
-                        {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
-                        {m.patientCode ? ` · ${tr('Ασθενής {0}', m.patientCode)}` : ''}
-                      </small>
+          {needle ? (
+            <div className="timeline list-scroll-region" role="region" tabIndex={0} aria-label={tr('Κινήσεις')}>
+              {related.length ? (
+                related.map((m, i) => (
+                  <Fragment key={m.id}>
+                    {i === own.length && carrierSet && (
+                      <h3 className="trace-group">
+                        {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
+                      </h3>
+                    )}
+                    <div className="timeline-item trace-step">
+                      <time>{m.at}</time>
+                      <div className="dot" />
+                      <div>
+                        <strong>
+                          {movementText(m.status)}{' '}
+                          {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+                        </strong>
+                        {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
+                        <small>
+                          {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
+                          {m.patientCode && (
+                            <>
+                              {' · '}
+                              <button
+                                type="button"
+                                className="trace-patient-link"
+                                title={tr('Ιχνηλάτηση ασθενούς {0}', m.patientCode)}
+                                onClick={() => setParams({tab: 'patients', patient: m.patientCode!}, {replace: true})}
+                              >
+                                {tr('Ασθενής {0}', m.patientCode)}
+                              </button>
+                            </>
+                          )}
+                        </small>
+                      </div>
                     </div>
-                  </div>
-                </Fragment>
-              ))
-            ) : choosing ? null : (
-              <div className="empty">
-                <strong>
-                  {!needle
-                    ? tr('Αναζητήστε Σετ ή εργαλείο')
-                    : asset
-                      ? tr('Δεν βρέθηκαν κινήσεις')
-                      : tr('Δεν βρέθηκε Σετ ή εργαλείο με «{0}»', q.trim())}
-                </strong>
-                <span>
-                  {needle
-                    ? tr('Δοκιμάστε άλλο barcode ή όνομα.')
-                    : tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}
-                </span>
-              </div>
-            )}
-          </div>
+                  </Fragment>
+                ))
+              ) : choosing ? null : (
+                <div className="empty">
+                  <strong>
+                    {asset ? tr('Δεν βρέθηκαν κινήσεις') : tr('Δεν βρέθηκε Σετ ή εργαλείο με «{0}»', q.trim())}
+                  </strong>
+                  <span>{tr('Δοκιμάστε άλλο barcode ή όνομα.')}</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="trace-hint">{tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}</p>
+          )}
         </>
       )}
       {report && <PrintPreviewModal title={tr('Ιχνηλάτηση')} html={report} onClose={() => setReport(null)} />}

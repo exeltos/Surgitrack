@@ -26,7 +26,7 @@ import {
   type Row,
 } from './reportsMeta';
 import {buildReport} from './buildReport';
-import {reportGroups as splitRows, reportSummary} from './reportSummary';
+import {reportSummary} from './reportSummary';
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
@@ -135,7 +135,6 @@ export default function ReportsPage() {
   );
 
   const summary = reportSummary(active, reportData.rows, warningThreshold);
-  const split = splitRows(active, reportData.rows);
   // The whole report is listed until a card or a group narrows it.
   const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : reportData.rows), [view, reportData.rows]);
   const buildPreview = () => {
@@ -310,12 +309,16 @@ export default function ReportsPage() {
             {key: 'barcodes', label: 'Barcodes'},
           ]
         : reportData.columns;
-    return columns.filter(c =>
-      reportData.rows.some((row: Row) => {
-        const value = String(row[c.key] ?? '').trim();
-        return value !== '' && value !== '—';
-      }),
-    );
+    // A report with a barcode and a name shows the barcode under the name, not in a column of its own.
+    const underName = columns.some(c => c.key === 'barcode') && columns.some(c => c.key === 'name');
+    return columns
+      .filter(c => !(underName && c.key === 'barcode'))
+      .filter(c =>
+        reportData.rows.some((row: Row) => {
+          const value = String(row[c.key] ?? '').trim();
+          return value !== '' && value !== '—';
+        }),
+      );
   }, [active, reportData]);
   // Every column of the report sorts by its own title.
   const order = useTableSort(
@@ -393,45 +396,40 @@ export default function ReportsPage() {
               </button>
             ))}
           </div>
-          <div
-            className="reports-catalog-list"
-            role="group"
-            aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
-          >
-            {reports
-              .filter(report => report.group === activeMeta.group)
-              .map(report => {
-                const Icon = report.icon;
-                return (
-                  <button
-                    key={report.id}
-                    title={tr(report.purpose)}
-                    className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                    onClick={() => {
-                      setActive(report.id);
-                      setView(null);
-                    }}
-                  >
-                    <span className="reports-catalog-icon">
-                      <Icon size={18} />
-                    </span>
-                    <span>
-                      <strong>{tr(report.title)}</strong>
-                      <small>{tr(report.purpose)}</small>
-                    </span>
-                  </button>
-                );
-              })}
-          </div>
         </aside>
         <section className="reports-stage">
           <header className="reports-stage-head">
-            <div>
-              <span className="eyebrow">{tr('ΕΠΙΛΕΓΜΕΝΗ ΑΝΑΦΟΡΑ')}</span>
-              <h2>{tr(activeMeta.title)}</h2>
-              <p>
-                {tr(activeMeta.description)} {tr(activeMeta.purpose)}
-              </p>
+            {/* The title of the report is its button below; the heading is for readers who navigate by headings. */}
+            <h2 className="visually-hidden">{tr(activeMeta.title)}</h2>
+            <div
+              className="reports-catalog-list"
+              role="group"
+              aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
+            >
+              {reports
+                .filter(report => report.group === activeMeta.group)
+                .map(report => {
+                  const Icon = report.icon;
+                  return (
+                    <button
+                      key={report.id}
+                      title={tr(report.purpose)}
+                      className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setActive(report.id);
+                        setView(null);
+                      }}
+                    >
+                      <span className="reports-catalog-icon">
+                        <Icon size={18} />
+                      </span>
+                      <span>
+                        <strong>{tr(report.title)}</strong>
+                        <small>{tr(report.purpose)}</small>
+                      </span>
+                    </button>
+                  );
+                })}
             </div>
             <div className="reports-stage-actions" data-tour="report-download">
               <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
@@ -457,28 +455,6 @@ export default function ReportsPage() {
                 </li>
               ))}
             </ul>
-            {split.items.length > 1 && (
-              <div className="reports-split" role="group" aria-label={split.title}>
-                <strong>{split.title}</strong>
-                {split.items.map(item => (
-                  <button
-                    type="button"
-                    key={item.label}
-                    className={view?.label === `${split.title}: ${item.label}` ? 'active' : ''}
-                    onClick={() =>
-                      setView({
-                        label: `${split.title}: ${item.label}`,
-                        test: row => String(row[split.key] ?? '—') === item.label,
-                      })
-                    }
-                  >
-                    <span>{cellText(split.key, item.label)}</span>
-                    <i style={{width: `${Math.max(4, (item.value / split.items[0].value) * 100)}%`}} />
-                    <b>{item.value}</b>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
           <div className="reports-result-card">
             <div className="reports-result-head">
@@ -534,6 +510,9 @@ export default function ReportsPage() {
                             }
                           >
                             {cellText(c.key, row[c.key])}
+                            {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
+                              <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
+                            ) : null}
                           </td>
                         ))}
                       </tr>

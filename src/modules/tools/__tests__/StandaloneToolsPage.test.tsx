@@ -12,7 +12,7 @@ describe('the individual instruments in use', () => {
   it('counts the cards above the list for what the department chosen leaves, and says what each counts', () => {
     renderPage(<StandaloneToolsPage />);
     const all = value('Όλα');
-    const limitedAll = value('Με όριο');
+    const limitedAll = value('Με όριο χρήσεων');
     expect(all).toBeGreaterThan(0);
     // Pick the first department the list offers.
     const departmentFilter = screen.getByRole('button', {name: /Φίλτρα/});
@@ -21,8 +21,8 @@ describe('the individual instruments in use', () => {
     const option = [...select.options].find(o => o.value)!;
     fireEvent.change(select, {target: {value: option.value}});
     expect(value('Όλα')).toBeLessThanOrEqual(all);
-    expect(value('Με όριο')).toBeLessThanOrEqual(limitedAll);
-    expect(card('Με όριο').getAttribute('title')).toMatch(/μέγιστο αριθμό αποστειρώσεων/);
+    expect(value('Με όριο χρήσεων')).toBeLessThanOrEqual(limitedAll);
+    expect(card('Με όριο χρήσεων').getAttribute('title')).toMatch(/μέγιστο αριθμό αποστειρώσεων/);
   });
 
   it('has a new-instruments card and a way to download the list', () => {

@@ -176,35 +176,32 @@ export default function IssuesPage() {
       ) : (
         <>
           {tabs}
+          <QuickFilters
+            items={[
+              {
+                key: 'open',
+                label: tr('Ανοικτές'),
+                count: counted.filter(i => i.status === 'OPEN').length,
+                tone: 'warn',
+                ...card('OPEN'),
+              },
+              {
+                key: 'old',
+                label: tr('Πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
+                count: counted.filter(isOld).length,
+                tone: 'bad',
+                ...card('OPEN', 'OLD'),
+              },
+              {
+                key: 'resolved',
+                label: tr('Επιλυμένες'),
+                count: counted.filter(i => i.status === 'RESOLVED').length,
+                ...card('RESOLVED'),
+              },
+              {key: 'all', label: tr('Όλες'), count: counted.length, ...card('')},
+            ]}
+          />
           <AssetFilterBar
-            className="with-quick-filters"
-            extra={
-              <QuickFilters
-                items={[
-                  {
-                    key: 'open',
-                    label: tr('Ανοικτές'),
-                    count: counted.filter(i => i.status === 'OPEN').length,
-                    tone: 'warn',
-                    ...card('OPEN'),
-                  },
-                  {
-                    key: 'old',
-                    label: tr('Πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
-                    count: counted.filter(isOld).length,
-                    tone: 'bad',
-                    ...card('OPEN', 'OLD'),
-                  },
-                  {
-                    key: 'resolved',
-                    label: tr('Επιλυμένες'),
-                    count: counted.filter(i => i.status === 'RESOLVED').length,
-                    ...card('RESOLVED'),
-                  },
-                  {key: 'all', label: tr('Όλες'), count: counted.length, ...card('')},
-                ]}
-              />
-            }
             query={q}
             onQueryChange={setQ}
             placeholder={tr('Εργαλείο/Σετ, barcode, τύπος ή σημείωση...')}

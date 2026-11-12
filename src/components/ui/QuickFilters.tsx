@@ -13,7 +13,10 @@ export type QuickFilter = {
   tone?: 'warn' | 'bad' | 'good';
 };
 
-/** A short row of one-click filters with their counts, next to a list's search (in place of figure cards). */
+/**
+ * Small figures above a list, each one a filter: the label and its count on one line, the active one dark. A row
+ * about half the height of the old figure cards, so the list keeps its room and the search bar stays clean.
+ */
 export default function QuickFilters({items, label}: {items: QuickFilter[]; label?: string}) {
   return (
     <div className="quick-filters" role="group" aria-label={label || tr('Γρήγορα φίλτρα')}>
@@ -26,7 +29,7 @@ export default function QuickFilters({items, label}: {items: QuickFilter[]; labe
           aria-pressed={item.active}
           onClick={item.onClick}
         >
-          {item.label} <b className={item.tone || ''}>{item.count}</b>
+          <span>{item.label}</span> <b className={item.tone || ''}>{item.count}</b>
         </button>
       ))}
     </div>

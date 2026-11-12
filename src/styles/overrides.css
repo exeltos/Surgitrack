@@ -2154,23 +2154,6 @@ html body .tools-list-workspace > .asset-list-controls {
 html body .asset-filter-bar {
   padding: 5px 8px;
 }
-/* With quick filters everything stays on one row: the search gives its room, and the grouping button keeps only
-   its icon (its words are the tooltip). */
-html body .asset-filter-bar.with-quick-filters {
-  flex-wrap: nowrap;
-}
-html body .asset-filter-bar.with-quick-filters > .asset-filter-search {
-  flex: 1 1 120px;
-  min-width: 120px;
-}
-html body .asset-filter-bar.with-quick-filters .export-day-word,
-html body .asset-filter-bar.with-quick-filters .asset-filter-toggle[aria-pressed] span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-}
 html body .asset-list-controls > .icon-toggle {
   min-height: 46px;
 }

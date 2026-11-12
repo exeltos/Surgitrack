@@ -58,32 +58,30 @@ export default function SterileExpiryPage() {
         title={tr('Λήξεις αποστείρωσης')}
         description={tr('Σετ και εργαλεία που λήγουν ή έληξαν· όταν λήξουν χρειάζονται νέα επεξεργασία.')}
       />
+      <QuickFilters
+        items={[
+          {
+            key: 'alert',
+            label: tr('Χρειάζονται προσοχή'),
+            count: counts.EXPIRING + counts.EXPIRED,
+            ...quick('ALERT'),
+          },
+          {
+            key: 'expiring',
+            label: tr('Λήγουν σύντομα'),
+            count: counts.EXPIRING,
+            tone: 'warn',
+            ...quick('EXPIRING'),
+          },
+          {key: 'expired', label: tr('Έληξαν'), count: counts.EXPIRED, tone: 'bad', ...quick('EXPIRED')},
+          {key: 'all', label: tr('Όλα'), count: all.length, ...quick('ALL')},
+        ]}
+      />
       <div className="asset-list-controls">
         <AssetFilterBar
           query={q}
           onQueryChange={setQ}
           placeholder={tr('Ονομασία ή barcode...')}
-          extra={
-            <QuickFilters
-              items={[
-                {
-                  key: 'alert',
-                  label: tr('Χρειάζονται προσοχή'),
-                  count: counts.EXPIRING + counts.EXPIRED,
-                  ...quick('ALERT'),
-                },
-                {
-                  key: 'expiring',
-                  label: tr('Λήγουν σύντομα'),
-                  count: counts.EXPIRING,
-                  tone: 'warn',
-                  ...quick('EXPIRING'),
-                },
-                {key: 'expired', label: tr('Έληξαν'), count: counts.EXPIRED, tone: 'bad', ...quick('EXPIRED')},
-                {key: 'all', label: tr('Όλα'), count: all.length, ...quick('ALL')},
-              ]}
-            />
-          }
           filters={
             own
               ? []

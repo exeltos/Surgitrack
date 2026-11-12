@@ -4,7 +4,6 @@ import {LOAD_STATUS, type ReportId, type Row} from './reportsMeta';
 /** A card above the table: how many rows fit, and which they are (opens the list when pressed). */
 export type SummaryChip = {label: string; value: number; tone?: 'warn' | 'bad'; test: (row: Row) => boolean};
 /** The rows split by one column (department, sterilizer…), the biggest groups first. */
-export type SummaryGroup = {title: string; key: string; items: Array<{label: string; value: number}>};
 
 const all = () => true;
 
@@ -105,30 +104,4 @@ export function reportSummary(active: ReportId, rows: Row[], warningThreshold: n
       test: r => r.signature === tr('Μη επιβεβαιωμένη'),
     },
   ];
-}
-
-/** What each report is split by in its small chart. */
-const GROUP_BY: Record<ReportId, {title: () => string; key: string}> = {
-  inventory: {title: () => tr('Ανά τμήμα'), key: 'department'},
-  issues: {title: () => tr('Ανά είδος'), key: 'type'},
-  usage: {title: () => tr('Ανά τμήμα'), key: 'department'},
-  loads: {title: () => tr('Ανά κλίβανο'), key: 'equipment'},
-  expiry: {title: () => tr('Ανά τμήμα'), key: 'department'},
-  handovers: {title: () => tr('Ανά τμήμα'), key: 'department'},
-};
-
-/** The rows split by one column, biggest first (at most six groups). An inventory by specialty splits by that. */
-export function reportGroups(active: ReportId, rows: Row[]): SummaryGroup {
-  const spec = GROUP_BY[active];
-  const key = active === 'inventory' && rows.length && !('department' in rows[0]) ? 'specialty' : spec.key;
-  const counts = new Map<string, number>();
-  for (const row of rows) {
-    const value = String(row[key] ?? '—');
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  }
-  const items = [...counts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([label, value]) => ({label, value}));
-  return {title: spec.title(), key, items};
 }
