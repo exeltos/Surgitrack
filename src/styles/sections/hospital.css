@@ -1338,13 +1338,17 @@ html body .department-home .dash-activity .dash-columns {
     align-content: start;
   }
   /* Activity: the latest movements show whole (no scroll bar of their own); the chart takes the height left. */
+  /* Activity: the chart keeps a fixed height; the latest movements take the rest and scroll on their own (a thin
+     bar), so the last one is never cut. */
   html body .hospital-overview .dash-activity > .dash-columns {
-    flex: 1 1 140px;
-    min-height: 60px;
+    flex: 0 0 96px;
+    min-height: 0;
   }
   html body .hospital-overview .dash-activity > .dash-list {
-    flex: 0 0 auto;
-    overflow: visible;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
   }
 }
 /* Overview on a phone: the department bars get the room (the name wraps less than a bar shrinks). */

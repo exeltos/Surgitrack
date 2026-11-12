@@ -47,6 +47,13 @@ const QUEUE_OF: Partial<Record<AssetState, string>> = {
  */
 const DEPARTMENTS_SHOWN = 8;
 
+/** A movement's text without the load's inner id (L1794482016773-t8wvpx): it tells a person nothing. */
+const plainStatus = (text: string) =>
+  text
+    .replace(/ L\d{9,}-[a-z0-9]+/g, '')
+    .replace(/^(Φορτίο|Load) · /, '')
+    .trim();
+
 export default function HospitalOverviewPage() {
   const {sets, tools, retiredTools, issues, movements, lifecycleAlerts, purchaseOrders, processLoads} = useSurgi();
   // An issue or a movement names its Set or instrument as «barcode · name»: its row opens that card.
@@ -502,13 +509,13 @@ export default function HospitalOverviewPage() {
             <span>{dayLabel(perDay[perDay.length - 1].day)}</span>
           </div>
           <ul className="dash-list" tabIndex={0} aria-label={L('Τελευταίες κινήσεις', 'Latest movements')}>
-            {latestMovements.slice(0, 4).map(m => (
+            {latestMovements.slice(0, 12).map(m => (
               <li key={m.id}>
                 <History size={15} />
                 <Link to={assetPath(m.asset) || '/movements'}>
                   <b>{m.asset}</b>
                   <small>
-                    {movementText(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
+                    {plainStatus(movementText(m.status))} · {trData(m.from)} → {trData(m.to)} · {m.at}
                   </small>
                 </Link>
               </li>

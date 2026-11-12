@@ -111,10 +111,13 @@ beforeEach(() => {
 });
 
 describe('Sterilizers & Devices, one screen', () => {
-  it('lists every piece of equipment in a row: the library sterilizers and washers and the connected devices', async () => {
+  it('lists every piece of equipment in a row, each kind in its own tab: sterilizers, washers, connected devices', async () => {
     open();
     expect((await rowOf('ΚΛΙΒΑΝΟΣ 1')).textContent).toContain('Δίκτυο');
     expect((await rowOf('ΚΛΙΒΑΝΟΣ 2')).textContent).toContain('Χωρίς σύνδεση');
+    // The washers are in their own tab.
+    expect(screen.queryByText('ΠΛΥΝΤΗΡΙΟ 1')).toBeNull();
+    fireEvent.click(screen.getByRole('tab', {name: /Πλυντήρια/}));
     const washerRow = await rowOf('ΠΛΥΝΤΗΡΙΟ 1');
     expect(within(washerRow).getByText('Ανενεργή')).toBeInTheDocument();
   });

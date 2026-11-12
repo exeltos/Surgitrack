@@ -228,19 +228,24 @@ export default function EquipmentDetails({
         <section className="asset-section equipment-facts-card">
           <div className="asset-section-head">
             <div>
-              <span className="eyebrow">
-                {L(deviceKindLabel[row.kind].el, deviceKindLabel[row.kind].en).toUpperCase()}
-              </span>
               <h2>
                 {row.name}
                 {device && isSimulatedDevice(device) && (
                   <span className="device-sim-badge">{L('Προσομοίωση', 'Simulation')}</span>
                 )}
               </h2>
+              {/* What it is and its state on one line (the device's maker, serial number and connection with it). */}
+              <p className="equipment-facts-line">
+                {facts
+                  .filter(([, value]) => value)
+                  .map(([label, value]) => (label === L('Σειριακός αριθμός', 'Serial number') ? `S/N ${value}` : value))
+                  .join(' · ')}
+              </p>
             </div>
           </div>
-          <div className="asset-section-body">
-            {row.outOfService && (
+          {/* Its body only says it is out of service (the facts are on the line under the name). */}
+          {row.outOfService && (
+            <div className="asset-section-body">
               <div className="equipment-out" role="status">
                 <Wrench size={16} aria-hidden="true" />
                 <div>
@@ -251,24 +256,13 @@ export default function EquipmentDetails({
                   </small>
                 </div>
               </div>
-            )}
-            <dl className="equipment-facts">
-              {facts
-                .filter(([, value]) => value)
-                .map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-            </dl>
-          </div>
+            </div>
+          )}
         </section>
 
         <section className={`asset-section equipment-top${row.trouble?.items.length ? '' : ' equipment-wide'}`}>
           <div className="asset-section-head">
             <div>
-              <span className="eyebrow">{L('ΦΟΡΤΙΟ', 'LOAD')}</span>
               <h2>
                 {row.load ? L('Φορτίο στον κλίβανο', 'Load in the sterilizer') : L('Τελευταίο φορτίο', 'Last load')}
               </h2>
@@ -297,7 +291,6 @@ export default function EquipmentDetails({
           <section className="asset-section equipment-wide">
             <div className="asset-section-head">
               <div>
-                <span className="eyebrow">{L('ΔΟΚΙΜΕΣ', 'TESTS')}</span>
                 <h2>
                   {row.kind === 'WASHER'
                     ? L('Δοκιμές πλυντηρίου', 'Washer tests')
@@ -306,40 +299,33 @@ export default function EquipmentDetails({
               </div>
             </div>
             <div className="asset-section-body">
-              <p className="equipment-tests-intro">
-                {row.kind === 'WASHER'
-                  ? L(
-                      'Οι δοκιμές δείχνουν ότι το πλυντήριο καθαρίζει σωστά πριν φορτωθεί. Ο έλεγχος καθαρισμού με δείκτη λερώματος γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, το πλυντήριο δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Καθαρισμός».',
-                      'The tests show that the washer cleans properly before it is loaded. The cleaning test with a soil indicator is done every day before the first load, the other two every week. If a test fails, the washer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Cleaning” stage.',
-                    )
-                  : L(
-                      'Οι δοκιμές δείχνουν ότι ο κλίβανος δουλεύει σωστά πριν φορτωθεί. Το Bowie-Dick γίνεται κάθε μέρα πριν το πρώτο φορτίο, οι άλλες δύο κάθε εβδομάδα. Αν μια δοκιμή αποτύχει, ο κλίβανος δεν φορτώνεται μέχρι να καταγραφεί επιτυχής. Καταγράφονται και στην Αποστείρωση, στο στάδιο «Φόρτωση».',
-                      'The tests show that the sterilizer works properly before it is loaded. The Bowie-Dick is done every day before the first load, the other two every week. If a test fails, the sterilizer is not loaded until a passing one is recorded. They can also be recorded in Sterilization, in the “Loading” stage.',
-                    )}
-              </p>
+              {/* When each test is due, and how the results can come by themselves, on one line. */}
               <div className="equipment-test-devices">
-                {testDevices.length ? (
-                  <>
-                    <FlaskConical size={15} aria-hidden="true" />
-                    <span>
+                <FlaskConical size={15} aria-hidden="true" />
+                <span>
+                  {row.kind === 'WASHER'
+                    ? L(
+                        'Έλεγχος καθαρισμού κάθε μέρα πριν το πρώτο φορτίο, οι άλλες κάθε εβδομάδα.',
+                        'Cleaning test every day before the first load, the others every week.',
+                      )
+                    : L(
+                        'Bowie-Dick κάθε μέρα πριν το πρώτο φορτίο, οι άλλες κάθε εβδομάδα.',
+                        'Bowie-Dick every day before the first load, the others every week.',
+                      )}{' '}
+                  {testDevices.length ? (
+                    <>
                       {L('Συσκευή δοκιμών', 'Test device')}: <b>{testDevices.map(device => device.name).join(', ')}</b>{' '}
-                      —{' '}
-                      {L('τα αποτελέσματά της μπαίνουν εδώ αυτόματα.', 'its results are recorded here automatically.')}
+                      ({L('τα αποτελέσματα μπαίνουν αυτόματα', 'results are recorded automatically')}).
+                    </>
+                  ) : (
+                    <span className="muted">
+                      {L(
+                        'Με συσκευή δοκιμών τα αποτελέσματα έρχονται μόνα τους.',
+                        'With a test device the results come by themselves.',
+                      )}
                     </span>
-                  </>
-                ) : (
-                  <span className="muted">
-                    {row.kind === 'WASHER'
-                      ? L(
-                          'Αν έχετε συσκευή δοκιμών (δείκτης λερώματος, πρωτεΐνη), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
-                          'If you have a test device (soil indicator, protein), connect it so its results come here by themselves.',
-                        )
-                      : L(
-                          'Αν έχετε συσκευή δοκιμών (Bowie-Dick, βιολογική), συνδέστε την για να έρχονται εδώ τα αποτελέσματα μόνα τους.',
-                          'If you have a test device (Bowie-Dick, biological), connect it so its results come here by themselves.',
-                        )}
-                  </span>
-                )}
+                  )}
+                </span>
                 {devicesEnabled && isAdmin && (
                   <AppButton size="sm" icon={<Plus size={14} />} onClick={onConnectTestDevice}>
                     {L('Σύνδεση συσκευής δοκιμών', 'Connect a test device')}
@@ -415,7 +401,6 @@ export default function EquipmentDetails({
           <section className="asset-section equipment-top">
             <div className="asset-section-head">
               <div>
-                <span className="eyebrow">{L('ΙΣΤΟΡΙΚΟ', 'HISTORY')}</span>
                 <h2>
                   {row.kind === 'WASHER'
                     ? L('Αποτυχημένες πλύσεις', 'Failed washes')
@@ -464,7 +449,6 @@ export default function EquipmentDetails({
           <section className="asset-section equipment-wide equipment-cycles">
             <div className="asset-section-head">
               <div>
-                <span className="eyebrow">{L('ΣΥΣΚΕΥΗ', 'DEVICE')}</span>
                 <h2>{L('Κύκλοι που έστειλε η συσκευή', 'Cycles the device sent')}</h2>
               </div>
               <DownloadMenu table={table} disabled={!readings.length} />
