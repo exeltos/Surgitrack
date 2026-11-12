@@ -549,10 +549,7 @@ html body .load-release-modal {
 }
 html body .load-release-modal .workflow-modal-body {
   flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 12px 20px;
-  align-items: start;
   /* The left column (checks, tests, note) scrolls on a short window instead of being cut. */
 }
 html body .load-release-modal .release-check-card {
@@ -2661,31 +2658,47 @@ html body .sterilizer-rows .row-simulate {
   cursor: pointer;
 }
 
-/* Load release: as tall as its content. Left the checks and the note, right the sterilizer's tests and the load's
-   content (which scrolls when long); the two checks side by side. */
+/* Load release: as tall as its content, two columns side by side. Left the checks and the note (which takes what is
+   left), right the sterilizer's tests and the load's content: the card is tall (as the window allows) and only its
+   list scrolls, a sterilizer can hold many items. The two checks side by side. */
 html body .load-release-modal {
   width: min(1240px, calc(100vw - 32px));
 }
 html body .load-release-modal .workflow-modal-body {
-  grid-template-rows: auto auto auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-rows: auto;
+  align-items: stretch;
   overflow-y: auto;
 }
-html body .load-release-modal .release-check-card {
-  grid-row: 1 / span 2;
-  align-self: start;
+html body .load-release-modal .release-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
 }
-html body .load-release-modal .release-tests {
-  grid-row: 1;
-  align-self: start;
+html body .load-release-modal .release-col > * {
+  grid-column: auto;
+  grid-row: auto;
+  margin: 0;
 }
-html body .load-release-modal .cycle-note {
-  grid-row: 3;
+html body .load-release-modal .release-col > .cycle-note {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
   padding: 0;
 }
-html body .load-release-modal .load-manifest {
-  grid-row: 2 / span 2;
-  align-self: start;
-  max-height: 320px;
+html body .load-release-modal .release-col > .cycle-note textarea {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 64px;
+}
+html body .load-release-modal .release-col > .load-manifest {
+  flex: 0 0 auto;
+  height: clamp(160px, calc(100dvh - 470px), 560px);
+  max-height: none;
 }
 html body .load-release-modal .release-check-pair {
   display: grid;
