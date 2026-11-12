@@ -220,3 +220,15 @@ html body .trace-back {
   font-weight: 700;
   cursor: pointer;
 }
+
+/* The search: the suggestions list opens under it, and with nothing typed a line of help is all the page shows. */
+html body .trace-search {
+  position: relative;
+  margin-bottom: 10px;
+  padding: 6px 8px 6px 12px;
+}
+html body .trace-hint {
+  margin: 4px 2px 0;
+  color: var(--st-muted);
+  font-size: 13px;
+}

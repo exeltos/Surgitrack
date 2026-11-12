@@ -301,7 +301,6 @@ html body .reports-catalog-item strong {
   font-size: 12px;
 }
 html body .reports-stage-head {
-  padding: 8px 16px 4px;
   gap: 12px;
 }
 html body .reports-stage-head .eyebrow {
@@ -384,4 +383,26 @@ html body .reports-category:focus-visible {
 }
 html body .reports-catalog-list {
   padding: 8px 0 4px;
+}
+
+/* The report choices sit in the header of the report's card, with the download at its end: one row. */
+html body .reports-stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 6px;
+}
+html body .reports-stage-head .reports-catalog-list {
+  flex: 1 1 auto;
+  padding: 0;
+}
+html body .reports-stage-head .reports-stage-actions {
+  flex: 0 0 auto;
+}
+/* «355 εγγραφές» next to its title, on one line. */
+html body .reports-result-head > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }

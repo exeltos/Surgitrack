@@ -449,7 +449,6 @@ export const en: Record<string, string> = {
   'Διαχειρίστηκε κατά τη σύνθεση & προετοιμασία': 'Handled during composition & preparation',
   Διαχειριστής: 'Administrator',
   ΕΚΚΡΕΜΟΤΗΤΕΣ: 'ISSUES',
-  'ΕΠΙΛΕΓΜΕΝΗ ΑΝΑΦΟΡΑ': 'SELECTED REPORT',
   ΕΡΓΑΛΕΙΟ: 'INSTRUMENT',
   Ειδικότητα: 'Specialty',
   'Εκκρεμεί τελικός έλεγχος': 'Final check pending',
@@ -2299,7 +2298,7 @@ export const en: Record<string, string> = {
   'Κάθε φορά που ένα Σετ ή εργαλείο στάλθηκε προς Αποστείρωση με κωδικό ασθενούς. Πατήστε μια γραμμή για τον ασθενή.':
     'Each time a Set or instrument was sent to Sterilization with a patient code. Click a row for the patient.',
   'Δεν βρέθηκαν καταγραφές με κωδικό ασθενούς': 'No records with a patient code found',
-  'Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός, χωρίς ονοματεπώνυμο).':
+  'Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός).':
     'What happened to a Set or instrument, or which items were recorded for a patient (code only, no name).',
   'Σετ / εργαλείο': 'Set / instrument',
   Ασθενής: 'Patient',
@@ -2311,7 +2310,6 @@ export const en: Record<string, string> = {
   'Barcode (S..., T...) ή όνομα Σετ/εργαλείου': 'Barcode (S..., T...) or Set/instrument name',
   'Το «{0}» είναι κωδικός ασθενούς.': '«{0}» is a patient code.',
   'Άνοιγμα ασθενούς': 'Open patient',
-  'Αναζητήστε Σετ ή εργαλείο': 'Search for a Set or instrument',
   'Δεν βρέθηκε Σετ ή εργαλείο με «{0}»': 'No Set or instrument found with «{0}»',
   'Δοκιμάστε άλλο barcode ή όνομα.': 'Try another barcode or name.',
   'Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.': 'Scan or type a barcode (S..., T...) or a name.',

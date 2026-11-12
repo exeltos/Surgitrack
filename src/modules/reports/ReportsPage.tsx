@@ -310,12 +310,16 @@ export default function ReportsPage() {
             {key: 'barcodes', label: 'Barcodes'},
           ]
         : reportData.columns;
-    return columns.filter(c =>
-      reportData.rows.some((row: Row) => {
-        const value = String(row[c.key] ?? '').trim();
-        return value !== '' && value !== '—';
-      }),
-    );
+    // A report with a barcode and a name shows the barcode under the name, not in a column of its own.
+    const underName = columns.some(c => c.key === 'barcode') && columns.some(c => c.key === 'name');
+    return columns
+      .filter(c => !(underName && c.key === 'barcode'))
+      .filter(c =>
+        reportData.rows.some((row: Row) => {
+          const value = String(row[c.key] ?? '').trim();
+          return value !== '' && value !== '—';
+        }),
+      );
   }, [active, reportData]);
   // Every column of the report sorts by its own title.
   const order = useTableSort(
@@ -393,45 +397,40 @@ export default function ReportsPage() {
               </button>
             ))}
           </div>
-          <div
-            className="reports-catalog-list"
-            role="group"
-            aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
-          >
-            {reports
-              .filter(report => report.group === activeMeta.group)
-              .map(report => {
-                const Icon = report.icon;
-                return (
-                  <button
-                    key={report.id}
-                    title={tr(report.purpose)}
-                    className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                    onClick={() => {
-                      setActive(report.id);
-                      setView(null);
-                    }}
-                  >
-                    <span className="reports-catalog-icon">
-                      <Icon size={18} />
-                    </span>
-                    <span>
-                      <strong>{tr(report.title)}</strong>
-                      <small>{tr(report.purpose)}</small>
-                    </span>
-                  </button>
-                );
-              })}
-          </div>
         </aside>
         <section className="reports-stage">
           <header className="reports-stage-head">
-            <div>
-              <span className="eyebrow">{tr('ΕΠΙΛΕΓΜΕΝΗ ΑΝΑΦΟΡΑ')}</span>
-              <h2>{tr(activeMeta.title)}</h2>
-              <p>
-                {tr(activeMeta.description)} {tr(activeMeta.purpose)}
-              </p>
+            {/* The title of the report is its button below; the heading is for readers who navigate by headings. */}
+            <h2 className="visually-hidden">{tr(activeMeta.title)}</h2>
+            <div
+              className="reports-catalog-list"
+              role="group"
+              aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
+            >
+              {reports
+                .filter(report => report.group === activeMeta.group)
+                .map(report => {
+                  const Icon = report.icon;
+                  return (
+                    <button
+                      key={report.id}
+                      title={tr(report.purpose)}
+                      className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setActive(report.id);
+                        setView(null);
+                      }}
+                    >
+                      <span className="reports-catalog-icon">
+                        <Icon size={18} />
+                      </span>
+                      <span>
+                        <strong>{tr(report.title)}</strong>
+                        <small>{tr(report.purpose)}</small>
+                      </span>
+                    </button>
+                  );
+                })}
             </div>
             <div className="reports-stage-actions" data-tour="report-download">
               <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
@@ -534,6 +533,9 @@ export default function ReportsPage() {
                             }
                           >
                             {cellText(c.key, row[c.key])}
+                            {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
+                              <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
+                            ) : null}
                           </td>
                         ))}
                       </tr>
