@@ -31,7 +31,8 @@ export default function HandoverSignature({
   autoFocus,
   assetIds = [],
 }: {
-  label: string;
+  /** Shown above the fields; left out where the section's own title already says it. */
+  label?: string;
   /** The Sets and instruments of this handover. */
   assetIds?: string[];
   /** The department the handover concerns, for the demo hint. */
@@ -97,7 +98,7 @@ export default function HandoverSignature({
         void sign();
       }}
     >
-      <span className="handover-signature-label">{label}</span>
+      {label && <span className="handover-signature-label">{label}</span>}
       <div className="handover-signature-row">
         <input
           autoFocus={autoFocus}

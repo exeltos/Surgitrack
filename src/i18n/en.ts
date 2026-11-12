@@ -1,5 +1,7 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
+  'Υπογραφή παραδίδοντα': 'Signature of who hands over',
+  'Παραλαμβάνει: {0}': 'Received by: {0}',
   '{0} · κύκλος {1}': '{0} · cycle {1}',
   'ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ': 'QUALITY GATE',
   'Χωρίς πλυντήριο': 'Without a washer',
@@ -416,8 +418,6 @@ export const en: Record<string, string> = {
   'Δεν υπάρχουν σημειώσεις.': 'No notes.',
   'Δεν υπάρχουν συνδεδεμένα εργαλεία στο demo.': 'No linked instruments in the demo.',
   'Δεν υπάρχουν φωτογραφίες': 'No photos',
-  'Δεν υποκαθιστά τον αναλυτικό Έλεγχο & Σύνθεση.': 'Does not replace the detailed Inspection & Assembly.',
-  'Δηλωμένη σύνθεση': 'Declared composition',
   'Δηλώθηκε εμφανής απόκλιση κατά τη μαζική φυσική παραλαβή.':
     'A visible deviation was declared at the batch physical receipt.',
   'Δηλώθηκε εμφανής απόκλιση κατά τη φυσική παραλαβή.': 'A visible deviation was declared at physical receipt.',
@@ -491,7 +491,6 @@ export const en: Record<string, string> = {
   'Επιβεβαίωση διαγραφής εργαλείου': 'Confirm instrument deletion',
   'Επιβεβαίωση εργαλείου': 'Instrument confirmation',
   'Επιβεβαίωση κάλυψης έλλειψης': 'Confirm shortage cover',
-  'Επιβεβαίωση με προσωπικό κωδικό.': 'Confirm with a personal code.',
   'Επιβεβαίωση φυσικής παραλαβής': 'Confirm physical receipt',
   'Επιλέχθηκε κατάλληλη και ακέραιη συσκευασία ή περιέκτης.': 'Suitable, intact packaging or container selected.',
   Επιλεγμένα: 'Selected',
@@ -564,7 +563,6 @@ export const en: Record<string, string> = {
   Εμφανίζονται: 'Shown',
   'Δεν εμφανίζονται': 'Not shown',
   'Η παραλαβή ολοκληρώθηκε': 'Receipt completed',
-  'Η παραλαβή ολοκληρώνεται μόνο μετά την ταυτοποίηση.': 'The receipt completes only after identification.',
   'Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.': 'Unit policy does not allow this exception.',
   'Η πολιτική της μονάδας δεν επιτρέπει παραλαβή από διαφορετικό τμήμα.':
     'Unit policy does not allow receipt from a different department.',
@@ -724,8 +722,6 @@ export const en: Record<string, string> = {
     'On confirmation, the selected physical instrument is added to the set and covers the shortage.',
   'Με την ολοκλήρωση καταγράφονται κοινό ID παράδοσης, χρήστης αποστείρωσης, παραλαμβάνων, τμήμα, ημερομηνία/ώρα και σύνδεση κάθε barcode με το ιστορικό κύκλου του.':
     'Completing records a shared delivery ID, the sterilization user, the receiver, department, date/time and links each barcode to its cycle history.',
-  'Με την ολοκλήρωση καταγράφονται κοινός κωδικός, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.':
-    'Completing records a shared batch ID, sender, receiver, department, time and the visible-deviation declaration per barcode.',
   'Αχρησιμοποίητα (0 χρήσεις)': 'Unused (0 uses)',
   Χρησιμοποιημένα: 'Used',
   'Έχει όριο χρήσεων και καμία χρήση ακόμα.': 'Has a use limit and no use yet.',
@@ -1157,8 +1153,6 @@ export const en: Record<string, string> = {
   'Σε καθαρισμό': 'Being cleaned',
   'Σε σύνθεση': 'Being assembled',
   'Σε συσκευασία': 'Being packed',
-  'Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα, στη «Σύνθεση».':
-    'The detailed function check comes later, at «Assembly».',
   'Σε αποθήκευση': 'In storage',
   'Σε αποστείρωση': 'In sterilization',
   'Σε προετοιμασία': 'In preparation',
@@ -1185,7 +1179,6 @@ export const en: Record<string, string> = {
   Στοιχεία: 'Details',
   'Στοιχεία Εργαλείου': 'Instrument details',
   'Στοιχεία Σετ': 'Set details',
-  'Στοιχεία παραλαβής': 'Receipt details',
   'Συμπληρώστε κωδικό': 'Enter a code',
   'Συνδεδεμένος χρήστης': 'Signed-in user',
   Συσκευασία: 'Packaging',
@@ -1220,7 +1213,6 @@ export const en: Record<string, string> = {
   'Τεχνικές ή μόνιμες παρατηρήσεις...': 'Technical or permanent notes...',
   'Τι θέλεις να αντιγραφεί από το': 'What should be copied from',
   Τμήμα: 'Department',
-  'Τμήμα αποστολής': 'Sending department',
   Τμήματα: 'Departments',
   'Το Σετ δεν βρέθηκε.': 'Set not found.',
   'Το Σετ θα προχωρήσει με': 'The set will proceed with',
@@ -1286,14 +1278,11 @@ export const en: Record<string, string> = {
   'Υπόλοιπο χρήσεων': 'Uses left',
   'ΦΟΡΤΙΟ ΑΠΟΣΤΕΙΡΩΣΗΣ': 'STERILIZATION LOAD',
   'ΦΟΡΤΙΟ ΠΛΥΝΤΗΡΙΟΥ': 'WASHER LOAD',
-  'ΦΥΣΙΚΗ ΠΑΡΑΛΑΒΗ': 'PHYSICAL RECEIPT',
   Φθορά: 'Wear',
   'Φυσικά εργαλεία': 'Physical instruments',
   'Φυσικές παράμετροι κύκλου αποδεκτές': 'Cycle physical parameters acceptable',
-  'Φυσική παράδοση και στοιχεία παραλαμβάνοντα.': 'Physical handover and receiver details.',
   'Φυσική παραλαβή': 'Physical receipt',
   'Φυσική παραλαβή + καταμέτρηση': 'Physical receipt + count',
-  'Φυσική σύνθεση Σετ': 'Physical set composition',
   Φωτογραφία: 'Photo',
   'Φωτογραφία αντικειμένου': 'Item photo',
   Φωτογραφίες: 'Photos',
@@ -1334,7 +1323,6 @@ export const en: Record<string, string> = {
     'Without a department, the set is registered automatically as a stock set and stays whole.',
   'Χωρίς Τμήμα, το εργαλείο καταχωρείται αυτόματα στο Απόθεμα εργαλείων. Με Τμήμα, καταχωρείται ως μεμονωμένο σε χρήση.':
     'Without a department, the instrument goes to instrument stock automatically. With a department, it is registered as standalone in use.',
-  'Χωρίς απόκλιση': 'No deviation',
   'Χωρίς ειδικότητα': 'No specialty',
   'Χωρίς εμφανή απόκλιση': 'No visible deviation',
   'Χωρίς ονομασία': 'Unnamed',
@@ -1363,7 +1351,6 @@ export const en: Record<string, string> = {
   εργαλεία: 'instruments',
   'εργαλεία ·': 'instruments ·',
   'εργαλεία σε αυτόνομη χρήση': 'instruments in standalone use',
-  'εργαλεία — αναφορά μόνο αν εντοπιστεί εμφανές πρόβλημα': 'instruments — report only if a visible problem is found',
   'κατά την παραλαβή': 'at receipt',
   'κενό Σετ χωρίς φυσικά εργαλεία': 'empty set without physical instruments',
   'μαζική παραλαβή': 'batch receipt',

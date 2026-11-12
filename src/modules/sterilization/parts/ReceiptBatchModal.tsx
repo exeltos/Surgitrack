@@ -4,16 +4,7 @@ import {departmentsOf} from '../batchDepartments';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import BatchSetTools from '../BatchSetTools';
-import {
-  CheckCircle2,
-  ScanBarcode,
-  TriangleAlert,
-  UserRoundCheck,
-  X,
-  ShieldCheck,
-  IdCard,
-  UserCheck,
-} from 'lucide-react';
+import {CheckCircle2, ScanBarcode, TriangleAlert, UserRoundCheck, X} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -25,7 +16,6 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
     closeReceiptBatch,
     selectReceiptBatchDepartment,
     completeReceiptBatch,
-    currentUser,
     incoming,
     issues,
     openIssueReport,
@@ -72,15 +62,10 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                 <ScanBarcode size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('ΦΥΣΙΚΗ ΠΑΡΑΛΑΒΗ')}</span>
                 <h2>{tr('Μαζική παραλαβή')}</h2>
                 <p>
                   {tr('Ταυτοποίησε τον παραδίδοντα μία φορά και σκάναρε διαδοχικά τα αντικείμενα του ίδιου τμήματος.')}
                 </p>
-              </div>
-              <div className="delivery-batch-count">
-                <strong>{receiptBatchAssets.length}</strong>
-                <span>{tr('αντικείμενα')}</span>
               </div>
             </div>
             <div className="delivery-batch-body">
@@ -104,7 +89,6 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                         {receiptBatchDepartment ? ` · ${receiptBatchDepartment}` : ''}
                       </span>
                     </div>
-                    <small>{tr('Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα, στη «Σύνθεση».')}</small>
                   </div>
                   <BatchDepartmentPicker
                     departments={departmentsOf(incoming)}
@@ -192,29 +176,10 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                   </div>
                 </section>
                 <section className="delivery-batch-confirm">
-                  <div className="delivery-pair">
-                    <div className="delivery-person confirmed">
-                      <UserCheck size={19} />
-                      <div>
-                        <span>{tr('Παραλαμβάνει')}</span>
-                        <strong>{trData(currentUser.name)}</strong>
-                        <small>{trData(currentUser.department)}</small>
-                      </div>
-                    </div>
-                    <div className={`delivery-person ${receiptBatchIdentityValid ? 'confirmed' : ''}`}>
-                      <IdCard size={19} />
-                      <div>
-                        <span>{tr('Παραδίδει')}</span>
-                        <strong>
-                          {receiptBatchIdentityValid ? receiptBatchDeliverer?.name : tr('Αναμονή ταυτοποίησης')}
-                        </strong>
-                        <small>{receiptBatchDepartment || tr('Σκανάρετε πρώτα αντικείμενο')}</small>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Who receives is the person signed in: only who hands over signs here. */}
                   <section className="delivery-auth">
                     <HandoverSignature
-                      label={tr('Υπογραφή παραδίδοντα (κωδικός χρήστη + συνθηματικό)')}
+                      label={tr('Υπογραφή παραδίδοντα')}
                       department={receiptBatchDepartment}
                       disabled={!receiptBatchDepartment}
                       signer={receiptBatchDeliverer}
@@ -267,14 +232,6 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                       placeholder={tr('Προαιρετική κοινή παρατήρηση…')}
                     />
                   </label>
-                  <div className="delivery-trace-note">
-                    <ShieldCheck size={17} />
-                    <span>
-                      {tr(
-                        'Με την ολοκλήρωση καταγράφονται κοινός κωδικός, παραδίδων, παραλαμβάνων, τμήμα, χρόνος και η δήλωση εμφανής απόκλισης ανά barcode.',
-                      )}
-                    </span>
-                  </div>
                 </section>
               </div>
             </div>
