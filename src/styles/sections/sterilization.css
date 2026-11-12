@@ -392,40 +392,11 @@ html body .sterile-queues.modern button > span {
   cursor: pointer;
   text-decoration: underline;
 }
-.ster-row-note {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.release-load-picker {
-  display: grid;
-  gap: 4px;
-  margin-bottom: 10px;
-  color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-.release-load-picker select {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-  color: var(--c-cyan-20);
-  font-size: 13px;
-}
 html body .sterilization-workspace .ster-asset-cell.with-pick {
   grid-template-columns: 22px 44px minmax(0, 1fr);
 }
 html body .ster-asset-cell.with-pick .ster-row-pick {
   margin-right: 0;
-}
-html body .ster-row-action .ster-row-note {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: right;
 }
 /* Release: the two indicators side by side, with what the unit's policy says about them. */
 .release-indicators {
@@ -474,7 +445,6 @@ html body .ster-row-action .ster-row-note {
 /* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
 html body .load-modal {
   width: min(1180px, calc(100vw - 32px));
-  height: min(900px, calc(100dvh - 32px));
   max-height: calc(100dvh - 32px);
 }
 html body .load-modal .load-modal-body {
@@ -499,7 +469,6 @@ html body .load-indicator-pick legend {
   color: var(--c-cyan-50);
 }
 html body .load-modal .load-assets {
-  flex: 1 1 auto;
   max-height: none;
 }
 html body .load-modal .load-assets-list > label {
@@ -580,26 +549,15 @@ html body .load-release-modal {
 }
 html body .load-release-modal .workflow-modal-body {
   flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 12px 20px;
-  align-items: start;
   /* The left column (checks, tests, note) scrolls on a short window instead of being cut. */
-  overflow-y: auto;
-}
-html body .load-release-modal .release-load-picker {
-  grid-column: 1 / -1;
-  margin: 0;
 }
 html body .load-release-modal .release-check-card {
   grid-column: 1;
-  grid-row: 2;
   margin: 0;
 }
 html body .load-release-modal .load-manifest {
   grid-column: 2;
-  grid-row: 3 / span 2;
-  align-self: stretch;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -615,13 +573,10 @@ html body .load-release-modal .load-manifest > div {
 }
 html body .load-release-modal .release-tests {
   grid-column: 2;
-  grid-row: 2;
-  align-self: stretch;
   margin: 0;
 }
 html body .load-release-modal .cycle-note {
   grid-column: 1;
-  grid-row: 3;
   margin: 0;
 }
 html body .load-release-modal .cycle-note textarea {
@@ -671,11 +626,6 @@ html body .load-modal .load-assets-list > label {
 }
 html body .load-modal .load-assets-list span {
   grid-template-columns: 110px minmax(0, 1fr) 200px;
-}
-html body .load-release-modal .workflow-modal-body {
-  /* The picker, then the checks and the sterilizer's tests side by side, then the note and the load's content; the
-     last row takes what is left. */
-  grid-template-rows: auto auto auto minmax(0, 1fr);
 }
 html body .load-release-modal .cycle-note {
   align-self: start;
@@ -1016,9 +966,11 @@ html body .delivery-batch-modal .handover-signature-row input {
   min-width: 0;
   width: 100%;
 }
-html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
-html body .receipt-card-modal.workflow-modal.workflow-modal-delivery,
-html body .receipt-card-modal.workflow-modal.load-modal.washer-load {
+html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal.workflow-checkpoint-modal,
+html body .receipt-card-modal.workflow-modal.workflow-modal-delivery.workflow-modal-delivery,
+html body .receipt-card-modal.workflow-modal.load-modal.washer-load,
+html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load,
+html body .receipt-card-modal.workflow-modal.load-release-modal {
   height: auto !important;
   min-height: 0;
   max-height: calc(100dvh - 32px) !important;
@@ -1181,7 +1133,6 @@ html body .receipt-visible-deviation button {
 }
 /* Bulk receipt and delivery: the hint beside the list title wraps in the type of the title's own hint
    instead of running out of room in a larger one. */
-html body .delivery-list-actions small,
 html body .delivery-batch-assets .load-assets-head > small {
   max-width: 340px;
   overflow: visible;
@@ -1269,18 +1220,6 @@ html body .ster-load-badge.in {
   color: var(--c-cyan-30-5);
 }
 /* Release: the sterilizer and the cycle on two whole lines. */
-html body .ster-row-action .ster-row-note.ster-row-load {
-  display: grid;
-  gap: 1px;
-  white-space: normal;
-  overflow: visible;
-  line-height: 1.3;
-}
-html body .ster-row-load b {
-  color: var(--c-cyan-20);
-  font-size: 12px;
-  font-weight: 650;
-}
 @media (max-width: 760px) {
   .shelf-life-picker {
     grid-template-columns: 1fr;
@@ -1504,9 +1443,6 @@ html body .ster-row-load b {
 }
 
 /* Release: the loads still in the sterilizer come first, where their end of cycle is recorded. */
-.release-running-loads {
-  flex: 0 0 auto;
-}
 
 /* Composition on a phone: the name on its own line, the state and the button under it, all inside the row. */
 @media (max-width: 700px) {
@@ -2646,19 +2582,22 @@ html body .delivery-batch-modal .delivery-batch-confirm .cycle-note textarea {
   min-height: 150px;
 }
 
-/* Washer load: one row of cycle fields, the result and the note side by side under the content; the dialog is only
-   as tall as it needs, the content list scrolls when long. */
-html body .load-modal.washer-load {
+/* Washer and sterilizer load: one row of cycle fields, the result (or the indicators) and the note side by side under
+   the content; the dialog is only as tall as it needs, the content list scrolls when long. */
+html body .load-modal {
   height: auto;
   width: min(1100px, calc(100vw - 32px));
+}
+html body .load-modal.sterilizer-load .cycle-clean-fields {
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr);
 }
 html body .load-modal.washer-load .cycle-clean-fields {
   grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.7fr) minmax(0, 0.7fr);
 }
-html body .load-modal.washer-load .load-assets {
+html body .load-modal .load-assets {
   flex: 0 1 auto;
 }
-html body .load-modal.washer-load .load-assets-list {
+html body .load-modal .load-assets-list {
   max-height: 420px;
 }
 html body .load-modal .load-finish-row {
@@ -2675,4 +2614,155 @@ html body .load-modal .load-finish-row > .cycle-note {
 }
 html body .load-modal .load-finish-row textarea {
   min-height: 64px;
+}
+
+/* In the sterilizer: a row opens the load's card; the cycle in one column (phase, temperature and pressure on one
+   line, the progress bar and the minutes below). */
+html body .sterilizer-rows tbody tr.row-opens {
+  cursor: pointer;
+}
+html body .sterilizer-rows tbody tr.row-opens:hover > td {
+  background: var(--c-gray-100-2);
+}
+html body .sterilizer-rows .row-cycle {
+  min-width: 220px;
+}
+html body .sterilizer-rows .row-cycle-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-bottom: 5px;
+}
+html body .sterilizer-rows .row-cycle-line .bad {
+  color: var(--c-red-40-2);
+  font-weight: 700;
+}
+html body .sterilizer-rows td:first-child .row-name,
+html body .sterilizer-rows td:first-child small {
+  white-space: nowrap;
+}
+html body .sterilizer-rows .row-simulate {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 0;
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  color: var(--c-cyan-60);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Load release: as tall as its content, two columns side by side. Left the checks and the note (which takes what is
+   left), right the sterilizer's tests and the load's content: the card is tall (as the window allows) and only its
+   list scrolls, a sterilizer can hold many items. The two checks side by side. */
+html body .load-release-modal {
+  width: min(1240px, calc(100vw - 32px));
+}
+html body .load-release-modal .workflow-modal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-rows: auto;
+  align-items: stretch;
+  overflow-y: auto;
+}
+html body .load-release-modal .release-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+html body .load-release-modal .release-col > * {
+  grid-column: auto;
+  grid-row: auto;
+  margin: 0;
+}
+html body .load-release-modal .release-col > .cycle-note {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 0;
+}
+html body .load-release-modal .release-col > .cycle-note textarea {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 64px;
+}
+html body .load-release-modal .release-col > .load-manifest {
+  flex: 0 0 auto;
+  height: clamp(160px, calc(100dvh - 470px), 560px);
+  max-height: none;
+}
+html body .load-release-modal .release-check-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+/* Release queue: one block per load, its own release button. */
+html body .sterilization-workspace .ster-load-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--c-gray-95-3);
+}
+html body .sterilization-workspace .ster-load-group > span {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--c-cyan-20);
+  font-size: 14px;
+}
+html body .sterilization-workspace .ster-load-group small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+/* A queue whose rows have no status to show: the status column is left out and the specialty takes its room. */
+@media (min-width: 1101px) {
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-list-head > span:nth-child(4),
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-work-row > .ster-meta {
+    display: none;
+  }
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-list-head > span:nth-child(3),
+  html body .sterilization-workspace .ster-work-panel.no-status .ster-work-row > .ster-cell-specialty {
+    grid-column: span 2;
+  }
+}
+/* Delivery: one light button per row; the department's block above carries the strong «Παράδοση όλων». */
+html body .sterilization-workspace .ster-row-deliver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--c-gray-90);
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+}
+html body .sterilization-workspace .ster-row-deliver:hover {
+  border-color: var(--c-cyan-60);
+}
+/* Dialogs as tall as their content: on a short window the content scrolls and the buttons stay in view. */
+html body .workflow-checkpoint-modal > .workflow-checkpoint-body,
+html body .workflow-modal-delivery > .workflow-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+html body .workflow-checkpoint-modal > .workflow-modal-actions,
+html body .workflow-modal-delivery > .workflow-modal-actions {
+  flex: 0 0 auto;
 }

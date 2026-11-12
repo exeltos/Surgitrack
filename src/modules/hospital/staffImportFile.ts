@@ -36,14 +36,17 @@ export const cleanStaffName = (value: string) => value.trim().replace(/\s+/g, ' 
 const NAME = /^[A-ZΑ-ΩΆΈΉΊΌΎΏΪΫ][A-ZΑ-ΩΆΈΉΊΌΎΏΪΫ .'-]*$/u;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** The initial password (digits of the mobile number, +30 dropped), or null when it is not a plausible number. */
+/**
+ * The initial password (digits of the mobile number, +30 dropped), or null when it is not a plausible number. At least
+ * 10 digits, as the sign-in service takes no shorter password: a shorter number abroad needs its country code.
+ */
 export const phonePassword = (value: string) => {
   let digits = String(value ?? '').replace(/[^\d+]/g, '');
   if (digits.startsWith('+')) digits = digits.slice(1);
   digits = digits.replace(/\D/g, '');
   if (digits.startsWith('0030')) digits = digits.slice(4);
   else if (digits.startsWith('30') && digits.length === 12) digits = digits.slice(2);
-  return digits.length >= 8 && digits.length <= 15 ? digits : null;
+  return digits.length >= 10 && digits.length <= 15 ? digits : null;
 };
 
 /** 691••••678: enough to recognise the number, not to read it. */
@@ -160,7 +163,10 @@ export const importErrorText = (code: string, el: boolean) => {
     invalid_name: ['Μη έγκυρο όνομα', 'Invalid name'],
     invalid_role: ['Μη έγκυρος ρόλος', 'Invalid role'],
     invalid_department: ['Άγνωστο τμήμα', 'Unknown department'],
-    invalid_phone: ['Μη έγκυρο κινητό', 'Invalid mobile number'],
+    invalid_phone: [
+      'Μη έγκυρο κινητό (10 ψηφία· από το εξωτερικό με κωδικό χώρας)',
+      'Invalid mobile number (10 digits; from abroad with the country code)',
+    ],
     invalid_email: ['Μη έγκυρο email', 'Invalid email'],
     already_exists: ['Υπάρχει ήδη', 'Already exists'],
     email_taken: ['Το email χρησιμοποιείται ήδη', 'The email is already used'],

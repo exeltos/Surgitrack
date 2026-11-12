@@ -9,7 +9,6 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
   const withTests = useHasModule('EQUIPMENT_TESTS');
   const {
     closeLoadRelease,
-    awaitingLoads,
     completeLoadRelease,
     releaseLoadBi,
     releaseLoadChecks,
@@ -21,7 +20,6 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
     setReleaseLoadBi,
     setReleaseLoadChecks,
     setReleaseLoadChem,
-    setReleaseLoadId,
     setReleaseLoadNote,
   } = s;
   const chemPlanned = selectedReleaseLoad?.chemicalIndicatorResult !== undefined;
@@ -38,116 +36,110 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 <ShieldCheck size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ')}</span>
-                <h2>{loadLabel(selectedReleaseLoad)}</h2>
+                <h2>{tr('Αποδέσμευση · {0}', loadLabel(selectedReleaseLoad))}</h2>
                 <p>
                   {selectedReleaseLoad.program} · {selectedReleaseLoad.items.length} {tr('αντικείμενα')}
                 </p>
               </div>
             </div>
             <div className="workflow-modal-body">
-              {awaitingLoads.length > 1 && (
-                <label className="release-load-picker">
-                  {tr('Φορτίο / κλίβανος')}
-                  <select value={selectedReleaseLoad.id} onChange={e => setReleaseLoadId(e.target.value)}>
-                    {awaitingLoads.map(load => (
-                      <option key={load.id} value={load.id}>
-                        {loadLabel(load)} · {load.items.length} {tr('αντικείμενα')}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-              <section className="release-check-card">
-                <div className="receipt-section-title">
-                  <div>
-                    <strong>{tr('Έλεγχοι φορτίου')}</strong>
-                    <span>
-                      {tr('Η απόφαση εφαρμόζεται σε όλα τα αντικείμενα που συνδέονται με το συγκεκριμένο φορτίο.')}
-                    </span>
+              {/* Left the checks and the note (it takes what is left), right the sterilizer's tests and the load's
+                  content (its list scrolls): each column on its own, so neither leaves a gap in the other. */}
+              <div className="release-col">
+                <section className="release-check-card">
+                  <div className="receipt-section-title">
+                    <div>
+                      <strong>{tr('Έλεγχοι φορτίου')}</strong>
+                    </div>
+                    <ShieldCheck size={18} />
                   </div>
-                  <ShieldCheck size={18} />
-                </div>
-                <label className="release-check-row">
-                  <input
-                    type="checkbox"
-                    checked={releaseLoadChecks.physicalParametersOk}
-                    onChange={e => setReleaseLoadChecks(v => ({...v, physicalParametersOk: e.target.checked}))}
-                  />
-                  <span>
-                    <strong>{tr('Φυσικές παράμετροι κύκλου αποδεκτές')}</strong>
-                  </span>
-                </label>
-                <label className="release-check-row">
-                  <input
-                    type="checkbox"
-                    checked={releaseLoadChecks.packagingIntegrityOk}
-                    onChange={e => setReleaseLoadChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
-                  />
-                  <span>
-                    <strong>{tr('Συσκευασίες στεγνές και ακέραιες')}</strong>
-                  </span>
-                </label>
-                <div className="release-indicators">
-                  {showChem && (
-                    <label>
-                      {tr('Χημικός δείκτης')}
-                      <select
-                        value={releaseLoadChem}
-                        onChange={e => setReleaseLoadChem(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
-                      >
-                        <option value="NOT_RECORDED">{tr('Δεν έγινε')}</option>
-                        <option value="PASS">{tr('Επιτυχής')}</option>
-                        <option value="FAIL">{tr('Ανεπιτυχής')}</option>
-                      </select>
+                  <div className="release-check-pair">
+                    <label className="release-check-row">
+                      <input
+                        type="checkbox"
+                        checked={releaseLoadChecks.physicalParametersOk}
+                        onChange={e => setReleaseLoadChecks(v => ({...v, physicalParametersOk: e.target.checked}))}
+                      />
+                      <span>
+                        <strong>{tr('Φυσικές παράμετροι κύκλου αποδεκτές')}</strong>
+                      </span>
                     </label>
-                  )}
-                  {showBi && (
-                    <label>
-                      {tr('Βιολογικός δείκτης')}
-                      <select
-                        value={releaseLoadBi}
-                        onChange={e => setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')}
-                      >
-                        <option value="NOT_REQUIRED">{tr('Δεν έγινε')}</option>
-                        <option value="PASS">{tr('Επιτυχής')}</option>
-                        <option value="PENDING">{tr('Σε αναμονή')}</option>
-                        <option value="FAIL">{tr('Ανεπιτυχής')}</option>
-                      </select>
+                    <label className="release-check-row">
+                      <input
+                        type="checkbox"
+                        checked={releaseLoadChecks.packagingIntegrityOk}
+                        onChange={e => setReleaseLoadChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
+                      />
+                      <span>
+                        <strong>{tr('Συσκευασίες στεγνές και ακέραιες')}</strong>
+                      </span>
                     </label>
-                  )}
-                </div>
-                <p className={`release-indicator-hint${releaseVerdict.ok ? ' ok' : ''}`}>
-                  {releaseVerdict.ok
-                    ? tr('Οι δείκτες επιτρέπουν την αποδέσμευση.')
-                    : releaseVerdict.reason === 'FAILED'
-                      ? tr('Ανεπιτυχής δείκτης: το φορτίο δεν αποδεσμεύεται, επιστρέφει σε επανεπεξεργασία.')
-                      : releaseVerdict.reason === 'CHEMICAL_REQUIRED'
-                        ? tr('Η μονάδα απαιτεί επιτυχή χημικό δείκτη.')
-                        : releaseVerdict.reason === 'BIOLOGICAL_REQUIRED'
-                          ? tr('Η μονάδα απαιτεί επιτυχή βιολογικό δείκτη.')
-                          : tr('Αρκεί ένας από τους δύο δείκτες: συμπλήρωσε τουλάχιστον έναν ως επιτυχή.')}
-                </p>
-              </section>
-              {withTests && <ReleaseTests equipment={selectedReleaseLoad.equipment} />}
-              <div className="load-manifest">
-                <strong>{tr('Περιεχόμενο φορτίου')}</strong>
-                {selectedReleaseLoad.items.map(item => (
-                  <div key={`${item.assetKind}:${item.assetId}`}>
-                    <span className="mono">{item.barcode}</span>
-                    <b>{item.assetName}</b>
-                    <small>{trData(item.department)}</small>
                   </div>
-                ))}
+                  <div className="release-indicators">
+                    {showChem && (
+                      <label>
+                        {tr('Χημικός δείκτης')}
+                        <select
+                          value={releaseLoadChem}
+                          onChange={e => setReleaseLoadChem(e.target.value as 'PASS' | 'FAIL' | 'NOT_RECORDED')}
+                        >
+                          <option value="NOT_RECORDED">{tr('Δεν έγινε')}</option>
+                          <option value="PASS">{tr('Επιτυχής')}</option>
+                          <option value="FAIL">{tr('Ανεπιτυχής')}</option>
+                        </select>
+                      </label>
+                    )}
+                    {showBi && (
+                      <label>
+                        {tr('Βιολογικός δείκτης')}
+                        <select
+                          value={releaseLoadBi}
+                          onChange={e =>
+                            setReleaseLoadBi(e.target.value as 'NOT_REQUIRED' | 'PASS' | 'PENDING' | 'FAIL')
+                          }
+                        >
+                          <option value="NOT_REQUIRED">{tr('Δεν έγινε')}</option>
+                          <option value="PASS">{tr('Επιτυχής')}</option>
+                          <option value="PENDING">{tr('Σε αναμονή')}</option>
+                          <option value="FAIL">{tr('Ανεπιτυχής')}</option>
+                        </select>
+                      </label>
+                    )}
+                  </div>
+                  <p className={`release-indicator-hint${releaseVerdict.ok ? ' ok' : ''}`}>
+                    {releaseVerdict.ok
+                      ? tr('Οι δείκτες επιτρέπουν την αποδέσμευση.')
+                      : releaseVerdict.reason === 'FAILED'
+                        ? tr('Ανεπιτυχής δείκτης: το φορτίο δεν αποδεσμεύεται, επιστρέφει σε επανεπεξεργασία.')
+                        : releaseVerdict.reason === 'CHEMICAL_REQUIRED'
+                          ? tr('Η μονάδα απαιτεί επιτυχή χημικό δείκτη.')
+                          : releaseVerdict.reason === 'BIOLOGICAL_REQUIRED'
+                            ? tr('Η μονάδα απαιτεί επιτυχή βιολογικό δείκτη.')
+                            : tr('Αρκεί ένας από τους δύο δείκτες: συμπλήρωσε τουλάχιστον έναν ως επιτυχή.')}
+                  </p>
+                </section>
+                <label className="cycle-note">
+                  {tr('Παρατήρηση αποδέσμευσης')}
+                  <textarea
+                    value={releaseLoadNote}
+                    onChange={e => setReleaseLoadNote(e.target.value)}
+                    placeholder={tr('Προαιρετική παρατήρηση / αιτιολογία…')}
+                  />
+                </label>
               </div>
-              <label className="cycle-note">
-                {tr('Παρατήρηση αποδέσμευσης')}
-                <textarea
-                  value={releaseLoadNote}
-                  onChange={e => setReleaseLoadNote(e.target.value)}
-                  placeholder={tr('Προαιρετική παρατήρηση / αιτιολογία…')}
-                />
-              </label>
+              <div className="release-col">
+                {withTests && <ReleaseTests equipment={selectedReleaseLoad.equipment} />}
+                <div className="load-manifest">
+                  <strong>{tr('Περιεχόμενο φορτίου')}</strong>
+                  {selectedReleaseLoad.items.map(item => (
+                    <div key={`${item.assetKind}:${item.assetId}`}>
+                      <span className="mono">{item.barcode}</span>
+                      <b>{item.assetName}</b>
+                      <small>{trData(item.department)}</small>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="modal-actions workflow-modal-actions release-actions">
               <button onClick={closeLoadRelease}>{tr('Ακύρωση')}</button>
@@ -160,7 +152,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 </button>
               )}
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>
-                <TriangleAlert size={16} /> {tr('Μη αποδέσμευση · όλο το φορτίο')}
+                <TriangleAlert size={16} /> {tr('Απόρριψη φορτίου')}
               </button>
               <button className="primary" disabled={!releaseLoadReady} onClick={() => completeLoadRelease('RELEASED')}>
                 <ShieldCheck size={16} /> {tr('Αποδέσμευση φορτίου ·') + ' '}

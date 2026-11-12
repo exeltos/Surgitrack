@@ -108,7 +108,7 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
           <span>{tr('Στον κλίβανο')}</span>
           <strong>{inSterilizer.length}</strong>
         </button>,
-        (stageEnabled('RELEASE') || awaitingRelease.length > 0 || inSterilizer.length > 0) && (
+        (stageEnabled('RELEASE') || awaitingRelease.length > 0) && (
           <button
             key="RELEASE"
             className={step('RELEASE', awaitingRelease.length)}

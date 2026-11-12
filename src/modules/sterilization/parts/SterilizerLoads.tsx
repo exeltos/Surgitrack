@@ -20,13 +20,21 @@ import type {ProcessLoadRecord} from '../../../types/domain';
 import LoadDetailsDialog from './LoadDetailsDialog';
 import {phaseText} from './cycleLabels';
 import {liveOf, simulationRunning, useNow} from './simulationClock';
+import {formatDate} from '../../../core/displayDate';
+
+/** What the load holds, by kind: «2 Σετ · 3 εργαλεία». */
+const contentText = (load: ProcessLoadRecord) => {
+  const sets = load.items.filter(item => item.assetKind === 'SET').length;
+  const tools = load.items.length - sets;
+  return [sets ? tr('{0} Σετ', sets) : '', tools ? tr('{0} εργαλεία', tools) : ''].filter(Boolean).join(' · ');
+};
 
 /**
- * The loads in the sterilizer right now, one row each: the sterilizer and cycle, the program, where the cycle is
- * (live for a simulated one: phase, temperature, pressure, progress), what is in it, and the actions. «Λεπτομέρειες»
- * opens the load's card with its Sets and instruments. Their Sets and instruments are locked until the end of
- * the cycle. «Στον κλίβανο» only shows them; Release (with `onFinish`) records the end of the cycle: «Τέλος κύκλου»
- * makes the load ready to release, «Αποτυχία κύκλου» sends the whole load back.
+ * The loads in the sterilizer right now, one row each: the sterilizer and cycle, the program (when and by whom it was
+ * loaded), where the cycle is (live for a simulated or connected one: phase, progress, temperature and pressure), what
+ * is in it, and the actions. The row (or «Λεπτομέρειες») opens the load's card with its Sets and instruments, which
+ * are locked until the end of the cycle. With `onFinish` («Στον κλίβανο») the end of the cycle is recorded here:
+ * «Τέλος κύκλου» makes the load ready to release, «Αποτυχία κύκλου» sends the whole load back.
  */
 export default function SterilizerLoads({
   loads,
@@ -51,7 +59,6 @@ export default function SterilizerLoads({
   const order = useTableSort(loads, {
     equipment: load => load.equipment,
     program: load => load.program,
-    status: load => load.status,
     items: load => load.items.length,
   });
   if (!loads.length && !onFinish)
@@ -64,6 +71,9 @@ export default function SterilizerLoads({
     );
   if (!loads.length) return null;
   const opened = loads.find(load => load.id === openId);
+  // The day is said only when it is not today.
+  const today = formatDate(new Date());
+  const loadedAt = (at: string) => (at.startsWith(today) ? at.slice(today.length).trim() : at);
   return (
     <div className="sterilizer-rows-wrap">
       {confirm}
@@ -72,10 +82,7 @@ export default function SterilizerLoads({
           <tr>
             <SortTh label={tr('Κλίβανος')} sortKey="equipment" sort={order.sort} onSort={order.toggle} />
             <SortTh label={tr('Πρόγραμμα')} sortKey="program" sort={order.sort} onSort={order.toggle} />
-            <SortTh label={tr('Κατάσταση')} sortKey="status" sort={order.sort} onSort={order.toggle} />
-            <th>{tr('Θερμοκρασία')}</th>
-            <th>{tr('Πίεση')}</th>
-            <th>{tr('Πρόοδος')}</th>
+            <th>{tr('Κύκλος')}</th>
             <SortTh label={tr('Αντικείμενα')} sortKey="items" sort={order.sort} onSort={order.toggle} />
             <th>
               <span className="sr-only">{tr('Ενέργειες')}</span>
@@ -87,7 +94,12 @@ export default function SterilizerLoads({
             const live = liveOf(load, now);
             const running = simulationRunning(load, now);
             return (
-              <tr key={load.id} className={live?.done ? 'done' : 'busy'}>
+              <tr
+                key={load.id}
+                className={`${live?.done ? 'done' : 'busy'} row-opens`}
+                title={tr('Λεπτομέρειες')}
+                onClick={() => setOpenId(load.id)}
+              >
                 <td data-label={tr('Κλίβανος')}>
                   <span className="row-name">
                     {live?.done ? <Hourglass size={16} aria-hidden="true" /> : <Flame size={16} aria-hidden="true" />}
@@ -99,33 +111,24 @@ export default function SterilizerLoads({
                 </td>
                 <td data-label={tr('Πρόγραμμα')}>
                   {load.program}
-                  <small>{tr('Φορτώθηκε {0} από {1}', load.createdAt, trData(load.createdByName))}</small>
+                  <small>
+                    {loadedAt(load.createdAt)} · {trData(load.createdByName)}
+                  </small>
                 </td>
-                <td data-label={tr('Κατάσταση')}>
-                  <span className={`row-phase${live?.done ? ' done' : ''}`}>
-                    {live ? phaseText(live.sample.phase) : tr('Σε εξέλιξη')}
-                  </span>
-                  {load.simulation && <small>{tr('Προσομοίωση')}</small>}
-                </td>
-                <td data-label={tr('Θερμοκρασία')} className="num">
-                  {live ? `${live.sample.temperature.toFixed(1)} °C` : '—'}
-                </td>
-                <td data-label={tr('Πίεση')} className="num">
-                  {live ? (
-                    <span
-                      className={
-                        live.sample.phase === 'HOLDING' && live.sample.pressure < MIN_HOLD_PRESSURE ? 'bad' : ''
-                      }
-                    >
-                      {live.sample.pressure.toFixed(2)} bar
-                    </span>
-                  ) : (
-                    '—'
-                  )}
-                </td>
-                <td data-label={tr('Πρόοδος')}>
+                <td data-label={tr('Κύκλος')} className="row-cycle">
                   {live ? (
                     <>
+                      <span className="row-cycle-line">
+                        <span className={`row-phase${live.done ? ' done' : ''}`}>{phaseText(live.sample.phase)}</span>
+                        <span className="num">{live.sample.temperature.toFixed(1)} °C</span>
+                        <span
+                          className={`num${
+                            live.sample.phase === 'HOLDING' && live.sample.pressure < MIN_HOLD_PRESSURE ? ' bad' : ''
+                          }`}
+                        >
+                          {live.sample.pressure.toFixed(2)} bar
+                        </span>
+                      </span>
                       <div
                         className="tile-progress"
                         role="progressbar"
@@ -136,24 +139,32 @@ export default function SterilizerLoads({
                       >
                         <i style={{width: `${live.progress}%`}} />
                       </div>
-                      <small>{tr('{0} / {1} λεπτά', Math.floor(live.minute), Math.ceil(live.end))}</small>
+                      <small>
+                        {tr('{0} / {1} λεπτά', Math.floor(live.minute), Math.ceil(live.end))}
+                        {load.simulation ? ` · ${tr('Προσομοίωση')}` : ''}
+                      </small>
                     </>
+                  ) : canSimulate && !load.simulation ? (
+                    // Demo: the cycle can be simulated, in the load's card (where the scenario is chosen); its data then
+                    // shows here.
+                    <button className="row-simulate" onClick={() => setOpenId(load.id)}>
+                      <FlaskConical size={14} /> {tr('Προσομοίωση')}
+                    </button>
                   ) : (
                     <small>{tr('Χωρίς ζωντανά δεδομένα')}</small>
                   )}
                 </td>
-                <td data-label={tr('Αντικείμενα')} className="num">
-                  {load.items.length}
-                </td>
-                <td className="row-actions">
+                <td data-label={tr('Αντικείμενα')}>{contentText(load)}</td>
+                {/* The buttons act on their own: a click on them does not open the card too. */}
+                <td className="row-actions" onClick={e => e.stopPropagation()}>
                   <div className="row-actions-inner">
-                    {canSimulate && !load.simulation && (
-                      <button className="row-details" onClick={() => setOpenId(load.id)}>
-                        <FlaskConical size={15} /> {tr('Προσομοίωση')}
-                      </button>
-                    )}
-                    <button className="row-details" onClick={() => setOpenId(load.id)}>
-                      <ListTree size={15} /> {tr('Λεπτομέρειες')}
+                    <button
+                      className="row-icon"
+                      title={tr('Λεπτομέρειες')}
+                      aria-label={tr('Λεπτομέρειες')}
+                      onClick={() => setOpenId(load.id)}
+                    >
+                      <ListTree size={15} />
                     </button>
                     {onFinish && (
                       <>
@@ -187,6 +198,7 @@ export default function SterilizerLoads({
                         </button>
                         <button
                           className="primary"
+                          data-tour="cycle-end"
                           disabled={!canFinish || running}
                           title={running ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
                           onClick={() => onFinish(load.id, 'PASSED')}

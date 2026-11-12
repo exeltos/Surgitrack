@@ -75,9 +75,12 @@ export function useDeliveryFlow(
     closeDelivery();
     setQueue('READY');
   };
-  const openDeliveryBatch = () => {
+  /** The batch delivery; with a department, everything ready for it is picked already. */
+  const openDeliveryBatch = (department?: string) => {
     setDeliveryBatchOpen(true);
-    setDeliverySelected(new Set());
+    setDeliverySelected(
+      new Set(department ? ready.filter(x => x.department === department).map(x => `${x.kind}:${x.id}`) : []),
+    );
     setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
     setDeliveryScanFeedback(null);

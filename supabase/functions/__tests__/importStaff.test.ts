@@ -310,5 +310,5 @@ describe('the initial password', () => {
     [6912345678, '6912345678'],
   ])('reads %s as %s', (given, wanted) => expect(phonePassword(given)).toBe(wanted));
 
-  it.each(['', 'abc', '12345', '1234567', '1'.repeat(16), null, undefined])('refuses %s', given => expect(phonePassword(given)).toBeNull());
+  it.each(['', 'abc', '12345', '1234567', '22123456', '221234567', '1'.repeat(16), null, undefined])('refuses %s', given => expect(phonePassword(given)).toBeNull());
 });
