@@ -70,7 +70,12 @@ export function ScanItemList({
     <ul className="scan-items">
       {[...items].reverse().map(item => (
         <li key={`${item.kind}:${item.id}`}>
-          <AssetTypeIcon kind={item.kind} maxUses={item.kind === 'TOOL' ? item.maxUses : undefined} size={16} />
+          <AssetTypeIcon
+            kind={item.kind}
+            maxUses={item.kind === 'TOOL' ? item.maxUses : undefined}
+            wearCheck={item.kind === 'TOOL' ? item.wearCheck : undefined}
+            size={16}
+          />
           <span>
             <b>
               <span className="mono">{item.barcode}</span> · {item.name}
@@ -247,6 +252,7 @@ export type DemoItem = {
   name: string;
   department?: string;
   maxUses?: number;
+  wearCheck?: boolean;
 };
 
 /** How many waiting items the Demo lists. */
@@ -270,7 +276,12 @@ export function DemoWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcod
         {(all ? items : items.slice(0, DEMO_SHOWN)).map(item => (
           <li key={`${item.kind}:${item.id}`}>
             <button type="button" onClick={() => onPick(item.barcode)}>
-              <AssetTypeIcon kind={item.kind} maxUses={item.kind === 'TOOL' ? item.maxUses : undefined} size={16} />
+              <AssetTypeIcon
+                kind={item.kind}
+                maxUses={item.kind === 'TOOL' ? item.maxUses : undefined}
+                wearCheck={item.kind === 'TOOL' ? item.wearCheck : undefined}
+                size={16}
+              />
               <span className="scan-demo-text">
                 <b>
                   <span className="mono">{item.barcode}</span> · {item.name}

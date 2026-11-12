@@ -279,7 +279,7 @@ export default function ToolsPage() {
                   <tr key={t.id}>
                     <td>
                       <div className="registry-asset-name">
-                        <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                        <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} wearCheck={t.wearCheck} framed size={15} />
                         <span>
                           <Link className="row-title-link" to={`/tools/${t.id}`}>
                             {t.name}
@@ -320,6 +320,10 @@ export default function ToolsPage() {
                           <span className="muted"> / {t.maxUses}</span>
                           {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
                         </>
+                      ) : t.wearCheck ? (
+                        <span title={tr('Χρήσεις με έλεγχο φθοράς')}>
+                          <b>{t.uses}</b> <span className="muted">{tr('χρήσεις')}</span>
+                        </span>
                       ) : (
                         <span className="muted">{tr('Χωρίς όριο')}</span>
                       )}

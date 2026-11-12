@@ -516,6 +516,8 @@ export const en: Record<string, string> = {
   Εργαλείο: 'Instrument',
   'Εργαλείο αντικατάστασης': 'Replacement instrument',
   'Εργαλείο περιορισμένων χρήσεων': 'Limited-use instrument',
+  χρήσεις: 'uses',
+  'Εργαλείο με έλεγχο φθοράς': 'Instrument with a wear check',
   'Εργαλείο που αφαιρείται': 'Instrument being removed',
   'Εργαλείο, κωδικός ή barcode σε {0}...': 'Instrument, code or barcode in {0}...',
   'Εργαλείο, κωδικός, barcode ή serial...': 'Instrument, code, barcode or serial...',

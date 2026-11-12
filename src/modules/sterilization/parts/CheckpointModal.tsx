@@ -32,6 +32,7 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
               <AssetTypeIcon
                 kind={checkpointDraft.draft.kind}
                 maxUses={checkpointDraft.draft.kind === 'TOOL' ? checkpointDraft.draft.asset.maxUses : undefined}
+                wearCheck={checkpointDraft.draft.kind === 'TOOL' ? checkpointDraft.draft.asset.wearCheck : undefined}
                 framed
                 className="ster-kind"
                 size={19}

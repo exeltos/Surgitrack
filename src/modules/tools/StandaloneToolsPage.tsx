@@ -123,7 +123,7 @@ export default function StandaloneToolsPage() {
     <tr key={t.id} className={nested ? 'standalone-piece' : undefined}>
       <td>
         <div className="registry-asset-name">
-          <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+          <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} wearCheck={t.wearCheck} framed size={15} />
           <span>
             <Link className="row-title-link" to={`/tools/${t.id}`}>
               {t.name}
@@ -149,6 +149,10 @@ export default function StandaloneToolsPage() {
             <span className="muted"> / {t.maxUses}</span>
             {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
           </>
+        ) : t.wearCheck ? (
+          <span title={tr('Χρήσεις με έλεγχο φθοράς')}>
+            <b>{t.uses}</b> <span className="muted">{tr('χρήσεις')}</span>
+          </span>
         ) : (
           <span className="muted">{tr('Χωρίς όριο')}</span>
         )}
@@ -345,7 +349,7 @@ export default function StandaloneToolsPage() {
                         <tr className={open ? 'standalone-group open' : 'standalone-group'}>
                           <td>
                             <div className="registry-asset-name">
-                              <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} framed size={15} />
+                              <AssetTypeIcon kind="TOOL" maxUses={t.maxUses} wearCheck={t.wearCheck} framed size={15} />
                               <span>
                                 <button type="button" className="row-title-link" onClick={() => toggleGroup(key)}>
                                   {t.name}

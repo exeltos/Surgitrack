@@ -3390,6 +3390,12 @@ td {
   color: var(--c-orange-50-3);
   border-color: var(--c-amber-90);
 }
+/* Uses with a wear check: its own colour, apart from limited (amber) and plain (blue) instruments. */
+.asset-type-icon.tool.wear {
+  background: var(--c-violet-95);
+  color: var(--c-violet-30);
+  border-color: var(--c-violet-85-2);
+}
 .asset-type-icon-inline {
   display: inline-flex;
   align-items: center;
@@ -3402,6 +3408,9 @@ td {
 }
 .asset-type-icon-inline.limited {
   color: var(--c-orange-50-3);
+}
+.asset-type-icon-inline.wear {
+  color: var(--c-violet-30);
 }
 .ster-work-row > .asset-type-icon.ster-kind {
   width: 38px;

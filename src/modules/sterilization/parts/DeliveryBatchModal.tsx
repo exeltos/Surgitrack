@@ -112,6 +112,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                           <AssetTypeIcon
                             kind={item.kind}
                             maxUses={item.kind === 'TOOL' ? item.maxUses : undefined}
+                            wearCheck={item.kind === 'TOOL' ? item.wearCheck : undefined}
                             size={16}
                           />
                           <div>

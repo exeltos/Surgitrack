@@ -344,6 +344,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                     <AssetTypeIcon
                       kind={x.kind}
                       maxUses={x.kind === 'TOOL' ? x.maxUses : undefined}
+                      wearCheck={x.kind === 'TOOL' ? x.wearCheck : undefined}
                       framed
                       className="ster-kind"
                       size={18}

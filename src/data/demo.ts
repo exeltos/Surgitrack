@@ -133,7 +133,14 @@ export const sets: SetAsset[] = [
   },
 ];
 
-type ToolSeed = {code: string; name: string; manufacturer: string; specialty: string; maxUses?: number};
+type ToolSeed = {
+  code: string;
+  name: string;
+  manufacturer: string;
+  specialty: string;
+  maxUses?: number;
+  wearCheck?: boolean;
+};
 const catalog: ToolSeed[] = [
   {
     code: '12.320.20',
@@ -158,7 +165,14 @@ const catalog: ToolSeed[] = [
   },
   {code: '10.110.16', name: 'ΛΑΒΙΔΑ ΑΝΑΤΟΜΙΚΗ 16 CM', manufacturer: 'AESCULAP', specialty: 'Γενική Χειρουργική'},
   {code: '11.410.16', name: 'ΛΑΒΙΔΑ ΧΕΙΡΟΥΡΓΙΚΗ 16 CM', manufacturer: 'KLS MARTIN', specialty: 'Γενική Χειρουργική'},
-  {code: '42.300.01', name: 'ΑΓΚΙΣΤΡΟ LANGENBECK', manufacturer: 'AESCULAP', specialty: 'Γενική Χειρουργική'},
+  // Uses with a wear check: no limit, its uses are counted and it is checked for wear.
+  {
+    code: '42.300.01',
+    name: 'ΑΓΚΙΣΤΡΟ LANGENBECK',
+    manufacturer: 'AESCULAP',
+    specialty: 'Γενική Χειρουργική',
+    wearCheck: true,
+  },
   {
     code: '70.510.05',
     name: 'ΛΑΠΑΡΟΣΚΟΠΙΚΗ ΛΑΒΙΔΑ 5MM',
@@ -191,6 +205,7 @@ const add = (
     uses: opts.uses ?? Math.floor((n % 17) + 4),
     sterilizations: (opts.uses ?? 10) + 2,
     maxUses: opts.maxUses ?? seed.maxUses,
+    wearCheck: opts.maxUses ? undefined : seed.wearCheck,
     serialNumber: `SN-${serial}`,
     purchaseDate: '15/01/2026',
     warrantyUntil: '15/01/2029',
