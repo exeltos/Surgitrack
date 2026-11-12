@@ -583,7 +583,14 @@ export default function EquipmentPage() {
                           </>
                         ) : row.load && canSimulate && !row.load.simulation ? (
                           // Demo: the cycle can be simulated, in the sterilizer's card; its data then shows here.
-                          <button className="row-simulate" onClick={() => setOpenKey(row.key)}>
+                          <button
+                            className="row-simulate"
+                            onClick={e => {
+                              // The row opens the page too: once is enough (one entry in the browser's history).
+                              e.stopPropagation();
+                              setOpenKey(row.key);
+                            }}
+                          >
                             <FlaskConical size={14} /> {L('Προσομοίωση', 'Simulation')}
                           </button>
                         ) : row.load ? (
