@@ -18,7 +18,9 @@ describe('the mobile number as the initial password', () => {
     ['0030 691 234 5678', '6912345678'],
     ['306912345678', '6912345678'],
   ])('reads %s as %s', (given, wanted) => expect(phonePassword(given)).toBe(wanted));
-  it.each(['', 'abc', '12345', '1'.repeat(16)])('refuses %j', given => expect(phonePassword(given)).toBeNull());
+  it.each(['', 'abc', '12345', '22123456', '221234567', '1'.repeat(16)])('refuses %j', given =>
+    expect(phonePassword(given)).toBeNull(),
+  );
   it('shows it masked: enough to recognise, not to read', () => {
     expect(maskPhone('6912345678')).toBe('691••••678');
     expect(maskPhone('+30 691 234 5678')).toBe('691••••678');

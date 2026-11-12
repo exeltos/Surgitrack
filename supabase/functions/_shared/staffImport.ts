@@ -18,7 +18,8 @@ export const cleanName = (value: unknown) =>
 
 /**
  * The initial password is the person's mobile number: digits only, a Greek country code dropped
- * (+30 69… and 0030 69… become 69…). Returns null for anything that is not a plausible number.
+ * (+30 69… and 0030 69… become 69…). Returns null for anything that is not a plausible number. At least 10 digits,
+ * as the sign-in service takes no shorter password: a shorter number abroad needs its country code.
  */
 export const phonePassword = (value: unknown) => {
   let digits = String(value ?? "").replace(/[^\d+]/g, "");
@@ -26,5 +27,5 @@ export const phonePassword = (value: unknown) => {
   digits = digits.replace(/\D/g, "");
   if (digits.startsWith("0030")) digits = digits.slice(4);
   else if (digits.startsWith("30") && digits.length === 12) digits = digits.slice(2);
-  return digits.length >= 8 && digits.length <= 15 ? digits : null;
+  return digits.length >= 10 && digits.length <= 15 ? digits : null;
 };
