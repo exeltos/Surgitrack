@@ -459,6 +459,8 @@ async function main() {
         const allowed = new Set(seed.permissions[role]);
         list = routes.filter(r => r.permissions.some(p => allowed.has(p))).map(r => r.path);
         if (allowed.has('issue.view')) list.push('/issues?tab=replacements', '/issues?tab=orders');
+        // A hospital admin's own settings are tabs of Studio.
+        if (list.includes('/studio')) list.push('/studio?tab=libraries', '/studio?tab=system');
         if (list.includes('/traceability'))
           list.push(
             '/traceability?q=S000321',
