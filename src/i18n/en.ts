@@ -1090,13 +1090,11 @@ export const en: Record<string, string> = {
   'Μόνο ο Διαχειριστής επαναφέρει εγγραφές βιβλιοθηκών.': 'Only the administrator restores library records.',
   'Ό,τι διαγράφεται μένει εδώ {0} ημέρες και μπορεί να επανέλθει.':
     'Deleted items stay here for {0} days and can be restored.',
-  'Αλυσίδα φύλαξης': 'Chain of custody',
   'Πύλη ποιότητας': 'Quality gate',
   'Πολλαπλές φωτογραφίες. Η λήψη ενεργοποιεί την κάμερα της συσκευής.':
     'Multiple photos. Capture turns on the device camera.',
   Ποσότητα: 'Quantity',
   'Πού θα μεταφερθεί το υπάρχον εργαλείο;': 'Where will the current instrument go?',
-  'Πριν την παράδοση': 'Before delivery',
   Προέλευση: 'Origin',
   Προαιρετικά: 'Optional',
   'Προαιρετικά, μία ή περισσότερες φωτογραφίες.': 'Optional, one or more photos.',
@@ -1123,7 +1121,6 @@ export const en: Record<string, string> = {
   'Προς έλεγχο / σύνθεση': 'To inspection / assembly',
   'Προς καθαρισμό / απολύμανση': 'To cleaning / disinfection',
   'Προς συσκευασία / σήμανση': 'To packaging / labelling',
-  'Προς τμήμα': 'To department',
   'Προς όλα τα τμήματα': 'To all departments',
   'Προσθήκη εργαλείου στη σύνθεση Set': 'Instrument added to set composition',
   'Προσθήκη εργαλείων': 'Add instruments',
@@ -1160,9 +1157,6 @@ export const en: Record<string, string> = {
   'Σε καθαρισμό': 'Being cleaned',
   'Σε σύνθεση': 'Being assembled',
   'Σε συσκευασία': 'Being packed',
-  'Πλύση & απολύμανση': 'Washing & disinfection',
-  'Συσκευασία & σήμανση': 'Packing & labelling',
-  'Κλίβανος & φορτίο': 'Sterilizer & load',
   'Η λεπτομερής λειτουργική επιθεώρηση γίνεται αργότερα, στη «Σύνθεση».':
     'The detailed function check comes later, at «Assembly».',
   'Σε αποθήκευση': 'In storage',

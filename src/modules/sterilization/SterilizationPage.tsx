@@ -1,7 +1,7 @@
 import FilterMenu from '../../components/assets/FilterMenu';
-import {ScanBarcode, ShieldCheck, Barcode, X} from 'lucide-react';
+import {ScanBarcode, Barcode, X} from 'lucide-react';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
-import {tr, trData} from '../../i18n';
+import {tr} from '../../i18n';
 import {useSterilizationPage} from './useSterilizationPage';
 import QueueTabs from './parts/QueueTabs';
 import WorkPanel from './parts/WorkPanel';
@@ -26,7 +26,6 @@ export default function SterilizationPage() {
   const {
     addIssuePhotos,
     colorQuestion,
-    currentUser,
     departmentFilter,
     issueCameraOpen,
     kindFilter,
@@ -48,14 +47,6 @@ export default function SterilizationPage() {
           <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
           <h1>{tr('Αποστείρωση')}</h1>
           <p>{tr('Η πορεία των εργαλείων από την παραλαβή έως την παράδοση στο τμήμα.')}</p>
-        </div>
-        <div className="ster-shift">
-          <ShieldCheck size={18} />
-          <div>
-            <small>{tr('Συνδεδεμένος χρήστης')}</small>
-            <strong>{trData(currentUser.name)}</strong>
-            <span>{trData(currentUser.department)}</span>
-          </div>
         </div>
       </div>
       <div className="ster-scan ster-scan-restored">

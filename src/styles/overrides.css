@@ -2305,12 +2305,6 @@ html body .dash-kpi strong {
   font-size: 26px;
 }
 /* Sterilization header: logged-in user as a slim pill, one-line stage labels. */
-html body .ster-shift {
-  padding: 6px 12px;
-  border-radius: 12px;
-  gap: 8px;
-  align-items: center;
-}
 /* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
 html body .registry-fixed td:nth-child(4) .row-sub {
   max-width: none;

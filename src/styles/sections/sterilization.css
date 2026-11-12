@@ -389,15 +389,6 @@ html body .sterilization-workspace .sterile-queues.modern button {
   padding-top: 7px;
   padding-bottom: 7px;
 }
-html body .ster-shift > div {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-html body .ster-shift small {
-  display: none;
-}
 html body .sterile-queues.modern button > span {
   white-space: nowrap;
   overflow: hidden;
@@ -558,38 +549,39 @@ html body .load-release-modal {
     grid-column: 3;
   }
 }
+/* On a phone a row is three lines: the item across the whole width, then department · specialty, then what there is
+   to see (a Set's composition, an issue, a shortage) with the buttons on the right (the action, and the return for
+   who may use it). */
 @media (max-width: 760px) {
   .sterilization-workspace .ster-work-panel .ster-list-head {
     display: none;
   }
   .sterilization-workspace .ster-work-panel .ster-work-row {
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) !important;
-    gap: 8px 10px;
-    padding: 13px 14px;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center;
+    gap: 4px 10px;
+    padding: 10px 12px;
   }
   .sterilization-workspace .ster-work-panel .ster-asset-cell {
-    grid-column: 1/-1;
+    grid-column: 1 / -1;
+    grid-row: 1;
   }
-  .sterilization-workspace .ster-work-panel .ster-cell-department,
-  .sterilization-workspace .ster-work-panel .ster-meta,
+  .sterilization-workspace .ster-work-panel .ster-cell-department {
+    grid-column: 1/-1 !important;
+    grid-row: 2;
+  }
+  html body .sterilization-workspace .ster-work-panel .ster-work-row > .ster-meta {
+    grid-column: 1;
+    grid-row: 3;
+  }
   .sterilization-workspace .ster-work-panel .ster-row-action {
-    grid-column: 2/-1 !important;
+    grid-column: 2 !important;
+    grid-row: 3;
+    flex-wrap: nowrap;
   }
   .sterilization-workspace .ster-work-panel .ster-status {
     display: none;
-  }
-  .sterilization-workspace .ster-work-panel .ster-row-action {
-    flex-wrap: wrap;
-  }
-}
-@media (max-width: 1700px) {
-  /* Seven cards in a row leave no room for the icon: titles keep their whole word. */
-  .sterile-queues.modern button {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  .sterile-queues.modern button > small {
-    grid-column: 1 / -1;
   }
 }
 @media (max-width: 1699px) {
@@ -1454,9 +1446,6 @@ html body .ster-row-load b {
     scroll-snap-align: start;
   }
   /* The user's name is already in the menu. */
-  html body .sterilization-workspace .ster-shift {
-    display: none;
-  }
   /* In the sterilizer: the cycle under the sterilizer, the badge under the title. */
   html body .sterilization-workspace .ster-work-panel .ster-meta:has(> .ster-meta-none) {
     display: none;
@@ -2522,4 +2511,112 @@ html body .content:has(> .equipment-page) {
   color: var(--st-muted);
   font-size: 12.5px;
   line-height: 1.5;
+}
+
+/* The stages as one thin step bar: icon, name and count on one line, a chevron between stages for the flow;
+   the open stage stands out, an empty one fades. On a phone it scrolls sideways. */
+html body .sterilization-workspace .sterile-queues.ster-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid var(--c-gray-90-3);
+  border-radius: 12px;
+  background: var(--c-white);
+  scrollbar-width: none;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: max-content;
+  min-height: 38px;
+  padding: 6px 10px;
+  overflow: visible;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--c-cyan-30);
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: none;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button:hover {
+  background: var(--c-gray-100-2);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button > svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button > span {
+  overflow: visible;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button > strong {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-cyan-20);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps > .ster-step-arrow {
+  align-self: center;
+  color: var(--c-gray-70);
+  font-size: 16px;
+  pointer-events: none;
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.empty {
+  color: var(--st-muted);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.empty > strong {
+  background: transparent;
+  color: var(--st-muted);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.active {
+  background: var(--c-cyan-20);
+  color: var(--c-white);
+}
+html body .sterilization-workspace .sterile-queues.ster-steps button.active > strong {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--c-white);
+}
+@media (max-width: 760px) {
+  html body .sterilization-workspace .sterile-queues.ster-steps button {
+    flex: 0 0 auto;
+  }
+}
+/* The row above the list holds only the stage's actions: with none, it takes no room. */
+html body .sterilization-workspace .ster-panel-head:not(:has(button)) {
+  display: none;
+}
+/* On a phone: department and specialty on one line. */
+@media (max-width: 760px) {
+  html body .sterilization-workspace .ster-work-panel .ster-cell-department {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 6px;
+  }
+  html body .sterilization-workspace .ster-work-panel .ster-cell-department > span::before {
+    content: '· ';
+  }
+  html body .sterilization-workspace .ster-work-panel .ster-meta:not(:has(> :not(.ster-meta-none))) {
+    display: none;
+  }
+}
+/* The stage's actions sit on the right, above the actions column of the list. */
+html body .sterilization-workspace .ster-work-panel > .ster-panel-head {
+  justify-content: flex-end;
+}
+html body .sterilization-workspace .ster-work-panel > .ster-panel-head > .ster-panel-head-actions {
+  margin-left: auto;
 }

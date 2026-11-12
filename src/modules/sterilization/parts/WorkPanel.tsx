@@ -78,7 +78,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     processing,
     queue,
     queueStageLabel,
-    queueTitle,
     ready,
     recallCases,
     recallLoad,
@@ -112,13 +111,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const inLoad = new Set(awaitingLoads.flatMap(load => load.items.map(item => `${item.assetKind}:${item.assetId}`)));
   return (
     <div className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}`}>
+      {/* The stage and its count are in the step bar above: this row only holds the stage's actions. */}
       <div className="ster-panel-head">
-        <div>
-          <strong>{queueTitle}</strong>
-          <span>
-            {rows.length} {rows.length === 1 ? tr('εγγραφή') : tr('εγγραφές')}
-          </span>
-        </div>
         <div className="ster-panel-head-actions" data-tour="ster-panel-actions">
           {queue === 'INCOMING' && (
             <>
@@ -354,7 +348,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <Link to={detail} className="mono ster-code">
                           {x.barcode}
                         </Link>
-                        <span className="ster-type">{x.kind === 'SET' ? tr('ΣΕΤ') : tr('ΕΡΓΑΛΕΙΟ')}</span>
                       </div>
                       <Link to={detail} className="ster-asset-name">
                         {x.name}
@@ -370,16 +363,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   </div>
                   <div className="ster-meta">
                     {queue === 'INCOMING' ? (
+                      // A Set's composition (the column says so); a standalone instrument has none.
                       x.kind === 'SET' ? (
-                        <>
-                          <small>{tr('Σύνθεση')}</small>
-                          <strong className={x.actual !== x.expected ? 'warn-text' : ''}>
-                            {x.actual} / {x.expected}
-                          </strong>
-                        </>
-                      ) : (
-                        <span className="ster-object-state">{tr('Μεμονωμένο εργαλείο')}</span>
-                      )
+                        <strong className={x.actual !== x.expected ? 'warn-text' : ''}>
+                          {x.actual} / {x.expected}
+                        </strong>
+                      ) : null
                     ) : assetIssues.length === 0 && !again ? (
                       // The stage is the tab itself: the column only speaks up for something to see.
                       <span className="ster-meta-none">—</span>
