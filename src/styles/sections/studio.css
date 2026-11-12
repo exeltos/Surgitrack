@@ -2590,22 +2590,34 @@ html body .studio-security-blocked > li > span > :is(b, small) {
   line-height: 1.35;
 }
 
-/* The contact for trial hospitals: three rows like the other settings, «Αποθήκευση» under them on the right. */
-html body .studio-system-grid > .platform-contact {
-  padding: 4px 20px 8px;
-}
-html body .studio-system-grid > .platform-contact > label:last-of-type {
+/* The contact for trial hospitals: the first row of the settings, its three fields stacked on the right, saved on
+   leaving a field. */
+html body .studio-system-grid > section > .platform-contact {
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  border-top: 0;
   border-bottom: 1px solid var(--c-gray-95);
 }
-html body .platform-contact-save {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0 8px;
+html body .platform-contact-fields {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  display: grid;
+  gap: 6px;
 }
-html body .platform-contact-save .platform-contact-status {
-  margin: 0;
+html body .platform-contact-fields > input {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .platform-contact .platform-contact-status {
+  color: var(--c-green-35);
+  font-weight: 700;
 }
 
 /* Readable contrast (WCAG AA): the «ΒΑΣΙΚΟ» mark of the core stages and the text of the protected-core note. */
@@ -2630,4 +2642,51 @@ html body .studio-security-table :is(th, td) {
 }
 html body .studio-security-table td.studio-security-hospital {
   max-width: 170px;
+}
+
+/* Security, connected now: four columns and two square buttons (the name on hover), nothing cut at the right. */
+html body .studio-security-table td b {
+  font-weight: 600;
+}
+html body .studio-security-table .studio-security-icon {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+html body .studio-security-table td:last-child {
+  width: 1%;
+}
+/* Blocked addresses: the form and the list in one card, fields as everywhere else. */
+html body .studio-security-card {
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+  overflow: hidden;
+}
+html body .studio-security-card > .studio-security-add {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--st-line);
+  align-items: center;
+}
+html body .studio-security-card .studio-security-field {
+  height: 36px;
+  font-size: 13px;
+}
+html body .studio-security-card .studio-security-blocked {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-security-card .studio-security-blocked > li {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--st-line);
+}
+html body .studio-security-card .studio-security-blocked > li:last-child {
+  border-bottom: 0;
+}
+html body .studio-security-card .studio-security-blocked b.mono {
+  font-size: 13px;
 }
