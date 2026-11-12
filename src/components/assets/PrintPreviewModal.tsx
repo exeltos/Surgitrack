@@ -30,10 +30,8 @@ export default function PrintPreviewModal({
 }) {
   const frameId = 'surgitrack-print-preview';
   const doPrint = () => {
-    if (labelPdf) {
-      printLabelPdf(title, labelPdf.html, labelPdf.widthMm, labelPdf.heightMm);
-      return;
-    }
+    // With popups blocked no window opens: the preview's own frame prints instead.
+    if (labelPdf && printLabelPdf(title, labelPdf.html, labelPdf.widthMm, labelPdf.heightMm)) return;
     if (printInWindow && printDocumentInWindow(title, html)) return;
     const frame = document.getElementById(frameId) as HTMLIFrameElement | null;
     frame?.contentWindow?.focus();

@@ -49,8 +49,12 @@ const errorText = (code: string, el: boolean) => {
         : 'The Demo has reached its user limit. Tell whoever invited you.';
     case 'password_invalid':
       return el
-        ? 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό.'
-        : 'The password needs at least 8 characters, with a letter and a number.';
+        ? 'Ο κωδικός πρέπει να έχει τουλάχιστον 10 χαρακτήρες, με ένα γράμμα και έναν αριθμό.'
+        : 'The password needs at least 10 characters, with a letter and a number.';
+    case 'password_weak':
+      return el
+        ? 'Ο κωδικός είναι πολύ κοινός (υπάρχει σε λίστες κωδικών που έχουν διαρρεύσει). Διαλέξτε άλλον.'
+        : 'This password is too common (it appears in lists of leaked passwords). Choose another.';
     case 'email_failed':
       return el
         ? 'Δεν στάλθηκε το email επιβεβαίωσης. Δοκιμάστε ξανά σε λίγο.'

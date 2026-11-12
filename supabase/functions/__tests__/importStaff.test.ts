@@ -189,7 +189,7 @@ describe('import-staff: the welcome email', () => {
     expect(mail.html).toContain('AB1000');
     expect(mail.html).toContain('όνομα χρήστη');
     expect(mail.html).toContain('αριθμό του κινητού σας τηλεφώνου');
-    expect(mail.html).toContain('τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό');
+    expect(mail.html).toContain('τουλάχιστον 10 χαρακτήρες, με ένα γράμμα και έναν αριθμό');
     expect(mail.html).toMatch(/μέχρι \d{2}\/\d{2}\/\d{4}/);
     expect(mail.html).toContain('κλειδώνει');
   });

@@ -199,7 +199,7 @@ export function printDocumentInWindow(title: string, documentHtml: string) {
 
 type PrintAsset = (
   | Pick<SetAsset, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
-  | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses'>
+  | Pick<Tool, 'barcode' | 'name' | 'department' | 'uses' | 'maxUses' | 'wearCheck'>
 ) & {code?: string; sterileUntil?: string; sterilizedOn?: string; shelfLifeMonths?: number};
 
 /** The label's paper size: the chosen size, or the printer roll's own when set (20–150 mm). */
@@ -258,8 +258,17 @@ function barcodeLabelBody(
   // Bottom line: the remaining uses on the left (limited-use Sets and instruments), the two dates side by side on the right.
   const maxUses = 'maxUses' in asset ? asset.maxUses : undefined;
   const usesLeft = maxUses ? Math.max(0, maxUses - (('uses' in asset ? asset.uses : 0) || 0)) : undefined;
+  // Uses checked for wear (no limit): the label carries how many it has had, as the limited ones carry what is left.
+  const wearUses =
+    !maxUses && 'wearCheck' in asset && asset.wearCheck ? ('uses' in asset ? asset.uses : 0) || 0 : undefined;
+  const usesHtml =
+    usesLeft !== undefined
+      ? `<span class="left">${escapeHtml(tr('Υπόλ. χρήσεων: {0}', usesLeft))}</span>`
+      : wearUses !== undefined
+        ? `<span class="left">${escapeHtml(`${tr('Χρήσεις')}: ${wearUses}`)}</span>`
+        : '';
   const datesHtml = asset.sterileUntil
-    ? `${usesLeft !== undefined ? `<span class="left">${escapeHtml(tr('Υπόλ. χρήσεων: {0}', usesLeft))}</span>` : ''}<span class="dates">${sterileDatesHtml(sterilizedOnOf(asset), asset.sterileUntil, '0.95em', true)}</span>`
+    ? `${usesHtml}<span class="dates">${sterileDatesHtml(sterilizedOnOf(asset), asset.sterileUntil, '0.95em', true)}</span>`
     : '';
   const details =
     kind === 'SET'

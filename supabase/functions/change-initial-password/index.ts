@@ -5,11 +5,16 @@ import {corsFor, jsonWith} from "../_shared/http.ts";
 // The first sign-in of a person made by the staff import: they replace the initial password (their mobile number)
 // with their own, and only then does the database give them their hospital (profiles.password_change_required).
 // The change is made here, not by the browser, so the requirement is lifted only if the password really changed.
-// A new password has at least 8 characters with a letter and a number: a mobile number (digits only) can never pass.
+// A new password has at least 10 characters with a letter and a number: a mobile number (digits only) can never pass.
+// The sign-in service also turns down passwords known from leaks: the answer then says so (password_weak).
 const corsBase = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+/** The sign-in service turned the password down as too common (found in leaks) or too short. */
+const isWeak = (error: {code?: string; message?: string} | null) =>
+  !!error && (error.code === "weak_password" || /weak|easy to guess|at least \d+ characters/i.test(error.message || ""));
 
 Deno.serve(async req => {
   const cors = corsFor(req, corsBase);
@@ -37,10 +42,11 @@ Deno.serve(async req => {
 
     const body = await req.json().catch(() => ({}));
     const password = typeof body?.password === "string" ? body.password : "";
-    if (password.length < 8 || password.length > 72 || !/\p{L}/u.test(password) || !/\d/.test(password)) {
+    if (password.length < 10 || password.length > 72 || !/\p{L}/u.test(password) || !/\d/.test(password)) {
       return json({error: "password_invalid"}, 400);
     }
     const {error: passwordError} = await admin.auth.admin.updateUserById(auth.user.id, {password});
+    if (isWeak(passwordError)) return json({error: "password_weak"}, 400);
     if (passwordError) return json({error: "update_failed"}, 500);
     const {error: profileError} = await admin
       .from("profiles")
