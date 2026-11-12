@@ -2623,4 +2623,10 @@ html body .receipt-card-modal .tool-report-btn.icon-only {
 html body .delivery-batch-modal > .delivery-batch-body {
   flex: 1 1 auto;
   grid-template-rows: auto minmax(0, 1fr);
+  /* Room between the header's line and the scanner box. */
+  padding-top: 14px;
+}
+/* The note of a batch has room to write (it grows with the card). */
+html body .delivery-batch-modal .delivery-batch-confirm .cycle-note textarea {
+  min-height: 150px;
 }
