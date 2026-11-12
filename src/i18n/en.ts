@@ -2328,8 +2328,6 @@ export const en: Record<string, string> = {
     'To re-sterilize what is on the shelves before it expires.',
   'Για να δεις ποιος παρέδωσε σε ποιον και ποιες υπογραφές λείπουν.':
     'To see who handed over to whom and which signatures are missing.',
-  'Ανά είδος': 'By kind',
-  'Ανά κλίβανο': 'By sterilizer',
   'Εμφάνιση όλων': 'Show all',
   'Το κουμπί «Οδηγός οθόνης» με σύντομες οδηγίες για κάθε οθόνη. Αλλάζει αργότερα από τις Ρυθμίσεις του νοσοκομείου.':
     'The «Screen guide» button with short instructions for each screen. Changed later in the hospital Settings.',

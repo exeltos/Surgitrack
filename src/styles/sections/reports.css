@@ -102,40 +102,12 @@ html body .reports-summary button.warn {
 html body .reports-summary button.bad {
   border-color: #d0503f;
 }
-html body .reports-summary button.active,
-html body .reports-split button.active {
+html body .reports-summary button.active {
   outline: 2px solid var(--primary, #0f6bb8);
 }
 html body .reports-summary button:disabled {
   opacity: 0.5;
   cursor: default;
-}
-html body .reports-split strong {
-  font-size: 0.8rem;
-  color: var(--muted, #6b7f8a);
-}
-html body .reports-split button {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  background: transparent;
-  overflow: hidden;
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
-  font-size: 0.88rem;
-}
-html body .reports-split button i {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: rgba(15, 107, 184, 0.12);
-  z-index: 0;
-}
-html body .reports-split button span,
-html body .reports-split button b {
-  position: relative;
-  z-index: 1;
 }
 html body .reports-close-list {
   border: 0;
@@ -203,26 +175,6 @@ html body .reports-summary button {
   gap: 8px;
   min-width: 0;
   border-radius: 999px;
-}
-html body .reports-split {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-html body .reports-split strong {
-  margin-right: 4px;
-}
-html body .reports-split button {
-  padding: 4px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 999px;
-}
-html body .reports-split button i {
-  display: none;
-}
-html body .reports-split button.active {
-  background: var(--c-gray-95);
 }
 
 /* Fewer frames: the report choices sit on the page itself, and inside the report there is one card, not cards in cards. */
@@ -331,9 +283,6 @@ html body .reports-overview .reports-filter-strip {
 html body .reports-overview .reports-summary {
   flex: 1 1 auto;
   margin: 0;
-}
-html body .reports-overview .reports-split {
-  flex: 1 0 100%;
 }
 html body .reports-summary button {
   padding: 3px 10px;

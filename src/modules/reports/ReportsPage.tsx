@@ -26,7 +26,7 @@ import {
   type Row,
 } from './reportsMeta';
 import {buildReport} from './buildReport';
-import {reportGroups as splitRows, reportSummary} from './reportSummary';
+import {reportSummary} from './reportSummary';
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
@@ -135,7 +135,6 @@ export default function ReportsPage() {
   );
 
   const summary = reportSummary(active, reportData.rows, warningThreshold);
-  const split = splitRows(active, reportData.rows);
   // The whole report is listed until a card or a group narrows it.
   const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : reportData.rows), [view, reportData.rows]);
   const buildPreview = () => {
@@ -456,28 +455,6 @@ export default function ReportsPage() {
                 </li>
               ))}
             </ul>
-            {split.items.length > 1 && (
-              <div className="reports-split" role="group" aria-label={split.title}>
-                <strong>{split.title}</strong>
-                {split.items.map(item => (
-                  <button
-                    type="button"
-                    key={item.label}
-                    className={view?.label === `${split.title}: ${item.label}` ? 'active' : ''}
-                    onClick={() =>
-                      setView({
-                        label: `${split.title}: ${item.label}`,
-                        test: row => String(row[split.key] ?? '—') === item.label,
-                      })
-                    }
-                  >
-                    <span>{cellText(split.key, item.label)}</span>
-                    <i style={{width: `${Math.max(4, (item.value / split.items[0].value) * 100)}%`}} />
-                    <b>{item.value}</b>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
           <div className="reports-result-card">
             <div className="reports-result-head">
