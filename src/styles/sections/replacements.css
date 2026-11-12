@@ -1,41 +1,4 @@
 /* Replacements. Moved together from overrides.css; cascade order is intentional. */
-.replacements-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-.replacements-kpis button {
-  display: grid;
-  gap: 2px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-.replacements-kpis button.active {
-  border-color: var(--c-cyan-35);
-  box-shadow: 0 0 0 2px rgba(21, 90, 110, 0.12);
-}
-.replacements-kpis span {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.replacements-kpis strong {
-  color: var(--c-blue-15-2);
-  font-size: 24px;
-}
-.replacements-kpis .warn strong {
-  color: var(--c-orange-50-2);
-}
-.replacements-kpis .good strong {
-  color: var(--c-green-45);
-}
-.replacements-kpis .bad strong {
-  color: var(--c-red-40-2);
-}
 .replacements-card {
   display: grid;
   gap: 10px;
@@ -51,9 +14,10 @@
 }
 .replacements-search {
   display: flex;
+  flex: 1 1 200px;
   align-items: center;
   gap: 7px;
-  min-width: min(360px, 100%);
+  min-width: min(200px, 100%);
   padding: 0 11px;
   min-height: 38px;
   border: 1px solid var(--c-gray-90);
@@ -354,7 +318,7 @@ html body .replacements-table tbody td {
   padding-bottom: 6px;
 }
 html body .replacements-fixed th.col-stock {
-  width: 80px;
+  width: 96px;
 }
 html body .replacements-fixed .row-actions {
   white-space: nowrap;
@@ -370,9 +334,6 @@ html body .replacements-fixed td > a {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-html body .replacements-kpis .bad strong {
-  color: #c0322f;
-}
 html body .replacements .replacements-table {
   flex: 1 1 auto;
   min-height: 0;
@@ -383,9 +344,6 @@ html body .replacements-search > svg {
   flex: 0 0 auto;
 }
 @media (max-width: 900px) {
-  .replacements-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .replacements-order-fields {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -431,7 +389,7 @@ html body .replacements-search > svg {
     width: 100px;
   }
   html body .replacements-fixed th.col-stock {
-    width: 72px;
+    width: 92px;
   }
   html body .replacements-fixed th.col-status {
     width: 124px;

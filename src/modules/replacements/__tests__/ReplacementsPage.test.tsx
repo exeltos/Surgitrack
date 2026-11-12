@@ -3,8 +3,9 @@ import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import ReplacementsPage from '../ReplacementsPage';
 
-const kpi = (label: string) => screen.getByText(label, {selector: '.replacements-kpis span'}).closest('button')!;
-const kpiValue = (label: string) => Number(within(kpi(label)).getByRole('strong', {hidden: true}).textContent);
+const kpi = (label: string) =>
+  screen.getAllByRole('button').find(b => b.closest('.quick-filters') && b.textContent?.startsWith(label))!;
+const kpiValue = (label: string) => Number(kpi(label).querySelector('b')!.textContent);
 const table = () => screen.getByRole('table');
 const rows = () => within(table()).queryAllByRole('row').slice(1);
 
@@ -23,7 +24,7 @@ describe('Replacements', () => {
   ] as const)('lists exactly what «%s» counts', (label, stock) => {
     renderPage(<ReplacementsPage />, {path: '/replacements'});
     fireEvent.click(kpi(label));
-    expect(kpi(label)).toHaveClass('active');
+    expect(kpi(label)).toHaveAttribute('aria-pressed', 'true');
     expect(rows()).toHaveLength(kpiValue(label));
     if (stock) for (const row of rows()) expect(within(row).getByText(stock)).toBeInTheDocument();
   });

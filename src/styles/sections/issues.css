@@ -26,10 +26,6 @@ html body .issues-fixed th.col-created {
 html body .issues-fixed .issue-note-inline {
   display: none;
 }
-/* Issues and Expiry review. Short tab labels exist for the phone only. */
-html body .issues-tabs .tab-short {
-  display: none;
-}
 @media (max-width: 1280px) {
   /* Issues: the note goes under the item instead of its own squeezed column. */
   html body .issues-fixed th:nth-child(2),
@@ -51,41 +47,75 @@ html body .issues-tabs .tab-short {
   html body .issues-fixed th.col-created {
     width: 104px;
   }
-  html body .kpis.issues-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-  html body .kpis.issues-kpis > * small {
-    white-space: normal;
-  }
 }
 @media (min-width: 701px) {
+  /* Row actions in fixed slots, so they line up down the list: «Επίλυση», the order cart, open. */
   html body .issues-fixed .issue-actions-row {
     display: grid;
-    grid-auto-flow: dense;
-    grid-template-columns: auto auto 34px;
+    grid-template-columns: auto 32px 32px;
     justify-content: end;
     align-items: center;
     gap: 6px;
   }
-  html body .issues-fixed .issue-actions-row > a.issue-action {
-    grid-column: 3;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > button.issue-action:last-child {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > button.issue-action:not(:last-child) {
+  html body .issues-fixed .issue-actions-row > .slot-resolve {
     grid-column: 1;
     grid-row: 1;
   }
+  html body .issues-fixed .issue-actions-row > .slot-order {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  html body .issues-fixed .issue-actions-row > .slot-open {
+    grid-column: 3;
+    grid-row: 1;
+  }
 }
-@media (max-width: 700px) {
-  html body .issues-tabs .tab-long {
-    display: none;
-  }
-  html body .issues-tabs .tab-short {
-    display: inline;
-  }
+/* One-click filters with counts, beside a list's search (Issues, Replacements). */
+.quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+.quick-filters button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--c-blue-35);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.quick-filters button:hover {
+  background: var(--c-gray-100-2);
+}
+.quick-filters button.active {
+  background: var(--c-cyan-35);
+  color: var(--c-white);
+}
+.quick-filters b {
+  font-weight: 800;
+}
+.quick-filters b.warn {
+  color: var(--c-orange-45-3);
+}
+.quick-filters b.bad {
+  color: var(--c-red-40-2);
+}
+.quick-filters b.good {
+  color: var(--c-green-40-3);
+}
+.quick-filters button.active b {
+  color: inherit;
 }

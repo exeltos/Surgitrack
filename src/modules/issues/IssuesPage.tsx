@@ -1,4 +1,4 @@
-import {CheckCircle2, ClipboardList, ExternalLink, Images, PackageX, ShoppingCart} from 'lucide-react';
+import {CheckCircle2, ClipboardList, ExternalLink, Images, PackageX, ShoppingCart, Truck} from 'lucide-react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {lazy, Suspense, useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
@@ -14,7 +14,8 @@ import type {Issue, PurchaseOrderLine} from '../../types/domain';
 import OrderDialog from '../replacements/OrderDialog';
 import {pieces} from '../replacements/pieces';
 import {useConfirm} from '../../components/ui/useConfirm';
-import KpiStrip from '../../components/ui/KpiStrip';
+import QuickFilters from '../../components/ui/QuickFilters';
+import {isReceivable} from '../../core/purchaseReceipt';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
 import {SortTh} from '../../components/ui/SortHeader';
@@ -48,7 +49,14 @@ export default function IssuesPage() {
   const hasReplacements = useHasModule('REPLACEMENTS');
   const withReplacements = can('stock.manage') && hasReplacements;
   const [params, setParams] = useSearchParams();
-  const tab = withReplacements && params.get('tab') === 'replacements' ? 'REPLACEMENTS' : 'REPORTS';
+  // Three tabs: the reports, the instruments to replace and the purchase orders (`view=orders` is the old link).
+  const tab = !withReplacements
+    ? 'REPORTS'
+    : params.get('tab') === 'orders' || (params.get('tab') === 'replacements' && params.get('view') === 'orders')
+      ? 'ORDERS'
+      : params.get('tab') === 'replacements'
+        ? 'REPLACEMENTS'
+        : 'REPORTS';
   const neededReplacements = useMemo(
     () =>
       withReplacements
@@ -63,7 +71,8 @@ export default function IssuesPage() {
   const [q, setQ] = useRememberedState('q', '');
   const [department, setDepartment] = useRememberedState('department', '');
   const [type, setType] = useRememberedState('type', '');
-  const [status, setStatus] = useRememberedState('status', '');
+  // The list opens on the open reports; the resolved ones are a click away.
+  const [status, setStatus] = useRememberedState('status', 'OPEN');
   const [age, setAge] = useRememberedState('age', '');
   const isOld = (issue: Issue) => issue.status === 'OPEN' && (daysSince(issue.created) ?? 0) > OLD_ISSUE_DAYS;
   const values = (key: 'department' | 'type' | 'status') =>
@@ -101,7 +110,7 @@ export default function IssuesPage() {
     const set = tool ? undefined : setsByBarcode.get(barcode);
     return {tool, set, to: tool ? `/tools/${tool.id}` : set ? `/sets/${set.id}` : undefined};
   };
-  // The cards count within the department/type/search chosen, and set the status (and age) filters.
+  // The quick filters count within the department/type/search chosen, and set the status (and age) filters.
   const counted = scopedIssues.filter(
     i =>
       (!department || i.department === department) &&
@@ -123,9 +132,7 @@ export default function IssuesPage() {
         className={tab === 'REPORTS' ? 'active' : ''}
         onClick={() => setParams({}, {replace: true})}
       >
-        <ClipboardList size={16} /> <span className="tab-long">{tr('Αναφορές προβλημάτων')}</span>
-        <span className="tab-short">{tr('Αναφορές')}</span>{' '}
-        <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
+        <ClipboardList size={16} /> {tr('Αναφορές')} <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
       </button>
       <button
         role="tab"
@@ -133,12 +140,19 @@ export default function IssuesPage() {
         className={tab === 'REPLACEMENTS' ? 'active' : ''}
         onClick={() => setParams({tab: 'replacements'}, {replace: true})}
       >
-        <PackageX size={16} /> <span className="tab-long">{tr('Αντικαταστάσεις & Παραγγελίες')}</span>
-        <span className="tab-short">{tr('Αντικαταστάσεις')}</span> <b>{neededReplacements}</b>
+        <PackageX size={16} /> {tr('Αντικαταστάσεις')} <b>{neededReplacements}</b>
+      </button>
+      <button
+        role="tab"
+        aria-selected={tab === 'ORDERS'}
+        className={tab === 'ORDERS' ? 'active' : ''}
+        onClick={() => setParams({tab: 'orders'}, {replace: true})}
+      >
+        <Truck size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
       </button>
     </div>
   ) : null;
-  const goToOrders = () => setParams({tab: 'replacements', view: 'orders'}, {replace: true});
+  const goToOrders = () => setParams({tab: 'orders'}, {replace: true});
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -150,31 +164,47 @@ export default function IssuesPage() {
             : tr('Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.')
         }
       />
-      {tab === 'REPLACEMENTS' ? (
+      {tab !== 'REPORTS' ? (
         <Suspense fallback={<Spinner />}>
-          <ReplacementsPage embedded tabs={tabs} />
+          <ReplacementsPage
+            embedded
+            tabs={tabs}
+            view={tab === 'ORDERS' ? 'ORDERS' : 'ITEMS'}
+            onView={view => setParams(view === 'ORDERS' ? {tab: 'orders'} : {tab: 'replacements'}, {replace: true})}
+          />
         </Suspense>
       ) : (
         <>
-          <KpiStrip
-            className="issues-kpis"
-            items={[
-              {label: tr('Σύνολο'), value: counted.length, ...card('')},
-              {label: tr('Ανοικτές'), value: counted.filter(i => i.status === 'OPEN').length, ...card('OPEN')},
-              {
-                label: tr('Πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
-                value: counted.filter(isOld).length,
-                ...card('OPEN', 'OLD'),
-              },
-              {
-                label: tr('Επιλυμένες'),
-                value: counted.filter(i => i.status === 'RESOLVED').length,
-                ...card('RESOLVED'),
-              },
-            ]}
-          />
           {tabs}
           <AssetFilterBar
+            className="with-quick-filters"
+            extra={
+              <QuickFilters
+                items={[
+                  {
+                    key: 'open',
+                    label: tr('Ανοικτές'),
+                    count: counted.filter(i => i.status === 'OPEN').length,
+                    tone: 'warn',
+                    ...card('OPEN'),
+                  },
+                  {
+                    key: 'old',
+                    label: tr('Πάνω από {0} ημέρες', OLD_ISSUE_DAYS),
+                    count: counted.filter(isOld).length,
+                    tone: 'bad',
+                    ...card('OPEN', 'OLD'),
+                  },
+                  {
+                    key: 'resolved',
+                    label: tr('Επιλυμένες'),
+                    count: counted.filter(i => i.status === 'RESOLVED').length,
+                    ...card('RESOLVED'),
+                  },
+                  {key: 'all', label: tr('Όλες'), count: counted.length, ...card('')},
+                ]}
+              />
+            }
             query={q}
             onQueryChange={setQ}
             placeholder={tr('Εργαλείο/Σετ, barcode, τύπος ή σημείωση...')}
@@ -196,23 +226,6 @@ export default function IssuesPage() {
                 placeholder: tr('Όλοι οι τύποι'),
                 options: values('type').map(value => ({value, label: value})),
                 onChange: setType,
-              },
-              {
-                key: 'status',
-                value: status,
-                placeholder: tr('Όλες οι καταστάσεις'),
-                options: [
-                  {value: 'OPEN', label: tr('Ανοικτές')},
-                  {value: 'RESOLVED', label: tr('Επιλυμένες')},
-                ],
-                onChange: setStatus,
-              },
-              {
-                key: 'age',
-                value: age,
-                placeholder: tr('Οποιαδήποτε ημερομηνία'),
-                options: [{value: 'OLD', label: tr('Ανοικτές πάνω από {0} ημέρες', OLD_ISSUE_DAYS)}],
-                onChange: setAge,
               },
             ]}
           />
@@ -306,32 +319,10 @@ export default function IssuesPage() {
                       {withReplacements && (
                         <td className="issue-actions">
                           <div className="issue-actions-row">
-                            {subject(i).to && (
-                              <Link
-                                className="issue-action"
-                                to={subject(i).to!}
-                                title={tr('Άνοιγμα καρτέλας')}
-                                aria-label={tr('Άνοιγμα καρτέλας')}
-                              >
-                                <ExternalLink size={14} />
-                              </Link>
-                            )}
-                            {subject(i).tool && (
-                              <button
-                                type="button"
-                                className="issue-action wide"
-                                title={tr('Παραγγελία')}
-                                aria-label={tr('Παραγγελία')}
-                                onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
-                              >
-                                <ShoppingCart size={14} />
-                                {tr('Παραγγελία')}
-                              </button>
-                            )}
                             {i.status === 'OPEN' && (
                               <button
                                 type="button"
-                                className="issue-action wide"
+                                className="issue-action wide slot-resolve"
                                 title={tr('Επίλυση')}
                                 aria-label={tr('Επίλυση')}
                                 onClick={() =>
@@ -354,6 +345,27 @@ export default function IssuesPage() {
                                 <CheckCircle2 size={14} />
                                 {tr('Επίλυση')}
                               </button>
+                            )}
+                            {subject(i).tool && (
+                              <button
+                                type="button"
+                                className="issue-action slot-order"
+                                title={tr('Παραγγελία αγοράς')}
+                                aria-label={tr('Παραγγελία')}
+                                onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
+                              >
+                                <ShoppingCart size={14} />
+                              </button>
+                            )}
+                            {subject(i).to && (
+                              <Link
+                                className="issue-action slot-open"
+                                to={subject(i).to!}
+                                title={tr('Άνοιγμα καρτέλας')}
+                                aria-label={tr('Άνοιγμα καρτέλας')}
+                              >
+                                <ExternalLink size={14} />
+                              </Link>
                             )}
                           </div>
                         </td>

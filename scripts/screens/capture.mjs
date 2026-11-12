@@ -453,7 +453,7 @@ async function main() {
       } else {
         const allowed = new Set(seed.permissions[role]);
         list = routes.filter(r => allowed.has(r.permission)).map(r => r.path);
-        if (allowed.has('issue.view')) list.push('/issues?tab=replacements');
+        if (allowed.has('issue.view')) list.push('/issues?tab=replacements', '/issues?tab=orders');
         if (role === 'ADMIN') list.push('/no-such-page');
       }
 

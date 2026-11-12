@@ -1847,9 +1847,8 @@ export const en: Record<string, string> = {
   'CSV (.csv)': 'CSV (.csv)',
   'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
   'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
-  'Ανοικτές πάνω από {0} ημέρες': 'Open over {0} days',
+  'Γρήγορα φίλτρα': 'Quick filters',
   'Πάνω από {0} ημέρες': 'Over {0} days',
-  'Οποιαδήποτε ημερομηνία': 'Any date',
   // Studio → Platform: evaluation Demos
   'Demo αξιολόγησης': 'Evaluation Demo',
   'DEMO ΑΞΙΟΛΟΓΗΣΗΣ': 'EVALUATION DEMO',
