@@ -23,7 +23,7 @@ import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
-import KpiStrip from '../../components/ui/KpiStrip';
+import QuickFilters from '../../components/ui/QuickFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
@@ -132,19 +132,6 @@ export default function ToolsPage() {
           ) : undefined
         }
       />
-      <KpiStrip
-        compact
-        items={[
-          {label: tr('Σύνολο εργαλείων'), value: tools.length, ...kpi()},
-          {label: tr('Σε Σετ'), value: tools.filter(t => t.mode === 'SET_MEMBER').length, ...kpi({mode: 'SET_MEMBER'})},
-          {
-            label: tr('Μεμονωμένα σε χρήση'),
-            value: tools.filter(t => t.mode === 'STANDALONE').length,
-            ...kpi({mode: 'STANDALONE'}),
-          },
-          {label: tr('Απόθεμα'), value: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
-        ]}
-      />
       <div className="asset-list-controls">
         <AssetFilterBar
           query={q}
@@ -205,28 +192,47 @@ export default function ToolsPage() {
               onChange: setUsage,
             },
           ]}
+          className="with-quick-filters"
           extra={
-            <ListExport
-              table={day => {
-                const history = onDay(day);
-                return toolsExportTable(listOn(history), tr('Εργαλεία'), history);
-              }}
-              pickDay
-              grouped={day => {
-                const history = onDay(day);
-                return toolsGroupedExportTable(
-                  listOn(history),
-                  tr('Εργαλεία'),
-                  systemSettings.usageWarningThreshold,
-                  history,
-                );
-              }}
-              disabled={filtered.length === 0}
-            />
+            <>
+              <QuickFilters
+                items={[
+                  {label: tr('Όλα'), count: tools.length, ...kpi()},
+                  {
+                    label: tr('Σε Σετ'),
+                    count: tools.filter(t => t.mode === 'SET_MEMBER').length,
+                    ...kpi({mode: 'SET_MEMBER'}),
+                  },
+                  {
+                    label: tr('Μεμονωμένα'),
+                    count: tools.filter(t => t.mode === 'STANDALONE').length,
+                    ...kpi({mode: 'STANDALONE'}),
+                  },
+                  {label: tr('Απόθεμα'), count: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
+                ]}
+              />
+              <ListExport
+                table={day => {
+                  const history = onDay(day);
+                  return toolsExportTable(listOn(history), tr('Εργαλεία'), history);
+                }}
+                pickDay
+                grouped={day => {
+                  const history = onDay(day);
+                  return toolsGroupedExportTable(
+                    listOn(history),
+                    tr('Εργαλεία'),
+                    systemSettings.usageWarningThreshold,
+                    history,
+                  );
+                }}
+                disabled={filtered.length === 0}
+              />
+            </>
           }
         />
       </div>
-      <ScrollableListPanel withKpis ariaLabel={tr('Λίστα εργαλείων')}>
+      <ScrollableListPanel ariaLabel={tr('Λίστα εργαλείων')}>
         {filtered.length === 0 ? (
           <ListEmpty
             total={tools.length}
@@ -285,7 +291,10 @@ export default function ToolsPage() {
                             {t.name}
                           </Link>
                           <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
-                          <small className="row-sub">{[t.manufacturer, t.code].filter(Boolean).join(' · ')}</small>
+                          <small className="row-sub">
+                            <span className="mono registry-row-barcode">{t.barcode}</span>
+                            {[t.manufacturer, t.code].filter(Boolean).map(part => ` · ${part}`)}
+                          </small>
                           {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                         </span>
                       </div>

@@ -2154,6 +2154,14 @@ html body .tools-list-workspace > .asset-list-controls {
 html body .asset-filter-bar {
   padding: 5px 8px;
 }
+/* With quick filters the bar wraps when they do not fit, the search keeping a usable width. */
+html body .asset-filter-bar.with-quick-filters {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+html body .asset-filter-bar.with-quick-filters > .asset-filter-search {
+  min-width: 220px;
+}
 html body .asset-list-controls > .icon-toggle {
   min-height: 46px;
 }
@@ -2307,10 +2315,10 @@ html body .registry-fixed th:last-child {
   padding-right: 8px;
 }
 @media (max-width: 1279px) {
-  html body .registry-fixed th:nth-child(3),
-  html body .registry-fixed td:nth-child(3),
-  html body .registry-fixed th:nth-child(7),
-  html body .registry-fixed td:nth-child(7) {
+  html body .registry-fixed:not(.expiry-table) th:nth-child(3),
+  html body .registry-fixed:not(.expiry-table) td:nth-child(3),
+  html body .registry-fixed:not(.expiry-table) th:nth-child(7),
+  html body .registry-fixed:not(.expiry-table) td:nth-child(7) {
     display: none;
   }
 }
@@ -4029,10 +4037,19 @@ html body .demo-welcome-actions {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-/* Sets list: the state on one line on a computer; on a tablet the barcode goes under the name, so the
-   name is never cut in the middle of a word. */
-html body .sets-registry .sets-row-barcode {
+/* Registries (Sets, instruments, standalone, Stock): the barcode sits under the name, not in a column of its
+   own, so the name keeps its width and is not cut. The state stays on one line on a computer. */
+html body .registry-fixed:not(.expiry-table) th:nth-child(2),
+html body .registry-fixed:not(.expiry-table) td:nth-child(2) {
   display: none;
+}
+html body .registry-row-barcode {
+  color: var(--c-cyan-45);
+  font-weight: 700;
+}
+/* Sets: «Εργαλεία» fits next to its sort arrow. */
+html body .sets-registry:not(.standalone-registry) th:nth-child(5) {
+  width: 104px;
 }
 @media (min-width: 1280px) {
   html body .sets-registry th:nth-child(6) {
@@ -4043,15 +4060,6 @@ html body .sets-registry .sets-row-barcode {
   }
 }
 @media (max-width: 1279px) {
-  html body .sets-registry th:nth-child(2),
-  html body .sets-registry td:nth-child(2) {
-    display: none;
-  }
-  html body .sets-registry .sets-row-barcode {
-    display: block;
-    color: var(--c-cyan-45);
-    font-weight: 700;
-  }
   html body .sets-registry td:first-child .row-title-link {
     overflow-wrap: normal;
     word-break: normal;

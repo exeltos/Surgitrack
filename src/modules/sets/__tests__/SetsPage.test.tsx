@@ -5,7 +5,7 @@ import SetsPage from '../SetsPage';
 
 const list = () => screen.getByRole('region', {name: 'Λίστα Σετ εργαλείων'});
 const rows = () => within(list()).queryAllByRole('row').slice(1);
-const kpi = (label: string) => screen.getByRole('button', {name: new RegExp(label)});
+const kpi = (label: string) => screen.getByRole('button', {name: new RegExp(`^${label} \\d+$`)});
 const kpiValue = (label: string) => Number(kpi(label).textContent!.replace(/\D+/g, ' ').trim().split(' ').pop());
 const cells = (label: string) => {
   const headers = within(list())
@@ -19,7 +19,7 @@ const cells = (label: string) => {
 describe('Sets', () => {
   it('lists every Set, as many as the total says', () => {
     renderPage(<SetsPage />, {path: '/sets'});
-    expect(rows().length).toBe(kpiValue('Σύνολο Σετ'));
+    expect(rows().length).toBe(kpiValue('Όλα'));
     expect(rows().length).toBeGreaterThan(0);
   });
 
@@ -31,7 +31,7 @@ describe('Sets', () => {
     expect(within(rows()[0]).getByRole('link', {name: barcode})).toBeInTheDocument();
   });
 
-  it('shows what each count names when it is pressed, and everything again under «Σύνολο Σετ»', () => {
+  it('shows what each count names when it is pressed, and everything again under «Όλα»', () => {
     renderPage(<SetsPage />, {path: '/sets'});
     const all = rows().length;
     for (const [label, state] of [
@@ -43,16 +43,16 @@ describe('Sets', () => {
       expect(kpi(label)).toHaveAttribute('aria-pressed', 'true');
       expect(rows()).toHaveLength(expected);
       expect(new Set(cells('Κατάσταση'))).toEqual(new Set([state]));
-      fireEvent.click(kpi('Σύνολο Σετ'));
-      expect(kpi('Σύνολο Σετ')).toHaveAttribute('aria-pressed', 'true');
+      fireEvent.click(kpi('Όλα'));
+      expect(kpi('Όλα')).toHaveAttribute('aria-pressed', 'true');
       expect(rows()).toHaveLength(all);
     }
   });
 
-  it('shows only Sets with missing instruments under «Σετ με έλλειψη»', () => {
+  it('shows only Sets with missing instruments under «Με έλλειψη»', () => {
     renderPage(<SetsPage />, {path: '/sets'});
-    fireEvent.click(kpi('Σετ με έλλειψη'));
-    expect(rows()).toHaveLength(kpiValue('Σετ με έλλειψη'));
+    fireEvent.click(kpi('Με έλλειψη'));
+    expect(rows()).toHaveLength(kpiValue('Με έλλειψη'));
     for (const text of cells('Εργαλεία')) {
       const [actual, expected] = text!.split('/').map(n => Number(n.trim()));
       expect(actual).toBeLessThan(expected);

@@ -20,7 +20,7 @@ import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import {statusLabel} from '../../components/ui/statusLabel';
 import PageHeader from '../../components/ui/PageHeader';
-import KpiStrip from '../../components/ui/KpiStrip';
+import QuickFilters from '../../components/ui/QuickFilters';
 import {kpiFilters} from '../../core/kpiFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
@@ -117,27 +117,6 @@ export default function SetsPage() {
           ) : undefined
         }
       />
-      <KpiStrip
-        compact
-        items={[
-          {label: tr('Σύνολο Σετ'), value: sets.length, ...kpi()},
-          {
-            label: tr('Στο τμήμα'),
-            value: sets.filter(x => x.state === 'IN_DEPARTMENT').length,
-            ...kpi({state: 'IN_DEPARTMENT'}),
-          },
-          {
-            label: tr('Έτοιμα για παραλαβή'),
-            value: sets.filter(x => x.state === 'READY_FOR_PICKUP').length,
-            ...kpi({state: 'READY_FOR_PICKUP'}),
-          },
-          {
-            label: tr('Σετ με έλλειψη'),
-            value: sets.filter(x => x.actual < x.expected).length,
-            ...kpi({completeness: 'SHORT'}),
-          },
-        ]}
-      />
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
@@ -196,11 +175,35 @@ export default function SetsPage() {
             onChange: setCompleteness,
           },
         ]}
+        className="with-quick-filters"
         extra={
-          <ListExport
-            table={() => setsExportTable(filtered, memberCount, tr('Σετ εργαλείων'))}
-            disabled={filtered.length === 0}
-          />
+          <>
+            <QuickFilters
+              items={[
+                {label: tr('Όλα'), count: sets.length, ...kpi()},
+                {
+                  label: tr('Στο τμήμα'),
+                  count: sets.filter(x => x.state === 'IN_DEPARTMENT').length,
+                  ...kpi({state: 'IN_DEPARTMENT'}),
+                },
+                {
+                  label: tr('Έτοιμα για παραλαβή'),
+                  count: sets.filter(x => x.state === 'READY_FOR_PICKUP').length,
+                  ...kpi({state: 'READY_FOR_PICKUP'}),
+                },
+                {
+                  label: tr('Με έλλειψη'),
+                  tone: 'bad' as const,
+                  count: sets.filter(x => x.actual < x.expected).length,
+                  ...kpi({completeness: 'SHORT'}),
+                },
+              ]}
+            />
+            <ListExport
+              table={() => setsExportTable(filtered, memberCount, tr('Σετ εργαλείων'))}
+              disabled={filtered.length === 0}
+            />
+          </>
         }
       />
       <ScrollableListPanel ariaLabel={tr('Λίστα Σετ εργαλείων')}>
@@ -263,9 +266,10 @@ export default function SetsPage() {
                             {s.name}
                           </Link>
                           <ColorMarker tapes={s.colorTapes} size="sm" />
-                          <small className="row-sub">{[s.manufacturer, s.code].filter(Boolean).join(' · ')}</small>
-                          {/* On a tablet the barcode sits here, so the name keeps the room of its column. */}
-                          <small className="row-sub mono sets-row-barcode">{s.barcode}</small>
+                          <small className="row-sub">
+                            <span className="mono registry-row-barcode">{s.barcode}</span>
+                            {[s.manufacturer, s.code].filter(Boolean).map(part => ` · ${part}`)}
+                          </small>
                         </span>
                       </div>
                     </td>

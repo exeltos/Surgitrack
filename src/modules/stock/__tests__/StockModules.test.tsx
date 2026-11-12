@@ -7,7 +7,7 @@ import {renderPage} from '../../../test/renderPage';
 const admin = {id: 'u-admin', name: 'Διαχειριστής', role: 'ADMIN' as const, department: ''};
 
 describe('Stock and the Minimum stock module', () => {
-  it('has the Minimum stock tab and card in a hospital that was given the module', () => {
+  it('has the Minimum stock tab in a hospital that was given the module', () => {
     renderPage(
       <ModulesContext.Provider value={['STOCK_MINIMUMS']}>
         <StockPage />
@@ -15,7 +15,7 @@ describe('Stock and the Minimum stock module', () => {
       {path: '/stock', signedIn: admin},
     );
     expect(screen.getByRole('tab', {name: /Ελάχιστα αποθέματα/})).toBeTruthy();
-    expect(screen.getByText('Κάτω από το ελάχιστο')).toBeTruthy();
+    expect(screen.getByRole('tab', {name: /Εργαλεία Αποθέματος/})).toBeTruthy();
   });
 
   it('has only the list in one that was not, even by the address of the minimums', () => {
@@ -26,7 +26,7 @@ describe('Stock and the Minimum stock module', () => {
       {path: '/stock?view=minimums', signedIn: admin},
     );
     expect(screen.queryByRole('tab', {name: /Ελάχιστα αποθέματα/})).toBeNull();
-    expect(screen.queryByText('Κάτω από το ελάχιστο')).toBeNull();
-    expect(screen.getByText('Εργαλεία Αποθέματος')).toBeTruthy();
+    expect(screen.queryByRole('tab')).toBeNull();
+    expect(screen.getByRole('region', {name: 'Απόθεμα εργαλείων'})).toBeTruthy();
   });
 });

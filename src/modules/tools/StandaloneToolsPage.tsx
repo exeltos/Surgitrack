@@ -23,7 +23,7 @@ import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
-import KpiStrip from '../../components/ui/KpiStrip';
+import QuickFilters from '../../components/ui/QuickFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
@@ -129,9 +129,10 @@ export default function StandaloneToolsPage() {
               {t.name}
             </Link>
             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
-            <small className="row-sub">{[t.manufacturer, t.code].filter(Boolean).join(' · ')}</small>
-            {/* On a tablet the barcode sits here, so the name keeps the room of its column. */}
-            <small className="row-sub mono sets-row-barcode">{t.barcode}</small>
+            <small className="row-sub">
+              <span className="mono registry-row-barcode">{t.barcode}</span>
+              {[t.manufacturer, t.code].filter(Boolean).map(part => ` · ${part}`)}
+            </small>
           </span>
         </div>
       </td>
@@ -186,36 +187,6 @@ export default function StandaloneToolsPage() {
           ) : undefined
         }
       />
-      <KpiStrip
-        compact
-        items={[
-          {label: tr('Σε χρήση'), value: scope.length, ...kpi()},
-          {
-            label: tr('Με όριο χρήσεων'),
-            value: scope.filter(t => t.maxUses).length,
-            hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
-            ...kpi({limit: 'LIMITED'}),
-          },
-          {
-            label: tr('Αχρησιμοποίητα'),
-            value: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
-            hint: tr('Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
-            ...kpi({usage: 'NEW'}),
-          },
-          {
-            label: tr('Λίγες χρήσεις'),
-            value: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
-            hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
-            ...kpi({usage: 'LOW'}),
-          },
-          {
-            label: tr('Εξαντλημένα'),
-            value: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
-            hint: tr('Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.'),
-            ...kpi({usage: 'EXHAUSTED'}),
-          },
-        ]}
-      />
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
@@ -264,8 +235,40 @@ export default function StandaloneToolsPage() {
             onChange: setUsage,
           },
         ]}
+        className="with-quick-filters"
         extra={
           <>
+            <QuickFilters
+              items={[
+                {label: tr('Όλα'), count: scope.length, ...kpi()},
+                {
+                  label: tr('Με όριο χρήσεων'),
+                  count: scope.filter(t => t.maxUses).length,
+                  hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
+                  ...kpi({limit: 'LIMITED'}),
+                },
+                {
+                  label: tr('Αχρησιμοποίητα'),
+                  count: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
+                  hint: tr('Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
+                  ...kpi({usage: 'NEW'}),
+                },
+                {
+                  label: tr('Λίγες χρήσεις'),
+                  tone: 'warn' as const,
+                  count: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+                  hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
+                  ...kpi({usage: 'LOW'}),
+                },
+                {
+                  label: tr('Εξαντλημένα'),
+                  tone: 'bad' as const,
+                  count: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
+                  hint: tr('Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.'),
+                  ...kpi({usage: 'EXHAUSTED'}),
+                },
+              ]}
+            />
             <button
               type="button"
               className={`asset-filter-toggle ${grouped ? 'has-active' : ''}`}
@@ -296,7 +299,7 @@ export default function StandaloneToolsPage() {
           </>
         }
       />
-      <ScrollableListPanel withKpis ariaLabel={tr('Μεμονωμένα εργαλεία σε χρήση')}>
+      <ScrollableListPanel ariaLabel={tr('Μεμονωμένα εργαλεία σε χρήση')}>
         {filtered.length === 0 ? (
           <ListEmpty
             total={standalone.length}
@@ -356,6 +359,7 @@ export default function StandaloneToolsPage() {
                                 </button>
                                 <small className="row-sub">
                                   {[
+                                    tr('{0} τεμ.', g.length),
                                     distinctValues(g, x => x.manufacturer).join(', '),
                                     distinctValues(g, x => x.code).length > 1
                                       ? tr('{0} κωδικοί', distinctValues(g, x => x.code).length)
@@ -367,9 +371,7 @@ export default function StandaloneToolsPage() {
                               </span>
                             </div>
                           </td>
-                          <td>
-                            <span className="qty-badge">{tr('{0} τεμ.', g.length)}</span>
-                          </td>
+                          <td />
                           <td>{trData(t.specialty) || '—'}</td>
                           <td title={departments.map(d => trData(d)).join(', ')}>
                             {departments.length === 1 ? trData(departments[0]) : tr('{0} τμήματα', departments.length)}

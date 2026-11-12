@@ -1,8 +1,11 @@
 import {tr} from '../../i18n';
 
 export type QuickFilter = {
-  key: string;
+  /** Defaults to the label. */
+  key?: string;
   label: string;
+  /** A longer explanation, shown on hover. */
+  hint?: string;
   count: number;
   active: boolean;
   onClick: () => void;
@@ -16,7 +19,8 @@ export default function QuickFilters({items, label}: {items: QuickFilter[]; labe
     <div className="quick-filters" role="group" aria-label={label || tr('Γρήγορα φίλτρα')}>
       {items.map(item => (
         <button
-          key={item.key}
+          key={item.key || item.label}
+          title={item.hint}
           type="button"
           className={item.active ? 'active' : ''}
           aria-pressed={item.active}

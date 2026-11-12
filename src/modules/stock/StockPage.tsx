@@ -24,7 +24,7 @@ import AppButton from '../../components/ui/AppButton';
 import StatusBadge from '../../components/ui/StatusBadge';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
-import KpiStrip from '../../components/ui/KpiStrip';
+import QuickFilters from '../../components/ui/QuickFilters';
 import {kpiFilters} from '../../core/kpiFilters';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
@@ -80,7 +80,7 @@ export default function StockPage() {
     order.rows,
     [q, specialty, manufacturer, state, limit, usage, order.sort?.key, order.sort?.dir].join('|'),
   );
-  // The same number cards as the other lists: each one filters the list, the last opens the minimums.
+  // The quick filters next to the search: each one sets exactly its filters.
   const kpi = kpiFilters({
     q: [q, setQ],
     specialty: [specialty, setSpecialty],
@@ -89,18 +89,6 @@ export default function StockPage() {
     limit: [limit, setLimit],
     usage: [usage, setUsage],
   });
-  // A filter card shows the list (from the minimums view too); the minimums view lights its own card.
-  const listKpi = (preset?: Record<string, string>) => {
-    const filter = kpi(preset);
-    return {
-      onClick: () => {
-        filter.onClick();
-        if (view === 'MIN') setParams({}, {replace: true});
-      },
-      active: view === 'LIST' && filter.active,
-    };
-  };
-  const stockKinds = new Set(stock.map(t => `${t.code}|${t.name}`)).size;
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -116,33 +104,6 @@ export default function StockPage() {
             )}
           </div>
         }
-      />
-      {/* The numbers first, for both views; then the tabs right above what they switch. */}
-      <KpiStrip
-        compact
-        items={[
-          {label: tr('Εργαλεία Αποθέματος'), value: stock.length, ...listKpi()},
-          {
-            label: tr('Είδη εργαλείων'),
-            value: stockKinds,
-            ...(withMinimums ? {onClick: () => setParams({view: 'minimums'}, {replace: true})} : {}),
-          },
-          {
-            label: tr('Με όριο χρήσεων'),
-            value: stock.filter(t => !!t.maxUses).length,
-            ...listKpi({limit: 'LIMITED'}),
-          },
-          ...(withMinimums
-            ? [
-                {
-                  label: tr('Κάτω από το ελάχιστο'),
-                  value: lowCount,
-                  onClick: () => setParams({view: 'minimums'}, {replace: true}),
-                  active: view === 'MIN',
-                },
-              ]
-            : []),
-        ]}
       />
       {withMinimums && (
         <div className="name-check-tabs stock-tabs" role="tablist">
@@ -209,27 +170,45 @@ export default function StockPage() {
                 onChange: setUsage,
               },
             ]}
+            className="with-quick-filters"
             extra={
-              <ListExport
-                table={day => {
-                  const history = onDay(day);
-                  return toolsExportTable(listOn(history), tr('Απόθεμα εργαλείων'), history);
-                }}
-                pickDay
-                grouped={day => {
-                  const history = onDay(day);
-                  return toolsGroupedExportTable(
-                    listOn(history),
-                    tr('Απόθεμα εργαλείων'),
-                    systemSettings.usageWarningThreshold,
-                    history,
-                  );
-                }}
-                disabled={filtered.length === 0}
-              />
+              <>
+                <QuickFilters
+                  items={[
+                    {label: tr('Όλα'), count: stock.length, ...kpi()},
+                    {
+                      label: tr('Με όριο χρήσεων'),
+                      count: stock.filter(t => !!t.maxUses).length,
+                      ...kpi({limit: 'LIMITED'}),
+                    },
+                    {
+                      label: tr('Χωρίς όριο'),
+                      count: stock.filter(t => !t.maxUses).length,
+                      ...kpi({limit: 'UNLIMITED'}),
+                    },
+                  ]}
+                />
+                <ListExport
+                  table={day => {
+                    const history = onDay(day);
+                    return toolsExportTable(listOn(history), tr('Απόθεμα εργαλείων'), history);
+                  }}
+                  pickDay
+                  grouped={day => {
+                    const history = onDay(day);
+                    return toolsGroupedExportTable(
+                      listOn(history),
+                      tr('Απόθεμα εργαλείων'),
+                      systemSettings.usageWarningThreshold,
+                      history,
+                    );
+                  }}
+                  disabled={filtered.length === 0}
+                />
+              </>
             }
           />
-          <ScrollableListPanel withKpis ariaLabel={tr('Απόθεμα εργαλείων')}>
+          <ScrollableListPanel ariaLabel={tr('Απόθεμα εργαλείων')}>
             {filtered.length === 0 ? (
               <ListEmpty
                 total={stock.length}
@@ -282,7 +261,10 @@ export default function StockPage() {
                               {t.name}
                             </Link>
                             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
-                            <small className="row-sub">{t.code}</small>
+                            <small className="row-sub">
+                              <span className="mono registry-row-barcode">{t.barcode}</span>
+                              {t.code ? ` · ${t.code}` : ''}
+                            </small>
                             {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                           </span>
                         </div>

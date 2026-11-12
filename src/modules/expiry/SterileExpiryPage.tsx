@@ -174,7 +174,9 @@ export default function SterileExpiryPage() {
                           <Link className="row-title-link" to={to}>
                             {item.name}
                           </Link>
-                          <small className="row-sub mono">{item.barcode}</small>
+                          <small className="row-sub">
+                            <span className="mono registry-row-barcode">{item.barcode}</span>
+                          </small>
                         </span>
                       </div>
                     </td>
