@@ -1,4 +1,4 @@
-import {Fragment, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode} from 'react';
+import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
 import {
@@ -23,7 +23,7 @@ import {
 import BrandMark from './BrandMark';
 import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
-import {expiryAlerts, sterileExpiryList} from '../../core/sterileExpiry';
+import {useShellNotifications} from './useShellNotifications';
 import {navSectionFor, navigationFor, navigationGroupLabel, ownerNavigation} from '../../config/navigation';
 import {isPlatformOnly} from '../../core/platformOnly';
 import {isOwnerOnlyPath, isOwnerOnlyTab} from '../../core/ownerOnlySections';
@@ -119,11 +119,8 @@ export default function AppShell({
   const trial = useTrial();
   const evaluationDemo = useEvaluationDemo();
   const {
-    issues,
     lifecycleAlerts,
-    sets,
     tools,
-    retiredTools,
     recycleBin,
     acknowledgeOutOfUse,
     currentUser,
@@ -179,7 +176,6 @@ export default function AppShell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const closeBriefing = useCallback(() => setSinceSignIn(''), []);
-  const [departmentReadyToast, setDepartmentReadyToast] = useState<{id: string; text: string}>();
   // A record changed on two devices at once: say where the other device's value was kept (S4).
   const [conflict, setConflict] = useState<SyncConflict>();
   useEffect(() => onSyncConflict(setConflict), []);
@@ -269,60 +265,21 @@ export default function AppShell({
   const binItem = navigation.find(item => item.to === '/bin');
   const binLabel = lang === 'en' ? 'Recycle bin' : 'Κάδος';
   const binCount = recycleBin.filter(entry => !isExpired(entry)).length;
-  const departmentAssets = [
-    ...sets.filter(s => s.department === currentUser.department),
-    ...tools.filter(t => t.department === currentUser.department && t.mode === 'STANDALONE'),
-  ];
-  const departmentReady = departmentAssets.filter(a => a.state === 'READY_FOR_PICKUP');
   // The person actually signed in, even while an admin views the app as another role.
   const signedInName = getRealIdentity()?.name || currentUser.name;
-  const departmentIssues = issues.filter(i => i.status === 'OPEN' && i.department === currentUser.department);
-  const departmentAssetIds = new Set(departmentAssets.map(asset => asset.id));
-  const departmentUsage = lifecycleAlerts.filter(a => departmentAssetIds.has(a.assetId));
-  // Sterile Sets and instruments in their last month (10 days for 2 months) or expired: worked out again only
-  // when the Sets or instruments change (or the day does), not on every update of the screen.
-  const day = new Date().toDateString();
-  const expiryNotices = useMemo(() => expiryAlerts(sterileExpiryList(sets, tools, new Date(day))), [sets, tools, day]);
-  const departmentExpiry = expiryNotices.filter(e => departmentAssetIds.has(e.id));
-  const accessRequests = hospitalId ? pendingAccess : 0;
-  const openIssues = issues.filter(i => i.status === 'OPEN');
-  // Instruments that just ran out of lives: Sterilization must set them aside and confirm.
-  const outOfUseNotices = role === 'DEPARTMENT' ? [] : retiredTools.filter(t => !t.retiredNoticeSeenAt);
-  const openNotifications =
-    role === 'DEPARTMENT'
-      ? departmentReady.length + departmentIssues.length + departmentUsage.length + departmentExpiry.length
-      : openIssues.length + lifecycleAlerts.length + accessRequests + outOfUseNotices.length + expiryNotices.length;
-  const readyKey = departmentReady.map(asset => asset.id).join('|');
-  useEffect(() => {
-    if (role !== 'DEPARTMENT' || departmentReady.length === 0) {
-      setDepartmentReadyToast(undefined);
-      return;
-    }
-    const storageKey = `surgitrack-ready-seen:${currentUser.department}`;
-    let seen = new Set<string>();
-    try {
-      seen = new Set(JSON.parse(window.sessionStorage.getItem(storageKey) || '[]') as string[]);
-    } catch {
-      seen = new Set<string>();
-    }
-    const newlyReady = departmentReady.filter(asset => !seen.has(asset.id));
-    if (!newlyReady.length) return;
-
-    const first = newlyReady[0];
-    const extra = newlyReady.length - 1;
-    const text =
-      lang === 'el'
-        ? `${first.barcode} · ${first.name} είναι έτοιμο για παραλαβή${extra > 0 ? ` (+${extra} ακόμη)` : ''}.`
-        : `${first.barcode} · ${first.name} is ready for pickup${extra > 0 ? ` (+${extra} more)` : ''}.`;
-    setDepartmentReadyToast({id: first.id, text});
-
-    newlyReady.forEach(asset => seen.add(asset.id));
-    window.sessionStorage.setItem(storageKey, JSON.stringify([...seen]));
-    const timer = window.setTimeout(() => setDepartmentReadyToast(undefined), 5200);
-    return () => window.clearTimeout(timer);
-    // Keyed on the ids of the ready assets (readyKey), not on the array itself, which is new every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, currentUser.department, readyKey, lang]);
+  const {
+    departmentReady,
+    departmentIssues,
+    departmentUsage,
+    departmentExpiry,
+    expiryNotices,
+    accessRequests,
+    openIssues,
+    outOfUseNotices,
+    openNotifications,
+    departmentReadyToast,
+    setDepartmentReadyToast,
+  } = useShellNotifications({lang, hospitalId, pendingAccess});
   const toolModeOf = (id: string) => tools.find(t => t.id === id)?.mode;
   const assetDetailMode = /^\/(tools|sets)\/[^/]+$/.test(location.pathname);
   const departmentMode = location.pathname === '/department' || location.pathname === '/department/tools';
