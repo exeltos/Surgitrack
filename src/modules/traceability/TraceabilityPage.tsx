@@ -296,7 +296,7 @@ export default function TraceabilityPage() {
               </div>
             </div>
           ))}
-          <div className="timeline list-scroll-region">
+          <div className="timeline list-scroll-region" role="region" tabIndex={0} aria-label={tr('Κινήσεις')}>
             {[...patientMoves]
               .sort((a, b) => time(b.at) - time(a.at))
               .map(m => (
@@ -429,7 +429,7 @@ export default function TraceabilityPage() {
             </section>
           )}
           {needle ? (
-            <div className="timeline list-scroll-region">
+            <div className="timeline list-scroll-region" role="region" tabIndex={0} aria-label={tr('Κινήσεις')}>
               {related.length ? (
                 related.map((m, i) => (
                   <Fragment key={m.id}>
