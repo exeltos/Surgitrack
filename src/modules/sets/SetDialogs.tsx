@@ -1,8 +1,8 @@
 import {useState} from 'react';
-import {Camera, Copy, Trash2} from 'lucide-react';
+import {Copy, Trash2} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import ReportTypeField from '../../components/assets/ReportTypeField';
-import {filesToAssetPhotos} from '../../components/assets/photoUtils';
+import ReportPhotoField from '../../components/assets/ReportPhotoField';
 import {tr} from '../../i18n';
 import type {AssetPhoto, SetAsset, Tool} from '../../types/domain';
 import {askConfirm} from '../../components/ui/confirmService';
@@ -131,22 +131,7 @@ export function SetReportModal({
                 placeholder={tr('Περιγραφή συμβάντος...')}
               />
             </label>
-            <label className="span-2 report-photo-input">
-              <Camera size={17} /> <b>{tr('Προσθήκη φωτογραφιών')}</b>
-              <input
-                className="visually-hidden-file"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                multiple
-                onChange={async e => setPhotos(await filesToAssetPhotos(Array.from(e.target.files || []), 'issues'))}
-              />
-              <small>
-                {photos.length
-                  ? tr('{0} φωτογραφίες έτοιμες', photos.length)
-                  : tr('Λήψη από κάμερα ή επιλογή πολλών φωτογραφιών')}
-              </small>
-            </label>
+            <ReportPhotoField photos={photos} onChange={setPhotos} />
           </div>
           {target === 'TOOLS' && (
             <div className="report-tool-picker">

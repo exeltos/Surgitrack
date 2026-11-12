@@ -616,42 +616,37 @@ html body .set-composition-head h2 {
   margin: 0;
 }
 
-/* The photo button of a report: our own words (a browser's own file button speaks the browser's language). */
-html body .report-photo-input b {
+/* The photo field of a report: the same height as the select next to it, a dashed button with our own words. */
+html body .report-photo-field .report-photo-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px dashed var(--c-gray-80);
+  border-radius: 10px;
+  background: var(--c-white);
   color: var(--c-cyan-40-3);
   font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
 }
-html body .report-photo-input:hover {
+html body .report-photo-field:hover .report-photo-button {
   border-color: var(--c-cyan-55-5);
   background: var(--c-gray-95-3);
 }
-html body .report-photo-input:focus-within {
+html body .report-photo-field:focus-within .report-photo-button {
   outline: 2px solid var(--c-cyan-45);
   outline-offset: 1px;
-}
-
-/* Name check: the figures as one line of text, the tabs and the table right under it. */
-html body .name-check-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  margin: 0 0 10px;
-  color: var(--st-muted);
-  font-size: 13px;
-}
-html body .name-check-summary b {
-  color: var(--c-blue-15-2);
-  font-size: 15px;
-}
-html body .name-check-summary .warn b {
-  color: var(--c-orange-45-3);
-}
-html body .name-check-summary .good b {
-  color: var(--c-green-45);
 }
 
 /* The empty photo tile: its label sits left, clear of the photo counter in the corner. */
 html body .asset-workbench-sidebar .asset-sidebar-quickfacts .asset-tool-photo-empty {
   justify-content: flex-start;
   padding-left: 12px;
+}
+
+/* The report of an instrument has no list to fill the card: it is as tall as its fields. */
+html body .asset-modal.set-report-modal.tool-report-modal {
+  height: auto;
 }
