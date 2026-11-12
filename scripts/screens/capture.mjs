@@ -125,8 +125,13 @@ async function loadSeed() {
 function appRoutes() {
   const source = readFileSync(join(ROOT, 'src/app/App.tsx'), 'utf8');
   const routes = [];
-  const re = /<Route\s+path="([^"]+)"\s+element=\{\s*<Guard permission="([^"]+)"/g;
-  for (let m; (m = re.exec(source));) routes.push({path: m[1], permission: m[2]});
+  // A comment may sit before the Guard, and a Guard may take a list of permissions (any one of them is enough).
+  const re =
+    /<Route\s+path="([^"]+)"\s+element=\{(?:\s*\/\/[^\n]*)*\s*<Guard permission=(?:"([^"]+)"|\{\[([^\]]+)\]\})/g;
+  for (let m; (m = re.exec(source));) {
+    const permissions = m[2] ? [m[2]] : [...m[3].matchAll(/'([^']+)'/g)].map(x => x[1]);
+    routes.push({path: m[1], permissions});
+  }
   return routes;
 }
 
@@ -452,7 +457,7 @@ async function main() {
         ];
       } else {
         const allowed = new Set(seed.permissions[role]);
-        list = routes.filter(r => allowed.has(r.permission)).map(r => r.path);
+        list = routes.filter(r => r.permissions.some(p => allowed.has(p))).map(r => r.path);
         if (allowed.has('issue.view')) list.push('/issues?tab=replacements', '/issues?tab=orders');
         if (role === 'ADMIN') list.push('/no-such-page');
       }
