@@ -138,4 +138,17 @@ describe('sterile label', () => {
     expect(html).toContain('04/08/26');
     expect(html).toContain('04/02/27');
   });
+
+  it('puts the uses so far on the left for an instrument checked for wear (no limit)', () => {
+    const settings = {size: 'SMALL' as const, header: 'BRAND' as const, showDetails: true};
+    const worn = {...tool, maxUses: undefined, wearCheck: true, uses: 41};
+    const sterile = barcodeLabelHtml(
+      {...worn, sterileUntil: '2027-02-04', shelfLifeMonths: 6},
+      'TOOL',
+      undefined,
+      settings,
+    );
+    expect(sterile).toContain('<span class="left">Χρήσεις: 41</span><span class="dates">');
+    expect(barcodeLabelHtml(worn, 'TOOL', undefined, settings)).toContain('Χρήσεις: 41');
+  });
 });
