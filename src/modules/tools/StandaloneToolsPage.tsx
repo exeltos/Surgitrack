@@ -187,6 +187,37 @@ export default function StandaloneToolsPage() {
           ) : undefined
         }
       />
+      <QuickFilters
+        items={[
+          {label: tr('Όλα'), count: scope.length, ...kpi()},
+          {
+            label: tr('Με όριο χρήσεων'),
+            count: scope.filter(t => t.maxUses).length,
+            hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
+            ...kpi({limit: 'LIMITED'}),
+          },
+          {
+            label: tr('Αχρησιμοποίητα'),
+            count: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
+            ...kpi({usage: 'NEW'}),
+          },
+          {
+            label: tr('Λίγες χρήσεις'),
+            tone: 'warn' as const,
+            count: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
+            ...kpi({usage: 'LOW'}),
+          },
+          {
+            label: tr('Εξαντλημένα'),
+            tone: 'bad' as const,
+            count: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
+            hint: tr('Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.'),
+            ...kpi({usage: 'EXHAUSTED'}),
+          },
+        ]}
+      />
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
@@ -235,40 +266,8 @@ export default function StandaloneToolsPage() {
             onChange: setUsage,
           },
         ]}
-        className="with-quick-filters"
         extra={
           <>
-            <QuickFilters
-              items={[
-                {label: tr('Όλα'), count: scope.length, ...kpi()},
-                {
-                  label: tr('Με όριο'),
-                  count: scope.filter(t => t.maxUses).length,
-                  hint: tr('Εργαλεία που έχουν ορισμένο μέγιστο αριθμό αποστειρώσεων· τα υπόλοιπα δεν έχουν όριο.'),
-                  ...kpi({limit: 'LIMITED'}),
-                },
-                {
-                  label: tr('Αχρησιμοποίητα'),
-                  count: scope.filter(t => matchesUsage('NEW', [t], systemSettings.usageWarningThreshold)).length,
-                  hint: tr('Εργαλεία με όριο και καμία χρήση ακόμα: το υπόλοιπο είναι ο αρχικός αριθμός χρήσεων.'),
-                  ...kpi({usage: 'NEW'}),
-                },
-                {
-                  label: tr('Λίγες χρήσεις'),
-                  tone: 'warn' as const,
-                  count: scope.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length,
-                  hint: tr('Εργαλεία που έχουν λίγες χρήσεις ακόμη, σύμφωνα με το όριο ειδοποίησης.'),
-                  ...kpi({usage: 'LOW'}),
-                },
-                {
-                  label: tr('Εξαντλημένα'),
-                  tone: 'bad' as const,
-                  count: scope.filter(t => matchesUsage('EXHAUSTED', [t], systemSettings.usageWarningThreshold)).length,
-                  hint: tr('Εργαλεία χωρίς καμία χρήση πια: έχουν τελειώσει και πρέπει να αποσυρθούν.'),
-                  ...kpi({usage: 'EXHAUSTED'}),
-                },
-              ]}
-            />
             <button
               type="button"
               className={`asset-filter-toggle ${grouped ? 'has-active' : ''}`}

@@ -129,6 +129,21 @@ export default function StockPage() {
         <StockMinimums />
       ) : (
         <>
+          <QuickFilters
+            items={[
+              {label: tr('Όλα'), count: stock.length, ...kpi()},
+              {
+                label: tr('Με όριο χρήσεων'),
+                count: stock.filter(t => !!t.maxUses).length,
+                ...kpi({limit: 'LIMITED'}),
+              },
+              {
+                label: tr('Χωρίς όριο'),
+                count: stock.filter(t => !t.maxUses).length,
+                ...kpi({limit: 'UNLIMITED'}),
+              },
+            ]}
+          />
           <AssetFilterBar
             query={q}
             onQueryChange={setQ}
@@ -170,24 +185,8 @@ export default function StockPage() {
                 onChange: setUsage,
               },
             ]}
-            className="with-quick-filters"
             extra={
               <>
-                <QuickFilters
-                  items={[
-                    {label: tr('Όλα'), count: stock.length, ...kpi()},
-                    {
-                      label: tr('Με όριο χρήσεων'),
-                      count: stock.filter(t => !!t.maxUses).length,
-                      ...kpi({limit: 'LIMITED'}),
-                    },
-                    {
-                      label: tr('Χωρίς όριο'),
-                      count: stock.filter(t => !t.maxUses).length,
-                      ...kpi({limit: 'UNLIMITED'}),
-                    },
-                  ]}
-                />
                 <ListExport
                   table={day => {
                     const history = onDay(day);

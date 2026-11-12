@@ -117,6 +117,27 @@ export default function SetsPage() {
           ) : undefined
         }
       />
+      <QuickFilters
+        items={[
+          {label: tr('Όλα'), count: sets.length, ...kpi()},
+          {
+            label: tr('Στο τμήμα'),
+            count: sets.filter(x => x.state === 'IN_DEPARTMENT').length,
+            ...kpi({state: 'IN_DEPARTMENT'}),
+          },
+          {
+            label: tr('Έτοιμα για παραλαβή'),
+            count: sets.filter(x => x.state === 'READY_FOR_PICKUP').length,
+            ...kpi({state: 'READY_FOR_PICKUP'}),
+          },
+          {
+            label: tr('Με έλλειψη'),
+            tone: 'bad' as const,
+            count: sets.filter(x => x.actual < x.expected).length,
+            ...kpi({completeness: 'SHORT'}),
+          },
+        ]}
+      />
       <AssetFilterBar
         query={q}
         onQueryChange={setQ}
@@ -175,30 +196,8 @@ export default function SetsPage() {
             onChange: setCompleteness,
           },
         ]}
-        className="with-quick-filters"
         extra={
           <>
-            <QuickFilters
-              items={[
-                {label: tr('Όλα'), count: sets.length, ...kpi()},
-                {
-                  label: tr('Στο τμήμα'),
-                  count: sets.filter(x => x.state === 'IN_DEPARTMENT').length,
-                  ...kpi({state: 'IN_DEPARTMENT'}),
-                },
-                {
-                  label: tr('Έτοιμα για παραλαβή'),
-                  count: sets.filter(x => x.state === 'READY_FOR_PICKUP').length,
-                  ...kpi({state: 'READY_FOR_PICKUP'}),
-                },
-                {
-                  label: tr('Με έλλειψη'),
-                  tone: 'bad' as const,
-                  count: sets.filter(x => x.actual < x.expected).length,
-                  ...kpi({completeness: 'SHORT'}),
-                },
-              ]}
-            />
             <ListExport
               table={() => setsExportTable(filtered, memberCount, tr('Σετ εργαλείων'))}
               disabled={filtered.length === 0}

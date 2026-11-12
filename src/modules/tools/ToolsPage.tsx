@@ -132,6 +132,22 @@ export default function ToolsPage() {
           ) : undefined
         }
       />
+      <QuickFilters
+        items={[
+          {label: tr('Όλα'), count: tools.length, ...kpi()},
+          {
+            label: tr('Σε Σετ'),
+            count: tools.filter(t => t.mode === 'SET_MEMBER').length,
+            ...kpi({mode: 'SET_MEMBER'}),
+          },
+          {
+            label: tr('Μεμονωμένα'),
+            count: tools.filter(t => t.mode === 'STANDALONE').length,
+            ...kpi({mode: 'STANDALONE'}),
+          },
+          {label: tr('Απόθεμα'), count: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
+        ]}
+      />
       <div className="asset-list-controls">
         <AssetFilterBar
           query={q}
@@ -192,25 +208,8 @@ export default function ToolsPage() {
               onChange: setUsage,
             },
           ]}
-          className="with-quick-filters"
           extra={
             <>
-              <QuickFilters
-                items={[
-                  {label: tr('Όλα'), count: tools.length, ...kpi()},
-                  {
-                    label: tr('Σε Σετ'),
-                    count: tools.filter(t => t.mode === 'SET_MEMBER').length,
-                    ...kpi({mode: 'SET_MEMBER'}),
-                  },
-                  {
-                    label: tr('Μεμονωμένα'),
-                    count: tools.filter(t => t.mode === 'STANDALONE').length,
-                    ...kpi({mode: 'STANDALONE'}),
-                  },
-                  {label: tr('Απόθεμα'), count: tools.filter(t => t.mode === 'STOCK').length, ...kpi({mode: 'STOCK'})},
-                ]}
-              />
               <ListExport
                 table={day => {
                   const history = onDay(day);
