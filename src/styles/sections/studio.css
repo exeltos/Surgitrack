@@ -1139,7 +1139,6 @@ html body .studio-security-table {
   border-collapse: collapse;
 }
 html body .studio-security-table :is(th, td) {
-  padding: 9px 12px;
   border-bottom: 1px solid var(--st-line);
   text-align: left;
   vertical-align: top;
@@ -1426,9 +1425,7 @@ html body .studio-ratings-kpis {
 html body .studio-ratings-kpis > * {
   display: grid;
   gap: 4px;
-  padding: 14px 16px;
   border: 1px solid var(--st-line);
-  border-radius: 12px;
   background: var(--c-white);
   font: inherit;
   text-align: left;
@@ -2318,41 +2315,6 @@ html body .settings-category:focus-visible {
 }
 
 /* The contact for trial hospitals on one line: the title, three fields and Save. The explanation is the tooltip. */
-html body .studio-system-grid > .platform-contact {
-  padding: 8px 14px;
-}
-html body .platform-contact-line {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 8px 10px;
-}
-html body .platform-contact-line h3 {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 6px 0 0;
-  font-size: 14px;
-  white-space: nowrap;
-}
-html body .platform-contact-line input {
-  flex: 1 1 110px;
-  min-width: 0;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 10px;
-  background: var(--c-white);
-  font: inherit;
-  font-size: 13px;
-}
-html body .platform-contact-line input.wide {
-  flex-grow: 1.8;
-}
-html body .platform-contact-line .app-button {
-  flex: 0 0 auto;
-  min-height: 36px;
-}
 
 /* Sterilization flow by category: the stages, the rules around them, the hospital's features — one at a time. */
 html body .studio-body-workflow .studio-workflow-page[data-group] {
@@ -2541,4 +2503,204 @@ html body .studio-system-grid > section > .studio-setting-row > .studio-setting-
 html body .studio-system-grid > section > .studio-setting-row > .studio-setting-input > .app-button {
   width: 100%;
   justify-content: center;
+}
+
+/* Owner overview: each figure's name on one line (the full name on hover). */
+html body .owner-kpi > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Hospitals: the figures that filter the list and «Νέο νοσοκομείο» on one row over it. */
+html body .platform-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 4px;
+}
+html body .platform-toolbar > .quick-filters {
+  flex: 1 1 auto;
+  margin: 0;
+}
+html body .platform-toolbar > .app-button {
+  flex: 0 0 auto;
+}
+html body .plan-badge {
+  white-space: nowrap;
+}
+
+/* Import: the hospital first, on the line of the explanation, before the steps. */
+html body .asset-import-head {
+  justify-content: flex-start;
+  align-items: center;
+  column-gap: 20px;
+}
+html body .asset-import-head > .asset-import-hospital {
+  order: -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Ratings: small figures on one line, as over the lists (the detail on hover); the Demo list in the size of
+   the other controls. */
+html body .studio-ratings-kpis > * {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+html body .studio-ratings-kpis > * > span {
+  overflow: hidden;
+  color: var(--c-cyan-30);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .studio-ratings-kpis > * > strong {
+  font-size: 16px;
+  line-height: 1;
+}
+html body .studio-ratings-kpis > * > small {
+  display: none;
+}
+html body .studio-ratings .studio-errors-actions select {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-cyan-20);
+}
+
+/* Security: the whole table fits: the hospital on one line, the browser under the address, small buttons. */
+html body .studio-security-table td.studio-security-hospital {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .studio-security-table td:is(:nth-child(4), :nth-child(5)) {
+  white-space: nowrap;
+}
+html body .studio-security-blocked > li > span > :is(b, small) {
+  display: block;
+  line-height: 1.35;
+}
+
+/* The contact for trial hospitals: the first row of the settings, its three fields stacked on the right, saved on
+   leaving a field. */
+html body .studio-system-grid > section > .platform-contact {
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  border-top: 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .platform-contact-fields {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  display: grid;
+  gap: 6px;
+}
+html body .platform-contact-fields > input {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-20);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .platform-contact .platform-contact-status {
+  color: var(--c-green-35);
+  font-weight: 700;
+}
+
+/* Readable contrast (WCAG AA): the «ΒΑΣΙΚΟ» mark of the core stages and the text of the protected-core note. */
+html body .workflow-core-chip {
+  color: var(--c-green-35);
+}
+html body .studio-role-security-banner span {
+  color: var(--c-cyan-30);
+}
+/* A stage that is off still reads: lighter, not faded out. */
+html body .studio-workflow-stage.disabled {
+  opacity: 1;
+}
+html body .studio-workflow-stage.disabled .workflow-stage-index {
+  color: var(--c-cyan-30);
+}
+html body .studio-workflow-stage.disabled :is(.workflow-stage-main, .workflow-check-preview) {
+  color: var(--st-muted);
+}
+html body .studio-security-table :is(th, td) {
+  padding: 9px 10px;
+}
+html body .studio-security-table td.studio-security-hospital {
+  max-width: 170px;
+}
+
+/* Security, connected now: four columns and two square buttons (the name on hover), nothing cut at the right. */
+html body .studio-security-table td b {
+  font-weight: 600;
+}
+html body .studio-security-table .studio-security-icon {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+html body .studio-security-table td:last-child {
+  width: 1%;
+}
+/* Blocked addresses: the form and the list in one card, fields as everywhere else. */
+html body .studio-security-card {
+  border: 1px solid var(--st-line);
+  border-radius: 12px;
+  background: var(--c-white);
+  overflow: hidden;
+}
+html body .studio-security-card > .studio-security-add {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--st-line);
+  align-items: center;
+}
+html body .studio-security-card .studio-security-field {
+  height: 36px;
+  font-size: 13px;
+}
+html body .studio-security-card .studio-security-blocked {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-security-card .studio-security-blocked > li {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--st-line);
+}
+html body .studio-security-card .studio-security-blocked > li:last-child {
+  border-bottom: 0;
+}
+html body .studio-security-card .studio-security-blocked b.mono {
+  font-size: 13px;
+}
+
+/* Roles: the role list and the permissions take the height left under the tabs, so their bottom edge is never
+   cut off. */
+@media (min-width: 901px) {
+  html body .studio-body-roles {
+    display: flex;
+    flex-direction: column;
+  }
+  html body .studio-body-roles > .studio-role-manager {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
 }

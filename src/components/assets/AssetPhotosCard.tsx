@@ -13,6 +13,8 @@ type Props = {
   title?: string;
   description?: string;
   readOnly?: boolean;
+  /** Inside a dialog that already names it: only the buttons, no title or explanation. */
+  bare?: boolean;
 };
 
 export default function AssetPhotosCard({
@@ -24,6 +26,7 @@ export default function AssetPhotosCard({
     'Φωτογραφική τεκμηρίωση του φυσικού αντικειμένου. Μπορείς να κρατήσεις περισσότερες από μία φωτογραφίες.',
   ),
   readOnly = false,
+  bare = false,
 }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
@@ -35,19 +38,23 @@ export default function AssetPhotosCard({
   };
   return (
     <section className="asset-section asset-photos-card">
-      <div className="asset-section-head photo-section-head">
-        <div>
-          <span className="eyebrow">{tr('ΤΕΚΜΗΡΙΩΣΗ')}</span>
-          <h2>{title}</h2>
+      <div className={`asset-section-head photo-section-head${bare ? ' bare' : ''}`}>
+        {bare ? (
           <p>{description}</p>
-        </div>
+        ) : (
+          <div>
+            <span className="eyebrow">{tr('ΤΕΚΜΗΡΙΩΣΗ')}</span>
+            <h2>{title}</h2>
+            <p>{description}</p>
+          </div>
+        )}
         {!readOnly && (
           <div className="photo-actions">
             <AppButton size="sm" icon={<Camera size={16} />} onClick={() => setCameraOpen(true)}>
               {tr('Λήψη φωτογραφίας')}
             </AppButton>
             <AppButton size="sm" icon={<ImagePlus size={16} />} onClick={() => uploadRef.current?.click()}>
-              {tr('Upload φωτογραφιών')}
+              {tr('Ανέβασμα φωτογραφιών')}
             </AppButton>
           </div>
         )}
@@ -76,7 +83,7 @@ export default function AssetPhotosCard({
       <input
         ref={uploadRef}
         className="visually-hidden-file"
-        aria-label={tr('Upload φωτογραφιών')}
+        aria-label={tr('Ανέβασμα φωτογραφιών')}
         type="file"
         accept="image/*"
         multiple

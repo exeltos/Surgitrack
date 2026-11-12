@@ -2794,45 +2794,12 @@
   /* header, KPIs, section switch, the section: only the section takes the free height */
   grid-template-rows: auto auto auto minmax(0, 1fr);
 }
-.platform-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--c-gray-95);
-  background: var(--c-white);
-}
-.platform-kpis > div {
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.platform-kpis span {
-  font-size: 11px;
-  color: var(--st-muted);
-}
-.platform-kpis strong {
-  font-size: 17px;
-  color: var(--studio-ink, var(--c-cyan-25-2));
-}
 .studio-access-toggle.demo.active {
   color: #14764f;
 }
 .studio-access-toggle:disabled {
   cursor: default;
   opacity: 0.7;
-}
-
-@media (max-width: 900px) {
-  .platform-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 /* v0.29.2 — Roles layout stability + private demo separation */

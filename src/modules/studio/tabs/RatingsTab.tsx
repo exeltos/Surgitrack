@@ -69,12 +69,17 @@ export default function RatingsTab({s}: {s: StudioPageState}) {
       ) : (
         <>
           <div className="studio-ratings-kpis">
-            <div>
+            <div title={L(`${summary.rated} βαθμολογίες`, `${summary.rated} ratings`)}>
               <span>{L('Μέση βαθμολογία', 'Average rating')}</span>
               <strong>{summary.average !== undefined ? stars(summary.average) : '—'}</strong>
               <small>{L(`${summary.rated} βαθμολογίες`, `${summary.rated} ratings`)}</small>
             </div>
-            <div>
+            <div
+              title={L(
+                `${summary.evaluations.length} τελικές αξιολογήσεις`,
+                `${summary.evaluations.length} final evaluations`,
+              )}
+            >
               <span>NPS</span>
               <strong className={summary.nps !== undefined && summary.nps < 0 ? 'negative' : ''}>
                 {summary.nps !== undefined ? npsLabel(summary.nps) : '—'}
@@ -86,14 +91,15 @@ export default function RatingsTab({s}: {s: StudioPageState}) {
                 )}
               </small>
             </div>
-            <div>
-              <span>Demo</span>
+            <div title={L('σε αξιολόγηση', 'being evaluated')}>
+              <span>{L('Demo σε αξιολόγηση', 'Demos being evaluated')}</span>
               <strong>{shown.length}</strong>
               <small>{L('σε αξιολόγηση', 'being evaluated')}</small>
             </div>
             <button
               type="button"
               className={summary.newRequests ? 'attention' : ''}
+              title={L('Αγορά ή παράταση · Demo αξιολόγησης', 'Purchase or more time · Evaluation Demos')}
               onClick={() => selectTab('PLATFORM')}
             >
               <span>{L('Νέα αιτήματα', 'New requests')}</span>

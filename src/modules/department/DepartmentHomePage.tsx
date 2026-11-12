@@ -4,11 +4,9 @@ import {
   Activity,
   CalendarClock,
   Gauge,
-  History,
   Home,
   Layers3,
   PackageCheck,
-  ShieldCheck,
   Sparkles,
   TriangleAlert,
   Wrench,
@@ -151,13 +149,6 @@ export default function DepartmentHomePage() {
         eyebrow={tr('ΑΡΧΙΚΗ ΤΜΗΜΑΤΟΣ')}
         title={trData(dept)}
         description={tr('Ο εξοπλισμός του τμήματος με μια ματιά: τι είναι πού και τι περιμένει.')}
-        actions={
-          <div className="department-user-sign">
-            <ShieldCheck size={18} />
-            <span>{tr('Συνδεδεμένος χρήστης')}</span>
-            <strong>{trData(currentUser.name)}</strong>
-          </div>
-        }
       />
 
       <div className="dash-kpis">
@@ -349,12 +340,14 @@ export default function DepartmentHomePage() {
           </header>
           <ul className="dash-list" tabIndex={0} aria-label={tr('Τελευταίες κινήσεις')}>
             {latestMovements.map(m => (
-              <li key={m.id}>
-                <History size={15} />
+              <li key={m.id} className="dash-movement">
                 <Link to={assetPath(m.asset) || '/movements'}>
                   <b>{m.asset}</b>
                   <small>
-                    {movementText(m.status)} · {trData(m.from)} → {trData(m.to)} · {m.at}
+                    {movementText(m.status)} · {m.at}
+                  </small>
+                  <small>
+                    {trData(m.from)} → {trData(m.to)}
                   </small>
                 </Link>
               </li>

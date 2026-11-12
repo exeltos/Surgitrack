@@ -8,13 +8,16 @@ export default function PlanBadge({org, L}: {org: Organization; L: (el: string, 
   const date = org.trialEndsAt ? formatDate(org.trialEndsAt) : '—';
   if (state.ended)
     return (
-      <span className="plan-badge locked">
-        {L(`Δοκιμή έληξε ${date} · κλειδωμένο`, `Trial ended ${date} · locked`)}
+      <span className="plan-badge locked" title={L(`Η δοκιμή έληξε ${date}`, `The trial ended ${date}`)}>
+        {L('Έληξε · κλειδωμένο', 'Ended · locked')}
       </span>
     );
   return (
-    <span className={`plan-badge trial${state.warn ? ' warn' : ''}`}>
-      {L(`Δοκιμαστική · λήγει ${date} (${state.daysLeft} ημέρες)`, `Trial · ends ${date} (${state.daysLeft} days)`)}
+    <span
+      className={`plan-badge trial${state.warn ? ' warn' : ''}`}
+      title={L(`Δοκιμαστική περίοδος έως ${date}`, `On trial until ${date}`)}
+    >
+      {L(`Δοκιμή · ${state.daysLeft} ημ.`, `Trial · ${state.daysLeft} d`)}
     </span>
   );
 }

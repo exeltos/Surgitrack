@@ -1380,3 +1380,8 @@ html body .hospital-people .people-requests {
   gap: 8px;
   padding: 10px 12px;
 }
+
+/* The department's latest movements: no clock on every row; the route on its own line, whole. */
+html body .dash-list li.dash-movement {
+  grid-template-columns: minmax(0, 1fr);
+}

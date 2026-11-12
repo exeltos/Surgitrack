@@ -64,35 +64,28 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                     roleCount.find(x => x.role === selectedRole)?.count || 0,
                   )}
                 </span>
-                <AppButton onClick={resetSelectedRole}>
-                  <RefreshCcw size={15} />
-                  {L('Επαναφορά', 'Reset')}
-                </AppButton>
-                <AppButton
-                  variant="primary"
-                  disabled={!roleDirty || selectedRole === 'ADMIN'}
-                  onClick={saveRolePermissions}
-                >
-                  <Save size={15} />
-                  {L('Αποθήκευση', 'Save')}
-                </AppButton>
+                {/* The Administrator is not configurable: nothing to reset or save. */}
+                {selectedRole !== 'ADMIN' && (
+                  <>
+                    <AppButton onClick={resetSelectedRole}>
+                      <RefreshCcw size={15} />
+                      {L('Επαναφορά', 'Reset')}
+                    </AppButton>
+                    <AppButton variant="primary" disabled={!roleDirty} onClick={saveRolePermissions}>
+                      <Save size={15} />
+                      {L('Αποθήκευση', 'Save')}
+                    </AppButton>
+                  </>
+                )}
               </div>
             </header>
-            <div className="studio-role-security-banner">
-              <ShieldCheck size={18} />
-              <div>
-                <strong>
-                  {selectedRole === 'ADMIN'
-                    ? L('Πλήρης πρόσβαση διαχειριστή', 'Full administrator access')
-                    : L('Προστατευμένος πυρήνας δικαιωμάτων', 'Protected permission core')}
-                </strong>
-                <span>
-                  {selectedRole === 'ADMIN'
-                    ? L(
-                        'Ο Διαχειριστής διατηρεί πάντα πλήρη πρόσβαση στο SurgiTrack.',
-                        'Administrator always retains full SurgiTrack access.',
-                      )
-                    : selectedRole === 'VIEWER'
+            {selectedRole !== 'ADMIN' && (
+              <div className="studio-role-security-banner">
+                <ShieldCheck size={18} />
+                <div>
+                  <strong>{L('Προστατευμένος πυρήνας δικαιωμάτων', 'Protected permission core')}</strong>
+                  <span>
+                    {selectedRole === 'VIEWER'
                       ? L(
                           'Ο Παρατηρητής δεν μπορεί ποτέ να αποκτήσει δικαίωμα ενέργειας· εδώ ορίζετε μόνο ποιες ενότητες βλέπει. Οι αλλαγές δεδομένων μπλοκάρονται και στον server.',
                           'A viewer can never be given an action; here you only choose which sections they see. Data changes are also blocked on the server.',
@@ -106,17 +99,16 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                             'Τα κρίσιμα δικαιώματα της αλυσίδας φύλαξης παραμένουν κλειδωμένα. Τα υπόλοιπα μπορούν να προσαρμοστούν στην πολιτική της μονάδας.',
                             'Critical chain-of-custody permissions remain locked. Other permissions can follow facility policy.',
                           )}
-                </span>
-                {selectedRole !== 'ADMIN' && (
+                  </span>
                   <span>
                     {L(
                       '🔒 Το λουκέτο σημαίνει ότι δεν αλλάζει (προστατευμένο ή μόνο ο Προϊστάμενος). Τα υπόλοιπα τα αλλάζεις και πατάς Αποθήκευση.',
                       '🔒 A padlock means it cannot be changed (protected, or Supervisor only). Change the others, then press Save.',
                     )}
                   </span>
-                )}
+                </div>
               </div>
-            </div>
+            )}
             {selectedRole === 'ADMIN' ? (
               <div className="studio-admin-access-summary">
                 <div>
@@ -136,8 +128,12 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                     <strong>{L(permissionGroupMeta[group].el, permissionGroupMeta[group].en)}</strong>
                     <span>
                       <CheckCircle2 size={15} />
-                      {permissionCatalog.filter(item => item.group === group).length}{' '}
-                      {L('δικαιώματα ενεργά', 'permissions active')}
+                      {(n =>
+                        n === 1
+                          ? L('1 δικαίωμα ενεργό', '1 permission active')
+                          : L(`${n} δικαιώματα ενεργά`, `${n} permissions active`))(
+                        permissionCatalog.filter(item => item.group === group).length,
+                      )}
                     </span>
                   </section>
                 ))}

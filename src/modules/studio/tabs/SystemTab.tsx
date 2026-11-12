@@ -37,11 +37,9 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             ))}
           </div>
           <div className="studio-system-grid">
-            {group === 'GENERAL' && platformAdmin && libs.dataMode === 'PRODUCTION' && (
-              <PlatformContactSettings L={L} />
-            )}
             {group === 'GENERAL' && (
               <section>
+                {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
                 <label>
                   {L('Προειδοποίηση υπολοίπου χρήσεων', 'Remaining-use warning')}
                   <div className="studio-setting-input">

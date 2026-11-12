@@ -92,19 +92,22 @@ export default function DemoAccountsPanel({
       className={`platform-evaluation-demos ${onCreatingChange ? 'embedded' : ''}`}
       aria-label={tr('Demo αξιολόγησης')}
     >
-      <header>
-        <small>
-          {tr(
-            'Κάθε Demo είναι ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα. Ο υπεύθυνος λαμβάνει email με τον λογαριασμό του και το Demo κλειδώνει στη λήξη του.',
-          )}
-        </small>
-        {!onCreatingChange && (
-          <AppButton variant="primary" onClick={() => setCreating(true)} disabled={!!d.busy}>
-            <Plus size={16} />
-            {tr('Νέο Demo')}
-          </AppButton>
-        )}
-      </header>
+      {/* Embedded in «Demo αξιολόγησης», the page head already explains it and holds «Νέο Demo αξιολόγησης». */}
+      {!onCreatingChange && (
+        <header>
+          <small>
+            {tr(
+              'Κάθε Demo είναι ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα. Ο υπεύθυνος λαμβάνει email με τον λογαριασμό του και το Demo κλειδώνει στη λήξη του.',
+            )}
+          </small>
+          {
+            <AppButton variant="primary" onClick={() => setCreating(true)} disabled={!!d.busy}>
+              <Plus size={16} />
+              {tr('Νέο Demo')}
+            </AppButton>
+          }
+        </header>
+      )}
       {!!d.demos.length && (
         <div className="evaluation-demo-counts">
           {(Object.keys(STAGE_LABEL) as DemoStage[]).map(stage => (
@@ -129,10 +132,6 @@ export default function DemoAccountsPanel({
               'Ένα Demo δίνει σε έναν υποψήφιο πελάτη δικό του νοσοκομείο με δοκιμαστικά δεδομένα, για όσες ημέρες ορίσετε.',
             )}
           </span>
-          <AppButton variant="primary" onClick={() => setCreating(true)} disabled={!!d.busy}>
-            <Plus size={16} />
-            {tr('Νέο Demo αξιολόγησης')}
-          </AppButton>
         </div>
       ) : (
         <div className="evaluation-demo-list">

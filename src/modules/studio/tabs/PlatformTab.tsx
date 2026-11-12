@@ -20,12 +20,14 @@ import {hospitalRoleKinds, hospitalRoleNames, type HospitalRoleKind} from '../..
 import type {Organization} from '../../../core/LibraryStore';
 import {trialEndAfter, trialEnded} from '../../../core/trial';
 import PlanBadge from '../PlanBadge';
+import QuickFilters from '../../../components/ui/QuickFilters';
 import NetworkAccessDialog from '../NetworkAccessDialog';
 import {activeHospitalId, switchHospital} from '../../../data/cloud/hospitalSwitch';
 import DemoAccountsPanel from '../demo/DemoAccountsPanel';
 import type {StudioPageState} from '../useStudioPage';
 
 type DemoView = 'EVALUATION' | 'PRIVATE';
+type HospitalFilter = 'ALL' | 'ACTIVE' | 'TRIAL';
 const VIEW_KEY = 'surgitrack-platform-view';
 const readView = (): DemoView => {
   try {
@@ -41,9 +43,11 @@ const readView = (): DemoView => {
  * Demos with sample data plus the owner's own practice Demo.
  */
 export default function PlatformTab({s}: {s: StudioPageState}) {
-  const {L, displayedOrganizations, displayedUsers, libs, platformAdmin, setOrganizationEditor, tab} = s;
+  const {L, displayedOrganizations, libs, platformAdmin, setOrganizationEditor, tab} = s;
   const [view, setViewState] = useState<DemoView>(readView);
   const [creatingDemo, setCreatingDemo] = useState(false);
+  // The figures over the hospitals filter them: all, the active ones, the ones on trial.
+  const [filter, setFilter] = useState<HospitalFilter>('ALL');
   const cloud = libs.dataMode === 'PRODUCTION';
   const setView = (next: DemoView) => {
     setViewState(next);
@@ -55,40 +59,33 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
   };
   if ((tab !== 'PLATFORM' && tab !== 'DEMOS') || !platformAdmin) return null;
   if (tab === 'PLATFORM') {
-    const trials = displayedOrganizations.filter(org => org.plan === 'TRIAL');
+    const active = displayedOrganizations.filter(org => org.active);
+    const onTrial = displayedOrganizations.filter(
+      org => org.plan === 'TRIAL' && !trialEnded(org.plan, org.trialEndsAt),
+    );
+    const shown = filter === 'ACTIVE' ? active : filter === 'TRIAL' ? onTrial : displayedOrganizations;
     return (
       <section className="studio-manager-panel studio-platform-panel">
-        <header className="studio-panel-head">
-          <div>
-            <span className="eyebrow">{L('ΠΛΑΤΦΟΡΜΑ', 'PLATFORM')}</span>
-            <h2>{L('Νοσοκομεία', 'Hospitals')}</h2>
-          </div>
-          <div className="platform-head-actions">
-            <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}>
-              <Plus size={16} />
-              {L('Νέο νοσοκομείο', 'New hospital')}
-            </AppButton>
-          </div>
-        </header>
-        <div className="platform-kpis">
-          <div>
-            <span>{L('Νοσοκομεία', 'Hospitals')}</span>
-            <strong>{displayedOrganizations.length}</strong>
-          </div>
-          <div>
-            <span>{L('Ενεργά', 'Active')}</span>
-            <strong>{displayedOrganizations.filter(org => org.active).length}</strong>
-          </div>
-          <div>
-            <span>{L('Σε δοκιμαστική περίοδο', 'On trial')}</span>
-            <strong>{trials.filter(org => !trialEnded(org.plan, org.trialEndsAt)).length}</strong>
-          </div>
-          <div>
-            <span>{L('Χρήστες νοσοκομείων', 'Hospital users')}</span>
-            <strong>{displayedUsers.length}</strong>
-          </div>
+        <h2 className="visually-hidden">{L('Νοσοκομεία', 'Hospitals')}</h2>
+        <div className="platform-toolbar">
+          <QuickFilters
+            label={L('Νοσοκομεία', 'Hospitals')}
+            items={[
+              {key: 'ALL', label: L('Όλα', 'All'), count: displayedOrganizations.length},
+              {key: 'ACTIVE', label: L('Ενεργά', 'Active'), count: active.length},
+              {key: 'TRIAL', label: L('Σε δοκιμαστική περίοδο', 'On trial'), count: onTrial.length},
+            ].map(f => ({
+              ...f,
+              active: filter === f.key,
+              onClick: () => setFilter(filter === f.key ? 'ALL' : (f.key as HospitalFilter)),
+            }))}
+          />
+          <AppButton variant="primary" onClick={() => setOrganizationEditor(null)}>
+            <Plus size={16} />
+            {L('Νέο νοσοκομείο', 'New hospital')}
+          </AppButton>
         </div>
-        <HospitalList s={s} />
+        <HospitalList s={s} organizations={shown} />
       </section>
     );
   }
@@ -105,8 +102,8 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
           <h2>{L('Demo αξιολόγησης', 'Evaluation Demos')}</h2>
           <p>
             {L(
-              'Δεν είναι πραγματικό νοσοκομείο: για πελάτη που ξεκινά, ανοίξτε «Νέο νοσοκομείο» με δοκιμαστική περίοδο.',
-              'Not a real hospital: for a customer who is starting, open a «New hospital» on trial.',
+              'Ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα, που κλειδώνει στη λήξη του. Για πελάτη που ξεκινά: «Νέο νοσοκομείο» με δοκιμαστική περίοδο.',
+              'A separate hospital with sample data that locks when it ends. For a customer who is starting: a «New hospital» on trial.',
             )}
           </p>
         </div>
@@ -149,14 +146,14 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
   );
 }
 
-function HospitalList({s}: {s: StudioPageState}) {
+function HospitalList({s, organizations}: {s: StudioPageState; organizations: Organization[]}) {
   const [network, setNetwork] = useState<Organization | null>(null);
-  const {L, changePlan, cloudDepartments, displayedOrganizations, displayedUsers, openOrganization} = s;
-  if (!displayedOrganizations.length)
+  const {L, changePlan, cloudDepartments, displayedUsers, openOrganization} = s;
+  if (!organizations.length)
     return <div className="studio-empty">{L('Δεν υπάρχουν νοσοκομεία.', 'No hospitals yet.')}</div>;
   return (
     <div className="platform-hospitals" role="list">
-      {displayedOrganizations.map(org => {
+      {organizations.map(org => {
         const users = displayedUsers.filter(user => user.organizationId === org.id).length;
         const departments = cloudDepartments.filter(d => d.organizationId === org.id).length;
         return (

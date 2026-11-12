@@ -354,3 +354,39 @@ html body .department-lives-hint {
   color: var(--st-muted);
   font-size: 11px;
 }
+
+/* The department's lists: one short row per Set or instrument: the barcode under the name, the state and its
+   stage or dates on one line. */
+html body .department-asset-row .department-asset-open {
+  min-height: 0;
+  padding: 7px 14px;
+}
+/* The wide columns only where they fit: narrower windows keep their own layouts. */
+@media (min-width: 1181px) {
+  html body .department-asset-row .department-asset-open {
+    grid-template-columns: 36px minmax(300px, 1.5fr) minmax(280px, 1fr) minmax(120px, 0.4fr) 24px;
+    gap: 14px;
+  }
+}
+html body .department-asset-row .department-asset-icon {
+  width: 32px;
+  height: 32px;
+}
+html body .department-asset-identity small .mono {
+  color: var(--c-cyan-40-5);
+  font-size: 12px;
+}
+html body .department-asset-state {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+}
+html body .department-asset-state > small.department-stage,
+html body .department-expiry {
+  margin-top: 0;
+}
+html body .department-workspace > .quick-filters {
+  margin-bottom: 10px;
+}

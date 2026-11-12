@@ -152,9 +152,7 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
                     ['name', L('Χρήστης', 'User')],
                     ['hospital', L('Νοσοκομείο', 'Hospital')],
                     ['ip', L('Διεύθυνση', 'Address')],
-                    ['browser', L('Πρόγραμμα περιήγησης', 'Browser')],
-                    ['since', L('Από', 'Since')],
-                    ['last', L('Τελευταία δραστηριότητα', 'Last seen')],
+                    ['last', L('Δραστηριότητα', 'Activity')],
                   ] as const
                 ).map(([key, label]) => (
                   <SortTh key={key} label={label} sortKey={key} sort={list.sort} onSort={list.toggle} />
@@ -169,29 +167,46 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
                     <b>{row.name}</b>
                     <small>{row.email}</small>
                   </td>
-                  <td>{row.organization_name || L('Πλατφόρμα', 'Platform')}</td>
+                  <td className="studio-security-hospital" title={row.organization_name || undefined}>
+                    {row.organization_name || L('Πλατφόρμα', 'Platform')}
+                  </td>
                   <td>
                     <b className="mono">{row.ip || '—'}</b>
                     {row.ip && (perIp.get(row.ip) || 0) > 1 && (
                       <small>{L(`${perIp.get(row.ip)} άτομα`, `${perIp.get(row.ip)} people`)}</small>
                     )}
                     {row.ip_blocked && <small className="studio-security-flag">{L('Μπλοκαρισμένη', 'Blocked')}</small>}
+                    <small>{browserOf(row.user_agent)}</small>
                   </td>
-                  <td>{browserOf(row.user_agent)}</td>
-                  <td>{formatDateTime(row.first_seen)}</td>
-                  <td>{sinceLabel(row.last_seen, Date.now(), L)}</td>
+                  <td>
+                    <b>{sinceLabel(row.last_seen, Date.now(), L)}</b>
+                    <small>
+                      {L(`από ${formatDateTime(row.first_seen)}`, `since ${formatDateTime(row.first_seen)}`)}
+                    </small>
+                  </td>
                   <td>
                     <div className="studio-security-actions">
                       {row.user_id === me && <small className="studio-security-me">{L('Εσείς', 'You')}</small>}
                       {row.user_id !== me && row.organization_id && row.ip && !row.ip_blocked && (
-                        <AppButton variant="danger" icon={<Ban size={15} />} onClick={() => void blockIp(row.ip!)}>
-                          {L('Μπλοκάρισμα IP', 'Block IP')}
-                        </AppButton>
+                        <AppButton
+                          size="sm"
+                          variant="danger"
+                          className="studio-security-icon"
+                          icon={<Ban size={15} />}
+                          aria-label={L('Μπλοκάρισμα IP', 'Block IP')}
+                          title={L('Μπλοκάρισμα IP', 'Block IP')}
+                          onClick={() => void blockIp(row.ip!)}
+                        />
                       )}
                       {row.organization_id && row.active && (
-                        <AppButton icon={<UserX size={15} />} onClick={() => void suspend(row)}>
-                          {L('Αναστολή χρήστη', 'Suspend user')}
-                        </AppButton>
+                        <AppButton
+                          size="sm"
+                          className="studio-security-icon"
+                          icon={<UserX size={15} />}
+                          aria-label={L('Αναστολή χρήστη', 'Suspend user')}
+                          title={L('Αναστολή χρήστη', 'Suspend user')}
+                          onClick={() => void suspend(row)}
+                        />
                       )}
                       {row.organization_id && !row.active && (
                         <small className="studio-security-flag">{L('Σε αναστολή', 'Suspended')}</small>
@@ -209,45 +224,49 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
           {L('Μπλοκαρισμένες διευθύνσεις', 'Blocked addresses')} · {blocked.length}
         </h3>
       </div>
-      <div className="studio-security-add">
-        <div className="studio-security-field">
-          <input
-            aria-label={L('Διεύθυνση ή μικρό εύρος', 'Address or small range')}
-            value={adding}
-            onChange={e => setAdding(e.target.value)}
-            placeholder={L(
-              'Διεύθυνση, π.χ. 203.0.113.5 ή 203.0.113.0/28',
-              'Address, e.g. 203.0.113.5 or 203.0.113.0/28',
-            )}
-          />
+      <div className="studio-security-card">
+        <div className="studio-security-add">
+          <div className="studio-security-field">
+            <input
+              aria-label={L('Διεύθυνση ή μικρό εύρος', 'Address or small range')}
+              value={adding}
+              onChange={e => setAdding(e.target.value)}
+              placeholder={L(
+                'Διεύθυνση, π.χ. 203.0.113.5 ή 203.0.113.0/28',
+                'Address, e.g. 203.0.113.5 or 203.0.113.0/28',
+              )}
+            />
+          </div>
+          <div className="studio-security-field">
+            <input
+              aria-label={L('Σημείωση', 'Note')}
+              value={note}
+              maxLength={200}
+              onChange={e => setNote(e.target.value)}
+              placeholder={L('Σημείωση (προαιρετικά)', 'Note (optional)')}
+            />
+          </div>
+          <AppButton variant="danger" icon={<Ban size={15} />} disabled={!adding.trim()} onClick={() => void addIp()}>
+            {L('Μπλοκάρισμα', 'Block')}
+          </AppButton>
         </div>
-        <div className="studio-security-field">
-          <input
-            aria-label={L('Σημείωση', 'Note')}
-            value={note}
-            maxLength={200}
-            onChange={e => setNote(e.target.value)}
-            placeholder={L('Σημείωση (προαιρετικά)', 'Note (optional)')}
-          />
-        </div>
-        <AppButton variant="danger" icon={<Ban size={15} />} disabled={!adding.trim()} onClick={() => void addIp()}>
-          {L('Μπλοκάρισμα', 'Block')}
-        </AppButton>
+        {blocked.length > 0 && (
+          <ul className="studio-security-blocked">
+            {blocked.map(row => (
+              <li key={row.ip}>
+                <span>
+                  <b className="mono">{row.ip.replace(/\/(32|128)$/, '')}</b>
+                  <small>
+                    {row.note ? `${row.note} · ` : ''}
+                    {formatDateTime(row.blocked_at)}
+                  </small>
+                </span>
+                <AppButton onClick={() => void unblock(row.ip)}>{L('Ξεμπλοκάρισμα', 'Unblock')}</AppButton>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      {blocked.length > 0 && (
-        <ul className="studio-errors-list studio-security-blocked">
-          {blocked.map(row => (
-            <li key={row.ip}>
-              <span>
-                <b className="mono">{row.ip.replace(/\/(32|128)$/, '')}</b>
-                {row.note && <small>{row.note}</small>}
-                <small>{formatDateTime(row.blocked_at)}</small>
-              </span>
-              <AppButton onClick={() => void unblock(row.ip)}>{L('Ξεμπλοκάρισμα', 'Unblock')}</AppButton>
-            </li>
-          ))}
-        </ul>
-      )}
     </section>
   );
 }
