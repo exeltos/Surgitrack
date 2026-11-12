@@ -58,11 +58,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Πρώτη σύνδεση',
-          'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας στο SurgiTrack εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234) και τον ρόλο σας. Συνδεθείτε με το όνομα χρήστη (ή το email σας) και τον κωδικό που ορίσατε στην εγγραφή: τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό. Αν τον λογαριασμό τον δημιούργησε ο διαχειριστής, πατήστε «Ορισμός κωδικού» στο email.',
+          'Μετά την έγκριση λαμβάνετε email «Η πρόσβασή σας στο SurgiTrack εγκρίθηκε» με το όνομα χρήστη σας (π.χ. GN1234) και τον ρόλο σας. Συνδεθείτε με το όνομα χρήστη (ή το email σας) και τον κωδικό που ορίσατε στην εγγραφή: τουλάχιστον 10 χαρακτήρες, με ένα γράμμα και έναν αριθμό. Αν τον λογαριασμό τον δημιούργησε ο διαχειριστής, πατήστε «Ορισμός κωδικού» στο email.',
         ],
         en: [
           'First sign-in',
-          'Once approved you get an "Your access to SurgiTrack was approved" email with your username (e.g. GN1234) and your role. Sign in with your username (or email) and the password you set when signing up: at least 8 characters, with a letter and a number. If the administrator created the account, press "Set password" in the email.',
+          'Once approved you get an "Your access to SurgiTrack was approved" email with your username (e.g. GN1234) and your role. Sign in with your username (or email) and the password you set when signing up: at least 10 characters, with a letter and a number. If the administrator created the account, press "Set password" in the email.',
         ],
       },
       {

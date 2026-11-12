@@ -29,8 +29,12 @@ export const INVITE_DAYS = 7;
 // An emailed confirmation link works for 7 days too.
 export const CONFIRM_DAYS = 7;
 const randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), b => b.toString(16).padStart(2, "0")).join("");
-const PASSWORD_MIN = 8;
+const PASSWORD_MIN = 10;
 const upperName = (value: unknown) => String(value || "").trim().replace(/\s+/g, " ").toLocaleUpperCase("el-GR");
+
+/** The sign-in service turned the password down as too common (found in leaks) or too short. */
+const isWeak = (error: {code?: string; message?: string} | null) =>
+  !!error && (error.code === "weak_password" || /weak|easy to guess|at least \d+ characters/i.test(error.message || ""));
 
 Deno.serve(async req => {
   const cors = corsFor(req, corsBase);
@@ -141,7 +145,7 @@ Deno.serve(async req => {
     const password = typeof body?.password === "string" ? body.password : "";
     if (!NAME.test(firstName) || !NAME.test(lastName) || !EMAIL.test(email) || (needsDepartment && !departmentId))
       return json({error: "invalid_input"}, 400);
-    // At least 8 characters, with a letter and a number (the app's form checks the same).
+    // At least 10 characters, with a letter and a number (the app's form checks the same).
     if (password.length < PASSWORD_MIN || password.length > 72 || !/\p{L}/u.test(password) || !/\d/.test(password))
       return json({error: "password_invalid"}, 400);
 
@@ -217,6 +221,7 @@ Deno.serve(async req => {
       email_confirm: !confirmByEmail,
       user_metadata: {full_name: fullName, user_code: userCode},
     });
+    if (isWeak(createError)) return json({error: "password_weak"}, 400);
     if (createError || !created?.user) {
       const exists = /already|registered|exists/i.test(createError?.message || "");
       return json({error: exists ? "email_exists" : "signup_failed"}, exists ? 409 : 500);

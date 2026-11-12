@@ -32,9 +32,19 @@ describe('change-initial-password', () => {
   });
 
   it('keeps the requirement when the password could not be changed', async () => {
-    fake.admin.updateUserById = () => ({error: {message: 'weak'}});
+    fake.admin.updateUserById = () => ({error: {message: 'database unavailable'}});
     const response = await change('Nea-kodikos-7');
     expect(response.status).toBe(500);
+    expect(fake.dbCalls('update')).toHaveLength(0);
+  });
+
+  it('says so when the sign-in service turns the password down as too common', async () => {
+    fake.admin.updateUserById = () => ({
+      error: {code: 'weak_password', message: 'Password is known to be weak and easy to guess, please choose a different one.'},
+    });
+    const response = await change('Kodikos-1234');
+    expect(response.status).toBe(400);
+    expect((await response.json()).error).toBe('password_weak');
     expect(fake.dbCalls('update')).toHaveLength(0);
   });
 

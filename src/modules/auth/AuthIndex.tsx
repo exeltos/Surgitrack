@@ -160,6 +160,12 @@ const copy = {
   },
 };
 
+/** The sign-in service turned the new password down as too common (it appears in lists of leaked passwords). */
+const weakPasswordText = (lang: string) =>
+  lang === 'el'
+    ? 'Ο κωδικός είναι πολύ κοινός (υπάρχει σε λίστες κωδικών που έχουν διαρρεύσει). Διαλέξτε άλλον.'
+    : 'This password is too common (it appears in lists of leaked passwords). Choose another.';
+
 export default function AuthIndex({
   onAuthenticated,
   goodbye,
@@ -307,8 +313,8 @@ export default function AuthIndex({
     if (!passwordOk(password)) {
       setMessage(
         lang === 'el'
-          ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες, με ένα γράμμα και έναν αριθμό.'
-          : 'The new password must be at least 8 characters, with a letter and a number.',
+          ? 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 10 χαρακτήρες, με ένα γράμμα και έναν αριθμό.'
+          : 'The new password must be at least 10 characters, with a letter and a number.',
       );
       return;
     }
@@ -320,10 +326,24 @@ export default function AuthIndex({
       // The first password of someone the owner's import made: changed on the server, which then lifts the requirement.
       const {error: firstError} = await supabase.functions.invoke('change-initial-password', {body: {password}});
       if (firstError) {
+        // Says why: a common password, a sign-in that has ended (e.g. the initial password was reset meanwhile), or
+        // only then «try again».
+        const response = firstError instanceof FunctionsHttpError ? (firstError.context as Response) : null;
+        const code = response ? String((await response.json().catch(() => ({})))?.error || '') : '';
         setMessage(
-          lang === 'el'
-            ? 'Ο κωδικός δεν άλλαξε. Δοκιμάστε ξανά σε λίγο.'
-            : 'The password was not changed. Try again shortly.',
+          code === 'password_weak'
+            ? weakPasswordText(lang)
+            : response?.status === 401 || code === 'forbidden'
+              ? lang === 'el'
+                ? 'Η σύνδεση έληξε. Συνδεθείτε ξανά με το όνομα χρήστη και τον αρχικό κωδικό (το κινητό σας).'
+                : 'Your sign-in has ended. Sign in again with your username and the initial password (your mobile).'
+              : code === 'not_required'
+                ? lang === 'el'
+                  ? 'Ο κωδικός σας έχει ήδη αλλάξει. Συνδεθείτε με τον κωδικό σας.'
+                  : 'Your password was already changed. Sign in with your password.'
+                : lang === 'el'
+                  ? 'Ο κωδικός δεν άλλαξε. Δοκιμάστε ξανά σε λίγο.'
+                  : 'The password was not changed. Try again shortly.',
         );
         return;
       }
@@ -334,7 +354,7 @@ export default function AuthIndex({
     }
     const {error} = await supabase.auth.updateUser({password});
     if (error) {
-      setMessage(error.message);
+      setMessage(error.code === 'weak_password' ? weakPasswordText(lang) : error.message);
       return;
     }
     await supabase.auth.signOut();

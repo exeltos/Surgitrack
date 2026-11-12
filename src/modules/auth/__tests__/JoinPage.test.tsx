@@ -119,7 +119,7 @@ describe('Signup password', () => {
     fireEvent.change(password, {target: {value: 'onlyletters'}});
     fireEvent.change(confirm, {target: {value: 'onlyletters'}});
     const rule = (text: string) => screen.getByText(text).closest('li')!;
-    expect(rule('Τουλάχιστον 8 χαρακτήρες')).toHaveClass('is-ok');
+    expect(rule('Τουλάχιστον 10 χαρακτήρες')).toHaveClass('is-ok');
     expect(rule('Ένα γράμμα')).toHaveClass('is-ok');
     expect(rule('Ένας αριθμός')).not.toHaveClass('is-ok');
     expect(rule('Οι δύο κωδικοί ταιριάζουν')).toHaveClass('is-ok');

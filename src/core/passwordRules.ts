@@ -1,7 +1,8 @@
 // What a new password must have, wherever one is set (signup, set or reset password). The server
-// checks the same (staff-signup); the sign-in service itself asks only for the length.
+// checks the same (staff-signup, change-initial-password). The sign-in service also asks for 10 characters and
+// turns down passwords known from leaks: that one cannot be checked here, its answer is `password_weak`.
 
-export const PASSWORD_MIN = 8;
+export const PASSWORD_MIN = 10;
 export const PASSWORD_MAX = 72;
 
 export type PasswordRule = {id: string; ok: boolean; el: string; en: string};

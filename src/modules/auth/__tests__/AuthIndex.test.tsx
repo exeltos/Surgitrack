@@ -30,7 +30,7 @@ describe('Setting a new password', () => {
     const {container, password, confirm} = openReset();
     fireEvent.change(password, {target: {value: 'surgitrack1'}});
     fireEvent.change(confirm, {target: {value: 'surgitrack1'}});
-    for (const rule of ['Τουλάχιστον 8 χαρακτήρες', 'Ένα γράμμα', 'Ένας αριθμός', 'Οι δύο κωδικοί ταιριάζουν'])
+    for (const rule of ['Τουλάχιστον 10 χαρακτήρες', 'Ένα γράμμα', 'Ένας αριθμός', 'Οι δύο κωδικοί ταιριάζουν'])
       expect(screen.getByText(rule).closest('li')).toHaveClass('is-ok');
     fireEvent.click(screen.getByRole('button', {name: 'Εμφάνιση κωδικού'}));
     expect(container.querySelectorAll('input[type="password"]')).toHaveLength(0);

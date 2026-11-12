@@ -31,8 +31,8 @@ export const usernameSheetsHtml = (rows: UsernameRow[], el: boolean, lang: strin
 <table><thead><tr><th class="n">#</th><th>${t('Ονοματεπώνυμο', 'Full name')}</th><th>${t('Όνομα χρήστη', 'Username')}</th></tr></thead>
 <tbody>${people.map((p, i) => `<tr><td class="n">${i + 1}</td><td>${escapeHtml(p.name)}</td><td class="u">${escapeHtml(p.userCode)}</td></tr>`).join('')}</tbody></table>
 <p class="how">${t(
-        'Στην πρώτη σύνδεση γράψτε το όνομα χρήστη (όχι email) και ως αρχικό κωδικό τον αριθμό του κινητού σας. Αμέσως μετά ορίστε δικό σας κωδικό: τουλάχιστον 8 χαρακτήρες, με γράμμα και αριθμό.',
-        'At the first sign-in enter the username (not an email) and your mobile number as the initial password. Then set a password of your own: at least 8 characters, with a letter and a number.',
+        'Στην πρώτη σύνδεση γράψτε το όνομα χρήστη (όχι email) και ως αρχικό κωδικό τον αριθμό του κινητού σας. Αμέσως μετά ορίστε δικό σας κωδικό: τουλάχιστον 10 χαρακτήρες, με γράμμα και αριθμό, όχι κάποιος πολύ κοινός.',
+        'At the first sign-in enter the username (not an email) and your mobile number as the initial password. Then set a password of your own: at least 10 characters, with a letter and a number, not a common one.',
       )}</p>
 </section>`,
     )
