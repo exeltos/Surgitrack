@@ -633,7 +633,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
       ['packaging', 'PACKAGING', firstRow],
       ['process', 'PROCESS', button(/^(Φόρτωση κλιβάνου|Load the sterilizer) · \d/)],
       ['in-sterilizer', 'IN_STERILIZER', button(/^(Λεπτομέρειες|Details)/)],
-      ['release', 'RELEASE', button(/^(Αποδέσμευση φορτίου|Release (the )?load)/)],
+      ['release', 'RELEASE', () => page.locator('.ster-load-group button').first().click({timeout: 3000})],
       ['ready', 'READY', firstRow],
     ];
     // The load's barcode field searching by name: the suggestions under it.
@@ -664,6 +664,7 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
   // The simulated sterilizer (Demo only): started on the first load in the sterilizer, then seen later in its cycle.
   if (sterilization && (process.env.SCREENS_DEMO === '1' || process.env.SCREENS_DEMO_HOSPITAL === '1')) {
     const toSterilizer = () => page.locator('[data-tour="queue-IN_STERILIZER"]').click({timeout: 3000});
+    const toRelease = () => page.locator('[data-tour="queue-RELEASE"]').click({timeout: 3000});
     modals.push({
       name: 'sterilization-simulation-3-done',
       route: '/sterilization',
@@ -724,7 +725,8 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByRole('button', {name: /^(Κλείσιμο|Close)$/})
           .last()
           .click({timeout: 3000});
-        await toSterilizer();
+        // The cycle ends by itself (a connected sterilizer's does): the load waits in Release.
+        await toRelease();
         await page.waitForTimeout(42000);
         // The cycle ended by itself (as a connected sterilizer's does): nobody pressed «Τέλος κύκλου».
         // The ended cycle was sent to device-ingest as the simulated device: it is on the Devices page.
@@ -739,12 +741,9 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
           .getByRole('link', {name: /^(Αποστείρωση|Sterilization)$/})
           .first()
           .click({timeout: 3000});
-        await toSterilizer();
+        await toRelease();
         await page.waitForTimeout(500);
-        await page
-          .getByRole('button', {name: /^(Αποδέσμευση φορτίου|Release (the )?load)/})
-          .first()
-          .click({timeout: 3000});
+        await page.locator('.ster-load-group button').first().click({timeout: 3000});
         await page.waitForTimeout(600);
         await shoot(
           page,

@@ -9,7 +9,6 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
   const withTests = useHasModule('EQUIPMENT_TESTS');
   const {
     closeLoadRelease,
-    awaitingLoads,
     completeLoadRelease,
     releaseLoadBi,
     releaseLoadChecks,
@@ -21,7 +20,6 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
     setReleaseLoadBi,
     setReleaseLoadChecks,
     setReleaseLoadChem,
-    setReleaseLoadId,
     setReleaseLoadNote,
   } = s;
   const chemPlanned = selectedReleaseLoad?.chemicalIndicatorResult !== undefined;
@@ -38,56 +36,42 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 <ShieldCheck size={20} />
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ')}</span>
-                <h2>{loadLabel(selectedReleaseLoad)}</h2>
+                <h2>{tr('Αποδέσμευση · {0}', loadLabel(selectedReleaseLoad))}</h2>
                 <p>
                   {selectedReleaseLoad.program} · {selectedReleaseLoad.items.length} {tr('αντικείμενα')}
                 </p>
               </div>
             </div>
             <div className="workflow-modal-body">
-              {awaitingLoads.length > 1 && (
-                <label className="release-load-picker">
-                  {tr('Φορτίο / κλίβανος')}
-                  <select value={selectedReleaseLoad.id} onChange={e => setReleaseLoadId(e.target.value)}>
-                    {awaitingLoads.map(load => (
-                      <option key={load.id} value={load.id}>
-                        {loadLabel(load)} · {load.items.length} {tr('αντικείμενα')}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
               <section className="release-check-card">
                 <div className="receipt-section-title">
                   <div>
                     <strong>{tr('Έλεγχοι φορτίου')}</strong>
-                    <span>
-                      {tr('Η απόφαση εφαρμόζεται σε όλα τα αντικείμενα που συνδέονται με το συγκεκριμένο φορτίο.')}
-                    </span>
                   </div>
                   <ShieldCheck size={18} />
                 </div>
-                <label className="release-check-row">
-                  <input
-                    type="checkbox"
-                    checked={releaseLoadChecks.physicalParametersOk}
-                    onChange={e => setReleaseLoadChecks(v => ({...v, physicalParametersOk: e.target.checked}))}
-                  />
-                  <span>
-                    <strong>{tr('Φυσικές παράμετροι κύκλου αποδεκτές')}</strong>
-                  </span>
-                </label>
-                <label className="release-check-row">
-                  <input
-                    type="checkbox"
-                    checked={releaseLoadChecks.packagingIntegrityOk}
-                    onChange={e => setReleaseLoadChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
-                  />
-                  <span>
-                    <strong>{tr('Συσκευασίες στεγνές και ακέραιες')}</strong>
-                  </span>
-                </label>
+                <div className="release-check-pair">
+                  <label className="release-check-row">
+                    <input
+                      type="checkbox"
+                      checked={releaseLoadChecks.physicalParametersOk}
+                      onChange={e => setReleaseLoadChecks(v => ({...v, physicalParametersOk: e.target.checked}))}
+                    />
+                    <span>
+                      <strong>{tr('Φυσικές παράμετροι κύκλου αποδεκτές')}</strong>
+                    </span>
+                  </label>
+                  <label className="release-check-row">
+                    <input
+                      type="checkbox"
+                      checked={releaseLoadChecks.packagingIntegrityOk}
+                      onChange={e => setReleaseLoadChecks(v => ({...v, packagingIntegrityOk: e.target.checked}))}
+                    />
+                    <span>
+                      <strong>{tr('Συσκευασίες στεγνές και ακέραιες')}</strong>
+                    </span>
+                  </label>
+                </div>
                 <div className="release-indicators">
                   {showChem && (
                     <label>
@@ -160,7 +144,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 </button>
               )}
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>
-                <TriangleAlert size={16} /> {tr('Μη αποδέσμευση · όλο το φορτίο')}
+                <TriangleAlert size={16} /> {tr('Απόρριψη φορτίου')}
               </button>
               <button className="primary" disabled={!releaseLoadReady} onClick={() => completeLoadRelease('RELEASED')}>
                 <ShieldCheck size={16} /> {tr('Αποδέσμευση φορτίου ·') + ' '}

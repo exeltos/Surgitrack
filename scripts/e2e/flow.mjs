@@ -397,10 +397,11 @@ async function main() {
     await step('Sterilization releases the load', async () => {
       const {page} = sterilization;
       await queue('Αποδέσμευση');
-      await page.getByRole('button', {name: /^Αποδέσμευση φορτίου/}).click();
+      // The load's own block: its release button.
+      await page.locator('.ster-load-group', {hasText: 'E2E-0001'}).getByRole('button', {name: 'Αποδέσμευση'}).click();
       const modal = page.locator('.modal-backdrop').last();
       const load = db.process_loads.find(l => l.cycle_number === 'E2E-0001');
-      await modal.locator('select').first().selectOption(load.id);
+      await modal.getByText(`κύκλος ${load.cycle_number}`).waitFor();
       // The parts of the dialog (checks, the sterilizer's tests, the note, the load's content) never sit on top of
       // each other, in a tall window and in a laptop one: a picture can look fine while the boxes overlap.
       for (const size of [
@@ -435,15 +436,17 @@ async function main() {
       await prints.nth(1).evaluate(el => el.remove());
       if (!first || !copy || copy.x - (first.x + first.width) > 30)
         throw new Error('the Report button is not next to the Print button in the release dialog');
-      // A long load: its content list scrolls inside its own box with the wheel, and does not stretch the dialog.
+      // A long load: its content list scrolls inside its own box with the wheel; the dialog (as tall as its content)
+      // still fits the window.
       const manifest = modal.locator('.load-manifest');
-      const dialogBefore = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
       await manifest.evaluate(el => {
         const row = el.querySelector(':scope > div');
         for (let i = 0; i < 30; i++) el.appendChild(row.cloneNode(true));
       });
       const dialogAfter = (await modal.locator('.load-release-modal').boundingBox())?.height ?? 0;
-      if (Math.abs(dialogAfter - dialogBefore) > 2) throw new Error('a long load stretches the release dialog');
+      if (dialogAfter > 900 - 16) throw new Error('a long load makes the release dialog taller than the window');
+      if (!(await manifest.evaluate(el => el.scrollHeight > el.clientHeight + 2)))
+        throw new Error('a long load does not scroll inside its own list');
       await manifest.hover();
       await page.mouse.wheel(0, 600);
       await page.waitForTimeout(300);
@@ -534,18 +537,19 @@ async function main() {
       const ids = load.items.map(i => i.assetId);
       const {page} = sterilization;
       await queue('Αποδέσμευση');
-      await page.getByRole('button', {name: /^Αποδέσμευση φορτίου/}).click();
+      // The load's own block: its release button opens the dialog on that load.
+      await page
+        .locator('.ster-load-group', {hasText: load.cycle_number})
+        .getByRole('button', {name: 'Αποδέσμευση'})
+        .click();
       const modal = page.locator('.modal-backdrop').last();
-      // With one load waiting, the dialog opens on it (no load picker).
-      const picker = modal.locator('select').filter({has: page.locator(`option[value="${load.id}"]`)});
-      if (await picker.count()) await picker.selectOption(load.id);
       await modal.getByText(`κύκλος ${load.cycle_number}`).waitFor();
       await modal.getByLabel('Χημικός δείκτης').selectOption('FAIL');
       await modal.getByText('Ανεπιτυχής δείκτης').waitFor();
       // Release is refused while an indicator failed: only "not released" is left.
       if (await modal.getByRole('button', {name: /^Αποδέσμευση φορτίου · /}).isEnabled())
         throw new Error('release still possible with a failed indicator');
-      await modal.getByRole('button', {name: 'Μη αποδέσμευση · όλο το φορτίο'}).click();
+      await modal.getByRole('button', {name: 'Απόρριψη φορτίου'}).click();
       await saved(sterilization);
       expectEqual(row('process_loads', load.id).status, 'REPROCESS', 'load status');
       for (const id of ids) {

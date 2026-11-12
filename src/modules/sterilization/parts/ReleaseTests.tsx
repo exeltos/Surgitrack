@@ -40,8 +40,8 @@ export default function ReleaseTests({equipment}: {equipment: string}) {
           <>
             <TriangleAlert size={14} aria-hidden="true" />{' '}
             {L(
-              'Αποτυχημένη δοκιμή: το φορτίο δεν αποδεσμεύεται. Καταγράψτε επιτυχή δοκιμή ή επιλέξτε «Μη αποδέσμευση».',
-              'Failed test: the load is not released. Record a passing test or choose “Not released”.',
+              'Αποτυχημένη δοκιμή: το φορτίο δεν αποδεσμεύεται. Καταγράψτε επιτυχή δοκιμή ή επιλέξτε «Απόρριψη φορτίου».',
+              'Failed test: the load is not released. Record a passing test or choose “Reject the load”.',
             )}
           </>
         ) : state === 'OK' ? (
@@ -53,8 +53,8 @@ export default function ReleaseTests({equipment}: {equipment: string}) {
           )
         ) : (
           L(
-            'Δεν έχουν καταγραφεί δοκιμές για τον κλίβανο. Συνδέστε μια συσκευή δοκιμών (π.χ. 3M) ή καταγράψτε τες από εδώ.',
-            'No tests are recorded for this sterilizer. Connect a test device (e.g. 3M) or record them here.',
+            'Δεν έχουν καταγραφεί δοκιμές. Καταγράψτε τες ή συνδέστε συσκευή δοκιμών.',
+            'No tests are recorded. Record them or connect a test device.',
           )
         )}
       </p>

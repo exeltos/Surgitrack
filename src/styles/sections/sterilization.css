@@ -392,40 +392,11 @@ html body .sterile-queues.modern button > span {
   cursor: pointer;
   text-decoration: underline;
 }
-.ster-row-note {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.release-load-picker {
-  display: grid;
-  gap: 4px;
-  margin-bottom: 10px;
-  color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-.release-load-picker select {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  background: var(--c-white);
-  color: var(--c-cyan-20);
-  font-size: 13px;
-}
 html body .sterilization-workspace .ster-asset-cell.with-pick {
   grid-template-columns: 22px 44px minmax(0, 1fr);
 }
 html body .ster-asset-cell.with-pick .ster-row-pick {
   margin-right: 0;
-}
-html body .ster-row-action .ster-row-note {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: right;
 }
 /* Release: the two indicators side by side, with what the unit's policy says about them. */
 .release-indicators {
@@ -583,21 +554,13 @@ html body .load-release-modal .workflow-modal-body {
   gap: 12px 20px;
   align-items: start;
   /* The left column (checks, tests, note) scrolls on a short window instead of being cut. */
-  overflow-y: auto;
-}
-html body .load-release-modal .release-load-picker {
-  grid-column: 1 / -1;
-  margin: 0;
 }
 html body .load-release-modal .release-check-card {
   grid-column: 1;
-  grid-row: 2;
   margin: 0;
 }
 html body .load-release-modal .load-manifest {
   grid-column: 2;
-  grid-row: 3 / span 2;
-  align-self: stretch;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -613,13 +576,10 @@ html body .load-release-modal .load-manifest > div {
 }
 html body .load-release-modal .release-tests {
   grid-column: 2;
-  grid-row: 2;
-  align-self: stretch;
   margin: 0;
 }
 html body .load-release-modal .cycle-note {
   grid-column: 1;
-  grid-row: 3;
   margin: 0;
 }
 html body .load-release-modal .cycle-note textarea {
@@ -669,11 +629,6 @@ html body .load-modal .load-assets-list > label {
 }
 html body .load-modal .load-assets-list span {
   grid-template-columns: 110px minmax(0, 1fr) 200px;
-}
-html body .load-release-modal .workflow-modal-body {
-  /* The picker, then the checks and the sterilizer's tests side by side, then the note and the load's content; the
-     last row takes what is left. */
-  grid-template-rows: auto auto auto minmax(0, 1fr);
 }
 html body .load-release-modal .cycle-note {
   align-self: start;
@@ -1017,7 +972,8 @@ html body .delivery-batch-modal .handover-signature-row input {
 html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal,
 html body .receipt-card-modal.workflow-modal.workflow-modal-delivery,
 html body .receipt-card-modal.workflow-modal.load-modal.washer-load,
-html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load {
+html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load,
+html body .receipt-card-modal.workflow-modal.load-release-modal {
   height: auto !important;
   min-height: 0;
   max-height: calc(100dvh - 32px) !important;
@@ -1268,18 +1224,6 @@ html body .ster-load-badge.in {
   color: var(--c-cyan-30-5);
 }
 /* Release: the sterilizer and the cycle on two whole lines. */
-html body .ster-row-action .ster-row-note.ster-row-load {
-  display: grid;
-  gap: 1px;
-  white-space: normal;
-  overflow: visible;
-  line-height: 1.3;
-}
-html body .ster-row-load b {
-  color: var(--c-cyan-20);
-  font-size: 12px;
-  font-weight: 650;
-}
 @media (max-width: 760px) {
   .shelf-life-picker {
     grid-template-columns: 1fr;
@@ -2715,4 +2659,59 @@ html body .sterilizer-rows .row-simulate {
   font-weight: 650;
   text-decoration: underline;
   cursor: pointer;
+}
+
+/* Load release: as tall as its content. Left the checks and the note, right the sterilizer's tests and the load's
+   content (which scrolls when long); the two checks side by side. */
+html body .load-release-modal {
+  width: min(1240px, calc(100vw - 32px));
+}
+html body .load-release-modal .workflow-modal-body {
+  grid-template-rows: auto auto auto;
+  overflow-y: auto;
+}
+html body .load-release-modal .release-check-card {
+  grid-row: 1 / span 2;
+  align-self: start;
+}
+html body .load-release-modal .release-tests {
+  grid-row: 1;
+  align-self: start;
+}
+html body .load-release-modal .cycle-note {
+  grid-row: 3;
+  padding: 0;
+}
+html body .load-release-modal .load-manifest {
+  grid-row: 2 / span 2;
+  align-self: start;
+  max-height: 320px;
+}
+html body .load-release-modal .release-check-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+/* Release queue: one block per load, its own release button. */
+html body .sterilization-workspace .ster-load-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--c-gray-95-3);
+}
+html body .sterilization-workspace .ster-load-group > span {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--c-cyan-20);
+  font-size: 14px;
+}
+html body .sterilization-workspace .ster-load-group small {
+  color: var(--st-muted);
+  font-size: 12px;
 }

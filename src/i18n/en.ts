@@ -109,7 +109,6 @@ export const en: Record<string, string> = {
   'Demo Χρήστης Χειρουργείου': 'Demo Operating Theatre User',
   'Περιεχόμενο φορτίου': 'Load contents',
   'ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ': 'QUALITY GATE · RELEASE',
-  'ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ ΦΟΡΤΙΟΥ': 'QUALITY GATE · LOAD RELEASE',
   'Service & βλάβες': 'Service & Damage',
   'Σετ προορισμού': 'Destination set',
   Stock: 'Stock',
@@ -370,6 +369,8 @@ export const en: Record<string, string> = {
   'Σάρωση ή αναζήτηση: barcode, όνομα, κωδικός…': 'Scan or search: barcode, name, code…',
   'Scanner, πληκτρολόγηση ή αναζήτηση με όνομα: Enter ή επιλογή από τη λίστα.':
     'Scanner, typing or search by name: Enter or pick from the list.',
+  'Αποδέσμευση · {0}': 'Release · {0}',
+  'Απόρριψη φορτίου': 'Reject the load',
   'Αριθμός κύκλου': 'Cycle number',
   'Αρνητικός / επιτυχής': 'Negative / pass',
   'Αρχική σύνθεση': 'Initial composition',
@@ -528,8 +529,6 @@ export const en: Record<string, string> = {
   'Η αντικατάσταση ολοκληρώνεται ως μία ενιαία κίνηση: ορίζεις πού πηγαίνει το υπάρχον εργαλείο και ποιο φυσικό εργαλείο μπαίνει στη θέση του.':
     'The replacement completes as one movement: you set where the current instrument goes and which physical instrument takes its place.',
   'Η αποδέσμευση δεν μπορεί να ολοκληρωθεί.': 'The release cannot be completed.',
-  'Η απόφαση εφαρμόζεται σε όλα τα αντικείμενα που συνδέονται με το συγκεκριμένο φορτίο.':
-    'The decision applies to every item linked to this load.',
   'Η διαγραφή δεν επιτρέπεται': 'Deletion not allowed',
   'Η διαγραφή είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.':
     'Deletion is locked while the instrument is in an active sterilization process.',
@@ -1600,7 +1599,6 @@ export const en: Record<string, string> = {
   'Φόρτωση κλιβάνου': 'Sterilizer load',
   'Προς φόρτωση στον κλίβανο': 'To load into the sterilizer',
   'Στη φόρτωση: {0}': 'In the load: {0}',
-  'Φορτίο / κλίβανος': 'Load / sterilizer',
   Φόρτωση: 'Load',
   'Στο φορτίο': 'In the load',
   'Έτοιμα για παράδοση': 'Ready for delivery',

@@ -172,7 +172,7 @@ const TOURS: Tour[] = [
         advance: 'click',
       },
       {
-        target: '[data-tour="ster-panel-actions"]',
+        target: '[data-tour="load-release"]',
         title: t('Δείκτες και έγκριση', 'Indicators and approval'),
         text: t(
           'Ανοίξτε την αποδέσμευση του φορτίου: παράμετροι κύκλου, χημικός και βιολογικός δείκτης, συσκευασία.',

@@ -112,6 +112,25 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     });
   // Assets that sit in a load waiting for release; a record without a load keeps its own release button.
   const inLoad = new Set(awaitingLoads.flatMap(load => load.items.map(item => `${item.assetKind}:${item.assetId}`)));
+  // Release: the rows under their load (one block each), then the items released on their own.
+  const loadIdOf = new Map<string, string>(
+    awaitingLoads.flatMap(load => load.items.map(item => [`${item.assetKind}:${item.assetId}`, load.id] as const)),
+  );
+  const listed: Array<{load: (typeof awaitingLoads)[number]} | {x: (typeof order.rows)[number]}> =
+    queue === 'RELEASE'
+      ? [
+          ...awaitingLoads.flatMap(load => {
+            const its = order.rows.filter(x => loadIdOf.get(keyOf(x)) === load.id);
+            return its.length ? [{load}, ...its.map(x => ({x}))] : [];
+          }),
+          ...order.rows.filter(x => !loadIdOf.has(keyOf(x))).map(x => ({x})),
+        ]
+      : order.rows.map(x => ({x}));
+  const loadContent = (load: (typeof awaitingLoads)[number]) => {
+    const sets = load.items.filter(item => item.assetKind === 'SET').length;
+    const tools = load.items.length - sets;
+    return [sets ? tr('{0} Σετ', sets) : '', tools ? tr('{0} εργαλεία', tools) : ''].filter(Boolean).join(' · ');
+  };
   return (
     <div className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}`}>
       {/* The stage and its count are in the step bar above: this row only holds the stage's actions. */}
@@ -184,12 +203,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
               <span className="ster-hint">
                 {tr('Αποδέσμευση ανά φορτίο με ενιαία τεκμηρίωση CI/BI και φυσικών παραμέτρων.')}
               </span>
-              {awaitingLoads.length > 0 && (
-                <button className="primary compact" onClick={() => openLoadRelease(awaitingLoads[0].id)}>
-                  <ShieldCheck size={15} /> {tr('Αποδέσμευση φορτίου')}
-                  {awaitingLoads.length > 1 ? ` · ${awaitingLoads.length}` : ''}
-                </button>
-              )}
             </>
           )}
         </div>
@@ -215,64 +228,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   </span>
                 </div>
               ))}
-          </div>
-        </details>
-      )}
-      {queue === 'RELEASE' && releasedLoads.length > 0 && (
-        <details
-          className="released-loads"
-          open={releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') || undefined}
-        >
-          <summary>
-            {tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}
-            {releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') &&
-              ` · ${tr('{0} με βιολογικό σε αναμονή', releasedLoads.filter(load => load.biologicalIndicatorResult === 'PENDING').length)}`}
-          </summary>
-          <div>
-            {releasedLoads.map(load => (
-              <div key={load.id}>
-                <span>
-                  <b>{loadLabel(load)}</b> · {load.items.length} {tr('αντικείμενα')}
-                </span>
-                <span className="released-load-actions">
-                  {load.biologicalIndicatorResult === 'PENDING' && (
-                    <>
-                      <span className="released-load-bi">{tr('Βιολογικός σε αναμονή')}</span>
-                      <button className="bi-pass" onClick={() => s.recordBiologicalResult(load.id, 'PASS')}>
-                        <CheckCircle2 size={14} /> {tr('BI επιτυχής')}
-                      </button>
-                      <button
-                        className="bi-fail"
-                        onClick={() =>
-                          void askConfirm({
-                            title: tr('BI ανεπιτυχής'),
-                            message: tr(
-                              'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;',
-                              load.cycleNumber,
-                            ),
-                            confirmLabel: tr('Ανάκληση φορτίου'),
-                            danger: true,
-                          }).then(sure => sure !== false && s.recordBiologicalResult(load.id, 'FAIL'))
-                        }
-                      >
-                        <TriangleAlert size={14} /> {tr('BI ανεπιτυχής')}
-                      </button>
-                    </>
-                  )}
-                  <button onClick={() => s.printLoadForm(load.id)}>
-                    <Printer size={14} /> {tr('Έντυπο')}
-                  </button>
-                  {load.cycleData && (
-                    <button onClick={() => s.printCycle(load.id)}>
-                      <Activity size={14} /> {tr('Report κύκλου')}
-                    </button>
-                  )}
-                  <button onClick={() => recallLoad(load.id)}>
-                    <TriangleAlert size={14} /> {tr('Ανάκληση')}
-                  </button>
-                </span>
-              </div>
-            ))}
           </div>
         </details>
       )}
@@ -317,7 +272,27 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             <span>{tr('Ενέργειες')}</span>
           </div>
           <div className="ster-list-scroll">
-            {order.rows.map(x => {
+            {listed.map(item => {
+              if ('load' in item) {
+                const load = item.load;
+                // One block per load: its sterilizer and cycle, what it holds, and its own release.
+                return (
+                  <div className="ster-load-group" key={`load-${load.id}`}>
+                    <span>
+                      <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', load.cycleNumber)}
+                      <small>{loadContent(load)}</small>
+                    </span>
+                    <button
+                      className="primary compact"
+                      data-tour="load-release"
+                      onClick={() => openLoadRelease(load.id)}
+                    >
+                      <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
+                    </button>
+                  </div>
+                );
+              }
+              const x = item.x;
               const assetIssues = openIssuesOf(x.barcode);
               const detail = x.kind === 'SET' ? `/sets/${x.id}` : `/tools/${x.id}`;
               const again = showsReprocess
@@ -448,26 +423,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <span className="ster-load-badge">{tr('Εκτός φορτίου')}</span>
                       )
                     ) : queue === 'RELEASE' ? (
-                      inLoad.has(keyOf(x)) ? (
-                        (() => {
-                          const load = awaitingLoads.find(l =>
-                            l.items.some(i => `${i.assetKind}:${i.assetId}` === keyOf(x)),
-                          );
-                          // One release per load, from the header button: the row only says which load it is in.
-                          return (
-                            <span className="ster-row-note ster-row-load">
-                              {load && (
-                                <>
-                                  <b>{trData(load.equipment)}</b>
-                                  <small>
-                                    {tr('Κύκλος')} {load.cycleNumber}
-                                  </small>
-                                </>
-                              )}
-                            </span>
-                          );
-                        })()
-                      ) : (
+                      // In a load: released with it, from the load's block above.
+                      inLoad.has(keyOf(x)) ? null : (
                         <button className="primary compact" onClick={() => openRelease(x.kind, x)}>
                           <ShieldCheck size={15} /> {tr('Έλεγχος αποδέσμευσης')}
                         </button>
@@ -498,6 +455,64 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             })}
           </div>
         </>
+      )}
+      {queue === 'RELEASE' && releasedLoads.length > 0 && (
+        <details
+          className="released-loads"
+          open={releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') || undefined}
+        >
+          <summary>
+            {tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}
+            {releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') &&
+              ` · ${tr('{0} με βιολογικό σε αναμονή', releasedLoads.filter(load => load.biologicalIndicatorResult === 'PENDING').length)}`}
+          </summary>
+          <div>
+            {releasedLoads.map(load => (
+              <div key={load.id}>
+                <span>
+                  <b>{loadLabel(load)}</b> · {load.items.length} {tr('αντικείμενα')}
+                </span>
+                <span className="released-load-actions">
+                  {load.biologicalIndicatorResult === 'PENDING' && (
+                    <>
+                      <span className="released-load-bi">{tr('Βιολογικός σε αναμονή')}</span>
+                      <button className="bi-pass" onClick={() => s.recordBiologicalResult(load.id, 'PASS')}>
+                        <CheckCircle2 size={14} /> {tr('BI επιτυχής')}
+                      </button>
+                      <button
+                        className="bi-fail"
+                        onClick={() =>
+                          void askConfirm({
+                            title: tr('BI ανεπιτυχής'),
+                            message: tr(
+                              'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;',
+                              load.cycleNumber,
+                            ),
+                            confirmLabel: tr('Ανάκληση φορτίου'),
+                            danger: true,
+                          }).then(sure => sure !== false && s.recordBiologicalResult(load.id, 'FAIL'))
+                        }
+                      >
+                        <TriangleAlert size={14} /> {tr('BI ανεπιτυχής')}
+                      </button>
+                    </>
+                  )}
+                  <button onClick={() => s.printLoadForm(load.id)}>
+                    <Printer size={14} /> {tr('Έντυπο')}
+                  </button>
+                  {load.cycleData && (
+                    <button onClick={() => s.printCycle(load.id)}>
+                      <Activity size={14} /> {tr('Report κύκλου')}
+                    </button>
+                  )}
+                  <button onClick={() => recallLoad(load.id)}>
+                    <TriangleAlert size={14} /> {tr('Ανάκληση')}
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
       )}
       {returning && <StageReturnModal asset={returning} onClose={() => setReturning(undefined)} />}
     </div>
