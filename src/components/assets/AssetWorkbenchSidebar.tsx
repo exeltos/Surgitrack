@@ -233,9 +233,11 @@ export default function AssetWorkbenchSidebar({
         <div>
           <dt>{tr('Αποστείρωση – Λήξη')}</dt>
           <dd className="sterile-dd">
-            {sterile && carrier.sterileUntil && sterilizedOnOf(carrier) ? (
+            {sterile && carrier.sterileUntil ? (
               <>
-                {formatExpiry(sterilizedOnOf(carrier)!)} → {formatExpiry(carrier.sterileUntil)}
+                {/* The expiry is shown whenever it is known, with a dash for a sterilization date that is not. */}
+                {sterilizedOnOf(carrier) ? formatExpiry(sterilizedOnOf(carrier)!) : '—'} →{' '}
+                {formatExpiry(carrier.sterileUntil)}
                 {fromSet && <small className="muted">{tr('από το Σετ')}</small>}
               </>
             ) : (
