@@ -2537,12 +2537,6 @@ html body .settings-categories {
   backdrop-filter: blur(4px);
 }
 
-/* Roles: a padlock instead of a long badge on every locked row, and a line that says what it means. */
-html body .studio-permission-lock {
-  padding: 4px 6px;
-  gap: 0;
-}
-
 /* A setting whose control is a button (the barcode label): laid out as the other rows, below a line. */
 html body .studio-system-grid > section > .studio-setting-row {
   display: grid;
