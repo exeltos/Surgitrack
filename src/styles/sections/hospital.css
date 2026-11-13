@@ -1547,5 +1547,33 @@ html body .hospital-overview .dash-flow .dash-bar:hover .dash-bar-track {
   html body .hospital-overview .dash-activity > .dash-columns {
     flex: 1 1 auto;
     min-height: 60px;
+    height: auto;
+    max-height: none;
+  }
+}
+
+/* Overview on a computer: «Χρειάζεται προσοχή» rows close together so more of them show, and no scroll bars inside
+   the cards (a list that has more still scrolls with the wheel or a finger, and fades out at its foot to say so). */
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview .dash-attention > .dash-list {
+    grid-auto-rows: max-content;
+    gap: 6px;
+  }
+  html body .hospital-overview .dash-triage li > a {
+    min-height: 40px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  html body .hospital-overview .dash-card .dash-list,
+  html body .hospital-overview .dash-card .dash-depts-list {
+    scrollbar-width: none;
+  }
+  html body .hospital-overview .dash-card .dash-list::-webkit-scrollbar,
+  html body .hospital-overview .dash-card .dash-depts-list::-webkit-scrollbar {
+    display: none;
+  }
+  html body .hospital-overview .dash-equipment > .dash-depts-list {
+    padding-bottom: 18px;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
   }
 }

@@ -1,6 +1,9 @@
 import {describe, expect, it, vi} from 'vitest';
 import {fireEvent, render, screen} from '@testing-library/react';
 import LandingPage from '../LandingPage';
+import {loadPublicContact} from '../../../data/cloud/platformContact';
+
+vi.mock('../../../data/cloud/platformContact', () => ({loadPublicContact: vi.fn(async () => ({}))}));
 
 describe('the public first page', () => {
   it('shows how to reach the company and opens the sign-in screen', () => {
@@ -24,5 +27,14 @@ describe('the public first page', () => {
     fireEvent.click(screen.getByRole('button', {name: 'EN'}));
     expect(screen.getByRole('heading', {level: 1})).toHaveTextContent('Every instrument');
     expect(screen.getByRole('button', {name: 'Sign in'})).toBeInTheDocument();
+  });
+
+  it('shows the details set in Studio → Settings', async () => {
+    vi.mocked(loadPublicContact).mockResolvedValueOnce({phone: '210 123 4567', website: 'example.com'});
+    render(<LandingPage onSignIn={() => undefined} />);
+    expect(await screen.findByRole('link', {name: '210 123 4567'})).toHaveAttribute('href', 'tel:+302101234567');
+    expect(screen.getByRole('link', {name: 'example.com'})).toHaveAttribute('href', 'https://example.com');
+    // What was left empty keeps the built-in value.
+    expect(screen.getByRole('link', {name: 'info@exeltos.com'})).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import BrandMark from '../../components/layout/BrandMark';
 import {COMPANY_CONTACT} from '../../config/appMeta';
+import {loadPublicContact} from '../../data/cloud/platformContact';
 
 type Lang = 'el' | 'en';
 
@@ -158,6 +159,19 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
       return 'el';
     }
   });
+  // The company's details as set in Studio → Settings; the built-in ones until they arrive (or if they cannot).
+  const [contact, setContact] = useState(COMPANY_CONTACT);
+  useEffect(() => {
+    let alive = true;
+    void loadPublicContact()
+      .then(found => {
+        if (alive) setContact(c => ({...c, ...Object.fromEntries(Object.entries(found).filter(([, v]) => v))}));
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
   const t = copy[lang];
   const switchLang = () => {
     const next = lang === 'el' ? 'en' : 'el';
@@ -169,8 +183,10 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
     }
     document.documentElement.lang = next;
   };
-  const phoneHref = `tel:+30${COMPANY_CONTACT.phone.replace(/\s+/g, '')}`;
-  const mailHref = `mailto:${COMPANY_CONTACT.email}?subject=${encodeURIComponent(t.mailSubject)}`;
+  const phoneDigits = contact.phone.replace(/[^\d+]/g, '');
+  const phoneHref = `tel:${phoneDigits.startsWith('+') ? phoneDigits : `+30${phoneDigits}`}`;
+  const website = /^https?:\/\//.test(contact.website) ? contact.website : `https://${contact.website}`;
+  const mailHref = `mailto:${contact.email}?subject=${encodeURIComponent(t.mailSubject)}`;
   const toSection = (id: string) => (e: React.MouseEvent) => {
     // The app routes by the hash: scroll to the section instead of changing it.
     e.preventDefault();
@@ -334,7 +350,7 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
                   <Building2 size={16} aria-hidden="true" />
                   {t.company}
                 </dt>
-                <dd>{COMPANY_CONTACT.name}</dd>
+                <dd>{contact.name}</dd>
               </div>
               <div>
                 <dt>
@@ -342,7 +358,7 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
                   {t.email}
                 </dt>
                 <dd>
-                  <a href={mailHref}>{COMPANY_CONTACT.email}</a>
+                  <a href={mailHref}>{contact.email}</a>
                 </dd>
               </div>
               <div>
@@ -351,7 +367,7 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
                   {t.phone}
                 </dt>
                 <dd>
-                  <a href={phoneHref}>{COMPANY_CONTACT.phone}</a>
+                  <a href={phoneHref}>{contact.phone}</a>
                 </dd>
               </div>
               <div>
@@ -360,8 +376,8 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
                   {t.website}
                 </dt>
                 <dd>
-                  <a href={COMPANY_CONTACT.website} target="_blank" rel="noopener noreferrer">
-                    {COMPANY_CONTACT.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                  <a href={website} target="_blank" rel="noopener noreferrer">
+                    {contact.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                   </a>
                 </dd>
               </div>
@@ -373,8 +389,8 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
       <footer className="landing-foot">
         <div className="landing-wrap">
           © {new Date().getFullYear()} SurgiTrack · {t.footer} · {t.by}{' '}
-          <a href={COMPANY_CONTACT.website} target="_blank" rel="noopener noreferrer">
-            {COMPANY_CONTACT.name}
+          <a href={website} target="_blank" rel="noopener noreferrer">
+            {contact.name}
           </a>
         </div>
       </footer>
