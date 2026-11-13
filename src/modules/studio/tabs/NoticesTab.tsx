@@ -83,17 +83,6 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
 
   return (
     <section className="studio-errors studio-notices">
-      <header className="studio-errors-head">
-        <div>
-          <h2>{L('Ανακοινώσεις και προωθήσεις', 'Announcements and promotions')}</h2>
-        </div>
-        <div className="studio-errors-actions">
-          <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
-            {L('Ανανέωση', 'Refresh')}
-          </AppButton>
-        </div>
-      </header>
-
       <NoticeComposer
         L={L}
         organizations={displayedOrganizations.map(o => ({id: o.id, name: o.name}))}
@@ -103,6 +92,13 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
         onUploadFile={uploadPromoFile}
       />
 
+      {/* «Ανανέωση» refreshes the published notices, so it heads their list (not a row of its own above the form). */}
+      <header className="studio-notices-listhead">
+        <h2>{L('Δημοσιευμένες ειδοποιήσεις', 'Published notices')}</h2>
+        <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
+          {L('Ανανέωση', 'Refresh')}
+        </AppButton>
+      </header>
       {failed && <p className="studio-errors-failed">{failed}</p>}
       {notices === null ? (
         <Spinner />
