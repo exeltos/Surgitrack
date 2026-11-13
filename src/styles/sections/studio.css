@@ -1512,10 +1512,6 @@ html body .studio-ratings .studio-errors-actions select {
   background: var(--c-white);
   font: inherit;
 }
-/* Studio: column names in sentence case, as on the other lists. */
-html body .studio-list-head {
-  text-transform: none;
-}
 /* Studio: «Πραγματικά δεδομένα» / «Demo» is a small label, not something to press. */
 html body .studio-health {
   border: 0;
