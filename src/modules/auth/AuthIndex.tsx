@@ -372,13 +372,14 @@ export default function AuthIndex({
   return (
     <div className="auth-page auth-split">
       <aside className="auth-hero">
-        <div className="auth-hero-brand">
+        {/* Back to the site's first page, like the small brand above the form (the phone app has none). */}
+        <a className="auth-hero-brand" href={scan ? undefined : '#/'}>
           <BrandMark className="auth-hero-mark" />
           <div>
             <strong>{t.product}</strong>
             <span>{scan ? scanTitle : t.suite}</span>
           </div>
-        </div>
+        </a>
         <h1>
           {t.heroTitle}
           <br />

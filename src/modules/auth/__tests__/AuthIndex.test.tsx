@@ -106,3 +106,15 @@ describe("The first password of someone the owner's import made", () => {
     await waitFor(() => expect(auth.signOut).toHaveBeenCalled());
   });
 });
+
+describe('The way back to the first page', () => {
+  it('has both SurgiTrack brands lead to the first page, but not in the phone app', () => {
+    const view = render(<AuthIndex onAuthenticated={() => undefined} />);
+    const brands = screen.getAllByRole('link', {name: /SurgiTrack/});
+    expect(brands).toHaveLength(2);
+    for (const brand of brands) expect(brand).toHaveAttribute('href', '#/');
+    view.unmount();
+    render(<AuthIndex onAuthenticated={() => undefined} scan />);
+    expect(screen.queryAllByRole('link', {name: /SurgiTrack/})).toHaveLength(0);
+  });
+});

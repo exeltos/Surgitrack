@@ -499,7 +499,8 @@ html body .landing-foot {
 }
 
 /* The sign-in screen's brand leads back to the first page. */
-html body a.auth-mini-brand {
+html body a.auth-mini-brand,
+html body a.auth-hero-brand {
   color: inherit;
   text-decoration: none;
 }
