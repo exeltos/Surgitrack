@@ -2264,6 +2264,24 @@ export const en: Record<string, string> = {
   'Άνοιγμα στην Αποστείρωση': 'Open in Sterilization',
   'Πορεία στην Αποστείρωση': 'Progress through Sterilization',
   'Επόμενο βήμα': 'Next step',
+  'Ο λογαριασμός μου': 'My account',
+  'Αλλαγή κωδικού': 'Change password',
+  'Ο κωδικός αλλάζει μόνο σε λογαριασμό που έχει συνδεθεί.':
+    'The password can only be changed for a signed-in account.',
+  'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 10 χαρακτήρες, με ένα γράμμα και έναν αριθμό.':
+    'The new password must be at least 10 characters, with a letter and a number.',
+  'Οι δύο νέοι κωδικοί δεν ταιριάζουν.': 'The two new passwords do not match.',
+  'Ο νέος κωδικός πρέπει να διαφέρει από τον τρέχοντα.': 'The new password must differ from the current one.',
+  'Ο τρέχων κωδικός δεν είναι σωστός.': 'The current password is not correct.',
+  'Ο κωδικός είναι πολύ κοινός (υπάρχει σε λίστες κωδικών που έχουν διαρρεύσει). Διαλέξτε άλλον.':
+    'This password is too common (it appears in lists of leaked passwords). Choose another.',
+  'Ο κωδικός δεν άλλαξε. Δοκιμάστε ξανά σε λίγο.': 'The password was not changed. Try again shortly.',
+  'Ο κωδικός σας άλλαξε. Την επόμενη φορά συνδέεστε με τον νέο.':
+    'Your password was changed. Next time, sign in with the new one.',
+  'Για ασφάλεια, γράψτε πρώτα τον τρέχοντα κωδικό σας.': 'For security, enter your current password first.',
+  'Τρέχων κωδικός': 'Current password',
+  'Νέος κωδικός': 'New password',
+  'Αποθήκευση νέου κωδικού': 'Save new password',
   'Κινήθηκαν πρόσφατα': 'Moved recently',
   'Στο στάδιο από {0}': 'In this stage since {0}',
   'Μετά τη χρήση, στείλτε το προς Αποστείρωση.': 'After use, send it to Sterilization.',
