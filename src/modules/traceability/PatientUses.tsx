@@ -156,7 +156,7 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
                   <span className="ledger-user">
                     <UserRound size={15} />
                     <span>
-                      <b>{trData(m.by)}</b>
+                      <b title={trData(m.by)}>{trData(m.by)}</b>
                     </span>
                   </span>
                   <ChevronRight className="ledger-open" size={18} />

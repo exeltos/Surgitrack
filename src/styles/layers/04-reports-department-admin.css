@@ -569,9 +569,12 @@
   flex-direction: column;
   min-width: 0;
 }
-.ledger-user b {
-  overflow-wrap: anywhere;
+.ledger-user b,
+.ledger-user small {
+  overflow: hidden;
   line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ledger-user small {
   font-size: 11px;

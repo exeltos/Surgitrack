@@ -2264,6 +2264,7 @@ export const en: Record<string, string> = {
   'Άνοιγμα στην Αποστείρωση': 'Open in Sterilization',
   'Πορεία στην Αποστείρωση': 'Progress through Sterilization',
   'Επόμενο βήμα': 'Next step',
+  'Κινήθηκαν πρόσφατα': 'Moved recently',
   'Στο στάδιο από {0}': 'In this stage since {0}',
   'Μετά τη χρήση, στείλτε το προς Αποστείρωση.': 'After use, send it to Sterilization.',
   'Αναμένει φυσική παραλαβή από την Αποστείρωση.': 'Waiting to be physically received by Sterilization.',
