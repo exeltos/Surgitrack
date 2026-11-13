@@ -15,6 +15,8 @@ export const en: Record<string, string> = {
     'An empty hospital with real data. It locks when it ends until you renew it.',
   Διάρκεια: 'Length',
   '{0} ημέρες': '{0} days',
+  '1 ημέρα': '1 day',
+  'Από σήμερα': 'Since today',
   'Λήγει στις': 'Ends on',
   'Διαχειριστής νοσοκομείου': 'Hospital administrator',
   'Λαμβάνει email με το όνομα χρήστη του και κουμπί «Αποδοχή και ορισμός κωδικού», και στήνει το νοσοκομείο.':

@@ -148,3 +148,43 @@ html body .issues-fixed .issue-note-inline {
 .quick-filters b.good {
   color: var(--c-green-40-3);
 }
+
+/* The kind of a report as a small coloured chip (damage/loss red, wear amber, missing violet, other grey), and how
+   long an open issue has waited instead of «Ανοικτή» on every row: grey, amber after a week. */
+html body .issues-fixed .row-sub > span + span::before {
+  content: ' · ';
+}
+html body .issue-type-chip {
+  display: inline-block;
+  margin-right: 2px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+html body .issue-type-chip.bad {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red);
+}
+html body .issue-type-chip.warn {
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+}
+html body .issue-type-chip.missing {
+  background: var(--c-gray-95-9);
+  color: var(--c-violet-30);
+}
+html body .issue-type-chip.neutral {
+  background: var(--c-gray-95);
+  color: var(--c-cyan-30);
+}
+html body .issue-age {
+  color: var(--st-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+html body .issue-age.old {
+  color: var(--c-orange-40);
+}
