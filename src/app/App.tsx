@@ -266,6 +266,9 @@ export default function App() {
         onFirstPasswordChanged={() => window.location.reload()}
         passwordRecovery={passwordRecovery}
         onPasswordRecoveryHandled={() => {
+          // The new password is set: stay on the sign-in screen (its «sign in with the new password»), not the
+          // site's first page that «/» shows to someone signed out.
+          navigate('/login', {replace: true});
           clearPasswordRecovery();
           setPasswordRecovery(false);
         }}
