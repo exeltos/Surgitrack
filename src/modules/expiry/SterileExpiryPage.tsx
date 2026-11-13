@@ -47,7 +47,6 @@ export default function SterileExpiryPage() {
     name: item => item.name,
     department: item => trData(item.department),
     place: item => statusLabel(item.assetState),
-    sterilized: item => item.sterilizedOn,
     until: item => item.sterileUntil,
     left: item => item.daysLeft,
   });
@@ -135,13 +134,6 @@ export default function SterileExpiryPage() {
                   onSort={order.toggle}
                 />
                 <SortTh
-                  className="col-sterilized"
-                  label={tr('Αποστείρωση')}
-                  sortKey="sterilized"
-                  sort={order.sort}
-                  onSort={order.toggle}
-                />
-                <SortTh
                   className="col-until"
                   label={tr('Λήξη')}
                   sortKey="until"
@@ -180,15 +172,27 @@ export default function SterileExpiryPage() {
                     </td>
                     {!departmentUser && <td className="col-dept">{trData(item.department) || '—'}</td>}
                     <td className="col-place">
-                      <StatusBadge value={item.assetState} />
+                      {/* Where it is matters only when it asks for something; «Στο τμήμα» is the usual case. */}
+                      {item.assetState === 'IN_DEPARTMENT' ? (
+                        <span className="expiry-place-plain">{statusLabel(item.assetState)}</span>
+                      ) : (
+                        <StatusBadge value={item.assetState} />
+                      )}
                     </td>
-                    <td className="col-sterilized" data-label={tr('Αποστείρωση')}>
-                      {item.sterilizedOn ? formatExpiry(item.sterilizedOn) : '—'}
-                      {item.shelfLifeMonths ? (
-                        <small className="row-sub">{tr('{0} μήνες', item.shelfLifeMonths)}</small>
+                    <td className="col-until" data-label={tr('Λήξη')}>
+                      {formatExpiry(item.sterileUntil)}
+                      {item.sterilizedOn ? (
+                        <small className="row-sub">
+                          {item.shelfLifeMonths
+                            ? tr(
+                                'αποστ. {0} · {1} μήνες',
+                                formatExpiry(item.sterilizedOn).slice(0, 5),
+                                item.shelfLifeMonths,
+                              )
+                            : tr('αποστ. {0}', formatExpiry(item.sterilizedOn).slice(0, 5))}
+                        </small>
                       ) : null}
                     </td>
-                    <td data-label={tr('Λήξη')}>{formatExpiry(item.sterileUntil)}</td>
                     <td>
                       <ExpiryBadge entry={item} />
                     </td>
@@ -204,6 +208,14 @@ export default function SterileExpiryPage() {
           </table>
         )}
       </ScrollableListPanel>
+      {view === 'ALERT' && shown.length > 0 && all.length > shown.length && (
+        <p className="expiry-rest-note">
+          {tr('Τα υπόλοιπα {0} είναι εντός ορίου.', all.length - shown.length)}{' '}
+          <button type="button" className="expiry-rest-link" onClick={() => setView('ALL')}>
+            {tr('Δες όλα')}
+          </button>
+        </p>
+      )}
     </div>
   );
 }

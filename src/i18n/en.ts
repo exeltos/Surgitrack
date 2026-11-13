@@ -1661,6 +1661,10 @@ export const en: Record<string, string> = {
   'Μετρά από την αποδέσμευση· σήμερα θα έληγε στις {0}.':
     'Counted from the release; released today it would expire on {0}.',
   '{0} μήνες': '{0} months',
+  'αποστ. {0} · {1} μήνες': 'sterilized {0} · {1} months',
+  'αποστ. {0}': 'sterilized {0}',
+  'Τα υπόλοιπα {0} είναι εντός ορίου.': 'The other {0} are within their shelf life.',
+  'Δες όλα': 'See all',
   'Λήξεις αποστείρωσης': 'Sterile expiry',
   'Σετ και εργαλεία που λήγουν ή έληξαν· όταν λήξουν χρειάζονται νέα επεξεργασία.':
     'Sets and instruments expiring or expired; once expired they need reprocessing.',

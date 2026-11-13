@@ -6,11 +6,8 @@ html body .expiry-table th.col-dept {
 html body .expiry-table th.col-place {
   width: 160px;
 }
-html body .expiry-table th.col-sterilized {
-  width: 132px;
-}
 html body .expiry-table th.col-until {
-  width: 108px;
+  width: 160px;
 }
 html body .expiry-table th.col-left {
   width: 140px;
@@ -18,9 +15,50 @@ html body .expiry-table th.col-left {
 html body .expiry-table th.col-open {
   width: 40px;
 }
-/* Expiry: the place badge stays on one line. */
+/* Expiry: the place badge stays on one line; the usual «Στο τμήμα» is plain grey text, not a badge. */
 html body .expiry-table td.col-place > .badge {
   white-space: nowrap;
+}
+html body .expiry-place-plain {
+  color: var(--st-muted);
+  font-size: 13px;
+}
+/* Expiry: the name and barcode stay quiet, so the colour left on the row is the time left. */
+html body .expiry-table td:first-child .row-title-link {
+  font-weight: 600;
+}
+html body .expiry-table .registry-row-barcode {
+  color: var(--st-muted);
+  font-weight: 500;
+}
+/* A thin edge in the colour of the time left: red expired, amber expiring. */
+html body .expiry-table tr.expiry-row.expired > td:first-child {
+  box-shadow: inset 3px 0 0 var(--st-red);
+}
+html body .expiry-table tr.expiry-row.expiring > td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-orange-60);
+}
+/* The list card ends with its rows (it still scrolls when long); under it, a quiet word that the rest is fine. */
+html body .sterile-expiry-page > .list-scroll-panel {
+  flex: 0 1 auto;
+}
+html body .expiry-rest-note {
+  flex: 0 0 auto;
+  margin: 10px 4px 0;
+  color: var(--st-muted);
+  font-size: 13px;
+}
+html body .expiry-rest-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-cyan-30);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .expiry-rest-link:hover {
+  text-decoration: underline;
 }
 @media (max-width: 1280px) {
   /* Tools, stock, standalone tools: 1 name, 2 barcode, 3 specialty, 4 place, 5 uses, 6 state, 7 open. */
