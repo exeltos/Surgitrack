@@ -59,7 +59,6 @@ const copy = {
     email: 'Email',
     loginId: 'Κωδικός χρήστη',
     loginPlaceholder: 'π.χ. AF2741',
-    loginHint: 'Ο κωδικός χρήστη σας: 2 γράμματα και 4 ψηφία. Δεν είναι το email σας.',
     password: 'Κωδικός πρόσβασης',
     forgotLink: 'Ξέχασα τον κωδικό μου',
     signIn: 'Σύνδεση',
@@ -118,7 +117,6 @@ const copy = {
     email: 'Email',
     loginId: 'User ID',
     loginPlaceholder: 'e.g. AF2741',
-    loginHint: 'Your user ID: 2 letters and 4 digits. It is not your email.',
     password: 'Password',
     forgotLink: 'Forgot my password',
     signIn: 'Sign in',
@@ -446,7 +444,6 @@ export default function AuthIndex({
                           placeholder={t.loginPlaceholder}
                         />
                       </div>
-                      <small className="auth-field-hint">{t.loginHint}</small>
                     </label>
                     <label>
                       {t.password}
