@@ -4356,6 +4356,10 @@ html body .people-row .people-password {
   font-weight: 600;
   cursor: help;
 }
+html body .people-row .people-password.changed {
+  color: #276044;
+  background: #e3f1e8;
+}
 html body .people-row .people-password.default {
   color: #9a5a00;
   background: #fff1d6;

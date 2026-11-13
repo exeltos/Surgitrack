@@ -4237,6 +4237,12 @@ a.auth-primary {
   border-radius: 50%;
   background: var(--c-gray-85);
 }
+.hospital-member-status.active {
+  color: var(--c-green-40-4);
+}
+.hospital-member-status.active > i {
+  background: var(--c-green-65);
+}
 /* Studio → Settings: the barcode label card, a summary of the hospital default and its editor. */
 .department-lives-head small {
   margin-left: auto;

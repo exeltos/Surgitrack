@@ -652,15 +652,12 @@ export default function UsersSection({s}: {s: PeopleState}) {
                         {L('Εκκρεμεί πρόσκληση', 'Invitation pending')}
                       </span>
                     ) : (
-                      // Only what differs from the usual shows: an active account with its own password says nothing.
-                      !m.active && (
-                        <span className="hospital-member-status">
-                          <i></i>
-                          {L('Ανενεργός', 'Inactive')}
-                        </span>
-                      )
+                      <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
+                        <i></i>
+                        {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                      </span>
                     )}
-                    {invitedAt(m) === undefined && passwordBadge(m) && passwordBadge(m)!.kind !== 'changed' && (
+                    {invitedAt(m) === undefined && passwordBadge(m) && (
                       <span
                         className={`people-password ${passwordBadge(m)!.kind}`}
                         title={`${passwordBadge(m)!.text}. ${passwordBadge(m)!.title}`}
