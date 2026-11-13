@@ -137,11 +137,20 @@
   background: var(--c-white);
 }
 .manual-side-label {
-  padding: 14px 14px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
+  padding: 14px 14px 4px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--c-gray-45);
+}
+/* The sections in the groups of the app's menu. */
+.manual-nav-group + .manual-nav-group {
+  margin-top: 8px;
+}
+.manual-nav-group-label {
+  padding: 8px 8px 4px;
+  color: var(--st-muted);
+  font-size: 11.5px;
+  font-weight: 600;
 }
 .manual-nav {
   flex: 1;
@@ -152,7 +161,7 @@
 .manual-side-bottom button {
   width: 100%;
   display: grid;
-  grid-template-columns: 19px minmax(0, 1fr) 14px;
+  grid-template-columns: 19px minmax(0, 1fr);
   gap: 6px;
   align-items: center;
   padding: 8px;
@@ -184,9 +193,6 @@
   padding: 8px;
   border-top: 1px solid var(--c-gray-90);
 }
-.manual-side-bottom button {
-  grid-template-columns: 19px minmax(0, 1fr);
-}
 .manual-version {
   display: flex;
   justify-content: space-between;
@@ -207,9 +213,8 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--c-cyan-50-2);
 }
 .manual-breadcrumb span {
@@ -247,41 +252,6 @@
   font-size: 12px;
   color: #33666e;
 }
-.manual-chapter-tabs {
-  display: flex;
-  gap: 5px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--c-gray-90);
-}
-.manual-chapter-tabs button {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border: 0;
-  border-radius: 7px;
-  background: var(--c-gray-100-2);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--c-cyan-45-2);
-  cursor: pointer;
-}
-.manual-chapter-tabs button span {
-  width: 18px;
-  height: 18px;
-  display: grid;
-  place-items: center;
-  border-radius: 5px;
-  background: var(--c-white);
-  font-size: 11px;
-}
-.manual-chapter-tabs button.active {
-  background: var(--c-gray-95-10);
-  color: var(--c-cyan-35-3);
-}
 .manual-copy {
   max-width: 760px;
   padding-top: 18px;
@@ -294,10 +264,10 @@
 }
 .manual-copy h2 {
   margin: 6px 0 8px;
-  font-size: 19px;
+  font-size: 17px;
   color: var(--c-blue-20);
 }
-.manual-copy > p {
+.manual-chapter p {
   margin: 0 0 18px;
   font-size: 14px;
   line-height: 1.6;
@@ -344,29 +314,24 @@
   font-size: 13px;
   color: #2d6a4f;
 }
-.manual-good-practice,
-.manual-role-note {
+.manual-good-practice {
   display: flex;
   gap: 10px;
   margin-top: 18px;
   padding: 12px 14px;
   border-radius: 9px;
-}
-.manual-good-practice {
   background: var(--c-amber-95-2);
   color: var(--c-amber-40-2);
 }
-.manual-role-note {
-  background: var(--c-gray-100-2);
-  color: var(--c-cyan-35-2);
-}
-.manual-good-practice p,
-.manual-role-note p {
+.manual-good-practice p {
   display: grid;
   gap: 3px;
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
+}
+.manual-chapter + .manual-chapter {
+  margin-top: 4px;
 }
 .manual-chapter-footer {
   display: flex;
@@ -411,18 +376,19 @@
   font-weight: 600;
   cursor: pointer;
 }
+/* The glossary: term and meaning with a rule between them, two columns where there is room. */
 .manual-glossary {
   display: grid;
-  gap: 8px;
-  margin-top: 18px;
-  max-width: 760px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  column-gap: 32px;
+  margin-top: 14px;
 }
 .manual-glossary div {
   display: grid;
+  align-content: start;
   gap: 3px;
-  padding: 11px 13px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 9px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--c-gray-95);
   font-size: 13px;
   color: var(--c-cyan-30-3);
 }
@@ -443,9 +409,8 @@
   border-radius: 9px;
 }
 .manual-about-grid small {
-  font-size: 11px;
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--st-muted);
 }
 .manual-about-grid strong {
@@ -469,10 +434,8 @@
   color: var(--c-cyan-30-3);
 }
 .manual-support-grid small {
-  font-size: 11px;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--st-muted);
 }
 .manual-support-grid strong {
