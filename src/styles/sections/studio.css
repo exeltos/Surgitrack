@@ -1925,7 +1925,7 @@ html body .notice-form {
 }
 html body .notice-block {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
   margin: 0;
   padding: 16px 18px 18px;
@@ -1985,11 +1985,9 @@ html body .notice-choice-group {
   gap: 6px;
 }
 html body .notice-choice-label {
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--st-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c-gray-15);
 }
 html body .notice-picture {
   display: grid;
@@ -2148,9 +2146,8 @@ html body .notice-preview {
 }
 html body .notice-preview h3 {
   margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--st-muted);
 }
 html body .notice-preview .notice-preview-who {
@@ -2185,6 +2182,54 @@ html body .notice-preview .maintenance-strip {
   html body .notice-preview {
     position: static;
   }
+}
+
+/* Ειδοποιήσεις: each choice is a compact two-way switch (half the height of the old option cards); what the chosen
+   option does is the line under it. */
+html body .notice-composer .notice-segments {
+  display: inline-flex;
+  grid-template-columns: none;
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+  padding: 3px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+}
+html body .notice-composer .notice-segments button {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--c-gray-15);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+html body .notice-composer .notice-segments button.on {
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgba(24, 56, 74, 0.16);
+  color: var(--st-teal);
+  font-weight: 600;
+}
+html body .notice-choice-hint {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+/* «Δημοσίευση» under the preview, which stays in view while the form scrolls. */
+html body .notice-preview-publish {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--c-gray-90-3);
+}
+html body .notice-preview-publish p:empty {
+  display: none;
 }
 
 /* Ειδοποιήσεις: the form is taller than the screen, so the tab scrolls inside the page. */

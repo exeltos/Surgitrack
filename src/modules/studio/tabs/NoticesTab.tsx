@@ -86,12 +86,6 @@ export default function NoticesTab({s}: {s: StudioPageState}) {
       <header className="studio-errors-head">
         <div>
           <h2>{L('Ανακοινώσεις και προωθήσεις', 'Announcements and promotions')}</h2>
-          <p>
-            {L(
-              'Η ανακοίνωση εμφανίζεται ως γραμμή πάνω στην εφαρμογή, σε όλους ή μόνο στους διαχειριστές, από την ώρα «Από» μέχρι την ώρα «Μέχρι». Η προώθηση (π.χ. ένα προϊόν) εμφανίζεται ως κάρτα στην Επισκόπηση του διαχειριστή του νοσοκομείου, με τίτλο και σύνδεσμο. Και τα δύο μπορούν να πάνε σε όλα τα νοσοκομεία ή σε επιλεγμένα.',
-              'An announcement shows as a line at the top of the app, to everyone or only to the administrators, from the "From" time until the "Until" time. A promotion (e.g. a product) shows as a card on the hospital administrator’s Overview, with a title and a link. Either can go to every hospital or to chosen ones.',
-            )}
-          </p>
         </div>
         <div className="studio-errors-actions">
           <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
