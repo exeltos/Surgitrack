@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Check, TriangleAlert} from 'lucide-react';
+import {Check, Circle, Clock3, TriangleAlert} from 'lucide-react';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useAppPreferences} from '../../../core/AppPreferences';
@@ -91,8 +91,12 @@ export default function SterilizerTestRow({
                 <Check size={13} aria-hidden="true" />
               ) : state === 'bad' ? (
                 <TriangleAlert size={13} aria-hidden="true" />
-              ) : null}
-              {L(kind.el, kind.en)}
+              ) : state === 'due' ? (
+                <Clock3 size={13} aria-hidden="true" />
+              ) : (
+                <Circle size={13} aria-hidden="true" />
+              )}
+              <span className="ster-test-name">{L(kind.el, kind.en)}</span>
               <small>
                 {standing.failed
                   ? L('απέτυχε', 'failed')
