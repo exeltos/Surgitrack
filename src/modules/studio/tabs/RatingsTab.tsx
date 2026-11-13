@@ -42,15 +42,15 @@ export default function RatingsTab({s}: {s: StudioPageState}) {
       <header className="studio-errors-head">
         <div>
           <h2>{L('Αξιολογήσεις από τα Demo', 'Ratings from the Demos')}</h2>
-          <p>
-            {L(
-              'Ό,τι βαθμολόγησαν οι υποψήφιοι πελάτες: τις ξεναγήσεις, τα πρώτα βήματα και κάθε οθόνη, με τα σχόλιά τους, και την τελική τους αξιολόγηση.',
-              'What prospects rated: the guided tours, the first steps and each screen, with their comments, and their final evaluation.',
-            )}
-          </p>
         </div>
-        <div className="studio-errors-actions">
-          <select value={demoId} onChange={e => setDemoId(e.target.value)} aria-label={L('Demo', 'Demo')}>
+        {/* One toolbar: which Demo on the left, «Ανανέωση» on the right. */}
+        <div className="studio-errors-actions studio-ratings-toolbar">
+          <select
+            className="studio-org-select"
+            value={demoId}
+            onChange={e => setDemoId(e.target.value)}
+            aria-label={L('Demo', 'Demo')}
+          >
             <option value="">{L('Όλα τα Demo', 'Every Demo')}</option>
             {(demos || []).map(d => (
               <option key={d.id} value={d.id}>
@@ -68,45 +68,48 @@ export default function RatingsTab({s}: {s: StudioPageState}) {
         <Spinner />
       ) : (
         <>
-          <div className="studio-ratings-kpis">
-            <div title={L(`${summary.rated} βαθμολογίες`, `${summary.rated} ratings`)}>
-              <span>{L('Μέση βαθμολογία', 'Average rating')}</span>
-              <strong>{summary.average !== undefined ? stars(summary.average) : '—'}</strong>
-              <small>{L(`${summary.rated} βαθμολογίες`, `${summary.rated} ratings`)}</small>
-            </div>
-            <div
-              title={L(
-                `${summary.evaluations.length} τελικές αξιολογήσεις`,
-                `${summary.evaluations.length} final evaluations`,
-              )}
-            >
-              <span>NPS</span>
-              <strong className={summary.nps !== undefined && summary.nps < 0 ? 'negative' : ''}>
-                {summary.nps !== undefined ? npsLabel(summary.nps) : '—'}
-              </strong>
-              <small>
-                {L(
+          {/* The figures show once there is something to count; until then the empty state says what will come. */}
+          {(summary.ratings.length > 0 || summary.evaluations.length > 0 || summary.newRequests > 0) && (
+            <div className="studio-ratings-kpis">
+              <div title={L(`${summary.rated} βαθμολογίες`, `${summary.rated} ratings`)}>
+                <span>{L('Μέση βαθμολογία', 'Average rating')}</span>
+                <strong>{summary.average !== undefined ? stars(summary.average) : '—'}</strong>
+                <small>{L(`${summary.rated} βαθμολογίες`, `${summary.rated} ratings`)}</small>
+              </div>
+              <div
+                title={L(
                   `${summary.evaluations.length} τελικές αξιολογήσεις`,
                   `${summary.evaluations.length} final evaluations`,
                 )}
-              </small>
+              >
+                <span>NPS</span>
+                <strong className={summary.nps !== undefined && summary.nps < 0 ? 'negative' : ''}>
+                  {summary.nps !== undefined ? npsLabel(summary.nps) : '—'}
+                </strong>
+                <small>
+                  {L(
+                    `${summary.evaluations.length} τελικές αξιολογήσεις`,
+                    `${summary.evaluations.length} final evaluations`,
+                  )}
+                </small>
+              </div>
+              <div title={L('σε αξιολόγηση', 'being evaluated')}>
+                <span>{L('Demo σε αξιολόγηση', 'Demos being evaluated')}</span>
+                <strong>{shown.length}</strong>
+                <small>{L('σε αξιολόγηση', 'being evaluated')}</small>
+              </div>
+              <button
+                type="button"
+                className={summary.newRequests ? 'attention' : ''}
+                title={L('Αγορά ή παράταση · Demo αξιολόγησης', 'Purchase or more time · Evaluation Demos')}
+                onClick={() => selectTab('DEMOS')}
+              >
+                <span>{L('Νέα αιτήματα', 'New requests')}</span>
+                <strong>{summary.newRequests}</strong>
+                <small>{L('Αγορά ή παράταση · Demo αξιολόγησης', 'Purchase or more time · Evaluation Demos')}</small>
+              </button>
             </div>
-            <div title={L('σε αξιολόγηση', 'being evaluated')}>
-              <span>{L('Demo σε αξιολόγηση', 'Demos being evaluated')}</span>
-              <strong>{shown.length}</strong>
-              <small>{L('σε αξιολόγηση', 'being evaluated')}</small>
-            </div>
-            <button
-              type="button"
-              className={summary.newRequests ? 'attention' : ''}
-              title={L('Αγορά ή παράταση · Demo αξιολόγησης', 'Purchase or more time · Evaluation Demos')}
-              onClick={() => selectTab('PLATFORM')}
-            >
-              <span>{L('Νέα αιτήματα', 'New requests')}</span>
-              <strong>{summary.newRequests}</strong>
-              <small>{L('Αγορά ή παράταση · Demo αξιολόγησης', 'Purchase or more time · Evaluation Demos')}</small>
-            </button>
-          </div>
+          )}
 
           {!summary.ratings.length && !summary.evaluations.length ? (
             <div className="studio-errors-empty">

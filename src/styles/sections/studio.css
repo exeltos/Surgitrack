@@ -1649,8 +1649,6 @@ html body .evaluation-demo-row-fact small {
   color: var(--c-violet-45);
   font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 html body .evaluation-demo-row-fact b {
   color: var(--c-blue-15);
@@ -2816,4 +2814,19 @@ html body .asset-import-steps li span {
   color: var(--c-cyan-20);
   font-size: 15px;
   font-weight: 600;
+}
+
+/* Αξιολογήσεις: the Demo picker on the left and «Ανανέωση» on the right of one toolbar. */
+html body .studio-ratings-toolbar {
+  flex: 1 1 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+/* On a narrow screen the four steps wrap onto a second line instead of scrolling sideways. */
+@media (max-width: 760px) {
+  html body .asset-import-steps {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    overflow: visible;
+  }
 }

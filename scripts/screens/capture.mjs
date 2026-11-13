@@ -5,7 +5,7 @@
  * role that can open it, at desktop and mobile size. See README.md.
  *
  *   node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,...|all]
- *        [--viewport desktop|tablet|mobile|both] [--out dir] [--only route] [--rebuild] [--no-extras] [--a11y]
+ *        [--viewport desktop|wide|laptop|tablet|mobile|both] [--out dir] [--only route] [--rebuild] [--no-extras] [--a11y]
  *
  * --a11y also runs axe-core (WCAG 2 A/AA) on every route and exits 1 on any serious or critical finding.
  */
@@ -47,6 +47,9 @@ const ROLES = roleArg === 'ALL' ? ALL_ROLES : roleArg.split(',').filter(r => ALL
 const VIEWPORTS = {
   desktop: {width: 1440, height: 900},
   mobile: {width: 390, height: 844},
+  // A Full HD computer screen, and a common laptop one.
+  wide: {width: 1920, height: 1080},
+  laptop: {width: 1366, height: 768},
   // A tablet held sideways (iPad Air), with touch.
   tablet: {width: 1180, height: 820},
   // A common laptop window (1366×768 screen minus the browser's bars); only when asked for.
