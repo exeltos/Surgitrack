@@ -1154,15 +1154,24 @@ html body .studio-security-table td small {
   display: block;
   color: var(--st-muted);
 }
-html body .studio-security-table tr.blocked {
-  background: var(--st-red-soft, var(--c-gray-95-2));
+/* A user on a blocked address: a red bar at the row's start and a badge by the address, not a pink row. */
+html body .studio-security-table tr.blocked > td:first-child {
+  box-shadow: inset 3px 0 0 var(--st-red);
 }
 html body .studio-security-me {
   align-self: center;
   color: var(--st-muted);
 }
 html body .studio-security-flag {
+  display: inline-block;
+  width: max-content;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--st-red-soft, var(--c-gray-95-2));
   color: var(--st-red);
+  font-size: 11px;
+  font-weight: 600;
 }
 html body .studio-security-actions {
   display: flex;
@@ -1185,6 +1194,9 @@ html body .studio-security-title {
 html body .studio-security-title h3 {
   margin: 0;
   margin-right: auto;
+  color: var(--c-cyan-20);
+  font-size: 15px;
+  font-weight: 600;
 }
 html body .studio-security-title small {
   color: var(--st-muted);
@@ -2711,17 +2723,27 @@ html body .studio-security-table td.studio-security-hospital {
   max-width: 170px;
 }
 
-/* Security, connected now: four columns and two square buttons (the name on hover), nothing cut at the right. */
+/* Security, connected now: the address in plain dark mono (the person's name leads), and two small buttons that say
+   what they do; on a narrow screen they keep their icon only (the name on hover). */
 html body .studio-security-table td b {
   font-weight: 600;
 }
-html body .studio-security-table .studio-security-icon {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  justify-content: center;
+html body .studio-security-table td b.mono {
+  color: var(--c-gray-15);
+  font-weight: 500;
+}
+html body .studio-security-table .studio-security-action {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  html body .studio-security-table .studio-security-action {
+    width: 32px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
 }
 html body .studio-security-table td:last-child {
   width: 1%;
@@ -2755,7 +2777,9 @@ html body .studio-security-card .studio-security-blocked > li:last-child {
   border-bottom: 0;
 }
 html body .studio-security-card .studio-security-blocked b.mono {
+  color: var(--c-gray-15);
   font-size: 13px;
+  font-weight: 500;
 }
 
 /* Roles: the role list and the permissions take the height left under the tabs, so their bottom edge is never

@@ -191,22 +191,24 @@ export default function SecurityTab({s}: {s: StudioPageState}) {
                         <AppButton
                           size="sm"
                           variant="danger"
-                          className="studio-security-icon"
-                          icon={<Ban size={15} />}
-                          aria-label={L('Μπλοκάρισμα IP', 'Block IP')}
-                          title={L('Μπλοκάρισμα IP', 'Block IP')}
+                          className="studio-security-action"
+                          icon={<Ban size={14} />}
+                          title={L('Μπλοκάρισμα της διεύθυνσης {0}', 'Block the address {0}').replace('{0}', row.ip!)}
                           onClick={() => void blockIp(row.ip!)}
-                        />
+                        >
+                          {L('Μπλοκάρισμα IP', 'Block IP')}
+                        </AppButton>
                       )}
                       {row.organization_id && row.active && (
                         <AppButton
                           size="sm"
-                          className="studio-security-icon"
-                          icon={<UserX size={15} />}
-                          aria-label={L('Αναστολή χρήστη', 'Suspend user')}
-                          title={L('Αναστολή χρήστη', 'Suspend user')}
+                          className="studio-security-action"
+                          icon={<UserX size={14} />}
+                          title={L('Αναστολή του λογαριασμού', 'Suspend the account')}
                           onClick={() => void suspend(row)}
-                        />
+                        >
+                          {L('Αναστολή', 'Suspend')}
+                        </AppButton>
                       )}
                       {row.organization_id && !row.active && (
                         <small className="studio-security-flag">{L('Σε αναστολή', 'Suspended')}</small>
