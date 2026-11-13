@@ -11,6 +11,7 @@ import {
   List,
   LogOut,
   PackageCheck,
+  QrCode,
   Search,
   Send,
   ShieldCheck,
@@ -42,6 +43,7 @@ import ReleaseStation from './stations/ReleaseStation';
 import IssueStation from './stations/IssueStation';
 import PickupStation from './stations/PickupStation';
 import ReportStation from './stations/ReportStation';
+import MyPass from './MyPass';
 import SendStation from './stations/SendStation';
 import {ScanStationLook} from './scanLook';
 import {useNewVersion} from './useNewVersion';
@@ -63,6 +65,14 @@ const managesSterilization = (user: SessionUser) =>
   user.role === 'ADMIN' || (user.role === 'STERILIZATION' && !!user.supervisor);
 
 const stations = (): Station[] => [
+  {
+    // A department person's QR: shown at a handover, Sterilization scans it in place of their password.
+    path: 'pass',
+    title: tr('Το QR μου'),
+    icon: <QrCode size={26} />,
+    tone: 'pass',
+    only: user => user.role === 'DEPARTMENT',
+  },
   {
     path: 'send',
     title: tr('Αποστολή στην Αποστείρωση'),
@@ -303,6 +313,7 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
         <Route path={`${SCAN_PATH}/send`} element={station('send', <SendStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/pickup`} element={station('pickup', <PickupStation onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/issue`} element={station('issue', <IssueStation onStations={toStations} />)} />
+        <Route path={`${SCAN_PATH}/pass`} element={station('pass', <MyPass onStations={toStations} />)} />
         <Route path={`${SCAN_PATH}/lookup`} element={station('lookup', <LookupStation onStations={toStations} />)} />
         <Route path="*" element={<Navigate to={SCAN_PATH} replace />} />
       </Routes>

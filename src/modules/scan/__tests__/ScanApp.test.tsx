@@ -278,3 +278,37 @@ describe('ScanApp sending, an instrument not used', () => {
     expect(lives.getAllByText('χωρίς χρήση').length).toBe(ticks.length);
   });
 });
+
+describe('ScanApp: «Το QR μου» for a department', () => {
+  const nurse = {id: 'u-or', name: 'Νοσηλεύτρια Χειρουργείου', role: 'DEPARTMENT' as const, department: 'Χειρουργείο'};
+
+  it('is the first station of a department person, and draws their QR', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan', signedIn: nurse});
+    const tiles = within(screen.getByRole('navigation', {name: 'Αρχική'})).getAllByRole('button');
+    expect(tiles[0]).toHaveTextContent('Το QR μου');
+    fireEvent.click(tiles[0]);
+    expect(await screen.findByRole('img', {name: 'QR υπογραφής παράδοσης'})).toBeInTheDocument();
+    expect(screen.getByText('Αλλάζει κάθε 30 δευτερόλεπτα και ισχύει μία φορά.')).toBeInTheDocument();
+  });
+
+  it('is not a station of Sterilization', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan'});
+    expect(screen.queryByText('Το QR μου')).not.toBeInTheDocument();
+  });
+});
+
+describe('ScanApp: a handover signed with the other person’s QR', () => {
+  it('receipt: the QR of the person handing over signs in place of their password', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/receive'});
+    typeBarcode('S000327');
+    fireEvent.click(screen.getByRole('button', {name: 'Συνέχεια · 1'}));
+    expect(screen.getByText('Σάρωση QR του άλλου προσώπου')).toBeInTheDocument();
+    // A Set's barcode is not a signature.
+    typeBarcode('S000321');
+    expect(await screen.findByText(/Σκανάρετε το QR από το κινητό του άλλου προσώπου/)).toBeInTheDocument();
+    // The Demo person of Αίθουσα Τοκετών shows their QR.
+    typeBarcode('SURGITRACK-PASS:DEMO:TK1042');
+    expect(await screen.findByText('TK1042')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /Ολοκλήρωση παραλαβής · 1/})).toBeEnabled();
+  });
+});

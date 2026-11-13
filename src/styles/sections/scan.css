@@ -1490,3 +1490,79 @@ html body .scan-more .scan-moves,
 html body .scan-more .scan-empty {
   margin: 10px;
 }
+
+/* «Το QR μου»: a big QR on white, the person under it, a thin bar for the seconds it has left. */
+html body .scan-tile.pass .scan-station-icon,
+html body .scan-head-icon.pass {
+  background: #17384a;
+}
+html body .scan-pass {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px 0 12px;
+  text-align: center;
+}
+html body .scan-pass-hint {
+  margin: 0 0 6px;
+  color: var(--st-muted);
+  font-size: 14px;
+}
+html body .scan-pass-code {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  width: min(300px, 100%);
+  min-height: 300px;
+  padding: 18px;
+  border: 1px solid #dbe3ea;
+  border-radius: 22px;
+  background: #fff;
+}
+html body .scan-pass-qr svg {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+}
+html body .scan-pass-timer {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6edf2;
+}
+html body .scan-pass-timer i {
+  display: block;
+  height: 100%;
+  background: var(--c-cyan-20);
+  transition: width 1s linear;
+}
+html body .scan-pass-failed {
+  display: grid;
+  gap: 10px;
+  color: var(--st-muted);
+  font-size: 14px;
+}
+html body .scan-pass > b {
+  margin-top: 8px;
+  font-size: 17px;
+}
+html body .scan-pass > small {
+  color: var(--st-muted);
+  font-size: 13.5px;
+}
+html body .scan-pass > small.scan-pass-note {
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+/* A handover's confirmation: the other person's QR first, the username and password under it. */
+html body .scan-pass-scan {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+html body .scan-pass-scan-label {
+  font-size: 15px;
+  font-weight: 650;
+}

@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {TriangleAlert} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
+import PassScanner from '../PassScanner';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
 import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
@@ -86,8 +87,10 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
           </div>
         </dl>
         <section className="scan-sign">
+          {/* The person receiving shows «Το QR μου»; the username and password stay for who has no phone. */}
+          {!receiver && <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setDeliveryBatchReceiver} />}
           <HandoverSignature
-            label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
+            label={tr('ή με κωδικό χρήστη και συνθηματικό')}
             department={department}
             signer={receiver}
             assetIds={items.map(item => item.id)}

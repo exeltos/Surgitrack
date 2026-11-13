@@ -457,9 +457,19 @@ async function main() {
         list = [
           '/scan',
           '/scan/account',
-          ...['send', 'pickup', 'receive', 'load', 'release', 'deliver', 'issue', 'lookup', 'lists', 'report'].map(
-            s => `/scan/${s}`,
-          ),
+          ...[
+            'pass',
+            'send',
+            'pickup',
+            'receive',
+            'load',
+            'release',
+            'deliver',
+            'issue',
+            'lookup',
+            'lists',
+            'report',
+          ].map(s => `/scan/${s}`),
         ];
       } else if (role === 'PLATFORM') {
         // The platform owner outside any hospital: Studio and the hospital list.

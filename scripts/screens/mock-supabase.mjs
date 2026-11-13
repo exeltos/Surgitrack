@@ -702,13 +702,26 @@ const FUNCTIONS = {
           departments: db.departments.map(d => ({id: d.id, name: d.name, code: d.code})),
         }
       : {ok: true, user_code: 'newuser'},
-  // A hand-over signed by a colleague of the hospital: their user code and HANDOVER_PASSWORD.
+  // «Το QR μου»: a pass naming the signed-in person (the real one is random and one-time).
+  'handover-pass': (db, body, account) =>
+    account
+      ? {
+          pass: `PASS${String(account.user_code || account.id).toUpperCase()}`,
+          expires_at: new Date(Date.now() + 45_000).toISOString(),
+        }
+      : {status: 401, body: {error: 'unauthorized'}},
+  // A hand-over signed by a colleague of the hospital: their user code and HANDOVER_PASSWORD, or their QR's pass.
   'verify-handover': (db, body, account) => {
+    const pass = String(body?.pass || '').toUpperCase();
     const signer = db.profiles.find(
       p =>
-        p.active && p.organization_id === ORG_ID && p.user_code.toUpperCase() === String(body?.user_code).toUpperCase(),
+        p.active &&
+        p.organization_id === ORG_ID &&
+        (pass
+          ? pass === `PASS${String(p.user_code || p.id).toUpperCase()}`
+          : p.user_code.toUpperCase() === String(body?.user_code).toUpperCase()),
     );
-    if (!signer || body?.password !== HANDOVER_PASSWORD) return {status: 401, body: {error: 'invalid'}};
+    if (!signer || (!pass && body?.password !== HANDOVER_PASSWORD)) return {status: 401, body: {error: 'invalid'}};
     if (signer.id === account?.id) return {status: 409, body: {error: 'same_user'}};
     return {
       user_id: signer.id,
