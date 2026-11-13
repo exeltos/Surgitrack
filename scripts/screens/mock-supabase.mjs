@@ -276,6 +276,10 @@ export function createDatabase(seed) {
         contact_name: 'SurgiTrack Support',
         contact_email: 'support@example.test',
         contact_phone: '210 000 0000',
+        public_name: 'Exeltos',
+        public_email: 'info@exeltos.com',
+        public_phone: '694 247 1022',
+        public_website: 'https://exeltos.com/',
         // SCREENS_MAINTENANCE=1 shows the owner's notice to every user.
         maintenance_message:
           process.env.SCREENS_MAINTENANCE === '1'
@@ -574,6 +578,11 @@ const VERSIONED = new Set([
 ]);
 
 const RPC = {
+  // The company on the public first page (the four public_* fields of platform_settings).
+  public_contact: db => {
+    const row = (db.platform_settings || [])[0] || {};
+    return [{name: row.public_name, email: row.public_email, phone: row.public_phone, website: row.public_website}];
+  },
   claim_platform_admin: () => null,
   // Records saved together in one transaction (a release, a delivery): each row in order, the changed ones
   // merged into what is there, history rows added once. The groups are kept in db._groups for the checks.
