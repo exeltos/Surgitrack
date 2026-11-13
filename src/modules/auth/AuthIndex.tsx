@@ -404,13 +404,14 @@ export default function AuthIndex({
       </aside>
       <div className="auth-side">
         <header className="auth-topbar">
-          <div className="auth-mini-brand">
+          {/* Back to the site's first page (the phone app has none). */}
+          <a className="auth-mini-brand" href={scan ? undefined : '#/'}>
             <BrandMark className="auth-brand-mark" />
             <div>
               <strong>{t.product}</strong>
               <span>{scan ? scanTitle : t.suite}</span>
             </div>
-          </div>
+          </a>
           <button className="auth-lang" onClick={switchLang}>
             <Languages size={16} />
             <span>{lang === 'el' ? 'EN' : 'EL'}</span>

@@ -6,6 +6,7 @@ import {UnsavedChangesProvider} from './UnsavedChangesProvider';
 import {ConfirmHost} from '../components/ui/ConfirmHost';
 import ProtectedRoute from '../components/layout/ProtectedRoute';
 import AuthIndex from '../modules/auth/AuthIndex';
+import LandingPage from '../modules/auth/LandingPage';
 import PendingAccess from '../modules/auth/PendingAccess';
 import {useSurgi} from '../store/SurgiStore';
 import {useAppPreferences} from '../core/AppPreferences';
@@ -244,6 +245,17 @@ export default function App() {
         }}
       />
     );
+  // The public first page of the site: what SurgiTrack is and how to reach Exeltos; «Σύνδεση» opens #/login. A
+  // sign-out, a password reset or the phone app go straight to the sign-in screen.
+  if (
+    !authenticated &&
+    location.pathname === '/' &&
+    !onScanScreens() &&
+    !goodbye &&
+    !firstPassword &&
+    !passwordRecovery
+  )
+    return <LandingPage onSignIn={() => navigate('/login')} />;
   if (!authenticated)
     return (
       <AuthIndex
@@ -286,6 +298,8 @@ export default function App() {
         {/* Pages re-render their text in the new language when it changes. */}
         <Routes key={lang}>
           <Route path="/" element={<RoleHome />} />
+          {/* The sign-in screen's address, once signed in: the home page. */}
+          <Route path="/login" element={<Navigate to="/" replace />} />
           <Route
             path="/sets"
             element={
