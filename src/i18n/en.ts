@@ -234,6 +234,10 @@ export const en: Record<string, string> = {
   'Έλεγχος αποθήκευσης': 'Storage check',
   'Έλεγχος και επιβεβαίωση πριν τη συσκευασία': 'Check and confirm before packaging',
   'Έλεγχος λειτουργικότητας, σύνθεση και διαχείριση αποκλίσεων.': 'Function check, assembly and deviation handling.',
+  'Επιλέξτε τι μπαίνει στο πλυντήριο και φορτώστε τα μαζί.': 'Choose what goes into the washer and load it together.',
+  'Επιλέξτε τι μπαίνει στον κλίβανο και φορτώστε τα σε έναν κύκλο.':
+    'Choose what goes into the sterilizer and load it in one cycle.',
+  'Παράδοση στο τμήμα με υπογραφή του παραλήπτη.': 'Delivery to the department, signed by the recipient.',
   'Έλεγχος συσκευασίας': 'Packaging check',
   'Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.':
     'Check of the physical instruments after washing and before sterilization.',

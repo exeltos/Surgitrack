@@ -2839,3 +2839,20 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
     content: none;
   }
 }
+
+/* The row above a stage's list, on a computer or tablet: the stage's hint on the left and its buttons on the
+   right, a toolbar instead of one button alone on a whole line. A long hint is cut with an ellipsis. */
+@media (min-width: 1101px) {
+  html body .sterilization-workspace .ster-work-panel > .ster-panel-head > .ster-panel-head-actions {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  html body .sterilization-workspace .ster-work-panel > .ster-panel-head .ster-hint {
+    display: block;
+    margin-right: auto;
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
