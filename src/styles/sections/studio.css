@@ -423,9 +423,6 @@
   html body .studio-body-workflow .studio-release-policy > header span {
     display: none;
   }
-  html body .studio-body-workflow .studio-workflow-policy span {
-    display: none;
-  }
   html body .studio-body-workflow .studio-release-policy-grid > label {
     padding: 7px 10px !important;
     min-height: 0 !important;
@@ -2695,9 +2692,9 @@ html body .platform-contact .platform-contact-status {
   font-weight: 600;
 }
 
-/* Readable contrast (WCAG AA): the «ΒΑΣΙΚΟ» mark of the core stages and the text of the protected-core note. */
+/* Readable contrast (WCAG AA): the «Βασικό» mark of the core stages and the text of the protected-core note. */
 html body .workflow-core-chip {
-  color: var(--c-green-35);
+  color: var(--c-cyan-30);
 }
 html body .studio-role-security-banner span {
   color: var(--c-cyan-30);
