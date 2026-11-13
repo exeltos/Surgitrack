@@ -5,7 +5,7 @@ size. The app runs fully signed in with no network access: Supabase is mocked in
 
 ```sh
 node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,SUPERVISOR,DEPARTMENT,VIEWER,PLATFORM|all]
-     [--viewport desktop|wide|laptop|tablet|mobile|both] [--out dir] [--only route] [--rebuild] [--no-extras]
+     [--viewport desktop|wide|laptop|tablet|mobile|both|WIDTHxHEIGHT] [--out dir] [--only route] [--rebuild] [--no-extras]
      [--settle ms] [--max-height px]
 ```
 
