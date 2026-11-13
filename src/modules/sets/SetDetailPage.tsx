@@ -316,7 +316,6 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΣΥΝΟΨΗ')}</span>
                     <h2>{tr('Κατάσταση & κύκλος ζωής')}</h2>
                     <p>{tr('Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.')}</p>
                   </div>
@@ -381,7 +380,6 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
                     <h2>{tr('Ιστορικό κινήσεων')}</h2>
                   </div>
                   <History size={19} />
@@ -401,11 +399,8 @@ export default function SetDetailPage() {
                             {movementText(item.status)}{' '}
                             {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                           </strong>
-                          <p>
-                            {trData(item.from)} → {trData(item.to)}
-                          </p>
                           <small>
-                            {item.at} · {trData(item.by)}
+                            {trData(item.from)} → {trData(item.to)} · {item.at} · {trData(item.by)}
                             {item.patientCode ? ` · ${item.patientCode}` : ''}
                             {item.undoes && item.note ? ` · ${tr('Αιτιολογία')}: ${item.note}` : ''}
                           </small>
@@ -422,7 +417,6 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΕΚΚΡΕΜΟΤΗΤΕΣ')}</span>
                     <h2>{tr('Ανοικτές αναφορές')}</h2>
                   </div>
                 </div>
@@ -455,7 +449,6 @@ export default function SetDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΣΗΜΕΙΩΣΕΙΣ')}</span>
                     <h2>{tr('Μόνιμες παρατηρήσεις')}</h2>
                   </div>
                 </div>

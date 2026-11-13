@@ -210,16 +210,23 @@
 /* Instruments list: the Set an instrument is in, by name (a link to it) with its barcode below. */
 html body .tools-registry .tools-place-set {
   font-size: 12.5px;
+  font-weight: 500;
   white-space: normal;
+}
+/* The place stays quieter than the instrument's own name: no bold words, the Set's barcode grey under it. */
+html body .tools-registry td:nth-child(4) > b {
+  font-weight: 500;
+}
+html body .tools-registry td:nth-child(4) .row-sub {
+  color: var(--st-muted);
+  font-size: 11.5px;
 }
 /* Instrument card: the moves of the Set it travels in, under its own. */
 html body .asset-history-group {
   margin: 14px 0 4px;
   color: var(--c-blue-45);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 /* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
 html body .standalone-registry th:nth-child(5) {

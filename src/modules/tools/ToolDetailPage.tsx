@@ -134,11 +134,8 @@ export default function ToolDetailPage() {
         <strong>
           {movementText(item.status)} {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
         </strong>
-        <p>
-          {trData(item.from)} → {trData(item.to)}
-        </p>
         <small>
-          {item.at} · {trData(item.by)}
+          {trData(item.from)} → {trData(item.to)} · {item.at} · {trData(item.by)}
           {item.undoes && item.note ? ` · ${tr('Αιτιολογία')}: ${item.note}` : ''}
         </small>
       </div>
@@ -298,7 +295,6 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
                     <h2>{tr('Ιστορικό κινήσεων')}</h2>
                     <p>{tr('Όλες οι κινήσεις του συγκεκριμένου φυσικού εργαλείου.')}</p>
                   </div>
@@ -330,7 +326,6 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΕΚΚΡΕΜΟΤΗΤΕΣ')}</span>
                     <h2>{tr('Ανοικτές αναφορές')}</h2>
                   </div>
                 </div>
@@ -363,7 +358,6 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΣΥΝΟΨΗ')}</span>
                     <h2>{tr('Κατάσταση & κύκλος ζωής')}</h2>
                     <p>{tr('Η λειτουργική εικόνα του εργαλείου χωρίς επανάληψη των στοιχείων ταυτότητας.')}</p>
                   </div>
@@ -419,7 +413,6 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΣΗΜΕΙΩΣΕΙΣ')}</span>
                     <h2>{tr('Μόνιμες παρατηρήσεις')}</h2>
                   </div>
                 </div>

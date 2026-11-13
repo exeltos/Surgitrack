@@ -292,9 +292,10 @@ export default function ToolsPage() {
                           <ColorMarker tapes={effectiveToolMarker(t, set)} size="sm" />
                           <small className="row-sub">
                             <span className="mono registry-row-barcode">{t.barcode}</span>
-                            {[t.manufacturer, t.code].filter(Boolean).map(part => ` · ${part}`)}
+                            {[t.manufacturer, t.code, t.serialNumber && `S/N ${t.serialNumber}`]
+                              .filter(Boolean)
+                              .map(part => ` · ${part}`)}
                           </small>
-                          {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                         </span>
                       </div>
                     </td>

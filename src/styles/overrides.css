@@ -2163,7 +2163,7 @@ html body .asset-registry-table tbody td {
   padding-bottom: 7px;
 }
 html body .asset-registry-table td small.row-sub {
-  max-width: 220px;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4007,9 +4007,10 @@ html body .registry-fixed:not(.expiry-table) th:nth-child(2),
 html body .registry-fixed:not(.expiry-table) td:nth-child(2) {
   display: none;
 }
+/* The barcode under a name: grey and quiet, so the name and what needs attention lead. */
 html body .registry-row-barcode {
-  color: var(--c-cyan-45);
-  font-weight: 600;
+  color: var(--st-muted);
+  font-weight: 500;
 }
 /* Sets: «Εργαλεία» fits next to its sort arrow. */
 html body .sets-registry:not(.standalone-registry) th:nth-child(5) {

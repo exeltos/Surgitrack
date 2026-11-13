@@ -102,7 +102,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+}
+/* The colour button stays beside the value; a long value («Χωρίς χρώμα, όπως το Σετ») wraps in its own room. */
+.asset-marker-field dd > .color-marker-empty {
+  min-width: 0;
 }
 .color-mode-choices {
   display: grid;
@@ -713,6 +716,9 @@ html body .asset-workbench-sidebar .sterile-until.expired {
   html body .asset-workbench-sidebar .asset-sidebar-quickfacts {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
+  html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+    grid-template-columns: 124px minmax(0, 1fr);
+  }
 }
 
 /* The photos of a Set or instrument: a dialog as tall as what it holds (no empty half under «Κλείσιμο»), the
@@ -779,10 +785,6 @@ html body .sets-main .set-name-line .row-title-link {
 html body .sets-main .set-name-line .color-marker {
   flex: 0 0 auto;
   margin-left: 0;
-}
-html body .sets-main .registry-row-barcode {
-  color: var(--st-muted);
-  font-weight: 500;
 }
 html body .sets-main .sets-expiry {
   color: var(--st-muted);

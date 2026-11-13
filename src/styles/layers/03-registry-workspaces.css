@@ -1005,8 +1005,8 @@ body {
   padding: 17px 19px;
 }
 .asset-detail-workspace .asset-section-head h2 {
-  font-size: 18px;
-  margin: 3px 0 2px;
+  font-size: 16px;
+  margin: 0 0 2px;
 }
 .asset-detail-workspace .asset-section-head p {
   font-size: 12px;
@@ -1333,10 +1333,9 @@ body {
   padding: 12px;
   min-height: 0;
 }
+/* A tab's content sits straight in the tab panel: no card inside the card. */
 .asset-workbench-main .asset-section {
   box-shadow: none;
-}
-.asset-workbench-main .set-composition-fixed {
   border: 0;
 }
 .asset-workbench-main .set-composition-head {
@@ -1928,7 +1927,7 @@ body {
 }
 @media (max-width: 1180px) {
   .tool-detail-workspace .asset-workbench-grid {
-    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-columns: 340px minmax(0, 1fr);
   }
   .asset-workbench-sidebar-tool .asset-workbench-fields > div {
     grid-template-columns: 108px minmax(0, 1fr);

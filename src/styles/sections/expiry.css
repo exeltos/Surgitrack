@@ -27,10 +27,6 @@ html body .expiry-place-plain {
 html body .expiry-table td:first-child .row-title-link {
   font-weight: 600;
 }
-html body .expiry-table .registry-row-barcode {
-  color: var(--st-muted);
-  font-weight: 500;
-}
 /* A thin edge in the colour of the time left: red expired, amber expiring. */
 html body .expiry-table tr.expiry-row.expired > td:first-child {
   box-shadow: inset 3px 0 0 var(--st-red);
