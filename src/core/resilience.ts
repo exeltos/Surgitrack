@@ -33,11 +33,10 @@ export function installChunkRecovery() {
 }
 
 /** React.lazy that reloads once when the page file is gone after a new version was published. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- same constraint as React.lazy
-export function lazyPage<T extends ComponentType<any>>(load: () => Promise<{default: T}>) {
+export function lazyPage<P extends object>(load: () => Promise<{default: ComponentType<P>}>) {
   return lazy(() =>
     load().catch(error => {
-      if (isChunkLoadError(error) && reloadForNewVersion()) return new Promise<{default: T}>(() => {});
+      if (isChunkLoadError(error) && reloadForNewVersion()) return new Promise<{default: ComponentType<P>}>(() => {});
       throw error;
     }),
   );
