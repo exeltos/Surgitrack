@@ -62,7 +62,7 @@ html body .kpis > * svg {
   padding: 0 9px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 .expiry-badge.ok {

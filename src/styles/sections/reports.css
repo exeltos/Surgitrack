@@ -113,7 +113,7 @@ html body .reports-close-list {
   border: 0;
   background: none;
   color: var(--primary, #0f6bb8);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
 }
@@ -125,7 +125,7 @@ html body .usage-fresh-badge {
   background: #e3f4ea;
   color: #1c6b3f;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Reports: the catalog is a strip across the top, the filters and totals sit on one line and the list opens at once. */
@@ -191,7 +191,7 @@ html body .reports-catalog-item:hover {
   border-color: var(--c-cyan-45);
 }
 html body .reports-catalog-item strong {
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .reports-catalog-item.active {
   border-color: var(--c-cyan-45);
@@ -310,12 +310,12 @@ html body .reports-category {
   color: var(--st-muted);
   font: inherit;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 650;
   cursor: pointer;
 }
 html body .reports-category b {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-gray-65);
 }
 html body .reports-category:hover {
@@ -369,12 +369,12 @@ html body .reports-table td {
 }
 html body .reports-table td.report-cell-name {
   color: var(--c-cyan-20);
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .reports-table td.report-cell-name .registry-row-barcode {
   display: block;
   margin-top: 2px;
-  font-weight: 700;
+  font-weight: 600;
 }
 @media (min-width: 701px) {
   html body .reports-table td.report-cell-repeat {
@@ -386,7 +386,7 @@ html body .reports-table tr.report-group-start td {
 }
 html body .reports-table tr.report-group-start td:first-child {
   color: var(--c-cyan-20);
-  font-weight: 750;
+  font-weight: 650;
 }
 html body .reports-table tbody tr:nth-child(even) {
   background: rgba(237, 242, 244, 0.35);

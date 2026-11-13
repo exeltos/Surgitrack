@@ -83,7 +83,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 .replacement-stock.yes {
@@ -151,7 +151,7 @@
 }
 .replacements-order-body .qty {
   text-align: center;
-  font-weight: 800;
+  font-weight: 650;
 }
 .replacements-order-note {
   margin: 0;
@@ -208,7 +208,7 @@
   display: grid;
   gap: 4px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-40-2);
 }
 .replacements-order-add input {
@@ -232,7 +232,7 @@
   display: grid;
   gap: 4px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-40-2);
 }
 .replacements-order-fields input {
@@ -262,7 +262,7 @@
   padding: 6px 2px;
   color: var(--st-muted);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .replacements-order.o-CANCELLED {
@@ -294,7 +294,7 @@
   color: var(--c-cyan-35);
   font: inherit;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }

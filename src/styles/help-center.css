@@ -58,7 +58,7 @@
   background: var(--c-cyan-40);
   color: var(--c-white);
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
 }
 .manual-brand p {
   display: grid;
@@ -139,7 +139,7 @@
 .manual-side-label {
   padding: 14px 14px 8px;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.11em;
   color: var(--c-gray-45);
 }
@@ -173,7 +173,7 @@
 .manual-side-bottom button.active {
   background: var(--c-gray-95-3);
   color: var(--c-cyan-40);
-  font-weight: 800;
+  font-weight: 650;
 }
 .manual-nav-empty {
   padding: 12px 8px;
@@ -208,7 +208,7 @@
   align-items: center;
   gap: 5px;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--c-cyan-50-2);
 }
@@ -265,7 +265,7 @@
   background: var(--c-gray-100-2);
   font: inherit;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-45-2);
   cursor: pointer;
 }
@@ -288,7 +288,7 @@
 }
 .manual-step-label {
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--st-muted);
 }
@@ -408,7 +408,7 @@
   color: var(--c-white);
   font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .manual-glossary {
@@ -444,7 +444,7 @@
 }
 .manual-about-grid small {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.08em;
   color: var(--st-muted);
 }
@@ -470,7 +470,7 @@
 }
 .manual-support-grid small {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--st-muted);
@@ -492,7 +492,7 @@
   border-radius: 7px;
   background: var(--c-cyan-40);
   color: var(--c-white) !important;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 @media (max-width: 1000px) {
@@ -566,7 +566,7 @@
   background: rgba(16, 45, 56, 0.82);
   color: var(--c-white);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .manual-screen-thumb:hover span,
 .manual-screen-thumb:focus-visible span {
@@ -604,7 +604,7 @@
   min-width: 78px;
   text-align: center;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .manual-lightbox-tools button {
   height: 32px;
@@ -689,7 +689,7 @@
   background: var(--c-white);
   font: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-40);
   cursor: pointer;
 }

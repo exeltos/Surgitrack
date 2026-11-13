@@ -53,7 +53,7 @@ html body .department-count-step > div {
 }
 html body .department-count-step small.missing {
   color: var(--c-red-40);
-  font-weight: 700;
+  font-weight: 600;
 }
 /* The count window: laid out like the printed count form. */
 html body .count-form-backdrop {
@@ -84,7 +84,7 @@ html body .count-form-modal > header h2 {
 html body .count-form-modal > header p {
   margin: 2px 0 0;
   color: var(--c-cyan-40);
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .count-form-body {
   flex: 1 1 auto;
@@ -126,7 +126,7 @@ html body .count-form-meta > div:nth-last-child(-n + 3) {
 html body .count-form-meta span {
   display: block;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .count-form-b {
   flex: 1 1 auto;
@@ -155,7 +155,7 @@ html body .count-form-all {
   border-radius: 8px;
   background: var(--c-white);
   color: var(--c-green-40-2);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .count-form-all:disabled {
@@ -218,15 +218,15 @@ html body .count-form-table .chk {
   text-align: center;
 }
 html body .count-form-table td.name {
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .count-form-sent {
   color: var(--c-green-40-2);
-  font-weight: 800;
+  font-weight: 650;
 }
 html body .count-form-sum {
   margin: 8px 0 0;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .count-form-sum.short {
   color: var(--c-red-40);

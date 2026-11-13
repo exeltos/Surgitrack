@@ -41,7 +41,7 @@ html body .guided-tour-head {
 }
 html body .guided-tour-head small {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--st-muted);
@@ -83,7 +83,7 @@ html body .guided-tour-actions button {
   background: var(--c-white);
   font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .guided-tour-actions button.primary {

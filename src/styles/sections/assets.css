@@ -253,7 +253,7 @@
   background: none;
   color: var(--st-teal, var(--c-cyan-45));
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -531,7 +531,7 @@ html body .usage-correct button:disabled {
   background: var(--c-gray-95);
   color: var(--st-muted);
   font-size: 12.5px;
-  font-weight: 650;
+  font-weight: 600;
   white-space: nowrap;
   clip-path: polygon(
     0 0,
@@ -558,7 +558,7 @@ html body .usage-correct button:disabled {
 .asset-lifecycle-steps li.current {
   background: var(--c-cyan-20);
   color: var(--c-white);
-  font-weight: 800;
+  font-weight: 650;
 }
 .asset-lifecycle-next {
   display: flex;
@@ -572,12 +572,12 @@ html body .usage-correct button:disabled {
 .asset-lifecycle-next b {
   color: var(--st-muted);
   font-size: 10.5px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.06em;
 }
 .asset-lifecycle-next span {
   color: var(--c-cyan-20-2);
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-lifecycle-next em {
   color: var(--st-muted);
@@ -591,7 +591,7 @@ html body .usage-correct button:disabled {
   margin-left: auto;
   color: var(--c-cyan-45);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .asset-lifecycle-link:hover {
@@ -654,7 +654,7 @@ html body .report-photo-field .report-photo-button {
   background: var(--c-white);
   color: var(--c-cyan-40-3);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .report-photo-field:hover .report-photo-button {

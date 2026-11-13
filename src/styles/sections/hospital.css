@@ -94,7 +94,7 @@
   padding: 0 12px;
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   text-transform: uppercase;
 }
 .people-rows {
@@ -106,7 +106,7 @@
   background: var(--c-white);
 }
 .people-row code {
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.5px;
   color: var(--c-cyan-45);
 }
@@ -135,7 +135,7 @@
   color: var(--c-cyan-45);
   font-size: 11px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 650;
 }
 .people-value {
   min-width: 0;
@@ -406,7 +406,7 @@
   gap: 6px;
   color: var(--st-muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   align-items: flex-start;
   min-height: 32px;
   line-height: 1.25;
@@ -414,7 +414,7 @@
 .dash-kpi strong {
   color: var(--c-cyan-20);
   font-size: 34px;
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -545,7 +545,7 @@
 }
 .dash-dept-name {
   overflow: hidden;
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -567,7 +567,7 @@
   min-height: 20px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .dash-pill.bad {
   background: var(--c-gray-95-2);
@@ -683,7 +683,7 @@
   color: #9a5a00;
   font-size: 13px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 650;
   text-align: center;
 }
 .dash-triage li.bad > a > em {
@@ -806,7 +806,7 @@ html body .dash-more {
   color: var(--c-cyan-35);
   font: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -1084,7 +1084,7 @@ html body .department-home .dash-latest > .dash-list {
 }
 .department-home .dash-bar-name {
   overflow: hidden;
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1159,7 +1159,7 @@ html body .department-home .dash-activity .dash-columns {
   border-radius: 9px;
   background: var(--st-teal);
   color: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .promo-card .promo-cta:focus-visible {
@@ -1232,7 +1232,7 @@ html body .department-home .dash-activity .dash-columns {
   border-radius: 10px;
   background: var(--st-teal);
   color: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -1262,7 +1262,7 @@ html body .department-home .dash-activity .dash-columns {
   border-radius: 10px;
   background: var(--c-white);
   color: var(--c-cyan-20-3);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .promo-card .promo-file {
@@ -1278,7 +1278,7 @@ html body .department-home .dash-activity .dash-columns {
   border: 1px solid var(--c-gray-90-2);
   border-radius: 9px;
   background: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 

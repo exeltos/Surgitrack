@@ -17,7 +17,7 @@ html body .trace-step time {
   padding-top: 1px;
   color: var(--c-blue-15);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 html body .trace-step .dot {
@@ -91,7 +91,7 @@ html body .trace-patient li {
 }
 html body .trace-patient li a {
   color: var(--c-cyan-35);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 html body .trace-patient li small {
@@ -114,7 +114,7 @@ html body .trace-group {
   margin: 0;
   color: var(--c-blue-45);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -129,7 +129,7 @@ html body .trace-cycles li {
   font-size: 13px;
 }
 html body .trace-cycles time {
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 html body .trace-cycles b.ok {
@@ -217,7 +217,7 @@ html body .trace-back {
   border: 0;
   background: none;
   color: var(--primary, #0f6bb8);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -263,7 +263,7 @@ html body .trace-patient-link {
   background: var(--c-gray-95-3);
   color: var(--c-cyan-40-3);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .trace-patient-link:hover {

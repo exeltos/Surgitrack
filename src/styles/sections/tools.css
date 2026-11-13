@@ -54,7 +54,7 @@
   text-align: right;
 }
 .name-check-table td.num {
-  font-weight: 700;
+  font-weight: 600;
 }
 .name-check-table tr.skipped td {
   opacity: 0.45;
@@ -83,7 +83,7 @@
 }
 .name-check-group code {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--c-blue-15-2);
 }
 .name-check-odd {
@@ -95,7 +95,7 @@
   background: var(--c-gray-95-2);
   color: var(--c-red-40);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .name-check-group ul {
   display: grid;
@@ -143,7 +143,7 @@
   background: var(--c-white);
   color: var(--c-cyan-35);
   font: inherit;
-  font-weight: 800;
+  font-weight: 650;
   cursor: pointer;
 }
 .name-check-count:hover {
@@ -217,7 +217,7 @@ html body .asset-history-group {
   margin: 14px 0 4px;
   color: var(--c-blue-45);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }

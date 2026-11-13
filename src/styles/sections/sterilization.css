@@ -69,7 +69,7 @@
   background: var(--c-white);
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.055em;
   text-transform: uppercase;
 }
@@ -96,7 +96,7 @@
   text-overflow: ellipsis;
 }
 .ster-cell-text strong {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-25);
 }
 .ster-meta {
@@ -135,7 +135,7 @@
 }
 .receipt-tool-barcode {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--c-cyan-40-6);
 }
 .receipt-tool-code,
@@ -388,7 +388,7 @@ html body .sterile-queues.modern button > span {
   background: transparent;
   color: var(--c-cyan-35);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -410,7 +410,7 @@ html body .ster-asset-cell.with-pick .ster-row-pick {
   gap: 4px;
   color: var(--st-muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .release-indicators select {
   min-height: 40px;
@@ -617,7 +617,7 @@ html body .load-modal .load-indicator-pick {
 }
 html body .load-indicator-pick > span {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-50);
 }
 html body .load-modal .load-assets-list > label {
@@ -981,7 +981,7 @@ html body .receipt-card-modal.workflow-modal.load-release-modal {
   background: var(--c-amber-95);
   color: var(--c-orange-40);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .released-load-actions .bi-pass {
   border-color: var(--c-teal-80);
@@ -1065,7 +1065,7 @@ html body .ster-count-shortage {
   border-radius: 999px;
   background: var(--c-gray-95-2);
   color: var(--c-red-40);
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   font-size: 11px;
 }
@@ -1081,7 +1081,7 @@ html body .ster-reprocess {
   background: var(--c-gray-100-2);
   color: var(--c-red-40);
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .ster-reprocess small {
   color: var(--st-muted);
@@ -1187,7 +1187,7 @@ html body .prep-workspace-modal .prep-head-prints button {
 /* Sterilization review: the scan button reads like every other button. */
 html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan-clear) {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 /* Stage cards: the short description shows whole, on two lines where it needs them; every card in a row keeps
    the same height. */
@@ -1211,7 +1211,7 @@ html body .ster-load-badge {
   background: var(--c-gray-95);
   color: var(--st-muted);
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
   white-space: nowrap;
 }
 html body .ster-load-badge.in {
@@ -1487,7 +1487,7 @@ html body .batch-department label {
   min-width: 0;
   color: var(--c-cyan-30);
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .batch-department select {
   min-height: 34px;
@@ -1515,7 +1515,7 @@ html body .batch-department button {
   color: var(--c-cyan-30);
   font: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   box-shadow: none;
   cursor: pointer;
@@ -1543,7 +1543,7 @@ html body .batch-department button.clear:hover {
   gap: 6px;
   padding: 0 20px 14px 68px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
 }
 .stage-return-field select,
@@ -1641,7 +1641,7 @@ html body .batch-department button.clear:hover {
   background: var(--c-amber-95);
   color: var(--c-orange-40);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .cycle-monitor-body {
   display: grid;
@@ -1669,7 +1669,7 @@ html body .batch-department button.clear:hover {
 }
 .cycle-readings dd {
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .cycle-readings dd.bad {
@@ -1812,7 +1812,7 @@ html body .batch-department button.clear:hover {
 }
 .sterilizer-rows .num {
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 .sterilizer-rows .num .bad {
@@ -1825,7 +1825,7 @@ html body .batch-department button.clear:hover {
   background: var(--c-amber-95);
   color: var(--c-orange-40);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .sterilizer-rows .row-phase.done {
   background: var(--c-green-90);
@@ -1863,7 +1863,7 @@ html body .batch-department button.clear:hover {
   border-radius: 9px;
   background: var(--c-white);
   color: var(--st-teal);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .sterilizer-rows .row-icon {
@@ -2014,7 +2014,7 @@ html body .batch-department button.clear:hover {
   padding: 2px 9px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .equipment-rows .row-test.ok {
   background: var(--c-green-90);
@@ -2092,13 +2092,13 @@ html body .batch-department button.clear:hover {
 .ster-tests-name {
   min-width: 150px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .ster-tests li em {
   color: var(--c-red-40);
   font-size: 12px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
 }
 .ster-tests-buttons {
   display: flex;
@@ -2114,7 +2114,7 @@ html body .batch-department button.clear:hover {
   border-radius: 999px;
   background: var(--c-white);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .ster-test small {
@@ -2288,7 +2288,7 @@ html body .content:has(> .equipment-page) {
   border-radius: 9px;
   color: var(--st-teal);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .equipment-detail-workspace .equipment-open-link:hover {
@@ -2318,7 +2318,7 @@ html body .content:has(> .equipment-page) {
   background: var(--c-amber-95);
   color: var(--c-red-40);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .equipment-detail-workspace .equipment-trouble {
   display: grid;
@@ -2372,7 +2372,7 @@ html body .content:has(> .equipment-page) {
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-red-45);
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -2434,7 +2434,7 @@ html body .sterilization-workspace .sterile-queues.ster-steps button {
   background: var(--c-gray-95);
   color: var(--c-cyan-30);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
   box-shadow: none;
   clip-path: polygon(
     0 0,
@@ -2477,7 +2477,7 @@ html body .sterilization-workspace .sterile-queues.ster-steps button > strong {
   background: var(--c-white);
   color: var(--c-cyan-20);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 650;
   line-height: 18px;
   text-align: center;
 }
@@ -2600,7 +2600,7 @@ html body .sterilizer-rows .row-cycle-line {
 }
 html body .sterilizer-rows .row-cycle-line .bad {
   color: var(--c-red-40-2);
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .sterilizer-rows td:first-child .row-name,
 html body .sterilizer-rows td:first-child small {
@@ -2616,7 +2616,7 @@ html body .sterilizer-rows .row-simulate {
   background: none;
   color: var(--c-cyan-60);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -2711,7 +2711,7 @@ html body .sterilization-workspace .ster-row-deliver {
   padding: 6px 12px;
   border-radius: 9px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   border: 1px solid var(--c-gray-90);
   background: var(--c-white);
   color: var(--c-cyan-20);
@@ -2808,7 +2808,7 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
     margin-bottom: 3px;
     color: var(--st-muted);
     font-size: 10.5px;
-    font-weight: 800;
+    font-weight: 650;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
