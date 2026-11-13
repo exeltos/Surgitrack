@@ -2715,20 +2715,19 @@ html body .studio-security-blocked > li > span > :is(b, small) {
   line-height: 1.35;
 }
 
-/* The contact for trial hospitals: the first row of the settings, its three fields stacked on the right, saved on
-   leaving a field. */
+/* The two contacts (public page, trial hospitals): title and note on top, their fields side by side across the
+   whole width below, saved on leaving a field. */
 html body .studio-system-grid > section > .platform-contact {
-  grid-template-rows: auto auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   border-top: 0;
   border-bottom: 1px solid var(--c-gray-95);
 }
 html body .platform-contact-fields {
-  grid-column: 2;
-  grid-row: 1 / -1;
   display: grid;
-  align-content: start;
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px 14px;
+  margin-top: 10px;
 }
 html body .platform-contact-field {
   display: grid;
