@@ -101,8 +101,6 @@ html body .count-form-body h3 {
   align-items: baseline;
   margin: 0 0 6px;
   font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--c-cyan-40-2);
 }
 html body .count-form-meta {
@@ -190,8 +188,6 @@ html body .count-form-table th {
   border-bottom: 1px solid var(--c-cyan-70);
   color: var(--c-cyan-40-2);
   font-size: 10.5px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
   text-align: left;
 }
 html body .count-form-table td {

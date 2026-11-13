@@ -66,7 +66,7 @@ export default function AddToolsToSetModal({setId, onClose}: {setId: string; onC
               <Box size={22} />
             </div>
             <div className="asset-profile-title">
-              <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ ΣΕΤ')}</span>
+              <span className="eyebrow">{tr('Σύνθεση Σετ')}</span>
               <h2>{tr('Προσθήκη εργαλείων')}</h2>
               <p>
                 <b>{target?.name || tr('Σετ')}</b> {tr('· Κωδικός:') + ' '}

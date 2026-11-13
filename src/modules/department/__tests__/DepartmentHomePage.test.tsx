@@ -13,7 +13,7 @@ const department = {
 describe('Department home', () => {
   it('shows the department at a glance: its counts, what needs attention and its latest movements', () => {
     renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: department});
-    expect(screen.getByText('ΑΡΧΙΚΗ ΤΜΗΜΑΤΟΣ')).toBeInTheDocument();
+    expect(screen.getByText('Αρχική τμήματος')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Χειρουργείο'})).toBeInTheDocument();
     for (const label of ['Σετ', 'Μεμονωμένα', 'Στο τμήμα', 'Για παραλαβή'])
       expect(screen.getByRole('link', {name: new RegExp(`^${label}`)})).toBeInTheDocument();

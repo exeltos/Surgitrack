@@ -105,8 +105,6 @@ html body .sidebar .nav-group {
   margin: 10px 11px 2px;
   font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: rgb(255 255 255 / 45%);
 }
 html body .sidebar .nav-group.first {

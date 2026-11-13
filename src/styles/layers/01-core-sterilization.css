@@ -1082,9 +1082,8 @@ td {
   font-size: 13px;
 }
 .eyebrow {
-  font-size: 11px;
-  font-weight: 650;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  font-weight: 600;
   color: #60778b;
 }
 .ster-scan {
@@ -1379,8 +1378,6 @@ td {
 .receipt-note-read > span {
   font-size: 11px;
   color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 .identity-section {
   border: 1px solid var(--c-gray-90-3);
@@ -2578,8 +2575,6 @@ td {
 .cycle-clean-summary span {
   font-size: 11px;
   color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .cycle-clean-summary strong {
   font-size: 12px;
@@ -5013,8 +5008,6 @@ td {
   color: var(--st-muted);
   font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
 }
 .sterilization-workspace .ster-work-row {
   min-width: 1280px;

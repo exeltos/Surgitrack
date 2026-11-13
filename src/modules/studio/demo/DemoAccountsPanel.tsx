@@ -153,7 +153,7 @@ export default function DemoAccountsPanel({
           <aside className="studio-drawer evaluation-demo-drawer" aria-label={open.hospitalName}>
             <header>
               <div>
-                <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
+                <span className="eyebrow">{tr('Demo αξιολόγησης')}</span>
                 <h2>{open.hospitalName}</h2>
               </div>
               <button onClick={() => setOpenId(null)} aria-label={tr('Κλείσιμο')}>

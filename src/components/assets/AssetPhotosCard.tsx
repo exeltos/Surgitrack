@@ -43,7 +43,7 @@ export default function AssetPhotosCard({
           <p>{description}</p>
         ) : (
           <div>
-            <span className="eyebrow">{tr('ΤΕΚΜΗΡΙΩΣΗ')}</span>
+            <span className="eyebrow">{tr('Τεκμηρίωση')}</span>
             <h2>{title}</h2>
             <p>{description}</p>
           </div>

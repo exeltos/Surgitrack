@@ -16,7 +16,7 @@ export default function ImportPage() {
     return (
       <div className="import-page">
         <PageHeader
-          eyebrow={lang === 'el' ? 'ΝΟΣΟΚΟΜΕΙΟ' : 'HOSPITAL'}
+          eyebrow={lang === 'el' ? 'Νοσοκομείο' : 'HOSPITAL'}
           title={lang === 'el' ? 'Μαζική εισαγωγή' : 'Bulk import'}
         />
         <div className="devices-empty">

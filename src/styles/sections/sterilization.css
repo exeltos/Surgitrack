@@ -70,8 +70,6 @@
   color: var(--st-muted);
   font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
 }
 .ster-work-row {
   padding: 14px 16px;
@@ -1781,9 +1779,7 @@ html body .batch-department button.clear:hover {
   border-bottom: 1px solid var(--c-gray-90-3);
   color: var(--st-muted);
   font-size: 11px;
-  letter-spacing: 0.04em;
   text-align: left;
-  text-transform: uppercase;
 }
 .sterilizer-rows td {
   padding: 9px 8px;
@@ -1897,7 +1893,6 @@ html body .batch-department button.clear:hover {
     display: block;
     color: var(--st-muted);
     font-size: 10.5px;
-    text-transform: uppercase;
   }
   .sterilizer-rows td.row-actions {
     display: flex;
@@ -1941,8 +1936,6 @@ html body .batch-department button.clear:hover {
 .load-details-body h4 {
   margin: 14px 0 8px;
   font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--st-muted);
 }
 .load-details-items,
@@ -2182,9 +2175,7 @@ html body .batch-department button.clear:hover {
   border-bottom: 1px solid var(--c-gray-90-3);
   color: var(--st-muted);
   font-size: 11px;
-  letter-spacing: 0.04em;
   text-align: left;
-  text-transform: uppercase;
 }
 .equipment-detail-workspace .equipment-tests td {
   padding: 8px;
@@ -2809,8 +2800,6 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
     color: var(--st-muted);
     font-size: 10.5px;
     font-weight: 650;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
   }
   /* The name, then what it is doing now, each across the card. */
   html body .equipment-page .equipment-rows td:first-child,

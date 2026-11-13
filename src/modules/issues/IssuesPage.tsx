@@ -172,7 +172,7 @@ export default function IssuesPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΠΑΡΑΚΟΛΟΥΘΗΣΗ')}
+        eyebrow={tr('Παρακολούθηση')}
         title={tr('Εκκρεμότητες')}
         description={
           role === 'DEPARTMENT'

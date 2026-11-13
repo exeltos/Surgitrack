@@ -202,7 +202,7 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
       >
         <header>
           <div>
-            <span className="eyebrow">{L('ΙΔΙΟΚΤΗΤΗΣ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM OWNER')}</span>
+            <span className="eyebrow">{L('Ιδιοκτήτης πλατφόρμας', 'Platform owner')}</span>
             <h2>{L('Εισαγωγή εργαζομένων', 'Import employees')}</h2>
           </div>
         </header>

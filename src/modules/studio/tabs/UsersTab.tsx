@@ -25,7 +25,7 @@ export default function UsersTab({s}: {s: StudioPageState}) {
         <section className="studio-manager-panel studio-users-panel">
           <header className="studio-panel-head">
             <div>
-              <span className="eyebrow">{L('ΧΡΗΣΤΕΣ', 'USERS')}</span>
+              <span className="eyebrow">{L('Χρήστες', 'Users')}</span>
               <h2>{selectedOrganization ? selectedOrganization.name : L('Χρήστες νοσοκομείου', 'Hospital users')}</h2>
               <p>
                 {selectedOrganization

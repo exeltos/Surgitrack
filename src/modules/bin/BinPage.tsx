@@ -114,7 +114,7 @@ export default function BinPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΔΙΑΓΡΑΦΕΣ')}
+        eyebrow={tr('Διαγραφές')}
         title={tr('Κάδος')}
         description={tr('Ό,τι διαγράφεται μένει εδώ {0} ημέρες και μπορεί να επανέλθει.', BIN_DAYS)}
       />

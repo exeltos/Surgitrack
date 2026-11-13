@@ -146,7 +146,7 @@ export default function CountModal({
       <div className="count-form-modal" role="dialog" aria-label={tr('Καταμέτρηση εργαλείων')}>
         <header>
           <div>
-            <span className="eyebrow">{tr('ΕΝΤΥΠΟ ΚΑΤΑΜΕΤΡΗΣΗΣ ΕΡΓΑΛΕΙΩΝ')}</span>
+            <span className="eyebrow">{tr('Έντυπο καταμέτρησης εργαλείων')}</span>
             <h2>{asset.name}</h2>
             <p className="mono">{asset.barcode}</p>
           </div>

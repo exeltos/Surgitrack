@@ -13,7 +13,6 @@
 .reports-page-head .eyebrow {
   display: block;
   font-size: 11px;
-  letter-spacing: 0.12em;
   font-weight: 850;
   color: var(--st-muted);
   margin-bottom: 4px;
@@ -134,7 +133,6 @@
 .reports-stage-head .eyebrow {
   display: block;
   font-size: 11px;
-  letter-spacing: 0.1em;
   font-weight: 850;
   color: var(--st-muted);
 }
@@ -478,8 +476,6 @@
   color: var(--st-muted);
   font-size: 11px;
   font-weight: 650;
-  text-transform: uppercase;
-  letter-spacing: 0.035em;
 }
 .ledger-scroll {
   flex: 1 1 auto;
@@ -1110,8 +1106,6 @@
 }
 .department-signature-card span {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 .department-signature-card strong {
   font-size: 11px;
@@ -2206,7 +2200,6 @@
   font-size: 11px;
   line-height: 1.2;
   font-weight: 650;
-  letter-spacing: 0.09em;
   color: var(--st-muted);
 }
 .studio-head h1 {
@@ -3813,8 +3806,6 @@ html body .platform-hospital-actions .app-button.platform-enter:hover:not(:disab
   color: var(--st-muted);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .join-username strong {
   color: var(--c-blue-15-2);
@@ -4246,8 +4237,6 @@ a.auth-primary {
   border-bottom: 1px solid var(--c-gray-95);
   font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--c-cyan-45-2);
 }
 .notification-more {

@@ -23,7 +23,7 @@ export default function NewDemoDialog({onClose, onCreate}: {onClose: () => void;
       <aside className="studio-drawer" aria-label={tr('Νέο Demo αξιολόγησης')}>
         <header>
           <div>
-            <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
+            <span className="eyebrow">{tr('Demo αξιολόγησης')}</span>
             <h2>{tr('Νέο Demo αξιολόγησης')}</h2>
           </div>
         </header>

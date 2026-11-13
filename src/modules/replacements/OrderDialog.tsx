@@ -56,7 +56,7 @@ export default function OrderDialog({
       <div className="replacements-order-modal" role="dialog" aria-label={tr('Νέα παραγγελία αγοράς')}>
         <header>
           <div>
-            <span className="eyebrow">{tr('ΠΑΡΑΓΓΕΛΙΑ ΑΓΟΡΑΣ')}</span>
+            <span className="eyebrow">{tr('Παραγγελία αγοράς')}</span>
             <h2>{tr('Νέα παραγγελία αγοράς')}</h2>
             <p>{tr('Μία γραμμή ανά είδος εργαλείου. Αλλάξτε την ποσότητα ή προσθέστε οποιοδήποτε άλλο εργαλείο.')}</p>
           </div>

@@ -48,8 +48,6 @@
   color: var(--st-muted);
   font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
 }
 .receipt-tool-columns span:last-child {
   text-align: right;
@@ -673,8 +671,6 @@
   margin-bottom: 6px;
   font-size: 12px;
   color: var(--c-cyan-40-2);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .color-palette section > div {
   display: grid;
@@ -1094,7 +1090,6 @@
   font-size: 11px;
   font-weight: 600;
   text-align: left;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 .asset-import-tools > small {
@@ -1528,7 +1523,6 @@ div.asset-import-hospital b {
   font-size: 11px;
   font-weight: 650;
   text-align: left;
-  text-transform: uppercase;
 }
 .asset-import-guide li i {
   width: 8px;
@@ -1613,7 +1607,6 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 11px;
   text-align: left;
-  text-transform: uppercase;
 }
 .name-check-filter {
   display: flex;
@@ -1689,7 +1682,6 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 11px;
   text-align: left;
-  text-transform: uppercase;
 }
 .name-check-list-table tbody tr {
   cursor: pointer;
@@ -1726,7 +1718,6 @@ div.asset-import-hospital b {
   color: var(--st-muted);
   font-size: 11px;
   text-align: left;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 .replacements-table tr.selected td {
@@ -1931,7 +1922,6 @@ div.asset-import-hospital b {
 .studio-head .eyebrow {
   margin: 0 0 2px;
   font-size: 11px;
-  letter-spacing: 0.12em;
 }
 
 /* Sterilization stage cards: the title wraps inside its column instead of running under the count. */
@@ -3028,8 +3018,6 @@ html body .count-form-meta b {
   align-items: center;
   gap: 5px;
   font-size: 10.5px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
   color: var(--c-cyan-50-2);
 }
 html body .count-form-meta small {
@@ -3837,8 +3825,6 @@ html body .screen-guide-icon {
 html body .screen-guide-body small {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--st-teal, var(--c-cyan-30-2));
 }
 html body .screen-guide-body h2 {

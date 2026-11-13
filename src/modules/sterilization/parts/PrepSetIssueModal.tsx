@@ -26,7 +26,7 @@ export default function PrepSetIssueModal({s}: {s: SterilizationPageState}) {
   return (
     <div className="nested-modal-backdrop" onMouseDown={close}>
       <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-        <span className="eyebrow">{tr('ΕΚΚΡΕΜΟΤΗΤΑ ΣΕΤ')}</span>
+        <span className="eyebrow">{tr('Εκκρεμότητα Σετ')}</span>
         <h3>{trData(prepManageIssue.type)}</h3>
         <div className="prep-manage-summary">
           <span>

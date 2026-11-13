@@ -146,7 +146,7 @@ export default function DepartmentHomePage() {
   return (
     <div className="department-home dash">
       <PageHeader
-        eyebrow={tr('ΑΡΧΙΚΗ ΤΜΗΜΑΤΟΣ')}
+        eyebrow={tr('Αρχική τμήματος')}
         title={trData(dept)}
         description={tr('Ο εξοπλισμός του τμήματος με μια ματιά: τι είναι πού και τι περιμένει.')}
       />

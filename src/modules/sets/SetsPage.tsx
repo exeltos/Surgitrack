@@ -99,7 +99,7 @@ export default function SetsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        eyebrow={tr('Μητρώο εξοπλισμού')}
         title={tr('Σετ εργαλείων')}
         description={tr('Όλα τα Σετ του νοσοκομείου: πού βρίσκονται, τι τους λείπει, πότε λήγουν.')}
         actions={

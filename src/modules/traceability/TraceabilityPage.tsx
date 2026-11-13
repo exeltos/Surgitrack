@@ -209,7 +209,7 @@ export default function TraceabilityPage() {
     <div className={tab === 'HISTORY' ? 'trace-with-history' : undefined}>
       <div className="page-head">
         <div>
-          <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
+          <span className="eyebrow">{tr('Ιχνηλασιμότητα')}</span>
           <h1>{tr('Ιχνηλάτηση')}</h1>
           <p>{tr('Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός).')}</p>
         </div>

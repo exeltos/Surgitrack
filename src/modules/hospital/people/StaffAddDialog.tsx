@@ -94,7 +94,7 @@ export default function StaffAddDialog({s, onClose}: {s: PeopleState; onClose: (
       >
         <header>
           <div>
-            <span className="eyebrow">{L('ΙΔΙΟΚΤΗΤΗΣ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM OWNER')}</span>
+            <span className="eyebrow">{L('Ιδιοκτήτης πλατφόρμας', 'Platform owner')}</span>
             <h2>{L('Νέος ενεργός χρήστης', 'New active user')}</h2>
           </div>
         </header>

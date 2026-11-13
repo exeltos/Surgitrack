@@ -524,7 +524,7 @@ export default function AuthIndex({
                       <span className="auth-eyebrow">
                         {firstPasswordChange
                           ? lang === 'el'
-                            ? 'ΠΡΩΤΗ ΣΥΝΔΕΣΗ'
+                            ? 'Πρώτη σύνδεση'
                             : 'FIRST SIGN-IN'
                           : lang === 'el'
                             ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ'

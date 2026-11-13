@@ -44,7 +44,7 @@ export default function SterilizationPage() {
     <div className="sterilization-workspace">
       <div className="ster-work-head">
         <div>
-          <span className="eyebrow">{tr('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ')}</span>
+          <span className="eyebrow">{tr('Κεντρική Αποστείρωση')}</span>
           <h1>{tr('Αποστείρωση')}</h1>
           <p>{tr('Η πορεία των εργαλείων από την παραλαβή έως την παράδοση στο τμήμα.')}</p>
         </div>

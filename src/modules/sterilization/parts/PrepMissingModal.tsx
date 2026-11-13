@@ -27,7 +27,7 @@ export default function PrepMissingModal({s}: {s: SterilizationPageState}) {
       {prepManageMissing && prepDraft?.kind === 'SET' && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepManage}>
           <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-            <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΕΛΛΕΙΨΗΣ')}</span>
+            <span className="eyebrow">{tr('Διαχείριση έλλειψης')}</span>
             <h3>{prepManageMissing.name}</h3>
             <div className="prep-manage-summary">
               <span>

@@ -36,7 +36,7 @@ export default function OrganizationEditor({
       <aside className="studio-drawer">
         <header>
           <div>
-            <span className="eyebrow">{tr('ΝΟΣΟΚΟΜΕΙΟ')}</span>
+            <span className="eyebrow">{tr('Νοσοκομείο')}</span>
             <h2>{organization ? tr('Επεξεργασία νοσοκομείου') : tr('Νέο νοσοκομείο')}</h2>
           </div>
         </header>

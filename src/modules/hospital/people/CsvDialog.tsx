@@ -11,7 +11,7 @@ export default function CsvDialog({s}: {s: PeopleState}) {
           <aside className="studio-drawer">
             <header>
               <div>
-                <span className="eyebrow">{L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
+                <span className="eyebrow">{L('Πρόσκληση', 'Invitation')}</span>
                 <h2>{L('Προσκλήσεις από αρχείο', 'Invitations from a file')}</h2>
               </div>
             </header>

@@ -345,7 +345,7 @@ function PrivateDemo({s}: {s: StudioPageState}) {
   return (
     <section className="platform-private-demo">
       <div>
-        <span className="eyebrow">{L('ΔΙΚΟ ΜΟΥ DEMO', 'MY DEMO')}</span>
+        <span className="eyebrow">{L('Δικό μου Demo', 'My Demo')}</span>
         <strong>{L('Περιβάλλον πρακτικής με δοκιμαστικά δεδομένα', 'Practice environment with sample data')}</strong>
         <small>
           {L(

@@ -25,7 +25,7 @@ export default function IssueReportModal({s}: {s: SterilizationPageState}) {
       {issueTarget && (
         <div className="nested-modal-backdrop" onMouseDown={closeIssueReport}>
           <div className="tool-issue-card" onMouseDown={e => e.stopPropagation()}>
-            <span className="eyebrow">{issueTarget.kind === 'SET' ? tr('ΑΝΑΦΟΡΑ ΣΕΤ') : tr('ΑΝΑΦΟΡΑ ΕΡΓΑΛΕΙΟΥ')}</span>
+            <span className="eyebrow">{issueTarget.kind === 'SET' ? tr('Αναφορά Σετ') : tr('Αναφορά εργαλείου')}</span>
             <h3>
               {issueTarget.kind === 'SET'
                 ? `${sets.find(x => x.id === issueTarget.id)?.barcode || ''} · ${sets.find(x => x.id === issueTarget.id)?.name || ''}`

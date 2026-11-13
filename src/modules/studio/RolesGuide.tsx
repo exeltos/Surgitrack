@@ -114,7 +114,7 @@ export default function RolesGuide({owner = false}: {owner?: boolean}) {
   return (
     <section className="roles-guide">
       <header>
-        <span className="eyebrow">{lang === 'el' ? 'ΠΟΙΟΣ ΕΙΝΑΙ ΠΟΙΟΣ' : 'WHO IS WHO'}</span>
+        <span className="eyebrow">{lang === 'el' ? 'Ποιος είναι ποιος' : 'WHO IS WHO'}</span>
         <h2>{lang === 'el' ? 'Ρόλοι στο SurgiTrack' : 'Roles in SurgiTrack'}</h2>
         <p>
           {lang === 'el'

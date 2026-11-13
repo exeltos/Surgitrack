@@ -34,7 +34,7 @@ export default function PrepToolActionModal({s}: {s: SterilizationPageState}) {
       {prepToolAction && prepDraft?.kind === 'SET' && (prepSelectedTool || prepReplacementRequirement) && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepToolAction}>
           <div className="tool-issue-card prep-tool-action-card" onMouseDown={e => e.stopPropagation()}>
-            <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΣΥΝΘΕΣΗΣ')}</span>
+            <span className="eyebrow">{tr('Διαχείριση σύνθεσης')}</span>
             <h3>
               {prepSelectedTool
                 ? `${prepSelectedTool.barcode} · ${prepSelectedTool.name}`

@@ -39,7 +39,7 @@ export default function NewBarcodeModal({
       <div className="new-barcode-modal" role="dialog" aria-modal="true">
         <header>
           <div>
-            <span className="eyebrow">{tr('ΝΕΟ BARCODE')}</span>
+            <span className="eyebrow">{tr('Νέο barcode')}</span>
             <h2>{asset.name}</h2>
           </div>
         </header>

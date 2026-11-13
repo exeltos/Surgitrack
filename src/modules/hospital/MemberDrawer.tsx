@@ -90,7 +90,7 @@ export default function MemberDrawer({
       <aside className="studio-drawer people-drawer">
         <header>
           <div>
-            <span className="eyebrow">{member ? L('ΧΡΗΣΤΗΣ', 'USER') : L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
+            <span className="eyebrow">{member ? L('Χρήστης', 'User') : L('Πρόσκληση', 'Invitation')}</span>
             <h2>{member ? member.name : L('Προσθήκη χρήστη', 'Add user')}</h2>
           </div>
         </header>

@@ -891,7 +891,6 @@
   display: block;
   margin: 0 0 2px;
   font-size: 11px;
-  letter-spacing: 0.12em;
 }
 /* Studio density: one-line header, slimmer tabs and library list. */
 html body .studio-head {
@@ -1444,8 +1443,6 @@ html body .studio-tab-row {
 html body .studio-tab-group {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--st-muted);
 }
 html body .studio-tab-row .studio-tabs {

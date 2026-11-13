@@ -63,7 +63,7 @@ export default function NameCheckPage() {
     <ShowTools.Provider value={(ids, title) => setList({ids, title})}>
       <div className="name-check">
         <PageHeader
-          eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+          eyebrow={tr('Μητρώο εξοπλισμού')}
           title={tr('Έλεγχος ονομασιών')}
           description={tr('Μία ονομασία ανά εργαλείο. Κάθε αλλαγή καταγράφεται και αναιρείται.')}
           actions={

@@ -95,7 +95,6 @@
   color: var(--st-muted);
   font-size: 11px;
   font-weight: 650;
-  text-transform: uppercase;
 }
 .people-rows {
   display: grid;
@@ -1145,8 +1144,6 @@ html body .department-home .dash-activity .dash-columns {
 .promo-card small {
   color: var(--st-muted);
   font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .promo-card h3 {
   margin: 2px 0 4px;
@@ -1210,8 +1207,6 @@ html body .department-home .dash-activity .dash-columns {
 .promo-popup-body small {
   color: var(--st-muted);
   font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .promo-popup-body h2 {
   margin: 0;

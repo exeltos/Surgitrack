@@ -92,7 +92,7 @@ export default function StockPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        eyebrow={tr('Μητρώο εξοπλισμού')}
         title={tr('Απόθεμα εργαλείων')}
         description={tr('Διαθέσιμα φυσικά εργαλεία για αντικατάσταση, σύνθεση Σετ ή αυτόνομη διάθεση.')}
         actions={

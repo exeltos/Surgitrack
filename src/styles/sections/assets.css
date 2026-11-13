@@ -210,8 +210,6 @@ html body .asset-workbench-sidebar .asset-marker-field dd > .color-marker-empty 
 }
 .new-barcode-swap small {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 .new-barcode-swap b {
   font-size: 18px;

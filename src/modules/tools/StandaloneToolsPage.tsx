@@ -175,7 +175,7 @@ export default function StandaloneToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        eyebrow={tr('Μητρώο εξοπλισμού')}
         title={tr('Μεμονωμένα εργαλεία σε χρήση')}
         description={tr('Εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα, εκτός Σετ.')}
         actions={
