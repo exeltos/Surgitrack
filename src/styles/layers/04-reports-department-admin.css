@@ -2888,48 +2888,6 @@
 }
 
 /* Studio → Platform: header buttons, section switch, one row per hospital */
-.platform-head-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-.platform-views {
-  display: flex;
-  gap: 4px;
-  padding: 10px 16px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-}
-.platform-views button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 14px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--c-blue-45-3);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.platform-views button:hover {
-  color: #1f4d61;
-}
-.platform-views button.active {
-  color: #12546a;
-  border-bottom-color: var(--c-cyan-45);
-}
-.platform-views b {
-  min-width: 20px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--c-gray-95);
-  color: var(--c-cyan-35-9);
-  font-size: 11px;
-  text-align: center;
-}
 /* Hospitals: one list with dividers (not a box per hospital inside the panel's box), fixed columns: name and
    code, use and status, users, departments, actions. */
 .platform-hospitals {
@@ -3138,9 +3096,6 @@ html body .platform-hospital-actions .app-button.platform-enter:hover:not(:disab
     grid-column: 1 / -1;
     justify-content: flex-start;
     flex-wrap: wrap;
-  }
-  .platform-head-actions {
-    justify-content: flex-start;
   }
 }
 

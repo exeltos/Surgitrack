@@ -7,9 +7,9 @@
 .studio-users-panel {
   display: flex !important;
   flex-direction: column !important;
-  height: auto !important;
-  min-height: 100%;
-  overflow: visible !important;
+  height: 100% !important;
+  min-height: 0;
+  overflow: hidden !important;
 }
 .roles-guide {
   padding: 4px 2px 24px;
@@ -517,7 +517,14 @@
   font-weight: 600;
 }
 .studio-users-panel .hospital-people {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 0 16px 16px;
+}
+.studio-users-panel > .studio-panel-head {
+  flex: 0 0 auto;
 }
 
 /* The platform owner's start page in Studio. */
@@ -2703,4 +2710,9 @@ html body .studio-security-card .studio-security-blocked b.mono {
     height: auto;
     min-height: 0;
   }
+}
+
+/* Evaluation Demos: «Νέο Demo αξιολόγησης» and «⋯» on the right, as «Νέο νοσοκομείο» on Hospitals. */
+.platform-demo-toolbar {
+  justify-content: flex-end;
 }

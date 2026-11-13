@@ -106,9 +106,9 @@
   margin: 0 22px 12px !important;
 }
 
-/* Studio — hospital access tab: natural height, no stretched gaps */
+/* Studio — Users: the page stays put and only the list of people scrolls (see sections/hospital.css). */
 .studio-body-users {
-  overflow-y: auto !important;
+  overflow: hidden !important;
   padding-bottom: 4px;
 }
 .studio-users-panel > .studio-scroll-list {

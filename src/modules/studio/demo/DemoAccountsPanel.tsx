@@ -132,6 +132,9 @@ export default function DemoAccountsPanel({
               'Ένα Demo δίνει σε έναν υποψήφιο πελάτη δικό του νοσοκομείο με δοκιμαστικά δεδομένα, για όσες ημέρες ορίσετε.',
             )}
           </span>
+          <AppButton variant="primary" icon={<FlaskConical size={15} />} onClick={() => setCreating(true)}>
+            {tr('Νέο Demo αξιολόγησης')}
+          </AppButton>
         </div>
       ) : (
         <div className="evaluation-demo-list">
