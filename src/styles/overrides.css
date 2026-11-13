@@ -2857,39 +2857,13 @@ html body .release-actions .release-print {
   font-weight: 700;
 }
 /* Sterilization stage tabs on narrower screens (tablet): less inner padding so every label fits whole. */
-/* Recycle bin at the bottom right of the menu, at its edge: the icon alone (full when something was deleted). */
+/* Recycle bin: the last entry of the menu, at its foot, like the other entries; the count is grey, not an alert. */
 html body .sidebar-bin {
-  align-self: flex-end;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin: auto 8px 6px 0;
-  padding: 4px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: var(--c-gray-95);
-  font-size: 12px;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  text-decoration: none;
   flex: 0 0 auto;
+  margin-top: auto;
 }
-html body .sidebar-bin:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--c-white);
-}
-html body .sidebar-bin.active {
-  background: rgba(118, 196, 212, 0.2);
-  border-color: rgba(160, 214, 226, 0.55);
-  color: var(--c-white);
-}
-.sidebar-bin-icon {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
+html body .sidebar-bin .nav-badge.muted {
+  background: rgba(255, 255, 255, 0.18);
 }
 /* Phone: title and Filters on the first line, the search field on its own full-width line. */
 /* Composition & preparation: one compact line for who/when/how many, checks as tidy cards, the accepted

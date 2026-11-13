@@ -40,25 +40,6 @@ html body .notification-item.expiry.expired svg {
 html body .notification-item.expiry.expiring svg {
   color: var(--c-orange-50-2);
 }
-.recycle-bin-icon {
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
-}
-.sidebar-bin-icon em {
-  position: absolute;
-  top: -5px;
-  right: -7px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #d64545;
-  color: var(--c-white);
-  font-size: 10.5px;
-  font-style: normal;
-  font-weight: 800;
-  line-height: 18px;
-  text-align: center;
-}
 /* Toasts sit above the notice while it shows. */
 html body:has(.offline-strip) .toast {
   bottom: 110px;
@@ -482,9 +463,5 @@ html body .sidebar .sidebar-pin:focus-visible {
     top: 2px;
     right: 4px;
     margin: 0;
-  }
-  html body .menu-rail .sidebar:not(:hover):not(:focus-within) .sidebar-bin {
-    align-self: center;
-    margin: 6px 0;
   }
 }
