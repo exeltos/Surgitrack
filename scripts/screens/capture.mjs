@@ -6,7 +6,9 @@
  *
  *   node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,...|all]
  *        [--viewport desktop|wide|laptop|tablet|mobile|both|WIDTHxHEIGHT] [--out dir] [--only route] [--rebuild] [--no-extras] [--a11y]
+ *        [--scan]
  *
+ * --scan captures the phone scanning app (the /scan screens, as scan.html shows them) instead of the main app.
  * --a11y also runs axe-core (WCAG 2 A/AA) on every route and exits 1 on any serious or critical finding.
  */
 import {spawnSync} from 'node:child_process';
@@ -65,6 +67,7 @@ const OUT = resolve(String(arg('out', join(CACHE, 'out'))));
 const ONLY = arg('only', undefined);
 const REBUILD = !!arg('rebuild', false);
 const EXTRAS = !arg('no-extras', false);
+const SCAN = !!arg('scan', false);
 const SETTLE_MS = Number(arg('settle', 600));
 const A11Y = !!arg('a11y', false);
 const AXE = join(ROOT, 'node_modules/axe-core/axe.min.js');
@@ -449,7 +452,26 @@ async function main() {
       page.on('dialog', dialog => void dialog.dismiss());
 
       let list;
-      if (role === 'PLATFORM') {
+      if (SCAN) {
+        // The phone scanning app: its home, account and every station (each guards itself by permission).
+        list = [
+          '/scan',
+          '/scan/account',
+          ...[
+            'pass',
+            'send',
+            'pickup',
+            'receive',
+            'load',
+            'release',
+            'deliver',
+            'issue',
+            'lookup',
+            'lists',
+            'report',
+          ].map(s => `/scan/${s}`),
+        ];
+      } else if (role === 'PLATFORM') {
         // The platform owner outside any hospital: Studio and the hospital list.
         list = [
           '/studio?tab=overview',

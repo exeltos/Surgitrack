@@ -57,7 +57,8 @@ export const demoSigned = (otherPartyId?: string, signatureId?: string) =>
     : undefined;
 
 export type HandoverVerifyResult =
-  {ok: true; signer: HandoverSigner} | {ok: false; reason: 'invalid' | 'locked' | 'same_user' | 'unavailable'};
+  | {ok: true; signer: HandoverSigner}
+  | {ok: false; reason: 'invalid' | 'invalid_pass' | 'locked' | 'same_user' | 'unavailable'};
 
 /** Confirms the other party for the handover of these items (Set and instrument ids). */
 export async function verifyHandover(
@@ -92,6 +93,69 @@ export async function verifyHandover(
     if (status === 429) return {ok: false, reason: 'locked'};
     if (status === 409) return {ok: false, reason: 'same_user'};
     if (status === 401) return {ok: false, reason: 'invalid'};
+    return {ok: false, reason: 'unavailable'};
+  }
+  return {
+    ok: true,
+    signer: {
+      code: data.user_code,
+      userId: data.user_id,
+      name: data.name,
+      department: data.department,
+      role: data.role,
+      signatureId: data.signature_id,
+    },
+  };
+}
+
+/** What the QR of a person's phone holds: this prefix, then a one-time pass (or, in the Demo, their code). */
+export const HANDOVER_PASS_PREFIX = 'SURGITRACK-PASS:';
+
+/** The pass inside a scanned QR, or null when the scan is something else (a Set's barcode). */
+export const passFromScan = (scanned: string): string | null => {
+  const text = scanned.trim();
+  return text.toUpperCase().startsWith(HANDOVER_PASS_PREFIX) ? text.slice(HANDOVER_PASS_PREFIX.length).trim() : null;
+};
+
+/**
+ * A new one-time pass for the signed-in person's QR (it lives 45 seconds). In the Demo a fixed pass naming the
+ * Demo person of their department, which the Demo accepts as their signature.
+ */
+export async function requestHandoverPass(department: string): Promise<{pass: string; expiresAt: number} | null> {
+  if (isDemoHandover()) {
+    const person = DEMO_HANDOVER_PEOPLE.find(p => p.department === department) || DEMO_HANDOVER_PEOPLE[0];
+    return {pass: `DEMO:${person.code}`, expiresAt: Date.now() + 45_000};
+  }
+  const {data, error} = await supabase.functions.invoke<{pass: string; expires_at: string}>('handover-pass', {
+    body: {},
+  });
+  if (error || !data?.pass) return null;
+  return {pass: data.pass, expiresAt: new Date(data.expires_at).getTime()};
+}
+
+/** Confirms the other party from the QR they showed, for the handover of these items. */
+export async function verifyHandoverPass(pass: string, assetIds: string[] = []): Promise<HandoverVerifyResult> {
+  if (!pass) return {ok: false, reason: 'invalid'};
+  if (isDemoHandover()) {
+    const code = pass.startsWith('DEMO:') ? pass.slice(5) : '';
+    const signer = [...DEMO_HANDOVER_PEOPLE, DEMO_HANDOVER_STERILIZATION].find(person => person.code === code);
+    return signer ? {ok: true, signer} : {ok: false, reason: 'invalid'};
+  }
+  const real = getRealIdentity();
+  const {data, error} = await supabase.functions.invoke<{
+    signature_id?: string;
+    user_id: string;
+    name: string;
+    user_code: string;
+    role: string;
+    department: string;
+  }>('verify-handover', {
+    body: {pass, asset_ids: assetIds, organization_id: real ? productionOrganizationFor(real) : undefined},
+  });
+  if (error || !data) {
+    const status = (error as {context?: {status?: number}} | null)?.context?.status;
+    if (status === 409) return {ok: false, reason: 'same_user'};
+    if (status === 401) return {ok: false, reason: 'invalid_pass'};
     return {ok: false, reason: 'unavailable'};
   }
   return {

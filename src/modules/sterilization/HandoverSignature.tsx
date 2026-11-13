@@ -4,7 +4,9 @@ import {
   DEMO_HANDOVER_PEOPLE,
   DEMO_HANDOVER_STERILIZATION,
   isDemoHandover,
+  passFromScan,
   verifyHandover,
+  verifyHandoverPass,
   type HandoverSigner,
 } from '../../data/cloud/handover';
 import {tr, trData} from '../../i18n';
@@ -13,6 +15,7 @@ const REASON_TEXT = {
   invalid: 'Λάθος κωδικός χρήστη ή συνθηματικό.',
   locked: 'Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.',
   same_user: 'Υπογράφει το άλλο πρόσωπο της παράδοσης, όχι ο συνδεδεμένος χρήστης.',
+  invalid_pass: 'Το QR έληξε ή χρησιμοποιήθηκε. Ζητήστε να ανανεωθεί και σκανάρετε ξανά.',
   unavailable: 'Η επιβεβαίωση δεν είναι διαθέσιμη. Ελέγξτε τη σύνδεση και δοκιμάστε ξανά.',
 } as const;
 
@@ -58,6 +61,19 @@ export default function HandoverSignature({
     else if (signedFor.current !== null && signedFor.current !== itemsKey) onSigned(null);
   }, [itemsKey, signer, onSigned]);
 
+  // The other party's QR, read by a scanner into the code field (or by the phone's camera): a one-time pass.
+  const signWithPass = async (pass: string) => {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    setCode('');
+    const result = await verifyHandoverPass(pass, assetIds);
+    setBusy(false);
+    if (result.ok) {
+      signedFor.current = itemsKey;
+      onSigned(result.signer);
+    } else setError(tr(REASON_TEXT[result.reason]));
+  };
   const sign = async (userCode = code, secret = password) => {
     if (busy || !userCode.trim() || !secret) return;
     setBusy(true);
@@ -105,6 +121,14 @@ export default function HandoverSignature({
           disabled={disabled || busy}
           value={code}
           onChange={e => setCode(e.target.value.toUpperCase())}
+          onKeyDown={e => {
+            // A scanner types the QR and then Enter: the pass signs on its own, no password asked.
+            const pass = passFromScan(code);
+            if (e.key === 'Enter' && pass) {
+              e.preventDefault();
+              void signWithPass(pass);
+            }
+          }}
           placeholder={tr('Κωδικός χρήστη')}
           aria-label={tr('Κωδικός χρήστη')}
           autoComplete="off"

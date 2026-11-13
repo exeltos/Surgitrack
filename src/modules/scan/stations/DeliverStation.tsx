@@ -2,9 +2,10 @@ import {useEffect, useRef, useState} from 'react';
 import {TriangleAlert} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
+import PassScanner from '../PassScanner';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
-import {DemoWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
+import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /**
@@ -86,8 +87,10 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
           </div>
         </dl>
         <section className="scan-sign">
+          {/* The person receiving shows «Το QR μου»; the username and password stay for who has no phone. */}
+          {!receiver && <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setDeliveryBatchReceiver} />}
           <HandoverSignature
-            label={tr('Υπογραφή παραλαμβάνοντα (κωδικός χρήστη + συνθηματικό)')}
+            label={tr('ή με κωδικό χρήστη και συνθηματικό')}
             department={department}
             signer={receiver}
             assetIds={items.map(item => item.id)}
@@ -135,7 +138,7 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
         <b>{items.length}</b>
       </div>
       <ScanRefused messages={answers.refused} />
-      <DemoWaiting
+      <ScanWaiting
         items={s.ready.filter(
           item => !items.some(row => row.id === item.id) && (!department || item.department === department),
         )}

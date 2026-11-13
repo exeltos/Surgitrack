@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {ChevronRight, Clock3} from 'lucide-react';
+import {CheckCircle2, ChevronRight, Clock3, TriangleAlert} from 'lucide-react';
+import {expiryStatus, formatExpiry} from '../../../core/sterileExpiry';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import type {BarcodeFeedback} from '../../../components/barcode/BarcodeCapture';
 import {statusLabel} from '../../../components/ui/statusLabel';
@@ -8,6 +9,7 @@ import {tr, trData} from '../../../i18n';
 import {useSurgi} from '../../../store/SurgiStore';
 import ScanCamera from '../ScanCamera';
 import {DemoWaiting, ScanScreen, SetContents, SetPdfButton} from '../ScanParts';
+import {setMissing} from '../stationCounts';
 import {useScanAnswers} from '../useScanAnswers';
 import {movementText} from '../../../core/movementText';
 
@@ -62,6 +64,28 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
         .slice(0, RECENT)
     : [];
 
+  // The answer first, for whoever scans a Set on the shelf: can it be used now, and if not, why.
+  const missing = set
+    ? setMissing(
+        set,
+        tools.filter(item => item.setId === set.id),
+      )
+    : 0;
+  // An instrument in a Set travels, and is sterile, with its Set: the Set holds the state and the expiry.
+  const carrier = parentSet || asset;
+  const sterileUntil = carrier?.sterileUntil;
+  const expired = !!sterileUntil && expiryStatus(sterileUntil, carrier?.shelfLifeMonths).state === 'EXPIRED';
+  const usableStates = ['IN_DEPARTMENT', 'READY_FOR_PICKUP'];
+  const verdict = !asset
+    ? null
+    : !usableStates.includes(carrier!.state)
+      ? {ok: false, text: tr('Δεν είναι διαθέσιμο: {0}', statusLabel(carrier!.state))}
+      : expired
+        ? {ok: false, text: tr('Η αποστείρωση έληξε στις {0}', formatExpiry(sterileUntil!))}
+        : missing > 0
+          ? {ok: false, text: missing === 1 ? tr('Λείπει 1 εργαλείο') : tr('Λείπουν {0} εργαλεία', missing)}
+          : {ok: true, text: tr('Έτοιμο για χρήση')};
+
   return (
     <ScanScreen
       title={tr('Αναζήτηση')}
@@ -85,53 +109,49 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
               <b>{asset.name}</b>
             </span>
           </header>
-          <dl className="scan-summary">
-            <div>
-              <dt>{tr('Κατάσταση')}</dt>
-              <dd>{statusLabel(asset.state)}</dd>
-            </div>
-            <div>
-              <dt>{tr('Τμήμα')}</dt>
-              <dd>{trData(asset.department) || tr('Χωρίς τμήμα')}</dd>
-            </div>
-            {parentSet && (
-              <div>
-                <dt>{tr('Σετ')}</dt>
-                <dd>
-                  <span className="mono">{parentSet.barcode}</span> · {parentSet.name}
-                </dd>
-              </div>
-            )}
-            {asset.sterileUntil && (
-              <div>
-                <dt>{tr('Αποστειρωμένο έως')}</dt>
-                <dd>{formatDate(asset.sterileUntil)}</dd>
-              </div>
-            )}
-          </dl>
-          {set && <SetContents set={set} tools={tools.filter(item => item.setId === set.id)} issues={issues} />}
-          {set && <SetPdfButton set={set} tools={tools.filter(item => item.setId === set.id)} />}
-          <h2 className="scan-section">{tr('Τελευταίες κινήσεις')}</h2>
-          {recent.length ? (
-            <ul className="scan-moves">
-              {recent.map(m => (
-                <li key={m.id}>
-                  <Clock3 size={15} />
-                  <span>
-                    <b>{movementText(m.status)}</b>
-                    <small>
-                      {trData(m.from)} <ChevronRight size={12} /> {trData(m.to)}
-                    </small>
-                    <small>
-                      {m.at} · {trData(m.by)}
-                    </small>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="scan-empty">{tr('Δεν υπάρχουν κινήσεις.')}</p>
+          {verdict && (
+            <p className={`scan-answer ${verdict.ok ? 'ok' : 'bad'}`} role="status">
+              {verdict.ok ? <CheckCircle2 size={18} /> : <TriangleAlert size={18} />}
+              {verdict.text}
+            </p>
           )}
+          {/* Where it is and until when, in one quiet line. */}
+          <p className="scan-facts">
+            {[
+              statusLabel(asset.state),
+              trData(asset.department) || tr('Χωρίς τμήμα'),
+              parentSet ? `${tr('Σετ')} ${parentSet.barcode}` : '',
+              sterileUntil ? tr('έως {0}', formatDate(sterileUntil)) : '',
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+          {set && <SetContents set={set} tools={tools.filter(item => item.setId === set.id)} issues={issues} quiet />}
+          {set && <SetPdfButton set={set} tools={tools.filter(item => item.setId === set.id)} />}
+          {/* The history only when asked for: one tap opens it. */}
+          <details className="scan-more">
+            <summary>{tr('Τελευταίες κινήσεις')}</summary>
+            {recent.length ? (
+              <ul className="scan-moves">
+                {recent.map(m => (
+                  <li key={m.id}>
+                    <Clock3 size={15} />
+                    <span>
+                      <b>{movementText(m.status)}</b>
+                      <small>
+                        {trData(m.from)} <ChevronRight size={12} /> {trData(m.to)}
+                      </small>
+                      <small>
+                        {m.at} · {trData(m.by)}
+                      </small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="scan-empty">{tr('Δεν υπάρχουν κινήσεις.')}</p>
+            )}
+          </details>
         </article>
       )}
     </ScanScreen>

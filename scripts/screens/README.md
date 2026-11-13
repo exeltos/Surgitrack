@@ -81,3 +81,6 @@ SCREENS_EVAL="$(cat scripts/screens/alignment-probe.js)" node scripts/screens/ca
 ```
 
 Each screen's findings are in `index.json` as `state.probe`.
+
+`--scan` captures the phone scanning app (`/scan` and every station, as `scan.html` shows them) instead of the
+main app, e.g. `node scripts/screens/capture.mjs --scan --viewport mobile --role STERILIZATION,DEPARTMENT`.

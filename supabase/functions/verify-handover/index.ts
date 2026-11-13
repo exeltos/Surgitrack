@@ -3,7 +3,8 @@ import {createClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith} from "../_shared/http.ts";
 
 // Signs a handover between Sterilization and a department. The signed-in Sterilization user is
-// one party; the other party confirms with their own user code + password on the same screen.
+// one party; the other party confirms with their own user code + password on the same screen, or by showing
+// the QR of their own signed-in phone (a one-time pass from handover-pass, taken once here).
 // Returns who signed, never a session: the password check's session is revoked at once. Each
 // confirmed signature is recorded in handover_signatures, against which the records are stamped.
 // Failed attempts share the login limiter (per code, and per signed-in caller).
@@ -16,6 +17,10 @@ const WINDOW_MINUTES = 15;
 const MAX_FAILS_PER_CODE = 5;
 const MAX_FAILS_PER_CALLER = 20;
 const CODE_FORMAT = /^([A-Z]{2}[0-9]{4}|DEMO)$/;
+const sha256 = async (text: string) => {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+};
 const ROLE_LABEL: Record<string, string> = {
   ADMIN: "Διαχειριστής",
   STERILIZATION: "Αποστείρωση",
@@ -58,52 +63,76 @@ Deno.serve(async req => {
     const organizationId = me.organization_id || (me.role === "ADMIN" ? String(body?.organization_id || "") : "");
     if (!organizationId) return json({error: "no_organization"}, 400);
 
-    const code = String(body?.user_code || "").trim().toUpperCase();
-    const password = String(body?.password || "");
-    if (!CODE_FORMAT.test(code) || !password) {
-      await settle();
-      return json({error: "invalid_credentials"}, 401);
-    }
-
-    const {data: attemptId, error: reserveError} = await admin.rpc("reserve_login_attempt", {
-      p_user_code: code,
-      p_ip: `handover:${auth.user.id}`,
-      p_window_minutes: WINDOW_MINUTES,
-      p_max_code_fails: MAX_FAILS_PER_CODE,
-      p_max_ip_fails: MAX_FAILS_PER_CALLER,
-    });
-    if (reserveError) {
-      await settle();
-      return json({error: "unavailable"}, 503);
-    }
-    if (attemptId === null) {
-      await settle();
-      return json({error: "too_many_attempts", retry_after_minutes: WINDOW_MINUTES}, 429);
-    }
-
-    const {data: person} = await admin
-      .from("profiles")
-      .select("id, name, email, role, user_code, department:departments(name)")
-      .eq("user_code", code)
-      .eq("organization_id", organizationId)
-      .eq("active", true)
-      // ... and nobody can sign as a person who still has the initial password: a colleague who knows their username
-      // and their mobile number could otherwise obtain a verified signature in their name.
-      .eq("password_change_required", false)
-      .maybeSingle();
-
-    let verified = false;
-    if (person?.email) {
-      const check = createClient(url, anon, {auth: {persistSession: false, autoRefreshToken: false}});
-      const {data, error} = await check.auth.signInWithPassword({email: person.email, password});
-      if (!error && data.session) {
-        verified = true;
-        await admin.auth.admin.signOut(data.session.access_token, "local").catch(() => undefined);
+    // The other party showed their QR (handover-pass): a one-time pass in place of their username and password.
+    const pass = typeof body?.pass === "string" ? body.pass.trim().toUpperCase() : "";
+    let person: {id: string; name: string; email?: string; role: string; user_code: string; department: unknown} | null = null;
+    if (pass) {
+      const {data: passUser} = await admin.rpc("consume_handover_pass", {
+        p_token_hash: await sha256(pass),
+        p_organization_id: organizationId,
+      });
+      if (passUser) {
+        const {data} = await admin
+          .from("profiles")
+          .select("id, name, email, role, user_code, department:departments(name)")
+          .eq("id", String(passUser))
+          .eq("organization_id", organizationId)
+          .eq("active", true)
+          .eq("password_change_required", false)
+          .maybeSingle();
+        person = data;
       }
+      await settle();
+      if (!person) return json({error: "invalid_pass"}, 401);
+    } else {
+      const code = String(body?.user_code || "").trim().toUpperCase();
+      const password = String(body?.password || "");
+      if (!CODE_FORMAT.test(code) || !password) {
+        await settle();
+        return json({error: "invalid_credentials"}, 401);
+      }
+
+      const {data: attemptId, error: reserveError} = await admin.rpc("reserve_login_attempt", {
+        p_user_code: code,
+        p_ip: `handover:${auth.user.id}`,
+        p_window_minutes: WINDOW_MINUTES,
+        p_max_code_fails: MAX_FAILS_PER_CODE,
+        p_max_ip_fails: MAX_FAILS_PER_CALLER,
+      });
+      if (reserveError) {
+        await settle();
+        return json({error: "unavailable"}, 503);
+      }
+      if (attemptId === null) {
+        await settle();
+        return json({error: "too_many_attempts", retry_after_minutes: WINDOW_MINUTES}, 429);
+      }
+
+      const {data: found} = await admin
+        .from("profiles")
+        .select("id, name, email, role, user_code, department:departments(name)")
+        .eq("user_code", code)
+        .eq("organization_id", organizationId)
+        .eq("active", true)
+        // ... and nobody can sign as a person who still has the initial password: a colleague who knows their username
+        // and their mobile number could otherwise obtain a verified signature in their name.
+        .eq("password_change_required", false)
+        .maybeSingle();
+
+      let verified = false;
+      if (found?.email) {
+        const check = createClient(url, anon, {auth: {persistSession: false, autoRefreshToken: false}});
+        const {data, error} = await check.auth.signInWithPassword({email: found.email, password});
+        if (!error && data.session) {
+          verified = true;
+          await admin.auth.admin.signOut(data.session.access_token, "local").catch(() => undefined);
+        }
+      }
+      if (verified) await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
+      await settle();
+      if (!verified || !found) return json({error: "invalid_credentials"}, 401);
+      person = found;
     }
-    if (verified) await admin.from("login_attempts").update({succeeded: true}).eq("id", attemptId);
-    await settle();
-    if (!verified || !person) return json({error: "invalid_credentials"}, 401);
     if (person.id === auth.user.id) return json({error: "same_user"}, 409);
     // Read-only viewers take no part in a handover.
     if (person.role === "VIEWER") return json({error: "invalid_credentials"}, 401);

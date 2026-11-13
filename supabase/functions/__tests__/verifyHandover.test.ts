@@ -20,7 +20,8 @@ const credentials = {user_code: 'MP1234', password: 'secret'};
 /** The signed-in caller's profile and the person who confirms (found by user code). */
 const world = (w: {me?: Row; person?: Row} = {}) => {
   answerTables({
-    'profiles:select': (call: DbCall) => (eqValue(call, 'id') ? ('me' in w ? w.me : NURSE) : 'person' in w ? w.person : PERSON),
+    'profiles:select': (call: DbCall) =>
+      eqValue(call, 'id') === 'sterilization-1' ? ('me' in w ? w.me : NURSE) : 'person' in w ? w.person : PERSON,
   });
   fake.rpc = () => ({data: 'attempt-1', error: null});
 };
@@ -292,5 +293,62 @@ describe('verify-handover: a confirmed handover', () => {
     const response = await sign();
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({error: 'failed'});
+  });
+});
+
+describe('verify-handover: the QR of the other party (a one-time pass)', () => {
+  /** The pass is taken by the database (consume_handover_pass), which names its person or nobody. */
+  const passTaken = (userId: string | null) => {
+    fake.rpc = (name: string) => (name === 'consume_handover_pass' ? {data: userId, error: null} : {data: null, error: null});
+  };
+
+  it('signs with the person the pass names, without a password or the login limiter', async () => {
+    passTaken('person-2');
+    const response = await sign({pass: 'p4ss-from-the-qr', asset_ids: ['set-1']});
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({user_id: 'person-2', name: 'ΜΑΡΙΑ ΠΑΠΑ', department: 'Χειρουργείο'});
+    const taken = calls('rpc').find(c => c.args[0] === 'consume_handover_pass')!;
+    const args = taken.args[1] as {p_token_hash: string; p_organization_id: string};
+    // Only the pass's hash travels to the database, for the caller's own hospital.
+    expect(args.p_token_hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(args.p_organization_id).toBe('org-1');
+    expect(calls('rpc').some(c => c.args[0] === 'reserve_login_attempt')).toBe(false);
+    expect(calls('signIn')).toHaveLength(0);
+    const signature = fake.dbCalls('insert').find(c => c.table === 'handover_signatures')!;
+    expect(signature.values).toMatchObject({signer_id: 'person-2', witness_id: 'sterilization-1', asset_ids: ['set-1']});
+  });
+
+  it('reads the pass whatever the case it was scanned in (a scanner may turn it to capitals or not)', async () => {
+    passTaken('person-2');
+    await sign({pass: 'abc123'});
+    await sign({pass: 'ABC123'});
+    const hashes = calls('rpc')
+      .filter(c => c.args[0] === 'consume_handover_pass')
+      .map(c => (c.args[1] as {p_token_hash: string}).p_token_hash);
+    expect(hashes[0]).toBe(hashes[1]);
+  });
+
+  it('refuses a pass that is used, expired or of another hospital, no sooner than about 0.5 s', async () => {
+    passTaken(null);
+    const started = Date.now();
+    const response = await sign({pass: 'old-pass'});
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({error: 'invalid_pass'});
+    expect(Date.now() - started).toBeGreaterThanOrEqual(450);
+    expect(fake.dbCalls('insert')).toHaveLength(0);
+  });
+
+  it('refuses a pass whose person may no longer sign (inactive, or the initial password again)', async () => {
+    passTaken('person-2');
+    world({person: null});
+    passTaken('person-2');
+    expect((await sign({pass: 'p4ss'})).status).toBe(401);
+  });
+
+  it('still refuses the signed-in person’s own QR', async () => {
+    passTaken('sterilization-1');
+    world({person: {...PERSON, id: 'sterilization-1'}});
+    passTaken('sterilization-1');
+    expect((await sign({pass: 'p4ss'})).status).toBe(409);
   });
 });

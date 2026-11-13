@@ -8,7 +8,7 @@ import HandoverSignature from '../../sterilization/HandoverSignature';
 import type {SterilizationRow} from '../../sterilization/sterilizationTypes';
 import {departmentOf, findScanned} from '../findScanned';
 import ScanCamera from '../ScanCamera';
-import {DemoWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
+import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
 /** The role the handover check gives Sterilization staff (verify-handover). */
@@ -159,7 +159,7 @@ export default function PickupStation({onStations}: {onStations: () => void}) {
         <b>{items.length}</b>
       </div>
       <ScanRefused messages={answers.refused} />
-      <DemoWaiting
+      <ScanWaiting
         items={[
           ...sets.map(asset => ({...asset, kind: 'SET' as const})),
           ...tools.filter(tool => !tool.setId).map(asset => ({...asset, kind: 'TOOL' as const})),

@@ -43,8 +43,10 @@ describe('ScanApp', () => {
     typeBarcode('S000322');
     const card = screen.getByRole('article');
     expect(within(card).getByText('ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ')).toBeInTheDocument();
-    expect(within(card).getByText('Έτοιμο για παραλαβή')).toBeInTheDocument();
-    expect(within(card).getByRole('heading', {name: 'Τελευταίες κινήσεις'})).toBeInTheDocument();
+    // The answer first, then where it is in one line; the history behind a tap.
+    expect(within(card).getByRole('status')).toBeInTheDocument();
+    expect(within(card).getByText(/Έτοιμο για παραλαβή ·/)).toBeInTheDocument();
+    expect(within(card).getByText('Τελευταίες κινήσεις')).toBeInTheDocument();
   });
 });
 
@@ -274,5 +276,52 @@ describe('ScanApp sending, an instrument not used', () => {
     const ticks = lives.getAllByRole('checkbox', {name: /Χρησιμοποιήθηκε:/});
     for (const tick of ticks) fireEvent.click(tick);
     expect(lives.getAllByText('χωρίς χρήση').length).toBe(ticks.length);
+  });
+});
+
+describe('ScanApp: «Το QR μου» for a department', () => {
+  const nurse = {id: 'u-or', name: 'Νοσηλεύτρια Χειρουργείου', role: 'DEPARTMENT' as const, department: 'Χειρουργείο'};
+
+  it('is the first station of a department person, and draws their QR', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan', signedIn: nurse});
+    const tiles = within(screen.getByRole('navigation', {name: 'Αρχική'})).getAllByRole('button');
+    expect(tiles[0]).toHaveTextContent('Το QR μου');
+    fireEvent.click(tiles[0]);
+    expect(await screen.findByRole('img', {name: 'QR υπογραφής παράδοσης'})).toBeInTheDocument();
+    expect(screen.getByText('Αλλάζει κάθε 30 δευτερόλεπτα και ισχύει μία φορά.')).toBeInTheDocument();
+  });
+
+  it('is not a station of Sterilization', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan'});
+    expect(screen.queryByText('Το QR μου')).not.toBeInTheDocument();
+  });
+});
+
+describe('ScanApp: a handover signed with the other person’s QR', () => {
+  it('receipt: the QR of the person handing over signs in place of their password', async () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/receive'});
+    typeBarcode('S000327');
+    fireEvent.click(screen.getByRole('button', {name: 'Συνέχεια · 1'}));
+    expect(screen.getByText('Σάρωση QR του άλλου προσώπου')).toBeInTheDocument();
+    // A Set's barcode is not a signature.
+    typeBarcode('S000321');
+    expect(await screen.findByText(/Σκανάρετε το QR από το κινητό του άλλου προσώπου/)).toBeInTheDocument();
+    // The Demo person of Αίθουσα Τοκετών shows their QR.
+    typeBarcode('SURGITRACK-PASS:DEMO:TK1042');
+    expect(await screen.findByText('TK1042')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /Ολοκλήρωση παραλαβής · 1/})).toBeEnabled();
+  });
+});
+
+describe('ScanApp lookup: the answer for an instrument in a Set', () => {
+  it('takes the Set’s expiry: an instrument of an expired Set is not «ready to use»', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/lookup'});
+    typeBarcode('S000323');
+    expect(within(screen.getByRole('article')).getByRole('status')).toHaveTextContent('Η αποστείρωση έληξε');
+    // The Set's first instrument: it carries no expiry of its own, the Set does.
+    typeBarcode('T001228');
+    const card = screen.getByRole('article');
+    expect(within(card).getByText(/Σετ S000323/)).toBeInTheDocument();
+    expect(within(card).getByRole('status')).toHaveTextContent('Η αποστείρωση έληξε');
   });
 });
