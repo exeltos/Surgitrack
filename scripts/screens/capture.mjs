@@ -704,6 +704,33 @@ async function captureModals(page, {role, viewport, seed, record, log, wanted}) 
         await button(/^(Μαζική παράδοση|Batch delivery)/)();
       },
     });
+    // The washers' and the sterilizers' tests, opened from the line over the list.
+    for (const [name, q, title] of [
+      ['washer-tests', 'WASHING', /^(Δοκιμές πλυντηρίων|Washer tests)/],
+      ['sterilizer-tests', 'PROCESS', /^(Δοκιμές κλιβάνων|Sterilizer tests)/],
+    ])
+      modals.push({
+        name: `sterilization-${name}`,
+        route: '/sterilization',
+        open: async () => {
+          await queue(q);
+          await page.waitForTimeout(300);
+          await button(title)();
+        },
+      });
+    // One test recorded: it turns green and the others come due (orange), as on a working day.
+    modals.push({
+      name: 'sterilization-washer-tests-due',
+      route: '/sterilization',
+      open: async () => {
+        await queue('WASHING');
+        await page.waitForTimeout(300);
+        await button(/^(Δοκιμές πλυντηρίων|Washer tests)/)();
+        await button(/^(Έλεγχος καθαρισμού|Cleaning test)/)();
+        await button(/^(Καταγραφή|Record)$/)();
+        await page.waitForTimeout(300);
+      },
+    });
     for (const [name, q, opener] of stages) {
       modals.push({name: `sterilization-queue-${name}`, route: '/sterilization', dialog: false, open: () => queue(q)});
       if (opener)
