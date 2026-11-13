@@ -1,5 +1,6 @@
 :root {
   font-family:
+    'Inter Variable',
     Inter,
     ui-sans-serif,
     system-ui,
@@ -4348,7 +4349,7 @@ td {
 }
 /* The hint reads as ordinary text; what is typed stays a monospace, capital barcode. */
 .load-barcode-entry input::placeholder {
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
   text-transform: none;
 }
 .load-barcode-entry button {

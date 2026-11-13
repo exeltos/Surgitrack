@@ -536,10 +536,10 @@
   font-size: 12px;
   font-weight: 600;
 }
+/* Icon, name and number on one low line, as on the department's Home. */
 .owner-kpi strong {
-  grid-column: 1 / -1;
   color: var(--c-cyan-20-2);
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1;
 }
 .owner-kpi.warn {
@@ -576,7 +576,7 @@
 .owner-card h2 {
   margin: 2px 0 0;
   color: var(--c-cyan-20-2);
-  font-size: 18px;
+  font-size: 15px;
 }
 .owner-count {
   min-width: 30px;

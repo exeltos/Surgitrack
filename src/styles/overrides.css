@@ -1402,11 +1402,11 @@ div.asset-import-hospital b {
 }
 .owner-kpi {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 8px;
   row-gap: 4px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   border: 1px solid var(--c-gray-90);
   border-radius: 14px;
   background: var(--c-white);
@@ -3552,7 +3552,7 @@ html body .sets-registry .set-count-short .muted {
   html body .registry-fixed tbody td[data-label]::before {
     content: attr(data-label) ' ';
     color: var(--c-blue-45);
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
   }
 }
