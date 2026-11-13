@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {Bug, RefreshCw, Trash2} from 'lucide-react';
+import {Bug, MoreHorizontal, RefreshCw, Trash2} from 'lucide-react';
+import ActionMenu from '../../../components/ui/ActionMenu';
 import AppButton from '../../../components/ui/AppButton';
 import Spinner from '../../../components/ui/Spinner';
 import {askConfirm} from '../../../components/ui/confirmService';
@@ -88,21 +89,31 @@ export default function ErrorsTab({s}: {s: StudioPageState}) {
       <header className="studio-errors-head">
         <div>
           <h2>{L('Σφάλματα εφαρμογής', 'App errors')}</h2>
-          <p>
-            {L(
-              'Ό,τι στράβωσε στους χρήστες όλων των νοσοκομείων: το ίδιο σφάλμα μαζί, με το πόσες φορές, πού και πότε. Μένουν 90 ημέρες. Χωρίς δεδομένα ασθενών.',
-              'What went wrong for users in every hospital: the same error together, how often, where and when. Kept 90 days. No patient data.',
-            )}
-          </p>
         </div>
         <div className="studio-errors-actions">
+          <small className="studio-errors-note">
+            {L('Μένουν 90 ημέρες · χωρίς δεδομένα ασθενών', 'Kept 90 days · no patient data')}
+          </small>
           <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
             {L('Ανανέωση', 'Refresh')}
           </AppButton>
+          {/* Deleting every error is rare and cannot be undone: behind «⋯», still asked for first. */}
           {!!rows?.length && (
-            <AppButton variant="danger" icon={<Trash2 size={16} />} onClick={() => void clear()}>
-              {L('Διαγραφή όλων', 'Delete all')}
-            </AppButton>
+            <ActionMenu
+              icon={<MoreHorizontal size={15} />}
+              label={L('Ενέργειες', 'Actions')}
+              align="right"
+              items={[
+                {
+                  key: 'clear-all',
+                  icon: <Trash2 size={15} />,
+                  label: L('Διαγραφή όλων', 'Delete all'),
+                  hint: L('Όλα τα σφάλματα, οριστικά', 'Every error, for good'),
+                  danger: true,
+                  onSelect: () => void clear(),
+                },
+              ]}
+            />
           )}
         </div>
       </header>

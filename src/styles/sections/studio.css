@@ -1119,7 +1119,7 @@ html body .studio-errors-head {
 html body .studio-errors-actions {
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: center;
 }
 html body .studio-errors-failed {
   color: var(--st-red);
@@ -1238,17 +1238,23 @@ html body .studio-security-blocked small {
   display: block;
   color: var(--st-muted);
 }
+/* Errors and published notices: one list with dividers, not a box per entry. */
 html body .studio-errors-list {
   display: grid;
-  gap: 8px;
+  gap: 0;
   margin: 0;
   padding: 0;
-  list-style: none;
-}
-html body .studio-errors-list > li {
+  overflow: hidden;
   border: 1px solid var(--st-line);
   border-radius: 12px;
   background: var(--c-white);
+  list-style: none;
+}
+html body .studio-errors-list > li {
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .studio-errors-list > li:last-child {
+  border-bottom: 0;
 }
 html body .studio-error-row {
   display: grid;
@@ -1273,7 +1279,18 @@ html body .studio-error-main {
   min-width: 0;
 }
 html body .studio-error-main b {
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 500;
   overflow-wrap: anywhere;
+}
+html body .studio-error-row:hover {
+  background: var(--c-gray-100-2);
+}
+html body .studio-errors-note {
+  align-self: center;
+  color: var(--st-muted);
+  font-size: 12px;
 }
 html body .studio-error-count {
   display: grid;
