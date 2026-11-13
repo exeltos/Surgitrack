@@ -1,4 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "jsr:@supabase/functions-js@2/edge-runtime.d.ts";
 import {createClient} from "jsr:@supabase/supabase-js@2";
 
 // Receives cycle data from a connected device (or the gateway / manufacturer software in front of
@@ -133,7 +133,7 @@ Deno.serve(async req => {
       return json({error: "hospital_locked"}, 403);
     }
 
-    const rows = [];
+    const rows: Raw[] = [];
     const rejected: number[] = [];
     list.forEach((item, index) => {
       const row = (item && typeof item === "object" ? item : {}) as Raw;

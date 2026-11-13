@@ -1,0 +1,11 @@
+{
+  "nodeModulesDir": "none",
+  "lock": false,
+  "lint": {
+    "exclude": ["__tests__/"],
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-import-prefix"]
+    }
+  }
+}

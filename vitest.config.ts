@@ -10,7 +10,7 @@ export default defineConfig({
       'jsr:@supabase/supabase-js@2': fileURLToPath(
         new URL('./supabase/functions/__tests__/fakes/supabase.ts', import.meta.url),
       ),
-      'jsr:@supabase/functions-js/edge-runtime.d.ts': fileURLToPath(
+      'jsr:@supabase/functions-js@2/edge-runtime.d.ts': fileURLToPath(
         new URL('./supabase/functions/__tests__/fakes/empty.ts', import.meta.url),
       ),
       'npm:nodemailer@6.9.16': fileURLToPath(
