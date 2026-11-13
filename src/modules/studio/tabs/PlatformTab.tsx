@@ -164,17 +164,16 @@ function HospitalList({s, organizations}: {s: StudioPageState; organizations: Or
             <div className="platform-hospital-name">
               <strong>{org.name}</strong>
               <small>
-                {org.code} · {users} {L('χρήστες', 'users')} · {departments} {L('τμήματα', 'departments')}
+                {org.code}
+                {/* On a narrow screen the counts have no columns of their own: they follow the code. */}
+                <span className="platform-hospital-counts-inline">
+                  {' '}
+                  · {users} {L('χρήστες', 'users')} · {departments} {L('τμήματα', 'departments')}
+                </span>
               </small>
             </div>
             <div className="platform-hospital-badges">
               <PlanBadge org={org} L={L} />
-              <span className={`platform-status ${org.active ? 'on' : 'off'}`}>
-                {org.active ? L('Ενεργό', 'Active') : L('Ανενεργό', 'Inactive')}
-              </span>
-              {org.demoEnabled && <span className="platform-status demo">{L('Demo ανοικτό', 'Demo open')}</span>}
-            </div>
-            <div className="platform-hospital-actions">
               {org.plan === 'TRIAL' && (
                 <button
                   className="platform-quick"
@@ -195,6 +194,19 @@ function HospitalList({s, organizations}: {s: StudioPageState; organizations: Or
                   {L('+30 ημέρες', '+30 days')}
                 </button>
               )}
+              {/* Only what differs from the usual is coloured: an inactive hospital, an open Demo. */}
+              {!org.active && <span className="platform-status off">{L('Ανενεργό', 'Inactive')}</span>}
+              {org.demoEnabled && <span className="platform-status demo">{L('Demo ανοικτό', 'Demo open')}</span>}
+            </div>
+            <div className="platform-hospital-count">
+              <strong>{users}</strong>
+              <small>{L('χρήστες', 'users')}</small>
+            </div>
+            <div className="platform-hospital-count">
+              <strong>{departments}</strong>
+              <small>{L('τμήματα', 'departments')}</small>
+            </div>
+            <div className="platform-hospital-actions">
               <AppButton onClick={() => openOrganization(org)}>
                 <Users size={15} />
                 {L('Διαχείριση', 'Manage')}
@@ -202,7 +214,7 @@ function HospitalList({s, organizations}: {s: StudioPageState; organizations: Or
               {org.id === activeHospitalId() ? (
                 <span className="platform-here">{L('Εδώ εργάζεστε', 'Working here')}</span>
               ) : (
-                <AppButton variant="primary" disabled={!org.active} onClick={() => switchHospital(org.id)}>
+                <AppButton disabled={!org.active} onClick={() => switchHospital(org.id)}>
                   <LogIn size={15} />
                   {L('Είσοδος', 'Enter')}
                 </AppButton>

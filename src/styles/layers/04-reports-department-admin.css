@@ -2930,26 +2930,49 @@
   font-size: 11px;
   text-align: center;
 }
+/* Hospitals: one list with dividers (not a box per hospital inside the panel's box), fixed columns: name and
+   code, use and status, users, departments, actions. */
 .platform-hospitals {
   min-height: 0;
   overflow: auto;
-  padding: 12px 16px 18px;
+  padding: 4px 16px 18px;
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 0;
 }
 .platform-hospital {
   display: grid;
-  grid-template-columns: auto minmax(180px, 1.4fr) minmax(0, 1.6fr) auto;
+  grid-template-columns: 36px minmax(200px, 1.4fr) minmax(220px, 1.2fr) 70px 70px 360px;
   align-items: center;
   gap: 14px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
+  min-height: 60px;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+  border-radius: 10px;
   background: var(--c-white);
 }
+.platform-hospital:last-child {
+  border-bottom: 0;
+}
 .platform-hospital:hover {
-  border-color: #c4dbe2;
+  background: var(--c-gray-100-2);
+}
+.platform-hospital-count {
+  display: grid;
+  justify-items: end;
+  line-height: 1.15;
+}
+.platform-hospital-count strong {
+  color: var(--c-cyan-20);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.platform-hospital-count small {
+  color: var(--st-muted);
+  font-size: 11px;
+}
+.platform-hospital-counts-inline {
+  display: none;
 }
 .platform-hospital.inactive {
   background: var(--c-white);
@@ -3007,10 +3030,6 @@
   border-radius: 50%;
   background: currentColor;
 }
-.platform-status.on {
-  background: var(--c-gray-95-8);
-  color: var(--c-green-40);
-}
 .platform-status.off {
   background: var(--c-gray-95);
   color: var(--c-blue-50-2);
@@ -3029,8 +3048,8 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 36px;
-  padding: 0 11px;
+  height: 28px;
+  padding: 0 9px;
   border: 1px solid var(--c-gray-90-4);
   border-radius: 10px;
   background: var(--c-gray-100-2);
@@ -3074,6 +3093,12 @@
   .platform-hospital-badges {
     grid-column: 2 / -1;
     grid-row: 2;
+  }
+  .platform-hospital-count {
+    display: none;
+  }
+  .platform-hospital-counts-inline {
+    display: inline;
   }
 }
 @media (max-width: 700px) {
