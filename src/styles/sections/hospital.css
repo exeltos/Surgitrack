@@ -1522,3 +1522,30 @@ html body select.studio-org-select {
 html body select.studio-org-select:hover {
   border-color: var(--c-cyan-65);
 }
+
+/* Overview on a computer screen of any height: the eight stages of «Ροή Αποστείρωσης» always fit (each row takes its
+   share of the card, up to 42px), with no scroll bar of their own; on hover the empty track stays visible. */
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview .dash-flow > .dash-bars {
+    grid-auto-rows: minmax(0, 42px);
+    overflow: hidden;
+  }
+  html body .hospital-overview .dash-flow .dash-bar {
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+html body .hospital-overview .dash-flow .dash-bar:hover .dash-bar-track {
+  background: var(--c-gray-90-3);
+}
+/* «Δραστηριότητα» on a screen under 1000px tall: the chart takes the card and the latest movements are left to «Όλο
+   το ιστορικό» (a strip of two half-cut lines under the chart helped no one); on a tall screen they show below it. */
+@media (min-width: 1100px) and (min-height: 600px) and (max-height: 999px) {
+  html body .hospital-overview .dash-activity > .dash-list {
+    display: none;
+  }
+  html body .hospital-overview .dash-activity > .dash-columns {
+    flex: 1 1 auto;
+    min-height: 60px;
+  }
+}

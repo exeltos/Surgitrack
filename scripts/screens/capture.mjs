@@ -367,6 +367,8 @@ const BEFORE = process.env.SCREENS_BEFORE;
 // or the window is made taller until nothing needs to scroll.
 const WHEEL = Number(process.env.SCREENS_WHEEL || 0);
 
+// SCREENS_FIT=1: the screen as a person sees it (its own size, inner lists scrolling), not grown to show everything.
+const FIT = process.env.SCREENS_FIT === '1';
 async function shoot(page, file, viewport) {
   if (BEFORE) await page.evaluate(BEFORE).catch(() => undefined);
   if (WHEEL) {
@@ -377,7 +379,7 @@ async function shoot(page, file, viewport) {
   }
   const size = VIEWPORTS[viewport];
   let height = size.height;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < (FIT ? 0 : 5); i++) {
     const extra = await page.evaluate(() => {
       let most = 0;
       for (const el of document.querySelectorAll('body *')) {
@@ -393,7 +395,7 @@ async function shoot(page, file, viewport) {
     await page.setViewportSize({width: size.width, height});
     await page.waitForTimeout(250);
   }
-  await page.screenshot({path: join(OUT, file), fullPage: true, animations: 'disabled'});
+  await page.screenshot({path: join(OUT, file), fullPage: !FIT, animations: 'disabled'});
   if (height !== size.height) await page.setViewportSize(size);
 }
 
