@@ -17,7 +17,7 @@ html body .scan-screen {
   margin: 0 auto;
 }
 html body .scan-head {
-  padding: calc(12px + env(safe-area-inset-top)) 18px 16px;
+  padding: calc(10px + env(safe-area-inset-top)) 18px 12px;
   background: linear-gradient(180deg, var(--c-cyan-20), var(--c-cyan-15-2));
   color: #fff;
 }
@@ -1121,27 +1121,36 @@ html body .scan-tile.report .scan-station-icon {
   background: var(--c-cyan-20);
 }
 
+/* A station's header: slim (title and one short line), so the screen is left to the scan and the list. */
 html body .scan-head-title {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 4px;
 }
 html body .scan-head-title h1 {
   margin: 0;
+  font-size: 20px;
+}
+html body .scan-head-title p {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12.5px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 html body .scan-head-icon {
   display: grid;
   place-items: center;
   flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   background: rgb(255 255 255 / 16%);
 }
 html body .scan-head-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 html body .scan-app.with-tabs .scan-screen {
@@ -1353,4 +1362,131 @@ html body .scan-hint {
   margin: 0;
   color: #627887;
   font-size: 13px;
+}
+
+/* Barcodes in the phone app: grey and quiet, as in the full app; the name leads. */
+html body .scan-body .mono {
+  color: inherit;
+}
+html body .scan-body small .mono {
+  color: var(--st-muted);
+}
+
+/* What waits at a station: a number on its tile. */
+html body .scan-tile {
+  position: relative;
+}
+html body .scan-tile-count {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  min-width: 28px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--c-cyan-20);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 650;
+  text-align: center;
+}
+
+/* What waits at a station, under the scan: to see, not to tap (a scan proves it is in hand). */
+html body .scan-waiting h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+html body .scan-waiting h2 span {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #e6edf2;
+  font-size: 12.5px;
+}
+html body .scan-waiting ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+  list-style: none;
+}
+html body .scan-waiting li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+html body .scan-waiting li + li {
+  border-top: 1px solid #eef2f5;
+}
+html body .scan-waiting li > span {
+  display: grid;
+  min-width: 0;
+}
+html body .scan-waiting li b {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .scan-waiting li small {
+  color: var(--st-muted);
+  font-size: 12.5px;
+}
+
+/* Lookup: the answer first, can it be used now (green) or what stands in the way (amber). */
+html body .scan-answer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 650;
+}
+html body .scan-answer.ok {
+  background: #e7f6ee;
+  color: #146c43;
+}
+html body .scan-answer.bad {
+  background: #fff4e0;
+  color: #8a4b00;
+}
+
+/* A station's hint goes once the waiting list shows what to scan. */
+html body .scan-waiting ~ .scan-empty {
+  display: none;
+}
+/* Home: a tile is its icon, its name and what waits; no line of explanation under it. */
+html body .scan-tiles .scan-tile {
+  min-height: 112px;
+}
+/* Lookup: where it is in one line; the history behind a tap. */
+html body .scan-facts {
+  margin: 8px 2px 0;
+  color: var(--st-muted);
+  font-size: 13.5px;
+}
+html body .scan-more {
+  border: 1px solid #dbe3ea;
+  border-radius: 14px;
+  background: #fff;
+}
+html body .scan-more > summary {
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .scan-more[open] > summary {
+  border-bottom: 1px solid #eef2f5;
+}
+html body .scan-more .scan-moves,
+html body .scan-more .scan-empty {
+  margin: 10px;
 }

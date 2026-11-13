@@ -147,7 +147,18 @@ export function ScanDone({
  * A Set's composition sheet, as printed from the Set's page: one row per kind of instrument with its code
  * and how many there should be and are, what is missing, and open issues (Βλάβη, Φθορά…).
  */
-export function SetContents({set, tools, issues}: {set: SetAsset; tools: Tool[]; issues: Issue[]}) {
+export function SetContents({
+  set,
+  tools,
+  issues,
+  quiet = false,
+}: {
+  set: SetAsset;
+  tools: Tool[];
+  issues: Issue[];
+  /** The screen already says what is missing (Lookup's answer at the top): no second note here. */
+  quiet?: boolean;
+}) {
   const problems = new Map<string, string[]>();
   for (const issue of issues) {
     if (issue.status !== 'OPEN') continue;
@@ -167,7 +178,7 @@ export function SetContents({set, tools, issues}: {set: SetAsset; tools: Tool[];
           {expected ? ` / ${expected}` : ''}
         </span>
       </h2>
-      {missing > 0 && (
+      {missing > 0 && !quiet && (
         <p className="scan-form-alert">
           {missing === 1 ? tr('Λείπει 1 εργαλείο') : tr('Λείπουν {0} εργαλεία', missing)}
         </p>
@@ -294,6 +305,51 @@ export function DemoWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcod
         ))}
       </ul>
       {!all && items.length > DEMO_SHOWN && (
+        <button type="button" className="scan-secondary" onClick={() => setAll(true)}>
+          {tr('Όλα ({0})', items.length)}
+        </button>
+      )}
+    </section>
+  );
+}
+
+/** How many waiting items a station lists before «Όλα». */
+const WAITING_SHOWN = 8;
+
+/**
+ * What waits at this station (sent by departments, ready for the sterilizer, ready for a department), under the
+ * scan: one look says what is expected and what is still missing from the round. In a real hospital only to see:
+ * a scan proves the item is in hand. In the Demo (no labels to scan) the Demo list, tapped in instead.
+ */
+export function ScanWaiting({items, onPick}: {items: DemoItem[]; onPick: (barcode: string) => void}) {
+  const [all, setAll] = useState(false);
+  if (getRuntimeDataMode() === 'DEMO') return <DemoWaiting items={items} onPick={onPick} />;
+  if (!items.length) return null;
+  return (
+    <section className="scan-waiting" aria-label={tr('Περιμένουν')}>
+      <h2 className="scan-section">
+        {tr('Περιμένουν')} <span>{items.length}</span>
+      </h2>
+      <ul>
+        {(all ? items : items.slice(0, WAITING_SHOWN)).map(item => (
+          <li key={`${item.kind}:${item.id}`}>
+            <AssetTypeIcon
+              kind={item.kind}
+              maxUses={item.kind === 'TOOL' ? item.maxUses : undefined}
+              wearCheck={item.kind === 'TOOL' ? item.wearCheck : undefined}
+              size={16}
+            />
+            <span>
+              <b>{item.name}</b>
+              <small>
+                <span className="mono">{item.barcode}</span>
+                {item.department ? ` · ${trData(item.department)}` : ''}
+              </small>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {!all && items.length > WAITING_SHOWN && (
         <button type="button" className="scan-secondary" onClick={() => setAll(true)}>
           {tr('Όλα ({0})', items.length)}
         </button>

@@ -43,8 +43,10 @@ describe('ScanApp', () => {
     typeBarcode('S000322');
     const card = screen.getByRole('article');
     expect(within(card).getByText('ΛΑΠΑΡΟΣΚΟΠΙΚΟ ΒΑΣΙΚΟ')).toBeInTheDocument();
-    expect(within(card).getByText('Έτοιμο για παραλαβή')).toBeInTheDocument();
-    expect(within(card).getByRole('heading', {name: 'Τελευταίες κινήσεις'})).toBeInTheDocument();
+    // The answer first, then where it is in one line; the history behind a tap.
+    expect(within(card).getByRole('status')).toBeInTheDocument();
+    expect(within(card).getByText(/Έτοιμο για παραλαβή ·/)).toBeInTheDocument();
+    expect(within(card).getByText('Τελευταίες κινήσεις')).toBeInTheDocument();
   });
 });
 

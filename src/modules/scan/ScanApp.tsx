@@ -45,12 +45,12 @@ import ReportStation from './stations/ReportStation';
 import SendStation from './stations/SendStation';
 import {ScanStationLook} from './scanLook';
 import {useNewVersion} from './useNewVersion';
+import {stationCounts} from './stationCounts';
 import {hospitalRoleNames} from '../../config/demoRoles';
 
 type Station = {
   path: string;
   title: string;
-  text: string;
   icon: ReactNode;
   tone: string;
   permission?: Permission;
@@ -66,7 +66,6 @@ const stations = (): Station[] => [
   {
     path: 'send',
     title: tr('Αποστολή στην Αποστείρωση'),
-    text: tr('Μετά τη χρήση: κωδικός ασθενούς, καταμέτρηση, αποστολή'),
     icon: <Send size={26} />,
     tone: 'send',
     permission: 'department.dispatch',
@@ -75,7 +74,6 @@ const stations = (): Station[] => [
   {
     path: 'pickup',
     title: tr('Παραλαβή από Αποστείρωση'),
-    text: tr('Τα αποστειρωμένα που φτάνουν στο τμήμα'),
     icon: <PackageCheck size={26} />,
     tone: 'pickup',
     only: user => user.role === 'DEPARTMENT',
@@ -83,7 +81,6 @@ const stations = (): Station[] => [
   {
     path: 'receive',
     title: tr('Παραλαβή'),
-    text: tr('Από τα τμήματα στην Αποστείρωση'),
     icon: <ArrowDownToLine size={26} />,
     tone: 'receive',
     permission: 'sterilization.receive',
@@ -91,7 +88,6 @@ const stations = (): Station[] => [
   {
     path: 'load',
     title: tr('Φόρτωση κλιβάνου'),
-    text: tr('Σάρωση όσων μπαίνουν στον κύκλο'),
     icon: <Flame size={26} />,
     tone: 'load',
     permission: 'sterilization.cycle',
@@ -99,7 +95,6 @@ const stations = (): Station[] => [
   {
     path: 'release',
     title: tr('Αποδέσμευση'),
-    text: tr('Τέλος κύκλου, δείκτες, αποδέσμευση φορτίου'),
     icon: <ShieldCheck size={26} />,
     tone: 'release',
     permission: 'sterilization.cycle',
@@ -107,7 +102,6 @@ const stations = (): Station[] => [
   {
     path: 'deliver',
     title: tr('Παράδοση'),
-    text: tr('Αποστειρωμένα προς τμήμα / αίθουσα'),
     icon: <Truck size={26} />,
     tone: 'deliver',
     permission: 'sterilization.deliver',
@@ -115,7 +109,6 @@ const stations = (): Station[] => [
   {
     path: 'issue',
     title: tr('Αναφορά βλάβης'),
-    text: tr('Βλάβη, φθορά ή έλλειψη, με φωτογραφία'),
     icon: <TriangleAlert size={26} />,
     tone: 'issue',
     permission: 'issue.create',
@@ -123,21 +116,18 @@ const stations = (): Station[] => [
   {
     path: 'lookup',
     title: tr('Αναζήτηση'),
-    text: tr('Σκανάρετε ένα Σετ: πού είναι, τι έγινε'),
     icon: <Search size={26} />,
     tone: 'lookup',
   },
   {
     path: 'lists',
     title: tr('Λίστες'),
-    text: tr('Σετ και μεμονωμένα, με το περιεχόμενο κάθε Σετ'),
     icon: <List size={26} />,
     tone: 'lists',
   },
   {
     path: 'report',
     title: tr('Αναφορά'),
-    text: tr('Η ημέρα: παραλαβές, φορτία, παραδόσεις, εκκρεμότητες'),
     icon: <ChartColumn size={26} />,
     tone: 'report',
     only: managesSterilization,
@@ -150,8 +140,8 @@ const stations = (): Station[] => [
  * rules and lands in the same records as the Sterilization screen of the full app.
  */
 export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => void}) {
-  const {currentUser, organizationName, can, toast, clearToast} = useSurgi();
-  const {systemSettings} = useLibraries();
+  const {currentUser, organizationName, can, toast, clearToast, sets, tools, processLoads} = useSurgi();
+  const {systemSettings, sterilizationWorkflow} = useLibraries();
   const navigate = useNavigate();
   // A link may end in «/» (#/scan/): the same screen.
   const pathname = useLocation().pathname.replace(/\/+$/, '') || '/';
@@ -164,6 +154,8 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
     station => (!station.permission || can(station.permission)) && (!station.only || station.only(currentUser)),
   );
   const toStations = () => navigate(SCAN_PATH);
+  // What waits at each station: a number on its tile, so one look says where there is work.
+  const waiting = stationCounts(sets, tools, processLoads, sterilizationWorkflow.stages, currentUser.department);
   // The platform owner: outside any hospital the home offers the Demo and the hospitals (OwnerEntry); inside
   // one, «Αλλαγή» goes back to that choice; in the Demo, a bar picks the role and leaves it (as in the app).
   const owner = !!getRealIdentity()?.platform;
@@ -218,8 +210,12 @@ export default function ScanApp({onLogout}: {onLogout: (direct?: boolean) => voi
               onClick={() => navigate(`${SCAN_PATH}/${station.path}`)}
             >
               <span className="scan-station-icon">{station.icon}</span>
+              {!!waiting[station.path] && (
+                <span className="scan-tile-count" aria-label={tr('{0} σε αναμονή', waiting[station.path])}>
+                  {waiting[station.path]}
+                </span>
+              )}
               <b>{station.title}</b>
-              <small>{station.text}</small>
             </button>
           ))}
         </nav>
