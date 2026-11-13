@@ -205,7 +205,7 @@ export default function StudioPage() {
             </button>
           </div>
         )}
-        {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide /> : <RolesTab s={s} />}
+        {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide owner={platformAdmin} /> : <RolesTab s={s} />}
         <SystemTab s={s} />
         <ErrorsTab s={s} />
         <SecurityTab s={s} />
