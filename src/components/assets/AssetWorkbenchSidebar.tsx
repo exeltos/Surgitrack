@@ -8,6 +8,7 @@ import StatusBadge from '../ui/StatusBadge';
 import ExpiryBadge from '../ui/ExpiryBadge';
 import {STERILE_STATES, expiryStatus, formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import AssetTypeIcon from './AssetTypeIcon';
+import {assetLifecycle} from '../../core/assetLifecycle';
 import {tr, trData} from '../../i18n';
 
 type EditablePatch = Partial<
@@ -75,7 +76,7 @@ export default function AssetWorkbenchSidebar({
   canEditUsage = false,
   onCorrectUses,
 }: Props) {
-  const {systemSettings} = useLibraries();
+  const {systemSettings, sterilizationWorkflow} = useLibraries();
   const tool = kind === 'TOOL' ? (asset as Tool) : null;
   const photos = asset.photos || [];
   const cover = photos[0]?.dataUrl || tool?.imageUrl;
@@ -88,6 +89,9 @@ export default function AssetWorkbenchSidebar({
     carrier.sterileUntil && (STERILE_STATES as readonly string[]).includes(carrier.state)
       ? expiryStatus(carrier.sterileUntil, carrier.shelfLifeMonths)
       : undefined;
+  // The bar of steps above the card already shows where it is: the state is not repeated here (only to be edited,
+  // or when it is off that path, e.g. in stock, lost or at service).
+  const stateOnPath = !displayStateLabel && !!assetLifecycle(sterilizationWorkflow.stages, asset.state);
   const makeDraft = () => ({
     name: asset.name,
     code: asset.code,
@@ -163,7 +167,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-workbench-title-main">
           <AssetTypeIcon kind={kind} maxUses={asset.maxUses} wearCheck={tool?.wearCheck} framed size={19} />
           <div>
-            <span className="eyebrow">{kind === 'SET' ? tr('ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
+            <span className="eyebrow">{kind === 'SET' ? tr('Καρτέλα Σετ') : tr('Καρτέλα εργαλείου')}</span>
             <h1>{asset.name}</h1>
             {/* The code is shown under the name only when it says something else. */}
             {asset.code && asset.code.trim().toLowerCase() !== asset.name.trim().toLowerCase() && <p>{asset.code}</p>}
@@ -172,7 +176,7 @@ export default function AssetWorkbenchSidebar({
         <div className="asset-workbench-title-status">
           {displayStateLabel ? (
             <span className="status-badge asset-member-status">{displayStateLabel}</span>
-          ) : (
+          ) : stateOnPath ? null : (
             <StatusBadge value={carrier.state} />
           )}{' '}
           {sterile && sterile.state !== 'OK' && <ExpiryBadge entry={sterile} />}
@@ -205,49 +209,60 @@ export default function AssetWorkbenchSidebar({
         )}
       </div>
       <dl className="asset-workbench-fields">
-        <div>
-          <dt>{tr('Κατάσταση')}</dt>
-          <dd>
-            {!editing && displayStateLabel ? (
-              <span className="status-badge asset-member-status">{displayStateLabel}</span>
-            ) : editing ? (
-              <select
-                className="asset-inline-input"
-                value={draft.state}
-                onChange={e => setDraft(c => ({...c, state: e.target.value as AssetState}))}
-              >
-                {states.map(s => (
-                  <option key={s.value} value={s.value}>
-                    {tr(s.label)}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <>
-                <StatusBadge value={carrier.state} />
-                {fromSet && <small className="muted"> {tr('με το Σετ')}</small>}
-              </>
-            )}
-          </dd>
-        </div>
-        {/* Always shown: the dates once released, a dash while the item is not sterile. */}
-        <div>
-          <dt>{tr('Αποστείρωση – Λήξη')}</dt>
-          <dd className="sterile-dd">
-            {sterile && carrier.sterileUntil ? (
-              <>
-                {/* The expiry is shown whenever it is known, with a dash for a sterilization date that is not. */}
-                {sterilizedOnOf(carrier) ? formatExpiry(sterilizedOnOf(carrier)!) : '—'} →{' '}
-                {formatExpiry(carrier.sterileUntil)}
+        {(editing || !stateOnPath) && (
+          <div>
+            <dt>{tr('Κατάσταση')}</dt>
+            <dd>
+              {!editing && displayStateLabel ? (
+                <span className="status-badge asset-member-status">{displayStateLabel}</span>
+              ) : editing ? (
+                <select
+                  className="asset-inline-input"
+                  value={draft.state}
+                  onChange={e => setDraft(c => ({...c, state: e.target.value as AssetState}))}
+                >
+                  {states.map(s => (
+                    <option key={s.value} value={s.value}>
+                      {tr(s.label)}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <>
+                  <StatusBadge value={carrier.state} />
+                  {fromSet && <small className="muted"> {tr('με το Σετ')}</small>}
+                </>
+              )}
+            </dd>
+          </div>
+        )}
+        {/* Always shown: the dates once released (the expiry coloured when near or past), a dash while not sterile. */}
+        {sterile && carrier.sterileUntil ? (
+          <>
+            <div>
+              <dt>{tr('Αποστείρωση')}</dt>
+              <dd className="sterile-dd">
+                {sterilizedOnOf(carrier) ? formatExpiry(sterilizedOnOf(carrier)!) : '—'}
                 {fromSet && <small className="muted">{tr('από το Σετ')}</small>}
-              </>
-            ) : (
+              </dd>
+            </div>
+            <div>
+              <dt>{tr('Λήξη')}</dt>
+              <dd className={`sterile-dd sterile-until ${sterile.state.toLowerCase()}`}>
+                {formatExpiry(carrier.sterileUntil)}
+              </dd>
+            </div>
+          </>
+        ) : (
+          <div>
+            <dt>{tr('Αποστείρωση – Λήξη')}</dt>
+            <dd className="sterile-dd">
               <span className="muted" title={tr('Συμπληρώνεται στην αποδέσμευση από τον κλίβανο')}>
                 —
               </span>
-            )}
-          </dd>
-        </div>
+            </dd>
+          </div>
+        )}
         {/* The title above already shows the name and the code: they are listed only to be edited. */}
         {editing && (
           <>
@@ -331,8 +346,12 @@ export default function AssetWorkbenchSidebar({
                 {markerNote && <small>{markerNote}</small>}
               </>
             ) : (
-              <span className="color-marker-empty">
-                {markerNote ? tr('Χωρίς χρώμα, {0}', markerNote) : tr('Χωρίς χρώμα')}
+              <span
+                className="color-marker-empty"
+                title={markerNote ? `${tr('Χωρίς χρώμα')} · ${markerNote}` : undefined}
+              >
+                {tr('Χωρίς χρώμα')}
+                {markerNote && <small> · {markerNote}</small>}
               </span>
             )}
             {onEditMarker && (

@@ -17,7 +17,7 @@ html body .trace-step time {
   padding-top: 1px;
   color: var(--c-blue-15);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 html body .trace-step .dot {
@@ -91,7 +91,7 @@ html body .trace-patient li {
 }
 html body .trace-patient li a {
   color: var(--c-cyan-35);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 html body .trace-patient li small {
@@ -113,10 +113,8 @@ html body .trace-group {
   gap: 6px;
   margin: 0;
   color: var(--c-blue-45);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
 }
 html body .trace-group {
   margin: 10px 0 8px;
@@ -129,7 +127,7 @@ html body .trace-cycles li {
   font-size: 13px;
 }
 html body .trace-cycles time {
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 html body .trace-cycles b.ok {
@@ -202,6 +200,11 @@ html body .trace-patients {
   gap: 12px;
   min-height: 0;
 }
+/* Uses with a patient code: the item gets the room, the department what it needs, the user one line. */
+html body .trace-patients-ledger .ledger-columns,
+html body .trace-patients-ledger .ledger-row {
+  grid-template-columns: 128px minmax(220px, 1.6fr) minmax(150px, 1fr) 150px minmax(170px, 1fr) 24px;
+}
 /* The patient code as a chip its own size, not the column's. */
 html body .trace-patients-ledger .movement-chip {
   justify-self: start;
@@ -217,7 +220,7 @@ html body .trace-back {
   border: 0;
   background: none;
   color: var(--primary, #0f6bb8);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -263,9 +266,61 @@ html body .trace-patient-link {
   background: var(--c-gray-95-3);
   color: var(--c-cyan-40-3);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .trace-patient-link:hover {
   text-decoration: underline;
+}
+
+/* An empty search: the Sets and instruments that moved last, as small cards; one click opens the trail. */
+html body .trace-recently {
+  margin-top: 16px;
+}
+html body .trace-recently h3 {
+  margin: 0 0 8px;
+  color: var(--c-blue-45);
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-recently-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+html body .trace-recently-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+html body .trace-recently-card:hover {
+  border-color: var(--c-cyan-45);
+}
+html body .trace-recently-card > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+html body .trace-recently-card strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .trace-recently-card small {
+  overflow: hidden;
+  color: var(--st-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

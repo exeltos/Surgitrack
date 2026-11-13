@@ -65,7 +65,7 @@
 }
 .form-grid label {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-30-3);
   display: flex;
   flex-direction: column;
@@ -90,7 +90,7 @@
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 650;
 }
 .composer-search {
   display: flex;
@@ -307,7 +307,7 @@
   border-radius: 9px;
   padding: 0 14px;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 650;
 }
 .asset-page-actions .primary,
 .page-head > .primary {
@@ -430,7 +430,7 @@
   background: var(--c-gray-95-4);
   color: #17624c;
   border-radius: 12px;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 13px;
 }
 .demo-role-grid {
@@ -462,7 +462,7 @@
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-45-4);
-  font-weight: 750;
+  font-weight: 650;
   font-size: 12px;
   padding: 8px 11px;
 }
@@ -612,7 +612,7 @@
   gap: 6px;
   color: var(--c-green-30);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .table-panel tbody tr {
   cursor: pointer;
@@ -660,7 +660,7 @@
   border-radius: 999px;
   background: var(--c-gray-100-2);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--muted);
 }
 .usage-view-stats {
@@ -713,7 +713,7 @@
   color: var(--c-cyan-30);
   font: inherit;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1;
   cursor: pointer;
   transition:
@@ -1247,7 +1247,7 @@ td {
   background: var(--c-gray-100-2);
   color: var(--c-cyan-50-4);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -1451,9 +1451,7 @@ td {
   background: var(--c-white);
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 650;
 }
 .create-set-tools-list {
   scrollbar-gutter: stable;
@@ -1683,7 +1681,7 @@ td {
   color: #627174;
 }
 .asset-create-field-list label > span {
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-create-field-list .asset-inline-input {
   width: 100%;
@@ -1791,7 +1789,7 @@ td {
   background: var(--c-gray-95);
   color: var(--c-cyan-35-9);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
 }
 
 /* Barcode label options */
@@ -1801,7 +1799,7 @@ td {
 }
 .label-option-group > span {
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--st-muted);
 }
@@ -1831,7 +1829,7 @@ td {
   border-color: var(--c-cyan-40);
   background: var(--c-gray-95-3);
   color: var(--c-cyan-35-3);
-  font-weight: 700;
+  font-weight: 600;
 }
 .label-segments.sizes {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1865,7 +1863,7 @@ td {
 .label-logo-row label {
   cursor: pointer;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-40);
 }
 .label-check {

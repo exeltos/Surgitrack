@@ -30,7 +30,7 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
                 {releaseDraft.kind === 'SET' ? <Box size={20} /> : <Stethoscope size={20} />}
               </div>
               <div className="workflow-modal-title">
-                <span className="eyebrow">{tr('ΕΛΕΓΧΟΣ ΠΟΙΟΤΗΤΑΣ · ΑΠΟΔΕΣΜΕΥΣΗ')}</span>
+                <span className="eyebrow">{tr('Έλεγχος ποιότητας · Αποδέσμευση')}</span>
                 <h2>
                   {releaseDraft.asset.barcode} · {releaseDraft.asset.name}
                 </h2>

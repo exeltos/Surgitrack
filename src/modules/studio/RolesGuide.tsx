@@ -104,15 +104,23 @@ const rows: Row[] = [
   },
 ];
 
-/** Who is who in SurgiTrack: the platform owner and the five kinds of hospital user. */
-export default function RolesGuide() {
+/**
+ * Who is who in SurgiTrack: the five kinds of hospital user, side by side, for whoever approves people and gives them a
+ * role; the platform owner sees their own row too.
+ */
+export default function RolesGuide({owner = false}: {owner?: boolean}) {
   const {lang} = useAppPreferences();
   const L = (text: {el: string; en: string}) => (lang === 'el' ? text.el : text.en);
   return (
     <section className="roles-guide">
       <header>
-        <span className="eyebrow">{lang === 'el' ? 'ΠΟΙΟΣ ΕΙΝΑΙ ΠΟΙΟΣ' : 'WHO IS WHO'}</span>
+        <span className="eyebrow">{lang === 'el' ? 'Ποιος είναι ποιος' : 'WHO IS WHO'}</span>
         <h2>{lang === 'el' ? 'Ρόλοι στο SurgiTrack' : 'Roles in SurgiTrack'}</h2>
+        <p>
+          {lang === 'el'
+            ? 'Για όποιον εγκρίνει χρήστες: το προσωπικό της Αποστείρωσης παίρνει ρόλο Αποστείρωσης, όχι Τμήματος· ένας χρήστης Τμήματος βλέπει μόνο τα Σετ του δικού του τμήματος.'
+            : "For whoever approves users: Sterilization staff get the Sterilization role, not Department; a Department user sees only their own department's Sets."}
+        </p>
       </header>
       <div className="roles-guide-table">
         <div className="roles-guide-head">
@@ -121,17 +129,19 @@ export default function RolesGuide() {
           <span>{lang === 'el' ? 'Τι βλέπει' : 'Sees'}</span>
           <span>{lang === 'el' ? 'Τι κάνει' : 'Does'}</span>
         </div>
-        {rows.map(row => (
-          <div className="roles-guide-row" key={row.name.el}>
-            <b>
-              {row.icon}
-              {L(row.name)}
-            </b>
-            <span>{L(row.who)}</span>
-            <span>{L(row.sees)}</span>
-            <span>{L(row.does)}</span>
-          </div>
-        ))}
+        {rows
+          .filter(row => owner || row.name.el !== 'Owner πλατφόρμας')
+          .map(row => (
+            <div className="roles-guide-row" key={row.name.el}>
+              <b>
+                {row.icon}
+                {L(row.name)}
+              </b>
+              <span>{L(row.who)}</span>
+              <span>{L(row.sees)}</span>
+              <span>{L(row.does)}</span>
+            </div>
+          ))}
       </div>
     </section>
   );

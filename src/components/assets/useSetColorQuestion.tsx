@@ -55,7 +55,7 @@ export function useSetColorQuestion(): {
         <header>
           <Palette size={20} />
           <div>
-            <span className="eyebrow">{tr('ΧΡΩΜΑΤΙΚΟΣ ΜΑΡΤΥΡΑΣ')}</span>
+            <span className="eyebrow">{tr('Χρωματικός μάρτυρας')}</span>
             <h2>
               {pending.conflicts.length === 1
                 ? tr('Το εργαλείο έχει ήδη ταινία άλλου χρώματος')

@@ -238,7 +238,7 @@ export default function ReplacementsPage({
     <div className={embedded ? 'replacements embedded' : 'replacements'}>
       {!embedded && (
         <PageHeader
-          eyebrow={tr('ΒΛΑΒΕΣ · SERVICE · ΑΠΩΛΕΙΕΣ')}
+          eyebrow={tr('Βλάβες · Service · Απώλειες')}
           title={tr('Αντικαταστάσεις')}
           description={tr('Εργαλεία σε Service, με βλάβη ή χαμένα: αντικατάσταση από το Απόθεμα ή παραγγελία.')}
         />

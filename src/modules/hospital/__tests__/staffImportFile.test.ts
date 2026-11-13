@@ -95,6 +95,19 @@ describe('reading the list', () => {
     expect(rows[0].role).toBe('DEPARTMENT');
   });
 
+  it('gives a person of the Sterilization department the Sterilization role when no role is given', () => {
+    const rows = parse([
+      ['Ονοματεπώνυμο', 'Τμήμα', 'Κινητό', 'Ρόλος'],
+      ['Νίκος Σάββα', 'Αποστείρωση', '6912345678', ''],
+      ['Άννα Λάμπρου', 'CSSD', '6912345678', ''],
+      ['Πέτρος Ράλλης', 'Αποστείρωση', '6912345678', 'Χρήστης Τμήματος'],
+      ['Μαρία Ιωάννου', 'Χειρουργείο', '6912345678', ''],
+    ]);
+    // A role written in the sheet is kept as written.
+    expect(rows.map(r => r.role)).toEqual(['STERILIZATION', 'STERILIZATION', 'DEPARTMENT', 'DEPARTMENT']);
+    expect(rows.every(r => r.problems.length === 0)).toBe(true);
+  });
+
   it('says what is wrong with a row, and leaves the good ones alone', () => {
     const rows = parse([
       ['Ονοματεπώνυμο', 'Τμήμα', 'Κινητό', 'Email', 'Ρόλος'],

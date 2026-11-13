@@ -142,7 +142,10 @@ export default function StandaloneToolsPage() {
         </Link>
       </td>
       <td>{trData(t.specialty) || '—'}</td>
-      <td>{trData(t.department) || '—'}</td>
+      <td>
+        {trData(t.department) || '—'}
+        {t.specialty ? <small className="row-sub">{trData(t.specialty)}</small> : null}
+      </td>
       <td>
         {t.maxUses ? (
           <>
@@ -172,7 +175,7 @@ export default function StandaloneToolsPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΜΗΤΡΩΟ ΕΞΟΠΛΙΣΜΟΥ')}
+        eyebrow={tr('Μητρώο εξοπλισμού')}
         title={tr('Μεμονωμένα εργαλεία σε χρήση')}
         description={tr('Εργαλεία που χρησιμοποιούνται αυτόνομα σε τμήματα, εκτός Σετ.')}
         actions={
@@ -317,7 +320,7 @@ export default function StandaloneToolsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table registry-fixed sets-registry standalone-registry">
+          <table className="asset-registry-table registry-fixed sets-registry sets-main standalone-registry">
             <thead>
               <tr>
                 <SortTh label={tr('Ονομασία')} sortKey="name" sort={order.sort} onSort={order.toggle} />
@@ -374,6 +377,7 @@ export default function StandaloneToolsPage() {
                           <td>{trData(t.specialty) || '—'}</td>
                           <td title={departments.map(d => trData(d)).join(', ')}>
                             {departments.length === 1 ? trData(departments[0]) : tr('{0} τμήματα', departments.length)}
+                            {t.specialty ? <small className="row-sub">{trData(t.specialty)}</small> : null}
                           </td>
                           <td>
                             {sameLimit ? (

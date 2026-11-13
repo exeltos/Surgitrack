@@ -1,5 +1,5 @@
 import {useContext, useState} from 'react';
-import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Puzzle} from 'lucide-react';
+import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Puzzle, Lock} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import type {StudioPageState} from '../useStudioPage';
 import {useSurgi} from '../../../store/SurgiStore';
@@ -25,6 +25,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
    * Turning a stage off: what is in it moves on to the next stage the hospital runs (after a confirmation),
    * so its tab empties; turning one on just takes effect for what comes next.
    */
+  const coreStages = libs.sterilizationWorkflow.stages.filter(stage => stage.locked);
   const toggleStage = (stage: WorkflowStageConfig, enabled: boolean) => {
     const fromState = workflowStageState[stage.id] as AssetState;
     const count = enabled
@@ -72,10 +73,11 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                 <ShieldCheck size={19} />
                 <div>
                   <strong>{L('Ασφαλής βασικός κορμός', 'Protected core workflow')}</strong>
+                  {/* Named from the stages actually locked, so the note always matches the list. */}
                   <span>
                     {L(
-                      'Παραλαβή, Αποστείρωση και Παράδοση αποτελούν βασικά σημεία της αλυσίδας φύλαξης και παραμένουν ενεργά. Οι ενδιάμεσοι έλεγχοι ποιότητας προσαρμόζονται ανά νοσοκομείο.',
-                      'Receipt, Sterilization and Delivery are protected chain-of-custody milestones. Intermediate quality gates can be configured per hospital.',
+                      `Τα βασικά στάδια (${coreStages.map(s => s.labelEl).join(', ')}) είναι πάντα ενεργά· τα υπόλοιπα τα ανοίγει ή τα κλείνει κάθε νοσοκομείο.`,
+                      `The core stages (${coreStages.map(s => s.labelEn).join(', ')}) are always on; each hospital turns the others on or off.`,
                     )}
                   </span>
                 </div>
@@ -342,7 +344,8 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                             className="workflow-core-chip"
                             title={L('Βασικό στάδιο: δεν απενεργοποιείται', 'Core stage: cannot be turned off')}
                           >
-                            {L('ΒΑΣΙΚΟ', 'CORE')}
+                            <Lock size={11} aria-hidden="true" />
+                            {L('Βασικό', 'Core')}
                           </span>
                         )}
                       </div>
@@ -356,16 +359,23 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                         ))}
                       </div>
                     </div>
-                    <label className={`workflow-stage-toggle ${stage.locked ? 'locked' : ''}`}>
-                      <input
-                        type="checkbox"
-                        checked={stage.enabled}
-                        disabled={stage.locked}
-                        onChange={e => toggleStage(stage, e.target.checked)}
-                      />
-                      <span></span>
-                      <b>{stage.enabled ? L('Ενεργό', 'Active') : L('Παράκαμψη', 'Skipped')}</b>
-                    </label>
+                    {/* A core stage cannot be turned off: it says so instead of showing a switch that does nothing. */}
+                    {stage.locked ? (
+                      <span className="workflow-stage-always">
+                        <Lock size={13} aria-hidden="true" />
+                        {L('Πάντα ενεργό', 'Always on')}
+                      </span>
+                    ) : (
+                      <label className="workflow-stage-toggle">
+                        <input
+                          type="checkbox"
+                          checked={stage.enabled}
+                          onChange={e => toggleStage(stage, e.target.checked)}
+                        />
+                        <span></span>
+                        <b>{stage.enabled ? L('Ενεργό', 'Active') : L('Παράκαμψη', 'Skipped')}</b>
+                      </label>
+                    )}
                   </section>
                 ))}
               </div>

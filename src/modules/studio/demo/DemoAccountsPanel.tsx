@@ -132,6 +132,9 @@ export default function DemoAccountsPanel({
               'Ένα Demo δίνει σε έναν υποψήφιο πελάτη δικό του νοσοκομείο με δοκιμαστικά δεδομένα, για όσες ημέρες ορίσετε.',
             )}
           </span>
+          <AppButton variant="primary" icon={<FlaskConical size={15} />} onClick={() => setCreating(true)}>
+            {tr('Νέο Demo αξιολόγησης')}
+          </AppButton>
         </div>
       ) : (
         <div className="evaluation-demo-list">
@@ -150,7 +153,7 @@ export default function DemoAccountsPanel({
           <aside className="studio-drawer evaluation-demo-drawer" aria-label={open.hospitalName}>
             <header>
               <div>
-                <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
+                <span className="eyebrow">{tr('Demo αξιολόγησης')}</span>
                 <h2>{open.hospitalName}</h2>
               </div>
               <button onClick={() => setOpenId(null)} aria-label={tr('Κλείσιμο')}>

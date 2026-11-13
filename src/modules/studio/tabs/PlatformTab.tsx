@@ -26,16 +26,7 @@ import {activeHospitalId, switchHospital} from '../../../data/cloud/hospitalSwit
 import DemoAccountsPanel from '../demo/DemoAccountsPanel';
 import type {StudioPageState} from '../useStudioPage';
 
-type DemoView = 'EVALUATION' | 'PRIVATE';
 type HospitalFilter = 'ALL' | 'ACTIVE' | 'TRIAL';
-const VIEW_KEY = 'surgitrack-platform-view';
-const readView = (): DemoView => {
-  try {
-    return sessionStorage.getItem(VIEW_KEY) === 'PRIVATE' ? 'PRIVATE' : 'EVALUATION';
-  } catch {
-    return 'EVALUATION';
-  }
-};
 
 /**
  * Two sections of the platform: «Νοσοκομεία», every customer hospital with its plan, state and «Είσοδος»
@@ -44,19 +35,10 @@ const readView = (): DemoView => {
  */
 export default function PlatformTab({s}: {s: StudioPageState}) {
   const {L, displayedOrganizations, libs, platformAdmin, setOrganizationEditor, tab} = s;
-  const [view, setViewState] = useState<DemoView>(readView);
   const [creatingDemo, setCreatingDemo] = useState(false);
   // The figures over the hospitals filter them: all, the active ones, the ones on trial.
   const [filter, setFilter] = useState<HospitalFilter>('ALL');
   const cloud = libs.dataMode === 'PRODUCTION';
-  const setView = (next: DemoView) => {
-    setViewState(next);
-    try {
-      sessionStorage.setItem(VIEW_KEY, next);
-    } catch {
-      // Without storage the view simply opens on the evaluation Demos next time.
-    }
-  };
   if ((tab !== 'PLATFORM' && tab !== 'DEMOS') || !platformAdmin) return null;
   if (tab === 'PLATFORM') {
     const active = displayedOrganizations.filter(org => org.active);
@@ -89,61 +71,60 @@ export default function PlatformTab({s}: {s: StudioPageState}) {
       </section>
     );
   }
-  const views: Array<{id: DemoView; label: string}> = [
-    ...(cloud ? [{id: 'EVALUATION' as const, label: L('Demo υποψήφιων πελατών', 'Prospects’ Demos')}] : []),
-    {id: 'PRIVATE', label: L('Δικό μου Demo', 'My Demo')},
-  ];
-  const current: DemoView = !cloud ? 'PRIVATE' : view;
+  // Without a cloud the owner's own practice Demo is all there is. With one, this page is the prospects' Demos:
+  // the owner enters their own Demo from «Είσοδος Demo» in the header, and resets it from the «⋯» menu here.
+  if (!cloud)
+    return (
+      <section className="studio-manager-panel studio-platform-panel">
+        <PrivateDemo s={s} />
+      </section>
+    );
   return (
     <section className="studio-manager-panel studio-platform-panel">
-      <header className="studio-panel-head">
-        <div>
-          <span className="eyebrow">{L('ΠΛΑΤΦΟΡΜΑ', 'PLATFORM')}</span>
-          <h2>{L('Demo αξιολόγησης', 'Evaluation Demos')}</h2>
-          <p>
-            {L(
-              'Ξεχωριστό νοσοκομείο με δοκιμαστικά δεδομένα, που κλειδώνει στη λήξη του. Για πελάτη που ξεκινά: «Νέο νοσοκομείο» με δοκιμαστική περίοδο.',
-              'A separate hospital with sample data that locks when it ends. For a customer who is starting: a «New hospital» on trial.',
-            )}
-          </p>
-        </div>
-        {cloud && (
-          <div className="platform-head-actions">
-            <AppButton
-              variant="primary"
-              title={L(
-                'Με δοκιμαστικά δεδομένα, για παρουσίαση σε υποψήφιο πελάτη',
-                'With sample data, to show a prospective customer',
-              )}
-              onClick={() => {
-                setView('EVALUATION');
-                setCreatingDemo(true);
-              }}
-            >
-              <FlaskConical size={16} />
-              {L('Νέο Demo αξιολόγησης', 'New evaluation Demo')}
-            </AppButton>
-          </div>
-        )}
-      </header>
-      {views.length > 1 && (
-        <nav className="platform-views" aria-label={L('Ενότητες', 'Sections')}>
-          {views.map(v => (
-            <button
-              key={v.id}
-              className={current === v.id ? 'active' : ''}
-              aria-pressed={current === v.id}
-              onClick={() => setView(v.id)}
-            >
-              {v.label}
-            </button>
-          ))}
-        </nav>
-      )}
-      {current === 'EVALUATION' && <DemoAccountsPanel creating={creatingDemo} onCreatingChange={setCreatingDemo} />}
-      {current === 'PRIVATE' && <PrivateDemo s={s} />}
+      <h2 className="visually-hidden">{L('Demo αξιολόγησης', 'Evaluation Demos')}</h2>
+      <div className="platform-toolbar platform-demo-toolbar">
+        <AppButton
+          variant="primary"
+          title={L(
+            'Με δοκιμαστικά δεδομένα, για παρουσίαση σε υποψήφιο πελάτη',
+            'With sample data, to show a prospective customer',
+          )}
+          onClick={() => setCreatingDemo(true)}
+        >
+          <FlaskConical size={16} />
+          {L('Νέο Demo αξιολόγησης', 'New evaluation Demo')}
+        </AppButton>
+        <ActionMenu
+          icon={<MoreHorizontal size={15} />}
+          label={L('Ενέργειες', 'Actions')}
+          align="right"
+          items={[
+            {
+              key: 'reset-own',
+              icon: <RotateCcw size={15} />,
+              label: L('Επαναφορά του δικού μου Demo', 'Reset my own Demo'),
+              hint: L('Ξανά τα αρχικά δοκιμαστικά δεδομένα', 'The original sample data again'),
+              onSelect: () => confirmResetOwnDemo(s),
+            },
+          ]}
+        />
+      </div>
+      <DemoAccountsPanel creating={creatingDemo} onCreatingChange={setCreatingDemo} />
     </section>
   );
+}
+
+/** Asks before the owner's own practice Demo goes back to its original sample data. */
+function confirmResetOwnDemo(s: StudioPageState) {
+  const {L, resetBuiltInDemo, setConfirm} = s;
+  setConfirm({
+    title: L('Επαναφορά Demo', 'Reset Demo'),
+    message: L(
+      'Θα διαγραφούν όλα τα δεδομένα του SurgiTrack Demo και θα ξαναφορτωθούν τα αρχικά δοκιμαστικά. Τα πραγματικά νοσοκομεία δεν επηρεάζονται.',
+      'All SurgiTrack Demo data will be deleted and the original sample data reloaded. Real hospitals are not affected.',
+    ),
+    action: () => void resetBuiltInDemo(),
+  });
 }
 
 function HospitalList({s, organizations}: {s: StudioPageState; organizations: Organization[]}) {
@@ -164,17 +145,16 @@ function HospitalList({s, organizations}: {s: StudioPageState; organizations: Or
             <div className="platform-hospital-name">
               <strong>{org.name}</strong>
               <small>
-                {org.code} · {users} {L('χρήστες', 'users')} · {departments} {L('τμήματα', 'departments')}
+                {org.code}
+                {/* On a narrow screen the counts have no columns of their own: they follow the code. */}
+                <span className="platform-hospital-counts-inline">
+                  {' '}
+                  · {users} {L('χρήστες', 'users')} · {departments} {L('τμήματα', 'departments')}
+                </span>
               </small>
             </div>
             <div className="platform-hospital-badges">
               <PlanBadge org={org} L={L} />
-              <span className={`platform-status ${org.active ? 'on' : 'off'}`}>
-                {org.active ? L('Ενεργό', 'Active') : L('Ανενεργό', 'Inactive')}
-              </span>
-              {org.demoEnabled && <span className="platform-status demo">{L('Demo ανοικτό', 'Demo open')}</span>}
-            </div>
-            <div className="platform-hospital-actions">
               {org.plan === 'TRIAL' && (
                 <button
                   className="platform-quick"
@@ -195,14 +175,29 @@ function HospitalList({s, organizations}: {s: StudioPageState; organizations: Or
                   {L('+30 ημέρες', '+30 days')}
                 </button>
               )}
-              <AppButton onClick={() => openOrganization(org)}>
-                <Users size={15} />
-                {L('Διαχείριση', 'Manage')}
-              </AppButton>
+              {/* Only what differs from the usual is coloured: an inactive hospital, an open Demo. */}
+              {!org.active && <span className="platform-status off">{L('Ανενεργό', 'Inactive')}</span>}
+              {org.demoEnabled && <span className="platform-status demo">{L('Demo ανοικτό', 'Demo open')}</span>}
+            </div>
+            {/* The number of users opens them: the hospital's people, roles and departments. */}
+            <button
+              type="button"
+              className="platform-hospital-count platform-hospital-users"
+              onClick={() => openOrganization(org)}
+              title={L('Χρήστες και τμήματα του νοσοκομείου', "The hospital's users and departments")}
+            >
+              <strong>{users}</strong>
+              <small>{L('χρήστες', 'users')}</small>
+            </button>
+            <div className="platform-hospital-count">
+              <strong>{departments}</strong>
+              <small>{L('τμήματα', 'departments')}</small>
+            </div>
+            <div className="platform-hospital-actions">
               {org.id === activeHospitalId() ? (
                 <span className="platform-here">{L('Εδώ εργάζεστε', 'Working here')}</span>
               ) : (
-                <AppButton variant="primary" disabled={!org.active} onClick={() => switchHospital(org.id)}>
+                <AppButton className="platform-enter" disabled={!org.active} onClick={() => switchHospital(org.id)}>
                   <LogIn size={15} />
                   {L('Είσοδος', 'Enter')}
                 </AppButton>
@@ -239,6 +234,13 @@ function hospitalActions(
     updateOrganizationFlags,
   } = s;
   const items: ActionMenuItem[] = [
+    {
+      key: 'users',
+      icon: <Users size={15} />,
+      label: L('Χρήστες & τμήματα', 'Users & departments'),
+      hint: L('Οι άνθρωποι του νοσοκομείου, οι ρόλοι και τα τμήματα', "The hospital's people, roles and departments"),
+      onSelect: () => s.openOrganization(org),
+    },
     {
       key: 'edit',
       icon: <Pencil size={15} />,
@@ -338,12 +340,12 @@ function hospitalActions(
 
 /** The owner's own practice hospital: pick a role and enter, or reset it. */
 function PrivateDemo({s}: {s: StudioPageState}) {
-  const {L, enterBuiltInDemo, resetBuiltInDemo, setConfirm} = s;
+  const {L, enterBuiltInDemo} = s;
   const [kind, setKind] = useState<HospitalRoleKind>('ADMIN');
   return (
     <section className="platform-private-demo">
       <div>
-        <span className="eyebrow">{L('ΔΙΚΟ ΜΟΥ DEMO', 'MY DEMO')}</span>
+        <span className="eyebrow">{L('Δικό μου Demo', 'My Demo')}</span>
         <strong>{L('Περιβάλλον πρακτικής με δοκιμαστικά δεδομένα', 'Practice environment with sample data')}</strong>
         <small>
           {L(
@@ -367,19 +369,7 @@ function PrivateDemo({s}: {s: StudioPageState}) {
           <LogIn size={15} />
           {L('Είσοδος', 'Enter')}
         </AppButton>
-        <button
-          className="platform-demo-reset"
-          onClick={() =>
-            setConfirm({
-              title: L('Επαναφορά Demo', 'Reset Demo'),
-              message: L(
-                'Θα διαγραφούν όλα τα δεδομένα του SurgiTrack Demo και θα ξαναφορτωθούν τα αρχικά δοκιμαστικά. Τα πραγματικά νοσοκομεία δεν επηρεάζονται.',
-                'All SurgiTrack Demo data will be deleted and the original sample data reloaded. Real hospitals are not affected.',
-              ),
-              action: () => void resetBuiltInDemo(),
-            })
-          }
-        >
+        <button className="platform-demo-reset" onClick={() => confirmResetOwnDemo(s)}>
           <RotateCcw size={14} />
           {L('Επαναφορά', 'Reset')}
         </button>

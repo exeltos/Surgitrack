@@ -1,5 +1,6 @@
 :root {
   font-family:
+    'Inter Variable',
     Inter,
     ui-sans-serif,
     system-ui,
@@ -41,7 +42,7 @@ body {
   color: white;
   display: grid;
   place-items: center;
-  font-weight: 800;
+  font-weight: 650;
 }
 .brand strong,
 .brand span {
@@ -99,7 +100,7 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-weight: 650;
+  font-weight: 600;
 }
 .top-actions {
   margin-left: auto;
@@ -119,7 +120,7 @@ body {
 }
 .lang {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .avatar {
   width: 34px;
@@ -129,7 +130,7 @@ body {
   display: grid;
   place-items: center;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .content {
   padding: 32px;
@@ -141,7 +142,7 @@ body {
   border-radius: 9px;
   padding: 10px 15px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .attention span {
   font-size: 12px;
@@ -520,7 +521,7 @@ td {
   color: var(--c-white);
 }
 .set-select {
-  font-weight: 700;
+  font-weight: 600;
   min-width: 480px;
 }
 @media (max-width: 700px) {
@@ -537,7 +538,7 @@ td {
   background: var(--c-white);
   padding: 0 10px;
   color: var(--c-blue-25);
-  font-weight: 650;
+  font-weight: 600;
 }
 .sterile-queues {
   display: grid;
@@ -564,7 +565,7 @@ td {
 }
 .sterile-queues button span {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .sterile-queues button strong {
   font-size: 18px;
@@ -609,10 +610,10 @@ td {
   text-decoration: none;
 }
 .strong-link {
-  font-weight: 800;
+  font-weight: 650;
 }
 .row-title-link {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-25-3);
 }
 .row-title-link:hover,
@@ -747,7 +748,7 @@ td {
   color: var(--c-white);
   display: grid;
   place-items: center;
-  font-weight: 800;
+  font-weight: 650;
 }
 .auth-brand-mark {
   width: 31px;
@@ -765,7 +766,7 @@ td {
   color: var(--c-blue-35);
   padding: 0 11px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   cursor: pointer;
 }
 .auth-main {
@@ -789,18 +790,16 @@ td {
   box-shadow: 0 8px 22px rgba(24, 59, 86, 0.14);
   margin-bottom: 21px;
 }
+/* The uppercase line over a sign-in card's title only repeated it: the title says it. */
 .auth-eyebrow {
-  display: block;
-  color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.11em;
-  font-weight: 800;
-  font-size: 11px;
+  display: none;
 }
 .auth-intro h1 {
-  font-size: 44px;
-  letter-spacing: -0.045em;
-  margin: 5px 0 0;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 12px 0 6px;
   color: var(--c-blue-15-2);
 }
 .auth-product-subtitle {
@@ -818,7 +817,7 @@ td {
   border-radius: 9px;
   padding: 9px 11px;
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 600;
 }
 .auth-card {
   background: var(--c-white);
@@ -834,9 +833,9 @@ td {
   gap: 20px;
   margin-bottom: 23px;
 }
+/* No decorative icon beside a sign-in card's title. */
 .auth-card-title > svg {
-  color: var(--st-muted);
-  margin-top: 5px;
+  display: none;
 }
 .auth-card-title h2 {
   margin: 4px 0 6px;
@@ -858,13 +857,7 @@ td {
   gap: 6px;
   color: var(--c-blue-40);
   font-size: 12px;
-  font-weight: 700;
-}
-.auth-field-hint {
-  color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.4;
+  font-weight: 600;
 }
 .auth-form input:not([type='checkbox']) {
   height: 42px;
@@ -929,7 +922,7 @@ td {
   color: var(--c-cyan-40-6);
   font-size: 12px;
   white-space: nowrap;
-  font-weight: 750;
+  font-weight: 650;
   cursor: pointer;
 }
 .auth-primary {
@@ -938,7 +931,7 @@ td {
   border-radius: 9px;
   background: var(--c-blue-25-2);
   color: var(--c-white);
-  font-weight: 800;
+  font-weight: 650;
   font-size: 12px;
   cursor: pointer;
   margin-top: 2px;
@@ -999,7 +992,7 @@ td {
     margin-right: auto;
   }
   .auth-intro h1 {
-    font-size: 34px;
+    font-size: 24px;
   }
   .auth-security {
     display: none;
@@ -1083,9 +1076,8 @@ td {
   font-size: 13px;
 }
 .eyebrow {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  font-weight: 600;
   color: #60778b;
 }
 .ster-scan {
@@ -1144,7 +1136,7 @@ td {
   border: 0;
   background: var(--c-gray-95);
   color: var(--c-cyan-30-5);
-  font-weight: 750;
+  font-weight: 650;
   padding: 0 15px;
   cursor: pointer;
 }
@@ -1222,7 +1214,7 @@ td {
 .ster-code {
   text-decoration: none;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 650;
 }
 .ster-asset strong {
   font-size: 13px;
@@ -1363,7 +1355,7 @@ td {
 .receipt-card-head > div:not(.prep-head-prints) > span {
   font-size: 11px;
   letter-spacing: 0.11em;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--st-muted);
 }
 .receipt-card-head h2 {
@@ -1380,8 +1372,6 @@ td {
 .receipt-note-read > span {
   font-size: 11px;
   color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 .identity-section {
   border: 1px solid var(--c-gray-90-3);
@@ -1395,7 +1385,7 @@ td {
   gap: 6px;
   color: var(--c-blue-40);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .identity-section input {
   height: 40px;
@@ -1598,7 +1588,7 @@ td {
   border-radius: 7px;
   padding: 7px 9px;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   cursor: pointer;
 }
 .tool-report-btn:hover {
@@ -1630,7 +1620,7 @@ td {
   flex-direction: column;
   gap: 6px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
   margin-top: 10px;
 }
@@ -1834,7 +1824,7 @@ td {
   border-radius: 8px;
   padding: 0 12px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -2140,7 +2130,7 @@ td {
   border-radius: 8px;
   padding: 9px 11px;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   cursor: pointer;
 }
 .prep-print-actions button:hover {
@@ -2186,7 +2176,7 @@ td {
   gap: 5px;
   padding: 0 12px 12px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
 }
 .prep-note-field textarea {
@@ -2208,7 +2198,7 @@ td {
 }
 .prep-tools-progress {
   font-size: 12px !important;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--c-blue-35-3) !important;
   background: var(--c-gray-95);
   border-radius: 999px;
@@ -2473,7 +2463,7 @@ td {
   border: 1px solid var(--border, var(--c-gray-90-2));
   border-radius: 10px;
   background: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-35-4);
 }
 .prep-source-buttons button.active {
@@ -2579,8 +2569,6 @@ td {
 .cycle-clean-summary span {
   font-size: 11px;
   color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .cycle-clean-summary strong {
   font-size: 12px;
@@ -2595,7 +2583,7 @@ td {
   display: grid;
   gap: 6px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
 }
 .cycle-clean-fields input,
@@ -2660,7 +2648,7 @@ td {
   display: grid;
   gap: 7px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
 }
 @media (max-width: 780px) {
@@ -2877,7 +2865,7 @@ td {
   border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-30);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 12px;
   text-decoration: none;
 }
@@ -2921,7 +2909,7 @@ td {
 }
 .asset-count-state span {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-count-state.ok {
   color: var(--c-green-45-7);
@@ -2980,7 +2968,7 @@ td {
   margin: 0;
   text-align: right;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-25-4);
   min-width: 0;
 }
@@ -2991,7 +2979,7 @@ td {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 9px;
-  padding: 10px 0;
+  padding: 8px 0;
   border-bottom: 1px solid var(--c-gray-95);
 }
 .asset-history-row:last-child {
@@ -3000,13 +2988,10 @@ td {
 .asset-history-row strong {
   font-size: 11.5px;
 }
-.asset-history-row p {
-  margin: 2px 0;
-  font-size: 11px;
-  color: var(--c-cyan-50-2);
-}
 .asset-history-row small {
-  font-size: 11px;
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
   color: var(--st-muted);
 }
 .asset-empty {
@@ -3023,7 +3008,7 @@ td {
   margin-top: 12px;
   color: var(--c-blue-20-3);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-side-tabs {
   display: flex;
@@ -3042,7 +3027,7 @@ td {
   background: transparent;
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   padding: 0 8px;
   white-space: nowrap;
 }
@@ -3086,7 +3071,7 @@ td {
 }
 .asset-issue-row span {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-issue-row small {
   font-size: 11px;
@@ -3147,7 +3132,7 @@ td {
   gap: 5px;
   font-size: 11px;
   color: var(--st-muted);
-  font-weight: 700;
+  font-weight: 600;
 }
 .usage-config-limit input {
   height: 36px;
@@ -3180,7 +3165,7 @@ td {
   background: var(--c-amber-95-2);
   color: var(--c-amber-40);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .set-workspace-grid {
   display: grid;
@@ -3221,7 +3206,7 @@ td {
   display: grid;
   place-items: center;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
 }
 .set-tool-code,
 .set-tool-name {
@@ -3263,7 +3248,7 @@ td {
 .set-tool-state small {
   font-size: 11px;
   color: var(--st-amber);
-  font-weight: 700;
+  font-weight: 600;
 }
 .set-detail-workspace {
   min-height: 0;
@@ -3426,7 +3411,7 @@ td {
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -3578,7 +3563,7 @@ td {
   background: var(--c-white);
   min-height: 34px;
   padding: 6px 10px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .prep-manage-card {
   width: min(640px, calc(100vw - 32px));
@@ -3677,7 +3662,7 @@ td {
   background: var(--c-amber-95-2);
   color: var(--c-amber-40);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .prep-open-issue-state {
   display: flex;
@@ -3767,7 +3752,7 @@ td {
   padding: 4px 8px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .prep-missing-chip {
   background: #fff0cf;
@@ -3813,7 +3798,7 @@ td {
   display: grid;
   place-items: center;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
 }
 .prep-replace-step > div {
   display: flex;
@@ -3933,7 +3918,7 @@ td {
   flex-direction: column;
   gap: 6px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
   margin-top: 2px;
 }
@@ -4073,7 +4058,7 @@ td {
   cursor: pointer;
   padding: 9px 11px;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   color: var(--st-muted);
 }
 .released-loads > div {
@@ -4162,7 +4147,7 @@ td {
   background: transparent;
   color: var(--c-cyan-45-3);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   cursor: pointer;
 }
 .load-assets-list {
@@ -4348,7 +4333,7 @@ td {
 }
 /* The hint reads as ordinary text; what is typed stays a monospace, capital barcode. */
 .load-barcode-entry input::placeholder {
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
   text-transform: none;
 }
 .load-barcode-entry button {
@@ -4358,7 +4343,7 @@ td {
   background: var(--c-gray-95);
   color: var(--c-cyan-40-7);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   padding: 0 11px;
   cursor: pointer;
 }
@@ -4369,7 +4354,7 @@ td {
   padding: 8px 10px;
   border-radius: 9px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .load-scan-feedback.ok {
   background: var(--c-gray-95-4);
@@ -4782,7 +4767,7 @@ td {
   display: grid;
   gap: 6px;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   color: var(--c-blue-45-2);
 }
 .delivery-batch-list > label.incompatible {
@@ -4812,7 +4797,7 @@ td {
   color: var(--c-cyan-40-7);
   font: inherit;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1;
   cursor: pointer;
   box-shadow: none;
@@ -4899,7 +4884,7 @@ td {
   border: 1px solid var(--c-gray-90);
   border-radius: 10px;
   background: var(--c-white);
-  font-weight: 750;
+  font-weight: 650;
   color: var(--c-cyan-45-4);
   cursor: pointer;
 }
@@ -5016,9 +5001,7 @@ td {
   background: var(--c-gray-100-2);
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
+  font-weight: 650;
 }
 .sterilization-workspace .ster-work-row {
   min-width: 1280px;
@@ -5119,12 +5102,13 @@ td {
 }
 
 /* Set and single-tool receipt lists share one predictable six-column table. The state column speaks only of a
-   problem and «Αναφορά» is an icon button: the name gets the room. */
+   problem and «Αναφορά» is an icon button: the name gets the room. Small minimum widths, so the six columns fit the
+   receipt window on a tablet too (the report button was cut off). */
 .receipt-tool-columns,
 .receipt-verification-row {
   display: grid;
   grid-template-columns:
-    minmax(92px, 0.7fr) minmax(90px, 0.7fr) minmax(240px, 2.2fr) minmax(110px, 0.85fr) minmax(80px, 0.6fr)
+    minmax(80px, 0.7fr) minmax(70px, 0.7fr) minmax(150px, 2.2fr) minmax(80px, 0.85fr) minmax(60px, 0.6fr)
     36px !important;
   gap: 12px;
   align-items: center;
@@ -5411,7 +5395,7 @@ td {
   display: block;
   color: inherit;
   text-decoration: none;
-  font-weight: 800;
+  font-weight: 650;
 }
 .ster-asset-name:hover,
 .ster-code:hover {
@@ -5537,7 +5521,7 @@ td {
 .sterilization-workspace .ster-asset-name {
   font-size: 13px;
   line-height: 1.15;
-  font-weight: 800;
+  font-weight: 650;
 }
 .sterilization-workspace .ster-cell-text strong {
   font-size: 11.5px;
@@ -6075,13 +6059,13 @@ td {
   border-radius: 9px;
   background: var(--c-white);
   padding: 8px 14px;
-  font-weight: 650;
+  font-weight: 600;
   color: var(--c-blue-25);
   cursor: pointer;
 }
 .sync-status {
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
   white-space: nowrap;
   border-radius: 999px;
   padding: 4px 10px;
@@ -6188,7 +6172,7 @@ td {
 }
 .handover-signature-label {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--c-cyan-40-5);
 }
 .handover-signature-row {
@@ -6225,7 +6209,7 @@ td {
   background: transparent;
   color: var(--c-cyan-40);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .app-spinner.inline {
@@ -6255,7 +6239,7 @@ td {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.12);
   color: var(--c-white);
-  font-weight: 800;
+  font-weight: 650;
   font-size: 12px;
   cursor: pointer;
 }
@@ -6279,7 +6263,7 @@ td {
   background: none;
   font: inherit;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-35-2);
   cursor: pointer;
 }
@@ -6322,7 +6306,7 @@ td {
   align-items: center;
   gap: 3px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 11px;
 }
 .batch-set-tools li button {

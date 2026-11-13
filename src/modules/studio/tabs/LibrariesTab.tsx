@@ -174,9 +174,20 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                     </div>
                   </div>
                 ))}
-                {!filteredItems.length && (
-                  <div className="studio-empty">{L('Δεν βρέθηκαν εγγραφές.', 'No records found.')}</div>
-                )}
+                {/* A search that finds nothing says so; an empty list shows what goes in it and adds the first. */}
+                {!filteredItems.length &&
+                  (query.trim() ? (
+                    <div className="studio-empty">{L('Δεν βρέθηκαν εγγραφές.', 'No records found.')}</div>
+                  ) : (
+                    <div className="studio-empty studio-empty-start">
+                      <currentMeta.icon size={22} aria-hidden="true" />
+                      <strong>{L('Καμία εγγραφή ακόμα', 'No records yet')}</strong>
+                      <span>{L(currentMeta.hintEl, currentMeta.hintEn)}</span>
+                      <AppButton variant="primary" icon={<Plus size={15} />} onClick={() => setNewItem(true)}>
+                        {L('Νέα εγγραφή', 'New record')}
+                      </AppButton>
+                    </div>
+                  ))}
               </div>
             </section>
           )}

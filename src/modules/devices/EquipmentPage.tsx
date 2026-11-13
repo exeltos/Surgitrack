@@ -364,7 +364,7 @@ export default function EquipmentPage() {
     <div className="devices-page equipment-page">
       {!opened && (
         <PageHeader
-          eyebrow={L('ΚΕΝΤΡΙΚΗ ΑΠΟΣΤΕΙΡΩΣΗ', 'CENTRAL STERILE SERVICES')}
+          eyebrow={L('Κεντρική Αποστείρωση', 'Central sterile services')}
           title={L('Κλίβανοι & Συσκευές', 'Sterilizers & Devices')}
           description={
             rows.length === 0

@@ -48,7 +48,7 @@ function Choice<T extends string>({
   return (
     <div className="notice-choice-group">
       <span className="notice-choice-label">{label}</span>
-      <div className="notice-choice" role="radiogroup" aria-label={label}>
+      <div className="notice-choice notice-segments" role="radiogroup" aria-label={label}>
         {options.map(option => (
           <button
             key={option.id}
@@ -57,14 +57,17 @@ function Choice<T extends string>({
             aria-checked={value === option.id}
             disabled={option.disabled}
             className={value === option.id ? 'on' : ''}
+            title={option.hint}
             onClick={() => onChange(option.id)}
           >
-            <i className="notice-dot" aria-hidden="true" />
-            <b>{option.title}</b>
-            {option.hint && <small>{option.hint}</small>}
+            {option.title}
           </button>
         ))}
       </div>
+      {/* What the chosen option does, once, under the switch (each option says it on hover too). */}
+      {options.find(o => o.id === value)?.hint && (
+        <small className="notice-choice-hint">{options.find(o => o.id === value)!.hint}</small>
+      )}
     </div>
   );
 }
@@ -471,13 +474,6 @@ export default function NoticeComposer({
             </label>
           </div>
         </fieldset>
-
-        <div className="notice-footer">
-          <p role="alert">{problem || uploadError}</p>
-          <AppButton type="submit" variant="primary" icon={<Plus size={16} />} disabled={!ready}>
-            {L('Δημοσίευση', 'Publish')}
-          </AppButton>
-        </div>
       </div>
 
       <aside className="notice-preview" aria-label={L('Προεπισκόπηση', 'Preview')}>
@@ -528,6 +524,12 @@ export default function NoticeComposer({
             <span>{message.trim() || L('Το μήνυμα θα εμφανιστεί εδώ.', 'The message will show here.')}</span>
           </div>
         )}
+        <div className="notice-footer notice-preview-publish">
+          <p role="alert">{problem || uploadError}</p>
+          <AppButton type="submit" variant="primary" icon={<Plus size={16} />} disabled={!ready}>
+            {L('Δημοσίευση', 'Publish')}
+          </AppButton>
+        </div>
       </aside>
     </form>
   );

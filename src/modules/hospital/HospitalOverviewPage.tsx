@@ -319,7 +319,7 @@ export default function HospitalOverviewPage() {
   return (
     <div className="hospital-overview dash">
       <PageHeader
-        eyebrow={L('ΠΙΝΑΚΑΣ ΕΛΕΓΧΟΥ', 'DASHBOARD')}
+        eyebrow={L('Πίνακας ελέγχου', 'Dashboard')}
         title={L('Επισκόπηση', 'Overview')}
         description={L(
           'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',

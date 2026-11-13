@@ -8,6 +8,7 @@ import {
   Compass,
   FlaskConical,
   Home,
+  KeyRound,
   LogOut,
   Menu,
   Pin,
@@ -19,9 +20,9 @@ import {
   Eye,
   Undo2,
   WifiOff,
+  Trash2,
 } from 'lucide-react';
 import BrandMark from './BrandMark';
-import RecycleBinIcon from './RecycleBinIcon';
 import {isExpired} from '../../core/recycleBin';
 import {useShellNotifications} from './useShellNotifications';
 import {navSectionFor, navigationFor, navigationGroupLabel, ownerNavigation} from '../../config/navigation';
@@ -59,6 +60,7 @@ import {formatDate, formatTime} from '../../core/displayDate';
 
 // The user manual is loaded only when first opened.
 import NotificationPanel from './NotificationPanel';
+import ChangePasswordDialog from './ChangePasswordDialog';
 import OwnerDemoAlerts from './OwnerDemoAlerts';
 import {enterPlatformDemo} from '../../data/cloud/platformDemo';
 import {tellUser} from '../ui/confirmService';
@@ -142,10 +144,13 @@ export default function AppShell({
   // The menu is open (pinned) or a thin rail of icons; the choice stays on this device.
   const [pinned, setPinned] = useState(() => {
     try {
-      return window.localStorage.getItem('surgitrack-menu-pinned') !== 'no';
+      const saved = window.localStorage.getItem('surgitrack-menu-pinned');
+      if (saved) return saved !== 'no';
     } catch {
-      return true;
+      // Private mode: fall back to the screen size.
     }
+    // No choice yet: on a tablet or a small laptop the menu starts as the thin rail, so the page keeps its width.
+    return !window.matchMedia?.('(max-width: 1280px)').matches;
   });
   const togglePinned = () => {
     const next = !pinned;
@@ -190,6 +195,23 @@ export default function AppShell({
   const navigate = useGuardedNavigate();
   const leave = useLeave();
   const logout = onLogout && (() => leave(() => onLogout()));
+  // The person's own menu under their initials (top right): closes on a click elsewhere or Escape.
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!accountOpen) return;
+    const away = (e: MouseEvent) => {
+      if (!accountRef.current?.contains(e.target as Node)) setAccountOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setAccountOpen(false);
+    document.addEventListener('mousedown', away);
+    window.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      window.removeEventListener('keydown', esc);
+    };
+  }, [accountOpen]);
   // From the screen lock the user already chose to sign in as someone else: no second question.
   const switchUser = onLogout && (() => leave(() => onLogout(true)));
   const location = useLocation();
@@ -369,19 +391,18 @@ export default function AppShell({
           })}
       </nav>
       {binItem && (
-        // The recycle bin sits at the bottom right of the menu, as an icon: full when something was deleted.
+        // The recycle bin is the last entry of the menu, at its foot, with how many deleted items it holds.
         <NavLink
           to="/bin"
           end
           onClick={() => setMobileOpen(false)}
-          className={location.pathname === '/bin' ? 'sidebar-bin active' : 'sidebar-bin'}
+          className={location.pathname === '/bin' ? 'nav-item sidebar-bin active' : 'nav-item sidebar-bin'}
           aria-label={`${binLabel}${binCount ? ` · ${binCount}` : ''}`}
           title={binLabel}
         >
-          <span className="sidebar-bin-icon">
-            <RecycleBinIcon full={binCount > 0} />
-            {binCount > 0 && <em>{binCount}</em>}
-          </span>
+          <Trash2 size={18} />
+          <span className="nav-label">{binLabel}</span>
+          {binCount > 0 && <em className="nav-badge muted">{binCount}</em>}
         </NavLink>
       )}
       <div className="sidebar-foot">
@@ -534,9 +555,46 @@ export default function AppShell({
                 />
               )}
             </div>
-            <div className="avatar" title={signedInName}>
-              {initialsOf(signedInName)}
+            {/* The initials open the person's own menu: who is signed in, and the change of their password. */}
+            <div className="account-menu-wrap" ref={accountRef}>
+              <button
+                type="button"
+                className="avatar account-menu-btn"
+                title={signedInName}
+                aria-haspopup="menu"
+                aria-expanded={accountOpen}
+                aria-label={tr('Ο λογαριασμός μου')}
+                onClick={() => setAccountOpen(v => !v)}
+              >
+                {initialsOf(signedInName)}
+              </button>
+              {accountOpen && (
+                <div className="account-menu" role="menu">
+                  <div className="account-menu-who">
+                    <b>{signedInName}</b>
+                    {(getRealIdentity()?.departmentName || currentUser.department) && (
+                      <small>{getRealIdentity()?.departmentName || currentUser.department}</small>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      setPasswordOpen(true);
+                    }}
+                  >
+                    <KeyRound size={16} /> {tr('Αλλαγή κωδικού')}
+                  </button>
+                  {logout && (
+                    <button type="button" role="menuitem" onClick={logout}>
+                      <LogOut size={16} /> {lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
+            {passwordOpen && <ChangePasswordDialog onClose={() => setPasswordOpen(false)} />}
             <button className="icon-btn" onClick={logout} title={lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}>
               <LogOut size={17} />
             </button>

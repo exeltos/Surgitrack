@@ -169,6 +169,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           )}
           {queue === 'WASHING' && washing.length > 0 && (
             <>
+              <span className="ster-hint">{tr('Επιλέξτε τι μπαίνει στο πλυντήριο και φορτώστε τα μαζί.')}</span>
               <button
                 className="ster-pick-all"
                 onClick={() => setLeft(pickedKeys.length === rows.length ? new Set(rows.map(keyOf)) : new Set())}
@@ -194,6 +195,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           )}
           {queue === 'PROCESS' && processing.length > 0 && (
             <>
+              <span className="ster-hint">{tr('Επιλέξτε τι μπαίνει στον κλίβανο και φορτώστε τα σε έναν κύκλο.')}</span>
               <button
                 className="ster-pick-all"
                 onClick={() => setLeft(pickedKeys.length === rows.length ? new Set(rows.map(keyOf)) : new Set())}
@@ -213,9 +215,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             <span className="ster-hint">{tr('Προαιρετικός έλεγχος ασφαλούς αποθήκευσης πριν την παράδοση.')}</span>
           )}
           {queue === 'READY' && ready.length > 0 && (
-            <button className="primary compact" onClick={() => openDeliveryBatch()}>
-              <ScanBarcode size={15} /> {tr('Μαζική παράδοση')}
-            </button>
+            <>
+              <span className="ster-hint">{tr('Παράδοση στο τμήμα με υπογραφή του παραλήπτη.')}</span>
+              <button className="primary compact" onClick={() => openDeliveryBatch()}>
+                <ScanBarcode size={15} /> {tr('Μαζική παράδοση')}
+              </button>
+            </>
           )}
           {queue === 'RELEASE' && (
             <>

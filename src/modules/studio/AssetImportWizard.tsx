@@ -61,9 +61,10 @@ export default function AssetImportWizard({asPage = false, ...props}: Props) {
             <b>{organizations[0].name}</b>
           </div>
         ) : (
-          <label className="asset-import-hospital">
+          <label className={`asset-import-hospital${organizationId ? '' : ' needs-choice'}`}>
             {L('Νοσοκομείο', 'Hospital')}
             <select
+              className="studio-org-select"
               value={organizationId}
               disabled={step !== 'FILE' || Boolean(busy)}
               onChange={e => {

@@ -173,7 +173,7 @@ export default function SetContents({
                       <span className="group-disclosure">
                         {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                       </span>
-                      {groupHasIssue && <IssueDot label={tr('Υπάρχει αναφορά')} />}
+                      {groupHasIssue && <IssueDot label={tr('Εκκρεμότητα')} />}
                     </div>
                   </button>
                   {open && (
@@ -202,7 +202,7 @@ export default function SetContents({
                             <div className="set-tool-state">
                               <MemberMarker tool={tool} set={set} />
                               {tool.state !== set.state && <StatusBadge value={tool.state} />}
-                              {hasIssue && <IssueDot label={tr('Ανοικτή αναφορά')} />}
+                              {hasIssue && <IssueDot label={tr('Εκκρεμότητα')} />}
                             </div>
                           </Link>
                         );
@@ -235,7 +235,7 @@ export default function SetContents({
                   <div className="set-tool-state">
                     <MemberMarker tool={tool} set={set} />
                     {tool.state !== set.state && <StatusBadge value={tool.state} />}
-                    {hasIssue && <IssueDot label={tr('Ανοικτή αναφορά')} />}
+                    {hasIssue && <IssueDot label={tr('Εκκρεμότητα')} />}
                   </div>
                 </Link>
               );
@@ -261,9 +261,9 @@ function UsesCell({tool}: {tool: Tool}) {
   );
 }
 
-/** A small red dot for an instrument with an open issue (the words are its tooltip). */
+/** An instrument with an open issue: a small red chip that says so. */
 function IssueDot({label}: {label: string}) {
-  return <i className="issue-dot" role="img" title={label} aria-label={label} />;
+  return <span className="issue-chip">{label}</span>;
 }
 
 /** In the Set's composition: an instrument whose color differs from the Set's, or that has none. */

@@ -94,8 +94,7 @@
   padding: 0 12px;
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-weight: 650;
 }
 .people-rows {
   display: grid;
@@ -106,7 +105,7 @@
   background: var(--c-white);
 }
 .people-row code {
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.5px;
   color: var(--c-cyan-45);
 }
@@ -135,7 +134,7 @@
   color: var(--c-cyan-45);
   font-size: 11px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 650;
 }
 .people-value {
   min-width: 0;
@@ -406,7 +405,7 @@
   gap: 6px;
   color: var(--st-muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   align-items: flex-start;
   min-height: 32px;
   line-height: 1.25;
@@ -414,7 +413,7 @@
 .dash-kpi strong {
   color: var(--c-cyan-20);
   font-size: 34px;
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -545,7 +544,7 @@
 }
 .dash-dept-name {
   overflow: hidden;
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -567,7 +566,7 @@
   min-height: 20px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .dash-pill.bad {
   background: var(--c-gray-95-2);
@@ -683,7 +682,7 @@
   color: #9a5a00;
   font-size: 13px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 650;
   text-align: center;
 }
 .dash-triage li.bad > a > em {
@@ -729,24 +728,32 @@ html body .dash-dept-name {
   font-size: 13px;
 }
 html body .hospital-admin .hospital-people > .hospital-tabs,
-html body .hospital-admin .hospital-people > .hospital-notice {
+html body .hospital-admin .hospital-people > .hospital-notice,
+html body .studio-users-panel .hospital-people > .hospital-tabs,
+html body .studio-users-panel .hospital-people > .hospital-notice {
   flex: 0 0 auto;
 }
-html body .hospital-admin .hospital-people > section.hospital-card {
+html body .hospital-admin .hospital-people > section.hospital-card,
+html body .studio-users-panel .hospital-people > section.hospital-card {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
-html body .hospital-admin .hospital-people > section.hospital-card > * {
+html body .hospital-admin .hospital-people > section.hospital-card > *,
+html body .studio-users-panel .hospital-people > section.hospital-card > * {
   flex: 0 0 auto;
 }
 /* The list takes the card's remaining height and scrolls (also as the card's own child, e.g. Departments). */
 html body .hospital-admin .hospital-people .hospital-rows,
 html body .hospital-admin .hospital-people .people-rows,
 html body .hospital-admin .hospital-people > section.hospital-card > .hospital-rows,
-html body .hospital-admin .hospital-people > section.hospital-card > .people-rows {
+html body .hospital-admin .hospital-people > section.hospital-card > .people-rows,
+html body .studio-users-panel .hospital-people .hospital-rows,
+html body .studio-users-panel .hospital-people .people-rows,
+html body .studio-users-panel .hospital-people > section.hospital-card > .hospital-rows,
+html body .studio-users-panel .hospital-people > section.hospital-card > .people-rows {
   flex: 1 1 auto;
   /* Rows keep their own height: a short list does not stretch them to fill the card. */
   align-content: start;
@@ -791,9 +798,6 @@ html body .people-head span {
   white-space: nowrap;
 }
 /* Users list: column names in sentence case, as on the other lists. */
-html body .people-head {
-  text-transform: none;
-}
 html body .hospital-tabs .hospital-count {
   white-space: nowrap;
 }
@@ -806,7 +810,7 @@ html body .dash-more {
   color: var(--c-cyan-35);
   font: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -936,10 +940,12 @@ html body .dash-more {
   html body .people-requests > header small {
     display: none;
   }
-  html body .hospital-admin .hospital-people > section.hospital-card {
+  html body .hospital-admin .hospital-people > section.hospital-card,
+  html body .studio-users-panel .hospital-people > section.hospital-card {
     overflow-y: auto;
   }
-  html body .hospital-admin .hospital-people .people-rows {
+  html body .hospital-admin .hospital-people .people-rows,
+  html body .studio-users-panel .hospital-people .people-rows {
     flex: 0 0 auto;
     overflow: visible;
   }
@@ -1084,7 +1090,7 @@ html body .department-home .dash-latest > .dash-list {
 }
 .department-home .dash-bar-name {
   overflow: hidden;
-  font-weight: 700;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1138,8 +1144,6 @@ html body .department-home .dash-activity .dash-columns {
 .promo-card small {
   color: var(--st-muted);
   font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .promo-card h3 {
   margin: 2px 0 4px;
@@ -1159,7 +1163,7 @@ html body .department-home .dash-activity .dash-columns {
   border-radius: 9px;
   background: var(--st-teal);
   color: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .promo-card .promo-cta:focus-visible {
@@ -1203,8 +1207,6 @@ html body .department-home .dash-activity .dash-columns {
 .promo-popup-body small {
   color: var(--st-muted);
   font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .promo-popup-body h2 {
   margin: 0;
@@ -1232,7 +1234,7 @@ html body .department-home .dash-activity .dash-columns {
   border-radius: 10px;
   background: var(--st-teal);
   color: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -1262,7 +1264,7 @@ html body .department-home .dash-activity .dash-columns {
   border-radius: 10px;
   background: var(--c-white);
   color: var(--c-cyan-20-3);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .promo-card .promo-file {
@@ -1278,7 +1280,7 @@ html body .department-home .dash-activity .dash-columns {
   border: 1px solid var(--c-gray-90-2);
   border-radius: 9px;
   background: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -1384,4 +1386,139 @@ html body .hospital-people .people-requests {
 /* The department's latest movements: no clock on every row; the route on its own line, whole. */
 html body .dash-list li.dash-movement {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* Overview, Sterilization flow: rows of a steady height with a divider and a hover, instead of eight rows stretched
+   to fill the card with wide gaps between them. */
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .hospital-overview .dash-card .dash-bars {
+    grid-auto-rows: minmax(30px, 42px);
+    gap: 0;
+  }
+}
+html body .hospital-overview .dash-flow .dash-bar {
+  padding: 0 6px;
+  border-radius: 8px;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .hospital-overview .dash-flow .dash-bar:last-child {
+  border-bottom: 0;
+}
+html body .hospital-overview .dash-flow .dash-bar:hover {
+  background: var(--c-gray-95);
+}
+html body .hospital-overview .dash-flow .dash-bar-track {
+  height: 10px;
+}
+
+/* Department Home on a computer or tablet: the six figures as one low row, the number beside its label, so the
+   cards below get the height. */
+@media (min-width: 901px) {
+  html body .department-home .dash-kpis {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  html body .department-home .dash-kpi {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label value'
+      'note value';
+    align-items: center;
+    column-gap: 8px;
+    min-height: 0;
+    padding: 9px 14px;
+    border-radius: 12px;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .department-home .dash-kpi:hover {
+    border-color: var(--c-cyan-65);
+    box-shadow: 0 6px 16px rgba(24, 56, 74, 0.08);
+  }
+  html body .department-home .dash-kpi-label {
+    grid-area: label;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html body .department-home .dash-kpi strong {
+    grid-area: value;
+    font-size: 24px;
+    line-height: 1;
+  }
+  html body .department-home .dash-kpi small {
+    grid-area: note;
+    overflow: hidden;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Lists inside a card fade out at the foot instead of cutting a line in half: the fade says there is more to
+   scroll to, and the last entry can scroll clear of it. */
+html body .department-home .dash-attention > .dash-list,
+html body .department-home .dash-latest > .dash-list,
+html body .hospital-overview .dash-activity > .dash-list,
+html body .hospital-overview .dash-attention > .dash-list {
+  padding-bottom: 22px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+}
+
+/* Users (hospital admin and owner): one list with dividers instead of a box per person; the username grey and
+   small, so the person's name leads; the column names in sentence case. */
+html body .people-rows {
+  gap: 0;
+}
+html body .people-row {
+  min-height: 52px;
+  border: 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  border-radius: 8px;
+}
+html body .people-row:last-child {
+  border-bottom: 0;
+}
+html body .people-row:hover:not(:disabled) {
+  background: var(--c-gray-100-2);
+}
+html body .people-row code {
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+html body .people-head {
+  text-transform: none;
+}
+/* A signup request: the name at the size of a list name, not a heading. */
+html body .hospital-request-who strong {
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Owner › Users: the hospital picker in the style of the other filters. */
+html body select.studio-org-select {
+  height: 38px;
+  min-width: 240px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b7480' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 12px center;
+  color: var(--c-cyan-20);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+html body select.studio-org-select:hover {
+  border-color: var(--c-cyan-65);
 }

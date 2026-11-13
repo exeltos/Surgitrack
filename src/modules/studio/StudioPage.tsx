@@ -112,7 +112,7 @@ export default function StudioPage() {
           <span className="eyebrow">
             {platformAdmin
               ? L('ΔΙΑΧΕΙΡΙΣΗ ΠΛΑΤΦΟΡΜΑΣ', 'PLATFORM ADMINISTRATION')
-              : L('ΡΥΘΜΙΣΕΙΣ ΝΟΣΟΚΟΜΕΙΟΥ', 'HOSPITAL SETTINGS')}
+              : L('Ρυθμίσεις νοσοκομείου', 'Hospital settings')}
           </span>
           <h1>{section ? L(section.el, section.en) : 'SurgiTrack Studio'}</h1>
           <p>
@@ -205,7 +205,7 @@ export default function StudioPage() {
             </button>
           </div>
         )}
-        {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide /> : <RolesTab s={s} />}
+        {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide owner={platformAdmin} /> : <RolesTab s={s} />}
         <SystemTab s={s} />
         <ErrorsTab s={s} />
         <SecurityTab s={s} />

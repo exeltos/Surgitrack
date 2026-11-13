@@ -1,4 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "jsr:@supabase/functions-js@2/edge-runtime.d.ts";
 import {createClient, type SupabaseClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith, SITE} from "../_shared/http.ts";
 import {esc, layout, sendEmail} from "../_shared/mail.ts";

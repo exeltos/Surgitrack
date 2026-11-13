@@ -21,7 +21,7 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
       {prepManageTool && prepDraft && (
         <div className="nested-modal-backdrop" onMouseDown={closePrepManage}>
           <div className="tool-issue-card prep-manage-card" onMouseDown={e => e.stopPropagation()}>
-            <span className="eyebrow">{tr('ΔΙΑΧΕΙΡΙΣΗ ΕΡΓΑΛΕΙΟΥ')}</span>
+            <span className="eyebrow">{tr('Διαχείριση εργαλείου')}</span>
             <h3>
               {prepManageTool.barcode} · {prepManageTool.name}
             </h3>

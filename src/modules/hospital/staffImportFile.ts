@@ -91,6 +91,14 @@ const ROLE_WORDS: Array<[StaffRole, string[]]> = [
   ['DEPARTMENT', ['ΤΜΗΜΑ', 'ΧΡΗΣΤΗΣ ΤΜΗΜΑΤΟΣ', 'DEPARTMENT', 'ΝΟΣΗΛΕΥΤΗΣ', 'ΝΟΣΗΛΕΥΤΡΙΑ']],
 ];
 
+/** A department name or code that means the Central Sterilization (CSSD) itself. */
+export function isSterilizationName(value: string) {
+  const key = fold(value);
+  return (
+    /(^|\s)(ΚΕΝΤΡΙΚΗ\s+)?ΑΠΟΣΤΕΙΡΩΣΗ(Σ)?(\s|$)/.test(key) || /(^|\s)(CSSD|STERILIZATION|STERILISATION)(\s|$)/.test(key)
+  );
+}
+
 /** The hospital's department a cell names: by name or code, then by a name that starts or contains it (only if one does). */
 export function matchDepartment(given: string, departments: Array<{id: string; name: string; code: string | null}>) {
   const key = fold(given);
@@ -135,8 +143,16 @@ export function parseStaffSheet(
     const phone = cell(row, cols.phone);
     const email = cell(row, cols.email).toLowerCase();
     const roleGiven = fold(cell(row, cols.role));
-    const role = roleGiven ? (ROLE_WORDS.find(([, words]) => words.includes(roleGiven))?.[0] ?? null) : 'DEPARTMENT';
     const departmentId = matchDepartment(departmentGiven, departments);
+    // Without a role, a person of the Sterilization department works in Sterilization: as a department user they
+    // would see only that department's own Sets, which is none, and every stage would look empty.
+    const department = departments.find(d => d.id === departmentId);
+    const inSterilization = [departmentGiven, department?.name ?? '', department?.code ?? ''].some(isSterilizationName);
+    const role = roleGiven
+      ? (ROLE_WORDS.find(([, words]) => words.includes(roleGiven))?.[0] ?? null)
+      : inSterilization
+        ? 'STERILIZATION'
+        : 'DEPARTMENT';
     const problems: string[] = [];
     if (!name || !NAME.test(name)) problems.push('name');
     if (!role) problems.push('role');

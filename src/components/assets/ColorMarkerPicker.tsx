@@ -66,7 +66,7 @@ export default function ColorMarkerPicker({
       <div className="color-picker-modal" role="dialog" aria-modal="true">
         <header>
           <div>
-            <span className="eyebrow">{tr('ΧΡΩΜΑΤΙΚΟΣ ΜΑΡΤΥΡΑΣ')}</span>
+            <span className="eyebrow">{tr('Χρωματικός μάρτυρας')}</span>
             <h2>{title}</h2>
           </div>
         </header>

@@ -42,7 +42,7 @@ export default function PrintPreviewModal({
       <div className={`print-preview-modal${compact ? ' compact' : ''}`}>
         <header>
           <div>
-            <span className="eyebrow">{tr('ΠΡΟΕΠΙΣΚΟΠΗΣΗ')}</span>
+            <span className="eyebrow">{tr('Προεπισκόπηση')}</span>
             <h2>{title}</h2>
           </div>
         </header>

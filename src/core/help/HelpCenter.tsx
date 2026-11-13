@@ -2,19 +2,41 @@ import '../../styles/help-center.css';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {
+  BarChart3,
   BookOpen,
+  Building2,
+  CalendarClock,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   FileDown,
+  FileSpreadsheet,
+  Flame,
+  History,
+  Hospital,
+  IdCard,
   Info,
+  Layers3,
+  LayoutDashboard,
   LifeBuoy,
   Mail,
+  Repeat,
+  Rocket,
+  ScanSearch,
+  Scissors,
   Search,
+  Settings2,
   ShieldCheck,
   Sparkles,
+  SpellCheck,
+  Trash2,
+  TriangleAlert,
+  Warehouse,
+  Wrench,
   X,
+  type LucideIcon,
 } from 'lucide-react';
+import {navigationGroupLabel, type NavigationGroup} from '../../config/navigation';
 import {useSurgi} from '../../store/SurgiStore';
 import {useAppPreferences} from '../AppPreferences';
 import {APP_VERSION, SUPPORT_CONTACT} from '../../config/appMeta';
@@ -33,22 +55,20 @@ const ui = {
     search: 'Αναζήτηση στο εγχειρίδιο...',
     searchGlossary: 'Αναζήτηση ορολογίας...',
     roleGuide: 'Εγχειρίδιο προσαρμοσμένο στον ρόλο σας',
-    sections: 'ΕΝΟΤΗΤΕΣ ΓΙΑ ΤΟΝ ΡΟΛΟ ΣΑΣ',
+    sections: 'Ενότητες για τον ρόλο σας',
     glossary: 'Ορολογία',
     whatsNew: 'Τι νέο υπάρχει',
     about: 'Σχετικά / Έκδοση',
     version: 'Έκδοση',
-    userGuide: 'ΟΔΗΓΟΣ ΧΡΗΣΗΣ',
-    currentScreen: 'ΤΡΕΧΟΥΣΑ ΟΘΟΝΗ',
+    userGuide: 'Οδηγός χρήσης',
+    currentScreen: 'Τρέχουσα οθόνη',
     forRole: 'Αφορά',
-    chapter: 'ΚΕΦΑΛΑΙΟ',
     howTo: 'Πώς το χρησιμοποιώ',
     beforeFinish: 'Έλεγχος πριν ολοκληρώσετε',
     goodPractice: 'Καλή πρακτική',
-    roleAware: 'Προσαρμοσμένο στον λογαριασμό σας',
-    roleAwareBody: 'Βλέπετε μόνο ενότητες στις οποίες ο ρόλος και τα δικαιώματά σας δίνουν πρόσβαση.',
-    previous: 'Προηγούμενο',
-    next: 'Επόμενο',
+    previous: 'Προηγούμενη ενότητα',
+    next: 'Επόμενη ενότητα',
+    firstSteps: 'Πρώτα βήματα',
     related: 'Σχετικές ενότητες',
     openScreen: 'Άνοιγμα οθόνης',
     glossaryTitle: 'Όροι της εφαρμογής',
@@ -83,22 +103,20 @@ const ui = {
     search: 'Search the user guide...',
     searchGlossary: 'Search terminology...',
     roleGuide: 'User guide tailored to your role',
-    sections: 'SECTIONS AVAILABLE TO YOUR ROLE',
+    sections: 'Sections available to your role',
     glossary: 'Glossary',
     whatsNew: "What's new",
     about: 'About / Version',
     version: 'Version',
-    userGuide: 'USER GUIDE',
-    currentScreen: 'CURRENT SCREEN',
+    userGuide: 'User guide',
+    currentScreen: 'Current screen',
     forRole: 'For',
-    chapter: 'CHAPTER',
     howTo: 'How to use it',
     beforeFinish: 'Check before you finish',
     goodPractice: 'Good practice',
-    roleAware: 'Tailored to your account',
-    roleAwareBody: 'You see only the sections your role and permissions give you access to.',
-    previous: 'Previous',
-    next: 'Next',
+    previous: 'Previous section',
+    next: 'Next section',
+    firstSteps: 'First steps',
     related: 'Related sections',
     openScreen: 'Open screen',
     glossaryTitle: 'Application terms',
@@ -130,6 +148,62 @@ const ui = {
 
 type Mode = 'manual' | 'news' | 'glossary' | 'about' | 'support' | 'pdf';
 
+/** The manual's sections in the groups of the app's own menu, each with the icon of its menu entry. */
+const SECTION_GROUP: Record<string, NavigationGroup | 'START'> = {
+  '/start': 'START',
+  '/start-admin': 'START',
+  '/asset-card': 'START',
+  '/overview': 'WORK',
+  '/department': 'WORK',
+  '/sterilization': 'WORK',
+  '/sterilizers': 'WORK',
+  '/issues': 'WORK',
+  '/replacements': 'WORK',
+  '/expiry': 'WORK',
+  '/sets': 'EQUIPMENT',
+  '/tools': 'EQUIPMENT',
+  '/standalone-tools': 'EQUIPMENT',
+  '/stock': 'EQUIPMENT',
+  '/tools/names': 'EQUIPMENT',
+  '/traceability': 'INSIGHT',
+  '/reports': 'INSIGHT',
+  '/movements': 'INSIGHT',
+  '/hospital': 'ADMIN',
+  '/hospitals': 'ADMIN',
+  '/studio': 'ADMIN',
+  '/import': 'ADMIN',
+  '/bin': 'ADMIN',
+};
+const GROUP_ORDER: Array<NavigationGroup | 'START'> = ['START', 'WORK', 'EQUIPMENT', 'INSIGHT', 'ADMIN'];
+const SECTION_ICON: Record<string, LucideIcon> = {
+  '/start': Rocket,
+  '/start-admin': Building2,
+  '/asset-card': IdCard,
+  '/overview': LayoutDashboard,
+  '/department': Layers3,
+  '/sterilization': Sparkles,
+  '/sterilizers': Flame,
+  '/issues': TriangleAlert,
+  '/replacements': Repeat,
+  '/expiry': CalendarClock,
+  '/sets': Layers3,
+  '/tools': Wrench,
+  '/standalone-tools': Scissors,
+  '/stock': Warehouse,
+  '/tools/names': SpellCheck,
+  '/traceability': ScanSearch,
+  '/reports': BarChart3,
+  '/movements': History,
+  '/hospital': Building2,
+  '/hospitals': Hospital,
+  '/studio': Settings2,
+  '/import': FileSpreadsheet,
+  '/bin': Trash2,
+};
+const groupOf = (to: string) => SECTION_GROUP[to] || 'ADMIN';
+const sortByGroup = (sections: ManualSection[]) =>
+  GROUP_ORDER.flatMap(group => sections.filter(s => groupOf(s.to) === group));
+
 /** Pages from which Set and instrument cards open. */
 const RECORD_LISTS = ['/department', '/tools', '/sets', '/standalone-tools', '/stock', '/sterilization'];
 
@@ -148,7 +222,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
   const tx = ui[L];
   const visible = useMemo(
     () =>
-      helpManual.filter(
+      sortByGroup(helpManual).filter(
         s =>
           (!s.permission || can(s.permission)) &&
           (s.detailOf
@@ -170,7 +244,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
       ? visible.find(s => s.to === '/replacements')
       : undefined) || sectionFor(pathname);
   const [selected, setSelected] = useState(() => (screenSection || visible[0])?.to || '');
-  const [chapter, setChapter] = useState(0);
   const [mode, setMode] = useState<Mode>('manual');
   // The PDF manuals are for the platform owner's own account only (not when viewing as a role, not in Demo).
   const owner = !!getRealIdentity()?.platform && getRuntimeDataMode() !== 'DEMO';
@@ -190,7 +263,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
   );
   const terms = glossary.filter(g => `${g.term} ${g.el} ${g.en}`.toLowerCase().includes(q));
   const current = visible.find(s => s.to === selected) || visible[0];
-  const currentChapter = current?.chapters[Math.min(chapter, current.chapters.length - 1)];
   const related = (current?.related || [])
     .map(to => visible.find(s => s.to === to))
     .filter((s): s is ManualSection => Boolean(s));
@@ -238,7 +310,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
   const select = (to: string) => {
     setMode('manual');
     setSelected(to);
-    setChapter(0);
     setQuery('');
   };
 
@@ -250,7 +321,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
           <div className="manual-brand">
             <span>S</span>
             <p>
-              <strong>SURGITRACK</strong>
+              <strong>SurgiTrack</strong>
               <small>{tx.guide}</small>
             </p>
           </div>
@@ -301,17 +372,30 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
             <div className="manual-side-label">{tx.sections}</div>
             <nav className="manual-nav">
               {filtered.length ? (
-                filtered.map(s => (
-                  <button
-                    key={s.to}
-                    className={selected === s.to && mode === 'manual' ? 'active' : ''}
-                    onClick={() => select(s.to)}
-                  >
-                    <BookOpen size={15} />
-                    <span>{s.title[L]}</span>
-                    <ChevronRight size={13} />
-                  </button>
-                ))
+                GROUP_ORDER.map(group => {
+                  const inGroup = filtered.filter(s => groupOf(s.to) === group);
+                  if (!inGroup.length) return null;
+                  return (
+                    <div className="manual-nav-group" key={group}>
+                      <div className="manual-nav-group-label">
+                        {group === 'START' ? tx.firstSteps : navigationGroupLabel[group][L === 'en' ? 1 : 0]}
+                      </div>
+                      {inGroup.map(s => {
+                        const Icon = SECTION_ICON[s.to] || BookOpen;
+                        return (
+                          <button
+                            key={s.to}
+                            className={selected === s.to && mode === 'manual' ? 'active' : ''}
+                            onClick={() => select(s.to)}
+                          >
+                            <Icon size={15} />
+                            <span>{s.title[L]}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })
               ) : (
                 <div className="manual-nav-empty">{tx.noResults}</div>
               )}
@@ -345,7 +429,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
             </div>
           </aside>
 
-          {mode === 'manual' && current && currentChapter && (
+          {mode === 'manual' && current && (
             <main className="manual-article">
               <div className="manual-breadcrumb">
                 {tx.userGuide}
@@ -382,26 +466,14 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                   <ChevronRight size={14} />
                 </button>
               )}
-              <div className="manual-chapter-tabs" role="tablist" aria-label={current.title[L]}>
-                {current.chapters.map((c, i) => (
-                  <button
-                    key={c[L][0]}
-                    role="tab"
-                    aria-selected={chapter === i}
-                    className={chapter === i ? 'active' : ''}
-                    onClick={() => setChapter(i)}
-                  >
-                    <span>{i + 1}</span>
-                    {c[L][0]}
-                  </button>
-                ))}
-              </div>
               <article className="manual-copy">
-                <span className="manual-step-label">
-                  {tx.chapter} {chapter + 1} / {current.chapters.length}
-                </span>
-                <h2>{currentChapter[L][0]}</h2>
-                <p>{currentChapter[L][1]}</p>
+                {/* Every chapter on one page: they are short, so no tabs and no «1 / 2» to click through. */}
+                {current.chapters.map(c => (
+                  <section className="manual-chapter" key={c[L][0]}>
+                    <h2>{c[L][0]}</h2>
+                    <p>{c[L][1]}</p>
+                  </section>
+                ))}
                 <section className="manual-detail-section">
                   <h3>{tx.howTo}</h3>
                   <ol>
@@ -438,13 +510,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                     </p>
                   </div>
                 )}
-                <div className="manual-role-note">
-                  <ShieldCheck size={17} />
-                  <p>
-                    <b>{tx.roleAware}</b>
-                    <span>{tx.roleAwareBody}</span>
-                  </p>
-                </div>
                 {related.length > 0 && (
                   <section className="manual-see-also" role="group" aria-label={tx.related}>
                     <b>{tx.related}</b>
@@ -458,21 +523,25 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
                     </div>
                   </section>
                 )}
+                {/* On to the section before or after, in the order of the list on the left. */}
                 <footer className="manual-chapter-footer">
-                  <button disabled={chapter === 0} onClick={() => setChapter(i => Math.max(0, i - 1))}>
-                    <ChevronLeft size={14} />
-                    {tx.previous}
-                  </button>
-                  <span>
-                    {chapter + 1} / {current.chapters.length}
-                  </span>
-                  <button
-                    disabled={chapter === current.chapters.length - 1}
-                    onClick={() => setChapter(i => Math.min(current.chapters.length - 1, i + 1))}
-                  >
-                    {tx.next}
-                    <ChevronRight size={14} />
-                  </button>
+                  {(() => {
+                    const at = visible.findIndex(s => s.to === current.to);
+                    const prev = visible[at - 1];
+                    const next = visible[at + 1];
+                    return (
+                      <>
+                        <button disabled={!prev} onClick={() => prev && select(prev.to)}>
+                          <ChevronLeft size={14} />
+                          {prev ? prev.title[L] : tx.previous}
+                        </button>
+                        <button disabled={!next} onClick={() => next && select(next.to)}>
+                          {next ? next.title[L] : tx.next}
+                          <ChevronRight size={14} />
+                        </button>
+                      </>
+                    );
+                  })()}
                 </footer>
               </article>
             </main>
@@ -480,7 +549,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
 
           {mode === 'glossary' && (
             <main className="manual-special">
-              <span className="manual-step-label">{tx.glossary.toUpperCase()}</span>
               <h1>{tx.glossaryTitle}</h1>
               <p>{tx.glossaryBody}</p>
               <div className="manual-glossary">
@@ -496,7 +564,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
 
           {mode === 'support' && (
             <main className="manual-special">
-              <span className="manual-step-label">{tx.support.toUpperCase()}</span>
               <h1>{tx.supportTitle}</h1>
               <p>{tx.supportBody}</p>
               <div className="manual-support-grid">
@@ -540,7 +607,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
 
           {mode === 'news' && (
             <main className="manual-special whats-new-help">
-              <span className="manual-step-label">SURGITRACK</span>
               <h1>{tx.whatsNew}</h1>
               <ReleaseHistory lang={L} can={can} />
             </main>
@@ -550,7 +616,6 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
 
           {mode === 'about' && (
             <main className="manual-special">
-              <span className="manual-step-label">SURGITRACK</span>
               <h1>{tx.aboutTitle}</h1>
               <p>{tx.purposeBody}</p>
               <div className="manual-about-grid">

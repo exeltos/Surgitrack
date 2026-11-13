@@ -180,7 +180,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
       <main className="auth-main">
         <section className="auth-intro">
           <BrandMark className="auth-logo" />
-          <span className="auth-eyebrow">{L('ΕΓΓΡΑΦΗ ΠΡΟΣΩΠΙΚΟΥ', 'STAFF SIGNUP')}</span>
+          <span className="auth-eyebrow">{L('Εγγραφή προσωπικού', 'Staff signup')}</span>
           <h1>{info?.organization_name || 'SurgiTrack'}</h1>
           <p className="auth-product-subtitle">
             {L(
@@ -204,7 +204,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                   <p>{L('Επιβεβαίωση email…', 'Confirming your email…')}</p>
                 ) : typeof confirmed === 'object' && confirmed.emailChange !== undefined ? (
                   <>
-                    <span className="auth-eyebrow">{L('ΤΟ EMAIL ΕΠΙΒΕΒΑΙΩΘΗΚΕ', 'EMAIL CONFIRMED')}</span>
+                    <span className="auth-eyebrow">{L('Το email επιβεβαιώθηκε', 'Email confirmed')}</span>
                     <h2>{L('Το email σύνδεσης άλλαξε', 'Your sign-in email was changed')}</h2>
                     <p>
                       {L(
@@ -215,7 +215,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                   </>
                 ) : typeof confirmed === 'object' ? (
                   <>
-                    <span className="auth-eyebrow">{L('ΤΟ EMAIL ΕΠΙΒΕΒΑΙΩΘΗΚΕ', 'EMAIL CONFIRMED')}</span>
+                    <span className="auth-eyebrow">{L('Το email επιβεβαιώθηκε', 'Email confirmed')}</span>
                     <h2>{L('Αναμονή έγκρισης', 'Awaiting approval')}</h2>
                     <p>
                       {L(
@@ -275,7 +275,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
                 <div className="auth-status-icon">
                   <Clock3 size={24} />
                 </div>
-                <span className="auth-eyebrow">{L('Η ΕΓΓΡΑΦΗ ΟΛΟΚΛΗΡΩΘΗΚΕ', 'SIGNED UP')}</span>
+                <span className="auth-eyebrow">{L('Η εγγραφή ολοκληρώθηκε', 'Signed up')}</span>
                 <h2>
                   {done.confirm
                     ? L('Ελέγξτε το email σας', 'Check your email')
@@ -311,7 +311,7 @@ export default function JoinPage({token, confirm = false}: {token: string; confi
               <>
                 <div className="auth-card-title">
                   <div>
-                    <span className="auth-eyebrow">{L('ΝΕΟΣ ΛΟΓΑΡΙΑΣΜΟΣ', 'NEW ACCOUNT')}</span>
+                    <span className="auth-eyebrow">{L('Νέος λογαριασμός', 'New account')}</span>
                     <h2>{L('Εγγραφή', 'Sign up')}</h2>
                     {expires && (
                       <p>{L(`Ο σύνδεσμος ισχύει έως ${expires}.`, `This link is valid until ${expires}.`)}</p>

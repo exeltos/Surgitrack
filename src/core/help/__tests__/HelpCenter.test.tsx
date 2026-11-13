@@ -33,12 +33,12 @@ describe('Help Center', () => {
       <HelpCenter onClose={() => {}} screens={['/department', '/issues', '/movements']} />,
     );
     expect(screen.getByRole('heading', {level: 1, name: 'Σετ & Εργαλεία τμήματος'})).toBeInTheDocument();
-    expect(screen.getByText('ΤΡΕΧΟΥΣΑ ΟΘΟΝΗ')).toBeInTheDocument();
+    expect(screen.getByText('Τρέχουσα οθόνη')).toBeInTheDocument();
     expect(screen.queryByText('SurgiTrack Studio')).not.toBeInTheDocument();
     expect(screen.queryByText('Stock εργαλείων')).not.toBeInTheDocument();
   });
 
-  it('moves between chapters, shows the glossary and closes', () => {
+  it('shows every chapter on one page, moves to the next section, shows the glossary and closes', () => {
     const onClose = vi.fn();
     setup('ADMIN', '/tools', <HelpCenter onClose={onClose} screens={['/overview', '/tools', '/sets', '/reports']} />);
     expect(screen.getByRole('heading', {level: 1, name: 'Εργαλεία'})).toBeInTheDocument();
@@ -47,8 +47,15 @@ describe('Help Center', () => {
     fireEvent.click(within(related).getByRole('button', {name: /Σετ εργαλείων/}));
     expect(screen.getByRole('heading', {level: 1, name: 'Σετ εργαλείων'})).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', {name: /^Εργαλεία$/})[0]);
-    fireEvent.click(screen.getByRole('button', {name: /Επόμενο/}));
+    // Every chapter is on the page at once: no chapter tabs to click through.
     expect(screen.getByRole('heading', {level: 2, name: 'Τύπος χρήσης'})).toBeInTheDocument();
+    // The footer goes on to the next section of the list.
+    const footer = document.querySelector('.manual-chapter-footer') as HTMLElement;
+    const buttons = within(footer).getAllByRole('button');
+    const next = buttons[buttons.length - 1];
+    const nextTitle = next.textContent || '';
+    fireEvent.click(next);
+    expect(screen.getByRole('heading', {level: 1, name: nextTitle})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: 'Ορολογία'}));
     expect(screen.getByText('Όριο χρήσεων')).toBeInTheDocument();
     fireEvent.keyDown(window, {key: 'Escape'});

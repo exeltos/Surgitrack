@@ -51,7 +51,6 @@ const copy = {
       'Σάρωση barcode από το κινητό',
       'Δικαιώματα ανά ρόλο · ασφαλής πρόσβαση',
     ],
-    heroChips: ['Υπογραφές παράδοσης', 'Ιστορικό ανά εργαλείο', 'Αναφορές ημέρας'],
     login: 'Σύνδεση',
     register: 'Εγγραφή',
     forgot: 'Ξέχασα τον κωδικό',
@@ -60,7 +59,6 @@ const copy = {
     email: 'Email',
     loginId: 'Κωδικός χρήστη',
     loginPlaceholder: 'π.χ. AF2741',
-    loginHint: 'Ο κωδικός χρήστη σας: 2 γράμματα και 4 ψηφία. Δεν είναι το email σας.',
     password: 'Κωδικός πρόσβασης',
     forgotLink: 'Ξέχασα τον κωδικό μου',
     signIn: 'Σύνδεση',
@@ -111,7 +109,6 @@ const copy = {
       'Barcode scanning from the phone',
       'Rights by role · secure access',
     ],
-    heroChips: ['Handover signatures', 'History per instrument', 'Daily reports'],
     login: 'Sign in',
     register: 'Register',
     forgot: 'Forgot password',
@@ -120,7 +117,6 @@ const copy = {
     email: 'Email',
     loginId: 'User ID',
     loginPlaceholder: 'e.g. AF2741',
-    loginHint: 'Your user ID: 2 letters and 4 digits. It is not your email.',
     password: 'Password',
     forgotLink: 'Forgot my password',
     signIn: 'Sign in',
@@ -405,11 +401,6 @@ export default function AuthIndex({
             </li>
           ))}
         </ul>
-        <div className="auth-hero-chips">
-          {t.heroChips.map(chip => (
-            <span key={chip}>{chip}</span>
-          ))}
-        </div>
       </aside>
       <div className="auth-side">
         <header className="auth-topbar">
@@ -453,7 +444,6 @@ export default function AuthIndex({
                           placeholder={t.loginPlaceholder}
                         />
                       </div>
-                      <small className="auth-field-hint">{t.loginHint}</small>
                     </label>
                     <label>
                       {t.password}
@@ -531,7 +521,7 @@ export default function AuthIndex({
                       <span className="auth-eyebrow">
                         {firstPasswordChange
                           ? lang === 'el'
-                            ? 'ΠΡΩΤΗ ΣΥΝΔΕΣΗ'
+                            ? 'Πρώτη σύνδεση'
                             : 'FIRST SIGN-IN'
                           : lang === 'el'
                             ? 'ΑΣΦΑΛΕΙΑ ΛΟΓΑΡΙΑΣΜΟΥ'

@@ -1,4 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "jsr:@supabase/functions-js@2/edge-runtime.d.ts";
 import {createClient, type SupabaseClient} from "jsr:@supabase/supabase-js@2";
 import {corsFor, jsonWith, SITE} from "../_shared/http.ts";
 import {esc, layout, sendEmail} from "../_shared/mail.ts";
@@ -101,7 +101,8 @@ Deno.serve(async req => {
     if (error) throw error;
     const now = Date.now();
     const done = {ending: 0, ended: 0, deleted: 0, failed: 0};
-    for (const d of (demos || []) as DemoRow[]) {
+    // Without generated database types the client types the many-to-one embed as an array; PostgREST returns one object.
+    for (const d of (demos || []) as unknown as DemoRow[]) {
       const step = plan(d, now);
       if (!step) continue;
       try {

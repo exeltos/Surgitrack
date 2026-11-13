@@ -7,9 +7,9 @@
 .studio-users-panel {
   display: flex !important;
   flex-direction: column !important;
-  height: auto !important;
-  min-height: 100%;
-  overflow: visible !important;
+  height: 100% !important;
+  min-height: 0;
+  overflow: hidden !important;
 }
 .roles-guide {
   padding: 4px 2px 24px;
@@ -29,10 +29,8 @@
   align-items: start;
 }
 .roles-guide-head {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--muted);
   border-bottom: 1px solid var(--line, var(--c-gray-90-2));
 }
@@ -43,6 +41,16 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+/* The one line for whoever approves people, under the title. */
+.roles-guide header p {
+  max-width: 900px;
+  margin: 0 0 4px;
+  color: var(--st-muted);
+  font-size: 13px;
 }
 .platform-private-demo-actions .platform-demo-reset {
   margin-left: auto;
@@ -66,7 +74,7 @@
   display: grid;
   gap: 5px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--st-muted, var(--c-cyan-55));
 }
 .asset-import-steps {
@@ -81,7 +89,7 @@
   gap: 8px;
   color: var(--st-muted, var(--c-cyan-55));
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-import-steps li.active {
   border-color: var(--st-teal, var(--c-cyan-45));
@@ -312,7 +320,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   background: var(--st-canvas, var(--c-gray-95));
   color: var(--st-muted, var(--c-cyan-55));
 }
@@ -338,7 +346,7 @@
 .studio-plan legend {
   margin-bottom: 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .studio-plan label {
   display: flex !important;
@@ -368,7 +376,7 @@
 }
 .studio-trial-length > span {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 @media (max-width: 900px) {
   .studio-users-panel > .studio-panel-head {
@@ -421,9 +429,6 @@
     display: none;
   }
   html body .studio-body-workflow .studio-release-policy > header span {
-    display: none;
-  }
-  html body .studio-body-workflow .studio-workflow-policy span {
     display: none;
   }
   html body .studio-body-workflow .studio-release-policy-grid > label {
@@ -514,10 +519,17 @@
   display: block;
   margin-top: 8px;
   color: #3f7d56;
-  font-weight: 700;
+  font-weight: 600;
 }
 .studio-users-panel .hospital-people {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 0 16px 16px;
+}
+.studio-users-panel > .studio-panel-head {
+  flex: 0 0 auto;
 }
 
 /* The platform owner's start page in Studio. */
@@ -534,12 +546,12 @@
 .owner-kpi span {
   color: var(--c-cyan-45-2);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
+/* Icon, name and number on one low line, as on the department's Home. */
 .owner-kpi strong {
-  grid-column: 1 / -1;
   color: var(--c-cyan-20-2);
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1;
 }
 .owner-kpi.warn {
@@ -576,7 +588,7 @@
 .owner-card h2 {
   margin: 2px 0 0;
   color: var(--c-cyan-20-2);
-  font-size: 18px;
+  font-size: 15px;
 }
 .owner-count {
   min-width: 30px;
@@ -584,7 +596,7 @@
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--c-cyan-45);
-  font-weight: 800;
+  font-weight: 650;
   text-align: center;
 }
 .owner-count.warn {
@@ -765,7 +777,7 @@
 .asset-import-guide td:last-child,
 .asset-import-guide th:last-child {
   text-align: right;
-  font-weight: 800;
+  font-weight: 650;
 }
 .asset-import-guide td.blank {
   color: #a3b1ba;
@@ -773,7 +785,7 @@
 .asset-import-guide tr.set-a td:first-child {
   box-shadow: inset 3px 0 0 var(--c-cyan-60);
   background: var(--c-gray-95);
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-import-guide ul {
   display: grid;
@@ -864,7 +876,7 @@
   margin: 0 0 4px;
   color: var(--c-cyan-20);
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
@@ -879,7 +891,6 @@
   display: block;
   margin: 0 0 2px;
   font-size: 11px;
-  letter-spacing: 0.12em;
 }
 /* Studio density: one-line header, slimmer tabs and library list. */
 html body .studio-head {
@@ -966,7 +977,7 @@ html body .owner-hospitals > header {
   text-align: left;
   color: var(--st-muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .owner-hospitals td {
   padding: 8px 12px;
@@ -983,7 +994,7 @@ html body .owner-hospitals > header {
   background: var(--c-gray-95-8);
   color: var(--c-green-45);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .owner-status.warn {
   background: var(--c-amber-95);
@@ -999,7 +1010,7 @@ html body .owner-hospitals > header {
 }
 .owner-missing {
   color: var(--c-orange-50);
-  font-weight: 700;
+  font-weight: 600;
 }
 .owner-hospitals td.owner-none {
   padding: 14px 12px;
@@ -1009,7 +1020,7 @@ html body .owner-hospitals > header {
   display: grid;
   gap: 6px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-50);
 }
 .sterilizer-batch-style > div {
@@ -1032,7 +1043,7 @@ html body .sterilizer-batch-style label.on {
   color: var(--c-cyan-50);
 }
 .sterilizer-batch-preview > span {
-  font-weight: 700;
+  font-weight: 600;
 }
 .sterilizer-batch-preview ul {
   display: flex;
@@ -1072,16 +1083,70 @@ html body .sterilizer-batch-style label.on {
   background: var(--c-gray-95-3);
   color: var(--c-cyan-35);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+}
+/* A yes/no setting: a switch in the place of the list. */
+html body .studio-setting-switch {
+  gap: 10px;
+  min-height: 38px;
+  border-color: transparent;
+  background: none;
+  cursor: pointer;
+}
+html body .studio-setting-switch > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+html body .studio-setting-switch > span {
+  position: relative;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--c-gray-85-3);
+  transition: background 0.18s;
+}
+html body .studio-setting-switch > span::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: left 0.18s;
+}
+html body .studio-setting-switch > input:checked + span {
+  background: #3b8798;
+}
+html body .studio-setting-switch > input:checked + span::after {
+  left: 19px;
+}
+html body .studio-setting-switch > input:focus-visible + span {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 2px;
+}
+html body .studio-setting-switch > b {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+  font-weight: 500;
 }
 html body .studio-setting-input select {
   flex: 1 1 auto;
   width: 100%;
   min-height: 36px;
-  padding: 0 4px;
+  padding: 0 28px 0 4px;
   border: 0;
   outline-offset: 2px;
-  background: transparent;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b7480' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 4px center;
+  appearance: none;
+  cursor: pointer;
   color: var(--c-cyan-20);
   font-size: 14px;
 }
@@ -1112,7 +1177,7 @@ html body .studio-errors-head {
 html body .studio-errors-actions {
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: center;
 }
 html body .studio-errors-failed {
   color: var(--st-red);
@@ -1147,15 +1212,24 @@ html body .studio-security-table td small {
   display: block;
   color: var(--st-muted);
 }
-html body .studio-security-table tr.blocked {
-  background: var(--st-red-soft, var(--c-gray-95-2));
+/* A user on a blocked address: a red bar at the row's start and a badge by the address, not a pink row. */
+html body .studio-security-table tr.blocked > td:first-child {
+  box-shadow: inset 3px 0 0 var(--st-red);
 }
 html body .studio-security-me {
   align-self: center;
   color: var(--st-muted);
 }
 html body .studio-security-flag {
+  display: inline-block;
+  width: max-content;
+  margin-top: 2px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--st-red-soft, var(--c-gray-95-2));
   color: var(--st-red);
+  font-size: 11px;
+  font-weight: 600;
 }
 html body .studio-security-actions {
   display: flex;
@@ -1178,6 +1252,9 @@ html body .studio-security-title {
 html body .studio-security-title h3 {
   margin: 0;
   margin-right: auto;
+  color: var(--c-cyan-20);
+  font-size: 15px;
+  font-weight: 600;
 }
 html body .studio-security-title small {
   color: var(--st-muted);
@@ -1231,17 +1308,23 @@ html body .studio-security-blocked small {
   display: block;
   color: var(--st-muted);
 }
+/* Errors and published notices: one list with dividers, not a box per entry. */
 html body .studio-errors-list {
   display: grid;
-  gap: 8px;
+  gap: 0;
   margin: 0;
   padding: 0;
-  list-style: none;
-}
-html body .studio-errors-list > li {
+  overflow: hidden;
   border: 1px solid var(--st-line);
   border-radius: 12px;
   background: var(--c-white);
+  list-style: none;
+}
+html body .studio-errors-list > li {
+  border-bottom: 1px solid var(--c-gray-95);
+}
+html body .studio-errors-list > li:last-child {
+  border-bottom: 0;
 }
 html body .studio-error-row {
   display: grid;
@@ -1266,7 +1349,18 @@ html body .studio-error-main {
   min-width: 0;
 }
 html body .studio-error-main b {
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 500;
   overflow-wrap: anywhere;
+}
+html body .studio-error-row:hover {
+  background: var(--c-gray-100-2);
+}
+html body .studio-errors-note {
+  align-self: center;
+  color: var(--st-muted);
+  font-size: 12px;
 }
 html body .studio-error-count {
   display: grid;
@@ -1348,9 +1442,7 @@ html body .studio-tab-row {
 }
 html body .studio-tab-group {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: var(--st-muted);
 }
 html body .studio-tab-row .studio-tabs {
@@ -1439,7 +1531,7 @@ html body .studio-ratings-kpis > .attention {
 }
 html body .studio-ratings-kpis span {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--st-muted);
 }
 html body .studio-ratings-kpis strong {
@@ -1475,10 +1567,6 @@ html body .studio-ratings .studio-errors-actions select {
   border-radius: 10px;
   background: var(--c-white);
   font: inherit;
-}
-/* Studio: column names in sentence case, as on the other lists. */
-html body .studio-list-head {
-  text-transform: none;
 }
 /* Studio: «Πραγματικά δεδομένα» / «Demo» is a small label, not something to press. */
 html body .studio-health {
@@ -1536,7 +1624,7 @@ html body .platform-here {
   padding: 0 10px;
   color: var(--st-muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 /* Hospitals list: the code and counts under a name meet the contrast ratio (the lighter cyan did not). */
@@ -1641,9 +1729,7 @@ html body .evaluation-demo-row-fact {
 html body .evaluation-demo-row-fact small {
   color: var(--c-violet-45);
   font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 600;
 }
 html body .evaluation-demo-row-fact b {
   color: var(--c-blue-15);
@@ -1829,7 +1915,7 @@ html body .ratings-part-row {
   cursor: pointer;
 }
 html body .ratings-part-title {
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .ratings-part-row b {
   color: var(--c-amber-50);
@@ -1898,7 +1984,7 @@ html body .studio-notice-kind {
   color: var(--c-orange-40);
   font-size: 11px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Studio › Ειδοποιήσεις: the form in three parts with a preview beside it (tabs/NoticeComposer.tsx). */
@@ -1918,7 +2004,7 @@ html body .notice-form {
 }
 html body .notice-block {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
   margin: 0;
   padding: 16px 18px 18px;
@@ -1931,7 +2017,7 @@ html body .notice-block-title {
   padding-bottom: 8px;
   border-bottom: 1px solid var(--c-gray-90-3);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--st-teal);
 }
 html body .notice-block label {
@@ -1939,7 +2025,7 @@ html body .notice-block label {
   gap: 6px;
   min-width: 0;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-gray-15);
 }
 html body .notice-block label small,
@@ -1978,11 +2064,9 @@ html body .notice-choice-group {
   gap: 6px;
 }
 html body .notice-choice-label {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--st-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c-gray-15);
 }
 html body .notice-picture {
   display: grid;
@@ -2005,7 +2089,7 @@ html body .notice-picture-row button {
   border: 1px solid var(--c-gray-90-2);
   border-radius: 9px;
   background: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .notice-picture-pick {
@@ -2092,7 +2176,7 @@ html body .notice-orgs-bar button {
   border: 1px solid var(--c-gray-90-2);
   border-radius: 9px;
   background: var(--c-white);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .notice-orgs-bar span {
@@ -2141,9 +2225,8 @@ html body .notice-preview {
 }
 html body .notice-preview h3 {
   margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--st-muted);
 }
 html body .notice-preview .notice-preview-who {
@@ -2180,6 +2263,54 @@ html body .notice-preview .maintenance-strip {
   }
 }
 
+/* Ειδοποιήσεις: each choice is a compact two-way switch (half the height of the old option cards); what the chosen
+   option does is the line under it. */
+html body .notice-composer .notice-segments {
+  display: inline-flex;
+  grid-template-columns: none;
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+  padding: 3px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+}
+html body .notice-composer .notice-segments button {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--c-gray-15);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+html body .notice-composer .notice-segments button.on {
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgba(24, 56, 74, 0.16);
+  color: var(--st-teal);
+  font-weight: 600;
+}
+html body .notice-choice-hint {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+/* «Δημοσίευση» under the preview, which stays in view while the form scrolls. */
+html body .notice-preview-publish {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--c-gray-90-3);
+}
+html body .notice-preview-publish p:empty {
+  display: none;
+}
+
 /* Ειδοποιήσεις: the form is taller than the screen, so the tab scrolls inside the page. */
 html body .studio-body-notices {
   min-height: 0;
@@ -2212,7 +2343,7 @@ html body .studio-flow-modules-list em {
   grid-row: 1 / span 2;
   align-self: center;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--st-green, #2f7d57);
 }
 html body .studio-flow-modules-list > li.off {
@@ -2298,7 +2429,7 @@ html body .settings-category {
   color: var(--st-muted);
   font: inherit;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 650;
   cursor: pointer;
 }
 html body .settings-category:hover {
@@ -2337,7 +2468,7 @@ html body .studio-body-workflow .studio-workflow-page[data-group='FEATURES'] .st
 }
 html body .studio-flow-modules-list > li b {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-20-3);
 }
 html body .studio-flow-modules-list small {
@@ -2384,7 +2515,7 @@ html body .studio-fact em i {
   color: var(--c-cyan-20-3);
   font-size: 12px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
 }
 @media (max-width: 760px) {
   html body .studio-system-grid > section > .studio-fact {
@@ -2465,12 +2596,6 @@ html body .settings-categories {
   backdrop-filter: blur(4px);
 }
 
-/* Roles: a padlock instead of a long badge on every locked row, and a line that says what it means. */
-html body .studio-permission-lock {
-  padding: 4px 6px;
-  gap: 0;
-}
-
 /* A setting whose control is a button (the barcode label): laid out as the other rows, below a line. */
 html body .studio-system-grid > section > .studio-setting-row {
   display: grid;
@@ -2543,7 +2668,7 @@ html body .asset-import-head > .asset-import-hospital {
   align-items: center;
   gap: 10px;
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Ratings: small figures on one line, as over the lists (the detail on hover); the Demo list in the size of
@@ -2602,9 +2727,20 @@ html body .platform-contact-fields {
   grid-column: 2;
   grid-row: 1 / -1;
   display: grid;
-  gap: 6px;
+  align-content: start;
+  gap: 8px;
 }
-html body .platform-contact-fields > input {
+html body .platform-contact-field {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+}
+html body .platform-contact-field > span {
+  color: var(--st-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+html body .platform-contact-field > input {
   height: 38px;
   padding: 0 12px;
   border: 1px solid var(--border);
@@ -2617,12 +2753,12 @@ html body .platform-contact-fields > input {
 }
 html body .platform-contact .platform-contact-status {
   color: var(--c-green-35);
-  font-weight: 700;
+  font-weight: 600;
 }
 
-/* Readable contrast (WCAG AA): the «ΒΑΣΙΚΟ» mark of the core stages and the text of the protected-core note. */
+/* Readable contrast (WCAG AA): the «Βασικό» mark of the core stages and the text of the protected-core note. */
 html body .workflow-core-chip {
-  color: var(--c-green-35);
+  color: var(--c-cyan-30);
 }
 html body .studio-role-security-banner span {
   color: var(--c-cyan-30);
@@ -2644,17 +2780,27 @@ html body .studio-security-table td.studio-security-hospital {
   max-width: 170px;
 }
 
-/* Security, connected now: four columns and two square buttons (the name on hover), nothing cut at the right. */
+/* Security, connected now: the address in plain dark mono (the person's name leads), and two small buttons that say
+   what they do; on a narrow screen they keep their icon only (the name on hover). */
 html body .studio-security-table td b {
   font-weight: 600;
 }
-html body .studio-security-table .studio-security-icon {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  justify-content: center;
+html body .studio-security-table td b.mono {
+  color: var(--c-gray-15);
+  font-weight: 500;
+}
+html body .studio-security-table .studio-security-action {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  html body .studio-security-table .studio-security-action {
+    width: 32px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
 }
 html body .studio-security-table td:last-child {
   width: 1%;
@@ -2688,7 +2834,9 @@ html body .studio-security-card .studio-security-blocked > li:last-child {
   border-bottom: 0;
 }
 html body .studio-security-card .studio-security-blocked b.mono {
+  color: var(--c-gray-15);
   font-size: 13px;
+  font-weight: 500;
 }
 
 /* Roles: the role list and the permissions take the height left under the tabs, so their bottom edge is never
@@ -2702,5 +2850,81 @@ html body .studio-security-card .studio-security-blocked b.mono {
     flex: 1 1 auto;
     height: auto;
     min-height: 0;
+  }
+}
+
+/* Evaluation Demos: «Νέο Demo αξιολόγησης» and «⋯» on the right, as «Νέο νοσοκομείο» on Hospitals. */
+.platform-demo-toolbar {
+  justify-content: flex-end;
+}
+
+/* Import, in Studio: the page title already says what it is, so the explanation under it goes; the hospital is the
+   first thing to choose, its picker in the style of the other filters and outlined until one is chosen; the file
+   area stays faded until then. */
+html body .studio-body-import .asset-import-head p {
+  display: none;
+}
+html body .asset-import-head > .asset-import-hospital {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}
+html body .asset-import-hospital.needs-choice .studio-org-select {
+  border-color: var(--c-cyan-45);
+  box-shadow: 0 0 0 3px rgba(21, 90, 110, 0.12);
+}
+html body .asset-import-drop.disabled {
+  opacity: 0.6;
+}
+/* The four steps as one compact line: number and name, a short connector, not stretched to the full width. */
+html body .asset-import-steps {
+  gap: 0;
+}
+html body .asset-import-steps li {
+  flex: 0 0 auto;
+  min-width: 0;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 12.5px;
+}
+html body .asset-import-steps li:not(:last-child)::after {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 1.5px;
+  margin: 0 10px;
+}
+html body .asset-import-steps li span {
+  width: 22px;
+  height: 22px;
+  border-width: 1.5px;
+  font-size: 11.5px;
+}
+
+/* Ειδοποιήσεις: the list of published notices under the form, headed by its title and «Ανανέωση». */
+.studio-notices-listhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+.studio-notices-listhead h2 {
+  margin: 0;
+  color: var(--c-cyan-20);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Αξιολογήσεις: the Demo picker on the left and «Ανανέωση» on the right of one toolbar. */
+html body .studio-ratings-toolbar {
+  flex: 1 1 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+/* On a narrow screen the four steps wrap onto a second line instead of scrolling sideways. */
+@media (max-width: 760px) {
+  html body .asset-import-steps {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    overflow: visible;
   }
 }

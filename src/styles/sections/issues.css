@@ -10,7 +10,7 @@ html body .issues-fixed .row-sub {
 }
 html body .issues-fixed a.issue-asset {
   color: inherit;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 html body .issues-fixed a.issue-asset:hover {
@@ -105,21 +105,39 @@ html body .issues-fixed .issue-note-inline {
   border-color: var(--c-cyan-45);
 }
 .quick-filters button.active {
-  border-color: rgba(21, 90, 110, 0.6);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(21, 90, 110, 0.2));
+  border-color: rgba(21, 90, 110, 0.55);
+  background: rgba(21, 90, 110, 0.08);
   color: var(--c-cyan-20);
-  font-weight: 750;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 0 0 1px rgba(21, 90, 110, 0.15),
-    0 3px 12px rgba(21, 90, 110, 0.2);
-  backdrop-filter: blur(6px);
+  font-weight: 650;
+  box-shadow: inset 0 0 0 1px rgba(21, 90, 110, 0.35);
+}
+/* On a phone the tiles keep their whole label and the row scrolls sideways, instead of four tiles cut to "Ό…". */
+@media (max-width: 700px) {
+  .quick-filters {
+    flex-shrink: 0;
+    overflow-x: auto;
+    margin-inline: -2px;
+    padding: 2px;
+    scrollbar-width: none;
+  }
+  .quick-filters::-webkit-scrollbar {
+    display: none;
+  }
+  .quick-filters button {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+  .quick-filters b {
+    font-size: 15px;
+  }
 }
 .quick-filters b {
   flex: 0 0 auto;
   color: var(--c-blue-15-2);
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 650;
 }
 .quick-filters b.warn {
   color: var(--c-orange-45-3);
@@ -129,4 +147,44 @@ html body .issues-fixed .issue-note-inline {
 }
 .quick-filters b.good {
   color: var(--c-green-40-3);
+}
+
+/* The kind of a report as a small coloured chip (damage/loss red, wear amber, missing violet, other grey), and how
+   long an open issue has waited instead of «Ανοικτή» on every row: grey, amber after a week. */
+html body .issues-fixed .row-sub > span + span::before {
+  content: ' · ';
+}
+html body .issue-type-chip {
+  display: inline-block;
+  margin-right: 2px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+html body .issue-type-chip.bad {
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red);
+}
+html body .issue-type-chip.warn {
+  background: var(--c-amber-95);
+  color: var(--c-orange-40);
+}
+html body .issue-type-chip.missing {
+  background: var(--c-gray-95-9);
+  color: var(--c-violet-30);
+}
+html body .issue-type-chip.neutral {
+  background: var(--c-gray-95);
+  color: var(--c-cyan-30);
+}
+html body .issue-age {
+  color: var(--st-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+html body .issue-age.old {
+  color: var(--c-orange-40);
 }

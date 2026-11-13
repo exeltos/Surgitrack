@@ -167,6 +167,21 @@ export default function TraceabilityPage() {
       });
     return [...seen.values()];
   })();
+  // An empty search offers the Sets and instruments that moved last: one click opens their trail.
+  const recentlyMoved = (() => {
+    if (needle) return [];
+    const seen = new Set<string>();
+    const out: Array<{item: SetAsset | Tool; at: string; status: string}> = [];
+    for (const m of [...movements].sort((a, b) => time(b.at) - time(a.at))) {
+      const code = barcodeOf(m);
+      if (seen.has(code)) continue;
+      seen.add(code);
+      const item = all.find(x => x.barcode === code);
+      if (item) out.push({item, at: m.at, status: m.status});
+      if (out.length === 8) break;
+    }
+    return out;
+  })();
   const traceTable = (): ExportTable => ({
     title: tr('Ιχνηλάτηση · {0}', q.trim()),
     subtitle: tr('{0} κινήσεις', related.length),
@@ -194,7 +209,7 @@ export default function TraceabilityPage() {
     <div className={tab === 'HISTORY' ? 'trace-with-history' : undefined}>
       <div className="page-head">
         <div>
-          <span className="eyebrow">{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</span>
+          <span className="eyebrow">{tr('Ιχνηλασιμότητα')}</span>
           <h1>{tr('Ιχνηλάτηση')}</h1>
           <p>{tr('Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός).')}</p>
         </div>
@@ -477,7 +492,39 @@ export default function TraceabilityPage() {
               )}
             </div>
           ) : (
-            <p className="trace-hint">{tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}</p>
+            <>
+              <p className="trace-hint">{tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}</p>
+              {recentlyMoved.length > 0 && (
+                <section className="trace-recently" aria-label={tr('Κινήθηκαν πρόσφατα')}>
+                  <h3>{tr('Κινήθηκαν πρόσφατα')}</h3>
+                  <div className="trace-recently-grid">
+                    {recentlyMoved.map(({item, at, status}) => {
+                      const itemIsSet = sets.some(x => x.id === item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          className="trace-recently-card"
+                          onClick={() => {
+                            setQ(item.barcode);
+                            remember(item.barcode);
+                          }}
+                        >
+                          <AssetTypeIcon kind={itemIsSet ? 'SET' : 'TOOL'} framed size={15} />
+                          <span>
+                            <strong>{item.name}</strong>
+                            <small>
+                              <span className="mono">{item.barcode}</span> · {movementText(status)}
+                            </small>
+                            <small>{at}</small>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+            </>
           )}
         </>
       )}

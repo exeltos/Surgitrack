@@ -12,7 +12,7 @@ export default function SignupLinkDrawer({s}: {s: PeopleState}) {
           <aside className="studio-drawer">
             <header>
               <div>
-                <span className="eyebrow">{L('ΠΡΟΣΚΛΗΣΗ', 'INVITATION')}</span>
+                <span className="eyebrow">{L('Πρόσκληση', 'Invitation')}</span>
                 <h2>{L('Σύνδεσμος εγγραφής', 'Signup link')}</h2>
               </div>
             </header>

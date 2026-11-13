@@ -381,15 +381,15 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
                     <i>{trData(m.to)}</i>
                   </span>
                   <span>
-                    <mark className="movement-chip" title={movementText(m.status)}>
+                    <span className="ledger-action" title={movementText(m.status)}>
                       {movementText(m.status)}
-                    </mark>
+                    </span>
                     {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                   </span>
                   <span className="ledger-user">
                     <UserRound size={15} />
                     <span>
-                      <b>{trData(m.by)}</b>
+                      <b title={trData(m.by)}>{trData(m.by)}</b>
                       {accountDiffers(m.by, accountOf(m)) && (
                         <small className="ledger-account-differs">{tr('Λογαριασμός: {0}', accountOf(m) || '')}</small>
                       )}

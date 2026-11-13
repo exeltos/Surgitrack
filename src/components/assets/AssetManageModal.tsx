@@ -218,7 +218,7 @@ export default function AssetManageModal({
       <div className="asset-manage-modal" role="dialog" aria-modal="true">
         <header>
           <div>
-            <span className="eyebrow">{kind === 'TOOL' ? tr('ΔΙΑΧΕΙΡΙΣΗ ΕΡΓΑΛΕΙΟΥ') : tr('ΔΙΑΧΕΙΡΙΣΗ ΣΕΤ')}</span>
+            <span className="eyebrow">{kind === 'TOOL' ? tr('Διαχείριση εργαλείου') : tr('ΔΙΑΧΕΙΡΙΣΗ ΣΕΤ')}</span>
             <h2>
               <span className="mono">{asset.barcode}</span> · {asset.name}
             </h2>

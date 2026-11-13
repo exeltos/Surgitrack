@@ -31,7 +31,7 @@ export default function ConvertDemoDialog({
       <aside className="studio-drawer" aria-label={tr('Μετατροπή σε πελάτη')}>
         <header>
           <div>
-            <span className="eyebrow">{tr('DEMO ΑΞΙΟΛΟΓΗΣΗΣ')}</span>
+            <span className="eyebrow">{tr('Demo αξιολόγησης')}</span>
             <h2>{tr('Μετατροπή σε πελάτη')}</h2>
           </div>
         </header>

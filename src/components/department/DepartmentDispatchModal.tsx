@@ -79,7 +79,7 @@ export default function DepartmentDispatchModal({
       <div className="asset-modal department-send-modal">
         <header>
           <div>
-            <span className="eyebrow">{tr('ΗΛΕΚΤΡΟΝΙΚΗ ΠΡΟΩΘΗΣΗ')}</span>
+            <span className="eyebrow">{tr('Ηλεκτρονική προώθηση')}</span>
             <h2>{tr('Αποστολή προς Αποστείρωση')}</h2>
             <p>
               {barcode} · {name}

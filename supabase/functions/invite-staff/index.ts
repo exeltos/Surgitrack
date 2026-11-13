@@ -1,4 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import "jsr:@supabase/functions-js@2/edge-runtime.d.ts";
 import {createClient, type SupabaseClient} from "jsr:@supabase/supabase-js@2";
 import {grantAccess, roleName, type Grant} from "../_shared/grantAccess.ts";
 import {corsFor, jsonWith} from "../_shared/http.ts";

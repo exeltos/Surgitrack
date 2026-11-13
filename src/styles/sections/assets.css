@@ -102,7 +102,20 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+}
+/* The colour field on one line like the others: «Χωρίς χρώμα» as a value, where it comes from small and grey
+   after it (cut with «…» if the card is narrow), the colour button at the end. */
+html body .asset-workbench-sidebar .asset-marker-field dd > .color-marker-empty {
+  overflow: hidden;
+  min-width: 0;
+  color: inherit;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .asset-workbench-sidebar .asset-marker-field dd > .color-marker-empty small {
+  color: var(--st-muted);
+  font-weight: 500;
 }
 .color-mode-choices {
   display: grid;
@@ -197,8 +210,6 @@
 }
 .new-barcode-swap small {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 .new-barcode-swap b {
   font-size: 18px;
@@ -253,7 +264,7 @@
   background: none;
   color: var(--st-teal, var(--c-cyan-45));
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -428,6 +439,32 @@ html body .photo-viewer .icon-button {
     flex: 1 1 0;
     min-width: 0;
   }
+  /* Search, Filters and Download on one line on a phone: the two buttons show their icon only (the label stays for
+     screen readers), so Download no longer drops to a line of its own under the search. */
+  html body .asset-filter-bar:has(.action-menu):not(:has(.export-day)) {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  html body .asset-filter-bar:has(.action-menu):not(:has(.export-day)) .asset-filter-search {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  /* With the «Κατάσταση» day picker too, the search takes its own line and the buttons sit below it. */
+  html body .asset-filter-bar:has(.export-day) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  html body .asset-filter-bar:has(.export-day) .asset-filter-search {
+    flex: 1 1 100%;
+  }
+  html body .asset-filter-bar .action-menu-toggle {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  html body .asset-filter-bar .action-menu-toggle .action-menu-caret {
+    display: none;
+  }
+  html body .asset-filter-bar .action-menu-toggle > span,
   html body .asset-filter-bar .asset-filter-toggle[aria-pressed] span {
     position: absolute;
     width: 1px;
@@ -505,7 +542,7 @@ html body .usage-correct button:disabled {
   background: var(--c-gray-95);
   color: var(--st-muted);
   font-size: 12.5px;
-  font-weight: 650;
+  font-weight: 600;
   white-space: nowrap;
   clip-path: polygon(
     0 0,
@@ -532,7 +569,7 @@ html body .usage-correct button:disabled {
 .asset-lifecycle-steps li.current {
   background: var(--c-cyan-20);
   color: var(--c-white);
-  font-weight: 800;
+  font-weight: 650;
 }
 .asset-lifecycle-next {
   display: flex;
@@ -545,13 +582,12 @@ html body .usage-correct button:disabled {
 }
 .asset-lifecycle-next b {
   color: var(--st-muted);
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 600;
 }
 .asset-lifecycle-next span {
   color: var(--c-cyan-20-2);
-  font-weight: 700;
+  font-weight: 600;
 }
 .asset-lifecycle-next em {
   color: var(--st-muted);
@@ -565,7 +601,7 @@ html body .usage-correct button:disabled {
   margin-left: auto;
   color: var(--c-cyan-45);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 .asset-lifecycle-link:hover {
@@ -602,18 +638,29 @@ html body .asset-workbench-sidebar .usage-left.warn-text {
   color: var(--c-orange-45-3);
 }
 
-/* An instrument of a Set with an open issue: a small red dot, not a line of words. */
-html body .set-tool-state .issue-dot {
-  display: inline-block;
+/* An instrument of a Set with an open issue: a small red chip that says so, not a bare dot. */
+html body .set-tool-state .issue-chip {
   flex: 0 0 auto;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--c-red-40-2);
-  box-shadow: 0 0 0 3px rgba(192, 50, 47, 0.15);
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
 }
+/* The list's own title: a section heading, not a page title, on a lower row. */
 html body .set-composition-head h2 {
   margin: 0;
+}
+html body .asset-detail-workspace .set-composition-head h2 {
+  font-size: 16px;
+  font-weight: 650;
+}
+html body .asset-workbench-main .set-composition-head {
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 /* The photo field of a report: the same height as the select next to it, a dashed button with our own words. */
@@ -628,7 +675,7 @@ html body .report-photo-field .report-photo-button {
   background: var(--c-white);
   color: var(--c-cyan-40-3);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .report-photo-field:hover .report-photo-button {
@@ -658,7 +705,32 @@ html body .asset-workbench-sidebar .asset-workbench-title h1 {
   letter-spacing: -0.01em;
 }
 html body .asset-workbench-sidebar .asset-workbench-title .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* The expiry on the card: coloured when near or past. */
+html body .asset-workbench-sidebar .sterile-until.expiring {
+  color: var(--c-orange-45-2);
+}
+html body .asset-workbench-sidebar .sterile-until.expired {
+  color: var(--c-red-40-2);
+}
+/* A tablet: the card is a little wider, so its values stay on one line. */
+@media (max-width: 1180px) {
+  html body .asset-workbench-grid {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+  html body .asset-workbench-sidebar .asset-sidebar-quickfacts {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  html body .asset-workbench-sidebar-tool .asset-workbench-fields > div {
+    grid-template-columns: 134px minmax(0, 1fr);
+  }
+  /* No room for «· όπως το Σετ» next to «Χωρίς χρώμα»: it stays in the tooltip. */
+  html body .asset-workbench-sidebar .asset-marker-field dd > .color-marker-empty small {
+    display: none;
+  }
 }
 
 /* The photos of a Set or instrument: a dialog as tall as what it holds (no empty half under «Κλείσιμο»), the
@@ -681,4 +753,69 @@ html body .photo-section-head.bare > p {
   margin: 0;
   color: var(--st-muted);
   font-size: 13px;
+}
+
+/* Sets list: the specialty sits under the department (its own column is gone, on a computer and a tablet), the
+   colour tapes on the name's line so every row has one height, the barcode quiet, and the expiry date grey unless
+   it is near or past. */
+html body .sets-registry.sets-main th:nth-child(3),
+html body .sets-registry.sets-main td:nth-child(3) {
+  display: none;
+}
+html body .sets-registry.sets-main th:nth-child(4) {
+  width: 22%;
+}
+html body .sets-registry.sets-main th:nth-child(5) {
+  width: 96px;
+}
+html body .sets-registry.sets-main th:nth-child(6) {
+  width: 196px;
+}
+html body .sets-registry.sets-main th:nth-child(7) {
+  width: 104px;
+}
+html body .sets-registry.sets-main td:nth-child(6) .badge {
+  white-space: nowrap;
+}
+html body .sets-registry.sets-main td:nth-child(4) .row-sub {
+  display: block;
+  overflow: hidden;
+  color: var(--st-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .sets-main .set-name-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+html body .sets-main .set-name-line .row-title-link {
+  min-width: 0;
+}
+html body .sets-main .set-name-line .color-marker {
+  flex: 0 0 auto;
+  margin-left: 0;
+}
+html body .sets-main .sets-expiry {
+  color: var(--st-muted);
+}
+html body .sets-main .sets-expiry.expiring {
+  color: var(--c-orange-45-2);
+}
+html body .sets-main .sets-expiry.expired {
+  color: var(--c-red-40-2);
+}
+@media (max-width: 1279px) {
+  html body .sets-registry.sets-main th:nth-child(7),
+  html body .sets-registry.sets-main td:nth-child(7) {
+    display: table-cell;
+  }
+  html body .sets-registry.sets-main th:nth-child(4) {
+    width: 20%;
+  }
+  html body .sets-registry.sets-main th:nth-child(6) {
+    width: 184px;
+  }
 }

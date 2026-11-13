@@ -13,7 +13,6 @@
 .reports-page-head .eyebrow {
   display: block;
   font-size: 11px;
-  letter-spacing: 0.12em;
   font-weight: 850;
   color: var(--st-muted);
   margin-bottom: 4px;
@@ -134,7 +133,6 @@
 .reports-stage-head .eyebrow {
   display: block;
   font-size: 11px;
-  letter-spacing: 0.1em;
   font-weight: 850;
   color: var(--st-muted);
 }
@@ -170,7 +168,7 @@
 }
 .reports-filter-strip label > span {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--st-muted);
 }
 .reports-filter-strip select,
@@ -259,7 +257,7 @@
   background: var(--c-gray-100-2);
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   padding: 9px 10px;
   border-bottom: 1px solid var(--c-gray-90);
   white-space: nowrap;
@@ -274,7 +272,7 @@
   background: var(--c-white);
 }
 .reports-table .mono {
-  font-weight: 750;
+  font-weight: 650;
   color: var(--c-cyan-45);
 }
 .reports-empty {
@@ -425,7 +423,7 @@
   border-radius: 9px;
   padding: 9px 12px;
   color: var(--c-cyan-30-4);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .movement-ledger {
@@ -477,9 +475,7 @@
   border-bottom: 1px solid var(--c-gray-90);
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.035em;
+  font-weight: 650;
 }
 .ledger-scroll {
   flex: 1 1 auto;
@@ -518,7 +514,7 @@
 }
 .ledger-asset small {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   color: var(--c-cyan-45);
   letter-spacing: 0.05em;
 }
@@ -569,9 +565,12 @@
   flex-direction: column;
   min-width: 0;
 }
-.ledger-user b {
-  overflow-wrap: anywhere;
+.ledger-user b,
+.ledger-user small {
+  overflow: hidden;
   line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ledger-user small {
   font-size: 11px;
@@ -620,7 +619,7 @@
   border-bottom: 1px solid var(--c-gray-90);
 }
 .movement-detail-head small {
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.08em;
   color: var(--c-cyan-45);
 }
@@ -927,7 +926,7 @@
   border-radius: 7px;
   padding: 7px 10px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--st-muted);
   cursor: pointer;
 }
@@ -1078,7 +1077,7 @@
   flex-direction: column;
   gap: 6px;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 650;
   color: var(--c-cyan-45-4);
 }
 .department-patient-code small {
@@ -1107,8 +1106,6 @@
 }
 .department-signature-card span {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 .department-signature-card strong {
   font-size: 11px;
@@ -1557,7 +1554,6 @@
 }
 .studio-list-head {
   color: var(--st-muted);
-  text-transform: uppercase;
   border-bottom: 1px solid var(--c-gray-95);
 }
 .studio-scroll-list {
@@ -1597,6 +1593,18 @@
   text-align: center;
   color: var(--st-muted);
 }
+/* An empty library: its icon, one line on what goes in it, and the button that adds the first record. */
+.studio-empty-start {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.studio-empty-start strong {
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
 .studio-users-panel {
   grid-template-rows: auto auto auto minmax(0, 1fr);
 }
@@ -1608,7 +1616,7 @@
   gap: 7px;
   color: var(--st-muted);
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 11px;
 }
 .studio-access-toggle > span {
@@ -1903,13 +1911,25 @@
   color: var(--st-muted);
 }
 .workflow-core-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
-  letter-spacing: 0.08em;
-  background: var(--c-gray-95-4);
-  color: var(--c-green-50-3);
+  background: var(--c-gray-95);
   border-radius: 999px;
-  padding: 3px 6px;
-  font-weight: 850;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+/* A core stage: «Πάντα ενεργό» with a lock where the other stages have their switch. */
+.workflow-stage-always {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--st-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 .workflow-check-preview {
   display: flex;
@@ -1965,12 +1985,6 @@
 }
 .workflow-stage-toggle input:checked + span:after {
   left: 18px;
-}
-.workflow-stage-toggle.locked {
-  cursor: not-allowed;
-}
-.workflow-stage-toggle.locked > span {
-  background: var(--c-cyan-65);
 }
 @media (max-width: 900px) {
   .studio-workflow-stage {
@@ -2185,8 +2199,7 @@
 .studio-workspace .eyebrow {
   font-size: 11px;
   line-height: 1.2;
-  font-weight: 750;
-  letter-spacing: 0.09em;
+  font-weight: 650;
   color: var(--st-muted);
 }
 .studio-head h1 {
@@ -2203,7 +2216,7 @@
 }
 .studio-health strong {
   font-size: 12px;
-  font-weight: 680;
+  font-weight: 600;
 }
 .studio-health span {
   font-size: 11px;
@@ -2223,18 +2236,18 @@
   padding: 8px 9px !important;
   font-size: 13px;
   line-height: 1;
-  font-weight: 620;
+  font-weight: 600;
 }
 .studio-tabs button.active {
-  font-weight: 680 !important;
+  font-weight: 600 !important;
 }
 .studio-panel-head h2 {
   color: var(--studio-ink);
-  font-weight: 680;
+  font-weight: 600;
   letter-spacing: -0.012em;
 }
 .studio-panel-head h2 {
-  font-size: 19px;
+  font-size: 15px;
 }
 .studio-panel-head p {
   font-size: 11.5px;
@@ -2277,9 +2290,8 @@
 }
 .studio-list-head {
   padding: 7px 16px;
-  font-size: 11px;
-  font-weight: 680;
-  letter-spacing: 0.055em;
+  font-size: 12px;
+  font-weight: 600;
 }
 .studio-scroll-list {
   padding: 0 13px 9px;
@@ -2290,7 +2302,7 @@
   font-size: 11.5px;
 }
 .studio-list-row strong {
-  font-weight: 620;
+  font-weight: 600;
   color: var(--studio-ink);
 }
 .studio-list-row > span {
@@ -2307,7 +2319,7 @@
 .studio-access-toggle,
 .role-chip {
   font-size: 11px;
-  font-weight: 620;
+  font-weight: 600;
 }
 .studio-system-grid h3 {
   font-size: 15px !important;
@@ -2319,7 +2331,7 @@
 }
 .workflow-stage-main strong {
   font-size: 12px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
 }
 .workflow-stage-main p {
   font-size: 11px !important;
@@ -2329,11 +2341,11 @@
 }
 .studio-drawer h2 {
   font-size: 19px;
-  font-weight: 680;
+  font-weight: 600;
 }
 .studio-drawer-form label {
   font-size: 11.5px;
-  font-weight: 620;
+  font-weight: 600;
 }
 .studio-drawer-form input,
 .studio-drawer-form select {
@@ -2345,7 +2357,7 @@
 .studio-workspace .app-button,
 .studio-workspace button.primary,
 .studio-workspace button.secondary {
-  font-weight: 620;
+  font-weight: 600;
 }
 .studio-panel-head .app-button {
   min-height: 38px;
@@ -2437,17 +2449,22 @@
   min-width: 0;
 }
 .studio-role-permission-head h2 {
-  font-size: 19px;
+  font-size: 15px;
   margin: 2px 0 3px;
   color: var(--c-cyan-25-2);
-  font-weight: 680;
+  font-weight: 600;
 }
 .studio-role-permission-head p {
-  font-size: 11px;
+  display: -webkit-box;
+  font-size: 12px;
   color: var(--st-muted);
   margin: 0;
   max-width: 720px;
+  overflow: hidden;
   line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
 }
 .studio-role-head-actions {
   display: flex;
@@ -2466,7 +2483,7 @@
   background: var(--c-white);
   color: var(--c-cyan-50);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 600;
 }
 .studio-role-head-actions .app-button {
   min-height: 36px !important;
@@ -2476,12 +2493,12 @@
 
 .studio-role-security-banner {
   margin: 10px 12px 0;
-  padding: 9px 11px;
+  padding: 7px 11px;
   border: 1px solid var(--c-teal-90-2);
   border-radius: 11px;
   background: var(--c-gray-95-3);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   color: var(--c-cyan-40-10);
 }
@@ -2494,13 +2511,13 @@
   display: grid;
   gap: 2px;
 }
-.studio-role-security-banner strong {
-  font-size: 11px;
-}
 .studio-role-security-banner span {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
-  color: var(--c-cyan-55-3);
+}
+.studio-role-security-banner small {
+  color: var(--st-muted);
+  font-size: 11.5px;
 }
 
 .studio-permission-groups {
@@ -2525,7 +2542,7 @@
 .studio-permission-group > header strong {
   font-size: 11px;
   color: var(--c-cyan-35-2);
-  font-weight: 680;
+  font-weight: 600;
 }
 .studio-permission-group > header span {
   min-width: 31px;
@@ -2537,7 +2554,7 @@
   place-items: center;
   font-size: 11px;
   color: #47717f;
-  font-weight: 700;
+  font-weight: 600;
 }
 .studio-permission-group > div {
   display: grid;
@@ -2600,7 +2617,7 @@
 .studio-permission-copy b {
   font-size: 11px;
   color: var(--c-cyan-30-4);
-  font-weight: 650;
+  font-weight: 600;
 }
 .studio-permission-copy small {
   font-size: 11px;
@@ -2608,17 +2625,11 @@
   line-height: 1.35;
 }
 .studio-permission-lock {
-  align-self: start;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 6px;
-  border-radius: 7px;
-  background: var(--c-gray-95);
+  margin-left: 6px;
+  vertical-align: -2px;
   color: var(--st-muted);
-  font-size: 11px;
-  font-weight: 650;
-  white-space: nowrap;
 }
 
 .studio-role-audit {
@@ -2627,23 +2638,33 @@
   background: var(--c-white);
   padding: 9px 12px 10px;
 }
-.studio-role-audit > header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.studio-role-audit > header > div {
+.studio-role-audit > summary {
   display: flex;
   align-items: baseline;
   gap: 7px;
+  cursor: pointer;
+  list-style-position: inside;
 }
-.studio-role-audit > header strong {
-  font-size: 11px;
+.studio-role-audit > summary strong {
+  font-size: 12px;
   color: var(--c-cyan-35-2);
 }
-.studio-role-audit > header small {
+.studio-role-audit > summary small {
   font-size: 11px;
   color: var(--st-muted);
+}
+.studio-role-audit-count {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-cyan-35-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+.studio-role-audit[open] > summary {
+  margin-bottom: 6px;
 }
 .studio-role-audit-row {
   display: grid;
@@ -2658,7 +2679,7 @@
 .studio-role-audit-row strong {
   font-size: 11px;
   color: var(--c-cyan-35-2);
-  font-weight: 620;
+  font-weight: 600;
 }
 .studio-role-audit-row small {
   font-size: 11px;
@@ -2768,7 +2789,7 @@
   border: 0 !important;
   outline: 0;
   padding: 11px 12px;
-  font-weight: 700;
+  font-weight: 600;
   background: transparent;
 }
 .studio-setting-input span {
@@ -2862,7 +2883,7 @@
   background: var(--c-white);
   color: var(--c-cyan-40-4);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .platform-private-demo-actions button:not(.app-button):hover {
@@ -2888,68 +2909,78 @@
 }
 
 /* Studio → Platform: header buttons, section switch, one row per hospital */
-.platform-head-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-.platform-views {
-  display: flex;
-  gap: 4px;
-  padding: 10px 16px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-}
-.platform-views button {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 14px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--c-blue-45-3);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.platform-views button:hover {
-  color: #1f4d61;
-}
-.platform-views button.active {
-  color: #12546a;
-  border-bottom-color: var(--c-cyan-45);
-}
-.platform-views b {
-  min-width: 20px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--c-gray-95);
-  color: var(--c-cyan-35-9);
-  font-size: 11px;
-  text-align: center;
-}
+/* Hospitals: one list with dividers (not a box per hospital inside the panel's box), fixed columns: name and
+   code, use and status, users, departments, actions. */
 .platform-hospitals {
   min-height: 0;
   overflow: auto;
-  padding: 12px 16px 18px;
+  padding: 4px 16px 18px;
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 0;
 }
 .platform-hospital {
   display: grid;
-  grid-template-columns: auto minmax(180px, 1.4fr) minmax(0, 1.6fr) auto;
+  grid-template-columns: 36px minmax(200px, 1.4fr) minmax(220px, 1.2fr) 70px 70px 250px;
   align-items: center;
   gap: 14px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
+  min-height: 60px;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+  border-radius: 10px;
   background: var(--c-white);
 }
+.platform-hospital:last-child {
+  border-bottom: 0;
+}
 .platform-hospital:hover {
-  border-color: #c4dbe2;
+  background: var(--c-gray-100-2);
+}
+.platform-hospital-count {
+  display: grid;
+  justify-items: end;
+  line-height: 1.15;
+}
+.platform-hospital-count strong {
+  color: var(--c-cyan-20);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.platform-hospital-count small {
+  color: var(--st-muted);
+  font-size: 11px;
+}
+.platform-hospital-counts-inline {
+  display: none;
+}
+/* The users count is a link to the hospital's users. */
+.platform-hospital-users {
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.platform-hospital-users:hover {
+  border-color: var(--c-gray-90);
+  background: var(--c-white);
+}
+.platform-hospital-users:hover strong {
+  text-decoration: underline;
+}
+/* «Είσοδος»: the row's own action, recognisable at once (tinted teal) without competing with «Νέο νοσοκομείο». */
+/* (:not(:disabled) outweighs the shared .app-button:not(…):not(…):not(…) rule; a disabled one stays plain.) */
+html body .platform-hospital-actions .app-button.platform-enter:not(:disabled) {
+  border: 1.5px solid var(--c-cyan-25);
+  background: #e2f0f3;
+  color: var(--c-cyan-25);
+  font-weight: 650;
+}
+html body .platform-hospital-actions .app-button.platform-enter:hover:not(:disabled) {
+  border-color: var(--c-cyan-25);
+  background: var(--c-cyan-25);
+  color: var(--c-white);
 }
 .platform-hospital.inactive {
   background: var(--c-white);
@@ -2998,7 +3029,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .platform-status::before {
   content: '';
@@ -3006,10 +3037,6 @@
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-}
-.platform-status.on {
-  background: var(--c-gray-95-8);
-  color: var(--c-green-40);
 }
 .platform-status.off {
   background: var(--c-gray-95);
@@ -3029,15 +3056,15 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 36px;
-  padding: 0 11px;
+  height: 28px;
+  padding: 0 9px;
   border: 1px solid var(--c-gray-90-4);
   border-radius: 10px;
   background: var(--c-gray-100-2);
   color: var(--c-cyan-35);
   font: inherit;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -3050,7 +3077,7 @@
   gap: 7px;
   color: var(--c-cyan-45-4);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .platform-private-demo-actions select {
   height: 36px;
@@ -3075,6 +3102,12 @@
     grid-column: 2 / -1;
     grid-row: 2;
   }
+  .platform-hospital-count {
+    display: none;
+  }
+  .platform-hospital-counts-inline {
+    display: inline;
+  }
 }
 @media (max-width: 700px) {
   .platform-hospital {
@@ -3084,9 +3117,6 @@
     grid-column: 1 / -1;
     justify-content: flex-start;
     flex-wrap: wrap;
-  }
-  .platform-head-actions {
-    justify-content: flex-start;
   }
 }
 
@@ -3115,7 +3145,7 @@
   background: var(--c-violet-30);
   color: var(--c-white);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.06em;
 }
 .demo-bar.ending .demo-bar-chip {
@@ -3135,7 +3165,7 @@
   background: var(--c-white);
   color: inherit;
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .demo-bar-guide b {
@@ -3241,7 +3271,7 @@
   color: var(--c-violet-25);
   font: inherit;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -3266,7 +3296,7 @@
   background: var(--c-white);
   color: inherit;
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -3318,7 +3348,7 @@
   background: var(--c-amber-95-2);
   color: var(--c-orange-35-3);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .demo-dialog {
@@ -3356,7 +3386,7 @@
   gap: 5px;
   color: var(--c-violet-30-2);
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .demo-dialog input,
 .demo-dialog textarea {
@@ -3378,14 +3408,14 @@
   gap: 10px;
   color: var(--c-violet-30-2);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .demo-dialog-nps {
   display: grid;
   gap: 6px;
   color: var(--c-violet-30-2);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .demo-dialog-nps > div {
   display: grid;
@@ -3399,7 +3429,7 @@
   background: var(--c-white);
   color: var(--c-violet-25);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .demo-dialog-nps button.on {
@@ -3425,7 +3455,7 @@
   background: var(--c-white);
   color: var(--c-violet-25);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .demo-dialog .demo-dialog-primary {
@@ -3532,7 +3562,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   background: var(--c-gray-95);
   color: var(--c-blue-35-4);
@@ -3586,7 +3616,7 @@
   background: var(--c-white);
   color: inherit;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .evaluation-demo-notice .evaluation-demo-notice-close {
@@ -3601,7 +3631,7 @@
   font-size: 12px;
 }
 .evaluation-demo-busy {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-violet-30);
 }
 .evaluation-demo-list {
@@ -3653,15 +3683,13 @@
 .evaluation-demo-facts dt {
   color: var(--c-violet-45);
   font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 .evaluation-demo-facts dd {
   margin: 0;
   color: var(--c-blue-15);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .evaluation-demo-facts em {
   color: var(--c-violet-45);
@@ -3686,7 +3714,7 @@
   background: var(--c-white);
   color: var(--c-violet-25);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .evaluation-demo-actions button:hover:not(:disabled) {
@@ -3760,7 +3788,7 @@
   gap: 6px;
   color: var(--c-blue-40);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .auth-name-row .auth-input input {
   padding: 0 2px !important;
@@ -3777,9 +3805,7 @@
 .join-username span {
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-weight: 600;
 }
 .join-username strong {
   color: var(--c-blue-15-2);
@@ -3834,7 +3860,7 @@ a.auth-primary {
 }
 .pending-access-details dt {
   color: var(--st-muted);
-  font-weight: 700;
+  font-weight: 600;
 }
 .pending-access-details dd {
   margin: 0;
@@ -3849,7 +3875,7 @@ a.auth-primary {
   color: var(--c-white);
   font-size: 10.5px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 650;
   text-align: center;
 }
 .hospital-admin {
@@ -3922,7 +3948,7 @@ a.auth-primary {
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--c-cyan-45);
-  font-weight: 800;
+  font-weight: 650;
   text-align: center;
 }
 .hospital-empty {
@@ -3951,7 +3977,7 @@ a.auth-primary {
 .hospital-department-add,
 .hospital-row {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-40);
 }
 .hospital-request label {
@@ -4123,7 +4149,7 @@ a.auth-primary {
   border-radius: 7px;
   padding: 5px 9px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .department-kpis > button,
@@ -4160,7 +4186,7 @@ a.auth-primary {
   background: transparent;
   font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-45-2);
   cursor: pointer;
 }
@@ -4175,7 +4201,7 @@ a.auth-primary {
   gap: 6px;
   color: var(--st-muted);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .hospital-member-status > i {
   width: 8px;
@@ -4210,9 +4236,7 @@ a.auth-primary {
   background: var(--c-gray-100-2);
   border-bottom: 1px solid var(--c-gray-95);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 650;
   color: var(--c-cyan-45-2);
 }
 .notification-more {
@@ -4222,7 +4246,7 @@ a.auth-primary {
   background: var(--c-white);
   font: inherit;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-cyan-40);
   cursor: pointer;
 }
@@ -4283,7 +4307,7 @@ a.auth-primary {
 .evaluation-demo-feedback h4 {
   margin: 0 0 4px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--c-blue-15);
 }
 .evaluation-demo-feedback ul {
@@ -4332,7 +4356,7 @@ a.auth-primary {
 .evaluation-demo-nps {
   padding: 1px 8px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .evaluation-demo-nps.promoter {
   background: var(--c-gray-100-3);
@@ -4411,7 +4435,7 @@ a.auth-primary {
 }
 .studio-convert-choice legend {
   padding: 0 4px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .studio-convert-choice > label {
   display: flex;
@@ -4450,7 +4474,7 @@ a.auth-primary {
 /* Reports: a handover whose other party did not confirm with their own password (over the table's text colour). */
 html body .report-cell-warn {
   color: var(--c-red-40);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Demo: the card that asks how a guide step was, as soon as it is done (bottom right, never covering the screen). */
@@ -4516,7 +4540,7 @@ html body .report-cell-warn {
   color: var(--c-violet-20);
   font: inherit;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
 }
 .step-rating-card footer button.primary {

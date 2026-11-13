@@ -153,7 +153,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                 size={19}
               />
               <div>
-                <span className="eyebrow">{kind === 'SET' ? tr('ΝΕΑ ΚΑΡΤΕΛΑ ΣΕΤ') : tr('ΝΕΑ ΚΑΡΤΕΛΑ ΕΡΓΑΛΕΙΟΥ')}</span>
+                <span className="eyebrow">{kind === 'SET' ? tr('Νέα καρτέλα Σετ') : tr('Νέα καρτέλα εργαλείου')}</span>
                 <h1>{name || tr('Χωρίς ονομασία')}</h1>
                 <p>{code || tr('Συμπληρώστε κωδικό')}</p>
               </div>
@@ -358,7 +358,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <section className="asset-section asset-detail-full-panel create-card-composition">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΣΥΝΘΕΣΗ')}</span>
+                    <span className="eyebrow">{tr('Σύνθεση')}</span>
                     <h2>{tr('Εργαλεία νέου Σετ')}</h2>
                     <p>{tr('Επιλέξτε τα φυσικά εργαλεία που θα ανήκουν στο Σετ από την πρώτη αποθήκευση.')}</p>
                   </div>
@@ -447,7 +447,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <span className="eyebrow">{tr('ΣΗΜΕΙΩΣΕΙΣ')}</span>
+                    <span className="eyebrow">{tr('Σημειώσεις')}</span>
                     <h2>{tr('Μόνιμες παρατηρήσεις')}</h2>
                     <p>{tr('Οι σημειώσεις θα αποθηκευτούν στην ίδια καρτέλα του αντικειμένου.')}</p>
                   </div>

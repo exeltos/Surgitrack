@@ -101,7 +101,7 @@ html body .scan-danger {
   border-radius: 14px;
   font: inherit;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .scan-primary {
   border: 0;
@@ -137,7 +137,7 @@ html body .scan-demo-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: 0.04em;
 }
 html body .scan-demo-bar .role-switch {
@@ -163,7 +163,7 @@ html body .scan-demo-bar > button {
   background: transparent;
   color: #fff;
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* The stations. */
@@ -389,7 +389,7 @@ html body .scan-camera-type button {
   color: #fff;
   font: inherit;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .scan-camera-type button:disabled {
   background: #b9c7d0;
@@ -433,7 +433,7 @@ html body .scan-form-alert {
   background: #fff4f3;
   color: #912018;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .scan-form-lines {
   margin: 0;
@@ -483,7 +483,7 @@ html body .scan-form-name em {
   border-radius: 6px;
   font-size: 12px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 650;
 }
 html body .scan-form-name em.miss {
   background: #fde8e6;
@@ -495,7 +495,7 @@ html body .scan-form-name em.prob {
 }
 html body .scan-form-qty {
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 650;
   white-space: nowrap;
 }
 html body .scan-form-qty small {
@@ -625,7 +625,7 @@ html body .scan-summary dt {
 }
 html body .scan-summary dd {
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
   text-align: right;
   overflow-wrap: anywhere;
 }
@@ -854,7 +854,7 @@ html body .scan-report-kpis dt {
 html body .scan-report-kpis dd {
   margin: 2px 0 0;
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .scan-refused li.scan-report-row {
   display: flex;
@@ -972,7 +972,7 @@ html body .scan-fab {
     color: #fff;
     font: inherit;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     box-shadow:
       0 8px 22px rgba(16, 45, 60, 0.35),
       0 2px 6px rgba(16, 45, 60, 0.25);

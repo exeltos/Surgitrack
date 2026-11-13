@@ -29,7 +29,7 @@
   border-radius: 11px;
   background: var(--c-blue-25-2);
   color: var(--c-white);
-  font-weight: 800;
+  font-weight: 650;
 }
 .email-link-brand b {
   display: block;
@@ -64,7 +64,7 @@
   color: var(--c-white);
   font: inherit;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
 }
@@ -181,22 +181,6 @@ html body .auth-hero-points li > span {
   border-radius: 10px;
   background: rgb(255 255 255 / 12%);
 }
-html body .auth-hero-chips {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
-}
-html body .auth-hero-chips span {
-  padding: 7px 12px;
-  border: 1px solid rgb(255 255 255 / 15%);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 10%);
-  font-size: 12.5px;
-  font-weight: 600;
-}
 html body .auth-side {
   display: flex;
   flex: 1 1 auto;
@@ -252,8 +236,7 @@ html body .auth-logo {
   }
   html body .auth-hero::before,
   html body .auth-hero-lead,
-  html body .auth-hero-points,
-  html body .auth-hero-chips {
+  html body .auth-hero-points {
     display: none;
   }
   html body .auth-hero h1 {

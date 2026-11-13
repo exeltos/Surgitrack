@@ -56,6 +56,33 @@ jobs:
           # Placeholders: the build only checks that the settings exist.
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci
+      - name: First-load size
+        run: npm run check:size
+
+  edge-functions:
+    name: Edge functions (Deno)
+    # The edge functions run on Deno with the service role, outside ESLint and tsc: lint and type-check them
+    # with Deno itself, using supabase/functions/deno.json (their tests run under Node with the rest of the suite).
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: supabase/functions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.x
+
+      - name: Lint
+        run: deno lint
+
+      - name: Type-check every function
+        run: deno check */index.ts
 
   database:
     name: Database tests

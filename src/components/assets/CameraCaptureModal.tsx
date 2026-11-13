@@ -68,7 +68,7 @@ export default function CameraCaptureModal({onCapture, onClose}: Props) {
       <div className="camera-modal" onMouseDown={e => e.stopPropagation()}>
         <header>
           <div>
-            <span className="eyebrow">{tr('ΚΑΜΕΡΑ')}</span>
+            <span className="eyebrow">{tr('Κάμερα')}</span>
             <h2>{tr('Λήψη φωτογραφίας')}</h2>
           </div>
         </header>

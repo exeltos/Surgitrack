@@ -5,7 +5,17 @@ html body .ledger-row {
   gap: 10px;
   /* Movements: the action column gets the room (up to two lines, full text on hover), the date stays on one
    line, the route takes only what it needs. */
-  grid-template-columns: 128px minmax(180px, 1.15fr) minmax(230px, 1.5fr) minmax(170px, 1fr) minmax(140px, 0.9fr) 24px;
+  grid-template-columns: 128px minmax(200px, 1.4fr) minmax(210px, 1.3fr) minmax(170px, 1.1fr) minmax(150px, 0.9fr) 24px;
+}
+/* The action is words, not a grey pill: two lines at most, the full text on hover. */
+html body .ledger-row .ledger-action {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--c-cyan-30);
+  font-size: 12.5px;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 html body .ledger-route i {
   overflow: hidden;
@@ -44,7 +54,7 @@ html body .movement-ledger.cleaning .ledger-date input {
 /* History: the account the database recorded, shown when it is not the name the device wrote. */
 html body .ledger-user small.ledger-account-differs {
   color: var(--c-orange-45-2);
-  font-weight: 700;
+  font-weight: 600;
 }
 html body .movement-detail-grid .movement-account.differs strong {
   color: var(--c-orange-45-2);
@@ -176,7 +186,7 @@ html body .movement-detail-links .app-button {
   background: var(--c-gray-95);
   color: var(--c-orange-45);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   vertical-align: middle;
 }

@@ -5,7 +5,7 @@
  * role that can open it, at desktop and mobile size. See README.md.
  *
  *   node scripts/screens/capture.mjs [--lang el|en] [--role ADMIN,STERILIZATION,...|all]
- *        [--viewport desktop|mobile|both] [--out dir] [--only route] [--rebuild] [--no-extras] [--a11y]
+ *        [--viewport desktop|wide|laptop|tablet|mobile|both|WIDTHxHEIGHT] [--out dir] [--only route] [--rebuild] [--no-extras] [--a11y]
  *
  * --a11y also runs axe-core (WCAG 2 A/AA) on every route and exits 1 on any serious or critical finding.
  */
@@ -47,12 +47,19 @@ const ROLES = roleArg === 'ALL' ? ALL_ROLES : roleArg.split(',').filter(r => ALL
 const VIEWPORTS = {
   desktop: {width: 1440, height: 900},
   mobile: {width: 390, height: 844},
+  // A tablet held sideways (iPad Air), with touch.
+  tablet: {width: 1180, height: 820},
   // A common laptop window (1366×768 screen minus the browser's bars); only when asked for.
   laptop: {width: 1366, height: 650},
   // A 1920×1080 screen at 125% scaling, as many hospital PCs are set.
   wide: {width: 1536, height: 760},
 };
 const vpArg = String(arg('viewport', 'both'));
+// Besides the named sizes, an exact window size as WIDTHxHEIGHT (e.g. 1895x860, to match a screenshot).
+for (const v of vpArg.split(',')) {
+  const size = /^(\d{3,4})x(\d{3,4})$/.exec(v);
+  if (size) VIEWPORTS[v] = {width: Number(size[1]), height: Number(size[2])};
+}
 const VIEWPORT_NAMES = vpArg === 'both' ? ['desktop', 'mobile'] : vpArg.split(',').filter(v => VIEWPORTS[v]);
 const OUT = resolve(String(arg('out', join(CACHE, 'out'))));
 const ONLY = arg('only', undefined);
@@ -172,7 +179,7 @@ async function newContext(browser, {viewport, account, db, log}) {
     viewport: VIEWPORTS[viewport],
     deviceScaleFactor: 1,
     isMobile: viewport === 'mobile',
-    hasTouch: viewport === 'mobile',
+    hasTouch: viewport === 'mobile' || viewport === 'tablet',
     locale: LANG === 'el' ? 'el-GR' : 'en-GB',
     timezoneId: 'Europe/Athens',
     reducedMotion: 'reduce',

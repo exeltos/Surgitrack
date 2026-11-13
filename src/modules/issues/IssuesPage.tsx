@@ -26,6 +26,22 @@ import {useHasModule} from '../../data/cloud/modulesContext';
 /** An open issue older than this many days is "waiting long" (its own card and filter). */
 const OLD_ISSUE_DAYS = 7;
 
+/** The colour of a report's kind: damage or loss red, wear amber, a missing piece violet, anything else grey. */
+const issueTone = (type: string) =>
+  /Βλάβη|Απώλεια/.test(type) && !/Service/.test(type)
+    ? 'bad'
+    : /Φθορά/.test(type)
+      ? 'warn'
+      : /Έλλειψη/.test(type)
+        ? 'missing'
+        : 'neutral';
+
+/** How long an open issue has waited: «Από σήμερα», «1 ημέρα», «N ημέρες». */
+const issueAge = (created: string) => {
+  const days = daysSince(created) ?? 0;
+  return days <= 0 ? tr('Από σήμερα') : days === 1 ? tr('1 ημέρα') : tr('{0} ημέρες', days);
+};
+
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 
 export default function IssuesPage() {
@@ -156,7 +172,7 @@ export default function IssuesPage() {
   return (
     <div className="tools-list-workspace">
       <PageHeader
-        eyebrow={tr('ΠΑΡΑΚΟΛΟΥΘΗΣΗ')}
+        eyebrow={tr('Παρακολούθηση')}
         title={tr('Εκκρεμότητες')}
         description={
           role === 'DEPARTMENT'
@@ -284,7 +300,8 @@ export default function IssuesPage() {
                           <strong className="issue-asset">{i.asset}</strong>
                         )}
                         <small className="row-sub">
-                          {[trData(i.type), trData(i.department)].filter(Boolean).join(' · ')}
+                          {i.type && <span className={`issue-type-chip ${issueTone(i.type)}`}>{trData(i.type)}</span>}
+                          {i.department && <span>{trData(i.department)}</span>}
                         </small>
                         {i.note && <small className="issue-note-inline">{i.note}</small>}
                       </td>
@@ -309,9 +326,14 @@ export default function IssuesPage() {
                         </td>
                       )}
                       <td>
-                        <span className={`badge ${i.status === 'OPEN' ? 'warning' : ''}`}>
-                          {i.status === 'OPEN' ? tr('Ανοικτή') : tr('Επιλυμένη')}
-                        </span>
+                        {/* An open issue says how long it has waited (orange after a week); a resolved one says so. */}
+                        {i.status === 'OPEN' ? (
+                          <span className={`issue-age${isOld(i) ? ' old' : ''}`} title={tr('Ανοικτή')}>
+                            {issueAge(i.created)}
+                          </span>
+                        ) : (
+                          <span className="badge">{tr('Επιλυμένη')}</span>
+                        )}
                       </td>
                       {withReplacements && (
                         <td className="issue-actions">

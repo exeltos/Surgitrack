@@ -50,7 +50,13 @@ export default function RolesTab({s}: {s: StudioPageState}) {
             <header className="studio-role-permission-head">
               <div>
                 <h2>{L(roles.find(r => r.id === selectedRole)!.el, roles.find(r => r.id === selectedRole)!.en)}</h2>
-                <p>
+                {/* One line; the whole description on hover. */}
+                <p
+                  title={L(
+                    roles.find(r => r.id === selectedRole)!.descriptionEl,
+                    roles.find(r => r.id === selectedRole)!.descriptionEn,
+                  )}
+                >
                   {L(
                     roles.find(r => r.id === selectedRole)!.descriptionEl,
                     roles.find(r => r.id === selectedRole)!.descriptionEn,
@@ -81,31 +87,31 @@ export default function RolesTab({s}: {s: StudioPageState}) {
             </header>
             {selectedRole !== 'ADMIN' && (
               <div className="studio-role-security-banner">
-                <ShieldCheck size={18} />
+                <Lock size={15} aria-hidden="true" />
                 <div>
-                  <strong>{L('Προστατευμένος πυρήνας δικαιωμάτων', 'Protected permission core')}</strong>
-                  <span>
-                    {selectedRole === 'VIEWER'
-                      ? L(
-                          'Ο Παρατηρητής δεν μπορεί ποτέ να αποκτήσει δικαίωμα ενέργειας· εδώ ορίζετε μόνο ποιες ενότητες βλέπει. Οι αλλαγές δεδομένων μπλοκάρονται και στον server.',
-                          'A viewer can never be given an action; here you only choose which sections they see. Data changes are also blocked on the server.',
-                        )
-                      : selectedRole === 'DEPARTMENT'
-                        ? L(
-                            'Ο ρόλος Τμήματος βλέπει πάντα μόνο τα Σετ και τα εργαλεία του τμήματός του και δεν μπορεί να πάρει δικαιώματα Αποστείρωσης ή Studio.',
-                            'Department role is always scoped to its assigned department and cannot gain CSSD or Studio administration permissions.',
-                          )
-                        : L(
-                            'Τα κρίσιμα δικαιώματα της αλυσίδας φύλαξης παραμένουν κλειδωμένα. Τα υπόλοιπα μπορούν να προσαρμοστούν στην πολιτική της μονάδας.',
-                            'Critical chain-of-custody permissions remain locked. Other permissions can follow facility policy.',
-                          )}
-                  </span>
                   <span>
                     {L(
-                      '🔒 Το λουκέτο σημαίνει ότι δεν αλλάζει (προστατευμένο ή μόνο ο Προϊστάμενος). Τα υπόλοιπα τα αλλάζεις και πατάς Αποθήκευση.',
-                      '🔒 A padlock means it cannot be changed (protected, or Supervisor only). Change the others, then press Save.',
+                      'Με λουκέτο: προστατευμένο, δεν αλλάζει · τα υπόλοιπα αλλάζουν με «Αποθήκευση».',
+                      'With a padlock: protected, cannot change · change the others, then «Save».',
                     )}
                   </span>
+                  {/* The two roles whose limits hold whatever is ticked: said once, under the legend. */}
+                  {selectedRole === 'VIEWER' && (
+                    <small>
+                      {L(
+                        'Ο Παρατηρητής δεν παίρνει ποτέ δικαίωμα ενέργειας· εδώ ορίζετε μόνο τι βλέπει (μπλοκάρεται και στον server).',
+                        'A viewer never gets an action; here you only choose what they see (also blocked on the server).',
+                      )}
+                    </small>
+                  )}
+                  {selectedRole === 'DEPARTMENT' && (
+                    <small>
+                      {L(
+                        'Το Τμήμα βλέπει πάντα μόνο το δικό του τμήμα και δεν παίρνει δικαιώματα Αποστείρωσης ή Studio.',
+                        'A department user always sees only their own department and never gets Sterilization or Studio rights.',
+                      )}
+                    </small>
+                  )}
                 </div>
               </div>
             )}
@@ -168,27 +174,29 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                             />
                             <span className="studio-permission-check"></span>
                             <span className="studio-permission-copy">
-                              <b>{L(item.el, item.en)}</b>
+                              <b>
+                                {L(item.el, item.en)}
+                                {locked && (
+                                  <span
+                                    className="studio-permission-lock"
+                                    title={
+                                      supervisorOnly
+                                        ? L('Μόνο ο Προϊστάμενος', 'Supervisor only')
+                                        : L('Προστατευμένο', 'Protected')
+                                    }
+                                    role="img"
+                                    aria-label={
+                                      supervisorOnly
+                                        ? L('Μόνο ο Προϊστάμενος', 'Supervisor only')
+                                        : L('Προστατευμένο', 'Protected')
+                                    }
+                                  >
+                                    <Lock size={13} />
+                                  </span>
+                                )}
+                              </b>
                               <small>{L(item.hintEl, item.hintEn)}</small>
                             </span>
-                            {locked && (
-                              <span
-                                className="studio-permission-lock"
-                                title={
-                                  supervisorOnly
-                                    ? L('Μόνο ο Προϊστάμενος', 'Supervisor only')
-                                    : L('Προστατευμένο', 'Protected')
-                                }
-                                role="img"
-                                aria-label={
-                                  supervisorOnly
-                                    ? L('Μόνο ο Προϊστάμενος', 'Supervisor only')
-                                    : L('Προστατευμένο', 'Protected')
-                                }
-                              >
-                                <Lock size={13} />
-                              </span>
-                            )}
                           </label>
                         );
                       })}
@@ -197,13 +205,15 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                 ))}
               </div>
             )}
-            <section className="studio-role-audit">
-              <header>
-                <div>
-                  <strong>{L('Πρόσφατες αλλαγές δικαιωμάτων', 'Recent permission changes')}</strong>
-                  <small>{L('Καταγραφή χρήστη και χρονικής σήμανσης.', 'User and timestamp audit trail.')}</small>
-                </div>
-              </header>
+            {/* The history of this role's changes, folded: the permissions keep the height. */}
+            <details className="studio-role-audit">
+              <summary>
+                <strong>{L('Ιστορικό αλλαγών', 'Change history')}</strong>
+                <span className="studio-role-audit-count">
+                  {(libs.rolePermissionAudit || []).filter(entry => entry.role === selectedRole).length}
+                </span>
+                <small>{L('ποιος και πότε', 'who and when')}</small>
+              </summary>
               {(libs.rolePermissionAudit || [])
                 .filter(entry => entry.role === selectedRole)
                 .slice(0, 5)
@@ -224,7 +234,7 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                   )}
                 </div>
               )}
-            </section>
+            </details>
           </section>
         </div>
       )}
