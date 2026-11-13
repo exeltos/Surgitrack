@@ -355,3 +355,42 @@ html body .reports-result-head > div {
   align-items: baseline;
   gap: 10px;
 }
+
+/* Reports table: easier to read. Text at the size of the other lists, the name in bold, the status as the same
+   coloured badge the lists use, and each group (department, specialty …) starting with a line and its name written
+   once. */
+html body .reports-table {
+  font-size: 12.5px;
+}
+html body .reports-table td {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  vertical-align: middle;
+}
+html body .reports-table td.report-cell-name {
+  color: var(--c-cyan-20);
+  font-weight: 700;
+}
+html body .reports-table td.report-cell-name .registry-row-barcode {
+  display: block;
+  margin-top: 2px;
+  font-weight: 700;
+}
+@media (min-width: 701px) {
+  html body .reports-table td.report-cell-repeat {
+    color: transparent;
+  }
+}
+html body .reports-table tr.report-group-start td {
+  border-top: 1px solid var(--c-gray-90);
+}
+html body .reports-table tr.report-group-start td:first-child {
+  color: var(--c-cyan-20);
+  font-weight: 750;
+}
+html body .reports-table tbody tr:nth-child(even) {
+  background: rgba(237, 242, 244, 0.35);
+}
+html body .reports-table tbody tr:hover {
+  background: var(--c-gray-95);
+}

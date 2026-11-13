@@ -1408,3 +1408,61 @@ html body .hospital-overview .dash-flow .dash-bar:hover {
 html body .hospital-overview .dash-flow .dash-bar-track {
   height: 10px;
 }
+
+/* Department Home on a computer or tablet: the six figures as one low row, the number beside its label, so the
+   cards below get the height. */
+@media (min-width: 901px) {
+  html body .department-home .dash-kpis {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  html body .department-home .dash-kpi {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label value'
+      'note value';
+    align-items: center;
+    column-gap: 8px;
+    min-height: 0;
+    padding: 9px 14px;
+    border-radius: 12px;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .department-home .dash-kpi:hover {
+    border-color: var(--c-cyan-65);
+    box-shadow: 0 6px 16px rgba(24, 56, 74, 0.08);
+  }
+  html body .department-home .dash-kpi-label {
+    grid-area: label;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html body .department-home .dash-kpi strong {
+    grid-area: value;
+    font-size: 24px;
+    line-height: 1;
+  }
+  html body .department-home .dash-kpi small {
+    grid-area: note;
+    overflow: hidden;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Lists inside a card fade out at the foot instead of cutting a line in half: the fade says there is more to
+   scroll to, and the last entry can scroll clear of it. */
+html body .department-home .dash-attention > .dash-list,
+html body .department-home .dash-latest > .dash-list,
+html body .hospital-overview .dash-activity > .dash-list,
+html body .hospital-overview .dash-attention > .dash-list {
+  padding-bottom: 22px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+}

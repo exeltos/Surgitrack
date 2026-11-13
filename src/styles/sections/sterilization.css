@@ -2741,3 +2741,101 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
     max-height: 60dvh;
   }
 }
+
+/* Sterilizers & devices on a computer or tablet: one card per device instead of a table of two rows lost in white
+   space. A coloured bar on top says its state at a glance (running orange, cycle ended green, free grey, out of
+   service red); the details sit under it with their labels; a click opens it, as the row did. */
+@media (min-width: 901px) {
+  html body .equipment-page .equipment-rows thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  html body .equipment-page .equipment-rows,
+  html body .equipment-page .equipment-rows tbody {
+    display: block;
+  }
+  html body .equipment-page .equipment-rows tbody {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 16px;
+  }
+  html body .equipment-page .equipment-rows tr {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1.3fr);
+    align-content: start;
+    gap: 12px 18px;
+    padding: 16px 18px 14px;
+    border: 1px solid var(--c-gray-90);
+    border-top: 4px solid var(--c-gray-90);
+    border-radius: 14px;
+    background: var(--c-white);
+    box-shadow: 0 6px 18px rgba(24, 56, 74, 0.05);
+    cursor: pointer;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  html body .equipment-page .equipment-rows tr:hover {
+    border-color: var(--c-cyan-65);
+    box-shadow: 0 10px 26px rgba(24, 56, 74, 0.1);
+  }
+  html body .equipment-page .equipment-rows tr.busy {
+    border-top-color: var(--c-orange-60);
+  }
+  html body .equipment-page .equipment-rows tr.done {
+    border-top-color: var(--c-green-45);
+  }
+  html body .equipment-page .equipment-rows tr.out {
+    border-top-color: var(--c-red-45);
+  }
+  html body .equipment-page .equipment-rows tr[class] > td:first-child {
+    box-shadow: none;
+  }
+  html body .equipment-page .equipment-rows tr > td {
+    display: block;
+    min-width: 0;
+    max-width: none;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  html body .equipment-page .equipment-rows td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 3px;
+    color: var(--st-muted);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  /* The name, then what it is doing now, each across the card. */
+  html body .equipment-page .equipment-rows td:first-child,
+  html body .equipment-page .equipment-rows td.row-cycle {
+    grid-column: 1 / -1;
+  }
+  html body .equipment-page .equipment-rows td:first-child::before {
+    content: none;
+  }
+  html body .equipment-page .equipment-rows td:first-child .row-name {
+    font-size: 16px;
+  }
+  html body .equipment-page .equipment-rows td.row-cycle {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--c-gray-100-2);
+  }
+  html body .equipment-page .equipment-rows td.row-actions {
+    grid-column: 1 / -1;
+    width: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--c-gray-95);
+    text-align: right;
+  }
+  html body .equipment-page .equipment-rows td.row-actions::before {
+    content: none;
+  }
+}

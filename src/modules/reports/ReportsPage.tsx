@@ -14,6 +14,7 @@ import {useTableSort} from '../../components/ui/useTableSort';
 import {displaySortValue} from '../../core/tableSort';
 import {tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
+import StatusBadge from '../../components/ui/StatusBadge';
 import {
   LOAD_STATUS,
   cellText,
@@ -495,28 +496,43 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {shownRows.visible.map((row, index) => (
-                      <tr key={index}>
-                        {screenColumns.map(c => (
-                          <td
-                            key={c.key}
-                            data-label={c.label}
-                            className={
-                              c.key === 'barcode'
-                                ? 'mono'
-                                : c.key === 'signature' && row.signature === tr('Μη επιβεβαιωμένη')
-                                  ? 'report-cell-warn'
-                                  : ''
-                            }
-                          >
-                            {cellText(c.key, row[c.key])}
-                            {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
-                              <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
-                            ) : null}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
+                    {shownRows.visible.map((row, index) => {
+                      // The first column groups the rows (department, specialty …): it is written on the first row
+                      // of each group only, so the groups read at a glance.
+                      const first = screenColumns[0]?.key;
+                      const previous = index ? shownRows.visible[index - 1] : undefined;
+                      const sameGroup = Boolean(first && previous && previous[first] === row[first]);
+                      return (
+                        <tr key={index} className={sameGroup ? '' : 'report-group-start'}>
+                          {screenColumns.map((c, column) => (
+                            <td
+                              key={c.key}
+                              data-label={c.label}
+                              className={
+                                c.key === 'barcode'
+                                  ? 'mono'
+                                  : c.key === 'name'
+                                    ? 'report-cell-name'
+                                    : c.key === 'signature' && row.signature === tr('Μη επιβεβαιωμένη')
+                                      ? 'report-cell-warn'
+                                      : column === 0 && sameGroup
+                                        ? 'report-cell-repeat'
+                                        : ''
+                              }
+                            >
+                              {c.key === 'stateLabel' && typeof row.state === 'string' && row.state ? (
+                                <StatusBadge value={row.state} />
+                              ) : (
+                                cellText(c.key, row[c.key])
+                              )}
+                              {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
+                                <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
+                              ) : null}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
                     {shownRows.hasMore && <MoreRows colSpan={screenColumns.length} onVisible={shownRows.showMore} />}
                   </tbody>
                 </table>

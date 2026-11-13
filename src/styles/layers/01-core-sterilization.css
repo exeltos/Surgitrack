@@ -5119,12 +5119,13 @@ td {
 }
 
 /* Set and single-tool receipt lists share one predictable six-column table. The state column speaks only of a
-   problem and «Αναφορά» is an icon button: the name gets the room. */
+   problem and «Αναφορά» is an icon button: the name gets the room. Small minimum widths, so the six columns fit the
+   receipt window on a tablet too (the report button was cut off). */
 .receipt-tool-columns,
 .receipt-verification-row {
   display: grid;
   grid-template-columns:
-    minmax(92px, 0.7fr) minmax(90px, 0.7fr) minmax(240px, 2.2fr) minmax(110px, 0.85fr) minmax(80px, 0.6fr)
+    minmax(80px, 0.7fr) minmax(70px, 0.7fr) minmax(150px, 2.2fr) minmax(80px, 0.85fr) minmax(60px, 0.6fr)
     36px !important;
   gap: 12px;
   align-items: center;
