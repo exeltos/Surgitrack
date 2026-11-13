@@ -22,13 +22,13 @@ select tests.eq((
   'platform_create_department,platform_create_organization,platform_delete_movements,'
   'platform_ensure_demo_organization,platform_list_departments,platform_reset_demo_organization,'
   'platform_set_ip_access,platform_unblock_ip,platform_undo_asset_import,platform_update_department,platform_update_organization,'
-  'profile_contacts,role_has_permission,signup_link_info,touch_presence',
+  'profile_contacts,public_contact,role_has_permission,signup_link_info,touch_presence',
   'signed-in users call only the reviewed security definer functions');
 
 select tests.eq((
   select string_agg(p.proname, ',' order by p.proname) from pg_proc p
    where p.pronamespace = 'public'::regnamespace and p.prosecdef
      and has_function_privilege('anon', p.oid, 'execute')),
-  'signup_link_info', 'signed-out visitors call only signup_link_info');
+  'public_contact,signup_link_info', 'signed-out visitors call only public_contact and signup_link_info');
 
 rollback;

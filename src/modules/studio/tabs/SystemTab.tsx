@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {RefreshCcw} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
-import PlatformContactSettings from '../PlatformContactSettings';
+import PlatformContactSettings, {PublicContactSettings} from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
@@ -39,7 +39,12 @@ export default function SystemTab({s}: {s: StudioPageState}) {
           <div className="studio-system-grid">
             {group === 'GENERAL' && (
               <section>
-                {platformAdmin && libs.dataMode === 'PRODUCTION' && <PlatformContactSettings L={L} />}
+                {platformAdmin && libs.dataMode === 'PRODUCTION' && (
+                  <>
+                    <PublicContactSettings L={L} />
+                    <PlatformContactSettings L={L} />
+                  </>
+                )}
                 <label>
                   {L('Προειδοποίηση υπολοίπου χρήσεων', 'Remaining-use warning')}
                   <div className="studio-setting-input">

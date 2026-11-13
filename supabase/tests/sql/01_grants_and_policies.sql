@@ -1,5 +1,5 @@
 -- Signed-out visitors (anon) have no access to public tables, sequences or functions except the
--- signup page's signup_link_info; the platform defaults no longer hand anon new objects; no policy
+-- signup page's signup_link_info and the first page's public_contact; the platform defaults no longer hand anon new objects; no policy
 -- applies to {public}; one permissive policy per table, role and action.
 begin;
 \ir ../local/fixtures.sql
@@ -21,7 +21,7 @@ select tests.eq((
 select tests.eq((
   select string_agg(p.proname, ',' order by p.proname) from pg_proc p
    where p.pronamespace = 'public'::regnamespace and has_function_privilege('anon', p.oid, 'execute')),
-  'signup_link_info', 'anon executes only signup_link_info');
+  'public_contact,signup_link_info', 'anon executes only public_contact and signup_link_info');
 select tests.eq((
   select count(*)::int from pg_proc p
    where p.pronamespace = 'public'::regnamespace
