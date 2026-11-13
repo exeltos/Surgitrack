@@ -237,7 +237,7 @@ export default function SetsPage() {
             }}
           />
         ) : (
-          <table className="asset-registry-table registry-fixed sets-registry">
+          <table className="asset-registry-table registry-fixed sets-registry sets-main">
             <thead>
               <tr>
                 <SortTh label={tr('Όνομα Σετ')} sortKey="name" sort={order.sort} onSort={order.toggle} />
@@ -261,10 +261,13 @@ export default function SetsPage() {
                       <div className="registry-asset-name">
                         <AssetTypeIcon kind="SET" framed size={15} />
                         <span>
-                          <Link className="row-title-link" to={`/sets/${s.id}`}>
-                            {s.name}
-                          </Link>
-                          <ColorMarker tapes={s.colorTapes} size="sm" />
+                          {/* The colour tapes sit on the name's line, so every row keeps the same height. */}
+                          <span className="set-name-line">
+                            <Link className="row-title-link" to={`/sets/${s.id}`}>
+                              {s.name}
+                            </Link>
+                            <ColorMarker tapes={s.colorTapes} size="sm" />
+                          </span>
                           <small className="row-sub">
                             <span className="mono registry-row-barcode">{s.barcode}</span>
                             {[s.manufacturer, s.code].filter(Boolean).map(part => ` · ${part}`)}
@@ -284,6 +287,8 @@ export default function SetsPage() {
                       ) : (
                         trData(s.department) || '—'
                       )}
+                      {/* The specialty under the department: one column less, and it is seen on a tablet too. */}
+                      {s.specialty ? <small className="row-sub">{trData(s.specialty)}</small> : null}
                     </td>
                     <td className={count < s.expected ? 'set-count-short' : undefined}>
                       <b>{count}</b>

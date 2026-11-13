@@ -708,3 +708,72 @@ html body .photo-section-head.bare > p {
   color: var(--st-muted);
   font-size: 13px;
 }
+
+/* Sets list: the specialty sits under the department (its own column is gone, on a computer and a tablet), the
+   colour tapes on the name's line so every row has one height, the barcode quiet, and the expiry date grey unless
+   it is near or past. */
+html body .sets-registry.sets-main th:nth-child(3),
+html body .sets-registry.sets-main td:nth-child(3) {
+  display: none;
+}
+html body .sets-registry.sets-main th:nth-child(4) {
+  width: 22%;
+}
+html body .sets-registry.sets-main th:nth-child(5) {
+  width: 96px;
+}
+html body .sets-registry.sets-main th:nth-child(6) {
+  width: 196px;
+}
+html body .sets-registry.sets-main th:nth-child(7) {
+  width: 104px;
+}
+html body .sets-registry.sets-main td:nth-child(6) .badge {
+  white-space: nowrap;
+}
+html body .sets-registry.sets-main td:nth-child(4) .row-sub {
+  display: block;
+  overflow: hidden;
+  color: var(--st-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .sets-main .set-name-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+html body .sets-main .set-name-line .row-title-link {
+  min-width: 0;
+}
+html body .sets-main .set-name-line .color-marker {
+  flex: 0 0 auto;
+  margin-left: 0;
+}
+html body .sets-main .registry-row-barcode {
+  color: var(--st-muted);
+  font-weight: 500;
+}
+html body .sets-main .sets-expiry {
+  color: var(--st-muted);
+}
+html body .sets-main .sets-expiry.expiring {
+  color: var(--c-orange-45-2);
+}
+html body .sets-main .sets-expiry.expired {
+  color: var(--c-red-40-2);
+}
+@media (max-width: 1279px) {
+  html body .sets-registry.sets-main th:nth-child(7),
+  html body .sets-registry.sets-main td:nth-child(7) {
+    display: table-cell;
+  }
+  html body .sets-registry.sets-main th:nth-child(4) {
+    width: 20%;
+  }
+  html body .sets-registry.sets-main th:nth-child(6) {
+    width: 184px;
+  }
+}
