@@ -85,7 +85,7 @@ export default function AssetLifecycle({
         </ol>
       </div>
       <p className="asset-lifecycle-next">
-        <b>{tr('ΕΠΟΜΕΝΟ ΒΗΜΑ')}</b>
+        <b>{tr('Επόμενο βήμα')}</b>
         <span>{tr(NEXT_TEXT[currentId])}</span>
         {since && <em>{tr('Στο στάδιο από {0}', since)}</em>}
         {action}

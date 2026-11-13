@@ -1416,9 +1416,8 @@ body {
   padding: 8px 0 3px;
 }
 .asset-fields-heading > strong {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--st-muted);
 }
 .asset-inline-edit {

@@ -571,9 +571,8 @@ html body .usage-correct button:disabled {
 }
 .asset-lifecycle-next b {
   color: var(--st-muted);
-  font-size: 10.5px;
-  font-weight: 650;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 600;
 }
 .asset-lifecycle-next span {
   color: var(--c-cyan-20-2);
@@ -628,18 +627,29 @@ html body .asset-workbench-sidebar .usage-left.warn-text {
   color: var(--c-orange-45-3);
 }
 
-/* An instrument of a Set with an open issue: a small red dot, not a line of words. */
-html body .set-tool-state .issue-dot {
-  display: inline-block;
+/* An instrument of a Set with an open issue: a small red chip that says so, not a bare dot. */
+html body .set-tool-state .issue-chip {
   flex: 0 0 auto;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--c-red-40-2);
-  box-shadow: 0 0 0 3px rgba(192, 50, 47, 0.15);
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--st-red-soft, var(--c-gray-95-2));
+  color: var(--st-red);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
 }
+/* The list's own title: a section heading, not a page title, on a lower row. */
 html body .set-composition-head h2 {
   margin: 0;
+}
+html body .asset-detail-workspace .set-composition-head h2 {
+  font-size: 16px;
+  font-weight: 650;
+}
+html body .asset-workbench-main .set-composition-head {
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 /* The photo field of a report: the same height as the select next to it, a dashed button with our own words. */
@@ -684,7 +694,25 @@ html body .asset-workbench-sidebar .asset-workbench-title h1 {
   letter-spacing: -0.01em;
 }
 html body .asset-workbench-sidebar .asset-workbench-title .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* The expiry on the card: coloured when near or past. */
+html body .asset-workbench-sidebar .sterile-until.expiring {
+  color: var(--c-orange-45-2);
+}
+html body .asset-workbench-sidebar .sterile-until.expired {
+  color: var(--c-red-40-2);
+}
+/* A tablet: the card is a little wider, so its values stay on one line. */
+@media (max-width: 1180px) {
+  html body .asset-workbench-grid {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+  html body .asset-workbench-sidebar .asset-sidebar-quickfacts {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 /* The photos of a Set or instrument: a dialog as tall as what it holds (no empty half under «Κλείσιμο»), the
