@@ -2716,3 +2716,44 @@ html body .studio-security-card .studio-security-blocked b.mono {
 .platform-demo-toolbar {
   justify-content: flex-end;
 }
+
+/* Import, in Studio: the page title already says what it is, so the explanation under it goes; the hospital is the
+   first thing to choose, its picker in the style of the other filters and outlined until one is chosen; the file
+   area stays faded until then. */
+html body .studio-body-import .asset-import-head p {
+  display: none;
+}
+html body .asset-import-head > .asset-import-hospital {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}
+html body .asset-import-hospital.needs-choice .studio-org-select {
+  border-color: var(--c-cyan-45);
+  box-shadow: 0 0 0 3px rgba(21, 90, 110, 0.12);
+}
+html body .asset-import-drop.disabled {
+  opacity: 0.6;
+}
+/* The four steps as one compact line: number and name, a short connector, not stretched to the full width. */
+html body .asset-import-steps {
+  gap: 0;
+}
+html body .asset-import-steps li {
+  flex: 0 0 auto;
+  min-width: 0;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 12.5px;
+}
+html body .asset-import-steps li:not(:last-child)::after {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 1.5px;
+  margin: 0 10px;
+}
+html body .asset-import-steps li span {
+  width: 22px;
+  height: 22px;
+  border-width: 1.5px;
+  font-size: 11.5px;
+}

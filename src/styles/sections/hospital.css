@@ -1508,7 +1508,7 @@ html body .hospital-request-who strong {
 }
 
 /* Owner › Users: the hospital picker in the style of the other filters. */
-.studio-org-select {
+select.studio-org-select {
   height: 38px;
   min-width: 240px;
   padding: 0 36px 0 12px;
@@ -1524,6 +1524,6 @@ html body .hospital-request-who strong {
   appearance: none;
   cursor: pointer;
 }
-.studio-org-select:hover {
+select.studio-org-select:hover {
   border-color: var(--c-cyan-65);
 }
