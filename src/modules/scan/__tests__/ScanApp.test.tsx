@@ -312,3 +312,16 @@ describe('ScanApp: a handover signed with the other person’s QR', () => {
     expect(screen.getByRole('button', {name: /Ολοκλήρωση παραλαβής · 1/})).toBeEnabled();
   });
 });
+
+describe('ScanApp lookup: the answer for an instrument in a Set', () => {
+  it('takes the Set’s expiry: an instrument of an expired Set is not «ready to use»', () => {
+    renderPage(<ScanApp onLogout={() => undefined} />, {path: '/scan/lookup'});
+    typeBarcode('S000323');
+    expect(within(screen.getByRole('article')).getByRole('status')).toHaveTextContent('Η αποστείρωση έληξε');
+    // The Set's first instrument: it carries no expiry of its own, the Set does.
+    typeBarcode('T001228');
+    const card = screen.getByRole('article');
+    expect(within(card).getByText(/Σετ S000323/)).toBeInTheDocument();
+    expect(within(card).getByRole('status')).toHaveTextContent('Η αποστείρωση έληξε');
+  });
+});

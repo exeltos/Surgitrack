@@ -71,14 +71,17 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
         tools.filter(item => item.setId === set.id),
       )
     : 0;
-  const expired = !!asset?.sterileUntil && expiryStatus(asset.sterileUntil, asset.shelfLifeMonths).state === 'EXPIRED';
+  // An instrument in a Set travels, and is sterile, with its Set: the Set holds the state and the expiry.
+  const carrier = parentSet || asset;
+  const sterileUntil = carrier?.sterileUntil;
+  const expired = !!sterileUntil && expiryStatus(sterileUntil, carrier?.shelfLifeMonths).state === 'EXPIRED';
   const usableStates = ['IN_DEPARTMENT', 'READY_FOR_PICKUP'];
   const verdict = !asset
     ? null
-    : !usableStates.includes((parentSet || asset).state)
-      ? {ok: false, text: tr('Δεν είναι διαθέσιμο: {0}', statusLabel((parentSet || asset).state))}
+    : !usableStates.includes(carrier!.state)
+      ? {ok: false, text: tr('Δεν είναι διαθέσιμο: {0}', statusLabel(carrier!.state))}
       : expired
-        ? {ok: false, text: tr('Η αποστείρωση έληξε στις {0}', formatExpiry(asset.sterileUntil!))}
+        ? {ok: false, text: tr('Η αποστείρωση έληξε στις {0}', formatExpiry(sterileUntil!))}
         : missing > 0
           ? {ok: false, text: missing === 1 ? tr('Λείπει 1 εργαλείο') : tr('Λείπουν {0} εργαλεία', missing)}
           : {ok: true, text: tr('Έτοιμο για χρήση')};
@@ -118,7 +121,7 @@ export default function LookupStation({onStations}: {onStations: () => void}) {
               statusLabel(asset.state),
               trData(asset.department) || tr('Χωρίς τμήμα'),
               parentSet ? `${tr('Σετ')} ${parentSet.barcode}` : '',
-              asset.sterileUntil ? tr('έως {0}', formatDate(asset.sterileUntil)) : '',
+              sterileUntil ? tr('έως {0}', formatDate(sterileUntil)) : '',
             ]
               .filter(Boolean)
               .join(' · ')}
