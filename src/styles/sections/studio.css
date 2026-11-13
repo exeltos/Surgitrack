@@ -1086,14 +1086,68 @@ html body .sterilizer-batch-style label.on {
   font-size: 13px;
   font-weight: 600;
 }
+/* A yes/no setting: a switch in the place of the list. */
+html body .studio-setting-switch {
+  gap: 10px;
+  min-height: 38px;
+  border-color: transparent;
+  background: none;
+  cursor: pointer;
+}
+html body .studio-setting-switch > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+html body .studio-setting-switch > span {
+  position: relative;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--c-gray-85-3);
+  transition: background 0.18s;
+}
+html body .studio-setting-switch > span::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: left 0.18s;
+}
+html body .studio-setting-switch > input:checked + span {
+  background: #3b8798;
+}
+html body .studio-setting-switch > input:checked + span::after {
+  left: 19px;
+}
+html body .studio-setting-switch > input:focus-visible + span {
+  outline: 2px solid var(--c-cyan-45);
+  outline-offset: 2px;
+}
+html body .studio-setting-switch > b {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+  font-weight: 500;
+}
 html body .studio-setting-input select {
   flex: 1 1 auto;
   width: 100%;
   min-height: 36px;
-  padding: 0 4px;
+  padding: 0 28px 0 4px;
   border: 0;
   outline-offset: 2px;
-  background: transparent;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b7480' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 4px center;
+  appearance: none;
+  cursor: pointer;
   color: var(--c-cyan-20);
   font-size: 14px;
 }
@@ -2676,9 +2730,20 @@ html body .platform-contact-fields {
   grid-column: 2;
   grid-row: 1 / -1;
   display: grid;
-  gap: 6px;
+  align-content: start;
+  gap: 8px;
 }
-html body .platform-contact-fields > input {
+html body .platform-contact-field {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+}
+html body .platform-contact-field > span {
+  color: var(--st-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+html body .platform-contact-field > input {
   height: 38px;
   padding: 0 12px;
   border: 1px solid var(--border);

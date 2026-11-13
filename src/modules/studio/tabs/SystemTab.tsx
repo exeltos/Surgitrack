@@ -117,16 +117,20 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                 </label>
                 <label>
                   {L('Οδηγοί οθόνης', 'Screen guides')}
-                  <div className="studio-setting-input">
-                    <select
-                      value={libs.systemSettings.screenGuides === false ? 'OFF' : 'ON'}
-                      onChange={e =>
-                        libs.updateSystemSettings({screenGuides: e.target.value === 'ON'}, currentUser.name)
-                      }
-                    >
-                      <option value="ON">{L('Εμφανίζονται', 'Shown')}</option>
-                      <option value="OFF">{L('Δεν εμφανίζονται', 'Not shown')}</option>
-                    </select>
+                  {/* Two values only: a switch, not a list. */}
+                  <div className="studio-setting-input studio-setting-switch">
+                    <input
+                      type="checkbox"
+                      role="switch"
+                      checked={libs.systemSettings.screenGuides !== false}
+                      onChange={e => libs.updateSystemSettings({screenGuides: e.target.checked}, currentUser.name)}
+                    />
+                    <span aria-hidden="true"></span>
+                    <b>
+                      {libs.systemSettings.screenGuides !== false
+                        ? L('Εμφανίζονται', 'Shown')
+                        : L('Δεν εμφανίζονται', 'Not shown')}
+                    </b>
                   </div>
                   <small>
                     {L(

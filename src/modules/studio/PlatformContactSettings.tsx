@@ -25,15 +25,17 @@ export default function PlatformContactSettings({L}: {L: (el: string, en: string
       setStatus(e instanceof Error ? e.message : String(e));
     }
   };
+  // Each field keeps its name above it, so an emptied field still says what goes in it.
   const field = (key: keyof PlatformContact, label: string, type = 'text') => (
-    <input
-      type={type}
-      aria-label={label}
-      placeholder={label}
-      value={contact[key] || ''}
-      onChange={e => set(key, e.target.value)}
-      onBlur={() => void save()}
-    />
+    <label className="platform-contact-field">
+      <span>{label}</span>
+      <input
+        type={type}
+        value={contact[key] || ''}
+        onChange={e => set(key, e.target.value)}
+        onBlur={() => void save()}
+      />
+    </label>
   );
   return (
     <div className="studio-setting-row platform-contact">
