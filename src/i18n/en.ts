@@ -843,7 +843,6 @@ export const en: Record<string, string> = {
     'With more pieces, the serial number is filled in on each piece’s card.',
   'με το Σετ': 'with the Set',
   'από το Σετ': 'from the Set',
-  'Χωρίς χρώμα, {0}': 'No color, {0}',
   'Κινήσεις του Σετ {0}': 'Moves of the Set {0}',
   'Μόνο εργαλεία': 'Instruments only',
   'Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.':

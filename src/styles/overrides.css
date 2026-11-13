@@ -553,15 +553,19 @@
 }
 .asset-marker-edit {
   display: inline-grid;
+  flex: 0 0 auto;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   margin-left: auto;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 8px;
-  background: var(--c-white);
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
   color: var(--c-cyan-40);
   cursor: pointer;
+}
+.asset-marker-edit:hover {
+  background: var(--c-gray-95);
 }
 .member-marker {
   display: inline-flex;

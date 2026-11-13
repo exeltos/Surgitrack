@@ -346,8 +346,12 @@ export default function AssetWorkbenchSidebar({
                 {markerNote && <small>{markerNote}</small>}
               </>
             ) : (
-              <span className="color-marker-empty">
-                {markerNote ? tr('Χωρίς χρώμα, {0}', markerNote) : tr('Χωρίς χρώμα')}
+              <span
+                className="color-marker-empty"
+                title={markerNote ? `${tr('Χωρίς χρώμα')} · ${markerNote}` : undefined}
+              >
+                {tr('Χωρίς χρώμα')}
+                {markerNote && <small> · {markerNote}</small>}
               </span>
             )}
             {onEditMarker && (
