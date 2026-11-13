@@ -1337,8 +1337,16 @@ html body .ster-load-badge.in {
   html body .sterilization-workspace .ster-list-head,
   html body .sterilization-workspace .ster-work-row {
     grid-template-columns:
-      minmax(300px, 1.7fr) minmax(145px, 0.8fr) minmax(140px, 0.75fr) minmax(170px, 0.9fr)
-      minmax(210px, 1fr);
+      minmax(240px, 1.7fr) minmax(135px, 0.8fr) minmax(120px, 0.75fr) minmax(140px, 0.9fr)
+      minmax(210px, max-content);
+  }
+  /* The main action and the «Επιστροφή» icon stay side by side: the column grows to fit them both. */
+  html body .sterilization-workspace .ster-row-action {
+    flex-wrap: nowrap;
+  }
+  html body .sterilization-workspace .ster-row-action > button {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
   /* The stage column is gone: the action and its title take the last of the five (not a sixth one). */
   html body .sterilization-workspace .ster-row-action,
