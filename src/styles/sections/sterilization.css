@@ -2076,8 +2076,22 @@ html body .batch-department button.clear:hover {
   color: var(--c-orange-40);
 }
 /* The reminder card, in front of the page. */
+/* Many machines or a short screen: the list scrolls inside the card, the title and «Αργότερα» stay in view. */
 html body .ster-tests-card {
+  display: flex;
+  flex-direction: column;
   width: min(760px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow: hidden;
+}
+html body .ster-tests-card > :not(.ster-tests-list) {
+  flex: 0 0 auto;
+}
+html body .ster-tests-card > .ster-tests-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 html body .ster-tests-card.bad {
   border-top: 4px solid var(--c-red-45);
