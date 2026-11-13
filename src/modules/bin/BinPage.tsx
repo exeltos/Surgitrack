@@ -123,7 +123,7 @@ export default function BinPage() {
           {notice.text}
         </div>
       )}
-      <ScrollableListPanel ariaLabel={tr('Κάδος')}>
+      <ScrollableListPanel ariaLabel={tr('Κάδος')} className={entries.length ? undefined : 'bin-empty-panel'}>
         {entries.length ? (
           <table className="asset-registry-table bin-table">
             <thead>

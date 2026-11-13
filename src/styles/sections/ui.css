@@ -205,3 +205,8 @@ html body .barcode-suggest small {
   color: var(--c-cyan-60-2);
   white-space: nowrap;
 }
+
+/* The Recycle Bin when empty: the card closes round its message, not a white frame over the whole page. */
+html body .tools-list-workspace > .list-scroll-panel.bin-empty-panel {
+  flex: 0 1 auto;
+}

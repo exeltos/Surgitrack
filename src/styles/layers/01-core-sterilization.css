@@ -790,18 +790,16 @@ td {
   box-shadow: 0 8px 22px rgba(24, 59, 86, 0.14);
   margin-bottom: 21px;
 }
+/* The uppercase line over a sign-in card's title only repeated it: the title says it. */
 .auth-eyebrow {
-  display: block;
-  color: var(--st-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.11em;
-  font-weight: 650;
-  font-size: 11px;
+  display: none;
 }
 .auth-intro h1 {
-  font-size: 44px;
-  letter-spacing: -0.045em;
-  margin: 5px 0 0;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 12px 0 6px;
   color: var(--c-blue-15-2);
 }
 .auth-product-subtitle {
@@ -835,9 +833,9 @@ td {
   gap: 20px;
   margin-bottom: 23px;
 }
+/* No decorative icon beside a sign-in card's title. */
 .auth-card-title > svg {
-  color: var(--st-muted);
-  margin-top: 5px;
+  display: none;
 }
 .auth-card-title h2 {
   margin: 4px 0 6px;
@@ -1000,7 +998,7 @@ td {
     margin-right: auto;
   }
   .auth-intro h1 {
-    font-size: 34px;
+    font-size: 24px;
   }
   .auth-security {
     display: none;

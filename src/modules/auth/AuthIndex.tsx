@@ -51,7 +51,6 @@ const copy = {
       'Σάρωση barcode από το κινητό',
       'Δικαιώματα ανά ρόλο · ασφαλής πρόσβαση',
     ],
-    heroChips: ['Υπογραφές παράδοσης', 'Ιστορικό ανά εργαλείο', 'Αναφορές ημέρας'],
     login: 'Σύνδεση',
     register: 'Εγγραφή',
     forgot: 'Ξέχασα τον κωδικό',
@@ -111,7 +110,6 @@ const copy = {
       'Barcode scanning from the phone',
       'Rights by role · secure access',
     ],
-    heroChips: ['Handover signatures', 'History per instrument', 'Daily reports'],
     login: 'Sign in',
     register: 'Register',
     forgot: 'Forgot password',
@@ -405,11 +403,6 @@ export default function AuthIndex({
             </li>
           ))}
         </ul>
-        <div className="auth-hero-chips">
-          {t.heroChips.map(chip => (
-            <span key={chip}>{chip}</span>
-          ))}
-        </div>
       </aside>
       <div className="auth-side">
         <header className="auth-topbar">
