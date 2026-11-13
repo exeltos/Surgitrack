@@ -102,3 +102,9 @@ html body .stock-min-add > small {
     display: none;
   }
 }
+
+/* Stock list: «Απόθεμα» on every row is plain grey text; a badge stays for another state (Service, lost…). */
+html body .stock-state-plain {
+  color: var(--st-muted);
+  font-size: 13px;
+}

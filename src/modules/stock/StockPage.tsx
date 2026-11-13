@@ -262,9 +262,10 @@ export default function StockPage() {
                             <ColorMarker tapes={effectiveToolMarker(t)} size="sm" />
                             <small className="row-sub">
                               <span className="mono registry-row-barcode">{t.barcode}</span>
-                              {t.code ? ` · ${t.code}` : ''}
+                              {[t.code, t.serialNumber && `S/N ${t.serialNumber}`]
+                                .filter(Boolean)
+                                .map(part => ` · ${part}`)}
                             </small>
-                            {t.serialNumber && <small className="row-sub">S/N {t.serialNumber}</small>}
                           </span>
                         </div>
                       </td>
@@ -291,7 +292,12 @@ export default function StockPage() {
                         )}
                       </td>
                       <td>
-                        <StatusBadge value={t.state} />
+                        {/* Every row of this page is in stock: that is plain text, a badge only for another state. */}
+                        {t.state === 'IN_STOCK' ? (
+                          <span className="stock-state-plain">{statusLabel(t.state)}</span>
+                        ) : (
+                          <StatusBadge value={t.state} />
+                        )}
                       </td>
                       <td>
                         <Link className="icon-link" to={`/tools/${t.id}`} aria-label={tr('Άνοιγμα {0}', t.barcode)}>
