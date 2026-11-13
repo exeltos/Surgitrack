@@ -4038,6 +4038,10 @@ html body .sets-registry:not(.standalone-registry) th:nth-child(5) {
     flex-wrap: wrap;
     row-gap: 8px;
   }
+  /* Print, actions and «Προς Αποστείρωση» stay on the right, also when the bar wraps. */
+  html body .asset-workbench-actions > .asset-action-group:last-child:not(:first-child) {
+    margin-left: auto;
+  }
 }
 /* New Set / instrument form on a tablet: the label above its field, so the field gets the full width
    and its placeholder is not cut; the hint below it, in full. */

@@ -1358,7 +1358,6 @@ body {
   }
   .asset-workbench-actions {
     overflow-x: auto;
-    justify-content: flex-start;
   }
   .asset-action-group {
     flex: 0 0 auto;
