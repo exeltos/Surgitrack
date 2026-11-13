@@ -791,9 +791,6 @@ html body .people-head span {
   white-space: nowrap;
 }
 /* Users list: column names in sentence case, as on the other lists. */
-html body .people-head {
-  text-transform: none;
-}
 html body .hospital-tabs .hospital-count {
   white-space: nowrap;
 }
@@ -1465,4 +1462,58 @@ html body .hospital-overview .dash-activity > .dash-list,
 html body .hospital-overview .dash-attention > .dash-list {
   padding-bottom: 22px;
   mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+}
+
+/* Users (hospital admin and owner): one list with dividers instead of a box per person; the username grey and
+   small, so the person's name leads; the column names in sentence case. */
+html body .people-rows {
+  gap: 0;
+}
+html body .people-row {
+  min-height: 52px;
+  border: 0;
+  border-bottom: 1px solid var(--c-gray-95);
+  border-radius: 8px;
+}
+html body .people-row:last-child {
+  border-bottom: 0;
+}
+html body .people-row:hover:not(:disabled) {
+  background: var(--c-gray-100-2);
+}
+html body .people-row code {
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+html body .people-head {
+  text-transform: none;
+}
+/* A signup request: the name at the size of a list name, not a heading. */
+html body .hospital-request-who strong {
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Owner › Users: the hospital picker in the style of the other filters. */
+.studio-org-select {
+  height: 38px;
+  min-width: 240px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b7480' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 12px center;
+  color: var(--c-cyan-20);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+.studio-org-select:hover {
+  border-color: var(--c-cyan-65);
 }

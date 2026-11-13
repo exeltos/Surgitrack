@@ -37,6 +37,7 @@ export default function UsersTab({s}: {s: StudioPageState}) {
               </p>
             </div>
             <select
+              className="studio-org-select"
               aria-label={L('Νοσοκομείο', 'Hospital')}
               value={selectedOrganizationId}
               onChange={e => setSelectedOrganizationId(e.target.value)}

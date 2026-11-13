@@ -198,23 +198,25 @@ function HospitalList({s, organizations}: {s: StudioPageState; organizations: Or
               {!org.active && <span className="platform-status off">{L('Ανενεργό', 'Inactive')}</span>}
               {org.demoEnabled && <span className="platform-status demo">{L('Demo ανοικτό', 'Demo open')}</span>}
             </div>
-            <div className="platform-hospital-count">
+            {/* The number of users opens them: the hospital's people, roles and departments. */}
+            <button
+              type="button"
+              className="platform-hospital-count platform-hospital-users"
+              onClick={() => openOrganization(org)}
+              title={L('Χρήστες και τμήματα του νοσοκομείου', "The hospital's users and departments")}
+            >
               <strong>{users}</strong>
               <small>{L('χρήστες', 'users')}</small>
-            </div>
+            </button>
             <div className="platform-hospital-count">
               <strong>{departments}</strong>
               <small>{L('τμήματα', 'departments')}</small>
             </div>
             <div className="platform-hospital-actions">
-              <AppButton onClick={() => openOrganization(org)}>
-                <Users size={15} />
-                {L('Διαχείριση', 'Manage')}
-              </AppButton>
               {org.id === activeHospitalId() ? (
                 <span className="platform-here">{L('Εδώ εργάζεστε', 'Working here')}</span>
               ) : (
-                <AppButton disabled={!org.active} onClick={() => switchHospital(org.id)}>
+                <AppButton className="platform-enter" disabled={!org.active} onClick={() => switchHospital(org.id)}>
                   <LogIn size={15} />
                   {L('Είσοδος', 'Enter')}
                 </AppButton>
@@ -251,6 +253,13 @@ function hospitalActions(
     updateOrganizationFlags,
   } = s;
   const items: ActionMenuItem[] = [
+    {
+      key: 'users',
+      icon: <Users size={15} />,
+      label: L('Χρήστες & τμήματα', 'Users & departments'),
+      hint: L('Οι άνθρωποι του νοσοκομείου, οι ρόλοι και τα τμήματα', "The hospital's people, roles and departments"),
+      onSelect: () => s.openOrganization(org),
+    },
     {
       key: 'edit',
       icon: <Pencil size={15} />,

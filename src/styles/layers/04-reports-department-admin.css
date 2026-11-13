@@ -2942,7 +2942,7 @@
 }
 .platform-hospital {
   display: grid;
-  grid-template-columns: 36px minmax(200px, 1.4fr) minmax(220px, 1.2fr) 70px 70px 360px;
+  grid-template-columns: 36px minmax(200px, 1.4fr) minmax(220px, 1.2fr) 70px 70px 250px;
   align-items: center;
   gap: 14px;
   min-height: 60px;
@@ -2973,6 +2973,35 @@
 }
 .platform-hospital-counts-inline {
   display: none;
+}
+/* The users count is a link to the hospital's users. */
+.platform-hospital-users {
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.platform-hospital-users:hover {
+  border-color: var(--c-gray-90);
+  background: var(--c-white);
+}
+.platform-hospital-users:hover strong {
+  text-decoration: underline;
+}
+/* «Είσοδος»: the row's own action, recognisable at once (tinted teal) without competing with «Νέο νοσοκομείο». */
+/* (:not(:disabled) outweighs the shared .app-button:not(…):not(…):not(…) rule; a disabled one stays plain.) */
+html body .platform-hospital-actions .app-button.platform-enter:not(:disabled) {
+  border: 1.5px solid var(--c-cyan-25);
+  background: #e2f0f3;
+  color: var(--c-cyan-25);
+  font-weight: 650;
+}
+html body .platform-hospital-actions .app-button.platform-enter:hover:not(:disabled) {
+  border-color: var(--c-cyan-25);
+  background: var(--c-cyan-25);
+  color: var(--c-white);
 }
 .platform-hospital.inactive {
   background: var(--c-white);
@@ -4207,12 +4236,6 @@ a.auth-primary {
   height: 8px;
   border-radius: 50%;
   background: var(--c-gray-85);
-}
-.hospital-member-status.active {
-  color: var(--c-green-40-4);
-}
-.hospital-member-status.active > i {
-  background: var(--c-green-65);
 }
 /* Studio → Settings: the barcode label card, a summary of the hospital default and its editor. */
 .department-lives-head small {

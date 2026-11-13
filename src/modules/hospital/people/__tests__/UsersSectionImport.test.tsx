@@ -83,7 +83,7 @@ describe('the password mark on each person', () => {
     demo_enabled: false,
     ...extra,
   });
-  it('says who still has the initial password (and until when), who set their own, and who was locked', () => {
+  it('says who still has the initial password (and until when) and who was locked; a personal password, the usual, says nothing', () => {
     const shown = [
       member('a1', 'ΕΛΕΝΗ', {password_change_required: true, password_change_deadline: '2026-11-10T09:00:00Z'}),
       member('b2', 'ΝΙΚΟΣ', {password_change_required: false}),
@@ -109,7 +109,7 @@ describe('the password mark on each person', () => {
       ),
     );
     expect(screen.getByTitle(/Αρχικός κωδικός · έως 10\/11/)).toBeInTheDocument();
-    expect(screen.getByTitle(/^Προσωπικός κωδικός\./)).toBeInTheDocument();
+    expect(screen.queryByTitle(/^Προσωπικός κωδικός\./)).not.toBeInTheDocument();
     expect(screen.getByTitle(/Δεν άλλαξε κωδικό · κλειδώθηκε/)).toBeInTheDocument();
   });
 });
