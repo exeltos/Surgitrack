@@ -1,7 +1,8 @@
 name: Nightly backup
 
 # Every night: integrity checks (supabase/integrity.sql) and a data-only dump of the live database's public schema, restored onto a fresh database built
-# from supabase/migrations (which also proves the repository's schema still matches production), row counts
+# from supabase/migrations (which also proves the repository's schema still matches production; a migration already
+# live whose pull request is not merged yet is replayed from the live history, scripts/backup-live-migrations.sh), row counts
 # compared table by table, then encrypted and kept as a workflow artifact for 14 days.
 #
 # Needs two repository secrets (Settings → Secrets and variables → Actions):
@@ -64,6 +65,12 @@ jobs:
               (xpath('/row/n/text()', query_to_xml(format('select count(*) as n from public.%I', c.relname), false, true, '')))[1]::text)
             from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') order by 1" > live-counts.txt
           echo "Dump: $(du -h backup.dump | cut -f1), $(wc -l < live-counts.txt) tables."
+
+      # A migration applied live just before its pull request is merged is replayed from the live history (with a
+      # warning), so the restore test does not fail in that window; a change made outside a migration still fails it.
+      - name: Migrations live but not yet in main
+        if: steps.secrets.outputs.ready == 'true'
+        run: PSQL=/usr/lib/postgresql/17/bin/psql bash scripts/backup-live-migrations.sh
 
       - name: Restore onto the schema built from the migrations
         if: steps.secrets.outputs.ready == 'true'
