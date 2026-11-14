@@ -501,6 +501,8 @@ async function main() {
             '/traceability?q=S000321',
             '/traceability?q=T001201',
             '/traceability?tab=patients',
+            '/traceability?tab=patients&patient=PT-2026-0041',
+            '/traceability?tab=load',
             '/traceability?tab=history',
           );
         if (role === 'ADMIN') list.push('/no-such-page');

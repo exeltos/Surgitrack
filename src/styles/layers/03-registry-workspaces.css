@@ -585,8 +585,7 @@ body {
   flex: 0 0 auto;
 }
 .tools-list-workspace > .list-scroll-panel,
-.tools-list-workspace > .list-scroll-panel-kpis,
-.tools-list-workspace > .list-scroll-region {
+.tools-list-workspace > .list-scroll-panel-kpis {
   flex: 1 1 auto;
   min-height: 0;
   max-height: none;

@@ -1,76 +1,44 @@
-import {Fragment, useEffect, useState} from 'react';
-import {Link, useSearchParams} from 'react-router-dom';
-import {Search, Route, History, ExternalLink, Flame, UserRound, Users, ArrowLeft} from 'lucide-react';
+import {useEffect, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
+import {Search, History, Flame, Users, Package} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import PatientUses from './PatientUses';
 import MovementsPage from '../movements/MovementsPage';
-
 import {readRecentSearches, rememberRecentSearch} from '../../core/recentSearches';
 import {useSurgi} from '../../store/SurgiStore';
 import {getI18nLang, tr, trData} from '../../i18n';
 import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
-import {parseDisplayDate} from '../../core/displayDate';
-import type {Movement, ProcessLoadStatus, SetAsset, Tool} from '../../types/domain';
-import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import type {SetAsset, Tool} from '../../types/domain';
 import {movementText} from '../../core/movementText';
 import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
-import StatusBadge from '../../components/ui/StatusBadge';
+import ItemTrace from './ItemTrace';
+import PatientTrace from './PatientTrace';
+import LoadTrace from './LoadTrace';
+import {barcodeOf, cyclesOf, roundsOf, time} from './traceModel';
 
-/** One sterilization cycle an item went through, from the load it was in (or an older per-item record). */
-type CycleEntry = {
-  id: string;
-  at: string;
-  sterilizer: string;
-  cycleNumber: string;
-  program?: string;
-  label: string;
-  tone: 'ok' | 'bad' | '';
-  /** The Set the instrument was in, when the cycle was its Set's. */
-  via?: string;
-};
-const LOAD_STATUS: Record<ProcessLoadStatus, {label: string; tone: CycleEntry['tone']}> = {
-  OPEN: {label: 'Σε εξέλιξη', tone: ''},
-  PASSED: {label: 'Επιτυχία', tone: 'ok'},
-  AWAITING_RELEASE: {label: 'Αναμονή αποδέσμευσης', tone: ''},
-  RELEASED: {label: 'Αποδεσμεύτηκε', tone: 'ok'},
-  FAILED: {label: 'Αποτυχία', tone: 'bad'},
-  REPROCESS: {label: 'Επανεπεξεργασία', tone: 'bad'},
-  RECALLED: {label: 'Ανάκληση', tone: 'bad'},
+type Tab = 'SEARCH' | 'PATIENTS' | 'LOAD' | 'HISTORY';
+const TAB_PARAM: Record<Tab, string | undefined> = {
+  SEARCH: undefined,
+  PATIENTS: 'patients',
+  LOAD: 'load',
+  HISTORY: 'history',
 };
 
-const time = (value: string | undefined) => parseDisplayDate(value)?.getTime() ?? 0;
-const barcodeOf = (m: Movement) => m.asset.split(' · ')[0].trim();
+/**
+ * Traceability answers three questions, one tab each: where a Set or instrument is and what happened to it, what
+ * was used on a patient and whether it was sterilized in a good cycle, and what a sterilizer load held (to recall
+ * it). Every movement of the hospital is the fourth tab.
+ */
 export default function TraceabilityPage() {
-  const {sets, tools, movements, counts, sterilizationCycles, processLoads} = useSurgi();
-  const undone = useUndoneMovements();
-  // Opened from a movement: the item to look up comes in the address (?q=S000321).
+  const {sets, tools, movements, sterilizationCycles, processLoads} = useSurgi();
+  // Everything open is in the address (?q=, ?tab=, ?patient=, ?load=): «Πίσω» returns to it, a link opens it.
   const [params, setParams] = useSearchParams();
   const [q, setQ] = useState(() => params.get('q') || '');
-  // A movement opened from «Όλες οι κινήσεις» links here with its barcode while the page stays open.
   const urlQuery = params.get('q');
-  // A finished search (Enter, a pick, leaving the field) is a step of the browser's history, so «Πίσω» returns to it
-  // after opening an item, and from it to the empty search.
-  const commit = (term: string) => {
-    remember(term);
-    const value = term.trim();
-    // The field shows the term even when the address already has it (a recent search picked again).
-    setQ(term);
-    if (value && value !== urlQuery) setParams(current => ({...Object.fromEntries(current), q: value}));
-  };
-  useEffect(() => {
-    // «Πίσω» to a search, or to no search: the field follows the address.
-    setQ(urlQuery ?? '');
-  }, [urlQuery]);
-  // Three tabs: the search (a barcode or a patient code), every movement of the hospital, and every use
-  // recorded with a patient code.
-  const tab = params.get('tab') === 'patients' ? 'PATIENTS' : params.get('tab') === 'history' ? 'HISTORY' : 'SEARCH';
-  const patientCodes = new Set(movements.map(m => m.patientCode).filter(Boolean)).size;
-  // «Ασθενής»: the list of codes, or (?patient=PT-…) one patient's trace.
-  const patient = params.get('patient') || '';
   const [recent, setRecent] = useState<string[]>(readRecentSearches);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
@@ -78,6 +46,31 @@ export default function TraceabilityPage() {
     if (!term) return;
     setRecent(rememberRecentSearch(recent, term));
   };
+  // A finished search (Enter, a pick, leaving the field) is a step of the browser's history, so «Πίσω» returns to it
+  // after opening an item, and from it to the empty search.
+  const commit = (term: string) => {
+    remember(term);
+    const value = term.trim();
+    // The field shows the term even when the address already has it (a recent search picked again).
+    setQ(term);
+    if (value && value !== urlQuery) setParams({q: value});
+  };
+  useEffect(() => {
+    // «Πίσω» to a search, or to no search: the field follows the address.
+    setQ(urlQuery ?? '');
+  }, [urlQuery]);
+  const tabParam = params.get('tab');
+  const tab: Tab =
+    tabParam === 'patients' ? 'PATIENTS' : tabParam === 'load' ? 'LOAD' : tabParam === 'history' ? 'HISTORY' : 'SEARCH';
+  const patient = params.get('patient') || '';
+  const loadId = params.get('load') || '';
+  const openTab = (next: Tab) => {
+    if (next !== tab) setParams(TAB_PARAM[next] ? {tab: TAB_PARAM[next]!} : {});
+  };
+  const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
+  const openLoad = (id: string) => setParams({tab: 'load', load: id});
+  const openItem = (barcode: string) => commit(barcode);
+
   const needle = q.trim().toLowerCase();
   const all: Array<SetAsset | Tool> = [...sets, ...tools];
   // A barcode finds its item; a name or code finds every item it fits, to choose from when there are several.
@@ -87,96 +80,23 @@ export default function TraceabilityPage() {
   const nameMatches =
     needle && !exact ? all.filter(x => x.name.toLowerCase().includes(needle) || x.code?.toLowerCase() === needle) : [];
   // Typing a name or code offers the Sets and instruments (members of Sets too) to pick from.
-  const suggest = useAssetSuggest(
-    q,
-    picked => {
-      setQ(picked);
-      commit(picked);
-    },
-    all,
-  );
+  const suggest = useAssetSuggest(q, picked => commit(picked), all);
   const asset = exact || (nameMatches.length === 1 ? nameMatches[0] : undefined);
   const choosing = !asset && nameMatches.length > 1;
-  const isSet = !!asset && sets.some(s => s.id === asset.id);
-  const tool = asset && !isSet ? (asset as Tool) : undefined;
+  const tool = asset && !sets.some(s => s.id === asset.id) ? (asset as Tool) : undefined;
   // A member instrument travels inside its Set: the Set's moves belong to its trail too.
   const carrierSet = tool?.mode === 'SET_MEMBER' ? sets.find(s => s.id === tool.setId) : undefined;
-  const codes = asset ? [asset.barcode, ...(asset.legacyBarcodes || [])].map(b => b.toLowerCase()) : [];
-  const own = asset
-    ? movements.filter(m => codes.includes(barcodeOf(m).toLowerCase()))
-    : choosing
-      ? []
-      : needle
-        ? movements.filter(m => [m.asset, m.status].some(x => x?.toLowerCase().includes(needle)))
-        : [];
-  const setMoves = carrierSet
-    ? movements.filter(m => barcodeOf(m).toLowerCase() === carrierSet.barcode.toLowerCase())
-    : [];
-  const related = [...own, ...setMoves];
-  const countHits = patient ? counts.filter(c => c.patientCode.toLowerCase() === patient.toLowerCase()) : [];
-  // One item's trail: its name is in the card above, so each step shows only what happened.
-  const singleAsset = !!asset;
-  // The sterilization cycles an item went through: its own, or (an instrument in a Set) its Set's.
-  const cyclesOf = (item: SetAsset | Tool): CycleEntry[] => {
-    const inSet = 'mode' in item && item.mode === 'SET_MEMBER' ? sets.find(x => x.id === item.setId) : undefined;
-    const entries: CycleEntry[] = [];
-    processLoads
-      .filter(l => l.kind === 'STERILIZATION')
-      .forEach(l => {
-        const own = l.items.some(i => i.assetId === item.id || i.barcode === item.barcode);
-        const viaSet = !own && !!inSet && l.items.some(i => i.assetId === inSet.id);
-        if (!own && !viaSet) return;
-        const status = LOAD_STATUS[l.status];
-        entries.push({
-          id: l.id,
-          at: l.completedAt || l.createdAt,
-          sterilizer: l.equipment,
-          cycleNumber: l.cycleNumber,
-          program: l.program,
-          label: tr(status.label),
-          tone: status.tone,
-          via: viaSet ? inSet?.barcode : undefined,
-        });
-      });
-    sterilizationCycles
-      .filter(c => c.assetId === item.id || c.barcode === item.barcode || c.toolIds?.includes(item.id))
-      .forEach(c => {
-        if (entries.some(e => e.sterilizer === c.sterilizer && e.cycleNumber === c.cycleNumber)) return;
-        entries.push({
-          id: c.id,
-          at: c.completedAt,
-          sterilizer: c.sterilizer,
-          cycleNumber: c.cycleNumber,
-          program: c.program,
-          label: c.result === 'PASSED' ? tr('Επιτυχία') : tr('Αποτυχία'),
-          tone: c.result === 'PASSED' ? 'ok' : 'bad',
-          via: c.barcode !== item.barcode ? c.barcode : undefined,
-        });
-      });
-    return entries.sort((x, y) => time(y.at) - time(x.at));
-  };
-  const cycles = asset ? cyclesOf(asset).slice(0, 20) : [];
-  // A patient code: what was used for that patient, with the last cycle before the use.
-  const patientMoves = patient ? movements.filter(m => m.patientCode?.toLowerCase() === patient.toLowerCase()) : [];
+  const codes = [asset, carrierSet]
+    .flatMap(x => (x ? [x.barcode, ...(x.legacyBarcodes || [])] : []))
+    .map(b => b.toLowerCase());
+  const moves = asset ? movements.filter(m => codes.includes(barcodeOf(m).toLowerCase())) : [];
+  const cycles = asset ? cyclesOf(asset, sets, processLoads, sterilizationCycles) : [];
+  const rounds = asset ? roundsOf(moves, cycles) : [];
   // A code typed in the item search: offered to open as a patient.
   const typedPatient =
     needle && !asset && !choosing
       ? movements.find(m => m.patientCode?.toLowerCase() === needle)?.patientCode
       : undefined;
-  const patientItems = (() => {
-    const seen = new Map<string, {item?: SetAsset | Tool; label: string; at: string; cycle?: CycleEntry}>();
-    [...patientMoves]
-      .sort((a, b) => time(a.at) - time(b.at))
-      .forEach(m => {
-        const code = barcodeOf(m);
-        if (seen.has(code)) return;
-        const item = all.find(x => x.barcode === code);
-        const used = time(m.at);
-        const cycle = item ? cyclesOf(item).find(c => !used || time(c.at) <= used) : undefined;
-        seen.set(code, {item, label: m.asset, at: m.at, cycle});
-      });
-    return [...seen.values()];
-  })();
   // An empty search offers the Sets and instruments that moved last: one click opens their trail.
   const recentlyMoved = (() => {
     if (needle) return [];
@@ -193,8 +113,8 @@ export default function TraceabilityPage() {
     return out;
   })();
   const traceTable = (): ExportTable => ({
-    title: tr('Ιχνηλάτηση · {0}', q.trim()),
-    subtitle: tr('{0} κινήσεις', related.length),
+    title: tr('Ιχνηλάτηση · {0}', asset ? `${asset.barcode} ${asset.name}` : q.trim()),
+    subtitle: tr('{0} κινήσεις', moves.length),
     headers: [
       tr('Ημερομηνία / ώρα'),
       tr('Σετ / Εργαλείο'),
@@ -204,141 +124,62 @@ export default function TraceabilityPage() {
       tr('Χρήστης'),
       tr('Κωδικός ασθενούς'),
     ],
-    rows: related.map(m => [
-      m.at,
-      m.asset,
-      movementText(m.status),
-      trData(m.from),
-      trData(m.to),
-      trData(m.by),
-      m.patientCode || '',
-    ]),
+    rows: [...moves]
+      .sort((a, b) => time(b.at) - time(a.at))
+      .map(m => [
+        m.at,
+        m.asset,
+        movementText(m.status),
+        trData(m.from),
+        trData(m.to),
+        trData(m.by),
+        m.patientCode || '',
+      ]),
   });
+  const tabs: Array<{id: Tab; label: string; icon: typeof Search}> = [
+    {id: 'SEARCH', label: 'Σετ / εργαλείο', icon: Package},
+    {id: 'PATIENTS', label: 'Ασθενής', icon: Users},
+    {id: 'LOAD', label: 'Φορτίο κλιβάνου', icon: Flame},
+    {id: 'HISTORY', label: 'Όλες οι κινήσεις', icon: History},
+  ];
+
   return (
     // The movements tab fills the page, as «Ιστορικό» did on its own.
-    <div className={tab === 'HISTORY' ? 'trace-with-history' : undefined}>
+    <div className={tab === 'HISTORY' ? 'trace-with-history' : 'trace-page'}>
       <div className="page-head">
         <div>
-          <span className="eyebrow">{tr('Ιχνηλασιμότητα')}</span>
           <h1>{tr('Ιχνηλάτηση')}</h1>
-          <p>{tr('Τι έγινε σε ένα Σετ ή εργαλείο, ή ποιο υλικό καταγράφηκε για έναν ασθενή (μόνο κωδικός).')}</p>
         </div>
-        {tab === 'SEARCH' && related.length > 0 && (
-          <div className="page-head-actions">
-            <DownloadMenu table={traceTable} onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))} />
-          </div>
-        )}
+      </div>
+      <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            className={tab === t.id ? 'active' : ''}
+            onClick={() => openTab(t.id)}
+          >
+            <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
+          </button>
+        ))}
       </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
-      <div className="name-check-tabs trace-tabs" role="tablist">
-        <button
-          role="tab"
-          aria-selected={tab === 'SEARCH'}
-          className={tab === 'SEARCH' ? 'active' : ''}
-          onClick={() => setParams({})}
-        >
-          <Search size={16} /> {tr('Σετ / εργαλείο')}
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'PATIENTS'}
-          className={tab === 'PATIENTS' ? 'active' : ''}
-          onClick={() => setParams({tab: 'patients'})}
-        >
-          <Users size={16} /> {tr('Ασθενής')} <b>{patientCodes}</b>
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'HISTORY'}
-          className={tab === 'HISTORY' ? 'active' : ''}
-          onClick={() => setParams({tab: 'history'})}
-        >
-          <History size={16} /> {tr('Όλες οι κινήσεις')}
-        </button>
-      </div>
       {tab === 'HISTORY' ? (
         <MovementsPage embedded />
       ) : tab === 'PATIENTS' && !patient ? (
-        <PatientUses movements={movements} onOpen={code => setParams({tab: 'patients', patient: code})} />
+        <PatientUses movements={movements} onOpen={openPatient} />
       ) : tab === 'PATIENTS' ? (
-        <>
-          <button type="button" className="trace-back" onClick={() => setParams({tab: 'patients'})}>
-            <ArrowLeft size={16} /> {tr('Όλοι οι ασθενείς')}
-          </button>
-          {patientItems.length > 0 ? (
-            <div className="trace-card trace-patient">
-              <UserRound size={24} />
-              <div>
-                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
-                <h2>{patientMoves[0].patientCode}</h2>
-                <ul>
-                  {patientItems.map(p => (
-                    <li key={p.label}>
-                      {p.item ? (
-                        <Link to={sets.some(x => x.id === p.item!.id) ? `/sets/${p.item.id}` : `/tools/${p.item.id}`}>
-                          {p.label}
-                        </Link>
-                      ) : (
-                        <b>{p.label}</b>
-                      )}
-                      <small>
-                        {tr('Καταγράφηκε στις {0}', p.at)} ·{' '}
-                        {p.cycle
-                          ? tr(
-                              'Τελευταίος κύκλος πριν: {0} · κύκλος {1} · {2} · {3}',
-                              p.cycle.sterilizer,
-                              p.cycle.cycleNumber,
-                              p.cycle.at,
-                              p.cycle.label,
-                            )
-                          : tr('Δεν βρέθηκε κύκλος αποστείρωσης πριν.')}
-                      </small>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="empty">
-              <strong>{tr('Δεν βρέθηκε ασθενής με κωδικό «{0}»', patient)}</strong>
-            </div>
-          )}
-          {countHits.map(c => (
-            <div className="trace-card" key={c.id}>
-              <Route size={24} />
-              <div>
-                <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
-                <h2>{c.patientCode}</h2>
-                <p>
-                  {tr('Υπογεγραμμένη καταμέτρηση Σετ') + ' '}
-                  {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/{c.expected} {tr('εργαλεία ·') + ' '}
-                  {c.at}.
-                </p>
-              </div>
-            </div>
-          ))}
-          <div className="timeline list-scroll-region" role="region" tabIndex={0} aria-label={tr('Κινήσεις')}>
-            {[...patientMoves]
-              .sort((a, b) => time(b.at) - time(a.at))
-              .map(m => (
-                <div className="timeline-item trace-step" key={m.id}>
-                  <time>{m.at}</time>
-                  <div className="dot" />
-                  <div>
-                    <strong>
-                      {movementText(m.status)}{' '}
-                      {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                    </strong>
-                    <span className="trace-step-asset">{m.asset}</span>
-                    <small>
-                      {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
-                    </small>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </>
+        <PatientTrace
+          patient={patient}
+          onBack={() => setParams({tab: 'patients'})}
+          onItem={openItem}
+          onLoad={openLoad}
+        />
+      ) : tab === 'LOAD' ? (
+        <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
       ) : (
         <>
           <form
@@ -394,110 +235,42 @@ export default function TraceabilityPage() {
               )}
             </div>
           )}
-          {asset && (
-            <div className="trace-card trace-item">
-              <AssetTypeIcon
-                kind={isSet ? 'SET' : 'TOOL'}
-                maxUses={tool?.maxUses}
-                wearCheck={tool?.wearCheck}
-                framed
-                size={16}
-              />
-              <div>
-                <h2>
-                  <span className="mono">{asset.barcode}</span> · {asset.name}
-                </h2>
-                <p>
-                  {trData(asset.department) || tr('Απόθεμα')}
-                  {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
-                </p>
-              </div>
-              <StatusBadge value={asset.state} />
-              <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
-                <ExternalLink size={16} /> {tr('Άνοιγμα καρτέλας')}
-              </Link>
-            </div>
-          )}
           {typedPatient && (
             <div className="trace-pick">
               <strong>{tr('Το «{0}» είναι κωδικός ασθενούς.', typedPatient)}</strong>
-              <button
-                type="button"
-                className="app-button"
-                onClick={() => setParams({tab: 'patients', patient: typedPatient})}
-              >
+              <button type="button" className="app-button" onClick={() => openPatient(typedPatient)}>
                 {tr('Άνοιγμα ασθενούς')}
               </button>
             </div>
           )}
-          {cycles.length > 0 && (
-            <section className="trace-cycles">
-              <h3>
-                <Flame size={15} /> {tr('Κύκλοι αποστείρωσης')}
-              </h3>
-              <ul>
-                {cycles.map(c => (
-                  <li key={c.id}>
-                    <time>{c.at}</time>
-                    <span>
-                      {c.sterilizer} · {tr('κύκλος {0}', c.cycleNumber)}
-                      {c.program ? ` · ${c.program}` : ''}
-                      {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
-                    </span>
-                    <b className={c.tone}>{c.label}</b>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {needle ? (
-            <div className="timeline list-scroll-region" role="region" tabIndex={0} aria-label={tr('Κινήσεις')}>
-              {related.length ? (
-                related.map((m, i) => (
-                  <Fragment key={m.id}>
-                    {i === own.length && carrierSet && (
-                      <h3 className="trace-group">
-                        {tr('Κινήσεις του Σετ {0}', `${carrierSet.barcode} · ${carrierSet.name}`)}
-                      </h3>
-                    )}
-                    <div className="timeline-item trace-step">
-                      <time>{m.at}</time>
-                      <div className="dot" />
-                      <div>
-                        <strong>
-                          {movementText(m.status)}{' '}
-                          {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                        </strong>
-                        {!singleAsset && <span className="trace-step-asset">{m.asset}</span>}
-                        <small>
-                          {trData(m.from)} → {trData(m.to)} · {trData(m.by)}
-                          {m.patientCode && (
-                            <>
-                              {' · '}
-                              <button
-                                type="button"
-                                className="trace-patient-link"
-                                title={tr('Ιχνηλάτηση ασθενούς {0}', m.patientCode)}
-                                onClick={() => setParams({tab: 'patients', patient: m.patientCode!})}
-                              >
-                                {tr('Ασθενής {0}', m.patientCode)}
-                              </button>
-                            </>
-                          )}
-                        </small>
-                      </div>
-                    </div>
-                  </Fragment>
-                ))
-              ) : choosing ? null : (
-                <div className="empty">
-                  <strong>
-                    {asset ? tr('Δεν βρέθηκαν κινήσεις') : tr('Δεν βρέθηκε Σετ ή εργαλείο με «{0}»', q.trim())}
-                  </strong>
-                  <span>{tr('Δοκιμάστε άλλο barcode ή όνομα.')}</span>
+          {asset ? (
+            <>
+              <ItemTrace
+                asset={asset}
+                carrierSet={carrierSet}
+                moves={moves}
+                cycles={cycles}
+                rounds={rounds}
+                onPatient={openPatient}
+                onLoad={openLoad}
+              />
+              {moves.length > 0 && (
+                <div className="trace-actions">
+                  <DownloadMenu
+                    table={traceTable}
+                    onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))}
+                  />
                 </div>
               )}
-            </div>
+            </>
+          ) : needle ? (
+            !choosing &&
+            !typedPatient && (
+              <div className="empty">
+                <strong>{tr('Δεν βρέθηκε Σετ ή εργαλείο με «{0}»', q.trim())}</strong>
+                <span>{tr('Δοκιμάστε άλλο barcode ή όνομα.')}</span>
+              </div>
+            )
           ) : (
             <>
               <p className="trace-hint">{tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}</p>
@@ -505,29 +278,23 @@ export default function TraceabilityPage() {
                 <section className="trace-recently" aria-label={tr('Κινήθηκαν πρόσφατα')}>
                   <h3>{tr('Κινήθηκαν πρόσφατα')}</h3>
                   <div className="trace-recently-grid">
-                    {recentlyMoved.map(({item, at, status}) => {
-                      const itemIsSet = sets.some(x => x.id === item.id);
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          className="trace-recently-card"
-                          onClick={() => {
-                            setQ(item.barcode);
-                            commit(item.barcode);
-                          }}
-                        >
-                          <AssetTypeIcon kind={itemIsSet ? 'SET' : 'TOOL'} framed size={15} />
-                          <span>
-                            <strong>{item.name}</strong>
-                            <small>
-                              <span className="mono">{item.barcode}</span> · {movementText(status)}
-                            </small>
-                            <small>{at}</small>
-                          </span>
-                        </button>
-                      );
-                    })}
+                    {recentlyMoved.map(({item, at, status}) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="trace-recently-card"
+                        onClick={() => commit(item.barcode)}
+                      >
+                        <AssetTypeIcon kind={sets.some(x => x.id === item.id) ? 'SET' : 'TOOL'} framed size={15} />
+                        <span>
+                          <strong>{item.name}</strong>
+                          <small>
+                            <span className="mono">{item.barcode}</span> · {movementText(status)}
+                          </small>
+                          <small>{at}</small>
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </section>
               )}

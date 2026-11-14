@@ -2,46 +2,6 @@
 
 /* Traceability trail: date and time in their own column, a line joining the steps, the step
    itself as the headline; the item's card has «Άνοιγμα καρτέλας» on the right. */
-html body .trace-card .trace-open {
-  text-decoration: none;
-  margin-left: auto;
-  align-self: center;
-  white-space: nowrap;
-}
-html body .timeline-item.trace-step {
-  grid-template-columns: 132px 18px minmax(0, 1fr);
-  gap: 12px;
-  padding: 6px 0 16px;
-}
-html body .trace-step time {
-  padding-top: 1px;
-  color: var(--c-blue-15);
-  font-size: 13px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-html body .trace-step .dot {
-  position: relative;
-  justify-self: center;
-}
-html body .trace-step:not(:last-child) .dot::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 4px;
-  width: 2px;
-  height: calc(100% + 40px);
-  background: var(--c-gray-80);
-}
-html body .trace-step > div:last-child {
-  display: grid;
-  gap: 2px;
-}
-html body .trace-step-asset {
-  color: var(--c-cyan-35);
-  font-size: 13px;
-  font-weight: 600;
-}
 /* Traceability: several items fit a name, so they are listed to choose from. */
 html body .trace-pick {
   margin-bottom: 16px;
@@ -50,9 +10,7 @@ html body .trace-pick {
   border-radius: 12px;
   background: var(--c-white);
 }
-html body .trace-pick ul,
-html body .trace-patient ul,
-html body .trace-cycles ul {
+html body .trace-pick ul {
   display: grid;
   gap: 6px;
   margin: 8px 0 0;
@@ -81,117 +39,406 @@ html body .trace-pick button .mono {
   color: var(--c-cyan-35);
 }
 html body .trace-pick button small {
-  color: var(--c-blue-50);
+  color: var(--c-blue-40);
   font-size: 12px;
-}
-/* A patient: what was used, each with the last sterilization cycle before the use. */
-html body .trace-patient li {
-  display: grid;
-  gap: 2px;
-}
-html body .trace-patient li a {
-  color: var(--c-cyan-35);
-  font-weight: 600;
-  text-decoration: none;
-}
-html body .trace-patient li small {
-  color: var(--c-blue-50);
-  font-size: 12.5px;
-}
-/* The sterilization cycles an item went through. */
-html body .trace-cycles {
-  margin-bottom: 16px;
-  padding: 14px 16px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .trace-cycles h3,
-html body .trace-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  color: var(--c-blue-45);
-  font-size: 12px;
-  font-weight: 600;
-}
-html body .trace-group {
-  margin: 10px 0 8px;
-}
-html body .trace-cycles li {
-  display: grid;
-  grid-template-columns: 132px minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: baseline;
-  font-size: 13px;
-}
-html body .trace-cycles time {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-html body .trace-cycles b.ok {
-  color: var(--c-green-40-3);
-}
-html body .trace-cycles b.bad {
-  color: var(--c-red-40-2);
-}
-html body .trace-patient li a,
-html body .trace-patient li b {
-  font-size: 14px;
 }
 html body .trace-pick > small {
   display: block;
   margin-top: 8px;
-  color: var(--c-blue-50);
+  color: var(--c-blue-40);
   font-size: 12px;
 }
-@media (max-width: 700px) {
-  html body .timeline-item.trace-step {
-    grid-template-columns: 18px minmax(0, 1fr);
-  }
-  html body .trace-step time {
-    grid-column: 2;
-    order: -1;
-  }
-  html body .trace-step .dot {
-    grid-row: 1 / span 2;
-    grid-column: 1;
-  }
-  html body .trace-card {
-    flex-wrap: wrap;
-    /* The item's card stays small, so its trail shows at once. */
-    gap: 10px;
-    padding: 12px 14px;
-  }
-  html body .trace-card .trace-open {
-    margin-left: 0;
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 13px;
-  }
-  html body .trace-cycles li {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  html body .trace-cycles li span {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-  html body .trace-card > svg {
-    display: none;
-  }
-  html body .trace-card h2 {
-    font-size: 19px;
-  }
-  html body .trace-card p {
-    font-size: 13.5px;
-  }
-}
 
-/* Search | Uses with a patient code. */
+/* The tabs keep the same room before what follows them as every tab bar. */
 html body .trace-tabs {
   flex: none;
-  margin-bottom: 12px;
+}
+
+/* One item, one patient or one load: a card with the answer first. */
+html body .trace-summary {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 22px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 16px;
+  background: var(--c-white);
+}
+html body .trace-summary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+}
+html body .trace-summary-title {
+  display: grid;
+  flex: 1 1 260px;
+  gap: 4px;
+  min-width: 0;
+}
+html body .trace-summary-title small {
+  color: var(--c-blue-40);
+  font-size: 13px;
+  font-weight: 700;
+}
+html body .trace-summary-title h2 {
+  margin: 0;
+  color: var(--c-blue-15-2);
+  font-size: 22px;
+  font-weight: 800;
+}
+html body .trace-summary-title span {
+  color: var(--c-blue-40);
+  font-size: 14px;
+}
+html body .trace-now {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+html body .trace-now-place {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--c-gray-95-11);
+  color: var(--c-blue-25-2);
+  font-weight: 700;
+}
+html body .trace-now small {
+  color: var(--c-blue-40);
+  font-size: 13px;
+}
+html body .trace-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+html body .trace-facts > div {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--c-gray-95);
+}
+html body .trace-facts dt {
+  color: var(--c-blue-40);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+html body .trace-facts dd {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+html body .trace-facts dd b {
+  color: var(--c-blue-15-2);
+  font-size: 16px;
+}
+html body .trace-facts dd span {
+  color: var(--c-blue-40);
+  font-size: 13px;
+}
+html body .trace-facts .trace-expired {
+  color: var(--c-red-40);
+  font-weight: 700;
+}
+html body .trace-summary .trace-open {
+  justify-self: start;
+  text-decoration: none;
+}
+
+/* A result: green when it went well, red when not, amber while it is awaited. */
+html body .trace-tone {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-blue-15-2);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+  white-space: nowrap;
+}
+html body .trace-tone.ok {
+  background: var(--c-gray-95-8);
+  color: var(--c-green-40);
+}
+html body .trace-tone.bad {
+  background: var(--c-gray-95-5);
+  color: var(--c-red-40);
+}
+html body .trace-tone.wait {
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+}
+html body .trace-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+html body .trace-verdict.ok {
+  background: var(--c-gray-95-8);
+  color: var(--c-green-40);
+}
+html body .trace-verdict.wait {
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+}
+html body .trace-verdict.bad {
+  background: var(--c-gray-95-5);
+  color: var(--c-red-40);
+}
+html body .trace-patient-summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+html body .trace-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-cyan-35);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* The history, round by round: the current one open, the older ones one line each. */
+html body .trace-rounds {
+  display: grid;
+  gap: 10px;
+}
+html body .trace-rounds > h3,
+html body .trace-load-items h3 {
+  margin: 0;
+  color: var(--c-blue-15-2);
+  font-size: 16px;
+}
+html body .trace-round {
+  display: grid;
+  gap: 4px;
+  padding: 16px 20px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+html body .trace-round.current {
+  border: 2px solid var(--c-blue-25-2);
+}
+html body .trace-round-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-bottom: 6px;
+}
+html body .trace-round-head b {
+  color: var(--c-blue-15-2);
+}
+html body .trace-round-head span {
+  flex: 1;
+  color: var(--c-blue-40);
+  font-size: 14px;
+}
+html body .trace-round-line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: var(--c-blue-15-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+html body .trace-round-line:hover {
+  background: var(--c-gray-95);
+}
+html body .trace-round-line span {
+  overflow: hidden;
+  color: var(--c-blue-40);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .trace-steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .trace-steps li {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  padding: 6px 0;
+  border-top: 1px solid var(--c-gray-95);
+}
+html body .trace-steps li:first-child {
+  border-top: 0;
+}
+html body .trace-steps time {
+  color: var(--c-blue-40);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-steps li > span:nth-child(2) {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+html body .trace-steps b {
+  color: var(--c-blue-15-2);
+  font-weight: 600;
+}
+html body .trace-steps small {
+  color: var(--c-blue-40);
+  font-size: 13px;
+}
+html body .trace-step-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+html body .trace-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+/* A table of what was used, or what was in a load. */
+html body .trace-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+html body .trace-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+html body .trace-table th {
+  padding: 12px 18px;
+  color: var(--c-blue-40);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+}
+html body .trace-table td {
+  padding: 14px 18px;
+  border-top: 1px solid var(--c-gray-95);
+  vertical-align: middle;
+}
+html body .trace-table td > small {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-blue-40);
+  font-size: 13px;
+}
+html body .trace-table td > b {
+  color: var(--c-blue-15-2);
+}
+
+/* A load: sterilizer and cycle to find it; what it held, with the ones already used on a patient marked. */
+html body .trace-load-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+html body .trace-load-search label {
+  display: grid;
+  gap: 6px;
+  color: var(--c-blue-40);
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-load-search select,
+html body .trace-load-search input {
+  min-width: 180px;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-4);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-blue-15-2);
+  font: inherit;
+  font-weight: 600;
+}
+html body .trace-load-search button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+}
+html body .trace-load-items {
+  display: grid;
+  gap: 10px;
+}
+html body .trace-load-items-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+html body .trace-used {
+  color: var(--c-amber-35);
+  font-weight: 700;
+}
+html body .trace-recall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 2px solid var(--c-red-40);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: var(--c-red-40);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body .trace-recall:hover {
+  background: var(--c-gray-95-5);
+}
+@media (max-width: 720px) {
+  html body .trace-steps li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  html body .trace-steps time {
+    grid-column: 1 / -1;
+  }
+  html body .trace-now {
+    justify-items: start;
+  }
+  html body .trace-patient-summary {
+    grid-template-columns: 1fr;
+  }
 }
 /* Uses with a patient code: filters on one line, then the list. */
 html body .trace-patients {
@@ -237,41 +484,7 @@ html body .trace-hint {
 }
 
 /* The item found: one row (icon, barcode and name, its place, its state, the way to its card). */
-html body .trace-card.trace-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  margin-bottom: 10px;
-}
-html body .trace-card.trace-item h2 {
-  margin: 0;
-  color: var(--c-cyan-20);
-  font-size: 16px;
-}
-html body .trace-card.trace-item p {
-  margin: 2px 0 0;
-  color: var(--st-muted);
-  font-size: 12.5px;
-}
-html body .trace-card.trace-item > .status-badge,
-html body .trace-card.trace-item > .badge {
-  margin-left: auto;
-}
 /* A patient code in the trail opens that patient's trace. */
-html body .trace-patient-link {
-  padding: 0 6px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--c-gray-95-3);
-  color: var(--c-cyan-40-3);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-html body .trace-patient-link:hover {
-  text-decoration: underline;
-}
 
 /* An empty search: the Sets and instruments that moved last, as small cards; one click opens the trail. */
 html body .trace-recently {

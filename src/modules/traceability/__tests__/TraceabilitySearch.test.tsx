@@ -15,7 +15,7 @@ describe('TraceabilityPage search', () => {
     fireEvent.click(within(first).getByRole('button'));
     expect(field()).toHaveValue(barcode);
     expect(screen.queryByRole('listbox', {name: 'Προτάσεις'})).not.toBeInTheDocument();
-    expect(screen.getByRole('link', {name: /Άνοιγμα καρτέλας/})).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
   });
 
   it('shows one line of help, not an empty card, before anything is typed', () => {
