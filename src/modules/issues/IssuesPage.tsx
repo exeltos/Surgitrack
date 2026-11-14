@@ -146,7 +146,7 @@ export default function IssuesPage() {
         role="tab"
         aria-selected={tab === 'REPORTS'}
         className={tab === 'REPORTS' ? 'active' : ''}
-        onClick={() => setParams({}, {replace: true})}
+        onClick={() => setParams({})}
       >
         <ClipboardList size={16} /> {tr('Αναφορές')} <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
       </button>
@@ -154,7 +154,7 @@ export default function IssuesPage() {
         role="tab"
         aria-selected={tab === 'REPLACEMENTS'}
         className={tab === 'REPLACEMENTS' ? 'active' : ''}
-        onClick={() => setParams({tab: 'replacements'}, {replace: true})}
+        onClick={() => setParams({tab: 'replacements'})}
       >
         <PackageX size={16} /> {tr('Αντικαταστάσεις')} <b>{neededReplacements}</b>
       </button>
@@ -162,13 +162,13 @@ export default function IssuesPage() {
         role="tab"
         aria-selected={tab === 'ORDERS'}
         className={tab === 'ORDERS' ? 'active' : ''}
-        onClick={() => setParams({tab: 'orders'}, {replace: true})}
+        onClick={() => setParams({tab: 'orders'})}
       >
         <Truck size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
       </button>
     </div>
   ) : null;
-  const goToOrders = () => setParams({tab: 'orders'}, {replace: true});
+  const goToOrders = () => setParams({tab: 'orders'});
   return (
     <div className="tools-list-workspace">
       <PageHeader
@@ -186,7 +186,7 @@ export default function IssuesPage() {
             embedded
             tabs={tabs}
             view={tab === 'ORDERS' ? 'ORDERS' : 'ITEMS'}
-            onView={view => setParams(view === 'ORDERS' ? {tab: 'orders'} : {tab: 'replacements'}, {replace: true})}
+            onView={view => setParams(view === 'ORDERS' ? {tab: 'orders'} : {tab: 'replacements'})}
           />
         </Suspense>
       ) : (

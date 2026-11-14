@@ -52,8 +52,16 @@ export default function TraceabilityPage() {
   const [q, setQ] = useState(() => params.get('q') || '');
   // A movement opened from «Όλες οι κινήσεις» links here with its barcode while the page stays open.
   const urlQuery = params.get('q');
+  // A finished search (Enter, a pick, leaving the field) is a step of the browser's history, so «Πίσω» returns to it
+  // after opening an item, and from it to the empty search.
+  const commit = (term: string) => {
+    remember(term);
+    const value = term.trim();
+    if (value && value !== urlQuery) setParams(current => ({...Object.fromEntries(current), q: value}));
+  };
   useEffect(() => {
-    if (urlQuery) setQ(urlQuery);
+    // «Πίσω» to a search, or to no search: the field follows the address.
+    setQ(urlQuery ?? '');
   }, [urlQuery]);
   // Three tabs: the search (a barcode or a patient code), every movement of the hospital, and every use
   // recorded with a patient code.
@@ -81,7 +89,7 @@ export default function TraceabilityPage() {
     q,
     picked => {
       setQ(picked);
-      remember(picked);
+      commit(picked);
     },
     all,
   );
@@ -226,7 +234,7 @@ export default function TraceabilityPage() {
           role="tab"
           aria-selected={tab === 'SEARCH'}
           className={tab === 'SEARCH' ? 'active' : ''}
-          onClick={() => setParams({}, {replace: true})}
+          onClick={() => setParams({})}
         >
           <Search size={16} /> {tr('Σετ / εργαλείο')}
         </button>
@@ -234,7 +242,7 @@ export default function TraceabilityPage() {
           role="tab"
           aria-selected={tab === 'PATIENTS'}
           className={tab === 'PATIENTS' ? 'active' : ''}
-          onClick={() => setParams({tab: 'patients'}, {replace: true})}
+          onClick={() => setParams({tab: 'patients'})}
         >
           <Users size={16} /> {tr('Ασθενής')} <b>{patientCodes}</b>
         </button>
@@ -242,7 +250,7 @@ export default function TraceabilityPage() {
           role="tab"
           aria-selected={tab === 'HISTORY'}
           className={tab === 'HISTORY' ? 'active' : ''}
-          onClick={() => setParams({tab: 'history'}, {replace: true})}
+          onClick={() => setParams({tab: 'history'})}
         >
           <History size={16} /> {tr('Όλες οι κινήσεις')}
         </button>
@@ -250,13 +258,10 @@ export default function TraceabilityPage() {
       {tab === 'HISTORY' ? (
         <MovementsPage embedded />
       ) : tab === 'PATIENTS' && !patient ? (
-        <PatientUses
-          movements={movements}
-          onOpen={code => setParams({tab: 'patients', patient: code}, {replace: true})}
-        />
+        <PatientUses movements={movements} onOpen={code => setParams({tab: 'patients', patient: code})} />
       ) : tab === 'PATIENTS' ? (
         <>
-          <button type="button" className="trace-back" onClick={() => setParams({tab: 'patients'}, {replace: true})}>
+          <button type="button" className="trace-back" onClick={() => setParams({tab: 'patients'})}>
             <ArrowLeft size={16} /> {tr('Όλοι οι ασθενείς')}
           </button>
           {patientItems.length > 0 ? (
@@ -338,7 +343,7 @@ export default function TraceabilityPage() {
             className="trace-search"
             onSubmit={e => {
               e.preventDefault();
-              remember(q);
+              commit(q);
             }}
           >
             <Search />
@@ -346,7 +351,7 @@ export default function TraceabilityPage() {
               value={q}
               onChange={e => setQ(e.target.value)}
               onKeyDown={suggest.onKeyDown}
-              onBlur={() => needle && remember(q)}
+              onBlur={() => needle && commit(q)}
               placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
               aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
             />
@@ -360,7 +365,7 @@ export default function TraceabilityPage() {
               <History size={15} />
               <span>{tr('Πρόσφατες αναζητήσεις')}</span>
               {recent.map(term => (
-                <button key={term} type="button" onClick={() => setQ(term)}>
+                <button key={term} type="button" onClick={() => commit(term)}>
                   {term}
                 </button>
               ))}
@@ -373,7 +378,7 @@ export default function TraceabilityPage() {
               <ul>
                 {nameMatches.slice(0, 30).map(x => (
                   <li key={x.id}>
-                    <button type="button" onClick={() => setQ(x.barcode)}>
+                    <button type="button" onClick={() => commit(x.barcode)}>
                       <b className="mono">{x.barcode}</b> {x.name}
                       <small>
                         {trData(x.department) || tr('Απόθεμα')} · {statusLabel(x.state)}
@@ -417,7 +422,7 @@ export default function TraceabilityPage() {
               <button
                 type="button"
                 className="app-button"
-                onClick={() => setParams({tab: 'patients', patient: typedPatient}, {replace: true})}
+                onClick={() => setParams({tab: 'patients', patient: typedPatient})}
               >
                 {tr('Άνοιγμα ασθενούς')}
               </button>
@@ -471,7 +476,7 @@ export default function TraceabilityPage() {
                                 type="button"
                                 className="trace-patient-link"
                                 title={tr('Ιχνηλάτηση ασθενούς {0}', m.patientCode)}
-                                onClick={() => setParams({tab: 'patients', patient: m.patientCode!}, {replace: true})}
+                                onClick={() => setParams({tab: 'patients', patient: m.patientCode!})}
                               >
                                 {tr('Ασθενής {0}', m.patientCode)}
                               </button>
@@ -507,7 +512,7 @@ export default function TraceabilityPage() {
                           className="trace-recently-card"
                           onClick={() => {
                             setQ(item.barcode);
-                            remember(item.barcode);
+                            commit(item.barcode);
                           }}
                         >
                           <AssetTypeIcon kind={itemIsSet ? 'SET' : 'TOOL'} framed size={15} />
