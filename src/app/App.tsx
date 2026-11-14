@@ -196,10 +196,16 @@ export default function App() {
   // Asked in the app, after what is still unsaved has had a chance to reach the server (see useSignOutGuard).
   const logout = (direct?: boolean) => guardSignOut(() => void signOut(), {direct});
   const signOut = async () => {
+    // The platform owner's account has no name of its own («Platform Admin»): no first name to greet.
+    const first = currentUser.name === 'Platform Admin' ? '' : currentUser.name.split(' ')[0];
     const msg =
       lang === 'el'
-        ? `Καλή συνέχεια, ${currentUser.name.split(' ')[0]}.`
-        : `See you soon, ${currentUser.name.split(' ')[0]}.`;
+        ? first
+          ? `Καλή συνέχεια, ${first}.`
+          : 'Καλή συνέχεια.'
+        : first
+          ? `See you soon, ${first}.`
+          : 'See you soon.';
     const wasDemo = sessionStorage.getItem('surgitrack-data-mode') === 'DEMO';
     // This device's copy of the hospital (patient codes included) goes with the session.
     await clearCache();
@@ -219,7 +225,8 @@ export default function App() {
     }
     setGoodbye(msg);
     setAuthenticated(false);
-    navigate(onScanScreens() ? SCAN_PATH : '/', {replace: true});
+    // The sign-in screen with its goodbye; the brand there leads on to the site's first page.
+    navigate(onScanScreens() ? SCAN_PATH : '/login', {replace: true});
   };
   // A hospital's signup link is public: it works signed in or not.
   const joinToken = /^\/join\/([0-9a-f]{16,})$/.exec(location.pathname)?.[1];
@@ -246,15 +253,8 @@ export default function App() {
       />
     );
   // The public first page of the site: what SurgiTrack is and how to reach Exeltos; «Σύνδεση» opens #/login. A
-  // sign-out, a password reset or the phone app go straight to the sign-in screen.
-  if (
-    !authenticated &&
-    location.pathname === '/' &&
-    !onScanScreens() &&
-    !goodbye &&
-    !firstPassword &&
-    !passwordRecovery
-  )
+  // sign-out goes to #/login (with its goodbye); a password reset and the phone app stay on the sign-in screen.
+  if (!authenticated && location.pathname === '/' && !onScanScreens() && !firstPassword && !passwordRecovery)
     return <LandingPage onSignIn={() => navigate('/login')} />;
   if (!authenticated)
     return (
