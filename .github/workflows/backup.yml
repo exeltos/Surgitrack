@@ -1,7 +1,8 @@
 name: Nightly backup
 
 # Every night: integrity checks (supabase/integrity.sql) and a data-only dump of the live database's public schema, restored onto a fresh database built
-# from supabase/migrations (which also proves the repository's schema still matches production), row counts
+# from supabase/migrations (which also proves the repository's schema still matches production; a migration already
+# live whose pull request is not merged yet is replayed from the live history, scripts/backup-live-migrations.sh), row counts
 # compared table by table, then encrypted and kept as a workflow artifact for 14 days.
 #
 # Needs two repository secrets (Settings → Secrets and variables → Actions):
@@ -65,6 +66,12 @@ jobs:
             from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') order by 1" > live-counts.txt
           echo "Dump: $(du -h backup.dump | cut -f1), $(wc -l < live-counts.txt) tables."
 
+      # A migration applied live just before its pull request is merged is replayed from the live history (with a
+      # warning), so the restore test does not fail in that window; a change made outside a migration still fails it.
+      - name: Migrations live but not yet in main
+        if: steps.secrets.outputs.ready == 'true'
+        run: PSQL=/usr/lib/postgresql/17/bin/psql bash scripts/backup-live-migrations.sh
+
       - name: Restore onto the schema built from the migrations
         if: steps.secrets.outputs.ready == 'true'
         run: PGBIN=/usr/lib/postgresql/17/bin RESTORE_DUMP=backup.dump RESTORE_COUNTS=restored-counts.txt bash supabase/tests/run-local.sh
@@ -83,6 +90,12 @@ jobs:
         run: |
           gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase-fd 0 -o "backup-$STAMP.dump.gpg" backup.dump <<< "$BACKUP_PASSPHRASE"
           rm backup.dump
+          # Migrations that were live but not yet in main (see above): a restore before their pull request is merged
+          # replays them too (gpg --decrypt live-only-migrations-….tar.gpg | tar x).
+          if [ -n "$(ls -A live-only-migrations 2>/dev/null)" ]; then
+            tar -cf - live-only-migrations | gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase-fd 3 \
+              -o "live-only-migrations-$STAMP.tar.gpg" 3<<< "$BACKUP_PASSPHRASE"
+          fi
 
       - name: Keep the backup for 14 days
         if: steps.secrets.outputs.ready == 'true'
@@ -91,6 +104,7 @@ jobs:
           name: surgitrack-backup-${{ env.STAMP }}
           path: |
             backup-${{ env.STAMP }}.dump.gpg
+            live-only-migrations-${{ env.STAMP }}.tar.gpg
             live-counts.txt
           retention-days: 14
 
