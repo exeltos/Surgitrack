@@ -31,3 +31,7 @@ verify_jwt = false
 # the gateway check on would be a separate decision, tried first with a real admin session.
 [functions.update-staff]
 verify_jwt = false
+
+# «Ζητήστε παρουσίαση» on the public first page: visitors are not signed in. The function limits requests itself.
+[functions.contact-request]
+verify_jwt = false

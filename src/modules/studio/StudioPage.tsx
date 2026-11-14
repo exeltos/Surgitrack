@@ -21,6 +21,7 @@ import ErrorsTab from './tabs/ErrorsTab';
 import SecurityTab from './tabs/SecurityTab';
 import NoticesTab from './tabs/NoticesTab';
 import RatingsTab from './tabs/RatingsTab';
+import RequestsTab from './tabs/RequestsTab';
 
 /** With the owner's menu each section is a page: its own one-line description under its title. */
 const SECTION_TEXT: Record<Tab, [string, string]> = {
@@ -36,6 +37,10 @@ const SECTION_TEXT: Record<Tab, [string, string]> = {
     'Bulk import of Sets and instruments into a hospital.',
   ],
   RATINGS: ['Τι λένε οι χρήστες για κάθε λειτουργία.', 'What users say about each feature.'],
+  REQUESTS: [
+    'Όσοι ζήτησαν παρουσίαση από την πρώτη σελίδα του www.surgitrack.eu.',
+    'Who asked for a demo on the first page of www.surgitrack.eu.',
+  ],
   NOTICES: [
     'Ανακοινώσεις και προωθήσεις προς τους χρήστες και τους διαχειριστές των νοσοκομείων.',
     'Announcements and promotions to the users and the administrators of the hospitals.',
@@ -210,6 +215,7 @@ export default function StudioPage() {
         <ErrorsTab s={s} />
         <SecurityTab s={s} />
         <RatingsTab s={s} />
+        <RequestsTab s={s} />
         <NoticesTab s={s} />
       </div>
       {(editItem || newItem) && (

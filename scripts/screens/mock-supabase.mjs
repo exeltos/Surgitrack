@@ -270,6 +270,31 @@ export function createDatabase(seed) {
       },
     ],
     blocked_ips: [{ip: '198.51.100.44/32', note: 'Πολλές αποτυχημένες προσπάθειες', blocked_at: iso(-0.02)}],
+    // «Ζητήστε παρουσίαση» from the public first page (Studio → Αιτήματα παρουσίασης).
+    contact_requests: [
+      {
+        id: 'cr-1',
+        created_at: iso(-0.1),
+        name: 'Ελένη Μαυρίδου',
+        organization: 'Γενικό Νοσοκομείο Βόλου',
+        role: 'Προϊσταμένη Κεντρικής Αποστείρωσης',
+        email: 'e.mavridou@example.test',
+        phone: '2421 000000',
+        message: 'Καλησπέρα σας. Θα θέλαμε μια παρουσίαση του SurgiTrack για την Αποστείρωση και τα χειρουργεία μας.',
+        handled_at: null,
+      },
+      {
+        id: 'cr-2',
+        created_at: iso(-2.3),
+        name: 'Νίκος Αλεξίου',
+        organization: 'Ιδιωτική Κλινική Αθηνών',
+        role: 'Διευθυντής',
+        email: 'n.alexiou@example.test',
+        phone: null,
+        message: 'Ενδιαφερόμαστε για τιμές και χρόνο εγκατάστασης.',
+        handled_at: iso(-1.9),
+      },
+    ],
     platform_settings: [
       {
         id: true,
@@ -711,6 +736,8 @@ const FUNCTIONS = {
           departments: db.departments.map(d => ({id: d.id, name: d.name, code: d.code})),
         }
       : {ok: true, user_code: 'newuser'},
+  // «Ζητήστε παρουσίαση»: accepted (nothing is sent).
+  'contact-request': () => ({ok: true, emailed: true}),
   // «Το QR μου»: a pass naming the signed-in person (the real one is random and one-time).
   'handover-pass': (db, body, account) =>
     account

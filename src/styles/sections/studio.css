@@ -2927,3 +2927,146 @@ html body .studio-ratings-toolbar {
     overflow: visible;
   }
 }
+
+/* Studio → Αιτήματα παρουσίασης: one card per request, the hospital first, how to reach them, then the message. */
+html body .studio-requests {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+html body .studio-requests-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+html body .studio-requests-filter {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--c-gray-95);
+}
+html body .studio-requests-filter button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .studio-requests-filter button.active {
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+  color: var(--c-cyan-20);
+}
+html body .studio-requests-filter button:focus-visible {
+  outline: 2px solid var(--c-cyan-65);
+  outline-offset: 1px;
+}
+html body .studio-requests-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .studio-requests-list > li {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--st-line);
+  border-left: 4px solid var(--c-cyan-40);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .studio-requests-list > li.handled {
+  border-left-color: var(--c-gray-90-2);
+}
+html body .studio-request-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+html body .studio-request-who {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+html body .studio-request-who b {
+  color: var(--c-cyan-20);
+  font-size: 15px;
+}
+html body .studio-request-who small {
+  color: var(--st-muted);
+  font-size: 12px;
+}
+html body .studio-request-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+html body .studio-request-state.new {
+  background: #e3f4f7;
+  color: var(--c-cyan-30);
+}
+html body .studio-request-facts {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--c-cyan-20);
+  font-size: 13.5px;
+}
+html body .studio-request-facts li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+html body .studio-request-facts svg {
+  flex: 0 0 auto;
+  color: var(--st-muted);
+}
+html body .studio-request-facts small {
+  color: var(--st-muted);
+}
+html body .studio-request-facts a {
+  color: var(--c-cyan-30);
+}
+html body .studio-request-message {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-20);
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+html body .studio-request-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

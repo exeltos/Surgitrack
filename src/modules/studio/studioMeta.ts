@@ -12,6 +12,7 @@ import {
   Gauge,
   Layers3,
   Megaphone,
+  Inbox,
   MessageSquareHeart,
   Settings2,
   ShieldAlert,
@@ -35,7 +36,8 @@ export type Tab =
   | 'ERRORS'
   | 'SECURITY'
   | 'NOTICES'
-  | 'RATINGS';
+  | 'RATINGS'
+  | 'REQUESTS';
 
 export const roles: Array<{id: UserRole; el: string; en: string; descriptionEl: string; descriptionEn: string}> = [
   {
@@ -158,6 +160,7 @@ export const STUDIO_TABS: StudioTabDef[] = [
   {id: 'DEMOS', el: 'Demo αξιολόγησης', en: 'Evaluation Demos', icon: FlaskConical, group: 'PLATFORM'},
   {id: 'IMPORT', el: 'Εισαγωγή', en: 'Import', icon: FileSpreadsheet, group: 'PLATFORM'},
   {id: 'RATINGS', el: 'Αξιολογήσεις', en: 'Ratings', icon: MessageSquareHeart, group: 'PLATFORM'},
+  {id: 'REQUESTS', el: 'Αιτήματα παρουσίασης', en: 'Demo requests', icon: Inbox, group: 'PLATFORM'},
   {id: 'NOTICES', el: 'Ειδοποιήσεις', en: 'Notices', icon: Megaphone, group: 'PLATFORM'},
   {id: 'ERRORS', el: 'Σφάλματα', en: 'Errors', icon: Bug, group: 'PLATFORM'},
   {id: 'SECURITY', el: 'Ασφάλεια', en: 'Security', icon: ShieldAlert, group: 'PLATFORM'},
