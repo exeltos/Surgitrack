@@ -1,6 +1,7 @@
 import {parseDisplayDate} from '../../core/displayDate';
 import type {
   Movement,
+  ProcessLoadItem,
   ProcessLoadRecord,
   ProcessLoadStatus,
   SetAsset,
