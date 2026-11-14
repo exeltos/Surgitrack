@@ -57,6 +57,8 @@ export default function TraceabilityPage() {
   const commit = (term: string) => {
     remember(term);
     const value = term.trim();
+    // The field shows the term even when the address already has it (a recent search picked again).
+    setQ(term);
     if (value && value !== urlQuery) setParams(current => ({...Object.fromEntries(current), q: value}));
   };
   useEffect(() => {

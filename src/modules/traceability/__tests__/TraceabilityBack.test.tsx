@@ -37,4 +37,13 @@ describe('Ιχνηλάτηση and the browser’s «Πίσω»', () => {
     await screen.findByText('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.');
     expect(field()).toHaveValue('');
   });
+
+  it('a recent search picked again fills the field, even when it is the one in the address', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability'});
+    fireEvent.change(field(), {target: {value: 'S000321'}});
+    fireEvent.submit(field().closest('form')!);
+    fireEvent.change(field(), {target: {value: ''}});
+    fireEvent.click(screen.getByRole('button', {name: 'S000321'}));
+    expect(field()).toHaveValue('S000321');
+  });
 });

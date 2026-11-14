@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText} from 'lucide-react';
@@ -43,6 +43,8 @@ export default function ReportsPage() {
   };
   // The list opens when a card or a group is pressed: the report starts with its totals.
   const [view, setView] = useState<{label: string; test: (row: Row) => boolean} | null>(null);
+  // «Πίσω» to another report: its list starts closed, as when its button is pressed.
+  useEffect(() => setView(null), [active]);
   const [group, setGroup] = useState<InventoryGroup>('department');
   const [department, setDepartment] = useState('ALL');
   const [specialty, setSpecialty] = useState('ALL');
