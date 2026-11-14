@@ -3,6 +3,7 @@ import {ArrowLeft, CircleAlert, CircleCheck, Printer} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import InfoList from './InfoList';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import {getI18nLang, tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
@@ -78,30 +79,35 @@ export default function PatientTrace({
         </div>
       ) : (
         <>
-          <section className="trace-summary trace-patient-summary" aria-label={tr('Ασθενής')}>
-            <div className="trace-summary-title">
+          <div className="trace-item-head">
+            <div>
               <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
               <h2>{shownCode}</h2>
-              <span>
-                {[moves[0].at.split(' ')[0], place, tr('{0} αντικείμενα', used.length)].filter(Boolean).join(' · ')}
-              </span>
-              {signed.map(c => (
-                <span key={c.id}>
-                  {tr('Υπογεγραμμένη καταμέτρηση Σετ')} {sets.find(s => s.id === c.setId)?.barcode}: {c.counted}/
-                  {c.expected}
-                </span>
-              ))}
             </div>
-            {unconfirmed ? (
-              <p className="trace-verdict wait">
-                <CircleAlert size={18} aria-hidden="true" /> {tr('Χωρίς επιβεβαιωμένο κύκλο: {0}', unconfirmed)}
-              </p>
-            ) : (
-              <p className="trace-verdict ok">
-                <CircleCheck size={18} aria-hidden="true" /> {tr('Όλα αποστειρώθηκαν σε κύκλο με επιτυχία')}
-              </p>
-            )}
-          </section>
+          </div>
+          <InfoList
+            label={tr('Ασθενής')}
+            rows={[
+              {label: tr('Χρήση'), value: [moves[0].at.split(' ')[0], place].filter(Boolean).join(' · ')},
+              {label: tr('Τι χρησιμοποιήθηκε'), value: tr('{0} αντικείμενα', used.length)},
+              {
+                label: tr('Αποστείρωση'),
+                value: unconfirmed ? (
+                  <span className="trace-verdict wait">
+                    <CircleAlert size={16} aria-hidden="true" /> {tr('Χωρίς επιβεβαιωμένο κύκλο: {0}', unconfirmed)}
+                  </span>
+                ) : (
+                  <span className="trace-verdict ok">
+                    <CircleCheck size={16} aria-hidden="true" /> {tr('Όλα αποστειρώθηκαν σε κύκλο με επιτυχία')}
+                  </span>
+                ),
+              },
+              ...signed.map(c => ({
+                label: tr('Υπογεγραμμένη καταμέτρηση Σετ'),
+                value: `${sets.find(s => s.id === c.setId)?.barcode || ''}: ${c.counted}/${c.expected}`,
+              })),
+            ]}
+          />
           <div className="trace-table-wrap" role="region" tabIndex={0} aria-label={tr('Τι χρησιμοποιήθηκε')}>
             <table className="trace-table">
               <thead>

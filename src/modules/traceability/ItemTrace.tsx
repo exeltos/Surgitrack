@@ -1,13 +1,12 @@
-import {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {ChevronDown, ExternalLink, MapPin} from 'lucide-react';
-import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
+import {ExternalLink} from 'lucide-react';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {formatDate} from '../../core/displayDate';
 import {movementText} from '../../core/movementText';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 import type {Movement, SetAsset, Tool} from '../../types/domain';
+import InfoList from './InfoList';
 import {daysUntil, isSetAsset, patientsIn, time, type CycleEntry, type Round} from './traceModel';
 
 type Props = {
@@ -21,15 +20,12 @@ type Props = {
   onLoad: (loadId: string) => void;
 };
 
-const day = (value: string) => value.split(' ')[0];
-
 /**
- * One Set or instrument: where it is now and what its last cycle, patient, uses and expiry are, then its history
- * round by round (a cycle and what followed it). The newest round is open, the older ones one line each.
+ * One Set or instrument: a list of what is known (where it is, last cycle, last patient, uses, expiry), then every
+ * step in one table, newest first, with a line where each round (a cycle and what followed it) begins.
  */
 export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onPatient, onLoad}: Props) {
   const undone = useUndoneMovements();
-  const [opened, setOpened] = useState<string[]>([]);
   const isSet = isSetAsset(asset);
   const tool = isSet ? undefined : asset;
   const last = [...moves].sort((a, b) => time(b.at) - time(a.at))[0];
@@ -38,196 +34,186 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
     .sort((a, b) => time(b.at) - time(a.at))
     .find(m => m.patientCode && !m.undoes && !undone.has(m.id));
   // A member instrument is as sterile as its Set.
-  const sterileHolder = carrierSet || asset;
-  const sterileUntil = sterileHolder.sterileUntil;
+  const sterileUntil = (carrierSet || asset).sterileUntil;
   const daysLeft = daysUntil(sterileUntil);
   const uses = tool ? tool.uses : (asset as SetAsset).uses;
   const maxUses = tool?.maxUses;
-  const toggle = (key: string) =>
-    setOpened(list => (list.includes(key) ? list.filter(k => k !== key) : [...list, key]));
 
   return (
     <>
-      <section className="trace-summary" aria-label={tr('Σύνοψη')}>
-        <div className="trace-summary-head">
-          <AssetTypeIcon
-            kind={isSet ? 'SET' : 'TOOL'}
-            maxUses={tool?.maxUses}
-            wearCheck={tool?.wearCheck}
-            framed
-            size={16}
-          />
-          <div className="trace-summary-title">
-            <small>
-              <span className="mono">{asset.barcode}</span> · {isSet ? tr('Σετ') : tr('Εργαλείο')}
-              {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
-            </small>
-            <h2>{asset.name}</h2>
-          </div>
-          <div className="trace-now">
-            <span className="trace-now-place">
-              <MapPin size={16} aria-hidden="true" /> {trData(asset.department) || tr('Απόθεμα')}
-            </span>
-            <small>
-              {statusLabel(asset.state)}
-              {last && ` · ${tr('από {0}', last.at)}`}
-            </small>
-          </div>
+      <div className="trace-item-head">
+        <div>
+          <small>
+            <span className="mono">{asset.barcode}</span> · {isSet ? tr('Σετ') : tr('Εργαλείο')}
+            {carrierSet && ` · ${tr('στο Σετ {0}', `${carrierSet.barcode} ${carrierSet.name}`)}`}
+          </small>
+          <h2>{asset.name}</h2>
         </div>
-        <dl className="trace-facts">
-          <div>
-            <dt>{tr('Τελευταίος κύκλος')}</dt>
-            {lastCycle ? (
-              <dd>
-                <b>
-                  {lastCycle.sterilizer} · #{lastCycle.cycleNumber}
-                </b>
-                <span>
-                  {lastCycle.at} <i className={`trace-tone ${lastCycle.tone}`}>{tr(lastCycle.label)}</i>
-                </span>
-              </dd>
-            ) : (
-              <dd>
-                <b>—</b>
-              </dd>
-            )}
-          </div>
-          <div>
-            <dt>{tr('Τελευταίος ασθενής')}</dt>
-            {lastPatient ? (
-              <dd>
-                <button type="button" className="trace-link" onClick={() => onPatient(lastPatient.patientCode!)}>
-                  {lastPatient.patientCode}
-                </button>
-                <span>
-                  {day(lastPatient.at)} · {trData(lastPatient.from || lastPatient.to)}
-                </span>
-              </dd>
-            ) : (
-              <dd>
-                <b>—</b>
-              </dd>
-            )}
-          </div>
-          <div>
-            <dt>{tr('Χρήσεις')}</dt>
-            <dd>
-              <b>{maxUses ? `${uses ?? 0} / ${maxUses}` : (uses ?? '—')}</b>
-              {maxUses ? <span>{tr('Απομένουν {0}', Math.max(0, maxUses - (uses ?? 0)))}</span> : null}
-            </dd>
-          </div>
-          <div>
-            <dt>{tr('Αποστειρωμένο έως')}</dt>
-            <dd>
-              <b>{sterileUntil ? formatDate(sterileUntil) : '—'}</b>
-              {daysLeft !== undefined && (
-                <span className={daysLeft < 0 ? 'trace-expired' : undefined}>
-                  {daysLeft < 0 ? tr('Έληξε') : tr('Σε {0} ημέρες', daysLeft)}
-                </span>
-              )}
-            </dd>
-          </div>
-        </dl>
         <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
           <ExternalLink size={16} /> {isSet ? tr('Καρτέλα Σετ') : tr('Καρτέλα εργαλείου')}
         </Link>
-      </section>
-
-      <section className="trace-rounds" aria-label={tr('Ιστορικό ανά γύρο')}>
-        <h3>{tr('Ιστορικό ανά γύρο')}</h3>
-        {rounds.length === 0 && <p className="trace-hint">{tr('Δεν βρέθηκαν κινήσεις')}</p>}
-        {rounds.map((round, index) => {
-          const open = index === 0 || opened.includes(round.key);
-          // The cycle among the moves, in the order they happened.
-          const steps: Array<{at: string; move?: Movement; cycle?: CycleEntry}> = [
-            ...round.moves.map(m => ({at: m.at, move: m})),
-            ...(round.cycle ? [{at: round.cycle.at, cycle: round.cycle}] : []),
-          ].sort((a, b) => time(a.at) - time(b.at));
-          const first = steps[0]?.at || '';
-          const end = steps[steps.length - 1]?.at;
-          const range = index === 0 ? tr('από {0}', day(first)) : `${day(first)} – ${day(end || first)}`;
-          const patients = patientsIn(round.moves);
-          const title = index === 0 ? tr('Τρέχων γύρος') : range;
-          const headline = [
-            round.cycle ? `${round.cycle.sterilizer} · #${round.cycle.cycleNumber}` : tr('Χωρίς καταγεγραμμένο κύκλο'),
-            patients.length ? tr('ασθενής {0}', patients.join(', ')) : '',
-          ]
-            .filter(Boolean)
-            .join(' · ');
-          if (!open)
-            return (
-              <button
-                key={round.key}
-                type="button"
-                className="trace-round-line"
-                aria-expanded={false}
-                onClick={() => toggle(round.key)}
-              >
-                <b>{title}</b>
-                <span>{headline}</span>
-                <ChevronDown size={18} aria-hidden="true" />
-              </button>
-            );
-          return (
-            <div key={round.key} className={`trace-round ${index === 0 ? 'current' : ''}`}>
-              <div className="trace-round-head">
-                <b>{title}</b>
-                <span>{index === 0 ? range : headline}</span>
-                {index > 0 && (
-                  <button type="button" className="trace-link" aria-expanded onClick={() => toggle(round.key)}>
-                    {tr('Κλείσιμο')}
+      </div>
+      <InfoList
+        label={tr('Σύνοψη')}
+        rows={[
+          {
+            label: tr('Πού είναι τώρα'),
+            value: (
+              <>
+                <b>{trData(asset.department) || tr('Απόθεμα')}</b> · {statusLabel(asset.state)}
+                {last && ` · ${tr('από {0}', last.at)}`}
+              </>
+            ),
+          },
+          {
+            label: tr('Τελευταίος κύκλος'),
+            value: lastCycle ? (
+              <>
+                <b>
+                  {lastCycle.sterilizer} · #{lastCycle.cycleNumber}
+                </b>{' '}
+                · {lastCycle.at} <i className={`trace-tone ${lastCycle.tone}`}>{tr(lastCycle.label)}</i>
+                {lastCycle.loadId && (
+                  <button type="button" className="trace-link" onClick={() => onLoad(lastCycle.loadId!)}>
+                    {tr('Φορτίο')}
                   </button>
                 )}
-              </div>
-              <ol className="trace-steps">
-                {steps.map(({move: m, cycle: c}) =>
-                  c ? (
-                    <li key={c.id}>
-                      <time>{c.at}</time>
-                      <span>
-                        <b>{tr('Αποστείρωση')}</b>
-                        <small>
-                          {c.sterilizer} · {tr('κύκλος {0}', c.cycleNumber)}
-                          {c.program ? ` · ${c.program}` : ''}
-                          {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
-                        </small>
-                      </span>
-                      <span className="trace-step-end">
-                        <i className={`trace-tone ${c.tone}`}>{tr(c.label)}</i>
-                        {c.loadId && (
-                          <button type="button" className="trace-link" onClick={() => onLoad(c.loadId!)}>
-                            {tr('Φορτίο')}
-                          </button>
-                        )}
-                      </span>
-                    </li>
-                  ) : (
-                    <li key={m!.id}>
-                      <time>{m!.at}</time>
-                      <span>
-                        <b>
-                          {movementText(m!.status)}{' '}
-                          {undone.has(m!.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                        </b>
-                        <small>
-                          {trData(m!.from)} → {trData(m!.to)} · {trData(m!.by)}
-                        </small>
-                      </span>
-                      <span className="trace-step-end">
-                        {m!.patientCode && (
-                          <button type="button" className="trace-link" onClick={() => onPatient(m!.patientCode!)}>
-                            {tr('Ασθενής {0}', m!.patientCode)}
-                          </button>
-                        )}
-                      </span>
-                    </li>
-                  ),
+              </>
+            ) : (
+              '—'
+            ),
+          },
+          {
+            label: tr('Τελευταίος ασθενής'),
+            value: lastPatient ? (
+              <>
+                <button type="button" className="trace-link" onClick={() => onPatient(lastPatient.patientCode!)}>
+                  {lastPatient.patientCode}
+                </button>{' '}
+                · {lastPatient.at} · {trData(lastPatient.from || lastPatient.to)}
+              </>
+            ) : (
+              '—'
+            ),
+          },
+          {
+            label: tr('Χρήσεις'),
+            value: maxUses ? (
+              <>
+                <b>
+                  {uses ?? 0} / {maxUses}
+                </b>{' '}
+                · {tr('Απομένουν {0}', Math.max(0, maxUses - (uses ?? 0)))}
+              </>
+            ) : (
+              <b>{uses ?? '—'}</b>
+            ),
+          },
+          {
+            label: tr('Αποστειρωμένο έως'),
+            value: sterileUntil ? (
+              <>
+                <b>{formatDate(sterileUntil)}</b>
+                {daysLeft !== undefined && (
+                  <span className={daysLeft < 0 ? 'trace-expired' : undefined}>
+                    {' '}
+                    · {daysLeft < 0 ? tr('Έληξε') : tr('Σε {0} ημέρες', daysLeft)}
+                  </span>
                 )}
-              </ol>
-            </div>
-          );
-        })}
-      </section>
+              </>
+            ) : (
+              '—'
+            ),
+          },
+        ]}
+      />
+
+      <h3 className="trace-section-title">{tr('Ιστορικό')}</h3>
+      {rounds.length === 0 ? (
+        <p className="trace-hint">{tr('Δεν βρέθηκαν κινήσεις')}</p>
+      ) : (
+        <div className="trace-table-wrap" role="region" tabIndex={0} aria-label={tr('Ιστορικό')}>
+          <table className="trace-table trace-history">
+            <thead>
+              <tr>
+                <th>{tr('Ημερομηνία / ώρα')}</th>
+                <th>{tr('Ενέργεια')}</th>
+                <th>{tr('Από → Προς')}</th>
+                <th>{tr('Χρήστης')}</th>
+                <th>
+                  <span className="visually-hidden">{tr('Σύνδεσμοι')}</span>
+                </th>
+              </tr>
+            </thead>
+            {rounds.map((round, index) => {
+              // Newest first, the cycle among the moves.
+              const steps: Array<{at: string; move?: Movement; cycle?: CycleEntry}> = [
+                ...round.moves.map(m => ({at: m.at, move: m})),
+                ...(round.cycle ? [{at: round.cycle.at, cycle: round.cycle}] : []),
+              ].sort((a, b) => time(b.at) - time(a.at));
+              const patients = patientsIn(round.moves);
+              return (
+                <tbody key={round.key}>
+                  <tr className="trace-round-row">
+                    <th colSpan={5} scope="rowgroup">
+                      {index === 0 ? tr('Τρέχων γύρος') : tr('Γύρος')}
+                      {' · '}
+                      {round.cycle
+                        ? `${round.cycle.sterilizer} · #${round.cycle.cycleNumber}`
+                        : tr('Χωρίς καταγεγραμμένο κύκλο')}
+                      {patients.length > 0 && ` · ${tr('ασθενής {0}', patients.join(', '))}`}
+                    </th>
+                  </tr>
+                  {steps.map(({move: m, cycle: c}) =>
+                    c ? (
+                      <tr key={c.id}>
+                        <td className="trace-when">{c.at}</td>
+                        <td>
+                          <b>{tr('Αποστείρωση')}</b>{' '}
+                          <small>
+                            {c.sterilizer} · {tr('κύκλος {0}', c.cycleNumber)}
+                            {c.program ? ` · ${c.program}` : ''}
+                            {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
+                          </small>
+                        </td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td className="trace-end">
+                          <i className={`trace-tone ${c.tone}`}>{tr(c.label)}</i>
+                          {c.loadId && (
+                            <button type="button" className="trace-link" onClick={() => onLoad(c.loadId!)}>
+                              {tr('Φορτίο')}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={m!.id}>
+                        <td className="trace-when">{m!.at}</td>
+                        <td>
+                          <b>{movementText(m!.status)}</b>{' '}
+                          {undone.has(m!.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
+                        </td>
+                        <td>
+                          {trData(m!.from)} → {trData(m!.to)}
+                        </td>
+                        <td>{trData(m!.by)}</td>
+                        <td className="trace-end">
+                          {m!.patientCode && (
+                            <button type="button" className="trace-link" onClick={() => onPatient(m!.patientCode!)}>
+                              {tr('Ασθενής {0}', m!.patientCode)}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ),
+                  )}
+                </tbody>
+              );
+            })}
+          </table>
+        </div>
+      )}
     </>
   );
 }

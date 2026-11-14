@@ -18,9 +18,10 @@ describe('TraceabilityPage search', () => {
     expect(screen.getByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
   });
 
-  it('shows one line of help, not an empty card, before anything is typed', () => {
+  it('offers the items that moved last, as a list, before anything is typed', () => {
     renderPage(<TraceabilityPage />, {path: '/traceability'});
-    expect(screen.getByText('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')).toBeInTheDocument();
-    expect(document.querySelector('.timeline')).toBeNull();
+    const recent = screen.getByRole('region', {name: 'Κινήθηκαν πρόσφατα'});
+    expect(recent.querySelectorAll('li').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('region', {name: 'Ιστορικό'})).toBeNull();
   });
 });

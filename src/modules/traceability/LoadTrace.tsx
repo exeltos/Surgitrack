@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {Flame, Search, TriangleAlert} from 'lucide-react';
+import {Search, TriangleAlert} from 'lucide-react';
+import InfoList from './InfoList';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -100,26 +101,22 @@ export default function LoadTrace({
         />
       ) : (
         recent.length > 0 && (
-          <section className="trace-recently" aria-label={tr('Πρόσφατα φορτία')}>
-            <h3>{tr('Πρόσφατα φορτία')}</h3>
-            <div className="trace-recently-grid">
-              {recent.slice(0, 8).map(l => (
-                <button key={l.id} type="button" className="trace-recently-card" onClick={() => onOpen(l.id)}>
-                  <Flame size={18} aria-hidden="true" />
-                  <span>
-                    <strong>
+          <section className="trace-recent-list" aria-label={tr('Πρόσφατα φορτία')}>
+            <h3 className="trace-section-title">{tr('Πρόσφατα φορτία')}</h3>
+            <ul>
+              {recent.slice(0, 10).map(l => (
+                <li key={l.id}>
+                  <button type="button" onClick={() => onOpen(l.id)}>
+                    <b>
                       {l.equipment} · #{l.cycleNumber}
-                    </strong>
-                    <small>
-                      {l.completedAt || l.createdAt} · {tr('{0} αντικείμενα', l.items.length)}
-                    </small>
-                    <small>
-                      <i className={`trace-tone ${LOAD_STATUS[l.status].tone}`}>{tr(LOAD_STATUS[l.status].label)}</i>
-                    </small>
-                  </span>
-                </button>
+                    </b>
+                    <span>{l.completedAt || l.createdAt}</span>
+                    <span>{tr('{0} αντικείμενα', l.items.length)}</span>
+                    <i className={`trace-tone ${LOAD_STATUS[l.status].tone}`}>{tr(LOAD_STATUS[l.status].label)}</i>
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
         )
       )}
@@ -179,54 +176,50 @@ function LoadView({
 
   return (
     <>
-      <section className="trace-summary" aria-label={tr('Φορτίο')}>
-        <div className="trace-summary-head">
-          <div className="trace-summary-title">
-            <small>{tr('ΦΟΡΤΙΟ')}</small>
-            <h2>
-              {load.equipment} · {tr('κύκλος {0}', `#${load.cycleNumber}`)}
-            </h2>
-            <span>
-              {[
-                load.completedAt
-                  ? `${load.createdAt} – ${load.completedAt.split(' ')[1] || load.completedAt}`
-                  : load.createdAt,
-                load.program,
-                trData(load.createdByName),
-                tr('{0} αντικείμενα', load.items.length),
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </span>
-          </div>
-          <div className="trace-now">
-            <i className={`trace-tone ${status.tone}`}>{tr(status.label)}</i>
-            {canRecall && (
-              <button type="button" className="trace-recall" onClick={() => void recall()}>
-                <TriangleAlert size={17} aria-hidden="true" /> {tr('Ανάκληση φορτίου')}
-              </button>
-            )}
-          </div>
+      <div className="trace-item-head">
+        <div>
+          <small>{tr('ΦΟΡΤΙΟ')}</small>
+          <h2>
+            {load.equipment} · {tr('κύκλος {0}', `#${load.cycleNumber}`)}
+          </h2>
         </div>
-        {load.status === 'RECALLED' && (
-          <p className="trace-verdict bad">
-            {tr('Ανακλήθηκε στις {0}', load.recalledAt || '')}
-            {load.recallReason ? ` · ${load.recallReason}` : ''}
-          </p>
+        {canRecall && (
+          <button type="button" className="trace-recall" onClick={() => void recall()}>
+            <TriangleAlert size={17} aria-hidden="true" /> {tr('Ανάκληση φορτίου')}
+          </button>
         )}
-        {indicators.length > 0 && (
-          <dl className="trace-facts">
-            {indicators.map(i => (
-              <div key={i.label}>
-                <dt>{tr(i.label)}</dt>
-                <dd>
-                  <i className={`trace-tone ${i.value!.tone}`}>{tr(i.value!.label)}</i>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </section>
+      </div>
+      <InfoList
+        label={tr('Φορτίο')}
+        rows={[
+          {label: tr('Κατάσταση'), value: <i className={`trace-tone ${status.tone}`}>{tr(status.label)}</i>},
+          ...(load.status === 'RECALLED'
+            ? [
+                {
+                  label: tr('Ανάκληση'),
+                  value: `${tr('Ανακλήθηκε στις {0}', load.recalledAt || '')}${load.recallReason ? ` · ${load.recallReason}` : ''}`,
+                },
+              ]
+            : []),
+          {
+            label: tr('Κύκλος'),
+            value: [
+              load.completedAt
+                ? `${load.createdAt} – ${load.completedAt.split(' ')[1] || load.completedAt}`
+                : load.createdAt,
+              load.program,
+              trData(load.createdByName),
+            ]
+              .filter(Boolean)
+              .join(' · '),
+          },
+          ...indicators.map(i => ({
+            label: tr(i.label),
+            value: <i className={`trace-tone ${i.value!.tone}`}>{tr(i.value!.label)}</i>,
+          })),
+          {label: tr('Τι ήταν στο φορτίο'), value: tr('{0} αντικείμενα', load.items.length)},
+        ]}
+      />
       <section className="trace-load-items">
         <div className="trace-load-items-head">
           <h3>{tr('Τι ήταν στο φορτίο')}</h3>
