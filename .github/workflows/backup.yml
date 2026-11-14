@@ -90,6 +90,12 @@ jobs:
         run: |
           gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase-fd 0 -o "backup-$STAMP.dump.gpg" backup.dump <<< "$BACKUP_PASSPHRASE"
           rm backup.dump
+          # Migrations that were live but not yet in main (see above): a restore before their pull request is merged
+          # replays them too (gpg --decrypt live-only-migrations-….tar.gpg | tar x).
+          if [ -n "$(ls -A live-only-migrations 2>/dev/null)" ]; then
+            tar -cf - live-only-migrations | gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase-fd 3 \
+              -o "live-only-migrations-$STAMP.tar.gpg" 3<<< "$BACKUP_PASSPHRASE"
+          fi
 
       - name: Keep the backup for 14 days
         if: steps.secrets.outputs.ready == 'true'
@@ -98,6 +104,7 @@ jobs:
           name: surgitrack-backup-${{ env.STAMP }}
           path: |
             backup-${{ env.STAMP }}.dump.gpg
+            live-only-migrations-${{ env.STAMP }}.tar.gpg
             live-counts.txt
           retention-days: 14
 

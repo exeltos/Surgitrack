@@ -8,12 +8,19 @@
 # restore replays it too, and warns about it. A change made to the live database outside a migration is not in that
 # history, so it still makes the restore fail, as it should.
 #
-#   SUPABASE_DB_URL=... bash scripts/backup-live-migrations.sh [migrations-dir]
+# Each one is also copied to the second folder (default live-only-migrations), which the workflow encrypts and keeps
+# with the backup: a restore made before that pull request is merged needs it as well.
+#
+#   SUPABASE_DB_URL=... bash scripts/backup-live-migrations.sh [migrations-dir] [kept-dir]
 set -euo pipefail
 dir="${1:-supabase/migrations}"
+kept="${2:-live-only-migrations}"
+mkdir -p "$kept"
 psql_live() { "${PSQL:-psql}" "$SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -tA "$@"; }
 
 known="$(ls "$dir" | sed -E 's/_.*//' | sort -u)"
+# Read in full first: a failed query (connection, rights) stops the run here, never passes for an empty history.
+history="$(psql_live -F ' ' -c "select version, name from supabase_migrations.schema_migrations order by version")"
 pending=0
 while read -r version name; do
   [ -n "$version" ] || continue
@@ -25,7 +32,8 @@ while read -r version name; do
   grep -qx "$version" <<<"$known" && continue
   psql_live -c "select array_to_string(statements, E';\n') from supabase_migrations.schema_migrations where version = '$version'" \
     >"$dir/${version}_${name}.sql"
+  cp "$dir/${version}_${name}.sql" "$kept/"
   echo "::warning::Migration ${version}_${name} is live but not yet in main: replayed from the live history for this restore test."
   pending=$((pending + 1))
-done < <(psql_live -F ' ' -c "select version, name from supabase_migrations.schema_migrations order by version")
+done <<<"$history"
 echo "$pending live migration(s) not yet in main."
