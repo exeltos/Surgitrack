@@ -30,7 +30,7 @@ describe('Ιχνηλάτηση and the browser’s «Πίσω»', () => {
     expect(screen.queryByRole('textbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'})).toBeNull();
     // Back: the search and its result, as left.
     fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
-    expect(await screen.findByRole('link', {name: /Άνοιγμα καρτέλας/})).toBeInTheDocument();
+    expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
     expect(field()).toHaveValue('S000321');
     // Back again: the empty search.
     fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));

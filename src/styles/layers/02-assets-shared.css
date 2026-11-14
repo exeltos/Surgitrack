@@ -1009,7 +1009,6 @@ body {
   color: var(--st-muted);
 }
 .panel,
-.trace-card,
 .table-panel {
   border-color: var(--c-gray-90);
   box-shadow: 0 5px 20px rgba(23, 56, 74, 0.035);
@@ -1526,13 +1525,6 @@ td {
   background: var(--c-white);
   box-shadow: 0 1px 0 var(--c-gray-90);
 }
-.list-scroll-region {
-  min-height: 0;
-  max-height: min(650px, calc(100dvh - 300px));
-  overflow: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
-}
 
 /* Remove the earlier forced viewport locking that could crop cards/actions. */
 .set-detail-workspace,
@@ -1617,7 +1609,6 @@ td {
 @media (max-width: 900px) {
   .list-scroll-panel,
   .list-scroll-panel-kpis,
-  .list-scroll-region,
   .ster-work-panel,
   .set-composition-fixed {
     max-height: none;

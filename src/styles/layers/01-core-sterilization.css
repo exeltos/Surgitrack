@@ -250,8 +250,7 @@ button {
   outline: 0;
   font-size: 14px;
 }
-.panel,
-.trace-card {
+.panel {
   background: var(--c-white);
   border: 1px solid var(--c-gray-90-3);
   border-radius: 12px;
@@ -384,38 +383,6 @@ td {
   border: 1px solid var(--c-gray-90-3);
   border-radius: 12px;
   padding: 18px;
-}
-.timeline-item {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr) auto;
-  gap: 12px;
-  padding: 8px 0 20px;
-  position: relative;
-}
-.timeline-item .dot {
-  width: 10px;
-  height: 10px;
-  background: var(--c-cyan-45);
-  border-radius: 50%;
-  margin-top: 5px;
-}
-.timeline-item p {
-  margin: 4px 0;
-}
-.timeline-item small {
-  color: var(--c-blue-50);
-}
-.trace-card {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-.trace-card h2 {
-  margin: 3px 0;
-}
-.trace-card p {
-  margin: 0;
-  color: var(--c-blue-35);
 }
 .quick {
   display: flex;

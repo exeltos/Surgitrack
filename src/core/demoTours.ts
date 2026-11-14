@@ -219,6 +219,14 @@ const TOURS: Tour[] = [
     to: '/traceability',
     stops: [
       {
+        target: '.trace-tabs',
+        title: t('Τρεις ερωτήσεις', 'Three questions'),
+        text: t(
+          'Πού είναι ένα Σετ και τι του έγινε, τι χρησιμοποιήθηκε σε έναν ασθενή, και τι είχε ένα φορτίο κλιβάνου (για ανάκληση).',
+          'Where a Set is and what happened to it, what was used on a patient, and what a sterilizer load held (for a recall).',
+        ),
+      },
+      {
         target: '.trace-search',
         title: t('Αναζήτηση', 'Search'),
         text: t(

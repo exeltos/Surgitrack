@@ -3643,14 +3643,6 @@ html body .sets-registry .set-count-short .muted {
     flex-wrap: wrap;
   }
 }
-html body .trace-step strong {
-  color: var(--c-blue-15-2);
-  font-size: 14px;
-}
-html body .trace-step small {
-  color: var(--c-blue-50);
-  font-size: 12.5px;
-}
 
 /* Reports on phone: every report type visible, result rows as cards */
 
