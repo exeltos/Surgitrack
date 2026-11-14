@@ -143,3 +143,25 @@ export const daysUntil = (isoDate: string | undefined, now = new Date()) => {
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.round((Date.UTC(y, m - 1, d) - today) / 86_400_000);
 };
+
+/**
+ * The first patient an item of a load was used on after that load's cycle and before the item's next sterilization:
+ * a use after that came from the next load, not this one. `uses` are the uses that stand (none undone).
+ */
+export const firstUseAfter = (
+  load: ProcessLoadRecord,
+  item: ProcessLoadItem,
+  loads: ProcessLoadRecord[],
+  uses: Movement[],
+) => {
+  const start = time(load.createdAt);
+  const done = time(load.completedAt || load.createdAt);
+  const next = Math.min(
+    ...loads
+      .filter(l => l.id !== load.id && time(l.createdAt) > start && l.items.some(i => i.assetId === item.assetId))
+      .map(l => time(l.createdAt)),
+  );
+  return uses
+    .filter(m => m.patientCode && barcodeOf(m) === item.barcode && time(m.at) >= done && time(m.at) < next)
+    .sort((a, b) => time(a.at) - time(b.at))[0];
+};

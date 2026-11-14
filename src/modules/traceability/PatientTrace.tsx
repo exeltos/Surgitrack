@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {ArrowLeft, CircleAlert, CircleCheck, Printer} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
+import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import {getI18nLang, tr, trData} from '../../i18n';
@@ -28,7 +29,11 @@ export default function PatientTrace({
   const {sets, tools, movements, counts, processLoads, sterilizationCycles} = useSurgi();
   const [report, setReport] = useState<string | null>(null);
   const code = patient.toLowerCase();
-  const moves = movements.filter(m => m.patientCode?.toLowerCase() === code).sort((a, b) => time(a.at) - time(b.at));
+  // A use undone later (a wrong patient code) is not part of the patient's record.
+  const undone = useUndoneMovements();
+  const moves = movements
+    .filter(m => m.patientCode?.toLowerCase() === code && !m.undoes && !undone.has(m.id))
+    .sort((a, b) => time(a.at) - time(b.at));
   const all: Array<SetAsset | Tool> = [...sets, ...tools];
   const used: Used[] = [];
   moves.forEach(m => {

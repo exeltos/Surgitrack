@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import type {Movement} from '../../../types/domain';
-import {daysUntil, roundsOf, type CycleEntry} from '../traceModel';
+import type {Movement, ProcessLoadRecord} from '../../../types/domain';
+import {daysUntil, firstUseAfter, roundsOf, type CycleEntry} from '../traceModel';
 
 const move = (id: string, at: string, patientCode?: string): Movement =>
   ({id, asset: 'S1 · Set', assetKind: 'SET', from: 'A', to: 'B', status: id, at, by: 'X', patientCode}) as Movement;
@@ -45,5 +45,24 @@ describe('daysUntil', () => {
     expect(daysUntil('2026-11-24', today)).toBe(10);
     expect(daysUntil('2026-11-10', today)).toBe(-4);
     expect(daysUntil(undefined, today)).toBeUndefined();
+  });
+});
+
+describe('firstUseAfter', () => {
+  const item = {assetId: 'set-1', assetKind: 'SET', barcode: 'S1', assetName: 'Set', department: 'A'} as const;
+  const load = (id: string, at: string) =>
+    ({id, kind: 'STERILIZATION', createdAt: at, completedAt: at, items: [item]}) as unknown as ProcessLoadRecord;
+  const a = load('A', '01/11/2026 10:00');
+  const b = load('B', '05/11/2026 10:00');
+
+  it('gives a use to the load before it, not to an earlier one the item left unused', () => {
+    const uses = [move('use', '06/11/2026 09:00', 'P1')];
+    expect(firstUseAfter(a, item, [a, b], uses)).toBeUndefined();
+    expect(firstUseAfter(b, item, [a, b], uses)?.patientCode).toBe('P1');
+  });
+
+  it('finds the first use between this cycle and the next', () => {
+    const uses = [move('late', '04/11/2026 09:00', 'P2'), move('early', '02/11/2026 09:00', 'P1')];
+    expect(firstUseAfter(a, item, [a, b], uses)?.patientCode).toBe('P1');
   });
 });

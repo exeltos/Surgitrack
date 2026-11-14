@@ -34,7 +34,9 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
   const tool = isSet ? undefined : asset;
   const last = [...moves].sort((a, b) => time(b.at) - time(a.at))[0];
   const lastCycle = cycles[0];
-  const lastPatient = [...moves].sort((a, b) => time(b.at) - time(a.at)).find(m => m.patientCode);
+  const lastPatient = [...moves]
+    .sort((a, b) => time(b.at) - time(a.at))
+    .find(m => m.patientCode && !m.undoes && !undone.has(m.id));
   // A member instrument is as sterile as its Set.
   const sterileHolder = carrierSet || asset;
   const sterileUntil = sterileHolder.sterileUntil;

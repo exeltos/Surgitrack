@@ -1,11 +1,12 @@
 import {useState} from 'react';
 import {Flame, Search, TriangleAlert} from 'lucide-react';
 import {askConfirm} from '../../components/ui/confirmService';
+import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {statusLabel} from '../../components/ui/statusLabel';
 import {tr, trData} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import type {BiologicalIndicatorResult, ProcessLoadRecord, SterilizationIndicatorResult} from '../../types/domain';
-import {LOAD_STATUS, barcodeOf, time, type Tone} from './traceModel';
+import {LOAD_STATUS, firstUseAfter, time, type Tone} from './traceModel';
 
 const indicator = (value: SterilizationIndicatorResult | undefined): {label: string; tone: Tone} | undefined =>
   value === 'PASS' ? {label: 'Εντάξει', tone: 'ok'} : value === 'FAIL' ? {label: 'Αποτυχία', tone: 'bad'} : undefined;
@@ -37,6 +38,9 @@ export default function LoadTrace({
 }) {
   const {processLoads, sets, tools, movements, can, recallProcessLoad} = useSurgi();
   const loads = processLoads.filter(l => l.kind === 'STERILIZATION');
+  // A use undone later (a wrong patient code) did not happen.
+  const undone = useUndoneMovements();
+  const uses = movements.filter(m => m.patientCode && !m.undoes && !undone.has(m.id));
   const sterilizers = [...new Set(loads.map(l => l.equipment))].sort();
   const load = loads.find(l => l.id === loadId);
   const [sterilizer, setSterilizer] = useState(load?.equipment || sterilizers[0] || '');
@@ -87,7 +91,8 @@ export default function LoadTrace({
           load={load}
           sets={sets}
           tools={tools}
-          movements={movements}
+          movements={uses}
+          loads={loads}
           canRecall={can('sterilization.workspace') && load.status === 'RELEASED'}
           onRecall={reason => recallProcessLoad(load.id, reason)}
           onItem={onItem}
@@ -127,6 +132,7 @@ function LoadView({
   sets,
   tools,
   movements,
+  loads,
   canRecall,
   onRecall,
   onItem,
@@ -136,25 +142,23 @@ function LoadView({
   sets: ReturnType<typeof useSurgi>['sets'];
   tools: ReturnType<typeof useSurgi>['tools'];
   movements: ReturnType<typeof useSurgi>['movements'];
+  loads: ProcessLoadRecord[];
   canRecall: boolean;
   onRecall: (reason: string) => void;
   onItem: (barcode: string) => void;
   onPatient: (code: string) => void;
 }) {
   const status = LOAD_STATUS[load.status];
-  const done = time(load.completedAt || load.createdAt);
   const indicators = [
     {label: 'Φυσικές παράμετροι', value: physical(load.physicalParametersOk)},
     {label: 'Χημικός δείκτης', value: indicator(load.chemicalIndicatorResult)},
     {label: 'Βιολογικός δείκτης', value: biological(load.biologicalIndicatorResult)},
   ].filter(i => i.value);
-  // Each item: where it is now, and the first patient it was used on after this cycle (before its next one).
+  // Each item: where it is now, and the first patient it was used on after this cycle, before its next one.
   const rows = load.items.map(item => {
     const asset =
       item.assetKind === 'SET' ? sets.find(s => s.id === item.assetId) : tools.find(t => t.id === item.assetId);
-    const used = movements
-      .filter(m => m.patientCode && barcodeOf(m) === item.barcode && time(m.at) >= done)
-      .sort((a, b) => time(a.at) - time(b.at))[0];
+    const used = firstUseAfter(load, item, loads, movements);
     return {item, asset, used};
   });
   const usedCount = rows.filter(r => r.used).length;
