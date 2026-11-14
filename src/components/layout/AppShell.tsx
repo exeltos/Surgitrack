@@ -288,7 +288,11 @@ export default function AppShell({
   const binLabel = lang === 'en' ? 'Recycle bin' : 'Κάδος';
   const binCount = recycleBin.filter(entry => !isExpired(entry)).length;
   // The person actually signed in, even while an admin views the app as another role.
-  const signedInName = getRealIdentity()?.name || currentUser.name;
+  // The platform owner's account has no name of its own: shown in the app's language, as is its «Platform».
+  const rawName = getRealIdentity()?.name || currentUser.name;
+  const signedInName = rawName === 'Platform Admin' ? tr('Διαχειριστής πλατφόρμας') : rawName;
+  const rawDepartment = getRealIdentity()?.departmentName || currentUser.department;
+  const signedInDepartment = rawDepartment === 'Platform' ? tr('Πλατφόρμα') : rawDepartment;
   const {
     departmentReady,
     departmentIssues,
@@ -555,7 +559,8 @@ export default function AppShell({
                 />
               )}
             </div>
-            {/* The initials open the person's own menu: who is signed in, and the change of their password. */}
+            {/* The initials open the person's own menu: who is signed in, the change of their password and signing out
+                (signing out is only here, not a second button beside it). */}
             <div className="account-menu-wrap" ref={accountRef}>
               <button
                 type="button"
@@ -572,9 +577,7 @@ export default function AppShell({
                 <div className="account-menu" role="menu">
                   <div className="account-menu-who">
                     <b>{signedInName}</b>
-                    {(getRealIdentity()?.departmentName || currentUser.department) && (
-                      <small>{getRealIdentity()?.departmentName || currentUser.department}</small>
-                    )}
+                    {signedInDepartment && <small>{signedInDepartment}</small>}
                   </div>
                   <button
                     type="button"
@@ -595,9 +598,6 @@ export default function AppShell({
               )}
             </div>
             {passwordOpen && <ChangePasswordDialog onClose={() => setPasswordOpen(false)} />}
-            <button className="icon-btn" onClick={logout} title={lang === 'el' ? 'Αποσύνδεση' : 'Sign out'}>
-              <LogOut size={17} />
-            </button>
           </div>
         </header>
         {!online && (

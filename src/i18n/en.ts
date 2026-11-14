@@ -2253,6 +2253,8 @@ export const en: Record<string, string> = {
   'Έτοιμο για χρήση': 'Ready to use',
   Περιμένουν: 'Waiting',
   'Αρχική τμήματος': 'Department home',
+  'Διαχειριστής πλατφόρμας': 'Platform administrator',
+  Πλατφόρμα: 'Platform',
   'Ο λογαριασμός μου': 'My account',
   'Αλλαγή κωδικού': 'Change password',
   'Ο κωδικός αλλάζει μόνο σε λογαριασμό που έχει συνδεθεί.':
