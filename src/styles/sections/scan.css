@@ -196,7 +196,7 @@ html body .scan-station b {
 html body .scan-station small {
   display: block;
   margin-top: 2px;
-  color: #627887;
+  color: #56707f;
   font-size: 13px;
 }
 html body .scan-station > svg {
@@ -396,7 +396,7 @@ html body .scan-camera-type button:disabled {
 }
 html body .scan-camera-hint {
   margin: 0;
-  color: #627887;
+  color: #56707f;
   font-size: 13.5px;
 }
 
@@ -410,7 +410,7 @@ html body .scan-search {
   border: 1px solid #c9d5de;
   border-radius: 12px;
   background: #fff;
-  color: #627887;
+  color: #56707f;
 }
 html body .scan-search input {
   flex: 1;
@@ -473,7 +473,7 @@ html body .scan-form-name b {
 }
 html body .scan-form-name small {
   display: block;
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
 }
 html body .scan-form-name em {
@@ -499,7 +499,7 @@ html body .scan-form-qty {
   white-space: nowrap;
 }
 html body .scan-form-qty small {
-  color: #627887;
+  color: #56707f;
   font-size: 13px;
   font-weight: 600;
 }
@@ -512,7 +512,8 @@ html body .scan-count {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  color: #627887;
+  /* Readable on the light page (WCAG AA): the lighter grey fell just short. */
+  color: #56707f;
   font-size: 14px;
 }
 html body .scan-count b {
@@ -557,7 +558,7 @@ html body .scan-items b {
 html body .scan-items small {
   display: block;
   margin-top: 2px;
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
 }
 html body .scan-item-remove {
@@ -582,7 +583,7 @@ html body .scan-refused li {
 }
 html body .scan-empty {
   margin: 4px 0;
-  color: #627887;
+  color: #56707f;
   font-size: 14px;
   text-align: center;
 }
@@ -621,7 +622,7 @@ html body .scan-summary div:last-child {
   border-bottom: 0;
 }
 html body .scan-summary dt {
-  color: #627887;
+  color: #56707f;
 }
 html body .scan-summary dd {
   margin: 0;
@@ -765,7 +766,7 @@ html body .scan-loads b {
 }
 html body .scan-loads small {
   display: block;
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
 }
 html body .scan-loads li > button > svg:first-child {
@@ -802,7 +803,7 @@ html body .scan-lookup > header {
 }
 html body .scan-lookup > header small {
   display: block;
-  color: #627887;
+  color: #56707f;
   font-size: 13px;
 }
 html body .scan-lookup > header b {
@@ -820,7 +821,7 @@ html body .scan-moves li {
 html body .scan-moves li > svg {
   flex: none;
   margin-top: 2px;
-  color: #627887;
+  color: #56707f;
 }
 html body .scan-moves b {
   display: block;
@@ -830,7 +831,7 @@ html body .scan-moves small {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
 }
 
@@ -848,7 +849,7 @@ html body .scan-report-kpis div {
   background: #fff;
 }
 html body .scan-report-kpis dt {
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
 }
 html body .scan-report-kpis dd {
@@ -1014,7 +1015,7 @@ html body .scan-checks label > span {
   min-width: 0;
 }
 html body .scan-checks label small {
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
   font-weight: 500;
 }
@@ -1091,7 +1092,7 @@ html body .scan-tile small {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
   line-height: 1.35;
 }
@@ -1180,7 +1181,7 @@ html body .scan-tabs a {
   min-height: 52px;
   padding: 4px 0;
   border-radius: 14px;
-  color: #627887;
+  color: #56707f;
   font-size: 11.5px;
   font-weight: 600;
   text-decoration: none;
@@ -1213,7 +1214,7 @@ html body .scan-account b {
   font-size: 18px;
 }
 html body .scan-account small {
-  color: #627887;
+  color: #56707f;
   font-size: 14px;
 }
 html body .scan-account-avatar {
@@ -1352,7 +1353,7 @@ html body .scan-demo-waiting b {
   font-size: 14px;
 }
 html body .scan-demo-waiting small {
-  color: #627887;
+  color: #56707f;
   font-size: 12.5px;
 }
 html body .scan-demo-waiting li button > svg:last-child {
@@ -1360,7 +1361,7 @@ html body .scan-demo-waiting li button > svg:last-child {
 }
 html body .scan-hint {
   margin: 0;
-  color: #627887;
+  color: #56707f;
   font-size: 13px;
 }
 
