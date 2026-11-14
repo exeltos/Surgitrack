@@ -1,4 +1,5 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -32,9 +33,18 @@ import {reportSummary} from './reportSummary';
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
-  const [active, setActive] = useState<ReportId>('inventory');
+  // The report open is in the address (?report=…): «Πίσω» returns to the one before, and a link opens it.
+  const [params, setParams] = useSearchParams();
+  const active: ReportId = reports.some(r => r.id === params.get('report'))
+    ? (params.get('report') as ReportId)
+    : 'inventory';
+  const setActive = (id: ReportId) => {
+    if (id !== active) setParams({report: id});
+  };
   // The list opens when a card or a group is pressed: the report starts with its totals.
   const [view, setView] = useState<{label: string; test: (row: Row) => boolean} | null>(null);
+  // «Πίσω» to another report: its list starts closed, as when its button is pressed.
+  useEffect(() => setView(null), [active]);
   const [group, setGroup] = useState<InventoryGroup>('department');
   const [department, setDepartment] = useState('ALL');
   const [specialty, setSpecialty] = useState('ALL');

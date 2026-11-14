@@ -111,7 +111,7 @@ export default function StockPage() {
             role="tab"
             aria-selected={view === 'LIST'}
             className={view === 'LIST' ? 'active' : ''}
-            onClick={() => setParams({}, {replace: true})}
+            onClick={() => setParams({})}
           >
             <Boxes size={16} /> {tr('Εργαλεία Αποθέματος')} <b>{stock.length}</b>
           </button>
@@ -119,7 +119,7 @@ export default function StockPage() {
             role="tab"
             aria-selected={view === 'MIN'}
             className={view === 'MIN' ? 'active' : ''}
-            onClick={() => setParams({view: 'minimums'}, {replace: true})}
+            onClick={() => setParams({view: 'minimums'})}
           >
             <Gauge size={16} /> {tr('Ελάχιστα αποθέματα')} {lowCount > 0 && <b className="warn">{lowCount}</b>}
           </button>

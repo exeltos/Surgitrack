@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
@@ -69,19 +69,26 @@ export function useSterilizationState() {
   const requestedQueue = searchParams.get('queue') as Queue | null;
   const validRequest = requestedQueue && QUEUES.includes(requestedQueue) ? requestedQueue : null;
   const [queue, setQueueState] = useState<Queue>(validRequest || 'INCOMING');
+  // «Πίσω» to the stage open before (or to the first, when the address names none).
   useEffect(() => {
-    if (validRequest) setQueueState(validRequest);
+    setQueueState(validRequest || 'INCOMING');
   }, [validRequest]);
+  // Read through a ref so setQueue keeps one identity (callers keep it in their effects' dependencies).
+  const queueParam = useRef(searchParams.get('queue'));
+  queueParam.current = searchParams.get('queue');
   const setQueue = useCallback(
     (next: Queue) => {
       setQueueState(next);
+      // The same stage again (a scan of something already there): no second step in the history.
+      if (queueParam.current === next) return;
       setSearchParams(
         current => {
           const params = new URLSearchParams(current);
           params.set('queue', next);
           return params;
         },
-        {replace: true},
+        // A step of the browser's history, so «Πίσω» returns to the stage before.
+        {replace: false},
       );
     },
     [setSearchParams],
