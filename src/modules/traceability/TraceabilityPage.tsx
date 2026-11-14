@@ -31,7 +31,7 @@ const TAB_PARAM: Record<Tab, string | undefined> = {
 /**
  * Traceability answers three questions, one tab each: where a Set or instrument is and what happened to it, what
  * was used on a patient and whether it was sterilized in a good cycle, and what a sterilizer load held (to recall
- * it). Every movement of the hospital is one more, smaller tab at the end.
+ * it). Every movement of the hospital is the fourth tab.
  */
 export default function TraceabilityPage() {
   const {sets, tools, movements, sterilizationCycles, processLoads} = useSurgi();
@@ -140,36 +140,30 @@ export default function TraceabilityPage() {
     {id: 'SEARCH', label: 'Σετ / εργαλείο', icon: Package},
     {id: 'PATIENTS', label: 'Ασθενής', icon: Users},
     {id: 'LOAD', label: 'Φορτίο κλιβάνου', icon: Flame},
+    {id: 'HISTORY', label: 'Όλες οι κινήσεις', icon: History},
   ];
 
   return (
     // The movements tab fills the page, as «Ιστορικό» did on its own.
     <div className={tab === 'HISTORY' ? 'trace-with-history' : 'trace-page'}>
-      <div className="page-head trace-head">
-        <h1>{tr('Ιχνηλάτηση')}</h1>
-        <div className="trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.id}
-              className={tab === t.id ? 'active' : ''}
-              onClick={() => openTab(t.id)}
-            >
-              <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
-            </button>
-          ))}
+      <div className="page-head">
+        <div>
+          <h1>{tr('Ιχνηλάτηση')}</h1>
+        </div>
+      </div>
+      <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
+        {tabs.map(t => (
           <button
+            key={t.id}
             type="button"
             role="tab"
-            aria-selected={tab === 'HISTORY'}
-            className={`trace-tab-minor ${tab === 'HISTORY' ? 'active' : ''}`}
-            onClick={() => openTab('HISTORY')}
+            aria-selected={tab === t.id}
+            className={tab === t.id ? 'active' : ''}
+            onClick={() => openTab(t.id)}
           >
-            <History size={15} aria-hidden="true" /> {tr('Όλες οι κινήσεις')}
+            <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
           </button>
-        </div>
+        ))}
       </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}

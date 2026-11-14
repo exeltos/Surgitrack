@@ -49,49 +49,9 @@ html body .trace-pick > small {
   font-size: 12px;
 }
 
-/* The title and the three questions on one line; «Όλες οι κινήσεις» a smaller fourth at the end. */
-html body .trace-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 20px;
-}
+/* The tabs keep the same room before what follows them as every tab bar. */
 html body .trace-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .trace-tabs button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--c-blue-15-2);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-html body .trace-tabs button:hover {
-  background: var(--c-gray-95);
-}
-html body .trace-tabs button.active {
-  background: var(--c-blue-25-2);
-  color: var(--c-white);
-}
-html body .trace-tabs .trace-tab-minor {
-  padding: 0 12px;
-  color: var(--c-blue-40);
-  font-size: 13px;
+  flex: none;
 }
 
 /* One item, one patient or one load: a card with the answer first. */
