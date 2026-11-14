@@ -10,6 +10,7 @@ here and to that test's list. State checked against the live project on 09/10/20
 | Function                  | What it does                                                       | Guard                                                                       |
 | ------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
 | `signup_link_info(token)` | The signup page: hospital name, link expiry and active departments | Only for a valid, unrevoked, unexpired link of an active, non-Demo hospital |
+| `public_contact()`        | The first page: the company's name, email, phone and website       | Returns only the four `public_*` fields of `platform_settings`              |
 
 ## Callable by signed-in users
 
@@ -42,4 +43,4 @@ here and to that test's list. State checked against the live project on 09/10/20
 `demo_user_limit`, `generate_user_code`, `handle_new_user`, `handover_counterparty_stamp`, `hospital_settings_keep_manufacturers`,
 `hospital_settings_to_audit`, `merge_used_manufacturers`, `purge_recycle_bin`, `record_deletion`, `forget_deletion`,
 `rename_department_references`, `reserve_login_attempt`, `staff_request_email_confirmed`,
-`supervisor_guard_insert`, `supervisor_guard_instrument`, `supervisor_guard_set`.
+`submit_contact_request` (the contact-request function: the hourly limits and the insert in one locked step), `supervisor_guard_insert`, `supervisor_guard_instrument`, `supervisor_guard_set`.

@@ -14,11 +14,13 @@ import {
   QrCode,
   RefreshCcw,
   ScanBarcode,
+  Send,
   ShieldCheck,
   Smartphone,
   type LucideIcon,
 } from 'lucide-react';
 import BrandMark from '../../components/layout/BrandMark';
+import ContactFormDialog from './ContactFormDialog';
 import {COMPANY_CONTACT} from '../../config/appMeta';
 import {loadPublicContact} from '../../data/cloud/platformContact';
 
@@ -172,6 +174,7 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
       alive = false;
     };
   }, []);
+  const [requesting, setRequesting] = useState(false);
   const t = copy[lang];
   const switchLang = () => {
     const next = lang === 'el' ? 'en' : 'el';
@@ -241,10 +244,10 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
               </h1>
               <p className="landing-lead">{t.lead}</p>
               <div className="landing-cta">
-                <a className="landing-btn landing-btn-solid" href="#contact" onClick={toSection('contact')}>
+                <button type="button" className="landing-btn landing-btn-solid" onClick={() => setRequesting(true)}>
                   {t.ctaContact}
                   <ArrowRight size={18} aria-hidden="true" />
-                </a>
+                </button>
               </div>
               <ul className="landing-points">
                 {t.points.map(point => (
@@ -334,7 +337,11 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
               <h2>{t.contactTitle}</h2>
               <p className="landing-section-lead">{t.contactLead}</p>
               <div className="landing-cta">
-                <a className="landing-btn landing-btn-solid" href={mailHref}>
+                <button type="button" className="landing-btn landing-btn-solid" onClick={() => setRequesting(true)}>
+                  <Send size={18} aria-hidden="true" />
+                  {t.ctaContact}
+                </button>
+                <a className="landing-btn landing-btn-outline" href={mailHref}>
                   <Mail size={18} aria-hidden="true" />
                   {t.sendEmail}
                 </a>
@@ -386,6 +393,7 @@ export default function LandingPage({onSignIn}: {onSignIn: () => void}) {
         </section>
       </main>
 
+      {requesting && <ContactFormDialog lang={lang} email={contact.email} onClose={() => setRequesting(false)} />}
       <footer className="landing-foot">
         <div className="landing-wrap">
           © {new Date().getFullYear()} SurgiTrack · {t.footer} · {t.by}{' '}

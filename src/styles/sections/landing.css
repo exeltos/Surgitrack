@@ -1,9 +1,12 @@
 /* The public first page (LandingPage.tsx): a dark hero in the SurgiTrack teal, light sections below. */
-html body .landing {
+html body .landing,
+html body .contact-backdrop {
   --landing-ink: #0f2a36;
   --landing-muted: #4d6572;
   --landing-accent: #9be3ef;
   --landing-teal: #1d6b7a;
+}
+html body .landing {
   height: 100dvh;
   overflow-y: auto;
   scroll-behavior: smooth;
@@ -503,4 +506,152 @@ html body a.auth-mini-brand,
 html body a.auth-hero-brand {
   color: inherit;
   text-decoration: none;
+}
+
+/* «Ζητήστε παρουσίαση»: the form over the whole page. */
+html body .contact-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 24px 16px;
+  background: rgb(8 30 40 / 55%);
+  backdrop-filter: blur(3px);
+}
+html body .contact-dialog,
+html body .contact-dialog * {
+  box-sizing: border-box;
+}
+html body .contact-dialog {
+  position: relative;
+  width: min(620px, 100%);
+  padding: 28px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 30%);
+  color: var(--landing-ink);
+}
+html body .contact-dialog h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+html body .contact-intro {
+  margin: 6px 0 18px;
+  color: var(--landing-muted);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+html body .contact-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: #f1f5f7;
+  color: var(--landing-muted);
+  cursor: pointer;
+}
+html body .contact-close:hover {
+  background: #e3ebef;
+}
+html body .contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+html body .contact-wide {
+  grid-column: 1 / -1;
+}
+html body .contact-field {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+}
+html body .contact-field small {
+  color: var(--landing-muted);
+  font-weight: 500;
+}
+html body .contact-field input,
+html body .contact-field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cfdde3;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--landing-ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+}
+html body .contact-field textarea {
+  resize: vertical;
+}
+html body .contact-field input:focus-visible,
+html body .contact-field textarea:focus-visible,
+html body .contact-close:focus-visible {
+  outline: 3px solid #5fc8db;
+  outline-offset: 1px;
+}
+html body .contact-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+html body .contact-error {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fdecea;
+  color: #a12a1f;
+  font-size: 14px;
+}
+html body .contact-error a {
+  color: inherit;
+  font-weight: 700;
+}
+html body .contact-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+html body .contact-done {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 18px 0 6px;
+  text-align: center;
+}
+html body .contact-done svg {
+  color: #1c7a43;
+}
+html body .contact-done p {
+  margin: 0 0 8px;
+  color: var(--landing-muted);
+  font-size: 15px;
+}
+@media (max-width: 560px) {
+  html body .contact-dialog {
+    padding: 22px 18px;
+  }
+  html body .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .contact-actions > .landing-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }
