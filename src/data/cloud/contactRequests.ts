@@ -39,25 +39,59 @@ export async function sendContactRequest(form: ContactForm): Promise<ContactResu
   return {ok: false, reason: code === 'invalid' ? 'invalid' : code === 'too_many' ? 'too_many' : 'unavailable'};
 }
 
-/** The requests, newest first (the platform owner only: the database shows nobody else any). */
-export async function loadContactRequests(): Promise<ContactRequest[]> {
-  const {data, error} = await supabase
+/** How many requests one page of the Studio list shows. */
+export const CONTACT_PAGE = 50;
+
+type Row = {
+  id: string;
+  created_at: string;
+  name: string;
+  organization: string | null;
+  role: string | null;
+  email: string;
+  phone: string | null;
+  message: string;
+  handled_at: string | null;
+};
+const fromRow = (row: Row): ContactRequest => ({
+  id: row.id,
+  createdAt: row.created_at,
+  name: row.name,
+  organization: row.organization || undefined,
+  role: row.role || undefined,
+  email: row.email,
+  phone: row.phone || undefined,
+  message: row.message,
+  handledAt: row.handled_at || undefined,
+});
+
+/**
+ * One page of requests, newest first: the new ones only (filtered by the database, so an old unanswered one is
+ * never lost behind newer handled ones) or all; `before` continues after the last one shown. The platform owner
+ * only: the database shows nobody else any.
+ */
+export async function loadContactRequests(view: 'NEW' | 'ALL', before?: string): Promise<ContactRequest[]> {
+  let query = supabase
     .from('contact_requests')
     .select('id, created_at, name, organization, role, email, phone, message, handled_at')
     .order('created_at', {ascending: false})
-    .limit(200);
+    .limit(CONTACT_PAGE);
+  if (view === 'NEW') query = query.is('handled_at', null);
+  if (before) query = query.lt('created_at', before);
+  const {data, error} = await query;
   if (error) throw error;
-  return (data || []).map(row => ({
-    id: row.id,
-    createdAt: row.created_at,
-    name: row.name,
-    organization: row.organization || undefined,
-    role: row.role || undefined,
-    email: row.email,
-    phone: row.phone || undefined,
-    message: row.message,
-    handledAt: row.handled_at || undefined,
-  }));
+  return ((data || []) as Row[]).map(fromRow);
+}
+
+/** How many requests there are, new and in all. */
+export async function countContactRequests(): Promise<{open: number; all: number}> {
+  const [open, all] = await Promise.all([
+    supabase.from('contact_requests').select('id', {count: 'exact', head: true}).is('handled_at', null),
+    supabase.from('contact_requests').select('id', {count: 'exact', head: true}),
+  ]);
+  if (open.error) throw open.error;
+  if (all.error) throw all.error;
+  return {open: open.count ?? 0, all: all.count ?? 0};
 }
 
 /** Marks a request handled (or not again). */

@@ -3070,3 +3070,6 @@ html body .studio-request-actions {
   justify-content: flex-end;
   gap: 8px;
 }
+html body .studio-requests-more {
+  justify-self: center;
+}

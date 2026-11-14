@@ -49,20 +49,24 @@ Deno.serve(async req => {
     const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const admin = createClient(url, service, {auth: {persistSession: false}});
     const ipHash = await sha256(`contact:${service.slice(-16)}:${clientIp(req)}`);
-    const hourAgo = new Date(Date.now() - 3600_000).toISOString();
-    const [{count: fromAddress, error: addressError}, {count: all, error: allError}] = await Promise.all([
-      admin.from("contact_requests").select("id", {count: "exact", head: true}).eq("ip_hash", ipHash).gte("created_at", hourAgo),
-      admin.from("contact_requests").select("id", {count: "exact", head: true}).gte("created_at", hourAgo),
-    ]);
-    if (addressError || allError) return json({error: "unavailable"}, 503);
-    if ((fromAddress ?? 0) >= PER_ADDRESS_PER_HOUR || (all ?? 0) >= PER_HOUR)
-      return json({error: "too_many"}, 429);
-
-    const {error: insertError} = await admin.from("contact_requests").insert({...request, ip_hash: ipHash});
-    if (insertError) {
-      console.error("contact-request", insertError.message);
+    // The limits and the insert in one locked step in the database: simultaneous requests cannot all slip past.
+    const {data: outcome, error: submitError} = await admin.rpc("submit_contact_request", {
+      p_name: request.name,
+      p_organization: request.organization,
+      p_role: request.role,
+      p_email: request.email,
+      p_phone: request.phone,
+      p_message: request.message,
+      p_ip_hash: ipHash,
+      p_per_address: PER_ADDRESS_PER_HOUR,
+      p_per_hour: PER_HOUR,
+    });
+    if (submitError) {
+      console.error("contact-request", submitError.message);
       return json({error: "unavailable"}, 503);
     }
+    if (outcome === "too_many") return json({error: "too_many"}, 429);
+    if (outcome !== "ok") return json({error: "unavailable"}, 503);
 
     // To the company's public address, or else the trial contact's.
     const {data: settings} = await admin

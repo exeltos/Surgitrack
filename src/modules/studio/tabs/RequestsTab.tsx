@@ -5,6 +5,8 @@ import Spinner from '../../../components/ui/Spinner';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {formatDateTime} from '../../../core/displayDate';
 import {
+  CONTACT_PAGE,
+  countContactRequests,
   deleteContactRequest,
   loadContactRequests,
   setContactRequestHandled,
@@ -19,25 +21,42 @@ import type {StudioPageState} from '../useStudioPage';
 export default function RequestsTab({s}: {s: StudioPageState}) {
   const {L, platformAdmin, tab} = s;
   const [rows, setRows] = useState<ContactRequest[] | null>(null);
+  const [counts, setCounts] = useState({open: 0, all: 0});
+  const [more, setMore] = useState(false);
   const [failed, setFailed] = useState('');
   const [all, setAll] = useState(false);
   const active = tab === 'REQUESTS' && platformAdmin;
+  const view = all ? 'ALL' : 'NEW';
+  // The first page again (after a change too), with the counts; «Περισσότερα» adds the next page.
   const load = useCallback(async () => {
     setFailed('');
     try {
-      setRows(await loadContactRequests());
+      const [page, total] = await Promise.all([loadContactRequests(view), countContactRequests()]);
+      setRows(page);
+      setCounts(total);
+      setMore(page.length === CONTACT_PAGE);
     } catch (e) {
       setFailed(e instanceof Error ? e.message : String((e as {message?: string})?.message || e));
       setRows([]);
     }
-  }, []);
+  }, [view]);
+  const loadMore = async () => {
+    const last = rows?.[rows.length - 1];
+    if (!last) return;
+    try {
+      const page = await loadContactRequests(view, last.createdAt);
+      setRows(current => [...(current || []), ...page]);
+      setMore(page.length === CONTACT_PAGE);
+    } catch (e) {
+      setFailed(e instanceof Error ? e.message : String(e));
+    }
+  };
   useEffect(() => {
     if (active) void load();
   }, [active, load]);
   if (!active) return null;
 
-  const open = (rows || []).filter(r => !r.handledAt);
-  const shown = all ? rows || [] : open;
+  const shown = rows || [];
   const mark = async (row: ContactRequest, handled: boolean) => {
     try {
       await setContactRequestHandled(row.id, handled);
@@ -66,11 +85,27 @@ export default function RequestsTab({s}: {s: StudioPageState}) {
     <section className="studio-requests">
       <header className="studio-requests-head">
         <div className="studio-requests-filter" role="group" aria-label={L('Ποια αιτήματα', 'Which requests')}>
-          <button type="button" aria-pressed={!all} className={!all ? 'active' : ''} onClick={() => setAll(false)}>
-            {L('Νέα', 'New')} <b>{open.length}</b>
+          <button
+            type="button"
+            aria-pressed={!all}
+            className={!all ? 'active' : ''}
+            onClick={() => {
+              setRows(null);
+              setAll(false);
+            }}
+          >
+            {L('Νέα', 'New')} <b>{counts.open}</b>
           </button>
-          <button type="button" aria-pressed={all} className={all ? 'active' : ''} onClick={() => setAll(true)}>
-            {L('Όλα', 'All')} <b>{rows?.length ?? 0}</b>
+          <button
+            type="button"
+            aria-pressed={all}
+            className={all ? 'active' : ''}
+            onClick={() => {
+              setRows(null);
+              setAll(true);
+            }}
+          >
+            {L('Όλα', 'All')} <b>{counts.all}</b>
           </button>
         </div>
         <AppButton icon={<RefreshCw size={16} />} onClick={() => void load()}>
@@ -158,6 +193,11 @@ export default function RequestsTab({s}: {s: StudioPageState}) {
             </li>
           ))}
         </ul>
+      )}
+      {more && (
+        <AppButton className="studio-requests-more" onClick={() => void loadMore()}>
+          {L('Περισσότερα', 'More')}
+        </AppButton>
       )}
     </section>
   );

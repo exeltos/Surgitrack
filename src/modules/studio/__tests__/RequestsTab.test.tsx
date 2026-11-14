@@ -5,7 +5,9 @@ import {loadContactRequests, setContactRequestHandled} from '../../../data/cloud
 import type {StudioPageState} from '../useStudioPage';
 
 vi.mock('../../../data/cloud/contactRequests', () => ({
+  CONTACT_PAGE: 50,
   loadContactRequests: vi.fn(),
+  countContactRequests: vi.fn(async () => ({open: 1, all: 2})),
   setContactRequestHandled: vi.fn(async () => undefined),
   deleteContactRequest: vi.fn(async () => undefined),
 }));
@@ -33,7 +35,10 @@ const REQUESTS = [
 const studio = (tab = 'REQUESTS') => ({L: (el: string) => el, platformAdmin: true, tab}) as unknown as StudioPageState;
 
 beforeEach(() => {
-  vi.mocked(loadContactRequests).mockResolvedValue(REQUESTS);
+  // The database filters: «Νέα» asks for the unhandled ones only.
+  vi.mocked(loadContactRequests).mockImplementation(async view =>
+    view === 'NEW' ? REQUESTS.filter(r => !r.handledAt) : REQUESTS,
+  );
   vi.mocked(setContactRequestHandled).mockClear();
 });
 
@@ -50,12 +55,29 @@ describe('Studio → Αιτήματα παρουσίασης', () => {
     expect(screen.queryByText('Ευχαριστώ')).toBeNull();
     fireEvent.click(within(card).getByRole('button', {name: 'Ολοκληρώθηκε'}));
     await vi.waitFor(() => expect(setContactRequestHandled).toHaveBeenCalledWith('r1', true));
+    expect(loadContactRequests).toHaveBeenCalledWith('NEW');
+    expect(screen.getByRole('button', {name: /Νέα/})).toHaveTextContent('1');
     fireEvent.click(screen.getByRole('button', {name: /Όλα/}));
-    expect(screen.getByText('Ευχαριστώ')).toBeInTheDocument();
+    expect(await screen.findByText('Ευχαριστώ')).toBeInTheDocument();
+    expect(loadContactRequests).toHaveBeenCalledWith('ALL');
+    // Fewer than a page: no «Περισσότερα».
+    expect(screen.queryByRole('button', {name: 'Περισσότερα'})).toBeNull();
   });
 
   it('shows nothing on another tab', () => {
     const {container} = render(<RequestsTab s={studio('SYSTEM')} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('pages on with «Περισσότερα», continuing after the last one shown', async () => {
+    const page = Array.from({length: 50}, (_, i) => ({...REQUESTS[0], id: `p${i}`, message: `Μήνυμα ${i}`}));
+    vi.mocked(loadContactRequests)
+      .mockResolvedValueOnce(page)
+      .mockResolvedValueOnce([{...REQUESTS[0], id: 'old', message: 'Παλιό αίτημα'}]);
+    render(<RequestsTab s={studio()} />);
+    fireEvent.click(await screen.findByRole('button', {name: 'Περισσότερα'}));
+    expect(await screen.findByText('Παλιό αίτημα')).toBeInTheDocument();
+    expect(loadContactRequests).toHaveBeenLastCalledWith('NEW', page[49].createdAt);
+    expect(screen.queryByRole('button', {name: 'Περισσότερα'})).toBeNull();
   });
 });
