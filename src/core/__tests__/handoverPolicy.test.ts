@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {handoverCheck} from '../handoverPolicy';
+import {handoverCheck, renameExemptDepartment} from '../handoverPolicy';
 
 describe('handoverCheck', () => {
   const policy = {
@@ -32,5 +32,23 @@ describe('handoverCheck', () => {
   it('treats a person with no department as another department, never as exempt', () => {
     expect(handoverCheck('', 'ΜΕΘ', policy, 'RECEIPT')).toBe('REASON');
     expect(handoverCheck(undefined, 'ΜΕΘ', policy, 'DELIVERY')).toBe('BLOCKED');
+  });
+});
+
+describe('renameExemptDepartment', () => {
+  const policy = {
+    countSetsAtReceipt: false,
+    allowCrossDepartmentHandover: true,
+    receiptExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ'],
+    deliveryExemptDepartments: ['ΜΕΘ'],
+  };
+  it('carries the exemptions over to the new name', () => {
+    const renamed = renameExemptDepartment(policy, 'ΜΕΘ', 'ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ');
+    expect(renamed.receiptExemptDepartments).toEqual(['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ']);
+    expect(renamed.deliveryExemptDepartments).toEqual(['ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ']);
+    expect(handoverCheck('ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ', 'ΧΕΙΡΟΥΡΓΕΙΟ', renamed, 'DELIVERY')).toBe('OK');
+  });
+  it('leaves a policy without the department as it is', () => {
+    expect(renameExemptDepartment(policy, 'ΤΕΠ', 'ΕΠΕΙΓΟΝΤΑ')).toBe(policy);
   });
 });

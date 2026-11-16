@@ -1,6 +1,7 @@
 import {supabase} from '../../../lib/supabase';
 import {wholeHospital} from '../hospitalPeopleMeta';
 import type {Department} from '../hospitalPeopleMeta';
+import {renameExemptDepartment} from '../../../core/handoverPolicy';
 import type {usePeopleState} from './usePeopleState';
 import type {usePeopleData} from './usePeopleData';
 import type {usePeopleView} from './usePeopleView';
@@ -34,6 +35,14 @@ export function usePeopleDepartments(
       await changed();
     }
   };
+  // A renamed department keeps its exemptions from the department check (they are kept by name).
+  const carryExemptions = (id: string, to: string) => {
+    const from = departments.find(d => d.id === id)?.name;
+    const policy = libs.sterilizationWorkflow.receiptPolicy;
+    if (!from || from === to || !policy) return;
+    const renamed = renameExemptDepartment(policy, from, to);
+    if (renamed !== policy) libs.updateSterilizationWorkflow({receiptPolicy: renamed});
+  };
   const saveDepartment = async () => {
     if (!editing?.name.trim()) return;
     if (demo) {
@@ -41,6 +50,7 @@ export function usePeopleDepartments(
         el: editing.name.trim(),
         code: editing.code.trim().toUpperCase() || undefined,
       });
+      carryExemptions(editing.id, editing.name.trim());
       setEditing(null);
       return;
     }
@@ -49,6 +59,7 @@ export function usePeopleDepartments(
       .update({name: editing.name.trim(), code: editing.code.trim().toUpperCase() || null})
       .eq('id', editing.id);
     if (!fail(error)) {
+      carryExemptions(editing.id, editing.name.trim());
       setEditing(null);
       await changed();
     }

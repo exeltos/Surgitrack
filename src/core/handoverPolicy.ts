@@ -21,3 +21,12 @@ export function handoverCheck(
     at === 'RECEIPT' ? (policy?.allowCrossDepartmentHandover ?? true) : !!policy?.allowCrossDepartmentDelivery;
   return allowed ? 'REASON' : 'BLOCKED';
 }
+
+/** The policy with a renamed department's exemptions carried over to its new name; the same policy when it had none. */
+export function renameExemptDepartment<P extends SterilizationReceiptPolicy>(policy: P, from: string, to: string): P {
+  const rename = (list?: string[]) => (list?.includes(from) ? list.map(d => (d === from ? to : d)) : list);
+  const receipt = rename(policy.receiptExemptDepartments);
+  const delivery = rename(policy.deliveryExemptDepartments);
+  if (receipt === policy.receiptExemptDepartments && delivery === policy.deliveryExemptDepartments) return policy;
+  return {...policy, receiptExemptDepartments: receipt, deliveryExemptDepartments: delivery};
+}
