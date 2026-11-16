@@ -3,7 +3,7 @@ import {Download, FileSpreadsheet} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {supabase} from '../../../lib/supabase';
 import {readSheetFile} from '../../../core/sheetImport';
-import {downloadCsv} from '../../../core/exportTable';
+import {downloadXlsx} from '../../../core/exportTable';
 import {formatDate} from '../../../core/displayDate';
 import {importErrorText, maskPhone, parseStaffSheet, type StaffRole, type StaffRow} from '../staffImportFile';
 import type {PeopleState} from './usePeople';
@@ -176,7 +176,7 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
 
   const download = () => {
     if (!results || !rows) return;
-    downloadCsv({
+    downloadXlsx({
       title: L('Νέοι λογαριασμοί', 'New accounts'),
       headers: [L('Ονοματεπώνυμο', 'Name'), L('Τμήμα', 'Department'), L('Όνομα χρήστη', 'Username')],
       rows: rows
@@ -475,7 +475,7 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
           )}
           {results && (
             <AppButton icon={<Download size={16} />} onClick={download}>
-              {L('Λήψη ονομάτων χρήστη (CSV)', 'Download usernames (CSV)')}
+              {L('Λήψη ονομάτων χρήστη (Excel)', 'Download usernames (Excel)')}
             </AppButton>
           )}
           <AppButton onClick={onClose} disabled={running}>

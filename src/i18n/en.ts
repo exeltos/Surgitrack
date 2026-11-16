@@ -1815,8 +1815,6 @@ export const en: Record<string, string> = {
   'PDF / Εκτύπωση': 'PDF / Print',
   'PDF / Εκτύπωση επιλεγμένων': 'PDF / Print selected',
   'Προεπισκόπηση, μετά εκτύπωση ή αποθήκευση ως PDF.': 'Preview, then print or save as PDF.',
-  'CSV (.csv)': 'CSV (.csv)',
-  'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
   'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
   'Γρήγορα φίλτρα': 'Quick filters',
   'Πάνω από {0} ημέρες': 'Over {0} days',

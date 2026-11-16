@@ -7,7 +7,7 @@ import {getI18nLang, tr} from '../../i18n';
 import {dayLabel} from '../../core/usageHistory';
 
 /**
- * The "Download" button of a list: Excel, CSV, and a PDF / print preview, all from the rows the list shows. With
+ * The "Download" button of a list: Excel and a PDF / print preview, all from the rows the list shows. With
  * `grouped` each of them is offered both ways, itemised and grouped by kind, inside the same menu.
  */
 export default function ListExport({
