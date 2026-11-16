@@ -67,8 +67,11 @@ export function correctionFor(word: string, uses: ReadonlyMap<string, number> = 
     } else if (score === best.score) {
       const mine = uses.get(known) || 0;
       const theirs = uses.get(best.word) || 0;
-      if (mine > theirs) best = {word: known, score};
-      tie = mine === theirs;
+      // A more used one wins; an equally used one leaves it undecided; a less used one changes nothing.
+      if (mine > theirs) {
+        best = {word: known, score};
+        tie = false;
+      } else if (mine === theirs) tie = true;
     }
   }
   return best && !tie ? best.word : undefined;

@@ -18,6 +18,27 @@ describe('correctionFor', () => {
     expect(correctionFor('ΡΙΤΣΑΡΣΟΝ')).toBeUndefined();
     expect(correctionFor('METZENBAUM')).toBeUndefined();
   });
+
+  it('suggests nothing when two equally close words are used as much, whatever comes after', () => {
+    expect(
+      correctionFor(
+        'ΑΒΙΔΕΣ',
+        new Map([
+          ['ΑΚΙΔΕΣ', 10],
+          ['ΒΙΔΕΣ', 10],
+        ]),
+      ),
+    ).toBeUndefined();
+    expect(
+      correctionFor(
+        'ΑΒΙΔΕΣ',
+        new Map([
+          ['ΑΚΙΔΕΣ', 10],
+          ['ΒΙΔΕΣ', 3],
+        ]),
+      ),
+    ).toBe('ΑΚΙΔΕΣ');
+  });
 });
 
 describe('spellingFixes', () => {
