@@ -54,7 +54,18 @@ const reprocessText = (again: ReprocessReason) =>
         : tr('Δεν αποδεσμεύτηκε: περνά ξανά από πλύση, έλεγχο και συσκευασία.');
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
-  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads} = useSurgi();
+  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads, reopenProcessLoad} =
+    useSurgi();
+  // «Τέλος κύκλου» pressed too soon: the load goes back into the sterilizer, with the reason, before any release.
+  const reopenLoad = async (loadId: string) => {
+    const reason = await askConfirm({
+      title: tr('Επιστροφή στον κλίβανο'),
+      message: tr('Το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου». Καταγράφεται στο ιστορικό.'),
+      note: {label: tr('Αιτιολογία:'), initial: tr('Πατήθηκε «Τέλος κύκλου» πριν τελειώσει ο κύκλος'), required: true},
+      confirmLabel: tr('Επιστροφή στον κλίβανο'),
+    });
+    if (reason) reopenProcessLoad(loadId, reason);
+  };
   const [returning, setReturning] = useState<{
     kind: SterilizationRow['kind'];
     id: string;
@@ -306,6 +317,11 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', load.cycleNumber)}
                       <small>{contentOf(load.items.map(item => item.assetKind))}</small>
                     </span>
+                    {!sterilizationReleases.some(r => r.loadId === load.id) && (
+                      <button className="compact" onClick={() => void reopenLoad(load.id)}>
+                        <Undo2 size={15} /> {tr('Επιστροφή στον κλίβανο')}
+                      </button>
+                    )}
                     <button
                       className="primary compact"
                       data-tour="load-release"

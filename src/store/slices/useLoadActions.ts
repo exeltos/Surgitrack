@@ -59,6 +59,8 @@ export function useLoadActions(
     setDeliveries,
     setProcessLoads,
     setSterilizationCycles,
+    sterilizationCycles,
+    sterilizationReleases,
     setTools,
     setWorkflowCheckpoints,
     sets,
@@ -390,6 +392,55 @@ export function useLoadActions(
     );
     return finished;
   };
+  /**
+   * «Τέλος κύκλου» pressed too soon: the load goes back into the sterilizer, as it was before, while nothing of it has
+   * been released. The sterilization it counted is taken back, its items are in the sterilizer again, and each gets
+   * a history entry with the reason.
+   */
+  const reopenProcessLoad = (loadId: string, reason: string) => {
+    const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
+    if (!load || load.status !== 'AWAITING_RELEASE' || !reason.trim()) return false;
+    if (sterilizationReleases.some(r => r.loadId === loadId)) {
+      notify(
+        tr('Από το φορτίο {0} έχουν ήδη αποδεσμευτεί αντικείμενα: δεν επιστρέφει στον κλίβανο.', named(loadId)),
+        true,
+      );
+      return false;
+    }
+    // The cycle records stay in the history (they are never deleted); the sterilization they counted is taken back,
+    // and «Τέλος κύκλου» pressed again records new ones, which release then uses (the newest come first).
+    const counted = new Map<string, number>();
+    sterilizationCycles
+      .filter(c => c.loadId === loadId && c.result === 'PASSED' && c.completedAt === load.completedAt)
+      .forEach(c => c.toolIds.forEach(id => counted.set(id, (counted.get(id) || 0) + 1)));
+    setTools(list =>
+      list.map(tool =>
+        counted.has(tool.id)
+          ? {...tool, sterilizations: Math.max(0, (tool.sterilizations || 0) - counted.get(tool.id)!)}
+          : tool,
+      ),
+    );
+    load.items.forEach(item => {
+      const asset = assetName(item.assetKind, item.assetId);
+      if (!asset || asset.state !== 'AWAITING_RELEASE') return;
+      updateState(item.assetKind, item.assetId, 'IN_STERILIZATION');
+      addMovement({
+        asset: `${asset.barcode} · ${asset.name}`,
+        assetKind: item.assetKind,
+        from: 'Αποδέσμευση',
+        to: 'Στον κλίβανο',
+        status: `Επιστροφή στον κλίβανο · Φορτίο ${load.id} · ${load.equipment} · ${load.cycleNumber} · ${reason.trim()}`,
+        by: currentUser.name,
+      });
+    });
+    setProcessLoads(list =>
+      list.map(item =>
+        item.id === loadId ? {...item, status: 'OPEN', completedAt: undefined, cycleData: undefined} : item,
+      ),
+    );
+    notify(tr('Το φορτίο {0} επέστρεψε στον κλίβανο.', named(loadId)));
+    return true;
+  };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
     const a = assetName(kind, id);
     if (!a) return;
@@ -517,6 +568,7 @@ export function useLoadActions(
   }, [simulating]);
   return {
     finishProcessLoad,
+    reopenProcessLoad,
     startCycleSimulation,
     // All its records reach the server together, or none of them (S5).
     completeDeliveryToDepartment: savedTogether(completeDeliveryToDepartment),

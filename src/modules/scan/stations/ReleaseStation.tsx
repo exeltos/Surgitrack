@@ -245,7 +245,22 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
                   >
                     <TriangleAlert size={16} /> {tr('Αποτυχία κύκλου')}
                   </button>
-                  <button type="button" className="scan-primary" onClick={() => s.finishProcessLoad(l.id, 'PASSED')}>
+                  <button
+                    type="button"
+                    className="scan-primary"
+                    onClick={() =>
+                      void askConfirm({
+                        title: tr('Τέλος κύκλου;'),
+                        message: tr(
+                          'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
+                          l.cycleNumber,
+                          trData(l.equipment),
+                          l.items.length,
+                        ),
+                        confirmLabel: tr('Τέλος κύκλου'),
+                      }).then(sure => sure !== false && s.finishProcessLoad(l.id, 'PASSED'))
+                    }
+                  >
                     <CheckCircle2 size={16} /> {tr('Τέλος κύκλου · {0}', l.items.length)}
                   </button>
                 </div>

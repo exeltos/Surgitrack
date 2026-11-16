@@ -1,4 +1,5 @@
 import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
+import {personDepartment, personName} from '../../core/personName';
 import {NavLink, useLocation} from 'react-router-dom';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
 import {
@@ -290,9 +291,9 @@ export default function AppShell({
   // The person actually signed in, even while an admin views the app as another role.
   // The platform owner's account has no name of its own: shown in the app's language, as is its «Platform».
   const rawName = getRealIdentity()?.name || currentUser.name;
-  const signedInName = rawName === 'Platform Admin' ? tr('Διαχειριστής πλατφόρμας') : rawName;
+  const signedInName = personName(rawName);
   const rawDepartment = getRealIdentity()?.departmentName || currentUser.department;
-  const signedInDepartment = rawDepartment === 'Platform' ? tr('Πλατφόρμα') : rawDepartment;
+  const signedInDepartment = personDepartment(rawDepartment);
   const {
     departmentReady,
     departmentIssues,
