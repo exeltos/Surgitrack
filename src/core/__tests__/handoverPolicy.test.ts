@@ -25,4 +25,9 @@ describe('handoverCheck', () => {
     expect(handoverCheck('ΜΕΘ', 'ΤΕΠ', {...policy, allowCrossDepartmentDelivery: true}, 'DELIVERY')).toBe('REASON');
     expect(handoverCheck('ΜΕΘ', 'ΤΕΠ', {...policy, allowCrossDepartmentHandover: false}, 'RECEIPT')).toBe('BLOCKED');
   });
+
+  it('treats a person with no department as another department, never as exempt', () => {
+    expect(handoverCheck('', 'ΜΕΘ', policy, 'RECEIPT')).toBe('REASON');
+    expect(handoverCheck(undefined, 'ΜΕΘ', policy, 'DELIVERY')).toBe('BLOCKED');
+  });
 });

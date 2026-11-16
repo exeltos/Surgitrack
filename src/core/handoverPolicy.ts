@@ -13,8 +13,9 @@ export function handoverCheck(
   policy: Partial<SterilizationReceiptPolicy> | undefined,
   at: 'RECEIPT' | 'DELIVERY',
 ): HandoverCheck {
-  if (!personDepartment || !itemDepartment || personDepartment === itemDepartment) return 'OK';
-  if (policy?.exemptDepartments?.includes(personDepartment)) return 'OK';
+  // The same department (as before: both left empty counts as the same). A person with no department is not exempt.
+  if ((personDepartment || '') === (itemDepartment || '')) return 'OK';
+  if (personDepartment && policy?.exemptDepartments?.includes(personDepartment)) return 'OK';
   const allowed =
     at === 'RECEIPT' ? (policy?.allowCrossDepartmentHandover ?? true) : !!policy?.allowCrossDepartmentDelivery;
   return allowed ? 'REASON' : 'BLOCKED';
