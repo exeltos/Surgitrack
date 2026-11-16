@@ -6,7 +6,8 @@ describe('handoverCheck', () => {
     countSetsAtReceipt: false,
     allowCrossDepartmentHandover: true,
     allowCrossDepartmentDelivery: false,
-    exemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ'],
+    receiptExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ'],
+    deliveryExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΤΑΦΟΡΕΙΣ'],
   };
 
   it('lets a person hand over and receive for their own department', () => {
@@ -14,9 +15,11 @@ describe('handoverCheck', () => {
     expect(handoverCheck('ΜΕΘ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('OK');
   });
 
-  it('lets an exempt department act for any department, with no reason', () => {
+  it('lets an exempt department act for any department, with no reason, at the stage it is exempt in', () => {
     expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', policy, 'RECEIPT')).toBe('OK');
     expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('OK');
+    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('OK');
+    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', policy, 'RECEIPT')).toBe('REASON');
   });
 
   it('asks a reason, or refuses, for another department, each way on its own setting', () => {

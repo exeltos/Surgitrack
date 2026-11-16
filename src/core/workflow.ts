@@ -22,8 +22,10 @@ export type SterilizationReceiptPolicy = {
   allowCrossDepartmentHandover: boolean;
   /** Delivery to someone of another department: allowed with a written reason (else refused). */
   allowCrossDepartmentDelivery?: boolean;
-  /** Departments whose people hand over and receive for any department, with no reason asked (see handoverPolicy). */
-  exemptDepartments?: string[];
+  /** Departments whose people hand over at receipt for any department, with no reason asked (see handoverPolicy). */
+  receiptExemptDepartments?: string[];
+  /** Departments whose people receive at delivery for any department, with no reason asked. */
+  deliveryExemptDepartments?: string[];
 };
 /**
  * Washing goes through a washer load (washer, cycle and program recorded for every item). Washing an item

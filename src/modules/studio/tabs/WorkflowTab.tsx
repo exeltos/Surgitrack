@@ -15,7 +15,6 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
     countSetsAtReceipt: false,
     allowCrossDepartmentHandover: true,
   };
-  const exempt = receiptPolicy.exemptDepartments || [];
   const setReceiptPolicy = (patch: Partial<typeof receiptPolicy>) =>
     libs.updateSterilizationWorkflow({receiptPolicy: {...receiptPolicy, ...patch}});
   const {sets, tools, advanceStageItems} = useSurgi();
@@ -208,40 +207,28 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                         </small>
                       </span>
                     </label>
-                    <fieldset className="studio-exempt-departments">
-                      <legend>
-                        <b>{L('Τμήματα χωρίς έλεγχο τμήματος', 'Departments without the department check')}</b>
-                        <small>
-                          {L(
-                            'Οι χρήστες τους παραδίδουν και παραλαμβάνουν για οποιοδήποτε τμήμα, με υπογραφή, χωρίς αιτιολόγηση (π.χ. Χειρουργείο, μεταφορείς).',
-                            'Their users hand over and receive for any department, with a signature and no justification (e.g. theatre, porters).',
-                          )}
-                        </small>
-                      </legend>
-                      {!libs.departments.length && (
-                        <small>{L('Δεν υπάρχουν ακόμη τμήματα.', 'No departments yet.')}</small>
+                    <ExemptDepartments
+                      L={L}
+                      title={L('Τμήματα χωρίς έλεγχο στην παραλαβή', 'Departments without the check at receipt')}
+                      hint={L(
+                        'Οι χρήστες τους φέρνουν στην παραλαβή Σετ οποιουδήποτε τμήματος, με υπογραφή, χωρίς αιτιολόγηση.',
+                        'Their users bring Sets of any department to receipt, with a signature and no justification.',
                       )}
-                      <div className="studio-exempt-list">
-                        {libs.departments.map(d => {
-                          const on = exempt.includes(d.el);
-                          return (
-                            <button
-                              key={d.id}
-                              type="button"
-                              aria-pressed={on}
-                              className={on ? 'on' : ''}
-                              onClick={() =>
-                                setReceiptPolicy({
-                                  exemptDepartments: on ? exempt.filter(x => x !== d.el) : [...exempt, d.el],
-                                })
-                              }
-                            >
-                              {L(d.el, d.en)}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </fieldset>
+                      departments={libs.departments}
+                      selected={receiptPolicy.receiptExemptDepartments || []}
+                      onChange={list => setReceiptPolicy({receiptExemptDepartments: list})}
+                    />
+                    <ExemptDepartments
+                      L={L}
+                      title={L('Τμήματα χωρίς έλεγχο στην παράδοση', 'Departments without the check at delivery')}
+                      hint={L(
+                        'Οι χρήστες τους παραλαμβάνουν στην παράδοση Σετ οποιουδήποτε τμήματος, με υπογραφή, χωρίς αιτιολόγηση.',
+                        'Their users receive Sets of any department at delivery, with a signature and no justification.',
+                      )}
+                      departments={libs.departments}
+                      selected={receiptPolicy.deliveryExemptDepartments || []}
+                      onChange={list => setReceiptPolicy({deliveryExemptDepartments: list})}
+                    />
                   </div>
                 </section>
                 <section className="studio-release-policy">
@@ -509,5 +496,48 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
         </div>
       )}
     </>
+  );
+}
+
+/** The departments exempt from the department check at one stage: one chip each, pressed when exempt. */
+function ExemptDepartments({
+  L,
+  title,
+  hint,
+  departments,
+  selected,
+  onChange,
+}: {
+  L: (el: string, en: string) => string;
+  title: string;
+  hint: string;
+  departments: Array<{id: string; el: string; en: string}>;
+  selected: string[];
+  onChange: (list: string[]) => void;
+}) {
+  return (
+    <fieldset className="studio-exempt-departments">
+      <legend>
+        <b>{title}</b>
+        <small>{hint}</small>
+      </legend>
+      {!departments.length && <small>{L('Δεν υπάρχουν ακόμη τμήματα.', 'No departments yet.')}</small>}
+      <div className="studio-exempt-list">
+        {departments.map(d => {
+          const on = selected.includes(d.el);
+          return (
+            <button
+              key={d.id}
+              type="button"
+              aria-pressed={on}
+              className={on ? 'on' : ''}
+              onClick={() => onChange(on ? selected.filter(x => x !== d.el) : [...selected, d.el])}
+            >
+              {L(d.el, d.en)}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }
