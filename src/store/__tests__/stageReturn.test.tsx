@@ -172,11 +172,11 @@ describe('returning an item to an earlier stage', () => {
     expect(f.run(() => f.s().reopenProcessLoad(created.id, ' '))).toBe(false);
     expect(f.run(() => f.s().reopenProcessLoad(created.id, 'πατήθηκε νωρίς'))).toBe(true);
     expect(f.tool().state).toBe('IN_STERILIZATION');
-    expect(f.tool().sterilizations).toBe(sterilized);
     expect(f.s().processLoads.find(l => l.id === created.id)).toMatchObject({status: 'OPEN', completedAt: undefined});
     expect(f.s().movements[0].status).toContain('Επιστροφή στον κλίβανο');
-    // Ended again, then released: it cannot go back any more.
+    // Ended again: its sterilization counts once (a count never goes down). Then released: it cannot go back any more.
     f.run(() => f.s().finishProcessLoad(created.id, 'PASSED'));
+    expect(f.tool().sterilizations).toBe(sterilized + 1);
     f.run(() =>
       f.s().releaseProcessLoad(created.id, {
         physicalParametersOk: true,

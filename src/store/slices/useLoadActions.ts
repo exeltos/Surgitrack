@@ -293,12 +293,17 @@ export function useLoadActions(
         toolIds,
       };
       setSterilizationCycles(list => [cycle, ...list]);
+      // A load taken back into the sterilizer (reopenProcessLoad) and ended again counts its sterilization once.
+      const counted = sterilizationCycles.some(
+        c => c.loadId === load.id && c.assetId === ref.id && c.result === 'PASSED',
+      );
       if (result === 'PASSED') {
-        setTools(list =>
-          list.map(tool =>
-            toolIds.includes(tool.id) ? {...tool, sterilizations: (tool.sterilizations || 0) + 1} : tool,
-          ),
-        );
+        if (!counted)
+          setTools(list =>
+            list.map(tool =>
+              toolIds.includes(tool.id) ? {...tool, sterilizations: (tool.sterilizations || 0) + 1} : tool,
+            ),
+          );
         // A sterilizer load always goes on to load release (indicators and approval).
         updateState(ref.kind, ref.id, 'AWAITING_RELEASE');
       } else updateState(ref.kind, ref.id, reprocessState());
@@ -394,8 +399,7 @@ export function useLoadActions(
   };
   /**
    * «Τέλος κύκλου» pressed too soon: the load goes back into the sterilizer, as it was before, while nothing of it has
-   * been released. The sterilization it counted is taken back, its items are in the sterilizer again, and each gets
-   * a history entry with the reason.
+   * been released. Its items are in the sterilizer again, and each gets a history entry with the reason.
    */
   const reopenProcessLoad = (loadId: string, reason: string) => {
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
@@ -407,19 +411,8 @@ export function useLoadActions(
       );
       return false;
     }
-    // The cycle records stay in the history (they are never deleted); the sterilization they counted is taken back,
-    // and «Τέλος κύκλου» pressed again records new ones, which release then uses (the newest come first).
-    const counted = new Map<string, number>();
-    sterilizationCycles
-      .filter(c => c.loadId === loadId && c.result === 'PASSED' && c.completedAt === load.completedAt)
-      .forEach(c => c.toolIds.forEach(id => counted.set(id, (counted.get(id) || 0) + 1)));
-    setTools(list =>
-      list.map(tool =>
-        counted.has(tool.id)
-          ? {...tool, sterilizations: Math.max(0, (tool.sterilizations || 0) - counted.get(tool.id)!)}
-          : tool,
-      ),
-    );
+    // The cycle records stay in the history (they are never deleted) and so does the sterilization they counted
+    // (counts never go down): «Τέλος κύκλου» pressed again does not count it a second time (recordCycleResult).
     load.items.forEach(item => {
       const asset = assetName(item.assetKind, item.assetId);
       if (!asset || asset.state !== 'AWAITING_RELEASE') return;
