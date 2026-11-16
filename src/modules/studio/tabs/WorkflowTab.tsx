@@ -1,5 +1,5 @@
 import {useContext, useState} from 'react';
-import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Puzzle, Lock} from 'lucide-react';
+import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Puzzle, Lock, X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import type {StudioPageState} from '../useStudioPage';
 import {useSurgi} from '../../../store/SurgiStore';
@@ -209,25 +209,12 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                     </label>
                     <ExemptDepartments
                       L={L}
-                      title={L('Τμήματα χωρίς έλεγχο στην παραλαβή', 'Departments without the check at receipt')}
-                      hint={L(
-                        'Οι χρήστες τους φέρνουν στην παραλαβή Σετ οποιουδήποτε τμήματος, με υπογραφή, χωρίς αιτιολόγηση.',
-                        'Their users bring Sets of any department to receipt, with a signature and no justification.',
-                      )}
                       departments={libs.departments}
-                      selected={receiptPolicy.receiptExemptDepartments || []}
-                      onChange={list => setReceiptPolicy({receiptExemptDepartments: list})}
-                    />
-                    <ExemptDepartments
-                      L={L}
-                      title={L('Τμήματα χωρίς έλεγχο στην παράδοση', 'Departments without the check at delivery')}
-                      hint={L(
-                        'Οι χρήστες τους παραλαμβάνουν στην παράδοση Σετ οποιουδήποτε τμήματος, με υπογραφή, χωρίς αιτιολόγηση.',
-                        'Their users receive Sets of any department at delivery, with a signature and no justification.',
-                      )}
-                      departments={libs.departments}
-                      selected={receiptPolicy.deliveryExemptDepartments || []}
-                      onChange={list => setReceiptPolicy({deliveryExemptDepartments: list})}
+                      receipt={receiptPolicy.receiptExemptDepartments || []}
+                      delivery={receiptPolicy.deliveryExemptDepartments || []}
+                      onChange={(receiptExemptDepartments, deliveryExemptDepartments) =>
+                        setReceiptPolicy({receiptExemptDepartments, deliveryExemptDepartments})
+                      }
                     />
                   </div>
                 </section>
@@ -499,45 +486,96 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   );
 }
 
-/** The departments exempt from the department check at one stage: one chip each, pressed when exempt. */
+/**
+ * The departments exempt from the department check, as a short list: only the exempt ones, each with the stage it is
+ * exempt at (receipt, delivery). A department is added from the list of the rest; unticking both stages removes it.
+ */
 function ExemptDepartments({
   L,
-  title,
-  hint,
   departments,
-  selected,
+  receipt,
+  delivery,
   onChange,
 }: {
   L: (el: string, en: string) => string;
-  title: string;
-  hint: string;
   departments: Array<{id: string; el: string; en: string}>;
-  selected: string[];
-  onChange: (list: string[]) => void;
+  receipt: string[];
+  delivery: string[];
+  onChange: (receipt: string[], delivery: string[]) => void;
 }) {
+  const exempt = departments.filter(d => receipt.includes(d.el) || delivery.includes(d.el));
+  const rest = departments.filter(d => !exempt.includes(d));
+  const toggle = (list: string[], dept: string, on: boolean) =>
+    on ? [...list.filter(x => x !== dept), dept] : list.filter(x => x !== dept);
   return (
-    <fieldset className="studio-exempt-departments">
-      <legend>
-        <b>{title}</b>
-        <small>{hint}</small>
-      </legend>
-      {!departments.length && <small>{L('Δεν υπάρχουν ακόμη τμήματα.', 'No departments yet.')}</small>}
-      <div className="studio-exempt-list">
-        {departments.map(d => {
-          const on = selected.includes(d.el);
-          return (
-            <button
-              key={d.id}
-              type="button"
-              aria-pressed={on}
-              className={on ? 'on' : ''}
-              onClick={() => onChange(on ? selected.filter(x => x !== d.el) : [...selected, d.el])}
-            >
-              {L(d.el, d.en)}
-            </button>
-          );
-        })}
+    <div className="studio-exempt">
+      <div className="studio-exempt-head">
+        <b>{L('Τμήματα χωρίς έλεγχο', 'Departments without the check')}</b>
+        <small>
+          {L(
+            'Υπογράφουν για Σετ οποιουδήποτε τμήματος, χωρίς αιτιολόγηση.',
+            'They sign for Sets of any department, with no justification.',
+          )}
+        </small>
       </div>
-    </fieldset>
+      {exempt.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th>{L('Τμήμα', 'Department')}</th>
+              <th>{L('Παραλαβή', 'Receipt')}</th>
+              <th>{L('Παράδοση', 'Delivery')}</th>
+              <th aria-label={L('Αφαίρεση', 'Remove')} />
+            </tr>
+          </thead>
+          <tbody>
+            {exempt.map(d => (
+              <tr key={d.id}>
+                <td>{L(d.el, d.en)}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    aria-label={`${L(d.el, d.en)} · ${L('Παραλαβή', 'Receipt')}`}
+                    checked={receipt.includes(d.el)}
+                    onChange={e => onChange(toggle(receipt, d.el, e.target.checked), delivery)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    aria-label={`${L(d.el, d.en)} · ${L('Παράδοση', 'Delivery')}`}
+                    checked={delivery.includes(d.el)}
+                    onChange={e => onChange(receipt, toggle(delivery, d.el, e.target.checked))}
+                  />
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    aria-label={`${L('Αφαίρεση', 'Remove')} ${L(d.el, d.en)}`}
+                    onClick={() => onChange(toggle(receipt, d.el, false), toggle(delivery, d.el, false))}
+                  >
+                    <X size={15} aria-hidden="true" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {rest.length > 0 && (
+        <select
+          aria-label={L('Προσθήκη τμήματος', 'Add a department')}
+          value=""
+          onChange={e => e.target.value && onChange([...receipt, e.target.value], [...delivery, e.target.value])}
+        >
+          <option value="">{L('+ Προσθήκη τμήματος', '+ Add a department')}</option>
+          {rest.map(d => (
+            <option key={d.id} value={d.el}>
+              {L(d.el, d.en)}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
   );
 }

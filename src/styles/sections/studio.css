@@ -3075,41 +3075,55 @@ html body .studio-requests-more {
 }
 
 /* Departments without the department check: one chip each, pressed when exempt. */
-html body .studio-exempt-departments {
+html body .studio-exempt {
   display: grid;
   gap: 8px;
-  margin: 0;
   padding: 10px 11px;
   border: 1px solid var(--c-gray-90);
   border-radius: 11px;
   background: var(--c-gray-100-2);
 }
-html body .studio-exempt-departments legend {
+html body .studio-exempt-head {
   display: grid;
   gap: 2px;
-  float: left;
+}
+html body .studio-exempt table {
   width: 100%;
-  padding: 0;
-}
-html body .studio-exempt-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-html body .studio-exempt-list button {
-  min-height: 32px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 999px;
-  background: var(--c-white);
-  color: var(--c-cyan-30-4);
-  font: inherit;
+  border-collapse: collapse;
   font-size: 12px;
+}
+html body .studio-exempt th {
+  padding: 4px 6px;
+  color: var(--c-gray-45);
   font-weight: 600;
+  text-align: center;
+}
+html body .studio-exempt td {
+  padding: 4px 6px;
+  border-top: 1px solid var(--c-gray-90);
+  text-align: center;
+}
+html body .studio-exempt th:first-child,
+html body .studio-exempt td:first-child {
+  width: 100%;
+  font-weight: 600;
+  text-align: left;
+}
+html body .studio-exempt td button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--c-gray-45);
   cursor: pointer;
 }
-html body .studio-exempt-list button.on {
-  border-color: var(--c-cyan-35);
-  background: var(--c-cyan-35);
-  color: var(--c-white);
+html body .studio-exempt select {
+  justify-self: start;
+  width: auto;
+  min-width: 220px;
+  min-height: 32px;
+  font-size: 12px;
 }
