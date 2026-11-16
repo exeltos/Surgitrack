@@ -2391,4 +2391,7 @@ export const en: Record<string, string> = {
   'Από το φορτίο {0} έχουν ήδη αποδεσμευτεί αντικείμενα: δεν επιστρέφει στον κλίβανο.':
     'Items of load {0} have already been released: it does not go back into the sterilizer.',
   'Το φορτίο {0} επέστρεψε στον κλίβανο.': 'Load {0} went back into the sterilizer.',
+  'Όλο το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου».':
+    'The whole load goes back “In the sterilizer”, as if “End of cycle” had not been pressed.',
+  'Στον κλίβανο · όλο το φορτίο': 'Into the sterilizer · the whole load',
 };

@@ -25,7 +25,7 @@ export default function StageReturnModal({
   asset: {kind: AssetKind; id: string; barcode: string; name: string};
   onClose: () => void;
 }) {
-  const {stageReturnInfo, returnToStage, movements} = useSurgi();
+  const {stageReturnInfo, returnToStage, reopenProcessLoad, movements} = useSurgi();
   const last = latestMovement(movements, asset.barcode);
   const info = stageReturnInfo(asset.kind, asset.id);
   const [stage, setStage] = useState<ReturnTargetId | ''>(info?.targets[0]?.id ?? '');
@@ -51,6 +51,11 @@ export default function StageReturnModal({
           </div>
         </header>
         {refusal && <div className="identity-error">{refusal}</div>}
+        {stage === 'STERILIZER' && (
+          <p className="stage-return-last">
+            {tr('Όλο το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου».')}
+          </p>
+        )}
         {last && (
           <p className="stage-return-last">
             {tr('Τελευταία κίνηση: «{0}» της {1} ({2}).', movementText(last.status), last.at, trData(last.by))}
@@ -83,7 +88,13 @@ export default function StageReturnModal({
             icon={<Undo2 size={16} />}
             disabled={!ready}
             onClick={() => {
-              if (stage && returnToStage(asset.kind, asset.id, stage, reason)) onClose();
+              // Back into the sterilizer: the whole load, as the load's own button does.
+              if (
+                stage === 'STERILIZER'
+                  ? info?.loadId && reopenProcessLoad(info.loadId, reason)
+                  : stage && returnToStage(asset.kind, asset.id, stage, reason)
+              )
+                onClose();
             }}
           >
             {/* Where to is in the list just above: the button stays short so the two buttons fit side by side. */}

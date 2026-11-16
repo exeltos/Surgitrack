@@ -168,6 +168,12 @@ describe('returning an item to an earlier stage', () => {
     f.run(() => f.s().finishProcessLoad(created.id, 'PASSED'));
     expect(f.tool().state).toBe('AWAITING_RELEASE');
     expect(f.tool().sterilizations).toBe(sterilized + 1);
+    // Its own return button offers it too: the only item of the load can only go back into the sterilizer.
+    expect(f.s().stageReturnInfo('TOOL', f.asset.id)).toMatchObject({
+      loadId: created.id,
+      targets: [{id: 'STERILIZER', state: 'IN_STERILIZATION'}],
+    });
+    expect(f.s().stageReturnInfo('TOOL', f.asset.id)?.refusal).toBeUndefined();
     // A reason is required.
     expect(f.run(() => f.s().reopenProcessLoad(created.id, ' '))).toBe(false);
     expect(f.run(() => f.s().reopenProcessLoad(created.id, 'πατήθηκε νωρίς'))).toBe(true);
