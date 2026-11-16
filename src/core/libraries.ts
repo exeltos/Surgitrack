@@ -25,6 +25,8 @@ export type LibraryItem = {
   outOfService?: OutOfService;
   /** A sterilizer's tests, newest first (the last ones only). */
   tests?: EquipmentTest[];
+  /** A sterilizer's programs, as offered when a load starts (none set: the usual ones, see sterilizerPrograms). */
+  programs?: string[];
 };
 export const departments: LibraryItem[] = [
   {id: 'ster', code: 'STER', el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},

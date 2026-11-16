@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {programsOf} from '../../../core/sterilizerPrograms';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
 import {DEFAULT_SHELF_LIFE, isShelfLife} from '../../../core/sterileExpiry';
@@ -47,6 +48,8 @@ export function useSterilizationState() {
   // The first one that is in service: a load is not offered an out-of-service sterilizer.
   const defaultSterilizer =
     sterilizerLibrary.find(item => !item.outOfService)?.el || sterilizerNames[0] || 'Κλίβανος 1';
+  /** The first program of that sterilizer, offered when a load starts. */
+  const defaultSterilizerProgram = programsOf(sterilizerLibrary.find(item => item.el === defaultSterilizer))[0];
   /** The first washer of Studio › Libraries › Washers, or the usual name when the hospital lists none. */
   const defaultWasher = washers.find(item => !item.outOfService)?.el || washers[0]?.el || 'Πλυντήριο 1';
   const compositionOptions = useCompositionOptions();
@@ -422,6 +425,7 @@ export function useSterilizationState() {
     sterilizationWorkflow,
     sterilizerNames,
     defaultSterilizer,
+    defaultSterilizerProgram,
     defaultWasher,
     systemSettings,
     tools,

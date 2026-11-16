@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {Languages} from 'lucide-react';
+import {Languages, Plus, X} from 'lucide-react';
+import {programsOf} from '../../core/sterilizerPrograms';
 import type {LibraryItem} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import {translateToEnglish} from '../../core/glossary';
@@ -10,7 +11,10 @@ export default function LibraryEditor({
   title,
   onClose,
   onSave,
+  withPrograms,
 }: {
+  /** A sterilizer: its programs are edited too. */
+  withPrograms?: boolean;
   item?: LibraryItem;
   title: string;
   onClose: () => void;
@@ -18,6 +22,11 @@ export default function LibraryEditor({
 }) {
   const [el, setEl] = useState(item?.el || '');
   const [code, setCode] = useState(item?.code || '');
+  // Its own programs once edited; until then the usual ones for its name (steam, or plasma).
+  const [ownPrograms, setOwnPrograms] = useState<string[] | null>(item?.programs?.length ? item.programs : null);
+  const programs = ownPrograms ?? programsOf({el});
+  const setProgram = (index: number, value: string) =>
+    setOwnPrograms(programs.map((p, i) => (i === index ? value : p)));
   // One name only: the English comes from the built-in glossary (or stays as written).
   const english = translateToEnglish(el);
   return (
@@ -53,13 +62,45 @@ export default function LibraryEditor({
             {tr('Κωδικός')}
             <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder={tr('Προαιρετικό')} />
           </label>
+          {withPrograms && (
+            <fieldset className="studio-programs">
+              <legend>{tr('Προγράμματα')}</legend>
+              {programs.map((program, index) => (
+                <div key={index} className="studio-program-row">
+                  <input
+                    value={program}
+                    aria-label={tr('Πρόγραμμα {0}', index + 1)}
+                    onChange={e => setProgram(index, e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    aria-label={tr('Αφαίρεση προγράμματος')}
+                    disabled={programs.length === 1}
+                    onClick={() => setOwnPrograms(programs.filter((_, i) => i !== index))}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+              <AppButton size="sm" icon={<Plus size={15} />} onClick={() => setOwnPrograms([...programs, ''])}>
+                {tr('Προσθήκη προγράμματος')}
+              </AppButton>
+            </fieldset>
+          )}
         </div>
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
             disabled={!el.trim()}
-            onClick={() => onSave({el: el.trim(), en: english || el.trim(), code: code.trim() || undefined})}
+            onClick={() =>
+              onSave({
+                el: el.trim(),
+                en: english || el.trim(),
+                code: code.trim() || undefined,
+                ...(withPrograms ? {programs: programs.map(p => p.trim()).filter(Boolean)} : {}),
+              })
+            }
           >
             {tr('Αποθήκευση')}
           </AppButton>

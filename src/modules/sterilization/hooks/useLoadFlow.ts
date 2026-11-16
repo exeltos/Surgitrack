@@ -85,7 +85,7 @@ export function useLoadFlow(
     setLoadSelected(new Set(preselected ?? candidates.map(item => `${item.kind}:${item.id}`)));
     setLoadEquipment(kind === 'WASHING' ? p.defaultWasher : p.defaultSterilizer);
     setLoadCycleNumber('');
-    setLoadProgram(kind === 'WASHING' ? 'Θερμική απολύμανση' : '134°C · 5 min');
+    setLoadProgram(kind === 'WASHING' ? 'Θερμική απολύμανση' : p.defaultSterilizerProgram);
     // A washing cycle is passed unless the person (or the washer) says otherwise.
     setLoadChemical(kind === 'WASHING' ? 'PASS' : 'NOT_RECORDED');
     p.setLoadWashTemp('');

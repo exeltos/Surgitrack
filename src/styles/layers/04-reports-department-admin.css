@@ -1765,6 +1765,41 @@
   font: inherit;
   color: var(--c-cyan-30-5);
 }
+.studio-programs {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.studio-programs legend {
+  margin-bottom: 6px;
+  padding: 0;
+  color: var(--c-cyan-45-4);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.studio-program-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  gap: 6px;
+  width: 100%;
+}
+.studio-program-row button {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-cyan-30-5);
+  cursor: pointer;
+}
+.studio-program-row button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 .studio-switch-row {
   display: flex !important;
   align-items: center;
