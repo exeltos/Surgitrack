@@ -31,7 +31,6 @@ import SterilizerLoads from './SterilizerLoads';
 import SterilizerTests from './SterilizerTests';
 import {reprocessReason, type ReprocessReason} from '../../../core/reprocessReason';
 import StageReturnModal from './StageReturnModal';
-import AppButton from '../../../components/ui/AppButton';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {openIssuesByBarcode} from '../../../core/openIssuesByBarcode';
 
@@ -55,18 +54,7 @@ const reprocessText = (again: ReprocessReason) =>
         : tr('Δεν αποδεσμεύτηκε: περνά ξανά από πλύση, έλεγχο και συσκευασία.');
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
-  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads, reopenProcessLoad} =
-    useSurgi();
-  // «Τέλος κύκλου» pressed too soon: the load goes back into the sterilizer, with the reason, before any release.
-  const reopenLoad = async (loadId: string) => {
-    const reason = await askConfirm({
-      title: tr('Επιστροφή στον κλίβανο'),
-      message: tr('Το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου». Καταγράφεται στο ιστορικό.'),
-      note: {label: tr('Αιτιολογία:'), initial: tr('Πατήθηκε «Τέλος κύκλου» πριν τελειώσει ο κύκλος'), required: true},
-      confirmLabel: tr('Επιστροφή στον κλίβανο'),
-    });
-    if (reason) reopenProcessLoad(loadId, reason);
-  };
+  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads} = useSurgi();
   const [returning, setReturning] = useState<{
     kind: SterilizationRow['kind'];
     id: string;
@@ -318,20 +306,13 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', load.cycleNumber)}
                       <small>{contentOf(load.items.map(item => item.assetKind))}</small>
                     </span>
-                    <div className="ster-load-actions">
-                      {!sterilizationReleases.some(r => r.loadId === load.id) && (
-                        <AppButton size="sm" icon={<Undo2 size={15} />} onClick={() => void reopenLoad(load.id)}>
-                          {tr('Επιστροφή στον κλίβανο')}
-                        </AppButton>
-                      )}
-                      <button
-                        className="primary compact"
-                        data-tour="load-release"
-                        onClick={() => openLoadRelease(load.id)}
-                      >
-                        <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
-                      </button>
-                    </div>
+                    <button
+                      className="primary compact"
+                      data-tour="load-release"
+                      onClick={() => openLoadRelease(load.id)}
+                    >
+                      <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
+                    </button>
                   </div>
                 );
               }

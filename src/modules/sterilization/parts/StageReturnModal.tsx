@@ -88,7 +88,7 @@ export default function StageReturnModal({
             icon={<Undo2 size={16} />}
             disabled={!ready}
             onClick={() => {
-              // Back into the sterilizer: the whole load, as the load's own button does.
+              // Back into the sterilizer: the whole load (its cycle is the load's).
               if (
                 stage === 'STERILIZER'
                   ? info?.loadId && reopenProcessLoad(info.loadId, reason)

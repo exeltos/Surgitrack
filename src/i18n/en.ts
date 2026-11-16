@@ -2291,8 +2291,8 @@ export const en: Record<string, string> = {
   '{0}: επέστρεψε στο στάδιο «{1}».': '{0}: returned to the stage “{1}”.',
   'Είναι σε κλίβανο με κύκλο σε εξέλιξη: χρησιμοποιήστε «Αναίρεση φόρτωσης» ή τερματίστε τον κύκλο.':
     'It is in a sterilizer with a running cycle: use “Undo loading” or end the cycle.',
-  'Είναι το μόνο που απομένει στο φορτίο: «Επιστροφή στον κλίβανο» στο φορτίο (αν πατήθηκε νωρίς το «Τέλος κύκλου»), ή «Μη αποδέσμευση» για επανεπεξεργασία.':
-    'It is the only one left in the load: “Back into the sterilizer” on the load (if “End of cycle” was pressed too soon), or “Not released” for reprocessing.',
+  'Είναι το μόνο που απομένει στο φορτίο: αποδεσμεύστε το φορτίο ως «Μη αποδέσμευση» για να γυρίσει σε επανεπεξεργασία.':
+    'It is the only one left in the load: release the load as “Not released” to send it back to reprocessing.',
   'Δεν υπάρχει προηγούμενο στάδιο.': 'There is no earlier stage.',
   'Αναιρείται η κίνηση «{0}» της {1} ({2}) και το {3} επιστρέφει όπως ήταν πριν. Η κίνηση μένει στο ιστορικό ως αναιρεμένη.':
     'The movement “{0}” of {1} ({2}) is undone and {3} goes back to how it was before. The movement stays in the history, marked undone.',
@@ -2381,10 +2381,6 @@ export const en: Record<string, string> = {
   'Ορθογραφικές διορθώσεις σε {0} λέξεις': 'Spelling corrections in {0} words',
   'Διόρθωση της λέξης {0}': 'Correct the word {0}',
   'Επιστροφή στον κλίβανο': 'Back into the sterilizer',
-  'Το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου». Καταγράφεται στο ιστορικό.':
-    'The load goes back “In the sterilizer”, as if “End of cycle” had not been pressed. It is recorded in the history.',
-  'Αιτιολογία:': 'Reason:',
-  'Πατήθηκε «Τέλος κύκλου» πριν τελειώσει ο κύκλος': '“End of cycle” was pressed before the cycle ended',
   'Τέλος κύκλου;': 'End of cycle?',
   'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.':
     'Has cycle {0} on {1} ended? The load ({2} items) goes to release.',
