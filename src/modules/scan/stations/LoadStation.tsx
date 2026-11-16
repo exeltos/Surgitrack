@@ -3,6 +3,8 @@ import {useLibraries} from '../../../core/LibraryStore';
 import {tr, trData} from '../../../i18n';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
+import ProgramSelect from '../../sterilization/parts/ProgramSelect';
+import {programsOf} from '../../../core/sterilizerPrograms';
 import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
 
@@ -76,7 +78,14 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
         <label className="scan-field">
           {tr('Κλίβανος')}
           {sterilizers.length ? (
-            <select value={s.loadEquipment} onChange={e => s.setLoadEquipment(e.target.value)}>
+            <select
+              value={s.loadEquipment}
+              onChange={e => {
+                s.setLoadEquipment(e.target.value);
+                // Another sterilizer: its first program.
+                s.setLoadProgram(programsOf(sterilizers.find(item => item.el === e.target.value))[0]);
+              }}
+            >
               {sterilizers.map(item => (
                 <option key={item.id} value={item.el}>
                   {trData(item.el)}
@@ -99,10 +108,12 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
             inputMode="text"
           />
         </label>
-        <label className="scan-field">
-          {tr('Πρόγραμμα')}
-          <input value={s.loadProgram} onChange={e => s.setLoadProgram(e.target.value)} />
-        </label>
+        <ProgramSelect
+          className="scan-field"
+          sterilizer={sterilizers.find(item => item.el === s.loadEquipment)}
+          value={s.loadProgram}
+          onChange={s.setLoadProgram}
+        />
         <div className="scan-field" role="group" aria-label={tr('Δείκτες στο φορτίο')}>
           {tr('Δείκτες στο φορτίο')}
           <div className="scan-chips">

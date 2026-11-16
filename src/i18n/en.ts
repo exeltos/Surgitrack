@@ -2370,4 +2370,8 @@ export const en: Record<string, string> = {
   'Φυσικές παράμετροι': 'Physical parameters',
   Αναμένεται: 'Pending',
   'Φορτίο κλιβάνου': 'Sterilizer load',
+  Προγράμματα: 'Programs',
+  'Πρόγραμμα {0}': 'Program {0}',
+  'Αφαίρεση προγράμματος': 'Remove program',
+  'Προσθήκη προγράμματος': 'Add program',
 };

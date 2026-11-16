@@ -221,6 +221,7 @@ export default function StudioPage() {
       {(editItem || newItem) && (
         <LibraryEditor
           item={editItem || undefined}
+          withPrograms={libraryKey === 'sterilizers'}
           title={L(currentMeta.el, currentMeta.en)}
           onClose={() => {
             setEditItem(null);

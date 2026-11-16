@@ -2,6 +2,8 @@ import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, Flame, TriangleAlert, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
+import ProgramSelect from './ProgramSelect';
+import {programsOf} from '../../../core/sterilizerPrograms';
 import {useLibraries} from '../../../core/LibraryStore';
 import {testsInUse, testsState} from '../../../core/equipmentTests';
 import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
@@ -81,7 +83,15 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                 <label>
                   {loadModal === 'WASHING' ? tr('Πλυντήριο / απολυμαντής') : tr('Κλίβανος')}
                   {equipmentList.length ? (
-                    <select value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)}>
+                    <select
+                      value={loadEquipment}
+                      onChange={e => {
+                        setLoadEquipment(e.target.value);
+                        // Another sterilizer: its first program.
+                        if (loadModal !== 'WASHING')
+                          setLoadProgram(programsOf(sterilizers.find(item => item.el === e.target.value))[0]);
+                      }}
+                    >
                       {equipmentList.map(item => (
                         <option
                           key={item.id}
@@ -122,10 +132,18 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     placeholder={tr('π.χ. 2026-0815-07')}
                   />
                 </label>
-                <label>
-                  {tr('Πρόγραμμα')}
-                  <input value={loadProgram} onChange={e => setLoadProgram(e.target.value)} />
-                </label>
+                {loadModal === 'WASHING' ? (
+                  <label>
+                    {tr('Πρόγραμμα')}
+                    <input value={loadProgram} onChange={e => setLoadProgram(e.target.value)} />
+                  </label>
+                ) : (
+                  <ProgramSelect
+                    sterilizer={sterilizers.find(item => item.el === loadEquipment)}
+                    value={loadProgram}
+                    onChange={setLoadProgram}
+                  />
+                )}
                 {loadModal === 'WASHING' && (
                   <>
                     <label>
