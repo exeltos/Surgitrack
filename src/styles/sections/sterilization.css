@@ -2792,6 +2792,14 @@ html body .sterilization-workspace .ster-load-group > span {
   color: var(--c-cyan-20);
   font-size: 14px;
 }
+/* A load's own actions, side by side on the right: back into the sterilizer, and its release. */
+html body .sterilization-workspace .ster-load-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
 html body .sterilization-workspace .ster-load-group small {
   color: var(--st-muted);
   font-size: 12px;

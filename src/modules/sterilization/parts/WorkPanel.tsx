@@ -31,6 +31,7 @@ import SterilizerLoads from './SterilizerLoads';
 import SterilizerTests from './SterilizerTests';
 import {reprocessReason, type ReprocessReason} from '../../../core/reprocessReason';
 import StageReturnModal from './StageReturnModal';
+import AppButton from '../../../components/ui/AppButton';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {openIssuesByBarcode} from '../../../core/openIssuesByBarcode';
 
@@ -317,18 +318,20 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', load.cycleNumber)}
                       <small>{contentOf(load.items.map(item => item.assetKind))}</small>
                     </span>
-                    {!sterilizationReleases.some(r => r.loadId === load.id) && (
-                      <button className="compact" onClick={() => void reopenLoad(load.id)}>
-                        <Undo2 size={15} /> {tr('Επιστροφή στον κλίβανο')}
+                    <div className="ster-load-actions">
+                      {!sterilizationReleases.some(r => r.loadId === load.id) && (
+                        <AppButton size="sm" icon={<Undo2 size={15} />} onClick={() => void reopenLoad(load.id)}>
+                          {tr('Επιστροφή στον κλίβανο')}
+                        </AppButton>
+                      )}
+                      <button
+                        className="primary compact"
+                        data-tour="load-release"
+                        onClick={() => openLoadRelease(load.id)}
+                      >
+                        <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
                       </button>
-                    )}
-                    <button
-                      className="primary compact"
-                      data-tour="load-release"
-                      onClick={() => openLoadRelease(load.id)}
-                    >
-                      <ShieldCheck size={15} /> {tr('Αποδέσμευση')}
-                    </button>
+                    </div>
                   </div>
                 );
               }
