@@ -14,7 +14,6 @@ import HistoryWindowNote from '../../components/ui/HistoryWindowNote';
 import type {SetAsset, Tool} from '../../types/domain';
 import {movementText} from '../../core/movementText';
 import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
-import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import ItemTrace from './ItemTrace';
 import PatientTrace from './PatientTrace';
 import LoadTrace from './LoadTrace';
@@ -273,29 +272,21 @@ export default function TraceabilityPage() {
             )
           ) : (
             <>
-              <p className="trace-hint">{tr('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.')}</p>
               {recentlyMoved.length > 0 && (
-                <section className="trace-recently" aria-label={tr('Κινήθηκαν πρόσφατα')}>
-                  <h3>{tr('Κινήθηκαν πρόσφατα')}</h3>
-                  <div className="trace-recently-grid">
+                <section className="trace-recent-list" aria-label={tr('Κινήθηκαν πρόσφατα')}>
+                  <h3 className="trace-section-title">{tr('Κινήθηκαν πρόσφατα')}</h3>
+                  <ul>
                     {recentlyMoved.map(({item, at, status}) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        className="trace-recently-card"
-                        onClick={() => commit(item.barcode)}
-                      >
-                        <AssetTypeIcon kind={sets.some(x => x.id === item.id) ? 'SET' : 'TOOL'} framed size={15} />
-                        <span>
-                          <strong>{item.name}</strong>
-                          <small>
-                            <span className="mono">{item.barcode}</span> · {movementText(status)}
-                          </small>
-                          <small>{at}</small>
-                        </span>
-                      </button>
+                      <li key={item.id}>
+                        <button type="button" onClick={() => commit(item.barcode)}>
+                          <b className="mono">{item.barcode}</b>
+                          <span>{item.name}</span>
+                          <span>{movementText(status)}</span>
+                          <span>{at}</span>
+                        </button>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </section>
               )}
             </>

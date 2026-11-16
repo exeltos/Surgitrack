@@ -34,7 +34,7 @@ describe('Ιχνηλάτηση and the browser’s «Πίσω»', () => {
     expect(field()).toHaveValue('S000321');
     // Back again: the empty search.
     fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
-    await screen.findByText('Σκανάρετε ή πληκτρολογήστε barcode (S..., T...) ή όνομα.');
+    await screen.findByRole('region', {name: 'Κινήθηκαν πρόσφατα'});
     expect(field()).toHaveValue('');
   });
 

@@ -55,102 +55,6 @@ html body .trace-tabs {
 }
 
 /* One item, one patient or one load: a card with the answer first. */
-html body .trace-summary {
-  display: grid;
-  gap: 18px;
-  margin-bottom: 18px;
-  padding: 22px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 16px;
-  background: var(--c-white);
-}
-html body .trace-summary-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 14px;
-}
-html body .trace-summary-title {
-  display: grid;
-  flex: 1 1 260px;
-  gap: 4px;
-  min-width: 0;
-}
-html body .trace-summary-title small {
-  color: var(--c-blue-40);
-  font-size: 13px;
-  font-weight: 700;
-}
-html body .trace-summary-title h2 {
-  margin: 0;
-  color: var(--c-blue-15-2);
-  font-size: 22px;
-  font-weight: 800;
-}
-html body .trace-summary-title span {
-  color: var(--c-blue-40);
-  font-size: 14px;
-}
-html body .trace-now {
-  display: grid;
-  justify-items: end;
-  gap: 6px;
-}
-html body .trace-now-place {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: var(--c-gray-95-11);
-  color: var(--c-blue-25-2);
-  font-weight: 700;
-}
-html body .trace-now small {
-  color: var(--c-blue-40);
-  font-size: 13px;
-}
-html body .trace-facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin: 0;
-}
-html body .trace-facts > div {
-  display: grid;
-  align-content: start;
-  gap: 4px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: var(--c-gray-95);
-}
-html body .trace-facts dt {
-  color: var(--c-blue-40);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-html body .trace-facts dd {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-}
-html body .trace-facts dd b {
-  color: var(--c-blue-15-2);
-  font-size: 16px;
-}
-html body .trace-facts dd span {
-  color: var(--c-blue-40);
-  font-size: 13px;
-}
-html body .trace-facts .trace-expired {
-  color: var(--c-red-40);
-  font-weight: 700;
-}
-html body .trace-summary .trace-open {
-  justify-self: start;
-  text-decoration: none;
-}
 
 /* A result: green when it went well, red when not, amber while it is awaited. */
 html body .trace-tone {
@@ -199,10 +103,6 @@ html body .trace-verdict.bad {
   background: var(--c-gray-95-5);
   color: var(--c-red-40);
 }
-html body .trace-patient-summary {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-}
 html body .trace-link {
   padding: 0;
   border: 0;
@@ -217,108 +117,10 @@ html body .trace-link {
 }
 
 /* The history, round by round: the current one open, the older ones one line each. */
-html body .trace-rounds {
-  display: grid;
-  gap: 10px;
-}
-html body .trace-rounds > h3,
 html body .trace-load-items h3 {
   margin: 0;
   color: var(--c-blue-15-2);
   font-size: 16px;
-}
-html body .trace-round {
-  display: grid;
-  gap: 4px;
-  padding: 16px 20px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 14px;
-  background: var(--c-white);
-}
-html body .trace-round.current {
-  border: 2px solid var(--c-blue-25-2);
-}
-html body .trace-round-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 14px;
-  margin-bottom: 6px;
-}
-html body .trace-round-head b {
-  color: var(--c-blue-15-2);
-}
-html body .trace-round-head span {
-  flex: 1;
-  color: var(--c-blue-40);
-  font-size: 14px;
-}
-html body .trace-round-line {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 52px;
-  padding: 0 18px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-  color: var(--c-blue-15-2);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-html body .trace-round-line:hover {
-  background: var(--c-gray-95);
-}
-html body .trace-round-line span {
-  overflow: hidden;
-  color: var(--c-blue-40);
-  font-size: 14px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-html body .trace-steps {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-html body .trace-steps li {
-  display: grid;
-  grid-template-columns: 132px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-  min-height: 44px;
-  padding: 6px 0;
-  border-top: 1px solid var(--c-gray-95);
-}
-html body .trace-steps li:first-child {
-  border-top: 0;
-}
-html body .trace-steps time {
-  color: var(--c-blue-40);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-html body .trace-steps li > span:nth-child(2) {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-html body .trace-steps b {
-  color: var(--c-blue-15-2);
-  font-weight: 600;
-}
-html body .trace-steps small {
-  color: var(--c-blue-40);
-  font-size: 13px;
-}
-html body .trace-step-end {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
 }
 html body .trace-actions {
   display: flex;
@@ -426,20 +228,6 @@ html body .trace-recall {
 html body .trace-recall:hover {
   background: var(--c-gray-95-5);
 }
-@media (max-width: 720px) {
-  html body .trace-steps li {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  html body .trace-steps time {
-    grid-column: 1 / -1;
-  }
-  html body .trace-now {
-    justify-items: start;
-  }
-  html body .trace-patient-summary {
-    grid-template-columns: 1fr;
-  }
-}
 /* Uses with a patient code: filters on one line, then the list. */
 html body .trace-patients {
   display: flex;
@@ -487,53 +275,148 @@ html body .trace-hint {
 /* A patient code in the trail opens that patient's trace. */
 
 /* An empty search: the Sets and instruments that moved last, as small cards; one click opens the trail. */
-html body .trace-recently {
-  margin-top: 16px;
+
+/* The page scrolls on its own: the content area around it does not. */
+html body .trace-page {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 24px;
 }
-html body .trace-recently h3 {
-  margin: 0 0 8px;
-  color: var(--c-blue-45);
-  font-size: 13px;
-  font-weight: 600;
-}
-html body .trace-recently-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 8px;
-}
-html body .trace-recently-card {
+
+/* An item, patient or load: its name, then one line per fact. */
+html body .trace-item-head {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  min-width: 0;
-  padding: 10px 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 6px 0 10px;
+}
+html body .trace-item-head small {
+  color: var(--c-blue-40);
+  font-size: 13px;
+  font-weight: 700;
+}
+html body .trace-item-head h2 {
+  margin: 2px 0 0;
+  color: var(--c-blue-15-2);
+  font-size: 21px;
+  font-weight: 800;
+}
+html body .trace-item-head .trace-open {
+  text-decoration: none;
+}
+html body .trace-info {
+  margin: 0 0 18px;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
   background: var(--c-white);
-  color: inherit;
+}
+html body .trace-info > div {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 16px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--c-gray-95);
+}
+html body .trace-info > div:first-child {
+  border-top: 0;
+}
+html body .trace-info dt {
+  color: var(--c-blue-40);
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-info dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0;
+  color: var(--c-blue-15-2);
+}
+html body .trace-section-title {
+  margin: 4px 0 8px;
+  color: var(--c-blue-15-2);
+  font-size: 16px;
+}
+
+/* The history: one table, a line where each round begins. */
+html body .trace-history .trace-round-row th {
+  padding: 10px 18px;
+  border-top: 1px solid var(--c-gray-90);
+  background: var(--c-gray-95);
+  color: var(--c-blue-15-2);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: none;
+}
+html body .trace-history td {
+  padding: 10px 18px;
+  font-size: 14px;
+}
+html body .trace-history td small {
+  color: var(--c-blue-40);
+  font-size: 13px;
+}
+html body .trace-history .trace-when {
+  color: var(--c-blue-40);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+html body .trace-history .trace-end {
+  text-align: right;
+  white-space: nowrap;
+}
+html body .trace-history .trace-end > * + * {
+  margin-left: 10px;
+}
+
+/* Recently moved items, recent loads: one line each. */
+html body .trace-recent-list ul {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  list-style: none;
+}
+html body .trace-recent-list li + li {
+  border-top: 1px solid var(--c-gray-95);
+}
+html body .trace-recent-list button {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 2fr) minmax(0, 1.5fr) auto;
+  align-items: center;
+  gap: 4px 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  background: none;
+  color: var(--c-blue-15-2);
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
-html body .trace-recently-card:hover {
-  border-color: var(--c-cyan-45);
+html body .trace-recent-list button:hover {
+  background: var(--c-gray-95);
 }
-html body .trace-recently-card > span {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-html body .trace-recently-card strong {
+html body .trace-recent-list button span {
   overflow: hidden;
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--c-blue-40);
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-html body .trace-recently-card small {
-  overflow: hidden;
-  color: var(--st-muted);
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+@media (max-width: 720px) {
+  html body .trace-info > div {
+    grid-template-columns: 1fr;
+  }
+  html body .trace-recent-list button {
+    grid-template-columns: 1fr auto;
+  }
 }
