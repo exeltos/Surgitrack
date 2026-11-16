@@ -212,6 +212,8 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                       departments={libs.departments}
                       receipt={receiptPolicy.receiptExemptDepartments || []}
                       delivery={receiptPolicy.deliveryExemptDepartments || []}
+                      receiptOn={receiptPolicy.allowCrossDepartmentHandover ?? true}
+                      deliveryOn={receiptPolicy.allowCrossDepartmentDelivery ?? false}
                       onChange={(receiptExemptDepartments, deliveryExemptDepartments) =>
                         setReceiptPolicy({receiptExemptDepartments, deliveryExemptDepartments})
                       }
@@ -495,18 +497,27 @@ function ExemptDepartments({
   departments,
   receipt,
   delivery,
+  receiptOn,
+  deliveryOn,
   onChange,
 }: {
   L: (el: string, en: string) => string;
   departments: Array<{id: string; el: string; en: string}>;
   receipt: string[];
   delivery: string[];
+  /** Whether that stage's controlled handover is on: its column is greyed out otherwise, as its exemptions do not apply. */
+  receiptOn: boolean;
+  deliveryOn: boolean;
   onChange: (receipt: string[], delivery: string[]) => void;
 }) {
-  const exempt = departments.filter(d => receipt.includes(d.el) || delivery.includes(d.el));
+  // Only the exemptions of the stages that are controlled count, so only those show.
+  const exempt = departments.filter(
+    d => (receiptOn && receipt.includes(d.el)) || (deliveryOn && delivery.includes(d.el)),
+  );
   const rest = departments.filter(d => !exempt.includes(d));
   const toggle = (list: string[], dept: string, on: boolean) =>
     on ? [...list.filter(x => x !== dept), dept] : list.filter(x => x !== dept);
+  if (!receiptOn && !deliveryOn) return null;
   return (
     <div className="studio-exempt">
       <div className="studio-exempt-head">
@@ -523,8 +534,8 @@ function ExemptDepartments({
           <thead>
             <tr>
               <th>{L('Τμήμα', 'Department')}</th>
-              <th>{L('Παραλαβή', 'Receipt')}</th>
-              <th>{L('Παράδοση', 'Delivery')}</th>
+              <th className={receiptOn ? '' : 'off'}>{L('Παραλαβή', 'Receipt')}</th>
+              <th className={deliveryOn ? '' : 'off'}>{L('Παράδοση', 'Delivery')}</th>
               <th aria-label={L('Αφαίρεση', 'Remove')} />
             </tr>
           </thead>
@@ -536,7 +547,8 @@ function ExemptDepartments({
                   <input
                     type="checkbox"
                     aria-label={`${L(d.el, d.en)} · ${L('Παραλαβή', 'Receipt')}`}
-                    checked={receipt.includes(d.el)}
+                    disabled={!receiptOn}
+                    checked={receiptOn && receipt.includes(d.el)}
                     onChange={e => onChange(toggle(receipt, d.el, e.target.checked), delivery)}
                   />
                 </td>
@@ -544,7 +556,8 @@ function ExemptDepartments({
                   <input
                     type="checkbox"
                     aria-label={`${L(d.el, d.en)} · ${L('Παράδοση', 'Delivery')}`}
-                    checked={delivery.includes(d.el)}
+                    disabled={!deliveryOn}
+                    checked={deliveryOn && delivery.includes(d.el)}
                     onChange={e => onChange(receipt, toggle(delivery, d.el, e.target.checked))}
                   />
                 </td>
@@ -566,7 +579,10 @@ function ExemptDepartments({
         <select
           aria-label={L('Προσθήκη τμήματος', 'Add a department')}
           value=""
-          onChange={e => e.target.value && onChange([...receipt, e.target.value], [...delivery, e.target.value])}
+          onChange={e => {
+            const dept = e.target.value;
+            if (dept) onChange(toggle(receipt, dept, receiptOn), toggle(delivery, dept, deliveryOn));
+          }}
         >
           <option value="">{L('+ Προσθήκη τμήματος', '+ Add a department')}</option>
           {rest.map(d => (

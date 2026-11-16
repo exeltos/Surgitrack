@@ -16,10 +16,18 @@ describe('handoverCheck', () => {
   });
 
   it('lets an exempt department act for any department, with no reason, at the stage it is exempt in', () => {
-    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', policy, 'RECEIPT')).toBe('OK');
-    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('OK');
-    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('OK');
-    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', policy, 'RECEIPT')).toBe('REASON');
+    const controlled = {...policy, allowCrossDepartmentDelivery: true};
+    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', controlled, 'RECEIPT')).toBe('OK');
+    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', controlled, 'DELIVERY')).toBe('OK');
+    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', controlled, 'DELIVERY')).toBe('OK');
+    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', controlled, 'RECEIPT')).toBe('REASON');
+  });
+
+  it('ignores the exemptions of a stage whose controlled handover is off', () => {
+    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('BLOCKED');
+    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', {...policy, allowCrossDepartmentHandover: false}, 'RECEIPT')).toBe(
+      'BLOCKED',
+    );
   });
 
   it('asks a reason, or refuses, for another department, each way on its own setting', () => {
@@ -39,6 +47,7 @@ describe('renameExemptDepartment', () => {
   const policy = {
     countSetsAtReceipt: false,
     allowCrossDepartmentHandover: true,
+    allowCrossDepartmentDelivery: true,
     receiptExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ'],
     deliveryExemptDepartments: ['ΜΕΘ'],
   };

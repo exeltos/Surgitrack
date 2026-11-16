@@ -3098,6 +3098,9 @@ html body .studio-exempt th {
   font-weight: 600;
   text-align: center;
 }
+html body .studio-exempt th.off {
+  opacity: 0.45;
+}
 html body .studio-exempt td {
   padding: 4px 6px;
   border-top: 1px solid var(--c-gray-90);
@@ -3120,8 +3123,9 @@ html body .studio-exempt td button {
   color: var(--c-gray-45);
   cursor: pointer;
 }
-html body .studio-exempt select {
+html body .studio-body-workflow .studio-exempt select {
   justify-self: start;
+  max-width: none;
   width: auto;
   min-width: 220px;
   min-height: 32px;
