@@ -1,4 +1,5 @@
 import {CheckCircle2, Box, Stethoscope, UserRoundCheck, IdCard, UserCheck} from 'lucide-react';
+import DeliveryMismatch from './DeliveryMismatch';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
@@ -12,6 +13,10 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
     deliveryNote,
     receiver,
     receiverMatches,
+    receiverCheck,
+    receiverAllowed,
+    deliveryMismatchReason,
+    setDeliveryMismatchReason,
     setDeliveryNote,
     setReceiver,
   } = s;
@@ -47,12 +52,12 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
                     <small>{trData(currentUser.department)}</small>
                   </div>
                 </div>
-                <div className={`delivery-person ${receiver && receiverMatches ? 'confirmed' : ''}`}>
+                <div className={`delivery-person ${receiver && receiverAllowed ? 'confirmed' : ''}`}>
                   <IdCard size={19} />
                   <div>
                     <span>{tr('Παραλαμβάνει')}</span>
-                    <strong>{receiver && receiverMatches ? receiver.name : tr('Αναμονή ταυτοποίησης')}</strong>
-                    <small>{receiver && receiverMatches ? receiver.department : deliveryDraft.asset.department}</small>
+                    <strong>{receiver && receiverAllowed ? receiver.name : tr('Αναμονή ταυτοποίησης')}</strong>
+                    <small>{receiver && receiverAllowed ? receiver.department : deliveryDraft.asset.department}</small>
                   </div>
                 </div>
               </div>
@@ -67,11 +72,13 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
                 />
                 {receiver &&
                   (!receiverMatches ? (
-                    <div className="identity-error">
-                      {tr('Ο χρήστης ανήκει στο') + ' '}
-                      {trData(receiver.department)}
-                      {tr(', ενώ η παράδοση αφορά το')} {trData(deliveryDraft.asset.department)}.
-                    </div>
+                    <DeliveryMismatch
+                      personDepartment={receiver.department}
+                      department={deliveryDraft.asset.department || ''}
+                      allowed={receiverCheck === 'REASON'}
+                      reason={deliveryMismatchReason}
+                      onReason={setDeliveryMismatchReason}
+                    />
                   ) : (
                     <div className="identity-result">
                       <CheckCircle2 size={17} />
@@ -95,7 +102,7 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
             </div>
             <div className="modal-actions workflow-modal-actions">
               <button onClick={closeDelivery}>{tr('Ακύρωση')}</button>
-              <button className="primary" disabled={!receiver || !receiverMatches} onClick={completeDelivery}>
+              <button className="primary" disabled={!receiver || !receiverAllowed} onClick={completeDelivery}>
                 <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης')}
               </button>
             </div>

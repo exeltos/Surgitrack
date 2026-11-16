@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {TriangleAlert} from 'lucide-react';
+import DeliveryMismatch from '../../sterilization/parts/DeliveryMismatch';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
 import PassScanner from '../PassScanner';
@@ -61,7 +61,7 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
           <button
             type="button"
             className="scan-primary"
-            disabled={!items.length || !s.deliveryBatchReceiverMatches}
+            disabled={!items.length || !s.deliveryBatchReceiverAllowed}
             onClick={() => {
               submitted.current = {count: items.length, department};
               s.completeDeliveryBatch();
@@ -97,14 +97,13 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
             onSigned={s.setDeliveryBatchReceiver}
           />
           {receiver && !s.deliveryBatchReceiverMatches && (
-            <div className="identity-warning">
-              <TriangleAlert size={15} />
-              <span>
-                {tr('Ο χρήστης ανήκει στο') + ' '}
-                {trData(receiver.department)}
-                {tr(', ενώ η παράδοση αφορά το')} {trData(department)}.
-              </span>
-            </div>
+            <DeliveryMismatch
+              personDepartment={receiver.department}
+              department={department}
+              allowed={s.deliveryBatchReceiverCheck === 'REASON'}
+              reason={s.deliveryBatchMismatchReason}
+              onReason={s.setDeliveryBatchMismatchReason}
+            />
           )}
         </section>
         <label className="scan-field">

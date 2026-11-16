@@ -1,4 +1,5 @@
 import type {Asset} from '../../../types/domain';
+import {handoverCheck} from '../../../core/handoverPolicy';
 import {tr, trData} from '../../../i18n';
 import type {Kind, SterilizationRow} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
@@ -27,6 +28,11 @@ export function useDeliveryFlow(
     deliveryBatchReceiver,
     deliveryDraft,
     deliveryNote,
+    deliveryMismatchReason,
+    setDeliveryMismatchReason,
+    deliveryBatchMismatchReason,
+    setDeliveryBatchMismatchReason,
+    sterilizationWorkflow,
     deliverySelected,
     ready,
     receiver,
@@ -43,33 +49,50 @@ export function useDeliveryFlow(
     tools,
   } = p;
 
-  const receiverMatches = !deliveryDraft || !receiver || receiver.department === deliveryDraft.asset.department;
+  const handoverPolicy = sterilizationWorkflow.receiptPolicy;
+  // Their own department, or an exempt one: «OK». Another one: a reason where the hospital allows it, else refused.
+  const receiverCheck =
+    deliveryDraft && receiver
+      ? handoverCheck(receiver.department, deliveryDraft.asset.department, handoverPolicy, 'DELIVERY')
+      : 'OK';
+  const receiverMatches = receiverCheck === 'OK';
+  const receiverAllowed = receiverMatches || (receiverCheck === 'REASON' && !!deliveryMismatchReason.trim());
   const deliverySelectedAssets = ready.filter(item => deliverySelected.has(`${item.kind}:${item.id}`));
   const deliveryBatchDepartment = deliverySelectedAssets[0]?.department || '';
-  const deliveryBatchReceiverMatches =
-    !!deliveryBatchReceiver &&
-    !!deliveryBatchDepartment &&
-    deliveryBatchReceiver.department === deliveryBatchDepartment;
+  const deliveryBatchReceiverCheck =
+    deliveryBatchReceiver && deliveryBatchDepartment
+      ? handoverCheck(deliveryBatchReceiver.department, deliveryBatchDepartment, handoverPolicy, 'DELIVERY')
+      : 'BLOCKED';
+  const deliveryBatchReceiverMatches = deliveryBatchReceiverCheck === 'OK';
+  const deliveryBatchReceiverAllowed =
+    deliveryBatchReceiverMatches || (deliveryBatchReceiverCheck === 'REASON' && !!deliveryBatchMismatchReason.trim());
+  /** The delivery's note, with the reason it went to someone of another department. */
+  const withReason = (note: string, reason: string, matches: boolean, department?: string) =>
+    [note.trim(), matches ? '' : `Παράδοση σε χρήστη άλλου τμήματος (${department || ''}): ${reason.trim()}`]
+      .filter(Boolean)
+      .join(' · ') || undefined;
   const openDelivery = (kind: Kind, asset: Asset) => {
     const draft = resolveAssetDraft(kind, asset.id);
     if (!draft) return;
     setDeliveryDraft(draft);
     setReceiver(null);
     setDeliveryNote('');
+    setDeliveryMismatchReason('');
   };
   const closeDelivery = () => {
     setDeliveryDraft(null);
     setReceiver(null);
     setDeliveryNote('');
+    setDeliveryMismatchReason('');
   };
   const completeDelivery = () => {
-    if (!deliveryDraft || !receiver || !receiverMatches) return;
+    if (!deliveryDraft || !receiver || !receiverAllowed) return;
     const done = completeDeliveryToDepartment(deliveryDraft.kind, deliveryDraft.asset.id, {
       handoverSignatureId: receiver.signatureId,
       receivedByUserId: receiver.userId,
       receivedByName: receiver.name,
       receivedByDepartment: receiver.department,
-      note: deliveryNote,
+      note: withReason(deliveryNote, deliveryMismatchReason, receiverMatches, receiver.department),
     });
     if (!done) return;
     closeDelivery();
@@ -83,6 +106,7 @@ export function useDeliveryFlow(
     );
     setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
+    setDeliveryBatchMismatchReason('');
     setDeliveryScanFeedback(null);
   };
   const closeDeliveryBatch = () => {
@@ -90,6 +114,7 @@ export function useDeliveryFlow(
     setDeliverySelected(new Set());
     setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
+    setDeliveryBatchMismatchReason('');
     setDeliveryScanFeedback(null);
   };
   const addBarcodeToDelivery = (raw: string) => {
@@ -180,7 +205,7 @@ export function useDeliveryFlow(
     setDeliveryBatchReceiver(null);
   };
   const completeDeliveryBatch = () => {
-    if (!deliverySelectedAssets.length || !deliveryBatchReceiver || !deliveryBatchReceiverMatches) return;
+    if (!deliverySelectedAssets.length || !deliveryBatchReceiver || !deliveryBatchReceiverAllowed) return;
     const batchId = `DB-${Date.now()}`;
     let completed = 0;
     deliverySelectedAssets.forEach(item => {
@@ -190,13 +215,22 @@ export function useDeliveryFlow(
         receivedByUserId: deliveryBatchReceiver.userId,
         receivedByName: deliveryBatchReceiver.name,
         receivedByDepartment: deliveryBatchReceiver.department,
-        note: deliveryBatchNote.trim() || undefined,
+        note: withReason(
+          deliveryBatchNote,
+          deliveryBatchMismatchReason,
+          deliveryBatchReceiverMatches,
+          deliveryBatchReceiver.department,
+        ),
       });
       if (done) completed += 1;
     });
     if (completed === deliverySelectedAssets.length) closeDeliveryBatch();
   };
   return {
+    receiverCheck,
+    receiverAllowed,
+    deliveryBatchReceiverCheck,
+    deliveryBatchReceiverAllowed,
     selectDeliveryDepartment,
     addBarcodeToDelivery,
     closeDelivery,

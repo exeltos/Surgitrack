@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import DeliveryMismatch from './DeliveryMismatch';
 import {loadLabel} from '../../../core/loadLabel';
 import BatchDepartmentPicker from './BatchDepartmentPicker';
 import {departmentsOf} from '../batchDepartments';
@@ -19,6 +20,10 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
     deliveryBatchOpen,
     deliveryBatchReceiver,
     deliveryBatchReceiverMatches,
+    deliveryBatchReceiverCheck,
+    deliveryBatchReceiverAllowed,
+    deliveryBatchMismatchReason,
+    setDeliveryBatchMismatchReason,
     deliveryScanFeedback,
     deliverySelected,
     deliverySelectedAssets,
@@ -143,11 +148,13 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                     />
                     {deliveryBatchReceiver &&
                       (!deliveryBatchReceiverMatches ? (
-                        <div className="identity-error">
-                          {tr('Ο χρήστης ανήκει στο') + ' '}
-                          {trData(deliveryBatchReceiver.department)}
-                          {tr(', ενώ η παράδοση αφορά το')} {deliveryBatchDepartment}.
-                        </div>
+                        <DeliveryMismatch
+                          personDepartment={deliveryBatchReceiver.department}
+                          department={deliveryBatchDepartment}
+                          allowed={deliveryBatchReceiverCheck === 'REASON'}
+                          reason={deliveryBatchMismatchReason}
+                          onReason={setDeliveryBatchMismatchReason}
+                        />
                       ) : (
                         <div className="identity-result">
                           <CheckCircle2 size={17} />
@@ -175,7 +182,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
               <button onClick={closeDeliveryBatch}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
-                disabled={!deliverySelectedAssets.length || !deliveryBatchReceiverMatches}
+                disabled={!deliverySelectedAssets.length || !deliveryBatchReceiverAllowed}
                 onClick={completeDeliveryBatch}
               >
                 <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης ·') + ' '}

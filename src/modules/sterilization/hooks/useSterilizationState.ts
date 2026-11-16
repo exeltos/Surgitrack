@@ -174,6 +174,9 @@ export function useSterilizationState() {
   const [deliveryDraft, setDeliveryDraft] = useState<AssetDraft | null>(null);
   const [receiver, setReceiver] = useState<Identity | null>(null);
   const [deliveryNote, setDeliveryNote] = useState('');
+  // Delivery to someone of another department: the reason, where the hospital allows it.
+  const [deliveryMismatchReason, setDeliveryMismatchReason] = useState('');
+  const [deliveryBatchMismatchReason, setDeliveryBatchMismatchReason] = useState('');
   const [deliveryBatchOpen, setDeliveryBatchOpen] = useState(false);
   const [deliverySelected, setDeliverySelected] = useState<Set<string>>(new Set());
   const [deliveryBatchReceiver, setDeliveryBatchReceiver] = useState<Identity | null>(null);
@@ -251,6 +254,10 @@ export function useSterilizationState() {
     deliveryBatchReceiver,
     deliveryDraft,
     deliveryNote,
+    deliveryMismatchReason,
+    setDeliveryMismatchReason,
+    deliveryBatchMismatchReason,
+    setDeliveryBatchMismatchReason,
     deliveryScanFeedback,
     deliverySelected,
     departmentFilter,

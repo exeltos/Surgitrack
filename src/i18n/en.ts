@@ -2390,4 +2390,7 @@ export const en: Record<string, string> = {
   'Όλο το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου».':
     'The whole load goes back “In the sterilizer”, as if “End of cycle” had not been pressed.',
   'Στον κλίβανο · όλο το φορτίο': 'Into the sterilizer · the whole load',
+  'Π.χ. εξουσιοδοτημένη παραλαβή για άλλο τμήμα…': 'E.g. authorised pickup for another department…',
+  'Η πολιτική της μονάδας δεν επιτρέπει παράδοση σε άλλο τμήμα.':
+    'The unit policy does not allow delivery to another department.',
 };

@@ -16,7 +16,15 @@ export type SterilizationReleasePolicy = {
   biologicalIndicator: 'OPTIONAL' | 'REQUIRED' | 'NOT_REQUIRED';
   allowReleaseWhileBiPending: boolean;
 };
-export type SterilizationReceiptPolicy = {countSetsAtReceipt: boolean; allowCrossDepartmentHandover: boolean};
+export type SterilizationReceiptPolicy = {
+  countSetsAtReceipt: boolean;
+  /** Receipt from someone of another department: allowed with a written reason (else refused). */
+  allowCrossDepartmentHandover: boolean;
+  /** Delivery to someone of another department: allowed with a written reason (else refused). */
+  allowCrossDepartmentDelivery?: boolean;
+  /** Departments whose people hand over and receive for any department, with no reason asked (see handoverPolicy). */
+  exemptDepartments?: string[];
+};
 /**
  * Washing goes through a washer load (washer, cycle and program recorded for every item). Washing an item
  * without one (manual cleaning) is offered only where the hospital allows it.

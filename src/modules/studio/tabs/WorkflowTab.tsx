@@ -11,6 +11,13 @@ import {ModulesContext} from '../../../data/cloud/modulesContext';
 
 export default function WorkflowTab({s}: {s: StudioPageState}) {
   const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
+  const receiptPolicy = libs.sterilizationWorkflow.receiptPolicy || {
+    countSetsAtReceipt: false,
+    allowCrossDepartmentHandover: true,
+  };
+  const exempt = receiptPolicy.exemptDepartments || [];
+  const setReceiptPolicy = (patch: Partial<typeof receiptPolicy>) =>
+    libs.updateSterilizationWorkflow({receiptPolicy: {...receiptPolicy, ...patch}});
   const {sets, tools, advanceStageItems} = useSurgi();
   const modules = useContext(ModulesContext);
   // The page by category: the stages, the rules around them, or the hospital's features.
@@ -123,7 +130,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                   <header>
                     <ShieldCheck size={18} />
                     <div>
-                      <strong>{L('Πολιτική παραλαβής', 'Receipt policy')}</strong>
+                      <strong>{L('Πολιτική παραλαβής & παράδοσης', 'Receipt & delivery policy')}</strong>
                       <span>
                         {L(
                           'Η βασική παραλαβή παραμένει γρήγορη. Η καταμέτρηση Σετ ενεργοποιείται μόνο αν απαιτείται από την πολιτική της μονάδας.',
@@ -185,6 +192,56 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                         </small>
                       </span>
                     </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={receiptPolicy.allowCrossDepartmentDelivery ?? false}
+                        onChange={e => setReceiptPolicy({allowCrossDepartmentDelivery: e.target.checked})}
+                      />
+                      <span>
+                        <b>{L('Ελεγχόμενη παράδοση σε άλλο τμήμα', 'Controlled cross-department delivery')}</b>
+                        <small>
+                          {L(
+                            'Παράδοση σε χρήστη άλλου τμήματος μόνο με προειδοποίηση και υποχρεωτική αιτιολόγηση.',
+                            'Delivery to a user of another department only with warning and mandatory justification.',
+                          )}
+                        </small>
+                      </span>
+                    </label>
+                    <fieldset className="studio-exempt-departments">
+                      <legend>
+                        <b>{L('Τμήματα χωρίς έλεγχο τμήματος', 'Departments without the department check')}</b>
+                        <small>
+                          {L(
+                            'Οι χρήστες τους παραδίδουν και παραλαμβάνουν για οποιοδήποτε τμήμα, με υπογραφή, χωρίς αιτιολόγηση (π.χ. Χειρουργείο, μεταφορείς).',
+                            'Their users hand over and receive for any department, with a signature and no justification (e.g. theatre, porters).',
+                          )}
+                        </small>
+                      </legend>
+                      {!libs.departments.length && (
+                        <small>{L('Δεν υπάρχουν ακόμη τμήματα.', 'No departments yet.')}</small>
+                      )}
+                      <div className="studio-exempt-list">
+                        {libs.departments.map(d => {
+                          const on = exempt.includes(d.el);
+                          return (
+                            <button
+                              key={d.id}
+                              type="button"
+                              aria-pressed={on}
+                              className={on ? 'on' : ''}
+                              onClick={() =>
+                                setReceiptPolicy({
+                                  exemptDepartments: on ? exempt.filter(x => x !== d.el) : [...exempt, d.el],
+                                })
+                              }
+                            >
+                              {L(d.el, d.en)}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
                   </div>
                 </section>
                 <section className="studio-release-policy">

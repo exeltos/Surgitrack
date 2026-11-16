@@ -3073,3 +3073,43 @@ html body .studio-request-actions {
 html body .studio-requests-more {
   justify-self: center;
 }
+
+/* Departments without the department check: one chip each, pressed when exempt. */
+html body .studio-exempt-departments {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  background: var(--c-gray-100-2);
+}
+html body .studio-exempt-departments legend {
+  display: grid;
+  gap: 2px;
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+html body .studio-exempt-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html body .studio-exempt-list button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 999px;
+  background: var(--c-white);
+  color: var(--c-cyan-30-4);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .studio-exempt-list button.on {
+  border-color: var(--c-cyan-35);
+  background: var(--c-cyan-35);
+  color: var(--c-white);
+}

@@ -1,4 +1,5 @@
 import type {Asset, ReceiptCheckResult} from '../../../types/domain';
+import {handoverCheck} from '../../../core/handoverPolicy';
 import {tr, trData} from '../../../i18n';
 import type {Kind, SterilizationRow} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
@@ -59,18 +60,24 @@ export function useReceiptFlow(
     visibleDeviation,
   } = p;
 
-  const delivererMatches = !receiptDraft || !deliverer || deliverer.department === receiptDraft.asset.department;
   const receiptPolicy = sterilizationWorkflow.receiptPolicy || {
     countSetsAtReceipt: false,
     allowCrossDepartmentHandover: true,
   };
+  // Their own department, or an exempt one: no reason asked.
+  const delivererMatches =
+    !receiptDraft ||
+    !deliverer ||
+    handoverCheck(deliverer.department, receiptDraft.asset.department, receiptPolicy, 'RECEIPT') === 'OK';
   const departmentExceptionAllowed =
     !!deliverer && !delivererMatches && receiptPolicy.allowCrossDepartmentHandover && !!departmentMismatchReason.trim();
   const receiptIdentityValid = !!deliverer && (delivererMatches || departmentExceptionAllowed);
   const receiptBatchAssets = incoming.filter(item => receiptBatchSelected.has(`${item.kind}:${item.id}`));
   const receiptBatchDepartment = receiptBatchAssets[0]?.department || '';
   const receiptBatchDelivererMatches =
-    !!receiptBatchDeliverer && !!receiptBatchDepartment && receiptBatchDeliverer.department === receiptBatchDepartment;
+    !!receiptBatchDeliverer &&
+    !!receiptBatchDepartment &&
+    handoverCheck(receiptBatchDeliverer.department, receiptBatchDepartment, receiptPolicy, 'RECEIPT') === 'OK';
   const receiptBatchDepartmentException =
     !!receiptBatchDeliverer &&
     !receiptBatchDelivererMatches &&
