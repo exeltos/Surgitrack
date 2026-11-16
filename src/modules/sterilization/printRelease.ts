@@ -1,4 +1,5 @@
 import type {ProcessLoadRecord} from '../../types/domain';
+import {personDepartment, personName} from '../../core/personName';
 import {tr, trData} from '../../i18n';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
@@ -119,8 +120,8 @@ export function releaseFormBody({
   .checks{display:flex;flex-wrap:wrap;gap:6mm;padding:2.5mm 3mm;border:.25mm solid #d7e0e5;border-radius:2mm}
   table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}
   th{font-size:7pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:1.8mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
-  td{padding:1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nth-child(even) td{background:#f8fafb}
-  .num{width:6%;color:#6a7a84;text-align:right}th:nth-child(2),td.mono{width:15%}td.mono{font-family:monospace;font-weight:700}td.name{font-weight:700}th:nth-child(4),td:nth-child(4){width:11%}th:nth-child(5),td:nth-child(5){width:15%}th:nth-child(6),td:nth-child(6){width:24%}td.dates .sym-date{display:inline-flex;align-items:center;gap:1mm;margin-right:2mm;white-space:nowrap}.chk{width:8%;text-align:center}
+  td{padding:1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top;overflow-wrap:anywhere}tbody tr:nth-child(even) td{background:#f8fafb}
+  .num{width:6%;color:#6a7a84;text-align:right}th:nth-child(2),td.mono{width:15%}td.mono{font-family:monospace;font-weight:700}td.name{font-weight:700}th:nth-child(4),td:nth-child(4){width:11%}th:nth-child(5),td:nth-child(5){width:19%}th:nth-child(6),td:nth-child(6){width:20%}td.dates .sym-date{display:inline-flex;align-items:center;gap:1mm;margin-right:2mm;white-space:nowrap}.chk{width:8%;text-align:center}
   .approve{display:grid;grid-template-columns:1.1fr 1fr;gap:5mm;margin-top:4mm;break-inside:avoid}
   .decision{border:.3mm solid #b9c8cf;border-radius:2mm;padding:3mm;display:grid;gap:2.5mm}
   .sign{border:.3mm solid #b9c8cf;border-radius:2mm;padding:3mm;display:grid;gap:1.2mm;font-size:8.5pt}.sign b{font-size:7pt;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68}.sign .line{margin-top:9mm;border-top:.3mm solid #8a9aa3;padding-top:1mm;font-size:7pt;color:#6a7a84}
@@ -143,7 +144,7 @@ export function releaseFormBody({
   <table><thead><tr><th class="num">#</th><th>Barcode</th><th>${escapeHtml(tr('Ονομασία'))}</th><th>${escapeHtml(tr('Τύπος'))}</th><th>${escapeHtml(tr('Τμήμα'))}</th><th>${sterileSymbolSvg()} / ${expirySymbolSvg()}</th><th class="chk">${escapeHtml(tr('Έλεγχος'))}</th></tr></thead><tbody>${rows}</tbody></table>
   <div class="approve">
     <div class="decision"><b>${escapeHtml(tr('Απόφαση'))}</b>${choice(tr('Αποδεσμεύεται'), decided === 'RELEASED')}${choice(tr('Μη αποδέσμευση · επανεπεξεργασία όλου του φορτίου'), decided === 'REPROCESS')}${load.note ? `<small>${escapeHtml(load.note)}</small>` : ''}</div>
-    <div class="sign"><b>${escapeHtml(tr('Έγκριση'))}</b><span>${escapeHtml(trData(approver.name))}</span><span>${escapeHtml(trData(approver.department || ''))}</span><span>${escapeHtml(released ? released.at : draft?.at || tr('Ημερομηνία / ώρα: ………………'))}</span><div class="line">${escapeHtml(tr('Υπογραφή'))}</div></div>
+    <div class="sign"><b>${escapeHtml(tr('Έγκριση'))}</b><span>${escapeHtml(trData(personName(approver.name)))}</span><span>${escapeHtml(trData(personDepartment(approver.department || '')))}</span><span>${escapeHtml(released ? released.at : draft?.at || tr('Ημερομηνία / ώρα: ………………'))}</span><div class="line">${escapeHtml(tr('Υπογραφή'))}</div></div>
   </div>
   <div class="footer"><span>SurgiTrack · ${escapeHtml(load.id)}</span><span>${escapeHtml(tr('Εκτυπώθηκε {0}', formatDateTime()))}</span></div>
   </div>`;

@@ -146,6 +146,55 @@ describe('returning an item to an earlier stage', () => {
     expect(f.tool().sterileUntil).toBeUndefined();
   });
 
+  it('takes a load whose «Τέλος κύκλου» was pressed too soon back into the sterilizer, before any release', () => {
+    const f = setup();
+    f.through();
+    f.run(() =>
+      f.s().recordPreparation('TOOL', f.asset.id, {toolIds: [f.asset.id], checkedToolIds: [f.asset.id], allOk: true}),
+    );
+    f.run(() =>
+      f.s().completeWorkflowCheckpoint('TOOL', f.asset.id, {stageId: 'PACKAGING', checks: [true, true, true]}),
+    );
+    const created = f.run(() =>
+      f.s().createProcessLoad({
+        kind: 'STERILIZATION',
+        assetRefs: [{kind: 'TOOL', id: f.asset.id}],
+        equipment: 'ΚΛΙΒΑΝΟΣ 1',
+        cycleNumber: 'S-2',
+        program: '134°C',
+      }),
+    )!;
+    const sterilized = f.tool().sterilizations || 0;
+    f.run(() => f.s().finishProcessLoad(created.id, 'PASSED'));
+    expect(f.tool().state).toBe('AWAITING_RELEASE');
+    expect(f.tool().sterilizations).toBe(sterilized + 1);
+    // Its own return button offers it too: the only item of the load can only go back into the sterilizer.
+    expect(f.s().stageReturnInfo('TOOL', f.asset.id)).toMatchObject({
+      loadId: created.id,
+      targets: [{id: 'STERILIZER', state: 'IN_STERILIZATION'}],
+    });
+    expect(f.s().stageReturnInfo('TOOL', f.asset.id)?.refusal).toBeUndefined();
+    // A reason is required.
+    expect(f.run(() => f.s().reopenProcessLoad(created.id, ' '))).toBe(false);
+    expect(f.run(() => f.s().reopenProcessLoad(created.id, 'πατήθηκε νωρίς'))).toBe(true);
+    expect(f.tool().state).toBe('IN_STERILIZATION');
+    expect(f.s().processLoads.find(l => l.id === created.id)).toMatchObject({status: 'OPEN', completedAt: undefined});
+    expect(f.s().movements[0].status).toContain('Επιστροφή στον κλίβανο');
+    // Ended again: its sterilization counts once (a count never goes down). Then released: it cannot go back any more.
+    f.run(() => f.s().finishProcessLoad(created.id, 'PASSED'));
+    expect(f.tool().sterilizations).toBe(sterilized + 1);
+    f.run(() =>
+      f.s().releaseProcessLoad(created.id, {
+        physicalParametersOk: true,
+        chemicalIndicatorOk: true,
+        packagingIntegrityOk: true,
+        biologicalIndicatorResult: 'NOT_REQUIRED',
+        decision: 'RELEASED',
+      }),
+    );
+    expect(f.run(() => f.s().reopenProcessLoad(created.id, 'πατήθηκε νωρίς'))).toBe(false);
+  });
+
   it('sends an instrument back to its department, and a delivered one back to the sterilization stages', () => {
     const f = setup();
     f.through();

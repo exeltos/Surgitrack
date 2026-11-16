@@ -66,7 +66,7 @@ const assetNavigation: NavigationItem[] = [
   {to: '/sets', label: 'Σετ εργαλείων', icon: Layers3, permission: 'asset.registry.view', group: 'EQUIPMENT'},
   {
     to: '/tools',
-    label: 'Εργαλεία',
+    label: 'Όλα τα εργαλεία',
     icon: Wrench,
     exactSearch: '',
     permission: 'asset.registry.view',

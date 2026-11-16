@@ -1815,8 +1815,6 @@ export const en: Record<string, string> = {
   'PDF / Εκτύπωση': 'PDF / Print',
   'PDF / Εκτύπωση επιλεγμένων': 'PDF / Print selected',
   'Προεπισκόπηση, μετά εκτύπωση ή αποθήκευση ως PDF.': 'Preview, then print or save as PDF.',
-  'CSV (.csv)': 'CSV (.csv)',
-  'Απλό κείμενο, για άλλα προγράμματα.': 'Plain text, for other programs.',
   'Δεν υπάρχουν εγγραφές για λήψη.': 'There are no records to download.',
   'Γρήγορα φίλτρα': 'Quick filters',
   'Πάνω από {0} ημέρες': 'Over {0} days',
@@ -2374,4 +2372,22 @@ export const en: Record<string, string> = {
   'Πρόγραμμα {0}': 'Program {0}',
   'Αφαίρεση προγράμματος': 'Remove program',
   'Προσθήκη προγράμματος': 'Add program',
+  'λέξεις με ορθογραφικό λάθος': 'words misspelled',
+  Ορθογραφία: 'Spelling',
+  'Δεν βρέθηκαν ορθογραφικά λάθη.': 'No misspellings found.',
+  'Ορθογραφικά λάθη': 'Misspellings',
+  'Λέξεις που μοιάζουν με γνωστή λέξη εργαλείων γραμμένη αλλιώς (π.χ. ΛΑΒΗΔΑ → ΛΑΒΙΔΑ). Ελέγξτε τις προτάσεις· όποια δεν ισχύει, βγάλτε το σημάδι.':
+    'Words that look like a known instrument word written another way (e.g. ΛΑΒΗΔΑ → ΛΑΒΙΔΑ). Check the suggestions; untick any that does not apply.',
+  'Ορθογραφικές διορθώσεις σε {0} λέξεις': 'Spelling corrections in {0} words',
+  'Διόρθωση της λέξης {0}': 'Correct the word {0}',
+  'Επιστροφή στον κλίβανο': 'Back into the sterilizer',
+  'Τέλος κύκλου;': 'End of cycle?',
+  'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.':
+    'Has cycle {0} on {1} ended? The load ({2} items) goes to release.',
+  'Από το φορτίο {0} έχουν ήδη αποδεσμευτεί αντικείμενα: δεν επιστρέφει στον κλίβανο.':
+    'Items of load {0} have already been released: it does not go back into the sterilizer.',
+  'Το φορτίο {0} επέστρεψε στον κλίβανο.': 'Load {0} went back into the sterilizer.',
+  'Όλο το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου».':
+    'The whole load goes back “In the sterilizer”, as if “End of cycle” had not been pressed.',
+  'Στον κλίβανο · όλο το φορτίο': 'Into the sterilizer · the whole load',
 };

@@ -20,7 +20,12 @@ import type {useSurgiHelpers} from './useSurgiHelpers';
 export type UndoInfo = {movement: Movement; snapshot: UndoSnapshot} & ({ok: true} | {ok: false; reason: UndoRefusal});
 
 /** Where an item may be put back to by hand, or why it may not (nothing: not for this person or this item). */
-export type StageReturnInfo = {targets: ReturnTarget[]; refusal?: ReturnRefusal};
+export type StageReturnInfo = {
+  targets: ReturnTarget[];
+  refusal?: ReturnRefusal;
+  /** The load waiting for release that holds it: «Στον κλίβανο» takes that whole load back (reopenProcessLoad). */
+  loadId?: string;
+};
 
 /** Undoing a dispatch, receipt, stage or delivery made by mistake (see core/movementUndo). */
 export function useUndoActions(
@@ -181,7 +186,18 @@ export function useUndoActions(
           l.items.some(i => i.assetKind === kind && i.assetId === id),
       );
     if (holds('OPEN')) return {targets, refusal: 'IN_RUNNING_LOAD'};
-    if (holds('AWAITING_RELEASE')?.items.length === 1) return {targets, refusal: 'LAST_IN_LOAD'};
+    const waiting = holds('AWAITING_RELEASE');
+    // Nothing of its load released yet: it can go back into the sterilizer, with the whole load (the cycle is the
+    // load's); the only item left can go nowhere else.
+    if (waiting && !sterilizationReleases.some(r => r.loadId === waiting.id)) {
+      const back: ReturnTarget = {
+        id: 'STERILIZER',
+        state: 'IN_STERILIZATION',
+        label: waiting.items.length > 1 ? 'Στον κλίβανο · όλο το φορτίο' : 'Στον κλίβανο',
+      };
+      return {targets: waiting.items.length === 1 ? [back] : [back, ...targets], loadId: waiting.id};
+    }
+    if (waiting?.items.length === 1) return {targets, refusal: 'LAST_IN_LOAD'};
     return {targets};
   };
 
@@ -190,7 +206,8 @@ export function useUndoActions(
     const info = stageReturnInfo(kind, id);
     const asset = assetName(kind, id);
     const target = info?.targets.find(t => t.id === stage);
-    if (!info || info.refusal || !asset || !target || !reason.trim()) return false;
+    // Back into the sterilizer is the whole load's (reopenProcessLoad), not this item's.
+    if (!info || info.refusal || !asset || !target || target.id === 'STERILIZER' || !reason.trim()) return false;
     const from =
       asset.state === 'IN_DEPARTMENT'
         ? asset.department

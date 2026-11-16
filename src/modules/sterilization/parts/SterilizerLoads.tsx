@@ -201,7 +201,19 @@ export default function SterilizerLoads({
                           data-tour="cycle-end"
                           disabled={!canFinish || running}
                           title={running ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
-                          onClick={() => onFinish(load.id, 'PASSED')}
+                          onClick={() =>
+                            ask({
+                              title: tr('Τέλος κύκλου;'),
+                              message: tr(
+                                'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
+                                load.cycleNumber,
+                                trData(load.equipment),
+                                load.items.length,
+                              ),
+                              confirmLabel: tr('Τέλος κύκλου'),
+                              onConfirm: () => onFinish(load.id, 'PASSED'),
+                            })
+                          }
                         >
                           <CheckCircle2 size={15} /> {tr('Τέλος κύκλου')}
                         </button>

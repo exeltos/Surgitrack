@@ -7,7 +7,7 @@ vi.mock('../../../../lib/supabase', () => ({supabase: {functions: {invoke}}}));
 const sheet = vi.hoisted(() => ({rows: [] as string[][]}));
 vi.mock('../../../../core/sheetImport', () => ({readSheetFile: vi.fn(async () => sheet.rows)}));
 const csv = vi.hoisted(() => ({download: vi.fn()}));
-vi.mock('../../../../core/exportTable', () => ({downloadCsv: csv.download}));
+vi.mock('../../../../core/exportTable', () => ({downloadXlsx: csv.download}));
 
 const {default: StaffImportDialog} = await import('../StaffImportDialog');
 

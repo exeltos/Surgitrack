@@ -59,6 +59,8 @@ export function useLoadActions(
     setDeliveries,
     setProcessLoads,
     setSterilizationCycles,
+    sterilizationCycles,
+    sterilizationReleases,
     setTools,
     setWorkflowCheckpoints,
     sets,
@@ -291,12 +293,17 @@ export function useLoadActions(
         toolIds,
       };
       setSterilizationCycles(list => [cycle, ...list]);
+      // A load taken back into the sterilizer (reopenProcessLoad) and ended again counts its sterilization once.
+      const counted = sterilizationCycles.some(
+        c => c.loadId === load.id && c.assetId === ref.id && c.result === 'PASSED',
+      );
       if (result === 'PASSED') {
-        setTools(list =>
-          list.map(tool =>
-            toolIds.includes(tool.id) ? {...tool, sterilizations: (tool.sterilizations || 0) + 1} : tool,
-          ),
-        );
+        if (!counted)
+          setTools(list =>
+            list.map(tool =>
+              toolIds.includes(tool.id) ? {...tool, sterilizations: (tool.sterilizations || 0) + 1} : tool,
+            ),
+          );
         // A sterilizer load always goes on to load release (indicators and approval).
         updateState(ref.kind, ref.id, 'AWAITING_RELEASE');
       } else updateState(ref.kind, ref.id, reprocessState());
@@ -389,6 +396,43 @@ export function useLoadActions(
       result !== 'PASSED',
     );
     return finished;
+  };
+  /**
+   * «Τέλος κύκλου» pressed too soon: the load goes back into the sterilizer, as it was before, while nothing of it has
+   * been released. Its items are in the sterilizer again, and each gets a history entry with the reason.
+   */
+  const reopenProcessLoad = (loadId: string, reason: string) => {
+    const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
+    if (!load || load.status !== 'AWAITING_RELEASE' || !reason.trim()) return false;
+    if (sterilizationReleases.some(r => r.loadId === loadId)) {
+      notify(
+        tr('Από το φορτίο {0} έχουν ήδη αποδεσμευτεί αντικείμενα: δεν επιστρέφει στον κλίβανο.', named(loadId)),
+        true,
+      );
+      return false;
+    }
+    // The cycle records stay in the history (they are never deleted) and so does the sterilization they counted
+    // (counts never go down): «Τέλος κύκλου» pressed again does not count it a second time (recordCycleResult).
+    load.items.forEach(item => {
+      const asset = assetName(item.assetKind, item.assetId);
+      if (!asset || asset.state !== 'AWAITING_RELEASE') return;
+      updateState(item.assetKind, item.assetId, 'IN_STERILIZATION');
+      addMovement({
+        asset: `${asset.barcode} · ${asset.name}`,
+        assetKind: item.assetKind,
+        from: 'Αποδέσμευση',
+        to: 'Στον κλίβανο',
+        status: `Επιστροφή στον κλίβανο · Φορτίο ${load.id} · ${load.equipment} · ${load.cycleNumber} · ${reason.trim()}`,
+        by: currentUser.name,
+      });
+    });
+    setProcessLoads(list =>
+      list.map(item =>
+        item.id === loadId ? {...item, status: 'OPEN', completedAt: undefined, cycleData: undefined} : item,
+      ),
+    );
+    notify(tr('Το φορτίο {0} επέστρεψε στον κλίβανο.', named(loadId)));
+    return true;
   };
   const completeWorkflowCheckpoint = (kind: AssetKind, id: string, payload: WorkflowCheckpointPayload) => {
     const a = assetName(kind, id);
@@ -517,6 +561,7 @@ export function useLoadActions(
   }, [simulating]);
   return {
     finishProcessLoad,
+    reopenProcessLoad,
     startCycleSimulation,
     // All its records reach the server together, or none of them (S5).
     completeDeliveryToDepartment: savedTogether(completeDeliveryToDepartment),

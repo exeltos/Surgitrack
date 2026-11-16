@@ -37,6 +37,7 @@ export const ACTIONS = new Set([
   'createProcessLoad',
   'releaseProcessLoad',
   'finishProcessLoad',
+  'reopenProcessLoad',
   'startCycleSimulation',
   'recordBiologicalResult',
   'advanceStageItems',

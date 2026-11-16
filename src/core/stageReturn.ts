@@ -6,7 +6,8 @@ import {effectiveState, workflowStageState, type WorkflowStageConfig, type Workf
  * Sterilization supervisor) does it, with a reason, and the move is recorded in the history.
  */
 
-export type ReturnTargetId = WorkflowStageId | 'DEPARTMENT';
+/** 'STERILIZER': back into the sterilizer with its whole load, when «Τέλος κύκλου» was pressed too soon. */
+export type ReturnTargetId = WorkflowStageId | 'DEPARTMENT' | 'STERILIZER';
 export type ReturnTarget = {
   id: ReturnTargetId;
   state: string;
