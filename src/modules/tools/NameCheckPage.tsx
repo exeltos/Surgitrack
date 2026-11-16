@@ -2,7 +2,17 @@ import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {createContext, useContext, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {AlertTriangle, ArrowLeft, ArrowRight, CheckCheck, ChevronRight, Search, SpellCheck2, Wand2} from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  CheckCheck,
+  ChevronRight,
+  ListTree,
+  Search,
+  SpellCheck2,
+  Wand2,
+} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
@@ -14,6 +24,7 @@ import {
   staleCompositionLines,
   type CodeGroup,
 } from '../../core/nameCheck';
+import {correctName, spellingFixes} from '../../core/spelling';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 
@@ -51,8 +62,9 @@ export default function NameCheckPage() {
     return sets.filter(set => renameComposition(set.compositionTemplate, follow)).length;
   }, [tools, sets]);
   const [list, setList] = useState<{ids: string[]; title: string}>();
-  const [tab, setTab] = useState<'CLEAN' | 'CODES'>('CLEAN');
+  const [tab, setTab] = useState<'CLEAN' | 'SPELLING' | 'CODES'>('CLEAN');
   const fixes = useMemo(() => cleanUps(tools), [tools]);
+  const spelling = useMemo(() => spellingFixes(tools), [tools]);
   const groups = useMemo(() => codeGroups(tools), [tools]);
   const distinct = useMemo(() => new Set(tools.map(t => t.name)).size, [tools]);
   const odd = useMemo(() => groups.filter(g => g.names.some(n => n.odd)).length, [groups]);
@@ -81,6 +93,9 @@ export default function NameCheckPage() {
           </span>
           <span className={fixes.length ? 'warn' : 'good'}>
             <b>{fixes.reduce((sum, f) => sum + f.items.length, 0)}</b> {tr('εργαλεία με διόρθωση γραφής')}
+          </span>
+          <span className={spelling.length ? 'warn' : 'good'}>
+            <b>{spelling.length}</b> {tr('λέξεις με ορθογραφικό λάθος')}
           </span>
           <span className={odd ? 'warn' : 'good'}>
             <b>{odd}</b> {tr('κωδικοί με πιθανό λάθος')}
@@ -115,15 +130,25 @@ export default function NameCheckPage() {
           </button>
           <button
             role="tab"
+            aria-selected={tab === 'SPELLING'}
+            className={tab === 'SPELLING' ? 'active' : ''}
+            onClick={() => setTab('SPELLING')}
+          >
+            <SpellCheck2 size={16} /> {tr('Ορθογραφία')} <b>{spelling.length}</b>
+          </button>
+          <button
+            role="tab"
             aria-selected={tab === 'CODES'}
             className={tab === 'CODES' ? 'active' : ''}
             onClick={() => setTab('CODES')}
           >
-            <SpellCheck2 size={16} /> {tr('Ίδιος κωδικός, πολλές ονομασίες')} <b>{groups.length}</b>
+            <ListTree size={16} /> {tr('Ίδιος κωδικός, πολλές ονομασίες')} <b>{groups.length}</b>
           </button>
         </div>
         {tab === 'CLEAN' ? (
           <CleanUps fixes={fixes} editable={editable} onApply={renameTools} />
+        ) : tab === 'SPELLING' ? (
+          <SpellingFixes fixes={spelling} editable={editable} onApply={renameTools} />
         ) : (
           <CodeGroups groups={groups} currentName={currentName} editable={editable} onApply={renameTools} />
         )}
@@ -216,6 +241,111 @@ function CleanUps({
                     <input
                       type="checkbox"
                       aria-label={tr('Μπαίνει στην ενοποίηση')}
+                      checked={!skipped.has(f.from)}
+                      onChange={() => toggle(f.from)}
+                    />
+                  </td>
+                )}
+                <td className="from">{f.from}</td>
+                <td className="arrow">
+                  <ArrowRight size={14} />
+                </td>
+                <td className="to">{f.to}</td>
+                <td className="num">
+                  <CountButton ids={f.items.map(t => t.id)} title={f.from} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {fixes.length > shown && (
+        <AppButton size="sm" onClick={() => setShown(n => n + PAGE * 5)}>
+          {tr('Περισσότερες ({0} ακόμη)', fixes.length - shown)}
+        </AppButton>
+      )}
+    </section>
+  );
+}
+
+/** Misspelled words, each with its correction: the chosen ones are corrected in every name that has them. */
+function SpellingFixes({
+  fixes,
+  editable,
+  onApply,
+}: {
+  fixes: ReturnType<typeof spellingFixes>;
+  editable: boolean;
+  onApply: Apply;
+}) {
+  const [skipped, setSkipped] = useState<Set<string>>(new Set());
+  const [shown, setShown] = useState(PAGE * 5);
+  const chosen = fixes.filter(f => !skipped.has(f.from));
+  const changes = (() => {
+    const words = new Map(chosen.map(f => [f.from, f.to]));
+    const byId = new Map<string, {id: string; name: string}>();
+    for (const f of chosen) for (const t of f.items) byId.set(t.id, {id: t.id, name: correctName(t.name, words)});
+    return [...byId.values()];
+  })();
+  const toggle = (from: string) =>
+    setSkipped(current => {
+      const next = new Set(current);
+      if (next.has(from)) next.delete(from);
+      else next.add(from);
+      return next;
+    });
+  if (!fixes.length)
+    return (
+      <div className="name-check-empty">
+        <CheckCheck size={22} />
+        <strong>{tr('Δεν βρέθηκαν ορθογραφικά λάθη.')}</strong>
+      </div>
+    );
+  return (
+    <section className="name-check-card">
+      <header>
+        <div>
+          <b>{tr('Ορθογραφικά λάθη')}</b>
+          <small>
+            {tr(
+              'Λέξεις που μοιάζουν με γνωστή λέξη εργαλείων γραμμένη αλλιώς (π.χ. ΛΑΒΗΔΑ → ΛΑΒΙΔΑ). Ελέγξτε τις προτάσεις· όποια δεν ισχύει, βγάλτε το σημάδι.',
+            )}
+          </small>
+        </div>
+        {editable && (
+          <AppButton
+            variant="primary"
+            icon={<SpellCheck2 size={15} />}
+            disabled={!changes.length}
+            onClick={() => onApply(changes, tr('Ορθογραφικές διορθώσεις σε {0} λέξεις', chosen.length))}
+          >
+            {tr('Εφαρμογή σε {0} εργαλεία', changes.length)}
+          </AppButton>
+        )}
+      </header>
+      <div className="name-check-table">
+        <table>
+          <thead>
+            <tr>
+              {editable && (
+                <th>
+                  <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                </th>
+              )}
+              <th>{tr('Σήμερα')}</th>
+              <th aria-hidden="true" />
+              <th>{tr('Θα γίνει')}</th>
+              <th>{tr('Εργαλεία')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fixes.slice(0, shown).map(f => (
+              <tr key={f.from} className={skipped.has(f.from) ? 'skipped' : ''}>
+                {editable && (
+                  <td>
+                    <input
+                      type="checkbox"
+                      aria-label={tr('Διόρθωση της λέξης {0}', f.from)}
                       checked={!skipped.has(f.from)}
                       onChange={() => toggle(f.from)}
                     />

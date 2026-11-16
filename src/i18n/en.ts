@@ -2372,4 +2372,12 @@ export const en: Record<string, string> = {
   'Πρόγραμμα {0}': 'Program {0}',
   'Αφαίρεση προγράμματος': 'Remove program',
   'Προσθήκη προγράμματος': 'Add program',
+  'λέξεις με ορθογραφικό λάθος': 'words misspelled',
+  Ορθογραφία: 'Spelling',
+  'Δεν βρέθηκαν ορθογραφικά λάθη.': 'No misspellings found.',
+  'Ορθογραφικά λάθη': 'Misspellings',
+  'Λέξεις που μοιάζουν με γνωστή λέξη εργαλείων γραμμένη αλλιώς (π.χ. ΛΑΒΗΔΑ → ΛΑΒΙΔΑ). Ελέγξτε τις προτάσεις· όποια δεν ισχύει, βγάλτε το σημάδι.':
+    'Words that look like a known instrument word written another way (e.g. ΛΑΒΗΔΑ → ΛΑΒΙΔΑ). Check the suggestions; untick any that does not apply.',
+  'Ορθογραφικές διορθώσεις σε {0} λέξεις': 'Spelling corrections in {0} words',
+  'Διόρθωση της λέξης {0}': 'Correct the word {0}',
 };
