@@ -388,6 +388,8 @@ async function main() {
         .locator('.sterilizer-rows tbody tr', {hasText: 'E2E-0001'})
         .getByRole('button', {name: 'Τέλος κύκλου', exact: true})
         .click();
+      // It asks first: a cycle ended by mistake sends the load to release.
+      await page.getByRole('dialog').getByRole('button', {name: 'Τέλος κύκλου', exact: true}).click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'AWAITING_RELEASE', 'state saved');
       const cycle = db.sterilization_cycles.find(c => c.asset_id === setId && c.cycle_number === 'E2E-0001');
