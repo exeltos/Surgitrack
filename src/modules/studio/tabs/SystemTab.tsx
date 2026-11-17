@@ -5,6 +5,7 @@ import PlatformContactSettings, {PublicContactSettings} from '../PlatformContact
 import LabelSettingsCard from '../LabelSettingsCard';
 import HospitalProfile from '../HospitalProfile';
 import type {StudioPageState} from '../useStudioPage';
+import {isPlatformOnly} from '../../../core/platformOnly';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
 
@@ -12,9 +13,11 @@ export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
   // Settings by category: only one category is on screen at a time.
   // Inside a hospital, its own details come first; the owner outside one has no hospital to show.
-  const [group, setGroup] = useState<'HOSPITAL' | 'GENERAL' | 'STERILIZATION'>(platformAdmin ? 'GENERAL' : 'HOSPITAL');
+  // The owner inside a hospital (not viewing as someone) is still the owner: outside one means no open hospital.
+  const outside = isPlatformOnly();
+  const [group, setGroup] = useState<'HOSPITAL' | 'GENERAL' | 'STERILIZATION'>(outside ? 'GENERAL' : 'HOSPITAL');
   const groups = [
-    ...(platformAdmin ? [] : [{id: 'HOSPITAL' as const, label: L('Νοσοκομείο', 'Hospital')}]),
+    ...(outside ? [] : [{id: 'HOSPITAL' as const, label: L('Νοσοκομείο', 'Hospital')}]),
     {id: 'GENERAL' as const, label: L('Γενικά', 'General')},
     {id: 'STERILIZATION' as const, label: L('Αποστείρωση & ετικέτες', 'Sterilization & labels')},
   ];
