@@ -66,8 +66,8 @@ const HOSPITAL_SECTION_TEXT: Partial<Record<Tab, [string, string]>> = {
     'The hospital’s lists: specialties, makers, sterilizers and more.',
   ],
   WORKFLOW: [
-    'Τα στάδια της Αποστείρωσης του νοσοκομείου και οι κανόνες τους.',
-    'The hospital’s sterilization stages and their rules.',
+    'Οι κανόνες της Αποστείρωσης του νοσοκομείου: παραλαβή, παράδοση, καθαρισμός, αποδέσμευση.',
+    'The hospital’s sterilization rules: receipt, delivery, washing, release.',
   ],
   ROLES: ['Τι μπορεί να κάνει κάθε ρόλος στο νοσοκομείο.', 'What each role can do in the hospital.'],
   SYSTEM: [

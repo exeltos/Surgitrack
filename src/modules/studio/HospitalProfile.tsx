@@ -8,14 +8,18 @@ import {getRealIdentity, productionOrganizationFor} from '../../data/cloud/ident
 import {getCloudOrganizationId} from '../../data/cloud/appRecords';
 import {loadHospital, saveHospital} from '../../data/cloud/hospitalProfile';
 import {announceHospitalChange} from '../../data/cloud/modulesContext';
-import {tellUser} from '../../components/ui/confirmService';
+import {askConfirm, tellUser} from '../../components/ui/confirmService';
+import {useSurgi} from '../../store/SurgiStore';
+import {workflowStageState, type WorkflowStageId} from '../../core/workflow';
+import type {AssetState} from '../../types/domain';
+import {getI18nLang} from '../../i18n';
 import OrganizationFields from './OrganizationFields';
 import {organizationForm, type OrganizationForm} from './organizationForm';
 
 /**
  * Settings → Hospital: everything about the open hospital in one place, in the same form as Studio → Hospitals.
- * The platform owner changes its name, code, use and modules here without leaving it; its admin sees them and keeps
- * the hospital's own details (address, phone, email, contact person).
+ * The platform owner sets its name, code, use, modules and sterilization stages here without leaving it; the
+ * hospital's admin sees only the hospital's own details (address, phone, email, contact person), which they keep.
  */
 export default function HospitalProfile({actor}: {actor: string}) {
   const libs = useLibraries();
@@ -27,6 +31,13 @@ export default function HospitalProfile({actor}: {actor: string}) {
   const [form, setForm] = useState<OrganizationForm>(() => organizationForm());
   const [details, setDetails] = useState<HospitalDetails>(libs.systemSettings.hospitalDetails || {});
   const [saving, setSaving] = useState(false);
+  const {sets, tools, advanceStageItems} = useSurgi();
+  const stages = libs.sterilizationWorkflow.stages;
+  // The stages as the owner leaves them on screen; applied with the rest on «Save».
+  const [stageOn, setStageOn] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(stages.map(st => [st.id, st.enabled])),
+  );
+  const en = getI18nLang() === 'en';
 
   useEffect(() => {
     let alive = true;
@@ -52,6 +63,46 @@ export default function HospitalProfile({actor}: {actor: string}) {
 
   const setDetail = (key: keyof HospitalDetails, value: string) => setDetails(d => ({...d, [key]: value}));
   const ready = !!form.name.trim() && !!form.code.trim() && (form.plan === 'STANDARD' || !!form.endDate);
+
+  /**
+   * The stages turned on or off: what waits in a stage turned off moves on to the next stage the hospital runs
+   * (after one confirmation naming them), so nothing is left in a tab that went away. False when not confirmed.
+   */
+  const applyStages = async () => {
+    const changed = stages.filter(st => !st.locked && (stageOn[st.id] ?? st.enabled) !== st.enabled);
+    if (!changed.length) return true;
+    const finalOn = (id: string) => stageOn[id] ?? stages.find(st => st.id === id)?.enabled;
+    const moves = changed
+      .filter(st => !finalOn(st.id))
+      .map(st => {
+        const from = workflowStageState[st.id] as AssetState;
+        const count =
+          sets.filter(a => a.state === from).length +
+          tools.filter(t => t.mode === 'STANDALONE' && t.state === from).length;
+        const next = stages.slice(stages.findIndex(x => x.id === st.id) + 1).find(x => finalOn(x.id));
+        return {stage: st, from, count, next};
+      })
+      .filter(m => m.count && m.next);
+    if (moves.length) {
+      const answer = await askConfirm({
+        title: tr('Απενεργοποίηση σταδίου;'),
+        message: moves
+          .map(m =>
+            tr(
+              '«{0}»: {1} αντικείμενα προχωρούν στο «{2}».',
+              en ? m.stage.labelEn : m.stage.labelEl,
+              m.count,
+              en ? m.next!.labelEn : m.next!.labelEl,
+            ),
+          )
+          .join('\n'),
+      });
+      if (answer === false) return false;
+    }
+    for (const st of changed) libs.setWorkflowStageEnabled(st.id as WorkflowStageId, !!finalOn(st.id), actor);
+    for (const m of moves) advanceStageItems(m.from, workflowStageState[m.next!.id] as AssetState, m.stage.labelEl);
+    return true;
+  };
 
   const save = async () => {
     setSaving(true);
@@ -82,6 +133,7 @@ export default function HospitalProfile({actor}: {actor: string}) {
         }
         setOrg({...org, ...data});
         announceHospitalChange({modules: data.modules, plan: data.plan, trialEndsAt: data.trialEndsAt});
+        if (!(await applyStages())) return;
       }
       await tellUser(tr('Αποθηκεύτηκε'), tr('Τα στοιχεία του νοσοκομείου αποθηκεύτηκαν.'));
     } finally {
@@ -92,16 +144,37 @@ export default function HospitalProfile({actor}: {actor: string}) {
   return (
     <section className="hospital-profile">
       <div className="studio-drawer-form">
-        {org ? (
-          <OrganizationFields value={form} readOnly={!owner} onChange={patch => setForm(f => ({...f, ...patch}))} />
-        ) : (
-          <small className="studio-field-hint">{tr('Φόρτωση…')}</small>
-        )}
-        {!owner && (
-          <small className="studio-field-hint">
-            {tr('Ονομασία, χρήση και ενότητες αλλάζουν από τον διαχειριστή της πλατφόρμας.')}
-          </small>
-        )}
+        {owner &&
+          (org ? (
+            <>
+              <OrganizationFields value={form} onChange={patch => setForm(f => ({...f, ...patch}))} />
+              <fieldset className="studio-plan">
+                <legend>{tr('Στάδια αποστείρωσης')}</legend>
+                {stages.map(st => {
+                  const on = st.locked || (stageOn[st.id] ?? st.enabled);
+                  return (
+                    <label key={st.id} className={on ? 'active' : ''}>
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        disabled={st.locked}
+                        onChange={e => setStageOn(v => ({...v, [st.id]: e.target.checked}))}
+                      />
+                      <span>
+                        <b>
+                          {en ? st.labelEn : st.labelEl}
+                          {st.locked && <em className="hospital-stage-core">{tr('Βασικό · πάντα ενεργό')}</em>}
+                        </b>
+                        <small>{en ? st.descriptionEn : st.descriptionEl}</small>
+                      </span>
+                    </label>
+                  );
+                })}
+              </fieldset>
+            </>
+          ) : (
+            <small className="studio-field-hint">{tr('Φόρτωση…')}</small>
+          ))}
         <fieldset className="hospital-details">
           <legend>{tr('Στοιχεία επικοινωνίας')}</legend>
           <label>

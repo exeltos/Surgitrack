@@ -8,7 +8,7 @@ import type {AssetState} from '../../../types/domain';
 import {formatDateTime} from '../../../core/displayDate';
 
 export default function WorkflowTab({s}: {s: StudioPageState}) {
-  const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
+  const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, platformAdmin, tab} = s;
   const receiptPolicy = libs.sterilizationWorkflow.receiptPolicy || {
     countSetsAtReceipt: false,
     allowCrossDepartmentHandover: true,
@@ -16,10 +16,11 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   const setReceiptPolicy = (patch: Partial<typeof receiptPolicy>) =>
     libs.updateSterilizationWorkflow({receiptPolicy: {...receiptPolicy, ...patch}});
   const {sets, tools, advanceStageItems} = useSurgi();
-  // The page by category: the stages, the rules around them, or their history.
-  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'HISTORY'>('STAGES');
+  // The page by category: the stages (the template's), the rules around them, or their history.
+  // Inside a hospital its stages are the platform owner's, in Settings → Hospital; here the owner sets the template.
+  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'HISTORY'>(platformAdmin ? 'STAGES' : 'POLICIES');
   const groups = [
-    {id: 'STAGES' as const, label: L('Στάδια', 'Stages')},
+    ...(platformAdmin ? [{id: 'STAGES' as const, label: L('Στάδια', 'Stages')}] : []),
     {id: 'POLICIES' as const, label: L('Κανόνες', 'Rules')},
     {id: 'HISTORY' as const, label: L('Ιστορικό & επαναφορά', 'History & reset')},
   ];

@@ -5,8 +5,10 @@ export const en: Record<string, string> = {
   'Δεν αποθηκεύτηκε': 'Not saved',
   Αποθηκεύτηκε: 'Saved',
   'Τα στοιχεία του νοσοκομείου αποθηκεύτηκαν.': 'The hospital details were saved.',
-  'Ονομασία, χρήση και ενότητες αλλάζουν από τον διαχειριστή της πλατφόρμας.':
-    'The name, use and modules are changed by the platform administrator.',
+  'Απενεργοποίηση σταδίου;': 'Turn the stage off?',
+  '«{0}»: {1} αντικείμενα προχωρούν στο «{2}».': '“{0}”: {1} items move on to “{2}”.',
+  'Στάδια αποστείρωσης': 'Sterilization stages',
+  'Βασικό · πάντα ενεργό': 'Core · always on',
   'Στοιχεία επικοινωνίας': 'Contact details',
   Διεύθυνση: 'Address',
   'Υπεύθυνος επικοινωνίας': 'Contact person',
