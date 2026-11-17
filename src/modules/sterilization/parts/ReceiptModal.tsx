@@ -2,11 +2,15 @@ import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {CheckCircle2, TriangleAlert, UserRoundCheck, X, IdCard} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
+import NoSignature from './NoSignature';
+import SentBy from './SentBy';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import {formatDateTime} from '../../../core/displayDate';
 
 export default function ReceiptModal({s}: {s: SterilizationPageState}) {
   const {
+    receiptSignatureFree,
+    receiptSender,
     checkedCount,
     closeReceipt,
     confirmReceipt,
@@ -54,69 +58,80 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                   {receiptDraft.asset.barcode} · {receiptDraft.asset.name}
                 </h2>
                 {/* Where it comes from, when and who receives it: one line instead of a card of four boxes. */}
-                <p>
-                  {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')} · {formatDateTime()} ·{' '}
-                  {tr('Παραλαμβάνει: {0}', trData(currentUser.name))}
+                <p className="receipt-meta">
+                  <span>
+                    {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')} · {formatDateTime()}
+                  </span>
+                  <span className="receipt-receiver">
+                    {tr('Παραλαμβάνει:')} <b>{trData(currentUser.name)}</b>
+                  </span>
+                  <SentBy barcode={receiptDraft.asset.barcode} />
                 </p>
               </div>
             </div>
 
             <div className="receipt-card-body receipt-two-column">
               <div className="receipt-left-panel">
-                <section className="receipt-work-section identity-work-section">
-                  <div className="receipt-section-title">
-                    <div>
-                      <strong>{tr('Υπογραφή παραδίδοντα')}</strong>
+                {receiptSignatureFree ? (
+                  <section className="receipt-work-section identity-work-section">
+                    <NoSignature at="RECEIPT" department={receiptDraft.asset.department || ''} sender={receiptSender} />
+                  </section>
+                ) : (
+                  <section className="receipt-work-section identity-work-section">
+                    <div className="receipt-section-title">
+                      <div>
+                        <strong>{tr('Υπογραφή παραδίδοντα')}</strong>
+                      </div>
+                      <IdCard size={18} />
                     </div>
-                    <IdCard size={18} />
-                  </div>
-                  <div className="identity-section">
-                    <HandoverSignature
-                      autoFocus
-                      department={receiptDraft.asset.department}
-                      signer={deliverer}
-                      assetIds={[receiptDraft.asset.id]}
-                      onSigned={setDeliverer}
-                    />
-                    {deliverer &&
-                      (!delivererMatches ? (
-                        <div className="identity-mismatch-box">
-                          <div className="identity-warning">
-                            <TriangleAlert size={16} />
-                            <span>
-                              {tr('Ο χρήστης ανήκει στο') + ' '}
-                              <b>{trData(deliverer.department)}</b>
-                              {tr(', ενώ η αποστολή προέρχεται από')} <b>{trData(receiptDraft.asset.department)}</b>.
-                            </span>
-                          </div>
-                          {receiptPolicy.allowCrossDepartmentHandover ? (
-                            <label>
-                              {tr('Αιτιολόγηση εξαίρεσης')}
-                              <textarea
-                                value={departmentMismatchReason}
-                                onChange={e => setDepartmentMismatchReason(e.target.value)}
-                                placeholder={tr('Π.χ. εξουσιοδοτημένη μεταφορά από άλλο τμήμα…')}
-                              />
-                            </label>
-                          ) : (
-                            <div className="identity-error">
-                              {tr('Η πολιτική της μονάδας δεν επιτρέπει παραλαβή από διαφορετικό τμήμα.')}
+                    <div className="identity-section">
+                      <HandoverSignature
+                        autoFocus
+                        department={receiptDraft.asset.department}
+                        signer={deliverer}
+                        assetIds={[receiptDraft.asset.id]}
+                        onSigned={setDeliverer}
+                      />
+                      {deliverer &&
+                        (!delivererMatches ? (
+                          <div className="identity-mismatch-box">
+                            <div className="identity-warning">
+                              <TriangleAlert size={16} />
+                              <span>
+                                {tr('Ο χρήστης ανήκει στο') + ' '}
+                                <b>{trData(deliverer.department)}</b>
+                                {tr(', ενώ η αποστολή προέρχεται από')} <b>{trData(receiptDraft.asset.department)}</b>.
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="identity-result">
-                          <CheckCircle2 size={17} />
-                          <div>
-                            <strong>{deliverer.name}</strong>
-                            <span>
-                              {deliverer.role} · {trData(deliverer.department)}
-                            </span>
+                            {receiptPolicy.allowCrossDepartmentHandover ? (
+                              <label>
+                                {tr('Αιτιολόγηση εξαίρεσης')}
+                                <textarea
+                                  value={departmentMismatchReason}
+                                  onChange={e => setDepartmentMismatchReason(e.target.value)}
+                                  placeholder={tr('Π.χ. εξουσιοδοτημένη μεταφορά από άλλο τμήμα…')}
+                                />
+                              </label>
+                            ) : (
+                              <div className="identity-error">
+                                {tr('Η πολιτική της μονάδας δεν επιτρέπει παραλαβή από διαφορετικό τμήμα.')}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
-                  </div>
-                </section>
+                        ) : (
+                          <div className="identity-result">
+                            <CheckCircle2 size={17} />
+                            <div>
+                              <strong>{deliverer.name}</strong>
+                              <span>
+                                {deliverer.role} · {trData(deliverer.department)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </section>
+                )}
 
                 <section className="receipt-work-section receipt-check-section">
                   <div className="receipt-section-title">

@@ -23,7 +23,7 @@ import PageHeader from '../../components/ui/PageHeader';
 import {equipmentTrouble} from '../../core/equipmentHealth';
 import OutOfServiceDialog from './OutOfServiceDialog';
 import TestDialog from './TestDialog';
-import {TEST_KINDS, testsFromDevices, testsInUse, testsState, withTest} from '../../core/equipmentTests';
+import {TEST_KINDS, testsFromDevices, testsInUse, withTest, itemTestsState} from '../../core/equipmentTests';
 import type {EquipmentTest} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -150,6 +150,7 @@ export default function EquipmentPage() {
         libraryId: item.id,
         outOfService: item.outOfService,
         tests: item.tests,
+        testKinds: item.testKinds,
       })),
       ...washers.map(item => ({
         name: item.el,
@@ -158,6 +159,7 @@ export default function EquipmentPage() {
         libraryId: item.id,
         outOfService: item.outOfService,
         tests: item.tests,
+        testKinds: item.testKinds,
       })),
     ];
     const matched = new Set<string>();
@@ -226,7 +228,7 @@ export default function EquipmentPage() {
     (row.kind === 'STERILIZER' || row.kind === 'WASHER') &&
     row.libraryId &&
     (testsUsed[row.kind] || row.tests?.length)
-      ? testsState(row.tests, Date.now(), row.kind)
+      ? itemTestsState({el: row.name, tests: row.tests, testKinds: row.testKinds}, Date.now(), row.kind)
       : undefined;
   const attention = rows.filter(
     r => !r.outOfService && (r.trouble?.attention || (testStateOf(r) && testStateOf(r) !== 'OK')),

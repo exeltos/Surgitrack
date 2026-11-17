@@ -69,7 +69,10 @@ export type SystemSettings = {
   reminderEmails?: ReminderEmails;
   /** The first-visit guide above each screen (ScreenGuide); unset: shown. Each person can still turn it off. */
   screenGuides?: boolean;
+  /** The hospital's own details, kept by its admin (Settings → Hospital) and shown where the hospital is named. */
+  hospitalDetails?: HospitalDetails;
 };
+export type HospitalDetails = {address?: string; phone?: string; email?: string; contactName?: string};
 export type ReminderEmails = 'OFF' | 'ADMINS' | 'ADMINS_SUPERVISORS';
 export const DEFAULT_IDLE_LOCK_MINUTES = 15;
 export const IDLE_LOCK_OPTIONS = [0, 5, 10, 15, 30, 60] as const;

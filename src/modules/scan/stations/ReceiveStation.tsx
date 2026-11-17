@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {TriangleAlert} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
+import NoSignature from '../../sterilization/parts/NoSignature';
 import PassScanner from '../PassScanner';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
@@ -76,43 +77,49 @@ export default function ReceiveStation({onStations}: {onStations: () => void}) {
             <dd>{trData(s.currentUser.name)}</dd>
           </div>
         </dl>
-        <section className="scan-sign">
-          {/* The person handing over shows «Το QR μου»; the username and password stay for who has no phone. */}
-          {!s.receiptBatchDeliverer && (
-            <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setReceiptBatchDeliverer} />
-          )}
-          <HandoverSignature
-            label={tr('ή με κωδικό χρήστη και συνθηματικό')}
-            department={department}
-            signer={s.receiptBatchDeliverer}
-            assetIds={items.map(item => item.id)}
-            onSigned={s.setReceiptBatchDeliverer}
-          />
-          {s.receiptBatchDeliverer && !s.receiptBatchDelivererMatches && (
-            <div className="identity-mismatch-box">
-              <div className="identity-warning">
-                <TriangleAlert size={15} />
-                <span>
-                  {tr('Ο χρήστης ανήκει στο') + ' '}
-                  {trData(s.receiptBatchDeliverer.department)}
-                  {tr(', ενώ η παραλαβή αφορά το')} {trData(department)}.
-                </span>
+        {s.receiptBatchSignatureFree ? (
+          <section className="scan-sign">
+            <NoSignature at="RECEIPT" department={department} />
+          </section>
+        ) : (
+          <section className="scan-sign">
+            {/* The person handing over shows «Το QR μου»; the username and password stay for who has no phone. */}
+            {!s.receiptBatchDeliverer && (
+              <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setReceiptBatchDeliverer} />
+            )}
+            <HandoverSignature
+              label={tr('ή με κωδικό χρήστη και συνθηματικό')}
+              department={department}
+              signer={s.receiptBatchDeliverer}
+              assetIds={items.map(item => item.id)}
+              onSigned={s.setReceiptBatchDeliverer}
+            />
+            {s.receiptBatchDeliverer && !s.receiptBatchDelivererMatches && (
+              <div className="identity-mismatch-box">
+                <div className="identity-warning">
+                  <TriangleAlert size={15} />
+                  <span>
+                    {tr('Ο χρήστης ανήκει στο') + ' '}
+                    {trData(s.receiptBatchDeliverer.department)}
+                    {tr(', ενώ η παραλαβή αφορά το')} {trData(department)}.
+                  </span>
+                </div>
+                {s.receiptPolicy.allowCrossDepartmentHandover ? (
+                  <label>
+                    {tr('Αιτιολόγηση εξαίρεσης')}
+                    <textarea
+                      value={s.receiptBatchMismatchReason}
+                      onChange={e => s.setReceiptBatchMismatchReason(e.target.value)}
+                      placeholder={tr('Υποχρεωτική αιτιολόγηση…')}
+                    />
+                  </label>
+                ) : (
+                  <div className="identity-error">{tr('Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.')}</div>
+                )}
               </div>
-              {s.receiptPolicy.allowCrossDepartmentHandover ? (
-                <label>
-                  {tr('Αιτιολόγηση εξαίρεσης')}
-                  <textarea
-                    value={s.receiptBatchMismatchReason}
-                    onChange={e => s.setReceiptBatchMismatchReason(e.target.value)}
-                    placeholder={tr('Υποχρεωτική αιτιολόγηση…')}
-                  />
-                </label>
-              ) : (
-                <div className="identity-error">{tr('Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.')}</div>
-              )}
-            </div>
-          )}
-        </section>
+            )}
+          </section>
+        )}
         <label className="scan-field">
           {tr('Παρατήρηση παραλαβής')}
           <textarea

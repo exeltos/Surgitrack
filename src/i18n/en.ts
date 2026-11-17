@@ -1,7 +1,25 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
   'Υπογραφή παραδίδοντα': 'Signature of who hands over',
-  'Παραλαμβάνει: {0}': 'Received by: {0}',
+  'Παραλαμβάνει:': 'Received by:',
+  'Ρυθμίσεις για': 'Settings for',
+  'Πρότυπο νέων νοσοκομείων': 'Template for new hospitals',
+  'Τρέχον νοσοκομείο': 'Current hospital',
+  'Δεν αποθηκεύτηκε': 'Not saved',
+  Αποθηκεύτηκε: 'Saved',
+  'Τα στοιχεία του νοσοκομείου αποθηκεύτηκαν.': 'The hospital details were saved.',
+  'Απενεργοποίηση σταδίου;': 'Turn the stage off?',
+  'Στάδια αποστείρωσης': 'Sterilization stages',
+  'Στοιχεία επικοινωνίας': 'Contact details',
+  Διεύθυνση: 'Address',
+  'Υπεύθυνος επικοινωνίας': 'Contact person',
+  'Χωρίς υπογραφή': 'No signature',
+  'Ηλεκτρονική αποστολή: {0}': 'Sent electronically: {0}',
+  'Ηλεκτρονική αποστολή από {0}': 'Sent electronically by {0}',
+  'Παράδοση στο {0}': 'Delivery to {0}',
+  'Χωρίς υπογραφή · τμήμα χωρίς έλεγχο': 'No signature · department without the check',
+  'Εκκρεμεί φυσική παράδοση': 'Physical handover pending',
+  'Ηλεκτρονικά · {0}': 'Electronically · {0}',
   '{0} · κύκλος {1}': '{0} · cycle {1}',
   'Έλεγχος ποιότητας': 'Quality gate',
   'Χωρίς πλυντήριο': 'Without a washer',
@@ -1644,6 +1662,34 @@ export const en: Record<string, string> = {
   'Μετρά από την αποδέσμευση· σήμερα θα έληγε στις {0}.':
     'Counted from the release; released today it would expire on {0}.',
   '{0} μήνες': '{0} months',
+  '1 μήνας': '1 month',
+  'Αποστολέας: {0} · {1}': 'Sent by: {0} · {1}',
+  Αποστολέας: 'Sent by',
+  'Αποτυχία: {0}': 'Failed: {0}',
+  'Αποτυχία ✓': 'Failed ✓',
+  'Αποτυχία · επανεπεξεργασία': 'Failed · reprocessing',
+  'Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα)· {2} επέστρεψαν σε επανεπεξεργασία.':
+    'Load {0} released ({1} items); {2} went back to reprocessing.',
+  'Σημείωση τμήματος: {0}': 'Department’s note: {0}',
+  'Ημερήσιο έντυπο δοκιμών πλυντηρίων': 'Daily washer test sheet',
+  'Ημερήσιο έντυπο δοκιμών κλιβάνων': 'Daily sterilizer test sheet',
+  'Ημερήσιο έντυπο πλυντηρίων': 'Daily washer sheet',
+  'Ημερήσιο έντυπο κλιβάνων': 'Daily sterilizer sheet',
+  Πλυντήρια: 'Washers',
+  Πλυντήριο: 'Washer',
+  Ώρα: 'Time',
+  'Ό,τι καταγράφηκε σήμερα στην εφαρμογή είναι ήδη συμπληρωμένο· τα υπόλοιπα συμπληρώνονται με το χέρι.':
+    'What was recorded in the app today is filled in already; the rest is filled in by hand.',
+  'Εσφαλμένη δοκιμή: το πλυντήριο δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.':
+    'A failed test: the washer is not used until a repeat passes.',
+  'Εσφαλμένη δοκιμή: ο κλίβανος δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.':
+    'A failed test: the sterilizer is not used until a repeat passes.',
+  'Δοκιμές εξοπλισμού': 'Equipment tests',
+  'Ποιες δοκιμές κάνει ο καθένας· μόνο αυτές ζητούνται πριν τη φόρτωση.':
+    'Which tests each one does; only these are asked before loading.',
+  Εσφαλμένη: 'Failed',
+  'Επικολλήστε τον δείκτη': 'Stick the indicator here',
+  'Ονοματεπώνυμο χρήστη': 'User’s full name',
   'αποστ. {0} · {1} μήνες': 'sterilized {0} · {1} months',
   'αποστ. {0}': 'sterilized {0}',
   'Τα υπόλοιπα {0} είναι εντός ορίου.': 'The other {0} are within their shelf life.',
@@ -2390,4 +2436,7 @@ export const en: Record<string, string> = {
   'Όλο το φορτίο γυρίζει «Στον κλίβανο», σαν να μην πατήθηκε «Τέλος κύκλου».':
     'The whole load goes back “In the sterilizer”, as if “End of cycle” had not been pressed.',
   'Στον κλίβανο · όλο το φορτίο': 'Into the sterilizer · the whole load',
+  'Π.χ. εξουσιοδοτημένη παραλαβή για άλλο τμήμα…': 'E.g. authorised pickup for another department…',
+  'Η πολιτική της μονάδας δεν επιτρέπει παράδοση σε άλλο τμήμα.':
+    'The unit policy does not allow delivery to another department.',
 };

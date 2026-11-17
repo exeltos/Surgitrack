@@ -4,6 +4,7 @@ import {formatDate} from '../core/displayDate';
 import {DEMO_ANCHOR} from './demoDates';
 import type {
   DeliveryRecord,
+  RecallCase,
   Issue,
   Movement,
   PreparationRecord,
@@ -30,7 +31,6 @@ export const sets: SetAsset[] = [
     category: 'Χειρουργικά Σετ',
     createdAt: '10/01/2026',
     uses: 24,
-    maxUses: 60,
   },
   {
     id: 's2',
@@ -46,7 +46,6 @@ export const sets: SetAsset[] = [
     category: 'Χειρουργικά Σετ',
     createdAt: '12/02/2026',
     uses: 17,
-    maxUses: 50,
   },
   {
     id: 's3',
@@ -99,7 +98,6 @@ export const sets: SetAsset[] = [
     category: 'Μαιευτικά Σετ',
     createdAt: '02/04/2026',
     uses: 18,
-    maxUses: 50,
   },
   {
     id: 's6',
@@ -147,21 +145,19 @@ const catalog: ToolSeed[] = [
     name: 'KOCHER ΕΥΘΕΙΑ 20 CM',
     manufacturer: 'DEWIMED',
     specialty: 'Γενική Χειρουργική',
-    maxUses: 50,
   },
   {
     code: '08.280.18',
     name: 'ΨΑΛΙΔΙ MAYO ΕΥΘΥ 18 CM',
     manufacturer: 'AESCULAP',
     specialty: 'Γενική Χειρουργική',
-    maxUses: 50,
+    wearCheck: true,
   },
   {
     code: '24.180.20',
     name: 'ΒΕΛΟΝΟΚΑΤΟΧΟ MAYO-HEGAR 20 CM',
     manufacturer: 'DEWIMED',
     specialty: 'Γενική Χειρουργική',
-    maxUses: 50,
   },
   {code: '10.110.16', name: 'ΛΑΒΙΔΑ ΑΝΑΤΟΜΙΚΗ 16 CM', manufacturer: 'AESCULAP', specialty: 'Γενική Χειρουργική'},
   {code: '11.410.16', name: 'ΛΑΒΙΔΑ ΧΕΙΡΟΥΡΓΙΚΗ 16 CM', manufacturer: 'KLS MARTIN', specialty: 'Γενική Χειρουργική'},
@@ -245,8 +241,8 @@ add(catalog[6], 'STANDALONE', {department: 'Χειρουργείο', uses: 28, m
 add(catalog[1], 'STOCK', {uses: 49, maxUses: 50});
 add(catalog[0], 'STANDALONE', {department: 'ΤΕΠ', uses: 50, maxUses: 50});
 // Department Workspace demo: enough assets in Αίθουσα Τοκετών to test filters, reports and electronic transfer.
-add(catalog[0], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 12, maxUses: 50});
-add(catalog[1], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 22, maxUses: 50});
+add(catalog[0], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 12});
+add(catalog[1], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 22});
 add(catalog[2], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 47, maxUses: 50});
 add(catalog[3], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 9});
 add(catalog[6], 'STANDALONE', {department: 'Αίθουσα Τοκετών', uses: 28, maxUses: 30});
@@ -867,6 +863,7 @@ const story: Array<[string, string, string, string, string, string, string?]> = 
     people.ivf,
     'PT-2026-0191',
   ],
+  ['RESUS-PAED', 'ΜΕΘ', 'Κεντρική Αποστείρωση', 'Αποστολή προς αποστείρωση', '29/09/2026 07:30', people.icu],
   ['LAP-CHOLE', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Παραλαβή στην Αποστείρωση', '29/09/2026 07:55', people.ster],
   [
     'LAP-CHOLE',
@@ -1004,9 +1001,16 @@ const story: Array<[string, string, string, string, string, string, string?]> = 
     'PT-2026-0175',
   ],
 ];
+// What a department writes with a dispatch («we need it back in 2 hours»): shown to Sterilization at every stage.
+const dispatchNotes: Record<string, string> = {
+  'ORTHO-HIP': 'Το χρειαζόμαστε ξανά για χειρουργείο στις 14:00· παρακαλώ εντός 2 ωρών.',
+  'IVF-OPU': 'Επόμενη ωοληψία αύριο 08:00.',
+  'RESUS-PAED': 'Το καρότσι ανάνηψης είναι χωρίς παιδικό σετ· επείγον.',
+};
 story.forEach(([code, from, to, status, at, by, patientCode], i) => {
   const set = setByCode(code);
-  movements.push({id: `m${100 + i}`, asset: label(set), assetKind: 'SET', from, to, status, at, by, patientCode});
+  const note = status === 'Αποστολή προς αποστείρωση' ? dispatchNotes[code] : undefined;
+  movements.push({id: `m${100 + i}`, asset: label(set), assetKind: 'SET', from, to, status, at, by, patientCode, note});
 });
 const outOfUse = tools.filter(tool => tool.state === 'RETIRED');
 outOfUse.forEach((tool, i) =>
@@ -1293,6 +1297,68 @@ export const processLoads: ProcessLoadRecord[] = [
     completedAt: '28/09/2026 07:05',
     releasedAt: '28/09/2026 07:40',
   },
+  {
+    // Low temperature: the resuscitation Set (silicone, plastics) goes through the plasma sterilizer.
+    id: 'L-DEMO-0926',
+    workflowVersion: 1,
+    kind: 'STERILIZATION',
+    equipment: 'Πλάσμα STERRAD 100NX',
+    cycleNumber: 'P-2026-0214',
+    program: '60°C',
+    status: 'RELEASED',
+    items: [loadItem(setByCode('RESUS-ADULT'))],
+    chemicalIndicatorResult: 'PASS',
+    biologicalIndicatorResult: 'PASS',
+    physicalParametersOk: true,
+    packagingIntegrityOk: true,
+    createdByUserId: 'demo-sterilization',
+    createdByName: people.ster,
+    createdAt: '27/09/2026 13:20',
+    completedAt: '27/09/2026 14:15',
+    releasedAt: '27/09/2026 14:40',
+  },
+  {
+    // Released, then its spore test came back positive: the load was recalled and its Sets brought back.
+    id: 'L-DEMO-0911',
+    workflowVersion: 1,
+    kind: 'STERILIZATION',
+    equipment: 'Κλίβανος Ατμού 02',
+    cycleNumber: '2026-0911',
+    program: '134°C · 5′',
+    status: 'RECALLED',
+    items: [loadItem(setByCode('GYN-LAP')), loadItem(setByCode('ER-SUTURE'))],
+    chemicalIndicatorResult: 'PASS',
+    biologicalIndicatorResult: 'FAIL',
+    physicalParametersOk: true,
+    packagingIntegrityOk: true,
+    createdByUserId: 'demo-sterilization',
+    createdByName: people.ster,
+    createdAt: '14/09/2026 07:15',
+    completedAt: '14/09/2026 08:10',
+    releasedAt: '14/09/2026 08:40',
+  },
+];
+/** The recall of that load: both Sets returned and sterilized again, the case closed. */
+export const recallCases: RecallCase[] = [
+  {
+    id: 'rcl-demo-0911',
+    loadId: 'L-DEMO-0911',
+    cycleNumber: '2026-0911',
+    sterilizer: 'Κλίβανος Ατμού 02',
+    reason: 'Θετικός βιολογικός δείκτης (καλλιέργεια 48 ωρών)',
+    openedAt: '16/09/2026 09:05',
+    openedByUserId: 'demo-sterilization-supervisor',
+    openedByName: people.supervisor,
+    status: 'CLOSED',
+    closedAt: '16/09/2026 15:30',
+    items: ['GYN-LAP', 'ER-SUTURE'].map((code, i) => ({
+      ...loadItem(setByCode(code)),
+      currentState: setByCode(code).state,
+      patientCode: i === 0 ? 'PT-2026-0152' : undefined,
+      status: 'CLOSED' as const,
+      returnedAt: i === 0 ? '16/09/2026 11:20' : '16/09/2026 12:05',
+    })),
+  },
 ];
 /**
  * The sterilizer cycles behind the finished loads and the sterile Sets: a release cites its cycle, so a load
@@ -1451,6 +1517,20 @@ historyDeliveries.forEach(([set, receivedByName, at], i) =>
     receivedByName,
     receivedByDepartment: set.department,
     at,
+  }),
+);
+
+// The recall, in each Set's history.
+['GYN-LAP', 'ER-SUTURE'].forEach((code, i) =>
+  movements.push({
+    id: `m-recall-${i}`,
+    asset: label(setByCode(code)),
+    assetKind: 'SET',
+    from: setByCode(code).department,
+    to: 'Κεντρική Αποστείρωση',
+    status: 'Ανάκληση φορτίου 2026-0911 · επιστροφή για επαναποστείρωση',
+    at: i === 0 ? '16/09/2026 11:20' : '16/09/2026 12:05',
+    by: people.supervisor,
   }),
 );
 

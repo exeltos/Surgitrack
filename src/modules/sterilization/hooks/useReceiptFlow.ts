@@ -1,4 +1,6 @@
 import type {Asset, ReceiptCheckResult} from '../../../types/domain';
+import {handoverCheck, signatureExempt} from '../../../core/handoverPolicy';
+import {electronicDispatch, latestDispatches, type Dispatch} from '../../../core/electronicDispatch';
 import {tr, trData} from '../../../i18n';
 import type {Kind, SterilizationRow} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
@@ -19,6 +21,7 @@ export function useReceiptFlow(
     deliverer,
     departmentMismatchReason,
     incoming,
+    movements,
     note,
     receiptBatchDeliverer,
     receiptBatchDeviations,
@@ -59,25 +62,65 @@ export function useReceiptFlow(
     visibleDeviation,
   } = p;
 
-  const delivererMatches = !receiptDraft || !deliverer || deliverer.department === receiptDraft.asset.department;
   const receiptPolicy = sterilizationWorkflow.receiptPolicy || {
     countSetsAtReceipt: false,
     allowCrossDepartmentHandover: true,
   };
+  // Their own department, or an exempt one: no reason asked.
+  const delivererMatches =
+    !receiptDraft ||
+    !deliverer ||
+    handoverCheck(deliverer.department, receiptDraft.asset.department, receiptPolicy, 'RECEIPT') === 'OK';
   const departmentExceptionAllowed =
     !!deliverer && !delivererMatches && receiptPolicy.allowCrossDepartmentHandover && !!departmentMismatchReason.trim();
-  const receiptIdentityValid = !!deliverer && (delivererMatches || departmentExceptionAllowed);
+  // A department without the check at receipt hands over without a signature: the receipt records who sent it.
+  const receiptSignatureFree =
+    !!receiptDraft && signatureExempt(receiptDraft.asset.department, receiptPolicy, 'RECEIPT');
+  const receiptSender = receiptDraft ? electronicDispatch(movements, receiptDraft.asset.barcode) : undefined;
+  const receiptIdentityValid =
+    receiptSignatureFree || (!!deliverer && (delivererMatches || departmentExceptionAllowed));
   const receiptBatchAssets = incoming.filter(item => receiptBatchSelected.has(`${item.kind}:${item.id}`));
   const receiptBatchDepartment = receiptBatchAssets[0]?.department || '';
   const receiptBatchDelivererMatches =
-    !!receiptBatchDeliverer && !!receiptBatchDepartment && receiptBatchDeliverer.department === receiptBatchDepartment;
+    !!receiptBatchDeliverer &&
+    !!receiptBatchDepartment &&
+    handoverCheck(receiptBatchDeliverer.department, receiptBatchDepartment, receiptPolicy, 'RECEIPT') === 'OK';
   const receiptBatchDepartmentException =
     !!receiptBatchDeliverer &&
     !receiptBatchDelivererMatches &&
     receiptPolicy.allowCrossDepartmentHandover &&
     !!receiptBatchMismatchReason.trim();
+  const receiptBatchSignatureFree =
+    !!receiptBatchDepartment && signatureExempt(receiptBatchDepartment, receiptPolicy, 'RECEIPT');
   const receiptBatchIdentityValid =
-    !!receiptBatchDeliverer && (receiptBatchDelivererMatches || receiptBatchDepartmentException);
+    receiptBatchSignatureFree ||
+    (!!receiptBatchDeliverer && (receiptBatchDelivererMatches || receiptBatchDepartmentException));
+  /** Who hands over: the one who signed, else (no signature asked) whoever sent it electronically. */
+  const handoverFrom = (
+    barcode: string,
+    department: string,
+    signer: typeof deliverer,
+    dispatches?: ReadonlyMap<string, Dispatch>,
+  ) => {
+    if (signer)
+      return {
+        handoverSignatureId: signer.signatureId,
+        deliveredByUserId: signer.userId,
+        deliveredByName: signer.name,
+        deliveredByDepartment: signer.department,
+        unsigned: '',
+      };
+    const sent = dispatches ? dispatches.get(barcode) : electronicDispatch(movements, barcode);
+    return {
+      handoverSignatureId: undefined,
+      deliveredByUserId: '',
+      deliveredByName: sent?.by || department,
+      deliveredByDepartment: department,
+      unsigned: sent
+        ? `Χωρίς υπογραφή · ηλεκτρονική αποστολή από ${sent.by} (${sent.at})`
+        : 'Χωρίς υπογραφή · τμήμα χωρίς έλεγχο στην παραλαβή',
+    };
+  };
 
   const receiptTools = receiptDraft?.kind === 'SET' ? tools.filter(t => t.setId === receiptDraft.asset.id) : [];
   const receiptExpectedCount = receiptDraft?.kind === 'SET' ? receiptTools.length : 1;
@@ -163,27 +206,32 @@ export function useReceiptFlow(
     return true;
   };
   const completeReceiptBatch = () => {
-    if (!receiptBatchAssets.length || !receiptBatchDeliverer || !receiptBatchIdentityValid) return;
+    if (!receiptBatchAssets.length || !receiptBatchIdentityValid) return;
+    // A signature asked: only the one who signed hands over. None asked: each item's electronic sender.
+    const signer = receiptBatchSignatureFree ? null : receiptBatchDeliverer;
+    if (!receiptBatchSignatureFree && !signer) return;
+    const mismatch = !!signer && !receiptBatchDelivererMatches;
     const batchId = `RB-${Date.now()}`;
+    // The history read once for the whole batch, not once per item.
+    const dispatches = signer ? undefined : latestDispatches(movements);
     receiptBatchAssets.forEach(item => {
       const key = `${item.kind}:${item.id}`;
       const expected = item.kind === 'SET' ? tools.filter(t => t.setId === item.id).length : undefined;
+      const {unsigned, ...from} = handoverFrom(item.barcode, item.department || '', signer, dispatches);
       receiveAtSterilization(item.kind, item.id, {
         batchId,
-        handoverSignatureId: receiptBatchDeliverer.signatureId,
-        deliveredByUserId: receiptBatchDeliverer.userId,
-        deliveredByName: receiptBatchDeliverer.name,
-        deliveredByDepartment: receiptBatchDeliverer.department,
+        ...from,
         note:
           [
             receiptBatchNote.trim(),
-            !receiptBatchDelivererMatches ? `Παράδοση από διαφορετικό τμήμα: ${receiptBatchMismatchReason.trim()}` : '',
+            unsigned,
+            mismatch ? `Παράδοση από διαφορετικό τμήμα: ${receiptBatchMismatchReason.trim()}` : '',
           ]
             .filter(Boolean)
             .join(' · ') || undefined,
         visibleDeviation: receiptBatchDeviations.has(key),
-        departmentMismatch: !receiptBatchDelivererMatches,
-        departmentMismatchReason: !receiptBatchDelivererMatches ? receiptBatchMismatchReason.trim() : undefined,
+        departmentMismatch: mismatch,
+        departmentMismatchReason: mismatch ? receiptBatchMismatchReason.trim() : undefined,
         checkPerformed: item.kind === 'SET' && receiptPolicy.countSetsAtReceipt,
         checkedCount: item.kind === 'SET' && receiptPolicy.countSetsAtReceipt ? expected : undefined,
         checkResult:
@@ -235,7 +283,10 @@ export function useReceiptFlow(
     setReceiptSetChecks({containerOk: false, compositionOk: false, visualOk: false});
   };
   const confirmReceipt = () => {
-    if (!receiptDraft || !deliverer || !receiptIdentityValid) return;
+    if (!receiptDraft || !receiptIdentityValid) return;
+    const signer = receiptSignatureFree ? null : deliverer;
+    if (!receiptSignatureFree && !signer) return;
+    const mismatch = !!signer && !delivererMatches;
     if (visibleDeviation && !receiptDeviationRecorded) {
       void tellUser(
         tr('Λείπει η καταγραφή απόκλισης'),
@@ -246,21 +297,20 @@ export function useReceiptFlow(
     const countPerformed = receiptDraft.kind === 'SET' && receiptPolicy.countSetsAtReceipt;
     const countResult: ReceiptCheckResult =
       countPerformed && checkedCount !== receiptExpectedCount ? 'MISSING' : visibleDeviation ? 'OTHER' : 'OK';
+    const {unsigned, ...from} = handoverFrom(receiptDraft.asset.barcode, receiptDraft.asset.department || '', signer);
     const combinedNote = [
       note.trim(),
-      !delivererMatches ? `Παράδοση από διαφορετικό τμήμα: ${departmentMismatchReason.trim()}` : '',
+      unsigned,
+      mismatch ? `Παράδοση από διαφορετικό τμήμα: ${departmentMismatchReason.trim()}` : '',
     ]
       .filter(Boolean)
       .join(' · ');
     receiveAtSterilization(receiptDraft.kind, receiptDraft.asset.id, {
-      handoverSignatureId: deliverer.signatureId,
-      deliveredByUserId: deliverer.userId,
-      deliveredByName: deliverer.name,
-      deliveredByDepartment: deliverer.department,
+      ...from,
       note: combinedNote || undefined,
       visibleDeviation: visibleDeviation || (countPerformed && checkedCount !== receiptExpectedCount),
-      departmentMismatch: !delivererMatches,
-      departmentMismatchReason: !delivererMatches ? departmentMismatchReason.trim() : undefined,
+      departmentMismatch: mismatch,
+      departmentMismatchReason: mismatch ? departmentMismatchReason.trim() : undefined,
       checkPerformed: countPerformed,
       checkedCount: countPerformed ? checkedCount : undefined,
       checkResult: countPerformed ? countResult : visibleDeviation ? 'OTHER' : undefined,
@@ -295,6 +345,9 @@ export function useReceiptFlow(
     receiptBatchDelivererMatches,
     receiptBatchDepartment,
     receiptBatchIdentityValid,
+    receiptBatchSignatureFree,
+    receiptSender,
+    receiptSignatureFree,
     receiptExpectedCount,
     receiptIdentityValid,
     receiptPolicy,

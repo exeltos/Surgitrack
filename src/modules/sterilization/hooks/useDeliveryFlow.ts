@@ -1,4 +1,5 @@
 import type {Asset} from '../../../types/domain';
+import {handoverCheck, signatureExempt} from '../../../core/handoverPolicy';
 import {tr, trData} from '../../../i18n';
 import type {Kind, SterilizationRow} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
@@ -27,6 +28,11 @@ export function useDeliveryFlow(
     deliveryBatchReceiver,
     deliveryDraft,
     deliveryNote,
+    deliveryMismatchReason,
+    setDeliveryMismatchReason,
+    deliveryBatchMismatchReason,
+    setDeliveryBatchMismatchReason,
+    sterilizationWorkflow,
     deliverySelected,
     ready,
     receiver,
@@ -43,34 +49,76 @@ export function useDeliveryFlow(
     tools,
   } = p;
 
-  const receiverMatches = !deliveryDraft || !receiver || receiver.department === deliveryDraft.asset.department;
+  const handoverPolicy = sterilizationWorkflow.receiptPolicy;
+  // Their own department, or an exempt one: «OK». Another one: a reason where the hospital allows it, else refused.
+  const receiverCheck =
+    deliveryDraft && receiver
+      ? handoverCheck(receiver.department, deliveryDraft.asset.department, handoverPolicy, 'DELIVERY')
+      : 'OK';
+  const receiverMatches = receiverCheck === 'OK';
+  // A department without the check at delivery takes its Sets without a signature.
+  const deliverySignatureFree =
+    !!deliveryDraft && signatureExempt(deliveryDraft.asset.department, handoverPolicy, 'DELIVERY');
+  const receiverAllowed =
+    deliverySignatureFree ||
+    (!!receiver && (receiverMatches || (receiverCheck === 'REASON' && !!deliveryMismatchReason.trim())));
   const deliverySelectedAssets = ready.filter(item => deliverySelected.has(`${item.kind}:${item.id}`));
   const deliveryBatchDepartment = deliverySelectedAssets[0]?.department || '';
-  const deliveryBatchReceiverMatches =
-    !!deliveryBatchReceiver &&
-    !!deliveryBatchDepartment &&
-    deliveryBatchReceiver.department === deliveryBatchDepartment;
+  const deliveryBatchReceiverCheck =
+    deliveryBatchReceiver && deliveryBatchDepartment
+      ? handoverCheck(deliveryBatchReceiver.department, deliveryBatchDepartment, handoverPolicy, 'DELIVERY')
+      : 'BLOCKED';
+  const deliveryBatchReceiverMatches = deliveryBatchReceiverCheck === 'OK';
+  const deliveryBatchSignatureFree =
+    !!deliveryBatchDepartment && signatureExempt(deliveryBatchDepartment, handoverPolicy, 'DELIVERY');
+  const deliveryBatchReceiverAllowed =
+    deliveryBatchSignatureFree ||
+    (!!deliveryBatchReceiver &&
+      (deliveryBatchReceiverMatches ||
+        (deliveryBatchReceiverCheck === 'REASON' && !!deliveryBatchMismatchReason.trim())));
+  /** The receiving side of a delivery without a signature: the department itself. */
+  const unsignedReceiver = (department: string) => ({
+    handoverSignatureId: undefined,
+    receivedByUserId: '',
+    receivedByName: department,
+    receivedByDepartment: department,
+  });
+  const UNSIGNED = 'Χωρίς υπογραφή · τμήμα χωρίς έλεγχο στην παράδοση';
+  /** The delivery's note, with the reason it went to someone of another department. */
+  const withReason = (note: string, reason: string, matches: boolean, department?: string) =>
+    [note.trim(), matches ? '' : `Παράδοση σε χρήστη άλλου τμήματος (${department || ''}): ${reason.trim()}`]
+      .filter(Boolean)
+      .join(' · ') || undefined;
   const openDelivery = (kind: Kind, asset: Asset) => {
     const draft = resolveAssetDraft(kind, asset.id);
     if (!draft) return;
     setDeliveryDraft(draft);
     setReceiver(null);
     setDeliveryNote('');
+    setDeliveryMismatchReason('');
   };
   const closeDelivery = () => {
     setDeliveryDraft(null);
     setReceiver(null);
     setDeliveryNote('');
+    setDeliveryMismatchReason('');
   };
   const completeDelivery = () => {
-    if (!deliveryDraft || !receiver || !receiverMatches) return;
-    const done = completeDeliveryToDepartment(deliveryDraft.kind, deliveryDraft.asset.id, {
-      handoverSignatureId: receiver.signatureId,
-      receivedByUserId: receiver.userId,
-      receivedByName: receiver.name,
-      receivedByDepartment: receiver.department,
-      note: deliveryNote,
-    });
+    if (!deliveryDraft || !receiverAllowed) return;
+    const department = deliveryDraft.asset.department || '';
+    const done = completeDeliveryToDepartment(
+      deliveryDraft.kind,
+      deliveryDraft.asset.id,
+      deliverySignatureFree || !receiver
+        ? {...unsignedReceiver(department), note: [deliveryNote.trim(), UNSIGNED].filter(Boolean).join(' · ')}
+        : {
+            handoverSignatureId: receiver.signatureId,
+            receivedByUserId: receiver.userId,
+            receivedByName: receiver.name,
+            receivedByDepartment: receiver.department,
+            note: withReason(deliveryNote, deliveryMismatchReason, receiverMatches, receiver.department),
+          },
+    );
     if (!done) return;
     closeDelivery();
     setQueue('READY');
@@ -83,6 +131,7 @@ export function useDeliveryFlow(
     );
     setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
+    setDeliveryBatchMismatchReason('');
     setDeliveryScanFeedback(null);
   };
   const closeDeliveryBatch = () => {
@@ -90,6 +139,7 @@ export function useDeliveryFlow(
     setDeliverySelected(new Set());
     setDeliveryBatchReceiver(null);
     setDeliveryBatchNote('');
+    setDeliveryBatchMismatchReason('');
     setDeliveryScanFeedback(null);
   };
   const addBarcodeToDelivery = (raw: string) => {
@@ -180,23 +230,45 @@ export function useDeliveryFlow(
     setDeliveryBatchReceiver(null);
   };
   const completeDeliveryBatch = () => {
-    if (!deliverySelectedAssets.length || !deliveryBatchReceiver || !deliveryBatchReceiverMatches) return;
+    if (!deliverySelectedAssets.length || !deliveryBatchReceiverAllowed) return;
     const batchId = `DB-${Date.now()}`;
     let completed = 0;
+    const signer = deliveryBatchSignatureFree ? null : deliveryBatchReceiver;
     deliverySelectedAssets.forEach(item => {
-      const done = completeDeliveryToDepartment(item.kind, item.id, {
-        batchId,
-        handoverSignatureId: deliveryBatchReceiver.signatureId,
-        receivedByUserId: deliveryBatchReceiver.userId,
-        receivedByName: deliveryBatchReceiver.name,
-        receivedByDepartment: deliveryBatchReceiver.department,
-        note: deliveryBatchNote.trim() || undefined,
-      });
+      const done = completeDeliveryToDepartment(
+        item.kind,
+        item.id,
+        signer
+          ? {
+              batchId,
+              handoverSignatureId: signer.signatureId,
+              receivedByUserId: signer.userId,
+              receivedByName: signer.name,
+              receivedByDepartment: signer.department,
+              note: withReason(
+                deliveryBatchNote,
+                deliveryBatchMismatchReason,
+                deliveryBatchReceiverMatches,
+                signer.department,
+              ),
+            }
+          : {
+              batchId,
+              ...unsignedReceiver(deliveryBatchDepartment),
+              note: [deliveryBatchNote.trim(), UNSIGNED].filter(Boolean).join(' · '),
+            },
+      );
       if (done) completed += 1;
     });
     if (completed === deliverySelectedAssets.length) closeDeliveryBatch();
   };
   return {
+    deliverySignatureFree,
+    deliveryBatchSignatureFree,
+    receiverCheck,
+    receiverAllowed,
+    deliveryBatchReceiverCheck,
+    deliveryBatchReceiverAllowed,
     selectDeliveryDepartment,
     addBarcodeToDelivery,
     closeDelivery,

@@ -5,7 +5,7 @@ import {tr, trData} from '../../../i18n';
 import ProgramSelect from './ProgramSelect';
 import {programsOf} from '../../../core/sterilizerPrograms';
 import {useLibraries} from '../../../core/LibraryStore';
-import {testsInUse, testsState} from '../../../core/equipmentTests';
+import {testsInUse, itemTestsState} from '../../../core/equipmentTests';
 import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {deviceNote} from '../sterilizationTypes';
@@ -96,12 +96,12 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                         <option
                           key={item.id}
                           value={item.el}
-                          disabled={!!item.outOfService || testsState(item.tests, Date.now(), tested) === 'FAILED'}
+                          disabled={!!item.outOfService || itemTestsState(item, Date.now(), tested) === 'FAILED'}
                         >
                           {trData(item.el)}
                           {item.outOfService
                             ? ` · ${item.outOfService.reason === 'BREAKDOWN' ? tr('σε βλάβη') : tr('σε συντήρηση')}`
-                            : testsState(item.tests, Date.now(), tested) === 'FAILED'
+                            : itemTestsState(item, Date.now(), tested) === 'FAILED'
                               ? ` · ${tr('αποτυχημένη δοκιμή')}`
                               : ''}
                         </option>
@@ -114,8 +114,11 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     <input value={loadEquipment} onChange={e => setLoadEquipment(e.target.value)} />
                   )}
                   {testsInUse(equipmentList) &&
-                    testsState(equipmentList.find(item => item.el === loadEquipment)?.tests, Date.now(), tested) ===
-                      'DUE' && (
+                    itemTestsState(
+                      equipmentList.find(item => item.el === loadEquipment),
+                      Date.now(),
+                      tested,
+                    ) === 'DUE' && (
                       <small className="load-test-due">
                         <TriangleAlert size={13} aria-hidden="true" />{' '}
                         {loadModal === 'WASHING'

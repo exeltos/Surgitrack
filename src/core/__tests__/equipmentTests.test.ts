@@ -3,6 +3,9 @@ import {
   TESTS_KEPT,
   testKindOfProgram,
   testKindsFor,
+  testKindsOf,
+  itemTestStandings,
+  itemTestsState,
   testStandings,
   testsFromDevices,
   testsInUse,
@@ -135,5 +138,26 @@ describe('the tests of a sterilizer', () => {
     const found = testsFromDevices({el: 'Πλυντήριο 1'}, devices, readings, new Set(), 'WASHER');
     expect(found?.ids).toEqual(['dev-a']);
     expect(found?.tests[0]).toMatchObject({kind: 'CLEANING', result: 'PASS', by: 'Tester'});
+  });
+});
+
+describe('the tests one sterilizer is held to', () => {
+  it('are the usual ones for its kind, a plasma sterilizer without Bowie-Dick or leak test', () => {
+    expect(testKindsOf({el: 'Κλίβανος Ατμού 01'})).toEqual(['BOWIE_DICK', 'LEAK', 'BIOLOGICAL']);
+    expect(testKindsOf({el: 'STERRAD 100NX'})).toEqual(['BIOLOGICAL']);
+    expect(testKindsOf({el: 'Πλυντήριο 1'}, 'WASHER')).toEqual(['CLEANING', 'PROTEIN', 'SPRAY']);
+  });
+
+  it('are the ones the hospital chose, and only those are due', () => {
+    const item = {el: 'Κλίβανος Ατμού 02', testKinds: ['BIOLOGICAL' as const]};
+    expect(testKindsOf(item)).toEqual(['BIOLOGICAL']);
+    expect(itemTestStandings(item).map(s => s.kind)).toEqual(['BIOLOGICAL']);
+    // A plasma sterilizer is not held back for a Bowie-Dick it never does.
+    expect(
+      itemTestsState({
+        el: 'STERRAD',
+        tests: [{id: 't', kind: 'BIOLOGICAL', result: 'PASS', at: new Date().toLocaleString('el-GR'), by: 'A'}],
+      }),
+    ).not.toBe('FAILED');
   });
 });

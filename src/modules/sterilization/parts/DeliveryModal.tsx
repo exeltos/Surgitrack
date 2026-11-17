@@ -1,10 +1,13 @@
 import {CheckCircle2, Box, Stethoscope, UserRoundCheck, IdCard, UserCheck} from 'lucide-react';
+import DeliveryMismatch from './DeliveryMismatch';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
+import NoSignature from './NoSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function DeliveryModal({s}: {s: SterilizationPageState}) {
   const {
+    deliverySignatureFree,
     closeDelivery,
     completeDelivery,
     currentUser,
@@ -12,6 +15,10 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
     deliveryNote,
     receiver,
     receiverMatches,
+    receiverCheck,
+    receiverAllowed,
+    deliveryMismatchReason,
+    setDeliveryMismatchReason,
     setDeliveryNote,
     setReceiver,
   } = s;
@@ -47,42 +54,64 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
                     <small>{trData(currentUser.department)}</small>
                   </div>
                 </div>
-                <div className={`delivery-person ${receiver && receiverMatches ? 'confirmed' : ''}`}>
+                <div
+                  className={`delivery-person ${receiverAllowed && (deliverySignatureFree || receiver) ? 'confirmed' : ''}`}
+                >
                   <IdCard size={19} />
                   <div>
                     <span>{tr('Παραλαμβάνει')}</span>
-                    <strong>{receiver && receiverMatches ? receiver.name : tr('Αναμονή ταυτοποίησης')}</strong>
-                    <small>{receiver && receiverMatches ? receiver.department : deliveryDraft.asset.department}</small>
+                    <strong>
+                      {deliverySignatureFree
+                        ? trData(deliveryDraft.asset.department)
+                        : receiver && receiverAllowed
+                          ? receiver.name
+                          : tr('Αναμονή ταυτοποίησης')}
+                    </strong>
+                    <small>
+                      {deliverySignatureFree
+                        ? tr('Χωρίς υπογραφή')
+                        : receiver && receiverAllowed
+                          ? receiver.department
+                          : deliveryDraft.asset.department}
+                    </small>
                   </div>
                 </div>
               </div>
               <section className="delivery-auth">
-                <HandoverSignature
-                  autoFocus
-                  label={tr('Υπογραφή παραλαμβάνοντα')}
-                  department={deliveryDraft.asset.department}
-                  signer={receiver}
-                  assetIds={[deliveryDraft.asset.id]}
-                  onSigned={setReceiver}
-                />
-                {receiver &&
-                  (!receiverMatches ? (
-                    <div className="identity-error">
-                      {tr('Ο χρήστης ανήκει στο') + ' '}
-                      {trData(receiver.department)}
-                      {tr(', ενώ η παράδοση αφορά το')} {trData(deliveryDraft.asset.department)}.
-                    </div>
-                  ) : (
-                    <div className="identity-result">
-                      <CheckCircle2 size={17} />
-                      <div>
-                        <strong>{receiver.name}</strong>
-                        <span>
-                          {receiver.role} · {trData(receiver.department)}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                {deliverySignatureFree ? (
+                  <NoSignature at="DELIVERY" department={deliveryDraft.asset.department || ''} />
+                ) : (
+                  <>
+                    <HandoverSignature
+                      autoFocus
+                      label={tr('Υπογραφή παραλαμβάνοντα')}
+                      department={deliveryDraft.asset.department}
+                      signer={receiver}
+                      assetIds={[deliveryDraft.asset.id]}
+                      onSigned={setReceiver}
+                    />
+                    {receiver &&
+                      (!receiverMatches ? (
+                        <DeliveryMismatch
+                          personDepartment={receiver.department}
+                          department={deliveryDraft.asset.department || ''}
+                          allowed={receiverCheck === 'REASON'}
+                          reason={deliveryMismatchReason}
+                          onReason={setDeliveryMismatchReason}
+                        />
+                      ) : (
+                        <div className="identity-result">
+                          <CheckCircle2 size={17} />
+                          <div>
+                            <strong>{receiver.name}</strong>
+                            <span>
+                              {receiver.role} · {trData(receiver.department)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </>
+                )}
               </section>
               <label className="cycle-note">
                 {tr('Παρατήρηση παράδοσης')}
@@ -95,7 +124,7 @@ export default function DeliveryModal({s}: {s: SterilizationPageState}) {
             </div>
             <div className="modal-actions workflow-modal-actions">
               <button onClick={closeDelivery}>{tr('Ακύρωση')}</button>
-              <button className="primary" disabled={!receiver || !receiverMatches} onClick={completeDelivery}>
+              <button className="primary" disabled={!receiverAllowed} onClick={completeDelivery}>
                 <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης')}
               </button>
             </div>

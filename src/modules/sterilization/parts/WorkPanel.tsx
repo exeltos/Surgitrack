@@ -3,6 +3,8 @@ import {statusLabel} from '../../../components/ui/statusLabel';
 import SortHeader from '../../../components/ui/SortHeader';
 import {useTableSort} from '../../../components/ui/useTableSort';
 import {loadLabel} from '../../../core/loadLabel';
+import {signatureExempt} from '../../../core/handoverPolicy';
+import {latestDispatches} from '../../../core/electronicDispatch';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useEffect, useMemo, useState} from 'react';
@@ -54,7 +56,10 @@ const reprocessText = (again: ReprocessReason) =>
         : tr('Δεν αποδεσμεύτηκε: περνά ξανά από πλύση, έλεγχο και συσκευασία.');
 
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
-  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads} = useSurgi();
+  const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads, movements} = useSurgi();
+  const receiptPolicy = useLibraries().sterilizationWorkflow.receiptPolicy;
+  // Who sent each item electronically, gathered once from the history (each row then looks itself up).
+  const dispatches = useMemo(() => latestDispatches(movements), [movements]);
   const [returning, setReturning] = useState<{
     kind: SterilizationRow['kind'];
     id: string;
@@ -263,7 +268,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           loads={s.runningLoads}
           canFinish={s.can('sterilization.cycle')}
           onFinish={(id, result) => s.finishProcessLoad(id, result)}
-          onPrint={s.printLoadForm}
           onReport={s.printCycle}
         />
       ) : rows.length === 0 ? (
@@ -406,6 +410,27 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         {assetIssues.length} {assetIssues.length === 1 ? tr('ανοικτή') : tr('ανοικτές')}
                       </span>
                     )}
+                    {(() => {
+                      // The department's note with the dispatch, at every stage until it goes back.
+                      const note = dispatches.get(x.barcode)?.note;
+                      return note ? (
+                        <span className="ster-dispatch-note" title={note}>
+                          {note}
+                        </span>
+                      ) : null;
+                    })()}
+                    {queue === 'INCOMING' &&
+                      (() => {
+                        // A physical handover (signed) still to come, or a department that only sends electronically.
+                        if (!signatureExempt(x.department, receiptPolicy, 'RECEIPT'))
+                          return <span className="ster-handover pending">{tr('Εκκρεμεί φυσική παράδοση')}</span>;
+                        const sent = dispatches.get(x.barcode);
+                        return (
+                          <span className="ster-handover electronic" title={sent?.at}>
+                            {sent ? tr('Ηλεκτρονικά · {0}', trData(sent.by)) : tr('Ηλεκτρονική αποστολή')}
+                          </span>
+                        );
+                      })()}
                     {queue === 'INCOMING' &&
                       (() => {
                         // The operating theatre's count at sending: a shortage shows here before the receipt.

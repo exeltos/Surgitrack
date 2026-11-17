@@ -1,3 +1,4 @@
+import SentBy from './SentBy';
 import type {UIEvent} from 'react';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {
@@ -19,6 +20,8 @@ import ShelfLifePicker from './ShelfLifePicker';
 import {isoDate, sterileUntil} from '../../../core/sterileExpiry';
 import {SET_SHORTAGE_CODE} from '../hooks/usePreparationChecks';
 import {formatDateTime} from '../../../core/displayDate';
+import {useSurgi} from '../../../store/SurgiStore';
+import {electronicDispatch} from '../../../core/electronicDispatch';
 
 // The side column and the list scroll only up and down: a tap (focus) must never shift them sideways.
 const keepLeft = (event: UIEvent<HTMLElement>) => {
@@ -66,6 +69,18 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
     togglePrepItem,
     undoAcceptedMissing,
   } = s;
+  const {movements, receipts} = useSurgi();
+  /** What the sheet carries while the Set is being prepared: who sent it, who received it, the dates it will get. */
+  const expectedSheet = () => {
+    if (!prepDraft) return undefined;
+    const sent = electronicDispatch(movements, prepDraft.asset.barcode);
+    const received = receipts.find(r => r.assetKind === prepDraft.kind && r.assetId === prepDraft.asset.id);
+    return {
+      shelfLifeMonths: s.shelfLife,
+      sentBy: sent ? `${trData(sent.by)} · ${sent.at}` : undefined,
+      receivedBy: received ? `${trData(received.receivedByName)} · ${received.at}` : undefined,
+    };
+  };
   // The prints: in the side column on a computer, in the header on a tablet (where the column moves below the list).
   const printButtons = prepDraft && (
     <>
@@ -85,7 +100,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                     [prepDraft.asset.barcode, ...prepTools.map(t => t.barcode)].some(b => i.asset.startsWith(b)),
                 )
                 .map(i => ({barcode: i.asset.split(' · ')[0], type: i.type})),
-              compositionOptions(prepDraft.asset.colorTapes),
+              {...compositionOptions(prepDraft.asset.colorTapes), expected: expectedSheet()},
             )
           }
         >
@@ -143,6 +158,7 @@ export default function PreparationModal({s}: {s: SterilizationPageState}) {
                     </>
                   )}
                   {tr('Έλεγχος φυσικών εργαλείων μετά το πλύσιμο και πριν τον κλιβανισμό.')}
+                  <SentBy barcode={prepDraft.asset.barcode} />
                 </p>
               </div>
               <div className="prep-print-actions prep-head-prints">{printButtons}</div>

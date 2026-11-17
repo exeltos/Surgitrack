@@ -298,9 +298,11 @@ html body .role-switch-hospital > button:hover {
     display: none;
   }
 }
-/* Header controls on one line and one height: the hospital, the role, «Είσοδος Demo». */
+/* Header controls on one line and one height: the hospital, the role, «Είσοδος Demo». Its menus (account,
+   notifications) open over the bars and the page below it. */
 html body .topbar {
   align-items: center;
+  z-index: 30;
 }
 html body .topbar .role-switch {
   display: flex;

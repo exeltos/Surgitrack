@@ -1,7 +1,7 @@
 import type {Asset} from '../../../types/domain';
 import {releaseIndicatorVerdict} from '../../../core/releaseIndicators';
 import {useLibraries} from '../../../core/LibraryStore';
-import {testsState} from '../../../core/equipmentTests';
+import {itemTestsState} from '../../../core/equipmentTests';
 import type {Kind} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
 import type {useSterilizationQueues} from './useSterilizationQueues';
@@ -79,7 +79,7 @@ export function useCycleFlow(
   const {sterilizers} = useLibraries();
   const testsFailed =
     !!selectedReleaseLoad &&
-    testsState(sterilizers.find(item => item.el === selectedReleaseLoad.equipment)?.tests) === 'FAILED';
+    itemTestsState(sterilizers.find(item => item.el === selectedReleaseLoad.equipment)) === 'FAILED';
   const releaseLoadReady =
     releaseLoadChecks.physicalParametersOk &&
     releaseLoadChecks.packagingIntegrityOk &&

@@ -463,7 +463,8 @@
   html body .studio-system-grid > .platform-contact {
     grid-column: 1 / -1;
   }
-  html body .studio-body-workflow {
+  /* The page's own scroller only (not the flow's parts shown inside Settings, which scroll with Settings). */
+  html body .studio-body.studio-body-workflow {
     overflow-y: auto !important;
   }
 }
@@ -2318,40 +2319,6 @@ html body .studio-body-notices {
 }
 
 /* Studio → Sterilization flow: which features the hospital has (its modules). */
-html body .studio-flow-modules-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-html body .studio-flow-modules-list > li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 2px 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--st-line);
-  border-radius: 10px;
-  background: var(--c-white);
-}
-html body .studio-flow-modules-list small {
-  grid-column: 1;
-  color: var(--st-muted);
-}
-html body .studio-flow-modules-list em {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: center;
-  font-style: normal;
-  font-weight: 600;
-  color: var(--st-green, #2f7d57);
-}
-html body .studio-flow-modules-list > li.off {
-  opacity: 0.65;
-}
-html body .studio-flow-modules-list > li.off em {
-  color: var(--st-muted);
-}
 
 /* Settings: one column of rows: the name and a line of help on the left, the control on the right, no boxes within boxes. */
 html body .studio-system-grid,
@@ -2462,20 +2429,6 @@ html body .studio-body-workflow .studio-workflow-page[data-group='POLICIES'] .st
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   align-items: start;
   gap: 12px;
-}
-html body .studio-body-workflow .studio-workflow-page[data-group='FEATURES'] .studio-flow-modules-list {
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-}
-html body .studio-flow-modules-list > li b {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--c-cyan-20-3);
-}
-html body .studio-flow-modules-list small {
-  font-size: 12px;
-}
-html body .studio-flow-modules-list em {
-  font-size: 12.5px;
 }
 
 /* A setting nobody changes (fixed or always on): the name, what it does, and a quiet note — not a field. */
@@ -3072,4 +3025,202 @@ html body .studio-request-actions {
 }
 html body .studio-requests-more {
   justify-self: center;
+}
+
+/* Departments without the department check: one chip each, pressed when exempt. */
+html body .studio-exempt {
+  display: grid;
+  gap: 8px;
+  padding: 10px 11px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  background: var(--c-gray-100-2);
+}
+html body .studio-exempt-head {
+  display: grid;
+  gap: 2px;
+}
+html body .studio-exempt table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+html body .studio-exempt th {
+  padding: 4px 6px;
+  color: var(--c-gray-45);
+  font-weight: 600;
+  text-align: center;
+}
+html body .studio-exempt th.off {
+  opacity: 0.45;
+}
+html body .studio-exempt td {
+  padding: 4px 6px;
+  border-top: 1px solid var(--c-gray-90);
+  text-align: center;
+}
+html body .studio-exempt th:first-child,
+html body .studio-exempt td:first-child {
+  width: 100%;
+  font-weight: 600;
+  text-align: left;
+}
+html body .studio-exempt td button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--c-gray-45);
+  cursor: pointer;
+}
+html body .studio-body-workflow .studio-exempt select {
+  justify-self: start;
+  max-width: none;
+  width: auto;
+  min-width: 220px;
+  min-height: 32px;
+  font-size: 12px;
+}
+html body .hospital-profile {
+  display: grid;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+html body .hospital-profile .studio-drawer-form {
+  overflow: visible;
+}
+/* Spread over the page: the hospital, its use and contact details on the left, its modules on the right. */
+html body .org-split {
+  display: grid;
+  gap: 24px;
+}
+html body .org-split > .org-main {
+  display: grid;
+  align-content: start;
+  gap: 13px;
+}
+@media (min-width: 1000px) {
+  html body .org-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+html body .hospital-profile fieldset:disabled label {
+  cursor: default;
+}
+html body .hospital-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+html body .hospital-details legend {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .hospital-profile > footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 18px;
+  border-top: 1px solid var(--c-gray-90);
+}
+@media (max-width: 640px) {
+  html body .hospital-details {
+    grid-template-columns: 1fr;
+  }
+}
+/* Settings → Sterilization / History: the flow's stages, rules and history, one under the other. */
+html body .settings-flow {
+  display: grid;
+  gap: 12px;
+}
+/* Settings: whose settings (the template or one hospital), for the platform owner. */
+html body .settings-hospital-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-gray-45);
+}
+html body .settings-hospital-picker select {
+  min-width: 260px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-blue-15);
+  font: inherit;
+  font-weight: 600;
+}
+/* Settings → Sterilization: the tests of each sterilizer and washer, a machine per row and a test per column. */
+html body .equipment-test-settings {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .equipment-test-settings header > div {
+  display: grid;
+  gap: 2px;
+}
+html body .equipment-test-settings header small {
+  color: var(--c-gray-45);
+}
+html body .equipment-test-group {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+html body .equipment-test-group table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+html body .equipment-test-group th {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--c-gray-90);
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+html body .equipment-test-group td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+  text-align: center;
+}
+html body .equipment-test-group th:first-child,
+html body .equipment-test-group td:first-child {
+  width: 34%;
+  text-align: left;
+}
+html body .equipment-test-group td:first-child {
+  font-weight: 700;
+}
+html body .equipment-test-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }

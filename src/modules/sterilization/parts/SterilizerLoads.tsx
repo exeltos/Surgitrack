@@ -1,16 +1,7 @@
 import {SortTh} from '../../../components/ui/SortHeader';
 import {useTableSort} from '../../../components/ui/useTableSort';
 import {useState} from 'react';
-import {
-  CheckCircle2,
-  Flame,
-  FlaskConical,
-  Hourglass,
-  ListTree,
-  PackageCheck,
-  Printer,
-  TriangleAlert,
-} from 'lucide-react';
+import {CheckCircle2, Flame, FlaskConical, Hourglass, ListTree, PackageCheck, TriangleAlert} from 'lucide-react';
 import {getRuntimeDataMode} from '../../../config/dataMode';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useConfirm} from '../../../components/ui/useConfirm';
@@ -40,13 +31,11 @@ export default function SterilizerLoads({
   loads,
   canFinish = false,
   onFinish,
-  onPrint,
   onReport,
 }: {
   loads: ProcessLoadRecord[];
   canFinish?: boolean;
   onFinish?: (loadId: string, result: 'PASSED' | 'FAILED') => void;
-  onPrint?: (loadId: string) => void;
   onReport?: (loadId: string) => void;
 }) {
   const [confirm, ask] = useConfirm();
@@ -168,16 +157,6 @@ export default function SterilizerLoads({
                     </button>
                     {onFinish && (
                       <>
-                        {onPrint && (
-                          <button
-                            className="row-icon"
-                            title={tr('Έντυπο')}
-                            aria-label={tr('Έντυπο')}
-                            onClick={() => onPrint(load.id)}
-                          >
-                            <Printer size={15} />
-                          </button>
-                        )}
                         <button
                           className="release-reprocess"
                           disabled={!canFinish}
@@ -226,9 +205,7 @@ export default function SterilizerLoads({
           })}
         </tbody>
       </table>
-      {opened && (
-        <LoadDetailsDialog load={opened} onClose={() => setOpenId('')} onPrint={onPrint} onReport={onReport} />
-      )}
+      {opened && <LoadDetailsDialog load={opened} onClose={() => setOpenId('')} onReport={onReport} />}
     </div>
   );
 }

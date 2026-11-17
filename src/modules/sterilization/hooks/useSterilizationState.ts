@@ -27,6 +27,7 @@ export function useSterilizationState() {
     recordBiologicalResult,
     recallProcessLoad,
     processLoads,
+    movements,
     recallCases,
     issues,
     sterilizationCycles,
@@ -102,6 +103,7 @@ export function useSterilizationState() {
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState('');
   const [kindFilter, setKindFilter] = useState('');
+  const [usageFilter, setUsageFilter] = useState('');
   const [receiptDraft, setReceiptDraft] = useState<AssetDraft | null>(null);
   const [receiptView, setReceiptView] = useState<ReceiptRecord | null>(null);
   const [receiptBatchOpen, setReceiptBatchOpen] = useState(false);
@@ -174,6 +176,9 @@ export function useSterilizationState() {
   const [deliveryDraft, setDeliveryDraft] = useState<AssetDraft | null>(null);
   const [receiver, setReceiver] = useState<Identity | null>(null);
   const [deliveryNote, setDeliveryNote] = useState('');
+  // Delivery to someone of another department: the reason, where the hospital allows it.
+  const [deliveryMismatchReason, setDeliveryMismatchReason] = useState('');
+  const [deliveryBatchMismatchReason, setDeliveryBatchMismatchReason] = useState('');
   const [deliveryBatchOpen, setDeliveryBatchOpen] = useState(false);
   const [deliverySelected, setDeliverySelected] = useState<Set<string>>(new Set());
   const [deliveryBatchReceiver, setDeliveryBatchReceiver] = useState<Identity | null>(null);
@@ -251,6 +256,10 @@ export function useSterilizationState() {
     deliveryBatchReceiver,
     deliveryDraft,
     deliveryNote,
+    deliveryMismatchReason,
+    setDeliveryMismatchReason,
+    deliveryBatchMismatchReason,
+    setDeliveryBatchMismatchReason,
     deliveryScanFeedback,
     deliverySelected,
     departmentFilter,
@@ -263,6 +272,7 @@ export function useSterilizationState() {
     issueType,
     issues,
     kindFilter,
+    usageFilter,
     loadChemical,
     loadChemicalOn,
     loadBiologicalOn,
@@ -363,6 +373,7 @@ export function useSterilizationState() {
     setIssueTarget,
     setIssueType,
     setKindFilter,
+    setUsageFilter,
     setLoadChemical,
     setLoadChemicalOn,
     setLoadBiologicalOn,
@@ -428,6 +439,7 @@ export function useSterilizationState() {
     defaultSterilizerProgram,
     defaultWasher,
     systemSettings,
+    movements,
     tools,
     visibleDeviation,
   };

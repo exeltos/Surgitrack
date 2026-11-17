@@ -17,7 +17,7 @@ import Spinner from '../../components/ui/Spinner';
 import {trialState, type HospitalPlan, type TrialState} from '../../core/trial';
 import {loadPlatformContact, type PlatformContact} from './platformContact';
 import {TrialContext} from './trialContext';
-import {ModulesContext} from './modulesContext';
+import {HOSPITAL_CHANGED, ModulesContext, type HospitalChange} from './modulesContext';
 import {modulesOf, type HospitalModule} from '../../core/hospitalModules';
 import {EvaluationDemoContext, type EvaluationDemo} from './demoContext';
 import {formatDate} from '../../core/displayDate';
@@ -219,6 +219,20 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
   useEffect(() => {
     void load();
   }, [load]);
+
+  // The owner changed this hospital's name, modules or use from its Settings: the screens follow at once.
+  useEffect(() => {
+    const changed = (e: Event) => {
+      const {name, modules: next, plan, trialEndsAt} = (e as CustomEvent<HospitalChange>).detail;
+      setModules(next);
+      // Its name too, so what is printed next carries the new one.
+      setWorkspace(w => (w ? {...w, organizationName: name} : w));
+      const state = trialState(plan, trialEndsAt);
+      setTrial(state.plan === 'TRIAL' ? state : null);
+    };
+    window.addEventListener(HOSPITAL_CHANGED, changed);
+    return () => window.removeEventListener(HOSPITAL_CHANGED, changed);
+  }, []);
 
   // A tab left open past the trial's end reloads then, so it locks without waiting for a refresh
   // (and picks up an extension the owner made meanwhile). Timers cap at ~24 days, so a later end

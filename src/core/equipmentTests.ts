@@ -1,6 +1,7 @@
 import {formatDateTime, parseDisplayDate} from './displayDate';
 import type {Device, DeviceReading} from './deviceData';
 import type {EquipmentTest, EquipmentTestKind, TestedEquipment} from './libraries';
+import {isPlasma} from './sterilizerPrograms';
 
 /** Each test, how often it is due, and what it is called. A day is the calendar day; a week is seven days. */
 export const TEST_KINDS: Array<{
@@ -63,6 +64,31 @@ export const TEST_KINDS: Array<{
 ];
 /** The tests of one kind of equipment. */
 export const testKindsFor = (equipment: TestedEquipment) => TEST_KINDS.filter(kind => kind.equipment === equipment);
+
+type TestedItem = {el: string; tests?: EquipmentTest[]; testKinds?: EquipmentTestKind[]};
+
+/**
+ * The tests one sterilizer or washer is held to: the ones the hospital chose for it, else the usual ones for its
+ * kind (a plasma sterilizer: the biological test only; no Bowie-Dick or vacuum leak test).
+ */
+export function testKindsOf(item: TestedItem | undefined, equipment: TestedEquipment = 'STERILIZER') {
+  const all = testKindsFor(equipment).map(kind => kind.id);
+  if (item?.testKinds) return all.filter(id => item.testKinds!.includes(id));
+  if (item && equipment === 'STERILIZER' && isPlasma(item.el)) return all.filter(id => id === 'BIOLOGICAL');
+  return all;
+}
+
+/** testStandings for one sterilizer or washer, its own tests only. */
+export const itemTestStandings = (item: TestedItem, now = Date.now(), equipment: TestedEquipment = 'STERILIZER') =>
+  testStandings(item.tests, now, equipment, testKindsOf(item, equipment));
+
+/** testsState for one sterilizer or washer (none: OK), its own tests only. */
+export const itemTestsState = (
+  item: TestedItem | undefined,
+  now = Date.now(),
+  equipment: TestedEquipment = 'STERILIZER',
+) =>
+  item ? testsState(item.tests, now, equipment, testKindsOf(item, equipment)) : testsState(undefined, now, equipment);
 /** The newest tests kept per piece of equipment. */
 export const TESTS_KEPT = 40;
 
@@ -99,19 +125,23 @@ export function testStandings(
   tests: readonly EquipmentTest[] = [],
   now = Date.now(),
   equipment: TestedEquipment = 'STERILIZER',
+  /** Only these tests (the ones the equipment is held to); all of its kind otherwise. */
+  kinds?: readonly EquipmentTestKind[],
 ): TestStanding[] {
-  return testKindsFor(equipment).map(({id, days}) => {
-    // The newest by its date (a test from a device may be recorded after a later one done by hand).
-    const last = tests
-      .filter(test => test.kind === id)
-      .reduce<EquipmentTest | undefined>((newest, test) => {
-        const at = parseDisplayDate(test.at)?.getTime() ?? 0;
-        return !newest || at > (parseDisplayDate(newest.at)?.getTime() ?? 0) ? test : newest;
-      }, undefined);
-    const at = last ? parseDisplayDate(last.at) : undefined;
-    const due = !at || (days === 1 ? !sameDay(at, new Date(now)) : now - at.getTime() > days * 24 * 60 * 60 * 1000);
-    return {kind: id, last, failed: last?.result === 'FAIL', due};
-  });
+  return testKindsFor(equipment)
+    .filter(kind => !kinds || kinds.includes(kind.id))
+    .map(({id, days}) => {
+      // The newest by its date (a test from a device may be recorded after a later one done by hand).
+      const last = tests
+        .filter(test => test.kind === id)
+        .reduce<EquipmentTest | undefined>((newest, test) => {
+          const at = parseDisplayDate(test.at)?.getTime() ?? 0;
+          return !newest || at > (parseDisplayDate(newest.at)?.getTime() ?? 0) ? test : newest;
+        }, undefined);
+      const at = last ? parseDisplayDate(last.at) : undefined;
+      const due = !at || (days === 1 ? !sameDay(at, new Date(now)) : now - at.getTime() > days * 24 * 60 * 60 * 1000);
+      return {kind: id, last, failed: last?.result === 'FAIL', due};
+    });
 }
 
 /**
@@ -122,8 +152,9 @@ export function testsState(
   tests: readonly EquipmentTest[] | undefined,
   now = Date.now(),
   equipment: TestedEquipment = 'STERILIZER',
+  kinds?: readonly EquipmentTestKind[],
 ): 'OK' | 'DUE' | 'FAILED' {
-  const standings = testStandings(tests, now, equipment);
+  const standings = testStandings(tests, now, equipment, kinds);
   if (standings.some(item => item.failed)) return 'FAILED';
   return standings.some(item => item.due) ? 'DUE' : 'OK';
 }

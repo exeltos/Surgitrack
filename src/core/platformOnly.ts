@@ -9,3 +9,9 @@ export const isPlatformOnly = () =>
   getRuntimeDataMode() !== 'DEMO' &&
   !!getRealIdentity()?.platform &&
   !sessionStorage.getItem('surgitrack-active-organization');
+
+/** The platform owner (or local development, signed in as no one), inside a hospital or not. */
+export const isPlatformOwner = () => {
+  const real = getRealIdentity();
+  return !real || !!real.platform;
+};

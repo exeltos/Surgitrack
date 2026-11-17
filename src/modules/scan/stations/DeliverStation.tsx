@@ -1,7 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
-import {TriangleAlert} from 'lucide-react';
+import DeliveryMismatch from '../../sterilization/parts/DeliveryMismatch';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
+import NoSignature from '../../sterilization/parts/NoSignature';
 import PassScanner from '../PassScanner';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
@@ -61,7 +62,7 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
           <button
             type="button"
             className="scan-primary"
-            disabled={!items.length || !s.deliveryBatchReceiverMatches}
+            disabled={!items.length || !s.deliveryBatchReceiverAllowed}
             onClick={() => {
               submitted.current = {count: items.length, department};
               s.completeDeliveryBatch();
@@ -86,27 +87,32 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
             <dd>{trData(s.currentUser.name)}</dd>
           </div>
         </dl>
-        <section className="scan-sign">
-          {/* The person receiving shows «Το QR μου»; the username and password stay for who has no phone. */}
-          {!receiver && <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setDeliveryBatchReceiver} />}
-          <HandoverSignature
-            label={tr('ή με κωδικό χρήστη και συνθηματικό')}
-            department={department}
-            signer={receiver}
-            assetIds={items.map(item => item.id)}
-            onSigned={s.setDeliveryBatchReceiver}
-          />
-          {receiver && !s.deliveryBatchReceiverMatches && (
-            <div className="identity-warning">
-              <TriangleAlert size={15} />
-              <span>
-                {tr('Ο χρήστης ανήκει στο') + ' '}
-                {trData(receiver.department)}
-                {tr(', ενώ η παράδοση αφορά το')} {trData(department)}.
-              </span>
-            </div>
-          )}
-        </section>
+        {s.deliveryBatchSignatureFree ? (
+          <section className="scan-sign">
+            <NoSignature at="DELIVERY" department={department} />
+          </section>
+        ) : (
+          <section className="scan-sign">
+            {/* The person receiving shows «Το QR μου»; the username and password stay for who has no phone. */}
+            {!receiver && <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setDeliveryBatchReceiver} />}
+            <HandoverSignature
+              label={tr('ή με κωδικό χρήστη και συνθηματικό')}
+              department={department}
+              signer={receiver}
+              assetIds={items.map(item => item.id)}
+              onSigned={s.setDeliveryBatchReceiver}
+            />
+            {receiver && !s.deliveryBatchReceiverMatches && (
+              <DeliveryMismatch
+                personDepartment={receiver.department}
+                department={department}
+                allowed={s.deliveryBatchReceiverCheck === 'REASON'}
+                reason={s.deliveryBatchMismatchReason}
+                onReason={s.setDeliveryBatchMismatchReason}
+              />
+            )}
+          </section>
+        )}
         <label className="scan-field">
           {tr('Παρατήρηση παράδοσης')}
           <textarea

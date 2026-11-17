@@ -2,6 +2,7 @@ import FilterMenu from '../../components/assets/FilterMenu';
 import {ScanBarcode, Barcode, X} from 'lucide-react';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr} from '../../i18n';
+import {limitFilterOptions, usageFilterOptions} from '../../core/usageFilter';
 import {useSterilizationPage} from './useSterilizationPage';
 import QueueTabs from './parts/QueueTabs';
 import WorkPanel from './parts/WorkPanel';
@@ -35,10 +36,12 @@ export default function SterilizationPage() {
     setDepartmentFilter,
     setIssueCameraOpen,
     setKindFilter,
+    setUsageFilter,
     setQuery,
     setQuickScanFeedback,
     setSpecialtyFilter,
     specialtyFilter,
+    usageFilter,
   } = s;
   return (
     <div className="sterilization-workspace">
@@ -116,6 +119,14 @@ export default function SterilizationPage() {
                   {value: 'TOOL', label: tr('Μόνο εργαλεία')},
                 ],
                 onChange: setKindFilter,
+              },
+              {
+                key: 'usage',
+                value: usageFilter,
+                // Instruments with a limit of uses until they wear out, and how far along they are.
+                placeholder: tr('Με ή χωρίς όριο'),
+                options: [...limitFilterOptions(), ...usageFilterOptions()],
+                onChange: setUsageFilter,
               },
             ]}
           />

@@ -313,6 +313,37 @@
   overflow-wrap: anywhere;
   line-height: 1.3;
 }
+/* On a wide screen the stage column says nothing here (the tab is the stage): the composition and the row's notes
+   (the department's note, the handover, a count shortage) take its room too, side by side, the note in full. */
+@media (min-width: 1101px) {
+  html body .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4),
+  html body .sterilization-workspace .receipt-queue-panel .ster-work-row > .ster-meta {
+    grid-column: 3 / span 2;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5),
+  html body .sterilization-workspace .receipt-queue-panel .ster-work-row > .ster-status {
+    display: none;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-work-row > .ster-meta {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-self: center;
+    justify-content: flex-start;
+    gap: 5px 6px;
+    text-align: left;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-meta > * {
+    margin-top: 0;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-meta > strong {
+    margin-right: 4px;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-meta .ster-dispatch-note {
+    white-space: normal;
+  }
+}
 
 /* Sterilization staff: Set changes are the supervisor's. */
 .prep-supervisor-note {
@@ -569,10 +600,6 @@ html body .load-release-modal .load-manifest > strong {
 html body .load-release-modal .load-manifest > div {
   padding: 10px 12px;
 }
-html body .load-release-modal .release-tests {
-  grid-column: 2;
-  margin: 0;
-}
 html body .load-release-modal .cycle-note {
   grid-column: 1;
   margin: 0;
@@ -634,7 +661,35 @@ html body .load-release-modal .release-check-card .receipt-section-title {
   gap: 10px;
 }
 html body .load-release-modal .load-manifest > div {
-  grid-template-columns: 84px minmax(0, 1fr) minmax(70px, 120px);
+  grid-template-columns: 84px minmax(0, 1fr) minmax(70px, 120px) auto;
+  align-items: center;
+}
+/* An item failed at release: marked, and it goes back to reprocessing on its own. */
+html body .load-release-modal .load-manifest > div.failed {
+  background: var(--c-amber-95);
+}
+html body .load-release-modal .load-manifest > div.failed b {
+  text-decoration: line-through;
+}
+html body .release-item-fail {
+  padding: 3px 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 8px;
+  background: var(--c-white);
+  color: var(--c-gray-45);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .release-item-fail.on {
+  border-color: var(--c-red-40);
+  color: var(--c-red-40);
+}
+html body .release-failed-count {
+  margin-left: 8px;
+  color: var(--c-red-40);
+  font-style: normal;
 }
 html body .load-release-modal .load-manifest > div b {
   min-width: 0;
@@ -708,9 +763,11 @@ html body .load-modal .load-modal-body {
   overflow: hidden;
 }
 html body .load-modal .load-assets {
-  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 html body .load-modal .load-assets-list {
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
 }
@@ -965,8 +1022,6 @@ html body .delivery-batch-modal .handover-signature-row input {
 }
 html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal.workflow-checkpoint-modal,
 html body .receipt-card-modal.workflow-modal.workflow-modal-delivery.workflow-modal-delivery,
-html body .receipt-card-modal.workflow-modal.load-modal.washer-load,
-html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load,
 html body .receipt-card-modal.workflow-modal.load-release-modal {
   height: auto !important;
   min-height: 0;
@@ -2019,7 +2074,7 @@ html body .batch-department button.clear:hover {
 }
 .equipment-rows .row-test.ok {
   background: var(--c-green-90);
-  color: var(--c-green-45);
+  color: var(--c-green-35);
 }
 .equipment-rows .row-test.due {
   background: var(--c-amber-95);
@@ -2187,6 +2242,7 @@ html body .ster-tests-card footer {
   gap: 12px;
 }
 .ster-tests-later {
+  flex: 1;
   color: var(--st-muted);
   font-size: 12.5px;
 }
@@ -2240,23 +2296,6 @@ html body .ster-tests-card footer {
 .ster-test.bad {
   border-color: var(--c-red-45);
   background: var(--c-amber-95);
-  color: var(--c-red-40);
-}
-.release-tests {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 10px 14px;
-  border: 1px solid var(--c-gray-90-3);
-  border-radius: 12px;
-}
-.release-tests .receipt-section-title {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-.release-tests .release-indicator-hint.bad {
   color: var(--c-red-40);
 }
 .ster-tests-message.warning {
@@ -2663,11 +2702,13 @@ html body .load-modal.sterilizer-load .cycle-clean-fields {
 html body .load-modal.washer-load .cycle-clean-fields {
   grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.7fr) minmax(0, 0.7fr);
 }
+/* The list takes the dialog's free height, so many instruments show at once. */
 html body .load-modal .load-assets {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
+  min-height: 120px;
 }
 html body .load-modal .load-assets-list {
-  max-height: 420px;
+  max-height: none;
 }
 html body .load-modal .load-finish-row {
   display: flex;
@@ -2958,4 +2999,93 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+}
+html body .ster-handover {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+html body .ster-handover.pending {
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+}
+html body .ster-handover.electronic {
+  background: var(--c-gray-95-2);
+  color: var(--c-cyan-30);
+}
+/* Where it comes from, who receives it, who sent it and the department's note: chips side by side, wrapping evenly. */
+html body .receipt-card-head .receipt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+html body .receipt-card-head .receipt-meta .sent-by,
+html body .receipt-card-head .receipt-meta .sent-note {
+  margin-left: 0;
+}
+html body .receipt-card-head .receipt-receiver {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-cyan-90);
+  color: var(--c-blue-15);
+  font-size: 12px;
+}
+html body .no-signature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-30);
+}
+html body .no-signature div {
+  display: grid;
+  gap: 2px;
+}
+html body .no-signature strong {
+  color: var(--c-blue-15);
+  font-size: 13px;
+}
+html body .no-signature span {
+  color: var(--st-muted);
+  font-size: 11.5px;
+}
+/* Who sent it, at the end of a stage dialog's subtitle. */
+html body .sent-by {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95-2);
+  color: var(--c-cyan-30);
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* The department's note with the dispatch: in the queue rows and the stage dialogs. */
+html body .ster-dispatch-note,
+html body .sent-note {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+  font-size: 11.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .sent-note {
+  margin-left: 8px;
+  white-space: normal;
 }

@@ -56,7 +56,10 @@ const SECTION_TEXT: Record<Tab, [string, string]> = {
   ],
   WORKFLOW: ['Τα στάδια της Αποστείρωσης για τα νέα νοσοκομεία.', 'The sterilization stages for new hospitals.'],
   ROLES: ['Τι μπορεί να κάνει κάθε ρόλος.', 'What each role can do.'],
-  SYSTEM: ['Επαφή υποστήριξης, ετικέτες και γενικές ρυθμίσεις.', 'Support contact, labels and general settings.'],
+  SYSTEM: [
+    'Το πρότυπο των νέων νοσοκομείων (στάδια, κανόνες, ετικέτες) ή, από τη λίστα, ένα νοσοκομείο· και η επαφή υποστήριξης.',
+    'The template for new hospitals (stages, rules, labels) or, from the list, one hospital; and the support contact.',
+  ],
 };
 
 /** Inside a hospital the same sections set up that hospital, not the ones to come. */
@@ -66,13 +69,13 @@ const HOSPITAL_SECTION_TEXT: Partial<Record<Tab, [string, string]>> = {
     'The hospital’s lists: specialties, makers, sterilizers and more.',
   ],
   WORKFLOW: [
-    'Τα στάδια της Αποστείρωσης του νοσοκομείου και οι κανόνες τους.',
-    'The hospital’s sterilization stages and their rules.',
+    'Οι κανόνες της Αποστείρωσης του νοσοκομείου: παραλαβή, παράδοση, καθαρισμός, αποδέσμευση.',
+    'The hospital’s sterilization rules: receipt, delivery, washing, release.',
   ],
   ROLES: ['Τι μπορεί να κάνει κάθε ρόλος στο νοσοκομείο.', 'What each role can do in the hospital.'],
   SYSTEM: [
-    'Διάρκεια αποστείρωσης, ετικέτες, κλείδωμα οθόνης και υπενθυμίσεις.',
-    'Sterile shelf life, labels, screen lock and reminders.',
+    'Το νοσοκομείο, η αποστείρωσή του (στάδια, κανόνες, διάρκεια), ετικέτες, γενικές ρυθμίσεις και ιστορικό.',
+    'The hospital, its sterilization (stages, rules, shelf life), labels, general settings and history.',
   ],
 };
 

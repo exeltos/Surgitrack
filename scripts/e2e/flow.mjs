@@ -319,6 +319,9 @@ async function main() {
         .first()
         .click();
       await sterilization.page.waitForTimeout(400);
+      // A sterilizer or washer test due today brings its card up in front: put it off, it is not this flow's.
+      const later = sterilization.page.getByRole('button', {name: 'Αργότερα'});
+      if (await later.isVisible().catch(() => false)) await later.click();
     };
 
     /** Ticks every check of the open stage dialog and completes the stage. */
@@ -404,8 +407,8 @@ async function main() {
       const modal = page.locator('.modal-backdrop').last();
       const load = db.process_loads.find(l => l.cycle_number === 'E2E-0001');
       await modal.getByText(`κύκλος ${load.cycle_number}`).waitFor();
-      // The parts of the dialog (checks, the sterilizer's tests, the note, the load's content) never sit on top of
-      // each other, in a tall window and in a laptop one: a picture can look fine while the boxes overlap.
+      // The parts of the dialog (checks, the note, the load's content) never sit on top of each other, in a tall
+      // window and in a laptop one: a picture can look fine while the boxes overlap.
       for (const size of [
         {width: 1440, height: 900},
         {width: 1366, height: 650},
@@ -413,9 +416,9 @@ async function main() {
         await page.setViewportSize(size);
         await page.waitForTimeout(200);
         const boxes = await modal
-          .locator('.release-check-card, .release-tests, .cycle-note, .load-manifest')
+          .locator('.release-check-card, .cycle-note, .load-manifest')
           .evaluateAll(els => els.map(el => ({name: el.className, ...el.getBoundingClientRect().toJSON()})));
-        if (boxes.length < 4) throw new Error(`the release dialog has ${boxes.length} of its 4 parts`);
+        if (boxes.length < 3) throw new Error(`the release dialog has ${boxes.length} of its 3 parts`);
         if (size.height >= 900) {
           // In a window of this size nothing in the dialog needs scrolling.
           const hidden = await modal.locator('.workflow-modal-body').evaluate(el => el.scrollHeight - el.clientHeight);

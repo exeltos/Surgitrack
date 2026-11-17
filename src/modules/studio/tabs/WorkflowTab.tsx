@@ -1,24 +1,37 @@
-import {useContext, useState} from 'react';
-import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Puzzle, Lock} from 'lucide-react';
+import {useState} from 'react';
+import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Lock, X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import type {StudioPageState} from '../useStudioPage';
+import {isPlatformOnly} from '../../../core/platformOnly';
 import {useSurgi} from '../../../store/SurgiStore';
 import {workflowStageState, type WorkflowStageConfig} from '../../../core/workflow';
 import type {AssetState} from '../../../types/domain';
 import {formatDateTime} from '../../../core/displayDate';
-import {HOSPITAL_MODULES} from '../../../core/hospitalModules';
-import {ModulesContext} from '../../../data/cloud/modulesContext';
 
-export default function WorkflowTab({s}: {s: StudioPageState}) {
+type FlowGroup = 'STAGES' | 'POLICIES' | 'HISTORY';
+
+/**
+ * The sterilization flow: its stages, the rules around them and their history. On its own page for the template
+ * (the owner with no hospital open); inside a hospital each part is a tab of Settings (`only`).
+ */
+export default function WorkflowTab({s, only}: {s: StudioPageState; only?: FlowGroup}) {
   const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
+  // The template's stages, set by the owner with no hospital open; a hospital's are in Settings → Hospital.
+  const template = isPlatformOnly();
+  const receiptPolicy = libs.sterilizationWorkflow.receiptPolicy || {
+    countSetsAtReceipt: false,
+    allowCrossDepartmentHandover: true,
+  };
+  const setReceiptPolicy = (patch: Partial<typeof receiptPolicy>) =>
+    libs.updateSterilizationWorkflow({receiptPolicy: {...receiptPolicy, ...patch}});
   const {sets, tools, advanceStageItems} = useSurgi();
-  const modules = useContext(ModulesContext);
-  // The page by category: the stages, the rules around them, or the hospital's features.
-  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'FEATURES' | 'HISTORY'>('STAGES');
+  // The page by category: the stages (the template's), the rules around them, or their history.
+  // Inside a hospital its stages are the platform owner's, in Settings → Hospital; here the owner sets the template.
+  const [chosen, setGroup] = useState<FlowGroup>(template ? 'STAGES' : 'POLICIES');
+  const group = only || chosen;
   const groups = [
-    {id: 'STAGES' as const, label: L('Στάδια', 'Stages')},
+    ...(template ? [{id: 'STAGES' as const, label: L('Στάδια', 'Stages')}] : []),
     {id: 'POLICIES' as const, label: L('Κανόνες', 'Rules')},
-    {id: 'FEATURES' as const, label: L('Λειτουργίες νοσοκομείου', 'Hospital features')},
     {id: 'HISTORY' as const, label: L('Ιστορικό & επαναφορά', 'History & reset')},
   ];
   /**
@@ -52,21 +65,23 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   };
   return (
     <>
-      {tab === 'WORKFLOW' && (
+      {(only || tab === 'WORKFLOW') && (
         <div className="studio-workflow-page" data-group={group}>
-          <div className="settings-categories" role="group" aria-label={L('Κατηγορίες ροής', 'Flow categories')}>
-            {groups.map(g => (
-              <button
-                key={g.id}
-                type="button"
-                className={`settings-category ${group === g.id ? 'active' : ''}`}
-                aria-pressed={group === g.id}
-                onClick={() => setGroup(g.id)}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
+          {!only && (
+            <div className="settings-categories" role="group" aria-label={L('Κατηγορίες ροής', 'Flow categories')}>
+              {groups.map(g => (
+                <button
+                  key={g.id}
+                  type="button"
+                  className={`settings-category ${group === g.id ? 'active' : ''}`}
+                  aria-pressed={group === g.id}
+                  onClick={() => setGroup(g.id)}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="studio-workflow-side">
             {group === 'STAGES' && (
               <section className="studio-workflow-policy">
@@ -83,34 +98,6 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                 </div>
               </section>
             )}
-            {group === 'FEATURES' && (
-              <section className="studio-release-policy studio-flow-modules">
-                <header>
-                  <Puzzle size={18} />
-                  <div>
-                    <strong>{L('Λειτουργίες του νοσοκομείου', 'Hospital features')}</strong>
-                    <span>
-                      {L(
-                        'Ό,τι δεν έχει το νοσοκομείο δεν εμφανίζεται στα στάδια. Τις λειτουργίες τις ανοίγει ο διαχειριστής της πλατφόρμας στα Νοσοκομεία.',
-                        'What the hospital does not have does not appear in the stages. The platform owner turns features on in Hospitals.',
-                      )}
-                    </span>
-                  </div>
-                </header>
-                <ul className="studio-flow-modules-list">
-                  {HOSPITAL_MODULES.map(m => {
-                    const on = modules === null || modules.includes(m.id);
-                    return (
-                      <li key={m.id} className={on ? 'on' : 'off'}>
-                        <b>{L(m.el, m.en)}</b>
-                        <small>{L(m.descriptionEl, m.descriptionEn)}</small>
-                        <em>{on ? L('Ενεργό', 'On') : L('Δεν υπάρχει', 'Not available')}</em>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            )}
             {group === 'POLICIES' && (
               <>
                 <section
@@ -123,7 +110,7 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                   <header>
                     <ShieldCheck size={18} />
                     <div>
-                      <strong>{L('Πολιτική παραλαβής', 'Receipt policy')}</strong>
+                      <strong>{L('Πολιτική παραλαβής & παράδοσης', 'Receipt & delivery policy')}</strong>
                       <span>
                         {L(
                           'Η βασική παραλαβή παραμένει γρήγορη. Η καταμέτρηση Σετ ενεργοποιείται μόνο αν απαιτείται από την πολιτική της μονάδας.',
@@ -185,6 +172,33 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                         </small>
                       </span>
                     </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={receiptPolicy.allowCrossDepartmentDelivery ?? false}
+                        onChange={e => setReceiptPolicy({allowCrossDepartmentDelivery: e.target.checked})}
+                      />
+                      <span>
+                        <b>{L('Ελεγχόμενη παράδοση σε άλλο τμήμα', 'Controlled cross-department delivery')}</b>
+                        <small>
+                          {L(
+                            'Παράδοση σε χρήστη άλλου τμήματος μόνο με προειδοποίηση και υποχρεωτική αιτιολόγηση.',
+                            'Delivery to a user of another department only with warning and mandatory justification.',
+                          )}
+                        </small>
+                      </span>
+                    </label>
+                    <ExemptDepartments
+                      L={L}
+                      departments={libs.departments}
+                      receipt={receiptPolicy.receiptExemptDepartments || []}
+                      delivery={receiptPolicy.deliveryExemptDepartments || []}
+                      receiptOn={receiptPolicy.allowCrossDepartmentHandover ?? true}
+                      deliveryOn={receiptPolicy.allowCrossDepartmentDelivery ?? false}
+                      onChange={(receiptExemptDepartments, deliveryExemptDepartments) =>
+                        setReceiptPolicy({receiptExemptDepartments, deliveryExemptDepartments})
+                      }
+                    />
                   </div>
                 </section>
                 <section className="studio-release-policy">
@@ -452,5 +466,113 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * The departments exempt from the department check, as a short list: only the exempt ones, each with the stage it is
+ * exempt at (receipt, delivery). A department is added from the list of the rest; unticking both stages removes it.
+ */
+function ExemptDepartments({
+  L,
+  departments,
+  receipt,
+  delivery,
+  receiptOn,
+  deliveryOn,
+  onChange,
+}: {
+  L: (el: string, en: string) => string;
+  departments: Array<{id: string; el: string; en: string}>;
+  receipt: string[];
+  delivery: string[];
+  /** Whether that stage's controlled handover is on: its column is greyed out otherwise, as its exemptions do not apply. */
+  receiptOn: boolean;
+  deliveryOn: boolean;
+  onChange: (receipt: string[], delivery: string[]) => void;
+}) {
+  // Only the exemptions of the stages that are controlled count, so only those show.
+  const exempt = departments.filter(
+    d => (receiptOn && receipt.includes(d.el)) || (deliveryOn && delivery.includes(d.el)),
+  );
+  const rest = departments.filter(d => !exempt.includes(d));
+  const toggle = (list: string[], dept: string, on: boolean) =>
+    on ? [...list.filter(x => x !== dept), dept] : list.filter(x => x !== dept);
+  if (!receiptOn && !deliveryOn) return null;
+  return (
+    <div className="studio-exempt">
+      <div className="studio-exempt-head">
+        <b>{L('Τμήματα χωρίς έλεγχο', 'Departments without the check')}</b>
+        <small>
+          {L(
+            'Τα Σετ τους παραλαμβάνονται και παραδίδονται χωρίς υπογραφή· στην παραλαβή φαίνεται ποιος τα έστειλε ηλεκτρονικά.',
+            'Their Sets are received and delivered without a signature; the receipt shows who sent them electronically.',
+          )}
+        </small>
+      </div>
+      {exempt.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th>{L('Τμήμα', 'Department')}</th>
+              <th className={receiptOn ? '' : 'off'}>{L('Παραλαβή', 'Receipt')}</th>
+              <th className={deliveryOn ? '' : 'off'}>{L('Παράδοση', 'Delivery')}</th>
+              <th aria-label={L('Αφαίρεση', 'Remove')} />
+            </tr>
+          </thead>
+          <tbody>
+            {exempt.map(d => (
+              <tr key={d.id}>
+                <td>{L(d.el, d.en)}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    aria-label={`${L(d.el, d.en)} · ${L('Παραλαβή', 'Receipt')}`}
+                    disabled={!receiptOn}
+                    checked={receiptOn && receipt.includes(d.el)}
+                    onChange={e => onChange(toggle(receipt, d.el, e.target.checked), delivery)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    aria-label={`${L(d.el, d.en)} · ${L('Παράδοση', 'Delivery')}`}
+                    disabled={!deliveryOn}
+                    checked={deliveryOn && delivery.includes(d.el)}
+                    onChange={e => onChange(receipt, toggle(delivery, d.el, e.target.checked))}
+                  />
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    aria-label={`${L('Αφαίρεση', 'Remove')} ${L(d.el, d.en)}`}
+                    onClick={() => onChange(toggle(receipt, d.el, false), toggle(delivery, d.el, false))}
+                  >
+                    <X size={15} aria-hidden="true" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {rest.length > 0 && (
+        <select
+          aria-label={L('Προσθήκη τμήματος', 'Add a department')}
+          value=""
+          onChange={e => {
+            const dept = e.target.value;
+            if (dept) onChange(toggle(receipt, dept, receiptOn), toggle(delivery, dept, deliveryOn));
+          }}
+        >
+          <option value="">{L('+ Προσθήκη τμήματος', '+ Add a department')}</option>
+          {rest.map(d => (
+            <option key={d.id} value={d.el}>
+              {L(d.el, d.en)}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
   );
 }

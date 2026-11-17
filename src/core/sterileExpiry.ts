@@ -1,9 +1,9 @@
 /**
- * Sterile shelf life: chosen at Packaging & Labelling (2, 3 or 6 months, the hospital default otherwise),
+ * Sterile shelf life: chosen at Packaging & Labelling (1, 2, 3 or 6 months, the hospital default otherwise),
  * counted from the release date. A Set or instrument is "expiring" in its last month (the last 10 days for
- * a 2-month shelf life) and "expired" after the date. On expiry the app only warns and lists it.
+ * a 2-month shelf life, the last week for 1 month) and "expired" after the date. On expiry the app only warns and lists it.
  */
-export const SHELF_LIFE_OPTIONS = [2, 3, 6] as const;
+export const SHELF_LIFE_OPTIONS = [1, 2, 3, 6] as const;
 export type ShelfLifeMonths = (typeof SHELF_LIFE_OPTIONS)[number];
 export const DEFAULT_SHELF_LIFE: ShelfLifeMonths = 6;
 
@@ -23,7 +23,7 @@ export function sterileUntil(from: Date, months: number): string {
 }
 
 /** How many days before expiry the warning starts. */
-export const warningDays = (months?: number) => (months === 2 ? 10 : 30);
+export const warningDays = (months?: number) => (months === 1 ? 7 : months === 2 ? 10 : 30);
 
 export type ExpiryStatus = {state: 'OK' | 'EXPIRING' | 'EXPIRED'; daysLeft: number};
 

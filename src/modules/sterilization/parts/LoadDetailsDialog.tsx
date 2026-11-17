@@ -1,4 +1,4 @@
-import {Activity, Printer} from 'lucide-react';
+import {Activity} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {loadLabel} from '../../../core/loadLabel';
 import {LOAD_STATUS} from '../../reports/reportsMeta';
@@ -13,12 +13,10 @@ import LoadContents from './LoadContents';
 export default function LoadDetailsDialog({
   load,
   onClose,
-  onPrint,
   onReport,
 }: {
   load: ProcessLoadRecord;
   onClose: () => void;
-  onPrint?: (loadId: string) => void;
   onReport?: (loadId: string) => void;
 }) {
   const data = load.cycleData;
@@ -40,11 +38,6 @@ export default function LoadDetailsDialog({
           <LoadContents load={load} />
         </div>
         <footer>
-          {onPrint && (
-            <AppButton icon={<Printer size={15} />} onClick={() => onPrint(load.id)}>
-              {tr('Έντυπο')}
-            </AppButton>
-          )}
           {onReport && data && (
             <AppButton icon={<Activity size={15} />} onClick={() => onReport(load.id)}>
               {tr('Report κύκλου')}

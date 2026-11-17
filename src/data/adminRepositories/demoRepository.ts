@@ -1,13 +1,4 @@
-import {
-  departments,
-  specialties,
-  manufacturers,
-  suppliers,
-  toolCategories,
-  sterilizers,
-  washers,
-  demoUsers,
-} from '../../core/libraries';
+import {departments, specialties, manufacturers, suppliers, toolCategories, demoUsers} from '../../core/libraries';
 import type {AdminUser, LibraryState} from '../../core/libraryTypes';
 import type {AdminRepository} from './types';
 import {defaultSterilizationWorkflow} from '../../core/workflow';
@@ -18,6 +9,7 @@ export const DEMO_ORGANIZATION = {id: 'org-demo-main', name: 'SurgiTrack Demo', 
 /** Ids an earlier Demo stored in this browser for its sample hospital. */
 export const LEGACY_DEMO_ORGANIZATION_IDS = ['org-iaso-thessalias'];
 import {colorTapeCatalog} from '../../core/colorTapes';
+import {demoSterilizers, demoWashers} from './demoEquipment';
 
 const cloneItems = <T extends {id: string}>(items: readonly T[]): T[] => items.map(item => ({...item}));
 
@@ -27,8 +19,8 @@ const createDemoInitialData = (): LibraryState => ({
   manufacturers: cloneItems(manufacturers),
   suppliers: cloneItems(suppliers),
   toolCategories: cloneItems(toolCategories),
-  sterilizers: cloneItems(sterilizers),
-  washers: cloneItems(washers),
+  sterilizers: demoSterilizers(),
+  washers: demoWashers(),
   colorTapes: colorTapeCatalog.map(tape => ({...tape, colors: [...tape.colors]})),
   organizations: [
     {
@@ -73,16 +65,24 @@ const createDemoInitialData = (): LibraryState => ({
       },
     },
   ],
-  systemSettings: {usageWarningThreshold: 3},
+  systemSettings: {
+    usageWarningThreshold: 3,
+    sterileShelfLifeMonths: 6,
+    // The wards that count the instruments when they send a Set (the Orthopaedic one did, and found one missing).
+    surgicalCountDepartments: ['Ορθοπεδική Κλινική', 'Χειρουργείο'],
+    hospitalDetails: {address: 'Οδός Δοκιμής 1, Λάρισα', phone: '2410 000000', contactName: 'Γραφείο Αποστείρωσης'},
+  },
   sterilizationWorkflow: {
     ...defaultSterilizationWorkflow,
+    // The ICU hands over without a signature: its electronic dispatch is enough (Settings → Sterilization).
+    receiptPolicy: {...defaultSterilizationWorkflow.receiptPolicy, receiptExemptDepartments: ['ΜΕΘ']},
     stages: defaultSterilizationWorkflow.stages.map(stage => ({...stage})),
   },
 });
 
 export const demoAdminRepository: AdminRepository = {
   mode: 'DEMO',
-  storageKey: 'surgitrack-admin-core-demo-v1',
-  legacyStorageKeys: ['surgitrack-admin-core-v1'],
+  // v2: the fuller sample hospital (equipment with tests, a plasma sterilizer); an older saved Demo starts afresh.
+  storageKey: 'surgitrack-admin-core-demo-v2',
   getInitialData: createDemoInitialData,
 };

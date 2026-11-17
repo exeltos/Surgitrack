@@ -1,3 +1,4 @@
+import SentBy from './SentBy';
 import StatusBadge from '../../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {CheckCircle2, ShieldCheck, UserCheck} from 'lucide-react';
@@ -44,7 +45,10 @@ export default function CheckpointModal({s}: {s: SterilizationPageState}) {
                 <h2>
                   {checkpointDraft.draft.asset.barcode} · {checkpointDraft.draft.asset.name}
                 </h2>
-                <p>{en ? checkpointStage.descriptionEn : checkpointStage.descriptionEl}</p>
+                <p>
+                  {en ? checkpointStage.descriptionEn : checkpointStage.descriptionEl}
+                  <SentBy barcode={checkpointDraft.draft.asset.barcode} />
+                </p>
               </div>
               <StatusBadge value={checkpointDraft.draft.asset.state} />
             </div>

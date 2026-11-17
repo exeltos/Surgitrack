@@ -13,7 +13,7 @@ import type {ReleaseProcessLoadPayload} from '../types';
 import {workflowStageState} from '../../core/workflow';
 import {savedTogether} from '../../data/cloud/useAppRecordSync';
 import {useLibraries} from '../../core/LibraryStore';
-import {testsState} from '../../core/equipmentTests';
+import {itemTestsState} from '../../core/equipmentTests';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -66,7 +66,7 @@ export function useLoadReleaseActions(
     };
     // A load is not released while the latest test of its sterilizer failed.
     const failedSterilizer = sterilizerList.find(
-      item => item.el === load.equipment && testsState(item.tests) === 'FAILED',
+      item => item.el === load.equipment && itemTestsState(item) === 'FAILED',
     );
     if (payload.decision === 'RELEASED' && failedSterilizer) {
       notify(
@@ -103,6 +103,9 @@ export function useLoadReleaseActions(
       return undefined;
     }
     const now = formatStoreDateTime();
+    // Items failed one by one at release (only when the load is released: a rejected load goes back whole).
+    const failed = new Set(decision === 'RELEASED' ? payload.failedItems || [] : []);
+    const failedOf = (item: (typeof load.items)[number]) => failed.has(`${item.assetKind}:${item.assetId}`);
     load.items.forEach((item, index) => {
       const cycle = passedCycle(item.assetId);
       if (!cycle) {
@@ -118,7 +121,8 @@ export function useLoadReleaseActions(
         });
         return;
       }
-      const shelfLife = decision === 'RELEASED' ? releaseShelfLife(item.assetKind, item.assetId) : undefined;
+      const itemDecision = decision === 'RELEASED' && failedOf(item) ? 'REPROCESS' : decision;
+      const shelfLife = itemDecision === 'RELEASED' ? releaseShelfLife(item.assetKind, item.assetId) : undefined;
       const record: SterilizationReleaseRecord = {
         id: `sr${uniqueStamp()}-${index}`,
         workflowVersion: sterilizationWorkflow.version,
@@ -135,8 +139,11 @@ export function useLoadReleaseActions(
         chemicalIndicatorOk: chemical === 'PASS',
         packagingIntegrityOk: payload.packagingIntegrityOk,
         biologicalIndicatorResult: payload.biologicalIndicatorResult,
-        decision,
-        note: payload.note,
+        decision: itemDecision,
+        note:
+          itemDecision !== decision
+            ? [`Αποτυχία στην αποδέσμευση`, payload.note].filter(Boolean).join(' · ')
+            : payload.note,
         releasedByUserId: currentUser.id,
         releasedByName: currentUser.name,
         releasedByDepartment: currentUser.department,
@@ -151,11 +158,14 @@ export function useLoadReleaseActions(
         assetKind: item.assetKind,
         from: 'Αποδέσμευση',
         to:
-          decision === 'RELEASED'
+          itemDecision === 'RELEASED'
             ? sterilizationWorkflow.stages.find(s => workflowStageState[s.id] === nextStateAfter('RELEASE'))?.labelEl ||
               'Έτοιμα'
             : 'Επανεπεξεργασία',
-        status: `${decision === 'RELEASED' ? 'Αποδέσμευση' : 'Μη αποδέσμευση'} φορτίου ${loadId} · κύκλος ${load.cycleNumber}`,
+        status:
+          itemDecision !== decision
+            ? `Αποτυχία στην αποδέσμευση φορτίου ${loadId} · κύκλος ${load.cycleNumber}${payload.note ? ` · ${payload.note}` : ''}`
+            : `${decision === 'RELEASED' ? 'Αποδέσμευση' : 'Μη αποδέσμευση'} φορτίου ${loadId} · κύκλος ${load.cycleNumber}`,
         by: currentUser.name,
       });
     });
@@ -171,7 +181,9 @@ export function useLoadReleaseActions(
     };
     setProcessLoads(list => list.map(item => (item.id === loadId ? updated : item)));
     if (decision === 'RELEASED') {
-      const releasedKeys = new Set(load.items.map(item => `${item.assetKind}:${item.assetId}`));
+      const releasedKeys = new Set(
+        load.items.filter(item => !failedOf(item)).map(item => `${item.assetKind}:${item.assetId}`),
+      );
       setRecallCases(cases =>
         cases.map(recall => {
           if (recall.status !== 'OPEN') return recall;
@@ -190,7 +202,14 @@ export function useLoadReleaseActions(
     }
     notify(
       decision === 'RELEASED'
-        ? tr('Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).', named(loadId), load.items.length)
+        ? failed.size
+          ? tr(
+              'Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα)· {2} επέστρεψαν σε επανεπεξεργασία.',
+              named(loadId),
+              load.items.length - load.items.filter(failedOf).length,
+              load.items.filter(failedOf).length,
+            )
+          : tr('Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα).', named(loadId), load.items.length)
         : tr('Το φορτίο {0} δεν αποδεσμεύτηκε και επέστρεψε σε επανεπεξεργασία.', named(loadId)),
       decision !== 'RELEASED',
     );

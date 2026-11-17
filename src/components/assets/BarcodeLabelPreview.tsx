@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Check, ImagePlus, Save, Trash2} from 'lucide-react';
 import PrintPreviewModal from './PrintPreviewModal';
 import AppButton from '../ui/AppButton';
@@ -78,6 +78,27 @@ export default function BarcodeLabelPreview({
     setSettings(current => ({...current, ...patch}));
   };
   const paper = labelPaper(settings);
+  // The most the label can be enlarged and still show whole in the preview pane (its 4 mm margin around it).
+  const [fit, setFit] = useState(4);
+  useEffect(() => {
+    const pane = document.querySelector<HTMLElement>('.print-preview-body');
+    if (!pane) return;
+    const measure = () => {
+      const pxPerMm = 96 / 25.4;
+      const room = (px: number) => Math.max(0, px - 40);
+      const most = Math.min(
+        room(pane.clientWidth) / ((paper.w + 8) * pxPerMm),
+        room(pane.clientHeight) / ((paper.h + 8) * pxPerMm),
+      );
+      setFit(Math.max(1, Math.floor(most * 5) / 5));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const watch = new ResizeObserver(measure);
+    watch.observe(pane);
+    return () => watch.disconnect();
+  }, [paper.w, paper.h]);
+  const shown = Math.min(zoom, fit);
   const saveDefault = () => {
     libs.updateSystemSettings({label: settings}, currentUser.name, 'Προεπιλογές ετικέτας barcode');
     setEdited(false);
@@ -243,13 +264,13 @@ export default function BarcodeLabelPreview({
           <input
             type="range"
             min={1}
-            max={4}
+            max={fit}
             step={0.2}
-            value={zoom}
+            value={shown}
             onChange={e => setZoom(Number(e.target.value))}
             aria-label={tr('Μεγέθυνση')}
           />
-          <b>{Math.round(zoom * 100)}%</b>
+          <b>{Math.round(shown * 100)}%</b>
         </label>
       )}
       {!configure && (
@@ -266,7 +287,7 @@ export default function BarcodeLabelPreview({
       printInWindow
       labelPdf={{html: barcodeLabelHtml(asset, kind, toolCount, settings, 1), widthMm: paper.w, heightMm: paper.h}}
       title={`Barcode ${asset.barcode}`}
-      html={barcodeLabelHtml(asset, kind, toolCount, settings, zoom)}
+      html={barcodeLabelHtml(asset, kind, toolCount, settings, shown)}
       aside={aside}
       onClose={close}
       actions={

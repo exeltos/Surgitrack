@@ -1,9 +1,16 @@
+import {useEffect, useState} from 'react';
 import {useHasModule} from '../../../data/cloud/modulesContext';
+import {useTestDeviceSync} from '../../devices/useTestDeviceSync';
 import {loadLabel} from '../../../core/loadLabel';
 import {Activity, Printer, TriangleAlert, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
-import ReleaseTests from './ReleaseTests';
+
+/** Brings in the tests the connected test devices recorded, so a failure there stops the release (nothing shown). */
+function TestDeviceSync() {
+  useTestDeviceSync();
+  return null;
+}
 
 export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
   const withTests = useHasModule('EQUIPMENT_TESTS');
@@ -22,6 +29,18 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
     setReleaseLoadChem,
     setReleaseLoadNote,
   } = s;
+  // Sets or instruments failed one by one (a wet or torn pack): they go back, the rest is released.
+  const [failed, setFailed] = useState<Set<string>>(new Set());
+  const loadId = selectedReleaseLoad?.id;
+  useEffect(() => setFailed(new Set()), [loadId]);
+  const toggleFailed = (key: string) =>
+    setFailed(current => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  const releasing = (selectedReleaseLoad?.items.length || 0) - failed.size;
   const chemPlanned = selectedReleaseLoad?.chemicalIndicatorResult !== undefined;
   const biPlanned = selectedReleaseLoad?.biologicalIndicatorResult === 'PENDING';
   const showChem = chemPlanned || !biPlanned;
@@ -31,6 +50,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
       {selectedReleaseLoad && (
         <div className="modal-backdrop" onMouseDown={closeLoadRelease}>
           <div className="receipt-card-modal workflow-modal load-release-modal" onMouseDown={e => e.stopPropagation()}>
+            {withTests && <TestDeviceSync />}
             <div className="workflow-modal-head">
               <div className="ster-kind set">
                 <ShieldCheck size={20} />
@@ -128,22 +148,39 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
                 </label>
               </div>
               <div className="release-col">
-                {withTests && <ReleaseTests equipment={selectedReleaseLoad.equipment} />}
                 <div className="load-manifest">
-                  <strong>{tr('Περιεχόμενο φορτίου')}</strong>
-                  {selectedReleaseLoad.items.map(item => (
-                    <div key={`${item.assetKind}:${item.assetId}`}>
-                      <span className="mono">{item.barcode}</span>
-                      <b>{item.assetName}</b>
-                      <small>{trData(item.department)}</small>
-                    </div>
-                  ))}
+                  <strong>
+                    {tr('Περιεχόμενο φορτίου')}
+                    {failed.size > 0 && <em className="release-failed-count">{tr('Αποτυχία: {0}', failed.size)}</em>}
+                  </strong>
+                  {selectedReleaseLoad.items.map(item => {
+                    const key = `${item.assetKind}:${item.assetId}`;
+                    const isFailed = failed.has(key);
+                    return (
+                      <div key={key} className={isFailed ? 'failed' : ''}>
+                        <span className="mono">{item.barcode}</span>
+                        <b>{item.assetName}</b>
+                        <small>{trData(item.department)}</small>
+                        <button
+                          type="button"
+                          className={`release-item-fail${isFailed ? ' on' : ''}`}
+                          aria-pressed={isFailed}
+                          onClick={() => toggleFailed(key)}
+                        >
+                          {isFailed ? tr('Αποτυχία ✓') : tr('Αποτυχία')}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
             <div className="modal-actions workflow-modal-actions release-actions">
               <button onClick={closeLoadRelease}>{tr('Ακύρωση')}</button>
-              <button className="release-print" onClick={() => s.printLoadForm(selectedReleaseLoad.id, true)}>
+              <button
+                className="release-print"
+                onClick={() => s.printLoadForm(selectedReleaseLoad.id, true, [...failed])}
+              >
                 <Printer size={16} /> {tr('Έντυπο')}
               </button>
               {selectedReleaseLoad.cycleData && (
@@ -154,9 +191,13 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>
                 <TriangleAlert size={16} /> {tr('Απόρριψη φορτίου')}
               </button>
-              <button className="primary" disabled={!releaseLoadReady} onClick={() => completeLoadRelease('RELEASED')}>
+              <button
+                className="primary"
+                disabled={!releaseLoadReady || releasing <= 0}
+                onClick={() => completeLoadRelease('RELEASED', [...failed])}
+              >
                 <ShieldCheck size={16} /> {tr('Αποδέσμευση φορτίου ·') + ' '}
-                {selectedReleaseLoad.items.length}
+                {releasing}
               </button>
             </div>
           </div>

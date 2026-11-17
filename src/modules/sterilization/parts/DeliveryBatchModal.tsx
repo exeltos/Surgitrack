@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import DeliveryMismatch from './DeliveryMismatch';
 import {loadLabel} from '../../../core/loadLabel';
 import BatchDepartmentPicker from './BatchDepartmentPicker';
 import {departmentsOf} from '../batchDepartments';
@@ -7,10 +8,12 @@ import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, ScanBarcode, UserRoundCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
+import NoSignature from './NoSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
   const {
+    deliveryBatchSignatureFree,
     addBarcodeToDelivery,
     closeDeliveryBatch,
     completeDeliveryBatch,
@@ -19,6 +22,10 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
     deliveryBatchOpen,
     deliveryBatchReceiver,
     deliveryBatchReceiverMatches,
+    deliveryBatchReceiverCheck,
+    deliveryBatchReceiverAllowed,
+    deliveryBatchMismatchReason,
+    setDeliveryBatchMismatchReason,
     deliveryScanFeedback,
     deliverySelected,
     deliverySelectedAssets,
@@ -133,32 +140,40 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
                 </section>
                 <section className="delivery-batch-confirm">
                   <section className="delivery-auth">
-                    <HandoverSignature
-                      label={tr('Υπογραφή παραλαμβάνοντα')}
-                      department={deliveryBatchDepartment}
-                      disabled={!deliveryBatchDepartment}
-                      signer={deliveryBatchReceiver}
-                      assetIds={deliverySelectedAssets.map(item => item.id)}
-                      onSigned={setDeliveryBatchReceiver}
-                    />
-                    {deliveryBatchReceiver &&
-                      (!deliveryBatchReceiverMatches ? (
-                        <div className="identity-error">
-                          {tr('Ο χρήστης ανήκει στο') + ' '}
-                          {trData(deliveryBatchReceiver.department)}
-                          {tr(', ενώ η παράδοση αφορά το')} {deliveryBatchDepartment}.
-                        </div>
-                      ) : (
-                        <div className="identity-result">
-                          <CheckCircle2 size={17} />
-                          <div>
-                            <strong>{deliveryBatchReceiver.name}</strong>
-                            <span>
-                              {deliveryBatchReceiver.role} · {trData(deliveryBatchReceiver.department)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                    {deliveryBatchSignatureFree ? (
+                      <NoSignature at="DELIVERY" department={deliveryBatchDepartment} />
+                    ) : (
+                      <>
+                        <HandoverSignature
+                          label={tr('Υπογραφή παραλαμβάνοντα')}
+                          department={deliveryBatchDepartment}
+                          disabled={!deliveryBatchDepartment}
+                          signer={deliveryBatchReceiver}
+                          assetIds={deliverySelectedAssets.map(item => item.id)}
+                          onSigned={setDeliveryBatchReceiver}
+                        />
+                        {deliveryBatchReceiver &&
+                          (!deliveryBatchReceiverMatches ? (
+                            <DeliveryMismatch
+                              personDepartment={deliveryBatchReceiver.department}
+                              department={deliveryBatchDepartment}
+                              allowed={deliveryBatchReceiverCheck === 'REASON'}
+                              reason={deliveryBatchMismatchReason}
+                              onReason={setDeliveryBatchMismatchReason}
+                            />
+                          ) : (
+                            <div className="identity-result">
+                              <CheckCircle2 size={17} />
+                              <div>
+                                <strong>{deliveryBatchReceiver.name}</strong>
+                                <span>
+                                  {deliveryBatchReceiver.role} · {trData(deliveryBatchReceiver.department)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                      </>
+                    )}
                   </section>
                   <label className="cycle-note">
                     {tr('Παρατήρηση παράδοσης')}
@@ -175,7 +190,7 @@ export default function DeliveryBatchModal({s}: {s: SterilizationPageState}) {
               <button onClick={closeDeliveryBatch}>{tr('Ακύρωση')}</button>
               <button
                 className="primary"
-                disabled={!deliverySelectedAssets.length || !deliveryBatchReceiverMatches}
+                disabled={!deliverySelectedAssets.length || !deliveryBatchReceiverAllowed}
                 onClick={completeDeliveryBatch}
               >
                 <UserRoundCheck size={16} /> {tr('Ολοκλήρωση παράδοσης ·') + ' '}

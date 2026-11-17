@@ -3,7 +3,7 @@ import {Check, Circle, Clock3, TriangleAlert} from 'lucide-react';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useAppPreferences} from '../../../core/AppPreferences';
-import {TEST_KINDS, testStandings, withTest} from '../../../core/equipmentTests';
+import {TEST_KINDS, withTest, itemTestStandings} from '../../../core/equipmentTests';
 import type {EquipmentTest, LibraryItem} from '../../../core/libraries';
 import {formatDateTime} from '../../../core/displayDate';
 import TestDialog from '../../devices/TestDialog';
@@ -75,7 +75,7 @@ export default function SterilizerTestRow({
   return (
     <>
       <span className="ster-tests-buttons">
-        {testStandings(sterilizer.tests, Date.now(), washer ? 'WASHER' : 'STERILIZER').map(standing => {
+        {itemTestStandings(sterilizer, Date.now(), washer ? 'WASHER' : 'STERILIZER').map(standing => {
           const kind = TEST_KINDS.find(entry => entry.id === standing.kind)!;
           const state = standing.failed ? 'bad' : standing.due ? (inUse ? 'due' : 'none') : 'ok';
           return (
