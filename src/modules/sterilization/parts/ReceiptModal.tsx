@@ -58,12 +58,14 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                   {receiptDraft.asset.barcode} · {receiptDraft.asset.name}
                 </h2>
                 {/* Where it comes from, when and who receives it: one line instead of a card of four boxes. */}
-                <p>
-                  {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')} · {formatDateTime()} ·{' '}
-                  <SentBy barcode={receiptDraft.asset.barcode} />{' '}
+                <p className="receipt-meta">
+                  <span>
+                    {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')} · {formatDateTime()}
+                  </span>
                   <span className="receipt-receiver">
                     {tr('Παραλαμβάνει:')} <b>{trData(currentUser.name)}</b>
                   </span>
+                  <SentBy barcode={receiptDraft.asset.barcode} />
                 </p>
               </div>
             </div>

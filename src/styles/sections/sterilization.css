@@ -313,6 +313,37 @@
   overflow-wrap: anywhere;
   line-height: 1.3;
 }
+/* On a wide screen the stage column says nothing here (the tab is the stage): the composition and the row's notes
+   (the department's note, the handover, a count shortage) take its room too, side by side, the note in full. */
+@media (min-width: 1101px) {
+  html body .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(4),
+  html body .sterilization-workspace .receipt-queue-panel .ster-work-row > .ster-meta {
+    grid-column: 3 / span 2;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-list-head > span:nth-child(5),
+  html body .sterilization-workspace .receipt-queue-panel .ster-work-row > .ster-status {
+    display: none;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-work-row > .ster-meta {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-self: center;
+    justify-content: flex-start;
+    gap: 5px 6px;
+    text-align: left;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-meta > * {
+    margin-top: 0;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-meta > strong {
+    margin-right: 4px;
+  }
+  html body .sterilization-workspace .receipt-queue-panel .ster-meta .ster-dispatch-note {
+    white-space: normal;
+  }
+}
 
 /* Sterilization staff: Set changes are the supervisor's. */
 .prep-supervisor-note {
@@ -2985,6 +3016,17 @@ html body .ster-handover.pending {
 html body .ster-handover.electronic {
   background: var(--c-gray-95-2);
   color: var(--c-cyan-30);
+}
+/* Where it comes from, who receives it, who sent it and the department's note: chips side by side, wrapping evenly. */
+html body .receipt-card-head .receipt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+html body .receipt-card-head .receipt-meta .sent-by,
+html body .receipt-card-head .receipt-meta .sent-note {
+  margin-left: 0;
 }
 html body .receipt-card-head .receipt-receiver {
   display: inline-block;
