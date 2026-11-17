@@ -3006,3 +3006,14 @@ html body .no-signature span {
   color: var(--st-muted);
   font-size: 11.5px;
 }
+/* Who sent it, at the end of a stage dialog's subtitle. */
+html body .sent-by {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95-2);
+  color: var(--c-cyan-30);
+  font-weight: 600;
+  white-space: nowrap;
+}

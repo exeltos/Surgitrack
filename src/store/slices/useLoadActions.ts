@@ -28,7 +28,7 @@ import {formatDateTime} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {savedTogether} from '../../data/cloud/useAppRecordSync';
 import {useLibraries} from '../../core/LibraryStore';
-import {testsState} from '../../core/equipmentTests';
+import {itemTestsState} from '../../core/equipmentTests';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
 import {tr} from '../../i18n';
@@ -89,7 +89,7 @@ export function useLoadActions(
     const failedTest = (washing ? washerList : sterilizerList).find(
       item =>
         item.el === payload.equipment.trim() &&
-        testsState(item.tests, Date.now(), washing ? 'WASHER' : 'STERILIZER') === 'FAILED',
+        itemTestsState(item, Date.now(), washing ? 'WASHER' : 'STERILIZER') === 'FAILED',
     );
     if (failedTest) {
       notify(

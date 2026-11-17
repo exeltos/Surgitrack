@@ -1662,6 +1662,24 @@ export const en: Record<string, string> = {
   'Μετρά από την αποδέσμευση· σήμερα θα έληγε στις {0}.':
     'Counted from the release; released today it would expire on {0}.',
   '{0} μήνες': '{0} months',
+  '1 μήνας': '1 month',
+  'Αποστολέας: {0} · {1}': 'Sent by: {0} · {1}',
+  Αποστολέας: 'Sent by',
+  'Έντυπο καταγραφής δοκιμών κλιβάνου': 'Sterilizer test log',
+  'Έντυπο καταγραφής δοκιμών πλυντηρίου': 'Washer test log',
+  'Σημειώστε με ✓ το αποτέλεσμα. Εσφαλμένη δοκιμή: το πλυντήριο δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.':
+    'Tick the result. A failed test: the washer is not used until a repeat passes.',
+  'Κλίβανος / συσκευή': 'Sterilizer / device',
+  'Μήνας / έτος': 'Month / year',
+  Εσφαλμένη: 'Failed',
+  'Επικολλήστε τον δείκτη': 'Stick the indicator here',
+  'Ονοματεπώνυμο χρήστη': 'User’s full name',
+  'Σημειώστε με ✓ το αποτέλεσμα. Εσφαλμένη δοκιμή: ο κλίβανος δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.':
+    'Tick the result. A failed test: the sterilizer is not used until a repeat passes.',
+  'Δοκιμές · {0}': 'Tests · {0}',
+  'Δοκιμές ανά κλίβανο και πλυντήριο': 'Tests per sterilizer and washer',
+  'Ποιες δοκιμές κάνει ο καθένας· μόνο αυτές ζητούνται πριν τη φόρτωση. Το έντυπο έχει θέση για την επικόλληση του δείκτη.':
+    'Which tests each one does; only these are asked before loading. The log has room to stick the indicator.',
   'αποστ. {0} · {1} μήνες': 'sterilized {0} · {1} months',
   'αποστ. {0}': 'sterilized {0}',
   'Τα υπόλοιπα {0} είναι εντός ορίου.': 'The other {0} are within their shelf life.',

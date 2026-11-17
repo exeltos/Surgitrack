@@ -2,7 +2,7 @@ import {CalendarClock} from 'lucide-react';
 import {tr} from '../../../i18n';
 import {SHELF_LIFE_OPTIONS, formatExpiry, sterileUntil} from '../../../core/sterileExpiry';
 
-/** The sterile shelf life chosen at Packaging & Labelling: 2, 3 or 6 months from the release. */
+/** The sterile shelf life chosen at Packaging & Labelling: 1, 2, 3 or 6 months from the release. */
 export default function ShelfLifePicker({value, onChange}: {value: number; onChange: (months: number) => void}) {
   return (
     <section className="shelf-life-picker" aria-label={tr('Διάρκεια αποστείρωσης')}>
@@ -25,7 +25,7 @@ export default function ShelfLifePicker({value, onChange}: {value: number; onCha
             className={value === months ? 'on' : ''}
             onClick={() => onChange(months)}
           >
-            {tr('{0} μήνες', months)}
+            {months === 1 ? tr('1 μήνας') : tr('{0} μήνες', months)}
           </button>
         ))}
       </div>

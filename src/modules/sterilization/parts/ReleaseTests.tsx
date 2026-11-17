@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {FlaskConical, TriangleAlert} from 'lucide-react';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useAppPreferences} from '../../../core/AppPreferences';
-import {testsInUse, testsState} from '../../../core/equipmentTests';
+import {testsInUse, itemTestsState} from '../../../core/equipmentTests';
 import {useTestDeviceSync} from '../../devices/useTestDeviceSync';
 import SterilizerTestRow from './SterilizerTestRow';
 
@@ -20,7 +20,7 @@ export default function ReleaseTests({equipment}: {equipment: string}) {
   const sterilizer = sterilizers.find(item => item.el === equipment);
   if (!sterilizer) return null;
   const inUse = testsInUse(sterilizers);
-  const state = testsState(sterilizer.tests);
+  const state = itemTestsState(sterilizer);
 
   return (
     <section className="release-tests" aria-label={L('Δοκιμές κλιβάνου', 'Sterilizer tests')}>

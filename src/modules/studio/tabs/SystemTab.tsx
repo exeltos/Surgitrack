@@ -8,6 +8,7 @@ import type {StudioPageState} from '../useStudioPage';
 import {isPlatformOnly, isPlatformOwner} from '../../../core/platformOnly';
 import WorkflowTab from './WorkflowTab';
 import SettingsHospitalPicker from '../SettingsHospitalPicker';
+import EquipmentTestSettings from '../EquipmentTestSettings';
 import {getRealIdentity} from '../../../data/cloud/identity';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
@@ -60,6 +61,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               <WorkflowTab s={s} only="POLICIES" />
             </div>
           )}
+          {group === 'STERILIZATION' && <EquipmentTestSettings />}
           {flow && group === 'HISTORY' && (
             <div className="studio-body-workflow settings-flow">
               <WorkflowTab s={s} only="HISTORY" />
@@ -211,7 +213,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                       >
                         {SHELF_LIFE_OPTIONS.map(months => (
                           <option key={months} value={months}>
-                            {L(`${months} μήνες`, `${months} months`)}
+                            {months === 1 ? L('1 μήνας', '1 month') : L(`${months} μήνες`, `${months} months`)}
                           </option>
                         ))}
                       </select>

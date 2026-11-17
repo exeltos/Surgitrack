@@ -1,3 +1,4 @@
+import SentBy from './SentBy';
 import StatusBadge from '../../../components/ui/StatusBadge';
 import {CheckCircle2, TriangleAlert, Box, Stethoscope, ShieldCheck, Clock3} from 'lucide-react';
 import {tr} from '../../../i18n';
@@ -34,7 +35,10 @@ export default function ReleaseModal({s}: {s: SterilizationPageState}) {
                 <h2>
                   {releaseDraft.asset.barcode} · {releaseDraft.asset.name}
                 </h2>
-                <p>{tr('Τεκμηριωμένος τελικός έλεγχος πριν χαρακτηριστεί έτοιμο για παράδοση.')}</p>
+                <p>
+                  {tr('Τεκμηριωμένος τελικός έλεγχος πριν χαρακτηριστεί έτοιμο για παράδοση.')}
+                  <SentBy barcode={releaseDraft.asset.barcode} />
+                </p>
               </div>
               <StatusBadge value={releaseDraft.asset.state} />
             </div>

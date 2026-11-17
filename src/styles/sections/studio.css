@@ -3147,3 +3147,73 @@ html body .settings-hospital-picker select {
   font: inherit;
   font-weight: 600;
 }
+/* Settings → Sterilization: the tests of each sterilizer and washer, one line each. */
+html body .equipment-test-settings {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .equipment-test-settings header {
+  display: grid;
+  gap: 2px;
+}
+html body .equipment-test-settings header small {
+  color: var(--c-gray-45);
+}
+html body .equipment-test-settings ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .equipment-test-settings li {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--c-gray-95);
+}
+html body .equipment-test-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html body .equipment-test-kinds label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .equipment-test-kinds label.on {
+  border-color: var(--c-cyan-35);
+  background: var(--c-gray-95-3);
+}
+html body .equipment-test-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 9px;
+  background: var(--c-white);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  html body .equipment-test-settings li {
+    grid-template-columns: 1fr;
+  }
+}

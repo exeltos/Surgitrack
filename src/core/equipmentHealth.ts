@@ -1,5 +1,5 @@
 import {parseDisplayDate} from './displayDate';
-import {testsInUse, testsState} from './equipmentTests';
+import {testsInUse, itemTestsState} from './equipmentTests';
 import type {LibraryItem} from './libraries';
 import type {ProcessLoadRecord} from '../types/domain';
 
@@ -80,7 +80,7 @@ export function equipmentBriefing(
         out.outOfService += 1;
         continue;
       }
-      const state = testsState(item.tests, now, tested);
+      const state = itemTestsState(item, now, tested);
       if (state === 'FAILED') out.failedTests += 1;
       else if (state === 'DUE' && inUse) out.testsDue += 1;
       if (equipmentTrouble(item.el, loads, now, loadKind).attention) out.troubled += 1;

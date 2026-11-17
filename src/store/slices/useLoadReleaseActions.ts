@@ -13,7 +13,7 @@ import type {ReleaseProcessLoadPayload} from '../types';
 import {workflowStageState} from '../../core/workflow';
 import {savedTogether} from '../../data/cloud/useAppRecordSync';
 import {useLibraries} from '../../core/LibraryStore';
-import {testsState} from '../../core/equipmentTests';
+import {itemTestsState} from '../../core/equipmentTests';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -66,7 +66,7 @@ export function useLoadReleaseActions(
     };
     // A load is not released while the latest test of its sterilizer failed.
     const failedSterilizer = sterilizerList.find(
-      item => item.el === load.equipment && testsState(item.tests) === 'FAILED',
+      item => item.el === load.equipment && itemTestsState(item) === 'FAILED',
     );
     if (payload.decision === 'RELEASED' && failedSterilizer) {
       notify(

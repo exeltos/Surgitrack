@@ -4,7 +4,7 @@ import {ChevronRight, FlaskConical} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useAppPreferences} from '../../../core/AppPreferences';
-import {testsInUse, testsState} from '../../../core/equipmentTests';
+import {testsInUse, itemTestsState} from '../../../core/equipmentTests';
 import {trData} from '../../../i18n';
 import {useTestDeviceSync} from '../../devices/useTestDeviceSync';
 import SterilizerTestRow from './SterilizerTestRow';
@@ -48,7 +48,7 @@ export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?
   useTestDeviceSync();
 
   const inUse = testsInUse(sterilizers);
-  const states = sterilizers.map(item => testsState(item.tests, Date.now(), type));
+  const states = sterilizers.map(item => itemTestsState(item, Date.now(), type));
   const failed = states.filter(state => state === 'FAILED').length;
   const due = inUse ? states.filter(state => state === 'DUE').length : 0;
   // What the reminder is about today: a new failure, or the next day, brings it back after «Αργότερα».

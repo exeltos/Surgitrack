@@ -27,6 +27,11 @@ export type LibraryItem = {
   tests?: EquipmentTest[];
   /** A sterilizer's programs, as offered when a load starts (none set: the usual ones, see sterilizerPrograms). */
   programs?: string[];
+  /**
+   * The tests this sterilizer or washer is held to (Settings → Sterilization); none set: the usual ones for its
+   * kind (a plasma sterilizer has no Bowie-Dick or vacuum leak test). See testKindsOf.
+   */
+  testKinds?: EquipmentTestKind[];
 };
 export const departments: LibraryItem[] = [
   {id: 'ster', code: 'STER', el: 'Κεντρική Αποστείρωση', en: 'Central Sterile Services'},

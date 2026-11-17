@@ -52,8 +52,9 @@ export function digest(input: {assets: AssetRow[]; issues: IssueRow[]; devices: 
     const until = a.extra?.sterileUntil;
     if (!until || !STERILE_STATES.includes(a.state)) continue;
     const left = daysBetween(today, until);
-    // The same warning as in the app: the last month, or 10 days for a 2-month shelf life.
-    const warn = a.extra?.shelfLifeMonths === 2 ? 10 : 30;
+    // The same warning as in the app: the last month, 10 days for a 2-month shelf life, a week for 1 month.
+    const months = a.extra?.shelfLifeMonths;
+    const warn = months === 1 ? 7 : months === 2 ? 10 : 30;
     if (left < 0) expired.push(line(a, ` · έληξε ${until.split("-").reverse().join("/")}`));
     else if (left <= warn) expiring.push(line(a, ` · λήγει ${until.split("-").reverse().join("/")}`));
   }

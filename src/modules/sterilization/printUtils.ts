@@ -4,7 +4,7 @@ import {getI18nLang, tr, trData} from '../../i18n';
 import {compositionLines} from '../../core/compositionCheck';
 import {markPrintHtml} from '../../core/sampleDataMark';
 import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/sterileSymbols';
-import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
+import {STERILE_STATES, formatExpiry, isoDate, sterileUntil, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 import {labelToPdf} from '../../core/labelPdf';
 
@@ -350,6 +350,11 @@ export function printBarcodeLabel(asset: PrintAsset, kind: AssetKind, toolCount?
 export type CompositionOptions = {
   label?: LabelSettings;
   marker?: Array<{name: string; colors: string[]; label?: string}>;
+  /**
+   * Printed while it is being prepared (not sterile yet): the dates it will carry if sterilized today with the
+   * hospital's shelf life, who sent it and who received it at Sterilization (name · time).
+   */
+  expected?: {shelfLifeMonths: number; sentBy?: string; receivedBy?: string};
 };
 
 const markerChips = (marker: CompositionOptions['marker'] = []) =>
@@ -364,19 +369,20 @@ const markerChips = (marker: CompositionOptions['marker'] = []) =>
     .join('');
 
 /** Sterilization (date and time), expiry and remaining uses, with their symbols, for the composition sheet. */
-const sterileMetaHtml = (set: SetAsset) => {
-  const on = set.sterileUntil ? sterilizedOnOf(set) : undefined;
+const sterileMetaHtml = (set: SetAsset, expected?: CompositionOptions['expected']) => {
+  // Its own dates once sterile; while it is prepared, the ones it will carry if sterilized today.
+  const sterile = !!set.sterileUntil && (STERILE_STATES as readonly string[]).includes(set.state);
+  const today = new Date();
+  const on = sterile ? sterilizedOnOf(set) : expected ? isoDate(today) : undefined;
+  const until = sterile ? set.sterileUntil : expected ? sterileUntil(today, expected.shelfLifeMonths) : undefined;
   const cell = (label: string, value: string) => `<div><b>${label}</b><span class="symv">${value}</span></div>`;
   const usesLeft = set.maxUses ? Math.max(0, set.maxUses - (set.uses || 0)) : undefined;
   return [
     cell(
       `${sterileSymbolSvg('1em')} ${escapeHtml(tr('Αποστείρωση'))}`,
-      on ? escapeHtml(`${formatExpiry(on)}${set.sterilizedTime ? `, ${set.sterilizedTime}` : ''}`) : '—',
+      on ? escapeHtml(`${formatExpiry(on)}${sterile && set.sterilizedTime ? `, ${set.sterilizedTime}` : ''}`) : '—',
     ),
-    cell(
-      `${expirySymbolSvg('1em')} ${escapeHtml(tr('Λήξη'))}`,
-      set.sterileUntil ? escapeHtml(formatExpiry(set.sterileUntil)) : '—',
-    ),
+    cell(`${expirySymbolSvg('1em')} ${escapeHtml(tr('Λήξη'))}`, until ? escapeHtml(formatExpiry(until)) : '—'),
     cell(
       escapeHtml(tr('Υπόλοιπο χρήσεων')),
       escapeHtml(usesLeft !== undefined ? `${usesLeft} / ${set.maxUses}` : tr('Χωρίς όριο')),
@@ -453,9 +459,21 @@ function compositionBody(
       [tr('Είδη εργαλείων'), String(lines.length)],
       [tr('Προετοίμασε'), preparedBy],
       [tr('Ημερομηνία / ώρα'), preparedAt],
+      ...(options.expected
+        ? [
+            [tr('Αποστολέας'), options.expected.sentBy || '—'],
+            [tr('Παρέλαβε'), options.expected.receivedBy || '—'],
+            [
+              tr('Διάρκεια αποστείρωσης'),
+              options.expected.shelfLifeMonths === 1
+                ? tr('1 μήνας')
+                : tr('{0} μήνες', options.expected.shelfLifeMonths),
+            ],
+          ]
+        : []),
     ]
       .map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`)
-      .join('') + sterileMetaHtml(set);
+      .join('') + sterileMetaHtml(set, options.expected);
   const barcode = code128Svg(set.barcode, 48);
   return `<style>
   @page{size:A4 portrait;margin:12mm 11mm 14mm;@bottom-right{content:counter(page) " / " counter(pages);font:7pt Arial,sans-serif;color:#667}}

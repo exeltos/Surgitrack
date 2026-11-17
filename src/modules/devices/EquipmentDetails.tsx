@@ -26,8 +26,8 @@ import {
 } from '../../core/deviceData';
 import type {ExportTable} from '../../core/exportTable';
 import {formatDateTime} from '../../core/displayDate';
-import type {EquipmentTest, OutOfService} from '../../core/libraries';
-import {TEST_KINDS, testStandings} from '../../core/equipmentTests';
+import type {EquipmentTest, EquipmentTestKind, OutOfService} from '../../core/libraries';
+import {TEST_KINDS, itemTestStandings} from '../../core/equipmentTests';
 import type {EquipmentTrouble} from '../../core/equipmentHealth';
 import type {ProcessLoadRecord} from '../../types/domain';
 import LoadContents from '../sterilization/parts/LoadContents';
@@ -47,8 +47,9 @@ export type EquipmentRow = {
   libraryKey?: 'sterilizers' | 'washers';
   libraryId?: string;
   outOfService?: OutOfService;
-  /** A sterilizer's tests (newest first). */
+  /** A sterilizer's tests (newest first), and the ones it is held to (Settings → Sterilization). */
   tests?: EquipmentTest[];
+  testKinds?: EquipmentTestKind[];
   /** The failures of a sterilizer (newest first), the ones in the last 30 days, and whether they call for attention. */
   trouble?: {items: EquipmentTrouble[]; recent: number; attention: boolean};
 };
@@ -346,51 +347,53 @@ export default function EquipmentDetails({
                   </tr>
                 </thead>
                 <tbody>
-                  {testStandings(row.tests, Date.now(), row.kind === 'WASHER' ? 'WASHER' : 'STERILIZER').map(
-                    standing => {
-                      const kind = TEST_KINDS.find(item => item.id === standing.kind)!;
-                      return (
-                        <tr key={standing.kind}>
-                          <td>
-                            <b>{L(kind.el, kind.en)}</b>
-                            <small>{L(kind.hint.el, kind.hint.en)}</small>
-                          </td>
-                          <td>{standing.last?.at || '—'}</td>
-                          <td>
-                            {standing.last ? (
-                              <span className={`device-result ${standing.last.result === 'PASS' ? 'pass' : 'fail'}`}>
-                                {standing.last.result === 'PASS' ? L('Επιτυχία', 'Pass') : L('Αποτυχία', 'Fail')}
-                              </span>
-                            ) : (
-                              '—'
-                            )}
-                            {standing.last?.note && <small>{standing.last.note}</small>}
-                          </td>
-                          <td>
-                            {standing.last?.id.startsWith('dev-')
-                              ? L('Συσκευή: ', 'Device: ') + standing.last.by
-                              : standing.last?.by || '—'}
-                          </td>
-                          <td>
-                            {standing.failed ? (
-                              <b className="equipment-test-bad">{L('Επανάληψη', 'Repeat')}</b>
-                            ) : standing.due ? (
-                              <b className="equipment-test-due">{L('Εκκρεμεί', 'Due')}</b>
-                            ) : (
-                              <span className="muted">{L('Εντάξει', 'Up to date')}</span>
-                            )}
-                          </td>
-                          <td className="row-actions">
-                            {canRecord && (
-                              <AppButton size="sm" onClick={() => onRecordTest(standing.kind)}>
-                                {L('Καταγραφή', 'Record')}
-                              </AppButton>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    },
-                  )}
+                  {itemTestStandings(
+                    {el: row.name, tests: row.tests, testKinds: row.testKinds},
+                    Date.now(),
+                    row.kind === 'WASHER' ? 'WASHER' : 'STERILIZER',
+                  ).map(standing => {
+                    const kind = TEST_KINDS.find(item => item.id === standing.kind)!;
+                    return (
+                      <tr key={standing.kind}>
+                        <td>
+                          <b>{L(kind.el, kind.en)}</b>
+                          <small>{L(kind.hint.el, kind.hint.en)}</small>
+                        </td>
+                        <td>{standing.last?.at || '—'}</td>
+                        <td>
+                          {standing.last ? (
+                            <span className={`device-result ${standing.last.result === 'PASS' ? 'pass' : 'fail'}`}>
+                              {standing.last.result === 'PASS' ? L('Επιτυχία', 'Pass') : L('Αποτυχία', 'Fail')}
+                            </span>
+                          ) : (
+                            '—'
+                          )}
+                          {standing.last?.note && <small>{standing.last.note}</small>}
+                        </td>
+                        <td>
+                          {standing.last?.id.startsWith('dev-')
+                            ? L('Συσκευή: ', 'Device: ') + standing.last.by
+                            : standing.last?.by || '—'}
+                        </td>
+                        <td>
+                          {standing.failed ? (
+                            <b className="equipment-test-bad">{L('Επανάληψη', 'Repeat')}</b>
+                          ) : standing.due ? (
+                            <b className="equipment-test-due">{L('Εκκρεμεί', 'Due')}</b>
+                          ) : (
+                            <span className="muted">{L('Εντάξει', 'Up to date')}</span>
+                          )}
+                        </td>
+                        <td className="row-actions">
+                          {canRecord && (
+                            <AppButton size="sm" onClick={() => onRecordTest(standing.kind)}>
+                              {L('Καταγραφή', 'Record')}
+                            </AppButton>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
