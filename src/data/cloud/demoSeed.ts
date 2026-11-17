@@ -5,9 +5,10 @@ import {demoShiftDays} from '../demoDates';
 
 /**
  * The sample hospital's version, kept with every load of an evaluation Demo. 2: dates moved to
- * today; composition, release and count records included.
+ * today; composition, release and count records included. 3: a varied hospital (most instruments without a use
+ * limit), sterilizers and washers with their tests, a plasma load and a closed recall.
  */
-export const DEMO_PACK_VERSION = 2;
+export const DEMO_PACK_VERSION = 3;
 
 /**
  * Fills a Demo hospital with the built-in sample hospital. An evaluation Demo (a prospect's) keeps
@@ -41,6 +42,7 @@ export const seedDemoOrganization = async (
     sterilizationCycles: store.sterilizationCycles || [],
     sterilizationReleases: store.sterilizationReleases || [],
     counts: store.counts || [],
+    recallCases: store.recallCases || [],
     library: [library],
   } as Partial<CloudRecords>;
   await seedAppRecords(organizationId, records, options.onProgress);
