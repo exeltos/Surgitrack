@@ -165,14 +165,6 @@ export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?
                 </p>
               )}
               <footer>
-                <span className="ster-tests-later">
-                  {attention
-                    ? L(
-                        'Ξανανοίγει από τη γραμμή «{0}» πάνω από τη λίστα.',
-                        'Open it again from «{0}» above the list.',
-                      ).replace('{0}', title)
-                    : ''}
-                </span>
                 {/* The day's sheet of all of them: today's results and who did them filled in, a box per test for its indicator. */}
                 <AppButton
                   type="button"
@@ -194,6 +186,14 @@ export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?
                 >
                   {L('Ημερήσιο έντυπο', 'Daily sheet')}
                 </AppButton>
+                <span className="ster-tests-later">
+                  {attention
+                    ? L(
+                        'Ξανανοίγει από τη γραμμή «{0}» πάνω από τη λίστα.',
+                        'Open it again from «{0}» above the list.',
+                      ).replace('{0}', title)
+                    : ''}
+                </span>
                 <AppButton variant={attention ? undefined : 'primary'} type="button" onClick={close} autoFocus>
                   {attention ? L('Αργότερα', 'Later') : L('Κλείσιμο', 'Close')}
                 </AppButton>

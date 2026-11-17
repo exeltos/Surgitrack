@@ -2211,6 +2211,7 @@ html body .ster-tests-card footer {
   gap: 12px;
 }
 .ster-tests-later {
+  flex: 1;
   color: var(--st-muted);
   font-size: 12.5px;
 }
