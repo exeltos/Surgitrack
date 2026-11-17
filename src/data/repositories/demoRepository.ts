@@ -6,6 +6,7 @@ import {
   preparations,
   processLoads,
   purchaseOrders,
+  recallCases,
   receipts,
   sets,
   sterilizationCycles,
@@ -39,6 +40,7 @@ const cloneInitialData = (): SurgiInitialData => ({
     checkedToolIds: [...item.checkedToolIds],
   })),
   sterilizationReleases: sterilizationReleases.map(item => ({...item})),
+  recallCases: recallCases.map(item => ({...item, items: item.items.map(line => ({...line}))})),
   sterilizationCycles: sterilizationCycles.map(item => ({...item, toolIds: [...item.toolIds]})),
   counts: counts.map(count => ({
     ...count,

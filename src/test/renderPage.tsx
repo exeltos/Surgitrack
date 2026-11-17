@@ -1,3 +1,5 @@
+import type {LibraryState} from '../core/libraryTypes';
+import {demoAdminRepository} from '../data/adminRepositories/demoRepository';
 import type {ReactElement} from 'react';
 import {render} from '@testing-library/react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
@@ -26,14 +28,18 @@ export function renderPage(
     route = '*',
     signedIn,
     demo,
+    library,
   }: {
     path?: string;
     route?: string;
     signedIn?: SessionUser;
     /** In the platform's Demo (as entered from Studio). */ demo?: boolean;
+    /** Libraries in place of the Demo's own (as if saved in this browser). */
+    library?: Partial<LibraryState>;
   } = {},
 ) {
   forgetPageMemory();
+  if (library) localStorage.setItem(demoAdminRepository.storageKey!, JSON.stringify(library));
   if (demo) sessionStorage.setItem('surgitrack-data-mode', 'DEMO');
   // Someone other than the sample hospital's default user (the store reads them from the session).
   if (signedIn) {

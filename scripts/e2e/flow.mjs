@@ -319,6 +319,9 @@ async function main() {
         .first()
         .click();
       await sterilization.page.waitForTimeout(400);
+      // A sterilizer or washer test due today brings its card up in front: put it off, it is not this flow's.
+      const later = sterilization.page.getByRole('button', {name: 'Αργότερα'});
+      if (await later.isVisible().catch(() => false)) await later.click();
     };
 
     /** Ticks every check of the open stage dialog and completes the stage. */

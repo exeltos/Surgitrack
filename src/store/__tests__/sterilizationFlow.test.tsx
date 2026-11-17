@@ -464,6 +464,8 @@ describe('sterilization flow', () => {
       f.release(load.id);
       return {f, load};
     };
+    // The Demo already holds a closed recall of its own: each test looks at its load's case.
+    const casesOf = (f: ReturnType<typeof setup>, loadId: string) => f.s().recallCases.filter(c => c.loadId === loadId);
     const recall = (f: ReturnType<typeof setup>, loadId: string, reason: string) =>
       act(() => f.s().recallProcessLoad(loadId, reason));
 
@@ -471,11 +473,11 @@ describe('sterilization flow', () => {
       const f = setup();
       const pending = f.toAwaitingRelease();
       recall(f, pending.id, 'Λόγος');
-      expect(f.s().recallCases).toHaveLength(0);
+      expect(casesOf(f, pending.id)).toHaveLength(0);
 
       f.release(pending.id);
       recall(f, pending.id, '   ');
-      expect(f.s().recallCases).toHaveLength(0);
+      expect(casesOf(f, pending.id)).toHaveLength(0);
       expect(f.s().processLoads.find(l => l.id === pending.id)!.status).toBe('RELEASED');
     });
 
@@ -488,15 +490,15 @@ describe('sterilization flow', () => {
       const loadAfter = f.s().processLoads.find(l => l.id === load.id)!;
       expect(loadAfter.status).toBe('RECALLED');
       expect(loadAfter.recallReason).toBe('Αποτυχία βιολογικού δείκτη');
-      expect(f.s().recallCases).toHaveLength(1);
-      const item = f.s().recallCases[0].items[0];
+      expect(casesOf(f, load.id)).toHaveLength(1);
+      const item = casesOf(f, load.id)[0].items[0];
       // It was already out in the department when the recall opened.
       expect(item.status).toBe('OUTSTANDING');
       expect(f.state()).toBe('PENDING_STERILIZATION');
 
       // The same load cannot be recalled twice.
       recall(f, load.id, 'Ξανά');
-      expect(f.s().recallCases).toHaveLength(1);
+      expect(casesOf(f, load.id)).toHaveLength(1);
 
       // A recalled asset may not circulate (dispatch is refused and nothing is recorded).
       const movements = f.s().movements.length;
@@ -507,20 +509,20 @@ describe('sterilization flow', () => {
     it('closes the case when the recalled instrument is reprocessed and released again', () => {
       const {f, load} = released();
       recall(f, load.id, 'Έλεγχος κλιβάνου');
-      expect(f.s().recallCases[0].status).toBe('OPEN');
+      expect(casesOf(f, load.id)[0].status).toBe('OPEN');
 
       // The instrument came back from the shelf: receive it again and run it through the process.
       f.receive();
-      expect(f.s().recallCases[0].items[0].status).toBe('REPROCESSING');
+      expect(casesOf(f, load.id)[0].items[0].status).toBe('REPROCESSING');
       f.wash();
       f.prepare();
       f.pack();
       const again = f.sterilize('PASS', 'S-2')!;
       f.release(again.id);
 
-      expect(f.s().recallCases[0].items[0].status).toBe('CLOSED');
-      expect(f.s().recallCases[0].status).toBe('CLOSED');
-      expect(f.s().recallCases[0].closedAt).toBeTruthy();
+      expect(casesOf(f, load.id)[0].items[0].status).toBe('CLOSED');
+      expect(casesOf(f, load.id)[0].status).toBe('CLOSED');
+      expect(casesOf(f, load.id)[0].closedAt).toBeTruthy();
       expect(f.state()).toBe('READY_FOR_PICKUP');
     });
   });

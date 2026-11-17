@@ -3,12 +3,18 @@ import {fireEvent, screen, within} from '@testing-library/react';
 import {renderPage} from '../../../test/renderPage';
 import SterilizerTests from '../parts/SterilizerTests';
 import type {SessionUser} from '../../../store/types';
+import {demoSterilizers, demoWashers} from '../../../data/adminRepositories/demoEquipment';
 
 const staff: SessionUser = {id: 'u-ster', name: 'Δοκιμή', role: 'STERILIZATION', department: 'Κεντρική Αποστείρωση'};
 /** The row of a sterilizer. */
 const row = async (name: string) => (await screen.findByText(name)).closest('li') as HTMLElement;
 /** Opens the card from the slim line over the list (nothing recorded yet, so it does not come up by itself). */
 const openCard = async (title: RegExp) => fireEvent.click(await screen.findByRole('button', {name: title}));
+/** A hospital that has never recorded a test (the Demo's equipment, its tests cleared). */
+const neverTested = {
+  sterilizers: demoSterilizers().map(item => ({...item, tests: [], outOfService: undefined})),
+  washers: demoWashers().map(item => ({...item, tests: []})),
+};
 
 describe('the tests of the sterilizers in the Loading stage', () => {
   it('lists each sterilizer with its three tests, and records one with its result', async () => {
@@ -32,7 +38,7 @@ describe('the tests of the sterilizers in the Loading stage', () => {
   });
 
   it('marks a test as due only once the hospital records tests at all', async () => {
-    renderPage(<SterilizerTests />, {signedIn: staff, demo: true});
+    renderPage(<SterilizerTests />, {signedIn: staff, demo: true, library: neverTested});
     await openCard(/Δοκιμές κλιβάνων/);
     const first = await row('Κλίβανος Ατμού 01');
     // Nothing was ever recorded: no nagging yet.
@@ -65,7 +71,7 @@ describe('the tests of the sterilizers in the Loading stage', () => {
 
   it('comes up in front when a test is due, closes with «Αργότερα» and opens again from the line', async () => {
     window.localStorage.clear();
-    renderPage(<SterilizerTests />, {signedIn: staff, demo: true});
+    renderPage(<SterilizerTests />, {signedIn: staff, demo: true, library: neverTested});
     await openCard(/Δοκιμές κλιβάνων/);
     // One test recorded: the others are now due, and the card says so.
     fireEvent.click(within(await row('Κλίβανος Ατμού 01')).getByRole('button', {name: /Bowie-Dick/}));
