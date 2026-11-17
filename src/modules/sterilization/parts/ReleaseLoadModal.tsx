@@ -1,10 +1,19 @@
 import {useEffect, useState} from 'react';
+import {useHasModule} from '../../../data/cloud/modulesContext';
+import {useTestDeviceSync} from '../../devices/useTestDeviceSync';
 import {loadLabel} from '../../../core/loadLabel';
 import {Activity, Printer, TriangleAlert, ShieldCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
+/** Brings in the tests the connected test devices recorded, so a failure there stops the release (nothing shown). */
+function TestDeviceSync() {
+  useTestDeviceSync();
+  return null;
+}
+
 export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
+  const withTests = useHasModule('EQUIPMENT_TESTS');
   const {
     closeLoadRelease,
     completeLoadRelease,
@@ -41,6 +50,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
       {selectedReleaseLoad && (
         <div className="modal-backdrop" onMouseDown={closeLoadRelease}>
           <div className="receipt-card-modal workflow-modal load-release-modal" onMouseDown={e => e.stopPropagation()}>
+            {withTests && <TestDeviceSync />}
             <div className="workflow-modal-head">
               <div className="ster-kind set">
                 <ShieldCheck size={20} />
