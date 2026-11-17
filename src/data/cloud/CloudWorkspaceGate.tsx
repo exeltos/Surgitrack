@@ -220,11 +220,13 @@ export default function CloudWorkspaceGate({children}: {children: (workspace: Cl
     void load();
   }, [load]);
 
-  // The owner changed this hospital's modules or use from its Settings: the screens follow at once.
+  // The owner changed this hospital's name, modules or use from its Settings: the screens follow at once.
   useEffect(() => {
     const changed = (e: Event) => {
-      const {modules: next, plan, trialEndsAt} = (e as CustomEvent<HospitalChange>).detail;
+      const {name, modules: next, plan, trialEndsAt} = (e as CustomEvent<HospitalChange>).detail;
       setModules(next);
+      // Its name too, so what is printed next carries the new one.
+      setWorkspace(w => (w ? {...w, organizationName: name} : w));
       const state = trialState(plan, trialEndsAt);
       setTrial(state.plan === 'TRIAL' ? state : null);
     };

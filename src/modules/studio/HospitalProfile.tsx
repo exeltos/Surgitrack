@@ -132,7 +132,12 @@ export default function HospitalProfile({actor}: {actor: string}) {
           }
         }
         setOrg({...org, ...data});
-        announceHospitalChange({modules: data.modules, plan: data.plan, trialEndsAt: data.trialEndsAt});
+        announceHospitalChange({
+          name: data.name,
+          modules: data.modules,
+          plan: data.plan,
+          trialEndsAt: data.trialEndsAt,
+        });
         if (!(await applyStages())) return;
       }
       await tellUser(tr('Αποθηκεύτηκε'), tr('Τα στοιχεία του νοσοκομείου αποθηκεύτηκαν.'));

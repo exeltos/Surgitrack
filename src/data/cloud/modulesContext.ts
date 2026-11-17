@@ -13,8 +13,13 @@ export const useHasModule = (module: HospitalModule) => {
   return modules === null || modules.includes(module);
 };
 
-/** Sent when the platform owner changes the open hospital's modules or use from its Settings. */
+/** Sent when the platform owner changes the open hospital's name, modules or use from its Settings. */
 export const HOSPITAL_CHANGED = 'surgitrack-hospital-changed';
-export type HospitalChange = {modules: HospitalModule[]; plan: 'STANDARD' | 'TRIAL'; trialEndsAt?: string};
+export type HospitalChange = {
+  name: string;
+  modules: HospitalModule[];
+  plan: 'STANDARD' | 'TRIAL';
+  trialEndsAt?: string;
+};
 export const announceHospitalChange = (change: HospitalChange) =>
   window.dispatchEvent(new CustomEvent<HospitalChange>(HOSPITAL_CHANGED, {detail: change}));
