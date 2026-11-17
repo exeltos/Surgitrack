@@ -268,7 +268,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           loads={s.runningLoads}
           canFinish={s.can('sterilization.cycle')}
           onFinish={(id, result) => s.finishProcessLoad(id, result)}
-          onPrint={s.printLoadForm}
           onReport={s.printCycle}
         />
       ) : rows.length === 0 ? (
