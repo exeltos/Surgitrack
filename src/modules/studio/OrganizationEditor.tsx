@@ -2,9 +2,9 @@ import {useState} from 'react';
 import {type Organization} from '../../core/LibraryStore';
 import AppButton from '../../components/ui/AppButton';
 import {tr} from '../../i18n';
-import {TRIAL_LENGTHS, trialEndAfter, trialEndDate, trialEndOn} from '../../core/trial';
-import {ALL_MODULES, HOSPITAL_MODULES, type HospitalModule} from '../../core/hospitalModules';
-import {getI18nLang} from '../../i18n';
+import {trialEndOn} from '../../core/trial';
+import OrganizationFields from './OrganizationFields';
+import {organizationForm, type OrganizationForm} from './organizationForm';
 
 export default function OrganizationEditor({
   organization,
@@ -15,17 +15,11 @@ export default function OrganizationEditor({
   onClose: () => void;
   onSave: (data: Omit<Organization, 'id'>, hospitalAdmin?: {name: string; email: string}) => void;
 }) {
-  const [name, setName] = useState(organization?.name || '');
-  const [code, setCode] = useState(organization?.code || '');
+  const [form, setForm] = useState<OrganizationForm>(() => organizationForm(organization));
+  const {name, code, plan, endDate, modules} = form;
   // Active and Demo access are switched on the hospital's card; a new hospital starts active, without Demo.
   const active = organization?.active ?? true;
   const demoEnabled = organization?.demoEnabled ?? false;
-  const [plan, setPlan] = useState<'STANDARD' | 'TRIAL'>(organization?.plan || 'STANDARD');
-  const [endDate, setEndDate] = useState(trialEndDate(organization?.trialEndsAt) || trialEndDate(trialEndAfter(30)));
-  // A new hospital starts without the optional modules, and the owner picks the ones it wants.
-  const [modules, setModules] = useState<HospitalModule[]>(organization ? (organization.modules ?? ALL_MODULES) : []);
-  const toggleModule = (id: HospitalModule) =>
-    setModules(list => (list.includes(id) ? list.filter(m => m !== id) : [...list, id]));
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const emailOk = !adminEmail.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim());
@@ -41,70 +35,12 @@ export default function OrganizationEditor({
           </div>
         </header>
         <div className="studio-drawer-form">
-          <label>
-            {tr('Ονομασία')}
-            <input autoFocus value={name} onChange={e => setName(e.target.value)} />
-          </label>
-          {organization ? (
-            <label>
-              {tr('Κωδικός')}
-              <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} />
-            </label>
-          ) : (
-            <small className="studio-field-hint">{tr('Ο κωδικός του νοσοκομείου δημιουργείται αυτόματα.')}</small>
-          )}
-          <fieldset className="studio-plan">
-            <legend>{tr('Χρήση')}</legend>
-            <label className={plan === 'STANDARD' ? 'active' : ''}>
-              <input type="radio" name="plan" checked={plan === 'STANDARD'} onChange={() => setPlan('STANDARD')} />
-              <span>
-                <b>{tr('Κανονική χρήση')}</b>
-                <small>{tr('Χωρίς λήξη.')}</small>
-              </span>
-            </label>
-            <label className={plan === 'TRIAL' ? 'active' : ''}>
-              <input type="radio" name="plan" checked={plan === 'TRIAL'} onChange={() => setPlan('TRIAL')} />
-              <span>
-                <b>{tr('Δοκιμαστική περίοδος')}</b>
-                <small>
-                  {tr('Άδειο νοσοκομείο με πραγματικά δεδομένα. Κλειδώνει στη λήξη μέχρι να το ανανεώσετε.')}
-                </small>
-              </span>
-            </label>
-          </fieldset>
-          <fieldset className="studio-plan">
-            <legend>{tr('Ενότητες')}</legend>
-            {HOSPITAL_MODULES.map(m => (
-              <label key={m.id} className={modules.includes(m.id) ? 'active' : ''}>
-                <input type="checkbox" checked={modules.includes(m.id)} onChange={() => toggleModule(m.id)} />
-                <span>
-                  <b>{getI18nLang() === 'en' ? m.en : m.el}</b>
-                  <small>{getI18nLang() === 'en' ? m.descriptionEn : m.descriptionEl}</small>
-                </span>
-              </label>
-            ))}
-          </fieldset>
-          {plan === 'TRIAL' && (
-            <div className="studio-trial-length">
-              <span>{tr('Διάρκεια')}</span>
-              <div>
-                {TRIAL_LENGTHS.map(days => (
-                  <button
-                    key={days}
-                    type="button"
-                    className={endDate === trialEndDate(trialEndAfter(days)) ? 'active' : ''}
-                    onClick={() => setEndDate(trialEndDate(trialEndAfter(days)))}
-                  >
-                    {tr('{0} ημέρες', days)}
-                  </button>
-                ))}
-              </div>
-              <label>
-                {tr('Λήγει στις')}
-                <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
-              </label>
-            </div>
-          )}
+          <OrganizationFields
+            autoFocus
+            isNew={!organization}
+            value={form}
+            onChange={patch => setForm(f => ({...f, ...patch}))}
+          />
           {!organization && (
             <div className="studio-admin-invite">
               <b>{tr('Διαχειριστής νοσοκομείου')}</b>

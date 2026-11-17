@@ -1,13 +1,11 @@
-import {useContext, useState} from 'react';
-import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Puzzle, Lock, X} from 'lucide-react';
+import {useState} from 'react';
+import {RefreshCcw, ShieldCheck, CheckCircle2, WashingMachine, Lock, X} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import type {StudioPageState} from '../useStudioPage';
 import {useSurgi} from '../../../store/SurgiStore';
 import {workflowStageState, type WorkflowStageConfig} from '../../../core/workflow';
 import type {AssetState} from '../../../types/domain';
 import {formatDateTime} from '../../../core/displayDate';
-import {HOSPITAL_MODULES} from '../../../core/hospitalModules';
-import {ModulesContext} from '../../../data/cloud/modulesContext';
 
 export default function WorkflowTab({s}: {s: StudioPageState}) {
   const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
@@ -18,13 +16,11 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   const setReceiptPolicy = (patch: Partial<typeof receiptPolicy>) =>
     libs.updateSterilizationWorkflow({receiptPolicy: {...receiptPolicy, ...patch}});
   const {sets, tools, advanceStageItems} = useSurgi();
-  const modules = useContext(ModulesContext);
-  // The page by category: the stages, the rules around them, or the hospital's features.
-  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'FEATURES' | 'HISTORY'>('STAGES');
+  // The page by category: the stages, the rules around them, or their history.
+  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'HISTORY'>('STAGES');
   const groups = [
     {id: 'STAGES' as const, label: L('Στάδια', 'Stages')},
     {id: 'POLICIES' as const, label: L('Κανόνες', 'Rules')},
-    {id: 'FEATURES' as const, label: L('Λειτουργίες νοσοκομείου', 'Hospital features')},
     {id: 'HISTORY' as const, label: L('Ιστορικό & επαναφορά', 'History & reset')},
   ];
   /**
@@ -87,34 +83,6 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
                     )}
                   </span>
                 </div>
-              </section>
-            )}
-            {group === 'FEATURES' && (
-              <section className="studio-release-policy studio-flow-modules">
-                <header>
-                  <Puzzle size={18} />
-                  <div>
-                    <strong>{L('Λειτουργίες του νοσοκομείου', 'Hospital features')}</strong>
-                    <span>
-                      {L(
-                        'Ό,τι δεν έχει το νοσοκομείο δεν εμφανίζεται στα στάδια. Τις λειτουργίες τις ανοίγει ο διαχειριστής της πλατφόρμας στα Νοσοκομεία.',
-                        'What the hospital does not have does not appear in the stages. The platform owner turns features on in Hospitals.',
-                      )}
-                    </span>
-                  </div>
-                </header>
-                <ul className="studio-flow-modules-list">
-                  {HOSPITAL_MODULES.map(m => {
-                    const on = modules === null || modules.includes(m.id);
-                    return (
-                      <li key={m.id} className={on ? 'on' : 'off'}>
-                        <b>{L(m.el, m.en)}</b>
-                        <small>{L(m.descriptionEl, m.descriptionEn)}</small>
-                        <em>{on ? L('Ενεργό', 'On') : L('Δεν υπάρχει', 'Not available')}</em>
-                      </li>
-                    );
-                  })}
-                </ul>
               </section>
             )}
             {group === 'POLICIES' && (

@@ -2,6 +2,14 @@
 export const en: Record<string, string> = {
   'Υπογραφή παραδίδοντα': 'Signature of who hands over',
   'Παραλαμβάνει:': 'Received by:',
+  'Δεν αποθηκεύτηκε': 'Not saved',
+  Αποθηκεύτηκε: 'Saved',
+  'Τα στοιχεία του νοσοκομείου αποθηκεύτηκαν.': 'The hospital details were saved.',
+  'Ονομασία, χρήση και ενότητες αλλάζουν από τον διαχειριστή της πλατφόρμας.':
+    'The name, use and modules are changed by the platform administrator.',
+  'Στοιχεία επικοινωνίας': 'Contact details',
+  Διεύθυνση: 'Address',
+  'Υπεύθυνος επικοινωνίας': 'Contact person',
   'Χωρίς υπογραφή': 'No signature',
   'Ηλεκτρονική αποστολή: {0}': 'Sent electronically: {0}',
   'Ηλεκτρονική αποστολή από {0}': 'Sent electronically by {0}',

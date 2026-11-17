@@ -3,6 +3,7 @@ import {RefreshCcw} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import PlatformContactSettings, {PublicContactSettings} from '../PlatformContactSettings';
 import LabelSettingsCard from '../LabelSettingsCard';
+import HospitalProfile from '../HospitalProfile';
 import type {StudioPageState} from '../useStudioPage';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
@@ -10,8 +11,10 @@ import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
   // Settings by category: only one category is on screen at a time.
-  const [group, setGroup] = useState<'GENERAL' | 'STERILIZATION'>('GENERAL');
+  // Inside a hospital, its own details come first; the owner outside one has no hospital to show.
+  const [group, setGroup] = useState<'HOSPITAL' | 'GENERAL' | 'STERILIZATION'>(platformAdmin ? 'GENERAL' : 'HOSPITAL');
   const groups = [
+    ...(platformAdmin ? [] : [{id: 'HOSPITAL' as const, label: L('Νοσοκομείο', 'Hospital')}]),
     {id: 'GENERAL' as const, label: L('Γενικά', 'General')},
     {id: 'STERILIZATION' as const, label: L('Αποστείρωση & ετικέτες', 'Sterilization & labels')},
   ];
@@ -36,7 +39,8 @@ export default function SystemTab({s}: {s: StudioPageState}) {
               </button>
             ))}
           </div>
-          <div className="studio-system-grid">
+          {group === 'HOSPITAL' && <HospitalProfile actor={currentUser.name} />}
+          <div className="studio-system-grid" hidden={group === 'HOSPITAL'}>
             {group === 'GENERAL' && (
               <section>
                 {platformAdmin && libs.dataMode === 'PRODUCTION' && (

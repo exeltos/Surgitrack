@@ -71,8 +71,8 @@ const HOSPITAL_SECTION_TEXT: Partial<Record<Tab, [string, string]>> = {
   ],
   ROLES: ['Τι μπορεί να κάνει κάθε ρόλος στο νοσοκομείο.', 'What each role can do in the hospital.'],
   SYSTEM: [
-    'Διάρκεια αποστείρωσης, ετικέτες, κλείδωμα οθόνης και υπενθυμίσεις.',
-    'Sterile shelf life, labels, screen lock and reminders.',
+    'Στοιχεία και ενότητες του νοσοκομείου, διάρκεια αποστείρωσης, ετικέτες, κλείδωμα οθόνης και υπενθυμίσεις.',
+    'The hospital’s details and modules, sterile shelf life, labels, screen lock and reminders.',
   ],
 };
 
