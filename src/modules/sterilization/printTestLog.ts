@@ -3,6 +3,7 @@ import {getI18nLang, tr, trData} from '../../i18n';
 import {TEST_KINDS, itemTestStandings, testKindsOf} from '../../core/equipmentTests';
 import {parseDisplayDate} from '../../core/displayDate';
 import type {EquipmentTest, EquipmentTestKind, TestedEquipment} from '../../core/libraries';
+import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
 
 type Machine = {el: string; tests?: EquipmentTest[]; testKinds?: EquipmentTestKind[]; outOfService?: unknown};
 
@@ -19,8 +20,15 @@ export function dailyTestLogHtml(
   machines: readonly Machine[],
   equipment: TestedEquipment = 'STERILIZER',
   now = new Date(),
+  /** The hospital's label header (logo or text), as on its other prints; none set: its name. */
+  labelSettings?: LabelSettings,
 ) {
   const en = getI18nLang() === 'en';
+  const label = {...DEFAULT_LABEL_SETTINGS, ...(labelSettings || {})};
+  const brand =
+    label.header === 'LOGO' && label.logo && /^data:image\/(png|jpeg|webp);/.test(label.logo)
+      ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
+      : `<div class="brand">${escapeHtml(label.header === 'TEXT' && label.text?.trim() ? label.text.trim() : trData(hospital) || 'SurgiTrack')}</div>`;
   const washer = equipment === 'WASHER';
   const day = now.toLocaleDateString(en ? 'en-GB' : 'el-GR', {
     weekday: 'long',
@@ -70,7 +78,8 @@ export function dailyTestLogHtml(
 @page{size:A4 landscape;margin:10mm 11mm 12mm;@bottom-right{content:counter(page) " / " counter(pages);font:7pt Arial,sans-serif;color:#667}}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#15232b;font-size:9pt}
 .top{padding-bottom:3mm;border-bottom:.6mm solid #1d6b7a}
-.brand{font-size:13pt;font-weight:800;letter-spacing:.03em;color:#1d6b7a}.doc{font-size:7pt;font-weight:700;letter-spacing:.12em;color:#5f707b;text-transform:uppercase;margin-top:2mm}
+.brand-row{display:flex;align-items:center;min-height:9mm}.brand{font-size:13pt;font-weight:800;letter-spacing:.03em;color:#1d6b7a}.logo{max-height:11mm;max-width:55mm;object-fit:contain}
+@media screen{html{background:#eef2f5}body{max-width:297mm;margin:6mm auto;padding:10mm 11mm;background:#fff;box-shadow:0 1mm 4mm rgba(0,0,0,.08)}}.doc{font-size:7pt;font-weight:700;letter-spacing:.12em;color:#5f707b;text-transform:uppercase;margin-top:2mm}
 h1{margin:1mm 0 0;font-size:15pt;line-height:1.15}
 .meta{display:grid;grid-template-columns:2fr 2fr 1fr;margin:4mm 0;border:.25mm solid #d7e0e5;border-radius:2mm;overflow:hidden}.meta div{padding:2mm 3mm;border-right:.25mm solid #e3e9ec}.meta div:last-child{border-right:0}.meta b{display:block;font-size:6.5pt;font-weight:700;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.6mm}.meta span{font-size:9pt;font-weight:700}
 table{width:100%;border-collapse:collapse;table-layout:fixed}thead th{background:#eef3f5;color:#5f707b;font-size:6.5pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:2mm;border-bottom:.3mm solid #c9d4da}
@@ -84,7 +93,7 @@ td.res{font-size:8pt;color:#3d4f5a}td.res.ok{color:#1b7a43;font-weight:700}td.re
 td.strip{border-left:.25mm dashed #b8c4ca;border-right:.25mm dashed #b8c4ca}td.who{font-weight:700}
 .foot{display:flex;justify-content:space-between;margin-top:3mm;font-size:7pt;color:#6a7a84}
 </style></head><body>
-<div class="top"><div class="brand">SurgiTrack</div><div class="doc">${escapeHtml(title)}</div><h1>${escapeHtml(day)}</h1></div>
+<div class="top"><div class="brand-row">${brand}</div><div class="doc">${escapeHtml(title)}</div><h1>${escapeHtml(day)}</h1></div>
 <div class="meta">${meta}</div>
 <table><thead><tr><th class="machine">${escapeHtml(washer ? tr('Πλυντήριο') : tr('Κλίβανος'))}</th><th class="name">${escapeHtml(tr('Δοκιμή'))}</th><th class="time">${escapeHtml(tr('Ώρα'))}</th><th class="res">${escapeHtml(tr('Αποτέλεσμα'))}</th><th>${escapeHtml(tr('Επικολλήστε τον δείκτη'))}</th><th class="who">${escapeHtml(tr('Ονοματεπώνυμο χρήστη'))}</th></tr></thead><tbody>${lines.join('')}</tbody></table>
 <div class="foot"><span>${escapeHtml(tr('Ό,τι καταγράφηκε σήμερα στην εφαρμογή είναι ήδη συμπληρωμένο· τα υπόλοιπα συμπληρώνονται με το χέρι.'))}</span><span>${escapeHtml(washer ? tr('Εσφαλμένη δοκιμή: το πλυντήριο δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.') : tr('Εσφαλμένη δοκιμή: ο κλίβανος δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.'))}</span></div>

@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {tr, getI18nLang} from '../../i18n';
 import {TRIAL_LENGTHS, trialEndAfter, trialEndDate} from '../../core/trial';
 import {HOSPITAL_MODULES, type HospitalModule} from '../../core/hospitalModules';
@@ -14,18 +15,23 @@ export default function OrganizationFields({
   isNew = false,
   readOnly = false,
   autoFocus = false,
+  split = false,
+  children,
 }: {
   value: OrganizationForm;
   onChange: (patch: Partial<OrganizationForm>) => void;
   isNew?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
+  /** Spread over a page: the hospital, its use and `children` on the left, its modules on the right. */
+  split?: boolean;
+  children?: ReactNode;
 }) {
   const {name, code, plan, endDate, modules} = value;
   const en = getI18nLang() === 'en';
   const toggleModule = (id: HospitalModule) =>
     onChange({modules: modules.includes(id) ? modules.filter(m => m !== id) : [...modules, id]});
-  return (
+  const main = (
     <>
       <label>
         {tr('Ονομασία')}
@@ -89,18 +95,35 @@ export default function OrganizationFields({
           </label>
         </div>
       )}
-      <fieldset className="studio-plan org-modules" disabled={readOnly}>
-        <legend>{tr('Ενότητες')}</legend>
-        {HOSPITAL_MODULES.map(m => (
-          <label key={m.id} className={modules.includes(m.id) ? 'active' : ''}>
-            <input type="checkbox" checked={modules.includes(m.id)} onChange={() => toggleModule(m.id)} />
-            <span>
-              <b>{en ? m.en : m.el}</b>
-              <small>{en ? m.descriptionEn : m.descriptionEl}</small>
-            </span>
-          </label>
-        ))}
-      </fieldset>
+    </>
+  );
+  const modulesField = (
+    <fieldset className="studio-plan org-modules" disabled={readOnly}>
+      <legend>{tr('Ενότητες')}</legend>
+      {HOSPITAL_MODULES.map(m => (
+        <label key={m.id} className={modules.includes(m.id) ? 'active' : ''}>
+          <input type="checkbox" checked={modules.includes(m.id)} onChange={() => toggleModule(m.id)} />
+          <span>
+            <b>{en ? m.en : m.el}</b>
+            <small>{en ? m.descriptionEn : m.descriptionEl}</small>
+          </span>
+        </label>
+      ))}
+    </fieldset>
+  );
+  return split ? (
+    <div className="org-split">
+      <div className="org-main">
+        {main}
+        {children}
+      </div>
+      {modulesField}
+    </div>
+  ) : (
+    <>
+      {main}
+      {modulesField}
+      {children}
     </>
   );
 }

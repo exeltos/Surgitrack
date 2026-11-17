@@ -3093,24 +3093,20 @@ html body .hospital-profile {
 html body .hospital-profile .studio-drawer-form {
   overflow: visible;
 }
-/* Spread over the page: the hospital and its use on the left, its modules on the right. */
+/* Spread over the page: the hospital, its use and contact details on the left, its modules on the right. */
+html body .org-split {
+  display: grid;
+  gap: 24px;
+}
+html body .org-split > .org-main {
+  display: grid;
+  align-content: start;
+  gap: 13px;
+}
 @media (min-width: 1000px) {
-  html body .hospital-profile .studio-drawer-form {
+  html body .org-split {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-auto-flow: dense;
-    column-gap: 28px;
-  }
-  html body .hospital-profile .studio-drawer-form > * {
-    grid-column: 1;
-  }
-  html body .hospital-profile .studio-drawer-form > .org-modules {
-    grid-column: 2;
-    grid-row: 1 / span 12;
-    align-self: start;
-  }
-  /* The hospital's admin sees its details only: those take the whole width. */
-  html body .hospital-profile .studio-drawer-form:not(:has(.org-modules)) > * {
-    grid-column: 1 / -1;
+    align-items: start;
   }
 }
 html body .hospital-profile fieldset:disabled label {

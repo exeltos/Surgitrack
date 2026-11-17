@@ -95,36 +95,42 @@ export default function HospitalProfile({actor}: {actor: string}) {
     }
   };
 
+  const contact = (
+    <fieldset className="hospital-details">
+      <legend>{tr('Στοιχεία επικοινωνίας')}</legend>
+      <label>
+        {tr('Διεύθυνση')}
+        <input value={details.address || ''} onChange={e => setDetail('address', e.target.value)} />
+      </label>
+      <label>
+        {tr('Τηλέφωνο')}
+        <input type="tel" value={details.phone || ''} onChange={e => setDetail('phone', e.target.value)} />
+      </label>
+      <label>
+        Email
+        <input type="email" value={details.email || ''} onChange={e => setDetail('email', e.target.value)} />
+      </label>
+      <label>
+        {tr('Υπεύθυνος επικοινωνίας')}
+        <input value={details.contactName || ''} onChange={e => setDetail('contactName', e.target.value)} />
+      </label>
+    </fieldset>
+  );
+
   return (
     <section className="hospital-profile">
       <div className="studio-drawer-form">
-        {owner &&
-          (org ? (
-            <>
-              <OrganizationFields value={form} onChange={patch => setForm(f => ({...f, ...patch}))} />
-            </>
-          ) : (
-            <small className="studio-field-hint">{tr('Φόρτωση…')}</small>
-          ))}
-        <fieldset className="hospital-details">
-          <legend>{tr('Στοιχεία επικοινωνίας')}</legend>
-          <label>
-            {tr('Διεύθυνση')}
-            <input value={details.address || ''} onChange={e => setDetail('address', e.target.value)} />
-          </label>
-          <label>
-            {tr('Τηλέφωνο')}
-            <input type="tel" value={details.phone || ''} onChange={e => setDetail('phone', e.target.value)} />
-          </label>
-          <label>
-            Email
-            <input type="email" value={details.email || ''} onChange={e => setDetail('email', e.target.value)} />
-          </label>
-          <label>
-            {tr('Υπεύθυνος επικοινωνίας')}
-            <input value={details.contactName || ''} onChange={e => setDetail('contactName', e.target.value)} />
-          </label>
-        </fieldset>
+        {/* The owner: the hospital and its use on the left with its contact details, its modules on the right. */}
+        {owner && org ? (
+          <OrganizationFields split value={form} onChange={patch => setForm(f => ({...f, ...patch}))}>
+            {contact}
+          </OrganizationFields>
+        ) : (
+          <>
+            {owner && <small className="studio-field-hint">{tr('Φόρτωση…')}</small>}
+            {contact}
+          </>
+        )}
       </div>
       <footer>
         <AppButton variant="primary" disabled={saving || (owner && !!org && !ready)} onClick={() => void save()}>

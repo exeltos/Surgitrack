@@ -45,7 +45,7 @@ export default function EquipmentTestSettings() {
   const print = (equipment: TestedEquipment, items: LibraryItem[]) =>
     printDocumentInWindow(
       equipment === 'WASHER' ? tr('Ημερήσιο έντυπο δοκιμών πλυντηρίων') : tr('Ημερήσιο έντυπο δοκιμών κλιβάνων'),
-      dailyTestLogHtml(organizationName || '', items, equipment),
+      dailyTestLogHtml(organizationName || '', items, equipment, new Date(), libs.systemSettings.label),
     );
   return (
     <section className="equipment-test-settings">

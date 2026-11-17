@@ -182,7 +182,13 @@ export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?
                       washer
                         ? L('Ημερήσιο έντυπο δοκιμών πλυντηρίων', 'Daily washer test sheet')
                         : L('Ημερήσιο έντυπο δοκιμών κλιβάνων', 'Daily sterilizer test sheet'),
-                      dailyTestLogHtml(organizationName || '', sterilizers, type),
+                      dailyTestLogHtml(
+                        organizationName || '',
+                        sterilizers,
+                        type,
+                        new Date(),
+                        library.systemSettings.label,
+                      ),
                     )
                   }
                 >
