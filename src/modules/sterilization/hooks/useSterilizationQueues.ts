@@ -66,17 +66,30 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
                     : ready;
   const queueValues = (key: 'department' | 'specialty'): string[] =>
     [...new Set<string>(source.map(x => String(x[key] || '')).filter(Boolean))].sort();
+  // A Set's instruments, gathered once, only while the usage filter is on.
+  const toolsBySet = useMemo(() => {
+    const bySet = new Map<string, typeof tools>();
+    if (!usageFilter) return bySet;
+    for (const t of tools) {
+      if (!t.setId) continue;
+      const list = bySet.get(t.setId);
+      if (list) list.push(t);
+      else bySet.set(t.setId, [t]);
+    }
+    return bySet;
+  }, [tools, usageFilter]);
   const rows = source.filter(
     x =>
       (!departmentFilter || x.department === departmentFilter) &&
       (!specialtyFilter || x.specialty === specialtyFilter) &&
       (!kindFilter || x.kind === kindFilter) &&
       // A Set by its own limit and its instruments' (as in the Sets list), an instrument by its own.
-      matchesUsage(
-        usageFilter,
-        x.kind === 'SET' ? [x, ...tools.filter(t => t.setId === x.id)] : [x],
-        systemSettings.usageWarningThreshold,
-      ) &&
+      (!usageFilter ||
+        matchesUsage(
+          usageFilter,
+          x.kind === 'SET' ? [x, ...(toolsBySet.get(x.id) || [])] : [x],
+          systemSettings.usageWarningThreshold,
+        )) &&
       `${x.barcode} ${x.name} ${x.code || ''} ${x.department || ''} ${x.specialty || ''}`
         .toLowerCase()
         .includes(query.toLowerCase()),
