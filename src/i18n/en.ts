@@ -1667,6 +1667,7 @@ export const en: Record<string, string> = {
   Αποστολέας: 'Sent by',
   'Αποτυχία: {0}': 'Failed: {0}',
   'Αποτυχία ✓': 'Failed ✓',
+  'Αποτυχία · επανεπεξεργασία': 'Failed · reprocessing',
   'Το φορτίο {0} αποδεσμεύτηκε ({1} αντικείμενα)· {2} επέστρεψαν σε επανεπεξεργασία.':
     'Load {0} released ({1} items); {2} went back to reprocessing.',
   'Σημείωση τμήματος: {0}': 'Department’s note: {0}',

@@ -167,7 +167,10 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
             </div>
             <div className="modal-actions workflow-modal-actions release-actions">
               <button onClick={closeLoadRelease}>{tr('Ακύρωση')}</button>
-              <button className="release-print" onClick={() => s.printLoadForm(selectedReleaseLoad.id, true)}>
+              <button
+                className="release-print"
+                onClick={() => s.printLoadForm(selectedReleaseLoad.id, true, [...failed])}
+              >
                 <Printer size={16} /> {tr('Έντυπο')}
               </button>
               {selectedReleaseLoad.cycleData && (

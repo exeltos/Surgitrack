@@ -207,8 +207,11 @@ export function useLoadFlow(
     if (!reason) return;
     recallProcessLoad(id, reason);
   };
-  /** Prints the release form of a load: blank while in the sterilizer, filled in once released. */
-  const printLoadForm = (loadId: string, fromReleaseDialog = false) => {
+  /**
+   * Prints the release form of a load: blank while in the sterilizer, filled in once released. The items failed at
+   * release are marked (from the dialog: the ones ticked there now).
+   */
+  const printLoadForm = (loadId: string, fromReleaseDialog = false, failedKeys: readonly string[] = []) => {
     const load = p.processLoads.find(item => item.id === loadId);
     if (!load) return;
     const releases = p.sterilizationReleases.filter(r => r.loadId === loadId);
@@ -224,6 +227,9 @@ export function useLoadFlow(
         shelfLifeMonths: release?.shelfLifeMonths ?? asset?.shelfLifeMonths ?? p.defaultShelfLife,
         sterileUntil: release?.sterileUntil,
         sterilizedOn: release && sterilizedOnOf(release),
+        failed: fromReleaseDialog
+          ? failedKeys.includes(`${item.assetKind}:${item.assetId}`)
+          : load.status === 'RELEASED' && release?.decision === 'REPROCESS',
       };
     });
     const first = releases[0];
