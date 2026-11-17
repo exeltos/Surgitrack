@@ -463,7 +463,8 @@
   html body .studio-system-grid > .platform-contact {
     grid-column: 1 / -1;
   }
-  html body .studio-body-workflow {
+  /* The page's own scroller only (not the flow's parts shown inside Settings, which scroll with Settings). */
+  html body .studio-body.studio-body-workflow {
     overflow-y: auto !important;
   }
 }
@@ -3124,4 +3125,25 @@ html body .hospital-profile > footer {
 html body .settings-flow {
   display: grid;
   gap: 12px;
+}
+/* Settings: whose settings (the template or one hospital), for the platform owner. */
+html body .settings-hospital-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-gray-45);
+}
+html body .settings-hospital-picker select {
+  min-width: 260px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--c-blue-15);
+  font: inherit;
+  font-weight: 600;
 }

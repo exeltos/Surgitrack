@@ -7,19 +7,22 @@ import HospitalProfile from '../HospitalProfile';
 import type {StudioPageState} from '../useStudioPage';
 import {isPlatformOnly, isPlatformOwner} from '../../../core/platformOnly';
 import WorkflowTab from './WorkflowTab';
+import SettingsHospitalPicker from '../SettingsHospitalPicker';
+import {getRealIdentity} from '../../../data/cloud/identity';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
-  // Settings by category, one on screen at a time. Inside a hospital everything about it is here: the hospital, its
-  // sterilization (stages and rules: the platform owner's), labels, general settings and the flow's history. The
-  // owner with no hospital open (the template) keeps the flow on its own page.
+  // Settings by category, one on screen at a time: the hospital, its sterilization (stages and rules: the platform
+  // owner's), labels, general settings and the flow's history. The owner picks above whose settings they are: the
+  // template new hospitals start from (no hospital open), or one hospital.
   const outside = isPlatformOnly();
   const owner = isPlatformOwner();
-  const flow = owner && !outside;
+  const flow = owner;
+  const picker = !!getRealIdentity()?.platform && libs.dataMode === 'PRODUCTION';
   type Group = 'HOSPITAL' | 'STERILIZATION' | 'LABELS' | 'GENERAL' | 'HISTORY';
-  const [group, setGroup] = useState<Group>(outside ? 'GENERAL' : 'HOSPITAL');
+  const [group, setGroup] = useState<Group>(outside ? (flow ? 'STERILIZATION' : 'GENERAL') : 'HOSPITAL');
   const groups: Array<{id: Group; label: string}> = [
     ...(outside ? [] : [{id: 'HOSPITAL' as const, label: L('Νοσοκομείο', 'Hospital')}]),
     {id: 'STERILIZATION', label: L('Αποστείρωση', 'Sterilization')},
@@ -31,6 +34,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
     <>
       {tab === 'SYSTEM' && (
         <>
+          {picker && <SettingsHospitalPicker />}
           <div
             className="settings-categories"
             role="group"

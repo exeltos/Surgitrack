@@ -20,6 +20,6 @@ describe('the Studio sections only the platform owner works in', () => {
     const adminMenu = navigationFor('ADMIN').filter(item => isOwnerOnlyPath(item.to));
     // A hospital's sterilization flow is in its Settings now; only the template keeps a page of its own.
     expect(adminMenu.map(item => item.label)).toEqual(['Ρόλοι & δικαιώματα']);
-    expect(ownerNavigation.filter(item => isOwnerOnlyPath(item.to))).toHaveLength(2);
+    expect(ownerNavigation.filter(item => isOwnerOnlyPath(item.to))).toHaveLength(1);
   });
 });

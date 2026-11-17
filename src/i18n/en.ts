@@ -2,6 +2,9 @@
 export const en: Record<string, string> = {
   'Υπογραφή παραδίδοντα': 'Signature of who hands over',
   'Παραλαμβάνει:': 'Received by:',
+  'Ρυθμίσεις για': 'Settings for',
+  'Πρότυπο νέων νοσοκομείων': 'Template for new hospitals',
+  'Τρέχον νοσοκομείο': 'Current hospital',
   'Δεν αποθηκεύτηκε': 'Not saved',
   Αποθηκεύτηκε: 'Saved',
   'Τα στοιχεία του νοσοκομείου αποθηκεύτηκαν.': 'The hospital details were saved.',

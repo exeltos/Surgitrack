@@ -56,7 +56,10 @@ const SECTION_TEXT: Record<Tab, [string, string]> = {
   ],
   WORKFLOW: ['Τα στάδια της Αποστείρωσης για τα νέα νοσοκομεία.', 'The sterilization stages for new hospitals.'],
   ROLES: ['Τι μπορεί να κάνει κάθε ρόλος.', 'What each role can do.'],
-  SYSTEM: ['Επαφή υποστήριξης, ετικέτες και γενικές ρυθμίσεις.', 'Support contact, labels and general settings.'],
+  SYSTEM: [
+    'Το πρότυπο των νέων νοσοκομείων (στάδια, κανόνες, ετικέτες) ή, από τη λίστα, ένα νοσοκομείο· και η επαφή υποστήριξης.',
+    'The template for new hospitals (stages, rules, labels) or, from the list, one hospital; and the support contact.',
+  ],
 };
 
 /** Inside a hospital the same sections set up that hospital, not the ones to come. */

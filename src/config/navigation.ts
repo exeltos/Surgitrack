@@ -190,13 +190,7 @@ export const ownerNavigation: NavigationItem[] = [
   {to: '/studio?tab=errors', label: 'Σφάλματα', icon: Bug, permission: 'studio.manage', group: 'CONTACT'},
   {to: '/studio?tab=security', label: 'Ασφάλεια', icon: ShieldAlert, permission: 'studio.manage', group: 'CONTACT'},
   {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'TEMPLATE'},
-  {
-    to: '/studio?tab=workflow',
-    label: 'Ροή Αποστείρωσης',
-    icon: Layers3,
-    permission: 'studio.manage',
-    group: 'TEMPLATE',
-  },
+  // The template's sterilization flow is part of Settings (Sterilization, History).
   {to: '/studio?tab=roles', label: 'Ρόλοι & δικαιώματα', icon: UserCog, permission: 'studio.manage', group: 'TEMPLATE'},
   {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'TEMPLATE'},
 ];
