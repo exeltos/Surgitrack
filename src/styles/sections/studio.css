@@ -3086,13 +3086,32 @@ html body .studio-body-workflow .studio-exempt select {
 }
 html body .hospital-profile {
   display: grid;
-  max-width: 760px;
   border: 1px solid var(--c-gray-90);
   border-radius: 14px;
   background: var(--c-white);
 }
 html body .hospital-profile .studio-drawer-form {
   overflow: visible;
+}
+/* Spread over the page: the hospital and its use on the left, its modules on the right. */
+@media (min-width: 1000px) {
+  html body .hospital-profile .studio-drawer-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-auto-flow: dense;
+    column-gap: 28px;
+  }
+  html body .hospital-profile .studio-drawer-form > * {
+    grid-column: 1;
+  }
+  html body .hospital-profile .studio-drawer-form > .org-modules {
+    grid-column: 2;
+    grid-row: 1 / span 12;
+    align-self: start;
+  }
+  /* The hospital's admin sees its details only: those take the whole width. */
+  html body .hospital-profile .studio-drawer-form:not(:has(.org-modules)) > * {
+    grid-column: 1 / -1;
+  }
 }
 html body .hospital-profile fieldset:disabled label {
   cursor: default;
@@ -3147,56 +3166,53 @@ html body .settings-hospital-picker select {
   font: inherit;
   font-weight: 600;
 }
-/* Settings → Sterilization: the tests of each sterilizer and washer, one line each. */
+/* Settings → Sterilization: the tests of each sterilizer and washer, a machine per row and a test per column. */
 html body .equipment-test-settings {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   margin: 12px 0;
   padding: 12px 14px;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
   background: var(--c-white);
 }
-html body .equipment-test-settings header {
+html body .equipment-test-settings header > div {
   display: grid;
   gap: 2px;
 }
 html body .equipment-test-settings header small {
   color: var(--c-gray-45);
 }
-html body .equipment-test-settings ul {
+html body .equipment-test-group {
   display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  gap: 8px;
+  justify-items: start;
 }
-html body .equipment-test-settings li {
-  display: grid;
-  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  border-top: 1px solid var(--c-gray-95);
+html body .equipment-test-group table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
 }
-html body .equipment-test-kinds {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-html body .equipment-test-kinds label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border: 1px solid var(--c-gray-90-2);
-  border-radius: 999px;
+html body .equipment-test-group th {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--c-gray-90);
+  color: var(--c-gray-45);
   font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
+  text-align: center;
 }
-html body .equipment-test-kinds label.on {
-  border-color: var(--c-cyan-35);
-  background: var(--c-gray-95-3);
+html body .equipment-test-group td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+  text-align: center;
+}
+html body .equipment-test-group th:first-child,
+html body .equipment-test-group td:first-child {
+  width: 34%;
+  text-align: left;
+}
+html body .equipment-test-group td:first-child {
+  font-weight: 700;
 }
 html body .equipment-test-print {
   display: inline-flex;
@@ -3211,9 +3227,4 @@ html body .equipment-test-print {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-}
-@media (max-width: 760px) {
-  html body .equipment-test-settings li {
-    grid-template-columns: 1fr;
-  }
 }

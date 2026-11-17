@@ -89,7 +89,7 @@ export default function OrganizationFields({
           </label>
         </div>
       )}
-      <fieldset className="studio-plan" disabled={readOnly}>
+      <fieldset className="studio-plan org-modules" disabled={readOnly}>
         <legend>{tr('Ενότητες')}</legend>
         {HOSPITAL_MODULES.map(m => (
           <label key={m.id} className={modules.includes(m.id) ? 'active' : ''}>

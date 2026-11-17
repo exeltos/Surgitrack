@@ -708,9 +708,11 @@ html body .load-modal .load-modal-body {
   overflow: hidden;
 }
 html body .load-modal .load-assets {
-  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 html body .load-modal .load-assets-list {
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
 }
@@ -965,8 +967,6 @@ html body .delivery-batch-modal .handover-signature-row input {
 }
 html body .receipt-card-modal.workflow-modal.workflow-checkpoint-modal.workflow-checkpoint-modal,
 html body .receipt-card-modal.workflow-modal.workflow-modal-delivery.workflow-modal-delivery,
-html body .receipt-card-modal.workflow-modal.load-modal.washer-load,
-html body .receipt-card-modal.workflow-modal.load-modal.sterilizer-load,
 html body .receipt-card-modal.workflow-modal.load-release-modal {
   height: auto !important;
   min-height: 0;
@@ -2663,11 +2663,13 @@ html body .load-modal.sterilizer-load .cycle-clean-fields {
 html body .load-modal.washer-load .cycle-clean-fields {
   grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 0.7fr) minmax(0, 0.7fr);
 }
+/* The list takes the dialog's free height, so many instruments show at once. */
 html body .load-modal .load-assets {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
+  min-height: 120px;
 }
 html body .load-modal .load-assets-list {
-  max-height: 420px;
+  max-height: none;
 }
 html body .load-modal .load-finish-row {
   display: flex;

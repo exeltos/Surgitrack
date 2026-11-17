@@ -1,10 +1,13 @@
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {ChevronRight, FlaskConical} from 'lucide-react';
+import {ChevronRight, FlaskConical, Printer} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useAppPreferences} from '../../../core/AppPreferences';
 import {testsInUse, itemTestsState} from '../../../core/equipmentTests';
+import {useSurgi} from '../../../store/SurgiStore';
+import {printDocumentInWindow} from '../printUtils';
+import {dailyTestLogHtml} from '../printTestLog';
 import {trData} from '../../../i18n';
 import {useTestDeviceSync} from '../../devices/useTestDeviceSync';
 import SterilizerTestRow from './SterilizerTestRow';
@@ -45,6 +48,7 @@ export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const [message, setMessage] = useState<{text: string; warning: boolean}>();
   const [open, setOpen] = useState(false);
+  const {organizationName} = useSurgi();
   useTestDeviceSync();
 
   const inUse = testsInUse(sterilizers);
@@ -169,6 +173,21 @@ export default function SterilizerTests({equipment = 'sterilizers'}: {equipment?
                       ).replace('{0}', title)
                     : ''}
                 </span>
+                {/* The day's sheet of all of them: today's results and who did them filled in, a box per test for its indicator. */}
+                <AppButton
+                  type="button"
+                  icon={<Printer size={15} />}
+                  onClick={() =>
+                    printDocumentInWindow(
+                      washer
+                        ? L('Ημερήσιο έντυπο δοκιμών πλυντηρίων', 'Daily washer test sheet')
+                        : L('Ημερήσιο έντυπο δοκιμών κλιβάνων', 'Daily sterilizer test sheet'),
+                      dailyTestLogHtml(organizationName || '', sterilizers, type),
+                    )
+                  }
+                >
+                  {L('Ημερήσιο έντυπο', 'Daily sheet')}
+                </AppButton>
                 <AppButton variant={attention ? undefined : 'primary'} type="button" onClick={close} autoFocus>
                   {attention ? L('Αργότερα', 'Later') : L('Κλείσιμο', 'Close')}
                 </AppButton>
