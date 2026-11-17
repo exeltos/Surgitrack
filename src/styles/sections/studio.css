@@ -3120,10 +3120,8 @@ html body .hospital-profile > footer {
     grid-template-columns: 1fr;
   }
 }
-html body .hospital-stage-core {
-  margin-left: 8px;
-  color: var(--c-gray-45);
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 600;
+/* Settings → Sterilization / History: the flow's stages, rules and history, one under the other. */
+html body .settings-flow {
+  display: grid;
+  gap: 12px;
 }

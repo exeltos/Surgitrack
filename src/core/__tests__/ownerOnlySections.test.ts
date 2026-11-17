@@ -18,7 +18,8 @@ describe('the Studio sections only the platform owner works in', () => {
 
   it('cover exactly those entries of the hospital admin menu and of the platform owner menu', () => {
     const adminMenu = navigationFor('ADMIN').filter(item => isOwnerOnlyPath(item.to));
-    expect(adminMenu.map(item => item.label)).toEqual(['Ροή Αποστείρωσης', 'Ρόλοι & δικαιώματα']);
+    // A hospital's sterilization flow is in its Settings now; only the template keeps a page of its own.
+    expect(adminMenu.map(item => item.label)).toEqual(['Ρόλοι & δικαιώματα']);
     expect(ownerNavigation.filter(item => isOwnerOnlyPath(item.to))).toHaveLength(2);
   });
 });

@@ -18,11 +18,10 @@ describe('Settings → Hospital', () => {
     expect(screen.queryByText('Στάδια αποστείρωσης')).not.toBeInTheDocument();
   });
 
-  it('gives the platform owner the name, use, modules and stages together', async () => {
+  it('gives the platform owner the name, use and modules', async () => {
     identity.current = {id: 'owner', platform: true};
     renderPage(<HospitalProfile actor="Owner" />, {path: '/studio'});
     expect(await screen.findByText('Ενότητες')).toBeInTheDocument();
-    expect(screen.getByText('Στάδια αποστείρωσης')).toBeInTheDocument();
     expect(screen.getByText('Χρήση')).toBeInTheDocument();
     expect(screen.getByLabelText('Διεύθυνση')).toBeInTheDocument();
   });

@@ -5,21 +5,27 @@ import PlatformContactSettings, {PublicContactSettings} from '../PlatformContact
 import LabelSettingsCard from '../LabelSettingsCard';
 import HospitalProfile from '../HospitalProfile';
 import type {StudioPageState} from '../useStudioPage';
-import {isPlatformOnly} from '../../../core/platformOnly';
+import {isPlatformOnly, isPlatformOwner} from '../../../core/platformOnly';
+import WorkflowTab from './WorkflowTab';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
 import {DEFAULT_IDLE_LOCK_MINUTES, IDLE_LOCK_OPTIONS, type ReminderEmails} from '../../../core/libraryTypes';
 
 export default function SystemTab({s}: {s: StudioPageState}) {
   const {L, currentUser, libs, platformAdmin, setConfirm, tab} = s;
-  // Settings by category: only one category is on screen at a time.
-  // Inside a hospital, its own details come first; the owner outside one has no hospital to show.
-  // The owner inside a hospital (not viewing as someone) is still the owner: outside one means no open hospital.
+  // Settings by category, one on screen at a time. Inside a hospital everything about it is here: the hospital, its
+  // sterilization (stages and rules: the platform owner's), labels, general settings and the flow's history. The
+  // owner with no hospital open (the template) keeps the flow on its own page.
   const outside = isPlatformOnly();
-  const [group, setGroup] = useState<'HOSPITAL' | 'GENERAL' | 'STERILIZATION'>(outside ? 'GENERAL' : 'HOSPITAL');
-  const groups = [
+  const owner = isPlatformOwner();
+  const flow = owner && !outside;
+  type Group = 'HOSPITAL' | 'STERILIZATION' | 'LABELS' | 'GENERAL' | 'HISTORY';
+  const [group, setGroup] = useState<Group>(outside ? 'GENERAL' : 'HOSPITAL');
+  const groups: Array<{id: Group; label: string}> = [
     ...(outside ? [] : [{id: 'HOSPITAL' as const, label: L('Νοσοκομείο', 'Hospital')}]),
-    {id: 'GENERAL' as const, label: L('Γενικά', 'General')},
-    {id: 'STERILIZATION' as const, label: L('Αποστείρωση & ετικέτες', 'Sterilization & labels')},
+    {id: 'STERILIZATION', label: L('Αποστείρωση', 'Sterilization')},
+    {id: 'LABELS', label: L('Ετικέτες', 'Labels')},
+    {id: 'GENERAL', label: L('Γενικά', 'General')},
+    ...(flow ? [{id: 'HISTORY' as const, label: L('Ιστορικό', 'History')}] : []),
   ];
   return (
     <>
@@ -43,164 +49,185 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             ))}
           </div>
           {group === 'HOSPITAL' && <HospitalProfile actor={currentUser.name} />}
-          <div className="studio-system-grid" hidden={group === 'HOSPITAL'}>
-            {group === 'GENERAL' && (
-              <section>
-                {platformAdmin && libs.dataMode === 'PRODUCTION' && (
-                  <>
-                    <PublicContactSettings L={L} />
-                    <PlatformContactSettings L={L} />
-                  </>
-                )}
-                <label>
-                  {L('Προειδοποίηση υπολοίπου χρήσεων', 'Remaining-use warning')}
-                  <div className="studio-setting-input">
-                    <input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={libs.systemSettings.usageWarningThreshold}
-                      onChange={e =>
-                        libs.updateSystemSettings(
-                          {
-                            usageWarningThreshold: Math.max(1, Math.min(20, Number(e.target.value) || 1)),
-                          },
-                          currentUser.name,
-                        )
-                      }
-                    />
-                    <span>{L('χρήσεις', 'uses')}</span>
-                  </div>
-                  <small>
-                    {L(
-                      'Εφαρμόζεται στις ειδοποιήσεις και στις καρτέλες περιορισμένων χρήσεων.',
-                      'Applied to alerts and limited-use asset cards.',
-                    )}
-                  </small>
-                </label>
-                <label>
-                  {L('Κλείδωμα οθόνης μετά από αδράνεια', 'Screen lock after inactivity')}
-                  <div className="studio-setting-input">
-                    <select
-                      value={libs.systemSettings.idleLockMinutes ?? DEFAULT_IDLE_LOCK_MINUTES}
-                      onChange={e =>
-                        libs.updateSystemSettings({idleLockMinutes: Number(e.target.value)}, currentUser.name)
-                      }
-                    >
-                      {IDLE_LOCK_OPTIONS.map(minutes => (
-                        <option key={minutes} value={minutes}>
-                          {minutes ? L(`${minutes} λεπτά`, `${minutes} minutes`) : L('Ποτέ', 'Never')}
+          {/* The flow's own parts, laid out as on its page (that page's styles apply under this class). */}
+          {flow && group === 'STERILIZATION' && (
+            <div className="studio-body-workflow settings-flow">
+              <WorkflowTab s={s} only="STAGES" />
+              <WorkflowTab s={s} only="POLICIES" />
+            </div>
+          )}
+          {flow && group === 'HISTORY' && (
+            <div className="studio-body-workflow settings-flow">
+              <WorkflowTab s={s} only="HISTORY" />
+            </div>
+          )}
+          {(group === 'GENERAL' || group === 'STERILIZATION' || group === 'LABELS') && (
+            <div className="studio-system-grid">
+              {group === 'GENERAL' && (
+                <section>
+                  {platformAdmin && libs.dataMode === 'PRODUCTION' && (
+                    <>
+                      <PublicContactSettings L={L} />
+                      <PlatformContactSettings L={L} />
+                    </>
+                  )}
+                  <label>
+                    {L('Προειδοποίηση υπολοίπου χρήσεων', 'Remaining-use warning')}
+                    <div className="studio-setting-input">
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={libs.systemSettings.usageWarningThreshold}
+                        onChange={e =>
+                          libs.updateSystemSettings(
+                            {
+                              usageWarningThreshold: Math.max(1, Math.min(20, Number(e.target.value) || 1)),
+                            },
+                            currentUser.name,
+                          )
+                        }
+                      />
+                      <span>{L('χρήσεις', 'uses')}</span>
+                    </div>
+                    <small>
+                      {L(
+                        'Εφαρμόζεται στις ειδοποιήσεις και στις καρτέλες περιορισμένων χρήσεων.',
+                        'Applied to alerts and limited-use asset cards.',
+                      )}
+                    </small>
+                  </label>
+                  <label>
+                    {L('Κλείδωμα οθόνης μετά από αδράνεια', 'Screen lock after inactivity')}
+                    <div className="studio-setting-input">
+                      <select
+                        value={libs.systemSettings.idleLockMinutes ?? DEFAULT_IDLE_LOCK_MINUTES}
+                        onChange={e =>
+                          libs.updateSystemSettings({idleLockMinutes: Number(e.target.value)}, currentUser.name)
+                        }
+                      >
+                        {IDLE_LOCK_OPTIONS.map(minutes => (
+                          <option key={minutes} value={minutes}>
+                            {minutes ? L(`${minutes} λεπτά`, `${minutes} minutes`) : L('Ποτέ', 'Never')}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <small>
+                      {L(
+                        'Για κοινόχρηστα tablet και υπολογιστές: η οθόνη κλειδώνει και ξεκλειδώνει με το συνθηματικό του χρήστη· ο συγχρονισμός συνεχίζει από πίσω.',
+                        'For shared tablets and computers: the screen locks and unlocks with the user’s password; syncing goes on behind it.',
+                      )}
+                    </small>
+                  </label>
+                  <label>
+                    {L('Email υπενθυμίσεων κάθε πρωί', 'Reminder email every morning')}
+                    <div className="studio-setting-input">
+                      <select
+                        value={libs.systemSettings.reminderEmails || 'OFF'}
+                        onChange={e =>
+                          libs.updateSystemSettings(
+                            {reminderEmails: e.target.value as ReminderEmails},
+                            currentUser.name,
+                          )
+                        }
+                      >
+                        <option value="OFF">{L('Όχι', 'Off')}</option>
+                        <option value="ADMINS">{L('Στους διαχειριστές', 'To administrators')}</option>
+                        <option value="ADMINS_SUPERVISORS">
+                          {L(
+                            'Σε διαχειριστές και Προϊστάμενο Αποστείρωσης',
+                            'To administrators and the Sterilization supervisor',
+                          )}
                         </option>
-                      ))}
-                    </select>
-                  </div>
-                  <small>
-                    {L(
-                      'Για κοινόχρηστα tablet και υπολογιστές: η οθόνη κλειδώνει και ξεκλειδώνει με το συνθηματικό του χρήστη· ο συγχρονισμός συνεχίζει από πίσω.',
-                      'For shared tablets and computers: the screen locks and unlocks with the user’s password; syncing goes on behind it.',
-                    )}
-                  </small>
-                </label>
-                <label>
-                  {L('Email υπενθυμίσεων κάθε πρωί', 'Reminder email every morning')}
-                  <div className="studio-setting-input">
-                    <select
-                      value={libs.systemSettings.reminderEmails || 'OFF'}
-                      onChange={e =>
-                        libs.updateSystemSettings({reminderEmails: e.target.value as ReminderEmails}, currentUser.name)
-                      }
-                    >
-                      <option value="OFF">{L('Όχι', 'Off')}</option>
-                      <option value="ADMINS">{L('Στους διαχειριστές', 'To administrators')}</option>
-                      <option value="ADMINS_SUPERVISORS">
-                        {L(
-                          'Σε διαχειριστές και Προϊστάμενο Αποστείρωσης',
-                          'To administrators and the Sterilization supervisor',
-                        )}
-                      </option>
-                    </select>
-                  </div>
-                  <small>
-                    {L(
-                      'Περίπου 8 το πρωί, μόνο όταν κάτι περιμένει: λήξεις αποστείρωσης, έτοιμα που δεν παραλήφθηκαν, σταλμένα χωρίς παραλαβή, εκκρεμότητες άνω της εβδομάδας, συσκευές χωρίς δεδομένα. Χωρίς στοιχεία ασθενών.',
-                      'Around 8 in the morning, only when something is waiting: sterile dates ending, ready items not collected, sent items not received, issues open over a week, devices not reporting. No patient data.',
-                    )}
-                  </small>
-                </label>
-                <label>
-                  {L('Οδηγοί οθόνης', 'Screen guides')}
-                  {/* Two values only: a switch, not a list. */}
-                  <div className="studio-setting-input studio-setting-switch">
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      checked={libs.systemSettings.screenGuides !== false}
-                      onChange={e => libs.updateSystemSettings({screenGuides: e.target.checked}, currentUser.name)}
-                    />
-                    <span aria-hidden="true"></span>
-                    <b>
-                      {libs.systemSettings.screenGuides !== false
-                        ? L('Εμφανίζονται', 'Shown')
-                        : L('Δεν εμφανίζονται', 'Not shown')}
-                    </b>
-                  </div>
-                  <small>
-                    {L(
-                      'Το κουμπί «Οδηγός οθόνης» στην πάνω μπάρα: τι κάνει η οθόνη και τα πρώτα βήματα, όποτε τον ζητήσει ο χρήστης. Για τα τμήματα, την Αποστείρωση και τον διαχειριστή του νοσοκομείου.',
-                      'The «Screen guide» button in the top bar: what the screen does and the first steps, whenever the user asks. For departments, Sterilization and the hospital admin.',
-                    )}
-                  </small>
-                </label>
-                {/* Only in Demo: in a real hospital the libraries are the hospital's, saved for everyone, and a
+                      </select>
+                    </div>
+                    <small>
+                      {L(
+                        'Περίπου 8 το πρωί, μόνο όταν κάτι περιμένει: λήξεις αποστείρωσης, έτοιμα που δεν παραλήφθηκαν, σταλμένα χωρίς παραλαβή, εκκρεμότητες άνω της εβδομάδας, συσκευές χωρίς δεδομένα. Χωρίς στοιχεία ασθενών.',
+                        'Around 8 in the morning, only when something is waiting: sterile dates ending, ready items not collected, sent items not received, issues open over a week, devices not reporting. No patient data.',
+                      )}
+                    </small>
+                  </label>
+                  <label>
+                    {L('Οδηγοί οθόνης', 'Screen guides')}
+                    {/* Two values only: a switch, not a list. */}
+                    <div className="studio-setting-input studio-setting-switch">
+                      <input
+                        type="checkbox"
+                        role="switch"
+                        checked={libs.systemSettings.screenGuides !== false}
+                        onChange={e => libs.updateSystemSettings({screenGuides: e.target.checked}, currentUser.name)}
+                      />
+                      <span aria-hidden="true"></span>
+                      <b>
+                        {libs.systemSettings.screenGuides !== false
+                          ? L('Εμφανίζονται', 'Shown')
+                          : L('Δεν εμφανίζονται', 'Not shown')}
+                      </b>
+                    </div>
+                    <small>
+                      {L(
+                        'Το κουμπί «Οδηγός οθόνης» στην πάνω μπάρα: τι κάνει η οθόνη και τα πρώτα βήματα, όποτε τον ζητήσει ο χρήστης. Για τα τμήματα, την Αποστείρωση και τον διαχειριστή του νοσοκομείου.',
+                        'The «Screen guide» button in the top bar: what the screen does and the first steps, whenever the user asks. For departments, Sterilization and the hospital admin.',
+                      )}
+                    </small>
+                  </label>
+                  {/* Only in Demo: in a real hospital the libraries are the hospital's, saved for everyone, and a
                 reset here would empty them for every user. */}
-                {libs.dataMode === 'DEMO' && (
-                  <AppButton
-                    onClick={() =>
-                      setConfirm({
-                        title: L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?'),
-                        message: L(
-                          'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
-                          'Initial libraries and demo users will be restored.',
-                        ),
-                        action: libs.resetData,
-                      })
-                    }
-                  >
-                    <RefreshCcw size={16} />
-                    {L('Επαναφορά demo δεδομένων', 'Reset demo data')}
-                  </AppButton>
-                )}
-              </section>
-            )}
-            {group === 'STERILIZATION' && (
-              <section>
-                <label>
-                  {L('Διάρκεια αποστείρωσης (προεπιλογή)', 'Sterile shelf life (default)')}
-                  <div className="studio-setting-input">
-                    <select
-                      value={libs.systemSettings.sterileShelfLifeMonths || DEFAULT_SHELF_LIFE}
-                      onChange={e =>
-                        libs.updateSystemSettings({sterileShelfLifeMonths: Number(e.target.value)}, currentUser.name)
+                  {libs.dataMode === 'DEMO' && (
+                    <AppButton
+                      onClick={() =>
+                        setConfirm({
+                          title: L('Επαναφορά demo ρυθμίσεων;', 'Reset demo settings?'),
+                          message: L(
+                            'Θα επανέλθουν οι αρχικές βιβλιοθήκες και οι demo χρήστες.',
+                            'Initial libraries and demo users will be restored.',
+                          ),
+                          action: libs.resetData,
+                        })
                       }
                     >
-                      {SHELF_LIFE_OPTIONS.map(months => (
-                        <option key={months} value={months}>
-                          {L(`${months} μήνες`, `${months} months`)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <small>
-                    {L(
-                      'Προτείνεται στη Συσκευασία και αλλάζει ανά Σετ ή εργαλείο. Μετρά από την αποδέσμευση.',
-                      'Suggested at Packaging & Labelling and changeable per Set or instrument. Counted from the release.',
-                    )}
-                  </small>
-                </label>
-                <LabelSettingsCard L={L} />
-              </section>
-            )}
-          </div>
+                      <RefreshCcw size={16} />
+                      {L('Επαναφορά demo δεδομένων', 'Reset demo data')}
+                    </AppButton>
+                  )}
+                </section>
+              )}
+              {group === 'STERILIZATION' && (
+                <section>
+                  <label>
+                    {L('Διάρκεια αποστείρωσης (προεπιλογή)', 'Sterile shelf life (default)')}
+                    <div className="studio-setting-input">
+                      <select
+                        value={libs.systemSettings.sterileShelfLifeMonths || DEFAULT_SHELF_LIFE}
+                        onChange={e =>
+                          libs.updateSystemSettings({sterileShelfLifeMonths: Number(e.target.value)}, currentUser.name)
+                        }
+                      >
+                        {SHELF_LIFE_OPTIONS.map(months => (
+                          <option key={months} value={months}>
+                            {L(`${months} μήνες`, `${months} months`)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <small>
+                      {L(
+                        'Προτείνεται στη Συσκευασία και αλλάζει ανά Σετ ή εργαλείο. Μετρά από την αποδέσμευση.',
+                        'Suggested at Packaging & Labelling and changeable per Set or instrument. Counted from the release.',
+                      )}
+                    </small>
+                  </label>
+                </section>
+              )}
+              {group === 'LABELS' && (
+                <section>
+                  <LabelSettingsCard L={L} />
+                </section>
+              )}
+            </div>
+          )}
         </>
       )}
     </>

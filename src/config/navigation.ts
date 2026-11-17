@@ -115,13 +115,7 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
     {to: '/studio?tab=platform', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'ADMIN'},
     // The hospital's Studio sections are menu entries of their own (they were four tabs in one page).
     {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'SETTINGS'},
-    {
-      to: '/studio?tab=workflow',
-      label: 'Ροή Αποστείρωσης',
-      icon: Layers3,
-      permission: 'studio.manage',
-      group: 'SETTINGS',
-    },
+    // The hospital's sterilization flow (stages, rules, history) is part of its Settings.
     {
       to: '/studio?tab=roles',
       label: 'Ρόλοι & δικαιώματα',

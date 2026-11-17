@@ -8,7 +8,13 @@ import {workflowStageState, type WorkflowStageConfig} from '../../../core/workfl
 import type {AssetState} from '../../../types/domain';
 import {formatDateTime} from '../../../core/displayDate';
 
-export default function WorkflowTab({s}: {s: StudioPageState}) {
+type FlowGroup = 'STAGES' | 'POLICIES' | 'HISTORY';
+
+/**
+ * The sterilization flow: its stages, the rules around them and their history. On its own page for the template
+ * (the owner with no hospital open); inside a hospital each part is a tab of Settings (`only`).
+ */
+export default function WorkflowTab({s, only}: {s: StudioPageState; only?: FlowGroup}) {
   const {L, currentUser, handleResetSterilizationWorkflow, lang, libs, tab} = s;
   // The template's stages, set by the owner with no hospital open; a hospital's are in Settings → Hospital.
   const template = isPlatformOnly();
@@ -21,7 +27,8 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   const {sets, tools, advanceStageItems} = useSurgi();
   // The page by category: the stages (the template's), the rules around them, or their history.
   // Inside a hospital its stages are the platform owner's, in Settings → Hospital; here the owner sets the template.
-  const [group, setGroup] = useState<'STAGES' | 'POLICIES' | 'HISTORY'>(template ? 'STAGES' : 'POLICIES');
+  const [chosen, setGroup] = useState<FlowGroup>(template ? 'STAGES' : 'POLICIES');
+  const group = only || chosen;
   const groups = [
     ...(template ? [{id: 'STAGES' as const, label: L('Στάδια', 'Stages')}] : []),
     {id: 'POLICIES' as const, label: L('Κανόνες', 'Rules')},
@@ -58,21 +65,23 @@ export default function WorkflowTab({s}: {s: StudioPageState}) {
   };
   return (
     <>
-      {tab === 'WORKFLOW' && (
+      {(only || tab === 'WORKFLOW') && (
         <div className="studio-workflow-page" data-group={group}>
-          <div className="settings-categories" role="group" aria-label={L('Κατηγορίες ροής', 'Flow categories')}>
-            {groups.map(g => (
-              <button
-                key={g.id}
-                type="button"
-                className={`settings-category ${group === g.id ? 'active' : ''}`}
-                aria-pressed={group === g.id}
-                onClick={() => setGroup(g.id)}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
+          {!only && (
+            <div className="settings-categories" role="group" aria-label={L('Κατηγορίες ροής', 'Flow categories')}>
+              {groups.map(g => (
+                <button
+                  key={g.id}
+                  type="button"
+                  className={`settings-category ${group === g.id ? 'active' : ''}`}
+                  aria-pressed={group === g.id}
+                  onClick={() => setGroup(g.id)}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="studio-workflow-side">
             {group === 'STAGES' && (
               <section className="studio-workflow-policy">
