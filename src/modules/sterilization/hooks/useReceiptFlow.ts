@@ -1,6 +1,6 @@
 import type {Asset, ReceiptCheckResult} from '../../../types/domain';
 import {handoverCheck, signatureExempt} from '../../../core/handoverPolicy';
-import {electronicDispatch} from '../../../core/electronicDispatch';
+import {electronicDispatch, latestDispatches, type Dispatch} from '../../../core/electronicDispatch';
 import {tr, trData} from '../../../i18n';
 import type {Kind, SterilizationRow} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
@@ -96,7 +96,12 @@ export function useReceiptFlow(
     receiptBatchSignatureFree ||
     (!!receiptBatchDeliverer && (receiptBatchDelivererMatches || receiptBatchDepartmentException));
   /** Who hands over: the one who signed, else (no signature asked) whoever sent it electronically. */
-  const handoverFrom = (barcode: string, department: string, signer: typeof deliverer) => {
+  const handoverFrom = (
+    barcode: string,
+    department: string,
+    signer: typeof deliverer,
+    dispatches?: ReadonlyMap<string, Dispatch>,
+  ) => {
     if (signer)
       return {
         handoverSignatureId: signer.signatureId,
@@ -105,7 +110,7 @@ export function useReceiptFlow(
         deliveredByDepartment: signer.department,
         unsigned: '',
       };
-    const sent = electronicDispatch(movements, barcode);
+    const sent = dispatches ? dispatches.get(barcode) : electronicDispatch(movements, barcode);
     return {
       handoverSignatureId: undefined,
       deliveredByUserId: '',
@@ -207,10 +212,12 @@ export function useReceiptFlow(
     if (!receiptBatchSignatureFree && !signer) return;
     const mismatch = !!signer && !receiptBatchDelivererMatches;
     const batchId = `RB-${Date.now()}`;
+    // The history read once for the whole batch, not once per item.
+    const dispatches = signer ? undefined : latestDispatches(movements);
     receiptBatchAssets.forEach(item => {
       const key = `${item.kind}:${item.id}`;
       const expected = item.kind === 'SET' ? tools.filter(t => t.setId === item.id).length : undefined;
-      const {unsigned, ...from} = handoverFrom(item.barcode, item.department || '', signer);
+      const {unsigned, ...from} = handoverFrom(item.barcode, item.department || '', signer, dispatches);
       receiveAtSterilization(item.kind, item.id, {
         batchId,
         ...from,

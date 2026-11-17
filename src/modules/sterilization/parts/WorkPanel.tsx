@@ -4,7 +4,7 @@ import SortHeader from '../../../components/ui/SortHeader';
 import {useTableSort} from '../../../components/ui/useTableSort';
 import {loadLabel} from '../../../core/loadLabel';
 import {signatureExempt} from '../../../core/handoverPolicy';
-import {electronicDispatch} from '../../../core/electronicDispatch';
+import {latestDispatches} from '../../../core/electronicDispatch';
 import {useSurgi} from '../../../store/SurgiStore';
 import {useLibraries} from '../../../core/LibraryStore';
 import {useEffect, useMemo, useState} from 'react';
@@ -58,6 +58,8 @@ const reprocessText = (again: ReprocessReason) =>
 export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const {counts, stageReturnInfo, sterilizationCycles, sterilizationReleases, processLoads, movements} = useSurgi();
   const receiptPolicy = useLibraries().sterilizationWorkflow.receiptPolicy;
+  // Who sent each item electronically, gathered once from the history (each row then looks itself up).
+  const dispatches = useMemo(() => latestDispatches(movements), [movements]);
   const [returning, setReturning] = useState<{
     kind: SterilizationRow['kind'];
     id: string;
@@ -414,7 +416,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         // A physical handover (signed) still to come, or a department that only sends electronically.
                         if (!signatureExempt(x.department, receiptPolicy, 'RECEIPT'))
                           return <span className="ster-handover pending">{tr('Εκκρεμεί φυσική παράδοση')}</span>;
-                        const sent = electronicDispatch(movements, x.barcode);
+                        const sent = dispatches.get(x.barcode);
                         return (
                           <span className="ster-handover electronic" title={sent?.at}>
                             {sent ? tr('Ηλεκτρονικά · {0}', trData(sent.by)) : tr('Ηλεκτρονική αποστολή')}
