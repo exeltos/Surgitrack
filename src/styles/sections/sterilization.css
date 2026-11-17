@@ -569,10 +569,6 @@ html body .load-release-modal .load-manifest > strong {
 html body .load-release-modal .load-manifest > div {
   padding: 10px 12px;
 }
-html body .load-release-modal .release-tests {
-  grid-column: 2;
-  margin: 0;
-}
 html body .load-release-modal .cycle-note {
   grid-column: 1;
   margin: 0;
@@ -634,7 +630,35 @@ html body .load-release-modal .release-check-card .receipt-section-title {
   gap: 10px;
 }
 html body .load-release-modal .load-manifest > div {
-  grid-template-columns: 84px minmax(0, 1fr) minmax(70px, 120px);
+  grid-template-columns: 84px minmax(0, 1fr) minmax(70px, 120px) auto;
+  align-items: center;
+}
+/* An item failed at release: marked, and it goes back to reprocessing on its own. */
+html body .load-release-modal .load-manifest > div.failed {
+  background: var(--c-amber-95);
+}
+html body .load-release-modal .load-manifest > div.failed b {
+  text-decoration: line-through;
+}
+html body .release-item-fail {
+  padding: 3px 10px;
+  border: 1px solid var(--c-gray-90-2);
+  border-radius: 8px;
+  background: var(--c-white);
+  color: var(--c-gray-45);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+html body .release-item-fail.on {
+  border-color: var(--c-red-40);
+  color: var(--c-red-40);
+}
+html body .release-failed-count {
+  margin-left: 8px;
+  color: var(--c-red-40);
+  font-style: normal;
 }
 html body .load-release-modal .load-manifest > div b {
   min-width: 0;
@@ -2242,23 +2266,6 @@ html body .ster-tests-card footer {
   background: var(--c-amber-95);
   color: var(--c-red-40);
 }
-.release-tests {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 10px 14px;
-  border: 1px solid var(--c-gray-90-3);
-  border-radius: 12px;
-}
-.release-tests .receipt-section-title {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-.release-tests .release-indicator-hint.bad {
-  color: var(--c-red-40);
-}
 .ster-tests-message.warning {
   color: var(--c-red-40);
 }
@@ -3018,4 +3025,24 @@ html body .sent-by {
   color: var(--c-cyan-30);
   font-weight: 600;
   white-space: nowrap;
+}
+/* The department's note with the dispatch: in the queue rows and the stage dialogs. */
+html body .ster-dispatch-note,
+html body .sent-note {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+  font-size: 11.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .sent-note {
+  margin-left: 8px;
+  white-space: normal;
 }

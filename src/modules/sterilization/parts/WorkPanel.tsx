@@ -411,6 +411,15 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         {assetIssues.length} {assetIssues.length === 1 ? tr('ανοικτή') : tr('ανοικτές')}
                       </span>
                     )}
+                    {(() => {
+                      // The department's note with the dispatch, at every stage until it goes back.
+                      const note = dispatches.get(x.barcode)?.note;
+                      return note ? (
+                        <span className="ster-dispatch-note" title={note}>
+                          {note}
+                        </span>
+                      ) : null;
+                    })()}
                     {queue === 'INCOMING' &&
                       (() => {
                         // A physical handover (signed) still to come, or a department that only sends electronically.

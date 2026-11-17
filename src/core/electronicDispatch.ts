@@ -3,7 +3,8 @@ import {movementStamp} from './movementTime';
 
 const DISPATCH = /^(ηλεκτρονική αποστολή|αποστολή προς αποστείρωση)/i;
 
-export type Dispatch = {by: string; at: string; department: string};
+/** Who sent it, when, from where, and the department's note with it («θα το θέλαμε σε 2 ώρες»). */
+export type Dispatch = {by: string; at: string; department: string; note?: string};
 
 /**
  * Each Set's or instrument's latest electronic dispatch to Sterilization (who sent it and when), by barcode, not
@@ -22,7 +23,8 @@ export function latestDispatches(movements: readonly Movement[]) {
     if (!seen || (movementStamp(m.at) || 0) > (movementStamp(seen.at) || 0)) latest.set(barcode, m);
   }
   const index = new Map<string, Dispatch>();
-  for (const [barcode, m] of latest) index.set(barcode, {by: m.by, at: m.at, department: m.from});
+  for (const [barcode, m] of latest)
+    index.set(barcode, {by: m.by, at: m.at, department: m.from, ...(m.note?.trim() ? {note: m.note.trim()} : {})});
   return index;
 }
 

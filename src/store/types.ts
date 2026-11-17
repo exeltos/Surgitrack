@@ -155,6 +155,11 @@ export type ReleaseProcessLoadPayload = {
   biologicalIndicatorResult: BiologicalIndicatorResult;
   decision: 'RELEASED' | 'REPROCESS';
   note?: string;
+  /**
+   * Released, but these Sets or instruments failed («SET:id», «TOOL:id»: a wet or torn pack, say): they go back to
+   * reprocessing on their own, the rest of the load is released.
+   */
+  failedItems?: string[];
 };
 
 export type WorkflowCheckpointPayload = {

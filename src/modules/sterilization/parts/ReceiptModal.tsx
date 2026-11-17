@@ -3,6 +3,7 @@ import {CheckCircle2, TriangleAlert, UserRoundCheck, X, IdCard} from 'lucide-rea
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
 import NoSignature from './NoSignature';
+import SentBy from './SentBy';
 import type {SterilizationPageState} from '../useSterilizationPage';
 import {formatDateTime} from '../../../core/displayDate';
 
@@ -59,6 +60,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                 {/* Where it comes from, when and who receives it: one line instead of a card of four boxes. */}
                 <p>
                   {trData(receiptDraft.asset.department)} {tr('→ Κεντρική Αποστείρωση')} · {formatDateTime()} ·{' '}
+                  <SentBy barcode={receiptDraft.asset.barcode} />{' '}
                   <span className="receipt-receiver">
                     {tr('Παραλαμβάνει:')} <b>{trData(currentUser.name)}</b>
                   </span>

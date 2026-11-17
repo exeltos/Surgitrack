@@ -178,9 +178,11 @@ export function useLoadFlow(
     setReleaseLoadBi('NOT_REQUIRED');
     setReleaseLoadNote('');
   };
-  const completeLoadRelease = (decision: 'RELEASED' | 'REPROCESS') => {
+  /** Releases the load (but the items marked failed, which go back to reprocessing), or rejects it whole. */
+  const completeLoadRelease = (decision: 'RELEASED' | 'REPROCESS', failedItems: string[] = []) => {
     if (!releaseLoadId) return;
     const done = releaseProcessLoad(releaseLoadId, {
+      failedItems,
       ...releaseLoadChecks,
       chemicalIndicatorOk: releaseLoadChem === 'PASS',
       chemicalIndicatorResult: releaseLoadChem,
