@@ -2043,7 +2043,7 @@ html body .batch-department button.clear:hover {
 }
 .equipment-rows .row-test.ok {
   background: var(--c-green-90);
-  color: var(--c-green-45);
+  color: var(--c-green-35);
 }
 .equipment-rows .row-test.due {
   background: var(--c-amber-95);
