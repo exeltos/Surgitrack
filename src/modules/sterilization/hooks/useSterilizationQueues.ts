@@ -1,6 +1,7 @@
 import {useMemo} from 'react';
 import {tr} from '../../../i18n';
 import {effectiveState} from '../../../core/workflow';
+import {matchesUsage} from '../../../core/usageFilter';
 import type {AssetState} from '../../../types/domain';
 import type {Kind, SterilizationRow, AssetDraft} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
@@ -15,7 +16,9 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
     sets,
     specialtyFilter,
     sterilizationWorkflow,
+    systemSettings,
     tools,
+    usageFilter,
   } = p;
 
   // An item left in a stage since turned off in Studio shows (and is handled) in the next enabled stage.
@@ -68,6 +71,12 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
       (!departmentFilter || x.department === departmentFilter) &&
       (!specialtyFilter || x.specialty === specialtyFilter) &&
       (!kindFilter || x.kind === kindFilter) &&
+      // A Set by its own limit and its instruments' (as in the Sets list), an instrument by its own.
+      matchesUsage(
+        usageFilter,
+        x.kind === 'SET' ? [x, ...tools.filter(t => t.setId === x.id)] : [x],
+        systemSettings.usageWarningThreshold,
+      ) &&
       `${x.barcode} ${x.name} ${x.code || ''} ${x.department || ''} ${x.specialty || ''}`
         .toLowerCase()
         .includes(query.toLowerCase()),

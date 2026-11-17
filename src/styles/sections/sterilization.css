@@ -2959,3 +2959,50 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
     white-space: nowrap;
   }
 }
+html body .ster-handover {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+html body .ster-handover.pending {
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+}
+html body .ster-handover.electronic {
+  background: var(--c-gray-95-2);
+  color: var(--c-cyan-30);
+}
+html body .receipt-card-head .receipt-receiver {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c-cyan-90);
+  color: var(--c-blue-15);
+  font-size: 12px;
+}
+html body .no-signature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 11px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-30);
+}
+html body .no-signature div {
+  display: grid;
+  gap: 2px;
+}
+html body .no-signature strong {
+  color: var(--c-blue-15);
+  font-size: 13px;
+}
+html body .no-signature span {
+  color: var(--st-muted);
+  font-size: 11.5px;
+}

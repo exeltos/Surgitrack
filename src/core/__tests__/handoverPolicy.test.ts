@@ -1,5 +1,29 @@
 import {describe, expect, it} from 'vitest';
-import {handoverCheck, renameExemptDepartment} from '../handoverPolicy';
+import {handoverCheck, renameExemptDepartment, signatureExempt} from '../handoverPolicy';
+
+describe('signatureExempt', () => {
+  const policy = {
+    countSetsAtReceipt: false,
+    allowCrossDepartmentHandover: true,
+    allowCrossDepartmentDelivery: true,
+    receiptExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ'],
+    deliveryExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ'],
+  };
+
+  it('lets a listed department hand over and receive without a signature, at the stage it is listed in', () => {
+    expect(signatureExempt('ΧΕΙΡΟΥΡΓΕΙΟ', policy, 'RECEIPT')).toBe(true);
+    expect(signatureExempt('ΧΕΙΡΟΥΡΓΕΙΟ', policy, 'DELIVERY')).toBe(true);
+    expect(signatureExempt('ΜΕΘ', policy, 'DELIVERY')).toBe(true);
+    expect(signatureExempt('ΜΕΘ', policy, 'RECEIPT')).toBe(false);
+    expect(signatureExempt('ΤΕΠ', policy, 'RECEIPT')).toBe(false);
+    expect(signatureExempt(undefined, policy, 'RECEIPT')).toBe(false);
+  });
+
+  it('asks for the signature at a stage whose controlled handover is off', () => {
+    expect(signatureExempt('ΧΕΙΡΟΥΡΓΕΙΟ', {...policy, allowCrossDepartmentDelivery: false}, 'DELIVERY')).toBe(false);
+    expect(signatureExempt('ΧΕΙΡΟΥΡΓΕΙΟ', {...policy, allowCrossDepartmentHandover: false}, 'RECEIPT')).toBe(false);
+  });
+});
 
 describe('handoverCheck', () => {
   const policy = {
@@ -7,7 +31,7 @@ describe('handoverCheck', () => {
     allowCrossDepartmentHandover: true,
     allowCrossDepartmentDelivery: false,
     receiptExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ'],
-    deliveryExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΤΑΦΟΡΕΙΣ'],
+    deliveryExemptDepartments: ['ΧΕΙΡΟΥΡΓΕΙΟ'],
   };
 
   it('lets a person hand over and receive for their own department', () => {
@@ -15,19 +39,10 @@ describe('handoverCheck', () => {
     expect(handoverCheck('ΜΕΘ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('OK');
   });
 
-  it('lets an exempt department act for any department, with no reason, at the stage it is exempt in', () => {
-    const controlled = {...policy, allowCrossDepartmentDelivery: true};
-    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', controlled, 'RECEIPT')).toBe('OK');
-    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', controlled, 'DELIVERY')).toBe('OK');
-    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', controlled, 'DELIVERY')).toBe('OK');
-    expect(handoverCheck('ΜΕΤΑΦΟΡΕΙΣ', 'ΜΕΘ', controlled, 'RECEIPT')).toBe('REASON');
-  });
-
-  it('ignores the exemptions of a stage whose controlled handover is off', () => {
-    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', policy, 'DELIVERY')).toBe('BLOCKED');
-    expect(handoverCheck('ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΕΘ', {...policy, allowCrossDepartmentHandover: false}, 'RECEIPT')).toBe(
-      'BLOCKED',
-    );
+  it('asks no reason for a Set of a department without the check', () => {
+    expect(handoverCheck('ΜΕΘ', 'ΧΕΙΡΟΥΡΓΕΙΟ', policy, 'RECEIPT')).toBe('OK');
+    // Delivery is not controlled here, so the list does not count.
+    expect(handoverCheck('ΜΕΘ', 'ΧΕΙΡΟΥΡΓΕΙΟ', policy, 'DELIVERY')).toBe('BLOCKED');
   });
 
   it('asks a reason, or refuses, for another department, each way on its own setting', () => {
@@ -37,7 +52,7 @@ describe('handoverCheck', () => {
     expect(handoverCheck('ΜΕΘ', 'ΤΕΠ', {...policy, allowCrossDepartmentHandover: false}, 'RECEIPT')).toBe('BLOCKED');
   });
 
-  it('treats a person with no department as another department, never as exempt', () => {
+  it('treats a person with no department as another department', () => {
     expect(handoverCheck('', 'ΜΕΘ', policy, 'RECEIPT')).toBe('REASON');
     expect(handoverCheck(undefined, 'ΜΕΘ', policy, 'DELIVERY')).toBe('BLOCKED');
   });
@@ -55,7 +70,7 @@ describe('renameExemptDepartment', () => {
     const renamed = renameExemptDepartment(policy, 'ΜΕΘ', 'ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ');
     expect(renamed.receiptExemptDepartments).toEqual(['ΧΕΙΡΟΥΡΓΕΙΟ', 'ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ']);
     expect(renamed.deliveryExemptDepartments).toEqual(['ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ']);
-    expect(handoverCheck('ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ', 'ΧΕΙΡΟΥΡΓΕΙΟ', renamed, 'DELIVERY')).toBe('OK');
+    expect(signatureExempt('ΜΟΝΑΔΑ ΕΝΤΑΤΙΚΗΣ', renamed, 'DELIVERY')).toBe(true);
   });
   it('leaves a policy without the department as it is', () => {
     expect(renameExemptDepartment(policy, 'ΤΕΠ', 'ΕΠΕΙΓΟΝΤΑ')).toBe(policy);

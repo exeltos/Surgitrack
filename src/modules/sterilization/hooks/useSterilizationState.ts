@@ -27,6 +27,7 @@ export function useSterilizationState() {
     recordBiologicalResult,
     recallProcessLoad,
     processLoads,
+    movements,
     recallCases,
     issues,
     sterilizationCycles,
@@ -102,6 +103,7 @@ export function useSterilizationState() {
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState('');
   const [kindFilter, setKindFilter] = useState('');
+  const [usageFilter, setUsageFilter] = useState('');
   const [receiptDraft, setReceiptDraft] = useState<AssetDraft | null>(null);
   const [receiptView, setReceiptView] = useState<ReceiptRecord | null>(null);
   const [receiptBatchOpen, setReceiptBatchOpen] = useState(false);
@@ -270,6 +272,7 @@ export function useSterilizationState() {
     issueType,
     issues,
     kindFilter,
+    usageFilter,
     loadChemical,
     loadChemicalOn,
     loadBiologicalOn,
@@ -370,6 +373,7 @@ export function useSterilizationState() {
     setIssueTarget,
     setIssueType,
     setKindFilter,
+    setUsageFilter,
     setLoadChemical,
     setLoadChemicalOn,
     setLoadBiologicalOn,
@@ -435,6 +439,7 @@ export function useSterilizationState() {
     defaultSterilizerProgram,
     defaultWasher,
     systemSettings,
+    movements,
     tools,
     visibleDeviation,
   };

@@ -1,7 +1,14 @@
 /** English UI text, keyed by the Greek text shown in the Greek UI (see i18n/index.ts). */
 export const en: Record<string, string> = {
   'Υπογραφή παραδίδοντα': 'Signature of who hands over',
-  'Παραλαμβάνει: {0}': 'Received by: {0}',
+  'Παραλαμβάνει:': 'Received by:',
+  'Χωρίς υπογραφή': 'No signature',
+  'Ηλεκτρονική αποστολή: {0}': 'Sent electronically: {0}',
+  'Ηλεκτρονική αποστολή από {0}': 'Sent electronically by {0}',
+  'Παράδοση στο {0}': 'Delivery to {0}',
+  'Χωρίς υπογραφή · τμήμα χωρίς έλεγχο': 'No signature · department without the check',
+  'Εκκρεμεί φυσική παράδοση': 'Physical handover pending',
+  'Ηλεκτρονικά · {0}': 'Electronically · {0}',
   '{0} · κύκλος {1}': '{0} · cycle {1}',
   'Έλεγχος ποιότητας': 'Quality gate',
   'Χωρίς πλυντήριο': 'Without a washer',

@@ -1,9 +1,25 @@
 import type {SterilizationReceiptPolicy} from './workflow';
 
 /**
+ * Whether a department's Sets and instruments go through a stage without a signature: the hospital listed it among
+ * the departments without the check at that stage (the theatre, say), while that stage's controlled handover is on.
+ * The receipt then records who sent them electronically; the delivery, the department itself.
+ */
+export function signatureExempt(
+  itemDepartment: string | undefined,
+  policy: Partial<SterilizationReceiptPolicy> | undefined,
+  at: 'RECEIPT' | 'DELIVERY',
+) {
+  const controlled =
+    at === 'RECEIPT' ? (policy?.allowCrossDepartmentHandover ?? true) : !!policy?.allowCrossDepartmentDelivery;
+  const list = at === 'RECEIPT' ? policy?.receiptExemptDepartments : policy?.deliveryExemptDepartments;
+  return controlled && !!itemDepartment && !!list?.includes(itemDepartment);
+}
+
+/**
  * Whether a person may hand over (at receipt) or receive (at delivery) a Set of a department: «OK» when it is their
- * own department or theirs is exempt at that stage while it is controlled (the theatre, the porters…), «REASON» when another department is allowed with
- * a written reason, «BLOCKED» when it is not allowed at all.
+ * own department or the Set's department needs no signature at that stage, «REASON» when another department is
+ * allowed with a written reason, «BLOCKED» when it is not allowed at all.
  */
 export type HandoverCheck = 'OK' | 'REASON' | 'BLOCKED';
 
@@ -13,15 +29,12 @@ export function handoverCheck(
   policy: Partial<SterilizationReceiptPolicy> | undefined,
   at: 'RECEIPT' | 'DELIVERY',
 ): HandoverCheck {
-  // The same department (as before: both left empty counts as the same). A person with no department is not exempt.
+  // The same department (as before: both left empty counts as the same).
   if ((personDepartment || '') === (itemDepartment || '')) return 'OK';
+  if (signatureExempt(itemDepartment, policy, at)) return 'OK';
   const allowed =
     at === 'RECEIPT' ? (policy?.allowCrossDepartmentHandover ?? true) : !!policy?.allowCrossDepartmentDelivery;
-  if (!allowed) return 'BLOCKED';
-  // Exemptions count only while that stage's controlled handover is on (the list is greyed out otherwise).
-  const exempt = at === 'RECEIPT' ? policy?.receiptExemptDepartments : policy?.deliveryExemptDepartments;
-  if (personDepartment && exempt?.includes(personDepartment)) return 'OK';
-  return 'REASON';
+  return allowed ? 'REASON' : 'BLOCKED';
 }
 
 /** The policy with a renamed department's exemptions carried over to its new name; the same policy when it had none. */

@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import DeliveryMismatch from '../../sterilization/parts/DeliveryMismatch';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../../sterilization/HandoverSignature';
+import NoSignature from '../../sterilization/parts/NoSignature';
 import PassScanner from '../PassScanner';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
@@ -86,26 +87,32 @@ export default function DeliverStation({onStations}: {onStations: () => void}) {
             <dd>{trData(s.currentUser.name)}</dd>
           </div>
         </dl>
-        <section className="scan-sign">
-          {/* The person receiving shows «Το QR μου»; the username and password stay for who has no phone. */}
-          {!receiver && <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setDeliveryBatchReceiver} />}
-          <HandoverSignature
-            label={tr('ή με κωδικό χρήστη και συνθηματικό')}
-            department={department}
-            signer={receiver}
-            assetIds={items.map(item => item.id)}
-            onSigned={s.setDeliveryBatchReceiver}
-          />
-          {receiver && !s.deliveryBatchReceiverMatches && (
-            <DeliveryMismatch
-              personDepartment={receiver.department}
+        {s.deliveryBatchSignatureFree ? (
+          <section className="scan-sign">
+            <NoSignature at="DELIVERY" department={department} />
+          </section>
+        ) : (
+          <section className="scan-sign">
+            {/* The person receiving shows «Το QR μου»; the username and password stay for who has no phone. */}
+            {!receiver && <PassScanner assetIds={items.map(item => item.id)} onSigned={s.setDeliveryBatchReceiver} />}
+            <HandoverSignature
+              label={tr('ή με κωδικό χρήστη και συνθηματικό')}
               department={department}
-              allowed={s.deliveryBatchReceiverCheck === 'REASON'}
-              reason={s.deliveryBatchMismatchReason}
-              onReason={s.setDeliveryBatchMismatchReason}
+              signer={receiver}
+              assetIds={items.map(item => item.id)}
+              onSigned={s.setDeliveryBatchReceiver}
             />
-          )}
-        </section>
+            {receiver && !s.deliveryBatchReceiverMatches && (
+              <DeliveryMismatch
+                personDepartment={receiver.department}
+                department={department}
+                allowed={s.deliveryBatchReceiverCheck === 'REASON'}
+                reason={s.deliveryBatchMismatchReason}
+                onReason={s.setDeliveryBatchMismatchReason}
+              />
+            )}
+          </section>
+        )}
         <label className="scan-field">
           {tr('Παρατήρηση παράδοσης')}
           <textarea

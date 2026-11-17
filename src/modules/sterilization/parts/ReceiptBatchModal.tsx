@@ -7,10 +7,12 @@ import BatchSetTools from '../BatchSetTools';
 import {CheckCircle2, ScanBarcode, TriangleAlert, UserRoundCheck} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import HandoverSignature from '../HandoverSignature';
+import NoSignature from './NoSignature';
 import type {SterilizationPageState} from '../useSterilizationPage';
 
 export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
   const {
+    receiptBatchSignatureFree,
     addBarcodeToReceiptBatch,
     clearReceiptBatchSelection,
     closeReceiptBatch,
@@ -177,51 +179,57 @@ export default function ReceiptBatchModal({s}: {s: SterilizationPageState}) {
                 <section className="delivery-batch-confirm">
                   {/* Who receives is the person signed in: only who hands over signs here. */}
                   <section className="delivery-auth">
-                    <HandoverSignature
-                      label={tr('Υπογραφή παραδίδοντα')}
-                      department={receiptBatchDepartment}
-                      disabled={!receiptBatchDepartment}
-                      signer={receiptBatchDeliverer}
-                      assetIds={receiptBatchAssets.map(item => item.id)}
-                      onSigned={setReceiptBatchDeliverer}
-                    />
-                    {receiptBatchDeliverer &&
-                      (!receiptBatchDelivererMatches ? (
-                        <div className="identity-mismatch-box">
-                          <div className="identity-warning">
-                            <TriangleAlert size={15} />
-                            <span>
-                              {tr('Ο χρήστης ανήκει στο') + ' '}
-                              {trData(receiptBatchDeliverer.department)}
-                              {tr(', ενώ η παραλαβή αφορά το')} {receiptBatchDepartment}.
-                            </span>
-                          </div>
-                          {receiptPolicy.allowCrossDepartmentHandover ? (
-                            <label>
-                              {tr('Αιτιολόγηση εξαίρεσης')}
-                              <textarea
-                                value={receiptBatchMismatchReason}
-                                onChange={e => setReceiptBatchMismatchReason(e.target.value)}
-                                placeholder={tr('Υποχρεωτική αιτιολόγηση…')}
-                              />
-                            </label>
-                          ) : (
-                            <div className="identity-error">
-                              {tr('Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.')}
+                    {receiptBatchSignatureFree ? (
+                      <NoSignature at="RECEIPT" department={receiptBatchDepartment} />
+                    ) : (
+                      <>
+                        <HandoverSignature
+                          label={tr('Υπογραφή παραδίδοντα')}
+                          department={receiptBatchDepartment}
+                          disabled={!receiptBatchDepartment}
+                          signer={receiptBatchDeliverer}
+                          assetIds={receiptBatchAssets.map(item => item.id)}
+                          onSigned={setReceiptBatchDeliverer}
+                        />
+                        {receiptBatchDeliverer &&
+                          (!receiptBatchDelivererMatches ? (
+                            <div className="identity-mismatch-box">
+                              <div className="identity-warning">
+                                <TriangleAlert size={15} />
+                                <span>
+                                  {tr('Ο χρήστης ανήκει στο') + ' '}
+                                  {trData(receiptBatchDeliverer.department)}
+                                  {tr(', ενώ η παραλαβή αφορά το')} {receiptBatchDepartment}.
+                                </span>
+                              </div>
+                              {receiptPolicy.allowCrossDepartmentHandover ? (
+                                <label>
+                                  {tr('Αιτιολόγηση εξαίρεσης')}
+                                  <textarea
+                                    value={receiptBatchMismatchReason}
+                                    onChange={e => setReceiptBatchMismatchReason(e.target.value)}
+                                    placeholder={tr('Υποχρεωτική αιτιολόγηση…')}
+                                  />
+                                </label>
+                              ) : (
+                                <div className="identity-error">
+                                  {tr('Η πολιτική της μονάδας δεν επιτρέπει αυτή την εξαίρεση.')}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="identity-result">
-                          <CheckCircle2 size={17} />
-                          <div>
-                            <strong>{receiptBatchDeliverer.name}</strong>
-                            <span>
-                              {receiptBatchDeliverer.role} · {trData(receiptBatchDeliverer.department)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                          ) : (
+                            <div className="identity-result">
+                              <CheckCircle2 size={17} />
+                              <div>
+                                <strong>{receiptBatchDeliverer.name}</strong>
+                                <span>
+                                  {receiptBatchDeliverer.role} · {trData(receiptBatchDeliverer.department)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                      </>
+                    )}
                   </section>
                   <label className="cycle-note">
                     {tr('Παρατήρηση παραλαβής')}

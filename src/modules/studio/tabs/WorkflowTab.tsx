@@ -524,8 +524,8 @@ function ExemptDepartments({
         <b>{L('Τμήματα χωρίς έλεγχο', 'Departments without the check')}</b>
         <small>
           {L(
-            'Υπογράφουν για Σετ οποιουδήποτε τμήματος, χωρίς αιτιολόγηση.',
-            'They sign for Sets of any department, with no justification.',
+            'Τα Σετ τους παραλαμβάνονται και παραδίδονται χωρίς υπογραφή· στην παραλαβή φαίνεται ποιος τα έστειλε ηλεκτρονικά.',
+            'Their Sets are received and delivered without a signature; the receipt shows who sent them electronically.',
           )}
         </small>
       </div>
