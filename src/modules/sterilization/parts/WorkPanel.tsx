@@ -123,8 +123,9 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   );
   type Row = (typeof order.rows)[number];
   const listed: Array<{load: (typeof awaitingLoads)[number]} | {department: string; items: Row[]} | {x: Row}> =
-    queue === 'READY'
-      ? // Delivery: the rows under their department (a delivery goes to one), in the order the list is sorted.
+    queue === 'READY' || queue === 'INCOMING'
+      ? // Receipt and delivery: the rows under their department (a handover is with one), in the order the list is
+        // sorted.
         [...new Set(order.rows.map(x => x.department || ''))].flatMap(department => {
           const its = order.rows.filter(x => (x.department || '') === department);
           return [{department, items: its}, ...its.map(x => ({x}))];
@@ -141,7 +142,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
   const contentOf = (kinds: string[]) => {
     const sets = kinds.filter(kind => kind === 'SET').length;
     const tools = kinds.length - sets;
-    return [sets ? tr('{0} Σετ', sets) : '', tools ? tr('{0} εργαλεία', tools) : ''].filter(Boolean).join(' · ');
+    return [
+      sets ? tr('{0} Σετ', sets) : '',
+      tools === 1 ? tr('{0} εργαλείο', tools) : tools ? tr('{0} εργαλεία', tools) : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
   };
   // The status column speaks only when a row has something to say (an open report, a reprocess): otherwise it is
   // left out and the specialty takes its room.
@@ -166,7 +172,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                 {tr('Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.')}
               </span>
               {incoming.length > 0 && (
-                <button className="primary compact" onClick={openReceiptBatch}>
+                <button className="primary compact" onClick={() => openReceiptBatch()}>
                   <ScanBarcode size={15} /> {tr('Μαζική παραλαβή')}
                 </button>
               )}
@@ -327,9 +333,15 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       <b>{trData(item.department) || tr('Χωρίς τμήμα')}</b>
                       <small>{contentOf(item.items.map(x => x.kind))}</small>
                     </span>
-                    <button className="primary compact" onClick={() => openDeliveryBatch(item.department)}>
-                      <UserRoundCheck size={15} /> {tr('Παράδοση όλων')}
-                    </button>
+                    {queue === 'INCOMING' ? (
+                      <button className="primary compact" onClick={() => openReceiptBatch(item.items)}>
+                        <ScanBarcode size={15} /> {tr('Παραλαβή όλων')}
+                      </button>
+                    ) : (
+                      <button className="primary compact" onClick={() => openDeliveryBatch(item.department)}>
+                        <UserRoundCheck size={15} /> {tr('Παράδοση όλων')}
+                      </button>
+                    )}
                   </div>
                 );
               const x = item.x;

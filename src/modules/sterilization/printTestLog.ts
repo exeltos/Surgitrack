@@ -55,6 +55,18 @@ export function dailyTestLogHtml(
         return {kind, today, show: kind.days === 1 || !!today || !!due};
       })
       .filter(row => row.show);
+    // A machine with nothing due today (a plasma sterilizer between its weekly spore tests) is still on the sheet, so
+    // it lists every machine in use the header counts.
+    if (!rows.length) {
+      const held = kinds
+        .map(id => TEST_KINDS.find(kind => kind.id === id))
+        .filter(Boolean)
+        .map(kind => `${en ? kind!.en : kind!.el} · ${en ? kind!.hint.en : kind!.hint.el}`)
+        .join(' · ');
+      lines.push(
+        `<tr class="none"><td class="machine">${escapeHtml(trData(machine.el))}</td><td class="name" colspan="5">${escapeHtml(tr('Καμία δοκιμή σήμερα'))}${held ? `<small>${escapeHtml(held)}</small>` : ''}</td></tr>`,
+      );
+    }
     rows.forEach(({kind, today}, i) => {
       const machineCell =
         i === 0 ? `<td class="machine" rowspan="${rows.length}">${escapeHtml(trData(machine.el))}</td>` : '';
@@ -90,7 +102,7 @@ th.name{width:44mm}td.name{font-weight:700}td.name small{display:block;font-weig
 th.time{width:16mm}th.res{width:44mm}th.who{width:46mm}
 td.res{font-size:8pt;color:#3d4f5a}td.res.ok{color:#1b7a43;font-weight:700}td.res.bad{color:#b4232a;font-weight:700}
 .box{display:inline-block;width:3.2mm;height:3.2mm;border:.3mm solid #7d8d96;border-radius:.6mm;margin:0 1mm -.6mm 0}.box.gap{margin-left:3mm}
-td.strip{border-left:.25mm dashed #b8c4ca;border-right:.25mm dashed #b8c4ca}td.who{font-weight:700}
+tr.none td.name{font-weight:600;color:#6a7a84}td.strip{border-left:.25mm dashed #b8c4ca;border-right:.25mm dashed #b8c4ca}td.who{font-weight:700}
 .foot{display:flex;justify-content:space-between;margin-top:3mm;font-size:7pt;color:#6a7a84}
 </style></head><body>
 <div class="top"><div class="brand-row">${brand}</div><div class="doc">${escapeHtml(title)}</div><h1>${escapeHtml(day)}</h1></div>
