@@ -17,6 +17,7 @@ import {useHasModule} from '../../data/cloud/modulesContext';
 import {movementStamp} from '../../core/movementTime';
 import {movementText} from '../../core/movementText';
 import PromoCards from '../../components/layout/PromoCards';
+import TodayBand from './TodayBand';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -163,7 +164,8 @@ export default function HospitalOverviewPage() {
   const pipelineMax = Math.max(1, ...pipeline.map(p => p.count));
 
   const shortSets = sets.filter(x => x.actual < x.expected).length;
-  const expiry = expiryAlerts(sterileExpiryList(sets, tools));
+  const sterile = sterileExpiryList(sets, tools);
+  const expiry = expiryAlerts(sterile);
   const expired = expiry.filter(e => e.state === 'EXPIRED').length;
   // What waits for action, most urgent first (the red ones, then the amber): one row per kind, with the count and a
   // few examples, opening the list that holds them.
@@ -325,6 +327,16 @@ export default function HospitalOverviewPage() {
           'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',
           'Where the equipment is, what is moving and what needs attention.',
         )}
+      />
+
+      <TodayBand
+        incoming={tracked.filter(a => a.state === 'PENDING_STERILIZATION').length}
+        inProcess={inProcess.length}
+        inSterilizer={tracked.filter(a => inSterilizer.has(a.id)).length}
+        ready={ready.length}
+        next={triage[0] && {title: triage[0].title, to: triage[0].to}}
+        processLoads={processLoads}
+        expiries={sterile}
       />
 
       <PromoCards />
