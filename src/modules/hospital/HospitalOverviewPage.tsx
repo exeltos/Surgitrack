@@ -273,7 +273,7 @@ export default function HospitalOverviewPage() {
         `${pendingAccess} ${pendingAccess === 1 ? 'αίτημα πρόσβασης περιμένει' : 'αιτήματα πρόσβασης περιμένουν'} έγκριση`,
         `${pendingAccess} access ${pendingAccess === 1 ? 'request is' : 'requests are'} awaiting approval`,
       ),
-      note: L('Χρήστες & Τμήματα', 'Users & departments'),
+      note: L('Οργάνωση', 'Organization'),
       to: '/hospital',
     });
 

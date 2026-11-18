@@ -2979,20 +2979,6 @@ html body dd.sterile-dd small {
   white-space: nowrap;
 }
 /* Studio → Departments: which ones count the instruments (operating theatres). */
-html body .studio-list-row button.studio-count-toggle {
-  width: auto !important;
-  min-width: 112px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0 10px;
-  border: 1px solid var(--c-gray-85);
-  border-radius: 999px;
-  background: var(--c-white);
-  color: var(--c-blue-45);
-  font-size: 12px;
-  font-weight: 600;
-}
 /* Send to Sterilization: the count step (operating theatres), signed in its own window first. */
 html body .department-count-step.signed {
   border-color: #b7dfc8;

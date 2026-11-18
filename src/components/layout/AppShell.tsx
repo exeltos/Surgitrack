@@ -104,7 +104,7 @@ const navEN: Record<string, string> = {
   'Ροή Αποστείρωσης': 'Sterilization Flow',
   'Ρόλοι & δικαιώματα': 'Roles & permissions',
   Ρυθμίσεις: 'Settings',
-  'Χρήστες & Τμήματα': 'Users & departments',
+  Οργάνωση: 'Organization',
   Νοσοκομεία: 'Hospitals',
   Επισκόπηση: 'Overview',
   Λήξεις: 'Expiry',

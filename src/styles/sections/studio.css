@@ -811,15 +811,6 @@
     overflow-y: hidden;
     height: auto;
   }
-  html body .studio-list-head.with-count,
-  html body .studio-list-row.with-count {
-    grid-template-columns: minmax(0, 1fr) 70px 196px !important;
-    align-items: center;
-  }
-  html body .studio-list-head.with-count > span:nth-child(2),
-  html body .studio-list-row.with-count > span:nth-child(2) {
-    display: none !important;
-  }
 }
 @media (max-width: 1100px) {
   .owner-kpis {
@@ -1151,15 +1142,6 @@ html body .studio-setting-input select {
   color: var(--c-cyan-20);
   font-size: 14px;
 }
-html body .studio-list-row button.studio-count-toggle.on {
-  border-color: var(--c-green-40-2);
-  background: var(--c-gray-100-3);
-  color: var(--c-green-40-2);
-}
-html body .studio-list-head.with-count,
-html body .studio-list-row.with-count {
-  grid-template-columns: minmax(160px, 1.2fr) minmax(140px, 1fr) 90px 196px;
-}
 html body .roles-guide header h2 {
   margin: 6px 0 14px;
 }
@@ -1460,12 +1442,6 @@ html body .studio-ratings-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-}
-@media (max-width: 1100px) {
-  html body .studio-list-head.with-count,
-  html body .studio-list-row.with-count {
-    grid-template-columns: minmax(140px, 1fr) 80px 196px;
-  }
 }
 @media (max-width: 700px) {
   html body .studio-manager-nav {
@@ -3225,25 +3201,31 @@ html body .equipment-test-print {
   cursor: pointer;
 }
 /* Settings → Sterilization: the departments where the patient code is required, ticked in a wrapping grid. */
-html body .studio-system-grid .patient-code-departments {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 6px 14px;
-  margin: 0 0 12px;
-  padding: 12px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
+/* Organization → Departments: what each department does when it sends to Sterilization, as two small toggles. */
+html body .hospital-dept-flags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
-html body .studio-system-grid .patient-code-departments legend {
-  padding: 0 6px;
+html body .hospital-dept-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 999px;
+  background: var(--c-gray-100-2);
   color: var(--st-muted);
   font-size: 12px;
   font-weight: 600;
 }
-html body .studio-system-grid .patient-code-departments label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--c-cyan-20);
-  font-size: 13px;
+html body .hospital-dept-flag.on {
+  border-color: var(--c-green-40-2);
+  background: var(--c-gray-100-3);
+  color: var(--c-green-40-2);
+}
+/* A department row with those toggles has a fourth column. */
+html body .hospital-row:has(> .hospital-dept-flags) {
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
 }

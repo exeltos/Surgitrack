@@ -322,7 +322,7 @@ const SCREEN_TITLES: Record<string, Text> = {
   reports: t('Αναφορές', 'Reports'),
   movements: t('Ιστορικό', 'History'),
   department: t('Σετ & Εργαλεία τμήματος', 'Department Sets & Instruments'),
-  hospital: t('Χρήστες & Τμήματα', 'Users & Departments'),
+  hospital: t('Οργάνωση', 'Organization'),
   studio: t('SurgiTrack Studio', 'SurgiTrack Studio'),
 };
 

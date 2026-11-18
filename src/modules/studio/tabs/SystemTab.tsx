@@ -7,8 +7,8 @@ import HospitalProfile from '../HospitalProfile';
 import type {StudioPageState} from '../useStudioPage';
 import {isPlatformOnly, isPlatformOwner} from '../../../core/platformOnly';
 import WorkflowTab from './WorkflowTab';
+import LibrariesTab from './LibrariesTab';
 import SettingsHospitalPicker from '../SettingsHospitalPicker';
-import PatientCodeSetting from '../PatientCodeSetting';
 import EquipmentTestSettings from '../EquipmentTestSettings';
 import {getRealIdentity} from '../../../data/cloud/identity';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
@@ -23,11 +23,12 @@ export default function SystemTab({s}: {s: StudioPageState}) {
   const owner = isPlatformOwner();
   const flow = owner;
   const picker = !!getRealIdentity()?.platform && libs.dataMode === 'PRODUCTION';
-  type Group = 'HOSPITAL' | 'STERILIZATION' | 'LABELS' | 'GENERAL' | 'HISTORY';
+  type Group = 'HOSPITAL' | 'STERILIZATION' | 'LIBRARIES' | 'LABELS' | 'GENERAL' | 'HISTORY';
   const [group, setGroup] = useState<Group>(outside ? (flow ? 'STERILIZATION' : 'GENERAL') : 'HOSPITAL');
   const groups: Array<{id: Group; label: string}> = [
     ...(outside ? [] : [{id: 'HOSPITAL' as const, label: L('Νοσοκομείο', 'Hospital')}]),
     {id: 'STERILIZATION', label: L('Αποστείρωση', 'Sterilization')},
+    {id: 'LIBRARIES', label: L('Βιβλιοθήκες', 'Libraries')},
     {id: 'LABELS', label: L('Ετικέτες', 'Labels')},
     {id: 'GENERAL', label: L('Γενικά', 'General')},
     ...(flow ? [{id: 'HISTORY' as const, label: L('Ιστορικό', 'History')}] : []),
@@ -55,6 +56,12 @@ export default function SystemTab({s}: {s: StudioPageState}) {
             ))}
           </div>
           {group === 'HOSPITAL' && <HospitalProfile actor={currentUser.name} />}
+          {/* The libraries (departments, sterilizers, manufacturers…) are part of the settings too. */}
+          {group === 'LIBRARIES' && (
+            <div className="studio-body studio-body-libraries settings-libraries">
+              <LibrariesTab s={{...s, tab: 'LIBRARIES'}} />
+            </div>
+          )}
           {/* The flow's own parts, laid out as on its page (that page's styles apply under this class). */}
           {flow && group === 'STERILIZATION' && (
             <div className="studio-body-workflow settings-flow">
@@ -226,7 +233,6 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                       )}
                     </small>
                   </label>
-                  <PatientCodeSetting L={L} actor={currentUser.name} />
                 </section>
               )}
               {group === 'LABELS' && (

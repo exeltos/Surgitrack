@@ -38,9 +38,9 @@ export const HOSPITAL_MODULES: Array<{
     el: 'Καταμέτρηση εργαλείων',
     en: 'Instrument count',
     descriptionEl:
-      'Τα τμήματα που επιλέγετε (χειρουργείο, αίθουσα τοκετών, ΤΕΠ…) μετρούν και υπογράφουν τα εργαλεία όταν στέλνουν Σετ ή εργαλείο προς Αποστείρωση (Βιβλιοθήκες → Τμήματα).',
+      'Τα τμήματα που επιλέγετε (χειρουργείο, αίθουσα τοκετών, ΤΕΠ…) μετρούν και υπογράφουν τα εργαλεία όταν στέλνουν Σετ ή εργαλείο προς Αποστείρωση (Οργάνωση → Τμήματα).',
     descriptionEn:
-      'The departments you choose (operating theatre, delivery suite, emergency…) count and sign the instruments when they send a Set or instrument to Sterilization (Libraries → Departments).',
+      'The departments you choose (operating theatre, delivery suite, emergency…) count and sign the instruments when they send a Set or instrument to Sterilization (Organization → Departments).',
   },
   {
     id: 'EQUIPMENT_TESTS',

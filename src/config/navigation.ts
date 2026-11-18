@@ -23,7 +23,6 @@ import {
   MessageSquareHeart,
   Bug,
   ShieldAlert,
-  BookOpen,
   UserCog,
   Settings2,
   type LucideIcon,
@@ -111,19 +110,11 @@ export const navigationFor = (role: UserRole, can?: (permission: Permission) => 
   const adminNavigation: NavigationItem[] = [
     overview,
     ...assetNavigation,
-    {to: '/hospital', label: 'Χρήστες & Τμήματα', icon: Building2, permission: 'studio.manage', group: 'ADMIN'},
+    // Two entries: the hospital's people (users, departments with what each does, roles and permissions), and its
+    // settings (the hospital, sterilization, libraries, labels, general). «Νοσοκομεία» only for the platform owner.
+    {to: '/hospital', label: 'Οργάνωση', icon: Building2, permission: 'studio.manage', group: 'ADMIN'},
+    {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'ADMIN'},
     {to: '/studio?tab=platform', label: 'Νοσοκομεία', icon: Hospital, permission: 'studio.manage', group: 'ADMIN'},
-    // The hospital's Studio sections are menu entries of their own (they were four tabs in one page).
-    {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'SETTINGS'},
-    // The hospital's sterilization flow (stages, rules, history) is part of its Settings.
-    {
-      to: '/studio?tab=roles',
-      label: 'Ρόλοι & δικαιώματα',
-      icon: UserCog,
-      permission: 'studio.manage',
-      group: 'SETTINGS',
-    },
-    {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'SETTINGS'},
   ];
   return adminNavigation.filter(shows);
 };
@@ -189,8 +180,7 @@ export const ownerNavigation: NavigationItem[] = [
   },
   {to: '/studio?tab=errors', label: 'Σφάλματα', icon: Bug, permission: 'studio.manage', group: 'CONTACT'},
   {to: '/studio?tab=security', label: 'Ασφάλεια', icon: ShieldAlert, permission: 'studio.manage', group: 'CONTACT'},
-  {to: '/studio?tab=libraries', label: 'Βιβλιοθήκες', icon: BookOpen, permission: 'studio.manage', group: 'TEMPLATE'},
-  // The template's sterilization flow is part of Settings (Sterilization, History).
+  // The template's sterilization flow and libraries are part of Settings (Sterilization, Libraries, History).
   {to: '/studio?tab=roles', label: 'Ρόλοι & δικαιώματα', icon: UserCog, permission: 'studio.manage', group: 'TEMPLATE'},
   {to: '/studio?tab=system', label: 'Ρυθμίσεις', icon: Settings2, permission: 'studio.manage', group: 'TEMPLATE'},
 ];

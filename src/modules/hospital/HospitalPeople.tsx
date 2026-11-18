@@ -1,4 +1,5 @@
-import {Building2, Users, X} from 'lucide-react';
+import type {ReactNode} from 'react';
+import {Building2, UserCog, Users, X} from 'lucide-react';
 import MemberDrawer from './MemberDrawer';
 import CopyField from './CopyField';
 import {usePeople} from './people/usePeople';
@@ -18,6 +19,7 @@ export default function HospitalPeople({
   hospitalDemo = false,
   refreshKey = 0,
   onChanged,
+  roles,
 }: {
   organizationId?: string;
   /** The platform owner: may also give Demo access. */
@@ -26,6 +28,8 @@ export default function HospitalPeople({
   hospitalDemo?: boolean;
   refreshKey?: number;
   onChanged?: () => void;
+  /** The hospital's Organization page: its roles and permissions, a third tab next to users and departments. */
+  roles?: ReactNode;
 }) {
   const s = usePeople({organizationId, platform, hospitalDemo, refreshKey, onChanged});
   const {
@@ -92,7 +96,18 @@ export default function HospitalPeople({
           <Building2 size={16} /> {L('Τμήματα', 'Departments')}
           <span className="hospital-count">{activeDepartments.length}</span>
         </button>
+        {roles && (
+          <button
+            role="tab"
+            aria-selected={tab === 'ROLES'}
+            className={tab === 'ROLES' ? 'active' : ''}
+            onClick={() => setTab('ROLES')}
+          >
+            <UserCog size={16} /> {L('Ρόλοι & δικαιώματα', 'Roles & permissions')}
+          </button>
+        )}
       </div>
+      {roles && tab === 'ROLES' && <div className="hospital-roles">{roles}</div>}
       <UsersSection s={s} />
       <DepartmentsSection s={s} />
       {drawer && (

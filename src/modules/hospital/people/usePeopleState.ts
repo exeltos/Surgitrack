@@ -31,7 +31,7 @@ export function usePeopleState(props: {
   /** A message over the list; `link` is one to pass on by hand when the email did not go out. */
   const [notice, setNotice] = useState<{kind: 'ok' | 'warn' | 'error'; text: string; link?: string} | null>(null);
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState<'USERS' | 'DEPARTMENTS'>('USERS');
+  const [tab, setTab] = useState<'USERS' | 'DEPARTMENTS' | 'ROLES'>('USERS');
   const [query, setQuery] = useState('');
   /** List filters: department id, role, access (ACTIVE, INACTIVE, INVITED) and password (INITIAL, OWN, LOCKED). */
   const [filters, setFilters] = useState({department: '', role: '', access: '', password: '', online: ''});

@@ -3,6 +3,8 @@ import {RefreshCw} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import HospitalPeople from './HospitalPeople';
+import OrganizationRoles from './OrganizationRoles';
+import {actingAsPlatformOwner} from '../../data/cloud/identity';
 import {supabase} from '../../lib/supabase';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {getRuntimeDataMode} from '../../config/dataMode';
@@ -43,21 +45,31 @@ export default function HospitalAdminPage() {
       </div>
     );
 
+  // Roles and permissions are the platform owner's: a tab here for them only.
+  const owner = actingAsPlatformOwner();
   return (
     <div className="hospital-admin">
       <PageHeader
-        title={L('Χρήστες & Τμήματα', 'Users & departments')}
-        description={`${(demo ? L('Demo νοσοκομείο', 'Demo hospital') : hospital) || L('Νοσοκομείο', 'Hospital')} · ${L(
-          'χρήστες, προσκλήσεις και τμήματα.',
-          'users, invitations and departments.',
-        )}`}
+        title={L('Οργάνωση', 'Organization')}
+        description={`${(demo ? L('Demo νοσοκομείο', 'Demo hospital') : hospital) || L('Νοσοκομείο', 'Hospital')} · ${
+          owner
+            ? L('χρήστες, τμήματα, ρόλοι και δικαιώματα.', 'users, departments, roles and permissions.')
+            : L(
+                'χρήστες, τμήματα και τι κάνει το καθένα στην αποστολή.',
+                'users, departments and what each does when it sends.',
+              )
+        }`}
         actions={
           <AppButton onClick={() => setRefreshKey(k => k + 1)} icon={<RefreshCw size={15} />}>
             {L('Ανανέωση', 'Refresh')}
           </AppButton>
         }
       />
-      <HospitalPeople organizationId={organizationId} refreshKey={refreshKey} />
+      <HospitalPeople
+        organizationId={organizationId}
+        refreshKey={refreshKey}
+        roles={owner ? <OrganizationRoles /> : undefined}
+      />
     </div>
   );
 }
