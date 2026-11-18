@@ -3241,3 +3241,49 @@ html body .settings-libraries .studio-scroll-list {
   max-height: none;
   overflow: visible;
 }
+/* Roles: the real checkbox (hidden behind its drawn box) stays inside its row. Placed against a far ancestor, its
+   focus made the browser scroll the whole page to it, the menu and header out of view. */
+html body .studio-permission-toggle {
+  position: relative;
+}
+html body .studio-permission-toggle input {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+/* Roles → Change history: one list of every change, newest first. */
+html body .roles-history {
+  padding: 4px 0;
+}
+html body .roles-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--c-white);
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 13px;
+}
+html body .roles-history-table th {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--c-gray-90);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+html body .roles-history-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--c-gray-95);
+  color: var(--c-cyan-20);
+}
+/* Roles → «Ποιος κάνει τι» and «Ιστορικό αλλαγών», in Studio and in Organization: the view takes the height left
+   under the tabs and scrolls on its own (the roles body around it hides what overflows). */
+html body .studio-body-roles .roles-guide-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

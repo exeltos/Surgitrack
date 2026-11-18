@@ -1,5 +1,6 @@
 import {createContext, useContext} from 'react';
 import {type HospitalModule} from '../../core/hospitalModules';
+import {actingAsPlatformOwner} from './identity';
 
 /**
  * The modules the platform owner switched on for the open hospital. Null where nothing says otherwise (the
@@ -23,3 +24,13 @@ export type HospitalChange = {
 };
 export const announceHospitalChange = (change: HospitalChange) =>
   window.dispatchEvent(new CustomEvent<HospitalChange>(HOSPITAL_CHANGED, {detail: change}));
+
+/**
+ * Whether uses may be corrected by hand here: the hospital has «Χειροκίνητη καταγραφή χρήσεων» on, or the platform
+ * owner is working as the owner (always, whatever the hospital's modules; viewing as its admin, they see what the
+ * admin sees). Who may correct is the permission asset.usage.correct.
+ */
+export const useManualUses = () => {
+  const on = useHasModule('MANUAL_USES');
+  return on || actingAsPlatformOwner();
+};

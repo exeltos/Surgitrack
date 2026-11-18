@@ -14,7 +14,7 @@ import {emailLink} from './modules/auth/emailLink';
 // typeface instead of falling back to a heavier system font where Inter is not installed.
 import '@fontsource-variable/inter/wght.css';
 import './styles/global.css';
-import {installChunkRecovery, installEscapeClosesDialogs} from './core/resilience';
+import {installChunkRecovery, installEscapeClosesDialogs, installPageStaysPut} from './core/resilience';
 import {registerServiceWorker} from './core/registerServiceWorker';
 import {installDialogFocus} from './core/dialogFocus';
 import {installErrorReporting} from './data/cloud/errorReporting';
@@ -26,6 +26,7 @@ import {SCAN_PATH, isScanStandalone} from './modules/scan/scanApp';
 installChunkRecovery();
 installErrorReporting();
 installEscapeClosesDialogs();
+installPageStaysPut();
 installDialogFocus();
 installTabletViewport();
 registerServiceWorker();

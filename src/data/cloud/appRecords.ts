@@ -133,11 +133,14 @@ const chunks = <T>(items: T[]) =>
 
 const UNIQUE_VIOLATION = '23505';
 const RLS_VIOLATION = '42501';
-/** The database refused a save because the record changed since this device saw it (S4). */
-const STALE_VERSION = '40001';
+/**
+ * The database refused a save because the record changed since this device saw it (S4): PT409 (HTTP 409).
+ * 40001, as before 18/11/2026, made the API server retry the refusal by itself without end.
+ */
+const STALE_VERSIONS = ['PT409', '40001'];
 type DbError = {code?: string; message?: string; details?: string};
 const isStale = (error: DbError | null) =>
-  !!error && (error.code === STALE_VERSION || /changed on another device/.test(error.message || ''));
+  !!error && (STALE_VERSIONS.includes(error.code || '') || /changed on another device/.test(error.message || ''));
 /**
  * A refusal that sending again will not change: permission (RLS), a constraint or invalid data, or a
  * rule raised by a trigger. Anything else (network, timeouts, server errors, a schema the client does

@@ -33,7 +33,7 @@ import AssetPhotosCard from '../../components/assets/AssetPhotosCard';
 import AssetWorkbenchSidebar from '../../components/assets/AssetWorkbenchSidebar';
 import {filesToAssetPhotos} from '../../components/assets/photoUtils';
 import DepartmentDispatchModal from '../../components/department/DepartmentDispatchModal';
-import {useHasModule} from '../../data/cloud/modulesContext';
+import {useManualUses} from '../../data/cloud/modulesContext';
 import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
@@ -73,7 +73,7 @@ export default function SetDetailPage() {
     organizationName,
     recordUsage,
   } = useSurgi();
-  const manualUses = useHasModule('MANUAL_USES');
+  const manualUses = useManualUses();
   const undone = useUndoneMovements();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
