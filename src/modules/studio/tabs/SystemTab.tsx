@@ -22,7 +22,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
   const outside = isPlatformOnly();
   const owner = isPlatformOwner();
   const flow = owner;
-  const picker = !!getRealIdentity()?.platform && libs.dataMode === 'PRODUCTION';
+  const picker = owner && !!getRealIdentity()?.platform && libs.dataMode === 'PRODUCTION';
   type Group = 'HOSPITAL' | 'STERILIZATION' | 'LIBRARIES' | 'LABELS' | 'GENERAL' | 'HISTORY';
   const [group, setGroup] = useState<Group>(outside ? (flow ? 'STERILIZATION' : 'GENERAL') : 'HOSPITAL');
   const groups: Array<{id: Group; label: string}> = [
