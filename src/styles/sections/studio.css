@@ -3279,3 +3279,11 @@ html body .roles-history-table td {
   border-bottom: 1px solid var(--c-gray-95);
   color: var(--c-cyan-20);
 }
+/* Roles → «Ποιος κάνει τι» and «Ιστορικό αλλαγών», in Studio and in Organization: the view takes the height left
+   under the tabs and scrolls on its own (the roles body around it hides what overflows). */
+html body .studio-body-roles .roles-guide-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

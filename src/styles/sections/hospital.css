@@ -1607,12 +1607,6 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
   height: auto;
   min-height: 0;
 }
-html body .hospital-admin .hospital-roles .roles-guide-scroll {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
 html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.studio-body-roles > .studio-role-manager {
   flex: 1 1 auto;
   height: auto;
