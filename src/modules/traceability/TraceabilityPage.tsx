@@ -68,9 +68,14 @@ export default function TraceabilityPage() {
     if (next !== tab) setParams(TAB_PARAM[next] ? {tab: TAB_PARAM[next]!} : {});
   };
   const navigate = useNavigate();
-  // A step to go back to inside the app: the first page opened has the router's «default» key.
-  const canGoBack = useLocation().key !== 'default';
-  const goBack = () => (canGoBack ? navigate(-1) : setParams({}));
+  // A step to go back to inside the app: the browser's history index (a page reached by a redirect is at 0 too); where
+  // there is none (tests, in memory), the router's key, «default» on the first page.
+  const location = useLocation();
+  const historyIndex = (window.history.state as {idx?: number} | null)?.idx;
+  const canGoBack = typeof historyIndex === 'number' ? historyIndex > 0 : location.key !== 'default';
+  // Something open on the tab (a search, a patient, a load): with nothing before it, «Πίσω» returns to the tab's start.
+  const detailOpen = !!(urlQuery || patient || loadId);
+  const goBack = () => (canGoBack ? navigate(-1) : setParams(TAB_PARAM[tab] ? {tab: TAB_PARAM[tab]!} : {}));
   const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
   const openLoad = (id: string) => setParams({tab: 'load', load: id});
   const openItem = (barcode: string) => commit(barcode);
@@ -154,7 +159,7 @@ export default function TraceabilityPage() {
           λίστα» on the Set and instrument pages: to the previous step (a search, a patient, a load, the page this was
           opened from); with nothing before it, to the tab's empty start. */}
       <h1 className="visually-hidden">{tr('Ιχνηλάτηση')}</h1>
-      {(canGoBack || params.toString()) && (
+      {(canGoBack || detailOpen) && (
         <div className="trace-head">
           <AppButton icon={<ArrowLeft size={18} />} onClick={goBack} className="trace-page-back">
             {tr('Πίσω')}

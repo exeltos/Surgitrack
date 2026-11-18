@@ -25,6 +25,13 @@ describe('TraceabilityPage', () => {
     expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
   });
 
+  it('a patient opened directly goes «Πίσω» to the list of patients, not to another tab', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients&patient=PT-2026-0041'});
+    fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
+    expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
+  });
+
   it('shows nothing for an unknown patient code', () => {
     renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients'});
     fireEvent.change(within(uses()).getByPlaceholderText('Κωδικός ασθενούς, π.χ. PT-2026-0041'), {
