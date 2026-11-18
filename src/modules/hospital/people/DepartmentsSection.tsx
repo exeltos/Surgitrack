@@ -17,6 +17,7 @@ export default function DepartmentsSection({s}: {s: PeopleState}) {
     lang,
     members,
     newDepartment,
+    ownHospital,
     saveDepartment,
     setEditing,
     setNewDepartment,
@@ -110,7 +111,7 @@ export default function DepartmentsSection({s}: {s: PeopleState}) {
                     </small>
                   </span>
                   {/* Sterilization receives, it does not send: nothing to count or to ask for. */}
-                  {d.code !== 'STER' && (
+                  {ownHospital && d.code !== 'STER' && (
                     <span className="hospital-dept-flags">
                       {withCount && (
                         <button
