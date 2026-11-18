@@ -68,7 +68,8 @@ export default function DepartmentDispatchModal({
     });
   // The department may require the patient code (Organization → Departments); limited-use instruments sent back
   // unused (no use recorded) were used on no patient, so they do not ask for it.
-  const sentUnused = (limitedTools.length > 0 || limitedSet) && !consumesLives;
+  // A Set may hold instruments without a limit that were used: only a standalone instrument is exempt.
+  const sentUnused = kind === 'TOOL' && limitedTools.length > 0 && !consumesLives;
   const patientRequired = consumesLives || (!sentUnused && patientCodeRequired(asset?.department, systemSettings));
   const canSend =
     (!counting || !!count) && (!patientRequired || patientCode.trim().length > 0) && (!consumesLives || livesConfirmed);

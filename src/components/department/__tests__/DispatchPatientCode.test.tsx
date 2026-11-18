@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {fireEvent, screen} from '@testing-library/react';
 import {renderPage} from '../../../test/renderPage';
 import DepartmentDispatchModal from '../DepartmentDispatchModal';
-import {tools} from '../../../data/demo';
+import {sets, tools} from '../../../data/demo';
 import type {SessionUser} from '../../../store/types';
 
 // A standalone limited-use instrument in the Delivery suite (the Demo has some, with their uses counted).
@@ -26,5 +26,26 @@ describe('the patient code a department requires', () => {
     // Not used: it goes back with no use recorded, and no patient code.
     fireEvent.click(screen.getByRole('checkbox', {name: `Χρησιμοποιήθηκε: ${tool.barcode}`}));
     expect(send()).toBeEnabled();
+  });
+
+  it('stays required for a Set even with its limited-use instruments unticked (the others were used)', () => {
+    // A Set in the Delivery suite with limited-use instruments and others without a limit.
+    const set = sets.find(
+      x =>
+        x.department === 'Αίθουσα Τοκετών' &&
+        !x.maxUses &&
+        tools.some(t => t.setId === x.id && t.maxUses) &&
+        tools.some(t => t.setId === x.id && !t.maxUses),
+    )!;
+    renderPage(
+      <DepartmentDispatchModal kind="SET" id={set.id} barcode={set.barcode} name={set.name} onClose={() => {}} />,
+      {
+        signedIn: user,
+        demo: true,
+        library: {systemSettings: {usageWarningThreshold: 3, patientCodeDepartments: ['Αίθουσα Τοκετών']}},
+      },
+    );
+    for (const box of screen.getAllByRole('checkbox', {name: /^Χρησιμοποιήθηκε: /})) fireEvent.click(box);
+    expect(send()).toBeDisabled();
   });
 });

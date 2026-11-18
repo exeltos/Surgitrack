@@ -111,7 +111,8 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const consumesLives = used.length > 0 || limitedSet;
   // Limited-use instruments sent back unused (no use recorded) were used on no patient: the department's rule
   // does not ask for the code then.
-  const sentUnused = (limited.length > 0 || limitedSet) && !consumesLives;
+  // A Set may hold instruments without a limit that were used: only a standalone instrument is exempt.
+  const sentUnused = kind === 'TOOL' && limited.length > 0 && !consumesLives;
   const needsPatient =
     counting || consumesLives || (!sentUnused && patientCodeRequired(departmentOf(found, sets), systemSettings));
   const ready =
