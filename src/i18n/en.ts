@@ -1492,6 +1492,7 @@ export const en: Record<string, string> = {
   'Καταγραφή χρήσης': 'Use recorded',
   'Τελευταία χρήση · θα τεθεί εκτός χρήσης': 'Last use · will be taken out of use',
   'Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)': 'I confirm it was used (one use is recorded)',
+  'υποχρεωτικός για το τμήμα · όχι ονοματεπώνυμο': 'required for the department · not a name',
   'υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο':
     'required · limited-use instrument, no patient name',
   '{0}: απαιτείται κωδικός ασθενούς για εργαλεία περιορισμένων χρήσεων.':

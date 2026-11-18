@@ -8,6 +8,7 @@ import type {StudioPageState} from '../useStudioPage';
 import {isPlatformOnly, isPlatformOwner} from '../../../core/platformOnly';
 import WorkflowTab from './WorkflowTab';
 import SettingsHospitalPicker from '../SettingsHospitalPicker';
+import PatientCodeSetting from '../PatientCodeSetting';
 import EquipmentTestSettings from '../EquipmentTestSettings';
 import {getRealIdentity} from '../../../data/cloud/identity';
 import {DEFAULT_SHELF_LIFE, SHELF_LIFE_OPTIONS} from '../../../core/sterileExpiry';
@@ -225,6 +226,7 @@ export default function SystemTab({s}: {s: StudioPageState}) {
                       )}
                     </small>
                   </label>
+                  <PatientCodeSetting L={L} actor={currentUser.name} />
                 </section>
               )}
               {group === 'LABELS' && (

@@ -63,6 +63,10 @@ export type SystemSettings = {
   sterileShelfLifeMonths?: number;
   /** Departments that count the instruments when sending to Sterilization (see core/surgicalCount). */
   surgicalCountDepartments?: string[];
+  /** The patient code is required with a dispatch (see core/patientCode), in the departments listed below. */
+  patientCodeRequired?: boolean;
+  /** The departments where the patient code is required, when the rule is on. */
+  patientCodeDepartments?: string[];
   /** Minutes without use before the screen locks (0: never). Unset: DEFAULT_IDLE_LOCK_MINUTES. */
   idleLockMinutes?: number;
   /** Who gets the morning reminder email (edge function `reminders`); unset: nobody. */

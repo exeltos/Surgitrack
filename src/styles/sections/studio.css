@@ -3224,3 +3224,26 @@ html body .equipment-test-print {
   font-weight: 600;
   cursor: pointer;
 }
+/* Settings → Sterilization: the departments where the patient code is required, ticked in a wrapping grid. */
+html body .studio-system-grid .patient-code-departments {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 6px 14px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+}
+html body .studio-system-grid .patient-code-departments legend {
+  padding: 0 6px;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+html body .studio-system-grid .patient-code-departments label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-cyan-20);
+  font-size: 13px;
+}

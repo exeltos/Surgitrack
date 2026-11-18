@@ -2,6 +2,7 @@ import {usesAreCounted} from '../../store/helpers';
 import {useState} from 'react';
 import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, MessageSquarePlus} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
+import {patientCodeRequired} from '../../core/patientCode';
 import {countsAtDepartment} from '../../core/surgicalCount';
 import type {SurgicalCount} from '../../store/types';
 import CountModal from './CountModal';
@@ -65,7 +66,10 @@ export default function DepartmentDispatchModal({
       else next.add(toolId);
       return next;
     });
-  const canSend = (!counting || !!count) && (!consumesLives || (patientCode.trim().length > 0 && livesConfirmed));
+  // The hospital may require the patient code for this department (Settings → Sterilization).
+  const patientRequired = consumesLives || patientCodeRequired(asset?.department, systemSettings);
+  const canSend =
+    (!counting || !!count) && (!patientRequired || patientCode.trim().length > 0) && (!consumesLives || livesConfirmed);
   const send = () => {
     if (!canSend) return;
     sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined, [...unused]);
@@ -103,7 +107,9 @@ export default function DepartmentDispatchModal({
             <small>
               {consumesLives
                 ? tr('υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο')
-                : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
+                : patientRequired
+                  ? tr('υποχρεωτικός για το τμήμα · όχι ονοματεπώνυμο')
+                  : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
             </small>
             <input
               value={patientCode}

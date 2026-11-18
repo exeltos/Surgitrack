@@ -6,6 +6,7 @@ import type {BarcodeFeedback} from '../../../components/barcode/BarcodeCapture';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {useLibraries} from '../../../core/LibraryStore';
 import {sterilizedOnOf} from '../../../core/sterileExpiry';
+import {patientCodeRequired} from '../../../core/patientCode';
 import {countsAtDepartment} from '../../../core/surgicalCount';
 import {tr, trData} from '../../../i18n';
 import {useSurgi} from '../../../store/SurgiStore';
@@ -108,7 +109,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const used = limited.filter(t => !unused.has(t.id));
   const limitedSet = kind === 'SET' && !!found.asset.maxUses;
   const consumesLives = used.length > 0 || limitedSet;
-  const needsPatient = counting || consumesLives;
+  const needsPatient = counting || consumesLives || patientCodeRequired(departmentOf(found, sets), systemSettings);
   const ready =
     (!needsPatient || patientCode.trim().length > 0) &&
     (!consumesLives || livesConfirmed) &&
