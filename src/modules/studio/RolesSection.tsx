@@ -30,7 +30,13 @@ export default function RolesSection({s}: {s: StudioPageState}) {
           {L('Ποιος κάνει τι', 'Who does what')}
         </button>
       </div>
-      {view === 'GUIDE' ? <RolesGuide owner={platformAdmin} /> : <RolesTab s={{...s, tab: 'ROLES'}} />}
+      {view === 'GUIDE' ? (
+        <div className="roles-guide-scroll">
+          <RolesGuide owner={platformAdmin} />
+        </div>
+      ) : (
+        <RolesTab s={{...s, tab: 'ROLES'}} />
+      )}
     </>
   );
 }
