@@ -26,10 +26,12 @@ describe('TraceabilityPage', () => {
   });
 
   it('a patient opened directly goes «Πίσω» to the list of patients, not to another tab', () => {
-    renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients&patient=PT-2026-0041'});
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients&patient=PT-2026-0041', browserHistory: true});
     fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
     expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
+    // Nothing behind it any more: no «Πίσω» that would reopen the patient.
+    expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
   });
 
   it('shows nothing for an unknown patient code', () => {

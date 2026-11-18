@@ -75,7 +75,8 @@ export default function TraceabilityPage() {
   const canGoBack = typeof historyIndex === 'number' ? historyIndex > 0 : location.key !== 'default';
   // Something open on the tab (a search, a patient, a load): with nothing before it, «Πίσω» returns to the tab's start.
   const detailOpen = !!(urlQuery || patient || loadId);
-  const goBack = () => (canGoBack ? navigate(-1) : setParams(TAB_PARAM[tab] ? {tab: TAB_PARAM[tab]!} : {}));
+  const goBack = () =>
+    canGoBack ? navigate(-1) : setParams(TAB_PARAM[tab] ? {tab: TAB_PARAM[tab]!} : {}, {replace: true});
   const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
   const openLoad = (id: string) => setParams({tab: 'load', load: id});
   const openItem = (barcode: string) => commit(barcode);
