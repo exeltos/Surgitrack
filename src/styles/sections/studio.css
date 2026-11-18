@@ -3241,3 +3241,15 @@ html body .settings-libraries .studio-scroll-list {
   max-height: none;
   overflow: visible;
 }
+/* Roles: the real checkbox (hidden behind its drawn box) stays inside its row. Placed against a far ancestor, its
+   focus made the browser scroll the whole page to it, the menu and header out of view. */
+html body .studio-permission-toggle {
+  position: relative;
+}
+html body .studio-permission-toggle input {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}

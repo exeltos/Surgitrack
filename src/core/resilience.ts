@@ -106,3 +106,15 @@ export function installEscapeClosesDialogs() {
     true,
   );
 }
+
+/**
+ * The app's page never scrolls as a whole (its panels do): a focused control placed outside its panel can still
+ * make the browser scroll it, shifting the menu and header out of view with an empty band below. Put it back.
+ */
+export function installPageStaysPut() {
+  const reset = () => {
+    const root = document.scrollingElement || document.documentElement;
+    if (root.scrollTop && document.querySelector('.app-shell')) root.scrollTop = 0;
+  };
+  window.addEventListener('scroll', reset, {passive: true});
+}

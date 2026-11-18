@@ -416,6 +416,9 @@ async function shoot(page, file, viewport) {
       `  wheel ${file}: moved ${Math.round(moved)}px${clipped.length ? ` · cut off: ${clipped.join(', ')}` : ''}`,
     );
   }
+  // SCREENS_AFTER: an expression evaluated just before the shot (after SCREENS_BEFORE and the wheel), printed.
+  if (process.env.SCREENS_AFTER)
+    console.log(`  after ${file}: ${await page.evaluate(process.env.SCREENS_AFTER).catch(e => String(e))}`);
   const size = VIEWPORTS[viewport];
   let height = size.height;
   for (let i = 0; i < (FIT ? 0 : 5); i++) {
