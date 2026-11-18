@@ -2592,8 +2592,6 @@ html body .department-asset-list article > a {
 }
 /* Users & departments: the title, tabs and add row stay put; only the list scrolls. */
 html body .hospital-admin {
-  display: flex;
-  flex-direction: column;
   gap: 10px;
   overflow: hidden;
 }

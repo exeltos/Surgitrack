@@ -376,6 +376,45 @@ async function shoot(page, file, viewport) {
     await page.mouse.move(at.width / 2 + 100, at.height / 2);
     await page.mouse.wheel(0, WHEEL);
     await page.waitForTimeout(400);
+    // How far the wheel moved anything: the page, or the panel under the pointer. 0 means it did not scroll.
+    const moved = await page.evaluate(
+      () =>
+        window.scrollY +
+        [...document.querySelectorAll('body *')].reduce((sum, el) => sum + (el.scrollTop > 0 ? el.scrollTop : 0), 0),
+    );
+    // Content cut off with nothing to scroll it: an element taller inside than outside that hides the rest.
+    const clipped = await page.evaluate(() =>
+      [...document.querySelectorAll('body *')]
+        .filter(el => {
+          const cs = getComputedStyle(el);
+          return el.clientHeight > 60 && el.scrollHeight > el.clientHeight + 4 && cs.overflowY !== 'visible';
+        })
+        .map(
+          el =>
+            `${String(el.className).split(' ')[0] || el.tagName} ${getComputedStyle(el).overflowY} ${el.scrollHeight}/${el.clientHeight}`,
+        )
+        .slice(-4),
+    );
+    if (process.env.SCREENS_WHEEL_DEBUG)
+      console.log(
+        await page.evaluate(
+          ([x, y]) => {
+            const out = [];
+            for (let el = document.elementFromPoint(x, y); el; el = el.parentElement) {
+              const cs = getComputedStyle(el);
+              if (cs.overflowY !== 'visible' || cs.overscrollBehaviorY !== 'auto')
+                out.push(
+                  `${String(el.className).split(' ')[0] || el.tagName} oy=${cs.overflowY} ob=${cs.overscrollBehaviorY} ${el.scrollHeight}/${el.clientHeight}`,
+                );
+            }
+            return out.join(' < ');
+          },
+          [VIEWPORTS[viewport].width / 2 + 100, VIEWPORTS[viewport].height / 2],
+        ),
+      );
+    console.log(
+      `  wheel ${file}: moved ${Math.round(moved)}px${clipped.length ? ` · cut off: ${clipped.join(', ')}` : ''}`,
+    );
   }
   const size = VIEWPORTS[viewport];
   let height = size.height;

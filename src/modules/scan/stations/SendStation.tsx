@@ -109,7 +109,11 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const used = limited.filter(t => !unused.has(t.id));
   const limitedSet = kind === 'SET' && !!found.asset.maxUses;
   const consumesLives = used.length > 0 || limitedSet;
-  const needsPatient = counting || consumesLives || patientCodeRequired(departmentOf(found, sets), systemSettings);
+  // Limited-use instruments sent back unused (no use recorded) were used on no patient: the department's rule
+  // does not ask for the code then.
+  const sentUnused = (limited.length > 0 || limitedSet) && !consumesLives;
+  const needsPatient =
+    counting || consumesLives || (!sentUnused && patientCodeRequired(departmentOf(found, sets), systemSettings));
   const ready =
     (!needsPatient || patientCode.trim().length > 0) &&
     (!consumesLives || livesConfirmed) &&

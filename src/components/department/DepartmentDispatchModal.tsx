@@ -66,8 +66,10 @@ export default function DepartmentDispatchModal({
       else next.add(toolId);
       return next;
     });
-  // The hospital may require the patient code for this department (Settings → Sterilization).
-  const patientRequired = consumesLives || patientCodeRequired(asset?.department, systemSettings);
+  // The department may require the patient code (Organization → Departments); limited-use instruments sent back
+  // unused (no use recorded) were used on no patient, so they do not ask for it.
+  const sentUnused = (limitedTools.length > 0 || limitedSet) && !consumesLives;
+  const patientRequired = consumesLives || (!sentUnused && patientCodeRequired(asset?.department, systemSettings));
   const canSend =
     (!counting || !!count) && (!patientRequired || patientCode.trim().length > 0) && (!consumesLives || livesConfirmed);
   const send = () => {

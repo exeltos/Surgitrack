@@ -3229,3 +3229,15 @@ html body .hospital-dept-flag.on {
 html body .hospital-row:has(> .hospital-dept-flags) {
   grid-template-columns: minmax(0, 1fr) auto auto auto;
 }
+/* Settings → Libraries: the lists keep their natural height and the settings page scrolls as one, instead of a
+   list scrolling inside a page that scrolls too (the wheel stopped at the list's end). */
+html body .studio-body.settings-libraries,
+html body .settings-libraries .studio-manager,
+html body .settings-libraries .studio-manager-nav,
+html body .settings-libraries .studio-manager-panel,
+html body .settings-libraries .studio-scroll-list {
+  overscroll-behavior: auto;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}

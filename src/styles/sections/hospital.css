@@ -1577,3 +1577,43 @@ html body .hospital-overview .dash-flow .dash-bar:hover .dash-bar-track {
     mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
   }
 }
+/* Organization: the page fills the screen and its open tab takes the rest, so the list under the tabs (users,
+   departments) or the roles scroll with the wheel instead of being cut off at the bottom. */
+html body .hospital-admin {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+html body .hospital-admin > .hospital-people {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+html body .hospital-admin .hospital-people > .hospital-roles {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+html body .hospital-admin .hospital-roles > .studio-body {
+  height: auto;
+  overflow: visible;
+}
+/* A short window (a laptop): the list would be left a sliver under the card's header and toolbar, so the whole
+   card scrolls instead, header and all. */
+@media (max-height: 860px) {
+  html body .hospital-admin .hospital-people > section.hospital-card,
+  html body .studio-users-panel .hospital-people > section.hospital-card {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  html body .hospital-admin .hospital-people > section.hospital-card .people-rows,
+  html body .hospital-admin .hospital-people > section.hospital-card .hospital-rows,
+  html body .studio-users-panel .hospital-people > section.hospital-card .people-rows,
+  html body .studio-users-panel .hospital-people > section.hospital-card .hospital-rows {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+}
