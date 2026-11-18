@@ -99,6 +99,9 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [accessRequest, setAccessRequest] = useState<AccessRequest>();
   const [authReady, setAuthReady] = useState(false);
+  // Signed in: the page reloads into the app. Until it does, a spinner, not the site's first page that «/» shows
+  // to someone not yet signed in.
+  const [signingIn, setSigningIn] = useState(false);
   const [goodbye, setGoodbye] = useState('');
   // Someone the owner's staff import made: the first password must be replaced before anything else.
   const [firstPassword, setFirstPassword] = useState<{deadline: string | null} | null>(null);
@@ -189,6 +192,7 @@ export default function App() {
     sessionStorage.setItem('surgitrack-auth', '1');
     sessionStorage.removeItem('surgitrack-session-user');
     sessionStorage.removeItem('surgitrack-view-as');
+    setSigningIn(true);
     // Signed in from the phone app (or its screens): back to scanning, not to the full app.
     window.location.hash = onScanScreens() ? `#${SCAN_PATH}` : '#/';
     window.location.reload();
@@ -238,7 +242,7 @@ export default function App() {
         <JoinPage token={(joinToken || confirmToken)!} confirm={!!confirmToken} />
       </Suspense>
     );
-  if (!authReady) return <Spinner fullScreen />;
+  if (!authReady || signingIn) return <Spinner fullScreen />;
   if (accessRequest)
     return (
       <PendingAccess
