@@ -408,14 +408,8 @@ html body .trace-recent-list button span {
     grid-template-columns: 1fr auto;
   }
 }
-/* The page's «Πίσω» on a line of its own, top left above the title, as on the Set and instrument pages. */
+/* The page's «Πίσω», top left where a title would be, as «Πίσω στη λίστα» on the Set and instrument pages. */
 html body .trace-head {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 10px;
-}
-html body .trace-head h1 {
-  margin: 0;
+  margin-bottom: 10px;
 }
