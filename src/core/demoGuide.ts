@@ -135,7 +135,7 @@ const DEPARTMENT: GuideStep[] = [
   {
     key: 'count',
     to: '/department',
-    title: {el: 'Καταμέτρηση στο χειρουργείο', en: 'Count in theatre'},
+    title: {el: 'Καταμέτρηση εργαλείων', en: 'Instrument count'},
     text: {
       el: 'Καταγράψτε την καταμέτρηση εργαλείων ενός Σετ για έναν ασθενή.',
       en: 'Record the instrument count of a Set for a patient.',

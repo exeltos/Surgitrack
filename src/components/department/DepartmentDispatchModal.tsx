@@ -2,6 +2,7 @@ import {usesAreCounted} from '../../store/helpers';
 import {useState} from 'react';
 import {CheckCircle2, ClipboardCheck, Gauge, Printer, Send, ShieldCheck, MessageSquarePlus} from 'lucide-react';
 import {useLibraries} from '../../core/LibraryStore';
+import {patientCodeRequired} from '../../core/patientCode';
 import {countsAtDepartment} from '../../core/surgicalCount';
 import type {SurgicalCount} from '../../store/types';
 import CountModal from './CountModal';
@@ -65,7 +66,13 @@ export default function DepartmentDispatchModal({
       else next.add(toolId);
       return next;
     });
-  const canSend = (!counting || !!count) && (!consumesLives || (patientCode.trim().length > 0 && livesConfirmed));
+  // The department may require the patient code (Organization → Departments); limited-use instruments sent back
+  // unused (no use recorded) were used on no patient, so they do not ask for it.
+  // A Set may hold instruments without a limit that were used: only a standalone instrument is exempt.
+  const sentUnused = kind === 'TOOL' && limitedTools.length > 0 && !consumesLives;
+  const patientRequired = consumesLives || (!sentUnused && patientCodeRequired(asset?.department, systemSettings));
+  const canSend =
+    (!counting || !!count) && (!patientRequired || patientCode.trim().length > 0) && (!consumesLives || livesConfirmed);
   const send = () => {
     if (!canSend) return;
     sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined, [...unused]);
@@ -103,7 +110,9 @@ export default function DepartmentDispatchModal({
             <small>
               {consumesLives
                 ? tr('υποχρεωτικός · εργαλείο περιορισμένων χρήσεων, όχι ονοματεπώνυμο')
-                : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
+                : patientRequired
+                  ? tr('υποχρεωτικός για το τμήμα · όχι ονοματεπώνυμο')
+                  : tr('προαιρετικός · μόνο για ιχνηλασιμότητα, όχι ονοματεπώνυμο')}
             </small>
             <input
               value={patientCode}

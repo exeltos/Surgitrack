@@ -168,7 +168,7 @@ export default function SetDetailPage() {
                 key: 'count',
                 icon: <ClipboardCheck size={16} />,
                 label: tr('Έντυπο καταμέτρησης'),
-                hint: tr('Αποστείρωση προϋπογεγραμμένη · καταμέτρηση χειρουργείου'),
+                hint: tr('Αποστείρωση προϋπογεγραμμένη · καταμέτρηση τμήματος'),
                 onSelect: () => {
                   // The latest count since the Set left Sterilization; otherwise part B prints blank.
                   const release = sterilizationReleases.find(r => r.assetId === set.id && r.decision === 'RELEASED');
@@ -326,9 +326,7 @@ export default function SetDetailPage() {
                     maxUses={set.maxUses}
                     fresh={isNew(set)}
                     onSetUses={
-                      can('asset.usage.configure') && manualUses
-                        ? uses => recordUsage('SET', set.id, {uses})
-                        : undefined
+                      can('asset.usage.correct') && manualUses ? uses => recordUsage('SET', set.id, {uses}) : undefined
                     }
                     description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />

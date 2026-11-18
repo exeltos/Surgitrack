@@ -13,5 +13,13 @@ export const isPlatformOnly = () =>
 /** The platform owner (or local development, signed in as no one), inside a hospital or not. */
 export const isPlatformOwner = () => {
   const real = getRealIdentity();
-  return !real || !!real.platform;
+  if (!real) return true;
+  if (!real.platform) return false;
+  // The owner viewing the hospital as one of its roles («Διαχειριστής νοσοκομείου»…) sees exactly what that role
+  // sees: none of the owner's parts.
+  try {
+    return !JSON.parse(sessionStorage.getItem('surgitrack-session-user') || 'null')?.viewAs;
+  } catch {
+    return true;
+  }
 };

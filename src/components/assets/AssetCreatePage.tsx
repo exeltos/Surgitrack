@@ -22,7 +22,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
   const {departments, manufacturers, specialties} = useLibraries();
   const {sets, tools, createTool, createSet, nextBarcode, addAssetPhotos, can} = useSurgi();
   // Uses already made are written by hand only by who may set the usage limits, and while the owner leaves it on.
-  const manualUses = useHasModule('MANUAL_USES') && can('asset.usage.configure');
+  const manualUses = useHasModule('MANUAL_USES') && can('asset.usage.correct');
   // Opened from the Standalone list: an instrument given to a department, so the department is required.
   const [params] = useSearchParams();
   const standaloneOnly = kind === 'TOOL' && params.get('for') === 'standalone';

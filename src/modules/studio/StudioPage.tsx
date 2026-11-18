@@ -1,8 +1,7 @@
-import {useState} from 'react';
 import {ShieldCheck} from 'lucide-react';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import OwnerDashboard from './OwnerDashboard';
-import RolesGuide from './RolesGuide';
+import RolesSection from './RolesSection';
 import AssetImportWizard from './AssetImportWizard';
 import LibraryEditor from './LibraryEditor';
 import OrganizationEditor from './OrganizationEditor';
@@ -15,7 +14,6 @@ import PlatformTab from './tabs/PlatformTab';
 import LibrariesTab from './tabs/LibrariesTab';
 import WorkflowTab from './tabs/WorkflowTab';
 import UsersTab from './tabs/UsersTab';
-import RolesTab from './tabs/RolesTab';
 import SystemTab from './tabs/SystemTab';
 import ErrorsTab from './tabs/ErrorsTab';
 import SecurityTab from './tabs/SecurityTab';
@@ -74,14 +72,13 @@ const HOSPITAL_SECTION_TEXT: Partial<Record<Tab, [string, string]>> = {
   ],
   ROLES: ['Τι μπορεί να κάνει κάθε ρόλος στο νοσοκομείο.', 'What each role can do in the hospital.'],
   SYSTEM: [
-    'Το νοσοκομείο, η αποστείρωσή του (στάδια, κανόνες, διάρκεια), ετικέτες, γενικές ρυθμίσεις και ιστορικό.',
-    'The hospital, its sterilization (stages, rules, shelf life), labels, general settings and history.',
+    'Το νοσοκομείο, η αποστείρωσή του (στάδια, κανόνες, διάρκεια), βιβλιοθήκες, ετικέτες και γενικές ρυθμίσεις.',
+    'The hospital, its sterilization (stages, rules, shelf life), libraries, labels and general settings.',
   ],
 };
 
 export default function StudioPage() {
   const s = useStudioPage();
-  const [rolesView, setRolesView] = useState<'PERMISSIONS' | 'GUIDE'>('PERMISSIONS');
   // A menu entry opens one section («?tab=…»): the page shows it, titled, with no tab rows.
   const section = new URLSearchParams(useLocation().search).get('tab')
     ? STUDIO_TABS.find(t => t.id === s.tab)
@@ -192,28 +189,7 @@ export default function StudioPage() {
             choose
           />
         )}
-        {tab === 'ROLES' && (
-          // Roles and permissions in one tab: who does what, or each role's permissions to change.
-          <div className="settings-categories" role="group" aria-label={L('Προβολή', 'View')}>
-            <button
-              type="button"
-              aria-pressed={rolesView === 'PERMISSIONS'}
-              className={`settings-category ${rolesView === 'PERMISSIONS' ? 'active' : ''}`}
-              onClick={() => setRolesView('PERMISSIONS')}
-            >
-              {L('Δικαιώματα ανά ρόλο', 'Permissions by role')}
-            </button>
-            <button
-              type="button"
-              aria-pressed={rolesView === 'GUIDE'}
-              className={`settings-category ${rolesView === 'GUIDE' ? 'active' : ''}`}
-              onClick={() => setRolesView('GUIDE')}
-            >
-              {L('Ποιος κάνει τι', 'Who does what')}
-            </button>
-          </div>
-        )}
-        {tab === 'ROLES' && rolesView === 'GUIDE' ? <RolesGuide owner={platformAdmin} /> : <RolesTab s={s} />}
+        {tab === 'ROLES' && <RolesSection s={s} />}
         <SystemTab s={s} />
         <ErrorsTab s={s} />
         <SecurityTab s={s} />

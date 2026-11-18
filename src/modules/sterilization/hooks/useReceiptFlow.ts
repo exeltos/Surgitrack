@@ -124,9 +124,10 @@ export function useReceiptFlow(
 
   const receiptTools = receiptDraft?.kind === 'SET' ? tools.filter(t => t.setId === receiptDraft.asset.id) : [];
   const receiptExpectedCount = receiptDraft?.kind === 'SET' ? receiptTools.length : 1;
-  const openReceiptBatch = () => {
+  /** Opens the batch receipt, with `items` already picked (a department's «Παραλαβή όλων»), or none. */
+  const openReceiptBatch = (items: ReadonlyArray<{kind: string; id: string}> = []) => {
     setReceiptBatchOpen(true);
-    setReceiptBatchSelected(new Set());
+    setReceiptBatchSelected(new Set(items.map(item => `${item.kind}:${item.id}`)));
     setReceiptBatchDeliverer(null);
     setReceiptBatchNote('');
     setReceiptBatchMismatchReason('');

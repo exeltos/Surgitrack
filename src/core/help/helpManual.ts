@@ -148,11 +148,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Τμήματα και βιβλιοθήκες',
-          'Στη Χρήστες & Τμήματα → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Ρυθμίσεις νοσοκομείου → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους, πλυντήρια και χρωματικούς μάρτυρες· στη Ροή Αποστείρωσης τα στάδια.',
+          'Στη Οργάνωση → Τμήματα προσθέστε όλα τα τμήματα (Χειρουργείο, ΜΕΘ, Κεντρική Αποστείρωση…). Στο Ρυθμίσεις → Βιβλιοθήκες ελέγξτε ειδικότητες, κατασκευαστές, κλιβάνους, πλυντήρια και χρωματικούς μάρτυρες· στη Ροή Αποστείρωσης τα στάδια.',
         ],
         en: [
           'Departments and libraries',
-          'In Users & departments → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Hospital settings → Libraries check specialties, manufacturers, sterilizers, washers and color markers; in Sterilization Flow the stages.',
+          'In Organization → Departments add every department (Operating theatre, ICU, Central Sterilization…). In Settings → Libraries check specialties, manufacturers, sterilizers, washers and color markers; in Sterilization Flow the stages.',
         ],
       },
       {
@@ -168,11 +168,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Προσωπικό',
-          'Στη Χρήστες & Τμήματα → Χρήστες → «Προσθήκη χρήστη»: «Πρόσκληση ατόμου» για έναν έναν (email ή σύνδεσμος), «Κοινός σύνδεσμος νοσοκομείου» για πολλούς ή «Από αρχείο Excel ή CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τα αιτήματα (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
+          'Στη Οργάνωση → Χρήστες → «Προσθήκη χρήστη»: «Πρόσκληση ατόμου» για έναν έναν (email ή σύνδεσμος), «Κοινός σύνδεσμος νοσοκομείου» για πολλούς ή «Από αρχείο Excel ή CSV». Πρώτα τον Προϊστάμενο Αποστείρωσης, μετά Αποστείρωση και τμήματα. Εγκρίνετε τα αιτήματα (πορτοκαλί) με τον σωστό ρόλο και τμήμα.',
         ],
         en: [
           'Staff',
-          'In Users & departments → Users → "Add user": "Invite a person" one by one (email or link), "Hospital signup link" for many, or "From an Excel or CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
+          'In Organization → Users → "Add user": "Invite a person" one by one (email or link), "Hospital signup link" for many, or "From an Excel or CSV file". First the Sterilization supervisor, then Sterilization and the departments. Approve the requests (orange) with the right role and department.',
         ],
       },
       {
@@ -188,11 +188,11 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Εκπαίδευση και έναρξη',
-          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Χρήστες & Τμήματα. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
+          'Εκπαιδεύστε το προσωπικό στο Demo: ίδιες οθόνες με δοκιμαστικά δεδομένα· την πρόσβαση Demo την ανοίγετε ανά χρήστη στη Οργάνωση. Κολλήστε ετικέτες στα Σετ και στα εργαλεία, ορίστε μέρα έναρξης και από εκείνη τη μέρα κάθε παράδοση και παραλαβή γίνεται με σάρωση.',
         ],
         en: [
           'Training and go-live',
-          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Users & departments. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
+          'Train staff in the Demo: the same screens with test data; you turn Demo access on per user in Organization. Label the Sets and instruments, set a start day and from that day every handover and receipt is done by scanning.',
         ],
       },
     ],
@@ -408,12 +408,12 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Καταμέτρηση χειρουργείου',
-          'Στα χειρουργεία (Ρυθμίσεις νοσοκομείου → Βιβλιοθήκες → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» ζητά πρώτα καταμέτρηση. Το κουμπί «Καταμέτρηση» ανοίγει το έντυπο: πάνω το μέρος της Αποστείρωσης (σύνθεση, αποδέσμευση, αποστείρωση και λήξη, κύκλος), κάτω τα εργαλεία με «Εστάλη» και «Καταμετρήθηκε». Γράφετε τον κωδικό ασθενούς, τσεκάρετε ή σαρώνετε κάθε εργαλείο ή πατάτε «Όλα παρόντα», και «Υπογραφή καταμέτρησης» (όνομα και ώρα). Μετά ενεργοποιείται η αποστολή. Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το έντυπο τυπώνεται κενό ή υπογεγραμμένο, και από την Εκτύπωση του Σετ.',
+          'Καταμέτρηση εργαλείων',
+          'Στα τμήματα που μετρούν (χειρουργείο, αίθουσα τοκετών, ΤΕΠ ή όποιο ορίσετε: Οργάνωση → Τμήματα → «Καταμέτρηση») η «Αποστολή προς Αποστείρωση» ζητά πρώτα καταμέτρηση. Το κουμπί «Καταμέτρηση» ανοίγει το έντυπο: πάνω το μέρος της Αποστείρωσης (σύνθεση, αποδέσμευση, αποστείρωση και λήξη, κύκλος), κάτω τα εργαλεία με «Εστάλη» και «Καταμετρήθηκε». Γράφετε τον κωδικό ασθενούς, τσεκάρετε ή σαρώνετε κάθε εργαλείο ή πατάτε «Όλα παρόντα», και «Υπογραφή καταμέτρησης» (όνομα και ώρα). Μετά ενεργοποιείται η αποστολή. Αν λείπουν εργαλεία, ανοίγει εκκρεμότητα και η Αποστείρωση το βλέπει στην Παραλαβή. Το έντυπο τυπώνεται κενό ή υπογεγραμμένο, και από την Εκτύπωση του Σετ.',
         ],
         en: [
-          'Surgical count',
-          'In operating theatres (Hospital settings → Libraries → Departments → "Count") "Send to Sterilization" asks for the count first. The "Count" button opens the form: Sterilization’s part on top (composition, release, sterilization and expiry, cycle), the instruments below with "Sent" and "Counted". Enter the patient code, tick or scan each instrument or press "All present", then "Sign the count" (name and time). Sending is then enabled. If instruments are missing, an issue opens and Sterilization sees it at Receipt. The form prints blank or signed, also from the Set’s Print menu.',
+          'Instrument count',
+          'In the departments that count (operating theatre, delivery suite, emergency, or any you set: Organization → Departments → "Count") "Send to Sterilization" asks for the count first. The "Count" button opens the form: Sterilization’s part on top (composition, release, sterilization and expiry, cycle), the instruments below with "Sent" and "Counted". Enter the patient code, tick or scan each instrument or press "All present", then "Sign the count" (name and time). Sending is then enabled. If instruments are missing, an issue opens and Sterilization sees it at Receipt. The form prints blank or signed, also from the Set’s Print menu.',
         ],
       },
       {
@@ -1280,7 +1280,7 @@ export const helpManual: ManualSection[] = [
   {
     to: '/hospital',
     permission: 'studio.manage',
-    title: {el: 'Χρήστες & Τμήματα', en: 'Users & departments'},
+    title: {el: 'Οργάνωση', en: 'Organization'},
     summary: {
       el: 'Οι χρήστες, οι προσκλήσεις, οι αιτήσεις πρόσβασης και τα τμήματα του νοσοκομείου.',
       en: "The hospital's users, invitations, access requests and departments.",
@@ -1549,12 +1549,12 @@ export const helpManual: ManualSection[] = [
     },
     checks: {
       el: [
-        'Τα ονόματα τμημάτων είναι ίδια με αυτά της σελίδας Χρήστες & Τμήματα.',
+        'Τα ονόματα τμημάτων είναι ίδια με αυτά της σελίδας Οργάνωση.',
         'Οι γραμμές με πρόβλημα διορθώθηκαν ή δεν χρειάζονται.',
         'Μετά την εισαγωγή: «Έλεγχος ονομασιών».',
       ],
       en: [
-        'Department names match those in Users & departments.',
+        'Department names match those in Organization.',
         'Rows with problems were fixed or are not needed.',
         'After importing: "Name check".',
       ],

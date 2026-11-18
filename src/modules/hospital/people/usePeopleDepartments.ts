@@ -2,6 +2,7 @@ import {supabase} from '../../../lib/supabase';
 import {wholeHospital} from '../hospitalPeopleMeta';
 import type {Department} from '../hospitalPeopleMeta';
 import {renameExemptDepartment} from '../../../core/handoverPolicy';
+import {managedHospitalId} from '../../../data/cloud/accessRequests';
 import type {usePeopleState} from './usePeopleState';
 import type {usePeopleData} from './usePeopleData';
 import type {usePeopleView} from './usePeopleView';
@@ -15,6 +16,11 @@ export function usePeopleDepartments(
 ) {
   const {changed, demo, departments, editing, fail, libs, newDepartment, organizationId, setEditing, setNewDepartment} =
     p;
+
+  // The hospital's own settings (receipt exemptions, which departments count, the patient code) are those of the
+  // hospital the app is working in: the platform owner looking at another hospital's departments from Studio does
+  // not change them (they would land on the hospital open, under another hospital's department names).
+  const ownHospital = demo || (!!organizationId && organizationId === managedHospitalId());
 
   // ---- Departments ----
   const addDepartment = async () => {
@@ -35,13 +41,25 @@ export function usePeopleDepartments(
       await changed();
     }
   };
-  // A renamed department keeps its exemptions from the department check (they are kept by name).
+  // A renamed department keeps what it was set to do (they are kept by name): its exemptions from the department
+  // check, its instrument count and its required patient code.
   const carryExemptions = (id: string, to: string) => {
     const from = departments.find(d => d.id === id)?.name;
+    if (!ownHospital || !from || from === to) return;
     const policy = libs.sterilizationWorkflow.receiptPolicy;
-    if (!from || from === to || !policy) return;
-    const renamed = renameExemptDepartment(policy, from, to);
-    if (renamed !== policy) libs.updateSterilizationWorkflow({receiptPolicy: renamed});
+    if (policy) {
+      const renamed = renameExemptDepartment(policy, from, to);
+      if (renamed !== policy) libs.updateSterilizationWorkflow({receiptPolicy: renamed});
+    }
+    const rename = (list?: string[]) =>
+      list?.includes(from) ? list.map(name => (name === from ? to : name)) : undefined;
+    const counting = rename(libs.systemSettings.surgicalCountDepartments);
+    const patientCode = rename(libs.systemSettings.patientCodeDepartments);
+    if (counting || patientCode)
+      libs.updateSystemSettings({
+        ...(counting ? {surgicalCountDepartments: counting} : {}),
+        ...(patientCode ? {patientCodeDepartments: patientCode} : {}),
+      });
   };
   const saveDepartment = async () => {
     if (!editing?.name.trim()) return;
@@ -76,5 +94,11 @@ export function usePeopleDepartments(
   // ---- Users ----
   const departmentLabel = (role: string, departmentId: string) =>
     wholeHospital(role) ? '' : departments.find(d => d.id === departmentId)?.name || '';
-  return {addDepartment, departmentLabel, saveDepartment, toggleDepartment};
+  return {
+    ownHospital,
+    addDepartment,
+    departmentLabel,
+    saveDepartment,
+    toggleDepartment,
+  };
 }

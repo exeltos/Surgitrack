@@ -7,6 +7,7 @@ import {AppPreferencesProvider} from './core/AppPreferences';
 import {LibraryStoreProvider} from './core/LibraryStore';
 import {getRuntimeDataMode} from './config/dataMode';
 import CloudWorkspaceGate from './data/cloud/CloudWorkspaceGate';
+import RouteErrorBoundary from './components/layout/RouteErrorBoundary';
 import EmailLinkPage from './modules/auth/EmailLinkPage';
 import {emailLink} from './modules/auth/emailLink';
 // Inter ships with the app (Greek and Latin, one variable file per script), so every computer shows the same
@@ -45,17 +46,21 @@ const render = () =>
     ) : (
       <React.StrictMode>
         <HashRouter>
-          <AppPreferencesProvider>
-            <CloudWorkspaceGate>
-              {cloud => (
-                <LibraryStoreProvider dataMode={runtimeDataMode} cloud={cloud}>
-                  <SurgiProvider dataMode={runtimeDataMode} cloud={cloud}>
-                    <App />
-                  </SurgiProvider>
-                </LibraryStoreProvider>
-              )}
-            </CloudWorkspaceGate>
-          </AppPreferencesProvider>
+          {/* Last line of defence: a failure outside a page (the shell, the workspace, the stores) shows a message
+              and a reload instead of a blank page. */}
+          <RouteErrorBoundary>
+            <AppPreferencesProvider>
+              <CloudWorkspaceGate>
+                {cloud => (
+                  <LibraryStoreProvider dataMode={runtimeDataMode} cloud={cloud}>
+                    <SurgiProvider dataMode={runtimeDataMode} cloud={cloud}>
+                      <App />
+                    </SurgiProvider>
+                  </LibraryStoreProvider>
+                )}
+              </CloudWorkspaceGate>
+            </AppPreferencesProvider>
+          </RouteErrorBoundary>
         </HashRouter>
       </React.StrictMode>
     ),

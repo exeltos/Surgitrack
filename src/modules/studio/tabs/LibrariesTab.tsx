@@ -1,7 +1,5 @@
-import {useHasModule} from '../../../data/cloud/modulesContext';
 import {useState} from 'react';
-import {Plus, Search, Trash2, Pencil, Palette, ListPlus, ClipboardCheck} from 'lucide-react';
-import {countDepartments} from '../../../core/surgicalCount';
+import {Plus, Search, Trash2, Pencil, Palette, ListPlus} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import ColorTapeLibrary from '../ColorTapeLibrary';
 import SterilizerBatchDialog from '../SterilizerBatchDialog';
@@ -30,24 +28,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
     tapesOpen,
   } = s;
   const withCodes = filteredItems.some(item => item.code);
-  // The count at the operating theatre is a module of the hospital.
-  const withCount = useHasModule('SURGICAL_COUNT');
   const [batchOpen, setBatchOpen] = useState(false);
-  // Departments that count the instruments when sending to Sterilization (operating theatres).
-  const counting = countDepartments(
-    libs.departments.map(item => item.el),
-    libs.systemSettings.surgicalCountDepartments,
-  );
-  const toggleCounting = (name: string) =>
-    libs.updateSystemSettings(
-      {
-        surgicalCountDepartments: counting.includes(name)
-          ? counting.filter(item => item !== name)
-          : [...counting, name],
-      },
-      undefined,
-      'Καταμέτρηση χειρουργείου',
-    );
   const naming = libs.systemSettings.sterilizerNaming || defaultSterilizerNaming;
   return (
     <>
@@ -123,7 +104,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                   placeholder={L('Αναζήτηση ονομασίας ή κωδικού...', 'Search name or code...')}
                 />
               </div>
-              <div className={`studio-list-head${libraryKey === 'departments' ? ' with-count' : ''}`}>
+              <div className="studio-list-head">
                 <span>{L('Ονομασία', 'Name')}</span>
                 <span>{L('Αγγλικά', 'English')}</span>
                 {/* No item has a code: the column stays empty instead of a dash on every row. */}
@@ -132,26 +113,11 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
               </div>
               <div className="studio-scroll-list">
                 {filteredItems.map(item => (
-                  <div className={`studio-list-row${libraryKey === 'departments' ? ' with-count' : ''}`} key={item.id}>
+                  <div className="studio-list-row" key={item.id}>
                     <strong>{item.el}</strong>
                     <span>{item.en}</span>
                     <code>{withCodes ? item.code || '—' : ''}</code>
                     <div>
-                      {libraryKey === 'departments' && withCount && (
-                        <button
-                          type="button"
-                          className={`studio-count-toggle ${counting.includes(item.el) ? 'on' : ''}`}
-                          aria-pressed={counting.includes(item.el)}
-                          title={L(
-                            'Καταμέτρηση εργαλείων κατά την αποστολή προς Αποστείρωση (χειρουργείο)',
-                            'Instrument count when sending to Sterilization (operating theatre)',
-                          )}
-                          onClick={() => toggleCounting(item.el)}
-                        >
-                          <ClipboardCheck size={15} />
-                          {L('Καταμέτρηση', 'Count')}
-                        </button>
-                      )}
                       <button title={L('Επεξεργασία', 'Edit')} onClick={() => setEditItem(item)}>
                         <Pencil size={16} />
                       </button>
