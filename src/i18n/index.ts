@@ -73,7 +73,8 @@ const DATA_PATTERNS: Array<[RegExp, string]> = [
   [/^παρέδωσε (.+)$/, 'handed over by $1'],
   [/^παρέλαβε (.+)$/, 'received by $1'],
   [/^Ολοκλήρωση ελέγχου$/, 'Check completed'],
-  [/^Καταμέτρηση χειρουργείου υπογεγραμμένη · (\d+)\/(\d+)$/, 'Surgical count signed · $1/$2'],
+  // Older records say «χειρουργείου»: a count is any counting department's now.
+  [/^Καταμέτρηση (?:χειρουργείου|εργαλείων) υπογεγραμμένη · (\d+)\/(\d+)$/, 'Instrument count signed · $1/$2'],
   [/^Λείπουν: (.+)$/, 'Missing: $1'],
   [/^Καθαρισμός ιστορικού · (\d+) εγγραφές$/, 'History clean-up · $1 entries'],
   [/^Ιστορικό κινήσεων$/, 'Movement history'],

@@ -90,7 +90,7 @@ export function useAssetCatalogActions(
       assetKind: kind,
       from: department,
       to: department,
-      status: `Καταμέτρηση χειρουργείου υπογεγραμμένη · ${p.counted}/${p.expected}`,
+      status: `Καταμέτρηση εργαλείων υπογεγραμμένη · ${p.counted}/${p.expected}`,
       by: currentUser.name,
       patientCode: p.patientCode,
     });

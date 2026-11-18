@@ -46,7 +46,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
           : [...counting, name],
       },
       undefined,
-      'Καταμέτρηση χειρουργείου',
+      'Καταμέτρηση εργαλείων',
     );
   const naming = libs.systemSettings.sterilizerNaming || defaultSterilizerNaming;
   return (
@@ -143,7 +143,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                           className={`studio-count-toggle ${counting.includes(item.el) ? 'on' : ''}`}
                           aria-pressed={counting.includes(item.el)}
                           title={L(
-                            'Καταμέτρηση εργαλείων κατά την αποστολή προς Αποστείρωση (χειρουργείο)',
+                            'Καταμέτρηση εργαλείων κατά την αποστολή προς Αποστείρωση',
                             'Instrument count when sending to Sterilization (operating theatre)',
                           )}
                           onClick={() => toggleCounting(item.el)}

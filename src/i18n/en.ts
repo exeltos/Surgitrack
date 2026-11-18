@@ -650,8 +650,6 @@ export const en: Record<string, string> = {
   'Καταγραφή της έλλειψης και συνέχιση της διαδικασίας': 'Record the shortage and continue the process',
   'Καταγραφή της έλλειψης ως απόκλιση του Σετ': 'Record the shortage as a set deviation',
   'Καταμέτρηση κατά την παραλαβή': 'Count at receipt',
-  'Καταμέτρηση χειρουργείου': 'Surgical count',
-  'Καταμέτρηση χειρουργείου υπογεγραμμένη': 'Surgical count signed',
   Κατασκευαστής: 'Manufacturer',
   'Καταχώρησε επανεπεξεργασία και ακολούθησε τη διαδικασία διερεύνησης της μονάδας.':
     "Record reprocessing and follow the unit's investigation procedure.",
@@ -1822,7 +1820,7 @@ export const en: Record<string, string> = {
   'Έντυπο καταμέτρησης εργαλείων': 'Instrument count form',
   'Όλα παρόντα': 'All present',
   'Α. Αποστείρωση · ελεγμένο και αποστειρωμένο': 'A. Sterilization · checked and sterilized',
-  'Αποστείρωση προϋπογεγραμμένη · καταμέτρηση χειρουργείου': 'Pre-signed by Sterilization · operating theatre count',
+  'Αποστείρωση προϋπογεγραμμένη · καταμέτρηση τμήματος': 'Pre-signed by Sterilization · department count',
   'Β. Χειρουργείο · καταμέτρηση μετά την επέμβαση': 'B. Operating theatre · count after the procedure',
   'Εκκρεμεί υπογραφή': 'Signature pending',
   'Επιβεβαιώνετε ότι καταμετρήθηκαν και τα {0} εργαλεία;': 'Confirm that all {0} instruments were counted?',
