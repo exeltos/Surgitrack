@@ -39,7 +39,7 @@ select tests.eq((select state from public.instrument_sets where id = 'set-a1'), 
 
 -- Saved from an old version of the Set (another station changed it): refused, nothing kept.
 select tests.throws($q$select public.save_records_together(pg_temp.release_rows('r-old', true,
-  (select updated_at - interval '1 minute' from version_seen)))$q$, '40001', 'a group with a stale record fails as a whole');
+  (select updated_at - interval '1 minute' from version_seen)))$q$, 'PT409', 'a group with a stale record fails as a whole');
 select tests.eq(tests.count($q$select 1 from public.sterilization_releases where id = 'r-old'$q$), 0,
   '... its release is not kept');
 

@@ -1,6 +1,6 @@
 /**
  * A database in memory for the sync's tests (syncAtScale, saveTogether), that behaves like ours where it
- * matters: it stamps updated_at, refuses a save made from an old version (40001, S4, see
+ * matters: it stamps updated_at, refuses a save made from an old version (PT409, S4, see
  * 20261008160000_version_check.sql), answers the same queries, and saves a group of records in one
  * transaction (save_records_together, 20261112100000). Its state lives on globalThis, so that every station's
  * own copy of the modules (vi.resetModules) talks to the same database.
@@ -54,7 +54,7 @@ export const tableOf = (name: string) => {
 };
 const staleError = (id: unknown): DbError => (
   db.stale++,
-  {code: '40001', message: `record ${String(id)} changed on another device`}
+  {code: 'PT409', message: `record ${String(id)} changed on another device`}
 );
 /** The tables whose records change after they are created (they have updated_at). */
 const VERSIONED = new Set([
