@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {ArrowLeft, CircleAlert, CircleCheck, Printer} from 'lucide-react';
+import {CircleAlert, CircleCheck, Printer} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -18,12 +18,10 @@ type Used = {code: string; item?: SetAsset | Tool; label: string; at: string; by
  */
 export default function PatientTrace({
   patient,
-  onBack,
   onItem,
   onLoad,
 }: {
   patient: string;
-  onBack: () => void;
   onItem: (barcode: string) => void;
   onLoad: (loadId: string) => void;
 }) {
@@ -70,9 +68,6 @@ export default function PatientTrace({
 
   return (
     <>
-      <button type="button" className="trace-back" onClick={onBack}>
-        <ArrowLeft size={16} /> {tr('Όλοι οι ασθενείς')}
-      </button>
       {used.length === 0 ? (
         <div className="empty">
           <strong>{tr('Δεν βρέθηκε ασθενής με κωδικό «{0}»', patient)}</strong>

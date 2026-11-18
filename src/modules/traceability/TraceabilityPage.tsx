@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
-import {Search, History, Flame, Users, Package} from 'lucide-react';
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {ArrowLeft, Search, History, Flame, Users, Package} from 'lucide-react';
+import AppButton from '../../components/ui/AppButton';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -66,6 +67,10 @@ export default function TraceabilityPage() {
   const openTab = (next: Tab) => {
     if (next !== tab) setParams(TAB_PARAM[next] ? {tab: TAB_PARAM[next]!} : {});
   };
+  const navigate = useNavigate();
+  // A step to go back to inside the app: the first page opened has the router's «default» key.
+  const canGoBack = useLocation().key !== 'default';
+  const goBack = () => (canGoBack ? navigate(-1) : setParams({}));
   const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
   const openLoad = (id: string) => setParams({tab: 'load', load: id});
   const openItem = (barcode: string) => commit(barcode);
@@ -145,10 +150,16 @@ export default function TraceabilityPage() {
   return (
     // The movements tab fills the page, as «Ιστορικό» did on its own.
     <div className={tab === 'HISTORY' ? 'trace-with-history' : 'trace-page'}>
-      <div className="page-head">
-        <div>
-          <h1>{tr('Ιχνηλάτηση')}</h1>
-        </div>
+      {/* One «Πίσω» in the same place on every tab, and where the Set, instrument and sterilizer pages have theirs
+          (top left): to the previous step (a search, a patient, a load, the page this was opened from); with nothing
+          before it, to the tab's empty start. */}
+      <div className="page-head trace-head">
+        {(canGoBack || params.toString()) && (
+          <AppButton icon={<ArrowLeft size={18} />} onClick={goBack} className="trace-page-back">
+            {tr('Πίσω')}
+          </AppButton>
+        )}
+        <h1>{tr('Ιχνηλάτηση')}</h1>
       </div>
       <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
         {tabs.map(t => (
@@ -171,12 +182,7 @@ export default function TraceabilityPage() {
       ) : tab === 'PATIENTS' && !patient ? (
         <PatientUses movements={movements} onOpen={openPatient} />
       ) : tab === 'PATIENTS' ? (
-        <PatientTrace
-          patient={patient}
-          onBack={() => setParams({tab: 'patients'})}
-          onItem={openItem}
-          onLoad={openLoad}
-        />
+        <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
       ) : tab === 'LOAD' ? (
         <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
       ) : (

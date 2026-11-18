@@ -21,7 +21,7 @@ describe('TraceabilityPage', () => {
     fireEvent.click(uses().querySelector('.ledger-row')!);
     expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', {name: /Όλοι οι ασθενείς/}));
+    fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
     expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
   });
 
