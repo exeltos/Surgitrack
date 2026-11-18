@@ -4,12 +4,10 @@ import {permissionCatalog, type PermissionGroup} from '../../../core/permissions
 import AppButton from '../../../components/ui/AppButton';
 import {roles, permissionGroupMeta} from '../studioMeta';
 import type {StudioPageState} from '../useStudioPage';
-import {formatDateTime} from '../../../core/displayDate';
 
 export default function RolesTab({s}: {s: StudioPageState}) {
   const {
     L,
-    libs,
     protectedPermissionSet,
     resetSelectedRole,
     roleCount,
@@ -205,36 +203,6 @@ export default function RolesTab({s}: {s: StudioPageState}) {
                 ))}
               </div>
             )}
-            {/* The history of this role's changes, folded: the permissions keep the height. */}
-            <details className="studio-role-audit">
-              <summary>
-                <strong>{L('Ιστορικό αλλαγών', 'Change history')}</strong>
-                <span className="studio-role-audit-count">
-                  {(libs.rolePermissionAudit || []).filter(entry => entry.role === selectedRole).length}
-                </span>
-                <small>{L('ποιος και πότε', 'who and when')}</small>
-              </summary>
-              {(libs.rolePermissionAudit || [])
-                .filter(entry => entry.role === selectedRole)
-                .slice(0, 5)
-                .map(entry => (
-                  <div className="studio-role-audit-row" key={entry.id}>
-                    <span>{formatDateTime(entry.at)}</span>
-                    <strong>{entry.by}</strong>
-                    <small>
-                      {entry.permissions.length} {L('δικαιώματα', 'permissions')}
-                    </small>
-                  </div>
-                ))}
-              {!(libs.rolePermissionAudit || []).some(entry => entry.role === selectedRole) && (
-                <div className="studio-role-audit-empty">
-                  {L(
-                    'Δεν υπάρχουν ακόμη αλλαγές για αυτόν τον ρόλο.',
-                    'No changes have been recorded for this role yet.',
-                  )}
-                </div>
-              )}
-            </details>
           </section>
         </div>
       )}

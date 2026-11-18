@@ -3253,3 +3253,29 @@ html body .studio-permission-toggle input {
   height: 1px;
   margin: 0;
 }
+/* Roles → Change history: one list of every change, newest first. */
+html body .roles-history {
+  padding: 4px 0;
+}
+html body .roles-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--c-white);
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 13px;
+}
+html body .roles-history-table th {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--c-gray-90);
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+html body .roles-history-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--c-gray-95);
+  color: var(--c-cyan-20);
+}
