@@ -326,9 +326,7 @@ export default function SetDetailPage() {
                     maxUses={set.maxUses}
                     fresh={isNew(set)}
                     onSetUses={
-                      can('asset.usage.configure') && manualUses
-                        ? uses => recordUsage('SET', set.id, {uses})
-                        : undefined
+                      can('asset.usage.correct') && manualUses ? uses => recordUsage('SET', set.id, {uses}) : undefined
                     }
                     description={tr('Κύκλος ζωής του Σετ, όταν έχει οριστεί όριο χρήσεων.')}
                   />

@@ -276,7 +276,7 @@ export function useAssetEditActions(
    * only who may set the usage limit (hospital admin, Sterilization supervisor, platform owner). Recorded.
    */
   const correctUses = (kind: AssetKind, id: string, delta: 1 | -1) => {
-    if (!can('asset.usage.configure')) return;
+    if (!can('asset.usage.correct')) return;
     const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
     if (!asset || !(asset.maxUses || ('wearCheck' in asset && asset.wearCheck)) || asset.state === 'RETIRED') return;
     const before = asset.uses || 0;
@@ -299,7 +299,7 @@ export function useAssetEditActions(
    * counted wrongly); same people as the correction, recorded. What is left follows: the limit less the uses.
    */
   const recordUsage = (kind: AssetKind, id: string, change: {uses?: number}) => {
-    if (!can('asset.usage.configure')) return;
+    if (!can('asset.usage.correct')) return;
     const asset = kind === 'SET' ? sets.find(item => item.id === id) : tools.find(item => item.id === id);
     if (!asset || !(asset.maxUses || ('wearCheck' in asset && asset.wearCheck)) || asset.state === 'RETIRED') return;
     const before = asset.uses || 0;

@@ -369,7 +369,7 @@ export default function ToolDetailPage() {
                     wearCheck={tool.wearCheck}
                     fresh={isNew(tool)}
                     onSetUses={
-                      can('asset.usage.configure') && manualUses && tool.state !== 'RETIRED'
+                      can('asset.usage.correct') && manualUses && tool.state !== 'RETIRED'
                         ? uses => recordUsage('TOOL', tool.id, {uses})
                         : undefined
                     }

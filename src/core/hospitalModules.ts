@@ -56,9 +56,9 @@ export const HOSPITAL_MODULES: Array<{
     el: 'Χειροκίνητη καταγραφή χρήσεων',
     en: 'Manual use records',
     descriptionEl:
-      'Όποιος ορίζει τα όρια χρήσεων (διαχειριστής νοσοκομείου, προϊστάμενος Αποστείρωσης) προσθέτει ή διορθώνει με το χέρι τις χρήσεις που έχουν γίνει, και στη δημιουργία εργαλείου.',
+      'Ο διαχειριστής του νοσοκομείου και ο προϊστάμενος Αποστείρωσης προσθέτουν ή διορθώνουν με το χέρι τις χρήσεις που έχουν γίνει, και στη δημιουργία εργαλείου. Ξεχωριστό από τον ορισμό των ορίων χρήσεων.',
     descriptionEn:
-      'Whoever sets the usage limits (hospital admin, Sterilization supervisor) adds or corrects the uses already made by hand, also when creating an instrument.',
+      'The hospital admin and the Sterilization supervisor add or correct by hand the uses already made, also when creating an instrument. Separate from setting the usage limits.',
   },
 ];
 

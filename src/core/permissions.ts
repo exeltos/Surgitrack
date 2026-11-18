@@ -10,6 +10,7 @@ export const permissionKeys = [
   'asset.photos.manage',
   'asset.barcode.reissue',
   'asset.usage.configure',
+  'asset.usage.correct',
   'asset.composition.manage',
   'stock.manage',
   'department.workspace',
@@ -113,6 +114,16 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     en: 'Configure usage limit',
     hintEl: 'Ορισμός ή μεταβολή περιορισμένων χρήσεων.',
     hintEn: 'Set or change limited-use thresholds.',
+  },
+  {
+    key: 'asset.usage.correct',
+    group: 'ASSETS',
+    el: 'Χειροκίνητη διόρθωση χρήσεων',
+    en: 'Correct uses by hand',
+    hintEl:
+      'Προσθήκη ή διόρθωση με το χέρι των χρήσεων που έχουν γίνει (και στη δημιουργία εργαλείου), όταν είναι ενεργή η λειτουργία· μόνο διαχειριστής και προϊστάμενος Αποστείρωσης.',
+    hintEn:
+      'Add or correct by hand the uses already made (also when creating an instrument), when the feature is on; only the admin and the Sterilization supervisor.',
   },
   {
     key: 'asset.composition.manage',
@@ -284,6 +295,7 @@ const sterilizationPermissions: readonly Permission[] = [
   'asset.photos.manage',
   'asset.barcode.reissue',
   'asset.usage.configure',
+  'asset.usage.correct',
   'asset.composition.manage',
   'stock.manage',
   'sterilization.workspace',
@@ -312,6 +324,7 @@ export const supervisorOnlyPermissions: readonly Permission[] = [
   'asset.delete',
   'asset.duplicate',
   'asset.usage.configure',
+  'asset.usage.correct',
   'asset.composition.manage',
   'overview.view',
 ];
@@ -354,6 +367,7 @@ export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]>
     'asset.photos.manage',
     'asset.barcode.reissue',
     'asset.usage.configure',
+    'asset.usage.correct',
     'asset.composition.manage',
     'stock.manage',
     'sterilization.workspace',
@@ -385,6 +399,7 @@ const sanitize = (role: UserRole, permissions: readonly Permission[]) => {
       'asset.photos.manage',
       'asset.barcode.reissue',
       'asset.usage.configure',
+      'asset.usage.correct',
       'asset.composition.manage',
       'stock.manage',
       'sterilization.workspace',
