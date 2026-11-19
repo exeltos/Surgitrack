@@ -376,21 +376,31 @@ html body .reports-table td.report-cell-name .registry-row-barcode {
   margin-top: 2px;
   font-weight: 600;
 }
-@media (min-width: 701px) {
-  html body .reports-table td.report-cell-repeat {
-    color: transparent;
-  }
-}
-html body .reports-table tr.report-group-start td {
-  border-top: 1px solid var(--c-gray-90);
-}
-html body .reports-table tr.report-group-start td:first-child {
-  color: var(--c-cyan-20);
-  font-weight: 650;
-}
 html body .reports-table tbody tr:nth-child(even) {
   background: rgba(237, 242, 244, 0.35);
 }
 html body .reports-table tbody tr:hover {
   background: var(--c-gray-95);
+}
+
+/* The inventory by department or specialty: each group opens with its own line — the name and how many — and its
+   rows follow without a group column. */
+html body .reports-table tr.report-group-row th {
+  padding: 14px 12px 6px;
+  border-top: 1px solid var(--c-gray-90);
+  background: none;
+  color: var(--c-cyan-20);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+}
+html body .reports-table tr.report-group-row:first-child th {
+  border-top: 0;
+}
+html body .reports-table tr.report-group-row th span {
+  margin-left: 8px;
+  color: var(--c-gray-45);
+  font-weight: 500;
 }

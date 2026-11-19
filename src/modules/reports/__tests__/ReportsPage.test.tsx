@@ -18,7 +18,16 @@ const results = () => screen.getByRole('region', {name: 'Αποτελέσματ�
 const count = () =>
   Number(/(\d+) εγγραφές/.exec(document.querySelector('.reports-result-head span')!.textContent!)![1]);
 /** A report lists everything at once; a card or a group narrows it, and «Εμφάνιση όλων» brings it all back. */
-const bodyRows = () => within(results()).queryAllByRole('row').slice(1);
+const bodyRows = () =>
+  within(results())
+    .queryAllByRole('row')
+    .slice(1)
+    .filter(row => within(row).queryAllByRole('cell').length > 0);
+/** The inventory's groups (department or specialty): the line that opens each, its name then how many it holds. */
+const groups = () =>
+  within(results())
+    .queryAllByRole('rowheader')
+    .map(h => ({name: h.firstChild!.textContent, size: Number(h.querySelector('span')!.textContent)}));
 const column = (label: string) => {
   const headers = within(results())
     .getAllByRole('columnheader')
@@ -64,17 +73,20 @@ describe('Reports', () => {
     expect(screen.queryByRole('button', {name: /^Σύνθεση Σετ/})).not.toBeInTheDocument();
   });
 
-  it('groups the inventory by department or by specialty', () => {
+  it('groups the inventory by department or by specialty: a line opens each group, no column left blank', () => {
     renderPage(<ReportsPage />);
-    const headers = () => {
-      return within(results())
+    const headers = () =>
+      within(results())
         .getAllByRole('columnheader')
         .map(h => h.textContent);
-    };
-    expect(headers()[0]).toBe('Τμήμα');
-    filter('Ομαδοποίηση ανά τμήμα', 'specialty');
-    expect(headers()[0]).toBe('Ειδικότητα');
     expect(headers()).not.toContain('Τμήμα');
+    const byDepartment = groups();
+    expect(byDepartment.length).toBeGreaterThan(1);
+    expect(byDepartment.reduce((n, g) => n + g.size, 0)).toBe(count());
+    filter('Ομαδοποίηση ανά τμήμα', 'specialty');
+    expect(headers()).not.toContain('Ειδικότητα');
+    expect(headers()).not.toContain('Τμήμα');
+    expect(groups().map(g => g.name)).not.toEqual(byDepartment.map(g => g.name));
   });
 
   it('lists the instruments in service and those taken out of service, each from its card', () => {
@@ -93,10 +105,10 @@ describe('Reports', () => {
     renderPage(<ReportsPage />);
     choose('Απογραφή εξοπλισμού');
     const all = count();
-    const department = column('Τμήμα')[0]!;
+    const department = groups()[0].name!;
     filter('Όλα τα τμήματα', department);
     expect(count()).toBeLessThanOrEqual(all);
-    expect(new Set(column('Τμήμα'))).toEqual(new Set([department]));
+    expect(groups().map(g => g.name)).toEqual([department]);
   });
 
   it('has no patient traceability: it lives in Traceability', () => {
