@@ -2024,3 +2024,58 @@ html body .department-home .dash-most-used > .dept-cols {
   color: var(--c-cyan-30-6, inherit);
   font-weight: 600;
 }
+/* «Εκκρεμότητες»: the instruments out of order as small figures above the tabs, each opening its list. */
+.problem-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.problem-kpi {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--c-gray-90);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: var(--c-white);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.problem-kpi span {
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+.problem-kpi b {
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.problem-kpi:hover,
+.problem-kpi.active {
+  background: var(--c-gray-95);
+}
+.problem-kpi.active {
+  border-color: var(--c-gray-45);
+}
+.problem-kpi.damaged {
+  border-left-color: var(--c-red-40);
+}
+.problem-kpi.service {
+  border-left-color: var(--c-amber-50);
+}
+.problem-kpi.lost {
+  border-left-color: var(--c-red-30);
+}
+.problem-kpi.retired {
+  border-left-color: var(--c-gray-65);
+}
+.problem-kpi.low {
+  border-left-color: var(--c-amber-35);
+}

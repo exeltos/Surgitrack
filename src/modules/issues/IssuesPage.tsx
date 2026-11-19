@@ -43,6 +43,7 @@ const issueAge = (created: string) => {
 };
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
+import EquipmentProblems from './EquipmentProblems';
 
 export default function IssuesPage() {
   const {
@@ -180,9 +181,18 @@ export default function IssuesPage() {
             : tr('Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.')
         }
       />
+      {/* The instruments out of order, the same above every tab: each opens the instruments to replace by it. */}
+      {withReplacements && (
+        <EquipmentProblems
+          reason={tab === 'REPLACEMENTS' ? params.get('reason') || undefined : undefined}
+          onReason={reason => setParams({tab: 'replacements', reason})}
+        />
+      )}
       {tab !== 'REPORTS' ? (
         <Suspense fallback={<Spinner />}>
           <ReplacementsPage
+            key={params.get('reason') || ''}
+            initialReason={params.get('reason') || ''}
             embedded
             tabs={tabs}
             view={tab === 'ORDERS' ? 'ORDERS' : 'ITEMS'}
