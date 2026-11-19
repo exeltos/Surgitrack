@@ -88,6 +88,8 @@ export const cyclesOf = (
         return;
       entries.push({
         id: c.id,
+        // Its load, when the record has one: a later record of the same load (reopened and completed again) matches it.
+        loadId: c.loadId,
         start: c.completedAt,
         at: c.completedAt,
         sterilizer: c.sterilizer,
