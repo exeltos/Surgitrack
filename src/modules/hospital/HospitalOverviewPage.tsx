@@ -315,36 +315,39 @@ export default function HospitalOverviewPage() {
   const perDayMax = Math.max(1, ...perDay.map(x => x.n));
   const perDayTotal = perDay.reduce((sum, x) => sum + x.n, 0);
   const deptMax = Math.max(1, ...byDepartment.map(d => d.total));
+  // Today's work in Sterilization, for «Σήμερα»: the cycles started and the loads released (the cards below show what
+  // is where now and what waits).
+  const todayKey = new Date().toDateString();
+  // A load rejected at release keeps its release time too (it goes to reprocessing): only the released ones count.
+  const today = (kind: 'STERILIZATION' | 'WASHING', field: 'createdAt' | 'releasedAt') =>
+    processLoads.filter(load => {
+      if (field === 'releasedAt' && load.status !== 'RELEASED' && load.status !== 'RECALLED') return false;
+      const at = load.kind === kind ? load[field] : undefined;
+      const stamp = at ? movementStamp(at) : 0;
+      return !!stamp && new Date(stamp).toDateString() === todayKey;
+    }).length;
   const dayLabel = (d: Date) =>
     d.toLocaleDateString(lang === 'el' ? 'el-GR' : 'en-GB', {day: 'numeric', month: 'short'});
 
   return (
     <div className="hospital-overview dash">
-      <PageHeader
-        eyebrow={L('Πίνακας ελέγχου', 'Dashboard')}
-        title={L('Επισκόπηση', 'Overview')}
-        description={L(
-          'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',
-          'Where the equipment is, what is moving and what needs attention.',
-        )}
-      />
+      <PageHeader eyebrow={L('Πίνακας ελέγχου', 'Dashboard')} title={L('Επισκόπηση', 'Overview')} />
 
       <TodayBand
         counts={[
           {
-            n: tracked.filter(a => a.state === 'PENDING_STERILIZATION').length,
-            label: L('Προς παραλαβή', 'To receive'),
-            to: '/sterilization?queue=INCOMING',
+            n: today('STERILIZATION', 'createdAt'),
+            label: L('Κύκλοι αποστείρωσης', 'Sterilization cycles'),
+            to: '/sterilizers',
           },
-          {n: inProcess.length, label: L('Σε αποστείρωση', 'In sterilization'), to: '/sterilization'},
+          {n: today('WASHING', 'createdAt'), label: L('Κύκλοι πλύσης', 'Washing cycles'), to: '/sterilizers'},
           {
-            n: tracked.filter(a => inSterilizer.has(a.id)).length,
-            label: L('Στον κλίβανο', 'In the sterilizer'),
-            to: '/sterilization?queue=IN_STERILIZER',
+            n: today('STERILIZATION', 'releasedAt'),
+            label: L('Φορτία αποδεσμεύτηκαν', 'Loads released'),
+            to: '/sterilizers',
           },
-          {n: ready.length, label: L('Έτοιμα για παραλαβή', 'Ready for pickup'), to: '/sterilization?queue=READY'},
         ]}
-        next={triage[0] && {title: triage[0].title, to: triage[0].to}}
+        next={null}
         events={processLoads.filter(load => load.kind === 'STERILIZATION').map(load => load.createdAt)}
         eventsLabel={n => L(`${n} κύκλοι αποστείρωσης`, `${n} sterilization cycles`)}
         expiries={sterile}
@@ -449,35 +452,40 @@ export default function HospitalOverviewPage() {
             {(allDepartments ? byDepartment : byDepartment.slice(0, DEPARTMENTS_SHOWN)).map(d => {
               const other = Math.max(0, d.total - d.atDepartment - d.inProcess - d.ready);
               return (
-                <Link
-                  key={d.id}
-                  className="dash-dept"
-                  to={`/overview/department?d=${encodeURIComponent(d.key)}`}
-                  title={`${d.name}: ${d.total}`}
-                >
-                  <span className="dash-dept-name">{d.name}</span>
-                  <span className="dash-dept-track">
-                    <span className="dash-dept-fill" style={{width: `${(d.total / deptMax) * 100}%`}}>
-                      <i className="seg-dept" style={{flexGrow: d.atDepartment}} />
-                      <i className="seg-process" style={{flexGrow: d.inProcess}} />
-                      <i className="seg-ready" style={{flexGrow: d.ready}} />
-                      <i className="seg-lost" style={{flexGrow: other}} />
-                    </span>
-                  </span>
-                  <strong>{d.total}</strong>
-                  <span
-                    className={`dash-pill${d.issues ? ' bad' : ''}`}
-                    title={L('Ανοικτές εκκρεμότητες', 'Open issues')}
+                // The row opens the department; its issues mark opens its open issues.
+                <div key={d.id} className="dash-dept">
+                  <Link
+                    className="dash-dept-main"
+                    to={`/overview/department?d=${encodeURIComponent(d.key)}`}
+                    title={`${d.name}: ${d.total}`}
                   >
-                    {d.issues ? (
-                      <>
-                        <TriangleAlert size={12} /> {d.issues}
-                      </>
-                    ) : (
-                      ''
-                    )}
-                  </span>
-                </Link>
+                    <span className="dash-dept-name">{d.name}</span>
+                    <span className="dash-dept-track">
+                      <span className="dash-dept-fill" style={{width: `${(d.total / deptMax) * 100}%`}}>
+                        <i className="seg-dept" style={{flexGrow: d.atDepartment}} />
+                        <i className="seg-process" style={{flexGrow: d.inProcess}} />
+                        <i className="seg-ready" style={{flexGrow: d.ready}} />
+                        <i className="seg-lost" style={{flexGrow: other}} />
+                      </span>
+                    </span>
+                    <strong>{d.total}</strong>
+                  </Link>
+                  {d.issues ? (
+                    <Link
+                      className="dash-pill bad"
+                      to={presetPath('/issues', {status: 'OPEN', department: d.key})}
+                      title={L('Ανοιχτές εκκρεμότητες του τμήματος', "The department's open issues")}
+                      aria-label={L(
+                        `${d.issues} ανοιχτές εκκρεμότητες: ${d.name}`,
+                        `${d.issues} open issues: ${d.name}`,
+                      )}
+                    >
+                      <TriangleAlert size={12} aria-hidden="true" /> {d.issues}
+                    </Link>
+                  ) : (
+                    <span className="dash-pill" />
+                  )}
+                </div>
               );
             })}
             {byDepartment.length > DEPARTMENTS_SHOWN && (

@@ -143,6 +143,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
             <div className="studio-search">
               <Search size={17} />
               <input
+                type="search"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder={L(

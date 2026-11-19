@@ -180,6 +180,7 @@ export default function DepartmentPage() {
           <label className="department-search">
             <Search size={17} />
             <input
+              type="search"
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder={tr('Ονομασία, κωδικός ή barcode...')}

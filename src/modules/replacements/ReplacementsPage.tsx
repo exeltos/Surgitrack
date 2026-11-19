@@ -307,6 +307,7 @@ export default function ReplacementsPage({
               <label className="replacements-search">
                 <Search size={15} />
                 <input
+                  type="search"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder={tr('Αναζήτηση barcode, ονομασίας, κωδικού ή Σετ…')}

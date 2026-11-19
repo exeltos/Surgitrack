@@ -3,6 +3,7 @@ import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
 import {CheckCircle2, Flame, TriangleAlert, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import ProgramSelect from './ProgramSelect';
+import CycleNumberSelect from './CycleNumberSelect';
 import {programsOf} from '../../../core/sterilizerPrograms';
 import {useLibraries} from '../../../core/LibraryStore';
 import {testsInUse, itemTestsState} from '../../../core/equipmentTests';
@@ -127,14 +128,22 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                       </small>
                     )}
                 </label>
-                <label>
-                  {tr('Αριθμός κύκλου')}
-                  <input
+                {loadModal === 'WASHING' ? (
+                  <label>
+                    {tr('Αριθμός κύκλου')}
+                    <input value={loadCycleNumber} onChange={e => setLoadCycleNumber(e.target.value)} />
+                  </label>
+                ) : (
+                  <CycleNumberSelect
+                    sterilizer={sterilizers.find(item => item.el === loadEquipment)}
+                    sterilizers={sterilizers}
+                    equipment={loadEquipment}
+                    loads={s.processLoads}
                     value={loadCycleNumber}
-                    onChange={e => setLoadCycleNumber(e.target.value)}
-                    placeholder={tr('π.χ. 2026-0815-07')}
+                    onChange={setLoadCycleNumber}
+                    fromDevice={s.loadFromDevice}
                   />
-                </label>
+                )}
                 {loadModal === 'WASHING' ? (
                   <label>
                     {tr('Πρόγραμμα')}

@@ -4,6 +4,7 @@ import {tr, trData} from '../../../i18n';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
 import ProgramSelect from '../../sterilization/parts/ProgramSelect';
+import CycleNumberSelect from '../../sterilization/parts/CycleNumberSelect';
 import {programsOf} from '../../../core/sterilizerPrograms';
 import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
@@ -99,15 +100,15 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
             <input value={s.loadEquipment} onChange={e => s.setLoadEquipment(e.target.value)} />
           )}
         </label>
-        <label className="scan-field">
-          {tr('Αριθμός κύκλου / φορτίου')}
-          <input
-            value={s.loadCycleNumber}
-            onChange={e => s.setLoadCycleNumber(e.target.value)}
-            placeholder={tr('π.χ. 2026-0815-07')}
-            inputMode="text"
-          />
-        </label>
+        <CycleNumberSelect
+          className="scan-field"
+          sterilizer={sterilizers.find(item => item.el === s.loadEquipment)}
+          sterilizers={sterilizers}
+          equipment={s.loadEquipment}
+          loads={s.processLoads}
+          value={s.loadCycleNumber}
+          onChange={s.setLoadCycleNumber}
+        />
         <ProgramSelect
           className="scan-field"
           sterilizer={sterilizers.find(item => item.el === s.loadEquipment)}

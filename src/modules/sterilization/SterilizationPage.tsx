@@ -63,6 +63,7 @@ export default function SterilizationPage() {
         <div className="ster-scan-input" data-tour="ster-scan">
           <Barcode size={17} />
           <input
+            type="search"
             autoComplete="off"
             value={query}
             onChange={e => {

@@ -203,6 +203,7 @@ export default function TraceabilityPage() {
           >
             <Search />
             <input
+              type="search"
               value={q}
               onChange={e => setQ(e.target.value)}
               onKeyDown={suggest.onKeyDown}

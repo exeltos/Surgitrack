@@ -260,6 +260,7 @@ export default function StaffImportDialog({s, onClose}: {s: PeopleState; onClose
             <>
               <div className="staff-import-tools">
                 <input
+                  type="search"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder={L('Αναζήτηση ονόματος ή τμήματος…', 'Search name or department…')}

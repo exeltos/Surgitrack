@@ -3,7 +3,7 @@ import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import TraceabilityPage from '../TraceabilityPage';
 
-const field = () => screen.getByRole('textbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
+const field = () => screen.getByRole('searchbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
 
 describe('Ιχνηλάτηση and its «Πίσω»', () => {
   it('inside a card shows «Πίσω» in place of the tabs, and «Πίσω» returns to the tab’s list with its tabs', async () => {

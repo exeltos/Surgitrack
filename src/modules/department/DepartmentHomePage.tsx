@@ -1,17 +1,17 @@
 import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
-import {CalendarClock, Gauge, Layers3, PackageCheck, TriangleAlert, Wrench} from 'lucide-react';
-import {expiryAlerts, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
-import {movementStamp} from '../../core/movementTime';
+import {Gauge, Layers3, Wrench} from 'lucide-react';
+import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {presetPath} from '../../core/listMemory';
 import PageHeader from '../../components/ui/PageHeader';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
-import {isDispatch, statusCard} from './departmentStatus';
+import {isDispatch} from './departmentStatus';
 import TodayBand from '../../components/layout/TodayBand';
-import {movementText} from '../../core/movementText';
+import {statusLabel} from '../../components/ui/statusLabel';
+import {undoneIds} from '../../core/movementUndo';
 
-/** Every state the department counts as «Σε αποστείρωση». */
+/** Every state the department counts as «Στην Αποστείρωση». */
 const IN_STERILIZATION_STATES: string[] = [
   'PENDING_STERILIZATION',
   'IN_WASHING',
@@ -22,56 +22,128 @@ const IN_STERILIZATION_STATES: string[] = [
   'IN_STORAGE',
 ];
 
+/** «Κοντά στο όριο»: a limited-use Set or instrument with this many uses left, or fewer. */
+const NEAR_END = 3;
+
+type Kind = {
+  key: string;
+  kind: 'SET' | 'TOOL';
+  name: string;
+  here: number;
+  away: number;
+  ready: number;
+  total: number;
+  /** The soonest expiry of the ones in the department (yyyy-mm-dd), and whether it is past or near. */
+  expiry?: string;
+  expiryState?: 'OK' | 'EXPIRING' | 'EXPIRED';
+};
+
 /**
- * The department's home after signing in: only what a department acts on — today («Σήμερα»: what is here, what is
- * away, what waits to be picked up, the first thing to do and this week), what needs attention and the latest
- * movements.
+ * The department's home, in the Overview's look: «Σήμερα» (what to pick up, what expires, the open issues, the first
+ * thing to do, this week); then the uses of its equipment — the limited-use ones near their end (3 left or fewer) and
+ * the uses of those only counted — or, with neither, its equipment one line per kind; beside its most frequent uses.
  */
 export default function DepartmentHomePage() {
-  const {sets, tools, issues, movements, lifecycleAlerts, currentUser} = useSurgi();
+  const {sets, tools, issues, movements, currentUser} = useSurgi();
   const dept = currentUser.department;
 
   const departmentSets = useMemo(() => sets.filter(item => item.department === dept), [sets, dept]);
   const departmentTools = useMemo(() => tools.filter(item => item.department === dept), [tools, dept]);
-  const standalone = departmentTools.filter(item => item.mode === 'STANDALONE');
-  // Sets and standalone instruments move on their own; a Set's instruments travel with it.
-  const tracked = [...departmentSets, ...standalone];
-  const ready = tracked.filter(a => a.state === 'READY_FOR_PICKUP');
-  const byStatus = (statusFilter: string, match: (state: string) => boolean) =>
-    statusCard(departmentSets, standalone, statusFilter, match);
-  const atDepartment = byStatus('IN_DEPARTMENT', state => state === 'IN_DEPARTMENT');
-  const inSterilization = byStatus('STERILIZATION', state => IN_STERILIZATION_STATES.includes(state));
-  const readyStatus = byStatus('READY', state => state === 'READY_FOR_PICKUP');
+  const standalone = useMemo(() => departmentTools.filter(t => t.mode === 'STANDALONE'), [departmentTools]);
   const openIssues = issues.filter(issue => issue.department === dept && issue.status === 'OPEN');
   const sterile = sterileExpiryList(departmentSets, departmentTools);
   const expiry = expiryAlerts(sterile);
   const expired = expiry.filter(e => e.state === 'EXPIRED').length;
-  const ownIds = new Set([...departmentSets, ...departmentTools].map(a => a.id));
-  const nearLimit = lifecycleAlerts.filter(a => ownIds.has(a.assetId));
 
-  // An issue or a movement names its Set or instrument as «barcode · name»: its row opens that card.
-  const byBarcode = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const s of departmentSets) map.set(s.barcode.toUpperCase(), `/sets/${s.id}`);
-    for (const t of departmentTools) map.set(t.barcode.toUpperCase(), `/tools/${t.id}`);
-    return map;
-  }, [departmentSets, departmentTools]);
-  const assetPath = (label: string) => byBarcode.get(label.split(' · ')[0].trim().toUpperCase());
+  // One line per kind (a Set's name, an instrument's name), Sets first.
+  const kinds = useMemo(() => {
+    const rows = new Map<string, Kind>();
+    const add = (
+      kind: 'SET' | 'TOOL',
+      a: {name: string; state: string; sterileUntil?: string; shelfLifeMonths?: number},
+    ) => {
+      const key = `${kind}|${a.name.trim().toUpperCase()}`;
+      const row = rows.get(key) || {key, kind, name: a.name.trim(), here: 0, away: 0, ready: 0, total: 0};
+      row.total++;
+      if (a.state === 'IN_DEPARTMENT') {
+        row.here++;
+        if (a.sterileUntil && (!row.expiry || a.sterileUntil < row.expiry)) {
+          row.expiry = a.sterileUntil;
+          row.expiryState = expiryStatus(a.sterileUntil, a.shelfLifeMonths).state;
+        }
+      } else if (a.state === 'READY_FOR_PICKUP') {
+        row.away++;
+        row.ready++;
+      } else if (IN_STERILIZATION_STATES.includes(a.state)) row.away++;
+      rows.set(key, row);
+    };
+    departmentSets.forEach(s => add('SET', s));
+    standalone.forEach(t => add('TOOL', t));
+    return [...rows.values()].sort(
+      (a, b) => Number(b.kind === 'SET') - Number(a.kind === 'SET') || a.name.localeCompare(b.name, 'el'),
+    );
+  }, [departmentSets, standalone]);
+  const ready = kinds.reduce((n, k) => n + k.ready, 0);
+  const readyPath = presetPath(kinds.some(k => k.kind === 'SET' && k.ready) ? '/department' : '/department/tools', {
+    statusFilter: 'READY',
+  });
+  const issuesPath = presetPath('/issues', {status: 'OPEN', department: dept});
 
-  const latestMovements = useMemo(
-    () =>
-      movements
-        .filter(m => byBarcode.has(m.asset.split(' · ')[0].trim().toUpperCase()) || m.from === dept || m.to === dept)
-        .map((m, index) => ({m, index, stamp: movementStamp(m.at)}))
-        .sort((a, b) => b.stamp - a.stamp || a.index - b.index)
-        .slice(0, 15)
-        .map(x => x.m),
-    [movements, byBarcode, dept],
+  // «Σήμερα», as on the Overview: what the department has to do — pick up, renew what expires, its issues — the first of
+  // them, and this week's movements.
+  const counts = [
+    {n: ready, label: tr('Για παραλαβή'), to: readyPath},
+    {n: expiry.length, label: tr('Λήγουν σύντομα'), to: '/expiry'},
+    {n: openIssues.length, label: tr('Εκκρεμότητες'), to: issuesPath},
+  ];
+  const next = ready
+    ? {title: tr('{0} έτοιμα για παραλαβή από την Αποστείρωση', ready), to: readyPath}
+    : expiry.length
+      ? {
+          title: expired
+            ? tr('{0} έληξαν · {1} λήγουν σύντομα', expired, expiry.length - expired)
+            : tr('{0} λήγουν σύντομα', expiry.length),
+          to: '/expiry',
+        }
+      : openIssues.length
+        ? {title: tr('{0} ανοιχτές εκκρεμότητες', openIssues.length), to: issuesPath}
+        : undefined;
+  const weekEvents = useMemo(
+    () => movements.filter(m => isDispatch(m, dept) || m.to === dept).map(m => m.at),
+    [movements, dept],
   );
 
-  // The most used Sets and instruments (in a Set or on their own), the busiest first.
+  // Limited-use Sets and instruments (a number of lives) with 3 uses left or fewer, the fewest first; and those whose
+  // uses are only counted (a wear check), each with its uses, the most first.
+  const limited = [
+    ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+    ...departmentTools.map(t => ({...t, kind: 'TOOL' as const})),
+  ]
+    .filter(a => (a.maxUses ?? 0) > 0)
+    .map(a => ({
+      id: a.id,
+      kind: a.kind,
+      name: a.name,
+      barcode: a.barcode,
+      uses: a.uses || 0,
+      max: a.maxUses!,
+      left: Math.max(0, a.maxUses! - (a.uses || 0)),
+    }))
+    .sort((a, b) => a.left - b.left || a.name.localeCompare(b.name, 'el'));
+  const nearEnd = limited.filter(a => a.left <= NEAR_END);
+  const counted = [
+    ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+    ...departmentTools.map(t => ({...t, kind: 'TOOL' as const})),
+  ]
+    .filter(a => !a.maxUses && 'wearCheck' in a && a.wearCheck)
+    .map(a => ({id: a.id, kind: a.kind, name: a.name, barcode: a.barcode, uses: a.uses || 0}))
+    .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name, 'el'));
+  const countedMax = Math.max(1, ...counted.map(a => a.uses));
+  const showsUses = limited.length > 0 || counted.length > 0;
+
+  // The most frequent uses: the Sets and instruments used most, the busiest first.
   const mostUsed = [
-    ...departmentSets.map(s => ({id: s.id, kind: 'SET' as const, barcode: s.barcode, name: s.name, uses: s.uses || 0})),
+    ...departmentSets.map(x => ({id: x.id, kind: 'SET' as const, barcode: x.barcode, name: x.name, uses: x.uses || 0})),
     ...departmentTools.map(t => ({
       id: t.id,
       kind: 'TOOL' as const,
@@ -82,49 +154,53 @@ export default function DepartmentHomePage() {
   ]
     .filter(a => a.uses > 0)
     .sort((a, b) => b.uses - a.uses)
-    .slice(0, 10);
-  const mostUsedMax = Math.max(1, ...mostUsed.map(a => a.uses));
-
-  // Today, for the band at the top: what is here, what is away, what waits to be picked up, what is open.
-  const issuesPath = presetPath('/issues', {status: 'OPEN', department: dept});
-  const counts = [
-    {n: atDepartment.value, label: tr('Στο τμήμα'), to: atDepartment.to},
-    {n: inSterilization.value, label: tr('Σε αποστείρωση'), to: inSterilization.to},
-    {n: readyStatus.value, label: tr('Για παραλαβή'), to: readyStatus.to},
-    {n: openIssues.length, label: tr('Εκκρεμότητες'), to: issuesPath},
-  ];
-  // The first thing to do: pick up what is ready, then what expires, then the issues, then the worn ones.
-  const next = ready.length
-    ? {title: tr('{0} έτοιμα για παραλαβή από την Αποστείρωση', ready.length), to: readyStatus.to}
-    : expiry.length
-      ? {
-          title: expired
-            ? tr('{0} έληξαν · {1} λήγουν σύντομα', expired, expiry.length - expired)
-            : tr('{0} λήγουν σύντομα', expiry.length),
-          to: '/expiry',
-        }
-      : openIssues.length
-        ? {title: tr('{0} ανοιχτές εκκρεμότητες', openIssues.length), to: issuesPath}
-        : nearLimit.length
-          ? {
-              // The first one's card, as its row under «Χρειάζεται προσοχή»: a Set or an instrument (in a Set or not).
-              title: tr('{0} κοντά στο όριο χρήσεων', nearLimit.length),
-              to: nearLimit[0].assetKind === 'SET' ? `/sets/${nearLimit[0].assetId}` : `/tools/${nearLimit[0].assetId}`,
-            }
-          : undefined;
-  const weekEvents = useMemo(
-    () => movements.filter(m => isDispatch(m, dept) || m.to === dept).map(m => m.at),
-    [movements, dept],
-  );
-  const allClear = !ready.length && !expiry.length && !openIssues.length && !nearLimit.length;
+    .slice(0, 15);
+  // A department that records no uses: how many times each was sent for sterilization instead.
+  const dispatched = useMemo(() => {
+    if (mostUsed.length) return [];
+    const undone = undoneIds(movements);
+    const byBarcode = new Map<string, number>();
+    for (const m of movements) {
+      if (m.undoes || undone.has(m.id) || m.causedBy || !isDispatch(m, dept)) continue;
+      const code = m.asset.split(' · ')[0].trim().toUpperCase();
+      byBarcode.set(code, (byBarcode.get(code) || 0) + 1);
+    }
+    const own = [
+      ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+      ...departmentTools.map(t => ({...t, kind: 'TOOL' as const})),
+    ];
+    return own
+      .map(a => ({
+        id: a.id,
+        kind: a.kind,
+        barcode: a.barcode,
+        name: a.name,
+        uses: [a.barcode, ...(a.legacyBarcodes || [])].reduce((n, b) => n + (byBarcode.get(b.toUpperCase()) || 0), 0),
+      }))
+      .filter(a => a.uses > 0)
+      .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name, 'el'))
+      .slice(0, 15);
+  }, [mostUsed.length, movements, dept, departmentSets, departmentTools]);
+  const byDispatch = !mostUsed.length;
+  const frequent = byDispatch ? dispatched : mostUsed;
+  const frequentMax = Math.max(1, ...frequent.map(a => a.uses));
+  // What is in Sterilization now, the ones ready for pickup first, then the nearest to coming back.
+  const STAGE_ORDER = ['READY_FOR_PICKUP', ...[...IN_STERILIZATION_STATES].reverse()];
+  const away = [
+    ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+    ...standalone.map(t => ({...t, kind: 'TOOL' as const})),
+  ]
+    .filter(a => STAGE_ORDER.includes(a.state))
+    .sort((a, b) => STAGE_ORDER.indexOf(a.state) - STAGE_ORDER.indexOf(b.state) || a.name.localeCompare(b.name, 'el'));
+  // The sterile ones in the department, the soonest to expire first.
+  const nextExpiries = sterile
+    .filter(e => e.assetState === 'IN_DEPARTMENT')
+    .sort((a, b) => a.sterileUntil.localeCompare(b.sterileUntil))
+    .slice(0, 6);
 
   return (
     <div className="department-home dash">
-      <PageHeader
-        eyebrow={tr('Αρχική τμήματος')}
-        title={trData(dept)}
-        description={tr('Ο εξοπλισμός του τμήματος με μια ματιά: τι είναι πού και τι περιμένει.')}
-      />
+      <PageHeader eyebrow={tr('Αρχική τμήματος')} title={trData(dept)} />
 
       <TodayBand
         counts={counts}
@@ -135,135 +211,193 @@ export default function DepartmentHomePage() {
       />
 
       <div className="dash-grid">
-        <section className="dash-card dash-attention">
-          <header>
-            <div>
-              <b>{tr('Χρειάζεται προσοχή')}</b>
-              <small>{tr('Ό,τι περιμένει το τμήμα τώρα.')}</small>
+        {showsUses ? (
+          <section className="dash-card dept-lives" aria-labelledby="dept-lives-title">
+            <header>
+              <div>
+                <b id="dept-lives-title">{tr('Χρήσεις εξοπλισμού')}</b>
+                <small>{tr('Όσα κοντεύουν στο όριο χρήσεων, και οι χρήσεις όσων απλώς μετρούν.')}</small>
+              </div>
+              <Gauge size={18} />
+            </header>
+            <div className="dept-lives-body" tabIndex={0} role="region" aria-labelledby="dept-lives-title">
+              {limited.length > 0 && (
+                <>
+                  <h3>
+                    {tr('Κοντά στο όριο')} <span>{tr('{0} χρήσεις ή λιγότερες', NEAR_END)}</span>
+                  </h3>
+                  {nearEnd.length ? (
+                    <ul className="dash-list dash-lives" aria-label={tr('Κοντά στο όριο')}>
+                      {nearEnd.map(a => (
+                        <li key={a.id} className={a.left === 0 ? 'out' : 'near'}>
+                          {a.kind === 'SET' ? (
+                            <Layers3 size={15} aria-hidden="true" />
+                          ) : (
+                            <Wrench size={15} aria-hidden="true" />
+                          )}
+                          <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                            <b>{a.name}</b>
+                            <small>{a.barcode}</small>
+                          </Link>
+                          <span className="dash-lives-track" aria-hidden="true">
+                            <i style={{width: `${Math.min(100, (a.uses / a.max) * 100)}%`}} />
+                          </span>
+                          <span className="dash-lives-count">
+                            <strong>
+                              {a.uses} / {a.max}
+                            </strong>
+                            <small>{a.left === 0 ? tr('Εξαντλήθηκε') : tr('απομένουν {0}', a.left)}</small>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="dept-lives-none">
+                      {tr('Κανένα · {0} με όριο χρήσεων, όλα με περισσότερες από {1}.', limited.length, NEAR_END)}
+                    </p>
+                  )}
+                </>
+              )}
+              {counted.length > 0 && (
+                <>
+                  <h3>{tr('Καταμέτρηση χρήσεων')}</h3>
+                  <ul className="dash-list dash-lives" aria-label={tr('Καταμέτρηση χρήσεων')}>
+                    {counted.map(a => (
+                      <li key={a.id}>
+                        {a.kind === 'SET' ? (
+                          <Layers3 size={15} aria-hidden="true" />
+                        ) : (
+                          <Wrench size={15} aria-hidden="true" />
+                        )}
+                        <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                          <b>{a.name}</b>
+                          <small>{a.barcode}</small>
+                        </Link>
+                        <span className="dash-lives-track" aria-hidden="true">
+                          <i style={{width: `${(a.uses / countedMax) * 100}%`}} />
+                        </span>
+                        <span className="dash-lives-count">
+                          <strong>{a.uses}</strong>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
-            <TriangleAlert size={18} />
-          </header>
-          <ul className="dash-list" tabIndex={0} aria-label={tr('Χρειάζεται προσοχή')}>
-            {ready.length > 0 && (
-              <li>
-                <PackageCheck size={15} className="warn" />
-                <Link to={readyStatus.to}>
-                  <b>{tr('{0} έτοιμα για παραλαβή από την Αποστείρωση', ready.length)}</b>
-                  <small>
-                    {ready
-                      .slice(0, 3)
-                      .map(a => `${a.barcode} · ${a.name}`)
-                      .join(' · ')}
-                  </small>
-                </Link>
-              </li>
-            )}
-            {expiry.length > 0 && (
-              <li>
-                <CalendarClock size={15} className={expired ? 'bad' : 'warn'} />
-                <Link to="/expiry">
-                  <b>
-                    {expired
-                      ? tr('{0} έληξαν · {1} λήγουν σύντομα', expired, expiry.length - expired)
-                      : tr('{0} λήγουν σύντομα', expiry.length)}
-                  </b>
-                  <small>
-                    {expiry
-                      .slice(0, 3)
-                      .map(e => `${e.barcode} · ${formatExpiry(e.sterileUntil)}`)
-                      .join(' · ')}
-                  </small>
-                </Link>
-              </li>
-            )}
-            {openIssues.slice(0, 5).map(i => (
-              <li key={i.id}>
-                <TriangleAlert size={15} className="bad" />
-                <Link to={assetPath(i.asset) || issuesPath}>
-                  <b>{i.asset}</b>
-                  <small>
-                    {trData(i.type)} · {i.created}
-                  </small>
-                </Link>
-              </li>
-            ))}
-            {nearLimit.slice(0, 3).map(a => (
-              <li key={a.id}>
-                <Gauge size={15} className="warn" />
-                <Link to={a.assetKind === 'SET' ? `/sets/${a.assetId}` : `/tools/${a.assetId}`}>
-                  <b>
-                    {a.barcode} · {a.name}
-                  </b>
-                  <small>{tr('απομένουν {0} χρήσεις', a.remaining)}</small>
-                </Link>
-              </li>
-            ))}
-            {allClear && (
-              <li className="ok">
-                <PackageCheck size={15} />
-                <span>{tr('Όλα εντάξει: τίποτα δεν περιμένει.')}</span>
-              </li>
-            )}
-          </ul>
-        </section>
+          </section>
+        ) : (
+          // Without limited or counted equipment: where its equipment is now and what expires next.
+          <section className="dash-card dept-lives" aria-labelledby="dept-where-title">
+            <header>
+              <div>
+                <b id="dept-where-title">{tr('Ο εξοπλισμός μου')}</b>
+                <small>{tr('Τι είναι στην Αποστείρωση τώρα και τι λήγει πρώτο στο τμήμα.')}</small>
+              </div>
+              <Layers3 size={18} />
+            </header>
+            <div className="dept-lives-body" tabIndex={0} role="region" aria-labelledby="dept-where-title">
+              <h3>
+                {tr('Στην Αποστείρωση')} <span>{away.length}</span>
+              </h3>
+              {away.length ? (
+                <ul className="dash-list dash-lives dash-where" aria-label={tr('Στην Αποστείρωση')}>
+                  {away.map(a => (
+                    <li key={a.id} className={a.state === 'READY_FOR_PICKUP' ? 'ready' : undefined}>
+                      {a.kind === 'SET' ? (
+                        <Layers3 size={15} aria-hidden="true" />
+                      ) : (
+                        <Wrench size={15} aria-hidden="true" />
+                      )}
+                      <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                        <b>{a.name}</b>
+                        <small>{a.barcode}</small>
+                      </Link>
+                      <span className="dash-where-stage">{statusLabel(a.state)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="dept-lives-none">
+                  {departmentSets.length + standalone.length
+                    ? tr('Όλα στο τμήμα: {0} Σετ, {1} μεμονωμένα εργαλεία.', departmentSets.length, standalone.length)
+                    : tr('Το τμήμα δεν έχει ακόμα εξοπλισμό.')}
+                </p>
+              )}
+              <h3>{tr('Επόμενες λήξεις')}</h3>
+              {nextExpiries.length ? (
+                <ul className="dash-list dash-lives dash-where" aria-label={tr('Επόμενες λήξεις')}>
+                  {nextExpiries.map(e => (
+                    <li key={`${e.kind}-${e.id}`} className={e.state === 'OK' ? undefined : e.state.toLowerCase()}>
+                      {e.kind === 'SET' ? (
+                        <Layers3 size={15} aria-hidden="true" />
+                      ) : (
+                        <Wrench size={15} aria-hidden="true" />
+                      )}
+                      <Link to={e.kind === 'SET' ? `/sets/${e.id}` : `/tools/${e.id}`}>
+                        <b>{e.name}</b>
+                        <small>{e.barcode}</small>
+                      </Link>
+                      <span className="dash-where-stage">
+                        {e.state === 'EXPIRED' ? tr('Έληξε') : formatExpiry(e.sterileUntil)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="dept-lives-none">{tr('Τίποτα αποστειρωμένο στο τμήμα.')}</p>
+              )}
+            </div>
+          </section>
+        )}
 
-        <section className="dash-card dash-latest">
-          <header>
-            <div>
-              <b>{tr('Τελευταίες κινήσεις')}</b>
-              <small>{tr('Οι πιο πρόσφατες κινήσεις των Σετ και εργαλείων του τμήματος.')}</small>
-            </div>
-            <Link to="/movements">{tr('Όλο το ιστορικό')}</Link>
-          </header>
-          <ul className="dash-list" tabIndex={0} aria-label={tr('Τελευταίες κινήσεις')}>
-            {latestMovements.map(m => (
-              <li key={m.id} className="dash-movement">
-                <Link to={assetPath(m.asset) || '/movements'}>
-                  <b>{m.asset}</b>
-                  <small>
-                    {movementText(m.status)} · {m.at}
-                  </small>
-                  <small>
-                    {trData(m.from)} → {trData(m.to)}
-                  </small>
-                </Link>
-              </li>
-            ))}
-            {latestMovements.length === 0 && (
-              <li className="ok">
-                <span>{tr('Δεν υπάρχουν κινήσεις ακόμα.')}</span>
-              </li>
-            )}
-          </ul>
-        </section>
         <section className="dash-card dash-most-used">
           <header>
             <div>
-              <b>{tr('Πιο πολυχρησιμοποιημένα')}</b>
-              <small>{tr('Τα Σετ και τα εργαλεία του τμήματος με τις περισσότερες χρήσεις.')}</small>
+              <b>{byDispatch ? tr('Συχνότερες αποστολές') : tr('Συχνότερες χρήσεις')}</b>
+              <small>
+                {byDispatch
+                  ? tr('Πόσες φορές στάλθηκε το καθένα για αποστείρωση.')
+                  : tr('Τα Σετ και τα εργαλεία του τμήματος με τις περισσότερες χρήσεις.')}
+              </small>
             </div>
             <Gauge size={18} />
           </header>
-          <ul className="dash-list dash-used" tabIndex={0} aria-label={tr('Πιο πολυχρησιμοποιημένα')}>
-            {mostUsed.map(a => (
-              <li key={a.id}>
-                {a.kind === 'SET' ? <Layers3 size={15} aria-hidden="true" /> : <Wrench size={15} aria-hidden="true" />}
-                <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`} title={`${a.name}: ${a.uses}`}>
-                  <b>{a.name}</b>
-                  <small>{a.barcode}</small>
-                  <span className="dash-used-track" aria-hidden="true">
-                    <i style={{width: `${(a.uses / mostUsedMax) * 100}%`}} />
-                  </span>
-                </Link>
-                <strong>{a.uses}</strong>
-              </li>
-            ))}
-            {mostUsed.length === 0 && (
-              <li className="ok">
-                <span>{tr('Καμία χρήση ακόμα.')}</span>
-              </li>
-            )}
-          </ul>
+          {frequent.length ? (
+            <>
+              <ol className="dept-cols" aria-label={byDispatch ? tr('Συχνότερες αποστολές') : tr('Συχνότερες χρήσεις')}>
+                {frequent.slice(0, 8).map((a, i) => (
+                  <li key={a.id} className={a.kind === 'SET' ? 'set' : 'tool'}>
+                    <Link
+                      to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}
+                      title={`${a.name} · ${a.barcode}: ${a.uses}`}
+                      aria-label={`${a.name} ${a.barcode}: ${a.uses}`}
+                    >
+                      <b aria-hidden="true">{a.uses}</b>
+                      <span className="dept-col" aria-hidden="true">
+                        <i style={{height: `${Math.max(4, (a.uses / frequentMax) * 100)}%`}} />
+                      </span>
+                      <small aria-hidden="true">{i + 1}</small>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+              <ol className="dept-cols-names" aria-hidden="true">
+                {frequent.slice(0, 8).map(a => (
+                  <li key={a.id}>
+                    <span>{a.name}</span>
+                    <small>{a.barcode}</small>
+                  </li>
+                ))}
+              </ol>
+              <p className="dept-cols-legend">
+                <span className="set">{tr('Σετ')}</span>
+                <span className="tool">{tr('Εργαλεία')}</span>
+              </p>
+            </>
+          ) : (
+            <p className="dept-empty">{tr('Καμία αποστολή ακόμα.')}</p>
+          )}
         </section>
       </div>
     </div>

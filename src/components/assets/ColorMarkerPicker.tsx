@@ -138,7 +138,12 @@ export default function ColorMarkerPicker({
             )}
             <label className="color-search">
               <Search size={15} />
-              <input value={query} onChange={e => setQuery(e.target.value)} placeholder={tr('Αναζήτηση χρώματος...')} />
+              <input
+                type="search"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder={tr('Αναζήτηση χρώματος...')}
+              />
             </label>
             <div className="color-palette">
               {colorTapeGroups.map(group => {

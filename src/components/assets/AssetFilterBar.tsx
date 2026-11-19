@@ -40,6 +40,7 @@ export default function AssetFilterBar({
       <div className="asset-filter-search">
         <Search size={17} />
         <input
+          type="search"
           value={query}
           onChange={e => onQueryChange(e.target.value)}
           onKeyDown={e => {

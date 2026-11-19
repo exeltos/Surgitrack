@@ -54,6 +54,7 @@ const IssuesPage = lazyPage(() => import('../modules/issues/IssuesPage'));
 const MovementsPage = lazyPage(() => import('../modules/movements/MovementsPage'));
 const TraceabilityPage = lazyPage(() => import('../modules/traceability/TraceabilityPage'));
 const ReportsPage = lazyPage(() => import('../modules/reports/ReportsPage'));
+const IndicatorsPage = lazyPage(() => import('../modules/indicators/IndicatorsPage'));
 const StudioPage = lazyPage(() => import('../modules/studio/StudioPage'));
 const HospitalAdminPage = lazyPage(() => import('../modules/hospital/HospitalAdminPage'));
 const HospitalOverviewPage = lazyPage(() => import('../modules/hospital/HospitalOverviewPage'));
@@ -476,6 +477,14 @@ export default function App() {
             element={
               <Guard permission="traceability.view">
                 <TraceabilityPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/indicators"
+            element={
+              <Guard permission="indicators.view">
+                <IndicatorsPage />
               </Guard>
             }
           />

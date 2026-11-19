@@ -1,4 +1,5 @@
 import {
+  TrendingUp,
   Layers3,
   Wrench,
   Sparkles,
@@ -74,6 +75,7 @@ const assetNavigation: NavigationItem[] = [
   {to: '/standalone-tools', label: 'Μεμονωμένα', icon: Scissors, permission: 'asset.registry.view', group: 'EQUIPMENT'},
   {to: '/stock', label: 'Απόθεμα εργαλείων', icon: Warehouse, permission: 'stock.manage', group: 'EQUIPMENT'},
   {to: '/traceability', label: 'Ιχνηλάτηση', icon: ScanSearch, permission: 'traceability.view', group: 'INSIGHT'},
+  {to: '/indicators', label: 'Δείκτες', icon: TrendingUp, permission: 'indicators.view', group: 'INSIGHT'},
   {to: '/reports', label: 'Αναφορές', icon: BarChart3, permission: 'reports.view', group: 'INSIGHT'},
   {
     to: '/movements',

@@ -411,8 +411,7 @@
 .dash-activity {
   grid-column: span 5;
 }
-.dash-attention,
-.dash-latest {
+.dash-attention {
   grid-column: span 6;
 }
 .dash-bars {
@@ -762,8 +761,7 @@ html body .dash-more {
 @media (max-width: 1180px) {
   .dash-flow,
   .dash-activity,
-  .dash-attention,
-  .dash-latest {
+  .dash-attention {
     grid-column: 1 / -1;
   }
 }
@@ -773,18 +771,13 @@ html body .dash-more {
   }
 }
 @media (min-width: 1100px) and (min-height: 600px) {
-  /* The cards fill the window's height but never shrink below a readable one: on a short window, below the
-     «Σήμερα» band, the page scrolls instead. */
   html body .hospital-overview.dash > .dash-grid {
-    flex: 1 0 auto;
-    grid-template-rows: repeat(2, minmax(270px, 1fr));
-  }
-  html body .hospital-overview.dash {
-    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
   }
   html body .dash-flow > .dash-bars,
-  html body .dash-attention > .dash-list,
-  html body .dash-latest > .dash-list {
+  html body .dash-attention > .dash-list {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -960,9 +953,8 @@ html body .department-home .dash-grid {
 html body .department-home .dash-grid > .dash-card {
   grid-column: auto;
 }
-/* «Χρειάζεται προσοχή» and «Τελευταίες κινήσεις» keep a fixed height: a long list scrolls inside its card. */
-html body .department-home .dash-attention > .dash-list,
-html body .department-home .dash-latest > .dash-list {
+/* On a narrow screen each list keeps a fixed height: a long one scrolls inside its card. */
+html body .department-home .dash-grid > .dash-card > .dash-list {
   max-height: 300px;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -1252,9 +1244,6 @@ html body .hospital-people .people-requests {
 }
 
 /* The department's latest movements: no clock on every row; the route on its own line, whole. */
-html body .dash-list li.dash-movement {
-  grid-template-columns: minmax(0, 1fr);
-}
 
 /* Overview, Sterilization flow: rows of a steady height with a divider and a hover, instead of eight rows stretched
    to fill the card with wide gaps between them. */
@@ -1284,8 +1273,7 @@ html body .hospital-overview .dash-flow .dash-bar-track {
 
 /* Lists inside a card fade out at the foot instead of cutting a line in half: the fade says there is more to
    scroll to, and the last entry can scroll clear of it. */
-html body .department-home .dash-attention > .dash-list,
-html body .department-home .dash-latest > .dash-list,
+html body .department-home .dash-grid > .dash-card > .dash-list,
 html body .hospital-overview .dash-activity > .dash-list,
 html body .hospital-overview .dash-attention > .dash-list {
   padding-bottom: 22px;
@@ -1613,9 +1601,9 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
   scrollbar-gutter: stable;
 }
 
-/* Department Home on a computer: under «Σήμερα», what needs attention beside the latest movements, both down to the
-   foot of the window; a long list scrolls inside its card, never the page. */
-@media (min-width: 1100px) and (min-height: 600px) {
+/* Department Home on a computer: one screen, never scrolling. Under «Σήμερα», three columns down to the foot of the
+   window — available, in Sterilization, uses; a long list scrolls inside its card. */
+@media (min-width: 1100px) {
   html body .department-home.dash {
     display: flex;
     flex-direction: column;
@@ -1632,51 +1620,389 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: minmax(0, 1fr);
   }
-  html body .department-home .dash-attention > .dash-list,
-  html body .department-home .dash-latest > .dash-list,
-  html body .department-home .dash-most-used > .dash-list {
+  html body .department-home .dash-grid > .dash-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  html body .department-home .dash-grid > .dash-card > .dash-list {
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    align-content: start;
   }
 }
 
 /* Department Home › «Πιο πολυχρησιμοποιημένα»: one row per Set or instrument — its name and barcode over a thin bar
    of its uses, the count at the end. */
-.dash-used li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
+
+/* Department Home › «Διαθέσιμα στο τμήμα» and «Στην Αποστείρωση»: one row per Set or instrument — its name and
+   barcode, and at the end its expiry or its stage. */
+
+/* Overview on a computer: one screen, never scrolling, whatever the window's height. Under «Σήμερα» the four cards
+   share what is left; what a card cannot show scrolls inside it, its rows keeping their height. */
+@media (min-width: 1100px) {
+  html body .hospital-overview.dash {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  html body .hospital-overview.dash > .dash-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  html body .hospital-overview.dash > .dash-grid > .dash-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  html body .hospital-overview.dash .dash-card > .dash-list,
+  html body .hospital-overview.dash .dash-card > .dash-bars,
+  html body .hospital-overview.dash .dash-card > .dash-depts-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    align-content: start;
+  }
+  html body .hospital-overview.dash .dash-card > .dash-bars {
+    grid-auto-rows: 30px;
+  }
+  html body .hospital-overview.dash .dash-activity > .dash-columns {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 72px;
+  }
 }
-.dash-used li > a {
+/* On the amber of the row last opened, the notes take a darker shade to stay readable. */
+
+/* Department Home: «Τι έχω να κάνω» — three links with their count, lit when there is something to do — then «Ο
+   εξοπλισμός μου», one line per kind, its list scrolling under a fixed head; the page itself stays put. */
+html body .department-home {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+html body .department-home > * {
+  flex: 0 0 auto;
+}
+.dept-empty {
+  margin: 0;
+  padding: 16px;
+  color: var(--c-gray-45);
+}
+@media (max-width: 720px) {
+  html body .department-home {
+    overflow-y: auto;
+  }
+}
+
+/* Every search field: an «×» at its end once something is typed, to clear it (the browser's own clear button,
+   drawn in the app's look); the field keeps the look of a plain text box otherwise. */
+input[type='search'] {
+  appearance: none;
+}
+input[type='search']::-webkit-search-decoration {
+  appearance: none;
+}
+input[type='search']::-webkit-search-cancel-button {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--c-gray-85)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2315232b' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E")
+    center / 10px no-repeat;
+  cursor: pointer;
+}
+input[type='search']::-webkit-search-cancel-button:hover {
+  background-color: var(--c-gray-65);
+}
+
+/* Department Home in the Overview's look: «Σήμερα», then two cards side by side down to the foot of the window — the
+   equipment by kind (wider) and the uses; each card's list scrolls inside it. */
+html body .department-home.dash > .dash-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+html body .department-home .dash-grid > .dash-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+html body .department-home .dash-most-used > .dash-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  align-content: start;
+}
+@media (max-width: 1099px) {
+  html body .department-home.dash > .dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+  html body .department-home.dash {
+    overflow-y: auto;
+  }
+  html body .department-home .dash-grid > .dash-card {
+    overflow: visible;
+  }
+  html body .department-home .dash-most-used > .dash-list {
+    max-height: 360px;
+  }
+}
+/* Department Home › «Όριο χρήσεων»: one row per limited-use Set or instrument — its name, a bar of the uses made
+   and «12 / 20 · απομένουν 8»; near the end in amber, used up in red. */
+html body .department-home .dept-lives > .dash-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  align-content: start;
+}
+.dash-lives li {
   display: grid;
-  gap: 2px;
+  grid-template-columns: auto minmax(0, 1.4fr) minmax(80px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.dash-lives li > a {
+  display: grid;
   min-width: 0;
   color: inherit;
   text-decoration: none;
 }
-.dash-used li > a b {
+.dash-lives li > a b {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.dash-used-track {
+.dash-lives-track {
   display: block;
-  height: 5px;
+  height: 6px;
   border-radius: 3px;
   background: var(--dash-track);
+  overflow: hidden;
 }
-.dash-used-track i {
+.dash-lives-track i {
   display: block;
   height: 100%;
   border-radius: 3px;
   background: var(--dash-bar);
 }
-.dash-used strong {
+.dash-lives li.near .dash-lives-track i {
+  background: var(--c-amber-50);
+}
+.dash-lives li.out .dash-lives-track i {
+  background: var(--c-red-40);
+}
+.dash-lives-count {
+  display: grid;
+  justify-items: end;
+  min-width: 84px;
+  white-space: nowrap;
+}
+.dash-lives-count strong {
   font-variant-numeric: tabular-nums;
 }
-html body .department-home .dash-latest header > a {
+.dash-lives-count small {
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+.dash-lives li.near .dash-lives-count small {
+  color: var(--c-amber-35);
+  font-weight: 600;
+}
+.dash-lives li.out .dash-lives-count small {
+  color: var(--c-red-35);
+  font-weight: 600;
+}
+@media (max-width: 1099px) {
+  html body .department-home .dept-lives > .dash-list {
+    max-height: 420px;
+  }
+}
+/* «Χρήσεις εξοπλισμού»: its two parts under small titles, scrolling together inside the card. */
+html body .department-home .dept-lives > .dept-lives-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.dept-lives-body h3 {
+  margin: 10px 0 2px;
+  color: var(--c-gray-15);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.dept-lives-body h3:first-child {
+  margin-top: 0;
+}
+.dept-lives-body h3 span {
+  margin-left: 6px;
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+.dept-lives-none {
+  margin: 4px 0 8px;
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+}
+@media (max-width: 1099px) {
+  html body .department-home .dept-lives > .dept-lives-body {
+    max-height: 480px;
+  }
+}
+/* Overview › by department: the row opens the department (its link lays its parts in the row's grid); the issues mark
+   is a link of its own, to the department's open issues. */
+.dash-dept-main {
+  display: contents;
+  color: inherit;
+  text-decoration: none;
+}
+.dash-dept:has(.dash-dept-main:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+a.dash-pill {
+  text-decoration: none;
+}
+a.dash-pill:hover {
+  text-decoration: underline;
+}
+/* Department Home › «Συχνότερες χρήσεις»: a column chart of the eight most used — the uses on top, the name under
+   each column; Sets in blue, instruments in green. */
+.dept-cols {
+  display: grid;
+  flex: 1 1 auto;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+  min-height: 160px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.dept-cols li > a {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: 4px;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.dept-cols b {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dept-col {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 44px;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--dash-track);
+}
+.dept-col i {
+  display: block;
+  width: 100%;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--dash-1);
+}
+.dept-cols li.tool .dept-col i {
+  background: var(--dash-3);
+}
+.dept-cols li > a:hover .dept-col i {
+  filter: brightness(0.9);
+}
+.dept-cols small {
+  color: var(--c-gray-45);
+  font-size: 11px;
+  font-weight: 600;
+}
+/* The names, numbered as the columns. */
+.dept-cols-names {
+  flex: 0 0 auto;
+  margin: 10px 0 0;
+  padding: 0 0 0 22px;
+  overflow-y: auto;
+  font-size: 12.5px;
+}
+.dept-cols-names li {
+  padding: 3px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.dept-cols-names li::marker {
+  color: var(--c-gray-45);
+  font-weight: 600;
+}
+.dept-cols-names span {
+  font-weight: 600;
+}
+.dept-cols-names small {
+  margin-left: 6px;
+  color: var(--c-gray-45);
+}
+.dept-cols-legend {
+  display: flex;
+  gap: 14px;
+  margin: 8px 0 0;
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+.dept-cols-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 3px;
+  background: var(--dash-1);
+  vertical-align: -1px;
+}
+.dept-cols-legend span.tool::before {
+  background: var(--dash-3);
+}
+/* The chart takes the card's height (the cards' children otherwise keep their own). */
+html body .department-home .dash-most-used > .dept-cols {
+  flex: 1 1 auto;
+}
+/* The department's equipment without uses: where it is now and what expires next, one line each. */
+.dash-where li {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.dash-where-stage {
+  color: var(--c-gray-35);
+  font-size: 12px;
   white-space: nowrap;
+}
+.dash-where li.ready .dash-where-stage {
+  color: var(--c-green-35);
+  font-weight: 600;
+}
+.dash-where li.expiring .dash-where-stage {
+  color: var(--c-amber-35);
+  font-weight: 600;
+}
+.dash-where li.expired .dash-where-stage {
+  color: var(--c-red-35);
+  font-weight: 600;
 }

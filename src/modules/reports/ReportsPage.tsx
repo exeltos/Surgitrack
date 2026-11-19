@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {Fragment, useEffect, useMemo, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText} from 'lucide-react';
@@ -29,6 +29,7 @@ import {
 } from './reportsMeta';
 import {buildReport} from './buildReport';
 import {reportSummary} from './reportSummary';
+import LoadCell from './loadCells';
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
@@ -311,13 +312,13 @@ export default function ReportsPage() {
         ? [
             {key: 'loaded', label: tr('Φόρτωση')},
             {key: 'equipment', label: tr('Κλίβανος')},
-            {key: 'cycleProgram', label: tr('Κύκλος')},
+            {key: 'cycle', label: tr('Κύκλος')},
+            {key: 'program', label: tr('Πρόγραμμα')},
             {key: 'items', label: tr('Αντικείμενα')},
             {key: 'indicators', label: tr('Δείκτες')},
             {key: 'cycleReadings', label: tr('Παράμετροι κύκλου')},
             {key: 'loadStatus', label: tr('Κατάσταση')},
             {key: 'releasedInfo', label: tr('Αποδέσμευση')},
-            {key: 'barcodes', label: 'Barcodes'},
           ]
         : reportData.columns;
     // A report with a barcode and a name shows the barcode under the name, not in a column of its own.
@@ -342,6 +343,20 @@ export default function ReportsPage() {
       ]),
     ),
   );
+  // The inventory, by department or specialty, reads as groups as it opens: the group's name heads its rows, and its
+  // column goes. Sorting by any column (that one too, either way) shows the plain table; a third click on the sorted
+  // column returns to the groups.
+  const firstKey = screenColumns[0]?.key;
+  const groupKey =
+    firstKey && (firstKey === 'department' || firstKey === 'specialty') && !order.sort ? firstKey : undefined;
+  const tableColumns = groupKey ? screenColumns.slice(1) : screenColumns;
+  const groupSizes = useMemo(() => {
+    const sizes = new Map<string, number>();
+    if (groupKey)
+      for (const row of viewRows)
+        sizes.set(String(row[groupKey] ?? ''), (sizes.get(String(row[groupKey] ?? '')) || 0) + 1);
+    return sizes;
+  }, [groupKey, viewRows]);
   const shownRows = useProgressiveList(
     order.rows,
     [
@@ -497,53 +512,62 @@ export default function ReportsPage() {
               aria-label={tr('Αποτελέσματα')}
             >
               {viewRows.length ? (
-                <table className="reports-table">
+                <table className={`reports-table${groupKey ? ' reports-grouped' : ''}`}>
                   <thead>
                     <tr>
-                      {screenColumns.map(c => (
+                      {tableColumns.map(c => (
                         <SortTh key={c.key} label={c.label} sortKey={c.key} sort={order.sort} onSort={order.toggle} />
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {shownRows.visible.map((row, index) => {
-                      // The first column groups the rows (department, specialty …): it is written on the first row
-                      // of each group only, so the groups read at a glance.
-                      const first = screenColumns[0]?.key;
+                      // Grouped (by department, specialty): each group opens with a line of its own — its name and
+                      // how many it holds — instead of a column written on the first row and blank below it.
                       const previous = index ? shownRows.visible[index - 1] : undefined;
-                      const sameGroup = Boolean(first && previous && previous[first] === row[first]);
+                      const opens = Boolean(groupKey && (!previous || previous[groupKey] !== row[groupKey]));
                       return (
-                        <tr key={index} className={sameGroup ? '' : 'report-group-start'}>
-                          {screenColumns.map((c, column) => (
-                            <td
-                              key={c.key}
-                              data-label={c.label}
-                              className={
-                                c.key === 'barcode'
-                                  ? 'mono'
-                                  : c.key === 'name'
-                                    ? 'report-cell-name'
-                                    : c.key === 'signature' && row.signature === tr('Μη επιβεβαιωμένη')
-                                      ? 'report-cell-warn'
-                                      : column === 0 && sameGroup
-                                        ? 'report-cell-repeat'
+                        <Fragment key={index}>
+                          {opens && (
+                            <tr className="report-group-row">
+                              <th colSpan={tableColumns.length} scope="rowgroup">
+                                {cellText(groupKey!, row[groupKey!]) || '—'}
+                                <span>{groupSizes.get(String(row[groupKey!] ?? ''))}</span>
+                              </th>
+                            </tr>
+                          )}
+                          <tr>
+                            {tableColumns.map(c => (
+                              <td
+                                key={c.key}
+                                data-label={c.label}
+                                className={
+                                  c.key === 'barcode'
+                                    ? 'mono'
+                                    : c.key === 'name'
+                                      ? 'report-cell-name'
+                                      : c.key === 'signature' && row.signature === tr('Μη επιβεβαιωμένη')
+                                        ? 'report-cell-warn'
                                         : ''
-                              }
-                            >
-                              {c.key === 'stateLabel' && typeof row.state === 'string' && row.state ? (
-                                <StatusBadge value={row.state} />
-                              ) : (
-                                cellText(c.key, row[c.key])
-                              )}
-                              {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
-                                <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
-                              ) : null}
-                            </td>
-                          ))}
-                        </tr>
+                                }
+                              >
+                                {c.key === 'stateLabel' && typeof row.state === 'string' && row.state ? (
+                                  <StatusBadge value={row.state} />
+                                ) : active === 'loads' && ['indicators', 'loadStatus', 'items'].includes(c.key) ? (
+                                  <LoadCell column={c.key} row={row} />
+                                ) : (
+                                  cellText(c.key, row[c.key])
+                                )}
+                                {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
+                                  <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
+                                ) : null}
+                              </td>
+                            ))}
+                          </tr>
+                        </Fragment>
                       );
                     })}
-                    {shownRows.hasMore && <MoreRows colSpan={screenColumns.length} onVisible={shownRows.showMore} />}
+                    {shownRows.hasMore && <MoreRows colSpan={tableColumns.length} onVisible={shownRows.showMore} />}
                   </tbody>
                 </table>
               ) : (

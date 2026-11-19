@@ -417,9 +417,14 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       </span>
                     )}
                     {assetIssues.length > 0 && (
-                      <span className="issue-inline">
+                      // What is open, not only how many: the type of the newest, its note on hover.
+                      <span
+                        className="issue-inline"
+                        title={assetIssues.map(i => [trData(i.type), i.note].filter(Boolean).join(': ')).join('\n')}
+                      >
                         <TriangleAlert size={14} />
-                        {assetIssues.length} {assetIssues.length === 1 ? tr('ανοικτή') : tr('ανοικτές')}
+                        {trData(assetIssues[0].type)}
+                        {assetIssues.length > 1 && ` +${assetIssues.length - 1}`}
                       </span>
                     )}
                     {(() => {
