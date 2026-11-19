@@ -315,36 +315,37 @@ export default function HospitalOverviewPage() {
   const perDayMax = Math.max(1, ...perDay.map(x => x.n));
   const perDayTotal = perDay.reduce((sum, x) => sum + x.n, 0);
   const deptMax = Math.max(1, ...byDepartment.map(d => d.total));
+  // Today's work in Sterilization, for «Σήμερα»: the cycles started and the loads released (the cards below show what
+  // is where now and what waits).
+  const todayKey = new Date().toDateString();
+  const today = (kind: 'STERILIZATION' | 'WASHING', field: 'createdAt' | 'releasedAt') =>
+    processLoads.filter(load => {
+      const at = load.kind === kind ? load[field] : undefined;
+      const stamp = at ? movementStamp(at) : 0;
+      return !!stamp && new Date(stamp).toDateString() === todayKey;
+    }).length;
   const dayLabel = (d: Date) =>
     d.toLocaleDateString(lang === 'el' ? 'el-GR' : 'en-GB', {day: 'numeric', month: 'short'});
 
   return (
     <div className="hospital-overview dash">
-      <PageHeader
-        eyebrow={L('Πίνακας ελέγχου', 'Dashboard')}
-        title={L('Επισκόπηση', 'Overview')}
-        description={L(
-          'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',
-          'Where the equipment is, what is moving and what needs attention.',
-        )}
-      />
+      <PageHeader eyebrow={L('Πίνακας ελέγχου', 'Dashboard')} title={L('Επισκόπηση', 'Overview')} />
 
       <TodayBand
         counts={[
           {
-            n: tracked.filter(a => a.state === 'PENDING_STERILIZATION').length,
-            label: L('Προς παραλαβή', 'To receive'),
-            to: '/sterilization?queue=INCOMING',
+            n: today('STERILIZATION', 'createdAt'),
+            label: L('Κύκλοι αποστείρωσης', 'Sterilization cycles'),
+            to: '/sterilizers',
           },
-          {n: inProcess.length, label: L('Σε αποστείρωση', 'In sterilization'), to: '/sterilization'},
+          {n: today('WASHING', 'createdAt'), label: L('Κύκλοι πλύσης', 'Washing cycles'), to: '/sterilizers'},
           {
-            n: tracked.filter(a => inSterilizer.has(a.id)).length,
-            label: L('Στον κλίβανο', 'In the sterilizer'),
-            to: '/sterilization?queue=IN_STERILIZER',
+            n: today('STERILIZATION', 'releasedAt'),
+            label: L('Φορτία αποδεσμεύτηκαν', 'Loads released'),
+            to: '/sterilizers',
           },
-          {n: ready.length, label: L('Έτοιμα για παραλαβή', 'Ready for pickup'), to: '/sterilization?queue=READY'},
         ]}
-        next={triage[0] && {title: triage[0].title, to: triage[0].to}}
+        next={null}
         events={processLoads.filter(load => load.kind === 'STERILIZATION').map(load => load.createdAt)}
         eventsLabel={n => L(`${n} κύκλοι αποστείρωσης`, `${n} sterilization cycles`)}
         expiries={sterile}

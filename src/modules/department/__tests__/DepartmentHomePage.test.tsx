@@ -1,4 +1,4 @@
-import {screen} from '@testing-library/react';
+import {screen, within} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import DepartmentHomePage from '../DepartmentHomePage';
@@ -11,23 +11,30 @@ const department = {
 };
 
 describe('Department home', () => {
-  it('shows the department at a glance: its counts, what needs attention and its latest movements', () => {
+  it('shows each thing once: today, what is available, what is in Sterilization and the uses', () => {
     renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: department});
-    expect(screen.getByText('Αρχική τμήματος')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Χειρουργείο'})).toBeInTheDocument();
-    // Today's figures, each opening its list.
-    for (const label of ['Στο τμήμα', 'Σε αποστείρωση', 'Για παραλαβή', 'Εκκρεμότητες'])
+    // «Σήμερα» counts only what no column below counts.
+    for (const label of ['Εκκρεμότητες', 'Λήγουν σύντομα'])
       expect(screen.getByRole('link', {name: new RegExp(`^${label}: \\d+$`)})).toBeInTheDocument();
-    expect(screen.getByRole('link', {name: /^Στο τμήμα: /})).toHaveAttribute(
-      'href',
-      '/department?preset=1&statusFilter=IN_DEPARTMENT',
-    );
-    expect(screen.getByRole('list', {name: 'Χρειάζεται προσοχή'})).toBeInTheDocument();
-    expect(screen.getByRole('list', {name: 'Τελευταίες κινήσεις'})).toBeInTheDocument();
-    // The most used, Sets and instruments together, the busiest first.
-    const used = screen.getByRole('list', {name: 'Πιο πολυχρησιμοποιημένα'});
-    const counts = [...used.querySelectorAll('strong')].map(n => Number(n.textContent));
-    expect(counts.length).toBeGreaterThan(0);
-    expect(counts).toEqual([...counts].sort((a, b) => b - a));
+    expect(screen.queryByRole('link', {name: /^Στο τμήμα: /})).toBeNull();
+
+    // Available: the soonest expiry first.
+    const available = screen.getByRole('list', {name: 'Διαθέσιμα στο τμήμα'});
+    const dates = within(available)
+      .queryAllByText(/^έως \d\d\/\d\d\/\d{4}$/)
+      .map(n => n.textContent!.slice(4).split('/').reverse().join(''));
+    expect(dates.length).toBeGreaterThan(0);
+    expect(dates).toEqual([...dates].sort());
+
+    // In Sterilization: what waits to be picked up comes first.
+    const away = within(screen.getByRole('list', {name: 'Στην Αποστείρωση'})).getAllByRole('listitem');
+    expect(away.length).toBeGreaterThan(0);
+    const readyAt = away.findIndex(li => /Έτοιμο για παραλαβή|Για παραλαβή/i.test(li.textContent || ''));
+    if (readyAt >= 0) expect(readyAt).toBe(0);
+
+    // Uses: the worn ones first, each with what it has left.
+    const uses = within(screen.getByRole('list', {name: 'Χρήσεις'})).getAllByRole('listitem');
+    expect(uses.length).toBeGreaterThan(0);
   });
 });

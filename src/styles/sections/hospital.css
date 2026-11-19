@@ -411,8 +411,7 @@
 .dash-activity {
   grid-column: span 5;
 }
-.dash-attention,
-.dash-latest {
+.dash-attention {
   grid-column: span 6;
 }
 .dash-bars {
@@ -762,8 +761,7 @@ html body .dash-more {
 @media (max-width: 1180px) {
   .dash-flow,
   .dash-activity,
-  .dash-attention,
-  .dash-latest {
+  .dash-attention {
     grid-column: 1 / -1;
   }
 }
@@ -773,18 +771,13 @@ html body .dash-more {
   }
 }
 @media (min-width: 1100px) and (min-height: 600px) {
-  /* The cards fill the window's height but never shrink below a readable one: on a short window, below the
-     «Σήμερα» band, the page scrolls instead. */
   html body .hospital-overview.dash > .dash-grid {
-    flex: 1 0 auto;
-    grid-template-rows: repeat(2, minmax(270px, 1fr));
-  }
-  html body .hospital-overview.dash {
-    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
   }
   html body .dash-flow > .dash-bars,
-  html body .dash-attention > .dash-list,
-  html body .dash-latest > .dash-list {
+  html body .dash-attention > .dash-list {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -960,9 +953,8 @@ html body .department-home .dash-grid {
 html body .department-home .dash-grid > .dash-card {
   grid-column: auto;
 }
-/* «Χρειάζεται προσοχή» and «Τελευταίες κινήσεις» keep a fixed height: a long list scrolls inside its card. */
-html body .department-home .dash-attention > .dash-list,
-html body .department-home .dash-latest > .dash-list {
+/* On a narrow screen each list keeps a fixed height: a long one scrolls inside its card. */
+html body .department-home .dash-grid > .dash-card > .dash-list {
   max-height: 300px;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -1252,9 +1244,6 @@ html body .hospital-people .people-requests {
 }
 
 /* The department's latest movements: no clock on every row; the route on its own line, whole. */
-html body .dash-list li.dash-movement {
-  grid-template-columns: minmax(0, 1fr);
-}
 
 /* Overview, Sterilization flow: rows of a steady height with a divider and a hover, instead of eight rows stretched
    to fill the card with wide gaps between them. */
@@ -1284,8 +1273,7 @@ html body .hospital-overview .dash-flow .dash-bar-track {
 
 /* Lists inside a card fade out at the foot instead of cutting a line in half: the fade says there is more to
    scroll to, and the last entry can scroll clear of it. */
-html body .department-home .dash-attention > .dash-list,
-html body .department-home .dash-latest > .dash-list,
+html body .department-home .dash-grid > .dash-card > .dash-list,
 html body .hospital-overview .dash-activity > .dash-list,
 html body .hospital-overview .dash-attention > .dash-list {
   padding-bottom: 22px;
@@ -1613,9 +1601,9 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
   scrollbar-gutter: stable;
 }
 
-/* Department Home on a computer: under «Σήμερα», what needs attention beside the latest movements, both down to the
-   foot of the window; a long list scrolls inside its card, never the page. */
-@media (min-width: 1100px) and (min-height: 600px) {
+/* Department Home on a computer: one screen, never scrolling. Under «Σήμερα», three columns down to the foot of the
+   window — available, in Sterilization, uses; a long list scrolls inside its card. */
+@media (min-width: 1100px) {
   html body .department-home.dash {
     display: flex;
     flex-direction: column;
@@ -1632,13 +1620,18 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: minmax(0, 1fr);
   }
-  html body .department-home .dash-attention > .dash-list,
-  html body .department-home .dash-latest > .dash-list,
-  html body .department-home .dash-most-used > .dash-list {
+  html body .department-home .dash-grid > .dash-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  html body .department-home .dash-grid > .dash-card > .dash-list {
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    align-content: start;
   }
 }
 
@@ -1677,6 +1670,79 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
 .dash-used strong {
   font-variant-numeric: tabular-nums;
 }
-html body .department-home .dash-latest header > a {
+
+/* Department Home › «Διαθέσιμα στο τμήμα» and «Στην Αποστείρωση»: one row per Set or instrument — its name and
+   barcode, and at the end its expiry or its stage. */
+.dash-count {
+  margin-left: 4px;
+  color: var(--c-gray-45);
+  font-style: normal;
+  font-weight: 600;
+}
+.dash-items li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.dash-items li > a {
+  display: grid;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.dash-items li > a b {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.dash-item-note {
+  font-size: 12px;
+  color: var(--c-gray-45);
+  white-space: nowrap;
+}
+.dash-item-note.expired {
+  color: var(--c-red-35);
+  font-weight: 600;
+}
+.dash-item-note.expiring {
+  color: var(--c-amber-35);
+  font-weight: 600;
+}
+.dash-item-note.ready {
+  color: var(--c-green-35);
+  font-weight: 600;
+}
+
+/* Overview on a computer: one screen, never scrolling, whatever the window's height. Under «Σήμερα» the four cards
+   share what is left; what a card cannot show scrolls inside it, its rows keeping their height. */
+@media (min-width: 1100px) {
+  html body .hospital-overview.dash {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  html body .hospital-overview.dash > .dash-grid > .dash-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  html body .hospital-overview.dash .dash-card > .dash-list,
+  html body .hospital-overview.dash .dash-card > .dash-bars,
+  html body .hospital-overview.dash .dash-card > .dash-depts-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    align-content: start;
+  }
+  html body .hospital-overview.dash .dash-card > .dash-bars {
+    grid-auto-rows: 30px;
+  }
+  html body .hospital-overview.dash .dash-activity > .dash-columns {
+    flex: 0 0 auto;
+    height: 72px;
+    min-height: 72px;
+  }
 }

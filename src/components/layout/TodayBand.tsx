@@ -44,8 +44,8 @@ function Count({n, label, to}: {n: number; label: string; to: string}) {
 type Props = {
   /** Today's figures, each opening the list that holds them. */
   counts: Array<{n: number; label: string; to: string}>;
-  /** The most urgent thing waiting, if any. */
-  next?: {title: string; to: string};
+  /** The most urgent thing waiting, if any; `null` where the page lists what waits already (no «Πρώτα»). */
+  next?: {title: string; to: string} | null;
   /** When each of the week's events happened (a sterilization cycle, a movement): one bar per day. */
   events: readonly string[];
   /** How a day's count of events reads, e.g. «3 κύκλοι αποστείρωσης». */
@@ -108,7 +108,7 @@ export default function TodayBand({counts, next, events, eventsLabel, expiries}:
           <Link className="today-next" to={next.to}>
             <span>{L('Πρώτα:', 'First:')}</span> {next.title} <ArrowRight size={16} aria-hidden="true" />
           </Link>
-        ) : (
+        ) : next === null ? null : (
           <p className="today-next ok">
             <PackageCheck size={16} aria-hidden="true" /> {L('Τίποτα δεν περιμένει.', 'Nothing is waiting.')}
           </p>
