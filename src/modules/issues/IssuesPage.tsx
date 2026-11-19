@@ -184,8 +184,9 @@ export default function IssuesPage() {
       />
       {/* The records in the middle, with the whole height; beside them, on the right, the instruments out of order
           (the same on every tab), each opening the instruments to replace by it. */}
-      <div className={withReplacements ? 'issues-layout' : undefined}>
-        <div className="issues-main">
+      <div className={`issues-layout${withReplacements ? '' : ' solo'}`}>
+        {/* A workspace of its own: its header and filters stay still and only its list scrolls, as on the page. */}
+        <div className="issues-main tools-list-workspace">
           {tab !== 'REPORTS' ? (
             <Suspense fallback={<Spinner />}>
               <ReplacementsPage

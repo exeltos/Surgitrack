@@ -2027,13 +2027,21 @@ html body .department-home .dash-most-used > .dept-cols {
 /* «Εκκρεμότητες»: the records in the middle with the whole height; the instruments out of order in a narrow
    column on the right, one line each (a low row above the records on a narrow screen). */
 .issues-layout {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 230px;
+  grid-template-rows: minmax(0, 1fr);
   gap: 16px;
-  align-items: start;
+}
+.issues-layout.solo {
+  grid-template-columns: minmax(0, 1fr);
 }
 .issues-main {
   min-width: 0;
+}
+.issues-layout > .problem-aside {
+  align-self: start;
 }
 .problem-aside {
   /* Level with the list (below the tabs), not with the tabs. */
@@ -2108,7 +2116,11 @@ html body .department-home .dash-most-used > .dept-cols {
 @media (max-width: 1599px) {
   .issues-layout {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 10px;
+  }
+  .issues-layout.solo {
+    grid-template-rows: minmax(0, 1fr);
   }
   .problem-aside {
     order: -1;
