@@ -65,9 +65,9 @@ html body .trace-tone {
   border-radius: 999px;
   background: var(--c-gray-95);
   color: var(--c-blue-15-2);
-  font-size: 13px;
+  font-size: 12px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 html body .trace-tone.ok {
@@ -89,7 +89,8 @@ html body .trace-verdict {
   margin: 0;
   padding: 10px 16px;
   border-radius: 12px;
-  font-weight: 700;
+  font-size: 13.5px;
+  font-weight: 600;
 }
 html body .trace-verdict.ok {
   background: var(--c-gray-95-8);
@@ -109,7 +110,7 @@ html body .trace-link {
   background: none;
   color: var(--c-cyan-35);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   text-align: left;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -120,7 +121,8 @@ html body .trace-link {
 html body .trace-load-items h3 {
   margin: 0;
   color: var(--c-blue-15-2);
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
 }
 html body .trace-actions {
   display: flex;
@@ -283,14 +285,14 @@ html body .trace-item-head {
 }
 html body .trace-item-head small {
   color: var(--c-blue-40);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 500;
 }
 html body .trace-item-head h2 {
   margin: 2px 0 0;
   color: var(--c-blue-15-2);
-  font-size: 21px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 600;
 }
 html body .trace-item-head .trace-open {
   text-decoration: none;
@@ -315,8 +317,8 @@ html body .trace-info > div:first-child {
 }
 html body .trace-info dt {
   color: var(--c-blue-40);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12.5px;
+  font-weight: 500;
 }
 html body .trace-info dd {
   display: flex;
@@ -325,11 +327,16 @@ html body .trace-info dd {
   gap: 4px 8px;
   margin: 0;
   color: var(--c-blue-15-2);
+  font-size: 13.5px;
+}
+html body .trace-info dd b {
+  font-weight: 600;
 }
 html body .trace-section-title {
   margin: 4px 0 8px;
   color: var(--c-blue-15-2);
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* The history: one table, a line where each round begins. */
@@ -338,17 +345,20 @@ html body .trace-history .trace-round-row th {
   border-top: 1px solid var(--c-gray-90);
   background: var(--c-gray-95);
   color: var(--c-blue-15-2);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 600;
   text-transform: none;
 }
 html body .trace-history td {
-  padding: 10px 18px;
-  font-size: 14px;
+  padding: 9px 18px;
+  font-size: 13px;
+}
+html body .trace-history td b {
+  font-weight: 600;
 }
 html body .trace-history td small {
   color: var(--c-blue-40);
-  font-size: 13px;
+  font-size: 12px;
 }
 html body .trace-history .trace-when {
   color: var(--c-blue-40);
@@ -396,7 +406,7 @@ html body .trace-recent-list button:hover {
 html body .trace-recent-list button span {
   overflow: hidden;
   color: var(--c-blue-40);
-  font-size: 14px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
