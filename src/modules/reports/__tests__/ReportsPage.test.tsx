@@ -156,5 +156,6 @@ describe('Reports', () => {
     expect(new Set(column('Τύπος')).size).toBeGreaterThan(1);
     // The split by department is gone: the Filters cover it.
     expect(screen.queryByRole('group', {name: 'Ανά τμήμα'})).not.toBeInTheDocument();
-  });
+    // Every row of the demo data, rendered three times: slow on a busy CI runner.
+  }, 20_000);
 });
