@@ -3,7 +3,7 @@ import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import TraceabilityPage from '../TraceabilityPage';
 
-const field = () => screen.getByRole('textbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
+const field = () => screen.getByRole('searchbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
 
 describe('TraceabilityPage search', () => {
   it('offers the Sets and instruments a typed name fits, and opens the one picked', () => {

@@ -401,6 +401,7 @@ function CodeGroups({
         <label className="name-check-search">
           <Search size={15} />
           <input
+            type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={tr('Αναζήτηση κωδικού ή ονομασίας…')}

@@ -11,39 +11,35 @@ const department = {
 };
 
 describe('Department home', () => {
-  it('shows what to do now, then the equipment one line per kind', () => {
+  it('shows «Σήμερα», the limited-use equipment and the most frequent uses', () => {
     renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: department});
     expect(screen.getByRole('heading', {name: 'Χειρουργείο'})).toBeInTheDocument();
 
-    // What to do: pick up, expiries, issues — each with its count, opening its list.
-    const todo = screen.getByRole('navigation', {name: 'Τι έχω να κάνω'});
-    for (const label of ['Παραλαβή', 'Λήξεις', 'Εκκρεμότητες'])
-      expect(within(todo).getByRole('link', {name: new RegExp(`^\\d+\\s*${label}`)})).toBeInTheDocument();
-    expect(within(todo).getByRole('link', {name: /Εκκρεμότητες/})).toHaveAttribute(
+    // «Σήμερα», as on the Overview: what to pick up, what expires, the open issues — each opening its list.
+    for (const label of ['Για παραλαβή', 'Λήγουν σύντομα', 'Εκκρεμότητες'])
+      expect(screen.getByRole('link', {name: new RegExp(`^${label}: \\d+$`)})).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /^Εκκρεμότητες: /})).toHaveAttribute(
       'href',
       expect.stringContaining('/issues?'),
     );
+    // The most frequent uses, the busiest first.
+    const used = within(screen.getByRole('list', {name: 'Συχνότερες χρήσεις'}))
+      .getAllByRole('listitem')
+      .map(li => Number(li.querySelector('strong')?.textContent));
+    expect(used).toEqual([...used].sort((a, b) => b - a));
 
-    // The equipment: one line per kind, Sets then standalone instruments, each line's counts adding up.
-    const table = screen.getByRole('table');
-    const groups = within(table)
-      .getAllByRole('rowheader')
-      .filter(h => h.getAttribute('scope') === 'rowgroup')
-      .map(h => h.textContent);
-    expect(groups[0]).toMatch(/^Σετ/);
-    const rows = within(table)
-      .getAllByRole('row')
-      .filter(r => within(r).queryAllByRole('cell').length === 5);
-    expect(rows.length).toBeGreaterThan(0);
-    for (const row of rows) {
-      const [here, away, total] = within(row)
-        .getAllByRole('cell')
-        .slice(0, 3)
-        .map(c => Number.parseInt(c.textContent || '0', 10) || 0);
-      expect(here + away).toBeLessThanOrEqual(total);
-    }
-    // A kind opens the list of its units.
-    const first = within(rows[0]).getAllByRole('link')[0];
-    expect(first.getAttribute('href')).toMatch(/^\/department(\/tools)?\?preset=1&query=/);
+    // Its limited-use Sets and instruments: those alerted near their end first, then the fewest left.
+    const lives = within(screen.getByRole('list', {name: 'Όριο χρήσεων'})).getAllByRole('listitem');
+    expect(lives.length).toBeGreaterThan(0);
+    const firstPlain = lives.findIndex(li => !li.classList.contains('near') && !li.classList.contains('out'));
+    if (firstPlain >= 0) expect(lives.slice(firstPlain).every(li => !li.classList.contains('near'))).toBe(true);
+    // With those, no table of kinds.
+    expect(screen.queryByRole('table')).toBeNull();
+  });
+
+  it('without limited-use equipment, shows its equipment one line per kind', () => {
+    renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: {...department, department: 'Κανένα'}});
+    expect(screen.queryByRole('list', {name: 'Όριο χρήσεων'})).toBeNull();
+    expect(screen.getByText('Το τμήμα δεν έχει ακόμα εξοπλισμό.')).toBeInTheDocument();
   });
 });

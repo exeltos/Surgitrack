@@ -99,6 +99,7 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
               <div className="studio-search">
                 <Search size={17} />
                 <input
+                  type="search"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder={L('Αναζήτηση ονομασίας ή κωδικού...', 'Search name or code...')}

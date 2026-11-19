@@ -209,6 +209,7 @@ export default function NetworkAccessDialog({
             <legend>{L('Εξαιρέσεις', 'Exceptions')}</legend>
             {editing && (
               <input
+                type="search"
                 value={find}
                 placeholder={L('Αναζήτηση χρήστη…', 'Search a user…')}
                 aria-label={L('Αναζήτηση χρήστη', 'Search a user')}

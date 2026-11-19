@@ -328,6 +328,7 @@ export default function HelpCenter({onClose, screens}: {onClose: () => void; scr
           <label className="manual-search">
             <Search size={15} />
             <input
+              type="search"
               ref={searchRef}
               value={query}
               onChange={e => setQuery(e.target.value)}

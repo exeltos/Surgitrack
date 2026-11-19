@@ -31,6 +31,7 @@ export default function ToolsPreview({plan, L}: {plan: ImportPlan; L: (el: strin
         <label className="asset-import-tools-search">
           <Search size={15} />
           <input
+            type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={L('Αναζήτηση ονομασίας, κωδικού, κατασκευαστή…', 'Search name, code, manufacturer…')}

@@ -381,6 +381,7 @@ export default function AssetCreatePage({kind}: {kind: AssetKind}) {
                   <div className="composer-search create-set-search">
                     <Search size={17} />
                     <input
+                      type="search"
                       value={query}
                       onChange={e => setQuery(e.target.value)}
                       placeholder={tr('Barcode, κωδικός ή ονομασία εργαλείου...')}

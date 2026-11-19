@@ -270,6 +270,7 @@ export default function AssetManageModal({
             <label>
               <Layers3 size={16} />
               <input
+                type="search"
                 value={setQuery}
                 onChange={e => setSetQuery(e.target.value)}
                 placeholder={tr('Αναζήτηση Σετ με barcode, όνομα ή τμήμα...')}
