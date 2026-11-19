@@ -48,10 +48,12 @@ export default function ReplacementsPage({
   tabs,
   view,
   onView,
-  initialReason = '',
+  reason: givenReason,
+  onReason,
 }: {
-  /** The reason the list opens filtered by (from «Εκκρεμότητες»' figures above). */
-  initialReason?: string;
+  /** The reason filter, when the page above keeps it (the figures of «Εκκρεμότητες» set it too). */
+  reason?: string;
+  onReason?: (reason: string) => void;
   embedded?: boolean;
   tabs?: ReactNode;
   view?: Tab;
@@ -70,7 +72,9 @@ export default function ReplacementsPage({
   const tab = view ?? ownTab;
   const setTab = onView ?? setOwnTab;
   const [query, setQuery] = useState('');
-  const [reason, setReason] = useState(initialReason);
+  const [ownReason, setOwnReason] = useState('');
+  const reason = givenReason ?? ownReason;
+  const setReason = onReason ?? setOwnReason;
   const [department, setDepartment] = useState('');
   const [stock, setStock] = useState('');
   const [status, setStatus] = useState<StatusFilter>('NEEDED');

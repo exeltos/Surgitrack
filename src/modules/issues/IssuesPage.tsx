@@ -191,8 +191,8 @@ export default function IssuesPage() {
       {tab !== 'REPORTS' ? (
         <Suspense fallback={<Spinner />}>
           <ReplacementsPage
-            key={params.get('reason') || ''}
-            initialReason={params.get('reason') || ''}
+            reason={params.get('reason') || ''}
+            onReason={reason => setParams(reason ? {tab: 'replacements', reason} : {tab: 'replacements'})}
             embedded
             tabs={tabs}
             view={tab === 'ORDERS' ? 'ORDERS' : 'ITEMS'}

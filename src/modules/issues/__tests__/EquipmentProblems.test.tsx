@@ -25,5 +25,9 @@ describe('«Εκκρεμότητες»: the instruments out of order above the t
     const reasons = rows.slice(1).map(r => r.textContent || '');
     expect(reasons.length).toBeGreaterThan(0);
     expect(reasons.every(t => t.includes('Απώλεια'))).toBe(true);
+    // The list's own reason filter and the figures stay one: clearing it there unmarks the figure.
+    fireEvent.click(within(figures).getByRole('button', {name: /^Service/}));
+    expect(within(figures).getByRole('button', {name: /^Service/})).toHaveAttribute('aria-pressed', 'true');
+    expect(within(figures).getByRole('button', {name: /^Απώλεια/})).toHaveAttribute('aria-pressed', 'false');
   });
 });
