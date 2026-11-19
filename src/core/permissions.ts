@@ -24,6 +24,7 @@ export const permissionKeys = [
   'issue.create',
   'history.view',
   'reports.view',
+  'indicators.view',
   'traceability.view',
   'counts.record',
   'overview.view',
@@ -230,6 +231,16 @@ export const permissionCatalog: readonly PermissionDescriptor[] = [
     hintEn: 'Access consolidated reports.',
   },
   {
+    key: 'indicators.view',
+    group: 'TRACEABILITY',
+    el: 'Δείκτες',
+    en: 'Indicators',
+    hintEl:
+      'Γραφήματα και ανάλυση: φόρτος ανά ώρα και ημέρα, χρόνος κύκλου, χρήση ανά τμήμα, ποιότητα, απώλειες· μόνο διαχειριστής και προϊστάμενος Αποστείρωσης.',
+    hintEn:
+      'Charts and analysis: workload by hour and day, turnaround, use by department, quality, losses; only the admin and the Sterilization supervisor.',
+  },
+  {
     key: 'traceability.view',
     group: 'TRACEABILITY',
     el: 'Πλήρης ιχνηλασιμότητα',
@@ -307,6 +318,7 @@ const sterilizationPermissions: readonly Permission[] = [
   'issue.create',
   'history.view',
   'reports.view',
+  'indicators.view',
   'traceability.view',
   'counts.record',
   'overview.view',
@@ -327,6 +339,7 @@ export const supervisorOnlyPermissions: readonly Permission[] = [
   'asset.usage.correct',
   'asset.composition.manage',
   'overview.view',
+  'indicators.view',
 ];
 export const isSupervisorOnly = (permission: Permission) => supervisorOnlyPermissions.includes(permission);
 
@@ -376,6 +389,7 @@ export const roleUnavailablePermissions: Record<UserRole, readonly Permission[]>
     'sterilization.cycle',
     'sterilization.deliver',
     'reports.view',
+    'indicators.view',
     'traceability.view',
     'overview.view',
     'studio.manage',
@@ -408,6 +422,7 @@ const sanitize = (role: UserRole, permissions: readonly Permission[]) => {
       'sterilization.cycle',
       'sterilization.deliver',
       'reports.view',
+      'indicators.view',
       'traceability.view',
       'overview.view',
       'studio.manage',

@@ -19,6 +19,7 @@
 @import './sections/devices.css';
 @import './sections/movements.css';
 @import './sections/traceability.css';
+@import './sections/indicators.css';
 @import './sections/reports.css';
 @import './sections/auth.css';
 @import './sections/landing.css';
