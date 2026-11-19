@@ -33,5 +33,8 @@ describe('cycle numbers', () => {
     expect([...today.used].sort()).toEqual([1, 3]);
     expect(today.next).toBe(4);
     expect(todaysCycles([], 'Κλίβανος 1', 'A', now).next).toBe(1);
+    // A device's long identifier with the same letter is not one of the day's numbers.
+    const device = [{equipment: 'Κλίβανος 1', cycleNumber: 'A20261119001', createdAt: '19/11/2026 09:00'}];
+    expect(todaysCycles(device, 'Κλίβανος 1', 'A', now).next).toBe(1);
   });
 });

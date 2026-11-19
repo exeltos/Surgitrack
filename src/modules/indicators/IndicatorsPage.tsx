@@ -36,7 +36,14 @@ export default function IndicatorsPage() {
   const live = useMemo(() => liveMovements(movements, since), [movements, since]);
   const load = useMemo(() => workload(live, since, days), [live, since, days]);
   const equipment = useMemo(() => equipmentLoad(processLoads, since), [processLoads, since]);
-  const rounds = useMemo(() => turnaround(movements, since), [movements, since]);
+  // Each barcode, earlier ones too, to its asset's current one.
+  const assetOf = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const x of [...sets, ...tools])
+      for (const b of [x.barcode, ...(x.legacyBarcodes || [])]) map.set(b.toUpperCase(), x.barcode.toUpperCase());
+    return map;
+  }, [sets, tools]);
+  const rounds = useMemo(() => turnaround(movements, since, b => assetOf.get(b) || b), [movements, since, assetOf]);
   const setBarcodes = useMemo(
     () => new Set(sets.flatMap(x => [x.barcode, ...(x.legacyBarcodes || [])]).map(b => b.toUpperCase())),
     [sets],

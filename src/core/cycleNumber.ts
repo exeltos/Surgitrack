@@ -46,6 +46,8 @@ export function cycleDigits(cycleNumber: string, prefix: string) {
   return /^\d+$/.test(digits) ? Number(digits) : undefined;
 }
 
+const MAX_OF_DAY = 999;
+
 /**
  * Today's cycle numbers of a sterilizer, with its letter: the ones used already and the next one (one after the
  * highest, 1 at the start of the day).
@@ -63,7 +65,8 @@ export function todaysCycles(
     if (load.kind && load.kind !== 'STERILIZATION') continue;
     if (load.equipment !== equipment || movementStamp(load.createdAt) < start.getTime()) continue;
     const n = cycleDigits(load.cycleNumber, prefix);
-    if (n !== undefined) used.add(n);
+    // A number of the day (A1…A999); a longer one is a device's own identifier, not one of the day's.
+    if (n !== undefined && n <= MAX_OF_DAY) used.add(n);
   }
   return {used, next: used.size ? Math.max(...used) + 1 : 1};
 }

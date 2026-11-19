@@ -97,14 +97,19 @@ export function equipmentLoad(loads: readonly ProcessLoadRecord[], since: number
  * Turnaround per department: from the department's dispatch to Sterilization until the Set or instrument is back in
  * the department, in hours (median and the slowest tenth).
  */
-export function turnaround(movements: readonly Movement[], since: number) {
+export function turnaround(
+  movements: readonly Movement[],
+  since: number,
+  // The asset a barcode belongs to: a barcode changed between dispatch and return is still the same asset.
+  identity: (barcode: string) => string = barcode => barcode,
+) {
   // An undo and what it undid are no move: an undone dispatch is no round, the undo itself no return.
   // History comes newest first: `order` keeps that, so moves within the same minute stay in the order they were made.
   const byAsset = new Map<string, Array<{m: Movement; stamp: number; order: number}>>();
   liveMovements(movements, 0).forEach((m, index) => {
     const stamp = stampOf(m.at);
     if (!stamp) return;
-    const code = m.asset.split(' · ')[0].trim().toUpperCase();
+    const code = identity(m.asset.split(' · ')[0].trim().toUpperCase());
     byAsset.set(code, [...(byAsset.get(code) || []), {m, stamp, order: -index}]);
   });
   const hours = new Map<string, number[]>();

@@ -81,6 +81,15 @@ describe('indicators', () => {
       move('k', '19/11/2026 08:00', 'Χειρουργείο', 'Χειρουργείο', 'Καταμέτρηση'),
     ];
     expect(turnaround(signed, since).overall.rounds).toBe(0);
+    // A barcode changed between dispatch and return: the same asset, one round.
+    const renamed = [
+      move('r1', '16/11/2026 08:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
+      move('r2', '17/11/2026 08:00', 'Κεντρική Αποστείρωση', 'Χειρουργείο', 'Παράδοση στο τμήμα', {
+        asset: 'S000002 · ΟΡΘΟΠΕΔΙΚΟ ΒΑΣΙΚΟ',
+      }),
+    ];
+    expect(turnaround(renamed, since).overall.rounds).toBe(0);
+    expect(turnaround(renamed, since, b => (b === 'S000001' ? 'S000002' : b)).overall.rounds).toBe(1);
     expect(t.departments).toEqual([{department: 'Χειρουργείο', median: 24, p90: 24, rounds: 1}]);
   });
 
