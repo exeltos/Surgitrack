@@ -2,7 +2,7 @@ import type {LibraryState} from '../core/libraryTypes';
 import {demoAdminRepository} from '../data/adminRepositories/demoRepository';
 import type {ReactElement} from 'react';
 import {render} from '@testing-library/react';
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {HashRouter, MemoryRouter, Route, Routes} from 'react-router-dom';
 import {AppPreferencesProvider} from '../core/AppPreferences';
 import {LibraryStoreProvider} from '../core/LibraryStore';
 import {SurgiProvider} from '../store/SurgiStore';
@@ -29,6 +29,7 @@ export function renderPage(
     signedIn,
     demo,
     library,
+    browserHistory,
   }: {
     path?: string;
     route?: string;
@@ -36,6 +37,8 @@ export function renderPage(
     /** In the platform's Demo (as entered from Studio). */ demo?: boolean;
     /** Libraries in place of the Demo's own (as if saved in this browser). */
     library?: Partial<LibraryState>;
+    /** On the browser's own history, as the app is (a fresh tab at `path`), rather than one kept in memory. */
+    browserHistory?: boolean;
   } = {},
 ) {
   forgetPageMemory();
@@ -46,8 +49,15 @@ export function renderPage(
     sessionStorage.setItem('surgitrack-demo-role', signedIn.role);
     sessionStorage.setItem('surgitrack-session-user', JSON.stringify(signedIn));
   }
+  if (browserHistory) window.history.replaceState(null, '', `#${path}`);
+  const Router = ({children}: {children: ReactElement}) =>
+    browserHistory ? (
+      <HashRouter>{children}</HashRouter>
+    ) : (
+      <MemoryRouter initialEntries={[path]}>{children}</MemoryRouter>
+    );
   return render(
-    <MemoryRouter initialEntries={[path]}>
+    <Router>
       <AppPreferencesProvider>
         <LibraryStoreProvider dataMode="DEMO">
           <SurgiProvider dataMode="DEMO">
@@ -59,6 +69,6 @@ export function renderPage(
           </SurgiProvider>
         </LibraryStoreProvider>
       </AppPreferencesProvider>
-    </MemoryRouter>,
+    </Router>,
   );
 }

@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
-import {Search, History, Flame, Users, Package} from 'lucide-react';
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {ArrowLeft, Search, History, Flame, Users, Package} from 'lucide-react';
+import AppButton from '../../components/ui/AppButton';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -66,6 +67,16 @@ export default function TraceabilityPage() {
   const openTab = (next: Tab) => {
     if (next !== tab) setParams(TAB_PARAM[next] ? {tab: TAB_PARAM[next]!} : {});
   };
+  const navigate = useNavigate();
+  // A step to go back to inside the app: the browser's history index (a page reached by a redirect is at 0 too); where
+  // there is none (tests, in memory), the router's key, «default» on the first page.
+  const location = useLocation();
+  const historyIndex = (window.history.state as {idx?: number} | null)?.idx;
+  const canGoBack = typeof historyIndex === 'number' ? historyIndex > 0 : location.key !== 'default';
+  // Something open on the tab (a search, a patient, a load): with nothing before it, «Πίσω» returns to the tab's start.
+  const detailOpen = !!(urlQuery || patient || loadId);
+  const goBack = () =>
+    canGoBack ? navigate(-1) : setParams(TAB_PARAM[tab] ? {tab: TAB_PARAM[tab]!} : {}, {replace: true});
   const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
   const openLoad = (id: string) => setParams({tab: 'load', load: id});
   const openItem = (barcode: string) => commit(barcode);
@@ -145,25 +156,32 @@ export default function TraceabilityPage() {
   return (
     // The movements tab fills the page, as «Ιστορικό» did on its own.
     <div className={tab === 'HISTORY' ? 'trace-with-history' : 'trace-page'}>
-      <div className="page-head">
-        <div>
-          <h1>{tr('Ιχνηλάτηση')}</h1>
+      {/* No page title: the menu says where this is. On a tab's list, the tabs; inside one of its cards (a Set or
+          instrument found, a patient, a load), only «Πίσω» in their place, as «Πίσω στη λίστα» on the Set and
+          instrument pages: to the previous step, or with nothing before it, to the tab's list. */}
+      <h1 className="visually-hidden">{tr('Ιχνηλάτηση')}</h1>
+      {detailOpen ? (
+        <div className="trace-head">
+          <AppButton icon={<ArrowLeft size={18} />} onClick={goBack} className="trace-page-back">
+            {tr('Πίσω')}
+          </AppButton>
         </div>
-      </div>
-      <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
-        {tabs.map(t => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            className={tab === t.id ? 'active' : ''}
-            onClick={() => openTab(t.id)}
-          >
-            <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
-          </button>
-        ))}
-      </div>
+      ) : (
+        <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
+          {tabs.map(t => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              className={tab === t.id ? 'active' : ''}
+              onClick={() => openTab(t.id)}
+            >
+              <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
+            </button>
+          ))}
+        </div>
+      )}
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
       {tab === 'HISTORY' ? (
@@ -171,12 +189,7 @@ export default function TraceabilityPage() {
       ) : tab === 'PATIENTS' && !patient ? (
         <PatientUses movements={movements} onOpen={openPatient} />
       ) : tab === 'PATIENTS' ? (
-        <PatientTrace
-          patient={patient}
-          onBack={() => setParams({tab: 'patients'})}
-          onItem={openItem}
-          onLoad={openLoad}
-        />
+        <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
       ) : tab === 'LOAD' ? (
         <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
       ) : (
