@@ -291,7 +291,9 @@ describe('Sterilizers & Devices, one screen', () => {
     );
     fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
     // The row says which test failed: Bowie-Dick, marked failed.
-    const failed = within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('Bowie-Dick').closest('li')!;
+    const failed = within(await rowOf('ΚΛΙΒΑΝΟΣ 2'))
+      .getByText('Bowie-Dick')
+      .closest('li')!;
     expect(failed).toHaveClass('bad');
     expect(within(failed).getByText('απέτυχε')).toBeInTheDocument();
   });
