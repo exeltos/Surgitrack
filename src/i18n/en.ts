@@ -110,6 +110,12 @@ export const en: Record<string, string> = {
   'Barcode / Κωδικός': 'Barcode / Code',
   'Ιχνηλάτηση · {0}': 'Trace · {0}',
   '{0} κινήσεις': '{0} movements',
+  '{0} ανοιχτές εκκρεμότητες': '{0} open issues',
+  'Πιο πολυχρησιμοποιημένα': 'Most used',
+  'Τα Σετ και τα εργαλεία του τμήματος με τις περισσότερες χρήσεις.':
+    "The department's Sets and instruments with the most uses.",
+  'Καμία χρήση ακόμα.': 'No uses yet.',
+  '{0} κοντά στο όριο χρήσεων': '{0} near their usage limit',
   'Άνοιγμα καρτέλας': 'Open card',
   'Πώς επιλύθηκε (προαιρετικό)': 'How it was resolved (optional)',
   'π.χ. Αντικαταστάθηκε από το Απόθεμα': 'e.g. Replaced from Stock',
@@ -2187,16 +2193,8 @@ export const en: Record<string, string> = {
   'Όλο το ιστορικό': 'Full history',
   'Δεν υπάρχουν κινήσεις ακόμα.': 'No movements yet.',
   'Πού βρίσκεται ο εξοπλισμός': 'Where the equipment is',
-  'Τα Σετ και τα μεμονωμένα εργαλεία του τμήματος τώρα.': "The department's Sets and standalone instruments now.",
   'Service / απολεσθέντα': 'Service / lost',
   'Κινήσεις 14 ημερών': 'Movements, last 14 days',
-  'Αποστολές στην Αποστείρωση και παραλαβές στο τμήμα, ανά ημέρα.':
-    'Sent to Sterilization and received at the department, per day.',
-  Αποστολές: 'Sent',
-  '{0}: {1} αποστολές, {2} παραλαβές': '{0}: {1} sent, {2} received',
-  'Πιο πολυχρησιμοποιημένα Σετ': 'Most used Sets',
-  'Τα Σετ του τμήματος με τις περισσότερες χρήσεις.': "The department's Sets with the most uses.",
-  'Καμία χρήση ακόμα.': 'No uses yet.',
   'Μετρήθηκε χρήση: την αποστολή την ακυρώνει ο προϊστάμενος Αποστείρωσης.':
     'A use was counted: the Sterilization supervisor cancels this dispatch.',
   'Αναιρείτε μόνο κινήσεις της ίδιας ημέρας· τις παλαιότερες ο προϊστάμενος.':
