@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {CheckCircle2, ShoppingCart, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import {tr, trData} from '../../i18n';
 import type {Issue} from '../../types/domain';
 
@@ -24,14 +25,18 @@ export default function IssueActions({
   ask,
   onManage,
   replaceable,
+  locked,
 }: {
   issue: Issue;
   ask: Ask;
   onManage: () => void;
   /** An instrument: it can be replaced with a new one. */
   replaceable?: boolean;
+  /** In an active reprocessing: Service, Stock and composition wait for it, as the item's «Διαχείριση» does. */
+  locked?: boolean;
 }): ReactNode {
   const {resolveIssues, can} = useSurgi();
+  const withReplacements = useHasModule('REPLACEMENTS');
   if (issue.status !== 'OPEN' || !can('asset.composition.manage')) return null;
   return (
     <div className="asset-issue-actions">
@@ -50,10 +55,18 @@ export default function IssueActions({
       >
         {tr('Ελέγχθηκε · σε χρήση')}
       </AppButton>
-      <AppButton size="sm" icon={<Wrench size={14} />} onClick={onManage}>
+      <AppButton
+        size="sm"
+        icon={<Wrench size={14} />}
+        onClick={onManage}
+        disabled={locked}
+        title={
+          locked ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.') : undefined
+        }
+      >
         {tr('Service, Απόθεμα…')}
       </AppButton>
-      {replaceable && can('stock.manage') && (
+      {replaceable && withReplacements && can('stock.manage') && (
         <Link className="app-button app-button-secondary app-button-sm" to="/issues?tab=replacements">
           <ShoppingCart size={14} aria-hidden="true" />
           {tr('Αντικατάσταση')}

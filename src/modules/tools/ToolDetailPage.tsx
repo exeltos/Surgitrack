@@ -346,7 +346,13 @@ export default function ToolDetailPage() {
                               ))}
                             </div>
                           ) : null}
-                          <IssueActions issue={issue} ask={ask} onManage={() => setManageOpen(true)} replaceable />
+                          <IssueActions
+                            issue={issue}
+                            ask={ask}
+                            onManage={() => setManageOpen(true)}
+                            locked={workflowLocked}
+                            replaceable
+                          />
                         </div>
                       </div>
                     ))

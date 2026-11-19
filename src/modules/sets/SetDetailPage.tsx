@@ -444,6 +444,8 @@ export default function SetDetailPage() {
                                 issue={issue}
                                 ask={ask}
                                 replaceable={!!member}
+                                // An instrument's own page keeps its own lock.
+                                locked={!member && workflowLocked}
                                 onManage={() => (member ? navigate(`/tools/${member.id}`) : setManageOpen(true))}
                               />
                             );
