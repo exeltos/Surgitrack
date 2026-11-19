@@ -61,7 +61,13 @@ export default function IndicatorsPage() {
 
   const NONE = L('Χωρίς τμήμα', 'No department');
   // Losses and expiries now, per department: instruments lost, sterile items already expired.
-  const lost = tools.filter(t => t.state === 'LOST');
+  // Declaring an instrument lost clears its department; its loss issue keeps the one that lost it (the latest one).
+  const lossDepartment = new Map<string, string>();
+  for (const i of issues)
+    if (i.type === 'Απώλεια') lossDepartment.set(i.asset.split(' · ')[0].trim().toUpperCase(), i.department);
+  const lost = tools
+    .filter(t => t.state === 'LOST')
+    .map(t => ({...t, department: t.department || lossDepartment.get(t.barcode.toUpperCase())}));
   const expiredNow = sterileExpiryList(sets, tools).filter(e => e.state === 'EXPIRED');
   const perDepartment = (items: ReadonlyArray<{department?: string}>) => {
     const map = new Map<string, number>();
