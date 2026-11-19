@@ -1673,8 +1673,8 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
     grid-auto-rows: 30px;
   }
   html body .hospital-overview.dash .dash-activity > .dash-columns {
-    flex: 0 0 auto;
-    height: 72px;
+    flex: 1 1 auto;
+    height: auto;
     min-height: 72px;
   }
 }
