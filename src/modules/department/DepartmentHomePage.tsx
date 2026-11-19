@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
-import {ChevronRight, Gauge, Layers3, Wrench} from 'lucide-react';
+import {Gauge, Layers3, Wrench} from 'lucide-react';
 import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {presetPath} from '../../core/listMemory';
 import PageHeader from '../../components/ui/PageHeader';
@@ -8,6 +8,8 @@ import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
 import {isDispatch} from './departmentStatus';
 import TodayBand from '../../components/layout/TodayBand';
+import {statusLabel} from '../../components/ui/statusLabel';
+import {undoneIds} from '../../core/movementUndo';
 
 /** Every state the department counts as «Στην Αποστείρωση». */
 const IN_STERILIZATION_STATES: string[] = [
@@ -153,11 +155,48 @@ export default function DepartmentHomePage() {
     .filter(a => a.uses > 0)
     .sort((a, b) => b.uses - a.uses)
     .slice(0, 15);
-  const mostUsedMax = Math.max(1, ...mostUsed.map(a => a.uses));
-  const sections: Array<{kind: 'SET' | 'TOOL'; title: string; to: string}> = [
-    {kind: 'SET', title: tr('Σετ'), to: '/department'},
-    {kind: 'TOOL', title: tr('Μεμονωμένα εργαλεία'), to: '/department/tools'},
-  ];
+  // A department that records no uses: how many times each was sent for sterilization instead.
+  const dispatched = useMemo(() => {
+    if (mostUsed.length) return [];
+    const undone = undoneIds(movements);
+    const byBarcode = new Map<string, number>();
+    for (const m of movements) {
+      if (m.undoes || undone.has(m.id) || m.causedBy || !isDispatch(m, dept)) continue;
+      const code = m.asset.split(' · ')[0].trim().toUpperCase();
+      byBarcode.set(code, (byBarcode.get(code) || 0) + 1);
+    }
+    const own = [
+      ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+      ...departmentTools.map(t => ({...t, kind: 'TOOL' as const})),
+    ];
+    return own
+      .map(a => ({
+        id: a.id,
+        kind: a.kind,
+        barcode: a.barcode,
+        name: a.name,
+        uses: [a.barcode, ...(a.legacyBarcodes || [])].reduce((n, b) => n + (byBarcode.get(b.toUpperCase()) || 0), 0),
+      }))
+      .filter(a => a.uses > 0)
+      .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name, 'el'))
+      .slice(0, 15);
+  }, [mostUsed.length, movements, dept, departmentSets, departmentTools]);
+  const byDispatch = !mostUsed.length;
+  const frequent = byDispatch ? dispatched : mostUsed;
+  const frequentMax = Math.max(1, ...frequent.map(a => a.uses));
+  // What is in Sterilization now, the ones ready for pickup first, then the nearest to coming back.
+  const STAGE_ORDER = ['READY_FOR_PICKUP', ...[...IN_STERILIZATION_STATES].reverse()];
+  const away = [
+    ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+    ...standalone.map(t => ({...t, kind: 'TOOL' as const})),
+  ]
+    .filter(a => STAGE_ORDER.includes(a.state))
+    .sort((a, b) => STAGE_ORDER.indexOf(a.state) - STAGE_ORDER.indexOf(b.state) || a.name.localeCompare(b.name, 'el'));
+  // The sterile ones in the department, the soonest to expire first.
+  const nextExpiries = sterile
+    .filter(e => e.assetState === 'IN_DEPARTMENT')
+    .sort((a, b) => a.sterileUntil.localeCompare(b.sterileUntil))
+    .slice(0, 6);
 
   return (
     <div className="department-home dash">
@@ -248,76 +287,66 @@ export default function DepartmentHomePage() {
             </div>
           </section>
         ) : (
-          <section className="dash-card dept-stock" aria-labelledby="dept-stock-title">
+          // Without limited or counted equipment: where its equipment is now and what expires next.
+          <section className="dash-card dept-lives" aria-labelledby="dept-where-title">
             <header>
               <div>
-                <b id="dept-stock-title">{tr('Ο εξοπλισμός μου')}</b>
-                <small>{tr('Ανά είδος: πόσα είναι στο τμήμα, πόσα στην Αποστείρωση, η πρώτη λήξη.')}</small>
+                <b id="dept-where-title">{tr('Ο εξοπλισμός μου')}</b>
+                <small>{tr('Τι είναι στην Αποστείρωση τώρα και τι λήγει πρώτο στο τμήμα.')}</small>
               </div>
               <Layers3 size={18} />
             </header>
-            <div className="dept-stock-wrap" role="region" tabIndex={0} aria-labelledby="dept-stock-title">
-              <table className="dept-stock-table">
-                <thead>
-                  <tr>
-                    <th scope="col">{tr('Είδος')}</th>
-                    <th scope="col">{tr('Στο τμήμα')}</th>
-                    <th scope="col">{tr('Στην Αποστείρωση')}</th>
-                    <th scope="col">{tr('Σύνολο')}</th>
-                    <th scope="col">{tr('Πρώτη λήξη')}</th>
-                    <th scope="col">
-                      <span className="visually-hidden">{tr('Άνοιγμα')}</span>
-                    </th>
-                  </tr>
-                </thead>
-                {sections.map(section => {
-                  const rows = kinds.filter(k => k.kind === section.kind);
-                  if (!rows.length) return null;
-                  return (
-                    <tbody key={section.kind}>
-                      <tr className="dept-stock-group">
-                        <th colSpan={6} scope="rowgroup">
-                          {section.title} <span>{rows.reduce((n, k) => n + k.total, 0)}</span>
-                        </th>
-                      </tr>
-                      {rows.map(k => (
-                        <tr key={k.key} className={k.here === 0 ? 'none-here' : undefined}>
-                          <th scope="row">
-                            <Link to={presetPath(section.to, {query: k.name})}>{k.name}</Link>
-                          </th>
-                          <td className="dept-n">{k.here}</td>
-                          <td>
-                            {k.away ? (
-                              <>
-                                {k.away}
-                                {k.ready > 0 && <em className="dept-ready"> · {tr('{0} για παραλαβή', k.ready)}</em>}
-                              </>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
-                          <td>{k.total}</td>
-                          <td
-                            className={
-                              k.expiryState && k.expiryState !== 'OK'
-                                ? `dept-exp ${k.expiryState.toLowerCase()}`
-                                : undefined
-                            }
-                          >
-                            {k.expiry ? (k.expiryState === 'EXPIRED' ? tr('Έληξε') : formatExpiry(k.expiry)) : '—'}
-                          </td>
-                          <td className="dept-open">
-                            <Link to={presetPath(section.to, {query: k.name})} aria-label={tr('Άνοιγμα: {0}', k.name)}>
-                              <ChevronRight size={16} aria-hidden="true" />
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  );
-                })}
-              </table>
-              {kinds.length === 0 && <p className="dept-empty">{tr('Το τμήμα δεν έχει ακόμα εξοπλισμό.')}</p>}
+            <div className="dept-lives-body" tabIndex={0} role="region" aria-labelledby="dept-where-title">
+              <h3>
+                {tr('Στην Αποστείρωση')} <span>{away.length}</span>
+              </h3>
+              {away.length ? (
+                <ul className="dash-list dash-lives dash-where" aria-label={tr('Στην Αποστείρωση')}>
+                  {away.map(a => (
+                    <li key={a.id} className={a.state === 'READY_FOR_PICKUP' ? 'ready' : undefined}>
+                      {a.kind === 'SET' ? (
+                        <Layers3 size={15} aria-hidden="true" />
+                      ) : (
+                        <Wrench size={15} aria-hidden="true" />
+                      )}
+                      <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                        <b>{a.name}</b>
+                        <small>{a.barcode}</small>
+                      </Link>
+                      <span className="dash-where-stage">{statusLabel(a.state)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="dept-lives-none">
+                  {departmentSets.length + standalone.length
+                    ? tr('Όλα στο τμήμα: {0} Σετ, {1} μεμονωμένα εργαλεία.', departmentSets.length, standalone.length)
+                    : tr('Το τμήμα δεν έχει ακόμα εξοπλισμό.')}
+                </p>
+              )}
+              <h3>{tr('Επόμενες λήξεις')}</h3>
+              {nextExpiries.length ? (
+                <ul className="dash-list dash-lives dash-where" aria-label={tr('Επόμενες λήξεις')}>
+                  {nextExpiries.map(e => (
+                    <li key={`${e.kind}-${e.id}`} className={e.state === 'OK' ? undefined : e.state.toLowerCase()}>
+                      {e.kind === 'SET' ? (
+                        <Layers3 size={15} aria-hidden="true" />
+                      ) : (
+                        <Wrench size={15} aria-hidden="true" />
+                      )}
+                      <Link to={e.kind === 'SET' ? `/sets/${e.id}` : `/tools/${e.id}`}>
+                        <b>{e.name}</b>
+                        <small>{e.barcode}</small>
+                      </Link>
+                      <span className="dash-where-stage">
+                        {e.state === 'EXPIRED' ? tr('Έληξε') : formatExpiry(e.sterileUntil)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="dept-lives-none">{tr('Τίποτα αποστειρωμένο στο τμήμα.')}</p>
+              )}
             </div>
           </section>
         )}
@@ -325,15 +354,19 @@ export default function DepartmentHomePage() {
         <section className="dash-card dash-most-used">
           <header>
             <div>
-              <b>{tr('Συχνότερες χρήσεις')}</b>
-              <small>{tr('Τα Σετ και τα εργαλεία του τμήματος με τις περισσότερες χρήσεις.')}</small>
+              <b>{byDispatch ? tr('Συχνότερες αποστολές') : tr('Συχνότερες χρήσεις')}</b>
+              <small>
+                {byDispatch
+                  ? tr('Πόσες φορές στάλθηκε το καθένα για αποστείρωση.')
+                  : tr('Τα Σετ και τα εργαλεία του τμήματος με τις περισσότερες χρήσεις.')}
+              </small>
             </div>
             <Gauge size={18} />
           </header>
-          {mostUsed.length ? (
+          {frequent.length ? (
             <>
-              <ol className="dept-cols" aria-label={tr('Συχνότερες χρήσεις')}>
-                {mostUsed.slice(0, 8).map((a, i) => (
+              <ol className="dept-cols" aria-label={byDispatch ? tr('Συχνότερες αποστολές') : tr('Συχνότερες χρήσεις')}>
+                {frequent.slice(0, 8).map((a, i) => (
                   <li key={a.id} className={a.kind === 'SET' ? 'set' : 'tool'}>
                     <Link
                       to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}
@@ -342,7 +375,7 @@ export default function DepartmentHomePage() {
                     >
                       <b aria-hidden="true">{a.uses}</b>
                       <span className="dept-col" aria-hidden="true">
-                        <i style={{height: `${Math.max(4, (a.uses / mostUsedMax) * 100)}%`}} />
+                        <i style={{height: `${Math.max(4, (a.uses / frequentMax) * 100)}%`}} />
                       </span>
                       <small aria-hidden="true">{i + 1}</small>
                     </Link>
@@ -350,7 +383,7 @@ export default function DepartmentHomePage() {
                 ))}
               </ol>
               <ol className="dept-cols-names" aria-hidden="true">
-                {mostUsed.slice(0, 8).map(a => (
+                {frequent.slice(0, 8).map(a => (
                   <li key={a.id}>
                     <span>{a.name}</span>
                     <small>{a.barcode}</small>
@@ -363,7 +396,7 @@ export default function DepartmentHomePage() {
               </p>
             </>
           ) : (
-            <p className="dept-empty">{tr('Καμία χρήση ακόμα.')}</p>
+            <p className="dept-empty">{tr('Καμία αποστολή ακόμα.')}</p>
           )}
         </section>
       </div>

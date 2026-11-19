@@ -1694,97 +1694,6 @@ html body .department-home {
 html body .department-home > * {
   flex: 0 0 auto;
 }
-html body .department-home > .dept-stock {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
-}
-.dept-stock h2 {
-  margin: 0 0 6px;
-  color: var(--c-cyan-20);
-  font-size: 15px;
-  font-weight: 600;
-}
-.dept-stock-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  margin: 0 -16px -12px;
-  border-top: 1px solid var(--c-gray-95);
-}
-html body .dept-stock-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-html body .dept-stock-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--c-gray-90);
-  background: var(--c-gray-95);
-  color: var(--c-gray-15);
-  font-size: 12px;
-  font-weight: 600;
-  text-align: left;
-  text-transform: none;
-}
-html body .dept-stock-table td,
-html body .dept-stock-table tbody th {
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--c-gray-95);
-  font-weight: 400;
-  text-align: left;
-}
-html body .dept-stock-table tbody th a {
-  color: var(--c-cyan-20);
-  font-weight: 600;
-  text-decoration: none;
-}
-html body .dept-stock-table tbody th a:hover {
-  text-decoration: underline;
-}
-html body .dept-stock-table .dept-stock-group th {
-  padding: 12px 14px 4px;
-  border-bottom: 0;
-  color: var(--c-gray-45);
-  font-size: 12px;
-  font-weight: 600;
-}
-.dept-stock-group th span {
-  margin-left: 6px;
-  font-weight: 500;
-}
-.dept-stock-table .dept-n {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-html body .dept-stock-table tr.none-here .dept-n {
-  color: var(--c-gray-45);
-  font-weight: 400;
-}
-.dept-ready {
-  color: var(--c-green-35);
-  font-style: normal;
-  font-weight: 600;
-}
-.dept-exp.expiring {
-  color: var(--c-amber-35);
-  font-weight: 600;
-}
-.dept-exp.expired {
-  color: var(--c-red-35);
-  font-weight: 600;
-}
-.dept-open {
-  width: 32px;
-  text-align: right;
-}
-.dept-open a {
-  color: var(--c-gray-45);
-}
 .dept-empty {
   margin: 0;
   padding: 16px;
@@ -1793,9 +1702,6 @@ html body .dept-stock-table tr.none-here .dept-n {
 @media (max-width: 720px) {
   html body .department-home {
     overflow-y: auto;
-  }
-  .dept-stock-wrap {
-    overflow: visible;
   }
 }
 
@@ -1857,10 +1763,6 @@ html body .department-home .dash-most-used > .dash-list {
   html body .department-home .dash-most-used > .dash-list {
     max-height: 360px;
   }
-}
-html body .dept-stock-table thead th,
-html body .dept-stock-table td {
-  white-space: nowrap;
 }
 /* Department Home › «Όριο χρήσεων»: one row per limited-use Set or instrument — its name, a bar of the uses made
    and «12 / 20 · απομένουν 8»; near the end in amber, used up in red. */
@@ -2082,4 +1984,25 @@ a.dash-pill:hover {
 /* The chart takes the card's height (the cards' children otherwise keep their own). */
 html body .department-home .dash-most-used > .dept-cols {
   flex: 1 1 auto;
+}
+/* The department's equipment without uses: where it is now and what expires next, one line each. */
+.dash-where li {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.dash-where-stage {
+  color: var(--c-gray-35);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.dash-where li.ready .dash-where-stage {
+  color: var(--c-green-35);
+  font-weight: 600;
+}
+.dash-where li.expiring .dash-where-stage {
+  color: var(--c-amber-35);
+  font-weight: 600;
+}
+.dash-where li.expired .dash-where-stage {
+  color: var(--c-red-35);
+  font-weight: 600;
 }
