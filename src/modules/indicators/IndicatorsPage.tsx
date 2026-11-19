@@ -78,7 +78,9 @@ export default function IndicatorsPage() {
   const lossDepartment = new Map<string, {department: string; stamp: number}>();
   for (const i of issues) {
     if (i.type !== 'Απώλεια') continue;
-    const code = i.asset.split(' · ')[0].trim().toUpperCase();
+    // Recorded under the barcode it had then: a barcode reissued since still names the same instrument.
+    const raw = i.asset.split(' · ')[0].trim().toUpperCase();
+    const code = assetOf.get(raw) || raw;
     const stamp = movementStamp(i.created);
     if (stamp > (lossDepartment.get(code)?.stamp ?? -1)) lossDepartment.set(code, {department: i.department, stamp});
   }
