@@ -1,11 +1,13 @@
 import {tr} from '../i18n';
 import {isExhausted, isLimited, isLow, isNew, isUsed, type Lives} from './usageStatus';
 
-export type UsageFilter = '' | 'LIMITED' | 'NEW' | 'USED' | 'LOW' | 'EXHAUSTED' | 'UNLIMITED';
+export type UsageFilter = '' | 'LIMITED' | 'COUNTED' | 'NEW' | 'USED' | 'LOW' | 'EXHAUSTED' | 'UNLIMITED';
 
 /** The "limit" list filter (with or without a limit of uses) and the "usage" one (new, used, few left, finished) combine. */
 export const limitFilterOptions = () => [
   {value: 'LIMITED', label: tr('Με όριο χρήσεων')},
+  // No limit, but the uses are counted until the instrument wears out (a wear check).
+  {value: 'COUNTED', label: tr('Μέτρηση χρήσεων (έως φθορά)')},
   {value: 'UNLIMITED', label: tr('Χωρίς όριο')},
 ];
 
@@ -21,6 +23,7 @@ export const matchesUsage = (filter: string, items: Lives[], warningThreshold: n
   if (!filter) return true;
   const limited = items.filter(isLimited);
   if (filter === 'LIMITED') return limited.length > 0;
+  if (filter === 'COUNTED') return items.some(x => !isLimited(x) && !!x.wearCheck);
   // A Set is new when all its instruments with a limit are; used when any is.
   if (filter === 'NEW') return limited.length > 0 && limited.every(isNew);
   if (filter === 'USED') return limited.some(isUsed);

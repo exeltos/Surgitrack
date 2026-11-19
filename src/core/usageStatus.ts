@@ -8,7 +8,8 @@
  *
  * «Low» is the used ones (or new ones) with few uses left, at most the warning threshold.
  */
-export type Lives = {maxUses?: number; uses?: number};
+/** What the usage helpers read: a limit of uses, the uses so far, and whether they are only counted (to wear). */
+export type Lives = {maxUses?: number; uses?: number; wearCheck?: boolean};
 
 export const isLimited = (x: Lives) => !!x.maxUses;
 export const remainingUses = (x: Lives) => (x.maxUses ? Math.max(0, x.maxUses - (x.uses || 0)) : Infinity);

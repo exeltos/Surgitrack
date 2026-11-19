@@ -1349,6 +1349,7 @@ export const en: Record<string, string> = {
   'Αποστείρωση – Λήξη': 'Sterilized – Expires',
   'υπόλοιπο {0}': 'left {0}',
   'Χωρίς όριο': 'No limit',
+  'Μέτρηση χρήσεων (έως φθορά)': 'Uses counted (until worn)',
   'άλλα Σετ': 'other sets',
   'έτοιμο για παραλαβή': 'ready for pickup',
   'αναμονή φυσικής παράδοσης': 'awaiting physical handover',

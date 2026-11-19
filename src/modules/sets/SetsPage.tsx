@@ -36,11 +36,11 @@ export default function SetsPage() {
   const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
   const [completeness, setCompleteness] = useRememberedState('completeness', '');
-  // Limited-use instruments per Set, for the usage filter.
+  // Limited-use and counted-use instruments per Set, for the usage filters.
   const limitedBySet = useMemo(() => {
     const map = new Map<string, typeof tools>();
     tools.forEach(t => {
-      if (!t.setId || !t.maxUses) return;
+      if (!t.setId || (!t.maxUses && !t.wearCheck)) return;
       const list = map.get(t.setId);
       if (list) list.push(t);
       else map.set(t.setId, [t]);
