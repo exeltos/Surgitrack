@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {Gauge, Home, Layers3, Sparkles, Wrench} from 'lucide-react';
 import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {movementStamp} from '../../core/movementTime';
+import {undoneIds} from '../../core/movementUndo';
 import {presetPath} from '../../core/listMemory';
 import PageHeader from '../../components/ui/PageHeader';
 import {useSurgi} from '../../store/SurgiStore';
@@ -51,11 +52,14 @@ export default function DepartmentHomePage() {
   const nearLimit = lifecycleAlerts.filter(a => ownIds.has(a.assetId));
 
   // When each Set or instrument last moved to where it is, by barcode: how long it has been at its stage. Only real
-  // moves count (from one place to another): a record kept in place, such as a correction of its uses, is not one.
+  // moves count (from one place to another, not undone): a record kept in place, such as a correction of its uses, is
+  // not one.
   const lastMoved = useMemo(() => {
     const map = new Map<string, {at: string; stamp: number}>();
+    // An undo and the move it cancelled are no move either.
+    const undone = undoneIds(movements);
     for (const m of movements) {
-      if (m.from === m.to || m.undoes) continue;
+      if (m.from === m.to || m.undoes || undone.has(m.id)) continue;
       const code = m.asset.split(' · ')[0].trim().toUpperCase();
       const stamp = movementStamp(m.at);
       if (stamp && stamp > (map.get(code)?.stamp ?? 0)) map.set(code, {at: m.at, stamp});
