@@ -41,12 +41,13 @@ describe('indicators', () => {
       move('c', '18/11/2026 14:00', 'Κεντρική Αποστείρωση', 'Χειρουργείο', 'Παράδοση'),
       move('old', '01/10/2026 09:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
     ];
-    const w = workload(moves, since, new Date(2026, 10, 30).getTime());
+    const w = workload(moves, since, 30);
     expect(w.total).toBe(3);
     expect(w.grid[0][9]).toBe(2);
     expect(w.grid[2][14]).toBe(1);
     expect(w.peakHour).toBe(9);
     expect(w.peakDay).toBe(0);
+    expect(w.perDay).toBe(0.1);
   });
 
   it('an undo and what it undid count as nothing', () => {
@@ -65,6 +66,12 @@ describe('indicators', () => {
     ];
     const t = turnaround(moves, since);
     expect(t.overall.rounds).toBe(1);
+    // An undone dispatch is no round, and its undo (back to the department) no return.
+    const undone = [
+      move('x', '18/11/2026 08:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
+      move('y', '18/11/2026 08:05', 'Κεντρική Αποστείρωση', 'Χειρουργείο', 'Αναίρεση', {undoes: 'x'}),
+    ];
+    expect(turnaround(undone, since).overall.rounds).toBe(0);
     expect(t.departments).toEqual([{department: 'Χειρουργείο', median: 24, p90: 24, rounds: 1}]);
   });
 
@@ -77,6 +84,8 @@ describe('indicators', () => {
         patientCode: 'PT-2',
       }),
       move('c', '17/11/2026 09:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
+      // The count signed for the same use carries the same patient code: still one use.
+      move('d', '17/11/2026 07:55', 'Χειρουργείο', 'Χειρουργείο', 'Καταμέτρηση', {patientCode: 'PT-2'}),
     ];
     const u = usage(moves, since);
     expect(u.departments).toEqual([

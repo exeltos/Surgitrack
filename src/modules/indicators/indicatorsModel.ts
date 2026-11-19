@@ -34,9 +34,9 @@ export function liveMovements(movements: readonly Movement[], since: number) {
 
 /**
  * Workload: every movement in the period by weekday (rows, Monday first) and hour (columns), with the busiest hour,
- * the busiest weekday and the average per day.
+ * the busiest weekday and the average per day over the period's `days` calendar days (today included).
  */
-export function workload(movements: readonly Movement[], since: number, now = Date.now()) {
+export function workload(movements: readonly Movement[], since: number, days: number) {
   const grid = Array.from({length: 7}, () => Array.from({length: 24}, () => 0));
   const byHour = Array.from({length: 24}, () => 0);
   const byDay = Array.from({length: 7}, () => 0);
@@ -51,10 +51,18 @@ export function workload(movements: readonly Movement[], since: number, now = Da
     byDay[d]++;
     total++;
   }
-  const days = Math.max(1, Math.round((now - since) / 86_400_000));
   const peakHour = total ? byHour.indexOf(Math.max(...byHour)) : undefined;
   const peakDay = total ? byDay.indexOf(Math.max(...byDay)) : undefined;
-  return {grid, byHour, byDay, total, perDay: total / days, peakHour, peakDay, max: Math.max(0, ...grid.flat())};
+  return {
+    grid,
+    byHour,
+    byDay,
+    total,
+    perDay: total / Math.max(1, days),
+    peakHour,
+    peakDay,
+    max: Math.max(0, ...grid.flat()),
+  };
 }
 
 /** Each sterilizer and washer in the period: its cycles, the failed ones and the busiest weekday. */
@@ -88,8 +96,9 @@ export function equipmentLoad(loads: readonly ProcessLoadRecord[], since: number
  * the department, in hours (median and the slowest tenth).
  */
 export function turnaround(movements: readonly Movement[], since: number) {
+  // An undo and what it undid are no move: an undone dispatch is no round, the undo itself no return.
   const byAsset = new Map<string, Array<{m: Movement; stamp: number}>>();
-  for (const m of movements) {
+  for (const m of liveMovements(movements, 0)) {
     const stamp = stampOf(m.at);
     if (!stamp) continue;
     const code = m.asset.split(' · ')[0].trim().toUpperCase();
@@ -124,8 +133,14 @@ export function usage(movements: readonly Movement[], since: number) {
     {department: string; uses: number; patients: Set<string>; kinds: Map<string, number>}
   >();
   const kinds = new Map<string, number>();
+  // One use is one Set or instrument on one patient: the count signed for it, its dispatch, a recall or a retirement
+  // may each carry the same patient code.
+  const seen = new Set<string>();
   for (const m of movements) {
     if (!m.patientCode || stampOf(m.at) < since) continue;
+    const use = `${m.asset.split(' · ')[0].trim().toUpperCase()}|${m.patientCode}`;
+    if (seen.has(use)) continue;
+    seen.add(use);
     const department = m.from;
     const name = (m.asset.split(' · ')[1] || m.asset).trim();
     const row = departments.get(department) || {department, uses: 0, patients: new Set(), kinds: new Map()};

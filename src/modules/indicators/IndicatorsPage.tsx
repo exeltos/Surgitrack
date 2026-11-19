@@ -33,7 +33,7 @@ export default function IndicatorsPage() {
   const since = sinceDays(days);
 
   const live = useMemo(() => liveMovements(movements, since), [movements, since]);
-  const load = useMemo(() => workload(live, since), [live, since]);
+  const load = useMemo(() => workload(live, since, days), [live, since, days]);
   const equipment = useMemo(() => equipmentLoad(processLoads, since), [processLoads, since]);
   const rounds = useMemo(() => turnaround(movements, since), [movements, since]);
   const use = useMemo(() => usage(live, since), [live, since]);
