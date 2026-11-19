@@ -142,8 +142,10 @@ export function usage(movements: readonly Movement[], since: number) {
   // may each carry the same patient code.
   const seen = new Set<string>();
   for (const m of movements) {
-    // A record another one caused (an instrument retired as its Set is dispatched, «from» the Set) is no use of its own.
+    // A use is recorded by the department: the count it signs, or its dispatch to Sterilization. Other records may
+    // carry the same patient code without being a use — a recall of the load, an instrument retired as its Set went.
     if (!m.patientCode || m.causedBy || stampOf(m.at) < since) continue;
+    if (!isDispatch(m, m.from) && !/^Καταμέτρηση εργαλείων υπογεγραμμένη/.test(m.status)) continue;
     const use = `${m.asset.split(' · ')[0].trim().toUpperCase()}|${m.patientCode}`;
     if (seen.has(use)) continue;
     seen.add(use);
