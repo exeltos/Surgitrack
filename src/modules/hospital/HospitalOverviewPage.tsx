@@ -17,7 +17,7 @@ import {useHasModule} from '../../data/cloud/modulesContext';
 import {movementStamp} from '../../core/movementTime';
 import {movementText} from '../../core/movementText';
 import PromoCards from '../../components/layout/PromoCards';
-import TodayBand from './TodayBand';
+import TodayBand from '../../components/layout/TodayBand';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -330,12 +330,23 @@ export default function HospitalOverviewPage() {
       />
 
       <TodayBand
-        incoming={tracked.filter(a => a.state === 'PENDING_STERILIZATION').length}
-        inProcess={inProcess.length}
-        inSterilizer={tracked.filter(a => inSterilizer.has(a.id)).length}
-        ready={ready.length}
+        counts={[
+          {
+            n: tracked.filter(a => a.state === 'PENDING_STERILIZATION').length,
+            label: L('Προς παραλαβή', 'To receive'),
+            to: '/sterilization?queue=INCOMING',
+          },
+          {n: inProcess.length, label: L('Σε αποστείρωση', 'In sterilization'), to: '/sterilization'},
+          {
+            n: tracked.filter(a => inSterilizer.has(a.id)).length,
+            label: L('Στον κλίβανο', 'In the sterilizer'),
+            to: '/sterilization?queue=IN_STERILIZER',
+          },
+          {n: ready.length, label: L('Έτοιμα για παραλαβή', 'Ready for pickup'), to: '/sterilization?queue=READY'},
+        ]}
         next={triage[0] && {title: triage[0].title, to: triage[0].to}}
-        processLoads={processLoads}
+        events={processLoads.filter(load => load.kind === 'STERILIZATION').map(load => load.createdAt)}
+        eventsLabel={n => L(`${n} κύκλοι αποστείρωσης`, `${n} sterilization cycles`)}
         expiries={sterile}
       />
 

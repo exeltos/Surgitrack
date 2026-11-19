@@ -15,13 +15,19 @@ describe('Department home', () => {
     renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: department});
     expect(screen.getByText('Αρχική τμήματος')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Χειρουργείο'})).toBeInTheDocument();
-    for (const label of ['Σετ', 'Μεμονωμένα', 'Στο τμήμα', 'Για παραλαβή'])
-      expect(screen.getByRole('link', {name: new RegExp(`^${label}`)})).toBeInTheDocument();
-    expect(screen.getByRole('link', {name: /Στο τμήμα/})).toHaveAttribute(
+    // Today's figures, each opening its list.
+    for (const label of ['Στο τμήμα', 'Σε αποστείρωση', 'Για παραλαβή', 'Εκκρεμότητες'])
+      expect(screen.getByRole('link', {name: new RegExp(`^${label}: \\d+$`)})).toBeInTheDocument();
+    expect(screen.getByRole('link', {name: /^Στο τμήμα: /})).toHaveAttribute(
       'href',
       '/department?preset=1&statusFilter=IN_DEPARTMENT',
     );
     expect(screen.getByRole('list', {name: 'Χρειάζεται προσοχή'})).toBeInTheDocument();
     expect(screen.getByRole('list', {name: 'Τελευταίες κινήσεις'})).toBeInTheDocument();
+    // The most used, Sets and instruments together, the busiest first.
+    const used = screen.getByRole('list', {name: 'Πιο πολυχρησιμοποιημένα'});
+    const counts = [...used.querySelectorAll('strong')].map(n => Number(n.textContent));
+    expect(counts.length).toBeGreaterThan(0);
+    expect(counts).toEqual([...counts].sort((a, b) => b - a));
   });
 });

@@ -383,48 +383,6 @@
   --dash-track: var(--c-gray-95);
   --dash-other: var(--c-gray-85-2);
 }
-.dash-kpis {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
-}
-.dash-kpi {
-  display: grid;
-  align-content: start;
-  gap: 4px;
-  padding: 14px 16px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 14px;
-  background: var(--c-white);
-  color: inherit;
-  text-decoration: none;
-}
-.dash-kpi-label {
-  display: flex;
-  gap: 6px;
-  color: var(--st-muted);
-  font-size: 12px;
-  font-weight: 600;
-  align-items: flex-start;
-  min-height: 32px;
-  line-height: 1.25;
-}
-.dash-kpi strong {
-  color: var(--c-cyan-20);
-  font-size: 34px;
-  font-weight: 650;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-.dash-kpi small {
-  color: var(--st-muted);
-  font-size: 12px;
-}
-.dash-kpi.warn strong,
-.dash-kpi.warn .dash-kpi-label {
-  color: var(--c-orange-45);
-}
 .dash-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -449,9 +407,6 @@
 }
 .dash-flow {
   grid-column: span 7;
-}
-.dash-where {
-  grid-column: span 5;
 }
 .dash-activity {
   grid-column: span 5;
@@ -495,35 +450,6 @@
 .dash-stack i.empty {
   flex: 1;
   background: var(--dash-track);
-}
-.dash-legend {
-  display: grid;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.dash-legend li {
-  display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) auto 44px;
-  align-items: center;
-  gap: 8px;
-  min-height: 30px;
-  border-bottom: 1px solid var(--c-gray-95);
-  font-size: 13px;
-}
-.dash-legend li:last-child {
-  border-bottom: 0;
-}
-.dash-legend strong {
-  font-size: 14px;
-}
-.dash-legend small {
-  color: var(--st-muted);
-  text-align: right;
-}
-.dash-legend-inline .dot {
-  margin-right: 6px;
 }
 .dash-depts-list {
   display: grid;
@@ -689,16 +615,6 @@
   background: #fde8e6;
   color: #b3261e;
 }
-.dash-kpi-label svg {
-  flex: 0 0 auto;
-  margin-top: 1px;
-}
-.dash .dash-legend-inline {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-}
 
 /* The Overview dashboard is taller than the screen: it scrolls instead of cutting off its lower cards. */
 .hospital-overview.dash {
@@ -712,9 +628,6 @@ html body .dash-grid {
 html body .dash-card {
   gap: 8px;
   padding: 12px 16px;
-}
-html body .dash-legend li {
-  min-height: 26px;
 }
 html body .dash-list li {
   padding: 5px 0;
@@ -847,11 +760,7 @@ html body .dash-more {
   }
 }
 @media (max-width: 1180px) {
-  .dash-kpis {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
   .dash-flow,
-  .dash-where,
   .dash-activity,
   .dash-attention,
   .dash-latest {
@@ -859,24 +768,21 @@ html body .dash-more {
   }
 }
 @media (max-width: 640px) {
-  .dash-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .dash-bar {
     grid-template-columns: minmax(110px, 140px) minmax(0, 1fr) 30px;
   }
 }
 @media (min-width: 1100px) and (min-height: 600px) {
+  /* The cards fill the window's height but never shrink below a readable one: on a short window, below the
+     «Σήμερα» band, the page scrolls instead. */
   html body .hospital-overview.dash > .dash-grid {
-    flex: 1 1 auto;
-    min-height: 300px;
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+    flex: 1 0 auto;
+    grid-template-rows: repeat(2, minmax(270px, 1fr));
   }
   html body .hospital-overview.dash {
-    overflow: hidden;
+    overflow-y: auto;
   }
   html body .dash-flow > .dash-bars,
-  html body .dash-where > .dash-legend,
   html body .dash-attention > .dash-list,
   html body .dash-latest > .dash-list {
     flex: 1 1 auto;
@@ -985,9 +891,6 @@ html body .dash-more {
   }
 }
 @media (min-width: 1100px) and (min-height: 600px) and (max-height: 760px) {
-  html body .dash-kpi small {
-    display: none;
-  }
   html body .dash-activity-stats {
     margin: 2px 0 4px;
   }
@@ -1004,8 +907,7 @@ html body .dash-more {
   }
   html body .dash-card .dash-depts-list,
   html body .dash-card .dash-list,
-  html body .dash-card .dash-bars,
-  html body .dash-card .dash-legend {
+  html body .dash-card .dash-bars {
     flex: 0 0 auto;
     overflow: visible;
   }
@@ -1026,23 +928,6 @@ html body .dash-more {
   html body .hospital-overview .page-head p {
     font-size: 12.5px;
   }
-  html body .hospital-overview .dash-kpis {
-    gap: 10px;
-  }
-  html body .hospital-overview .dash-kpi {
-    gap: 2px !important;
-    padding: 8px 14px !important;
-    border-radius: 12px;
-  }
-  html body .hospital-overview .dash-kpi-label {
-    font-size: 12px !important;
-  }
-  html body .hospital-overview .dash-kpi strong {
-    font-size: 21px !important;
-  }
-  html body .hospital-overview .dash-kpi small {
-    font-size: 11.5px;
-  }
   html body .hospital-overview .dash-grid {
     gap: 10px;
   }
@@ -1057,9 +942,6 @@ html body .dash-more {
   html body .hospital-overview .dash-card > header small {
     margin-top: 1px;
     font-size: 11.5px;
-  }
-  html body .hospital-overview .dash-legend li {
-    min-height: 22px;
   }
   html body .hospital-overview .dash-list li {
     padding: 4px 0;
@@ -1078,9 +960,6 @@ html body .department-home .dash-grid {
 html body .department-home .dash-grid > .dash-card {
   grid-column: auto;
 }
-html body .department-home .dash-grid > .dash-most-used {
-  grid-column: 1 / -1;
-}
 /* «Χρειάζεται προσοχή» and «Τελευταίες κινήσεις» keep a fixed height: a long list scrolls inside its card. */
 html body .department-home .dash-attention > .dash-list,
 html body .department-home .dash-latest > .dash-list {
@@ -1095,21 +974,10 @@ html body .department-home .dash-latest > .dash-list {
   white-space: nowrap;
 }
 /* Sent and received stacked in one column per day. */
-.dash-col.stacked {
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 2px;
-}
-.dash-col.stacked i:not(:first-child) {
-  border-radius: 0;
-}
 html body .department-home .dash-activity .dash-columns {
   flex: 0 0 auto;
   height: 130px;
   max-height: 130px;
-}
-.department-home .dash-axis .dash-legend-inline {
-  font-size: 11px;
 }
 @media (max-width: 900px) {
   html body .department-home .dash-grid {
@@ -1413,51 +1281,6 @@ html body .hospital-overview .dash-flow .dash-bar-track {
 
 /* Department Home on a computer or tablet: the six figures as one low row, the number beside its label, so the
    cards below get the height. */
-@media (min-width: 901px) {
-  html body .department-home .dash-kpis {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  html body .department-home .dash-kpi {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'label value'
-      'note value';
-    align-items: center;
-    column-gap: 8px;
-    min-height: 0;
-    padding: 9px 14px;
-    border-radius: 12px;
-    transition:
-      border-color 0.15s,
-      box-shadow 0.15s;
-  }
-  html body .department-home .dash-kpi:hover {
-    border-color: var(--c-cyan-65);
-    box-shadow: 0 6px 16px rgba(24, 56, 74, 0.08);
-  }
-  html body .department-home .dash-kpi-label {
-    grid-area: label;
-    min-width: 0;
-    overflow: hidden;
-    font-size: 12.5px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  html body .department-home .dash-kpi strong {
-    grid-area: value;
-    font-size: 24px;
-    line-height: 1;
-  }
-  html body .department-home .dash-kpi small {
-    grid-area: note;
-    overflow: hidden;
-    font-size: 11px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
 
 /* Lists inside a card fade out at the foot instead of cutting a line in half: the fade says there is more to
    scroll to, and the last entry can scroll clear of it. */
@@ -1778,4 +1601,82 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
   .today-next {
     transition: none;
   }
+}
+
+/* The department's Home is taller than the screen and the app's content pane does not scroll: the page scrolls
+   itself, so its last card (the most used Sets) is never cut. */
+.department-home.dash {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 4px 8px 0;
+  scrollbar-gutter: stable;
+}
+
+/* Department Home on a computer: under «Σήμερα», what needs attention beside the latest movements, both down to the
+   foot of the window; a long list scrolls inside its card, never the page. */
+@media (min-width: 1100px) and (min-height: 600px) {
+  html body .department-home.dash {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+  html body .department-home.dash > * {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+  }
+  html body .department-home.dash > .dash-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+  html body .department-home .dash-attention > .dash-list,
+  html body .department-home .dash-latest > .dash-list,
+  html body .department-home .dash-most-used > .dash-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+/* Department Home › «Πιο πολυχρησιμοποιημένα»: one row per Set or instrument — its name and barcode over a thin bar
+   of its uses, the count at the end. */
+.dash-used li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.dash-used li > a {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.dash-used li > a b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-used-track {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--dash-track);
+}
+.dash-used-track i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--dash-bar);
+}
+.dash-used strong {
+  font-variant-numeric: tabular-nums;
+}
+html body .department-home .dash-latest header > a {
+  white-space: nowrap;
 }

@@ -3,25 +3,24 @@ import {MemoryRouter} from 'react-router-dom';
 import {describe, expect, it} from 'vitest';
 import {AppPreferencesProvider} from '../../../core/AppPreferences';
 import {isoDate} from '../../../core/sterileExpiry';
-import type {ProcessLoadRecord} from '../../../types/domain';
 import TodayBand from '../TodayBand';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const now = new Date();
 const today = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} 08:15`;
-const load = (id: string, kind: 'STERILIZATION' | 'WASHING') => ({id, kind, createdAt: today}) as ProcessLoadRecord;
 
 const band = (next?: {title: string; to: string}) =>
   render(
     <MemoryRouter>
       <AppPreferencesProvider>
         <TodayBand
-          incoming={6}
-          inProcess={20}
-          inSterilizer={2}
-          ready={7}
+          counts={[
+            {n: 6, label: 'Προς παραλαβή', to: '/sterilization?queue=INCOMING'},
+            {n: 2, label: 'Στον κλίβανο', to: '/sterilization?queue=IN_STERILIZER'},
+          ]}
           next={next}
-          processLoads={[load('a', 'STERILIZATION'), load('b', 'STERILIZATION'), load('c', 'WASHING')]}
+          events={[today, today, '01/01/2001 08:00']}
+          eventsLabel={n => `${n} κύκλοι αποστείρωσης`}
           expiries={[{sterileUntil: isoDate(now)}]}
         />
       </AppPreferencesProvider>
