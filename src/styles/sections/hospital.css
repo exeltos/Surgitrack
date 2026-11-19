@@ -1986,12 +1986,12 @@ a.dash-pill:hover {
    each column; Sets in blue, instruments in green. */
 .dept-cols {
   display: grid;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   align-items: stretch;
   gap: 8px;
-  height: 200px;
+  min-height: 160px;
   margin: 8px 0 0;
   padding: 0;
   list-style: none;
@@ -2015,7 +2015,7 @@ a.dash-pill:hover {
   display: flex;
   align-items: flex-end;
   width: 100%;
-  max-width: 36px;
+  max-width: 44px;
   border-radius: 6px 6px 2px 2px;
   background: var(--dash-track);
 }
@@ -2038,8 +2038,7 @@ a.dash-pill:hover {
 }
 /* The names, numbered as the columns. */
 .dept-cols-names {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   margin: 10px 0 0;
   padding: 0 0 0 22px;
   overflow-y: auto;
@@ -2079,4 +2078,8 @@ a.dash-pill:hover {
 }
 .dept-cols-legend span.tool::before {
   background: var(--dash-3);
+}
+/* The chart takes the card's height (the cards' children otherwise keep their own). */
+html body .department-home .dash-most-used > .dept-cols {
+  flex: 1 1 auto;
 }
