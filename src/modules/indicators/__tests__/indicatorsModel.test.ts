@@ -75,6 +75,12 @@ describe('indicators', () => {
       move('y', '18/11/2026 08:05', 'Κεντρική Αποστείρωση', 'Χειρουργείο', 'Αναίρεση', {undoes: 'x'}),
     ];
     expect(turnaround(undone, since).overall.rounds).toBe(0);
+    // The count signed with the dispatch, in the same minute (newest first, as history comes), is no return.
+    const signed = [
+      move('s', '19/11/2026 08:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
+      move('k', '19/11/2026 08:00', 'Χειρουργείο', 'Χειρουργείο', 'Καταμέτρηση'),
+    ];
+    expect(turnaround(signed, since).overall.rounds).toBe(0);
     expect(t.departments).toEqual([{department: 'Χειρουργείο', median: 24, p90: 24, rounds: 1}]);
   });
 

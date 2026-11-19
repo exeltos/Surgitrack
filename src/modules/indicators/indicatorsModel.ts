@@ -99,19 +99,22 @@ export function equipmentLoad(loads: readonly ProcessLoadRecord[], since: number
  */
 export function turnaround(movements: readonly Movement[], since: number) {
   // An undo and what it undid are no move: an undone dispatch is no round, the undo itself no return.
-  const byAsset = new Map<string, Array<{m: Movement; stamp: number}>>();
-  for (const m of liveMovements(movements, 0)) {
+  // History comes newest first: `order` keeps that, so moves within the same minute stay in the order they were made.
+  const byAsset = new Map<string, Array<{m: Movement; stamp: number; order: number}>>();
+  liveMovements(movements, 0).forEach((m, index) => {
     const stamp = stampOf(m.at);
-    if (!stamp) continue;
+    if (!stamp) return;
     const code = m.asset.split(' · ')[0].trim().toUpperCase();
-    byAsset.set(code, [...(byAsset.get(code) || []), {m, stamp}]);
-  }
+    byAsset.set(code, [...(byAsset.get(code) || []), {m, stamp, order: -index}]);
+  });
   const hours = new Map<string, number[]>();
   for (const trail of byAsset.values()) {
-    trail.sort((a, b) => a.stamp - b.stamp);
+    trail.sort((a, b) => a.stamp - b.stamp || a.order - b.order);
     trail.forEach(({m, stamp}, i) => {
       if (stamp < since || !isDispatch(m, m.from)) return;
-      const back = trail.slice(i + 1).find(x => x.m.to === m.from);
+      // Back means moved into the department from elsewhere: a record kept in place (the count signed with the
+      // dispatch) is no return.
+      const back = trail.slice(i + 1).find(x => x.m.to === m.from && x.m.from !== x.m.to);
       if (!back) return;
       hours.set(m.from, [...(hours.get(m.from) || []), (back.stamp - stamp) / 3_600_000]);
     });
