@@ -44,11 +44,19 @@ export default function IndicatorsPage() {
     return map;
   }, [sets, tools]);
   const rounds = useMemo(() => turnaround(movements, since, b => assetOf.get(b) || b), [movements, since, assetOf]);
-  const setBarcodes = useMemo(
-    () => new Set(sets.flatMap(x => [x.barcode, ...(x.legacyBarcodes || [])]).map(b => b.toUpperCase())),
-    [sets],
-  );
-  const use = useMemo(() => usage(live, since, b => setBarcodes.has(b)), [live, since, setBarcodes]);
+  // Whether a barcode is a Set's: today's Sets (earlier barcodes too), any record that said so (a Set deleted since
+  // keeps its history), and, for one neither knows nor any instrument holds, the S… of a Set's barcode.
+  const isSet = useMemo(() => {
+    const codes = (list: ReadonlyArray<{barcode: string; legacyBarcodes?: string[]}>) =>
+      list.flatMap(x => [x.barcode, ...(x.legacyBarcodes || [])]).map(b => b.toUpperCase());
+    const setCodes = new Set([
+      ...codes(sets),
+      ...movements.filter(m => m.assetKind === 'SET').map(m => m.asset.split(' · ')[0].trim().toUpperCase()),
+    ]);
+    const toolCodes = new Set(codes(tools));
+    return (b: string) => setCodes.has(b) || (!toolCodes.has(b) && /^S/i.test(b));
+  }, [sets, tools, movements]);
+  const use = useMemo(() => usage(live, since, isSet), [live, since, isSet]);
   const q = useMemo(() => quality(processLoads, since), [processLoads, since]);
   const problems = useMemo(() => issueCounts(issues, since), [issues, since]);
 

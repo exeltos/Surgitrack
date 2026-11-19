@@ -39,7 +39,10 @@ export default function CycleNumberSelect({
   const listed = digits !== undefined && digits >= 1 && digits <= last && `${prefix}${digits}` === value;
   // Another sterilizer picked (or none yet): today's next number of this one. A device's number stays.
   const suggested = prefix ? `${prefix}${next}` : '';
-  const stale = !fromDevice && (!value || (/^[A-Z]+\d+$/.test(value) && digits === undefined));
+  // Empty, another sterilizer's, or taken meanwhile (another workstation recorded it): today's next one instead.
+  const stale =
+    !fromDevice &&
+    (!value || (/^[A-Z]+\d+$/.test(value) && digits === undefined) || (digits !== undefined && used.has(digits)));
   useEffect(() => {
     if (suggested && stale) onChange(suggested);
   }, [suggested, stale, onChange]);

@@ -17,6 +17,14 @@ describe('CycleNumberSelect', () => {
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByRole('combobox')).toHaveValue('B123');
   });
+  it('moves on when the number picked is taken meanwhile by another workstation', () => {
+    const onChange = vi.fn();
+    const now = new Date();
+    const at = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} 00:01`;
+    const loads = [{equipment: 'Κλίβανος 1', cycleNumber: 'A1', createdAt: at, kind: 'STERILIZATION'}];
+    render(<CycleNumberSelect {...props} loads={loads as never} value="A1" onChange={onChange} />);
+    expect(onChange).toHaveBeenCalledWith('A2');
+  });
   it('shows a number past the ones offered as it is', () => {
     render(<CycleNumberSelect {...props} value="A123" onChange={vi.fn()} fromDevice />);
     expect(screen.getByRole('combobox')).toHaveValue('A123');

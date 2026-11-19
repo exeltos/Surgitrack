@@ -1,3 +1,4 @@
+import {movementStamp} from '../../../core/movementTime';
 import {normalizeCycleNumber} from '../../../core/cycleNumber';
 import {sterilizedOnOf} from '../../../core/sterileExpiry';
 import {tr} from '../../../i18n';
@@ -139,6 +140,26 @@ export function useLoadFlow(
   const completeLoad = () => {
     if (!loadModal || !loadEquipment.trim() || !loadCycleNumber.trim() || !loadProgram.trim() || !loadSelected.size)
       return;
+    // A cycle number of the day once: another workstation may have recorded it while this form was open.
+    const number = normalizeCycleNumber(loadCycleNumber);
+    if (loadModal === 'STERILIZATION') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const taken = processLoads.some(
+        l =>
+          l.kind === 'STERILIZATION' &&
+          l.equipment === loadEquipment.trim() &&
+          normalizeCycleNumber(l.cycleNumber) === number &&
+          movementStamp(l.createdAt) >= today.getTime(),
+      );
+      if (taken) {
+        setLoadScanFeedback({
+          type: 'ERROR',
+          message: tr('Ο κύκλος {0} του {1} έχει ήδη καταγραφεί σήμερα.', number, loadEquipment.trim()),
+        });
+        return;
+      }
+    }
     const candidates = loadModal === 'WASHING' ? washing : processing;
     const assetRefs = candidates
       .filter(item => loadSelected.has(`${item.kind}:${item.id}`))
@@ -148,7 +169,7 @@ export function useLoadFlow(
       assetRefs,
       equipment: loadEquipment.trim(),
       // One way of writing it: «a3» and «Α3» (Greek) are «A3».
-      cycleNumber: normalizeCycleNumber(loadCycleNumber),
+      cycleNumber: number,
       program: loadProgram.trim(),
       chemicalIndicatorResult:
         loadModal === 'STERILIZATION' && (loadChemicalOn || loadChemical === 'FAIL') ? loadChemical : undefined,
