@@ -351,7 +351,6 @@
   .hospital-overview {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
   .hospital-overview > * {
     flex-shrink: 0;
@@ -1998,13 +1997,6 @@ div.asset-import-hospital b {
 .dash .seg-other {
   background: var(--dash-other);
 }
-.dash-kpi:hover {
-  border-color: var(--c-cyan-75);
-}
-.dash-kpi.warn {
-  border-color: #f0c9a5;
-  background: var(--c-gray-100);
-}
 .dash-card > header b {
   display: block;
   font-size: 15px;
@@ -2037,13 +2029,6 @@ div.asset-import-hospital b {
   height: 10px;
   margin-right: 0;
   border-radius: 3px;
-}
-.dash-legend-inline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  color: var(--st-muted);
-  font-size: 12px;
 }
 .dash-dept-track {
   height: 14px;
@@ -2163,13 +2148,6 @@ html body .asset-registry-table td small.row-sub {
   white-space: nowrap;
 }
 /* Overview dashboard. */
-html body .dash-kpis {
-  gap: 10px;
-  margin-bottom: 10px;
-}
-html body .dash-kpi-label {
-  min-height: 0;
-}
 html body .dash-bar {
   min-height: 24px;
 }
@@ -2275,19 +2253,6 @@ html body .studio-head p {
   text-overflow: clip;
 }
 /* Overview KPIs: one-line labels, same tile height everywhere. */
-html body .dash-kpi-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-html body .dash-kpi {
-  min-width: 0;
-  padding: 8px 14px;
-  gap: 2px;
-}
-html body .dash-kpi strong {
-  font-size: 26px;
-}
 /* Sterilization header: logged-in user as a slim pill, one-line stage labels. */
 /* Tools table: the name gets the free width; narrow secondary columns, no sideways scrolling. */
 html body .registry-fixed td:nth-child(4) .row-sub {
@@ -2430,12 +2395,6 @@ html body .replacements-fixed th.col-since {
 /* One KPI look everywhere: one-line label (truncated with a tooltip-free ellipsis), number on the right. */
 html body .kpis > * small {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-html body .kpis > * {
-  min-width: 0;
 }
 /* Detail pages: labels on one line with a fixed column, tighter rows, eyebrow never wraps. */
 html body .asset-detail-workspace .asset-definition-list dt {
@@ -2485,8 +2444,7 @@ html body .movements-actions > button {
   font-size: 13px;
 }
 /* One KPI card everywhere: label on top, big number below, a soft shadow so the strip stands out. */
-html body .kpis > *,
-html body .dash-kpi {
+html body .kpis > * {
   display: grid !important;
   align-content: start;
   justify-content: stretch !important;
@@ -2500,8 +2458,7 @@ html body .dash-kpi {
   box-shadow: 0 1px 3px rgba(16, 42, 67, 0.08);
   text-align: left;
 }
-html body .kpis > * small,
-html body .dash-kpi-label {
+html body .kpis > * small {
   color: var(--st-muted);
   font-size: 13px !important;
   font-weight: 500;
@@ -2510,8 +2467,7 @@ html body .dash-kpi-label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-html body .kpis > * strong,
-html body .dash-kpi strong {
+html body .kpis > * strong {
   margin: 0;
   color: var(--c-blue-15-2);
   font-size: 26px !important;
@@ -2524,9 +2480,6 @@ html body .kpis > *.active {
   box-shadow:
     0 0 0 1px var(--c-cyan-40),
     0 1px 3px rgba(16, 42, 67, 0.08);
-}
-html body .dash-kpi.warn strong {
-  color: var(--c-orange-45);
 }
 /* Replacement rows: same-size buttons, right-aligned, never stretched or cut off. */
 html body .replacements-fixed .row-actions {
@@ -2690,8 +2643,7 @@ html body .asset-count-state span {
     scrollbar-width: thin;
   }
   html body .dash-card .dash-list,
-  html body .dash-card .dash-bars,
-  html body .dash-card .dash-legend {
+  html body .dash-card .dash-bars {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
@@ -3641,12 +3593,6 @@ html body .sets-registry .set-count-short .muted {
   }
 }
 @media (min-width: 1100px) and (min-height: 600px) and (max-height: 760px) {
-  html body .dash-kpi {
-    padding: 6px 12px;
-  }
-  html body .dash-kpi strong {
-    font-size: 22px;
-  }
   html body .dash-activity-stats b {
     font-size: 16px;
   }

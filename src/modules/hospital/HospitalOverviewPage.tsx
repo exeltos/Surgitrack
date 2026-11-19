@@ -17,6 +17,7 @@ import {useHasModule} from '../../data/cloud/modulesContext';
 import {movementStamp} from '../../core/movementTime';
 import {movementText} from '../../core/movementText';
 import PromoCards from '../../components/layout/PromoCards';
+import TodayBand from '../../components/layout/TodayBand';
 
 /** Where an item is in the sterilization cycle, in process order. */
 const PROCESS_STATES: AssetState[] = [
@@ -163,7 +164,8 @@ export default function HospitalOverviewPage() {
   const pipelineMax = Math.max(1, ...pipeline.map(p => p.count));
 
   const shortSets = sets.filter(x => x.actual < x.expected).length;
-  const expiry = expiryAlerts(sterileExpiryList(sets, tools));
+  const sterile = sterileExpiryList(sets, tools);
+  const expiry = expiryAlerts(sterile);
   const expired = expiry.filter(e => e.state === 'EXPIRED').length;
   // What waits for action, most urgent first (the red ones, then the amber): one row per kind, with the count and a
   // few examples, opening the list that holds them.
@@ -325,6 +327,27 @@ export default function HospitalOverviewPage() {
           'Πού βρίσκεται ο εξοπλισμός, τι κινείται και τι χρειάζεται προσοχή.',
           'Where the equipment is, what is moving and what needs attention.',
         )}
+      />
+
+      <TodayBand
+        counts={[
+          {
+            n: tracked.filter(a => a.state === 'PENDING_STERILIZATION').length,
+            label: L('Προς παραλαβή', 'To receive'),
+            to: '/sterilization?queue=INCOMING',
+          },
+          {n: inProcess.length, label: L('Σε αποστείρωση', 'In sterilization'), to: '/sterilization'},
+          {
+            n: tracked.filter(a => inSterilizer.has(a.id)).length,
+            label: L('Στον κλίβανο', 'In the sterilizer'),
+            to: '/sterilization?queue=IN_STERILIZER',
+          },
+          {n: ready.length, label: L('Έτοιμα για παραλαβή', 'Ready for pickup'), to: '/sterilization?queue=READY'},
+        ]}
+        next={triage[0] && {title: triage[0].title, to: triage[0].to}}
+        events={processLoads.filter(load => load.kind === 'STERILIZATION').map(load => load.createdAt)}
+        eventsLabel={n => L(`${n} κύκλοι αποστείρωσης`, `${n} sterilization cycles`)}
+        expiries={sterile}
       />
 
       <PromoCards />
