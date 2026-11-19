@@ -15,6 +15,13 @@ describe('cycle numbers', () => {
   it('gives each sterilizer its letter: its own, else by its place in the list', () => {
     expect(sterilizers.map(s => cyclePrefixOf(s, sterilizers))).toEqual(['A', 'K', 'C']);
     expect(cyclePrefixOf(undefined, sterilizers)).toBe('');
+    // A name ending with a letter or a number gives it: Greek letters by their place (Γ is the third: C).
+    const named = ['ΚΛΙΒΑΝΟΣ Α', 'ΚΛΙΒΑΝΟΣ Β', 'ΚΛΙΒΑΝΟΣ Γ', 'Κλίβανος 1', 'Κλίβανος Ατμού 02'].map((el, i) => ({
+      id: String(i),
+      el,
+      en: el,
+    }));
+    expect(named.map(s => cyclePrefixOf(s, named))).toEqual(['A', 'B', 'C', 'A', 'B']);
   });
   it('knows the number of a cycle written with the letter only', () => {
     expect(cycleDigits('α12', 'A')).toBe(12);

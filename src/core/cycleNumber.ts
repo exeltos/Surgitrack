@@ -29,13 +29,31 @@ export function normalizeCycleNumber(value: string | undefined | null) {
     .replace(/\s+/g, '');
 }
 
-/** A sterilizer's cycle letter: its own (Settings), else A, B, C… in the order the sterilizers are listed. */
+const GREEK_ORDER = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ';
+const letterAt = (index: number) => (index >= 0 && index < 26 ? String.fromCharCode(65 + index) : '');
+
+/** The letter a sterilizer's name ends with: «ΚΛΙΒΑΝΟΣ Γ» → C (the third), «Κλίβανος 02» → B; none otherwise. */
+function letterOfName(name: string) {
+  const last = name.trim().split(/\s+/).pop() || '';
+  if (/^\d{1,2}$/.test(last) && Number(last) > 0) return letterAt(Number(last) - 1);
+  if (last.length !== 1) return '';
+  const upper = last.toLocaleUpperCase('el');
+  if (/[A-Z]/.test(upper)) return upper;
+  return letterAt(GREEK_ORDER.indexOf(upper.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+}
+
+/**
+ * A sterilizer's cycle letter: its own (Settings), else the letter or number its name ends with (ΚΛΙΒΑΝΟΣ Α → A,
+ * Κλίβανος 2 → B), else A, B, C… in the order the sterilizers are listed.
+ */
 export function cyclePrefixOf(sterilizer: LibraryItem | undefined, sterilizers: readonly LibraryItem[]) {
   if (!sterilizer) return '';
   const own = normalizeCycleNumber(sterilizer.cyclePrefix);
   if (own) return own;
+  const named = letterOfName(sterilizer.el);
+  if (named) return named;
   const index = sterilizers.findIndex(s => s.id === sterilizer.id);
-  return index < 0 ? '' : index < 26 ? String.fromCharCode(65 + index) : `S${index + 1}`;
+  return index < 0 ? '' : letterAt(index) || `S${index + 1}`;
 }
 
 /** The number of a cycle written with this letter («A3» → 3), or undefined when it is written otherwise. */
