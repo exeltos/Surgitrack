@@ -106,7 +106,11 @@ export default function DepartmentHomePage() {
       : openIssues.length
         ? {title: tr('{0} ανοιχτές εκκρεμότητες', openIssues.length), to: issuesPath}
         : nearLimit.length
-          ? {title: tr('{0} κοντά στο όριο χρήσεων', nearLimit.length), to: presetPath('/department/tools')}
+          ? {
+              // The first one's card, as its row under «Χρειάζεται προσοχή»: a Set or an instrument (in a Set or not).
+              title: tr('{0} κοντά στο όριο χρήσεων', nearLimit.length),
+              to: nearLimit[0].assetKind === 'SET' ? `/sets/${nearLimit[0].assetId}` : `/tools/${nearLimit[0].assetId}`,
+            }
           : undefined;
   const weekEvents = useMemo(
     () => movements.filter(m => isDispatch(m, dept) || m.to === dept).map(m => m.at),
