@@ -2,8 +2,6 @@ import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import {Gauge, Home, Layers3, Sparkles, Wrench} from 'lucide-react';
 import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
-import {movementStamp} from '../../core/movementTime';
-import {undoneIds} from '../../core/movementUndo';
 import {presetPath} from '../../core/listMemory';
 import PageHeader from '../../components/ui/PageHeader';
 import {useSurgi} from '../../store/SurgiStore';
@@ -51,36 +49,20 @@ export default function DepartmentHomePage() {
   const ownIds = new Set([...departmentSets, ...departmentTools].map(a => a.id));
   const nearLimit = lifecycleAlerts.filter(a => ownIds.has(a.assetId));
 
-  // When each Set or instrument last moved to where it is, by barcode: how long it has been at its stage. Only real
-  // moves count (from one place to another, not undone): a record kept in place, such as a correction of its uses, is
-  // not one.
-  const lastMoved = useMemo(() => {
-    const map = new Map<string, {at: string; stamp: number}>();
-    // An undo and the move it cancelled are no move either.
-    const undone = undoneIds(movements);
-    for (const m of movements) {
-      if (m.from === m.to || m.undoes || undone.has(m.id)) continue;
-      const code = m.asset.split(' · ')[0].trim().toUpperCase();
-      const stamp = movementStamp(m.at);
-      if (stamp && stamp > (map.get(code)?.stamp ?? 0)) map.set(code, {at: m.at, stamp});
-    }
-    return map;
-  }, [movements]);
-
   // Ready to use: in the department, the soonest expiry first (expired ones on top).
   const available = tracked
     .filter(a => a.state === 'IN_DEPARTMENT')
     .map(a => ({a, status: a.sterileUntil ? expiryStatus(a.sterileUntil, a.shelfLifeMonths) : undefined}))
     .sort((x, y) => (x.status?.daysLeft ?? Infinity) - (y.status?.daysLeft ?? Infinity));
-  // Away in Sterilization: what waits to be picked up first, then by stage, the longest there first.
+  // Away in Sterilization: what waits to be picked up first, then by stage, the nearest to coming back first. (No «since
+  // when»: the history does not say when an item entered its stage — records kept along the way would only mislead.)
   const away = tracked
     .filter(a => a.state === 'READY_FOR_PICKUP' || IN_STERILIZATION_STATES.includes(a.state))
-    .map(a => ({a, moved: lastMoved.get(a.barcode.toUpperCase())}))
+    .map(a => ({a}))
     .sort(
       (x, y) =>
         Number(y.a.state === 'READY_FOR_PICKUP') - Number(x.a.state === 'READY_FOR_PICKUP') ||
-        IN_STERILIZATION_STATES.indexOf(y.a.state) - IN_STERILIZATION_STATES.indexOf(x.a.state) ||
-        (x.moved?.stamp ?? 0) - (y.moved?.stamp ?? 0),
+        IN_STERILIZATION_STATES.indexOf(y.a.state) - IN_STERILIZATION_STATES.indexOf(x.a.state),
     );
   const ready = away.filter(x => x.a.state === 'READY_FOR_PICKUP');
 
@@ -199,15 +181,12 @@ export default function DepartmentHomePage() {
             <Sparkles size={18} />
           </header>
           <ul className="dash-list dash-items" tabIndex={0} aria-label={tr('Στην Αποστείρωση')}>
-            {away.map(({a, moved}) => (
+            {away.map(({a}) => (
               <li key={a.id}>
                 {kindIcon(a.kind)}
                 <Link to={pathOf(a.kind, a.id)}>
                   <b>{a.name}</b>
-                  <small>
-                    {a.barcode}
-                    {moved && ` · ${tr('από {0}', moved.at)}`}
-                  </small>
+                  <small>{a.barcode}</small>
                 </Link>
                 <span className={`dash-item-note${a.state === 'READY_FOR_PICKUP' ? ' ready' : ''}`}>
                   {statusLabel(a.state)}
