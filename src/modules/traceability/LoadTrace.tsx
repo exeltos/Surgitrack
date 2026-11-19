@@ -91,7 +91,7 @@ export default function LoadTrace({
         </button>
       </form>
       {missing && <p className="trace-hint">{missing}</p>}
-      {matches.length > 1 && !matches.some(m => m.id === load?.id) ? (
+      {matches.length > 1 ? (
         <section className="trace-recent-list" aria-label={tr('Φορτία με αυτόν τον κύκλο')}>
           <h3 className="trace-section-title">
             {tr(
@@ -104,7 +104,14 @@ export default function LoadTrace({
           <ul>
             {matches.map(l => (
               <li key={l.id}>
-                <button type="button" onClick={() => onOpen(l.id)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // The day chosen: the search's list gives way to its load.
+                    setMatches([]);
+                    onOpen(l.id);
+                  }}
+                >
                   <b>
                     {l.equipment} · #{l.cycleNumber}
                   </b>
