@@ -6356,3 +6356,21 @@ td {
     grid-area: action;
   }
 }
+/* Under an open report: what can be done about it. */
+.asset-issue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.asset-issue-actions .app-button {
+  text-decoration: none;
+}
+/* Under the cycle number: the sterilizer's previous cycle today. */
+.cycle-previous {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 500;
+}

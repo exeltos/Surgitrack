@@ -75,9 +75,21 @@ export const cyclesOf = (
   sterilizationCycles
     .filter(c => c.assetId === item.id || c.barcode === item.barcode || c.toolIds?.includes(item.id))
     .forEach(c => {
-      if (entries.some(e => e.sterilizer === c.sterilizer && e.cycleNumber === c.cycleNumber)) return;
+      // Already there with its load; a record without one, by sterilizer and number on the same day (numbers come
+      // back every day: A1, A2…).
+      const day = (at?: string) => (at ? new Date(time(at)).toDateString() : '');
+      if (
+        entries.some(e =>
+          c.loadId
+            ? e.loadId === c.loadId
+            : e.sterilizer === c.sterilizer && e.cycleNumber === c.cycleNumber && day(e.at) === day(c.completedAt),
+        )
+      )
+        return;
       entries.push({
         id: c.id,
+        // Its load, when the record has one: a later record of the same load (reopened and completed again) matches it.
+        loadId: c.loadId,
         start: c.completedAt,
         at: c.completedAt,
         sterilizer: c.sterilizer,

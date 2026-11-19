@@ -25,6 +25,19 @@ describe('CycleNumberSelect', () => {
     render(<CycleNumberSelect {...props} loads={loads as never} value="A1" onChange={onChange} />);
     expect(onChange).toHaveBeenCalledWith('A2');
   });
+  it("shows the sterilizer's previous cycle today, or that this is the day's first", () => {
+    const now = new Date();
+    const day = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+    const loads = [
+      {equipment: 'Κλίβανος 1', cycleNumber: 'A1', createdAt: `${day} 00:01`, kind: 'STERILIZATION'},
+      {equipment: 'Κλίβανος 1', cycleNumber: 'A2', createdAt: `${day} 00:02`, kind: 'STERILIZATION'},
+    ];
+    const {unmount} = render(<CycleNumberSelect {...props} loads={loads as never} value="A3" onChange={vi.fn()} />);
+    expect(screen.getByText('Προηγούμενος σήμερα: A2 · 00:02')).toBeInTheDocument();
+    unmount();
+    render(<CycleNumberSelect {...props} value="A1" onChange={vi.fn()} />);
+    expect(screen.getByText('Πρώτος κύκλος της ημέρας')).toBeInTheDocument();
+  });
   it('shows a number past the ones offered as it is', () => {
     render(<CycleNumberSelect {...props} value="A123" onChange={vi.fn()} fromDevice />);
     expect(screen.getByRole('combobox')).toHaveValue('A123');

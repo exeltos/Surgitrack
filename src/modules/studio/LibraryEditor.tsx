@@ -70,8 +70,8 @@ export default function LibraryEditor({
               <input
                 value={cyclePrefix}
                 maxLength={2}
-                onChange={e => setCyclePrefix(normalizeCycleNumber(e.target.value).replace(/[^A-Z]/g, ''))}
-                placeholder={tr('π.χ. A — οι κύκλοι του: A1, A2…')}
+                onChange={e => setCyclePrefix(normalizeCycleNumber(e.target.value).replace(/[^A-ZΑ-Ω]/g, ''))}
+                placeholder={tr('π.χ. Α — οι κύκλοι του: Α1, Α2…')}
               />
             </label>
           )}

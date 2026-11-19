@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import type {Movement, ProcessLoadRecord} from '../../../types/domain';
-import {daysUntil, firstUseAfter, roundsOf, type CycleEntry} from '../traceModel';
+import type {Movement, ProcessLoadRecord, SterilizationCycleRecord, Tool} from '../../../types/domain';
+import {cyclesOf, daysUntil, firstUseAfter, roundsOf, type CycleEntry} from '../traceModel';
 
 const move = (id: string, at: string, patientCode?: string): Movement =>
   ({id, asset: 'S1 · Set', assetKind: 'SET', from: 'A', to: 'B', status: id, at, by: 'X', patientCode}) as Movement;
@@ -64,5 +64,26 @@ describe('firstUseAfter', () => {
   it('finds the first use between this cycle and the next', () => {
     const uses = [move('late', '04/11/2026 09:00', 'P2'), move('early', '02/11/2026 09:00', 'P1')];
     expect(firstUseAfter(a, item, [a, b], uses)?.patientCode).toBe('P1');
+  });
+});
+
+describe('cyclesOf', () => {
+  it('keeps one cycle for a load recorded twice (reopened and completed again), its item out of the Set since', () => {
+    const tool = {id: 't1', barcode: 'T1', name: 'Λαβίδα', mode: 'STANDALONE'} as Tool;
+    const record = (id: string, at: string) =>
+      ({
+        id,
+        loadId: 'L1',
+        assetId: 's1',
+        barcode: 'S1',
+        toolIds: ['t1'],
+        sterilizer: 'ΚΛΙΒΑΝΟΣ Α',
+        cycleNumber: 'Α1',
+        completedAt: at,
+        result: 'PASSED',
+      }) as unknown as SterilizationCycleRecord;
+    const cycles = cyclesOf(tool, [], [], [record('c1', '19/11/2026 10:00'), record('c2', '19/11/2026 11:00')]);
+    expect(cycles).toHaveLength(1);
+    expect(cycles[0].loadId).toBe('L1');
   });
 });

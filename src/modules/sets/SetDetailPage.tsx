@@ -39,6 +39,7 @@ import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
 import {SetDeleteDialog, SetDuplicateDialog, SetReportModal} from './SetDialogs';
 import AssetManageModal from '../../components/assets/AssetManageModal';
+import IssueActions from '../../components/assets/IssueActions';
 import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
 import ActionMenu from '../../components/ui/ActionMenu';
@@ -434,6 +435,21 @@ export default function SetDetailPage() {
                               ))}
                             </div>
                           ) : null}
+                          {(() => {
+                            // The Set's own report is managed here; an instrument's, on the instrument's page.
+                            const code = issue.asset.split(' · ')[0].trim().toUpperCase();
+                            const member = tools.find(t => t.barcode.toUpperCase() === code);
+                            return (
+                              <IssueActions
+                                issue={issue}
+                                ask={ask}
+                                replaceable={!!member}
+                                // An instrument's own page keeps its own lock.
+                                locked={!member && workflowLocked}
+                                onManage={() => (member ? navigate(`/tools/${member.id}`) : setManageOpen(true))}
+                              />
+                            );
+                          })()}
                         </div>
                       </div>
                     ))
