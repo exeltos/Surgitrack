@@ -247,18 +247,6 @@ html body .trace-patients-ledger .movement-chip {
   max-width: 100%;
 }
 
-html body .trace-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 4px 0 10px;
-  border: 0;
-  background: none;
-  color: var(--primary, #0f6bb8);
-  font-weight: 600;
-  cursor: pointer;
-}
-
 /* The search: the suggestions list opens under it, and with nothing typed a line of help is all the page shows. */
 html body .trace-search {
   position: relative;
@@ -419,4 +407,9 @@ html body .trace-recent-list button span {
   html body .trace-recent-list button {
     grid-template-columns: 1fr auto;
   }
+}
+/* The page's «Πίσω», top left where a title would be, as «Πίσω στη λίστα» on the Set and instrument pages. */
+html body .trace-head {
+  display: flex;
+  margin-bottom: 10px;
 }

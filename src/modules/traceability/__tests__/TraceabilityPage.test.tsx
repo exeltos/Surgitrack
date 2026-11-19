@@ -19,10 +19,21 @@ describe('TraceabilityPage', () => {
     expect(codes().length).toBeLessThan(everyone.length);
     expect(new Set(codes())).toEqual(new Set(['PT-2026-0041']));
     fireEvent.click(uses().querySelector('.ledger-row')!);
-    expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
+    // Inside the patient: «Πίσω» in place of the tabs.
     expect(screen.getByText('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', {name: /Όλοι οι ασθενείς/}));
+    expect(screen.queryByRole('tablist')).toBeNull();
+    fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
     expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
+    expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('a patient opened directly goes «Πίσω» to the list of patients, not to another tab', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=patients&patient=PT-2026-0041', browserHistory: true});
+    fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
+    expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
+    // Nothing behind it any more: no «Πίσω» that would reopen the patient.
+    expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
   });
 
   it('shows nothing for an unknown patient code', () => {

@@ -29,7 +29,9 @@ describe('Ιχνηλάτηση › Φορτίο κλιβάνου', () => {
     const held = screen.getByRole('region', {name: 'Τι ήταν στο φορτίο'});
     fireEvent.click(within(held).getAllByRole('button')[0]);
     // The item's trail, with the load among its cycles.
-    expect(screen.getByRole('tab', {name: /Σετ \/ εργαλείο/})).toHaveAttribute('aria-selected', 'true');
+    // The item's card: «Πίσω» in place of the tabs.
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', {name: 'Φορτίο'})[0]);
     expect(screen.getByRole('heading', {name: /κύκλος #/})).toBeInTheDocument();
   });

@@ -2360,7 +2360,7 @@ export const en: Record<string, string> = {
   'Δεν βρέθηκαν καταγραφές με κωδικό ασθενούς': 'No records with a patient code found',
   'Σετ / εργαλείο': 'Set / instrument',
   Ασθενής: 'Patient',
-  'Όλοι οι ασθενείς': 'All patients',
+  Πίσω: 'Back',
   'Δεν βρέθηκε ασθενής με κωδικό «{0}»': 'No patient with code «{0}» found',
   'Barcode (S..., T...) ή όνομα Σετ/εργαλείου': 'Barcode (S..., T...) or Set/instrument name',
   'Το «{0}» είναι κωδικός ασθενούς.': '«{0}» is a patient code.',
