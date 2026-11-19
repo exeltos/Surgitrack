@@ -132,7 +132,12 @@ export function turnaround(movements: readonly Movement[], since: number) {
  * Use: the movements recorded with a patient code in the period, by department (uses and patients), and the Sets
  * (by name: the kind of operation) used most, overall and in each department.
  */
-export function usage(movements: readonly Movement[], since: number) {
+export function usage(
+  movements: readonly Movement[],
+  since: number,
+  // Whether a barcode is a Set's: a dispatch is recorded without its kind, so the kind comes from the Sets themselves.
+  isSet: (barcode: string) => boolean = barcode => /^S/i.test(barcode),
+) {
   type Item = {name: string; uses: number; departments: Map<string, number>};
   const departments = new Map<
     string,
@@ -150,7 +155,8 @@ export function usage(movements: readonly Movement[], since: number) {
     if (seen.has(use)) continue;
     seen.add(use);
     const department = m.from;
-    const kind = m.assetKind === 'SET' ? 'SET' : 'TOOL';
+    const barcode = m.asset.split(' · ')[0].trim().toUpperCase();
+    const kind = isSet(barcode) ? 'SET' : 'TOOL';
     const row = departments.get(department) || {department, uses: 0, sets: 0, tools: 0, patients: new Set<string>()};
     row.uses++;
     if (kind === 'SET') row.sets++;

@@ -37,7 +37,11 @@ export default function IndicatorsPage() {
   const load = useMemo(() => workload(live, since, days), [live, since, days]);
   const equipment = useMemo(() => equipmentLoad(processLoads, since), [processLoads, since]);
   const rounds = useMemo(() => turnaround(movements, since), [movements, since]);
-  const use = useMemo(() => usage(live, since), [live, since]);
+  const setBarcodes = useMemo(
+    () => new Set(sets.flatMap(x => [x.barcode, ...(x.legacyBarcodes || [])]).map(b => b.toUpperCase())),
+    [sets],
+  );
+  const use = useMemo(() => usage(live, since, b => setBarcodes.has(b)), [live, since, setBarcodes]);
   const q = useMemo(() => quality(processLoads, since), [processLoads, since]);
   const problems = useMemo(() => issueCounts(issues, since), [issues, since]);
 

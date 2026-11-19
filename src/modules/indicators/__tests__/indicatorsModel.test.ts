@@ -109,6 +109,9 @@ describe('indicators', () => {
     expect(u.departments).toEqual([{department: 'Χειρουργείο', uses: 2, sets: 2, tools: 0, patients: 2}]);
     expect(u.sets).toEqual([{name: 'ΟΡΘΟΠΕΔΙΚΟ ΒΑΣΙΚΟ', uses: 2, departments: ['Χειρουργείο']}]);
     expect(u.tools).toEqual([]);
+    // A dispatch is recorded without its kind: the Set is known by its barcode.
+    const untyped = moves.map(m => ({...m, assetKind: undefined}) as unknown as Movement);
+    expect(usage(untyped, since, b => b === 'S000001').sets[0]?.uses).toBe(2);
   });
 
   it('equipment and quality count the cycles in the period and the failed ones', () => {
