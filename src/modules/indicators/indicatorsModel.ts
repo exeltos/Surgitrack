@@ -1,5 +1,6 @@
 import {movementStamp} from '../../core/movementTime';
 import {isDispatch} from '../department/departmentStatus';
+import {undoneIds} from '../../core/movementUndo';
 import type {Issue, Movement, ProcessLoadRecord} from '../../types/domain';
 
 /** The indicators' period: from `since` (a timestamp) to now. */
@@ -26,9 +27,10 @@ export const percentile = (values: number[], p: number) => {
   return sorted[Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1)];
 };
 
-/** Live movements in the period (an undo and what it undid count as nothing). */
+/** Live movements in the period: an undo, what it undid and what that caused (a retirement at a dispatch) count as
+ * nothing. */
 export function liveMovements(movements: readonly Movement[], since: number) {
-  const undone = new Set(movements.filter(m => m.undoes).map(m => m.undoes!));
+  const undone = undoneIds(movements);
   return movements.filter(m => !m.undoes && !undone.has(m.id) && stampOf(m.at) >= since);
 }
 
@@ -173,7 +175,8 @@ export function quality(loads: readonly ProcessLoadRecord[], since: number) {
     washes: inPeriod.length - sterilization.length,
     failed: count('FAILED'),
     reprocess: count('REPROCESS'),
-    recalled: count('RECALLED'),
+    // A recall belongs to the day it was made, not to the cycle's: a load from before the period may be recalled in it.
+    recalled: loads.filter(l => l.status === 'RECALLED' && stampOf(l.recalledAt || l.createdAt) >= since).length,
   };
 }
 

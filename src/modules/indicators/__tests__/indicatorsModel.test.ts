@@ -56,6 +56,9 @@ describe('indicators', () => {
       move('u', '16/11/2026 09:20', 'Κεντρική Αποστείρωση', 'Χειρουργείο', 'Αναίρεση', {undoes: 'a'}),
     ];
     expect(liveMovements(moves, since)).toEqual([]);
+    // What the undone dispatch caused (a retirement) counts as nothing too.
+    const caused = move('r', '16/11/2026 09:10', 'Χειρουργείο', 'Εκτός λειτουργίας', 'Απόσυρση', {causedBy: 'a'});
+    expect(liveMovements([...moves, caused], since)).toEqual([]);
   });
 
   it('turnaround runs from the department’s dispatch until it is back there', () => {
@@ -107,5 +110,8 @@ describe('indicators', () => {
       ['Β', 1, 1],
     ]);
     expect(quality(loads, since)).toEqual({cycles: 3, washes: 0, failed: 1, reprocess: 0, recalled: 1});
+    // A load from before the period, recalled in it, is a recall of the period.
+    const late = {...load('5', 'Β', 'RECALLED', '01/10/2026 08:00'), recalledAt: '18/11/2026 10:00'};
+    expect(quality([...loads, late], since).recalled).toBe(2);
   });
 });
