@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Search, TriangleAlert} from 'lucide-react';
 import InfoList from './InfoList';
-import {foldCycleNumber, normalizeCycleNumber} from '../../core/cycleNumber';
+import {foldCycleNumber, normalizeCycleNumber, shortCycleNumber} from '../../core/cycleNumber';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -22,6 +22,8 @@ const biological = (value: BiologicalIndicatorResult | undefined): {label: strin
         : undefined;
 const physical = (value: boolean | undefined): {label: string; tone: Tone} | undefined =>
   value === undefined ? undefined : value ? {label: 'Εντάξει', tone: 'ok'} : {label: 'Αποτυχία', tone: 'bad'};
+
+const digitsOf = (value: string) => value.replace(/\D/g, '');
 
 /**
  * One sterilizer load, by sterilizer and cycle number: how its indicators came out, what was in it, where each item
@@ -46,7 +48,7 @@ export default function LoadTrace({
   const sterilizers = [...new Set(loads.map(l => l.equipment))].sort();
   const load = loads.find(l => l.id === loadId);
   const [sterilizer, setSterilizer] = useState(load?.equipment || sterilizers[0] || '');
-  const [cycle, setCycle] = useState(load?.cycleNumber || '');
+  const [cycle, setCycle] = useState(load ? shortCycleNumber(load.cycleNumber) : '');
   const [missing, setMissing] = useState('');
   const recent = [...loads].sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
 
@@ -56,7 +58,15 @@ export default function LoadTrace({
     const number = normalizeCycleNumber(cycle.replace(/^\s*#/, ''));
     if (!number) return;
     const hits = loads
-      .filter(l => l.equipment === sterilizer && foldCycleNumber(l.cycleNumber) === foldCycleNumber(number))
+      // The number only (the sterilizer gives the letter); a full number (Α4, a device's 2026-0932) also matches.
+      .filter(
+        l =>
+          l.equipment === sterilizer &&
+          (shortCycleNumber(l.cycleNumber) === number ||
+            foldCycleNumber(l.cycleNumber) === foldCycleNumber(number) ||
+            // A device's number with letters (P-2026-0214), typed with its digits only.
+            digitsOf(l.cycleNumber) === digitsOf(number)),
+      )
       .sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
     setMissing(hits.length ? '' : tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer));
     setMatches(hits.length > 1 ? hits : []);
@@ -84,7 +94,12 @@ export default function LoadTrace({
         </label>
         <label>
           {tr('Κύκλος')}
-          <input value={cycle} onChange={e => setCycle(e.target.value)} />
+          <input
+            value={cycle}
+            inputMode="numeric"
+            // The number only: the sterilizer chosen gives the letter.
+            onChange={e => setCycle(e.target.value.replace(/[^\d\-/]/g, ''))}
+          />
         </label>
         <button className="primary" type="submit">
           <Search size={16} /> {tr('Αναζήτηση')}
@@ -96,7 +111,7 @@ export default function LoadTrace({
           <h3 className="trace-section-title">
             {tr(
               'Ο κύκλος {0} του {1} υπάρχει σε {2} ημέρες: διαλέξτε ποιον.',
-              matches[0].cycleNumber,
+              shortCycleNumber(matches[0].cycleNumber),
               sterilizer,
               matches.length,
             )}
@@ -113,7 +128,7 @@ export default function LoadTrace({
                   }}
                 >
                   <b>
-                    {l.equipment} · #{l.cycleNumber}
+                    {l.equipment} · #{shortCycleNumber(l.cycleNumber)}
                   </b>
                   <span>{l.completedAt || l.createdAt}</span>
                   <span>{tr('{0} αντικείμενα', l.items.length)}</span>
@@ -144,7 +159,7 @@ export default function LoadTrace({
                 <li key={l.id}>
                   <button type="button" onClick={() => onOpen(l.id)}>
                     <b>
-                      {l.equipment} · #{l.cycleNumber}
+                      {l.equipment} · #{shortCycleNumber(l.cycleNumber)}
                     </b>
                     <span>{l.completedAt || l.createdAt}</span>
                     <span>{tr('{0} αντικείμενα', l.items.length)}</span>
@@ -216,7 +231,7 @@ function LoadView({
         <div>
           <small>{tr('ΦΟΡΤΙΟ')}</small>
           <h2>
-            {load.equipment} · {tr('κύκλος {0}', `#${load.cycleNumber}`)}
+            {load.equipment} · {tr('κύκλος {0}', `#${shortCycleNumber(load.cycleNumber)}`)}
           </h2>
         </div>
         {canRecall && (

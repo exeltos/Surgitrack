@@ -370,6 +370,8 @@ async function main() {
     });
 
     let sterilizerCycle = '';
+    // Beside its sterilizer a cycle shows its number only («Κύκλος 1» for A1).
+    const shownCycle = () => new RegExp(`[Κκ]ύκλος #?${sterilizerCycle.replace(/^\D+/, '')}(?![\\d-])`);
     await step('Sterilization loads it into a sterilizer', async () => {
       const {page} = sterilization;
       await queue('Φόρτωση');
@@ -391,7 +393,7 @@ async function main() {
       await queue('Στον κλίβανο');
       // The row of this load (the sample hospital has another load in the sterilizer).
       await page
-        .locator('.sterilizer-rows tbody tr', {hasText: sterilizerCycle})
+        .locator('.sterilizer-rows tbody tr', {has: page.locator('small', {hasText: shownCycle()})})
         .getByRole('button', {name: 'Τέλος κύκλου', exact: true})
         .click();
       // It asks first: a cycle ended by mistake sends the load to release.
@@ -407,7 +409,7 @@ async function main() {
       await queue('Αποδέσμευση');
       // The load's own block: its release button.
       await page
-        .locator('.ster-load-group', {hasText: sterilizerCycle})
+        .locator('.ster-load-group', {has: page.locator('span', {hasText: shownCycle()})})
         .getByRole('button', {name: 'Αποδέσμευση'})
         .click();
       const modal = page.locator('.modal-backdrop').last();

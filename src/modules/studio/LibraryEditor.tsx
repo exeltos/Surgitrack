@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {Languages, Plus, X} from 'lucide-react';
 import {programsOf} from '../../core/sterilizerPrograms';
-import {normalizeCycleNumber} from '../../core/cycleNumber';
 import type {LibraryItem} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import {translateToEnglish} from '../../core/glossary';
@@ -23,7 +22,6 @@ export default function LibraryEditor({
 }) {
   const [el, setEl] = useState(item?.el || '');
   const [code, setCode] = useState(item?.code || '');
-  const [cyclePrefix, setCyclePrefix] = useState(item?.cyclePrefix || '');
   // Its own programs once edited; until then the usual ones for its name (steam, or plasma).
   const [ownPrograms, setOwnPrograms] = useState<string[] | null>(item?.programs?.length ? item.programs : null);
   const programs = ownPrograms ?? programsOf({el});
@@ -65,17 +63,6 @@ export default function LibraryEditor({
             <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder={tr('Προαιρετικό')} />
           </label>
           {withPrograms && (
-            <label>
-              {tr('Γράμμα κύκλων')}
-              <input
-                value={cyclePrefix}
-                maxLength={2}
-                onChange={e => setCyclePrefix(normalizeCycleNumber(e.target.value).replace(/[^A-ZΑ-Ω]/g, ''))}
-                placeholder={tr('π.χ. Α — οι κύκλοι του: Α1, Α2…')}
-              />
-            </label>
-          )}
-          {withPrograms && (
             <fieldset className="studio-programs">
               <legend>{tr('Προγράμματα')}</legend>
               {programs.map((program, index) => (
@@ -111,9 +98,7 @@ export default function LibraryEditor({
                 el: el.trim(),
                 en: english || el.trim(),
                 code: code.trim() || undefined,
-                ...(withPrograms
-                  ? {programs: programs.map(p => p.trim()).filter(Boolean), cyclePrefix: cyclePrefix || undefined}
-                  : {}),
+                ...(withPrograms ? {programs: programs.map(p => p.trim()).filter(Boolean)} : {}),
               })
             }
           >

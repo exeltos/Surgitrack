@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../../core/cycleNumber';
 import {SortTh} from '../../../components/ui/SortHeader';
 import {useTableSort} from '../../../components/ui/useTableSort';
 import {useState} from 'react';
@@ -95,7 +96,7 @@ export default function SterilizerLoads({
                     <b>{trData(load.equipment)}</b>
                   </span>
                   <small>
-                    {tr('Κύκλος')} {load.cycleNumber}
+                    {tr('Κύκλος')} {shortCycleNumber(load.cycleNumber)}
                   </small>
                 </td>
                 <td data-label={tr('Πρόγραμμα')}>

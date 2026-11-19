@@ -1249,11 +1249,13 @@ html body .hospital-people .people-requests {
    to fill the card with wide gaps between them. */
 @media (min-width: 1100px) and (min-height: 600px) {
   html body .hospital-overview .dash-card .dash-bars {
-    grid-auto-rows: minmax(30px, 42px);
+    grid-auto-rows: minmax(22px, 42px);
     gap: 0;
   }
 }
 html body .hospital-overview .dash-flow .dash-bar {
+  min-height: 0;
+  line-height: 1.2;
   padding: 0 6px;
   border-radius: 8px;
   border-bottom: 1px solid var(--c-gray-95);
@@ -1669,8 +1671,10 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
     overscroll-behavior: contain;
     align-content: start;
   }
+  /* The stages share the card's height, 20–30px each: all of them show without a scroll bar. */
   html body .hospital-overview.dash .dash-card > .dash-bars {
-    grid-auto-rows: 30px;
+    grid-auto-rows: minmax(20px, 30px);
+    align-content: stretch;
   }
   html body .hospital-overview.dash .dash-activity > .dash-columns {
     flex: 1 1 auto;
@@ -2004,5 +2008,19 @@ html body .department-home .dash-most-used > .dept-cols {
 }
 .dash-where li.expired .dash-where-stage {
   color: var(--c-red-35);
+  font-weight: 600;
+}
+/* «+N ακόμη» under a list cut to the first five on the department's home. */
+.dept-lives-more {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+}
+.dept-lives-more button {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+  color: var(--c-cyan-30-6, inherit);
   font-weight: 600;
 }

@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../core/cycleNumber';
 import {useState} from 'react';
 import {CircleAlert, CircleCheck, Printer} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
@@ -59,7 +60,7 @@ export default function PatientTrace({
     headers: [tr('Σετ / Εργαλείο'), tr('Κύκλος αποστείρωσης'), tr('Αποτέλεσμα'), tr('Χρήση'), tr('Χρήστης')],
     rows: used.map(u => [
       u.label,
-      u.cycle ? `${u.cycle.sterilizer} · #${u.cycle.cycleNumber} · ${u.cycle.at}` : '—',
+      u.cycle ? `${u.cycle.sterilizer} · #${shortCycleNumber(u.cycle.cycleNumber)} · ${u.cycle.at}` : '—',
       u.cycle ? tr(u.cycle.label) : tr('Δεν βρέθηκε κύκλος'),
       u.at,
       trData(u.by),
@@ -127,11 +128,11 @@ export default function PatientTrace({
                         <>
                           {u.cycle.loadId ? (
                             <button type="button" className="trace-link" onClick={() => onLoad(u.cycle!.loadId!)}>
-                              {u.cycle.sterilizer} · #{u.cycle.cycleNumber}
+                              {u.cycle.sterilizer} · #{shortCycleNumber(u.cycle.cycleNumber)}
                             </button>
                           ) : (
                             <b>
-                              {u.cycle.sterilizer} · #{u.cycle.cycleNumber}
+                              {u.cycle.sterilizer} · #{shortCycleNumber(u.cycle.cycleNumber)}
                             </b>
                           )}
                           <small>{u.cycle.at}</small>

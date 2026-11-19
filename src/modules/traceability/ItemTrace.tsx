@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../core/cycleNumber';
 import {Link} from 'react-router-dom';
 import {ExternalLink} from 'lucide-react';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
@@ -70,7 +71,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
             value: lastCycle ? (
               <>
                 <b>
-                  {lastCycle.sterilizer} · #{lastCycle.cycleNumber}
+                  {lastCycle.sterilizer} · #{shortCycleNumber(lastCycle.cycleNumber)}
                 </b>{' '}
                 · {lastCycle.at} <i className={`trace-tone ${lastCycle.tone}`}>{tr(lastCycle.label)}</i>
                 {lastCycle.loadId && (
@@ -159,7 +160,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                       {index === 0 ? tr('Τρέχων γύρος') : tr('Γύρος')}
                       {' · '}
                       {round.cycle
-                        ? `${round.cycle.sterilizer} · #${round.cycle.cycleNumber}`
+                        ? `${round.cycle.sterilizer} · #${shortCycleNumber(round.cycle.cycleNumber)}`
                         : tr('Χωρίς καταγεγραμμένο κύκλο')}
                       {patients.length > 0 && ` · ${tr('ασθενής {0}', patients.join(', '))}`}
                     </th>
@@ -171,7 +172,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                         <td>
                           <b>{tr('Αποστείρωση')}</b>{' '}
                           <small>
-                            {c.sterilizer} · {tr('κύκλος {0}', c.cycleNumber)}
+                            {c.sterilizer} · {tr('κύκλος {0}', shortCycleNumber(c.cycleNumber))}
                             {c.program ? ` · ${c.program}` : ''}
                             {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
                           </small>

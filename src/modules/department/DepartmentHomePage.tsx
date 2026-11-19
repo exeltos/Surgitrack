@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {Gauge, Layers3, Wrench} from 'lucide-react';
 import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
@@ -24,6 +24,19 @@ const IN_STERILIZATION_STATES: string[] = [
 
 /** «Κοντά στο όριο»: a limited-use Set or instrument with this many uses left, or fewer. */
 const NEAR_END = 3;
+/** How many of each list show on the home, so the card needs no scroll bar; the rest are a click away. */
+const SHOWN = 5;
+
+/** «+N ακόμη»: the rest of a list, opened in place (the card then scrolls, on request only). */
+function MoreLine({n, onOpen}: {n: number; onOpen: () => void}) {
+  return (
+    <p className="dept-lives-more">
+      <button type="button" onClick={onOpen}>
+        {tr('+{0} ακόμη', n)}
+      </button>
+    </p>
+  );
+}
 
 type Kind = {
   key: string;
@@ -46,6 +59,8 @@ type Kind = {
 export default function DepartmentHomePage() {
   const {sets, tools, issues, movements, currentUser} = useSurgi();
   const dept = currentUser.department;
+  const [allNear, setAllNear] = useState(false);
+  const [allCounted, setAllCounted] = useState(false);
 
   const departmentSets = useMemo(() => sets.filter(item => item.department === dept), [sets, dept]);
   const departmentTools = useMemo(() => tools.filter(item => item.department === dept), [tools, dept]);
@@ -227,30 +242,35 @@ export default function DepartmentHomePage() {
                     {tr('Κοντά στο όριο')} <span>{tr('{0} χρήσεις ή λιγότερες', NEAR_END)}</span>
                   </h3>
                   {nearEnd.length ? (
-                    <ul className="dash-list dash-lives" aria-label={tr('Κοντά στο όριο')}>
-                      {nearEnd.map(a => (
-                        <li key={a.id} className={a.left === 0 ? 'out' : 'near'}>
-                          {a.kind === 'SET' ? (
-                            <Layers3 size={15} aria-hidden="true" />
-                          ) : (
-                            <Wrench size={15} aria-hidden="true" />
-                          )}
-                          <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
-                            <b>{a.name}</b>
-                            <small>{a.barcode}</small>
-                          </Link>
-                          <span className="dash-lives-track" aria-hidden="true">
-                            <i style={{width: `${Math.min(100, (a.uses / a.max) * 100)}%`}} />
-                          </span>
-                          <span className="dash-lives-count">
-                            <strong>
-                              {a.uses} / {a.max}
-                            </strong>
-                            <small>{a.left === 0 ? tr('Εξαντλήθηκε') : tr('απομένουν {0}', a.left)}</small>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="dash-list dash-lives" aria-label={tr('Κοντά στο όριο')}>
+                        {nearEnd.slice(0, allNear ? undefined : SHOWN).map(a => (
+                          <li key={a.id} className={a.left === 0 ? 'out' : 'near'}>
+                            {a.kind === 'SET' ? (
+                              <Layers3 size={15} aria-hidden="true" />
+                            ) : (
+                              <Wrench size={15} aria-hidden="true" />
+                            )}
+                            <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                              <b>{a.name}</b>
+                              <small>{a.barcode}</small>
+                            </Link>
+                            <span className="dash-lives-track" aria-hidden="true">
+                              <i style={{width: `${Math.min(100, (a.uses / a.max) * 100)}%`}} />
+                            </span>
+                            <span className="dash-lives-count">
+                              <strong>
+                                {a.uses} / {a.max}
+                              </strong>
+                              <small>{a.left === 0 ? tr('Εξαντλήθηκε') : tr('απομένουν {0}', a.left)}</small>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      {!allNear && nearEnd.length > SHOWN && (
+                        <MoreLine n={nearEnd.length - SHOWN} onOpen={() => setAllNear(true)} />
+                      )}
+                    </>
                   ) : (
                     <p className="dept-lives-none">
                       {tr('Κανένα · {0} με όριο χρήσεων, όλα με περισσότερες από {1}.', limited.length, NEAR_END)}
@@ -262,7 +282,7 @@ export default function DepartmentHomePage() {
                 <>
                   <h3>{tr('Καταμέτρηση χρήσεων')}</h3>
                   <ul className="dash-list dash-lives" aria-label={tr('Καταμέτρηση χρήσεων')}>
-                    {counted.map(a => (
+                    {counted.slice(0, allCounted ? undefined : SHOWN).map(a => (
                       <li key={a.id}>
                         {a.kind === 'SET' ? (
                           <Layers3 size={15} aria-hidden="true" />
@@ -282,6 +302,9 @@ export default function DepartmentHomePage() {
                       </li>
                     ))}
                   </ul>
+                  {!allCounted && counted.length > SHOWN && (
+                    <MoreLine n={counted.length - SHOWN} onOpen={() => setAllCounted(true)} />
+                  )}
                 </>
               )}
             </div>

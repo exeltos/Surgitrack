@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../core/cycleNumber';
 import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -642,7 +643,7 @@ export default function EquipmentPage() {
                       <td data-label={L('Τελευταίος κύκλος', 'Last cycle')}>
                         {last ? (
                           <>
-                            <b>{last.cycleNumber}</b>
+                            <b>{shortCycleNumber(last.cycleNumber)}</b>
                             <small>
                               {when(last.startedAt || last.createdAt)}
                               {last.result === 'FAIL' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}
@@ -650,7 +651,7 @@ export default function EquipmentPage() {
                           </>
                         ) : row.lastLoad ? (
                           <>
-                            <b>{row.lastLoad.cycleNumber}</b>
+                            <b>{shortCycleNumber(row.lastLoad.cycleNumber)}</b>
                             <small>
                               {row.lastLoad.completedAt || row.lastLoad.createdAt}
                               {row.lastLoad.status === 'FAILED' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}

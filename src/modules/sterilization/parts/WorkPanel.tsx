@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../../core/cycleNumber';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {statusLabel} from '../../../components/ui/statusLabel';
 import SortHeader from '../../../components/ui/SortHeader';
@@ -313,7 +314,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                 return (
                   <div className="ster-load-group" key={`load-${load.id}`}>
                     <span>
-                      <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', load.cycleNumber)}
+                      <b>{trData(load.equipment)}</b> · {tr('κύκλος {0}', shortCycleNumber(load.cycleNumber))}{' '}
                       <small>{contentOf(load.items.map(item => item.assetKind))}</small>
                     </span>
                     <button
