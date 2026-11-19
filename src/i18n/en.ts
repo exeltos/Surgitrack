@@ -436,7 +436,7 @@ export const en: Record<string, string> = {
   'Αρνητικός / επιτυχής': 'Negative / pass',
   'Γράμμα κύκλων': 'Cycle letter',
   'έγινε σήμερα': 'done today',
-  'π.χ. A — οι κύκλοι του: A1, A2…': 'e.g. A — its cycles: A1, A2…',
+  'π.χ. Α — οι κύκλοι του: Α1, Α2…': 'e.g. A — its cycles: A1, A2…',
   'Αρχικό όριο': 'Initial limit',
   'Αρχικό όριο χρήσεων': 'Initial usage limit',
   'Αφαίρεση από σύνθεση': 'Removed from composition',

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {cycleDigits, cyclePrefixOf, normalizeCycleNumber, todaysCycles} from '../cycleNumber';
+import {cycleDigits, cyclePrefixOf, foldCycleNumber, normalizeCycleNumber, todaysCycles} from '../cycleNumber';
 
 const sterilizers = [
   {id: 'a', el: 'Κλίβανος 1', en: 'Sterilizer 1'},
@@ -8,23 +8,25 @@ const sterilizers = [
 ];
 
 describe('cycle numbers', () => {
-  it('reads «a3», «A3» and «Α3» (Greek) as one', () => {
-    for (const typed of ['a3', 'A3', 'Α3', ' α 3 ']) expect(normalizeCycleNumber(typed)).toBe('A3');
+  it('reads «a3», «A3» and «Α3» (Greek) as one, and keeps Greek Greek', () => {
+    for (const typed of ['a3', 'A3', 'Α3', ' α 3 ']) expect(foldCycleNumber(typed)).toBe('A3');
+    expect(normalizeCycleNumber(' ά 3')).toBe('Α3');
     expect(normalizeCycleNumber('2026-0932')).toBe('2026-0932');
   });
   it('gives each sterilizer its letter: its own, else by its place in the list', () => {
-    expect(sterilizers.map(s => cyclePrefixOf(s, sterilizers))).toEqual(['A', 'K', 'C']);
+    expect(sterilizers.map(s => cyclePrefixOf(s, sterilizers))).toEqual(['A', 'Κ', 'C']);
     expect(cyclePrefixOf(undefined, sterilizers)).toBe('');
-    // A name ending with a letter or a number gives it: Greek letters by their place (Γ is the third: C).
+    // A name ending with a letter gives it as written (Greek stays Greek); a number, by its place.
     const named = ['ΚΛΙΒΑΝΟΣ Α', 'ΚΛΙΒΑΝΟΣ Β', 'ΚΛΙΒΑΝΟΣ Γ', 'Κλίβανος 1', 'Κλίβανος Ατμού 02'].map((el, i) => ({
       id: String(i),
       el,
       en: el,
     }));
-    expect(named.map(s => cyclePrefixOf(s, named))).toEqual(['A', 'B', 'C', 'A', 'B']);
+    expect(named.map(s => cyclePrefixOf(s, named))).toEqual(['Α', 'Β', 'Γ', 'A', 'B']);
   });
   it('knows the number of a cycle written with the letter only', () => {
     expect(cycleDigits('α12', 'A')).toBe(12);
+    expect(cycleDigits('A12', 'Α')).toBe(12);
     expect(cycleDigits('B3', 'A')).toBeUndefined();
     expect(cycleDigits('2026-0932', 'A')).toBeUndefined();
   });

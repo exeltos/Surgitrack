@@ -1,7 +1,7 @@
 import type {LibraryItem} from './libraries';
 import {movementStamp} from './movementTime';
 
-// Greek capitals that look like Latin ones: «Α3» typed on a Greek keyboard is the same cycle as «A3».
+// Greek capitals that look like Latin ones: «A3» typed on a Latin keyboard is the same cycle as «Α3» (Greek).
 const GREEK_LOOKALIKES: Record<string, string> = {
   Α: 'A',
   Β: 'B',
@@ -19,32 +19,34 @@ const GREEK_LOOKALIKES: Record<string, string> = {
   Χ: 'X',
 };
 
-/** One way of writing a cycle number: «a3», «A3» and «Α3» (Greek Α) all read «A3»; no spaces. */
+/** A cycle number as stored and shown: capitals, no accents, no spaces («α 3» → «Α3»); Greek stays Greek. */
 export function normalizeCycleNumber(value: string | undefined | null) {
   return String(value || '')
     .trim()
     .toLocaleUpperCase('el')
-    .replace(/[ΆΈΉΊΌΎ]/g, c => ({Ά: 'Α', Έ: 'Ε', Ή: 'Η', Ί: 'Ι', Ό: 'Ο', Ύ: 'Υ'})[c] || c)
-    .replace(/[ΑΒΕΖΗΙΚΜΝΟΡΤΥΧ]/g, c => GREEK_LOOKALIKES[c])
+    .replace(/[ΆΈΉΊΌΎΏ]/g, c => ({Ά: 'Α', Έ: 'Ε', Ή: 'Η', Ί: 'Ι', Ό: 'Ο', Ύ: 'Υ', Ώ: 'Ω'})[c] || c)
     .replace(/\s+/g, '');
 }
 
-const GREEK_ORDER = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ';
+/** For comparing only: «a3», «A3» and «Α3» (Greek Α) are the same cycle. */
+export function foldCycleNumber(value: string | undefined | null) {
+  return normalizeCycleNumber(value).replace(/[ΑΒΕΖΗΙΚΜΝΟΡΤΥΧ]/g, c => GREEK_LOOKALIKES[c]);
+}
+
 const letterAt = (index: number) => (index >= 0 && index < 26 ? String.fromCharCode(65 + index) : '');
 
-/** The letter a sterilizer's name ends with: «ΚΛΙΒΑΝΟΣ Γ» → C (the third), «Κλίβανος 02» → B; none otherwise. */
+/** The letter a sterilizer's name ends with, as written («ΚΛΙΒΑΝΟΣ Γ» → Γ), or by its number («Κλίβανος 02» → B). */
 function letterOfName(name: string) {
   const last = name.trim().split(/\s+/).pop() || '';
   if (/^\d{1,2}$/.test(last) && Number(last) > 0) return letterAt(Number(last) - 1);
   if (last.length !== 1) return '';
-  const upper = last.toLocaleUpperCase('el');
-  if (/[A-Z]/.test(upper)) return upper;
-  return letterAt(GREEK_ORDER.indexOf(upper.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+  const upper = normalizeCycleNumber(last);
+  return /^[A-ZΑ-Ω]$/.test(upper) ? upper : '';
 }
 
 /**
- * A sterilizer's cycle letter: its own (Settings), else the letter or number its name ends with (ΚΛΙΒΑΝΟΣ Α → A,
- * Κλίβανος 2 → B), else A, B, C… in the order the sterilizers are listed.
+ * A sterilizer's cycle letter: its own (Settings), else the letter its name ends with, as written (ΚΛΙΒΑΝΟΣ Α → Α,
+ * Γ → Γ), or its number (Κλίβανος 2 → B), else A, B, C… in the order the sterilizers are listed.
  */
 export function cyclePrefixOf(sterilizer: LibraryItem | undefined, sterilizers: readonly LibraryItem[]) {
   if (!sterilizer) return '';
@@ -56,11 +58,12 @@ export function cyclePrefixOf(sterilizer: LibraryItem | undefined, sterilizers: 
   return index < 0 ? '' : letterAt(index) || `S${index + 1}`;
 }
 
-/** The number of a cycle written with this letter («A3» → 3), or undefined when it is written otherwise. */
+/** The number of a cycle written with this letter («Α3», «a3» → 3), or undefined when it is written otherwise. */
 export function cycleDigits(cycleNumber: string, prefix: string) {
-  const value = normalizeCycleNumber(cycleNumber);
-  if (!prefix || !value.startsWith(prefix)) return undefined;
-  const digits = value.slice(prefix.length);
+  const value = foldCycleNumber(cycleNumber);
+  const letter = foldCycleNumber(prefix);
+  if (!letter || !value.startsWith(letter)) return undefined;
+  const digits = value.slice(letter.length);
   return /^\d+$/.test(digits) ? Number(digits) : undefined;
 }
 

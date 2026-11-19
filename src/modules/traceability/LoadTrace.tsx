@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Search, TriangleAlert} from 'lucide-react';
 import InfoList from './InfoList';
-import {normalizeCycleNumber} from '../../core/cycleNumber';
+import {foldCycleNumber, normalizeCycleNumber} from '../../core/cycleNumber';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -56,7 +56,7 @@ export default function LoadTrace({
     const number = normalizeCycleNumber(cycle.replace(/^\s*#/, ''));
     if (!number) return;
     const hits = loads
-      .filter(l => l.equipment === sterilizer && normalizeCycleNumber(l.cycleNumber) === number)
+      .filter(l => l.equipment === sterilizer && foldCycleNumber(l.cycleNumber) === foldCycleNumber(number))
       .sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
     setMissing(hits.length ? '' : tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer));
     setMatches(hits.length > 1 ? hits : []);

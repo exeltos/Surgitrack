@@ -1,5 +1,5 @@
 import {movementStamp} from '../../../core/movementTime';
-import {normalizeCycleNumber} from '../../../core/cycleNumber';
+import {foldCycleNumber, normalizeCycleNumber} from '../../../core/cycleNumber';
 import {sterilizedOnOf} from '../../../core/sterileExpiry';
 import {tr} from '../../../i18n';
 import {printReleaseForm} from '../printRelease';
@@ -149,7 +149,7 @@ export function useLoadFlow(
         l =>
           l.kind === 'STERILIZATION' &&
           l.equipment === loadEquipment.trim() &&
-          normalizeCycleNumber(l.cycleNumber) === number &&
+          foldCycleNumber(l.cycleNumber) === foldCycleNumber(number) &&
           movementStamp(l.createdAt) >= today.getTime(),
       );
       if (taken) {

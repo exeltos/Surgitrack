@@ -42,10 +42,13 @@ export default function CycleNumberSelect({
   // Empty, another sterilizer's, or taken meanwhile (another workstation recorded it): today's next one instead.
   const stale =
     !fromDevice &&
-    (!value || (/^[A-Z]+\d+$/.test(value) && digits === undefined) || (digits !== undefined && used.has(digits)));
+    (!value || (/^[A-ZΑ-Ω]+\d+$/.test(value) && digits === undefined) || (digits !== undefined && used.has(digits)));
+  // This sterilizer's number written with a lookalike letter («A3» for «Α3»): written with its own.
+  const own = !fromDevice && digits !== undefined && `${prefix}${digits}` !== value ? `${prefix}${digits}` : '';
   useEffect(() => {
     if (suggested && stale) onChange(suggested);
-  }, [suggested, stale, onChange]);
+    else if (own) onChange(own);
+  }, [suggested, stale, own, onChange]);
 
   if (!prefix)
     return (
