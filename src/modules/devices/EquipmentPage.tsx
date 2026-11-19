@@ -445,8 +445,8 @@ export default function EquipmentPage() {
                 <button
                   key={group.id}
                   role="tab"
-                  aria-selected={group.id === shownGroup?.id}
-                  className={group.id === shownGroup?.id ? 'active' : ''}
+                  aria-selected={kindTab !== 'TESTS' && group.id === shownGroup?.id}
+                  className={kindTab !== 'TESTS' && group.id === shownGroup?.id ? 'active' : ''}
                   onClick={() => setKindTab(group.id)}
                 >
                   {group.id === 'STERILIZER' ? (

@@ -356,6 +356,9 @@ describe('Sterilizers & Devices › «Δοκιμές»', () => {
     ] as never;
     open();
     fireEvent.click(await screen.findByRole('tab', {name: /Δοκιμές/}));
+    // Only the tab open is marked: «Κλίβανοι» is not, while the tests show.
+    expect(screen.getByRole('tab', {name: /Κλίβανοι/})).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('tab', {name: /Δοκιμές/})).toHaveAttribute('aria-selected', 'true');
     const table = screen.getByRole('table');
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows.map(r => (r as HTMLTableRowElement).cells[0].textContent)).toEqual([
