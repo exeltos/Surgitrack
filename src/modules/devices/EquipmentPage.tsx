@@ -6,6 +6,7 @@ import {useSearchParams} from 'react-router-dom';
 import {
   Cable,
   CheckCircle2,
+  ClipboardCheck,
   Flame,
   FlaskConical,
   Droplets,
@@ -26,6 +27,7 @@ import OutOfServiceDialog from './OutOfServiceDialog';
 import TestDialog from './TestDialog';
 import {TEST_KINDS, testsFromDevices, testsInUse, withTest, itemTestsState} from '../../core/equipmentTests';
 import TestStandingsCell from './TestStandingsCell';
+import EquipmentTestsTab from './EquipmentTestsTab';
 import type {EquipmentTest} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -75,7 +77,8 @@ const emptyDevice: DeviceInput = {name: '', kind: 'STERILIZER', connection: 'FIL
  * with the load, the Sets and instruments inside, and the device's own actions and cycles.
  */
 export default function EquipmentPage() {
-  const {organizationId, role, can, sterilizationCycles, processLoads, addToBin, currentUser} = useSurgi();
+  const {organizationId, role, can, sterilizationCycles, processLoads, addToBin, currentUser, organizationName} =
+    useSurgi();
   const {lang} = useAppPreferences();
   const L = (el: string, en: string) => (lang === 'el' ? el : en);
   const withDevices = useHasModule('DEVICES');
@@ -436,7 +439,7 @@ export default function EquipmentPage() {
         </div>
       ) : (
         <>
-          {groups.length > 1 && (
+          {(groups.length > 1 || withTests) && (
             <div className="name-check-tabs equipment-tabs" role="tablist">
               {groups.map(group => (
                 <button
@@ -456,230 +459,253 @@ export default function EquipmentPage() {
                   {group.label} <b>{group.rows.length}</b>
                 </button>
               ))}
+              {/* Every test of the sterilizers and washers, newest first, filtered and printed for an inspection. */}
+              {withTests && (
+                <button
+                  role="tab"
+                  aria-selected={kindTab === 'TESTS'}
+                  className={kindTab === 'TESTS' ? 'active' : ''}
+                  onClick={() => setKindTab('TESTS')}
+                >
+                  <ClipboardCheck size={16} /> {L('Δοκιμές', 'Tests')}
+                </button>
+              )}
             </div>
           )}
-          <div className="sterilizer-rows-wrap">
-            <table className="sterilizer-rows equipment-rows">
-              <thead>
-                <tr>
-                  <SortTh label={L('Εξοπλισμός', 'Equipment')} sortKey="name" sort={order.sort} onSort={order.toggle} />
-                  <SortTh label={L('Τώρα', 'Now')} sortKey="state" sort={order.sort} onSort={order.toggle} />
-                  {devicesEnabled && (
+          {kindTab === 'TESTS' ? (
+            <EquipmentTestsTab sterilizers={sterilizers} washers={washers} hospital={organizationName} />
+          ) : (
+            <div className="sterilizer-rows-wrap">
+              <table className="sterilizer-rows equipment-rows">
+                <thead>
+                  <tr>
                     <SortTh
-                      label={L('Σύνδεση', 'Connection')}
-                      sortKey="connection"
+                      label={L('Εξοπλισμός', 'Equipment')}
+                      sortKey="name"
                       sort={order.sort}
                       onSort={order.toggle}
                     />
-                  )}
-                  {withTests && (
-                    <SortTh label={L('Δοκιμές', 'Tests')} sortKey="tests" sort={order.sort} onSort={order.toggle} />
-                  )}
-                  <SortTh
-                    label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}
-                    sortKey="failures"
-                    sort={order.sort}
-                    onSort={order.toggle}
-                  />
-                  <SortTh
-                    label={L('Τελευταίος κύκλος', 'Last cycle')}
-                    sortKey="last"
-                    sort={order.sort}
-                    onSort={order.toggle}
-                  />
-                  <th>
-                    <span className="sr-only">{L('Ενέργειες', 'Actions')}</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {(shownGroup?.rows ?? []).map(row => {
-                  const {device} = row;
-                  const live = row.load ? liveOf(row.load, now) : undefined;
-                  const last = device ? lastReading(device.id) : undefined;
-                  const ConnectionIcon =
-                    device?.connection === 'API' ? Wifi : device?.connection === 'SERIAL' ? Cable : Upload;
-                  const stateText = row.load
-                    ? live
-                      ? phaseText(live.sample.phase)
-                      : L('Σε εξέλιξη', 'Running')
-                    : row.outOfService
-                      ? row.outOfService.reason === 'BREAKDOWN'
-                        ? L('Βλάβη', 'Breakdown')
-                        : L('Συντήρηση', 'Maintenance')
-                      : device && !device.active
-                        ? L('Ανενεργή', 'Inactive')
-                        : L('Ελεύθερος', 'Free');
-                  return (
-                    <tr
-                      key={row.key}
-                      className={`${row.load ? (live?.done ? 'done' : 'busy') : row.outOfService ? 'out' : 'free'} row-opens`}
-                      title={L('Λεπτομέρειες', 'Details')}
-                      onClick={() => setOpenKey(row.key)}
-                    >
-                      <td data-label={L('Εξοπλισμός', 'Equipment')}>
-                        <span className="row-name">
-                          {row.load ? (
-                            live?.done ? (
-                              <Hourglass size={16} aria-hidden="true" />
+                    <SortTh label={L('Τώρα', 'Now')} sortKey="state" sort={order.sort} onSort={order.toggle} />
+                    {devicesEnabled && (
+                      <SortTh
+                        label={L('Σύνδεση', 'Connection')}
+                        sortKey="connection"
+                        sort={order.sort}
+                        onSort={order.toggle}
+                      />
+                    )}
+                    {withTests && (
+                      <SortTh label={L('Δοκιμές', 'Tests')} sortKey="tests" sort={order.sort} onSort={order.toggle} />
+                    )}
+                    <SortTh
+                      label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')}
+                      sortKey="failures"
+                      sort={order.sort}
+                      onSort={order.toggle}
+                    />
+                    <SortTh
+                      label={L('Τελευταίος κύκλος', 'Last cycle')}
+                      sortKey="last"
+                      sort={order.sort}
+                      onSort={order.toggle}
+                    />
+                    <th>
+                      <span className="sr-only">{L('Ενέργειες', 'Actions')}</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(shownGroup?.rows ?? []).map(row => {
+                    const {device} = row;
+                    const live = row.load ? liveOf(row.load, now) : undefined;
+                    const last = device ? lastReading(device.id) : undefined;
+                    const ConnectionIcon =
+                      device?.connection === 'API' ? Wifi : device?.connection === 'SERIAL' ? Cable : Upload;
+                    const stateText = row.load
+                      ? live
+                        ? phaseText(live.sample.phase)
+                        : L('Σε εξέλιξη', 'Running')
+                      : row.outOfService
+                        ? row.outOfService.reason === 'BREAKDOWN'
+                          ? L('Βλάβη', 'Breakdown')
+                          : L('Συντήρηση', 'Maintenance')
+                        : device && !device.active
+                          ? L('Ανενεργή', 'Inactive')
+                          : L('Ελεύθερος', 'Free');
+                    return (
+                      <tr
+                        key={row.key}
+                        className={`${row.load ? (live?.done ? 'done' : 'busy') : row.outOfService ? 'out' : 'free'} row-opens`}
+                        title={L('Λεπτομέρειες', 'Details')}
+                        onClick={() => setOpenKey(row.key)}
+                      >
+                        <td data-label={L('Εξοπλισμός', 'Equipment')}>
+                          <span className="row-name">
+                            {row.load ? (
+                              live?.done ? (
+                                <Hourglass size={16} aria-hidden="true" />
+                              ) : (
+                                <Flame size={16} aria-hidden="true" />
+                              )
                             ) : (
-                              <Flame size={16} aria-hidden="true" />
-                            )
-                          ) : (
-                            <Power size={16} aria-hidden="true" />
-                          )}
-                          <b>{row.name}</b>
-                          {device && isSimulatedDevice(device) && (
-                            <span className="device-sim-badge">{L('Προσομοίωση', 'Simulation')}</span>
-                          )}
-                        </span>
-                        <small>
-                          {L(deviceKindLabel[row.kind].el, deviceKindLabel[row.kind].en)}
-                          {device
-                            ? ` · ${[device.manufacturer, device.model].filter(Boolean).join(' ')}`.replace(/ · $/, '')
-                            : ''}
-                        </small>
-                      </td>
-                      <td data-label={L('Τώρα', 'Now')} className="row-cycle">
-                        <span className="row-cycle-line">
-                          <span
-                            className={`row-phase${row.load ? (live?.done ? ' done' : '') : row.outOfService ? ' out' : ' idle'}`}
-                          >
-                            {stateText}
+                              <Power size={16} aria-hidden="true" />
+                            )}
+                            <b>{row.name}</b>
+                            {device && isSimulatedDevice(device) && (
+                              <span className="device-sim-badge">{L('Προσομοίωση', 'Simulation')}</span>
+                            )}
                           </span>
-                          {row.load && (
-                            <span>
-                              {L('κύκλος', 'cycle')} {row.load.cycleNumber} · {contentText(row.load.items)}
-                            </span>
-                          )}
-                          {live && (
-                            <>
-                              <span className="num">{live.sample.temperature.toFixed(1)} °C</span>
-                              <span
-                                className={`num${
-                                  live.sample.phase === 'HOLDING' && live.sample.pressure < MIN_HOLD_PRESSURE
-                                    ? ' bad'
-                                    : ''
-                                }`}
-                              >
-                                {live.sample.pressure.toFixed(2)} bar
-                              </span>
-                            </>
-                          )}
-                        </span>
-                        {live ? (
-                          <>
-                            <div
-                              className="tile-progress"
-                              role="progressbar"
-                              aria-valuenow={live.progress}
-                              aria-valuemin={0}
-                              aria-valuemax={100}
-                              aria-label={L('Πρόοδος κύκλου', 'Cycle progress')}
-                            >
-                              <i style={{width: `${live.progress}%`}} />
-                            </div>
-                            <small>
-                              {row.load?.program} · {Math.floor(live.minute)} / {Math.ceil(live.end)}{' '}
-                              {L('λεπτά', 'min')}
-                              {row.load?.simulation ? ` · ${L('Προσομοίωση', 'Simulation')}` : ''}
-                            </small>
-                          </>
-                        ) : row.load && canSimulate && !row.load.simulation ? (
-                          // Demo: the cycle can be simulated, in the sterilizer's card; its data then shows here.
-                          <button
-                            className="row-simulate"
-                            onClick={e => {
-                              // The row opens the page too: once is enough (one entry in the browser's history).
-                              e.stopPropagation();
-                              setOpenKey(row.key);
-                            }}
-                          >
-                            <FlaskConical size={14} /> {L('Προσομοίωση', 'Simulation')}
-                          </button>
-                        ) : row.load ? (
                           <small>
-                            {row.load.program} · {L('χωρίς ζωντανά δεδομένα', 'no live data')}
+                            {L(deviceKindLabel[row.kind].el, deviceKindLabel[row.kind].en)}
+                            {device
+                              ? ` · ${[device.manufacturer, device.model].filter(Boolean).join(' ')}`.replace(
+                                  / · $/,
+                                  '',
+                                )
+                              : ''}
                           </small>
-                        ) : null}
-                      </td>
-                      {devicesEnabled && (
-                        <td data-label={L('Σύνδεση', 'Connection')}>
-                          {device ? (
-                            <span className="row-connection">
-                              <ConnectionIcon size={14} />
-                              {L(connectionShort[device.connection].el, connectionShort[device.connection].en)}
-                              {device.connection === 'API' && device.keyHint ? ` …${device.keyHint}` : ''}
+                        </td>
+                        <td data-label={L('Τώρα', 'Now')} className="row-cycle">
+                          <span className="row-cycle-line">
+                            <span
+                              className={`row-phase${row.load ? (live?.done ? ' done' : '') : row.outOfService ? ' out' : ' idle'}`}
+                            >
+                              {stateText}
+                            </span>
+                            {row.load && (
+                              <span>
+                                {L('κύκλος', 'cycle')} {row.load.cycleNumber} · {contentText(row.load.items)}
+                              </span>
+                            )}
+                            {live && (
+                              <>
+                                <span className="num">{live.sample.temperature.toFixed(1)} °C</span>
+                                <span
+                                  className={`num${
+                                    live.sample.phase === 'HOLDING' && live.sample.pressure < MIN_HOLD_PRESSURE
+                                      ? ' bad'
+                                      : ''
+                                  }`}
+                                >
+                                  {live.sample.pressure.toFixed(2)} bar
+                                </span>
+                              </>
+                            )}
+                          </span>
+                          {live ? (
+                            <>
+                              <div
+                                className="tile-progress"
+                                role="progressbar"
+                                aria-valuenow={live.progress}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-label={L('Πρόοδος κύκλου', 'Cycle progress')}
+                              >
+                                <i style={{width: `${live.progress}%`}} />
+                              </div>
+                              <small>
+                                {row.load?.program} · {Math.floor(live.minute)} / {Math.ceil(live.end)}{' '}
+                                {L('λεπτά', 'min')}
+                                {row.load?.simulation ? ` · ${L('Προσομοίωση', 'Simulation')}` : ''}
+                              </small>
+                            </>
+                          ) : row.load && canSimulate && !row.load.simulation ? (
+                            // Demo: the cycle can be simulated, in the sterilizer's card; its data then shows here.
+                            <button
+                              className="row-simulate"
+                              onClick={e => {
+                                // The row opens the page too: once is enough (one entry in the browser's history).
+                                e.stopPropagation();
+                                setOpenKey(row.key);
+                              }}
+                            >
+                              <FlaskConical size={14} /> {L('Προσομοίωση', 'Simulation')}
+                            </button>
+                          ) : row.load ? (
+                            <small>
+                              {row.load.program} · {L('χωρίς ζωντανά δεδομένα', 'no live data')}
+                            </small>
+                          ) : null}
+                        </td>
+                        {devicesEnabled && (
+                          <td data-label={L('Σύνδεση', 'Connection')}>
+                            {device ? (
+                              <span className="row-connection">
+                                <ConnectionIcon size={14} />
+                                {L(connectionShort[device.connection].el, connectionShort[device.connection].en)}
+                                {device.connection === 'API' && device.keyHint ? ` …${device.keyHint}` : ''}
+                              </span>
+                            ) : (
+                              <span className="muted">{L('Χωρίς σύνδεση', 'Not connected')}</span>
+                            )}
+                          </td>
+                        )}
+                        {withTests && (
+                          <td data-label={L('Δοκιμές', 'Tests')}>
+                            {/* Each test on its own line: which passed, failed or is due, and when it was done. */}
+                            {testStateOf(row) && (row.kind === 'STERILIZER' || row.kind === 'WASHER') ? (
+                              <TestStandingsCell
+                                item={{el: row.name, tests: row.tests, testKinds: row.testKinds}}
+                                equipment={row.kind}
+                              />
+                            ) : (
+                              '—'
+                            )}
+                          </td>
+                        )}
+                        <td data-label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')} className="num">
+                          {row.kind !== 'STERILIZER' && row.kind !== 'WASHER' ? (
+                            '—'
+                          ) : row.trouble?.recent ? (
+                            <span className={`row-trouble${row.trouble.attention ? ' attention' : ''}`}>
+                              {row.trouble.attention && <TriangleAlert size={13} aria-hidden="true" />}
+                              {row.trouble.recent}
                             </span>
                           ) : (
-                            <span className="muted">{L('Χωρίς σύνδεση', 'Not connected')}</span>
+                            <span className="muted">0</span>
                           )}
                         </td>
-                      )}
-                      {withTests && (
-                        <td data-label={L('Δοκιμές', 'Tests')}>
-                          {/* Each test on its own line: which passed, failed or is due, and when it was done. */}
-                          {testStateOf(row) && (row.kind === 'STERILIZER' || row.kind === 'WASHER') ? (
-                            <TestStandingsCell
-                              item={{el: row.name, tests: row.tests, testKinds: row.testKinds}}
-                              equipment={row.kind}
-                            />
+                        <td data-label={L('Τελευταίος κύκλος', 'Last cycle')}>
+                          {last ? (
+                            <>
+                              <b>{shortCycleNumber(last.cycleNumber)}</b>
+                              <small>
+                                {when(last.startedAt || last.createdAt)}
+                                {last.result === 'FAIL' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}
+                              </small>
+                            </>
+                          ) : row.lastLoad ? (
+                            <>
+                              <b>{shortCycleNumber(row.lastLoad.cycleNumber)}</b>
+                              <small>
+                                {row.lastLoad.completedAt || row.lastLoad.createdAt}
+                                {row.lastLoad.status === 'FAILED' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}
+                              </small>
+                            </>
                           ) : (
                             '—'
                           )}
                         </td>
-                      )}
-                      <td data-label={L('Αποτυχίες 30 ημ.', 'Failures, 30 days')} className="num">
-                        {row.kind !== 'STERILIZER' && row.kind !== 'WASHER' ? (
-                          '—'
-                        ) : row.trouble?.recent ? (
-                          <span className={`row-trouble${row.trouble.attention ? ' attention' : ''}`}>
-                            {row.trouble.attention && <TriangleAlert size={13} aria-hidden="true" />}
-                            {row.trouble.recent}
-                          </span>
-                        ) : (
-                          <span className="muted">0</span>
-                        )}
-                      </td>
-                      <td data-label={L('Τελευταίος κύκλος', 'Last cycle')}>
-                        {last ? (
-                          <>
-                            <b>{shortCycleNumber(last.cycleNumber)}</b>
-                            <small>
-                              {when(last.startedAt || last.createdAt)}
-                              {last.result === 'FAIL' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}
-                            </small>
-                          </>
-                        ) : row.lastLoad ? (
-                          <>
-                            <b>{shortCycleNumber(row.lastLoad.cycleNumber)}</b>
-                            <small>
-                              {row.lastLoad.completedAt || row.lastLoad.createdAt}
-                              {row.lastLoad.status === 'FAILED' ? ` · ${L('Αποτυχία', 'Fail')}` : ''}
-                            </small>
-                          </>
-                        ) : (
-                          '—'
-                        )}
-                      </td>
-                      <td className="row-actions" onClick={e => e.stopPropagation()}>
-                        <div className="row-actions-inner">
-                          <button
-                            className="row-icon"
-                            title={L('Λεπτομέρειες', 'Details')}
-                            aria-label={L('Λεπτομέρειες', 'Details')}
-                            onClick={() => setOpenKey(row.key)}
-                          >
-                            <ListTree size={15} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        <td className="row-actions" onClick={e => e.stopPropagation()}>
+                          <div className="row-actions-inner">
+                            <button
+                              className="row-icon"
+                              title={L('Λεπτομέρειες', 'Details')}
+                              aria-label={L('Λεπτομέρειες', 'Details')}
+                              onClick={() => setOpenKey(row.key)}
+                            >
+                              <ListTree size={15} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
 

@@ -28,10 +28,11 @@ td{padding:1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nt
 @media screen{html{background:#e9eef1}body{max-width:297mm;margin:0 auto;padding:11mm 10mm;background:#fff;min-height:210mm}}
 `;
 
-const page = (title: string, body: string) =>
+/** A printable page in the lists' style (A4 landscape): the header, a summary row, a table, the footer. */
+export const page = (title: string, body: string) =>
   `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${STYLE}</style></head><body>${body}</body></html>`;
 
-const now = () => formatDateTime();
+export const now = () => formatDateTime();
 
 /** The list of instruments to replace, as filtered or selected on screen, for print or PDF. */
 export function replacementListHtml(items: readonly ReplacementItem[], subtitle: string, hospital?: string) {

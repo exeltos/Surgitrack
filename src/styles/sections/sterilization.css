@@ -3106,3 +3106,80 @@ html body .sent-note {
   color: var(--c-red-35);
   font-weight: 600;
 }
+/* «Δοκιμές»: every test of the sterilizers and washers, filtered and printed. */
+.equipment-tests-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+.equipment-tests-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.equipment-tests-bar select {
+  min-width: 180px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-85);
+  border-radius: 10px;
+  background: var(--c-white);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+}
+.equipment-tests-count {
+  margin-left: auto;
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+}
+.equipment-tests-scroll {
+  /* The list scrolls within the window, its header kept. */
+  max-height: calc(100dvh - 330px);
+  min-height: 160px;
+  overflow: auto;
+}
+.equipment-tests-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.equipment-tests-table th {
+  position: sticky;
+  top: 0;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--c-gray-90);
+  background: var(--c-white);
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+.equipment-tests-table td:first-child {
+  white-space: nowrap;
+}
+.equipment-tests-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.test-result {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.test-result.ok {
+  background: var(--c-green-90);
+  color: var(--c-green-35);
+}
+.test-result.bad {
+  background: var(--c-red-85);
+  color: var(--c-red-35);
+}
