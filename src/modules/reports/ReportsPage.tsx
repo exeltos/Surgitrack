@@ -342,13 +342,12 @@ export default function ReportsPage() {
       ]),
     ),
   );
-  // The inventory, by department or specialty, reads as groups while it is in that order (as it opens, or sorted by
-  // that column): the group's name heads its rows, and its column goes.
+  // The inventory, by department or specialty, reads as groups as it opens: the group's name heads its rows, and its
+  // column goes. Sorting by any column (that one too, either way) shows the plain table; a third click on the sorted
+  // column returns to the groups.
   const firstKey = screenColumns[0]?.key;
   const groupKey =
-    firstKey && (firstKey === 'department' || firstKey === 'specialty') && (!order.sort || order.sort.key === firstKey)
-      ? firstKey
-      : undefined;
+    firstKey && (firstKey === 'department' || firstKey === 'specialty') && !order.sort ? firstKey : undefined;
   const tableColumns = groupKey ? screenColumns.slice(1) : screenColumns;
   const groupSizes = useMemo(() => {
     const sizes = new Map<string, number>();

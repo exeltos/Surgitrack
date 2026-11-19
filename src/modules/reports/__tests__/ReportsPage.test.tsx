@@ -89,6 +89,19 @@ describe('Reports', () => {
     expect(groups().map(g => g.name)).not.toEqual(byDepartment.map(g => g.name));
   });
 
+  it('a sort shows the plain table, the group column too, both ways; a third click brings the groups back', () => {
+    renderPage(<ReportsPage />);
+    const header = (name: string) => within(results()).getByRole('columnheader', {name: new RegExp(`^${name}`)});
+    fireEvent.click(within(header('Τύπος')).getByRole('button'));
+    expect(groups()).toEqual([]);
+    const department = () => within(header('Τμήμα')).getByRole('button');
+    fireEvent.click(department());
+    fireEvent.click(department());
+    expect(header('Τμήμα')).toHaveAttribute('aria-sort', 'descending');
+    fireEvent.click(department());
+    expect(groups().length).toBeGreaterThan(1);
+  });
+
   it('lists the instruments in service and those taken out of service, each from its card', () => {
     renderPage(<ReportsPage />);
     choose('Χρήσεις & αποσύρσεις');
