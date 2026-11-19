@@ -6356,3 +6356,13 @@ td {
     grid-area: action;
   }
 }
+/* Under an open report: what can be done about it. */
+.asset-issue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.asset-issue-actions .app-button {
+  text-decoration: none;
+}

@@ -417,6 +417,10 @@ export const en: Record<string, string> = {
   'Παράδοση όλων': 'Deliver all',
   'Παραλαβή όλων': 'Receive all',
   'Αριθμός κύκλου': 'Cycle number',
+  'π.χ. Ακονίστηκε, κόβει κανονικά': 'e.g. Sharpened, cuts properly',
+  'Ελέγχθηκε · παραμένει σε χρήση': 'Checked · stays in use',
+  'Ελέγχθηκε · σε χρήση': 'Checked · in use',
+  'Service, Απόθεμα…': 'Service, Stock…',
   'Τι είναι στην Αποστείρωση τώρα και τι λήγει πρώτο στο τμήμα.':
     'What is in Sterilization now and what expires first in the department.',
   'Όλα στο τμήμα: {0} Σετ, {1} μεμονωμένα εργαλεία.': 'All in the department: {0} Sets, {1} standalone instruments.',

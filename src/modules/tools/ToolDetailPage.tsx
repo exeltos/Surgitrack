@@ -36,6 +36,7 @@ import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import BackLink from '../../components/ui/BackLink';
 import AssetManageModal from '../../components/assets/AssetManageModal';
+import IssueActions from '../../components/assets/IssueActions';
 import ColorMarkerPicker from '../../components/assets/ColorMarkerPicker';
 import {markerText, useColorTapes} from '../../components/assets/colorMarkerUtils';
 import {effectiveToolMarker} from '../../core/colorTapes';
@@ -345,6 +346,7 @@ export default function ToolDetailPage() {
                               ))}
                             </div>
                           ) : null}
+                          <IssueActions issue={issue} ask={ask} onManage={() => setManageOpen(true)} replaceable />
                         </div>
                       </div>
                     ))
