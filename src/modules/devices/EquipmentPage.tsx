@@ -25,6 +25,7 @@ import {equipmentTrouble} from '../../core/equipmentHealth';
 import OutOfServiceDialog from './OutOfServiceDialog';
 import TestDialog from './TestDialog';
 import {TEST_KINDS, testsFromDevices, testsInUse, withTest, itemTestsState} from '../../core/equipmentTests';
+import TestStandingsCell from './TestStandingsCell';
 import type {EquipmentTest} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -617,12 +618,12 @@ export default function EquipmentPage() {
                       )}
                       {withTests && (
                         <td data-label={L('Δοκιμές', 'Tests')}>
-                          {testStateOf(row) === 'FAILED' ? (
-                            <span className="row-test bad">{L('Απέτυχε', 'Failed')}</span>
-                          ) : testStateOf(row) === 'DUE' ? (
-                            <span className="row-test due">{L('Εκκρεμεί', 'Due')}</span>
-                          ) : testStateOf(row) === 'OK' ? (
-                            <span className="row-test ok">{L('Εντάξει', 'Up to date')}</span>
+                          {/* Each test on its own line: which passed, failed or is due, and when it was done. */}
+                          {testStateOf(row) && (row.kind === 'STERILIZER' || row.kind === 'WASHER') ? (
+                            <TestStandingsCell
+                              item={{el: row.name, tests: row.tests, testKinds: row.testKinds}}
+                              equipment={row.kind}
+                            />
                           ) : (
                             '—'
                           )}

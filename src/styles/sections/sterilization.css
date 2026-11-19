@@ -2065,25 +2065,6 @@ html body .batch-department button.clear:hover {
   background: var(--c-red-95, var(--c-amber-95));
   color: var(--c-red-40);
 }
-.equipment-rows .row-test {
-  display: inline-block;
-  padding: 2px 9px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.equipment-rows .row-test.ok {
-  background: var(--c-green-90);
-  color: var(--c-green-35);
-}
-.equipment-rows .row-test.due {
-  background: var(--c-amber-95);
-  color: var(--c-orange-40);
-}
-.equipment-rows .row-test.bad {
-  background: var(--c-amber-95);
-  color: var(--c-red-40);
-}
 /* The tests over the list: one slim line, coloured by where they stand; it opens the card. */
 .ster-tests-bar {
   display: flex;
@@ -3088,4 +3069,40 @@ html body .sent-note {
 html body .sent-note {
   margin-left: 8px;
   white-space: normal;
+}
+/* A sterilizer's or washer's tests, one line each: the mark, the test, when it was last done. */
+.test-standings {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.test-standings li {
+  display: grid;
+  grid-template-columns: 14px auto auto;
+  justify-content: start;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.test-standings small {
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+}
+.test-standings .test-mark {
+  font-weight: 700;
+}
+.test-standings .ok .test-mark {
+  color: var(--c-green-35);
+}
+.test-standings .due .test-mark,
+.test-standings .due small {
+  color: var(--c-amber-35);
+}
+.test-standings .bad .test-mark,
+.test-standings .bad > span:nth-child(2) {
+  color: var(--c-red-35);
+  font-weight: 600;
 }
