@@ -2112,8 +2112,8 @@ html body .department-home .dash-most-used > .dept-cols {
 .problem-kpi.low {
   border-left-color: var(--c-amber-35);
 }
-/* Below a wide screen the column would narrow the tables: the figures become one low row of chips above them. */
-@media (max-width: 1599px) {
+/* On a narrow screen (a tablet) the column would leave no room for the records: one low row of chips above them. */
+@media (max-width: 1099px) {
   .issues-layout {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
@@ -2158,5 +2158,34 @@ html body .department-home .dash-most-used > .dept-cols {
   }
   .problem-kpi b {
     font-size: 13px;
+  }
+}
+
+/* Beside the column of «Εκκρεμότητες», the instruments to replace have less room than the window: their compact
+   columns (actions as icons, the main one kept) up to a wide screen. */
+@media (min-width: 1100px) and (max-width: 1699px) {
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-set {
+    width: 16%;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-reason {
+    width: 100px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-stock {
+    width: 92px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-status {
+    width: 124px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-actions {
+    width: 140px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed .replacement-actions {
+    grid-template-columns: 34px 34px 34px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed .replacement-actions > button {
+    padding: 0;
+  }
+  html body .issues-layout:not(.solo) .replacements-table .row-actions button .btn-label {
+    display: none;
   }
 }
