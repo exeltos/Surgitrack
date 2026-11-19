@@ -2036,6 +2036,8 @@ html body .department-home .dash-most-used > .dept-cols {
   min-width: 0;
 }
 .problem-aside {
+  /* Level with the list (below the tabs), not with the tabs. */
+  margin-top: 52px;
   padding: 12px;
   border: 1px solid var(--c-gray-90);
   border-radius: 14px;
@@ -2110,6 +2112,7 @@ html body .department-home .dash-most-used > .dept-cols {
   }
   .problem-aside {
     order: -1;
+    margin-top: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
