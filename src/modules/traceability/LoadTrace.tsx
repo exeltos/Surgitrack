@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {Search, TriangleAlert} from 'lucide-react';
 import InfoList from './InfoList';
+import {normalizeCycleNumber} from '../../core/cycleNumber';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {statusLabel} from '../../components/ui/statusLabel';
@@ -49,14 +50,17 @@ export default function LoadTrace({
   const [missing, setMissing] = useState('');
   const recent = [...loads].sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
 
+  // A cycle number comes back every day (A1, A2…): one load opens; more, and the day is chosen from them.
+  const [matches, setMatches] = useState<ProcessLoadRecord[]>([]);
   const find = () => {
-    const number = cycle.trim().replace(/^#/, '');
+    const number = normalizeCycleNumber(cycle.replace(/^\s*#/, ''));
     if (!number) return;
-    const hit = loads.find(l => l.equipment === sterilizer && l.cycleNumber.trim() === number);
-    if (hit) {
-      setMissing('');
-      onOpen(hit.id);
-    } else setMissing(tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer));
+    const hits = loads
+      .filter(l => l.equipment === sterilizer && normalizeCycleNumber(l.cycleNumber) === number)
+      .sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
+    setMissing(hits.length ? '' : tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer));
+    setMatches(hits.length > 1 ? hits : []);
+    if (hits.length === 1) onOpen(hits[0].id);
   };
 
   return (
@@ -80,14 +84,39 @@ export default function LoadTrace({
         </label>
         <label>
           {tr('Κύκλος')}
-          <input value={cycle} inputMode="numeric" onChange={e => setCycle(e.target.value)} />
+          <input value={cycle} onChange={e => setCycle(e.target.value)} />
         </label>
         <button className="primary" type="submit">
           <Search size={16} /> {tr('Αναζήτηση')}
         </button>
       </form>
       {missing && <p className="trace-hint">{missing}</p>}
-      {load ? (
+      {matches.length > 1 && !matches.some(m => m.id === load?.id) ? (
+        <section className="trace-recent-list" aria-label={tr('Φορτία με αυτόν τον κύκλο')}>
+          <h3 className="trace-section-title">
+            {tr(
+              'Ο κύκλος {0} του {1} υπάρχει σε {2} ημέρες: διαλέξτε ποιον.',
+              matches[0].cycleNumber,
+              sterilizer,
+              matches.length,
+            )}
+          </h3>
+          <ul>
+            {matches.map(l => (
+              <li key={l.id}>
+                <button type="button" onClick={() => onOpen(l.id)}>
+                  <b>
+                    {l.equipment} · #{l.cycleNumber}
+                  </b>
+                  <span>{l.completedAt || l.createdAt}</span>
+                  <span>{tr('{0} αντικείμενα', l.items.length)}</span>
+                  <i className={`trace-tone ${LOAD_STATUS[l.status].tone}`}>{tr(LOAD_STATUS[l.status].label)}</i>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : load ? (
         <LoadView
           load={load}
           sets={sets}

@@ -417,6 +417,8 @@ export const en: Record<string, string> = {
   'Παράδοση όλων': 'Deliver all',
   'Παραλαβή όλων': 'Receive all',
   'Αριθμός κύκλου': 'Cycle number',
+  'Φορτία με αυτόν τον κύκλο': 'Loads with this cycle',
+  'Ο κύκλος {0} του {1} υπάρχει σε {2} ημέρες: διαλέξτε ποιον.': 'Cycle {0} of {1} is on {2} days: choose which.',
   'π.χ. Ακονίστηκε, κόβει κανονικά': 'e.g. Sharpened, cuts properly',
   'Ελέγχθηκε · παραμένει σε χρήση': 'Checked · stays in use',
   'Ελέγχθηκε · σε χρήση': 'Checked · in use',
