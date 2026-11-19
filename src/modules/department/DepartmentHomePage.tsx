@@ -111,7 +111,10 @@ export default function DepartmentHomePage() {
   const next = ready.length
     ? {
         title: tr('{0} έτοιμα για παραλαβή από την Αποστείρωση', ready.length),
-        to: presetPath('/department', {statusFilter: 'READY'}),
+        // Sets first; only instruments ready opens the instruments' list (the Sets' one would be empty).
+        to: presetPath(ready.some(x => x.a.kind === 'SET') ? '/department' : '/department/tools', {
+          statusFilter: 'READY',
+        }),
       }
     : expiry.length
       ? {

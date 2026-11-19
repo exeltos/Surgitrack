@@ -139,7 +139,8 @@ export function usage(movements: readonly Movement[], since: number) {
   // may each carry the same patient code.
   const seen = new Set<string>();
   for (const m of movements) {
-    if (!m.patientCode || stampOf(m.at) < since) continue;
+    // A record another one caused (an instrument retired as its Set is dispatched, «from» the Set) is no use of its own.
+    if (!m.patientCode || m.causedBy || stampOf(m.at) < since) continue;
     const use = `${m.asset.split(' · ')[0].trim().toUpperCase()}|${m.patientCode}`;
     if (seen.has(use)) continue;
     seen.add(use);

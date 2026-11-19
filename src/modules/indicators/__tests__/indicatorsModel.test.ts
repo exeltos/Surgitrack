@@ -89,6 +89,11 @@ describe('indicators', () => {
       move('c', '17/11/2026 09:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
       // The count signed for the same use carries the same patient code: still one use.
       move('d', '17/11/2026 07:55', 'Χειρουργείο', 'Χειρουργείο', 'Καταμέτρηση', {patientCode: 'PT-2'}),
+      // An instrument retired as its Set went: caused by the dispatch, «from» the Set — no use, no department.
+      move('e', '17/11/2026 08:00', 'Set S000001', 'Εκτός λειτουργίας', 'Απόσυρση', {
+        patientCode: 'PT-2',
+        causedBy: 'b',
+      }),
     ];
     const u = usage(moves, since);
     expect(u.departments).toEqual([
