@@ -144,16 +144,11 @@ export function usage(
     {department: string; uses: number; sets: number; tools: number; patients: Set<string>}
   >();
   const items = {SET: new Map<string, Item>(), TOOL: new Map<string, Item>()};
-  // One use is one Set or instrument on one patient: the count signed for it and its dispatch carry the same code.
-  const seen = new Set<string>();
   for (const m of movements) {
-    // A use is recorded by the department: the count it signs, or its dispatch to Sterilization. Other records may
-    // carry the same patient code without being a use — a recall of the load, an instrument retired as its Set went.
-    if (!m.patientCode || m.causedBy || stampOf(m.at) < since) continue;
-    if (!isDispatch(m, m.from) && !/^Καταμέτρηση εργαλείων υπογεγραμμένη/.test(m.status)) continue;
-    const use = `${m.asset.split(' · ')[0].trim().toUpperCase()}|${m.patientCode}`;
-    if (seen.has(use)) continue;
-    seen.add(use);
+    // One use is one dispatch to Sterilization with a patient code: every use ends in one, each cycle its own. The
+    // count signed with it, a recall of the load or an instrument retired as its Set went carry the same code without
+    // being another use.
+    if (!m.patientCode || m.causedBy || stampOf(m.at) < since || !isDispatch(m, m.from)) continue;
     const department = m.from;
     const barcode = m.asset.split(' · ')[0].trim().toUpperCase();
     const kind = isSet(barcode) ? 'SET' : 'TOOL';

@@ -93,7 +93,7 @@ describe('indicators', () => {
         patientCode: 'PT-2',
       }),
       move('c', '17/11/2026 09:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή'),
-      // The count signed for the same use carries the same patient code: still one use.
+      // The count signed with a dispatch carries the same patient code: still one use.
       move('d', '17/11/2026 07:55', 'Χειρουργείο', 'Χειρουργείο', 'Καταμέτρηση εργαλείων υπογεγραμμένη · 10/10', {
         patientCode: 'PT-2',
       }),
@@ -110,6 +110,14 @@ describe('indicators', () => {
     expect(u.sets).toEqual([{name: 'ΟΡΘΟΠΕΔΙΚΟ ΒΑΣΙΚΟ', uses: 2, departments: ['Χειρουργείο']}]);
     expect(u.tools).toEqual([]);
     // A dispatch is recorded without its kind: the Set is known by its barcode.
+    // The same Set on the same patient in two cycles: two uses.
+    const again = [
+      ...moves,
+      move('f', '18/11/2026 08:00', 'Χειρουργείο', 'Κεντρική Αποστείρωση', 'Ηλεκτρονική αποστολή', {
+        patientCode: 'PT-1',
+      }),
+    ];
+    expect(usage(again, since).departments[0].uses).toBe(3);
     const untyped = moves.map(m => ({...m, assetKind: undefined}) as unknown as Movement);
     expect(usage(untyped, since, b => b === 'S000001').sets[0]?.uses).toBe(2);
   });
