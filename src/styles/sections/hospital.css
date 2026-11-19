@@ -1843,39 +1843,6 @@ html body .department-home .dash-most-used > .dash-list {
   overscroll-behavior: contain;
   align-content: start;
 }
-.dash-used li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-}
-.dash-used li > a {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-}
-.dash-used li > a b {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dash-used-track {
-  display: block;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--dash-track);
-}
-.dash-used-track i {
-  display: block;
-  height: 100%;
-  border-radius: 3px;
-  background: var(--dash-bar);
-}
-.dash-used strong {
-  font-variant-numeric: tabular-nums;
-}
 @media (max-width: 1099px) {
   html body .department-home.dash > .dash-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1965,4 +1932,151 @@ html body .department-home .dept-lives > .dash-list {
   html body .department-home .dept-lives > .dash-list {
     max-height: 420px;
   }
+}
+/* «Χρήσεις εξοπλισμού»: its two parts under small titles, scrolling together inside the card. */
+html body .department-home .dept-lives > .dept-lives-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.dept-lives-body h3 {
+  margin: 10px 0 2px;
+  color: var(--c-gray-15);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.dept-lives-body h3:first-child {
+  margin-top: 0;
+}
+.dept-lives-body h3 span {
+  margin-left: 6px;
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+.dept-lives-none {
+  margin: 4px 0 8px;
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+}
+@media (max-width: 1099px) {
+  html body .department-home .dept-lives > .dept-lives-body {
+    max-height: 480px;
+  }
+}
+/* Overview › by department: the row opens the department (its link lays its parts in the row's grid); the issues mark
+   is a link of its own, to the department's open issues. */
+.dash-dept-main {
+  display: contents;
+  color: inherit;
+  text-decoration: none;
+}
+.dash-dept:has(.dash-dept-main:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+a.dash-pill {
+  text-decoration: none;
+}
+a.dash-pill:hover {
+  text-decoration: underline;
+}
+/* Department Home › «Συχνότερες χρήσεις»: a column chart of the eight most used — the uses on top, the name under
+   each column; Sets in blue, instruments in green. */
+.dept-cols {
+  display: grid;
+  flex: 0 0 auto;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+  height: 200px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.dept-cols li > a {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: 4px;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.dept-cols b {
+  color: var(--c-cyan-20);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dept-col {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 36px;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--dash-track);
+}
+.dept-col i {
+  display: block;
+  width: 100%;
+  border-radius: 6px 6px 2px 2px;
+  background: var(--dash-1);
+}
+.dept-cols li.tool .dept-col i {
+  background: var(--dash-3);
+}
+.dept-cols li > a:hover .dept-col i {
+  filter: brightness(0.9);
+}
+.dept-cols small {
+  color: var(--c-gray-45);
+  font-size: 11px;
+  font-weight: 600;
+}
+/* The names, numbered as the columns. */
+.dept-cols-names {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 10px 0 0;
+  padding: 0 0 0 22px;
+  overflow-y: auto;
+  font-size: 12.5px;
+}
+.dept-cols-names li {
+  padding: 3px 0;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.dept-cols-names li::marker {
+  color: var(--c-gray-45);
+  font-weight: 600;
+}
+.dept-cols-names span {
+  font-weight: 600;
+}
+.dept-cols-names small {
+  margin-left: 6px;
+  color: var(--c-gray-45);
+}
+.dept-cols-legend {
+  display: flex;
+  gap: 14px;
+  margin: 8px 0 0;
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+.dept-cols-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 3px;
+  background: var(--dash-1);
+  vertical-align: -1px;
+}
+.dept-cols-legend span.tool::before {
+  background: var(--dash-3);
 }

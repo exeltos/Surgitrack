@@ -25,21 +25,25 @@ describe('Department home', () => {
     // The most frequent uses, the busiest first.
     const used = within(screen.getByRole('list', {name: 'Συχνότερες χρήσεις'}))
       .getAllByRole('listitem')
-      .map(li => Number(li.querySelector('strong')?.textContent));
+      .map(li => Number(li.querySelector('b')?.textContent));
     expect(used).toEqual([...used].sort((a, b) => b - a));
 
-    // Its limited-use Sets and instruments: those alerted near their end first, then the fewest left.
-    const lives = within(screen.getByRole('list', {name: 'Όριο χρήσεων'})).getAllByRole('listitem');
-    expect(lives.length).toBeGreaterThan(0);
-    const firstPlain = lives.findIndex(li => !li.classList.contains('near') && !li.classList.contains('out'));
-    if (firstPlain >= 0) expect(lives.slice(firstPlain).every(li => !li.classList.contains('near'))).toBe(true);
+    // Its limited-use Sets and instruments near their end (3 uses left or fewer), the fewest left first.
+    const left = within(screen.getByRole('list', {name: 'Κοντά στο όριο'}))
+      .getAllByRole('listitem')
+      .map(li => Number(/απομένουν (\d+)/.exec(li.textContent || '')?.[1] ?? 0));
+    expect(left.length).toBeGreaterThan(0);
+    expect(left.every(n => n <= 3)).toBe(true);
+    expect(left).toEqual([...left].sort((a, b) => a - b));
+    // And the uses of those only counted.
+    expect(screen.getByRole('list', {name: 'Καταμέτρηση χρήσεων'})).toBeInTheDocument();
     // With those, no table of kinds.
     expect(screen.queryByRole('table')).toBeNull();
   });
 
   it('without limited-use equipment, shows its equipment one line per kind', () => {
     renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: {...department, department: 'Κανένα'}});
-    expect(screen.queryByRole('list', {name: 'Όριο χρήσεων'})).toBeNull();
+    expect(screen.queryByRole('list', {name: 'Κοντά στο όριο'})).toBeNull();
     expect(screen.getByText('Το τμήμα δεν έχει ακόμα εξοπλισμό.')).toBeInTheDocument();
   });
 });

@@ -20,6 +20,9 @@ const IN_STERILIZATION_STATES: string[] = [
   'IN_STORAGE',
 ];
 
+/** «Κοντά στο όριο»: a limited-use Set or instrument with this many uses left, or fewer. */
+const NEAR_END = 3;
+
 type Kind = {
   key: string;
   kind: 'SET' | 'TOOL';
@@ -35,11 +38,11 @@ type Kind = {
 
 /**
  * The department's home, in the Overview's look: «Σήμερα» (what to pick up, what expires, the open issues, the first
- * thing to do, this week); then its limited-use Sets and instruments (uses made of how many, those near their end
- * first) — or, with none of those, its equipment one line per kind — beside its most frequent uses.
+ * thing to do, this week); then the uses of its equipment — the limited-use ones near their end (3 left or fewer) and
+ * the uses of those only counted — or, with neither, its equipment one line per kind; beside its most frequent uses.
  */
 export default function DepartmentHomePage() {
-  const {sets, tools, issues, movements, lifecycleAlerts, currentUser} = useSurgi();
+  const {sets, tools, issues, movements, currentUser} = useSurgi();
   const dept = currentUser.department;
 
   const departmentSets = useMemo(() => sets.filter(item => item.department === dept), [sets, dept]);
@@ -108,10 +111,8 @@ export default function DepartmentHomePage() {
     [movements, dept],
   );
 
-  // Limited-use Sets and instruments (a number of lives): uses made of how many, the ones alerted as near their end
-  // first, then the fewest left.
-  const ownIds = new Set([...departmentSets, ...departmentTools].map(a => a.id));
-  const alerted = new Set(lifecycleAlerts.filter(a => ownIds.has(a.assetId)).map(a => a.assetId));
+  // Limited-use Sets and instruments (a number of lives) with 3 uses left or fewer, the fewest first; and those whose
+  // uses are only counted (a wear check), each with its uses, the most first.
   const limited = [
     ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
     ...departmentTools.map(t => ({...t, kind: 'TOOL' as const})),
@@ -125,9 +126,18 @@ export default function DepartmentHomePage() {
       uses: a.uses || 0,
       max: a.maxUses!,
       left: Math.max(0, a.maxUses! - (a.uses || 0)),
-      alert: alerted.has(a.id),
     }))
-    .sort((a, b) => Number(b.alert) - Number(a.alert) || a.left - b.left || a.name.localeCompare(b.name, 'el'));
+    .sort((a, b) => a.left - b.left || a.name.localeCompare(b.name, 'el'));
+  const nearEnd = limited.filter(a => a.left <= NEAR_END);
+  const counted = [
+    ...departmentSets.map(x => ({...x, kind: 'SET' as const})),
+    ...departmentTools.map(t => ({...t, kind: 'TOOL' as const})),
+  ]
+    .filter(a => !a.maxUses && 'wearCheck' in a && a.wearCheck)
+    .map(a => ({id: a.id, kind: a.kind, name: a.name, barcode: a.barcode, uses: a.uses || 0}))
+    .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name, 'el'));
+  const countedMax = Math.max(1, ...counted.map(a => a.uses));
+  const showsUses = limited.length > 0 || counted.length > 0;
 
   // The most frequent uses: the Sets and instruments used most, the busiest first.
   const mostUsed = [
@@ -162,39 +172,80 @@ export default function DepartmentHomePage() {
       />
 
       <div className="dash-grid">
-        {limited.length > 0 ? (
+        {showsUses ? (
           <section className="dash-card dept-lives" aria-labelledby="dept-lives-title">
             <header>
               <div>
-                <b id="dept-lives-title">{tr('Όριο χρήσεων')}</b>
-                <small>{tr('Σετ και εργαλεία με περιορισμένες χρήσεις· πρώτα όσα κοντεύουν να τελειώσουν.')}</small>
+                <b id="dept-lives-title">{tr('Χρήσεις εξοπλισμού')}</b>
+                <small>{tr('Όσα κοντεύουν στο όριο χρήσεων, και οι χρήσεις όσων απλώς μετρούν.')}</small>
               </div>
               <Gauge size={18} />
             </header>
-            <ul className="dash-list dash-lives" tabIndex={0} aria-label={tr('Όριο χρήσεων')}>
-              {limited.map(a => (
-                <li key={a.id} className={a.left === 0 ? 'out' : a.alert ? 'near' : undefined}>
-                  {a.kind === 'SET' ? (
-                    <Layers3 size={15} aria-hidden="true" />
+            <div className="dept-lives-body" tabIndex={0} role="region" aria-labelledby="dept-lives-title">
+              {limited.length > 0 && (
+                <>
+                  <h3>
+                    {tr('Κοντά στο όριο')} <span>{tr('{0} χρήσεις ή λιγότερες', NEAR_END)}</span>
+                  </h3>
+                  {nearEnd.length ? (
+                    <ul className="dash-list dash-lives" aria-label={tr('Κοντά στο όριο')}>
+                      {nearEnd.map(a => (
+                        <li key={a.id} className={a.left === 0 ? 'out' : 'near'}>
+                          {a.kind === 'SET' ? (
+                            <Layers3 size={15} aria-hidden="true" />
+                          ) : (
+                            <Wrench size={15} aria-hidden="true" />
+                          )}
+                          <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                            <b>{a.name}</b>
+                            <small>{a.barcode}</small>
+                          </Link>
+                          <span className="dash-lives-track" aria-hidden="true">
+                            <i style={{width: `${Math.min(100, (a.uses / a.max) * 100)}%`}} />
+                          </span>
+                          <span className="dash-lives-count">
+                            <strong>
+                              {a.uses} / {a.max}
+                            </strong>
+                            <small>{a.left === 0 ? tr('Εξαντλήθηκε') : tr('απομένουν {0}', a.left)}</small>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   ) : (
-                    <Wrench size={15} aria-hidden="true" />
+                    <p className="dept-lives-none">
+                      {tr('Κανένα · {0} με όριο χρήσεων, όλα με περισσότερες από {1}.', limited.length, NEAR_END)}
+                    </p>
                   )}
-                  <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
-                    <b>{a.name}</b>
-                    <small>{a.barcode}</small>
-                  </Link>
-                  <span className="dash-lives-track" aria-hidden="true">
-                    <i style={{width: `${Math.min(100, (a.uses / a.max) * 100)}%`}} />
-                  </span>
-                  <span className="dash-lives-count">
-                    <strong>
-                      {a.uses} / {a.max}
-                    </strong>
-                    <small>{a.left === 0 ? tr('Εξαντλήθηκε') : tr('απομένουν {0}', a.left)}</small>
-                  </span>
-                </li>
-              ))}
-            </ul>
+                </>
+              )}
+              {counted.length > 0 && (
+                <>
+                  <h3>{tr('Καταμέτρηση χρήσεων')}</h3>
+                  <ul className="dash-list dash-lives" aria-label={tr('Καταμέτρηση χρήσεων')}>
+                    {counted.map(a => (
+                      <li key={a.id}>
+                        {a.kind === 'SET' ? (
+                          <Layers3 size={15} aria-hidden="true" />
+                        ) : (
+                          <Wrench size={15} aria-hidden="true" />
+                        )}
+                        <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}>
+                          <b>{a.name}</b>
+                          <small>{a.barcode}</small>
+                        </Link>
+                        <span className="dash-lives-track" aria-hidden="true">
+                          <i style={{width: `${(a.uses / countedMax) * 100}%`}} />
+                        </span>
+                        <span className="dash-lives-count">
+                          <strong>{a.uses}</strong>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
           </section>
         ) : (
           <section className="dash-card dept-stock" aria-labelledby="dept-stock-title">
@@ -279,26 +330,41 @@ export default function DepartmentHomePage() {
             </div>
             <Gauge size={18} />
           </header>
-          <ul className="dash-list dash-used" tabIndex={0} aria-label={tr('Συχνότερες χρήσεις')}>
-            {mostUsed.map(a => (
-              <li key={a.id}>
-                {a.kind === 'SET' ? <Layers3 size={15} aria-hidden="true" /> : <Wrench size={15} aria-hidden="true" />}
-                <Link to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`} title={`${a.name}: ${a.uses}`}>
-                  <b>{a.name}</b>
-                  <small>{a.barcode}</small>
-                  <span className="dash-used-track" aria-hidden="true">
-                    <i style={{width: `${(a.uses / mostUsedMax) * 100}%`}} />
-                  </span>
-                </Link>
-                <strong>{a.uses}</strong>
-              </li>
-            ))}
-            {mostUsed.length === 0 && (
-              <li className="ok">
-                <span>{tr('Καμία χρήση ακόμα.')}</span>
-              </li>
-            )}
-          </ul>
+          {mostUsed.length ? (
+            <>
+              <ol className="dept-cols" aria-label={tr('Συχνότερες χρήσεις')}>
+                {mostUsed.slice(0, 8).map((a, i) => (
+                  <li key={a.id} className={a.kind === 'SET' ? 'set' : 'tool'}>
+                    <Link
+                      to={a.kind === 'SET' ? `/sets/${a.id}` : `/tools/${a.id}`}
+                      title={`${a.name} · ${a.barcode}: ${a.uses}`}
+                      aria-label={`${a.name} ${a.barcode}: ${a.uses}`}
+                    >
+                      <b aria-hidden="true">{a.uses}</b>
+                      <span className="dept-col" aria-hidden="true">
+                        <i style={{height: `${Math.max(4, (a.uses / mostUsedMax) * 100)}%`}} />
+                      </span>
+                      <small aria-hidden="true">{i + 1}</small>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+              <ol className="dept-cols-names" aria-hidden="true">
+                {mostUsed.slice(0, 8).map(a => (
+                  <li key={a.id}>
+                    <span>{a.name}</span>
+                    <small>{a.barcode}</small>
+                  </li>
+                ))}
+              </ol>
+              <p className="dept-cols-legend">
+                <span className="set">{tr('Σετ')}</span>
+                <span className="tool">{tr('Εργαλεία')}</span>
+              </p>
+            </>
+          ) : (
+            <p className="dept-empty">{tr('Καμία χρήση ακόμα.')}</p>
+          )}
         </section>
       </div>
     </div>

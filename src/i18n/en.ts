@@ -110,8 +110,14 @@ export const en: Record<string, string> = {
   'Barcode / Κωδικός': 'Barcode / Code',
   'Ιχνηλάτηση · {0}': 'Trace · {0}',
   '{0} κινήσεις': '{0} movements',
-  'Σετ και εργαλεία με περιορισμένες χρήσεις· πρώτα όσα κοντεύουν να τελειώσουν.':
-    'Sets and instruments with limited uses; those near their end first.',
+  'Χρήσεις εξοπλισμού': 'Equipment uses',
+  'Όσα κοντεύουν στο όριο χρήσεων, και οι χρήσεις όσων απλώς μετρούν.':
+    'Those near their usage limit, and the uses of those only counted.',
+  'Κοντά στο όριο': 'Near the limit',
+  '{0} χρήσεις ή λιγότερες': '{0} uses or fewer',
+  'Κανένα · {0} με όριο χρήσεων, όλα με περισσότερες από {1}.':
+    'None · {0} with a usage limit, all with more than {1} left.',
+  'Καταμέτρηση χρήσεων': 'Counted uses',
   Εξαντλήθηκε: 'Used up',
   'απομένουν {0}': '{0} left',
   'Συχνότερες χρήσεις': 'Most frequent uses',
