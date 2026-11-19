@@ -60,6 +60,7 @@ export default function IssuesPage() {
     createPurchaseOrder,
   } = useSurgi();
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
+  const [figureOpened, setFigureOpened] = useState(0);
   const [confirm, ask] = useConfirm();
   // Sterilization and admins also see the instruments to replace, as a second tab (in a hospital the platform
   // owner gave the Replacements & Orders module).
@@ -188,6 +189,8 @@ export default function IssuesPage() {
           {tab !== 'REPORTS' ? (
             <Suspense fallback={<Spinner />}>
               <ReplacementsPage
+                // A figure clicked opens the list afresh: its other filters back to the instruments to replace, as counted.
+                key={figureOpened}
                 reason={params.get('reason') || ''}
                 onReason={reason => setParams(reason ? {tab: 'replacements', reason} : {tab: 'replacements'})}
                 embedded
@@ -416,7 +419,10 @@ export default function IssuesPage() {
         {withReplacements && (
           <EquipmentProblems
             reason={tab === 'REPLACEMENTS' ? params.get('reason') || undefined : undefined}
-            onReason={reason => setParams({tab: 'replacements', reason})}
+            onReason={reason => {
+              setFigureOpened(n => n + 1);
+              setParams({tab: 'replacements', reason});
+            }}
           />
         )}
       </div>

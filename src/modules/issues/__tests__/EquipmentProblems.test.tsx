@@ -25,6 +25,10 @@ describe('«Εκκρεμότητες»: the instruments out of order above the t
     const reasons = rows.slice(1).map(r => r.textContent || '');
     expect(reasons.length).toBeGreaterThan(0);
     expect(reasons.every(t => t.includes('Απώλεια'))).toBe(true);
+    // A figure opens what it counts, whatever the list was showing (here the instruments already on order).
+    fireEvent.click(screen.getByRole('button', {name: /^Σε παραγγελία/}));
+    fireEvent.click(within(figures).getByRole('button', {name: /^Απώλεια/}));
+    expect(screen.getByRole('button', {name: /^Προς αντικατάσταση/})).toHaveAttribute('aria-pressed', 'true');
     // The list's own reason filter and the figures stay one: clearing it there unmarks the figure.
     fireEvent.click(within(figures).getByRole('button', {name: /^Service/}));
     expect(within(figures).getByRole('button', {name: /^Service/})).toHaveAttribute('aria-pressed', 'true');
