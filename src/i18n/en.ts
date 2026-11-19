@@ -427,6 +427,8 @@ export const en: Record<string, string> = {
     'What is in Sterilization now and what expires first in the department.',
   'Όλα στο τμήμα: {0} Σετ, {1} μεμονωμένα εργαλεία.': 'All in the department: {0} Sets, {1} standalone instruments.',
   'Επόμενες λήξεις': 'Next expiries',
+  'Προηγούμενος σήμερα: {0} · {1}': 'Previous today: {0} · {1}',
+  'Πρώτος κύκλος της ημέρας': 'First cycle of the day',
   '1 αντικείμενο': '1 item',
   'Ο κύκλος {0} του {1} έχει ήδη καταγραφεί σήμερα.': 'Cycle {0} of {1} is already recorded today.',
   'Τίποτα αποστειρωμένο στο τμήμα.': 'Nothing sterile in the department.',

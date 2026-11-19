@@ -32,7 +32,7 @@ export default function CycleNumberSelect({
   fromDevice?: boolean;
 }) {
   const prefix = cyclePrefixOf(sterilizer, sterilizers);
-  const {used, next} = todaysCycles(loads, equipment, prefix);
+  const {used, next, previous} = todaysCycles(loads, equipment, prefix);
   const digits = cycleDigits(value, prefix);
   const last = Math.max(10, next + 2);
   // The value is among the numbers offered; otherwise (a device's, or one past them) it is offered as it is.
@@ -70,6 +70,12 @@ export default function CycleNumberSelect({
           </option>
         ))}
       </select>
+      {/* The day's previous cycle beside it, so the next one is not mistaken (numbering starts again each day). */}
+      <small className="cycle-previous">
+        {previous
+          ? tr('Προηγούμενος σήμερα: {0} · {1}', previous.cycleNumber, previous.at.split(' ').pop() || previous.at)
+          : tr('Πρώτος κύκλος της ημέρας')}
+      </small>
     </label>
   );
 }

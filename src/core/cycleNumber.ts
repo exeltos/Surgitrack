@@ -70,8 +70,8 @@ export function cycleDigits(cycleNumber: string, prefix: string) {
 const MAX_OF_DAY = 999;
 
 /**
- * Today's cycle numbers of a sterilizer, with its letter: the ones used already and the next one (one after the
- * highest, 1 at the start of the day).
+ * Today's cycle numbers of a sterilizer, with its letter: the ones used already, the next one (one after the
+ * highest, 1 at the start of each day) and the last load of the day.
  */
 export function todaysCycles(
   loads: ReadonlyArray<{equipment: string; cycleNumber: string; createdAt: string; kind?: string}>,
@@ -82,12 +82,16 @@ export function todaysCycles(
   const start = new Date(now);
   start.setHours(0, 0, 0, 0);
   const used = new Set<number>();
+  // The sterilizer's last load today, whatever its number: what the operator compares the next one with.
+  let previous: {cycleNumber: string; at: string; stamp: number} | undefined;
   for (const load of loads) {
     if (load.kind && load.kind !== 'STERILIZATION') continue;
-    if (load.equipment !== equipment || movementStamp(load.createdAt) < start.getTime()) continue;
+    const stamp = movementStamp(load.createdAt);
+    if (load.equipment !== equipment || stamp < start.getTime()) continue;
+    if (!previous || stamp >= previous.stamp) previous = {cycleNumber: load.cycleNumber, at: load.createdAt, stamp};
     const n = cycleDigits(load.cycleNumber, prefix);
     // A number of the day (A1…A999); a longer one is a device's own identifier, not one of the day's.
     if (n !== undefined && n <= MAX_OF_DAY) used.add(n);
   }
-  return {used, next: used.size ? Math.max(...used) + 1 : 1};
+  return {used, next: used.size ? Math.max(...used) + 1 : 1, previous};
 }
