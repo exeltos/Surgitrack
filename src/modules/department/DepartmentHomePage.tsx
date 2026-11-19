@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {Gauge, Layers3, Wrench} from 'lucide-react';
 import {expiryAlerts, expiryStatus, formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
@@ -27,11 +27,13 @@ const NEAR_END = 3;
 /** How many of each list show on the home, so the card needs no scroll bar; the rest are a click away. */
 const SHOWN = 5;
 
-/** «+N ακόμη»: the rest of a list, in the department's instruments. */
-function MoreLine({n}: {n: number}) {
+/** «+N ακόμη»: the rest of a list, opened in place (the card then scrolls, on request only). */
+function MoreLine({n, onOpen}: {n: number; onOpen: () => void}) {
   return (
     <p className="dept-lives-more">
-      <Link to="/department/tools">{tr('+{0} ακόμη', n)}</Link>
+      <button type="button" onClick={onOpen}>
+        {tr('+{0} ακόμη', n)}
+      </button>
     </p>
   );
 }
@@ -57,6 +59,8 @@ type Kind = {
 export default function DepartmentHomePage() {
   const {sets, tools, issues, movements, currentUser} = useSurgi();
   const dept = currentUser.department;
+  const [allNear, setAllNear] = useState(false);
+  const [allCounted, setAllCounted] = useState(false);
 
   const departmentSets = useMemo(() => sets.filter(item => item.department === dept), [sets, dept]);
   const departmentTools = useMemo(() => tools.filter(item => item.department === dept), [tools, dept]);
@@ -240,7 +244,7 @@ export default function DepartmentHomePage() {
                   {nearEnd.length ? (
                     <>
                       <ul className="dash-list dash-lives" aria-label={tr('Κοντά στο όριο')}>
-                        {nearEnd.slice(0, SHOWN).map(a => (
+                        {nearEnd.slice(0, allNear ? undefined : SHOWN).map(a => (
                           <li key={a.id} className={a.left === 0 ? 'out' : 'near'}>
                             {a.kind === 'SET' ? (
                               <Layers3 size={15} aria-hidden="true" />
@@ -263,7 +267,9 @@ export default function DepartmentHomePage() {
                           </li>
                         ))}
                       </ul>
-                      {nearEnd.length > SHOWN && <MoreLine n={nearEnd.length - SHOWN} />}
+                      {!allNear && nearEnd.length > SHOWN && (
+                        <MoreLine n={nearEnd.length - SHOWN} onOpen={() => setAllNear(true)} />
+                      )}
                     </>
                   ) : (
                     <p className="dept-lives-none">
@@ -276,7 +282,7 @@ export default function DepartmentHomePage() {
                 <>
                   <h3>{tr('Καταμέτρηση χρήσεων')}</h3>
                   <ul className="dash-list dash-lives" aria-label={tr('Καταμέτρηση χρήσεων')}>
-                    {counted.slice(0, SHOWN).map(a => (
+                    {counted.slice(0, allCounted ? undefined : SHOWN).map(a => (
                       <li key={a.id}>
                         {a.kind === 'SET' ? (
                           <Layers3 size={15} aria-hidden="true" />
@@ -296,7 +302,9 @@ export default function DepartmentHomePage() {
                       </li>
                     ))}
                   </ul>
-                  {counted.length > SHOWN && <MoreLine n={counted.length - SHOWN} />}
+                  {!allCounted && counted.length > SHOWN && (
+                    <MoreLine n={counted.length - SHOWN} onOpen={() => setAllCounted(true)} />
+                  )}
                 </>
               )}
             </div>

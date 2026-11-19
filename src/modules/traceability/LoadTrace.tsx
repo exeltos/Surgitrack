@@ -23,6 +23,8 @@ const biological = (value: BiologicalIndicatorResult | undefined): {label: strin
 const physical = (value: boolean | undefined): {label: string; tone: Tone} | undefined =>
   value === undefined ? undefined : value ? {label: 'Εντάξει', tone: 'ok'} : {label: 'Αποτυχία', tone: 'bad'};
 
+const digitsOf = (value: string) => value.replace(/\D/g, '');
+
 /**
  * One sterilizer load, by sterilizer and cycle number: how its indicators came out, what was in it, where each item
  * is now and which were already used on a patient. A released load can be recalled from here.
@@ -60,7 +62,10 @@ export default function LoadTrace({
       .filter(
         l =>
           l.equipment === sterilizer &&
-          (shortCycleNumber(l.cycleNumber) === number || foldCycleNumber(l.cycleNumber) === foldCycleNumber(number)),
+          (shortCycleNumber(l.cycleNumber) === number ||
+            foldCycleNumber(l.cycleNumber) === foldCycleNumber(number) ||
+            // A device's number with letters (P-2026-0214), typed with its digits only.
+            digitsOf(l.cycleNumber) === digitsOf(number)),
       )
       .sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
     setMissing(hits.length ? '' : tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer));
