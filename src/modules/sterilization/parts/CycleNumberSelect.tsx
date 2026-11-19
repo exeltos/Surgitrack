@@ -18,6 +18,7 @@ export default function CycleNumberSelect({
   onChange,
   label = tr('Αριθμός κύκλου'),
   className,
+  fromDevice,
 }: {
   sterilizer?: LibraryItem;
   sterilizers: readonly LibraryItem[];
@@ -27,13 +28,18 @@ export default function CycleNumberSelect({
   onChange: (value: string) => void;
   label?: string;
   className?: string;
+  /** The number came from a connected device's cycle: it stays as the device gave it, whatever its letter. */
+  fromDevice?: boolean;
 }) {
   const prefix = cyclePrefixOf(sterilizer, sterilizers);
   const {used, next} = todaysCycles(loads, equipment, prefix);
-  const ownNumber = cycleDigits(value, prefix) !== undefined;
+  const digits = cycleDigits(value, prefix);
+  const last = Math.max(10, next + 2);
+  // The value is among the numbers offered; otherwise (a device's, or one past them) it is offered as it is.
+  const listed = digits !== undefined && digits >= 1 && digits <= last && `${prefix}${digits}` === value;
   // Another sterilizer picked (or none yet): today's next number of this one. A device's number stays.
   const suggested = prefix ? `${prefix}${next}` : '';
-  const stale = !value || (/^[A-Z]+\d+$/.test(value) && !ownNumber);
+  const stale = !fromDevice && (!value || (/^[A-Z]+\d+$/.test(value) && digits === undefined));
   useEffect(() => {
     if (suggested && stale) onChange(suggested);
   }, [suggested, stale, onChange]);
@@ -45,12 +51,11 @@ export default function CycleNumberSelect({
         <input value={value} onChange={e => onChange(e.target.value)} />
       </label>
     );
-  const last = Math.max(10, next + 2);
   return (
     <label className={className}>
       {label}
       <select value={value} onChange={e => onChange(e.target.value)}>
-        {value && !ownNumber && <option value={value}>{value}</option>}
+        {value && !listed && <option value={value}>{value}</option>}
         {Array.from({length: last}, (_, i) => i + 1).map(n => (
           <option key={n} value={`${prefix}${n}`} disabled={used.has(n)}>
             {prefix}

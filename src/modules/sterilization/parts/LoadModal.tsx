@@ -141,6 +141,7 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                     loads={s.processLoads}
                     value={loadCycleNumber}
                     onChange={setLoadCycleNumber}
+                    fromDevice={s.loadFromDevice}
                   />
                 )}
                 {loadModal === 'WASHING' ? (
