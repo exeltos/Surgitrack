@@ -404,3 +404,60 @@ html body .reports-table tr.report-group-row th span {
   color: var(--c-gray-45);
   font-weight: 500;
 }
+/* Sterilizer loads on screen: the indicators as marks, the state as a badge, the contents one click away. */
+.load-marks {
+  display: inline-flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+.load-mark {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-gray-45);
+}
+.load-mark.pass {
+  color: var(--c-green-35);
+}
+.load-mark.fail {
+  color: var(--c-red-35);
+}
+.load-mark.pending {
+  color: var(--c-amber-35);
+}
+.load-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-gray-15);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.load-status.ok {
+  background: var(--c-green-90);
+  color: var(--c-green-35);
+}
+.load-status.bad {
+  background: var(--c-red-85);
+  color: var(--c-red-35);
+}
+.load-status.wait,
+.load-status.busy {
+  background: var(--c-amber-90);
+  color: var(--c-amber-35);
+}
+.load-items summary {
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.load-items[open] summary {
+  margin-bottom: 4px;
+}
+.load-items .mono {
+  display: block;
+  max-width: 260px;
+  font-size: 12px;
+  line-height: 1.5;
+}

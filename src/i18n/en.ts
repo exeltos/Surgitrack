@@ -421,6 +421,7 @@ export const en: Record<string, string> = {
     'What is in Sterilization now and what expires first in the department.',
   'Όλα στο τμήμα: {0} Σετ, {1} μεμονωμένα εργαλεία.': 'All in the department: {0} Sets, {1} standalone instruments.',
   'Επόμενες λήξεις': 'Next expiries',
+  '1 αντικείμενο': '1 item',
   'Τίποτα αποστειρωμένο στο τμήμα.': 'Nothing sterile in the department.',
   'Συχνότερες αποστολές': 'Most frequently sent',
   'Πόσες φορές στάλθηκε το καθένα για αποστείρωση.': 'How many times each was sent for sterilization.',

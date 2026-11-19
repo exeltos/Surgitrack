@@ -235,6 +235,10 @@ export function buildReport(
           released: load.releasedAt || '—',
           releasedBy: release?.releasedByName || '—',
           barcodes: load.items.map(item => item.barcode).join(', '),
+          // On screen: the raw values behind the marks and the badge.
+          chemicalCode: load.chemicalIndicatorResult || '',
+          biologicalCode: load.biologicalIndicatorResult || '',
+          loadCode: load.status,
           // On screen fewer, fuller columns; the download and print keep every column.
           cycleProgram: [load.cycleNumber, load.program].filter(Boolean).join(' · '),
           indicators: `${tr('Χημ.')} ${indicatorText(load.chemicalIndicatorResult)} · ${tr('Βιολ.')} ${indicatorText(load.biologicalIndicatorResult)}`,

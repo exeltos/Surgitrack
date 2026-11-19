@@ -29,6 +29,7 @@ import {
 } from './reportsMeta';
 import {buildReport} from './buildReport';
 import {reportSummary} from './reportSummary';
+import LoadCell from './loadCells';
 
 export default function ReportsPage() {
   const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
@@ -311,13 +312,13 @@ export default function ReportsPage() {
         ? [
             {key: 'loaded', label: tr('Φόρτωση')},
             {key: 'equipment', label: tr('Κλίβανος')},
-            {key: 'cycleProgram', label: tr('Κύκλος')},
+            {key: 'cycle', label: tr('Κύκλος')},
+            {key: 'program', label: tr('Πρόγραμμα')},
             {key: 'items', label: tr('Αντικείμενα')},
             {key: 'indicators', label: tr('Δείκτες')},
             {key: 'cycleReadings', label: tr('Παράμετροι κύκλου')},
             {key: 'loadStatus', label: tr('Κατάσταση')},
             {key: 'releasedInfo', label: tr('Αποδέσμευση')},
-            {key: 'barcodes', label: 'Barcodes'},
           ]
         : reportData.columns;
     // A report with a barcode and a name shows the barcode under the name, not in a column of its own.
@@ -552,6 +553,8 @@ export default function ReportsPage() {
                               >
                                 {c.key === 'stateLabel' && typeof row.state === 'string' && row.state ? (
                                   <StatusBadge value={row.state} />
+                                ) : active === 'loads' && ['indicators', 'loadStatus', 'items'].includes(c.key) ? (
+                                  <LoadCell column={c.key} row={row} />
                                 ) : (
                                   cellText(c.key, row[c.key])
                                 )}
