@@ -4,6 +4,7 @@
  * `extra`, so a record always comes back as it was saved (dates in older forms read the one way).
  */
 import {normalizeDates} from '../../core/displayDate';
+import {normalizeCycleNumber} from '../../core/cycleNumber';
 
 type FieldKind = 'text' | 'number' | 'boolean' | 'json' | 'textArray';
 type Field = readonly [field: string, column: string, kind: FieldKind];
@@ -402,6 +403,8 @@ export function tableFromRow(collection: TableCollection, row: Row): {id: string
   // A value kept in `extra` (one the columns could not hold) wins over the column's placeholder.
   Object.assign(record, (row.extra as Record<string, unknown> | null) || {});
   for (const column of BOOKKEEPING) delete record[column];
+  // Cycle numbers typed before they were picked read one way: «a3» and «Α3» (Greek) are «A3».
+  if (typeof record.cycleNumber === 'string') record.cycleNumber = normalizeCycleNumber(record.cycleNumber);
   // Dates saved by older versions ("8/10/26, 1:05 μ.μ.") read the one way (08/10/2026 13:05).
   return normalizeDates({...record, id: String(row.id)});
 }

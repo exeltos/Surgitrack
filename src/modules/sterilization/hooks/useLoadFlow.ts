@@ -1,3 +1,4 @@
+import {normalizeCycleNumber} from '../../../core/cycleNumber';
 import {sterilizedOnOf} from '../../../core/sterileExpiry';
 import {tr} from '../../../i18n';
 import {printReleaseForm} from '../printRelease';
@@ -146,7 +147,8 @@ export function useLoadFlow(
       kind: loadModal,
       assetRefs,
       equipment: loadEquipment.trim(),
-      cycleNumber: loadCycleNumber.trim(),
+      // One way of writing it: «a3» and «Α3» (Greek) are «A3».
+      cycleNumber: normalizeCycleNumber(loadCycleNumber),
       program: loadProgram.trim(),
       chemicalIndicatorResult:
         loadModal === 'STERILIZATION' && (loadChemicalOn || loadChemical === 'FAIL') ? loadChemical : undefined,

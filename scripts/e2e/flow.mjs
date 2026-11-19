@@ -340,7 +340,7 @@ async function main() {
       await queueRow().locator('input[type=checkbox]').check();
       await sterilization.page.getByRole('button', {name: /^Φόρτωση πλυντηρίου · 1/}).click();
       const modal = sterilization.page.locator('.load-modal');
-      await modal.getByPlaceholder('π.χ. 2026-0815-07').fill('W-E2E-1');
+      await modal.getByLabel('Αριθμός κύκλου').fill('W-E2E-1');
       await modal.getByRole('button', {name: /^Ολοκλήρωση φορτίου/}).click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'IN_PREPARATION', 'state saved');
@@ -369,16 +369,19 @@ async function main() {
       expectEqual(row('instrument_sets', setId).state, 'IN_STERILIZATION', 'state saved');
     });
 
+    let sterilizerCycle = '';
     await step('Sterilization loads it into a sterilizer', async () => {
       const {page} = sterilization;
       await queue('Φόρτωση');
       await page.getByRole('button', {name: 'Αποεπιλογή όλων'}).click();
       await queueRow().locator('input[type=checkbox]').check();
       await page.getByRole('button', {name: /^Φόρτωση κλιβάνου · 1/}).click();
-      await page.getByPlaceholder('π.χ. 2026-0815-07').fill('E2E-0001');
+      // The cycle number is the sterilizer's letter with today's next number, already picked (A1).
+      sterilizerCycle = await page.getByLabel('Αριθμός κύκλου').inputValue();
+      if (!/^[A-Z]+\d+$/.test(sterilizerCycle)) throw new Error(`cycle number ${sterilizerCycle}`);
       await page.getByRole('button', {name: 'Έναρξη κύκλου · 1'}).click();
       await saved(sterilization);
-      const load = db.process_loads.find(l => l.cycle_number === 'E2E-0001');
+      const load = db.process_loads.find(l => l.cycle_number === sterilizerCycle);
       if (!load) throw new Error('no load saved');
       expectEqual(load.status, 'OPEN', 'load status');
     });
@@ -388,14 +391,14 @@ async function main() {
       await queue('Στον κλίβανο');
       // The row of this load (the sample hospital has another load in the sterilizer).
       await page
-        .locator('.sterilizer-rows tbody tr', {hasText: 'E2E-0001'})
+        .locator('.sterilizer-rows tbody tr', {hasText: sterilizerCycle})
         .getByRole('button', {name: 'Τέλος κύκλου', exact: true})
         .click();
       // It asks first: a cycle ended by mistake sends the load to release.
       await page.getByRole('dialog').getByRole('button', {name: 'Τέλος κύκλου', exact: true}).click();
       await saved(sterilization);
       expectEqual(row('instrument_sets', setId).state, 'AWAITING_RELEASE', 'state saved');
-      const cycle = db.sterilization_cycles.find(c => c.asset_id === setId && c.cycle_number === 'E2E-0001');
+      const cycle = db.sterilization_cycles.find(c => c.asset_id === setId && c.cycle_number === sterilizerCycle);
       expectEqual(cycle?.result, 'PASSED', 'cycle result');
     });
 
@@ -403,9 +406,12 @@ async function main() {
       const {page} = sterilization;
       await queue('Αποδέσμευση');
       // The load's own block: its release button.
-      await page.locator('.ster-load-group', {hasText: 'E2E-0001'}).getByRole('button', {name: 'Αποδέσμευση'}).click();
+      await page
+        .locator('.ster-load-group', {hasText: sterilizerCycle})
+        .getByRole('button', {name: 'Αποδέσμευση'})
+        .click();
       const modal = page.locator('.modal-backdrop').last();
-      const load = db.process_loads.find(l => l.cycle_number === 'E2E-0001');
+      const load = db.process_loads.find(l => l.cycle_number === sterilizerCycle);
       await modal.getByText(`κύκλος ${load.cycle_number}`).waitFor();
       // The parts of the dialog (checks, the note, the load's content) never sit on top of each other, in a tall
       // window and in a laptop one: a picture can look fine while the boxes overlap.

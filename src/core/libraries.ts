@@ -22,6 +22,8 @@ export type LibraryItem = {
   en: string;
   active?: boolean;
   code?: string;
+  /** A sterilizer's cycle letter (A, B…): its cycles are numbered A1, A2… each day. None set: by its place in the list. */
+  cyclePrefix?: string;
   outOfService?: OutOfService;
   /** A sterilizer's tests, newest first (the last ones only). */
   tests?: EquipmentTest[];
@@ -75,8 +77,8 @@ export const toolCategories: LibraryItem[] = [
   {id: 'airway', el: 'Αναζωογόνηση / Αεραγωγός', en: 'Resuscitation / Airway'},
 ];
 export const sterilizers: LibraryItem[] = [
-  {id: 'aut1', code: 'AUT-01', el: 'Κλίβανος Ατμού 01', en: 'Steam Sterilizer 01'},
-  {id: 'aut2', code: 'AUT-02', el: 'Κλίβανος Ατμού 02', en: 'Steam Sterilizer 02'},
+  {id: 'aut1', code: 'AUT-01', cyclePrefix: 'A', el: 'Κλίβανος Ατμού 01', en: 'Steam Sterilizer 01'},
+  {id: 'aut2', code: 'AUT-02', cyclePrefix: 'B', el: 'Κλίβανος Ατμού 02', en: 'Steam Sterilizer 02'},
 ];
 export const washers: LibraryItem[] = [
   {id: 'wd1', code: 'WD-01', el: 'Πλυντήριο 1', en: 'Washer 1'},
