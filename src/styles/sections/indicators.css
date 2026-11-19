@@ -45,12 +45,12 @@
 }
 .ind-facts dt {
   color: var(--c-gray-45);
-  font-size: 12.5px;
+  font-size: 12px;
 }
 .ind-facts dd {
   margin: 2px 0 0;
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .ind-facts dd small {
@@ -69,7 +69,8 @@
 }
 .ind-section h2 {
   margin: 8px 0 0;
-  font-size: 1rem;
+  font-size: 14px;
+  font-weight: 600;
 }
 .ind-note {
   margin: 0;
@@ -92,15 +93,19 @@
   grid-template-columns: minmax(120px, 1.2fr) minmax(80px, 2fr) auto;
   align-items: center;
   gap: 2px 12px;
-  padding: 7px 0;
+  padding: 6px 0;
   border-bottom: 1px solid var(--c-gray-95);
 }
 .ind-rows li > b {
+  font-size: 13px;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .ind-rows li > strong {
+  font-size: 13px;
+  font-weight: 600;
   min-width: 3ch;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -116,7 +121,7 @@
 }
 .ind-bar {
   display: block;
-  height: 8px;
+  height: 6px;
   border-radius: 4px;
   background: var(--c-gray-95);
   overflow: hidden;

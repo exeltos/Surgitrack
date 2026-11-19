@@ -130,7 +130,7 @@ export default function IndicatorsPage() {
           </dl>
 
           <section className="ind-section" aria-labelledby="ind-heat">
-            <h2 id="ind-heat">{L('Πότε δουλεύει η Αποστείρωση', 'When Sterilization works')}</h2>
+            <h2 id="ind-heat">{L('Φόρτος ανά ημέρα και ώρα', 'Load by day and hour')}</h2>
             <p className="ind-note">
               {L(
                 'Οι κινήσεις κάθε ώρας της εβδομάδας· όσο πιο σκούρο, τόσο περισσότερη δουλειά.',
@@ -201,15 +201,15 @@ export default function IndicatorsPage() {
         <>
           <dl className="ind-facts">
             <div>
-              <dt>{L('Διάμεσος χρόνος κύκλου', 'Median turnaround')}</dt>
+              <dt>{L('Συνήθης χρόνος επιστροφής', 'Typical turnaround')}</dt>
               <dd>{rounds.overall.rounds ? hoursText(rounds.overall.median) : '—'}</dd>
             </div>
             <div>
-              <dt>{L('9 στους 10 επιστρέφουν σε', '9 in 10 are back within')}</dt>
+              <dt>{L('Το 90% επιστρέφει σε', '90% are back within')}</dt>
               <dd>{rounds.overall.rounds ? hoursText(rounds.overall.p90) : '—'}</dd>
             </div>
             <div>
-              <dt>{L('Ολοκληρωμένοι γύροι', 'Completed rounds')}</dt>
+              <dt>{L('Ολοκληρωμένοι κύκλοι', 'Completed cycles')}</dt>
               <dd>{rounds.overall.rounds}</dd>
             </div>
           </dl>
@@ -228,14 +228,13 @@ export default function IndicatorsPage() {
                   <Bar value={d.median} max={rounds.departments[0]?.median || 1} />
                   <strong>{hoursText(d.median)}</strong>
                   <small>
-                    {L('9 στους 10 σε', '9 in 10 within')} {hoursText(d.p90)} ·{' '}
-                    {L(`${d.rounds} γύροι`, `${d.rounds} rounds`)}
+                    {L('το 90% σε', '90% within')} {hoursText(d.p90)} · {L(`${d.rounds} κύκλοι`, `${d.rounds} cycles`)}
                   </small>
                 </li>
               ))}
               {rounds.departments.length === 0 && (
                 <li className="ind-empty">
-                  {L('Κανένας ολοκληρωμένος γύρος στην περίοδο.', 'No completed round in the period.')}
+                  {L('Κανένας ολοκληρωμένος κύκλος στην περίοδο.', 'No completed cycle in the period.')}
                 </li>
               )}
             </ul>
