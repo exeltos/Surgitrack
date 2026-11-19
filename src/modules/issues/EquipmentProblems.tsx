@@ -10,7 +10,7 @@ import {tr} from '../../i18n';
 const REASONS: ReplacementReason[] = ['DAMAGED', 'SERVICE', 'LOST', 'RETIRED'];
 
 /**
- * The instruments out of order at a glance, above «Εκκρεμότητες»: damaged or worn, at Service, lost, out of use
+ * The instruments out of order at a glance, beside the records of «Εκκρεμότητες»: damaged or worn, at Service, lost, out of use
  * (to replace) and near the end of their uses. Each opens its list: the first four the instruments to replace by
  * that reason, the last the instruments with few uses left.
  */
@@ -32,26 +32,29 @@ export default function EquipmentProblems({
   }, [tools, retiredTools, sets, issues, movements, purchaseOrders]);
   const nearLimit = tools.filter(t => matchesUsage('LOW', [t], systemSettings.usageWarningThreshold)).length;
   return (
-    <ul className="problem-kpis" aria-label={tr('Εξοπλισμός με πρόβλημα')}>
-      {REASONS.map(r => (
-        <li key={r}>
-          <button
-            type="button"
-            className={`problem-kpi ${r.toLowerCase()}${reason === r ? ' active' : ''}`}
-            aria-pressed={reason === r}
-            onClick={() => onReason(r)}
-          >
-            <span>{tr(REASON_LABEL[r])}</span>
-            <b>{counts[r]}</b>
-          </button>
+    <aside className="problem-aside" aria-labelledby="problem-aside-title">
+      <h2 id="problem-aside-title">{tr('Εξοπλισμός με πρόβλημα')}</h2>
+      <ul className="problem-kpis" aria-label={tr('Εξοπλισμός με πρόβλημα')}>
+        {REASONS.map(r => (
+          <li key={r}>
+            <button
+              type="button"
+              className={`problem-kpi ${r.toLowerCase()}${reason === r ? ' active' : ''}`}
+              aria-pressed={reason === r}
+              onClick={() => onReason(r)}
+            >
+              <span>{tr(REASON_LABEL[r])}</span>
+              <b>{counts[r]}</b>
+            </button>
+          </li>
+        ))}
+        <li>
+          <Link className="problem-kpi low" to={presetPath('/tools', {usage: 'LOW'})}>
+            <span>{tr('Κοντά στο όριο χρήσεων')}</span>
+            <b>{nearLimit}</b>
+          </Link>
         </li>
-      ))}
-      <li>
-        <Link className="problem-kpi low" to={presetPath('/tools', {usage: 'LOW'})}>
-          <span>{tr('Κοντά στο όριο χρήσεων')}</span>
-          <b>{nearLimit}</b>
-        </Link>
-      </li>
-    </ul>
+      </ul>
+    </aside>
   );
 }

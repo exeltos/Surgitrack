@@ -2024,24 +2024,47 @@ html body .department-home .dash-most-used > .dept-cols {
   color: var(--c-cyan-30-6, inherit);
   font-weight: 600;
 }
-/* «Εκκρεμότητες»: the instruments out of order as small figures above the tabs, each opening its list. */
+/* «Εκκρεμότητες»: the records in the middle with the whole height; the instruments out of order in a narrow
+   column on the right, one line each (a low row above the records on a narrow screen). */
+.issues-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 16px;
+  align-items: start;
+}
+.issues-main {
+  min-width: 0;
+}
+.problem-aside {
+  padding: 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+.problem-aside h2 {
+  margin: 0 0 8px;
+  color: var(--c-gray-15);
+  font-size: 13px;
+  font-weight: 600;
+}
 .problem-kpis {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
-  margin: 0 0 14px;
+  gap: 4px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 .problem-kpi {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--c-gray-90);
-  border-left-width: 4px;
-  border-radius: 12px;
-  background: var(--c-white);
+  padding: 7px 10px;
+  border: 0;
+  border-left: 3px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: none;
   color: inherit;
   font: inherit;
   text-align: left;
@@ -2049,11 +2072,11 @@ html body .department-home .dash-most-used > .dept-cols {
   cursor: pointer;
 }
 .problem-kpi span {
-  color: var(--c-gray-45);
-  font-size: 12px;
+  color: var(--c-gray-15);
+  font-size: 13px;
 }
 .problem-kpi b {
-  font-size: 22px;
+  font-size: 15px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -2061,8 +2084,8 @@ html body .department-home .dash-most-used > .dept-cols {
 .problem-kpi.active {
   background: var(--c-gray-95);
 }
-.problem-kpi.active {
-  border-color: var(--c-gray-45);
+.problem-kpi.active span {
+  font-weight: 600;
 }
 .problem-kpi.damaged {
   border-left-color: var(--c-red-40);
@@ -2078,4 +2101,47 @@ html body .department-home .dash-most-used > .dept-cols {
 }
 .problem-kpi.low {
   border-left-color: var(--c-amber-35);
+}
+/* Below a wide screen the column would narrow the tables: the figures become one low row of chips above them. */
+@media (max-width: 1599px) {
+  .issues-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .problem-aside {
+    order: -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .problem-aside h2 {
+    margin: 0;
+    color: var(--c-gray-45);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .problem-kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .problem-kpi {
+    gap: 6px;
+    width: auto;
+    padding: 4px 10px;
+    border: 1px solid var(--c-gray-90);
+    border-left-width: 3px;
+    border-radius: 999px;
+    background: var(--c-white);
+  }
+  .problem-kpi span {
+    font-size: 12.5px;
+  }
+  .problem-kpi b {
+    font-size: 13px;
+  }
 }
