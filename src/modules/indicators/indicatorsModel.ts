@@ -133,13 +133,13 @@ export function turnaround(movements: readonly Movement[], since: number) {
  * (by name: the kind of operation) used most, overall and in each department.
  */
 export function usage(movements: readonly Movement[], since: number) {
+  type Item = {name: string; uses: number; departments: Map<string, number>};
   const departments = new Map<
     string,
-    {department: string; uses: number; patients: Set<string>; kinds: Map<string, number>}
+    {department: string; uses: number; sets: number; tools: number; patients: Set<string>}
   >();
-  const kinds = new Map<string, number>();
-  // One use is one Set or instrument on one patient: the count signed for it, its dispatch, a recall or a retirement
-  // may each carry the same patient code.
+  const items = {SET: new Map<string, Item>(), TOOL: new Map<string, Item>()};
+  // One use is one Set or instrument on one patient: the count signed for it and its dispatch carry the same code.
   const seen = new Set<string>();
   for (const m of movements) {
     // A use is recorded by the department: the count it signs, or its dispatch to Sterilization. Other records may
@@ -150,24 +150,37 @@ export function usage(movements: readonly Movement[], since: number) {
     if (seen.has(use)) continue;
     seen.add(use);
     const department = m.from;
-    const name = (m.asset.split(' · ')[1] || m.asset).trim();
-    const row = departments.get(department) || {department, uses: 0, patients: new Set(), kinds: new Map()};
+    const kind = m.assetKind === 'SET' ? 'SET' : 'TOOL';
+    const row = departments.get(department) || {department, uses: 0, sets: 0, tools: 0, patients: new Set<string>()};
     row.uses++;
+    if (kind === 'SET') row.sets++;
+    else row.tools++;
     row.patients.add(m.patientCode);
-    row.kinds.set(name, (row.kinds.get(name) || 0) + 1);
     departments.set(department, row);
-    kinds.set(name, (kinds.get(name) || 0) + 1);
+    // The same kind of Set or instrument (by name), however many units of it.
+    const name = (m.asset.split(' · ')[1] || m.asset).trim();
+    const key = name.toUpperCase();
+    const item = items[kind].get(key) || {name, uses: 0, departments: new Map<string, number>()};
+    item.uses++;
+    item.departments.set(department, (item.departments.get(department) || 0) + 1);
+    items[kind].set(key, item);
   }
-  const top = (map: Map<string, number>, n: number) =>
-    [...map.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, n)
-      .map(([name, uses]) => ({name, uses}));
+  const top = (map: Map<string, Item>) =>
+    [...map.values()]
+      .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name, 'el'))
+      .slice(0, 10)
+      .map(i => ({
+        name: i.name,
+        uses: i.uses,
+        // Who uses it, the most first.
+        departments: [...i.departments.entries()].sort((a, b) => b[1] - a[1]).map(([d]) => d),
+      }));
   return {
     departments: [...departments.values()]
-      .map(d => ({department: d.department, uses: d.uses, patients: d.patients.size, top: top(d.kinds, 3)}))
+      .map(d => ({department: d.department, uses: d.uses, sets: d.sets, tools: d.tools, patients: d.patients.size}))
       .sort((a, b) => b.uses - a.uses),
-    kinds: top(kinds, 10),
+    sets: top(items.SET),
+    tools: top(items.TOOL),
   };
 }
 

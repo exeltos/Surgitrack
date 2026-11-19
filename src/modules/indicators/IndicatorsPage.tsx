@@ -249,51 +249,83 @@ export default function IndicatorsPage() {
       )}
 
       {tab === 'USE' && (
-        <div className="ind-columns">
+        <>
+          <dl className="ind-facts">
+            <div>
+              <dt>{L('Χρήσεις σε ασθενή', 'Uses on a patient')}</dt>
+              <dd>{use.departments.reduce((n, d) => n + d.uses, 0)}</dd>
+            </div>
+            <div>
+              <dt>{L('Σετ', 'Sets')}</dt>
+              <dd>{use.departments.reduce((n, d) => n + d.sets, 0)}</dd>
+            </div>
+            <div>
+              <dt>{L('Εργαλεία', 'Instruments')}</dt>
+              <dd>{use.departments.reduce((n, d) => n + d.tools, 0)}</dd>
+            </div>
+          </dl>
           <section className="ind-section" aria-labelledby="ind-use">
             <h2 id="ind-use">{L('Ανά τμήμα', 'By department')}</h2>
-            <p className="ind-note">
-              {L(
-                'Χρήσεις σε ασθενή και οι επεμβάσεις (κατά Σετ) που τις απασχόλησαν περισσότερο.',
-                'Uses on a patient and the operations (by Set) that took most of them.',
-              )}
-            </p>
-            <ul className="ind-rows" aria-labelledby="ind-use">
-              {use.departments.map(d => (
-                <li key={d.department}>
-                  <b>{trData(d.department)}</b>
-                  <Bar value={d.uses} max={use.departments[0]?.uses || 1} />
-                  <strong>{d.uses}</strong>
-                  <small>
-                    {L(`${d.patients} ασθενείς`, `${d.patients} patients`)}
-                    {d.top.length > 0 && ` · ${d.top.map(k => `${k.name} (${k.uses})`).join(', ')}`}
-                  </small>
-                </li>
-              ))}
-              {use.departments.length === 0 && (
-                <li className="ind-empty">
-                  {L('Καμία χρήση σε ασθενή στην περίοδο.', 'No use on a patient in the period.')}
-                </li>
-              )}
-            </ul>
+            {use.departments.length ? (
+              <div className="ind-table-wrap" role="region" tabIndex={0} aria-labelledby="ind-use">
+                <table className="ind-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{L('Τμήμα', 'Department')}</th>
+                      <th scope="col">{L('Χρήσεις', 'Uses')}</th>
+                      <th scope="col">{L('Ασθενείς', 'Patients')}</th>
+                      <th scope="col">{L('Σετ', 'Sets')}</th>
+                      <th scope="col">{L('Εργαλεία', 'Instruments')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {use.departments.map(d => (
+                      <tr key={d.department}>
+                        <th scope="row">{trData(d.department)}</th>
+                        <td>
+                          <span className="ind-cell-bar">
+                            <strong>{d.uses}</strong>
+                            <Bar value={d.uses} max={use.departments[0]?.uses || 1} />
+                          </span>
+                        </td>
+                        <td>{d.patients}</td>
+                        <td>{d.sets}</td>
+                        <td>{d.tools}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="ind-note">
+                {L('Καμία χρήση σε ασθενή στην περίοδο.', 'No use on a patient in the period.')}
+              </p>
+            )}
           </section>
-          <section className="ind-section" aria-labelledby="ind-kinds">
-            <h2 id="ind-kinds">{L('Πιο συχνές επεμβάσεις', 'Most frequent operations')}</h2>
-            <p className="ind-note">
-              {L('Κατά Σετ ή εργαλείο που χρησιμοποιήθηκε.', 'By the Set or instrument used.')}
-            </p>
-            <ol className="ind-rows" aria-labelledby="ind-kinds">
-              {use.kinds.map(k => (
-                <li key={k.name}>
-                  <b>{k.name}</b>
-                  <Bar value={k.uses} max={use.kinds[0]?.uses || 1} />
-                  <strong>{k.uses}</strong>
-                </li>
-              ))}
-              {use.kinds.length === 0 && <li className="ind-empty">—</li>}
-            </ol>
-          </section>
-        </div>
+          <div className="ind-columns">
+            {(
+              [
+                ['sets', L('Σετ που χρησιμοποιήθηκαν περισσότερο', 'Most used Sets'), use.sets],
+                ['tools', L('Εργαλεία που χρησιμοποιήθηκαν περισσότερο', 'Most used instruments'), use.tools],
+              ] as const
+            ).map(([key, title, list]) => (
+              <section key={key} className="ind-section" aria-labelledby={`ind-${key}`}>
+                <h2 id={`ind-${key}`}>{title}</h2>
+                <ol className="ind-rows" aria-labelledby={`ind-${key}`}>
+                  {list.map(k => (
+                    <li key={k.name}>
+                      <b>{k.name}</b>
+                      <Bar value={k.uses} max={list[0]?.uses || 1} />
+                      <strong>{k.uses}</strong>
+                      <small>{k.departments.map(d => trData(d)).join(' · ')}</small>
+                    </li>
+                  ))}
+                  {list.length === 0 && <li className="ind-empty">—</li>}
+                </ol>
+              </section>
+            ))}
+          </div>
+        </>
       )}
 
       {tab === 'QUALITY' && (

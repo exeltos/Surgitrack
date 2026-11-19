@@ -106,9 +106,9 @@ describe('indicators', () => {
       }),
     ];
     const u = usage(moves, since);
-    expect(u.departments).toEqual([
-      {department: 'Χειρουργείο', uses: 2, patients: 2, top: [{name: 'ΟΡΘΟΠΕΔΙΚΟ ΒΑΣΙΚΟ', uses: 2}]},
-    ]);
+    expect(u.departments).toEqual([{department: 'Χειρουργείο', uses: 2, sets: 2, tools: 0, patients: 2}]);
+    expect(u.sets).toEqual([{name: 'ΟΡΘΟΠΕΔΙΚΟ ΒΑΣΙΚΟ', uses: 2, departments: ['Χειρουργείο']}]);
+    expect(u.tools).toEqual([]);
   });
 
   it('equipment and quality count the cycles in the period and the failed ones', () => {

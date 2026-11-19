@@ -176,3 +176,34 @@
 .indicators .ind-heat tbody th {
   padding-right: 8px;
 }
+/* A table of figures (use by department): the name, then numbers; the first one with its bar. */
+.ind-table-wrap {
+  overflow-x: auto;
+}
+.indicators .ind-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.indicators .ind-table th,
+.indicators .ind-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+.indicators .ind-table thead th {
+  color: var(--c-gray-15);
+  font-size: 12px;
+  font-weight: 600;
+}
+.indicators .ind-table tbody th {
+  font-weight: 600;
+}
+.ind-cell-bar {
+  display: grid;
+  grid-template-columns: 3ch minmax(80px, 240px);
+  align-items: center;
+  gap: 10px;
+}

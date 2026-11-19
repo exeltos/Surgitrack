@@ -1637,82 +1637,9 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
 
 /* Department Home › «Πιο πολυχρησιμοποιημένα»: one row per Set or instrument — its name and barcode over a thin bar
    of its uses, the count at the end. */
-.dash-used li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-}
-.dash-used li > a {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-}
-.dash-used li > a b {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dash-used-track {
-  display: block;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--dash-track);
-}
-.dash-used-track i {
-  display: block;
-  height: 100%;
-  border-radius: 3px;
-  background: var(--dash-bar);
-}
-.dash-used strong {
-  font-variant-numeric: tabular-nums;
-}
 
 /* Department Home › «Διαθέσιμα στο τμήμα» and «Στην Αποστείρωση»: one row per Set or instrument — its name and
    barcode, and at the end its expiry or its stage. */
-.dash-count {
-  margin-left: 4px;
-  color: var(--c-gray-45);
-  font-style: normal;
-  font-weight: 600;
-}
-.dash-items li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-}
-.dash-items li > a {
-  display: grid;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-}
-.dash-items li > a b {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dash-item-note {
-  font-size: 12px;
-  color: var(--c-gray-45);
-  white-space: nowrap;
-}
-.dash-item-note.expired {
-  color: var(--c-red-35);
-  font-weight: 600;
-}
-.dash-item-note.expiring {
-  color: var(--c-amber-35);
-  font-weight: 600;
-}
-.dash-item-note.ready {
-  color: var(--c-green-35);
-  font-weight: 600;
-}
 
 /* Overview on a computer: one screen, never scrolling, whatever the window's height. Under «Σήμερα» the four cards
    share what is left; what a card cannot show scrolls inside it, its rows keeping their height. */
@@ -1752,12 +1679,175 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
   }
 }
 /* On the amber of the row last opened, the notes take a darker shade to stay readable. */
-.row-last-visited > .dash-item-note {
+
+/* Department Home: «Τι έχω να κάνω» — three links with their count, lit when there is something to do — then «Ο
+   εξοπλισμός μου», one line per kind, its list scrolling under a fixed head; the page itself stays put. */
+html body .department-home {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+html body .department-home > * {
+  flex: 0 0 auto;
+}
+.dept-todo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.dept-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  color: var(--c-gray-45);
+  text-decoration: none;
+}
+.dept-todo-item b {
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dept-todo-item span {
+  display: grid;
+}
+.dept-todo-item strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.dept-todo-item small {
+  font-size: 12px;
+}
+.dept-todo-item.on {
+  color: var(--c-cyan-20);
+}
+.dept-todo-item.on.ready {
+  border-color: var(--c-green-65);
+  background: var(--c-green-90);
+}
+.dept-todo-item.on.expiry {
+  border-color: var(--c-amber-70);
+  background: var(--c-amber-95);
+}
+.dept-todo-item.on.issues {
+  border-color: var(--c-red-75);
+  background: var(--c-red-85);
+}
+.dept-todo-item:hover {
+  border-color: var(--c-cyan-65);
+}
+html body .department-home > .dept-stock {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+.dept-stock h2 {
+  margin: 0 0 6px;
+  color: var(--c-cyan-20);
+  font-size: 15px;
+  font-weight: 600;
+}
+.dept-stock-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .dept-stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+html body .dept-stock-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--c-gray-90);
+  background: var(--c-gray-95);
   color: var(--c-gray-15);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: none;
 }
-.row-last-visited > .dash-item-note.expiring {
-  color: var(--c-amber-25);
+html body .dept-stock-table td,
+html body .dept-stock-table tbody th {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--c-gray-95);
+  font-weight: 400;
+  text-align: left;
 }
-.row-last-visited > .dash-item-note.ready {
+html body .dept-stock-table tbody th a {
+  color: var(--c-cyan-20);
+  font-weight: 600;
+  text-decoration: none;
+}
+html body .dept-stock-table tbody th a:hover {
+  text-decoration: underline;
+}
+html body .dept-stock-table .dept-stock-group th {
+  padding: 12px 14px 4px;
+  border-bottom: 0;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 600;
+}
+.dept-stock-group th span {
+  margin-left: 6px;
+  font-weight: 500;
+}
+.dept-stock-table .dept-n {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+html body .dept-stock-table tr.none-here .dept-n {
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+.dept-ready {
   color: var(--c-green-35);
+  font-style: normal;
+  font-weight: 600;
+}
+.dept-exp.expiring {
+  color: var(--c-amber-35);
+  font-weight: 600;
+}
+.dept-exp.expired {
+  color: var(--c-red-35);
+  font-weight: 600;
+}
+.dept-open {
+  width: 32px;
+  text-align: right;
+}
+.dept-open a {
+  color: var(--c-gray-45);
+}
+.dept-empty {
+  margin: 0;
+  padding: 16px;
+  color: var(--c-gray-45);
+}
+@media (max-width: 720px) {
+  .dept-todo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .department-home {
+    overflow-y: auto;
+  }
+  .dept-stock-wrap {
+    overflow: visible;
+  }
 }

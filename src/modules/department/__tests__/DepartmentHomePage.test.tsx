@@ -11,30 +11,39 @@ const department = {
 };
 
 describe('Department home', () => {
-  it('shows each thing once: today, what is available, what is in Sterilization and the uses', () => {
+  it('shows what to do now, then the equipment one line per kind', () => {
     renderPage(<DepartmentHomePage />, {path: '/department/home', signedIn: department});
     expect(screen.getByRole('heading', {name: 'Χειρουργείο'})).toBeInTheDocument();
-    // «Σήμερα» counts only what no column below counts.
-    for (const label of ['Εκκρεμότητες', 'Λήγουν σύντομα'])
-      expect(screen.getByRole('link', {name: new RegExp(`^${label}: \\d+$`)})).toBeInTheDocument();
-    expect(screen.queryByRole('link', {name: /^Στο τμήμα: /})).toBeNull();
 
-    // Available: the soonest expiry first.
-    const available = screen.getByRole('list', {name: 'Διαθέσιμα στο τμήμα'});
-    const dates = within(available)
-      .queryAllByText(/^έως \d\d\/\d\d\/\d{4}$/)
-      .map(n => n.textContent!.slice(4).split('/').reverse().join(''));
-    expect(dates.length).toBeGreaterThan(0);
-    expect(dates).toEqual([...dates].sort());
+    // What to do: pick up, expiries, issues — each with its count, opening its list.
+    const todo = screen.getByRole('navigation', {name: 'Τι έχω να κάνω'});
+    for (const label of ['Παραλαβή', 'Λήξεις', 'Εκκρεμότητες'])
+      expect(within(todo).getByRole('link', {name: new RegExp(`^\\d+\\s*${label}`)})).toBeInTheDocument();
+    expect(within(todo).getByRole('link', {name: /Εκκρεμότητες/})).toHaveAttribute(
+      'href',
+      expect.stringContaining('/issues?'),
+    );
 
-    // In Sterilization: what waits to be picked up comes first.
-    const away = within(screen.getByRole('list', {name: 'Στην Αποστείρωση'})).getAllByRole('listitem');
-    expect(away.length).toBeGreaterThan(0);
-    const readyAt = away.findIndex(li => /Έτοιμο για παραλαβή|Για παραλαβή/i.test(li.textContent || ''));
-    if (readyAt >= 0) expect(readyAt).toBe(0);
-
-    // Uses: the worn ones first, each with what it has left.
-    const uses = within(screen.getByRole('list', {name: 'Χρήσεις'})).getAllByRole('listitem');
-    expect(uses.length).toBeGreaterThan(0);
+    // The equipment: one line per kind, Sets then standalone instruments, each line's counts adding up.
+    const table = screen.getByRole('table');
+    const groups = within(table)
+      .getAllByRole('rowheader')
+      .filter(h => h.getAttribute('scope') === 'rowgroup')
+      .map(h => h.textContent);
+    expect(groups[0]).toMatch(/^Σετ/);
+    const rows = within(table)
+      .getAllByRole('row')
+      .filter(r => within(r).queryAllByRole('cell').length === 5);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const [here, away, total] = within(row)
+        .getAllByRole('cell')
+        .slice(0, 3)
+        .map(c => Number.parseInt(c.textContent || '0', 10) || 0);
+      expect(here + away).toBeLessThanOrEqual(total);
+    }
+    // A kind opens the list of its units.
+    const first = within(rows[0]).getAllByRole('link')[0];
+    expect(first.getAttribute('href')).toMatch(/^\/department(\/tools)?\?preset=1&query=/);
   });
 });
