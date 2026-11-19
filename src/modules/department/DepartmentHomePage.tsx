@@ -50,10 +50,12 @@ export default function DepartmentHomePage() {
   const ownIds = new Set([...departmentSets, ...departmentTools].map(a => a.id));
   const nearLimit = lifecycleAlerts.filter(a => ownIds.has(a.assetId));
 
-  // When each Set or instrument last moved, by barcode: how long it has been at its stage.
+  // When each Set or instrument last moved to where it is, by barcode: how long it has been at its stage. Only real
+  // moves count (from one place to another): a record kept in place, such as a correction of its uses, is not one.
   const lastMoved = useMemo(() => {
     const map = new Map<string, {at: string; stamp: number}>();
     for (const m of movements) {
+      if (m.from === m.to || m.undoes) continue;
       const code = m.asset.split(' · ')[0].trim().toUpperCase();
       const stamp = movementStamp(m.at);
       if (stamp && stamp > (map.get(code)?.stamp ?? 0)) map.set(code, {at: m.at, stamp});

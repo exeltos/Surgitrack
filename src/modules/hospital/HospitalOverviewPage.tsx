@@ -318,8 +318,10 @@ export default function HospitalOverviewPage() {
   // Today's work in Sterilization, for «Σήμερα»: the cycles started and the loads released (the cards below show what
   // is where now and what waits).
   const todayKey = new Date().toDateString();
+  // A load rejected at release keeps its release time too (it goes to reprocessing): only the released ones count.
   const today = (kind: 'STERILIZATION' | 'WASHING', field: 'createdAt' | 'releasedAt') =>
     processLoads.filter(load => {
+      if (field === 'releasedAt' && load.status !== 'RELEASED' && load.status !== 'RECALLED') return false;
       const at = load.kind === kind ? load[field] : undefined;
       const stamp = at ? movementStamp(at) : 0;
       return !!stamp && new Date(stamp).toDateString() === todayKey;

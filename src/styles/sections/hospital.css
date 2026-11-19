@@ -1746,3 +1746,13 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
     min-height: 72px;
   }
 }
+/* On the amber of the row last opened, the notes take a darker shade to stay readable. */
+.row-last-visited > .dash-item-note {
+  color: var(--c-gray-15);
+}
+.row-last-visited > .dash-item-note.expiring {
+  color: var(--c-amber-25);
+}
+.row-last-visited > .dash-item-note.ready {
+  color: var(--c-green-35);
+}
