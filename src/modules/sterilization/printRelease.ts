@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../core/cycleNumber';
 import type {ProcessLoadRecord} from '../../types/domain';
 import {personDepartment, personName} from '../../core/personName';
 import {tr, trData} from '../../i18n';
@@ -79,7 +80,7 @@ export function releaseFormBody({
   const meta = [
     [tr('Τύπος φορτίου'), loadType || '—'],
     [tr('Κλίβανος'), trData(load.equipment)],
-    [tr('Κύκλος'), load.cycleNumber],
+    [tr('Κύκλος'), shortCycleNumber(load.cycleNumber)],
     [tr('Πρόγραμμα'), load.program],
     [tr('Φόρτωση'), `${load.createdAt} · ${trData(load.createdByName)}`],
     [tr('Τέλος κύκλου'), load.completedAt || '—'],
@@ -131,7 +132,7 @@ export function releaseFormBody({
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:11mm;background:#fff;min-height:297mm}}
   @media print{tr{break-inside:avoid}}
   </style></head><body><div class="sheet">
-  <div class="top"><div>${header}<div class="doc">${escapeHtml(tr('Έντυπο αποδέσμευσης φορτίου'))}</div><h1>${escapeHtml(trData(load.equipment))} · ${escapeHtml(tr('Κύκλος'))} ${escapeHtml(load.cycleNumber)}</h1></div><div class="barcode">${code128Svg(load.cycleNumber, 40)}<div class="barcode-code">${escapeHtml(load.cycleNumber)}</div></div></div>
+  <div class="top"><div>${header}<div class="doc">${escapeHtml(tr('Έντυπο αποδέσμευσης φορτίου'))}</div><h1>${escapeHtml(trData(load.equipment))} · ${escapeHtml(tr('Κύκλος'))} ${escapeHtml(shortCycleNumber(load.cycleNumber))}</h1></div><div class="barcode">${code128Svg(load.cycleNumber, 40)}<div class="barcode-code">${escapeHtml(load.cycleNumber)}</div></div></div>
   <div class="meta">${meta}</div>
   <h2>${escapeHtml(tr('Δείκτες'))}</h2>
   <div class="inds">${indicator(tr('Χημικός δείκτης'), chemicalUsed, chem, '')}${indicator(

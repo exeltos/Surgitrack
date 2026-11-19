@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {cycleDigits, cyclePrefixOf, todaysCycles} from '../../../core/cycleNumber';
+import {cycleDigits, cyclePrefixOf, shortCycleNumber, todaysCycles} from '../../../core/cycleNumber';
 import type {LibraryItem} from '../../../core/libraries';
 import type {ProcessLoadRecord} from '../../../types/domain';
 import {tr} from '../../../i18n';
@@ -54,17 +54,16 @@ export default function CycleNumberSelect({
     return (
       <label className={className}>
         {label}
-        <input value={value} onChange={e => onChange(e.target.value)} />
+        <input value={value} inputMode="numeric" onChange={e => onChange(e.target.value.replace(/[^\d\-/]/g, ''))} />
       </label>
     );
   return (
     <label className={className}>
       {label}
       <select value={value} onChange={e => onChange(e.target.value)}>
-        {value && !listed && <option value={value}>{value}</option>}
+        {value && !listed && <option value={value}>{shortCycleNumber(value)}</option>}
         {Array.from({length: last}, (_, i) => i + 1).map(n => (
           <option key={n} value={`${prefix}${n}`} disabled={used.has(n)}>
-            {prefix}
             {n}
             {used.has(n) ? ` · ${tr('έγινε σήμερα')}` : ''}
           </option>
@@ -73,7 +72,11 @@ export default function CycleNumberSelect({
       {/* The day's previous cycle beside it, so the next one is not mistaken (numbering starts again each day). */}
       <small className="cycle-previous">
         {previous
-          ? tr('Προηγούμενος σήμερα: {0} · {1}', previous.cycleNumber, previous.at.split(' ').pop() || previous.at)
+          ? tr(
+              'Προηγούμενος σήμερα: {0} · {1}',
+              shortCycleNumber(previous.cycleNumber),
+              previous.at.split(' ').pop() || previous.at,
+            )
           : tr('Πρώτος κύκλος της ημέρας')}
       </small>
     </label>

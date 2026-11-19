@@ -95,3 +95,12 @@ export function todaysCycles(
   }
   return {used, next: used.size ? Math.max(...used) + 1 : 1, previous};
 }
+
+/**
+ * A cycle number beside its sterilizer: the number only («Α4» → «4»), since the sterilizer's name already says the
+ * letter (ΚΛΙΒΑΝΟΣ Α · Κύκλος 4). Any other number (a device's «2026-0932») as it is.
+ */
+export function shortCycleNumber(cycleNumber: string | undefined | null) {
+  const value = normalizeCycleNumber(cycleNumber);
+  return /^[A-ZΑ-Ω]{1,2}\d+$/.test(value) ? value.replace(/^[A-ZΑ-Ω]+/, '') : value;
+}

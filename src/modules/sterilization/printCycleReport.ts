@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../core/cycleNumber';
 import type {ProcessLoadRecord} from '../../types/domain';
 import {tr, trData} from '../../i18n';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryTypes';
@@ -68,7 +69,7 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
         : '<div class="brand">SurgiTrack</div>';
   const meta = [
     [tr('Κλίβανος'), trData(load.equipment)],
-    [tr('Κύκλος'), load.cycleNumber],
+    [tr('Κύκλος'), shortCycleNumber(load.cycleNumber)],
     [tr('Πρόγραμμα'), data.program],
     [tr('Έναρξη'), data.startedAt],
     [tr('Λήξη'), data.endedAt],
@@ -134,7 +135,7 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:11mm;background:#fff;min-height:297mm}}
   @media print{tr{break-inside:avoid}}
   </style></head><body><div class="sheet">
-  <div class="top"><div>${header}<div class="doc">${escapeHtml(tr('Report κύκλου αποστείρωσης'))}</div><h1>${escapeHtml(trData(load.equipment))} · ${escapeHtml(tr('Κύκλος'))} ${escapeHtml(load.cycleNumber)}</h1></div><div class="barcode">${code128Svg(load.cycleNumber, 40)}<div class="barcode-code">${escapeHtml(load.cycleNumber)}</div></div></div>
+  <div class="top"><div>${header}<div class="doc">${escapeHtml(tr('Report κύκλου αποστείρωσης'))}</div><h1>${escapeHtml(trData(load.equipment))} · ${escapeHtml(tr('Κύκλος'))} ${escapeHtml(shortCycleNumber(load.cycleNumber))}</h1></div><div class="barcode">${code128Svg(load.cycleNumber, 40)}<div class="barcode-code">${escapeHtml(load.cycleNumber)}</div></div></div>
   ${simulated ? `<div class="sim">${escapeHtml(tr('Προσομοίωση: οι τιμές είναι δοκιμαστικές και δεν προέρχονται από πραγματικό κλίβανο.'))}</div>` : ''}
   <div class="meta">${meta}</div>
   <h2>${escapeHtml(tr('Καμπύλη κύκλου'))}</h2>

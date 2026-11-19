@@ -33,7 +33,7 @@ describe('CycleNumberSelect', () => {
       {equipment: 'Κλίβανος 1', cycleNumber: 'A2', createdAt: `${day} 00:02`, kind: 'STERILIZATION'},
     ];
     const {unmount} = render(<CycleNumberSelect {...props} loads={loads as never} value="A3" onChange={vi.fn()} />);
-    expect(screen.getByText('Προηγούμενος σήμερα: A2 · 00:02')).toBeInTheDocument();
+    expect(screen.getByText('Προηγούμενος σήμερα: 2 · 00:02')).toBeInTheDocument();
     unmount();
     render(<CycleNumberSelect {...props} value="A1" onChange={vi.fn()} />);
     expect(screen.getByText('Πρώτος κύκλος της ημέρας')).toBeInTheDocument();

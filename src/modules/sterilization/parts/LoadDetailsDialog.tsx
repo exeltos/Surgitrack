@@ -1,3 +1,4 @@
+import {shortCycleNumber} from '../../../core/cycleNumber';
 import {Activity} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import {loadLabel} from '../../../core/loadLabel';
@@ -26,7 +27,7 @@ export default function LoadDetailsDialog({
         <header>
           <div>
             <h3>
-              {trData(load.equipment)} · {tr('Κύκλος')} {load.cycleNumber}
+              {trData(load.equipment)} · {tr('Κύκλος')} {shortCycleNumber(load.cycleNumber)}
             </h3>
             <p>
               {load.program} · {tr('Φορτώθηκε {0} από {1}', load.createdAt, trData(load.createdByName))} ·{' '}
