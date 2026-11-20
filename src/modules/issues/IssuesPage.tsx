@@ -154,7 +154,7 @@ export default function IssuesPage() {
         className={tab === 'REPORTS' ? 'active' : ''}
         onClick={() => setParams({})}
       >
-        <ClipboardList size={16} /> {tr('Αναφορές')} <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
+        <ClipboardList size={16} /> {tr('Προβλήματα')} <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
       </button>
       <button
         role="tab"
@@ -182,7 +182,7 @@ export default function IssuesPage() {
         title={tr('Εκκρεμότητες')}
         description={
           role === 'DEPARTMENT'
-            ? tr('Αναφορές και εκκρεμότητες του τμήματος {0}.', trData(currentUser.department))
+            ? tr('Προβλήματα και εκκρεμότητες του τμήματος {0}.', trData(currentUser.department))
             : tr('Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.')
         }
       />

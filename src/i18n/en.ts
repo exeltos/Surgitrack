@@ -151,7 +151,7 @@ export const en: Record<string, string> = {
   'Demo Χρήστης Χειρουργείου': 'Demo Operating Theatre User',
   'Περιεχόμενο φορτίου': 'Load contents',
   'Έλεγχος ποιότητας · Αποδέσμευση': 'Quality gate · release',
-  'Service & βλάβες': 'Service & Damage',
+  'Ιστορικό βλαβών & απωλειών': 'Damage & loss history',
   'Σετ προορισμού': 'Destination set',
   Stock: 'Stock',
   Απόθεμα: 'Stock',
@@ -354,9 +354,9 @@ export const en: Record<string, string> = {
   'Αναφορά απόκλισης': 'Report deviation',
   'Αναφορά συστήματος': 'System report',
   Αναφορές: 'Reports',
-  'Αναφορές και εκκρεμότητες του τμήματος {0}.': 'Reports and issues of department {0}.',
+  'Προβλήματα και εκκρεμότητες του τμήματος {0}.': 'Problems and issues of department {0}.',
   Ανοικτές: 'Open',
-  'Ανοικτές αναφορές': 'Open reports',
+  'Ανοιχτά προβλήματα': 'Open problems',
   'Ανοικτές εκκρεμότητες': 'Open issues',
   Ανοικτή: 'Open',
   'Ανοικτή αναφορά': 'Open report',
@@ -454,7 +454,8 @@ export const en: Record<string, string> = {
   'Αφαίρεση εργαλείου από Set': 'Instrument removed from set',
   'Αφαίρεση φωτογραφίας': 'Remove photo',
   'Βιολογικός δείκτης': 'Biological indicator',
-  'Βλάβες, φθορές, απώλειες και εκκρεμότητες.': 'Damage, wear, losses and issues.',
+  'Όλες οι βλάβες, φθορές και απώλειες, ανοιχτές και κλειστές, για εκτύπωση.':
+    'All damage, wear and losses, open and closed, for printing.',
   Βλάβη: 'Damage',
   'Βλάβη / Service': 'Damage / Service',
   'Βλάβη / μη λειτουργικό': 'Damaged / not working',
@@ -1726,7 +1727,8 @@ export const en: Record<string, string> = {
   'Παραλήφθηκε {0} · Νέα εργαλεία στο Απόθεμα: {1}': 'Received {0} · New instruments in Stock: {1}',
   'Παραλήφθηκε {0}': 'Received {0}',
   'Η παραγγελία {0} παραλήφθηκε: {1} νέα εργαλεία στο Απόθεμα.': 'Order {0} received: {1} new instruments in Stock.',
-  'Αναφορές προβλημάτων': 'Problem reports',
+  Προβλήματα: 'Problems',
+  Δήλωσε: 'Reported by',
   'Αντικαταστάσεις & Παραγγελίες': 'Replacements & orders',
   'Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.':
     'Reported problems and instruments that need replacing.',
@@ -2440,7 +2442,8 @@ export const en: Record<string, string> = {
   Εξοπλισμός: 'Equipment',
   'Για απογραφή και έλεγχο: τι υπάρχει και πού βρίσκεται.':
     'For stocktaking and checks: what there is and where it is.',
-  'Για να δεις ποιες βλάβες και απώλειες εκκρεμούν.': 'To see which faults and losses are pending.',
+  'Για αρχείο και έλεγχο: τι χάλασε, πότε, ποιος το δήλωσε και πώς έκλεισε. Ό,τι εκκρεμεί διαχειρίζεται στις Εκκρεμότητες.':
+    'For the record and audits: what broke, when, who reported it and how it was closed. What is pending is handled in Issues.',
   'Για να προλάβεις εργαλεία που φτάνουν στο όριο χρήσεων.': 'To catch instruments approaching their use limit.',
   'Για τεκμηρίωση κύκλων και αποδεσμεύσεων σε έλεγχο.': 'To document cycles and releases for an audit.',
   'Για να ξανα-αποστειρώσεις πριν λήξει ό,τι είναι στα ράφια.':

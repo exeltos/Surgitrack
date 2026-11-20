@@ -327,7 +327,7 @@ export default function ToolDetailPage() {
               <section className="asset-section asset-detail-full-panel">
                 <div className="asset-section-head">
                   <div>
-                    <h2>{tr('Ανοικτές αναφορές')}</h2>
+                    <h2>{tr('Ανοιχτά προβλήματα')}</h2>
                   </div>
                 </div>
                 <div className="asset-detail-scroll asset-issue-list">

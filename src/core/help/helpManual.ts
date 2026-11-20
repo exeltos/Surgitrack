@@ -657,12 +657,12 @@ export const helpManual: ManualSection[] = [
       },
       {
         el: [
-          'Δύο καρτέλες',
-          'Η Αποστείρωση και ο Διαχειριστής βλέπουν δύο καρτέλες: «Αναφορές προβλημάτων» (ό,τι αναφέρθηκε) και «Αντικαταστάσεις & Παραγγελίες» (τα εργαλεία που πρέπει να αντικατασταθούν, από το Απόθεμα ή με παραγγελία αγοράς). Σε κινητό γράφονται «Αναφορές» και «Αντικαταστάσεις».',
+          'Τρεις καρτέλες',
+          'Η Αποστείρωση και ο Διαχειριστής βλέπουν τρεις καρτέλες: «Προβλήματα» (ό,τι δήλωσαν οι χρήστες, για να ελεγχθεί και να κλείσει), «Αντικαταστάσεις» (τα εργαλεία που πρέπει να αντικατασταθούν, από το Απόθεμα ή άλλο Σετ) και «Παραγγελίες» (οι παραγγελίες αγοράς). Το αρχείο όλων των βλαβών για εκτύπωση είναι στις Αναφορές › «Ιστορικό βλαβών & απωλειών».',
         ],
         en: [
-          'Two tabs',
-          'Sterilization and the Administrator see two tabs: "Problem reports" (what was reported) and "Replacements & orders" (the instruments to replace, from Stock or with a purchase order). On a phone they read "Reports" and "Replacements".',
+          'Three tabs',
+          'Sterilization and the Administrator see three tabs: "Problems" (what users reported, to be checked and closed), "Replacements" (the instruments to replace, from Stock or another Set) and "Orders" (purchase orders). The printable record of all damage is in Reports › "Damage & loss history".',
         ],
       },
       {
@@ -1173,7 +1173,7 @@ export const helpManual: ManualSection[] = [
       {
         el: [
           'Διαθέσιμες αναφορές',
-          'Απογραφή εξοπλισμού (ανά τμήμα ή ανά ειδικότητα), Service & βλάβες, Χρήσεις & αποσύρσεις, Φορτία κλιβάνου, Λήξεις αποστείρωσης και Παραδόσεις & παραλαβές. Η σύνθεση ενός Σετ τυπώνεται από την καρτέλα του Σετ και η ιχνηλασιμότητα ασθενούς βρίσκεται στην «Ιχνηλάτηση».',
+          'Απογραφή εξοπλισμού (ανά τμήμα ή ανά ειδικότητα), Ιστορικό βλαβών & απωλειών, Χρήσεις & αποσύρσεις, Φορτία κλιβάνου, Λήξεις αποστείρωσης και Παραδόσεις & παραλαβές. Η σύνθεση ενός Σετ τυπώνεται από την καρτέλα του Σετ και η ιχνηλασιμότητα ασθενούς βρίσκεται στην «Ιχνηλάτηση».',
         ],
         en: [
           'Available reports',

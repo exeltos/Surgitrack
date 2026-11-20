@@ -47,7 +47,7 @@ export default function PrepToolManageModal({s}: {s: SterilizationPageState}) {
             )}
             {issues.filter(i => i.status === 'OPEN' && i.asset.startsWith(prepManageTool.barcode)).length > 0 && (
               <div className="prep-manage-open-issues">
-                <strong>{tr('Ανοικτές αναφορές')}</strong>
+                <strong>{tr('Ανοιχτά προβλήματα')}</strong>
                 {issues
                   .filter(i => i.status === 'OPEN' && i.asset.startsWith(prepManageTool.barcode))
                   .map(i => (
