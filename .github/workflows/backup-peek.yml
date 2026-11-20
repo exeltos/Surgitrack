@@ -1,0 +1,46 @@
+name: Backup peek (temporary)
+
+# Temporary, deleted after use: opens the backup of 2026-11-20 (taken before the edits of that morning) and prints
+# only the rows of four instruments, so their earlier name and code can be seen. Nothing else is printed.
+
+on:
+  push:
+    branches: [claude/backup-peek]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  peek:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Download the backup of 2026-11-20
+        uses: actions/download-artifact@v4
+        with:
+          name: surgitrack-backup-2026-11-20
+          run-id: 44704534743
+          github-token: ${{ github.token }}
+
+      - name: The four instruments as they were
+        run: |
+          gpg --batch --quiet --passphrase-fd 0 --decrypt backup-2026-11-20.dump.gpg > backup.dump <<< "$BACKUP_PASSPHRASE"
+          /usr/lib/postgresql/17/bin/pg_restore --data-only --table=instruments -f - backup.dump > instruments.sql
+          head -c 0 instruments.sql
+          echo "Columns:"
+          grep -m1 '^COPY public.instruments' instruments.sql
+          echo "Rows:"
+          grep -P '\t(T007727|T007728|T007730|T007750)\t' instruments.sql || echo "none found"
+          rm -f backup.dump instruments.sql
