@@ -6,6 +6,7 @@ import {useHasModule} from '../../data/cloud/modulesContext';
 import {tr, trData} from '../../i18n';
 import type {Issue, Tool} from '../../types/domain';
 import ReplaceToolModal from './ReplaceToolModal';
+import {inActiveProcess} from '../../core/replacements';
 
 type Ask = (ask: {
   title: string;
@@ -39,6 +40,8 @@ export default function IssueActions({
   const withReplacements = useHasModule('REPLACEMENTS');
   const [replacing, setReplacing] = useState(false);
   if (issue.status !== 'OPEN' || !can('asset.composition.manage')) return null;
+  // The instrument itself in washing, sterilization or on its way waits too, whatever page the report is on.
+  const replaceLocked = locked || (!!replaceable && inActiveProcess(replaceable));
   return (
     <div className="asset-issue-actions">
       <AppButton
@@ -72,8 +75,10 @@ export default function IssueActions({
           size="sm"
           icon={<ShoppingCart size={14} />}
           onClick={() => setReplacing(true)}
-          disabled={locked}
-          title={locked ? tr('Η αντικατάσταση περιμένει το τέλος της ενεργής διαδικασίας αποστείρωσης.') : undefined}
+          disabled={replaceLocked}
+          title={
+            replaceLocked ? tr('Η αντικατάσταση περιμένει το τέλος της ενεργής διαδικασίας αποστείρωσης.') : undefined
+          }
         >
           {tr('Αντικατάσταση')}
         </AppButton>

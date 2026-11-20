@@ -29,6 +29,12 @@ export type ReplacementItem = {
   status: 'NEEDED' | 'IN_ORDER' | 'REPLACED';
 };
 
+/** An instrument that may change place: not in washing, sterilization or on its way (as on its own page). */
+export const isMovable = (item: Pick<Tool, 'state'>) => item.state === 'IN_DEPARTMENT' || item.state === 'IN_STOCK';
+/** In washing, sterilization or on its way: nothing about it changes until the process ends. */
+export const inActiveProcess = (item: Pick<Tool, 'state'>) =>
+  !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST', 'RETIRED'].includes(item.state);
+
 /** What makes two instruments the same kind: the catalogue code, else the written name. */
 export const kindKey = (tool: Pick<Tool, 'code' | 'name'>) => {
   const code = (tool.code || '').trim().toUpperCase();

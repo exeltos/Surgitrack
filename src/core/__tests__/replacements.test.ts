@@ -133,3 +133,15 @@ describe('ordering from anywhere', () => {
     expect(toolKinds([tool('1'), tool('2'), tool('3', {code: 'X', name: 'ΑΛΛΟ'})]).map(t => t.id)).toEqual(['3', '1']);
   });
 });
+
+describe('what may change place in a replacement', () => {
+  it('only an instrument in a department or in Stock is taken; one in a process is neither taken nor replaced', async () => {
+    const {inActiveProcess, isMovable} = await import('../replacements');
+    expect(isMovable({state: 'IN_STOCK'})).toBe(true);
+    expect(isMovable({state: 'IN_DEPARTMENT'})).toBe(true);
+    expect(isMovable({state: 'IN_STERILIZATION'})).toBe(false);
+    expect(isMovable({state: 'IN_WASHING'})).toBe(false);
+    expect(inActiveProcess({state: 'IN_STERILIZATION'})).toBe(true);
+    expect(inActiveProcess({state: 'SERVICE'})).toBe(false);
+  });
+});

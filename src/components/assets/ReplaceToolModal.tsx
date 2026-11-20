@@ -1,9 +1,9 @@
-import {useMemo, useState, type ReactNode} from 'react';
+import {useMemo, useRef, useState, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
 import {Layers3, PackageOpen, Search, ShoppingCart, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
-import {kindKey} from '../../core/replacements';
+import {inActiveProcess, isMovable, kindKey} from '../../core/replacements';
 import {tr, trData} from '../../i18n';
 import {useSetColorQuestion} from './useSetColorQuestion';
 import type {Tool} from '../../types/domain';
@@ -18,12 +18,16 @@ type Source = 'STOCK' | 'SET' | 'STANDALONE';
 export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: () => void}) {
   const {tools, sets, replaceFromStock, replaceToolInSet, applyColorPlan} = useSurgi();
   const colorQuestion = useSetColorQuestion();
+  // The instruments as they are when the step is confirmed (after the color question), not when it was opened.
+  const latest = useRef(tools);
+  latest.current = tools;
   const target = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
   const kind = kindKey(tool);
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
-  // Where each usable instrument is now; one in Service, lost or out of use replaces nothing.
+  // Where each usable instrument is now; one in Service, lost, out of use or in an active process (washing,
+  // sterilization, on its way) replaces nothing.
   const sourceOf = (t: Tool): Source | undefined =>
-    t.id === tool.id || t.state === 'SERVICE' || t.state === 'LOST' || t.state === 'RETIRED'
+    t.id === tool.id || !isMovable(t)
       ? undefined
       : t.mode === 'STOCK'
         ? 'STOCK'
@@ -55,10 +59,15 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
   const choice = tools.find(t => t.id === picked);
   const from = choice?.setId ? setsById.get(choice.setId) : undefined;
 
+  // The instrument replaced and its Set must be out of any active process too.
+  const open = !!target && !inActiveProcess(tool) && !inActiveProcess(target);
   const confirm = async () => {
-    if (!target || !choice) return;
+    if (!target || !choice || !open) return;
     const plan = await colorQuestion.ask([choice.id], target.id);
     if (!plan) return;
+    // Checked again: the donor may have gone into a process while the question was open.
+    const now = latest.current.find(t => t.id === choice.id);
+    if (!now || !sourceOf(now)) return;
     if (sourceOf(choice) === 'STOCK') replaceFromStock([{toolId: tool.id, stockToolId: choice.id, setId: target.id}]);
     else replaceToolInSet(target.id, tool.id, choice.id, 'SERVICE');
     applyColorPlan(plan, target.barcode);
@@ -120,7 +129,7 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
                     type="radio"
                     name="replacement"
                     checked={picked === t.id}
-                    disabled={!target}
+                    disabled={!open}
                     onChange={() => setPicked(t.id)}
                   />
                   <span className="mono">{t.barcode}</span>
@@ -160,7 +169,7 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
             </Link>
           )}
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
-          <AppButton variant="primary" disabled={!target || !choice} onClick={confirm}>
+          <AppButton variant="primary" disabled={!open || !choice} onClick={confirm}>
             {tr('Αντικατάσταση')}
           </AppButton>
         </footer>
