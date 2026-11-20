@@ -103,6 +103,8 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
     setCounts,
     setDeliveries,
     setIssues,
+    /** Puts reports back as they were (from the recycle bin), without naming the current user as their writer. */
+    setIssuesAsIs: setStoredIssues,
     setMovements,
     setPreparations,
     setProcessLoads,

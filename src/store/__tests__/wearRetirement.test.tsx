@@ -31,3 +31,22 @@ describe('an instrument counted until wear, reported worn', () => {
     expect(result.current.issues.some(i => i.status === 'OPEN' && i.asset.startsWith(tool.barcode))).toBe(false);
   });
 });
+
+describe('a deleted report put back from the bin', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+  });
+
+  it('comes back as it was, without naming the admin as its writer', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const old = result.current.issues.find(i => !i.reportedBy)!;
+    act(() => result.current.deleteIssue(old.id, 'Διπλή'));
+    const entry = result.current.recycleBin.find(e => e.kind === 'ISSUE')!;
+    act(() => {
+      result.current.restoreFromBin(entry.id);
+    });
+    expect(result.current.issues.find(i => i.id === old.id)?.reportedBy).toBeUndefined();
+  });
+});

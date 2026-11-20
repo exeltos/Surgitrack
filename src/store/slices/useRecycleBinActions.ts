@@ -10,7 +10,8 @@ import type {useSurgiHelpers} from './useSurgiHelpers';
 export function useRecycleBinActions(
   p: ReturnType<typeof useSurgiSession> & ReturnType<typeof useSurgiRecords> & ReturnType<typeof useSurgiHelpers>,
 ) {
-  const {addMovement, currentUser, notify, recycleBin, setIssues, setRecycleBin, setSets, setTools, sets, tools} = p;
+  const {addMovement, currentUser, notify, recycleBin, setIssuesAsIs, setRecycleBin, setSets, setTools, sets, tools} =
+    p;
 
   // Deletions made in the Studio libraries (a store above this one) arrive here.
   useEffect(
@@ -27,7 +28,7 @@ export function useRecycleBinActions(
     // A deleted report comes back as it was (unless it is back already).
     if (entry?.kind === 'ISSUE' && entry.payload.issue) {
       const issue = entry.payload.issue;
-      setIssues(x => (x.some(i => i.id === issue.id) ? x : [issue, ...x]));
+      setIssuesAsIs(x => (x.some(i => i.id === issue.id) ? x : [issue, ...x]));
       setRecycleBin(x => x.filter(e => e.id !== id));
       notify(tr('Έγινε επαναφορά: {0}.', entry.label));
       return true;
