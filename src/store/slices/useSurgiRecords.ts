@@ -34,7 +34,17 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
     );
   });
   const [movements, setMovements] = useState(initialData.movements);
-  const [issues, setIssues] = useState(initialData.issues);
+  const [issues, setStoredIssues] = useState(initialData.issues);
+  // Every new report carries who wrote it (the issue is saved as is, so the name goes to the cloud with it). The
+  // reports that come from other devices keep theirs (they are merged with setStoredIssues).
+  const reporter = p.currentUser.name;
+  const setIssues: typeof setStoredIssues = update =>
+    setStoredIssues(list => {
+      const next = typeof update === 'function' ? update(list) : update;
+      if (!reporter || next === list) return next;
+      const known = new Set(list.map(i => i.id));
+      return next.map(i => (known.has(i.id) || i.reportedBy ? i : {...i, reportedBy: reporter}));
+    });
   const [counts, setCounts] = useState<SurgicalCount[]>(initialData.counts || []);
   const [receipts, setReceipts] = useState<ReceiptRecord[]>(initialData.receipts || []);
   const [preparations, setPreparations] = useState<PreparationRecord[]>(initialData.preparations || []);
@@ -61,7 +71,7 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
   useAppRecordSync(cloudOrganizationId, 'sets', sets, merged(setSets));
   useAppRecordSync(cloudOrganizationId, 'tools', tools, merged(setTools));
   useAppRecordSync(cloudOrganizationId, 'movements', movements, merged(setMovements));
-  useAppRecordSync(cloudOrganizationId, 'issues', issues, merged(setIssues));
+  useAppRecordSync(cloudOrganizationId, 'issues', issues, merged(setStoredIssues));
   useAppRecordSync(cloudOrganizationId, 'counts', counts, merged(setCounts));
   useAppRecordSync(cloudOrganizationId, 'receipts', receipts, merged(setReceipts));
   useAppRecordSync(cloudOrganizationId, 'preparations', preparations, merged(setPreparations));
@@ -93,6 +103,8 @@ export function useSurgiRecords(p: ReturnType<typeof useSurgiSession>) {
     setCounts,
     setDeliveries,
     setIssues,
+    /** Puts reports back as they were (from the recycle bin), without naming the current user as their writer. */
+    setIssuesAsIs: setStoredIssues,
     setMovements,
     setPreparations,
     setProcessLoads,

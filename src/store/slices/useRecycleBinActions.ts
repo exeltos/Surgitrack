@@ -10,7 +10,8 @@ import type {useSurgiHelpers} from './useSurgiHelpers';
 export function useRecycleBinActions(
   p: ReturnType<typeof useSurgiSession> & ReturnType<typeof useSurgiRecords> & ReturnType<typeof useSurgiHelpers>,
 ) {
-  const {addMovement, currentUser, notify, recycleBin, setRecycleBin, setSets, setTools, sets, tools} = p;
+  const {addMovement, currentUser, notify, recycleBin, setIssuesAsIs, setRecycleBin, setSets, setTools, sets, tools} =
+    p;
 
   // Deletions made in the Studio libraries (a store above this one) arrive here.
   useEffect(
@@ -24,6 +25,14 @@ export function useRecycleBinActions(
   /** Undoes a deletion: the Set or instrument comes back as it was, and leaves the bin. Returns false when it cannot. */
   const restoreFromBin = (id: string) => {
     const entry = recycleBin.find(e => e.id === id);
+    // A deleted report comes back as it was (unless it is back already).
+    if (entry?.kind === 'ISSUE' && entry.payload.issue) {
+      const issue = entry.payload.issue;
+      setIssuesAsIs(x => (x.some(i => i.id === issue.id) ? x : [issue, ...x]));
+      setRecycleBin(x => x.filter(e => e.id !== id));
+      notify(tr('Έγινε επαναφορά: {0}.', entry.label));
+      return true;
+    }
     // Libraries and devices are put back by the bin page, which can reach them.
     if (!entry || (entry.kind !== 'SET' && entry.kind !== 'TOOL')) return false;
     const plan = planRestore(entry, {sets, tools});

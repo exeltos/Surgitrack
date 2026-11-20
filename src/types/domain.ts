@@ -148,6 +148,8 @@ export interface Issue {
   department: string;
   note: string;
   photos?: AssetPhoto[];
+  /** Who wrote the report (older reports have none). */
+  reportedBy?: string;
 }
 export type ReceiptCheckResult = 'OK' | 'MISSING' | 'DAMAGE' | 'OTHER';
 export type ReceiptItemCheckStatus = 'OK' | 'PROBLEM';
@@ -414,7 +416,7 @@ export interface PurchaseOrder {
   receivedBarcodes?: string[];
 }
 
-export type BinKind = 'SET' | 'TOOL' | 'LIBRARY' | 'COLOR_TAPE' | 'DEVICE';
+export type BinKind = 'SET' | 'TOOL' | 'LIBRARY' | 'COLOR_TAPE' | 'DEVICE' | 'ISSUE';
 /** What a deletion keeps so it can be undone: the Set or instrument as it was, and the instruments with it. */
 export interface BinPayload {
   set?: SetAsset;
@@ -426,6 +428,8 @@ export interface BinPayload {
   parentSetId?: string;
   /** A Studio library record (department, specialty, manufacturer…) and the library it came from. */
   library?: {key: string; item: Record<string, unknown>};
+  /** A problem report deleted by the hospital admin (a duplicate or a mistake). */
+  issue?: Issue;
   /** A hospital colour tape. */
   colorTape?: Record<string, unknown>;
   /** A connected device with its newest readings (`readingsTotal` counts every reading it had). */

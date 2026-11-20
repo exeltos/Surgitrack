@@ -2024,3 +2024,173 @@ html body .department-home .dash-most-used > .dept-cols {
   color: var(--c-cyan-30-6, inherit);
   font-weight: 600;
 }
+/* «Εκκρεμότητες»: the records in the middle with the whole height; the instruments out of order in a narrow
+   column on the right, one line each (a low row above the records on a narrow screen). */
+.issues-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 16px;
+}
+.issues-layout.solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.issues-main {
+  min-width: 0;
+}
+.issues-layout > .problem-aside {
+  align-self: start;
+}
+.problem-aside {
+  /* Level with the list (below the tabs), not with the tabs. */
+  margin-top: 52px;
+  padding: 12px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+}
+.problem-aside h2 {
+  margin: 0 0 8px;
+  color: var(--c-gray-15);
+  font-size: 13px;
+  font-weight: 600;
+}
+.problem-kpis {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.problem-kpi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-left: 3px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.problem-kpi span {
+  color: var(--c-gray-15);
+  font-size: 13px;
+}
+.problem-kpi b {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.problem-kpi:hover,
+.problem-kpi.active {
+  background: var(--c-gray-95);
+}
+.problem-kpi.active span {
+  font-weight: 600;
+}
+.problem-kpi.damaged {
+  border-left-color: var(--c-red-40);
+}
+.problem-kpi.service {
+  border-left-color: var(--c-amber-50);
+}
+.problem-kpi.lost {
+  border-left-color: var(--c-red-30);
+}
+.problem-kpi.retired {
+  border-left-color: var(--c-gray-65);
+}
+.problem-kpi.low {
+  border-left-color: var(--c-amber-35);
+}
+/* On a narrow screen (a tablet) the column would leave no room for the records: one low row of chips above them. */
+@media (max-width: 1099px) {
+  .issues-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 10px;
+  }
+  .issues-layout.solo {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .problem-aside {
+    order: -1;
+    margin-top: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .problem-aside h2 {
+    margin: 0;
+    color: var(--c-gray-45);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .problem-kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .problem-kpi {
+    gap: 6px;
+    width: auto;
+    padding: 4px 10px;
+    border: 1px solid var(--c-gray-90);
+    border-left-width: 3px;
+    border-radius: 999px;
+    background: var(--c-white);
+  }
+  .problem-kpi span {
+    font-size: 12.5px;
+  }
+  .problem-kpi b {
+    font-size: 13px;
+  }
+}
+
+/* Beside the column of «Εκκρεμότητες», the instruments to replace have less room than the window: their compact
+   columns (actions as icons, the main one kept) up to a wide screen. */
+@media (min-width: 1100px) and (max-width: 1699px) {
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-set {
+    width: 16%;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-reason {
+    width: 100px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-stock {
+    width: 92px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed th.col-status {
+    width: 130px;
+  }
+  /* The state in full, on two lines, instead of cut. */
+  html body .issues-layout:not(.solo) .replacements-fixed .replacement-status {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed {
+    --w-replace: 34px;
+    --w-other: 34px;
+  }
+  html body .issues-layout:not(.solo) .replacements-fixed .replacement-actions > button {
+    padding: 0;
+  }
+  html body .issues-layout:not(.solo) .replacements-table .row-actions button .btn-label {
+    display: none;
+  }
+}

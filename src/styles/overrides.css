@@ -2583,7 +2583,7 @@ html body .replacements > section {
   flex-direction: column;
 }
 html body .replacements-fixed th.col-status {
-  width: 215px;
+  width: 190px;
 }
 html body .replacements-fixed .replacement-status {
   display: inline-block;
@@ -3099,9 +3099,9 @@ html body .trace-recent button {
   font-size: 12.5px;
   cursor: pointer;
 }
-/* Issues: room for the three worded actions. */
+/* Issues: room for «Επίλυση» and the icon actions beside it (order, open, delete), and no more. */
 html body .issues-fixed th.col-actions {
-  width: 290px;
+  width: 250px;
 }
 /* Sets list: the name keeps its width next to the new expiry column. */
 html body .sets-registry th:nth-child(3) {

@@ -290,7 +290,12 @@ describe('Sterilizers & Devices, one screen', () => {
       }),
     );
     fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
-    expect(within(await rowOf('ΚΛΙΒΑΝΟΣ 2')).getByText('Απέτυχε')).toBeInTheDocument();
+    // The row says which test failed: Bowie-Dick, marked failed.
+    const failed = within(await rowOf('ΚΛΙΒΑΝΟΣ 2'))
+      .getByText('Bowie-Dick')
+      .closest('li')!;
+    expect(failed).toHaveClass('bad');
+    expect(within(failed).getByText('απέτυχε')).toBeInTheDocument();
   });
 
   it("records the results a connected test device sent among its sterilizer's tests, once each", async () => {
@@ -332,5 +337,39 @@ describe('Sterilizers & Devices, one screen', () => {
     expect(within(card).getByText(/Δοκιμαστής Bowie-Dick/, {selector: 'b'})).toBeInTheDocument();
     expect(within(card).getByText(/Συσκευή: Δοκιμαστής Bowie-Dick/)).toBeInTheDocument();
     expect(lib.updateEquipment).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Sterilizers & Devices › «Δοκιμές»', () => {
+  it('lists every test of the sterilizers and washers, newest first, and filters them by result', async () => {
+    const test = (id: string, kind: string, result: string, at: string) => ({id, kind, result, at, by: 'Μαρία'});
+    lib.sterilizers = [
+      {
+        id: 'st1',
+        el: 'ΚΛΙΒΑΝΟΣ Α',
+        en: 'A',
+        tests: [test('t1', 'BOWIE_DICK', 'PASS', '18/11/2026 06:40'), test('t2', 'LEAK', 'FAIL', '19/11/2026 06:20')],
+      },
+    ] as never;
+    lib.washers = [
+      {id: 'w1', el: 'ΠΛΥΝΤΗΡΙΟ 1', en: 'W', tests: [test('t3', 'CLEANING', 'PASS', '17/11/2026 06:15')]},
+    ] as never;
+    open();
+    fireEvent.click(await screen.findByRole('tab', {name: /Δοκιμές/}));
+    // Only the tab open is marked: «Κλίβανοι» is not, while the tests show.
+    expect(screen.getByRole('tab', {name: /Κλίβανοι/})).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('tab', {name: /Δοκιμές/})).toHaveAttribute('aria-selected', 'true');
+    const table = screen.getByRole('table');
+    const rows = within(table).getAllByRole('row').slice(1);
+    expect(rows.map(r => (r as HTMLTableRowElement).cells[0].textContent)).toEqual([
+      '19/11/2026 06:20',
+      '18/11/2026 06:40',
+      '17/11/2026 06:15',
+    ]);
+    fireEvent.change(screen.getByLabelText('Αποτέλεσμα'), {target: {value: 'FAIL'}});
+    const failed = within(screen.getByRole('table')).getAllByRole('row').slice(1);
+    expect(failed).toHaveLength(1);
+    expect(failed[0]).toHaveTextContent('ΚΛΙΒΑΝΟΣ Α');
+    expect(failed[0]).toHaveTextContent('Αποτυχία');
   });
 });

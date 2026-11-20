@@ -381,6 +381,10 @@ export type SurgiStoreValue = {
   ) => void;
   reportIssue: (toolId: string, type: string, note: string, source?: string, photos?: AssetPhoto[]) => void;
   resolveIssues: (issueIds: string[], resolutionNote?: string) => void;
+  /** Hospital admin only: a report written by mistake or twice goes to the recycle bin, with why. */
+  deleteIssue: (issueId: string, reason: string) => void;
+  /** An instrument counted until wear, checked after a wear report and taken out of use, with why. */
+  retireForWear: (toolId: string, note: string) => void;
   addAssetPhotos: (kind: AssetKind, id: string, photos: AssetPhoto[]) => void;
   removeAssetPhoto: (kind: AssetKind, id: string, photoId: string) => void;
   nextBarcode: (kind: AssetKind) => string;

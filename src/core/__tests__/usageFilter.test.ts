@@ -10,6 +10,14 @@ describe('usage filter', () => {
     expect(matchesUsage('LIMITED', [limited], 3)).toBe(true);
     expect(matchesUsage('LIMITED', [free], 3)).toBe(false);
   });
+  it('finds the instruments whose uses are only counted, until they wear out', () => {
+    const counted = {uses: 12, wearCheck: true};
+    expect(matchesUsage('COUNTED', [counted], 3)).toBe(true);
+    expect(matchesUsage('COUNTED', [free], 3)).toBe(false);
+    expect(matchesUsage('COUNTED', [limited], 3)).toBe(false);
+    // A Set with such an instrument inside.
+    expect(matchesUsage('COUNTED', [{}, counted], 3)).toBe(true);
+  });
   it('finds few lives left', () => {
     expect(matchesUsage('LOW', [low], 3)).toBe(true);
     expect(matchesUsage('LOW', [limited], 3)).toBe(false);

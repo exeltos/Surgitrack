@@ -234,6 +234,7 @@ export default function AssetManageModal({
                   <strong>{trData(report.type)}</strong>
                   <small>
                     {report.note} · {trData(report.department)} · {report.created}
+                    {report.reportedBy ? ` · ${report.reportedBy}` : ''}
                   </small>
                 </span>
               </label>

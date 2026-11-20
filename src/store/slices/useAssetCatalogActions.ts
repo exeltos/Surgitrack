@@ -35,6 +35,7 @@ export function useAssetCatalogActions(
     sets,
     tools,
     setMovements,
+    role,
   } = p;
 
   /**
@@ -225,6 +226,9 @@ export function useAssetCatalogActions(
     const outgoingTargetSet = outgoingDestination === 'SET' ? sets.find(s => s.id === outgoingSetId) : undefined;
     if (outgoingDestination === 'SET' && !outgoingTargetSet) return;
     if (replacementSourceSetId === target.id) return;
+    // Nothing comes from, or goes into, a Set in washing or sterilization (the Set being prepared is in neither).
+    const busy = (state: string) => state === 'IN_WASHING' || state === 'IN_STERILIZATION';
+    if (busy(replacement.state)) return;
     setTools(list =>
       list.map(tool => {
         if (tool.id === replacement.id)
@@ -232,8 +236,16 @@ export function useAssetCatalogActions(
         if (tool.id !== outgoing.id) return tool;
         if (outgoingDestination === 'STOCK')
           return {...tool, mode: 'STOCK', setId: undefined, department: undefined, state: 'IN_STOCK'};
+        // Its place is filled: the replacements list counts it as replaced, whichever instrument took it.
         if (outgoingDestination === 'SERVICE')
-          return {...tool, mode: 'STANDALONE', setId: undefined, department: 'Service', state: 'SERVICE'};
+          return {
+            ...tool,
+            mode: 'STANDALONE',
+            setId: undefined,
+            department: 'Service',
+            state: 'SERVICE',
+            replacedBy: replacement.barcode,
+          };
         return {
           ...tool,
           mode: 'SET_MEMBER',
@@ -332,6 +344,62 @@ export function useAssetCatalogActions(
     notify(
       issueIds.length === 1 ? tr('Η εκκρεμότητα επιλύθηκε.') : tr('{0} εκκρεμότητες επιλύθηκαν.', issueIds.length),
     );
+  };
+  /**
+   * A report written by mistake or twice: only the hospital admin (and the platform owner, who acts as one) takes it
+   * away, with why. It goes to the recycle bin, from where it can come back.
+   */
+  const deleteIssue = (issueId: string, reason: string) => {
+    const issue = issues.find(i => i.id === issueId);
+    if (role !== 'ADMIN' || !issue || !reason.trim()) return;
+    setIssues(list => list.filter(i => i.id !== issueId));
+    setRecycleBin(x => [
+      {
+        id: `bin-issue-${issue.id}-${uniqueStamp()}`,
+        kind: 'ISSUE',
+        label: `${issue.type} · ${issue.asset}`,
+        detail: `${issue.created}${issue.reportedBy ? ` · ${issue.reportedBy}` : ''} · ${reason.trim()}`,
+        payload: {tools: [], toolsDeleted: false, issue},
+        deletedAt: new Date().toISOString(),
+        deletedByName: currentUser.name,
+      },
+      ...x,
+    ]);
+    notify(tr('Η αναφορά διαγράφηκε· μπορεί να επανέλθει από τον Κάδο.'));
+  };
+  /**
+   * An instrument counted until wear, reported worn and checked by Sterilization: it is taken out of use (out of its
+   * Set, kept in the history with its uses), and its open reports close with the decision. Not while it is in
+   * washing or in a sterilizer.
+   */
+  const retireForWear = (toolId: string, note: string) => {
+    const tool = tools.find(t => t.id === toolId);
+    if (!tool || tool.state === 'RETIRED' || tool.state === 'IN_WASHING' || tool.state === 'IN_STERILIZATION') return;
+    const at = formatStoreDateTime();
+    const set = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
+    const why = `Φθορά μετά από ${tool.uses || 0} χρήσεις${note.trim() ? ` · ${note.trim()}` : ''}`;
+    setTools(list =>
+      list.map(t =>
+        t.id === toolId ? {...t, state: 'RETIRED' as const, retiredAt: at, retiredReason: why, setId: undefined} : t,
+      ),
+    );
+    if (set) setSets(list => list.map(s => (s.id === set.id ? {...s, actual: Math.max(0, s.actual - 1)} : s)));
+    setIssues(list =>
+      list.map(i =>
+        i.status === 'OPEN' && i.asset.split(' ')[0] === tool.barcode
+          ? {...i, status: 'RESOLVED' as const, note: `${i.note} · Επίλυση: Αποσύρθηκε (${why})`}
+          : i,
+      ),
+    );
+    addMovement({
+      asset: `${tool.barcode} · ${tool.name}`,
+      assetKind: 'TOOL',
+      from: set ? `Set ${set.barcode}` : tool.department || 'Απόθεμα',
+      to: 'Εκτός χρήσης',
+      status: `Απόσυρση μετά από έλεγχο φθοράς · ${why}`,
+      by: currentUser.name,
+    });
+    notify(tr('{0}: αποσύρθηκε μετά από έλεγχο φθοράς ({1} χρήσεις).', tool.barcode, tool.uses || 0));
   };
   const addAssetPhotos = (kind: AssetKind, id: string, photos: AssetPhoto[]) => {
     if (!photos.length) return;
@@ -628,5 +696,7 @@ export function useAssetCatalogActions(
     replaceToolInSet,
     reportIssue,
     resolveIssues,
+    deleteIssue,
+    retireForWear,
   };
 }

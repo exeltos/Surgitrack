@@ -212,3 +212,11 @@ export function testsFromDevices(
     });
   return {tests, ids: fresh.map(item => item.id)};
 }
+
+/** When a test was done: its day and time («20/11 06:40»). */
+export function testWhen(at: string) {
+  const date = parseDisplayDate(at);
+  if (!date) return at;
+  const two = (n: number) => String(n).padStart(2, '0');
+  return `${two(date.getDate())}/${two(date.getMonth() + 1)} ${two(date.getHours())}:${two(date.getMinutes())}`;
+}

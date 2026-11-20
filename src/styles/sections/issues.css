@@ -52,7 +52,7 @@ html body .issues-fixed .issue-note-inline {
   /* Row actions in fixed slots, so they line up down the list: «Επίλυση», the order cart, open. */
   html body .issues-fixed .issue-actions-row {
     display: grid;
-    grid-template-columns: auto 32px 32px;
+    grid-template-columns: auto 32px 32px 32px;
     justify-content: end;
     align-items: center;
     gap: 6px;
@@ -67,6 +67,10 @@ html body .issues-fixed .issue-note-inline {
   }
   html body .issues-fixed .issue-actions-row > .slot-open {
     grid-column: 3;
+    grid-row: 1;
+  }
+  html body .issues-fixed .issue-actions-row > .slot-delete {
+    grid-column: 4;
     grid-row: 1;
   }
 }
