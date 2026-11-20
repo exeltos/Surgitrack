@@ -3,6 +3,7 @@ import {tr} from '../../../i18n';
 import {effectiveState} from '../../../core/workflow';
 import {matchesUsage} from '../../../core/usageFilter';
 import {latestDispatches} from '../../../core/electronicDispatch';
+import {undoneIds} from '../../../core/movementUndo';
 import {movementStamp} from '../../../core/movementTime';
 
 /** Entries that change a record but move nothing (details, names, uses, a piece added to a composition). */
@@ -94,8 +95,10 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
     // When it got to where it is: its last entry that moved it (a step, a stage check), not an edit of its details,
     // a correction or an undo.
     const lastAt = new Map<string, number>();
+    // A step undone since does not count either: the item is back where it was waiting.
+    const undone = undoneIds(movements);
     for (const m of movements) {
-      if (m.undoes || EDIT.test(m.status)) continue;
+      if (m.undoes || undone.has(m.id) || EDIT.test(m.status)) continue;
       const barcode = m.asset.split(' · ')[0];
       const at = movementStamp(m.at) || 0;
       if (at > (lastAt.get(barcode) || 0)) lastAt.set(barcode, at);
