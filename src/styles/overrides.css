@@ -3101,7 +3101,7 @@ html body .trace-recent button {
 }
 /* Issues: room for «Επίλυση» and the icon actions beside it (order, open, delete), and no more. */
 html body .issues-fixed th.col-actions {
-  width: 250px;
+  width: 288px;
 }
 /* Sets list: the name keeps its width next to the new expiry column. */
 html body .sets-registry th:nth-child(3) {

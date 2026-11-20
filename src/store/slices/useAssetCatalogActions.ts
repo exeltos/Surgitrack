@@ -367,6 +367,18 @@ export function useAssetCatalogActions(
     ]);
     notify(tr('Η αναφορά διαγράφηκε· μπορεί να επανέλθει από τον Κάδο.'));
   };
+  /** Hospital admin only: corrects the text of a report (a typo in it or in how it was closed); who and when are kept. */
+  const editIssueNote = (issueId: string, note: string) => {
+    if (role !== 'ADMIN' || !note.trim()) return;
+    setIssues(list =>
+      list.map(i =>
+        i.id === issueId && i.note !== note.trim()
+          ? {...i, note: note.trim(), editedBy: currentUser.name, editedAt: formatStoreDateTime()}
+          : i,
+      ),
+    );
+    notify(tr('Η σημείωση διορθώθηκε.'));
+  };
   /**
    * An instrument with a report (wear, damage), checked by Sterilization and not to be used again: it is taken out of use (out of its
    * Set, kept in the history with its uses), and its open reports close with the decision. Not while it is in
@@ -697,6 +709,7 @@ export function useAssetCatalogActions(
     reportIssue,
     resolveIssues,
     deleteIssue,
+    editIssueNote,
     retireForWear,
   };
 }

@@ -1621,6 +1621,10 @@ export const en: Record<string, string> = {
     'It is taken out of use{0}, with its uses ({1}). It stays in the history.',
   ' και από το Σετ του': ' and out of its Set',
   'Όχι όσο είναι σε πλύσιμο ή στον κλίβανο.': 'Not while in washing or in a sterilizer.',
+  'Διόρθωση σημείωσης': 'Correct the note',
+  '«{0}» για {1}. Η διόρθωση καταγράφεται με το όνομά σας.':
+    '«{0}» for {1}. The correction is recorded under your name.',
+  'Η σημείωση διορθώθηκε.': 'Note corrected.',
   'Αντικατάσταση από Απόθεμα ({0})': 'Replace from Stock ({0})',
   Αντικαταστάθηκε: 'Replaced',
   'Αντικαταστάθηκε από {0}': 'Replaced by {0}',

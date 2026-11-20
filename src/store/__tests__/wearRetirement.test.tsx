@@ -50,3 +50,28 @@ describe('a deleted report put back from the bin', () => {
     expect(result.current.issues.find(i => i.id === old.id)?.reportedBy).toBeUndefined();
   });
 });
+
+describe('correcting a report', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+  });
+
+  it('the hospital admin corrects its text, and the correction is signed', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const issue = result.current.issues[0];
+    act(() => result.current.editIssueNote(issue.id, 'Ελέγχθηκε και τέθηκε σε χρήση ξανά.'));
+    const after = result.current.issues.find(i => i.id === issue.id)!;
+    expect(after.note).toBe('Ελέγχθηκε και τέθηκε σε χρήση ξανά.');
+    expect(after.editedBy).toBeTruthy();
+  });
+
+  it('Sterilization staff cannot', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const issue = result.current.issues[0];
+    act(() => result.current.editIssueNote(issue.id, 'Άλλο'));
+    expect(result.current.issues.find(i => i.id === issue.id)!.note).toBe(issue.note);
+  });
+});

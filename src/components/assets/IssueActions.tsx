@@ -1,5 +1,5 @@
 import {useState, type ReactNode} from 'react';
-import {CheckCircle2, ShoppingCart, Trash2, Wrench} from 'lucide-react';
+import {CheckCircle2, Pencil, ShoppingCart, Trash2, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {useHasModule} from '../../data/cloud/modulesContext';
@@ -13,7 +13,7 @@ type Ask = (ask: {
   title: string;
   message: string;
   confirmLabel?: string;
-  note?: {label: string; placeholder?: string; required?: boolean};
+  note?: {label: string; placeholder?: string; initial?: string; required?: boolean};
   onConfirm: (note: string) => void;
 }) => void;
 
@@ -121,5 +121,36 @@ export function DeleteIssueButton({
     <AppButton size="sm" icon={<Trash2 size={14} />} onClick={open}>
       {tr('Διαγραφή')}
     </AppButton>
+  );
+}
+
+/** Corrects the text of a report (a typo in it or in how it was closed): the hospital admin only. */
+export function EditIssueNoteButton({
+  issue,
+  ask,
+  onEdit,
+}: {
+  issue: Issue;
+  ask: Ask;
+  onEdit: (id: string, note: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="issue-action slot-edit"
+      title={tr('Διόρθωση σημείωσης')}
+      aria-label={tr('Διόρθωση σημείωσης')}
+      onClick={() =>
+        ask({
+          title: tr('Διόρθωση σημείωσης'),
+          message: tr('«{0}» για {1}. Η διόρθωση καταγράφεται με το όνομά σας.', trData(issue.type), issue.asset),
+          confirmLabel: tr('Αποθήκευση'),
+          note: {label: tr('Σημείωση'), initial: issue.note, required: true},
+          onConfirm: note => onEdit(issue.id, note),
+        })
+      }
+    >
+      <Pencil size={14} />
+    </button>
   );
 }

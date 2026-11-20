@@ -44,7 +44,7 @@ const issueAge = (created: string) => {
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 import EquipmentProblems from './EquipmentProblems';
-import {DeleteIssueButton} from '../../components/assets/IssueActions';
+import {DeleteIssueButton, EditIssueNoteButton} from '../../components/assets/IssueActions';
 import ResolveIssueDialog from '../../components/assets/ResolveIssueDialog';
 
 export default function IssuesPage() {
@@ -59,6 +59,7 @@ export default function IssuesPage() {
     movements,
     purchaseOrders,
     deleteIssue,
+    editIssueNote,
     createPurchaseOrder,
   } = useSurgi();
   // Only the hospital admin (or the owner acting as one) deletes a report someone wrote.
@@ -392,6 +393,7 @@ export default function IssuesPage() {
                                     <ExternalLink size={14} />
                                   </Link>
                                 )}
+                                {canDelete && <EditIssueNoteButton issue={i} ask={ask} onEdit={editIssueNote} />}
                                 {canDelete && <DeleteIssueButton issue={i} ask={ask} onDelete={deleteIssue} compact />}
                               </div>
                             </td>

@@ -14,8 +14,8 @@ export type QuickFilter = {
 };
 
 /**
- * Small figures above a list, each one a filter: the label and its count on one line, the active one dark. A row
- * about half the height of the old figure cards, so the list keeps its room and the search bar stays clean.
+ * Small figures above a list, each one a filter: the figure, then what it counts, on one line. The chosen one is
+ * underlined like a tab; a figure of nothing stays quiet.
  */
 export default function QuickFilters({items, label}: {items: QuickFilter[]; label?: string}) {
   return (
@@ -25,7 +25,7 @@ export default function QuickFilters({items, label}: {items: QuickFilter[]; labe
           key={item.key || item.label}
           title={item.hint}
           type="button"
-          className={item.active ? 'active' : ''}
+          className={[item.active ? 'active' : '', item.count ? '' : 'zero'].filter(Boolean).join(' ')}
           aria-pressed={item.active}
           onClick={item.onClick}
         >
