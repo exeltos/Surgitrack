@@ -44,7 +44,8 @@ export function usePurchaseActions(
   const replaceFromStock = (pairs: Array<{toolId: string; stockToolId: string; setId: string}>) => {
     const valid = pairs.filter(
       p =>
-        sets.some(s => s.id === p.setId) &&
+        // A Set in washing or sterilization is not changed until it comes out.
+        sets.some(s => s.id === p.setId && s.state !== 'IN_WASHING' && s.state !== 'IN_STERILIZATION') &&
         tools.some(t => t.id === p.stockToolId && t.state === 'IN_STOCK') &&
         tools.some(t => t.id === p.toolId),
     );

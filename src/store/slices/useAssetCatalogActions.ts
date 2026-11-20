@@ -225,6 +225,9 @@ export function useAssetCatalogActions(
     const outgoingTargetSet = outgoingDestination === 'SET' ? sets.find(s => s.id === outgoingSetId) : undefined;
     if (outgoingDestination === 'SET' && !outgoingTargetSet) return;
     if (replacementSourceSetId === target.id) return;
+    // Nothing comes from, or goes into, a Set in washing or sterilization (the Set being prepared is in neither).
+    const busy = (state: string) => state === 'IN_WASHING' || state === 'IN_STERILIZATION';
+    if (busy(replacement.state)) return;
     setTools(list =>
       list.map(tool => {
         if (tool.id === replacement.id)

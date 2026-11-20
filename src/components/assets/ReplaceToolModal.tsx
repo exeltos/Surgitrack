@@ -16,11 +16,13 @@ type Source = 'STOCK' | 'SET' | 'STANDALONE';
  * from, the purchase order is one step away.
  */
 export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: () => void}) {
-  const {tools, sets, replaceFromStock, replaceToolInSet, applyColorPlan} = useSurgi();
+  const store = useSurgi();
+  const {tools, sets} = store;
   const colorQuestion = useSetColorQuestion();
-  // The instruments as they are when the step is confirmed (after the color question), not when it was opened.
-  const latest = useRef(tools);
-  latest.current = tools;
+  // The store as it is when the step is confirmed (after the color question), not when it was opened: another
+  // workstation may have started a process meanwhile.
+  const latest = useRef(store);
+  latest.current = store;
   const target = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
   const kind = kindKey(tool);
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
@@ -65,12 +67,17 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
     if (!target || !choice || !open) return;
     const plan = await colorQuestion.ask([choice.id], target.id);
     if (!plan) return;
-    // Checked again: the donor may have gone into a process while the question was open.
-    const now = latest.current.find(t => t.id === choice.id);
-    if (!now || !sourceOf(now)) return;
-    if (sourceOf(choice) === 'STOCK') replaceFromStock([{toolId: tool.id, stockToolId: choice.id, setId: target.id}]);
-    else replaceToolInSet(target.id, tool.id, choice.id, 'SERVICE');
-    applyColorPlan(plan, target.barcode);
+    // Checked again on the current data: the donor, the instrument replaced and its Set.
+    const now = latest.current;
+    const donor = now.tools.find(t => t.id === choice.id);
+    const outgoing = now.tools.find(t => t.id === tool.id);
+    const set = now.sets.find(s => s.id === target.id);
+    if (!donor || !sourceOf(donor) || !outgoing || !set || outgoing.setId !== set.id) return onClose();
+    if (inActiveProcess(outgoing) || inActiveProcess(set)) return onClose();
+    if (sourceOf(donor) === 'STOCK')
+      now.replaceFromStock([{toolId: outgoing.id, stockToolId: donor.id, setId: set.id}]);
+    else now.replaceToolInSet(set.id, outgoing.id, donor.id, 'SERVICE');
+    now.applyColorPlan(plan, set.barcode);
     onClose();
   };
 
