@@ -4628,7 +4628,6 @@ html
   background: transparent;
   color: inherit;
   font-weight: inherit;
-  opacity: 0.7;
 }
 html
   body
@@ -4851,12 +4850,10 @@ html body .hospital-tabs > button .hospital-count {
   color: inherit;
   font-size: 12px;
   font-weight: 500;
-  opacity: 0.7;
 }
 html body .hospital-tabs > button .hospital-count.attention {
   color: var(--c-orange-40);
   font-weight: 600;
-  opacity: 1;
 }
 /* Settings: its tabs on the page's line, not on a grey strip. */
 html body .studio-tabs {
