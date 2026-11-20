@@ -480,12 +480,12 @@ html body .reports-page-workspace .reports-catalog-item {
 }
 html body .reports-page-workspace .reports-catalog-item:hover {
   background: transparent;
-  color: var(--c-blue-10);
+  color: var(--c-cyan-20-3);
 }
 /* As every other row of tabs: words only, the chosen one near-black with a thin bar turned up at its ends. */
 html body .reports-page-workspace .reports-catalog-item.active {
   background: transparent;
-  color: var(--c-blue-10);
+  color: var(--c-cyan-20-3);
   font-weight: 600;
 }
 html body .reports-page-workspace .reports-catalog-item.active::after {
@@ -495,7 +495,7 @@ html body .reports-page-workspace .reports-catalog-item.active::after {
   bottom: -1px;
   left: 4px;
   height: 5px;
-  border: 2px solid var(--c-blue-35-2);
+  border: 2px solid var(--c-cyan-35);
   border-top: 0;
   border-radius: 0 0 8px 8px;
 }

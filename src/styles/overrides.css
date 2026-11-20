@@ -4600,14 +4600,14 @@ html
   body
   :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
   > :is(button, a):hover {
-  color: var(--c-blue-10);
+  color: var(--c-cyan-20-3);
   background: transparent;
 }
 html
   body
   :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
   > :is(button.active, a.active, [aria-selected='true']) {
-  color: var(--c-blue-10);
+  color: var(--c-cyan-20-3);
   font-weight: 600;
   background: transparent;
 }
@@ -4621,7 +4621,7 @@ html
   bottom: -1px;
   left: 4px;
   height: 5px;
-  border: 2px solid var(--c-blue-35-2);
+  border: 2px solid var(--c-cyan-35);
   border-top: 0;
   border-radius: 0 0 8px 8px;
   background: transparent;
