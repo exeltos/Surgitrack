@@ -1620,7 +1620,8 @@ export const en: Record<string, string> = {
   'Βγαίνει από τη χρήση{0}, με τις χρήσεις του ({1}). Μένει στο ιστορικό.':
     'It is taken out of use{0}, with its uses ({1}). It stays in the history.',
   ' και από το Σετ του': ' and out of its Set',
-  'Όχι όσο είναι σε πλύσιμο ή στον κλίβανο.': 'Not while in washing or in a sterilizer.',
+  'Όχι όσο είναι σε πλύσιμο, συσκευασία, κλίβανο, αναμονή αποδέσμευσης ή καθ’ οδόν.':
+    'Not while in washing, packing, a sterilizer, awaiting release or on its way.',
   'Διόρθωση σημείωσης': 'Correct the note',
   '«{0}» για {1}. Η διόρθωση καταγράφεται με το όνομά σας.':
     '«{0}» for {1}. The correction is recorded under your name.',

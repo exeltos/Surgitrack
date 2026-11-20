@@ -4,6 +4,7 @@ import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {tr, trData} from '../../i18n';
 import type {Issue, Tool} from '../../types/domain';
+import {canRetireNow} from '../../core/replacements';
 
 type Outcome = 'IN_USE' | 'RETIRE';
 
@@ -22,7 +23,7 @@ export default function ResolveIssueDialog({
   onClose: () => void;
 }) {
   const {resolveIssues, retireForWear} = useSurgi();
-  const retirable = !!tool && tool.state !== 'IN_WASHING' && tool.state !== 'IN_STERILIZATION';
+  const retirable = !!tool && canRetireNow(tool);
   const [outcome, setOutcome] = useState<Outcome>('IN_USE');
   const [note, setNote] = useState('');
   const confirm = () => {
@@ -83,7 +84,7 @@ export default function ResolveIssueDialog({
                         tool.setId ? tr(' και από το Σετ του') : '',
                         tool.uses || 0,
                       )
-                    : tr('Όχι όσο είναι σε πλύσιμο ή στον κλίβανο.')}
+                    : tr('Όχι όσο είναι σε πλύσιμο, συσκευασία, κλίβανο, αναμονή αποδέσμευσης ή καθ’ οδόν.')}
                 </small>
               </span>
             </label>

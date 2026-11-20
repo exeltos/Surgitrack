@@ -31,6 +31,13 @@ export type ReplacementItem = {
 
 /** An instrument that may change place: not in washing, sterilization or on its way (as on its own page). */
 export const isMovable = (item: Pick<Tool, 'state'>) => item.state === 'IN_DEPARTMENT' || item.state === 'IN_STOCK';
+/**
+ * When an instrument may be retired after a check: in a department, in Stock, in Service or lost, or in composition
+ * (where Sterilization checks it). Not while washed, packed, in a sterilizer, awaiting release or on its way: a
+ * release or delivery would put it back into use.
+ */
+export const canRetireNow = (item: Pick<Tool, 'state'>) =>
+  ['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST', 'IN_PREPARATION'].includes(item.state);
 /** In washing, sterilization or on its way: nothing about it changes until the process ends. */
 export const inActiveProcess = (item: Pick<Tool, 'state'>) =>
   !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST', 'RETIRED'].includes(item.state);

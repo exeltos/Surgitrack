@@ -2,6 +2,7 @@ import type {AssetKind, AssetPhoto, AssetState, SetAsset, Tool} from '../../type
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
 import type {CreateSetPayload, CreateToolPayload, SurgicalCount} from '../types';
 import {tr} from '../../i18n';
+import {canRetireNow} from '../../core/replacements';
 import {binEntryForSet, binEntryForTool} from '../../core/recycleBin';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -386,7 +387,7 @@ export function useAssetCatalogActions(
    */
   const retireForWear = (toolId: string, note: string) => {
     const tool = tools.find(t => t.id === toolId);
-    if (!tool || tool.state === 'RETIRED' || tool.state === 'IN_WASHING' || tool.state === 'IN_STERILIZATION') return;
+    if (!tool || !canRetireNow(tool)) return;
     const at = formatStoreDateTime();
     const set = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
     const why = `Μετά από έλεγχο στις ${tool.uses || 0} χρήσεις${note.trim() ? ` · ${note.trim()}` : ''}`;

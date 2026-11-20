@@ -75,3 +75,20 @@ describe('correcting a report', () => {
     expect(result.current.issues.find(i => i.id === issue.id)!.note).toBe(issue.note);
   });
 });
+
+describe('retiring during a process', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+  });
+
+  it('is refused while awaiting release, so a release cannot put it back into use', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const busy = result.current.tools.find(t =>
+      ['AWAITING_RELEASE', 'IN_STERILIZATION', 'IN_PACKAGING', 'IN_STORAGE'].includes(t.state),
+    )!;
+    act(() => result.current.retireForWear(busy.id, 'Δεν κόβει'));
+    expect(result.current.tools.find(t => t.id === busy.id)!.state).toBe(busy.state);
+  });
+});
