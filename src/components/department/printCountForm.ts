@@ -100,7 +100,7 @@ export function countFormBody({asset, items, hospital, preparation, release, cou
   .num{width:7%;color:#6a7a84;text-align:right;padding-right:2.5mm}.mono{width:16%;font-family:monospace;font-weight:700}td.name{font-weight:700}th:nth-child(4){width:16%}.chk{width:14%;text-align:center}th.chk{font-size:6pt;letter-spacing:0}
   .box{display:inline-grid;place-items:center;width:4mm;height:4mm;border:.3mm solid #4b5d68;border-radius:.6mm;font-size:8pt;font-weight:800;line-height:1}.box.on{background:#e8f4ee;color:#1a6b3c;border-color:#1a6b3c}
   .sum{margin-top:2mm;font-weight:700}
-  .signs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;margin-top:8mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:.6mm}.signs strong{display:block;font-size:9pt;color:#15232b}
+  .signs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm;margin-top:16mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:.6mm}.signs strong{display:block;font-size:9pt;color:#15232b}
   .footer{margin-top:5mm;padding-top:2mm;border-top:.2mm solid #d7e0e5;display:flex;justify-content:space-between;font-size:7pt;color:#6a7a84}
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}.pg>thead,.pg>tfoot{display:none}}
   @media print{tr{break-inside:avoid}.pg>tbody>tr{break-inside:auto}}

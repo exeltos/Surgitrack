@@ -140,16 +140,41 @@ export async function labelToPdf(html: string, widthMm: number, heightMm: number
       pdf.setFontSize(sizePx * 0.75);
       const spacing = mm(spacingPx);
       const widthOf = (value: string) => pdf.getTextWidth(value) + spacing * value.length;
-      // Text the page cut short with an ellipsis is cut the same way here.
-      if (style.textOverflow === 'ellipsis' && box.width > element.clientWidth + 0.5) {
-        while (text.length > 1 && widthOf(`${text}…`) > mm(element.clientWidth)) text = text.slice(0, -1);
-        text += '…';
-      }
       const options: {charSpace?: number; renderingMode?: 'fillThenStroke'} = spacing ? {charSpace: spacing} : {};
       // The brand name is drawn a little heavier: thin strokes come out pale on a thermal printer.
       if (element.classList.contains('brand')) {
         pdf.setLineWidth(0.12);
         options.renderingMode = 'fillThenStroke';
+      }
+      // Text the page wrapped (a long name on two lines): each line where the browser put it, the lines the box
+      // hides left out, and the last one shown ending in «…» when some were.
+      if (range.getClientRects().length > 1) {
+        const lines: Array<{text: string; left: number; top: number}> = [];
+        const words = /\S+/g;
+        for (let m = words.exec(text); m; m = words.exec(text)) {
+          const word = doc.createRange();
+          word.setStart(node, first + m.index);
+          word.setEnd(node, first + m.index + m[0].length);
+          const at = word.getBoundingClientRect();
+          const line = lines[lines.length - 1];
+          if (line && Math.abs(line.top - at.top) < 1) line.text += ` ${m[0]}`;
+          else lines.push({text: m[0], left: at.left, top: at.top});
+        }
+        const bottom = element.getBoundingClientRect().bottom + 0.5;
+        const shown = lines.filter(line => line.top + sizePx * 0.8 <= bottom);
+        if (shown.length < lines.length && shown.length) {
+          const last = shown[shown.length - 1];
+          while (last.text.length > 1 && widthOf(`${last.text}…`) > mm(element.clientWidth))
+            last.text = last.text.slice(0, -1);
+          last.text = `${last.text.trimEnd()}…`;
+        }
+        for (const line of shown) pdf.text(line.text, mm(line.left), mm(line.top + ASCENT * sizePx), options);
+        continue;
+      }
+      // Text the page cut short with an ellipsis is cut the same way here.
+      if (style.textOverflow === 'ellipsis' && box.width > element.clientWidth + 0.5) {
+        while (text.length > 1 && widthOf(`${text}…`) > mm(element.clientWidth)) text = text.slice(0, -1);
+        text += '…';
       }
       pdf.text(text, mm(box.left), mm(box.top + ASCENT * sizePx), options);
     }

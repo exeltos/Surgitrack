@@ -185,7 +185,7 @@ export default function ReleaseLoadModal({s}: {s: SterilizationPageState}) {
               </button>
               {selectedReleaseLoad.cycleData && (
                 <button className="release-print" onClick={() => s.printCycle(selectedReleaseLoad.id)}>
-                  <Activity size={16} /> {tr('Report κύκλου')}
+                  <Activity size={16} /> {tr('Αναφορά κύκλου')}
                 </button>
               )}
               <button className="release-reprocess" onClick={() => completeLoadRelease('REPROCESS')}>

@@ -79,13 +79,9 @@ export function dailyTestLogHtml(
     });
   }
   const title = washer ? tr('Ημερήσιο έντυπο δοκιμών πλυντηρίων') : tr('Ημερήσιο έντυπο δοκιμών κλιβάνων');
-  const meta = [
-    [tr('Νοσοκομείο'), trData(hospital) || '—'],
-    [tr('Ημερομηνία'), day],
-    [washer ? tr('Πλυντήρια') : tr('Κλίβανοι'), String(machines.filter(m => !m.outOfService).length)],
-  ]
-    .map(([k, v]) => `<div><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></div>`)
-    .join('');
+  // The hospital is the sheet's head and the day its title: only how many machines are on it is added.
+  const inUse = machines.filter(m => !m.outOfService).length;
+  const count = `${washer ? tr('Πλυντήρια') : tr('Κλίβανοι')}: ${inUse}`;
   return `<!doctype html><html lang="${getI18nLang()}"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>
 @page{size:A4 landscape;margin:10mm 11mm 12mm;@bottom-right{content:counter(page) " / " counter(pages);font:7pt Arial,sans-serif;color:#667}}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#15232b;font-size:9pt}
@@ -93,9 +89,8 @@ export function dailyTestLogHtml(
 .brand-row{display:flex;align-items:center;min-height:9mm}.brand{font-size:13pt;font-weight:800;letter-spacing:.03em;color:#1d6b7a}.logo{max-height:11mm;max-width:55mm;object-fit:contain}
 @media screen{html{background:#eef2f5}body{max-width:297mm;margin:6mm auto;padding:10mm 11mm;background:#fff;box-shadow:0 1mm 4mm rgba(0,0,0,.08)}}.doc{font-size:7pt;font-weight:700;letter-spacing:.12em;color:#5f707b;text-transform:uppercase;margin-top:2mm}
 h1{margin:1mm 0 0;font-size:15pt;line-height:1.15}
-.meta{display:grid;grid-template-columns:2fr 2fr 1fr;margin:4mm 0;border:.25mm solid #d7e0e5;border-radius:2mm;overflow:hidden}.meta div{padding:2mm 3mm;border-right:.25mm solid #e3e9ec}.meta div:last-child{border-right:0}.meta b{display:block;font-size:6.5pt;font-weight:700;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.6mm}.meta span{font-size:9pt;font-weight:700}
 table{width:100%;border-collapse:collapse;table-layout:fixed}thead th{background:#eef3f5;color:#5f707b;font-size:6.5pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:2mm;border-bottom:.3mm solid #c9d4da}
-td{padding:1.6mm 2mm;border-bottom:.25mm solid #e1e7ea;height:13mm;vertical-align:middle}
+td{padding:1.6mm 2mm;border-bottom:.25mm solid #e1e7ea;height:22mm;vertical-align:middle}tr.none td{height:11mm}
 tr{page-break-inside:avoid;break-inside:avoid}
 th.machine{width:38mm}td.machine{font-weight:800;font-size:10pt;border-right:.25mm solid #e1e7ea;background:#f8fafb}
 th.name{width:44mm}td.name{font-weight:700}td.name small{display:block;font-weight:400;font-size:7pt;color:#6a7a84;margin-top:.5mm}
@@ -103,11 +98,11 @@ th.time{width:16mm}th.res{width:44mm}th.who{width:46mm}
 td.res{font-size:8pt;color:#3d4f5a}td.res.ok{color:#1b7a43;font-weight:700}td.res.bad{color:#b4232a;font-weight:700}
 .box{display:inline-block;width:3.2mm;height:3.2mm;border:.3mm solid #7d8d96;border-radius:.6mm;margin:0 1mm -.6mm 0}.box.gap{margin-left:3mm}
 tr.none td.name{font-weight:600;color:#6a7a84}td.strip{border-left:.25mm dashed #b8c4ca;border-right:.25mm dashed #b8c4ca}td.who{font-weight:700}
-.foot{display:flex;justify-content:space-between;margin-top:3mm;font-size:7pt;color:#6a7a84}
+.foot{display:flex;justify-content:space-between;margin-top:3mm;font-size:7pt;color:#6a7a84}.sign{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8mm;margin-top:8mm;break-inside:avoid}.sign div{padding-top:14mm;border-bottom:.3mm solid #7d8d96;font-size:7pt;color:#6a7a84}.sign span{display:block;transform:translateY(4.5mm)}
 </style></head><body>
-<div class="top"><div class="brand-row">${brand}</div><div class="doc">${escapeHtml(title)}</div><h1>${escapeHtml(day)}</h1></div>
-<div class="meta">${meta}</div>
-<table><thead><tr><th class="machine">${escapeHtml(washer ? tr('Πλυντήριο') : tr('Κλίβανος'))}</th><th class="name">${escapeHtml(tr('Δοκιμή'))}</th><th class="time">${escapeHtml(tr('Ώρα'))}</th><th class="res">${escapeHtml(tr('Αποτέλεσμα'))}</th><th>${escapeHtml(tr('Επικολλήστε τον δείκτη'))}</th><th class="who">${escapeHtml(tr('Ονοματεπώνυμο χρήστη'))}</th></tr></thead><tbody>${lines.join('')}</tbody></table>
+<div class="top"><div class="brand-row">${brand}</div><div class="doc">${escapeHtml(title)} · ${escapeHtml(count)}</div><h1>${escapeHtml(day)}</h1></div>
+<table><thead><tr><th class="machine">${escapeHtml(washer ? tr('Πλυντήριο') : tr('Κλίβανος'))}</th><th class="name">${escapeHtml(tr('Δοκιμή'))}</th><th class="time">${escapeHtml(tr('Ώρα'))}</th><th class="res">${escapeHtml(tr('Αποτέλεσμα'))}</th><th>${escapeHtml(tr('Επικολλήστε τον δείκτη'))}</th><th class="who">${escapeHtml(tr('Ονοματεπώνυμο & υπογραφή'))}</th></tr></thead><tbody>${lines.join('')}</tbody></table>
 <div class="foot"><span>${escapeHtml(tr('Ό,τι καταγράφηκε σήμερα στην εφαρμογή είναι ήδη συμπληρωμένο· τα υπόλοιπα συμπληρώνονται με το χέρι.'))}</span><span>${escapeHtml(washer ? tr('Εσφαλμένη δοκιμή: το πλυντήριο δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.') : tr('Εσφαλμένη δοκιμή: ο κλίβανος δεν χρησιμοποιείται μέχρι επιτυχή επανάληψη.'))}</span></div>
+<div class="sign"><div><span>${escapeHtml(tr('Έλεγχος υπευθύνου · Ονοματεπώνυμο'))}</span></div><div><span>${escapeHtml(tr('Υπογραφή'))}</span></div><div><span>${escapeHtml(tr('Ώρα'))}</span></div></div>
 </body></html>`;
 }
