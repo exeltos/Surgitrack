@@ -306,34 +306,14 @@ html body .reports-category {
   padding: 7px 16px 9px;
   border: 0;
   background: transparent;
-  color: var(--c-gray-45);
   font: inherit;
   font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
 }
 html body .reports-category b {
   font-size: 11px;
   font-weight: 600;
   color: var(--c-gray-65);
-}
-html body .reports-category:hover {
-  color: var(--c-blue-10);
-}
-/* As every other row of tabs: the chosen one dark, a little bolder, a short rounded bar under its words. */
-html body .reports-category.active {
-  color: var(--c-blue-10);
-  font-weight: 650;
-}
-html body .reports-category.active::after {
-  content: '';
-  position: absolute;
-  right: 10px;
-  bottom: -1px;
-  left: 10px;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--c-cyan-35);
 }
 html body .reports-category:focus-visible {
   outline: 2px solid var(--c-cyan-65);
@@ -488,24 +468,36 @@ html body .reports-page-workspace .reports-catalog-item {
   align-items: center;
   gap: 7px;
   min-height: 0;
-  padding: 9px 12px;
+  position: relative;
+  padding: 9px 18px;
   border: 0;
-  border-bottom: 2px solid transparent;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  color: var(--c-cyan-40-2);
-  font-size: 13.5px;
-  font-weight: 600;
+  color: var(--c-gray-45);
+  font-size: 14px;
+  font-weight: 400;
 }
 html body .reports-page-workspace .reports-catalog-item:hover {
   background: transparent;
-  color: var(--c-cyan-35);
+  color: var(--c-blue-10);
 }
+/* As every other row of tabs: words only, the chosen one near-black with a thin bar turned up at its ends. */
 html body .reports-page-workspace .reports-catalog-item.active {
-  border-bottom-color: var(--c-cyan-35);
   background: transparent;
-  color: var(--c-cyan-35);
+  color: var(--c-blue-10);
+  font-weight: 600;
+}
+html body .reports-page-workspace .reports-catalog-item.active::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: -1px;
+  left: 4px;
+  height: 5px;
+  border: 2px solid var(--c-blue-35-2);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
 }
 html body .reports-page-workspace .reports-catalog-item small {
   display: none;
@@ -517,7 +509,7 @@ html body .reports-page-workspace .reports-catalog-item strong {
 }
 html body .reports-page-workspace .reports-catalog-icon,
 html body .reports-page-workspace .reports-catalog-item.active .reports-catalog-icon {
-  display: inline-flex;
+  display: none;
   width: auto;
   height: auto;
   padding: 0;

@@ -4558,45 +4558,73 @@ html body .network-log td {
   color: var(--st-ink, inherit);
 }
 
-/* Every row of tabs the same way: the others grey and plain, the chosen one dark and a little bolder, with a short
-   rounded bar under its words; a thin line under the whole row. */
-html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs) {
+/* Every row of tabs the same way: words only, the others grey and plain, the chosen one near-black and a little
+   bolder, with a thin rounded bar under its words that turns up at its ends; a thin line under the whole row. */
+html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories) {
+  gap: 8px;
   border-bottom: 1px solid var(--c-gray-90);
 }
-html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs) > :is(button, a) {
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a) {
   position: relative;
+  padding-right: 18px;
+  padding-left: 18px;
   border: 0;
-  border-bottom: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
   color: var(--c-gray-45);
-  font-weight: 500;
+  font-weight: 400;
 }
-html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs) > :is(button, a):hover {
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a)
+  > svg {
+  display: none;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a)
+  > b {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: inherit;
+  opacity: 0.7;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a):hover {
   color: var(--c-blue-10);
   background: transparent;
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs)
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
   > :is(button.active, a.active, [aria-selected='true']) {
   color: var(--c-blue-10);
-  font-weight: 650;
+  font-weight: 600;
   background: transparent;
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs)
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
   > :is(button.active, a.active, [aria-selected='true'])::after {
   content: '';
   position: absolute;
-  right: 10px;
+  right: 4px;
   bottom: -1px;
-  left: 10px;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--c-cyan-35);
+  left: 4px;
+  height: 5px;
+  border: 2px solid var(--c-blue-35-2);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: transparent;
 }
 /* The tabs of a Set's or an instrument's page: as wide as their words, left, as every other row of tabs (they were
    five equal columns, the chosen one's bar as wide as a fifth of the card). */
